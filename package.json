@@ -1,0 +1,29 @@
+{
+  "name": "the-valley",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Valley — idle simulation of a medieval village. See docs/design.md.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:balance": "vitest run --config vitest.balance.config.ts",
+    "chronicle": "tsx src/cli/chronicle.ts",
+    "shots": "playwright test --config playwright.config.ts",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.17.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.18.0",
+    "vite": "^6.0.0",
+    "vitest": "^2.1.0"
+  }
+}

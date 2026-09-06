@@ -1,0 +1,16 @@
+// Suite de balance. Simula siglos; se lanza aparte (design.md §14.2).
+import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
+
+export default defineConfig({
+  resolve: {
+    alias: { '@engine': fileURLToPath(new URL('./src/engine', import.meta.url)) },
+  },
+  test: {
+    globals: true,
+    include: ['tests/balance/**/*.test.ts'],
+    testTimeout: 600_000,
+    hookTimeout: 600_000,
+    reporters: 'default',
+  },
+});

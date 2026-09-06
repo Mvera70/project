@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+artifacts/
+!artifacts/.gitkeep
+.DS_Store
+*.local
+.vite/
