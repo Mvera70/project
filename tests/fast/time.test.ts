@@ -2,16 +2,11 @@
 // año, cuatro estaciones de doce. Los bordes son lo que importa, porque el paso
 // 2 del tick (§4.2) sólo dispara en week === 0 y la cosecha sólo en la 35.
 import { describe, expect, it } from 'vitest';
-import type { Season } from '@engine/time';
-import {
-  SEASONS,
-  WEEKS_PER_SEASON,
-  WEEKS_PER_YEAR,
-  clockOf,
-  seasonOf,
-  weekOf,
-  yearOf,
-} from '@engine/time';
+import { TIME } from '@engine/balance';
+import type { Season } from '@engine/state';
+import { SEASONS, clockOf, seasonOf, weekOf, yearOf } from '@engine/time';
+
+const { WEEKS_PER_SEASON, WEEKS_PER_YEAR } = TIME;
 
 describe('time · unidades', () => {
   it('el año tiene cuatro estaciones de doce semanas', () => {

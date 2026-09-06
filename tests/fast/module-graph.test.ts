@@ -1,0 +1,60 @@
+// M-02 · El grafo de dependencias del motor. Obligatorio y acíclico.
+//
+// El orden importa porque state.ts es el contrato que M-03 a M-06 van a
+// importar en paralelo. Un ciclo aquí no rompe la compilación —con
+// verbatimModuleSyntax los `import type` se borran— pero sí rompe la posibilidad
+// de razonar sobre qué depende de qué, y es la clase de deuda que se nota
+// cuando ya la han heredado cinco módulos.
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+
+const ENGINE = fileURLToPath(new URL('../../src/engine/', import.meta.url));
+
+/** Los módulos del motor a los que apunta un fichero, por su ruta relativa. */
+function importsOf(file: string): string[] {
+  const src = readFileSync(ENGINE + file, 'utf8');
+  return [...src.matchAll(/from\s+'([^']+)'/g)]
+    .map((m) => m[1] ?? '')
+    .filter((s) => s.startsWith('.'))
+    .map((s) => s.replace(/^\.\.?\//, '').replace(/^\.\//, ''));
+}
+
+describe('grafo de módulos del motor', () => {
+  it('rng.ts no importa nada', () => {
+    expect(importsOf('rng.ts')).toEqual([]);
+  });
+
+  it('balance.ts no importa nada', () => {
+    // Todos los números del juego, sin dependencias: cualquiera puede leerlo.
+    expect(importsOf('balance.ts')).toEqual([]);
+  });
+
+  it('state.ts sólo importa de rng.ts', () => {
+    expect(importsOf('state.ts')).toEqual(['rng']);
+  });
+
+  it('schema.ts sólo importa de state.ts, nunca al revés', () => {
+    // La dirección es ésta y no la contraria porque §8 necesita seis tipos de
+    // §3 (Season, Role, Trait, BuildingKind, StatName, MemoryKind) y §3 sólo
+    // necesita uno de §8, Condition — que por eso vive en state.ts.
+    expect(importsOf('crossroads/schema.ts')).toEqual(['state']);
+    expect(importsOf('state.ts')).not.toContain('crossroads/schema');
+  });
+
+  it('time.ts importa de balance.ts y de state.ts', () => {
+    expect(importsOf('time.ts').sort()).toEqual(['balance', 'state']);
+  });
+
+  it('ningún módulo del motor se importa a sí mismo', () => {
+    for (const [file, self] of [
+      ['rng.ts', 'rng'],
+      ['balance.ts', 'balance'],
+      ['state.ts', 'state'],
+      ['time.ts', 'time'],
+      ['crossroads/schema.ts', 'schema'],
+    ] as const) {
+      expect(importsOf(file), file).not.toContain(self);
+    }
+  });
+});

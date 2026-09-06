@@ -1,0 +1,119 @@
+// M-02 · The crossroad template schema. design.md §8.1, §8.3, §8.4, §8.5.
+//
+// Types and nothing else. M-07 writes the logic (evaluation, casting,
+// selection, resolution) in the other files of this folder; M-08 writes the
+// catalogue against these declarations.
+//
+// Op and Condition are not here but in state.ts: PlantedSeed depends on
+// Condition, and putting the DSL here would make the two files import each
+// other. This file imports from state.ts, never the reverse.
+
+import type {
+  BuildingKind,
+  Condition,
+  MemoryKind,
+  Role,
+  StatName,
+  Trait,
+} from '../state';
+
+// ---------------------------------------------------------------------------
+// §8.1 · Template
+// ---------------------------------------------------------------------------
+
+export type CrossroadCategory =
+  | 'famine'
+  | 'plague'
+  | 'lord'
+  | 'feud'
+  | 'faith'
+  | 'forest'
+  | 'stranger'
+  | 'succession';
+
+export interface CrossroadTemplate {
+  id: string; // 'winter_grain_debt'
+  category: CrossroadCategory;
+  weight: number; // base selection weight
+  cooldownYears: number; // cannot repeat before this
+  maxPerGame?: number;
+  minYear?: number;
+  requires: Condition[]; // ALL must hold
+  cast: CastSpec[];
+  title: string; // key into the text bank
+  body: string; // key into the text bank
+  options: CrossroadOption[]; // 2 or 3
+}
+
+/**
+ * `visible` is mandatory and must not be empty. A test walks the catalogue and
+ * fails if any option changes nothing on screen — principle 1 of the game
+ * turned into an assertion (design.md §8.1).
+ */
+export interface CrossroadOption {
+  id: string;
+  label: string; // key: the verb, 1-3 words
+  cost: string; // key: the price, visible before choosing
+  effects: Effect[];
+  visible: VisualEffect[]; // MANDATORY, length >= 1
+  seeds: SeedSpec[];
+  requires?: Condition[]; // the option may be unavailable
+  traitWeight?: Partial<Record<Trait, number>>; // casting weighs, it does not decide
+}
+
+// ---------------------------------------------------------------------------
+// §8.3 · Casting
+//
+// Binds letters to actual villagers. If a part cannot be filled, the template
+// is not eligible.
+// ---------------------------------------------------------------------------
+
+export type CastSpec =
+  | { as: string; role: Role }
+  | { as: string; anyNamed: true; excluding?: string[] }
+  | { as: string; grudgeAgainst: string } // the one who hates them most
+  | { as: string; childOf: string }
+  | { as: string; youngestNamed: true; female?: boolean };
+
+// ---------------------------------------------------------------------------
+// §8.4 · Effects
+// ---------------------------------------------------------------------------
+
+export type Effect =
+  | { k: 'stat'; stat: StatName; delta: number }
+  | { k: 'stat'; stat: StatName; mul: number }
+  | { k: 'kill'; who: 'random' | 'weakest' | string; count: number | 'fraction'; fraction?: number }
+  | { k: 'arrive'; count: number }
+  | { k: 'flag'; flag: string; years: number } // 0 = permanent
+  | { k: 'build'; kind: BuildingKind; free: true }
+  | { k: 'destroy'; kind: BuildingKind; count: number }
+  | { k: 'opinion'; from: string; to: string; delta: number }
+  | { k: 'memory'; who: string; kind: MemoryKind; about?: string; weight: number }
+  | { k: 'role'; who: string; role: Role | null }
+  | { k: 'lit'; kind: BuildingKind; on: boolean };
+
+/** What the option changes on screen. Never empty. */
+export type VisualEffect =
+  | { k: 'raise'; kind: BuildingKind }
+  | { k: 'ruin'; kind: BuildingKind }
+  | { k: 'banner'; colour: string; years: number } // a banner over the core
+  | { k: 'douse'; kind: BuildingKind } // put a building's fire out
+  | { k: 'gather'; where: 'square' | 'chapel' | 'ford'; days: number }
+  | { k: 'scar'; what: 'burnt_field' | 'grave_row' | 'felled_wood' };
+
+// ---------------------------------------------------------------------------
+// §8.5 · Seeds — the deferred consequence
+//
+// Half the design. Without it a crossroad is a menu of modifiers; with it, it
+// is a decision. When it comes due the chronicle entry quotes the decision that
+// planted it, with the year.
+// ---------------------------------------------------------------------------
+
+export interface SeedSpec {
+  id: string;
+  delayYears: [number, number]; // drawn within the range
+  condition?: Condition; // if it fails when due, the seed withers
+  effects: Effect[];
+  visible: VisualEffect[];
+  chronicleKey: string; // the text that links back to the original decision
+}
