@@ -258,8 +258,22 @@ export const TRAIT_COUNT = [3, 4] as const;
 // ---------------------------------------------------------------------------
 
 export const PEOPLE = {
-  // TUNE: §3.4 caps namedIds at eight in a comment and §6.1 says "six at the
-  // founding, up to eight", but the number is in neither §12 nor §7.2 and
-  // promoteToNamed has to enforce it.
+  /** §6.1: how many people the player can hold in their head at once. */
   MAX_NAMED: 8,
+  /**
+   * The age floor for taking an office. §6.2 weighs age when filling a
+   * vacancy but said nothing about the founding, and without a floor the
+   * village was founded by seventeen-year-old midwives.
+   *
+   * `herbalist` and `stranger` have no floor: one arises out of need, the
+   * other walks in from outside.
+   */
+  ROLE_MIN_AGE: {
+    leader: 25,
+    midwife: 28,
+    priest: 25,
+    smith: 20,
+    woodward: 18,
+    reeve: 22,
+  },
 } as const;

@@ -15,6 +15,7 @@ import {
   ageOf,
   foundPeople,
   makeVillager,
+  minAgeFor,
   promoteToNamed,
 } from '@engine/people/villagers';
 
@@ -236,6 +237,64 @@ describe('fundación', () => {
     }
   });
 
+  it('nadie toma un oficio por debajo de su edad mínima habiendo quien lo cumpla', () => {
+    // §12.4 ROLE_MIN_AGE. Sin suelo salían comadronas de diecisiete años. El
+    // respaldo —el de más edad disponible— sólo puede saltar cuando NADIE lo
+    // cumple: un oficio joven es mejor que un oficio vacante, pero sólo
+    // entonces.
+    let fallbacks = 0;
+    const SEEDS = 500;
+    for (let seed = 0; seed < SEEDS; seed += 1) {
+      const p = foundPeople(makeBundle(seed), 0);
+      for (const role of FOUNDING_ROLES) {
+        const v = p.villagers.find((x) => x.role === role);
+        expect(v, `semilla ${seed} · ${role}`).toBeDefined();
+        const holder = v as Villager;
+        if (ageOf(holder, 0) >= minAgeFor(role)) continue;
+
+        fallbacks += 1;
+        const spare = p.villagers.filter(
+          (x) =>
+            x.role === null &&
+            ageOf(x, 0) >= FOUNDING.AGE_RANGES.adults[0] &&
+            ageOf(x, 0) <= FOUNDING.AGE_RANGES.adults[1] &&
+            (role !== 'midwife' || x.female) &&
+            ageOf(x, 0) >= minAgeFor(role),
+        );
+        expect(spare, `semilla ${seed} · ${role} tenía candidato de sobra`).toEqual([]);
+      }
+    }
+    // Y el respaldo tiene que ser una rareza, no la vía normal.
+    expect(fallbacks / (SEEDS * FOUNDING_ROLES.length)).toBeLessThan(0.01);
+  });
+
+  it('cada oficio va al más viejo que lo cumple, no a uno cualquiera', () => {
+    // La comadrona (suelo 28) reparte primero por ser la más exigente y la
+    // única con requisito de sexo; nadie puede llevarse a la anciana que
+    // necesitaba.
+    for (const seed of [7, 42, 108, 999, 2024]) {
+      const p = foundPeople(makeBundle(seed), 0);
+      const midwife = p.villagers.find((x) => x.role === 'midwife');
+      const olderWomen = p.villagers.filter(
+        (x) =>
+          x.female &&
+          x.id !== midwife?.id &&
+          ageOf(x, 0) > ageOf(midwife as Villager, 0) &&
+          ageOf(x, 0) <= FOUNDING.AGE_RANGES.adults[1] &&
+          ageOf(x, 0) >= FOUNDING.AGE_RANGES.adults[0],
+      );
+      expect(olderWomen, `semilla ${seed}`).toEqual([]);
+    }
+  });
+
+  it('los seis oficios siguen cubiertos aunque el suelo apriete', () => {
+    // Un oficio joven es mejor que un oficio vacante en la fundación.
+    for (let seed = 0; seed < 500; seed += 1) {
+      const p = foundPeople(makeBundle(seed), 0);
+      expect(p.namedIds.length, `semilla ${seed}`).toBe(FOUNDING_ROLES.length);
+    }
+  });
+
   it('garantiza mujeres fértiles suficientes en 1 000 semillas', () => {
     // Una fundación que no puede reproducirse es una partida muerta al nacer.
     for (let seed = 0; seed < 1000; seed += 1) {
@@ -424,6 +483,21 @@ describe('promoteToNamed', () => {
     // Y la opinión es recíproca: los demás también lo ven llegar.
     for (const other of living) expect(other.opinions[id]).toBe(0);
     expect(dead.opinions[id]).toBeUndefined();
+  });
+
+  it('no asciende a quien no tiene edad para el oficio', () => {
+    const s = stateOf(7);
+    const before = [...s.people.namedIds];
+    const young = s.people.villagers.find(
+      (v) => !v.named && ageOf(v, s.tick) < minAgeFor('leader'),
+    );
+    if (young === undefined) throw new Error('la fundación no dejó a nadie joven');
+    promoteToNamed(s, young.id, 'leader');
+    expect(s.people.namedIds).toEqual(before);
+    expect(young.named).toBe(false);
+    // El mismo aldeano sí puede ser herbalist: ese oficio no tiene suelo.
+    promoteToNamed(s, young.id, 'herbalist');
+    expect(young.named).toBe(true);
   });
 
   it('no asciende a un muerto, ni a quien ya tiene nombre, ni a un desconocido', () => {

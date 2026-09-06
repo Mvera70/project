@@ -659,6 +659,13 @@ intencionado.** Que cada rasgo tenga un número asociado convierte a los
 personajes en un árbol de habilidades, que es justo lo que `valle.md` §9
 descarta.
 
+**Rasgos mutuamente excluyentes.** `hardy` y `frail` son ×0.7 y ×1.6 sobre la
+misma tasa de mortalidad: tenerlos los dos no es un personaje contradictorio,
+es un personaje cuyo multiplicador queda en 1.12 sin que nada lo explique.
+Ningún nombrado sale con ambos. El sorteo lo garantiza por construcción, no por
+un reintento: al elegir uno se retira el otro de la bolsa. La lista de pares
+opuestos vive en `traits.ts` como `OPPOSED`; hoy tiene una sola entrada.
+
 ### 6.4 Memoria y opiniones
 
 Los nombrados guardan hasta 12 memorias. Cada una tiene peso 1–5 y decae
@@ -1393,6 +1400,14 @@ export const LIFE = {
   HARDY: 0.7, FRAIL: 1.6,
 } as const;
 
+export const PEOPLE = {
+  MAX_NAMED: 8,                 // §6.1; cuánta gente cabe en la cabeza del jugador
+  ROLE_MIN_AGE: {               // edad mínima para tomar el oficio
+    leader: 25, midwife: 28, priest: 25,
+    smith: 20, woodward: 18, reeve: 22,
+  },
+} as const;
+
 export const MIGRATION = {
   ARRIVE_CHANCE: 0.30,
   ARRIVE_MIN_PEOPLE: 8,
@@ -1408,6 +1423,19 @@ export const MIGRATION = {
 **Aforo máximo: 80.** 16 casas × 5. Coincide con el tope de figuras del render y
 con la escala de `valle.md` §7: no es casualidad, es la misma cifra vista desde
 tres sitios.
+
+**`MAX_NAMED` no es una perilla.** Ocho es la decisión de §6.1 sobre cuánta
+gente puede el jugador tener en la cabeza a la vez, no un número que se ajuste
+buscando una curva. Estaba solo en prosa, que era un fallo del documento.
+
+**`ROLE_MIN_AGE` y la fundación.** §6.2 pondera por edad al cubrir una vacante,
+pero no decía nada del reparto fundacional, y sin un suelo salían comadronas de
+diecisiete años. Cada oficio va al adulto **de mayor edad** que cumpla su
+mínimo; si ninguno lo cumple —raro con trece adultos de 16 a 45, pero no
+imposible— va al de más edad disponible antes que quedar vacante. Los oficios se
+reparten en orden decreciente de exigencia, de modo que el más difícil de cubrir
+elige primero. `herbalist` y `stranger` no tienen suelo: el primero surge de la
+necesidad y el segundo llega de fuera.
 
 ### 12.5 Desastres
 

@@ -10,7 +10,7 @@
 
 import { FOUNDING, LIFE, PEOPLE, TIME } from '../balance';
 import type { RngBundle } from '../rng';
-import { int, next, pick } from '../rng';
+import { int, next } from '../rng';
 import type {
   BuildingId,
   GameState,
@@ -33,9 +33,43 @@ export const FOUNDING_ROLES: readonly Role[] = [
   'reeve',
 ] as const;
 
+/**
+ * The founding offices again, hardest to fill first. Ties keep the order of
+ * §6.2, so the listing order of the spec is still what breaks them.
+ */
+const ROLES_BY_DEMAND: readonly Role[] = [...FOUNDING_ROLES].sort(
+  (a, b) => minAgeFor(b) - minAgeFor(a),
+);
+
 /** Years lived by tick `tick`. Everyone has a birthday at once, in week 0. */
 export function ageOf(v: Villager, tick: number): number {
   return Math.floor((tick - v.bornTick) / TIME.WEEKS_PER_YEAR);
+}
+
+/** The age floor of a role, or 0 for the roles §12.4 leaves without one. */
+export function minAgeFor(role: Role): number {
+  const floors: Partial<Record<Role, number>> = PEOPLE.ROLE_MIN_AGE;
+  return floors[role] ?? 0;
+}
+
+/**
+ * The oldest of `ids` who clears the role's floor; if nobody does, the oldest
+ * of them anyway — an office held young beats an office left vacant at the
+ * founding. Ties go to the lowest id, so the choice is total and deterministic.
+ */
+function oldestFor(
+  villagers: readonly Villager[],
+  ids: readonly VillagerId[],
+  role: Role,
+  tick: number,
+): VillagerId | undefined {
+  const floor = minAgeFor(role);
+  const byAge = [...ids].sort((a, b) => {
+    const ageA = ageOf(villagers[a] as Villager, tick);
+    const ageB = ageOf(villagers[b] as Villager, tick);
+    return ageB - ageA || a - b;
+  });
+  return byAge.find((id) => ageOf(villagers[id] as Villager, tick) >= floor) ?? byAge[0];
 }
 
 export interface VillagerSpec {
@@ -144,20 +178,21 @@ export function foundPeople(b: RngBundle, tick: number): PeopleState {
     }),
   );
 
-  // 4 · Who holds which office. The midwife is drawn first because she is the
-  // only role with a requirement (§6.2: an adult woman inherits it); leaving
-  // her last could find no eligible adult left.
-  const free = new Set<number>(villagers.slice(0, FOUNDING.ADULTS).map((v) => v.id));
+  // 4 · Who holds which office. Each goes to the oldest adult who clears its
+  // floor (§12.4 ROLE_MIN_AGE); if nobody clears it, to the oldest available
+  // rather than leaving the office vacant. The offices are filled in order of
+  // decreasing demand so that the hardest to fill chooses first — the midwife
+  // is both the oldest floor and the only one with a sex requirement (§6.2),
+  // so she is served before anyone can take the elder she needed.
+  const free = new Set<VillagerId>(villagers.slice(0, FOUNDING.ADULTS).map((v) => v.id));
   const holder: Partial<Record<Role, VillagerId>> = {};
 
-  const women = [...free].filter((id) => villagers[id]?.female === true);
-  const midwifeId = pick(b, 'names', women);
-  holder.midwife = midwifeId;
-  free.delete(midwifeId);
-
-  for (const role of FOUNDING_ROLES) {
-    if (role === 'midwife') continue;
-    const id = pick(b, 'names', [...free]);
+  for (const role of ROLES_BY_DEMAND) {
+    const eligible = [...free].filter(
+      (id) => role !== 'midwife' || villagers[id]?.female === true,
+    );
+    const id = oldestFor(villagers, eligible, role, tick);
+    if (id === undefined) continue;
     holder[role] = id;
     free.delete(id);
   }
@@ -209,6 +244,7 @@ export function promoteToNamed(state: GameState, id: VillagerId, role: Role): vo
   const v = people.villagers.find((x) => x.id === id);
   if (v === undefined || v.diedTick !== null || v.named) return;
   if (people.namedIds.length >= PEOPLE.MAX_NAMED) return;
+  if (ageOf(v, state.tick) < minAgeFor(role)) return; // §12.4 ROLE_MIN_AGE
 
   const living = people.namedIds
     .map((nid) => people.villagers.find((x) => x.id === nid))
