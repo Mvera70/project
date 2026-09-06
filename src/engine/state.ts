@@ -103,6 +103,7 @@ export interface Villager {
   bornTick: number;
   diedTick: number | null;
   causeOfDeath: DeathCause | null;
+  leftTick: number | null; // walked out of the valley (§5.7); not dead
   traits: Trait[]; // 3..4, only on the named
   homeId: BuildingId | null;
   parentIds: [VillagerId | null, VillagerId | null];
@@ -330,6 +331,39 @@ export interface EndState {
   cause: 'extinction';
   lastId: VillagerId | null; // the last to die, quoted by the chronicle
 }
+
+// ---------------------------------------------------------------------------
+// The tick context and what the systems report
+//
+// TickContext carries what one step of the tick computed and the next steps
+// read. Demography consumes it; M-06 produces it. Passing it explicitly is what
+// keeps step 12 from having to recompute the hunger of step 7.
+// ---------------------------------------------------------------------------
+
+export interface TickContext {
+  severity: number; // 0..1, this week's hunger (§5.3)
+  cold: boolean; // winter with the firewood gone (§5.4)
+  outbreak: Outbreak | null; // the running plague, if any (§5.8)
+}
+
+export interface DeathEvent {
+  id: VillagerId;
+  cause: DeathCause;
+  age: number;
+  named: boolean;
+  role: Role | null;
+}
+
+export interface BirthEvent {
+  id: VillagerId;
+  motherId: VillagerId;
+  fatherId: VillagerId | null;
+  female: boolean;
+}
+
+export type MigrationEvent =
+  | { kind: 'arrival'; ids: VillagerId[] }
+  | { kind: 'departure'; ids: VillagerId[] };
 
 // ---------------------------------------------------------------------------
 // §3.1 · Root state

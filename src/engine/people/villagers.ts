@@ -20,6 +20,7 @@ import type {
   Villager,
   VillagerId,
 } from '../state';
+import { yearOf } from '../time';
 import { makeName } from './names';
 import { rollTraits } from './traits';
 
@@ -41,9 +42,16 @@ const ROLES_BY_DEMAND: readonly Role[] = [...FOUNDING_ROLES].sort(
   (a, b) => minAgeFor(b) - minAgeFor(a),
 );
 
-/** Years lived by tick `tick`. Everyone has a birthday at once, in week 0. */
+/**
+ * Years lived by tick `tick`.
+ *
+ * Calendar years, not weeks elapsed: everyone has their birthday at once, in
+ * week 0 (§6.5). That is the simplification the spec buys with it — it saves a
+ * field per villager and nobody can tell. Deriving it also means the age can
+ * never drift out of step with `bornTick`.
+ */
 export function ageOf(v: Villager, tick: number): number {
-  return Math.floor((tick - v.bornTick) / TIME.WEEKS_PER_YEAR);
+  return yearOf(tick) - yearOf(v.bornTick);
 }
 
 /** The age floor of a role, or 0 for the roles §12.4 leaves without one. */
@@ -101,6 +109,7 @@ export function makeVillager(spec: VillagerSpec): Villager {
     bornTick: spec.bornTick,
     diedTick: null,
     causeOfDeath: null,
+    leftTick: null,
     traits: [...(spec.traits ?? [])],
     homeId: spec.homeId ?? null,
     parentIds: [...(spec.parentIds ?? [null, null])] as [VillagerId | null, VillagerId | null],

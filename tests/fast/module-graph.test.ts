@@ -60,7 +60,15 @@ describe('grafo de módulos del motor', () => {
       'names',
       'rng',
       'state',
+      'time',
       'traits',
+    ]);
+    expect(importsOf('people/demography.ts')).toEqual([
+      'balance',
+      'rng',
+      'state',
+      'time',
+      'villagers',
     ]);
     expect(importsOf('state.ts')).not.toContain('people/villagers');
   });
@@ -75,6 +83,7 @@ describe('grafo de módulos del motor', () => {
       ['people/names.ts', 'names'],
       ['people/traits.ts', 'traits'],
       ['people/villagers.ts', 'villagers'],
+      ['people/demography.ts', 'demography'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }

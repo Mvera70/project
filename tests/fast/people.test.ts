@@ -540,6 +540,7 @@ describe('makeVillager', () => {
       bornTick: -480,
       diedTick: null,
       causeOfDeath: null,
+      leftTick: null,
       traits: [],
       homeId: null,
       parentIds: [null, null],

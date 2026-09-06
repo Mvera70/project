@@ -71,6 +71,11 @@ export const LABOUR = {
   SMITHY_BONUS: 1.2,
   WINTER_WOOD: 0.4, // per person and week
   COLD_MORTALITY: 1.4,
+  // TUNE: §5.2 writes the workforce formula inline and §12 keeps none of it.
+  // W = (adults 15-59) · 1.0 + (12-14 and 60-69) · 0.5
+  HALF_WORKER_YOUNG: [12, 14],
+  HALF_WORKER_OLD: [60, 69],
+  HALF_WORKER_SHARE: 0.5,
 } as const;
 
 /** Factor and probability. The probabilities add up to 1. */
@@ -115,6 +120,13 @@ export const MIGRATION = {
   ARRIVE_COUNT: [2, 4],
   LEAVE_BELOW_MORALE: 30,
   LEAVE_COUNT: [1, 3],
+  // TUNE: §5.7 writes the leaving chance inline as (30 - morale)/60.
+  LEAVE_SCALE: 60,
+  // TUNE: §5.7 says the arrivals are "a mix of young adults and children"
+  // without fixing either the ages or the mix. The children reuse
+  // FOUNDING.AGE_RANGES.children.
+  ARRIVE_ADULT_AGE: [16, 30],
+  ARRIVE_CHILD_SHARE: 0.35,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -130,6 +142,9 @@ export const DISASTER = {
   FIRE_CHANCE: 0.035, // annual
   FIRE_GRAIN_LOSS: 0.45, // if a granary burns
   FIRE_MORALE: -6,
+  // TUNE: §5.8 gives the weak band in prose: "4 years or under, or 60 or over".
+  PLAGUE_WEAK_MAX_AGE: 4,
+  PLAGUE_WEAK_MIN_AGE: 60,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -217,6 +232,30 @@ export const BUILDINGS = {
   stone_house: { w: 2, h: 2, wood: 0, stone: 50, bp: 70, cap: null, tier: 1, upgradeOf: 'house', byCrossroad: false }, // does not burn
   church: { w: 3, h: 3, wood: 0, stone: 120, bp: 200, cap: 1, tier: 1, upgradeOf: 'chapel', byCrossroad: false }, // MOOD.*_CHURCH
   watchtower: { w: 2, h: 2, wood: 0, stone: 60, bp: 90, cap: 2, tier: 1, upgradeOf: null, byCrossroad: true },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Births and deaths
+//
+// TUNE: §6.5 writes both formulas inline and §12.4 keeps only BIRTH_BASE and
+// the mortality table. The rest of those two formulas is transcribed here so
+// that no number of the game lives in a function.
+// ---------------------------------------------------------------------------
+
+export const BIRTH = {
+  FOOD_WEEKS: 24, // foodFactor = clamp(grain / (people · 24), 0, 1.2)
+  FOOD_FACTOR_MAX: 1.2,
+  MORALE_BASE: 0.6, // moraleFactor = 0.6 + 0.8 · morale/100
+  MORALE_SPAN: 0.8,
+  HOUSING_GOOD_BEDS: 3, // freeBeds >= 3 -> 1.3
+  HOUSING_GOOD: 1.3,
+  HOUSING_SOME_BEDS: 1, // freeBeds >= 1 -> 1.0
+  HOUSING_SOME: 1.0,
+  HOUSING_NONE: 0.15, // no free bed at all
+} as const;
+
+export const DEATH = {
+  HUNGER_MULT: 2, // weekly rate × (1 + 2 · severity)
 } as const;
 
 // ---------------------------------------------------------------------------
