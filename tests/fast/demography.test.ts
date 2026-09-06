@@ -22,7 +22,7 @@ import {
 import { ageOf, foundPeople, makeVillager } from '@engine/people/villagers';
 
 const CELLS = 36 * 56;
-const CALM: TickContext = { severity: 0, cold: false, outbreak: null };
+const CALM: TickContext = { severity: 0, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 };
 
 function house(id: number): Building {
   return {
@@ -229,13 +229,13 @@ describe('mortalidad · lo que la agrava', () => {
 
   it('el hambre multiplica la mortalidad', () => {
     const calm = tollOver(5, CALM, 11);
-    const hungry = tollOver(5, { severity: 1, cold: false, outbreak: null }, 11);
+    const hungry = tollOver(5, { severity: 1, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 }, 11);
     expect(hungry).toBeGreaterThan(calm * 2);
   });
 
   it('el frío la multiplica por 1.4', () => {
     const calm = tollOver(10, CALM, 12);
-    const cold = tollOver(10, { severity: 0, cold: true, outbreak: null }, 12);
+    const cold = tollOver(10, { severity: 0, cold: true, outbreak: null, deaths: 0, unexplainedDeaths: 0 }, 12);
     expect(cold).toBeGreaterThan(calm);
     expect(cold / calm).toBeGreaterThan(1.2);
     expect(cold / calm).toBeLessThan(1.6);
@@ -249,6 +249,8 @@ describe('mortalidad · lo que la agrava', () => {
       severity: 0,
       cold: false,
       outbreak: { startedTick: 1, endsTick: 1 + weeks, deaths: 0 },
+      deaths: 0,
+      unexplainedDeaths: 0,
     };
     const before = population(s);
     for (let i = 0; i < weeks; i += 1) {
@@ -266,6 +268,8 @@ describe('mortalidad · lo que la agrava', () => {
       severity: 0,
       cold: false,
       outbreak: { startedTick: 1, endsTick: 3, deaths: 0 },
+      deaths: 0,
+      unexplainedDeaths: 0,
     };
     for (let i = 0; i < 2; i += 1) {
       s.tick += 1;
@@ -666,7 +670,7 @@ describe('la aldea a lo largo de los años', () => {
   it('con severity 1 sostenido, deja de reproducirse y encoge', () => {
     // Sólo con la mortalidad de §6.5. La extinción en cinco años es del paso 7
     // (FOOD.STARVATION_RATE), que es de M-06 — ver el test siguiente.
-    const hungry: TickContext = { severity: 1, cold: false, outbreak: null };
+    const hungry: TickContext = { severity: 1, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 };
     for (let seed = 0; seed < 10; seed += 1) {
       const s = village(seed, 12);
       s.village.grain = 0;
@@ -684,7 +688,7 @@ describe('la aldea a lo largo de los años', () => {
 
   it('con el paso 7 de §5.3 encima, muere en menos de cinco años', () => {
     // La afirmación del brief, con el consumo de M-06 puesto a mano.
-    const hungry: TickContext = { severity: 1, cold: false, outbreak: null };
+    const hungry: TickContext = { severity: 1, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 };
     for (let seed = 0; seed < 10; seed += 1) {
       const s = village(seed, 12);
       s.village.grain = 0;

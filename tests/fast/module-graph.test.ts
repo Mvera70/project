@@ -73,6 +73,52 @@ describe('grafo de módulos del motor', () => {
     expect(importsOf('state.ts')).not.toContain('people/villagers');
   });
 
+  it('subsistence/ cuelga de people/ y de las hojas, nunca al revés', () => {
+    // M-06. buildings.ts es la única puerta a state.buildings; los cinco
+    // sistemas de §5 la usan y ninguno cuenta edificios por su cuenta.
+    expect(importsOf('subsistence/buildings.ts')).toEqual(['state']);
+    expect(importsOf('subsistence/seasons.ts')).toEqual(['balance', 'rng', 'state', 'time']);
+    expect(importsOf('subsistence/labour.ts')).toEqual([
+      'balance',
+      'buildings',
+      'people/demography',
+      'state',
+    ]);
+    expect(importsOf('subsistence/consumption.ts')).toEqual([
+      'balance',
+      'people/demography',
+      'people/villagers',
+      'rng',
+      'state',
+      'time',
+    ]);
+    expect(importsOf('subsistence/harvest.ts')).toEqual([
+      'balance',
+      'buildings',
+      'state',
+      'time',
+    ]);
+    expect(importsOf('subsistence/mood.ts')).toEqual([
+      'balance',
+      'buildings',
+      'people/demography',
+      'state',
+      'time',
+    ]);
+    expect(importsOf('subsistence/disasters.ts')).toEqual([
+      'balance',
+      'buildings',
+      'people/demography',
+      'rng',
+      'state',
+      'time',
+    ]);
+    // Y nadie de people/ mira hacia subsistence/.
+    for (const f of ['people/demography.ts', 'people/villagers.ts'] as const) {
+      expect(importsOf(f).some((x) => x.includes('subsistence')), f).toBe(false);
+    }
+  });
+
   it('ningún módulo del motor se importa a sí mismo', () => {
     for (const [file, self] of [
       ['rng.ts', 'rng'],
@@ -84,6 +130,13 @@ describe('grafo de módulos del motor', () => {
       ['people/traits.ts', 'traits'],
       ['people/villagers.ts', 'villagers'],
       ['people/demography.ts', 'demography'],
+      ['subsistence/buildings.ts', 'buildings'],
+      ['subsistence/labour.ts', 'labour'],
+      ['subsistence/consumption.ts', 'consumption'],
+      ['subsistence/harvest.ts', 'harvest'],
+      ['subsistence/mood.ts', 'mood'],
+      ['subsistence/seasons.ts', 'seasons'],
+      ['subsistence/disasters.ts', 'disasters'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }

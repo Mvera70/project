@@ -61,6 +61,17 @@ export const FOOD = {
   SPOILAGE: 0.08, // weekly, on the surplus
   STARVATION_RATE: 0.025, // deaths/week as a fraction, by severity
   MILL_BONUS: 1.15,
+  // TUNE: §5.2 writes neededFields inline as people · 48 · 1.3 / FIELD_YIELD.
+  // The 1.3 is the margin the village sows above what it eats.
+  NEEDED_FIELDS_MARGIN: 1.3,
+  // TUNE: the harvest's morale factor, written inline in §5.3 as
+  // (0.8 + 0.4 · morale/100). Runs 0.80 at despair to 1.20 at elation.
+  HARVEST_MORALE_BASE: 0.8,
+  HARVEST_MORALE_SPAN: 0.4,
+  // TUNE: §5.3 orders the starving "over 60 first, then under 5". Strictly
+  // over and strictly under, as written — note these are not §5.8's bands.
+  STARVE_ELDER_OVER: 60,
+  STARVE_CHILD_UNDER: 5,
 } as const;
 
 export const LABOUR = {
@@ -145,6 +156,13 @@ export const DISASTER = {
   // TUNE: §5.8 gives the weak band in prose: "4 years or under, or 60 or over".
   PLAGUE_WEAK_MAX_AGE: 4,
   PLAGUE_WEAK_MIN_AGE: 60,
+  // TUNE: §5.8 writes the annual chance inline as PLAGUE_BASE + people/2500.
+  // A bigger village is a likelier one to catch it.
+  PLAGUE_PER_PEOPLE: 2500,
+  // TUNE: §5.9 says the fire takes a wooden building at random "preferring the
+  // houses" without saying by how much. This is the weight a house carries
+  // against every other wooden building's 1.
+  FIRE_HOUSE_WEIGHT: 3,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -170,6 +188,8 @@ export const MOOD = {
   FAITH_DEVOUT_PRIEST: 0.1,
   FAITH_NO_PRIEST: -0.15,
   FAITH_OUTBREAK: -0.6,
+  // TUNE: §5.6 writes it inline as unexplainedDeathsThisTick · 0.30.
+  FAITH_UNEXPLAINED_DEATH: -0.3,
   MORALE_FLOOR_FROM_FAITH: 0.25,
 } as const;
 

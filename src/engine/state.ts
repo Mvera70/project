@@ -344,6 +344,48 @@ export interface TickContext {
   severity: number; // 0..1, this week's hunger (§5.3)
   cold: boolean; // winter with the firewood gone (§5.4)
   outbreak: Outbreak | null; // the running plague, if any (§5.8)
+  /**
+   * Deaths recorded so far this tick, which §5.5 charges to morale.
+   *
+   * MOOD is step 11 and DEATHS is step 12 (§4.2), so what mood can see are the
+   * deaths of steps 3, 4 and 7 — crossroads, seeds and starvation. M-10 fills
+   * these from the tick's event buffer.
+   */
+  deaths: number;
+  /** Of those, the ones with no worldly explanation. §5.6, see mood.ts. */
+  unexplainedDeaths: number;
+}
+
+/**
+ * How the week's labour was split. §5.2. Produced by M-06 in step 5 and read by
+ * steps 6 and 9; M-10 carries it between them.
+ */
+export interface Allocation {
+  workforce: number; // W
+  workedFields: number; // capped at what the village actually needs
+  farmers: number;
+  cutters: number;
+  builders: number;
+  labourFactor: number; // 0..1, how well the worked fields were manned
+}
+
+export interface HarvestResult {
+  happened: boolean; // false every week that is not HARVEST_WEEK
+  yielded: number;
+  workedFields: number;
+  weatherFactor: number;
+  labourFactor: number;
+}
+
+/**
+ * A fire that broke out. §5.9. Nothing has been destroyed yet: M-14 owns the
+ * buildings and executes this once it exists.
+ */
+export interface FireResult {
+  buildingId: BuildingId;
+  kind: BuildingKind;
+  grainLost: number;
+  moraleDelta: number;
 }
 
 export interface DeathEvent {
