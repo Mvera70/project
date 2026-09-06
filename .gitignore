@@ -1,7 +1,7 @@
 node_modules/
 dist/
 coverage/
-artifacts/
+artifacts/*
 !artifacts/.gitkeep
 .DS_Store
 *.local

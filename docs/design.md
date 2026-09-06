@@ -398,7 +398,7 @@ export type RngStream =
   | 'map' | 'weather' | 'births' | 'deaths' | 'plague'
   | 'crossroads' | 'cast' | 'names' | 'chronicle' | 'world';
 
-export interface RngBundle { [k in RngStream]: number }  // estado de 32 bits
+export type RngBundle = Record<RngStream, number>;  // estado de 32 bits por flujo
 ```
 
 Algoritmo: **mulberry32**, sembrado con `hash32(masterSeed, streamName)`.
@@ -1260,10 +1260,14 @@ exige `valle.md` §11.
 
 ## 12. Balance
 
-**Todos los números del juego están aquí y en ningún otro sitio.** Este capítulo
-se traduce literalmente a `src/engine/balance.ts`. Cualquier constante que un
-módulo necesite y no esté aquí se añade a ese fichero con `// TUNE:` y se
-menciona en el PR.
+**Todos los números del juego están aquí, con una excepción declarada.** Este
+capítulo se traduce literalmente a `src/engine/balance.ts`. La excepción es la
+**tabla de edificios de §7.2** —celdas, madera, obra, efecto y tope—, que
+también es balance y vive allí porque se lee junto al resto del sistema del
+valle; se transcribe a `balance.ts` como `BUILDINGS` y esa transcripción es la
+que consume el motor. Fuera de §12 y de esa tabla no hay ningún número del
+juego. Cualquier constante que un módulo necesite y no esté en ninguna de las
+dos se añade a `balance.ts` con `// TUNE:` y se menciona en el PR.
 
 Estos valores no son una hipótesis en bruto: salen de simular 60 semillas
 durante 200 años cada una y ajustar hasta cumplir los objetivos de §12.9. Siguen
