@@ -119,23 +119,23 @@ export interface Memory {
 
 /**
  * A grudge. Born when an opinion crosses -50, with its cause on record
- * (design.md §6.4). Stored rather than derived from `opinions` because the
- * cause and the tick are what the feud templates quote, and an opinion that
- * later drifts back above -50 does not unmake the memory of it.
+ * (design.md §3.4, §6.4). Stored rather than derived from `opinions` because
+ * the cause and the tick are what the feud templates quote.
  */
 export interface Grudge {
   fromId: VillagerId;
-  againstId: VillagerId;
-  sinceTick: number;
+  toId: VillagerId;
   cause: MemoryKind;
-  intensity: number; // 0..100, how far past -50 the opinion went
+  causeTick: number; // when the thing that caused it happened
+  formedTick: number; // when the opinion crossed -50
+  healedTick: number | null; // set when the opinion climbs back above -20
 }
 
 export interface PeopleState {
   villagers: Villager[]; // includes the dead; nobody is ever removed
   nextId: VillagerId;
   namedIds: VillagerId[]; // alive and named, max 8
-  grudges: Grudge[]; // design.md §6.4
+  grudges: Grudge[]; // append-only, same discipline as villagers
 }
 
 // ---------------------------------------------------------------------------

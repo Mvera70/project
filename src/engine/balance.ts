@@ -137,10 +137,7 @@ export const MOOD = {
   MORALE_CHAPEL: 0.15,
   MORALE_CHURCH: 0.3,
   MORALE_MILL: 0.05,
-  // TUNE: the graveyard's morale effect is quoted in the §7.2 table but is
-  // missing from §12.6. Transcribed here so that BUILDINGS holds no loose
-  // number of its own.
-  MORALE_GRAVEYARD: 0.05,
+  MORALE_GRAVEYARD: 0.05, // the effect §7.2 gives to `grave_yard`
   MORALE_OUTBREAK: -0.8,
   MORALE_HARVEST: 25, // × (weather factor − 1)
   FAITH_DRIFT_TO: 40,

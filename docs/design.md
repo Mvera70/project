@@ -232,16 +232,34 @@ export interface Memory {
   weight: number;           // 1..5, decae con los años
 }
 
+export interface Grudge {
+  fromId: VillagerId;
+  toId: VillagerId;
+  cause: MemoryKind;
+  causeTick: number;
+  formedTick: number;
+  healedTick: number | null;
+}
+
 export interface PeopleState {
   villagers: Villager[];    // incluye a los muertos; nunca se borra a nadie
   nextId: VillagerId;
   namedIds: VillagerId[];   // vivos y nombrados, máx. 8
+  grudges: Grudge[];        // append-only, igual que villagers
 }
 ```
 
 **Por qué no se borra a los muertos.** La crónica los cita cuarenta años
 después, y las ruinas de una casa recuerdan quién la levantó. Un array de 400
 aldeanos muertos ocupa nada.
+
+**Por qué el rencor se almacena y no se deriva.** Un rencor podría leerse de
+`opinions` mirando quién está por debajo de −50, pero eso pierde las dos cosas
+que lo hacen contable: la causa y el tick en que se formó, que son justo lo que
+citan las plantillas de disputa (§8.2 `{k:'grudge'}`, §8.3 `grudgeAgainst`).
+`grudges` es **append-only**, con la misma disciplina que `villagers`: un rencor
+nunca se borra. Cuando la opinión sube por encima de −20 se le pone
+`healedTick`, y ahí queda — la aldea recuerda que un día se odiaron.
 
 ### 3.5 El valle
 
@@ -1303,9 +1321,22 @@ export const FOUNDING = {
 } as const;
 ```
 
-Comprobación: 20 personas consumen 960 al año; dos campos rinden ~1 220 con
-clima normal. El margen es del 27 %, y el arranque de 900 de grano cubre un solo
-año malo. La primera hambruna es cuestión de cuándo, no de si.
+Comprobación, con el cálculo explícito para que nadie lo «arregle» en ninguna
+de las dos direcciones:
+
+```
+consumo = 20 personas · 48 semanas · 1.0            =   960
+cosecha = 2 campos · 600 · 1.00 clima · 1.02 ánimo  = 1 224
+margen  = 1 224 / 960                               = 1.275
+```
+
+El 1.02 es el factor de ánimo de la fundación: `0.8 + 0.4 · 0.55`, con
+`MORALE = 55`. El cociente desnudo, sin ánimo, es `1 200 / 960 = 1.25`, y
+**también es correcto**: es el mismo margen visto sin el multiplicador. Los dos
+números aparecen en sitios distintos del proyecto y ninguno es una errata.
+
+El margen es, pues, del 27 %, y el arranque de 900 de grano cubre un solo año
+malo. La primera hambruna es cuestión de cuándo, no de si.
 
 ### 12.3 Subsistencia
 
@@ -1402,6 +1433,7 @@ export const MOOD = {
   MORALE_HUNGER: -4.0,          // × severidad
   MORALE_CROWDING: -0.4,        // por persona sin cama
   MORALE_CHAPEL: 0.15, MORALE_CHURCH: 0.30, MORALE_MILL: 0.05,
+  MORALE_GRAVEYARD: 0.05,       // el efecto que §7.2 da a `grave_yard`
   MORALE_OUTBREAK: -0.8,
   MORALE_HARVEST: 25,           // × (factor de clima − 1)
   FAITH_DRIFT_TO: 40,    FAITH_DRIFT: 0.01,
@@ -1697,13 +1729,40 @@ por cero.
 
 **Objetivo.** El contrato común, escrito una vez.
 **Depende de.** M-01.
-**Ficheros.** `src/engine/state.ts`, `src/engine/balance.ts`.
+**Ficheros.** `src/engine/state.ts`, `src/engine/balance.ts`,
+`src/engine/crossroads/schema.ts`.
 **Contrato.** Todos los tipos de §3, literalmente. Todas las constantes de §12,
-literalmente, como objetos `as const`.
+literalmente, como objetos `as const`, más la tabla de edificios de §7.2 como
+`BUILDINGS`. Los tipos de §8.1, §8.3, §8.4 y §8.5 van en `schema.ts`: son
+declaraciones puras y `state.ts` necesita el DSL para `PlantedSeed`. M-07
+escribe sólo la lógica en el resto de esa carpeta.
 **Reglas.** Sin lógica: solo tipos y datos. Ni una función.
+
+**Grafo de dependencias, obligatorio y acíclico:**
+
+```
+rng.ts, balance.ts        hojas, no importan nada
+state.ts                  -> rng.ts
+crossroads/schema.ts      -> state.ts
+time.ts                   -> state.ts, balance.ts
+```
+
+`Op` y `Condition` (§8.2) viven en `state.ts`, no en `schema.ts`, y la flecha va
+de `schema` a `state` y no al revés. La razón es de conteo: §8 necesita seis
+tipos de §3 —`Season`, `Role`, `Trait`, `BuildingKind`, `StatName`,
+`MemoryKind`— y §3 necesita uno solo de §8, `Condition`, para `PlantedSeed`. Con
+`Condition` en `state.ts` el grafo queda acíclico; en la dirección contraria los
+dos ficheros se importarían entre sí. Con `verbatimModuleSyntax` un ciclo de
+`import type` compila sin quejarse, así que no se notaría hasta que lo hubieran
+heredado cinco módulos: hay un test que guarda el grafo.
+
 **Tests.** Un test que compruebe la coherencia interna de §12: aforo máximo
 (`MAX_HOUSES · HOUSE_CAPACITY`) igual a 80; probabilidades de `WEATHER` sumando
-1; tramos de `MORTALITY` monótonos y cubriendo hasta 200.
+1; y sobre `MORTALITY`, tramos de edad estrictamente crecientes que cubren de 0
+a 200 sin hueco ni solape, con tasas crecientes **a partir del segundo tramo**.
+La curva es de bañera, no una rampa: el `0.060` infantil es deliberado y está
+por encima del `0.012` que le sigue. Exigir monotonía desde el primer tramo era
+una errata de este brief, no de §12.4.
 **Terminado cuando.** El resto de módulos puede importar de aquí sin
 dependencias circulares.
 
