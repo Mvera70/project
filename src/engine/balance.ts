@@ -36,6 +36,14 @@ export const FOUNDING = {
   FAITH: 50,
   HOUSES: 4,
   FIELDS: 2,
+  // TUNE: §12.2 gives the head count of each age group but not the ages
+  // themselves, and M-03 has to draw them. Inclusive ranges, in years.
+  AGE_RANGES: { adults: [16, 45], children: [1, 13], elders: [60, 70] },
+  // TUNE: a founding that cannot reproduce is not interesting variance, it is
+  // a game dead on arrival — and it is the first thing the player sees. The
+  // draw is corrected upwards until this many adult women fall inside
+  // LIFE.FERTILE.
+  MIN_FERTILE_WOMEN: 4,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -209,4 +217,49 @@ export const BUILDINGS = {
   stone_house: { w: 2, h: 2, wood: 0, stone: 50, bp: 70, cap: null, tier: 1, upgradeOf: 'house', byCrossroad: false }, // does not burn
   church: { w: 3, h: 3, wood: 0, stone: 120, bp: 200, cap: 1, tier: 1, upgradeOf: 'chapel', byCrossroad: false }, // MOOD.*_CHURCH
   watchtower: { w: 2, h: 2, wood: 0, stone: 60, bp: 90, cap: 2, tier: 1, upgradeOf: null, byCrossroad: true },
+} as const;
+
+// ---------------------------------------------------------------------------
+// Traits
+//
+// TUNE: §6.3 says the traits are drawn with weights per role and names two of
+// the leanings ("a priest has a high probability of `devout`, a leader of
+// `ambitious` or `proud`"), but never writes the table. This is it.
+//
+// A trait the role leans towards weighs 3; every trait not listed weighs 1.
+// That is the whole rule — a table of data, not a chain of ifs, so that a new
+// role is a new row and nothing else. A role of null (an anonymous villager
+// promoted with no office) draws uniformly.
+//
+// The leanings read as the job: the reeve counts other people's grain, the
+// woodward works alone at the treeline, the stranger either came to make
+// something of themselves or came running from something.
+// ---------------------------------------------------------------------------
+
+export const TRAIT_WEIGHT_ROLE = 3;
+export const TRAIT_WEIGHT_BASE = 1;
+
+export const TRAIT_WEIGHTS = {
+  leader: { ambitious: TRAIT_WEIGHT_ROLE, proud: TRAIT_WEIGHT_ROLE },
+  smith: { stubborn: TRAIT_WEIGHT_ROLE, proud: TRAIT_WEIGHT_ROLE },
+  midwife: { kind: TRAIT_WEIGHT_ROLE, hardy: TRAIT_WEIGHT_ROLE },
+  priest: { devout: TRAIT_WEIGHT_ROLE },
+  woodward: { secretive: TRAIT_WEIGHT_ROLE, loyal: TRAIT_WEIGHT_ROLE },
+  reeve: { greedy: TRAIT_WEIGHT_ROLE, cunning: TRAIT_WEIGHT_ROLE },
+  herbalist: { kind: TRAIT_WEIGHT_ROLE, secretive: TRAIT_WEIGHT_ROLE },
+  stranger: { ambitious: TRAIT_WEIGHT_ROLE, craven: TRAIT_WEIGHT_ROLE },
+} as const;
+
+/** How many traits a named villager gets. design.md §6.3: "3 or 4". */
+export const TRAIT_COUNT = [3, 4] as const;
+
+// ---------------------------------------------------------------------------
+// People
+// ---------------------------------------------------------------------------
+
+export const PEOPLE = {
+  // TUNE: §3.4 caps namedIds at eight in a comment and §6.1 says "six at the
+  // founding, up to eight", but the number is in neither §12 nor §7.2 and
+  // promoteToNamed has to enforce it.
+  MAX_NAMED: 8,
 } as const;

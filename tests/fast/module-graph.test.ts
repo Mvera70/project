@@ -11,13 +11,18 @@ import { describe, expect, it } from 'vitest';
 
 const ENGINE = fileURLToPath(new URL('../../src/engine/', import.meta.url));
 
-/** Los módulos del motor a los que apunta un fichero, por su ruta relativa. */
+/**
+ * Los módulos del motor a los que apunta un fichero, sin repetir y ordenados.
+ * Un mismo módulo aparece dos veces en el fuente cuando se importan de él tipos
+ * y valores por separado, y eso no es una dependencia más.
+ */
 function importsOf(file: string): string[] {
   const src = readFileSync(ENGINE + file, 'utf8');
-  return [...src.matchAll(/from\s+'([^']+)'/g)]
+  const targets = [...src.matchAll(/from\s+'([^']+)'/g)]
     .map((m) => m[1] ?? '')
     .filter((s) => s.startsWith('.'))
     .map((s) => s.replace(/^\.\.?\//, '').replace(/^\.\//, ''));
+  return [...new Set(targets)].sort();
 }
 
 describe('grafo de módulos del motor', () => {
@@ -43,7 +48,21 @@ describe('grafo de módulos del motor', () => {
   });
 
   it('time.ts importa de balance.ts y de state.ts', () => {
-    expect(importsOf('time.ts').sort()).toEqual(['balance', 'state']);
+    expect(importsOf('time.ts')).toEqual(['balance', 'state']);
+  });
+
+  it('people/ cuelga de las hojas y de state.ts, nunca al revés', () => {
+    // M-03. names.ts y traits.ts no se conocen entre sí; villagers.ts los usa.
+    expect(importsOf('people/names.ts')).toEqual(['rng']);
+    expect(importsOf('people/traits.ts')).toEqual(['balance', 'rng', 'state']);
+    expect(importsOf('people/villagers.ts')).toEqual([
+      'balance',
+      'names',
+      'rng',
+      'state',
+      'traits',
+    ]);
+    expect(importsOf('state.ts')).not.toContain('people/villagers');
   });
 
   it('ningún módulo del motor se importa a sí mismo', () => {
@@ -53,6 +72,9 @@ describe('grafo de módulos del motor', () => {
       ['state.ts', 'state'],
       ['time.ts', 'time'],
       ['crossroads/schema.ts', 'schema'],
+      ['people/names.ts', 'names'],
+      ['people/traits.ts', 'traits'],
+      ['people/villagers.ts', 'villagers'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }
