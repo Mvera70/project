@@ -35,11 +35,17 @@ describe('balance · fundación', () => {
     expect(margin).toBeLessThanOrEqual(1.35);
   });
 
-  it('el grano inicial cubre cerca de un año entero', () => {
-    // §12.2: "el arranque de 900 de grano cubre un solo año malo".
+  it('el grano inicial cubre casi un año entero', () => {
     const yearOfFood = FOUNDING.POPULATION * TIME.WEEKS_PER_YEAR * FOOD.GRAIN_PER_PERSON;
-    expect(FOUNDING.GRAIN / yearOfFood).toBeGreaterThan(0.8);
+    expect(FOUNDING.GRAIN / yearOfFood).toBeGreaterThan(0.75);
     expect(FOUNDING.GRAIN / yearOfFood).toBeLessThan(1.2);
+  });
+
+  it('la aldea no nace por encima de su propia capacidad', () => {
+    // §12.2: GRAIN es exactamente BASE_STORAGE. Con más, la merma de §5.3
+    // mordería desde el primer tick y se leería como un fallo.
+    expect(FOUNDING.GRAIN).toBeLessThanOrEqual(FOOD.BASE_STORAGE);
+    expect(FOUNDING.GRAIN).toBe(FOOD.BASE_STORAGE);
   });
 
   it('la aldea nace con casas de sobra para su gente', () => {

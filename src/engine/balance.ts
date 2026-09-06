@@ -30,7 +30,7 @@ export const FOUNDING = {
   ADULTS: 13,
   CHILDREN: 5,
   ELDERS: 2,
-  GRAIN: 900,
+  GRAIN: 800, // exactly BASE_STORAGE: the village must not be born spoiling
   WOOD: 200,
   MORALE: 55,
   FAITH: 50,

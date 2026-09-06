@@ -9,7 +9,6 @@ import { FOOD, FOUNDING, LIFE, MIGRATION, TIME } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { Building, GameState, TickContext, Villager } from '@engine/state';
 import {
-  ageEveryone,
   annualMortality,
   freeBeds,
   housingCapacity,
@@ -82,10 +81,7 @@ function village(seed: number, houses: number): GameState {
  */
 function step(s: GameState, ctx: TickContext, starve?: { acc: number }): void {
   s.tick += 1;
-  if (s.tick % TIME.WEEKS_PER_YEAR === 0) {
-    ageEveryone(s);
-    resolveMigration(s);
-  }
+  if (s.tick % TIME.WEEKS_PER_YEAR === 0) resolveMigration(s);
   if (starve !== undefined) {
     // §5.3 paso 7: los muertos de la semana son una FRACCIÓN de la población.
     // Con veinte personas eso es medio muerto por semana, así que el resto se
@@ -730,15 +726,13 @@ describe('la aldea a lo largo de los años', () => {
     }
   });
 
-  it('ageEveryone no escribe nada: la edad se deriva de bornTick', () => {
+  it('todos cumplen a la vez, en la semana 0, sin que nadie los envejezca', () => {
+    // §6.5: la edad se deriva de bornTick en años de calendario. No hay ninguna
+    // función de envejecer porque no hay ningún campo que incrementar.
     const s = village(7, 6);
-    s.tick = TIME.WEEKS_PER_YEAR;
-    const before = structuredClone(s.people);
-    ageEveryone(s);
-    expect(s.people).toEqual(before);
-    // Y aun así todos han cumplido un año respecto al tick 0.
     for (const v of s.people.villagers) {
-      expect(ageOf(v, s.tick)).toBe(ageOf(v, 0) + 1);
+      expect(ageOf(v, TIME.WEEKS_PER_YEAR - 1)).toBe(ageOf(v, 0));
+      expect(ageOf(v, TIME.WEEKS_PER_YEAR)).toBe(ageOf(v, 0) + 1);
     }
   });
 });

@@ -218,6 +218,7 @@ export interface Villager {
   bornTick: number;
   diedTick: number | null;
   causeOfDeath: DeathCause | null;
+  leftTick: number | null;  // se marchó del valle (§5.7); no está muerto
   traits: Trait[];          // 3..4, solo en los nombrados
   homeId: BuildingId | null;
   parentIds: [VillagerId | null, VillagerId | null];
@@ -252,6 +253,12 @@ export interface PeopleState {
 **Por qué no se borra a los muertos.** La crónica los cita cuarenta años
 después, y las ruinas de una casa recuerdan quién la levantó. Un array de 400
 aldeanos muertos ocupa nada.
+
+**Por qué `leftTick` y no una causa de muerte.** Los que se marchan por §5.7 no
+están muertos, y tampoco se pueden borrar del array. Un `diedTick` con una causa
+«se fue» haría que la crónica mintiera al citarlos cuarenta años después. Están
+vivos, en otra parte; la aldea simplemente ya no los cuenta. Vivo y presente es
+`diedTick === null && leftTick === null`.
 
 **Por qué el rencor se almacena y no se deriva.** Un rencor podría leerse de
 `opinions` mirando quién está por debajo de −50, pero eso pierde las dos cosas
@@ -574,7 +581,10 @@ años, `hostile` sin activar y al menos 2 huecos de vivienda. Probabilidad 0.30;
 llegan 2–4 personas, mezcla de adultos jóvenes y niños.
 
 **Marcha.** Si `morale < 30`, con probabilidad `(30 − morale)/60` se van 1–3
-personas.
+personas. **Sólo se van anónimos.** Que un nombrado desaparezca sin una línea
+que lo cuente es sacar un personaje de la historia a espaldas del jugador, y ese
+momento le pertenece a él: la plantilla A.7 ya lo tiene como resultado de una
+decisión, no como una gota de la simulación.
 
 Los forasteros son el motor principal del crecimiento temprano: la biología sola
 hace crecer la aldea demasiado despacio para que la primera generación sea
@@ -712,6 +722,13 @@ Tabla de mortalidad anual base en §12.4.
 
 **Envejecimiento.** Todos cumplen años a la vez, en la semana 0. Una simplificación
 que ahorra un campo por aldeano y no se nota.
+
+Literalmente ahorra el campo: la edad **se deriva** de `bornTick` en años de
+calendario, `yearOf(tick) − yearOf(bornTick)`, y por eso el cumpleaños de todos
+cae en la semana 0 y en ninguna otra. **En el borde del año no hay nada que
+incrementar**, así que no existe ninguna función de envejecer. Lo que sí ocurre
+en la semana 0 —clima, peste, incendio, migración, cobertura de vacantes— es el
+paso 2 del tick y vive en `sim.ts`.
 
 ### 6.6 Sucesión
 
@@ -1319,7 +1336,7 @@ export const TIME = {
 export const FOUNDING = {
   POPULATION: 20,          // 6 nombrados + 14 anónimos
   ADULTS: 13, CHILDREN: 5, ELDERS: 2,
-  GRAIN: 900,
+  GRAIN: 800,
   WOOD: 200,
   MORALE: 55,
   FAITH: 50,
@@ -1342,8 +1359,13 @@ El 1.02 es el factor de ánimo de la fundación: `0.8 + 0.4 · 0.55`, con
 **también es correcto**: es el mismo margen visto sin el multiplicador. Los dos
 números aparecen en sitios distintos del proyecto y ninguno es una errata.
 
-El margen es, pues, del 27 %, y el arranque de 900 de grano cubre un solo año
-malo. La primera hambruna es cuestión de cuándo, no de si.
+El margen es, pues, del 27 %, y el arranque de 800 de grano cubre casi un año
+entero. La primera hambruna es cuestión de cuándo, no de si.
+
+**`GRAIN` es exactamente `BASE_STORAGE`, y eso es a propósito.** Con 900 la
+aldea nacía por encima de su propia capacidad y perdía grano a merma desde el
+primer tick, que se lee como un fallo aunque no lo sea. El cambio no mueve la
+tasa de extinción, los años de extinción ni la mediana de pico.
 
 ### 12.3 Subsistencia
 
@@ -1826,7 +1848,6 @@ reparto de edades de §12.2 y los 6 roles fundacionales; sin nombres repetidos e
 **Ficheros.** `src/engine/people/demography.ts`.
 **Contrato.**
 ```ts
-export function ageEveryone(state: GameState): void;
 export function resolveDeaths(state: GameState, ctx: TickContext): DeathEvent[];
 export function resolveBirths(state: GameState, ctx: TickContext): BirthEvent[];
 export function resolveMigration(state: GameState): MigrationEvent[];
@@ -1836,9 +1857,20 @@ export function population(state: GameState): number;
 **Reglas.** Fórmulas de §6.5 y §5.7 exactas. `TickContext` transporta `severity`,
 `cold` y el brote activo; la demografía no los calcula. Las listas se fotografían
 al empezar: un recién nacido no muere en su mismo tick.
+
+**No hay `ageEveryone`.** La edad se deriva de `bornTick` (§6.5), así que en el
+borde del año no hay ningún campo que incrementar y la función sería un no-op en
+el contrato público del módulo de personas. Lo que sí pasa en la semana 0 es el
+paso 2 del tick y vive en `sim.ts` (M-10).
+
 **Tests.** Una aldea de 20 personas sin hambre ni peste crece; con `severity = 1`
-sostenido, muere en menos de 5 años; la esperanza de vida al nacer cae entre 28 y
-38 años sobre 20 000 aldeanos simulados; la migración respeta todas sus puertas.
+sostenido deja de reproducirse por completo y encoge —la extinción la produce el
+paso 7 del tick, `STARVATION_RATE`, que es de M-06 y se asevera allí—; la
+esperanza de vida al nacer cae entre 28 y 38 años sobre 20 000 aldeanos
+simulados con la tabla **pura**, sin hambre ni frío ni brote, porque medida
+dentro de una partida con hambre baja de 28 y el test fallaría sin que nada
+estuviera mal; en torno a dos de cada tres llegan a los 15; la migración respeta
+todas sus puertas.
 **Terminado cuando.** Los tests pasan sobre al menos 10 semillas.
 
 ---

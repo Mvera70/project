@@ -76,25 +76,13 @@ export function workforce(state: GameState): number {
 }
 
 // ---------------------------------------------------------------------------
-// Growing old
-// ---------------------------------------------------------------------------
-
-/**
- * Step 2 of the tick, in week 0 (§4.2, §6.5).
- *
- * There is nothing to write. Ages are derived from `bornTick` in calendar
- * years, so everybody's birthday already falls on week 0 and no field has to be
- * incremented — which is exactly the saving §6.5 claims for the simplification
- * ("ahorra un campo por aldeano"). The function exists because the tick order
- * is normative and because anything that must happen at the year boundary
- * belongs here rather than scattered through the other steps.
- */
-export function ageEveryone(state: GameState): void {
-  if (weekOf(state.tick) !== 0) return;
-}
-
-// ---------------------------------------------------------------------------
 // Dying
+//
+// There is no `ageEveryone`. Ages are derived from `bornTick` in calendar years
+// (§6.5), so every birthday already falls on week 0 and there is no field to
+// increment at the year boundary. What does happen in week 0 — weather, plague,
+// fire, migration, filling vacant offices — is step 2 of the tick and lives in
+// sim.ts.
 // ---------------------------------------------------------------------------
 
 /** The annual base rate for an age, from the table of §12.4. */
