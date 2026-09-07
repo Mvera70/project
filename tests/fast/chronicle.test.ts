@@ -151,6 +151,20 @@ describe('el banco · las prohibiciones de §9.3', () => {
     }
   });
 
+  it('ningún hueco en minúscula abre una segunda frase', () => {
+    // Sólo se capitaliza la primera posición (§9.1), así que una plantilla como
+    // "... did not stay there. {season}, year 7." sale con minúscula a mitad.
+    // Los huecos que dan número o nombre propio no tienen este problema.
+    const lowercaseHoles = ['{season}', '{building}', '{count}'];
+    for (const [key, variants] of Object.entries(BANK)) {
+      for (const t of variants) {
+        for (const hole of lowercaseHoles) {
+          expect(t, `${key}: ${t}`).not.toContain(`. ${hole}`);
+        }
+      }
+    }
+  });
+
   it('las frases son cortas: ninguna pasa de 120 caracteres', () => {
     for (const t of ALL_TEXTS) expect(t.length, t).toBeLessThanOrEqual(120);
   });

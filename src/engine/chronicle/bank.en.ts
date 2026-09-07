@@ -310,7 +310,7 @@ export const BANK: Record<string, string[]> = {
   ],
   'plague.begins': [
     'The sickness came in the {season} of year {year}.',
-    'It started in one house and did not stay there. {season}, year {year}.',
+    'It started in one house and did not stay there. That was the {season} of year {year}.',
     'The sickness reached the valley that {season}.',
   ],
   'plague.ends': [
