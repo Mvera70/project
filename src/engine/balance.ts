@@ -163,6 +163,12 @@ export const DISASTER = {
   // houses" without saying by how much. This is the weight a house carries
   // against every other wooden building's 1.
   FIRE_HOUSE_WEIGHT: 3,
+  // §5.9, v2.13: what can actually catch. A wooden building **with a roof**,
+  // enumerated in the section itself. `field`, `well`, `palisade` and
+  // `grave_yard` are tier 0 by accident of §7.2's table, not because fire
+  // should take them: losing a field costs 600 of harvest for ever and reads
+  // wrong in the chronicle.
+  FIRE_KINDS: ['house', 'granary', 'chapel', 'smithy', 'mill'],
 } as const;
 
 // ---------------------------------------------------------------------------

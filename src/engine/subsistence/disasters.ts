@@ -43,10 +43,12 @@ export function rollPlague(state: GameState): Outbreak | null {
 }
 
 /**
- * §5.9. Annual chance FIRE_CHANCE. Takes one wooden building at random,
+ * §5.9. Annual chance FIRE_CHANCE. Takes one roofed wooden building at random,
  * preferring the houses; a granary also costs 45 % of the stored grain, and the
  * village loses 6 morale either way. Stone does not burn — that is the
- * mechanical reward for the late progression.
+ * mechanical reward for the late progression. Neither do the fields, the well,
+ * the palisade or the graveyard: they are tier 0 because §7.2's table has no
+ * other column for them, not because they have anything to burn.
  *
  * **This destroys nothing.** It reports which building caught and what it
  * costs; M-14 owns the buildings and executes it. Until M-14 exists the fire is
@@ -60,7 +62,12 @@ export function rollFire(state: GameState): FireResult | null {
   if (weekOf(state.tick) !== 0) return null;
   if (next(state.rng, 'world') >= DISASTER.FIRE_CHANCE) return null;
 
-  const wooden = state.buildings.filter((b) => b.lostTick === null && b.tier === 0);
+  // v2.13: tier 0 **and roofed** (§5.9). The draw still happens above whatever
+  // the valley holds, so narrowing this set does not shift the stream.
+  const wooden = state.buildings.filter(
+    (b) => b.lostTick === null && b.tier === 0 &&
+      (DISASTER.FIRE_KINDS as readonly string[]).includes(b.kind),
+  );
   if (wooden.length === 0) return null;
 
   const target = weighted(state.rng, 'world', wooden, (b) =>
