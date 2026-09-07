@@ -4,6 +4,17 @@
 // filled the template is not eligible at all — a crossroad about the smith is
 // not a crossroad when there is no smith.
 //
+// **With backtracking.** Choosing `A` blind and then asking who hates them gets
+// it right one time in eight, so a template can satisfy its `requires` every
+// week of a century and never once cast. That is dead content no eligibility
+// measurement can see, because the conditions hold perfectly well. Here, a
+// choice that strands a dependent letter is undone and another is tried.
+//
+// The randomness is drawn ONCE per spec, before the search starts: an offset
+// that rotates the candidate list. So the number of draws depends only on the
+// shape of the template and never on how much backtracking it took, which is
+// what keeps the stream aligned whatever state the village is in.
+//
 // Draws from the 'cast' stream, never from 'crossroads': which template comes
 // up and who is in it are two separate questions, and keeping them on separate
 // streams means a catalogue that grows does not reshuffle the casting of the
@@ -12,7 +23,7 @@
 import { isHere } from '../people/demography';
 import { worstEnemyOf } from '../people/opinions';
 import { ageOf } from '../people/villagers';
-import { pick } from '../rng';
+import { int } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
 import { holderOf } from './conditions';
 import type { CastSpec, CrossroadTemplate } from './schema';
@@ -34,47 +45,58 @@ function dependsOn(spec: CastSpec): string | null {
   return null;
 }
 
-/**
- * Whether casting `id` for this letter would leave a dependent letter with
- * nobody to fill it.
- *
- * `{as:'A', anyNamed}` followed by `{as:'B', grudgeAgainst:'A'}` used to pick A
- * blindly and then ask who hates them. With eight named villagers and one
- * quarrel in the valley it guessed right one time in eight, and the two feud
- * templates were eligible a fiftieth of the time and cast none of it — dead
- * content that no eligibility measurement could see, because the requires held
- * perfectly well.
- */
-function wouldStrand(
-  id: VillagerId,
-  letter: string,
-  pending: readonly CastSpec[],
-  state: GameState,
-): boolean {
-  for (const other of pending) {
-    if ('grudgeAgainst' in other && other.grudgeAgainst === letter) {
-      if (worstEnemyOf(state, id) === null) return true;
-    }
-    if ('childOf' in other && other.childOf === letter) {
-      const hasChild = state.people.villagers.some(
-        (v) => isHere(v) && v.parentIds.includes(id),
-      );
-      if (!hasChild) return true;
-    }
-  }
-  return false;
+/** True for the specs whose answer is a choice rather than a lookup. */
+function needsDraw(spec: CastSpec): boolean {
+  return 'anyNamed' in spec || 'childOf' in spec;
 }
 
-function fillOne(
+/**
+ * The specs in dependency order, or null if two letters point at each other.
+ * A template may declare `{as:'B', grudgeAgainst:'A'}` before `A` and still
+ * work; a cycle is not eligible rather than a hang.
+ */
+function inDependencyOrder(cast: readonly CastSpec[]): CastSpec[] | null {
+  const ordered: CastSpec[] = [];
+  const placed = new Set<string>();
+  let pending = [...cast];
+
+  while (pending.length > 0) {
+    const ready = pending.filter((s) => {
+      const needs = dependsOn(s);
+      return needs === null || placed.has(needs);
+    });
+    if (ready.length === 0) return null;
+    for (const s of ready) {
+      ordered.push(s);
+      placed.add(s.as);
+    }
+    pending = pending.filter((s) => !ready.includes(s));
+  }
+  return ordered;
+}
+
+/**
+ * Everyone this spec could bind to, in the order the search will try them.
+ *
+ * Pure: the rotation offset is passed in, already drawn. An empty list means
+ * this branch of the search is dead.
+ */
+function candidatesFor(
   spec: CastSpec,
   state: GameState,
   filled: Record<string, VillagerId>,
-  pending: readonly CastSpec[],
-): VillagerId | null {
+  offset: number,
+): VillagerId[] {
   const taken = new Set(Object.values(filled));
+  const rotate = (xs: VillagerId[]): VillagerId[] => {
+    if (xs.length <= 1) return xs;
+    const at = offset % xs.length;
+    return [...xs.slice(at), ...xs.slice(0, at)];
+  };
 
   if ('role' in spec) {
-    return holderOf(state, spec.role);
+    const id = holderOf(state, spec.role);
+    return id === null || taken.has(id) ? [] : [id];
   }
 
   if ('anyNamed' in spec) {
@@ -82,7 +104,6 @@ function fillOne(
     // one already cast as A".
     const barred = new Set((spec.excluding ?? []).map((letter) => filled[letter]));
     const pool = livingNamed(state).filter((v) => !barred.has(v.id) && !taken.has(v.id));
-    if (pool.length === 0) return null;
 
     // A hard filter (§8.3, v2.9) with one escape: a village with nobody of that
     // age still has to be able to answer the question.
@@ -94,68 +115,67 @@ function fillOne(
             const age = ageOf(v, state.tick);
             return age >= band[0] && age <= band[1];
           });
-    const wide = inBand.length > 0 ? inBand : pool;
-
-    // Somebody another letter can actually hang off. Falling back to the whole
-    // pool keeps the old behaviour when nothing depends on this letter.
-    const viable = wide.filter((v) => !wouldStrand(v.id, spec.as, pending, state));
-    return pick(state.rng, 'cast', viable.length > 0 ? viable : wide).id;
+    return rotate((inBand.length > 0 ? inBand : pool).map((v) => v.id));
   }
 
   if ('grudgeAgainst' in spec) {
     const target = filled[spec.grudgeAgainst];
-    return target === undefined ? null : worstEnemyOf(state, target);
+    if (target === undefined) return [];
+    const enemy = worstEnemyOf(state, target);
+    return enemy === null || taken.has(enemy) ? [] : [enemy];
   }
 
   if ('childOf' in spec) {
     const parent = filled[spec.childOf];
-    if (parent === undefined) return null;
+    if (parent === undefined) return [];
     const children = state.people.villagers
-      .filter((v) => isHere(v) && v.parentIds.includes(parent))
+      .filter((v) => isHere(v) && v.parentIds.includes(parent) && !taken.has(v.id))
       .sort((a, b) => a.id - b.id);
-    return children.length === 0 ? null : pick(state.rng, 'cast', children).id;
+    return rotate(children.map((v) => v.id));
   }
 
-  // youngestNamed: deterministic, no draw. Ties go to the lowest id.
+  // youngestNamed: deterministic. Ties go to the lowest id.
   const pool = livingNamed(state)
     .filter((v) => spec.female === undefined || v.female === spec.female)
     .filter((v) => !taken.has(v.id));
-  if (pool.length === 0) return null;
-  return pool.reduce((youngest, v) =>
-    ageOf(v, state.tick) < ageOf(youngest, state.tick) ? v : youngest,
-  ).id;
+  if (pool.length === 0) return [];
+  const youngest = pool.reduce((best, v) =>
+    ageOf(v, state.tick) < ageOf(best, state.tick) ? v : best,
+  );
+  return [youngest.id];
 }
 
 /**
  * Fill every letter of a template, or return null.
  *
- * The specs are resolved in dependency order rather than declaration order, so
- * a template may write `{as:'B', grudgeAgainst:'A'}` before it writes A without
- * silently failing to cast. A cycle between two letters resolves to null, which
- * is the right answer: neither can be filled first.
+ * The search is exhaustive over the candidates it is given, so if a complete
+ * casting exists it is found. What it is not exhaustive over is orderings: the
+ * rotation fixes which candidate is tried first, and the offsets are drawn
+ * before the search, so the cost in randomness is the same whether the first
+ * try worked or the twentieth did.
  */
 export function fillCast(
   t: CrossroadTemplate,
   state: GameState,
 ): Record<string, VillagerId> | null {
+  const order = inDependencyOrder(t.cast);
+  if (order === null) return null;
+
+  // One draw per spec that involves a choice, always, before anything is tried.
+  const offsets = order.map((spec) => (needsDraw(spec) ? int(state.rng, 'cast', 0, 9973) : 0));
+
   const filled: Record<string, VillagerId> = {};
-  let pending = [...t.cast];
 
-  while (pending.length > 0) {
-    const ready = pending.filter((s) => {
-      const needs = dependsOn(s);
-      return needs === null || filled[needs] !== undefined;
-    });
-    if (ready.length === 0) return null; // a cycle, or a reference to nothing
-
-    for (const spec of ready) {
-      const laterOn = pending.filter((s) => s !== spec);
-      const id = fillOne(spec, state, filled, laterOn);
-      if (id === null) return null;
+  const solve = (i: number): boolean => {
+    const spec = order[i];
+    if (spec === undefined) return true;
+    for (const id of candidatesFor(spec, state, filled, offsets[i] ?? 0)) {
       filled[spec.as] = id;
+      if (solve(i + 1)) return true;
+      delete filled[spec.as];
     }
-    pending = pending.filter((s) => !ready.includes(s));
-  }
+    return false;
+  };
 
-  return filled;
+  return solve(0) ? filled : null;
 }

@@ -495,6 +495,63 @@ describe('reparto · §8.3', () => {
     expect(fillCast(cyclic, s)).toBeNull();
   });
 
+  it('con vuelta atrás: reparte SIEMPRE que exista una pareja válida', () => {
+    // §8.3 v2.10. Elegir A a ciegas y preguntar despues quien lo odia acierta
+    // una vez de cada ocho: la plantilla cumple sus requires siempre y no
+    // reparte jamas, que es contenido muerto que ninguna medicion de
+    // elegibilidad detecta.
+    let cast = 0;
+    const RUNS = 200;
+    for (let seed = 0; seed < RUNS; seed += 1) {
+      const s = village(seed);
+      makeFeud(s); // existe exactamente una pareja con rencor
+      if (fillCast(T_FEUD, s) !== null) cast += 1;
+    }
+    expect(cast).toBe(RUNS);
+  });
+
+  it('la vuelta atrás encuentra la pareja aunque no sea la primera que toca', () => {
+    // Con seis nombrados y un solo rencor, sin vuelta atras acertaria ~1/6.
+    const s = village(7);
+    const [leader, other] = makeFeud(s);
+    for (let i = 0; i < 60; i += 1) {
+      const cast = fillCast(T_FEUD, s) as Record<string, VillagerId>;
+      expect(cast, `intento ${i}`).not.toBeNull();
+      expect(cast['A']).toBe(leader);
+      expect(cast['B']).toBe(other);
+    }
+  });
+
+  it('sin ninguna pareja válida sigue devolviendo null', () => {
+    for (let seed = 0; seed < 50; seed += 1) {
+      expect(fillCast(T_FEUD, village(seed))).toBeNull();
+    }
+  });
+
+  it('el número de tiradas no depende de cuánto haya que retroceder', () => {
+    // Las tiradas se sacan antes de buscar: una por letra que elige. Si
+    // dependieran del retroceso, el flujo se desalinearia segun el estado.
+    const easy = village(11);
+    makeFeud(easy);
+    const before = { ...easy.rng };
+    fillCast(T_FEUD, easy);
+    const spentEasy = easy.rng.cast - before.cast;
+
+    const hard = village(11);
+    makeFeud(hard);
+    // Mas nombrados entre los que buscar, mismo numero de letras.
+    for (const v of hard.people.villagers) {
+      if (!v.named && hard.people.namedIds.length < 8) {
+        v.named = true;
+        v.name = `X${v.id}`;
+        hard.people.namedIds.push(v.id);
+      }
+    }
+    const beforeHard = { ...hard.rng };
+    fillCast(T_FEUD, hard);
+    expect(hard.rng.cast - beforeHard.cast).toBe(spentEasy);
+  });
+
   it('el reparto consume de cast y nunca de crossroads', () => {
     const s = village(7);
     const before = { ...s.rng };

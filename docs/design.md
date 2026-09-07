@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.9 · 7 de septiembre de 2026, 19:11 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.10 · 7 de septiembre de 2026, 19:26 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -29,9 +29,40 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
 | **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
 | **2.6** | 7 sep 2026, 13:56 | Revisión de M-05 y M-09 | Componer crónica no consume aleatoriedad; **§9.4 nueva: la muerte de un nombrado**; semillas append-only; crisis de hambruna definida con fórmula. |
+| **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
 | **2.9** | 7 sep 2026, 19:11 | Puerta de M-08b | **Cubrir una vacante no es elegir al mayor**; el diagnóstico del catálogo pasa a dos columnas; `quiet_years` fuera del reparto; deuda del bosque registrada. |
 | **2.8** | 7 sep 2026, 18:53 | Revisión de M-08 | **Regla de elegibilidad episódica**; `grudge` mira opiniones; ratio `grainToHarvest`; A.1, A.13 y A.15 corregidas; la cobertura de vacantes tiene dueño. |
 | **2.7** | 7 sep 2026, 14:18 | Revisión de M-07 | **La exención del techo se gasta en la primera pregunta**; criterio medible para el ritmo; epitafio con rencores sanados; `TERRAIN_CODE` como contrato de serialización. |
+
+### 2.10 — Puerta de M-08c · superada
+
+- **§12.9 · El rango sube de 1–4 a 1–5, media, y ninguna semilla por encima
+  de 7.** El 1–4 lo fijé antes de que existiera el catálogo y era una
+  suposición. Medido: la sucesión sola consume un tercio del presupuesto —7 por
+  siglo, que es lo que da una tenencia de 13 o 14 años— y **eso es correcto**.
+  La muerte del líder es el latido del bucle largo, no ruido que apretar.
+  Subir el rango reconoce el presupuesto; sacar la sucesión de la cuenta lo
+  habría disimulado.
+- **§8.3 · `fillCast` con vuelta atrás.** El hallazgo más fino de la ronda:
+  elegir `A` a ciegas y preguntar después quién lo odia acierta una vez de cada
+  ocho, así que una plantilla puede cumplir siempre sus `requires` y no repartir
+  jamás. Es contenido muerto que **ninguna medición de elegibilidad detecta**,
+  porque las condiciones se cumplen perfectamente.
+- **§8.2 · Trampa de estación, documentada.** La cosecha es la semana 35 y el
+  invierno empieza en la 36: `season = winter` y «granero vacío» están
+  anticorrelacionados. El fallo se cometió dos veces —A.1 y A.4— y la segunda
+  fue reintroducirlo justo después de arreglar la primera. Las plantillas de
+  escasez se apoyan en `grainToHarvest`, nunca en la estación.
+- **§12.9 y §14.2 · La política `first` no es neutra: es acomodaticia.** Toma
+  siempre la primera opción, que en casi todas las plantillas es la que no paga
+  un coste presente. Nunca levanta la empalizada, así que `bandits` no se apaga
+  jamás. Toda medición informa dos políticas y la verdad queda entre ellas.
+- **§12.9 · La cadencia se medirá otra vez con la fundación real.** El banco
+  actual reparte catorce casas y una fragua desde el tick 0, lo que abre desde
+  el año 1 las puertas de `people > 30`, `has granary` y `has smithy`. Medir
+  contra eso es calibrar contra un valle que no existe.
+- **Anexo A.7 · `smith_feud` queda en 45**, comprobado: con 55 no dispara ni una
+  vez en 2 000 años de aldea.
 
 ### 2.9 — Puerta de M-08b
 
@@ -1216,6 +1247,16 @@ export type Condition =
 export type Op = '<' | '<=' | '>' | '>=' | '==' ;
 ```
 
+**Trampa de estación: el invierno es el momento MÁS lleno del granero.** La
+cosecha cae en la semana 35 y el invierno empieza en la 36, así que `season =
+winter` y «granero vacío» están **anticorrelacionados**. Ninguna plantilla de
+escasez debe apoyarse en la estación: se apoya en `grainToHarvest`, que es la
+magnitud que pregunta si se llega. Este fallo ya se cometió dos veces, en A.1 y
+en A.4.
+
+```ts
+```
+
 ### 8.3 Reparto (`cast`)
 
 Vincula letras a aldeanos concretos. Si un papel no se puede cubrir, la
@@ -1234,6 +1275,13 @@ El reparto se resuelve **en orden de dependencia, no de declaración**: una
 plantilla puede escribir `{as:'B', grudgeAgainst:'A'}` antes que `A` sin fallar
 en silencio. Un ciclo entre dos letras devuelve `null` — la plantilla no es
 elegible— en vez de colgarse.
+
+**Y con vuelta atrás.** Elegir `A` a ciegas y preguntar después quién lo odia
+acierta una vez de cada ocho, así que una plantilla puede cumplir sus `requires`
+siempre y no repartir jamás: contenido muerto que **ninguna medición de
+elegibilidad detecta**, porque las condiciones se cumplen perfectamente.
+`fillCast` no puede elegir un vínculo que deje sin cubrir una letra dependiente:
+si lo hace, deshace y prueba otro.
 
 ### 8.4 Efectos
 
@@ -1872,7 +1920,12 @@ export const CROSSROADS = {
 ### 12.9 Objetivos que verifica la suite de balance
 
 Estos son los asertos, no los resultados. Se comprueban sobre 60 semillas × 200
-años, con una política de decisión neutra (siempre la primera opción):
+años. **Se miden dos políticas, y ninguna es neutra.** `first` toma siempre la
+primera opción, que en casi todas las plantillas es la acomodaticia: nunca paga
+un coste presente, así que jamás levanta la empalizada ni funda nada, y toda
+plantilla cuyo interruptor sea una obra del jugador se queda encendida para
+siempre. `last` toma la desafiante. La verdad está entre las dos y por eso se
+informan las dos:
 
 | Propiedad | Umbral |
 |---|---|
@@ -1881,12 +1934,21 @@ años, con una política de decisión neutra (siempre la primera opción):
 | Mediana del pico de población | 65 – 82 |
 | Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas |
 | Población visible al final de la primera generación | ≥ 26 en la mediana |
-| **Encrucijadas por generación** | **1 – 4** — este es el aserto que manda. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15**: sin bosque que mengüe, `forestLeft` está congelado y sus disparos son un artefacto. Deuda registrada: volver a medirlas con las dos dentro en cuanto M-15 esté fusionado, y si siguen al ras de su reposo, alargarlo. |
+| **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. |
 | Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
 | Fracción de ticks elegibles, por plantilla | < 1 % |
 | Bosque restante en el año 100 | 40 % – 70 % del inicial |
 | Choque del 90 % de bajas en el año 40 → extinción | ≥ 25 % |
 | Cualquier estadística fuera de rango o `NaN` | 0 casos |
+
+**El presupuesto de la sucesión.** El rango era 1–4 y estaba mal calibrado: lo
+fijé antes de que existiera el catálogo. Medido, la sucesión sola consume un
+tercio del total —unas 7 por siglo, que es lo que da una tenencia de 13 o 14
+años para un líder elegido a los cuarenta— y **eso es correcto, no un exceso**:
+la muerte del líder es el latido del bucle largo, no ruido que apretar. Con 20
+encrucijadas por siglo y 7 sucesiones quedan 13 para las otras dieciséis
+plantillas, menos de una por plantilla y siglo. El rango sube a 1–5 para
+reconocerlo en vez de disimularlo sacando la sucesión de la cuenta.
 
 La segunda fila es la que hace cumplir el principio 4 de `valle.md`: **la aldea
 solo muere si el jugador la mata.** Si esa cifra baja del 25 %, las encrucijadas
@@ -2783,7 +2845,7 @@ todo.*
 ### A.7 `smith_feud` · feud
 
 **Peso** 9 · **Reposo** 15 años
-**Requiere** `grudge min 55`, `people > 20`
+**Requiere** `grudge min 45`, `people > 20` — con 55 no dispara nunca: la ventana en que alguien odia a otro por más de 55, hay más de veinte personas y el reposo ha vencido, no llega a solaparse en 2 000 años de aldea
 **Reparto** `A = anyNamed`, `B = grudgeAgainst A`
 
 > **The Anvil and the Altar**
