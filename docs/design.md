@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.12 · 8 de septiembre de 2026, 00:47 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.13 · 8 de septiembre de 2026, 01:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -41,6 +41,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
 | **2.11** | 7 sep 2026, 23:44 | Revisión de M-10 y desarrollo de M-11/M-12 | Muertes de todos los pasos con epitafio y coste de ánimo; búfer de crónica; determinismo con 5 000 ticks realmente alcanzados; banco real y cobertura pendiente explícita. |
 | **2.12** | 8 sep 2026, 00:47 | M-13 y M-14 | Fuente única; **mapa real y aldea que se construye sola**; piedra en puntos de obra; dos lecturas de §7.4 corregidas; la iglesia crece desde cualquier esquina. Medido, no previsto. |
+| **2.13** | 8 sep 2026, 01:20 | Revisión de M-13/M-14 | **Política `prudent` como referencia** y bandas por política; horquilla mínima entre jugar bien y mal; `interregnum` cierra la sucesión; los campos no arden. |
 
 ### 2.12 — El valle existe y la aldea se construye sola
 
@@ -1073,7 +1074,10 @@ como una catástrofe, no como un impuesto.
 ### 5.9 Incendio
 
 Comprobación anual, `p = FIRE_CHANCE`. Destruye un edificio de madera al azar
-(`tier === 0`), con preferencia por las casas. Si toca un granero, se pierde
+(`tier === 0`) **con techo** —casas, granero, capilla, fragua, molino—, con
+preferencia por las casas. **Los campos no arden**: son `tier: 0` por accidente
+de la tabla de §7.2, no porque el fuego deba llevárselos. Perder un campo cuesta
+600 de cosecha para siempre y en la crónica se lee raro. Si toca un granero, se pierde
 además el 45 % del grano almacenado. `morale −= 6`. El edificio pasa a ruina y
 **se ve** — es el suceso más barato del juego en código y de los más visibles.
 
@@ -2154,20 +2158,46 @@ export const CROSSROADS = {
 ### 12.9 Objetivos que verifica la suite de balance
 
 Estos son los asertos, no los resultados. Se comprueban sobre 60 semillas × 200
-años. **Se miden dos políticas, y ninguna es neutra.** `first` toma siempre la
-primera opción, que en casi todas las plantillas es la acomodaticia: nunca paga
-un coste presente, así que jamás levanta la empalizada ni funda nada, y toda
-plantilla cuyo interruptor sea una obra del jugador se queda encendida para
-siempre. `last` toma la desafiante. La verdad está entre las dos y por eso se
-informan las dos:
+años, con **cuatro políticas**.
 
-| Propiedad | Umbral |
-|---|---|
-| Extinción con política neutra | 2 % – 12 % |
-| Extinción con política adversa (siempre la peor opción) | ≥ 25 % |
-| Mediana del pico de población | 65 – 82 |
-| Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas |
-| Población visible al final de la primera generación | ≥ 26 en la mediana |
+**Ninguna de las tres primeras representa a alguien jugando con cabeza, y por eso
+no sirven para fijar una banda.** `first` toma siempre la primera opción, que en
+casi todas las plantillas es la acomodaticia — y en un juego de subsistencia la
+acomodaticia es **la manirrota**: comprar la reliquia son seis semanas de pan,
+acoger a los nueve del vado son nueve bocas más, pagar a los bandidos es un
+tercio del granero. Además nunca paga un coste presente, así que jamás levanta la
+empalizada y toda plantilla cuyo interruptor sea una obra del jugador se queda
+encendida para siempre. `last` toma la desafiante y `worst` la peor. Las tres son
+cotas, no medidas.
+
+**`prudent` es la política de referencia.** Sin lookahead y determinista: puntúa
+cada opción disponible como
+
+```
+score = −(grano que cuesta) − 40·(muertos inmediatos)
+        − 15·(ánimo perdido)  + 10·(si no planta semilla)
+```
+
+y toma la mayor. No pretende ser juego óptimo —no lo es— sino **un aldeano
+cauto**: el suelo por debajo del cual ningún jugador razonable debería caer. Las
+bandas de esta tabla se miden con ella; las otras tres se informan al lado para
+ver la horquilla.
+
+**Por qué hacía falta.** Medido con M-14 en pie, `first` extingue el 61,7 % de
+las aldeas y `worst` el 75 %: catorce puntos de diferencia entre la política
+manirrota y la peor posible. Si el desenlace apenas depende de lo que se elige,
+el jugador no es un cuello de botella sino un espectador con botones, y eso rompe
+el principio 2 de `valle.md`. Antes de tocar la letalidad de las encrucijadas hay
+que medir con una política que no se arruine sola.
+
+| Propiedad | Umbral | Política |
+|---|---|---|
+| Extinción | 2 % – 12 % | `prudent` |
+| Extinción | ≥ 25 % | `worst` |
+| Horquilla entre `prudent` y `worst` | ≥ 20 puntos | — |
+| Mediana del pico de población | 65 – 82 | `prudent` |
+| Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas | `prudent` |
+| Población visible al final de la primera generación | ≥ 26 en la mediana | `prudent` |
 | **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. |
 | Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
 | Fracción de ticks elegibles, por plantilla | < 1 % |
@@ -2184,9 +2214,11 @@ encrucijadas por siglo y 7 sucesiones quedan 13 para las otras dieciséis
 plantillas, menos de una por plantilla y siglo. El rango sube a 1–5 para
 reconocerlo en vez de disimularlo sacando la sucesión de la cuenta.
 
-La segunda fila es la que hace cumplir el principio 4 de `valle.md`: **la aldea
-solo muere si el jugador la mata.** Si esa cifra baja del 25 %, las encrucijadas
-no tienen dientes suficientes y hay que endurecer sus efectos, no el mundo.
+La fila de `worst` es la que hace cumplir el principio 4 de `valle.md`: **la
+aldea solo muere si el jugador la mata.** Si esa cifra baja del 25 %, las
+encrucijadas no tienen dientes suficientes y hay que endurecer sus efectos, no el
+mundo. Y la fila de la horquilla es la que hace cumplir el principio 2: si jugar
+bien y jugar mal acaban en el mismo sitio, el jugador sobra.
 
 ---
 
@@ -2653,7 +2685,7 @@ resolver) sobre 5 000 entradas generadas.
 export function foundGame(seed: number): GameState;
 export function tick(state: GameState, catalogue: Catalogue, decision?: Decision): TickReport;
 export function run(state: GameState, ticks: number, policy: Policy, catalogue: Catalogue): TickReport[];
-export type Policy = 'first' | 'last' | 'random' | 'worst'
+export type Policy = 'first' | 'last' | 'random' | 'worst' | 'prudent'
   | ((state: GameState, options: readonly string[]) => string);
 ```
 El catálogo se inyecta como en M-07, para probar escenarios sin introducir un
@@ -2690,7 +2722,7 @@ cámara y guardado figuran pendientes: no se sustituyen por pruebas del andamiaj
 **Depende de.** M-10.
 **Ficheros.** `tests/balance/**`, `tools/balance-report.ts`.
 **Contrato.** `npm run test:balance` ejecuta 60 semillas × 200 años con las
-políticas `first`, `last` y `worst`, comprueba los umbrales de §12.9, imprime una tabla
+políticas `prudent`, `first`, `last` y `worst`, comprueba los umbrales de §12.9, imprime una tabla
 y escribe `artifacts/balance.csv`.
 **Reglas.** Ningún umbral se fija con una sola semilla. Las series se guardan
 para poder mirar la forma de las curvas.
@@ -3267,7 +3299,7 @@ todo.*
 ### A.15 `succession` · succession
 
 **Peso** 100 · **Reposo** 0 · **Salta el intervalo mínimo**
-**Requiere** `not role leader alive`
+**Requiere** `not role leader alive`, `not flag interregnum`
 **Reparto** `A = anyNamed` **filtrado** a 20–60 años, `B = anyNamed excluding [A]` (igual). Si no llegan a dos candidatos en la banda, se ensancha; el respaldo es la excepción, no la regla.
 
 > **Who Speaks Now**
@@ -3278,11 +3310,19 @@ todo.*
 |---|---|---|---|---|
 | **{A}** | {B} will remember it | `role A leader`, `opinion B→A −45`, `memory B was_passed_over 4` | `gather square 3` | `the_passed_over`, 5–20 años: si `opinion B→A < −60`, dispara `smith_feud` |
 | **{B}** | {A} will remember it | Simétrico | `gather square 3` | Simétrico |
-| **No one** | The valley decides things by shouting for a while | `morale −12`, `faith −6`, obra ×0.8 durante 2 años | `douse` general 1 año | `the_leaderless_years`, 2–4 años: se vuelve a disparar `succession` |
+| **No one** | The valley decides things by shouting for a while | `morale −12`, `faith −6`, obra ×0.8 durante 2 años, **`flag interregnum` los mismos años que tarde la semilla** | `douse` general 1 año | `the_leaderless_years`, 2–4 años: levanta `interregnum` y se vuelve a disparar `succession` |
 
 *Nota de diseño: es la única plantilla que ignora el intervalo mínimo, y el
 latido del bucle largo. Cada generación el jugador reparte una herencia y crea
 un rencor.*
+
+**Por qué la bandera `interregnum`.** Sin ella, elegir «No one» deja el puesto
+vacante, la vacante vuelve a hacer elegible la plantilla al tick siguiente, y
+`succession` pasa a ser elegible el 78 % de los ticks: bajo cualquier política
+que rechace a los dos candidatos, la aldea vive preguntándose quién manda y no
+queda presupuesto para nada más. La semilla ya decía que la aldea pasa dos a
+cuatro años a gritos antes de volver a preguntar; la bandera es la mitad que
+faltaba para que eso se cumpliera de verdad.
 
 ---
 
