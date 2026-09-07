@@ -10,7 +10,9 @@ import { run } from '../src/engine/sim';
 import { TERRAIN_CODE } from '../src/engine/state';
 import type { GameState } from '../src/engine/state';
 
-export const POLICIES = ['first', 'last', 'worst'] as const;
+// v2.13: `prudent` first, because it is the reference §12.9 measures its bands
+// with. The other three are bounds reported beside it.
+export const POLICIES = ['prudent', 'first', 'last', 'worst'] as const;
 export type BenchPolicy = typeof POLICIES[number];
 const YEARS = 200;
 const SEEDS = 60;
@@ -47,6 +49,7 @@ export interface Trial {
   allowedByTemplate: Record<string, number>;
   invalid: string[];
   geometry: string[];
+  deathsByCause: Record<string, number>;
   shocked: boolean;
   shockExtinct: boolean;
 }
@@ -131,7 +134,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     generationOne: 0, fullMap: false, forestRatio: null, cadence: 0, allCadence: 0,
     ceilingIntervals: 0, intervals: 0, eligibleTicks: Object.fromEntries(CATALOG.map((t) => [t.id, 0])),
     posedByTemplate: Object.fromEntries(CATALOG.map((t) => [t.id, 0])), allowedByTemplate: {},
-    invalid: [], geometry: [], shocked: false, shockExtinct: false };
+    invalid: [], geometry: [], deathsByCause: {}, shocked: false, shockExtinct: false };
   let shock: GameState | null = null;
   let counted = 0;
   let allCounted = 0;
@@ -149,6 +152,11 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     }
     const report = run(state, 1, policy, CATALOG)[0];
     if (report === undefined) throw new Error('Live simulation did not advance');
+    // Where the deaths come from, so that an extinction rate above its band can
+    // be attributed rather than guessed at.
+    for (const death of report.deaths) {
+      result.deathsByCause[death.cause] = (result.deathsByCause[death.cause] ?? 0) + 1;
+    }
     if (report.posed !== null) {
       allCounted += 1;
       result.posedByTemplate[report.posed] = (result.posedByTemplate[report.posed] ?? 0) + 1;
@@ -220,6 +228,7 @@ export interface PolicySummary {
   shockExtinction: number | null;
   invalidCases: number;
   geometryCases: number;
+  deathsByCause: Record<string, number>;
   eligibility: Record<string, number>;
   restUtilization: Record<string, number | null>;
 }
@@ -238,6 +247,10 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
     shockExtinction: shocked.length === 0 ? null : shocked.filter((t) => t.shockExtinct).length / shocked.length,
     invalidCases: total((t) => t.invalid.length),
     geometryCases: total((t) => t.geometry.length),
+    deathsByCause: group.reduce<Record<string, number>>((acc, t) => {
+      for (const [cause, n] of Object.entries(t.deathsByCause)) acc[cause] = (acc[cause] ?? 0) + n;
+      return acc;
+    }, {}),
     eligibility: Object.fromEntries(CATALOG.map((template) => [template.id,
       total((t) => t.eligibleTicks[template.id] ?? 0) / total((t) => t.ticks)])),
     restUtilization: Object.fromEntries(CATALOG.map((template) => {
@@ -261,13 +274,18 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
   const durationMs = performance.now() - started;
   writeFileSync('artifacts/balance-summary.json', JSON.stringify({ durationMs, summaries, trials }, null, 2) + '\n');
   console.table(summaries.map((summary) => Object.fromEntries(Object.entries(summary)
-    .filter(([key]) => key !== 'eligibility' && key !== 'restUtilization'))));
+    .filter(([key]) => key !== 'eligibility' && key !== 'restUtilization' && key !== 'deathsByCause'))));
+  console.info('Deaths by cause:');
+  console.table(summaries.map((s) => ({ policy: s.policy, ...s.deathsByCause })));
   console.table(CATALOG.map((t) => ({ template: t.id, ...Object.fromEntries(summaries.map((s) => [s.policy, s.eligibility[t.id]])) })));
   console.info('Posed / theoretical maximum from template rest (reserve excluded):');
   console.table(CATALOG.filter((t) => t.id !== 'quiet_years').map((t) => ({ template: t.id,
     ...Object.fromEntries(summaries.map((s) => [s.policy, s.restUtilization[t.id]])) })));
   console.info('quiet_years is the guarantee reserve; raw counts are in the per-seed JSON.');
-  console.info('Extinction first/last: historical 2–12% band is diagnostic; neutral policy is undefined.');
+  const band = (policy: BenchPolicy): number =>
+    summaries.find((s) => s.policy === policy)?.extinction ?? Number.NaN;
+  console.info(`Extinction spread, worst - prudent: ${((band('worst') - band('prudent')) * 100).toFixed(1)} points (§12.9: >= 20)`);
+
   console.info('Forest ratio: pending M-15.');
   console.info(`Series: artifacts/balance.csv; raw trials: artifacts/balance-summary.json; runtime ${(durationMs / 1000).toFixed(2)}s`);
   return { trials, summaries, durationMs };

@@ -6,7 +6,7 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
   beforeAll(() => { result = runBalance(); });
 
   it('runs all 60 seeds for each policy within five minutes', () => {
-    expect(result.trials).toHaveLength(180);
+    expect(result.trials).toHaveLength(60 * POLICIES.length);
     for (const policy of POLICIES) expect(result.trials.filter((t) => t.policy === policy)).toHaveLength(60);
     expect(result.durationMs).toBeLessThan(300_000);
   });
@@ -33,7 +33,11 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
         expect(summary().shockTrials).toBeGreaterThan(0);
         expect(summary().shockExtinction).toBeGreaterThanOrEqual(0.25);
       });
-      if (policy !== 'worst') {
+      // v2.13: the population bands belong to `prudent` and to nothing else.
+      // `first` is the spendthrift policy, `last` the defiant one and `worst`
+      // the adverse one; none of the three stands in for a player with their
+      // head on, so none of the three can set a floor.
+      if (policy === 'prudent') {
         it('has median peak population 65–82', () => {
           expect(summary().medianPeak).toBeGreaterThanOrEqual(65);
           expect(summary().medianPeak).toBeLessThanOrEqual(82);
@@ -41,20 +45,27 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
         it('has median population at least 26 at the end of generation one', () => {
           expect(summary().medianGenerationOne).toBeGreaterThanOrEqual(26);
         });
+        it('has extinction between 2% and 12%', () => {
+          expect(summary().extinction).toBeGreaterThanOrEqual(0.02);
+          expect(summary().extinction).toBeLessThanOrEqual(0.12);
+        });
       }
     });
   }
   it('has at least 25% extinction under the adverse policy', () => {
     expect(result.summaries.find((s) => s.policy === 'worst')?.extinction).toBeGreaterThanOrEqual(0.25);
   });
-  it.todo('neutral extinction 2–12%: §12.9 explicitly says first and last are not neutral; policy needs definition');
+  it('opens at least 20 points of extinction between prudent and worst', () => {
+    // Principle 2 of valle.md, as a number: if playing well and playing badly
+    // end in the same place, the player is a spectator with buttons.
+    const of = (policy: string): number =>
+      result.summaries.find((s) => s.policy === policy)?.extinction ?? Number.NaN;
+    expect(of('worst') - of('prudent')).toBeGreaterThanOrEqual(0.2);
+  });
   it('fills 60% of maps with 8 fields and 16 houses before year 120', () => {
-    // §12.9. Now measurable: step 6 spends the build points. `worst` is the
-    // adverse policy and is not held to a growth target.
-    for (const policy of ['first', 'last'] as const) {
-      expect(result.summaries.find((s) => s.policy === policy)?.fullMap, policy)
-        .toBeGreaterThanOrEqual(0.6);
-    }
+    // §12.9, measured with the reference policy since v2.13.
+    expect(result.summaries.find((s) => s.policy === 'prudent')?.fullMap)
+      .toBeGreaterThanOrEqual(0.6);
   });
   it.todo('40–70% initial forest remaining at year 100: requires M-15');
 });

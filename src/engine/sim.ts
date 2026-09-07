@@ -148,28 +148,72 @@ export interface TickReport {
 }
 
 /**
- * How the player answers. §12.9 measures two of these, and neither is neutral.
+ * How the player answers. §12.9 measures four of these, and only one of them
+ * stands in for somebody playing with their head on.
  *
+ *   `prudent` scores each option and takes the best. **The reference policy**
+ *            (§12.9, v2.13): the bands of the balance suite are measured with
+ *            it, because a band measured with a policy that ruins itself says
+ *            nothing about whether the game is winnable.
  *   `first`  takes the first option, which in almost every template is the
- *            accommodating one: it never pays a present cost. It never raises
- *            the palisade, so `bandits` never switches itself off. Calling it
- *            "neutral" is what let the cadence measurements of M-08 read
- *            higher than the game will play.
+ *            accommodating one — and in a subsistence game the accommodating
+ *            option is the spendthrift one. It never pays a present cost
+ *            either, so it never raises the palisade and every template whose
+ *            off-switch is a work of the player's stays lit for ever.
  *   `last`   takes the last, which is usually the defiant one. It pays now.
  *   `random` draws from the 'crossroads' stream, so a scripted game stays
  *            reproducible.
- *   `worst`  takes the option with the heaviest immediate cost, which is the
- *            adverse policy §12.9 uses to check that the village can be killed.
+ *   `worst`  takes the option with the heaviest immediate cost, the adverse
+ *            policy §12.9 uses to check that the village can be killed.
  *
- * The truth about a balance number lies between `first` and `last`, which is
- * why both are reported and neither is called neutral.
+ * The first three are bounds, not measurements. The spread between `prudent`
+ * and `worst` is what principle 2 of valle.md is measured by: if playing well
+ * and playing badly end in the same place, the player is a spectator.
  */
 export type Policy =
   | 'first'
   | 'last'
   | 'random'
   | 'worst'
+  | 'prudent'
   | ((state: GameState, options: readonly string[]) => string);
+
+/**
+ * §12.9's scoring for `prudent`, literally:
+ *
+ *   score = −(grain it costs) − 40·(immediate dead)
+ *           − 15·(morale lost) + 10·(if it plants no seed)
+ *
+ * No lookahead: it weighs what it can see this week, exactly as a villager
+ * would. It is not optimal play and does not pretend to be — it is the floor
+ * below which no reasonable player should fall.
+ *
+ * A gain counts as a negative cost, so an option that brings grain scores
+ * above one that does not. The seed bonus is a preference for consequences the
+ * village can still see coming, not a claim that seeds are always bad.
+ */
+function prudentScore(state: GameState, catalogue: Catalogue, optionId: string): number {
+  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
+  const option = template?.options.find((o) => o.id === optionId);
+  if (option === undefined) return Number.NEGATIVE_INFINITY;
+
+  let grain = 0;
+  let dead = 0;
+  let morale = 0;
+  for (const e of option.effects) {
+    if (e.k === 'kill') {
+      dead += e.count === 'fraction' ? population(state) * (e.fraction ?? 0) : e.count;
+    } else if (e.k === 'stat') {
+      // A multiplier's cost depends on the stat as it stands right now, which
+      // is the whole reason this is evaluated per tick and not per template.
+      const delta = 'delta' in e ? e.delta : state.village[e.stat] * (e.mul - 1);
+      if (e.stat === 'grain') grain -= delta;
+      if (e.stat === 'morale') morale -= delta;
+    }
+  }
+
+  return -grain - 40 * dead - 15 * morale + (option.seeds.length === 0 ? 10 : 0);
+}
 
 /**
  * How much an option costs the village right now. Used only by `worst`.
@@ -225,6 +269,21 @@ export function decide(
         }
       }
       return worst;
+    }
+    case 'prudent': {
+      // Ties break on the option's id, never on where it happens to sit in the
+      // template (§12.9, v2.13): the order the options are written in must not
+      // be able to move a balance number.
+      let best: string | null = null;
+      let bestScore = Number.NEGATIVE_INFINITY;
+      for (const id of options) {
+        const score = prudentScore(state, catalogue, id);
+        if (score > bestScore || (score === bestScore && best !== null && id < best)) {
+          bestScore = score;
+          best = id;
+        }
+      }
+      return best;
     }
     default:
       return options[0] ?? null;

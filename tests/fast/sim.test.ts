@@ -13,6 +13,7 @@ import { ageOf } from '@engine/people/villagers';
 import { holderOf } from '@engine/crossroads/conditions';
 import { decide, fillVacancies, run, tick } from '@engine/sim';
 import type { GameState, Villager } from '@engine/state';
+import type { CrossroadTemplate } from '@engine/crossroads/schema';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
 
@@ -228,8 +229,8 @@ describe('robustez', () => {
     }
   });
 
-  it('las cuatro políticas corren sin romperse', () => {
-    for (const policy of ['first', 'last', 'random', 'worst'] as const) {
+  it('las cinco políticas corren sin romperse', () => {
+    for (const policy of ['first', 'last', 'random', 'worst', 'prudent'] as const) {
       const s = foundGame(11);
       expect(() => run(s, 2000, policy, CATALOG), policy).not.toThrow();
     }
@@ -351,5 +352,122 @@ describe('políticas · §12.9', () => {
     run(s, 100 * YEAR, 'first', CATALOG);
     const walled = s.history.filter((d) => d.optionId === 'wall_the_village_first');
     expect(walled).toHaveLength(0);
+  });
+});
+
+describe('la política prudent · §12.9', () => {
+  // El catálogo real no sirve para fijar el resultado de una puntuación: no se
+  // sabe qué encrucijada sale ni con qué estado. Estas plantillas existen sólo
+  // aquí, con las cifras a la vista, que es lo que hace legible el aserto.
+  const template = (options: CrossroadTemplate['options']): CrossroadTemplate => ({
+    id: 'probe', category: 'lord', weight: 1, cooldownYears: 0,
+    requires: [], cast: [],
+    title: 'crossroad.probe.title', body: 'crossroad.probe.body',
+    options,
+  });
+  const option = (
+    id: string,
+    effects: CrossroadTemplate['options'][number]['effects'],
+    seeds: CrossroadTemplate['options'][number]['seeds'] = [],
+  ): CrossroadTemplate['options'][number] => ({
+    id, label: `crossroad.probe.${id}.label`, cost: `crossroad.probe.${id}.cost`,
+    effects, visible: [{ k: 'gather', where: 'square', days: 1 }], seeds,
+  });
+
+  const ask = (t: CrossroadTemplate, state = foundGame(7)): string | null => {
+    state.crossroad = {
+      templateId: t.id, posedTick: state.tick, cast: {},
+      optionIds: t.options.map((o) => o.id),
+    };
+    return decide(state, [t], 'prudent');
+  };
+
+  it('prefiere no pagar grano', () => {
+    const t = template([
+      option('pay', [{ k: 'stat', stat: 'grain', delta: -300 }]),
+      option('refuse', []),
+    ]);
+    expect(ask(t)).toBe('refuse');
+  });
+
+  it('un muerto pesa 40, así que cuarenta de grano no lo compran', () => {
+    const t = template([
+      option('kill_one', [{ k: 'kill', who: 'random', count: 1 }]),
+      option('pay_thirty', [{ k: 'stat', stat: 'grain', delta: -30 }]),
+    ]);
+    expect(ask(t)).toBe('pay_thirty');
+    const u = template([
+      option('kill_one', [{ k: 'kill', who: 'random', count: 1 }]),
+      option('pay_fifty', [{ k: 'stat', stat: 'grain', delta: -50 }]),
+    ]);
+    expect(ask(u)).toBe('kill_one');
+  });
+
+  it('el ánimo perdido pesa 15 por punto', () => {
+    const t = template([
+      option('mood', [{ k: 'stat', stat: 'morale', delta: -10 }]), // −150
+      option('grain', [{ k: 'stat', stat: 'grain', delta: -100 }]), // −100
+    ]);
+    expect(ask(t)).toBe('grain');
+  });
+
+  it('con todo lo demás igual, prefiere la opción que no planta semilla', () => {
+    const seed = {
+      id: 'later', delayYears: [2, 4] as [number, number], effects: [],
+      visible: [], chronicleKey: 'consequence.later',
+    };
+    const t = template([option('with_seed', [], [seed]), option('clean', [])]);
+    expect(ask(t)).toBe('clean');
+  });
+
+  it('una ganancia de grano es un coste negativo, no cero', () => {
+    const t = template([
+      option('take', [{ k: 'stat', stat: 'grain', delta: 200 }]),
+      option('leave', []),
+    ]);
+    expect(ask(t)).toBe('take');
+  });
+
+  it('el coste de un multiplicador se mide sobre el estado de este tick', () => {
+    const t = template([
+      option('third', [{ k: 'stat', stat: 'grain', mul: 0.66 }]),
+      option('flat', [{ k: 'stat', stat: 'grain', delta: -100 }]),
+    ]);
+    const poor = foundGame(7);
+    poor.village.grain = 60; // un tercio de 60 son 20: más barato que 100
+    expect(ask(t, poor)).toBe('third');
+    const rich = foundGame(7);
+    rich.village.grain = 3000; // un tercio de 3000 son 1020
+    expect(ask(t, rich)).toBe('flat');
+  });
+
+  it('el orden en que estén escritas las opciones no cambia el resultado', () => {
+    // El aserto que pide el brief: ante un empate desempata el id, no la
+    // posición. Con las dos ordenaciones tiene que salir la misma opción.
+    const a = option('aaa', [{ k: 'stat', stat: 'grain', delta: -50 }]);
+    const z = option('zzz', [{ k: 'stat', stat: 'grain', delta: -50 }]);
+    expect(ask(template([a, z]))).toBe('aaa');
+    expect(ask(template([z, a]))).toBe('aaa');
+  });
+
+  it('es determinista y no consume aleatoriedad', () => {
+    const s = foundGame(7);
+    const t = template([
+      option('a', [{ k: 'stat', stat: 'grain', delta: -10 }]),
+      option('b', [{ k: 'stat', stat: 'morale', delta: -1 }]),
+    ]);
+    s.crossroad = { templateId: t.id, posedTick: 0, cast: {}, optionIds: ['a', 'b'] };
+    const before = { ...s.rng };
+    const first = decide(s, [t], 'prudent');
+    expect(decide(s, [t], 'prudent')).toBe(first);
+    expect({ ...s.rng }).toEqual(before);
+  });
+
+  it('dos partidas con prudent y la misma semilla son idénticas', () => {
+    const a = foundGame(19);
+    const b = foundGame(19);
+    run(a, 3000, 'prudent', CATALOG);
+    run(b, 3000, 'prudent', CATALOG);
+    expect(fingerprint(a)).toBe(fingerprint(b));
   });
 });
