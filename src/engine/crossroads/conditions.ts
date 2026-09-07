@@ -5,9 +5,10 @@
 // and a saved game can carry its pending seeds' conditions without carrying
 // code.
 
-import { FOOD, TERRAIN_CODE, TIME } from '../balance';
+import { FOOD, TIME } from '../balance';
 import { freeBeds, housingCapacity, isHere, population } from '../people/demography';
 import { grudges } from '../people/opinions';
+import { TERRAIN_CODE } from '../state';
 import type { Condition, GameState, Op, Role } from '../state';
 import { seasonOf, weekOf, yearOf } from '../time';
 import { count } from '../subsistence/building-counts';

@@ -4,8 +4,9 @@
 // definido aquí, escogido para ejercitar cada variante del DSL, cada forma de
 // reparto y las dos reglas que se pelean: el techo y la garantía.
 import { describe, expect, it } from 'vitest';
-import { CROSSROADS, TERRAIN_CODE, TIME } from '@engine/balance';
+import { CROSSROADS, TIME } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
+import { TERRAIN_CODE } from '@engine/state';
 import type { Building, Condition, GameState, Villager, VillagerId } from '@engine/state';
 import { foundPeople, ageOf } from '@engine/people/villagers';
 import { isHere, population } from '@engine/people/demography';

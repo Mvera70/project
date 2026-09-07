@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.6 · 7 de septiembre de 2026, 13:56 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.7 · 7 de septiembre de 2026, 14:18 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -29,6 +29,32 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
 | **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
 | **2.6** | 7 sep 2026, 13:56 | Revisión de M-05 y M-09 | Componer crónica no consume aleatoriedad; **§9.4 nueva: la muerte de un nombrado**; semillas append-only; crisis de hambruna definida con fórmula. |
+| **2.7** | 7 sep 2026, 14:18 | Revisión de M-07 | **La exención del techo se gasta en la primera pregunta**; criterio medible para el ritmo; epitafio con rencores sanados; `TERRAIN_CODE` como contrato de serialización. |
+
+### 2.7 — Revisión de M-07
+
+- **§8.6 · La exención del techo se gasta en la primera pregunta.** El fallo de
+  la ronda, y era de diseño, no de implementación: §6.6 dice que la sucesión se
+  dispara «siempre» al morir el líder y §8.6 que una crisis salta el techo, sin
+  decir que la exención es **por episodio y no mientras dure la condición**. Con
+  el líder muerto y sin sucesor, la encrucijada se disparaba cada dos ticks para
+  siempre — 6 578 veces en 20 partidas. Una hambruna dura meses y un puesto
+  vacante dura hasta que alguien lo toma: una exención que valiera todo ese
+  tiempo convierte la decisión en un menú.
+- **§8.6 · Criterio medible para el ritmo.** Contar encrucijadas por partida no
+  basta: lo que importa es qué fracción de los intervalos queda pegada al techo.
+  Si manda el reloj, el jugador percibe un metrónomo en vez de un mundo. Umbral:
+  40 %, y **subir el techo es el último remedio**, no el primero.
+- **§9.4 · El epitafio admite rencores sanados**, con orden de preferencia de
+  cuatro escalones. Un arco cerrado es tan buen epitafio como uno abierto: *«They
+  had not spoken for seven years, and then they had.»* Y se elige el rencor más
+  **antiguo**, no el más hondo.
+- **§8.3 · El reparto se resuelve en orden de dependencia**, no de declaración, y
+  un ciclo devuelve `null` en vez de colgarse.
+- **§3.5 · `TERRAIN_CODE` vive en `state.ts`, no en `balance.ts`.** Es contrato
+  de serialización, no perilla: los bytes de toda partida guardada dependen de
+  él. Un fichero cuyo propósito es que lo toquen no es sitio para algo que no se
+  puede tocar nunca.
 
 ### 2.6 — Revisión de M-05 y M-09
 
@@ -391,6 +417,13 @@ nunca se borra. Cuando la opinión sube por encima de −20 se le pone
 
 ```ts
 export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared';
+
+/** Contrato de serialización. Vive en `state.ts`, NO en `balance.ts`: no es una
+ *  perilla. Los bytes de toda partida guardada dependen de estos valores y el
+ *  orden no se puede cambiar nunca. */
+export const TERRAIN_CODE = {
+  meadow: 0, forest: 1, water: 2, rock: 3, marsh: 4, cleared: 5,
+} as const;
 
 export interface ValleyMap {
   width: 36;
@@ -1094,6 +1127,11 @@ export type CastSpec =
   | { as: string; youngestNamed: true; female?: boolean };
 ```
 
+El reparto se resuelve **en orden de dependencia, no de declaración**: una
+plantilla puede escribir `{as:'B', grudgeAgainst:'A'}` antes que `A` sin fallar
+en silencio. Un ciclo entre dos letras devuelve `null` — la plantilla no es
+elegible— en vez de colgarse.
+
 ### 8.4 Efectos
 
 ```ts
@@ -1163,7 +1201,15 @@ pick weighted by score, from the 'crossroads' stream
 
 **Crisis** = hambruna proyectada —`grain < people · (semanas que faltan hasta la
 semana 35)`, es decir, la despensa no llega a la próxima cosecha—, brote activo,
-bandera `threatened`, o muerte del líder. Una crisis salta el intervalo mínimo.
+bandera `threatened`, o muerte del líder.
+
+**La exención se gasta en la primera pregunta.** Una crisis y la sucesión se
+saltan el techo de 120 ticks, pero **una sola vez por episodio**, no mientras
+dure la condición. Una hambruna dura meses y un puesto vacante dura hasta que
+alguien lo toma: una exención que valiera todo ese tiempo dispararía la misma
+encrucijada cada dos ticks y convertiría la decisión en un menú. §6.6 dice que
+la sucesión se dispara «siempre» al morir el líder: **una vez por muerte, no una
+vez por tick.**
 
 **Garantía por generación:** si han pasado 960 ticks sin ninguna encrucijada, se
 fuerza la de mayor puntuación aunque no sea crisis. Si no hay ninguna elegible
@@ -1172,6 +1218,19 @@ qué hacer con un excedente.
 
 **Techo:** una cada 120 ticks (30 minutos reales a ×1). Las encrucijadas tienen
 que seguir siendo raras o dejan de pesar.
+
+**Cómo se comprueba que el ritmo es sano.** No basta con contar encrucijadas por
+partida: hay que mirar **qué fracción de los intervalos queda pegada al techo**.
+Si el techo manda casi siempre, el jugador percibe un metrónomo en vez de un
+mundo, aunque el total parezca razonable.
+
+| Señal | Diagnóstico | Remedio, en este orden |
+|---|---|---|
+| La garantía se dispara a menudo | Casi nada resulta elegible | Aflojar condiciones del catálogo |
+| **> 40 % de intervalos al ras del techo** | Manda el reloj, no el contenido | Endurecer condiciones; luego subir cooldowns; **subir el techo es el último recurso** |
+| < 40 %, y la garantía a cero | Sano | — |
+
+Se mide con el catálogo real de 16 plantillas, sobre 20 semillas × 100 años.
 
 ### 8.7 Resolución
 
@@ -1245,8 +1304,16 @@ narra, no juzga.
 
 Una muerte corriente es una línea de peso 1. **La de un nombrado es de peso 3**,
 y no puede limitarse a decir el nombre y la edad: tiene que cargar con quién fue
-esa persona. Al componerla se le añade, si existe, una subordinada con el rencor
-abierto más antiguo del muerto, o en su defecto su memoria de mayor peso.
+esa persona. Al componerla se le añade una subordinada, eligiendo en este orden:
+
+1. Su **rencor abierto más antiguo**. Antiguo, no hondo: una enemistad de treinta
+   años dice más de quién fue alguien que una del invierno pasado.
+2. Si no tiene ninguno abierto, su **rencor sanado más largo**. Un arco cerrado
+   es tan buen epitafio como uno abierto, y da una de las mejores líneas que
+   puede escribir este juego: *«They had not spoken for seven years, and then
+   they had.»*
+3. Si tampoco, su **memoria de mayor peso**.
+4. Si no hay nada, la variante desnuda: nombre, estación y edad.
 
 > *Aethelred died in the winter of year 14, sixty-eight winters old. He had not
 > spoken to Wulfnoth since the year 5.*

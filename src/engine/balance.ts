@@ -216,22 +216,6 @@ export const WORLD = {
   STONE_PER_BP: 0.5, // build points converted to stone, with a smithy
 } as const;
 
-/**
- * How the terrain of §3.5 is encoded in `map.terrain`.
- *
- * TUNE: this is not a tunable, it is a serialisation contract — a saved game's
- * bytes depend on it and the numbers must never be reordered. §3.5 names the
- * six terrains and never says which byte each one is; M-13 owns the map and
- * should adopt this rather than pick its own.
- */
-export const TERRAIN_CODE = {
-  meadow: 0,
-  forest: 1,
-  water: 2,
-  rock: 3,
-  marsh: 4,
-  cleared: 5,
-} as const;
 
 // ---------------------------------------------------------------------------
 // §12.8 · Crossroads

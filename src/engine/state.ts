@@ -161,6 +161,26 @@ export interface PeopleState {
 
 export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared';
 
+/**
+ * How a terrain is written into `map.terrain`. §3.5.
+ *
+ * A serialisation contract, not a tunable — which is why it is here and not in
+ * balance.ts, whose whole purpose is to be edited. The bytes of every saved
+ * game depend on these values and **the order is never changed**. A new terrain
+ * gets the next free number; none of the six below ever moves.
+ *
+ * This is the one value in a file that is otherwise types only, and it earns
+ * the exception by being the thing that gives those types a meaning on disk.
+ */
+export const TERRAIN_CODE = {
+  meadow: 0,
+  forest: 1,
+  water: 2,
+  rock: 3,
+  marsh: 4,
+  cleared: 5,
+} as const;
+
 export interface ValleyMap {
   width: 36;
   height: 56;

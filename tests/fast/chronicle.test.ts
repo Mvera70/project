@@ -476,7 +476,8 @@ describe('§9.4 · la muerte de un nombrado', () => {
     expect(namedDeathEntry(s, a, 'old_age').params['other']).toBe(older.name);
   });
 
-  it('un rencor ya sanado no se arrastra', () => {
+  it('un rencor sanado se arrastra como tal, no como abierto', () => {
+    // Era la regla de la v2.6; la v2.7 lo sube a escalón 2 de §9.4.
     const s = village(7);
     const a = named(s);
     const b = named(s, 1);
@@ -485,6 +486,83 @@ describe('§9.4 · la muerte de un nombrado', () => {
     s.tick = 48 * 12;
     adjustOpinion(s, a.id, b.id, 50);
     s.tick = 48 * 14;
+
+    const e = namedDeathEntry(s, a, 'old_age');
+    expect(e.params['tail']).toBe('death.named.grudge_healed');
+    expect(e.params['count']).toBe(7);
+    expect(renderEntry({ ...e, tick: s.tick }, s.rng)).not.toMatch(/\{\w+\}/);
+  });
+
+  it('sin rencor abierto, arrastra el sanado más LARGO', () => {
+    // §9.4 escalón 2: un arco cerrado es tan buen epitafio como uno abierto.
+    const s = village(7);
+    const a = named(s);
+    const shortOne = named(s, 1);
+    const longOne = named(s, 2);
+
+    s.tick = 48 * 10;
+    adjustOpinion(s, a.id, shortOne.id, -60);
+    s.tick = 48 * 12; // dos años
+    adjustOpinion(s, a.id, shortOne.id, 50);
+
+    s.tick = 48 * 3;
+    adjustOpinion(s, a.id, longOne.id, -60);
+    s.tick = 48 * 10; // siete años
+    adjustOpinion(s, a.id, longOne.id, 50);
+
+    s.tick = 48 * 20;
+    const e = namedDeathEntry(s, a, 'old_age');
+    expect(e.params['tail']).toBe('death.named.grudge_healed');
+    expect(e.params['other']).toBe(longOne.name);
+    expect(e.params['count']).toBe(7);
+
+    const text = renderEntry({ ...e, tick: s.tick }, s.rng);
+    expect(text).toContain(longOne.name);
+    expect(text.toLowerCase()).toContain('seven');
+  });
+
+  it('un rencor abierto gana a uno sanado, por viejo que sea el sanado', () => {
+    const s = village(7);
+    const a = named(s);
+    const healedWith = named(s, 1);
+    const openWith = named(s, 2);
+
+    s.tick = 48 * 2;
+    adjustOpinion(s, a.id, healedWith.id, -60);
+    s.tick = 48 * 18; // dieciséis años, larguísimo
+    adjustOpinion(s, a.id, healedWith.id, 50);
+
+    s.tick = 48 * 19;
+    adjustOpinion(s, a.id, openWith.id, -60); // recién abierto
+
+    s.tick = 48 * 20;
+    const e = namedDeathEntry(s, a, 'old_age');
+    expect(e.params['tail']).toBe('death.named.grudge');
+    expect(e.params['other']).toBe(openWith.name);
+  });
+
+  it('un rencor sanado gana a la memoria más pesada', () => {
+    const s = village(7);
+    const a = named(s);
+    const b = named(s, 1);
+    remember(a, { tick: 48 * 4, kind: 'lost_child', aboutId: null, weight: 5 });
+    s.tick = 48 * 5;
+    adjustOpinion(s, a.id, b.id, -60);
+    s.tick = 48 * 9;
+    adjustOpinion(s, a.id, b.id, 50);
+    s.tick = 48 * 20;
+    expect(namedDeathEntry(s, a, 'old_age').params['tail']).toBe('death.named.grudge_healed');
+  });
+
+  it('una riña arreglada el mismo año no es una historia', () => {
+    const s = village(7);
+    const a = named(s);
+    const b = named(s, 1);
+    s.tick = 48 * 5;
+    adjustOpinion(s, a.id, b.id, -60);
+    s.tick = 48 * 5 + 20; // el mismo año
+    adjustOpinion(s, a.id, b.id, 50);
+    s.tick = 48 * 20;
     expect(namedDeathEntry(s, a, 'old_age').params['tail']).toBeUndefined();
   });
 

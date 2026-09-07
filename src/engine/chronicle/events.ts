@@ -90,15 +90,16 @@ export function departureKey(count: number): string {
 // ---------------------------------------------------------------------------
 
 /**
- * What a named villager's death drags behind it: the oldest grudge they never
- * made up, or failing that the heaviest thing they remembered.
+ * What a named villager's death drags behind it. §9.4, in this order:
  *
- * Returns a key and the parameters it needs, or null when there is nothing to
- * carry — a villager who quarrelled with nobody and remembered nothing gets the
- * plain line, and that is its own kind of epitaph.
- *
- * The oldest open grudge and not the deepest: a feud that has run for thirty
- * years says more about who someone was than one that started last winter.
+ *   1. The oldest grudge they never made up. Oldest, not deepest: a feud that
+ *      has run for thirty years says more about who someone was than one that
+ *      started last winter.
+ *   2. Failing that, the longest grudge they DID make up. A closed arc is as
+ *      good an epitaph as an open one, and gives one of the best lines this
+ *      game can write: "They had not spoken for seven years, and then they had."
+ *   3. Failing that, the heaviest thing they remembered.
+ *   4. Failing everything, null — and the bare line is its own kind of epitaph.
  */
 export function epitaphFor(
   state: GameState,
@@ -108,11 +109,12 @@ export function epitaphFor(
 
   const nameOf = (id: VillagerId): string =>
     state.people.villagers.find((x) => x.id === id)?.name ?? '';
+  const mine = state.people.grudges.filter((g) => g.fromId === v.id);
 
-  const open = state.people.grudges
-    .filter((g) => g.fromId === v.id && g.healedTick === null)
+  // 1 · the oldest open one
+  const open = mine
+    .filter((g) => g.healedTick === null)
     .sort((a, b) => a.formedTick - b.formedTick)[0];
-
   if (open !== undefined) {
     const other = nameOf(open.toId);
     if (other !== '') {
@@ -123,6 +125,28 @@ export function epitaphFor(
     }
   }
 
+  // 2 · the longest healed one. Longest by how many years it ran, not by when
+  // it started: the length is what the line is about.
+  const healed = mine
+    .filter((g) => g.healedTick !== null)
+    .sort(
+      (a, b) =>
+        (b.healedTick as number) - b.formedTick - ((a.healedTick as number) - a.formedTick) ||
+        a.formedTick - b.formedTick,
+    )[0];
+  if (healed !== undefined) {
+    const other = nameOf(healed.toId);
+    const years = yearOf(healed.healedTick as number) - yearOf(healed.formedTick);
+    // A quarrel that was made up inside the same year is not a story.
+    if (other !== '' && years >= 1) {
+      return {
+        key: 'death.named.grudge_healed',
+        params: { other, count: years, sinceYear: yearOf(healed.formedTick) },
+      };
+    }
+  }
+
+  // 3 · the heaviest memory
   const heaviest = [...v.memories].sort(
     (a, b) => b.weight - a.weight || a.tick - b.tick,
   )[0];

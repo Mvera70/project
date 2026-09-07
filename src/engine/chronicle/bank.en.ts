@@ -230,6 +230,11 @@ export const BANK: Record<string, string[]> = {
     '{name} and {other} had not spoken since year {sinceYear}.',
     'Whatever stood between {name} and {other} since year {sinceYear} went into the ground too.',
   ],
+  'death.named.grudge_healed': [
+    'They had not spoken to {other} for {count} years, and then they had.',
+    '{name} and {other} were at odds for {count} years before they made it up.',
+    'The quarrel with {other} lasted {count} years, and ended before either did.',
+  ],
   'death.named.lost_child': [
     '{name} had buried a child in year {sinceYear}.',
     'There had been a child, buried in year {sinceYear}.',
