@@ -315,6 +315,21 @@ describe('render', () => {
     expect(text).not.toContain('3 ');
   });
 
+  it('toda frase empieza con mayúscula, aunque abra con un recuento', () => {
+    // "three came over the ridge" es el fallo que sólo se ve leyendo.
+    const b = makeBundle(7);
+    const params = {
+      name: 'Mildreth', other: 'Osric', age: 44, year: 17, season: 'autumn',
+      count: 3, grain: 1224, people: 31, building: 'mill',
+    };
+    for (const key of bankKeys()) {
+      for (let tick = 0; tick < 12; tick += 1) {
+        const text = renderEntry(entry({ templateKey: key, tick, params }), b);
+        expect(text[0], `${key}: ${text}`).toBe(text[0]?.toUpperCase());
+      }
+    }
+  });
+
   it('las demás cifras van en números', () => {
     const text = renderEntry(
       entry({ templateKey: 'harvest.poor', params: { grain: 412, people: 23, year: 8 } }),

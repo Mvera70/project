@@ -81,7 +81,19 @@ function fill(template: string, params: Record<string, string | number>): string
 export function renderEntry(e: ChronicleEntry, b: RngBundle): string {
   const template = variantOf(b, e);
   if (template === undefined) return `[${e.templateKey}]`;
-  return fill(template, e.params);
+  return capitalise(fill(template, e.params));
+}
+
+/**
+ * A sentence starts with a capital.
+ *
+ * It has to happen here and not in the bank: a template that opens with
+ * `{count}` becomes "three came over the ridge" once the number is spelled out,
+ * and no amount of care writing the templates can fix that, because the same
+ * hole is mid-sentence in another line.
+ */
+function capitalise(text: string): string {
+  return text.length === 0 ? text : text[0]?.toUpperCase() + text.slice(1);
 }
 
 /**
