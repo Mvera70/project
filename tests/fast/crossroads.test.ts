@@ -566,11 +566,55 @@ describe('selección · §8.6', () => {
     });
     expect(selectCrossroad(s, CATALOGUE)).toBeNull();
 
-    (s.people.villagers.find((v) => v.role === 'leader') as Villager).diedTick = 1;
-    s.people.namedIds = s.people.namedIds.filter(
-      (id) => at(s, id).diedTick === null,
-    );
+    // El líder muere AHORA: es la muerte lo que exime, no el hueco.
+    (s.people.villagers.find((v) => v.role === 'leader') as Villager).diedTick = s.tick;
+    s.people.namedIds = s.people.namedIds.filter((id) => at(s, id).diedTick === null);
     expect(selectCrossroad(s, CATALOGUE)?.templateId).toBe(T_SUCCESSION.id);
+  });
+
+  it('la exención de succession se gasta en la primera pregunta', () => {
+    // Si valiera mientras el puesto siga vacante, la encrucijada saltaría cada
+    // dos ticks hasta que alguien lo tomara, y dejaría de ser una decisión.
+    const s = calm(7);
+    // Bajo el techo, para que sólo la exención pueda dejar pasar algo.
+    s.history.push({ tick: s.tick - 5, templateId: T_QUIET.id, optionId: 'store_it', cast: {} });
+    (s.people.villagers.find((v) => v.role === 'leader') as Villager).diedTick = s.tick;
+    s.people.namedIds = s.people.namedIds.filter((id) => at(s, id).diedTick === null);
+
+    s.crossroad = selectCrossroad(s, CATALOGUE);
+    expect(s.crossroad?.templateId).toBe(T_SUCCESSION.id);
+    // Se responde dejando el puesto vacante: el hueco sigue ahí.
+    applyOption(s, 'leave_it_vacant', CATALOGUE);
+    expect(s.people.villagers.some((v) => v.role === 'leader' && isHere(v))).toBe(false);
+
+    const answeredAt = s.tick;
+    for (let i = 1; i < CROSSROADS.MIN_TICKS_BETWEEN; i += 1) {
+      s.tick = answeredAt + i;
+      expect(selectCrossroad(s, CATALOGUE), `tick +${i}`).toBeNull();
+    }
+    s.tick = answeredAt + CROSSROADS.MIN_TICKS_BETWEEN;
+    expect(selectCrossroad(s, CATALOGUE)).not.toBeNull(); // ya pasó el techo
+  });
+
+  it('la exención de crisis también se gasta: una hambruna no pregunta cada semana', () => {
+    const s = village(7);
+    s.tick = YEAR * 3 + 10;
+    s.village.grain = 0; // hambruna proyectada, y no se va a arreglar sola
+    // Bajo el techo: sólo la crisis puede dejar pasar algo, y sólo de su rama.
+    s.history.push({ tick: s.tick - 5, templateId: T_QUIET.id, optionId: 'store_it', cast: {} });
+
+    s.crossroad = selectCrossroad(s, [T_FAMINE, T_QUIET]);
+    expect(s.crossroad?.templateId).toBe(T_FAMINE.id);
+    applyOption(s, 'hold_the_line', [T_FAMINE, T_QUIET]);
+
+    const answeredAt = s.tick;
+    let asked = 0;
+    for (let i = 1; i < CROSSROADS.MIN_TICKS_BETWEEN; i += 1) {
+      s.tick = answeredAt + i;
+      s.village.grain = 0;
+      if (selectCrossroad(s, [T_FAMINE, T_QUIET]) !== null) asked += 1;
+    }
+    expect(asked).toBe(0);
   });
 
   it('la garantía dispara a los 960 ticks exactos y elige la mejor, no una al azar', () => {

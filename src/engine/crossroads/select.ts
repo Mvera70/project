@@ -39,6 +39,24 @@ export function crisisOf(state: GameState): CrossroadCategory | null {
   return null;
 }
 
+/**
+ * When the office of leader fell vacant, or null if it is filled.
+ *
+ * §6.6 gives `succession` the one exemption from the ceiling: the death of a
+ * leader always asks, immediately. "Always" means once per death — the office
+ * staying empty afterwards is not a new death, and a template that skipped the
+ * ceiling on the strength of a standing vacancy would fire every other tick
+ * until somebody took the job.
+ */
+export function leaderVacantSince(state: GameState): number | null {
+  if (holderOf(state, 'leader') !== null) return null;
+  let latest = 0;
+  for (const v of state.people.villagers) {
+    if (v.role === 'leader' && v.diedTick !== null && v.diedTick > latest) latest = v.diedTick;
+  }
+  return latest;
+}
+
 /** When the village was last asked something. §8.6. */
 export function lastCrossroadTick(state: GameState): number {
   let last = -1;
@@ -51,6 +69,26 @@ export function lastCrossroadTick(state: GameState): number {
 
 function timesSeen(state: GameState, templateId: string): number {
   return state.history.filter((d) => d.templateId === templateId).length;
+}
+
+/**
+ * When the village last answered a question of this category. -1 if never.
+ *
+ * Needs the catalogue because `history` records the template, not its category:
+ * the category is a property of the template, and duplicating it into the save
+ * would be a second source of truth for something that never changes.
+ */
+function lastTickOfCategory(
+  state: GameState,
+  catalogue: Catalogue,
+  category: CrossroadCategory,
+): number {
+  let last = -1;
+  for (const d of state.history) {
+    const t = catalogue.find((x) => x.id === d.templateId);
+    if (t?.category === category && d.tick > last) last = d.tick;
+  }
+  return last;
 }
 
 /** How long since this template last came up, in years. Infinity if never. */
@@ -130,9 +168,17 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
 /**
  * Step 15 of the tick. Returns the crossroad to pose, or null.
  *
- * The ceiling is skipped by a crisis, and by `succession` whatever else is
- * happening: §6.6 makes the death of a leader the one thing that always asks
- * immediately, because it is the heartbeat of the long loop.
+ * §8.6 says a crisis jumps the minimum interval, and §6.6 gives `succession`
+ * the same exemption on the death of a leader. Both mean **once**, not once a
+ * tick: a famine lasts months and an empty office lasts until somebody takes
+ * it, and an exemption that held for the whole of either would fire a crossroad
+ * every other week and turn the decision into a menu — which is precisely what
+ * the ceiling exists to prevent.
+ *
+ * So the exemption is spent on the first question. A crisis lets a crossroad of
+ * its own category through the ceiling; having just answered one of those, the
+ * village waits out the ceiling like anyone else. The succession is stricter
+ * still: the exemption belongs to a death nobody has been asked about yet.
  *
  * The guarantee overrides the weighted draw rather than joining it — after 960
  * quiet ticks the village gets its best question, not a random one.
@@ -140,14 +186,27 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
 export function selectCrossroad(state: GameState, catalogue: Catalogue): PendingCrossroad | null {
   if (state.crossroad !== null) return null;
 
-  const since = state.tick - lastCrossroadTick(state);
+  const last = lastCrossroadTick(state);
+  const since = state.tick - last;
   const crisis = crisisOf(state);
   const guaranteed = since >= CROSSROADS.GUARANTEE_TICKS;
 
   const candidates = eligible(state, catalogue);
-  const succession = candidates.filter((c) => c.template.category === 'succession');
 
-  if (since < CROSSROADS.MIN_TICKS_BETWEEN && crisis === null && succession.length === 0) {
+  // The succession exemption belongs to a death nobody has been asked about.
+  const vacantSince = leaderVacantSince(state);
+  const succession =
+    vacantSince !== null && last < vacantSince
+      ? candidates.filter((c) => c.template.category === 'succession')
+      : [];
+
+  // Any other crisis spends its exemption on the first question of its own kind.
+  const crisisJumps =
+    crisis !== null &&
+    crisis !== 'succession' &&
+    state.tick - lastTickOfCategory(state, catalogue, crisis) >= CROSSROADS.MIN_TICKS_BETWEEN;
+
+  if (since < CROSSROADS.MIN_TICKS_BETWEEN && !crisisJumps && succession.length === 0) {
     return null;
   }
 
