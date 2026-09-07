@@ -14,10 +14,13 @@ export const SMITH_FEUD: CrossroadTemplate = {
   category: 'feud',
   weight: 9,
   cooldownYears: 15,
-  // v2.8. El Anexo A pide 55, y medido sobre 20 partidas de 100 años la opinión
-  // más honda que se alcanza jamás es −50: ningún efecto del catálogo baja tanto
-  // de una vez y la deriva de §6.4 deshace lo que se acumula. Con 55 la
-  // plantilla era inalcanzable.
+  // El Anexo A pide 55, y se probó con 55 en la v2.9 ahora que las opiniones
+  // llegan a −83: sigue sin disparar ni una vez en 20 partidas de 100 años,
+  // porque la ventana en que alguien odia a otro por más de 55 Y hay más de
+  // veinte personas Y el reposo de quince años ha pasado no se solapa nunca.
+  // 45 la deja en tres disparos por 2 000 años de aldea, que es raro pero
+  // existe. Queda anotado: si M-05 llega a producir enemistades más hondas de
+  // forma sostenida, esto vuelve a 55.
   requires: [
     { k: 'grudge', min: 45 },
     { k: 'stat', stat: 'people', op: '>', v: 20 },

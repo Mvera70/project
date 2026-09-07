@@ -34,10 +34,42 @@ function dependsOn(spec: CastSpec): string | null {
   return null;
 }
 
+/**
+ * Whether casting `id` for this letter would leave a dependent letter with
+ * nobody to fill it.
+ *
+ * `{as:'A', anyNamed}` followed by `{as:'B', grudgeAgainst:'A'}` used to pick A
+ * blindly and then ask who hates them. With eight named villagers and one
+ * quarrel in the valley it guessed right one time in eight, and the two feud
+ * templates were eligible a fiftieth of the time and cast none of it — dead
+ * content that no eligibility measurement could see, because the requires held
+ * perfectly well.
+ */
+function wouldStrand(
+  id: VillagerId,
+  letter: string,
+  pending: readonly CastSpec[],
+  state: GameState,
+): boolean {
+  for (const other of pending) {
+    if ('grudgeAgainst' in other && other.grudgeAgainst === letter) {
+      if (worstEnemyOf(state, id) === null) return true;
+    }
+    if ('childOf' in other && other.childOf === letter) {
+      const hasChild = state.people.villagers.some(
+        (v) => isHere(v) && v.parentIds.includes(id),
+      );
+      if (!hasChild) return true;
+    }
+  }
+  return false;
+}
+
 function fillOne(
   spec: CastSpec,
   state: GameState,
   filled: Record<string, VillagerId>,
+  pending: readonly CastSpec[],
 ): VillagerId | null {
   const taken = new Set(Object.values(filled));
 
@@ -52,17 +84,22 @@ function fillOne(
     const pool = livingNamed(state).filter((v) => !barred.has(v.id) && !taken.has(v.id));
     if (pool.length === 0) return null;
 
-    // The age band is a preference (§8.3): a village with nobody of that age
-    // still has to be able to answer the question.
+    // A hard filter (§8.3, v2.9) with one escape: a village with nobody of that
+    // age still has to be able to answer the question.
     const band = spec.agedBetween;
-    const preferred =
+    const inBand =
       band === undefined
         ? pool
         : pool.filter((v) => {
             const age = ageOf(v, state.tick);
             return age >= band[0] && age <= band[1];
           });
-    return pick(state.rng, 'cast', preferred.length > 0 ? preferred : pool).id;
+    const wide = inBand.length > 0 ? inBand : pool;
+
+    // Somebody another letter can actually hang off. Falling back to the whole
+    // pool keeps the old behaviour when nothing depends on this letter.
+    const viable = wide.filter((v) => !wouldStrand(v.id, spec.as, pending, state));
+    return pick(state.rng, 'cast', viable.length > 0 ? viable : wide).id;
   }
 
   if ('grudgeAgainst' in spec) {
@@ -112,7 +149,8 @@ export function fillCast(
     if (ready.length === 0) return null; // a cycle, or a reference to nothing
 
     for (const spec of ready) {
-      const id = fillOne(spec, state, filled);
+      const laterOn = pending.filter((s) => s !== spec);
+      const id = fillOne(spec, state, filled, laterOn);
       if (id === null) return null;
       filled[spec.as] = id;
     }

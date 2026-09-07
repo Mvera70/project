@@ -9,9 +9,8 @@ import { describe, expect, it } from 'vitest';
 import { FOUNDING, TIME } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { Building, GameState, TickContext } from '@engine/state';
-import { ageOf, foundPeople, minAgeFor, promoteToNamed } from '@engine/people/villagers';
+import { foundPeople } from '@engine/people/villagers';
 import {
-  isHere,
   population,
   resolveBirths,
   resolveDeaths,
@@ -25,10 +24,9 @@ import { applySpoilage, harvest } from '@engine/subsistence/harvest';
 import { isUnexplained, updateMood } from '@engine/subsistence/mood';
 import { rollWeather } from '@engine/subsistence/seasons';
 import { rollPlague } from '@engine/subsistence/disasters';
-import { count } from '@engine/subsistence/building-counts';
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { AppliedEffects, CrossroadCategory } from '@engine/crossroads/schema';
-import { holderOf } from '@engine/crossroads/conditions';
+import { fillVacancies } from '@engine/sim';
 import { selectCrossroad } from '@engine/crossroads/select';
 import { applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds } from '@engine/crossroads/seeds';
@@ -281,37 +279,6 @@ function founded(seed: number): GameState {
     works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [],
     weather: { year: 0, index: 2, factor: 1 }, outbreak: null, ended: null,
   };
-}
-
-/**
- * §6.2: un oficio que queda vacante se cubre en el paso ANNUAL del año
- * siguiente, con el adulto vivo de más edad que no tenga oficio.
- *
- * Eso vive en sim.ts, que es de M-10 y todavía no existe, así que va aquí como
- * parte del banco de pruebas — igual que el paso 7 se stubbeó en M-04. Sin
- * ello, cuando muere el cura fundador no hay otro nunca, y la mitad del
- * catálogo se queda sin reparto para siempre.
- *
- * El líder NO se cubre así a propósito: su sucesión es una decisión del
- * jugador (§6.6), y cubrirla sola mataría la plantilla que es el latido del
- * bucle largo.
- */
-function fillVacancies(s: GameState): void {
-  for (const role of ['smith', 'midwife', 'priest', 'woodward', 'reeve'] as const) {
-    if (holderOf(s, role) !== null) continue;
-    if (role === 'priest' && count(s, 'chapel') === 0) continue; // §6.2
-    const best = s.people.villagers
-      .filter(
-        (v) =>
-          isHere(v) &&
-          !v.named &&
-          v.role === null &&
-          ageOf(v, s.tick) >= minAgeFor(role) &&
-          (role !== 'midwife' || v.female),
-      )
-      .sort((a, b) => ageOf(b, s.tick) - ageOf(a, s.tick) || a.id - b.id)[0];
-    if (best !== undefined) promoteToNamed(s, best.id, role);
-  }
 }
 
 /**

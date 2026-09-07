@@ -372,4 +372,15 @@ export const PEOPLE = {
     woodward: 18,
     reeve: 22,
   },
+  /**
+   * §6.2: the top of the band a vacancy is filled from. Above it, only if
+   * nobody in the band will do.
+   *
+   * Reading "chosen by age" as "the oldest" ages the whole cast in a few
+   * decades: the offices always go to elders, the elders die soon, and the
+   * succession — which should be the beat of a generation — fires at twice its
+   * natural rate. Measured: 9.55 successions a century against the 3.6 a
+   * forty-year-old leader earns under the table of §12.4.
+   */
+  ROLE_MAX_PREFERRED: 55,
 } as const;

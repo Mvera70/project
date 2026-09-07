@@ -81,8 +81,17 @@ export const GRANARY_THEFT: CrossroadTemplate = {
   category: 'famine',
   weight: 7,
   cooldownYears: 18,
+  // v2.9. Elegible el 4.5 % de los ticks; el invierno entrado es el disparador,
+  // que es cuando forzar el granero de noche significa algo.
+  //
+  // Con `grainYears` la condición era casi imposible, y por el mismo motivo que
+  // A.1 antes de arreglarla: `grainYears` está más alto en invierno que en
+  // ninguna otra estación, porque la cosecha es la semana 35. Invierno y
+  // granero vacío están ANTICORRELACIONADOS. `grainToHarvest` sí baja según se
+  // aleja la próxima cosecha, que es la magnitud que el ladrón mira.
   requires: [
-    { k: 'ratio', ratio: 'grainYears', op: '<', v: 0.5 },
+    { k: 'season', season: 'winter', minWeek: 4 },
+    { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 1.1 },
     { k: 'has', building: 'granary' },
     { k: 'grudge', min: 40 },
   ],

@@ -16,12 +16,13 @@ export const SUCCESSION: CrossroadTemplate = {
   weight: 100,
   cooldownYears: 0,
   requires: [{ k: 'role', role: 'leader', alive: false }],
-  // v2.8. Con `anyNamed` a secas se encadenaban ancianos: la sucesión elegía a
-  // un viejo, el viejo moría a los pocos años y volvía a preguntar. Once
-  // sucesiones por partida contra las cinco que corresponden a una generación.
+  // v2.9. Filtro duro, no preferencia: con `anyNamed` a secas se encadenaban
+  // ancianos y la sucesión disparaba al doble de su ritmo natural. El ensanche
+  // solo actúa si la banda no da dos candidatos — A toma el único que hay y B
+  // se queda sin banda, que es exactamente cuándo debe ensancharse.
   cast: [
-    { as: 'A', anyNamed: true, agedBetween: [25, 55] },
-    { as: 'B', anyNamed: true, excluding: ['A'], agedBetween: [25, 55] },
+    { as: 'A', anyNamed: true, agedBetween: [20, 60] },
+    { as: 'B', anyNamed: true, excluding: ['A'], agedBetween: [20, 60] },
   ],
   title: 'crossroad.succession.title',
   body: 'crossroad.succession.body',

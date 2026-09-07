@@ -19,6 +19,9 @@ export const STRANGERS_AT_THE_FORD: CrossroadTemplate = {
     { k: 'stat', stat: 'morale', op: '>=', v: 55 },
     // Y en primavera, que es cuando §5.7 mueve a la gente por los caminos.
     { k: 'season', season: 'spring' },
+    // v2.9. «{B} ha contado el grano dos veces»: la aldea acoge a nueve cuando
+    // la despensa llega a la cosecha con sitio de sobra, no cuando cabe justo.
+    { k: 'ratio', ratio: 'grainToHarvest', op: '>', v: 1.4 },
   ],
   cast: [
     { as: 'A', role: 'leader' },
@@ -94,13 +97,17 @@ export const BANDITS: CrossroadTemplate = {
   id: 'bandits',
   category: 'stranger',
   weight: 8,
-  cooldownYears: 18,
+  // v2.9. Segunda columna de §8.1: disparaba al 66 % de lo que su reposo
+  // permite, así que quien marcaba el paso era el reposo y no las condiciones.
+  // El Anexo A pide 18; 25 lo deja al ritmo de una vez por generación, que es
+  // lo que una banda de seis hombres y un caballo debería ser.
+  cooldownYears: 30,
   minYear: 16,
   // v2.8. Elegible el 71 % de los ticks: las tres condiciones eran permanentes.
   // El disparador episódico es la cosecha — vienen a por un tercio del granero,
   // así que vienen cuando el granero se llena, no cuando les apetece.
   requires: [
-    { k: 'season', season: 'autumn', minWeek: 8 },
+    { k: 'season', season: 'autumn', minWeek: 10 },
     { k: 'stat', stat: 'people', op: '>', v: 30 },
     { k: 'not', c: { k: 'has', building: 'palisade' } },
     { k: 'year', op: '>', v: 15 },

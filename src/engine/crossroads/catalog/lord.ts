@@ -109,11 +109,18 @@ export const TITHE_DEMAND: CrossroadTemplate = {
   id: 'tithe_demand',
   category: 'lord',
   weight: 6,
-  cooldownYears: 20,
+  // v2.9. Segunda columna de §8.1: 54 disparos, el 54 % de lo que su reposo
+  // permitía, con la elegibilidad ya en el 1.2 %. Cuando endurecer condiciones
+  // deja de mover el número, lo que manda es el reposo. El Anexo A pide 20; una
+  // visita del recaudador cada treinta años es lo que hace que se note.
+  cooldownYears: 30,
   minYear: 6,
+  // v2.9. Elegible el 12 % de los ticks: `vassal` es permanente y el otoño es
+  // un cuarto del año. El disparador es la cuenta misma — el hombre del señor
+  // cuenta las gavillas cuando hay gavillas que contar, no en cualquier otoño.
   requires: [
     { k: 'flag', flag: 'vassal', set: true },
-    { k: 'season', season: 'autumn' },
+    { k: 'season', season: 'autumn', minWeek: 11 },
     { k: 'year', op: '>', v: 5 },
   ],
   cast: [
