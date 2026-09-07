@@ -46,10 +46,10 @@ export function numberWord(n: number): string {
  * away and back does not quietly reword the village's history — which it would
  * if every render consumed a draw.
  */
-function variantOf(b: RngBundle, e: ChronicleEntry): string | undefined {
-  const variants = BANK[e.templateKey];
+function variantOf(b: RngBundle, key: string, tick: number, discriminant: number): string | undefined {
+  const variants = BANK[key];
   if (variants === undefined || variants.length === 0) return undefined;
-  const pickIndex = hash32(b.chronicle, `${e.templateKey}:${e.tick}`) % variants.length;
+  const pickIndex = hash32(b.chronicle, `${key}:${tick}:${discriminant}`) % variants.length;
   return variants[pickIndex];
 }
 
@@ -73,15 +73,29 @@ function fill(template: string, params: Record<string, string | number>): string
 /**
  * One entry, as a sentence. Pure: it does not touch the state or the bundle.
  *
+ * `discriminant` separates two entries that share a key and a tick — a village
+ * that buries two named people in the same week should not bury them in the
+ * same words. Their position in `state.chronicle` does the job (§9.1).
+ *
  * A key with no entry in the bank renders as `[the.key]` rather than throwing.
  * The chronicle is what the player reads; a missing line should spoil one
  * sentence and be obvious, not take down the screen. The catalogue test of
  * M-08 is what turns that into a failure at build time.
  */
-export function renderEntry(e: ChronicleEntry, b: RngBundle): string {
-  const template = variantOf(b, e);
+export function renderEntry(e: ChronicleEntry, b: RngBundle, discriminant = 0): string {
+  const template = variantOf(b, e.templateKey, e.tick, discriminant);
   if (template === undefined) return `[${e.templateKey}]`;
-  return capitalise(fill(template, e.params));
+
+  const main = capitalise(fill(template, e.params));
+
+  // §9.4: a named death drags what the person was behind it. The subordinate
+  // is a key of its own rather than a phrase built by the system that recorded
+  // the death — the systems still push keys, never prose.
+  const tailKey = e.params['tail'];
+  if (typeof tailKey !== 'string') return main;
+  const tail = variantOf(b, tailKey, e.tick, discriminant + 1);
+  if (tail === undefined) return main;
+  return `${main} ${capitalise(fill(tail, e.params))}`;
 }
 
 /**
@@ -103,10 +117,13 @@ function capitalise(text: string): string {
  * births and deaths, the turn of the seasons — only when a year is opened up.
  */
 export function renderYear(state: GameState, year: number, minWeight: 1 | 2 | 3 = 2): string[] {
+  // The discriminant is the entry's place in the chronicle, so that two deaths
+  // of the same kind in the same week do not come out word for word identical.
   return state.chronicle
-    .filter((e) => yearOf(e.tick) === year && e.weight >= minWeight)
-    .sort((a, b) => a.tick - b.tick)
-    .map((e) => renderEntry(e, state.rng));
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => yearOf(e.tick) === year && e.weight >= minWeight)
+    .sort((a, b) => a.e.tick - b.e.tick || a.i - b.i)
+    .map(({ e, i }) => renderEntry(e, state.rng, i));
 }
 
 /** Every key the bank knows. M-08's catalogue test checks its keys against it. */

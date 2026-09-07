@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.5 · 7 de septiembre de 2026, 13:34 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.6 · 7 de septiembre de 2026, 13:56 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -28,6 +28,34 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.3** | 6 sep 2026 | Revisión de M-03 | Edad mínima por rol; rasgos incompatibles; constantes que solo vivían en prosa. |
 | **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
 | **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
+| **2.6** | 7 sep 2026, 13:56 | Revisión de M-05 y M-09 | Componer crónica no consume aleatoriedad; **§9.4 nueva: la muerte de un nombrado**; semillas append-only; crisis de hambruna definida con fórmula. |
+
+### 2.6 — Revisión de M-05 y M-09
+
+- **§9.4 · Nueva sección: la muerte de un nombrado.** El hallazgo de la ronda.
+  Al leer la crónica de veinte años se vio que la disputa del año 5, la
+  reconciliación del 12 y la muerte del 14 del mismo personaje quedan como tres
+  líneas sueltas que ningún lector enlaza: el personaje se muere sin haber
+  existido. Ahora la muerte de un nombrado es de peso 3 y arrastra su rencor
+  abierto más antiguo o su memoria de mayor peso. Es el mecanismo de las
+  semillas de §8.5 aplicado a las personas: **el material narrativo no está en
+  los sucesos, está en los enlaces entre sucesos separados por años.**
+- **§9.1 · Componer no consume aleatoriedad.** La variante es función pura de
+  semilla, clave, tick y un discriminante. Si cada render gastara una tirada,
+  desplazar la crónica en pantalla y volver reescribiría la historia de la
+  aldea. El flujo `chronicle` es fuente de semilla, no flujo que se avance.
+- **§9.1 · La capitalización se resuelve al componer.** El mismo hueco va al
+  principio en unas plantillas y a mitad de frase en otras; no se arregla
+  escribiendo mejor.
+- **§6.4 y §17 M-05 · Las opiniones hacia los muertos no se limpian**, contra lo
+  que decía el brief. Que uno no perdonara a un muerto es material narrativo.
+- **§3.4 · `DeathCause` enumerada, con `cold`.** Morir de frío se explica tan
+  bien como morir de hambre; sin esa causa, esas muertes contarían como presagio
+  y la fe caería sin motivo.
+- **§3.6 · Las semillas son append-only**, con `firedTick` y `witheredTick`.
+  Misma disciplina que `villagers` y `grudges`.
+- **§8.6 · Hambruna proyectada, con fórmula.** Estaba en prosa y cada módulo
+  habría interpretado una cosa.
 
 ### 2.5 — Revisión de M-06
 
@@ -306,7 +334,8 @@ export interface Villager {
   role: Role | null;
   female: boolean;
   bornTick: number;
-  diedTick: number | null;
+  diedTick: number | null;   // causeOfDeath ∈ natural | old_age | hunger |
+                             //   cold | plague | fire | violence
   causeOfDeath: DeathCause | null;
   leftTick: number | null;  // se marchó del valle (§5.7); no está muerto
   traits: Trait[];          // 3..4, solo en los nombrados
@@ -409,7 +438,9 @@ export interface PlantedSeed {
   plantedTick: number;
   firesAtTick: number;
   cast: Record<string, VillagerId>;
-  condition: Condition | null;        // si falla al vencer, la semilla se marchita
+  condition: Condition | null;   // si falla al vencer, la semilla se marchita
+  firedTick: number | null;      // append-only: las semillas no se borran
+  witheredTick: number | null;   //   nunca, igual que villagers y grudges
 }
 
 export interface DecisionRecord {
@@ -1130,7 +1161,8 @@ score(t) = t.weight
 pick weighted by score, from the 'crossroads' stream
 ```
 
-**Crisis** = hambruna proyectada (`grain` no llega a la cosecha), brote activo,
+**Crisis** = hambruna proyectada —`grain < people · (semanas que faltan hasta la
+semana 35)`, es decir, la despensa no llega a la próxima cosecha—, brote activo,
 bandera `threatened`, o muerte del líder. Una crisis salta el intervalo mínimo.
 
 **Garantía por generación:** si han pasado 960 ticks sin ninguna encrucijada, se
@@ -1157,8 +1189,20 @@ La encrucijada no caduca nunca. No se pierde por ausencia (§1).
 ### 9.1 Cómo se compone
 
 Los sistemas empujan `ChronicleEntry` con `templateKey` y `params`. Al mostrar,
-`renderEntry(entry, bank, rng)` elige una de las 3–5 variantes de esa clave con
-el flujo `chronicle` y sustituye los parámetros.
+`renderEntry` elige una de las 3–5 variantes de esa clave y sustituye los
+parámetros.
+
+**Componer no consume aleatoriedad.** La variante es una **función pura** de la
+semilla maestra, la clave, el tick y un discriminante que distingue dos entradas
+de la misma clave en el mismo tick (su posición en `chronicle` sirve). El flujo
+`chronicle` es la fuente de la semilla, no un flujo que se avance: nadie lo
+consume nunca. Si cada render gastara una tirada, desplazar la crónica en
+pantalla y volver reescribiría la historia de la aldea — y el aislamiento de
+§4.3 dejaría de significar nada.
+
+**La capitalización se resuelve al componer**, no escribiendo mejor las
+plantillas: el mismo hueco `{count}` va al principio en unas líneas y a mitad de
+frase en otras. Si la sustitución cae en la primera posición, se capitaliza.
 
 ```ts
 // Banco de textos: src/engine/chronicle/bank.en.ts
@@ -1197,7 +1241,26 @@ Prohibido en el banco de textos: signos de exclamación, segunda persona,
 metáforas, y cualquier frase que valore la decisión del jugador. La crónica
 narra, no juzga.
 
-### 9.4 Criterio del hito 0
+### 9.4 La muerte de un nombrado
+
+Una muerte corriente es una línea de peso 1. **La de un nombrado es de peso 3**,
+y no puede limitarse a decir el nombre y la edad: tiene que cargar con quién fue
+esa persona. Al componerla se le añade, si existe, una subordinada con el rencor
+abierto más antiguo del muerto, o en su defecto su memoria de mayor peso.
+
+> *Aethelred died in the winter of year 14, sixty-eight winters old. He had not
+> spoken to Wulfnoth since the year 5.*
+
+Sin esa segunda frase, los tres momentos que definieron a Aethelred —la disputa
+del año 5, la reconciliación del 12 y su muerte en el 14— quedan en la crónica
+como tres líneas sueltas que ningún lector enlaza, y el personaje se muere sin
+haber existido. Es el mismo mecanismo que las semillas de §8.5 aplicado a las
+personas en vez de a las decisiones: **el material narrativo del juego no está
+en los sucesos, está en los enlaces entre sucesos separados por años.**
+
+La sucesión que sigue a la muerte de un líder cita también a quién sucede.
+
+### 9.5 Criterio del hito 0
 
 Tres crónicas de tres partidas distintas, leídas por alguien ajeno al proyecto,
 que sepa contar en qué se diferencian. **Esto es lo que decide si el proyecto
@@ -2004,7 +2067,11 @@ export function worstEnemyOf(state: GameState, id: VillagerId): VillagerId | nul
 ```
 **Reglas.** Tabla de §6.4 exacta. Máximo 12 memorias, se descarta la de menor
 peso efectivo. `spiteful` y `loyal` modulan la recuperación. Las opiniones solo
-existen entre nombrados vivos; al morir alguien, se limpian sus entradas.
+existen entre nombrados. **No se limpian al morir alguien**: que uno no
+perdonara a un muerto es material narrativo, y con ocho nombrados vivos el coste
+de guardarlo es cero. `driftOpinions` sí se salta a los muertos en ambos
+sentidos — un muerto no cambia de opinión, ni sobre él se ablanda nadie solo con
+el tiempo.
 **Tests.** Una opinión llevada a −60 crea rencor con causa; sin sucesos nuevos,
 un `loyal` vuelve a 0 en la mitad de tiempo que un `spiteful`; la memoria nunca
 supera 12 entradas.

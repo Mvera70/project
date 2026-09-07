@@ -5,7 +5,7 @@
 // el capítulo 9: la crónica narra, no califica.
 import { describe, expect, it } from 'vitest';
 import { makeBundle } from '@engine/rng';
-import type { ChronicleEntry, ChronicleKind, DeathCause, GameState } from '@engine/state';
+import type { ChronicleEntry, ChronicleKind, DeathCause, GameState, Villager } from '@engine/state';
 import { foundPeople } from '@engine/people/villagers';
 import { BANK } from '@engine/chronicle/bank.en';
 import {
@@ -21,6 +21,9 @@ import {
   seasonKey,
 } from '@engine/chronicle/events';
 import { bankKeys, knows, numberWord, renderEntry, renderYear } from '@engine/chronicle/render';
+import { epitaphFor, namedDeathEntry } from '@engine/chronicle/events';
+import { adjustOpinion } from '@engine/people/opinions';
+import { remember } from '@engine/people/memories';
 import { welcomeDigest } from '@engine/chronicle/digest';
 
 const CELLS = 36 * 56;
@@ -278,6 +281,7 @@ describe('render', () => {
       grain: 1224,
       people: 31,
       building: 'mill',
+      sinceYear: 5,
     };
     const keys = bankKeys();
     let rendered = 0;
@@ -311,7 +315,9 @@ describe('render', () => {
       entry({ templateKey: 'death.hunger.anon.many', params: { count: 3, season: 'winter', year: 4, people: 18 } }),
       makeBundle(7),
     );
-    expect(text).toContain('three');
+    // Capitalizada si abre la frase, en minúscula si no: en los dos casos
+    // escrita con letra y nunca con dígito.
+    expect(text.toLowerCase()).toContain('three');
     expect(text).not.toContain('3 ');
   });
 
@@ -320,7 +326,7 @@ describe('render', () => {
     const b = makeBundle(7);
     const params = {
       name: 'Mildreth', other: 'Osric', age: 44, year: 17, season: 'autumn',
-      count: 3, grain: 1224, people: 31, building: 'mill',
+      count: 3, grain: 1224, people: 31, building: 'mill', sinceYear: 5,
     };
     for (const key of bankKeys()) {
       for (let tick = 0; tick < 12; tick += 1) {
@@ -347,6 +353,36 @@ describe('render', () => {
     const first = renderEntry(e, b);
     for (let i = 0; i < 50; i += 1) expect(renderEntry(e, b)).toBe(first);
     expect(b).toEqual(before);
+  });
+
+  it('dos entradas de la misma clave y el mismo tick se distinguen', () => {
+    // §9.1: su posición en la crónica es el discriminante. Sin él, dos muertos
+    // de la misma semana se entierran con las mismas palabras.
+    const b = makeBundle(7);
+    const e = entry();
+    const texts = new Set<string>();
+    for (let i = 0; i < 20; i += 1) texts.add(renderEntry(e, b, i));
+    expect(texts.size).toBeGreaterThan(1);
+  });
+
+  it('el mismo discriminante da siempre el mismo texto', () => {
+    const b = makeBundle(7);
+    const e = entry();
+    expect(renderEntry(e, b, 4)).toBe(renderEntry(e, b, 4));
+  });
+
+  it('renderYear distingue dos entradas iguales del mismo tick', () => {
+    const s = village(7);
+    s.tick = 100;
+    for (let i = 0; i < 6; i += 1) {
+      record(s, {
+        kind: 'death',
+        templateKey: 'death.old_age.named',
+        params: { name: 'Osric', age: 70, year: 2, season: 'winter' },
+        weight: 2,
+      });
+    }
+    expect(new Set(renderYear(s, 2)).size).toBeGreaterThan(1);
   });
 
   it('dos entradas de la misma clave en ticks distintos no dicen lo mismo', () => {
@@ -381,6 +417,116 @@ describe('render', () => {
     expect(renderYear(s, 1, 3)).toHaveLength(1);
     expect(renderYear(s, 4)).toHaveLength(1);
     expect(renderYear(s, 99)).toEqual([]);
+  });
+});
+
+describe('§9.4 · la muerte de un nombrado', () => {
+  const named = (s: GameState, i = 0): Villager =>
+    s.people.villagers.find((v) => v.id === s.people.namedIds[i]) as Villager;
+
+  it('es de peso 3: era uno de los ocho', () => {
+    const s = village(7);
+    s.tick = 48 * 14;
+    expect(namedDeathEntry(s, named(s), 'old_age').weight).toBe(3);
+  });
+
+  it('arrastra el rencor abierto más antiguo', () => {
+    const s = village(7);
+    const a = named(s);
+    const b = named(s, 1);
+    s.tick = 48 * 5;
+    adjustOpinion(s, a.id, b.id, -60);
+    s.tick = 48 * 14;
+
+    const e = namedDeathEntry(s, a, 'old_age');
+    expect(e.params['tail']).toBe('death.named.grudge');
+    expect(e.params['other']).toBe(b.name);
+    expect(e.params['sinceYear']).toBe(5);
+
+    const text = renderEntry({ ...e, tick: s.tick }, s.rng);
+    expect(text).toContain(a.name);
+    expect(text).toContain(b.name);
+    expect(text).toContain('5');
+  });
+
+  it('el más antiguo, no el más hondo', () => {
+    const s = village(7);
+    const a = named(s);
+    const older = named(s, 1);
+    const deeper = named(s, 2);
+    s.tick = 48 * 3;
+    adjustOpinion(s, a.id, older.id, -55);
+    s.tick = 48 * 9;
+    adjustOpinion(s, a.id, deeper.id, -95);
+    s.tick = 48 * 20;
+    expect(namedDeathEntry(s, a, 'old_age').params['other']).toBe(older.name);
+  });
+
+  it('un rencor ya sanado no se arrastra', () => {
+    const s = village(7);
+    const a = named(s);
+    const b = named(s, 1);
+    s.tick = 48 * 5;
+    adjustOpinion(s, a.id, b.id, -60);
+    s.tick = 48 * 12;
+    adjustOpinion(s, a.id, b.id, 50);
+    s.tick = 48 * 14;
+    expect(namedDeathEntry(s, a, 'old_age').params['tail']).toBeUndefined();
+  });
+
+  it('sin rencor, arrastra la memoria de más peso', () => {
+    const s = village(7);
+    const a = named(s);
+    remember(a, { tick: 48 * 4, kind: 'went_hungry', aboutId: null, weight: 2 });
+    remember(a, { tick: 48 * 7, kind: 'lost_child', aboutId: null, weight: 5 });
+    s.tick = 48 * 14;
+
+    const e = namedDeathEntry(s, a, 'old_age');
+    expect(e.params['tail']).toBe('death.named.lost_child');
+    expect(e.params['sinceYear']).toBe(7);
+  });
+
+  it('sin nada que arrastrar, la línea va sola y no queda hueco', () => {
+    const s = village(7);
+    s.tick = 48 * 14;
+    const e = namedDeathEntry(s, named(s), 'old_age');
+    expect(e.params['tail']).toBeUndefined();
+    expect(epitaphFor(s, named(s))).toBeNull();
+
+    const text = renderEntry({ ...e, tick: s.tick }, s.rng);
+    expect(text).not.toMatch(/\{\w+\}/);
+    expect(text).toContain(named(s).name);
+  });
+
+  it('una memoria was_saved sin nadie a quien nombrar cae en unspoken', () => {
+    const s = village(7);
+    const a = named(s);
+    remember(a, { tick: 48 * 6, kind: 'was_saved', aboutId: null, weight: 5 });
+    s.tick = 48 * 14;
+    expect(namedDeathEntry(s, a, 'old_age').params['tail']).toBe('death.named.unspoken');
+  });
+
+  it('los anónimos no llevan epitafio', () => {
+    const s = village(7);
+    const anon = s.people.villagers.find((v) => !v.named) as Villager;
+    expect(epitaphFor(s, anon)).toBeNull();
+  });
+
+  it('toda subordinada rinde sin dejar huecos, para toda causa', () => {
+    const s = village(7);
+    const a = named(s);
+    const b = named(s, 1);
+    s.tick = 48 * 5;
+    adjustOpinion(s, a.id, b.id, -60);
+    s.tick = 48 * 14;
+    for (const cause of ['natural', 'old_age', 'hunger', 'cold', 'plague', 'fire', 'violence'] as const) {
+      const e = namedDeathEntry(s, a, cause);
+      for (let d = 0; d < 10; d += 1) {
+        const text = renderEntry({ ...e, tick: s.tick }, s.rng, d);
+        expect(text, cause).not.toMatch(/\{\w+\}/);
+        expect(text.startsWith('['), cause).toBe(false);
+      }
+    }
   });
 });
 

@@ -130,7 +130,9 @@ describe('grafo de módulos del motor', () => {
   it('chronicle/ no lo importa nadie: es la salida, no una entrada', () => {
     // M-09. El banco no importa nada; render sólo lee; digest cuenta cabezas.
     expect(importsOf('chronicle/bank.en.ts')).toEqual([]);
-    expect(importsOf('chronicle/events.ts')).toEqual(['state']);
+    // events.ts lee gente para el epitafio de §9.4; sigue sin que nadie de
+    // people/ o subsistence/ mire hacia chronicle/.
+    expect(importsOf('chronicle/events.ts')).toEqual(['people/villagers', 'state', 'time']);
     expect(importsOf('chronicle/render.ts')).toEqual(['bank.en', 'rng', 'state', 'time']);
     expect(importsOf('chronicle/digest.ts')).toEqual(['people/demography', 'state']);
     for (const f of ['people/demography.ts', 'subsistence/mood.ts', 'state.ts'] as const) {

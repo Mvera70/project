@@ -214,6 +214,59 @@ export const BANK: Record<string, string[]> = {
   ],
 
   // -------------------------------------------------------------------------
+  // §9.4 · What a named death drags behind it
+  //
+  // These are not lines of their own. They are the second sentence appended to
+  // a named villager's death, carrying the oldest grudge they never made up or,
+  // failing that, the heaviest thing they remembered.
+  //
+  // Without it the quarrel of year 5, the reconciliation of year 12 and the
+  // death in year 14 are three loose lines that no reader joins up, and the
+  // character dies without ever having existed. The material is not in the
+  // events; it is in the links between events years apart.
+  // -------------------------------------------------------------------------
+  'death.named.grudge': [
+    'The quarrel with {other} had run since year {sinceYear}, and was never made up.',
+    '{name} and {other} had not spoken since year {sinceYear}.',
+    'Whatever stood between {name} and {other} since year {sinceYear} went into the ground too.',
+  ],
+  'death.named.lost_child': [
+    '{name} had buried a child in year {sinceYear}.',
+    'There had been a child, buried in year {sinceYear}.',
+    '{name} lost a child in year {sinceYear} and did not speak of it after.',
+  ],
+  'death.named.was_blamed': [
+    '{name} had been blamed in front of the village in year {sinceYear}.',
+    'The accusation of year {sinceYear} was never taken back.',
+    'Since year {sinceYear} there were those who still held it against {name}.',
+  ],
+  'death.named.was_saved': [
+    '{other} had pulled {name} out of it in year {sinceYear}.',
+    '{name} had owed {other} since year {sinceYear}.',
+    'There was a debt to {other} from year {sinceYear}, and it was never called in.',
+  ],
+  'death.named.was_passed_over': [
+    '{name} had been passed over in year {sinceYear}, and never asked again.',
+    'They had chosen someone else in year {sinceYear}.',
+    '{name} was not the one they turned to in year {sinceYear}.',
+  ],
+  'death.named.went_hungry': [
+    '{name} had gone without in the hunger of year {sinceYear}.',
+    'There had been a winter, year {sinceYear}, that {name} did not talk about.',
+    '{name} gave away a share in year {sinceYear} and never got it back.',
+  ],
+  'death.named.lost_home': [
+    '{name} had lost a house in year {sinceYear}.',
+    'The house {name} lost in year {sinceYear} was never rebuilt.',
+    'There had been a fire in year {sinceYear}, and {name} started again after it.',
+  ],
+  'death.named.unspoken': [
+    'Nobody could say what had gone wrong, only that it had, in year {sinceYear}.',
+    'There was something from year {sinceYear} that nobody wrote down.',
+    'Whatever happened in year {sinceYear} was never said out loud.',
+  ],
+
+  // -------------------------------------------------------------------------
   // The harvest
   // -------------------------------------------------------------------------
   'harvest.ruinous': [

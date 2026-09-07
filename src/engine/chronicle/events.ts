@@ -8,13 +8,17 @@
 // system knows a villager starved; it should not also have to know that the
 // key for that is spelled `death.hunger.anon.many`.
 
+import { ageOf } from '../people/villagers';
 import type {
   BuildingKind,
   ChronicleEntry,
   DeathCause,
   GameState,
   Season,
+  Villager,
+  VillagerId,
 } from '../state';
+import { seasonOf, yearOf } from '../time';
 
 /**
  * Push an entry. The tick is the state's, always — an entry that could claim a
@@ -79,4 +83,84 @@ export function arrivalKey(count: number): string {
 
 export function departureKey(count: number): string {
   return `departure.${plural(count)}`;
+}
+
+// ---------------------------------------------------------------------------
+// §9.4 · The death of a named villager
+// ---------------------------------------------------------------------------
+
+/**
+ * What a named villager's death drags behind it: the oldest grudge they never
+ * made up, or failing that the heaviest thing they remembered.
+ *
+ * Returns a key and the parameters it needs, or null when there is nothing to
+ * carry — a villager who quarrelled with nobody and remembered nothing gets the
+ * plain line, and that is its own kind of epitaph.
+ *
+ * The oldest open grudge and not the deepest: a feud that has run for thirty
+ * years says more about who someone was than one that started last winter.
+ */
+export function epitaphFor(
+  state: GameState,
+  v: Villager,
+): { key: string; params: Record<string, string | number> } | null {
+  if (!v.named) return null;
+
+  const nameOf = (id: VillagerId): string =>
+    state.people.villagers.find((x) => x.id === id)?.name ?? '';
+
+  const open = state.people.grudges
+    .filter((g) => g.fromId === v.id && g.healedTick === null)
+    .sort((a, b) => a.formedTick - b.formedTick)[0];
+
+  if (open !== undefined) {
+    const other = nameOf(open.toId);
+    if (other !== '') {
+      return {
+        key: 'death.named.grudge',
+        params: { other, sinceYear: yearOf(open.formedTick) },
+      };
+    }
+  }
+
+  const heaviest = [...v.memories].sort(
+    (a, b) => b.weight - a.weight || a.tick - b.tick,
+  )[0];
+  if (heaviest === undefined) return null;
+
+  // `was_saved` is the one epitaph that needs somebody else in it. Without a
+  // name to put there it becomes the unspoken one rather than a broken line.
+  const other = heaviest.aboutId === null ? '' : nameOf(heaviest.aboutId);
+  const kind = heaviest.kind === 'was_saved' && other === '' ? 'unspoken' : heaviest.kind;
+
+  return {
+    key: `death.named.${kind}`,
+    params: { other, sinceYear: yearOf(heaviest.tick) },
+  };
+}
+
+/**
+ * The chronicle entry for a named villager's death. Weight 3 (§9.4): they were
+ * one of the eight people the player was asked to hold in their head.
+ */
+export function namedDeathEntry(
+  state: GameState,
+  v: Villager,
+  cause: DeathCause,
+  extra: Record<string, string | number> = {},
+): Omit<ChronicleEntry, 'tick'> {
+  const epitaph = epitaphFor(state, v);
+  return {
+    kind: 'death',
+    templateKey: deathKey(cause, true),
+    weight: 3,
+    params: {
+      name: v.name,
+      age: ageOf(v, state.tick),
+      year: yearOf(state.tick),
+      season: seasonOf(state.tick),
+      ...extra,
+      ...(epitaph === null ? {} : { tail: epitaph.key, ...epitaph.params }),
+    },
+  };
 }
