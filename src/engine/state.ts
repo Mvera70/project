@@ -76,10 +76,25 @@ export type Trait =
 
 /**
  * How a villager died. Content identifiers: stable forever, they are written
- * into saved games (design.md §2.2). Sources: §5.8 plague, §5.9 fire, §6.5 age,
- * starvation and cold, §8.4 the `kill` effect of a crossroad.
+ * into saved games (design.md §2.2).
+ *
+ * `natural` and `old_age` are the same base mortality table (§12.4) split by
+ * age, and the split is what §5.6 needs: an unexplained death — the kind a
+ * village reads as a sign — is a `natural` death between 5 and 59. The same
+ * death at 74 is `old_age` and explains itself.
+ *
+ * `cold` is not in §5.6's list of explained causes because §5.6 lists what an
+ * unexplained death is NOT; freezing in a winter with no firewood explains
+ * itself as plainly as hunger does, and the chronicle wants to say so.
  */
-export type DeathCause = 'age' | 'starvation' | 'cold' | 'plague' | 'fire' | 'crossroad';
+export type DeathCause =
+  | 'natural' // the table took them, and they were not old (§5.6)
+  | 'old_age' // the table took them, and nobody was surprised
+  | 'hunger' // §5.3
+  | 'cold' // §5.4, a winter with the woodpile empty
+  | 'plague' // §5.8
+  | 'fire' // §5.9
+  | 'violence'; // §8.4, the `kill` effect of a crossroad
 
 /**
  * What a named villager remembers. design.md §3.4 names the first three and

@@ -64,7 +64,7 @@ export function consume(state: GameState): { severity: number; starved: Villager
       const v = pick(state.rng, 'deaths', pool);
       pool.splice(pool.indexOf(v), 1);
       v.diedTick = state.tick;
-      v.causeOfDeath = 'starvation';
+      v.causeOfDeath = 'hunger';
       starved.push(v.id);
     }
     if (starved.length >= toll) break;

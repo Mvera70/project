@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2 · Septiembre 2026 · Sucede a `valle.md` (v1)**
+**v2.5 · 7 de septiembre de 2026, 13:34 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -9,6 +9,96 @@ Simulación idle de una aldea medieval para móvil.
 > paralelo sin consultarse entre ellos. Todo lo que aquí se afirma es
 > vinculante; lo que no aparece, se decide en el módulo correspondiente y se
 > documenta ahí.
+
+---
+
+## Registro de cambios
+
+Este documento es la fuente de verdad del proyecto y cambia. Cada revisión nace
+de implementar un módulo y descubrir que la especificación decía algo imposible,
+ambiguo o falso — que es exactamente para lo que sirven los briefs. **Toda
+entrada dice qué cambió y por qué**: el motivo es lo que evita que alguien lo
+revierta dentro de seis meses creyendo que arregla algo.
+
+| Versión | Fecha | Origen | Qué cambió |
+|---|---|---|---|
+| **2.0** | 6 sep 2026 | Diseño inicial | Documento detallado completo: modelo de dominio, balance verificado sobre 60 semillas × 200 años, 16 encrucijadas, 24 briefs. Única desviación de `valle.md`: mapa transpuesto a 36 × 56. |
+| **2.1** | 6 sep 2026 | Revisión de M-01 | Tipo `RngBundle` inválido; alcance real de §12. |
+| **2.2** | 6 sep 2026 | Revisión de M-02 | Grafo de dependencias invertido; `Grudge` incorporado; mortalidad no monótona; dos erratas de prosa. |
+| **2.3** | 6 sep 2026 | Revisión de M-03 | Edad mínima por rol; rasgos incompatibles; constantes que solo vivían en prosa. |
+| **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
+| **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
+
+### 2.5 — Revisión de M-06
+
+- **§4.2 · `DEATHS` pasa a ser el paso 11 y `MOOD` el 12.** Con el orden
+  anterior, las muertes de un tick llegaban al ánimo al tick siguiente y había
+  que arrastrarlas en el contexto. Ahora el ánimo ve las muertes de su propio
+  tick, y los nacimientos (13) usan un ánimo ya actualizado. Es el momento de
+  cambiarlo: no hay partidas guardadas que invalidar.
+- **§5.3 · El bono de ánimo de la cosecha sale de aquí.** Estaba escrito en dos
+  sitios, §5.3 y §5.5. Con dos escritores, el ánimo se bifurca. Lo aplica el
+  paso `MOOD` y nadie más.
+- **§12.6 · `FAITH_DEVOUT_PRIEST` de 0.10 a 0.13.** Con 0.10, la deriva
+  `(40 − 50)·0.01` lo cancelaba exactamente: cualquier aldea con cura devoto
+  congelaba la fe en 50.0 clavado durante décadas. Un equilibrio está bien; un
+  equilibrio en un número redondo parece un valor escrito a mano.
+- **§5.6 · Definida la «muerte inexplicada».** El término existía en la fórmula
+  sin definición: es una muerte entre los 5 y los 59 años por causa natural. Es
+  la principal fuente de movimiento de la fe en años tranquilos.
+- **§5.6 · La fe no lleva término estocástico**, y queda escrito por qué: en
+  este juego lo que cambia en pantalla significa algo.
+- **§5.4 · Anotada como cuestión abierta el tope de la madera**, con el criterio
+  para decidirla después de M-14 en vez de ahora a ciegas.
+
+### 2.4 — Revisión de M-04
+
+- **§12.2 · `FOUNDING.GRAIN` de 900 a 800.** Con `BASE_STORAGE = 800` la aldea
+  nacía por encima de la capacidad y perdía grano a merma desde el primer tick:
+  se leía como un fallo. Verificado contra el modelo de calibración — extinción,
+  años de extinción y mediana de pico no se mueven.
+- **§3.4 · `Villager.leftTick`.** §5.7 hace que se marche gente y §3.4 prohíbe
+  borrar a nadie del array; sin el campo, `DeathCause` tendría que mentir.
+- **§5.7 · Solo se marchan anónimos.** Un nombrado que desaparece sin una línea
+  de crónica es sacar un personaje de la historia sin contarlo, y ese momento
+  pertenece al jugador.
+- **§6.5 · La edad se deriva; en el borde del año no hay nada que incrementar.**
+- **§17 M-04 · `ageEveryone` eliminada.** Era un no-op: la escribí como si la
+  edad estuviera almacenada. Una función vacía en un contrato público es una
+  invitación a que alguien la «implemente».
+- **§17 M-04 · Corregido el test de hambre**, que atribuía a M-04 una extinción
+  que provoca el paso 7 (de M-06), y la esperanza de vida, que hay que medir
+  sobre la tabla pura o el umbral no se cumple.
+
+### 2.3 — Revisión de M-03
+
+- **§12.4 · `ROLE_MIN_AGE`.** §6.2 pondera por edad en las sucesiones y la
+  fundación no: salían comadronas de diecisiete años.
+- **§6.3 · `hardy` y `frail` son incompatibles.** Son ×0.7 y ×1.6 sobre la misma
+  tasa; tener los dos es incoherente por construcción.
+- **§12.2 y §12.4 · `MAX_NAMED`, `AGE_RANGES`, `MIN_FERTILE_WOMEN`.**
+  Constantes que el documento usaba en prosa sin fijarlas, obligando a los
+  módulos a inventarlas.
+
+### 2.2 — Revisión de M-02
+
+- **§17 M-02 · Grafo de dependencias invertido.** §8 necesita seis tipos de §3 y
+  §3 necesita uno solo de §8. `Op` y `Condition` viven en `state.ts`.
+- **§3.4 · `Grudge` y `PeopleState.grudges`.** §6.4 decía «con causa registrada»
+  y no había dónde guardarla. Almacenado y append-only: una opinión que remonta
+  por encima de −50 no borra lo que pasó.
+- **§12.6 · `MORALE_GRAVEYARD`**, número citado en §7.2 que §12 no tenía.
+- **§17 M-02 · Mortalidad no monótona.** Es una curva de bañera y el 0.060
+  infantil es deliberado; el brief pedía monotonía y habría llevado a
+  «arreglar» la demografía del juego.
+- **§12.2 · Cálculo del margen fundacional explícito.**
+
+### 2.1 — Revisión de M-01
+
+- **§4.3 · `RngBundle`.** `interface` con tipo mapeado no es TypeScript válido.
+- **§12 · Excepción declarada:** la tabla de edificios de §7.2 también es
+  balance y se transcribe como `BUILDINGS`.
+- **§17 M-02 · Alcance ampliado** con los tipos que §3 referencia sin declarar.
 
 ---
 
@@ -393,8 +483,8 @@ tick(state, decision?) :
    8.  WINTER       si es invierno, restar leña; marcar frío si falta
    9.  HARVEST      si week == 35, resolver la cosecha
   10.  STORAGE      aplicar merma sobre el excedente
-  11.  MOOD         actualizar ánimo y fe
-  12.  DEATHS       mortalidad por edad, con multiplicadores
+  11.  DEATHS       mortalidad por edad, con multiplicadores
+  12.  MOOD         actualizar ánimo y fe
   13.  BIRTHS       nacimientos
   14.  WORLD        tráfico y caminos; rebrote del bosque; iluminación
   15.  CROSSROAD    si no hay una pendiente, evaluar el catálogo
@@ -520,7 +610,8 @@ yield = workedFields · FIELD_YIELD
       · (0.8 + 0.4 · morale/100) // 0.80 .. 1.20
       · labourFactor
       · (mill ? 1.15 : 1.00)
-morale += (weatherFactor − 1) · 25
+// el bono de ánimo por la cosecha lo aplica el paso MOOD (§5.5), no este.
+// Un solo escritor del ánimo, o el ánimo se bifurca.
 ```
 
 **Almacenamiento:**
@@ -540,6 +631,15 @@ Producción: `cutters · WOOD_PER_CUTTER`, limitada por el bosque disponible (§
 Consumo: construcción, y calefacción en invierno a `WINTER_WOOD` por persona y
 semana. Si la leña se agota en invierno, se marca `cold` y la mortalidad se
 multiplica por 1.4 esa semana.
+
+**Cuestión abierta — el tope de la madera.** El grano tiene capacidad y merma;
+la madera no tiene ni una cosa ni la otra, así que una aldea sin obras acumula
+sin límite. Con los edificios congelados se llega a 5 000 en veinte años. **No se
+decide aquí**: hasta M-14 no hay en qué gastarla y hasta M-15 el bosque no
+limita la producción. El criterio para decidirlo, después de M-14: si la reserva
+acumulada permite levantar más de tres edificios seguidos sin esperar a los
+leñadores, la madera necesita tope y merma como el grano; si no, se queda como
+está. Ponerle tope antes de saberlo es arriesgarse a asfixiar la construcción.
 
 ### 5.5 Ánimo (0–100)
 
@@ -566,6 +666,19 @@ faith −= priestAlive ? 0 : 0.15
 faith −= outbreak ? 0.60 : 0
 faith −= unexplainedDeathsThisTick · 0.30
 ```
+
+**Qué cuenta como muerte inexplicada.** Un fallecimiento de alguien entre 5 y 59
+años por causa `natural` — ni hambre, ni peste, ni incendio, ni violencia. Son
+las muertes que una aldea medieval lee como señal, y son la principal fuente de
+movimiento de la fe en años tranquilos.
+
+**El punto fijo.** La fe es un atractor: sin sucesos se queda quieta en su
+equilibrio (25 sin cura, 40 con cura tibio, 53 con cura devoto). Eso es correcto
+—la fe se mueve cuando pasan cosas, no porque sí— y por eso **no lleva término
+estocástico**: en este juego, algo que cambia en pantalla siempre significa algo.
+`FAITH_DEVOUT_PRIEST` vale 0.13 y no 0.10 por un motivo concreto: con 0.10 la
+deriva `(40 − 50)·0.01` lo cancelaba exactamente y la fe se congelaba en 50.0
+clavado durante décadas, que parece un número escrito a mano.
 
 La fe no da recursos. Hace dos cosas: abre y cierra plantillas de encrucijada, y
 pone un suelo al ánimo (`morale` no baja de `faith · 0.25`). Una aldea muy
@@ -1488,7 +1601,7 @@ export const MOOD = {
   MORALE_HARVEST: 25,           // × (factor de clima − 1)
   FAITH_DRIFT_TO: 40,    FAITH_DRIFT: 0.01,
   FAITH_CHAPEL: 0.20, FAITH_CHURCH: 0.35,
-  FAITH_DEVOUT_PRIEST: 0.10,
+  FAITH_DEVOUT_PRIEST: 0.13,   // 0.10 congelaba la fe en 50.0 exacto (§5.6)
   FAITH_NO_PRIEST: -0.15,
   FAITH_OUTBREAK: -0.60,
   MORALE_FLOOR_FROM_FAITH: 0.25,

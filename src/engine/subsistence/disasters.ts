@@ -13,7 +13,7 @@ import { population } from '../people/demography';
 import { int, next, weighted } from '../rng';
 import type { FireResult, GameState, Outbreak } from '../state';
 import { weekOf } from '../time';
-import { has } from './buildings';
+import { has } from './building-counts';
 
 /**
  * §5.8. `p = PLAGUE_BASE + people/2500`, times 0.6 if there is a well. Lasts

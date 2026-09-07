@@ -4,7 +4,7 @@
 import { FOOD, TIME } from '../balance';
 import type { Allocation, GameState, HarvestResult } from '../state';
 import { weekOf } from '../time';
-import { count, has } from './buildings';
+import { count, has } from './building-counts';
 
 /**
  * What the village can hold. §5.3.

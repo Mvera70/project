@@ -91,7 +91,7 @@ function step(s: GameState, ctx: TickContext, starve?: { acc: number }): void {
     starve.acc -= toll;
     for (const v of s.people.villagers.filter(isHere).slice(0, toll)) {
       v.diedTick = s.tick;
-      v.causeOfDeath = 'starvation';
+      v.causeOfDeath = 'hunger';
     }
   }
   resolveDeaths(s, ctx);
@@ -319,7 +319,7 @@ describe('mortalidad · lo que la agrava', () => {
       events = resolveDeaths(s, CALM);
     }
     expect(victim.diedTick).not.toBeNull();
-    expect(victim.causeOfDeath).toBe('age');
+    expect(victim.causeOfDeath).toBe('old_age');
     expect(s.people.namedIds).not.toContain(victim.id);
     expect(before).toContain(victim.id);
     expect(events.some((e) => e.id === victim.id)).toBe(true);

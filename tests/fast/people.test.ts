@@ -468,7 +468,7 @@ describe('promoteToNamed', () => {
     const dead = namedOf(s)[0];
     if (dead === undefined) throw new Error('la fundación no nombró a nadie');
     dead.diedTick = 10;
-    dead.causeOfDeath = 'age';
+    dead.causeOfDeath = 'old_age';
     s.people.namedIds = s.people.namedIds.filter((x) => x !== dead.id);
 
     const id = anonAdultId(s);

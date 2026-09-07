@@ -13,24 +13,33 @@ import { MOOD, TIME } from '../balance';
 import { housingCapacity, isHere, population } from '../people/demography';
 import type { DeathCause, GameState, TickContext } from '../state';
 import { weekOf } from '../time';
-import { has } from './buildings';
+import { has } from './building-counts';
 
 /**
- * Which deaths a medieval village reads as having no worldly explanation, and
- * so charges to faith (§5.6). Hunger, cold and old age all explain themselves;
- * so does a death the player chose at a crossroad. The sickness and the fire do
- * not.
+ * A death with no worldly explanation, which §5.6 charges to faith: someone
+ * between 5 and 59 taken by nothing anyone can name.
  *
- * M-10 counts the tick's deaths through this so that the definition lives in
- * one place.
+ * Everything else explains itself. Hunger, cold, the sickness and the fire all
+ * have a cause the village can point at; so does a death the player chose at a
+ * crossroad. And a child or an elder dying of nothing in particular is grief,
+ * not an omen — which is why the age band is narrower than a life.
+ *
+ * These are the deaths that move faith in quiet years, when nothing else does.
+ * M-10 counts the tick's deaths through this so the definition lives in one
+ * place.
  */
-export function isUnexplained(cause: DeathCause): boolean {
-  return cause === 'plague' || cause === 'fire';
+export function isUnexplained(cause: DeathCause, age: number): boolean {
+  return (
+    cause === 'natural' && age >= MOOD.UNEXPLAINED_MIN_AGE && age <= MOOD.UNEXPLAINED_MAX_AGE
+  );
 }
 
 const clamp = (x: number): number => Math.max(0, Math.min(100, x));
 
 /**
+ * Step 12 of the tick, after DEATHS (§4.2, v2.5): `ctx.deaths` and
+ * `ctx.unexplainedDeaths` are this tick's, not last tick's.
+ *
  * §5.5 and §5.6, in that order, with the faith floor applied last.
  *
  * The floor goes after every other term and before the clamp, so that a devout

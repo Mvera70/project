@@ -9,7 +9,7 @@
 // Every step photographs its list before it starts (§4.2): a newborn cannot
 // die in the tick it is born, and somebody who dies this tick fathers nobody.
 
-import { BIRTH, DEATH, DISASTER, FOUNDING, LABOUR, LIFE, MIGRATION, TIME } from '../balance';
+import { BIRTH, DEATH, DISASTER, FOUNDING, LABOUR, LIFE, MIGRATION, MOOD, TIME } from '../balance';
 import { int, next, pick } from '../rng';
 import type {
   BirthEvent,
@@ -107,7 +107,8 @@ function traitMortality(v: Villager): number {
 }
 
 /**
- * Step 12 of the tick. design.md §6.5.
+ * Step 11 of the tick — before MOOD, which reads the deaths of this same tick
+ * through the TickContext (§4.2, v2.5). design.md §6.5.
  *
  *   weekly = annualRate(age)/48, multiplied by
  *     · 1 + 2 · severity        (hunger)
@@ -141,9 +142,12 @@ export function resolveDeaths(state: GameState, ctx: TickContext): DeathEvent[] 
     const r = next(state.rng, 'deaths');
     if (r >= total) continue;
 
+    // The cause is whatever pushed them over, and the base-table deaths split
+    // by age: `natural` under 60 is the death §5.6 calls unexplained, `old_age`
+    // above it is the death nobody is surprised by.
     let cause: DeathCause;
-    if (r < Math.min(pAge, base)) cause = 'age';
-    else if (r < Math.min(pHunger, base)) cause = 'starvation';
+    if (r < Math.min(pAge, base)) cause = age > MOOD.UNEXPLAINED_MAX_AGE ? 'old_age' : 'natural';
+    else if (r < Math.min(pHunger, base)) cause = 'hunger';
     else if (r < base) cause = 'cold';
     else cause = 'plague';
 

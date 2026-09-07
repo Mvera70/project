@@ -76,11 +76,11 @@ describe('grafo de módulos del motor', () => {
   it('subsistence/ cuelga de people/ y de las hojas, nunca al revés', () => {
     // M-06. buildings.ts es la única puerta a state.buildings; los cinco
     // sistemas de §5 la usan y ninguno cuenta edificios por su cuenta.
-    expect(importsOf('subsistence/buildings.ts')).toEqual(['state']);
+    expect(importsOf('subsistence/building-counts.ts')).toEqual(['state']);
     expect(importsOf('subsistence/seasons.ts')).toEqual(['balance', 'rng', 'state', 'time']);
     expect(importsOf('subsistence/labour.ts')).toEqual([
       'balance',
-      'buildings',
+      'building-counts',
       'people/demography',
       'state',
     ]);
@@ -94,20 +94,20 @@ describe('grafo de módulos del motor', () => {
     ]);
     expect(importsOf('subsistence/harvest.ts')).toEqual([
       'balance',
-      'buildings',
+      'building-counts',
       'state',
       'time',
     ]);
     expect(importsOf('subsistence/mood.ts')).toEqual([
       'balance',
-      'buildings',
+      'building-counts',
       'people/demography',
       'state',
       'time',
     ]);
     expect(importsOf('subsistence/disasters.ts')).toEqual([
       'balance',
-      'buildings',
+      'building-counts',
       'people/demography',
       'rng',
       'state',
@@ -130,7 +130,7 @@ describe('grafo de módulos del motor', () => {
       ['people/traits.ts', 'traits'],
       ['people/villagers.ts', 'villagers'],
       ['people/demography.ts', 'demography'],
-      ['subsistence/buildings.ts', 'buildings'],
+      ['subsistence/building-counts.ts', 'building-counts'],
       ['subsistence/labour.ts', 'labour'],
       ['subsistence/consumption.ts', 'consumption'],
       ['subsistence/harvest.ts', 'harvest'],

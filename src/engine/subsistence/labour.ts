@@ -16,7 +16,7 @@
 import { FOOD, LABOUR, TIME } from '../balance';
 import { population, workforce } from '../people/demography';
 import type { Allocation, GameState } from '../state';
-import { count, smithyWorking } from './buildings';
+import { count, smithyWorking } from './building-counts';
 
 /**
  * Step 5. Splits the week's labour. Pure: reads the state, writes nothing.

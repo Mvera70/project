@@ -15,7 +15,7 @@ import type {
 } from '@engine/state';
 import { isHere, population, workforce } from '@engine/people/demography';
 import { foundPeople, makeVillager } from '@engine/people/villagers';
-import { count, has, smithyWorking, standing } from '@engine/subsistence/buildings';
+import { count, has, smithyWorking, standing } from '@engine/subsistence/building-counts';
 import { allocateLabour, produce } from '@engine/subsistence/labour';
 import { consume, overwinter } from '@engine/subsistence/consumption';
 import { applySpoilage, harvest, storageCapacity } from '@engine/subsistence/harvest';
@@ -267,7 +267,7 @@ describe('consumo · §5.3', () => {
       for (const id of consume(s).starved) {
         const v = s.people.villagers.find((x) => x.id === id) as Villager;
         expect(v.diedTick).toBe(s.tick);
-        expect(v.causeOfDeath).toBe('starvation');
+        expect(v.causeOfDeath).toBe('hunger');
         expect(isHere(v)).toBe(false);
         expect(s.people.namedIds).not.toContain(id);
         starved += 1;
@@ -614,12 +614,19 @@ describe('ánimo y fe · §5.5, §5.6', () => {
   });
 
   it('las muertes sin explicación hunden la fe; las explicadas no', () => {
-    expect(isUnexplained('plague')).toBe(true);
-    expect(isUnexplained('fire')).toBe(true);
-    expect(isUnexplained('age')).toBe(false);
-    expect(isUnexplained('starvation')).toBe(false);
-    expect(isUnexplained('cold')).toBe(false);
-    expect(isUnexplained('crossroad')).toBe(false);
+    // §5.6: alguien de 5 a 59 años al que no se lo llevó nada que se pueda
+    // nombrar. Lo demás se explica solo.
+    expect(isUnexplained('natural', 30)).toBe(true);
+    expect(isUnexplained('natural', 5)).toBe(true);
+    expect(isUnexplained('natural', 59)).toBe(true);
+    expect(isUnexplained('natural', 4)).toBe(false); // un crío, no un presagio
+    expect(isUnexplained('natural', 60)).toBe(false); // un anciano tampoco
+    expect(isUnexplained('old_age', 70)).toBe(false);
+    expect(isUnexplained('plague', 30)).toBe(false);
+    expect(isUnexplained('fire', 30)).toBe(false);
+    expect(isUnexplained('hunger', 30)).toBe(false);
+    expect(isUnexplained('cold', 30)).toBe(false);
+    expect(isUnexplained('violence', 30)).toBe(false);
 
     const s = founded(7);
     const plain = founded(7);
@@ -808,7 +815,7 @@ describe('desastres · §5.8, §5.9', () => {
 });
 
 describe('el tick de subsistencia completo', () => {
-  /** Los pasos 5 a 11 de §4.2, en su orden, sin los que son de otros módulos. */
+  /** Los pasos 5 a 12 de §4.2 v2.5, sin los que son de otros módulos. */
   function subsistenceTick(s: GameState): TickContext {
     s.tick += 1;
     if (s.tick % TIME.WEEKS_PER_YEAR === 0) s.weather = rollWeather(s);
@@ -827,7 +834,7 @@ describe('el tick de subsistencia completo', () => {
       deaths: starved.length,
       unexplainedDeaths: 0,
     };
-    updateMood(s, ctx); // 11 MOOD
+    updateMood(s, ctx); // 12 MOOD (DEATHS, el 11, es de M-04)
     return ctx;
   }
 

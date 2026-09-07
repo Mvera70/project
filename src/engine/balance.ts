@@ -185,11 +185,16 @@ export const MOOD = {
   FAITH_DRIFT: 0.01,
   FAITH_CHAPEL: 0.2,
   FAITH_CHURCH: 0.35,
-  FAITH_DEVOUT_PRIEST: 0.1,
+  FAITH_DEVOUT_PRIEST: 0.13, // 0.10 froze faith at exactly 50.0 (§5.6)
   FAITH_NO_PRIEST: -0.15,
   FAITH_OUTBREAK: -0.6,
   // TUNE: §5.6 writes it inline as unexplainedDeathsThisTick · 0.30.
   FAITH_UNEXPLAINED_DEATH: -0.3,
+  // §5.6: an unexplained death is a `natural` one between these ages. Younger
+  // and the village mourns a child; older and it buries an elder. Neither is
+  // read as a sign.
+  UNEXPLAINED_MIN_AGE: 5,
+  UNEXPLAINED_MAX_AGE: 59,
   MORALE_FLOOR_FROM_FAITH: 0.25,
 } as const;
 
