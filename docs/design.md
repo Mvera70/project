@@ -1,8 +1,14 @@
 # The Valley — Documento de diseño detallado
 
-**v2.10 · 7 de septiembre de 2026, 19:26 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.12 · 8 de septiembre de 2026, 00:47 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
+
+**Fuente única.** El diseño vigente vive únicamente en `docs/design.md`.
+`docs/the-valley-design.md` se utiliza solo para recibir propuestas de un agente
+externo: se revisa su diff frente al principal, se incorporan los cambios
+aceptados y se elimina la copia una vez sincronizada. El trabajo local actualiza
+este documento directamente, con versión, motivos y evidencia.
 
 > **Qué es este documento.** `valle.md` decide *qué* juego es. Este decide *cómo*
 > se construye, con el detalle necesario para que varios agentes trabajen en
@@ -29,10 +35,193 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
 | **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
 | **2.6** | 7 sep 2026, 13:56 | Revisión de M-05 y M-09 | Componer crónica no consume aleatoriedad; **§9.4 nueva: la muerte de un nombrado**; semillas append-only; crisis de hambruna definida con fórmula. |
-| **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
-| **2.9** | 7 sep 2026, 19:11 | Puerta de M-08b | **Cubrir una vacante no es elegir al mayor**; el diagnóstico del catálogo pasa a dos columnas; `quiet_years` fuera del reparto; deuda del bosque registrada. |
-| **2.8** | 7 sep 2026, 18:53 | Revisión de M-08 | **Regla de elegibilidad episódica**; `grudge` mira opiniones; ratio `grainToHarvest`; A.1, A.13 y A.15 corregidas; la cobertura de vacantes tiene dueño. |
 | **2.7** | 7 sep 2026, 14:18 | Revisión de M-07 | **La exención del techo se gasta en la primera pregunta**; criterio medible para el ritmo; epitafio con rencores sanados; `TERRAIN_CODE` como contrato de serialización. |
+| **2.8** | 7 sep 2026, 18:53 | Revisión de M-08 | **Regla de elegibilidad episódica**; `grudge` mira opiniones; ratio `grainToHarvest`; A.1, A.13 y A.15 corregidas; la cobertura de vacantes tiene dueño. |
+| **2.9** | 7 sep 2026, 19:11 | Puerta de M-08b | **Cubrir una vacante no es elegir al mayor**; el diagnóstico del catálogo pasa a dos columnas; `quiet_years` fuera del reparto; deuda del bosque registrada. |
+| **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
+| **2.11** | 7 sep 2026, 23:44 | Revisión de M-10 y desarrollo de M-11/M-12 | Muertes de todos los pasos con epitafio y coste de ánimo; búfer de crónica; determinismo con 5 000 ticks realmente alcanzados; banco real y cobertura pendiente explícita. |
+| **2.12** | 8 sep 2026, 00:47 | M-13 y M-14 | Fuente única; **mapa real y aldea que se construye sola**; piedra en puntos de obra; dos lecturas de §7.4 corregidas; la iglesia crece desde cualquier esquina. Medido, no previsto. |
+
+### 2.12 — El valle existe y la aldea se construye sola
+
+Todo lo de abajo está medido sobre el motor, no previsto. Las cifras vienen de
+`npm run test:balance` (60 semillas × 200 años × tres políticas, 187,55 s) y de
+`npm test` (464 pruebas, 2 pendientes, 9,5 s).
+
+- Se elimina la copia sincronizada `the-valley-design.md` y se registra arriba
+  el flujo indicado por el usuario; evita mantener dos diseños vigentes.
+- **M-13.** El generador sustituye la pradera provisional, con los cinco pasos
+  de §7.1 y un claro de fundación garantizado. `foundingSite` devuelve la
+  esquina superior izquierda de un claro de 12×12, no un punto ambiguo que el
+  consumidor tenga que reinterpretar; el claro se reserva **antes** de bosque,
+  roca y marisma, así que ninguno de los tres puede invadirlo y el río no se
+  corta ni se desplaza para abrirle sitio. `generateMap` es pura: trabaja sobre
+  una copia del *bundle*, de modo que llamarla dos veces da el mismo valle y no
+  desplaza ningún flujo. Verificado en 200 semillas: río continuo de borde a
+  borde y de una sola masa de agua, bosque entre el 18 % y el 30 %, y claro
+  válido en todas.
+- **M-14.** El paso 6 del tick deja de tirar los puntos de obra. La aldea abre
+  **un proyecto cada vez** —§7.3 es una lista ordenada de qué empezar, no un
+  conjunto de obras en paralelo, y veinte personas que abren ocho cimientos no
+  terminan ninguno—, paga la madera al empezar, reserva la parcela mientras
+  dura y escribe la entrada de crónica cuando el edificio se levanta.
+  Fundación, incendios y efectos de encrucijada usan las mismas reglas.
+- **Piedra.** La conversión a `wood` carecía de factor especificado y
+  contradecía su producción mediante obra. Se usa la tasa ya existente
+  `STONE_PER_BP`: `bpCost = BUILDINGS[kind].bp + BUILDINGS[kind].stone /
+  WORLD.STONE_PER_BP`. Requiere fragua y roca en el mapa; no añade una sexta
+  estadística ni un almacén de piedra.
+- **Encrucijadas.** `build.free` exime materiales, no puntos de obra. El
+  contrato actual de M-07 solo admite `free: true`, así que **no se cambia**
+  `schema.ts` ni `resolve.ts`. Lo que se exime es la madera *y* el recargo de
+  cantera: la piedra que el señor regala no hay que picarla, pero la torre sí
+  hay que levantarla. `bpCost(free) = BUILDINGS[kind].bp`.
+
+**Tres lecturas de §7.4 y §7.3 que había que fijar,** porque la primera versión
+razonable de cada una rompía la aldea:
+
+- **«Lejos del bosque» (campo) es *no pegado* al bosque, no lo más lejos
+  posible.** Maximizar esa distancia mandaba los campos al borde sur del mapa,
+  a veinticinco celdas de las casas, y arrastraba con ellos a los graneros.
+- **«Algo apartada» (capilla) es al otro lado del borde del núcleo, no en la
+  esquina opuesta.** Y la roca —único sustituto de «celda alta» que hay en el
+  estado— es el desempate *dentro* de ese anillo, no la primera clave: con la
+  roca primero, un afloramiento a quince celdas ganaba a cualquier sitio
+  sensato y la capilla acababa contra el borde del mapa, donde una iglesia de
+  3×3 ya no cabe. Ambas preferencias se ordenan lexicográficamente, sin
+  inventar una suma de coeficientes; empata el índice menor.
+- **La iglesia crece desde cualquiera de las cuatro esquinas que contengan a la
+  capilla.** Es 3×3 sobre 2×2, y una capilla bien colocada tiene vecinos: si
+  solo se probara la esquina superior izquierda, §7.3 punto 9 terminaría en las
+  murallas y la iglesia sería contenido muerto.
+
+**Punto 9 de §7.3, ámbito declarado.** Dice «cuando no queda sitio». Se
+implementa como «cuando no se puede empezar nada de los puntos 1 a 8» —sin
+sitio, sin madera o sin necesidad—, que es lo que cumple su motivo escrito: que
+el motor de obras siga funcionando produciendo transformación en vez de
+superficie. Con fragua y roca, una aldea que ya lo tiene todo pasa sus casas a
+piedra en lugar de quedarse parada.
+
+**Medición de esta ronda.** Frente a v2.11, con WORKS vacío, en la misma prueba:
+
+| Métrica | `first` | `last` | `worst` |
+|---|---:|---:|---:|
+| Extinción | 61,7 % (era 100 %) | 80,0 % (era 100 %) | 75,0 % (era 100 %) |
+| Mediana del pico de población | **72,5** (era 21) | 46,0 (era 20) | 45,5 (era 20) |
+| Mediana al año 20 | **37,5** (era 12,5) | 27,5 (era 13) | 27,5 (era 13) |
+| Mapas con 8 campos y 16 casas antes del año 120 | 46,7 % | 26,7 % | 28,3 % |
+| Encrucijadas/generación, sin bosque | **2,278** | 5,932 | 5,914 |
+| Máximo por semilla, sin bosque | **4,600** | 7,800 | 7,900 |
+| Extinción tras el choque del año 40 | 78,9 % | 84,2 % | 77,2 % |
+| Rangos o valores no finitos | 0 | 0 | 0 |
+| **Geometría: solapamientos y edificios sobre agua o marisma** | **0** | **0** | **0** |
+
+`first` pasa ahora los seis umbrales aplicables de §12.9. **Siguen fallando
+cuatro asertos, y ninguno se relaja:**
+
+1. **Cadencia de `last` y `worst`: 5,93 y 5,91 contra el máximo de 5.** La causa
+   está localizada y es una sola: `succession` es elegible en el **78,25 %** de
+   los ticks bajo ambas políticas, y el 94,9 % de los intervalos entre preguntas
+   caen exactamente en el techo global. Ambas políticas eligen la opción que
+   deja el liderazgo vacante, la vacante vuelve a hacer elegible la plantilla al
+   tick siguiente y el juego pregunta tan a menudo como el techo le permite.
+   Se arregla en la plantilla, no en el reposo ni en el techo, y esta ronda
+   tenía prohibido tocar los tres.
+2. **Elegibilidad de `wolf_winter`: 1,27 % y 1,77 % contra el 1 %.** Depende del
+   bosque, que no retrocede hasta M-15. No se juzga hasta entonces.
+3. **Pico de población de `last`: 46 contra la banda 65–82.** `first` da 72,5 y
+   entra. La distancia entre ambas es el coste real de la política desafiante,
+   que es exactamente lo que §12.9 quería medir teniendo las dos.
+4. **Mapas llenos antes del año 120: 46,7 % de `first` contra el 60 %.** El
+   techo lo pone la extinción, no la construcción: solo el 38,3 % de las
+   partidas de `first` llegan vivas al año 200. Las muertes se reparten
+   natural 7 520, hambre 1 964, vejez 1 272, peste 1 271, violencia 519 y frío
+   **5** en 60 semillas de 200 años; el frío no interviene, así que las obras no
+   están dejando a la aldea sin leña para el invierno y no hace falta una regla
+   de reserva que §7.3 no tiene.
+
+No se han tocado reposos, condiciones, techo, A.7=45 ni ninguna constante de
+§12. Lo que falta para cerrar M-12 es una decisión de diseño sobre `succession`
+y sobre la banda de extinción «neutra», que sigue sin política asignada.
+M-15, cámara, guardado y la lectura por un tercero siguen fuera de esta ronda.
+
+### 2.11 — Revisión de M-10 y desarrollo de M-11/M-12
+
+- **§4.2, §5.5 y §9.4 · Todas las muertes de la semana cuentan.** M-10
+  solo componía epitafios para la mortalidad del paso 11. El hambre agrupaba
+  también a los nombrados como anónimos y la violencia de decisiones y semillas
+  no componía epitafio. Ahora los pasos 3, 4, 7 y 11 aportan sus víctimas al
+  informe y al coste de ánimo; cada nombrado recibe su entrada de peso 3 con
+  memoria o rencor, sin duplicarse entre causas. No se cambian tasas de muerte.
+- **§4.2 · El búfer incluye la resolución de M-07.** Sus entradas directas se
+  capturan en la orquestación para que no adelanten los eventos anuales y para
+  que el paso 16 vuelque también decisiones y consecuencias.
+- **Brief M-10 · API ratificada.** Se explicitan el catálogo inyectado y los
+  informes devueltos por `run`, ya presentes en la implementación anterior:
+  permiten instrumentar y probar el motor sin depender de un catálogo global.
+- **§4.3 y M-11 · El reloj es parte del aserto.** El antiguo test pedía 5 000
+  ticks a una partida que terminaba antes. El nuevo exige alcanzar los 5 000 y
+  reproduce el registro exacto de decisiones; compara SHA-256 del estado
+  completo, incluidos mapa, obras y pregunta pendiente. Se añade aislamiento
+  tras 1 000 tiradas de `chronicle`, e invariantes en 200 ticks de cinco semillas.
+- **M-11 · Cobertura honesta.** §14.1 enumera nueve grupos, no diez. Quedan
+  explícitos los pendientes de geometría, mapa, cámara y guardado, dependientes
+  de módulos posteriores. La suite rápida verificada en esta ronda: 431 pruebas
+  aprobadas y cuatro pendientes, 8,58 segundos; no equivale al cierre de M-11.
+- **M-12 · Banco con la fundación y motor reales.** Se miden semillas 0–59
+  durante hasta 200 años con `first`, `last` y `worst`. Las partidas extinguidas
+  no aportan siglos vacíos al denominador de cadencia. Las series y el resumen
+  se conservan aunque fallen asertos. La banda de extinción «neutra» queda
+  pendiente de asignación explícita: no se inventa una política ni se llama
+  neutra a `first` o `last` para cerrar la contradicción heredada.
+- **Alcance conservado.** No se retocan reposos, condiciones, techo ni A.7=45.
+  La aceptación narrativa por un tercero sigue pendiente; esta ronda verifica
+  el motor y no sustituye esa lectura.
+
+**Medición de esta ronda, no umbrales nuevos.** M-12 termina en 32,94 segundos
+(32,56 de banco): once pruebas aprobadas, ocho fallidas y tres pendientes.
+Semillas 0–59, hasta 200 años, con el catálogo completo y el M-10 corregido:
+
+| Métrica | `first` | `last` | `worst` |
+|---|---:|---:|---:|
+| Extinción | 100 % | 100 % | 100 % |
+| Mediana del pico de población | 21 | 20 | 20 |
+| Mediana de población al año 20 | 12,5 | 13 | 13 |
+| Encrucijadas/generación, media sin bosque | 1,963 | 5,189 | 5,203 |
+| Máximo por semilla, sin bosque | 3,849 | 7,750 | 8,287 |
+| Partidas vivas al choque del año 40 | 53 | 48 | 52 |
+| Extinción posterior al choque | 100 % | 100 % | 100 % |
+| Incidencias de rango o valores no finitos | 0 | 0 | 0 |
+
+Los ocho fallos corresponden a pico y población al año 20 (`first` y `last`),
+cadencia (`last` y `worst`) y elegibilidad (`last` y `worst`, con `succession`
+por encima del 60 % de los ticks). **M-12 no está cerrado.** WORKS sigue vacío:
+la falta de M-14 limita la interpretación de población y extinción, pero no
+convierte sus objetivos incumplidos en aprobados. El choque mide mortalidad
+posterior, no causalidad: también se extinguen todas las partidas base.
+
+Metodología reproducible en `tests/balance/README.md`: cadencia por generaciones
+efectivamente vividas; las dos plantillas de bosque siguen en la simulación y
+se excluyen solo de ese numerador. Elegibilidad se observa en la frontera previa
+al tick con copia del RNG, incluyendo condiciones, reparto y reposos; no es una
+sonda interna del paso 15. La segunda columna de §8.1 informa disparos divididos
+por el máximo teórico del reposo, considerando `minYear` y `maxPerGame`, con la
+reserva aparte. Las series anuales están en `artifacts/balance.csv` y las cifras
+por semilla en `artifacts/balance-summary.json`; se regeneran con
+`npm run test:balance`, incluso cuando los asertos fallan.
+
+**Siguiente trabajo.** M-13/M-14 deben sustituir el mapa y la colocación
+provisionales y ejecutar WORKS antes de recalibrar contra crecimiento real;
+M-15 habilitará la comprobación del bosque. El mapa provisional ya coloca el
+campo 5 de la semilla 7 sobre agua: no se acepta como generador definitivo.
+Las crónicas anteriores a esta corrección carecían de algunos epitafios y deben
+regenerarse para la lectura externa. En esta ronda se han regenerado sin errores
+en `artifacts/chronicle-7-v2.11.txt`, `artifacts/chronicle-42-v2.11.txt` y
+`artifacts/chronicle-108-v2.11.txt`. La comprobación adicional encuentra 9, 13
+y 6 muertes de nombrados respectivamente: todas tienen exactamente un epitafio.
+Typecheck y lint completos también pasan.
+La geometría no forma parte del hito 0
+(§15.1); su prueba queda pendiente, no aprobada por esperar ese defecto.
 
 ### 2.10 — Puerta de M-08c · superada
 
@@ -657,6 +846,10 @@ Notas obligatorias:
   Un recién nacido no puede morir en el mismo tick en el que nace.
 - El paso 16 no calcula nada. Los pasos anteriores empujan eventos a un búfer y
   este los vuelca. Ningún sistema escribe texto.
+- El búfer incluye las entradas que generan las APIs de resolución de M-07:
+  M-10 captura esas entradas antes del volcado. El informe semanal incluye las
+  muertes de decisiones, semillas, hambre y mortalidad demográfica; MOOD cuenta
+  todas una sola vez, y §9.4 se aplica a los nombrados cualquiera que sea la causa.
 
 ### 4.3 Determinismo y flujos aleatorios
 
@@ -681,6 +874,12 @@ o en un log jamás puede desplazar la simulación.
 **Test de determinismo (obligatorio, suite rápida):** dos partidas con la misma
 semilla y la misma lista de decisiones producen estados idénticos byte a byte
 tras 5 000 ticks.
+
+Ambas ejecuciones deben **alcanzar** el tick 5 000: una extinción anterior no
+verifica ese horizonte. Se reproduce el registro de decisiones y se compara el
+hash de todo el estado serializado, no una selección de campos. En la prueba de
+aislamiento se excluye únicamente el flujo `chronicle` intervenido; se compara
+el resto del estado completo tras continuar la simulación.
 
 ---
 
@@ -1078,10 +1277,11 @@ borde a borde, entre el 18 % y el 30 % de bosque, y un sitio de fundación váli
 | `church` | 3×3 | 0 + 120 piedra | 200 | Mejora de `chapel` | 1 |
 | `watchtower` | 2×2 | 0 + 60 piedra | 90 | Solo por encrucijada | 2 |
 
-La piedra no es un sexto recurso: aparece cuando hay `smithy`, y se produce
-consumiendo puntos de obra contra los afloramientos de roca del mapa. Se
-contabiliza dentro de `wood` con un factor de conversión, y la interfaz nunca la
-nombra por separado.
+La piedra no es un sexto recurso. Con `smithy` y roca en el mapa, su extracción
+añade `stone / WORLD.STONE_PER_BP` a los puntos de obra del proyecto; se paga la
+madera de la tabla al comenzar. No se almacena piedra dentro de `wood`: no había
+un factor de conversión definido y mezclar ambos materiales ocultaría su coste.
+Esta ronda no agota los afloramientos ni introduce un stock nuevo.
 
 ### 7.3 Prioridad de construcción
 
@@ -1102,6 +1302,19 @@ El punto 9 es lo que resuelve el problema de ritmo a largo plazo de `valle.md`
 §7. Cuando el mapa se llena, el mismo motor de obras sigue funcionando pero
 produce transformación en vez de superficie.
 
+**Ámbito del punto 9 (v2.12).** «Cuando no queda sitio» se implementa como
+«cuando no se puede empezar ninguno de los puntos 1 a 8»: sin parcela, sin
+madera o sin necesidad. Es lo que cumple el motivo escrito arriba —que el motor
+de obras no se pare— y evita que una aldea que ya lo tiene todo se quede sin
+nada que hacer durante un siglo. Las mejoras exigen fragua y roca en el mapa
+(§7.2), así que una aldea sin fragua sí se queda parada, que es el incentivo.
+
+La aldea abre **un proyecto cada vez**. §7.3 es una lista ordenada de qué
+empezar a continuación, no un conjunto de obras simultáneas: veinte personas
+que abren ocho cimientos no terminan ninguno. Un `build` de encrucijada (§8.4)
+entra en la misma cola en vez de saltársela, y los puntos que sobran al
+terminar una obra pasan a la siguiente de la cola.
+
 ### 7.4 Colocación
 
 Determinista y sin intervención del jugador. Para cada tipo se puntúa cada
@@ -1120,6 +1333,27 @@ posición válida y se elige la mejor; empate por índice menor.
 Ninguna colocación puede pisar `water`, `marsh` ni `ruins` de piedra. Las ruinas
 de madera **sí** se pueden edificar encima; la ruina desaparece del mapa pero
 queda en la crónica.
+
+**Cómo se ordenan estas preferencias (v2.12).** No hay elevación ni fertilidad
+en el estado, así que no se inventa una suma de coeficientes: las preferencias
+de cada fila se ordenan lexicográficamente, en el orden en que están escritas,
+y empata el índice menor. Dos de ellas hay que leerlas con cuidado, porque la
+lectura literal desperdiga la aldea por el valle entero:
+
+- **`field` · «lejos del bosque» es *no adyacente* al bosque.** Maximizar la
+  distancia al bosque manda los campos al borde del mapa, a veinticinco celdas
+  de las casas, y arrastra los graneros con ellos.
+- **`chapel` · «algo apartada» es al otro lado del borde del núcleo**, a
+  `BUILDING_RULES.CHAPEL_SET_BACK` celdas de él, y «celda alta y visible» —la
+  roca es el único sustituto disponible— desempata *dentro* de ese anillo. Con
+  la roca como primera clave, un afloramiento lejano gana a cualquier sitio
+  sensato y la capilla acaba contra el borde del mapa.
+
+**La iglesia crece desde cualquiera de sus cuatro esquinas.** Es 3×3 sobre una
+capilla de 2×2, así que tiene que ganar una celda en cada eje. Se prueban las
+cuatro posiciones que siguen conteniendo a la capilla, en orden de fila, y vale
+la primera que quepa. Probando solo la esquina superior izquierda, una capilla
+con un vecino al sur o al este nunca llegaría a iglesia.
 
 ### 7.5 El bosque
 
@@ -2417,10 +2651,15 @@ resolver) sobre 5 000 entradas generadas.
 **Contrato.**
 ```ts
 export function foundGame(seed: number): GameState;
-export function tick(state: GameState, decision?: Decision): TickReport;
-export function run(state: GameState, ticks: number, policy: Policy): void;
-export type Policy = 'first' | 'last' | 'random' | 'worst' | ((s, c) => string);
+export function tick(state: GameState, catalogue: Catalogue, decision?: Decision): TickReport;
+export function run(state: GameState, ticks: number, policy: Policy, catalogue: Catalogue): TickReport[];
+export type Policy = 'first' | 'last' | 'random' | 'worst'
+  | ((state: GameState, options: readonly string[]) => string);
 ```
+El catálogo se inyecta como en M-07, para probar escenarios sin introducir un
+catálogo global en la orquestación. `run` devuelve los informes semanales que
+usa la instrumentación; `TickReport.deaths` abarca todas las causas de la semana.
+Estas firmas hacen explícita la API ya implementada en M-10.
 **Reglas.** El orden de §4.2 es normativo y el código lo refleja con 17 llamadas
 numeradas y comentadas. `tick` no dibuja ni escribe por consola.
 **Tests.** El test de determinismo de §4.3; el orden del tick verificado con
@@ -2435,11 +2674,13 @@ crónica legible. **Este es el hito 0.**
 **Objetivo.** Que romper algo se note en segundos.
 **Depende de.** M-10.
 **Ficheros.** `tests/fast/**`.
-**Contrato.** Los diez grupos de §14.1.
+**Contrato.** Los nueve grupos enumerados en §14.1.
 **Reglas.** Los tests describen propiedades del diseño, no detalles de
 implementación. Nada de comprobar que una función llama a otra.
 **Tests.** Son el entregable.
-**Terminado cuando.** `npm test` tarda menos de 20 s y cubre los diez grupos.
+**Terminado cuando.** `npm test` tarda menos de 20 s y cubre los nueve grupos.
+Hasta implementar M-13/M-14, M-20 y M-23, las propiedades de geometría, mapa,
+cámara y guardado figuran pendientes: no se sustituyen por pruebas del andamiaje.
 
 ---
 
@@ -2449,13 +2690,22 @@ implementación. Nada de comprobar que una función llama a otra.
 **Depende de.** M-10.
 **Ficheros.** `tests/balance/**`, `tools/balance-report.ts`.
 **Contrato.** `npm run test:balance` ejecuta 60 semillas × 200 años con las
-políticas `first` y `worst`, comprueba los umbrales de §12.9, imprime una tabla
+políticas `first`, `last` y `worst`, comprueba los umbrales de §12.9, imprime una tabla
 y escribe `artifacts/balance.csv`.
 **Reglas.** Ningún umbral se fija con una sola semilla. Las series se guardan
 para poder mirar la forma de las curvas.
 **Tests.** Son el entregable.
-**Terminado cuando.** Los nueve umbrales de §12.9 pasan y la ejecución completa
-tarda menos de 5 minutos.
+**Terminado cuando.** Los umbrales aplicables de §12.9 pasan, las comprobaciones
+pendientes de módulos posteriores o de aclaración de política están resueltas,
+y la ejecución completa tarda menos de 5 minutos.
+
+**Estado (v2.12): no cerrado.** 19 de 25 asertos pasan en 187,55 s. `first` pasa
+los seis umbrales que le aplican. Quedan cuatro fallos, enumerados en §2.12: la
+cadencia de `last`/`worst` (arrastrada por `succession`, elegible en el 78 % de
+los ticks), la elegibilidad de `wolf_winter` (pendiente de M-15), el pico de
+`last` y el 60 % de mapas llenos. Ninguno se ha relajado. Las dos pruebas
+pendientes son la banda de extinción «neutra» —sin política asignada— y el
+bosque restante al año 100, de M-15.
 
 ---
 
@@ -2464,6 +2714,12 @@ tarda menos de 5 minutos.
 **Objetivo.** Un valle creíble y siempre igual para la misma semilla.
 **Depende de.** M-02.
 **Ficheros.** `src/engine/world/mapgen.ts`, `tiles.ts`.
+La ronda v2.12 incluye sus constantes en `balance.ts` (`MAPGEN`), las pruebas en
+`tests/fast/mapgen.test.ts` y el volcado ASCII en `tools/map-dump.ts`
+(`npm run map -- --seed 7`); la conexión con `found.ts` pertenece a M-10.
+`idx` y `neighbours4` viven en `tiles.ts`, para que M-14 y M-15 tengan la
+topología sin arrastrar el generador, y `mapgen.ts` las reexporta para que el
+contrato de abajo se lea de un solo import.
 **Contrato.**
 ```ts
 export function generateMap(b: RngBundle): ValleyMap;
@@ -2477,6 +2733,12 @@ distintas dan mapas visiblemente distintos (más del 15 % de celdas diferentes).
 **Terminado cuando.** Un volcado ASCII del mapa por consola se reconoce como un
 valle con río.
 
+**Estado (v2.12): hecho.** Nueve pruebas sobre 200 semillas: río continuo de
+borde a borde y de una sola masa de agua, bosque en la banda, claro de 12×12 de
+pradera sin marisma adyacente, pureza de `generateMap`, reproducibilidad celda a
+celda y más del 15 % de celdas distintas entre semillas. El volcado de la
+semilla 7 se reconoce como valle.
+
 ---
 
 ### M-14 · Edificios, colocación y obras
@@ -2485,6 +2747,12 @@ valle con río.
 **Depende de.** M-13, M-06.
 **Ficheros.** `src/engine/world/buildings.ts`, `placement.ts`, `works.ts`,
 `upgrade.ts`.
+La ronda v2.12 incluye las constantes en `balance.ts` (`BUILDING_RULES`), las
+pruebas en `tests/fast/works.test.ts` y en `tests/balance/`, y la integración
+M-10 en `found.ts`/`sim.ts`. El contrato M-07 ya garantiza `build.free: true`;
+no se cambia su API, el catálogo ni sus efectos. `nextProject` devuelve también
+las mejoras, y el tipo `Upgrade` vive en `upgrade.ts` junto a `upgradeSpot`, que
+es quien sabe que una iglesia es más grande que su capilla.
 **Contrato.**
 ```ts
 export function nextProject(state: GameState): BuildingKind | Upgrade | null;
@@ -2502,6 +2770,15 @@ respeta en una batería de estados construidos a mano; al llenarse el mapa,
 superan.
 **Terminado cuando.** Una partida de 120 años llega a los ~45 edificios de
 `valle.md` §7.
+
+**Estado (v2.12): hecho, con un objetivo de §12.9 sin alcanzar.** La semilla 108
+llega al año 120 con 51 edificios en pie —16 casas de piedra, 8 campos, 3
+graneros, capilla, molino, fragua, pozo y 18 tramos de muralla— y 45 vivos. En
+60 semillas × 200 años × tres políticas no hay **ni un** solapamiento entre
+edificios u obras, ni un edificio sobre agua o marisma, ni un tope de §7.2
+superado. Lo que no llega es el 60 % de mapas con 8 campos y 16 casas antes del
+año 120: `first` da 46,7 %, y el techo lo pone la extinción (61,7 %), no la
+construcción. Ver §2.12.
 
 ---
 
