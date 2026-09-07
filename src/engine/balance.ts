@@ -318,6 +318,37 @@ export const TRAIT_WEIGHTS = {
 export const TRAIT_COUNT = [3, 4] as const;
 
 // ---------------------------------------------------------------------------
+// §6.4 · Memory, opinions and grudges
+//
+// TUNE: §6.4 gives the table in prose and none of it reaches §12.
+// ---------------------------------------------------------------------------
+
+export const MEMORY = {
+  MAX: 12, // per named villager
+  WEIGHT_MIN: 1,
+  WEIGHT_MAX: 5,
+  DECAY_PER_YEAR: 0.02,
+} as const;
+
+export const OPINION = {
+  MIN: -100,
+  MAX: 100,
+  /** "Living together without incident: +0.05/week, towards 0 from the ends." */
+  DRIFT_PER_WEEK: 0.05,
+  SPITEFUL_RECOVERY: 0.5, // a spiteful villager forgives at half speed
+  LOYAL_RECOVERY: 2.0, // a loyal one at double
+  /** A grudge forms when an opinion crosses this going down. */
+  GRUDGE_AT: -50,
+  /** And heals when it climbs back above this. It is never deleted. */
+  GRUDGE_HEALS_AT: -20,
+  // The three named events of the §6.4 table. The crossroad templates of M-08
+  // quote these rather than writing their own numbers.
+  LOST_CHILD_TO_LEADER: -35,
+  PUBLICLY_BLAMED: -30,
+  WAS_SAVED: 25,
+} as const;
+
+// ---------------------------------------------------------------------------
 // People
 // ---------------------------------------------------------------------------
 

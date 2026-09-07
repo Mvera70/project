@@ -107,7 +107,8 @@ export type MemoryKind =
   | 'was_saved'
   | 'was_passed_over' // §6.6: the succession they did not win
   | 'went_hungry'
-  | 'lost_home';
+  | 'lost_home'
+  | 'unspoken'; // a grudge whose cause nobody wrote down (§6.4)
 
 export interface Villager {
   id: VillagerId;

@@ -71,6 +71,14 @@ describe('grafo de módulos del motor', () => {
       'villagers',
     ]);
     expect(importsOf('state.ts')).not.toContain('people/villagers');
+    // M-05. memories.ts no conoce a nadie; opinions.ts lo usa para la causa.
+    expect(importsOf('people/memories.ts')).toEqual(['balance', 'state', 'time']);
+    expect(importsOf('people/opinions.ts')).toEqual([
+      'balance',
+      'demography',
+      'memories',
+      'state',
+    ]);
   });
 
   it('subsistence/ cuelga de people/ y de las hojas, nunca al revés', () => {
@@ -130,6 +138,8 @@ describe('grafo de módulos del motor', () => {
       ['people/traits.ts', 'traits'],
       ['people/villagers.ts', 'villagers'],
       ['people/demography.ts', 'demography'],
+      ['people/memories.ts', 'memories'],
+      ['people/opinions.ts', 'opinions'],
       ['subsistence/building-counts.ts', 'building-counts'],
       ['subsistence/labour.ts', 'labour'],
       ['subsistence/consumption.ts', 'consumption'],
