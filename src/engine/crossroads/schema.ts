@@ -123,6 +123,17 @@ export interface SeedSpec {
   effects: Effect[];
   visible: VisualEffect[];
   chronicleKey: string; // the text that links back to the original decision
+  /**
+   * A flag held for exactly as long as the seed takes to come due (v2.13).
+   *
+   * The delay is drawn when the option is taken, so an ordinary
+   * `{k:'flag', years}` effect cannot match it: it would have to guess. A.15
+   * needs the match exactly — `interregnum` must lift on the week the leaderless
+   * years end, not a year before or after — and this is the only way to say
+   * "until this consequence arrives" without special-casing a flag name inside
+   * the resolver.
+   */
+  holdsFlag?: string;
 }
 
 // ---------------------------------------------------------------------------

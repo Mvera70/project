@@ -195,6 +195,8 @@ export function applyOption(
   // the decision and not of whenever the seed happens to be looked at.
   for (const spec of option.seeds) {
     const years = int(state.rng, 'crossroads', spec.delayYears[0], spec.delayYears[1]);
+    // A flag that lasts exactly until this seed comes due (§8.5, v2.13).
+    if (spec.holdsFlag !== undefined) state.flags[spec.holdsFlag] = state.tick + years * 48;
     state.seeds.push({
       id: `${template.id}:${option.id}:${spec.id}:${state.tick}`,
       fromTemplateId: template.id,

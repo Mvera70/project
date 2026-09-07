@@ -15,7 +15,17 @@ export const SUCCESSION: CrossroadTemplate = {
   category: 'succession',
   weight: 100,
   cooldownYears: 0,
-  requires: [{ k: 'role', role: 'leader', alive: false }],
+  // v2.13: `interregnum` is what closes the loop. Without it, "No one" leaves
+  // the office vacant, the vacancy makes the template eligible again on the
+  // very next tick, and succession is eligible on 78 % of the ticks of any game
+  // where the two candidates get refused: the valley spends its whole crossroad
+  // budget asking who is in charge. The seed already said the village shouts at
+  // each other for two to four years first; the flag is the half that was
+  // missing for that to be true.
+  requires: [
+    { k: 'role', role: 'leader', alive: false },
+    { k: 'flag', flag: 'interregnum', set: false },
+  ],
   // v2.9. Filtro duro, no preferencia: con `anyNamed` a secas se encadenaban
   // ancianos y la sucesión disparaba al doble de su ritmo natural. El ensanche
   // solo actúa si la banda no da dos candidatos — A toma el único que hay y B
@@ -85,6 +95,8 @@ export const SUCCESSION: CrossroadTemplate = {
         {
           id: 'the_leaderless_years',
           delayYears: [2, 4],
+          // Held for exactly the years the shouting lasts, whatever they were.
+          holdsFlag: 'interregnum',
           condition: { k: 'role', role: 'leader', alive: false },
           effects: [{ k: 'stat', stat: 'morale', delta: -10 }],
           visible: [{ k: 'gather', where: 'square', days: 2 }],
