@@ -127,6 +127,47 @@ describe('grafo de módulos del motor', () => {
     }
   });
 
+  it('world/ cuelga de subsistence/ y de people/, y no conoce §8', () => {
+    // M-13 y M-14. tiles.ts es la hoja topológica: la geometría del mapa sin
+    // el generador, para que M-14 y M-15 no arrastren el ruido.
+    expect(importsOf('world/tiles.ts')).toEqual(['balance']);
+    expect(importsOf('world/mapgen.ts')).toEqual(['balance', 'rng', 'state', 'tiles']);
+    expect(importsOf('world/placement.ts')).toEqual(['balance', 'state']);
+    expect(importsOf('world/buildings.ts')).toEqual([
+      'balance',
+      'people/demography',
+      'state',
+      'subsistence/harvest',
+    ]);
+    expect(importsOf('world/upgrade.ts')).toEqual(['balance', 'placement', 'state']);
+    expect(importsOf('world/works.ts')).toEqual([
+      'balance',
+      'buildings',
+      'people/demography',
+      'placement',
+      'state',
+      'subsistence/building-counts',
+      'subsistence/harvest',
+      'upgrade',
+    ]);
+    // §7.3 punto 8 lee la bandera `threatened`, que hoy vive en
+    // crossroads/conditions.ts. Leerla desde allí pondría a world/ por encima
+    // de la cima del grafo; works.ts la lee de state.flags, que es de quien es.
+    for (const f of ['world/works.ts', 'world/buildings.ts', 'world/placement.ts'] as const) {
+      expect(importsOf(f).some((x) => x.includes('crossroads')), f).toBe(false);
+      expect(importsOf(f).some((x) => x.includes('chronicle')), f).toBe(false);
+    }
+    // Y nadie de subsistence/ o people/ mira hacia world/.
+    for (const f of [
+      'people/demography.ts',
+      'subsistence/labour.ts',
+      'subsistence/harvest.ts',
+      'subsistence/disasters.ts',
+    ] as const) {
+      expect(importsOf(f).some((x) => x.includes('world')), f).toBe(false);
+    }
+  });
+
   it('chronicle/ no lo importa nadie: es la salida, no una entrada', () => {
     // M-09. El banco no importa nada; render sólo lee; digest cuenta cabezas.
     expect(importsOf('chronicle/bank.en.ts')).toEqual([]);
@@ -192,6 +233,12 @@ describe('grafo de módulos del motor', () => {
       ['crossroads/select.ts', 'select'],
       ['crossroads/resolve.ts', 'resolve'],
       ['crossroads/seeds.ts', 'seeds'],
+      ['world/tiles.ts', 'tiles'],
+      ['world/mapgen.ts', 'mapgen'],
+      ['world/placement.ts', 'placement'],
+      ['world/buildings.ts', 'buildings'],
+      ['world/upgrade.ts', 'upgrade'],
+      ['world/works.ts', 'works'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }

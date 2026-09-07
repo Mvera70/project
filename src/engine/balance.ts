@@ -202,6 +202,26 @@ export const MOOD = {
 // §12.7 · The valley
 // ---------------------------------------------------------------------------
 
+/** Map-generation parameters from §7.1; unspecified choices are marked TUNE. */
+export const MAPGEN = {
+  RIVER_ENTRY: [10, 26],
+  RIVER_FORWARD_CHANCE: 0.65,
+  RIVER_WIDTH: 2,
+  RIVER_LOWER_WIDTH: 3,
+  NOISE_SCALES: [8, 4],
+  FOREST_FRACTION: [0.20, 0.26],
+  ROCK_PATCHES: [3, 6],
+  ROCK_SIZE: [6, 14],
+  MARSH_WIDTH: [1, 2],
+  CLEARING_SIZE: 12,
+  SITE_RIVER_DISTANCE: [3, 6],
+  RIVER_MEANDER: 3, // TUNE: bound lateral drift so either bank can hold a clearing.
+  FINE_NOISE_WEIGHT: 0.5, // TUNE: relative amplitude of the second octave.
+  SLOPE_BIAS: 0.22, // TUNE: modest forest preference for the east/west slopes.
+  NORTH_BIAS: 0.12, // TUNE: modest forest preference for the northern end.
+  ROCK_RIVER_DISTANCE: 5, // TUNE: preferred minimum distance from water.
+} as const;
+
 export const WORLD = {
   WIDTH: 36,
   HEIGHT: 56,
@@ -258,6 +278,26 @@ export const BUILDINGS = {
   stone_house: { w: 2, h: 2, wood: 0, stone: 50, bp: 70, cap: null, tier: 1, upgradeOf: 'house', byCrossroad: false }, // does not burn
   church: { w: 3, h: 3, wood: 0, stone: 120, bp: 200, cap: 1, tier: 1, upgradeOf: 'chapel', byCrossroad: false }, // MOOD.*_CHURCH
   watchtower: { w: 2, h: 2, wood: 0, stone: 60, bp: 90, cap: 2, tier: 1, upgradeOf: null, byCrossroad: true },
+} as const;
+
+/**
+ * §7.3's build priority and §7.4's placement, as numbers.
+ *
+ * The population gates and the granary threshold are written in §7.3 itself and
+ * are transcribed literally. The two placement distances are marked TUNE: §7.4
+ * gives the preferences in prose ("a menos de 6 celdas de una casa", "dilatada
+ * 2 celdas") and one of them is a number, the other is not.
+ */
+export const BUILDING_RULES = {
+  WELL_PEOPLE: 25, // §7.3 point 4
+  CHAPEL_PEOPLE: 30, // §7.3 point 5
+  CHAPEL_FAITH: 45, // §7.3 point 5
+  SMITHY_PEOPLE: 35, // §7.3 point 6
+  MILL_PEOPLE: 45, // §7.3 point 7
+  GRANARY_FULL: 0.8, // §7.3 point 3: grain above 80 % of capacity
+  GRANARY_HOUSE_DISTANCE: 6, // §7.4: "a menos de 6 celdas de una casa"
+  PALISADE_DILATION: 2, // §7.4: "envolvente convexa del núcleo, dilatada 2 celdas"
+  CHAPEL_SET_BACK: 2, // TUNE: §7.4 wants the chapel "algo apartada"; cells past the core rim.
 } as const;
 
 // ---------------------------------------------------------------------------
