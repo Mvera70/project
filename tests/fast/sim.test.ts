@@ -4,7 +4,8 @@
 // partidas guardadas. Lo que se protege aquí es ese orden, el determinismo del
 // que cuelga todo el proyecto, y que mil ticks no revienten.
 import { describe, expect, it, vi } from 'vitest';
-import { PEOPLE, TIME } from '@engine/balance';
+import { createHash } from 'node:crypto';
+import { LIFE, PEOPLE, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { isHere, population } from '@engine/people/demography';
@@ -15,22 +16,9 @@ import type { GameState, Villager } from '@engine/state';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
 
-/** Un hash barato de todo lo que la simulación puede haber tocado. */
+/** Hash every state field, including typed map arrays, works and pending choices. */
 function fingerprint(s: GameState): string {
-  return JSON.stringify({
-    tick: s.tick,
-    rng: s.rng,
-    village: s.village,
-    people: s.people,
-    buildings: s.buildings,
-    flags: s.flags,
-    seeds: s.seeds,
-    history: s.history,
-    weather: s.weather,
-    outbreak: s.outbreak,
-    ended: s.ended,
-    chronicle: s.chronicle,
-  });
+  return createHash('sha256').update(JSON.stringify(s)).digest('hex');
 }
 
 describe('la fundación', () => {
@@ -41,6 +29,11 @@ describe('la fundación', () => {
     expect(s.village.grain).toBe(800);
     expect(s.buildings.filter((b) => b.kind === 'house')).toHaveLength(4);
     expect(s.buildings.filter((b) => b.kind === 'field')).toHaveLength(2);
+    expect(s.village.wood).toBe(200);
+    expect(s.works).toEqual([]);
+    for (const house of s.buildings.filter((b) => b.kind === 'house')) {
+      expect(s.people.villagers.filter((v) => v.homeId === house.id)).toHaveLength(LIFE.HOUSE_CAPACITY);
+    }
     expect(s.crossroad).toBeNull();
     expect(s.ended).toBeNull();
     expect(s.chronicle[0]?.kind).toBe('founding');
@@ -52,26 +45,34 @@ describe('la fundación', () => {
   });
 
   it('el valle tiene bosque y río', () => {
-    // Mapa provisional hasta M-13, pero el motor lo lee: sin bosque, las dos
-    // plantillas de `forest` serían contenido muerto desde el primer tick.
+    // The integrated founding uses M-13's real valley.
     const s = foundGame(7);
     const forest = [...s.map.terrain].filter((t) => t === 1).length;
     const water = [...s.map.terrain].filter((t) => t === 2).length;
-    expect(forest / s.map.terrain.length).toBeGreaterThan(0.15);
-    expect(forest / s.map.terrain.length).toBeLessThan(0.35);
+    expect(forest / s.map.terrain.length).toBeGreaterThanOrEqual(0.18);
+    expect(forest / s.map.terrain.length).toBeLessThanOrEqual(0.30);
     expect(water).toBeGreaterThan(0);
   });
 });
 
 describe('determinismo · §4.3', () => {
   it('misma semilla y mismas decisiones dan el mismo estado a los 5 000 ticks', () => {
-    // El aserto del que cuelga el proyecto entero.
-    const play = (): GameState => {
-      const s = foundGame(7);
-      run(s, 5000, 'first', CATALOG);
-      return s;
-    };
-    expect(fingerprint(play())).toBe(fingerprint(play()));
+    // This seed survives the full horizon; an ended game must not pass early.
+    const original = foundGame(6);
+    run(original, 5000, 'first', CATALOG);
+    expect(original.tick).toBe(5000);
+    expect(original.history.length).toBeGreaterThan(0);
+    const replay = foundGame(6);
+    let decisions = 0;
+    for (let week = 1; week <= 5000; week += 1) {
+      const recorded = original.history[decisions];
+      const decision = recorded?.tick === week ? recorded : undefined;
+      tick(replay, CATALOG, decision);
+      if (decision !== undefined) decisions += 1;
+    }
+    expect(replay.tick).toBe(5000);
+    expect(decisions).toBe(original.history.length);
+    expect(fingerprint(replay)).toBe(fingerprint(original));
   });
 
   it('dos semillas divergen', () => {
@@ -123,6 +124,7 @@ describe('el orden del tick · §4.2', () => {
     };
 
     await watch('@engine/subsistence/labour', ['allocateLabour', 'produce']);
+    await watch('@engine/world/works', ['advanceWorks']);
     await watch('@engine/subsistence/consumption', ['consume', 'overwinter']);
     await watch('@engine/subsistence/harvest', ['harvest', 'applySpoilage']);
     await watch('@engine/subsistence/mood', ['updateMood']);
@@ -138,7 +140,8 @@ describe('el orden del tick · §4.2', () => {
     expect(at('fireSeeds')).toBeGreaterThanOrEqual(0); // 4
     expect(at('allocateLabour')).toBeGreaterThan(at('fireSeeds')); // 5
     expect(at('produce')).toBeGreaterThan(at('allocateLabour')); // 5
-    expect(at('consume')).toBeGreaterThan(at('produce')); // 7
+    expect(at('advanceWorks')).toBeGreaterThan(at('produce')); // 6
+    expect(at('consume')).toBeGreaterThan(at('advanceWorks')); // 7
     expect(at('overwinter')).toBeGreaterThan(at('consume')); // 8
     expect(at('harvest')).toBeGreaterThan(at('overwinter')); // 9 — DESPUÉS de comer
     expect(at('applySpoilage')).toBeGreaterThan(at('harvest')); // 10

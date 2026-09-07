@@ -27,13 +27,16 @@ import type {
   Villager,
 } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
-import { count, standing as standingOf } from './subsistence/building-counts';
+import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
 import { consume, overwinter } from './subsistence/consumption';
 import { applySpoilage, harvest } from './subsistence/harvest';
 import { isUnexplained, updateMood } from './subsistence/mood';
 import { rollWeather } from './subsistence/seasons';
 import { rollFire, rollPlague } from './subsistence/disasters';
+import { destroyBuilding } from './world/buildings';
+import type { BuiltEvent } from './world/buildings';
+import { advanceWorks, requestBuild } from './world/works';
 import { holderOf } from './crossroads/conditions';
 import { selectCrossroad } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
@@ -92,7 +95,8 @@ export function fillVacancies(state: GameState): void {
   for (const role of RENEWABLE_ROLES) {
     if (holderOf(state, role) !== null) continue;
     // §6.2: no chapel, no priest. The office simply stays vacant.
-    if (role === 'priest' && count(state, 'chapel') === 0) continue;
+    // A church is a chapel that grew (§7.3 point 9): it still consecrates.
+    if (role === 'priest' && count(state, 'chapel') + count(state, 'church') === 0) continue;
 
     const floor = minAgeFor(role);
     const free = state.people.villagers.filter(
@@ -132,6 +136,7 @@ export interface TickReport {
   arrived: number;
   left: number;
   buildPoints: number;
+  built: BuiltEvent[];
   wood: number;
   harvested: number;
   spoiled: number;
@@ -246,6 +251,27 @@ export function tick(
   };
   const year = (): number => yearOf(state.tick);
   const season = (): string => seasonOf(state.tick);
+  const deaths: DeathEvent[] = [];
+  const reportVictims = (ids: readonly number[]): void => {
+    const events: DeathEvent[] = [];
+    for (const id of ids) {
+      const v = state.people.villagers.find((person) => person.id === id);
+      if (v === undefined || v.causeOfDeath === null) continue;
+      events.push({ id, cause: v.causeOfDeath, age: ageOf(v, state.tick), named: v.named, role: v.role });
+    }
+    deaths.push(...events);
+    reportDeaths(state, events, say, year, season);
+  };
+
+  // M-07 also supports standalone resolution and writes its own entries.
+  // Move those entries into this tick's buffer immediately, keeping step 16
+  // as the single flush and preserving ANNUAL → DECISION → SEEDS ordering.
+  const captureEntries = <T>(resolve: () => T): T => {
+    const start = state.chronicle.length;
+    const result = resolve();
+    buffer.push(...state.chronicle.splice(start));
+    return result;
+  };
 
   // ---- 1 · ADVANCE ---------------------------------------------------------
   state.tick += 1;
@@ -268,8 +294,9 @@ export function tick(
     // The fire of §5.9 comes back as a description; this is where it happens.
     const fire = rollFire(state);
     if (fire !== null) {
-      const building = state.buildings.find((b) => b.id === fire.buildingId);
-      if (building !== undefined) building.lostTick = state.tick;
+      // M-14 owns the destruction: the plot becomes a ruin and whoever slept
+      // there is homeless this week, which the housing factor of §5.7 reads.
+      destroyBuilding(state, fire.buildingId);
       state.village.grain = Math.max(0, state.village.grain - fire.grainLost);
       state.village.morale = Math.max(0, Math.min(100, state.village.morale + fire.moraleDelta));
       say({
@@ -318,14 +345,20 @@ export function tick(
   // ---- 3 · DECISION --------------------------------------------------------
   let decided: AppliedEffects | null = null;
   if (decision !== undefined && state.crossroad?.templateId === decision.templateId) {
-    decided = applyOption(state, decision.optionId, catalogue);
-    if (decided !== null) carryOutBuildings(state, decided, say);
+    decided = captureEntries(() => applyOption(state, decision.optionId, catalogue));
+    if (decided !== null) {
+      reportVictims(decided.killed);
+      carryOutBuildings(state, decided, say);
+    }
   }
 
   // ---- 4 · SEEDS -----------------------------------------------------------
-  const fired = fireSeeds(state, catalogue);
+  const fired = captureEntries(() => fireSeeds(state, catalogue));
   for (const seed of fired) {
-    if (seed.effects !== null) carryOutBuildings(state, seed.effects, say);
+    if (seed.effects !== null) {
+      reportVictims(seed.effects.killed);
+      carryOutBuildings(state, seed.effects, say);
+    }
   }
 
   // ---- 5 · LABOUR ----------------------------------------------------------
@@ -333,24 +366,30 @@ export function tick(
   const produced = produce(state, allocation);
 
   // ---- 6 · WORKS -----------------------------------------------------------
-  // M-14 owns the works. Until it exists the build points are produced and go
-  // nowhere, which is why the valley of the milestone-0 chronicle never grows.
-  // The number is reported so that the day advanceWorks lands, it plugs in here
-  // and nothing else moves.
+  // M-14 spends the week's build points and opens the next project. The
+  // chronicle line for a building is written when it is raised, never when it
+  // is decided: a crossroad that grants a watchtower still has to build it.
+  const built = advanceWorks(state, produced.buildPoints);
+  for (const raised of built) {
+    say({
+      kind: 'built',
+      templateKey: builtKey(raised.kind),
+      params: {
+        year: year(),
+        season: season(),
+        count: count(state, raised.kind),
+        building: raised.kind,
+      },
+      weight: raised.kind === 'chapel' || raised.kind === 'church' ? 3 : 2,
+    });
+  }
 
   // ---- 7 · CONSUME ---------------------------------------------------------
   // Before the harvest on purpose (§4.2): the week of the harvest is eaten
   // first and reaped after, which is what makes a bad autumn show in the
   // granary before the winter.
   const { severity, starved } = consume(state);
-  if (starved.length > 0) {
-    say({
-      kind: 'death',
-      templateKey: deathKey('hunger', false, starved.length),
-      params: { year: year(), season: season(), count: starved.length, people: population(state) },
-      weight: starved.length > 2 ? 2 : 1,
-    });
-  }
+  reportVictims(starved);
 
   // ---- 8 · WINTER ----------------------------------------------------------
   const { cold } = overwinter(state);
@@ -379,18 +418,19 @@ export function tick(
     severity,
     cold,
     outbreak: state.outbreak,
-    deaths: 0,
+    deaths: deaths.length,
     unexplainedDeaths: 0,
   };
-  const deaths = resolveDeaths(state, partial);
-  reportDeaths(state, deaths, say, year, season);
+  const demographicDeaths = resolveDeaths(state, partial);
+  deaths.push(...demographicDeaths);
+  reportDeaths(state, demographicDeaths, say, year, season);
 
   // ---- 12 · MOOD -----------------------------------------------------------
   // After DEATHS since v2.5, so the mood sees the week's dead rather than last
   // week's, and the births of step 13 use a morale that is already up to date.
   const ctx: TickContext = {
     ...partial,
-    deaths: starved.length + deaths.length,
+    deaths: deaths.length,
     unexplainedDeaths: deaths.filter((d) => isUnexplained(d.cause, d.age)).length,
   };
   updateMood(state, ctx);
@@ -475,6 +515,7 @@ export function tick(
     arrived,
     left,
     buildPoints: produced.buildPoints,
+    built,
     wood: produced.wood,
     harvested: reaped.yielded,
     spoiled,
@@ -487,48 +528,27 @@ export function tick(
 }
 
 /**
- * §8.4's `build` and `destroy` are requests, and M-14 is what carries them out.
- * Until it exists this does the minimum the rest of the engine needs: a
- * building that is asked for stands, one that is destroyed becomes a ruin.
- * Placement is M-14's (§7.4) and is not attempted here.
+ * §8.4's `build` and `destroy`, carried out by M-14's rules.
+ *
+ * A granted building is a **project**, not a building: `free: true` waives its
+ * materials (§17 M-14, v2.12) and nothing else, so the plot is chosen now under
+ * §7.4 and the village still has to raise it. That is why no chronicle line is
+ * written here — step 6 writes it the week the thing actually stands.
+ *
+ * A destroyed building becomes a ruin on the map and empties its beds.
  */
 function carryOutBuildings(
   state: GameState,
   applied: AppliedEffects,
   say: (e: Omit<ChronicleEntry, 'tick'>) => void,
 ): void {
-  for (const kind of applied.build) {
-    const spec = standingOf(state, kind)[0];
-    state.buildings.push({
-      id: state.buildings.length,
-      kind,
-      x: spec?.x ?? 2,
-      y: spec?.y ?? 2,
-      w: spec?.w ?? 2,
-      h: spec?.h ?? 2,
-      builtTick: state.tick,
-      lostTick: null,
-      tier: kind === 'wall' || kind === 'stone_house' || kind === 'church' || kind === 'watchtower' ? 1 : 0,
-      lit: true,
-    });
-    say({
-      kind: 'built',
-      templateKey: builtKey(kind),
-      params: {
-        year: yearOf(state.tick),
-        season: seasonOf(state.tick),
-        count: count(state, kind),
-        building: kind,
-      },
-      weight: kind === 'chapel' || kind === 'church' ? 3 : 2,
-    });
-  }
+  for (const kind of applied.build) requestBuild(state, kind);
 
   for (const { kind, count: howMany } of applied.destroy) {
     const doomed = state.buildings
       .filter((b: Building) => b.kind === kind && b.lostTick === null)
       .slice(0, howMany);
-    for (const b of doomed) b.lostTick = state.tick;
+    for (const b of doomed) destroyBuilding(state, b.id);
     if (doomed.length > 0) {
       say({
         kind: 'lost',

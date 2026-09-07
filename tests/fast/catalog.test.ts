@@ -231,6 +231,7 @@ describe('el catálogo · los textos', () => {
           CROSSROAD_BANK[o.label] ?? '',
           CROSSROAD_BANK[o.cost] ?? '',
           ...(BANK[`crossroad.${t.id}.${o.id}`] ?? []),
+          ...o.seeds.flatMap((seed) => BANK[seed.chronicleKey] ?? []),
         ]),
       ];
       for (const text of texts) {

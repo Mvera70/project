@@ -2,86 +2,33 @@
 //
 // Twenty came over the ridge and stopped where the river bends.
 
-import { FOUNDING, WORLD } from './balance';
+import { BUILDINGS, FOUNDING, LIFE } from './balance';
 import { foundPeople } from './people/villagers';
-import { makeBundle, next } from './rng';
-import { TERRAIN_CODE } from './state';
-import type { Building, BuildingKind, GameState, ValleyMap } from './state';
-import { BUILDINGS } from './balance';
+import { makeBundle } from './rng';
+import type { BuildingKind, GameState } from './state';
+import { generateMap } from './world/mapgen';
+import { placeBuilding } from './world/placement';
 
-/**
- * A stand-in valley until M-13 generates one.
- *
- * §7.1 wants a river, a forest between 18 % and 30 %, and a founding site that
- * the terrain justifies. None of that exists yet, and the engine below it needs
- * a map to read: `forestLeft` counts forest cells, and a map of nothing would
- * make every forest template dead on arrival.
- *
- * So: a meadow with a band of forest along one edge and a river down the
- * middle, drawn from the 'map' stream so that two seeds differ and one seed
- * repeats. It is the right shape and the wrong valley, and M-13 replaces it
- * whole.
- */
-function stubMap(seed: number): ValleyMap {
-  const cells = WORLD.WIDTH * WORLD.HEIGHT;
-  const terrain = new Uint8Array(cells);
-  const b = makeBundle(seed);
-
-  const forestTarget = WORLD.FOREST_TARGET[0] +
-    next(b, 'map') * (WORLD.FOREST_TARGET[1] - WORLD.FOREST_TARGET[0]);
-  const forestRows = Math.round(WORLD.HEIGHT * forestTarget);
-  const riverX = Math.floor(WORLD.WIDTH / 2) + Math.round((next(b, 'map') - 0.5) * 6);
-
-  for (let y = 0; y < WORLD.HEIGHT; y += 1) {
-    for (let x = 0; x < WORLD.WIDTH; x += 1) {
-      const i = y * WORLD.WIDTH + x;
-      terrain[i] = y < forestRows ? TERRAIN_CODE.forest : TERRAIN_CODE.meadow;
-      if (x === riverX) terrain[i] = TERRAIN_CODE.water;
-    }
-  }
-
-  return {
-    width: WORLD.WIDTH,
-    height: WORLD.HEIGHT,
-    terrain,
-    traffic: new Uint16Array(cells),
-    path: new Uint8Array(cells),
-    ruins: new Uint8Array(cells),
-    forestAge: new Uint8Array(cells),
-  };
-}
-
-/**
- * The buildings the village is founded with. §12.2: four houses and two fields.
- *
- * Placed in a row down the meadow, which is M-13/M-14's job to do properly
- * (§7.4). Nothing in the engine reads a building's coordinates yet; everything
- * reads its kind and whether it still stands.
- */
-function foundingBuildings(): Building[] {
-  const out: Building[] = [];
+/** Place completed founding buildings without charging the opening stores. */
+function foundingBuildings(state: GameState): void {
   const place = (kind: BuildingKind, n: number): void => {
     const spec = BUILDINGS[kind];
     for (let i = 0; i < n; i += 1) {
-      out.push({
-        id: out.length,
-        kind,
-        x: 2 + ((out.length * 3) % (WORLD.WIDTH - 6)),
-        y: WORLD.HEIGHT - 8 - Math.floor((out.length * 3) / (WORLD.WIDTH - 6)) * 3,
-        w: spec.w,
-        h: spec.h,
-        builtTick: 0,
-        lostTick: null,
-        tier: spec.tier,
-        lit: true,
+      const position = placeBuilding(state, kind);
+      if (position === null) throw new Error(`No founding site for ${kind}`);
+      state.buildings.push({
+        id: state.buildings.length, kind, ...position,
+        w: spec.w, h: spec.h, builtTick: 0, lostTick: null, tier: spec.tier, lit: true,
       });
     }
   };
   place('house', FOUNDING.HOUSES);
   place('field', FOUNDING.FIELDS);
-  return out;
+  const homes = state.buildings.filter((b) => b.kind === 'house');
+  for (const [index, villager] of state.people.villagers.entries()) {
+    villager.homeId = homes[Math.floor(index / LIFE.HOUSE_CAPACITY)]?.id ?? null;
+  }
 }
-
 /**
  * A new game. §12.2, and the one place a GameState is created from nothing.
  *
@@ -92,12 +39,12 @@ function foundingBuildings(): Building[] {
  */
 export function foundGame(seed: number): GameState {
   const rng = makeBundle(seed);
-  return {
+  const state: GameState = {
     version: 1,
     seed,
     tick: 0,
     rng,
-    map: stubMap(seed),
+    map: generateMap(rng),
     village: {
       grain: FOUNDING.GRAIN,
       wood: FOUNDING.WOOD,
@@ -105,7 +52,7 @@ export function foundGame(seed: number): GameState {
       faith: FOUNDING.FAITH,
     },
     people: foundPeople(rng, 0),
-    buildings: foundingBuildings(),
+    buildings: [],
     works: [],
     crossroad: null,
     seeds: [],
@@ -118,4 +65,6 @@ export function foundGame(seed: number): GameState {
     outbreak: null,
     ended: null,
   };
+  foundingBuildings(state);
+  return state;
 }
