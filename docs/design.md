@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.8 · 7 de septiembre de 2026, 18:53 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.9 · 7 de septiembre de 2026, 19:11 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -29,8 +29,35 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
 | **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
 | **2.6** | 7 sep 2026, 13:56 | Revisión de M-05 y M-09 | Componer crónica no consume aleatoriedad; **§9.4 nueva: la muerte de un nombrado**; semillas append-only; crisis de hambruna definida con fórmula. |
+| **2.9** | 7 sep 2026, 19:11 | Puerta de M-08b | **Cubrir una vacante no es elegir al mayor**; el diagnóstico del catálogo pasa a dos columnas; `quiet_years` fuera del reparto; deuda del bosque registrada. |
 | **2.8** | 7 sep 2026, 18:53 | Revisión de M-08 | **Regla de elegibilidad episódica**; `grudge` mira opiniones; ratio `grainToHarvest`; A.1, A.13 y A.15 corregidas; la cobertura de vacantes tiene dueño. |
 | **2.7** | 7 sep 2026, 14:18 | Revisión de M-07 | **La exención del techo se gasta en la primera pregunta**; criterio medible para el ritmo; epitafio con rencores sanados; `TERRAIN_CODE` como contrato de serialización. |
+
+### 2.9 — Puerta de M-08b
+
+- **§6.2 · Cubrir una vacante no es elegir al de más edad.** Error de redacción
+  mío: «se elige por edad» se leyó como «el mayor», que es una lectura legítima.
+  La consecuencia es una cascada: los oficios recaen en ancianos, los ancianos
+  mueren pronto, la sucesión se dispara al doble de su ritmo natural —9,55 por
+  siglo contra 3,6— y `succession` acaba siendo el 27 % de todas las
+  encrucijadas. Ahora es una banda: `ROLE_MIN_AGE` a `ROLE_MAX_PREFERRED` (55),
+  gana la mejor opinión media, desempata el más joven. Y un reparto que no se
+  renueva tampoco deja ver a nadie envejecer, que es la mitad del bucle largo.
+- **§8.1 · El diagnóstico del catálogo pasa a dos columnas.** La lección de la
+  ronda: los disparadores episódicos atacaron la elegibilidad —del 70 % al 4 %—
+  y **la cadencia apenas se movió**, de 36,4 a 35,4 disparos. Son métricas
+  distintas: por debajo de cierta elegibilidad, quien fija el ritmo es el
+  reposo. La segunda columna es disparos ÷ máximo que permite el reposo, y por
+  encima del 70 % el remedio ya no es endurecer condiciones.
+- **Anexo A.15 · `agedBetween` pasa de preferencia a filtro duro**, banda 20–60,
+  con ensanche solo si no hay dos candidatos.
+- **Anexo A.17 · `quiet_years` está fuera del reparto normal.** §8.6 la define
+  como reserva y el Anexo no lo decía con claridad; en la baraja era una de cada
+  seis encrucijadas.
+- **§12.9 · La cadencia se mide excluyendo las dos plantillas de bosque hasta
+  M-15**, con la deuda registrada y su disparador. Ajustar sus reposos ahora
+  sería calibrar contra un artefacto: sin M-15 el bosque no mengua y su
+  condición está congelada.
 
 ### 2.8 — Revisión de M-08
 
@@ -854,8 +881,20 @@ Cuando un rol queda vacante y hay candidato (adulto vivo, sin rol), se cubre en
 el paso ANNUAL del año siguiente. **La cobertura de vacantes la ejecuta M-10**
 en el paso 2 del tick, llamando a `promoteToNamed` de M-03: ningún otro brief la
 tenía asignada, y sin ella una aldea que pierde al cura fundador no vuelve a
-tener cura nunca. El candidato se elige por edad y por opinión
-media del resto. Ascender a un anónimo le genera nombre, rasgos y opiniones
+tener cura nunca.
+
+**Cómo se elige al candidato — y no es «el mayor».** Se filtran los adultos
+entre `ROLE_MIN_AGE` y `ROLE_MAX_PREFERRED` (55); gana el de mejor opinión media
+del resto y desempata el más joven. Solo si la banda queda vacía se ensancha
+hacia arriba.
+
+Leer «por edad» como «el de más edad» envejece el reparto entero en pocas
+décadas: los oficios recaen siempre en ancianos, los ancianos mueren pronto, y
+la sucesión —que debería ser el latido de una generación— se dispara al doble de
+su ritmo natural. Medido: 9,55 sucesiones por siglo contra las 3,6 que
+corresponden a un líder de cuarenta años con la tabla de §12.4. Y un reparto que
+no se renueva tampoco deja ver a nadie envejecer, que es la mitad del bucle
+largo. Ascender a un anónimo le genera nombre, rasgos y opiniones
 neutras: **nace un personaje**, y la crónica lo anuncia.
 
 ### 6.3 Rasgos
@@ -1140,9 +1179,19 @@ un techo de 120, en la inmensa mayoría de los ticks **no puede haber nada
 elegible**. Eso solo ocurre si cada plantilla es elegible unas pocas semanas por
 siglo.
 
-**Diagnóstico obligatorio del catálogo:** medir, por plantilla, la fracción de
-ticks en que sus `requires` se cumplen. Las que superan el 1 % son ambientales
-disfrazadas y hay que darles un disparador.
+**Diagnóstico obligatorio del catálogo — dos columnas, no una.**
+
+| Métrica | Qué revela | Remedio |
+|---|---|---|
+| **% de ticks elegible** | Si la plantilla es ambiental. Por encima del 1 %, lo es. | Darle un disparador episódico |
+| **Disparos ÷ máximo que permite su reposo** | Quién marca de verdad el paso. Por encima del 70 %, **manda el reposo, no las condiciones**. | Alargar el reposo |
+
+Las dos columnas hacen falta porque miden cosas distintas y se confunden con
+facilidad: una plantilla puede bajar del 70 % de elegibilidad al 4 % y **seguir
+disparando lo mismo**, porque a partir de cierto punto el que fija el ritmo es
+su reposo. Endurecer condiciones deja de servir en cuanto la elegibilidad cae
+por debajo de la tasa que impone el reposo; de ahí en adelante, el reposo es lo
+único que queda antes del techo.
 
 ### 8.2 DSL de condiciones
 
@@ -1725,6 +1774,7 @@ export const PEOPLE = {
     leader: 25, midwife: 28, priest: 25,
     smith: 20, woodward: 18, reeve: 22,
   },
+  ROLE_MAX_PREFERRED: 55,       // §6.2: por encima, solo si no hay nadie en banda
 } as const;
 
 export const MIGRATION = {
@@ -1831,7 +1881,7 @@ años, con una política de decisión neutra (siempre la primera opción):
 | Mediana del pico de población | 65 – 82 |
 | Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas |
 | Población visible al final de la primera generación | ≥ 26 en la mediana |
-| **Encrucijadas por generación** | **1 – 4** — este es el aserto que manda |
+| **Encrucijadas por generación** | **1 – 4** — este es el aserto que manda. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15**: sin bosque que mengüe, `forestLeft` está congelado y sus disparos son un artefacto. Deuda registrada: volver a medirlas con las dos dentro en cuanto M-15 esté fusionado, y si siguen al ras de su reposo, alargarlo. |
 | Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
 | Fracción de ticks elegibles, por plantilla | < 1 % |
 | Bosque restante en el año 100 | 40 % – 70 % del inicial |
@@ -2879,7 +2929,7 @@ todo.*
 
 **Peso** 100 · **Reposo** 0 · **Salta el intervalo mínimo**
 **Requiere** `not role leader alive`
-**Reparto** `A = anyNamed` (preferentemente de 25 a 55 años), `B = anyNamed excluding [A]` (igual)
+**Reparto** `A = anyNamed` **filtrado** a 20–60 años, `B = anyNamed excluding [A]` (igual). Si no llegan a dos candidatos en la banda, se ensancha; el respaldo es la excepción, no la regla.
 
 > **Who Speaks Now**
 > {leaderName} is buried. Two people in this valley expect to be asked, and
@@ -2918,7 +2968,9 @@ un rencor.*
 ### A.17 `quiet_years` · reserva
 
 Plantilla de reserva para la garantía por generación cuando no hay ninguna otra
-elegible. Requiere solo `grainYears > 1.0`. Ofrece dos usos de un excedente
+elegible. **Está fuera del reparto normal**: `eligible()` la salta siempre y solo
+se alcanza por el camino de la garantía. Tenerla en la baraja la convertía en una
+de cada seis encrucijadas. Requiere solo `grainYears > 1.0`. Ofrece dos usos de un excedente
 (una obra libre o una temporada de fiesta con `morale +20`), y **no planta
 semillas**. Existe para que la garantía nunca falle, no para ser interesante.
 
