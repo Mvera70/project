@@ -2772,7 +2772,7 @@ superan.
 `valle.md` §7.
 
 **Estado (v2.12): hecho, con un objetivo de §12.9 sin alcanzar.** La semilla 108
-llega al año 120 con 51 edificios en pie —16 casas de piedra, 8 campos, 3
+llega al año 120 con 49 edificios en pie —16 casas de piedra, 8 campos, 3
 graneros, capilla, molino, fragua, pozo y 18 tramos de muralla— y 45 vivos. En
 60 semillas × 200 años × tres políticas no hay **ni un** solapamiento entre
 edificios u obras, ni un edificio sobre agua o marisma, ni un tope de §7.2
