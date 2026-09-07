@@ -16,9 +16,12 @@ export const SUCCESSION: CrossroadTemplate = {
   weight: 100,
   cooldownYears: 0,
   requires: [{ k: 'role', role: 'leader', alive: false }],
+  // v2.8. Con `anyNamed` a secas se encadenaban ancianos: la sucesión elegía a
+  // un viejo, el viejo moría a los pocos años y volvía a preguntar. Once
+  // sucesiones por partida contra las cinco que corresponden a una generación.
   cast: [
-    { as: 'A', anyNamed: true },
-    { as: 'B', anyNamed: true, excluding: ['A'] },
+    { as: 'A', anyNamed: true, agedBetween: [25, 55] },
+    { as: 'B', anyNamed: true, excluding: ['A'], agedBetween: [25, 55] },
   ],
   title: 'crossroad.succession.title',
   body: 'crossroad.succession.body',
@@ -107,7 +110,10 @@ export const FIRST_STONE: CrossroadTemplate = {
   cooldownYears: 50,
   maxPerGame: 1,
   minYear: 41,
+  // v2.8. Sus tres condiciones son permanentes una vez ciertas; la primavera
+  // es el disparador — una cantera se abre cuando el suelo deja de estar duro.
   requires: [
+    { k: 'season', season: 'spring' },
     { k: 'stat', stat: 'people', op: '>=', v: 45 },
     { k: 'has', building: 'smithy' },
     { k: 'year', op: '>', v: 40 },

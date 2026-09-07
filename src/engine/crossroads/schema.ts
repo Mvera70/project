@@ -71,7 +71,12 @@ export interface CrossroadOption {
 
 export type CastSpec =
   | { as: string; role: Role }
-  | { as: string; anyNamed: true; excluding?: string[] }
+  /**
+    * `agedBetween` is a preference, not a filter: if nobody in the band can be
+    * cast the spec falls back to anyone named. §A.15 wants a leader of an age
+    * to lead, without making the succession impossible in a village of elders.
+    */
+  | { as: string; anyNamed: true; excluding?: string[]; agedBetween?: [number, number] }
   | { as: string; grudgeAgainst: string } // the one who hates them most
   | { as: string; childOf: string }
   | { as: string; youngestNamed: true; female?: boolean };

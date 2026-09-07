@@ -7,11 +7,18 @@ export const STRANGERS_AT_THE_FORD: CrossroadTemplate = {
   id: 'strangers_at_the_ford',
   category: 'stranger',
   weight: 10,
-  cooldownYears: 10,
+  // v2.8. Disparaba al 89 % de su máximo posible: sus condiciones eran ciertas
+  // casi siempre y el reposo era lo único que la frenaba. El ánimo ≥ 55 es el
+  // disparador episódico — una aldea acoge a nueve desconocidos cuando está de
+  // buen año, no cuando está apretada.
+  cooldownYears: 20,
   requires: [
     { k: 'stat', stat: 'people', op: '>=', v: 12 },
     { k: 'ratio', ratio: 'housingFree', op: '>', v: 0.02 },
     { k: 'flag', flag: 'hostile', set: false },
+    { k: 'stat', stat: 'morale', op: '>=', v: 55 },
+    // Y en primavera, que es cuando §5.7 mueve a la gente por los caminos.
+    { k: 'season', season: 'spring' },
   ],
   cast: [
     { as: 'A', role: 'leader' },
@@ -89,7 +96,11 @@ export const BANDITS: CrossroadTemplate = {
   weight: 8,
   cooldownYears: 18,
   minYear: 16,
+  // v2.8. Elegible el 71 % de los ticks: las tres condiciones eran permanentes.
+  // El disparador episódico es la cosecha — vienen a por un tercio del granero,
+  // así que vienen cuando el granero se llena, no cuando les apetece.
   requires: [
+    { k: 'season', season: 'autumn', minWeek: 8 },
     { k: 'stat', stat: 'people', op: '>', v: 30 },
     { k: 'not', c: { k: 'has', building: 'palisade' } },
     { k: 'year', op: '>', v: 15 },

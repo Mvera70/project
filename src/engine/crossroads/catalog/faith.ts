@@ -76,7 +76,11 @@ export const RELIC_PEDLAR: CrossroadTemplate = {
   category: 'faith',
   weight: 6,
   cooldownYears: 25,
+  // v2.8. La capilla y la fe son ambientales: dicen a quién se le puede hacer
+  // la pregunta, no cuándo. Que llegue un hombre por el camino con una caja es
+  // un suceso, y los caminos se andan en verano.
   requires: [
+    { k: 'season', season: 'summer' },
     { k: 'has', building: 'chapel' },
     { k: 'stat', stat: 'faith', op: '>', v: 30 },
     { k: 'stat', stat: 'faith', op: '<', v: 70 },

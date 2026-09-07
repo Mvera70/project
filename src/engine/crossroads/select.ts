@@ -137,6 +137,10 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
   const out: ScoredTemplate[] = [];
 
   for (const t of catalogue) {
+    // La reserva no compite: §8.6 la usa cuando NO hay ninguna elegible, y
+    // dejarla en la baraja la convertía en el 57 % de los ticks elegibles y en
+    // una de cada seis encrucijadas.
+    if (t.id === FALLBACK_ID) continue;
     if (t.minYear !== undefined && Math.floor(state.tick / TIME.WEEKS_PER_YEAR) < t.minYear) continue;
     if (t.maxPerGame !== undefined && timesSeen(state, t.id) >= t.maxPerGame) continue;
     if (yearsSince(state, t.id) < t.cooldownYears) continue;

@@ -379,51 +379,26 @@ describe('el catálogo · cobertura', () => {
     for (const d of s.history) seen.set(d.templateId, (seen.get(d.templateId) ?? 0) + 1);
   }
 
-  /**
-   * Las dos plantillas de `lord` no salen, y no es un fallo de selección: es que
-   * `grainYears < 0.25` en invierno no ocurre nunca.
-   *
-   * A.1 pide que el granero esté vacío en invierno, y el invierno empieza en la
-   * semana 36 — justo después de la cosecha de la 35, que es cuando el granero
-   * está más lleno. Medido sobre 20 partidas de 100 años, el mínimo de
-   * grainYears en invierno es 0.33 y la mediana 1.35. Y como §12.3 tapa el
-   * almacén en 800 + 650 por granero, una aldea de sesenta bocas no puede
-   * guardar más de medio año de comida ni queriendo: el número que A.1 mira
-   * está acotado por arriba por la capacidad, no por la cosecha.
-   *
-   * A.2 depende de la bandera `vassal`, que sólo pone A.1, así que cae con ella.
-   *
-   * La lista es exacta a propósito: si aparece una tercera, el test falla; si
-   * una de estas dos empieza a salir, también, y entonces esta excepción se
-   * borra. TODO(spec): §A.1 pide 0.25 y le haría falta 0.4-0.5, o que la
-   * condición mire el grano contra la capacidad en vez de contra el año.
-   */
-  const KNOWN_UNREACHABLE = ['tithe_demand', 'winter_grain_debt'];
-
   it('ninguna plantilla se queda a cero apariciones en 30 semillas × 150 años', () => {
     // Contenido muerto: condiciones que no se cumplen nunca. Con dieciséis
     // escritas a mano, es el fallo más fácil de cometer y el más difícil de ver.
+    //
+    // Las dos de `lord` estuvieron muertas hasta la v2.8: A.1 pedía el granero
+    // vacío en invierno, y el invierno empieza la semana 36, justo después de la
+    // cosecha. Con `grainToHarvest` y la semana de invierno avanzada disparan.
     const missing = CATALOG.filter((t) => (seen.get(t.id) ?? 0) === 0).map((t) => t.id);
-    expect(missing.sort(), `sin salir nunca: ${missing.join(', ')}`).toEqual(KNOWN_UNREACHABLE);
+    expect(missing, `sin salir nunca: ${missing.join(', ')}`).toEqual([]);
   });
 
-  it('las catorce que sí salen, salen de verdad', () => {
-    for (const t of CATALOG) {
-      if (KNOWN_UNREACHABLE.includes(t.id)) continue;
-      expect(seen.get(t.id) ?? 0, t.id).toBeGreaterThan(0);
-    }
-  });
-
-  it('ninguna categoría se queda muda, salvo lord por lo de arriba', () => {
+  it('ninguna categoría se queda muda', () => {
     const byCategory = new Set(
       CATALOG.filter((t) => (seen.get(t.id) ?? 0) > 0).map((t) => t.category),
     );
     for (const c of [
-      'famine', 'plague', 'feud', 'faith', 'forest', 'stranger', 'succession',
+      'famine', 'plague', 'lord', 'feud', 'faith', 'forest', 'stranger', 'succession',
     ] as CrossroadCategory[]) {
       expect(byCategory.has(c), c).toBe(true);
     }
-    expect(byCategory.has('lord')).toBe(false);
   });
 });
 

@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.7 · 7 de septiembre de 2026, 14:18 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.8 · 7 de septiembre de 2026, 18:53 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -29,7 +29,41 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.4** | 6 sep 2026 | Revisión de M-04 | `leftTick`; edad derivada; `ageEveryone` eliminada; `FOUNDING.GRAIN` a 800. |
 | **2.5** | 7 sep 2026, 13:34 | Revisión de M-06 | Orden del tick corregido; un solo escritor del ánimo; punto fijo de la fe roto; muerte inexplicada definida. |
 | **2.6** | 7 sep 2026, 13:56 | Revisión de M-05 y M-09 | Componer crónica no consume aleatoriedad; **§9.4 nueva: la muerte de un nombrado**; semillas append-only; crisis de hambruna definida con fórmula. |
+| **2.8** | 7 sep 2026, 18:53 | Revisión de M-08 | **Regla de elegibilidad episódica**; `grudge` mira opiniones; ratio `grainToHarvest`; A.1, A.13 y A.15 corregidas; la cobertura de vacantes tiene dueño. |
 | **2.7** | 7 sep 2026, 14:18 | Revisión de M-07 | **La exención del techo se gasta en la primera pregunta**; criterio medible para el ritmo; epitafio con rencores sanados; `TERRAIN_CODE` como contrato de serialización. |
+
+### 2.8 — Revisión de M-08
+
+- **§8.1 · Regla de elegibilidad episódica.** El hallazgo de la ronda, y explica
+  las cinco anomalías a la vez en vez de parchearlas una a una: **una plantilla
+  cuyas condiciones son ambientales dispara siempre que el techo se lo permite.**
+  Toda plantilla necesita al menos una condición que sea falsa casi siempre y se
+  vuelva cierta por un suceso. Las ambientales dicen quién puede recibir la
+  pregunta, no cuándo se hace. Con diagnóstico medible: fracción de ticks
+  elegibles por plantilla, por debajo del 1 %.
+- **§12.9 · El aserto que manda es 1–4 encrucijadas por generación.** El
+  porcentaje pegado al techo es diagnóstico. La medición de M-08 dio 8,9 por
+  generación: el doble del máximo, y por eso el catálogo se lee repetitivo.
+- **§8.2 · `{k:'grudge', min:N}` mira las opiniones, no el registro.** Un
+  `Grudge` no existe hasta cruzar −50, así que `min: 30` y `min: 40` eran
+  insatisfacibles y las cuatro plantillas de disputa eran contenido muerto.
+- **§8.2 · Nuevo ratio `grainToHarvest`** = `grain / (people · semanas hasta la
+  cosecha)`. Es la magnitud que ya define la crisis en §8.6, y es la que las
+  plantillas necesitan para preguntar «¿llegamos?».
+- **Anexo A.1 · Condición corregida.** Pedía `grainYears < 0.25` en invierno, y
+  el invierno empieza en la semana 36, **justo después de la cosecha**: pedía el
+  momento más vacío en el momento más lleno. Además `grainYears` está acotado
+  por arriba por la capacidad del granero, no por la cosecha. Ahora usa
+  `grainToHarvest` y exige invierno avanzado. A.2 dependía de la bandera que
+  solo pone A.1 y caía con ella.
+- **Anexo A.13 · `strangers_at_the_ford`**: reposo de 10 a 20 años y condición
+  episódica `morale ≥ 55`. Disparaba al 89 % de su máximo posible.
+- **Anexo A.15 · El reparto de la sucesión prefiere de 25 a 55 años.** Con
+  `anyNamed` se encadenaban ancianos: 11 sucesiones por partida contra las 5 que
+  corresponden a una generación de 20 años.
+- **§6.2 y §17 M-10 · La cobertura de vacantes tiene dueño.** Ningún brief la
+  tenía asignada. Sin ella, una aldea que pierde al cura fundador no vuelve a
+  tener cura nunca.
 
 ### 2.7 — Revisión de M-07
 
@@ -817,7 +851,10 @@ encrucijadas.
 | `stranger` | No | Llega por encrucijada; puede quedarse |
 
 Cuando un rol queda vacante y hay candidato (adulto vivo, sin rol), se cubre en
-el paso ANNUAL del año siguiente. El candidato se elige por edad y por opinión
+el paso ANNUAL del año siguiente. **La cobertura de vacantes la ejecuta M-10**
+en el paso 2 del tick, llamando a `promoteToNamed` de M-03: ningún otro brief la
+tenía asignada, y sin ella una aldea que pierde al cura fundador no vuelve a
+tener cura nunca. El candidato se elige por edad y por opinión
 media del resto. Ascender a un anónimo le genera nombre, rasgos y opiniones
 neutras: **nace un personaje**, y la crónica lo anuncia.
 
@@ -1090,6 +1127,23 @@ export interface CrossroadOption {
 catálogo y falla si alguna opción no cambia nada en pantalla. Es el principio 1
 de `valle.md` convertido en un test que se ejecuta en cada commit.
 
+**Regla de elegibilidad episódica.** Toda plantilla necesita al menos una
+condición **episódica**: falsa la mayor parte del tiempo, que se vuelve cierta
+por un suceso o al cruzarse un umbral. Las condiciones **ambientales**
+—`people ≥ 12`, `has chapel`, `forestLeft > 0.3`— dicen **quién** puede recibir
+la pregunta, nunca **cuándo** se hace.
+
+Una plantilla solo con condiciones ambientales dispara siempre que el techo se
+lo permite, y con dieciséis plantillas así el jugador percibe un metrónomo.
+La aritmética es implacable: para que el intervalo medio ronde los 480 ticks con
+un techo de 120, en la inmensa mayoría de los ticks **no puede haber nada
+elegible**. Eso solo ocurre si cada plantilla es elegible unas pocas semanas por
+siglo.
+
+**Diagnóstico obligatorio del catálogo:** medir, por plantilla, la fracción de
+ticks en que sus `requires` se cumplen. Las que superan el 1 % son ambientales
+disfrazadas y hay que darles un disparador.
+
 ### 8.2 DSL de condiciones
 
 Datos, no funciones. Deben ser serializables para poder inspeccionar por qué se
@@ -1098,14 +1152,14 @@ disparó una encrucijada.
 ```ts
 export type Condition =
   | { k: 'stat';    stat: 'grain'|'wood'|'morale'|'faith'|'people'; op: Op; v: number }
-  | { k: 'ratio';   ratio: 'grainYears'|'housingFree'|'forestLeft'; op: Op; v: number }
+  | { k: 'ratio';   ratio: 'grainYears'|'grainToHarvest'|'housingFree'|'forestLeft'; op: Op; v: number }
   | { k: 'season';  season: Season }
   | { k: 'year';    op: Op; v: number }
   | { k: 'has';     building: BuildingKind }
   | { k: 'flag';    flag: string; set: boolean }
   | { k: 'outbreak'; active: boolean }
   | { k: 'role';    role: Role; alive: boolean }
-  | { k: 'grudge';  min: number }            // existe un rencor de al menos N
+  | { k: 'grudge';  min: number }            // existe una opinión ≤ −N (no el registro)
   | { k: 'trait';   role: Role; trait: Trait }
   | { k: 'not';     c: Condition }
   | { k: 'any';     cs: Condition[] };
@@ -1777,7 +1831,9 @@ años, con una política de decisión neutra (siempre la primera opción):
 | Mediana del pico de población | 65 – 82 |
 | Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas |
 | Población visible al final de la primera generación | ≥ 26 en la mediana |
-| Encrucijadas por generación | 1 – 4 |
+| **Encrucijadas por generación** | **1 – 4** — este es el aserto que manda |
+| Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
+| Fracción de ticks elegibles, por plantilla | < 1 % |
 | Bosque restante en el año 100 | 40 % – 70 % del inicial |
 | Choque del 90 % de bajas en el año 40 → extinción | ≥ 25 % |
 | Cualquier estadística fuera de rango o `NaN` | 0 casos |
@@ -2564,7 +2620,7 @@ el precio visible, los efectos, el cambio en pantalla y las semillas.
 ### A.1 `winter_grain_debt` · lord
 
 **Peso** 10 · **Reposo** 30 años · **Máx.** 2
-**Requiere** `season = winter`, `grainYears < 0.25`, `flag vassal` sin poner
+**Requiere** `season = winter`, `seasonWeek ≥ 6`, `grainToHarvest < 0.9`, `flag vassal` sin poner
 **Reparto** `A = leader`
 
 > **The Lord's Grain**
@@ -2785,8 +2841,8 @@ todo.*
 
 ### A.13 `strangers_at_the_ford` · stranger
 
-**Peso** 10 · **Reposo** 10 años
-**Requiere** `people ≥ 12`, `housingFree ≥ 2`, `not flag hostile`
+**Peso** 10 · **Reposo** 20 años
+**Requiere** `people ≥ 12`, `housingFree ≥ 2`, `not flag hostile`, `morale ≥ 55`
 **Reparto** `A = leader`, `B = reeve`
 
 > **Nine at the Ford**
@@ -2823,7 +2879,7 @@ todo.*
 
 **Peso** 100 · **Reposo** 0 · **Salta el intervalo mínimo**
 **Requiere** `not role leader alive`
-**Reparto** `A = anyNamed`, `B = anyNamed excluding [A]`
+**Reparto** `A = anyNamed` (preferentemente de 25 a 55 años), `B = anyNamed excluding [A]` (igual)
 
 > **Who Speaks Now**
 > {leaderName} is buried. Two people in this valley expect to be asked, and

@@ -7,7 +7,7 @@
 
 import { FOOD, TIME } from '../balance';
 import { freeBeds, housingCapacity, isHere, population } from '../people/demography';
-import { deepestDislike, grudges } from '../people/opinions';
+import { deepestDislike } from '../people/opinions';
 import { TERRAIN_CODE } from '../state';
 import type { Condition, GameState, Op, Role } from '../state';
 import { seasonOf, weekOf, yearOf } from '../time';
@@ -56,12 +56,25 @@ export function outbreakRunning(state: GameState): boolean {
  *   housingFree spare beds as a fraction of the roof there is
  *   forestLeft  how much of the valley is still standing forest
  */
-export function ratioOf(state: GameState, which: 'grainYears' | 'housingFree' | 'forestLeft'): number {
+export function ratioOf(
+  state: GameState,
+  which: 'grainYears' | 'grainToHarvest' | 'housingFree' | 'forestLeft',
+): number {
   switch (which) {
     case 'grainYears': {
       const people = population(state);
       if (people === 0) return Number.POSITIVE_INFINITY;
       return state.village.grain / (people * TIME.WEEKS_PER_YEAR * FOOD.GRAIN_PER_PERSON);
+    }
+    case 'grainToHarvest': {
+      // Does the pantry reach the next harvest? The same magnitude §8.6 uses
+      // for the projected famine, and the one a template needs to ask "do we
+      // make it?" — unlike grainYears, it is not capped from above by how much
+      // the granary can physically hold.
+      const people = population(state);
+      const weeks = weeksToHarvest(state.tick);
+      if (people === 0 || weeks === 0) return Number.POSITIVE_INFINITY;
+      return state.village.grain / (people * weeks * FOOD.GRAIN_PER_PERSON);
     }
     case 'housingFree': {
       const capacity = housingCapacity(state);
@@ -93,8 +106,11 @@ export function evaluate(c: Condition, state: GameState): boolean {
     }
     case 'ratio':
       return compare(ratioOf(state, c.ratio), c.op, c.v);
-    case 'season':
-      return seasonOf(state.tick) === c.season;
+    case 'season': {
+      if (seasonOf(state.tick) !== c.season) return false;
+      if (c.minWeek === undefined) return true;
+      return weekOf(state.tick) % TIME.WEEKS_PER_SEASON >= c.minWeek;
+    }
     case 'year':
       return compare(yearOf(state.tick), c.op, c.v);
     case 'has':
@@ -106,11 +122,11 @@ export function evaluate(c: Condition, state: GameState): boolean {
     case 'role':
       return (holderOf(state, c.role) !== null) === c.alive;
     case 'grudge':
-      // "There is a grudge of at least N." Either one on the ledger that still
-      // runs that deep, or an ill feeling that deep whether or not it ever
-      // crossed the −50 that writes a Grudge down (§6.4). Reading only the
-      // ledger would make Annex A's `grudge min 30` and `min 40` impossible.
-      return grudges(state, c.min).length > 0 || deepestDislike(state) >= c.min;
+      // §8.2 (v2.8): an opinion at or below −N. NOT the grudge ledger — a
+      // Grudge is only written once an opinion crosses −50 (§6.4), so reading
+      // the ledger made Annex A's `min: 30` and `min: 40` unsatisfiable and
+      // left the four feud templates as dead content.
+      return deepestDislike(state) >= c.min;
     case 'trait': {
       const id = holderOf(state, c.role);
       if (id === null) return false;

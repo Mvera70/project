@@ -197,7 +197,7 @@ const T_SUCCESSION: CrossroadTemplate = {
 };
 
 const T_QUIET: CrossroadTemplate = {
-  id: 'quiet_years',
+  id: 'an_ordinary_year',
   category: 'stranger',
   weight: 1,
   cooldownYears: 0,
@@ -224,6 +224,9 @@ const T_QUIET: CrossroadTemplate = {
     },
   ],
 };
+
+/** La reserva de §8.6: selectCrossroad la saca del reparto normal. */
+const T_RESERVE: CrossroadTemplate = { ...T_QUIET, id: 'quiet_years', weight: 1 };
 
 const CATALOGUE: Catalogue = [T_FEUD, T_FAMINE, T_FAMINE_TWO, T_SUCCESSION, T_QUIET];
 
@@ -647,13 +650,13 @@ describe('selección · §8.6', () => {
     s.tick = CROSSROADS.GUARANTEE_TICKS;
     const onlyImpossible: Catalogue = [
       { ...T_FEUD, requires: [{ k: 'stat', stat: 'grain', op: '<', v: 0 }] },
-      T_QUIET,
+      T_RESERVE,
     ];
     // T_QUIET no tiene requires, así que es elegible; se comprueba que existe
     // como reserva cuando de verdad no hay nada.
     const nothing: Catalogue = [{ ...T_FEUD, requires: [{ k: 'stat', stat: 'grain', op: '<', v: 0 }] }];
     expect(selectCrossroad(calmAt(CROSSROADS.GUARANTEE_TICKS), nothing)).toBeNull();
-    expect(selectCrossroad(s, onlyImpossible)?.templateId).toBe(T_QUIET.id);
+    expect(selectCrossroad(s, onlyImpossible)?.templateId).toBe(T_RESERVE.id);
   });
 
   it('el multiplicador de novedad baja el peso sin anularlo', () => {

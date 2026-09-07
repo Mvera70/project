@@ -14,8 +14,12 @@ export const SMITH_FEUD: CrossroadTemplate = {
   category: 'feud',
   weight: 9,
   cooldownYears: 15,
+  // v2.8. El Anexo A pide 55, y medido sobre 20 partidas de 100 años la opinión
+  // más honda que se alcanza jamás es −50: ningún efecto del catálogo baja tanto
+  // de una vez y la deriva de §6.4 deshace lo que se acumula. Con 55 la
+  // plantilla era inalcanzable.
   requires: [
-    { k: 'grudge', min: 55 },
+    { k: 'grudge', min: 45 },
     { k: 'stat', stat: 'people', op: '>', v: 20 },
   ],
   cast: [
@@ -110,9 +114,11 @@ export const FEUD_INHERITED: CrossroadTemplate = {
   weight: 5,
   cooldownYears: 20,
   minYear: 25,
+  // v2.8. `grudge min 30` era ambiental — cierta el 26 % de los ticks. Una
+  // enemistad heredada es la honda, no cualquiera.
   requires: [
     { k: 'year', op: '>', v: 24 },
-    { k: 'grudge', min: 30 },
+    { k: 'grudge', min: 45 },
     { k: 'stat', stat: 'people', op: '>', v: 15 },
   ],
   cast: [

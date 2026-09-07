@@ -18,9 +18,14 @@ export const WINTER_GRAIN_DEBT: CrossroadTemplate = {
   weight: 10,
   cooldownYears: 30,
   maxPerGame: 2,
+  // v2.8. La condición vieja pedía `grainYears < 0.25` en invierno, y el
+  // invierno empieza la semana 36 — justo después de la cosecha de la 35. Pedía
+  // el momento más vacío en el momento más lleno, y encima `grainYears` está
+  // acotado por arriba por la capacidad del granero. Ahora mira si la despensa
+  // llega a la próxima cosecha, y espera a que el invierno esté entrado.
   requires: [
-    { k: 'season', season: 'winter' },
-    { k: 'ratio', ratio: 'grainYears', op: '<', v: 0.25 },
+    { k: 'season', season: 'winter', minWeek: 6 },
+    { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 0.9 },
     { k: 'flag', flag: 'vassal', set: false },
   ],
   cast: [{ as: 'A', role: 'leader' }],

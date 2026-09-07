@@ -50,7 +50,19 @@ function fillOne(
     // one already cast as A".
     const barred = new Set((spec.excluding ?? []).map((letter) => filled[letter]));
     const pool = livingNamed(state).filter((v) => !barred.has(v.id) && !taken.has(v.id));
-    return pool.length === 0 ? null : pick(state.rng, 'cast', pool).id;
+    if (pool.length === 0) return null;
+
+    // The age band is a preference (§8.3): a village with nobody of that age
+    // still has to be able to answer the question.
+    const band = spec.agedBetween;
+    const preferred =
+      band === undefined
+        ? pool
+        : pool.filter((v) => {
+            const age = ageOf(v, state.tick);
+            return age >= band[0] && age <= band[1];
+          });
+    return pick(state.rng, 'cast', preferred.length > 0 ? preferred : pool).id;
   }
 
   if ('grudgeAgainst' in spec) {

@@ -294,8 +294,16 @@ export type Op = '<' | '<=' | '>' | '>=' | '==';
 
 export type Condition =
   | { k: 'stat'; stat: StatName | 'people'; op: Op; v: number }
-  | { k: 'ratio'; ratio: 'grainYears' | 'housingFree' | 'forestLeft'; op: Op; v: number }
-  | { k: 'season'; season: Season }
+  | {
+      k: 'ratio';
+      ratio: 'grainYears' | 'grainToHarvest' | 'housingFree' | 'forestLeft';
+      op: Op;
+      v: number;
+    }
+  // `minWeek` is the week WITHIN the season, 0..11. §8.1 needs "deep winter"
+  // and not merely "winter": the granary is fullest the week after the harvest,
+  // which is the first week of winter.
+  | { k: 'season'; season: Season; minWeek?: number }
   | { k: 'year'; op: Op; v: number }
   | { k: 'has'; building: BuildingKind }
   | { k: 'flag'; flag: string; set: boolean }
