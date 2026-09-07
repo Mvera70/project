@@ -127,6 +127,17 @@ describe('grafo de módulos del motor', () => {
     }
   });
 
+  it('chronicle/ no lo importa nadie: es la salida, no una entrada', () => {
+    // M-09. El banco no importa nada; render sólo lee; digest cuenta cabezas.
+    expect(importsOf('chronicle/bank.en.ts')).toEqual([]);
+    expect(importsOf('chronicle/events.ts')).toEqual(['state']);
+    expect(importsOf('chronicle/render.ts')).toEqual(['bank.en', 'rng', 'state', 'time']);
+    expect(importsOf('chronicle/digest.ts')).toEqual(['people/demography', 'state']);
+    for (const f of ['people/demography.ts', 'subsistence/mood.ts', 'state.ts'] as const) {
+      expect(importsOf(f).some((x) => x.includes('chronicle')), f).toBe(false);
+    }
+  });
+
   it('ningún módulo del motor se importa a sí mismo', () => {
     for (const [file, self] of [
       ['rng.ts', 'rng'],
@@ -147,6 +158,9 @@ describe('grafo de módulos del motor', () => {
       ['subsistence/mood.ts', 'mood'],
       ['subsistence/seasons.ts', 'seasons'],
       ['subsistence/disasters.ts', 'disasters'],
+      ['chronicle/events.ts', 'events'],
+      ['chronicle/render.ts', 'render'],
+      ['chronicle/digest.ts', 'digest'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }
