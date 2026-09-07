@@ -35,7 +35,7 @@ const policyName = args.get('policy') ?? 'first';
 const minWeight = Number(args.get('weight') ?? 2);
 const plain = args.get('plain') === 'true';
 
-const POLICIES = new Set(['first', 'last', 'random', 'worst']);
+const POLICIES = new Set(['prudent', 'first', 'last', 'random', 'worst']);
 if (!POLICIES.has(policyName)) {
   console.error(`unknown policy '${policyName}'. one of: ${[...POLICIES].join(', ')}`);
   process.exitCode = 1;
