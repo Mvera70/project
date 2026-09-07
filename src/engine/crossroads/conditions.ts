@@ -7,7 +7,7 @@
 
 import { FOOD, TIME } from '../balance';
 import { freeBeds, housingCapacity, isHere, population } from '../people/demography';
-import { grudges } from '../people/opinions';
+import { deepestDislike, grudges } from '../people/opinions';
 import { TERRAIN_CODE } from '../state';
 import type { Condition, GameState, Op, Role } from '../state';
 import { seasonOf, weekOf, yearOf } from '../time';
@@ -106,9 +106,11 @@ export function evaluate(c: Condition, state: GameState): boolean {
     case 'role':
       return (holderOf(state, c.role) !== null) === c.alive;
     case 'grudge':
-      // "there is a grudge of at least N": the depth is how far the opinion
-      // behind it still runs (§6.4).
-      return grudges(state, c.min).length > 0;
+      // "There is a grudge of at least N." Either one on the ledger that still
+      // runs that deep, or an ill feeling that deep whether or not it ever
+      // crossed the −50 that writes a Grudge down (§6.4). Reading only the
+      // ledger would make Annex A's `grudge min 30` and `min 40` impossible.
+      return grudges(state, c.min).length > 0 || deepestDislike(state) >= c.min;
     case 'trait': {
       const id = holderOf(state, c.role);
       if (id === null) return false;

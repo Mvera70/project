@@ -296,6 +296,10 @@ describe('render', () => {
       people: 31,
       building: 'mill',
       sinceYear: 5,
+      years: 12,
+      // Las letras del reparto: es lo que produce namesOf (§8.3).
+      A: 'Aelric',
+      B: 'Wulfrun',
     };
     const keys = bankKeys();
     let rendered = 0;
@@ -340,7 +344,8 @@ describe('render', () => {
     const b = makeBundle(7);
     const params = {
       name: 'Mildreth', other: 'Osric', age: 44, year: 17, season: 'autumn',
-      count: 3, grain: 1224, people: 31, building: 'mill', sinceYear: 5,
+      count: 3, grain: 1224, people: 31, building: 'mill', sinceYear: 5, years: 12,
+      A: 'Aelric', B: 'Wulfrun',
     };
     for (const key of bankKeys()) {
       for (let tick = 0; tick < 12; tick += 1) {

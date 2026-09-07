@@ -153,6 +153,28 @@ export function grudges(state: GameState, min = 0): Grudge[] {
 }
 
 /**
+ * How deep the worst dislike in the village runs, as a positive number.
+ * Zero when nobody dislikes anybody.
+ *
+ * §8.2's `{k:'grudge', min:N}` asks whether "a grudge of at least N exists". A
+ * Grudge record only comes into being once an opinion has crossed −50 (§6.4),
+ * so reading the ledger alone would make every template asking for less than
+ * fifty unsatisfiable — and Annex A asks for 30, 40 and 55.
+ */
+export function deepestDislike(state: GameState): number {
+  let worst = 0;
+  for (const v of state.people.villagers) {
+    if (!v.named || !isHere(v)) continue;
+    for (const [key, value] of Object.entries(v.opinions)) {
+      const other = villager(state, Number(key));
+      if (other === undefined || !isHere(other) || !other.named) continue;
+      if (value < worst) worst = value;
+    }
+  }
+  return -worst;
+}
+
+/**
  * Who hates `id` the most — the casting of §8.3's `grudgeAgainst`.
  *
  * Only the living named can hate anyone, and only a genuinely negative opinion
