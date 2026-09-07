@@ -140,6 +140,30 @@ describe('grafo de módulos del motor', () => {
     }
   });
 
+  it('crossroads/ es la cima: lee de todo y nadie lee de él', () => {
+    // M-07. schema.ts sigue siendo la hoja de tipos; el resto cuelga de gente,
+    // subsistencia y las hojas, y ningún módulo de abajo mira hacia arriba.
+    expect(importsOf('crossroads/schema.ts')).toEqual(['state']);
+    expect(importsOf('crossroads/cast.ts')).toEqual([
+      'conditions',
+      'people/demography',
+      'people/opinions',
+      'people/villagers',
+      'rng',
+      'schema',
+      'state',
+    ]);
+    for (const f of [
+      'state.ts',
+      'people/demography.ts',
+      'people/opinions.ts',
+      'subsistence/mood.ts',
+      'chronicle/render.ts',
+    ] as const) {
+      expect(importsOf(f).some((x) => x.includes('crossroads')), f).toBe(false);
+    }
+  });
+
   it('ningún módulo del motor se importa a sí mismo', () => {
     for (const [file, self] of [
       ['rng.ts', 'rng'],
@@ -163,6 +187,11 @@ describe('grafo de módulos del motor', () => {
       ['chronicle/events.ts', 'events'],
       ['chronicle/render.ts', 'render'],
       ['chronicle/digest.ts', 'digest'],
+      ['crossroads/conditions.ts', 'conditions'],
+      ['crossroads/cast.ts', 'cast'],
+      ['crossroads/select.ts', 'select'],
+      ['crossroads/resolve.ts', 'resolve'],
+      ['crossroads/seeds.ts', 'seeds'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }

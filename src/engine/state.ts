@@ -238,6 +238,11 @@ export interface PlantedSeed {
   firesAtTick: number;
   cast: Record<string, VillagerId>;
   condition: Condition | null; // if it fails when due, the seed withers
+  // Append-only, the same discipline as villagers and grudges (§3.6): a seed
+  // is never removed from the array. One of these two is stamped when it comes
+  // due, and which one it is stays on the record.
+  firedTick: number | null;
+  witheredTick: number | null;
 }
 
 export interface DecisionRecord {

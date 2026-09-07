@@ -15,6 +15,7 @@ import type {
   Role,
   StatName,
   Trait,
+  VillagerId,
 } from '../state';
 
 // ---------------------------------------------------------------------------
@@ -116,4 +117,53 @@ export interface SeedSpec {
   effects: Effect[];
   visible: VisualEffect[];
   chronicleKey: string; // the text that links back to the original decision
+}
+
+// ---------------------------------------------------------------------------
+// M-07 · What the engine hands back
+//
+// Completing schema.ts rather than reopening it: these are declarations, they
+// belong with the rest of §8's types, and M-10 reads all three.
+// ---------------------------------------------------------------------------
+
+/** The whole catalogue. M-08 writes it; M-07 only ever reads one. */
+export type Catalogue = readonly CrossroadTemplate[];
+
+/** A template that could fire this tick, with the score §8.6 gives it. */
+export interface ScoredTemplate {
+  template: CrossroadTemplate;
+  cast: Record<string, VillagerId>;
+  score: number;
+  /** The parts of the score, so that why it won can be inspected. */
+  weight: number;
+  crisis: number;
+  trait: number;
+  novelty: number;
+}
+
+/**
+ * What resolving an option actually did.
+ *
+ * `build` and `destroy` are requests, not deeds: M-14 owns the buildings and
+ * carries them out, the same way rollFire reports a fire it does not light.
+ */
+export interface AppliedEffects {
+  templateId: string;
+  optionId: string;
+  killed: VillagerId[];
+  arrived: VillagerId[];
+  seedsPlanted: string[];
+  build: BuildingKind[];
+  destroy: { kind: BuildingKind; count: number }[];
+  visible: VisualEffect[];
+}
+
+/** What became of a seed that came due. §8.5. */
+export interface FiredSeed {
+  id: string;
+  fromTemplateId: string;
+  fromOptionId: string;
+  /** False when the condition failed and the seed withered instead. */
+  fired: boolean;
+  effects: AppliedEffects | null;
 }
