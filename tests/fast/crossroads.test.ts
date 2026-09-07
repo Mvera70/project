@@ -552,7 +552,10 @@ describe('selección · §8.6', () => {
     s.history.push({ tick: s.tick - 5, templateId: T_QUIET.id, optionId: 'store_it', cast: {} });
     const posed = selectCrossroad(s, CATALOGUE);
     expect(posed).not.toBeNull();
-    expect(posed?.templateId).toBe(T_FAMINE.id);
+    // Bajo el techo sólo pasa la pregunta DE LA CRISIS, y pasa la mejor: con
+    // dos de hambruna empatadas, el desempate por id es lo que decide.
+    const chosen = CATALOGUE.find((t) => t.id === posed?.templateId);
+    expect(chosen?.category).toBe('famine');
   });
 
   it("'succession' se dispara aunque falten 10 ticks para el techo", () => {

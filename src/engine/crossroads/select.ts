@@ -206,16 +206,24 @@ export function selectCrossroad(state: GameState, catalogue: Catalogue): Pending
     crisis !== 'succession' &&
     state.tick - lastTickOfCategory(state, catalogue, crisis) >= CROSSROADS.MIN_TICKS_BETWEEN;
 
-  if (since < CROSSROADS.MIN_TICKS_BETWEEN && !crisisJumps && succession.length === 0) {
-    return null;
-  }
-
   let chosen: ScoredTemplate | undefined;
 
-  if (succession.length > 0 && since < CROSSROADS.MIN_TICKS_BETWEEN) {
-    // Under the ceiling, only the succession may pass.
-    chosen = succession[0];
-  } else if (candidates.length === 0) {
+  if (since < CROSSROADS.MIN_TICKS_BETWEEN) {
+    // Under the ceiling only the crisis's OWN question may pass, and only the
+    // best one. A famine is a reason to ask about the grain; it is not a reason
+    // to ask what to do with a surplus, and letting it wave everything through
+    // turns the ceiling off for whole decades at a time.
+    const allowed =
+      succession.length > 0
+        ? succession
+        : crisisJumps
+          ? candidates.filter((c) => c.template.category === crisis)
+          : [];
+    if (allowed[0] === undefined) return null;
+    return pose(state, allowed[0].template, allowed[0].cast);
+  }
+
+  if (candidates.length === 0) {
     if (!guaranteed) return null;
     const fallback = catalogue.find((t) => t.id === FALLBACK_ID);
     if (fallback === undefined) return null;

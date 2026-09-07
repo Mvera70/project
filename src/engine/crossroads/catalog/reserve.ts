@@ -17,7 +17,10 @@ export const QUIET_YEARS: CrossroadTemplate = {
   id: 'quiet_years',
   category: 'stranger',
   weight: 1,
-  cooldownYears: 0,
+  // Annex A.17 gives it no cooldown, which in practice let it fire whenever
+  // the granary was full — and the granary is usually full. It is the reserve
+  // for the guarantee, not the wallpaper: it waits like everything else.
+  cooldownYears: 20,
   requires: [{ k: 'ratio', ratio: 'grainYears', op: '>', v: 1.0 }],
   cast: [{ as: 'A', role: 'leader' }],
   title: 'crossroad.quiet_years.title',
