@@ -4,7 +4,7 @@ import { hash32 } from '../rng';
 import type { RngBundle } from '../rng';
 import type { ChronicleEntry, GameState } from '../state';
 import { yearOf } from '../time';
-import { BANK } from './bank.en';
+import { BANK, CROSSROAD_BANK } from './bank.en';
 
 /**
  * Small counts read as words, because a chronicle says "three children" and a
@@ -47,6 +47,13 @@ export function numberWord(n: number): string {
  * if every render consumed a draw.
  */
 function variantOf(b: RngBundle, key: string, tick: number, discriminant: number): string | undefined {
+  // A crossroad's title and body live in the other bank, one entry each and no
+  // variants (§8.1): they are the situation itself, shown once. The chronicle
+  // quotes the title when it records that the question was asked, so it has to
+  // be able to reach them.
+  const single = CROSSROAD_BANK[key];
+  if (single !== undefined) return single;
+
   const variants = BANK[key];
   if (variants === undefined || variants.length === 0) return undefined;
   const pickIndex = hash32(b.chronicle, `${key}:${tick}:${discriminant}`) % variants.length;
@@ -131,7 +138,7 @@ export function bankKeys(): string[] {
   return Object.keys(BANK).sort();
 }
 
-/** Whether the bank can render a key at all. */
+/** Whether either bank can render a key at all. */
 export function knows(key: string): boolean {
-  return (BANK[key]?.length ?? 0) > 0;
+  return (BANK[key]?.length ?? 0) > 0 || CROSSROAD_BANK[key] !== undefined;
 }
