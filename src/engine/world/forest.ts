@@ -12,6 +12,17 @@ import { TIME } from '../balance';
 import { invalidateForest } from './paths';
 import { neighbours4 } from './tiles';
 
+interface FellTarget {
+  cell: number;
+  coreX: number;
+  coreY: number;
+}
+
+// A tree takes many weeks to fell. Remember the current nearest one instead of
+// searching all 2,016 cells again until either it falls or the built core moves.
+// Derived cache, never state: clones and loaded games rebuild it independently.
+const FELL_TARGET = new WeakMap<GameState, FellTarget>();
+
 /** The centre of mass of what is standing, in cell coordinates. */
 function core(state: GameState): { x: number; y: number } {
   const live = state.buildings.filter((b: Building) => b.lostTick === null);
@@ -69,32 +80,32 @@ export function fellForest(state: GameState, wood: number): number {
   if (wood <= 0) return 0;
   const centre = core(state);
 
-  // The cells that still have something in them, nearest first — but only as
-  // many as this week's cutting can actually reach. A week's cut is a few units
-  // against a cell of three hundred, so this is almost always one cell, and
-  // sorting five hundred of them every tick to take from the first was most of
-  // what M-15 cost.
-  const reach = Math.ceil(wood / WORLD.WOOD_PER_FOREST_TILE) + 1;
-  const standing: { cell: number; d: number }[] = [];
-  for (let i = 0; i < state.map.terrain.length; i += 1) {
-    if (state.map.terrain[i] !== TERRAIN_CODE.forest) continue;
-    if ((state.map.forestStock[i] as number) <= 0) continue;
-    const dx = (i % state.map.width) + 0.5 - centre.x;
-    const dy = Math.floor(i / state.map.width) + 0.5 - centre.y;
-    const d = dx * dx + dy * dy;
-    // Keep only the nearest `reach`, in order, by insertion.
-    if (standing.length === reach && d >= (standing[reach - 1] as { d: number }).d) continue;
-    let at = standing.length;
-    while (at > 0 && ((standing[at - 1] as { d: number }).d > d ||
-      ((standing[at - 1] as { d: number }).d === d && (standing[at - 1] as { cell: number }).cell > i))) at -= 1;
-    standing.splice(at, 0, { cell: i, d });
-    if (standing.length > reach) standing.pop();
-  }
-
   let got = 0;
   let cleared = false;
-  for (const { cell } of standing) {
-    if (got >= wood) break;
+  while (got < wood) {
+    let target = FELL_TARGET.get(state);
+    if (target === undefined || target.coreX !== centre.x || target.coreY !== centre.y ||
+      state.map.terrain[target.cell] !== TERRAIN_CODE.forest ||
+      (state.map.forestStock[target.cell] as number) <= 0) {
+      let cell = -1;
+      let bestD = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < state.map.terrain.length; i += 1) {
+        if (state.map.terrain[i] !== TERRAIN_CODE.forest ||
+          (state.map.forestStock[i] as number) <= 0) continue;
+        const dx = (i % state.map.width) + 0.5 - centre.x;
+        const dy = Math.floor(i / state.map.width) + 0.5 - centre.y;
+        const d = dx * dx + dy * dy;
+        if (d < bestD || (d === bestD && i < cell)) {
+          cell = i;
+          bestD = d;
+        }
+      }
+      if (cell < 0) break;
+      target = { cell, coreX: centre.x, coreY: centre.y };
+      FELL_TARGET.set(state, target);
+    }
+
+    const cell = target.cell;
     const have = state.map.forestStock[cell] as number;
     const take = Math.min(have, Math.ceil(wood - got));
     state.map.forestStock[cell] = have - take;
@@ -105,6 +116,7 @@ export function fellForest(state: GameState, wood: number): number {
       state.map.terrain[cell] = TERRAIN_CODE.cleared;
       state.map.forestAge[cell] = 0;
       cleared = true;
+      FELL_TARGET.delete(state);
       // The last of the old wood. Counting the whole map is only worth doing
       // on the week a cell of it actually falls, and only until it is gone.
       if (wasOld && state.flags['old_forest_gone'] === undefined &&

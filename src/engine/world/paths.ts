@@ -46,6 +46,21 @@ const WHERE = new WeakMap<GameState, {
   targets: Map<VillagerId, { from: number; to: number }>;
 }>();
 const FOREST_VERSION = new WeakMap<GameState, number>();
+// Derived like the route cache: cells whose traffic or visible path is nonzero.
+// A 36×56 map normally has only a few dozen of them; scanning all 2,016 cells
+// twice on every tick dominated long simulations after v2.18 made them survive.
+const ACTIVE_TRAFFIC = new WeakMap<GameState, Set<number>>();
+
+function activeTraffic(state: GameState): Set<number> {
+  let active = ACTIVE_TRAFFIC.get(state);
+  if (active !== undefined && active.size > 0) return active;
+  active = new Set<number>();
+  for (let i = 0; i < state.map.traffic.length; i += 1) {
+    if ((state.map.traffic[i] as number) > 0 || (state.map.path[i] as number) > 0) active.add(i);
+  }
+  ACTIVE_TRAFFIC.set(state, active);
+  return active;
+}
 
 /**
  * Say that what the ground costs has changed: a path upgraded, a building went
@@ -119,24 +134,24 @@ function destinations(
   const farmers = Math.round(a.farmers * share);
   const cutters = Math.round(a.cutters * share);
 
-  // Who is going where only changes when the crew changes, the split changes,
-  // or something moved. Everything else in the tick leaves it exactly as it
-  // was, and finding the nearest tree for every cutter over four hundred cells
-  // was the most expensive thing in step 14.
-  const key = [
-    crew.length, crew[0]?.id ?? -1, crew[crew.length - 1]?.id ?? -1,
-    farmers, cutters,
-    FOREST_VERSION.get(state) ?? 0, GROUND.get(state) ?? 0,
-    state.works.length, homes.size,
-  ].join(':');
-  const known = WHERE.get(state);
-  if (known !== undefined && known.key === key) return known.targets;
-
   const live = state.buildings.filter((b) => b.lostTick === null);
   const fields = live.filter((b) => b.kind === 'field')
     .map((b) => centreOf(b.x, b.y, b.w, b.h, state.map.width));
   const sites = state.works.map((w) => centreOf(w.x, w.y, w.w, w.h, state.map.width));
   const wood = treesOf(state);
+
+  // Who is going where only changes when the crew changes, the split changes,
+  // or something moved. Everything else in the tick leaves it exactly as it
+  // was, and finding the nearest tree for every cutter over four hundred cells
+  // was the most expensive thing in step 14.
+  const key = [
+    crew.map((v) => `${v.id}@${v.homeId ?? -1}`).join(','),
+    farmers, cutters,
+    FOREST_VERSION.get(state) ?? 0, GROUND.get(state) ?? 0,
+    fields.join(','), sites.join(','),
+  ].join(':');
+  const known = WHERE.get(state);
+  if (known !== undefined && known.key === key) return known.targets;
 
   crew.forEach((v, rank) => {
     const from = v.homeId === null ? undefined : homes.get(v.homeId);
@@ -209,7 +224,8 @@ export function routeFor(state: GameState, id: VillagerId): number[] {
  */
 export function accrueTraffic(state: GameState): void {
   const traffic = state.map.traffic;
-  for (let i = 0; i < traffic.length; i += 1) {
+  const active = activeTraffic(state);
+  for (const i of active) {
     const t = traffic[i] as number;
     if (t === 0) continue;
     traffic[i] = Math.max(0, t - Math.ceil(t * WORLD.TRAFFIC_DECAY));
@@ -221,6 +237,7 @@ export function accrueTraffic(state: GameState): void {
     for (const cell of walked) {
       const t = traffic[cell] as number;
       if (t < 65535) traffic[cell] = t + 1;
+      active.add(cell);
     }
   }
 }
@@ -234,16 +251,24 @@ export function accrueTraffic(state: GameState): void {
 export function upgradePaths(state: GameState): PathEvent[] {
   const road = smithyWorking(state);
   const events: PathEvent[] = [];
-  for (let i = 0; i < state.map.path.length; i += 1) {
+  const active = activeTraffic(state);
+  // The old full-map pass emitted cells in numeric order. Preserve that public
+  // ordering even though the working set follows route insertion order.
+  for (const i of [...active].sort((a, b) => a - b)) {
     const terrain = state.map.terrain[i];
-    if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) continue;
+    if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) {
+      active.delete(i);
+      continue;
+    }
 
     const wear = state.map.traffic[i] as number;
     const want = wear >= WORLD.PATH_T3 && road ? 3 : wear >= WORLD.PATH_T2 ? 2 : wear >= WORLD.PATH_T1 ? 1 : 0;
     const has = state.map.path[i] as number;
-    if (want === has) continue;
-    state.map.path[i] = want;
-    events.push({ cell: i, from: has as 0 | 1 | 2 | 3, to: want as 0 | 1 | 2 | 3 });
+    if (want !== has) {
+      state.map.path[i] = want;
+      events.push({ cell: i, from: has as 0 | 1 | 2 | 3, to: want as 0 | 1 | 2 | 3 });
+    }
+    if (wear === 0 && want === 0) active.delete(i);
   }
   // A changed path changes what A* costs, so every route is stale.
   if (events.length > 0) invalidateRoutes(state);

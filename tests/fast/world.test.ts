@@ -220,6 +220,19 @@ describe('el desgaste del suelo · §7.6', () => {
     );
     if (walker !== undefined) expect(routeFor(s, walker.id).length).toBeGreaterThanOrEqual(0);
   });
+
+  it('cambiar de casa invalida el destino aunque la cuadrilla mida lo mismo', () => {
+    const s = foundGame(108);
+    const houses = s.buildings.filter((building) => building.kind === 'house');
+    const walker = s.people.villagers
+      .filter((villager) => villager.diedTick === null && villager.leftTick === null && villager.homeId !== null)
+      .sort((a, b) => a.id - b.id)[1]!;
+    walker.homeId = houses[0]!.id;
+    const before = routeFor(s, walker.id);
+    walker.homeId = houses[houses.length - 1]!.id;
+    const after = routeFor(s, walker.id);
+    expect(after[0]).not.toBe(before[0]);
+  });
 });
 
 describe('el bosque · §7.5', () => {

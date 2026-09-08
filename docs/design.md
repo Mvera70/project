@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.18 · 8 de septiembre de 2026, 12:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.19 · 8 de septiembre de 2026, 13:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -47,6 +47,49 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.16** | 8 sep 2026, 11:20 | M-16 | **Abandono**: se acabó la agonía de cuarenta años. Presupuesto del banco a 10 min. La banda del bosque queda aguas abajo de la extinción. Atribución medida: `hostile` no se activa nunca con `prudent`. |
 | **2.17** | 8 sep 2026, 12:00 | Puerta de migración | **`prudent` deja de sobrevalorar el ánimo**: su peso baja de 15 a 3. La agonía se mide por la racha consecutiva más larga, igual que la regla de abandono. La puerta de ocho habitantes se somete a un A/B antes de tocarla. |
 | **2.18** | 8 sep 2026, 12:30 | Expiración de la peste | **Un brote dura 6–10 semanas también para el ánimo y para la siguiente tirada anual.** Un objeto `outbreak` vencido se estaba tratando como peste perpetua: hundía el ánimo hasta el suelo de fe e impedía cualquier brote posterior. |
+| **2.19** | 8 sep 2026, 13:00 | Rendimiento de M-12 | **Los caminos dejan de recorrer 2.016 celdas inertes cada semana.** Un conjunto derivado conserva solo celdas con tráfico o camino; no forma parte del estado ni del guardado y mantiene el orden observable de los eventos. |
+
+### 2.19 — El coste de andar
+
+Con la peste corregida, casi todas las partidas y sus ramas de choque llegan a
+200 años. El banco pasó de 443,0 a 1.143,63 s. El coste no se arregla recortando
+la muestra: el motor recorría las 2.016 celdas del mapa dos veces cada semana,
+una para decaer tráfico y otra para comprobar si cambiaba el camino, aunque casi
+todas estuvieran a cero.
+
+**Implementación.** `paths.ts` mantiene en un `WeakMap` el conjunto de celdas
+con tráfico o camino. Es caché derivada, como las rutas: no se serializa, cada
+clon tiene la suya y puede reconstruirse desde el mapa. `upgradePaths` ordena
+los índices antes de emitir cambios, de modo que conserva el mismo orden que el
+recorrido completo anterior.
+
+`forest.ts` conserva también en un `WeakMap` el árbol que se está talando. Una
+celda contiene 300 unidades y suele tardar muchas semanas en caer; mientras siga
+en pie y el centro de la aldea no cambie, volver a recorrer el mapa solo puede
+dar la misma respuesta. Al caer la celda o moverse el núcleo, el objetivo se
+calcula de nuevo con los mismos desempates.
+
+La clave de destinos incluye todos los pares aldeano–casa y las posiciones de
+campos y obras. La clave anterior solo guardaba longitud y extremos de la
+cuadrilla: cambiar un trabajador intermedio o su casa podía dejarle la ruta
+anterior aunque el número de trabajadores siguiera igual.
+
+**Criterio.** El estado final, los eventos de camino y las bandas del banco deben
+ser idénticos a v2.18. Solo puede cambiar el tiempo. Si el banco sigue por encima
+de 600 s, se perfila el siguiente coste; no se rebaja el número de observaciones.
+
+**Resultado parcial.** Las pruebas focalizadas de caminos bajan y el informe de
+60 semillas `prudent` tarda 201,59 s, prácticamente lo mismo que antes. Un perfil
+de CPU de una partida completa coloca `canPlace`, `onEnvelope` y
+`placeBuilding` muy por encima de rutas y bosque. El cuello real es volver a
+buscar cada semana un solar para una obra que sigue sin caber. Las cachés se
+conservan porque eliminan trabajo lineal y corrigen la identidad de los
+trayectos, pero no cierran el presupuesto de M-12. La siguiente optimización
+pertenece a M-14 y debe invalidar un fracaso de colocación cuando cambien
+ocupación, terreno o las puertas que hacen deseable la obra.
+
+**Verificación.** TypeScript, ESLint y las 524 pruebas ejecutables pasan; las dos
+pendientes siguen reservadas para M-20/M-23. La suite completa tarda 14,70 s.
 
 ### 2.18 — La peste que no terminaba
 
