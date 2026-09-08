@@ -153,9 +153,13 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
     // A deferred feud has a short window in which its people and grievance
     // still coexist. Carry that story across the ordinary weighted draw rather
     // than letting an unrelated question consume the window (§8.6, v2.30).
-    const storyMult = t.category === 'feud' && flagSet(state, 'feud_ripe')
-      ? CROSSROADS.FEUD_RIPE_MULTIPLIER
-      : 1;
+    let storyMult = 1;
+    if (t.category === 'feud' && flagSet(state, 'feud_ripe')) {
+      storyMult *= CROSSROADS.FEUD_RIPE_MULTIPLIER;
+    }
+    if ((t.category === 'lord' || t.category === 'stranger') && flagSet(state, 'behind_the_wall')) {
+      storyMult *= CROSSROADS.BEHIND_WALL_MULTIPLIER;
+    }
     const noveltyMult = timesSeen(state, t.id) > 0 ? CROSSROADS.NOVELTY_MULTIPLIER : 1;
     const traitMult = traitMultiplier(t, cast, state);
 

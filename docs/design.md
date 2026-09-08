@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.37 · 9 de septiembre de 2026, 00:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.38 · 9 de septiembre de 2026, 00:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -82,6 +82,17 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.35** | 8 sep 2026, 23:30 | Contrato de A.11 | **Las dos decisiones de tala modifican el bosque real.** `fell_it` extrae 900 de madera y deja claras sin rebrote; `take_the_edge` extrae 300 y fuerza una semana de hambre 0,5. |
 | **2.36** | 8 sep 2026, 23:50 | Consecuencia de A.11 | **Las laderas desnudas cambian el clima que se sortea.** `flood_prone` suma cinco puntos a los años ruinosos y los resta de los justos, sin añadir tiradas aleatorias. |
 | **2.37** | 9 sep 2026, 00:20 | Contrato de piedra de A.16 | **La elección abre la familia de mejora que nombra.** Muros y casas de piedra dejan de construirse antes de A.16; elegir muro aumenta un 50 % la leña invernal durante veinte años. |
+| **2.38** | 9 sep 2026, 00:45 | Consecuencia de A.16 | **Vivir tras la muralla reduce, pero no elimina, la presión exterior.** `behind_the_wall` multiplica por 0,4 el peso de las plantillas `lord` y `stranger`. |
+
+### 2.38 — La muralla cambia qué llega de fuera
+
+La semilla de A.16 escribía `behind_the_wall` veinte a cuarenta años después de
+abrir la cantera, pero selección no la leía. Mientras esté activa, el componente
+`story` multiplica por 0,4 las plantillas de categorías `lord` y `stranger`.
+No toca sus condiciones, reposos, límites ni el multiplicador de crisis: una
+amenaza concreta todavía puede llegar, solo compite con menos peso en tiempos
+ordinarios. La prueba compara ambas categorías con una historia de hambruna que
+permanece en 1.
 
 ### 2.37 — Piedra para una cosa
 
@@ -3194,6 +3205,7 @@ export const CROSSROADS = {
   GUARANTEE_TICKS: 960,         // una por generación como mínimo
   CRISIS_MULTIPLIER: 4.0,
   FEUD_RIPE_MULTIPLIER: 4.0,
+  BEHIND_WALL_MULTIPLIER: 0.4,
   NOVELTY_MULTIPLIER: 0.4,      // si ya salió en esta partida
   DEFAULT_COOLDOWN_YEARS: 25,
 } as const;

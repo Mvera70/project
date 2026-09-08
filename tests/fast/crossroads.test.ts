@@ -761,6 +761,21 @@ describe('selección · §8.6', () => {
     expect(after?.score).toBe((before?.score as number) * CROSSROADS.FEUD_RIPE_MULTIPLIER);
   });
 
+  it('behind_the_wall reduce las historias exteriores sin excluirlas', () => {
+    const s = calm(11);
+    const lord: CrossroadTemplate = { ...T_QUIET, id: 'test_lord', category: 'lord' };
+    const stranger: CrossroadTemplate = { ...T_QUIET, id: 'test_stranger', category: 'stranger' };
+    const famine: CrossroadTemplate = { ...T_QUIET, id: 'test_famine', category: 'famine' };
+    s.flags['behind_the_wall'] = 0;
+    const scored = eligible(s, [lord, stranger, famine]);
+
+    expect(scored.find((x) => x.template.id === lord.id)?.story)
+      .toBe(CROSSROADS.BEHIND_WALL_MULTIPLIER);
+    expect(scored.find((x) => x.template.id === stranger.id)?.story)
+      .toBe(CROSSROADS.BEHIND_WALL_MULTIPLIER);
+    expect(scored.find((x) => x.template.id === famine.id)?.story).toBe(1);
+  });
+
   it('los rasgos del reparto pesan', () => {
     const s = calm(7);
     const [leader, other] = makeFeud(s);

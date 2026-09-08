@@ -21,7 +21,7 @@
 //   flood_prone            M-06 rollWeather(): ruinous years +5 points (A.11)
 //   unconsecrated          M-08 later:      opens a template of its own (A.5)
 //   feud_ripe              M-07 select():   weights the feud templates up (A.4, A.6, A.8, A.15)
-//   behind_the_wall        M-07 scoring:    lord and stranger weigh less (A.16)
+//   behind_the_wall        M-07 select():   lord and stranger weigh ×0.4 (A.16)
 //   a_name_in_the_valley   M-07 scoring:    lord templates weigh less (A.14)
 //
 // The flags Annex A already named — vassal, proud, watched, threatened,
