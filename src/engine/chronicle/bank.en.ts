@@ -757,7 +757,7 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.chapel_or_granary.body':
     'There is standing timber for one great work and the season for it. {A} has been drawing a chapel in the dirt for two years. The reeve has been drawing a granary.',
   'crossroad.chapel_or_granary.the_chapel.label': 'The chapel',
-  'crossroad.chapel_or_granary.the_chapel.cost': 'The next lean year will be leaner',
+  'crossroad.chapel_or_granary.the_chapel.cost': 'The next harvest comes in one fifth lighter',
   'crossroad.chapel_or_granary.the_granary.label': 'The granary',
   'crossroad.chapel_or_granary.the_granary.cost': '{A} will remember which was chosen',
 

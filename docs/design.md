@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.33 · 8 de septiembre de 2026, 22:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.34 · 8 de septiembre de 2026, 23:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -78,6 +78,16 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.31** | 8 sep 2026, 21:30 | Contrato de A.6 | **Silenciar al sacerdote conserva al sacerdote.** `silence_a` mantiene el oficio y cobra la pérdida de fe y ánimo que promete; `no_shepherd` solo cae si el cargo queda vacante después. |
 | **2.32** | 8 sep 2026, 22:00 | Contrato de tregua de A.7 | **Construir juntos no hace que los rivales se perdonen.** Las opiniones mutuas bajan 15 en vez de subir 15; los cuatro proyectos y el ánimo común se conservan. |
 | **2.33** | 8 sep 2026, 22:30 | Contrato visible de A.13 | **El precio de despedir a los forasteros dice cuánto grano sale.** Se sustituye «It costs less» por «Sixty bushels»; la mecánica no cambia. |
+| **2.34** | 8 sep 2026, 23:00 | Contrato de A.9 | **La capilla compromete la próxima cosecha al 80 %.** El precio deja de prometer un «año magro» indefinido y nombra el quinto que se perderá en la siguiente siega. |
+
+### 2.34 — La madera que no guarda grano
+
+«The next lean year will be leaner» prometía una deuda sin definir qué año era
+magro ni cuánto empeoraba. A.9 ocurre una vez y contrapone capilla y granero: al
+elegir la capilla, la próxima cosecha usa el mecanismo contado en siegas de
+§5.3 con factor 0,8. El precio visible pasa a «The next harvest comes in one
+fifth lighter». La penalización no se repite ni depende del año civil; se
+consume en la primera siega posterior a la decisión.
 
 ### 2.33 — El coste antes de elegir
 
@@ -4259,7 +4269,7 @@ todo.*
 
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
-| **The chapel** | The next lean year will be leaner | `build chapel free`, `faith +20`, `morale +10` | `raise chapel` | `the_faithful_valley`, 15–30 años: si `faith > 70`, `arrive 4` peregrinos |
+| **The chapel** | The next harvest comes in one fifth lighter | `build chapel free`, `faith +20`, `morale +10`, próxima cosecha ×0.8 | `raise chapel` | `the_faithful_valley`, 15–30 años: si `faith > 70`, `arrive 4` peregrinos |
 | **The granary** | {A} will remember which you chose | `build granary free`, `opinion A→leader −35`, `faith −10` | `raise granary` | `a_priest_without_a_roof`, 8–16 años: `role priest null`, `faith −15` |
 
 ---

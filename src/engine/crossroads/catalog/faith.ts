@@ -29,6 +29,7 @@ export const CHAPEL_OR_GRANARY: CrossroadTemplate = {
         { k: 'build', kind: 'chapel', free: true },
         { k: 'stat', stat: 'faith', delta: 20 },
         { k: 'stat', stat: 'morale', delta: 10 },
+        { k: 'harvest', factor: 0.8, harvests: 1 },
       ],
       visible: [{ k: 'raise', kind: 'chapel' }],
       seeds: [

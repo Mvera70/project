@@ -47,6 +47,12 @@ describe('el catálogo · forma', () => {
     }
   });
 
+  it('la capilla compromete una cosecha al ochenta por ciento', () => {
+    const chapel = CATALOG.find((t) => t.id === 'chapel_or_granary')
+      ?.options.find((o) => o.id === 'the_chapel');
+    expect(chapel?.effects).toContainEqual({ k: 'harvest', factor: 0.8, harvests: 1 });
+  });
+
   it('TODA opción cambia algo en pantalla', () => {
     // El principio 1 del juego convertido en aserto (§8.1). Si esto falla, hay
     // una decisión que el jugador toma y no ve.
