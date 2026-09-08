@@ -19,7 +19,8 @@
     "map": "tsx tools/map-dump.ts",
     "attribution": "tsx tools/attribution-report.ts",
     "policy:attribution": "tsx tools/policy-attribution-report.ts",
-    "migration:ab": "tsx tools/migration-ab-report.ts"
+    "migration:ab": "tsx tools/migration-ab-report.ts",
+    "reader:packet": "tsx tools/reader-packet.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
