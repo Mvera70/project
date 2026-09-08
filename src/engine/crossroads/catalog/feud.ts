@@ -47,8 +47,11 @@ export const SMITH_FEUD: CrossroadTemplate = {
         {
           id: 'the_withdrawn',
           delayYears: [6, 14],
-          effects: [{ k: 'kill', who: 'B', count: 1 }],
-          visible: [{ k: 'scar', what: 'grave_row' }],
+          effects: [
+            { k: 'leave', who: 'B' },
+            { k: 'leave', who: 'random', count: 2 },
+          ],
+          visible: [{ k: 'gather', where: 'ford', days: 3 }],
           chronicleKey: 'consequence.the_withdrawn',
         },
       ],
@@ -69,8 +72,11 @@ export const SMITH_FEUD: CrossroadTemplate = {
         {
           id: 'the_withdrawn_other',
           delayYears: [6, 14],
-          effects: [{ k: 'kill', who: 'A', count: 1 }],
-          visible: [{ k: 'scar', what: 'grave_row' }],
+          effects: [
+            { k: 'leave', who: 'A' },
+            { k: 'leave', who: 'random', count: 2 },
+          ],
+          visible: [{ k: 'gather', where: 'ford', days: 3 }],
           chronicleKey: 'consequence.the_withdrawn',
         },
       ],

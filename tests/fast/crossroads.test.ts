@@ -994,6 +994,20 @@ describe('resolución · §8.4', () => {
     expect(s.people.namedIds).not.toContain(id);
   });
 
+  it('leave random lleva acompañantes anónimos sin borrar nombres', () => {
+    const s = calm(23);
+    const named = [...s.people.namedIds];
+    const before = population(s);
+    const out = emptyEffects();
+
+    applyEffect(s, {}, { k: 'leave', who: 'random', count: 2 }, out);
+
+    expect(out.left).toHaveLength(2);
+    expect(population(s)).toBe(before - 2);
+    expect(s.people.namedIds).toEqual(named);
+    for (const id of out.left) expect(at(s, id).named).toBe(false);
+  });
+
   it("kill 'weakest' se lleva primero a los más viejos", () => {
     const s = calm(11);
     s.tick = CROSSROADS.GUARANTEE_TICKS;

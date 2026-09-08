@@ -96,11 +96,29 @@ export function applyEffect(
       break;
     }
     case 'leave': {
-      const v = villagerOf(state, cast, e.who);
-      if (v === undefined || !isHere(v)) break;
-      v.leftTick = state.tick;
-      out.left.push(v.id);
-      state.people.namedIds = state.people.namedIds.filter((id) => id !== v.id);
+      const named = villagerOf(state, cast, e.who);
+      const leaving: Villager[] = [];
+      if (named !== undefined && e.who !== 'random') {
+        if (isHere(named)) leaving.push(named);
+      } else if (e.who === 'random') {
+        // Companions leave anonymously; a named departure needs a crossroad
+        // letter so the chronicle can say who went.
+        const pool = state.people.villagers.filter((v) => isHere(v) && !v.named);
+        const count = Math.min(e.count ?? 1, pool.length);
+        while (leaving.length < count) {
+          const v = pick(state.rng, 'crossroads', pool);
+          pool.splice(pool.indexOf(v), 1);
+          leaving.push(v);
+        }
+      }
+      for (const v of leaving) {
+        v.leftTick = state.tick;
+        out.left.push(v.id);
+      }
+      if (leaving.length > 0) {
+        const gone = new Set(leaving.map((v) => v.id));
+        state.people.namedIds = state.people.namedIds.filter((id) => !gone.has(id));
+      }
       break;
     }
     case 'arrive': {

@@ -1053,9 +1053,9 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The wall went up in year {year}. They did not speak while it did.',
   ],
   'consequence.the_withdrawn': [
-    '{years} years after the quarrel of year {sinceYear}, it ended the way it was going to.',
-    'The withdrawal of year {sinceYear} lasted {years} years, and then it was over.',
-    'It had been {years} years since either of them had spoken first.',
+    '{years} years after the quarrel of year {sinceYear}, three left by the ford road.',
+    'The withdrawal of year {sinceYear} lasted {years} years, and ended with three leaving.',
+    'Three walked out in year {year}, after {years} years of the old quarrel.',
   ],
   'consequence.uneasy_truce': [
     'The truce of year {sinceYear} held for {years} years and then it did not.',

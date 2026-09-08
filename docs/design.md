@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.39 · 9 de septiembre de 2026, 01:05 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.40 · 9 de septiembre de 2026, 01:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -84,6 +84,17 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.37** | 9 sep 2026, 00:20 | Contrato de piedra de A.16 | **La elección abre la familia de mejora que nombra.** Muros y casas de piedra dejan de construirse antes de A.16; elegir muro aumenta un 50 % la leña invernal durante veinte años. |
 | **2.38** | 9 sep 2026, 00:45 | Consecuencia de A.16 | **Vivir tras la muralla reduce, pero no elimina, la presión exterior.** `behind_the_wall` multiplica por 0,4 el peso de las plantillas `lord` y `stranger`. |
 | **2.39** | 9 sep 2026, 01:05 | Consecuencia de A.14 | **La reputación ganada frente a los bandidos reduce a la mitad el peso del señor.** `a_name_in_the_valley` se acumula con `behind_the_wall` sin saltarse elegibilidad ni crisis. |
+| **2.40** | 9 sep 2026, 01:30 | Consecuencia de A.7 | **Quien se retira acaba dejando el valle con dos acompañantes.** `leave` admite una cuenta aleatoria anónima; `the_withdrawn` marca tres marchas y deja de convertir una retirada en muerte. |
+
+### 2.40 — La retirada termina en el camino
+
+Las dos semillas `the_withdrawn` prometían que A o B se marcharía con otras dos
+personas, pero siempre lo mataban y no tocaban a nadie más. El efecto `leave`
+admite ahora `who:'random', count`; esa forma solo elige habitantes anónimos,
+porque una salida con nombre necesita una letra del reparto y una historia que
+la identifique. Cada semilla marca la salida del rival y de dos acompañantes,
+reduce la población en tres y la crónica cuenta el camino en vez de una tumba.
+Si quedan menos de dos anónimos, se marchan los disponibles.
 
 ### 2.39 — Un nombre que llega a Wealdmere
 
@@ -2547,7 +2558,7 @@ export type Effect =
   | { k: 'stat';   stat: StatName; delta: number }
   | { k: 'stat';   stat: StatName; mul: number }
   | { k: 'kill';   who: 'random'|'weakest'|string; count: number | 'fraction'; fraction?: number }
-  | { k: 'leave';  who: string }
+  | { k: 'leave';  who: string; count?: number }
   | { k: 'arrive'; count: number }
   | { k: 'flag';   flag: string; years: number }   // 0 = permanente
   | { k: 'build';  kind: BuildingKind; free: true }
@@ -4304,7 +4315,7 @@ todo.*
 
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
-| **Side with {A}** | {B} withdraws | `opinion B→A −30`, `lit` del edificio de B apagado 4 años, obra −15 % 4 años | `douse` del edificio de B | `the_withdrawn`, 6–14 años: B se marcha con 2 personas, o muere amargado |
+| **Side with {A}** | {B} withdraws | `opinion B→A −30`, `lit` del edificio de B apagado 4 años, obra −15 % 4 años | `douse` del edificio de B | `the_withdrawn`, 6–14 años: B se marcha con 2 personas |
 | **Side with {B}** | {A} withdraws | Simétrico | `douse` del edificio de A | Simétrico |
 | **Make them build something together** | Neither forgives it, and the wall goes up | `build palisade free` ×4, `morale +8`, ambas opiniones −15 | `raise palisade` | `uneasy_truce`, 10–25 años, 50 %: el rencor vuelve peor, `opinion −70` |
 

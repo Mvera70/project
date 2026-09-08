@@ -90,7 +90,7 @@ export type Effect =
   | { k: 'stat'; stat: StatName; delta: number }
   | { k: 'stat'; stat: StatName; mul: number }
   | { k: 'kill'; who: 'random' | 'weakest' | string; count: number | 'fraction'; fraction?: number }
-  | { k: 'leave'; who: string }
+  | { k: 'leave'; who: string; count?: number }
   | { k: 'arrive'; count: number }
   | { k: 'flag'; flag: string; years: number } // 0 = permanent
   | { k: 'build'; kind: BuildingKind; free: true }
