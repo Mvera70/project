@@ -31,6 +31,7 @@ export const FOREST_CUT: CrossroadTemplate = {
       effects: [
         { k: 'build', kind: 'field', free: true },
         { k: 'build', kind: 'field', free: true },
+        { k: 'fell', wood: 900, permanent: true },
         { k: 'stat', stat: 'wood', delta: 900 },
         { k: 'stat', stat: 'faith', delta: -10 },
       ],
@@ -52,7 +53,9 @@ export const FOREST_CUT: CrossroadTemplate = {
       cost: 'crossroad.forest_cut.take_the_edge.cost',
       effects: [
         { k: 'build', kind: 'field', free: true },
+        { k: 'fell', wood: 300, permanent: false },
         { k: 'stat', stat: 'wood', delta: 300 },
+        { k: 'flag', flag: 'forced_hunger', years: 1 / 48 },
       ],
       visible: [{ k: 'raise', kind: 'field' }],
       seeds: [],

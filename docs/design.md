@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.34 · 8 de septiembre de 2026, 23:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.35 · 8 de septiembre de 2026, 23:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -79,6 +79,22 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.32** | 8 sep 2026, 22:00 | Contrato de tregua de A.7 | **Construir juntos no hace que los rivales se perdonen.** Las opiniones mutuas bajan 15 en vez de subir 15; los cuatro proyectos y el ánimo común se conservan. |
 | **2.33** | 8 sep 2026, 22:30 | Contrato visible de A.13 | **El precio de despedir a los forasteros dice cuánto grano sale.** Se sustituye «It costs less» por «Sixty bushels»; la mecánica no cambia. |
 | **2.34** | 8 sep 2026, 23:00 | Contrato de A.9 | **La capilla compromete la próxima cosecha al 80 %.** El precio deja de prometer un «año magro» indefinido y nombra el quinto que se perderá en la siguiente siega. |
+| **2.35** | 8 sep 2026, 23:30 | Contrato de A.11 | **Las dos decisiones de tala modifican el bosque real.** `fell_it` extrae 900 de madera y deja claras sin rebrote; `take_the_edge` extrae 300 y fuerza una semana de hambre 0,5. |
+
+### 2.35 — Lo que sale del bosque sale del mapa
+
+§8.4 incorpora `{k:'fell', wood, permanent}` como petición al módulo M-15,
+igual que `build` y `destroy` delegan en M-14. A.11 `fell_it` tala 900 unidades
+con `permanent: true`; A.11 `take_the_edge` tala 300 con rebrote normal. La
+madera que aparece en el almacén tiene así una pérdida idéntica en el bosque.
+
+`forestAge = 254` queda reservado para una clara que no rebrota durante la vida
+de la simulación; 255 sigue significando bosque virgen. El barrido anual omite
+254 y los contadores normales saturan en 253. La tala menor añade
+`forced_hunger` durante un tick: como la decisión precede al consumo, «the
+children are hungry now» se cobra esa misma semana con severidad mínima 0,5.
+El informe semanal suma la madera de encrucijada a la tala ordinaria y el evento
+del último bosque viejo también detecta una tala decidida antes del paso 5.
 
 ### 2.34 — La madera que no guarda grano
 
@@ -2486,6 +2502,7 @@ export type Effect =
   | { k: 'flag';   flag: string; years: number }   // 0 = permanente
   | { k: 'build';  kind: BuildingKind; free: true }
   | { k: 'destroy'; kind: BuildingKind; count: number; blockYears?: number }
+  | { k: 'fell'; wood: number; permanent: boolean }
   | { k: 'harvest'; factor: number; harvests: number }
   | { k: 'outbreak'; weeks: number }
   | { k: 'opinion'; from: string; to: string; delta: number }
@@ -3130,10 +3147,11 @@ export const WORLD = {
   WOOD_PER_FOREST_TILE: 300,
   FOREST_REGROWTH_YEARS: 8,
   FOREST_REGROWTH_NEIGHBOURS: 3,
+  BARREN_CLEARING: 254,         // una tala de encrucijada no rebrota
   PATH_T1: 400, PATH_T2: 1600, PATH_T3: 6000,
   TRAFFIC_DECAY: 0.005,         // por tick
   STONE_PER_BP: 0.5,
-  VIRGIN_FOREST: 255,           // §9: marca de `forestAge` en el bosque viejo            // conversión de obra a piedra con fragua
+  VIRGIN_FOREST: 255,           // §9: marca de `forestAge` en el bosque viejo
 } as const;
 ```
 
@@ -4305,8 +4323,8 @@ todo.*
 
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
-| **Fell it** | The wood does not come back in your lifetime | `build field free` ×2, `wood +900`, `faith −10` | `scar felled_wood` + `raise field` | `bare_slopes`, 20–40 años: `flag flood_prone 0`; el clima ruinoso pasa a ser un 5 % más probable |
-| **Take only the edge** | Slower, and the children are hungry now | `build field free` ×1, `wood +300` | `raise field` | — |
+| **Fell it** | The wood does not come back in your lifetime | `fell 900 permanent`, `build field free` ×2, `wood +900`, `faith −10` | `scar felled_wood` + `raise field` | `bare_slopes`, 20–40 años: `flag flood_prone 0`; el clima ruinoso pasa a ser un 5 % más probable |
+| **Take only the edge** | Slower, and the children are hungry now | `fell 300`, `build field free` ×1, `wood +300`, `severity` mínima 0.5 una semana | `raise field` | — |
 | **Leave it standing** | {A} sleeps well; nobody else does | `morale −8`, `faith +12`, `opinion A→leader +40` | `gather ford 2` | `the_wood_holds`, 15–35 años: si `forestLeft > 0.5`, `arrive 3` y `morale +10` |
 
 ---

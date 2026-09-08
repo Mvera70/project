@@ -69,7 +69,7 @@ const at = (s: GameState, id: VillagerId): Villager =>
 
 function emptyEffects(): AppliedEffects {
   return { templateId: 'test', optionId: 'test', killed: [], left: [], arrived: [],
-    seedsPlanted: [], build: [], destroy: [], visible: [] };
+    seedsPlanted: [], build: [], destroy: [], fell: [], visible: [] };
 }
 
 /** Una aldea sin crisis ninguna: comida de sobra, líder vivo, nada en llamas. */

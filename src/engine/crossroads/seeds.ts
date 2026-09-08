@@ -59,6 +59,7 @@ export function fireSeeds(state: GameState, catalogue: Catalogue): FiredSeed[] {
       seedsPlanted: [],
       build: [],
       destroy: [],
+      fell: [],
       visible: spec === null ? [] : [...spec.visible],
     };
 

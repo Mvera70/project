@@ -100,6 +100,7 @@ export type Effect =
    * option charged was a few weeks of building work.
    */
   | { k: 'destroy'; kind: BuildingKind; count: number; blockYears?: number }
+  | { k: 'fell'; wood: number; permanent: boolean }
   /**
    * The next `harvests` reapings come in at `factor` of what they would have
    * been (§5.3, v2.25). The catalogue has asked for this since A.3 — "cosecha
@@ -187,6 +188,7 @@ export interface AppliedEffects {
   seedsPlanted: string[];
   build: BuildingKind[];
   destroy: { kind: BuildingKind; count: number; blockYears?: number }[];
+  fell: { wood: number; permanent: boolean }[];
   visible: VisualEffect[];
 }
 

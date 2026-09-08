@@ -127,6 +127,9 @@ export function applyEffect(
     case 'destroy':
       out.destroy.push({ kind: e.kind, count: e.count, ...(e.blockYears === undefined ? {} : { blockYears: e.blockYears }) });
       break;
+    case 'fell':
+      out.fell.push({ wood: e.wood, permanent: e.permanent });
+      break;
     case 'harvest':
       // The heavier promise wins if two land before a reaping, rather than
       // multiplying into something nobody wrote.
@@ -207,6 +210,7 @@ export function applyOption(
     seedsPlanted: [],
     build: [],
     destroy: [],
+    fell: [],
     visible: [...option.visible],
   };
 

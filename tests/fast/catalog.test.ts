@@ -53,6 +53,15 @@ describe('el catálogo · forma', () => {
     expect(chapel?.effects).toContainEqual({ k: 'harvest', factor: 0.8, harvests: 1 });
   });
 
+  it('las dos talas de A.11 alcanzan el mapa y la menor cobra hambre inmediata', () => {
+    const forest = CATALOG.find((t) => t.id === 'forest_cut');
+    const all = forest?.options.find((o) => o.id === 'fell_it');
+    const edge = forest?.options.find((o) => o.id === 'take_the_edge');
+    expect(all?.effects).toContainEqual({ k: 'fell', wood: 900, permanent: true });
+    expect(edge?.effects).toContainEqual({ k: 'fell', wood: 300, permanent: false });
+    expect(edge?.effects).toContainEqual({ k: 'flag', flag: 'forced_hunger', years: 1 / 48 });
+  });
+
   it('TODA opción cambia algo en pantalla', () => {
     // El principio 1 del juego convertido en aserto (§8.1). Si esto falla, hay
     // una decisión que el jugador toma y no ve.

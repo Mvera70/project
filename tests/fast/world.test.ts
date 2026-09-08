@@ -310,6 +310,21 @@ describe('el bosque · §7.5', () => {
     expect(s.map.forestStock[cell]).toBe(WORLD.WOOD_PER_FOREST_TILE);
   });
 
+  it('una tala marcada de por vida no rebrota', () => {
+    const s = foundGame(7);
+    fellForest(s, WORLD.WOOD_PER_FOREST_TILE, true);
+    const cell = [...s.map.forestAge].findIndex((age) => age === WORLD.BARREN_CLEARING);
+    expect(cell).toBeGreaterThanOrEqual(0);
+    expect(s.map.terrain[cell]).toBe(TERRAIN_CODE.cleared);
+
+    for (let year = 1; year <= 100; year += 1) {
+      s.tick = year * YEAR;
+      regrowForest(s);
+    }
+    expect(s.map.terrain[cell]).toBe(TERRAIN_CODE.cleared);
+    expect(s.map.forestAge[cell]).toBe(WORLD.BARREN_CLEARING);
+  });
+
   it('con menos de tres vecinas no rebrota nunca', () => {
     const s = foundGame(7);
     const cell = idx(4, 4);

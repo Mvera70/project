@@ -5,7 +5,7 @@
 // que cuelga todo el proyecto, y que mil ticks no revienten.
 import { describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
-import { LIFE, MIGRATION, PEOPLE, TIME } from '@engine/balance';
+import { LIFE, MIGRATION, PEOPLE, TIME, WORLD } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { isHere, population, resolveMigration } from '@engine/people/demography';
@@ -14,6 +14,7 @@ import { holderOf } from '@engine/crossroads/conditions';
 import { decide, fillVacancies, run, tick } from '@engine/sim';
 import type { GameState, Villager } from '@engine/state';
 import type { CrossroadTemplate } from '@engine/crossroads/schema';
+import { forestCells, woodStanding } from '@engine/world/forest';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
 
@@ -237,6 +238,28 @@ describe('el orden del tick · §4.2', () => {
     expect(log).not.toHaveBeenCalled();
     expect(err).not.toHaveBeenCalled();
     vi.restoreAllMocks();
+  });
+
+  it('una tala decidida modifica el bosque y aparece en el informe semanal', () => {
+    const s = foundGame(7);
+    const forest = CATALOG.find((t) => t.id === 'forest_cut') as CrossroadTemplate;
+    const woodward = s.people.villagers.find((v) => v.role === 'woodward') as Villager;
+    s.crossroad = {
+      templateId: forest.id,
+      posedTick: s.tick,
+      cast: { A: woodward.id },
+      optionIds: forest.options.map((o) => o.id),
+    };
+    const beforeWood = woodStanding(s);
+    const beforeCells = forestCells(s);
+
+    const report = tick(s, CATALOG, { templateId: forest.id, optionId: 'fell_it' });
+
+    expect(beforeWood - woodStanding(s)).toBeGreaterThanOrEqual(900);
+    expect(forestCells(s)).toBeLessThan(beforeCells);
+    expect(report.felled).toBeGreaterThanOrEqual(900);
+    expect([...s.map.forestAge].filter((age) => age === WORLD.BARREN_CLEARING).length)
+      .toBeGreaterThanOrEqual(3);
   });
 });
 

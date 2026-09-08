@@ -438,6 +438,8 @@ export function tick(
   }
   let arrived = 0;
   let left = 0;
+  let crossroadFelled = 0;
+  const oldWoodStoodAtStart = state.flags['old_forest_gone'] === undefined;
   if (weekOf(state.tick) === 0) {
     state.weather = rollWeather(state);
 
@@ -514,6 +516,7 @@ export function tick(
         });
       }
       carryOutBuildings(state, decided, say);
+      crossroadFelled += carryOutForest(state, decided);
 
       // Annex A.15, v2.22: `no_one` answered three times running, with no
       // leader appointed between them, and the valley gives up rather than
@@ -557,6 +560,7 @@ export function tick(
         });
       }
       carryOutBuildings(state, seed.effects, say);
+      crossroadFelled += carryOutForest(state, seed.effects);
     }
   }
 
@@ -565,11 +569,10 @@ export function tick(
   // says how much it actually got, which is §5.2's `woodCap`: a valley that has
   // been cut flat stops producing timber instead of producing it out of air.
   const allocation = allocateLabour(state);
-  const oldWoodStood = state.flags['old_forest_gone'] === undefined;
   const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER);
   const produced = produce(state, allocation, felled);
   // §9, v2.16: the one thing about the forest that is an event and not a state.
-  if (oldWoodStood && state.flags['old_forest_gone'] !== undefined) {
+  if (oldWoodStoodAtStart && state.flags['old_forest_gone'] !== undefined) {
     say({
       kind: 'lost',
       templateKey: 'forest.old_gone',
@@ -772,7 +775,7 @@ export function tick(
     buildPoints: produced.buildPoints,
     built,
     wood: produced.wood,
-    felled,
+    felled: felled + crossroadFelled,
     paths,
     harvested: reaped.yielded,
     spoiled,
@@ -815,6 +818,15 @@ function carryOutBuildings(
       });
     }
   }
+}
+
+/** §8.4's explicit removal of standing timber, using M-15's map rules. */
+function carryOutForest(state: GameState, applied: AppliedEffects): number {
+  let total = 0;
+  for (const request of applied.fell) {
+    total += fellForest(state, request.wood, request.permanent);
+  }
+  return total;
 }
 
 /**

@@ -220,7 +220,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
       shock = structuredClone(state);
       result.shocked = true;
       applyEffect(shock, {}, { k: 'kill', who: 'random', count: 'fraction', fraction: 0.9 },
-        { templateId: 'balance_shock', optionId: 'shock', killed: [], left: [], arrived: [], seedsPlanted: [], build: [], destroy: [], visible: [] });
+        { templateId: 'balance_shock', optionId: 'shock', killed: [], left: [], arrived: [], seedsPlanted: [], build: [], destroy: [], fell: [], visible: [] });
       samples.push(sample(shock, policy, 'shock'));
     }
   }

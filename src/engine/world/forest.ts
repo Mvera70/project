@@ -76,7 +76,7 @@ export function forestCells(state: GameState): number {
  * shortfall is what caps §5.2's wood: a village that has cut everything down
  * does not keep producing timber out of nothing.
  */
-export function fellForest(state: GameState, wood: number): number {
+export function fellForest(state: GameState, wood: number, permanent = false): number {
   if (wood <= 0) return 0;
   const centre = core(state);
 
@@ -114,7 +114,7 @@ export function fellForest(state: GameState, wood: number): number {
     if (state.map.forestStock[cell] === 0) {
       const wasOld = state.map.forestAge[cell] === WORLD.VIRGIN_FOREST;
       state.map.terrain[cell] = TERRAIN_CODE.cleared;
-      state.map.forestAge[cell] = 0;
+      state.map.forestAge[cell] = permanent ? WORLD.BARREN_CLEARING : 0;
       cleared = true;
       FELL_TARGET.delete(state);
       // The last of the old wood. Counting the whole map is only worth doing
@@ -164,10 +164,11 @@ export function regrowForest(state: GameState): void {
   let grew = false;
   for (let i = 0; i < state.map.terrain.length; i += 1) {
     if (before[i] !== TERRAIN_CODE.cleared) continue;
+    if (state.map.forestAge[i] === WORLD.BARREN_CLEARING) continue;
     // Saturating, not stopping: a cell that waited two and a half centuries for
     // a third forest neighbour is still allowed to get one.
     state.map.forestAge[i] = Math.min(
-      WORLD.VIRGIN_FOREST - 1,
+      WORLD.BARREN_CLEARING - 1,
       (state.map.forestAge[i] as number) + 1,
     );
     if ((state.map.forestAge[i] as number) < WORLD.FOREST_REGROWTH_YEARS) continue;

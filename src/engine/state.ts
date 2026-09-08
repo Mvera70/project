@@ -189,7 +189,7 @@ export interface ValleyMap {
   traffic: Uint16Array; // accumulated wear per cell
   path: Uint8Array; // 0 none, 1 trodden, 2 track, 3 road
   ruins: Uint8Array; // 0 none, 1 ruin; permanent
-  forestAge: Uint8Array; // years since felling, for the regrowth
+  forestAge: Uint8Array; // years since felling; 254 barren, 255 virgin forest
   /**
    * Wood left in each forest cell, out of WORLD.WOOD_PER_FOREST_TILE (§7.5).
    *

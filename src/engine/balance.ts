@@ -248,6 +248,7 @@ export const WORLD = {
   WOOD_PER_FOREST_TILE: 300,
   FOREST_REGROWTH_YEARS: 8,
   FOREST_REGROWTH_NEIGHBOURS: 3,
+  BARREN_CLEARING: 254, // a crossroad felled it for a lifetime (§A.11)
   PATH_T1: 400,
   PATH_T2: 1600,
   PATH_T3: 6000,

@@ -36,6 +36,7 @@ import { advanceWorks } from '@engine/world/works';
 import { selectCrossroad } from '@engine/crossroads/select';
 import { applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds } from '@engine/crossroads/seeds';
+import { fellForest } from '@engine/world/forest';
 
 const CELLS = 36 * 56;
 const YEAR = TIME.WEEKS_PER_YEAR;
@@ -92,6 +93,7 @@ function carryOut(s: GameState, applied: AppliedEffects): void {
       b.lostTick = s.tick;
     }
   }
+  for (const request of applied.fell) fellForest(s, request.wood, request.permanent);
 }
 
 /** El tick de §4.2, con los pasos que existen. Política neutra. */
