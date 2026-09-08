@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.20 · 8 de septiembre de 2026, 13:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.21 · 8 de septiembre de 2026, 14:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -49,6 +49,41 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.18** | 8 sep 2026, 12:30 | Expiración de la peste | **Un brote dura 6–10 semanas también para el ánimo y para la siguiente tirada anual.** Un objeto `outbreak` vencido se estaba tratando como peste perpetua: hundía el ánimo hasta el suelo de fe e impedía cualquier brote posterior. |
 | **2.19** | 8 sep 2026, 13:00 | Rendimiento de M-12 | **Los caminos dejan de recorrer 2.016 celdas inertes cada semana.** Un conjunto derivado conserva solo celdas con tráfico o camino; no forma parte del estado ni del guardado y mantiene el orden observable de los eventos. |
 | **2.20** | 8 sep 2026, 13:30 | Rendimiento de M-14 | **Un fracaso de colocación se recuerda mientras sus causas sigan iguales y cada búsqueda construye una sola máscara de ocupación.** El banco vuelve a entrar en diez minutos sin perder observaciones. |
+| **2.21** | 8 sep 2026, 14:00 | Atribución de política | **La brecha adversa se mide por opción tomada.** Antes de cambiar A.15 se separa la repetición de `succession:no_one` del resto de decisiones de `last` y `worst`. |
+
+### 2.21 — Qué elige realmente la política adversa
+
+El banco dice que `last` y `worst` crecen menos, pero no terminan mucho más que
+`prudent`. También dice que `succession` domina su elegibilidad y su cadencia.
+Eso no basta para tocar la plantilla: la elegibilidad mide cuánto tiempo puede
+salir una pregunta, no cuántas veces se eligió cada respuesta ni qué otras
+opciones separan las políticas.
+
+**Medición.** `npm run policy:attribution` corre `prudent`, `last` y `worst`
+sobre 60 semillas × 200 años. Cuenta cada par plantilla–opción, cuántas partidas
+lo vieron y cuántas decisiones y sucesiones hubo por generación. No cambia el
+catálogo ni introduce umbrales.
+
+**Hipótesis falsable.** Si casi toda la cadencia adicional es
+`succession:no_one` y la política adversa apenas toma opciones con muertes o
+destrucción diferida, A.15 está absorbiendo el presupuesto de decisiones sin
+convertir la obstinación en riesgo terminal. Si las decisiones destructivas ya
+son frecuentes, el fallo está en su magnitud o en la recuperación posterior.
+
+**Resultado: hipótesis confirmada.** Sobre las 60 semillas, `prudent` toma 2.249
+decisiones: 705 son sucesiones y en todas nombra a A. `last` toma 3.517 y
+`worst` 3.519; respectivamente 3.269 y 3.275 son `succession:no_one`, en las 60
+partidas. La negativa ocupa aproximadamente el 93 % de todo su historial y se
+repite unas 54,5 veces por valle, frente a 11,75 sucesiones resueltas por valle
+con `prudent`. Solo quedan 248 y 244 decisiones adversas para el resto del
+catálogo. A.15 no está haciendo más variada ni más peligrosa la mala política:
+está desplazando casi todas sus demás oportunidades de hacer daño.
+
+**Siguiente experimento.** Al vencer `the_leaderless_years`, A toma el cargo en
+la rama experimental. No se añaden muertes ni se cambia la respuesta inicial:
+se aísla únicamente si cerrar la vacante tras pagar los 2–4 años de desgobierno
+devuelve variedad, cadencia y riesgo a la política adversa. El cambio no se hace
+permanente hasta medirlo.
 
 ### 2.20 — El solar que no aparece por insistir
 
