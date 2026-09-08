@@ -4,7 +4,6 @@
 // partidas guardadas. Lo que se protege aquí es ese orden, el determinismo del
 // que cuelga todo el proyecto, y que mil ticks no revienten.
 import { describe, expect, it, vi } from 'vitest';
-import { createHash } from 'node:crypto';
 import { LIFE, MIGRATION, PEOPLE, TIME, WORLD } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
@@ -15,47 +14,9 @@ import { decide, fillVacancies, run, tick } from '@engine/sim';
 import type { GameState, Villager } from '@engine/state';
 import type { CrossroadTemplate } from '@engine/crossroads/schema';
 import { forestCells, woodStanding } from '@engine/world/forest';
+import { fingerprint } from '../helpers/fingerprint';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
-
-/**
- * Hash every state field, including typed map arrays, works and pending choices.
- *
- * Fed to the digest in pieces rather than as one `JSON.stringify(s)`. A village
- * that survives five thousand ticks carries thousands of chronicle entries and
- * hundreds of villagers with their memories, and the five map layers stringify
- * as objects with two thousand numeric keys each: the single string was large
- * enough to take the vitest worker down when two of them existed at once.
- * Streaming covers exactly the same bytes without ever holding them all.
- */
-function fingerprint(s: GameState): string {
-  const h = createHash('sha256');
-  const bytes = (a: Uint8Array | Uint16Array): void => {
-    h.update(Buffer.from(a.buffer, a.byteOffset, a.byteLength));
-  };
-  h.update(`${s.version}|${s.seed}|${s.tick}|${s.map.width}x${s.map.height}`);
-  bytes(s.map.terrain);
-  bytes(s.map.traffic);
-  bytes(s.map.path);
-  bytes(s.map.ruins);
-  bytes(s.map.forestAge);
-  h.update(JSON.stringify(s.rng));
-  h.update(JSON.stringify(s.village));
-  h.update(JSON.stringify(s.weather));
-  h.update(JSON.stringify(s.outbreak));
-  h.update(JSON.stringify(s.ended));
-  h.update(JSON.stringify(s.flags));
-  h.update(JSON.stringify(s.crossroad));
-  h.update(JSON.stringify(s.works));
-  h.update(JSON.stringify(s.people.namedIds));
-  for (const v of s.people.villagers) h.update(JSON.stringify(v));
-  for (const g of s.people.grudges) h.update(JSON.stringify(g));
-  for (const b of s.buildings) h.update(JSON.stringify(b));
-  for (const e of s.chronicle) h.update(JSON.stringify(e));
-  for (const d of s.history) h.update(JSON.stringify(d));
-  for (const seed of s.seeds) h.update(JSON.stringify(seed));
-  return h.digest('hex');
-}
 
 describe('la fundación', () => {
   it('empieza como manda §12.2', () => {
@@ -328,6 +289,60 @@ describe('el orden del tick · §4.2', () => {
     const standing = s.buildings.filter((b) => b.lostTick === null);
     const coreX = standing.reduce((sum, b) => sum + b.x + b.w / 2, 0) / standing.length;
     const coreY = standing.reduce((sum, b) => sum + b.y + b.h / 2, 0) / standing.length;
+    expect(placed?.x).toBeCloseTo(coreX);
+    expect(placed?.y).toBeCloseTo(coreY);
+  });
+
+  it("douse con 'who' apaga el edificio de esa persona, no una casa cualquiera (§11.5, v2.62)", () => {
+    const s = foundGame(7);
+    // Cuatro casas en pie con inquilinos distintos: sin `who`, `douse kind
+    // house` no podría saber cuál — es justo lo que A.7 prometía y no cumplía.
+    expect(s.buildings.filter((b) => b.kind === 'house' && b.lostTick === null).length).toBeGreaterThan(1);
+    const a = s.people.villagers.find((v) => v.role === 'leader') as Villager; // home 2
+    const b = s.people.villagers.find((v) => v.role === 'smith') as Villager; // home 1
+    expect(a.homeId).not.toBe(b.homeId);
+    const bHome = s.buildings.find((building) => building.id === b.homeId)!;
+
+    const template = CATALOG.find((t) => t.id === 'smith_feud') as CrossroadTemplate;
+    s.crossroad = {
+      templateId: template.id,
+      posedTick: s.tick,
+      cast: { A: a.id, B: b.id },
+      optionIds: template.options.map((o) => o.id),
+    };
+
+    // side_with_a: {B} withdraws, y el efecto visible es "douse del edificio
+    // de B" (Anexo A.7) — la casa de b, no la de a ni ninguna otra.
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'side_with_a' });
+    expect(report.visualEffects).toEqual([{ effect: { k: 'douse', kind: 'house', who: 'B' }, x: expect.any(Number), y: expect.any(Number) }]);
+    const [placed] = report.visualEffects;
+    expect(placed?.x).toBeCloseTo(bHome.x + bHome.w / 2);
+    expect(placed?.y).toBeCloseTo(bHome.y + bHome.h / 2);
+  });
+
+  it("douse con 'who' cae en el centro de la aldea si la persona no tiene casa en pie", () => {
+    const s = foundGame(7);
+    const a = s.people.villagers.find((v) => v.role === 'leader') as Villager;
+    const b = s.people.villagers.find((v) => v.role === 'smith') as Villager;
+    b.homeId = null; // homeless: no hay edificio suyo que localizar
+
+    const template = CATALOG.find((t) => t.id === 'smith_feud') as CrossroadTemplate;
+    s.crossroad = {
+      templateId: template.id,
+      posedTick: s.tick,
+      cast: { A: a.id, B: b.id },
+      optionIds: template.options.map((o) => o.id),
+    };
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'side_with_a' });
+    const [placed] = report.visualEffects;
+
+    // Sin casa que resolver, y con más de una en pie, cae al centro — no a una
+    // casa cualquiera elegida por casualidad de orden.
+    const standing = s.buildings.filter((building) => building.kind === 'house' && building.lostTick === null);
+    expect(standing.length).toBeGreaterThan(1);
+    const allStanding = s.buildings.filter((building) => building.lostTick === null);
+    const coreX = allStanding.reduce((sum, building) => sum + building.x + building.w / 2, 0) / allStanding.length;
+    const coreY = allStanding.reduce((sum, building) => sum + building.y + building.h / 2, 0) / allStanding.length;
     expect(placed?.x).toBeCloseTo(coreX);
     expect(placed?.y).toBeCloseTo(coreY);
   });

@@ -42,7 +42,8 @@ export const SMITH_FEUD: CrossroadTemplate = {
         { k: 'flag', flag: 'works_slowed_85', years: 4 },
         { k: 'memory', who: 'B', kind: 'was_blamed', about: 'A', weight: 4 },
       ],
-      visible: [{ k: 'douse', kind: 'smithy' }],
+      // A.7's own screen column: "douse del edificio de B", not any smithy.
+      visible: [{ k: 'douse', kind: 'house', who: 'B' }],
       seeds: [
         {
           id: 'the_withdrawn',
@@ -67,7 +68,8 @@ export const SMITH_FEUD: CrossroadTemplate = {
         { k: 'flag', flag: 'works_slowed_85', years: 4 },
         { k: 'memory', who: 'A', kind: 'was_blamed', about: 'B', weight: 4 },
       ],
-      visible: [{ k: 'douse', kind: 'smithy' }],
+      // Symmetric to side_with_a: "douse del edificio de A".
+      visible: [{ k: 'douse', kind: 'house', who: 'A' }],
       seeds: [
         {
           id: 'the_withdrawn_other',

@@ -302,6 +302,14 @@ describe('render', () => {
       // Las letras del reparto: es lo que produce namesOf (§8.3).
       A: 'Aelric',
       B: 'Wulfrun',
+      // El parte de bienvenida (§9.2, M-23): sus propias cifras.
+      weeks: 960,
+      born: 3,
+      died: 2,
+      arrived: 1,
+      left: 0,
+      built: 2,
+      lost: 1,
     };
     const keys = bankKeys();
     let rendered = 0;
@@ -348,6 +356,7 @@ describe('render', () => {
       name: 'Mildreth', other: 'Osric', age: 44, year: 17, season: 'autumn',
       count: 3, grain: 1224, people: 31, building: 'mill', sinceYear: 5, years: 12,
       A: 'Aelric', B: 'Wulfrun',
+      weeks: 960, born: 3, died: 2, arrived: 1, left: 0, built: 2, lost: 1,
     };
     for (const key of bankKeys()) {
       for (let tick = 0; tick < 12; tick += 1) {

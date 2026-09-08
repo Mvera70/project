@@ -1,17 +1,23 @@
 // M-20 · The first running application shell.
 
+import { TIME } from '@engine/balance';
+import { welcomeDigest } from '@engine/chronicle/digest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
+import { serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
-import type { Decision, GameState, SaveFile } from '@engine/state';
+import type { ArchivedGame, Decision, GameState, SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
 import { createRenderer } from '@render/renderer';
+import { persistSave } from './idb';
 import { inspectAt, panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
-import { startLoop } from './loop';
+import { runLethargy } from './lethargy';
+import { startLoop, type Loop } from './loop';
 import { openChronicle } from './screens/chronicle';
 import { openCrossroad } from './screens/crossroad';
 import { isSpeed, speedLabel, type Speed } from './speed';
+import { openWelcome } from './welcome';
 
 export interface App {
   setSpeed(speed: Speed): void;
@@ -66,6 +72,7 @@ function freshSeed(): number {
 
 export function boot(root: HTMLElement, save?: SaveFile): App {
   const state = save?.state ?? foundGame(freshSeed());
+  const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
   let lastFraction = 0;
   root.replaceChildren();
@@ -156,6 +163,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   });
   root.addEventListener('pointerdown', (event) => { if (event.target === root) panel.hidden = true; });
 
+  // §13.1: a snapshot and the decision log, every 20 ticks and whenever the
+  // tab is hidden. `archive` only ever changes on extinction (§13.3), out of
+  // this round's scope, so it is carried through unchanged.
+  const persist = (): void => {
+    void persistSave(serialize(state, state.history, archive, Date.now()));
+  };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+
   // The queue behind `decide` (v2.60). `runTick` is the one and only place a
   // queued decision is ever spent: it hands it to `tick`, which applies it at
   // step 3 (§4.2) and nowhere earlier. Consuming it here — not inside
@@ -174,9 +189,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     if (report.decided !== null) {
       document.dispatchEvent(new CustomEvent<TickReport>('valley:decided', { detail: report }));
     }
+    if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
-  const loop = startLoop(() => speed, runTick, paint);
-  window.addEventListener('pagehide', () => loop.stop(), { once: true });
+  let loop: Loop | undefined;
+  const beginLoop = (): void => {
+    loop = startLoop(() => speed, runTick, paint);
+    window.addEventListener('pagehide', () => loop?.stop(), { once: true });
+  };
 
   const app: App = {
     setSpeed(value: Speed): void {
@@ -196,5 +215,31 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   app.setSpeed(speed);
   paint(0);
   document.documentElement.dataset.appReady = 'true';
+
+  const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs) : 0;
+  if (save !== undefined && owed > 0) {
+    // §13.2: the absence is made up in batches *before* the interactive loop
+    // starts — the normal loop and the catch-up must never tick the same
+    // state at once. `paint` after every batch is the "progress screen":
+    // the valley is what fills in, not a bar standing in for it.
+    //
+    // Gated on `owed > 0`, not just on there being a save: a save reloaded
+    // moments after it was written (or the debug route's own synthetic one,
+    // stamped `Date.now()` at boot) owes zero ticks, and a "welcome back,
+    // nothing happened" screen over every debug route would be worse than
+    // the screen it is supposed to replace.
+    const elapsedMs = Date.now() - save.savedAtMs;
+    const sinceTick = state.tick;
+    runLethargy(state, elapsedMs, (progress) => {
+      paint(0);
+      if (progress.done >= progress.total || progress.ended) {
+        openWelcome(app, welcomeDigest(state, sinceTick));
+        beginLoop();
+      }
+    });
+  } else {
+    beginLoop();
+  }
+
   return app;
 }

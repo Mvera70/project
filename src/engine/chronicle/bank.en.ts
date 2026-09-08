@@ -1297,6 +1297,23 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'In year {year} the valley spent a good year on itself.',
     '{A} opened the granary in year {year}, and nobody counted for a season.',
   ],
+
+  // --- M-23 · welcome digest, design.md §9.2, §13.2 ---
+  'welcome.time': [
+    '{weeks} weeks passed.',
+    'It has been {weeks} weeks.',
+    '{weeks} weeks, and nobody was watching.',
+  ],
+  'welcome.people': [
+    '{people} people now. {born} born, {died} died, {arrived} arrived, {left} left.',
+    '{people} in the valley now — {born} born, {died} died, {arrived} arrived, {left} left since.',
+    'The valley counts {people} now: {born} born, {died} died, {arrived} arrived, {left} left.',
+  ],
+  'welcome.buildings': [
+    '{built} raised, {lost} lost.',
+    '{built} went up, {lost} came down.',
+    'Building: {built} raised, {lost} lost.',
+  ],
 };
 
 for (const [key, variants] of Object.entries(CROSSROAD_CHRONICLE)) BANK[key] = variants;

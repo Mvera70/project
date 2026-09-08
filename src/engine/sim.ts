@@ -28,6 +28,7 @@ import type {
   Role,
   TickContext,
   Villager,
+  VillagerId,
 } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
@@ -429,18 +430,35 @@ function centreOf(b: { x: number; y: number; w: number; h: number }): { x: numbe
   return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
 }
 
+/** The building this cast letter calls home, standing, if there is one. */
+function homeOf(
+  state: GameState,
+  cast: Record<string, VillagerId> | undefined,
+  who: string,
+): Building | null {
+  const id = cast?.[who];
+  if (id === undefined) return null;
+  const villager = state.people.villagers.find((v) => v.id === id);
+  if (villager === undefined || villager.homeId === null) return null;
+  const home = state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
+  return home ?? null;
+}
+
 /**
  * Where a `VisualEffect` just applied actually happened (§2.60, §17 M-22).
  * Reads the state *after* `carryOutBuildings`/`carryOutForest` ran this tick,
  * so a fresh work-in-progress or a fresh ruin is found by "did this change on
- * `state.tick`", never by guessing which building an option meant.
+ * `state.tick`", never by guessing which building an option meant. `cast` is
+ * the pending crossroad's own — captured before `applyOption` clears it — so
+ * `douse ... who` can resolve to whichever letter it names (§8.1, §11.5,
+ * v2.62): A.7 promised "B's building", and a kind alone cannot say which one.
  *
- * Three cases have nothing to point at, and all three fall back to
- * `valleyCore` rather than inventing a cell:
+ * Three cases still have nothing to point at, and fall back to `valleyCore`
+ * rather than inventing a cell:
  *
- *   - `douse`/`gather:'chapel'` on a kind the village has more than one of
- *     standing (in the catalogue today, only `house` does) — the effect names
- *     a kind, never an instance, so which one is not knowable from here.
+ *   - `douse`/`gather:'chapel'` without a `who` that resolves, on a kind the
+ *     village has more than one of standing — the effect names a kind, never
+ *     an instance, so which one is not knowable from here.
  *   - `gather:'ford'` — the ford only ever existed in the chronicle's prose
  *     ("up the ford road"); the map has never had one.
  *   - `scar:'felled_wood'` — `fellForest` (`world/forest.ts`) does pick a real
@@ -448,7 +466,11 @@ function centreOf(b: { x: number; y: number; w: number; h: number }): { x: numbe
  *     change.
  *   - `banner` — schema.ts's own comment settles it: "a banner over the core".
  */
-function locate(state: GameState, effect: VisualEffect): { x: number; y: number } {
+function locate(
+  state: GameState,
+  effect: VisualEffect,
+  cast: Record<string, VillagerId> | undefined,
+): { x: number; y: number } {
   switch (effect.k) {
     case 'raise': {
       const work = state.works.find((w) => w.kind === effect.kind && w.startedTick === state.tick);
@@ -459,6 +481,8 @@ function locate(state: GameState, effect: VisualEffect): { x: number; y: number 
       return ruin !== undefined ? centreOf(ruin) : valleyCore(state);
     }
     case 'douse': {
+      const home = effect.who !== undefined ? homeOf(state, cast, effect.who) : null;
+      if (home !== null) return centreOf(home);
       const building = theStanding(state, effect.kind);
       return building !== null ? centreOf(building) : valleyCore(state);
     }
@@ -610,6 +634,9 @@ export function tick(
   let decided: AppliedEffects | null = null;
   let visualEffects: PositionedVisualEffect[] = [];
   if (decision !== undefined && state.crossroad?.templateId === decision.templateId) {
+    // §11.5, v2.62: `applyOption` clears `state.crossroad` before it returns,
+    // so the cast has to be read now or `douse ... who` has nothing to resolve.
+    const cast = state.crossroad.cast;
     decided = captureEntries(() => applyOption(state, decision.optionId, catalogue));
     if (decided !== null) {
       reportVictims(decided.killed);
@@ -628,7 +655,7 @@ export function tick(
       // says what changed and where. Placed here and not earlier because a
       // `raise`/`ruin` needs the work opened or the building actually lost —
       // both just happened, two lines up.
-      visualEffects = decided.visible.map((effect) => ({ effect, ...locate(state, effect) }));
+      visualEffects = decided.visible.map((effect) => ({ effect, ...locate(state, effect, cast) }));
 
       // Annex A.15, v2.22: `no_one` answered three times running, with no
       // leader appointed between them, and the valley gives up rather than
