@@ -69,6 +69,20 @@ describe('el catálogo · forma', () => {
     expect(wall?.effects).toContainEqual({ k: 'flag', flag: 'cold_houses', years: 20 });
   });
 
+  it('ninguna bandera escrita por el catálogo carece de lector', () => {
+    const read = new Set([
+      'a_name_in_the_valley', 'behind_the_wall', 'cold_houses', 'feud_ripe',
+      'flood_prone', 'forced_hunger', 'hostile', 'proud', 'stone_house_unlocked',
+      'threatened', 'vassal', 'wall_unlocked', 'watched', 'works_slowed_40',
+      'works_slowed_80', 'works_slowed_85',
+    ]);
+    const written = CATALOG.flatMap((template) => template.options).flatMap((option) => [
+      ...option.effects,
+      ...option.seeds.flatMap((seed) => seed.effects),
+    ]).filter((effect) => effect.k === 'flag').map((effect) => effect.flag);
+    expect([...new Set(written)].filter((flag) => !read.has(flag))).toEqual([]);
+  });
+
   it('TODA opción cambia algo en pantalla', () => {
     // El principio 1 del juego convertido en aserto (§8.1). Si esto falla, hay
     // una decisión que el jugador toma y no ve.

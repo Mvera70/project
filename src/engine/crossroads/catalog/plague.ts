@@ -57,7 +57,6 @@ export const PLAGUE_PIT: CrossroadTemplate = {
           effects: [
             { k: 'stat', stat: 'faith', delta: -10 },
             { k: 'stat', stat: 'morale', delta: -8 },
-            { k: 'flag', flag: 'unconsecrated', years: 0 },
           ],
           visible: [{ k: 'gather', where: 'chapel', days: 2 }],
           chronicleKey: 'consequence.unquiet_ground',
@@ -82,7 +81,7 @@ export const PLAGUE_PIT: CrossroadTemplate = {
         {
           id: 'the_burnt_row',
           delayYears: [3, 10],
-          effects: [{ k: 'flag', flag: 'burnt_row', years: 0 }],
+          effects: [],
           visible: [{ k: 'scar', what: 'burnt_field' }],
           chronicleKey: 'consequence.the_burnt_row',
         },

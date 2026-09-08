@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.40 · 9 de septiembre de 2026, 01:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.41 · 9 de septiembre de 2026, 02:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -85,6 +85,20 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.38** | 9 sep 2026, 00:45 | Consecuencia de A.16 | **Vivir tras la muralla reduce, pero no elimina, la presión exterior.** `behind_the_wall` multiplica por 0,4 el peso de las plantillas `lord` y `stranger`. |
 | **2.39** | 9 sep 2026, 01:05 | Consecuencia de A.14 | **La reputación ganada frente a los bandidos reduce a la mitad el peso del señor.** `a_name_in_the_valley` se acumula con `behind_the_wall` sin saltarse elegibilidad ni crisis. |
 | **2.40** | 9 sep 2026, 01:30 | Consecuencia de A.7 | **Quien se retira acaba dejando el valle con dos acompañantes.** `leave` admite una cuenta aleatoria anónima; `the_withdrawn` marca tres marchas y deja de convertir una retirada en muerte. |
+| **2.41** | 9 sep 2026, 02:00 | Cierre de deuda de banderas | **El catálogo ya no escribe ninguna bandera sin lector.** Se retiran `unconsecrated`, para la que nunca existió plantilla, y `burnt_row`, sustituida por el bloqueo temporal de ruinas de v2.25. |
+
+### 2.41 — Ninguna bandera muda
+
+Tras conectar hambre, trabajo, disputas, clima, reputación y piedra, solo dos
+banderas del inventario de v2.25 seguían sin lector. `burnt_row` era redundante:
+las casas quemadas ya llevan `blockedUntil` y la semilla conserva su entrada y
+su cicatriz visual. `unconsecrated` prometía abrir una plantilla que no forma
+parte de las dieciséis del Anexo A; `unquiet_ground` conserva los costes reales
+de fe y ánimo y su entrada de crónica, sin dejar estado perpetuo ficticio.
+
+La prueba de forma enumera las banderas con lector y recorre efectos inmediatos
+y diferidos del catálogo. Cualquier nombre nuevo falla hasta que su módulo
+consumidor exista.
 
 ### 2.40 — La retirada termina en el camino
 
@@ -4280,8 +4294,8 @@ todo.*
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
 | **Bless them** | The sickness has more days to work | `faith +18`, `morale +6`, brote +3 semanas | `build grave_yard free` | — |
-| **The pit** | No one will forget who chose it | `faith −20`, brote −3 semanas, `opinion A→leader −40` | `scar grave_row` | `unquiet_ground`, 6–18 años: `faith −10`, `morale −8`, plantilla `unconsecrated` habilitada |
-| **Burn the houses of the dead** | Roofs for ash | `destroy house 2`, brote −4 semanas, `morale −14` | `ruin house` ×2 | `the_burnt_row`, 3–10 años: las ruinas no se reconstruyen; entrada de crónica |
+| **The pit** | No one will forget who chose it | `faith −20`, brote −3 semanas, `opinion A→leader −40` | `scar grave_row` | `unquiet_ground`, 6–18 años: `faith −10`, `morale −8` |
+| **Burn the houses of the dead** | Roofs for ash | `destroy house 2` con suelo bloqueado 20 años, brote −4 semanas, `morale −14` | `ruin house` ×2 | `the_burnt_row`, 3–10 años: entrada de crónica y cicatriz |
 
 ---
 
