@@ -5,6 +5,7 @@ import { clockOf } from '@engine/time';
 import { cellFor, paintVillageBackground, sizeCanvas } from './canvas';
 import { crowdPositions } from './crowd';
 import { paintFigures, paintFigureShadows } from './layers/figures';
+import { paintTells, tellsFor } from './layers/tells';
 import { paletteFor, type Palette } from './palette';
 
 function hashBytes(seed: number, bytes: ArrayLike<number>): number {
@@ -54,6 +55,7 @@ export function createRenderer(canvas: HTMLCanvasElement, viewport: HTMLElement)
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
       ctx.clearRect(0, 0, 36 * cell, 56 * cell);
       ctx.drawImage(background, 0, 0);
+      paintTells(ctx, tellsFor(state), palette, cell, tickFraction);
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const figures = crowdPositions(state, reduced ? 0.45 : tickFraction);
       paintFigureShadows(ctx, figures, cell);
@@ -61,4 +63,3 @@ export function createRenderer(canvas: HTMLCanvasElement, viewport: HTMLElement)
     },
   };
 }
-
