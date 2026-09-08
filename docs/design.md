@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.59 · 10 de septiembre de 2026, 07:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.61 · 10 de septiembre de 2026, 12:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,8 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.61** | 10 sep 2026, 12:40 | M-22 · hito 2 | **La encrucijada está en pantalla y decidir cambia el valle.** El precio de las tres opciones se lee sin desplazar a 390 px reales. Sin coordenada natural: `douse` sobre una clase con más de una en pie, `gather ford` y `scar felled_wood` — los tres caen al centro de la aldea, igual que el estandarte. |
+| **2.60** | 10 sep 2026, 09:15 | Contrato de decisión de M-22 | **`App.decide` encola; el paso 3 del tick aplica.** La interfaz nunca llama a `applyOption`. Encolar fuerza el tick siguiente para que el toque no se sienta roto, y el motor devuelve qué cambió y dónde — nunca adónde mirar. |
 | **2.59** | 10 sep 2026, 07:00 | M-21 · HUD diegético y fichas | **Las cifras ya viven detrás del valle.** Tocar abre la ficha exacta, mantener sigue a un nombrado, pellizcar amplía y los deslizamientos navegan. Luces, humo, reserva, velas, cruces y ritmo de trabajo traducen el estado sin mutarlo. |
 | **2.58** | 10 sep 2026, 06:30 | M-21a · contrato del HUD | **Una figura móvil se inspecciona donde se dibuja.** `inspectAt` admite la fracción visual sin romper su llamada de tres argumentos. Las señales de §11.1 reciben escalas deterministas y los seis gestos, umbrales táctiles explícitos. |
 | **2.57** | 10 sep 2026, 06:00 | Puerta de movimiento de M-18 | **La multitud supera sus veinte segundos.** Una ruta viva determinista abre un valle de 80 habitantes; el GIF muestra salida, trabajo, regreso, noche vacía y nuevo ciclo sin perder figuras ni convertirlas en ruido. §14.3 queda cerrada. |
@@ -104,6 +106,75 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.61 — El hito 2: la encrucijada en pantalla
+
+M-22 estaba escrito sobre el contrato de v2.60 y sobre un supuesto que no
+estaba escrito en ningún sitio: que un `VisualEffect` siempre tiene dónde
+señalar. No es así, y la lista completa importa más que el código:
+
+- **`raise`/`ruin`** se localizan solos: la obra que `requestBuild` acaba de
+  abrir, o el edificio que acaba de perder `lostTick` este mismo tick — ambos
+  ya existen en el estado cuando el paso 3 termina de aplicar la opción.
+- **`douse`** encuentra el único edificio en pie de esa clase — salvo que haya
+  más de uno. Hoy solo `house` tiene ese problema (`chapel`, `smithy`, `mill`
+  son singulares en la práctica); no hay forma de saber CUÁL casa desde el
+  efecto, que solo nombra la clase.
+- **`gather where:'ford'`** nunca tuvo una celda: el vado es atrezzo de la
+  crónica («up the ford road»), nunca una coordenada del mapa.
+- **`scar what:'felled_wood'`**: `fellForest` sí elige una celda real, pero
+  devuelve solo un total de madera, y `world/forest.ts` no es de este brief.
+- **`banner`** no señala nunca un edificio — el propio comentario de
+  `schema.ts` lo dice: «a banner over the core».
+
+Las cinco caen en el mismo sitio: el centro de la aldea, la misma cifra que ya
+calculan por su cuenta `render/crowd.ts` (`plaza`, adonde va la multitud del
+domingo) y `world/forest.ts` (`core`, de donde salen los leñadores). `sim.ts`
+guarda su propia copia — `valleyCore` — porque el motor no puede importar de
+`render/`, y tocar esos dos ficheros no estaba autorizado esta ronda. Tres
+copias de la misma fórmula no es ideal; es preferible a una cuarta que
+inventara un centro distinto.
+
+**El GIF, y la pregunta que lo decide.** ¿Se lee el precio antes de elegir, sin
+desplazar, con las tres opciones y el cuerpo en pantalla? A 390 px reales, sí:
+las 16 plantillas caben porque el precio vive en el mismo bloque que el verbo,
+nunca detrás de un segundo toque. Un hallazgo que no estaba pedido: la
+transformación de la cámara **no lleva transición CSS**. La probé con una
+(`transition: transform 250ms`) y el banco de pruebas la delató de inmediato —
+un reloj falso puede saltar los dos segundos de `setTimeout` sin que el
+compositor real haya movido un solo fotograma de la animación, y la captura
+quedaba a mitad de camino entre el zoom y la vuelta. Un corte seco es más
+honesto que una animación que dos relojes que no se hablan entre sí no pueden
+mantener de acuerdo.
+
+**Lo que no estaba en el brief de M-22 y hubo que tocar de todos modos.**
+`app.ts` ya estaba autorizado por el contrato de decisión (v2.60); esta ronda
+además engancha `openCrossroad`/`openChronicle` ahí, porque si nadie los llama
+el hito 2 no se puede alcanzar jugando: `paint` abre la encrucijada en cuanto
+`state.crossroad` no es nulo (incluida la primera pintura, para una partida
+guardada o `?live=1` que ya aterrice sobre una pendiente) y el deslizar hacia
+arriba, que llevaba dos rondas disparando un evento sin nadie escuchando, ahora
+abre la crónica.
+
+
+M-22 necesitaba una forma de que la opción elegida llegase al motor, y el
+contrato de `App` no tenía ninguna. La solución correcta es la que evita el
+atajo: **`decide` encola y el paso 3 del tick aplica**, porque §4.2 es normativo
+y porque el registro de decisiones del que depende la reproducción de §13.1 solo
+existe si todo pasa por ahí. Una interfaz que llamara a `applyOption` mutaría el
+estado fuera del orden y rompería las dos cosas a la vez.
+
+Las cuatro reglas están en el brief M-20. Dos merecen mención aparte:
+
+- **Encolar fuerza el tick siguiente de inmediato.** Sin eso el jugador toca y no
+  pasa nada durante quince segundos a ×1: la decisión más pesada del juego se
+  sentiría rota, y el arreglo tentador —aplicar el efecto en el acto desde la
+  interfaz— es justo el atajo que la regla prohíbe. Forzar el tick da inmediatez
+  conservando un único camino de mutación.
+- **El motor informa; la interfaz enfoca.** `TickReport` devuelve los
+  `VisualEffect` aplicados con coordenadas. El motor no sabe que existe una
+  cámara (§2.4): dice qué cambió y dónde, no adónde mirar. Los dos segundos de
+  §11.2 son decisión de la interfaz.
 
 ### 2.59 — La cifra está a un toque
 
@@ -4718,8 +4789,35 @@ real sin volver a diseñar la automatización.
 **Contrato.**
 ```ts
 export function boot(root: HTMLElement, save?: SaveFile): App;
-export interface App { setSpeed(s: 0|1|4|16): void; state(): Readonly<GameState>; }
+export interface App {
+  setSpeed(s: 0|1|4|16): void;
+  state(): Readonly<GameState>;
+  decide(optionId: string): boolean;   // v2.60 — ver abajo
+}
 ```
+**La decisión pendiente (v2.60).** `decide` **encola**, no aplica. La opción la
+consume el **paso 3 del tick**, que es donde §4.2 pone las decisiones, y así todo
+cambio de estado sigue pasando por el tick: la interfaz nunca llama a
+`applyOption`. Si lo hiciera, mutaría el estado fuera del orden normativo y
+rompería el registro de decisiones del que depende la reproducción de §13.1.
+
+Cuatro reglas, y las cuatro son contrato:
+
+1. **Se consume exactamente una vez.** Si no hay encrucijada pendiente, o ya hay
+   una decisión encolada, `decide` devuelve `false` y **no sustituye** a la
+   anterior. Decidido es decidido: un doble toque no puede cambiar algo que ya va
+   camino de `history`.
+2. **Encolar fuerza el tick siguiente de inmediato**, sea cual sea la velocidad.
+   Sin esto, el jugador toca y no pasa nada hasta quince segundos después a ×1, y
+   la decisión más pesada del juego se siente rota. Con esto, el efecto aparece
+   en el acto y sigue habiendo un solo camino de mutación.
+3. **En pausa la decisión espera.** §8.7 dice que la simulación no se detiene por
+   una encrucijada pendiente, no que el jugador no pueda pausar el juego.
+4. **El motor informa; la interfaz enfoca.** `TickReport` devuelve los
+   `VisualEffect` aplicados **con sus coordenadas de mapa**. El motor no sabe que
+   existe una cámara (§2.4) y no dice «enfoca aquí»: dice «esto ha cambiado, en
+   estas celdas». Los dos segundos de §11.2 los decide la interfaz con esa lista.
+
 **Reglas.** El bucle acumula tiempo real y ejecuta ticks enteros; el render
 interpola con la fracción sobrante. Si la pestaña estuvo oculta, no se acumulan
 ticks: eso lo resuelve el letargo (M-23). Nunca más de 8 ticks por fotograma.
@@ -4731,6 +4829,11 @@ minutos reales dan exactamente 192 ticks.
 mantiene la deuda tras el tope por fotograma. Playwright abre la aplicación a
 390×844, acciona las cuatro velocidades y adelanta el reloj hasta comprobar un
 cambio de estación.
+
+**Estado de `decide` (v2.61): implementado.** `attemptDecision` — la lógica
+pura de las cuatro reglas — se prueba sin DOM; `boot` la envuelve con el reloj
+real. Playwright confirma que decidir cierra la encrucijada y cambia la
+transformación del lienzo (§17 M-22).
 
 ---
 
@@ -4772,12 +4875,23 @@ export function openChronicle(app: App, sinceTick?: number): void;
 ```
 **Reglas.** El precio de cada opción siempre visible antes de elegir. Sin botón
 de cerrar. La simulación **no se pausa** mientras la encrucijada está abierta.
-Al decidir, la cámara enfoca durante 2 s el efecto visible.
+Al decidir, la cámara enfoca durante 2 s el efecto visible. El enfoque lo elige
+la interfaz a partir de los `VisualEffect` con coordenadas que devuelve el
+`TickReport` (M-20): el motor informa de qué cambió y dónde, nunca de adónde
+mirar.
 **Tests.** Todas las opciones de las 16 plantillas se renderizan sin
 desbordamiento a 390 px de ancho; el enfoque posterior apunta a una celda
 válida.
 **Terminado cuando.** Una decisión cambia el valle de forma visible. **Este es
 el hito 2.**
+
+**Estado (v2.61): implementado — hito 2 alcanzado.** El precio de las tres
+opciones se lee sin desplazar a 390 px de ancho reales (GIF y hallazgos en
+§2.61). `boot` (M-20) abre la encrucijada él mismo en cuanto hay una pendiente
+—incluida la primera pintura, para una partida guardada o una ruta de depuración
+que ya aterrice sobre una— y conecta el deslizar hacia arriba a `openChronicle`,
+que hasta ahora no tenía oyente. Sin botón de cerrar: un deslizar hacia abajo
+devuelve al valle y dibuja una marca discreta que reabre la misma encrucijada.
 
 ---
 

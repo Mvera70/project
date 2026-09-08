@@ -2,18 +2,47 @@
 
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { tick } from '@engine/sim';
-import type { GameState, SaveFile } from '@engine/state';
+import { tick, type TickReport } from '@engine/sim';
+import type { Decision, GameState, SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
 import { createRenderer } from '@render/renderer';
 import { inspectAt, panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { startLoop } from './loop';
+import { openChronicle } from './screens/chronicle';
+import { openCrossroad } from './screens/crossroad';
 import { isSpeed, speedLabel, type Speed } from './speed';
 
 export interface App {
   setSpeed(speed: Speed): void;
   state(): Readonly<GameState>;
+  decide(optionId: string): boolean;
+}
+
+export interface DecisionAttempt {
+  accepted: boolean;
+  forceTick: boolean;
+}
+
+/**
+ * The pure core of `App.decide` (v2.60, §2.60): whether the queue accepts the
+ * option, and whether accepting it should force an immediate tick. Split from
+ * `boot`'s DOM and render loop so the four rules of the decision contract can
+ * be checked without booting either — the same way `loop.ts` keeps
+ * `advanceAccumulator` pure and leaves `startLoop` as the DOM-bound wrapper.
+ *
+ * Rule 1: an option is accepted only if a crossroad is pending and nothing is
+ * already queued — decided is decided, a second tap cannot replace it.
+ * Rules 2–3: accepting forces a tick unless the game is paused; paused, §8.7
+ * still lets the decision wait rather than making the player unable to pause.
+ */
+export function attemptDecision(
+  hasPendingCrossroad: boolean,
+  alreadyQueued: boolean,
+  speed: Speed,
+): DecisionAttempt {
+  const accepted = hasPendingCrossroad && !alreadyQueued;
+  return { accepted, forceTick: accepted && speed !== 0 };
 }
 
 export function roman(value: number): string {
@@ -72,6 +101,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     lastFraction = fraction;
     year.textContent = `ANNO ${roman(yearOf(state.tick) + 1)}`;
     renderer.paint(state, fraction);
+    // §11.2's third screen opens itself the moment there is something to
+    // answer — including the very first paint, for a save or a debug
+    // fast-forward that already lands on a posed crossroad. `openCrossroad`
+    // is its own no-op once this one is already on screen.
+    if (state.crossroad !== null) openCrossroad(app, state.crossroad);
   };
 
   const showPanel = (target: InspectTarget): void => {
@@ -118,14 +152,30 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         if (gesture === 'hold' && target.kind === 'villager') renderer.track(target.id);
       }
     } else if (gesture === 'swipe_down') panel.hidden = true;
-    else if (gesture === 'swipe_up') root.dispatchEvent(new CustomEvent('valley:chronicle'));
+    else if (gesture === 'swipe_up') openChronicle(app);
   });
   root.addEventListener('pointerdown', (event) => { if (event.target === root) panel.hidden = true; });
-  const loop = startLoop(
-    () => speed,
-    () => { if (state.ended === null) tick(state, CATALOG); },
-    paint,
-  );
+
+  // The queue behind `decide` (v2.60). `runTick` is the one and only place a
+  // queued decision is ever spent: it hands it to `tick`, which applies it at
+  // step 3 (§4.2) and nowhere earlier. Consuming it here — not inside
+  // `decide` — is what makes "in pause the decision waits" true for free: a
+  // paused game just never calls `runTick`, so a decision queued while paused
+  // sits untouched until the player unpauses and a real tick runs.
+  let pendingDecision: Decision | undefined;
+  const runTick = (): void => {
+    if (state.ended !== null) return;
+    const decision = pendingDecision;
+    pendingDecision = undefined;
+    const report = tick(state, CATALOG, decision);
+    // Rule 4 (§2.60): the engine hands back what changed and where; `document`
+    // and not `root` because the crossroad screen mounts on `document.body`
+    // (§11.2's "ocupa la pantalla entera"), outside the app's own root.
+    if (report.decided !== null) {
+      document.dispatchEvent(new CustomEvent<TickReport>('valley:decided', { detail: report }));
+    }
+  };
+  const loop = startLoop(() => speed, runTick, paint);
   window.addEventListener('pagehide', () => loop.stop(), { once: true });
 
   const app: App = {
@@ -135,6 +185,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       for (const [candidate, button] of buttons) button.setAttribute('aria-pressed', String(candidate === speed));
     },
     state(): Readonly<GameState> { return state; },
+    decide(optionId: string): boolean {
+      const attempt = attemptDecision(state.crossroad !== null, pendingDecision !== undefined, speed);
+      if (!attempt.accepted || state.crossroad === null) return false;
+      pendingDecision = { templateId: state.crossroad.templateId, optionId };
+      if (attempt.forceTick) { runTick(); paint(lastFraction); }
+      return true;
+    },
   };
   app.setSpeed(speed);
   paint(0);

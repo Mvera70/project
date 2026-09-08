@@ -261,6 +261,76 @@ describe('el orden del tick · §4.2', () => {
     expect([...s.map.forestAge].filter((age) => age === WORLD.BARREN_CLEARING).length)
       .toBeGreaterThanOrEqual(3);
   });
+
+  it('el paso 3 aplica exactamente la decisión pendiente, y no antes (§2.60)', () => {
+    const s = foundGame(7);
+    const template = CATALOG.find((t) => t.id === 'chapel_or_granary') as CrossroadTemplate;
+    s.crossroad = {
+      templateId: template.id,
+      posedTick: s.tick,
+      cast: {},
+      optionIds: template.options.map((o) => o.id),
+    };
+
+    // Sin decisión que encaje con la pendiente, el paso 3 no toca nada.
+    const untouched = tick(s, CATALOG);
+    expect(untouched.decided).toBeNull();
+    expect(s.crossroad?.templateId).toBe(template.id);
+
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'the_chapel' });
+    expect(report.decided?.optionId).toBe('the_chapel');
+    expect(s.crossroad).toBeNull(); // resuelta: deja de estar pendiente (§8.1)
+  });
+
+  it('el TickReport trae coordenadas válidas para el efecto visible decidido', () => {
+    const s = foundGame(7);
+    const template = CATALOG.find((t) => t.id === 'chapel_or_granary') as CrossroadTemplate;
+    s.crossroad = {
+      templateId: template.id,
+      posedTick: s.tick,
+      cast: {},
+      optionIds: template.options.map((o) => o.id),
+    };
+
+    // `the_chapel` levanta una capilla (build chapel + visible: raise chapel):
+    // la coordenada tiene que ser la de la obra que el propio tick acaba de
+    // abrir, no una al azar.
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'the_chapel' });
+    expect(report.visualEffects).toEqual([{ effect: { k: 'raise', kind: 'chapel' }, x: expect.any(Number), y: expect.any(Number) }]);
+    const [placed] = report.visualEffects;
+    expect(placed?.x).toBeGreaterThanOrEqual(0);
+    expect(placed?.x).toBeLessThan(s.map.width);
+    expect(placed?.y).toBeGreaterThanOrEqual(0);
+    expect(placed?.y).toBeLessThan(s.map.height);
+    const work = s.works.find((w) => w.kind === 'chapel' && w.startedTick === s.tick);
+    expect(work).toBeDefined();
+    expect(placed?.x).toBeCloseTo((work?.x ?? 0) + (work?.w ?? 0) / 2);
+    expect(placed?.y).toBeCloseTo((work?.y ?? 0) + (work?.h ?? 0) / 2);
+  });
+
+  it('un efecto sin sitio natural cae en el centro de la aldea, no en un punto cualquiera', () => {
+    const s = foundGame(7);
+    const template = CATALOG.find((t) => t.id === 'winter_grain_debt') as CrossroadTemplate;
+    s.crossroad = {
+      templateId: template.id,
+      posedTick: s.tick,
+      cast: {},
+      optionIds: template.options.map((o) => o.id),
+    };
+
+    // 'kneel' iza un estandarte (§17 M-22: sin edificio bajo él, "sobre el
+    // centro" por definición) — no un raise ni un ruin que resolver.
+    const report = tick(s, CATALOG, { templateId: template.id, optionId: 'kneel' });
+    expect(report.visualEffects).toHaveLength(1);
+    const [placed] = report.visualEffects;
+    expect(placed?.effect).toEqual({ k: 'banner', colour: 'grey', years: 0 });
+
+    const standing = s.buildings.filter((b) => b.lostTick === null);
+    const coreX = standing.reduce((sum, b) => sum + b.x + b.w / 2, 0) / standing.length;
+    const coreY = standing.reduce((sum, b) => sum + b.y + b.h / 2, 0) / standing.length;
+    expect(placed?.x).toBeCloseTo(coreX);
+    expect(placed?.y).toBeCloseTo(coreY);
+  });
 });
 
 describe('robustez', () => {

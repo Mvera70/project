@@ -65,3 +65,32 @@ test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await page.screenshot({ path: 'artifacts/m21-hunger.png', fullPage: true });
   await test.expect(page.locator('.valley-panel')).toBeHidden();
 });
+
+test('la encrucijada muestra el precio de las tres opciones sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
+  // Semilla 7, año 80: exactamente 60 ticks a 16× (§17 M-22, medido con un
+  // sondeo de un solo uso) plantan `forest_cut` sin que nadie la conteste —
+  // esta aplicación real, a diferencia del banco, nunca decide sola.
+  await page.clock.install();
+  await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.getByRole('button', { name: '16×' }).click();
+  await page.clock.runFor(58_000);
+
+  const scrim = page.locator('.crossroad-scrim');
+  await test.expect(scrim).toBeVisible();
+  await test.expect(page.locator('.crossroad h1')).toHaveText('The Old Wood');
+  const costs = page.locator('.crossroad-cost');
+  await test.expect(costs).toHaveCount(3);
+  // El precio de cada opción, en pantalla junto al verbo, sin que haga falta
+  // desplazar nada para leerlo (§11.2, §17 M-22).
+  for (const cost of await costs.all()) await test.expect(cost).toBeInViewport();
+  await page.screenshot({ path: 'artifacts/m22-crossroad.png', fullPage: true });
+
+  const before = await page.locator('#valley').evaluate((el) => getComputedStyle(el).transform);
+  await page.getByRole('button', { name: /^Take only the edge\./ }).click();
+  await test.expect(scrim).toBeHidden();
+  await test.expect
+    .poll(() => page.locator('#valley').evaluate((el) => getComputedStyle(el).transform))
+    .not.toBe(before);
+  await page.screenshot({ path: 'artifacts/m22-focus.png', fullPage: true });
+});
