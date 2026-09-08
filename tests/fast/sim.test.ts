@@ -250,10 +250,15 @@ describe('robustez', () => {
     }
   });
 
-  it('ninguna cifra se sale de rango en un siglo', () => {
-    for (let seed = 0; seed < 10; seed += 1) {
+  it('ninguna cifra se sale de rango en sesenta años', () => {
+    // Cinco semillas y sesenta años. La versión grande de esto es
+    // `invalidCases` del banco de M-12: 240 partidas de 200 años con las mismas
+    // comprobaciones. Cuando se escribió esta prueba ese banco no existía, y
+    // repetirla aquí a escala de siglo cuesta la mitad del presupuesto de §14.1
+    // sin cubrir nada que allí no se cubra mejor.
+    for (let seed = 0; seed < 5; seed += 1) {
       const s = foundGame(seed);
-      for (let i = 0; i < 100 * YEAR && s.ended === null; i += 1) {
+      for (let i = 0; i < 60 * YEAR && s.ended === null; i += 1) {
         tick(s, CATALOG);
         if (i % 97 !== 0) continue;
         expect(Number.isFinite(s.village.grain), `semilla ${seed}`).toBe(true);

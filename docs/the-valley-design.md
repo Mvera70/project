@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.15 · 8 de septiembre de 2026, 09:52 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.14 · 8 de septiembre de 2026, 01:46 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -40,79 +40,9 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.9** | 7 sep 2026, 19:11 | Puerta de M-08b | **Cubrir una vacante no es elegir al mayor**; el diagnóstico del catálogo pasa a dos columnas; `quiet_years` fuera del reparto; deuda del bosque registrada. |
 | **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
 | **2.11** | 7 sep 2026, 23:44 | Revisión de M-10 y desarrollo de M-11/M-12 | Muertes de todos los pasos con epitafio y coste de ánimo; búfer de crónica; determinismo con 5 000 ticks realmente alcanzados; banco real y cobertura pendiente explícita. |
-| **2.12** | 8 sep 2026, 00:47 | M-13 y M-14 | Fuente única; **mapa real y aldea que se construye sola**; piedra en puntos de obra; dos lecturas de §7.4 corregidas; la iglesia crece desde cualquier esquina. Medido, no previsto. |
 | **2.13** | 8 sep 2026, 01:20 | Revisión de M-13/M-14 | **Política `prudent` como referencia** y bandas por política; horquilla mínima entre jugar bien y mal; `interregnum` cierra la sucesión; los campos no arden. |
 | **2.14** | 8 sep 2026, 01:46 | Primera lectura del hito 0 | **Tabla de pesos normativa y agregación por año**; **tripulación mínima de campo**: se acabó la aldea zombi; `prudent` no compra muertes. |
-| **2.15** | 8 sep 2026, 09:52 | M-15 | **Caminos y bosque**: el mapa cuenta dónde se pisa y qué se tala. Deuda del bosque de §12.9 saldada: incluir las dos plantillas mueve la cadencia 0,02. El banco se sale del presupuesto. |
-
-### 2.15 — Caminos y bosque
-
-- **M-15.** `astar.ts`, `forest.ts` y `paths.ts`, y el paso 14 del tick deja de
-  estar vacío. Todo entero y medido; los números están abajo.
-- **Capa nueva en el mapa: `forestStock`.** Desviación declarada. §7.5 dice que
-  «cada celda de bosque contiene `WOOD_PER_FOREST_TILE` unidades», y una semana
-  de tala son unas siete unidades contra una celda de trescientas: la celda pasa
-  medio año a medias. Sin dónde guardar eso, talar sería o una celda entera por
-  semana o nada. Es un cambio de §3 y del formato de §13.1; no hay partidas
-  guardadas todavía, y M-23 hereda la capa.
-- **`woodCap` deja de ser infinito.** El paso 5 pregunta al bosque cuánta madera
-  hay antes de producirla. Un valle talado deja de dar madera en vez de darla de
-  la nada, que es lo que hacía desde M-06.
-- **Coste del A\*: `PATHING`, todo TUNE.** §7.6 da la forma —«penaliza bosque y
-  roca y premia `path`»— y ningún número. Enteros, no decimales: dos máquinas
-  que redondeen distinto rutarían distinto, y una ruta que se desvía una celda
-  pone el desgaste en otro sitio, que al cabo de un siglo es otra aldea.
-- **Un edificio no cambia ninguna ruta.** El coste de §7.6 lee el terreno y el
-  camino, y nada más, así que levantar una casa no mueve un trayecto: lo que
-  puede mover es a dónde va la gente, y eso ya forma parte de la clave de la
-  caché. Invalidar por edificio costaba cuarenta A\* cada pocas semanas para
-  nada.
-- **Una celda talada no es un cambio de suelo.** Talar solo abarata el paso, así
-  que la ruta que la cruzaba sigue siendo una ruta —deja de ser la más barata y
-  se recalcula la próxima vez que algo se mueva—. El leñador cuyo árbol cae sí
-  recibe ruta nueva en el acto, porque el destino es parte de la clave.
-- **El destino de cada aldeano.** §7.6 quiere «cada aldeano vivo con casa y
-  destino de trabajo» y §5.2 reparte la mano de obra en tres cifras, no en
-  asignaciones. Se reparte por rango: los primeros `farmers` van a los campos,
-  los siguientes `cutters` al bosque, el resto a la obra abierta. Determinista,
-  sin estado nuevo, y se mueve con la asignación.
-
-**Medición de esta ronda.** 60 semillas × 200 años × cuatro políticas.
-
-| Métrica | `prudent` | `first` | `last` | `worst` |
-|---|---:|---:|---:|---:|
-| Extinción | 66,7 % | 66,7 % | 81,7 % | 78,3 % |
-| Mediana del pico | 76,5 | 72,5 | 46,5 | 50,5 |
-| Mapas llenos < año 120 | 50,0 % | 48,3 % | 33,3 % | 31,7 % |
-| Cadencia **sin** bosque | 2,266 | 2,272 | 4,999 | 5,072 |
-| Cadencia **con** bosque | 2,283 | 2,286 | 5,018 | 5,091 |
-| Bosque 40–70 % al año 100 | 24/40 | 24/42 | 15/31 | 14/31 |
-| Mediana del bosque al año 100 | 62,3 % | 67,2 % | 71,6 % | 71,7 % |
-| Rangos / geometría | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 |
-
-**Deuda del bosque de §12.9, saldada.** La fila de encrucijadas por generación
-decía «se mide excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15» y
-dejaba registrado volver a medirlo con las dos dentro. Medido: **la cadencia se
-mueve 0,02** (2,266 → 2,283 con `prudent`, 4,999 → 5,018 con `last`). La
-exclusión ya no cambia nada y puede retirarse cuando se quiera; se deja escrita
-para que la comparación con las rondas anteriores siga siendo legible.
-
-**Lo que no llega, sin ajustar nada:**
-
-1. **El bosque entra en banda en 24 de 40 valles que alcanzan el año 100** —el
-   60 %, contra los 20 de 30 que pide el brief de M-15—. Y falla **por arriba**:
-   sólo uno se queda por debajo del 40 %, y quince se pasan del 70 %. La aldea
-   que se muere pronto deja de talar, así que su valle conserva el bosque por no
-   haber nadie. Es la misma extinción del 66,7 % vista desde otro sitio, no un
-   problema de la tala.
-2. **`npm run test:balance` tarda 512 s contra el límite de 300.** Venía de 292.
-   El tick es un 30 % más caro con el paso 14 dentro, y el banco son unas 470
-   partidas de hasta 200 años. Muestrear la sonda no toca esto: ya está medido
-   que la sonda vale un 13 %.
-3. Siguen fuera de banda la extinción de `prudent` (66,7 % contra 2–12 %), la
-   horquilla (11,7 puntos contra 20), los mapas llenos (50 % contra 60 %), los
-   años agonizando (55,6 contra 10) y `succession` en `last`/`worst` (5,3 %
-   contra 1 %). Ninguno se ha tocado.
+| **2.12** | 8 sep 2026, 00:47 | M-13 y M-14 | Fuente única; **mapa real y aldea que se construye sola**; piedra en puntos de obra; dos lecturas de §7.4 corregidas; la iglesia crece desde cualquier esquina. Medido, no previsto. |
 
 ### 2.12 — El valle existe y la aldea se construye sola
 
@@ -2940,16 +2870,6 @@ ticks esperado ±5 %; sin tráfico, un camino desaparece; el bosque nunca baja d
 0 ni sube del total inicial; el rebrote no ocurre bajo un edificio.
 **Terminado cuando.** A los 100 años, el bosque restante cae en el rango de
 §12.9 en al menos 20 de 30 semillas.
-
-**Estado (v2.15): implementado, con el criterio de cierre sin alcanzar.** Las
-cinco funciones del contrato están, con veintiuna pruebas: el coste del suelo,
-que el trayecto es contiguo y determinista y prefiere la calzada al bosque, que
-una celda llega a sendero en el número de semanas que sale de la fórmula ±5 %,
-que sin tráfico el camino se borra, que la calzada necesita fragua, que la
-madera nunca baja de cero ni sube del total inicial en un siglo, y que el
-rebrote necesita sus tres vecinas y sus ocho años y no ocurre bajo un edificio.
-Lo que no llega es la fila del bosque: 24 de 40 valles, y quince de los fallos
-son por conservar **de más**. Ver §2.15.
 
 ---
 

@@ -97,6 +97,7 @@ export function generateMap(bundle: RngBundle): ValleyMap {
     terrain: new Uint8Array(CELLS).fill(TERRAIN_CODE.meadow),
     traffic: new Uint16Array(CELLS), path: new Uint8Array(CELLS),
     ruins: new Uint8Array(CELLS), forestAge: new Uint8Array(CELLS),
+    forestStock: new Uint16Array(CELLS),
   };
   // 2. RIVER: one continuous strip; a lateral move never skips a row.
   const entry = int(b, 'map', ...MAPGEN.RIVER_ENTRY);
@@ -179,6 +180,11 @@ export function generateMap(bundle: RngBundle): ValleyMap {
         map.terrain[cell] = TERRAIN_CODE.marsh;
       }
     }
+  }
+  // Every standing tree, counted. §7.5 gives each forest cell its own store,
+  // and this is the only place it is filled: after this, wood only leaves.
+  for (let i = 0; i < CELLS; i += 1) {
+    if (map.terrain[i] === TERRAIN_CODE.forest) map.forestStock[i] = WORLD.WOOD_PER_FOREST_TILE;
   }
   return map;
 }

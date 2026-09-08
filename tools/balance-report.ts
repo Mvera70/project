@@ -250,6 +250,10 @@ export interface PolicySummary {
   geometryCases: number;
   maxYearsDying: number;
   medianYearsDying: number;
+  /** Trials that reached year 100, and how many of them kept 40-70% of the wood. */
+  forestTrials: number;
+  forestInBand: number;
+  medianForestRatio: number | null;
   deathsByCause: Record<string, number>;
   eligibility: Record<string, number>;
   restUtilization: Record<string, number | null>;
@@ -274,6 +278,14 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
       .map((t) => t.ticksDying / TIME.WEEKS_PER_YEAR)),
     medianYearsDying: median([0, ...group.filter((t) => t.extinct)
       .map((t) => t.ticksDying / TIME.WEEKS_PER_YEAR)]),
+    // §12.9's forest row, live since M-15. Only games that reached year 100
+    // have a reading: a valley nobody lived in kept its wood for other reasons.
+    forestTrials: group.filter((t) => t.forestRatio !== null).length,
+    forestInBand: group.filter((t) => t.forestRatio !== null &&
+      (t.forestRatio as number) >= 0.4 && (t.forestRatio as number) <= 0.7).length,
+    medianForestRatio: group.some((t) => t.forestRatio !== null)
+      ? median(group.filter((t) => t.forestRatio !== null).map((t) => t.forestRatio as number))
+      : null,
     deathsByCause: group.reduce<Record<string, number>>((acc, t) => {
       for (const [cause, n] of Object.entries(t.deathsByCause)) acc[cause] = (acc[cause] ?? 0) + n;
       return acc;
@@ -315,7 +327,9 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
     summaries.find((s) => s.policy === policy)?.extinction ?? Number.NaN;
   console.info(`Extinction spread, worst - prudent: ${((band('worst') - band('prudent')) * 100).toFixed(1)} points (§12.9: >= 20)`);
 
-  console.info('Forest ratio: pending M-15.');
+  for (const summary of summaries) {
+    console.info(`${summary.policy}: forest 40-70% at year 100 in ${summary.forestInBand}/${summary.forestTrials} trials that got there (median ${summary.medianForestRatio === null ? 'n/a' : (100 * summary.medianForestRatio).toFixed(1) + '%'})`);
+  }
   console.info(`Series: artifacts/balance.csv; raw trials: artifacts/balance-summary.json; runtime ${(durationMs / 1000).toFixed(2)}s`);
   return { trials, summaries, durationMs };
 }

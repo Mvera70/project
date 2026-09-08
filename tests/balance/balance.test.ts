@@ -73,7 +73,13 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
     expect(result.summaries.find((s) => s.policy === 'prudent')?.fullMap)
       .toBeGreaterThanOrEqual(0.6);
   });
-  it.todo('40–70% initial forest remaining at year 100: requires M-15');
+  it('leaves 40-70% of the forest standing at year 100 in most valleys', () => {
+    // §12.9, live since M-15. M-15's own gate is 20 of 30 seeds; measured here
+    // over the 60 that reached year 100 under the reference policy.
+    const s = result.summaries.find((x) => x.policy === 'prudent');
+    expect(s?.forestTrials ?? 0).toBeGreaterThan(0);
+    expect((s?.forestInBand ?? 0) / (s?.forestTrials ?? 1)).toBeGreaterThanOrEqual(2 / 3);
+  });
 });
 
 it('computes the even-sample median from both middle observations without mutating input', () => {

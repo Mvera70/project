@@ -44,6 +44,7 @@ function village(seed: number, houses = 12): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
+      forestStock: new Uint16Array(CELLS),
     },
     village: { grain: 4000, wood: 400, morale: 55, faith: 50 },
     people: foundPeople(rng, 0),

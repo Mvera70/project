@@ -190,6 +190,17 @@ export interface ValleyMap {
   path: Uint8Array; // 0 none, 1 trodden, 2 track, 3 road
   ruins: Uint8Array; // 0 none, 1 ruin; permanent
   forestAge: Uint8Array; // years since felling, for the regrowth
+  /**
+   * Wood left in each forest cell, out of WORLD.WOOD_PER_FOREST_TILE (§7.5).
+   *
+   * Declared deviation of M-15: §3 did not have this layer and the brief lists
+   * only paths.ts, forest.ts and astar.ts. But "cada celda de bosque contiene
+   * WOOD_PER_FOREST_TILE unidades" is per-cell state, and a week's felling is
+   * about seven units against a cell of three hundred, so a cell is part-cut
+   * for the better part of a year. Without somewhere to keep that, felling
+   * either takes a whole cell a week or nothing at all.
+   */
+  forestStock: Uint16Array;
 }
 
 export type BuildingId = number;
@@ -220,6 +231,13 @@ export interface Building {
   lostTick: number | null; // if !== null, it is a ruin
   tier: 0 | 1; // 0 wood, 1 stone
   lit: boolean; // the smithy goes dark if the smith takes offence
+}
+
+/** A cell whose path level changed this tick. §7.6, M-15's report. */
+export interface PathEvent {
+  cell: number;
+  from: 0 | 1 | 2 | 3;
+  to: 0 | 1 | 2 | 3;
 }
 
 /**

@@ -4,7 +4,7 @@
 // to somebody else; what lives here is the sequence, and the sequence is
 // normative — changing it changes the balance and breaks saved games.
 
-import { PEOPLE } from './balance';
+import { LABOUR, PEOPLE } from './balance';
 import {
   isHere,
   population,
@@ -22,6 +22,7 @@ import type {
   Decision,
   DeathEvent,
   GameState,
+  PathEvent,
   Role,
   TickContext,
   Villager,
@@ -37,6 +38,8 @@ import { rollFire, rollPlague } from './subsistence/disasters';
 import { destroyBuilding } from './world/buildings';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
+import { fellForest, regrowForest } from './world/forest';
+import { accrueTraffic, upgradePaths } from './world/paths';
 import { holderOf } from './crossroads/conditions';
 import { selectCrossroad } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
@@ -146,6 +149,8 @@ export interface TickReport {
   buildPoints: number;
   built: BuiltEvent[];
   wood: number;
+  felled: number;
+  paths: PathEvent[];
   harvested: number;
   spoiled: number;
   fired: FiredSeed[];
@@ -460,8 +465,12 @@ export function tick(
   }
 
   // ---- 5 · LABOUR ----------------------------------------------------------
+  // The cutters can only bring back what is standing. M-15 fells it first and
+  // says how much it actually got, which is §5.2's `woodCap`: a valley that has
+  // been cut flat stops producing timber instead of producing it out of air.
   const allocation = allocateLabour(state);
-  const produced = produce(state, allocation);
+  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER);
+  const produced = produce(state, allocation, felled);
 
   // ---- 6 · WORKS -----------------------------------------------------------
   // M-14 spends the week's build points and opens the next project. The
@@ -555,7 +564,16 @@ export function tick(
   }
 
   // ---- 14 · WORLD ----------------------------------------------------------
-  // Traffic, paths, forest regrowth and lighting are M-15's. Nothing here yet.
+  // §7.5 and §7.6. The week's walking wears the ground, wear becomes a path,
+  // and once a year the wood behind the cutters closes over again.
+  //
+  // Nothing here invalidates the routes on a building. A building is not an
+  // obstacle: §7.6's cost reads the terrain and the path and nothing else, so
+  // raising one changes no route. What it can change is where people are going,
+  // and that is part of the route's cache key already.
+  accrueTraffic(state);
+  const paths = upgradePaths(state);
+  regrowForest(state);
 
   // The week's living-together, which §6.4 puts nowhere in particular and which
   // has to happen once a week and only once.
@@ -617,6 +635,8 @@ export function tick(
     buildPoints: produced.buildPoints,
     built,
     wood: produced.wood,
+    felled,
+    paths,
     harvested: reaped.yielded,
     spoiled,
     fired,

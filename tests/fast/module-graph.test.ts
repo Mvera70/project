@@ -140,6 +140,20 @@ describe('grafo de módulos del motor', () => {
       'subsistence/harvest',
     ]);
     expect(importsOf('world/upgrade.ts')).toEqual(['balance', 'placement', 'state']);
+    // M-15. astar.ts es hoja: el coste del suelo y nada más. paths.ts es quien
+    // sabe quién va a dónde, así que mira a people/ y a subsistence/; forest.ts
+    // le avisa de que los árboles se han movido, y la flecha no vuelve.
+    expect(importsOf('world/astar.ts')).toEqual(['balance', 'state', 'tiles']);
+    expect(importsOf('world/forest.ts')).toEqual(['balance', 'paths', 'state', 'tiles']);
+    expect(importsOf('world/paths.ts')).toEqual([
+      'astar',
+      'balance',
+      'people/demography',
+      'state',
+      'subsistence/building-counts',
+      'subsistence/labour',
+    ]);
+    expect(importsOf('world/paths.ts')).not.toContain('forest');
     expect(importsOf('world/works.ts')).toEqual([
       'balance',
       'buildings',
@@ -153,7 +167,10 @@ describe('grafo de módulos del motor', () => {
     // §7.3 punto 8 lee la bandera `threatened`, que hoy vive en
     // crossroads/conditions.ts. Leerla desde allí pondría a world/ por encima
     // de la cima del grafo; works.ts la lee de state.flags, que es de quien es.
-    for (const f of ['world/works.ts', 'world/buildings.ts', 'world/placement.ts'] as const) {
+    for (const f of [
+      'world/works.ts', 'world/buildings.ts', 'world/placement.ts',
+      'world/astar.ts', 'world/forest.ts', 'world/paths.ts',
+    ] as const) {
       expect(importsOf(f).some((x) => x.includes('crossroads')), f).toBe(false);
       expect(importsOf(f).some((x) => x.includes('chronicle')), f).toBe(false);
     }
@@ -242,6 +259,9 @@ describe('grafo de módulos del motor', () => {
       ['world/buildings.ts', 'buildings'],
       ['world/upgrade.ts', 'upgrade'],
       ['world/works.ts', 'works'],
+      ['world/astar.ts', 'astar'],
+      ['world/forest.ts', 'forest'],
+      ['world/paths.ts', 'paths'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
     }

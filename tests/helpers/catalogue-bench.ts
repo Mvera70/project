@@ -60,6 +60,7 @@ function founded(seed: number): GameState {
       terrain: new Uint8Array(CELLS).fill(1, 0, Math.floor(CELLS * 0.45)),
       traffic: new Uint16Array(CELLS), path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS), forestAge: new Uint8Array(CELLS),
+      forestStock: new Uint16Array(CELLS),
     },
     village: { grain: FOUNDING.GRAIN, wood: 900, morale: FOUNDING.MORALE, faith: FOUNDING.FAITH },
     people: foundPeople(rng, 0),

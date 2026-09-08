@@ -243,6 +243,22 @@ export const WORLD = {
   STONE_PER_BP: 0.5, // build points converted to stone, with a smithy
 } as const;
 
+/**
+ * §7.6 gives the shape of the A* cost — "penaliza bosque y roca y premia
+ * `path`" — and none of the numbers, so all of them are TUNE. Integers, because
+ * two machines that round a float differently would route differently, and a
+ * route that differs by one cell puts the traffic somewhere else.
+ */
+export const PATHING = {
+  STEP: 10, // TUNE: the cost of crossing an ordinary meadow cell.
+  FOREST: 12, // TUNE: going round the wood is worth about two cells of detour.
+  ROCK: 20, // TUNE: an outcrop is worth going round unless it is very close.
+  // TUNE: what each level of `path` takes off the step. Index is map.path:
+  // 0 none, 1 trodden, 2 track, 3 road.
+  PATH_DISCOUNT: [0, 3, 5, 7],
+  MIN_STEP: 3, // STEP - PATH_DISCOUNT[3]; the A* heuristic reads it.
+} as const;
+
 
 // ---------------------------------------------------------------------------
 // §12.8 · Crossroads

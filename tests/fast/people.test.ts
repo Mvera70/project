@@ -38,6 +38,7 @@ function stateOf(seed: number): GameState {
       path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS),
       forestAge: new Uint8Array(CELLS),
+      forestStock: new Uint16Array(CELLS),
     },
     village: {
       grain: FOUNDING.GRAIN,
