@@ -143,9 +143,10 @@ export const villager: Sprite = (ctx, x, y, cell, palette) => {
 
 export function namedVillager(tone: string): Sprite {
   return (ctx, x, y, cell, palette) => {
-    const own = { ...palette, wood: tone };
-    villager(ctx, x, y, cell, own, 0);
-    ctx.fillStyle = palette.accent; ctx.beginPath(); ctx.arc((x + 0.5) * cell, (y + 0.12) * cell, 0.08 * cell, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = tone; ctx.strokeStyle = outline(tone); ctx.lineWidth = Math.max(1, cell * 0.1);
+    ctx.beginPath(); ctx.ellipse((x + 0.5) * cell, (y + 1.24) * cell, 0.225 * cell, 0.48 * cell, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc((x + 0.5) * cell, (y + 0.4) * cell, 0.18 * cell, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = palette.accent; ctx.beginPath(); ctx.arc((x + 0.5) * cell, (y + 0.1) * cell, 0.08 * cell, 0, Math.PI * 2); ctx.fill();
   };
 }
 

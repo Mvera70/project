@@ -179,7 +179,7 @@ function destinations(
 }
 
 /** This week's routes, recomputing only the ones that actually moved. */
-function routesOf(state: GameState): Map<VillagerId, number[]> {
+export function routesFor(state: GameState): Map<VillagerId, number[]> {
   const ground = GROUND.get(state) ?? 0;
   let cache = CACHE.get(state);
   if (cache === undefined) {
@@ -212,7 +212,7 @@ function routesOf(state: GameState): Map<VillagerId, number[]> {
 
 /** §17's contract: the route this villager walks, cached. */
 export function routeFor(state: GameState, id: VillagerId): number[] {
-  return routesOf(state).get(id) ?? [];
+  return routesFor(state).get(id) ?? [];
 }
 
 /**
@@ -233,7 +233,7 @@ export function accrueTraffic(state: GameState): void {
 
   // The villagers who left this week are gone from the routes, and the ones who
   // arrived are not in them yet, which is what the invalidation is for.
-  for (const walked of routesOf(state).values()) {
+  for (const walked of routesFor(state).values()) {
     for (const cell of walked) {
       const t = traffic[cell] as number;
       if (t < 65535) traffic[cell] = t + 1;

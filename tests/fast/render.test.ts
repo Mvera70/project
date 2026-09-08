@@ -5,6 +5,10 @@ import { cellFor } from '@render/canvas';
 import { luminance, outline, PALETTES, paletteFor } from '@render/palette';
 import { regionContours } from '@render/layers/terrain';
 import { BUILDING_SPRITES, NAMED_TONES } from '@render/sprites';
+import { crowdPositions } from '@render/crowd';
+import { foundGame } from '@engine/found';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { run } from '@engine/sim';
 
 const SILHOUETTES = ['forest', 'meadow', 'field', 'water', 'path'] as const;
 
@@ -63,5 +67,40 @@ describe('M-17 · catálogo visual', () => {
   it('reserva ocho tonos estables para los personajes nombrados', () => {
     expect(NAMED_TONES).toHaveLength(8);
     expect(new Set(NAMED_TONES).size).toBe(8);
+  });
+});
+
+describe('M-18 · multitud derivada', () => {
+  it('es pura, determinista y no deja figuras fuera del valle', () => {
+    const state = foundGame(7);
+    run(state, 20 * 48, 'prudent', CATALOG);
+    const tick = state.tick;
+    const terrain = [...state.map.terrain];
+    const first = crowdPositions(state, 0.45);
+    expect(crowdPositions(state, 0.45)).toEqual(first);
+    expect(state.tick).toBe(tick);
+    expect([...state.map.terrain]).toEqual(terrain);
+    for (const figure of first) {
+      expect(figure.x).toBeGreaterThanOrEqual(0);
+      expect(figure.y).toBeGreaterThanOrEqual(0);
+      expect(figure.x + 1).toBeLessThanOrEqual(state.map.width);
+      expect(figure.y + (figure.named ? 1.8 : 1.5)).toBeLessThanOrEqual(state.map.height);
+    }
+  });
+
+  it('de noche no deja a nadie a la intemperie', () => {
+    expect(crowdPositions(foundGame(7), 0.9)).toEqual([]);
+  });
+
+  it('calcula mil fotogramas de ochenta figuras en menos de 100 ms', () => {
+    const state = foundGame(7);
+    const originals = state.people.villagers;
+    while (state.people.villagers.length < 80) {
+      const source = originals[state.people.villagers.length % originals.length]!;
+      state.people.villagers.push({ ...source, id: state.people.nextId++, named: false, name: '' });
+    }
+    const started = performance.now();
+    for (let i = 0; i < 1_000; i += 1) crowdPositions(state, 0.45);
+    expect(performance.now() - started).toBeLessThan(100);
   });
 });

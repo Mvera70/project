@@ -9,6 +9,8 @@ import { SEASONS } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
 import { paletteFor } from '@render/palette';
 import { auditSprites } from '@render/sprites/audit';
+import { crowdPositions } from '@render/crowd';
+import { paintFigures, paintFigureShadows } from '@render/layers/figures';
 
 export interface DebugRequest {
   seed: number;
@@ -52,6 +54,9 @@ function diagnosticCanvas(root: HTMLElement, state: GameState, request: DebugReq
   shell.style.background = palette.void;
   ctx.scale(2, 2);
   ctx.drawImage(paintVillageBackground(state, palette, 10), 0, 0);
+  const figures = crowdPositions(state, 0.45);
+  paintFigureShadows(ctx, figures, 10);
+  paintFigures(ctx, figures, palette, 10);
   shell.append(canvas);
   root.append(shell);
 }

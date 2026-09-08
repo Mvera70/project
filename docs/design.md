@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.51 · 10 de septiembre de 2026, 03:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.52 · 10 de septiembre de 2026, 03:50 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.52** | 10 sep 2026, 03:50 | M-18 · la multitud | **Los anclajes son caché, no estado.** M-15 ya deriva rutas desde hogares, trabajo y suelo; M-18 las lee una vez por fotograma y completa niños, mayores y gente sin oficio con su hogar o la plaza. Ochenta figuras, 1.000 llamadas en 9,14 ms. |
 | **2.51** | 10 sep 2026, 03:10 | M-17 · edificios y figuras | **Las aspas no giran dentro de un fondo inmóvil.** La firma pura no recibe tiempo ni viento y los edificios se cachean; el molino conserva una orientación fija. Trece edificios, ruina y dos figuras dibujados por código, con sombras y contornos. |
 | **2.50** | 10 sep 2026, 02:20 | M-16 · terreno y paletas | **La tabla de color no cumplía su propio test.** Primavera y verano dejaban siluetas a 1–2 puntos; se aplica el menor desplazamiento de luminosidad que garantiza 8, con margen de cuantización. Terreno por regiones, caminos y cuatro estaciones visibles en la hoja de M-19. |
 | **2.49** | 10 sep 2026, 01:35 | M-19 antes del primer píxel | **La captura deja de depender del render.** La ruta de depuración salta a año y estación con política `prudent`; el comando produce 16 vistas móviles, sus 16 versiones grises y una hoja de contacto. M-16 heredará este instrumento ya ejecutable. |
@@ -96,6 +97,30 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.52 — La multitud no crea una segunda aldea
+
+§10.6 decía que cada aldeano «tiene» `anchorHome` y `anchorWork`, pero esas
+propiedades no existen en `Villager` y M-15 ya resolvió el mismo dato para el
+desgaste de caminos. Guardarlas ahora duplicaría hogar, asignación de trabajo y
+ruta, con tres maneras de quedar obsoletas.
+
+Los anclajes pasan a ser explícitamente **cachés derivadas**. M-18 lee en bloque
+las rutas de M-15 para la población trabajadora; niños, mayores y gente sin ruta
+laboral se quedan en el hogar, o en la plaza si no tienen casa. Uno de cada
+cuatro ticks recalcula el camino de todos a la plaza. La caché se identifica por
+objeto de partida y tick y nunca entra en `GameState` ni en el guardado.
+
+El ciclo interpola salida 0,00–0,15, jornada 0,15–0,60 y regreso 0,60–0,80 con
+un desfase determinista máximo de ±0,04 por `id`; desde 0,80 devuelve cero
+figuras. La deriva en destino es de hasta ±0,5 celdas y también deriva solo del
+`id` y la fracción. El render limita la multitud a las primeras 80 personas
+vivas en orden estable.
+
+**Qué habría falsado la solución:** una escritura en el estado, una posición
+fuera del mapa, una figura visible a 0,9 o superar 100 ms en 1.000 llamadas con
+80 personas. Las pruebas pasan; la medición aislada da **9,14 ms** y devuelve
+las 80 figuras.
 
 ### 2.51 — Lo inmóvil se cachea; las aspas también
 
@@ -3348,8 +3373,9 @@ para que un personaje conserve su color toda la partida.
 
 Hasta 80 figuras. **No se simulan**: se programan.
 
-Cada aldeano vivo tiene un `anchorHome` y un `anchorWork` (su casa y su campo,
-taller o el bosque). El ciclo cosmético del día tiene cuatro tramos:
+Cada aldeano vivo tiene un `anchorHome` y un `anchorWork` **derivados y
+cacheados, nunca guardados en `GameState`** (su casa y su campo, taller o el
+bosque; ver §2.52). El ciclo cosmético del día tiene cuatro tramos:
 
 | Tramo | Fracción del tick | Dónde |
 |---|---|---|
@@ -4507,6 +4533,11 @@ figuras: se ilumina la ventana.
 mapa; a `tickFraction = 0.9` no hay figuras a la intemperie; con 80 aldeanos,
 1 000 llamadas en menos de 100 ms.
 **Terminado cuando.** En un GIF de 20 s se ve salir al campo y volver.
+
+**Estado (v2.52): implementado, pendiente del GIF de cierre.** Posiciones puras,
+rutas cacheadas, domingo en la plaza, noche vacía, límite de 80 y presupuesto
+verificados. La hoja estática confirma densidad y lectura; el GIF necesita el
+bucle de aplicación de M-20 para aportar una fracción temporal real.
 
 ---
 
