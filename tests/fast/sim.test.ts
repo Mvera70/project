@@ -482,6 +482,21 @@ describe('la política prudent · §12.9', () => {
     expect(ask(t)).toBe('pay');
   });
 
+  it('una expulsión también es población perdida y no se compra', () => {
+    const t = template([
+      option('expel', [{ k: 'leave', who: 'A' }]),
+      option('pay', [{ k: 'stat', stat: 'grain', delta: -100 }]),
+    ]);
+    expect(ask(t)).toBe('pay');
+
+    const s = foundGame(7);
+    s.crossroad = {
+      templateId: t.id, posedTick: s.tick, cast: {},
+      optionIds: t.options.map((o) => o.id),
+    };
+    expect(decide(s, [t], 'worst')).toBe('expel');
+  });
+
   it('si todas matan, elige la que mata a menos', () => {
     const t = template([
       option('many', [{ k: 'kill', who: 'random', count: 4 }]),

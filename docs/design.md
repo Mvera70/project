@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.41 · 9 de septiembre de 2026, 02:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.42 · 9 de septiembre de 2026, 02:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -86,6 +86,18 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.39** | 9 sep 2026, 01:05 | Consecuencia de A.14 | **La reputación ganada frente a los bandidos reduce a la mitad el peso del señor.** `a_name_in_the_valley` se acumula con `behind_the_wall` sin saltarse elegibilidad ni crisis. |
 | **2.40** | 9 sep 2026, 01:30 | Consecuencia de A.7 | **Quien se retira acaba dejando el valle con dos acompañantes.** `leave` admite una cuenta aleatoria anónima; `the_withdrawn` marca tres marchas y deja de convertir una retirada en muerte. |
 | **2.41** | 9 sep 2026, 02:00 | Cierre de deuda de banderas | **El catálogo ya no escribe ninguna bandera sin lector.** Se retiran `unconsecrated`, para la que nunca existió plantilla, y `burnt_row`, sustituida por el bloqueo temporal de ruinas de v2.25. |
+| **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
+
+### 2.42 — Irse también vacía el valle
+
+La política `prudent` rechazaba cualquier muerte inmediata antes de puntuar,
+pero ignoraba el nuevo efecto `leave`; `worst` tampoco veía ese coste. Ambas
+lecturas hacían que una expulsión pareciera gratis en el instrumento aunque la
+población bajase igual. El filtro pasa a contar personas perdidas: suma muertes
+y marchas, y sigue prefiriendo el mínimo antes de valorar grano y ánimo.
+`worst` asigna a una marcha el mismo peso de 40 que a una baja inmediata.
+El estado conserva la diferencia: quien se marcha mantiene `diedTick = null` y
+no aparece en ninguna causa de mortalidad.
 
 ### 2.41 — Ninguna bandera muda
 

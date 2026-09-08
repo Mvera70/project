@@ -206,12 +206,12 @@ export type Policy =
  * above one that does not. The seed bonus is a preference for consequences the
  * village can still see coming, not a claim that seeds are always bad.
  *
- * **Deaths are not in that sum** (v2.14). They were, and putting them there
+ * **People lost are not in that sum** (v2.14, v2.42). Deaths once were, and putting them there
  * priced a life at forty bushels: there are options in the catalogue where that
  * came out cheap, and measured over 60 seeds `prudent` was dying of violence
  * three times as often as `first` — 14.1 % of its dead against 4.2 %. A cautious
- * villager does not trade lives for grain at any exchange rate. So the killing
- * is a filter applied before the score, in `decide`, and never a term in it.
+ * villager does not trade inhabitants for grain at any exchange rate. Deaths
+ * and immediate departures are a filter in `decide`, never a term in the score.
  */
 function prudentScore(state: GameState, catalogue: Catalogue, optionId: string): number {
   const option = optionOf(state, catalogue, optionId);
@@ -241,14 +241,17 @@ function optionOf(
   return template?.options.find((o) => o.id === optionId);
 }
 
-/** How many the option kills outright. §12.9's filter, not its score. */
-function immediateDead(state: GameState, catalogue: Catalogue, optionId: string): number {
+/** How many people the option removes outright. §12.9's filter, not its score. */
+function immediatePeopleLost(state: GameState, catalogue: Catalogue, optionId: string): number {
   const option = optionOf(state, catalogue, optionId);
   if (option === undefined) return 0;
   let dead = 0;
   for (const e of option.effects) {
-    if (e.k !== 'kill') continue;
-    dead += e.count === 'fraction' ? population(state) * (e.fraction ?? 0) : e.count;
+    if (e.k === 'kill') {
+      dead += e.count === 'fraction' ? population(state) * (e.fraction ?? 0) : e.count;
+    } else if (e.k === 'leave') {
+      dead += e.count ?? 1;
+    }
   }
   return dead;
 }
@@ -269,6 +272,8 @@ function immediateCost(state: GameState, catalogue: Catalogue, optionId: string)
   for (const e of option.effects) {
     if (e.k === 'kill') {
       cost += 40 * (e.count === 'fraction' ? population(state) * (e.fraction ?? 0) : e.count);
+    } else if (e.k === 'leave') {
+      cost += 40 * (e.count ?? 1);
     } else if (e.k === 'stat') {
       const delta = 'delta' in e ? e.delta : state.village[e.stat] * (e.mul - 1);
       cost -= delta * (e.stat === 'grain' ? 0.05 : e.stat === 'wood' ? 0.02 : 1);
@@ -355,12 +360,12 @@ export function decide(
       return worst;
     }
     case 'prudent': {
-      // §12.9, v2.14: deaths are a filter, not a price. If anything on the
-      // table kills nobody, only those are considered; if everything kills,
-      // the fewest dead win and the score decides between equals.
-      const dead = new Map(options.map((id) => [id, immediateDead(state, catalogue, id)]));
-      const fewest = Math.min(...dead.values());
-      const survivable = options.filter((id) => dead.get(id) === fewest);
+      // §12.9, v2.14/v2.42: people lost are a filter, not a price. If anything
+      // on the table removes nobody, only those options are considered; if all
+      // do, the fewest lost win and the score decides between equals.
+      const lost = new Map(options.map((id) => [id, immediatePeopleLost(state, catalogue, id)]));
+      const fewest = Math.min(...lost.values());
+      const survivable = options.filter((id) => lost.get(id) === fewest);
 
       // Ties break on the option's id, never on where it happens to sit in the
       // template (§12.9, v2.13): the order the options are written in must not
