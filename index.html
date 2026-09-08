@@ -6,9 +6,14 @@
     <meta name="theme-color" content="#8fae5b" />
     <title>The Valley</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #b9c9cf; overscroll-behavior: none; }
+      html, body { margin: 0; height: 100%; background: #20201d; overscroll-behavior: none; }
       body { display: grid; place-items: center; font: 14px/1.4 system-ui, sans-serif; color: #3c3a34; }
-      #valley { display: block; touch-action: none; }
+      .valley-app { --valley-void: #b9c9cf; position: relative; display: grid; place-items: start center; width: min(100vw, 390px); height: min(100dvh, 844px); overflow: hidden; background: var(--valley-void); }
+      #valley { display: block; margin-top: max(22px, env(safe-area-inset-top)); border: 2px solid transparent; touch-action: none; }
+      .valley-year { position: absolute; top: max(7px, env(safe-area-inset-top)); left: 15px; color: #303029; font: 600 11px/1.2 Georgia, serif; letter-spacing: .12em; }
+      .valley-speeds { position: absolute; right: max(10px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: flex; gap: 6px; }
+      .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 8px; border: 1px solid rgba(48,48,41,.35); border-radius: 50%; background: rgba(242,244,246,.76); color: #303029; font: 600 12px/1 system-ui,sans-serif; }
+      .valley-speeds button[aria-pressed="true"] { background: #303029; color: #f2f4f6; }
     </style>
   </head>
   <body>
