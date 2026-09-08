@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.46 · 9 de septiembre de 2026, 23:50 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.47 · 10 de septiembre de 2026, 00:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,8 +89,63 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.47 — Cierre de la fase de balance
+
+**Dos correcciones que la auditoría de la v2.46 dejó servidas.** Las dos son
+erratas mías de la v2.0, no consecuencias de nada:
+
+- **A.11 · `forestLeft > 0.3` era inalcanzable.** `FOREST_TARGET` topa en 0.26
+  (§12.7), así que la plantilla estaba muerta **desde el tick cero** y sus cero
+  apariciones en 240 partidas no eran un síntoma de madurez: era aritmética. Baja
+  a 0.12, que es lo que la condición quería decir —«queda madera que valga la
+  pena talar»— dejando el disparador episódico en `neededFields > fields`. Con
+  eso, `forest_cut` es contenido de la primera mitad **por diseño**: no se
+  roturan más campos que el tope de ocho, y eso es correcto.
+- **A.10 · `relic_pedlar` abandonaba su franja de fe para no volver.** La deriva
+  de §5.6 estabiliza la fe por encima de 70 en cuanto hay capilla. Se retira el
+  tope: una aldea próspera y devota es exactamente donde aparecería un vendedor
+  de reliquias. Caso de manual de la regla de la aldea madura (§8.1).
+
+**Y el cierre de la fase.** El desenlace sigue fuera de banda —`prudent` 1,7 %
+contra 2–12 %, `worst` 10,0 % contra ≥25 %, horquilla 8,3 contra ≥20— y van
+**dos hipótesis falsadas seguidas** con el mismo método:
+
+| Hipótesis | Cómo se falsó |
+|---|---|
+| La puerta de ocho habitantes cierra la recuperación | A/B idéntico semilla por semilla (v2.17) |
+| Los dientes deben dañar la capacidad, no a la gente | Ocho campos en pie al año 200 en las cuatro políticas (v2.46) |
+
+La segunda dejó, además, la explicación de por qué: **un campo cuesta 0 de
+madera y 60 puntos de obra y encabeza la prioridad de construcción**, así que
+destruirlo es un rasguño que la aldea repara en semanas. El gradiente existe
+—7,92 campos y 98 % al tope con `prudent` contra 7,38 y 68 % con `worst`— pero
+queda sepultado por lo barato que es reconstruir.
+
+**Dos hipótesis falsadas seguidas significan que falta evidencia, no que falte
+otra hipótesis.** Una tercera conjetura de despacho tendría la misma calidad que
+las dos anteriores. Lo que queda por saber no es qué constante mover: es si un
+jugador **siente** la diferencia entre jugar bien y jugar mal — y eso §16.2 ya
+dice que solo se resuelve jugando.
+
+Por eso la fase de balance se cierra aquí. El banco queda como **red de
+regresión**, no como instrumento de diseño: sirve para que nada empeore mientras
+se construye el render. Las tres pistas vivas, para cuando haya con qué medirlas,
+quedan anotadas y sin tocar:
+
+1. **Impedir la reconstrucción, no destruir.** El mecanismo existe y no se ha
+   probado: `plague_pit:burn_the_houses` marca ruina de piedra veinte años. Un
+   campo quemado que no se puede volver a roturar es otra cosa que un campo
+   quemado.
+2. **El motor de recuperación es la inmigración, y el juego prudente nunca lo
+   apaga.** `hostile` no se activa jamás con `prudent` (medido dos veces). Nada
+   de lo que hace un jugador cuidadoso puede cortar su propia recuperación.
+3. **Los umbrales de §12.9 son suposiciones de la v2.0.** El 25 % y los 20
+   puntos se escribieron antes de que existiera el catálogo, igual que el rango
+   de cadencia 1–4 que ya hubo que corregir a 1–5.
 
 ### 2.46 — La hipótesis falsada, y la aldea madura completa
 
@@ -4667,7 +4722,7 @@ todo.*
 ### A.10 `relic_pedlar` · faith
 
 **Peso** 6 · **Reposo** 25 años
-**Requiere** `has chapel`, `faith` entre 30 y 70, `grainYears > 0.6`
+**Requiere** `has chapel`, `faith > 30`, `grainYears > 0.6` — se retira el tope de 70: la deriva de §5.6 estabiliza la fe por encima de esa cifra en cuanto hay capilla, así que la franja se abandonaba para no volver (§8.1, regla de la aldea madura). Y una aldea próspera y devota es justo donde aparecería un vendedor de reliquias
 **Reparto** `A = priest`, `B = leader`
 
 > **A Bone in a Box**
@@ -4685,7 +4740,7 @@ todo.*
 ### A.11 `forest_cut` · forest
 
 **Peso** 9 · **Reposo** 15 años
-**Requiere** `forestLeft > 0.3`, `neededFields > fields`, `people > 25`
+**Requiere** `forestLeft > 0.12`, `neededFields > fields`, `people > 25` — el 0.3 original era **inalcanzable**: la generación de mapa tope en 0.26 (§12.7), así que la plantilla estaba muerta desde el tick cero. El bosque es aquí una **puerta** («queda madera que valga la pena talar»); el disparador episódico es `neededFields > fields`, y por eso `forest_cut` es contenido de la primera mitad **por diseño**: no se roturan más campos que el tope de ocho
 **Reparto** `A = woodward`
 
 > **The Old Wood**
