@@ -4,7 +4,7 @@
 // to somebody else; what lives here is the sequence, and the sequence is
 // normative — changing it changes the balance and breaks saved games.
 
-import { LABOUR, PEOPLE } from './balance';
+import { LABOUR, MIGRATION, PEOPLE, TIME } from './balance';
 import {
   isHere,
   population,
@@ -469,8 +469,18 @@ export function tick(
   // says how much it actually got, which is §5.2's `woodCap`: a valley that has
   // been cut flat stops producing timber instead of producing it out of air.
   const allocation = allocateLabour(state);
+  const oldWoodStood = state.flags['old_forest_gone'] === undefined;
   const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER);
   const produced = produce(state, allocation, felled);
+  // §9, v2.16: the one thing about the forest that is an event and not a state.
+  if (oldWoodStood && state.flags['old_forest_gone'] !== undefined) {
+    say({
+      kind: 'lost',
+      templateKey: 'forest.old_gone',
+      params: { year: year(), season: season() },
+      weight: 2,
+    });
+  }
 
   // ---- 6 · WORKS -----------------------------------------------------------
   // M-14 spends the week's build points and opens the next project. The
@@ -605,6 +615,37 @@ export function tick(
   state.chronicle.push(...buffer);
 
   // ---- 17 · END ------------------------------------------------------------
+  // §5.7's abandonment, checked before extinction so that the two are told
+  // apart by which happened: a hamlet that walks out has people in it when it
+  // does, and a village that dies has nobody.
+  const living = population(state);
+  if (living >= MIGRATION.VIABLE_POPULATION) {
+    state.dwindlingSince = null;
+  } else if (living > 0 && state.dwindlingSince === null) {
+    state.dwindlingSince = state.tick;
+  }
+
+  if (
+    state.ended === null &&
+    living > 0 &&
+    state.dwindlingSince !== null &&
+    state.tick - state.dwindlingSince >= MIGRATION.ABANDON_YEARS * TIME.WEEKS_PER_YEAR
+  ) {
+    // They walk out; they do not die. `leftTick` is §5.7's own word for it, and
+    // it keeps the mortality of §12.4 honest — nobody was killed by this.
+    for (const v of state.people.villagers) {
+      if (isHere(v)) v.leftTick = state.tick;
+    }
+    state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };
+    state.chronicle.push({
+      tick: state.tick,
+      kind: 'abandonment',
+      templateKey: 'abandonment',
+      params: { year: year(), season: season(), count: living },
+      weight: 3,
+    });
+  }
+
   if (state.ended === null && population(state) === 0) {
     const last = [...state.people.villagers]
       .filter((v) => v.diedTick !== null)

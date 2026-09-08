@@ -354,7 +354,8 @@ export type ChronicleKind =
   | 'crossroad_posed'
   | 'crossroad_taken'
   | 'consequence'
-  | 'extinction';
+  | 'extinction'
+  | 'abandonment';
 
 /**
  * The chronicle stores keys and parameters, never prose. The text is composed
@@ -396,7 +397,15 @@ export interface Outbreak {
  */
 export interface EndState {
   tick: number;
-  cause: 'extinction';
+  /**
+   * `extinction` — the last of them died.
+   * `abandoned` — §5.7: too few for too long, and the rest walked out.
+   *
+   * Both leave the valley at zero, which is the only way §1 allows a game to
+   * be lost. They are told apart because the chronicle has to say which: a
+   * failed settlement is not a village that starved.
+   */
+  cause: 'extinction' | 'abandoned';
   lastId: VillagerId | null; // the last to die, quoted by the chronicle
 }
 
@@ -496,6 +505,15 @@ export interface GameState {
   history: DecisionRecord[]; // record of the player's decisions
   weather: YearWeather;
   outbreak: Outbreak | null;
+  /**
+   * When the village first fell below `MIGRATION.VIABLE_POPULATION`, or null if
+   * it is above it. §5.7's abandonment counts from here.
+   *
+   * A tick and not a counter of years, so that it says the same thing however
+   * often it is looked at, and so that a saved game does not have to remember
+   * how far through a year it was.
+   */
+  dwindlingSince: number | null;
   ended: EndState | null;
 }
 

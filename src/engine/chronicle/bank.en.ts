@@ -337,6 +337,28 @@ export const BANK: Record<string, string[]> = {
     '{count} things that had stood did not stand after year {year}.',
   ],
 
+  // -------------------------------------------------------------------------
+  // §5.7, v2.16 · The settlement that was given up. Weight 3: it is the end of
+  // the game, and it is not the same end as an extinction — nobody died of it.
+  // -------------------------------------------------------------------------
+
+  'abandonment': [
+    'The last {count} walked out in the {season} of year {year}, and the valley was nobody\u2019s again.',
+    'In year {year} the remaining {count} took what they could carry and went.',
+    'There were {count} left in year {year}, and then there were none. They did not die; they left.',
+  ],
+
+  // -------------------------------------------------------------------------
+  // §9, v2.16 · The one thing about the forest that is an event and not a
+  // state: the week the last of the old wood comes down. Weight 2.
+  // -------------------------------------------------------------------------
+
+  'forest.old_gone': [
+    'The last of the old wood came down in the {season} of year {year}.',
+    'In year {year} they felled the last tree that had been standing when they came.',
+    'By the {season} of year {year} nothing was left of the wood they had found here.',
+  ],
+
   // §9.4 · What a named death drags behind it
   //
   // These are not lines of their own. They are the second sentence appended to

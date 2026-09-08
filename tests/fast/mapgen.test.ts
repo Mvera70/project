@@ -144,8 +144,23 @@ describe('generación del mapa · §7.1', () => {
 
   it('las capas de simulación nacen en blanco', () => {
     const map = generateMap(makeBundle(7));
-    for (const layer of [map.traffic, map.path, map.ruins, map.forestAge]) {
+    for (const layer of [map.traffic, map.path, map.ruins]) {
       expect([...layer].every((v) => v === 0)).toBe(true);
+    }
+  });
+
+  it('el bosque nace lleno y marcado como viejo', () => {
+    // `forestStock` y `forestAge` no son capas en blanco: llevan lo que el
+    // valle tenía el día que llegaron. Fuera del bosque sí están a cero.
+    const map = generateMap(makeBundle(7));
+    for (let i = 0; i < map.terrain.length; i += 1) {
+      if (map.terrain[i] === TERRAIN_CODE.forest) {
+        expect(map.forestStock[i]).toBe(WORLD.WOOD_PER_FOREST_TILE);
+        expect(map.forestAge[i]).toBe(WORLD.VIRGIN_FOREST);
+      } else {
+        expect(map.forestStock[i]).toBe(0);
+        expect(map.forestAge[i]).toBe(0);
+      }
     }
   });
 });

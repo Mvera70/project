@@ -5,7 +5,7 @@
 // que cuelga todo el proyecto, y que mil ticks no revienten.
 import { describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
-import { LIFE, PEOPLE, TIME } from '@engine/balance';
+import { LIFE, MIGRATION, PEOPLE, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { isHere, population } from '@engine/people/demography';
@@ -544,5 +544,104 @@ describe('la política prudent · §12.9', () => {
     run(a, 3000, 'prudent', CATALOG);
     run(b, 3000, 'prudent', CATALOG);
     expect(fingerprint(a)).toBe(fingerprint(b));
+  });
+});
+
+describe('el abandono · §5.7, v2.16', () => {
+  const YEARS = MIGRATION.ABANDON_YEARS;
+
+  /** Una aldea reducida a `n` vivos, sin tocar nada más. */
+  function shrunk(n: number): GameState {
+    const s = foundGame(7);
+    s.people.villagers.forEach((v, i) => {
+      if (i >= n) {
+        v.diedTick = 0;
+        v.causeOfDeath = 'natural';
+      }
+    });
+    s.people.namedIds = s.people.namedIds.filter(
+      (id) => s.people.villagers.find((v) => v.id === id)?.diedTick === null,
+    );
+    s.village.grain = 100000; // que no sea el hambre quien decida
+    return s;
+  }
+
+  it('cinco años seguidos por debajo de seis y se marchan', () => {
+    const s = shrunk(3);
+    for (let i = 0; i < (YEARS + 2) * YEAR && s.ended === null; i += 1) tick(s, CATALOG);
+    expect(s.ended?.cause).toBe('abandoned');
+    expect(population(s)).toBe(0);
+    // Se van, no se mueren: la mortalidad de §12.4 no se lleva el mérito.
+    for (const v of s.people.villagers) {
+      if (v.diedTick === null) expect(v.leftTick).toBe(s.ended?.tick);
+    }
+  });
+
+  it('ni una semana antes', () => {
+    // El reloj arranca la semana en que se les ve por debajo de seis, así que
+    // se van cinco años completos después de esa semana y no antes.
+    const s = shrunk(3);
+    for (let i = 0; i < YEARS * YEAR; i += 1) tick(s, CATALOG);
+    expect(s.dwindlingSince).not.toBeNull();
+    expect(s.tick - (s.dwindlingSince as number)).toBeLessThan(YEARS * YEAR);
+    expect(s.ended).toBeNull();
+    tick(s, CATALOG);
+    expect(s.tick - (s.dwindlingSince as number)).toBe(YEARS * YEAR);
+    expect(s.ended?.cause).toBe('abandoned');
+  });
+
+  it('el reloj se pone a cero si la aldea se recupera', () => {
+    const s = shrunk(3);
+    for (let i = 0; i < 3 * YEAR; i += 1) tick(s, CATALOG);
+    expect(s.dwindlingSince).not.toBeNull();
+    // Vuelven a ser seis: el contador se reinicia y los cinco años empiezan de
+    // nuevo, que es lo que quiere decir "cinco años seguidos".
+    for (const v of s.people.villagers.slice(0, MIGRATION.VIABLE_POPULATION)) {
+      v.diedTick = null;
+      v.leftTick = null;
+    }
+    tick(s, CATALOG);
+    expect(s.dwindlingSince).toBeNull();
+    for (const v of s.people.villagers.slice(3, MIGRATION.VIABLE_POPULATION)) v.diedTick = 0;
+    for (let i = 0; i < 3 * YEAR; i += 1) tick(s, CATALOG);
+    expect(s.ended).toBeNull();
+  });
+
+  it('una aldea viable no se abandona nunca', () => {
+    const s = foundGame(108);
+    run(s, 40 * YEAR, 'prudent', CATALOG);
+    if (population(s) >= MIGRATION.VIABLE_POPULATION) {
+      expect(s.ended).toBeNull();
+      expect(s.dwindlingSince).toBeNull();
+    }
+  });
+
+  it('deja su línea de peso 3 en la crónica, y no es la de extinción', () => {
+    const s = shrunk(3);
+    for (let i = 0; i < (YEARS + 2) * YEAR && s.ended === null; i += 1) tick(s, CATALOG);
+    const entry = s.chronicle.find((e) => e.kind === 'abandonment');
+    expect(entry?.weight).toBe(3);
+    expect(s.chronicle.some((e) => e.kind === 'extinction')).toBe(false);
+  });
+
+  it('morir del todo sigue siendo extinción, no abandono', () => {
+    const s = foundGame(3);
+    for (const v of s.people.villagers) v.diedTick = 1;
+    tick(s, CATALOG);
+    expect(s.ended?.cause).toBe('extinction');
+  });
+
+  it('acota la agonía a los años que dice §5.7', () => {
+    // Lo que esto existe para arreglar: partidas que pasaban cuarenta años a
+    // dos habitantes sin morirse ni recuperarse.
+    for (const seed of [1, 2, 4, 14]) {
+      const s = foundGame(seed);
+      let below = 0;
+      for (let i = 0; i < 200 * YEAR && s.ended === null; i += 1) {
+        tick(s, CATALOG);
+        if (population(s) > 0 && population(s) < MIGRATION.VIABLE_POPULATION) below += 1;
+      }
+      expect(below / YEAR, `semilla ${seed}`).toBeLessThanOrEqual(MIGRATION.ABANDON_YEARS + 1);
+    }
   });
 });

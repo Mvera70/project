@@ -56,6 +56,7 @@ function stateOf(seed: number): GameState {
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
+    dwindlingSince: null,
     ended: null,
   };
 }

@@ -31,6 +31,21 @@ export function woodStanding(state: GameState): number {
   return total;
 }
 
+/**
+ * Cells of the wood that was standing when they arrived. §9, v2.16.
+ *
+ * Once this reaches zero it stays there: felling clears the mark, and regrowth
+ * never sets it. That is what makes the last one an event worth a line.
+ */
+export function virginForestCells(state: GameState): number {
+  let n = 0;
+  for (let i = 0; i < state.map.terrain.length; i += 1) {
+    if (state.map.terrain[i] === TERRAIN_CODE.forest &&
+      state.map.forestAge[i] === WORLD.VIRGIN_FOREST) n += 1;
+  }
+  return n;
+}
+
 /** How many cells are still forest. §12.9 measures the valley in these. */
 export function forestCells(state: GameState): number {
   let n = 0;
@@ -86,9 +101,16 @@ export function fellForest(state: GameState, wood: number): number {
     got += take;
     // Emptied: the cell is cleared and starts counting towards its regrowth.
     if (state.map.forestStock[cell] === 0) {
+      const wasOld = state.map.forestAge[cell] === WORLD.VIRGIN_FOREST;
       state.map.terrain[cell] = TERRAIN_CODE.cleared;
       state.map.forestAge[cell] = 0;
       cleared = true;
+      // The last of the old wood. Counting the whole map is only worth doing
+      // on the week a cell of it actually falls, and only until it is gone.
+      if (wasOld && state.flags['old_forest_gone'] === undefined &&
+        virginForestCells(state) === 0) {
+        state.flags['old_forest_gone'] = 0; // permanent (§3.1)
+      }
     }
   }
   // Only a cell that actually fell moves the wood. Taking seven units off a
@@ -130,8 +152,12 @@ export function regrowForest(state: GameState): void {
   let grew = false;
   for (let i = 0; i < state.map.terrain.length; i += 1) {
     if (before[i] !== TERRAIN_CODE.cleared) continue;
-    if (state.map.forestAge[i] === 255) continue; // saturated; already counted
-    state.map.forestAge[i] = Math.min(255, (state.map.forestAge[i] as number) + 1);
+    // Saturating, not stopping: a cell that waited two and a half centuries for
+    // a third forest neighbour is still allowed to get one.
+    state.map.forestAge[i] = Math.min(
+      WORLD.VIRGIN_FOREST - 1,
+      (state.map.forestAge[i] as number) + 1,
+    );
     if ((state.map.forestAge[i] as number) < WORLD.FOREST_REGROWTH_YEARS) continue;
     if (occupied[i] === 1) continue;
 

@@ -12,7 +12,13 @@ import { run } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
 import type { GameState } from '@engine/state';
 import { route, stepCost } from '@engine/world/astar';
-import { fellForest, forestCells, regrowForest, woodStanding } from '@engine/world/forest';
+import {
+  fellForest,
+  forestCells,
+  regrowForest,
+  virginForestCells,
+  woodStanding,
+} from '@engine/world/forest';
 import { accrueTraffic, routeFor, upgradePaths } from '@engine/world/paths';
 import { idx } from '@engine/world/tiles';
 
@@ -339,5 +345,56 @@ describe('el bosque · §7.5', () => {
     const before = s.village.wood;
     run(s, 20, 'prudent', CATALOG);
     expect(s.village.wood).toBeLessThanOrEqual(before);
+  });
+});
+
+describe('el bosque viejo · §9, v2.16', () => {
+  it('nace todo marcado y la marca no vuelve', () => {
+    const s = foundGame(7);
+    expect(virginForestCells(s)).toBe(forestCells(s));
+    // Talarlo entero y dejar que rebrote no devuelve la marca: lo que crece no
+    // es el bosque que encontraron.
+    fellForest(s, woodStanding(s));
+    expect(virginForestCells(s)).toBe(0);
+  });
+
+  it('la última celda del bosque viejo deja línea de peso 2, una sola vez', () => {
+    const s = foundGame(7);
+    const before = s.chronicle.length;
+    // Talar a mano hasta el final y luego dejar correr una semana del motor.
+    fellForest(s, woodStanding(s));
+    expect(s.flags['old_forest_gone']).toBe(0);
+
+    const t = foundGame(42);
+    let seen = 0;
+    for (let i = 0; i < 200 * YEAR && t.ended === null; i += 1) {
+      const report = run(t, 1, 'prudent', CATALOG)[0];
+      seen += (report?.entries ?? []).filter((e) => e.templateKey === 'forest.old_gone').length;
+    }
+    expect(seen).toBeLessThanOrEqual(1);
+    if (seen === 1) {
+      const entry = t.chronicle.find((e) => e.templateKey === 'forest.old_gone');
+      expect(entry?.weight).toBe(2);
+    }
+    expect(s.chronicle.length).toBe(before); // fellForest no escribe crónica
+  });
+
+  it('una celda despejada sigue pudiendo rebrotar tras siglos de espera', () => {
+    // El contador satura por debajo de la marca de bosque viejo en vez de
+    // pararse: si se parase, una celda que esperó doscientos cincuenta y cinco
+    // años a tener tres vecinas ya no rebrotaría nunca.
+    const s = foundGame(7);
+    const cell = idx(4, 4);
+    s.map.terrain[cell] = TERRAIN_CODE.cleared;
+    for (const n of [idx(3, 4), idx(5, 4), idx(4, 3)]) s.map.terrain[n] = TERRAIN_CODE.meadow;
+    for (let year = 1; year <= 300; year += 1) {
+      s.tick = year * YEAR;
+      regrowForest(s);
+    }
+    expect(s.map.forestAge[cell]).toBeLessThan(WORLD.VIRGIN_FOREST);
+    for (const n of [idx(3, 4), idx(5, 4), idx(4, 3)]) s.map.terrain[n] = TERRAIN_CODE.forest;
+    s.tick = 301 * YEAR;
+    regrowForest(s);
+    expect(s.map.terrain[cell]).toBe(TERRAIN_CODE.forest);
   });
 });

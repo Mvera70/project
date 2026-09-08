@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.15 · 8 de septiembre de 2026, 09:52 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.16 · 8 de septiembre de 2026, 11:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -44,6 +44,138 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.13** | 8 sep 2026, 01:20 | Revisión de M-13/M-14 | **Política `prudent` como referencia** y bandas por política; horquilla mínima entre jugar bien y mal; `interregnum` cierra la sucesión; los campos no arden. |
 | **2.14** | 8 sep 2026, 01:46 | Primera lectura del hito 0 | **Tabla de pesos normativa y agregación por año**; **tripulación mínima de campo**: se acabó la aldea zombi; `prudent` no compra muertes. |
 | **2.15** | 8 sep 2026, 09:52 | M-15 | **Caminos y bosque**: el mapa cuenta dónde se pisa y qué se tala. Deuda del bosque de §12.9 saldada: incluir las dos plantillas mueve la cadencia 0,02. El banco se sale del presupuesto. |
+| **2.16** | 8 sep 2026, 11:20 | M-16 | **Abandono**: se acabó la agonía de cuarenta años. Presupuesto del banco a 10 min. La banda del bosque queda aguas abajo de la extinción. Atribución medida: `hostile` no se activa nunca con `prudent`. |
+
+### 2.16 — El abandono, y dónde se mueren las aldeas
+
+- **§5.7 · Abandono.** `MIN_FIELD_CREW = 2` no mordía: con dos adultos ya se
+  cubre el mínimo de un campo, así que la aldea de dos seguía cosechando. El
+  listón estaba por debajo del caso que había que matar. En su lugar,
+  `VIABLE_POPULATION = 6` y `ABANDON_YEARS = 5`: cinco años seguidos por debajo
+  de seis habitantes y los que quedan se marchan. **Se van, no se mueren** —
+  `leftTick`, no `diedTick`—, así que la mortalidad de §12.4 no se lleva un
+  mérito que no es suyo, y la partida termina con el valle a cero, que es la
+  única forma de perder que admite §1. `MIN_FIELD_CREW` se queda: la regla es
+  correcta aunque no resolviera esto.
+- **§3 · `GameState.dwindlingSince`.** La semana en que se les vio por debajo de
+  seis, o `null`. Un tick y no una cuenta de años, para que diga lo mismo se
+  mire cuando se mire y para que una partida guardada no tenga que recordar por
+  dónde iba el año.
+- **§9 · Dos líneas nuevas.** `abandonment`, peso 3: un asentamiento fallido no
+  se muere de hambre, se abandona, y la crónica tiene que decir cuál de las dos
+  cosas pasó. Y `forest.old_gone`, peso 2, la semana en que cae la última celda
+  del bosque que estaba en pie cuando llegaron — lo único del bosque que es
+  suceso y no estado. Nada más de bosque en la crónica.
+- **§12.7 · `VIRGIN_FOREST`.** La marca que lleva `forestAge` en una celda del
+  bosque viejo. En una celda de bosque ese campo no tenía nada que decir —cuenta
+  los años de una celda *despejada*—, así que es donde cabe «este árbol estaba
+  aquí cuando llegaron» sin otra capa. Talar borra la marca y el rebrote no la
+  pone: lo que vuelve a crecer no es el bosque que encontraron.
+- **§14.2 · El presupuesto del banco sube de 5 a 10 minutos.** Los cinco se
+  fijaron cuando la suite no hacía nada. Se lanza aparte, en nocturna, y no
+  tiene sentido degradar la medición para caber en un número inventado.
+- **§12.9 · La banda del bosque es aguas abajo de la extinción.** Falla por
+  arriba, no por abajo: el valle que se queda sin gente conserva sus árboles
+  porque no hay quien los tale. No se ajusta hasta que la extinción esté en
+  banda.
+
+**Atribución de la extinción.** Medido con `prudent`, 60 semillas × 200 años, en
+`tools/attribution-report.ts` (`npm run attribution`). No es una puerta ni un
+umbral: son cuatro medidas para que la decisión sobre qué efecto tocar se tome
+contra números.
+
+Con el abandono dentro, **48 de 60 partidas terminan: 47 abandonadas y 1
+extinguida**. No son partidas nuevas que se mueran; son las mismas que antes se
+arrastraban décadas, terminadas cuando dejan de ser una aldea.
+
+**(a) Opciones tomadas en los 20 años anteriores al final.** Solo aparecen
+cuatro opciones distintas, porque a 2,2 encrucijadas por generación una ventana
+de veinte años contiene unas dos decisiones. Con esa reserva:
+
+| Opción | En finales | En supervivientes | Factor |
+|---|---:|---:|---:|
+| `succession:choose_a` | 70,8 % | 83,3 % | 0,85 |
+| `quiet_years:a_free_work` | 37,5 % | 16,7 % | **2,25** |
+| `tithe_demand:send_him_away` | 18,8 % | 58,3 % | 0,32 |
+| `quiet_years:a_season_of_feasting` | 8,3 % | 0,0 % | solo en finales |
+
+Las dos de `quiet_years` son la reserva de §8.1: salen cuando no hay ninguna
+otra plantilla elegible, que es lo que le pasa a una aldea que se está quedando
+sin gente. Son síntoma, no causa. `tithe_demand:send_him_away` aparece tres
+veces más en las que sobreviven.
+
+**(b) La bandera `hostile` no se activa nunca con `prudent`.** Ni una vez en 60
+partidas, ni tampoco con `first`. La ponen tres opciones —
+`strangers_at_the_ford:turn_them_away`, `relic_pedlar:take_the_box` y la semilla
+de `granary_theft:a_new_latch`— y ninguna de las dos políticas razonables toma
+ninguna. `last` y `worst` sí: `turn_them_away` en 34 y 35 de 60.
+
+El motivo es la fórmula de §12.9. En `strangers_at_the_ford`, acoger cuesta 40
+de grano y da +6 de ánimo; a 15 puntos por punto de ánimo eso son **+90 contra
+−40**, así que `prudent` acoge siempre. **El castigo por mala reputación que
+describe §5.7 es contenido muerto para el jugador que juega bien.** Es una
+decisión de diseño, no un fallo: o el ánimo pesa menos, o la mala reputación
+tiene que llegar por otro camino.
+
+**(c) Causas de muerte con `prudent`.** La violencia bajó de **14,1 % a 8,5 %**
+al dejar de comprar muertes; `first` está en 3,8 %. Lo que queda son opciones
+donde matan todas —ahí `prudent` minimiza pero sigue matando— y semillas que
+matan al vencer, años después de la decisión.
+
+| Causa | Muertes | Parte |
+|---|---:|---:|
+| natural | 6 897 | 59,7 % |
+| peste | 1 323 | 11,4 % |
+| hambre | 1 265 | 10,9 % |
+| vejez | 1 084 | 9,4 % |
+| violencia | 981 | 8,5 % |
+| frío | 5 | 0,0 % |
+
+**(d) Se decide tarde.** Población en el año 40, mediana: **54 en las que
+terminan, 62,5 en las que sobreviven**. Solo 9 de las 48 terminan antes del año
+40. Una aldea de cincuenta y cuatro personas en el año 40 no está condenada por
+nada que pasara temprano; se deshace después, a lo largo de un siglo o más.
+
+**Lo que no se ha tocado.** Ni reposos, ni condiciones, ni el techo, ni A.7=45,
+ni ningún efecto del catálogo. Las cuatro medidas están para que se decida
+contra ellas.
+
+**Lo que el abandono le hizo al banco.** 60 semillas × 200 años × cuatro
+políticas, 443 s (presupuesto nuevo: 600).
+
+| Métrica | `prudent` | `first` | `last` | `worst` |
+|---|---:|---:|---:|---:|
+| Partidas terminadas | 80,0 % | 71,7 % | 83,3 % | 83,3 % |
+| Mediana del pico | 76,5 | 72,5 | 46,5 | 50,5 |
+| Mapas llenos < año 120 | 50,0 % | 48,3 % | 33,3 % | 31,7 % |
+| Cadencia sin bosque | 2,465 | 2,468 | 5,312 | 5,338 |
+| **Mediana de años bajo seis** | **5,0** | **5,0** | **5,0** | **5,0** |
+| Máximo de años bajo seis | 9,96 | 15,31 | 10,25 | 10,25 |
+| Bosque 40–70 % al año 100 | 24/37 | 24/37 | 15/29 | 14/26 |
+| Rangos / geometría | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 |
+
+Tres consecuencias que hay que leer juntas, porque son la misma:
+
+1. **La agonía se acabó.** La mediana de años por debajo de seis habitantes cae
+   de **27,8 a 5,0** en las cuatro políticas. Es exactamente
+   `ABANDON_YEARS`: en cuanto una aldea cruza el umbral, tiene cinco años y se
+   acabó.
+2. **El máximo se pasa de diez en tres políticas**, hasta 15,3 con `first`. No
+   es un fallo de la regla: el contador se reinicia si la aldea vuelve a seis,
+   así que una que sube y baja acumula más de diez años por debajo sin haber
+   tenido nunca cinco *seguidos*. La regla dice «seguidos» y hace lo que dice;
+   la medida cuenta el total. Si lo que se quiere acotar es el total, la regla
+   tiene que dejar de reiniciarse, y eso es una decisión distinta.
+3. **La extinción sube y la cadencia con ella.** Con `prudent`, terminadas
+   66,7 % → 80,0 % y cadencia 2,27 → 2,47; con `worst`, 5,07 → 5,34. No son
+   partidas nuevas que se mueran: son las mismas, terminadas antes. Una partida
+   que acababa en el año 60 y ahora acaba en el 25 tiene las mismas
+   encrucijadas repartidas entre menos generaciones. La horquilla
+   `prudent`–`worst` se estrecha a 3,3 puntos por lo mismo.
+
+**Nada de esto se ajusta en esta ronda.** El abandono era el arreglo pedido y
+está medido; lo que arrastra —extinción, horquilla, cadencia de `last`/`worst`,
+bosque— sale de la misma decisión de diseño pendiente, y no se toca a ojo.
 
 ### 2.15 — Caminos y bosque
 
@@ -1144,6 +1276,28 @@ interesante de ver. Y son un buen castigo: una aldea con mala reputación —
 bandera `hostile`, que ponen ciertas encrucijadas — deja de crecer sin que muera
 nadie.
 
+> **Medido (v2.16): ese castigo no le ocurre nunca a quien juega bien.** Las
+> tres opciones que ponen `hostile` no las toma ni `prudent` ni `first` en 60
+> partidas de 200 años. Ver §2.16(b). Pendiente de decisión de diseño.
+
+**Abandono.** Si la aldea pasa `ABANDON_YEARS` años seguidos por debajo de
+`VIABLE_POPULATION` habitantes, los que quedan se marchan: `leftTick` para
+todos, el valle a cero y la partida terminada con `cause: 'abandoned'`.
+
+El contador vive en `state.dwindlingSince` y se reinicia en cuanto la población
+vuelve a alcanzar el mínimo, así que «cinco años seguidos» quiere decir seguidos.
+
+**Por qué hace falta, y por qué `MIN_FIELD_CREW` no bastaba.** Una aldea de dos
+adultos cubre la tripulación mínima de un campo, así que sigue cosechando
+trescientas fanegas contra noventa y seis de consumo, y con un granero lleno
+—que no se estropea por debajo de su capacidad— aguanta veintiocho años más. Eso
+no es un final: es una línea plana de la que la crónica no tiene nada que decir.
+Medido antes de esta regla, la mediana de las partidas que morían era de 28 años
+por debajo de seis habitantes, y la peor llegó a 55.
+
+Un asentamiento fallido no se muere de hambre. Se abandona, y es lo que la
+crónica escribe: peso 3, y no es la línea de la extinción.
+
 ### 5.8 Peste
 
 Comprobación anual: `p = PLAGUE_BASE + people/2500`, multiplicada por 0.6 si hay
@@ -2170,6 +2324,8 @@ export const MIGRATION = {
   ARRIVE_MIN_GRAIN_YEARS: 0.5,
   ARRIVE_MIN_FREE_BEDS: 2,
   ARRIVE_COUNT: [2, 4],
+  VIABLE_POPULATION: 6,         // §5.7: por debajo, esto ya no es una aldea
+  ABANDON_YEARS: 5,             // §5.7: años seguidos así antes de marcharse
   LEAVE_BELOW_MORALE: 30,
   LEAVE_COUNT: [1, 3],
 } as const;
@@ -2239,7 +2395,8 @@ export const WORLD = {
   FOREST_REGROWTH_NEIGHBOURS: 3,
   PATH_T1: 400, PATH_T2: 1600, PATH_T3: 6000,
   TRAFFIC_DECAY: 0.005,         // por tick
-  STONE_PER_BP: 0.5,            // conversión de obra a piedra con fragua
+  STONE_PER_BP: 0.5,
+  VIRGIN_FOREST: 255,           // §9: marca de `forestAge` en el bosque viejo            // conversión de obra a piedra con fragua
 } as const;
 ```
 
@@ -2307,7 +2464,7 @@ que medir con una política que no se arruine sola.
 | **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. |
 | Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
 | Fracción de ticks elegibles, por plantilla | < 1 % |
-| Bosque restante en el año 100 | 40 % – 70 % del inicial |
+| Bosque restante en el año 100 | 40 % – 70 % del inicial. **Aguas abajo de la extinción (v2.16):** falla por arriba, no por abajo — el valle que se queda sin gente conserva sus árboles porque no hay quien los tale. Medido: 24 de 40 valles en banda, uno solo por debajo del 40 % y quince por encima del 70 %. No se ajusta hasta que la extinción esté en banda. |
 | Choque del 90 % de bajas en el año 40 → extinción | ≥ 25 % |
 | Cualquier estadística fuera de rango o `NaN` | 0 casos |
 
@@ -2418,6 +2575,12 @@ semilla**: dos partidas divergen desde el primer tick y una sola es ruido.
 
 Salida: una tabla por consola y un CSV con las series de población, grano, ánimo
 y edificios, para poder mirar la forma de las curvas y no solo el aserto.
+
+**Presupuesto: 10 minutos** (v2.16; antes 5). Los cinco minutos se fijaron cuando
+esta suite todavía no medía nada. Se lanza aparte y en nocturna, así que el
+presupuesto está para que no se descontrole, no para forzar decisiones: **no se
+degrada la medición para caber en él.** Si un módulo nuevo lo desborda, se
+informa y se decide; no se recortan semillas ni años por su cuenta.
 
 ### 14.3 Capturas (`tools/screenshots.ts`, Playwright)
 
@@ -2835,7 +2998,7 @@ para poder mirar la forma de las curvas.
 **Tests.** Son el entregable.
 **Terminado cuando.** Los umbrales aplicables de §12.9 pasan, las comprobaciones
 pendientes de módulos posteriores o de aclaración de política están resueltas,
-y la ejecución completa tarda menos de 5 minutos.
+y la ejecución completa tarda menos de 10 minutos.
 
 **Estado (v2.12): no cerrado.** 19 de 25 asertos pasan en 187,55 s. `first` pasa
 los seis umbrales que le aplican. Quedan cuatro fallos, enumerados en §2.12: la

@@ -15,7 +15,8 @@
     "chronicle": "tsx src/cli/chronicle.ts",
     "shots": "playwright test --config playwright.config.ts",
     "lint": "eslint .",
-    "map": "tsx tools/map-dump.ts"
+    "map": "tsx tools/map-dump.ts",
+    "attribution": "tsx tools/attribution-report.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",

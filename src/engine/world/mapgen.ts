@@ -183,8 +183,16 @@ export function generateMap(bundle: RngBundle): ValleyMap {
   }
   // Every standing tree, counted. §7.5 gives each forest cell its own store,
   // and this is the only place it is filled: after this, wood only leaves.
+  //
+  // `forestAge` marks the old wood with VIRGIN_FOREST. On a forest cell that
+  // field has nothing else to say — it counts the years of a *cleared* cell —
+  // so it is where "this tree was here when they arrived" fits without another
+  // layer. A cell that is felled loses the mark, and one that grows back never
+  // gets it: what grows back is not the wood they found.
   for (let i = 0; i < CELLS; i += 1) {
-    if (map.terrain[i] === TERRAIN_CODE.forest) map.forestStock[i] = WORLD.WOOD_PER_FOREST_TILE;
+    if (map.terrain[i] !== TERRAIN_CODE.forest) continue;
+    map.forestStock[i] = WORLD.WOOD_PER_FOREST_TILE;
+    map.forestAge[i] = WORLD.VIRGIN_FOREST;
   }
   return map;
 }

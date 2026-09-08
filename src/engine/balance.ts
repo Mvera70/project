@@ -139,6 +139,12 @@ export const MIGRATION = {
   // FOUNDING.AGE_RANGES.children.
   ARRIVE_ADULT_AGE: [16, 30],
   ARRIVE_CHILD_SHARE: 0.35,
+  // §5.7, v2.16 · Abandonment. A settlement this small for this long is not a
+  // village any more, and the people left in it walk out. MIN_FIELD_CREW does
+  // not reach this case: two adults still crew one field, so the harvest keeps
+  // coming and the hamlet neither dies nor recovers.
+  VIABLE_POPULATION: 6,
+  ABANDON_YEARS: 5,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -241,6 +247,10 @@ export const WORLD = {
   PATH_T3: 6000,
   TRAFFIC_DECAY: 0.005, // per tick
   STONE_PER_BP: 0.5, // build points converted to stone, with a smithy
+  // §9, v2.16: the mark `forestAge` carries on a cell of the wood that was
+  // standing at the founding. Cleared cells count years there instead, and a
+  // cell that has been felled once can never carry it again.
+  VIRGIN_FOREST: 255,
 } as const;
 
 /**

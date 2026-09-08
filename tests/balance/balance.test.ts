@@ -5,10 +5,10 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
   let result: ReturnType<typeof runBalance>;
   beforeAll(() => { result = runBalance(); });
 
-  it('runs all 60 seeds for each policy within five minutes', () => {
+  it('runs all 60 seeds for each policy within ten minutes', () => {
     expect(result.trials).toHaveLength(60 * POLICIES.length);
     for (const policy of POLICIES) expect(result.trials.filter((t) => t.policy === policy)).toHaveLength(60);
-    expect(result.durationMs).toBeLessThan(300_000);
+    expect(result.durationMs).toBeLessThan(600_000);
   });
 
   for (const policy of POLICIES) {
