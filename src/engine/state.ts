@@ -400,12 +400,15 @@ export interface EndState {
   /**
    * `extinction` — the last of them died.
    * `abandoned` — §5.7: too few for too long, and the rest walked out.
+   * `dispersed` — Annex A.15, v2.22: refused a leader three times running,
+   *   with nobody appointed in between, and gave up on the valley.
    *
-   * Both leave the valley at zero, which is the only way §1 allows a game to
-   * be lost. They are told apart because the chronicle has to say which: a
-   * failed settlement is not a village that starved.
+   * All three leave the valley at zero, which is the only way §1 allows a game
+   * to be lost. They are told apart because the chronicle has to say which: a
+   * failed settlement is not a village that starved, and a valley that talked
+   * itself out of having anyone in charge is not one that simply dwindled.
    */
-  cause: 'extinction' | 'abandoned';
+  cause: 'extinction' | 'abandoned' | 'dispersed';
   lastId: VillagerId | null; // the last to die, quoted by the chronicle
 }
 
@@ -514,6 +517,12 @@ export interface GameState {
    * how far through a year it was.
    */
   dwindlingSince: number | null;
+  /**
+   * Consecutive `succession:no_one` answers with no leader appointed between
+   * them. §17 Annex A.15, v2.22: reset to 0 by `choose_a` or `choose_b`: a
+   * leader in office, however briefly, breaks the streak.
+   */
+  noOneStreak: number;
   ended: EndState | null;
 }
 

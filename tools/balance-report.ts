@@ -57,6 +57,11 @@ export interface Trial {
   eligibleTicks: Record<string, number>;
   posedByTemplate: Record<string, number>;
   allowedByTemplate: Record<string, number>;
+  /** `template:option` -> times chosen. §12.9, v2.22: a policy trapped
+   * answering the same question over and over is not measuring the
+   * catalogue, it is measuring the trap. */
+  decisionsByOption: Record<string, number>;
+  decisions: number;
   invalid: string[];
   geometry: string[];
   probes: number;
@@ -146,6 +151,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     generationOne: 0, fullMap: false, forestRatio: null, cadence: 0, allCadence: 0,
     ceilingIntervals: 0, intervals: 0, eligibleTicks: Object.fromEntries(CATALOG.map((t) => [t.id, 0])),
     posedByTemplate: Object.fromEntries(CATALOG.map((t) => [t.id, 0])), allowedByTemplate: {},
+    decisionsByOption: {}, decisions: 0,
     invalid: [], geometry: [], probes: 0, longestDwindlingTicks: 0, deathsByCause: {},
     shocked: false, shockExtinct: false };
   let shock: GameState | null = null;
@@ -172,6 +178,11 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     // be attributed rather than guessed at.
     for (const death of report.deaths) {
       result.deathsByCause[death.cause] = (result.deathsByCause[death.cause] ?? 0) + 1;
+    }
+    if (report.decided !== null) {
+      const key = `${report.decided.templateId}:${report.decided.optionId}`;
+      result.decisionsByOption[key] = (result.decisionsByOption[key] ?? 0) + 1;
+      result.decisions += 1;
     }
     if (report.posed !== null) {
       allCounted += 1;
@@ -261,6 +272,10 @@ export interface PolicySummary {
   deathsByCause: Record<string, number>;
   eligibility: Record<string, number>;
   restUtilization: Record<string, number | null>;
+  /** §12.9, v2.22: the single option that ate the largest share of this
+   * policy's decisions, and what share that was. */
+  busiestOption: string | null;
+  busiestOptionShare: number;
 }
 
 export function summarize(trials: readonly Trial[], policy: BenchPolicy): PolicySummary {
@@ -294,6 +309,22 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
       for (const [cause, n] of Object.entries(t.deathsByCause)) acc[cause] = (acc[cause] ?? 0) + n;
       return acc;
     }, {}),
+    ...(() => {
+      const byOption = group.reduce<Record<string, number>>((acc, t) => {
+        for (const [key, n] of Object.entries(t.decisionsByOption)) acc[key] = (acc[key] ?? 0) + n;
+        return acc;
+      }, {});
+      const decisions = total((t) => t.decisions);
+      let busiestOption: string | null = null;
+      let busiest = 0;
+      for (const [key, n] of Object.entries(byOption)) {
+        if (n > busiest) { busiest = n; busiestOption = key; }
+      }
+      return {
+        busiestOption,
+        busiestOptionShare: decisions === 0 ? 0 : busiest / decisions,
+      };
+    })(),
     // Sampled every PROBE_EVERY ticks, so the denominator is the probes taken.
     eligibility: Object.fromEntries(CATALOG.map((template) => [template.id,
       total((t) => t.eligibleTicks[template.id] ?? 0) / Math.max(1, total((t) => t.probes))])),
@@ -330,6 +361,9 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
   const band = (policy: BenchPolicy): number =>
     summaries.find((s) => s.policy === policy)?.extinction ?? Number.NaN;
   console.info(`Extinction spread, worst - prudent: ${((band('worst') - band('prudent')) * 100).toFixed(1)} points (§12.9: >= 20)`);
+  for (const summary of summaries) {
+    console.info(`${summary.policy}: busiest option ${summary.busiestOption ?? 'n/a'} at ${(summary.busiestOptionShare * 100).toFixed(1)}% of decisions (§12.9: < 40%)`);
+  }
 
   for (const summary of summaries) {
     console.info(`${summary.policy}: forest 40-70% at year 100 in ${summary.forestInBand}/${summary.forestTrials} trials that got there (median ${summary.medianForestRatio === null ? 'n/a' : (100 * summary.medianForestRatio).toFixed(1) + '%'})`);

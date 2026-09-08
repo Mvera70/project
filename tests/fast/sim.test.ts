@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { LIFE, MIGRATION, PEOPLE, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { isHere, population } from '@engine/people/demography';
+import { isHere, population, resolveMigration } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import { holderOf } from '@engine/crossroads/conditions';
 import { decide, fillVacancies, run, tick } from '@engine/sim';
@@ -647,5 +647,104 @@ describe('el abandono · §5.7, v2.16', () => {
     }
     expect(s.ended).not.toBeNull();
     expect(longest / YEAR).toBeLessThanOrEqual(MIGRATION.ABANDON_YEARS);
+  });
+});
+
+describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
+  /** Un líder muerto, sin nada más tocado: la sucesión queda pendiente de responder. */
+  function beheaded(seed: number): GameState {
+    const s = foundGame(seed);
+    const leader = s.people.villagers.find((v) => v.role === 'leader');
+    if (leader !== undefined) leader.diedTick = 0;
+    return s;
+  }
+
+  it('ningún forastero llega mientras el puesto está vacante', () => {
+    // Todas las demás puertas de §5.7 abiertas a propósito: si no llega nadie
+    // en treinta años con ánimo alto, grano de sobra y sitio en las casas, es
+    // porque falta el líder y no por otra cosa.
+    const s = beheaded(7);
+    s.village.morale = 80;
+    s.village.grain = 100000;
+    // El propio crossroad de sucesión queda sin responder: nunca se pasa una
+    // `decision`, así que el puesto sigue vacante los treinta años.
+    for (let i = 0; i < 30 * YEAR; i += 1) tick(s, CATALOG);
+    expect(holderOf(s, 'leader')).toBeNull();
+    expect(s.chronicle.some((e) => e.kind === 'arrival')).toBe(false);
+  });
+
+  it('en cambio, con líder, llega gente en esas mismas condiciones', () => {
+    const s = foundGame(7); // líder vivo
+    s.village.morale = 80;
+    s.village.grain = 100000;
+    let arrived = false;
+    for (let i = 0; i < 30 * YEAR && !arrived; i += 1) {
+      tick(s, CATALOG);
+      arrived = s.chronicle.some((e) => e.kind === 'arrival');
+    }
+    expect(arrived).toBe(true);
+  });
+
+  it('las marchas se duplican mientras el puesto está vacante', () => {
+    // Dos estados que comparten hasta el último bit de aleatoriedad: la única
+    // diferencia es si hay líder. Si la marcha se duplica, la cuenta de quienes
+    // se van tiene que ser exactamente el doble.
+    const base = foundGame(7);
+    base.tick = 0;
+    base.village.morale = 5; // la marcha es casi segura
+    const withLeader = structuredClone(base);
+    const withoutLeader = structuredClone(base);
+    const leader = withoutLeader.people.villagers.find((v) => v.role === 'leader');
+    if (leader !== undefined) leader.diedTick = 0;
+
+    const withEvents = resolveMigration(withLeader);
+    const withoutEvents = resolveMigration(withoutLeader);
+    const withCount = withEvents[0]?.kind === 'departure' ? withEvents[0].ids.length : 0;
+    const withoutCount = withoutEvents[0]?.kind === 'departure' ? withoutEvents[0].ids.length : 0;
+
+    expect(withCount).toBeGreaterThan(0);
+    expect(withoutCount).toBe(withCount * 2);
+  });
+
+  it('al tercer «No one» seguido, sin líder de por medio, la aldea se dispersa', () => {
+    const s = beheaded(7);
+    const answerNoOne = (state: GameState, options: readonly string[]): string =>
+      state.crossroad?.templateId === 'succession' ? 'no_one' : (options[0] as string);
+
+    let dispersed = false;
+    for (let i = 0; i < 60 * YEAR && !dispersed; i += 1) {
+      run(s, 1, answerNoOne, CATALOG);
+      dispersed = s.ended !== null;
+    }
+    expect(s.ended?.cause).toBe('dispersed');
+    expect(s.noOneStreak).toBeGreaterThanOrEqual(MIGRATION.NO_LEADER_DISPERSAL_STREAK);
+    expect(population(s)).toBe(0);
+    const entry = s.chronicle.find((e) => e.templateKey === 'dispersal');
+    expect(entry?.weight).toBe(3);
+    expect(entry?.kind).toBe('abandonment');
+  });
+
+  it('elegir a alguien reinicia la racha', () => {
+    const s = beheaded(7);
+    let noOnes = 0;
+    const answerTwiceThenChoose = (state: GameState, options: readonly string[]): string => {
+      if (state.crossroad?.templateId !== 'succession') return options[0] as string;
+      if (noOnes < 2) { noOnes += 1; return 'no_one'; }
+      return options.find((o) => o === 'choose_a' || o === 'choose_b') ?? (options[0] as string);
+    };
+    for (let i = 0; i < 60 * YEAR && s.noOneStreak < 2; i += 1) run(s, 1, answerTwiceThenChoose, CATALOG);
+    // Con un líder en el puesto, la racha vuelve a cero.
+    for (let i = 0; i < 20 * YEAR && holderOf(s, 'leader') === null; i += 1) {
+      run(s, 1, answerTwiceThenChoose, CATALOG);
+    }
+    expect(s.noOneStreak).toBe(0);
+    expect(s.ended).toBeNull();
+  });
+
+  it('no cuenta como racha si nunca se pregunta por sucesión', () => {
+    // Un `no_one` en una encrucijada cualquiera no es un `no_one` de A.15.
+    const s = foundGame(7); // líder vivo: succession nunca sale elegible
+    run(s, 20 * YEAR, 'first', CATALOG);
+    expect(s.noOneStreak).toBe(0);
   });
 });

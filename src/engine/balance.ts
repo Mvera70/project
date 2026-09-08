@@ -145,6 +145,12 @@ export const MIGRATION = {
   // coming and the hamlet neither dies nor recovers.
   VIABLE_POPULATION: 6,
   ABANDON_YEARS: 5,
+  // Annex A.15, v2.22 · Refusing a leader stops being free. Measured, `last`
+  // and `worst` spent 93 % of every decision on `succession:no_one` and paid
+  // nothing for it — nobody joins while the post is vacant, departures double,
+  // and after this many `no_one` answers running, with no leader appointed
+  // between them, the village gives up on itself rather than ask a fourth time.
+  NO_LEADER_DISPERSAL_STREAK: 3,
 } as const;
 
 // ---------------------------------------------------------------------------

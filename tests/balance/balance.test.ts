@@ -56,6 +56,15 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
           expect(summary().extinction).toBeLessThanOrEqual(0.12);
         });
       }
+      // §12.9, v2.22: an adverse policy caught looping on one answer is not
+      // measuring the catalogue, it is measuring the loop. `succession:no_one`
+      // used to be 93% of every decision `last` and `worst` made.
+      if (policy === 'last' || policy === 'worst') {
+        it('never dedicates 40% or more of its decisions to a single option', () => {
+          expect(summary().busiestOptionShare, summary().busiestOption ?? '?')
+            .toBeLessThan(0.4);
+        });
+      }
     });
   }
   it('has at least 25% extinction under the adverse policy', () => {

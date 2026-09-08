@@ -458,6 +458,31 @@ export function tick(
     if (decided !== null) {
       reportVictims(decided.killed);
       carryOutBuildings(state, decided, say);
+
+      // Annex A.15, v2.22: `no_one` answered three times running, with no
+      // leader appointed between them, and the valley gives up rather than
+      // ask a fourth. `choose_a`/`choose_b` break the streak — a leader in
+      // office, however briefly, makes next time a different question.
+      if (decision.templateId === 'succession') {
+        if (decision.optionId === 'no_one') {
+          state.noOneStreak += 1;
+          if (state.noOneStreak >= MIGRATION.NO_LEADER_DISPERSAL_STREAK && state.ended === null) {
+            const scattering = population(state);
+            for (const v of state.people.villagers) {
+              if (isHere(v)) v.leftTick = state.tick;
+            }
+            state.ended = { tick: state.tick, cause: 'dispersed', lastId: null };
+            say({
+              kind: 'abandonment',
+              templateKey: 'dispersal',
+              params: { year: year(), season: season(), count: scattering },
+              weight: 3,
+            });
+          }
+        } else {
+          state.noOneStreak = 0;
+        }
+      }
     }
   }
 

@@ -348,6 +348,14 @@ export const BANK: Record<string, string[]> = {
     'There were {count} left in year {year}, and then there were none. They did not die; they left.',
   ],
 
+  // Annex A.15, v2.22 \u00b7 Refused a leader three times running, with nobody
+  // appointed in between, and gave up on the valley. Weight 3.
+  'dispersal': [
+    'Nobody would speak for the valley a third time, in the {season} of year {year}, and the last {count} scattered.',
+    'Asked three times, and three times they said no one. In year {year} the {count} who were left went their own ways.',
+    'By the {season} of year {year} they had refused a leader three times, and nothing held {count} of them together.',
+  ],
+
   // -------------------------------------------------------------------------
   // §9, v2.16 · The one thing about the forest that is an event and not a
   // state: the week the last of the old wood comes down. Weight 2.

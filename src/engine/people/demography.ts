@@ -264,16 +264,32 @@ function flagSet(state: GameState, flag: string): boolean {
 }
 
 /**
+ * Whether the office of leader has anyone in it right now. Annex A.15, v2.22:
+ * a local copy rather than an import of `crossroads/conditions.ts`'s
+ * `holderOf`, for the same reason `flagSet` above is one — `crossroads/` sits
+ * above `people/` in the module graph, so the arrow cannot point back down.
+ */
+function leaderPresent(state: GameState): boolean {
+  return state.people.villagers.some((v) => isHere(v) && v.role === 'leader');
+}
+
+/**
  * Step 2 of the tick, week 0 only. design.md §5.7.
  *
- * Arrival needs all five gates open — people, morale, grain reserve, no
- * `hostile` flag, and free beds — and then wins a 0.30 roll. Departure needs
- * morale under 30 and then a roll of (30 − morale)/60.
+ * Arrival needs all six gates open — people, morale, grain reserve, no
+ * `hostile` flag, a leader in office, and free beds — and then wins a 0.30
+ * roll. Departure needs morale under 30 and then a roll of (30 − morale)/60;
+ * the count of who leaves doubles while the office is vacant.
  *
  * The two cannot both happen: one wants morale >= 50 and the other morale < 30.
  *
  * Outsiders are the main engine of early growth (§5.7). Biology alone grows the
  * village too slowly for the first generation to be worth watching.
+ *
+ * **Nobody joins a valley with nobody in charge (Annex A.15, v2.22).** Measured
+ * without this, `last` and `worst` spent 93 % of every decision refusing the
+ * two candidates and paid nothing for it. The leaderless years now cost the
+ * village its main engine of growth and lose people twice as fast.
  */
 export function resolveMigration(state: GameState): MigrationEvent[] {
   if (weekOf(state.tick) !== 0) return [];
@@ -282,12 +298,14 @@ export function resolveMigration(state: GameState): MigrationEvent[] {
   const grainYears = people > 0
     ? state.village.grain / (people * TIME.WEEKS_PER_YEAR * 1)
     : Number.POSITIVE_INFINITY;
+  const leaderless = !leaderPresent(state);
 
   const gatesOpen =
     people >= MIGRATION.ARRIVE_MIN_PEOPLE &&
     state.village.morale >= MIGRATION.ARRIVE_MIN_MORALE &&
     grainYears >= MIGRATION.ARRIVE_MIN_GRAIN_YEARS &&
     !flagSet(state, 'hostile') &&
+    !leaderless &&
     freeBeds(state) >= MIGRATION.ARRIVE_MIN_FREE_BEDS;
 
   if (gatesOpen) {
@@ -298,7 +316,7 @@ export function resolveMigration(state: GameState): MigrationEvent[] {
   if (state.village.morale < MIGRATION.LEAVE_BELOW_MORALE) {
     const chance = (MIGRATION.LEAVE_BELOW_MORALE - state.village.morale) / MIGRATION.LEAVE_SCALE;
     if (next(state.rng, 'births') >= chance) return [];
-    const event = depart(state);
+    const event = depart(state, leaderless ? 2 : 1);
     return event === null ? [] : [event];
   }
 
@@ -338,20 +356,25 @@ function arrive(state: GameState): MigrationEvent {
 }
 
 /**
- * One to three walk out. Only the anonymous leave: a named villager walking off
- * is a story, and stories are what the crossroads are for — letting one vanish
- * here would take a character out of the chronicle with nothing said.
+ * One to three walk out, or twice that many while the leadership is vacant
+ * (§5.7, Annex A.15, v2.22). Only the anonymous leave: a named villager walking
+ * off is a story, and stories are what the crossroads are for — letting one
+ * vanish here would take a character out of the chronicle with nothing said.
+ *
+ * The multiplier scales the drawn count rather than drawing twice, so it costs
+ * no extra number from the stream: the sequence a leaderless week consumes is
+ * identical to a led one, only the headcount differs.
  *
  * They are not dead. `leftTick` is what marks them gone; nobody is ever removed
  * from `villagers` (§3.4).
  */
-function depart(state: GameState): MigrationEvent | null {
+function depart(state: GameState, multiplier: 1 | 2 = 1): MigrationEvent | null {
   const leavers = state.people.villagers.filter((v) => isHere(v) && !v.named);
   if (leavers.length === 0) return null;
 
   const count = Math.min(
     leavers.length,
-    int(state.rng, 'births', MIGRATION.LEAVE_COUNT[0], MIGRATION.LEAVE_COUNT[1]),
+    multiplier * int(state.rng, 'births', MIGRATION.LEAVE_COUNT[0], MIGRATION.LEAVE_COUNT[1]),
   );
 
   const ids: VillagerId[] = [];

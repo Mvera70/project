@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.21 · 8 de septiembre de 2026, 14:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.23 · 8 de septiembre de 2026, 16:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -28,6 +28,22 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+> ### ⚠ Aviso sobre las entradas 2.10 a 2.17
+>
+> El fallo corregido en la **v2.18** —un brote de peste vencido que seguía
+> restando ánimo para siempre— llevaba activo desde M-06. En cuanto una aldea
+> sufría su primera peste, hacia el año 30, el ánimo quedaba clavado en el suelo
+> de fe (≈10) y con él: **inmigración cerrada de por vida** (exige ánimo ≥ 50),
+> **natalidad al 68 %** y **cosechas al 84 %**, en todas las partidas y para
+> siempre.
+>
+> **Toda medición de balance anterior a la v2.18 describe ese mundo roto, no
+> este.** Las decisiones que se tomaron *en respuesta* a esas cifras siguen en
+> pie pero **necesitan volver a justificarse por sí solas**, y están marcadas
+> abajo con ⚠. La lección, que vale para cualquier proyecto: **un número fuera
+> de banda puede ser un mecanismo roto y no un balance mal calibrado; antes de
+> ajustar una constante, comprueba que el mecanismo que mide funciona.**
+
 | **2.0** | 6 sep 2026 | Diseño inicial | Documento detallado completo: modelo de dominio, balance verificado sobre 60 semillas × 200 años, 16 encrucijadas, 24 briefs. Única desviación de `valle.md`: mapa transpuesto a 36 × 56. |
 | **2.1** | 6 sep 2026 | Revisión de M-01 | Tipo `RngBundle` inválido; alcance real de §12. |
 | **2.2** | 6 sep 2026 | Revisión de M-02 | Grafo de dependencias invertido; `Grudge` incorporado; mortalidad no monótona; dos erratas de prosa. |
@@ -38,18 +54,144 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.7** | 7 sep 2026, 14:18 | Revisión de M-07 | **La exención del techo se gasta en la primera pregunta**; criterio medible para el ritmo; epitafio con rencores sanados; `TERRAIN_CODE` como contrato de serialización. |
 | **2.8** | 7 sep 2026, 18:53 | Revisión de M-08 | **Regla de elegibilidad episódica**; `grudge` mira opiniones; ratio `grainToHarvest`; A.1, A.13 y A.15 corregidas; la cobertura de vacantes tiene dueño. |
 | **2.9** | 7 sep 2026, 19:11 | Puerta de M-08b | **Cubrir una vacante no es elegir al mayor**; el diagnóstico del catálogo pasa a dos columnas; `quiet_years` fuera del reparto; deuda del bosque registrada. |
-| **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
+| ⚠ **2.10** | 7 sep 2026, 19:26 | Puerta de M-08c | **Rango a 1–5**: la sucesión es el latido, no ruido; `fillCast` con vuelta atrás; la política `first` no es neutra; trampa de estación documentada. **Puerta superada.** |
 | **2.11** | 7 sep 2026, 23:44 | Revisión de M-10 y desarrollo de M-11/M-12 | Muertes de todos los pasos con epitafio y coste de ánimo; búfer de crónica; determinismo con 5 000 ticks realmente alcanzados; banco real y cobertura pendiente explícita. |
 | **2.12** | 8 sep 2026, 00:47 | M-13 y M-14 | Fuente única; **mapa real y aldea que se construye sola**; piedra en puntos de obra; dos lecturas de §7.4 corregidas; la iglesia crece desde cualquier esquina. Medido, no previsto. |
 | **2.13** | 8 sep 2026, 01:20 | Revisión de M-13/M-14 | **Política `prudent` como referencia** y bandas por política; horquilla mínima entre jugar bien y mal; `interregnum` cierra la sucesión; los campos no arden. |
-| **2.14** | 8 sep 2026, 01:46 | Primera lectura del hito 0 | **Tabla de pesos normativa y agregación por año**; **tripulación mínima de campo**: se acabó la aldea zombi; `prudent` no compra muertes. |
+| ⚠ **2.14** | 8 sep 2026, 01:46 | Primera lectura del hito 0 | **Tabla de pesos normativa y agregación por año**; **tripulación mínima de campo**: se acabó la aldea zombi; `prudent` no compra muertes. |
 | **2.15** | 8 sep 2026, 09:52 | M-15 | **Caminos y bosque**: el mapa cuenta dónde se pisa y qué se tala. Deuda del bosque de §12.9 saldada: incluir las dos plantillas mueve la cadencia 0,02. El banco se sale del presupuesto. |
-| **2.16** | 8 sep 2026, 11:20 | M-16 | **Abandono**: se acabó la agonía de cuarenta años. Presupuesto del banco a 10 min. La banda del bosque queda aguas abajo de la extinción. Atribución medida: `hostile` no se activa nunca con `prudent`. |
-| **2.17** | 8 sep 2026, 12:00 | Puerta de migración | **`prudent` deja de sobrevalorar el ánimo**: su peso baja de 15 a 3. La agonía se mide por la racha consecutiva más larga, igual que la regla de abandono. La puerta de ocho habitantes se somete a un A/B antes de tocarla. |
+| ⚠ **2.16** | 8 sep 2026, 11:20 | M-16 | **Abandono**: se acabó la agonía de cuarenta años. Presupuesto del banco a 10 min. La banda del bosque queda aguas abajo de la extinción. Atribución medida: `hostile` no se activa nunca con `prudent`. |
+| ⚠ **2.17** | 8 sep 2026, 12:00 | Puerta de migración | **`prudent` deja de sobrevalorar el ánimo**: su peso baja de 15 a 3. La agonía se mide por la racha consecutiva más larga, igual que la regla de abandono. La puerta de ocho habitantes se somete a un A/B antes de tocarla. |
 | **2.18** | 8 sep 2026, 12:30 | Expiración de la peste | **Un brote dura 6–10 semanas también para el ánimo y para la siguiente tirada anual.** Un objeto `outbreak` vencido se estaba tratando como peste perpetua: hundía el ánimo hasta el suelo de fe e impedía cualquier brote posterior. |
 | **2.19** | 8 sep 2026, 13:00 | Rendimiento de M-12 | **Los caminos dejan de recorrer 2.016 celdas inertes cada semana.** Un conjunto derivado conserva solo celdas con tráfico o camino; no forma parte del estado ni del guardado y mantiene el orden observable de los eventos. |
 | **2.20** | 8 sep 2026, 13:30 | Rendimiento de M-14 | **Un fracaso de colocación se recuerda mientras sus causas sigan iguales y cada búsqueda construye una sola máscara de ocupación.** El banco vuelve a entrar en diez minutos sin perder observaciones. |
 | **2.21** | 8 sep 2026, 14:00 | Atribución de política | **La brecha adversa se mide por opción tomada.** Antes de cambiar A.15 se separa la repetición de `succession:no_one` del resto de decisiones de `last` y `worst`. |
+| **2.22** | 8 sep 2026, 15:10 | El problema invertido | **Quedarse sin líder duele**: sin llegadas, marchas dobles y dispersión al tercer rechazo. Aviso de contaminación sobre las entradas medidas bajo la peste perpetua. Las bandas miden «partida terminada». |
+| **2.23** | 8 sep 2026, 16:40 | Verificación bajo el mundo corregido | **Los tres ⚠ re-medidos, sin ajustar nada.** A.15 implementado: `last`/`worst` pasan de casi nunca terminar a terminar el 100 %. La horquilla se dispara a 98,3 puntos. El bucle no era la elección — era que no tenía consecuencias; ahora las tiene y ambas políticas la eligen igual, deterministas. |
+
+### 2.23 — Verificación bajo el mundo corregido
+
+**PARTE 0 · Los tres ⚠ re-medidos, sin tocar nada, sobre el mundo de la v2.22.**
+
+- **Abandono.** 60 semillas × 200 años, las cuatro políticas, antes de tocar
+  A.15: `prudent` 1/60 (1,7 %), `first` 1/60 (1,7 %), `last` 4/60 (6,7 %),
+  `worst` 4/60 (6,7 %). Cero extinciones puras en las cuatro. No es contenido
+  muerto —dispara, y más en las políticas peores, que es la dirección
+  correcta— pero tampoco es una red de seguridad que se note: la inmensa
+  mayoría de las partidas no la necesita. Sigue sin ajustarse.
+- **`hostile`.** Sigue sin activarse con `prudent` ni con `first` —0/60 en
+  ambas— después de que M-17 bajara el peso del ánimo de 15 a 3. Con
+  `last`/`worst` sí: 36/60 y 34/60. La aritmética de por qué no se mueve:
+  `take_them_in` cuesta 40 de grano y da +6 de ánimo (puntuación −40+18=−22);
+  `turn_them_away` no cuesta grano y pierde 8 de ánimo (puntuación −24). Acoger
+  sigue ganando, por dos puntos. El margen es estrecho pero no es cero, así
+  que bajar el peso del ánimo un paso más lo volcaría — y eso no se ha hecho
+  aquí: se deja anotado, no decidido.
+- **`MIN_FIELD_CREW`.** Nunca se viola. Muestreado cada 12 ticks en las cuatro
+  políticas —entre 45 826 y 47 280 muestras por política—, la proporción de
+  adultos por campo trabajado nunca baja de 2,13. La regla es correcta y
+  sigue inerte: no hay ninguna partida donde estuviera decidiendo algo. Se
+  deja como está, tal como pediste.
+
+**PARTE 1 · A.15, implementado según la v2.22.** Tres mecanismos, todos sobre
+maquinaria que ya existía — ningún efecto nuevo en el catálogo:
+
+- Mientras el puesto de líder esté vacante, la puerta de llegada de §5.7 exige
+  además `holderOf(state, 'leader') !== null`: sexta puerta, nadie se muda a
+  un valle sin nadie al mando.
+- Mientras esté vacante, la cuenta de quienes se marchan se dobla. El
+  multiplicador escala la tirada ya hecha en vez de tirar otra vez, así que
+  una semana sin líder no consume un número más del flujo que una con él.
+- Al tercer `succession:no_one` seguido sin que se haya nombrado a nadie entre
+  medias, la aldea se dispersa: `EndState.cause: 'dispersed'`, todos a
+  `leftTick`, línea de crónica propia (`dispersal`, peso 3, banco de
+  `chronicle/bank.en.ts`) distinta de `abandonment`. El contador,
+  `state.noOneStreak`, se reinicia al elegir `{A}` o `{B}`.
+
+**Medido después, 60 semillas × 200 años:**
+
+| Métrica | `prudent` | `first` | `last` | `worst` |
+|---|---:|---:|---:|---:|
+| Partidas terminadas | 1,7 % | 1,7 % | **100 %** | **100 %** |
+| Horquilla `worst`−`prudent` | | | | **98,3 puntos** |
+| Mediana del pico | 83 | 83 | 29,5 | 29,5 |
+| Cadencia media | 3,78 | 3,79 | 4,36 | 4,41 |
+| Cadencia máxima | 5,70 | 5,40 | **9,37** | **9,37** |
+| Opción más repetida | `succession:choose_a` 31,4 % | `succession:choose_a` 34,8 % | `succession:no_one` **68,2 %** | `succession:no_one` **68,2 %** |
+
+`prudent` y `first` no se movieron: terminación y pico idénticos a los de antes
+de tocar nada. No es que se hayan protegido a mano — **`prudent` nunca contesta
+`no_one`**: de 711 sucesiones resueltas en las 60 partidas, las 711 nombran a
+alguien (`policy-attribution`, columna `chooseA`). Casi nunca deja el puesto
+vacante más de una semana, así que las tres consecuencias nuevas no tienen
+ocasión de aplicarse. El pico y la terminación de `prudent` quedan tal como
+estaban porque el mecanismo que los movería no llega a rozarlos.
+
+`last` y `worst` sí lo tocan: de tirar hasta 3 519 decisiones en 60 partidas
+(v2.21, con el bucle sin consecuencias) pasan a 261. El bucle ya no es
+infinito, y la horquilla se dispara de 5 a 98,3 puntos — muy por encima del
+mínimo de 20. **Pero sigue siendo un bucle, no una elección**: `last` responde
+`no_one` las 178 veces que se le pregunta —no 177, no 179: las 178— porque
+`no_one` es literalmente la última opción de la lista, que es todo lo que
+`last` mira. `worst` también responde `no_one` las 178 veces, porque su coste
+inmediato (12 de ánimo + 6 de fe = 18) supera al de nombrar a alguien (0, ya
+que `role`, `opinion` y `memory` no puntúan en `immediateCost`). Ninguna
+consecuencia que se le añada a `no_one` cambia esa aritmética: ambas políticas
+deciden sin mirar lo que pasa después de la semana en curso.
+
+**Por eso el aserto nuevo de §12.9 —menos del 40 % de las decisiones en una
+sola opción— sigue fallando, con 68,2 % en las dos**, y por eso la cadencia
+máxima se dispara a 9,37: una partida que se resuelve en diez años concentra
+sus tres sucesiones en muy pocas generaciones. Ninguna de las dos cosas es el
+bucle infinito que había: son la huella de un final que ahora llega rápido en
+vez de nunca.
+
+**No se abre la conversación sobre los efectos del catálogo.** La condición
+que la abriría era `worst` por debajo del 25 % de terminación estando ya fuera
+del bucle. Está en el 100 %. Por la regla que se puso esta misma ronda, aquí
+se para.
+
+**No es nuevo, y sigue sin explicarse del todo.** `smith_feud` sigue cruzando
+el 1 % de elegibilidad con `prudent` (1,74 %) y con `first` (1,20 %) — ya
+estaba entre los diez asertos rojos que la v2.20 dejó anotados como límites de
+balance abiertos, antes de que existiera A.15. No se ha medido si el margen se
+movió con esta ronda; con el resto del rediseño encima no se puede aislar la
+causa sin una medición dedicada, y no se ha hecho. Sigue anotado, no tocado.
+
+**Herramientas.** `npm run attribution` mide (a)-(d) de la ronda anterior
+sobre el mundo actual; `npm run policy:attribution` es la que ya existía de la
+v2.21, vuelta a correr — su tabla de arriba es la que sostiene los números de
+esta sección.
+
+### 2.22 — El problema invertido
+
+Con la peste arreglada, **el problema es el contrario del que perseguí durante
+cinco revisiones**. No es que las encrucijadas maten demasiado: es que
+**el jugador no puede perder aunque lo intente**. `worst` termina 4 partidas de
+60 y la horquilla contra `prudent` es de 5 puntos. Eso incumple el principio 4
+de `valle.md` más gravemente que el 66 % de terminaciones anterior, porque un
+juego donde jugar mal no tiene consecuencias no tiene drama, solo contemplación.
+
+- **Anexo A.15 · Quedarse sin líder deja de salir gratis.** La atribución mostró
+  que `last` y `worst` dedican el **93 % de sus decisiones** a `succession:no_one`
+  —54,5 por partida— y les quedan unas 250 para todo el resto del catálogo. La
+  opción no resuelve nada y vuelve a plantear la misma pregunta. Ahora, mientras
+  el puesto esté vacante: **ninguna llegada** —nadie se muda a un sitio donde
+  nadie manda—, **marchas ×2**, y **dispersión al tercer «No one» consecutivo**.
+  No se toca ni un efecto del catálogo: son mecanismos que ya existen.
+- **§12.9 · Aserto nuevo:** ninguna política puede dedicar más del 40 % de sus
+  decisiones a una sola opción. Una política adversa atrapada en un bucle no
+  está midiendo el catálogo, está midiendo el bucle.
+- **§12.9 · Las bandas miden «partida terminada»**, no «extinción»: con el
+  abandono en pie, casi todos los finales son abandonos y seguir llamándolo
+  extinción es contarse un cuento.
+- **Registro · Aviso de contaminación** sobre las entradas 2.10 a 2.17, con las
+  cuatro decisiones que hay que volver a justificar marcadas con ⚠.
+
+**Qué NO se toca todavía:** la terminación de `prudent` (1,7 % contra la banda
+2–12 %) y el pico de población (83 contra 65–82). Los dos están al filo y los dos
+se moverán cuando la sucesión tenga consecuencias. Ajustarlos ahora sería repetir
+el error que este aviso documenta.
 
 ### 2.21 — Qué elige realmente la política adversa
 
@@ -1491,11 +1633,13 @@ peligroso.
 Se comprueba una vez al año, en la semana 0.
 
 **Llegada.** Requiere `people ≥ 8`, `morale ≥ 50`, reservas de grano `≥ 0.5`
-años, `hostile` sin activar y al menos 2 huecos de vivienda. Probabilidad 0.30;
-llegan 2–4 personas, mezcla de adultos jóvenes y niños.
+años, `hostile` sin activar, **un líder en el puesto (Anexo A.15, v2.22)** y al
+menos 2 huecos de vivienda. Probabilidad 0.30; llegan 2–4 personas, mezcla de
+adultos jóvenes y niños.
 
 **Marcha.** Si `morale < 30`, con probabilidad `(30 − morale)/60` se van 1–3
-personas. **Sólo se van anónimos.** Que un nombrado desaparezca sin una línea
+personas, **el doble mientras el puesto de líder esté vacante** (Anexo A.15,
+v2.22). **Sólo se van anónimos.** Que un nombrado desaparezca sin una línea
 que lo cuente es sacar un personaje de la historia a espaldas del jugador, y ese
 momento le pertenece a él: la plantilla A.7 ya lo tiene como resultado de una
 decisión, no como una gota de la simulación.
@@ -1506,9 +1650,12 @@ interesante de ver. Y son un buen castigo: una aldea con mala reputación —
 bandera `hostile`, que ponen ciertas encrucijadas — deja de crecer sin que muera
 nadie.
 
-> **Medido (v2.16): ese castigo no le ocurre nunca a quien juega bien.** Las
-> tres opciones que ponen `hostile` no las toma ni `prudent` ni `first` en 60
-> partidas de 200 años. Ver §2.16(b). Pendiente de decisión de diseño.
+> **Medido (v2.16, reconfirmado en v2.23): ese castigo sigue sin ocurrirle a
+> quien juega bien.** Las tres opciones que ponen `hostile` no las toma ni
+> `prudent` ni `first` en 60 partidas de 200 años, ni siquiera después de que
+> M-17 bajara el peso del ánimo de 15 a 3 en la puntuación de `prudent`.
+> Acoger a los del vado sigue ganando por dos puntos (−22 contra −24). Ver
+> §2.23. Pendiente de decisión de diseño.
 
 **Abandono.** Si la aldea pasa `ABANDON_YEARS` años seguidos por debajo de
 `VIABLE_POPULATION` habitantes, los que quedan se marchan: `leftTick` para
@@ -2685,13 +2832,14 @@ que medir con una política que no se arruine sola.
 
 | Propiedad | Umbral | Política |
 |---|---|---|
-| Extinción | 2 % – 12 % | `prudent` |
-| Extinción | ≥ 25 % | `worst` |
+| **Partida terminada** (abandono o extinción) | 2 % – 12 % | `prudent` |
+| **Partida terminada** | ≥ 25 % | `worst` |
 | Horquilla entre `prudent` y `worst` | ≥ 20 puntos | — |
+| Decisiones de `last`/`worst` dedicadas a una sola opción | < 40 % | atribución por opción. **Medido (v2.23): sigue fallando, 68,2 % en las dos** — `succession:no_one`, todas las veces que se pregunta, sin excepción. Ver §2.23 y Anexo A.15. |
 | Mediana del pico de población | 65 – 82 | `prudent` |
 | Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas | `prudent` |
 | Población visible al final de la primera generación | ≥ 26 en la mediana | `prudent` |
-| **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. |
+| **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. **Medido (v2.23): la media pasa en las cuatro políticas (3,78–4,41), pero el máximo de `last`/`worst` sube a 9,37** — una partida que se dispersa en diez años concentra sus tres sucesiones en pocas generaciones. Consecuencia del final más corto de Anexo A.15, no del catálogo. |
 | Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
 | Fracción de ticks elegibles, por plantilla | < 1 % |
 | Bosque restante en el año 100 | 40 % – 70 % del inicial. **Aguas abajo de la extinción (v2.16):** falla por arriba, no por abajo — el valle que se queda sin gente conserva sus árboles porque no hay quien los tale. Medido: 24 de 40 valles en banda, uno solo por debajo del 40 % y quince por encima del 70 %. No se ajusta hasta que la extinción esté en banda. |
@@ -2712,6 +2860,16 @@ aldea solo muere si el jugador la mata.** Si esa cifra baja del 25 %, las
 encrucijadas no tienen dientes suficientes y hay que endurecer sus efectos, no el
 mundo. Y la fila de la horquilla es la que hace cumplir el principio 2: si jugar
 bien y jugar mal acaban en el mismo sitio, el jugador sobra.
+
+**Medido (v2.23), con A.15 en pie: las dos filas pasan, de sobra.** `worst`
+termina el 100 % de las partidas —muy por encima del 25 %— y la horquilla con
+`prudent` es de 98,3 puntos. Esa es también la condición que decide si toca
+hablar de los efectos del catálogo: solo se abriría esa conversación si `worst`
+siguiera por debajo del 25 % estando ya fuera del bucle de `succession`. No es
+el caso. Lo que sigue fallando —la fila de arriba, y la cadencia máxima de
+`last`/`worst` en 9,37— es harina de otro costal: ambas políticas contestan
+`no_one` el 100 % de las veces que se les pregunta, por cómo deciden, no por lo
+que la plantilla ofrezca a cambio. Ver §2.23.
 
 ---
 
@@ -3819,11 +3977,37 @@ todo.*
 |---|---|---|---|---|
 | **{A}** | {B} will remember it | `role A leader`, `opinion B→A −45`, `memory B was_passed_over 4` | `gather square 3` | `the_passed_over`, 5–20 años: si `opinion B→A < −60`, dispara `smith_feud` |
 | **{B}** | {A} will remember it | Simétrico | `gather square 3` | Simétrico |
-| **No one** | The valley decides things by shouting for a while | `morale −12`, `faith −6`, obra ×0.8 durante 2 años, **`flag interregnum` los mismos años que tarde la semilla** | `douse` general 1 año | `the_leaderless_years`, 2–4 años: levanta `interregnum` y se vuelve a disparar `succession` |
+| **No one** | Nobody joins a valley with nobody in charge | `morale −12`, `faith −6`, obra ×0.8 durante 2 años, **`flag interregnum` los mismos años que tarde la semilla**, **llegadas bloqueadas y marchas ×2 mientras no haya líder**; al **tercer «No one» seguido**, la aldea se dispersa (abandono) | `douse` general 1 año | `the_leaderless_years`, 2–4 años: levanta `interregnum` y se vuelve a disparar `succession` |
 
 *Nota de diseño: es la única plantilla que ignora el intervalo mínimo, y el
 latido del bucle largo. Cada generación el jugador reparte una herencia y crea
 un rencor.*
+
+**Por qué quedarse sin líder tiene que doler (v2.22).** `interregnum` bajó la
+elegibilidad de la plantilla del 78 % de los ticks al 5,5 %, pero no arregló lo
+de fondo: **«No one» es una opción que no resuelve nada y vuelve a plantear la
+misma pregunta.** Medido, `last` y `worst` dedican el **93 % de todas sus
+decisiones** —unas 54,5 por partida— a rechazar el liderazgo, y les quedan unas
+250 para el resto del catálogo entero. Rechazar salía gratis.
+
+Ahora no. Mientras el puesto esté vacante **ningún forastero se une** —nadie se
+muda a un sitio donde nadie manda— y **las marchas de §5.7 se duplican**; al
+tercer «No one» consecutivo sin líder de por medio, la aldea se dispersa. No
+hace falta tocar ni un efecto del catálogo: bastan mecanismos que ya existen.
+
+**Medido (v2.23).** Funciona, y de más: `last` y `worst` pasan de terminar
+prácticamente nunca a terminar el **100 %** de las 60 partidas, casi siempre
+antes del año 46. Pero `no_one` sigue siendo el **68,2 %** de sus decisiones —
+no el 93 % de antes, pero tampoco menos del 40 % que pide el nuevo aserto de
+§12.9—, porque ambas políticas contestan `no_one` **las 178 veces que se les
+pregunta, sin una sola excepción**: `last` porque es la última opción de la
+lista, que es todo lo que mira; `worst` porque su coste inmediato de ánimo y fe
+(18) supera al de nombrar a alguien (0, ninguno de los efectos de `choose_a`
+puntúa en `immediateCost`). Ningún castigo que se le añada a `no_one` cambia
+esa aritmética, porque ninguna de las dos políticas mira más allá de la semana
+en curso. Ver §2.23; la puerta que decidiría si tocar los efectos del
+catálogo —`worst` por debajo del 25 % de terminación estando ya fuera del
+bucle— no se cruza: está en el 100 %.
 
 **Por qué la bandera `interregnum`.** Sin ella, elegir «No one» deja el puesto
 vacante, la vacante vuelve a hacer elegible la plantilla al tick siguiente, y
