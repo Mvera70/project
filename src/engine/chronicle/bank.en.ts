@@ -802,7 +802,7 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.strangers_at_the_ford.take_them_in.cost': 'Nine more mouths before the harvest',
   'crossroad.strangers_at_the_ford.feed_them_and_send_them_on.label': 'Feed them and send them on',
   'crossroad.strangers_at_the_ford.feed_them_and_send_them_on.cost':
-    'It costs less, and it costs something',
+    'Sixty bushels, and they leave before nightfall',
   'crossroad.strangers_at_the_ford.turn_them_away.label': 'Turn them away',
   'crossroad.strangers_at_the_ford.turn_them_away.cost': 'The road will hear of it',
 

@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.32 · 8 de septiembre de 2026, 22:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.33 · 8 de septiembre de 2026, 22:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -77,6 +77,16 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.30** | 8 sep 2026, 21:00 | Contrato de conflicto diferido | **`feud_ripe` conserva durante cinco años la prioridad de una disputa sembrada.** Las plantillas `feud` elegibles multiplican su peso por cuatro mientras la bandera está activa. |
 | **2.31** | 8 sep 2026, 21:30 | Contrato de A.6 | **Silenciar al sacerdote conserva al sacerdote.** `silence_a` mantiene el oficio y cobra la pérdida de fe y ánimo que promete; `no_shepherd` solo cae si el cargo queda vacante después. |
 | **2.32** | 8 sep 2026, 22:00 | Contrato de tregua de A.7 | **Construir juntos no hace que los rivales se perdonen.** Las opiniones mutuas bajan 15 en vez de subir 15; los cuatro proyectos y el ánimo común se conservan. |
+| **2.33** | 8 sep 2026, 22:30 | Contrato visible de A.13 | **El precio de despedir a los forasteros dice cuánto grano sale.** Se sustituye «It costs less» por «Sixty bushels»; la mecánica no cambia. |
+
+### 2.33 — El coste antes de elegir
+
+A.13 `feed_them_and_send_them_on` cobra 60 fanegas, frente a las 40 de acoger
+al grupo. Puede ser más barato a largo plazo porque evita nueve bocas, pero el
+texto visible no decía ese horizonte y afirmaba simplemente «It costs less».
+El precio pasa a «Sixty bushels, and they leave before nightfall»: expone la
+cifra que el motor descontará y deja al jugador comparar población y grano sin
+una promesa ambigua. No cambia ningún efecto ni constante de balance.
 
 ### 2.32 — Una pared no es una reconciliación
 
@@ -4322,7 +4332,7 @@ todo.*
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
 | **Take them in** | Nine more mouths before the harvest | `arrive 9`, `grain −40`, `morale +6` | `gather ford 4` | `whoever_burned_it`, 3–10 años, 40 %: `flag threatened 3`, `kill random fraction 0.10` |
-| **Feed them and send them on** | It costs less and it costs something | `grain −60`, `faith +10`, `morale −3` | `gather ford 2` | — |
+| **Feed them and send them on** | Sixty bushels, and they leave before nightfall | `grain −60`, `faith +10`, `morale −3` | `gather ford 2` | — |
 | **Turn them away** | The road will hear of it | `flag hostile 10`, `faith −18`, `morale −8` | `banner` rojo 3 años | `no_one_comes`, 1 año: sin llegadas mientras dure `hostile` |
 
 ---
