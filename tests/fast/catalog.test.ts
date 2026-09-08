@@ -69,6 +69,12 @@ describe('el catálogo · forma', () => {
     });
   });
 
+  it('A.10 sigue abierta cuando la fe supera setenta', () => {
+    const relic = CATALOG.find((t) => t.id === 'relic_pedlar');
+    expect(relic?.requires).toContainEqual({ k: 'stat', stat: 'faith', op: '>', v: 30 });
+    expect(relic?.requires).not.toContainEqual({ k: 'stat', stat: 'faith', op: '<', v: 70 });
+  });
+
   it('elegir la muralla deja veinte años de casas frías', () => {
     const wall = CATALOG.find((t) => t.id === 'first_stone')
       ?.options.find((o) => o.id === 'the_wall');

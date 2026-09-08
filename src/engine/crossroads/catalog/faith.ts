@@ -84,7 +84,6 @@ export const RELIC_PEDLAR: CrossroadTemplate = {
     { k: 'season', season: 'summer' },
     { k: 'has', building: 'chapel' },
     { k: 'stat', stat: 'faith', op: '>', v: 30 },
-    { k: 'stat', stat: 'faith', op: '<', v: 70 },
     { k: 'ratio', ratio: 'grainYears', op: '>', v: 0.6 },
   ],
   cast: [
