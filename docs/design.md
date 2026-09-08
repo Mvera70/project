@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.38 · 9 de septiembre de 2026, 00:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.39 · 9 de septiembre de 2026, 01:05 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -83,6 +83,16 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.36** | 8 sep 2026, 23:50 | Consecuencia de A.11 | **Las laderas desnudas cambian el clima que se sortea.** `flood_prone` suma cinco puntos a los años ruinosos y los resta de los justos, sin añadir tiradas aleatorias. |
 | **2.37** | 9 sep 2026, 00:20 | Contrato de piedra de A.16 | **La elección abre la familia de mejora que nombra.** Muros y casas de piedra dejan de construirse antes de A.16; elegir muro aumenta un 50 % la leña invernal durante veinte años. |
 | **2.38** | 9 sep 2026, 00:45 | Consecuencia de A.16 | **Vivir tras la muralla reduce, pero no elimina, la presión exterior.** `behind_the_wall` multiplica por 0,4 el peso de las plantillas `lord` y `stranger`. |
+| **2.39** | 9 sep 2026, 01:05 | Consecuencia de A.14 | **La reputación ganada frente a los bandidos reduce a la mitad el peso del señor.** `a_name_in_the_valley` se acumula con `behind_the_wall` sin saltarse elegibilidad ni crisis. |
+
+### 2.39 — Un nombre que llega a Wealdmere
+
+La semilla de A.14 `fight_them` escribía `a_name_in_the_valley`, pero ninguna
+selección la observaba. Mientras la bandera esté activa, las plantillas `lord`
+multiplican su componente `story` por 0,5. Si además existe `behind_the_wall`,
+ambos efectos se componen y el peso ordinario queda en 0,2; la crisis del señor
+conserva su multiplicador independiente. La prueba cubre el factor aislado y
+su composición.
 
 ### 2.38 — La muralla cambia qué llega de fuera
 
@@ -3206,6 +3216,7 @@ export const CROSSROADS = {
   CRISIS_MULTIPLIER: 4.0,
   FEUD_RIPE_MULTIPLIER: 4.0,
   BEHIND_WALL_MULTIPLIER: 0.4,
+  VALLEY_NAME_LORD_MULTIPLIER: 0.5,
   NOVELTY_MULTIPLIER: 0.4,      // si ya salió en esta partida
   DEFAULT_COOLDOWN_YEARS: 25,
 } as const;

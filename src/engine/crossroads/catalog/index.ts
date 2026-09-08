@@ -22,7 +22,7 @@
 //   unconsecrated          M-08 later:      opens a template of its own (A.5)
 //   feud_ripe              M-07 select():   weights the feud templates up (A.4, A.6, A.8, A.15)
 //   behind_the_wall        M-07 select():   lord and stranger weigh ×0.4 (A.16)
-//   a_name_in_the_valley   M-07 scoring:    lord templates weigh less (A.14)
+//   a_name_in_the_valley   M-07 select():   lord templates weigh ×0.5 (A.14)
 //
 // The flags Annex A already named — vassal, proud, watched, threatened,
 // hostile — are read by the templates themselves and need nobody else.

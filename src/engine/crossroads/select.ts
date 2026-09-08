@@ -160,6 +160,9 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
     if ((t.category === 'lord' || t.category === 'stranger') && flagSet(state, 'behind_the_wall')) {
       storyMult *= CROSSROADS.BEHIND_WALL_MULTIPLIER;
     }
+    if (t.category === 'lord' && flagSet(state, 'a_name_in_the_valley')) {
+      storyMult *= CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER;
+    }
     const noveltyMult = timesSeen(state, t.id) > 0 ? CROSSROADS.NOVELTY_MULTIPLIER : 1;
     const traitMult = traitMultiplier(t, cast, state);
 

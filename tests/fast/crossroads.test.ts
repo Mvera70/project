@@ -776,6 +776,18 @@ describe('selección · §8.6', () => {
     expect(scored.find((x) => x.template.id === famine.id)?.story).toBe(1);
   });
 
+  it('un nombre ganado reduce al señor y se acumula con la muralla', () => {
+    const s = calm(13);
+    const lord: CrossroadTemplate = { ...T_QUIET, id: 'named_lord', category: 'lord' };
+    s.flags['a_name_in_the_valley'] = 0;
+    expect(eligible(s, [lord])[0]?.story).toBe(CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER);
+
+    s.flags['behind_the_wall'] = 0;
+    expect(eligible(s, [lord])[0]?.story).toBe(
+      CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER * CROSSROADS.BEHIND_WALL_MULTIPLIER,
+    );
+  });
+
   it('los rasgos del reparto pesan', () => {
     const s = calm(7);
     const [leader, other] = makeFeud(s);
