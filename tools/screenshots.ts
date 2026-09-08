@@ -37,12 +37,18 @@ async function shotPair(
   return [colour, grayscale];
 }
 
-async function contactSheet(browser: Browser, images: readonly Buffer[], path: string): Promise<void> {
+interface ContactImage { buffer: Buffer; label: string }
+
+async function contactSheet(browser: Browser, images: readonly ContactImage[], path: string): Promise<void> {
   const width = 390 * 8;
-  const height = 844 * Math.ceil(images.length / 8);
+  const captionHeight = 32;
+  const height = (844 + captionHeight) * Math.ceil(images.length / 8);
   const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
-  const sources = images.map((buffer) => `data:image/png;base64,${buffer.toString('base64')}`);
-  await page.setContent(`<style>*{box-sizing:border-box}html,body{margin:0;background:#20201d}main{display:grid;grid-template-columns:repeat(8,390px)}img{display:block;width:390px;height:844px}</style><main>${sources.map((source) => `<img src="${source}">`).join('')}</main>`);
+  const panels = images.map(({ buffer, label }) => ({
+    label,
+    source: `data:image/png;base64,${buffer.toString('base64')}`,
+  }));
+  await page.setContent(`<style>*{box-sizing:border-box}html,body{margin:0;background:#20201d}main{display:grid;grid-template-columns:repeat(8,390px)}figure{margin:0;width:390px;background:#20201d}figcaption{height:${captionHeight}px;padding:7px 10px;color:#f5f1e8;font:600 13px/18px system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase}img{display:block;width:390px;height:844px}</style><main>${panels.map(({ source, label }) => `<figure><figcaption>${label}</figcaption><img src="${source}"></figure>`).join('')}</main>`);
   await page.locator('img').last().evaluate((image) => (image as HTMLImageElement).decode());
   await page.screenshot({ path, fullPage: true });
   await page.close();
@@ -70,22 +76,26 @@ async function main(): Promise<void> {
         : {}),
     });
     const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
-    const buffers: Buffer[] = [];
+    const images: ContactImage[] = [];
     for (const year of years) {
       for (const season of SEASONS) {
         const stem = `seed-${seed}-year-${String(year).padStart(3, '0')}-${season}`;
         const url = `${base}?debug=1&seed=${seed}&year=${year}&season=${season}`;
-        buffers.push(...await shotPair(
+        const [colour, grayscale] = await shotPair(
           page,
           url,
           resolve(output, `${stem}.png`),
           resolve(output, `${stem}-gray.png`),
-        ));
+        );
+        images.push(
+          { buffer: colour, label: `Year ${year} · ${season}` },
+          { buffer: grayscale, label: `Year ${year} · ${season} · gray` },
+        );
       }
     }
     await page.close();
-    await contactSheet(browser, buffers, resolve(output, `seed-${seed}-contact-sheet.png`));
-    process.stdout.write(`Wrote ${buffers.length + 1} PNG files to ${output}\n`);
+    await contactSheet(browser, images, resolve(output, `seed-${seed}-contact-sheet.png`));
+    process.stdout.write(`Wrote ${images.length + 1} PNG files to ${output}\n`);
   } finally {
     await browser?.close();
     await server?.close();

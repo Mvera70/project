@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.53 · 10 de septiembre de 2026, 04:15 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.54 · 10 de septiembre de 2026, 04:35 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.54** | 10 sep 2026, 04:35 | Puerta visual de §14.3 | **Generar no es mirar.** La hoja de contacto rotula año, estación y versión gris en cada panel para que una persona pueda juzgarla sin memorizar el orden. M-16, M-17 y M-18 quedan técnicamente implementados y visualmente pendientes de ese veredicto. |
 | **2.53** | 10 sep 2026, 04:15 | Paquete ciego del hito 0 | **La entrega al lector ya es reproducible.** Un comando genera tres crónicas A/B/C de 60 años y una sola pregunta, sin semilla, política ni saldo final. El hito sigue sin validar: preparar al juez no equivale a recibir su veredicto. |
 | **2.52** | 10 sep 2026, 03:50 | M-18 · la multitud | **Los anclajes son caché, no estado.** M-15 ya deriva rutas desde hogares, trabajo y suelo; M-18 las lee una vez por fotograma y completa niños, mayores y gente sin oficio con su hogar o la plaza. Ochenta figuras, 1.000 llamadas en 9,14 ms. |
 | **2.51** | 10 sep 2026, 03:10 | M-17 · edificios y figuras | **Las aspas no giran dentro de un fondo inmóvil.** La firma pura no recibe tiempo ni viento y los edificios se cachean; el molino conserva una orientación fija. Trece edificios, ruina y dos figuras dibujados por código, con sombras y contornos. |
@@ -98,6 +99,25 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.54 — Una hoja generada todavía no ha sido mirada
+
+§14.3 es una puerta humana independiente de §9.5. El lector de las crónicas
+debe ser ajeno al proyecto; quien mira los píxeles solo necesita juzgarlos a
+tamaño real. Las pruebas de geometría, luminancia y cajas evitan regresiones,
+pero no pueden decidir si primavera y verano se confunden, si un edificio se
+reconoce o si ochenta cuerpos forman una mancha.
+
+La primera hoja reunía las 32 capturas sin identificar los paneles y obligaba a
+conocer su orden. M-19 ahora escribe sobre cada uno año, estación y `gray`, sin
+alterar las capturas individuales de 390×844. La puerta pide tres respuestas:
+si las cuatro estaciones se reconocen, si los siete edificios principales se
+distinguen sin rótulos y si la multitud sigue legible en los años 60 y 120.
+
+**Qué falsaría el cierre visual:** un «no» en cualquiera de esas tres preguntas.
+Hasta que una persona mire la hoja rotulada, M-16, M-17 y M-18 están
+técnicamente implementados, pero §14.3 sigue abierta. Esto no afecta al cegado
+del paquete de crónicas de §9.5.
 
 ### 2.53 — El juez sigue siendo una persona
 
