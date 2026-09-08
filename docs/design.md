@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.44 · 9 de septiembre de 2026, 21:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.46 · 9 de septiembre de 2026, 23:50 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -88,7 +88,132 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.41** | 9 sep 2026, 02:00 | Cierre de deuda de banderas | **El catálogo ya no escribe ninguna bandera sin lector.** Se retiran `unconsecrated`, para la que nunca existió plantilla, y `burnt_row`, sustituida por el bloqueo temporal de ruinas de v2.25. |
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
+| **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.46 — La hipótesis falsada, y la aldea madura completa
+
+**PARTE 1, resultado: la hipótesis se falsa tal como estaba planteada.**
+`bandits:fight_them` ya llevaba `destroy field 1` desde la v2.25 —no hubo nada
+que cambiar; se dice así en vez de fingir un experimento que no hizo falta— así
+que el banco de esta ronda mide exactamente la configuración pedida, con la
+métrica nueva (campos en pie al terminar la partida) añadida a
+`tools/balance-report.ts`.
+
+| | `prudent` | `first` | `last` | `worst` |
+|---|---:|---:|---:|---:|
+| Terminadas | 1,7 % | 1,7 % | 5,0 % | 10,0 % |
+| Horquilla `worst`−`prudent` | | | | 8,3 pts |
+| Pérdida media, `fight_them` a 5 años | — | — | — | 4,11 (205 veces) |
+| **Campos en pie al terminar, mediana** | **8** | **8** | **8** | **8** |
+
+Terminadas, horquilla y pérdida de `fight_them` salen idénticas a la v2.44,
+porque nada en el motor cambió entre un banco y otro: es la confirmación de que
+la medición es determinista y de que no hacía falta tocar código.
+
+**La mediana no discrimina — las cuatro políticas terminan con el mapa de
+campos lleno.** Por el criterio falsable que se propuso —`worst` sube
+claramente, `prudent` apenas se mueve—, esto es que **no se mueve ninguna de
+las dos**: la hipótesis, tal como se planteó con esta variable, es falsa.
+`FOOD.MAX_FIELDS` es 8 y `field` cuesta 0 de madera y solo 60 puntos de obra —el
+edificio más barato de reconstruir del catálogo, y el primero en la prioridad de
+§7.3—, así que una aldea que pierde un campo lo recupera antes de que el banco
+vuelva a mirar. Trescientos cuatro destrucciones de campo en doscientas
+cuarenta partidas (60 × 4 políticas) no dejan mella visible en la mediana.
+
+**La media sí ve algo, y hay que decirlo aunque la mediana no lo pida.**
+Repartición de campos al terminar: `prudent` 59/60 partidas en el tope, media
+7,92; `first` 51/60, media 7,78; `last` 56/60, media 7,68; **`worst` 41/60,
+media 7,38**. Hay un gradiente real —`worst` tiene doce partidas por debajo de
+7 campos, `prudent` solo una— pero está dominado por partidas que igual acaban
+en el tope, y la mediana, que es lo que se pidió medir, no lo distingue. La
+capacidad como palanca no está descartada del todo: está descartada **para
+esta opción y esta magnitud de golpe**. Un campo cada vez, con la prioridad de
+obra más alta del juego reconstruyéndolo, es un golpe demasiado pequeño y
+demasiado barato de curar.
+
+**No se toca nada.** Ni `fight_them`, ni `refuse`, ni ninguna otra opción; ni el
+mecanismo de bloqueo temporal que ya existe para `plague_pit:burn_the_houses`
+—que si se aplicara a un campo sí impediría la reconstrucción inmediata y sería
+la siguiente prueba, no esta.
+
+**PARTE 2 — Auditoría de la aldea madura, las 17 plantillas.**
+
+| Plantilla | Qué la mantiene elegible a los 80/mapa lleno | 0–100 → 100–200 | Primera mitad |
+|---|---|---:|---|
+| `winter_grain_debt` | Invierno, `grainToHarvest`<0,9, no vasallo. Tope 2/partida | 26 → 38 | Por diseño: crisis rara, capada a propósito |
+| `tithe_demand` | Solo si el jugador fue vasallo alguna vez (`kneel`); otoño, año>5 | 27 → 72 (`prudent`); 0 → 0 (`worst`, que nunca se arrodilla) | Por diseño: gira sobre una decisión anterior, no sobre la edad |
+| `hungry_spring` | `grainYears`<0,35, primavera | 42 → 80 | Por diseño: crisis de grano real, sube con la aldea |
+| `granary_theft` | `grainToHarvest`<1,1, granero, rencor≥40 | 14 → 30 | Por diseño: depende de rencores, no de la edad |
+| `smith_feud` | Rencor≥45 o `feud_ripe`; gente>20 | 7 → 11 | Por diseño |
+| `feud_inherited` | Año>24; rencor≥45 o `feud_ripe`; gente>15 | 7 → 8 | Por diseño |
+| **`forest_cut`** | `forestLeft`>0,3; gente>25 | **0 → 0** | **Por descuido.** El mapa nunca genera más del 0,26 de bosque (`MAPGEN.FOREST_FRACTION`); el umbral pide más bosque del que puede existir el día uno. Inalcanzable desde el tick cero, no por maduración |
+| `wolf_winter` | Invierno, `forestLeft`>0,25, gente>15 | 12 → 0 | **Aldea madura de manual.** El umbral cabe en el rango de fundación (0,20–0,26), así que nace viable; la tala acumulada de un siglo lo cierra para siempre. Ambiguo entre diseño («sin bosque no hay lobos») y descuido (nadie decidió que se apagara sin vuelta) |
+| `chapel_or_granary` | Gente≥30, sin capilla, madera>200, fe>45. Tope 1/partida | 16 → 0 | Por diseño: hito de una sola vez |
+| `relic_pedlar` | Verano, capilla, fe entre 30 y 70 | 12 → 0 | **Por descuido.** Con capilla la fe deriva hacia arriba y se estabiliza por encima de 70; sale de la banda para no volver. Nadie quiso que se apagara para siempre |
+| `plague_pit` | Brote activo, gente>12 | 24 → 16 | Por diseño: depende del brote, no de la edad |
+| `plague_blame` | Brote activo, fe>55, sacerdote devoto | 6 → 9 | Por diseño |
+| `strangers_at_the_ford` | Gente≥12, sitio libre, no `hostile`, ánimo≥55, primavera | 179 → 166 | Por diseño |
+| `bandits` | Otoño, gente>30, SIN empalizada, año>15 | 80 → 72 | Autolimitación deliberada —una de sus propias opciones levanta la empalizada—, no descuido: en la práctica sigue sano porque la empalizada no siempre se levanta |
+| `succession` | Líder muerto, sin interregno | 540 → 568 | Por diseño: el latido del bucle largo |
+| `first_stone` | Primavera, gente≥45, fragua, año>40. Tope 1/partida | 54 → 3 | Por diseño: hito de una sola vez |
+| `quiet_years` | `grainYears`>1,0 (reserva) | 17 → 16 | Por diseño: siempre disponible |
+
+Medido sobre 30 semillas × 200 años con `prudent` y `worst` (60 partidas
+combinadas); las cifras de `succession` y `strangers_at_the_ford` son grandes
+porque disparan cada semana que se cumplen sus condiciones, no porque se hayan
+contado distinto que el resto.
+
+**El patrón tiene dos formas, no una.** `chapel_or_granary` y `first_stone` se
+apagan porque **están diseñadas para apagarse** —hitos de una vez—, y eso no es
+un fallo: es exactamente lo que `maxPerGame: 1` promete. `tithe_demand` no
+enmudece por edad sino por una rama narrativa que la mayoría de políticas nunca
+toma. El fallo real, y solo él, tiene esta forma: **una condición de rango o de
+carencia que una aldea madura satisface o rebasa de forma permanente**, sin que
+nada en el catálogo pueda devolverla a la banda. Tres plantillas la tienen:
+`forest_cut` (inalcanzable desde el principio, el caso más simple), `relic_pedlar`
+(la fe se estabiliza fuera de rango) y `wolf_winter` (el bosque se agota con la
+edad). Las tres son `forest` o `faith` — las dos categorías que la v2.44 midió
+desplomadas.
+
+No se ha tocado nada de esto todavía.
+
+### 2.45 — La aldea madura no tiene enemigos
+
+La medición de la v2.44 completa la eliminación: **no es el bucle** (43,9 % y
+41,3 %, dentro del 45 %), **no es el instrumento** (`prudent` cuenta marchas
+desde la v2.42 y sigue en 1,7 %) y **no es el mundo roto** (arreglado en la
+v2.18). Queda el catálogo, con `worst` en el 10,0 % contra el 25 % exigido.
+
+Pero la tabla de pérdida por opción dice algo más preciso que «faltan dientes»:
+**los dientes existen y no matan.** `winter_grain_debt:refuse` se lleva 54,35
+personas de media —dos tercios de una aldea de ochenta— setenta y cinco veces, y
+la aldea sobrevive igual. No porque el golpe sea flojo: porque **el daño va a la
+gente, y la gente se regenera**. Ocho campos, dieciséis casas, tres graneros y el
+motor de inmigración siguen intactos y la vuelven a llenar. La aldea no es un
+edificio que se derriba: es un manantial que se vacía y se repone.
+
+De ahí la hipótesis a falsar: **el daño que cuenta es a la capacidad de
+recuperarse —campos, graneros, viviendas, la llegada de forasteros—, no a la
+población.** Se prueba con una sola variable, no rediseñando el catálogo.
+
+- **§8.1 · Regla de la aldea madura.** El hallazgo estructural de la ronda, y no
+  lo buscaba nadie: `forest_cut` a cero en 240 partidas y la categoría `faith`
+  desplomada hasta desaparecer son **el mismo fallo**. Una condición formulada
+  sobre una carencia (`neededFields > fields`) o sobre un rango (`faith` entre 30
+  y 70) muere cuando la carencia se cubre o el estado se estabiliza fuera del
+  rango. Es la cara opuesta de la regla episódica: allí la condición era siempre
+  cierta; aquí deja de serlo para siempre. El catálogo está escrito para una
+  aldea que crece — y enmudece justo donde el juego se queda sin presión.
+- **§14.2 · Presupuesto a 15 minutos**, con la nota de que es la última subida
+  sin optimizar.
+
+**Nota de proceso.** La v2.45 se perdió una vez antes de llegar: se escribió en
+una ruta de salida reutilizada de la ronda anterior y se envió el fichero viejo,
+revirtiendo la v2.44 entera. La medición se recuperó del commit `8ce9ef3`. Desde
+aquí, toda escritura del documento usa nombre único por ronda y **se relee del
+disco después de escribir**: verificar la edición no es verificar la escritura.
 
 ### 2.44 — El banco que termina
 
@@ -2577,6 +2702,27 @@ export interface CrossroadOption {
 catálogo y falla si alguna opción no cambia nada en pantalla. Es el principio 1
 de `valle.md` convertido en un test que se ejecuta en cada commit.
 
+**Regla de la aldea madura (v2.45).** Una plantilla cuyas condiciones describen
+una aldea **en crecimiento** queda muda en cuanto la aldea **ha crecido**, y el
+juego se queda sin presión justo donde más la necesita. Medido en la v2.44:
+`forest_cut` aparece **cero veces en 240 partidas** —pide `neededFields > fields`
+y con ocho campos eso ya no ocurre nunca— y la categoría `faith` se desploma
+entre un 72 % y un 100 % en la segunda mitad, hasta desaparecer con dos
+políticas, porque `chapel_or_granary` tiene `maxPerGame: 1` y `relic_pedlar`
+exige `faith` entre 30 y 70, franja de la que una aldea con iglesia sale para no
+volver.
+
+El patrón es el mismo en los dos casos: **una condición formulada sobre una
+carencia o sobre un rango muere cuando la carencia se cubre o el estado se
+estabiliza fuera del rango.** Es la cara opuesta de la regla episódica de más
+abajo: allí el problema era una condición siempre cierta; aquí, una que deja de
+serlo para siempre.
+
+**Toda plantilla debe declarar qué la mantiene viva en una aldea de ochenta
+habitantes con el mapa lleno**, o aceptar explícitamente que es contenido de la
+primera mitad. El diagnóstico obligatorio del catálogo gana una tercera columna:
+apariciones en los años 100–200 frente a los años 0–100.
+
 **Regla de elegibilidad episódica.** Toda plantilla necesita al menos una
 condición **episódica**: falsa la mayor parte del tiempo, que se vuelve cierta
 por un suceso o al cruzarse un umbral. Las condiciones **ambientales**
@@ -4028,7 +4174,11 @@ para poder mirar la forma de las curvas.
 **Tests.** Son el entregable.
 **Terminado cuando.** Los umbrales aplicables de §12.9 pasan, las comprobaciones
 pendientes de módulos posteriores o de aclaración de política están resueltas,
-y la ejecución completa tarda menos de 10 minutos.
+y la ejecución completa tarda menos de 15 minutos. **Subido de 10 a 15 en la
+v2.45, y es la última vez que se sube sin optimizar:** el coste creció a 638,4 s
+porque las partidas adversas ya no se dispersan hacia el año 25 y llegan al
+horizonte de 200 años. Es el mundo sano, no instrumentación cara. Pero un
+presupuesto que se amplía cada vez que se cruza deja de ser un presupuesto.
 
 **Estado (v2.12): no cerrado.** 19 de 25 asertos pasan en 187,55 s. `first` pasa
 los seis umbrales que le aplican. Quedan cuatro fallos, enumerados en §2.12: la

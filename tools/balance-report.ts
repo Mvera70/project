@@ -85,6 +85,10 @@ export interface Trial {
   /** Population lost per hard option `worst` takes, measured 5 years out
    * (v2.44) — the table the contract campaign was for. */
   hardOptionLoss: Record<string, { totalLoss: number; occurrences: number }>;
+  /** Fields standing when the trial stops, and whether that was year 200
+   * (v2.45's capacity experiment) or an earlier ending. */
+  fieldsAtEnd: number;
+  reachedHorizon: boolean;
   invalid: string[];
   geometry: string[];
   probes: number;
@@ -176,6 +180,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     posedByTemplate: Object.fromEntries(CATALOG.map((t) => [t.id, 0])), allowedByTemplate: {},
     decisionsByOption: {}, decisions: 0,
     posedByCategoryEarly: {}, posedByCategoryLate: {}, hardOptionLoss: {},
+    fieldsAtEnd: 0, reachedHorizon: false,
     invalid: [], geometry: [], probes: 0, longestDwindlingTicks: 0, deathsByCause: {},
     shocked: false, shockExtinct: false };
   let shock: GameState | null = null;
@@ -278,6 +283,12 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
   // Whatever the game ended before its window closed settles now, against
   // whatever population the ending left — zero, for the three ways of losing.
   if (policy === 'worst') settleLoss(state.tick, population(state), true);
+  // v2.45: fields standing wherever the trial actually stops. A game that
+  // ended early stopped being about capacity the moment it ended; recorded
+  // anyway, with `reachedHorizon` saying whether it is the year-200 reading
+  // or an earlier one.
+  result.fieldsAtEnd = state.buildings.filter((b) => b.kind === 'field' && b.lostTick === null).length;
+  result.reachedHorizon = state.tick >= YEARS * TIME.WEEKS_PER_YEAR;
   result.ticks = state.tick;
   result.extinct = state.ended !== null;
   for (const template of CATALOG) {
@@ -336,6 +347,10 @@ export interface PolicySummary {
   /** Average population lost 5 years after `worst` takes a hard option
    * (v2.44), and how many times each was actually taken. */
   hardOptionLoss: Record<string, { average: number; occurrences: number }>;
+  /** Fields standing at the end, median over all trials, and how many of
+   * those trials actually reached year 200 rather than ending early (v2.45). */
+  medianFieldsAtEnd: number;
+  reachedHorizonTrials: number;
 }
 
 export function summarize(trials: readonly Trial[], policy: BenchPolicy): PolicySummary {
@@ -412,7 +427,9 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
       }
       return Object.fromEntries(Object.entries(combined).map(([key, v]) =>
         [key, { average: v.occurrences === 0 ? 0 : v.totalLoss / v.occurrences, occurrences: v.occurrences }]));
-    })() };
+    })(),
+    medianFieldsAtEnd: median(group.map((t) => t.fieldsAtEnd)),
+    reachedHorizonTrials: group.filter((t) => t.reachedHorizon).length };
 }
 
 export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; durationMs: number } {
@@ -467,6 +484,12 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
   console.table(Object.entries(worstLoss)
     .sort((a, b) => b[1].average - a[1].average)
     .map(([option, v]) => ({ option, 'avg. lost': v.average.toFixed(2), occurrences: v.occurrences })));
+
+  // v2.45: the capacity experiment's own dependent variable.
+  console.info('Fields standing where each trial stops (median), and how many reached year 200:');
+  console.table(summaries.map((s) => ({
+    policy: s.policy, medianFieldsAtEnd: s.medianFieldsAtEnd, reachedYear200: `${s.reachedHorizonTrials}/${SEEDS}`,
+  })));
 
   for (const summary of summaries) {
     console.info(`${summary.policy}: forest 40-70% at year 100 in ${summary.forestInBand}/${summary.forestTrials} trials that got there (median ${summary.medianForestRatio === null ? 'n/a' : (100 * summary.medianForestRatio).toFixed(1) + '%'})`);

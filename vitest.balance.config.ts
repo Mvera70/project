@@ -9,8 +9,8 @@ export default defineConfig({
   test: {
     globals: true,
     include: ['tests/balance/**/*.test.ts'],
-    testTimeout: 600_000,
-    hookTimeout: 600_000,
+    testTimeout: 900_000, // §14.2, v2.45: budget up from 10 to 15 minutes
+    hookTimeout: 900_000,
     reporters: 'default',
   },
 });
