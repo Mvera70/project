@@ -192,7 +192,7 @@ describe('el desgaste del suelo · §7.6', () => {
 
     s.buildings.push({
       id: 900, kind: 'smithy', x: 0, y: 0, w: 2, h: 2,
-      builtTick: 0, lostTick: null, tier: 0, lit: true,
+      builtTick: 0, lostTick: null, tier: 0, lit: true, blockedUntil: null,
     });
     upgradePaths(s);
     expect(s.map.path[cell]).toBe(3);
@@ -330,7 +330,7 @@ describe('el bosque · §7.5', () => {
     s.map.terrain[cell] = TERRAIN_CODE.cleared;
     s.buildings.push({
       id: 901, kind: 'house', x: 4, y: 4, w: 2, h: 2,
-      builtTick: 0, lostTick: null, tier: 0, lit: true,
+      builtTick: 0, lostTick: null, tier: 0, lit: true, blockedUntil: null,
     });
     for (let year = 1; year <= 40; year += 1) {
       s.tick = year * YEAR;

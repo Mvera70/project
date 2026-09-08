@@ -25,7 +25,7 @@ const YEAR = TIME.WEEKS_PER_YEAR;
 let bid = 0;
 function build(kind: Building['kind'], tier: 0 | 1 = 0): Building {
   bid += 1;
-  return { id: bid, kind, x: 0, y: 0, w: 2, h: 2, builtTick: 0, lostTick: null, tier, lit: true };
+  return { id: bid, kind, x: 0, y: 0, w: 2, h: 2, builtTick: 0, lostTick: null, tier, lit: true, blockedUntil: null };
 }
 
 function village(seed: number, houses = 12): GameState {
@@ -57,7 +57,7 @@ function village(seed: number, houses = 12): GameState {
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
-    dwindlingSince: null, noOneStreak: 0,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
     ended: null,
   };
 }

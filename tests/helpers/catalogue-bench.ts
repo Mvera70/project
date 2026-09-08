@@ -42,7 +42,7 @@ const YEAR = TIME.WEEKS_PER_YEAR;
 
 let bid = 0;
 const build = (kind: Building['kind']): Building => ({
-  id: ++bid, kind, x: 0, y: 0, w: 2, h: 2, builtTick: 0, lostTick: null, tier: 0, lit: true,
+  id: ++bid, kind, x: 0, y: 0, w: 2, h: 2, builtTick: 0, lostTick: null, tier: 0, lit: true, blockedUntil: null,
 });
 
 /**
@@ -72,7 +72,7 @@ function founded(seed: number): GameState {
     ],
     works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [],
     weather: { year: 0, index: 2, factor: 1 }, outbreak: null,
-    dwindlingSince: null, noOneStreak: 0, ended: null,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null, ended: null,
   };
 }
 

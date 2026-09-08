@@ -93,7 +93,18 @@ export type Effect =
   | { k: 'arrive'; count: number }
   | { k: 'flag'; flag: string; years: number } // 0 = permanent
   | { k: 'build'; kind: BuildingKind; free: true }
-  | { k: 'destroy'; kind: BuildingKind; count: number }
+  /**
+   * `blockYears` leaves the ground unbuildable for that long (§7.4, v2.25).
+   * Without it a burnt house is rebuilt within the decade and the price the
+   * option charged was a few weeks of building work.
+   */
+  | { k: 'destroy'; kind: BuildingKind; count: number; blockYears?: number }
+  /**
+   * The next `harvests` reapings come in at `factor` of what they would have
+   * been (§5.3, v2.25). The catalogue has asked for this since A.3 — "cosecha
+   * del año ×0.55" — and it was implemented as a flag nobody reads.
+   */
+  | { k: 'harvest'; factor: number; harvests: number }
   | { k: 'opinion'; from: string; to: string; delta: number }
   | { k: 'memory'; who: string; kind: MemoryKind; about?: string; weight: number }
   | { k: 'role'; who: string; role: Role | null }
@@ -171,7 +182,7 @@ export interface AppliedEffects {
   arrived: VillagerId[];
   seedsPlanted: string[];
   build: BuildingKind[];
-  destroy: { kind: BuildingKind; count: number }[];
+  destroy: { kind: BuildingKind; count: number; blockYears?: number }[];
   visible: VisualEffect[];
 }
 

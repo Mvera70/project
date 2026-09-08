@@ -44,12 +44,24 @@ export function harvest(state: GameState, a: Allocation): HarvestResult {
   const moraleFactor =
     FOOD.HARVEST_MORALE_BASE + FOOD.HARVEST_MORALE_SPAN * (state.village.morale / 100);
 
+  // §5.3, v2.25: a harvest a decision already spent. Spent here and not at the
+  // decision, because "next year's harvest" has to mean the next one whenever
+  // the question was answered — in the spring or the week before the reaping.
+  const spoken = state.harvestModifier;
+  const promised = spoken === null ? 1 : spoken.factor;
+  if (spoken !== null) {
+    state.harvestModifier = spoken.harvests <= 1
+      ? null
+      : { factor: spoken.factor, harvests: spoken.harvests - 1 };
+  }
+
   const yielded =
     a.workedFields *
     FOOD.FIELD_YIELD *
     weatherFactor *
     moraleFactor *
     a.labourFactor *
+    promised *
     (has(state, 'mill') ? FOOD.MILL_BONUS : 1);
 
   state.village.grain += yielded;

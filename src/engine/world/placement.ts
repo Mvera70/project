@@ -1,6 +1,6 @@
 import { BUILDINGS, BUILDING_RULES } from '../balance';
 import { TERRAIN_CODE } from '../state';
-import type { BuildingKind, GameState } from '../state';
+import type { Building, BuildingKind, GameState } from '../state';
 
 interface Rect { x: number; y: number; w: number; h: number }
 interface Point { x: number; y: number }
@@ -16,8 +16,17 @@ export function canPlace(state: GameState, kind: BuildingKind, x: number, y: num
     if (tile === TERRAIN_CODE.water || tile === TERRAIN_CODE.marsh) return false;
     if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
   }
-  if (state.buildings.some((b) => b.id !== upgradeOf && (b.lostTick === null || b.tier === 1) && overlaps(rect, b))) return false;
+  if (state.buildings.some((b) => b.id !== upgradeOf && standsInTheWay(b, state.tick) && overlaps(rect, b))) return false;
   return !state.works.some((work) => overlaps(rect, work));
+}
+
+/**
+ * Whether a building's plot is unavailable. §7.4: what stands, plus stone ruin,
+ * plus — since v2.25 — burnt ground inside the years its `blockedUntil` names.
+ */
+function standsInTheWay(b: Building, tick: number): boolean {
+  if (b.lostTick === null || b.tier === 1) return true;
+  return b.blockedUntil !== null && b.blockedUntil > tick;
 }
 
 function distance(a: Point, b: Point): number { return (a.x - b.x) ** 2 + (a.y - b.y) ** 2; }
@@ -66,7 +75,7 @@ function occupiedCells(state: GameState): Uint8Array {
     }
   };
   for (const building of state.buildings) {
-    if (building.lostTick === null || building.tier === 1) mark(building);
+    if (standsInTheWay(building, state.tick)) mark(building);
   }
   for (const work of state.works) mark(work);
   return occupied;

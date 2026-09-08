@@ -783,11 +783,11 @@ function carryOutBuildings(
 ): void {
   for (const kind of applied.build) requestBuild(state, kind);
 
-  for (const { kind, count: howMany } of applied.destroy) {
+  for (const { kind, count: howMany, blockYears } of applied.destroy) {
     const doomed = state.buildings
       .filter((b: Building) => b.kind === kind && b.lostTick === null)
       .slice(0, howMany);
-    for (const b of doomed) destroyBuilding(state, b.id);
+    for (const b of doomed) destroyBuilding(state, b.id, blockYears ?? 0);
     if (doomed.length > 0) {
       say({
         kind: 'lost',

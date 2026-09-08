@@ -71,7 +71,10 @@ export const PLAGUE_PIT: CrossroadTemplate = {
       label: 'crossroad.plague_pit.burn_the_houses.label',
       cost: 'crossroad.plague_pit.burn_the_houses.cost',
       effects: [
-        { k: 'destroy', kind: 'house', count: 2 },
+        // v2.25 · §8.1: the seed `the_burnt_row` always said the ruins are not
+        // built over, and it was a flag nobody read — the houses were back
+        // within the decade and "roofs for ash" cost a few weeks of work.
+        { k: 'destroy', kind: 'house', count: 2, blockYears: 20 },
         { k: 'flag', flag: 'outbreak_faster', years: 1 },
         { k: 'stat', stat: 'morale', delta: -14 },
       ],

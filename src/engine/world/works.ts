@@ -259,6 +259,7 @@ function complete(state: GameState, work: ConstructionWork): BuiltEvent {
     lostTick: null,
     tier: spec.tier,
     lit: true,
+    blockedUntil: null,
   });
   clearRuins(state, work);
 

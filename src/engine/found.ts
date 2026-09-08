@@ -18,7 +18,7 @@ function foundingBuildings(state: GameState): void {
       if (position === null) throw new Error(`No founding site for ${kind}`);
       state.buildings.push({
         id: state.buildings.length, kind, ...position,
-        w: spec.w, h: spec.h, builtTick: 0, lostTick: null, tier: spec.tier, lit: true,
+        w: spec.w, h: spec.h, builtTick: 0, lostTick: null, tier: spec.tier, lit: true, blockedUntil: null,
       });
     }
   };
@@ -63,7 +63,7 @@ export function foundGame(seed: number): GameState {
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
-    dwindlingSince: null, noOneStreak: 0,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
     ended: null,
   };
   foundingBuildings(state);

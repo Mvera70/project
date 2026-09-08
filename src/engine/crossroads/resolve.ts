@@ -117,7 +117,14 @@ export function applyEffect(
       out.build.push(e.kind);
       break;
     case 'destroy':
-      out.destroy.push({ kind: e.kind, count: e.count });
+      out.destroy.push({ kind: e.kind, count: e.count, ...(e.blockYears === undefined ? {} : { blockYears: e.blockYears }) });
+      break;
+    case 'harvest':
+      // The heavier promise wins if two land before a reaping, rather than
+      // multiplying into something nobody wrote.
+      state.harvestModifier = state.harvestModifier === null || e.factor < state.harvestModifier.factor
+        ? { factor: e.factor, harvests: e.harvests }
+        : { factor: state.harvestModifier.factor, harvests: Math.max(state.harvestModifier.harvests, e.harvests) };
       break;
     case 'opinion': {
       const from = cast[e.from];

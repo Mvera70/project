@@ -44,7 +44,7 @@ function raise(state: GameState, kind: BuildingKind, n: number): GameState {
     state.buildings.push({
       id: state.buildings.reduce((m, b) => Math.max(m, b.id + 1), 0),
       kind, x: spot.x, y: spot.y, w: spec.w, h: spec.h,
-      builtTick: state.tick, lostTick: null, tier: spec.tier, lit: true,
+      builtTick: state.tick, lostTick: null, tier: spec.tier, lit: true, blockedUntil: null,
     });
   }
   return state;
@@ -232,7 +232,7 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
     const chapel = live(s).find((b) => b.kind === 'chapel')!;
     s.buildings.push({
       id: 900, kind: 'palisade', x: chapel.x + 2, y: chapel.y + 2, w: 1, h: 1,
-      builtTick: 0, lostTick: null, tier: 0, lit: true,
+      builtTick: 0, lostTick: null, tier: 0, lit: true, blockedUntil: null,
     });
     const spot = upgradeSpot(s, 'church', chapel);
     expect(spot).not.toBeNull();
@@ -406,5 +406,46 @@ describe('las obras dentro del tick · §4.2 paso 6', () => {
     advanceWorks(s, first.bpCost + 10);
     expect(s.works.some((w) => w.id === first.id)).toBe(false);
     expect(s.works.find((w) => w.kind === 'watchtower')?.bpDone).toBe(10);
+  });
+});
+
+describe('el suelo quemado · §7.4, v2.25', () => {
+  it('una ruina con plazo no se puede reconstruir mientras dure', () => {
+    const s = foundGame(7);
+    const house = live(s).find((b) => b.kind === 'house')!;
+    destroyBuilding(s, house.id, 20);
+    expect(canPlace(s, 'house', house.x, house.y)).toBe(false);
+    // Y sigue sin poderse un año antes de que venza.
+    s.tick = 19 * YEAR;
+    expect(canPlace(s, 'house', house.x, house.y)).toBe(false);
+  });
+
+  it('cuando vence, el suelo vuelve a ser suelo', () => {
+    const s = foundGame(7);
+    const house = live(s).find((b) => b.kind === 'house')!;
+    destroyBuilding(s, house.id, 20);
+    s.tick = 20 * YEAR + 1;
+    expect(canPlace(s, 'house', house.x, house.y)).toBe(true);
+  });
+
+  it('sin plazo, una ruina de madera se edifica encima como siempre', () => {
+    const s = foundGame(7);
+    const house = live(s).find((b) => b.kind === 'house')!;
+    destroyBuilding(s, house.id);
+    expect(canPlace(s, 'house', house.x, house.y)).toBe(true);
+  });
+
+  it('la aldea no coloca nada sobre suelo con plazo, ni al buscar sitio', () => {
+    const s = foundGame(7);
+    for (const b of live(s).filter((x) => x.kind === 'house')) destroyBuilding(s, b.id, 20);
+    const burnt = s.buildings.filter((b) => b.blockedUntil !== null);
+    expect(burnt.length).toBeGreaterThan(0);
+    const spot = placeBuilding(s, 'house');
+    if (spot !== null) {
+      for (const b of burnt) {
+        const hits = spot.x < b.x + b.w && spot.x + 2 > b.x && spot.y < b.y + b.h && spot.y + 2 > b.y;
+        expect(hits, `la casa nueva pisa la parcela quemada ${b.id}`).toBe(false);
+      }
+    }
   });
 });

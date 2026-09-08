@@ -368,7 +368,7 @@ describe('cobertura de vacantes · §6.2', () => {
 
     s.buildings.push({
       id: 999, kind: 'chapel', x: 0, y: 0, w: 2, h: 2,
-      builtTick: 0, lostTick: null, tier: 0, lit: true,
+      builtTick: 0, lostTick: null, tier: 0, lit: true, blockedUntil: null,
     });
     fillVacancies(s);
     expect(holderOf(s, 'priest')).not.toBeNull();

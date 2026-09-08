@@ -60,7 +60,14 @@ export const WINTER_GRAIN_DEBT: CrossroadTemplate = {
       id: 'refuse',
       label: 'crossroad.winter_grain_debt.refuse.label',
       cost: 'crossroad.winter_grain_debt.refuse.cost',
+      // v2.25 · §8.1: the written price is a contract. "People will die this
+      // winter" used to be morale +10 and a flag, which is a promise of dead
+      // villagers paid out as a bonus. The granary goes to the lord's men and
+      // next year's reaping comes in at 0.55: the winter does the killing,
+      // which is what the sentence says.
       effects: [
+        { k: 'stat', stat: 'grain', mul: 0 },
+        { k: 'harvest', factor: 0.55, harvests: 1 },
         { k: 'stat', stat: 'morale', delta: 10 },
         { k: 'flag', flag: 'proud', years: 20 },
       ],

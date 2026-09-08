@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.24 · 8 de septiembre de 2026, 13:54 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.25 · 8 de septiembre de 2026, 18:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -68,7 +68,134 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.21** | 8 sep 2026, 14:00 | Atribución de política | **La brecha adversa se mide por opción tomada.** Antes de cambiar A.15 se separa la repetición de `succession:no_one` del resto de decisiones de `last` y `worst`. |
 | **2.22** | 8 sep 2026, 15:10 | El problema invertido | **Quedarse sin líder duele**: sin llegadas, marchas dobles y dispersión al tercer rechazo. Aviso de contaminación sobre las entradas medidas bajo la peste perpetua. Las bandas miden «partida terminada». |
 | **2.24** | 8 sep 2026, 13:54 | El instrumento, no el juego | **Regla de no degeneración en las cuatro políticas.** Los dos umbrales adversos de la v2.23 pasan midiendo una sola opción: no valen. `hostile` inalcanzable para `prudent` es correcto. `MIN_FIELD_CREW` queda como invariante inerte. |
+| **2.25** | 8 sep 2026, 18:20 | El precio escrito es un contrato | **§8.1, regla nueva.** Auditadas las 48 opciones: 13 mienten y 9 cumplen a medias. La causa es una sola y estructural — **14 banderas que nadie lee**. La horquilla manda sobre el ≥ 25 %. Dos umbrales recalibrados. Experimento de tres dientes: `worst` sube de 3,3 % a 8,3 %, `prudent` no se mueve. |
 | **2.23** | 8 sep 2026, 16:40 | Verificación bajo el mundo corregido | **Los tres ⚠ re-medidos, sin ajustar nada.** A.15 implementado: `last`/`worst` pasan de casi nunca terminar a terminar el 100 %. La horquilla se dispara a 98,3 puntos. El bucle no era la elección — era que no tenía consecuencias; ahora las tiene y ambas políticas la eligen igual, deterministas. |
+
+### 2.25 — El precio escrito es un contrato
+
+- **§8.1 · Regla nueva.** El texto de la columna «Precio» promete algo. Si los
+  efectos no lo entregan, la plantilla miente y el jugador aprende que las
+  opciones duras son palabrería. Es la regla que faltaba, y la auditoría de esta
+  ronda dice cuánto hacía falta.
+- **§12.9 · La horquilla manda; el ≥ 25 % de `worst` es secundario.** El 25 % es
+  una suposición de la v2.0, anterior al catálogo — de la misma cosecha que el
+  rango 1–4 de cadencia que ya se corrigió en la v2.10 al medirlo. Lo que
+  encarna el principio 2 de `valle.md` no es una cifra absoluta de muertes: es
+  la **separación** entre jugar bien y jugar mal. Una aldea que aguanta el
+  desastre no incumple nada; una donde da igual lo que se elija, sí.
+- **§12.9 · Dos umbrales mal calibrados.** El pico mediano pasa de 65–82 a
+  **65–85**: fallar por un habitante es ruido, no señal. Y «una sola opción
+  < 40 %» sube a **< 45 %**, porque el 40 era inalcanzable: con la regla de no
+  degeneración una opción todavía puede llevarse dos de cada tres apariciones de
+  su plantilla, y `succession` es el 60 % de lo que se pregunta a las políticas
+  adversas — dos tercios de 60 son 40. **El techo es estructural**, y un aserto
+  que no se puede cumplir no avisa de nada.
+- **§8.5 · Los dientes salen de componer, no de subir números.** Una decisión
+  mala tiene que ser sobrevivible; tres seguidas, no. Efectos más grandes harían
+  que una sola tirada liquide la partida, y eso choca de frente con «decisiones
+  raras y pesadas»: si la primera te mata, no hay segunda.
+
+**Auditoría del contrato: las 48 opciones.** Recorridas una a una, comparando el
+precio escrito con los efectos que se ejecutan.
+
+| | Opciones |
+|---|---:|
+| ✅ El precio se cobra | **26** |
+| ⚠️ A medias o contradictorio | **9** |
+| ❌ El precio no se cobra | **13** |
+
+**La causa es una sola, y no son trece defectos sueltos: son 14 banderas que
+nadie lee.** El documento especificaba costes mecánicos reales —«`severity`
+forzada a 0.5 durante 8 semanas», «cosecha del año ×0.55», «brote +3 semanas»,
+«obra ×0.4 durante 6 semanas»— y M-08 los implementó como banderas con nombre.
+Nunca se escribió el sistema que las leyera. Medido: de las 19 banderas que pone
+el catálogo, solo **cinco** hacen algo — `hostile` (bloquea llegadas y condiciona
+tres plantillas), `threatened` (enruta crisis y prioriza la empalizada),
+`vassal`, `watched` y `proud` (condicionan plantillas). Las otras catorce
+—`forced_hunger`, `lean_harvest`, `half_harvest`, `feud_ripe`, `outbreak_slower`,
+`outbreak_faster`, `unconsecrated`, `burnt_row`, `works_slowed`, `flood_prone`,
+`a_name_in_the_valley`, `wall_unlocked`, `stone_house_unlocked`,
+`behind_the_wall`— se ponen y no las lee nadie, ni el motor ni otra plantilla.
+
+Eso explica la tabla del banco mejor que ninguna constante: **el catálogo no es
+blando, es que buena parte de su dureza no está conectada.**
+
+Las trece que mienten, por plantilla:
+
+| Plantilla · opción | Precio escrito | Lo que hace | Por qué miente |
+|---|---|---|---|
+| A.1 `refuse` | People will die this winter | `morale +10`, `flag proud` | Nadie muere. Es **ganancia neta** |
+| A.3 `sow_it` | A hungry summer | bandera muerta, `morale −8` | El doc pedía `severity` 0.5 ocho semanas |
+| A.3 `eat_it` | A thin harvest | **`grain +300`**, bandera muerta, semilla **vacía** | El doc pedía cosecha ×0.55. Ganancia pura |
+| A.3 `half_and_half` | Both, and neither enough | **`grain +140`**, bandera muerta | El doc pedía cosecha ×0.78. Ganancia neta |
+| A.4 `believe_b` | {A} is cast out | `role A null`, `morale −6` | A no se va: pierde el oficio. El doc pedía `people −1` |
+| A.5 `bless_them` | The sickness has more days to work | `faith +18`, `morale +6`, cementerio gratis | El brote no dura ni un día más. Ganancia pura |
+| A.6 `silence_a` | The village keeps its priest… | `faith −30`, **`role A null`** | A **es** el cura: el precio se contradice a sí mismo |
+| A.8 `send_b_away` | The valley loses a pair of hands and a name | `role B null`, `morale −4` | B sigue en la aldea trabajando. El doc pedía `people −1` |
+| A.9 `the_chapel` | The next lean year will be leaner | capilla gratis, `faith +20`, `morale +10` | Nada hace peor el año magro. Ganancia pura |
+| A.11 `fell_it` | The wood does not come back in a lifetime | 2 campos gratis, `wood +900` | **No se tala ni una celda**: ningún efecto toca el terreno, y §7.5 rebrota a los 8 años |
+| A.11 `take_the_edge` | Slower, and the children are hungry now | 1 campo gratis, `wood +300` | Coste cero. Nadie pasa hambre |
+| A.12 `keep_everyone_inside` | Nothing gets done for a month | bandera muerta, `wood −60`, `morale −8` | El trabajo no se detiene |
+| A.16 `the_wall` | Cold houses for a generation | bandera muerta, `morale +6` | Ni casas frías ni desbloqueo: M-14 ya permite `wall` sin bandera |
+
+Las nueve a medias: A.4 `believe_a` y A.15 `choose_a`/`choose_b` (el recuerdo es
+real, la semilla es una bandera muerta); A.5 `burn_the_houses` (las casas caen y
+se reconstruyen); A.6 `say_nothing` (el precio se cumple por accidente, porque
+el brote acaba solo); A.7 `build_together` (el precio dice que nadie perdona y el
+efecto inmediato es **opinión +15 en ambos sentidos**); A.13 `feed_them_and_send_them_on`
+(«cuesta menos» y cuesta 60 de grano frente a los 40 de acogerlos: cuesta
+**más**); A.14 `fight_them` (el precio no promete ningún coste, y el resultado
+neto es ganancia); A.16 `the_houses` (el precio no promete coste; la semilla sí
+entrega).
+
+**El experimento de los tres dientes.** Solo las tres que ya prometían un coste y
+no lo entregaban. Dos de ellas necesitaban mecanismos que no existían, y se
+escriben aquí porque son los que el Anexo A lleva pidiendo desde A.3:
+
+- **§5.3 · `GameState.harvestModifier`** y el efecto `{k:'harvest', factor,
+  harvests}`. La siega que una decisión ya se gastó. Se cuenta en siegas y no en
+  semanas, para que «la cosecha del año siguiente» sea la siguiente se decida en
+  primavera o la víspera de segar.
+- **§7.4 · `Building.blockedUntil`** y `destroy.blockYears`. El tercer caso que
+  el catálogo pedía y §3 no tenía: suelo quemado que nadie toca en unos años.
+  §7.4 tenía ruina de madera —se edifica encima— y ruina de piedra —nunca—; esto
+  es la de en medio, y es lo que la semilla `the_burnt_row` decía desde el
+  principio.
+
+Los tres cambios: `winter_grain_debt:refuse` vacía el granero y deja la siguiente
+siega al 0,55; `bandits:fight_them` añade `destroy field 1`;
+`plague_pit:burn_the_houses` deja las dos parcelas quemadas veinte años.
+
+**Resultado. La hipótesis se confirma en dirección y se queda corta en tamaño:**
+
+| | v2.24 | con los tres dientes |
+|---|---:|---:|
+| Terminadas, `prudent` | 1,7 % | **1,7 %** |
+| Terminadas, `first` | 1,7 % | 1,7 % |
+| Terminadas, `last` | 8,3 % | 8,3 % |
+| Terminadas, `worst` | 3,3 % | **8,3 %** |
+| **Horquilla `worst`−`prudent`** | 1,7 pts | **6,7 pts** |
+| Pico mediano, `prudent` | 83 | 83 |
+| Cadencia, las cuatro | 3,82–4,15 | 3,80–4,25 |
+
+`worst` se multiplica por 2,5 y `prudent` no se mueve **ni un punto**, que es lo
+que decía la hipótesis. Y no se mueve por la razón más limpia posible: de las
+tres opciones tocadas, `prudent` no elige **ninguna** en 60 partidas — 0, 0 y 0.
+El mecanismo no es romo; es que sólo alcanza a quien elige mal.
+
+Que dispara está comprobado: `worst` toma `refuse` 58 veces (44 de sus 60 valles
+ven la cosecha penalizada), `fight_them` 207 y `burn_the_houses` 31. `first`
+quema un campo 118 veces y **su terminación no se mueve del 1,7 %** — que es, por
+sí solo, la mejor medida de lo blando que sigue siendo el resto.
+
+**Pero 6,7 puntos contra los 20 que pide la horquilla, y 8,3 % contra el 25 %.**
+Tres opciones de trece no bastan, y era previsible: la auditoría dice que el
+problema es sistémico y de catorce banderas, no de tres plantillas. **Nada más se
+toca en esta ronda.**
+
+**Presupuesto.** El banco tarda 551,9 s de 600. El experimento no lo cruzó —bajó
+ocho segundos respecto a los 560,6 de la v2.24, dentro del ruido—, pero el margen
+sigue siendo de menos de un minuto y no se ha optimizado nada.
 
 ### 2.24 — El instrumento, no el juego
 
@@ -2107,7 +2234,7 @@ export type CrossroadCategory =
 export interface CrossroadOption {
   id: string;
   label: string;               // clave: el verbo, 1–3 palabras
-  cost: string;                // clave: el precio, visible antes de elegir
+  cost: string;                // clave: el precio, visible antes de elegir — CONTRATO (v2.25)
   effects: Effect[];
   visible: VisualEffect[];     // OBLIGATORIO, longitud ≥ 1
   seeds: SeedSpec[];
@@ -2146,6 +2273,24 @@ disparando lo mismo**, porque a partir de cierto punto el que fija el ritmo es
 su reposo. Endurecer condiciones deja de servir en cuanto la elegibilidad cae
 por debajo de la tasa que impone el reposo; de ahí en adelante, el reposo es lo
 único que queda antes del techo.
+
+**El precio escrito es un contrato (v2.25).** El texto de `cost` es lo único que
+el jugador ve antes de elegir, y es una promesa. **Si los efectos no la
+entregan, la plantilla miente**, y lo que el jugador aprende no es a temer las
+opciones duras: aprende que son palabrería, y a partir de ahí las escoge sin
+mirar. Una opción cuyo precio dice «People will die this winter» y da `morale
++10` sin una sola muerte no es una decisión difícil mal calibrada — es una
+decisión falsa.
+
+La regla, entonces: **para cada opción, lo que promete la columna «Precio» tiene
+que estar en sus efectos o en su semilla**, y una semilla solo cuenta si lo que
+lleva dentro lo lee alguien. Una bandera que nadie lee no es un coste; es un
+comentario.
+
+Es una regla de revisión, no de código: no hay aserto que sepa leer inglés. Se
+comprueba a mano cada vez que se toca una plantilla, y la auditoría completa de
+las 48 opciones está en §2.25 — 13 mentían y 9 cumplían a medias, casi todas por
+la misma causa: **catorce banderas que se ponen y nadie lee.**
 
 ### 8.2 DSL de condiciones
 
@@ -2250,6 +2395,20 @@ export interface SeedSpec {
 Al vencer, la entrada de crónica **cita explícitamente la decisión que la
 plantó**, con el año. «Thirty-one years after Osric swore to Wealdmere, the
 lord's men came for his grandson.» Esa frase es el producto del juego.
+
+**Los dientes salen de componer, no de subir números (v2.25).** Cuando el
+catálogo resulte blando —y §2.25 lo mide: `worst` termina el 8,3 % de las
+partidas— la respuesta **no** es multiplicar los efectos. Una decisión mala debe
+ser **sobrevivible**; tres seguidas, no. Efectos más grandes hacen que una sola
+tirada liquide la partida, y eso choca de frente con el principio de
+«decisiones raras y pesadas» de §8.6: si la primera te mata, no hay segunda, y
+la aldea deja de ser una historia para ser una moneda al aire.
+
+Lo que sí compone es esto: que el coste **caiga sobre lo que la aldea necesita
+para absorber el siguiente golpe**. Vaciar el granero no mata a nadie esa
+semana; deja a la aldea sin colchón para el invierno que viene. Quemar un campo
+no mata a nadie; baja el techo de la cosecha durante años. Esa es la diferencia
+entre un juego donde equivocarse duele y uno donde equivocarse mata.
 
 Regla: toda plantilla con una opción de beneficio inmediato claro debe plantar
 al menos una semilla. La suite de balance lo verifica.
@@ -2934,10 +3093,10 @@ que medir con una política que no se arruine sola.
 | Propiedad | Umbral | Política |
 |---|---|---|
 | **Partida terminada** (abandono o extinción) | 2 % – 12 % | `prudent` |
-| **Partida terminada** | ≥ 25 % | `worst` |
-| Horquilla entre `prudent` y `worst` | ≥ 20 puntos | — |
-| Decisiones de `last`/`worst` dedicadas a una sola opción | < 40 % | atribución por opción. **Cuando falla, se arregla la POLÍTICA, no el juego** (§12.9, regla de no degeneración). Medido en v2.23: 68,2 % en ambas, siempre `succession:no_one`. |
-| Mediana del pico de población | 65 – 82 | `prudent` |
+| **Partida terminada** | ≥ 25 % | `worst` — **secundario a la horquilla (v2.25)**, ver abajo |
+| **Horquilla entre `prudent` y `worst`** | **≥ 20 puntos** | — · **el aserto que manda (v2.25)** |
+| Decisiones de `last`/`worst` dedicadas a una sola opción | **< 45 %** | atribución por opción. **Cuando falla, se arregla la POLÍTICA, no el juego** (§12.9, regla de no degeneración). Era < 40 % y **es inalcanzable (v2.25)**: con la regla, una opción todavía se lleva dos de cada tres apariciones de su plantilla, y `succession` es el 60 % de lo que se pregunta a las adversas — dos tercios de 60 son 40. El techo es estructural; el umbral se pone encima. |
+| Mediana del pico de población | 65 – 85 | `prudent` · era 65–82 y fallaba por un habitante (v2.25): fallar por uno es ruido |
 | Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas | `prudent` |
 | Población visible al final de la primera generación | ≥ 26 en la mediana | `prudent` |
 | **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. **Medido (v2.23): la media pasa en las cuatro políticas (3,78–4,41), pero el máximo de `last`/`worst` sube a 9,37** — una partida que se dispersa en diez años concentra sus tres sucesiones en pocas generaciones. Consecuencia del final más corto de Anexo A.15, no del catálogo. |
@@ -2961,6 +3120,20 @@ aldea solo muere si el jugador la mata.** Si esa cifra baja del 25 %, las
 encrucijadas no tienen dientes suficientes y hay que endurecer sus efectos, no el
 mundo. Y la fila de la horquilla es la que hace cumplir el principio 2: si jugar
 bien y jugar mal acaban en el mismo sitio, el jugador sobra.
+
+**De las dos, manda la horquilla (v2.25).** El 25 % es una suposición de la
+v2.0, escrita antes de que existiera el catálogo y sin nada medido detrás — de
+la misma cosecha que el rango 1–4 de encrucijadas por generación, que resultó
+estar mal en cuanto se midió y se corrigió a 1–5 en la v2.10. No hay razón para
+tratar este número con más respeto que aquel.
+
+Lo que encarna el principio 2 no es una cifra absoluta de aldeas muertas: es la
+**separación**. Una aldea que aguanta el desastre no incumple nada —hay juegos
+enteros construidos sobre resistir—; una donde da exactamente igual lo que se
+elija, sí. Si algún día la horquilla llega a los 20 puntos con `worst` en el
+18 %, el juego cumple: jugar mal cuesta cuatro veces más que jugar bien, y eso
+es un jugador que importa. Al revés —`worst` en el 30 % con `prudent` en el
+28 %— no cumple nada, y con el aserto viejo habría pasado.
 
 **Medido (v2.23), con A.15 en pie: las dos filas pasan, de sobra.** `worst`
 termina el 100 % de las partidas —muy por encima del 25 %— y la horquilla con

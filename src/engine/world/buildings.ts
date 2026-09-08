@@ -1,4 +1,4 @@
-import { BUILDINGS, LIFE } from '../balance';
+import { BUILDINGS, LIFE, TIME } from '../balance';
 import { housingCapacity, isHere } from '../people/demography';
 import { storageCapacity } from '../subsistence/harvest';
 import type { BuildingId, BuildingKind, GameState } from '../state';
@@ -24,10 +24,13 @@ export function withinCap(state: GameState, kind: BuildingKind): boolean {
 }
 
 /** Ruin bytes are occupancy, while building history preserves their material. */
-export function destroyBuilding(state: GameState, id: BuildingId): void {
+export function destroyBuilding(state: GameState, id: BuildingId, blockYears = 0): void {
   const building = state.buildings.find((b) => b.id === id && b.lostTick === null);
   if (building === undefined) return;
   building.lostTick = state.tick;
+  // v2.25: burnt ground nobody will build on for a while. Zero leaves §7.4 as
+  // it was — a wooden ruin anyone may build over.
+  if (blockYears > 0) building.blockedUntil = state.tick + Math.round(blockYears * TIME.WEEKS_PER_YEAR);
   for (let y = building.y; y < building.y + building.h; y += 1) {
     for (let x = building.x; x < building.x + building.w; x += 1) state.map.ruins[y * state.map.width + x] = 1;
   }

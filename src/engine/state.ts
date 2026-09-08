@@ -229,6 +229,13 @@ export interface Building {
   h: number;
   builtTick: number;
   lostTick: number | null; // if !== null, it is a ruin
+  /**
+   * A ruin that still holds its ground. §7.4 lets a wooden ruin be built over
+   * and a stone one never; this is the third case the catalogue asked for and
+   * §3 did not have — burnt ground that nobody will touch for a while (A.5's
+   * `the_burnt_row`). Null on everything that is not one.
+   */
+  blockedUntil: number | null;
   tier: 0 | 1; // 0 wood, 1 stone
   lit: boolean; // the smithy goes dark if the smith takes offence
 }
@@ -523,6 +530,15 @@ export interface GameState {
    * leader in office, however briefly, breaks the streak.
    */
   noOneStreak: number;
+  /**
+   * A harvest that has been spoken for. §5.3, v2.25: the year a decision costs
+   * the village its harvest rather than its granary.
+   *
+   * Counted in harvests rather than in ticks, so that "next year's harvest" is
+   * the next one whenever the decision was taken — the same promise whether it
+   * was answered in the spring or the week before the reaping.
+   */
+  harvestModifier: { factor: number; harvests: number } | null;
   ended: EndState | null;
 }
 

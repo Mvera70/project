@@ -47,7 +47,7 @@ function village(seed: number): GameState {
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
-    dwindlingSince: null, noOneStreak: 0,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
     ended: null,
   };
 }

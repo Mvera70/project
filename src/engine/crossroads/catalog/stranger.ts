@@ -144,8 +144,12 @@ export const BANDITS: CrossroadTemplate = {
       id: 'fight_them',
       label: 'crossroad.bandits.fight_them.label',
       cost: 'crossroad.bandits.fight_them.cost',
+      // v2.25 · §8.1: they leave burning a field. Winning a fight was a tenth
+      // of the village against +18 morale and +80 wood — a net gain, and the
+      // adverse policy's favourite option for that reason.
       effects: [
         { k: 'kill', who: 'random', count: 'fraction', fraction: 0.1 },
+        { k: 'destroy', kind: 'field', count: 1 },
         { k: 'stat', stat: 'morale', delta: 18 },
         { k: 'stat', stat: 'wood', delta: 80 },
         { k: 'memory', who: 'B', kind: 'was_saved', about: 'A', weight: 4 },

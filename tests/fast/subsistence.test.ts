@@ -46,6 +46,7 @@ function build(kind: BuildingKind, tier: 0 | 1 = 0): Building {
     lostTick: null,
     tier,
     lit: true,
+    blockedUntil: null,
   };
 }
 
@@ -89,7 +90,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
-    dwindlingSince: null, noOneStreak: 0,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
     ended: null,
   };
 }
@@ -986,5 +987,54 @@ describe('tripulación mínima de campo · §5.2, v2.14', () => {
       expect(a.workedFields * FOOD.MIN_FIELD_CREW, `${adults} adultos`)
         .toBeLessThanOrEqual(a.farmers + 1e-9);
     }
+  });
+});
+
+describe('la cosecha ya vendida · §5.3, v2.25', () => {
+  // El mecanismo que el Anexo A pedía desde A.3 —«cosecha del año ×0.55»— y que
+  // se había implementado como una bandera que nadie lee.
+  function ready(seed = 7): GameState {
+    const s = founded(seed);
+    s.tick = TIME.HARVEST_WEEK;
+    return s;
+  }
+
+  it('sin modificador, la cosecha es la de siempre', () => {
+    const s = ready();
+    expect(s.harvestModifier).toBeNull();
+    expect(harvest(s, allocateLabour(s)).yielded).toBeGreaterThan(0);
+  });
+
+  it('con 0,55, la cosecha sale al 55 % de lo que habría sido', () => {
+    const plain = harvest(ready(), allocateLabour(ready())).yielded;
+    const s = ready();
+    s.harvestModifier = { factor: 0.55, harvests: 1 };
+    expect(harvest(s, allocateLabour(s)).yielded).toBeCloseTo(plain * 0.55, 6);
+  });
+
+  it('se gasta en la cosecha, no con el tiempo', () => {
+    // La promesa es «la cosecha del año siguiente», no «un año»: la paga la
+    // siguiente siega, se decida en primavera o la semana antes de segar.
+    const s = ready();
+    s.harvestModifier = { factor: 0.55, harvests: 1 };
+    harvest(s, allocateLabour(s));
+    expect(s.harvestModifier).toBeNull();
+  });
+
+  it('dos siegas si son dos las prometidas', () => {
+    const s = ready();
+    s.harvestModifier = { factor: 0.5, harvests: 2 };
+    harvest(s, allocateLabour(s));
+    expect(s.harvestModifier).toEqual({ factor: 0.5, harvests: 1 });
+    harvest(s, allocateLabour(s));
+    expect(s.harvestModifier).toBeNull();
+  });
+
+  it('una semana que no es la de la siega no gasta la promesa', () => {
+    const s = founded(7);
+    s.tick = TIME.HARVEST_WEEK + 1;
+    s.harvestModifier = { factor: 0.55, harvests: 1 };
+    harvest(s, allocateLabour(s));
+    expect(s.harvestModifier).toEqual({ factor: 0.55, harvests: 1 });
   });
 });

@@ -36,6 +36,7 @@ function house(id: number): Building {
     lostTick: null,
     tier: 0,
     lit: true,
+    blockedUntil: null,
   };
 }
 
@@ -69,7 +70,7 @@ function village(seed: number, houses: number): GameState {
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
-    dwindlingSince: null, noOneStreak: 0,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
     ended: null,
   };
 }
