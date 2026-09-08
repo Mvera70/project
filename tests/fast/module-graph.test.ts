@@ -174,7 +174,10 @@ describe('grafo de módulos del motor', () => {
     // events.ts lee gente para el epitafio de §9.4; sigue sin que nadie de
     // people/ o subsistence/ mire hacia chronicle/.
     expect(importsOf('chronicle/events.ts')).toEqual(['people/villagers', 'state', 'time']);
-    expect(importsOf('chronicle/render.ts')).toEqual(['bank.en', 'rng', 'state', 'time']);
+    // v2.14: render.ts asks events.ts which entries aggregate by year (9.2).
+    // events.ts still imports nothing from render.ts, so the arrow is one way.
+    expect(importsOf('chronicle/render.ts')).toEqual(['bank.en', 'events', 'rng', 'state', 'time']);
+    expect(importsOf('chronicle/events.ts')).not.toContain('render');
     expect(importsOf('chronicle/digest.ts')).toEqual(['people/demography', 'state']);
     for (const f of ['people/demography.ts', 'subsistence/mood.ts', 'state.ts'] as const) {
       expect(importsOf(f).some((x) => x.includes('chronicle')), f).toBe(false);

@@ -29,6 +29,12 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
       it('has less than 1% eligible ticks for every template', () => {
         for (const [id, fraction] of Object.entries(summary().eligibility)) expect(fraction, id).toBeLessThan(0.01);
       });
+      it('never lingers more than 10 years below a workable village before dying', () => {
+        // §5.2, v2.14. A game that spends decades at two or three people is not
+        // an ending; it is a flat line with nothing to write about. One trial
+        // used to sit there for 38 years.
+        expect(summary().maxYearsDying).toBeLessThanOrEqual(10);
+      });
       it('has at least 25% extinction after a 90% shock among survivors at year 40', () => {
         expect(summary().shockTrials).toBeGreaterThan(0);
         expect(summary().shockExtinction).toBeGreaterThanOrEqual(0.25);

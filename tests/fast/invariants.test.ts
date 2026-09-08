@@ -4,6 +4,9 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { next } from '@engine/rng';
 import { run } from '@engine/sim';
+import { yearKey } from '@engine/chronicle/events';
+import { knows, renderYear } from '@engine/chronicle/render';
+import { yearOf } from '@engine/time';
 import { TERRAIN_CODE } from '@engine/state';
 
 describe('M-11 · integrated invariants', () => {
@@ -59,5 +62,49 @@ describe('M-11 · integrated invariants', () => {
     const normalized = structuredClone(noisy);
     normalized.rng.chronicle = baseline.rng.chronicle;
     expect(normalized).toEqual(baseline);
+  });
+});
+
+describe('la crónica de una partida entera · §9.2', () => {
+  // Estas dos viven aquí y no en chronicle.test.ts porque necesitan el motor
+  // corriendo, y meter sim.ts en el worker del banco de textos duplicaba el
+  // coste de arranque de toda la suite.
+  const YEAR_TICKS = 48;
+
+  it('toda familia que se repite en un año tiene forma anual en el banco', () => {
+    // La cobertura no se adivina: se mide. Si una familia nueva empieza a
+    // repetirse y nadie le escribe su línea anual, esto lo dice.
+    const missing = new Set<string>();
+    for (const seed of [7, 19, 108]) {
+      const s = foundGame(seed);
+      run(s, 100 * YEAR_TICKS, 'prudent', CATALOG);
+      const perYear = new Map<string, number>();
+      for (const e of s.chronicle) {
+        const key = yearKey(e.templateKey);
+        if (key === null) continue;
+        const at = `${yearOf(e.tick)}|${key}`;
+        perYear.set(at, (perYear.get(at) ?? 0) + 1);
+      }
+      for (const [at, n] of perYear) {
+        if (n < 2) continue;
+        const key = at.split('|')[1] as string;
+        if (!knows(key)) missing.add(key);
+      }
+    }
+    expect([...missing].sort(), `sin forma anual: ${[...missing].join(', ')}`).toEqual([]);
+  });
+
+  it('ningún volcado de año deja una clave sin resolver', () => {
+    for (const seed of [7, 108]) {
+      const s = foundGame(seed);
+      run(s, 40 * YEAR_TICKS, 'prudent', CATALOG);
+      for (let y = 0; y <= 40; y += 1) {
+        for (const weight of [1, 2, 3] as const) {
+          for (const line of renderYear(s, y, weight)) {
+            expect(line, `semilla ${seed}, año ${y}`).not.toMatch(/\[[a-z]/);
+          }
+        }
+      }
+    }
   });
 });

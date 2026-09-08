@@ -4,6 +4,7 @@ import { hash32 } from '../rng';
 import type { RngBundle } from '../rng';
 import type { ChronicleEntry, GameState } from '../state';
 import { yearOf } from '../time';
+import { tallyOf, yearKey } from './events';
 import { BANK, CROSSROAD_BANK } from './bank.en';
 
 /**
@@ -122,15 +123,60 @@ function capitalise(text: string): string {
  *
  * §9.2: the screen shows weights 2 and 3 by default, and weight 1 — ordinary
  * births and deaths, the turn of the seasons — only when a year is opened up.
+ * **Every dump goes through here**, which is what makes the filter something
+ * the chronicle has rather than something each caller remembers to apply.
+ *
+ * Entries of the same family are aggregated into one line with a count, in the
+ * position of the first of them. Without it a year of building buries the
+ * plague, the decision and the dead that happened alongside it: twenty-one
+ * lengths of palisade are one line, not twenty-one.
+ *
+ * A family with only one entry that year is left exactly as it was — "a child
+ * was born that spring" is a better sentence than "one child was born that
+ * year", and it is also the truth about when it happened.
  */
 export function renderYear(state: GameState, year: number, minWeight: 1 | 2 | 3 = 2): string[] {
   // The discriminant is the entry's place in the chronicle, so that two deaths
   // of the same kind in the same week do not come out word for word identical.
-  return state.chronicle
+  const inYear = state.chronicle
     .map((e, i) => ({ e, i }))
     .filter(({ e }) => yearOf(e.tick) === year && e.weight >= minWeight)
-    .sort((a, b) => a.e.tick - b.e.tick || a.i - b.i)
-    .map(({ e, i }) => renderEntry(e, state.rng, i));
+    .sort((a, b) => a.e.tick - b.e.tick || a.i - b.i);
+
+  interface Group { entries: number; total: number; at: number }
+  const groups = new Map<string, Group>();
+  for (const { e, i } of inYear) {
+    const key = yearKey(e.templateKey);
+    // A family the bank has no yearly line for is left alone rather than
+    // rendered as `[the.key]`: a missing aggregate must cost repetition, never
+    // the entries themselves.
+    if (key === null || !knows(key)) continue;
+    const group = groups.get(key);
+    if (group === undefined) groups.set(key, { entries: 1, total: tallyOf(e), at: i });
+    else {
+      group.entries += 1;
+      group.total += tallyOf(e);
+    }
+  }
+
+  const out: string[] = [];
+  const emitted = new Set<string>();
+  for (const { e, i } of inYear) {
+    const key = yearKey(e.templateKey);
+    const group = key === null ? undefined : groups.get(key);
+    if (key === undefined || group === undefined || group.entries < 2) {
+      out.push(renderEntry(e, state.rng, i));
+      continue;
+    }
+    if (emitted.has(key as string)) continue; // swallowed by the aggregate
+    emitted.add(key as string);
+    out.push(renderEntry(
+      { ...e, templateKey: key as string, params: { ...e.params, count: group.total } },
+      state.rng,
+      group.at,
+    ));
+  }
+  return out;
 }
 
 /** Every key the bank knows. M-08's catalogue test checks its keys against it. */

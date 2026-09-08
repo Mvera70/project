@@ -54,6 +54,7 @@ export const FOOD = {
   GRAIN_PER_PERSON: 1.0, // per week
   FIELD_YIELD: 600, // per field, full harvest
   FIELD_CREW: 4, // adults to work a whole field
+  MIN_FIELD_CREW: 2, // below this a field yields nothing at all (§5.2, v2.14)
   MAX_FIELDS: 8,
   BASE_STORAGE: 800,
   GRANARY_CAPACITY: 650,

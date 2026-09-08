@@ -24,7 +24,7 @@ import { count, smithyWorking } from './building-counts';
  * §5.2, in order:
  *
  *   neededFields = ceil(people · 48 · 1.3 / FIELD_YIELD)
- *   workedFields = min(fields, neededFields)
+ *   workedFields = min(fields, neededFields, crewable)
  *   farmers      = min(W, workedFields · FIELD_CREW)
  *   spare        = W − farmers
  *   if spare < W · WORKS_RESERVE: borrow the difference back off the farmers
@@ -38,7 +38,18 @@ export function allocateLabour(state: GameState): Allocation {
   const neededFields = Math.ceil(
     (people * TIME.WEEKS_PER_YEAR * FOOD.NEEDED_FIELDS_MARGIN) / FOOD.FIELD_YIELD,
   );
-  const workedFields = Math.min(count(state, 'field'), neededFields);
+  // §5.2, v2.14: a field with fewer than MIN_FIELD_CREW on it yields nothing —
+  // one pair of hands cannot plough, sow and reap a field. So the village works
+  // no more fields than it can crew at that minimum.
+  //
+  // The labour measured against is what is left after the works reserve, not
+  // the raw workforce: those hands are not standing in the field. Without that,
+  // two survivors still crew one field, and two survivors reaping three hundred
+  // bushels against ninety-six of consumption is the flat line §5.2 is written
+  // to end — forty years of a village that neither dies nor recovers.
+  const farmLabour = w * (1 - LABOUR.WORKS_RESERVE);
+  const crewable = Math.floor(farmLabour / FOOD.MIN_FIELD_CREW);
+  const workedFields = Math.min(count(state, 'field'), neededFields, crewable);
   const farmDemand = workedFields * FOOD.FIELD_CREW;
 
   let farmers = Math.min(w, farmDemand);

@@ -17,9 +17,43 @@ import type { CrossroadTemplate } from '@engine/crossroads/schema';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
 
-/** Hash every state field, including typed map arrays, works and pending choices. */
+/**
+ * Hash every state field, including typed map arrays, works and pending choices.
+ *
+ * Fed to the digest in pieces rather than as one `JSON.stringify(s)`. A village
+ * that survives five thousand ticks carries thousands of chronicle entries and
+ * hundreds of villagers with their memories, and the five map layers stringify
+ * as objects with two thousand numeric keys each: the single string was large
+ * enough to take the vitest worker down when two of them existed at once.
+ * Streaming covers exactly the same bytes without ever holding them all.
+ */
 function fingerprint(s: GameState): string {
-  return createHash('sha256').update(JSON.stringify(s)).digest('hex');
+  const h = createHash('sha256');
+  const bytes = (a: Uint8Array | Uint16Array): void => {
+    h.update(Buffer.from(a.buffer, a.byteOffset, a.byteLength));
+  };
+  h.update(`${s.version}|${s.seed}|${s.tick}|${s.map.width}x${s.map.height}`);
+  bytes(s.map.terrain);
+  bytes(s.map.traffic);
+  bytes(s.map.path);
+  bytes(s.map.ruins);
+  bytes(s.map.forestAge);
+  h.update(JSON.stringify(s.rng));
+  h.update(JSON.stringify(s.village));
+  h.update(JSON.stringify(s.weather));
+  h.update(JSON.stringify(s.outbreak));
+  h.update(JSON.stringify(s.ended));
+  h.update(JSON.stringify(s.flags));
+  h.update(JSON.stringify(s.crossroad));
+  h.update(JSON.stringify(s.works));
+  h.update(JSON.stringify(s.people.namedIds));
+  for (const v of s.people.villagers) h.update(JSON.stringify(v));
+  for (const g of s.people.grudges) h.update(JSON.stringify(g));
+  for (const b of s.buildings) h.update(JSON.stringify(b));
+  for (const e of s.chronicle) h.update(JSON.stringify(e));
+  for (const d of s.history) h.update(JSON.stringify(d));
+  for (const seed of s.seeds) h.update(JSON.stringify(seed));
+  return h.digest('hex');
 }
 
 describe('la fundación', () => {
@@ -59,21 +93,29 @@ describe('la fundación', () => {
 describe('determinismo · §4.3', () => {
   it('misma semilla y mismas decisiones dan el mismo estado a los 5 000 ticks', () => {
     // This seed survives the full horizon; an ended game must not pass early.
-    const original = foundGame(6);
-    run(original, 5000, 'first', CATALOG);
-    expect(original.tick).toBe(5000);
-    expect(original.history.length).toBeGreaterThan(0);
+    //
+    // The first game is played inside a scope that keeps only its hash and its
+    // decisions, so that the second one is not built alongside a whole live
+    // village that nothing is going to read again.
+    const played = ((): { hash: string; history: GameState['history']; ticks: number } => {
+      const s = foundGame(6);
+      run(s, 5000, 'first', CATALOG);
+      return { hash: fingerprint(s), history: s.history, ticks: s.tick };
+    })();
+    expect(played.ticks).toBe(5000);
+    expect(played.history.length).toBeGreaterThan(0);
+
     const replay = foundGame(6);
     let decisions = 0;
     for (let week = 1; week <= 5000; week += 1) {
-      const recorded = original.history[decisions];
+      const recorded = played.history[decisions];
       const decision = recorded?.tick === week ? recorded : undefined;
       tick(replay, CATALOG, decision);
       if (decision !== undefined) decisions += 1;
     }
     expect(replay.tick).toBe(5000);
-    expect(decisions).toBe(original.history.length);
-    expect(fingerprint(replay)).toBe(fingerprint(original));
+    expect(decisions).toBe(played.history.length);
+    expect(fingerprint(replay)).toBe(played.hash);
   });
 
   it('dos semillas divergen', () => {
@@ -390,17 +432,45 @@ describe('la política prudent · §12.9', () => {
     expect(ask(t)).toBe('refuse');
   });
 
-  it('un muerto pesa 40, así que cuarenta de grano no lo compran', () => {
+  it('las muertes no se compran a ningún precio', () => {
+    // v2.14. La versión anterior tasaba una vida en 40 fanegas, y había
+    // opciones donde salía a cuenta: medido, prudent moría de violencia el
+    // triple que first. Ahora es un filtro, no un sumando, así que da igual
+    // cuánto grano haya al otro lado.
+    for (const price of [30, 50, 500, 5000, 50000]) {
+      const t = template([
+        option('kill_one', [{ k: 'kill', who: 'random', count: 1 }]),
+        option('pay', [{ k: 'stat', stat: 'grain', delta: -price }]),
+      ]);
+      expect(ask(t), `${price} de grano`).toBe('pay');
+    }
+  });
+
+  it('tampoco las compra cuando el muerto es una fracción de la aldea', () => {
     const t = template([
-      option('kill_one', [{ k: 'kill', who: 'random', count: 1 }]),
-      option('pay_thirty', [{ k: 'stat', stat: 'grain', delta: -30 }]),
+      option('cull', [{ k: 'kill', who: 'random', count: 'fraction', fraction: 0.1 }]),
+      option('pay', [{ k: 'stat', stat: 'grain', delta: -5000 }]),
     ]);
-    expect(ask(t)).toBe('pay_thirty');
-    const u = template([
-      option('kill_one', [{ k: 'kill', who: 'random', count: 1 }]),
-      option('pay_fifty', [{ k: 'stat', stat: 'grain', delta: -50 }]),
+    expect(ask(t)).toBe('pay');
+  });
+
+  it('si todas matan, elige la que mata a menos', () => {
+    const t = template([
+      option('many', [{ k: 'kill', who: 'random', count: 4 }]),
+      option('few', [
+        { k: 'kill', who: 'random', count: 1 },
+        { k: 'stat', stat: 'grain', delta: -400 },
+      ]),
     ]);
-    expect(ask(u)).toBe('kill_one');
+    expect(ask(t)).toBe('few');
+  });
+
+  it('entre las que no matan, sigue pesando el grano', () => {
+    const t = template([
+      option('cheap', [{ k: 'stat', stat: 'grain', delta: -10 }]),
+      option('dear', [{ k: 'stat', stat: 'grain', delta: -900 }]),
+    ]);
+    expect(ask(t)).toBe('cheap');
   });
 
   it('el ánimo perdido pesa 15 por punto', () => {

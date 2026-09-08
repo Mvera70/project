@@ -5,35 +5,14 @@
 // que ninguna plantilla tenga condiciones que no se cumplan jamás. Una
 // plantilla que nunca sale es contenido muerto, y con dieciséis escritas a mano
 // es fácil que pase.
-import { describe, expect, it } from 'vitest';
-import { FOUNDING, TIME } from '@engine/balance';
-import { makeBundle } from '@engine/rng';
-import type { Building, GameState, TickContext } from '@engine/state';
-import { foundPeople } from '@engine/people/villagers';
-import {
-  population,
-  resolveBirths,
-  resolveDeaths,
-  resolveMigration,
-} from '@engine/people/demography';
-import { driftOpinions } from '@engine/people/opinions';
-import { decayMemories } from '@engine/people/memories';
-import { allocateLabour, produce } from '@engine/subsistence/labour';
-import { consume, overwinter } from '@engine/subsistence/consumption';
-import { applySpoilage, harvest } from '@engine/subsistence/harvest';
-import { isUnexplained, updateMood } from '@engine/subsistence/mood';
-import { rollWeather } from '@engine/subsistence/seasons';
-import { rollPlague } from '@engine/subsistence/disasters';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import type { AppliedEffects, CrossroadCategory } from '@engine/crossroads/schema';
-import { fillVacancies } from '@engine/sim';
-import { selectCrossroad } from '@engine/crossroads/select';
-import { applyOption } from '@engine/crossroads/resolve';
-import { fireSeeds } from '@engine/crossroads/seeds';
+import type { CrossroadCategory } from '@engine/crossroads/schema';
+import type { GameState } from '@engine/state';
+import { population } from '@engine/people/demography';
 import { BANK, CROSSROAD_BANK } from '@engine/chronicle/bank.en';
+import { founded, silentIn, sweep, tick, YEAR } from '../helpers/catalogue-bench';
 
-const CELLS = 36 * 56;
-const YEAR = TIME.WEEKS_PER_YEAR;
 
 describe('el catálogo · forma', () => {
   it('son las dieciséis del Anexo A más la reserva', () => {
@@ -245,126 +224,35 @@ describe('el catálogo · los textos', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Cobertura: ninguna plantilla a cero apariciones
+// Cobertura
+//
+// El banco vive en tests/helpers/catalogue-bench.ts porque lo comparten las dos
+// suites. El barrido completo —30 semillas × 150 años— cuesta unos veinticinco
+// segundos él solo, que es el presupuesto entero de §14.1, así que se ejecuta
+// en tests/balance/catalog-coverage.test.ts. Aquí queda el que cabe.
 // ---------------------------------------------------------------------------
 
-let bid = 0;
-const build = (kind: Building['kind']): Building => ({
-  id: ++bid, kind, x: 0, y: 0, w: 2, h: 2, builtTick: 0, lostTick: null, tier: 0, lit: true,
-});
+describe('el catálogo · cobertura rápida', () => {
+  let seen: Map<string, number>;
+  beforeAll(() => { seen = sweep(12, 100); });
 
-/**
- * Una aldea con edificios generosos: M-13 y M-14 no existen, así que se le dan
- * de entrada los que el catálogo necesita poder ver. No es la partida real —
- * es el banco de pruebas que permite que las condiciones se cumplan alguna vez.
- */
-function founded(seed: number): GameState {
-  bid = 0;
-  const rng = makeBundle(seed);
-  return {
-    version: 1, seed, tick: 0, rng,
-    map: {
-      width: 36, height: 56,
-      terrain: new Uint8Array(CELLS).fill(1, 0, Math.floor(CELLS * 0.45)),
-      traffic: new Uint16Array(CELLS), path: new Uint8Array(CELLS),
-      ruins: new Uint8Array(CELLS), forestAge: new Uint8Array(CELLS),
-    },
-    village: { grain: FOUNDING.GRAIN, wood: 900, morale: FOUNDING.MORALE, faith: FOUNDING.FAITH },
-    people: foundPeople(rng, 0),
-    buildings: [
-      ...Array.from({ length: 14 }, () => build('house')),
-      ...Array.from({ length: 6 }, () => build('field')),
-      build('granary'),
-      build('smithy'),
-    ],
-    works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [],
-    weather: { year: 0, index: 2, factor: 1 }, outbreak: null, ended: null,
-  };
-}
+  // Estas cinco necesitan siglos o estados muy concretos y no salen en doce
+  // partidas de cien años. Que no falten de verdad lo comprueba el barrido
+  // completo de tests/balance/, no esta prueba.
+  const SLOW = ['plague_blame', 'forest_cut', 'wolf_winter', 'first_stone', 'chapel_or_granary'];
 
-/**
- * §8.4: `build` y `destroy` son peticiones, y quien las ejecuta es M-14, que
- * todavía no existe. Sin esto la capilla que paga `chapel_or_granary` no se
- * levanta nunca, y sin capilla §6.2 no nombra cura — con lo que media
- * categoría del catálogo se queda sin reparto para siempre.
- *
- * Otro trozo de M-14 stubbeado en el banco de pruebas. Coloca sin criterio,
- * porque la colocación de §7.4 también es suya.
- */
-function carryOut(s: GameState, applied: AppliedEffects): void {
-  for (const kind of applied.build) s.buildings.push(build(kind));
-  for (const { kind, count: howMany } of applied.destroy) {
-    for (const b of s.buildings.filter((x) => x.kind === kind && x.lostTick === null).slice(0, howMany)) {
-      b.lostTick = s.tick;
-    }
-  }
-}
-
-/** El tick de §4.2, con los pasos que existen. Política neutra. */
-function tick(s: GameState): void {
-  s.tick += 1;
-  if (s.tick % YEAR === 0) {
-    s.weather = rollWeather(s);
-    const o = rollPlague(s);
-    if (o) s.outbreak = o;
-    resolveMigration(s);
-    decayMemories(s);
-    fillVacancies(s);
-  }
-  if (s.outbreak && s.tick >= s.outbreak.endsTick) s.outbreak = null;
-  if (s.crossroad !== null) {
-    const applied = applyOption(s, s.crossroad.optionIds[0] as string, CATALOG);
-    if (applied !== null) carryOut(s, applied);
-  }
-  fireSeeds(s, CATALOG);
-  const a = allocateLabour(s);
-  produce(s, a);
-  const { severity, starved } = consume(s);
-  const { cold } = overwinter(s);
-  harvest(s, a);
-  applySpoilage(s);
-  const partial: TickContext = { severity, cold, outbreak: s.outbreak, deaths: 0, unexplainedDeaths: 0 };
-  const dead = resolveDeaths(s, partial);
-  const ctx: TickContext = {
-    ...partial,
-    deaths: starved.length + dead.length,
-    unexplainedDeaths: dead.filter((d) => isUnexplained(d.cause, d.age)).length,
-  };
-  updateMood(s, ctx);
-  resolveBirths(s, ctx);
-  driftOpinions(s);
-  if (s.crossroad === null) {
-    const posed = selectCrossroad(s, CATALOG);
-    if (posed) s.crossroad = posed;
-  }
-}
-
-describe('el catálogo · cobertura', () => {
-  const seen = new Map<string, number>();
-  for (let seed = 0; seed < 30; seed += 1) {
-    const s = founded(seed);
-    for (let i = 0; i < 150 * YEAR && population(s) > 0; i += 1) tick(s);
-    for (const d of s.history) seen.set(d.templateId, (seen.get(d.templateId) ?? 0) + 1);
-  }
-
-  it('ninguna plantilla se queda a cero apariciones en 30 semillas × 150 años', () => {
+  it('ninguna plantilla corriente se queda a cero en 12 semillas × 100 años', () => {
     // Contenido muerto: condiciones que no se cumplen nunca. Con dieciséis
     // escritas a mano, es el fallo más fácil de cometer y el más difícil de ver.
-    //
-    // Las dos de `lord` estuvieron muertas hasta la v2.8: A.1 pedía el granero
-    // vacío en invierno, y el invierno empieza la semana 36, justo después de la
-    // cosecha. Con `grainToHarvest` y la semana de invierno avanzada disparan.
-    const missing = CATALOG.filter((t) => (seen.get(t.id) ?? 0) === 0).map((t) => t.id);
+    const missing = silentIn(seen).filter((id) => !SLOW.includes(id));
     expect(missing, `sin salir nunca: ${missing.join(', ')}`).toEqual([]);
   });
 
-  it('ninguna categoría se queda muda', () => {
+  it('las categorías del bucle largo hablan', () => {
     const byCategory = new Set(
       CATALOG.filter((t) => (seen.get(t.id) ?? 0) > 0).map((t) => t.category),
     );
-    for (const c of [
-      'famine', 'plague', 'lord', 'feud', 'faith', 'forest', 'stranger', 'succession',
-    ] as CrossroadCategory[]) {
+    for (const c of ['famine', 'lord', 'feud', 'faith', 'stranger', 'succession'] as CrossroadCategory[]) {
       expect(byCategory.has(c), c).toBe(true);
     }
   });

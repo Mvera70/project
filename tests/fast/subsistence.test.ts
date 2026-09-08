@@ -907,3 +907,50 @@ describe('el tick de subsistencia completo', () => {
     expect(population(a)).toBe(population(b));
   });
 });
+
+describe('tripulación mínima de campo · §5.2, v2.14', () => {
+  // Una aldea diminuta no puede ser MÁS segura en comida que una grande. Sin
+  // esta regla, dos supervivientes cosechaban trescientas fanegas contra
+  // noventa y seis de consumo y el valle se quedaba cuarenta años en una línea
+  // plana: ni se moría ni se recuperaba.
+  const village = (adults: number, fields: number): GameState => {
+    const s = founded(7);
+    s.people.villagers = s.people.villagers.map((v, i) => (
+      i < adults
+        ? { ...v, bornTick: -30 * TIME.WEEKS_PER_YEAR }
+        : { ...v, diedTick: 0, causeOfDeath: 'natural' as const }
+    ));
+    s.people.namedIds = s.people.namedIds.filter(
+      (id) => s.people.villagers.find((v) => v.id === id)?.diedTick === null,
+    );
+    s.buildings = s.buildings.filter((b) => b.kind !== 'field');
+    for (let i = 0; i < fields; i += 1) s.buildings.push(build('field'));
+    return s;
+  };
+
+  it('dos supervivientes no trabajan ningún campo', () => {
+    const a = allocateLabour(village(2, 4));
+    expect(a.workedFields).toBe(0);
+    expect(a.labourFactor).toBe(0);
+  });
+
+  it('y por tanto no cosechan nada', () => {
+    const s = village(2, 4);
+    s.tick = TIME.HARVEST_WEEK;
+    const reaped = harvest(s, allocateLabour(s));
+    expect(reaped.happened).toBe(true);
+    expect(reaped.yielded).toBe(0);
+  });
+
+  it('una aldea entera sí trabaja sus campos', () => {
+    expect(allocateLabour(village(20, 4)).workedFields).toBeGreaterThan(0);
+  });
+
+  it('nunca se trabajan más campos de los que hay brazos para tripular', () => {
+    for (const adults of [1, 2, 3, 4, 6, 8, 12, 20]) {
+      const a = allocateLabour(village(adults, 8));
+      expect(a.workedFields * FOOD.MIN_FIELD_CREW, `${adults} adultos`)
+        .toBeLessThanOrEqual(a.farmers + 1e-9);
+    }
+  });
+});

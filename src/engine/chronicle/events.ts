@@ -73,6 +73,92 @@ export function lostKey(kind: BuildingKind): string {
   return 'lost.other';
 }
 
+/**
+ * §9.2's weight table, normative since v2.14. One entry per line of the table,
+ * and the only place a weight is decided.
+ *
+ *   3  founding, extinction, the death of a named villager, succession, a
+ *      crossroad and its deferred consequence, an outbreak, a famine with dead
+ *   2  an exceptional harvest, people arriving or leaving, a fire, a singular
+ *      building finished, a grudge formed
+ *   1  everything else
+ *
+ * Weight is not decoration: §9.2 says every dump filters, so a weight set one
+ * step too high is a line that pushes a death off the screen. That is why the
+ * table lives here as code and not as a judgement made at each call site — the
+ * previous version rated a finished house the same as a plague.
+ */
+
+/**
+ * The buildings §9.2 calls singular, verbatim from the table: chapel, church,
+ * smithy, mill, well, and the first granary. Everything else the village puts
+ * up — houses, fields, later granaries, and every single length of palisade or
+ * wall — is weight 1, because a year of building must not bury the year.
+ */
+const SINGULAR_BUILDINGS: readonly BuildingKind[] = [
+  'chapel',
+  'church',
+  'smithy',
+  'mill',
+  'well',
+];
+
+/** §9.2: a finished building. `standing` counts it, itself included. */
+export function builtWeight(kind: BuildingKind, standing: number): 1 | 2 {
+  if (SINGULAR_BUILDINGS.includes(kind)) return 2;
+  return kind === 'granary' && standing <= 1 ? 2 : 1;
+}
+
+/** §9.2: only a ruinous or an abundant harvest is worth a line of its own. */
+export function harvestWeight(weatherFactor: number): 1 | 2 {
+  return weatherFactor < 0.7 || weatherFactor > 1.3 ? 2 : 1;
+}
+
+/**
+ * §9.2: anonymous dead. A famine with dead is a headline; the ordinary
+ * mortality of a village is the quiet ticking underneath, however many it
+ * takes in one week.
+ */
+export function anonDeathWeight(cause: DeathCause): 1 | 3 {
+  return cause === 'hunger' ? 3 : 1;
+}
+
+/**
+ * The yearly form of a key, or null if this kind of entry never aggregates.
+ * §9.2, v2.14.
+ *
+ * Twenty-one lengths of palisade are one line with a count, not twenty-one
+ * lines. `.one` and `.many` collapse into the same yearly key, because four
+ * births in one week and one birth in four weeks are the same five children
+ * come the end of the year.
+ *
+ * The families listed here are exactly the ones that count heads or buildings.
+ * Nothing that names a person is on the list, and that is the point: two named
+ * villagers who die in the same year share a key but not a life, and §9.4 gives
+ * each of them their own line with their own epitaph. Collapsing those would
+ * throw away the best thing the chronicle has.
+ */
+export function yearKey(templateKey: string): string | null {
+  const counted = /^(birth\.anon|death\.[a-z_]+\.anon|arrival|departure)\.(?:one|many)$/
+    .exec(templateKey);
+  if (counted !== null) return `${counted[1] as string}.year`;
+  if (/^(?:built|lost)\.[a-z_]+$/.test(templateKey)) return `${templateKey}.year`;
+  return null;
+}
+
+/**
+ * What one entry contributes to its yearly count.
+ *
+ * For people it is the heads the entry already carries. For a building it is
+ * one: `count` there is how many of that kind now stand ("that made seven"),
+ * which is a running total and not something that can be added up.
+ */
+export function tallyOf(e: ChronicleEntry): number {
+  if (e.kind === 'built' || e.kind === 'lost') return 1;
+  const n = e.params['count'];
+  return typeof n === 'number' && n > 0 ? n : 1;
+}
+
 export function seasonKey(season: Season): string {
   return `season.${season}`;
 }

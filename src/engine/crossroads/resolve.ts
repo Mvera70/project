@@ -251,6 +251,8 @@ export function recordPosed(state: GameState, template: CrossroadTemplate): void
     kind: 'crossroad_posed',
     templateKey: template.title,
     params: { year: yearOf(state.tick), ...namesOf(state, state.crossroad.cast) },
-    weight: 2,
+    // §9.2, v2.14: a crossroad is weight 3. The question the player was asked
+    // is the spine of the chronicle; it was reading below the harvest.
+    weight: 3,
   });
 }

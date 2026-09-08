@@ -18,6 +18,16 @@ const YEARS = 200;
 const SEEDS = 60;
 const GENERATION = TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR;
 const FOREST_TEMPLATES = new Set(['forest_cut', 'wolf_winter']);
+/**
+ * How often the eligibility probe runs. Eligibility is a fraction over
+ * hundreds of thousands of ticks and does not move in the third decimal for
+ * being sampled; running `eligible()` over the whole catalogue on every tick of
+ * every trial was the single most expensive thing in the bench and pushed it
+ * past the five minutes of §14.2.
+ */
+const PROBE_EVERY = 8;
+/** A village this small is not living, it is taking a long time to die (§5.2). */
+const DYING_BELOW = 6;
 
 export interface Sample {
   policy: BenchPolicy;
@@ -49,6 +59,8 @@ export interface Trial {
   allowedByTemplate: Record<string, number>;
   invalid: string[];
   geometry: string[];
+  probes: number;
+  ticksDying: number;
   deathsByCause: Record<string, number>;
   shocked: boolean;
   shockExtinct: boolean;
@@ -134,7 +146,8 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     generationOne: 0, fullMap: false, forestRatio: null, cadence: 0, allCadence: 0,
     ceilingIntervals: 0, intervals: 0, eligibleTicks: Object.fromEntries(CATALOG.map((t) => [t.id, 0])),
     posedByTemplate: Object.fromEntries(CATALOG.map((t) => [t.id, 0])), allowedByTemplate: {},
-    invalid: [], geometry: [], deathsByCause: {}, shocked: false, shockExtinct: false };
+    invalid: [], geometry: [], probes: 0, ticksDying: 0, deathsByCause: {},
+    shocked: false, shockExtinct: false };
   let shock: GameState | null = null;
   let counted = 0;
   let allCounted = 0;
@@ -146,9 +159,12 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     // eligible only mutates rng.cast; copying the RNG keeps instrumentation
     // from consuming any of the game's streams. This is a start-of-tick probe,
     // before ANNUAL/DECISION, not a claim to observe the internal step 15.
-    for (const candidate of eligible({ ...state, rng: { ...state.rng } }, CATALOG)) {
-      const id = candidate.template.id;
-      result.eligibleTicks[id] = (result.eligibleTicks[id] ?? 0) + 1;
+    if (state.tick % PROBE_EVERY === 0) {
+      result.probes += 1;
+      for (const candidate of eligible({ ...state, rng: { ...state.rng } }, CATALOG)) {
+        const id = candidate.template.id;
+        result.eligibleTicks[id] = (result.eligibleTicks[id] ?? 0) + 1;
+      }
     }
     const report = run(state, 1, policy, CATALOG)[0];
     if (report === undefined) throw new Error('Live simulation did not advance');
@@ -169,6 +185,10 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
       previousPosed = state.tick;
     }
     result.peak = Math.max(result.peak, population(state));
+    // §5.2: how long a village hung on below a workable size before it went.
+    // A game that spends decades at two or three people is not an ending, it is
+    // a flat line, and the chronicle has nothing to say about any of it.
+    if (population(state) > 0 && population(state) < DYING_BELOW) result.ticksDying += 1;
     checkRanges(state, result.invalid);
     if (state.tick === GENERATION) result.generationOne = population(state);
     if (state.tick < 120 * TIME.WEEKS_PER_YEAR) {
@@ -228,6 +248,8 @@ export interface PolicySummary {
   shockExtinction: number | null;
   invalidCases: number;
   geometryCases: number;
+  maxYearsDying: number;
+  medianYearsDying: number;
   deathsByCause: Record<string, number>;
   eligibility: Record<string, number>;
   restUtilization: Record<string, number | null>;
@@ -247,12 +269,18 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
     shockExtinction: shocked.length === 0 ? null : shocked.filter((t) => t.shockExtinct).length / shocked.length,
     invalidCases: total((t) => t.invalid.length),
     geometryCases: total((t) => t.geometry.length),
+    // Only the games that actually died: a survivor never had a deathbed.
+    maxYearsDying: Math.max(0, ...group.filter((t) => t.extinct)
+      .map((t) => t.ticksDying / TIME.WEEKS_PER_YEAR)),
+    medianYearsDying: median([0, ...group.filter((t) => t.extinct)
+      .map((t) => t.ticksDying / TIME.WEEKS_PER_YEAR)]),
     deathsByCause: group.reduce<Record<string, number>>((acc, t) => {
       for (const [cause, n] of Object.entries(t.deathsByCause)) acc[cause] = (acc[cause] ?? 0) + n;
       return acc;
     }, {}),
+    // Sampled every PROBE_EVERY ticks, so the denominator is the probes taken.
     eligibility: Object.fromEntries(CATALOG.map((template) => [template.id,
-      total((t) => t.eligibleTicks[template.id] ?? 0) / total((t) => t.ticks)])),
+      total((t) => t.eligibleTicks[template.id] ?? 0) / Math.max(1, total((t) => t.probes))])),
     restUtilization: Object.fromEntries(CATALOG.map((template) => {
       const allowed = total((t) => t.allowedByTemplate[template.id] ?? 0);
       return [template.id, allowed === 0 ? null : total((t) => t.posedByTemplate[template.id] ?? 0) / allowed];
@@ -275,6 +303,7 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
   writeFileSync('artifacts/balance-summary.json', JSON.stringify({ durationMs, summaries, trials }, null, 2) + '\n');
   console.table(summaries.map((summary) => Object.fromEntries(Object.entries(summary)
     .filter(([key]) => key !== 'eligibility' && key !== 'restUtilization' && key !== 'deathsByCause'))));
+  console.info(`Eligibility sampled every ${PROBE_EVERY} ticks; villages below ${DYING_BELOW} counted as dying.`);
   console.info('Deaths by cause:');
   console.table(summaries.map((s) => ({ policy: s.policy, ...s.deathsByCause })));
   console.table(CATALOG.map((t) => ({ template: t.id, ...Object.fromEntries(summaries.map((s) => [s.policy, s.eligibility[t.id]])) })));

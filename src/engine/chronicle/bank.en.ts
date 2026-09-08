@@ -214,6 +214,129 @@ export const BANK: Record<string, string[]> = {
   ],
 
   // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // §9.2, v2.14 · The yearly forms.
+  //
+  // When a family of entries lands more than once in the same year the
+  // chronicle writes one line with the count instead of all of them. These
+  // lines are the ones it writes, and they carry only {count} and {year}: a
+  // season or a headcount taken from the first of a dozen entries would be a
+  // number that was true in March and printed as though it were true all year.
+  //
+  // Nothing that names a person aggregates, so there is no yearly form for a
+  // named death or a named birth. §9.4 gives each of those its own line.
+  // -------------------------------------------------------------------------
+
+  'birth.anon.year': [
+    '{count} children were born in year {year}.',
+    'There were {count} births that year.',
+    '{count} were born into the valley in year {year}.',
+  ],
+
+  'death.natural.anon.year': [
+    '{count} were buried in year {year}.',
+    'The year took {count}, and none of them were old.',
+    '{count} died in year {year} for no reason anyone could name.',
+  ],
+  'death.old_age.anon.year': [
+    '{count} were buried in year {year}, and none of them young.',
+    'The old went that year: {count} of them.',
+    'Year {year} buried {count} who had seen enough winters.',
+  ],
+  'death.hunger.anon.year': [
+    '{count} starved in year {year}.',
+    'Hunger took {count} that year.',
+    'Year {year} was the year {count} did not eat.',
+  ],
+  'death.cold.anon.year': [
+    'The cold took {count} in year {year}.',
+    '{count} froze that year.',
+    'Year {year} had an empty woodpile and {count} did not see the thaw.',
+  ],
+  'death.plague.anon.year': [
+    'The sickness took {count} in year {year}.',
+    '{count} died of it that year.',
+    'Year {year} buried {count} to the fever.',
+  ],
+  'death.fire.anon.year': [
+    'Fire took {count} in year {year}.',
+    '{count} died in the burning that year.',
+    'Year {year} lost {count} to fire.',
+  ],
+  'death.violence.anon.year': [
+    '{count} were killed in year {year}.',
+    'Year {year} was the year {count} died by hand.',
+    '{count} did not die of anything the valley could call natural, in year {year}.',
+  ],
+
+  'arrival.year': [
+    '{count} came up the ford road in year {year} and stayed.',
+    'Year {year} brought {count} over the ridge.',
+    '{count} arrived that year.',
+  ],
+  'departure.year': [
+    '{count} left by the ford road in year {year}.',
+    'Year {year} was the year {count} walked out.',
+    '{count} went that year and did not come back.',
+  ],
+
+  'built.house.year': [
+    '{count} houses went up in year {year}.',
+    'They raised {count} houses that year.',
+    'Year {year} put roofs over {count} more households.',
+  ],
+  'built.field.year': [
+    'They broke {count} new fields in year {year}.',
+    '{count} more fields were ploughed that year.',
+    'Year {year} took {count} fields out of the meadow.',
+  ],
+  'built.granary.year': [
+    'They finished {count} granaries in year {year}.',
+    '{count} more granaries stood by the end of year {year}.',
+    'Year {year} gave the valley {count} places to keep its grain.',
+  ],
+  'built.palisade.year': [
+    'The palisade closed around the village in year {year}.',
+    '{count} lengths of palisade went up that year.',
+    'Year {year} was the year they fenced themselves in.',
+  ],
+  'built.wall.year': [
+    'The wall went up in stone in year {year}, {count} lengths of it.',
+    '{count} lengths of palisade became wall that year.',
+    'Year {year} put stone where the stakes had been.',
+  ],
+  'built.stone_house.year': [
+    '{count} houses were rebuilt in stone in year {year}.',
+    'Year {year} put {count} families under stone.',
+    '{count} of the houses stopped being able to burn, in year {year}.',
+  ],
+  'built.watchtower.year': [
+    'They raised {count} towers in year {year}.',
+    '{count} watchtowers stood by the end of year {year}.',
+    'Year {year} gave the valley {count} places to watch the road from.',
+  ],
+
+  'lost.house.year': [
+    '{count} houses were lost in year {year}.',
+    'Year {year} took {count} houses.',
+    '{count} roofs came down that year.',
+  ],
+  'lost.granary.year': [
+    '{count} granaries were lost in year {year}.',
+    'Year {year} took {count} granaries and what was in them.',
+    '{count} of the granaries went that year.',
+  ],
+  'lost.field.year': [
+    '{count} fields went back to grass in year {year}.',
+    'Year {year} lost {count} fields.',
+    '{count} of the fields were not sown again after year {year}.',
+  ],
+  'lost.other.year': [
+    '{count} buildings were lost in year {year}.',
+    'Year {year} took {count} of the valley’s buildings.',
+    '{count} things that had stood did not stand after year {year}.',
+  ],
+
   // §9.4 · What a named death drags behind it
   //
   // These are not lines of their own. They are the second sentence appended to

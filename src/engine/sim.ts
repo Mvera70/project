@@ -41,15 +41,23 @@ import { holderOf } from './crossroads/conditions';
 import { selectCrossroad } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
 import { fireSeeds } from './crossroads/seeds';
-import type { AppliedEffects, Catalogue, FiredSeed } from './crossroads/schema';
+import type {
+  AppliedEffects,
+  Catalogue,
+  CrossroadTemplate,
+  FiredSeed,
+} from './crossroads/schema';
 import {
+  anonDeathWeight,
   arrivalKey,
   birthKey,
   builtKey,
+  builtWeight,
   deathKey,
   departureKey,
   fireKey,
   harvestKey,
+  harvestWeight,
   lostKey,
   namedDeathEntry,
   seasonKey,
@@ -191,28 +199,52 @@ export type Policy =
  * A gain counts as a negative cost, so an option that brings grain scores
  * above one that does not. The seed bonus is a preference for consequences the
  * village can still see coming, not a claim that seeds are always bad.
+ *
+ * **Deaths are not in that sum** (v2.14). They were, and putting them there
+ * priced a life at forty bushels: there are options in the catalogue where that
+ * came out cheap, and measured over 60 seeds `prudent` was dying of violence
+ * three times as often as `first` — 14.1 % of its dead against 4.2 %. A cautious
+ * villager does not trade lives for grain at any exchange rate. So the killing
+ * is a filter applied before the score, in `decide`, and never a term in it.
  */
 function prudentScore(state: GameState, catalogue: Catalogue, optionId: string): number {
-  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
-  const option = template?.options.find((o) => o.id === optionId);
+  const option = optionOf(state, catalogue, optionId);
   if (option === undefined) return Number.NEGATIVE_INFINITY;
 
   let grain = 0;
-  let dead = 0;
   let morale = 0;
   for (const e of option.effects) {
-    if (e.k === 'kill') {
-      dead += e.count === 'fraction' ? population(state) * (e.fraction ?? 0) : e.count;
-    } else if (e.k === 'stat') {
-      // A multiplier's cost depends on the stat as it stands right now, which
-      // is the whole reason this is evaluated per tick and not per template.
-      const delta = 'delta' in e ? e.delta : state.village[e.stat] * (e.mul - 1);
-      if (e.stat === 'grain') grain -= delta;
-      if (e.stat === 'morale') morale -= delta;
-    }
+    if (e.k !== 'stat') continue;
+    // A multiplier's cost depends on the stat as it stands right now, which is
+    // the whole reason this is evaluated per tick and not per template.
+    const delta = 'delta' in e ? e.delta : state.village[e.stat] * (e.mul - 1);
+    if (e.stat === 'grain') grain -= delta;
+    if (e.stat === 'morale') morale -= delta;
   }
 
-  return -grain - 40 * dead - 15 * morale + (option.seeds.length === 0 ? 10 : 0);
+  return -grain - 15 * morale + (option.seeds.length === 0 ? 10 : 0);
+}
+
+/** The option of the pending crossroad with this id, or undefined. */
+function optionOf(
+  state: GameState,
+  catalogue: Catalogue,
+  optionId: string,
+): CrossroadTemplate['options'][number] | undefined {
+  const template = catalogue.find((t) => t.id === state.crossroad?.templateId);
+  return template?.options.find((o) => o.id === optionId);
+}
+
+/** How many the option kills outright. §12.9's filter, not its score. */
+function immediateDead(state: GameState, catalogue: Catalogue, optionId: string): number {
+  const option = optionOf(state, catalogue, optionId);
+  if (option === undefined) return 0;
+  let dead = 0;
+  for (const e of option.effects) {
+    if (e.k !== 'kill') continue;
+    dead += e.count === 'fraction' ? population(state) * (e.fraction ?? 0) : e.count;
+  }
+  return dead;
 }
 
 /**
@@ -271,12 +303,19 @@ export function decide(
       return worst;
     }
     case 'prudent': {
+      // §12.9, v2.14: deaths are a filter, not a price. If anything on the
+      // table kills nobody, only those are considered; if everything kills,
+      // the fewest dead win and the score decides between equals.
+      const dead = new Map(options.map((id) => [id, immediateDead(state, catalogue, id)]));
+      const fewest = Math.min(...dead.values());
+      const survivable = options.filter((id) => dead.get(id) === fewest);
+
       // Ties break on the option's id, never on where it happens to sit in the
       // template (§12.9, v2.13): the order the options are written in must not
       // be able to move a balance number.
       let best: string | null = null;
       let bestScore = Number.NEGATIVE_INFINITY;
-      for (const id of options) {
+      for (const id of survivable) {
         const score = prudentScore(state, catalogue, id);
         if (score > bestScore || (score === bestScore && best !== null && id < best)) {
           bestScore = score;
@@ -367,7 +406,7 @@ export function tick(
           building: fire.kind,
           grain: Math.round(fire.grainLost),
         },
-        weight: fire.kind === 'granary' ? 3 : 2,
+        weight: 2, // §9.2: a fire is a fire, the granary included.
       });
     }
 
@@ -439,7 +478,7 @@ export function tick(
         count: count(state, raised.kind),
         building: raised.kind,
       },
-      weight: raised.kind === 'chapel' || raised.kind === 'church' ? 3 : 2,
+      weight: builtWeight(raised.kind, count(state, raised.kind)),
     });
   }
 
@@ -465,7 +504,7 @@ export function tick(
         grain: Math.round(reaped.yielded),
         people: population(state),
       },
-      weight: reaped.weatherFactor < 0.7 || reaped.weatherFactor > 1.3 ? 3 : 2,
+      weight: harvestWeight(reaped.weatherFactor),
     });
   }
 
@@ -535,7 +574,9 @@ export function tick(
           kind: 'crossroad_posed',
           templateKey: template.title,
           params: { year: year(), season: season() },
-          weight: 2,
+          // 9.2, v2.14: the question the player was asked is the spine of the
+          // chronicle. At weight 2 it read below an ordinary harvest.
+          weight: 3,
         });
       }
     }
@@ -647,7 +688,7 @@ function reportDeaths(
       kind: 'death',
       templateKey: deathKey(cause as DeathEvent['cause'], false, n),
       params: { year: year(), season: season(), count: n, people: population(state) },
-      weight: n > 2 ? 2 : 1,
+      weight: anonDeathWeight(cause as DeathEvent['cause']),
     });
   }
 }

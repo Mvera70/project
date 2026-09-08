@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.13 · 8 de septiembre de 2026, 01:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.14 · 8 de septiembre de 2026, 01:46 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -42,6 +42,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.11** | 7 sep 2026, 23:44 | Revisión de M-10 y desarrollo de M-11/M-12 | Muertes de todos los pasos con epitafio y coste de ánimo; búfer de crónica; determinismo con 5 000 ticks realmente alcanzados; banco real y cobertura pendiente explícita. |
 | **2.12** | 8 sep 2026, 00:47 | M-13 y M-14 | Fuente única; **mapa real y aldea que se construye sola**; piedra en puntos de obra; dos lecturas de §7.4 corregidas; la iglesia crece desde cualquier esquina. Medido, no previsto. |
 | **2.13** | 8 sep 2026, 01:20 | Revisión de M-13/M-14 | **Política `prudent` como referencia** y bandas por política; horquilla mínima entre jugar bien y mal; `interregnum` cierra la sucesión; los campos no arden. |
+| **2.14** | 8 sep 2026, 01:46 | Primera lectura del hito 0 | **Tabla de pesos normativa y agregación por año**; **tripulación mínima de campo**: se acabó la aldea zombi; `prudent` no compra muertes. |
 
 ### 2.12 — El valle existe y la aldea se construye sola
 
@@ -927,7 +928,19 @@ wood        += cutters · WOOD_PER_CUTTER
 buildPoints  = builders · BP_PER_BUILDER · (smithy ? 1.20 : 1.00)
 ```
 
-Tres decisiones dentro de esa fórmula merecen defensa:
+**Tripulación mínima.** Un campo con menos de `MIN_FIELD_CREW` adultos **no
+rinde nada**: no se puede arar, sembrar y segar entre dos personas. Un campo por
+debajo del mínimo no cuenta en `workedFields`.
+
+Sin esta regla, una aldea diminuta es **más** segura en comida que una grande:
+dos supervivientes cosechan trescientas fanegas y consumen noventa y seis al
+año, y el valle sobrevive con dos habitantes durante cuarenta años sin morirse ni
+recuperarse. Eso ya se vio en la primera lectura del hito 0 —treinta y ocho años
+de *«The harvest came in heavy. 195 bushels»* para dos bocas— y no es un final:
+es una línea plana. Con el mínimo, una aldea que baja de tres o cuatro adultos
+deja de comer y muere en un año, que es lo que `valle.md` §4 llama extinguirse.
+
+Cuatro decisiones dentro de esa fórmula merecen defensa:
 
 **`workedFields` en vez de `fields`.** Una aldea no trabaja más tierra de la que
 necesita. Sin este tope, un valle con ocho campos y poca gente diluye su mano de
@@ -1672,7 +1685,23 @@ export const BANK: Record<string, string[]> = {
 
 Cada entrada tiene peso 1–3. La pantalla de crónica muestra por defecto los
 pesos 2 y 3; el peso 1 (nacimientos y muertes corrientes, cambio de estación)
-aparece al desplegar un año.
+aparece al desplegar un año. **Cualquier volcado de crónica —pantalla, runner de
+consola, parte de bienvenida— aplica el filtro.** Volcar los tres pesos produce
+un registro de obra, no una crónica.
+
+**Tabla de pesos, normativa:**
+
+| Peso | Qué |
+|---|---|
+| **3** | Fundación, extinción, muerte de un nombrado, sucesión, encrucijada y su consecuencia diferida, brote de peste, hambruna con muertos |
+| **2** | Cosecha excepcional (ruinosa o abundante), llegada o marcha de gente, incendio, edificio **singular** terminado (capilla, iglesia, fragua, molino, pozo, primer granero), rencor formado |
+| **1** | Todo lo demás: casas, campos, graneros posteriores, **cada tramo de empalizada o muro**, cosecha normal, nacimientos y muertes corrientes, cambio de estación |
+
+**Y se agregan por año.** Varias entradas de la misma clave en el mismo año se
+componen en una sola línea con su recuento: veintiún tramos de empalizada son
+*«The palisade closed around the village that year»*, no veintiuna líneas. Sin
+esto, un año de obra sepulta la peste, la decisión y los muertos que lo rodean —
+que es exactamente lo que pasó en la primera lectura del hito 0.
 
 El **parte de bienvenida** al volver de una ausencia muestra, como máximo: el
 titular de peso 3 más reciente, hasta 4 entradas de peso 2, y un resumen
@@ -2006,6 +2035,7 @@ export const FOOD = {
   GRAIN_PER_PERSON: 1.0,        // por semana
   FIELD_YIELD: 600,             // por campo, cosecha completa
   FIELD_CREW: 4,                // adultos para trabajar un campo entero
+  MIN_FIELD_CREW: 2,            // por debajo, el campo NO rinde nada (§5.2)
   MAX_FIELDS: 8,
   BASE_STORAGE: 800,
   GRANARY_CAPACITY: 650,
@@ -2178,8 +2208,14 @@ score = −(grano que cuesta) − 40·(muertos inmediatos)
         − 15·(ánimo perdido)  + 10·(si no planta semilla)
 ```
 
-y toma la mayor. No pretende ser juego óptimo —no lo es— sino **un aldeano
-cauto**: el suelo por debajo del cual ningún jugador razonable debería caer. Las
+y toma la mayor, **pero las muertes no se compran**: si alguna opción no mata a
+nadie de inmediato, `prudent` elige solo entre esas; si todas matan, minimiza los
+muertos. La primera versión ponía las muertes en la misma suma que el grano, con
+lo que una vida quedaba tasada en cuarenta fanegas y había opciones donde salía a
+cuenta — medido, `prudent` moría de violencia tres veces más que `first`. Un
+aldeano cauto no cambia vidas por grano a ningún precio.
+
+No pretende ser juego óptimo —no lo es— sino **un aldeano cauto**: el suelo por debajo del cual ningún jugador razonable debería caer. Las
 bandas de esta tabla se miden con ella; las otras tres se informan al lado para
 ver la horquilla.
 

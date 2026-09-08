@@ -712,3 +712,83 @@ describe('welcomeDigest · §9.2', () => {
     expect(d.summary.weeks).toBe(20);
   });
 });
+
+describe('pesos y agregación por año · §9.2, v2.14', () => {
+  const YEAR_TICKS = 48;
+
+  function withEntries(entries: { key: string; weight: 1 | 2 | 3; kind: string; count?: number }[]): GameState {
+    const s = village(7);
+    s.chronicle = entries.map((e, i) => ({
+      tick: 3 * YEAR_TICKS + i,
+      kind: e.kind as ChronicleEntry['kind'],
+      templateKey: e.key,
+      params: { year: 3, season: 'spring', people: 20, ...(e.count === undefined ? {} : { count: e.count }) },
+      weight: e.weight,
+    }));
+    return s;
+  }
+
+  it('veintiún tramos de empalizada son una línea, no veintiuna', () => {
+    const s = withEntries(Array.from({ length: 21 }, (_, i) => ({
+      key: 'built.palisade', weight: 1 as const, kind: 'built', count: i + 1,
+    })));
+    const lines = renderYear(s, 3, 1);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).not.toContain('[');
+  });
+
+  it('el recuento agregado cuenta edificios, no el total acumulado del último', () => {
+    const s = withEntries(Array.from({ length: 4 }, (_, i) => ({
+      key: 'built.house', weight: 1 as const, kind: 'built', count: 12 + i,
+    })));
+    expect(renderYear(s, 3, 1)[0]).toContain('four');
+  });
+
+  it('para las personas, el recuento suma cabezas', () => {
+    const s = withEntries([
+      { key: 'birth.anon.one', weight: 1, kind: 'birth', count: 1 },
+      { key: 'birth.anon.many', weight: 1, kind: 'birth', count: 4 },
+    ]);
+    // Una sola línea, cinco cabezas: `.one` y `.many` son la misma familia.
+    const lines = renderYear(s, 3, 1);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toContain('five');
+  });
+
+  it('una sola entrada del año se queda como estaba', () => {
+    const s = withEntries([{ key: 'built.palisade', weight: 1, kind: 'built', count: 1 }]);
+    const lines = renderYear(s, 3, 1);
+    expect(lines).toHaveLength(1);
+    // La forma anual habla del año; la individual, de la estación.
+    expect(lines[0]).not.toMatch(/^The palisade closed/);
+  });
+
+  it('los nombrados nunca se agregan: cada muerte tiene su nombre y su epitafio', () => {
+    const s = village(7);
+    const named = s.people.villagers.filter((v: Villager) => v.named).slice(0, 3);
+    s.chronicle = named.map((v: Villager, i: number) => ({
+      tick: 3 * YEAR_TICKS + i,
+      kind: 'death' as const,
+      templateKey: 'death.natural.named',
+      params: { name: v.name, age: 60, year: 3, season: 'winter' },
+      weight: 3 as const,
+    }));
+    const lines = renderYear(s, 3);
+    expect(lines).toHaveLength(3);
+    for (const v of named) expect(lines.some((l) => l.includes(v.name))).toBe(true);
+  });
+
+  it('la línea agregada ocupa el sitio de la primera de su familia', () => {
+    const s = withEntries([
+      { key: 'built.palisade', weight: 1, kind: 'built', count: 1 },
+      { key: 'plague.begins', weight: 3, kind: 'plague' },
+      { key: 'built.palisade', weight: 1, kind: 'built', count: 2 },
+    ]);
+    const lines = renderYear(s, 3, 1);
+    expect(lines).toHaveLength(2);
+    // La empalizada abrió el año, así que su línea anual va primero y la peste
+    // detrás: agregar no reordena la crónica.
+    expect(lines[0]).toMatch(/palisade|fenced/i);
+  });
+
+});
