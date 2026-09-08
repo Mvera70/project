@@ -51,7 +51,8 @@ export function updateMood(state: GameState, ctx: TickContext): void {
   const chapel = has(state, 'chapel');
   const church = has(state, 'church');
   const mill = has(state, 'mill');
-  const outbreak = ctx.outbreak !== null;
+  const outbreak = ctx.outbreak !== null &&
+    state.tick >= ctx.outbreak.startedTick && state.tick < ctx.outbreak.endsTick;
 
   // --- §5.5 · morale ------------------------------------------------------
   let morale = state.village.morale;

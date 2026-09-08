@@ -1,7 +1,7 @@
 # Banco M-12
 
 `npm run test:balance` ejecuta `foundGame` y `run` reales para semillas 0–59,
-200 años y políticas `first`, `last`, `worst`. No modifica el catálogo ni los
+200 años y políticas `prudent`, `first`, `last`, `worst`. No modifica el catálogo ni los
 parámetros. El CSV anual incluye la fundación y el último tick de cada partida;
 no prolonga artificialmente las curvas de partidas extinguidas. JSON conserva
 resultados por semilla, denominadores y fracciones de elegibilidad.
@@ -31,16 +31,15 @@ el efecto real `kill(random, fraction=0.9)`, con redondeo propio del motor. Pros
 con la misma política hasta extinción o año 200. Denominador: supervivientes al
 choque, informado por política; no se atribuyen al choque muertes anteriores.
 
-Los umbrales de pico y primera generación están activos para `first` y `last`.
-Actualmente WORKS está pendiente de M-14: sus incumplimientos siguen siendo
-fallos, no aprobados ni excusas para cambiar cifras. `worst` verifica mortalidad
-adversa, además de rangos, elegibilidad, cadencia y choque.
+Los umbrales de pico, primera generación, extinción y mapa lleno pertenecen a
+`prudent`. `worst` verifica mortalidad adversa y la horquilla entre jugar con
+cabeza y jugar mal. Todas las políticas verifican rangos, geometría,
+elegibilidad, cadencia, bosque y choque cuando corresponden.
 
-Pendientes explícitos (tests `todo`, nunca verdes): mapa lleno necesita M-14;
-bosque necesita M-15; extinción «neutra» tiene banda 2–12% en la tabla, pero la
-prosa de §12.9 declara que ni `first` ni `last` son neutras. Se informan ambas
-tasas sin inventar una tercera política ni reasignar silenciosamente el umbral.
-El porcentaje de intervalos pegados al techo (<40%) es diagnóstico, no aserto.
+Mapa y bosque están activos desde M-14/M-15. El porcentaje de intervalos pegados
+al techo (<40%) sigue siendo diagnóstico, no aserto. El banco v2.18 queda rojo:
+once asertos fallan, enumerados en `docs/design.md` §2.18, incluido el presupuesto
+de diez minutos (1 143,63 s). No se recortan semillas ni años para ocultarlo.
 
 Artefactos: `artifacts/balance.csv` y `artifacts/balance-summary.json`, escritos
 antes de los asertos para preservar evidencia cuando el banco termina rojo.

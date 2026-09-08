@@ -40,6 +40,7 @@ interface Trial {
 
 interface GateSnapshot {
   tick: number;
+  moraleValue: number;
   people: boolean;
   morale: boolean;
   grain: boolean;
@@ -92,6 +93,7 @@ function play(seed: number): Trial {
         : state.village.grain / (people * YEAR);
       gates.push({
         tick: state.tick,
+        moraleValue: state.village.morale,
         people: people >= MIGRATION.ARRIVE_MIN_PEOPLE,
         morale: state.village.morale >= MIGRATION.ARRIVE_MIN_MORALE,
         grain: grainYears >= MIGRATION.ARRIVE_MIN_GRAIN_YEARS,
@@ -169,11 +171,18 @@ function gateRows(result: Scenario): Record<string, string | number>[] {
       const to = end - endBeforeEnd;
       return trial.gates.filter((gate) => gate.tick > from && gate.tick <= to);
     });
-    const share = (gate: keyof Omit<GateSnapshot, 'tick'>): number =>
+    const share = (gate: 'people' | 'morale' | 'grain' | 'reputation' | 'beds'): number =>
       snapshots.filter((snapshot) => snapshot[gate]).length / Math.max(1, snapshots.length);
+    const moraleAtLeast = (threshold: number): number =>
+      snapshots.filter((snapshot) => snapshot.moraleValue >= threshold).length /
+      Math.max(1, snapshots.length);
     rows.push({
       decade: `${decade * 10}-${(decade - 1) * 10} years before end`,
       samples: snapshots.length,
+      medianMorale: median(snapshots.map((snapshot) => snapshot.moraleValue)) ?? Number.NaN,
+      morale30: moraleAtLeast(30),
+      morale40: moraleAtLeast(40),
+      morale50: moraleAtLeast(50),
       people: share('people'),
       morale: share('morale'),
       grain: share('grain'),
@@ -202,9 +211,8 @@ function print(result: Scenario): void {
 const original = MIGRATION.ARRIVE_MIN_PEOPLE;
 try {
   const a = scenario(8);
-  const b = scenario(3);
   print(a);
-  print(b);
+  if (!process.argv.includes('--baseline')) print(scenario(3));
 } finally {
   mutableMigration.ARRIVE_MIN_PEOPLE = original;
 }

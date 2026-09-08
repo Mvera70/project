@@ -28,7 +28,7 @@ import { has } from './building-counts';
  */
 export function rollPlague(state: GameState): Outbreak | null {
   if (weekOf(state.tick) !== 0) return null;
-  if (state.outbreak !== null) return null;
+  if (outbreakActive(state, state.outbreak)) return null;
 
   const people = population(state);
   if (people === 0) return null;

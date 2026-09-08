@@ -366,16 +366,21 @@ describe('el bosque viejo · §9, v2.16', () => {
     expect(s.flags['old_forest_gone']).toBe(0);
 
     const t = foundGame(42);
-    let seen = 0;
-    for (let i = 0; i < 200 * YEAR && t.ended === null; i += 1) {
-      const report = run(t, 1, 'prudent', CATALOG)[0];
-      seen += (report?.entries ?? []).filter((e) => e.templateKey === 'forest.old_gone').length;
+    const last = [...t.map.terrain].findIndex((terrain) => terrain === TERRAIN_CODE.forest);
+    for (let cell = 0; cell < t.map.terrain.length; cell += 1) {
+      if (t.map.terrain[cell] !== TERRAIN_CODE.forest) continue;
+      t.map.terrain[cell] = TERRAIN_CODE.cleared;
+      t.map.forestStock[cell] = 0;
+      t.map.forestAge[cell] = 0;
     }
-    expect(seen).toBeLessThanOrEqual(1);
-    if (seen === 1) {
-      const entry = t.chronicle.find((e) => e.templateKey === 'forest.old_gone');
-      expect(entry?.weight).toBe(2);
-    }
+    t.map.terrain[last] = TERRAIN_CODE.forest;
+    t.map.forestStock[last] = 1;
+    t.map.forestAge[last] = WORLD.VIRGIN_FOREST;
+    const reports = [run(t, 1, 'prudent', CATALOG)[0], run(t, 1, 'prudent', CATALOG)[0]];
+    const seen = reports.flatMap((report) => report?.entries ?? [])
+      .filter((entry) => entry.templateKey === 'forest.old_gone');
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.weight).toBe(2);
     expect(s.chronicle.length).toBe(before); // fellForest no escribe crónica
   });
 

@@ -589,6 +589,22 @@ describe('ánimo y fe · §5.5, §5.6', () => {
     expect(after({}, ['mill'])).toBeGreaterThan(base);
   });
 
+  it('un brote vencido deja de castigar el ánimo y la fe', () => {
+    const expired = founded(7);
+    const calm = founded(7);
+    expired.tick = 20;
+    calm.tick = 20;
+    expired.village.morale = calm.village.morale = 50;
+    expired.village.faith = calm.village.faith = 50;
+    updateMood(expired, {
+      ...CALM,
+      outbreak: { startedTick: 2, endsTick: 10, deaths: 0 },
+    });
+    updateMood(calm, CALM);
+    expect(expired.village.morale).toBeCloseTo(calm.village.morale, 12);
+    expect(expired.village.faith).toBeCloseTo(calm.village.faith, 12);
+  });
+
   it('el hacinamiento pesa por cada persona sin cama', () => {
     const roomy = founded(7);
     const cramped = founded(7);
@@ -743,6 +759,22 @@ describe('desastres · §5.8, §5.9', () => {
       s.outbreak = o;
       expect(rollPlague(s)).toBeNull(); // ya hay uno corriendo
     }
+  });
+
+  it('un brote vencido no bloquea la tirada anual siguiente', () => {
+    let clearRolls = 0;
+    let expiredRolls = 0;
+    for (let seed = 0; seed < 1000; seed += 1) {
+      const clear = founded(seed);
+      clear.tick = TIME.WEEKS_PER_YEAR;
+      const expired = founded(seed);
+      expired.tick = TIME.WEEKS_PER_YEAR;
+      expired.outbreak = { startedTick: 1, endsTick: 9, deaths: 0 };
+      if (rollPlague(clear) !== null) clearRolls += 1;
+      if (rollPlague(expired) !== null) expiredRolls += 1;
+    }
+    expect(expiredRolls).toBe(clearRolls);
+    expect(expiredRolls).toBeGreaterThan(0);
   });
 
   it('el incendio sale con FIRE_CHANCE y devuelve qué arde', () => {

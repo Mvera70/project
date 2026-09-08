@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.17 · 8 de septiembre de 2026, 12:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.18 · 8 de septiembre de 2026, 12:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -46,6 +46,73 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.15** | 8 sep 2026, 09:52 | M-15 | **Caminos y bosque**: el mapa cuenta dónde se pisa y qué se tala. Deuda del bosque de §12.9 saldada: incluir las dos plantillas mueve la cadencia 0,02. El banco se sale del presupuesto. |
 | **2.16** | 8 sep 2026, 11:20 | M-16 | **Abandono**: se acabó la agonía de cuarenta años. Presupuesto del banco a 10 min. La banda del bosque queda aguas abajo de la extinción. Atribución medida: `hostile` no se activa nunca con `prudent`. |
 | **2.17** | 8 sep 2026, 12:00 | Puerta de migración | **`prudent` deja de sobrevalorar el ánimo**: su peso baja de 15 a 3. La agonía se mide por la racha consecutiva más larga, igual que la regla de abandono. La puerta de ocho habitantes se somete a un A/B antes de tocarla. |
+| **2.18** | 8 sep 2026, 12:30 | Expiración de la peste | **Un brote dura 6–10 semanas también para el ánimo y para la siguiente tirada anual.** Un objeto `outbreak` vencido se estaba tratando como peste perpetua: hundía el ánimo hasta el suelo de fe e impedía cualquier brote posterior. |
+
+### 2.18 — La peste que no terminaba
+
+La puerta de población de v2.17 no movió una sola semilla porque no era la
+puerta cerrada. En las aldeas que terminan, el ánimo mediano de las tres décadas
+finales está entre 10,2 y 10,5: no llega a 50, y apenas llega a 30 entre el 1 %
+y el 7 % de los años. Esa cifra coincide con el suelo de fe, no con una deriva
+normal hacia 50.
+
+**Causa.** La mortalidad comprobaba correctamente `startedTick ≤ tick <
+endsTick`, pero ánimo y fe comprobaban solo `outbreak !== null`. Como el objeto
+no se limpiaba al vencer, el primer brote aplicaba `MORALE_OUTBREAK` y
+`FAITH_OUTBREAK` todas las semanas durante el resto de la partida. La misma
+referencia no nula impedía además que `rollPlague` hiciera tiradas en años
+posteriores.
+
+**Regla cerrada.** `Outbreak` representa exclusivamente un brote activo. Se
+limpia en el primer tick posterior a `endsTick`; todos los consumidores usan la
+ventana temporal, y un brote vencido no bloquea la tirada anual siguiente. Esto
+no cambia ningún número de §12: hace cumplir las 6–10 semanas que ya decía
+§5.8.
+
+**Evidencia exigida.** Tras el arreglo se repite el banco completo. Si el ánimo
+deja de quedar clavado junto a 10 y vuelve la migración, la extinción perpetua
+era un defecto de duración. Si la terminación continúa fuera de banda, se
+reanuda la atribución sobre el nuevo mundo; no se compensará el fallo tocando
+`ARRIVE_MIN_MORALE`.
+
+**Resultado: causa confirmada.** La única modificación es la expiración del
+brote; no se ha tocado ningún número de balance. El banco de 60 semillas × 200
+años × cuatro políticas da:
+
+| Métrica | `prudent` | `first` | `last` | `worst` |
+|---|---:|---:|---:|---:|
+| Partidas terminadas | 1,7 % | 1,7 % | 6,7 % | 6,7 % |
+| Mediana del pico | 83 | 83 | 81 | 81 |
+| Población mediana, año 20 | 42 | 41,5 | 28 | 28 |
+| Mapas llenos < año 120 | 96,7 % | 95,0 % | 70,0 % | 65,0 % |
+| Cadencia por generación | 3,75 | 3,83 | 6,01 | 6,02 |
+| Choque del 90 % → final | 44,1 % | 40,7 % | 84,5 % | 77,6 % |
+| Bosque en banda al año 100 | 48/59 | 47/59 | 23/57 | 21/57 |
+
+El ánimo deja de quedar clavado en 10 y la extinción de `prudent` cae de 80 %
+a 1,7 %. La banda pedía 2–12 % y el pico 65–82: ambos fallan por una sola
+partida o una persona, respectivamente. No se toca nada para hacer verdes esos
+bordes antes de resolver el problema grande.
+
+**Problema grande, ahora visible.** `worst` debería terminar al menos el 25 % y
+solo termina el 6,7 %; la horquilla `worst − prudent` es de cinco puntos contra
+los veinte exigidos. Las elecciones malas reducen el crecimiento —año 20: 28
+contra 42—, pero no matan la aldea. `last` y `worst` superan además la cadencia
+máxima media (6,01 y 6,02), arrastradas por `succession`, elegible en torno al
+6,9 % de los ticks. La siguiente ronda debe estudiar el bucle de sucesión y los
+efectos adversos; no endurecer la mortalidad ambiental, que castigaría también
+a `prudent`.
+
+**Coste del banco.** 1 143,63 s, por encima del presupuesto de 600 s. Ahora casi
+todas las partidas recorren los 200 años completos, y sus choques también. Es
+un incumplimiento real de M-12. Se optimiza la instrumentación o el trabajo
+redundante del mundo sin recortar semillas, años ni políticas.
+
+**Suite rápida.** La misma supervivencia llevó `npm test` por encima de veinte
+segundos. Dos recorridos integrados que se habían vuelto redundantes o vacuos se
+reemplazan por casos directos que fuerzan el suceso: la última celda de bosque
+viejo y la única partida terminal de este banco. Resultado: 523 pruebas pasan,
+dos quedan pendientes de M-20/M-23, y la suite completa tarda 19,81 s.
 
 ### 2.17 — La puerta de ocho habitantes
 

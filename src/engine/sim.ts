@@ -34,7 +34,7 @@ import { consume, overwinter } from './subsistence/consumption';
 import { applySpoilage, harvest } from './subsistence/harvest';
 import { isUnexplained, updateMood } from './subsistence/mood';
 import { rollWeather } from './subsistence/seasons';
-import { rollFire, rollPlague } from './subsistence/disasters';
+import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { destroyBuilding } from './world/buildings';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
@@ -383,6 +383,12 @@ export function tick(
   // Week 0 and week 0 only: the weather of the year, the plague, the fire, the
   // spring migration, and the offices that fell vacant (§6.2). There is no
   // ageing to do — ages derive from bornTick (§6.5).
+  // An outbreak ceases to be state on the first tick after its last active
+  // week. Keeping the expired object made mood apply its weekly penalty for
+  // decades and prevented every later annual plague roll (v2.18).
+  if (state.outbreak !== null && !outbreakActive(state, state.outbreak)) {
+    state.outbreak = null;
+  }
   let arrived = 0;
   let left = 0;
   if (weekOf(state.tick) === 0) {
