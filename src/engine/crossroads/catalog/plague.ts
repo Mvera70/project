@@ -140,7 +140,6 @@ export const PLAGUE_BLAME: CrossroadTemplate = {
       cost: 'crossroad.plague_blame.silence_a.cost',
       effects: [
         { k: 'stat', stat: 'faith', delta: -30 },
-        { k: 'role', who: 'A', role: null },
         { k: 'stat', stat: 'morale', delta: -5 },
         { k: 'memory', who: 'A', kind: 'was_blamed', weight: 5 },
       ],

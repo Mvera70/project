@@ -13,11 +13,12 @@ import { isHere, population } from '@engine/people/demography';
 import { adjustOpinion } from '@engine/people/opinions';
 import { remember } from '@engine/people/memories';
 import type { AppliedEffects, Catalogue, CrossroadTemplate } from '@engine/crossroads/schema';
-import { all, evaluate, ratioOf, weeksToHarvest } from '@engine/crossroads/conditions';
+import { all, evaluate, holderOf, ratioOf, weeksToHarvest } from '@engine/crossroads/conditions';
 import { fillCast } from '@engine/crossroads/cast';
 import { crisisOf, eligible, lastCrossroadTick, selectCrossroad } from '@engine/crossroads/select';
 import { applyEffect, applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds, pendingSeeds } from '@engine/crossroads/seeds';
+import { PLAGUE_BLAME } from '@engine/crossroads/catalog/plague';
 
 const CELLS = 36 * 56;
 const YEAR = TIME.WEEKS_PER_YEAR;
@@ -894,6 +895,24 @@ describe('resolución · §8.4', () => {
     expect(s.outbreak.endsTick).toBe(21);
     applyEffect(s, {}, { k: 'outbreak', weeks: -20 }, emptyEffects());
     expect(s.outbreak.endsTick).toBe(s.tick);
+  });
+
+  it('silenciar al cura conserva al cura y cobra la pérdida de fe', () => {
+    const s = calm(17);
+    const priest = holderOf(s, 'priest') as VillagerId;
+    const other = s.people.namedIds.find((id) => id !== priest) as VillagerId;
+    const faith = s.village.faith;
+    s.crossroad = {
+      templateId: PLAGUE_BLAME.id,
+      posedTick: s.tick,
+      cast: { A: priest, B: other },
+      optionIds: PLAGUE_BLAME.options.map((o) => o.id),
+    };
+
+    applyOption(s, 'silence_a', [PLAGUE_BLAME]);
+
+    expect(holderOf(s, 'priest')).toBe(priest);
+    expect(s.village.faith).toBe(Math.max(0, faith - 30));
   });
 
   it('kill mata, marca violence y saca del reparto', () => {

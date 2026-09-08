@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.30 · 8 de septiembre de 2026, 21:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.31 · 8 de septiembre de 2026, 21:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -75,6 +75,17 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.28** | 8 sep 2026, 20:00 | Contrato de trabajo | **Cada promesa de obra tiene su factor y su duración.** A.7 aplica 0,85 durante cuatro años, A.15 aplica 0,8 durante dos y A.12 aplica 0,4 durante seis semanas exactas. |
 | **2.29** | 8 sep 2026, 20:30 | Contrato de expulsión | **Ser expulsado significa abandonar la población.** A.4 y A.8 marcan `leftTick`, sacan al personaje del reparto de nombres y contabilizan la marcha en el informe semanal y la crónica. |
 | **2.30** | 8 sep 2026, 21:00 | Contrato de conflicto diferido | **`feud_ripe` conserva durante cinco años la prioridad de una disputa sembrada.** Las plantillas `feud` elegibles multiplican su peso por cuatro mientras la bandera está activa. |
+| **2.31** | 8 sep 2026, 21:30 | Contrato de A.6 | **Silenciar al sacerdote conserva al sacerdote.** `silence_a` mantiene el oficio y cobra la pérdida de fe y ánimo que promete; `no_shepherd` solo cae si el cargo queda vacante después. |
+
+### 2.31 — Silenciado, todavía sacerdote
+
+En A.6 la letra A es necesariamente quien ocupa el sacerdocio. El precio de
+`silence_a` dice «The village keeps its priest and loses its faith», pero un
+efecto posterior ponía su `role` a `null`. Se elimina esa contradicción: A
+conserva el oficio, pierde autoridad mediante `faith −30`, `morale −5` y el
+recuerdo de haber sido culpado. La consecuencia `no_shepherd` conserva su
+condición; solo se cobra si el sacerdote muere y el puesto está vacío cuando
+vence. Una prueba resuelve la opción completa y comprueba oficio y fe.
 
 ### 2.30 — La disputa llega antes que el olvido
 
@@ -4174,7 +4185,7 @@ todo.*
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
 | **Give them {B}** | You will not get {B} back | `kill B 1`, `faith +25`, `morale +8`, `opinion` de los parientes de B hacia A −60 | `gather chapel 3` | `blood_debt`, 8–20 años: un hijo de B, si vive, `memory was_blamed 5` y dispara `feud_inherited` |
-| **Silence {A}** | The village keeps its priest and loses its faith | `faith −30`, `role A null`, `morale −5` | `douse` de la capilla 3 años | `no_shepherd`, 4–10 años: `faith −15` si sigue sin cura |
+| **Silence {A}** | The village keeps its priest and loses its faith | `faith −30`, `morale −5` | `douse` de la capilla 3 años | `no_shepherd`, 4–10 años: `faith −15` si entonces no hay cura |
 | **Say nothing** | It will find its own end | `morale −12`, `faith −8`, brote +2 semanas | `gather square 4` | `whispers`, 5–12 años: `grudge` nuevo entre dos nombrados al azar |
 
 ---
