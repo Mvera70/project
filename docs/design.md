@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.28 · 8 de septiembre de 2026, 20:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.29 · 8 de septiembre de 2026, 20:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -73,6 +73,26 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.26** | 8 sep 2026, 19:00 | Contrato de A.3 | **Las tres respuestas de `hungry_spring` cobran su precio.** Sembrar fuerza ocho semanas de hambre 0,5; comer o repartir compromete la siguiente siega mediante el mecanismo contado en cosechas de v2.25. |
 | **2.27** | 8 sep 2026, 19:30 | Contrato de A.5/A.6 | **Las decisiones durante una peste cambian su fecha final.** Un efecto explícito suma o resta semanas al brote activo una sola vez; desaparecen las dos banderas anuales que nadie podía leer correctamente. |
 | **2.28** | 8 sep 2026, 20:00 | Contrato de trabajo | **Cada promesa de obra tiene su factor y su duración.** A.7 aplica 0,85 durante cuatro años, A.15 aplica 0,8 durante dos y A.12 aplica 0,4 durante seis semanas exactas. |
+| **2.29** | 8 sep 2026, 20:30 | Contrato de expulsión | **Ser expulsado significa abandonar la población.** A.4 y A.8 marcan `leftTick`, sacan al personaje del reparto de nombres y contabilizan la marcha en el informe semanal y la crónica. |
+
+### 2.29 — Un nombre que cruza el vado
+
+`role null` solo deja un oficio vacante; no expulsa a nadie. §8.4 incorpora
+`{k:'leave', who}` para los dos verbos que prometen echar a un personaje: A.4
+`believe_b` y A.8 `send_b_away`. La resolución marca `leftTick`, conserva al
+aldeano en el registro histórico, lo retira del reparto vivo de nombres y
+devuelve su id en `AppliedEffects.left`. El orquestador suma esa salida al
+informe semanal y escribe el suceso de marcha, igual que la migración anual.
+
+La prueba de propiedad exige simultáneamente que la población baje en uno, que
+el personaje no conste como muerto y que deje de ser elegible para otro reparto.
+
+**Hallazgo aguas abajo.** El barrido de 30 semillas × 150 años deja mudas A.7 y
+A.8: la política del banco toma primero A.4 `believe_b` y ahora el agraviado se
+marcha de verdad, por lo que ya no queda disponible para su disputa posterior.
+Esto confirma que `feud_ripe`, escrita para transportar el conflicto entre
+historias, necesita un lector propio. Se corrige en la fase siguiente y no
+alterando la semántica de la expulsión.
 
 ### 2.28 — Cuando las manos no construyen
 
@@ -2403,6 +2423,7 @@ export type Effect =
   | { k: 'stat';   stat: StatName; delta: number }
   | { k: 'stat';   stat: StatName; mul: number }
   | { k: 'kill';   who: 'random'|'weakest'|string; count: number | 'fraction'; fraction?: number }
+  | { k: 'leave';  who: string }
   | { k: 'arrive'; count: number }
   | { k: 'flag';   flag: string; years: number }   // 0 = permanente
   | { k: 'build';  kind: BuildingKind; free: true }

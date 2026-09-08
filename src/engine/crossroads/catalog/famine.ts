@@ -106,6 +106,7 @@ export const GRANARY_THEFT: CrossroadTemplate = {
       cost: 'crossroad.granary_theft.believe_b.cost',
       effects: [
         { k: 'role', who: 'A', role: null },
+        { k: 'leave', who: 'A' },
         { k: 'stat', stat: 'morale', delta: -6 },
         { k: 'memory', who: 'A', kind: 'was_blamed', about: 'B', weight: 5 },
         { k: 'opinion', from: 'A', to: 'B', delta: -50 },

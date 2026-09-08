@@ -66,7 +66,7 @@ const at = (s: GameState, id: VillagerId): Villager =>
   s.people.villagers.find((v) => v.id === id) as Villager;
 
 function emptyEffects(): AppliedEffects {
-  return { templateId: 'test', optionId: 'test', killed: [], arrived: [],
+  return { templateId: 'test', optionId: 'test', killed: [], left: [], arrived: [],
     seedsPlanted: [], build: [], destroy: [], visible: [] };
 }
 
@@ -897,6 +897,23 @@ describe('resolución · §8.4', () => {
       expect(at(s, id).causeOfDeath).toBe('violence');
       expect(s.people.namedIds).not.toContain(id);
     }
+  });
+
+  it('leave expulsa al personaje sin matarlo y lo saca del reparto', () => {
+    const s = calm(13);
+    s.tick = 21;
+    const id = s.people.namedIds[0] as VillagerId;
+    const before = population(s);
+    const out = emptyEffects();
+
+    applyEffect(s, { A: id }, { k: 'leave', who: 'A' }, out);
+
+    expect(out.left).toEqual([id]);
+    expect(population(s)).toBe(before - 1);
+    expect(at(s, id).leftTick).toBe(s.tick);
+    expect(at(s, id).diedTick).toBeNull();
+    expect(at(s, id).causeOfDeath).toBeNull();
+    expect(s.people.namedIds).not.toContain(id);
   });
 
   it("kill 'weakest' se lleva primero a los más viejos", () => {

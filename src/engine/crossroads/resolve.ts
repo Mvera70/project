@@ -95,6 +95,14 @@ export function applyEffect(
       }
       break;
     }
+    case 'leave': {
+      const v = villagerOf(state, cast, e.who);
+      if (v === undefined || !isHere(v)) break;
+      v.leftTick = state.tick;
+      out.left.push(v.id);
+      state.people.namedIds = state.people.namedIds.filter((id) => id !== v.id);
+      break;
+    }
     case 'arrive': {
       for (let i = 0; i < e.count; i += 1) {
         const age = int(state.rng, 'names', 16, 30);
@@ -194,6 +202,7 @@ export function applyOption(
     templateId: template.id,
     optionId,
     killed: [],
+    left: [],
     arrived: [],
     seedsPlanted: [],
     build: [],

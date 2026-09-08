@@ -504,6 +504,15 @@ export function tick(
     decided = captureEntries(() => applyOption(state, decision.optionId, catalogue));
     if (decided !== null) {
       reportVictims(decided.killed);
+      if (decided.left.length > 0) {
+        left += decided.left.length;
+        say({
+          kind: 'departure',
+          templateKey: departureKey(decided.left.length),
+          params: { year: year(), season: season(), count: decided.left.length, people: population(state) },
+          weight: 2,
+        });
+      }
       carryOutBuildings(state, decided, say);
 
       // Annex A.15, v2.22: `no_one` answered three times running, with no
@@ -538,6 +547,15 @@ export function tick(
   for (const seed of fired) {
     if (seed.effects !== null) {
       reportVictims(seed.effects.killed);
+      if (seed.effects.left.length > 0) {
+        left += seed.effects.left.length;
+        say({
+          kind: 'departure',
+          templateKey: departureKey(seed.effects.left.length),
+          params: { year: year(), season: season(), count: seed.effects.left.length, people: population(state) },
+          weight: 2,
+        });
+      }
       carryOutBuildings(state, seed.effects, say);
     }
   }

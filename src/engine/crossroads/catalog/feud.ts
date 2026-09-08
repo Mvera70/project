@@ -150,6 +150,7 @@ export const FEUD_INHERITED: CrossroadTemplate = {
       cost: 'crossroad.feud_inherited.send_b_away.cost',
       effects: [
         { k: 'role', who: 'B', role: null },
+        { k: 'leave', who: 'B' },
         { k: 'stat', stat: 'morale', delta: -4 },
         { k: 'memory', who: 'A', kind: 'lost_child', about: 'B', weight: 4 },
       ],

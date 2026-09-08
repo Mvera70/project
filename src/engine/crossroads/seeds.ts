@@ -54,6 +54,7 @@ export function fireSeeds(state: GameState, catalogue: Catalogue): FiredSeed[] {
       templateId: seed.fromTemplateId,
       optionId: seed.fromOptionId,
       killed: [],
+      left: [],
       arrived: [],
       seedsPlanted: [],
       build: [],
