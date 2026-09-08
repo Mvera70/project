@@ -45,3 +45,10 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
   const summer = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
   test.expect(summer).not.toBe(spring);
 });
+
+test('la ruta viva abre un valle maduro determinista para revisar la multitud', async ({ page }) => {
+  await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await test.expect(page.locator('.valley-year')).toHaveText('ANNO LXXXI');
+  await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
+});

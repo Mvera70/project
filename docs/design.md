@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.56 · 10 de septiembre de 2026, 05:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.57 · 10 de septiembre de 2026, 06:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.57** | 10 sep 2026, 06:00 | Puerta de movimiento de M-18 | **La multitud supera sus veinte segundos.** Una ruta viva determinista abre un valle de 80 habitantes; el GIF muestra salida, trabajo, regreso, noche vacía y nuevo ciclo sin perder figuras ni convertirlas en ruido. §14.3 queda cerrada. |
 | **2.56** | 10 sep 2026, 05:30 | M-20 · armazón de aplicación | **La simulación ya corre en la pantalla móvil.** El reloj acumula fracciones sin perder ticks en sus límites, descarta el tiempo oculto y limita a ocho semanas cada fotograma. `ANNO I` presenta el año cero interno como primer año civil; la velocidad inicial es ×1. |
 | **2.55** | 10 sep 2026, 05:00 | Veredicto visual de §14.3 | **M-16 y M-17 superan la hoja a tamaño móvil.** Las cuatro estaciones se reconocen, el gris conserva las masas y los edificios principales tienen siluetas propias. La densidad de M-18 se juzga en movimiento tras M-20; una captura estática no demuestra ni falsifica su ciclo. |
 | **2.54** | 10 sep 2026, 04:35 | Puerta visual de §14.3 | **Generar no es mirar.** La hoja de contacto rotula año, estación y versión gris en cada panel para que una persona pueda juzgarla sin memorizar el orden. M-16, M-17 y M-18 quedan técnicamente implementados y visualmente pendientes de ese veredicto. |
@@ -101,6 +102,24 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.57 — La multitud se entiende en movimiento
+
+La ruta `?debug=1&live=1&seed=7&year=80&season=summer` carga el mismo estado
+maduro en el bucle real de M-20. No altera la ruta estática de M-19 y permite
+repetir una observación sin depender de la semilla aleatoria de una partida
+nueva. En ese estado hay 80 habitantes presentes.
+
+El GIF de veinte segundos, muestreado cada medio segundo a tamaño móvil, enseña
+la salida desde las viviendas, la separación por los caminos de trabajo, el
+regreso entre los segundos 9 y 12, la noche sin figuras y el comienzo del ciclo
+siguiente en el segundo 15. Los ocho tonos de personajes nombrados siguen
+localizables entre la multitud. **M-18 y la puerta visual de §14.3 quedan
+cerrados.**
+
+**Qué habría falsado este cierre:** teletransportes entre fotogramas, gente a la
+intemperie durante la noche, figuras perdidas fuera del mapa, una masa ilegible
+en el centro o destinos sin relación con campos y obras. No aparece ninguno.
 
 ### 2.56 — El tiempo del motor llega a la pantalla
 
@@ -4615,10 +4634,10 @@ mapa; a `tickFraction = 0.9` no hay figuras a la intemperie; con 80 aldeanos,
 1 000 llamadas en menos de 100 ms.
 **Terminado cuando.** En un GIF de 20 s se ve salir al campo y volver.
 
-**Estado (v2.52): implementado, pendiente del GIF de cierre.** Posiciones puras,
-rutas cacheadas, domingo en la plaza, noche vacía, límite de 80 y presupuesto
-verificados. La hoja estática confirma densidad y lectura; el GIF necesita el
-bucle de aplicación de M-20 para aportar una fracción temporal real.
+**Estado (v2.57): cerrado.** Posiciones puras, rutas cacheadas, domingo en la
+plaza, noche vacía, límite de 80 y presupuesto verificados. El GIF de veinte
+segundos sobre un valle determinista de 80 habitantes muestra salida, trabajo,
+regreso, noche y nuevo ciclo con la fracción temporal real de M-20.
 
 ---
 
