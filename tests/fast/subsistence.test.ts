@@ -711,6 +711,21 @@ describe('clima · §5.1, §12.3', () => {
     });
   });
 
+  it('las laderas desnudas trasladan cinco puntos de clima justo a ruinoso', () => {
+    const s = founded(7);
+    s.flags['flood_prone'] = 0;
+    const N = 20_000;
+    const seen = new Array<number>(WEATHER.length).fill(0);
+    for (let i = 0; i < N; i += 1) {
+      const index = rollWeather(s).index;
+      seen[index] = (seen[index] ?? 0) + 1;
+    }
+    expect((seen[0] ?? 0) / N).toBeGreaterThan(0.18);
+    expect((seen[0] ?? 0) / N).toBeLessThan(0.22);
+    expect((seen[2] ?? 0) / N).toBeGreaterThan(0.33);
+    expect((seen[2] ?? 0) / N).toBeLessThan(0.37);
+  });
+
   it('consume del flujo weather y de ningún otro', () => {
     const s = founded(7);
     const before = { ...s.rng };

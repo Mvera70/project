@@ -17,7 +17,7 @@
 //   wall_unlocked          M-14:            `wall` becomes buildable (A.16)
 //   stone_house_unlocked   M-14:            `stone_house` becomes buildable (A.16)
 //   burnt_row              M-14:            those ruins are never rebuilt (A.5)
-//   flood_prone            M-06 rollWeather(): ruinous years likelier (A.11)
+//   flood_prone            M-06 rollWeather(): ruinous years +5 points (A.11)
 //   unconsecrated          M-08 later:      opens a template of its own (A.5)
 //   feud_ripe              M-07 select():   weights the feud templates up (A.4, A.6, A.8, A.15)
 //   behind_the_wall        M-07 scoring:    lord and stranger weigh less (A.16)

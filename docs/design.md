@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.35 · 8 de septiembre de 2026, 23:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.36 · 8 de septiembre de 2026, 23:50 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -80,6 +80,19 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.33** | 8 sep 2026, 22:30 | Contrato visible de A.13 | **El precio de despedir a los forasteros dice cuánto grano sale.** Se sustituye «It costs less» por «Sixty bushels»; la mecánica no cambia. |
 | **2.34** | 8 sep 2026, 23:00 | Contrato de A.9 | **La capilla compromete la próxima cosecha al 80 %.** El precio deja de prometer un «año magro» indefinido y nombra el quinto que se perderá en la siguiente siega. |
 | **2.35** | 8 sep 2026, 23:30 | Contrato de A.11 | **Las dos decisiones de tala modifican el bosque real.** `fell_it` extrae 900 de madera y deja claras sin rebrote; `take_the_edge` extrae 300 y fuerza una semana de hambre 0,5. |
+| **2.36** | 8 sep 2026, 23:50 | Consecuencia de A.11 | **Las laderas desnudas cambian el clima que se sortea.** `flood_prone` suma cinco puntos a los años ruinosos y los resta de los justos, sin añadir tiradas aleatorias. |
+
+### 2.36 — Las laderas llegan a la cosecha
+
+`bare_slopes` ya plantaba `flood_prone` de forma permanente veinte a cuarenta
+años después de talar el bosque, pero el clima no la leía. `rollWeather` conserva
+la tabla de §12.3 y, mientras la bandera está activa, traslada 0,05 de la fila
+justa a la ruinosa: 20 % ruinoso, 35 % justo; las otras tres filas no cambian.
+La misma tirada sobre el mismo flujo elige la fila, de modo que no se desplaza
+ningún sistema aleatorio. Un barrido de 20.000 años comprueba ambas bandas.
+El cambio de trayectoria saca `smith_feud` de la muestra rápida de doce partidas;
+el barrido completo de 30 × 150 años sigue cubriendo las diecisiete plantillas y
+las ocho categorías, por lo que A.7 queda clasificada entre las historias lentas.
 
 ### 2.35 — Lo que sale del bosque sale del mapa
 
@@ -3148,6 +3161,7 @@ export const WORLD = {
   FOREST_REGROWTH_YEARS: 8,
   FOREST_REGROWTH_NEIGHBOURS: 3,
   BARREN_CLEARING: 254,         // una tala de encrucijada no rebrota
+  FLOOD_PRONE_SHIFT: 0.05,      // de clima justo a ruinoso
   PATH_T1: 400, PATH_T2: 1600, PATH_T3: 6000,
   TRAFFIC_DECAY: 0.005,         // por tick
   STONE_PER_BP: 0.5,
