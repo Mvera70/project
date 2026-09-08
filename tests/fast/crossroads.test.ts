@@ -12,11 +12,11 @@ import { foundPeople, ageOf } from '@engine/people/villagers';
 import { isHere, population } from '@engine/people/demography';
 import { adjustOpinion } from '@engine/people/opinions';
 import { remember } from '@engine/people/memories';
-import type { Catalogue, CrossroadTemplate } from '@engine/crossroads/schema';
+import type { AppliedEffects, Catalogue, CrossroadTemplate } from '@engine/crossroads/schema';
 import { all, evaluate, ratioOf, weeksToHarvest } from '@engine/crossroads/conditions';
 import { fillCast } from '@engine/crossroads/cast';
 import { crisisOf, eligible, lastCrossroadTick, selectCrossroad } from '@engine/crossroads/select';
-import { applyOption } from '@engine/crossroads/resolve';
+import { applyEffect, applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds, pendingSeeds } from '@engine/crossroads/seeds';
 
 const CELLS = 36 * 56;
@@ -64,6 +64,11 @@ function village(seed: number, houses = 12): GameState {
 
 const at = (s: GameState, id: VillagerId): Villager =>
   s.people.villagers.find((v) => v.id === id) as Villager;
+
+function emptyEffects(): AppliedEffects {
+  return { templateId: 'test', optionId: 'test', killed: [], arrived: [],
+    seedsPlanted: [], build: [], destroy: [], visible: [] };
+}
 
 /** Una aldea sin crisis ninguna: comida de sobra, líder vivo, nada en llamas. */
 function calm(seed: number): GameState {
@@ -867,6 +872,16 @@ describe('resolución · §8.4', () => {
     const s = posed();
     applyOption(s, 'let_it_lie', [T_FEUD]);
     expect(s.flags['threatened']).toBe(s.tick + 2 * YEAR);
+  });
+
+  it('alarga o acorta una peste una sola vez y nunca antes del tick actual', () => {
+    const s = calm(7);
+    s.tick = 10;
+    s.outbreak = { startedTick: 6, endsTick: 18, deaths: 0 };
+    applyEffect(s, {}, { k: 'outbreak', weeks: 3 }, emptyEffects());
+    expect(s.outbreak.endsTick).toBe(21);
+    applyEffect(s, {}, { k: 'outbreak', weeks: -20 }, emptyEffects());
+    expect(s.outbreak.endsTick).toBe(s.tick);
   });
 
   it('kill mata, marca violence y saca del reparto', () => {

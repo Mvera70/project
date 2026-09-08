@@ -1,8 +1,7 @@
 // M-08 · The sickness. design.md Annex A.5, A.6.
 //
-// The outbreak-length effects of Annex A ("+3 weeks", "−4 weeks") are flags:
-// M-06 owns `state.outbreak` and must read `outbreak_slower` and
-// `outbreak_faster` when it decides how long the sickness runs.
+// Outbreak-length effects alter the active outbreak once, when the answer is
+// taken. A year-long flag would either be inert or apply the same weeks again.
 
 import type { CrossroadTemplate } from '../schema';
 
@@ -33,7 +32,7 @@ export const PLAGUE_PIT: CrossroadTemplate = {
       effects: [
         { k: 'stat', stat: 'faith', delta: 18 },
         { k: 'stat', stat: 'morale', delta: 6 },
-        { k: 'flag', flag: 'outbreak_slower', years: 1 },
+        { k: 'outbreak', weeks: 3 },
         { k: 'build', kind: 'grave_yard', free: true },
       ],
       visible: [{ k: 'raise', kind: 'grave_yard' }],
@@ -46,7 +45,7 @@ export const PLAGUE_PIT: CrossroadTemplate = {
       cost: 'crossroad.plague_pit.the_pit.cost',
       effects: [
         { k: 'stat', stat: 'faith', delta: -20 },
-        { k: 'flag', flag: 'outbreak_faster', years: 1 },
+        { k: 'outbreak', weeks: -3 },
         { k: 'opinion', from: 'A', to: 'B', delta: -40 },
         { k: 'memory', who: 'A', kind: 'was_blamed', about: 'B', weight: 4 },
       ],
@@ -75,7 +74,7 @@ export const PLAGUE_PIT: CrossroadTemplate = {
         // built over, and it was a flag nobody read — the houses were back
         // within the decade and "roofs for ash" cost a few weeks of work.
         { k: 'destroy', kind: 'house', count: 2, blockYears: 20 },
-        { k: 'flag', flag: 'outbreak_faster', years: 1 },
+        { k: 'outbreak', weeks: -4 },
         { k: 'stat', stat: 'morale', delta: -14 },
       ],
       visible: [{ k: 'ruin', kind: 'house' }],
@@ -165,7 +164,7 @@ export const PLAGUE_BLAME: CrossroadTemplate = {
       effects: [
         { k: 'stat', stat: 'morale', delta: -12 },
         { k: 'stat', stat: 'faith', delta: -8 },
-        { k: 'flag', flag: 'outbreak_slower', years: 1 },
+        { k: 'outbreak', weeks: 2 },
       ],
       visible: [{ k: 'gather', where: 'square', days: 4 }],
       seeds: [

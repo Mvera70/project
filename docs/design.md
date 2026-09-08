@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.26 · 8 de septiembre de 2026, 19:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.27 · 8 de septiembre de 2026, 19:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -71,6 +71,23 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.25** | 8 sep 2026, 18:20 | El precio escrito es un contrato | **§8.1, regla nueva.** Auditadas las 48 opciones: 13 mienten y 9 cumplen a medias. La causa es una sola y estructural — **14 banderas que nadie lee**. La horquilla manda sobre el ≥ 25 %. Dos umbrales recalibrados. Experimento de tres dientes: `worst` sube de 3,3 % a 8,3 %, `prudent` no se mueve. |
 | **2.23** | 8 sep 2026, 16:40 | Verificación bajo el mundo corregido | **Los tres ⚠ re-medidos, sin ajustar nada.** A.15 implementado: `last`/`worst` pasan de casi nunca terminar a terminar el 100 %. La horquilla se dispara a 98,3 puntos. El bucle no era la elección — era que no tenía consecuencias; ahora las tiene y ambas políticas la eligen igual, deterministas. |
 | **2.26** | 8 sep 2026, 19:00 | Contrato de A.3 | **Las tres respuestas de `hungry_spring` cobran su precio.** Sembrar fuerza ocho semanas de hambre 0,5; comer o repartir compromete la siguiente siega mediante el mecanismo contado en cosechas de v2.25. |
+| **2.27** | 8 sep 2026, 19:30 | Contrato de A.5/A.6 | **Las decisiones durante una peste cambian su fecha final.** Un efecto explícito suma o resta semanas al brote activo una sola vez; desaparecen las dos banderas anuales que nadie podía leer correctamente. |
+
+### 2.27 — Los días que gana la peste
+
+La duración de un brote ya iniciado no puede expresarse con una bandera de un
+año: leerla cada semana repetiría el ajuste, y leerla al crear el brote llegaría
+demasiado pronto. §8.4 incorpora `{k:'outbreak', weeks}` y la resolución mueve
+`endsTick` una sola vez, sin permitir que retroceda antes del tick actual.
+
+A.5 aplica +3 semanas al bendecir, −3 al abrir la fosa y −4 al quemar las casas.
+A.6 aplica +2 al callar. La prueba de propiedad verifica extensión, reducción y
+el límite temporal. Esta rama no cambia ninguna otra consecuencia de peste.
+
+**Verificación.** TypeScript, ESLint y 556 pruebas ejecutables pasan; quedan dos
+pendientes. `feud_inherited` salió de la muestra rápida tras cambiar estas
+historias, pero sigue apareciendo en el barrido completo de 30 semillas × 150
+años, que pasa íntegro; se clasifica por ello entre las plantillas lentas.
 
 ### 2.26 — Semilla o pan
 
@@ -2375,7 +2392,9 @@ export type Effect =
   | { k: 'arrive'; count: number }
   | { k: 'flag';   flag: string; years: number }   // 0 = permanente
   | { k: 'build';  kind: BuildingKind; free: true }
-  | { k: 'destroy'; kind: BuildingKind; count: number }
+  | { k: 'destroy'; kind: BuildingKind; count: number; blockYears?: number }
+  | { k: 'harvest'; factor: number; harvests: number }
+  | { k: 'outbreak'; weeks: number }
   | { k: 'opinion'; from: string; to: string; delta: number }
   | { k: 'memory'; who: string; kind: MemoryKind; about?: string; weight: number }
   | { k: 'role';   who: string; role: Role | null }

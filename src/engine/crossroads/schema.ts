@@ -105,6 +105,7 @@ export type Effect =
    * del año ×0.55" — and it was implemented as a flag nobody reads.
    */
   | { k: 'harvest'; factor: number; harvests: number }
+  | { k: 'outbreak'; weeks: number }
   | { k: 'opinion'; from: string; to: string; delta: number }
   | { k: 'memory'; who: string; kind: MemoryKind; about?: string; weight: number }
   | { k: 'role'; who: string; role: Role | null }

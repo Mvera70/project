@@ -236,10 +236,13 @@ describe('el catálogo · cobertura rápida', () => {
   let seen: Map<string, number>;
   beforeAll(() => { seen = sweep(12, 100); });
 
-  // Estas cinco necesitan siglos o estados muy concretos y no salen en doce
+  // Estas seis necesitan siglos o estados muy concretos y no salen en doce
   // partidas de cien años. Que no falten de verdad lo comprueba el barrido
   // completo de tests/balance/, no esta prueba.
-  const SLOW = ['plague_blame', 'forest_cut', 'wolf_winter', 'first_stone', 'chapel_or_granary'];
+  const SLOW = [
+    'plague_blame', 'forest_cut', 'wolf_winter', 'first_stone',
+    'chapel_or_granary', 'feud_inherited',
+  ];
 
   it('ninguna plantilla corriente se queda a cero en 12 semillas × 100 años', () => {
     // Contenido muerto: condiciones que no se cumplen nunca. Con dieciséis

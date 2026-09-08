@@ -126,6 +126,11 @@ export function applyEffect(
         ? { factor: e.factor, harvests: e.harvests }
         : { factor: state.harvestModifier.factor, harvests: Math.max(state.harvestModifier.harvests, e.harvests) };
       break;
+    case 'outbreak':
+      if (state.outbreak !== null) {
+        state.outbreak.endsTick = Math.max(state.tick, state.outbreak.endsTick + e.weeks);
+      }
+      break;
     case 'opinion': {
       const from = cast[e.from];
       const to = cast[e.to];
