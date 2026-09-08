@@ -4,6 +4,7 @@ import { TERRAIN_CODE } from '@engine/state';
 import { cellFor } from '@render/canvas';
 import { luminance, outline, PALETTES, paletteFor } from '@render/palette';
 import { regionContours } from '@render/layers/terrain';
+import { BUILDING_SPRITES, NAMED_TONES } from '@render/sprites';
 
 const SILHOUETTES = ['forest', 'meadow', 'field', 'water', 'path'] as const;
 
@@ -51,3 +52,16 @@ describe('M-16 · geometría y regiones', () => {
   });
 });
 
+describe('M-17 · catálogo visual', () => {
+  it('tiene un sprite para cada clase de edificio', () => {
+    expect(Object.keys(BUILDING_SPRITES).sort()).toEqual([
+      'chapel', 'church', 'field', 'granary', 'grave_yard', 'house', 'mill',
+      'palisade', 'smithy', 'stone_house', 'wall', 'watchtower', 'well',
+    ]);
+  });
+
+  it('reserva ocho tonos estables para los personajes nombrados', () => {
+    expect(NAMED_TONES).toHaveLength(8);
+    expect(new Set(NAMED_TONES).size).toBe(8);
+  });
+});

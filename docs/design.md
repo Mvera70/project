@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.50 · 10 de septiembre de 2026, 02:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.51 · 10 de septiembre de 2026, 03:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,12 +89,39 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.51** | 10 sep 2026, 03:10 | M-17 · edificios y figuras | **Las aspas no giran dentro de un fondo inmóvil.** La firma pura no recibe tiempo ni viento y los edificios se cachean; el molino conserva una orientación fija. Trece edificios, ruina y dos figuras dibujados por código, con sombras y contornos. |
 | **2.50** | 10 sep 2026, 02:20 | M-16 · terreno y paletas | **La tabla de color no cumplía su propio test.** Primavera y verano dejaban siluetas a 1–2 puntos; se aplica el menor desplazamiento de luminosidad que garantiza 8, con margen de cuantización. Terreno por regiones, caminos y cuatro estaciones visibles en la hoja de M-19. |
 | **2.49** | 10 sep 2026, 01:35 | M-19 antes del primer píxel | **La captura deja de depender del render.** La ruta de depuración salta a año y estación con política `prudent`; el comando produce 16 vistas móviles, sus 16 versiones grises y una hoja de contacto. M-16 heredará este instrumento ya ejecutable. |
 | **2.48** | 10 sep 2026, 01:00 | Aplicación del cierre | **Las dos puertas decididas en v2.47 están vivas.** En 30 semillas × 150 años, `forest_cut` aparece 268 veces y `relic_pedlar` 49; ninguna de las 17 plantillas queda muda. Suite rápida: 577 pruebas pasan. No se reabre el balance. |
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.51 — Lo inmóvil se cachea; las aspas también
+
+M-17 destapó una contradicción entre tres contratos de §10: los edificios viven
+en el fondo cacheado, el sprite recibe solo contexto, posición, celda, paleta y
+nivel, pero la tabla pedía que las aspas girasen «si hay viento». `GameState` no
+tiene viento, la firma no tiene tiempo y regenerar edificios por fotograma
+rompería precisamente el presupuesto que justifica la caché.
+
+La orientación fija de las cuatro aspas pasa a ser normativa. Si una fase futura
+introduce viento visible, tendrá que separar las aspas en una capa dinámica con
+su propio contrato y presupuesto; M-17 no inventa ese sistema desde una frase
+incompatible.
+
+Los trece tipos de edificio, la ruina, el aldeano y el nombrado se dibujan por
+código. Los edificios en pie reutilizan su propia silueta desplazada para la
+sombra; la fragua solo recibe el punto naranja cuando `lit`; los ocho tonos de
+nombrados son estables por índice. La auditoría de navegador cubre los trece
+edificios a 9 y 10 px sobre blanco y negro: **52 casos**, todos con píxeles y
+ninguno fuera de su caja. Las ocupaciones de casa, capilla, granero y molino son
+cuatro mapas distintos.
+
+**Qué habría falsado la implementación:** una silueta principal confundible,
+un solo píxel fuera de caja, un sprite vacío sobre alguno de los dos fondos o
+una fragua apagada con resplandor. La auditoría automática pasa y la hoja móvil
+muestra las siete familias principales sin etiquetas.
 
 ### 2.50 — La tabla que se veía bien y no se leía
 
@@ -3306,7 +3333,7 @@ Cada uno es una función pura `(ctx, x, y, cell, palette, tier) => void`.
 | `chapel` | Nave baja + espadaña de `0.5×1.2` con una cruz de dos trazos |
 | `church` | Nave larga + torre de `1.0×2.2` |
 | `smithy` | Cobertizo abierto + yunque + **resplandor naranja si `lit`** |
-| `mill` | Torre + aspas de 4 trazos, girando lentamente si hay viento |
+| `mill` | Torre + aspas de 4 trazos en orientación fija. Una animación futura exige capa dinámica, estado de viento y presupuesto propios (§2.51) |
 | `well` | Círculo + arco de dos postes |
 | `palisade` | Serie de trazos verticales de `0.9` de alto con puntas |
 | `wall` | Bloque de `1.0` con almenas cada 2 celdas |
@@ -4456,6 +4483,11 @@ negro y produce píxeles no vacíos en ambos; ningún sprite pinta fuera de su c
 `chapel`, `granary` y `mill` tienen mapas de ocupación distintos entre sí.
 **Terminado cuando.** A tamaño de móvil real se distinguen los siete edificios
 principales sin leer una etiqueta.
+
+**Estado (v2.51): implementado.** Trece clases de edificio, ruina, aldeano y
+nombrado pasan la auditoría de píxeles a 9 y 10 px; la hoja móvil distingue las
+siete familias principales sin rótulos. Las aspas quedan quietas por el contrato
+de caché documentado en §2.51.
 
 ---
 

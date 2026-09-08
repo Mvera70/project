@@ -6,8 +6,9 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState, Season } from '@engine/state';
 import { SEASONS } from '@engine/time';
-import { makeBackground, sizeCanvas } from '@render/canvas';
+import { paintVillageBackground, sizeCanvas } from '@render/canvas';
 import { paletteFor } from '@render/palette';
+import { auditSprites } from '@render/sprites/audit';
 
 export interface DebugRequest {
   seed: number;
@@ -50,7 +51,7 @@ function diagnosticCanvas(root: HTMLElement, state: GameState, request: DebugReq
   const palette = paletteFor(request.season, 6);
   shell.style.background = palette.void;
   ctx.scale(2, 2);
-  ctx.drawImage(makeBackground(state.map, palette, 10), 0, 0);
+  ctx.drawImage(paintVillageBackground(state, palette, 10), 0, 0);
   shell.append(canvas);
   root.append(shell);
 }
@@ -59,5 +60,6 @@ export function mountDebug(root: HTMLElement, request: DebugRequest): GameState 
   const state = stateAt(request);
   diagnosticCanvas(root, state, request);
   document.documentElement.dataset.debugReady = 'true';
+  document.documentElement.dataset.spriteAudit = JSON.stringify(auditSprites());
   return state;
 }
