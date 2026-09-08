@@ -22,3 +22,26 @@ test('cada edificio pinta dentro de su caja a 9 y 10 px sobre claro y oscuro', a
   test.expect(result.spills).toEqual([]);
   test.expect(result.principalShapes).toBe(4);
 });
+
+test('la aplicación abre el valle con año y cuatro velocidades táctiles', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.screenshot({ path: 'artifacts/app-shell.png', fullPage: true });
+  await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
+  await test.expect(page.locator('#valley')).toHaveCSS('height', '560px');
+  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-speeds button')).toHaveCount(4);
+  for (const button of await page.locator('.valley-speeds button').all()) {
+    const box = await button.boundingBox();
+    test.expect(box?.width).toBeGreaterThanOrEqual(44);
+    test.expect(box?.height).toBeGreaterThanOrEqual(44);
+  }
+  await page.getByRole('button', { name: '4×' }).click();
+  await test.expect(page.getByRole('button', { name: '4×' })).toHaveAttribute('aria-pressed', 'true');
+  const spring = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
+  await page.getByRole('button', { name: '16×' }).click();
+  await page.clock.runFor(12_000);
+  const summer = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
+  test.expect(summer).not.toBe(spring);
+});

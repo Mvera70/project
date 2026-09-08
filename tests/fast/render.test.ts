@@ -9,6 +9,8 @@ import { crowdPositions } from '@render/crowd';
 import { foundGame } from '@engine/found';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
+import { advanceAccumulator } from '@ui/loop';
+import { roman } from '@ui/app';
 
 const SILHOUETTES = ['forest', 'meadow', 'field', 'water', 'path'] as const;
 
@@ -102,5 +104,33 @@ describe('M-18 · multitud derivada', () => {
     const started = performance.now();
     for (let i = 0; i < 1_000; i += 1) crowdPositions(state, 0.45);
     expect(performance.now() - started).toBeLessThan(100);
+  });
+});
+
+describe('M-20 · reloj de aplicación', () => {
+  it('a 4× y 60 fps, doce minutos reales producen 192 ticks', () => {
+    let remainder = 0;
+    let ticks = 0;
+    let maximum = 0;
+    for (let frame = 0; frame < 12 * 60 * 60; frame += 1) {
+      const advance = advanceAccumulator(remainder, 1000 / 60, 4);
+      remainder = advance.remainderMs;
+      ticks += advance.ticks;
+      maximum = Math.max(maximum, advance.ticks);
+    }
+    expect(ticks).toBe(192);
+    expect(maximum).toBeLessThanOrEqual(8);
+  });
+
+  it('un fotograma nunca ejecuta más de ocho ticks y conserva la deuda', () => {
+    const advance = advanceAccumulator(0, 10 * 60_000, 16);
+    expect(advance.ticks).toBe(8);
+    expect(advance.remainderMs).toBeGreaterThan(0);
+  });
+
+  it('presenta el año civil en romanos desde ANNO I', () => {
+    expect(roman(1)).toBe('I');
+    expect(roman(4)).toBe('IV');
+    expect(roman(120)).toBe('CXX');
   });
 });
