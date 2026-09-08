@@ -24,6 +24,74 @@ import type { Upgrade } from './upgrade';
 /** A project is either a new building of some kind or a stone upgrade. */
 export type Project = BuildingKind | Upgrade;
 
+interface NoProjectSnapshot {
+  population: number;
+  affordable: number;
+  granaryWanted: boolean;
+  chapelFaith: boolean;
+  threatened: boolean;
+  buildings: string;
+  terrain: Uint8Array;
+}
+
+const NO_PROJECT = new WeakMap<GameState, NoProjectSnapshot>();
+const AUTOMATIC_KINDS = [
+  'field', 'house', 'granary', 'well', 'chapel', 'smithy', 'mill', 'palisade',
+] as const;
+
+function threatenedNow(state: GameState): boolean {
+  const until = state.flags['threatened'];
+  return until !== undefined && (until === 0 || until > state.tick);
+}
+
+function affordableMask(state: GameState): number {
+  let mask = 0;
+  for (let i = 0; i < AUTOMATIC_KINDS.length; i += 1) {
+    if (state.village.wood >= BUILDINGS[AUTOMATIC_KINDS[i]!].wood) mask |= 1 << i;
+  }
+  return mask;
+}
+
+function buildingSignature(state: GameState): string {
+  return state.buildings.map((building) => [
+    building.id, building.kind, building.x, building.y, building.w, building.h,
+    building.lostTick ?? '', building.tier, Number(building.lit),
+  ].join(':')).join('|');
+}
+
+function projectSnapshot(state: GameState): NoProjectSnapshot {
+  return {
+    population: population(state),
+    affordable: affordableMask(state),
+    granaryWanted: count(state, 'granary') < FOOD.MAX_GRANARIES &&
+      state.village.grain > BUILDING_RULES.GRANARY_FULL * storageCapacity(state),
+    chapelFaith: state.village.faith >= BUILDING_RULES.CHAPEL_FAITH,
+    threatened: threatenedNow(state),
+    buildings: buildingSignature(state),
+    terrain: Uint8Array.from(state.map.terrain),
+  };
+}
+
+function sameTerrain(a: Uint8Array, b: GameState['map']['terrain']): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+function noProjectStillApplies(state: GameState): boolean {
+  const previous = NO_PROJECT.get(state);
+  if (previous === undefined) return false;
+  const granaryWanted = count(state, 'granary') < FOOD.MAX_GRANARIES &&
+    state.village.grain > BUILDING_RULES.GRANARY_FULL * storageCapacity(state);
+  return previous.population === population(state) &&
+    previous.affordable === affordableMask(state) &&
+    previous.granaryWanted === granaryWanted &&
+    previous.chapelFaith === (state.village.faith >= BUILDING_RULES.CHAPEL_FAITH) &&
+    previous.threatened === threatenedNow(state) &&
+    previous.buildings === buildingSignature(state) &&
+    sameTerrain(previous.terrain, state.map.terrain);
+}
+
 /**
  * The build points a project costs. §7.2, with the stone rule of v2.12.
  *
@@ -61,9 +129,7 @@ export function canQuarry(state: GameState): boolean {
  */
 export function nextProject(state: GameState): Project | null {
   const people = population(state);
-  const threatenedUntil = state.flags['threatened'];
-  const threatened = threatenedUntil !== undefined &&
-    (threatenedUntil === 0 || threatenedUntil > state.tick);
+  const threatened = threatenedNow(state);
 
   const neededFields = Math.ceil(
     (people * 48 * FOOD.NEEDED_FIELDS_MARGIN) / FOOD.FIELD_YIELD,
@@ -216,9 +282,13 @@ function complete(state: GameState, work: ConstructionWork): BuiltEvent {
  * around for a tick after deciding.
  */
 export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[] {
-  if (state.works.length === 0) {
+  if (state.works.length === 0 && !noProjectStillApplies(state)) {
     const project = nextProject(state);
-    if (project !== null) open(state, project);
+    if (project === null) NO_PROJECT.set(state, projectSnapshot(state));
+    else {
+      NO_PROJECT.delete(state);
+      open(state, project);
+    }
   }
 
   let left = Math.max(0, buildPoints);

@@ -46,10 +46,57 @@ function edgeDistance(point: Point, a: Point, b: Point): number {
 /** Cell centres in the outermost one-cell band of the dilated convex hull. */
 function onEnvelope(point: Point, hull: Point[]): boolean {
   if (hull.length < 3) return false;
-  const edges = hull.map((a, i) => [a, hull[(i + 1) % hull.length]!] as const);
-  if (edges.every(([a, b]) => cross(a, b, point) >= 0)) return false;
-  const d = Math.min(...edges.map(([a, b]) => edgeDistance(point, a, b)));
+  let inside = true;
+  let d = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < hull.length; i += 1) {
+    const a = hull[i]!;
+    const b = hull[(i + 1) % hull.length]!;
+    if (cross(a, b, point) < 0) inside = false;
+    d = Math.min(d, edgeDistance(point, a, b));
+  }
+  if (inside) return false;
   return d > BUILDING_RULES.PALISADE_DILATION - 1 && d <= BUILDING_RULES.PALISADE_DILATION;
+}
+
+function occupiedCells(state: GameState): Uint8Array {
+  const occupied = new Uint8Array(state.map.terrain.length);
+  const mark = (rect: Rect): void => {
+    for (let y = rect.y; y < rect.y + rect.h; y += 1) {
+      for (let x = rect.x; x < rect.x + rect.w; x += 1) occupied[y * state.map.width + x] = 1;
+    }
+  };
+  for (const building of state.buildings) {
+    if (building.lostTick === null || building.tier === 1) mark(building);
+  }
+  for (const work of state.works) mark(work);
+  return occupied;
+}
+
+function fitsEmptyGround(
+  state: GameState,
+  kind: BuildingKind,
+  x: number,
+  y: number,
+  occupied: Uint8Array,
+): boolean {
+  const { w, h } = BUILDINGS[kind];
+  for (let row = y; row < y + h; row += 1) {
+    for (let col = x; col < x + w; col += 1) {
+      const cell = row * state.map.width + col;
+      const tile = state.map.terrain[cell];
+      if (occupied[cell] !== 0 || tile === TERRAIN_CODE.water || tile === TERRAIN_CODE.marsh) return false;
+      if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
+    }
+  }
+  return true;
+}
+
+function lowerScore(candidate: number[], incumbent: number[]): boolean {
+  for (let i = 0; i < candidate.length; i += 1) {
+    if (candidate[i]! < incumbent[i]!) return true;
+    if (candidate[i]! > incumbent[i]!) return false;
+  }
+  return false;
 }
 
 /**
@@ -61,6 +108,13 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   const live = state.buildings.filter((b) => b.lostTick === null);
   const houses = live.filter((b) => b.kind === 'house' || b.kind === 'stone_house');
   const fields = live.filter((b) => b.kind === 'field');
+  const occupied = occupiedCells(state);
+  const fieldCells = new Uint8Array(state.map.terrain.length);
+  for (const field of fields) {
+    for (let y = field.y; y < field.y + field.h; y += 1) {
+      for (let x = field.x; x < field.x + field.w; x += 1) fieldCells[y * state.map.width + x] = 1;
+    }
+  }
   const centre = houses.length === 0 ? { x: state.map.width / 2, y: state.map.height / 2 }
     : { x: houses.reduce((n, b) => n + center(b).x, 0) / houses.length, y: houses.reduce((n, b) => n + center(b).y, 0) / houses.length };
   const hull = convexHull(houses.flatMap((b) => [{ x: b.x, y: b.y }, { x: b.x + b.w, y: b.y },
@@ -76,22 +130,27 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   let bestScore: number[] | null = null;
   const spec = BUILDINGS[kind];
   for (let y = 0; y <= state.map.height - spec.h; y += 1) for (let x = 0; x <= state.map.width - spec.w; x += 1) {
-    if (!canPlace(state, kind, x, y)) continue;
+    if (!fitsEmptyGround(state, kind, x, y, occupied)) continue;
     const rect = { x, y, w: spec.w, h: spec.h };
     const p = center(rect);
     if (kind === 'palisade' && !onEnvelope(p, hull)) continue;
-    const adjacent: number[] = [];
+    let river = false;
+    let touchesForest = false;
+    let path = false;
+    let touchesField = false;
     for (let row = y - 1; row <= y + spec.h; row += 1) for (let col = x - 1; col <= x + spec.w; col += 1) {
       if (row < 0 || col < 0 || row >= state.map.height || col >= state.map.width) continue;
       if ((row === y - 1 || row === y + spec.h) && col >= x && col < x + spec.w ||
-        (col === x - 1 || col === x + spec.w) && row >= y && row < y + spec.h) adjacent.push(row * state.map.width + col);
+        (col === x - 1 || col === x + spec.w) && row >= y && row < y + spec.h) {
+        const cell = row * state.map.width + col;
+        river ||= state.map.terrain[cell] === TERRAIN_CODE.water;
+        touchesForest ||= state.map.terrain[cell] === TERRAIN_CODE.forest;
+        path ||= (state.map.path[cell] ?? 0) > 0;
+        touchesField ||= fieldCells[cell] !== 0;
+      }
     }
-    const river = adjacent.some((i) => state.map.terrain[i] === TERRAIN_CODE.water);
-    const touchesForest = adjacent.some((i) => state.map.terrain[i] === TERRAIN_CODE.forest);
-    const path = adjacent.some((i) => (state.map.path[i] ?? 0) > 0);
     const houseDistance = houses.length === 0 ? Number.POSITIVE_INFINITY : Math.min(...houses.map((h) => distance(p, center(h))));
     const fieldDistance = fields.length === 0 ? Number.POSITIVE_INFINITY : Math.min(...fields.map((f) => distance(p, center(f))));
-    const touchesField = fields.some((f) => adjacent.some((i) => i % state.map.width >= f.x && i % state.map.width < f.x + f.w && Math.floor(i / state.map.width) >= f.y && Math.floor(i / state.map.width) < f.y + f.h));
     const rock = state.map.terrain[y * state.map.width + x] === TERRAIN_CODE.rock;
     let score: number[];
     switch (kind) {
@@ -114,7 +173,7 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       case 'smithy': score = [rimOffset(p, 0), -houseDistance]; break;
       default: score = [distance(p, centre)];
     }
-    if (bestScore === null || score.some((v, i) => v < bestScore![i]! && score.slice(0, i).every((n, j) => n === bestScore![j]))) {
+    if (bestScore === null || lowerScore(score, bestScore)) {
       best = { x, y }; bestScore = score;
     }
   }

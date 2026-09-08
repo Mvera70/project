@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.19 · 8 de septiembre de 2026, 13:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.20 · 8 de septiembre de 2026, 13:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -48,6 +48,45 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.17** | 8 sep 2026, 12:00 | Puerta de migración | **`prudent` deja de sobrevalorar el ánimo**: su peso baja de 15 a 3. La agonía se mide por la racha consecutiva más larga, igual que la regla de abandono. La puerta de ocho habitantes se somete a un A/B antes de tocarla. |
 | **2.18** | 8 sep 2026, 12:30 | Expiración de la peste | **Un brote dura 6–10 semanas también para el ánimo y para la siguiente tirada anual.** Un objeto `outbreak` vencido se estaba tratando como peste perpetua: hundía el ánimo hasta el suelo de fe e impedía cualquier brote posterior. |
 | **2.19** | 8 sep 2026, 13:00 | Rendimiento de M-12 | **Los caminos dejan de recorrer 2.016 celdas inertes cada semana.** Un conjunto derivado conserva solo celdas con tráfico o camino; no forma parte del estado ni del guardado y mantiene el orden observable de los eventos. |
+| **2.20** | 8 sep 2026, 13:30 | Rendimiento de M-14 | **Un fracaso de colocación se recuerda mientras sus causas sigan iguales y cada búsqueda construye una sola máscara de ocupación.** El banco vuelve a entrar en diez minutos sin perder observaciones. |
+
+### 2.20 — El solar que no aparece por insistir
+
+Cuando `nextProject` no encuentra nada que construir, `advanceWorks` repetía la
+misma búsqueda completa la semana siguiente. En un valle lleno, cada intento
+recorre hasta 2.016 posiciones para cada edificio deseado y después vuelve a
+probar todas las mejoras. El perfil de v2.19 señala esta repetición como el coste
+dominante del banco.
+
+**Regla de caché.** Solo se recuerda el resultado nulo y solo dentro de la misma
+partida. Se invalida si cambia la población viva, qué costes de madera pueden
+pagarse, la puerta de granero, la de fe, el estado efectivo de `threatened`, la
+descripción completa de los edificios o cualquier celda del terreno. Las rutas
+no invalidan un fracaso: alteran cuál es el mejor solar entre los válidos, pero
+no convierten un mapa sin solar en uno edificable. La caché es derivada, vive en
+un `WeakMap` y no entra en el estado serializado.
+
+**Criterio.** El banco debe conservar exactamente sus resultados de v2.18 y
+bajar de forma material los 201,59 s de las 60 semillas `prudent`. Una prueba de
+propiedad debe demostrar que una puerta que se abre después de un fracaso inicia
+la obra; no se comprueba la existencia interna de la caché.
+
+**Resultado focalizado.** Además del recuerdo de resultados nulos,
+`placeBuilding` construye una sola máscara de ocupación por búsqueda, marca las
+celdas de campo una vez y evalúa la envolvente sin crear listas por candidato.
+Son las mismas reglas y los mismos desempates. Las 60 semillas `prudent` tardan
+aproximadamente 67,6 s, frente a 201,59 s, y repiten exactamente 1/60 partidas
+terminadas, pico mediano 83 y 58/60 mapas llenos antes del año 120. La suite
+rápida pasa 525 pruebas, con dos pendientes, en 11,92 s.
+
+**Resultado completo: presupuesto recuperado.** El banco de 60 semillas × 200
+años × cuatro políticas, incluidas las ramas de choque, tarda 536,90 s frente a
+1.143,63 s en v2.18. Conserva exactamente todas las métricas de aquella versión,
+con cero estados inválidos y cero fallos de geometría. Sus diez asertos rojos
+son los límites de balance ya abiertos: pico y extinción marginales de
+`prudent`, elegibilidad de `smith_feud`, cadencia y elegibilidad de `succession`
+en `last`/`worst`, y la escasa mortalidad y horquilla de la política adversa.
+M-12 vuelve a cumplir su presupuesto sin reducir la muestra.
 
 ### 2.19 — El coste de andar
 

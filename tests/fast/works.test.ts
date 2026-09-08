@@ -163,6 +163,21 @@ describe('prioridad de construcción · §7.3', () => {
     s.village.wood = BUILDINGS.house.wood;
     expect(nextProject(s)).toBe('house');
   });
+
+  it('vuelve a buscar cuando se abre una puerta después de no hallar proyecto', () => {
+    const s = raise(foundGame(7), 'field', 1);
+    s.village.wood = 0;
+    advanceWorks(s, 0);
+    expect(s.works).toHaveLength(0);
+
+    // Una segunda semana idéntica sigue sin obra. Al poder pagar la casa, el
+    // cambio de estado debe invalidar cualquier resultado nulo recordado.
+    advanceWorks(s, 0);
+    s.village.wood = BUILDINGS.house.wood;
+    advanceWorks(s, 0);
+    expect(s.works).toHaveLength(1);
+    expect(s.works[0]?.kind).toBe('house');
+  });
 });
 
 describe('mejoras a piedra · §7.3 punto 9', () => {
