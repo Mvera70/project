@@ -62,6 +62,13 @@ describe('el catálogo · forma', () => {
     expect(edge?.effects).toContainEqual({ k: 'flag', flag: 'forced_hunger', years: 1 / 48 });
   });
 
+  it('A.11 abre la puerta mientras queda más del doce por ciento de bosque', () => {
+    const forest = CATALOG.find((t) => t.id === 'forest_cut');
+    expect(forest?.requires).toContainEqual({
+      k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.12,
+    });
+  });
+
   it('elegir la muralla deja veinte años de casas frías', () => {
     const wall = CATALOG.find((t) => t.id === 'first_stone')
       ?.options.find((o) => o.id === 'the_wall');

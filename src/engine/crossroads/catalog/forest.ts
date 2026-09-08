@@ -17,7 +17,7 @@ export const FOREST_CUT: CrossroadTemplate = {
   weight: 9,
   cooldownYears: 15,
   requires: [
-    { k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.3 },
+    { k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.12 },
     { k: 'stat', stat: 'people', op: '>', v: 25 },
   ],
   cast: [{ as: 'A', role: 'woodward' }],
