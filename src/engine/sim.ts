@@ -20,6 +20,7 @@ import type {
   Building,
   ChronicleEntry,
   Decision,
+  DecisionRecord,
   DeathEvent,
   GameState,
   PathEvent,
@@ -279,14 +280,58 @@ function immediateCost(state: GameState, catalogue: Catalogue, optionId: string)
 }
 
 /** Pick an option according to the policy. */
+/**
+ * §12.9's non-degeneracy rule, v2.24. Mandatory in all four measured policies.
+ *
+ * If the same option was chosen on the **two** previous appearances of this
+ * template, it is off the table this time, provided there is anything else to
+ * take. Nothing else about the policy changes: it picks as it always did, from
+ * what is left.
+ *
+ * This corrects the instrument, not the game. Measured in v2.23, `last` and
+ * `worst` answered `succession:no_one` 178 times out of 178 — `last` because it
+ * is the last option written, `worst` because its immediate cost is the highest
+ * — and 68.2 % of every decision they made went to that one option. Both
+ * adverse thresholds of §12.9 then "passed" while measuring a single option
+ * instead of the game, which is worse than failing: an assertion that passes
+ * for the wrong reason has stopped warning anybody. Neither policy looks past
+ * the current week, so neither can ever see the cost of repeating. A player who
+ * plays badly does not pick the same thing a hundred and seventy-eight times.
+ *
+ * The bar is on the option, not on the policy's reasoning, so it reads the same
+ * for all four and cannot depend on which one is asking.
+ */
+function withoutRepeats(state: GameState, options: readonly string[]): readonly string[] {
+  const templateId = state.crossroad?.templateId;
+  if (templateId === undefined || options.length < 2) return options;
+
+  // `history` holds what was decided before this tick: `applyOption` appends in
+  // step 3, and this runs before it.
+  const past = state.history.filter((d) => d.templateId === templateId);
+  if (past.length < 2) return options;
+
+  const last = past[past.length - 1] as DecisionRecord;
+  const before = past[past.length - 2] as DecisionRecord;
+  if (last.optionId !== before.optionId) return options;
+
+  const rest = options.filter((id) => id !== last.optionId);
+  // A template with one option left cannot be varied, and being unable to obey
+  // the rule is not a reason to stop answering the question.
+  return rest.length > 0 ? rest : options;
+}
+
 export function decide(
   state: GameState,
   catalogue: Catalogue,
   policy: Policy,
 ): string | null {
-  const options = state.crossroad?.optionIds ?? [];
-  if (options.length === 0) return null;
-  if (typeof policy === 'function') return policy(state, options);
+  const all = state.crossroad?.optionIds ?? [];
+  if (all.length === 0) return null;
+  // A function policy is the caller's own reasoning and is left alone; `random`
+  // does not degenerate, and barring an option would make it less random rather
+  // than more representative.
+  if (typeof policy === 'function') return policy(state, all);
+  const options = policy === 'random' ? all : withoutRepeats(state, all);
 
   switch (policy) {
     case 'first':
@@ -300,7 +345,9 @@ export function decide(
       let cost = immediateCost(state, catalogue, worst);
       for (const id of options.slice(1)) {
         const c = immediateCost(state, catalogue, id);
-        if (c > cost) {
+        // Ties break on the id, as prudent's have since v2.13: the order the
+        // options happen to be written in must not move a balance number.
+        if (c > cost || (c === cost && id < worst)) {
           cost = c;
           worst = id;
         }

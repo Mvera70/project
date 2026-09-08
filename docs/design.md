@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.23 · 8 de septiembre de 2026, 16:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.24 · 8 de septiembre de 2026, 13:54 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -67,7 +67,78 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.20** | 8 sep 2026, 13:30 | Rendimiento de M-14 | **Un fracaso de colocación se recuerda mientras sus causas sigan iguales y cada búsqueda construye una sola máscara de ocupación.** El banco vuelve a entrar en diez minutos sin perder observaciones. |
 | **2.21** | 8 sep 2026, 14:00 | Atribución de política | **La brecha adversa se mide por opción tomada.** Antes de cambiar A.15 se separa la repetición de `succession:no_one` del resto de decisiones de `last` y `worst`. |
 | **2.22** | 8 sep 2026, 15:10 | El problema invertido | **Quedarse sin líder duele**: sin llegadas, marchas dobles y dispersión al tercer rechazo. Aviso de contaminación sobre las entradas medidas bajo la peste perpetua. Las bandas miden «partida terminada». |
+| **2.24** | 8 sep 2026, 13:54 | El instrumento, no el juego | **Regla de no degeneración en las cuatro políticas.** Los dos umbrales adversos de la v2.23 pasan midiendo una sola opción: no valen. `hostile` inalcanzable para `prudent` es correcto. `MIN_FIELD_CREW` queda como invariante inerte. |
 | **2.23** | 8 sep 2026, 16:40 | Verificación bajo el mundo corregido | **Los tres ⚠ re-medidos, sin ajustar nada.** A.15 implementado: `last`/`worst` pasan de casi nunca terminar a terminar el 100 %. La horquilla se dispara a 98,3 puntos. El bucle no era la elección — era que no tenía consecuencias; ahora las tiene y ambas políticas la eligen igual, deterministas. |
+
+### 2.24 — El instrumento, no el juego
+
+- **§12.9 · Regla de no degeneración en las cuatro políticas.** El hallazgo de la
+  ronda: `last` y `worst` contestan `succession:no_one` **178 de 178 veces**, y
+  el 68,2 % de todas sus decisiones va a esa única opción. Con las consecuencias
+  de la v2.22 eso las lleva al 100 % de terminaciones y a una horquilla de 98,3
+  puntos — **así que los dos umbrales adversos de §12.9 “pasan” midiendo una sola
+  opción en vez del juego.** Un aserto que pasa por el motivo equivocado es peor
+  que uno que falla: deja de avisar. Ninguna de las dos políticas mira más allá
+  de la semana en curso, así que jamás ve el coste diferido de repetir. **Un
+  jugador que elige mal no elige lo mismo ciento setenta y ocho veces.** La regla
+  —no repetir una opción elegida en las dos apariciones anteriores de su
+  plantilla— corrige el instrumento y no toca el juego. Las cifras adversas de la
+  v2.23 quedan **anuladas** hasta volver a medirlas con ella.
+- **§12.9 · `hostile` inalcanzable para `prudent` es correcto**, no un defecto.
+  Un castigo que el juego prudente no alcanza es un castigo que funciona. Lo
+  traté como contenido muerto durante dos revisiones y me equivoqué; el peso del
+  ánimo en 3 se queda, pero por su propio motivo.
+- **§12.3 · `MIN_FIELD_CREW` es un invariante inerte**, y así queda escrito:
+  ninguna partida bajó nunca de 2,13 adultos por campo. Se conserva porque es
+  correcto y barato, no porque haga trabajo.
+- **§5.7 · El abandono se queda.** Dispara 1 de 60 con `prudent` y 4 de 60 con
+  las adversas: es un final poco frecuente y en la dirección correcta, no una red
+  que sostenga el balance.
+
+**Medido con la regla en pie (M-21).** 60 semillas × 200 años, las cuatro
+políticas, 560,6 s de los 600 del presupuesto. Nada ajustado.
+
+| Métrica | `prudent` | `first` | `last` | `worst` | Umbral |
+|---|---:|---:|---:|---:|---|
+| Partidas terminadas | 1,7 % | 1,7 % | 8,3 % | **3,3 %** | 2–12 % / ≥ 25 % |
+| Horquilla `worst`−`prudent` | | | | **1,7 pts** | ≥ 20 |
+| Decisiones en una sola opción | 22,2 % | 23,8 % | 39,9 % | **41,1 %** | < 40 % |
+| Cadencia por generación | 3,82 | 3,81 | 4,12 | 4,15 | 1–5 |
+| Cadencia máxima | 5,60 | 5,20 | 5,50 | 5,50 | ≤ 7 |
+| Mediana del pico | **83** | 83 | 81 | 81 | 65–82 |
+| Mapas llenos < año 120 | 95,0 % | 96,7 % | 70,0 % | 71,7 % | ≥ 60 % |
+| Rangos / geometría | 0/0 | 0/0 | 0/0 | 0/0 | 0 |
+
+**La regla funciona: el instrumento ya mide el catálogo.** `last` y `worst`
+pasan de 8 opciones distintas cada una en la v2.23 a 22 y 21, y de 261
+decisiones a 2.361 y 2.465 — comparables a las 2.288 de `prudent`. La cadencia
+entra en banda en las cuatro, y el máximo baja de 9,37 a 5,50. `succession:no_one`
+cae del 68,2 % al 39,9 % en `last` y al 41,1 % en `worst`, que es **justo el
+techo estructural que la regla permite**: dos de cada tres apariciones de una
+plantilla que supone el 60 % de sus decisiones.
+
+**Y con el instrumento arreglado, las dos puertas se abren.**
+
+1. **`worst` termina el 3,3 % de las partidas, contra el 25 % que exige §12.9.**
+   No es que no tome opciones duras: toma `bandits:fight_them` 218 veces en 58
+   valles, `strangers_at_the_ford:turn_them_away` 211, `hungry_spring:sow_it` 80,
+   `winter_grain_debt:refuse` 66, `first_stone:the_wall` 58,
+   `plague_pit:burn_the_houses` 34. Las toma, y la aldea sobrevive igual: mediana
+   de población final de los supervivientes, 62. **El catálogo no tiene dientes**,
+   y ahora está medido con la atribución por opción delante, no supuesto.
+2. **`prudent` termina el 1,7 %, por debajo del 2 % de la banda.** Al filo, como
+   estaba, y ahora al otro lado. La horquilla entre jugar bien y jugar mal es de
+   **1,7 puntos**: el principio 2 de `valle.md` sigue sin cumplirse, y el 98,3 de
+   la v2.23 era el artefacto que esta regla vino a borrar.
+
+**Lo que no llega, además.** El pico mediano de `prudent` es 83 contra el techo
+de 82 — un habitante—, `worst` se pasa del 40 % por una décima, y `smith_feud`
+sigue por encima del 1 % de elegibilidad con `prudent` (1,69 %) y `first`
+(1,38 %), como desde la v2.20. Ninguna de las tres se ha tocado.
+
+**Coste.** El banco sube de 352,8 s a 560,6 s: las partidas adversas ya no se
+dispersan en el año 25, así que casi todas llegan a los 200 años. Sigue dentro
+de los 600 s de §14.2, con menos margen del que había.
 
 ### 2.23 — Verificación bajo el mundo corregido
 
@@ -2637,6 +2708,9 @@ export const FOOD = {
   FIELD_YIELD: 600,             // por campo, cosecha completa
   FIELD_CREW: 4,                // adultos para trabajar un campo entero
   MIN_FIELD_CREW: 2,            // por debajo, el campo NO rinde nada (§5.2)
+                                // INERTE por medición (v2.24): ninguna partida
+                                // bajó nunca de 2,13 adultos por campo. Se
+                                // conserva como invariante, no como mecánica.
   MAX_FIELDS: 8,
   BASE_STORAGE: 800,
   GRANARY_CAPACITY: 650,
@@ -2804,6 +2878,24 @@ empalizada y toda plantilla cuyo interruptor sea una obra del jugador se queda
 encendida para siempre. `last` toma la desafiante y `worst` la peor. Las tres son
 cotas, no medidas.
 
+**Regla de no degeneración, obligatoria en las CUATRO políticas.** Si la misma
+opción se ha elegido en las **dos** apariciones anteriores de esa plantilla, la
+política debe elegir otra distinta si existe. Sin esta regla, `last` y `worst`
+son discos rayados y no miden el catálogo: medido en v2.23, contestan
+`succession:no_one` **178 de 178 veces** —`last` porque es la última de la lista,
+`worst` porque su coste inmediato es mayor— y el 68,2 % de todas sus decisiones
+va a esa sola opción.
+
+Ese es el motivo de que sus cifras de la v2.23 no valgan: terminan el 100 % y la
+horquilla sale de 98,3 puntos, así que **los dos umbrales de esta tabla “pasan”
+midiendo una única opción en vez del juego.** Un aserto que pasa por el motivo
+equivocado es peor que uno que falla, porque deja de avisar.
+
+La raíz es que ninguna de las dos mira más allá de la semana en curso, así que
+jamás ven el coste diferido de repetir. **Un jugador que elige mal no elige lo
+mismo ciento setenta y ocho veces**, y una política que sí lo hace no representa
+a nadie. La regla no cambia el juego: corrige el instrumento.
+
 **`prudent` es la política de referencia.** Sin lookahead y determinista: puntúa
 cada opción disponible como
 
@@ -2818,6 +2910,15 @@ muertos. La primera versión ponía las muertes en la misma suma que el grano, c
 lo que una vida quedaba tasada en cuarenta fanegas y había opciones donde salía a
 cuenta — medido, `prudent` moría de violencia tres veces más que `first`. Un
 aldeano cauto no cambia vidas por grano a ningún precio.
+
+**`hostile` fuera del alcance de `prudent` no es contenido muerto (v2.24).**
+Medido dos veces: `prudent` y `first` nunca la activan; `last` y `worst` la
+activan en 36 y 34 partidas de 60. Eso es exactamente lo que debe pasar. La mala
+reputación es el castigo de echar a la gente del vado, y **un castigo que el
+juego prudente no alcanza es un castigo que funciona**, no uno que sobra. Lo
+traté como defecto durante dos revisiones y no lo era. El peso del ánimo en 3 se
+mantiene, pero por su propio motivo —un aldeano cauto valora el granero lleno por
+encima del buen humor—, no por esto.
 
 No pretende ser juego óptimo —no lo es— sino **un aldeano cauto**: el suelo por debajo del cual ningún jugador razonable debería caer. Las
 bandas de esta tabla se miden con ella; las otras tres se informan al lado para
@@ -2835,7 +2936,7 @@ que medir con una política que no se arruine sola.
 | **Partida terminada** (abandono o extinción) | 2 % – 12 % | `prudent` |
 | **Partida terminada** | ≥ 25 % | `worst` |
 | Horquilla entre `prudent` y `worst` | ≥ 20 puntos | — |
-| Decisiones de `last`/`worst` dedicadas a una sola opción | < 40 % | atribución por opción. **Medido (v2.23): sigue fallando, 68,2 % en las dos** — `succession:no_one`, todas las veces que se pregunta, sin excepción. Ver §2.23 y Anexo A.15. |
+| Decisiones de `last`/`worst` dedicadas a una sola opción | < 40 % | atribución por opción. **Cuando falla, se arregla la POLÍTICA, no el juego** (§12.9, regla de no degeneración). Medido en v2.23: 68,2 % en ambas, siempre `succession:no_one`. |
 | Mediana del pico de población | 65 – 82 | `prudent` |
 | Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas | `prudent` |
 | Población visible al final de la primera generación | ≥ 26 en la mediana | `prudent` |

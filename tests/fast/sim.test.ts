@@ -748,3 +748,146 @@ describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
     expect(s.noOneStreak).toBe(0);
   });
 });
+
+describe('la regla de no degeneración · §12.9, v2.24', () => {
+  // Una plantilla de sonda con tres opciones y ninguna consecuencia: lo que se
+  // mide es a quién elige la política, no qué pasa después.
+  const PROBE: CrossroadTemplate = {
+    id: 'probe', category: 'lord', weight: 1, cooldownYears: 0,
+    requires: [], cast: [],
+    title: 'crossroad.probe.title', body: 'crossroad.probe.body',
+    options: ['alpha', 'beta', 'gamma'].map((id, i) => ({
+      id,
+      label: `crossroad.probe.${id}.label`,
+      cost: `crossroad.probe.${id}.cost`,
+      // Costes distintos y crecientes, para que `worst` y `prudent` tengan una
+      // preferencia clara y no elijan por casualidad.
+      effects: [{ k: 'stat', stat: 'morale', delta: -(i + 1) * 5 }],
+      visible: [{ k: 'gather', where: 'square', days: 1 }],
+      seeds: [],
+    })) as CrossroadTemplate['options'],
+  };
+
+  /** Veinte apariciones seguidas de la misma plantilla, anotando la elegida. */
+  function twentyAsks(policy: 'first' | 'last' | 'worst' | 'prudent'): string[] {
+    const s = foundGame(7);
+    const taken: string[] = [];
+    for (let i = 0; i < 20; i += 1) {
+      s.crossroad = {
+        templateId: PROBE.id, posedTick: s.tick, cast: {},
+        optionIds: PROBE.options.map((o) => o.id),
+      };
+      const chosen = decide(s, [PROBE], policy);
+      expect(chosen).not.toBeNull();
+      taken.push(chosen as string);
+      // Lo que `applyOption` haría en el paso 3: dejar constancia. La regla lee
+      // el historial, así que sin esto no hay apariciones anteriores.
+      s.history.push({ tick: s.tick, templateId: PROBE.id, optionId: chosen as string, cast: {} });
+      s.tick += 1;
+      s.crossroad = null;
+    }
+    return taken;
+  }
+
+  for (const policy of ['first', 'last', 'worst', 'prudent'] as const) {
+    it(`${policy} no elige lo mismo más de dos veces seguidas`, () => {
+      const taken = twentyAsks(policy);
+      expect(taken).toHaveLength(20);
+      for (let i = 2; i < taken.length; i += 1) {
+        const three = [taken[i - 2], taken[i - 1], taken[i]];
+        expect(new Set(three).size, `en la posición ${i}: ${three.join(', ')}`)
+          .toBeGreaterThan(1);
+      }
+    });
+
+    it(`${policy} sigue siendo determinista`, () => {
+      expect(twentyAsks(policy)).toEqual(twentyAsks(policy));
+    });
+  }
+
+  it('sin dos apariciones previas iguales, la política elige como siempre', () => {
+    const s = foundGame(7);
+    s.crossroad = {
+      templateId: PROBE.id, posedTick: s.tick, cast: {},
+      optionIds: PROBE.options.map((o) => o.id),
+    };
+    // Primera vez: no hay historial que mirar.
+    expect(decide(s, [PROBE], 'first')).toBe('alpha');
+    expect(decide(s, [PROBE], 'last')).toBe('gamma');
+    // Una sola repetición no basta: hacen falta las dos anteriores.
+    s.history.push({ tick: 0, templateId: PROBE.id, optionId: 'alpha', cast: {} });
+    expect(decide(s, [PROBE], 'first')).toBe('alpha');
+  });
+
+  it('el historial de otra plantilla no cuenta', () => {
+    const s = foundGame(7);
+    s.crossroad = {
+      templateId: PROBE.id, posedTick: s.tick, cast: {},
+      optionIds: PROBE.options.map((o) => o.id),
+    };
+    for (let i = 0; i < 2; i += 1) {
+      s.history.push({ tick: i, templateId: 'otra', optionId: 'alpha', cast: {} });
+    }
+    expect(decide(s, [PROBE], 'first')).toBe('alpha');
+  });
+
+  it('con una sola opción, la regla no puede aplicarse y no lo intenta', () => {
+    // Que no se pueda variar no es motivo para dejar de contestar la pregunta.
+    const single: CrossroadTemplate = {
+      ...PROBE,
+      id: 'single',
+      options: [PROBE.options[0] as CrossroadTemplate['options'][number]],
+    };
+    const s = foundGame(7);
+    s.crossroad = {
+      templateId: single.id, posedTick: s.tick, cast: {},
+      optionIds: ['alpha'],
+    };
+    for (let i = 0; i < 2; i += 1) {
+      s.history.push({ tick: i, templateId: single.id, optionId: 'alpha', cast: {} });
+    }
+    expect(decide(s, [single], 'first')).toBe('alpha');
+    expect(decide(s, [single], 'worst')).toBe('alpha');
+  });
+
+  it('`random` se queda fuera: no degenera, y vetarle una opción la haría menos aleatoria', () => {
+    const s = foundGame(7);
+    s.crossroad = {
+      templateId: PROBE.id, posedTick: s.tick, cast: {},
+      optionIds: PROBE.options.map((o) => o.id),
+    };
+    for (let i = 0; i < 2; i += 1) {
+      s.history.push({ tick: i, templateId: PROBE.id, optionId: 'alpha', cast: {} });
+    }
+    // Con el flujo en este punto la tirada da 'alpha', y la regla no la veta.
+    const rng = { ...s.rng };
+    const chosen = decide(s, [PROBE], 'random');
+    expect(PROBE.options.map((o) => o.id)).toContain(chosen);
+    // Y sigue consumiendo exactamente una tirada del flujo 'crossroads'.
+    const after = { ...s.rng };
+    expect(after.crossroads).not.toBe(rng.crossroads);
+    expect({ ...after, crossroads: rng.crossroads }).toEqual(rng);
+  });
+
+  it('en una partida real ninguna política repite tres veces seguidas', () => {
+    for (const policy of ['first', 'last', 'worst', 'prudent'] as const) {
+      const s = foundGame(11);
+      run(s, 200 * YEAR, policy, CATALOG);
+      const byTemplate = new Map<string, string[]>();
+      for (const d of s.history) {
+        const taken = byTemplate.get(d.templateId) ?? [];
+        taken.push(d.optionId);
+        byTemplate.set(d.templateId, taken);
+      }
+      for (const [templateId, taken] of byTemplate) {
+        for (let i = 2; i < taken.length; i += 1) {
+          const three = [taken[i - 2], taken[i - 1], taken[i]];
+          // Salvo que la plantilla no tenga con qué variar.
+          const template = CATALOG.find((t) => t.id === templateId);
+          if ((template?.options.length ?? 1) < 2) continue;
+          expect(new Set(three).size, `${policy}/${templateId} en ${i}`).toBeGreaterThan(1);
+        }
+      }
+    }
+  });
+});
