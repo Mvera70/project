@@ -6,10 +6,8 @@ import type { CrossroadTemplate } from '../schema';
  * A.3 · Seed or bread. The grain in the barn is the same grain either way, and
  * that is the whole decision.
  *
- * The harvest multipliers of Annex A are carried as flags: M-06 owns the
- * harvest, and a crossroad has no business reaching into its formula. M-06 must
- * read `lean_harvest` (×0.55) and `half_harvest` (×0.78) in `harvest()`, and
- * `forced_hunger` in `consume()`.
+ * Harvest promises use §8.4's harvest effect and are spent by the next reaping.
+ * `forced_hunger` remains a short flag because it changes eight weekly meals.
  */
 export const HUNGRY_SPRING: CrossroadTemplate = {
   id: 'hungry_spring',
@@ -32,7 +30,7 @@ export const HUNGRY_SPRING: CrossroadTemplate = {
       label: 'crossroad.hungry_spring.sow_it.label',
       cost: 'crossroad.hungry_spring.sow_it.cost',
       effects: [
-        { k: 'flag', flag: 'forced_hunger', years: 0.17 },
+        { k: 'flag', flag: 'forced_hunger', years: 8 / 48 },
         { k: 'stat', stat: 'morale', delta: -8 },
       ],
       visible: [{ k: 'raise', kind: 'field' }],
@@ -45,7 +43,7 @@ export const HUNGRY_SPRING: CrossroadTemplate = {
       cost: 'crossroad.hungry_spring.eat_it.cost',
       effects: [
         { k: 'stat', stat: 'grain', delta: 300 },
-        { k: 'flag', flag: 'lean_harvest', years: 1 },
+        { k: 'harvest', factor: 0.55, harvests: 1 },
       ],
       visible: [{ k: 'douse', kind: 'mill' }],
       seeds: [
@@ -65,7 +63,7 @@ export const HUNGRY_SPRING: CrossroadTemplate = {
       cost: 'crossroad.hungry_spring.half_and_half.cost',
       effects: [
         { k: 'stat', stat: 'grain', delta: 140 },
-        { k: 'flag', flag: 'half_harvest', years: 1 },
+        { k: 'harvest', factor: 0.78, harvests: 1 },
         { k: 'stat', stat: 'morale', delta: -4 },
       ],
       visible: [{ k: 'gather', where: 'square', days: 1 }],

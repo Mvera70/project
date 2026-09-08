@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.25 · 8 de septiembre de 2026, 18:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.26 · 8 de septiembre de 2026, 19:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -70,6 +70,20 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.24** | 8 sep 2026, 13:54 | El instrumento, no el juego | **Regla de no degeneración en las cuatro políticas.** Los dos umbrales adversos de la v2.23 pasan midiendo una sola opción: no valen. `hostile` inalcanzable para `prudent` es correcto. `MIN_FIELD_CREW` queda como invariante inerte. |
 | **2.25** | 8 sep 2026, 18:20 | El precio escrito es un contrato | **§8.1, regla nueva.** Auditadas las 48 opciones: 13 mienten y 9 cumplen a medias. La causa es una sola y estructural — **14 banderas que nadie lee**. La horquilla manda sobre el ≥ 25 %. Dos umbrales recalibrados. Experimento de tres dientes: `worst` sube de 3,3 % a 8,3 %, `prudent` no se mueve. |
 | **2.23** | 8 sep 2026, 16:40 | Verificación bajo el mundo corregido | **Los tres ⚠ re-medidos, sin ajustar nada.** A.15 implementado: `last`/`worst` pasan de casi nunca terminar a terminar el 100 %. La horquilla se dispara a 98,3 puntos. El bucle no era la elección — era que no tenía consecuencias; ahora las tiene y ambas políticas la eligen igual, deterministas. |
+| **2.26** | 8 sep 2026, 19:00 | Contrato de A.3 | **Las tres respuestas de `hungry_spring` cobran su precio.** Sembrar fuerza ocho semanas de hambre 0,5; comer o repartir compromete la siguiente siega mediante el mecanismo contado en cosechas de v2.25. |
+
+### 2.26 — Semilla o pan
+
+A.3 queda aislada en su propia rama. `sow_it` conserva una bandera semanal,
+ahora leída por `consume`: durante exactamente ocho ticks la severidad es como
+mínimo 0,5. `eat_it` y `half_and_half` dejan de poner `lean_harvest` y
+`half_harvest`, banderas muertas, y usan `{k:'harvest'}` con 0,55 y 0,78 para
+una siega. El modificador se consume al cosechar, no al pasar un año civil.
+
+**Criterio.** Las pruebas directas deben demostrar activación y caducidad del
+hambre y el mecanismo ya probado de cosecha debe recibir los dos factores del
+catálogo. El balance se mide al reunir las ramas de contratos; una sola
+plantilla no justifica gastar de nuevo los nueve minutos del banco.
 
 ### 2.25 — El precio escrito es un contrato
 

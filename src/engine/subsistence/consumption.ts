@@ -34,7 +34,12 @@ export function consume(state: GameState): { severity: number; starved: Villager
   if (people === 0) return { severity: 0, starved: [] };
 
   const demand = people * FOOD.GRAIN_PER_PERSON;
-  const severity = Math.max(0, demand - state.village.grain) / demand;
+  const forcedUntil = state.flags['forced_hunger'];
+  const forced = forcedUntil !== undefined && (forcedUntil === 0 || forcedUntil > state.tick);
+  const shortage = Math.max(0, demand - state.village.grain) / demand;
+  // A.3 spends the seed grain: for eight weeks hunger is at least one half,
+  // even if the numeric granary still contains what was reserved for sowing.
+  const severity = Math.max(shortage, forced ? 0.5 : 0);
   state.village.grain = Math.max(0, state.village.grain - demand);
 
   if (severity <= 0) return { severity: 0, starved: [] };

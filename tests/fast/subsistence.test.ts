@@ -1038,3 +1038,18 @@ describe('la cosecha ya vendida · §5.3, v2.25', () => {
     expect(s.harvestModifier).toEqual({ factor: 0.55, harvests: 1 });
   });
 });
+
+describe('el grano reservado para sembrar · A.3', () => {
+  it('fuerza hambre 0,5 mientras la bandera sigue activa', () => {
+    const s = founded(7);
+    s.flags['forced_hunger'] = s.tick + 8;
+    expect(consume(s).severity).toBe(0.5);
+  });
+
+  it('deja de forzarla al vencer las ocho semanas', () => {
+    const s = founded(7);
+    s.flags['forced_hunger'] = 8;
+    s.tick = 8;
+    expect(consume(s).severity).toBe(0);
+  });
+});
