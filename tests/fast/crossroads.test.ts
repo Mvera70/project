@@ -19,6 +19,7 @@ import { crisisOf, eligible, lastCrossroadTick, selectCrossroad } from '@engine/
 import { applyEffect, applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds, pendingSeeds } from '@engine/crossroads/seeds';
 import { PLAGUE_BLAME } from '@engine/crossroads/catalog/plague';
+import { SMITH_FEUD } from '@engine/crossroads/catalog/feud';
 
 const CELLS = 36 * 56;
 const YEAR = TIME.WEEKS_PER_YEAR;
@@ -913,6 +914,25 @@ describe('resolución · §8.4', () => {
 
     expect(holderOf(s, 'priest')).toBe(priest);
     expect(s.village.faith).toBe(Math.max(0, faith - 30));
+  });
+
+  it('la obra común levanta la pared sin perdonar la disputa', () => {
+    const s = calm(19);
+    const [a, b] = makeFeud(s);
+    const beforeAB = at(s, a).opinions[b] ?? 0;
+    const beforeBA = at(s, b).opinions[a] ?? 0;
+    s.crossroad = {
+      templateId: SMITH_FEUD.id,
+      posedTick: s.tick,
+      cast: { A: a, B: b },
+      optionIds: SMITH_FEUD.options.map((o) => o.id),
+    };
+
+    const applied = applyOption(s, 'build_together', [SMITH_FEUD]);
+
+    expect(applied?.build).toEqual(['palisade', 'palisade', 'palisade', 'palisade']);
+    expect(at(s, a).opinions[b]).toBe(beforeAB - 15);
+    expect(at(s, b).opinions[a]).toBe(beforeBA - 15);
   });
 
   it('kill mata, marca violence y saca del reparto', () => {

@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.31 · 8 de septiembre de 2026, 21:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.32 · 8 de septiembre de 2026, 22:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -76,6 +76,16 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.29** | 8 sep 2026, 20:30 | Contrato de expulsión | **Ser expulsado significa abandonar la población.** A.4 y A.8 marcan `leftTick`, sacan al personaje del reparto de nombres y contabilizan la marcha en el informe semanal y la crónica. |
 | **2.30** | 8 sep 2026, 21:00 | Contrato de conflicto diferido | **`feud_ripe` conserva durante cinco años la prioridad de una disputa sembrada.** Las plantillas `feud` elegibles multiplican su peso por cuatro mientras la bandera está activa. |
 | **2.31** | 8 sep 2026, 21:30 | Contrato de A.6 | **Silenciar al sacerdote conserva al sacerdote.** `silence_a` mantiene el oficio y cobra la pérdida de fe y ánimo que promete; `no_shepherd` solo cae si el cargo queda vacante después. |
+| **2.32** | 8 sep 2026, 22:00 | Contrato de tregua de A.7 | **Construir juntos no hace que los rivales se perdonen.** Las opiniones mutuas bajan 15 en vez de subir 15; los cuatro proyectos y el ánimo común se conservan. |
+
+### 2.32 — Una pared no es una reconciliación
+
+El precio de A.7 `build_together` dice «Neither forgives it», pero sus dos
+efectos de opinión sumaban 15 y deshacían el rencor que da sentido a la
+consecuencia `uneasy_truce`. Ambos pasan a `−15`: trabajar juntos levanta cuatro
+tramos de empalizada y mejora el ánimo colectivo, mientras la relación personal
+empeora. La prueba resuelve la opción real, comprueba los cuatro proyectos y
+las dos direcciones de opinión.
 
 ### 2.31 — Silenciado, todavía sacerdote
 
@@ -4204,7 +4214,7 @@ todo.*
 |---|---|---|---|---|
 | **Side with {A}** | {B} withdraws | `opinion B→A −30`, `lit` del edificio de B apagado 4 años, obra −15 % 4 años | `douse` del edificio de B | `the_withdrawn`, 6–14 años: B se marcha con 2 personas, o muere amargado |
 | **Side with {B}** | {A} withdraws | Simétrico | `douse` del edificio de A | Simétrico |
-| **Make them build something together** | Neither forgives you, but the wall goes up | `build palisade free` ×4, `morale +8`, ambas opiniones +15 | `raise palisade` | `uneasy_truce`, 10–25 años, 50 %: el rencor vuelve peor, `opinion −70` |
+| **Make them build something together** | Neither forgives it, and the wall goes up | `build palisade free` ×4, `morale +8`, ambas opiniones −15 | `raise palisade` | `uneasy_truce`, 10–25 años, 50 %: el rencor vuelve peor, `opinion −70` |
 
 ---
 

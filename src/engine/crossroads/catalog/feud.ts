@@ -86,8 +86,8 @@ export const SMITH_FEUD: CrossroadTemplate = {
         { k: 'build', kind: 'palisade', free: true },
         { k: 'build', kind: 'palisade', free: true },
         { k: 'stat', stat: 'morale', delta: 8 },
-        { k: 'opinion', from: 'A', to: 'B', delta: 15 },
-        { k: 'opinion', from: 'B', to: 'A', delta: 15 },
+        { k: 'opinion', from: 'A', to: 'B', delta: -15 },
+        { k: 'opinion', from: 'B', to: 'A', delta: -15 },
       ],
       visible: [{ k: 'raise', kind: 'palisade' }],
       seeds: [
