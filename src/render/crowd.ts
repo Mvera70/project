@@ -5,6 +5,7 @@ import type { Building, GameState, VillagerId } from '@engine/state';
 import { route } from '@engine/world/astar';
 import { routesFor } from '@engine/world/paths';
 import type { Figure } from './layers/figures';
+import { hungerSeverity } from './layers/tells';
 
 interface Point { x: number; y: number }
 interface CachedPaths { tick: number; paths: Map<VillagerId, number[]> }
@@ -86,6 +87,7 @@ function clampFigure(point: Point, state: GameState): Point {
 export function crowdPositions(state: GameState, tickFraction: number): Figure[] {
   const fraction = Math.max(0, Math.min(1, tickFraction));
   if (fraction >= 0.8) return [];
+  const hunger = hungerSeverity(state);
   const routes = state.tick % 4 === 0 ? sundayPaths(state) : workdayPaths(state);
   const namedOrder = new Map(state.people.namedIds.map((id, index) => [id, index]));
   const figures: Figure[] = [];
@@ -93,15 +95,16 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
     const cells = routes.get(person.id);
     if (cells === undefined || cells.length === 0) continue;
     const shifted = fraction - phaseOffset(person.id);
+    if (shifted >= 0.15 && shifted < 0.6 && ((Math.imul(person.id + 7, 2654435761) >>> 0) % 1000) / 999 < hunger * 0.5) continue;
     let point: Point;
     if (shifted < 0.15) {
-      point = onPath(cells, shifted / 0.15, state.map.width);
+      point = onPath(cells, Math.max(0, shifted / 0.15) ** (1 + hunger), state.map.width);
     } else if (shifted < 0.6) {
       point = onPath(cells, 1, state.map.width);
       point.x += Math.sin(person.id * 2.17 + fraction * Math.PI * 2) * 0.5;
       point.y += Math.cos(person.id * 1.73 + fraction * Math.PI * 2) * 0.5;
     } else {
-      point = onPath(cells, 1 - ((shifted - 0.6) / 0.2), state.map.width);
+      point = onPath(cells, 1 - (((shifted - 0.6) / 0.2) ** (1 + hunger)), state.map.width);
     }
     const placed = clampFigure(point, state);
     figures.push({

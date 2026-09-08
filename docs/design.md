@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.57 · 10 de septiembre de 2026, 06:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.59 · 10 de septiembre de 2026, 07:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,8 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.59** | 10 sep 2026, 07:00 | M-21 · HUD diegético y fichas | **Las cifras ya viven detrás del valle.** Tocar abre la ficha exacta, mantener sigue a un nombrado, pellizcar amplía y los deslizamientos navegan. Luces, humo, reserva, velas, cruces y ritmo de trabajo traducen el estado sin mutarlo. |
+| **2.58** | 10 sep 2026, 06:30 | M-21a · contrato del HUD | **Una figura móvil se inspecciona donde se dibuja.** `inspectAt` admite la fracción visual sin romper su llamada de tres argumentos. Las señales de §11.1 reciben escalas deterministas y los seis gestos, umbrales táctiles explícitos. |
 | **2.57** | 10 sep 2026, 06:00 | Puerta de movimiento de M-18 | **La multitud supera sus veinte segundos.** Una ruta viva determinista abre un valle de 80 habitantes; el GIF muestra salida, trabajo, regreso, noche vacía y nuevo ciclo sin perder figuras ni convertirlas en ruido. §14.3 queda cerrada. |
 | **2.56** | 10 sep 2026, 05:30 | M-20 · armazón de aplicación | **La simulación ya corre en la pantalla móvil.** El reloj acumula fracciones sin perder ticks en sus límites, descarta el tiempo oculto y limita a ocho semanas cada fotograma. `ANNO I` presenta el año cero interno como primer año civil; la velocidad inicial es ×1. |
 | **2.55** | 10 sep 2026, 05:00 | Veredicto visual de §14.3 | **M-16 y M-17 superan la hoja a tamaño móvil.** Las cuatro estaciones se reconocen, el gris conserva las masas y los edificios principales tienen siluetas propias. La densidad de M-18 se juzga en movimiento tras M-20; una captura estática no demuestra ni falsifica su ciclo. |
@@ -102,6 +104,50 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.59 — La cifra está a un toque
+
+M-21 conecta el contrato puro de v2.58 al lienzo. La ficha inferior conserva el
+valle detrás y muestra la lectura exacta del objetivo; una vivienda no duplica
+«usuarios» y «residentes», y talleres y templos nombran a quien ejerce el oficio.
+Mantener una figura nombrada activa un halo, el pellizco limita el lienzo entre
+1× y 2,5×, deslizar abajo cierra la ficha y deslizar arriba emite la transición
+a la crónica que M-22 materializa.
+
+El hambre no necesita estado nuevo: se deriva con la misma demanda semanal y
+la misma bandera `forced_hunger` que el consumo. Reduce de forma determinista
+cuánta gente llega al trabajo y ralentiza visualmente salida y regreso. La ruta
+viva acepta `hunger=1` solo en depuración para mantener una escena reproducible;
+la captura móvil muestra un granero vacío y menos manos en los destinos sin
+abrir ninguna ficha.
+
+**Qué habría falsado el cierre:** una ficha que no correspondiera al píxel
+tocado, cifras duplicadas o reconstruidas, gestos que escribieran en el motor,
+una señal que consumiera RNG o una escena hambrienta indistinguible de su control.
+La suite pura, cinco recorridos Playwright y la revisión de ambas capturas no
+muestran esos fallos.
+
+### 2.58 — Tocar lo que se ve
+
+La firma inicial de M-21 no llevaba tiempo visual: una figura podía estar en el
+campo y `inspectAt(state,x,y)` solo podía adivinar otra posición. Se conserva la
+llamada de tres argumentos y se añade `tickFraction = 0.45` como cuarto argumento
+opcional; la aplicación entrega la fracción exacta que acaba de pintar.
+
+La tabla de §11.1 tampoco fijaba escalas. Son presentación, no balance: el
+granero enseña su fracción de capacidad, cada casa ocupada tiene luz nocturna,
+el ánimo controla la opacidad del humo, la fe enciende de cero a cinco velas y
+un brote activo pone una cruz en cada vivienda ocupada. La ficha devuelve edad,
+rasgos, dos memorias y dos opiniones fuertes para un nombrado, y año, usuarios y
+cifra relevante para un edificio. Los umbrales de gesto son 10 px/300 ms para
+toque, 500 ms para mantener, 44 px verticales para deslizar y 12 px de cambio
+entre dedos para pellizcar.
+
+**Qué falsaría este contrato:** que un borde no sea pulsable, que consultar una
+señal mute el estado, que una cifra de ficha no proceda del estado actual o que
+dos gestos normativos produzcan el mismo resultado con trazas inequívocas. Las
+pruebas puras cubren estos límites. Falta conectar la ficha y los gestos al DOM
+para cerrar M-21.
 
 ### 2.57 — La multitud se entiende en movimiento
 
@@ -4696,7 +4742,7 @@ cambio de estación.
 **Contrato.**
 ```ts
 export function tellsFor(state: GameState): Tell[];         // humo, velas, cruces, granero
-export function inspectAt(state, x: number, y: number): InspectTarget | null;
+export function inspectAt(state, x: number, y: number, tickFraction?: number): InspectTarget | null;
 export function panelFor(t: InspectTarget, state): PanelModel;
 ```
 **Reglas.** La tabla de §11.1 completa. La ficha muestra la cifra exacta: el
@@ -4704,6 +4750,11 @@ juego no esconde datos. Gestos de §11.3, en un módulo sin DOM y con tests.
 **Tests.** `inspectAt` acierta el objetivo en los bordes de las cajas; `tellsFor`
 es pura; el reconocimiento de gestos se prueba con secuencias de eventos
 sintéticas.
+
+**Estado (v2.59): implementado.** Señales, inspección, fichas y reconocimiento
+de los seis gestos tienen pruebas sin DOM; la adaptación de puntero abre el panel
+inferior, sigue nombrados y aplica zoom. Playwright verifica el toque en un valle
+maduro y conserva una escena de hambre sin cifras ni ficha abiertas.
 **Terminado cuando.** Alguien que no conoce el juego sabe decir si hay hambre
 mirando la pantalla.
 

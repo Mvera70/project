@@ -51,4 +51,17 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   await page.locator('html[data-app-ready="true"]').waitFor();
   await test.expect(page.locator('.valley-year')).toHaveText('ANNO LXXXI');
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
+  await page.locator('#valley').click({ position: { x: 180, y: 280 } });
+  await test.expect(page.locator('.valley-panel')).toBeVisible();
+  await test.expect(page.locator('.valley-panel h2')).not.toBeEmpty();
+  await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
+});
+
+test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/?debug=1&live=1&hunger=1&seed=7&year=80&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.clock.runFor(5_000);
+  await page.screenshot({ path: 'artifacts/m21-hunger.png', fullPage: true });
+  await test.expect(page.locator('.valley-panel')).toBeHidden();
 });

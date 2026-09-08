@@ -14,6 +14,10 @@
       .valley-speeds { position: absolute; right: max(10px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: flex; gap: 6px; }
       .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 8px; border: 1px solid rgba(48,48,41,.35); border-radius: 50%; background: rgba(242,244,246,.76); color: #303029; font: 600 12px/1 system-ui,sans-serif; }
       .valley-speeds button[aria-pressed="true"] { background: #303029; color: #f2f4f6; }
+      .valley-panel { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; box-sizing: border-box; max-height: 48%; overflow: auto; padding: 18px 20px max(20px, env(safe-area-inset-bottom)); background: rgba(242,244,246,.96); border-top: 2px solid #3c3a34; }
+      .valley-panel[hidden] { display: none; }
+      .valley-panel h2 { margin: 0 0 8px; text-transform: capitalize; font: 600 20px/1.2 Georgia,serif; }
+      .valley-panel p { margin: 4px 0; }
     </style>
   </head>
   <body>
