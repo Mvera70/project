@@ -218,6 +218,19 @@ describe('producción · §5.2, §5.4', () => {
     );
   });
 
+  it('las promesas de obra aplican el factor más duro y caducan', () => {
+    const plain = founded(7);
+    const baseline = produce(plain, allocateLabour(plain)).buildPoints;
+    const slowed = founded(7);
+    slowed.flags['works_slowed_85'] = slowed.tick + 20;
+    slowed.flags['works_slowed_40'] = slowed.tick + 6;
+    expect(produce(slowed, allocateLabour(slowed)).buildPoints).toBeCloseTo(baseline * 0.4, 9);
+    slowed.tick += 6;
+    expect(produce(slowed, allocateLabour(slowed)).buildPoints).toBeCloseTo(baseline * 0.85, 9);
+    slowed.tick += 14;
+    expect(produce(slowed, allocateLabour(slowed)).buildPoints).toBeCloseTo(baseline, 9);
+  });
+
   it('woodCap limita la tala y por defecto no limita nada', () => {
     // M-15 aportará el tope del bosque; la firma ya lo acepta.
     const s = founded(7);

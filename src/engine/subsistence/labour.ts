@@ -98,8 +98,17 @@ export function produce(
   const wood = Math.max(0, Math.min(cut, woodCap));
   state.village.wood += wood;
 
-  const buildPoints =
-    a.builders * LABOUR.BP_PER_BUILDER * (smithyWorking(state) ? LABOUR.SMITHY_BONUS : 1);
+  const active = (flag: string): boolean => {
+    const until = state.flags[flag];
+    return until !== undefined && (until === 0 || until > state.tick);
+  };
+  let worksFactor = 1;
+  if (active('works_slowed_85')) worksFactor = Math.min(worksFactor, 0.85);
+  if (active('works_slowed_80')) worksFactor = Math.min(worksFactor, 0.8);
+  if (active('works_slowed_40')) worksFactor = Math.min(worksFactor, 0.4);
+
+  const buildPoints = a.builders * LABOUR.BP_PER_BUILDER *
+    (smithyWorking(state) ? LABOUR.SMITHY_BONUS : 1) * worksFactor;
 
   return { wood, buildPoints };
 }

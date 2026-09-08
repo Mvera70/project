@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.27 · 8 de septiembre de 2026, 19:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.28 · 8 de septiembre de 2026, 20:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -72,6 +72,20 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.23** | 8 sep 2026, 16:40 | Verificación bajo el mundo corregido | **Los tres ⚠ re-medidos, sin ajustar nada.** A.15 implementado: `last`/`worst` pasan de casi nunca terminar a terminar el 100 %. La horquilla se dispara a 98,3 puntos. El bucle no era la elección — era que no tenía consecuencias; ahora las tiene y ambas políticas la eligen igual, deterministas. |
 | **2.26** | 8 sep 2026, 19:00 | Contrato de A.3 | **Las tres respuestas de `hungry_spring` cobran su precio.** Sembrar fuerza ocho semanas de hambre 0,5; comer o repartir compromete la siguiente siega mediante el mecanismo contado en cosechas de v2.25. |
 | **2.27** | 8 sep 2026, 19:30 | Contrato de A.5/A.6 | **Las decisiones durante una peste cambian su fecha final.** Un efecto explícito suma o resta semanas al brote activo una sola vez; desaparecen las dos banderas anuales que nadie podía leer correctamente. |
+| **2.28** | 8 sep 2026, 20:00 | Contrato de trabajo | **Cada promesa de obra tiene su factor y su duración.** A.7 aplica 0,85 durante cuatro años, A.15 aplica 0,8 durante dos y A.12 aplica 0,4 durante seis semanas exactas. |
+
+### 2.28 — Cuando las manos no construyen
+
+La bandera única `works_slowed` mezclaba tres contratos distintos y nadie la
+leía. Se sustituye por tres banderas explícitas: `works_slowed_85`,
+`works_slowed_80` y `works_slowed_40`. `produce` aplica a los puntos de obra el
+factor activo más bajo; la tala y los campos conservan su asignación normal,
+porque los tres efectos escritos hablan de obra. Los solapes no multiplican
+penalizaciones que el catálogo nunca prometió.
+
+A.7 dura cuatro años al 85 %, A.15 dos años al 80 % y A.12 seis ticks al 40 %.
+La prueba recorre un solape y ambas caducidades, demostrando la transición
+0,40 → 0,85 → 1 sin inspeccionar la implementación.
 
 ### 2.27 — Los días que gana la peste
 

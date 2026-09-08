@@ -88,7 +88,7 @@ export const SUCCESSION: CrossroadTemplate = {
       effects: [
         { k: 'stat', stat: 'morale', delta: -12 },
         { k: 'stat', stat: 'faith', delta: -6 },
-        { k: 'flag', flag: 'works_slowed', years: 2 },
+        { k: 'flag', flag: 'works_slowed_80', years: 2 },
       ],
       visible: [{ k: 'douse', kind: 'house' }],
       seeds: [

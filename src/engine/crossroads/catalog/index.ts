@@ -13,7 +13,7 @@
 //   half_harvest           M-06 harvest():  the year's yield ×0.78 (A.3)
 //   outbreak_slower        M-06:            the sickness runs longer (A.5, A.6)
 //   outbreak_faster        M-06:            the sickness runs shorter (A.5)
-//   works_slowed           M-14 advanceWorks(): build points cut (A.7, A.12, A.15)
+//   works_slowed_85/_80/_40 M-06 produce(): build points cut (A.7, A.15, A.12)
 //   wall_unlocked          M-14:            `wall` becomes buildable (A.16)
 //   stone_house_unlocked   M-14:            `stone_house` becomes buildable (A.16)
 //   burnt_row              M-14:            those ruins are never rebuilt (A.5)

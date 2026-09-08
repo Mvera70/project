@@ -148,7 +148,7 @@ export const WOLF_WINTER: CrossroadTemplate = {
       label: 'crossroad.wolf_winter.keep_everyone_inside.label',
       cost: 'crossroad.wolf_winter.keep_everyone_inside.cost',
       effects: [
-        { k: 'flag', flag: 'works_slowed', years: 0.125 },
+        { k: 'flag', flag: 'works_slowed_40', years: 6 / 48 },
         { k: 'stat', stat: 'wood', delta: -60 },
         { k: 'stat', stat: 'morale', delta: -8 },
       ],

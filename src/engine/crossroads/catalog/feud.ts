@@ -39,7 +39,7 @@ export const SMITH_FEUD: CrossroadTemplate = {
       effects: [
         { k: 'opinion', from: 'B', to: 'A', delta: -30 },
         { k: 'lit', kind: 'smithy', on: false },
-        { k: 'flag', flag: 'works_slowed', years: 4 },
+        { k: 'flag', flag: 'works_slowed_85', years: 4 },
         { k: 'memory', who: 'B', kind: 'was_blamed', about: 'A', weight: 4 },
       ],
       visible: [{ k: 'douse', kind: 'smithy' }],
@@ -61,7 +61,7 @@ export const SMITH_FEUD: CrossroadTemplate = {
       effects: [
         { k: 'opinion', from: 'A', to: 'B', delta: -30 },
         { k: 'lit', kind: 'smithy', on: false },
-        { k: 'flag', flag: 'works_slowed', years: 4 },
+        { k: 'flag', flag: 'works_slowed_85', years: 4 },
         { k: 'memory', who: 'A', kind: 'was_blamed', about: 'B', weight: 4 },
       ],
       visible: [{ k: 'douse', kind: 'smithy' }],
