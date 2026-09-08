@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.49 · 10 de septiembre de 2026, 01:35 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.50 · 10 de septiembre de 2026, 02:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,11 +89,37 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.50** | 10 sep 2026, 02:20 | M-16 · terreno y paletas | **La tabla de color no cumplía su propio test.** Primavera y verano dejaban siluetas a 1–2 puntos; se aplica el menor desplazamiento de luminosidad que garantiza 8, con margen de cuantización. Terreno por regiones, caminos y cuatro estaciones visibles en la hoja de M-19. |
 | **2.49** | 10 sep 2026, 01:35 | M-19 antes del primer píxel | **La captura deja de depender del render.** La ruta de depuración salta a año y estación con política `prudent`; el comando produce 16 vistas móviles, sus 16 versiones grises y una hoja de contacto. M-16 heredará este instrumento ya ejecutable. |
 | **2.48** | 10 sep 2026, 01:00 | Aplicación del cierre | **Las dos puertas decididas en v2.47 están vivas.** En 30 semillas × 150 años, `forest_cut` aparece 268 veces y `relic_pedlar` 49; ninguna de las 17 plantillas queda muda. Suite rápida: 577 pruebas pasan. No se reabre el balance. |
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.50 — La tabla que se veía bien y no se leía
+
+Al convertir la tabla de §10.3 en su test obligatorio apareció una contradicción:
+las cinco ranuras exigían al menos 8 puntos de luminancia entre sí, pero el
+mínimo era **1,97 en primavera, 1,04 en verano y 7,57 en otoño**. Cumplir la
+tabla literal hacía imposible cumplir su criterio de terminado.
+
+Se conserva el orden perceptivo y el tono de cada ranura y se resuelve la
+restricción como un ajuste mínimo sobre sus canales: se ordenan las luminancias,
+se proyectan a una separación de 9 puntos y se desplaza cada RGB por igual. Ese
+punto adicional absorbe la cuantización a ocho bits. Los mínimos reales quedan
+en **8,63 primavera, 9,00 verano, 8,57 otoño y 9,28 invierno**. Diez valores de
+la tabla cambian; los otros treinta y ocho se conservan.
+
+M-16 pinta cada tipo como contornos de regiones cardinales, con perturbación
+determinista máxima de ±0,15 celdas solo en sus bordes; no introduce ruido por
+celda. El fondo añade los caminos del mapa y queda en `OffscreenCanvas`. La hoja
+de M-19 muestra las cuatro estaciones distintas antes de cualquier rótulo y las
+copias grises conservan cauce, pradera, roca, bosque y camino.
+
+**Qué habría falsado la solución:** una separación menor de 8, una estación
+confundible en la hoja, un contorno distinto para la misma entrada o una región
+fragmentada por celdas. Las cinco pruebas específicas, la captura completa y la
+inspección de la hoja pasan. M-17 puede empezar sobre este fondo cacheado.
 
 ### 2.49 — M-19 antes del primer píxel
 
@@ -3226,14 +3252,14 @@ ningún indicador.
 | Ranura | Spring | Summer | Autumn | Winter |
 |---|---|---|---|---|
 | `void` | `#b9c9cf` | `#c9cfc2` | `#cfc4b2` | `#c6ccd2` |
-| `meadow` | `#8fae5b` | `#9fb058` | `#a89a55` | `#d9dde0` |
+| `meadow` | `#96b562` | `#99aa52` | `#a89a55` | `#d9dde0` |
 | `meadowAlt` | `#7fa050` | `#8fa14c` | `#98884a` | `#c9ced3` |
-| `field` | `#9d9a52` | `#c9a94f` | `#d0b05a` | `#cfd4d6` |
+| `field` | `#95924a` | `#d2b258` | `#d0b05a` | `#cfd4d6` |
 | `forest` | `#4f7a3c` | `#46703a` | `#8a6f33` | `#3d5544` |
 | `forestDark` | `#3c6030` | `#35562c` | `#6a5326` | `#2e4235` |
-| `water` | `#6fa3bd` | `#6fa8b8` | `#6d97a8` | `#aebfc6` |
+| `water` | `#6ca0ba` | `#69a2b2` | `#6c96a7` | `#aebfc6` |
 | `rock` | `#9a968f` | `#a39e94` | `#a09a90` | `#8e939a` |
-| `path` | `#b09a72` | `#bda57b` | `#b79d74` | `#b4b0a6` |
+| `path` | `#b49e76` | `#bfa77d` | `#b89e75` | `#b4b0a6` |
 | `wood` | `#8a6a45` | `#8a6a45` | `#83643f` | `#6f563a` |
 | `roof` | `#6d5236` | `#6d5236` | `#654c32` | `#55402a` |
 | `accent` | `#d9d2c2` | `#efe6cf` | `#e8d9b8` | `#f2f4f6` |
@@ -4407,6 +4433,11 @@ Sin contorno en el terreno.
 `paletteFor` interpola de forma continua en los bordes de estación.
 **Terminado cuando.** La hoja de contacto de M-19 muestra cuatro estaciones
 inconfundibles.
+
+**Estado (v2.50): implementado.** El fondo cacheado pinta regiones de terreno y
+caminos; la hoja de 16 estados muestra cuatro estaciones inconfundibles. La
+tabla se corrigió porque sus colores originales no podían superar el test de
+silueta que ella misma imponía; evidencia y valores están en §2.50.
 
 ---
 
