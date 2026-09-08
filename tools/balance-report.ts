@@ -60,7 +60,7 @@ export interface Trial {
   invalid: string[];
   geometry: string[];
   probes: number;
-  ticksDying: number;
+  longestDwindlingTicks: number;
   deathsByCause: Record<string, number>;
   shocked: boolean;
   shockExtinct: boolean;
@@ -146,7 +146,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     generationOne: 0, fullMap: false, forestRatio: null, cadence: 0, allCadence: 0,
     ceilingIntervals: 0, intervals: 0, eligibleTicks: Object.fromEntries(CATALOG.map((t) => [t.id, 0])),
     posedByTemplate: Object.fromEntries(CATALOG.map((t) => [t.id, 0])), allowedByTemplate: {},
-    invalid: [], geometry: [], probes: 0, ticksDying: 0, deathsByCause: {},
+    invalid: [], geometry: [], probes: 0, longestDwindlingTicks: 0, deathsByCause: {},
     shocked: false, shockExtinct: false };
   let shock: GameState | null = null;
   let counted = 0;
@@ -185,10 +185,14 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
       previousPosed = state.tick;
     }
     result.peak = Math.max(result.peak, population(state));
-    // §5.2: how long a village hung on below a workable size before it went.
-    // A game that spends decades at two or three people is not an ending, it is
-    // a flat line, and the chronicle has nothing to say about any of it.
-    if (population(state) > 0 && population(state) < DYING_BELOW) result.ticksDying += 1;
+    // §5.7, v2.17: measure the longest consecutive spell, because the
+    // abandonment clock correctly resets whenever the village recovers.
+    if (state.dwindlingSince !== null) {
+      result.longestDwindlingTicks = Math.max(
+        result.longestDwindlingTicks,
+        state.tick - state.dwindlingSince,
+      );
+    }
     checkRanges(state, result.invalid);
     if (state.tick === GENERATION) result.generationOne = population(state);
     if (state.tick < 120 * TIME.WEEKS_PER_YEAR) {
@@ -275,9 +279,9 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
     geometryCases: total((t) => t.geometry.length),
     // Only the games that actually died: a survivor never had a deathbed.
     maxYearsDying: Math.max(0, ...group.filter((t) => t.extinct)
-      .map((t) => t.ticksDying / TIME.WEEKS_PER_YEAR)),
+      .map((t) => t.longestDwindlingTicks / TIME.WEEKS_PER_YEAR)),
     medianYearsDying: median([0, ...group.filter((t) => t.extinct)
-      .map((t) => t.ticksDying / TIME.WEEKS_PER_YEAR)]),
+      .map((t) => t.longestDwindlingTicks / TIME.WEEKS_PER_YEAR)]),
     // §12.9's forest row, live since M-15. Only games that reached year 100
     // have a reading: a valley nobody lived in kept its wood for other reasons.
     forestTrials: group.filter((t) => t.forestRatio !== null).length,
@@ -315,7 +319,7 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
   writeFileSync('artifacts/balance-summary.json', JSON.stringify({ durationMs, summaries, trials }, null, 2) + '\n');
   console.table(summaries.map((summary) => Object.fromEntries(Object.entries(summary)
     .filter(([key]) => key !== 'eligibility' && key !== 'restUtilization' && key !== 'deathsByCause'))));
-  console.info(`Eligibility sampled every ${PROBE_EVERY} ticks; villages below ${DYING_BELOW} counted as dying.`);
+  console.info(`Eligibility sampled every ${PROBE_EVERY} ticks; longest consecutive spell below ${DYING_BELOW} measured as dying.`);
   console.info('Deaths by cause:');
   console.table(summaries.map((s) => ({ policy: s.policy, ...s.deathsByCause })));
   console.table(CATALOG.map((t) => ({ template: t.id, ...Object.fromEntries(summaries.map((s) => [s.policy, s.eligibility[t.id]])) })));

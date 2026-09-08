@@ -478,12 +478,12 @@ describe('la política prudent · §12.9', () => {
     expect(ask(t)).toBe('cheap');
   });
 
-  it('el ánimo perdido pesa 15 por punto', () => {
+  it('el ánimo perdido pesa 3 por punto', () => {
     const t = template([
-      option('mood', [{ k: 'stat', stat: 'morale', delta: -10 }]), // −150
+      option('mood', [{ k: 'stat', stat: 'morale', delta: -10 }]), // −30
       option('grain', [{ k: 'stat', stat: 'grain', delta: -100 }]), // −100
     ]);
-    expect(ask(t)).toBe('grain');
+    expect(ask(t)).toBe('mood');
   });
 
   it('con todo lo demás igual, prefiere la opción que no planta semilla', () => {
@@ -631,17 +631,22 @@ describe('el abandono · §5.7, v2.16', () => {
     expect(s.ended?.cause).toBe('extinction');
   });
 
-  it('acota la agonía a los años que dice §5.7', () => {
+  it('acota la racha más larga de agonía a los años que dice §5.7', () => {
     // Lo que esto existe para arreglar: partidas que pasaban cuarenta años a
     // dos habitantes sin morirse ni recuperarse.
     for (const seed of [1, 2, 4, 14]) {
       const s = foundGame(seed);
       let below = 0;
+      let longest = 0;
       for (let i = 0; i < 200 * YEAR && s.ended === null; i += 1) {
         tick(s, CATALOG);
-        if (population(s) > 0 && population(s) < MIGRATION.VIABLE_POPULATION) below += 1;
+        if (s.dwindlingSince === null) below = 0;
+        else {
+          below = s.tick - s.dwindlingSince;
+          longest = Math.max(longest, below);
+        }
       }
-      expect(below / YEAR, `semilla ${seed}`).toBeLessThanOrEqual(MIGRATION.ABANDON_YEARS + 1);
+      expect(longest / YEAR, `semilla ${seed}`).toBeLessThanOrEqual(MIGRATION.ABANDON_YEARS);
     }
   });
 });

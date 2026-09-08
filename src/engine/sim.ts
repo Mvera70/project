@@ -194,8 +194,8 @@ export type Policy =
 /**
  * §12.9's scoring for `prudent`, literally:
  *
- *   score = −(grain it costs) − 40·(immediate dead)
- *           − 15·(morale lost) + 10·(if it plants no seed)
+ *   score = −(grain it costs) − 3·(morale lost)
+ *           + 10·(if it plants no seed)
  *
  * No lookahead: it weighs what it can see this week, exactly as a villager
  * would. It is not optimal play and does not pretend to be — it is the floor
@@ -227,7 +227,7 @@ function prudentScore(state: GameState, catalogue: Catalogue, optionId: string):
     if (e.stat === 'morale') morale -= delta;
   }
 
-  return -grain - 15 * morale + (option.seeds.length === 0 ? 10 : 0);
+  return -grain - 3 * morale + (option.seeds.length === 0 ? 10 : 0);
 }
 
 /** The option of the pending crossroad with this id, or undefined. */

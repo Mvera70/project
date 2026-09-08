@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.16 · 8 de septiembre de 2026, 11:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.17 · 8 de septiembre de 2026, 12:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -45,6 +45,55 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.14** | 8 sep 2026, 01:46 | Primera lectura del hito 0 | **Tabla de pesos normativa y agregación por año**; **tripulación mínima de campo**: se acabó la aldea zombi; `prudent` no compra muertes. |
 | **2.15** | 8 sep 2026, 09:52 | M-15 | **Caminos y bosque**: el mapa cuenta dónde se pisa y qué se tala. Deuda del bosque de §12.9 saldada: incluir las dos plantillas mueve la cadencia 0,02. El banco se sale del presupuesto. |
 | **2.16** | 8 sep 2026, 11:20 | M-16 | **Abandono**: se acabó la agonía de cuarenta años. Presupuesto del banco a 10 min. La banda del bosque queda aguas abajo de la extinción. Atribución medida: `hostile` no se activa nunca con `prudent`. |
+| **2.17** | 8 sep 2026, 12:00 | Puerta de migración | **`prudent` deja de sobrevalorar el ánimo**: su peso baja de 15 a 3. La agonía se mide por la racha consecutiva más larga, igual que la regla de abandono. La puerta de ocho habitantes se somete a un A/B antes de tocarla. |
+
+### 2.17 — La puerta de ocho habitantes
+
+- **§12.9 · `prudent`.** El peso del ánimo baja de 15 a 3. La atribución de
+  v2.16 demostró que, a quince fanegas por punto, seis puntos de ánimo valían
+  noventa fanegas y hacían que acoger desconocidos dominara el coste visible de
+  alimentarlos. Tres conserva el ánimo en la decisión sin convertirlo en la
+  unidad que manda sobre el grano.
+- **§12.9 · Agonía.** La medida pasa del total de años bajo
+  `VIABLE_POPULATION` a la **racha consecutiva más larga**. El contador de
+  abandono se reinicia cuando la aldea vuelve a ser viable; la métrica tiene que
+  medir la misma regla. Sumar recaídas distintas hacía aparecer como fallo un
+  comportamiento correcto.
+- **§5.7 · Puerta de llegadas.** `ARRIVE_MIN_PEOPLE = 8` se mantiene mientras se
+  contrasta con 3 sobre las mismas 60 semillas × 200 años. El valor B es un
+  experimento y no una decisión de balance.
+
+**Hipótesis falsable.** Si bajar la puerta a tres reduce de golpe las partidas
+terminadas y la descomposición de las tres décadas finales muestra que primero
+desaparecen las llegadas, la puerta de ocho convierte una peste profunda en una
+sentencia diferida. Si las llegadas continúan y domina otro término, la causa
+está en otro sistema y la puerta se queda.
+
+**Resultado: hipótesis falsada.** Las dos ramas dieron exactamente el mismo
+resultado, semilla por semilla. `ARRIVE_MIN_PEOPLE` se queda en 8.
+
+| `ARRIVE_MIN_PEOPLE` | Partidas terminadas | Mediana del pico | Mapas llenos < año 120 | Mediana del final |
+|---:|---:|---:|---:|---:|
+| 8 | 47/60 | 76,5 | 30/60 | año 104 |
+| 3 | 47/60 | 76,5 | 30/60 | año 104 |
+
+La descomposición siguiente usa solo ventanas completas de diez años y da la
+media por aldea terminada. El neto reconcilia exactamente nacimientos y llegadas
+menos muertes y marchas.
+
+| Ventana antes del final | Aldeas | Nacimientos | Llegadas | Muertes | Marchas | Neto |
+|---|---:|---:|---:|---:|---:|---:|
+| 30–20 años | 41 | 7,63 | 0,17 | 7,56 | 5,76 | −5,51 |
+| 20–10 años | 44 | 4,07 | 0,09 | 6,18 | 6,39 | −8,41 |
+| 10–0 años | 47 | 1,36 | 0,00 | 2,30 | 4,79 | −5,72 |
+
+Las llegadas sí se apagan, pero no por la población. Una sonda anual de las
+cinco puertas muestra que, en los últimos veinte años, grano, reputación y camas
+están abiertos en el 100 % de las observaciones y la población aún lo está en el
+87,5 % de la penúltima década. **El ánimo no alcanza 50 ni una sola vez.** Ya
+entre treinta y veinte años antes solo abre en el 1,5 % de las observaciones.
+La siguiente variable a aislar es, por tanto, `ARRIVE_MIN_MORALE`; tocar la
+puerta de población no arreglaría ninguna partida.
 
 ### 2.16 — El abandono, y dónde se mueren las aldeas
 
@@ -160,12 +209,9 @@ Tres consecuencias que hay que leer juntas, porque son la misma:
    de **27,8 a 5,0** en las cuatro políticas. Es exactamente
    `ABANDON_YEARS`: en cuanto una aldea cruza el umbral, tiene cinco años y se
    acabó.
-2. **El máximo se pasa de diez en tres políticas**, hasta 15,3 con `first`. No
-   es un fallo de la regla: el contador se reinicia si la aldea vuelve a seis,
-   así que una que sube y baja acumula más de diez años por debajo sin haber
-   tenido nunca cinco *seguidos*. La regla dice «seguidos» y hace lo que dice;
-   la medida cuenta el total. Si lo que se quiere acotar es el total, la regla
-   tiene que dejar de reiniciarse, y eso es una decisión distinta.
+2. **La medida anterior sumaba recaídas distintas.** Por eso llegaba a 15,3
+   años con `first` aunque ninguna racha pudiera durar más de cinco. Desde v2.17
+   se informa la racha consecutiva más larga, que es lo que la regla acota.
 3. **La extinción sube y la cadencia con ella.** Con `prudent`, terminadas
    66,7 % → 80,0 % y cadencia 2,27 → 2,47; con `worst`, 5,07 → 5,34. No son
    partidas nuevas que se mueran: son las mismas, terminadas antes. Una partida
@@ -2431,8 +2477,8 @@ cotas, no medidas.
 cada opción disponible como
 
 ```
-score = −(grano que cuesta) − 40·(muertos inmediatos)
-        − 15·(ánimo perdido)  + 10·(si no planta semilla)
+score = −(grano que cuesta) − 3·(ánimo perdido)
+        + 10·(si no planta semilla)
 ```
 
 y toma la mayor, **pero las muertes no se compran**: si alguna opción no mata a
