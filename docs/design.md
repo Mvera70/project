@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.48 · 10 de septiembre de 2026, 01:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.49 · 10 de septiembre de 2026, 01:35 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,10 +89,32 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.49** | 10 sep 2026, 01:35 | M-19 antes del primer píxel | **La captura deja de depender del render.** La ruta de depuración salta a año y estación con política `prudent`; el comando produce 16 vistas móviles, sus 16 versiones grises y una hoja de contacto. M-16 heredará este instrumento ya ejecutable. |
 | **2.48** | 10 sep 2026, 01:00 | Aplicación del cierre | **Las dos puertas decididas en v2.47 están vivas.** En 30 semillas × 150 años, `forest_cut` aparece 268 veces y `relic_pedlar` 49; ninguna de las 17 plantillas queda muda. Suite rápida: 577 pruebas pasan. No se reabre el balance. |
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.49 — M-19 antes del primer píxel
+
+La dependencia escrita en el brief de M-19 era circular en la práctica: pedía
+M-16 para construir la herramienta que §14.3 exige **antes del primer día que se
+dibuje algo**. Se separan infraestructura y juicio visual. M-19 monta primero la
+ruta determinista y la captura sobre un lienzo diagnóstico; M-16 sustituye el
+pintado y usa la misma hoja para demostrar que las estaciones se distinguen.
+
+`npm run shots -- --seed 7 --years 1,20,60,120` genera 33 PNG: 16 combinaciones
+de año y estación a 390×844, las 16 copias en gris y una hoja que reúne ambas.
+La ruta acepta semilla, año y estación, simula sin interacción con `prudent` y
+expone el lienzo de 360×560 CSS px. Chromium empaquetado es la primera opción;
+en una máquina de desarrollo sin él se usa Chrome instalado, sin cambiar el
+comportamiento de CI.
+
+**Qué habría falsado la decisión:** una captura ausente, una geometría distinta
+de la móvil o necesitar interacción para alcanzar el estado. El comando produjo
+las 33 imágenes en 12 s; el test Playwright de la ruta pasa, igual que build y
+las 577 pruebas rápidas. La hoja aún debe verse plana: juzgar estaciones antes
+de M-16 confundiría el instrumento con el arte.
 
 ### 2.48 — Las dos puertas, abiertas
 
@@ -4440,6 +4462,11 @@ permite saltar la simulación a un tick dado sin jugar.
 ficheros.
 **Terminado cuando.** Está fusionado **antes** que M-17. Ningún trabajo visual
 empieza sin esto.
+
+**Estado (v2.49): implementado.** Ruta determinista, geometría móvil, 32
+capturas y hoja de contacto verificadas antes de empezar M-16. El lienzo
+diagnóstico es deliberadamente plano: su único contrato es recibir el pintado
+real sin volver a diseñar la automatización.
 
 ---
 
