@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.42 · 9 de septiembre de 2026, 02:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.44 · 9 de septiembre de 2026, 21:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -86,7 +86,111 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.39** | 9 sep 2026, 01:05 | Consecuencia de A.14 | **La reputación ganada frente a los bandidos reduce a la mitad el peso del señor.** `a_name_in_the_valley` se acumula con `behind_the_wall` sin saltarse elegibilidad ni crisis. |
 | **2.40** | 9 sep 2026, 01:30 | Consecuencia de A.7 | **Quien se retira acaba dejando el valle con dos acompañantes.** `leave` admite una cuenta aleatoria anónima; `the_withdrawn` marca tres marchas y deja de convertir una retirada en muerte. |
 | **2.41** | 9 sep 2026, 02:00 | Cierre de deuda de banderas | **El catálogo ya no escribe ninguna bandera sin lector.** Se retiran `unconsecrated`, para la que nunca existió plantilla, y `burnt_row`, sustituida por el bloqueo temporal de ruinas de v2.25. |
+| **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
+| **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.44 — El banco que termina
+
+Dieciocho revisiones —de la v2.26 a la v2.43— repararon trece contratos,
+compusieron `story` por fuerza en vez de por producto y cerraron la deuda de
+banderas. Ninguna se había medido junta: el banco llevaba tres rondas
+cortándose a mitad. Esta ronda no añade nada. Ejecuta el banco entero, sin
+interrumpirlo, y dice lo que hay.
+
+**`story` compone por fuerza, implementado y probado.** `CROSSROADS.STORY_FLOOR
+= 0.25`; para cada categoría se recogen los modificadores que le aplican y solo
+sobrevive el más lejano de 1 — no se multiplican. `behind_the_wall` (0,4) y
+`a_name_in_the_valley` (0,5) sobre `lord` dan ahora 0,4, no 0,2. Dos pruebas
+nuevas en `crossroads.test.ts`: la composición ya no multiplica, y el suelo
+resiste con las banderas reales del catálogo.
+
+**60 semillas × 200 años × 4 políticas, sin interrupción:**
+
+| | `prudent` | `first` | `last` | `worst` |
+|---|---:|---:|---:|---:|
+| Terminadas | 1,7 % | 1,7 % | 5,0 % | **10,0 %** |
+| Horquilla `worst`−`prudent` | | | | **8,3 pts** |
+| Pico mediano | 82 | 83 | 81 | 81 |
+| Población gen. 1, mediana | 41 | 41,5 | 28 | 27,5 |
+| Mapas llenos < año 120 | 96,7 % | 95,0 % | 78,3 % | 75,0 % |
+| Cadencia media | 3,32 | 3,63 | 3,81 | 4,22 |
+| Cadencia máxima | 4,60 | 5,10 | 5,38 | 6,05 |
+| Opción más repetida | `succession:choose_a` 26,8 % | `succession:choose_a` 24,7 % | `succession:no_one` 43,9 % | `succession:no_one` 41,3 % |
+
+**Contra §12.9:** cadencia (media y máxima, las cuatro) ✅. Una sola opción
+< 45 % (`last`/`worst`) ✅ — 43,9 % y 41,3 %, la primera vez que este aserto
+pasa. Elegibilidad < 1 % por plantilla ❌ en cuatro casos: `smith_feud` con
+`prudent` (1,42 %), `succession` con `first` (2,52 %) y `last` (2,21 %),
+`strangers_at_the_ford` con `worst` (1,02 %) — los cuatro al filo, ninguno lejos
+del umbral. Partida terminada de `prudent` entre 2–12 % ❌, 1,7 %, al filo por
+abajo como en la v2.24. **Partida terminada de `worst` ≥ 25 % ❌, 10,0 %. Y la
+horquilla ≥ 20 puntos ❌, 8,3.**
+
+**Con las políticas ya no degeneradas y trece contratos reparados, las dos
+puertas se abren igual que en la v2.25 — y esta vez con el catálogo entero
+detrás, no con tres opciones sueltas.** `worst` casi se triplica frente al 3,3 %
+de la v2.25 (contra dos dientes), pero sigue a menos de la mitad del 25 % que
+exige §12.9. **No es el bucle** —la horquilla lo demuestra: `last` y `worst`
+dedican ahora el 43,9 % y el 41,3 % a su opción más repetida, dentro de banda,
+no el 68,2 % de la v2.24— **y no es el instrumento** —`prudent` recibe crédito
+por las marchas desde la v2.42 y sigue en 1,7 %—. Lo que queda, después de
+descartar las dos explicaciones anteriores, es el catálogo: trece contratos
+reparados no bastan para que jugar mal cueste lo que promete costar.
+
+**Cobertura: una sola plantilla a cero.** Sumando las 240 partidas (60 semillas
+× 4 políticas), `forest_cut` no aparece **ni una vez**. No es un problema de
+`last`/`worst` concretamente —`tithe_demand`, `feud_inherited` y `smith_feud`
+también caen a cero con ellas, pero salen con `prudent`/`first`—; `forest_cut`
+está muda con las cuatro. Contenido muerto, medido y sin tocar.
+
+**Categorías por mitad de partida, apariciones sumadas en 60 semillas:**
+
+| Categoría | `prudent` 0–100 → 100–200 | `first` | `last` | `worst` |
+|---|---|---|---|---|
+| `lord` | 115 → 178 (+55 %) | 129 → 187 (+45 %) | 35 → 39 (+11 %) | 26 → 49 (**+88 %**) |
+| `stranger` | 242 → 207 (−14 %) | 336 → 364 (+8 %) | 229 → 185 (−19 %) | 307 → 297 (−3 %) |
+| `faith` | 27 → 3 (−89 %) | 26 → 0 | 25 → 7 (−72 %) | 27 → 0 |
+| `feud` | 34 → 64 (+88 %) | 4 → 28 | 2 → 2 | 0 → 0 |
+
+**`lord` y `stranger` no se desploman en la fase tardía — al contrario:** `lord`
+sube en las cuatro políticas, hasta casi duplicarse con `worst`. El máximo en
+vez del producto ha bastado para esto; no hace falta hablarlo. **Lo que sí se
+desploma es `faith`**, sin que nadie lo pidiera: cae entre el 72 % y el 100 %
+en las cuatro, y con `first` y `worst` desaparece del todo en la segunda mitad.
+Ninguna semilla del catálogo actual toca su `story`; la explicación más simple
+es que sus condiciones —fe alta, capilla en pie— dejan de sortear tan seguido
+según el resto de la partida madura, no una supresión deliberada. Medido, no
+tocado.
+
+**Población perdida, cinco años después de que `worst` tome una opción dura:**
+
+| Opción | Pérdida media | Veces tomada |
+|---|---:|---:|
+| `winter_grain_debt:refuse` | **54,35** | 75 |
+| `hungry_spring:half_and_half` | 38,00 | 8 |
+| `plague_pit:burn_the_houses` | 5,36 | 28 |
+| `bandits:fight_them` | 4,11 | 205 |
+
+Trece contratos deberían haber puesto dientes donde no los había, y en dos de
+estas cuatro los puso: `refuse` (grano a cero, cosecha al 0,55 el año
+siguiente) y `half_and_half` arrastran pérdidas de tamaño de aldea entera.
+`fight_them` (un campo destruido) y `burn_the_houses` (parcelas bloqueadas 20
+años) cuestan un puñado de vidas de media, no una aldea — la ventana de cinco
+años puede ser corta para que un campo perdido se note en la mortalidad, o el
+coste de estas dos puede seguir siendo insuficiente. La tabla no dice cuál;
+dice que dos de trece contratos concentran casi toda la pérdida medida y las
+otras once —las que no llegan a `hardOptionLoss` porque ni matan, ni destruyen,
+ni penalizan cosecha— no aparecen aquí en absoluto.
+
+**Presupuesto: cruzado.** 638,4 s contra los 600 de §14.2, un 6,4 % por encima
+—38,4 s—. No es un cálculo que se haya vuelto más caro: es que las partidas
+adversas, que antes se dispersaban hacia el año 25 y ahora sobreviven mucho más
+cerca del horizonte de 200 años gracias al propio arreglo de A.15 y los
+contratos, alargan el bucle principal del banco. **El mundo arreglado cuesta
+más medir que el roto.** Ninguna semilla, año ni política se ha recortado para
+caber; el presupuesto se deja fuera de banda a propósito, como hallazgo y no
+como problema resuelto.
 
 ### 2.42 — Irse también vacía el valle
 
@@ -127,8 +231,8 @@ Si quedan menos de dos anónimos, se marchan los disponibles.
 La semilla de A.14 `fight_them` escribía `a_name_in_the_valley`, pero ninguna
 selección la observaba. Mientras la bandera esté activa, las plantillas `lord`
 multiplican su componente `story` por 0,5. Si además existe `behind_the_wall`,
-ambos efectos se componen y el peso ordinario queda en 0,2; la crisis del señor
-conserva su multiplicador independiente. La prueba cubre el factor aislado y
+**los dos NO se multiplican**: se aplica el más fuerte (§8.6). La crisis del
+señor conserva su multiplicador independiente. La prueba cubre el factor aislado y
 su composición.
 
 ### 2.38 — La muralla cambia qué llega de fuera
@@ -2657,11 +2761,31 @@ eligible = catalog.filter(t =>
 if eligible is empty: return
 score(t) = t.weight
          · crisisMultiplier(t)          // ×4 si su categoría es la crisis activa
-         · storyMultiplier(t)           // ×4 para feud si feud_ripe está activa
+         · storyMultiplier(t)           // reputación y protección; ver abajo
          · traitMultiplier(t)           // rasgos del reparto
          · noveltyMultiplier(t)         // ×0.4 si ya salió en esta partida
 pick weighted by score, from the 'crossroads' stream
 ```
+
+**El componente `story`, y cómo se compone (v2.43).** Las semillas pueden
+modificar el peso de una categoría: es lo que el Anexo A prometía desde la v2.0
+para `a_name_in_the_valley` (×0,5 sobre `lord`) y `behind_the_wall` (×0,4 sobre
+`lord` y `stranger`), y lo que `feud_ripe` hace al revés (×4 sobre `feud`).
+
+**Varios modificadores sobre la misma categoría NO se multiplican: gana el más
+fuerte.** El muro y la reputación dicen lo mismo —«a esta aldea se la molesta
+menos»— así que son la misma dimensión, no dos dados independientes.
+Multiplicándolos, 0,4 × 0,5 = 0,2, y una tercera semilla dejaría la categoría
+muda; con el máximo, quedan en 0,4 y el efecto sigue leyéndose. Los otros
+multiplicadores —crisis, novedad, rasgo— sí se multiplican entre sí, porque cada
+uno mide algo distinto. Como red de seguridad, el componente `story` nunca baja
+de **0,25**.
+
+Esto importa más de lo que parece: `behind_the_wall` dura 20–40 años y
+`a_name_in_the_valley` 5–15, así que caen justo en la fase tardía, cuando la
+aldea es más fuerte y el juego más necesita presión exterior. Silenciar ahí
+`lord` y `stranger` es quitarle dientes al catálogo precisamente donde ya se ha
+medido que no los tiene.
 
 **Crisis** = hambruna proyectada —`grain < people · (semanas que faltan hasta la
 semana 35)`, es decir, la despensa no llega a la próxima cosecha—, brote activo,
@@ -3329,19 +3453,20 @@ que medir con una política que no se arruine sola.
 
 | Propiedad | Umbral | Política |
 |---|---|---|
-| **Partida terminada** (abandono o extinción) | 2 % – 12 % | `prudent` |
-| **Partida terminada** | ≥ 25 % | `worst` — **secundario a la horquilla (v2.25)**, ver abajo |
-| **Horquilla entre `prudent` y `worst`** | **≥ 20 puntos** | — · **el aserto que manda (v2.25)** |
-| Decisiones de `last`/`worst` dedicadas a una sola opción | **< 45 %** | atribución por opción. **Cuando falla, se arregla la POLÍTICA, no el juego** (§12.9, regla de no degeneración). Era < 40 % y **es inalcanzable (v2.25)**: con la regla, una opción todavía se lleva dos de cada tres apariciones de su plantilla, y `succession` es el 60 % de lo que se pregunta a las adversas — dos tercios de 60 son 40. El techo es estructural; el umbral se pone encima. |
-| Mediana del pico de población | 65 – 85 | `prudent` · era 65–82 y fallaba por un habitante (v2.25): fallar por uno es ruido |
-| Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas | `prudent` |
-| Población visible al final de la primera generación | ≥ 26 en la mediana | `prudent` |
-| **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. **Medido (v2.23): la media pasa en las cuatro políticas (3,78–4,41), pero el máximo de `last`/`worst` sube a 9,37** — una partida que se dispersa en diez años concentra sus tres sucesiones en pocas generaciones. Consecuencia del final más corto de Anexo A.15, no del catálogo. |
+| **Partida terminada** (abandono o extinción) | 2 % – 12 % | `prudent` · **medido (v2.44): 1,7 %, al filo por abajo** |
+| **Partida terminada** | ≥ 25 % | `worst` — **secundario a la horquilla (v2.25)**, ver abajo. **Medido (v2.44): 10,0 %**, con trece contratos reparados y `story` compuesto por fuerza |
+| **Horquilla entre `prudent` y `worst`** | **≥ 20 puntos** | — · **el aserto que manda (v2.25)**. **Medido (v2.44): 8,3 puntos** — ni el bucle de A.15 ni el instrumento de políticas explican esto ya; descartados los dos, lo que queda es el catálogo |
+| Decisiones de `last`/`worst` dedicadas a una sola opción | **< 45 %** | atribución por opción. **Cuando falla, se arregla la POLÍTICA, no el juego** (§12.9, regla de no degeneración). Era < 40 % y **es inalcanzable (v2.25)**: con la regla, una opción todavía se lleva dos de cada tres apariciones de su plantilla, y `succession` es el 60 % de lo que se pregunta a las adversas — dos tercios de 60 son 40. El techo es estructural; el umbral se pone encima. **Medido (v2.44): pasa por primera vez — 43,9 % y 41,3 %.** |
+| Mediana del pico de población | 65 – 85 | `prudent` · era 65–82 y fallaba por un habitante (v2.25): fallar por uno es ruido. **Medido (v2.44): 82** |
+| Mapa lleno (8 campos, 16 casas) antes del año 120 | ≥ 60 % de las semillas | `prudent` · **medido (v2.44): 96,7 %** |
+| Población visible al final de la primera generación | ≥ 26 en la mediana | `prudent` · **medido (v2.44): 41** |
+| **Encrucijadas por generación** | **media entre 1 y 5**, y ninguna semilla por encima de 7. Se mide **excluyendo `forest_cut` y `wolf_winter` hasta que exista M-15** (sin bosque que mengüe, `forestLeft` está congelado y sus disparos son artefacto) y **con la fundación real**, no un banco de pruebas que reparta catorce casas y una fragua desde el tick 0. Deuda registrada: volver a medir con las dos plantillas dentro y con la fundación de M-13/M-14 en cuanto estén fusionados. **Medido (v2.23): la media pasa en las cuatro políticas (3,78–4,41), pero el máximo de `last`/`worst` sube a 9,37** — una partida que se dispersa en diez años concentra sus tres sucesiones en pocas generaciones. Consecuencia del final más corto de Anexo A.15, no del catálogo. **Vuelto a medir (v2.44), con las partidas viviendo más: media 3,32–4,22, máximo 4,60–6,05 — dentro de banda en las cuatro.** |
 | Intervalos pegados al techo | < 40 % — diagnóstico, no objetivo |
-| Fracción de ticks elegibles, por plantilla | < 1 % |
+| Fracción de ticks elegibles, por plantilla | < 1 % · **medido (v2.44): falla en cuatro casos, todos al filo** — `smith_feud` con `prudent` (1,42 %), `succession` con `first` (2,52 %) y `last` (2,21 %), `strangers_at_the_ford` con `worst` (1,02 %) |
 | Bosque restante en el año 100 | 40 % – 70 % del inicial. **Aguas abajo de la extinción (v2.16):** falla por arriba, no por abajo — el valle que se queda sin gente conserva sus árboles porque no hay quien los tale. Medido: 24 de 40 valles en banda, uno solo por debajo del 40 % y quince por encima del 70 %. No se ajusta hasta que la extinción esté en banda. |
 | Choque del 90 % de bajas en el año 40 → extinción | ≥ 25 % |
 | Cualquier estadística fuera de rango o `NaN` | 0 casos |
+| **Ninguna plantilla del catálogo a cero apariciones** | — · comprobación de cobertura, no aserto del banco | **Medido (v2.44), sumando las 240 partidas de las cuatro políticas: solo `forest_cut` se queda a cero.** El resto aparece con alguna política aunque falte con otra — `tithe_demand`, `feud_inherited` y `smith_feud` no salen con `last`/`worst` pero sí con `prudent`/`first`. |
 
 **El presupuesto de la sucesión.** El rango era 1–4 y estaba mal calibrado: lo
 fijé antes de que existiera el catálogo. Medido, la sucesión sola consume un
@@ -3480,6 +3605,12 @@ esta suite todavía no medía nada. Se lanza aparte y en nocturna, así que el
 presupuesto está para que no se descontrole, no para forzar decisiones: **no se
 degrada la medición para caber en él.** Si un módulo nuevo lo desborda, se
 informa y se decide; no se recortan semillas ni años por su cuenta.
+
+**Medido (v2.44): cruzado, 638,4 s.** No por un módulo más caro de calcular:
+las partidas adversas, que antes se dispersaban hacia el año 25 por el bucle de
+A.15 sin consecuencias, ahora sobreviven mucho más cerca del horizonte de 200
+años — el mismo arreglo que abrió la horquilla alarga el bucle principal del
+banco. Sin recortar semillas, años ni políticas. Sin resolver esta ronda.
 
 ### 14.3 Capturas (`tools/screenshots.ts`, Playwright)
 

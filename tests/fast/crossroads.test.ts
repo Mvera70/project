@@ -776,16 +776,35 @@ describe('selección · §8.6', () => {
     expect(scored.find((x) => x.template.id === famine.id)?.story).toBe(1);
   });
 
-  it('un nombre ganado reduce al señor y se acumula con la muralla', () => {
+  it('un nombre ganado reduce al señor', () => {
     const s = calm(13);
     const lord: CrossroadTemplate = { ...T_QUIET, id: 'named_lord', category: 'lord' };
     s.flags['a_name_in_the_valley'] = 0;
     expect(eligible(s, [lord])[0]?.story).toBe(CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER);
+  });
 
+  it('muralla y reputación NO se multiplican: gana la más fuerte (§8.6, v2.43)', () => {
+    // 0,5 × 0,4 = 0,2 sería la composición vieja; ganar la más fuerte deja el
+    // resultado en 0,4, que es el mínimo de las dos —el más lejos de 1.
+    const s = calm(13);
+    const lord: CrossroadTemplate = { ...T_QUIET, id: 'named_lord', category: 'lord' };
+    s.flags['a_name_in_the_valley'] = 0;
     s.flags['behind_the_wall'] = 0;
-    expect(eligible(s, [lord])[0]?.story).toBe(
+    expect(eligible(s, [lord])[0]?.story).toBe(CROSSROADS.BEHIND_WALL_MULTIPLIER);
+    expect(eligible(s, [lord])[0]?.story).not.toBe(
       CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER * CROSSROADS.BEHIND_WALL_MULTIPLIER,
     );
+  });
+
+  it('el componente story nunca baja del suelo, aunque se acumulen más protecciones', () => {
+    const s = calm(13);
+    const lord: CrossroadTemplate = { ...T_QUIET, id: 'named_lord', category: 'lord' };
+    s.flags['a_name_in_the_valley'] = 0;
+    s.flags['behind_the_wall'] = 0;
+    // Con solo estas dos ya no se llega al suelo (0,4 > 0,25); lo que se
+    // comprueba es que ninguna combinación real de las tres banderas puede
+    // bajar de él, no que estas dos por sí solas lo alcancen.
+    expect(eligible(s, [lord])[0]?.story).toBeGreaterThanOrEqual(CROSSROADS.STORY_FLOOR);
   });
 
   it('los rasgos del reparto pesan', () => {

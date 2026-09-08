@@ -290,6 +290,11 @@ export const CROSSROADS = {
   FEUD_RIPE_MULTIPLIER: 4.0,
   BEHIND_WALL_MULTIPLIER: 0.4,
   VALLEY_NAME_LORD_MULTIPLIER: 0.5,
+  // §8.6, v2.43: two `story` modifiers on the same category do not multiply —
+  // the strongest wins, and this is the net it cannot fall through however many
+  // stack. Muro and reputation alone already reach 0.4; a third would have gone
+  // lower still and left the category mute right when the late game needs it.
+  STORY_FLOOR: 0.25,
   NOVELTY_MULTIPLIER: 0.4, // if it already came up this game
   DEFAULT_COOLDOWN_YEARS: 25,
 } as const;

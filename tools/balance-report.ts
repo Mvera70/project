@@ -28,6 +28,22 @@ const FOREST_TEMPLATES = new Set(['forest_cut', 'wolf_winter']);
 const PROBE_EVERY = 8;
 /** A village this small is not living, it is taking a long time to die (§5.2). */
 const DYING_BELOW = 6;
+/** Where "early" ends and "late" begins, for the per-category split (v2.44). */
+const HALFWAY_TICK = 100 * TIME.WEEKS_PER_YEAR;
+/**
+ * How long after a hard decision the population is checked again (v2.44).
+ * Long enough to let a spent harvest or a burnt field actually starve someone
+ * — the harvest penalty alone can run a year and the field stays gone for
+ * years after — short enough that it is still that decision being measured
+ * and not the rest of the game.
+ */
+const LOSS_WINDOW_TICKS = 5 * TIME.WEEKS_PER_YEAR;
+/** An option only counts as "hard" if it can cost the village people directly. */
+const HARD_EFFECT_KINDS = new Set(['kill', 'destroy', 'harvest']);
+function isHardOption(templateId: string, optionId: string): boolean {
+  const option = CATALOG.find((t) => t.id === templateId)?.options.find((o) => o.id === optionId);
+  return option !== undefined && option.effects.some((e) => HARD_EFFECT_KINDS.has(e.k));
+}
 
 export interface Sample {
   policy: BenchPolicy;
@@ -62,6 +78,13 @@ export interface Trial {
    * catalogue, it is measuring the trap. */
   decisionsByOption: Record<string, number>;
   decisions: number;
+  /** Category appearances split at year 100 (v2.44): whether `story`'s late-game
+   * suppressors leave `lord`/`stranger` mute in the second half. */
+  posedByCategoryEarly: Record<string, number>;
+  posedByCategoryLate: Record<string, number>;
+  /** Population lost per hard option `worst` takes, measured 5 years out
+   * (v2.44) — the table the contract campaign was for. */
+  hardOptionLoss: Record<string, { totalLoss: number; occurrences: number }>;
   invalid: string[];
   geometry: string[];
   probes: number;
@@ -152,12 +175,30 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
     ceilingIntervals: 0, intervals: 0, eligibleTicks: Object.fromEntries(CATALOG.map((t) => [t.id, 0])),
     posedByTemplate: Object.fromEntries(CATALOG.map((t) => [t.id, 0])), allowedByTemplate: {},
     decisionsByOption: {}, decisions: 0,
+    posedByCategoryEarly: {}, posedByCategoryLate: {}, hardOptionLoss: {},
     invalid: [], geometry: [], probes: 0, longestDwindlingTicks: 0, deathsByCause: {},
     shocked: false, shockExtinct: false };
   let shock: GameState | null = null;
   let counted = 0;
   let allCounted = 0;
   let previousPosed: number | null = null;
+  // §12.9, v2.44: only `worst` is asked whether its hard options bit. Pending
+  // checks wait out LOSS_WINDOW_TICKS before they are charged against the
+  // population they found at the moment of the decision.
+  let pendingLoss: { optionKey: string; popBefore: number; dueTick: number }[] = [];
+  const settleLoss = (tick: number, popNow: number, force: boolean): void => {
+    const [due, notYet] = [
+      pendingLoss.filter((p) => force || tick >= p.dueTick),
+      pendingLoss.filter((p) => !force && tick < p.dueTick),
+    ];
+    for (const p of due) {
+      const entry = result.hardOptionLoss[p.optionKey] ?? { totalLoss: 0, occurrences: 0 };
+      entry.totalLoss += Math.max(0, p.popBefore - popNow);
+      entry.occurrences += 1;
+      result.hardOptionLoss[p.optionKey] = entry;
+    }
+    pendingLoss = notYet;
+  };
   samples.push(sample(state, policy, 'base'));
   checkRanges(state, result.invalid);
   checkGeometry(state, result.geometry);
@@ -172,6 +213,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
         result.eligibleTicks[id] = (result.eligibleTicks[id] ?? 0) + 1;
       }
     }
+    const popBeforeTick = population(state);
     const report = run(state, 1, policy, CATALOG)[0];
     if (report === undefined) throw new Error('Live simulation did not advance');
     // Where the deaths come from, so that an extinction rate above its band can
@@ -183,11 +225,19 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
       const key = `${report.decided.templateId}:${report.decided.optionId}`;
       result.decisionsByOption[key] = (result.decisionsByOption[key] ?? 0) + 1;
       result.decisions += 1;
+      if (policy === 'worst' && isHardOption(report.decided.templateId, report.decided.optionId)) {
+        pendingLoss.push({ optionKey: key, popBefore: popBeforeTick, dueTick: state.tick + LOSS_WINDOW_TICKS });
+      }
     }
     if (report.posed !== null) {
       allCounted += 1;
       result.posedByTemplate[report.posed] = (result.posedByTemplate[report.posed] ?? 0) + 1;
       if (!FOREST_TEMPLATES.has(report.posed)) counted += 1;
+      const category = CATALOG.find((t) => t.id === report.posed)?.category;
+      if (category !== undefined) {
+        const half = state.tick < HALFWAY_TICK ? result.posedByCategoryEarly : result.posedByCategoryLate;
+        half[category] = (half[category] ?? 0) + 1;
+      }
       if (previousPosed !== null) {
         result.intervals += 1;
         // Selection measures from the preceding decision, one tick after pose.
@@ -196,6 +246,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
       previousPosed = state.tick;
     }
     result.peak = Math.max(result.peak, population(state));
+    if (policy === 'worst' && pendingLoss.length > 0) settleLoss(state.tick, population(state), false);
     // §5.7, v2.17: measure the longest consecutive spell, because the
     // abandonment clock correctly resets whenever the village recovers.
     if (state.dwindlingSince !== null) {
@@ -224,6 +275,9 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
       samples.push(sample(shock, policy, 'shock'));
     }
   }
+  // Whatever the game ended before its window closed settles now, against
+  // whatever population the ending left — zero, for the three ways of losing.
+  if (policy === 'worst') settleLoss(state.tick, population(state), true);
   result.ticks = state.tick;
   result.extinct = state.ended !== null;
   for (const template of CATALOG) {
@@ -276,6 +330,12 @@ export interface PolicySummary {
    * policy's decisions, and what share that was. */
   busiestOption: string | null;
   busiestOptionShare: number;
+  /** Category appearances split at year 100 (v2.44). */
+  categoryEarly: Record<string, number>;
+  categoryLate: Record<string, number>;
+  /** Average population lost 5 years after `worst` takes a hard option
+   * (v2.44), and how many times each was actually taken. */
+  hardOptionLoss: Record<string, { average: number; occurrences: number }>;
 }
 
 export function summarize(trials: readonly Trial[], policy: BenchPolicy): PolicySummary {
@@ -331,7 +391,28 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
     restUtilization: Object.fromEntries(CATALOG.map((template) => {
       const allowed = total((t) => t.allowedByTemplate[template.id] ?? 0);
       return [template.id, allowed === 0 ? null : total((t) => t.posedByTemplate[template.id] ?? 0) / allowed];
-    })) };
+    })),
+    categoryEarly: group.reduce<Record<string, number>>((acc, t) => {
+      for (const [c, n] of Object.entries(t.posedByCategoryEarly)) acc[c] = (acc[c] ?? 0) + n;
+      return acc;
+    }, {}),
+    categoryLate: group.reduce<Record<string, number>>((acc, t) => {
+      for (const [c, n] of Object.entries(t.posedByCategoryLate)) acc[c] = (acc[c] ?? 0) + n;
+      return acc;
+    }, {}),
+    hardOptionLoss: (() => {
+      const combined: Record<string, { totalLoss: number; occurrences: number }> = {};
+      for (const t of group) {
+        for (const [key, v] of Object.entries(t.hardOptionLoss)) {
+          const entry = combined[key] ?? { totalLoss: 0, occurrences: 0 };
+          entry.totalLoss += v.totalLoss;
+          entry.occurrences += v.occurrences;
+          combined[key] = entry;
+        }
+      }
+      return Object.fromEntries(Object.entries(combined).map(([key, v]) =>
+        [key, { average: v.occurrences === 0 ? 0 : v.totalLoss / v.occurrences, occurrences: v.occurrences }]));
+    })() };
 }
 
 export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; durationMs: number } {
@@ -362,8 +443,30 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
     summaries.find((s) => s.policy === policy)?.extinction ?? Number.NaN;
   console.info(`Extinction spread, worst - prudent: ${((band('worst') - band('prudent')) * 100).toFixed(1)} points (§12.9: >= 20)`);
   for (const summary of summaries) {
-    console.info(`${summary.policy}: busiest option ${summary.busiestOption ?? 'n/a'} at ${(summary.busiestOptionShare * 100).toFixed(1)}% of decisions (§12.9: < 40%)`);
+    console.info(`${summary.policy}: busiest option ${summary.busiestOption ?? 'n/a'} at ${(summary.busiestOptionShare * 100).toFixed(1)}% of decisions (§12.9: < 45%)`);
   }
+
+  // v2.44: whether story's late-game suppressors leave lord/stranger mute in
+  // the second half rather than merely rarer.
+  console.info('Category appearances, year 0-100 vs 100-200:');
+  const categories = [...new Set(summaries.flatMap((s) => [
+    ...Object.keys(s.categoryEarly), ...Object.keys(s.categoryLate),
+  ]))].sort();
+  console.table(categories.map((c) => Object.fromEntries([
+    ['category', c],
+    ...summaries.flatMap((s) => [
+      [`${s.policy} 0-100`, s.categoryEarly[c] ?? 0],
+      [`${s.policy} 100-200`, s.categoryLate[c] ?? 0],
+    ]),
+  ])));
+
+  // v2.44: the table the contract campaign was for — do worst's hard options
+  // now cost population, five years out.
+  const worstLoss = summaries.find((s) => s.policy === 'worst')?.hardOptionLoss ?? {};
+  console.info('Population lost, 5 years after `worst` takes a hard option:');
+  console.table(Object.entries(worstLoss)
+    .sort((a, b) => b[1].average - a[1].average)
+    .map(([option, v]) => ({ option, 'avg. lost': v.average.toFixed(2), occurrences: v.occurrences })));
 
   for (const summary of summaries) {
     console.info(`${summary.policy}: forest 40-70% at year 100 in ${summary.forestInBand}/${summary.forestTrials} trials that got there (median ${summary.medianForestRatio === null ? 'n/a' : (100 * summary.medianForestRatio).toFixed(1) + '%'})`);

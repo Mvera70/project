@@ -153,16 +153,27 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
     // A deferred feud has a short window in which its people and grievance
     // still coexist. Carry that story across the ordinary weighted draw rather
     // than letting an unrelated question consume the window (§8.6, v2.30).
-    let storyMult = 1;
+    //
+    // Every modifier that applies to this category is collected and only the
+    // one furthest from 1 is used (§8.6, v2.43) — they do not multiply. Muro
+    // and reputation both mean "this village is bothered less"; compounding
+    // them punishes the same story twice and a third seed would have gone
+    // quieter still. `STORY_FLOOR` is the net none of it can fall through.
+    const storyCandidates: number[] = [];
     if (t.category === 'feud' && flagSet(state, 'feud_ripe')) {
-      storyMult *= CROSSROADS.FEUD_RIPE_MULTIPLIER;
+      storyCandidates.push(CROSSROADS.FEUD_RIPE_MULTIPLIER);
     }
     if ((t.category === 'lord' || t.category === 'stranger') && flagSet(state, 'behind_the_wall')) {
-      storyMult *= CROSSROADS.BEHIND_WALL_MULTIPLIER;
+      storyCandidates.push(CROSSROADS.BEHIND_WALL_MULTIPLIER);
     }
     if (t.category === 'lord' && flagSet(state, 'a_name_in_the_valley')) {
-      storyMult *= CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER;
+      storyCandidates.push(CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER);
     }
+    let storyMult = 1;
+    for (const candidate of storyCandidates) {
+      if (Math.abs(candidate - 1) > Math.abs(storyMult - 1)) storyMult = candidate;
+    }
+    storyMult = Math.max(storyMult, CROSSROADS.STORY_FLOOR);
     const noveltyMult = timesSeen(state, t.id) > 0 ? CROSSROADS.NOVELTY_MULTIPLIER : 1;
     const traitMult = traitMultiplier(t, cast, state);
 
