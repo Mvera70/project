@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { foundGame } from '@engine/found';
 import { inspectAt, panelFor } from '@ui/inspect';
 import { recogniseGesture } from '@ui/gestures';
-import { tellsFor } from '@render/layers/tells';
+import { hungerSeverity, tellsFor } from '@render/layers/tells';
+import { crowdPositions } from '@render/crowd';
 
 describe('M-21 · gestos puros', () => {
   it('distingue toque, pulsación y deslizamientos verticales', () => {
@@ -31,5 +32,13 @@ describe('M-21 · inspección y señales', () => {
     const before = JSON.stringify(state);
     expect(tellsFor(state).length).toBeGreaterThan(0);
     expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('hace visible el hambre sin añadir estado', () => {
+    const state = foundGame(7);
+    const normal = crowdPositions(state, 0.3).length;
+    state.flags['forced_hunger'] = state.tick + 8;
+    expect(hungerSeverity(state)).toBe(0.5);
+    expect(crowdPositions(state, 0.3).length).toBeLessThan(normal);
   });
 });

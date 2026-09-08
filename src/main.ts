@@ -4,11 +4,13 @@ import { boot } from './ui/app';
 
 const root = document.querySelector<HTMLDivElement>('#root');
 if (root) {
+  const query = new URLSearchParams(window.location.search);
   const request = parseDebugRequest(window.location.search);
   if (request === null) {
     boot(root);
-  } else if (new URLSearchParams(window.location.search).get('live') === '1') {
+  } else if (query.get('live') === '1') {
     const state = stateAt(request);
+    if (query.get('hunger') === '1') state.village.grain = 0;
     boot(root, {
       schema: state.version,
       savedAtMs: Date.now(),

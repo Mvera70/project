@@ -27,10 +27,18 @@ export function inspectAt(state: GameState, x: number, y: number, tickFraction =
 }
 
 function buildingPanel(building: Building, state: GameState): PanelModel {
-  const users = state.people.villagers.filter((person) => isHere(person) && person.homeId === building.id).length;
-  const lines = [`Raised in ANNO ${yearOf(building.builtTick) + 1}.`, `${users} people use it.`];
+  const residents = state.people.villagers.filter((person) => isHere(person) && person.homeId === building.id);
+  const lines = [`Raised in ANNO ${yearOf(building.builtTick) + 1}.`];
   if (building.kind === 'granary') lines.push(`${Math.floor(state.village.grain)} grain of ${capacityOf(state).storage} capacity.`);
-  if (building.kind === 'house' || building.kind === 'stone_house') lines.push(`${users} people under this roof.`);
+  if (building.kind === 'house' || building.kind === 'stone_house') {
+    const named = residents.filter((person) => person.named).map((person) => person.name);
+    lines.push(`${residents.length} people under this roof${named.length > 0 ? `: ${named.join(', ')}` : '.'}`);
+  }
+  const role = building.kind === 'smithy' ? 'smith' : building.kind === 'chapel' || building.kind === 'church' ? 'priest' : null;
+  if (role !== null) {
+    const holder = state.people.villagers.find((person) => isHere(person) && person.role === role);
+    lines.push(holder === undefined ? `No ${role} serves here.` : `${holder.name || `Villager ${holder.id}`} serves here as ${role}.`);
+  }
   return { title: building.kind.replaceAll('_', ' '), lines };
 }
 
