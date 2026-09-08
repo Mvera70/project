@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.47 · 10 de septiembre de 2026, 00:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.48 · 10 de septiembre de 2026, 01:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,9 +89,24 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.48** | 10 sep 2026, 01:00 | Aplicación del cierre | **Las dos puertas decididas en v2.47 están vivas.** En 30 semillas × 150 años, `forest_cut` aparece 268 veces y `relic_pedlar` 49; ninguna de las 17 plantillas queda muda. Suite rápida: 577 pruebas pasan. No se reabre el balance. |
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.48 — Las dos puertas, abiertas
+
+Se aplican las dos correcciones decididas en v2.47 sin tocar ningún otro
+mecanismo: A.11 exige `forestLeft > 0.12` y A.10 conserva `faith > 30` sin techo.
+El barrido de cobertura de **30 semillas × 150 años** da 268 apariciones de
+`forest_cut`, 49 de `relic_pedlar` y cero plantillas mudas. La suite rápida pasa
+**577 pruebas** (2 pendientes deliberadas).
+
+**Qué habría falsado la decisión:** que cualquiera de las dos siguiera a cero,
+que otra plantilla desapareciera del barrido o que fallara una prueba ajena a
+esas dos condiciones. No ocurrió ninguno. Esta es una confirmación de contenido
+vivo, no una nueva ronda de balance; los umbrales de desenlace quedan como están
+y el siguiente trabajo es M-19.
 
 ### 2.47 — Cierre de la fase de balance
 
