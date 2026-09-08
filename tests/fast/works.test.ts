@@ -203,6 +203,8 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
   it('cuando no queda sitio devuelve mejoras y no edificios nuevos', () => {
     const s = raise(foundGame(7), 'smithy', 1);
     fillTheValley(s);
+    expect(nextProject(s)).toBeNull();
+    s.flags['stone_house_unlocked'] = 0;
     const project = nextProject(s);
     expect(project).not.toBeNull();
     expect(typeof project).toBe('object');
@@ -218,6 +220,8 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
     // El orden lo fija nextUpgrade, y se comprueba sobre él: llenar el valle
     // además de esto sólo añade una segunda causa a cada fallo.
     const s = raise(raise(foundGame(7), 'palisade', 2), 'chapel', 1);
+    s.flags['stone_house_unlocked'] = 0;
+    s.flags['wall_unlocked'] = 0;
     expect(nextUpgrade(s)?.kind).toBe('stone_house');
     for (const b of live(s)) if (b.kind === 'house') b.kind = 'stone_house';
     expect(nextUpgrade(s)?.kind).toBe('wall');
@@ -256,6 +260,7 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
   it('una mejora sustituye a su origen sin dejar ruina ni gente en la calle', () => {
     const s = raise(foundGame(7), 'smithy', 1);
     fillTheValley(s);
+    s.flags['stone_house_unlocked'] = 0;
     const source = live(s).find((b) => b.kind === 'house')!;
     const tenants = s.people.villagers.filter((v) => v.homeId === source.id).map((v) => v.id);
     expect(tenants.length).toBeGreaterThan(0);

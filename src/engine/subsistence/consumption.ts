@@ -92,7 +92,11 @@ export function consume(state: GameState): { severity: number; starved: Villager
 export function overwinter(state: GameState): { cold: boolean } {
   if (seasonOf(state.tick) !== 'winter') return { cold: false };
 
-  const need = population(state) * LABOUR.WINTER_WOOD;
+  const coldUntil = state.flags['cold_houses'];
+  const coldHouses = coldUntil !== undefined && (coldUntil === 0 || coldUntil > state.tick);
+  const need = population(state) * LABOUR.WINTER_WOOD * (
+    coldHouses ? LABOUR.COLD_HOUSES_WOOD_MULTIPLIER : 1
+  );
   if (state.village.wood >= need) {
     state.village.wood -= need;
     return { cold: false };

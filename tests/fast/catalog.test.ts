@@ -62,6 +62,13 @@ describe('el catálogo · forma', () => {
     expect(edge?.effects).toContainEqual({ k: 'flag', flag: 'forced_hunger', years: 1 / 48 });
   });
 
+  it('elegir la muralla deja veinte años de casas frías', () => {
+    const wall = CATALOG.find((t) => t.id === 'first_stone')
+      ?.options.find((o) => o.id === 'the_wall');
+    expect(wall?.effects).toContainEqual({ k: 'flag', flag: 'wall_unlocked', years: 0 });
+    expect(wall?.effects).toContainEqual({ k: 'flag', flag: 'cold_houses', years: 20 });
+  });
+
   it('TODA opción cambia algo en pantalla', () => {
     // El principio 1 del juego convertido en aserto (§8.1). Si esto falla, hay
     // una decisión que el jugador toma y no ve.

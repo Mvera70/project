@@ -82,6 +82,7 @@ export const LABOUR = {
   CUTTER_SHARE: 0.4, // of what is left after the fields
   SMITHY_BONUS: 1.2,
   WINTER_WOOD: 0.4, // per person and week
+  COLD_HOUSES_WOOD_MULTIPLIER: 1.5,
   COLD_MORTALITY: 1.4,
   // TUNE: §5.2 writes the workforce formula inline and §12 keeps none of it.
   // W = (adults 15-59) · 1.0 + (12-14 and 60-69) · 0.5

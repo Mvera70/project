@@ -6,6 +6,11 @@ import { canPlace } from './placement';
 
 export interface Upgrade { kind: 'stone_house' | 'wall' | 'church'; buildingId: BuildingId }
 
+function flagActive(state: GameState, flag: string): boolean {
+  const until = state.flags[flag];
+  return until !== undefined && (until === 0 || until > state.tick);
+}
+
 /**
  * Where the replacement stands. Same corner when it is the same size.
  *
@@ -33,6 +38,8 @@ export function upgradeSpot(
 /** The order is normative: houses, palisades, chapel. Source ids break ties. */
 export function nextUpgrade(state: GameState): Upgrade | null {
   for (const kind of ['stone_house', 'wall', 'church'] as const) {
+    if (kind === 'stone_house' && !flagActive(state, 'stone_house_unlocked')) continue;
+    if (kind === 'wall' && !flagActive(state, 'wall_unlocked')) continue;
     for (const source of [...state.buildings].sort((a, b) => a.id - b.id)) {
       if (source.lostTick !== null || source.kind !== BUILDINGS[kind].upgradeOf) continue;
       if (state.works.some((work) => work.upgradeOf === source.id)) continue;

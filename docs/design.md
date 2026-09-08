@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.36 · 8 de septiembre de 2026, 23:50 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.37 · 9 de septiembre de 2026, 00:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -81,6 +81,22 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.34** | 8 sep 2026, 23:00 | Contrato de A.9 | **La capilla compromete la próxima cosecha al 80 %.** El precio deja de prometer un «año magro» indefinido y nombra el quinto que se perderá en la siguiente siega. |
 | **2.35** | 8 sep 2026, 23:30 | Contrato de A.11 | **Las dos decisiones de tala modifican el bosque real.** `fell_it` extrae 900 de madera y deja claras sin rebrote; `take_the_edge` extrae 300 y fuerza una semana de hambre 0,5. |
 | **2.36** | 8 sep 2026, 23:50 | Consecuencia de A.11 | **Las laderas desnudas cambian el clima que se sortea.** `flood_prone` suma cinco puntos a los años ruinosos y los resta de los justos, sin añadir tiradas aleatorias. |
+| **2.37** | 9 sep 2026, 00:20 | Contrato de piedra de A.16 | **La elección abre la familia de mejora que nombra.** Muros y casas de piedra dejan de construirse antes de A.16; elegir muro aumenta un 50 % la leña invernal durante veinte años. |
+
+### 2.37 — Piedra para una cosa
+
+A.16 dice que la cantera alcanza para una de dos transformaciones, pero M-14
+mejoraba casas y empalizadas sin leer `stone_house_unlocked` ni `wall_unlocked`.
+`nextUpgrade` exige ahora la bandera correspondiente; la iglesia conserva su
+regla propia. La caché de «no hay proyecto» incorpora ambos desbloqueos para
+que una decisión abra trabajo inmediatamente aunque el resto del valle no haya
+cambiado.
+
+`the_wall` añade `cold_houses` durante veinte años. En invierno, esa bandera
+multiplica por 1,5 la leña necesaria por persona; al vencer vuelve al consumo
+normal. Así «Cold houses for a generation» deja de ser una ganancia neta de
+ánimo. Las pruebas cubren el bloqueo antes de elegir, la invalidación de caché,
+el orden de mejoras ya abiertas y el gasto adicional de leña.
 
 ### 2.36 — Las laderas llegan a la cosecha
 
@@ -2263,8 +2279,8 @@ La aldea decide sola, siempre en este orden:
 6. `smithy`, si no existe y `people ≥ 35`
 7. `mill`, si no existe y `people ≥ 45`
 8. `palisade`, si existe `smithy` y la bandera `threatened` está puesta
-9. **Mejoras a piedra**, cuando no queda sitio: casas primero, luego empalizada,
-   luego capilla
+9. **Mejoras a piedra**, cuando no queda sitio: casas si A.16 las desbloqueó,
+   luego empalizada si A.16 desbloqueó el muro, luego capilla
 
 El punto 9 es lo que resuelve el problema de ritmo a largo plazo de `valle.md`
 §7. Cuando el mapa se llena, el mismo motor de obras sigue funcionando pero
@@ -3043,6 +3059,7 @@ export const LABOUR = {
   CUTTER_SHARE: 0.40,           // del sobrante tras el campo
   SMITHY_BONUS: 1.20,
   WINTER_WOOD: 0.4,             // por persona y semana
+  COLD_HOUSES_WOOD_MULTIPLIER: 1.5,
   COLD_MORTALITY: 1.4,
 } as const;
 
@@ -4466,7 +4483,7 @@ faltaba para que eso se cumpliera de verdad.
 
 | Verbo | Precio | Efectos | En pantalla | Semilla |
 |---|---|---|---|---|
-| **The wall** | Cold houses for a generation | Habilita `wall`, obra de mejora ×1.5 en muro, `morale +6` | `raise wall` | `behind_the_wall`, 20–40 años: plantillas de `lord` y `stranger` con peso ×0.4 |
+| **The wall** | Cold houses for a generation | Habilita `wall`, leña de invierno ×1.5 durante 20 años, `morale +6` | `raise wall` | `behind_the_wall`, 20–40 años: plantillas de `lord` y `stranger` con peso ×0.4 |
 | **The houses** | The valley is rich and open | Habilita `stone_house`, incendios ×0.3, `morale +12` | `raise stone_house` | `worth_taking`, 15–30 años: `flag threatened 8` |
 
 ---

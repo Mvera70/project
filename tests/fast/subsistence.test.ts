@@ -368,6 +368,18 @@ describe('invierno · §5.4', () => {
     expect(s.village.wood).toBeCloseTo(before - population(s) * LABOUR.WINTER_WOOD, 9);
   });
 
+  it('las casas frías queman un cincuenta por ciento más durante su bandera', () => {
+    const plain = founded(7);
+    const cold = founded(7);
+    plain.tick = cold.tick = winterTick;
+    cold.flags['cold_houses'] = cold.tick + 20 * TIME.WEEKS_PER_YEAR;
+    overwinter(plain);
+    overwinter(cold);
+    const plainSpent = FOUNDING.WOOD - plain.village.wood;
+    const coldSpent = FOUNDING.WOOD - cold.village.wood;
+    expect(coldSpent).toBeCloseTo(plainSpent * LABOUR.COLD_HOUSES_WOOD_MULTIPLIER, 9);
+  });
+
   it('sin leña se marca cold y la reserva queda a cero', () => {
     const s = founded(7);
     s.tick = winterTick;

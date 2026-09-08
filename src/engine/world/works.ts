@@ -30,6 +30,8 @@ interface NoProjectSnapshot {
   granaryWanted: boolean;
   chapelFaith: boolean;
   threatened: boolean;
+  wallUnlocked: boolean;
+  stoneHouseUnlocked: boolean;
   buildings: string;
   terrain: Uint8Array;
 }
@@ -67,6 +69,8 @@ function projectSnapshot(state: GameState): NoProjectSnapshot {
       state.village.grain > BUILDING_RULES.GRANARY_FULL * storageCapacity(state),
     chapelFaith: state.village.faith >= BUILDING_RULES.CHAPEL_FAITH,
     threatened: threatenedNow(state),
+    wallUnlocked: flagNow(state, 'wall_unlocked'),
+    stoneHouseUnlocked: flagNow(state, 'stone_house_unlocked'),
     buildings: buildingSignature(state),
     terrain: Uint8Array.from(state.map.terrain),
   };
@@ -76,6 +80,11 @@ function sameTerrain(a: Uint8Array, b: GameState['map']['terrain']): boolean {
   if (a.length !== b.length) return false;
   for (let i = 0; i < a.length; i += 1) if (a[i] !== b[i]) return false;
   return true;
+}
+
+function flagNow(state: GameState, flag: string): boolean {
+  const until = state.flags[flag];
+  return until !== undefined && (until === 0 || until > state.tick);
 }
 
 function noProjectStillApplies(state: GameState): boolean {
@@ -88,6 +97,8 @@ function noProjectStillApplies(state: GameState): boolean {
     previous.granaryWanted === granaryWanted &&
     previous.chapelFaith === (state.village.faith >= BUILDING_RULES.CHAPEL_FAITH) &&
     previous.threatened === threatenedNow(state) &&
+    previous.wallUnlocked === flagNow(state, 'wall_unlocked') &&
+    previous.stoneHouseUnlocked === flagNow(state, 'stone_house_unlocked') &&
     previous.buildings === buildingSignature(state) &&
     sameTerrain(previous.terrain, state.map.terrain);
 }

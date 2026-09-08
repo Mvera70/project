@@ -144,6 +144,7 @@ export const FIRST_STONE: CrossroadTemplate = {
       cost: 'crossroad.first_stone.the_wall.cost',
       effects: [
         { k: 'flag', flag: 'wall_unlocked', years: 0 },
+        { k: 'flag', flag: 'cold_houses', years: 20 },
         { k: 'stat', stat: 'morale', delta: 6 },
       ],
       visible: [{ k: 'raise', kind: 'wall' }],
