@@ -167,6 +167,7 @@ export interface ScoredTemplate {
   /** The parts of the score, so that why it won can be inspected. */
   weight: number;
   crisis: number;
+  story: number;
   trait: number;
   novelty: number;
 }

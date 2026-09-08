@@ -22,7 +22,7 @@ export const SMITH_FEUD: CrossroadTemplate = {
   // existe. Queda anotado: si M-05 llega a producir enemistades más hondas de
   // forma sostenida, esto vuelve a 55.
   requires: [
-    { k: 'grudge', min: 45 },
+    { k: 'any', cs: [{ k: 'grudge', min: 45 }, { k: 'flag', flag: 'feud_ripe', set: true }] },
     { k: 'stat', stat: 'people', op: '>', v: 20 },
   ],
   cast: [
@@ -121,7 +121,7 @@ export const FEUD_INHERITED: CrossroadTemplate = {
   // enemistad heredada es la honda, no cualquiera.
   requires: [
     { k: 'year', op: '>', v: 24 },
-    { k: 'grudge', min: 45 },
+    { k: 'any', cs: [{ k: 'grudge', min: 45 }, { k: 'flag', flag: 'feud_ripe', set: true }] },
     { k: 'stat', stat: 'people', op: '>', v: 15 },
   ],
   cast: [

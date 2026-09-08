@@ -747,6 +747,18 @@ describe('selección · §8.6', () => {
     expect(feud?.crisis).toBe(1);
   });
 
+  it('feud_ripe da prioridad temporal a una disputa elegible', () => {
+    const s = calm(7);
+    makeFeud(s);
+    const before = eligible(s, [T_FEUD])[0];
+    expect(before?.story).toBe(1);
+
+    s.flags['feud_ripe'] = s.tick + YEAR;
+    const after = eligible(s, [T_FEUD])[0];
+    expect(after?.story).toBe(CROSSROADS.FEUD_RIPE_MULTIPLIER);
+    expect(after?.score).toBe((before?.score as number) * CROSSROADS.FEUD_RIPE_MULTIPLIER);
+  });
+
   it('los rasgos del reparto pesan', () => {
     const s = calm(7);
     const [leader, other] = makeFeud(s);

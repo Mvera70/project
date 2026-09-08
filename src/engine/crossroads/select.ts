@@ -150,6 +150,12 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
     if (cast === null) continue;
 
     const crisisMult = crisis !== null && t.category === crisis ? CROSSROADS.CRISIS_MULTIPLIER : 1;
+    // A deferred feud has a short window in which its people and grievance
+    // still coexist. Carry that story across the ordinary weighted draw rather
+    // than letting an unrelated question consume the window (§8.6, v2.30).
+    const storyMult = t.category === 'feud' && flagSet(state, 'feud_ripe')
+      ? CROSSROADS.FEUD_RIPE_MULTIPLIER
+      : 1;
     const noveltyMult = timesSeen(state, t.id) > 0 ? CROSSROADS.NOVELTY_MULTIPLIER : 1;
     const traitMult = traitMultiplier(t, cast, state);
 
@@ -158,9 +164,10 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
       cast,
       weight: t.weight,
       crisis: crisisMult,
+      story: storyMult,
       trait: traitMult,
       novelty: noveltyMult,
-      score: t.weight * crisisMult * traitMult * noveltyMult,
+      score: t.weight * crisisMult * storyMult * traitMult * noveltyMult,
     });
   }
 

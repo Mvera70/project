@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.29 · 8 de septiembre de 2026, 20:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.30 · 8 de septiembre de 2026, 21:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -74,6 +74,23 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.27** | 8 sep 2026, 19:30 | Contrato de A.5/A.6 | **Las decisiones durante una peste cambian su fecha final.** Un efecto explícito suma o resta semanas al brote activo una sola vez; desaparecen las dos banderas anuales que nadie podía leer correctamente. |
 | **2.28** | 8 sep 2026, 20:00 | Contrato de trabajo | **Cada promesa de obra tiene su factor y su duración.** A.7 aplica 0,85 durante cuatro años, A.15 aplica 0,8 durante dos y A.12 aplica 0,4 durante seis semanas exactas. |
 | **2.29** | 8 sep 2026, 20:30 | Contrato de expulsión | **Ser expulsado significa abandonar la población.** A.4 y A.8 marcan `leftTick`, sacan al personaje del reparto de nombres y contabilizan la marcha en el informe semanal y la crónica. |
+| **2.30** | 8 sep 2026, 21:00 | Contrato de conflicto diferido | **`feud_ripe` conserva durante cinco años la prioridad de una disputa sembrada.** Las plantillas `feud` elegibles multiplican su peso por cuatro mientras la bandera está activa. |
+
+### 2.30 — La disputa llega antes que el olvido
+
+Las semillas de A.4, A.6, A.8 y A.15 ya escribían `feud_ripe`, pero la selección
+no la leía. El retraso de una semilla deja una ventana corta: todavía deben
+coexistir el agraviado, su contrario, población suficiente y un reparto válido.
+Durante los cinco años de la bandera, esta sustituye el umbral ambiental de
+rencor de A.7 y A.8: la semilla ya es la prueba de que existe una deuda concreta.
+La plantilla conserva sus demás condiciones y debe poder completar el reparto.
+Si resulta elegible, recibe `FEUD_RIPE_MULTIPLIER = 4`; no omite su reposo ni el
+techo, solo evita que otra historia consuma la ventana que una consecuencia
+anterior abrió expresamente.
+
+El factor iguala el de crisis y queda en §12.8. La prueba de selección separa
+su componente `story` del de crisis y de los rasgos para que la procedencia del
+peso siga siendo auditable.
 
 ### 2.29 — Un nombre que cruza el vado
 
@@ -2495,6 +2512,7 @@ eligible = catalog.filter(t =>
 if eligible is empty: return
 score(t) = t.weight
          · crisisMultiplier(t)          // ×4 si su categoría es la crisis activa
+         · storyMultiplier(t)           // ×4 para feud si feud_ripe está activa
          · traitMultiplier(t)           // rasgos del reparto
          · noveltyMultiplier(t)         // ×0.4 si ya salió en esta partida
 pick weighted by score, from the 'crossroads' stream
@@ -3085,6 +3103,7 @@ export const CROSSROADS = {
   MIN_TICKS_BETWEEN: 120,       // 30 min reales a ×1
   GUARANTEE_TICKS: 960,         // una por generación como mínimo
   CRISIS_MULTIPLIER: 4.0,
+  FEUD_RIPE_MULTIPLIER: 4.0,
   NOVELTY_MULTIPLIER: 0.4,      // si ya salió en esta partida
   DEFAULT_COOLDOWN_YEARS: 25,
 } as const;

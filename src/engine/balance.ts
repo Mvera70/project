@@ -284,6 +284,7 @@ export const CROSSROADS = {
   MIN_TICKS_BETWEEN: 120, // 30 real minutes at ×1
   GUARANTEE_TICKS: 960, // at least one per generation
   CRISIS_MULTIPLIER: 4.0,
+  FEUD_RIPE_MULTIPLIER: 4.0,
   NOVELTY_MULTIPLIER: 0.4, // if it already came up this game
   DEFAULT_COOLDOWN_YEARS: 25,
 } as const;
