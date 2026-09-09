@@ -37,14 +37,23 @@ function foundingBuildings(state: GameState): void {
  * ruinous year before it has done anything is a village the player never had a
  * hand in.
  */
-export function foundGame(seed: number): GameState {
+export interface InheritedValley {
+  terrainSeed: number;
+  ruins: Uint8Array;
+}
+
+export function foundGame(seed: number, inherited?: InheritedValley): GameState {
   const rng = makeBundle(seed);
+  const terrainSeed = inherited?.terrainSeed ?? seed;
+  const mapRng = terrainSeed === seed ? rng : makeBundle(terrainSeed);
   const state: GameState = {
-    version: 1,
+    version: 2,
     seed,
+    terrainSeed,
     tick: 0,
+    peakPeople: FOUNDING.POPULATION,
     rng,
-    map: generateMap(rng),
+    map: generateMap(mapRng),
     village: {
       grain: FOUNDING.GRAIN,
       wood: FOUNDING.WOOD,
@@ -67,5 +76,11 @@ export function foundGame(seed: number): GameState {
     ended: null,
   };
   foundingBuildings(state);
+  if (inherited !== undefined) {
+    if (inherited.ruins.length !== state.map.ruins.length) {
+      throw new Error('Inherited ruin mask does not fit the valley.');
+    }
+    state.map.ruins.set(inherited.ruins);
+  }
   return state;
 }

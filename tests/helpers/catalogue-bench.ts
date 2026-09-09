@@ -55,7 +55,7 @@ function founded(seed: number): GameState {
   bid = 0;
   const rng = makeBundle(seed);
   return {
-    version: 1, seed, tick: 0, rng,
+    version: 2, seed, terrainSeed: seed, tick: 0, peakPeople: 20, rng,
     map: {
       width: 36, height: 56,
       terrain: new Uint8Array(CELLS).fill(1, 0, Math.floor(CELLS * 0.45)),

@@ -8,8 +8,17 @@ import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { catchUp, deserialize, serialize, ticksOwed } from '@engine/save';
-import { run } from '@engine/sim';
+import { population } from '@engine/people/demography';
+import {
+  archiveGame,
+  catchUp,
+  deserialize,
+  foundSuccessor,
+  serialize,
+  ticksOwed,
+} from '@engine/save';
+import { run, tick } from '@engine/sim';
+import { TERRAIN_CODE } from '@engine/state';
 import type { DecisionRecord } from '@engine/state';
 import type { Policy } from '@engine/sim';
 import { fingerprint } from '../helpers/fingerprint';
@@ -49,6 +58,87 @@ describe('serialize / deserialize · §13.1', () => {
     const state = foundGame(3);
     const saved = serialize(state, state.history, [], Date.now());
     expect(() => deserialize(structuredClone(saved))).not.toThrow();
+  });
+
+  it('migra el esquema 1 conservando su semilla de terreno y el pico observable', () => {
+    const current = foundGame(7);
+    current.chronicle.push({
+      tick: 1,
+      kind: 'arrival',
+      templateKey: 'arrival',
+      params: { people: 27 },
+      weight: 2,
+    });
+    const legacyState = structuredClone(current) as unknown as Record<string, unknown>;
+    delete legacyState['terrainSeed'];
+    delete legacyState['peakPeople'];
+    const loaded = deserialize({
+      schema: 1,
+      savedAtMs: 10,
+      state: { ...legacyState, version: 1 },
+      decisions: [],
+      archive: [],
+    });
+
+    expect(loaded.schema).toBe(2);
+    expect(loaded.state.version).toBe(2);
+    expect(loaded.state.terrainSeed).toBe(7);
+    expect(loaded.state.peakPeople).toBe(27);
+  });
+});
+
+describe('herencia entre partidas · §13.3', () => {
+  it('registra el pico de los estados semanales que llegaron a completarse', () => {
+    const state = foundGame(7);
+    let observed = population(state);
+    for (let i = 0; i < 500 && state.ended === null; i += 1) {
+      tick(state, CATALOG);
+      observed = Math.max(observed, population(state));
+    }
+    expect(state.peakPeople).toBe(observed);
+  });
+
+  it('archiva la crónica y toda la huella visible, sin aceptar una aldea viva', () => {
+    const state = foundGame(7);
+    expect(() => archiveGame(state)).toThrow();
+    state.map.ruins[0] = 1;
+    state.peakPeople = 37;
+    state.ended = { tick: 12, cause: 'extinction', lastId: 0 };
+
+    const archived = archiveGame(state);
+    expect(archived.peakPeople).toBe(37);
+    expect(archived.ruins[0]).toBe(1);
+    for (const building of state.buildings) {
+      for (let y = building.y; y < building.y + building.h; y += 1) {
+        for (let x = building.x; x < building.x + building.w; x += 1) {
+          expect(archived.ruins[y * state.map.width + x]).toBe(1);
+        }
+      }
+    }
+    state.chronicle[0]!.params['changed'] = 1;
+    expect(archived.chronicle[0]?.params['changed']).toBeUndefined();
+  });
+
+  it('funda otra gente sobre el mismo terreno y siembra las ruinas sin hacerlas ocupación', () => {
+    const ended = foundGame(7);
+    const originalTerrain = Uint8Array.from(ended.map.terrain);
+    const altered = ended.map.terrain.findIndex((terrain) => terrain === TERRAIN_CODE.forest);
+    ended.map.terrain[altered] = TERRAIN_CODE.cleared;
+    ended.ended = { tick: 1, cause: 'abandoned', lastId: null };
+    const archived = archiveGame(ended);
+    const successor = foundSuccessor(archived, 42);
+
+    expect(successor.seed).toBe(42);
+    expect(successor.terrainSeed).toBe(7);
+    expect(successor.map.terrain).toEqual(originalTerrain);
+    expect(successor.map.terrain).not.toEqual(ended.map.terrain);
+    expect(successor.map.ruins).toEqual(archived.ruins);
+    expect(successor.people.villagers.map((person) => person.name))
+      .not.toEqual(ended.people.villagers.map((person) => person.name));
+    // Las casas fundacionales pueden ocupar su vieja huella: la máscara no es
+    // una regla de colocación ni convierte el fracaso en una ventaja mecánica.
+    expect(successor.buildings.some((building) =>
+      successor.map.ruins[building.y * successor.map.width + building.x] === 1)).toBe(true);
   });
 });
 
