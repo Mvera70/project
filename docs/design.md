@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.82 · 11 de septiembre de 2026, 11:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.83 · 11 de septiembre de 2026, 12:05 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.83** | 11 sep 2026, 12:05 | M-27.1 · el subdirectorio, probado | **Pages no sirve en la raíz, y eso solo falla una vez desplegado.** Un servidor propio monta el mismo `dist/` bajo `/project/` y un recorrido comprueba que arranca, que el ámbito del trabajador se limita a ese prefijo y que ninguna ruta guardada se sale de él. |
 | **2.82** | 11 sep 2026, 11:30 | M-27 · instalable y sin conexión | **La PWA que `CLAUDE.md` prometía desde el primer día y la spec no definía.** Manifest, iconos y un service worker con dos políticas: documento por red primero, lo demás por caché. §13.4 nueva, despliegue a GitHub Pages, y una frontera medida y declarada — abre sin red **desde la segunda apertura**, no desde la primera. |
 | **2.81** | 11 sep 2026, 10:40 | M-23.6 · dominios de las condiciones guardadas | **Una referencia que resuelve todavía puede nombrar algo que el DSL no tiene.** `PlantedSeed.condition` aceptaba `stat` y `ratio` como cualquier cadena y `minWeek` como cualquier entero ≥ 0: la frontera de v2.73 comprobaba la plantilla, la opción y el `id`, pero no los tres dominios cerrados de §8.2. |
 | **2.80** | 11 sep 2026, 03:20 | M-23.5 · guardado durante el letargo | **Una instantánea parcial no puede perdonar las semanas que aún debe.** Ocultar o cerrar entre lotes conserva en `savedAtMs` exactamente los ticks restantes; completar el letargo solicita su guardado antes de abrir la bienvenida y arrancar el reloj normal. |
@@ -127,6 +128,30 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.83 — La ruta que solo falla desplegada
+
+§13.4 dice que el mismo `dist/` sirve desde la raíz de un dominio y desde el
+subdirectorio de Pages sin reconstruirse. Estaba escrito y no estaba probado:
+`vite preview` solo sirve la raíz, así que la mitad que de verdad usa el
+despliegue —`/project/`— no la recorría nadie. Una sola ruta absoluta en un
+recurso, en el manifest o en el ámbito del trabajador rompe **solo ahí**, solo
+una vez publicado, y en ninguna ejecución local.
+
+`tools/subpath-server.mjs` monta `dist/` bajo `/project/` y el recorrido
+comprueba las tres cosas: que la aldea arranca, que el ámbito del trabajador es
+ese prefijo y no la raíz —uno con `scope: '/'` se apropiaría de todo lo demás
+publicado en el dominio— y que **toda** entrada que guarda en caché cuelga de
+él. Después, sin red, vuelve a abrir. Devolver 404 hasta que existe `dist/` es
+además lo que hace esperar a Playwright sin ordenar los dos servidores a mano.
+
+**Evidencia.** Cinco recorridos de PWA en 12,4 s, con el nuevo dentro; tipos y
+lint pasan. Medido antes de publicar nada: el ámbito sale
+`http://127.0.0.1:4180/project/` y las cinco entradas de la caché empiezan por
+`/project/`.
+
+**Lo falsaría** que la aldea no arrancase bajo un prefijo, que el trabajador
+reclamase la raíz o que una sola entrada guardada se saliera del subdirectorio.
 
 ### 2.82 — Instalable, y sin red desde la segunda vez
 
@@ -4994,7 +5019,9 @@ cumplida**, para que quien la resuelva sepa dónde estaba.
 dominio y desde el subdirectorio de GitHub Pages sin reconstruirse. Con
 `base: './'` los recursos, el manifest y el registro del service worker se
 resuelven contra el documento, y el ámbito del trabajador queda acotado a su
-propio directorio sin escribir la ruta en ningún sitio.
+propio directorio sin escribir la ruta en ningún sitio. Un recorrido sirve el
+mismo `dist/` bajo un prefijo y lo comprueba (v2.83): sin él, esta afirmación
+solo se verificaría desplegando.
 
 **Qué lo falsaría:** que la aldea no cargue con el modo avión puesto a partir de
 la segunda apertura; que un despliegue nuevo no llegue a un dispositivo que ya
