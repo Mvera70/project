@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.68 · 10 de septiembre de 2026, 18:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.69 · 10 de septiembre de 2026, 19:15 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.69** | 10 sep 2026, 19:15 | Auditoría de hitos 3, 5 y 6 | **Implementar y aceptar dejan de figurar como sinónimos.** Generaciones e idle cumplen sus criterios y se cierran con evidencia longitudinal y de interfaz. M-23 está completo, pero el hito 6 conserva su prueba de una partida humana de varios días: cuatro horas de reloj falso no son varios días jugados. |
 | **2.68** | 10 sep 2026, 18:30 | M-25 · epitafio y herencia visible | **El fracaso ya tiene salida y memoria visible.** El reloj se detiene ante un epitafio que explica causa, duración y pico; la crónica se puede leer y «Begin again» funda gente distinta sobre el mismo terreno. Las ruinas heredadas se dibujan como una cimentación continua. Las escrituras de IndexedDB se ordenan para que la partida muerta nunca sobrescriba a su sucesora. **Hito 4 alcanzado.** |
 | **2.67** | 10 sep 2026, 17:45 | M-24 · núcleo de herencia | **La semilla del valle sobrevive a sus habitantes.** El estado separa `seed` de `terrainSeed` y registra `peakPeople`; una partida terminada se archiva como crónica + huella, y una nueva semilla funda otra gente sobre el terreno y las ruinas anteriores. El hito 4 sigue abierto hasta decidir y mirar su interfaz. |
 | **2.66** | 10 sep 2026, 17:00 | Coordenadas de efectos de M-22 | **El vado es una orilla, no una celda de agua.** `gather ford` enfoca el acceso terrestre contiguo al río más cercano al núcleo; `scar felled_wood`, la primera celda que la tala tocó realmente. Los dos dejan de caer sobre `valleyCore`. |
@@ -113,6 +114,42 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.69 — Un test de reloj no juega durante varios días
+
+La tabla de hitos seguía llamando «esbozados» a sistemas ya recorribles y, a la
+vez, M-23 proclamaba el hito 6 superado con una prueba que no satisface su
+criterio. Esta revisión separa **módulo implementado** de **hito aceptado**.
+
+**Hito 3, alcanzado.** El contrato no exige una nueva interfaz: pide que la gente
+envejezca, muera, herede roles y que el valle conserve memoria. La suite ya fija
+edad derivada, nacimientos con padres, muerte, promoción, opiniones, recuerdos,
+rencores y sucesión. Como lectura longitudinal se corrieron diez semillas
+`prudent` durante cien años: una terminó por abandono en el año 20 y nueve
+llegaron al 100; juntas produjeron **2.351 descendientes**, **203 personajes
+nombrados nacidos después de la fundación** y **60 decisiones de sucesión**.
+Hubo dos rencores y uno llegó a sanar sin borrarse. No son piezas aisladas: el
+bucle largo las enlaza durante varias generaciones.
+
+**Hito 5, alcanzado.** M-20 aporta el reloj real y sus cuatro velocidades; M-23
+calcula la ausencia, ejecuta hasta 960 ticks en lotes de 64 y presenta el parte;
+v2.64 corrigió su selección y opacidad tras leerlo. La suite prueba el límite y
+Playwright recorre cuatro horas con reloj falso. La sensación de tres minutos
+por estación sigue siendo una hipótesis de balance para una partida larga, pero
+no falta ninguna pieza del criterio «tiempo real, letargo, parte».
+
+**Hito 6, pendiente de aceptación humana.** M-23 está implementado y Playwright
+demuestra que IndexedDB sobrevive a cerrar, adelantar cuatro horas y volver.
+M-24 prueba además la migración aditiva de esquema 1 a 2. Pero §15 exige la
+«primera partida real de varios días». Ningún reloj falso observa hábitos de
+guardado, cierres reales del navegador ni el deseo de volver. El hito no se
+declara alcanzado hasta que ocurra esa partida; es una deuda humana del mismo
+tipo que el lector externo del hito 0, aunque el software necesario ya exista.
+
+**Lo falsaría** encontrar una semilla longeva sin descendientes, promociones ni
+sucesiones; que un salto de cuatro horas resolviera una decisión pendiente,
+animara entre ticks o omitiera el parte; o llamar aceptado al hito 6 sin una
+sesión real que atraviese varios días.
 
 ### 2.68 — El valle termina antes de volver a empezar
 
@@ -4533,10 +4570,10 @@ color equivocado, figuras ilegibles a tamaño real— no los detecta ningún ase
 | **0** | Crónica sin gráficos | Tres crónicas distinguibles por un tercero | M-00 … M-12 |
 | **1** | Valle visible | Se ve la aldea y las estaciones; sin jugador | M-13 … M-19 |
 | **2** | Encrucijadas | Una decisión que cambia el valle de forma visible | M-20 … M-22 |
-| **3** | Generaciones | Envejecen, mueren, heredan; la aldea recuerda | M-04, M-05, M-06 ampliados |
+| **3** | Generaciones | Envejecen, mueren, heredan; la aldea recuerda | M-04, M-05, M-06 · **alcanzado v2.69** |
 | **4** | Fracaso y herencia | Una aldea puede extinguirse; quedan ruinas | M-24, M-25 |
-| **5** | Idle | Tiempo real, letargo, parte de bienvenida | Esbozado, §16.2 |
-| **6** | Guardado | Persistencia; primera partida real de varios días | M-23 |
+| **5** | Idle | Tiempo real, letargo, parte de bienvenida | M-20, M-23 · **alcanzado v2.69** |
+| **6** | Guardado | Persistencia; primera partida real de varios días | M-23 completo; aceptación humana pendiente |
 
 ### 15.1 El hito 0 en detalle
 
@@ -4560,11 +4597,11 @@ que arreglarlo antes de dibujar un solo píxel.
 
 ---
 
-## 16. Hitos 4 a 6 — esbozo
+## 16. Hitos 4 a 6 — estado
 
-No se detallan por decisión consciente: dependen de cómo se sienta el juego, y
-especificarlos ahora sería inventar. Se fija solo lo que otros módulos necesitan
-saber para no cerrarles la puerta.
+Nacieron como esbozos porque dependían de cómo se sintiera el juego. M-20 a M-25
+ya permiten evaluarlos: aquí queda separado lo implementado de las aceptaciones
+que todavía requieren una persona jugando.
 
 ### 16.1 Hito 4 — Fracaso y herencia
 
@@ -4585,16 +4622,21 @@ evidencia real de presión de almacenamiento.
 
 ### 16.2 Hito 5 — Idle
 
-El contrato de §13.2 es firme. Queda por decidir, y **solo se puede resolver
-jugando**: los tiempos de §12.1. La estación de 3 minutos y la generación de 4
-horas son una hipótesis razonada, no un dato. El ajuste se hace con la primera
-partida larga en la mano y consiste en cambiar `REAL_MS_PER_TICK` y nada más —
-por eso el motor cuenta en ticks y no en minutos.
+**Alcanzado en v2.69.** El contrato de §13.2 está implementado por M-20 y M-23:
+reloj real, pausa y tres velocidades, letargo acotado y parte de bienvenida. Lo
+que sigue necesitando juego humano es el ajuste de los tiempos de §12.1. La
+estación de 3 minutos y la generación de 4 horas son una hipótesis razonada, no
+un dato. Ese ajuste consiste en cambiar `REAL_MS_PER_TICK` y nada más — por eso
+el motor cuenta en ticks y no en minutos — y no reabre el hito mientras el flujo
+funcional permanezca entero.
 
 ### 16.3 Hito 6 — Guardado
 
-Especificado en §13.1. Queda por decidir la política de migración cuando cambie
-`schema`, que depende de si para entonces hay partidas de gente real.
+**M-23 implementado; hito pendiente.** §13.1 funciona en IndexedDB y M-24 ya
+resolvió la primera política de migración: esquema 1 a 2, aditiva y sin inventar
+el pico histórico ausente. Falta el criterio que no automatiza ninguna suite:
+una partida real de varios días. Hasta entonces el guardado está verificado,
+pero el hito no está aceptado.
 
 ---
 
@@ -5299,10 +5341,11 @@ aplicación; `catchUp` de 4 h ejecuta exactamente 960 ticks y tarda menos de 2 s
 reproducir el registro de decisiones desde la semilla da el mismo estado que la
 instantánea.
 **Terminado cuando.** Cerrar y abrir a las cuatro horas presenta un parte de
-bienvenida coherente. **Este es el hito 6.**
+bienvenida coherente. Esto cierra M-23 y deja listo el hito 6; la aceptación
+adicional de varios días reales permanece en §15.
 
-**Estado (v2.63): implementado — hito 6 alcanzado, con una reserva anotada en
-§2.63.** `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
+**Estado (v2.69): módulo implementado; hito 6 pendiente de aceptación humana
+según §15.** `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
 propia prueba mide en menos de 2 s); el letargo de la interfaz (`ui/lethargy.ts`)
 es un bucle distinto sobre lotes de 64, la misma separación pura/DOM que
 `loop.ts`. El guardado real vive en IndexedDB (`ui/idb.ts`, fuera del contrato
