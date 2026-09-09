@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.84 · 11 de septiembre de 2026, 13:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.85 · 11 de septiembre de 2026, 13:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.85** | 11 sep 2026, 13:40 | 64× para poder probar | **Una cuarta velocidad, y por un motivo declarado: §16.2 dice que el ritmo solo se resuelve jugando, y a 16× un año son 45 s.** A 64× son once. Los botones dejan de estar escritos a mano y salen de `TIME.SPEEDS`, que era la única lista que debía existir. |
 | **2.84** | 11 sep 2026, 13:10 | M-28 · lo que pasa se ve, y el reloj no se para | **Primera sesión humana real, y dice que no.** No es el guardado: en veinte años vistos hubo un asalto repelido, un asesinato, un incendio, una fragua y una sucesión, y el valle enseñó gente andando. §11.6 nueva: los sucesos de peso 2 y 3 aparecen sobre el valle con su propia línea. Y §13.2 gana su segunda puerta: volver de segundo plano ya no pierde el tiempo. |
 | **2.83** | 11 sep 2026, 12:05 | M-27.1 · el subdirectorio, probado | **Pages no sirve en la raíz, y eso solo falla una vez desplegado.** Un servidor propio monta el mismo `dist/` bajo `/project/` y un recorrido comprueba que arranca, que el ámbito del trabajador se limita a ese prefijo y que ninguna ruta guardada se sale de él. |
 | **2.82** | 11 sep 2026, 11:30 | M-27 · instalable y sin conexión | **La PWA que `CLAUDE.md` prometía desde el primer día y la spec no definía.** Manifest, iconos y un service worker con dos políticas: documento por red primero, lo demás por caché. §13.4 nueva, despliegue a GitHub Pages, y una frontera medida y declarada — abre sin red **desde la segunda apertura**, no desde la primera. |
@@ -129,6 +130,33 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.85 — Una velocidad más, para poder preguntar por el ritmo
+
+§16.2 lleva escrito desde hace tiempo que la estación de tres minutos y la
+generación de cuatro horas son «una hipótesis razonada, no un dato», y que
+ajustarlas es mover `REAL_MS_PER_TICK` y nada más. Pero para poder juzgar el
+ritmo hay que poder recorrerlo, y a 16× un año son cuarenta y cinco segundos:
+ver un siglo cuesta hora y cuarto de pantalla encendida. **A 64× un año son
+once segundos.** La progresión sigue siendo geométrica —1, 4, 16, 64— y los
+cinco botones caben a 390 px sin bajar del objetivo táctil de 44 px de §11.4.
+
+Esto **no responde** a la pregunta de §16.2 ni la da por cerrada: solo hace que
+se pueda formular con una partida delante en vez de con una estimación.
+
+De paso se corrige una duplicación que llevaba desde M-20: la fila de botones
+estaba escrita a mano como `[0, 1, 4, 16]` en `app.ts` y repetida en su prueba,
+de modo que §12.1 no era la única lista. Ahora las tres salen de `TIME.SPEEDS`,
+que es lo que CLAUDE.md exige de cualquier número del juego.
+
+**Evidencia.** Suite rápida **640 en 16,9 s** y Playwright **10/10**; el
+recorrido de M-20 comprueba los cinco botones y sus 44 px. Los localizadores de
+velocidad pasan a ser exactos: `4×` es subcadena de `64×` y el recorrido se
+volvió ambiguo en cuanto apareció el nuevo — encontrado por la prueba, no
+leyendo.
+
+**Lo falsaría** que un botón bajase del objetivo táctil, que la fila se saliese
+a 390 px, o que alguna velocidad dejase de corresponder con `TIME.SPEEDS`.
 
 ### 2.84 — El valle no contaba nada, y el reloj se paraba
 
@@ -619,7 +647,7 @@ nombrados nacidos después de la fundación** y **60 decisiones de sucesión**.
 Hubo dos rencores y uno llegó a sanar sin borrarse. No son piezas aisladas: el
 bucle largo las enlaza durante varias generaciones.
 
-**Hito 5, alcanzado.** M-20 aporta el reloj real y sus cuatro velocidades; M-23
+**Hito 5, alcanzado.** M-20 aporta el reloj real y sus velocidades; M-23
 calcula la ausencia, ejecuta hasta 960 ticks en lotes de 64 y presenta el parte;
 v2.64 corrigió su selección y opacidad tras leerlo. La suite prueba el límite y
 Playwright recorre cuatro horas con reloj falso. La sensación de tres minutos
@@ -4621,7 +4649,7 @@ export const TIME = {
   HARVEST_WEEK: 35,
   GENERATION_YEARS: 20,
   REAL_MS_PER_TICK: 15_000,
-  SPEEDS: [0, 1, 4, 16],
+  SPEEDS: [0, 1, 4, 16, 64],  // v2.85: 64x para poder probar el ritmo
   LETHARGY_CAP_MS: 4 * 60 * 60 * 1000,
 } as const;
 ```
@@ -5266,7 +5294,7 @@ evidencia real de presión de almacenamiento.
 ### 16.2 Hito 5 — Idle
 
 **Alcanzado en v2.69.** El contrato de §13.2 está implementado por M-20 y M-23:
-reloj real, pausa y tres velocidades, letargo acotado y parte de bienvenida. Lo
+reloj real, pausa y cuatro velocidades, letargo acotado y parte de bienvenida. Lo
 que sigue necesitando juego humano es el ajuste de los tiempos de §12.1. La
 estación de 3 minutos y la generación de 4 horas son una hipótesis razonada, no
 un dato. Ese ajuste consiste en cambiar `REAL_MS_PER_TICK` y nada más — por eso
@@ -5923,7 +5951,7 @@ minutos reales dan exactamente 192 ticks.
 
 **Estado (v2.56): implementado.** La prueba pura produce 192 ticks exactos y
 mantiene la deuda tras el tope por fotograma. Playwright abre la aplicación a
-390×844, acciona las cuatro velocidades y adelanta el reloj hasta comprobar un
+390×844, acciona las velocidades y adelanta el reloj hasta comprobar un
 cambio de estación.
 
 **Estado de `decide` (v2.61): implementado.** `attemptDecision` — la lógica

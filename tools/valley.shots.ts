@@ -31,16 +31,17 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
   await test.expect(page.locator('#valley')).toHaveCSS('height', '560px');
   await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
-  await test.expect(page.locator('.valley-speeds button')).toHaveCount(4);
+  // Cinco: pausa y las cuatro velocidades de §12.1 (v2.85).
+  await test.expect(page.locator('.valley-speeds button')).toHaveCount(5);
   for (const button of await page.locator('.valley-speeds button').all()) {
     const box = await button.boundingBox();
     test.expect(box?.width).toBeGreaterThanOrEqual(44);
     test.expect(box?.height).toBeGreaterThanOrEqual(44);
   }
-  await page.getByRole('button', { name: '4×' }).click();
-  await test.expect(page.getByRole('button', { name: '4×' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: '4×', exact: true }).click();
+  await test.expect(page.getByRole('button', { name: '4×', exact: true })).toHaveAttribute('aria-pressed', 'true');
   const spring = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
-  await page.getByRole('button', { name: '16×' }).click();
+  await page.getByRole('button', { name: '16×', exact: true }).click();
   await page.clock.runFor(12_000);
   const summer = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
   test.expect(summer).not.toBe(spring);
@@ -73,7 +74,7 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await page.getByRole('button', { name: '16×' }).click();
+  await page.getByRole('button', { name: '16×', exact: true }).click();
   await page.clock.runFor(58_000);
 
   const scrim = page.locator('.crossroad-scrim');
@@ -103,7 +104,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   await page.clock.install({ time: t0 });
   await page.goto('/'); // sin parámetros de depuración: la ruta real, guardado incluido
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await page.getByRole('button', { name: '16×' }).click();
+  await page.getByRole('button', { name: '16×', exact: true }).click();
   // Menos de 20 ticks: este estado no puede llegar al disco por el autoguardado.
   // `pagehide` tiene que solicitar la instantánea antes de detener el bucle.
   await page.clock.runFor((5 * 15_000) / 16 + 100);
@@ -251,7 +252,7 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
   await page.clock.install({ time: t0 });
   await page.goto('/');
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await page.getByRole('button', { name: '16×' }).click();
+  await page.getByRole('button', { name: '16×', exact: true }).click();
   await page.clock.runFor(5_000);
 
   const tickBefore = await page.evaluate(() => Number(document.documentElement.dataset['tick'] ?? '-1'));
@@ -279,7 +280,7 @@ test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await page.getByRole('button', { name: '16×' }).click();
+  await page.getByRole('button', { name: '16×', exact: true }).click();
 
   const notice = page.locator('.valley-notice');
   await test.expect(notice).toBeHidden(); // nada que decir todavía

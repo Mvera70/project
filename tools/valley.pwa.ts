@@ -96,7 +96,7 @@ function savedTick(page: Page): Promise<number> {
 test('la partida guardada sobrevive a quedarse sin red', async ({ page, context }) => {
   await page.clock.install({ time: Date.now() });
   await warmed(page);
-  await page.getByRole('button', { name: '16×' }).click();
+  await page.getByRole('button', { name: '16×', exact: true }).click();
   // Más de 20 ticks: cruza el autoguardado de §13.1.
   await page.clock.runFor((25 * 15_000) / 16 + 500);
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));

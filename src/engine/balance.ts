@@ -17,7 +17,10 @@ export const TIME = {
   HARVEST_WEEK: 35,
   GENERATION_YEARS: 20,
   REAL_MS_PER_TICK: 15_000,
-  SPEEDS: [0, 1, 4, 16],
+  // §12.1. Geometric, each one four times the last. 64x exists to make the
+  // pace question of §16.2 testable in a sitting: a year in eleven seconds
+  // instead of forty-five (v2.85).
+  SPEEDS: [0, 1, 4, 16, 64],
   LETHARGY_CAP_MS: 4 * 60 * 60 * 1000,
   LETHARGY_BATCH: 64, // §13.2: ticks per requestAnimationFrame while catching up
   // TUNE: how long a notable event stays legible over the valley (§11.6,
