@@ -275,6 +275,12 @@ export const ANIMALS = {
   // How far from its anchor an animal drifts, in cells. Small on purpose:
   // livestock that wanders like people reads as people.
   WANDER: 0.55,
+  // TUNE (§11.9, v3.06): y cuánto se desplaza su querencia de una semana a
+  // otra. El movimiento de dentro del día era el mismo círculo cada semana
+  // —no dependía del tick— así que una vaca llevaba veinte años pastando
+  // exactamente el mismo metro cuadrado. Un rebaño que no cambia de sitio es
+  // un adorno pintado en el fondo.
+  GRAZE: 1.6,
 
   // Wildlife (§7.7, v2.88). Still cosmetic: they eat nothing yet.
   FIELDS_PER_CROW: 2,

@@ -47,13 +47,24 @@ function noise(a: number, b: number): number {
 }
 
 /** Slow drift around an anchor, a full loop per day, each animal on its own phase. */
-function wander(anchorX: number, anchorY: number, id: number, fraction: number): { x: number; y: number } {
+function wander(
+  anchorX: number,
+  anchorY: number,
+  id: number,
+  fraction: number,
+  week: number,
+  drift: number = ANIMALS.GRAZE,
+): { x: number; y: number } {
   const phase = noise(id, 11) * Math.PI * 2;
   const rate = 0.6 + noise(id, 23) * 0.8;
   const radius = ANIMALS.WANDER * (0.35 + noise(id, 37) * 0.65);
+  // §11.9, v3.06: la querencia se mueve con la semana. Sin esto, el animal
+  // repetía el mismo círculo desde la fundación hasta el final de la partida.
+  const gx = (noise(id * 7 + 1, week) - 0.5) * 2 * drift;
+  const gy = (noise(id * 7 + 2, week) - 0.5) * 2 * drift * 0.6;
   return {
-    x: anchorX + Math.cos(phase + fraction * Math.PI * 2 * rate) * radius,
-    y: anchorY + Math.sin(phase + fraction * Math.PI * 2 * rate) * radius * 0.6,
+    x: anchorX + gx + Math.cos(phase + fraction * Math.PI * 2 * rate) * radius,
+    y: anchorY + gy + Math.sin(phase + fraction * Math.PI * 2 * rate) * radius * 0.6,
   };
 }
 
@@ -78,7 +89,7 @@ export function animalPositions(state: GameState, tickFraction: number): Animal[
   let id = 0;
 
   const place = (kind: AnimalKind, anchorX: number, anchorY: number): void => {
-    const point = wander(anchorX, anchorY, id, fraction);
+    const point = wander(anchorX, anchorY, id, fraction, state.tick);
     if (inside(state, point.x, point.y)) animals.push({ id, kind, x: point.x, y: point.y });
     id += 1;
   };
@@ -153,7 +164,11 @@ export function wildlifePositions(state: GameState, tickFraction: number): Anima
   let id = 10_000; // its own range, so a crow never shares an id with a hen
 
   const place = (kind: AnimalKind, anchorX: number, anchorY: number): void => {
-    const point = wander(anchorX, anchorY, id, fraction);
+    // Un pez no cambia de pasto: la querencia semanal vale para lo que anda por
+    // tierra, y moverlo de su celda lo deja nadando en la hierba. Los cuervos y
+    // los lobos sí se mueven, que para eso van y vienen.
+    const drift = kind === 'fish' ? 0 : ANIMALS.GRAZE;
+    const point = wander(anchorX, anchorY, id, fraction, state.tick, drift);
     if (inside(state, point.x, point.y)) animals.push({ id, kind, x: point.x, y: point.y });
     id += 1;
   };

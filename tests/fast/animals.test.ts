@@ -191,6 +191,39 @@ describe('la fauna · §7.7', () => {
     }
   });
 
+  it('el ganado no pasta veinte años en el mismo metro cuadrado', () => {
+    // v3.06: el vagabundeo dependía sólo del identificador y de la hora del
+    // día, así que una vaca repetía el mismo círculo desde la fundación hasta
+    // el final de la partida. Un rebaño clavado es un adorno pintado al fondo.
+    const state = village(20);
+    state.herd = { hens: 4, pigs: 0, cows: 2 };
+    const now = animalPositions(state, 0.45);
+    state.tick += 1;
+    const later = animalPositions(state, 0.45);
+
+    expect(now.length).toBeGreaterThan(0);
+    expect(later.length).toBe(now.length);
+    const before = new Map(now.map((a) => [a.id, a]));
+    let moved = 0;
+    for (const a of later) {
+      const was = before.get(a.id);
+      if (was !== undefined && Math.hypot(a.x - was.x, a.y - was.y) > 0.3) moved += 1;
+    }
+    expect(moved, 'la mayoría del rebaño cambia de sitio de una semana a otra')
+      .toBeGreaterThan(later.length / 2);
+  });
+
+  it('pero un pez no se sale del río al cambiar de semana', () => {
+    const state = village(20);
+    for (let week = 0; week < 8; week += 1) {
+      state.tick += 1;
+      for (const one of wildlifePositions(state, 0.45).filter((a) => a.kind === 'fish')) {
+        const cell = Math.round(one.y) * state.map.width + Math.round(one.x);
+        expect(state.map.terrain[cell], `semana ${week}`).toBe(TERRAIN_CODE.water);
+      }
+    }
+  });
+
   it('la fauna también es determinista', () => {
     expect(wildlifePositions(village(20), 0.45)).toEqual(wildlifePositions(village(20), 0.45));
   });
