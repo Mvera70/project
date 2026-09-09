@@ -92,6 +92,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.96** | 12 sep 2026, 00:40 | Lo que costó meter tres plantillas | **El catálogo estaba lleno y nadie lo sabía.** Los tres comerciantes suben la cadencia de §12.9 por encima de su techo en las cuatro políticas (5,46–5,92 contra ≤5), y `forest_cut` pasa más tiempo elegible porque sale menos. Subir sus reposos para compensar silencia `feud` en el barrido corto, y se comprobó con tres valores distintos: no hay hueco. **No se toca el techo ni se ajusta a ciegas**: queda como decisión de diseño abierta con tres salidas. |
 | **2.95** | 11 sep 2026, 23:30 | M-30 · los comerciantes del camino | **§7.8 nueva: el mundo exterior deja de ser mudo, y llega andando.** No hay pueblos vecinos en el mapa y no los habrá: lo que la aldea sabe de fuera es quién entra en ella. Tres comerciantes, una estación cada uno, y cada uno toca un sistema distinto — el tratante mueve el rebaño de §7.7, el salinero cambia lo que vale una matanza, el factor compra el excedente y paga en ser visto. Categoría `trade` y efecto `herd` nuevos en el DSL de §8.4. |
 | **2.94** | 11 sep 2026, 21:15 | M-29 · la peste del ganado | **Lo que al rebaño le faltaba: miedo.** Hasta ahora un rebaño grande solo costaba grano; ahora también enferma, y cuanto más apretado está el corral más probable es. Construida a imagen de la plaga de §5.8, con el pozo protegiendo igual que protege a las personas, que era el segundo motivo que le faltaba a ese edificio. Flujo `murrain` propio: añadir la enfermedad no desplaza ni un lobo de una partida ya guardada. |
 | **2.93** | 11 sep 2026, 19:40 | M-29 · los cuervos muerden | **El primer animal que le pide algo al jugador en vez de solo pasarle algo.** En las seis semanas antes de la siega los pájaros se llevan parte de la cosecha en pie, y la respuesta no es una obra sino brazos: alguien tiene que estar en el campo, y son los mismos brazos que quieren el bosque y las obras. Sin tirada de azar: lo que se pierde es consecuencia del reparto y se puede leer en él. De paso se arregla que `SCHEMA_VERSION` estuviera escrito a mano en dos sitios y se hubieran desincronizado. |
@@ -4285,6 +4286,49 @@ Lo que sí es corriente es tener grano de sobra, así que ésa es la puerta. Val
 la pena anotarlo porque no es sólo sobre este comerciante: **cualquier diseño
 futuro que dé por hecho que la madera aprieta está construyendo sobre algo que
 la medición dice que no ocurre.**
+
+#### El catálogo estaba lleno (v2.96 · medido, sin resolver)
+
+Los tres comerciantes pasan la suite rápida entera, cobertura incluida. El banco
+de §12.9 dice algo que la suite rápida no puede ver:
+
+| Medida | Antes de los comerciantes | Con ellos | Banda |
+|---|---|---|---|
+| Cadencia, `prudent` | pasaba | **5,51** | 1–5 |
+| Cadencia, `first` | pasaba | **5,70** | 1–5 |
+| Cadencia, `last` | pasaba | **5,46** | 1–5 |
+| Cadencia, `worst` | pasaba | **5,92** | 1–5 |
+| `forest_cut` elegible, `worst` | 4,39 % | 6,29 % | < 1 % |
+| `forest_cut` elegible, `last` | 3,80 % | 5,45 % | < 1 % |
+
+**La cadencia son decisiones por generación**, y su techo existe para que la
+partida no se convierta en un menú. Añadir contenido la sube: con más plantillas
+elegibles hay menos ticks en los que no hay ninguna, así que se pregunta más a
+menudo. Y `forest_cut` empeora por el mismo motivo del revés — sale menos porque
+compite con más, y al no salir pasa más semanas elegible.
+
+**No hay hueco libre.** Subir los reposos de los comerciantes para devolver la
+cadencia a su sitio silencia la categoría `feud` en el barrido de cobertura, y
+se probó con tres pares de valores distintos (25/30/20, 28/32/22, 30/35/25) con
+el mismo resultado en los tres. El catálogo estaba en un equilibrio más ajustado
+de lo que nadie había escrito.
+
+**Tres salidas, y son excluyentes:**
+
+1. **Los comerciantes dejan de competir.** Canal propio con su ritmo, fuera del
+   presupuesto de decisiones de §8.6. Es lo más defendible: un buhonero que
+   llama a la puerta no es lo mismo que una sucesión disputada y no debería
+   quitarle el turno. Es también la más cara.
+2. **El techo sube de 5 a 6.** Se puso cuando el catálogo tenía diecisiete
+   plantillas y ahora tiene veinte; seis por generación sigue siendo una
+   decisión cada ocho años. Barato, y hay que decir en voz alta que es mover la
+   raya después de ver dónde cayó el tiro.
+3. **Menos comerciantes.** Dejar uno y guardar los otros dos hasta que haya
+   sitio. Conserva el balance y desperdicia contenido ya escrito y probado.
+
+**Lo que NO se hace:** ajustar reposos y pesos a ojo hasta que las once pruebas
+del banco se pongan verdes. Eso es buscar la combinación que pasa el examen en
+vez de decidir qué ritmo debe tener el juego.
 
 **Qué falsaría esto:** que un trato dejara a la aldea con más cabezas de las que
 alimenta o con menos de cero, que la sal no cambiara nada en la matanza, que la
