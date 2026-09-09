@@ -12,6 +12,7 @@
 
 import { WORLD } from '../balance';
 import { isHere, workforce } from '../people/demography';
+import { seasonOf } from '../time';
 import { allocateLabour } from '../subsistence/labour';
 import { smithyWorking } from '../subsistence/building-counts';
 import { TERRAIN_CODE } from '../state';
@@ -41,6 +42,7 @@ interface CachedRoute {
 const CACHE = new WeakMap<GameState, Map<VillagerId, CachedRoute>>();
 const GROUND = new WeakMap<GameState, number>();
 const TREES = new WeakMap<GameState, { version: number; cells: number[] }>();
+const BANKS = new WeakMap<GameState, { version: number; cells: number[] }>();
 const WHERE = new WeakMap<GameState, {
   key: string;
   targets: Map<VillagerId, { from: number; to: number }>;
@@ -100,6 +102,36 @@ function treesOf(state: GameState): number[] {
   return cells;
 }
 
+/**
+ * Las orillas: tierra transitable con agua al lado. §11.9, v3.03.
+ *
+ * Los pescadores no pueden pisar el río —los caminos no cruzan agua (§11.5)—
+ * así que pescan desde la orilla, que es la misma solución que ya usa el vado.
+ */
+function banksOf(state: GameState): number[] {
+  const version = GROUND.get(state) ?? 0;
+  const known = BANKS.get(state);
+  if (known !== undefined && known.version === version) return known.cells;
+
+  const cells: number[] = [];
+  const { width, height, terrain } = state.map;
+  for (let i = 0; i < terrain.length; i += 1) {
+    if (terrain[i] === TERRAIN_CODE.water) continue;
+    if (terrain[i] === TERRAIN_CODE.marsh) continue;
+    const x = i % width;
+    const y = Math.floor(i / width);
+    const near = (dx: number, dy: number): boolean => {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) return false;
+      return terrain[ny * width + nx] === TERRAIN_CODE.water;
+    };
+    if (near(1, 0) || near(-1, 0) || near(0, 1) || near(0, -1)) cells.push(i);
+  }
+  BANKS.set(state, { version, cells });
+  return cells;
+}
+
 /** Every worker, in a fixed order, so the same village always splits the same. */
 function workers(state: GameState): Villager[] {
   return state.people.villagers
@@ -131,6 +163,13 @@ function destinations(
 
   const a = allocateLabour(state);
   const share = crew.length / Math.max(1, workforce(state));
+  // §11.9, v3.03: seis oficios, no tres. §5.2 lleva repartiendo cazadores,
+  // pescadores y guardas del grano desde v2.92 y aquí sólo se miraban los
+  // labradores y los leñadores: la aldea salía a cazar al bosque en el motor y
+  // en pantalla seguían todos yendo al mismo campo.
+  const wardens = Math.round(a.wardens * share);
+  const hunters = Math.round(a.hunters * share);
+  const fishers = Math.round(a.fishers * share);
   const farmers = Math.round(a.farmers * share);
   const cutters = Math.round(a.cutters * share);
 
@@ -139,6 +178,14 @@ function destinations(
     .map((b) => centreOf(b.x, b.y, b.w, b.h, state.map.width));
   const sites = state.works.map((w) => centreOf(w.x, w.y, w.w, w.h, state.map.width));
   const wood = treesOf(state);
+  const banks = banksOf(state);
+  // Adónde va el que labra, según el año. En invierno, al bosque a por leña, y
+  // si no queda bosque, a la obra: lo que no hace es fingir que ara la nieve.
+  const winter = seasonOf(state.tick) === 'winter';
+  const fieldwork = winter ? (wood.length > 0 ? wood : sites) : fields;
+  // El guarda del grano se planta en su campo, igual que el labrador: lo que
+  // cambia no es dónde está sino que está allí en vez de en el bosque.
+  const watch = fields;
 
   // Who is going where only changes when the crew changes, the split changes,
   // or something moved. Everything else in the tick leaves it exactly as it
@@ -146,7 +193,7 @@ function destinations(
   // was the most expensive thing in step 14.
   const key = [
     crew.map((v) => `${v.id}@${v.homeId ?? -1}`).join(','),
-    farmers, cutters,
+    farmers, cutters, wardens, hunters, fishers, winter ? 'w' : '-',
     FOREST_VERSION.get(state) ?? 0, GROUND.get(state) ?? 0,
     fields.join(','), sites.join(','),
   ].join(':');
@@ -157,13 +204,55 @@ function destinations(
     const from = v.homeId === null ? undefined : homes.get(v.homeId);
     if (from === undefined) return;
 
-    const pool = rank < farmers ? fields : rank < farmers + cutters ? wood : sites;
+    // El orden de los oficios es el mismo que el del reparto de §5.2: primero
+    // el grano que ya está en el campo, luego el que hay que buscar fuera, y
+    // al final la leña y la obra.
+    //
+    // §11.9, v3.03 · **Y el año manda sobre todo lo demás.** En invierno no se
+    // ara: la tierra está helada, y lo que hay que hacer es traer leña para las
+    // semanas que §5.4 quema y adelantar obra. Un valle donde en enero la gente
+    // sale al campo igual que en julio es un valle sin años, y era exactamente
+    // lo que se veía.
+    const bands: { upTo: number; pool: number[] }[] = [
+      { upTo: wardens, pool: watch },
+      { upTo: wardens + hunters, pool: wood },
+      { upTo: wardens + hunters + fishers, pool: banks },
+      { upTo: wardens + hunters + fishers + farmers, pool: fieldwork },
+      { upTo: wardens + hunters + fishers + farmers + cutters, pool: wood },
+    ];
+    let pool = sites;
+    let bandStart = wardens + hunters + fishers + farmers + cutters;
+    let isFarmer = false;
+    for (let b = 0; b < bands.length; b += 1) {
+      const band = bands[b] as { upTo: number; pool: number[] };
+      if (rank < band.upTo) {
+        pool = band.pool;
+        bandStart = b === 0 ? 0 : (bands[b - 1] as { upTo: number }).upTo;
+        isFarmer = band.pool === fieldwork && !winter;
+        break;
+      }
+    }
     if (pool.length === 0) return;
+
+    // §11.9, v3.03: repartidos entre los sitios de su clase, no todos al más
+    // cercano. Antes cada uno elegía el destino más próximo a su casa, y como
+    // las casas están juntas eso mandaba a la aldea entera al mismo campo: en
+    // pantalla, treinta figuras dibujadas unas encima de otras. Una aldea
+    // reparte la tierra, no deja que cada cual siegue donde le pilla mejor.
+    //
+    // El reparto es por rango dentro de su oficio, que es estable, así que
+    // cada uno vuelve a su mismo campo mientras no cambie la cuadrilla. Entre
+    // los que le tocan, sigue yendo al más cercano — la distancia deja de
+    // decidir a qué campo va y pasa a decidir a cuál de los suyos.
+    const rankInJob = rank - bandStart;
+    const slice = [pool[rankInJob % pool.length] as number];
+    const choices = pool.length > 1 && isFarmer ? slice : pool;
+
     // The nearest of the kind, by straight-line distance: A* decides how to get
     // there, not where to go. Ties go to the lower cell index.
-    let best = pool[0] as number;
+    let best = choices[0] as number;
     let bestD = Number.POSITIVE_INFINITY;
-    for (const cell of pool) {
+    for (const cell of choices) {
       const dx = (cell % state.map.width) - (from % state.map.width);
       const dy = Math.floor(cell / state.map.width) - Math.floor(from / state.map.width);
       const d = dx * dx + dy * dy;

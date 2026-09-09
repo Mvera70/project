@@ -606,6 +606,72 @@ export const SCARS = {
  * no en el render, porque §2 dice que ningún número del juego se inventa en
  * un fichero suelto — y cuánto dura un apagón es un número.
  */
+/**
+ * Los encuentros de la jornada (§11.9, v3.03). Sólo de presentación: no mueven
+ * un número del juego, no se guardan y no consumen azar. Están aquí porque
+ * §2 dice que ningún número del juego vive suelto en un fichero de dibujo.
+ */
+export const ENCOUNTER = {
+  // TUNE: a cuántas celdas hay que estar para pararse a hablar con alguien.
+  RANGE: 4.5,
+  // TUNE: por debajo de esta opinión no se paran jamás. Un rencor de §6.4 vive
+  // en −50, así que dos enemigos declarados nunca coinciden a propósito.
+  COLD_BELOW: -20,
+  // TUNE: probabilidad de pararse entre dos que no sienten nada especial.
+  BASE_CHANCE: 0.35,
+  // TUNE: y entre dos que se aprecian de verdad. La diferencia entre las dos
+  // es lo que hace que una aldea unida se vea distinta de una rota.
+  WARM_CHANCE: 0.8,
+  // TUNE: el tramo del día en que puede empezar una conversación, en fracción
+  // de tick. Después de llegar al destino y antes de volver a casa.
+  EARLIEST: 0.2,
+  LATEST: 0.45,
+  // TUNE: lo que dura, en fracción de tick.
+  MIN_SPAN: 0.08,
+  MAX_SPAN: 0.22,
+  // TUNE: cuánto se separa cada uno del centro de su destino. Sin esto, los
+  // ocho que trabajan el mismo campo se dibujan todos en la misma celda y el
+  // valle enseña un borrón de figuras superpuestas en vez de gente trabajando.
+  // Medido antes de ponerlo: 145 parejas superpuestas de media con 32 figuras.
+  SPREAD: 1.35,
+  // TUNE: y cuánto se separan en una reunión convocada (§11.8). Mucho menos:
+  // una reunión es gente apiñada escuchando, no gente repartida trabajando. Sin
+  // esta distinción, veintiséis personas en la misma celda abrían un corro de
+  // siete celdas de radio y la reunión se veía MÁS suelta que un día de campo.
+  MEETING_SPREAD: 0.45,
+} as const;
+
+/**
+ * La forma de la jornada (§11.9, v3.03). Sólo de presentación.
+ *
+ * Antes de esto, los cuarenta salían de casa en el mismo instante, llegaban a
+ * la vez, se quedaban lo mismo y volvían juntos, con un desfase por persona de
+ * apenas el 4 % del día. Eso es lo que se leía como un mecanismo en vez de como
+ * gente: en cualquier momento del día, todo el mundo estaba haciendo lo mismo.
+ */
+export const DAY = {
+  // TUNE: el margen dentro del cual cada uno sale de su casa. Amplio a
+  // propósito: es lo que hace que a media mañana todavía haya alguien saliendo
+  // mientras otro lleva un rato en el campo.
+  LEAVE_SPAN: 0.13,
+  // TUNE: y el margen en que cada uno da el día por terminado.
+  RETURN_EARLIEST: 0.52,
+  RETURN_SPAN: 0.16,
+  // TUNE: lo que se tarda en ir y en volver, en fracción de tick.
+  TRAVEL: 0.15,
+  // TUNE: por debajo y por encima de estas edades la jornada es más corta —
+  // los críos y los viejos vuelven antes. En fracción de la jornada.
+  SHORT_DAY: 0.75,
+  CHILD_UNDER: 12,
+  ELDER_OVER: 60,
+  // TUNE: cuántas veces recorre su parcela durante la jornada. Trabajar no es
+  // estarse quieto en un punto: es ir y venir por el mismo trozo de campo. Con
+  // el vaivén de antes —un seno de amplitud 0,18— la gente parecía clavada.
+  WORK_LAPS: 2.5,
+  // TUNE: lo que se aleja de su puesto al hacerlo, en celdas.
+  WORK_REACH: 0.9,
+} as const;
+
 export const MARKS = {
   // TUNE: cuánto dura a oscuras un edificio que una decisión apagó. El esquema
   // de `douse` dice qué se apaga y no cuánto. Ocho semanas se ve a ×16 sin

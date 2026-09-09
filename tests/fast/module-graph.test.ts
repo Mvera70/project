@@ -156,6 +156,7 @@ describe('grafo de módulos del motor', () => {
       'state',
       'subsistence/building-counts',
       'subsistence/labour',
+      'time',
     ]);
     expect(importsOf('world/paths.ts')).not.toContain('forest');
     expect(importsOf('world/works.ts')).toEqual([

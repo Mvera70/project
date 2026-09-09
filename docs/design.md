@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.03** | 12 sep 2026, 11:00 | M-35 · que la aldea parezca viva | **Segundo veredicto humano, y es el mismo problema visto de cerca: «se mueven todos los días igual».** Y era literal. Todos salían en el mismo instante, iban al mismo campo, se quedaban clavados y volvían juntos. §11.9 nueva: jornada propia por persona y por semana, la tierra repartida entre los campos, gente trabajando en vez de quieta, encuentros entre vecinos que deciden las opiniones, y un invierno en que **nadie ara**. |
 | **3.01** | 12 sep 2026, 08:30 | M-33 · el estandarte y el apagón | **Quedan 17 opciones menos mudas.** El estandarte se iza sobre el núcleo y el edificio que una decisión manda apagar se queda sin humo, sin luz y sin velas. Y se arregla un fallo que dejaba muerto justo el estandarte que más significa: `years: 0` es **para siempre** (§3.1), no «dura cero», así que el paño gris de arrodillarse ante el señor no se izaba jamás. Sólo queda `scar`, con dos de sus tres variantes irreconstruibles. |
 | **3.00** | 12 sep 2026, 06:00 | M-32 · que la decisión se vea | **42 de las 56 opciones del catálogo enfocaban una celda donde no aparecía nada nuevo.** El efecto visible no estaba roto —la cámara sí enfoca, como promete §11.2— pero ninguno de los seis tipos se representaba: un estandarte, una reunión y una cicatriz daban la misma imagen. §11.8 nueva: `gather` convoca de verdad a la aldea, derivado del historial y sin un byte de estado nuevo. Quedan cuatro tipos por representar, anotados. |
 | **2.99** | 12 sep 2026, 04:20 | M-31 · lo que el mundo escribe en la gente | **§7.9 nueva: hasta hoy sólo las decisiones del jugador dejaban recuerdo.** Una hambruna o un incendio le pasaban a una población, no a nadie. La prueba estaba a la vista: `went_hungry` y `lost_home` tenían epitafio escrito desde M-09 y **ningún sistema los escribía jamás**. Ahora el hambre marca a quien la vive y el fuego a quien vivía en esa casa, con un recuerdo por año y no uno por semana. |
@@ -5294,6 +5295,64 @@ compare «aldea con reunión» contra «aldea sin reunión» sin mover el reloj 
 comparando domingo contra reunión, y pasa aunque la reunión no mueva a nadie. Lo
 destapó una mutación. Cualquier prueba futura sobre la multitud tiene que elegir
 un día laborable a propósito.
+
+### 11.9 La vida del día
+
+**El diagnóstico vino de jugar, no de leer.** El segundo veredicto humano
+(§16.4) dijo que la aldea era «aburrida, repetitiva y que no cambia nada; los
+aldeanos se mueven todos los días igual». Era literalmente cierto, y en cuatro
+sentidos que se pueden medir por separado.
+
+| Lo que pasaba | Por qué | Medido |
+|---|---|---|
+| Todos salían y volvían a la vez | El desfase por persona era del 4 % del día | Dos picos de movimiento y un valle muerto en medio |
+| Todos iban al mismo sitio | Cada uno elegía el destino más cercano **a su casa**, y las casas están juntas | 4–5 destinos distintos para toda la aldea |
+| Amontonados en una celda | El destino era un punto, no un área | 145 parejas superpuestas con 32 figuras |
+| Nadie hablaba con nadie | No existía el concepto | — |
+| El año no se notaba | En enero se salía al campo igual que en julio | 92 % en los campos las cuatro estaciones |
+
+#### Lo que se hizo
+
+**Cada uno tiene su jornada, y cambia cada semana.** Cuándo sale, cuánto se
+queda y cuándo vuelve salen de la persona y del tick. Los críos y los viejos la
+dan por terminada antes. El resultado es que en cualquier instante del día hay
+alguien saliendo, alguien trabajando y alguien volviendo, en vez de cuarenta
+personas haciendo lo mismo.
+
+**La tierra se reparte.** Los labradores se distribuyen entre los campos por su
+rango en la cuadrilla, y entre los que les tocan van al más cercano. La
+distancia deja de decidir **a qué campo** se va y pasa a decidir **a cuál de los
+suyos**. De 4–5 destinos a 6–9.
+
+**Trabajar es moverse.** Cada uno recorre su parcela un par de veces por
+jornada, con rumbo y ritmo propios para que dos vecinos no vayan acompasados.
+
+**Y la gente se para a hablar.** Dos que coinciden cerca pueden pararse un rato
+a media jornada. **Lo decide la opinión** (§6.4): por debajo de `COLD_BELOW` no
+se paran jamás, y cuanto mejor se llevan más a menudo lo hacen. Una aldea unida
+tiene corrillos y una rota por las rencillas se queda en silencio, y eso se ve
+desde fuera sin leer una línea de crónica. **Es la primera vez que el sistema de
+opiniones se lee fuera del catálogo.**
+
+**El invierno vacía los campos.** No se ara la tierra helada: se va al bosque a
+por la leña que §5.4 quema, y si no queda bosque, a la obra. Medido: 0 % en los
+campos en invierno contra 92–96 % el resto del año.
+
+#### Las reglas que esto NO rompe
+
+Todo es **derivado**: ni un byte de estado nuevo, ni una tirada de ningún flujo
+(§4.3). Quién se para con quién sale de un hash de la semana y de los dos
+identificadores. El mismo instante siempre da la misma imagen, así que un salto
+de reloj o una partida cargada se recalculan enteros (§11.4).
+
+**Con una excepción que sí toca el motor**: el reparto entre campos y el
+invierno viven en `world/paths.ts`, que alimenta el desgaste de caminos de §7.6
+y por tanto el estado. No es cosmético y se mide con el banco.
+
+**Qué falsaría esto:** que hubiera ratos del día sin nadie moviéndose, que todos
+salieran a la vez, que la mayoría repitiera sitio semana tras semana, que se
+apilaran en una celda, que en invierno siguiera habiendo gente en los campos, o
+que dibujar escribiera en el estado o gastara una tirada.
 
 ### 11.7 Accesibilidad
 

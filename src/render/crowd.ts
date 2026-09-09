@@ -1,12 +1,14 @@
 // M-18 · Cosmetic villagers. Positions are derived; GameState is never written.
 
 import { isHere } from '@engine/people/demography';
-import type { Building, GameState, VillagerId } from '@engine/state';
+import type { Building, GameState, Villager, VillagerId } from '@engine/state';
 import { route } from '@engine/world/astar';
 import { routesFor } from '@engine/world/paths';
 import type { Figure } from './layers/figures';
 import { hungerSeverity } from './layers/tells';
 import { gatheringsAt } from './gatherings';
+import { encountersAmong, type Encounter } from './encounters';
+import { DAY, ENCOUNTER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 
 interface Point { x: number; y: number }
@@ -15,6 +17,26 @@ const SUNDAY = new WeakMap<GameState, CachedPaths>();
 const WORKDAY = new WeakMap<GameState, CachedPaths>();
 interface CachedMeeting extends CachedPaths { target: number }
 const MEETING = new WeakMap<GameState, CachedMeeting>();
+interface CachedTalk { tick: number; talks: Map<VillagerId, Encounter> }
+const TALK = new WeakMap<GameState, CachedTalk>();
+
+/**
+ * §11.9: quién se para con quién hoy. Una vez por tick y sobre los destinos,
+ * no en cada pintada y sobre las posiciones.
+ */
+function talksOf(state: GameState, routes: Map<VillagerId, number[]>): Map<VillagerId, Encounter> {
+  const known = TALK.get(state);
+  if (known !== undefined && known.tick === state.tick) return known.talks;
+  const width = state.map.width;
+  const spots = [...routes].flatMap(([id, cells]) => {
+    const last = cells[cells.length - 1];
+    if (last === undefined) return [];
+    return [{ id, x: (last % width) + 0.5, y: Math.floor(last / width) + 0.5 }];
+  });
+  const talks = encountersAmong(state, spots);
+  TALK.set(state, { tick: state.tick, talks });
+  return talks;
+}
 
 function centre(building: Building, width: number): number {
   return (building.y + Math.floor(building.h / 2)) * width + building.x + Math.floor(building.w / 2);
@@ -106,9 +128,67 @@ function onPath(cells: readonly number[], progress: number, width: number): Poin
   };
 }
 
-function phaseOffset(id: number): number {
-  const hash = Math.imul(id + 1, 1103515245) >>> 0;
-  return ((hash % 1000) / 999 - 0.5) * 0.08;
+/**
+ * §11.9: el sitio exacto donde esta persona pasa la jornada, dentro de su
+ * destino. Ocho segando el mismo campo no están en la misma celda: están
+ * repartidos por él. Estable por identificador, así que cada uno vuelve a su
+ * mismo trozo de campo, y sin tocar ningún flujo de azar (§4.3).
+ */
+function workSpot(id: number, at: Point, crowding: number, base: number): Point {
+  const angle = ((Math.imul(id + 17, 2654435761) >>> 0) % 6283) / 1000;
+  // El radio crece con la raíz de cuántos comparten el sitio, que es como
+  // crece el área: veinte personas en un campo ocupan un corro más ancho que
+  // tres, y si no se dibujan una encima de otra.
+  const spread = base * Math.sqrt(Math.max(1, crowding));
+  const radius = (((Math.imul(id + 91, 40503) >>> 0) % 1000) / 999) ** 0.5 * spread;
+  return { x: at.x + Math.cos(angle) * radius, y: at.y + Math.sin(angle) * radius };
+}
+
+/** Cuánta gente comparte cada destino esta semana. */
+function crowdingOf(routes: Map<VillagerId, number[]>): Map<number, number> {
+  const out = new Map<number, number>();
+  for (const cells of routes.values()) {
+    const last = cells[cells.length - 1];
+    if (last === undefined) continue;
+    out.set(last, (out.get(last) ?? 0) + 1);
+  }
+  return out;
+}
+
+/** Un pseudoaleatorio estable en 0..1 desde dos enteros. Sin tocar §4.3. */
+function stable(a: number, b: number): number {
+  let h = Math.imul(a + 0x6d2b, 0x85eb_ca6b) ^ Math.imul(b + 0x35a7, 0xc2b2_ae35);
+  h = Math.imul(h ^ (h >>> 15), 0x27d4_eb2f);
+  h ^= h >>> 16;
+  return ((h >>> 0) % 100_000) / 99_999;
+}
+
+interface Day {
+  /** Cuándo sale de casa. */
+  leave: number;
+  /** Cuándo está ya en su sitio. */
+  arrive: number;
+  /** Cuándo lo deja. */
+  depart: number;
+  /** Cuándo ha vuelto. */
+  home: number;
+}
+
+/**
+ * §11.9: la jornada de esta persona esta semana.
+ *
+ * Cambia con el tick y con quién es, así que ni dos personas hacen el mismo
+ * día ni la misma persona repite el de la semana pasada. Los críos y los
+ * viejos lo dan por terminado antes, que es lo que pasaba de verdad.
+ */
+function dayOf(person: Villager, tick: number): Day {
+  const leave = stable(person.id, tick) * DAY.LEAVE_SPAN;
+  const arrive = leave + DAY.TRAVEL;
+  const age = Math.floor((tick - person.bornTick) / TIME.WEEKS_PER_YEAR);
+  const short = age < DAY.CHILD_UNDER || age >= DAY.ELDER_OVER;
+  const full = DAY.RETURN_EARLIEST + stable(tick, person.id) * DAY.RETURN_SPAN;
+  const depart = short ? arrive + (full - arrive) * DAY.SHORT_DAY : full;
+  return { leave, arrive, depart, home: depart + DAY.TRAVEL };
 }
 
 function clampFigure(point: Point, state: GameState): Point {
@@ -129,23 +209,57 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
   const routes = meeting !== undefined
     ? gatheringPaths(state, cellOf(state, meeting))
     : state.tick % 4 === 0 ? sundayPaths(state) : workdayPaths(state);
+  const talks = meeting === undefined ? talksOf(state, routes) : new Map<VillagerId, Encounter>();
+  const crowding = crowdingOf(routes);
   const namedOrder = new Map(state.people.namedIds.map((id, index) => [id, index]));
   const figures: Figure[] = [];
   for (const person of state.people.villagers.filter(isHere).sort((a, b) => a.id - b.id).slice(0, 80)) {
     const cells = routes.get(person.id);
     if (cells === undefined || cells.length === 0) continue;
-    const shifted = fraction - phaseOffset(person.id);
-    if (shifted >= 0.15 && shifted < 0.6 && ((Math.imul(person.id + 7, 2654435761) >>> 0) % 1000) / 999 < hunger * 0.5) continue;
+    const day = dayOf(person, state.tick);
+    if (fraction >= day.arrive && fraction < day.depart
+      && ((Math.imul(person.id + 7, 2654435761) >>> 0) % 1000) / 999 < hunger * 0.5) continue;
     let point: Point;
-    if (shifted < 0.15) {
-      point = onPath(cells, Math.max(0, shifted / 0.15) ** (1 + hunger), state.map.width);
-    } else if (shifted < 0.6) {
-      point = onPath(cells, 1, state.map.width);
-      point.x += Math.sin(person.id * 2.17 + fraction * Math.PI * 2) * 0.5;
-      point.y += Math.cos(person.id * 1.73 + fraction * Math.PI * 2) * 0.5;
+    if (fraction < day.leave) {
+      // Todavía en casa: el día no ha empezado para esta persona.
+      point = onPath(cells, 0, state.map.width);
+    } else if (fraction < day.arrive) {
+      const progress = (fraction - day.leave) / Math.max(0.001, day.arrive - day.leave);
+      point = onPath(cells, progress ** (1 + hunger), state.map.width);
+    } else if (fraction < day.depart) {
+      const here = cells[cells.length - 1];
+      point = workSpot(
+        person.id,
+        onPath(cells, 1, state.map.width),
+        here === undefined ? 1 : (crowding.get(here) ?? 1),
+        meeting === undefined ? ENCOUNTER.SPREAD : ENCOUNTER.MEETING_SPREAD,
+      );
+      const talk = talks.get(person.id);
+      if (talk !== undefined && fraction >= talk.from && fraction < talk.to) {
+        // §11.9: se han parado a hablar. Quietos y juntos, uno a cada lado del
+        // punto de encuentro — dos figuras exactamente encima leerían como una
+        // sola, y lo que tiene que leerse es que son dos.
+        const side = person.id < talk.withId ? -0.35 : 0.35;
+        point = { x: talk.x + side, y: talk.y };
+      } else {
+        // §11.9: trabajando. Recorre su parcela en vez de quedarse clavado —
+        // el surco de ida y el de vuelta— con un ritmo y una dirección propios
+        // para que dos vecinos no vayan acompasados como un mecanismo.
+        const through = (fraction - day.arrive) / Math.max(0.001, day.depart - day.arrive);
+        const swing = Math.sin(through * Math.PI * 2 * DAY.WORK_LAPS + person.id * 1.7);
+        const heading = ((Math.imul(person.id + 31, 374761393) >>> 0) % 6283) / 1000;
+        point.x += Math.cos(heading) * swing * DAY.WORK_REACH;
+        point.y += Math.sin(heading) * swing * DAY.WORK_REACH;
+      }
+    } else if (fraction < day.home) {
+      const back = (fraction - day.depart) / Math.max(0.001, day.home - day.depart);
+      point = onPath(cells, 1 - (back ** (1 + hunger)), state.map.width);
     } else {
-      point = onPath(cells, 1 - (((shifted - 0.6) / 0.2) ** (1 + hunger)), state.map.width);
+      // De vuelta en casa antes de que caiga la noche, que es lo que hace que
+      // el valle se vaya apagando por partes en vez de de golpe.
+      point = onPath(cells, 0, state.map.width);
     }
+
     const placed = clampFigure(point, state);
     figures.push({
       id: person.id,
