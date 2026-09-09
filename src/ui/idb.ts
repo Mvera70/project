@@ -37,7 +37,7 @@ export async function loadSave(): Promise<SaveFile | null> {
   }
 }
 
-/** Best-effort: called every 20 ticks and on `visibilitychange` (§13.1), neither of which should ever throw. */
+/** Best-effort: called periodically and at both page-exit signals (§13.1); it must never throw. */
 export async function persistSave(save: SaveFile): Promise<void> {
   try {
     const db = await openDb();
