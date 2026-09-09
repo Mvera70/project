@@ -104,8 +104,25 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   await page.goto('/'); // sin parámetros de depuración: la ruta real, guardado incluido
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.getByRole('button', { name: '16×' }).click();
-  // Suficientes ticks reales a 16× para cruzar el guardado cada 20 (§13.1).
-  await page.clock.runFor((30 * 15_000) / 16 + 3_000);
+  // Menos de 20 ticks: este estado no puede llegar al disco por el autoguardado.
+  // `pagehide` tiene que solicitar la instantánea antes de detener el bucle.
+  await page.clock.runFor((5 * 15_000) / 16 + 100);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
+  await test.expect.poll(() => page.evaluate(async () => {
+    const request = indexedDB.open('the-valley', 1);
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const saved = await new Promise<{ state?: { tick?: number } } | undefined>((resolve, reject) => {
+      const get = db.transaction('saves', 'readonly').objectStore('saves').get('current');
+      get.onsuccess = () => resolve(get.result as { state?: { tick?: number } } | undefined);
+      get.onerror = () => reject(get.error);
+    });
+    db.close();
+    const tick = saved?.state?.tick ?? 0;
+    return tick > 0 && tick < 20;
+  })).toBe(true);
 
   // Cuatro horas después, con reloj falso — no se espera de verdad.
   await page.clock.setSystemTime(t0 + 4 * 60 * 60 * 1000);
