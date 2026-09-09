@@ -308,6 +308,38 @@ export const ANIMALS = {
   FISH_RANGE: 12,
 } as const;
 
+/**
+ * Hunting and fishing (§7.7, v2.92). The village sends hands to the woods and
+ * the river when the granary is low, and only then: this is the bad-year food,
+ * not a second industry. Every number here is TUNE — §12 predates it.
+ */
+export const FORAGE = {
+  // TUNE: below this many years of grain in store the village starts foraging.
+  // Three quarters of a year is roughly "we will not reach the next harvest",
+  // which is when a real village went to the woods.
+  THRESHOLD_YEARS: 0.75,
+  // TUNE: at most this fraction of the hands left after the fields. Foraging
+  // must never empty the works reserve of §5.2 or the valley stops changing.
+  MAX_SHARE: 0.5,
+  // TUNE: bushel-equivalents a week, at a full forest. Half of what the same
+  // hand yields in a field (600 per field-year over four crew is about 3.1 a
+  // week): hunting fed people, but never as well as farming them.
+  MEAT_PER_HUNTER: 1.5,
+  // TUNE: the river does not run out the way the wood does, so the fisher's
+  // yield is flat — and lower, because that is the trade for not depending on
+  // anything.
+  FISH_PER_FISHER: 1.2,
+  // TUNE: under this much forest left there is nothing worth hunting. It is
+  // the same floor `forest_cut` uses to stop offering the woods (§12).
+  MIN_FOREST: 0.1,
+  // TUNE: what counts as a full forest, as a fraction of the whole valley.
+  // Measured, not guessed: five seeds found 0.215-0.251 of the map wooded at
+  // the founding, and 0.131-0.184 after a hundred years of cutting. So a
+  // valley opens at a hunting factor of about 1 and falls to about two thirds
+  // by the second century, which is the decline this is meant to express.
+  FULL_FOREST: 0.25,
+} as const;
+
 export const WORLD = {
   WIDTH: 36,
   HEIGHT: 56,

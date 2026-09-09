@@ -1330,6 +1330,23 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'A cow, taken in the dark. Nothing between the valley and the trees.',
   ],
 
+  // --- M-29 · hunting and fishing, design.md §7.7, §5.2 ---
+  'forage.hunt': [
+    '{count} of them went to the woods that {season}, and not for timber.',
+    'They hunted the woods in year {year}. The fields would not be enough.',
+    'The granary was low, so {count} took to the trees.',
+  ],
+  'forage.fish': [
+    'They fished the river that {season}.',
+    '{count} of them worked the river in year {year}, for want of bread.',
+    'The river fed them that {season}. It had not been asked before.',
+  ],
+  'forage.both': [
+    'The woods and the river both, that {season}. It was that kind of year.',
+    '{count} of them left the fields for the trees and the water.',
+    'They took what the valley would give in year {year}, and it was not grain.',
+  ],
+
   // --- M-23 · welcome digest, design.md §9.2, §13.2 ---
   'welcome.time': [
     '{weeks} weeks passed.',

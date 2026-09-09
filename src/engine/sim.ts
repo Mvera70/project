@@ -34,6 +34,7 @@ import { TERRAIN_CODE } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
+import { forage } from './subsistence/forage';
 import { consume, overwinter } from './subsistence/consumption';
 import { tendHerd, type HerdReport } from './subsistence/herd';
 import { applySpoilage, harvest } from './subsistence/harvest';
@@ -46,7 +47,7 @@ import { advanceWorks, requestBuild } from './world/works';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, upgradePaths } from './world/paths';
-import { holderOf } from './crossroads/conditions';
+import { holderOf, ratioOf } from './crossroads/conditions';
 import { selectCrossroad } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
 import { fireSeeds } from './crossroads/seeds';
@@ -743,6 +744,25 @@ export function tick(
   const allocation = allocateLabour(state);
   const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER);
   const produced = produce(state, allocation, felled);
+  // §7.7, v2.92: the hands the allocation sent out come back with food. The
+  // forest fraction is read here and passed in because `subsistence/` may not
+  // look at `world/`, the same rule that makes `produce` take its wood cap.
+  const foraged = forage(state, allocation, ratioOf(state, 'forestLeft'));
+  if (foraged.hunted + foraged.fished > 0) {
+    // Weight 2: a village that has taken to the woods is the visible face of a
+    // bad year, and §11.6 should put it over the valley.
+    const both = foraged.hunted > 0 && foraged.fished > 0;
+    say({
+      kind: 'forage',
+      templateKey: both ? 'forage.both' : (foraged.hunted > 0 ? 'forage.hunt' : 'forage.fish'),
+      params: {
+        year: year(),
+        season: season(),
+        count: Math.round(allocation.hunters + allocation.fishers),
+      },
+      weight: 2,
+    });
+  }
   // §9, v2.16: the one thing about the forest that is an event and not a state.
   if (oldWoodStoodAtStart && state.flags['old_forest_gone'] !== undefined) {
     say({

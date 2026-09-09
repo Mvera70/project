@@ -366,6 +366,7 @@ export type ChronicleKind =
   | 'birth'
   | 'death'
   | 'harvest'
+  | 'forage' // hunting and fishing in a lean year (§7.7)
   | 'famine'
   | 'plague'
   | 'fire'
@@ -470,6 +471,9 @@ export interface Allocation {
   farmers: number;
   cutters: number;
   builders: number;
+  /** Hands sent to the woods and the river when the granary is low (§7.7). */
+  hunters: number;
+  fishers: number;
   labourFactor: number; // 0..1, how well the worked fields were manned
 }
 

@@ -89,6 +89,7 @@ describe('grafo de módulos del motor', () => {
     expect(importsOf('subsistence/labour.ts')).toEqual([
       'balance',
       'building-counts',
+      'forage',
       'people/demography',
       'state',
     ]);

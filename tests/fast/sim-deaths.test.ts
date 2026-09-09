@@ -4,6 +4,7 @@ import type { Catalogue, CrossroadTemplate } from '@engine/crossroads/schema';
 import { foundGame } from '@engine/found';
 import { makeVillager } from '@engine/people/villagers';
 import { tick } from '@engine/sim';
+import { TERRAIN_CODE } from '@engine/state';
 
 function violentCatalogue(): Catalogue {
   const template: CrossroadTemplate = {
@@ -42,6 +43,11 @@ describe('all deaths reach the weekly chronicle (§9.4)', () => {
     // (§7.7). Lo que esta prueba mide es la crónica del hambre, así que el
     // corral tiene que estar vacío para que el hambre llegue a la gente.
     state.herd = { hens: 0, pigs: 0, cows: 0 };
+    // v2.92: y tampoco puede haber bosque ni río. Una aldea hambrienta sale a
+    // cazar y a pescar (§7.7), y con el valle entero por delante salvaba a uno
+    // de los dos muertos que esta prueba necesita contar. Un prado pelado no da
+    // ni carne ni pescado, que es justo el escenario del hambre puro.
+    state.map.terrain.fill(TERRAIN_CODE.meadow);
     const report = tick(state, []);
     const hunger = report.entries.filter((e) => e.templateKey.startsWith('death.hunger.'));
     expect(hunger.find((e) => e.params.name === elder.name)).toMatchObject({

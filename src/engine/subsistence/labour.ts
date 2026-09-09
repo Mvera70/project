@@ -13,10 +13,11 @@
 //     people puts everything into the fields, never builds, and the player
 //     watches a valley that does not change — the cardinal sin of this game.
 
-import { FOOD, LABOUR, TIME } from '../balance';
+import { FOOD, FORAGE, LABOUR, TIME } from '../balance';
 import { population, workforce } from '../people/demography';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
+import { foragingUrgency, hasRiver } from './forage';
 
 /**
  * Step 5. Splits the week's labour. Pure: reads the state, writes nothing.
@@ -62,6 +63,23 @@ export function allocateLabour(state: GameState): Allocation {
     spare += borrowed;
   }
 
+  // §7.7, v2.92: before the wood and the works, the hungry village takes hands
+  // off both and sends them out for food. Only when it is short — with a full
+  // granary `urgency` is 0 and this whole block does nothing — and never more
+  // than half of what is spare, so the works reserve above survives it.
+  const grainYears = people > 0
+    ? state.village.grain / (people * TIME.WEEKS_PER_YEAR * FOOD.GRAIN_PER_PERSON)
+    : Number.POSITIVE_INFINITY;
+  const foragers = spare * FORAGE.MAX_SHARE * foragingUrgency(state, grainYears);
+  spare -= foragers;
+
+  // Half to the woods and half to the river, and all of it to whichever the
+  // valley actually has. A map with no water fishes nothing; that is why the
+  // river being on the map matters before anyone eats from it.
+  const river = hasRiver(state);
+  const hunters = river ? foragers * 0.5 : foragers;
+  const fishers = river ? foragers - hunters : 0;
+
   const cutters = spare * LABOUR.CUTTER_SHARE;
   const builders = spare - cutters;
 
@@ -71,6 +89,8 @@ export function allocateLabour(state: GameState): Allocation {
     farmers,
     cutters,
     builders,
+    hunters,
+    fishers,
     // No fields worked means no harvest at all, so the factor is 0 rather than
     // a division by zero.
     labourFactor: farmDemand > 0 ? farmers / farmDemand : 0,

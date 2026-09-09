@@ -91,6 +91,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.92** | 11 sep 2026, 18:10 | M-29 · caza y pesca, y lo que cuestan | **La aldea hambrienta sale al bosque y al río, y eso devuelve el desenlace a donde estaba antes del rebaño.** Extinción adversa 13,3 % → 11,7 % y separación 11,7 → 10,0 puntos: el forrajeo anula exactamente lo que el rebaño había ganado. Es la palanca que §2.47 dejó sin explorar, medida por fin. **No se ajusta ninguna constante para taparlo**: la fase de balance sigue cerrada y esto es una decisión de diseño pendiente, no un número mal puesto. |
 | **2.91** | 11 sep 2026, 16:30 | M-29 · el rebaño, con mecánica y medido | **El ganado deja de ser dibujo y pasa a ser estado: come, se sacrifica y cría, y los lobos se llevan cabezas de verdad.** La pregunta que §7.7 dejó abierta —colchón o coste— la contesta el banco: **gana el coste**. La extinción adversa sube de 11,7 % a 13,3 % y la separación con `prudent` de 10,0 a 11,7 puntos; las dos van **hacia** la banda de §12.9, no en contra. Fallan las mismas siete pruebas que antes del rebaño, ni una más. Esquema de guardado 3 con migración 2→3. |
 | **2.88** | 11 sep 2026, 15:45 | M-29 · la fauna, segundo trozo | **Cuervos sobre el grano maduro, lobos en la linde en las noches de invierno, peces en el río.** Cada uno con su reloj: es lo que hace que una noche de enero no se parezca a una tarde de julio. Siguen sin comerse nada — derivados y cosméticos como el ganado. |
 | **2.87** | 11 sep 2026, 15:00 | M-29 · el ganado, primer trozo | **§7.7 nueva: el valle tiene animales.** Gallinas por casa, cerdos cuando hay granero, vacas cuando hay campos. Derivado y cosmético como la multitud de §10.6 y como las ruinas de §13.3: no es estado, no se guarda, no mueve un número. Lobos, cuervos, caza y pesca quedan declarados y sin construir. |
@@ -4100,15 +4101,62 @@ una cabeza y empiezan por la mayor. Convierte una obra que el jugador ya podía
 levantar en una defensa con motivo. Consumen del flujo `animals`, nuevo y
 propio (§4.3): ninguna tirada de lobos puede desplazar la demografía.
 
+#### Caza y pesca (v2.92 · construido, y con un problema medido)
+
+La primera cosa que los aldeanos **hacen** en vez de que les pase. El reparto de
+§5.2 gana un destino más, y solo se abre cuando la despensa baja de
+`FORAGE.THRESHOLD_YEARS` (tres cuartos de año de grano). Por encima de eso no
+sale nadie: labrar alimenta a más gente por brazo de lo que la caza alimentó
+jamás, y una aldea harta que se fuera al bosque sería una aldea tonta.
+
+| | De qué depende | Qué lo limita |
+|---|---|---|
+| **Caza** | Del bosque en pie, normalizado contra un valle entero | Bajo `MIN_FOREST` no hay nada que cazar |
+| **Pesca** | De nada. El río no se agota | Que haya agua en el mapa, y nada más |
+
+Cuantos más brazos salen cuanta menos comida hay, hasta la mitad de los que
+sobran tras el campo. **Nunca más de la mitad**, para que la reserva de obras de
+§5.2 sobreviva al hambre: un valle que deja de construir porque pasa hambre es
+otra vez el valle que no cambia, y eso no se arregla con comida.
+
+**El problema, y está medido.** El mismo banco de §12.9 dice que el forrajeo
+devuelve el desenlace exactamente a donde estaba antes del rebaño:
+
+| Medida | Sin nada | Solo rebaño | Rebaño + forrajeo | Banda |
+|---|---|---|---|---|
+| Extinción con `worst` | 11,7 % | 13,3 % | **11,7 %** | ≥ 25 % |
+| Separación `prudent`–`worst` | 10,0 pts | 11,7 pts | **10,0 pts** | ≥ 20 pts |
+| Extinción con `prudent` | 1,67 % | 1,67 % | 1,67 % | 2 %–12 % |
+
+Siguen fallando las mismas siete pruebas de siempre y ninguna verde se ha
+puesto roja, pero **lo que el rebaño había ganado, la pesca lo devuelve**. Era
+literalmente lo que §2.47 anticipó al dejarla apuntada como *la palanca sin
+explorar*: comida que no depende de la cosecha es un amortiguador contra la
+hambruna, y el desenlace ya estaba blando por abajo.
+
+**Lo que NO se hace aquí.** No se toca una sola constante para tapar esto. La
+fase de balance está cerrada como red de regresión (§2.47) y bajar el
+rendimiento del pescador hasta que el número vuelva a su sitio sería ajustar el
+instrumento a la medida, que es la trampa que esa sección se escribió para
+evitar. Queda como **decisión de diseño abierta**, y son tres y excluyentes:
+
+1. **Aceptarlo.** El desenlace duro no se consigue con hambre sino con otra
+   cosa, y la hambruna deja de ser la palanca principal del juego.
+2. **Poner precio a la pesca.** Que exija un embarcadero construido, o que el
+   río rinda por estaciones. Deja de ser comida gratis sin dejar de existir.
+3. **Endurecer por otro lado.** Si el amortiguador se queda, la dificultad
+   tiene que venir de §8 y no de §5, que es un cambio mucho mayor.
+
+**Qué falsaría lo escrito aquí:** que quitando la pesca y dejando la caza el
+desenlace volviera a 13,3 %. Eso diría que la culpable es la comida que no se
+agota y no el forrajeo entero, y la opción 2 pasaría a ser la respuesta obvia.
+No está medido todavía: es la siguiente pregunta, no otra hipótesis encadenada
+a esta.
+
 #### Lo declarado y todavía NO construido
 
 - **Cuervos.** Sobre los campos maduros, antes de la cosecha de la semana 35.
   Muerden el rendimiento; el espantapájaros o la vigilancia son la respuesta.
-- **Caza.** La mano de obra de §5.2 puede ir al bosque en vez de al campo:
-  carne a cambio de brazos que no siembran, y depende del bosque que quede.
-- **Pesca.** El río ya está en el mapa y no sirve para nada. Pescar es comida
-  que no depende de la cosecha, y por tanto un amortiguador contra la hambruna
-  — que es justo la palanca que §2.47 dejó sin explorar.
 
 **Qué falsaría esto:** que el rebaño crezca por encima de lo que la aldea
 sostiene, que se coma grano que no tiene, que la aldea deje morir gente
