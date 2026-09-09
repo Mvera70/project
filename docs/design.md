@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.78 · 11 de septiembre de 2026, 02:15 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.79 · 11 de septiembre de 2026, 02:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.79** | 11 sep 2026, 02:45 | M-10.1 · contrato del paquete ciego | **La entrega reproducible también tiene una regresión.** El contenido puro se separa de la escritura en disco y una prueba fija los cuatro nombres, las tres historias distintas, la ausencia de metadatos y la única pregunta permitida. Esto protege el cegado; el veredicto del hito 0 sigue perteneciendo a una persona ajena. |
 | **2.78** | 11 sep 2026, 02:15 | M-09.1 · banco de interfaz completo | **El banco acababa en el epitafio.** Bienvenida, reloj, controles, marcador y fichas aún escribían inglés en los módulos UI, contra §2.2. Todo el texto visible y accesible pasa por `UI_BANK`; terrenos despejados dicen «clearing» y rasgos/memorias dejan de mostrar identificadores con guion bajo. |
 | **2.77** | 11 sep 2026, 01:40 | M-00.1 · integración continua | **«En CI nocturna» ya significa un proceso existente.** Push y pull request ejecutan tipos, suite rápida, build, lint y Playwright; el banco largo queda en otro workflow diario a las 03:00 UTC y con disparo manual. Capturas y series se conservan como artefactos. |
 | **2.76** | 11 sep 2026, 01:10 | Puerta de entrada del repositorio | **El README seguía viviendo en M-00.** Deja de anunciar «andamiaje» y cuenta el estado hasta M-26, cómo arrancar y validar, y cuáles son las dos aceptaciones que una automatización no puede adjudicarse. El paquete del lector del hito 0 queda accesible desde la portada. |
@@ -123,6 +124,28 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.79 — El cegado es un contrato comprobable
+
+El generador de v2.53 producía el paquete correcto, pero la afirmación de que la
+inspección de metadatos «pasa» no tenía una prueba que pudiera fallar. M-10.1
+separa `buildReaderPacket`, que devuelve el contenido exacto sin tocar el sistema
+de ficheros, de `reader-packet.ts`, que solo crea el directorio y escribe ese
+resultado. Así la entrega real y la prueba recorren la misma fuente.
+
+La regresión exige exactamente tres crónicas A/B/C distintas y
+`reader-question.txt`; comprueba que las historias empiezan por un año, contienen
+más de cincuenta líneas y no exponen semilla, política ni población final. La
+pregunta se compara completa para impedir que una futura ayuda insinúe al lector
+qué diferencias debe buscar. El comando conserva las 145, 169 y 188 líneas de
+v2.53. Suite rápida: **631 pruebas en 17,45 s**; tipos, lint, build y generación
+real pasan.
+
+**Qué falsaría este cierre técnico:** un quinto fichero, dos crónicas iguales,
+una etiqueta de ejecución, una pregunta distinta o superar el presupuesto de
+veinte segundos de la suite rápida. Nada de esto concede el hito: la respuesta
+libre de una persona ajena sigue siendo la única evidencia de §9.5 y continúa
+pendiente.
 
 ### 2.78 — La interfaz también habla desde el banco
 
@@ -876,8 +899,10 @@ El paquete actual contiene 145, 169 y 188 líneas. La pregunta es una sola:
 
 **Qué falsaría el hito 0:** que una persona ajena responda que las tres se
 parecen mucho o no pueda describir diferencias concretas entre gente y sucesos.
-Esa evidencia todavía no existe. El generador y la inspección de metadatos
-pasan; **el hito 0 continúa sin validar** hasta recibir la respuesta externa.
+Esa evidencia todavía no existe. Desde v2.79, el generador puro y el contrato de
+metadatos forman una regresión rápida; el escritor consume ese mismo resultado y
+su comando se verifica aparte. **El hito 0 continúa sin validar** hasta recibir
+la respuesta externa.
 
 ### 2.52 — La multitud no crea una segunda aldea
 
@@ -5208,7 +5233,8 @@ las cinco pantallas se resuelve mediante `renderEntry` o `renderUiText`.
 
 **Objetivo.** El tick completo y el entregable del hito 0.
 **Depende de.** M-04, M-06, M-07, M-08, M-09.
-**Ficheros.** `src/engine/sim.ts`, `src/engine/found.ts`, `src/cli/chronicle.ts`.
+**Ficheros.** `src/engine/sim.ts`, `src/engine/found.ts`, `src/cli/chronicle.ts`,
+`tools/reader-packet-content.ts`, `tools/reader-packet.ts`.
 **Contrato.**
 ```ts
 export function foundGame(seed: number, inherited?: {
@@ -5229,6 +5255,10 @@ numeradas y comentadas. `tick` no dibuja ni escribe por consola.
 espías; 1 000 ticks sin excepciones en 20 semillas.
 **Terminado cuando.** `npm run chronicle -- --seed 7 --years 60` imprime una
 crónica legible. **Este es el hito 0.**
+
+**Estado del paquete ciego (v2.79): implementado.** Su contenido es puro y una
+prueba rápida fija los cuatro ficheros entregables, el cegado y la pregunta. La
+aceptación humana de §9.5 permanece pendiente.
 
 ---
 
