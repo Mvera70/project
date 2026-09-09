@@ -670,6 +670,10 @@ export const DAY = {
   WORK_LAPS: 2.5,
   // TUNE: lo que se aleja de su puesto al hacerlo, en celdas.
   WORK_REACH: 0.9,
+  // TUNE: cuánto más se mueve un crío que un adulto. Los menores de
+  // `CHILD_UNDER` no trabajan: andan por delante de las casas, y andan mucho.
+  // Es el movimiento que más se ve, porque ocurre donde el jugador mira.
+  CHILD_ENERGY: 2.2,
 } as const;
 
 export const MARKS = {

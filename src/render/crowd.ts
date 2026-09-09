@@ -185,6 +185,15 @@ function workdayPaths(state: GameState): Map<VillagerId, number[]> {
     // puerta el día entero. Hace un recado por el pueblo, y uno distinto cada
     // semana. Antes se les daba una ruta de una sola celda —su casa— y eran
     // media docena de figuras inmóviles en cada partida.
+    //
+    // Los críos no: no mandas a un niño de cinco años a por agua al otro lado
+    // del valle. Se quedan delante de su casa, que es donde estaban, sólo que
+    // moviéndose (v3.05).
+    const age = Math.floor((state.tick - person.bornTick) / TIME.WEEKS_PER_YEAR);
+    if (age < DAY.CHILD_UNDER) {
+      paths.set(person.id, [home]);
+      continue;
+    }
     const pick = ((Math.imul(person.id + 13, 2246822519) ^ state.tick) >>> 0) % spots.length;
     const spot = spots[pick] ?? (spots[0] as number);
     const cells = spot === home ? [home] : route(state.map, home, spot);
@@ -330,10 +339,13 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
         // el surco de ida y el de vuelta— con un ritmo y una dirección propios
         // para que dos vecinos no vayan acompasados como un mecanismo.
         const through = (fraction - day.arrive) / Math.max(0.001, day.depart - day.arrive);
-        const swing = Math.sin(through * Math.PI * 2 * DAY.WORK_LAPS + person.id * 1.7);
+        // Un crío no trabaja: juega, y por eso da más vueltas y más rápidas.
+        const years = Math.floor((state.tick - person.bornTick) / TIME.WEEKS_PER_YEAR);
+        const energy = years < DAY.CHILD_UNDER ? DAY.CHILD_ENERGY : 1;
+        const swing = Math.sin(through * Math.PI * 2 * DAY.WORK_LAPS * energy + person.id * 1.7);
         const heading = ((Math.imul(person.id + 31, 374761393) >>> 0) % 6283) / 1000;
-        point.x += Math.cos(heading) * swing * DAY.WORK_REACH;
-        point.y += Math.sin(heading) * swing * DAY.WORK_REACH;
+        point.x += Math.cos(heading) * swing * DAY.WORK_REACH * energy;
+        point.y += Math.sin(heading) * swing * DAY.WORK_REACH * energy;
       }
     } else if (fraction < day.home) {
       const back = (fraction - day.depart) / Math.max(0.001, day.home - day.depart);

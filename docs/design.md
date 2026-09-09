@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.05** | 12 sep 2026, 13:30 | M-36/M-37 · la aldea se entera y los oficios se ven | **Ardía una casa y la gente seguía camino del campo.** Ahora lo que acaba de pasarle a la aldea manda sobre todo lo demás. Y los ocho con nombre dejan de ser ocho labradores más: el herrero está en la fragua, el cura en la capilla, el alguacil en el granero. Los que no trabajan hacen recados en vez de quedarse clavados en su puerta, y los críos juegan delante de casa. |
 | **3.03** | 12 sep 2026, 11:00 | M-35 · que la aldea parezca viva | **Segundo veredicto humano, y es el mismo problema visto de cerca: «se mueven todos los días igual».** Y era literal. Todos salían en el mismo instante, iban al mismo campo, se quedaban clavados y volvían juntos. §11.9 nueva: jornada propia por persona y por semana, la tierra repartida entre los campos, gente trabajando en vez de quieta, encuentros entre vecinos que deciden las opiniones, y un invierno en que **nadie ara**. |
 | **3.01** | 12 sep 2026, 08:30 | M-33 · el estandarte y el apagón | **Quedan 17 opciones menos mudas.** El estandarte se iza sobre el núcleo y el edificio que una decisión manda apagar se queda sin humo, sin luz y sin velas. Y se arregla un fallo que dejaba muerto justo el estandarte que más significa: `years: 0` es **para siempre** (§3.1), no «dura cero», así que el paño gris de arrodillarse ante el señor no se izaba jamás. Sólo queda `scar`, con dos de sus tres variantes irreconstruibles. |
 | **3.00** | 12 sep 2026, 06:00 | M-32 · que la decisión se vea | **42 de las 56 opciones del catálogo enfocaban una celda donde no aparecía nada nuevo.** El efecto visible no estaba roto —la cámara sí enfoca, como promete §11.2— pero ninguno de los seis tipos se representaba: un estandarte, una reunión y una cicatriz daban la misma imagen. §11.8 nueva: `gather` convoca de verdad a la aldea, derivado del historial y sin un byte de estado nuevo. Quedan cuatro tipos por representar, anotados. |
@@ -5337,6 +5338,54 @@ opiniones se lee fuera del catálogo.**
 **El invierno vacía los campos.** No se ara la tierra helada: se va al bosque a
 por la leña que §5.4 quema, y si no queda bosque, a la obra. Medido: 0 % en los
 campos en invierno contra 92–96 % el resto del año.
+
+#### La aldea se entera de lo que le pasa (v3.05)
+
+Ardía una casa y la gente seguía camino del campo. Se moría alguien y nadie
+levantaba la cabeza.
+
+No hace falta inventar ningún suceso: el estado ya guarda los que ocurrieron
+**esta misma semana**. Un edificio con `lostTick` igual al tick de hoy se acaba
+de perder; un nombrado con `diedTick` de hoy es alguien a quien están
+enterrando ahora.
+
+**El orden es el de la urgencia.** Lo que acaba de pasarle a la aldea manda
+sobre lo que el jugador decidió, y las dos cosas mandan sobre el domingo y sobre
+el trabajo: se te quema una casa y no te vas al campo.
+
+**Una muerte anónima no para el valle.** Sólo los nombrados tienen entierro con
+gente (§6.1). Si cada muerte anónima detuviera la aldea, no se trabajaría nunca.
+
+#### Los oficios se ven (v3.05)
+
+§5.2 cuenta brazos, no personas: dice cuántos labran, nunca quiénes. Así que el
+herrero labraba, el cura labraba y la comadrona labraba, y **los ocho con
+nombre —los únicos que el jugador sigue— eran ocho figuras más andando hacia el
+mismo campo**.
+
+| Oficio | Dónde pasa el día |
+|---|---|
+| Herrero | La fragua |
+| Cura | La iglesia, o la capilla |
+| Alguacil | El granero |
+| Líder | El pozo |
+| Comadrona y guardabosque | Sin taller fijo, que es cierto en los dos casos |
+
+Es **sólo presentación**: no toca el reparto ni la economía. Cambia dónde se
+dibuja a esa persona, no lo que la aldea produce. Por eso vive en `crowd.ts` y
+no en `world/paths.ts`, que sí alimenta el desgaste de caminos. Y si la fragua
+se pierde, el herrero vuelve al campo en vez de quedarse plantado en un solar.
+
+#### Y los que no trabajan (v3.05)
+
+Quien no tenía trabajo esa semana recibía una ruta de una sola celda —su propia
+puerta— y se quedaba ahí de sol a sol. Eran media docena de figuras inmóviles
+en cada partida. Ahora hacen un recado por el pueblo, y uno distinto cada
+semana: el pozo, el granero, la capilla, la fragua, el molino.
+
+**Los críos no.** A un niño de cinco años no se le manda a por agua al otro lado
+del valle: se quedan delante de su casa, sólo que moviéndose el doble que un
+adulto. Es el movimiento que más se ve, porque ocurre donde el jugador mira.
 
 #### Las reglas que esto NO rompe
 
