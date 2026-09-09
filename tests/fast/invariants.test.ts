@@ -44,8 +44,9 @@ describe('M-11 · integrated invariants', () => {
   });
 
   // M-13's mapgen tests cover the river, forest and site across 200 seeds.
-  it.todo('preserves pure camera and gesture behavior without a DOM (M-20)');
-  it.todo('round-trips complete state through the production save/load API (M-23)');
+  // The two contracts that used to wait here now have their production owners:
+  // ui.test.ts covers pure gesture/hit-test behavior and save.test.ts covers a
+  // full structured-clone round trip with a fingerprint of every state field.
 
   it('isolates 1,000 chronicle draws from the complete subsequent simulation', () => {
     const baseline = foundGame(6);

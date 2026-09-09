@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.64 · 10 de septiembre de 2026, 16:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.65 · 10 de septiembre de 2026, 16:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.65** | 10 sep 2026, 16:30 | Cierre de M-11 | **La suite ya no promete trabajo futuro que existe en otro sitio.** Gestos/cámara viven en `ui.test.ts`, `app.test.ts` y Playwright; el guardado completo vive en `save.test.ts`. Se retiran los dos `it.todo`: 620 pruebas, cero pendientes, 17,53 s. |
 | **2.64** | 10 sep 2026, 16:00 | Revisión del parte de bienvenida | **La recencia gana dentro de la variedad.** Las cuatro plazas toman primero el suceso más reciente de cada tipo y después una segunda aparición como máximo. Tres cosechas ya no expulsan una llegada ni se repiten por tercera vez. Bienvenida opaca y controles ocultos bajo la encrucijada cierran el sangrado entre pantallas. |
 | **2.63** | 10 sep 2026, 15:10 | M-23 · hito 6 | **La aldea sigue sin ti, y el parte de bienvenida se entiende leído en frío — casi siempre.** Guardado, letargo y bienvenida implementados y verificados con reloj falso. Hallazgo sin arreglar: la selección de las cuatro entradas puede llenarse de cosechas seguidas y dejar fuera todo lo demás — un problema de selección, no de formato. |
 | **2.62** | 10 sep 2026, 13:20 | El reloj del navegador no es el del juego | **Ninguna animación de interfaz corre sobre el compositor.** Una transición CSS dejó el zoom a medias; el caso de prueba es el letargo, 960 ticks en dos segundos. Y `douse` gana `who`: prometía apagar el taller de B y apagaba una casa cualquiera. |
@@ -109,6 +110,23 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.65 — Los pendientes tenían ya dueño
+
+Los dos `it.todo` de M-11 se escribieron antes de que existieran M-21 y M-23.
+Hoy duplicarlos dentro de `invariants.test.ts` habría probado otra vez la misma
+implementación: gestos e inspección pura ya viven en `ui.test.ts`, la cola y el
+enfoque en `app.test.ts` y Playwright, y el guardado recorre `serialize`, el clon
+estructurado de IndexedDB y `deserialize` con una huella de todo `GameState` en
+`save.test.ts`.
+
+Se retiran los marcadores y la matriz de cobertura apunta a esas pruebas de
+producción. `npm test` ejecuta **620 pruebas, cero pendientes, en 17,53 s**; los
+nueve grupos de §14.1 están cubiertos y M-11 queda cerrado.
+
+**Qué habría falsado el cierre:** un grupo sin prueba propietaria, una prueba de
+guardado que comparase la misma referencia consigo misma, una suite por encima
+de 20 s o cualquier `it.todo` restante. Ninguna condición ocurre.
 
 ### 2.64 — Cuatro plazas para contar una ausencia
 
@@ -4739,6 +4757,9 @@ implementación. Nada de comprobar que una función llama a otra.
 **Terminado cuando.** `npm test` tarda menos de 20 s y cubre los nueve grupos.
 Hasta implementar M-13/M-14, M-20 y M-23, las propiedades de geometría, mapa,
 cámara y guardado figuran pendientes: no se sustituyen por pruebas del andamiaje.
+
+**Estado (v2.65): implementado.** Los nueve grupos tienen pruebas propietarias;
+la suite ejecuta 620 pruebas sin pendientes en 17,53 s.
 
 ---
 

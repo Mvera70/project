@@ -12,11 +12,11 @@ sigue la enumeración publicada; no inventa un décimo requisito.
 | Catálogo | `catalog.test.ts`: opciones visibles, cardinalidad, claves de bancos, referencias de reparto y semillas. También comprueba letras usadas en textos de consecuencias. |
 | Condiciones | `crossroads.test.ts`: tabla de casos del DSL y resolución. |
 | Mapa | `mapgen.test.ts`: río continuo, bosque en rango y fundación válida sobre 200 semillas del generador real. |
-| Gestos y cámara | Pendiente de M-20 y su lógica pura. |
-| Guardado | Pendiente de M-23 y sus funciones reales de guardado/carga. |
+| Gestos y cámara | `ui.test.ts`: reconocimiento puro de toque, pulsación, deslizamientos y pellizco; inspección en bordes y señales sin mutar estado. `app.test.ts` cubre la cola de decisión y Playwright el enfoque. |
+| Guardado | `save.test.ts`: `serialize` → clon estructurado de IndexedDB → `deserialize`, huella completa, rechazo de corrupción, letargo y replay de decisiones. |
 
-Los dos pendientes figuran como `it.todo` en la suite. M-11 **no está cerrado**
-hasta cubrir cámara/gestos y guardado con sus APIs de producción.
+Los dos pendientes originales se cerraron cuando M-21 y M-23 entregaron sus
+APIs de producción. La suite rápida ya no contiene `it.todo`.
 
 ## Defectos encontrados al añadir las propiedades
 
@@ -38,4 +38,5 @@ La suite de balance se ejecuta aparte con `npm run test:balance`.
 En v2.18, tras corregir la peste perpetua, las partidas vuelven a recorrer casi
 todo su horizonte. Dos pruebas integradas que se habían vuelto lentas y vacuas
 se sustituyeron por casos que fuerzan el suceso observado. La suite completa
-queda en 19,81 s con 523 pruebas aprobadas y dos pendientes.
+La medición histórica fue 19,81 s con 523 pruebas y dos pendientes. La medición
+vigente está en `docs/design.md`; no se mantiene un contador duplicado aquí.
