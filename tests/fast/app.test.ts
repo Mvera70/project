@@ -9,7 +9,7 @@ import { attemptDecision, nextUnusedSeed, resumeAfterHidden } from '@ui/app';
 
 describe('attemptDecision · §2.60', () => {
   it('sin encrucijada pendiente, no se acepta a ninguna velocidad', () => {
-    for (const speed of [0, 1, 4, 16] as const) {
+    for (const speed of TIME.SPEEDS) {
       expect(attemptDecision(false, false, speed)).toEqual({ accepted: false, forceTick: false });
     }
   });

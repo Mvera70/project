@@ -128,7 +128,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const controls = document.createElement('div');
   controls.className = 'valley-speeds';
   controls.setAttribute('aria-label', renderUiText('app.speed.controls'));
-  const buttons = ([0, 1, 4, 16] as const).map((value) => {
+  const buttons = TIME.SPEEDS.map((value) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = speedLabel(value);
