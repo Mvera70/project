@@ -7,6 +7,7 @@ import { routesFor } from '@engine/world/paths';
 import type { Figure } from './layers/figures';
 import { hungerSeverity } from './layers/tells';
 import { gatheringsAt } from './gatherings';
+import { reactionsAt } from './reactions';
 import { encountersAmong, type Encounter } from './encounters';
 import { DAY, ENCOUNTER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -99,6 +100,25 @@ function gatheringPaths(state: GameState, target: number): Map<VillagerId, numbe
   return paths;
 }
 
+/**
+ * §11.9: los sitios del pueblo a los que se va sin ir a trabajar. El pozo, el
+ * granero, la capilla, la fragua, el molino — y la plaza como respaldo.
+ *
+ * Son los edificios que en una aldea daban un motivo para cruzarla: agua, pan,
+ * misa, herramienta. No hace falta representar el recado, basta con que la
+ * persona esté allí y no clavada en su puerta.
+ */
+function errandSpots(state: GameState): number[] {
+  const kinds: Building['kind'][] = ['well', 'granary', 'chapel', 'church', 'smithy', 'mill'];
+  const spots: number[] = [];
+  for (const building of state.buildings) {
+    if (building.lostTick !== null) continue;
+    if (!kinds.includes(building.kind)) continue;
+    spots.push(centre(building, state.map.width));
+  }
+  return spots.length > 0 ? spots : [plaza(state)];
+}
+
 function workdayPaths(state: GameState): Map<VillagerId, number[]> {
   const known = WORKDAY.get(state);
   if (known !== undefined && known.tick === state.tick) return known.paths;
@@ -106,10 +126,23 @@ function workdayPaths(state: GameState): Map<VillagerId, number[]> {
   const target = plaza(state);
   const homes = new Map(state.buildings.filter((building) => building.lostTick === null)
     .map((building) => [building.id, centre(building, state.map.width)]));
+  const spots = errandSpots(state);
+
   for (const person of state.people.villagers) {
     if (!isHere(person) || paths.has(person.id)) continue;
     const home = person.homeId === null ? undefined : homes.get(person.homeId);
-    paths.set(person.id, [home ?? target]);
+    if (home === undefined) {
+      paths.set(person.id, [target]);
+      continue;
+    }
+    // §11.9: quien no tiene trabajo esta semana no se queda clavado en su
+    // puerta el día entero. Hace un recado por el pueblo, y uno distinto cada
+    // semana. Antes se les daba una ruta de una sola celda —su casa— y eran
+    // media docena de figuras inmóviles en cada partida.
+    const pick = ((Math.imul(person.id + 13, 2246822519) ^ state.tick) >>> 0) % spots.length;
+    const spot = spots[pick] ?? (spots[0] as number);
+    const cells = spot === home ? [home] : route(state.map, home, spot);
+    paths.set(person.id, cells.length > 0 ? cells : [home]);
   }
   WORKDAY.set(state, { tick: state.tick, paths });
   return paths;
@@ -205,7 +238,12 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
   // §11.8: si una decisión convocó a la aldea, eso manda sobre el domingo y
   // sobre el trabajo. Es la única semana en que la gente hace algo porque el
   // jugador lo decidió, y por eso se ve.
-  const meeting = gatheringsAt(state, CATALOG)[0];
+  // §11.9, v3.04 · El orden importa y es el de la urgencia. Lo que acaba de
+  // pasarle a la aldea manda sobre lo que el jugador decidió, y las dos cosas
+  // mandan sobre el domingo y sobre el trabajo: se te quema una casa y no te
+  // vas al campo.
+  const reaction = reactionsAt(state)[0];
+  const meeting = reaction ?? gatheringsAt(state, CATALOG)[0];
   const routes = meeting !== undefined
     ? gatheringPaths(state, cellOf(state, meeting))
     : state.tick % 4 === 0 ? sundayPaths(state) : workdayPaths(state);
