@@ -171,6 +171,27 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
   await test.expect(page.locator('.valley-speeds')).toBeVisible();
   await page.screenshot({ path: 'artifacts/m25-inherited-valley.png', fullPage: true });
 
+  const canvas = page.locator('#valley');
+  const box = await canvas.boundingBox();
+  test.expect(box).not.toBeNull();
+  await page.mouse.move((box?.x ?? 0) + 180, (box?.y ?? 0) + 430);
+  await page.mouse.down();
+  await page.mouse.move((box?.x ?? 0) + 180, (box?.y ?? 0) + 230);
+  await page.mouse.up();
+  const archivePicker = page.getByRole('combobox', { name: 'Valley chronicle' });
+  await test.expect(archivePicker).toBeVisible();
+  await test.expect(archivePicker.locator('option')).toHaveCount(2);
+  await test.expect(archivePicker.locator('option').nth(1)).toHaveText('Earlier valley 1 — 80 years, peak 82');
+  const chronicleBody = page.locator('.chronicle-body');
+  const currentChronicle = await chronicleBody.innerText();
+  await archivePicker.selectOption('archive:0');
+  await test.expect.poll(() => chronicleBody.innerText()).not.toBe(currentChronicle);
+  await page.screenshot({ path: 'artifacts/m26-archive-reader.png', fullPage: true });
+  const archiveChronicle = page.locator('.chronicle-scrim');
+  await archiveChronicle.dispatchEvent('pointerdown', { clientX: 200, clientY: 200, pointerId: 1 });
+  await archiveChronicle.dispatchEvent('pointerup', { clientX: 200, clientY: 420, pointerId: 1 });
+  await test.expect(archiveChronicle).toBeHidden();
+
   // The archive write and successor write are ordered. Reloading after the
   // latter reaches IndexedDB must never resurrect the old epitaph.
   await test.expect.poll(() => page.evaluate(async () => {

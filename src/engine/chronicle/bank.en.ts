@@ -1325,6 +1325,9 @@ export const UI_BANK: Record<string, string> = {
   'epitaph.summary': '{years} years. {peak} people at its height.',
   'epitaph.chronicle': 'Read the chronicle',
   'epitaph.begin': 'Begin again',
+  'chronicle.source': 'Valley chronicle',
+  'chronicle.current': 'This valley',
+  'chronicle.archived': 'Earlier valley {number} — {years} years, peak {peak}',
 };
 
 for (const [key, variants] of Object.entries(CROSSROAD_CHRONICLE)) BANK[key] = variants;

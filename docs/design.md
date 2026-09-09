@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.70 · 10 de septiembre de 2026, 20:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.71 · 10 de septiembre de 2026, 21:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.71** | 10 sep 2026, 21:00 | M-26 · lector del archivo | **Una crónica guardada vuelve a ser legible.** La pantalla de crónica incorpora un selector para la aldea actual y todas las anteriores; reconstruye la voz desde la semilla archivada sin cambiar el esquema. La copia de la aldea que aún ocupa el epitafio no aparece dos veces. |
 | **2.70** | 10 sep 2026, 20:00 | M-23.2 · bordes de persistencia | **Cerrar también guarda, y una identidad archivada no vuelve.** `pagehide` solicita una instantánea antes de detener el bucle; cada sucesora evita las semillas de todo el archivo, no solo la de su madre. Se eliminan la pérdida posible antes del tick 20 y la colisión de `(seed, endedTick)`. |
 | **2.69** | 10 sep 2026, 19:15 | Auditoría de hitos 3, 5 y 6 | **Implementar y aceptar dejan de figurar como sinónimos.** Generaciones e idle cumplen sus criterios y se cierran con evidencia longitudinal y de interfaz. M-23 está completo, pero el hito 6 conserva su prueba de una partida humana de varios días: cuatro horas de reloj falso no son varios días jugados. |
 | **2.68** | 10 sep 2026, 18:30 | M-25 · epitafio y herencia visible | **El fracaso ya tiene salida y memoria visible.** El reloj se detiene ante un epitafio que explica causa, duración y pico; la crónica se puede leer y «Begin again» funda gente distinta sobre el mismo terreno. Las ruinas heredadas se dibujan como una cimentación continua. Las escrituras de IndexedDB se ordenan para que la partida muerta nunca sobrescriba a su sucesora. **Hito 4 alcanzado.** |
@@ -115,6 +116,38 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.71 — Guardar una historia obliga a devolverla
+
+Desde M-25 el archivo era acumulativo, pero después de «Begin again» no había
+ningún camino de interfaz hacia él. Conservar bytes que el jugador no puede
+volver a leer no es memoria del valle. M-26 añade el acceso dentro de la propia
+pantalla de crónica: sigue habiendo cinco pantallas, no nace una sexta.
+
+Cuando existe al menos una antepasada aparece el selector **«Valley
+chronicle»**. La primera opción es **«This valley»** y las anteriores se ordenan
+de más reciente a más antigua como **«Earlier valley N — X years, peak Y»**;
+`N` conserva el orden de archivo. Mientras se lee desde el epitafio, su copia
+recién archivada se excluye del selector porque «This valley» ya es esa misma
+crónica. Tras fundar de nuevo aparece como antepasada.
+
+`ArchivedGame` no gana otro campo ni fuerza un esquema 3. Las variantes del
+banco dependen de `rng.chronicle`, y §9.1 garantiza que ese flujo nunca avanza;
+`makeBundle(game.seed)` recupera exactamente el valor original. El compositor
+se abre en dos: `renderChronicleYear(entries, rng, year)` sirve tanto al archivo
+como a `renderYear(state, year)`, que conserva su contrato público.
+
+**Evidencia.** La prueba rápida confirma que dos entradas archivadas recuperan
+la misma voz que el estado original. Playwright termina una aldea de 80 años,
+funda la siguiente, abre la crónica con gesto, encuentra dos fuentes, selecciona
+la anterior y obtiene una historia distinta. La captura a 390 × 844 se miró:
+etiqueta, resumen y flecha caben en una línea; el encabezado fijo no tapa el
+primer año y el texto mantiene el ancho anterior. La red completa pasa
+**627 pruebas rápidas en 16,84 s** y **8/8** recorridos Playwright en 29,7 s.
+
+**Lo falsaría** necesitar una sexta pantalla, reescribir una línea al archivarla,
+mostrar dos veces la aldea del epitafio, ordenar las antepasadas al revés,
+truncar el resumen a 390 px o perder el cierre por gesto de la crónica.
 
 ### 2.70 — Los dos bordes que una partida larga sí tocará
 
@@ -4008,7 +4041,14 @@ cerrar: se decide o se vuelve al valle con gesto, y la encrucijada sigue
 pendiente con una marca discreta.
 
 **4. Crónica.** Lista desplazable por años. Al abrir tras una ausencia, encabeza
-el parte de bienvenida (§9.2).
+el parte de bienvenida (§9.2). Si el archivo contiene aldeas anteriores, una
+banda fija permite alternar entre «This valley» y cada antepasada, de más
+reciente a más antigua. La banda queda dentro de esta pantalla: no abre otra.
+Usa fondo `#14130f`, etiqueta dorada `#c9b46b` a `12 px/1.2`, hueco de `6 px` y
+margen inferior de `18 px`. El selector mide al menos `44 px`, con relleno
+`9 px 34 px 9 px 11 px`, borde `#756c55` de `1 px`, radio `8 px`, fondo
+`#24221b` y texto `#f2f4f6` a `14 px/1.2`. Se fija `20 px` por encima del borde
+de desplazamiento para compartir el área segura y no tapar el primer año.
 
 **5. Epitafio.** Solo aparece al terminar una aldea. El valle permanece detrás
 con un velo `rgba(18,17,14,0.78)` y los controles desaparecen. La tarjeta ocupa
@@ -4533,6 +4573,12 @@ El archivo conserva todas las partidas cerradas; una misma pareja
 `(seed, ended.tick)` solo se añade una vez. La semilla de una sucesora no puede
 ser ninguna del archivo: si la extracción coincide, avanza módulo `2³²` hasta
 la primera libre. Así esa pareja sigue siendo una identidad inequívoca.
+
+La pantalla de crónica expone el archivo completo tras la fundación siguiente.
+Las entradas se renderizan con `makeBundle(ArchivedGame.seed)`: el flujo
+`chronicle` nunca avanza (§9.1), así que la semilla reconstruye la misma voz sin
+guardar otro estado aleatorio ni subir el esquema. La partida terminada que aún
+se muestra como estado actual no se duplica en el selector.
 
 ---
 
@@ -5439,6 +5485,28 @@ una recarga no devuelve la aldea muerta.
 
 ---
 
+### M-26 · Lector de crónicas archivadas
+
+**Objetivo.** Que las historias conservadas por §13.3 sigan al alcance después
+de fundar otra aldea.
+**Depende de.** M-25, M-22, M-09.
+**Ficheros.** `src/ui/app.ts`, `src/ui/screens/chronicle.ts`,
+`src/engine/chronicle/render.ts`, `bank.en.ts`, pruebas rápida y Playwright.
+**Contrato.** `App.archive(): readonly ArchivedGame[]` expone lectura;
+`renderChronicleYear(entries, rng, year, minWeight?)` compone una fuente sin
+exigir un `GameState`. `renderYear` delega y no cambia de firma.
+**Reglas.** El selector vive dentro de la pantalla 4; actual primero,
+antepasadas en orden inverso de archivo. La partida actual terminada no se
+duplica. La voz se reconstruye desde `seed`, sin migración.
+**Tests.** Igualdad de prosa actual/archivada; dos opciones tras la primera
+sucesora; selección cambia el cuerpo; cierre por gesto; captura móvil mirada.
+**Terminado cuando.** Una crónica anterior se puede leer completa desde el
+valle sucesor y el selector cabe a 390 px.
+
+**Estado (v2.71): implementado y mirado.**
+
+---
+
 ### 17.1 Orden de trabajo
 
 ```
@@ -5461,6 +5529,7 @@ M-00
                                  M-23  ← HITO 6
                                    │
                                  M-24 ─ M-25  ← HITO 4
+                                         └─ M-26  (archivo legible)
 ```
 
 Se pueden trabajar en paralelo, sin pisarse: (M-03, M-06, M-09, M-13),
