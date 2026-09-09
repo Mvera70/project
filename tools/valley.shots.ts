@@ -161,6 +161,10 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
   await epitaph.getByRole('button', { name: 'Read the chronicle' }).click();
   const chronicle = page.locator('.chronicle-scrim');
   await test.expect(chronicle).toBeVisible();
+  await test.expect.poll(() => page.evaluate(() =>
+    document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest('.chronicle-scrim') !== null,
+  )).toBe(true);
+  await page.screenshot({ path: 'artifacts/m25-epitaph-chronicle.png', fullPage: true });
   await chronicle.dispatchEvent('pointerdown', { clientX: 200, clientY: 200, pointerId: 1 });
   await chronicle.dispatchEvent('pointerup', { clientX: 200, clientY: 420, pointerId: 1 });
   await test.expect(chronicle).toBeHidden();

@@ -15,7 +15,7 @@ import { recogniseGesture, type Point } from '../gestures';
 
 const STYLE_ID = 'valley-chronicle-style';
 const STYLE = `
-.chronicle-scrim { position: fixed; inset: 0; z-index: 10; overflow: auto; box-sizing: border-box;
+.chronicle-scrim { position: fixed; inset: 0; z-index: 13; overflow: auto; box-sizing: border-box;
   padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
   background: #14130f; color: #f2f4f6; font: 14px/1.4 system-ui, sans-serif; }
 .chronicle-scrim h2 { margin: 20px 0 8px; font: 600 15px/1.2 Georgia, serif; color: #c9b46b; }
