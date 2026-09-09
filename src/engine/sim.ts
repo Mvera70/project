@@ -30,6 +30,7 @@ import type {
   Villager,
   VillagerId,
 } from './state';
+import { TERRAIN_CODE } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
@@ -41,7 +42,8 @@ import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { destroyBuilding } from './world/buildings';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
-import { fellForest, regrowForest } from './world/forest';
+import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
+import { neighbours4 } from './world/tiles';
 import { accrueTraffic, upgradePaths } from './world/paths';
 import { holderOf } from './crossroads/conditions';
 import { selectCrossroad } from './crossroads/select';
@@ -430,6 +432,32 @@ function centreOf(b: { x: number; y: number; w: number; h: number }): { x: numbe
   return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
 }
 
+/**
+ * The landward end of the ford road: walkable ground beside water, nearest the
+ * village core, then lower cell index. Paths cannot occupy water (§7.6), so a
+ * literal "path cell crossing the river" cannot exist in this map model.
+ */
+function ford(state: GameState): { x: number; y: number } {
+  const core = valleyCore(state);
+  let best = -1;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+    const terrain = state.map.terrain[cell];
+    if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) continue;
+    if (!neighbours4(cell).some((next) => state.map.terrain[next] === TERRAIN_CODE.water)) continue;
+    const x = cell % state.map.width;
+    const y = Math.floor(cell / state.map.width);
+    const distance = (x + 0.5 - core.x) ** 2 + (y + 0.5 - core.y) ** 2;
+    if (distance < bestDistance || (distance === bestDistance && cell < best)) {
+      best = cell;
+      bestDistance = distance;
+    }
+  }
+  return best < 0
+    ? core
+    : { x: (best % state.map.width) + 0.5, y: Math.floor(best / state.map.width) + 0.5 };
+}
+
 /** The building this cast letter calls home, standing, if there is one. */
 function homeOf(
   state: GameState,
@@ -453,23 +481,19 @@ function homeOf(
  * `douse ... who` can resolve to whichever letter it names (§8.1, §11.5,
  * v2.62): A.7 promised "B's building", and a kind alone cannot say which one.
  *
- * Three cases still have nothing to point at, and fall back to `valleyCore`
+ * Two cases still have nothing to point at, and fall back to `valleyCore`
  * rather than inventing a cell:
  *
  *   - `douse`/`gather:'chapel'` without a `who` that resolves, on a kind the
  *     village has more than one of standing — the effect names a kind, never
  *     an instance, so which one is not knowable from here.
- *   - `gather:'ford'` — the ford only ever existed in the chronicle's prose
- *     ("up the ford road"); the map has never had one.
- *   - `scar:'felled_wood'` — `fellForest` (`world/forest.ts`) does pick a real
- *     cell, but hands back only a count, and that file is not this round's to
- *     change.
  *   - `banner` — schema.ts's own comment settles it: "a banner over the core".
  */
 function locate(
   state: GameState,
   effect: VisualEffect,
   cast: Record<string, VillagerId> | undefined,
+  felledCell: number | null,
 ): { x: number; y: number } {
   switch (effect.k) {
     case 'raise': {
@@ -495,14 +519,16 @@ function locate(
         const yard = theStanding(state, 'grave_yard');
         return yard !== null ? centreOf(yard) : valleyCore(state);
       }
-      return valleyCore(state); // 'felled_wood'
+      return felledCell === null
+        ? valleyCore(state)
+        : { x: (felledCell % state.map.width) + 0.5, y: Math.floor(felledCell / state.map.width) + 0.5 };
     }
     case 'gather': {
       if (effect.where === 'chapel') {
         const chapel = theStanding(state, 'chapel') ?? theStanding(state, 'church');
         if (chapel !== null) return centreOf(chapel);
       }
-      return valleyCore(state); // 'square' is the core by definition; 'ford' is never a cell
+      return effect.where === 'ford' ? ford(state) : valleyCore(state);
     }
     case 'banner':
       return valleyCore(state);
@@ -650,12 +676,16 @@ export function tick(
         });
       }
       carryOutBuildings(state, decided, say);
-      crossroadFelled += carryOutForest(state, decided);
+      const crossroadForest = carryOutForest(state, decided);
+      crossroadFelled += crossroadForest.wood;
       // §2.60, §17 M-22: the interface enfoca from this list; the engine only
       // says what changed and where. Placed here and not earlier because a
       // `raise`/`ruin` needs the work opened or the building actually lost —
       // both just happened, two lines up.
-      visualEffects = decided.visible.map((effect) => ({ effect, ...locate(state, effect, cast) }));
+      visualEffects = decided.visible.map((effect) => ({
+        effect,
+        ...locate(state, effect, cast, crossroadForest.firstCell),
+      }));
 
       // Annex A.15, v2.22: `no_one` answered three times running, with no
       // leader appointed between them, and the valley gives up rather than
@@ -699,7 +729,7 @@ export function tick(
         });
       }
       carryOutBuildings(state, seed.effects, say);
-      crossroadFelled += carryOutForest(state, seed.effects);
+      crossroadFelled += carryOutForest(state, seed.effects).wood;
     }
   }
 
@@ -961,12 +991,15 @@ function carryOutBuildings(
 }
 
 /** §8.4's explicit removal of standing timber, using M-15's map rules. */
-function carryOutForest(state: GameState, applied: AppliedEffects): number {
-  let total = 0;
+function carryOutForest(state: GameState, applied: AppliedEffects): { wood: number; firstCell: number | null } {
+  let wood = 0;
+  let firstCell: number | null = null;
   for (const request of applied.fell) {
-    total += fellForest(state, request.wood, request.permanent);
+    const felled = fellForestWithLocation(state, request.wood, request.permanent);
+    wood += felled.wood;
+    firstCell ??= felled.firstCell;
   }
-  return total;
+  return { wood, firstCell };
 }
 
 /**

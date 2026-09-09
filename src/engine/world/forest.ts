@@ -77,10 +77,30 @@ export function forestCells(state: GameState): number {
  * does not keep producing timber out of nothing.
  */
 export function fellForest(state: GameState, wood: number, permanent = false): number {
-  if (wood <= 0) return 0;
+  return fellForestWithLocation(state, wood, permanent).wood;
+}
+
+export interface FellForestResult {
+  wood: number;
+  /** First cell the cutters actually touched, or null when no wood was taken. */
+  firstCell: number | null;
+}
+
+/**
+ * The same felling operation, retaining the first real cell for a visible
+ * crossroad effect. Normal weekly production only needs `fellForest`'s number;
+ * decisions need both without selecting the forest a second time.
+ */
+export function fellForestWithLocation(
+  state: GameState,
+  wood: number,
+  permanent = false,
+): FellForestResult {
+  if (wood <= 0) return { wood: 0, firstCell: null };
   const centre = core(state);
 
   let got = 0;
+  let firstCell: number | null = null;
   let cleared = false;
   while (got < wood) {
     let target = FELL_TARGET.get(state);
@@ -106,6 +126,7 @@ export function fellForest(state: GameState, wood: number, permanent = false): n
     }
 
     const cell = target.cell;
+    firstCell ??= cell;
     const have = state.map.forestStock[cell] as number;
     const take = Math.min(have, Math.ceil(wood - got));
     state.map.forestStock[cell] = have - take;
@@ -129,7 +150,7 @@ export function fellForest(state: GameState, wood: number, permanent = false): n
   // cell of three hundred does not, and saying it did threw the route cache
   // away every single week for nothing.
   if (cleared) invalidateForest(state);
-  return got;
+  return { wood: got, firstCell };
 }
 
 /**

@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.65 · 10 de septiembre de 2026, 16:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.66 · 10 de septiembre de 2026, 17:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.66** | 10 sep 2026, 17:00 | Coordenadas de efectos de M-22 | **El vado es una orilla, no una celda de agua.** `gather ford` enfoca el acceso terrestre contiguo al río más cercano al núcleo; `scar felled_wood`, la primera celda que la tala tocó realmente. Los dos dejan de caer sobre `valleyCore`. |
 | **2.65** | 10 sep 2026, 16:30 | Cierre de M-11 | **La suite ya no promete trabajo futuro que existe en otro sitio.** Gestos/cámara viven en `ui.test.ts`, `app.test.ts` y Playwright; el guardado completo vive en `save.test.ts`. Se retiran los dos `it.todo`: 620 pruebas, cero pendientes, 17,53 s. |
 | **2.64** | 10 sep 2026, 16:00 | Revisión del parte de bienvenida | **La recencia gana dentro de la variedad.** Las cuatro plazas toman primero el suceso más reciente de cada tipo y después una segunda aparición como máximo. Tres cosechas ya no expulsan una llegada ni se repiten por tercera vez. Bienvenida opaca y controles ocultos bajo la encrucijada cierran el sangrado entre pantallas. |
 | **2.63** | 10 sep 2026, 15:10 | M-23 · hito 6 | **La aldea sigue sin ti, y el parte de bienvenida se entiende leído en frío — casi siempre.** Guardado, letargo y bienvenida implementados y verificados con reloj falso. Hallazgo sin arreglar: la selección de las cuatro entradas puede llenarse de cosechas seguidas y dejar fuera todo lo demás — un problema de selección, no de formato. |
@@ -110,6 +111,35 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.66 — El lugar que la prosa daba por hecho
+
+§11.5 decía que el vado era «donde el camino cruza el río». El mapa demuestra
+que esa celda no puede existir: §7.6 y A* prohíben que caminos y rutas pisen
+agua o marisma. La posición queda definida como **el acceso terrestre al vado**:
+entre las celdas transitables contiguas al agua, la más cercana al centro del
+núcleo; a igual distancia, el índice menor. Es derivada, determinista y no añade
+estado ni una constante de balance. Las reuniones ocurren en tierra y la cámara
+puede mostrar a la vez la gente y el río.
+
+La tala tenía la información correcta dentro de `fellForest` y la descartaba al
+devolver solo la madera. `fellForestWithLocation` ejecuta la misma operación y
+devuelve `{ wood, firstCell }`; `fellForest` conserva su contrato numérico para
+la producción semanal. Una decisión con varias peticiones enfoca la primera
+celda que llegó a tocar de verdad. No se vuelve a buscar el bosque después de
+modificarlo y no cambia ni el orden del tick ni la cantidad talada.
+
+**Evidencia.** La prueba integrada de `forest_cut/fell_it` comprueba que la celda
+señalada era bosque y acaba `cleared` y `BARREN_CLEARING`; la de
+`leave_it_standing` comprueba que el punto es transitable, toca agua y que no hay
+otra orilla candidata más cercana. La captura Playwright de M-22 decide ahora
+`Fell it`: enfoca el borde talado real y fue revisada como imagen, además de
+pasar las siete pruebas de navegador.
+
+**Lo falsaría** que un efecto `felled_wood` señalase una celda que no hubiese
+sido tocada por esa decisión, que un `ford` cayese en agua, marisma o una orilla
+no mínima, o que la misma partida talase una cantidad distinta por conservar la
+coordenada.
 
 ### 2.65 — Los pendientes tenían ya dueño
 
@@ -3865,22 +3895,23 @@ La regla, generalizada:
 
 ### 11.5 Cuando el efecto visible no tiene sitio
 
-Cuatro `VisualEffect` no traen coordenada y todos caen al mismo respaldo, el
-centro del núcleo (`valleyCore`) — un respaldo, no cuatro conjeturas distintas:
+Los `VisualEffect` no traen coordenada. El motor la deriva al aplicarlos y solo
+usa el centro del núcleo (`valleyCore`) cuando la identidad concreta no existe:
 
 | Efecto | Por qué no tiene celda | Deuda |
 |---|---|---|
 | `banner` | Es sobre el núcleo por definición | Ninguna: correcto |
-| `gather where:'ford'` | El vado siempre fue prosa, nunca una celda | Derivable: donde el camino cruza el río (§7.1) |
-| `scar:'felled_wood'` | `fellForest` **sí** elige celda, pero solo devuelve un recuento | Fontanería: que la devuelva |
+| `gather where:'ford'` | Los caminos no pueden pisar agua: el cruce literal no existe | Resuelta en v2.66: orilla transitable contigua al río más cercana al núcleo |
+| `scar:'felled_wood'` | `fellForest` **sí** elige celda | Resuelta en v2.66: devuelve también la primera celda tocada |
 | `douse` con varias instancias | El esquema nombra el **tipo**, y la plantilla quiere **una** | Contrato: ver abajo |
 
 **`douse` gana `who`.** A.7 promete apagar «el edificio de B» y el esquema solo
 sabía decir «un edificio de este tipo»: apagaba una casa cualquiera. Es la misma
 mentira que §8.1 persigue en la columna del precio, en la columna del efecto
 visible. Con `who` —una letra del reparto— se resuelve al edificio de esa
-persona. Las tres deudas de la tabla se saldan cuando su módulo se toque, no
-antes.
+persona. Si no se puede resolver y hay varias instancias, conserva el respaldo
+del núcleo; escoger la primera por orden convertiría una falta de identidad en
+una identidad falsa.
 
 ### 11.6 Accesibilidad
 
@@ -4875,7 +4906,10 @@ construcción. Ver §2.12.
 export function routeFor(state: GameState, id: VillagerId): number[]; // cacheada
 export function accrueTraffic(state: GameState): void;
 export function upgradePaths(state: GameState): PathEvent[];
-export function fellForest(state: GameState, wood: number): number;   // devuelve la madera obtenida
+export function fellForest(state: GameState, wood: number, permanent?: boolean): number;
+export function fellForestWithLocation(
+  state: GameState, wood: number, permanent?: boolean,
+): { wood: number; firstCell: number | null };
 export function regrowForest(state: GameState): void;
 ```
 **Reglas.** Umbrales y decaimiento de §12.7. La tala consume la celda de bosque
