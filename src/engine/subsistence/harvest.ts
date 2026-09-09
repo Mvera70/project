@@ -55,6 +55,11 @@ export function harvest(state: GameState, a: Allocation): HarvestResult {
       : { factor: spoken.factor, harvests: spoken.harvests - 1 };
   }
 
+  // §7.7, v2.93: what the crows took over the weeks the grain stood ripe. It
+  // is spent here and reset here, so a year's birds can never be paid twice.
+  const pecked = Math.max(0, 1 - state.crowBite);
+  state.crowBite = 0;
+
   const yielded =
     a.workedFields *
     FOOD.FIELD_YIELD *
@@ -62,6 +67,7 @@ export function harvest(state: GameState, a: Allocation): HarvestResult {
     moraleFactor *
     a.labourFactor *
     promised *
+    pecked *
     (has(state, 'mill') ? FOOD.MILL_BONUS : 1);
 
   state.village.grain += yielded;

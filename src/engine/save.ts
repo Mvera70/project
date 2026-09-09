@@ -7,12 +7,12 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HERD_KINDS } from './state';
+import { HERD_KINDS, SCHEMA_VERSION } from './state';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
 /** The schema this build writes and reads. §13.1. */
-export const SCHEMA_VERSION = 2;
+export { SCHEMA_VERSION } from './state';
 
 /**
  * Assembles a `SaveFile`. Two fields the state itself does not carry:
@@ -238,6 +238,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && byteMap(s['map'])
     && record(village) && ['grain', 'wood', 'morale', 'faith'].every((key) => finite(village[key]))
     && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
+    && finite(s['crowBite']) && (s['crowBite'] as number) >= 0
     && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
     && tickValue(people['nextId']) && Array.isArray(people['namedIds']) && people['namedIds'].every(tickValue)
     && Array.isArray(people['grudges']) && people['grudges'].every(grudge)
@@ -305,7 +306,8 @@ export function deserialize(raw: unknown): SaveFile {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
-  // 2 -> 3 (§7.7, v2.91): the herd and its own random stream. Additive, like
+  // 2 -> 3 (§7.7, v2.91 and v2.93): the herd, its own random stream, and the
+  // crows' running bite. Additive, like
   // every migration §13.1 allows. The herd starts at what its buildings can
   // hold, because that is exactly what the valley was already drawing before
   // the herd was state: the animals the player could see become the animals
@@ -324,6 +326,11 @@ export function deserialize(raw: unknown): SaveFile {
       cows: capacity.cows,
     };
     state = { ...withStream, herd: (state as Partial<GameState>).herd ?? herd } as GameState;
+  }
+  // The crows' bite starts at zero on a migrated game: a village cannot owe
+  // last year's birds a harvest it already reaped.
+  if ((state as Partial<GameState>).crowBite === undefined) {
+    state = { ...state, crowBite: 0 } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

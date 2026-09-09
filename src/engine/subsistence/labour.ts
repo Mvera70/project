@@ -18,6 +18,7 @@ import { population, workforce } from '../people/demography';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
 import { foragingUrgency, hasRiver } from './forage';
+import { wardensWanted } from './crows';
 
 /**
  * Step 5. Splits the week's labour. Pure: reads the state, writes nothing.
@@ -63,6 +64,13 @@ export function allocateLabour(state: GameState): Allocation {
     spare += borrowed;
   }
 
+  // §7.7, v2.93: the crows come first of the three, because the grain already
+  // in the field is worth more than the grain nobody has hunted yet. Only in
+  // the weeks before the reaping, and only up to what is spare: a village does
+  // not take people off the harvest itself to guard it.
+  const wardens = Math.min(spare, wardensWanted(state, workedFields));
+  spare -= wardens;
+
   // §7.7, v2.92: before the wood and the works, the hungry village takes hands
   // off both and sends them out for food. Only when it is short — with a full
   // granary `urgency` is 0 and this whole block does nothing — and never more
@@ -91,6 +99,7 @@ export function allocateLabour(state: GameState): Allocation {
     builders,
     hunters,
     fishers,
+    wardens,
     // No fields worked means no harvest at all, so the factor is 0 rather than
     // a division by zero.
     labourFactor: farmDemand > 0 ? farmers / farmDemand : 0,

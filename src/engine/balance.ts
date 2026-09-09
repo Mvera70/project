@@ -309,6 +309,26 @@ export const ANIMALS = {
 } as const;
 
 /**
+ * The crows (§7.7, v2.93). They were already on the fields in the weeks before
+ * the reaping; now they take something. The answer is not a building but
+ * hands: somebody has to stand in the field and keep them off, and those are
+ * the same hands the woods and the works want. Every number is TUNE.
+ */
+export const CROWS = {
+  // TUNE: share of the coming harvest lost per unwatched week. Over the six
+  // weeks of ANIMALS.CROW_WEEKS_BEFORE_HARVEST an entirely unwatched field
+  // loses about a seventh of the year, which hurts without being a disaster.
+  BITE_PER_WEEK: 0.024,
+  // TUNE: hands needed to keep the birds off one worked field. Under a fifth
+  // of FOOD.FIELD_CREW: watching is cheap next to reaping, and it must be
+  // cheap or no village would ever choose it over the woods.
+  WARDEN_PER_FIELD: 0.75,
+  // TUNE: however bad the year, the birds never take more than this. A harvest
+  // that can go to zero from crows alone would make one bad allocation fatal.
+  MAX_BITE: 0.35,
+} as const;
+
+/**
  * Hunting and fishing (§7.7, v2.92). The village sends hands to the woods and
  * the river when the granary is low, and only then: this is the bad-year food,
  * not a second industry. Every number here is TUNE — §12 predates it.

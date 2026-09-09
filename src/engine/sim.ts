@@ -4,7 +4,7 @@
 // to somebody else; what lives here is the sequence, and the sequence is
 // normative — changing it changes the balance and breaks saved games.
 
-import { LABOUR, MIGRATION, PEOPLE, TIME } from './balance';
+import { CROWS, LABOUR, MIGRATION, PEOPLE, TIME } from './balance';
 import {
   isHere,
   population,
@@ -35,6 +35,7 @@ import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
 import { forage } from './subsistence/forage';
+import { crowsPeck } from './subsistence/crows';
 import { consume, overwinter } from './subsistence/consumption';
 import { tendHerd, type HerdReport } from './subsistence/herd';
 import { applySpoilage, harvest } from './subsistence/harvest';
@@ -747,6 +748,11 @@ export function tick(
   // §7.7, v2.92: the hands the allocation sent out come back with food. The
   // forest fraction is read here and passed in because `subsistence/` may not
   // look at `world/`, the same rule that makes `produce` take its wood cap.
+  // §7.7, v2.93: the birds take their week's share of the harvest that is
+  // still standing. Nothing is said here week by week — six lines about crows
+  // in six weeks would drown the chronicle. The year's total is told at the
+  // reaping, where it can be compared with what came in.
+  crowsPeck(state, allocation);
   const foraged = forage(state, allocation, ratioOf(state, 'forestLeft'));
   if (foraged.hunted + foraged.fished > 0) {
     // Weight 2: a village that has taken to the woods is the visible face of a
@@ -814,7 +820,19 @@ export function tick(
   const { cold } = overwinter(state);
 
   // ---- 9 · HARVEST ---------------------------------------------------------
+  // Read before reaping: `harvest` spends the crows' bite and resets it.
+  const pecked = state.crowBite;
   const reaped = harvest(state, allocation);
+  if (reaped.happened && pecked > 0) {
+    // Weight 2 when the birds took a real bite, 1 when they only nibbled. A
+    // village that lost a tenth of its year to crows should be told plainly.
+    say({
+      kind: 'forage',
+      templateKey: pecked >= CROWS.BITE_PER_WEEK * 3 ? 'crows.heavy' : 'crows.light',
+      params: { year: year(), season: season(), count: Math.round(pecked * 100) },
+      weight: pecked >= CROWS.BITE_PER_WEEK * 3 ? 2 : 1,
+    });
+  }
   if (reaped.happened) {
     say({
       kind: 'harvest',

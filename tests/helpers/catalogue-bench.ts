@@ -64,6 +64,7 @@ function founded(seed: number): GameState {
       forestStock: new Uint16Array(CELLS),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
+    crowBite: 0,
     village: { grain: FOUNDING.GRAIN, wood: 900, morale: FOUNDING.MORALE, faith: FOUNDING.FAITH },
     people: foundPeople(rng, 0),
     buildings: [

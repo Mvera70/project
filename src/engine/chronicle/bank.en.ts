@@ -1331,6 +1331,16 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   ],
 
   // --- M-29 · hunting and fishing, design.md §7.7, §5.2 ---
+  'crows.light': [
+    'The crows had some of it before the reaping.',
+    'Birds took a little of the year, as birds do.',
+    'They lost {count} in the hundred to the crows that {season}.',
+  ],
+  'crows.heavy': [
+    'The crows had {count} in the hundred that year. Nobody stood in the field.',
+    'Birds went through the ripe grain of year {year} and there was no one to move them on.',
+    'They watched the crows take the year, and had nobody to spare for it.',
+  ],
   'forage.hunt': [
     '{count} of them went to the woods that {season}, and not for timber.',
     'They hunted the woods in year {year}. The fields would not be enough.',

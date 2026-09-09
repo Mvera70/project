@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.90 · 9 de septiembre de 2026, 14:54 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.91 · 9 de septiembre de 2026, 17:26 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **2.91** | 9 sep 2026, 17:26 | Ejecución G-01 | **El GLB de Blender carga directamente en Three.js r185 y dos capturas del mismo host coinciden byte a byte.** Se ratifican el encuadre ortográfico por caja, tiempo explícito y estados de carga; sombra y sesgo se derivan de escala. Three 0.185.0 + tipos 0.185.4 sustituyen r186 por compatibilidad. La cadena local de P0 queda cerrada; solo falta comprobar la recuperación desde otro dispositivo. |
 | **2.90** | 9 sep 2026, 14:54 | Ejecución G-00 | **Blender 5.2.1 LTS fabrica `.blend`, `.glb` y PNG en segundo plano y sin GUI.** El éxito exige una marca explícita y comprobar artefactos porque Blender devolvió 0 ante dos excepciones Python durante el diagnóstico. Chrome del sistema cubre Playwright. P0 queda parcial hasta cargar el GLB en Three.js y abrir la evidencia desde un segundo dispositivo. |
 | **2.89** | 9 sep 2026, 14:37 | Programa gráfico G-00–G-12 | **Una maqueta medieval 3D, producida y revisada por rondas reproducibles.** Anexo D incorpora análisis, dirección artística, contratos, producción Blender → GLB → Three.js, operación remota, pruebas y briefs. Autoriza un piloto aislado; no declara migrado el juego ni sustituye todavía los contratos Canvas de producción. La fecha es la del entorno de esta revisión; se conservan las fechas posteriores ya presentes en el historial, sin reinterpretarlas. |
 > ### ⚠ Aviso sobre las entradas 2.10 a 2.17
@@ -91,6 +92,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.93** | 11 sep 2026, 19:40 | M-29 · los cuervos muerden | **El primer animal que le pide algo al jugador en vez de solo pasarle algo.** En las seis semanas antes de la siega los pájaros se llevan parte de la cosecha en pie, y la respuesta no es una obra sino brazos: alguien tiene que estar en el campo, y son los mismos brazos que quieren el bosque y las obras. Sin tirada de azar: lo que se pierde es consecuencia del reparto y se puede leer en él. De paso se arregla que `SCHEMA_VERSION` estuviera escrito a mano en dos sitios y se hubieran desincronizado. |
 | **2.92** | 11 sep 2026, 18:10 | M-29 · caza y pesca, y lo que cuestan | **La aldea hambrienta sale al bosque y al río, y eso devuelve el desenlace a donde estaba antes del rebaño.** Extinción adversa 13,3 % → 11,7 % y separación 11,7 → 10,0 puntos: el forrajeo anula exactamente lo que el rebaño había ganado. Es la palanca que §2.47 dejó sin explorar, medida por fin. **No se ajusta ninguna constante para taparlo**: la fase de balance sigue cerrada y esto es una decisión de diseño pendiente, no un número mal puesto. |
 | **2.91** | 11 sep 2026, 16:30 | M-29 · el rebaño, con mecánica y medido | **El ganado deja de ser dibujo y pasa a ser estado: come, se sacrifica y cría, y los lobos se llevan cabezas de verdad.** La pregunta que §7.7 dejó abierta —colchón o coste— la contesta el banco: **gana el coste**. La extinción adversa sube de 11,7 % a 13,3 % y la separación con `prudent` de 10,0 a 11,7 puntos; las dos van **hacia** la banda de §12.9, no en contra. Fallan las mismas siete pruebas que antes del rebaño, ni una más. Esquema de guardado 3 con migración 2→3. |
 | **2.88** | 11 sep 2026, 15:45 | M-29 · la fauna, segundo trozo | **Cuervos sobre el grano maduro, lobos en la linde en las noches de invierno, peces en el río.** Cada uno con su reloj: es lo que hace que una noche de enero no se parezca a una tarde de julio. Siguen sin comerse nada — derivados y cosméticos como el ganado. |
@@ -4153,15 +4155,50 @@ agota y no el forrajeo entero, y la opción 2 pasaría a ser la respuesta obvia.
 No está medido todavía: es la siguiente pregunta, no otra hipótesis encadenada
 a esta.
 
-#### Lo declarado y todavía NO construido
+#### Los cuervos (v2.93 · construido, con mecánica)
 
-- **Cuervos.** Sobre los campos maduros, antes de la cosecha de la semana 35.
-  Muerden el rendimiento; el espantapájaros o la vigilancia son la respuesta.
+Estaban sobre los campos desde v2.88 y no se llevaban nada. Ahora se llevan lo
+único que podían llevarse: parte de la cosecha que todavía no se ha segado.
 
-**Qué falsaría esto:** que el rebaño crezca por encima de lo que la aldea
-sostiene, que se coma grano que no tiene, que la aldea deje morir gente
+Lo que los hace valer no es la pérdida, es **la respuesta**. Y la respuesta no
+es una obra: es gente. Alguien tiene que estar en el campo espantando pájaros
+durante las seis semanas que el grano está en pie, y esos son exactamente los
+mismos brazos que querrían estar cortando leña, levantando obra o —en un año
+malo— cazando en el bosque. **Es el primer animal que le pide algo al jugador
+en vez de limitarse a pasarle algo.**
+
+| | |
+|---|---|
+| **Cuándo** | Las `CROW_WEEKS_BEFORE_HARVEST` semanas anteriores a la siega |
+| **Cuánto** | `BITE_PER_WEEK` de la cosecha por semana sin vigilar, con tope en `MAX_BITE` |
+| **La respuesta** | `WARDEN_PER_FIELD` brazos por campo trabajado, tomados de lo que sobra |
+| **Se paga** | En la siega, que gasta el mordisco y lo pone a cero |
+
+**Sin tirada de azar, a propósito.** Una cosecha que perdió un décimo por
+pájaros es consecuencia del reparto de esa semana y el jugador tiene que poder
+leerla en él. Un dado aquí convertiría una decisión en una queja.
+
+**Por qué brazos y no espantapájaros.** Un edificio nuevo exige dibujarlo, y el
+apartado gráfico está congelado mientras se rehace por separado. Pero la razón
+de fondo es mejor que la circunstancial: un espantapájaros se construye una vez
+y deja de ser una decisión para siempre, mientras que los guardas se pagan cada
+año y compiten con todo lo demás justo en la semana que más aprieta.
+
+Los guardas salen **antes** que los cazadores en el reparto de §5.2: el grano
+que ya está en el campo vale más que el que nadie ha cazado todavía. Y salen
+solo de lo que sobra tras la siembra, porque una aldea no quita gente de la
+cosecha para vigilarla.
+
+**Qué falsaría todo lo anterior:** que el rebaño crezca por encima de lo que la
+aldea sostiene, que se coma grano que no tiene, que la aldea deje morir gente
 teniendo cabezas que sacrificar, que un lobo entre con la empalizada en pie, o
 que dos partidas con la misma semilla acaben con rebaños distintos.
+
+Y para los cuervos: que muerdan fuera de las semanas del grano en pie, que
+vigilar no sirva de nada, que una siega arrastre los pájaros del año anterior,
+o que los guardas salgan de los brazos de la propia cosecha en vez de los que
+sobran. Cada una de esas cinco tiene su prueba, y tres de ellas están
+verificadas por mutación.
 
 ---
 
@@ -6934,8 +6971,8 @@ Verificadas por test (§14.1):
 ### D.0 Autoridad, estado y lectura
 
 **Este anexo es la guía principal del desarrollo gráfico nuevo.** Forma parte de
-la fuente única, no es una segunda especificación. Estado: planificación;
-ningún módulo G está implementado por esta revisión. El usuario ha elegido
+la fuente única, no es una segunda especificación. Estado: ejecución; G-00 y
+G-01 están implementados y verificados en sus informes. El usuario ha elegido
 explorar 3D estilizado con habitantes animados y pide que los agentes produzcan
 también el arte, con iteración remota. El aspecto definitivo aún debe demostrarse.
 
@@ -6985,12 +7022,12 @@ Las referencias citadas por el usuario expresan cualidades: cercanía de los
 personajes, pueblo legible, profundidad, color y ambiente. No se copiarán sus
 personajes, escenarios ni recursos. El resultado debe tener identidad propia.
 
-Capacidades del entorno verificadas en esta ronda: lectura y escritura de
-archivos, ejecución de comandos y revisión de imágenes locales disponibles;
-control CUA de navegador disponible; control de aplicaciones nativas deshabilitado.
-No se puede prometer manejar Blender mediante clics aquí. La búsqueda en PATH
-y `C:/Program Files/Blender Foundation` no encontró Blender; instalación y
-ejecución siguen pendientes. No se ha probado GPU, exportación ni acceso remoto.
+Capacidades verificadas en G-00/G-01: Blender 5.2.1 LTS ejecuta Python en segundo
+plano desde una ruta con espacios; guarda `.blend`, exporta GLB y renderiza PNG.
+Chrome 153 carga ese GLB mediante Three.js 0.185.0 y Playwright; la GPU disponible
+produce capturas repetibles en este host. Sigue deshabilitado el control de
+aplicaciones nativas, que el flujo ya no necesita. La recuperación de la evidencia
+desde un segundo dispositivo y el rendimiento en móvil siguen pendientes.
 
 ### D.2 Decisiones, alcance y puertas
 
@@ -7637,10 +7674,11 @@ catálogo, paleta, contratos y configuración. No adelantar biblioteca completa
 mientras se desconozca el coste del rig. Revisión visual y medición tienen
 autor distinto cuando haya agentes disponibles, sin duplicar implementación.
 
-G-00 ejecutado en v2.90: fabricación local validada; P0 parcial hasta la carga
-Three.js y la comprobación externa descritas en su informe. Próxima ronda:
-**G-01**, que materializa el visor y debe cargar el GLB generado antes de iniciar
-arte complejo.
+G-00 y G-01 ejecutados en v2.90–v2.91: la cadena local crea, exporta, sirve,
+carga y captura sin GUI. P0 queda parcial únicamente por la comprobación externa
+desde un segundo dispositivo. Próxima ronda: **G-02**, que convierte el prototipo
+de G-00 en un pipeline de recursos con receta, catálogo, validación y promoción
+atómica. Ese trabajo local puede avanzar mientras espera la comprobación externa.
 La guía no incluye estimaciones en horas: herramientas, capacidad remota y
 criterio artístico siguen sin medir. Tras P0/P1 se estimará por recursos
 aprobados y rondas observadas, con incertidumbre explícita.
@@ -7661,6 +7699,14 @@ referencias:
 - [Three.js: liberación de recursos](https://threejs.org/manual/en/how-to-dispose-of-objects.html).
 
 ### D.15 Registro detallado de esta revisión
+
+v2.91 arbitra G-01. Se ratifican la exportación Y-up sin reparación, el encuadre
+por caja, el tiempo de presentación explícito y la captura repetible: dos PNG
+640 × 640 comparten SHA-256 en Chrome 153. Se promueve que `normalBias` y volumen
+de sombra se deriven de la caja. Three.js se fija en 0.185.0 con tipos 0.185.4:
+r186 estaba publicado pero no tenía tipos alineados. La suite nueva tarda 3 ms;
+la suite completa observada en 22,11 s supera el objetivo histórico por pruebas
+de simulación existentes, no por G-01. Informe: `docs/graphics-rounds/G-01.md`.
 
 v2.90 arbitra G-00. Se ratifica Blender en segundo plano con 5.2.1 LTS y Chrome
 del sistema como navegador Playwright. El diagnóstico no confía en el código de

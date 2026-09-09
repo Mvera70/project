@@ -51,6 +51,7 @@ function village(seed: number, houses = 12): GameState {
       forestStock: new Uint16Array(CELLS),
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
+    crowBite: 0,
     village: { grain: 4000, wood: 400, morale: 55, faith: 50 },
     people: foundPeople(rng, 0),
     buildings: Array.from({ length: houses }, () => build('house')),

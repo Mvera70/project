@@ -5,6 +5,7 @@
 import { BUILDINGS, FOUNDING, LIFE } from './balance';
 import { foundPeople } from './people/villagers';
 import { makeBundle } from './rng';
+import { SCHEMA_VERSION } from './state';
 import type { BuildingKind, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
@@ -47,7 +48,7 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
   const terrainSeed = inherited?.terrainSeed ?? seed;
   const mapRng = terrainSeed === seed ? rng : makeBundle(terrainSeed);
   const state: GameState = {
-    version: 2,
+    version: SCHEMA_VERSION,
     seed,
     terrainSeed,
     tick: 0,
@@ -73,7 +74,7 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
-    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null, crowBite: 0,
     ended: null,
   };
   foundingBuildings(state);

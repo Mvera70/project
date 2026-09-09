@@ -474,6 +474,8 @@ export interface Allocation {
   /** Hands sent to the woods and the river when the granary is low (§7.7). */
   hunters: number;
   fishers: number;
+  /** Hands standing in the fields keeping the crows off the grain (§7.7). */
+  wardens: number;
   labourFactor: number; // 0..1, how well the worked fields were manned
 }
 
@@ -519,6 +521,14 @@ export type MigrationEvent =
 // §3.1 · Root state
 // ---------------------------------------------------------------------------
 
+/**
+ * Version of the save schema this build writes and reads. It lives here, with
+ * the shape it numbers, so that `found.ts` can stamp it without importing
+ * `save.ts` — which imports `found.ts` and would close a cycle. v2.93: it used
+ * to be written by hand in two places, and they drifted apart.
+ */
+export const SCHEMA_VERSION = 3;
+
 export interface GameState {
   readonly version: number; // save schema version
   readonly seed: number; // master seed
@@ -563,6 +573,12 @@ export interface GameState {
    * was answered in the spring or the week before the reaping.
    */
   harvestModifier: { factor: number; harvests: number } | null;
+  /**
+   * Share of the coming harvest the crows have already taken (§7.7, schema 4).
+   * Accumulates through the weeks before the reaping and is spent, and reset,
+   * by the harvest itself.
+   */
+  crowBite: number;
   ended: EndState | null;
 }
 

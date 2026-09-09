@@ -15,8 +15,7 @@ import {
   deserialize,
   foundSuccessor,
   serialize,
-  ticksOwed,
-} from '@engine/save';
+  ticksOwed, SCHEMA_VERSION } from '@engine/save';
 import { run, tick } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
 import type { DecisionRecord } from '@engine/state';
@@ -226,8 +225,11 @@ describe('serialize / deserialize · §13.1', () => {
       archive: [],
     });
 
-    expect(loaded.schema).toBe(2);
-    expect(loaded.state.version).toBe(2);
+    // v2.93: contra SCHEMA_VERSION y no contra un 2 escrito a mano. Lo que la
+    // prueba defiende es que migrar deja la partida en la versión de este
+    // build, no que esa versión sea un número concreto para siempre.
+    expect(loaded.schema).toBe(SCHEMA_VERSION);
+    expect(loaded.state.version).toBe(SCHEMA_VERSION);
     expect(loaded.state.terrainSeed).toBe(7);
     expect(loaded.state.peakPeople).toBe(27);
   });
