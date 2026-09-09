@@ -15,6 +15,9 @@ if (root) {
   } else if (query.get('live') === '1') {
     const state = stateAt(request);
     if (query.get('hunger') === '1') state.village.grain = 0;
+    if (query.get('ended') === '1') {
+      state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };
+    }
     boot(root, {
       schema: state.version,
       savedAtMs: Date.now(),

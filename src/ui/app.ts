@@ -4,7 +4,7 @@ import { TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { serialize, ticksOwed } from '@engine/save';
+import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
@@ -15,7 +15,8 @@ import { recogniseGesture, type Point } from './gestures';
 import { runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
 import { openChronicle } from './screens/chronicle';
-import { openCrossroad } from './screens/crossroad';
+import { closeCrossroad, openCrossroad } from './screens/crossroad';
+import { openEpitaph } from './screens/epitaph';
 import { isSpeed, speedLabel, type Speed } from './speed';
 import { openWelcome } from './welcome';
 
@@ -64,14 +65,15 @@ export function roman(value: number): string {
   return result;
 }
 
-function freshSeed(): number {
+function freshSeed(excluding?: number): number {
   const value = new Uint32Array(1);
   crypto.getRandomValues(value);
-  return value[0] as number;
+  const drawn = value[0] as number;
+  return drawn === excluding ? (drawn + 1) >>> 0 : drawn;
 }
 
 export function boot(root: HTMLElement, save?: SaveFile): App {
-  const state = save?.state ?? foundGame(freshSeed());
+  let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
   let lastFraction = 0;
@@ -112,7 +114,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // answer — including the very first paint, for a save or a debug
     // fast-forward that already lands on a posed crossroad. `openCrossroad`
     // is its own no-op once this one is already on screen.
-    if (state.crossroad !== null) openCrossroad(app, state.crossroad);
+    if (state.crossroad !== null && state.ended === null) openCrossroad(app, state.crossroad);
   };
 
   const showPanel = (target: InspectTarget): void => {
@@ -164,10 +166,15 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   root.addEventListener('pointerdown', (event) => { if (event.target === root) panel.hidden = true; });
 
   // §13.1: a snapshot and the decision log, every 20 ticks and whenever the
-  // tab is hidden. `archive` only ever changes on extinction (§13.3), out of
-  // this round's scope, so it is carried through unchanged.
+  // tab is hidden. M-25 also writes immediately on ending and beginning again.
+  let saveQueue = Promise.resolve();
   const persist = (): void => {
-    void persistSave(serialize(state, state.history, archive, Date.now()));
+    // Freeze the value now, before either the live loop or "Begin again" can
+    // mutate it, and serialize writes in request order. Two independent IDB
+    // opens could otherwise let the final dead-village write land after the
+    // successor write and resurrect the epitaph on reload.
+    const snapshot = structuredClone(serialize(state, state.history, archive, Date.now()));
+    saveQueue = saveQueue.then(() => persistSave(snapshot));
   };
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
 
@@ -178,6 +185,28 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // paused game just never calls `runTick`, so a decision queued while paused
   // sits untouched until the player unpauses and a real tick runs.
   let pendingDecision: Decision | undefined;
+  let loop: Loop | undefined;
+  const finish = (): void => {
+    if (state.ended === null) return;
+    loop?.stop();
+    closeCrossroad();
+    let game = archive.find((item) =>
+      item.seed === state.seed && item.endedTick === state.ended?.tick);
+    if (game === undefined) {
+      game = archiveGame(state);
+      archive.push(game);
+    }
+    persist();
+    openEpitaph(app, game, () => {
+      state = foundSuccessor(game, freshSeed(state.seed));
+      pendingDecision = undefined;
+      lastFraction = 0;
+      app.setSpeed(1);
+      paint(0);
+      persist();
+      beginLoop();
+    });
+  };
   const runTick = (): void => {
     if (state.ended !== null) return;
     const decision = pendingDecision;
@@ -189,9 +218,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     if (report.decided !== null) {
       document.dispatchEvent(new CustomEvent<TickReport>('valley:decided', { detail: report }));
     }
+    if (state.ended !== null) { finish(); return; }
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
-  let loop: Loop | undefined;
   const beginLoop = (): void => {
     loop = startLoop(() => speed, runTick, paint);
     window.addEventListener('pagehide', () => loop?.stop(), { once: true });
@@ -217,7 +246,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   document.documentElement.dataset.appReady = 'true';
 
   const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs) : 0;
-  if (save !== undefined && owed > 0) {
+  if (state.ended !== null) {
+    finish();
+  } else if (save !== undefined && owed > 0) {
     // §13.2: the absence is made up in batches *before* the interactive loop
     // starts — the normal loop and the catch-up must never tick the same
     // state at once. `paint` after every batch is the "progress screen":
@@ -233,8 +264,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     runLethargy(state, elapsedMs, (progress) => {
       paint(0);
       if (progress.done >= progress.total || progress.ended) {
-        openWelcome(app, welcomeDigest(state, sinceTick));
-        beginLoop();
+        if (state.ended !== null) finish();
+        else {
+          openWelcome(app, welcomeDigest(state, sinceTick));
+          beginLoop();
+        }
       }
     });
   } else {

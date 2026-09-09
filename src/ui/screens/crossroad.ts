@@ -89,6 +89,12 @@ function removeShown(): void {
   document.documentElement.classList.remove('crossroad-open');
 }
 
+/** Remove a question that belongs to a game which has just ended. */
+export function closeCrossroad(): void {
+  removeShown();
+  shown = null;
+}
+
 function mountMarker(app: App, p: PendingCrossroad): void {
   const marker = document.createElement('button');
   marker.type = 'button';
