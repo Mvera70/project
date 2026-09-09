@@ -7,6 +7,7 @@ import { population } from './people/demography';
 import { RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import type { ArchivedGame, DecisionRecord, GameState, SaveFile } from './state';
+import { SEASONS } from './time';
 
 /** The schema this build writes and reads. §13.1. */
 export const SCHEMA_VERSION = 2;
@@ -46,6 +47,13 @@ const MEMORIES = new Set([
   'lost_home', 'stole', 'unspoken',
 ]);
 const OPS = new Set(['<', '<=', '>', '>=', '==']);
+// §8.2's two closed name domains. `stat` is `StatName` plus the derived
+// headcount; `ratio` is exactly what `ratioOf` can compute. A name outside
+// either is not old content, it is content the engine cannot read: the
+// comparison would run against `undefined` and the condition would answer
+// something no template ever meant (v2.81).
+const STATS = new Set(['people', 'grain', 'wood', 'morale', 'faith']);
+const RATIOS = new Set(['grainYears', 'grainToHarvest', 'housingFree', 'forestLeft']);
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -144,10 +152,14 @@ function condition(value: unknown): boolean {
   if (value === null) return true;
   if (!record(value) || typeof value['k'] !== 'string') return false;
   switch (value['k']) {
-    case 'stat': return typeof value['stat'] === 'string' && OPS.has(value['op'] as string) && finite(value['v']);
-    case 'ratio': return typeof value['ratio'] === 'string' && OPS.has(value['op'] as string) && finite(value['v']);
-    case 'season': return ['spring', 'summer', 'autumn', 'winter'].includes(value['season'] as string)
-      && (value['minWeek'] === undefined || tickValue(value['minWeek']));
+    case 'stat': return STATS.has(value['stat'] as string) && OPS.has(value['op'] as string) && finite(value['v']);
+    case 'ratio': return RATIOS.has(value['ratio'] as string) && OPS.has(value['op'] as string) && finite(value['v']);
+    // `minWeek` is the week WITHIN the season (§8.2), so its ceiling is the
+    // season itself: `weekOf(tick) % WEEKS_PER_SEASON` never reaches 12, and a
+    // condition asking for week 12 of winter can only ever answer no.
+    case 'season': return (SEASONS as readonly string[]).includes(value['season'] as string)
+      && (value['minWeek'] === undefined
+        || (tickValue(value['minWeek']) && (value['minWeek'] as number) < TIME.WEEKS_PER_SEASON));
     case 'year': return OPS.has(value['op'] as string) && finite(value['v']);
     case 'has': return typeof value['building'] === 'string' && value['building'] in BUILDINGS;
     case 'flag': return typeof value['flag'] === 'string' && typeof value['set'] === 'boolean';

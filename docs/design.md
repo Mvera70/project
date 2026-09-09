@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.80 · 11 de septiembre de 2026, 03:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.81 · 11 de septiembre de 2026, 10:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.81** | 11 sep 2026, 10:40 | M-23.6 · dominios de las condiciones guardadas | **Una referencia que resuelve todavía puede nombrar algo que el DSL no tiene.** `PlantedSeed.condition` aceptaba `stat` y `ratio` como cualquier cadena y `minWeek` como cualquier entero ≥ 0: la frontera de v2.73 comprobaba la plantilla, la opción y el `id`, pero no los tres dominios cerrados de §8.2. |
 | **2.80** | 11 sep 2026, 03:20 | M-23.5 · guardado durante el letargo | **Una instantánea parcial no puede perdonar las semanas que aún debe.** Ocultar o cerrar entre lotes conserva en `savedAtMs` exactamente los ticks restantes; completar el letargo solicita su guardado antes de abrir la bienvenida y arrancar el reloj normal. |
 | **2.79** | 11 sep 2026, 02:45 | M-10.1 · contrato del paquete ciego | **La entrega reproducible también tiene una regresión.** El contenido puro se separa de la escritura en disco y una prueba fija los cuatro nombres, las tres historias distintas, la ausencia de metadatos y la única pregunta permitida. Esto protege el cegado; el veredicto del hito 0 sigue perteneciendo a una persona ajena. |
 | **2.78** | 11 sep 2026, 02:15 | M-09.1 · banco de interfaz completo | **El banco acababa en el epitafio.** Bienvenida, reloj, controles, marcador y fichas aún escribían inglés en los módulos UI, contra §2.2. Todo el texto visible y accesible pasa por `UI_BANK`; terrenos despejados dicen «clearing» y rasgos/memorias dejan de mostrar identificadores con guion bajo. |
@@ -125,6 +126,54 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.81 — Una referencia que resuelve puede seguir nombrando lo que no existe
+
+v2.73 cerró las referencias huérfanas: plantilla, opción, `id` de semilla y
+letras del reparto tienen que resolver en el catálogo estable. La condición
+diferida que viaja con esa semilla quedó fuera. `condition` comprobaba la forma
+—`k` conocida, `op` en dominio, `v` finito— pero para los tres campos que §8.2
+cierra por enumeración se conformaba con el tipo: `stat` y `ratio`, cualquier
+cadena; `minWeek`, cualquier entero no negativo.
+
+**Reproducido antes de tocar nada.** Una semilla con plantilla, opción, `id` y
+reparto correctos y `condition: { k: 'stat', stat: 'missing', op: '>', v: 0 }`
+atraviesa `deserialize`. Lo mismo `{ k: 'ratio', ratio: 'missing' }` y
+`{ k: 'season', season: 'winter', minWeek: 12 }` o `999`. También anidadas bajo
+`not` y `any`. Once formas imposibles medidas, once aceptadas. El daño no es un
+fallo visible: `evaluate` compara `state.village['missing']` —`undefined`—
+contra un número, la comparación responde que no, y la consecuencia prometida
+por §8.5 no vence nunca sin que nada lo diga. Es exactamente lo que v2.73 decía
+haber cerrado.
+
+**La corrección se queda en los dominios cerrados.** `stat` pasa a exigir
+`people`, `grain`, `wood`, `morale` o `faith`; `ratio`, los cuatro nombres que
+`ratioOf` sabe calcular; `minWeek`, `0 .. WEEKS_PER_SEASON − 1`, derivado de la
+constante y no escrito a mano, porque es la semana **dentro** de la estación y
+`weekOf % 12` nunca llega a doce. `op`, `role`, `trait`, `building`, `season` y
+las causas de muerte ya estaban cerrados y se dejan como están. `flag` y
+`grudge.min` **no** se tocan: una bandera es un nombre libre y un umbral de
+rencor fuera de rango sigue siendo interpretable —siempre cierto o siempre
+falso—, no ilegible. Ampliarlos sería inventar dominio, no protegerlo.
+
+**Evidencia.** La regresión planta cada condición como semilla real y recorre la
+frontera completa: quince formas legítimas aceptadas —los cinco nombres de
+`stat`, los cuatro de `ratio`, `minWeek` 0 y 11— y siete imposibles rechazadas,
+dos de ellas anidadas. Y un control que no depende de la lista: **las 65
+condiciones que el catálogo escribe hoy**, que cubren las doce variantes del
+DSL, siguen entrando una por una. Ese control es el que impide apretar de más;
+el catálogo usa `minWeek: 11` y no usa `stat: 'grain'`, así que ni el borde
+superior ni un dominio recortado a «lo que se usa» pasarían inadvertidos. Tres
+mutaciones deliberadas lo confirman: quitar `people` de la lista, bajar el techo
+a `< 11` y volver a `typeof string` fallan la prueba, cada una por su motivo.
+Suite rápida: **634 pruebas en 18,39 s**; tipos, lint y build pasan. No se
+ejecuta Playwright: el cambio no alcanza la interfaz ni mueve un píxel.
+
+**Qué habría falsado este cierre:** que una condición escrita por el catálogo
+—cualquiera de las 65— dejase de cargar, que un guardado real de v2.80 fuese
+rechazado, o que alguna de las once formas imposibles siguiera entrando. Nada
+de esto toca los dos criterios humanos: el hito 0 sigue esperando a un lector
+ajeno y el hito 6, la partida de varios días de §15.
 
 ### 2.80 — Guardar a mitad de una ausencia no la termina
 
@@ -4780,9 +4829,15 @@ validación incluye los escalares finitos, todos los flujos aleatorios, las seis
 capas tipadas de 2.016 celdas y sus dominios, las colecciones del estado con la
 forma de cada entrada y cada `ArchivedGame` con crónica y máscara completas.
 Encrucijadas, decisiones y semillas deben resolver sus referencias en el
-catálogo estable y conservar todas las letras necesarias del reparto. No
-demuestra equilibrio ni vuelve a ejecutar invariantes semanales: si falla esta
-frontera, `loadSave` devuelve `null` antes de llamar a `boot`.
+catálogo estable y conservar todas las letras necesarias del reparto. Una
+condición diferida debe además caer dentro de los dominios que §8.2 cierra por
+enumeración: `stat` entre las cinco cifras, `ratio` entre los cuatro cocientes,
+`minWeek` entre 0 y `WEEKS_PER_SEASON − 1`, más `op`, `season`, `role`, `trait`
+y `building` (v2.81). Resolver la referencia no basta si el nombre que lleva
+dentro no lo puede leer el motor. Los campos abiertos por diseño —el nombre de
+una bandera, el umbral de un rencor— siguen siéndolo. No demuestra equilibrio ni
+vuelve a ejecutar invariantes semanales: si falla esta frontera, `loadSave`
+devuelve `null` antes de llamar a `boot`.
 
 ### 13.2 Letargo
 
@@ -5685,13 +5740,16 @@ interno parcial, se rechaza antes de `boot`; `catchUp` de 4 h ejecuta
 exactamente 960 ticks y tarda menos de 2 s;
 reproducir el registro de decisiones desde la semilla da el mismo estado que la
 instantánea; una instantánea entre lotes conserva exactamente la deuda restante
-y el estado completado se solicita antes de abrir el parte.
+y el estado completado se solicita antes de abrir el parte; una condición
+diferida fuera de los dominios cerrados de §8.2 se rechaza, y las 65 que el
+catálogo escribe hoy se aceptan.
 **Terminado cuando.** Cerrar y abrir a las cuatro horas presenta un parte de
 bienvenida coherente. Esto cierra M-23 y deja listo el hito 6; la aceptación
 adicional de varios días reales permanece en §15.
 
-**Estado (v2.80): módulo implementado; hito 6 pendiente de aceptación humana
-según §15.** `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
+**Estado (v2.81): módulo implementado; hito 6 pendiente de aceptación humana
+según §15.** La firma del contrato no cambia desde v2.63; lo que se estrecha en
+v2.81 es lo que `deserialize` acepta dentro de una condición diferida (§13.1). `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
 propia prueba mide en menos de 2 s); el letargo de la interfaz (`ui/lethargy.ts`)
 es un bucle distinto sobre lotes de 64, la misma separación pura/DOM que
 `loop.ts`. El guardado real vive en IndexedDB (`ui/idb.ts`, fuera del contrato
