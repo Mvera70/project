@@ -1,19 +1,54 @@
 // M-20 · The first running application shell.
 
+import { TIME } from '@engine/balance';
+import { welcomeDigest } from '@engine/chronicle/digest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { tick } from '@engine/sim';
-import type { GameState, SaveFile } from '@engine/state';
+import { serialize, ticksOwed } from '@engine/save';
+import { tick, type TickReport } from '@engine/sim';
+import type { ArchivedGame, Decision, GameState, SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
 import { createRenderer } from '@render/renderer';
+import { persistSave } from './idb';
 import { inspectAt, panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
-import { startLoop } from './loop';
+import { runLethargy } from './lethargy';
+import { startLoop, type Loop } from './loop';
+import { openChronicle } from './screens/chronicle';
+import { openCrossroad } from './screens/crossroad';
 import { isSpeed, speedLabel, type Speed } from './speed';
+import { openWelcome } from './welcome';
 
 export interface App {
   setSpeed(speed: Speed): void;
   state(): Readonly<GameState>;
+  decide(optionId: string): boolean;
+}
+
+export interface DecisionAttempt {
+  accepted: boolean;
+  forceTick: boolean;
+}
+
+/**
+ * The pure core of `App.decide` (v2.60, §2.60): whether the queue accepts the
+ * option, and whether accepting it should force an immediate tick. Split from
+ * `boot`'s DOM and render loop so the four rules of the decision contract can
+ * be checked without booting either — the same way `loop.ts` keeps
+ * `advanceAccumulator` pure and leaves `startLoop` as the DOM-bound wrapper.
+ *
+ * Rule 1: an option is accepted only if a crossroad is pending and nothing is
+ * already queued — decided is decided, a second tap cannot replace it.
+ * Rules 2–3: accepting forces a tick unless the game is paused; paused, §8.7
+ * still lets the decision wait rather than making the player unable to pause.
+ */
+export function attemptDecision(
+  hasPendingCrossroad: boolean,
+  alreadyQueued: boolean,
+  speed: Speed,
+): DecisionAttempt {
+  const accepted = hasPendingCrossroad && !alreadyQueued;
+  return { accepted, forceTick: accepted && speed !== 0 };
 }
 
 export function roman(value: number): string {
@@ -37,6 +72,7 @@ function freshSeed(): number {
 
 export function boot(root: HTMLElement, save?: SaveFile): App {
   const state = save?.state ?? foundGame(freshSeed());
+  const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
   let lastFraction = 0;
   root.replaceChildren();
@@ -72,6 +108,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     lastFraction = fraction;
     year.textContent = `ANNO ${roman(yearOf(state.tick) + 1)}`;
     renderer.paint(state, fraction);
+    // §11.2's third screen opens itself the moment there is something to
+    // answer — including the very first paint, for a save or a debug
+    // fast-forward that already lands on a posed crossroad. `openCrossroad`
+    // is its own no-op once this one is already on screen.
+    if (state.crossroad !== null) openCrossroad(app, state.crossroad);
   };
 
   const showPanel = (target: InspectTarget): void => {
@@ -118,15 +159,43 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         if (gesture === 'hold' && target.kind === 'villager') renderer.track(target.id);
       }
     } else if (gesture === 'swipe_down') panel.hidden = true;
-    else if (gesture === 'swipe_up') root.dispatchEvent(new CustomEvent('valley:chronicle'));
+    else if (gesture === 'swipe_up') openChronicle(app);
   });
   root.addEventListener('pointerdown', (event) => { if (event.target === root) panel.hidden = true; });
-  const loop = startLoop(
-    () => speed,
-    () => { if (state.ended === null) tick(state, CATALOG); },
-    paint,
-  );
-  window.addEventListener('pagehide', () => loop.stop(), { once: true });
+
+  // §13.1: a snapshot and the decision log, every 20 ticks and whenever the
+  // tab is hidden. `archive` only ever changes on extinction (§13.3), out of
+  // this round's scope, so it is carried through unchanged.
+  const persist = (): void => {
+    void persistSave(serialize(state, state.history, archive, Date.now()));
+  };
+  document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+
+  // The queue behind `decide` (v2.60). `runTick` is the one and only place a
+  // queued decision is ever spent: it hands it to `tick`, which applies it at
+  // step 3 (§4.2) and nowhere earlier. Consuming it here — not inside
+  // `decide` — is what makes "in pause the decision waits" true for free: a
+  // paused game just never calls `runTick`, so a decision queued while paused
+  // sits untouched until the player unpauses and a real tick runs.
+  let pendingDecision: Decision | undefined;
+  const runTick = (): void => {
+    if (state.ended !== null) return;
+    const decision = pendingDecision;
+    pendingDecision = undefined;
+    const report = tick(state, CATALOG, decision);
+    // Rule 4 (§2.60): the engine hands back what changed and where; `document`
+    // and not `root` because the crossroad screen mounts on `document.body`
+    // (§11.2's "ocupa la pantalla entera"), outside the app's own root.
+    if (report.decided !== null) {
+      document.dispatchEvent(new CustomEvent<TickReport>('valley:decided', { detail: report }));
+    }
+    if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
+  };
+  let loop: Loop | undefined;
+  const beginLoop = (): void => {
+    loop = startLoop(() => speed, runTick, paint);
+    window.addEventListener('pagehide', () => loop?.stop(), { once: true });
+  };
 
   const app: App = {
     setSpeed(value: Speed): void {
@@ -135,9 +204,42 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       for (const [candidate, button] of buttons) button.setAttribute('aria-pressed', String(candidate === speed));
     },
     state(): Readonly<GameState> { return state; },
+    decide(optionId: string): boolean {
+      const attempt = attemptDecision(state.crossroad !== null, pendingDecision !== undefined, speed);
+      if (!attempt.accepted || state.crossroad === null) return false;
+      pendingDecision = { templateId: state.crossroad.templateId, optionId };
+      if (attempt.forceTick) { runTick(); paint(lastFraction); }
+      return true;
+    },
   };
   app.setSpeed(speed);
   paint(0);
   document.documentElement.dataset.appReady = 'true';
+
+  const owed = save !== undefined ? ticksOwed(Date.now() - save.savedAtMs) : 0;
+  if (save !== undefined && owed > 0) {
+    // §13.2: the absence is made up in batches *before* the interactive loop
+    // starts — the normal loop and the catch-up must never tick the same
+    // state at once. `paint` after every batch is the "progress screen":
+    // the valley is what fills in, not a bar standing in for it.
+    //
+    // Gated on `owed > 0`, not just on there being a save: a save reloaded
+    // moments after it was written (or the debug route's own synthetic one,
+    // stamped `Date.now()` at boot) owes zero ticks, and a "welcome back,
+    // nothing happened" screen over every debug route would be worse than
+    // the screen it is supposed to replace.
+    const elapsedMs = Date.now() - save.savedAtMs;
+    const sinceTick = state.tick;
+    runLethargy(state, elapsedMs, (progress) => {
+      paint(0);
+      if (progress.done >= progress.total || progress.ended) {
+        openWelcome(app, welcomeDigest(state, sinceTick));
+        beginLoop();
+      }
+    });
+  } else {
+    beginLoop();
+  }
+
   return app;
 }

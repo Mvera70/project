@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.59 · 10 de septiembre de 2026, 07:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.63 · 10 de septiembre de 2026, 15:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,10 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.63** | 10 sep 2026, 15:10 | M-23 · hito 6 | **La aldea sigue sin ti, y el parte de bienvenida se entiende leído en frío — casi siempre.** Guardado, letargo y bienvenida implementados y verificados con reloj falso. Hallazgo sin arreglar: la selección de las cuatro entradas puede llenarse de cosechas seguidas y dejar fuera todo lo demás — un problema de selección, no de formato. |
+| **2.62** | 10 sep 2026, 13:20 | El reloj del navegador no es el del juego | **Ninguna animación de interfaz corre sobre el compositor.** Una transición CSS dejó el zoom a medias; el caso de prueba es el letargo, 960 ticks en dos segundos. Y `douse` gana `who`: prometía apagar el taller de B y apagaba una casa cualquiera. |
+| **2.61** | 10 sep 2026, 12:40 | M-22 · hito 2 | **La encrucijada está en pantalla y decidir cambia el valle.** El precio de las tres opciones se lee sin desplazar a 390 px reales. Sin coordenada natural: `douse` sobre una clase con más de una en pie, `gather ford` y `scar felled_wood` — los tres caen al centro de la aldea, igual que el estandarte. |
+| **2.60** | 10 sep 2026, 09:15 | Contrato de decisión de M-22 | **`App.decide` encola; el paso 3 del tick aplica.** La interfaz nunca llama a `applyOption`. Encolar fuerza el tick siguiente para que el toque no se sienta roto, y el motor devuelve qué cambió y dónde — nunca adónde mirar. |
 | **2.59** | 10 sep 2026, 07:00 | M-21 · HUD diegético y fichas | **Las cifras ya viven detrás del valle.** Tocar abre la ficha exacta, mantener sigue a un nombrado, pellizcar amplía y los deslizamientos navegan. Luces, humo, reserva, velas, cruces y ritmo de trabajo traducen el estado sin mutarlo. |
 | **2.58** | 10 sep 2026, 06:30 | M-21a · contrato del HUD | **Una figura móvil se inspecciona donde se dibuja.** `inspectAt` admite la fracción visual sin romper su llamada de tres argumentos. Las señales de §11.1 reciben escalas deterministas y los seis gestos, umbrales táctiles explícitos. |
 | **2.57** | 10 sep 2026, 06:00 | Puerta de movimiento de M-18 | **La multitud supera sus veinte segundos.** Una ruta viva determinista abre un valle de 80 habitantes; el GIF muestra salida, trabajo, regreso, noche vacía y nuevo ciclo sin perder figuras ni convertirlas en ruido. §14.3 queda cerrada. |
@@ -104,6 +108,196 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.63 — La aldea sigue sin ti
+
+**PARTE 0, hecha primero porque M-23 la necesitaba.** `douse` gana `who?:
+string` (§8.4, §11.5): una letra del reparto, resuelta al edificio que esa
+persona llama suyo (`Villager.homeId`). A.7 (`smith_feud`) es quien lo
+prometía y no lo cumplía — sus dos opciones dousaban `kind:'smithy'` a secas,
+así que apagaban el mismo taller sin mirar a quién servía. Ahora `side_with_a`
+apaga la casa de B y `side_with_b` la de A, tal y como dice el Anexo. Sin
+`who`, o si la persona no tiene casa en pie, cae donde caía antes: la única en
+pie de esa clase, o el centro.
+
+**M-23, el último módulo del hito 6.** `serialize`/`deserialize`/`catchUp`
+viven en `src/engine/save.ts`, sin `Date` ni IndexedDB — eso es
+`src/ui/idb.ts`, un fichero que el brief no nombraba y que hizo falta: ninguno
+de los tres contratos abre una base de datos, y algo tenía que hacerlo.
+`catchUp` corre los 960 ticks de un tirón (lo que su prueba cronometra); el
+letargo de la interfaz (`ui/lethargy.ts`) es un bucle *distinto* sobre lotes de
+64, no el mismo `catchUp` llamado en bucle — uno es atómico y el otro tiene
+que ceder el hilo entre lotes, y forzar los dos por la misma forma le habría
+costado la propiedad al que la necesita.
+
+**El caso de prueba de §11.4 era este letargo, y la prueba que lo prueba no
+toca ni DOM ni reloj falso.** `runBatch` devuelve un progreso que es una
+fracción entera de un recuento de ticks — nunca una animación de reloj real —
+así que "ningún estado intermedio" se comprueba corriendo los quince lotes de
+64 y mirando que cada uno aterriza en un número entero, mayor que el anterior,
+sin saltos de más de 64. Es la comprobación que una transición CSS no podía
+pasar y un recuento sí.
+
+**Ratificado, otra vez, el cableado más allá del contrato literal.** `app.ts`
+guarda cada 20 ticks y al ocultar la pestaña; `main.ts` carga al abrir, pone al
+día antes de arrancar el bucle normal — nunca los dos tocando el mismo estado a
+la vez — y abre el parte de bienvenida antes de que se vea nada más. Sin esto,
+"cerrar y abrir a las cuatro horas" solo era cierto dentro de un test, otra vez
+el mismo fallo que M-22 ya había encontrado.
+
+**El parte de bienvenida, leído en frío — la petición del hallazgo.**
+Verificado con Playwright y reloj falso instalado antes de navegar
+(`page.clock.setSystemTime` sobrevive a un `reload`, cosa que no daba por
+supuesta): cerrar tras algo de juego real, saltar cuatro horas sin esperarlas,
+recargar, y el parte aparece solo. Dos partidas de muestra:
+
+> While you were gone
+>
+> Age took Aethelswith that spring. 62 winters.
+>
+> The harvest failed. 729 bushels for 15 mouths.
+> A ruined autumn. 715 bushels, and the village is 15.
+> They got 707 bushels out of the ground in year 19, and counted them twice.
+> One of the houses burned down in year 20.
+>
+> 958 weeks passed.
+> The valley counts 18 now: 8 born, 13 died, 3 arrived, 0 left.
+> 4 raised, 0 lost.
+
+> While you were gone
+>
+> Botild died in year 17. 62 winters, and had seen the valley empty.
+>
+> Year 12 gave 3514 bushels to 34 mouths.
+> The church was finished in the winter of year 12.
+> 3673 bushels, and the granary would not hold it all.
+> One of the houses burned down in year 14.
+>
+> 958 weeks passed.
+> 34 people now. 36 born, 26 died, 4 arrived, 0 left.
+> 12 raised, 0 lost.
+
+La segunda se lee bien: una muerte con epitafio (§9.4), una cosecha, una
+capilla que se convierte en iglesia, otra cosecha, un incendio. Cuatro sucesos
+distintos, cuatro tipos distintos.
+
+**La primera no.** Tres de las cuatro entradas de peso 2 son cosechas
+seguidas —fallida, ruinosa, y una que ni siquiera suena mal pero comparte
+plantilla— y ninguna cuenta nada que no sea grano. `welcomeDigest` (M-09,
+§9.2) toma las cuatro últimas de peso 2 por orden cronológico, sin mirar de qué
+tratan; si los años más recientes de la ausencia dieron tres cosechas notables
+seguidas, se comen las cuatro plazas y cualquier llegada, construcción o disputa
+de antes queda fuera aunque hubiera pasado en la misma ausencia. Leído en frío,
+la primera partida dice "hubo una muerte y luego grano, grano, grano, una casa
+ardió" — se entiende, pero no dice nada de la aldea que las cifras de abajo sí
+cuentan (18 personas, 8 nacimientos, 3 llegadas: hubo más historia que grano).
+
+**Es un problema de selección, no de formato** (tal y como se pidió juzgar): la
+regla de §9.2 dice "hasta 4 entradas de peso 2", no dice nada sobre variedad,
+y la implementación de M-09 —ya probada, ya en uso— no la tiene. No se ha
+tocado: es un módulo de otro hito, y el arreglo natural —como mucho una o dos
+por categoría, no cuatro seguidas de la misma— es una decisión de diseño que
+corresponde decidir con esta prueba delante, no imponerla de oficio.
+
+### 2.62 — El reloj del navegador no es el del juego
+
+**§11.4, nueva.** El hallazgo de M-22, y vale más que la pantalla que lo
+destapó: una transición CSS corre sobre el reloj del compositor, que no tiene
+ningún motivo para coincidir con el del juego —pausa, ×1, ×4, ×16, y el letargo
+de §13.2 con **960 ticks en menos de dos segundos**—. En cuanto discrepan, la
+interfaz se queda a medias, y así apareció: una prueba de reloj falso encontró el
+zoom **atascado a mitad de recorrido**.
+
+Lo notable es que no lo cazó una revisión visual sino una prueba, y que el
+arreglo —corte seco— es un cambio real de comportamiento, no un retoque para que
+la captura quedara bien. Quedó dicho al reportarlo, y así debe ser.
+
+La regla generalizada distingue dos cosas: lo que representa el estado del juego
+se anima con la fracción del tick; lo que es afordancia para el humano puede usar
+tiempo real, pero tiene que tener estado definido en todo instante. **El caso de
+prueba es el letargo**, porque es donde el reloj del juego salta más.
+
+**§11.5 y §8.4 · `douse` gana `who`.** A.7 promete apagar «el edificio de B» y el
+esquema solo sabía nombrar el tipo: apagaba una casa cualquiera. Es la mentira de
+§8.1 trasladada de la columna del precio a la del efecto visible. Las otras tres
+carencias de coordenada son fontanería —el vado es derivable, `fellForest` ya
+elige celda y no la devuelve— y se saldan cuando se toque su módulo.
+
+**Ratificado el cableado de `app.ts` más allá de `decide()`.** Nada llamaba a
+`openCrossroad` ni a `openChronicle`, y el gesto de deslizar arriba llevaba desde
+M-21 emitiendo un evento sin oyente. Sin cerrar eso, el criterio del hito 2
+—«una decisión cambia el valle de forma visible»— solo se alcanzaba con un test
+llamando a la función, que es exactamente el fallo de pruebas verdes y juego
+roto.
+
+### 2.61 — El hito 2: la encrucijada en pantalla
+
+M-22 estaba escrito sobre el contrato de v2.60 y sobre un supuesto que no
+estaba escrito en ningún sitio: que un `VisualEffect` siempre tiene dónde
+señalar. No es así, y la lista completa importa más que el código:
+
+- **`raise`/`ruin`** se localizan solos: la obra que `requestBuild` acaba de
+  abrir, o el edificio que acaba de perder `lostTick` este mismo tick — ambos
+  ya existen en el estado cuando el paso 3 termina de aplicar la opción.
+- **`douse`** encuentra el único edificio en pie de esa clase — salvo que haya
+  más de uno. Hoy solo `house` tiene ese problema (`chapel`, `smithy`, `mill`
+  son singulares en la práctica); no hay forma de saber CUÁL casa desde el
+  efecto, que solo nombra la clase.
+- **`gather where:'ford'`** nunca tuvo una celda: el vado es atrezzo de la
+  crónica («up the ford road»), nunca una coordenada del mapa.
+- **`scar what:'felled_wood'`**: `fellForest` sí elige una celda real, pero
+  devuelve solo un total de madera, y `world/forest.ts` no es de este brief.
+- **`banner`** no señala nunca un edificio — el propio comentario de
+  `schema.ts` lo dice: «a banner over the core».
+
+Las cinco caen en el mismo sitio: el centro de la aldea, la misma cifra que ya
+calculan por su cuenta `render/crowd.ts` (`plaza`, adonde va la multitud del
+domingo) y `world/forest.ts` (`core`, de donde salen los leñadores). `sim.ts`
+guarda su propia copia — `valleyCore` — porque el motor no puede importar de
+`render/`, y tocar esos dos ficheros no estaba autorizado esta ronda. Tres
+copias de la misma fórmula no es ideal; es preferible a una cuarta que
+inventara un centro distinto.
+
+**El GIF, y la pregunta que lo decide.** ¿Se lee el precio antes de elegir, sin
+desplazar, con las tres opciones y el cuerpo en pantalla? A 390 px reales, sí:
+las 16 plantillas caben porque el precio vive en el mismo bloque que el verbo,
+nunca detrás de un segundo toque. Un hallazgo que no estaba pedido: la
+transformación de la cámara **no lleva transición CSS**. La probé con una
+(`transition: transform 250ms`) y el banco de pruebas la delató de inmediato —
+un reloj falso puede saltar los dos segundos de `setTimeout` sin que el
+compositor real haya movido un solo fotograma de la animación, y la captura
+quedaba a mitad de camino entre el zoom y la vuelta. Un corte seco es más
+honesto que una animación que dos relojes que no se hablan entre sí no pueden
+mantener de acuerdo.
+
+**Lo que no estaba en el brief de M-22 y hubo que tocar de todos modos.**
+`app.ts` ya estaba autorizado por el contrato de decisión (v2.60); esta ronda
+además engancha `openCrossroad`/`openChronicle` ahí, porque si nadie los llama
+el hito 2 no se puede alcanzar jugando: `paint` abre la encrucijada en cuanto
+`state.crossroad` no es nulo (incluida la primera pintura, para una partida
+guardada o `?live=1` que ya aterrice sobre una pendiente) y el deslizar hacia
+arriba, que llevaba dos rondas disparando un evento sin nadie escuchando, ahora
+abre la crónica.
+
+
+M-22 necesitaba una forma de que la opción elegida llegase al motor, y el
+contrato de `App` no tenía ninguna. La solución correcta es la que evita el
+atajo: **`decide` encola y el paso 3 del tick aplica**, porque §4.2 es normativo
+y porque el registro de decisiones del que depende la reproducción de §13.1 solo
+existe si todo pasa por ahí. Una interfaz que llamara a `applyOption` mutaría el
+estado fuera del orden y rompería las dos cosas a la vez.
+
+Las cuatro reglas están en el brief M-20. Dos merecen mención aparte:
+
+- **Encolar fuerza el tick siguiente de inmediato.** Sin eso el jugador toca y no
+  pasa nada durante quince segundos a ×1: la decisión más pesada del juego se
+  sentiría rota, y el arreglo tentador —aplicar el efecto en el acto desde la
+  interfaz— es justo el atajo que la regla prohíbe. Forzar el tick da inmediatez
+  conservando un único camino de mutación.
+- **El motor informa; la interfaz enfoca.** `TickReport` devuelve los
+  `VisualEffect` aplicados con coordenadas. El motor no sabe que existe una
+  cámara (§2.4): dice qué cambió y dónde, no adónde mirar. Los dos segundos de
+  §11.2 son decisión de la interfaz.
 
 ### 2.59 — La cifra está a un toque
 
@@ -3167,7 +3361,8 @@ export type VisualEffect =
   | { k: 'raise';   kind: BuildingKind }
   | { k: 'ruin';    kind: BuildingKind }
   | { k: 'banner';  colour: string; years: number }  // estandarte sobre el núcleo
-  | { k: 'douse';   kind: BuildingKind }             // apagar un edificio
+  | { k: 'douse';   kind: BuildingKind; who?: string }  // apagar un edificio;
+                                                      // `who` = letra del reparto
   | { k: 'gather';  where: 'square'|'chapel'|'ford'; days: number }
   | { k: 'scar';    what: 'burnt_field'|'grave_row'|'felled_wood' };
 ```
@@ -3600,7 +3795,49 @@ el parte de bienvenida (§9.2).
 La lógica de gestos vive en `src/ui/gestures.ts`, sin DOM y con tests, como
 exige `valle.md` §11.
 
-### 11.4 Accesibilidad
+### 11.4 La interfaz no anima sobre el reloj del navegador
+
+**Ninguna animación de interfaz puede depender del reloj del compositor.** El
+juego tiene su propio reloj y el jugador lo controla: pausa, ×1, ×4, ×16, y el
+letargo de §13.2 que ejecuta **960 ticks en menos de dos segundos**. Una
+transición CSS corre sobre un reloj que no tiene ningún motivo para coincidir con
+ninguno de esos, y en cuanto los dos discrepan la interfaz se queda a medias.
+
+Se descubrió en M-22 y no lo cazó una revisión visual: lo cazó una prueba de
+reloj falso que encontró el zoom **atascado a mitad de recorrido**. El arreglo
+fue sustituir la transición por un corte seco.
+
+La regla, generalizada:
+
+- Lo que representa el estado del juego se anima con **la fracción del tick**,
+  nunca con tiempo de pared. La multitud de §10.6 ya lo hace bien.
+- Lo que es afordancia para el humano —el enfoque de dos segundos de §11.2— sí
+  puede usar tiempo real, pero **debe tener un estado bien definido en todo
+  instante y sobrevivir a un salto de reloj**. Si no se puede garantizar, corte
+  seco.
+- **El caso de prueba es el letargo.** Cualquier animación que no aguante 960
+  ticks en dos segundos está mal, y ahí es donde se comprueba.
+
+### 11.5 Cuando el efecto visible no tiene sitio
+
+Cuatro `VisualEffect` no traen coordenada y todos caen al mismo respaldo, el
+centro del núcleo (`valleyCore`) — un respaldo, no cuatro conjeturas distintas:
+
+| Efecto | Por qué no tiene celda | Deuda |
+|---|---|---|
+| `banner` | Es sobre el núcleo por definición | Ninguna: correcto |
+| `gather where:'ford'` | El vado siempre fue prosa, nunca una celda | Derivable: donde el camino cruza el río (§7.1) |
+| `scar:'felled_wood'` | `fellForest` **sí** elige celda, pero solo devuelve un recuento | Fontanería: que la devuelva |
+| `douse` con varias instancias | El esquema nombra el **tipo**, y la plantilla quiere **una** | Contrato: ver abajo |
+
+**`douse` gana `who`.** A.7 promete apagar «el edificio de B» y el esquema solo
+sabía decir «un edificio de este tipo»: apagaba una casa cualquiera. Es la misma
+mentira que §8.1 persigue en la columna del precio, en la columna del efecto
+visible. Con `who` —una letra del reparto— se resuelve al edificio de esa
+persona. Las tres deudas de la tabla se saldan cuando su módulo se toque, no
+antes.
+
+### 11.6 Accesibilidad
 
 - Ningún dato depende solo del color: la estación se refuerza con el marco del
   canvas y con el texto de la ficha.
@@ -4718,8 +4955,35 @@ real sin volver a diseñar la automatización.
 **Contrato.**
 ```ts
 export function boot(root: HTMLElement, save?: SaveFile): App;
-export interface App { setSpeed(s: 0|1|4|16): void; state(): Readonly<GameState>; }
+export interface App {
+  setSpeed(s: 0|1|4|16): void;
+  state(): Readonly<GameState>;
+  decide(optionId: string): boolean;   // v2.60 — ver abajo
+}
 ```
+**La decisión pendiente (v2.60).** `decide` **encola**, no aplica. La opción la
+consume el **paso 3 del tick**, que es donde §4.2 pone las decisiones, y así todo
+cambio de estado sigue pasando por el tick: la interfaz nunca llama a
+`applyOption`. Si lo hiciera, mutaría el estado fuera del orden normativo y
+rompería el registro de decisiones del que depende la reproducción de §13.1.
+
+Cuatro reglas, y las cuatro son contrato:
+
+1. **Se consume exactamente una vez.** Si no hay encrucijada pendiente, o ya hay
+   una decisión encolada, `decide` devuelve `false` y **no sustituye** a la
+   anterior. Decidido es decidido: un doble toque no puede cambiar algo que ya va
+   camino de `history`.
+2. **Encolar fuerza el tick siguiente de inmediato**, sea cual sea la velocidad.
+   Sin esto, el jugador toca y no pasa nada hasta quince segundos después a ×1, y
+   la decisión más pesada del juego se siente rota. Con esto, el efecto aparece
+   en el acto y sigue habiendo un solo camino de mutación.
+3. **En pausa la decisión espera.** §8.7 dice que la simulación no se detiene por
+   una encrucijada pendiente, no que el jugador no pueda pausar el juego.
+4. **El motor informa; la interfaz enfoca.** `TickReport` devuelve los
+   `VisualEffect` aplicados **con sus coordenadas de mapa**. El motor no sabe que
+   existe una cámara (§2.4) y no dice «enfoca aquí»: dice «esto ha cambiado, en
+   estas celdas». Los dos segundos de §11.2 los decide la interfaz con esa lista.
+
 **Reglas.** El bucle acumula tiempo real y ejecuta ticks enteros; el render
 interpola con la fracción sobrante. Si la pestaña estuvo oculta, no se acumulan
 ticks: eso lo resuelve el letargo (M-23). Nunca más de 8 ticks por fotograma.
@@ -4731,6 +4995,11 @@ minutos reales dan exactamente 192 ticks.
 mantiene la deuda tras el tope por fotograma. Playwright abre la aplicación a
 390×844, acciona las cuatro velocidades y adelanta el reloj hasta comprobar un
 cambio de estación.
+
+**Estado de `decide` (v2.61): implementado.** `attemptDecision` — la lógica
+pura de las cuatro reglas — se prueba sin DOM; `boot` la envuelve con el reloj
+real. Playwright confirma que decidir cierra la encrucijada y cambia la
+transformación del lienzo (§17 M-22).
 
 ---
 
@@ -4772,12 +5041,23 @@ export function openChronicle(app: App, sinceTick?: number): void;
 ```
 **Reglas.** El precio de cada opción siempre visible antes de elegir. Sin botón
 de cerrar. La simulación **no se pausa** mientras la encrucijada está abierta.
-Al decidir, la cámara enfoca durante 2 s el efecto visible.
+Al decidir, la cámara enfoca durante 2 s el efecto visible. El enfoque lo elige
+la interfaz a partir de los `VisualEffect` con coordenadas que devuelve el
+`TickReport` (M-20): el motor informa de qué cambió y dónde, nunca de adónde
+mirar.
 **Tests.** Todas las opciones de las 16 plantillas se renderizan sin
 desbordamiento a 390 px de ancho; el enfoque posterior apunta a una celda
 válida.
 **Terminado cuando.** Una decisión cambia el valle de forma visible. **Este es
 el hito 2.**
+
+**Estado (v2.61): implementado — hito 2 alcanzado.** El precio de las tres
+opciones se lee sin desplazar a 390 px de ancho reales (GIF y hallazgos en
+§2.61). `boot` (M-20) abre la encrucijada él mismo en cuanto hay una pendiente
+—incluida la primera pintura, para una partida guardada o una ruta de depuración
+que ya aterrice sobre una— y conecta el deslizar hacia arriba a `openChronicle`,
+que hasta ahora no tenía oyente. Sin botón de cerrar: un deslizar hacia abajo
+devuelve al valle y dibuja una marca discreta que reabre la misma encrucijada.
 
 ---
 
@@ -4788,7 +5068,14 @@ el hito 2.**
 **Ficheros.** `src/engine/save.ts`, `src/ui/lethargy.ts`, `src/ui/welcome.ts`.
 **Contrato.**
 ```ts
-export function serialize(state: GameState, decisions: DecisionRecord[]): SaveFile;
+// v2.63: `serialize` gana dos parámetros que el esquema original no traía.
+// `SaveFile` necesita `archive` (partidas anteriores; no las deriva `state`) y
+// `savedAtMs` (reloj de pared) y ninguno de los dos sale de `(state,
+// decisions)` — y `src/engine/` no puede leer el reloj él mismo (CLAUDE.md).
+export function serialize(
+  state: GameState, decisions: DecisionRecord[],
+  archive: ArchivedGame[], savedAtMs: number,
+): SaveFile;
 export function deserialize(raw: unknown): SaveFile;          // valida y migra
 export function catchUp(state: GameState, elapsedMs: number): CatchUpReport;
 ```
@@ -4801,6 +5088,19 @@ reproducir el registro de decisiones desde la semilla da el mismo estado que la
 instantánea.
 **Terminado cuando.** Cerrar y abrir a las cuatro horas presenta un parte de
 bienvenida coherente. **Este es el hito 6.**
+
+**Estado (v2.63): implementado — hito 6 alcanzado, con una reserva anotada en
+§2.63.** `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
+propia prueba mide en menos de 2 s); el letargo de la interfaz (`ui/lethargy.ts`)
+es un bucle distinto sobre lotes de 64, la misma separación pura/DOM que
+`loop.ts`. El guardado real vive en IndexedDB (`ui/idb.ts`, fuera del contrato
+de este módulo: ninguno de los tres ficheros lo abre por su cuenta) y
+`app.ts`/`main.ts` quedan enganchados: guardar cada 20 ticks y al ocultar la
+pestaña, cargar al abrir, poner al día antes de que el bucle normal toque el
+mismo estado, y el parte de bienvenida antes de que se vea nada más. Verificado
+con Playwright y reloj falso: cerrar y volver a las cuatro horas, sin esperar,
+entrega un parte legible (§2.63 trae el texto real y lo que no se entiende a la
+primera lectura).
 
 ---
 

@@ -118,7 +118,12 @@ export type VisualEffect =
   | { k: 'raise'; kind: BuildingKind }
   | { k: 'ruin'; kind: BuildingKind }
   | { k: 'banner'; colour: string; years: number } // a banner over the core
-  | { k: 'douse'; kind: BuildingKind } // put a building's fire out
+  /**
+   * Put a building's fire out. `who`, when given, is a cast letter (§8.1,
+   * v2.62): the building is that person's own, not just any of `kind` — A.7
+   * promised "B's building" and the catalogue had no way to say so.
+   */
+  | { k: 'douse'; kind: BuildingKind; who?: string }
   | { k: 'gather'; where: 'square' | 'chapel' | 'ford'; days: number }
   | { k: 'scar'; what: 'burnt_field' | 'grave_row' | 'felled_wood' };
 

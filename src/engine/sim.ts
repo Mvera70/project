@@ -18,6 +18,7 @@ import { ageOf, minAgeFor, promoteToNamed } from './people/villagers';
 import { pick } from './rng';
 import type {
   Building,
+  BuildingKind,
   ChronicleEntry,
   Decision,
   DecisionRecord,
@@ -27,6 +28,7 @@ import type {
   Role,
   TickContext,
   Villager,
+  VillagerId,
 } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
@@ -50,6 +52,7 @@ import type {
   Catalogue,
   CrossroadTemplate,
   FiredSeed,
+  VisualEffect,
 } from './crossroads/schema';
 import {
   anonDeathWeight,
@@ -138,6 +141,18 @@ export function fillVacancies(state: GameState): void {
 // The tick
 // ---------------------------------------------------------------------------
 
+/**
+ * A `VisualEffect` (§8.4) names a kind of change, never a cell — the catalogue
+ * writes "raise a field", not a coordinate. `locate` (below) is what turns one
+ * into a place, so the interface can point a camera at it (§2.60, §17 M-22):
+ * the engine says what changed and where, never where to look.
+ */
+export interface PositionedVisualEffect {
+  effect: VisualEffect;
+  x: number;
+  y: number;
+}
+
 /** What one tick did. Nothing here is state; it is the account of the week. */
 export interface TickReport {
   tick: number;
@@ -156,6 +171,8 @@ export interface TickReport {
   spoiled: number;
   fired: FiredSeed[];
   decided: AppliedEffects | null;
+  /** `decided`'s own `visible`, each placed on the map. Empty if nothing was decided this tick. */
+  visualEffects: PositionedVisualEffect[];
   posed: string | null;
   entries: ChronicleEntry[];
   ended: boolean;
@@ -387,6 +404,114 @@ export function decide(
 }
 
 /**
+ * The centre of the valley: standing buildings averaged, or the map's own
+ * centre before anything has been raised. It is also where the Sunday crowd
+ * gathers (`render/crowd.ts`'s `plaza`) and where the woodcutters walk from
+ * (`world/forest.ts`'s `core`) — the same figure, kept as its own copy here
+ * because engine code cannot import render, and because this round's brief is
+ * `app.ts` and this file only, not the two modules that already have it.
+ */
+function valleyCore(state: GameState): { x: number; y: number } {
+  const standing = state.buildings.filter((b) => b.lostTick === null);
+  if (standing.length === 0) return { x: state.map.width / 2, y: state.map.height / 2 };
+  return {
+    x: standing.reduce((sum, b) => sum + b.x + b.w / 2, 0) / standing.length,
+    y: standing.reduce((sum, b) => sum + b.y + b.h / 2, 0) / standing.length,
+  };
+}
+
+/** The one standing building of this kind, or null if there are zero or several. */
+function theStanding(state: GameState, kind: BuildingKind): Building | null {
+  const found = state.buildings.filter((b) => b.kind === kind && b.lostTick === null);
+  return found.length === 1 ? (found[0] as Building) : null;
+}
+
+function centreOf(b: { x: number; y: number; w: number; h: number }): { x: number; y: number } {
+  return { x: b.x + b.w / 2, y: b.y + b.h / 2 };
+}
+
+/** The building this cast letter calls home, standing, if there is one. */
+function homeOf(
+  state: GameState,
+  cast: Record<string, VillagerId> | undefined,
+  who: string,
+): Building | null {
+  const id = cast?.[who];
+  if (id === undefined) return null;
+  const villager = state.people.villagers.find((v) => v.id === id);
+  if (villager === undefined || villager.homeId === null) return null;
+  const home = state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
+  return home ?? null;
+}
+
+/**
+ * Where a `VisualEffect` just applied actually happened (§2.60, §17 M-22).
+ * Reads the state *after* `carryOutBuildings`/`carryOutForest` ran this tick,
+ * so a fresh work-in-progress or a fresh ruin is found by "did this change on
+ * `state.tick`", never by guessing which building an option meant. `cast` is
+ * the pending crossroad's own — captured before `applyOption` clears it — so
+ * `douse ... who` can resolve to whichever letter it names (§8.1, §11.5,
+ * v2.62): A.7 promised "B's building", and a kind alone cannot say which one.
+ *
+ * Three cases still have nothing to point at, and fall back to `valleyCore`
+ * rather than inventing a cell:
+ *
+ *   - `douse`/`gather:'chapel'` without a `who` that resolves, on a kind the
+ *     village has more than one of standing — the effect names a kind, never
+ *     an instance, so which one is not knowable from here.
+ *   - `gather:'ford'` — the ford only ever existed in the chronicle's prose
+ *     ("up the ford road"); the map has never had one.
+ *   - `scar:'felled_wood'` — `fellForest` (`world/forest.ts`) does pick a real
+ *     cell, but hands back only a count, and that file is not this round's to
+ *     change.
+ *   - `banner` — schema.ts's own comment settles it: "a banner over the core".
+ */
+function locate(
+  state: GameState,
+  effect: VisualEffect,
+  cast: Record<string, VillagerId> | undefined,
+): { x: number; y: number } {
+  switch (effect.k) {
+    case 'raise': {
+      const work = state.works.find((w) => w.kind === effect.kind && w.startedTick === state.tick);
+      return work !== undefined ? centreOf(work) : valleyCore(state);
+    }
+    case 'ruin': {
+      const ruin = state.buildings.find((b) => b.kind === effect.kind && b.lostTick === state.tick);
+      return ruin !== undefined ? centreOf(ruin) : valleyCore(state);
+    }
+    case 'douse': {
+      const home = effect.who !== undefined ? homeOf(state, cast, effect.who) : null;
+      if (home !== null) return centreOf(home);
+      const building = theStanding(state, effect.kind);
+      return building !== null ? centreOf(building) : valleyCore(state);
+    }
+    case 'scar': {
+      if (effect.what === 'burnt_field') {
+        const field = state.buildings.find((b) => b.kind === 'field' && b.lostTick === state.tick);
+        return field !== undefined ? centreOf(field) : valleyCore(state);
+      }
+      if (effect.what === 'grave_row') {
+        const yard = theStanding(state, 'grave_yard');
+        return yard !== null ? centreOf(yard) : valleyCore(state);
+      }
+      return valleyCore(state); // 'felled_wood'
+    }
+    case 'gather': {
+      if (effect.where === 'chapel') {
+        const chapel = theStanding(state, 'chapel') ?? theStanding(state, 'church');
+        if (chapel !== null) return centreOf(chapel);
+      }
+      return valleyCore(state); // 'square' is the core by definition; 'ford' is never a cell
+    }
+    case 'banner':
+      return valleyCore(state);
+    default:
+      return valleyCore(state);
+  }
+}
+
+/**
  * One week. The seventeen steps of §4.2, in that order, and the order is
  * normative — changing it changes the balance and breaks saved games.
  *
@@ -507,7 +632,11 @@ export function tick(
 
   // ---- 3 · DECISION --------------------------------------------------------
   let decided: AppliedEffects | null = null;
+  let visualEffects: PositionedVisualEffect[] = [];
   if (decision !== undefined && state.crossroad?.templateId === decision.templateId) {
+    // §11.5, v2.62: `applyOption` clears `state.crossroad` before it returns,
+    // so the cast has to be read now or `douse ... who` has nothing to resolve.
+    const cast = state.crossroad.cast;
     decided = captureEntries(() => applyOption(state, decision.optionId, catalogue));
     if (decided !== null) {
       reportVictims(decided.killed);
@@ -522,6 +651,11 @@ export function tick(
       }
       carryOutBuildings(state, decided, say);
       crossroadFelled += carryOutForest(state, decided);
+      // §2.60, §17 M-22: the interface enfoca from this list; the engine only
+      // says what changed and where. Placed here and not earlier because a
+      // `raise`/`ruin` needs the work opened or the building actually lost —
+      // both just happened, two lines up.
+      visualEffects = decided.visible.map((effect) => ({ effect, ...locate(state, effect, cast) }));
 
       // Annex A.15, v2.22: `no_one` answered three times running, with no
       // leader appointed between them, and the valley gives up rather than
@@ -786,6 +920,7 @@ export function tick(
     spoiled,
     fired,
     decided,
+    visualEffects,
     posed,
     entries: buffer,
     ended: state.ended !== null,

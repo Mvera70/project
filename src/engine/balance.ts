@@ -19,6 +19,8 @@ export const TIME = {
   REAL_MS_PER_TICK: 15_000,
   SPEEDS: [0, 1, 4, 16],
   LETHARGY_CAP_MS: 4 * 60 * 60 * 1000,
+  LETHARGY_BATCH: 64, // §13.2: ticks per requestAnimationFrame while catching up
+  SAVE_EVERY_TICKS: 20, // §13.1
 } as const;
 
 // ---------------------------------------------------------------------------
