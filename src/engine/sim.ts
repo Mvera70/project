@@ -35,6 +35,7 @@ import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
 import { consume, overwinter } from './subsistence/consumption';
+import { tendHerd, type HerdReport } from './subsistence/herd';
 import { applySpoilage, harvest } from './subsistence/harvest';
 import { isUnexplained, updateMood } from './subsistence/mood';
 import { rollWeather } from './subsistence/seasons';
@@ -172,6 +173,8 @@ export interface TickReport {
   harvested: number;
   spoiled: number;
   fired: FiredSeed[];
+  /** What the herd did this week (§7.7): eaten, slaughtered, bred, taken. */
+  herd: HerdReport;
   decided: AppliedEffects | null;
   /** `decided`'s own `visible`, each placed on the map. Empty if nothing was decided this tick. */
   visualEffects: PositionedVisualEffect[];
@@ -773,8 +776,19 @@ export function tick(
   // Before the harvest on purpose (§4.2): the week of the harvest is eaten
   // first and reaped after, which is what makes a bad autumn show in the
   // granary before the winter.
-  const { severity, starved } = consume(state);
+  const { severity, starved, herd: fed } = consume(state);
   reportVictims(starved);
+  // §7.7: what the village ate of its own. Weight 2 — losing a cow is the kind
+  // of thing §9.2 puts on the chronicle screen without being asked.
+  for (const [kind, many] of Object.entries(fed.slaughtered)) {
+    if (many === undefined || many <= 0) continue;
+    say({
+      kind: 'lost',
+      templateKey: `herd.slaughtered.${kind}`,
+      params: { year: year(), season: season(), count: many },
+      weight: 2,
+    });
+  }
 
   // ---- 8 · WINTER ----------------------------------------------------------
   const { cold } = overwinter(state);
@@ -849,6 +863,18 @@ export function tick(
   // obstacle: §7.6's cost reads the terrain and the path and nothing else, so
   // raising one changes no route. What it can change is where people are going,
   // and that is part of the route's cache key already.
+  // §7.7: the herd breeds if there is room and food, and the wolves come in
+  // winter if nothing stands in their way. Here and not in step 7 because this
+  // is where the world acts on the village.
+  const herd: HerdReport = tendHerd(state);
+  if (herd.wolved !== null) {
+    say({
+      kind: 'lost',
+      templateKey: `herd.wolves.${herd.wolved}`,
+      params: { year: year(), season: season() },
+      weight: 2,
+    });
+  }
   accrueTraffic(state);
   const paths = upgradePaths(state);
   regrowForest(state);
@@ -950,6 +976,7 @@ export function tick(
     harvested: reaped.yielded,
     spoiled,
     fired,
+    herd: { ...fed, bred: herd.bred, wolved: herd.wolved },
     decided,
     visualEffects,
     posed,

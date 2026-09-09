@@ -41,6 +41,23 @@ export interface VillageStats {
 /** The four statistics an effect can move. design.md §8.4. */
 export type StatName = 'grain' | 'wood' | 'morale' | 'faith';
 
+/**
+ * The village's animals, as counts. design.md §7.7.
+ *
+ * Counts and not individuals on purpose: the chronicle says "wolves took a
+ * cow", never "wolves took Bertha's cow", so nothing needs an identity. Flat
+ * numbers keep §2.3's rule that the state is serialisable without ceremony.
+ */
+export interface Herd {
+  hens: number;
+  pigs: number;
+  cows: number;
+}
+
+/** The kinds, largest last: the order the village slaughters in (§7.7). */
+export const HERD_KINDS = ['hens', 'pigs', 'cows'] as const;
+export type HerdKind = (typeof HERD_KINDS)[number];
+
 // ---------------------------------------------------------------------------
 // §3.4 · People
 // ---------------------------------------------------------------------------
@@ -507,6 +524,7 @@ export interface GameState {
   rng: RngBundle; // state of the random streams
   map: ValleyMap;
   village: VillageStats;
+  herd: Herd; // §7.7, schema 3
   people: PeopleState;
   buildings: Building[];
   works: ConstructionWork[]; // works in progress

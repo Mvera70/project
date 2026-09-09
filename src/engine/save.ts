@@ -1,12 +1,14 @@
 // M-23 · Save format and the catch-up that follows loading one. design.md §13.
 
-import { BUILDINGS, TIME } from './balance';
+import { ANIMALS, BUILDINGS, TIME } from './balance';
 import { CATALOG } from './crossroads/catalog';
 import { foundGame } from './found';
 import { population } from './people/demography';
-import { RNG_STREAMS } from './rng';
+import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
-import type { ArchivedGame, DecisionRecord, GameState, SaveFile } from './state';
+import { herdCapacity } from './subsistence/herd';
+import { HERD_KINDS } from './state';
+import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
 /** The schema this build writes and reads. §13.1. */
@@ -235,6 +237,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && record(rng) && RNG_STREAMS.every((stream) => uint32(rng[stream]))
     && byteMap(s['map'])
     && record(village) && ['grain', 'wood', 'morale', 'faith'].every((key) => finite(village[key]))
+    && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
     && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
     && tickValue(people['nextId']) && Array.isArray(people['namedIds']) && people['namedIds'].every(tickValue)
     && Array.isArray(people['grudges']) && people['grudges'].every(grudge)
@@ -298,8 +301,29 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION) {
+  } else if (candidate.schema !== SCHEMA_VERSION && candidate.schema !== 2) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
+  }
+
+  // 2 -> 3 (§7.7, v2.91): the herd and its own random stream. Additive, like
+  // every migration §13.1 allows. The herd starts at what its buildings can
+  // hold, because that is exactly what the valley was already drawing before
+  // the herd was state: the animals the player could see become the animals
+  // the village has. The stream is derived from the master seed the same way
+  // every other one is, so a migrated game stays reproducible.
+  if (candidate.schema !== SCHEMA_VERSION || (state as Partial<GameState>).herd === undefined) {
+    const withStream = {
+      ...state,
+      version: SCHEMA_VERSION,
+      rng: { ...state.rng, animals: state.rng.animals ?? hash32(state.seed, 'animals') },
+    };
+    const capacity = herdCapacity(withStream as GameState);
+    const herd: Herd = {
+      hens: Math.min(capacity.hens, ANIMALS.HENS_PER_HOUSE * ANIMALS.MAX_PER_KIND),
+      pigs: capacity.pigs,
+      cows: capacity.cows,
+    };
+    state = { ...withStream, herd: (state as Partial<GameState>).herd ?? herd } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

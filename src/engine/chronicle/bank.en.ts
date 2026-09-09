@@ -1298,6 +1298,38 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     '{A} opened the granary in year {year}, and nobody counted for a season.',
   ],
 
+  // --- M-29 · the herd, design.md §7.7 ---
+  'herd.slaughtered.hens': [
+    'They ate the hens that {season}.',
+    '{count} of the hens went into the pot in year {year}.',
+    'The hens were the first to go, in the {season} of year {year}.',
+  ],
+  'herd.slaughtered.pigs': [
+    'They killed {count} of the pigs early that year.',
+    'They took {count} of the pigs before the winter was through.',
+    '{count} pigs, and the year had not turned yet.',
+  ],
+  'herd.slaughtered.cows': [
+    'They killed the cow in year {year}. Nobody said anything.',
+    '{count} of the cattle went, and that was the last of the milk.',
+    'The cattle were the last thing left to eat, and {count} of them went.',
+  ],
+  'herd.wolves.hens': [
+    'Wolves came down for the hens that winter.',
+    'Something took the hens in the night. The tracks were wolves.',
+    'A wolf had the henhouse open before anyone woke, in year {year}.',
+  ],
+  'herd.wolves.pigs': [
+    'Wolves took a pig in the winter of year {year}.',
+    'A pig went in the night. There was blood on the snow.',
+    'The wolves were bold that {season}, and a pig paid for it.',
+  ],
+  'herd.wolves.cows': [
+    'Wolves killed a cow in the winter of year {year}.',
+    'They found the cow at first light, and the wolves long gone.',
+    'A cow, taken in the dark. Nothing between the valley and the trees.',
+  ],
+
   // --- M-23 · welcome digest, design.md §9.2, §13.2 ---
   'welcome.time': [
     '{weeks} weeks passed.',

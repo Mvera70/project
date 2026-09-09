@@ -38,6 +38,10 @@ describe('all deaths reach the weekly chronicle (§9.4)', () => {
       }));
     }
     state.village.grain = 0;
+    // v2.91: una aldea con rebaño se lo come antes de dejar morir a nadie
+    // (§7.7). Lo que esta prueba mide es la crónica del hambre, así que el
+    // corral tiene que estar vacío para que el hambre llegue a la gente.
+    state.herd = { hens: 0, pigs: 0, cows: 0 };
     const report = tick(state, []);
     const hunger = report.entries.filter((e) => e.templateKey.startsWith('death.hunger.'));
     expect(hunger.find((e) => e.params.name === elder.name)).toMatchObject({

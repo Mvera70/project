@@ -11,6 +11,7 @@ import { ageOf } from '../people/villagers';
 import { next, pick } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
 import { seasonOf } from '../time';
+import { feedAndSlaughter, type HerdReport } from './herd';
 
 /**
  * Step 7. §5.3.
@@ -29,11 +30,19 @@ import { seasonOf } from '../time';
  * within each of those groups the choice is also by lot, so it is not always
  * the same villager who starves for being early in the array.
  */
-export function consume(state: GameState): { severity: number; starved: VillagerId[] } {
+export function consume(state: GameState): {
+  severity: number; starved: VillagerId[]; herd: HerdReport;
+} {
   const people = population(state);
-  if (people === 0) return { severity: 0, starved: [] };
+  if (people === 0) {
+    return { severity: 0, starved: [], herd: { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null } };
+  }
 
   const demand = people * FOOD.GRAIN_PER_PERSON;
+  // §7.7: the animals eat first and are eaten second. Before the shortage is
+  // worked out, never after — a village with hens in the yard does not let
+  // somebody starve and then remember them.
+  const herd = feedAndSlaughter(state, demand);
   const forcedUntil = state.flags['forced_hunger'];
   const forced = forcedUntil !== undefined && (forcedUntil === 0 || forcedUntil > state.tick);
   const shortage = Math.max(0, demand - state.village.grain) / demand;
@@ -42,14 +51,14 @@ export function consume(state: GameState): { severity: number; starved: Villager
   const severity = Math.max(shortage, forced ? 0.5 : 0);
   state.village.grain = Math.max(0, state.village.grain - demand);
 
-  if (severity <= 0) return { severity: 0, starved: [] };
+  if (severity <= 0) return { severity: 0, starved: [], herd };
 
   const expected = people * FOOD.STARVATION_RATE * severity;
   const whole = Math.floor(expected);
   // Always exactly one draw whenever there is hunger, whatever the fraction is,
   // so that a rounder number does not shift the stream for the deaths of §6.5.
   const toll = whole + (next(state.rng, 'deaths') < expected - whole ? 1 : 0);
-  if (toll === 0) return { severity, starved: [] };
+  if (toll === 0) return { severity, starved: [], herd };
 
   const present = state.people.villagers.filter(isHere);
   const tiers: Villager[][] = [
@@ -80,7 +89,7 @@ export function consume(state: GameState): { severity: number; starved: Villager
     state.people.namedIds = state.people.namedIds.filter((id) => !gone.has(id));
   }
 
-  return { severity, starved };
+  return { severity, starved, herd };
 }
 
 /**

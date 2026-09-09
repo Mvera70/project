@@ -42,6 +42,7 @@ function stateOf(seed: number): GameState {
       forestAge: new Uint8Array(CELLS),
       forestStock: new Uint16Array(CELLS),
     },
+    herd: { hens: 0, pigs: 0, cows: 0 },
     village: {
       grain: FOUNDING.GRAIN,
       wood: FOUNDING.WOOD,

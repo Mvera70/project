@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.88 · 11 de septiembre de 2026, 15:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.90 · 9 de septiembre de 2026, 14:54 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -28,6 +28,8 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **2.90** | 9 sep 2026, 14:54 | Ejecución G-00 | **Blender 5.2.1 LTS fabrica `.blend`, `.glb` y PNG en segundo plano y sin GUI.** El éxito exige una marca explícita y comprobar artefactos porque Blender devolvió 0 ante dos excepciones Python durante el diagnóstico. Chrome del sistema cubre Playwright. P0 queda parcial hasta cargar el GLB en Three.js y abrir la evidencia desde un segundo dispositivo. |
+| **2.89** | 9 sep 2026, 14:37 | Programa gráfico G-00–G-12 | **Una maqueta medieval 3D, producida y revisada por rondas reproducibles.** Anexo D incorpora análisis, dirección artística, contratos, producción Blender → GLB → Three.js, operación remota, pruebas y briefs. Autoriza un piloto aislado; no declara migrado el juego ni sustituye todavía los contratos Canvas de producción. La fecha es la del entorno de esta revisión; se conservan las fechas posteriores ya presentes en el historial, sin reinterpretarlas. |
 > ### ⚠ Aviso sobre las entradas 2.10 a 2.17
 >
 > El fallo corregido en la **v2.18** —un brote de peste vencido que seguía
@@ -89,6 +91,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.91** | 11 sep 2026, 16:30 | M-29 · el rebaño, con mecánica y medido | **El ganado deja de ser dibujo y pasa a ser estado: come, se sacrifica y cría, y los lobos se llevan cabezas de verdad.** La pregunta que §7.7 dejó abierta —colchón o coste— la contesta el banco: **gana el coste**. La extinción adversa sube de 11,7 % a 13,3 % y la separación con `prudent` de 10,0 a 11,7 puntos; las dos van **hacia** la banda de §12.9, no en contra. Fallan las mismas siete pruebas que antes del rebaño, ni una más. Esquema de guardado 3 con migración 2→3. |
 | **2.88** | 11 sep 2026, 15:45 | M-29 · la fauna, segundo trozo | **Cuervos sobre el grano maduro, lobos en la linde en las noches de invierno, peces en el río.** Cada uno con su reloj: es lo que hace que una noche de enero no se parezca a una tarde de julio. Siguen sin comerse nada — derivados y cosméticos como el ganado. |
 | **2.87** | 11 sep 2026, 15:00 | M-29 · el ganado, primer trozo | **§7.7 nueva: el valle tiene animales.** Gallinas por casa, cerdos cuando hay granero, vacas cuando hay campos. Derivado y cosmético como la multitud de §10.6 y como las ruinas de §13.3: no es estado, no se guarda, no mueve un número. Lobos, cuervos, caza y pesca quedan declarados y sin construir. |
 | **2.86** | 11 sep 2026, 14:15 | M-27.2 · «red primero» no lo era | **Un despliegue nuevo no llegaba a un móvil ya instalado, que es justo lo que §13.4 prometía.** Pages manda `Cache-Control: max-age=600` y un `fetch` corriente lo contesta la caché HTTP del navegador, por debajo del service worker. La prueba no lo veía porque `vite preview` no manda esa cabecera. |
@@ -3050,6 +3053,8 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 | Decisión | Elegido | Motivo |
 |---|---|---|
 | Título | **The Valley** | El contenido va en inglés; el título acompaña |
+| Evolución gráfica | Piloto 3D estilizado con cámara ortográfica; Anexo D | Validar belleza, animación, legibilidad y coste móvil antes de reemplazar Canvas; conservar motor y guardados |
+| Producción de arte | Fuentes reproducibles, Blender por scripts y revisión en el navegador | Permitir iteración y revisión remotas sin depender de operaciones manuales en el escritorio |
 | Idioma del contenido | Inglés (crónica, UI, nombres, topónimos) | Decisión de producto |
 | Idioma del código | Inglés (identificadores, ficheros, comentarios) | Convención estándar; evita mezclas |
 | Idioma de la documentación | Español | Es donde se piensa el juego |
@@ -4038,15 +4043,65 @@ El día es la fracción del tick (§10.6): a partir de 0,8 el ganado se recoge,
 igual que la gente. Que a esa hora el corral quede vacío no es un detalle
 estético — es la ventana por la que entrarán los lobos.
 
+#### El rebaño de verdad (v2.91 · construido, con mecánica)
+
+El ganado deja de derivarse y pasa a ser estado: `GameState.herd`, tres
+recuentos. Lo que se ve en el valle es lo que la aldea tiene de verdad, así que
+si un lobo se lleva una vaca, hay una vaca menos en pantalla.
+
+**El rebaño es comida almacenada que anda, come y puede perderse.** Esa es la
+frase que gobierna las tres reglas:
+
+| Regla | Cuándo | Qué hace |
+|---|---|---|
+| **Manutención** | Cada semana | Cada cabeza come grano. Una gallina casi nada, una vaca lo que un tercio de persona |
+| **Matanza** | Cuando falta comida (§5.3) | Antes de que muera nadie, la aldea sacrifica: primero gallinas, luego cerdos, la vaca la última. Cada cabeza vale su carne en semanas de comida |
+| **Cría** | Con excedente y sitio | Crece de una cabeza en una cabeza, nunca por encima de lo que las casas y los campos sostienen |
+
+**El techo es el mismo que dibujaba la versión cosmética**: gallinas por casa,
+cerdos si hay granero, vacas por cada dos campos. Un rebaño no puede ser mayor
+que la aldea que lo alimenta.
+
+**Por qué esto no es simplemente hacer el juego más fácil.** Un amortiguador
+contra el hambre lo sería, y el desenlace ya está fuera de banda por abajo
+(§2.47). Pero la manutención es un coste que **compite con las personas**: en un
+año malo, un rebaño grande es una carga que hay que sacrificar. Esa es la
+tensión, y es históricamente cierta. Qué gana la partida —el colchón o el
+coste— **no se decide aquí: se mide con el banco**.
+
+**Y lo medido (v2.91) dice que gana el coste.** El mismo banco de §12.9, 30
+semillas × 150 años × 5 políticas, corrido sobre el árbol con rebaño y sobre el
+commit inmediatamente anterior sin él:
+
+| Medida | Sin rebaño | Con rebaño | Banda de §12.9 |
+|---|---|---|---|
+| Extinción con `worst` | 11,7 % | **13,3 %** | ≥ 25 % |
+| Separación `prudent`–`worst` | 10,0 pts | **11,7 pts** | ≥ 20 pts |
+| Extinción con `prudent` | 1,67 % | 1,67 % | 2 %–12 % |
+| `forest_cut` elegible, `worst` | 4,47 % | 4,39 % | < 1 % |
+| `forest_cut` elegible, `last` | 3,85 % | 3,80 % | < 1 % |
+| `forest_cut` elegible, `first` | 2,56 % | 2,63 % | < 1 % |
+| `smith_feud` elegible, `prudent` | 1,69 % | 2,05 % | < 1 % |
+
+**Fallan exactamente las mismas siete pruebas antes y después**, que son las que
+v2.47 dejó fuera de banda y cerradas como red de regresión. El rebaño no rompe
+ninguna que estuviera verde. Y las dos que miden el desenlace se mueven en la
+dirección que §12.9 pide, aunque sigan lejos: **una aldea que mantiene animales
+paga por ellos más de lo que le devuelven en el año malo**, que es la tensión
+que la sección buscaba y no la comodidad que temía.
+
+La extinción con `prudent` no se mueve ni una centésima: la aldea bien llevada
+tiene grano de sobra para el rebaño, así que el coste solo se nota donde tenía
+que notarse. **Qué falsaría esta lectura:** que el rebaño bajara la extinción
+adversa, o que ablandara `prudent` por encima de su banda.
+
+**Lobos** (v2.91). En invierno, cuando la aldea no tiene empalizada, se llevan
+una cabeza y empiezan por la mayor. Convierte una obra que el jugador ya podía
+levantar en una defensa con motivo. Consumen del flujo `animals`, nuevo y
+propio (§4.3): ninguna tirada de lobos puede desplazar la demografía.
+
 #### Lo declarado y todavía NO construido
 
-Cada uno exige promover el ganado de derivado a estado, con su subida de
-esquema (§13.1), y **volver a medir el banco**: son comida, y §12.9 mide
-hambrunas.
-
-- **Lobos.** De noche y en invierno, cuando el bosque está cerca. Se llevan
-  cabezas de ganado, no personas. La empalizada es la respuesta que el jugador
-  ya puede construir, lo que convierte una obra existente en defensa.
 - **Cuervos.** Sobre los campos maduros, antes de la cosecha de la semana 35.
   Muerden el rendimiento; el espantapájaros o la vigilancia son la respuesta.
 - **Caza.** La mano de obra de §5.2 puede ir al bosque en vez de al campo:
@@ -4055,9 +4110,10 @@ hambrunas.
   que no depende de la cosecha, y por tanto un amortiguador contra la hambruna
   — que es justo la palanca que §2.47 dejó sin explorar.
 
-**Qué falsaría el primer trozo:** que el ganado escriba una sola vez en
-`GameState`, que aparezca donde no hay aldea, que dos partidas con la misma
-semilla lo coloquen distinto, o que mueva un número del balance.
+**Qué falsaría esto:** que el rebaño crezca por encima de lo que la aldea
+sostiene, que se coma grano que no tiene, que la aldea deje morir gente
+teniendo cabezas que sacrificar, que un lobo entre con la empalizada en pie, o
+que dos partidas con la misma semilla acaben con rebaños distintos.
 
 ---
 
@@ -5515,6 +5571,10 @@ tiene, por primera vez, una respuesta de una persona.
 
 ## 17. Briefs por módulo
 
+**Programa gráfico nuevo:** briefs G-00–G-12 en Anexo D.12, con dependencias
+en D.13. Se mantienen los briefs M como contrato del juego de producción hasta
+la migración explícita de G-12.
+
 Cada brief es autocontenido. Un agente que lea las secciones 1–4 y su brief
 tiene todo lo necesario. Las dependencias indican qué debe estar fusionado
 antes de empezar.
@@ -6818,6 +6878,759 @@ Verificadas por test (§14.1):
 | **Letargo** | Estado de la aldea mientras el jugador no está. Máximo 4 h de tiempo simulado. |
 | **Severidad** | Fracción de la demanda de grano no cubierta esta semana. 0–1. |
 | **Hoja de contacto** | PNG que junta las capturas automáticas de todas las estaciones y años. |
+
+---
+
+## Anexo D · Programa gráfico 3D y producción remota
+
+### D.0 Autoridad, estado y lectura
+
+**Este anexo es la guía principal del desarrollo gráfico nuevo.** Forma parte de
+la fuente única, no es una segunda especificación. Estado: planificación;
+ningún módulo G está implementado por esta revisión. El usuario ha elegido
+explorar 3D estilizado con habitantes animados y pide que los agentes produzcan
+también el arte, con iteración remota. El aspecto definitivo aún debe demostrarse.
+
+Los capítulos §10 y §11 siguen describiendo el juego Canvas de producción.
+Este anexo gobierna exclusivamente el piloto y su migración por fases. G-12
+actualizará esos capítulos al comportamiento aprobado antes de activar 3D por
+defecto. Las excepciones del piloto son explícitas: cámara 3D en vez de ajuste
+Canvas, representación temporal D.6, geometría GLB en vez de sprites, selección
+por proyección y recursos GPU en vez de fondo Canvas. No son excepciones al
+aislamiento del motor, al guardado, al balance ni a la veracidad de los efectos.
+
+Lectura común: §1–4, D.0–D.2, D.5–D.7, D.11 y el brief asignado. Después,
+solo las secciones que el brief nombre. El artista añade D.3–D.4 y D.8; el
+responsable de rendimiento D.9–D.10. No se pide leer todo el historial.
+
+Los informes de ronda y prompts son entregables derivados. No pueden introducir
+decisiones permanentes: el orquestador las ratifica aquí, con motivo y versión.
+Cada ronda informa si una afirmación es **verificada**, **decidida**, **hipótesis**
+o **pendiente**. Una captura de Blender no verifica el aspecto dentro del juego.
+
+### D.1 Diagnóstico de partida y alternativas
+
+Hechos inspeccionados en el repositorio:
+
+| Elemento actual | Reutilización y trabajo necesario |
+|---|---|
+| TypeScript, Vite, PWA, sin dependencia 3D en `package.json` | Mantener aplicación web; incorporar Three.js y fijar versión con lockfile después del diagnóstico |
+| `src/engine/` independiente del DOM y del render | Conservar simulación, semillas, decisiones y guardados; un renderer no puede añadir consumo de RNG |
+| `renderer.ts`: `paint(state, tickFraction)` y `track(id)` | Conservar una fachada durante transición; hacen falta ciclo de vida, selección y reloj de presentación explícitos |
+| `crowd.ts`: rutas derivadas, interpolación, hasta 80 figuras | Reutilizar significado de casa/destino y presencia; sus desplazamientos para anclar sprites no son coordenadas 3D reutilizables sin conversión |
+| `world/paths.ts`: destinos y rutas cacheados | Leer APIs puras existentes; no añadir otro sistema de trabajo, tráfico o productividad en el render |
+| `ui/inspect.ts` calcula selección usando figuras 2D | Separar elección geométrica del contenido de ficha; conservar `panelFor` y la identidad por id |
+| `ui/app.ts` ya permite pinch mediante escala CSS | Sustituir por zoom ortográfico y encuadre; no afirmar que el proyecto carece de zoom |
+| Mapa 36 × 56, presentación diseñada para celdas de 9–10 px | Cambiar composición: vista general y acercamiento donde sí se lean gestos y siluetas |
+| Capturas Playwright y pruebas PWA existentes | Ampliar para piloto y comparación; no reemplazar cobertura existente por una captura bonita |
+| `artifacts/*` está ignorado por Git | Un informe remoto necesita adjuntos o almacenamiento deliberado; una ruta local ignorada no es una entrega remota |
+| La base v2.88 incluye animales domésticos y fauna ambiental en el render | Incluirlos en la auditoría de paridad; su representación derivada no autoriza inventar un sistema ganadero en el motor |
+
+Opciones consideradas: mejorar sprites requiere menos infraestructura, pero no
+cubre la preferencia por personajes volumétricos; articular piezas 2D es viable
+pero limita las vistas; migrar a otro motor introduce portabilidad y reescritura
+sin evidencia de necesidad. Se elige **Three.js + modelos GLB + cámara fija**
+porque mantiene la aplicación y permite compartir un rig y animaciones.
+La recomendación es de ingeniería, no una medición de rendimiento ya realizada.
+
+Las referencias citadas por el usuario expresan cualidades: cercanía de los
+personajes, pueblo legible, profundidad, color y ambiente. No se copiarán sus
+personajes, escenarios ni recursos. El resultado debe tener identidad propia.
+
+Capacidades del entorno verificadas en esta ronda: lectura y escritura de
+archivos, ejecución de comandos y revisión de imágenes locales disponibles;
+control CUA de navegador disponible; control de aplicaciones nativas deshabilitado.
+No se puede prometer manejar Blender mediante clics aquí. La búsqueda en PATH
+y `C:/Program Files/Blender Foundation` no encontró Blender; instalación y
+ejecución siguen pendientes. No se ha probado GPU, exportación ni acceso remoto.
+
+### D.2 Decisiones, alcance y puertas
+
+**Decidido:** maqueta medieval estilizada, cámara ortográfica inclinada con
+orientación fija, desplazamiento y zoom; habitantes 3D; arte original generado
+mediante scripts editables; Blender como herramienta de autoría preferida;
+Three.js como renderer propuesto; motor y guardados conservados.
+
+**A validar:** proporciones, inclinación, materiales, calidad de sombra, rig,
+cadencia visual, rendimiento, tamaño descargable y dispositivo objetivo.
+No se fijan polígonos, huesos, FPS garantizados ni megabytes sin medir.
+
+Fuera de esta fase: interiores explorables, cámara libre, relieve que cambie
+rutas, físicas de personajes, combate nuevo, simulación de colisiones sociales,
+editores dentro del juego y generación de modelos durante la partida. El
+relieve inicial es visual y no puede representar una barrera transitable falsa.
+
+Puertas, en orden:
+
+| Puerta | Evidencia necesaria | Consecuencia de no pasar |
+|---|---|---|
+| P0 · Fabricación remota | Crear → exportar → cargar → capturar sin interacción de escritorio | Reparar herramientas; no producir catálogo |
+| P1 · Dirección artística | Un rincón de aldea y un habitante legibles en el navegador, general y cerca | Iterar forma/paleta/escala; no multiplicar modelos |
+| P2 · Vida | Caminar, trabajar y cargar; pausa y velocidades resueltas | Corregir rig, rutas y reloj antes de nuevas acciones |
+| P3 · Escala | Escena representativa, dispositivo identificado y métricas repetibles | Reducir coste y revisar presupuesto, sin degradar silenciosamente criterios |
+| P4 · Paridad | Efectos, interacción, guardado, letargo y PWA verificados | Mantener Canvas como producción |
+| P5 · Sustitución | Revisión visual aceptada y regresiones cerradas | Activación explícita, reversible y documentada |
+
+El orquestador puede iterar autónomamente dentro de una dirección aprobada.
+Para P1 y P5 pide una decisión remota sobre un resultado concreto. Mientras no
+llegue, puede completar validaciones independientes, pero no registrar aprobación
+por silencio. No se requiere al usuario delante del ordenador.
+
+### D.3 Dirección artística y criterios de lectura
+
+Intención: un valle que apetezca observar y cuya historia se pueda leer al
+acercarse. Formas compactas, volúmenes claros, superficies mates y detalle
+concentrado en puertas, herramientas, tejados y gestos. La iluminación ayuda
+a leer el volumen sin ocultar escasez, ruina o enfermedad.
+
+**Composición.** En vista general deben distinguirse núcleo, campos, bosque,
+río y huellas de abandono. En vista cercana, manos/herramientas y dirección de
+marcha. Reservar aire para las fichas y controles en vertical; ajustar encuadre
+al área útil real, no restar una altura fija como nuevo contrato. Ofrecer
+restablecer vista; la selección no debe perderse al abrir una ficha.
+
+**Habitantes.** Cabeza y manos ligeramente enfatizadas, postura reconocible,
+ropa medieval simplificada. Comparar articulación de piezas rígidas y malla
+deformable simple sobre el mismo personaje antes de cerrar el rig. Evitar
+adoptar muñecos de cápsulas como arte final por comodidad. Personalidad mediante
+silueta, accesorios, postura y color; las variaciones son estables por id.
+Una variante no puede sugerir un oficio que la persona no tiene. Edad derivada
+del estado, sin guardar edades o apariencias nuevas en la partida.
+
+**Arquitectura.** Muros anchos y tejados con silueta clara; casa, granero y
+fragua deben distinguirse sin texto. Madera y piedra son familias coherentes,
+no un simple cambio de color. Mejoras y ruinas conservan identidad y huella.
+No reducir edificios del estado a una colección de casas genéricas.
+
+**Terreno.** Grandes masas de color antes que detalle. Senderos continuos,
+orillas legibles y árboles agrupados con variación limitada y determinista.
+La decoración no oculta destinos, no inventa puentes ni cambia transitabilidad.
+No se mueve el edificio real para mejorar una composición de captura.
+
+**Color y material.** Paleta maestra con roles semánticos: tierra, hierba,
+follaje, agua, madera, piedra, cubierta, piel, tejido, luz y acento de selección.
+Probar temperaturas cálida/neutra y saturación contenida manteniendo la misma
+cámara y geometría. Materiales exportables sencillos; los nodos de Blender
+que no viajan a glTF necesitan horneado o sustitución verificada. Las sombras
+no se pintan en texturas si después contradicen la luz dinámica.
+
+**Estaciones y crisis.** Silueta/ocupación y signos además del color. Nieve
+dosificada, bosque talado con claros y restos, campos cosechados realmente
+distintos. El granero expresa cantidad usando el estado; hambre, fe, peste y
+fragua apagada conservan el significado de §11.1. Evitar embellecer una crisis
+hasta que deje de reconocerse. No añadir iconografía que prometa mecánicas.
+
+Ficha obligatoria de aceptación visual: silueta a tamaño de juego, escala junto
+a humano/puerta/celda, orientación, cuatro estaciones, color y grises,
+intersecciones y lectura de estado. Clasificar cada defecto como bloqueo,
+mejora o preferencia. P1 se falsea si solo resulta atractivo en el render de
+Blender, si los trabajos no se distinguen al acercarse o si los edificios tapan
+el pueblo a la distancia de uso.
+
+### D.4 Fabricación reproducible de modelos y animaciones
+
+Flujo preferido: **receta y parámetros → Blender en segundo plano → `.blend`
+de inspección → `.glb` de ejecución → visor Three.js → capturas y clips → revisión**.
+La interfaz gráfica es opcional para diagnóstico futuro, nunca requisito de
+la construcción. No se sustituye revisión visual por inspección del script.
+
+Estructura prevista, creada por los módulos correspondientes:
+
+```text
+art/recipes/                 # parámetros y paleta; fuente de autoría
+art/source/                  # fuentes manuales solo si se declaran canónicas
+art/catalog.json             # identidad, procedencia, variantes y estado de cada recurso
+tools/art/                   # scripts Python/Blender y runner TypeScript
+tools/graphics/              # visor, captura, validación y medición
+src/render3d/                # escena, cámara, adaptación, animación, selección
+public/assets/valley3d/       # GLB y manifiesto aprobados para distribución
+artifacts/graphics/<ronda>/   # resultados generados; no se asumen publicados
+docs/graphics-rounds/        # briefs ejecutados, evidencias resumidas y decisiones
+```
+
+No mantener dos fuentes editables para un mismo recurso. Por defecto la receta
+es canónica y el `.blend` es generado. Si hace falta edición manual, promover
+explícitamente ese `.blend` a fuente con procedencia; no sobrescribirlo mediante
+el generador. Scripts compartidos separan construir geometría, asignar material,
+crear rig, animar, exportar y preparar capturas. No un script monolítico por pueblo.
+
+Cada recurso declara id, versión, receta/fuente, versión de Blender/exportador,
+materiales, clips, dimensiones, origen, conectores, estadísticas y procedencia.
+Identidad del recurso estable; contenido distribuido con hash. Los ficheros
+generados no se editan a mano. Exportación a temporal, validación y promoción
+atómica: un proceso interrumpido no reemplaza el último recurso válido.
+
+Convención espacial: una celda del motor es una unidad de escena. Mapa `(x,y)`
+se proyecta a escena `(x,0,y)`, eje vertical `+Y` en ejecución. Origen de edificio
+en su esquina lógica, geometría local sobre la huella `w × h`; aldeano con origen
+en el suelo entre los pies y frente local `+Z`. Blender usa su convención nativa
+y la exportación hace la conversión; probar con un recurso asimétrico marcado
+con ejes para evitar una doble rotación. Nombres de conectores: `door`,
+`work_anchor`, `hand_r`, `hand_l`; manifiesto especifica cuáles exige cada tipo.
+Las unidades son contrato de coordenadas, no una estimación artística de metros.
+
+Para el primer personaje, comparar piezas rígidas frente a piel sencilla en
+un banco común. El rig ganador comparte jerarquía y nombres entre variantes.
+Ropa y herramientas no requieren un rig por aldeano. Exportar acciones como
+clips con nombres estables; hornear restricciones cuando corresponda y verificar
+el GLB, no asumir que un control de Blender existe en el navegador.
+
+Clips iniciales: `idle`, `walk`, `work_hoe`, `carry_walk`. Locomoción **in-place**:
+el controlador mueve el nodo raíz; el clip mueve el cuerpo. Asociar longitud
+de zancada para sincronizar velocidad y evitar deslizar los pies. Las acciones
+posteriores (`work_hammer`, `work_chop`, etc.) necesitan un brief y destino
+válido antes de producirse. La carga es un accesorio, no un segundo cuerpo.
+
+Validación de entrega: archivo cargable, escala/ejes, normales, geometría finita,
+materiales soportados, texturas resueltas localmente, conectores presentes,
+clips exigidos no vacíos, rig consistente y bucles sin salto visible. Un render
+de referencia frontal/lateral ayuda a detectar fallos; el juicio final ocurre
+con la cámara del juego. Reconstrucción reproducible significa equivalencia
+de geometría/material/animación; no exigir bytes idénticos de `.blend` si sus
+metadatos cambian. Registrar hashes de los artefactos concretos entregados.
+
+### D.5 Fronteras de software y contrato propuesto
+
+Flujo de datos: `GameState` → adaptación de solo lectura → escena derivada →
+presentación y GPU. La selección devuelve identidad al DOM; las decisiones
+siguen entrando por la API de juego existente. Ningún objeto Three.js, rig,
+reloj cosmético o cámara entra en el guardado. Los recursos no importan motor.
+
+El piloto vive en `src/render3d/`; no sustituye `src/render/` durante P0–P3.
+Separar una galería de recursos del piloto que lee una partida real. La galería
+sirve para arte; la partida real demuestra compatibilidad. Datos artificiales
+de estrés se etiquetan y no cuentan como evidencia de balance.
+
+Contrato a materializar por G-01 en `src/render3d/contracts.ts`, importando
+`GameState` desde el motor; todavía no es una API existente:
+
+```ts
+export type GraphicsTarget =
+  | { kind: 'building'; id: number }
+  | { kind: 'villager'; id: number }
+  | { kind: 'terrain'; x: number; y: number };
+
+export interface GraphicsFrame {
+  readonly tickFraction: number;
+  readonly presentationSeconds: number;
+  readonly deltaSeconds: number;
+  readonly speed: 0 | 1 | 4 | 16;
+  readonly reducedMotion: boolean;
+  readonly discontinuity: boolean;
+}
+
+export interface GraphicsViewport {
+  readonly widthCss: number;
+  readonly heightCss: number;
+  readonly pixelRatio: number;
+}
+
+export interface GraphicsRenderer {
+  resize(viewport: GraphicsViewport): void;
+  paint(state: Readonly<GameState>, frame: GraphicsFrame): void;
+  pick(localXCss: number, localYCss: number): GraphicsTarget | null;
+  track(id: number | null): void;
+  dispose(): void;
+}
+
+export interface GraphicsRendererOptions {
+  readonly canvas: HTMLCanvasElement;
+  readonly assetBaseUrl: string;
+  readonly quality: 'low' | 'standard';
+}
+
+export function createGraphicsRenderer(
+  options: GraphicsRendererOptions,
+): Promise<GraphicsRenderer>;
+```
+
+`pick` consulta la última escena pintada, con coordenadas CSS locales al canvas;
+no recalcula otra multitud. Tipos estructuralmente compatibles con `InspectTarget`;
+el renderer no importa UI. `Readonly` superficial no basta como garantía:
+prohibición de mutación respaldada por pruebas sobre estado serializado y RNG.
+El adaptador debe copiar vectores y listas que vaya a modificar.
+
+El reloj entra desde un propietario único de presentación, fuera del motor.
+La implementación decide estructura interna de cachés; no agrega campos
+inventados de profesión, destino o animación al `GameState`. G-01 valida tipos
+y límites; G-06 materializa el contrato. No publicar métodos vacíos para cumplir
+una interfaz. Hasta entonces los contratos son tipos, no un renderer ficticio.
+
+La carga asíncrona muestra estado de carga y error recuperable. El controlador
+de aplicación evita duplicar arranques y destruye una carga que terminó tras
+cerrar su vista. `dispose` libera listeners, mezcladores y recursos propios;
+geometrías/texturas compartidas tienen propietario explícito. No se destruyen
+recursos aún usados por otro habitante. Iniciar/detener renderer no inicia ni
+detiene ticks adicionales.
+
+### D.6 Tiempo, rutas y comportamiento visual
+
+La simulación conserva §4 íntegra. El piloto introduce un reloj de presentación
+acumulado con tiempo real visible y controlado por pruebas. No usa hora de pared
+para determinar la apariencia en capturas. Pausa congela desplazamiento y clips;
+la cámara y fichas siguen respondiendo. Ocultar pestaña suspende presentación.
+Al volver o terminar letargo se reconstruye desde el estado final sin representar
+todo el intervalo omitido. `discontinuity` cancela trayectos/transiciones obsoletos.
+
+**Decisión para el piloto:** el día escénico se desacopla de la semana, también
+a ×1. Su duración se calibra en G-05 y no escala automáticamente con ×4/×16.
+Así la marcha resulta legible en todas las velocidades; los cambios reales de
+estado siguen reflejándose al tick. Esto reemplaza el día por tick únicamente
+en el piloto. Las capturas especifican tick y tiempo de presentación por separado.
+
+Cada actor presente posee estado efímero de representación: en casa, saliendo,
+caminando, trabajando, regresando. La máquina no produce recursos. La actividad
+usa destinos derivados y validados; si faltan, se representa reposo o salida
+a un destino permitido, nunca se inventa un taller. El domingo/reuniones
+conserva su condición semántica cuando proceda, pero no obliga a reproducir
+trayectos completos por cada semana acelerada.
+
+Moverse por tramos transitables, girar según tangente y resolver las esquinas
+sin recortar por agua o edificios. Las rutas actuales pueden usar centros
+interiores de edificios: adaptar visualmente entrada/salida mediante `door`
+y ocultación dentro de la huella, sin cambiar el algoritmo económico de tráfico.
+Este caso se prueba antes de sustituir `crowd.ts`.
+
+Cambio de casa/destino: invalidar la ruta visual pertinente; replanificar desde
+posición válida. Muerte o marcha: retirar actor y selección sin seguir una ruta
+antigua. Demolición/tala: invalidar anclas afectadas. Nueva partida/guardado:
+vaciar cachés ligadas a la anterior. Las transiciones no pueden hacer aparecer
+muertos trabajando ni terminar una cosecha visual como si produjera grano.
+
+El máximo visible inicial conserva el límite actual; priorizar seleccionado y
+nombrados, completar con orden estable. No clonar habitantes para llenar escenas.
+Representación reducida puede disminuir animación, detalle y efectos, pero
+conserva señales relevantes. G-05 define y verifica `prefers-reduced-motion`:
+sin balanceos ambientales ni destellos; selección y estados siguen legibles.
+
+### D.7 Cámara, interacción y continuidad de producto
+
+Cámara inclinada fija: calibrar ángulo contra río, densidad de casas y lectura
+de personajes; no asumir que 45 grados es automáticamente óptimo. Zoom modifica
+el volumen ortográfico y mantiene el punto bajo el gesto. Arrastre limitado al
+valle, encuadre inicial legible y restauración de vista. Probar retrato, paisaje,
+distintas densidades de píxel, fichas abiertas y cambio de tamaño.
+
+Selección en espacio de pantalla: prioridad para actor visible cercano al toque,
+después edificio y terreno; resolver ambigüedades de forma estable. El tamaño
+táctil sigue §11.6; no exigir acertar en una mano de pocos píxeles. Probar techos
+y árboles delante del objetivo. Primera solución: encuadre y resalte de selección;
+si hace falta ocultación selectiva, incorporarla con brief, sin transparentar todo
+el pueblo indiscriminadamente. Los objetos decorativos no interceptan la ficha.
+
+Conservar fichas DOM, accesibilidad y crónica. Acciones de cámara no son decisiones
+del juego. La carga 3D no consume tiempo de simulación ocultamente; guardar/cerrar
+en carga o tras error conserva los contratos de §13. Cuando el dispositivo no
+pueda iniciar WebGL o pierda el contexto, ofrecer recuperación o Canvas sin
+recargar ni borrar la partida. Canvas y WebGL requieren canvases distintos al
+cambiar de tipo de contexto: no intentar convertir el mismo contexto ya creado.
+
+### D.8 Catálogo y orden de producción artística
+
+Primero un conjunto mínimo coherente: casa, campo, camino, árbol, habitante y
+azada/carga. Modelo junto a otros para evaluar escala. Después granero y fragua
+para probar cantidad y luz; por último el resto del catálogo. Nunca producir
+variantes de todo antes de que P1 y P2 estén resueltas.
+
+Matriz de cobertura G-10, derivada del `BuildingKind` real al iniciar la ronda:
+
+| Familia | Recursos y variaciones obligatorias |
+|---|---|
+| Vivienda | `house`, `stone_house`: construcción, ocupación/luz, mejora y ruina aplicables |
+| Sustento | `field`, `granary`, `mill`: estación, cosecha, grano y funcionamiento según estado disponible |
+| Comunidad | `well`, `chapel`, `church`, `grave_yard`: identidad y señales de reunión, fe y muerte existentes |
+| Trabajo | `smithy`: actividad y apagado identificables, herramienta vinculada a actividad |
+| Defensa | `palisade`, `wall`, `watchtower`: piezas que respetan huellas y no cierran pasos inexistentes |
+| Mundo | Todos los terrenos, tres estados actuales de camino, bosque talado/rebrote y ruinas heredadas |
+| Habitantes | Variación estable, nombrados distinguibles, edad/rol cuando el estado permita afirmarlos |
+| Fauna existente | Animales y fauna ambiental del render vigente: inventariar especies, anclas y comportamiento al abrir G-10, conservando su naturaleza cosmética |
+
+Cada fila se cruza con obras, desaparición y efectos de §8/§11 que le afecten.
+Si el estado no contiene un detalle, el arte no lo presenta como dato exacto.
+Por ejemplo, no inventar una reserva individual transportada porque el juego
+solo tenga una cantidad global. Cada lote declara qué cubre y qué falta.
+
+### D.9 Rendimiento: presupuesto antes de ampliar
+
+§10.7 contiene objetivos del Canvas, no mediciones ni garantías trasladables
+a 3D. El banco 3D conserva como escena de comparación los 80 habitantes y
+45 edificios del objetivo actual. También cubre escenas pequeñas, maduras,
+bosque denso, invierno, crisis y cámara cercana. El modelo exacto de móvil,
+navegador y modo energético aún deben identificarse en G-00/G-09.
+
+G-09 mide y el orquestador ratifica aquí una tabla con valor objetivo, límite,
+perfil, escena, dispositivo, fecha y artefacto. Filas obligatorias: tiempo de
+frame mediano/p95/p99, carga fría y caliente, bytes transferidos por recurso,
+tiempo de parseo/subida, draw calls, triángulos, texturas y sus dimensiones,
+estimación de memoria GPU claramente etiquetada, memoria observable y estabilidad
+en sesión sostenida. Sin acceso fiable a GPU timing se informa tiempo CPU y
+cadencia, sin llamar al primero tiempo GPU. Emulación móvil no sustituye hardware.
+
+No se inventan límites numéricos en esta revisión. G-09 propone presupuestos
+basándose en pruebas y no se supera P3 hasta incorporarlos como asertos. El
+objetivo de fluidez se expresa en tiempo de frame y estabilidad, no solo FPS
+medio. El objetivo histórico de 60 fps se contrasta; cualquier cambio requiere
+decisión visible, no rebajar el test hasta pasar.
+
+Orden de optimización: medir; compartir geometrías/materiales; agrupar estáticos
+o instanciar árboles; evitar reconstrucción de escena cada frame; limitar pixel
+ratio; comparar sombras sencillas y sombras dinámicas; reducir animación lejana;
+solo después compresión o shaders especializados. Instanciar árboles no implica
+que 80 mallas con esqueletos puedan compartir animación con la misma técnica.
+Prueba específica compara coste de rig/variantes antes de cerrar producción.
+
+Perfil bajo degrada sombra, vegetación decorativa, resolución y efectos en ese
+orden a validar, manteniendo personas y señales de crisis. Los valores visuales
+se centralizan en futura `src/render3d/visual-config.ts` y recetas artísticas;
+son una excepción acotada a la regla general de constantes en `engine/balance.ts`:
+**solo** presentación, jamás balance. D.9 será su fuente numérica una vez calibrada.
+Las proporciones exploratorias se registran como hipótesis en recetas, no límites
+de test arbitrarios. No duplicar valores entre Python y TypeScript.
+
+### D.10 Pruebas y evidencia
+
+1. **Aislamiento:** mismo estado/decisiones con Canvas, 3D y sin renderer;
+   variar número de frames, cámara, calidad y animación; estados serializados y
+   flujos RNG idénticos tras avanzar. No exigir píxeles idénticos entre GPUs.
+2. **Recursos:** generar en carpeta limpia, validar exportación y cargar GLB en
+   navegador; conectores/huellas, clips y texturas; fallos no promueven salida.
+3. **Actores:** pausas, cambios de velocidad, desaparición, nueva partida,
+   ruta inválida, terreno modificado, casa ausente y retorno tras letargo.
+4. **Selección:** mismo actor dibujado y tocado, zoom/pan, solapamiento,
+   desaparición y fichas; objetivos táctiles y movimiento reducido.
+5. **Ciclo GPU:** abrir/cerrar/reintentar, carga cancelada y pérdida de contexto;
+   recursos propios vuelven a una base estable, sin exigir cero objetos internos
+   de Three.js. No publicar como memoria real una estimación sin etiqueta.
+6. **Paridad visual:** fixtures reproducibles de escasez, frío, peste, tala,
+   fragua apagada, mejora, ruina, muerte y herencia; tabla estado → señal → captura.
+7. **PWA:** GLB y texturas locales bajo el prefijo de despliegue, primera apertura
+   online y posteriores offline, actualización entre versiones, recurso ausente,
+   cuota insuficiente y caché parcial. No descargar recursos críticos de CDN.
+8. **Rendimiento:** series repetidas con escena, duración y calentamiento
+   registrados. Si no hay móvil accesible, P3 queda pendiente con diagnóstico PC.
+
+Cada entrega visual congela semilla, decisiones/fixture, tick, tiempo escénico,
+cámara, perfil, viewport, pixel ratio, versión del código y hash de recursos.
+Las comparaciones cambian una variable deliberada. Capturas pequeñas de juego
+además del detalle; hoja de contacto color/grises y clip para animación.
+La revisión del agente debe abrir las imágenes y describir defectos concretos.
+Una revisión humana remota juzga atractivo; un test no puede certificarlo.
+
+Al cerrar módulo ejecutable: typecheck, suite rápida, lint y build; añadir las
+pruebas de navegador/recursos afectadas. Banco largo solo si se toca simulación
+o aparece evidencia de regresión que lo justifique. Un cambio exclusivamente
+documental se comprueba por diff, referencias y coherencia, no ejecutando balance.
+
+### D.11 Operación remota y gobierno de rondas
+
+El flujo debe funcionar sin sesión de Blender abierta: runner lanza procesos
+acotados en segundo plano, guarda logs y produce informes. Orden conceptual:
+`doctor → build asset → validate → preview → capture → report`. G-00/G-02
+implementarán los comandos; estos nombres no son comandos disponibles hoy.
+Fijar rutas mediante configuración local explícita, sin buscar ejecutables en
+cada frame. Si se necesita instalar, el agente concreta paquete, versión,
+procedencia y destino y respeta los permisos del entorno.
+
+**Requisitos físicos:** el host ejecutor debe estar encendido, accesible y sin
+suspensión durante los trabajos. No hay continuidad automática garantizada con
+el ordenador apagado o la tarea detenida. G-00 prueba el canal remoto realmente
+disponible: enviar trabajo, recuperar progreso y abrir una evidencia fuera del
+host. Si falta, propone un ejecutor siempre disponible o CI con artefactos,
+especificando coste/credenciales; no lo contrata ni publica por inferencia.
+No abrir puertos públicos ni depender de escritorio remoto para el pipeline.
+
+Reanudación: cada ejecución tiene id, revisión de spec, commit, inputs, comandos,
+etapas completas, outputs y error. Reejecutar solo etapas invalidadas; scripts
+idempotentes sobre su directorio de salida. Un bloqueo de GPU puede permitir
+autoría/exportación y pruebas CPU, pero no se registra validación gráfica.
+Límites de tiempo y cancelación limpian procesos propios; no matar todos los
+Blender del equipo. Ningún diálogo modal puede ser parte del camino feliz.
+
+Entrega remota: breve informe y hoja de contacto/clip adjuntos donde el canal
+los soporte, o artefacto privado accesible verificado. Las rutas locales se
+conservan para reproducir, pero no se consideran enlaces accesibles desde el
+móvil. No se crean automatizaciones ni servicios persistentes en esta ronda de
+planificación. La primera ejecución remota confirma capacidades, sin promesas
+de acceso que no se hayan ensayado.
+
+Roles: **orquestador** diseña, asigna, revisa y versiona esta spec; **agente de
+arte** implementa recetas/modelos/rig; **agente de render** integra escena y
+comportamiento; **verificador** reproduce y examina evidencia. Pueden ser roles
+secuenciales del mismo sistema. La función de orquestación no escribe código
+de producción. Paralelizar solo briefs sin ficheros compartidos ni contratos
+pendientes. No crear tareas de usuario automáticamente para simular delegación.
+
+Solo el orquestador integra cambios en la spec y ficheros compartidos de
+configuración. Al empezar: `git status`, revisión actual y diff local. No
+sobrescribir trabajo concurrente. Si el estado cambia, releer la sección
+afectada y aplicar una modificación acotada sobre la última copia. Ramas siguen
+la convención §2.5; el usuario decide publicación/merge según autorización.
+
+Formato de cada ronda:
+
+- **Cabecera:** id, versión, lecturas obligatorias y alcance excluido.
+- **PARTE 0 — Cierres:** decisiones previas y comprobaciones pendientes; si una
+  dependencia necesaria no está verificada, no iniciar su trabajo dependiente.
+- **PARTE 1 — Experimento:** hipótesis, alcance de archivos, contrato, tests y
+  evidencia posible hoy. No pedir métricas de módulos aún inexistentes.
+- **Entrega:** qué cambió, cómo reproducir, capturas abiertas/revisadas, mediciones,
+  límites, desviaciones y qué resultado falsaría la hipótesis.
+
+Arbitraje: ratificar con evidencia, rechazar explicando la restricción, o promover
+una decisión que la spec no cubría. Registrar motivo antes de la ronda siguiente.
+Para ahorrar uso: construir solo recursos afectados, compartir bibliotecas,
+hojas de contacto compactas, no cargar todo el historial ni repetir bancos
+sin cambios. Presupuesto de tiempo/créditos explícito cuando el usuario lo dé;
+si se agota, dejar checkpoint reproducible, nunca marcar aprobado lo pendiente.
+
+### D.12 Briefs por módulo
+
+Los ficheros indicados son el alcance autorizado al despachar cada brief, no una
+orden de implementar todos ahora. Nuevos paths se crean en su ronda. Todos
+entregan informe `docs/graphics-rounds/G-XX.md` y evidencia en su carpeta
+`artifacts/graphics/G-XX/`. Los informes no son fuente normativa.
+
+#### G-00 · Entorno y circuito remoto
+
+**Objetivo:** demostrar herramientas y acceso sin presencia física.
+**Depende de:** nada. **Lectura:** D.0–D.2, D.4, D.11.
+**Ficheros:** `tools/graphics/doctor.ts`, informe/evidencia G-00.
+**Contrato:** diagnóstico invocable mediante el `tsx` local; salida estructurada
+con herramienta, ruta, versión, comprobación, resultado y motivo de fallo.
+No exponer secretos ni volcar variables de entorno completas.
+**Reglas:** buscar instalaciones alternativas acotadas; si hay Blender ejecutar
+un trabajo mínimo en background que guarde una imagen y GLB en artifacts;
+documentar dependencia faltante sin fingir ejecución. No instalar por sorpresa.
+**Tests exigidos:** rutas con espacios, falta de ejecutable, código de salida;
+abrir imagen y demostrar carga del GLB si están disponibles las herramientas.
+**Terminado cuando:** pipeline mínimo comprobado y canal remoto con evidencia,
+o bloqueo preciso que impide P0. No cerrar P0 con una lista de programas.
+
+#### G-01 · Costuras, contratos y banco de captura
+
+**Objetivo:** piloto separado y evidencia repetible antes de arte complejo.
+**Depende de:** diagnóstico G-00; no exige Blender para la escena de prueba.
+**Lectura:** D.5, D.7, D.10. **Ficheros:** `src/render3d/contracts.ts`,
+`tools/graphics/viewer.html`, `tools/graphics/viewer.ts`,
+`tools/graphics/capture.ts`, `tests/fast/graphics-contracts.test.ts`.
+**Contrato:** tipos D.5; visor de desarrollo recibe fixture, cámara y tiempo
+explícitos y emite ready/error después de carga real, sin sleeps arbitrarios.
+**Reglas:** propuesta de dependencia Three.js/versionado a orquestador;
+`package.json` y lockfile los integra el responsable único de configuración.
+**Tests exigidos:** aislamiento, captura repetible dentro del mismo entorno,
+error de recurso visible al runner. **Terminado cuando:** una geometría asimétrica
+se ve y captura, contratos compilan y juego Canvas sigue funcionando.
+
+#### G-02 · Pipeline de arte y contrato GLB
+
+**Objetivo:** regenerar y validar un recurso desde fuentes.
+**Depende de:** G-00/P0 herramientas, G-01. **Lectura:** D.4 y D.10–D.11.
+**Ficheros:** `tools/art/`, `art/recipes/axis-marker.json`,
+`art/catalog.json`, `tests/fast/art-manifest.test.ts`.
+**Contrato:** comandos de runner `build`, `validate`, `report` con id de recurso
+y carpeta de salida; salida no cero en fallo; manifiesto con campos D.4.
+**Reglas:** fijar Blender/exportador ensayados; fuente única; promoción atómica.
+**Tests exigidos:** reconstruir carpeta limpia, ejes/escala y carga en visor,
+interrupción no corrompe aprobado. **Terminado cuando:** P0 reproducible completo.
+
+#### G-03 · Rincón de aldea y dirección artística
+
+**Objetivo:** cerrar lenguaje visual con un conjunto pequeño.
+**Depende de:** G-02. **Lectura:** D.3–D.4, D.8.
+**Ficheros:** `art/recipes/palette.json`, `art/recipes/village-kit/`,
+`art/recipes/villager-study/`, informe G-03; cambios de catálogo por propietario.
+**Contrato:** casa, campo, camino, árbol y estudio de habitante exportables bajo D.4.
+**Reglas:** comparar variantes controladas; parámetros etiquetados exploratorios;
+no reutilizar recursos de los juegos de referencia.
+**Tests exigidos:** huellas, materiales, capturas en cámara común y grises;
+leer a tamaño de móvil. **Terminado cuando:** P1 aceptada sobre visor real.
+**Falsación:** si necesita posproducción externa para resultar legible, revisar arte.
+
+#### G-04 · Habitante, rig y biblioteca inicial
+
+**Objetivo:** personaje terminado y cuatro clips iniciales coherentes.
+**Depende de:** G-03/P1. **Lectura:** D.3–D.4, D.6.
+**Ficheros:** `art/recipes/villager/`, `tools/art/rigs/`,
+`tools/art/animations/`, `tools/graphics/animation-audit.ts`.
+**Contrato:** clips y conectores D.4, misma jerarquía en variantes; locomoción in-place.
+**Reglas:** comparar rígido/deformable antes de fijar elección; probar manos,
+ropa y accesorios; no prometer expresividad solo por existir keyframes.
+**Tests exigidos:** duración/curvas válidas, no deriva raíz, clips cargados,
+bucles y transiciones inspeccionados en vídeo. **Terminado cuando:** caminar,
+trabajar y cargar se reconocen desde la cámara de juego sin deformaciones graves.
+
+#### G-05 · Reloj de presentación y actores
+
+**Objetivo:** vida continua sincronizada con verdad del estado.
+**Depende de:** G-04. **Lectura:** §4, §7.6, D.5–D.6.
+**Ficheros:** `src/render3d/presentation-clock.ts`, `src/render3d/actors/`,
+`tests/fast/graphics-actors.test.ts`, `tools/graphics/actor-scenarios.ts`.
+**Contrato:** `GraphicsFrame`; actores derivados por id, sin campos nuevos guardados.
+**Reglas:** acceso a rutas existente, anclas validadas, poses y retirada D.6;
+calibrar duración escénica y zancada, llevar decisión a D.9 antes del cierre.
+**Tests exigidos:** pausa/velocidades, letargo, muerte, mudanza, ruta fallida,
+esquinas y no mutación. **Terminado cuando:** P2 con clips en todas las velocidades
+y ausencia de saltos/lógicas económicas nuevas.
+
+#### G-06 · Escena conectada a una partida
+
+**Objetivo:** terreno, edificios y actores de estado real, incrementales.
+**Depende de:** G-03, G-05. **Lectura:** §3.5, D.5–D.6, D.8–D.10.
+**Ficheros:** `src/render3d/renderer.ts`, `src/render3d/world/`,
+`src/render3d/assets.ts`, `src/render3d/visual-config.ts`,
+`tests/fast/graphics-world.test.ts`, visor G-01 bajo propietario acordado.
+**Contrato:** implementación completa de `createGraphicsRenderer`/D.5;
+selección básica de geometría se perfecciona en G-07, nunca método vacío.
+**Reglas:** invalidar cambios relevantes, recursos compartidos con dueño,
+errores recuperables; no reconstruir todo cada fotograma.
+**Tests exigidos:** construcción/ruina/tala, nueva partida, disposición/cancelación,
+estado idéntico con distinto número de frames. **Terminado cuando:** una partida
+real produce escena correcta y el ciclo de vida no filtra recursos propios.
+
+#### G-07 · Cámara, tacto e integración de interfaz
+
+**Objetivo:** jugar y seleccionar desde móvil con el piloto.
+**Depende de:** G-06. **Lectura:** §11, D.5 y D.7.
+**Ficheros:** `src/render3d/camera.ts`, `src/render3d/picking.ts`,
+`src/ui/app.ts`, `src/ui/inspect.ts`, `src/ui/gestures.ts`,
+`src/ui/loop.ts`, `tools/graphics.shots.ts` y
+`tests/fast/graphics-picking.test.ts`.
+**Contrato:** `pick` D.5 y contenido existente de `panelFor`; selector de backend
+de desarrollo con Canvas por defecto; reloj de presentación sin tocar acumulador.
+**Reglas:** un solo propietario de app/loop; zoom real, no CSS; Canvas separado
+al volver de WebGL. **Tests exigidos:** tap/pinch/pan, solapamiento, paneles,
+pausa, reducido, resize y arranque asíncrono. **Terminado cuando:** mismas acciones
+del juego utilizables en piloto sin perder partidas ni accesibilidad.
+
+#### G-08 · Estaciones y consecuencias visibles
+
+**Objetivo:** que la belleza conserve el valle como HUD.
+**Depende de:** G-06; interacción de G-07 para evidencia final.
+**Lectura:** §8, §10–11 relevantes, D.3 y D.8.
+**Ficheros:** `src/render3d/effects/`, `art/recipes/effects/`,
+`tools/graphics/consequence-scenarios.ts`, `tools/graphics-parity.shots.ts` y
+`tests/fast/graphics-effects.test.ts`.
+**Contrato:** matriz de efecto/estado real → señal 3D → evidencia reproducible;
+reutilizar significado existente de `tellsFor` o adaptarlo sin duplicar reglas.
+**Reglas:** resolver condiciones exactas vigentes al abrir el brief; no
+representar consecuencias por temporizadores independientes de su expiración.
+**Tests exigidos:** estación/crisis antes y después de caducar, ruina/herencia,
+legibilidad en grises. **Terminado cuando:** ninguna consecuencia cubierta en
+Canvas desaparece del contrato visual 3D; pendientes de catálogo identificados.
+
+#### G-09 · Banco y presupuesto móvil
+
+**Objetivo:** decidir si el enfoque escala antes del catálogo completo.
+**Depende de:** G-06 y primer conjunto representativo G-08.
+**Lectura:** D.9–D.10. **Ficheros:** `tools/graphics/benchmark.ts`, escenarios
+de rendimiento, informe G-09; optimizaciones posteriores se asignan al dueño
+del módulo medido. **Contrato:** informe estructurado con métricas/contexto D.9.
+**Reglas:** no confundir headless con dispositivo real; no cambiar balance para
+bajar población; usar instancias provisionales etiquetadas si faltan modelos.
+**Tests exigidos:** repetición, sesión sostenida y ciclo de recursos; medir antes
+y después de optimizar. **Terminado cuando:** P3 y presupuesto incorporado a D.9;
+si hardware no está disponible, resultado parcial explícito.
+
+#### G-10 · Catálogo completo por lotes
+
+**Objetivo:** sustituir recursos provisionales con coherencia y cobertura.
+**Depende de:** P1–P3, G-08. **Lectura:** D.3–D.4 y D.8–D.9.
+**Ficheros:** subcarpeta `art/recipes/<familia>/` asignada por lote; publicación
+en `public/assets/valley3d/` por integrador; catálogo con escritor único.
+**Contrato:** una entrada verificable por kind/estado exigible de D.8.
+**Reglas:** dividir vivienda, sustento, comunidad/defensa y mundo en rondas;
+no modificar rig/paleta compartidos sin elevar propuesta.
+**Tests exigidos:** pipeline de recursos y presupuesto por lote, escenas reales
+jóvenes/maduras/ruinosas. **Terminado cuando:** cobertura sin placeholders y
+sin regresión de presupuesto con el catálogo real.
+
+#### G-11 · Distribución, PWA y recuperación
+
+**Objetivo:** uso instalable/offline y recuperación con recursos 3D.
+**Depende de:** G-07, G-10. **Lectura:** §13.4 y D.7/D.10/D.11.
+**Ficheros:** `src/ui/pwa.ts`, `public/sw.js`, `vite.config.ts`,
+`tools/graphics.pwa.ts`, `tools/subpath.pwa.ts`, `tools/stale.pwa.ts`;
+`src/render3d/assets.ts` mediante transferencia explícita de propiedad.
+**Contrato:** manifiesto versionado; recursos bajo base de despliegue;
+fallback conserva estado en memoria. **Reglas:** no purgar caché activa antes
+de disponer de actualización completa; sin publicación como parte de la prueba.
+**Tests exigidos:** casos PWA D.10, error/cancelación y pérdida de contexto.
+**Terminado cuando:** P4 en build de producción, incluido subdirectorio.
+
+#### G-12 · Aceptación y migración de la especificación
+
+**Objetivo:** activar solo lo demostrado y cerrar convivencia temporal.
+**Depende de:** G-00–G-11 y aceptación visual remota.
+**Ficheros:** `docs/design.md`, `CLAUDE.md`, `docs/handover.md` por orquestador;
+activación por agente de integración con brief acotado sobre app/config.
+**Contrato:** §10/§11 y briefs M afectados describen ahora el comportamiento
+aprobado; fuente única de reloj/constantes/presupuestos. **Reglas:** conservar
+historia; decidir mantenimiento del fallback antes de borrar Canvas; no retirar
+tests solo porque ahora fallan. **Tests exigidos:** suite rápida, tipos, lint,
+build, navegador y PWA sobre release candidata; paridad de guardados y checklist
+visual con evidencia. **Terminado cuando:** P5, activación reversible y ninguna
+regla Canvas vigente contradice la arquitectura activada.
+
+### D.13 Dependencias, paralelismo y próximo paso
+
+```text
+G-00 → G-01 → G-02 → G-03 → G-04 → G-05 → G-06
+                                               ├→ G-07 ───────────┐
+                                               └→ G-08 → G-09     │
+                                                          ↓       │
+                                                        G-10 ─────┤
+                                                                  ↓
+                                                                G-11 → G-12
+```
+
+G-07 y G-08 pueden avanzar en paralelo con propiedad de archivos acordada.
+Tras P3, lotes de G-10 se pueden repartir por familias. El orquestador serializa
+catálogo, paleta, contratos y configuración. No adelantar biblioteca completa
+mientras se desconozca el coste del rig. Revisión visual y medición tienen
+autor distinto cuando haya agentes disponibles, sin duplicar implementación.
+
+G-00 ejecutado en v2.90: fabricación local validada; P0 parcial hasta la carga
+Three.js y la comprobación externa descritas en su informe. Próxima ronda:
+**G-01**, que materializa el visor y debe cargar el GLB generado antes de iniciar
+arte complejo.
+La guía no incluye estimaciones en horas: herramientas, capacidad remota y
+criterio artístico siguen sin medir. Tras P0/P1 se estimará por recursos
+aprobados y rondas observadas, con incertidumbre explícita.
+
+### D.14 Fuentes técnicas y límites de evidencia
+
+Documentación primaria consultada para justificar el enfoque; G-00/G-02 deben
+verificar APIs contra la versión instalada, no asumir compatibilidad por estas
+referencias:
+
+- [Blender: argumentos de ejecución en segundo plano y Python](https://docs.blender.org/manual/en/3.0/advanced/command_line/arguments.html).
+  Verifica la existencia del mecanismo; no prueba una instalación local.
+- [Three.js: sistema de animación](https://threejs.org/manual/en/animation-system.html).
+  Soporta clips, huesos y transformaciones; no garantiza buen rig ni rendimiento.
+- [Three.js: cámara ortográfica](https://threejs.org/docs/pages/OrthographicCamera.html).
+- [Three.js: carga GLTF](https://threejs.org/docs/pages/GLTFLoader.html).
+- [Three.js: SkinnedMesh](https://threejs.org/docs/pages/SkinnedMesh.html).
+- [Three.js: liberación de recursos](https://threejs.org/manual/en/how-to-dispose-of-objects.html).
+
+### D.15 Registro detallado de esta revisión
+
+v2.90 arbitra G-00. Se ratifica Blender en segundo plano con 5.2.1 LTS y Chrome
+del sistema como navegador Playwright. El diagnóstico no confía en el código de
+salida de Blender: exige marca de finalización, los tres productos y cabecera
+GLB. Se promueve esta regla porque dos excepciones Python devolvieron 0 durante
+la construcción del propio diagnóstico. P0 permanece parcial: G-01 debe cargar
+el GLB en Three.js y la evidencia aún debe abrirse desde fuera del host. Informe:
+`docs/graphics-rounds/G-00.md`.
+
+v2.89 añade el programa sin cambiar código de producción. Motivos: separar
+capacidad de generar modelos de capacidad de manejar una GUI; hacer comprobable
+la continuidad remota; conservar inversión del motor; dar prioridad a escala,
+legibilidad, animación y medición antes de fabricar catálogo. Módulos afectados
+en futuras rondas: M-16–M-18, M-19/M-20, M-21, accesibilidad, persistencia/PWA
+y sus pruebas. No se declara completado ningún trabajo pendiente anterior.
+La base incorporaba revisiones hasta v2.88; se conserva íntegra y se añade este
+anexo. El sello temporal usa la fecha observada del entorno, aunque el historial
+anterior tenga fechas posteriores.
 
 ---
 

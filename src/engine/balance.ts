@@ -47,6 +47,11 @@ export const FOUNDING = {
   FAITH: 50,
   HOUSES: 4,
   FIELDS: 2,
+  // TUNE: §12.2 said nothing about animals. They arrive with what a party of
+  // twenty could drive: hens, and one milk cow — exactly the cow that two
+  // fields can pasture (§7.7), so the founding herd is already at its ceiling
+  // and the first growth has to wait for the third field.
+  HERD: { hens: 4, pigs: 0, cows: 1 },
   // TUNE: §12.2 gives the head count of each age group but not the ages
   // themselves, and M-03 has to draw them. Inclusive ranges, in years.
   AGE_RANGES: { adults: [16, 45], children: [1, 13], elders: [60, 70] },
@@ -278,6 +283,24 @@ export const ANIMALS = {
   // reaping of week 35 (§5.1) are when there is something on the field worth
   // taking.
   CROW_WEEKS_BEFORE_HARVEST: 6,
+  // --- Mechanics (§7.7, v2.91). These DO move numbers of the game. -------
+  //
+  // TUNE: §12 had no livestock. Sized against FOOD.GRAIN_PER_PERSON = 1.0 so
+  // that the whole herd a village can hold eats a small but real share of the
+  // food bill: about twenty hens, eight pigs and four cows come to 3.0 a week,
+  // roughly a fourteenth of what forty people eat.
+  UPKEEP: { hens: 0.02, pigs: 0.15, cows: 0.35 },
+  // What a slaughtered head is worth, in the same units: person-weeks of food.
+  // A cow is a week and a half for forty people; the whole herd is a buffer of
+  // the order of half a granary, and it walks.
+  MEAT: { hens: 2, pigs: 25, cows: 60 },
+  // Breeding: one head every this many weeks, and only with a full year of
+  // grain in hand. Slow on purpose — the herd must not outrun a bad winter.
+  BREED_EVERY: 8,
+  BREED_GRAIN_YEARS: 1.0,
+  // A winter week without a palisade. Per week, not per night: the tick is a
+  // week (§4.1) and the wolves of §7.7 come with the cold, not on a schedule.
+  WOLF_RAID_CHANCE: 0.08,
   WOLVES_MAX: 3,
   // How far into the trees a wolf may show, measured from the village centre.
   WOLF_RANGE: 14,

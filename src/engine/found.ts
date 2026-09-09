@@ -54,6 +54,7 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     peakPeople: FOUNDING.POPULATION,
     rng,
     map: generateMap(mapRng),
+    herd: { ...FOUNDING.HERD },
     village: {
       grain: FOUNDING.GRAIN,
       wood: FOUNDING.WOOD,

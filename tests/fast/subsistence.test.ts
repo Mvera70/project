@@ -72,6 +72,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
       forestAge: new Uint8Array(CELLS),
       forestStock: new Uint16Array(CELLS),
     },
+    herd: { hens: 0, pigs: 0, cows: 0 },
     village: {
       grain: FOUNDING.GRAIN,
       wood: FOUNDING.WOOD,
@@ -345,7 +346,13 @@ describe('consumo · §5.3', () => {
   it('una aldea vacía no divide por cero', () => {
     const s = founded(7);
     for (const v of s.people.villagers) v.diedTick = 0;
-    expect(consume(s)).toEqual({ severity: 0, starved: [] });
+    // v2.91: consume devuelve además el parte del rebaño (§7.7). En una
+    // aldea sin nadie no come, no se sacrifica y no nace nada.
+    expect(consume(s)).toEqual({
+      severity: 0,
+      starved: [],
+      herd: { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null },
+    });
   });
 });
 

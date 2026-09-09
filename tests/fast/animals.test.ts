@@ -10,6 +10,7 @@ import { ANIMALS, TIME } from '@engine/balance';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { animalPositions, wildlifePositions } from '@render/animals';
+import { herdCapacity } from '@engine/subsistence/herd';
 import { TERRAIN_CODE } from '@engine/state';
 import { fingerprint } from '../helpers/fingerprint';
 
@@ -52,29 +53,56 @@ describe('el ganado · §7.7', () => {
     expect(animalPositions(state, 0.45)).toEqual([]);
   });
 
-  it('las gallinas siguen a las casas y las vacas a los campos', () => {
+  // v2.91: el conteo dejó de derivarse del censo de edificios y ahora lo dice
+  // `state.herd`. La prueba cambia a propósito, como anunciaba la cabecera.
+  // Lo que se sigue protegiendo es que el dibujo no miente: si el lobo se
+  // llevo la vaca, hay una vaca menos en pantalla.
+  it('el dibujo enseña exactamente el rebaño que la aldea tiene', () => {
     const state = village(20);
+    state.herd = { hens: 5, pigs: 3, cows: 2 };
     const animals = animalPositions(state, 0.45);
-    const houses = state.buildings.filter((b) => b.lostTick === null
-      && (b.kind === 'house' || b.kind === 'stone_house')).length;
-    const fields = state.buildings.filter((b) => b.kind === 'field' && b.lostTick === null).length;
+    expect(animals.filter((a) => a.kind === 'hen')).toHaveLength(5);
+    expect(animals.filter((a) => a.kind === 'pig')).toHaveLength(3);
+    expect(animals.filter((a) => a.kind === 'cow')).toHaveLength(2);
 
-    expect(houses).toBeGreaterThan(0);
-    expect(animals.filter((a) => a.kind === 'hen')).toHaveLength(
-      Math.min(houses, ANIMALS.MAX_PER_KIND) * ANIMALS.HENS_PER_HOUSE,
-    );
-    expect(animals.filter((a) => a.kind === 'cow').length)
-      .toBe(Math.min(Math.floor(fields / ANIMALS.FIELDS_PER_COW), ANIMALS.MAX_PER_KIND));
+    state.herd.cows = 0;
+    expect(animalPositions(state, 0.45).some((a) => a.kind === 'cow')).toBe(false);
   });
 
-  it('no hay cerdos hasta que hay granero con que cebarlos', () => {
+  it('las gallinas siguen a las casas y las vacas a los campos', () => {
+    // La colocación sigue derivada: gallina a puerta de casa, vaca a linde de
+    // campo. Eso no se guarda y no tiene por qué guardarse.
+    const state = village(20);
+    state.herd = { hens: 2, pigs: 0, cows: 1 };
+    const animals = animalPositions(state, 0.45);
+    const houses = state.buildings.filter((b) => b.lostTick === null
+      && (b.kind === 'house' || b.kind === 'stone_house')).sort((a, b) => a.id - b.id);
+    const fields = state.buildings.filter((b) => b.kind === 'field' && b.lostTick === null)
+      .sort((a, b) => a.id - b.id);
+    expect(houses.length).toBeGreaterThan(0);
+    expect(fields.length).toBeGreaterThan(0);
+
+    const hen = animals.find((a) => a.kind === 'hen')!;
+    const house = houses[0]!;
+    expect(Math.hypot(hen.x - (house.x + house.w * 0.5), hen.y - (house.y + house.h)))
+      .toBeLessThan(2);
+
+    const cow = animals.find((a) => a.kind === 'cow')!;
+    const field = fields[0]!;
+    expect(Math.hypot(cow.x - (field.x + field.w * 0.5), cow.y - (field.y + field.h * 0.5)))
+      .toBeLessThan(field.w + field.h);
+  });
+
+  it('sin granero no se puede cebar un cerdo', () => {
+    // La regla del granero se mudó del dibujo a `herdCapacity`, que es donde
+    // tenía que estar desde el principio: es una regla del juego, no un pixel.
     const state = village(20);
     const granaries = state.buildings.filter((b) => b.kind === 'granary' && b.lostTick === null);
     expect(granaries.length).toBeGreaterThan(0);
-    expect(animalPositions(state, 0.45).some((a) => a.kind === 'pig')).toBe(true);
+    expect(herdCapacity(state).pigs).toBeGreaterThan(0);
 
     for (const granary of granaries) granary.lostTick = state.tick;
-    expect(animalPositions(state, 0.45).some((a) => a.kind === 'pig')).toBe(false);
+    expect(herdCapacity(state).pigs).toBe(0);
   });
 
   it('ninguna cabeza se sale del mapa, ni en una aldea del borde', () => {

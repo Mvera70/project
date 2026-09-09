@@ -75,7 +75,6 @@ export function animalPositions(state: GameState, tickFraction: number): Animal[
   const houses = [...standing(state, 'house'), ...standing(state, 'stone_house')]
     .sort((a, b) => a.id - b.id);
   const fields = standing(state, 'field').sort((a, b) => a.id - b.id);
-  const hasGranary = standing(state, 'granary').length > 0;
   const animals: Animal[] = [];
   let id = 0;
 
@@ -85,26 +84,30 @@ export function animalPositions(state: GameState, tickFraction: number): Animal[
     id += 1;
   };
 
-  // Hens: every house has a couple, scratching at its own doorstep.
-  for (const house of houses.slice(0, ANIMALS.MAX_PER_KIND)) {
-    for (let n = 0; n < ANIMALS.HENS_PER_HOUSE; n += 1) {
-      place('hen', house.x + house.w * 0.5 + (n - 0.5) * 0.6, house.y + house.h + 0.15);
-    }
+  // §7.7, v2.91: the counts come from `state.herd`, which is the herd the
+  // village actually keeps — not from what its buildings could hold. If a wolf
+  // took the cow, there is one fewer cow on the screen. What you see is true.
+  // Where each head stands is still derived: a hen belongs to a doorstep, a
+  // cow to a field, and that never needed saving.
+
+  // Hens: spread two to a house, from the first house onwards.
+  for (let n = 0; n < state.herd.hens; n += 1) {
+    const house = houses[Math.floor(n / ANIMALS.HENS_PER_HOUSE) % Math.max(1, houses.length)];
+    if (house === undefined) break;
+    place('hen', house.x + house.w * 0.5 + ((n % ANIMALS.HENS_PER_HOUSE) - 0.5) * 0.6, house.y + house.h + 0.15);
   }
 
-  // Pigs: only once there is a granary — a pig eats what the village can spare.
-  if (hasGranary) {
-    const pigs = Math.min(Math.floor(houses.length / ANIMALS.HOUSES_PER_PIG), ANIMALS.MAX_PER_KIND);
-    for (let n = 0; n < pigs; n += 1) {
-      const house = houses[n * ANIMALS.HOUSES_PER_PIG] as Building;
-      place('pig', house.x - 0.35, house.y + house.h * 0.65);
-    }
+  // Pigs: one to every other house.
+  for (let n = 0; n < state.herd.pigs; n += 1) {
+    const house = houses[(n * ANIMALS.HOUSES_PER_PIG) % Math.max(1, houses.length)];
+    if (house === undefined) break;
+    place('pig', house.x - 0.35, house.y + house.h * 0.65);
   }
 
   // Cows: pasture, so they follow the fields onto the meadow beside them.
-  const cows = Math.min(Math.floor(fields.length / ANIMALS.FIELDS_PER_COW), ANIMALS.MAX_PER_KIND);
-  for (let n = 0; n < cows; n += 1) {
-    const field = fields[n * ANIMALS.FIELDS_PER_COW] as Building;
+  for (let n = 0; n < state.herd.cows; n += 1) {
+    const field = fields[(n * ANIMALS.FIELDS_PER_COW) % Math.max(1, fields.length)];
+    if (field === undefined) break;
     const x = field.x + field.w + 0.4;
     const y = field.y + field.h * 0.5;
     const cell = Math.round(y) * state.map.width + Math.round(x);

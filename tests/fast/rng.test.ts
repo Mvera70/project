@@ -54,6 +54,10 @@ describe('rng · reproducibilidad', () => {
       names: 3162285625,
       chronicle: 1317042200,
       world: 3713464134,
+      // v2.91: el flujo `animals` (§7.7) entra al final y no mueve ni uno de
+      // los diez anteriores. Eso es §4.3 por escrito: un sistema nuevo puede
+      // añadir su propia aleatoriedad sin desplazar una sola partida guardada.
+      animals: 3726732107,
     });
   });
 
