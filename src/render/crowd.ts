@@ -6,14 +6,25 @@ import { route } from '@engine/world/astar';
 import { routesFor } from '@engine/world/paths';
 import type { Figure } from './layers/figures';
 import { hungerSeverity } from './layers/tells';
+import { gatheringsAt } from './gatherings';
+import { CATALOG } from '@engine/crossroads/catalog';
 
 interface Point { x: number; y: number }
 interface CachedPaths { tick: number; paths: Map<VillagerId, number[]> }
 const SUNDAY = new WeakMap<GameState, CachedPaths>();
 const WORKDAY = new WeakMap<GameState, CachedPaths>();
+interface CachedMeeting extends CachedPaths { target: number }
+const MEETING = new WeakMap<GameState, CachedMeeting>();
 
 function centre(building: Building, width: number): number {
   return (building.y + Math.floor(building.h / 2)) * width + building.x + Math.floor(building.w / 2);
+}
+
+/** La celda de una reunión, recortada al mapa. */
+function cellOf(state: GameState, at: { x: number; y: number }): number {
+  const x = Math.min(state.map.width - 1, Math.max(0, Math.round(at.x)));
+  const y = Math.min(state.map.height - 1, Math.max(0, Math.round(at.y)));
+  return y * state.map.width + x;
 }
 
 function plaza(state: GameState): number {
@@ -26,10 +37,11 @@ function plaza(state: GameState): number {
   return Math.min(state.map.terrain.length - 1, Math.max(0, y * state.map.width + x));
 }
 
-function sundayPaths(state: GameState): Map<VillagerId, number[]> {
-  const known = SUNDAY.get(state);
-  if (known !== undefined && known.tick === state.tick) return known.paths;
-  const target = plaza(state);
+/**
+ * Todos, desde su casa, hacia una misma celda. Es lo que ya hacía el domingo, y
+ * ahora también lo que hace una reunión convocada por una decisión (§11.8).
+ */
+function pathsToward(state: GameState, target: number): Map<VillagerId, number[]> {
   const homes = new Map(state.buildings.filter((building) => building.lostTick === null)
     .map((building) => [building.id, centre(building, state.map.width)]));
   const paths = new Map<VillagerId, number[]>();
@@ -39,7 +51,29 @@ function sundayPaths(state: GameState): Map<VillagerId, number[]> {
     const cells = from === undefined ? [target] : route(state.map, from, target);
     paths.set(person.id, cells.length > 0 ? cells : [from ?? target]);
   }
+  return paths;
+}
+
+function sundayPaths(state: GameState): Map<VillagerId, number[]> {
+  const known = SUNDAY.get(state);
+  if (known !== undefined && known.tick === state.tick) return known.paths;
+  const paths = pathsToward(state, plaza(state));
   SUNDAY.set(state, { tick: state.tick, paths });
+  return paths;
+}
+
+/**
+ * §11.8: la aldea se junta donde la decisión dijo que se juntaba.
+ *
+ * Cacheada por tick Y por celda: una reunión en la capilla y otra en el vado
+ * son rutas distintas, y una caché que solo mirase el tick devolvería la
+ * anterior el resto de la semana.
+ */
+function gatheringPaths(state: GameState, target: number): Map<VillagerId, number[]> {
+  const known = MEETING.get(state);
+  if (known !== undefined && known.tick === state.tick && known.target === target) return known.paths;
+  const paths = pathsToward(state, target);
+  MEETING.set(state, { tick: state.tick, target, paths });
   return paths;
 }
 
@@ -88,7 +122,13 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
   const fraction = Math.max(0, Math.min(1, tickFraction));
   if (fraction >= 0.8) return [];
   const hunger = hungerSeverity(state);
-  const routes = state.tick % 4 === 0 ? sundayPaths(state) : workdayPaths(state);
+  // §11.8: si una decisión convocó a la aldea, eso manda sobre el domingo y
+  // sobre el trabajo. Es la única semana en que la gente hace algo porque el
+  // jugador lo decidió, y por eso se ve.
+  const meeting = gatheringsAt(state, CATALOG)[0];
+  const routes = meeting !== undefined
+    ? gatheringPaths(state, cellOf(state, meeting))
+    : state.tick % 4 === 0 ? sundayPaths(state) : workdayPaths(state);
   const namedOrder = new Map(state.people.namedIds.map((id, index) => [id, index]));
   const figures: Figure[] = [];
   for (const person of state.people.villagers.filter(isHere).sort((a, b) => a.id - b.id).slice(0, 80)) {

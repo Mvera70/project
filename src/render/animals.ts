@@ -12,6 +12,7 @@
 
 import { ANIMALS, TIME } from '@engine/balance';
 import type { Building, GameState } from '@engine/state';
+import { standing, valleyCore } from './anchors';
 import { TERRAIN_CODE } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
 
@@ -30,9 +31,7 @@ export interface Animal {
 /** Dusk, the same threshold the crowd uses to go home (§10.6). */
 const NIGHT = 0.8;
 
-function standing(state: GameState, kind: Building['kind']): Building[] {
-  return state.buildings.filter((b) => b.kind === kind && b.lostTick === null);
-}
+
 
 /**
  * A stable pseudo-random in 0..1 from two integers.
@@ -119,19 +118,11 @@ export function animalPositions(state: GameState, tickFraction: number): Animal[
   return animals;
 }
 
-/** The centre of the village, the same figure §11.5 and the woodcutters use. */
-function core(state: GameState): { x: number; y: number } {
-  const live = state.buildings.filter((b) => b.lostTick === null);
-  if (live.length === 0) return { x: state.map.width / 2, y: state.map.height / 2 };
-  return {
-    x: live.reduce((n, b) => n + b.x + b.w / 2, 0) / live.length,
-    y: live.reduce((n, b) => n + b.y + b.h / 2, 0) / live.length,
-  };
-}
+
 
 /** Cells of one terrain within `range` of the village, nearest first and stable. */
 function nearbyCells(state: GameState, terrain: number, range: number, limit: number): number[] {
-  const centre = core(state);
+  const centre = valleyCore(state);
   const found: { cell: number; distance: number }[] = [];
   for (let i = 0; i < state.map.terrain.length; i += 1) {
     if (state.map.terrain[i] !== terrain) continue;

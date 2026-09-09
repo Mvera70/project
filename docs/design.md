@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.00** | 12 sep 2026, 06:00 | M-32 · que la decisión se vea | **42 de las 56 opciones del catálogo enfocaban una celda donde no aparecía nada nuevo.** El efecto visible no estaba roto —la cámara sí enfoca, como promete §11.2— pero ninguno de los seis tipos se representaba: un estandarte, una reunión y una cicatriz daban la misma imagen. §11.8 nueva: `gather` convoca de verdad a la aldea, derivado del historial y sin un byte de estado nuevo. Quedan cuatro tipos por representar, anotados. |
 | **2.99** | 12 sep 2026, 04:20 | M-31 · lo que el mundo escribe en la gente | **§7.9 nueva: hasta hoy sólo las decisiones del jugador dejaban recuerdo.** Una hambruna o un incendio le pasaban a una población, no a nadie. La prueba estaba a la vista: `went_hungry` y `lost_home` tenían epitafio escrito desde M-09 y **ningún sistema los escribía jamás**. Ahora el hambre marca a quien la vive y el fuego a quien vivía en esa casa, con un recuerdo por año y no uno por semana. |
 | **2.98** | 12 sep 2026, 03:05 | Cuánto comercio quiere la partida | **Medido el reposo largo y descartado.** Alargarlo de 18 a 26 años mete la cadencia adversa en banda y **devuelve la extinción a la línea base**: 15,0 % → 11,7 % y la separación 13,3 → 10,0 puntos. Menos comercio es menos presión. Se conservan los 18: el desenlace blando es el problema de fondo desde v2.47 y vale más que siete centésimas de cadencia. |
 | **2.97** | 12 sep 2026, 02:15 | El canal propio del comercio | **Los comerciantes salen del sorteo de §8.6 y dejan de gastar su reposo.** Un buhonero ya no puede retrasar la sucesión que ha dejado pendiente una muerte. Y no sólo devuelve la cadencia a su sitio: el comercio empuja el desenlace hacia la banda que §12.9 pide — extinción adversa 11,7 % → 15,0 % y separación 10,0 → 13,3 puntos, ambas mejores que antes de que los comerciantes existieran. De once fallos del banco a nueve. |
@@ -5191,6 +5192,74 @@ Esto es lo mínimo honesto y **no es el vocabulario visual definitivo**: qué
 dibujo merece una muerte, una cosecha perdida o un asalto pertenece al trabajo
 de arte, y llegará con él. Lo que esta sección fija es que el valle tiene que
 contar lo que pasa, no solo cómo está.
+
+### 11.8 Que la decisión se vea, no solo se enfoque
+
+**El diagnóstico, medido.** El catálogo tiene 56 opciones. En 42 de ellas el
+efecto visible declarado no cambiaba absolutamente nada en el valle.
+
+| | |
+|---|---|
+| Opciones del catálogo | 56 |
+| Opciones cuyo efecto visible no cambiaba nada | **42** |
+| Opciones con más de un efecto visible | 0 |
+| Por tipo | `gather` 25, `raise` 13, `douse` 8, `scar` 5, `banner` 4, `ruin` 1 |
+
+**Lo que NO estaba roto**, y conviene decirlo porque la primera lectura de esta
+auditoría fue equivocada: la interfaz sí consume `TickReport.visualEffects` y sí
+enfoca la cámara dos segundos sobre la celda, que es exactamente lo que el
+contrato de M-22 y §11.2 prometen. El hito 2 está donde dice que está.
+
+**Lo que faltaba** es que el *tipo* de efecto no llegaba a la imagen. Un
+estandarte sobre el núcleo, una reunión en la capilla y una cicatriz de tala
+producían los tres el mismo resultado: un acercamiento. Y como sólo `raise` y
+`ruin` van acompañados de un cambio de estado real —una obra abierta, un
+edificio perdido—, las otras 42 opciones enfocaban un sitio donde no había nada
+que ver. **Es la explicación más probable del veredicto humano de §16.3**, que
+dijo literalmente que las decisiones no parecían tener efecto.
+
+#### `gather`, el primero (v3.00)
+
+25 de las 42, y el más fácil de creer: la aldea se junta en la plaza, en la
+capilla o en el vado, y se ve porque la gente está en otro sitio.
+
+**Derivado, sin estado nuevo.** No se guarda nada. El historial ya dice qué se
+decidió y en qué semana, y el catálogo dice qué efecto visible tenía esa opción;
+con eso se sabe si hoy hay reunión y dónde. Es el mismo trato que §10.6 da a la
+multitud y §7.7 al ganado, y cumple §11.4 por construcción: no hay animación en
+marcha que un salto de reloj pueda dejar a medias.
+
+**El sitio se recalcula con el valle de hoy**, no con el de la semana en que se
+decidió: si la capilla ardió entretanto, la gente se junta donde puede juntarse
+ahora.
+
+**`days` se lee como ticks, no como séptimos de semana.** A ×1 un tick es un día
+en pantalla (§10.6), así que una reunión de cuatro días que durase medio tick no
+se vería nunca. Es una decisión y queda anotada para la revisión artística.
+
+#### Deuda declarada
+
+- **`banner`, `scar` y `douse` siguen sin representarse.** Son 17 opciones. Sus
+  coordenadas son derivables salvo dos casos: `scar burnt_field` y
+  `scar felled_wood` dependen de qué ardió o se taló aquella semana concreta y
+  no se pueden reconstruir desde el historial sin guardarlas.
+- **El vado se aproxima por el núcleo.** El motor calcula la orilla transitable
+  (§11.5, v2.66) y repetirlo aquí exigiría exportar ese cálculo. La diferencia
+  es de unas celdas sobre un mapa que se ve entero.
+- **Arte de prueba.** Todo lo de esta sección es geometría y posiciones, sin
+  sprites nuevos. El aspecto definitivo lo gobierna el Anexo D.
+
+**Qué falsaría esto:** que tras una decisión con `gather` la gente estuviera
+donde mismo, que la reunión no se acabara nunca, que contaran decisiones
+futuras, o que dibujarla escribiera en el estado o consumiera una tirada.
+
+**Una nota sobre las pruebas de esto**, porque costó verla: el estado de partida
+de una aldea de veinte años cae en un tick múltiplo de cuatro, que es **domingo**
+y en domingo la gente ya se junta en la plaza por su cuenta. Una prueba que
+compare «aldea con reunión» contra «aldea sin reunión» sin mover el reloj está
+comparando domingo contra reunión, y pasa aunque la reunión no mueva a nadie. Lo
+destapó una mutación. Cualquier prueba futura sobre la multitud tiene que elegir
+un día laborable a propósito.
 
 ### 11.7 Accesibilidad
 
