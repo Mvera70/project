@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.91 · 9 de septiembre de 2026, 17:26 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.92 · 9 de septiembre de 2026, 20:08 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **2.92** | 9 sep 2026, 20:08 | Ejecución G-02 | **Una receta declarativa ya genera, valida y promueve un recurso sin editar Blender.** Dos builds distintos conservaron 7 objetos, 4 materiales, 504 triángulos, caja y captura Three.js idénticos aunque sus binarios difirieran. El catálogo apunta a una promoción inmutable y guarda hashes concretos; los clips y conectores vacíos solo son válidos para el marcador. |
 | **2.91** | 9 sep 2026, 17:26 | Ejecución G-01 | **El GLB de Blender carga directamente en Three.js r185 y dos capturas del mismo host coinciden byte a byte.** Se ratifican el encuadre ortográfico por caja, tiempo explícito y estados de carga; sombra y sesgo se derivan de escala. Three 0.185.0 + tipos 0.185.4 sustituyen r186 por compatibilidad. La cadena local de P0 queda cerrada; solo falta comprobar la recuperación desde otro dispositivo. |
 | **2.90** | 9 sep 2026, 14:54 | Ejecución G-00 | **Blender 5.2.1 LTS fabrica `.blend`, `.glb` y PNG en segundo plano y sin GUI.** El éxito exige una marca explícita y comprobar artefactos porque Blender devolvió 0 ante dos excepciones Python durante el diagnóstico. Chrome del sistema cubre Playwright. P0 queda parcial hasta cargar el GLB en Three.js y abrir la evidencia desde un segundo dispositivo. |
 | **2.89** | 9 sep 2026, 14:37 | Programa gráfico G-00–G-12 | **Una maqueta medieval 3D, producida y revisada por rondas reproducibles.** Anexo D incorpora análisis, dirección artística, contratos, producción Blender → GLB → Three.js, operación remota, pruebas y briefs. Autoriza un piloto aislado; no declara migrado el juego ni sustituye todavía los contratos Canvas de producción. La fecha es la del entorno de esta revisión; se conservan las fechas posteriores ya presentes en el historial, sin reinterpretarlas. |
@@ -7280,6 +7281,10 @@ materiales, clips, dimensiones, origen, conectores, estadísticas y procedencia.
 Identidad del recurso estable; contenido distribuido con hash. Los ficheros
 generados no se editan a mano. Exportación a temporal, validación y promoción
 atómica: un proceso interrumpido no reemplaza el último recurso válido.
+G-02 verificó que dos exportaciones equivalentes pueden diferir en bytes: se
+comparan estructura, materiales, animación, caja y captura, y el catálogo conserva
+además el hash del binario concreto promovido. Blender solo cuenta como éxito si
+deja marca explícita y productos completos, aunque su proceso devuelva código 0.
 
 Convención espacial: una celda del motor es una unidad de escena. Mapa `(x,y)`
 se proyecta a escena `(x,0,y)`, eje vertical `+Y` en ejecución. Origen de edificio
@@ -7660,6 +7665,9 @@ interrupción no corrompe aprobado. **Terminado cuando:** P0 reproducible comple
 **Depende de:** G-02. **Lectura:** D.3–D.4, D.8.
 **Ficheros:** `art/recipes/palette.json`, `art/recipes/village-kit/`,
 `art/recipes/villager-study/`, informe G-03; cambios de catálogo por propietario.
+Si las formas aprobadas no caben en las primitivas de G-02, el orquestador puede
+transferir de forma explícita `tools/art/schema.ts`, `tools/art/blender-build.py`
+y sus pruebas para añadir primitivas generales, nunca lógica propia de un recurso.
 **Contrato:** casa, campo, camino, árbol y estudio de habitante exportables bajo D.4.
 **Reglas:** comparar variantes controladas; parámetros etiquetados exploratorios;
 no reutilizar recursos de los juegos de referencia.
@@ -7810,11 +7818,11 @@ catálogo, paleta, contratos y configuración. No adelantar biblioteca completa
 mientras se desconozca el coste del rig. Revisión visual y medición tienen
 autor distinto cuando haya agentes disponibles, sin duplicar implementación.
 
-G-00 y G-01 ejecutados en v2.90–v2.91: la cadena local crea, exporta, sirve,
-carga y captura sin GUI. P0 queda parcial únicamente por la comprobación externa
-desde un segundo dispositivo. Próxima ronda: **G-02**, que convierte el prototipo
-de G-00 en un pipeline de recursos con receta, catálogo, validación y promoción
-atómica. Ese trabajo local puede avanzar mientras espera la comprobación externa.
+G-00–G-02 ejecutados en v2.90–v2.92: la cadena local crea, exporta, sirve,
+carga, valida y promueve sin GUI. P0 queda parcial únicamente por la comprobación
+externa desde un segundo dispositivo. Próxima ronda: **G-03**, primer estudio
+artístico comparado. Ese trabajo local puede avanzar mientras espera la
+comprobación externa; P1 requiere aceptación del usuario sobre imágenes concretas.
 La guía no incluye estimaciones en horas: herramientas, capacidad remota y
 criterio artístico siguen sin medir. Tras P0/P1 se estimará por recursos
 aprobados y rondas observadas, con incertidumbre explícita.
@@ -7835,6 +7843,15 @@ referencias:
 - [Three.js: liberación de recursos](https://threejs.org/manual/en/how-to-dispose-of-objects.html).
 
 ### D.15 Registro detallado de esta revisión
+
+v2.92 arbitra G-02. Se ratifican receta canónica, generador reutilizable,
+candidato separado, carga Three.js y promoción atómica. Dos ejecuciones dieron
+GLB distintos en bytes pero idénticos en caja, nombres, materiales, 504 triángulos
+y captura; por ello se conserva la equivalencia semántica definida en D.4 y el
+hash exacto de cada entrega. Se promueve que clips y conectores vacíos solo son
+correctos para estudios que los declaran vacíos. G-03 puede ampliar primitivas
+del pipeline únicamente mediante transferencia explícita y general. Informe:
+`docs/graphics-rounds/G-02.md`.
 
 v2.91 arbitra G-01. Se ratifican la exportación Y-up sin reparación, el encuadre
 por caja, el tiempo de presentación explícito y la captura repetible: dos PNG

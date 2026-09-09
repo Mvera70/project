@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-graphics-state="loading" data-graphics-message="Waiting for viewer module">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Valley · GLB viewer</title>
+    <style>
+      html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #e8e2d6; }
+      canvas { display: block; }
+      output {
+        position: fixed; left: 12px; bottom: 12px; max-width: calc(100% - 24px);
+        padding: 6px 9px; border-radius: 3px; color: #302d27;
+        background: rgb(248 244 235 / 88%); font: 12px/1.4 ui-monospace, monospace;
+      }
+      html[data-graphics-state="ready"] output { display: none; }
+      html[data-graphics-state="error"] output { color: #fff6ed; background: #6f271e; }
+    </style>
+  </head>
+  <body>
+    <output id="status" role="status" aria-live="polite">Loading…</output>
+    <script type="module" src="./viewer.ts"></script>
+  </body>
+</html>

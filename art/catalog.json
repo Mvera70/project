@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "axis-marker",
+      "status": "study",
+      "recipe": "art/recipes/axis-marker.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-09T15-44-05-111Z-36764",
+        "directory": "artifacts/graphics/G-02/approved/f5ae6356e7b3c396"
+      },
+      "bounds": {
+        "min": [
+          -2.8,
+          -0.276507,
+          -2.35
+        ],
+        "max": [
+          2.8,
+          1.5,
+          2.3
+        ],
+        "size": [
+          5.6,
+          1.776507,
+          4.65
+        ]
+      },
+      "materials": [
+        "direction-red",
+        "front-gold",
+        "left-blue",
+        "ground"
+      ],
+      "clips": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 7,
+        "meshes": 7,
+        "materials": 4,
+        "triangles": 504
+      },
+      "hashes": {
+        "axis-marker.blend": "BE84E9A10914F963F3D01E1F107FDFE6FBE1F4D0C3BD28870BFFE05168085545",
+        "axis-marker.glb": "F5AE6356E7B3C39676A12222A5786E36304BE22E45ED2F9753ACBC9D1ACA2684",
+        "axis-marker-blender.png": "F567BA8E00528A209B1FFB84E0DB47999F3A20C480980F9C77387A7186A8B77B",
+        "capture-1.png": "A6D8C64857651B4CBFD4F23095923CE677AECFA83BD06CE4929C672BA3E69C32",
+        "capture.json": "4B81F3F1B4CEDFA0C1D2025EBB2BF5A81C5322EA35FA61247E27927FC1F7F845",
+        "build.json": "35C525A3700667F2AD1161F37AD8C8C8E7F24C47EE3F7D45EFDDE90B591FDEFD",
+        "validation.json": "545F420F459B7355A81477E249AE8A4B0EE7B985F100FD07C4BB69343A85AF70"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Axis convention study authored for The Valley G-00/G-02",
+        "license": "Project original"
+      }
+    }
+  ]
+}
