@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.85 · 11 de septiembre de 2026, 13:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.86 · 11 de septiembre de 2026, 14:15 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.86** | 11 sep 2026, 14:15 | M-27.2 · «red primero» no lo era | **Un despliegue nuevo no llegaba a un móvil ya instalado, que es justo lo que §13.4 prometía.** Pages manda `Cache-Control: max-age=600` y un `fetch` corriente lo contesta la caché HTTP del navegador, por debajo del service worker. La prueba no lo veía porque `vite preview` no manda esa cabecera. |
 | **2.85** | 11 sep 2026, 13:40 | 64× para poder probar | **Una cuarta velocidad, y por un motivo declarado: §16.2 dice que el ritmo solo se resuelve jugando, y a 16× un año son 45 s.** A 64× son once. Los botones dejan de estar escritos a mano y salen de `TIME.SPEEDS`, que era la única lista que debía existir. |
 | **2.84** | 11 sep 2026, 13:10 | M-28 · lo que pasa se ve, y el reloj no se para | **Primera sesión humana real, y dice que no.** No es el guardado: en veinte años vistos hubo un asalto repelido, un asesinato, un incendio, una fragua y una sucesión, y el valle enseñó gente andando. §11.6 nueva: los sucesos de peso 2 y 3 aparecen sobre el valle con su propia línea. Y §13.2 gana su segunda puerta: volver de segundo plano ya no pierde el tiempo. |
 | **2.83** | 11 sep 2026, 12:05 | M-27.1 · el subdirectorio, probado | **Pages no sirve en la raíz, y eso solo falla una vez desplegado.** Un servidor propio monta el mismo `dist/` bajo `/project/` y un recorrido comprueba que arranca, que el ámbito del trabajador se limita a ese prefijo y que ninguna ruta guardada se sale de él. |
@@ -130,6 +131,50 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.86 — «Red primero» pasaba por una caché que no habíamos contado
+
+Reportado jugando: cerrar y abrir la aplicación instalada no traía la versión
+nueva. Es exactamente lo que §13.4 decía que no podía pasar, y la sección
+estaba equivocada.
+
+**La causa, medida.** GitHub Pages sirve el documento con
+`Cache-Control: max-age=600`. El service worker hacía `fetch(request)` a secas,
+y esa petición **pasa por la caché HTTP del navegador**, que está por debajo
+del trabajador: durante diez minutos contesta ella y la red no se toca. La
+política no era «red primero» sino «caché del navegador primero, y la del
+trabajador después». Un dispositivo que abre la aplicación cada pocos minutos
+—justo lo que hace quien la está probando— puede no ver nunca una versión
+nueva.
+
+**Por qué la prueba de la v2.82 no lo vio.** Servía el build con
+`vite preview`, que no manda cabeceras de caché. La prueba comprobaba la
+política del trabajador sobre un servidor que no se parecía al de producción en
+lo único que importaba aquí. Es el fallo clásico: verde en un entorno que no
+reproduce la condición que rompe.
+
+**La corrección.** El documento se pide con `cache: 'reload'`, que salta la
+caché HTTP. Se construye un `Request` nuevo a partir del URL porque una
+petición de navegación no se puede reconstruir con un init —`fetch(request, {
+cache })` lanza justo en las peticiones para las que existe esta rama—. Sin red
+sigue cayendo al respaldo de siempre.
+
+**Evidencia.** `tools/stale-server.mjs` sirve el mismo `dist/` con
+`max-age=600` y sabe «desplegar» otra versión bajo el mismo URL. El recorrido
+carga, deja que el trabajador tome el control, despliega, vuelve a abrir y
+exige la versión nueva; falla antes del arreglo y pasa después, y comprueba
+además que tras actualizarse sigue abriendo sin red. Suite rápida **640 en
+17,1 s**, PWA **6/6**, Playwright **10/10**, tipos, lint y build pasan.
+
+**Qué lo falsaría:** que una versión nueva no alcance a un cliente que ya
+visitó, con las cabeceras de Pages puestas; que el documento deje de venir de
+la red habiéndola; o que saltar la caché HTTP rompa la apertura sin conexión.
+
+**Deuda anotada y no pagada:** el nombre de la caché no cambia entre
+despliegues, así que los paquetes viejos se quedan dentro. No afecta a la
+corrección y purgarlos junto a una actualización tiene el riesgo de borrar el
+recurso viejo antes de haber guardado el nuevo; se hará cuando haya motivo
+medido, no antes.
 
 ### 2.85 — Una velocidad más, para poder preguntar por el ritmo
 
@@ -5135,7 +5180,7 @@ normativa:
 
 | Qué | Política | Por qué |
 |---|---|---|
-| El documento (`navigate`) | **red primero**, caché como respaldo | Un despliegue nuevo tiene que alcanzar a un dispositivo ya instalado. Servir el documento desde caché deja al jugador clavado en una versión vieja para siempre |
+| El documento (`navigate`) | **red primero, saltando también la caché HTTP** (`cache: 'reload'`), caché del trabajador como respaldo | Un despliegue nuevo tiene que alcanzar a un dispositivo ya instalado. Y no basta con pedirlo antes que a la caché propia: Pages sirve el documento con `Cache-Control: max-age=600`, así que un `fetch` corriente lo contesta la caché del navegador sin tocar la red (v2.86) |
 | Todo lo demás del propio origen | **caché primero**, y se guarda al traerlo | Vite marca los recursos con su hash: un nombre distinto es un contenido distinto, así que la copia nunca puede quedar obsoleta |
 
 **Lo que el service worker no hace.** No toca IndexedDB —no puede, y la partida

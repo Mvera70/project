@@ -86,7 +86,20 @@ self.addEventListener('activate', (event) => {
 
 async function networkFirst(request) {
   try {
-    const response = await fetch(request);
+    // `cache: 'reload'` and not a plain `fetch(request)`: GitHub Pages serves
+    // the document with `Cache-Control: max-age=600`, so an ordinary fetch is
+    // answered by the browser's own HTTP cache and never reaches the network.
+    // "Network first" was really "HTTP cache first" for ten minutes at a time,
+    // and a new deployment did not reach a device that had already visited —
+    // measured, and the exact thing §13.4 promised would not happen.
+    //
+    // A fresh Request rather than the original: a navigation Request cannot be
+    // rebuilt with an init, so `fetch(request, { cache })` throws on exactly
+    // the requests this branch exists for.
+    const response = await fetch(new Request(request.url, {
+      cache: 'reload',
+      credentials: 'same-origin',
+    }));
     if (response.ok) {
       const cache = await caches.open(CACHE);
       await cache.put(request, response.clone());

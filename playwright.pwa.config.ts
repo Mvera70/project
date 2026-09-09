@@ -39,5 +39,12 @@ export default defineConfig({
       reuseExistingServer: false,
       timeout: 120_000,
     },
+    {
+      // The same build with the caching headers Pages really sends (§13.4).
+      command: 'node tools/stale-server.mjs',
+      url: 'http://127.0.0.1:4181/',
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
   ],
 });
