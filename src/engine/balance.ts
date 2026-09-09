@@ -253,6 +253,25 @@ export const MAPGEN = {
   ROCK_RIVER_DISTANCE: 5, // TUNE: preferred minimum distance from water.
 } as const;
 
+// ---------------------------------------------------------------------------
+// §7.7 · The livestock
+//
+// TUNE: none of these are in §12 because they move no number of the game. The
+// herd is derived and cosmetic (§7.7, v2.87): it is not state, it is not
+// saved, and it feeds nobody. They live here rather than in the render because
+// the day they DO feed somebody, this is where §12 will look for them.
+// ---------------------------------------------------------------------------
+
+export const ANIMALS = {
+  HENS_PER_HOUSE: 2,
+  HOUSES_PER_PIG: 2, // a pig needs surplus: only once the granary stands
+  FIELDS_PER_COW: 2, // and a cow needs pasture, so it follows the fields
+  MAX_PER_KIND: 24, // a village of eighty must not become a farmyard of hundreds
+  // How far from its anchor an animal drifts, in cells. Small on purpose:
+  // livestock that wanders like people reads as people.
+  WANDER: 0.55,
+} as const;
+
 export const WORLD = {
   WIDTH: 36,
   HEIGHT: 56,

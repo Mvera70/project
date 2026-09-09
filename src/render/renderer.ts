@@ -3,7 +3,9 @@
 import type { GameState } from '@engine/state';
 import { clockOf } from '@engine/time';
 import { cellFor, paintVillageBackground, sizeCanvas } from './canvas';
+import { animalPositions } from './animals';
 import { crowdPositions } from './crowd';
+import { paintAnimals, paintAnimalShadows } from './layers/animals';
 import { paintFigures, paintFigureShadows } from './layers/figures';
 import { paintTells, tellsFor } from './layers/tells';
 import { paletteFor, type Palette } from './palette';
@@ -60,6 +62,12 @@ export function createRenderer(canvas: HTMLCanvasElement, viewport: HTMLElement)
       ctx.drawImage(background, 0, 0);
       paintTells(ctx, tellsFor(state), palette, cell, tickFraction);
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // §7.7: the herd goes under the crowd, so a villager walking past a hen
+      // hides it and never the other way round. `reduced` freezes them at the
+      // same instant it freezes the people (§11.7).
+      const animals = animalPositions(state, reduced ? 0.45 : tickFraction);
+      paintAnimalShadows(ctx, animals, cell);
+      paintAnimals(ctx, animals, palette, cell);
       const figures = crowdPositions(state, reduced ? 0.45 : tickFraction);
       paintFigureShadows(ctx, figures, cell);
       const tracked = figures.find((figure) => figure.id === trackedId);

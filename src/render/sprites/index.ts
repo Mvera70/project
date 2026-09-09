@@ -150,6 +150,44 @@ export function namedVillager(tone: string): Sprite {
   };
 }
 
+// --- §7.7 · Livestock -------------------------------------------------------
+//
+// Deliberately small and plain: they read at 10 px as "there is an animal
+// there", which is all this slice claims. The art pass will replace them, and
+// nothing else depends on how they look.
+
+/** A body and a head, sized and toned per kind. */
+function beast(
+  bodyW: number, bodyH: number, headAt: number, tone: (p: Palette) => string, crest?: string,
+): Sprite {
+  return (ctx, x, y, cell, palette) => {
+    const fill = tone(palette);
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = outline(fill);
+    ctx.lineWidth = Math.max(1, cell * 0.08);
+    ctx.beginPath();
+    ctx.ellipse((x + 0.5) * cell, (y + 0.62) * cell, bodyW * cell, bodyH * cell, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc((x + 0.5 + headAt) * cell, (y + 0.44) * cell, bodyH * 0.62 * cell, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    if (crest !== undefined) {
+      ctx.fillStyle = crest;
+      ctx.beginPath();
+      ctx.arc((x + 0.5 + headAt) * cell, (y + 0.3) * cell, bodyH * 0.3 * cell, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+}
+
+export const hen: Sprite = beast(0.16, 0.11, 0.14, (p) => p.accent, '#c9463c');
+export const pig: Sprite = beast(0.21, 0.13, 0.18, () => '#c9948f');
+// Cream and not `palette.rock`: that IS the colour of the map's rock patches,
+// and a grey cow on green grass read as a stone (looked at, v2.87).
+export const cow: Sprite = beast(0.28, 0.17, 0.24, () => '#e2ddcf', '#4a3f33');
+
 export const ruin: Sprite = (ctx, x, y, cell, palette) => {
   ctx.strokeStyle = outline(palette.wood); ctx.lineWidth = Math.max(1, cell * 0.14); ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo((x + 0.1) * cell, (y + 0.85) * cell); ctx.lineTo((x + 0.45) * cell, (y + 0.45) * cell); ctx.lineTo((x + 0.8) * cell, (y + 0.78) * cell); ctx.moveTo((x + 0.22) * cell, (y + 0.9) * cell); ctx.lineTo((x + 0.72) * cell, (y + 0.9) * cell); ctx.stroke();

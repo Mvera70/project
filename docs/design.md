@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.86 · 11 de septiembre de 2026, 14:15 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.87 · 11 de septiembre de 2026, 15:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.87** | 11 sep 2026, 15:00 | M-29 · el ganado, primer trozo | **§7.7 nueva: el valle tiene animales.** Gallinas por casa, cerdos cuando hay granero, vacas cuando hay campos. Derivado y cosmético como la multitud de §10.6 y como las ruinas de §13.3: no es estado, no se guarda, no mueve un número. Lobos, cuervos, caza y pesca quedan declarados y sin construir. |
 | **2.86** | 11 sep 2026, 14:15 | M-27.2 · «red primero» no lo era | **Un despliegue nuevo no llegaba a un móvil ya instalado, que es justo lo que §13.4 prometía.** Pages manda `Cache-Control: max-age=600` y un `fetch` corriente lo contesta la caché HTTP del navegador, por debajo del service worker. La prueba no lo veía porque `vite preview` no manda esa cabecera. |
 | **2.85** | 11 sep 2026, 13:40 | 64× para poder probar | **Una cuarta velocidad, y por un motivo declarado: §16.2 dice que el ritmo solo se resuelve jugando, y a 16× un año son 45 s.** A 64× son once. Los botones dejan de estar escritos a mano y salen de `TIME.SPEEDS`, que era la única lista que debía existir. |
 | **2.84** | 11 sep 2026, 13:10 | M-28 · lo que pasa se ve, y el reloj no se para | **Primera sesión humana real, y dice que no.** No es el guardado: en veinte años vistos hubo un asalto repelido, un asesinato, un incendio, una fragua y una sucesión, y el valle enseñó gente andando. §11.6 nueva: los sucesos de peso 2 y 3 aparecen sobre el valle con su propia línea. Y §13.2 gana su segunda puerta: volver de segundo plano ya no pierde el tiempo. |
@@ -131,6 +132,46 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.87 — Un valle sin un animal a la vista
+
+Primer trozo de §7.7. La sesión humana de §16.3 no dijo que faltaran sucesos:
+dijo que no se veía ninguno. **Un animal es la excepción a ese problema**: una
+gallina picoteando entre dos casas se ve sin que nadie la anuncie, mientras que
+un rencor o una semilla diferida necesitan que alguien los cuente. Por eso el
+ganado va antes que más contenido.
+
+**Derivado, no estado.** Se calcula de lo que la aldea ya tiene, igual que la
+multitud de §10.6, y `GameState` no se escribe ni una vez. Es el trato de §13.3
+con las ruinas heredadas —*están ahí para verse*— y por un motivo concreto: el
+balance está fuera de banda y cerrado como red de regresión (§2.47), así que una
+fuente de comida nueva no entra sin volver a medir el banco. Gallinas por cada
+casa, cerdos solo cuando hay granero con que cebarlos, vacas solo cuando hay
+campos que pastorear al lado. De noche —la fracción de tick pasada 0,8, la misma
+que recoge a la gente— el corral queda vacío, que es la ventana por la que
+entrarán los lobos.
+
+**Mirado, no solo probado** (§14.3). La primera versión pintaba las vacas con
+`palette.rock`, que es literalmente el color de las manchas de roca del mapa: en
+la captura ampliada parecían piedras. Son de color crema desde la segunda.
+Gallinas y cerdos se leen a la primera. Los sprites son provisionales y el pase
+de arte los sustituirá; nada depende de cómo se ven.
+
+**Evidencia.** Ocho pruebas fijan lo que importa, que no es el dibujo: que el
+ganado no escribe estado —huella del estado idéntica antes y después de
+consultarlo—, que dos partidas iguales lo colocan igual, que de noche no hay
+ninguno, que sin aldea no hay ninguno, que las gallinas siguen a las casas y las
+vacas a los campos, que sin granero no hay cerdos, que ninguna cabeza se sale
+del mapa en cinco semillas y que una aldea de ochenta no se vuelve un corral de
+cientos. Suite rápida **648 en 17,2 s**; tipos, lint y build pasan.
+
+**Lo falsaría** que el ganado escribiese en `GameState`, que apareciese sin
+aldea, que dos partidas con la misma semilla lo colocasen distinto, o que
+moviese un número del balance.
+
+**Lo que NO hace todavía:** alimentar a nadie. Lobos, cuervos, caza y pesca
+están declarados en §7.7 y sin construir, y cada uno exige promover el ganado a
+estado, subir el esquema y volver a correr el banco.
 
 ### 2.86 — «Red primero» pasaba por una caché que no habíamos contado
 
@@ -3923,6 +3964,61 @@ solo, que es exactamente lo que pasa cuando se abandona un campo.
 Los caminos no son decoración: reducen el coste de A\*, así que se
 autorrefuerzan, y esa realimentación es la que produce la forma orgánica de la
 aldea sin que nadie la diseñe.
+
+---
+
+### 7.7 Los animales del valle
+
+Una aldea medieval sin un animal a la vista está vacía, y el valle lo estaba.
+Esta sección es el plan completo; **se construye por partes y cada parte dice
+si existe o solo está declarada**, para que nadie la lea como si estuviera toda
+hecha.
+
+**Por qué antes que otro contenido.** La primera sesión humana (§16.3) no dijo
+que faltaran sucesos: dijo que no se veía ninguno. Un rencor, una opinión o una
+semilla diferida son contenido invisible por naturaleza y necesitan que alguien
+los anuncie. **Un animal no**: una gallina picoteando entre dos casas se ve sin
+que nadie la nombre. Es el tipo de contenido que resuelve el problema de
+presencia por existir, y por eso va primero.
+
+#### El ganado (v2.87 · construido, sin efecto mecánico)
+
+Deriva de lo que la aldea ya tiene, exactamente como la multitud de §10.6
+deriva de la gente: **no es estado, no se guarda, no toca ningún número**. Es el
+mismo trato que §13.3 da a las ruinas heredadas — *están ahí para verse* — y por
+la misma razón: el balance está fuera de banda y cerrado como red de regresión
+(§2.47), así que una fuente de comida nueva no entra sin volver a medirlo.
+
+| Animal | De dónde sale | Dónde está |
+|---|---|---|
+| Gallinas | Por cada casa en pie | Picotean junto a su casa de día; dentro de noche |
+| Cerdos | Cuando hay granero: hay excedente con que cebarlos | Junto a las casas |
+| Vacas | Cuando hay dos campos o más | Pastan en la pradera junto a los campos |
+
+El día es la fracción del tick (§10.6): a partir de 0,8 el ganado se recoge,
+igual que la gente. Que a esa hora el corral quede vacío no es un detalle
+estético — es la ventana por la que entrarán los lobos.
+
+#### Lo declarado y todavía NO construido
+
+Cada uno exige promover el ganado de derivado a estado, con su subida de
+esquema (§13.1), y **volver a medir el banco**: son comida, y §12.9 mide
+hambrunas.
+
+- **Lobos.** De noche y en invierno, cuando el bosque está cerca. Se llevan
+  cabezas de ganado, no personas. La empalizada es la respuesta que el jugador
+  ya puede construir, lo que convierte una obra existente en defensa.
+- **Cuervos.** Sobre los campos maduros, antes de la cosecha de la semana 35.
+  Muerden el rendimiento; el espantapájaros o la vigilancia son la respuesta.
+- **Caza.** La mano de obra de §5.2 puede ir al bosque en vez de al campo:
+  carne a cambio de brazos que no siembran, y depende del bosque que quede.
+- **Pesca.** El río ya está en el mapa y no sirve para nada. Pescar es comida
+  que no depende de la cosecha, y por tanto un amortiguador contra la hambruna
+  — que es justo la palanca que §2.47 dejó sin explorar.
+
+**Qué falsaría el primer trozo:** que el ganado escriba una sola vez en
+`GameState`, que aparezca donde no hay aldea, que dos partidas con la misma
+semilla lo coloquen distinto, o que mueva un número del balance.
 
 ---
 
