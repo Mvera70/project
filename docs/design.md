@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.72 · 10 de septiembre de 2026, 22:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.73 · 10 de septiembre de 2026, 23:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.73** | 10 sep 2026, 23:00 | M-23.4 · identidad del contenido guardado | **Una forma completa también puede apuntar a nada.** Encrucijadas, decisiones y semillas guardadas solo cruzan la frontera si su plantilla, opción y consecuencia siguen en el catálogo y el reparto conserva todas sus letras. Una pregunta sin opciones ya no puede dejar la partida viva e irresoluble. |
 | **2.72** | 10 sep 2026, 22:00 | M-23.3 · frontera de guardado | **Un objeto no es todavía una partida.** `deserialize` deja de aceptar contenedores parciales que rompían después, fuera del `catch` de IndexedDB. Valida capas tipadas, longitudes, entradas que recorrerán motor/render, identificadores de contenido y el archivo completo antes de entregar el estado a `boot`. |
 | **2.71** | 10 sep 2026, 21:00 | M-26 · lector del archivo | **Una crónica guardada vuelve a ser legible.** La pantalla de crónica incorpora un selector para la aldea actual y todas las anteriores; reconstruye la voz desde la semilla archivada sin cambiar el esquema. La copia de la aldea que aún ocupa el epitafio no aparece dos veces. |
 | **2.70** | 10 sep 2026, 20:00 | M-23.2 · bordes de persistencia | **Cerrar también guarda, y una identidad archivada no vuelve.** `pagehide` solicita una instantánea antes de detener el bucle; cada sucesora evita las semillas de todo el archivo, no solo la de su madre. Se eliminan la pérdida posible antes del tick 20 y la colisión de `(seed, endedTick)`. |
@@ -117,6 +118,35 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.73 — Una referencia válida tiene que resolver
+
+La validación estructural de v2.72 todavía aceptaba una encrucijada con todos
+sus campos y un `templateId` inexistente. `openCrossroad` no encontraba la
+plantilla y regresaba sin mostrar nada; la partida conservaba una pregunta que
+ninguna opción podía resolver. Una lista de opciones vacía producía el mismo
+bloqueo. Las decisiones de replay y las semillas diferidas admitían referencias
+igual de huérfanas: las primeras divergían en silencio y las segundas vencían
+sin aplicar la consecuencia prometida.
+
+`deserialize` contrasta ahora esas tres formas con `CATALOG`. Una encrucijada
+requiere plantilla, al menos una opción existente sin duplicados y todas las
+letras de su reparto. Cada decisión requiere una opción de su plantilla y el
+mismo reparto mínimo. Cada semilla requiere que su plantilla, opción y `id`
+resuelvan hasta un `SeedSpec` vigente. Los identificadores del catálogo son
+estables para siempre según §2.2; por tanto esto distingue corrupción de datos
+históricos válidos, no crea una política nueva de migración.
+
+**Evidencia.** La regresión añade una plantilla inexistente, una pregunta sin
+opciones, una decisión con opción desconocida y una semilla huérfana. Las cuatro
+formas se rechazan junto a las seis de v2.72; una instantánea real, el replay y
+la migración 1→2 siguen siendo los controles positivos. La red completa pasa
+**628 pruebas rápidas en 16,90 s**, build y lint; Playwright pasa **8/8 en
+29,7 s**, incluidas sus dos reaperturas reales desde IndexedDB.
+
+**Lo falsaría** que una referencia aceptada no encontrase contenido al abrirse,
+resolverse o vencer; que una encrucijada cargada no ofreciese ninguna acción; o
+que un guardado emitido por esta versión dejase de pasar la frontera.
 
 ### 2.72 — Rechazar antes de arrancar
 
@@ -4567,7 +4597,9 @@ al guardado antiguo una precisión que nunca almacenó.
 `deserialize` solo devuelve una forma que motor y render puedan recorrer. La
 validación incluye los escalares finitos, todos los flujos aleatorios, las seis
 capas tipadas de 2.016 celdas y sus dominios, las colecciones del estado con la
-forma de cada entrada y cada `ArchivedGame` con crónica y máscara completas. No
+forma de cada entrada y cada `ArchivedGame` con crónica y máscara completas.
+Encrucijadas, decisiones y semillas deben resolver sus referencias en el
+catálogo estable y conservar todas las letras necesarias del reparto. No
 demuestra equilibrio ni vuelve a ejecutar invariantes semanales: si falla esta
 frontera, `loadSave` devuelve `null` antes de llamar a `boot`.
 

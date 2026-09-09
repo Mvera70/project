@@ -74,10 +74,27 @@ function chronicleEntry(value: unknown): boolean {
   return Object.values(value['params']).every((item) => typeof item === 'string' || finite(item));
 }
 
+function catalogueTemplate(id: unknown) {
+  return typeof id === 'string' ? CATALOG.find((template) => template.id === id) : undefined;
+}
+
+function catalogueOption(templateId: unknown, optionId: unknown) {
+  const template = catalogueTemplate(templateId);
+  return typeof optionId === 'string'
+    ? template?.options.find((option) => option.id === optionId)
+    : undefined;
+}
+
+function cast(value: unknown, letters: readonly string[]): boolean {
+  return record(value) && Object.values(value).every(tickValue)
+    && letters.every((letter) => tickValue(value[letter]));
+}
+
 function decisionRecord(value: unknown): boolean {
-  return record(value) && tickValue(value['tick']) && typeof value['templateId'] === 'string'
-    && typeof value['optionId'] === 'string' && record(value['cast'])
-    && Object.values(value['cast']).every(tickValue);
+  if (!record(value) || !tickValue(value['tick'])) return false;
+  const template = catalogueTemplate(value['templateId']);
+  return template !== undefined && catalogueOption(template.id, value['optionId']) !== undefined
+    && cast(value['cast'], template.cast.map((part) => part.as));
 }
 
 function building(value: unknown): boolean {
@@ -145,15 +162,25 @@ function condition(value: unknown): boolean {
 }
 
 function crossroad(value: unknown): boolean {
-  return record(value) && typeof value['templateId'] === 'string' && tickValue(value['posedTick'])
-    && record(value['cast']) && Object.values(value['cast']).every(tickValue)
-    && Array.isArray(value['optionIds']) && value['optionIds'].every((item) => typeof item === 'string');
+  if (!record(value) || !tickValue(value['posedTick'])) return false;
+  const template = catalogueTemplate(value['templateId']);
+  if (template === undefined || !cast(value['cast'], template.cast.map((part) => part.as))
+    || !Array.isArray(value['optionIds']) || value['optionIds'].length === 0) return false;
+  const optionIds = value['optionIds'];
+  return new Set(optionIds).size === optionIds.length
+    && optionIds.every((optionId) => catalogueOption(template.id, optionId) !== undefined);
 }
 
 function plantedSeed(value: unknown): boolean {
-  return record(value) && ['id', 'fromTemplateId', 'fromOptionId'].every((key) => typeof value[key] === 'string')
-    && tickValue(value['plantedTick']) && tickValue(value['firesAtTick'])
-    && record(value['cast']) && Object.values(value['cast']).every(tickValue)
+  if (!record(value) || typeof value['id'] !== 'string' || !tickValue(value['plantedTick'])
+    || !tickValue(value['firesAtTick'])) return false;
+  const template = catalogueTemplate(value['fromTemplateId']);
+  const option = catalogueOption(value['fromTemplateId'], value['fromOptionId']);
+  if (template === undefined || option === undefined
+    || !cast(value['cast'], template.cast.map((part) => part.as))) return false;
+  const prefix = `${template.id}:${option.id}:`;
+  const specId = value['id'].startsWith(prefix) ? value['id'].slice(prefix.length).split(':')[0] : undefined;
+  return specId !== undefined && option.seeds.some((seed) => seed.id === specId)
     && condition(value['condition']) && nullableTick(value['firedTick']) && nullableTick(value['witheredTick']);
 }
 

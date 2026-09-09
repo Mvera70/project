@@ -75,6 +75,37 @@ describe('serialize / deserialize · §13.1', () => {
     const badCrossroad = structuredClone(base);
     (badCrossroad.state as unknown as Record<string, unknown>)['crossroad'] = { templateId: 'x' };
 
+    const unknownCrossroad = structuredClone(base);
+    unknownCrossroad.state.crossroad = {
+      templateId: 'missing_template', posedTick: 1, cast: {}, optionIds: ['missing_option'],
+    };
+
+    const emptyCrossroad = structuredClone(base);
+    const known = CATALOG[0]!;
+    const knownCast = Object.fromEntries(known.cast.map((part, index) => [part.as, index]));
+    emptyCrossroad.state.crossroad = {
+      templateId: known.id,
+      posedTick: 1,
+      cast: knownCast,
+      optionIds: [],
+    };
+
+    const badDecision = structuredClone(base);
+    badDecision.decisions.push({ tick: 1, templateId: known.id, optionId: 'missing_option', cast: knownCast });
+
+    const badSeed = structuredClone(base);
+    badSeed.state.seeds.push({
+      id: 'missing_template:missing_option:missing_seed:1',
+      fromTemplateId: 'missing_template',
+      fromOptionId: 'missing_option',
+      plantedTick: 1,
+      firesAtTick: 2,
+      cast: {},
+      condition: null,
+      firedTick: null,
+      witheredTick: null,
+    });
+
     const ended = foundGame(8);
     ended.ended = { tick: ended.tick, cause: 'abandoned', lastId: null };
     const badArchive = structuredClone(serialize(state, state.history, [archiveGame(ended)], 10));
@@ -83,7 +114,10 @@ describe('serialize / deserialize · §13.1', () => {
     const badChronicle = structuredClone(base);
     (badChronicle.state.chronicle[0] as unknown as Record<string, unknown>)['params'] = null;
 
-    for (const broken of [brokenMap, shortTerrain, badBuilding, badCrossroad, badArchive, badChronicle]) {
+    for (const broken of [
+      brokenMap, shortTerrain, badBuilding, badCrossroad, unknownCrossroad,
+      emptyCrossroad, badDecision, badSeed, badArchive, badChronicle,
+    ]) {
       expect(() => deserialize(broken)).toThrow();
     }
   });
