@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.83 · 11 de septiembre de 2026, 12:05 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.84 · 11 de septiembre de 2026, 13:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.84** | 11 sep 2026, 13:10 | M-28 · lo que pasa se ve, y el reloj no se para | **Primera sesión humana real, y dice que no.** No es el guardado: en veinte años vistos hubo un asalto repelido, un asesinato, un incendio, una fragua y una sucesión, y el valle enseñó gente andando. §11.6 nueva: los sucesos de peso 2 y 3 aparecen sobre el valle con su propia línea. Y §13.2 gana su segunda puerta: volver de segundo plano ya no pierde el tiempo. |
 | **2.83** | 11 sep 2026, 12:05 | M-27.1 · el subdirectorio, probado | **Pages no sirve en la raíz, y eso solo falla una vez desplegado.** Un servidor propio monta el mismo `dist/` bajo `/project/` y un recorrido comprueba que arranca, que el ámbito del trabajador se limita a ese prefijo y que ninguna ruta guardada se sale de él. |
 | **2.82** | 11 sep 2026, 11:30 | M-27 · instalable y sin conexión | **La PWA que `CLAUDE.md` prometía desde el primer día y la spec no definía.** Manifest, iconos y un service worker con dos políticas: documento por red primero, lo demás por caché. §13.4 nueva, despliegue a GitHub Pages, y una frontera medida y declarada — abre sin red **desde la segunda apertura**, no desde la primera. |
 | **2.81** | 11 sep 2026, 10:40 | M-23.6 · dominios de las condiciones guardadas | **Una referencia que resuelve todavía puede nombrar algo que el DSL no tiene.** `PlantedSeed.condition` aceptaba `stat` y `ratio` como cualquier cadena y `minWeek` como cualquier entero ≥ 0: la frontera de v2.73 comprobaba la plantilla, la opción y el `id`, pero no los tres dominios cerrados de §8.2. |
@@ -128,6 +129,67 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.84 — El valle no contaba nada, y el reloj se paraba
+
+La primera partida humana real duró treinta y cinco minutos y terminó con
+*«no sé ni qué está pasando»* y *«no me pidas que me entren ganas de volver»*.
+Es la evidencia que el proyecto llevaba dieciséis módulos esperando, y la
+lectura importante no es el veredicto sino en qué se equivocaba el diagnóstico
+de todos —el mío incluido—.
+
+**Lo primero que había que descartar: que faltase contenido.** No falta. La
+crónica de esa misma sesión registra, en los veinte años que el jugador estuvo
+mirando, la fragua encendida, un asalto al granero repelido, una muerte a manos
+de otro, un incendio, una sucesión y dos encrucijadas decididas. Unos quince
+sucesos notables en veinte años: **uno por minuto de pantalla**. La densidad no
+era el problema. Ninguno de esos sucesos tenía un solo píxel en el valle.
+
+**§11.1 explica por qué, y lleva explicándolo desde que se escribió.** Sus siete
+filas —gente, grano, hambre, ánimo, fe, peste, estación— son **todas estados**.
+Ninguna es un suceso. La especificación nunca le pidió al valle que dijera que
+algo acababa de pasar, así que el render hacía exactamente lo pedido, y lo
+pedido era una pantalla donde nada ocurre. **§11.6, nueva:** lo que la crónica
+imprimiría en negrita aparece sobre el valle, con su propia frase del banco,
+unos segundos y con corte seco. Sin cifras (§11.1 las prohíbe) y sin vocabulario
+nuevo de sprites: qué dibujo merece una muerte o un asalto es del trabajo de
+arte, y este cambio no lo hipoteca.
+
+**El segundo hallazgo salió de las marcas de hora de las capturas.** A 16× un
+año son 45 s. Entre las 11:57 y las 12:10 pasaron trece minutos y diecisiete
+años: correcto. Entre las 12:11 y las 12:25 pasaron catorce minutos y **siete**
+años, cuando tocaban dieciocho. Faltaban once años. La causa: `loop.ts` descarta
+el tiempo transcurrido al ocultarse la pestaña, `app.ts` solo guardaba, y
+`runLethargy` se llamaba **en un único sitio, dentro de `boot`**. Es decir: el
+letargo solo funcionaba si el sistema mataba la página. Un móvil que bloquea la
+pantalla la mantiene viva, y entonces §13.2 —«la aldea sigue sin ti»— era
+sencillamente falso. No era una decisión de diseño: la propia spec decía que el
+letargo lo resolvía, y en esa ruta el letargo no se ejecutaba nunca.
+
+Ahora el letargo tiene dos puertas y comparten camino: arrancar con un guardado
+viejo, y volver de segundo plano. En pausa no se debe nada, y el parte de
+bienvenida pide al menos una estación de ausencia para no aparecer por cada
+ojeada a otra aplicación.
+
+**Evidencia.** El fallo del reloj se reprodujo primero: un recorrido oculta la
+pestaña, adelanta treinta minutos de reloj falso y la devuelve, exigiendo los
+120 ticks debidos; fallaba antes del arreglo y pasa después. `resumeAfterHidden`
+fija las tres reglas sin DOM. Para §11.6, `noticeworthy` fija el filtro de §9.2
+y comprueba sobre una partida real de diez años que el valle habla algunas
+veces y no en cada tick (menos del 25 %); un recorrido espera a que la aldea
+tenga algo que contar, lee la frase, comprueba que no queda ninguna clave sin
+resolver y que el aviso se retira solo. Suite rápida **640 en 17,42 s**;
+Playwright **10/10 en 41,9 s**; tipos, lint y build pasan.
+
+**Qué lo falsaría:** que volver de segundo plano siga perdiendo tiempo o que lo
+recupere estando en pausa; que el aviso hable en cada tick, se quede fijo, o
+tape la encrucijada; o que una segunda sesión humana con esto puesto vuelva a
+decir «no sé qué está pasando» — en cuyo caso el problema no era la presencia y
+habrá que buscar en otro sitio.
+
+**Lo que este cierre NO concede.** El hito 6 sigue sin aceptar (§16.3) y el hito
+0 sigue sin lector externo. Esto retira dos obstáculos concretos y medidos; la
+siguiente sesión humana es la que dirá si eran los que importaban.
 
 ### 2.83 — La ruta que solo falla desplegada
 
@@ -4390,6 +4452,10 @@ jugador necesita saber lo dice el propio valle:
 Al tocar cualquier elemento aparece una ficha con **la cifra exacta**. El juego
 no esconde datos: los pone a un toque de distancia en vez de a cero.
 
+**Esta tabla es de estados, y por sí sola no basta** (§11.6, v2.84): ninguna de
+sus filas dice que algo *acabe de ocurrir*, y una aldea donde solo se ven
+condiciones es una aldea donde el jugador no se entera de nada.
+
 ### 11.2 Pantallas
 
 Cinco, y solo cinco.
@@ -4488,7 +4554,39 @@ persona. Si no se puede resolver y hay varias instancias, conserva el respaldo
 del núcleo; escoger la primera por orden convertiría una falta de identidad en
 una identidad falsa.
 
-### 11.6 Accesibilidad
+### 11.6 Los sucesos se ven, no solo los estados
+
+**Las siete filas de §11.1 son estados y ninguna es un suceso.** Cuánta gente,
+cuánto grano, si hay hambre, el ánimo, la fe, la peste, la estación: todas
+describen una condición, ninguna dice que *acaba de pasar* algo. Escrito así,
+el valle es una pantalla donde nada ocurre nunca, y eso es exactamente lo que
+midió la primera sesión humana real (§2.84): veinte años en los que la aldea
+repelió un asalto a su granero, enterró a alguien muerto a manos de otro,
+perdió una casa en un incendio, encendió su fragua y eligió líder — y el
+jugador vio gente andando.
+
+**Cuando ocurre algo de peso 2 o 3, su propia línea de la crónica aparece sobre
+el valle unos segundos.** No es un HUD: §11.1 prohíbe cifras y aquí no hay
+ninguna, es la voz de §9 puesta donde el jugador ya está mirando en vez de
+detrás de un gesto que puede no hacer nunca. El filtro es el de §9.2 y no otro,
+para que «ha pasado algo» signifique lo mismo en la crónica y en el valle.
+
+Reglas:
+
+- **Se retira sola.** Es un aviso, no un panel: nada que cerrar.
+- **Corte seco, nunca desvanecido**, y por el motivo de §11.4: una animación
+  sobre el reloj de pared es lo que un salto del reloj del juego pilla a medias.
+- **Durante un letargo no habla.** Novecientos ticks de avisos son un teletipo;
+  esa ausencia la cuenta el parte de bienvenida de §9.2.
+- **Cede la pantalla.** La encrucijada y el epitafio la ocupan entera y el aviso
+  se retira.
+
+Esto es lo mínimo honesto y **no es el vocabulario visual definitivo**: qué
+dibujo merece una muerte, una cosecha perdida o un asalto pertenece al trabajo
+de arte, y llegará con él. Lo que esta sección fija es que el valle tiene que
+contar lo que pasa, no solo cómo está.
+
+### 11.7 Accesibilidad
 
 - Ningún dato depende solo del color: la estación se refuerza con el marco del
   canvas y con el texto de la ficha.
@@ -4938,6 +5036,24 @@ no caduca y no mata (§1).
 
 Al terminar, se abre el **parte de bienvenida** (§9.2).
 
+**El letargo tiene dos puertas, no una** (v2.84). Arrancar con un guardado
+viejo es la evidente. La otra es **volver de una pestaña oculta**: un móvil que
+bloquea la pantalla mantiene la página viva, no la vuelve a arrancar, y hasta
+la v2.84 ese tiempo se perdía entero — el valle se quedaba congelado y la
+promesa «la aldea sigue sin ti» era falsa justo en lo más corriente que hace un
+jugador. Medido en un Android real: catorce minutos de reloj de pared dieron
+siete años en vez de dieciocho.
+
+Al ocultarse se anota la hora; al volver se deben los ticks de esa ausencia,
+con el mismo tope de cuatro horas y los mismos lotes. Dos precisiones:
+
+- **En pausa no se debe nada.** Quien paró el reloj y cambió de aplicación lo
+  encuentra parado, igual que §2.60 deja esperando una decisión.
+- **El parte de bienvenida pide una ausencia que contar**: al menos una
+  estación completa. Por debajo, el resumen no tendría casi nada que decir y un
+  modal por cada ojeada a otra aplicación es peor que el silencio que sustituye.
+  El umbral es la estación de §5.1, no una cifra elegida para la ocasión.
+
 ### 13.3 Herencia entre partidas
 
 Al terminar una aldea por cualquiera de las tres causas de `EndState`, la
@@ -5164,6 +5280,28 @@ resolvió la primera política de migración: esquema 1 a 2, aditiva y sin inven
 el pico histórico ausente. Falta el criterio que no automatiza ninguna suite:
 una partida real de varios días. Hasta entonces el guardado está verificado,
 pero el hito no está aceptado.
+
+**Primera sesión humana real (11 sep 2026): el hito NO se acepta, y la razón no
+es el guardado.** Instalada en un Android, jugada unos treinta y cinco minutos
+y abandonada. Palabras del jugador: *«no sé ni qué está pasando, solo veo a los
+aldeanos salir de sus casas, dar un par de vueltas y volver a dormir»*, y *«no
+me pidas que me entren ganas de volver al juego»*. El criterio de §15 pregunta
+si vuelves; la respuesta fue no, y llegó sin necesidad de los varios días.
+
+**No es un fallo de persistencia y conviene no confundirlo.** El guardado
+funcionó; lo que falló fue que la aldea no cuenta lo que le pasa. Su crónica de
+esa misma sesión registra, en los veinte años que estuvo mirando, un asalto al
+granero repelido, una muerte a manos de otro, un incendio, la fragua encendida,
+una sucesión y dos encrucijadas decididas — **unos quince sucesos notables en
+veinte años, uno por minuto de pantalla** — y ninguno tenía un píxel en el
+valle. Dos causas medidas y atacadas en la v2.84: §11.6 (los sucesos no se
+veían) y §13.2 (el reloj se paraba en segundo plano y nadie lo recuperaba, así
+que la mitad del tiempo jugado no existió).
+
+Queda anotado como evidencia, no como veredicto definitivo del hito: la sesión
+se interrumpió antes del protocolo de varios días, y **hay que repetirla cuando
+el valle sepa contar lo que ocurre**. Lo que sí queda cerrado es que la pregunta
+tiene, por primera vez, una respuesta de una persona.
 
 ---
 

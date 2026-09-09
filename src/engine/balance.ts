@@ -20,6 +20,12 @@ export const TIME = {
   SPEEDS: [0, 1, 4, 16],
   LETHARGY_CAP_MS: 4 * 60 * 60 * 1000,
   LETHARGY_BATCH: 64, // §13.2: ticks per requestAnimationFrame while catching up
+  // TUNE: how long a notable event stays legible over the valley (§11.6,
+  // v2.84). Long enough to read one sentence, short enough that a village at
+  // 16x does not queue a backlog. Real time on purpose and cut hard, never
+  // faded: §11.4 forbids an interface animation that a clock jump can catch
+  // half-way.
+  NOTICE_MS: 5_000,
   SAVE_EVERY_TICKS: 20, // §13.1
 } as const;
 
