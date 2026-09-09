@@ -122,6 +122,90 @@ describe('serialize / deserialize · §13.1', () => {
     }
   });
 
+  it('rechaza una condición diferida fuera de los dominios cerrados del DSL', () => {
+    // v2.73 afirma que las referencias de contenido guardadas resuelven en el
+    // catálogo estable. Una `PlantedSeed.condition` con `stat: 'missing'`
+    // resuelve su plantilla, su opción y su `id`, pero nombra una cifra que
+    // §8.2 no tiene: el motor la leería como `undefined` y la compararía
+    // contra un número, de modo que la consecuencia prometida no vencería
+    // nunca y nada lo diría.
+    const state = foundGame(7);
+    const base = serialize(state, state.history, [], 10);
+    const template = CATALOG.find((t) => t.options.some((o) => o.seeds.length > 0))!;
+    const option = template.options.find((o) => o.seeds.length > 0)!;
+    const spec = option.seeds[0]!;
+    const cast = Object.fromEntries(template.cast.map((part, index) => [part.as, index]));
+
+    const planted = (condition: unknown): unknown => {
+      const save = structuredClone(base);
+      save.state.seeds.push({
+        id: `${template.id}:${option.id}:${spec.id}:1`,
+        fromTemplateId: template.id,
+        fromOptionId: option.id,
+        plantedTick: 1,
+        firesAtTick: 2,
+        cast,
+        condition: condition as never,
+        firedTick: null,
+        witheredTick: null,
+      });
+      return save;
+    };
+
+    // Controles positivos: los cinco nombres de `stat`, los cuatro de `ratio`
+    // y los dos extremos de `minWeek`. El catálogo hoy no escribe `grain`, así
+    // que sin esta lista un dominio recortado a «lo que se usa» pasaría.
+    for (const real of [
+      null,
+      { k: 'stat', stat: 'people', op: '>=', v: 30 },
+      { k: 'stat', stat: 'grain', op: '<', v: 100 },
+      { k: 'stat', stat: 'wood', op: '>', v: 200 },
+      { k: 'stat', stat: 'morale', op: '<=', v: 40 },
+      { k: 'stat', stat: 'faith', op: '==', v: 70 },
+      { k: 'ratio', ratio: 'grainYears', op: '<', v: 0.35 },
+      { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 0.9 },
+      { k: 'ratio', ratio: 'housingFree', op: '>', v: 0.1 },
+      { k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.5 },
+      { k: 'season', season: 'winter' },
+      { k: 'season', season: 'spring', minWeek: 0 },
+      { k: 'season', season: 'winter', minWeek: 11 },
+      { k: 'not', c: { k: 'has', building: 'chapel' } },
+      { k: 'any', cs: [{ k: 'grudge', min: 45 }, { k: 'flag', flag: 'feud_ripe', set: true }] },
+    ]) {
+      expect(() => deserialize(planted(real)), JSON.stringify(real)).not.toThrow();
+    }
+
+    for (const impossible of [
+      { k: 'stat', stat: 'missing', op: '>', v: 0 },
+      { k: 'stat', stat: '', op: '>', v: 0 },
+      { k: 'ratio', ratio: 'missing', op: '>', v: 0 },
+      { k: 'season', season: 'winter', minWeek: 12 },
+      { k: 'season', season: 'winter', minWeek: 999 },
+      // Anidadas: `not` y `any` recorren, no envuelven.
+      { k: 'not', c: { k: 'stat', stat: 'missing', op: '>', v: 0 } },
+      { k: 'any', cs: [{ k: 'ratio', ratio: 'missing', op: '>', v: 0 }] },
+    ]) {
+      expect(() => deserialize(planted(impossible)), JSON.stringify(impossible)).toThrow();
+    }
+
+    // El control que impide que apretar el dominio se lleve por delante
+    // contenido real: TODA condición que el catálogo escribe —requisitos de
+    // plantilla, requisitos de opción y condiciones de semilla— tiene que
+    // seguir entrando por la frontera.
+    const written: unknown[] = [];
+    for (const t of CATALOG) {
+      written.push(...t.requires);
+      for (const o of t.options) {
+        written.push(...(o.requires ?? []));
+        for (const s of o.seeds) if (s.condition !== undefined) written.push(s.condition);
+      }
+    }
+    expect(written.length).toBeGreaterThan(20);
+    for (const real of written) {
+      expect(() => deserialize(planted(real)), JSON.stringify(real)).not.toThrow();
+    }
+  });
+
   it('migra el esquema 1 conservando su semilla de terreno y el pico observable', () => {
     const current = foundGame(7);
     current.chronicle.push({
