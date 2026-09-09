@@ -8,7 +8,7 @@
 
 import { CATALOG } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
-import { renderEntry } from '@engine/chronicle/render';
+import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import type { GameState, PendingCrossroad } from '@engine/state';
 import type { TickReport } from '@engine/sim';
 import { yearOf } from '@engine/time';
@@ -99,7 +99,7 @@ function mountMarker(app: App, p: PendingCrossroad): void {
   const marker = document.createElement('button');
   marker.type = 'button';
   marker.className = 'crossroad-marker';
-  marker.setAttribute('aria-label', 'A crossroad is waiting');
+  marker.setAttribute('aria-label', renderUiText('crossroad.waiting'));
   marker.addEventListener('click', () => {
     marker.remove();
     mountOverlay(app, p);

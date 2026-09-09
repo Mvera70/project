@@ -2,6 +2,7 @@
 
 import { TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
+import { renderUiText } from '@engine/chronicle/render';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
@@ -89,12 +90,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
 
   const canvas = document.createElement('canvas');
   canvas.id = 'valley';
-  canvas.setAttribute('aria-label', 'The valley');
+  canvas.setAttribute('aria-label', renderUiText('app.valley'));
   const year = document.createElement('div');
   year.className = 'valley-year';
   const controls = document.createElement('div');
   controls.className = 'valley-speeds';
-  controls.setAttribute('aria-label', 'Simulation speed');
+  controls.setAttribute('aria-label', renderUiText('app.speed.controls'));
   const buttons = ([0, 1, 4, 16] as const).map((value) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -115,7 +116,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const renderer = createRenderer(canvas, root);
   const paint = (fraction: number): void => {
     lastFraction = fraction;
-    year.textContent = `ANNO ${roman(yearOf(state.tick) + 1)}`;
+    year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
     renderer.paint(state, fraction);
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
