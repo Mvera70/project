@@ -15,6 +15,7 @@ import { inspectAt, panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
+import { mountNotices } from './notice';
 import { openChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
@@ -52,6 +53,37 @@ export function attemptDecision(
 ): DecisionAttempt {
   const accepted = hasPendingCrossroad && !alreadyQueued;
   return { accepted, forceTick: accepted && speed !== 0 };
+}
+
+export interface Resumption {
+  /** Ticks the village owes for the time the tab spent hidden. */
+  ticks: number;
+  /** Whether coming back deserves the welcome report of §9.2. */
+  welcome: boolean;
+}
+
+/**
+ * What returning from a hidden tab owes (§13.2, v2.84).
+ *
+ * The lethargy used to run in one place only — `boot` — so it only ever
+ * happened when the page was reloaded. A phone that merely locks its screen
+ * keeps the page alive, and then §13.2's promise was false: the valley did not
+ * keep going, it froze and said nothing about it. Measured on a real Android
+ * session: fourteen minutes of wall clock produced seven years instead of the
+ * eighteen the speed called for.
+ *
+ * Paused is still paused. The player who stops the clock and switches apps
+ * gets it stopped when they come back, the same way §2.60 lets a decision wait.
+ *
+ * The welcome report needs an absence worth reporting: below a whole season
+ * the digest would have almost nothing to say, and a modal over every glance
+ * at another app is worse than the silence it replaces. The threshold is the
+ * season itself, not a number chosen for the occasion.
+ */
+export function resumeAfterHidden(hiddenMs: number, speed: Speed): Resumption {
+  if (speed === 0) return { ticks: 0, welcome: false };
+  const ticks = ticksOwed(hiddenMs);
+  return { ticks, welcome: ticks >= TIME.WEEKS_PER_SEASON };
 }
 
 export function roman(value: number): string {
@@ -107,6 +139,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   });
   root.append(canvas, year, controls);
 
+  // §11.6: the band that says what just happened, over the valley itself.
+  const notices = mountNotices(root);
+
   const panel = document.createElement('section');
   panel.className = 'valley-panel';
   panel.hidden = true;
@@ -117,6 +152,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
+    // The same kind of observability hook as `data-app-ready` (M-19): the year
+    // on screen is rounded to twelve weeks, and a test about the clock needs
+    // the week.
+    document.documentElement.dataset.tick = String(state.tick);
     renderer.paint(state, fraction);
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
@@ -191,7 +230,20 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     ));
     saveQueue = saveQueue.then(() => persistSave(snapshot));
   };
-  document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+  // §13.2, v2.84. The lethargy used to live only in `boot`, so it only ran on
+  // a cold start. A phone that locks its screen keeps the page alive, and the
+  // valley simply froze — the promise "sigue sin ti" was false for the most
+  // ordinary thing a player does. Hiding notes the hour; coming back owes it.
+  let hiddenAtMs: number | null = null;
+  let catchingUp = false;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { hiddenAtMs = Date.now(); persist(); return; }
+    const since = hiddenAtMs;
+    hiddenAtMs = null;
+    if (since === null || catchingUp || state.ended !== null) return;
+    const resumption = resumeAfterHidden(Date.now() - since, speed);
+    if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome);
+  });
   window.addEventListener('pagehide', () => { persist(); loop?.stop(); }, { once: true });
 
   // The queue behind `decide` (v2.60). `runTick` is the one and only place a
@@ -204,6 +256,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const finish = (): void => {
     if (state.ended === null) return;
     loop?.stop();
+    notices.clear();
     closeCrossroad();
     let game = archive.find((item) =>
       item.seed === state.seed && item.endedTick === state.ended?.tick);
@@ -234,10 +287,46 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       document.dispatchEvent(new CustomEvent<TickReport>('valley:decided', { detail: report }));
     }
     if (state.ended !== null) { finish(); return; }
+    // §11.6: what the chronicle would print in bold, where the player is
+    // already looking. Not during a catch-up — nine hundred ticks of notices
+    // is a backlog, and the welcome report of §9.2 is what tells that story.
+    if (!catchingUp) notices.show(state, report.entries);
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
   const beginLoop = (): void => {
     loop = startLoop(() => speed, runTick, paint);
+  };
+
+  /**
+   * §13.2's catch-up, used by both doors into it: a cold start with a save
+   * older than a tick, and a return from a hidden tab. The ordinary loop is
+   * stopped first — it and the catch-up must never tick the same state at
+   * once — and `paint` after every batch is the progress screen: the valley
+   * is what fills in.
+   */
+  const catchUpFor = (elapsedMs: number, showWelcome: boolean): void => {
+    loop?.stop();
+    loop = undefined;
+    catchingUp = true;
+    const sinceTick = state.tick;
+    // Covers an exit before the first requestAnimationFrame batch has run.
+    savedAtOverride = Date.now() - elapsedMs;
+    runLethargy(state, elapsedMs, (progress) => {
+      savedAtOverride = checkpointSavedAtMs(Date.now(), progress);
+      paint(0);
+      if (progress.done >= progress.total || progress.ended) {
+        catchingUp = false;
+        if (state.ended !== null) finish();
+        else {
+          // Commit the completed catch-up before the ordinary loop can mutate
+          // the state. This also supersedes any partial visibility checkpoint.
+          persist();
+          if (showWelcome) openWelcome(app, welcomeDigest(state, sinceTick));
+          beginLoop();
+        }
+        savedAtOverride = null;
+      }
+    });
   };
 
   const app: App = {
@@ -274,25 +363,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // stamped `Date.now()` at boot) owes zero ticks, and a "welcome back,
     // nothing happened" screen over every debug route would be worse than
     // the screen it is supposed to replace.
-    const elapsedMs = Date.now() - save.savedAtMs;
-    const sinceTick = state.tick;
-    // Covers an exit before the first requestAnimationFrame batch has run.
-    savedAtOverride = save.savedAtMs;
-    runLethargy(state, elapsedMs, (progress) => {
-      savedAtOverride = checkpointSavedAtMs(Date.now(), progress);
-      paint(0);
-      if (progress.done >= progress.total || progress.ended) {
-        if (state.ended !== null) finish();
-        else {
-          // Commit the completed catch-up before the ordinary loop can mutate
-          // the state. This also supersedes any partial visibility checkpoint.
-          persist();
-          openWelcome(app, welcomeDigest(state, sinceTick));
-          beginLoop();
-        }
-        savedAtOverride = null;
-      }
-    });
+    catchUpFor(Date.now() - save.savedAtMs, true);
   } else {
     beginLoop();
   }

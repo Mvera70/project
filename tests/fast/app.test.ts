@@ -4,7 +4,8 @@
 // than through `boot`, which needs a real DOM this suite does not open. The
 // split mirrors `loop.ts`'s own `advanceAccumulator` versus `startLoop`.
 import { describe, expect, it } from 'vitest';
-import { attemptDecision, nextUnusedSeed } from '@ui/app';
+import { TIME } from '@engine/balance';
+import { attemptDecision, nextUnusedSeed, resumeAfterHidden } from '@ui/app';
 
 describe('attemptDecision · §2.60', () => {
   it('sin encrucijada pendiente, no se acepta a ninguna velocidad', () => {
@@ -30,6 +31,27 @@ describe('attemptDecision · §2.60', () => {
     // Regla 3: §8.7 dice que la simulación no se detiene por una encrucijada
     // pendiente, no que el jugador no pueda pausarla él mismo.
     expect(attemptDecision(true, false, 0)).toEqual({ accepted: true, forceTick: false });
+  });
+});
+
+describe('resumeAfterHidden · §13.2, v2.84', () => {
+  const MINUTE = 60_000;
+
+  it('volver de una pestaña oculta debe los ticks de esa ausencia', () => {
+    // El fallo medido en un Android real: catorce minutos de reloj de pared
+    // daban siete años en vez de dieciocho, porque el letargo solo corría en
+    // `boot` y una pestaña que solo duerme nunca vuelve a arrancar.
+    expect(resumeAfterHidden(14 * MINUTE, 16).ticks).toBe(56); // 14 min / 15 s
+    expect(resumeAfterHidden(4 * 60 * MINUTE, 1).ticks).toBe(960); // el tope de §13.2
+  });
+
+  it('una ausencia de al menos una estación abre el parte; una ojeada no', () => {
+    expect(resumeAfterHidden(TIME.WEEKS_PER_SEASON * TIME.REAL_MS_PER_TICK, 1).welcome).toBe(true);
+    expect(resumeAfterHidden(30_000, 1)).toEqual({ ticks: 2, welcome: false });
+  });
+
+  it('en pausa no se debe nada: el jugador paró el reloj a propósito', () => {
+    expect(resumeAfterHidden(4 * 60 * MINUTE, 0)).toEqual({ ticks: 0, welcome: false });
   });
 });
 

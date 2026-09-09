@@ -242,3 +242,61 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
   await page.locator('html[data-app-ready="true"]').waitFor();
   await test.expect(page.locator('.epitaph-scrim')).toBeHidden();
 });
+
+test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (§13.2)', async ({ page }) => {
+  // Medido en un Android real: catorce minutos de reloj daban siete años en
+  // vez de dieciocho. El letargo solo corría en `boot`, así que una pestaña
+  // que solo duerme perdía el tiempo entero.
+  const t0 = Date.now();
+  await page.clock.install({ time: t0 });
+  await page.goto('/');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.getByRole('button', { name: '16×' }).click();
+  await page.clock.runFor(5_000);
+
+  const tickBefore = await page.evaluate(() => Number(document.documentElement.dataset['tick'] ?? '-1'));
+
+  // La pestaña se oculta, pasan treinta minutos y vuelve.
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+    Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await page.clock.fastForward(30 * 60_000);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true });
+    Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+
+  // 30 min / 15 s = 120 ticks debidos.
+  await test.expect
+    .poll(() => page.evaluate(() => Number(document.documentElement.dataset['tick'] ?? '-1')), { timeout: 20_000 })
+    .toBeGreaterThanOrEqual(tickBefore + 120);
+});
+
+test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)', async ({ page }) => {
+  await page.clock.install();
+  await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.getByRole('button', { name: '16×' }).click();
+
+  const notice = page.locator('.valley-notice');
+  await test.expect(notice).toBeHidden(); // nada que decir todavía
+
+  // Se deja correr hasta que la aldea tenga algo que contar. Antes de M-28
+  // esto no aparecía nunca: el suceso existía solo en la crónica.
+  await test.expect.poll(async () => {
+    await page.clock.runFor(4_000);
+    return notice.isVisible();
+  }, { timeout: 30_000 }).toBe(true);
+
+  const text = await notice.innerText();
+  test.expect(text.length).toBeGreaterThan(10);
+  test.expect(text).not.toMatch(/\{\w+\}/); // una frase del banco, no una clave
+  await page.screenshot({ path: 'artifacts/m28-notice.png', fullPage: true });
+
+  // Y se retira sola: es un aviso, no un panel que haya que cerrar.
+  await page.clock.runFor(6_000);
+  await test.expect(notice).toBeHidden();
+});
