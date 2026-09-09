@@ -13,7 +13,7 @@ import { createRenderer } from '@render/renderer';
 import { persistSave } from './idb';
 import { inspectAt, panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
-import { runLethargy } from './lethargy';
+import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
 import { openChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
@@ -177,12 +177,18 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // tab is hidden. M-25 also writes immediately on ending and beginning again.
   let loop: Loop | undefined;
   let saveQueue = Promise.resolve();
+  // During catch-up, a partial state is only as current as the ticks it has
+  // actually processed. The checkpoint clock preserves the remaining debt if
+  // visibilitychange/pagehide saves between two batches.
+  let savedAtOverride: number | null = null;
   const persist = (): void => {
     // Freeze the value now, before either the live loop or "Begin again" can
     // mutate it, and serialize writes in request order. Two independent IDB
     // opens could otherwise let the final dead-village write land after the
     // successor write and resurrect the epitaph on reload.
-    const snapshot = structuredClone(serialize(state, state.history, archive, Date.now()));
+    const snapshot = structuredClone(serialize(
+      state, state.history, archive, savedAtOverride ?? Date.now(),
+    ));
     saveQueue = saveQueue.then(() => persistSave(snapshot));
   };
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
@@ -270,14 +276,21 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // the screen it is supposed to replace.
     const elapsedMs = Date.now() - save.savedAtMs;
     const sinceTick = state.tick;
+    // Covers an exit before the first requestAnimationFrame batch has run.
+    savedAtOverride = save.savedAtMs;
     runLethargy(state, elapsedMs, (progress) => {
+      savedAtOverride = checkpointSavedAtMs(Date.now(), progress);
       paint(0);
       if (progress.done >= progress.total || progress.ended) {
         if (state.ended !== null) finish();
         else {
+          // Commit the completed catch-up before the ordinary loop can mutate
+          // the state. This also supersedes any partial visibility checkpoint.
+          persist();
           openWelcome(app, welcomeDigest(state, sinceTick));
           beginLoop();
         }
+        savedAtOverride = null;
       }
     });
   } else {

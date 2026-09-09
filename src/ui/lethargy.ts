@@ -18,6 +18,19 @@ function finished(p: LethargyProgress): boolean {
 }
 
 /**
+ * Wall-clock timestamp for a save taken between catch-up batches.
+ *
+ * The state already contains `done` newly simulated ticks. Dating that partial
+ * snapshot as "now" would forgive the ticks still owed on the next load. Date
+ * it by the remaining debt instead; once the run is complete (or the village
+ * ends), the snapshot is current.
+ */
+export function checkpointSavedAtMs(nowMs: number, progress: LethargyProgress): number {
+  if (finished(progress)) return nowMs;
+  return nowMs - (progress.total - progress.done) * TIME.REAL_MS_PER_TICK;
+}
+
+/**
  * Up to `TIME.LETHARGY_BATCH` ticks, never more. Pure state mutation and a
  * progress value that is an integer fraction of a tick count — never a
  * real-clock animation — which is §11.4's rule applied to its own test case:

@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { foundGame } from '@engine/found';
 import { ticksOwed } from '@engine/save';
-import { runBatch } from '@ui/lethargy';
+import { checkpointSavedAtMs, runBatch } from '@ui/lethargy';
 
 describe('runBatch · §13.2, §11.4', () => {
   it('nunca corre más de un lote de 64 ticks de una vez', () => {
@@ -62,5 +62,21 @@ describe('runBatch · §13.2, §11.4', () => {
     expect(progress.ended).toBe(true);
     expect(progress.done).toBeLessThan(960);
     expect(Number.isInteger(progress.done)).toBe(true);
+  });
+});
+
+describe('checkpoint de letargo · §13.1', () => {
+  it('conserva exactamente los ticks aún debidos en un guardado parcial', () => {
+    const now = 2_000_000;
+    const progress = { done: 64, total: 960, ended: false };
+    const savedAt = checkpointSavedAtMs(now, progress);
+
+    expect(ticksOwed(now - savedAt)).toBe(960 - 64);
+  });
+
+  it('fecha como actual un letargo completo o terminado antes de tiempo', () => {
+    const now = 2_000_000;
+    expect(checkpointSavedAtMs(now, { done: 960, total: 960, ended: false })).toBe(now);
+    expect(checkpointSavedAtMs(now, { done: 31, total: 960, ended: true })).toBe(now);
   });
 });
