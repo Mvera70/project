@@ -35,7 +35,7 @@ export function consume(state: GameState): {
 } {
   const people = population(state);
   if (people === 0) {
-    return { severity: 0, starved: [], herd: { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null } };
+    return { severity: 0, starved: [], herd: { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null, murrain: null } };
   }
 
   const demand = people * FOOD.GRAIN_PER_PERSON;

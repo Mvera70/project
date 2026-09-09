@@ -58,6 +58,9 @@ describe('rng · reproducibilidad', () => {
       // los diez anteriores. Eso es §4.3 por escrito: un sistema nuevo puede
       // añadir su propia aleatoriedad sin desplazar una sola partida guardada.
       animals: 3726732107,
+      // v2.94: y `murrain` (§7.7) igual. Once flujos y ninguno de los diez
+      // primeros se ha movido jamás al añadir los dos últimos.
+      murrain: 4187293312,
     });
   });
 

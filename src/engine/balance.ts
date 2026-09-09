@@ -309,6 +309,33 @@ export const ANIMALS = {
 } as const;
 
 /**
+ * Murrain, the cattle plague (§7.7, v2.94). Built in the image of §5.8's human
+ * plague, because it is the same kind of thing: a base annual chance plus a
+ * term for how much there is to catch it, halved by clean water.
+ *
+ * This is what the herd was missing. Until now a big herd only cost grain, and
+ * it should also frighten. Every number is TUNE.
+ */
+export const MURRAIN = {
+  // TUNE: annual chance at an empty pen, before the density term. Lower than
+  // DISASTER.PLAGUE_BASE: losing animals must be commoner than losing people
+  // in count, and rarer in occurrence.
+  BASE: 0.010,
+  // TUNE: added to the annual chance at a herd sitting on its ceiling. A full
+  // pen is roughly four times as likely to break out as an empty one, which is
+  // the pressure that makes a big herd a gamble rather than a free buffer.
+  PER_DENSITY: 0.030,
+  // TUNE: the well again (§5.8 gives DISASTER.PLAGUE_WELL 0.6 for people).
+  // Slightly kinder than for people because a trough is easier to keep clean
+  // than a village, and because the well needed a second reason to exist.
+  WELL: 0.55,
+  // TUNE: share of the affected kind that dies in an outbreak. Never all of
+  // it: a village that loses every cow in one week has nothing to decide
+  // afterwards, and §7.7's whole point is that the herd is a thing you manage.
+  TOLL: 0.5,
+} as const;
+
+/**
  * The crows (§7.7, v2.93). They were already on the fields in the weeks before
  * the reaping; now they take something. The answer is not a building but
  * hands: somebody has to stand in the field and keep them off, and those are

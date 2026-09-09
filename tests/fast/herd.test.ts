@@ -12,10 +12,20 @@ import { herdCapacity, tendHerd, upkeep } from '@engine/subsistence/herd';
 import { consume } from '@engine/subsistence/consumption';
 import { HERD_KINDS, type GameState } from '@engine/state';
 
+// Una sola aldea por (años, semilla) y copias para cada prueba: correr mil
+// ticks por prueba es lo que engorda la suite rápida, y CLAUDE.md le da veinte
+// segundos a toda ella. El clon es estructurado porque el estado es plano y
+// serializable por diseño (§2.3), así que copiarlo es legal y barato.
+const grown = new Map<string, GameState>();
 function village(years: number, seed = 7): GameState {
-  const state = foundGame(seed);
-  run(state, years * 48, 'prudent', CATALOG);
-  return state;
+  const key = `${years}:${seed}`;
+  let base = grown.get(key);
+  if (base === undefined) {
+    base = foundGame(seed);
+    run(base, years * 48, 'prudent', CATALOG);
+    grown.set(key, base);
+  }
+  return structuredClone(base);
 }
 
 describe('el rebaño come · §7.7', () => {

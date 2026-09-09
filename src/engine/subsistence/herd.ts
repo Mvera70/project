@@ -6,7 +6,7 @@
 // from `animals` and from nowhere else (§4.3) so that a raid can never shift
 // the deaths of §6.5.
 
-import { ANIMALS, FOOD, TIME } from '../balance';
+import { ANIMALS, FOOD, MURRAIN, TIME } from '../balance';
 import { population } from '../people/demography';
 import { next } from '../rng';
 import { HERD_KINDS, type GameState, type HerdKind } from '../state';
@@ -30,6 +30,38 @@ export function upkeep(state: GameState): number {
   return HERD_KINDS.reduce((sum, kind) => sum + state.herd[kind] * ANIMALS.UPKEEP[kind], 0);
 }
 
+/**
+ * How full the pen is, 0 to 1: the herd against what the village can hold.
+ * Density is what murrain feeds on, and it is also the only part of this the
+ * village has any say over — more houses and more fields raise the ceiling and
+ * thin the herd out against it.
+ */
+export function herdDensity(state: GameState): number {
+  const capacity = herdCapacity(state);
+  let head = 0;
+  let room = 0;
+  for (const kind of HERD_KINDS) {
+    head += state.herd[kind];
+    room += capacity[kind];
+  }
+  return room === 0 ? 0 : Math.min(1, head / room);
+}
+
+/**
+ * Annual chance of an outbreak, before it is divided into weeks. Exposed
+ * because it is the whole design in one line: a base risk, plus a term for how
+ * crowded the pen is, and clean water against both of them.
+ *
+ * The well covers the base as well as the density term. An earlier version had
+ * it protecting only the crowding, which would have meant a village with a
+ * well and two hens was no safer than one without — and the well is supposed
+ * to be about clean water, not about how many animals drink it.
+ */
+export function murrainChance(state: GameState): number {
+  const sheltered = count(state, 'well') > 0 ? MURRAIN.WELL : 1;
+  return (MURRAIN.BASE + MURRAIN.PER_DENSITY * herdDensity(state)) * sheltered;
+}
+
 export interface HerdReport {
   /** Grain eaten by the animals. */
   ate: number;
@@ -40,9 +72,13 @@ export interface HerdReport {
   bred: HerdKind | null;
   /** A head taken by wolves, if any. */
   wolved: HerdKind | null;
+  /** Heads lost to murrain this week, by kind (§7.7, v2.94). */
+  murrain: { kind: HerdKind; lost: number } | null;
 }
 
-const EMPTY: HerdReport = { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null };
+const EMPTY: HerdReport = {
+  ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null, murrain: null,
+};
 
 /**
  * Step 7's half of the herd: it eats, and if there is not enough food it is
@@ -55,7 +91,9 @@ const EMPTY: HerdReport = { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved
  * makes the buffer degrade gradually instead of in one lump.
  */
 export function feedAndSlaughter(state: GameState, demand: number): HerdReport {
-  const report: HerdReport = { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null };
+  const report: HerdReport = {
+    ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null, murrain: null,
+  };
 
   // The animals eat first, and only what there is: a herd cannot conjure grain
   // out of an empty granary to starve the village with.
@@ -87,7 +125,9 @@ export function feedAndSlaughter(state: GameState, demand: number): HerdReport {
  */
 export function tendHerd(state: GameState): HerdReport {
   if (population(state) === 0) return EMPTY;
-  const report: HerdReport = { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null };
+  const report: HerdReport = {
+    ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null, murrain: null,
+  };
   const capacity = herdCapacity(state);
 
   const people = population(state);
@@ -122,6 +162,28 @@ export function tendHerd(state: GameState): HerdReport {
           break;
         }
       }
+    }
+  }
+
+  // §7.7, v2.94: murrain. Built like §5.8's plague — a base chance plus a term
+  // for how much there is to catch it, and the well halves it. Drawn from its
+  // own `murrain` stream and not from `animals`, so that adding the sickness
+  // does not shift a single wolf in a game already saved (§4.3).
+  //
+  // Rolled weekly against the annual chance divided by the year, which is how
+  // §5.8 reads its own numbers: the chance quoted is the one over a year.
+  if (next(state.rng, 'murrain') < murrainChance(state) / TIME.WEEKS_PER_YEAR) {
+    // It takes the commonest kind, ties by the fixed order of HERD_KINDS. A
+    // sickness goes through what there is most of, and it also means the loss
+    // is felt without being the end of the herd.
+    let worst: HerdKind | null = null;
+    for (const kind of HERD_KINDS) {
+      if (worst === null || state.herd[kind] > state.herd[worst]) worst = kind;
+    }
+    if (worst !== null && state.herd[worst] > 0) {
+      const lost = Math.max(1, Math.floor(state.herd[worst] * MURRAIN.TOLL));
+      state.herd[worst] -= lost;
+      report.murrain = { kind: worst, lost };
     }
   }
 

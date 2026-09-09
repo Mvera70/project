@@ -317,7 +317,11 @@ export function deserialize(raw: unknown): SaveFile {
     const withStream = {
       ...state,
       version: SCHEMA_VERSION,
-      rng: { ...state.rng, animals: state.rng.animals ?? hash32(state.seed, 'animals') },
+      rng: {
+        ...state.rng,
+        animals: state.rng.animals ?? hash32(state.seed, 'animals'),
+        murrain: state.rng.murrain ?? hash32(state.seed, 'murrain'),
+      },
     };
     const capacity = herdCapacity(withStream as GameState);
     const herd: Herd = {

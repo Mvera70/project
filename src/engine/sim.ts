@@ -905,6 +905,16 @@ export function tick(
   // winter if nothing stands in their way. Here and not in step 7 because this
   // is where the world acts on the village.
   const herd: HerdReport = tendHerd(state);
+  if (herd.murrain !== null) {
+    // Weight 3 when it takes the cattle: losing the cows to sickness is the
+    // kind of year a village still talks about a generation later (§9.2).
+    say({
+      kind: 'lost',
+      templateKey: `herd.murrain.${herd.murrain.kind}`,
+      params: { year: year(), season: season(), count: herd.murrain.lost },
+      weight: herd.murrain.kind === 'cows' ? 3 : 2,
+    });
+  }
   if (herd.wolved !== null) {
     say({
       kind: 'lost',

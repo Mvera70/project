@@ -92,6 +92,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.94** | 11 sep 2026, 21:15 | M-29 · la peste del ganado | **Lo que al rebaño le faltaba: miedo.** Hasta ahora un rebaño grande solo costaba grano; ahora también enferma, y cuanto más apretado está el corral más probable es. Construida a imagen de la plaga de §5.8, con el pozo protegiendo igual que protege a las personas, que era el segundo motivo que le faltaba a ese edificio. Flujo `murrain` propio: añadir la enfermedad no desplaza ni un lobo de una partida ya guardada. |
 | **2.93** | 11 sep 2026, 19:40 | M-29 · los cuervos muerden | **El primer animal que le pide algo al jugador en vez de solo pasarle algo.** En las seis semanas antes de la siega los pájaros se llevan parte de la cosecha en pie, y la respuesta no es una obra sino brazos: alguien tiene que estar en el campo, y son los mismos brazos que quieren el bosque y las obras. Sin tirada de azar: lo que se pierde es consecuencia del reparto y se puede leer en él. De paso se arregla que `SCHEMA_VERSION` estuviera escrito a mano en dos sitios y se hubieran desincronizado. |
 | **2.92** | 11 sep 2026, 18:10 | M-29 · caza y pesca, y lo que cuestan | **La aldea hambrienta sale al bosque y al río, y eso devuelve el desenlace a donde estaba antes del rebaño.** Extinción adversa 13,3 % → 11,7 % y separación 11,7 → 10,0 puntos: el forrajeo anula exactamente lo que el rebaño había ganado. Es la palanca que §2.47 dejó sin explorar, medida por fin. **No se ajusta ninguna constante para taparlo**: la fase de balance sigue cerrada y esto es una decisión de diseño pendiente, no un número mal puesto. |
 | **2.91** | 11 sep 2026, 16:30 | M-29 · el rebaño, con mecánica y medido | **El ganado deja de ser dibujo y pasa a ser estado: come, se sacrifica y cría, y los lobos se llevan cabezas de verdad.** La pregunta que §7.7 dejó abierta —colchón o coste— la contesta el banco: **gana el coste**. La extinción adversa sube de 11,7 % a 13,3 % y la separación con `prudent` de 10,0 a 11,7 puntos; las dos van **hacia** la banda de §12.9, no en contra. Fallan las mismas siete pruebas que antes del rebaño, ni una más. Esquema de guardado 3 con migración 2→3. |
@@ -4098,6 +4099,35 @@ tiene grano de sobra para el rebaño, así que el coste solo se nota donde tení
 que notarse. **Qué falsaría esta lectura:** que el rebaño bajara la extinción
 adversa, o que ablandara `prudent` por encima de su banda.
 
+#### La peste del ganado (v2.94 · construida)
+
+Lo que al rebaño le faltaba. Hasta v2.91 tener muchos animales solo costaba
+grano, y debería además **dar miedo**: eso es lo que convierte un rebaño grande
+en una apuesta en vez de en un colchón gratis.
+
+Está construida a imagen de la plaga de §5.8, porque es la misma clase de cosa:
+
+| | Personas (§5.8) | Ganado (§7.7) |
+|---|---|---|
+| Riesgo base | `PLAGUE_BASE` anual | `MURRAIN.BASE` anual |
+| Término de tamaño | Habitantes / `PLAGUE_PER_PEOPLE` | Densidad del corral × `PER_DENSITY` |
+| El pozo | ×`PLAGUE_WELL` | ×`MURRAIN.WELL` |
+
+**La densidad es la única parte sobre la que el jugador manda**, y manda de la
+única forma en que puede: el techo del rebaño lo ponen las casas y los campos
+(v2.91), así que una aldea que crece diluye su ganado contra un techo más alto.
+Y el pozo, que hasta ahora solo servía contra la plaga humana, gana su segunda
+razón de existir.
+
+**Nunca se lleva una especie entera.** Se ceba en la más numerosa y se lleva
+`TOLL` de ella. Un valle que pierde todas las vacas en una semana no tiene nada
+que decidir después, y §7.7 va justo de que el rebaño es algo que se administra.
+
+**Flujo `murrain` propio, no `animals`.** Añadir la enfermedad no mueve ni una
+tirada de lobos en una partida ya guardada (§4.3). Once flujos, y ninguno de los
+diez primeros se ha desplazado nunca al añadir los dos últimos: está fijado en
+el estado dorado de `rng.test.ts`.
+
 **Lobos** (v2.91). En invierno, cuando la aldea no tiene empalizada, se llevan
 una cabeza y empiezan por la mayor. Convierte una obra que el jugador ya podía
 levantar en una defensa con motivo. Consumen del flujo `animals`, nuevo y
@@ -4199,6 +4229,13 @@ vigilar no sirva de nada, que una siega arrastre los pájaros del año anterior,
 o que los guardas salgan de los brazos de la propia cosecha en vez de los que
 sobran. Cada una de esas cinco tiene su prueba, y tres de ellas están
 verificadas por mutación.
+
+Y para la peste: que un corral apretado no corriera más riesgo que uno holgado,
+que el pozo no cambiara nada, que un brote se llevara una especie entera, o que
+tirara del flujo de los animales en vez del suyo. Las cuatro tienen prueba y
+las cuatro están verificadas por mutación — la del flujo hacía falta porque
+perturbar un flujo que nadie usa no cambia nada, y hay que mirar el contador de
+frente.
 
 ---
 

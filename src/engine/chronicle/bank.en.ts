@@ -1314,6 +1314,21 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     '{count} of the cattle went, and that was the last of the milk.',
     'The cattle were the last thing left to eat, and {count} of them went.',
   ],
+  'herd.murrain.hens': [
+    'A sickness went through the hens in year {year}.',
+    'The hens sickened that {season}, and {count} of them died.',
+    'Something got into the henhouse that was not a fox, and {count} died.',
+  ],
+  'herd.murrain.pigs': [
+    'Murrain took {count} of the pigs in year {year}.',
+    'The pigs sickened that {season}. They burned what was left of them.',
+    'A sickness in the sty, and {count} of them gone before the week was out.',
+  ],
+  'herd.murrain.cows': [
+    'Murrain came for the cattle in year {year}, and took {count}.',
+    'The cattle sickened that {season}. It was the year everyone remembered.',
+    'They lost {count} of the cows to the murrain, and the milk with them.',
+  ],
   'herd.wolves.hens': [
     'Wolves came down for the hens that winter.',
     'Something took the hens in the night. The tracks were wolves.',

@@ -352,7 +352,7 @@ describe('consumo · §5.3', () => {
     expect(consume(s)).toEqual({
       severity: 0,
       starved: [],
-      herd: { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null },
+      herd: { ate: 0, slaughtered: {}, meat: 0, bred: null, wolved: null, murrain: null },
     });
   });
 });
