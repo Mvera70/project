@@ -1,6 +1,7 @@
 // M-21 · Hit testing and panel content without DOM dependencies.
 
 import { population, isHere } from '@engine/people/demography';
+import { renderUiText } from '@engine/chronicle/render';
 import { ageOf } from '@engine/people/villagers';
 import type { Building, GameState, Villager } from '@engine/state';
 import { yearOf } from '@engine/time';
@@ -28,29 +29,44 @@ export function inspectAt(state: GameState, x: number, y: number, tickFraction =
 
 function buildingPanel(building: Building, state: GameState): PanelModel {
   const residents = state.people.villagers.filter((person) => isHere(person) && person.homeId === building.id);
-  const lines = [`Raised in ANNO ${yearOf(building.builtTick) + 1}.`];
-  if (building.kind === 'granary') lines.push(`${Math.floor(state.village.grain)} grain of ${capacityOf(state).storage} capacity.`);
+  const lines = [renderUiText('inspect.raised', { year: yearOf(building.builtTick) + 1 })];
+  if (building.kind === 'granary') lines.push(renderUiText('inspect.granary', {
+    grain: Math.floor(state.village.grain), capacity: capacityOf(state).storage,
+  }));
   if (building.kind === 'house' || building.kind === 'stone_house') {
     const named = residents.filter((person) => person.named).map((person) => person.name);
-    lines.push(`${residents.length} people under this roof${named.length > 0 ? `: ${named.join(', ')}` : '.'}`);
+    lines.push(renderUiText(named.length > 0 ? 'inspect.house.named' : 'inspect.house', {
+      people: residents.length, names: named.join(', '),
+    }));
   }
   const role = building.kind === 'smithy' ? 'smith' : building.kind === 'chapel' || building.kind === 'church' ? 'priest' : null;
   if (role !== null) {
     const holder = state.people.villagers.find((person) => isHere(person) && person.role === role);
-    lines.push(holder === undefined ? `No ${role} serves here.` : `${holder.name || `Villager ${holder.id}`} serves here as ${role}.`);
+    const roleName = renderUiText(`role.${role}`);
+    lines.push(holder === undefined
+      ? renderUiText('inspect.role.empty', { role: roleName })
+      : renderUiText('inspect.role.holder', {
+        name: holder.name || renderUiText('inspect.villager', { id: holder.id }), role: roleName,
+      }));
   }
-  return { title: building.kind.replaceAll('_', ' '), lines };
+  return { title: renderUiText(`building.${building.kind}`), lines };
 }
 
 function villagerPanel(person: Villager, state: GameState): PanelModel {
   const strong = Object.entries(person.opinions).filter(([, value]) => Math.abs(value) >= 40)
-    .map(([id, value]) => `${value > 0 ? 'Trusts' : 'Resents'} ${state.people.villagers.find((v) => v.id === Number(id))?.name || `#${id}`}: ${value}.`)
+    .map(([id, value]) => renderUiText(value > 0 ? 'inspect.opinion.trusts' : 'inspect.opinion.resents', {
+      name: state.people.villagers.find((v) => v.id === Number(id))?.name || `#${id}`, value,
+    }))
     .slice(0, 2);
   const memories = [...person.memories].sort((a, b) => b.weight - a.weight || b.tick - a.tick).slice(0, 2)
-    .map((memory) => `${memory.kind.replaceAll('_', ' ')} — ANNO ${yearOf(memory.tick) + 1}.`);
-  return { title: person.name || `Villager ${person.id}`, lines: [
-    `${ageOf(person, state.tick)} winters old.`,
-    person.traits.length > 0 ? person.traits.join(', ') : 'No named traits.',
+    .map((memory) => renderUiText('inspect.memory', {
+      memory: renderUiText(`memory.${memory.kind}`), year: yearOf(memory.tick) + 1,
+    }));
+  return { title: person.name || renderUiText('inspect.villager', { id: person.id }), lines: [
+    renderUiText('inspect.age', { age: ageOf(person, state.tick) }),
+    person.traits.length > 0
+      ? person.traits.map((trait) => renderUiText(`trait.${trait}`)).join(', ')
+      : renderUiText('inspect.traits.none'),
     ...memories, ...strong,
   ] };
 }
@@ -58,13 +74,16 @@ function villagerPanel(person: Villager, state: GameState): PanelModel {
 export function panelFor(target: InspectTarget, state: GameState): PanelModel {
   if (target.kind === 'building') {
     const building = state.buildings.find((item) => item.id === target.id);
-    return building === undefined ? { title: 'Gone', lines: [] } : buildingPanel(building, state);
+    return building === undefined ? { title: renderUiText('inspect.gone'), lines: [] } : buildingPanel(building, state);
   }
   if (target.kind === 'villager') {
     const person = state.people.villagers.find((item) => item.id === target.id);
-    return person === undefined ? { title: 'Gone', lines: [] } : villagerPanel(person, state);
+    return person === undefined ? { title: renderUiText('inspect.gone'), lines: [] } : villagerPanel(person, state);
   }
   const code = state.map.terrain[target.y * state.map.width + target.x];
-  const names = ['meadow', 'forest', 'water', 'rock', 'marsh'] as const;
-  return { title: names[code ?? 0] ?? 'land', lines: [`${population(state)} people live in the valley.`] };
+  const names = ['meadow', 'forest', 'water', 'rock', 'marsh', 'cleared'] as const;
+  return {
+    title: renderUiText(`terrain.${names[code ?? 0] ?? 'land'}`),
+    lines: [renderUiText('inspect.terrain.people', { people: population(state) })],
+  };
 }

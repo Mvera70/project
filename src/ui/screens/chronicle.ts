@@ -48,7 +48,7 @@ function yearBlock(source: ChronicleSource, year: number): HTMLElement | null {
   if (lines.length === 0) return null;
   const section = document.createElement('section');
   const heading = document.createElement('h2');
-  heading.textContent = `ANNO ${roman(year + 1)}`;
+  heading.textContent = renderUiText('app.year', { year: roman(year + 1) });
   section.append(heading, ...lines.map((line) => {
     const p = document.createElement('p');
     p.textContent = line;

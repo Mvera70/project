@@ -5,7 +5,7 @@
 // has to reconstruct by hand to know what happened while they were gone.
 
 import type { Digest } from '@engine/chronicle/digest';
-import { renderEntry } from '@engine/chronicle/render';
+import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import type { ChronicleEntry, GameState } from '@engine/state';
 import type { App } from './app';
 import { recogniseGesture, type Point } from './gestures';
@@ -75,7 +75,7 @@ export function openWelcome(app: App, digest: Digest): void {
   const card = document.createElement('section');
   card.className = 'welcome';
   const h1 = document.createElement('h1');
-  h1.textContent = 'While you were gone';
+  h1.textContent = renderUiText('welcome.title');
 
   const lines = welcomeLines(state, digest);
   const headlineCount = digest.headline !== null ? 1 : 0;
