@@ -600,6 +600,19 @@ export const SCARS = {
   LOST_HOME_WEIGHT: 4,
 } as const;
 
+/**
+ * Las marcas que una decisión deja en el valle (§11.8, v3.01). Son sólo de
+ * presentación: no mueven un número del juego y no se guardan. Están aquí, y
+ * no en el render, porque §2 dice que ningún número del juego se inventa en
+ * un fichero suelto — y cuánto dura un apagón es un número.
+ */
+export const MARKS = {
+  // TUNE: cuánto dura a oscuras un edificio que una decisión apagó. El esquema
+  // de `douse` dice qué se apaga y no cuánto. Ocho semanas se ve a ×16 sin
+  // convertirse en un edificio roto para siempre.
+  DOUSE_TICKS: 8,
+} as const;
+
 export const MEMORY = {
   MAX: 12, // per named villager
   WEIGHT_MIN: 1,

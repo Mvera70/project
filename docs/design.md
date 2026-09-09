@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.01** | 12 sep 2026, 08:30 | M-33 · el estandarte y el apagón | **Quedan 17 opciones menos mudas.** El estandarte se iza sobre el núcleo y el edificio que una decisión manda apagar se queda sin humo, sin luz y sin velas. Y se arregla un fallo que dejaba muerto justo el estandarte que más significa: `years: 0` es **para siempre** (§3.1), no «dura cero», así que el paño gris de arrodillarse ante el señor no se izaba jamás. Sólo queda `scar`, con dos de sus tres variantes irreconstruibles. |
 | **3.00** | 12 sep 2026, 06:00 | M-32 · que la decisión se vea | **42 de las 56 opciones del catálogo enfocaban una celda donde no aparecía nada nuevo.** El efecto visible no estaba roto —la cámara sí enfoca, como promete §11.2— pero ninguno de los seis tipos se representaba: un estandarte, una reunión y una cicatriz daban la misma imagen. §11.8 nueva: `gather` convoca de verdad a la aldea, derivado del historial y sin un byte de estado nuevo. Quedan cuatro tipos por representar, anotados. |
 | **2.99** | 12 sep 2026, 04:20 | M-31 · lo que el mundo escribe en la gente | **§7.9 nueva: hasta hoy sólo las decisiones del jugador dejaban recuerdo.** Una hambruna o un incendio le pasaban a una población, no a nadie. La prueba estaba a la vista: `went_hungry` y `lost_home` tenían epitafio escrito desde M-09 y **ningún sistema los escribía jamás**. Ahora el hambre marca a quien la vive y el fuego a quien vivía en esa casa, con un recuerdo por año y no uno por semana. |
 | **2.98** | 12 sep 2026, 03:05 | Cuánto comercio quiere la partida | **Medido el reposo largo y descartado.** Alargarlo de 18 a 26 años mete la cadencia adversa en banda y **devuelve la extinción a la línea base**: 15,0 % → 11,7 % y la separación 13,3 → 10,0 puntos. Menos comercio es menos presión. Se conservan los 18: el desenlace blando es el problema de fondo desde v2.47 y vale más que siete centésimas de cadencia. |
@@ -5237,12 +5238,45 @@ ahora.
 en pantalla (§10.6), así que una reunión de cuatro días que durase medio tick no
 se vería nunca. Es una decisión y queda anotada para la revisión artística.
 
+#### `banner` y `douse` (v3.01)
+
+Mismo trato y mismo módulo hermano: derivados del historial, sin estado nuevo.
+
+| Efecto | Qué se ve | Cuánto dura |
+|---|---|---|
+| `banner` | Un paño de color sobre un asta, en el núcleo | Los `years` que diga, **y `0` es para siempre** |
+| `douse` | Ese edificio se queda sin humo, sin luz y sin velas | `MARKS.DOUSE_TICKS` |
+
+**`years: 0` es para siempre**, la misma convención que las banderas de §3.1.
+Leerlo como «dura cero» dejaba muerto justo el estandarte que más significa: el
+gris de `winter_grain_debt.kneel`, el de haberse arrodillado ante el señor, que
+debía quedarse izado el resto de la partida. Es un ejemplo exacto de lo que
+persigue esta sección — el efecto estaba escrito, y no se veía.
+
+**`douse` no trae duración en el esquema**: dice qué se apaga, no cuánto. La
+pone `MARKS.DOUSE_TICKS`, porque un apagón eterno es un edificio roto y uno de
+un solo tick no se ve por encima de ×4.
+
+**Con `who`, se apaga la casa de esa persona.** El reparto va guardado en la
+decisión, así que aquí se resuelve igual que lo resolvió el motor en v2.66.
+
+#### Una discrepancia encontrada al hacerlo
+
+De las ocho opciones que declaran `douse`, **seis no cambian ningún estado** y
+las otras dos apagan un edificio **distinto del que prometen**: el efecto
+visible dice `house` y el efecto de motor apaga `smithy`.
+
+No es un error. `douse` es representacional por definición —§8.1 dice que
+`visible` es «lo que la opción cambia en pantalla»— y en `smith_feud` la
+lectura es buena: te pones del lado de uno, la casa del otro se queda a oscuras
+esa temporada, y la fragua se apaga de verdad porque el herrero enfadado no
+trabaja. Queda anotado porque un lector futuro puede tomarlo por un descuido.
+
 #### Deuda declarada
 
-- **`banner`, `scar` y `douse` siguen sin representarse.** Son 17 opciones. Sus
-  coordenadas son derivables salvo dos casos: `scar burnt_field` y
-  `scar felled_wood` dependen de qué ardió o se taló aquella semana concreta y
-  no se pueden reconstruir desde el historial sin guardarlas.
+- **`scar` sigue sin representarse.** De sus tres variantes sólo `grave_row` es
+  reconstruible; `burnt_field` y `felled_wood` dependen de qué ardió o se taló
+  aquella semana concreta y no se pueden derivar del historial sin guardarlas.
 - **El vado se aproxima por el núcleo.** El motor calcula la orilla transitable
   (§11.5, v2.66) y repetirlo aquí exigiría exportar ese cálculo. La diferencia
   es de unas celdas sobre un mapa que se ve entero.
