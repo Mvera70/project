@@ -137,6 +137,32 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   test.expect(text).not.toMatch(/\{\w+\}/);
   test.expect(text).toMatch(/weeks passed|has been \d+ weeks|weeks, and nobody/);
 
+  // The completed catch-up is itself a persistence boundary. Without this
+  // write, closing on the welcome screen can reload the pre-catch-up state;
+  // a partial visibility save used to make that loss permanent.
+  const persistedCatchUp = (): Promise<{
+    savedAtMs: number | undefined; tick: number | undefined;
+  } | undefined> => page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('the-valley', 1);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const save = await new Promise<{ savedAtMs?: number; state?: { tick?: number } } | undefined>((resolve, reject) => {
+      const request = db.transaction('saves', 'readonly').objectStore('saves').get('current');
+      request.onsuccess = () => resolve(request.result as { savedAtMs?: number; state?: { tick?: number } } | undefined);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return save === undefined ? undefined : { savedAtMs: save.savedAtMs, tick: save.state?.tick };
+  });
+  const returnAt = t0 + 4 * 60 * 60 * 1000;
+  await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? 0)
+    .toBeGreaterThanOrEqual(returnAt);
+  await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? Number.POSITIVE_INFINITY)
+    .toBeLessThan(returnAt + 2_000);
+  await test.expect.poll(async () => (await persistedCatchUp())?.tick ?? 0).toBeGreaterThan(900);
+
   // El letargo no decide por el jugador ni deja de correr el juego: la
   // encrucijada, si había una pendiente, sigue exactamente donde estaba
   // (§1, §13.2) — se comprueba dejando pasar el parte y comprobando que el

@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.79 · 11 de septiembre de 2026, 02:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.80 · 11 de septiembre de 2026, 03:20 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.80** | 11 sep 2026, 03:20 | M-23.5 · guardado durante el letargo | **Una instantánea parcial no puede perdonar las semanas que aún debe.** Ocultar o cerrar entre lotes conserva en `savedAtMs` exactamente los ticks restantes; completar el letargo solicita su guardado antes de abrir la bienvenida y arrancar el reloj normal. |
 | **2.79** | 11 sep 2026, 02:45 | M-10.1 · contrato del paquete ciego | **La entrega reproducible también tiene una regresión.** El contenido puro se separa de la escritura en disco y una prueba fija los cuatro nombres, las tres historias distintas, la ausencia de metadatos y la única pregunta permitida. Esto protege el cegado; el veredicto del hito 0 sigue perteneciendo a una persona ajena. |
 | **2.78** | 11 sep 2026, 02:15 | M-09.1 · banco de interfaz completo | **El banco acababa en el epitafio.** Bienvenida, reloj, controles, marcador y fichas aún escribían inglés en los módulos UI, contra §2.2. Todo el texto visible y accesible pasa por `UI_BANK`; terrenos despejados dicen «clearing» y rasgos/memorias dejan de mostrar identificadores con guion bajo. |
 | **2.77** | 11 sep 2026, 01:40 | M-00.1 · integración continua | **«En CI nocturna» ya significa un proceso existente.** Push y pull request ejecutan tipos, suite rápida, build, lint y Playwright; el banco largo queda en otro workflow diario a las 03:00 UTC y con disparo manual. Capturas y series se conservan como artefactos. |
@@ -124,6 +125,29 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.80 — Guardar a mitad de una ausencia no la termina
+
+El guardado de v2.70 cubría `visibilitychange` y `pagehide`, pero durante el
+letargo esos dos eventos fotografiaban un estado que solo había recorrido parte
+de sus lotes y lo fechaban como actual. Si la pestaña desaparecía tras 64 de 960
+ticks, la siguiente carga veía cero deuda en vez de los 896 ticks restantes. Si
+el proceso sí llegaba a la bienvenida, tampoco persistía ese final de inmediato:
+cerrar sobre el parte podía recuperar la instantánea anterior.
+
+M-23.5 fecha un punto intermedio como
+`now − (total − done) × REAL_MS_PER_TICK`. La instantánea y su reloj avanzan
+juntos, incluso cuando una ausencia mayor ya alcanzó el tope de cuatro horas.
+Antes del primer lote se conserva la fecha original. Al completar todos los
+ticks o terminar la aldea, la fecha pasa a ser la actual y se solicita un
+guardado antes de abrir la bienvenida o continuar el bucle.
+
+**Qué falsaría este cierre:** interrumpir tras 64 de 960 y que la siguiente
+carga deba algo distinto de 896 ticks; llegar al parte y encontrar en IndexedDB
+el tick previo al letargo o una fecha anterior al regreso. La prueba pura fija
+la primera cuenta y Playwright comprueba la segunda sobre la ruta real. Suite
+rápida: **633 pruebas en 17,39 s**; build y lint pasan; Playwright, **8/8 en
+29,7 s**. No cambia ningún píxel.
 
 ### 2.79 — El cegado es un contrato comprobable
 
@@ -4740,6 +4764,12 @@ consecutivas que pueden solicitar dos guardados casi a la vez; IndexedDB debe
 recibirlos en ese orden para que la instantánea terminada no pueda completar
 después y sustituir a la sucesora viva.
 
+Durante el letargo, una solicitud intermedia fecha la instantánea restando de
+`now` los ticks que aún debe procesar. Así ocultar o cerrar entre dos lotes no
+convierte una puesta al día parcial en una partida actual. El último lote es un
+límite de persistencia propio: solicita una instantánea con la hora actual antes
+de mostrar el parte y arrancar el bucle ordinario.
+
 **Esquema actual: 2 (v2.67).** El esquema 1 se migra de forma aditiva: su única
 `seed` pasa también a `terrainSeed`; `peakPeople` toma el mayor valor de
 `params.people` conservado en la crónica o la población presente. No se atribuye
@@ -5654,12 +5684,13 @@ dentro de `requestAnimationFrame`.
 interno parcial, se rechaza antes de `boot`; `catchUp` de 4 h ejecuta
 exactamente 960 ticks y tarda menos de 2 s;
 reproducir el registro de decisiones desde la semilla da el mismo estado que la
-instantánea.
+instantánea; una instantánea entre lotes conserva exactamente la deuda restante
+y el estado completado se solicita antes de abrir el parte.
 **Terminado cuando.** Cerrar y abrir a las cuatro horas presenta un parte de
 bienvenida coherente. Esto cierra M-23 y deja listo el hito 6; la aceptación
 adicional de varios días reales permanece en §15.
 
-**Estado (v2.70): módulo implementado; hito 6 pendiente de aceptación humana
+**Estado (v2.80): módulo implementado; hito 6 pendiente de aceptación humana
 según §15.** `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
 propia prueba mide en menos de 2 s); el letargo de la interfaz (`ui/lethargy.ts`)
 es un bucle distinto sobre lotes de 64, la misma separación pura/DOM que
@@ -5670,8 +5701,9 @@ pestaña y en `pagehide` antes de detener el bucle; cargan al abrir, ponen al d�
 antes de que el bucle normal toque el mismo estado y muestran el parte de
 bienvenida antes que nada más. Verificado
 con Playwright y reloj falso: cerrar y volver a las cuatro horas, sin esperar,
-entrega un parte legible (§2.63 trae el texto real y lo que no se entiende a la
-primera lectura).
+entrega un parte legible y la instantánea completada alcanza IndexedDB. Un
+cierre entre lotes conserva en su fecha la deuda exacta que falta (§2.80);
+§2.63 trae el texto real y lo que no se entiende a la primera lectura.
 
 ---
 
