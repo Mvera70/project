@@ -78,6 +78,7 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
 
   const scrim = page.locator('.crossroad-scrim');
   await test.expect(scrim).toBeVisible();
+  await test.expect(page.locator('.valley-speeds')).toHaveCSS('visibility', 'hidden');
   await test.expect(page.locator('.crossroad h1')).toHaveText('The Old Wood');
   const costs = page.locator('.crossroad-cost');
   await test.expect(costs).toHaveCount(3);
@@ -111,6 +112,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
 
   const welcome = page.locator('.welcome');
   await welcome.waitFor({ timeout: 15_000 });
+  await test.expect(page.locator('.welcome-scrim')).toHaveCSS('background-color', 'rgb(18, 17, 14)');
   await page.screenshot({ path: 'artifacts/m23-welcome.png', fullPage: true });
   const text = await welcome.innerText();
   test.expect(text).not.toMatch(/\{\w+\}/);

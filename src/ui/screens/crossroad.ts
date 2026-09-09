@@ -33,6 +33,7 @@ const STYLE = `
 .crossroad-marker { position: fixed; z-index: 9; top: max(9px, env(safe-area-inset-top));
   right: max(12px, env(safe-area-inset-right)); width: 14px; height: 14px; border-radius: 50%;
   background: #c9463c; border: 2px solid #f2f4f6; padding: 0; min-width: 0; min-height: 0; }
+.crossroad-open .valley-speeds { visibility: hidden; }
 `;
 
 function ensureStyle(): void {
@@ -85,6 +86,7 @@ function key(p: PendingCrossroad): string {
 function removeShown(): void {
   shown?.overlay?.remove();
   shown?.marker?.remove();
+  document.documentElement.classList.remove('crossroad-open');
 }
 
 function mountMarker(app: App, p: PendingCrossroad): void {
@@ -105,6 +107,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
   const state = app.state();
   const template = CATALOG.find((t) => t.id === p.templateId);
   if (template === undefined) return;
+  document.documentElement.classList.add('crossroad-open');
 
   const scrim = document.createElement('div');
   scrim.className = 'crossroad-scrim';
@@ -170,6 +173,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
     trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
     if (recogniseGesture({ points: trace }) === 'swipe_down') {
       scrim.remove();
+      document.documentElement.classList.remove('crossroad-open');
       mountMarker(app, p);
     }
   });

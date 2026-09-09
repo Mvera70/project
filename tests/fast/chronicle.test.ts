@@ -693,6 +693,33 @@ describe('welcomeDigest · §9.2', () => {
     expect(d.entries.map((e) => e.tick)).toEqual([40, 50, 60, 80]);
   });
 
+  it('no deja que cosechas consecutivas expulsen tipos de suceso distintos', () => {
+    const s = village(7);
+    const push = (tick: number, kind: ChronicleKind, key: string): void => {
+      s.tick = tick;
+      record(s, { kind, templateKey: key, params: {}, weight: 2 });
+    };
+    push(10, 'built', 'built.chapel');
+    push(20, 'arrival', 'arrival.many');
+    push(30, 'harvest', 'harvest.ruinous');
+    push(40, 'harvest', 'harvest.abundant');
+    push(50, 'harvest', 'harvest.poor');
+    s.tick = 60;
+    const entries = welcomeDigest(s, 0).entries;
+    expect(entries.map((entry) => entry.kind)).toEqual(['built', 'arrival', 'harvest', 'harvest']);
+    expect(entries.map((entry) => entry.tick)).toEqual([10, 20, 40, 50]);
+  });
+
+  it('deja plazas vacías antes que repetir un tipo por tercera vez', () => {
+    const s = village(7);
+    for (let tick = 10; tick <= 50; tick += 10) {
+      s.tick = tick;
+      record(s, { kind: 'harvest', templateKey: 'harvest.ruinous', params: {}, weight: 2 });
+    }
+    s.tick = 60;
+    expect(welcomeDigest(s, 0).entries.map((entry) => entry.tick)).toEqual([40, 50]);
+  });
+
   it('cuenta lo que cambió, contando las entradas agregadas', () => {
     const d = welcomeDigest(withHistory(), 0);
     expect(d.summary.born).toBe(3);

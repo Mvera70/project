@@ -10,6 +10,29 @@ import type { ChronicleEntry, GameState } from '../state';
 /** How many weight-2 entries the report carries at most. §9.2. */
 const MAX_ENTRIES = 4;
 
+/**
+ * Keep recency, but spend the four slots on different kinds of event first.
+ * A second event of one kind is allowed only after every kind available in
+ * the absence has had its most recent representative considered.
+ */
+function diverseRecent(entries: readonly ChronicleEntry[]): ChronicleEntry[] {
+  const chosen = new Set<number>();
+  const counts = new Map<ChronicleEntry['kind'], number>();
+  for (let i = entries.length - 1; i >= 0 && chosen.size < MAX_ENTRIES; i -= 1) {
+    const entry = entries[i] as ChronicleEntry;
+    if (counts.has(entry.kind)) continue;
+    counts.set(entry.kind, 1);
+    chosen.add(i);
+  }
+  for (let i = entries.length - 1; i >= 0 && chosen.size < MAX_ENTRIES; i -= 1) {
+    const entry = entries[i] as ChronicleEntry;
+    if (chosen.has(i) || (counts.get(entry.kind) ?? 0) >= 2) continue;
+    counts.set(entry.kind, 2);
+    chosen.add(i);
+  }
+  return entries.filter((_entry, index) => chosen.has(index));
+}
+
 export interface DigestSummary {
   weeks: number; // how long they were away
   people: number; // how many are left
@@ -89,9 +112,10 @@ export function welcomeDigest(state: GameState, sinceTick: number): Digest {
 
   return {
     headline: headlines[headlines.length - 1] ?? null,
-    // The last four, still oldest first: what happened most recently matters
-    // most, but it should read forwards.
-    entries: notable.slice(-MAX_ENTRIES),
+    // Recent representatives of different kinds first, then recent repeats if
+    // fewer than four kinds happened, capped at two of one kind. The returned
+    // account still reads forward; an empty slot is better than a third echo.
+    entries: diverseRecent(notable),
     summary,
   };
 }
