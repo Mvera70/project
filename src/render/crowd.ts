@@ -203,6 +203,26 @@ function workdayPaths(state: GameState): Map<VillagerId, number[]> {
   return paths;
 }
 
+/**
+ * §11.9, v3.06: el carril de esta persona, perpendicular a la marcha.
+ *
+ * Sin esto, todos los que comparten ruta van por la misma línea exacta y se
+ * tapan unos a otros: media docena de figuras dibujadas como una.
+ */
+function lane(cells: readonly number[], progress: number, width: number, id: number): Point {
+  const n = Math.max(1, cells.length - 1);
+  const at = Math.min(cells.length - 1, Math.max(0, Math.floor(n * progress)));
+  const next = Math.min(cells.length - 1, at + 1);
+  const a = cells[at] as number;
+  const b = cells[next] as number;
+  const dx = (b % width) - (a % width);
+  const dy = Math.floor(b / width) - Math.floor(a / width);
+  const len = Math.hypot(dx, dy);
+  if (len === 0) return { x: 0, y: 0 };
+  const side = ((Math.imul(id + 53, 2654435761) >>> 0) % 1000) / 999 - 0.5;
+  return { x: (-dy / len) * side * 2 * DAY.LANE, y: (dx / len) * side * 2 * DAY.LANE };
+}
+
 function onPath(cells: readonly number[], progress: number, width: number): Point {
   const distance = Math.max(0, cells.length - 1) * Math.max(0, Math.min(1, progress));
   const at = Math.min(cells.length - 1, Math.floor(distance));
@@ -271,12 +291,15 @@ interface Day {
  */
 function dayOf(person: Villager, tick: number): Day {
   const leave = stable(person.id, tick) * DAY.LEAVE_SPAN;
-  const arrive = leave + DAY.TRAVEL;
+  // §11.9, v3.06: cada uno anda a su paso. Con un viaje de duración fija, dos
+  // que salían a la vez llegaban a la vez, y la aldea marchaba en bloque.
+  const gait = 1 + (stable(person.id, tick + 977) - 0.5) * 2 * DAY.GAIT;
+  const arrive = leave + DAY.TRAVEL * gait;
   const age = Math.floor((tick - person.bornTick) / TIME.WEEKS_PER_YEAR);
   const short = age < DAY.CHILD_UNDER || age >= DAY.ELDER_OVER;
   const full = DAY.RETURN_EARLIEST + stable(tick, person.id) * DAY.RETURN_SPAN;
   const depart = short ? arrive + (full - arrive) * DAY.SHORT_DAY : full;
-  return { leave, arrive, depart, home: depart + DAY.TRAVEL };
+  return { leave, arrive, depart, home: depart + DAY.TRAVEL * gait };
 }
 
 function clampFigure(point: Point, state: GameState): Point {
@@ -318,7 +341,11 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
       point = onPath(cells, 0, state.map.width);
     } else if (fraction < day.arrive) {
       const progress = (fraction - day.leave) / Math.max(0.001, day.arrive - day.leave);
-      point = onPath(cells, progress ** (1 + hunger), state.map.width);
+      const walked = progress ** (1 + hunger);
+      point = onPath(cells, walked, state.map.width);
+      const off = lane(cells, walked, state.map.width, person.id);
+      point.x += off.x;
+      point.y += off.y;
     } else if (fraction < day.depart) {
       const here = cells[cells.length - 1];
       point = workSpot(
@@ -349,7 +376,11 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
       }
     } else if (fraction < day.home) {
       const back = (fraction - day.depart) / Math.max(0.001, day.home - day.depart);
-      point = onPath(cells, 1 - (back ** (1 + hunger)), state.map.width);
+      const walked = 1 - (back ** (1 + hunger));
+      point = onPath(cells, walked, state.map.width);
+      const off = lane(cells, walked, state.map.width, person.id);
+      point.x += off.x;
+      point.y += off.y;
     } else {
       // De vuelta en casa antes de que caiga la noche, que es lo que hace que
       // el valle se vaya apagando por partes en vez de de golpe.

@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.06** | 12 sep 2026, 15:00 | M-38 · el paso y el carril | **Todos andaban por la misma raya y a la misma velocidad**, tapándose unos a otros: media docena de figuras dibujadas como una. Cada uno anda ahora a su paso y por su carril. Y el rebaño deja de pastar veinte años en el mismo metro cuadrado. Medido de punta a punta del bloque: de 145 figuras tapadas por instante a 9,6, y de repetir sitio casi todos a 6 de 32. |
 | **3.05** | 12 sep 2026, 13:30 | M-36/M-37 · la aldea se entera y los oficios se ven | **Ardía una casa y la gente seguía camino del campo.** Ahora lo que acaba de pasarle a la aldea manda sobre todo lo demás. Y los ocho con nombre dejan de ser ocho labradores más: el herrero está en la fragua, el cura en la capilla, el alguacil en el granero. Los que no trabajan hacen recados en vez de quedarse clavados en su puerta, y los críos juegan delante de casa. |
 | **3.03** | 12 sep 2026, 11:00 | M-35 · que la aldea parezca viva | **Segundo veredicto humano, y es el mismo problema visto de cerca: «se mueven todos los días igual».** Y era literal. Todos salían en el mismo instante, iban al mismo campo, se quedaban clavados y volvían juntos. §11.9 nueva: jornada propia por persona y por semana, la tierra repartida entre los campos, gente trabajando en vez de quieta, encuentros entre vecinos que deciden las opiniones, y un invierno en que **nadie ara**. |
 | **3.01** | 12 sep 2026, 08:30 | M-33 · el estandarte y el apagón | **Quedan 17 opciones menos mudas.** El estandarte se iza sobre el núcleo y el edificio que una decisión manda apagar se queda sin humo, sin luz y sin velas. Y se arregla un fallo que dejaba muerto justo el estandarte que más significa: `years: 0` es **para siempre** (§3.1), no «dura cero», así que el paño gris de arrodillarse ante el señor no se izaba jamás. Sólo queda `scar`, con dos de sus tres variantes irreconstruibles. |
@@ -5386,6 +5387,24 @@ semana: el pozo, el granero, la capilla, la fragua, el molino.
 **Los críos no.** A un niño de cinco años no se le manda a por agua al otro lado
 del valle: se quedan delante de su casa, sólo que moviéndose el doble que un
 adulto. Es el movimiento que más se ve, porque ocurre donde el jugador mira.
+
+#### El paso y el carril (v3.06)
+
+Dos vecinos con la misma ruta iban **por la misma línea exacta y a la misma
+velocidad**, uno tapando al otro: en pantalla eran una figura, no dos. Ahora
+cada uno se aparta un poco del eje del camino y anda a su propio paso, así que
+el viejo llega más tarde que el mozo aunque salgan juntos.
+
+#### Lo que dio el bloque entero, medido
+
+| Medida | Al empezar | Al terminar |
+|---|---|---|
+| Figuras tapadas por otra, por instante | 145 | **9,6** |
+| Aldea en movimiento en un instante cualquiera | dos picos y un valle muerto | **75 %** |
+| Repiten sitio de una semana a otra | casi todos | **6 de 32** |
+| Destinos distintos | 4–5 | **6–9** |
+| Gente clavada el día entero | media docena | **0** |
+| Presencia en los campos en invierno | 92 % | **0 %** |
 
 #### Las reglas que esto NO rompe
 

@@ -680,6 +680,14 @@ export const DAY = {
   // `CHILD_UNDER` no trabajan: andan por delante de las casas, y andan mucho.
   // Es el movimiento que más se ve, porque ocurre donde el jugador mira.
   CHILD_ENERGY: 2.2,
+  // TUNE: cuánto se aparta cada uno del eje del camino, en celdas. Dos vecinos
+  // con la misma ruta iban por la misma línea exacta, uno tapando al otro: en
+  // pantalla eran una figura, no dos. La gente anda al lado del camino, no
+  // sobre una raya pintada.
+  LANE: 0.35,
+  // TUNE: cuánto varía el paso de una persona a otra. El viejo llega más tarde
+  // que el mozo aunque salgan juntos, y eso es lo que rompe la marcha en bloque.
+  GAIT: 0.35,
 } as const;
 
 export const MARKS = {
