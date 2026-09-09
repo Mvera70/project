@@ -22,10 +22,22 @@ export default defineConfig({
       ? { executablePath: systemChrome }
       : {},
   },
-  webServer: {
-    command: 'npm run build && npm run preview -- --port 4173',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: false,
-    timeout: 120_000,
-  },
+  // Dos servidores: el build en la raíz, y el mismo build bajo `/project/`
+  // para el recorrido de subdirectorio. El segundo devuelve 404 hasta que
+  // `npm run build` ha dejado dist/, que es justo lo que hace a Playwright
+  // esperar por él sin necesidad de ordenarlos a mano.
+  webServer: [
+    {
+      command: 'npm run build && npm run preview -- --port 4173',
+      url: 'http://127.0.0.1:4173',
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
+    {
+      command: 'node tools/subpath-server.mjs',
+      url: 'http://127.0.0.1:4180/project/',
+      reuseExistingServer: false,
+      timeout: 120_000,
+    },
+  ],
 });
