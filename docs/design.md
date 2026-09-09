@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.74 · 11 de septiembre de 2026, 00:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.75 · 11 de septiembre de 2026, 00:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.75** | 11 sep 2026, 00:40 | M-25.1 · crónica sobre el epitafio | **Existir en el DOM no es estar delante del jugador.** «Read the chronicle» montaba la pantalla 4 debajo del epitafio por el orden de capas. La crónica pasa al frente y al cerrarla devuelve intacto el epitafio. Playwright comprueba la superficie que recibe el toque, no solo la visibilidad CSS. |
 | **2.74** | 11 sep 2026, 00:10 | Auditoría de la tabla de hitos | **Tres cierres existían fuera de la tabla.** La puerta visual dio su veredicto en v2.57, la decisión visible en v2.61 y la herencia en v2.68. Los hitos 1, 2 y 4 quedan marcados donde se consulta el estado, sin repetir ni automatizar sus aceptaciones. |
 | **2.73** | 10 sep 2026, 23:00 | M-23.4 · identidad del contenido guardado | **Una forma completa también puede apuntar a nada.** Encrucijadas, decisiones y semillas guardadas solo cruzan la frontera si su plantilla, opción y consecuencia siguen en el catálogo y el reparto conserva todas sus letras. Una pregunta sin opciones ya no puede dejar la partida viva e irresoluble. |
 | **2.72** | 10 sep 2026, 22:00 | M-23.3 · frontera de guardado | **Un objeto no es todavía una partida.** `deserialize` deja de aceptar contenedores parciales que rompían después, fuera del `catch` de IndexedDB. Valida capas tipadas, longitudes, entradas que recorrerán motor/render, identificadores de contenido y el archivo completo antes de entregar el estado a `boot`. |
@@ -119,6 +120,31 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.75 — La pantalla que estaba detrás
+
+El botón «Read the chronicle» del epitafio sí llamaba a `openChronicle`, y la
+prueba encontraba `.chronicle-scrim` visible. Sin embargo, la crónica tenía la
+misma capa que la encrucijada (`z-index: 10`) y el epitafio estaba en la 12: el
+jugador seguía viendo y tocando la tarjeta de muerte. El aserto probaba estilo,
+no acceso.
+
+La crónica ocupa la capa 13. Es la pantalla de lectura que pueden invocar tanto
+el valle como el epitafio; cuando nace desde este último debe cubrirlo por
+completo y, al deslizarla hacia abajo, devolver el mismo epitafio para que el
+jugador aún pueda fundar la sucesora. No se añade una sexta pantalla ni se
+desmonta el final.
+
+**Evidencia.** Playwright abre un epitafio real, pulsa su acción y pregunta a
+`elementFromPoint` qué pantalla recibe el centro táctil. La respuesta debe ser
+la crónica; luego la cierra por gesto y continúa con «Begin again». La captura
+`m25-epitaph-chronicle.png` fue mirada a 390 × 844: no asoma el epitafio y el
+texto conserva su lectura. Build y lint pasan; Playwright queda **8/8 en
+29,7 s**.
+
+**Lo falsaría** que el centro siguiera perteneciendo al epitafio, que alguna
+parte de este asomase o recibiese toques, que cerrar la crónica cerrase también
+el final, o que «Begin again» dejase de estar disponible al volver.
 
 ### 2.74 — Los hitos que la tabla olvidó cerrar
 
@@ -4137,6 +4163,8 @@ margen inferior de `18 px`. El selector mide al menos `44 px`, con relleno
 `9 px 34 px 9 px 11 px`, borde `#756c55` de `1 px`, radio `8 px`, fondo
 `#24221b` y texto `#f2f4f6` a `14 px/1.2`. Se fija `20 px` por encima del borde
 de desplazamiento para compartir el área segura y no tapar el primer año.
+Cuando se abre desde el epitafio ocupa una capa superior; al cerrarse devuelve
+el mismo epitafio, sin resolver ni reiniciar la aldea.
 
 **5. Epitafio.** Solo aparece al terminar una aldea. El valle permanece detrás
 con un velo `rgba(18,17,14,0.78)` y los controles desaparecen. La tarjeta ocupa
