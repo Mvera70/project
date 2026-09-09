@@ -15,6 +15,8 @@
     "chronicle": "tsx src/cli/chronicle.ts",
     "shots": "tsx tools/screenshots.ts",
     "test:shots": "playwright test --config playwright.config.ts",
+    "test:pwa": "playwright test --config playwright.pwa.config.ts",
+    "icons": "tsx tools/icons.ts",
     "lint": "eslint .",
     "map": "tsx tools/map-dump.ts",
     "attribution": "tsx tools/attribution-report.ts",

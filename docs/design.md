@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.81 · 11 de septiembre de 2026, 10:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.82 · 11 de septiembre de 2026, 11:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.82** | 11 sep 2026, 11:30 | M-27 · instalable y sin conexión | **La PWA que `CLAUDE.md` prometía desde el primer día y la spec no definía.** Manifest, iconos y un service worker con dos políticas: documento por red primero, lo demás por caché. §13.4 nueva, despliegue a GitHub Pages, y una frontera medida y declarada — abre sin red **desde la segunda apertura**, no desde la primera. |
 | **2.81** | 11 sep 2026, 10:40 | M-23.6 · dominios de las condiciones guardadas | **Una referencia que resuelve todavía puede nombrar algo que el DSL no tiene.** `PlantedSeed.condition` aceptaba `stat` y `ratio` como cualquier cadena y `minWeek` como cualquier entero ≥ 0: la frontera de v2.73 comprobaba la plantilla, la opción y el `id`, pero no los tres dominios cerrados de §8.2. |
 | **2.80** | 11 sep 2026, 03:20 | M-23.5 · guardado durante el letargo | **Una instantánea parcial no puede perdonar las semanas que aún debe.** Ocultar o cerrar entre lotes conserva en `savedAtMs` exactamente los ticks restantes; completar el letargo solicita su guardado antes de abrir la bienvenida y arrancar el reloj normal. |
 | **2.79** | 11 sep 2026, 02:45 | M-10.1 · contrato del paquete ciego | **La entrega reproducible también tiene una regresión.** El contenido puro se separa de la escritura en disco y una prueba fija los cuatro nombres, las tres historias distintas, la ausencia de metadatos y la única pregunta permitida. Esto protege el cegado; el veredicto del hito 0 sigue perteneciendo a una persona ajena. |
@@ -126,6 +127,60 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.82 — Instalable, y sin red desde la segunda vez
+
+`CLAUDE.md` describe el proyecto como PWA desde M-00. `docs/design.md` no
+mencionaba ni el manifest, ni el trabajo sin conexión, ni la instalación: era un
+hueco de especificación en una promesa central del producto, y el hito 6 lo
+convirtió en urgente. Una partida de varios días en un móvil real atraviesa
+túneles y Wi-Fi que se caen, y **un juego que promete sobrevivir a que lo cierres
+y responde con una página en blanco no está midiendo su ritmo: está midiendo la
+cobertura.**
+
+§13.4 queda escrita primero y el código detrás. Manifest con `standalone`,
+vertical y tres iconos —192, 512 y uno `maskable`— generados renderizando la
+paleta de verano de §10.3 en Chromium, como M-19 ya produce todo lo demás: el
+icono es el valle o no es nada. Service worker con las dos políticas que §13.4
+vuelve normativas: **documento por red primero** —o un despliegue nuevo no
+alcanzaría jamás a un dispositivo ya instalado— y **todo lo demás por caché**,
+que es seguro porque Vite marca cada recurso con su hash. `base: './'` para que
+el mismo `dist/` sirva desde la raíz de un dominio y desde el subdirectorio de
+Pages sin reconstruirse.
+
+**La frontera medida, que no es la que yo quería escribir.** La promesa natural
+era «tras la primera visita». No se sostiene. El trabajador precachea en su
+instalación todo lo que `index.html` referencia —leído del propio documento, no
+de un manifest generado que haya que mantener en paso— y tras una sola visita
+está todo guardado: se comprobó entrada por entrada. Aun así, en esa primera
+vuelta el paquete **no carga como módulo**: `ERR_FAILED` sobre una entrada que
+la caché tiene y que el mismo trabajador entrega con un `fetch` normal, tipo
+`basic`, estado 200. Se descartaron por medición tres explicaciones: que faltara
+el recurso —estaba—, que la navegación no pasara por el trabajador
+—`workerStart > 0` en las dos— y que el modo de la petición al guardarla no
+coincidiera con el del parser —guardarla en modo `cors` con credenciales
+omitidas no cambió nada—. Desde la segunda apertura funciona siempre.
+
+Queda escrito como limitación conocida y no como promesa cumplida. Para el hito
+6 basta —una partida de varios días abre decenas de veces— pero quien lo
+retome merece saber dónde se quedó esto y qué se descartó ya.
+
+**Evidencia.** Cuatro recorridos nuevos contra el build real servido por
+`vite preview`, porque el trabajador no existe en el servidor de desarrollo:
+el manifest declara lo que §13.4 exige y sus tres iconos existen de verdad; la
+aldea abre en modo avión y la captura lo enseña; la partida de §13.1 sobrevive a
+quedarse sin red —el trabajador no toca IndexedDB—; y con red el documento viene
+de la red, comprobado interceptando en el contexto y no en la página, porque
+`page.route` no ve lo que pide un trabajador. Suite rápida **634 en 18,87 s**;
+tipos, lint y build pasan; Playwright **8/8** de siempre más **4/4** de PWA. El
+despliegue a Pages se añade a los workflows y la suite PWA entra en CI.
+
+**Qué falsaría este cierre:** que la aldea no abra sin red a partir de la segunda
+apertura; que un despliegue nuevo no llegue a un dispositivo ya instalado; que el
+trabajador conteste a algo que no sea `GET` del mismo origen; o que instalarla
+pierda la partida. Nada de esto concede el hito 6: sigue exigiendo la partida
+real de varios días de §15, y esto solo retira un obstáculo que la habría
+medido mal.
 
 ### 2.81 — Una referencia que resuelve puede seguir nombrando lo que no existe
 
@@ -4889,6 +4944,63 @@ Las entradas se renderizan con `makeBundle(ArchivedGame.seed)`: el flujo
 `chronicle` nunca avanza (§9.1), así que la semilla reconstruye la misma voz sin
 guardar otro estado aleatorio ni subir el esquema. La partida terminada que aún
 se muestra como estado actual no se duplica en el selector.
+
+### 13.4 Instalable y sin conexión
+
+`CLAUDE.md` describe el proyecto como PWA desde el primer día y este documento
+nunca dijo qué significaba eso. Queda dicho aquí, porque el hito 6 depende de
+ello: una partida de varios días en un móvil real atraviesa túneles, aviones,
+Wi-Fi que se caen y despliegues a media tarde. **Un juego que promete sobrevivir
+a que lo cierres y contesta con una página en blanco cuando no hay red no está
+midiendo su ritmo: está midiendo la cobertura.**
+
+**Instalable.** Un `manifest.webmanifest` con nombre, `display: standalone`,
+orientación vertical, color de tema y fondo, e iconos de 192 y 512 px, uno de
+ellos `maskable`. El criterio de §15 incluye el deseo de volver, y no es lo
+mismo un icono entre las aplicaciones que una pestaña perdida entre veinte.
+Medir lo segundo y llamarlo lo primero sesga el hito por una causa que no es del
+juego.
+
+**Sin conexión.** Un service worker con dos políticas, y la separación es
+normativa:
+
+| Qué | Política | Por qué |
+|---|---|---|
+| El documento (`navigate`) | **red primero**, caché como respaldo | Un despliegue nuevo tiene que alcanzar a un dispositivo ya instalado. Servir el documento desde caché deja al jugador clavado en una versión vieja para siempre |
+| Todo lo demás del propio origen | **caché primero**, y se guarda al traerlo | Vite marca los recursos con su hash: un nombre distinto es un contenido distinto, así que la copia nunca puede quedar obsoleta |
+
+**Lo que el service worker no hace.** No toca IndexedDB —no puede, y la partida
+es de §13.1, no suya—. No intercepta nada que no sea `GET` del mismo origen. No
+sirve un documento viejo cuando hay red. Al activarse borra toda caché cuyo
+nombre no sea el suyo: **la versión de la caché es el único mecanismo de
+invalidación**, y por eso es un nombre y no una fecha.
+
+**Desde cuándo abre sin red, exactamente.** Desde la **segunda apertura**, y la
+precisión no es pedantería: es la frontera medida. En su instalación el
+trabajador precachea el documento, el manifest, los iconos y el paquete —todo lo
+que `index.html` referencia, leído del propio documento— así que tras una sola
+visita está todo guardado y `fetch` lo sirve sin red perfectamente. Y aun así,
+en esa primera vuelta **el paquete no carga como módulo**: el navegador da
+`ERR_FAILED` sobre una entrada que la caché tiene y que el mismo trabajador
+entrega si se la pide de otra manera. Medido, no deducido (§2.82). A partir de
+la segunda apertura, cuando esa navegación ya ha pasado entera por el
+trabajador, la aldea abre en modo avión sin excepción.
+
+Para el hito 6 esto basta —una partida de varios días abre decenas de veces—,
+pero queda escrito como lo que es: **una limitación conocida y no una promesa
+cumplida**, para que quien la resuelva sepa dónde estaba.
+
+**Ruta base relativa.** El mismo `dist/` tiene que servir desde la raíz de un
+dominio y desde el subdirectorio de GitHub Pages sin reconstruirse. Con
+`base: './'` los recursos, el manifest y el registro del service worker se
+resuelven contra el documento, y el ámbito del trabajador queda acotado a su
+propio directorio sin escribir la ruta en ningún sitio.
+
+**Qué lo falsaría:** que la aldea no cargue con el modo avión puesto a partir de
+la segunda apertura; que un despliegue nuevo no llegue a un dispositivo que ya
+tenía la anterior; que el service worker responda a algo que no sea `GET` del
+mismo origen; o que quedarse sin red pierda la partida guardada —el trabajador
+no toca IndexedDB, así que perderla significaría que algo más la está borrando.
 
 ---
 

@@ -4,7 +4,9 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "types": ["node", "vitest/globals"],
+    // `vite/client` types `import.meta.env`, which §13.4's registration reads
+    // to stay out of the development server.
+    "types": ["node", "vitest/globals", "vite/client"],
 
     "strict": true,
     "noUncheckedIndexedAccess": true,

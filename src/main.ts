@@ -2,6 +2,12 @@
 import { mountDebug, parseDebugRequest, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
+import { registerServiceWorker } from './ui/pwa';
+
+// §13.4, before anything else and independent of which route boots: the
+// worker is what lets the valley open without a network, and it is registered
+// once whether the game founds, resumes or shows a debug scene.
+registerServiceWorker();
 
 const root = document.querySelector<HTMLDivElement>('#root');
 if (root) {
