@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.73 · 10 de septiembre de 2026, 23:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.74 · 11 de septiembre de 2026, 00:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.74** | 11 sep 2026, 00:10 | Auditoría de la tabla de hitos | **Tres cierres existían fuera de la tabla.** La puerta visual dio su veredicto en v2.57, la decisión visible en v2.61 y la herencia en v2.68. Los hitos 1, 2 y 4 quedan marcados donde se consulta el estado, sin repetir ni automatizar sus aceptaciones. |
 | **2.73** | 10 sep 2026, 23:00 | M-23.4 · identidad del contenido guardado | **Una forma completa también puede apuntar a nada.** Encrucijadas, decisiones y semillas guardadas solo cruzan la frontera si su plantilla, opción y consecuencia siguen en el catálogo y el reparto conserva todas sus letras. Una pregunta sin opciones ya no puede dejar la partida viva e irresoluble. |
 | **2.72** | 10 sep 2026, 22:00 | M-23.3 · frontera de guardado | **Un objeto no es todavía una partida.** `deserialize` deja de aceptar contenedores parciales que rompían después, fuera del `catch` de IndexedDB. Valida capas tipadas, longitudes, entradas que recorrerán motor/render, identificadores de contenido y el archivo completo antes de entregar el estado a `boot`. |
 | **2.71** | 10 sep 2026, 21:00 | M-26 · lector del archivo | **Una crónica guardada vuelve a ser legible.** La pantalla de crónica incorpora un selector para la aldea actual y todas las anteriores; reconstruye la voz desde la semilla archivada sin cambiar el esquema. La copia de la aldea que aún ocupa el epitafio no aparece dos veces. |
@@ -118,6 +119,28 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.74 — Los hitos que la tabla olvidó cerrar
+
+El criterio del hito 1 es ver la aldea y distinguir sus estaciones sin
+intervención del jugador. M-19 produjo primero el instrumento; M-16 y M-17
+pasaron después la hoja de contacto móvil y gris, mirada en v2.55; M-18 pasó en
+v2.57 su veredicto propio de veinte segundos: salida, trabajo, regreso, noche y
+nuevo ciclo. Los cuatro módulos figuran cerrados en sus briefs, pero la tabla de
+§15 seguía sin registrar el resultado. Allí faltaban también dos cierres ya
+explícitos: M-22 alcanzó el hito 2 en v2.61 al mostrar una decisión y enfocar su
+cambio, y M-25 alcanzó el hito 4 en v2.68 al cerrar una aldea y hacer visible su
+huella en la sucesora.
+
+**Hitos 1, 2 y 4, alcanzados.** Esta revisión corrige el índice de estado. No
+vuelve a generar imágenes ni sustituye los juicios ya registrados por asertos:
+las evidencias que aceptan cada hito permanecen en v2.55/v2.57, v2.61 y v2.68.
+
+**Lo falsaría** una hoja donde las estaciones no se distinguieran, edificios
+principales indistinguibles a 390 px, figuras ilegibles en movimiento, una
+opción sin cambio visible o una sucesora sin la huella de la aldea terminada.
+Cualquiera reabriría su hito; ninguna condición aparece en el estado documentado
+y fusionado.
 
 ### 2.73 — Una referencia válida tiene que resolver
 
@@ -4719,10 +4742,10 @@ color equivocado, figuras ilegibles a tamaño real— no los detecta ningún ase
 | | Hito | Criterio de salida | Módulos |
 |---|---|---|---|
 | **0** | Crónica sin gráficos | Tres crónicas distinguibles por un tercero | M-00 … M-12 |
-| **1** | Valle visible | Se ve la aldea y las estaciones; sin jugador | M-13 … M-19 |
-| **2** | Encrucijadas | Una decisión que cambia el valle de forma visible | M-20 … M-22 |
+| **1** | Valle visible | Se ve la aldea y las estaciones; sin jugador | M-13 … M-19 · **alcanzado v2.74** |
+| **2** | Encrucijadas | Una decisión que cambia el valle de forma visible | M-20 … M-22 · **alcanzado v2.61** |
 | **3** | Generaciones | Envejecen, mueren, heredan; la aldea recuerda | M-04, M-05, M-06 · **alcanzado v2.69** |
-| **4** | Fracaso y herencia | Una aldea puede extinguirse; quedan ruinas | M-24, M-25 |
+| **4** | Fracaso y herencia | Una aldea puede extinguirse; quedan ruinas | M-24, M-25 · **alcanzado v2.68** |
 | **5** | Idle | Tiempo real, letargo, parte de bienvenida | M-20, M-23 · **alcanzado v2.69** |
 | **6** | Guardado | Persistencia; primera partida real de varios días | M-23 completo; aceptación humana pendiente |
 
