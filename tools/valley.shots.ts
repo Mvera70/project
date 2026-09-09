@@ -88,7 +88,9 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   await page.screenshot({ path: 'artifacts/m22-crossroad.png', fullPage: true });
 
   const before = await page.locator('#valley').evaluate((el) => getComputedStyle(el).transform);
-  await page.getByRole('button', { name: /^Take only the edge\./ }).click();
+  // `Fell it` focuses the actual first cell cleared by the 900-unit decision;
+  // this is the visual proof for §11.5's former `felled_wood` fallback.
+  await page.getByRole('button', { name: /^Fell it\./ }).click();
   await test.expect(scrim).toBeHidden();
   await test.expect
     .poll(() => page.locator('#valley').evaluate((el) => getComputedStyle(el).transform))

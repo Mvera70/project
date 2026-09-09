@@ -11,9 +11,11 @@ import { isHere, population, resolveMigration } from '@engine/people/demography'
 import { ageOf } from '@engine/people/villagers';
 import { holderOf } from '@engine/crossroads/conditions';
 import { decide, fillVacancies, run, tick } from '@engine/sim';
+import { TERRAIN_CODE } from '@engine/state';
 import type { GameState, Villager } from '@engine/state';
 import type { CrossroadTemplate } from '@engine/crossroads/schema';
 import { forestCells, woodStanding } from '@engine/world/forest';
+import { neighbours4 } from '@engine/world/tiles';
 import { fingerprint } from '../helpers/fingerprint';
 
 const YEAR = TIME.WEEKS_PER_YEAR;
@@ -213,6 +215,7 @@ describe('el orden del tick · §4.2', () => {
     };
     const beforeWood = woodStanding(s);
     const beforeCells = forestCells(s);
+    const beforeTerrain = Uint8Array.from(s.map.terrain);
 
     const report = tick(s, CATALOG, { templateId: forest.id, optionId: 'fell_it' });
 
@@ -221,6 +224,47 @@ describe('el orden del tick · §4.2', () => {
     expect(report.felled).toBeGreaterThanOrEqual(900);
     expect([...s.map.forestAge].filter((age) => age === WORLD.BARREN_CLEARING).length)
       .toBeGreaterThanOrEqual(3);
+    const [scar] = report.visualEffects;
+    expect(scar?.effect).toEqual({ k: 'scar', what: 'felled_wood' });
+    const scarCell = Math.floor(scar?.y ?? -1) * s.map.width + Math.floor(scar?.x ?? -1);
+    expect(beforeTerrain[scarCell]).toBe(TERRAIN_CODE.forest);
+    expect(s.map.terrain[scarCell]).toBe(TERRAIN_CODE.cleared);
+    expect(s.map.forestAge[scarCell]).toBe(WORLD.BARREN_CLEARING);
+  });
+
+  it('una reunión en el vado señala la orilla transitable más cercana al núcleo (§11.5)', () => {
+    const s = foundGame(7);
+    const forest = CATALOG.find((t) => t.id === 'forest_cut') as CrossroadTemplate;
+    const woodward = s.people.villagers.find((v) => v.role === 'woodward') as Villager;
+    s.crossroad = {
+      templateId: forest.id,
+      posedTick: s.tick,
+      cast: { A: woodward.id },
+      optionIds: forest.options.map((o) => o.id),
+    };
+
+    const report = tick(s, CATALOG, { templateId: forest.id, optionId: 'leave_it_standing' });
+    const [gather] = report.visualEffects;
+    expect(gather?.effect).toEqual({ k: 'gather', where: 'ford', days: 2 });
+    const cell = Math.floor(gather?.y ?? -1) * s.map.width + Math.floor(gather?.x ?? -1);
+    expect(s.map.terrain[cell]).not.toBe(TERRAIN_CODE.water);
+    expect(s.map.terrain[cell]).not.toBe(TERRAIN_CODE.marsh);
+    expect(neighbours4(cell).some((next) => s.map.terrain[next] === TERRAIN_CODE.water)).toBe(true);
+
+    const standing = s.buildings.filter((building) => building.lostTick === null);
+    const coreX = standing.reduce((sum, building) => sum + building.x + building.w / 2, 0) / standing.length;
+    const coreY = standing.reduce((sum, building) => sum + building.y + building.h / 2, 0) / standing.length;
+    const distance = (Math.floor(gather?.x ?? -1) + 0.5 - coreX) ** 2
+      + (Math.floor(gather?.y ?? -1) + 0.5 - coreY) ** 2;
+    const nearerBank = [...s.map.terrain].some((terrain, candidate) => {
+      if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) return false;
+      if (!neighbours4(candidate).some((next) => s.map.terrain[next] === TERRAIN_CODE.water)) return false;
+      const x = candidate % s.map.width;
+      const y = Math.floor(candidate / s.map.width);
+      const candidateDistance = (x + 0.5 - coreX) ** 2 + (y + 0.5 - coreY) ** 2;
+      return candidateDistance < distance || (candidateDistance === distance && candidate < cell);
+    });
+    expect(nearerBank).toBe(false);
   });
 
   it('el paso 3 aplica exactamente la decisión pendiente, y no antes (§2.60)', () => {
