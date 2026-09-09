@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.98** | 12 sep 2026, 03:05 | Cuánto comercio quiere la partida | **Medido el reposo largo y descartado.** Alargarlo de 18 a 26 años mete la cadencia adversa en banda y **devuelve la extinción a la línea base**: 15,0 % → 11,7 % y la separación 13,3 → 10,0 puntos. Menos comercio es menos presión. Se conservan los 18: el desenlace blando es el problema de fondo desde v2.47 y vale más que siete centésimas de cadencia. |
 | **2.97** | 12 sep 2026, 02:15 | El canal propio del comercio | **Los comerciantes salen del sorteo de §8.6 y dejan de gastar su reposo.** Un buhonero ya no puede retrasar la sucesión que ha dejado pendiente una muerte. Y no sólo devuelve la cadencia a su sitio: el comercio empuja el desenlace hacia la banda que §12.9 pide — extinción adversa 11,7 % → 15,0 % y separación 10,0 → 13,3 puntos, ambas mejores que antes de que los comerciantes existieran. De once fallos del banco a nueve. |
 | **2.96** | 12 sep 2026, 00:40 | Lo que costó meter tres plantillas | **El catálogo estaba lleno y nadie lo sabía.** Los tres comerciantes suben la cadencia de §12.9 por encima de su techo en las cuatro políticas (5,46–5,92 contra ≤5), y `forest_cut` pasa más tiempo elegible porque sale menos. Subir sus reposos para compensar silencia `feud` en el barrido corto, y se comprobó con tres valores distintos: no hay hueco. **No se toca el techo ni se ajusta a ciegas**: queda como decisión de diseño abierta con tres salidas. |
 | **2.95** | 11 sep 2026, 23:30 | M-30 · los comerciantes del camino | **§7.8 nueva: el mundo exterior deja de ser mudo, y llega andando.** No hay pueblos vecinos en el mapa y no los habrá: lo que la aldea sabe de fuera es quién entra en ella. Tres comerciantes, una estación cada uno, y cada uno toca un sistema distinto — el tratante mueve el rebaño de §7.7, el salinero cambia lo que vale una matanza, el factor compra el excedente y paga en ser visto. Categoría `trade` y efecto `herd` nuevos en el DSL de §8.4. |
@@ -4370,9 +4371,34 @@ aldea vigilada recibe más presión del señor; pero eso es una hipótesis y no 
 medida por separado.
 
 **Quedan dos al borde y se dicen en voz alta:** la cadencia media con `worst` en
-5,07 contra un techo de 5, y una semilla suelta de `last` en 7,59 contra 7. No
-están dentro. Alargar el reposo entre comerciantes es la palanca obvia y es un
-parámetro del contenido nuevo, no del balance cerrado.
+5,07 contra un techo de 5, y una semilla suelta de `last` en 7,59 contra 7.
+
+#### Cuánto comercio quiere la partida (v2.98 · medido)
+
+La palanca obvia era alargar el reposo entre comerciantes, que es un parámetro
+del contenido nuevo y no del balance cerrado. Se midió, y tiene precio:
+
+| Medida | Reposo 18 años | Reposo 26 años | Banda |
+|---|---|---|---|
+| Fallos del banco | 9 | 8 | 0 |
+| Cadencia media, `worst` | 5,07 | **pasa** | 1–5 |
+| Extinción con `worst` | **15,0 %** | 11,7 % | ≥ 25 % |
+| Separación `prudent`–`worst` | **13,3 pts** | 10,0 pts | ≥ 20 pts |
+| `forest_cut` elegible, `worst` | 4,52 % | 4,06 % | < 1 % |
+
+**Menos comercio es menos presión.** Alargar el reposo arregla la cadencia y
+devuelve la extinción y la separación exactamente a la línea base anterior a los
+comerciantes, deshaciendo lo único que se había ganado.
+
+**Se conservan los 18 años.** El desenlace blando es el problema de fondo desde
+§2.47 y tres puntos largos de extinción adversa y de separación valen más que
+siete centésimas de cadencia. Es una decisión de diseño, no una medición: la
+medición dice qué cuesta cada opción, y ésta es la que se elige.
+
+**Y un dato que descarta una atribución:** la cadencia máxima de `last` da
+**7,58893280632411 con los dos reposos**, hasta el último decimal. Ese pico no
+lo causan los comerciantes y ya estaba ahí; buscarle culpa en el comercio habría
+sido perseguir la pista equivocada.
 
 **Efecto secundario que conviene recordar:** el banco de cobertura de
 `tests/fast/catalog.test.ts` **reimplementa el tick por su cuenta** y no vio el
