@@ -40,6 +40,9 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run test:shots
+      # §13.4: the offline promise is checked against the real build, so a
+      # regression in the worker cannot reach a device that trusts it.
+      - run: npm run test:pwa
       - uses: actions/upload-artifact@v4
         if: always()
         with:
