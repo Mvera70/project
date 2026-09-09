@@ -174,6 +174,56 @@ describe('la gente no se apila · §11.9', () => {
   });
 });
 
+describe('los oficios se ven · §11.9', () => {
+  const spotOf = (s: GameState, id: number): { x: number; y: number } | undefined =>
+    crowdPositions(s, 0.35).find((f) => f.id === id);
+
+  const centreOf = (s: GameState, kind: string): { x: number; y: number } | undefined => {
+    const b = s.buildings.find((v) => v.kind === kind && v.lostTick === null);
+    return b === undefined ? undefined : { x: b.x + b.w / 2, y: b.y + b.h / 2 };
+  };
+
+  it('el herrero pasa el día en la fragua, no en el campo', () => {
+    // El reparto de §5.2 cuenta brazos, no personas, así que el herrero era un
+    // labrador más. Los ocho con nombre son los únicos que el jugador sigue.
+    const state = workweek(village(25));
+    const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null);
+    const forge = centreOf(state, 'smithy');
+    expect(smith, 'la aldea de 25 años debe tener herrero').toBeDefined();
+    expect(forge, 'y fragua').toBeDefined();
+
+    const at = spotOf(state, smith!.id);
+    expect(at).toBeDefined();
+    expect(Math.hypot(at!.x - forge!.x, at!.y - forge!.y)).toBeLessThan(4);
+  });
+
+  it('el alguacil, junto al granero', () => {
+    const state = workweek(village(25));
+    const reeve = state.people.villagers.find((v) => v.role === 'reeve' && v.diedTick === null);
+    const granary = centreOf(state, 'granary');
+    if (reeve === undefined || granary === undefined) return;
+    const at = spotOf(state, reeve.id);
+    expect(at).toBeDefined();
+    expect(Math.hypot(at!.x - granary.x, at!.y - granary.y)).toBeLessThan(5);
+  });
+
+  it('y si la fragua se pierde, el herrero vuelve al campo', () => {
+    // Sin taller no hay sitio propio: no se le deja plantado en un solar.
+    const state = workweek(village(25));
+    const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null);
+    if (smith === undefined) return;
+    const withForge = spotOf(state, smith.id);
+
+    const razed = workweek(village(25));
+    for (const b of razed.buildings) if (b.kind === 'smithy') b.lostTick = razed.tick - 100;
+    const without = spotOf(razed, smith.id);
+
+    expect(withForge).toBeDefined();
+    expect(without).toBeDefined();
+    expect(without).not.toEqual(withForge);
+  });
+});
+
 describe('y sigue sin romper nada · §4.3, §10.6', () => {
   it('dibujar no escribe en el estado', () => {
     const state = workweek(village(20));

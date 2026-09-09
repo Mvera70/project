@@ -119,6 +119,41 @@ function errandSpots(state: GameState): number[] {
   return spots.length > 0 ? spots : [plaza(state)];
 }
 
+/**
+ * §11.9, v3.05 · Dónde pasa el día quien tiene oficio.
+ *
+ * El reparto de §5.2 cuenta brazos, no personas: dice cuántos labran, no
+ * quiénes. Así que el herrero labraba, el cura labraba y la comadrona labraba,
+ * y los ocho personajes con nombre —los únicos que el jugador sigue— eran ocho
+ * figuras más andando hacia el mismo campo.
+ *
+ * Esto es **sólo presentación**: no toca el reparto ni la economía. Lo que
+ * cambia es dónde se dibuja a esa persona, no cuánto rinde la aldea. Por eso
+ * vive aquí y no en `world/paths.ts`, que sí alimenta el desgaste de caminos.
+ */
+function tradeSpot(state: GameState, person: Villager): number | undefined {
+  const at = (kind: Building['kind']): number | undefined => {
+    const building = state.buildings.find((b) => b.kind === kind && b.lostTick === null);
+    return building === undefined ? undefined : centre(building, state.map.width);
+  };
+  switch (person.role) {
+    case 'smith':
+      return at('smithy');
+    case 'priest':
+      return at('church') ?? at('chapel');
+    case 'reeve':
+      return at('granary');
+    case 'midwife':
+      // Va de casa en casa, y de una distinta cada semana: es el oficio que
+      // menos sitio fijo tiene de los seis.
+      return undefined;
+    case 'leader':
+      return at('well') ?? undefined;
+    default:
+      return undefined;
+  }
+}
+
 function workdayPaths(state: GameState): Map<VillagerId, number[]> {
   const known = WORKDAY.get(state);
   if (known !== undefined && known.tick === state.tick) return known.paths;
@@ -127,6 +162,17 @@ function workdayPaths(state: GameState): Map<VillagerId, number[]> {
   const homes = new Map(state.buildings.filter((building) => building.lostTick === null)
     .map((building) => [building.id, centre(building, state.map.width)]));
   const spots = errandSpots(state);
+
+  // Primero los oficios: el que tiene taller va a su taller, aunque el reparto
+  // lo hubiera contado como un brazo más en el campo.
+  for (const person of state.people.villagers) {
+    if (!isHere(person) || person.role === null) continue;
+    const home = person.homeId === null ? undefined : homes.get(person.homeId);
+    const spot = tradeSpot(state, person);
+    if (home === undefined || spot === undefined || spot === home) continue;
+    const cells = route(state.map, home, spot);
+    if (cells.length > 0) paths.set(person.id, cells);
+  }
 
   for (const person of state.people.villagers) {
     if (!isHere(person) || paths.has(person.id)) continue;
