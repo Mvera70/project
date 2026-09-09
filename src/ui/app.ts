@@ -65,11 +65,17 @@ export function roman(value: number): string {
   return result;
 }
 
-function freshSeed(excluding?: number): number {
+/** Keep archive identity unambiguous even if the random draw repeats. */
+export function nextUnusedSeed(drawn: number, excluded: ReadonlySet<number>): number {
+  let candidate = drawn >>> 0;
+  while (excluded.has(candidate)) candidate = (candidate + 1) >>> 0;
+  return candidate;
+}
+
+function freshSeed(excluding: ReadonlySet<number> = new Set()): number {
   const value = new Uint32Array(1);
   crypto.getRandomValues(value);
-  const drawn = value[0] as number;
-  return drawn === excluding ? (drawn + 1) >>> 0 : drawn;
+  return nextUnusedSeed(value[0] as number, excluding);
 }
 
 export function boot(root: HTMLElement, save?: SaveFile): App {
@@ -167,6 +173,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
 
   // §13.1: a snapshot and the decision log, every 20 ticks and whenever the
   // tab is hidden. M-25 also writes immediately on ending and beginning again.
+  let loop: Loop | undefined;
   let saveQueue = Promise.resolve();
   const persist = (): void => {
     // Freeze the value now, before either the live loop or "Begin again" can
@@ -177,6 +184,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     saveQueue = saveQueue.then(() => persistSave(snapshot));
   };
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
+  window.addEventListener('pagehide', () => { persist(); loop?.stop(); }, { once: true });
 
   // The queue behind `decide` (v2.60). `runTick` is the one and only place a
   // queued decision is ever spent: it hands it to `tick`, which applies it at
@@ -185,7 +193,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // paused game just never calls `runTick`, so a decision queued while paused
   // sits untouched until the player unpauses and a real tick runs.
   let pendingDecision: Decision | undefined;
-  let loop: Loop | undefined;
   const finish = (): void => {
     if (state.ended === null) return;
     loop?.stop();
@@ -198,7 +205,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     }
     persist();
     openEpitaph(app, game, () => {
-      state = foundSuccessor(game, freshSeed(state.seed));
+      state = foundSuccessor(game, freshSeed(new Set(archive.map((item) => item.seed))));
       pendingDecision = undefined;
       lastFraction = 0;
       app.setSpeed(1);
@@ -223,7 +230,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
   const beginLoop = (): void => {
     loop = startLoop(() => speed, runTick, paint);
-    window.addEventListener('pagehide', () => loop?.stop(), { once: true });
   };
 
   const app: App = {

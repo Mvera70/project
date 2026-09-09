@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.69 · 10 de septiembre de 2026, 19:15 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.70 · 10 de septiembre de 2026, 20:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.70** | 10 sep 2026, 20:00 | M-23.2 · bordes de persistencia | **Cerrar también guarda, y una identidad archivada no vuelve.** `pagehide` solicita una instantánea antes de detener el bucle; cada sucesora evita las semillas de todo el archivo, no solo la de su madre. Se eliminan la pérdida posible antes del tick 20 y la colisión de `(seed, endedTick)`. |
 | **2.69** | 10 sep 2026, 19:15 | Auditoría de hitos 3, 5 y 6 | **Implementar y aceptar dejan de figurar como sinónimos.** Generaciones e idle cumplen sus criterios y se cierran con evidencia longitudinal y de interfaz. M-23 está completo, pero el hito 6 conserva su prueba de una partida humana de varios días: cuatro horas de reloj falso no son varios días jugados. |
 | **2.68** | 10 sep 2026, 18:30 | M-25 · epitafio y herencia visible | **El fracaso ya tiene salida y memoria visible.** El reloj se detiene ante un epitafio que explica causa, duración y pico; la crónica se puede leer y «Begin again» funda gente distinta sobre el mismo terreno. Las ruinas heredadas se dibujan como una cimentación continua. Las escrituras de IndexedDB se ordenan para que la partida muerta nunca sobrescriba a su sucesora. **Hito 4 alcanzado.** |
 | **2.67** | 10 sep 2026, 17:45 | M-24 · núcleo de herencia | **La semilla del valle sobrevive a sus habitantes.** El estado separa `seed` de `terrainSeed` y registra `peakPeople`; una partida terminada se archiva como crónica + huella, y una nueva semilla funda otra gente sobre el terreno y las ruinas anteriores. El hito 4 sigue abierto hasta decidir y mirar su interfaz. |
@@ -114,6 +115,33 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.70 — Los dos bordes que una partida larga sí tocará
+
+La auditoría del hito 6 encontró dos riesgos que las cuatro horas simuladas no
+ejercitaban. `visibilitychange` pedía guardado, pero `pagehide` se limitaba a
+detener el bucle. Un cierre antes del primer autoguardado de veinte ticks podía
+perder toda la sesión si el navegador no entregaba antes el cambio de
+visibilidad. `pagehide` solicita ahora la instantánea y después detiene el bucle;
+el oyente se instala una sola vez, aunque «Begin again» cree otros bucles.
+
+La identidad con la que M-25 evita archivar dos veces es `(seed, endedTick)`.
+La semilla sucesora excluía solo la partida recién terminada: una colisión con
+cualquier antepasada y el mismo tick habría recuperado la crónica equivocada.
+Una extracción aleatoria que ya está en el archivo avanza, módulo `2³²`, hasta
+la primera semilla libre. La sucesora excluye **todas** las semillas archivadas;
+desde v2.70 ninguna identidad nueva puede colisionar con una anterior.
+
+**Evidencia.** La prueba pura cubre una cadena ocupada y el borde
+`0xffffffff → 0`. Playwright deja avanzar menos de veinte ticks, dispara
+`pagehide`, comprueba que IndexedDB contiene ese estado y solo entonces salta
+cuatro horas y recarga; el parte de bienvenida sigue apareciendo. Build, lint y
+la suite completa pasan: **626 pruebas rápidas en 16,85 s** y **8/8** recorridos
+Playwright en 29,5 s.
+
+**Lo falsaría** perder los primeros diecinueve ticks al cerrar una pestaña,
+instalar un oyente nuevo por cada aldea, reutilizar cualquier `seed` del archivo
+o recuperar la crónica de una antepasada al terminar la sucesora.
 
 ### 2.69 — Un test de reloj no juega durante varios días
 
@@ -4446,8 +4474,9 @@ y migrar una partida si algún día cambia el esquema. Guardar solo el registro
 sería elegante y frágil: en cuanto se toque un número de §12, todas las partidas
 guardadas divergen.
 
-Se guarda cada 20 ticks y siempre al ocultarse la pestaña
-(`visibilitychange`).
+Se guarda cada 20 ticks, al ocultarse la pestaña (`visibilitychange`) y en
+`pagehide`, antes de detener el bucle. El oyente de `pagehide` pertenece a la
+aplicación, no a una instancia del bucle: fundar otra aldea no acumula oyentes.
 
 Cada solicitud clona su `SaveFile` en el momento de pedirla y entra en una cola
 de escritura única. Terminar, archivar y fundar de nuevo son mutaciones
@@ -4501,7 +4530,9 @@ La interfaz detiene el reloj y descarta la pantalla de encrucijada al detectar
 `ended`. El epitafio nombra causa, duración y pico de población, permite abrir
 la crónica completa y exige **«Begin again»** para llamar a `foundSuccessor`.
 El archivo conserva todas las partidas cerradas; una misma pareja
-`(seed, ended.tick)` solo se añade una vez.
+`(seed, ended.tick)` solo se añade una vez. La semilla de una sucesora no puede
+ser ninguna del archivo: si la extracción coincide, avanza módulo `2³²` hasta
+la primera libre. Así esa pareja sigue siendo una identidad inequívoca.
 
 ---
 
@@ -5344,15 +5375,16 @@ instantánea.
 bienvenida coherente. Esto cierra M-23 y deja listo el hito 6; la aceptación
 adicional de varios días reales permanece en §15.
 
-**Estado (v2.69): módulo implementado; hito 6 pendiente de aceptación humana
+**Estado (v2.70): módulo implementado; hito 6 pendiente de aceptación humana
 según §15.** `catchUp` corre los 960 ticks en un solo lote síncrono (es lo que su
 propia prueba mide en menos de 2 s); el letargo de la interfaz (`ui/lethargy.ts`)
 es un bucle distinto sobre lotes de 64, la misma separación pura/DOM que
 `loop.ts`. El guardado real vive en IndexedDB (`ui/idb.ts`, fuera del contrato
 de este módulo: ninguno de los tres ficheros lo abre por su cuenta) y
-`app.ts`/`main.ts` quedan enganchados: guardar cada 20 ticks y al ocultar la
-pestaña, cargar al abrir, poner al día antes de que el bucle normal toque el
-mismo estado, y el parte de bienvenida antes de que se vea nada más. Verificado
+`app.ts`/`main.ts` quedan enganchados: guardan cada 20 ticks, al ocultar la
+pestaña y en `pagehide` antes de detener el bucle; cargan al abrir, ponen al día
+antes de que el bucle normal toque el mismo estado y muestran el parte de
+bienvenida antes que nada más. Verificado
 con Playwright y reloj falso: cerrar y volver a las cuatro horas, sin esperar,
 entrega un parte legible (§2.63 trae el texto real y lo que no se entiende a la
 primera lectura).
@@ -5395,7 +5427,8 @@ registro cerrado y «Begin again» llama a `foundSuccessor` con semilla nueva.
 Las escrituras de guardado mantienen el orden de solicitud fijado en §13.1.
 **Reglas.** Ninguna opción se decide al cerrar; las ruinas son visibles e
 inertes; la máscara usa la regla gráfica de §10.4; el archivo es acumulativo.
-Todo texto visible procede del banco.
+La semilla nueva no repite ninguna del archivo. Todo texto visible procede del
+banco.
 **Tests.** Pantalla y controles a 390 × 844; crónica abrible y cerrable; sucesora
 en `ANNO I`; huella visible; guardado vivo con un solo archivo después de entrar
 de nuevo por la ruta normal.

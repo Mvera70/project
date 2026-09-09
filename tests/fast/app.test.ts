@@ -4,7 +4,7 @@
 // than through `boot`, which needs a real DOM this suite does not open. The
 // split mirrors `loop.ts`'s own `advanceAccumulator` versus `startLoop`.
 import { describe, expect, it } from 'vitest';
-import { attemptDecision } from '@ui/app';
+import { attemptDecision, nextUnusedSeed } from '@ui/app';
 
 describe('attemptDecision · §2.60', () => {
   it('sin encrucijada pendiente, no se acepta a ninguna velocidad', () => {
@@ -30,5 +30,12 @@ describe('attemptDecision · §2.60', () => {
     // Regla 3: §8.7 dice que la simulación no se detiene por una encrucijada
     // pendiente, no que el jugador no pueda pausarla él mismo.
     expect(attemptDecision(true, false, 0)).toEqual({ accepted: true, forceTick: false });
+  });
+});
+
+describe('semilla sucesora · §13.3', () => {
+  it('no reutiliza ninguna semilla archivada y atraviesa el borde uint32', () => {
+    expect(nextUnusedSeed(7, new Set([7, 8, 9]))).toBe(10);
+    expect(nextUnusedSeed(0xffff_ffff, new Set([0xffff_ffff, 0]))).toBe(1);
   });
 });
