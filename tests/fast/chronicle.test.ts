@@ -20,7 +20,7 @@ import {
   record,
   seasonKey,
 } from '@engine/chronicle/events';
-import { bankKeys, knows, numberWord, renderEntry, renderYear } from '@engine/chronicle/render';
+import { bankKeys, knows, numberWord, renderChronicleYear, renderEntry, renderYear } from '@engine/chronicle/render';
 import { epitaphFor, namedDeathEntry } from '@engine/chronicle/events';
 import { adjustOpinion } from '@engine/people/opinions';
 import { remember } from '@engine/people/memories';
@@ -449,6 +449,15 @@ describe('render', () => {
     expect(renderYear(s, 1, 3)).toHaveLength(1);
     expect(renderYear(s, 4)).toHaveLength(1);
     expect(renderYear(s, 99)).toEqual([]);
+  });
+
+  it('una crónica archivada recupera la misma voz desde su semilla', () => {
+    const s = village(7);
+    s.chronicle = [
+      { tick: 48, kind: 'harvest', templateKey: 'harvest.fair', params: { grain: 600, people: 20 }, weight: 2 },
+      { tick: 52, kind: 'death', templateKey: 'death.old_age.one', params: { count: 1 }, weight: 2 },
+    ];
+    expect(renderChronicleYear(s.chronicle, makeBundle(s.seed), 1)).toEqual(renderYear(s, 1));
   });
 });
 

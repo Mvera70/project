@@ -23,6 +23,7 @@ import { openWelcome } from './welcome';
 export interface App {
   setSpeed(speed: Speed): void;
   state(): Readonly<GameState>;
+  archive(): readonly ArchivedGame[];
   decide(optionId: string): boolean;
 }
 
@@ -239,6 +240,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       for (const [candidate, button] of buttons) button.setAttribute('aria-pressed', String(candidate === speed));
     },
     state(): Readonly<GameState> { return state; },
+    archive(): readonly ArchivedGame[] { return archive; },
     decide(optionId: string): boolean {
       const attempt = attemptDecision(state.crossroad !== null, pendingDecision !== undefined, speed);
       if (!attempt.accepted || state.crossroad === null) return false;

@@ -144,10 +144,15 @@ function capitalise(text: string): string {
  * was born that spring" is a better sentence than "one child was born that
  * year", and it is also the truth about when it happened.
  */
-export function renderYear(state: GameState, year: number, minWeight: 1 | 2 | 3 = 2): string[] {
+export function renderChronicleYear(
+  chronicle: readonly ChronicleEntry[],
+  rng: RngBundle,
+  year: number,
+  minWeight: 1 | 2 | 3 = 2,
+): string[] {
   // The discriminant is the entry's place in the chronicle, so that two deaths
   // of the same kind in the same week do not come out word for word identical.
-  const inYear = state.chronicle
+  const inYear = chronicle
     .map((e, i) => ({ e, i }))
     .filter(({ e }) => yearOf(e.tick) === year && e.weight >= minWeight)
     .sort((a, b) => a.e.tick - b.e.tick || a.i - b.i);
@@ -174,18 +179,23 @@ export function renderYear(state: GameState, year: number, minWeight: 1 | 2 | 3 
     const key = yearKey(e.templateKey);
     const group = key === null ? undefined : groups.get(key);
     if (key === undefined || group === undefined || group.entries < 2) {
-      out.push(renderEntry(e, state.rng, i));
+      out.push(renderEntry(e, rng, i));
       continue;
     }
     if (emitted.has(key as string)) continue; // swallowed by the aggregate
     emitted.add(key as string);
     out.push(renderEntry(
       { ...e, templateKey: key as string, params: { ...e.params, count: group.total } },
-      state.rng,
+      rng,
       group.at,
     ));
   }
   return out;
+}
+
+/** Render a year from the current authoritative state. */
+export function renderYear(state: GameState, year: number, minWeight: 1 | 2 | 3 = 2): string[] {
+  return renderChronicleYear(state.chronicle, state.rng, year, minWeight);
 }
 
 /** Every key the bank knows. M-08's catalogue test checks its keys against it. */
