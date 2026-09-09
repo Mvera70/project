@@ -887,6 +887,7 @@ export function tick(
   // apart by which happened: a hamlet that walks out has people in it when it
   // does, and a village that dies has nobody.
   const living = population(state);
+  state.peakPeople = Math.max(state.peakPeople, living);
   if (living >= MIGRATION.VIABLE_POPULATION) {
     state.dwindlingSince = null;
   } else if (living > 0 && state.dwindlingSince === null) {

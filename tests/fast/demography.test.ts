@@ -45,9 +45,11 @@ function village(seed: number, houses: number): GameState {
   const rng = makeBundle(seed);
   const people = foundPeople(rng, 0);
   return {
-    version: 1,
+    version: 2,
     seed,
+    terrainSeed: seed,
     tick: 0,
+    peakPeople: 20,
     rng,
     map: {
       width: 36,

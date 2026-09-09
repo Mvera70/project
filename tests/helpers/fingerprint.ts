@@ -19,17 +19,21 @@ export function fingerprint(s: GameState): string {
   const bytes = (a: Uint8Array | Uint16Array): void => {
     h.update(Buffer.from(a.buffer, a.byteOffset, a.byteLength));
   };
-  h.update(`${s.version}|${s.seed}|${s.tick}|${s.map.width}x${s.map.height}`);
+  h.update(`${s.version}|${s.seed}|${s.terrainSeed}|${s.tick}|${s.peakPeople}|${s.map.width}x${s.map.height}`);
   bytes(s.map.terrain);
   bytes(s.map.traffic);
   bytes(s.map.path);
   bytes(s.map.ruins);
   bytes(s.map.forestAge);
+  bytes(s.map.forestStock);
   h.update(JSON.stringify(s.rng));
   h.update(JSON.stringify(s.village));
   h.update(JSON.stringify(s.weather));
   h.update(JSON.stringify(s.outbreak));
   h.update(JSON.stringify(s.ended));
+  h.update(JSON.stringify(s.dwindlingSince));
+  h.update(JSON.stringify(s.noOneStreak));
+  h.update(JSON.stringify(s.harvestModifier));
   h.update(JSON.stringify(s.flags));
   h.update(JSON.stringify(s.crossroad));
   h.update(JSON.stringify(s.works));

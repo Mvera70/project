@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.66 · 10 de septiembre de 2026, 17:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.67 · 10 de septiembre de 2026, 17:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.67** | 10 sep 2026, 17:45 | M-24 · núcleo de herencia | **La semilla del valle sobrevive a sus habitantes.** El estado separa `seed` de `terrainSeed` y registra `peakPeople`; una partida terminada se archiva como crónica + huella, y una nueva semilla funda otra gente sobre el terreno y las ruinas anteriores. El hito 4 sigue abierto hasta decidir y mirar su interfaz. |
 | **2.66** | 10 sep 2026, 17:00 | Coordenadas de efectos de M-22 | **El vado es una orilla, no una celda de agua.** `gather ford` enfoca el acceso terrestre contiguo al río más cercano al núcleo; `scar felled_wood`, la primera celda que la tala tocó realmente. Los dos dejan de caer sobre `valleyCore`. |
 | **2.65** | 10 sep 2026, 16:30 | Cierre de M-11 | **La suite ya no promete trabajo futuro que existe en otro sitio.** Gestos/cámara viven en `ui.test.ts`, `app.test.ts` y Playwright; el guardado completo vive en `save.test.ts`. Se retiran los dos `it.todo`: 620 pruebas, cero pendientes, 17,53 s. |
 | **2.64** | 10 sep 2026, 16:00 | Revisión del parte de bienvenida | **La recencia gana dentro de la variedad.** Las cuatro plazas toman primero el suceso más reciente de cada tipo y después una segunda aparición como máximo. Tres cosechas ya no expulsan una llegada ni se repiten por tercera vez. Bienvenida opaca y controles ocultos bajo la encrucijada cierran el sangrado entre pantallas. |
@@ -111,6 +112,43 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.67 — Lo que sobrevive no puede reconstruirse después
+
+El contrato de §13.3 llevaba dos datos en los tipos y ninguno en el estado que
+debía producirlos. `ArchivedGame.peakPeople` no se deduce de la población final:
+los inmigrantes no guardan el tick de llegada. Y `seed` no era «semilla de
+terreno»: alimentaba también nombres, nacimientos, clima y encrucijadas;
+reutilizarla fundaba otra vez a las mismas personas.
+
+`GameState` gana `terrainSeed` y `peakPeople`. El primero permanece al cambiar de
+partida; el segundo toma el máximo de las poblaciones observadas al completar
+cada tick, que son los estados que llegan a pantalla y guardado. El esquema de
+guardado sube a 2. Los guardados de esquema 1 migran sin tirarse: `terrainSeed`
+era necesariamente su `seed`, y el pico toma el mayor recuento de población que
+su crónica llegó a escribir o la población cargada. Es el mejor dato observable;
+la precisión anterior no existe y no se finge.
+
+`archiveGame` solo acepta una aldea terminada y copia su crónica, las ruinas que
+ya tenía y la huella de todos los edificios aún en pie. `foundSuccessor` recibe
+una semilla maestra nueva, regenera el mapa con `terrainSeed` y siembra aquella
+máscara después de colocar la fundación. Las ruinas siguen sin participar en la
+colocación: pueden quedar bajo una casa nueva, pero no bloquean, pagan ni dan
+recursos.
+
+**Evidencia.** Cuatro pruebas nuevas cubren la migración 1→2, el pico observado,
+el rechazo de una aldea viva y la copia aislada de crónica/huella, y una
+sucesora con nombres y semilla nuevos cuyo terreno **regenerado** y ruinas
+coinciden byte a byte con lo heredado. La ampliación del estado destapó además
+que el `fingerprint` de determinismo omitía `forestStock`, `dwindlingSince`,
+`noOneStreak` y `harvestModifier`; ya recorre esos bytes y campos.
+La suite completa pasa **625 pruebas en 19,55 s**, a solo 0,45 s del presupuesto
+de §14.1: pasa, pero el margen vuelve a ser materialmente estrecho.
+
+**Lo falsaría** poder archivar una partida viva, perder una celda ocupada al
+cerrarla, que una mutación posterior reescribiese la crónica archivada, que la
+sucesora cambiase el terreno o repitiese la semilla humana, o que una ruina
+impidiese colocar un edificio. La interfaz sigue fuera de esta afirmación.
 
 ### 2.66 — El lugar que la prosa daba por hecho
 
@@ -2382,7 +2420,9 @@ Este es el contrato común. Vive en `src/engine/state.ts`.
 export interface GameState {
   readonly version: number;        // versión del esquema de guardado
   readonly seed: number;           // semilla maestra
+  readonly terrainSeed: number;    // persiste entre partidas del mismo valle
   tick: number;                    // semanas desde la fundación
+  peakPeople: number;              // máximo al cierre de un tick
   rng: RngBundle;                  // estados de los flujos aleatorios
   map: ValleyMap;
   village: VillageStats;
@@ -4311,6 +4351,11 @@ guardadas divergen.
 Se guarda cada 20 ticks y siempre al ocultarse la pestaña
 (`visibilitychange`).
 
+**Esquema actual: 2 (v2.67).** El esquema 1 se migra de forma aditiva: su única
+`seed` pasa también a `terrainSeed`; `peakPeople` toma el mayor valor de
+`params.people` conservado en la crónica o la población presente. No se atribuye
+al guardado antiguo una precisión que nunca almacenó.
+
 ### 13.2 Letargo
 
 Al cargar:
@@ -4332,10 +4377,16 @@ Al terminar, se abre el **parte de bienvenida** (§9.2).
 
 ### 13.3 Herencia entre partidas
 
-Al extinguirse una aldea, la partida se cierra y su crónica completa se archiva
-junto con la máscara de sus edificios. La siguiente partida genera un mapa nuevo
-con la misma semilla de terreno y **siembra las ruinas de la anterior** en
-`map.ruins`.
+Al terminar una aldea por cualquiera de las tres causas de `EndState`, la
+partida se cierra y su crónica completa se archiva junto con la unión de las
+ruinas existentes y la máscara de sus edificios en pie. La siguiente partida
+usa una `seed` maestra nueva, genera un mapa nuevo con la misma `terrainSeed` y
+**siembra las ruinas de la anterior** en `map.ruins`.
+
+```ts
+export function archiveGame(state: GameState): ArchivedGame; // exige state.ended
+export function foundSuccessor(game: ArchivedGame, seed: number): GameState;
+```
 
 Las ruinas heredadas no tienen efecto mecánico: no dan recursos, no bloquean la
 construcción de madera, no modifican ningún número. Están ahí para verse. Darles
@@ -4451,6 +4502,11 @@ Contrato que el resto del código debe respetar desde ya:
 - `SaveFile.archive` existe desde el principio, aunque esté vacío.
 - `ValleyMap.ruins` se rellena y se dibuja desde el hito 1, aunque solo lo use
   el incendio.
+
+**Núcleo implementado en M-24 (v2.67).** Archivo, semilla de terreno separada,
+pico de población y fundación sucesora existen como transición pura. No alcanza
+el hito por sí solo: todavía no hay un gesto de cierre ni una pantalla que deje
+al jugador comprender qué terminó y qué quedó.
 
 Queda por decidir: la pantalla de epitafio, si la crónica archivada se puede
 releer entera, y cuántas partidas se conservan.
@@ -4757,7 +4813,9 @@ resolver) sobre 5 000 entradas generadas.
 **Ficheros.** `src/engine/sim.ts`, `src/engine/found.ts`, `src/cli/chronicle.ts`.
 **Contrato.**
 ```ts
-export function foundGame(seed: number): GameState;
+export function foundGame(seed: number, inherited?: {
+  terrainSeed: number; ruins: Uint8Array;
+}): GameState;
 export function tick(state: GameState, catalogue: Catalogue, decision?: Decision): TickReport;
 export function run(state: GameState, ticks: number, policy: Policy, catalogue: Catalogue): TickReport[];
 export type Policy = 'first' | 'last' | 'random' | 'worst' | 'prudent'
@@ -5186,6 +5244,28 @@ primera lectura).
 
 ---
 
+### M-24 · Núcleo de fracaso y herencia
+
+**Objetivo.** Que una aldea terminada pueda convertirse, sin interfaz, en la
+memoria visual de la siguiente.
+**Depende de.** M-23, M-13, M-14.
+**Ficheros.** `src/engine/state.ts`, `found.ts`, `save.ts`, `sim.ts`.
+**Contrato.** `GameState.terrainSeed`, `GameState.peakPeople`, `archiveGame` y
+`foundSuccessor` tal como se fijan en §13.3.
+**Reglas.** Una aldea viva no se archiva. La máscara une ruinas previas y
+edificios finales. La sucesora cambia `seed`, conserva `terrainSeed`; la ruina
+es solo visible. El pico se observa al cierre de tick. Esquema 1 migra según
+§13.1.
+**Tests.** Migración aditiva; copia aislada; huella completa; terreno y máscara
+idénticos; personas distintas; ruina sin ocupación mecánica.
+**Terminado cuando.** La transición pura completa pasa ida y vuelta y no hace
+ninguna elección de interfaz. **No alcanza todavía el hito 4.**
+
+**Estado (v2.67): implementado.** Las decisiones pendientes permanecen en
+§16.1 y requieren jugar la pantalla que las presente.
+
+---
+
 ### 17.1 Orden de trabajo
 
 ```
@@ -5206,6 +5286,8 @@ M-00
                                  M-20 ─ M-21 ─ M-22  ← HITO 2
                                    │
                                  M-23  ← HITO 6
+                                   │
+                                 M-24  (núcleo del HITO 4)
 ```
 
 Se pueden trabajar en paralelo, sin pisarse: (M-03, M-06, M-09, M-13),

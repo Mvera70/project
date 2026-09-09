@@ -5,7 +5,7 @@ sigue la enumeración publicada; no inventa un décimo requisito.
 
 | Grupo | Cobertura |
 |---|---|
-| Determinismo | `sim.test.ts`: SHA-256 de JSON del estado completo, incluidos los arrays del mapa, obras y pregunta pendiente. Partida de semilla 6 y replay de su registro exacto de decisiones; ambos alcanzan explícitamente 5 000 ticks. |
+| Determinismo | `sim.test.ts`: SHA-256 incremental del estado completo, incluidos todos los arrays del mapa, obras, deuda de abandono, cosecha comprometida y pregunta pendiente. Partida de semilla 6 y replay de su registro exacto de decisiones; ambos alcanzan explícitamente 5 000 ticks. |
 | Aislamiento | `invariants.test.ts`: tras 1 000 ticks se consumen 1 000 números de `chronicle`, se avanzan otros 1 000 y se compara todo el estado, excluyendo únicamente el flujo intervenido. `rng.test.ts` cubre además el generador. |
 | Arquitectura | `module-graph.test.ts`: restricciones del motor y dependencias. |
 | Invariantes por tick | `invariants.test.ts`: grano finito y no negativo, ánimo/fe en rango, nacimientos no futuros y geometría válida; cada uno de 200 ticks en semillas 0, 6, 7, 42 y 108, con decisiones del catálogo. |
@@ -37,6 +37,6 @@ La suite de balance se ejecuta aparte con `npm run test:balance`.
 
 En v2.18, tras corregir la peste perpetua, las partidas vuelven a recorrer casi
 todo su horizonte. Dos pruebas integradas que se habían vuelto lentas y vacuas
-se sustituyeron por casos que fuerzan el suceso observado. La suite completa
-La medición histórica fue 19,81 s con 523 pruebas y dos pendientes. La medición
+se sustituyeron por casos que fuerzan el suceso observado. La medición histórica
+fue 19,81 s con 523 pruebas y dos pendientes. La medición
 vigente está en `docs/design.md`; no se mantiene un contador duplicado aquí.

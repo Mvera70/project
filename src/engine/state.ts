@@ -501,7 +501,9 @@ export type MigrationEvent =
 export interface GameState {
   readonly version: number; // save schema version
   readonly seed: number; // master seed
+  readonly terrainSeed: number; // may outlive a village across §13.3 succession
   tick: number; // weeks since the founding
+  peakPeople: number; // greatest population observed at a completed tick
   rng: RngBundle; // state of the random streams
   map: ValleyMap;
   village: VillageStats;
@@ -553,6 +555,7 @@ export interface GameState {
  */
 export interface ArchivedGame {
   seed: number;
+  terrainSeed: number;
   endedTick: number;
   cause: EndState['cause'];
   peakPeople: number;

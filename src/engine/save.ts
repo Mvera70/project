@@ -2,11 +2,13 @@
 
 import { TIME } from './balance';
 import { CATALOG } from './crossroads/catalog';
+import { foundGame } from './found';
+import { population } from './people/demography';
 import { tick } from './sim';
 import type { ArchivedGame, DecisionRecord, GameState, SaveFile } from './state';
 
 /** The schema this build writes and reads. §13.1. */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 /**
  * Assembles a `SaveFile`. Two fields the state itself does not carry:
@@ -38,7 +40,9 @@ function isPlausibleState(value: unknown): value is GameState {
   return (
     typeof s.version === 'number' &&
     typeof s.seed === 'number' &&
+    typeof s.terrainSeed === 'number' &&
     typeof s.tick === 'number' && s.tick >= 0 &&
+    typeof s.peakPeople === 'number' && s.peakPeople >= 0 &&
     typeof s.rng === 'object' && s.rng !== null &&
     typeof s.map === 'object' && s.map !== null &&
     typeof s.village === 'object' && s.village !== null &&
@@ -75,17 +79,10 @@ export function deserialize(raw: unknown): SaveFile {
     throw new Error('Save file has no schema version.');
   }
 
-  switch (candidate.schema) {
-    case SCHEMA_VERSION:
-      break;
-    default:
-      throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
-  }
-
   if (typeof candidate.savedAtMs !== 'number' || !Number.isFinite(candidate.savedAtMs)) {
     throw new Error('Save file has no valid savedAtMs.');
   }
-  if (!isPlausibleState(candidate.state)) {
+  if (typeof candidate.state !== 'object' || candidate.state === null) {
     throw new Error('Save file has no valid state.');
   }
   if (!Array.isArray(candidate.decisions)) {
@@ -95,13 +92,61 @@ export function deserialize(raw: unknown): SaveFile {
     throw new Error('Save file has no archive.');
   }
 
+  let state = candidate.state as GameState;
+  let archive = candidate.archive as ArchivedGame[];
+  if (candidate.schema === 1) {
+    const legacy = candidate.state as Omit<GameState, 'terrainSeed' | 'peakPeople'>;
+    const observed = legacy.chronicle.reduce((peak, entry) => {
+      const people = entry.params['people'];
+      return typeof people === 'number' ? Math.max(peak, people) : peak;
+    }, population(legacy as GameState));
+    state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
+    archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
+  } else if (candidate.schema !== SCHEMA_VERSION) {
+    throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
+  }
+  if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
+
   return {
-    schema: candidate.schema,
+    schema: SCHEMA_VERSION,
     savedAtMs: candidate.savedAtMs,
-    state: candidate.state,
+    state,
     decisions: candidate.decisions as DecisionRecord[],
-    archive: candidate.archive as ArchivedGame[],
+    archive,
   };
+}
+
+/** The whole visible footprint a finished village leaves behind. */
+function ruinMask(state: GameState): Uint8Array {
+  const ruins = Uint8Array.from(state.map.ruins);
+  for (const building of state.buildings) {
+    if (building.lostTick !== null) continue;
+    for (let y = building.y; y < building.y + building.h; y += 1) {
+      for (let x = building.x; x < building.x + building.w; x += 1) {
+        ruins[y * state.map.width + x] = 1;
+      }
+    }
+  }
+  return ruins;
+}
+
+/** Freeze a finished village into §13.3's non-mechanical inheritance. */
+export function archiveGame(state: GameState): ArchivedGame {
+  if (state.ended === null) throw new Error('A living village cannot be archived.');
+  return {
+    seed: state.seed,
+    terrainSeed: state.terrainSeed,
+    endedTick: state.ended.tick,
+    cause: state.ended.cause,
+    peakPeople: state.peakPeople,
+    chronicle: state.chronicle.map((entry) => ({ ...entry, params: { ...entry.params } })),
+    ruins: ruinMask(state),
+  };
+}
+
+/** Found different people in a fresh copy of the inherited terrain and ruins. */
+export function foundSuccessor(game: ArchivedGame, seed: number): GameState {
+  return foundGame(seed, { terrainSeed: game.terrainSeed, ruins: game.ruins });
 }
 
 /** How many ticks a gap of this length owes, capped at §12's four hours. */
