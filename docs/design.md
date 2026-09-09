@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.07** | 12 sep 2026, 17:30 | M-39 · las riñas, y lo que costó la vida nueva | **El valle escribía rencores desde M-05 y no hacía nada con ellos**: un rencor abierto era una fila en un registro y nadie discutía jamás. Ahora dos que se detestan acaban teniendo un mal día, con nombres y con consecuencias. Y se paga la factura de rendimiento de v3.03: mandar a la aldea entera al bosque en invierno había llevado el banco de once minutos a **cuarenta y tres**. |
 | **3.06** | 12 sep 2026, 15:00 | M-38 · el paso y el carril | **Todos andaban por la misma raya y a la misma velocidad**, tapándose unos a otros: media docena de figuras dibujadas como una. Cada uno anda ahora a su paso y por su carril. Y el rebaño deja de pastar veinte años en el mismo metro cuadrado. Medido de punta a punta del bloque: de 145 figuras tapadas por instante a 9,6, y de repetir sitio casi todos a 6 de 32. |
 | **3.05** | 12 sep 2026, 13:30 | M-36/M-37 · la aldea se entera y los oficios se ven | **Ardía una casa y la gente seguía camino del campo.** Ahora lo que acaba de pasarle a la aldea manda sobre todo lo demás. Y los ocho con nombre dejan de ser ocho labradores más: el herrero está en la fragua, el cura en la capilla, el alguacil en el granero. Los que no trabajan hacen recados en vez de quedarse clavados en su puerta, y los críos juegan delante de casa. |
 | **3.03** | 12 sep 2026, 11:00 | M-35 · que la aldea parezca viva | **Segundo veredicto humano, y es el mismo problema visto de cerca: «se mueven todos los días igual».** Y era literal. Todos salían en el mismo instante, iban al mismo campo, se quedaban clavados y volvían juntos. §11.9 nueva: jornada propia por persona y por semana, la tierra repartida entre los campos, gente trabajando en vez de quieta, encuentros entre vecinos que deciden las opiniones, y un invierno en que **nadie ara**. |
@@ -5405,6 +5406,64 @@ el viejo llega más tarde que el mozo aunque salgan juntos.
 | Destinos distintos | 4–5 | **6–9** |
 | Gente clavada el día entero | media docena | **0** |
 | Presencia en los campos en invierno | 92 % | **0 %** |
+
+#### Las riñas (v3.07)
+
+§6.4 sabía escribir rencores desde M-05, con su causa, su curación y una
+velocidad de perdón que cambia con los rasgos. **Y no hacía nada con ellos.** Un
+rencor abierto era una fila en un registro: nadie discutía, nadie se gritaba,
+nadie dejaba de hablarse en la plaza. Sólo servía para que el catálogo pesara
+más una plantilla de rencilla veinte años después.
+
+| | |
+|---|---|
+| **Cuándo** | Un rencor vivo, ya cocido, y la opinión todavía por debajo del umbral de curación |
+| **Qué pasa** | Casi siempre voces delante de todo el mundo; de vez en cuando, manos |
+| **Qué deja** | Se llevan peor que antes, y cada uno recuerda de quién fue la culpa |
+| **Quién estalla** | El de genio vivo mucho antes que el manso |
+
+**Los rasgos por fin deciden algo.** De los quince de §6.3, sólo dos cambiaban
+comportamiento —`hardy` y `frail`, sobre la mortalidad—; los otros trece
+inclinaban qué encrucijada sale y ahí se acababan. `hot_tempered`, `spiteful` y
+`kind` deciden ahora si el asunto estalla o se aguanta un año más. Medido: con
+el rasgo del genio vivo, la proporción frente al manso es de 1226 a 1; sin él,
+de 20 a 1.
+
+**Frecuencia medida:** unas seis por siglo y partida, con un rencor de cada
+cinco llegando a las manos. Ni cero —el sistema estaría muerto otra vez— ni una
+taberna. Y no se realimenta: los rencores totales pasan de 20 a 22 en cinco
+partidas de 120 años.
+
+#### Lo que costó la vida nueva (v3.07)
+
+La vida del día de §11.9 no salió gratis, y el banco lo dijo antes que nadie.
+
+| | Antes de v3.03 | Con la vida nueva | Tras optimizar |
+|---|---|---|---|
+| Tres partidas de 150 años | 3,3 s | 11,0 s | **5,7 s** |
+| Banco de §12.9 | ~11 min | **43 min** | por medir |
+
+**La causa fue el invierno.** Mandar a la aldea entera al bosque significaba
+buscar, para cada persona y cada semana, la celda más cercana entre las
+**quinientas** arboladas del valle. Antes sólo lo hacían los pocos leñadores.
+
+Tres arreglos, y el orden en que se probaron importa porque el segundo salió al
+revés:
+
+1. **Rutas cacheadas por par de celdas**, no por persona. Dos que van del mismo
+   sitio al mismo sitio comparten, y al volver el verano la ruta al campo sigue
+   guardada. De 11,0 s a 6,2 s.
+2. **Recortar el bosque a lo cercano al pueblo** (`LABOUR.WOOD_CHOICES`), que
+   además de barato es más cierto: se tala cerca. Sin cachear el recorte
+   **empeoró** —de 6,2 s a 7,0—, porque ordenar quinientas celdas cada tick
+   costaba más que el problema. Cacheado, 5,8 s.
+3. **La clave de la caché de destinos, un número en vez de una cadena.** Seis
+   centenares de caracteres por tick, en cada semilla de cada política. Efecto
+   marginal, 5,7 s, y se conserva porque no cuesta nada.
+
+**Deuda declarada:** la suite rápida está en 34 s contra los 20 de `CLAUDE.md`.
+Parte es contenido nuevo con sus pruebas y parte es que la simulación hace más
+cosas por tick. Sigue sin resolverse y no se resuelve escondiendo pruebas.
 
 #### Las reglas que esto NO rompe
 

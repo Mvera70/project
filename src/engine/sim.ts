@@ -14,6 +14,7 @@ import {
 } from './people/demography';
 import { decayMemories } from './people/memories';
 import { driftOpinions, opinionOf } from './people/opinions';
+import { quarrelOf } from './people/quarrels';
 import { ageOf, minAgeFor, promoteToNamed } from './people/villagers';
 import { pick } from './rng';
 import type {
@@ -936,6 +937,28 @@ export function tick(
   // The week's living-together, which §6.4 puts nowhere in particular and which
   // has to happen once a week and only once.
   driftOpinions(state);
+
+  // §7.9, v3.07: y lo que pasa cuando dos ya no se aguantan. Va después del
+  // roce de la semana y antes de la encrucijada, porque una riña de hoy tiene
+  // que poder pesar en la pregunta de hoy.
+  const quarrel = quarrelOf(state);
+  if (quarrel !== null) {
+    const a = state.people.villagers.find((v) => v.id === quarrel.a);
+    const b = state.people.villagers.find((v) => v.id === quarrel.b);
+    say({
+      kind: 'grudge',
+      templateKey: quarrel.blows ? 'quarrel.blows' : 'quarrel.words',
+      params: {
+        year: year(),
+        season: season(),
+        name: a?.name ?? '',
+        other: b?.name ?? '',
+      },
+      // Llegar a las manos en una aldea de cuarenta es de lo que se habla
+      // durante años; una discusión, de lo que se habla esa semana.
+      weight: quarrel.blows ? 3 : 2,
+    });
+  }
 
   // ---- 15 · CROSSROAD ------------------------------------------------------
   // §7.8, v2.97: two channels, and the order matters. The catalogue asks first

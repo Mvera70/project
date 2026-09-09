@@ -1367,6 +1367,18 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     '{A} opened the granary in year {year}, and nobody counted for a season.',
   ],
 
+  // --- M-39 · quarrels, design.md §6.4, §7.9 ---
+  'quarrel.words': [
+    '{name} and {other} had words in front of everybody, in year {year}.',
+    'It came out between {name} and {other} that {season}, and loudly.',
+    'Nobody was surprised when {name} and {other} stopped speaking that year.',
+  ],
+  'quarrel.blows': [
+    '{name} and {other} came to blows in year {year}. It had been coming.',
+    'They pulled {name} off {other} that {season}, and neither would say why.',
+    'There was blood between {name} and {other} in year {year}, and the valley picked sides.',
+  ],
+
   // --- M-29 · the herd, design.md §7.7 ---
   'herd.slaughtered.hens': [
     'They ate the hens that {season}.',

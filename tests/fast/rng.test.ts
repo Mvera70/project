@@ -65,6 +65,9 @@ describe('rng · reproducibilidad', () => {
       // los diez originales siguen intactos: anadir sistemas nunca ha movido
       // una sola partida guardada.
       traders: 3753186201,
+      // v3.07: y `quarrels` (7.9). Trece flujos, y los diez originales siguen
+      // dando lo mismo que el primer dia.
+      quarrels: 1072235657,
     });
   });
 

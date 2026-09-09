@@ -10,7 +10,7 @@
 // out on its own — which is exactly what happens to the track to an abandoned
 // field.
 
-import { WORLD } from '../balance';
+import { WORLD, LABOUR } from '../balance';
 import { isHere, workforce } from '../people/demography';
 import { seasonOf } from '../time';
 import { allocateLabour } from '../subsistence/labour';
@@ -40,11 +40,45 @@ interface CachedRoute {
   cells: number[];
 }
 const CACHE = new WeakMap<GameState, Map<VillagerId, CachedRoute>>();
+/**
+ * §7.6, v3.07 · Rutas por PAR de celdas, no por persona.
+ *
+ * La caché de arriba guarda la ruta de cada aldeano y se invalida en cuanto
+ * cambia su destino. Desde v3.03 los destinos cambian mucho más: los labradores
+ * se reparten entre campos distintos, y cuatro veces al año el invierno manda a
+ * la aldea entera del campo al bosque y luego de vuelta. Cada uno de esos
+ * vaivenes recalculaba el A* de todo el mundo.
+ *
+ * Medido antes de esto: el banco de §12.9 pasó de once minutos a **cuarenta y
+ * tres**, contra un techo de quince. Guardando por par se reutiliza entre
+ * personas que van del mismo sitio al mismo sitio, y sobre todo se reutiliza al
+ * volver el verano, porque la ruta al campo sigue guardada.
+ */
+const PAIRS = new WeakMap<GameState, Map<string, { ground: number; cells: number[] }>>();
+
+/** La ruta entre dos celdas, calculada una vez por partida y suelo. */
+function routeBetween(state: GameState, from: number, to: number, ground: number): number[] {
+  let pairs = PAIRS.get(state);
+  if (pairs === undefined) {
+    pairs = new Map<string, { ground: number; cells: number[] }>();
+    PAIRS.set(state, pairs);
+  }
+  const key = `${from}>${to}`;
+  const known = pairs.get(key);
+  if (known !== undefined && known.ground === ground) return known.cells;
+
+  const cells = route(state.map, from, to);
+  // Un tope generoso: una aldea grande no llega a mil pares distintos, y sin
+  // él una partida de dos siglos acumularía memoria sin necesidad.
+  if (pairs.size > 4000) pairs.clear();
+  pairs.set(key, { ground, cells });
+  return cells;
+}
 const GROUND = new WeakMap<GameState, number>();
 const TREES = new WeakMap<GameState, { version: number; cells: number[] }>();
 const BANKS = new WeakMap<GameState, { version: number; cells: number[] }>();
 const WHERE = new WeakMap<GameState, {
-  key: string;
+  key: number;
   targets: Map<VillagerId, { from: number; to: number }>;
 }>();
 const FOREST_VERSION = new WeakMap<GameState, number>();
@@ -132,6 +166,62 @@ function banksOf(state: GameState): number[] {
   return cells;
 }
 
+/** El centro del pueblo, medido sobre las casas que hay en pie. */
+function centreOfVillage(state: GameState, homes: Map<number, number>): number {
+  const cells = [...homes.values()];
+  if (cells.length === 0) {
+    return Math.floor(state.map.height / 2) * state.map.width + Math.floor(state.map.width / 2);
+  }
+  const width = state.map.width;
+  const x = Math.round(cells.reduce((n, c) => n + (c % width), 0) / cells.length);
+  const y = Math.round(cells.reduce((n, c) => n + Math.floor(c / width), 0) / cells.length);
+  return y * width + x;
+}
+
+const NEAR = new WeakMap<GameState, Map<string, number[]>>();
+
+/**
+ * Las `many` celdas más cercanas a un punto, cacheadas por (versión, punto).
+ *
+ * Sin la caché esto ordenaba quinientas celdas en cada tick y salía más caro
+ * que el problema que venía a resolver: medido, 6,2 s pasaron a 7,0.
+ */
+function nearestCached(
+  state: GameState,
+  cells: readonly number[],
+  to: number,
+  many: number,
+  version: number,
+  tag: string,
+): number[] {
+  let cache = NEAR.get(state);
+  if (cache === undefined) {
+    cache = new Map<string, number[]>();
+    NEAR.set(state, cache);
+  }
+  const key = `${tag}:${version}:${to}:${cells.length}`;
+  const known = cache.get(key);
+  if (known !== undefined) return known;
+  const picked = nearest(cells, to, state.map.width, many);
+  if (cache.size > 64) cache.clear();
+  cache.set(key, picked);
+  return picked;
+}
+
+/** Las `many` celdas más cercanas a un punto, en orden estable. */
+function nearest(cells: readonly number[], to: number, width: number, many: number): number[] {
+  if (cells.length <= many) return [...cells];
+  const tx = to % width;
+  const ty = Math.floor(to / width);
+  return [...cells]
+    .sort((a, b) => {
+      const da = ((a % width) - tx) ** 2 + (Math.floor(a / width) - ty) ** 2;
+      const db = ((b % width) - tx) ** 2 + (Math.floor(b / width) - ty) ** 2;
+      return da === db ? a - b : da - db;
+    })
+    .slice(0, many);
+}
+
 /** Every worker, in a fixed order, so the same village always splits the same. */
 function workers(state: GameState): Villager[] {
   return state.people.villagers
@@ -177,8 +267,19 @@ function destinations(
   const fields = live.filter((b) => b.kind === 'field')
     .map((b) => centreOf(b.x, b.y, b.w, b.h, state.map.width));
   const sites = state.works.map((w) => centreOf(w.x, w.y, w.w, w.h, state.map.width));
-  const wood = treesOf(state);
-  const banks = banksOf(state);
+  // §7.6, v3.07: sólo el bosque cercano al pueblo entra en el sorteo. Buscar
+  // la celda más próxima entre las quinientas arboladas, para cada persona y
+  // cada semana, era el grueso del coste desde que el invierno manda a la
+  // aldea entera al bosque.
+  const heart = centreOfVillage(state, homes);
+  const forestVersion = FOREST_VERSION.get(state) ?? 0;
+  const groundVersion = GROUND.get(state) ?? 0;
+  const wood = nearestCached(
+    state, treesOf(state), heart, LABOUR.WOOD_CHOICES, forestVersion, 'wood',
+  );
+  const banks = nearestCached(
+    state, banksOf(state), heart, LABOUR.WOOD_CHOICES, groundVersion, 'bank',
+  );
   // Adónde va el que labra, según el año. En invierno, al bosque a por leña, y
   // si no queda bosque, a la obra: lo que no hace es fingir que ara la nieve.
   const winter = seasonOf(state.tick) === 'winter';
@@ -191,12 +292,26 @@ function destinations(
   // or something moved. Everything else in the tick leaves it exactly as it
   // was, and finding the nearest tree for every cutter over four hundred cells
   // was the most expensive thing in step 14.
-  const key = [
-    crew.map((v) => `${v.id}@${v.homeId ?? -1}`).join(','),
-    farmers, cutters, wardens, hunters, fishers, winter ? 'w' : '-',
-    FOREST_VERSION.get(state) ?? 0, GROUND.get(state) ?? 0,
-    fields.join(','), sites.join(','),
-  ].join(':');
+  // §7.6, v3.07: un número, no una cadena. Construir aquí un texto con las
+  // cuarenta personas, sus casas y todas las celdas costaba seiscientos
+  // caracteres por tick, y esto corre en cada tick de cada semilla de cada
+  // política del banco. La comparación es la misma; lo que cambia es que no
+  // se reserva memoria para tirarla acto seguido.
+  let key = 2166136261;
+  const mix = (n: number): void => {
+    key = Math.imul(key ^ (n | 0), 16777619) >>> 0;
+  };
+  for (const v of crew) {
+    mix(v.id);
+    mix(v.homeId ?? -1);
+  }
+  mix(farmers * 1000 + cutters);
+  mix(wardens * 1000 + hunters);
+  mix(fishers * 1000 + (winter ? 1 : 0));
+  mix(FOREST_VERSION.get(state) ?? 0);
+  mix(GROUND.get(state) ?? 0);
+  for (const cell of fields) mix(cell);
+  for (const cell of sites) mix(cell);
   const known = WHERE.get(state);
   if (known !== undefined && known.key === key) return known.targets;
 
@@ -289,7 +404,7 @@ export function routesFor(state: GameState): Map<VillagerId, number[]> {
       if (known.cells.length > 0) out.set(id, known.cells);
       continue;
     }
-    const cells = route(state.map, from, to);
+    const cells = routeBetween(state, from, to, ground);
     cache.set(id, { from, to, ground, cells });
     if (cells.length > 0) out.set(id, cells);
   }

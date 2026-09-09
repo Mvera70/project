@@ -96,6 +96,15 @@ export const LABOUR = {
   BP_PER_BUILDER: 2.0, // build points per week
   WORKS_RESERVE: 0.15, // minimum fraction of W given to works
   CUTTER_SHARE: 0.4, // of what is left after the fields
+  /**
+   * TUNE (§7.6, v3.07): cuántas celdas de bosque se consideran como destino.
+   *
+   * Se tala cerca del pueblo, no en el confín del valle, así que mirar las
+   * quinientas celdas arboladas para cada leñador era además de caro, falso.
+   * Desde v3.03 el invierno manda al bosque a la aldea entera y el coste se
+   * disparó: el banco de §12.9 pasó de once minutos a cuarenta y tres.
+   */
+  WOOD_CHOICES: 48,
   SMITHY_BONUS: 1.2,
   WINTER_WOOD: 0.4, // per person and week
   COLD_HOUSES_WOOD_MULTIPLIER: 1.5,
@@ -695,6 +704,34 @@ export const MARKS = {
   // de `douse` dice qué se apaga y no cuánto. Ocho semanas se ve a ×16 sin
   // convertirse en un edificio roto para siempre.
   DOUSE_TICKS: 8,
+} as const;
+
+/**
+ * Las riñas (§6.4, §7.9, v3.07). El valle sabía escribir rencores desde M-05 y
+ * no hacía nada con ellos: un rencor abierto era una fila en un registro y
+ * nadie discutía nunca. Todo TUNE — §6.4 nombraba el rencor, no la riña.
+ */
+export const QUARREL = {
+  // TUNE: probabilidad semanal de que un rencor vivo estalle. Baja a
+  // propósito: sale a una riña cada tres o cuatro años por rencor abierto, y
+  // una aldea con dos rencores tiene un mal día cada año y medio.
+  WEEKLY: 0.022,
+  // TUNE: y de que la cosa pase de gritos a manos.
+  TO_BLOWS: 0.25,
+  // TUNE: los rasgos de §6.3 por fin deciden algo además de quién sale en las
+  // encrucijadas. Doce de los quince no cambiaban ningún comportamiento.
+  HOT_TEMPERED: 3,
+  SPITEFUL: 1.8,
+  KIND: 0.4,
+  // TUNE: lo que hay que esperar desde que nace el rencor. Un rencor recién
+  // escrito no estalla la misma semana: se cuece.
+  COOLING_TICKS: 24,
+  // TUNE: lo que la riña le resta a lo que ya se tenían.
+  AFTER_WORDS: -8,
+  AFTER_BLOWS: -20,
+  // TUNE: y el peso del recuerdo que deja cada uno del otro.
+  MEMORY_WORDS: 2,
+  MEMORY_BLOWS: 4,
 } as const;
 
 export const MEMORY = {
