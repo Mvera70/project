@@ -5,16 +5,23 @@
 // misma semilla lo colocan igual. El día que sea comida, esta prueba tendrá
 // que cambiar a propósito y no por accidente.
 import { describe, expect, it } from 'vitest';
-import { ANIMALS } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
+import { ANIMALS, TIME } from '@engine/balance';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
-import { animalPositions } from '@render/animals';
+import { animalPositions, wildlifePositions } from '@render/animals';
+import { TERRAIN_CODE } from '@engine/state';
 import { fingerprint } from '../helpers/fingerprint';
 
 function village(years: number, seed = 7) {
   const state = foundGame(seed);
   run(state, years * 48, 'prudent', CATALOG);
+  return state;
+}
+
+/** Same village, clock moved to a chosen week of the year. */
+function atWeek(state: ReturnType<typeof village>, week: number) {
+  state.tick = Math.floor(state.tick / TIME.WEEKS_PER_YEAR) * TIME.WEEKS_PER_YEAR + week;
   return state;
 }
 
@@ -92,5 +99,60 @@ describe('el ganado · §7.7', () => {
       const cap = kind === 'hen' ? ANIMALS.MAX_PER_KIND * ANIMALS.HENS_PER_HOUSE : ANIMALS.MAX_PER_KIND;
       expect(many, kind).toBeLessThanOrEqual(cap);
     }
+  });
+});
+
+describe('la fauna · §7.7', () => {
+  it('tampoco escribe estado', () => {
+    const state = village(20);
+    const before = fingerprint(state);
+    for (const fraction of [0, 0.3, 0.6, 0.9]) wildlifePositions(state, fraction);
+    expect(fingerprint(state)).toBe(before);
+  });
+
+  it('los cuervos solo bajan cuando hay grano en pie que valga la pena', () => {
+    const state = village(20);
+    const crows = (week: number, fraction = 0.45): number =>
+      wildlifePositions(atWeek(state, week), fraction).filter((a) => a.kind === 'crow').length;
+
+    // La cosecha es la semana 35 (§5.1): las semanas de antes, sí.
+    expect(crows(TIME.HARVEST_WEEK - 1)).toBeGreaterThan(0);
+    expect(crows(TIME.HARVEST_WEEK)).toBeGreaterThan(0);
+    // Primavera, con el campo recién sembrado: no hay nada que robar.
+    expect(crows(4)).toBe(0);
+    // Después de segar, tampoco.
+    expect(crows(TIME.HARVEST_WEEK + 4)).toBe(0);
+    // Y de noche los cuervos no vuelan.
+    expect(crows(TIME.HARVEST_WEEK - 1, 0.9)).toBe(0);
+  });
+
+  it('los lobos son de noche y de invierno, cuando el corral ya está vacío', () => {
+    const state = village(20);
+    const wolves = (week: number, fraction: number): number =>
+      wildlifePositions(atWeek(state, week), fraction).filter((a) => a.kind === 'wolf').length;
+
+    const winter = TIME.WEEKS_PER_SEASON * 3 + 4; // §5.1: el invierno empieza en la 36
+    expect(wolves(winter, 0.9)).toBeGreaterThan(0);
+    expect(wolves(winter, 0.45)).toBe(0); // de día no
+    expect(wolves(TIME.WEEKS_PER_SEASON + 4, 0.9)).toBe(0); // en verano tampoco
+
+    // Y a esa hora no queda una sola cabeza de ganado fuera: por eso vienen.
+    expect(animalPositions(atWeek(state, winter), 0.9)).toEqual([]);
+  });
+
+  it('hay peces en el río, que llevaba desde M-13 sin nada dentro', () => {
+    const state = village(20);
+    const fish = wildlifePositions(state, 0.45).filter((a) => a.kind === 'fish');
+    expect(fish.length).toBeGreaterThan(0);
+    expect(fish.length).toBeLessThanOrEqual(ANIMALS.FISH_MAX);
+    // Sobre agua, no sobre la hierba.
+    for (const one of fish) {
+      const cell = Math.round(one.y) * state.map.width + Math.round(one.x);
+      expect(state.map.terrain[cell]).toBe(TERRAIN_CODE.water);
+    }
+  });
+
+  it('la fauna también es determinista', () => {
+    expect(wildlifePositions(village(20), 0.45)).toEqual(wildlifePositions(village(20), 0.45));
   });
 });

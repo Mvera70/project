@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.87 · 11 de septiembre de 2026, 15:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.88 · 11 de septiembre de 2026, 15:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.88** | 11 sep 2026, 15:45 | M-29 · la fauna, segundo trozo | **Cuervos sobre el grano maduro, lobos en la linde en las noches de invierno, peces en el río.** Cada uno con su reloj: es lo que hace que una noche de enero no se parezca a una tarde de julio. Siguen sin comerse nada — derivados y cosméticos como el ganado. |
 | **2.87** | 11 sep 2026, 15:00 | M-29 · el ganado, primer trozo | **§7.7 nueva: el valle tiene animales.** Gallinas por casa, cerdos cuando hay granero, vacas cuando hay campos. Derivado y cosmético como la multitud de §10.6 y como las ruinas de §13.3: no es estado, no se guarda, no mueve un número. Lobos, cuervos, caza y pesca quedan declarados y sin construir. |
 | **2.86** | 11 sep 2026, 14:15 | M-27.2 · «red primero» no lo era | **Un despliegue nuevo no llegaba a un móvil ya instalado, que es justo lo que §13.4 prometía.** Pages manda `Cache-Control: max-age=600` y un `fetch` corriente lo contesta la caché HTTP del navegador, por debajo del service worker. La prueba no lo veía porque `vite preview` no manda esa cabecera. |
 | **2.85** | 11 sep 2026, 13:40 | 64× para poder probar | **Una cuarta velocidad, y por un motivo declarado: §16.2 dice que el ritmo solo se resuelve jugando, y a 16× un año son 45 s.** A 64× son once. Los botones dejan de estar escritos a mano y salen de `TIME.SPEEDS`, que era la única lista que debía existir. |
@@ -132,6 +133,44 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.88 — Cuervos, lobos y un río que por fin tiene algo dentro
+
+Segundo trozo de §7.7, y el mismo trato que el primero: derivado, cosmético, sin
+escribir estado y sin mover un número. Lo que aporta no es mecánica sino
+**tiempo**: cada bicho tiene su reloj, y eso es lo que hace que una noche de
+enero no se parezca a una tarde de julio.
+
+- **Cuervos** sobre los campos, solo en las semanas en que hay grano en pie que
+  valga la pena: las seis anteriores a la siega de la semana 35 (§5.1). En
+  primavera, con el campo recién sembrado, no bajan. De noche tampoco vuelan.
+- **Lobos** en la linde del bosque, en las noches de invierno, **justo cuando el
+  corral se ha quedado vacío**. No es casualidad de guion: la misma frontera de
+  la fracción de tick que mete a la gente en casa es la que los saca a ellos.
+- **Peces** en el río, que estaba dibujado desde M-13 y no tenía nada dentro. Se
+  pintan como una onda y no como un pez: lo que se ve desde la orilla es el agua
+  moviéndose.
+
+**Mirado** (§14.3). La captura de una noche de invierno es la que justifica el
+trozo entero: la aldea vacía y nevada, las ventanas encendidas, y tres lobos en
+la linde. Las ondas del río salieron mejor de lo esperado. Los cuervos son lo
+más flojo del conjunto —una mancha oscura sobre el campo— y queda dicho aquí en
+vez de descubrirse más tarde; el pase de arte tiene ahí trabajo.
+
+**Evidencia.** Cinco pruebas nuevas, trece en total para §7.7: que la fauna
+tampoco escribe estado, que los cuervos aparecen la semana 34 y no la 4 ni la
+39 ni de noche, que los lobos son de noche **y** de invierno —y que a esa misma
+hora no queda una cabeza de ganado fuera, comprobado en la misma prueba—, que
+los peces caen sobre agua y no sobre hierba, y que todo ello es determinista.
+Suite rápida **653 en 17,5 s**, Playwright **13/13**, tipos, lint y build pasan.
+
+**Lo falsaría** un cuervo en primavera, un lobo en verano o de día, un pez sobre
+la hierba, o que cualquiera de los tres escribiese en `GameState`.
+
+**Sigue sin construirse** lo que da de comer: que el lobo se lleve una cabeza,
+que el cuervo muerda el rendimiento, la caza y la pesca como trabajo. Todo eso
+exige promover los animales a estado, subir el esquema (§13.1) y volver a correr
+el banco, porque son comida y §12.9 mide hambrunas.
 
 ### 2.87 — Un valle sin un animal a la vista
 

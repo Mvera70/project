@@ -10,11 +10,15 @@
 // so is the herd. That empty yard at dusk is not decoration — it is the window
 // the wolves of §7.7 will come through.
 
-import { ANIMALS } from '@engine/balance';
+import { ANIMALS, TIME } from '@engine/balance';
 import type { Building, GameState } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
+import { seasonOf, weekOf } from '@engine/time';
 
-export type AnimalKind = 'hen' | 'pig' | 'cow';
+export type AnimalKind = 'hen' | 'pig' | 'cow' | 'crow' | 'wolf' | 'fish';
+
+/** The village's own, which go indoors at dusk. The rest is wildlife. */
+export const LIVESTOCK: readonly AnimalKind[] = ['hen', 'pig', 'cow'];
 
 export interface Animal {
   id: number;
@@ -107,6 +111,86 @@ export function animalPositions(state: GameState, tickFraction: number): Animal[
     // Beside the field if that is open meadow, otherwise on the field itself.
     const onMeadow = state.map.terrain[cell] === TERRAIN_CODE.meadow;
     place('cow', onMeadow ? x : field.x + field.w * 0.5, y);
+  }
+
+  return animals;
+}
+
+/** The centre of the village, the same figure §11.5 and the woodcutters use. */
+function core(state: GameState): { x: number; y: number } {
+  const live = state.buildings.filter((b) => b.lostTick === null);
+  if (live.length === 0) return { x: state.map.width / 2, y: state.map.height / 2 };
+  return {
+    x: live.reduce((n, b) => n + b.x + b.w / 2, 0) / live.length,
+    y: live.reduce((n, b) => n + b.y + b.h / 2, 0) / live.length,
+  };
+}
+
+/** Cells of one terrain within `range` of the village, nearest first and stable. */
+function nearbyCells(state: GameState, terrain: number, range: number, limit: number): number[] {
+  const centre = core(state);
+  const found: { cell: number; distance: number }[] = [];
+  for (let i = 0; i < state.map.terrain.length; i += 1) {
+    if (state.map.terrain[i] !== terrain) continue;
+    const dx = (i % state.map.width) - centre.x;
+    const dy = Math.floor(i / state.map.width) - centre.y;
+    const distance = dx * dx + dy * dy;
+    if (distance <= range * range) found.push({ cell: i, distance });
+  }
+  // Distance then index: never the order the array happened to be walked in.
+  found.sort((a, b) => a.distance - b.distance || a.cell - b.cell);
+  return found.slice(0, limit).map((item) => item.cell);
+}
+
+/**
+ * The wildlife, §7.7. Cosmetic like the herd — a crow eats no grain yet and a
+ * wolf takes no cow — but on their own clocks, which is the point: they are
+ * what makes a night in winter look different from an afternoon in summer.
+ *
+ *   crows  over ripening fields, in the weeks before the reaping of §5.1
+ *   wolves at the treeline, on winter nights, once the yard has emptied
+ *   fish   in the river, by day
+ */
+export function wildlifePositions(state: GameState, tickFraction: number): Animal[] {
+  const fraction = Math.max(0, Math.min(1, tickFraction));
+  const night = fraction >= NIGHT;
+  const week = weekOf(state.tick);
+  const animals: Animal[] = [];
+  let id = 10_000; // its own range, so a crow never shares an id with a hen
+
+  const place = (kind: AnimalKind, anchorX: number, anchorY: number): void => {
+    const point = wander(anchorX, anchorY, id, fraction);
+    if (inside(state, point.x, point.y)) animals.push({ id, kind, x: point.x, y: point.y });
+    id += 1;
+  };
+
+  // Crows: only while there is standing grain worth taking.
+  const ripening = week <= TIME.HARVEST_WEEK && week > TIME.HARVEST_WEEK - ANIMALS.CROW_WEEKS_BEFORE_HARVEST;
+  if (!night && ripening) {
+    const fields = state.buildings
+      .filter((b) => b.kind === 'field' && b.lostTick === null)
+      .sort((a, b) => a.id - b.id);
+    const crows = Math.min(Math.floor(fields.length / ANIMALS.FIELDS_PER_CROW), ANIMALS.CROWS_MAX);
+    for (let n = 0; n < crows; n += 1) {
+      const field = fields[n * ANIMALS.FIELDS_PER_CROW] as Building;
+      place('crow', field.x + field.w * 0.5, field.y + field.h * 0.4);
+    }
+  }
+
+  // Wolves: winter nights, at the treeline. The empty yard is the invitation.
+  if (night && seasonOf(state.tick) === 'winter') {
+    const trees = nearbyCells(state, TERRAIN_CODE.forest, ANIMALS.WOLF_RANGE, ANIMALS.WOLVES_MAX);
+    for (const cell of trees) {
+      place('wolf', cell % state.map.width, Math.floor(cell / state.map.width));
+    }
+  }
+
+  // Fish: the river was on the map from M-13 and had nothing in it.
+  if (!night) {
+    const water = nearbyCells(state, TERRAIN_CODE.water, ANIMALS.FISH_RANGE, ANIMALS.FISH_MAX);
+    for (const cell of water) {
+      place('fish', cell % state.map.width, Math.floor(cell / state.map.width));
+    }
   }
 
   return animals;

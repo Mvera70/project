@@ -188,6 +188,35 @@ export const pig: Sprite = beast(0.21, 0.13, 0.18, () => '#c9948f');
 // and a grey cow on green grass read as a stone (looked at, v2.87).
 export const cow: Sprite = beast(0.28, 0.17, 0.24, () => '#e2ddcf', '#4a3f33');
 
+export const crow: Sprite = (ctx, x, y, cell, palette) => {
+  // A dark wedge with two wings: at ten pixels a bird is a silhouette.
+  void palette;
+  ctx.fillStyle = '#2b2b28';
+  ctx.strokeStyle = '#1a1a18';
+  ctx.lineWidth = Math.max(1, cell * 0.06);
+  ctx.beginPath();
+  ctx.ellipse((x + 0.5) * cell, (y + 0.5) * cell, 0.14 * cell, 0.09 * cell, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo((x + 0.24) * cell, (y + 0.4) * cell);
+  ctx.lineTo((x + 0.5) * cell, (y + 0.5) * cell);
+  ctx.lineTo((x + 0.76) * cell, (y + 0.4) * cell);
+  ctx.stroke();
+};
+
+export const wolf: Sprite = beast(0.24, 0.12, 0.22, () => '#6d6a63', '#d9d2c2');
+
+export const fish: Sprite = (ctx, x, y, cell, palette) => {
+  // A ripple, not a fish: what you see from a bank is the water moving.
+  ctx.strokeStyle = palette.accent;
+  ctx.globalAlpha = 0.75;
+  ctx.lineWidth = Math.max(1, cell * 0.07);
+  ctx.beginPath();
+  ctx.ellipse((x + 0.5) * cell, (y + 0.5) * cell, 0.24 * cell, 0.1 * cell, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+};
+
 export const ruin: Sprite = (ctx, x, y, cell, palette) => {
   ctx.strokeStyle = outline(palette.wood); ctx.lineWidth = Math.max(1, cell * 0.14); ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo((x + 0.1) * cell, (y + 0.85) * cell); ctx.lineTo((x + 0.45) * cell, (y + 0.45) * cell); ctx.lineTo((x + 0.8) * cell, (y + 0.78) * cell); ctx.moveTo((x + 0.22) * cell, (y + 0.9) * cell); ctx.lineTo((x + 0.72) * cell, (y + 0.9) * cell); ctx.stroke();

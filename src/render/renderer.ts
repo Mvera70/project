@@ -3,7 +3,7 @@
 import type { GameState } from '@engine/state';
 import { clockOf } from '@engine/time';
 import { cellFor, paintVillageBackground, sizeCanvas } from './canvas';
-import { animalPositions } from './animals';
+import { animalPositions, wildlifePositions } from './animals';
 import { crowdPositions } from './crowd';
 import { paintAnimals, paintAnimalShadows } from './layers/animals';
 import { paintFigures, paintFigureShadows } from './layers/figures';
@@ -65,7 +65,10 @@ export function createRenderer(canvas: HTMLCanvasElement, viewport: HTMLElement)
       // §7.7: the herd goes under the crowd, so a villager walking past a hen
       // hides it and never the other way round. `reduced` freezes them at the
       // same instant it freezes the people (§11.7).
-      const animals = animalPositions(state, reduced ? 0.45 : tickFraction);
+      const animals = [
+        ...animalPositions(state, reduced ? 0.45 : tickFraction),
+        ...wildlifePositions(state, reduced ? 0.45 : tickFraction),
+      ];
       paintAnimalShadows(ctx, animals, cell);
       paintAnimals(ctx, animals, palette, cell);
       const figures = crowdPositions(state, reduced ? 0.45 : tickFraction);

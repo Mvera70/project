@@ -2,14 +2,16 @@
 
 import type { Animal } from '../animals';
 import type { Palette } from '../palette';
-import { cow, hen, pig, type DrawingContext } from '../sprites';
+import { cow, crow, fish, hen, pig, wolf, type DrawingContext } from '../sprites';
 
-const SPRITES = { hen, pig, cow } as const;
+const SPRITES = { hen, pig, cow, crow, wolf, fish } as const;
 
 export function paintAnimalShadows(ctx: DrawingContext, animals: readonly Animal[], cell: number): void {
   ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
   for (const animal of animals) {
-    const size = animal.kind === 'cow' ? 0.26 : animal.kind === 'pig' ? 0.2 : 0.15;
+    // A crow in the air and a ripple on the water cast nothing.
+    if (animal.kind === 'crow' || animal.kind === 'fish') continue;
+    const size = animal.kind === 'cow' || animal.kind === 'wolf' ? 0.26 : animal.kind === 'pig' ? 0.2 : 0.15;
     ctx.beginPath();
     ctx.ellipse((animal.x + 0.5) * cell, (animal.y + 0.76) * cell, size * cell, size * 0.4 * cell, 0, 0, Math.PI * 2);
     ctx.fill();

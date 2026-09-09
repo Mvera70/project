@@ -270,6 +270,19 @@ export const ANIMALS = {
   // How far from its anchor an animal drifts, in cells. Small on purpose:
   // livestock that wanders like people reads as people.
   WANDER: 0.55,
+
+  // Wildlife (§7.7, v2.88). Still cosmetic: they eat nothing yet.
+  FIELDS_PER_CROW: 2,
+  CROWS_MAX: 8,
+  // Crows come as the grain ripens, not all year: the weeks before the
+  // reaping of week 35 (§5.1) are when there is something on the field worth
+  // taking.
+  CROW_WEEKS_BEFORE_HARVEST: 6,
+  WOLVES_MAX: 3,
+  // How far into the trees a wolf may show, measured from the village centre.
+  WOLF_RANGE: 14,
+  FISH_MAX: 4,
+  FISH_RANGE: 12,
 } as const;
 
 export const WORLD = {
