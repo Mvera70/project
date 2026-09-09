@@ -35,7 +35,9 @@ npm run test:shots
 ```
 
 La suite rápida cubre el motor y los contratos puros. Playwright recorre el
-valle móvil, las encrucijadas, el letargo, el epitafio y la herencia.
+valle móvil, las encrucijadas, el letargo, el epitafio y la herencia. GitHub
+Actions ejecuta ambas redes en cada cambio a `main`; el banco largo corre cada
+noche y también admite un disparo manual.
 
 ## Preparar la lectura del hito 0
 
