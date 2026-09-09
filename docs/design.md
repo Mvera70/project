@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.76 · 11 de septiembre de 2026, 01:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.77 · 11 de septiembre de 2026, 01:40 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.77** | 11 sep 2026, 01:40 | M-00.1 · integración continua | **«En CI nocturna» ya significa un proceso existente.** Push y pull request ejecutan tipos, suite rápida, build, lint y Playwright; el banco largo queda en otro workflow diario a las 03:00 UTC y con disparo manual. Capturas y series se conservan como artefactos. |
 | **2.76** | 11 sep 2026, 01:10 | Puerta de entrada del repositorio | **El README seguía viviendo en M-00.** Deja de anunciar «andamiaje» y cuenta el estado hasta M-26, cómo arrancar y validar, y cuáles son las dos aceptaciones que una automatización no puede adjudicarse. El paquete del lector del hito 0 queda accesible desde la portada. |
 | **2.75** | 11 sep 2026, 00:40 | M-25.1 · crónica sobre el epitafio | **Existir en el DOM no es estar delante del jugador.** «Read the chronicle» montaba la pantalla 4 debajo del epitafio por el orden de capas. La crónica pasa al frente y al cerrarla devuelve intacto el epitafio. Playwright comprueba la superficie que recibe el toque, no solo la visibilidad CSS. |
 | **2.74** | 11 sep 2026, 00:10 | Auditoría de la tabla de hitos | **Tres cierres existían fuera de la tabla.** La puerta visual dio su veredicto en v2.57, la decisión visible en v2.61 y la herencia en v2.68. Los hitos 1, 2 y 4 quedan marcados donde se consulta el estado, sin repetir ni automatizar sus aceptaciones. |
@@ -121,6 +122,30 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.77 — Una red declarada tiene que ejecutarse sola
+
+§14.2 llevaba desde v2.16 diciendo que el banco se ejecutaba «en CI nocturna»,
+pero no existía `.github/workflows/`. La red solo corría cuando un agente se
+acordaba. Eso dejaba sin vigilancia tanto los umbrales de balance como los
+recorridos móviles que §14.3 exige desde el primer píxel.
+
+M-00.1 añade dos workflows con Node 22 y `npm ci`. `CI` corre en cada push a
+`main` y pull request: tipos, 628 pruebas rápidas, build y lint en un trabajo;
+Playwright con Chromium en otro, para aislar instalación y diagnóstico. Sus
+capturas se conservan siete días incluso ante fallo. `Nightly balance` corre a
+las **03:00 UTC**, también se puede lanzar a mano, tiene veinte minutos de tope
+y conserva CSV y resumen durante catorce días. El banco no entra en cada cambio:
+su última medida consume 638,4 s y §14.2 lo separa de forma expresa.
+
+**Evidencia local.** Los mismos comandos pasan en v2.73 y v2.75; los workflows
+solo los orquestan sobre un checkout limpio. La sintaxis usa acciones oficiales
+de checkout, Node y artefactos. La primera ejecución remota será la prueba del
+entorno GitHub, que no se confunde con esta revisión local.
+
+**Lo falsaría** que un push a `main` no iniciase ambas redes ordinarias, que el
+banco se ejecutase en cada commit, que el horario no iniciase el banco, que un
+fallo no dejase diagnóstico o que la duración medida agotase sus topes.
 
 ### 2.76 — La primera página también forma parte del estado
 
@@ -4755,7 +4780,8 @@ Se ejecuta en cada commit. Prohibido que tarde más de 20 s.
 
 ### 14.2 Suite de balance (`tests/balance/`, minutos)
 
-Se lanza aparte (`npm run test:balance`), en CI nocturna y antes de tocar §12.
+Se lanza aparte (`npm run test:balance`), en CI nocturna a las **03:00 UTC** y
+antes de tocar §12. También admite disparo manual.
 Comprueba los umbrales de §12.9. **Nunca se fija un umbral con una sola
 semilla**: dos partidas divergen desde el primer tick y una sola es ruido.
 
