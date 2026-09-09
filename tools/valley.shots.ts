@@ -129,3 +129,48 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   await test.expect(welcome).toBeHidden();
   await test.expect(page.locator('.valley-year')).not.toHaveText('ANNO I');
 });
+
+test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
+  await page.goto('/?debug=1&live=1&ended=1&seed=7&year=80&season=autumn');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  const epitaph = page.locator('.epitaph-scrim');
+  await test.expect(epitaph).toBeVisible();
+  await test.expect(epitaph.getByRole('heading')).toHaveText('The valley is empty');
+  await test.expect(epitaph).toContainText('The last households left in year 81.');
+  await test.expect(epitaph).toContainText('80 years. 82 people at its height.');
+  await test.expect(page.locator('.valley-speeds')).toHaveCSS('visibility', 'hidden');
+  await page.screenshot({ path: 'artifacts/m25-epitaph.png', fullPage: true });
+
+  await epitaph.getByRole('button', { name: 'Read the chronicle' }).click();
+  const chronicle = page.locator('.chronicle-scrim');
+  await test.expect(chronicle).toBeVisible();
+  await chronicle.dispatchEvent('pointerdown', { clientX: 200, clientY: 200, pointerId: 1 });
+  await chronicle.dispatchEvent('pointerup', { clientX: 200, clientY: 420, pointerId: 1 });
+  await test.expect(chronicle).toBeHidden();
+
+  await epitaph.getByRole('button', { name: 'Begin again' }).click();
+  await test.expect(epitaph).toBeHidden();
+  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-speeds')).toBeVisible();
+  await page.screenshot({ path: 'artifacts/m25-inherited-valley.png', fullPage: true });
+
+  // The archive write and successor write are ordered. Reloading after the
+  // latter reaches IndexedDB must never resurrect the old epitaph.
+  await test.expect.poll(() => page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('the-valley', 1);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const save = await new Promise<{ state?: { tick?: number; ended?: unknown }; archive?: unknown[] } | undefined>((resolve, reject) => {
+      const request = db.transaction('saves', 'readonly').objectStore('saves').get('current');
+      request.onsuccess = () => resolve(request.result as { state?: { tick?: number; ended?: unknown }; archive?: unknown[] } | undefined);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return save?.state?.tick === 0 && save.state.ended === null && save.archive?.length === 1;
+  })).toBe(true);
+  await page.goto('/');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await test.expect(page.locator('.epitaph-scrim')).toBeHidden();
+});

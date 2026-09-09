@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.67 · 10 de septiembre de 2026, 17:45 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.68 · 10 de septiembre de 2026, 18:30 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.68** | 10 sep 2026, 18:30 | M-25 · epitafio y herencia visible | **El fracaso ya tiene salida y memoria visible.** El reloj se detiene ante un epitafio que explica causa, duración y pico; la crónica se puede leer y «Begin again» funda gente distinta sobre el mismo terreno. Las ruinas heredadas se dibujan como una cimentación continua. Las escrituras de IndexedDB se ordenan para que la partida muerta nunca sobrescriba a su sucesora. **Hito 4 alcanzado.** |
 | **2.67** | 10 sep 2026, 17:45 | M-24 · núcleo de herencia | **La semilla del valle sobrevive a sus habitantes.** El estado separa `seed` de `terrainSeed` y registra `peakPeople`; una partida terminada se archiva como crónica + huella, y una nueva semilla funda otra gente sobre el terreno y las ruinas anteriores. El hito 4 sigue abierto hasta decidir y mirar su interfaz. |
 | **2.66** | 10 sep 2026, 17:00 | Coordenadas de efectos de M-22 | **El vado es una orilla, no una celda de agua.** `gather ford` enfoca el acceso terrestre contiguo al río más cercano al núcleo; `scar felled_wood`, la primera celda que la tala tocó realmente. Los dos dejan de caer sobre `valleyCore`. |
 | **2.65** | 10 sep 2026, 16:30 | Cierre de M-11 | **La suite ya no promete trabajo futuro que existe en otro sitio.** Gestos/cámara viven en `ui.test.ts`, `app.test.ts` y Playwright; el guardado completo vive en `save.test.ts`. Se retiran los dos `it.todo`: 620 pruebas, cero pendientes, 17,53 s. |
@@ -112,6 +113,49 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.68 — El valle termina antes de volver a empezar
+
+M-24 podía construir una sucesora, pero no decía cuándo hacerlo ni qué debía
+comprender el jugador. La transición queda cerrada así: al aparecer
+`state.ended`, el reloj se detiene, se retira cualquier encrucijada pendiente y
+se archiva la partida una sola vez. Un epitafio muestra la causa concreta, los
+años vividos y el máximo de habitantes. Desde él se puede leer la crónica
+completa o pulsar **«Begin again»**. Solo ese gesto funda la siguiente aldea;
+usa una semilla humana nueva sobre el mismo `terrainSeed` y conserva las ruinas.
+El archivo es acumulativo y no se poda: todavía no hay evidencia de presión de
+almacenamiento que justifique borrar memoria del jugador.
+
+La primera captura reveló un incumplimiento que ningún test de estado veía:
+`map.ruins` formaba parte de la caché y de la herencia, pero el render solo
+dibujaba edificios perdidos de la partida actual. Pintar un sprite triangular
+por cada celda volvió el antiguo poblado una trama ruidosa y **falsó esa primera
+solución al mirarla**. La regla aceptada es una cimentación conectada: cada celda
+de la máscara se rellena con `palette.rock` a alfa **0,58**, y solo sus bordes
+cardinales expuestos reciben `outline(palette.wood)` con ancho
+`max(1 px, cell · 0,10)`. Los escombros de un edificio perdido en la partida
+actual conservan el sprite individual de §10.5.
+
+El flujo descubrió además una carrera de persistencia. Terminar encolaba un
+guardado muerto y fundar encolaba el vivo, pero dos escrituras asíncronas podían
+completarse al revés; una recarga resucitaría el epitafio. Cada petición captura
+ahora su propia instantánea mediante clon estructurado y las escrituras en
+IndexedDB se ejecutan en una cola estricta. La partida archivada precede siempre
+a su sucesora.
+
+**Evidencia.** Playwright recorre a 390 × 844 la muerte, el epitafio, la lectura
+y cierre gestual de la crónica, la nueva fundación y una entrada posterior por
+la ruta normal. Antes de recargar comprueba en IndexedDB `tick === 0`,
+`ended === null` y exactamente una partida archivada. Las dos capturas se
+miraron a tamaño real: el texto y los dos verbos caben; la cimentación gris se
+reconoce detrás de cuatro casas y dos campos nuevos sin parecer un edificio
+activo. La suite rápida completa pasa **625 pruebas en 17,05 s**; build y lint
+también pasan, y Playwright completa sus **8/8** recorridos en 37,5 s.
+
+**Lo falsaría** que la causa o los verbos no se entendieran sin desplazar a
+390 px, que la huella pareciera una textura o dominara el valle, que comenzar
+otra vez cambiase el terreno, que una recarga devolviese la partida terminada,
+o que volver a presentar el mismo final duplicase su archivo.
 
 ### 2.67 — Lo que sobrevive no puede reconstruirse después
 
@@ -3800,6 +3844,11 @@ color» de `valle.md` §6, verificable.
   una perturbación determinista de ±0.15 celdas en los vértices. Prohibido el
   ruido por celda.
 - **Nada de texturas.** Un campo son cinco surcos rectos, no una trama.
+- **Ruina heredada.** La máscara de una aldea anterior se lee como una sola
+  cimentación baja: `palette.rock` a alfa `0.58`, con trazo únicamente en los
+  bordes cardinales expuestos, color `outline(palette.wood)` y ancho
+  `max(1 px, cell · 0.10)`. No se repite el sprite `ruin` por celda: a 10 px se
+  convierte en textura y deja de leerse como la huella de un poblado.
 
 ### 10.5 Sprites, dibujados por código
 
@@ -3878,7 +3927,7 @@ no esconde datos: los pone a un toque de distancia en vez de a cero.
 
 ### 11.2 Pantallas
 
-Cuatro, y solo cuatro.
+Cinco, y solo cinco.
 
 **1. El valle.** Por defecto. Arriba a la izquierda, el año en números romanos
 pequeños. Abajo a la derecha, los controles de velocidad. Nada más.
@@ -3895,6 +3944,18 @@ pendiente con una marca discreta.
 
 **4. Crónica.** Lista desplazable por años. Al abrir tras una ausencia, encabeza
 el parte de bienvenida (§9.2).
+
+**5. Epitafio.** Solo aparece al terminar una aldea. El valle permanece detrás
+con un velo `rgba(18,17,14,0.78)` y los controles desaparecen. La tarjeta ocupa
+el ancho inferior: relleno superior `max(24 px, safe-area)`, horizontal `20 px`
+y fondo `max(28 px, safe-area)`. Título Georgia `23 px/1.2`; texto de cuerpo
+`14 px/1.4`, `#d7dadd`. Las acciones se separan `10 px`, empiezan `22 px` bajo
+el resumen y miden al menos `48 px` de alto, con relleno `12 × 14 px`, radio
+`10 px` y Georgia `15 px/1.2`. La secundaria usa fondo blanco al 10 % y borde al
+40 %; «Begin again» usa fondo y borde `#d8c574`, texto `#242016`. El año de la
+causa es civil (`yearOf(endedTick) + 1`); la duración son años completos
+(`yearOf(endedTick)`). Contiene causa, duración, pico, «Read the chronicle» y
+«Begin again»; no se cierra con un toque accidental.
 
 ### 11.3 Gestos
 
@@ -4351,6 +4412,12 @@ guardadas divergen.
 Se guarda cada 20 ticks y siempre al ocultarse la pestaña
 (`visibilitychange`).
 
+Cada solicitud clona su `SaveFile` en el momento de pedirla y entra en una cola
+de escritura única. Terminar, archivar y fundar de nuevo son mutaciones
+consecutivas que pueden solicitar dos guardados casi a la vez; IndexedDB debe
+recibirlos en ese orden para que la instantánea terminada no pueda completar
+después y sustituir a la sucesora viva.
+
 **Esquema actual: 2 (v2.67).** El esquema 1 se migra de forma aditiva: su única
 `seed` pasa también a `terrainSeed`; `peakPeople` toma el mayor valor de
 `params.people` conservado en la crónica o la población presente. No se atribuye
@@ -4392,6 +4459,12 @@ Las ruinas heredadas no tienen efecto mecánico: no dan recursos, no bloquean la
 construcción de madera, no modifican ningún número. Están ahí para verse. Darles
 efecto convertiría la derrota en una moneda y la ruina en un recurso, que es
 justo lo contrario de lo que buscan los principios 4 y 3.
+
+La interfaz detiene el reloj y descarta la pantalla de encrucijada al detectar
+`ended`. El epitafio nombra causa, duración y pico de población, permite abrir
+la crónica completa y exige **«Begin again»** para llamar a `foundSuccessor`.
+El archivo conserva todas las partidas cerradas; una misma pareja
+`(seed, ended.tick)` solo se añade una vez.
 
 ---
 
@@ -4461,7 +4534,7 @@ color equivocado, figuras ilegibles a tamaño real— no los detecta ningún ase
 | **1** | Valle visible | Se ve la aldea y las estaciones; sin jugador | M-13 … M-19 |
 | **2** | Encrucijadas | Una decisión que cambia el valle de forma visible | M-20 … M-22 |
 | **3** | Generaciones | Envejecen, mueren, heredan; la aldea recuerda | M-04, M-05, M-06 ampliados |
-| **4** | Fracaso y herencia | Una aldea puede extinguirse; quedan ruinas | Esbozado, §16.1 |
+| **4** | Fracaso y herencia | Una aldea puede extinguirse; quedan ruinas | M-24, M-25 |
 | **5** | Idle | Tiempo real, letargo, parte de bienvenida | Esbozado, §16.2 |
 | **6** | Guardado | Persistencia; primera partida real de varios días | M-23 |
 
@@ -4503,13 +4576,12 @@ Contrato que el resto del código debe respetar desde ya:
 - `ValleyMap.ruins` se rellena y se dibuja desde el hito 1, aunque solo lo use
   el incendio.
 
-**Núcleo implementado en M-24 (v2.67).** Archivo, semilla de terreno separada,
-pico de población y fundación sucesora existen como transición pura. No alcanza
-el hito por sí solo: todavía no hay un gesto de cierre ni una pantalla que deje
-al jugador comprender qué terminó y qué quedó.
-
-Queda por decidir: la pantalla de epitafio, si la crónica archivada se puede
-releer entera, y cuántas partidas se conservan.
+**Hito alcanzado en M-25 (v2.68).** M-24 aporta archivo, semilla de terreno
+separada, pico de población y transición pura. M-25 detiene el reloj, presenta
+causa, duración y pico, deja releer la crónica completa y funda la sucesora solo
+por gesto explícito. La huella heredada se ve como cimentación continua. El
+archivo conserva todas las partidas; una política de poda exigiría primero
+evidencia real de presión de almacenamiento.
 
 ### 16.2 Hito 5 — Idle
 
@@ -5266,6 +5338,31 @@ ninguna elección de interfaz. **No alcanza todavía el hito 4.**
 
 ---
 
+### M-25 · Epitafio y herencia visible
+
+**Objetivo.** Cerrar una aldea ante el jugador y convertir su huella en el
+comienzo visible de la siguiente.
+**Depende de.** M-24, M-22, M-23.
+**Ficheros.** `src/ui/app.ts`, `src/ui/screens/epitaph.ts`,
+`src/ui/screens/crossroad.ts`, `src/render/layers/buildings.ts`, banco y render
+de crónica, ruta de depuración y Playwright.
+**Contrato.** El primer `EndState` detiene el bucle y archiva una sola vez. El
+epitafio presenta causa, años y `peakPeople`; «Read the chronicle» abre el
+registro cerrado y «Begin again» llama a `foundSuccessor` con semilla nueva.
+Las escrituras de guardado mantienen el orden de solicitud fijado en §13.1.
+**Reglas.** Ninguna opción se decide al cerrar; las ruinas son visibles e
+inertes; la máscara usa la regla gráfica de §10.4; el archivo es acumulativo.
+Todo texto visible procede del banco.
+**Tests.** Pantalla y controles a 390 × 844; crónica abrible y cerrable; sucesora
+en `ANNO I`; huella visible; guardado vivo con un solo archivo después de entrar
+de nuevo por la ruta normal.
+**Terminado cuando.** Las dos capturas se han mirado, el flujo completo pasa y
+una recarga no devuelve la aldea muerta.
+
+**Estado (v2.68): implementado. Hito 4 alcanzado.**
+
+---
+
 ### 17.1 Orden de trabajo
 
 ```
@@ -5287,7 +5384,7 @@ M-00
                                    │
                                  M-23  ← HITO 6
                                    │
-                                 M-24  (núcleo del HITO 4)
+                                 M-24 ─ M-25  ← HITO 4
 ```
 
 Se pueden trabajar en paralelo, sin pisarse: (M-03, M-06, M-09, M-13),

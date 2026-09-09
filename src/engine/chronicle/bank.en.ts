@@ -1316,4 +1316,15 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   ],
 };
 
+/** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
+export const UI_BANK: Record<string, string> = {
+  'epitaph.title': 'The valley is empty',
+  'epitaph.extinction': 'The last of them died in year {year}.',
+  'epitaph.abandoned': 'The last households left in year {year}.',
+  'epitaph.dispersed': 'The village broke apart in year {year}.',
+  'epitaph.summary': '{years} years. {peak} people at its height.',
+  'epitaph.chronicle': 'Read the chronicle',
+  'epitaph.begin': 'Begin again',
+};
+
 for (const [key, variants] of Object.entries(CROSSROAD_CHRONICLE)) BANK[key] = variants;

@@ -5,7 +5,7 @@ import type { RngBundle } from '../rng';
 import type { ChronicleEntry, GameState } from '../state';
 import { yearOf } from '../time';
 import { tallyOf, yearKey } from './events';
-import { BANK, CROSSROAD_BANK } from './bank.en';
+import { BANK, CROSSROAD_BANK, UI_BANK } from './bank.en';
 
 /**
  * Small counts read as words, because a chronicle says "three children" and a
@@ -76,6 +76,15 @@ function fill(template: string, params: Record<string, string | number>): string
     if (key === 'count' && typeof value === 'number') return numberWord(value);
     return String(value);
   });
+}
+
+/** Stable labels and summaries for screens, from the same text bank. */
+export function renderUiText(
+  key: string,
+  params: Record<string, string | number> = {},
+): string {
+  const template = UI_BANK[key];
+  return template === undefined ? `[${key}]` : fill(template, params);
 }
 
 /**
