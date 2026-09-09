@@ -1,9 +1,10 @@
 // M-23 · Save format and the catch-up that follows loading one. design.md §13.
 
-import { TIME } from './balance';
+import { BUILDINGS, TIME } from './balance';
 import { CATALOG } from './crossroads/catalog';
 import { foundGame } from './found';
 import { population } from './people/demography';
+import { RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import type { ArchivedGame, DecisionRecord, GameState, SaveFile } from './state';
 
@@ -33,29 +34,185 @@ export function serialize(
   };
 }
 
-/** Reject a value that plainly is not a `GameState`, without walking every field. */
+const ENDS = new Set(['extinction', 'abandoned', 'dispersed']);
+const ROLES = new Set(['leader', 'smith', 'midwife', 'priest', 'woodward', 'reeve', 'herbalist', 'stranger']);
+const TRAITS = new Set([
+  'ambitious', 'devout', 'spiteful', 'craven', 'generous', 'stubborn', 'cunning', 'kind',
+  'hot_tempered', 'frail', 'hardy', 'greedy', 'loyal', 'proud', 'secretive',
+]);
+const DEATHS = new Set(['natural', 'old_age', 'hunger', 'cold', 'plague', 'fire', 'violence']);
+const MEMORIES = new Set([
+  'lost_child', 'was_blamed', 'was_saved', 'was_passed_over', 'went_hungry',
+  'lost_home', 'stole', 'unspoken',
+]);
+const OPS = new Set(['<', '<=', '>', '>=', '==']);
+
+function record(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function finite(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function tickValue(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 0;
+}
+
+function uint32(value: unknown): value is number {
+  return tickValue(value) && (value as number) <= 0xffff_ffff;
+}
+
+function nullableTick(value: unknown): boolean {
+  return value === null || tickValue(value);
+}
+
+function chronicleEntry(value: unknown): boolean {
+  if (!record(value) || !tickValue(value['tick']) || typeof value['kind'] !== 'string'
+    || typeof value['templateKey'] !== 'string' || ![1, 2, 3].includes(value['weight'] as number)
+    || !record(value['params'])) return false;
+  return Object.values(value['params']).every((item) => typeof item === 'string' || finite(item));
+}
+
+function decisionRecord(value: unknown): boolean {
+  return record(value) && tickValue(value['tick']) && typeof value['templateId'] === 'string'
+    && typeof value['optionId'] === 'string' && record(value['cast'])
+    && Object.values(value['cast']).every(tickValue);
+}
+
+function building(value: unknown): boolean {
+  return record(value) && tickValue(value['id']) && typeof value['kind'] === 'string'
+    && value['kind'] in BUILDINGS && ['x', 'y', 'builtTick'].every((key) => tickValue(value[key]))
+    && tickValue(value['w']) && (value['w'] as number) > 0 && tickValue(value['h']) && (value['h'] as number) > 0
+    && (value['x'] as number) + (value['w'] as number) <= 36
+    && (value['y'] as number) + (value['h'] as number) <= 56
+    && nullableTick(value['lostTick']) && nullableTick(value['blockedUntil'])
+    && (value['tier'] === 0 || value['tier'] === 1) && typeof value['lit'] === 'boolean';
+}
+
+function work(value: unknown): boolean {
+  return record(value) && tickValue(value['id']) && typeof value['kind'] === 'string'
+    && value['kind'] in BUILDINGS
+    && ['x', 'y', 'w', 'h', 'bpCost', 'bpDone', 'startedTick'].every((key) => finite(value[key]))
+    && typeof value['materialsPaid'] === 'boolean'
+    && (value['upgradeOf'] === null || tickValue(value['upgradeOf']));
+}
+
+function memory(value: unknown): boolean {
+  return record(value) && tickValue(value['tick']) && MEMORIES.has(value['kind'] as string)
+    && (value['aboutId'] === null || tickValue(value['aboutId'])) && finite(value['weight']);
+}
+
+function grudge(value: unknown): boolean {
+  return record(value) && tickValue(value['fromId']) && tickValue(value['toId'])
+    && MEMORIES.has(value['cause'] as string) && tickValue(value['causeTick'])
+    && tickValue(value['formedTick']) && nullableTick(value['healedTick']);
+}
+
+function villager(value: unknown): boolean {
+  return record(value) && tickValue(value['id']) && typeof value['name'] === 'string'
+    && typeof value['named'] === 'boolean' && (value['role'] === null || ROLES.has(value['role'] as string))
+    && typeof value['female'] === 'boolean' && Number.isInteger(value['bornTick'])
+    && nullableTick(value['diedTick']) && (value['causeOfDeath'] === null || DEATHS.has(value['causeOfDeath'] as string))
+    && nullableTick(value['leftTick']) && Array.isArray(value['traits'])
+    && value['traits'].every((item) => TRAITS.has(item as string))
+    && (value['homeId'] === null || tickValue(value['homeId']))
+    && Array.isArray(value['parentIds']) && value['parentIds'].length === 2
+    && value['parentIds'].every((item) => item === null || tickValue(item))
+    && Array.isArray(value['memories']) && value['memories'].every(memory) && record(value['opinions'])
+    && Object.values(value['opinions']).every(finite);
+}
+
+function condition(value: unknown): boolean {
+  if (value === null) return true;
+  if (!record(value) || typeof value['k'] !== 'string') return false;
+  switch (value['k']) {
+    case 'stat': return typeof value['stat'] === 'string' && OPS.has(value['op'] as string) && finite(value['v']);
+    case 'ratio': return typeof value['ratio'] === 'string' && OPS.has(value['op'] as string) && finite(value['v']);
+    case 'season': return ['spring', 'summer', 'autumn', 'winter'].includes(value['season'] as string)
+      && (value['minWeek'] === undefined || tickValue(value['minWeek']));
+    case 'year': return OPS.has(value['op'] as string) && finite(value['v']);
+    case 'has': return typeof value['building'] === 'string' && value['building'] in BUILDINGS;
+    case 'flag': return typeof value['flag'] === 'string' && typeof value['set'] === 'boolean';
+    case 'outbreak': return typeof value['active'] === 'boolean';
+    case 'role': return ROLES.has(value['role'] as string) && typeof value['alive'] === 'boolean';
+    case 'grudge': return finite(value['min']);
+    case 'trait': return ROLES.has(value['role'] as string) && TRAITS.has(value['trait'] as string);
+    case 'not': return condition(value['c']);
+    case 'any': return Array.isArray(value['cs']) && value['cs'].every(condition);
+    default: return false;
+  }
+}
+
+function crossroad(value: unknown): boolean {
+  return record(value) && typeof value['templateId'] === 'string' && tickValue(value['posedTick'])
+    && record(value['cast']) && Object.values(value['cast']).every(tickValue)
+    && Array.isArray(value['optionIds']) && value['optionIds'].every((item) => typeof item === 'string');
+}
+
+function plantedSeed(value: unknown): boolean {
+  return record(value) && ['id', 'fromTemplateId', 'fromOptionId'].every((key) => typeof value[key] === 'string')
+    && tickValue(value['plantedTick']) && tickValue(value['firesAtTick'])
+    && record(value['cast']) && Object.values(value['cast']).every(tickValue)
+    && condition(value['condition']) && nullableTick(value['firedTick']) && nullableTick(value['witheredTick']);
+}
+
+function byteMap(value: unknown): boolean {
+  if (!record(value) || value['width'] !== 36 || value['height'] !== 56) return false;
+  const cells = 36 * 56;
+  return value['terrain'] instanceof Uint8Array && value['terrain'].length === cells
+    && value['traffic'] instanceof Uint16Array && value['traffic'].length === cells
+    && value['path'] instanceof Uint8Array && value['path'].length === cells
+    && value['ruins'] instanceof Uint8Array && value['ruins'].length === cells
+    && value['forestAge'] instanceof Uint8Array && value['forestAge'].length === cells
+    && value['forestStock'] instanceof Uint16Array && value['forestStock'].length === cells
+    && value['terrain'].every((cell) => cell <= 5)
+    && value['path'].every((cell) => cell <= 3)
+    && value['ruins'].every((cell) => cell <= 1);
+}
+
+function archivedGame(value: unknown): boolean {
+  return record(value) && uint32(value['seed']) && uint32(value['terrainSeed'])
+    && tickValue(value['endedTick']) && ENDS.has(value['cause'] as string)
+    && tickValue(value['peakPeople']) && Array.isArray(value['chronicle'])
+    && value['chronicle'].every(chronicleEntry) && value['ruins'] instanceof Uint8Array
+    && value['ruins'].length === 36 * 56 && value['ruins'].every((cell) => cell <= 1);
+}
+
+/** Reject every persisted shape the running engine or renderer cannot consume. */
 function isPlausibleState(value: unknown): value is GameState {
-  if (typeof value !== 'object' || value === null) return false;
-  const s = value as Partial<GameState>;
+  if (!record(value)) return false;
+  const s = value;
+  const rng = s['rng'];
+  const village = s['village'];
+  const people = s['people'];
+  const weather = s['weather'];
+  const outbreak = s['outbreak'];
+  const ended = s['ended'];
+  const modifier = s['harvestModifier'];
   return (
-    typeof s.version === 'number' &&
-    typeof s.seed === 'number' &&
-    typeof s.terrainSeed === 'number' &&
-    typeof s.tick === 'number' && s.tick >= 0 &&
-    typeof s.peakPeople === 'number' && s.peakPeople >= 0 &&
-    typeof s.rng === 'object' && s.rng !== null &&
-    typeof s.map === 'object' && s.map !== null &&
-    typeof s.village === 'object' && s.village !== null &&
-    typeof s.people === 'object' && s.people !== null &&
-    Array.isArray(s.buildings) &&
-    Array.isArray(s.works) &&
-    Array.isArray(s.seeds) &&
-    typeof s.flags === 'object' && s.flags !== null &&
-    Array.isArray(s.chronicle) &&
-    Array.isArray(s.history) &&
-    typeof s.weather === 'object' && s.weather !== null &&
-    (s.dwindlingSince === null || typeof s.dwindlingSince === 'number') &&
-    typeof s.noOneStreak === 'number'
+    s['version'] === SCHEMA_VERSION && uint32(s['seed']) && uint32(s['terrainSeed'])
+    && tickValue(s['tick']) && tickValue(s['peakPeople'])
+    && record(rng) && RNG_STREAMS.every((stream) => uint32(rng[stream]))
+    && byteMap(s['map'])
+    && record(village) && ['grain', 'wood', 'morale', 'faith'].every((key) => finite(village[key]))
+    && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
+    && tickValue(people['nextId']) && Array.isArray(people['namedIds']) && people['namedIds'].every(tickValue)
+    && Array.isArray(people['grudges']) && people['grudges'].every(grudge)
+    && Array.isArray(s['buildings']) && s['buildings'].every(building)
+    && Array.isArray(s['works']) && s['works'].every(work)
+    && (s['crossroad'] === null || crossroad(s['crossroad']))
+    && Array.isArray(s['seeds']) && s['seeds'].every(plantedSeed)
+    && record(s['flags']) && Object.values(s['flags']).every(tickValue)
+    && Array.isArray(s['chronicle']) && s['chronicle'].every(chronicleEntry)
+    && Array.isArray(s['history']) && s['history'].every(decisionRecord)
+    && record(weather) && tickValue(weather['year']) && tickValue(weather['index']) && finite(weather['factor'])
+    && (outbreak === null || (record(outbreak) && tickValue(outbreak['startedTick'])
+      && tickValue(outbreak['endsTick']) && tickValue(outbreak['deaths'])))
+    && nullableTick(s['dwindlingSince']) && tickValue(s['noOneStreak'])
+    && (modifier === null || (record(modifier) && finite(modifier['factor']) && tickValue(modifier['harvests'])))
+    && (ended === null || (record(ended) && tickValue(ended['tick'])
+      && ENDS.has(ended['cause'] as string) && (ended['lastId'] === null || tickValue(ended['lastId']))))
   );
 }
 
@@ -106,6 +263,10 @@ export function deserialize(raw: unknown): SaveFile {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
+  if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');
+  if (!(candidate.decisions as unknown[]).every(decisionRecord)) {
+    throw new Error('Save file has no valid decision record.');
+  }
 
   return {
     schema: SCHEMA_VERSION,

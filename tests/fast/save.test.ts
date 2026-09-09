@@ -60,6 +60,34 @@ describe('serialize / deserialize · §13.1', () => {
     expect(() => deserialize(structuredClone(saved))).not.toThrow();
   });
 
+  it('rechaza contenedores parciales antes de que lleguen al motor o al render', () => {
+    const state = foundGame(7);
+    const base = serialize(state, state.history, [], 10);
+    const brokenMap = structuredClone(base);
+    (brokenMap.state as unknown as Record<string, unknown>)['map'] = {};
+
+    const shortTerrain = structuredClone(base);
+    shortTerrain.state.map.terrain = new Uint8Array(1);
+
+    const badBuilding = structuredClone(base);
+    (badBuilding.state.buildings[0] as unknown as Record<string, unknown>)['kind'] = 'castle';
+
+    const badCrossroad = structuredClone(base);
+    (badCrossroad.state as unknown as Record<string, unknown>)['crossroad'] = { templateId: 'x' };
+
+    const ended = foundGame(8);
+    ended.ended = { tick: ended.tick, cause: 'abandoned', lastId: null };
+    const badArchive = structuredClone(serialize(state, state.history, [archiveGame(ended)], 10));
+    badArchive.archive[0]!.ruins = new Uint8Array(1);
+
+    const badChronicle = structuredClone(base);
+    (badChronicle.state.chronicle[0] as unknown as Record<string, unknown>)['params'] = null;
+
+    for (const broken of [brokenMap, shortTerrain, badBuilding, badCrossroad, badArchive, badChronicle]) {
+      expect(() => deserialize(broken)).toThrow();
+    }
+  });
+
   it('migra el esquema 1 conservando su semilla de terreno y el pico observable', () => {
     const current = foundGame(7);
     current.chronicle.push({
