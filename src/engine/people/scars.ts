@@ -6,14 +6,20 @@
 // and `lost_home` had epitaphs written for them in the bank since M-09 and no
 // system had ever written one. Dead content, waiting for a writer.
 //
+// Desde v3.02 no sólo escribe recuerdos: también mueve lo que la gente piensa
+// de la gente. Un año de hambre le resta al líder, y perder la casa en el mismo
+// fuego acerca a los que la perdieron. Uno separa y otro une, a propósito: un
+// mundo que sólo separase acabaría siempre en un valle de enemigos.
+//
 // This is the writer. The rule it follows is that a memory must be about a
 // thing that happened TO SOMEONE — the villager who went hungry, the villager
 // whose roof burned — never about a thing that happened to the village.
 // Otherwise every named villager ends up carrying an identical set of twelve
 // memories and the whole system says nothing.
 
-import { MEMORY, SCARS, TIME } from '../balance';
+import { MEMORY, OPINION, SCARS, TIME } from '../balance';
 import { remember } from './memories';
+import { adjustOpinion } from './opinions';
 import { isHere } from './demography';
 import type { BuildingId, GameState, MemoryKind, Villager } from '../state';
 import { yearOf } from '../time';
@@ -52,10 +58,32 @@ function hungerWeight(severity: number): number {
 export function scarHunger(state: GameState, severity: number): void {
   if (severity < SCARS.HUNGER_MIN) return;
   const weight = hungerWeight(severity);
+  const share = Math.min(1, severity / SCARS.HUNGER_FULL);
+
+  // §7.9, v3.02: quien manda carga con el año malo. No porque sea culpa suya
+  // —el hambre casi nunca lo es— sino porque es la única cabeza visible cuando
+  // no hay pan, y eso sí es cierto. Un solo año pesa poco; el que pasa tres
+  // seguidos bajo el mismo líder acaba cruzando el umbral de §6.4 y le sale un
+  // rencor con nombre.
+  const leader = state.people.villagers.find((v) => v.role === 'leader' && isHere(v));
+
   for (const v of state.people.villagers) {
     if (!v.named || !isHere(v)) continue;
     if (alreadyThisYear(v, 'went_hungry', state.tick)) continue;
-    remember(v, { tick: state.tick, kind: 'went_hungry', aboutId: null, weight });
+    // `aboutId` es el líder, no `null`. §6.4 saca la causa de un rencor de la
+    // memoria más pesada que el resentido guarda **sobre esa persona**; con un
+    // recuerdo que no apunta a nadie, el rencor salía mudo (`unspoken`) y la
+    // crónica no podía decir por qué dos aldeanos dejaron de hablarse. El
+    // recuerdo no es «pasé hambre»: es «pasé hambre bajo su mando».
+    remember(v, {
+      tick: state.tick,
+      kind: 'went_hungry',
+      aboutId: leader?.id ?? null,
+      weight,
+    });
+    if (leader !== undefined) {
+      adjustOpinion(state, v.id, leader.id, OPINION.HUNGER_TO_LEADER * share);
+    }
   }
 }
 
@@ -67,15 +95,28 @@ export function scarHunger(state: GameState, severity: number): void {
  * two would mark forty people with the loss of one house.
  */
 export function scarFire(state: GameState, homeId: BuildingId): void {
-  for (const v of state.people.villagers) {
-    if (!v.named || !isHere(v)) continue;
-    if (v.homeId !== homeId) continue;
+  const burned = state.people.villagers.filter(
+    (v) => v.named && isHere(v) && v.homeId === homeId,
+  );
+
+  for (const v of burned) {
     remember(v, {
       tick: state.tick,
       kind: 'lost_home',
       aboutId: null,
       weight: SCARS.LOST_HOME_WEIGHT,
     });
+  }
+
+  // §7.9, v3.02: y los que lo perdieron juntos se acercan. Es la otra mitad de
+  // esto y hacía falta que existiera: si el mundo sólo separase a la gente,
+  // toda partida larga acabaría en un valle de enemigos. Compartir una
+  // desgracia es de las pocas cosas que unen sin que nadie lo decida.
+  for (const a of burned) {
+    for (const b of burned) {
+      if (a.id === b.id) continue;
+      adjustOpinion(state, a.id, b.id, OPINION.SHARED_LOSS);
+    }
   }
 }
 

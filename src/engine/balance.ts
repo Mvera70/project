@@ -636,6 +636,18 @@ export const OPINION = {
   LOST_CHILD_TO_LEADER: -35,
   PUBLICLY_BLAMED: -30,
   WAS_SAVED: 25,
+  // §7.9, v3.02 · Lo que el mundo mueve por su cuenta, sin encrucijada de por
+  // medio. Los dos son TUNE: §6.4 sólo nombraba los tres sucesos de arriba,
+  // que salen todos del catálogo.
+  //
+  // TUNE: lo que un año de hambre le resta al líder en la cabeza de quien la
+  // pasó, en su peor grado. Menos que `PUBLICLY_BLAMED`, porque el hambre rara
+  // vez es culpa de una persona y todo el mundo lo sabe — pero se acumula año
+  // tras año, y ahí está su fuerza.
+  HUNGER_TO_LEADER: -18,
+  // TUNE: lo que acerca compartir una desgracia. Perder la casa en el mismo
+  // fuego que otro es de las pocas cosas que unen sin que nadie lo decida.
+  SHARED_LOSS: 12,
 } as const;
 
 // ---------------------------------------------------------------------------
