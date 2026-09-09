@@ -11,6 +11,7 @@
 import type {
   BuildingKind,
   Condition,
+  HerdKind,
   MemoryKind,
   Role,
   StatName,
@@ -30,6 +31,7 @@ export type CrossroadCategory =
   | 'faith'
   | 'forest'
   | 'stranger'
+  | 'trade'
   | 'succession';
 
 export interface CrossroadTemplate {
@@ -111,7 +113,14 @@ export type Effect =
   | { k: 'opinion'; from: string; to: string; delta: number }
   | { k: 'memory'; who: string; kind: MemoryKind; about?: string; weight: number }
   | { k: 'role'; who: string; role: Role | null }
-  | { k: 'lit'; kind: BuildingKind; on: boolean };
+  | { k: 'lit'; kind: BuildingKind; on: boolean }
+  /**
+   * Heads bought or sold (§7.7, §8.4, v2.95). Negative sells. Bounded by
+   * what the pen can hold and by what is actually in it: a trader cannot
+   * leave a village with more cows than it has pasture, and cannot buy a
+   * pig that does not exist.
+   */
+  | { k: 'herd'; kind: HerdKind; delta: number };
 
 /** What the option changes on screen. Never empty. */
 export type VisualEffect =

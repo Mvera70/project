@@ -104,11 +104,20 @@ export function feedAndSlaughter(state: GameState, demand: number): HerdReport {
   // Then, if the people are short, the herd is what stands between them and
   // hunger. One head at a time, smallest first, and never more than the week
   // needs — a village does not kill its cow to cover a missing bushel.
+  //
+  // §7.8, v2.95: with salt in the store a carcass keeps, so more of it is
+  // eaten and less of it rots. This is the reader for the `salted` flag the
+  // salt carrier sells — the flag is the promise, and this line is it kept.
+  const salted = state.flags['salted'];
+  const keeps = salted !== undefined && (salted === 0 || salted > state.tick);
+  const worth = keeps ? ANIMALS.SALTED_MEAT : 1;
+
   for (const kind of HERD_KINDS) {
     while (state.village.grain < demand && state.herd[kind] > 0) {
+      const meat = ANIMALS.MEAT[kind] * worth;
       state.herd[kind] -= 1;
-      state.village.grain += ANIMALS.MEAT[kind];
-      report.meat += ANIMALS.MEAT[kind];
+      state.village.grain += meat;
+      report.meat += meat;
       report.slaughtered[kind] = (report.slaughtered[kind] ?? 0) + 1;
     }
   }

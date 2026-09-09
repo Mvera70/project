@@ -16,6 +16,7 @@
 //   feud_ripe              M-07 select():   weights the feud templates up (A.4, A.6, A.8, A.15)
 //   behind_the_wall        M-07 select():   lord and stranger weigh ×0.4 (A.16)
 //   a_name_in_the_valley   M-07 select():   lord templates weigh ×0.5 (A.14)
+//   salted                 M-29 feedAndSlaughter(): meat goes further (§7.8)
 //
 // The flags Annex A already named — vassal, proud, watched, threatened,
 // hostile — are read by the templates themselves and need nobody else.
@@ -29,6 +30,7 @@ import { LORD_TEMPLATES } from './lord';
 import { PLAGUE_TEMPLATES } from './plague';
 import { RESERVE_TEMPLATES } from './reserve';
 import { STRANGER_TEMPLATES } from './stranger';
+import { TRADE_TEMPLATES } from './trade';
 import { SUCCESSION_TEMPLATES } from './succession';
 
 /**
@@ -44,6 +46,7 @@ export const CATALOG: Catalogue = [
   ...FAITH_TEMPLATES,
   ...FOREST_TEMPLATES,
   ...STRANGER_TEMPLATES,
+  ...TRADE_TEMPLATES,
   ...SUCCESSION_TEMPLATES,
   ...RESERVE_TEMPLATES,
 ];
@@ -57,3 +60,4 @@ export { PLAGUE_TEMPLATES } from './plague';
 export { RESERVE_TEMPLATES } from './reserve';
 export { STRANGER_TEMPLATES } from './stranger';
 export { SUCCESSION_TEMPLATES } from './succession';
+export { TRADE_TEMPLATES } from './trade';

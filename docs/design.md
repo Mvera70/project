@@ -92,6 +92,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.95** | 11 sep 2026, 23:30 | M-30 · los comerciantes del camino | **§7.8 nueva: el mundo exterior deja de ser mudo, y llega andando.** No hay pueblos vecinos en el mapa y no los habrá: lo que la aldea sabe de fuera es quién entra en ella. Tres comerciantes, una estación cada uno, y cada uno toca un sistema distinto — el tratante mueve el rebaño de §7.7, el salinero cambia lo que vale una matanza, el factor compra el excedente y paga en ser visto. Categoría `trade` y efecto `herd` nuevos en el DSL de §8.4. |
 | **2.94** | 11 sep 2026, 21:15 | M-29 · la peste del ganado | **Lo que al rebaño le faltaba: miedo.** Hasta ahora un rebaño grande solo costaba grano; ahora también enferma, y cuanto más apretado está el corral más probable es. Construida a imagen de la plaga de §5.8, con el pozo protegiendo igual que protege a las personas, que era el segundo motivo que le faltaba a ese edificio. Flujo `murrain` propio: añadir la enfermedad no desplaza ni un lobo de una partida ya guardada. |
 | **2.93** | 11 sep 2026, 19:40 | M-29 · los cuervos muerden | **El primer animal que le pide algo al jugador en vez de solo pasarle algo.** En las seis semanas antes de la siega los pájaros se llevan parte de la cosecha en pie, y la respuesta no es una obra sino brazos: alguien tiene que estar en el campo, y son los mismos brazos que quieren el bosque y las obras. Sin tirada de azar: lo que se pierde es consecuencia del reparto y se puede leer en él. De paso se arregla que `SCHEMA_VERSION` estuviera escrito a mano en dos sitios y se hubieran desincronizado. |
 | **2.92** | 11 sep 2026, 18:10 | M-29 · caza y pesca, y lo que cuestan | **La aldea hambrienta sale al bosque y al río, y eso devuelve el desenlace a donde estaba antes del rebaño.** Extinción adversa 13,3 % → 11,7 % y separación 11,7 → 10,0 puntos: el forrajeo anula exactamente lo que el rebaño había ganado. Es la palanca que §2.47 dejó sin explorar, medida por fin. **No se ajusta ninguna constante para taparlo**: la fase de balance sigue cerrada y esto es una decisión de diseño pendiente, no un número mal puesto. |
@@ -4236,6 +4237,60 @@ tirara del flujo de los animales en vez del suyo. Las cuatro tienen prueba y
 las cuatro están verificadas por mutación — la del flujo hacía falta porque
 perturbar un flujo que nadie usa no cambia nada, y hay que mirar el contador de
 frente.
+
+### 7.8 Los comerciantes del camino
+
+**No hay pueblos vecinos en el mapa y no los va a haber.** Lo que la aldea sabe
+del mundo exterior es quién entra en ella, y eso no es una limitación sino la
+idea: un comerciante es una persona con un camino a la espalda y una historia
+que cuenta sobre él. Los sitios de donde vienen existen sólo en lo que dicen.
+
+Se apoyan enteros en §8, sin subsistema nuevo: son plantillas del catálogo con
+categoría propia `trade`. El catálogo ya sabía plantear una decisión con
+opciones y precios visibles, así que un trato no necesitaba interfaz nueva.
+
+| Comerciante | Cuándo | Qué mueve | Qué cuesta de verdad |
+|---|---|---|---|
+| **El tratante** | Primavera | Compra y vende cabezas del rebaño (§7.7) | Grano, o dos cerdos que no verás crecer |
+| **El salinero** | Verano | Deja la bandera `salted` | Grano por algo que no se come |
+| **El factor** | Otoño | Compra excedente, paga en madera | Que el camino sepa lo que guardas |
+
+**Cada uno toca un sistema que los otros no tocan**, y hay una prueba que lo
+exige. Tres comerciantes que movieran los mismos números serían el mismo
+comerciante con tres nombres, y llegan en estaciones distintas por lo mismo.
+
+**La sal es la forma que al catálogo le faltaba.** Todas las demás opciones
+gastan para arreglar algo ahora; la sal es una inversión — no se come, y hace
+que cada cabeza sacrificada rinda `ANIMALS.SALTED_MEAT` mientras dure. Su
+bandera tiene lector en la matanza de §7.7, que es lo que la separa de un
+adorno.
+
+**Y vender el excedente no es gratis aunque lo parezca.** El grano por encima de
+la capacidad se pudre solo (§5.3), así que venderlo parece dinero encontrado. El
+precio no está en el grano: está en `watched`, que leen las plantillas del
+señor. Una aldea de la que se habla en el camino como aldea con grano de sobra
+es una aldea a la que alguien acaba viniendo a cobrar.
+
+#### Dos versiones medidas y tiradas
+
+El factor exigió primero un bosque talado. **No sale nunca**: el banco de
+cobertura no baja del 45 % de bosque en ninguna semilla, que es exactamente por
+lo que `forest_cut` vive en la lista de plantillas lentas de esa prueba. Se
+cambió entonces a exigir poca madera en el almacén, y tampoco: medido en doce
+semillas y cien años, **la reserva de madera nunca bajó de 507 y llegó a
+43 000**. La madera no es un bien escaso en este juego, y una plantilla atada a
+que lo fuera nace muda.
+
+Lo que sí es corriente es tener grano de sobra, así que ésa es la puerta. Vale
+la pena anotarlo porque no es sólo sobre este comerciante: **cualquier diseño
+futuro que dé por hecho que la madera aprieta está construyendo sobre algo que
+la medición dice que no ocurre.**
+
+**Qué falsaría esto:** que un trato dejara a la aldea con más cabezas de las que
+alimenta o con menos de cero, que la sal no cambiara nada en la matanza, que la
+sal caducada siguiera valiendo, o que los tres comerciantes acabaran moviendo
+los mismos números. Las cuatro tienen prueba y tres están verificadas por
+mutación.
 
 ---
 

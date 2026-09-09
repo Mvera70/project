@@ -10,6 +10,7 @@ import { remember } from '../people/memories';
 import { adjustOpinion } from '../people/opinions';
 import { ageOf, makeVillager } from '../people/villagers';
 import { int, next, pick } from '../rng';
+import { herdCapacity } from '../subsistence/herd';
 import type { GameState, Villager, VillagerId } from '../state';
 import { yearOf } from '../time';
 import { standing } from '../subsistence/building-counts';
@@ -133,6 +134,17 @@ export function applyEffect(
         state.people.villagers.push(v);
         out.arrived.push(v.id);
       }
+      break;
+    }
+    case 'herd': {
+      // §7.7, v2.95: a trade in livestock. Bounded on both sides — the village
+      // cannot sell a pig it has not got, and cannot be left holding more head
+      // than its houses and fields feed, which is the same ceiling breeding
+      // obeys. A trader who offers a second cow to a valley with one field is
+      // offering something the valley cannot keep.
+      const capacity = herdCapacity(state)[e.kind];
+      const held = state.herd[e.kind];
+      state.herd[e.kind] = Math.max(0, Math.min(capacity, held + e.delta));
       break;
     }
     case 'flag':

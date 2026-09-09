@@ -15,8 +15,10 @@ import { founded, silentIn, sweep, tick, YEAR } from '../helpers/catalogue-bench
 
 
 describe('el catálogo · forma', () => {
-  it('son las dieciséis del Anexo A más la reserva', () => {
-    expect(CATALOG).toHaveLength(17);
+  it('son las dieciséis del Anexo A, la reserva y los tres comerciantes', () => {
+    // v2.95: §7.8 añade la categoría `trade`. El número sube a propósito, y
+    // esta prueba existe justo para que subir sea una decisión y no un descuido.
+    expect(CATALOG).toHaveLength(20);
     expect(CATALOG.some((t) => t.id === 'quiet_years')).toBe(true);
   });
 
@@ -26,7 +28,7 @@ describe('el catálogo · forma', () => {
     for (const id of ids) expect(id, id).toMatch(/^[a-z][a-z0-9_]*$/);
   });
 
-  it('las ocho categorías tienen dos plantillas', () => {
+  it('cada categoría lleva al menos dos plantillas', () => {
     const byCategory = new Map<CrossroadCategory, number>();
     for (const t of CATALOG) byCategory.set(t.category, (byCategory.get(t.category) ?? 0) + 1);
     for (const c of [
@@ -36,6 +38,11 @@ describe('el catálogo · forma', () => {
     }
     // stranger lleva tres: las dos suyas y quiet_years, que es la reserva.
     expect(byCategory.get('stranger')).toBe(3);
+    // trade lleva tres, una por comerciante (§7.8).
+    expect(byCategory.get('trade')).toBe(3);
+    // Y ninguna categoría puede quedarse con una sola: con una, salir dos
+    // veces seguidas es repetirse, y §12.9 lo prohibe.
+    for (const [category, n] of byCategory) expect(n, category).toBeGreaterThanOrEqual(2);
   });
 
   it('toda plantilla tiene 2 o 3 opciones, con ids únicos', () => {
@@ -88,6 +95,9 @@ describe('el catálogo · forma', () => {
       'flood_prone', 'forced_hunger', 'hostile', 'proud', 'stone_house_unlocked',
       'threatened', 'vassal', 'wall_unlocked', 'watched', 'works_slowed_40',
       'works_slowed_80', 'works_slowed_85',
+      // §7.8, v2.95: la sal del salinero. Su lector está en la matanza de
+      // M-29, que saca más de cada cabeza mientras la sal dure.
+      'salted',
     ]);
     const written = CATALOG.flatMap((template) => template.options).flatMap((option) => [
       ...option.effects,

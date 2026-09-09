@@ -298,6 +298,11 @@ export const ANIMALS = {
   // grain in hand. Slow on purpose — the herd must not outrun a bad winter.
   BREED_EVERY: 8,
   BREED_GRAIN_YEARS: 1.0,
+  // TUNE (§7.8, v2.95): what salt is worth. A salted carcass keeps, so more of
+  // it is eaten and less of it spoils. A third more out of every head is the
+  // difference between a cow feeding the village for a week and a week and a
+  // half, which is what the salt trade was actually for.
+  SALTED_MEAT: 1.35,
   // A winter week without a palisade. Per week, not per night: the tick is a
   // week (§4.1) and the wolves of §7.7 come with the cold, not on a schedule.
   WOLF_RAID_CHANCE: 0.08,

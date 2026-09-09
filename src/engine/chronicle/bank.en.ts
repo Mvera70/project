@@ -772,6 +772,35 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.relic_pedlar.take_the_box.label': 'Take the box and pay nothing',
   'crossroad.relic_pedlar.take_the_box.cost': 'He will tell the road what happened here',
 
+  // --- §7.8 · the traders on the road ---
+  'crossroad.cattle_drover.title': 'The Drover',
+  'crossroad.cattle_drover.body':
+    'He came over the ford with four beasts and wintered feed for two. He says he is from the far side of the downs, and that the grass failed there. {A} has looked at the cow. {B} has looked at the man.',
+  'crossroad.cattle_drover.buy_the_cow.label': 'Buy the cow',
+  'crossroad.cattle_drover.buy_the_cow.cost': 'A hundred and twenty of grain, and she is thin',
+  'crossroad.cattle_drover.sell_him_pigs.label': 'Sell him two pigs',
+  'crossroad.cattle_drover.sell_him_pigs.cost': 'Two of the pigs, and he pays in bread',
+  'crossroad.cattle_drover.send_him_on.label': 'Send him on',
+  'crossroad.cattle_drover.send_him_on.cost': 'He waters his beasts and goes',
+
+  'crossroad.salt_carrier.title': 'Salt from the Coast',
+  'crossroad.salt_carrier.body':
+    'The salt man walks the same road every few summers and remembers who paid him last. He carries it in a sack on his own back, which is why he charges what he charges. {A} knows what salt does for a carcass. {B} knows what the sack costs.',
+  'crossroad.salt_carrier.buy_the_salt.label': 'Buy the sack',
+  'crossroad.salt_carrier.buy_the_salt.cost': 'Seventy of grain, and the meat keeps for years',
+  'crossroad.salt_carrier.haggle.label': 'Haggle him down',
+  'crossroad.salt_carrier.haggle.cost': 'Half the price and half the salt, and he remembers',
+  'crossroad.salt_carrier.no_salt.label': 'Let him pass',
+  'crossroad.salt_carrier.no_salt.cost': 'The granary keeps its grain and the meat keeps nothing',
+
+  'crossroad.grain_factor.title': 'The Factor',
+  'crossroad.grain_factor.body':
+    'He buys grain for towns that do not grow it, and he pays in timber because timber is what the towns have too much of. He has already counted the granaries from the rise, and he will count them again for somebody else. {A} has the tally. {B} has not spoken.',
+  'crossroad.grain_factor.sell_the_surplus.label': 'Sell him the surplus',
+  'crossroad.grain_factor.sell_the_surplus.cost': 'A fifth of the granary, and the road learns what this valley keeps',
+  'crossroad.grain_factor.keep_it_all.label': 'Keep it all',
+  'crossroad.grain_factor.keep_it_all.cost': 'It goes on rotting, and {B} wanted that wood',
+
   // --- A.11 forest_cut ---
   'crossroad.forest_cut.title': 'The Old Wood',
   'crossroad.forest_cut.body':
@@ -1113,6 +1142,46 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   ],
 
   // --- A.10 relic_pedlar ---
+  'crossroad.cattle_drover.buy_the_cow': [
+    'They bought a cow off a drover in year {year}. She was thin, and she lasted.',
+    'In year {year} the valley paid grain for a beast from the far downs.',
+    '{A} bought the cow, and {B} said nothing about the price.',
+  ],
+  'crossroad.cattle_drover.sell_him_pigs': [
+    'Two pigs went down the road with the drover in year {year}, and bread came back.',
+    'In year {year} they sold the pigs rather than feed them through another winter.',
+    '{B} counted the bread twice and called it a good trade.',
+  ],
+  'crossroad.cattle_drover.send_him_on': [
+    'The drover watered his beasts and went on, in year {year}.',
+    'In year {year} they let the cattle pass and kept the granary shut.',
+    '{A} watched the beasts go over the ford and said it was the wrong year for it.',
+  ],
+  'crossroad.salt_carrier.buy_the_salt': [
+    'They bought a sack of salt in year {year}, and the meat kept for years after.',
+    'In year {year} the valley paid for salt, which nobody could eat and everybody needed.',
+    '{A} put the salt where the rain would not find it.',
+  ],
+  'crossroad.salt_carrier.haggle': [
+    'They beat the salt man down in year {year}, and got half a sack for it.',
+    'In year {year} {B} argued the price and the salt ran out early.',
+    'The salt man took what he was offered, and remembered the valley for it.',
+  ],
+  'crossroad.salt_carrier.no_salt': [
+    'The salt went past the valley in year {year} on the man\u2019s own back.',
+    'In year {year} they kept the grain and let the salt walk on.',
+    '{A} said they would manage without, and for a while they did.',
+  ],
+  'crossroad.grain_factor.sell_the_surplus': [
+    'They sold a fifth of the granary for timber in year {year}, and were talked about for it.',
+    'In year {year} the valley traded bread for wood, having cut its own.',
+    '{B} had the timber stacked before the factor was over the rise.',
+  ],
+  'crossroad.grain_factor.keep_it_all': [
+    'The factor was turned away in year {year}, and the granary stayed full.',
+    'In year {year} they kept the grain, and the woodward kept his opinion.',
+    '{B} wanted that wood, and said so for a year afterwards.',
+  ],
   'crossroad.relic_pedlar.buy_it': [
     'They bought the box in year {year}, and it cost six weeks of bread.',
     'In year {year} the valley paid for a finger bone in grain.',
