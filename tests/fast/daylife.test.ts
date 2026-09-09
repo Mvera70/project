@@ -224,6 +224,51 @@ describe('los oficios se ven · §11.9', () => {
   });
 });
 
+describe('los rencores se ven · §11.9, §6.4', () => {
+  it('dos que se detestan trabajan más lejos que dos que se llevan bien', () => {
+    // Un rencor de §6.4 dejaba de ser una fila en un registro sólo cuando el
+    // catálogo lo usaba veinte años después. Ahora se ve todos los días.
+    // Hacen falta dos que trabajen CERCA: apartarse sólo tiene sentido de
+    // quien tienes al lado, y los dos primeros nombrados de la semilla 7
+    // trabajan a siete celdas. La primera versión de esta prueba los cogía a
+    // ciegas y daba exactamente el mismo número en los dos casos.
+    const base = workweek(village(20));
+    const figures = crowdPositions(base, 0.35);
+    const namedIds = new Set(
+      base.people.villagers.filter((v) => v.named && v.diedTick === null).map((v) => v.id),
+    );
+    let pair: [number, number] | null = null;
+    for (const one of figures) {
+      for (const two of figures) {
+        if (one.id >= two.id) continue;
+        if (!namedIds.has(one.id) || !namedIds.has(two.id)) continue;
+        if (Math.hypot(one.x - two.x, one.y - two.y) < 3) pair = [one.id, two.id];
+      }
+    }
+    expect(pair, 'la semilla debe tener dos nombrados trabajando cerca').not.toBeNull();
+
+    const distanceBetween = (hate: boolean): number => {
+      const state = workweek(village(20));
+      const a = state.people.villagers.find((v) => v.id === pair![0])!;
+      const b = state.people.villagers.find((v) => v.id === pair![1])!;
+      a.opinions[b.id] = hate ? -90 : 60;
+      b.opinions[a.id] = hate ? -90 : 60;
+
+      const now = crowdPositions(state, 0.35);
+      const one = now.find((f) => f.id === a.id);
+      const two = now.find((f) => f.id === b.id);
+      if (one === undefined || two === undefined) return -1;
+      return Math.hypot(one.x - two.x, one.y - two.y);
+    };
+
+    const apart = distanceBetween(true);
+    const together = distanceBetween(false);
+    expect(apart).toBeGreaterThan(0);
+    expect(together).toBeGreaterThan(0);
+    expect(apart, 'los que se odian acaban más separados').toBeGreaterThan(together);
+  });
+});
+
 describe('y sigue sin romper nada · §4.3, §10.6', () => {
   it('dibujar no escribe en el estado', () => {
     const state = workweek(village(20));

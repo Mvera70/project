@@ -61,6 +61,38 @@ function appetite(state: GameState, a: VillagerId, b: VillagerId): number {
 interface Spot { id: VillagerId; x: number; y: number }
 
 /**
+ * §11.9, v3.08 · De quién se aparta cada uno hoy.
+ *
+ * No pararse a hablar con un enemigo es la mitad de la historia; la otra mitad
+ * es no pasarse el día a su lado como si nada. Devuelve, por persona, el punto
+ * del que conviene alejarse — el sitio de aquel con quien peor se lleva de los
+ * que tiene cerca.
+ */
+export function shunnedAmong(
+  state: GameState,
+  spots: readonly Spot[],
+): Map<VillagerId, { x: number; y: number }> {
+  const out = new Map<VillagerId, { x: number; y: number }>();
+  for (const a of spots) {
+    let worstOpinion: number = ENCOUNTER.COLD_BELOW;
+    let worstSpot: Spot | undefined;
+    for (const b of spots) {
+      if (a.id === b.id) continue;
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      if (dx * dx + dy * dy > ENCOUNTER.RANGE * ENCOUNTER.RANGE) continue;
+      const feeling = opinionOf(state, a.id, b.id);
+      if (feeling < worstOpinion) {
+        worstOpinion = feeling;
+        worstSpot = b;
+      }
+    }
+    if (worstSpot !== undefined) out.set(a.id, { x: worstSpot.x, y: worstSpot.y });
+  }
+  return out;
+}
+
+/**
  * Quién se para con quién esta semana.
  *
  * Se resuelve una vez por tick sobre los destinos, no fotograma a fotograma

@@ -697,6 +697,11 @@ export const DAY = {
   // TUNE: cuánto varía el paso de una persona a otra. El viejo llega más tarde
   // que el mozo aunque salgan juntos, y eso es lo que rompe la marcha en bloque.
   GAIT: 0.35,
+  // TUNE (§11.9, v3.08): cuánto se aparta uno de alguien a quien no soporta.
+  // Dos con un rencor abierto no se paran a hablar —eso ya lo hacía v3.03— pero
+  // tampoco pasan la jornada codo con codo como si nada. Se dan la espalda, y
+  // eso se ve sin leer una línea de crónica.
+  SHUN: 1.8,
 } as const;
 
 export const MARKS = {

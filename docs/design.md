@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.08** | 12 sep 2026, 18:45 | Los rencores se ven | **Dos que se detestan dejan de trabajar codo con codo como si nada.** No pararse a hablar era sólo la mitad; la otra es darse la espalda, y eso se ve sin leer una línea de crónica. Un rencor de §6.4 pasa de ser una fila en un registro a algo que se nota todos los días. |
 | **3.07** | 12 sep 2026, 17:30 | M-39 · las riñas, y lo que costó la vida nueva | **El valle escribía rencores desde M-05 y no hacía nada con ellos**: un rencor abierto era una fila en un registro y nadie discutía jamás. Ahora dos que se detestan acaban teniendo un mal día, con nombres y con consecuencias. Y se paga la factura de rendimiento de v3.03: mandar a la aldea entera al bosque en invierno había llevado el banco de once minutos a **cuarenta y tres**. |
 | **3.06** | 12 sep 2026, 15:00 | M-38 · el paso y el carril | **Todos andaban por la misma raya y a la misma velocidad**, tapándose unos a otros: media docena de figuras dibujadas como una. Cada uno anda ahora a su paso y por su carril. Y el rebaño deja de pastar veinte años en el mismo metro cuadrado. Medido de punta a punta del bloque: de 145 figuras tapadas por instante a 9,6, y de repetir sitio casi todos a 6 de 32. |
 | **3.05** | 12 sep 2026, 13:30 | M-36/M-37 · la aldea se entera y los oficios se ven | **Ardía una casa y la gente seguía camino del campo.** Ahora lo que acaba de pasarle a la aldea manda sobre todo lo demás. Y los ocho con nombre dejan de ser ocho labradores más: el herrero está en la fragua, el cura en la capilla, el alguacil en el granero. Los que no trabajan hacen recados en vez de quedarse clavados en su puerta, y los críos juegan delante de casa. |
@@ -5395,6 +5396,17 @@ Dos vecinos con la misma ruta iban **por la misma línea exacta y a la misma
 velocidad**, uno tapando al otro: en pantalla eran una figura, no dos. Ahora
 cada uno se aparta un poco del eje del camino y anda a su propio paso, así que
 el viejo llega más tarde que el mozo aunque salgan juntos.
+
+#### Los rencores se ven (v3.08)
+
+Que dos enemigos no se paren a hablar era sólo la mitad de la historia. La otra
+es que tampoco pasan la jornada uno al lado del otro como si nada: se apartan.
+Cada uno se aleja de aquel con quien peor se lleva **de los que tiene cerca**,
+porque apartarse de alguien que está al otro lado del valle no significa nada.
+
+Con esto, un rencor de §6.4 deja de ser una fila en un registro que el catálogo
+consultará dentro de veinte años, y pasa a ser dos personas trabajando de
+espaldas en el mismo campo.
 
 #### Lo que dio el bloque entero, medido
 

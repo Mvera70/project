@@ -8,7 +8,7 @@ import type { Figure } from './layers/figures';
 import { hungerSeverity } from './layers/tells';
 import { gatheringsAt } from './gatherings';
 import { reactionsAt } from './reactions';
-import { encountersAmong, type Encounter } from './encounters';
+import { encountersAmong, shunnedAmong, type Encounter } from './encounters';
 import { DAY, ENCOUNTER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 
@@ -18,25 +18,33 @@ const SUNDAY = new WeakMap<GameState, CachedPaths>();
 const WORKDAY = new WeakMap<GameState, CachedPaths>();
 interface CachedMeeting extends CachedPaths { target: number }
 const MEETING = new WeakMap<GameState, CachedMeeting>();
-interface CachedTalk { tick: number; talks: Map<VillagerId, Encounter> }
+interface CachedTalk {
+  tick: number;
+  talks: Map<VillagerId, Encounter>;
+  shunned: Map<VillagerId, { x: number; y: number }>;
+}
 const TALK = new WeakMap<GameState, CachedTalk>();
 
 /**
  * §11.9: quién se para con quién hoy. Una vez por tick y sobre los destinos,
  * no en cada pintada y sobre las posiciones.
  */
-function talksOf(state: GameState, routes: Map<VillagerId, number[]>): Map<VillagerId, Encounter> {
+function socialOf(state: GameState, routes: Map<VillagerId, number[]>): CachedTalk {
   const known = TALK.get(state);
-  if (known !== undefined && known.tick === state.tick) return known.talks;
+  if (known !== undefined && known.tick === state.tick) return known;
   const width = state.map.width;
   const spots = [...routes].flatMap(([id, cells]) => {
     const last = cells[cells.length - 1];
     if (last === undefined) return [];
     return [{ id, x: (last % width) + 0.5, y: Math.floor(last / width) + 0.5 }];
   });
-  const talks = encountersAmong(state, spots);
-  TALK.set(state, { tick: state.tick, talks });
-  return talks;
+  const fresh: CachedTalk = {
+    tick: state.tick,
+    talks: encountersAmong(state, spots),
+    shunned: shunnedAmong(state, spots),
+  };
+  TALK.set(state, fresh);
+  return fresh;
 }
 
 function centre(building: Building, width: number): number {
@@ -325,7 +333,10 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
   const routes = meeting !== undefined
     ? gatheringPaths(state, cellOf(state, meeting))
     : state.tick % 4 === 0 ? sundayPaths(state) : workdayPaths(state);
-  const talks = meeting === undefined ? talksOf(state, routes) : new Map<VillagerId, Encounter>();
+  const social = meeting === undefined
+    ? socialOf(state, routes)
+    : { tick: state.tick, talks: new Map<VillagerId, Encounter>(), shunned: new Map() };
+  const talks = social.talks;
   const crowding = crowdingOf(routes);
   const namedOrder = new Map(state.people.namedIds.map((id, index) => [id, index]));
   const figures: Figure[] = [];
@@ -373,6 +384,20 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
         const heading = ((Math.imul(person.id + 31, 374761393) >>> 0) % 6283) / 1000;
         point.x += Math.cos(heading) * swing * DAY.WORK_REACH * energy;
         point.y += Math.sin(heading) * swing * DAY.WORK_REACH * energy;
+
+        // §11.9, v3.08: y si tiene cerca a alguien a quien no soporta, se pone
+        // al otro lado. Un rencor de §6.4 deja de ser una fila en un registro y
+        // se convierte en dos personas que trabajan de espaldas.
+        const away = social.shunned.get(person.id);
+        if (away !== undefined) {
+          const dx = point.x - away.x;
+          const dy = point.y - away.y;
+          const far = Math.hypot(dx, dy);
+          if (far > 0.001) {
+            point.x += (dx / far) * DAY.SHUN;
+            point.y += (dy / far) * DAY.SHUN;
+          }
+        }
       }
     } else if (fraction < day.home) {
       const back = (fraction - day.depart) / Math.max(0.001, day.home - day.depart);
