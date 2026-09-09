@@ -98,6 +98,7 @@ describe('grafo de módulos del motor', () => {
       'balance',
       'herd',
       'people/demography',
+      'people/scars',
       'people/villagers',
       'rng',
       'state',

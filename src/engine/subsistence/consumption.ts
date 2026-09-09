@@ -12,6 +12,7 @@ import { next, pick } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
 import { seasonOf } from '../time';
 import { feedAndSlaughter, type HerdReport } from './herd';
+import { scarHunger } from '../people/scars';
 
 /**
  * Step 7. §5.3.
@@ -50,6 +51,12 @@ export function consume(state: GameState): {
   // even if the numeric granary still contains what was reserved for sowing.
   const severity = Math.max(shortage, forced ? 0.5 : 0);
   state.village.grain = Math.max(0, state.village.grain - demand);
+
+  // §7.9, v2.99: the week's hunger goes into the people who lived it, before
+  // anyone dies of it. Here and not after the toll, so that a villager who
+  // starves this very week is not marked and then buried — the dead get an
+  // epitaph, which is a different thing.
+  scarHunger(state, severity);
 
   if (severity <= 0) return { severity: 0, starved: [], herd };
 

@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.99** | 12 sep 2026, 04:20 | M-31 · lo que el mundo escribe en la gente | **§7.9 nueva: hasta hoy sólo las decisiones del jugador dejaban recuerdo.** Una hambruna o un incendio le pasaban a una población, no a nadie. La prueba estaba a la vista: `went_hungry` y `lost_home` tenían epitafio escrito desde M-09 y **ningún sistema los escribía jamás**. Ahora el hambre marca a quien la vive y el fuego a quien vivía en esa casa, con un recuerdo por año y no uno por semana. |
 | **2.98** | 12 sep 2026, 03:05 | Cuánto comercio quiere la partida | **Medido el reposo largo y descartado.** Alargarlo de 18 a 26 años mete la cadencia adversa en banda y **devuelve la extinción a la línea base**: 15,0 % → 11,7 % y la separación 13,3 → 10,0 puntos. Menos comercio es menos presión. Se conservan los 18: el desenlace blando es el problema de fondo desde v2.47 y vale más que siete centésimas de cadencia. |
 | **2.97** | 12 sep 2026, 02:15 | El canal propio del comercio | **Los comerciantes salen del sorteo de §8.6 y dejan de gastar su reposo.** Un buhonero ya no puede retrasar la sucesión que ha dejado pendiente una muerte. Y no sólo devuelve la cadencia a su sitio: el comercio empuja el desenlace hacia la banda que §12.9 pide — extinción adversa 11,7 % → 15,0 % y separación 10,0 → 13,3 puntos, ambas mejores que antes de que los comerciantes existieran. De once fallos del banco a nueve. |
 | **2.96** | 12 sep 2026, 00:40 | Lo que costó meter tres plantillas | **El catálogo estaba lleno y nadie lo sabía.** Los tres comerciantes suben la cadencia de §12.9 por encima de su techo en las cuatro políticas (5,46–5,92 contra ≤5), y `forest_cut` pasa más tiempo elegible porque sale menos. Subir sus reposos para compensar silencia `feud` en el barrido corto, y se comprobó con tres valores distintos: no hay hueco. **No se toca el techo ni se ajusta a ciegas**: queda como decisión de diseño abierta con tres salidas. |
@@ -4410,6 +4411,51 @@ alimenta o con menos de cero, que la sal no cambiara nada en la matanza, que la
 sal caducada siguiera valiendo, o que los tres comerciantes acabaran moviendo
 los mismos números. Las cuatro tienen prueba y tres están verificadas por
 mutación.
+
+### 7.9 Lo que el mundo escribe en la gente
+
+Hasta v2.99 **sólo las decisiones del jugador dejaban recuerdo**. Todo lo que el
+valle hacía por su cuenta — un invierno con el granero vacío, una casa ardiendo —
+le pasaba a una población, no a una persona.
+
+Y había una prueba a la vista de que faltaba algo. Los tipos de recuerdo
+`went_hungry` y `lost_home` **tenían su epitafio escrito en el banco desde
+M-09** y ningún sistema los escribía nunca. Estaban esperando escritor desde el
+principio.
+
+| Suceso | A quién marca | Con qué peso |
+|---|---|---|
+| **Hambre** (§5.3) | A todos los que la viven y sobreviven | Según la gravedad, de `WEIGHT_MIN` al máximo |
+| **Incendio** (§5.9) | Sólo a quien tenía ahí su casa | `LOST_HOME_WEIGHT`, fijo |
+
+**La regla que gobierna esto: un recuerdo es de algo que le pasó A ALGUIEN**,
+nunca de algo que le pasó a la aldea. Si un incendio marcara a los cuarenta
+vecinos, todos acabarían cargando la misma lista de doce recuerdos idénticos y
+el sistema entero dejaría de decir nada. Por eso el fuego mira `homeId` y un
+granero ardiendo no deja a nadie sin casa.
+
+**Un recuerdo por año, no uno por semana.** El hambre se calcula cada semana y
+un mal invierno dura meses. Sin ese tope, una sola hambruna escribiría veinte
+recuerdos y expulsaría todo lo demás que esa persona hubiera vivido: §6.4 da
+doce huecos para una vida entera, no para una estación. Además es lo que una
+persona llevaría de verdad — el recuerdo es «el año que pasamos hambre», no «la
+novena semana».
+
+**Se escribe antes de que muera nadie.** Un aldeano que se muere de hambre esa
+misma semana no queda marcado y luego enterrado: los muertos tienen epitafio,
+que es otra cosa distinta.
+
+**Por qué esto importa más de lo que parece.** El valle ya tenía opiniones,
+rencores y rasgos, pero se alimentaban casi sólo del catálogo. Con esto, un
+suceso material se convierte en biografía, y la biografía es lo que §6 ya sabe
+convertir en conflicto. **Es el primer puente entre lo que le pasa a la aldea y
+lo que le pasa a la gente**, y es la dirección en la que crece todo lo demás.
+
+**Qué falsaría esto:** que una hambruna larga escribiera un recuerdo por semana,
+que un mal rato pequeño marcara igual que una hambruna, que el fuego marcara a
+quien no vivía allí, que el peso no dependiera de la gravedad, o que escribir
+recuerdos consumiera una tirada de azar. Las cinco tienen prueba y cuatro están
+verificadas por mutación.
 
 ---
 

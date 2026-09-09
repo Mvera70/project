@@ -582,6 +582,24 @@ export const TRAIT_COUNT = [3, 4] as const;
 // TUNE: §6.4 gives the table in prose and none of it reaches §12.
 // ---------------------------------------------------------------------------
 
+/**
+ * What the world leaves on people (§6.4, §7.9, v2.99). Until now only the
+ * player's decisions wrote memories; a famine or a fire happened to nobody in
+ * particular. Every number here is TUNE.
+ */
+export const SCARS = {
+  // TUNE: below this a short week is not something anyone remembers for life.
+  // §5.3's severity is 0 with a full granary and 1 with an empty one.
+  HUNGER_MIN: 0.15,
+  // TUNE: the severity at which a hunger leaves the heaviest mark it can. Well
+  // below 1: a village does not need the granary completely empty for the year
+  // to be the one people talk about.
+  HUNGER_FULL: 0.6,
+  // TUNE: losing the roof over your head. Near the top of MEMORY's range and
+  // fixed, not scaled: there are no degrees of your house burning down.
+  LOST_HOME_WEIGHT: 4,
+} as const;
+
 export const MEMORY = {
   MAX: 12, // per named villager
   WEIGHT_MIN: 1,

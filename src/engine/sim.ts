@@ -42,6 +42,7 @@ import { applySpoilage, harvest } from './subsistence/harvest';
 import { isUnexplained, updateMood } from './subsistence/mood';
 import { rollWeather } from './subsistence/seasons';
 import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
+import { scarFire } from './people/scars';
 import { destroyBuilding } from './world/buildings';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
@@ -613,6 +614,11 @@ export function tick(
     // The fire of §5.9 comes back as a description; this is where it happens.
     const fire = rollFire(state);
     if (fire !== null) {
+      // §7.9, v2.99: before the building is destroyed, because afterwards
+      // nobody's `homeId` points at it any more and there would be no way to
+      // tell whose roof it was. A granary burning marks nobody, which is right:
+      // `scarFire` only writes for whoever actually lived there.
+      scarFire(state, fire.buildingId);
       // M-14 owns the destruction: the plot becomes a ruin and whoever slept
       // there is homeless this week, which the housing factor of §5.7 reads.
       destroyBuilding(state, fire.buildingId);
