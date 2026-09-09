@@ -13,7 +13,7 @@ import { recogniseGesture, type Point } from './gestures';
 const STYLE_ID = 'valley-welcome-style';
 const STYLE = `
 .welcome-scrim { position: fixed; inset: 0; z-index: 11; display: flex; align-items: flex-end;
-  background: rgba(18,17,14,.88); color: #f2f4f6; font: 14px/1.4 system-ui, sans-serif; }
+  background: #12110e; color: #f2f4f6; font: 14px/1.4 system-ui, sans-serif; }
 .welcome { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
   padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom)); }
 .welcome h1 { margin: 0 0 14px; font: 600 20px/1.2 Georgia, serif; }

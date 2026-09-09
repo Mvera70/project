@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v2.63 · 10 de septiembre de 2026, 15:10 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v2.64 · 10 de septiembre de 2026, 16:00 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -89,6 +89,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.64** | 10 sep 2026, 16:00 | Revisión del parte de bienvenida | **La recencia gana dentro de la variedad.** Las cuatro plazas toman primero el suceso más reciente de cada tipo y después una segunda aparición como máximo. Tres cosechas ya no expulsan una llegada ni se repiten por tercera vez. Bienvenida opaca y controles ocultos bajo la encrucijada cierran el sangrado entre pantallas. |
 | **2.63** | 10 sep 2026, 15:10 | M-23 · hito 6 | **La aldea sigue sin ti, y el parte de bienvenida se entiende leído en frío — casi siempre.** Guardado, letargo y bienvenida implementados y verificados con reloj falso. Hallazgo sin arreglar: la selección de las cuatro entradas puede llenarse de cosechas seguidas y dejar fuera todo lo demás — un problema de selección, no de formato. |
 | **2.62** | 10 sep 2026, 13:20 | El reloj del navegador no es el del juego | **Ninguna animación de interfaz corre sobre el compositor.** Una transición CSS dejó el zoom a medias; el caso de prueba es el letargo, 960 ticks en dos segundos. Y `douse` gana `who`: prometía apagar el taller de B y apagaba una casa cualquiera. |
 | **2.61** | 10 sep 2026, 12:40 | M-22 · hito 2 | **La encrucijada está en pantalla y decidir cambia el valle.** El precio de las tres opciones se lee sin desplazar a 390 px reales. Sin coordenada natural: `douse` sobre una clase con más de una en pie, `gather ford` y `scar felled_wood` — los tres caen al centro de la aldea, igual que el estandarte. |
@@ -108,6 +109,29 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.47** | 10 sep 2026, 00:30 | Cierre de fase | **Las dos plantillas muertas se arreglan** (`forest_cut` pedía un bosque imposible; `relic_pedlar` abandonaba su franja de fe para siempre). Y se cierra la fase de balance: **dos hipótesis falsadas seguidas significan que falta evidencia, no otra hipótesis.** Siguiente hito, el render. |
 | **2.46** | 9 sep 2026, 23:50 | La hipótesis falsada, la auditoría completa | **La capacidad no es el palanca — al menos no así.** Campos en pie a mediana 8 en las cuatro políticas, `worst` incluido: la aldea reconstruye tan rápido como `fight_them` destruye. Auditoría de la aldea madura, 17 plantillas: `forest_cut` pide más bosque del que el mapa puede generar nunca — descuido puro, no maduración. |
 | **2.44** | 9 sep 2026, 21:40 | El banco que termina | **60 × 200 × 4, sin interrupción.** `story` compone por fuerza, no por producto — implementado. `worst` termina el 10,0 %, la horquilla es de 8,3 puntos: ni el bucle ni el instrumento; el catálogo. `forest_cut` a cero en 240 partidas. El banco cruza el presupuesto: 638,4 s. |
+
+### 2.64 — Cuatro plazas para contar una ausencia
+
+El parte selecciona primero la entrada más reciente de cada `ChronicleKind`,
+recorriendo la ausencia desde el final. Si hubo menos de cuatro tipos, admite
+una segunda aparición reciente de cada uno, nunca una tercera; después ordena
+lo elegido de antiguo a nuevo para leerlo. Así la recencia sigue decidiendo
+entre sucesos equivalentes y una plaza vacía cuesta menos que un tercer eco.
+
+El caso que destapó v2.63 queda convertido en prueba: tres cosechas consecutivas,
+una llegada y una obra producen obra, llegada y las dos cosechas más recientes.
+Si la ausencia solo produjo cosechas, se muestran las dos más recientes: la
+regla no inventa diversidad para completar una cuota que §9.2 define como tope.
+
+La bienvenida cubre ahora de forma opaca cualquier encrucijada pendiente que
+deba reaparecer al cerrarla. La encrucijada conserva el valle atenuado que pide
+§11.2, pero oculta los controles de velocidad mientras ocupa la pantalla; al
+resolverla o reducirla a su marcador los restaura.
+
+**Qué habría falsado este cierre:** perder la entrada más reciente de un tipo,
+cambiar el orden narrativo, mostrar una tercera entrada del mismo tipo, o
+dejar controles u otra pantalla legibles bajo un overlay. El caso sintético y
+la reapertura Playwright comprueban esos cuatro bordes.
 
 ### 2.63 — La aldea sigue sin ti
 
@@ -3548,7 +3572,10 @@ que es exactamente lo que pasó en la primera lectura del hito 0.
 
 El **parte de bienvenida** al volver de una ausencia muestra, como máximo: el
 titular de peso 3 más reciente, hasta 4 entradas de peso 2, y un resumen
-numérico de lo que cambió (gente, edificios levantados o perdidos).
+numérico de lo que cambió (gente, edificios levantados o perdidos). Las cuatro
+plazas toman primero el suceso más reciente de cada `ChronicleKind`; si quedan
+plazas, se completan con una segunda aparición reciente de cada tipo, nunca una
+tercera. El resultado se lee en orden cronológico.
 
 ### 9.3 Regla de escritura
 
