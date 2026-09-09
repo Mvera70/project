@@ -61,6 +61,10 @@ describe('rng · reproducibilidad', () => {
       // v2.94: y `murrain` (§7.7) igual. Once flujos y ninguno de los diez
       // primeros se ha movido jamás al añadir los dos últimos.
       murrain: 4187293312,
+      // v2.97: y `traders`, el canal propio del comercio (7.8). Doce flujos, y
+      // los diez originales siguen intactos: anadir sistemas nunca ha movido
+      // una sola partida guardada.
+      traders: 3753186201,
     });
   });
 

@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **2.97** | 12 sep 2026, 02:15 | El canal propio del comercio | **Los comerciantes salen del sorteo de §8.6 y dejan de gastar su reposo.** Un buhonero ya no puede retrasar la sucesión que ha dejado pendiente una muerte. Y no sólo devuelve la cadencia a su sitio: el comercio empuja el desenlace hacia la banda que §12.9 pide — extinción adversa 11,7 % → 15,0 % y separación 10,0 → 13,3 puntos, ambas mejores que antes de que los comerciantes existieran. De once fallos del banco a nueve. |
 | **2.96** | 12 sep 2026, 00:40 | Lo que costó meter tres plantillas | **El catálogo estaba lleno y nadie lo sabía.** Los tres comerciantes suben la cadencia de §12.9 por encima de su techo en las cuatro políticas (5,46–5,92 contra ≤5), y `forest_cut` pasa más tiempo elegible porque sale menos. Subir sus reposos para compensar silencia `feud` en el barrido corto, y se comprobó con tres valores distintos: no hay hueco. **No se toca el techo ni se ajusta a ciegas**: queda como decisión de diseño abierta con tres salidas. |
 | **2.95** | 11 sep 2026, 23:30 | M-30 · los comerciantes del camino | **§7.8 nueva: el mundo exterior deja de ser mudo, y llega andando.** No hay pueblos vecinos en el mapa y no los habrá: lo que la aldea sabe de fuera es quién entra en ella. Tres comerciantes, una estación cada uno, y cada uno toca un sistema distinto — el tratante mueve el rebaño de §7.7, el salinero cambia lo que vale una matanza, el factor compra el excedente y paga en ser visto. Categoría `trade` y efecto `herd` nuevos en el DSL de §8.4. |
 | **2.94** | 11 sep 2026, 21:15 | M-29 · la peste del ganado | **Lo que al rebaño le faltaba: miedo.** Hasta ahora un rebaño grande solo costaba grano; ahora también enferma, y cuanto más apretado está el corral más probable es. Construida a imagen de la plaga de §5.8, con el pozo protegiendo igual que protege a las personas, que era el segundo motivo que le faltaba a ese edificio. Flujo `murrain` propio: añadir la enfermedad no desplaza ni un lobo de una partida ya guardada. |
@@ -4314,6 +4315,9 @@ se probó con tres pares de valores distintos (25/30/20, 28/32/22, 30/35/25) con
 el mismo resultado en los tres. El catálogo estaba en un equilibrio más ajustado
 de lo que nadie había escrito.
 
+**Se tomó la primera, y el resultado está más abajo.** Lo que sigue se conserva
+porque las tres opciones se midieron contra ella.
+
 **Tres salidas, y son excluyentes:**
 
 1. **Los comerciantes dejan de competir.** Canal propio con su ritmo, fuera del
@@ -4330,6 +4334,50 @@ de lo que nadie había escrito.
 **Lo que NO se hace:** ajustar reposos y pesos a ojo hasta que las once pruebas
 del banco se pongan verdes. Eso es buscar la combinación que pasa el examen en
 vez de decidir qué ritmo debe tener el juego.
+
+#### El canal propio (v2.97 · construido y medido)
+
+Los comerciantes **salen del sorteo de §8.6 y no gastan su reposo**. Siguen en
+el catálogo para que la resolución, los textos y el guardado funcionen igual,
+pero `eligible()` no los mira y `lastCrossroadTick()` no los cuenta. Tienen
+reloj propio (`lastTradeTick`), flujo de azar propio (`traders`) y un
+seleccionador aparte, `selectTrader`, deliberadamente mucho más simple: sin
+exención de crisis, sin garantía por generación, sin novedad. **Un comerciante
+es una oferta, no un dilema que la aldea tenga derecho a que le planteen.**
+
+Dos reglas lo hacen un canal y no un segundo catálogo:
+
+- **Nunca llega con una pregunta sin responder.** Una aldea que está decidiendo
+  algo es una aldea por la que el buhonero pasa de largo.
+- **Nunca llega en crisis.** Hay hambruna; no se compra sal.
+
+| Medida | Sin comerciantes | En el catálogo | Con canal propio | Banda |
+|---|---|---|---|---|
+| Cadencia media, `prudent` | pasaba | 5,51 | **pasa** | 1–5 |
+| Cadencia media, `first` | pasaba | 5,70 | **pasa** | 1–5 |
+| Cadencia media, `worst` | pasaba | 5,92 | 5,07 | 1–5 |
+| Cadencia máxima, `last` | pasaba | — | 7,59 | ≤ 7 |
+| Extinción con `worst` | 11,7 % | 11,7 % | **15,0 %** | ≥ 25 % |
+| Separación `prudent`–`worst` | 10,0 pts | 10,0 pts | **13,3 pts** | ≥ 20 pts |
+| `forest_cut` elegible, `worst` | 4,39 % | 6,29 % | 4,52 % | < 1 % |
+
+Once fallos del banco pasan a nueve, y los siete de siempre —los que v2.47 dejó
+fuera de banda— siguen siendo los mismos. **Lo que no se esperaba es que el
+comercio empujara el desenlace en la dirección correcta**: la extinción adversa
+y la separación quedan mejor que antes de que los comerciantes existieran. La
+explicación más probable es que vender el excedente cuesta `watched`, y una
+aldea vigilada recibe más presión del señor; pero eso es una hipótesis y no está
+medida por separado.
+
+**Quedan dos al borde y se dicen en voz alta:** la cadencia media con `worst` en
+5,07 contra un techo de 5, y una semilla suelta de `last` en 7,59 contra 7. No
+están dentro. Alargar el reposo entre comerciantes es la palanca obvia y es un
+parámetro del contenido nuevo, no del balance cerrado.
+
+**Efecto secundario que conviene recordar:** el banco de cobertura de
+`tests/fast/catalog.test.ts` **reimplementa el tick por su cuenta** y no vio el
+canal nuevo hasta que se le añadió a mano. Cualquier paso futuro del tick tiene
+que tocar los dos sitios, y esa duplicación es deuda.
 
 **Qué falsaría esto:** que un trato dejara a la aldea con más cabezas de las que
 alimenta o con menos de cero, que la sal no cambiara nada en la matanza, que la

@@ -314,6 +314,24 @@ export const ANIMALS = {
 } as const;
 
 /**
+ * The traders' own clock (§7.8, v2.97). They do not compete for §8.6's decision
+ * budget and do not spend its rest: a pedlar at the door is not a disputed
+ * succession and must not take its turn. So they get a channel of their own,
+ * and a pace of their own that is measured separately.
+ */
+export const TRADE = {
+  // TUNE: years between one trader and the next, on their own clock. Long
+  // enough that a trader is an event; short enough that a player sees more
+  // than one in a lifetime.
+  MIN_YEARS_BETWEEN: 18,
+  // TUNE: weekly chance of somebody coming up the road, drawn only on the
+  // weeks where a trader could actually arrive — the right season, a village
+  // big enough, no crisis on. Over the twelve weeks of one season that is
+  // about one chance in three, so a trader is likely but never a metronome.
+  ARRIVE_CHANCE: 0.035,
+} as const;
+
+/**
  * Murrain, the cattle plague (§7.7, v2.94). Built in the image of §5.8's human
  * plague, because it is the same kind of thing: a base annual chance plus a
  * term for how much there is to catch it, halved by clean water.

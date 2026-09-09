@@ -49,7 +49,7 @@ import { fellForest, fellForestWithLocation, regrowForest } from './world/forest
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, upgradePaths } from './world/paths';
 import { holderOf, ratioOf } from './crossroads/conditions';
-import { selectCrossroad } from './crossroads/select';
+import { selectCrossroad, selectTrader } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
 import { fireSeeds } from './crossroads/seeds';
 import type {
@@ -932,9 +932,14 @@ export function tick(
   driftOpinions(state);
 
   // ---- 15 · CROSSROAD ------------------------------------------------------
+  // §7.8, v2.97: two channels, and the order matters. The catalogue asks first
+  // because its questions are the village's own — a famine, a succession, a
+  // feud — and a trader must never take that turn. Only if nothing was asked
+  // does anyone come up the road to sell, on the traders' own clock, which
+  // `lastCrossroadTick` does not see.
   let posed: string | null = null;
   if (state.crossroad === null && state.ended === null) {
-    const next = selectCrossroad(state, catalogue);
+    const next = selectCrossroad(state, catalogue) ?? selectTrader(state, catalogue);
     if (next !== null) {
       state.crossroad = next;
       posed = next.templateId;

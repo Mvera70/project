@@ -9,6 +9,11 @@ import { ANIMALS, TIME } from '@engine/balance';
 import { BANK, CROSSROAD_BANK } from '@engine/chronicle/bank.en';
 import { CATALOG, TRADE_TEMPLATES } from '@engine/crossroads/catalog';
 import { applyEffect } from '@engine/crossroads/resolve';
+import {
+  crisisOf, eligible, lastCrossroadTick, lastTradeTick, selectTrader,
+} from '@engine/crossroads/select';
+import { all } from '@engine/crossroads/conditions';
+import { fillCast } from '@engine/crossroads/cast';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { herdCapacity } from '@engine/subsistence/herd';
@@ -97,7 +102,11 @@ describe('el trato mueve el rebaño · §7.8', () => {
 });
 
 describe('la sal cumple lo que promete · §7.8', () => {
-  it('con sal, la misma matanza da más comida', () => {
+  it('con sal, cada res cunde más y hace falta matar menos', () => {
+    // v2.97: esta prueba medía antes la carne TOTAL de la semana, y eso es la
+    // métrica equivocada — con sal se para de matar antes, así que el total
+    // puede salir menor. Lo que la sal salva son cabezas, y eso es lo que se
+    // mide aquí.
     const make = (): GameState => {
       const s = village(20);
       s.village.grain = 0;
@@ -106,14 +115,25 @@ describe('la sal cumple lo que promete · §7.8', () => {
     };
 
     const plain = make();
-    const plainMeat = consume(plain).herd.meat;
+    consume(plain);
 
     const salted = make();
     salted.flags['salted'] = salted.tick + 5 * TIME.WEEKS_PER_YEAR;
-    const saltedMeat = consume(salted).herd.meat;
+    consume(salted);
 
-    expect(saltedMeat).toBeGreaterThan(plainMeat);
-    expect(saltedMeat).toBeCloseTo(plainMeat * ANIMALS.SALTED_MEAT);
+    expect(salted.herd.pigs).toBeGreaterThan(plain.herd.pigs);
+  });
+
+  it('una sola res salada alimenta más que una sin salar', () => {
+    // La misma regla vista de cerca: una cabeza, y lo que rinde.
+    const one = (flagged: boolean): number => {
+      const s = village(20);
+      s.village.grain = 0;
+      s.herd = { hens: 0, pigs: 1, cows: 0 };
+      if (flagged) s.flags['salted'] = s.tick + 5 * TIME.WEEKS_PER_YEAR;
+      return consume(s).herd.meat;
+    };
+    expect(one(true)).toBeCloseTo(one(false) * ANIMALS.SALTED_MEAT);
   });
 
   it('la sal caducada ya no vale', () => {
@@ -128,6 +148,7 @@ describe('la sal cumple lo que promete · §7.8', () => {
     plain.herd = { hens: 0, pigs: 4, cows: 0 };
 
     expect(consume(state).herd.meat).toBeCloseTo(consume(plain).herd.meat);
+    expect(state.herd.pigs).toBe(plain.herd.pigs);
   });
 });
 
@@ -165,6 +186,128 @@ describe('son tres personas distintas · §7.8', () => {
     const sell = TRADE_TEMPLATES.find((t) => t.id === 'grain_factor')!
       .options.find((o) => o.id === 'sell_the_surplus')!;
     expect(sell.effects).toContainEqual({ k: 'flag', flag: 'watched', years: 15 });
+  });
+});
+
+/**
+ * Una aldea en primavera, con la despensa llena y sin crisis: el estado exacto
+ * en que el tratante de ganado puede llamar a la puerta. Las dos pruebas que
+ * comprueban que NO llega necesitan partir de aquí, o pasarían por el motivo
+ * equivocado — y de hecho pasaban, hasta que una mutación lo destapó.
+ */
+function driverWelcome(): GameState {
+  const state = village(20);
+  state.tick = Math.floor(state.tick / TIME.WEEKS_PER_YEAR) * TIME.WEEKS_PER_YEAR + 2;
+  state.village.grain = 6000;
+  state.village.morale = 70;
+  delete state.flags['hostile'];
+  // Sin pregunta pendiente y sin comerciante reciente: las dos cosas que el
+  // canal comprueba antes que nada. Una aldea de veinte anos puede llegar aqui
+  // con cualquiera de las dos puestas, y entonces el escenario no probaria lo
+  // que dice probar.
+  state.crossroad = null;
+  state.history = state.history.filter((d) => !TRADE_TEMPLATES.some((t) => t.id === d.templateId));
+  return state;
+}
+
+/**
+ * ¿Llega alguien en 500 intentos? El canal tira un dado del 3,5 % cada semana,
+ * así que una sola llamada devuelve `null` casi siempre y no prueba nada.
+ */
+function arrives(state: GameState): boolean {
+  for (let n = 0; n < 500; n += 1) {
+    if (selectTrader(state, CATALOG) !== null) return true;
+  }
+  return false;
+}
+
+describe('el canal propio · §7.8, v2.97', () => {
+  it('el estado de partida de estas pruebas deja pasar de verdad al tratante', () => {
+    // Sin esto, las dos pruebas siguientes no valen nada: comprobarían que no
+    // llega nadie en un estado donde no podía llegar nadie de todos modos.
+    const state = driverWelcome();
+    expect(crisisOf(state)).toBeNull();
+    const drover = TRADE_TEMPLATES.find((t) => t.id === 'cattle_drover')!;
+    expect(all(drover.requires, state)).toBe(true);
+    // Y su reparto se puede cubrir: si no, quedaría fuera del sorteo por una
+    // razón que no es la que estas pruebas quieren medir.
+    expect(fillCast(drover, state)).not.toBeNull();
+    // Y de hecho llega, si se le da la oportunidad suficientes veces. Sin
+    // esto, todas las pruebas de «no llega» de aquí abajo pasarían solas: el
+    // dado del canal dice que no el 96 % de las semanas.
+    expect(arrives(driverWelcome())).toBe(true);
+  });
+
+  it('un comerciante no cuenta como encrucijada para el reposo de §8.6', () => {
+    // Lo esencial de todo el canal: que un buhonero no retrase la siguiente
+    // pregunta de la aldea ni un solo tick.
+    const state = village(20);
+    const before = lastCrossroadTick(state);
+    state.history.push({
+      tick: state.tick, templateId: 'cattle_drover', optionId: 'buy_the_cow',
+      cast: {},
+    });
+    expect(lastCrossroadTick(state)).toBe(before);
+    // Pero sí cuenta para el reloj de los comerciantes.
+    expect(lastTradeTick(state)).toBe(state.tick);
+  });
+
+  it('una encrucijada normal sí mueve el reposo', () => {
+    // El contraste, para que la prueba anterior signifique algo.
+    const state = village(20);
+    state.history.push({
+      tick: state.tick, templateId: 'strangers_at_the_ford', optionId: 'take_them_in',
+      cast: {},
+    });
+    expect(lastCrossroadTick(state)).toBe(state.tick);
+    expect(lastTradeTick(state)).toBeLessThan(state.tick);
+  });
+
+  it('los comerciantes no entran en el sorteo del catálogo', () => {
+    // Con sus condiciones cumplidas y todo: si entraran ahí, volverían a
+    // quitarle el turno a una hambruna, que es justo lo que v2.96 midió.
+    const state = driverWelcome();
+    const ids = new Set(eligible(state, CATALOG).map((c) => c.template.id));
+    for (const t of TRADE_TEMPLATES) expect(ids.has(t.id), t.id).toBe(false);
+  });
+
+  it('nadie sube a vender con una encrucijada sin responder', () => {
+    const state = driverWelcome();
+    state.crossroad = {
+      templateId: 'strangers_at_the_ford', posedTick: state.tick, cast: {}, optionIds: [],
+    };
+    expect(arrives(state)).toBe(false);
+  });
+
+  it('nadie sube a vender en plena crisis', () => {
+    // Partiendo de un estado donde el tratante SÍ podría llegar, y añadiendo
+    // sólo la crisis: así lo que se mide es la crisis y no otra cosa. Con
+    // hambre de verdad no valdría, porque entonces tampoco se cumplirían las
+    // condiciones del propio tratante.
+    const state = driverWelcome();
+    state.flags['threatened'] = 0;
+    expect(crisisOf(state)).not.toBeNull();
+    expect(arrives(state)).toBe(false);
+  });
+
+  it('dos comerciantes no se pisan: hay un reposo entre ellos', () => {
+    const state = driverWelcome();
+    state.history.push({
+      tick: state.tick, templateId: 'salt_carrier', optionId: 'buy_the_salt',
+      cast: {},
+    });
+    expect(arrives(state)).toBe(false);
+  });
+
+  it('el canal tira sólo de su propio flujo de azar', () => {
+    // §4.3: que venga o no venga un comerciante no puede desplazar una muerte.
+    const state = village(20);
+    const before = { ...state.rng };
+    for (let n = 0; n < 50; n += 1) selectTrader(state, CATALOG);
+    for (const stream of Object.keys(before) as (keyof typeof before)[]) {
+      if (stream === 'traders' || stream === 'cast') continue;
+      expect(state.rng[stream], stream).toBe(before[stream]);
+    }
   });
 });
 

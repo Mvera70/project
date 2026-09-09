@@ -33,7 +33,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import type { AppliedEffects } from '@engine/crossroads/schema';
 import { fillVacancies } from '@engine/sim';
 import { advanceWorks } from '@engine/world/works';
-import { selectCrossroad } from '@engine/crossroads/select';
+import { selectCrossroad, selectTrader } from '@engine/crossroads/select';
 import { applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds } from '@engine/crossroads/seeds';
 import { fellForest } from '@engine/world/forest';
@@ -136,7 +136,10 @@ function tick(s: GameState): void {
   resolveBirths(s, ctx);
   driftOpinions(s);
   if (s.crossroad === null) {
-    const posed = selectCrossroad(s, CATALOG);
+    // Los dos canales de §7.8, en el mismo orden que el paso 15 de sim.ts:
+    // primero las preguntas de la aldea, y solo si no hay ninguna, quien
+    // venga por el camino a vender.
+    const posed = selectCrossroad(s, CATALOG) ?? selectTrader(s, CATALOG);
     if (posed) s.crossroad = posed;
   }
 }
