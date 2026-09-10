@@ -67,9 +67,13 @@ export async function createGraphicsRenderer(
 
   // Only the villager, and only because that is all the catalogue holds. Loading
   // the whole of it to show one asset is the waste D.9 asks the pilot not to do.
-  const library: AssetLibrary = await loadAssets({
-    baseUrl: options.assetBaseUrl, wanted: [VILLAGER],
-  });
+  //
+  // A library brought by the caller belongs to the caller, so `dispose` leaves
+  // it alone: freeing something we were lent would take it out from under
+  // whoever else is using it.
+  const borrowed = options.library !== undefined;
+  const library: AssetLibrary = (options.library as AssetLibrary | undefined)
+    ?? await loadAssets({ baseUrl: options.assetBaseUrl, wanted: [VILLAGER] });
   const villager = library.get(VILLAGER);
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
@@ -257,7 +261,7 @@ export async function createGraphicsRenderer(
         ground.dispose();
         ground = null;
       }
-      library.dispose();
+      if (!borrowed) library.dispose();
       lastActors = [];
       renderer.dispose();
       renderer.forceContextLoss();

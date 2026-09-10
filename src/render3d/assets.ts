@@ -12,7 +12,7 @@
 // take the geometry of every other villager with them.
 
 import type { AnimationClip, Object3D } from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { Mesh, type Material, type Texture } from 'three';
 
@@ -102,14 +102,29 @@ export interface AssetOptions {
   readonly wanted?: readonly string[];
   /** Overridable so tests can drive the loader without a network. */
   readonly fetcher?: typeof fetch;
+  /**
+   * GLB bytes already in hand, by asset id. Anything found here is parsed
+   * instead of fetched.
+   *
+   * A published single-file page has no server to fetch from, and neither does
+   * a test. The alternative was a `data:` URL, which asks the loader to fetch
+   * something it already has and depends on a content policy allowing it.
+   */
+  readonly bytes?: Readonly<Record<string, ArrayBuffer>>;
+  /** The manifest itself, when it travels with the page instead of beside it. */
+  readonly manifest?: unknown;
 }
 
 export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
   const base = options.baseUrl.endsWith('/') ? options.baseUrl : `${options.baseUrl}/`;
   const get = options.fetcher ?? fetch;
-  const response = await get(`${base}manifest.json`);
-  if (!response.ok) throw new Error(`No asset manifest at ${base}manifest.json (${response.status}).`);
-  const manifest = parseManifest(await response.json());
+  const manifest = options.manifest === undefined
+    ? await (async (): Promise<AssetManifest> => {
+      const response = await get(`${base}manifest.json`);
+      if (!response.ok) throw new Error(`No asset manifest at ${base}manifest.json (${response.status}).`);
+      return parseManifest(await response.json());
+    })()
+    : parseManifest(options.manifest);
 
   const wanted = options.wanted === undefined
     ? manifest.assets
@@ -121,10 +136,17 @@ export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
     // Deliberately sequential. A phone loading six GLBs at once competes with
     // itself for the same decode budget, and D.9 asks the pilot to spend a
     // budget rather than to grab.
-    const gltf = await loader.loadAsync(`${base}${asset.file}`).catch((error: unknown) => {
-      const cause = error instanceof Error ? error.message : String(error);
-      throw new Error(`Could not load '${asset.id}' from ${base}${asset.file}: ${cause}`);
-    });
+    const held = options.bytes?.[asset.id];
+    const gltf = held === undefined
+      ? await loader.loadAsync(`${base}${asset.file}`).catch((error: unknown) => {
+        const cause = error instanceof Error ? error.message : String(error);
+        throw new Error(`Could not load '${asset.id}' from ${base}${asset.file}: ${cause}`);
+      })
+      : await new Promise<GLTF>((done, fail) => {
+        loader.parse(held, '', done, (error) => {
+          fail(new Error(`Could not parse '${asset.id}': ${error.message}`));
+        });
+      });
     loaded.set(asset.id, {
       id: asset.id,
       original: gltf.scene,

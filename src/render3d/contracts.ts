@@ -34,6 +34,26 @@ export interface GraphicsRendererOptions {
   readonly canvas: HTMLCanvasElement;
   readonly assetBaseUrl: string;
   readonly quality: 'low' | 'standard';
+  /**
+   * G-06 · Una biblioteca de recursos ya cargada, si el llamante la trae.
+   *
+   * Por defecto el renderer carga la suya desde `assetBaseUrl` y la suelta al
+   * disponerse. Con esto, el llamante la trae y **el llamante la posee**: el
+   * renderer no la suelta, porque no es suya. D.5 pide que los recursos
+   * compartidos tengan dueño explícito y éste es el caso en que el dueño está
+   * fuera.
+   *
+   * Existe por dos sitios que no tienen servidor del que pedir: una página
+   * publicada de una sola pieza, y una prueba.
+   */
+  readonly library?: AssetLibrary;
+}
+
+/** Lo que el renderer necesita de una biblioteca de recursos. Ver `assets.ts`. */
+export interface AssetLibrary {
+  get(id: string): { readonly id: string; readonly clips: readonly unknown[] } | undefined;
+  instance(id: string): unknown;
+  dispose(): void;
 }
 
 export declare function createGraphicsRenderer(
