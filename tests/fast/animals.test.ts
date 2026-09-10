@@ -224,6 +224,33 @@ describe('la fauna · §7.7', () => {
     }
   });
 
+  it('la bandada depende de la vigilancia, no sólo de los campos', () => {
+    // §7.7 descuenta la vigilancia del mordisco desde v2.93 y en la imagen no
+    // se notaba. Ahora sí, aunque **en una partida corriente casi no se ve**:
+    // los guardas se sirven de los brazos que sobran antes que nadie, así que
+    // la cobertura suele estar al máximo y la bandada sale siempre reducida.
+    // Se comprueba la regla, no un escenario que casi nunca ocurre.
+    const state = village(60);
+    atWeek(state, TIME.HARVEST_WEEK - 2);
+    const fields = state.buildings.filter((b) => b.kind === 'field' && b.lostTick === null);
+    const flock = Math.min(
+      Math.floor(fields.length / ANIMALS.FIELDS_PER_CROW), ANIMALS.CROWS_MAX,
+    );
+    const seen = wildlifePositions(state, 0.45).filter((a) => a.kind === 'crow').length;
+
+    expect(flock, 'la aldea grande tiene bandada').toBeGreaterThan(1);
+    expect(seen, 'y con guardas se ven menos de los que serían').toBeLessThan(flock);
+  });
+
+  it('pero vigilar espanta, no borra: siempre queda alguno', () => {
+    // Un campo sin un solo pájaro en agosto se lee como un campo muerto.
+    const state = village(20);
+    atWeek(state, TIME.HARVEST_WEEK - 2);
+    state.village.grain = 50_000;
+    expect(wildlifePositions(state, 0.45).filter((a) => a.kind === 'crow').length)
+      .toBeGreaterThan(0);
+  });
+
   it('la fauna también es determinista', () => {
     expect(wildlifePositions(village(20), 0.45)).toEqual(wildlifePositions(village(20), 0.45));
   });

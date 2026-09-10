@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.12** | 12 sep 2026, 23:20 | Los guardas espantan cuervos de verdad | **Mandabas gente a espantar pájaros y veías los mismos pájaros.** §7.7 descontaba la vigilancia del mordisco desde v2.93 y en la imagen no se notaba. Con un hallazgo anotado: en una partida corriente la cobertura está casi siempre al máximo, así que la diferencia apenas se ve. |
 | **3.11** | 12 sep 2026, 22:40 | La densidad, medida contra el veredicto | **El problema que abrió §11.6 está resuelto y se puede enseñar.** La primera sesión humana veía entre 0,0 y 0,6 sucesos notables en cinco minutos. Ahora son **2,8 a ×1** y 21 a ×4. Algo digno de contarse cada dos minutos a velocidad normal, donde antes cabía una sesión entera sin nada. |
 | **3.10** | 12 sep 2026, 22:00 | El banco después de la vida nueva | **`forest_cut` entra en banda por primera vez desde v2.47** — el invierno en el bosque hizo lo que años de ajustes no consiguieron. A cambio `smith_feud` pasa de fallar en una política a fallar en las cuatro, y la extinción adversa vuelve de 15,0 % a 11,7 %. El tiempo del banco baja de 43 a **18,1 min**, todavía por encima de los 15. Diez fallos. |
 | **3.09** | 12 sep 2026, 20:15 | La convivencia, y el freno que hacía falta | **Todas las fuerzas sobre las opiniones empujaban hacia abajo**, así que un valle largo acababa siendo siempre un valle de gente que no se aprecia. Trabajar en el mismo sitio ahora acerca. Y se destapa un bucle: sin freno, las riñas pasaron de 21 a **224** en cinco partidas, porque cada una hundía la opinión y los enemigos no trabajan juntos. |
@@ -5454,6 +5455,25 @@ estado nuevo — el recuerdo que dejó la última riña hace de marca de tiempo.
 Dieciocho es lo que había antes de que la convivencia existiera (21), así que el
 equilibrio se conserva: la aldea tiene ahora afectos **y** enemistades, y ni una
 cosa ni la otra se desbocan.
+
+#### Los guardas se ven (v3.12)
+
+§7.7 descuenta la vigilancia del mordisco de los cuervos desde v2.93, y en la
+imagen no se notaba: mandabas gente a espantar pájaros y veías exactamente los
+mismos pájaros. Ahora la bandada mengua con la cobertura.
+
+**Vigilar espanta, no borra.** Con vigilancia completa queda el 40 % de la
+bandada: un guarda ahuyenta cuervos, no los saca del valle, y un campo sin un
+solo pájaro en agosto se lee como un campo muerto.
+
+**Hallazgo anotado, y descoloca un poco:** en una partida corriente **la
+cobertura está casi siempre al máximo**. Los guardas se sirven de los brazos
+que sobran antes que el bosque y las obras, así que rara vez faltan. Dos intentos
+de prueba lo destaparon — uno variaba la despensa, que no toca la vigilancia, y
+otro vaciaba la aldea, que baja los campos trabajados y la vigilancia necesaria
+a la vez. La regla está bien puesta; lo que casi no ocurre es el escenario en
+que se nota. Si alguna vez se quiere que se note, hay que hacer que los guardas
+compitan de verdad con algo.
 
 #### La densidad, contra el veredicto que la motivó (v3.11)
 

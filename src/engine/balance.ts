@@ -298,6 +298,10 @@ export const ANIMALS = {
   // reaping of week 35 (§5.1) are when there is something on the field worth
   // taking.
   CROW_WEEKS_BEFORE_HARVEST: 6,
+  // TUNE (11.9, v3.12): qué parte de la bandada espanta una vigilancia
+  // completa. No todos: un guarda ahuyenta cuervos, no los borra del valle, y
+  // un campo sin un solo pájaro en agosto se lee como un campo muerto.
+  CROW_SCARED: 0.6,
   // --- Mechanics (§7.7, v2.91). These DO move numbers of the game. -------
   //
   // TUNE: §12 had no livestock. Sized against FOOD.GRAIN_PER_PERSON = 1.0 so

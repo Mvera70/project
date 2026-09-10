@@ -13,6 +13,8 @@
 import { ANIMALS, TIME } from '@engine/balance';
 import type { Building, GameState } from '@engine/state';
 import { standing, valleyCore } from './anchors';
+import { allocateLabour } from '@engine/subsistence/labour';
+import { wardensWanted } from '@engine/subsistence/crows';
 import { TERRAIN_CODE } from '@engine/state';
 import { seasonOf, weekOf } from '@engine/time';
 
@@ -147,6 +149,24 @@ function nearbyCells(state: GameState, terrain: number, range: number, limit: nu
   return found.slice(0, limit).map((item) => item.cell);
 }
 
+const COVER = new WeakMap<GameState, { tick: number; share: number }>();
+
+/**
+ * Qué parte de los campos está vigilada esta semana, de 0 a 1.
+ *
+ * Se cachea por tick: `allocateLabour` es puro pero no es gratis, y esto se
+ * pregunta en cada pintada, sesenta veces por segundo.
+ */
+function wardenCover(state: GameState): number {
+  const known = COVER.get(state);
+  if (known !== undefined && known.tick === state.tick) return known.share;
+  const a = allocateLabour(state);
+  const wanted = wardensWanted(state, a.workedFields);
+  const share = wanted <= 0 ? 0 : Math.max(0, Math.min(1, a.wardens / wanted));
+  COVER.set(state, { tick: state.tick, share });
+  return share;
+}
+
 /**
  * The wildlife, §7.7. Cosmetic like the herd — a crow eats no grain yet and a
  * wolf takes no cow — but on their own clocks, which is the point: they are
@@ -179,7 +199,14 @@ export function wildlifePositions(state: GameState, tickFraction: number): Anima
     const fields = state.buildings
       .filter((b) => b.kind === 'field' && b.lostTick === null)
       .sort((a, b) => a.id - b.id);
-    const crows = Math.min(Math.floor(fields.length / ANIMALS.FIELDS_PER_CROW), ANIMALS.CROWS_MAX);
+    // §11.9, v3.12: si la aldea ha puesto guardas, hay menos cuervos. §7.7
+    // descuenta su vigilancia del mordisco desde v2.93 y en la imagen no se
+    // notaba: mandabas gente a espantar pájaros y veías exactamente los mismos
+    // pájaros. Ahora pagar guardas se ve, que es lo que convierte una regla en
+    // una decisión.
+    const watched = wardenCover(state);
+    const flock = Math.min(Math.floor(fields.length / ANIMALS.FIELDS_PER_CROW), ANIMALS.CROWS_MAX);
+    const crows = Math.max(0, Math.round(flock * (1 - watched * ANIMALS.CROW_SCARED)));
     for (let n = 0; n < crows; n += 1) {
       const field = fields[n * ANIMALS.FIELDS_PER_CROW] as Building;
       place('crow', field.x + field.w * 0.5, field.y + field.h * 0.4);
