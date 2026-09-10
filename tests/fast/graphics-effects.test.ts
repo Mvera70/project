@@ -21,7 +21,8 @@ import { PALETTES, paletteFor } from '@render/palette';
 import { tellsFor } from '@render/layers/tells';
 import { Tells } from '../../src/render3d/effects/tells';
 import { cellColour } from '../../src/render3d/world/ground';
-import { groundSignature, planFor } from '../../src/render3d/world/plan';
+import { TIME } from '@engine/balance';
+import { groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
 
 const grown = new Map<string, GameState>();
@@ -213,6 +214,46 @@ describe('G-08 · las consecuencias', () => {
     expect(tells.count).toBeGreaterThan(built);
     tells.dispose();
     expect(tells.count).toBe(0);
+  });
+
+  it('el campo se ve segado después de la cosecha y sembrado antes', () => {
+    // G-08 pide consecuencias visibles y ésta es la mas grande del año: la
+    // semana de la siega el valle cambia de color en todas sus parcelas. La
+    // regla sale de la misma semana en la que el motor recoge el grano.
+    const state = village(14);
+    const fieldAt = (week: number): string | null => {
+      const moment = atTick(state, week);
+      const parcel = planFor(moment).buildings.find((building) => building.kind === 'field');
+      return parcel?.asset ?? null;
+    };
+    expect(fieldAt(TIME.HARVEST_WEEK - 1)).toBe('field');
+    expect(fieldAt(TIME.HARVEST_WEEK)).toBe('field-cut');
+    expect(fieldAt(TIME.HARVEST_WEEK + 6)).toBe('field-cut');
+    expect(fieldAt(2)).toBe('field-cut');
+    expect(fieldAt(20)).toBe('field');
+  });
+
+  it('y ese cambio pide reconstruir el campo, no el pueblo entero', () => {
+    const state = village(14);
+    const before = planFor(atTick(state, TIME.HARVEST_WEEK - 1));
+    const after = planFor(atTick(state, TIME.HARVEST_WEEK));
+    const change = planChange(before, after);
+    expect(change.added.length).toBe(0);
+    expect(change.removed.length).toBe(0);
+    expect(change.changed.length).toBeGreaterThan(0);
+    for (const building of change.changed) expect(building.kind).toBe('field');
+  });
+
+  it('una ruina no usa el recurso de lo que fue', () => {
+    // §7.4 la deja en el mapa, y lo que tiene que leerse es que ya no es una
+    // casa. Ponerle su modelo intacto diría lo contrario.
+    const state = village(14);
+    const burnt = structuredClone(state);
+    const home = burnt.buildings.find((building) => building.lostTick === null);
+    if (home !== undefined) home.lostTick = burnt.tick;
+    const ruin = planFor(burnt).buildings.find((building) => building.id === home?.id);
+    expect(ruin?.ruin).toBe(true);
+    expect(ruin?.asset).toBeNull();
   });
 
   it('la estación que se pinta es la del tick, no la de ninguna otra cuenta', () => {

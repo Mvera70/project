@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T23:06:41.123Z",
+  "generatedAt": "2026-09-10T23:17:55.582Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -116,6 +116,42 @@
       "id": "stone-house",
       "file": "stone-house.glb",
       "sha256": "16BC53B170903BE50216515799CA9008335502FC7ABB4C7B99A58ACA9AB6BBF2",
+      "motion": []
+    },
+    {
+      "id": "field",
+      "file": "field.glb",
+      "sha256": "62ED547480F857018D649435697C0FE9F44EF6BDC146FA4FC9050BE1D0A2BC67",
+      "motion": []
+    },
+    {
+      "id": "field-cut",
+      "file": "field-cut.glb",
+      "sha256": "29100C79FBF74CA646909A650113EDCBC1B079FBDD61D7ECC4BEEB35013FFE58",
+      "motion": []
+    },
+    {
+      "id": "palisade",
+      "file": "palisade.glb",
+      "sha256": "49C65821CCA0AD0A505854DD56B0EF420A89F6F4141970A7B3486B3E20F9B133",
+      "motion": []
+    },
+    {
+      "id": "wall",
+      "file": "wall.glb",
+      "sha256": "93067586949FABCDC849983A14175FF2D81818480D226ABA5290018816B431BF",
+      "motion": []
+    },
+    {
+      "id": "watchtower",
+      "file": "watchtower.glb",
+      "sha256": "D16C6CDA3AE329BE334F090AAA4622D8892ABE2FA119B8318F37ADB05E56E228",
+      "motion": []
+    },
+    {
+      "id": "grave-yard",
+      "file": "grave-yard.glb",
+      "sha256": "3975478F357C908E5F9A8E3920454737FD7E053C9F0B72B9C9CDDF37ACE20567",
       "motion": []
     }
   ]

@@ -53,6 +53,11 @@ export interface BuildingModel {
  */
 export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   house: 'house',
+  field: 'field',
+  palisade: 'palisade',
+  wall: 'wall',
+  watchtower: 'watchtower',
+  grave_yard: 'grave-yard',
   stone_house: 'stone-house',
   granary: 'granary',
   mill: 'mill',
@@ -156,8 +161,9 @@ export class Village {
 
   add(planned: PlannedBuilding): void {
     this.remove(planned.id);
-    const asset = planned.ruin ? undefined : BUILDING_ASSETS[planned.kind];
-    const source = asset === undefined ? undefined : this.instance?.(asset);
+    // Quien decide el recurso es el plan, no esto: el campo cambia con la
+    // cosecha y el plan es quien sabe en que semana estamos.
+    const source = planned.asset === null ? undefined : this.instance?.(planned.asset);
     const model = source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source);
     this.models.set(planned.id, model);
     this.group.add(model.object);

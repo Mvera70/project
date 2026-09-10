@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "id": "field",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "field",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "G-10, lote de sustento. Cinco surcos de mies a lo largo de la parcela. Los surcos son lo que separa un campo sembrado de un rectangulo de tierra a la escala del valle, donde nadie va a distinguir una espiga."
+  },
+  "materials": [
+    {
+      "name": "soil",
+      "role": "soil",
+      "roughness": 1.0
+    },
+    {
+      "name": "grain",
+      "role": "grain",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Field_Soil",
+      "location": [
+        4.5,
+        3.0,
+        0.04
+      ],
+      "dimensions": [
+        9.0,
+        6.0,
+        0.08
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Row_0",
+      "location": [
+        4.5,
+        0.6,
+        0.25
+      ],
+      "dimensions": [
+        8.4,
+        0.55,
+        0.5
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Row_1",
+      "location": [
+        4.5,
+        1.7999999999999998,
+        0.25
+      ],
+      "dimensions": [
+        8.4,
+        0.55,
+        0.5
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Row_2",
+      "location": [
+        4.5,
+        3.0,
+        0.25
+      ],
+      "dimensions": [
+        8.4,
+        0.55,
+        0.5
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Row_3",
+      "location": [
+        4.5,
+        4.199999999999999,
+        0.25
+      ],
+      "dimensions": [
+        8.4,
+        0.55,
+        0.5
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Row_4",
+      "location": [
+        4.5,
+        5.3999999999999995,
+        0.25
+      ],
+      "dimensions": [
+        8.4,
+        0.55,
+        0.5
+      ],
+      "material": "grain",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      11.0,
+      -13.75,
+      8.8
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.6
+    ],
+    "orthoScale": 15.399999999999999,
+    "worldRole": "sky"
+  }
+}

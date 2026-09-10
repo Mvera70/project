@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "id": "watchtower",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "watchtower",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de defensa. Seis metros de fuste, una galeria que vuela por encima y un chapitel. Lo mas alto del valle despues del campanario, que es de lo que sirve una atalaya."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.85
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Tower_Shaft",
+      "location": [
+        1.5,
+        1.5,
+        3.0
+      ],
+      "dimensions": [
+        2.2,
+        2.2,
+        6.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Tower_Gallery",
+      "location": [
+        1.5,
+        1.5,
+        6.3
+      ],
+      "dimensions": [
+        2.9,
+        2.9,
+        0.6
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Tower_Cap",
+      "location": [
+        1.5,
+        1.5,
+        7.4
+      ],
+      "radius": 1.9,
+      "depth": 1.7,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      9.0,
+      -11.25,
+      7.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      4.0
+    ],
+    "orthoScale": 12.6,
+    "worldRole": "sky"
+  }
+}

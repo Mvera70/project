@@ -13,7 +13,9 @@
 // nothing. The picture still needs looking at. The bookkeeping does not.
 
 import type { Building, BuildingId, BuildingKind, GameState, ValleyMap } from '@engine/state';
-import { SEASONS, clockOf } from '@engine/time';
+import { TIME } from '@engine/balance';
+import { SEASONS, clockOf, weekOf } from '@engine/time';
+import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 
 export interface PlannedBuilding {
@@ -30,6 +32,15 @@ export interface PlannedBuilding {
   readonly wallColour: string;
   readonly roofColour: string;
   readonly roofed: boolean;
+  /**
+   * G-10 · Qué recurso del catálogo le toca, o `null` para la caja con tejado.
+   *
+   * Va en el plan y no en el renderer porque es parte de **qué hay que ver**, no
+   * de cómo se dibuja: un campo segado y uno sembrado son dos cosas distintas en
+   * la escena, y el diff tiene que notar el cambio para reconstruir ese edificio
+   * y sólo ese la semana de la siega.
+   */
+  readonly asset: string | null;
 }
 
 export interface ScenePlan {
@@ -80,10 +91,31 @@ function look(building: Building): BuildingLook {
   return BUILDING_LOOKS[building.kind];
 }
 
-function plannedFrom(building: Building): PlannedBuilding {
+/** Semana en la que el sembrado ya se ve. TUNE: media primavera. */
+const SOWN_FROM = 6;
+
+/**
+ * El recurso que le toca a un edificio esta semana.
+ *
+ * Casi todos tienen uno fijo. El campo no: entre la siembra y la siega está
+ * sembrado y el resto del año está segado, y eso se ve desde arriba. La regla
+ * sale de `TIME.HARVEST_WEEK`, la misma semana en la que el motor recoge el
+ * grano, así que si alguien mueve la cosecha el campo cambia con ella.
+ */
+function assetFor(building: Building, tick: number): string | null {
+  if (building.lostTick !== null) return null;
+  if (building.kind === 'field') {
+    const week = weekOf(tick);
+    return week >= SOWN_FROM && week < TIME.HARVEST_WEEK ? 'field' : 'field-cut';
+  }
+  return BUILDING_ASSETS[building.kind] ?? null;
+}
+
+function plannedFrom(building: Building, tick: number): PlannedBuilding {
   const ruin = building.lostTick !== null;
   const shape = look(building);
   return {
+    asset: assetFor(building, tick),
     id: building.id,
     kind: building.kind,
     x: building.x,
@@ -106,14 +138,16 @@ export function planFor(state: GameState): ScenePlan {
   return {
     game: `${state.seed}:${state.terrainSeed}`,
     ground: groundSignature(state.map, state.tick),
-    buildings: state.buildings.map(plannedFrom).sort((a, b) => a.id - b.id),
+    buildings: state.buildings.map((building) => plannedFrom(building, state.tick))
+      .sort((a, b) => a.id - b.id),
   };
 }
 
 function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
   return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
-    && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed;
+    && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
+    && a.asset === b.asset;
 }
 
 /**

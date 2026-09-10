@@ -35,7 +35,10 @@ const VILLAGER = 'villager';
 const TREE = 'tree';
 const ROCK = 'rock';
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
-const WANTED = [VILLAGER, TREE, ROCK, ...new Set(Object.values(BUILDING_ASSETS))];
+const WANTED = [
+  VILLAGER, TREE, ROCK, 'field-cut',
+  ...new Set(Object.values(BUILDING_ASSETS)),
+];
 
 /**
  * Cuanto campo se deja alrededor de lo construido, en celdas.

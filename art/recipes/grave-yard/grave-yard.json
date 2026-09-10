@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "id": "grave-yard",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "grave-yard",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10. Cinco lapidas a alturas y sitios distintos, y una cruz al fondo. Alineadas y todas iguales pareceria un almacen de bloques; torcidas y desiguales se lee lo que es."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "soil",
+      "role": "soil",
+      "roughness": 1.0
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Yard_Ground",
+      "location": [
+        3.0,
+        3.0,
+        0.05
+      ],
+      "dimensions": [
+        5.8,
+        5.8,
+        0.1
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Stone_A",
+      "location": [
+        1.7,
+        1.9,
+        0.45
+      ],
+      "dimensions": [
+        0.5,
+        0.16,
+        0.9
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Stone_B",
+      "location": [
+        3.1,
+        1.6,
+        0.4
+      ],
+      "dimensions": [
+        0.5,
+        0.16,
+        0.8
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Stone_C",
+      "location": [
+        4.4,
+        2.1,
+        0.5
+      ],
+      "dimensions": [
+        0.5,
+        0.16,
+        1.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Stone_D",
+      "location": [
+        2.2,
+        3.9,
+        0.42
+      ],
+      "dimensions": [
+        0.5,
+        0.16,
+        0.85
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Stone_E",
+      "location": [
+        3.8,
+        4.2,
+        0.46
+      ],
+      "dimensions": [
+        0.5,
+        0.16,
+        0.92
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Cross_V",
+      "location": [
+        3.0,
+        5.1,
+        0.75
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        1.5
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Yard_Cross_H",
+      "location": [
+        3.0,
+        5.1,
+        1.2
+      ],
+      "dimensions": [
+        0.85,
+        0.18,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      8.0,
+      -10.0,
+      6.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.8
+    ],
+    "orthoScale": 11.2,
+    "worldRole": "sky"
+  }
+}
