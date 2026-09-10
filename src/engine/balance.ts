@@ -654,6 +654,13 @@ export const ENCOUNTER = {
   // esta distinción, veintiséis personas en la misma celda abrían un corro de
   // siete celdas de radio y la reunión se veía MÁS suelta que un día de campo.
   MEETING_SPREAD: 0.45,
+  // TUNE (§11.9, v3.10): cuántos caben en un corrillo. La gente no habla sólo
+  // de dos en dos, y una plaza con dos parejas y nadie más parece un tablero.
+  MAX_KNOT: 4,
+  // TUNE: y cuántas ganas hay que tener para unirse a uno que ya está formado.
+  // Más que para empezar una conversación: cuesta menos acercarse a un corro
+  // que abordar a alguien.
+  JOIN_BONUS: 1.4,
 } as const;
 
 /**

@@ -4,6 +4,7 @@
 // hicieran lo mismo a la vez, todos los días, apilados en la misma celda y sin
 // hablar con nadie. Cada prueba es una de esas cuatro cosas.
 import { describe, expect, it } from 'vitest';
+import { ENCOUNTER } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
@@ -221,6 +222,29 @@ describe('los oficios se ven · §11.9', () => {
     expect(withForge).toBeDefined();
     expect(without).toBeDefined();
     expect(without).not.toEqual(withForge);
+  });
+});
+
+describe('se habla en corro, no sólo de dos en dos · §11.9', () => {
+  it('hay grupos de más de dos', () => {
+    // Una plaza con dos parejas y nadie más parece un tablero.
+    const state = workweek(village(20));
+    const figures = crowdPositions(state, 0.3);
+    let biggest = 0;
+    for (const f of figures) {
+      const near = figures.filter((o) => Math.hypot(o.x - f.x, o.y - f.y) < 1.1).length;
+      biggest = Math.max(biggest, near);
+    }
+    expect(biggest, 'algún corro tiene que pasar de dos').toBeGreaterThan(2);
+  });
+
+  it('pero no se junta la aldea entera en un punto', () => {
+    const state = workweek(village(20));
+    const figures = crowdPositions(state, 0.3);
+    for (const f of figures) {
+      const near = figures.filter((o) => Math.hypot(o.x - f.x, o.y - f.y) < 1.1).length;
+      expect(near, 'un corro no es una asamblea').toBeLessThanOrEqual(ENCOUNTER.MAX_KNOT + 1);
+    }
   });
 });
 

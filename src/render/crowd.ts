@@ -367,11 +367,11 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
       );
       const talk = talks.get(person.id);
       if (talk !== undefined && fraction >= talk.from && fraction < talk.to) {
-        // §11.9: se han parado a hablar. Quietos y juntos, uno a cada lado del
+        // §11.9: se han parado a hablar. Quietos y en corro alrededor del
         // punto de encuentro — dos figuras exactamente encima leerían como una
-        // sola, y lo que tiene que leerse es que son dos.
-        const side = person.id < talk.withId ? -0.35 : 0.35;
-        point = { x: talk.x + side, y: talk.y };
+        // sola, y lo que tiene que leerse es cuántos son.
+        const seat = ((Math.imul(person.id + 7, 2654435761) >>> 0) % 360) * (Math.PI / 180);
+        point = { x: talk.x + Math.cos(seat) * 0.4, y: talk.y + Math.sin(seat) * 0.3 };
       } else {
         // §11.9: trabajando. Recorre su parcela en vez de quedarse clavado —
         // el surco de ida y el de vuelta— con un ritmo y una dirección propios

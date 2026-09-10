@@ -133,6 +133,28 @@ export function encountersAmong(state: GameState, spots: readonly Spot[]): Map<V
 
       out.set(a.id, { withId: b.id, x, y, from: start, to: start + span });
       out.set(b.id, { withId: a.id, x, y, from: start, to: start + span });
+
+      // §11.9, v3.10: y quien pasa por al lado puede quedarse. La gente no
+      // habla sólo de dos en dos, y una plaza con dos parejas y nadie más
+      // parece un tablero. Se unen al corro ya formado, que es más fácil que
+      // abordar a alguien — de ahí `JOIN_BONUS`.
+      let knot = 2;
+      for (let k = j + 1; k < ordered.length && knot < ENCOUNTER.MAX_KNOT; k += 1) {
+        const c = ordered[k] as Spot;
+        if (out.has(c.id)) continue;
+        const cx = c.x - x;
+        const cy = c.y - y;
+        if (cx * cx + cy * cy > ENCOUNTER.RANGE * ENCOUNTER.RANGE) continue;
+        // Tiene que llevarse bien con los dos: nadie se mete en un corro donde
+        // está alguien a quien no soporta.
+        const withA = appetite(state, c.id, a.id);
+        const withB = appetite(state, c.id, b.id);
+        if (withA <= 0 || withB <= 0) continue;
+        const want = Math.min(withA, withB) * ENCOUNTER.JOIN_BONUS;
+        if (noise(c.id, state.tick, a.id) >= want) continue;
+        out.set(c.id, { withId: a.id, x, y, from: start, to: start + span });
+        knot += 1;
+      }
       break;
     }
   }
