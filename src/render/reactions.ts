@@ -17,16 +17,16 @@ export interface Reaction {
   x: number;
   y: number;
   /** Qué la provocó, por si el dibujo quiere distinguirlas algún día. */
-  cause: 'loss' | 'death';
+  cause: 'loss' | 'death' | 'quarrel';
 }
 
 /**
  * Lo que ha pasado esta semana y merece que la aldea deje lo que estaba
  * haciendo.
  *
- * Se devuelve en orden de peso: una pérdida material se ve donde ocurrió, y una
- * muerte lleva a la gente al cementerio si lo hay, o al centro del pueblo si
- * todavía no lo han levantado.
+ * Se devuelve en orden de peso: una pérdida material se ve donde ocurrió, una
+ * riña se ve donde la aldea se junta, y una muerte lleva a la gente al
+ * cementerio si lo hay, o al centro del pueblo si todavía no lo han levantado.
  */
 export function reactionsAt(state: GameState): Reaction[] {
   const out: Reaction[] = [];
@@ -38,6 +38,18 @@ export function reactionsAt(state: GameState): Reaction[] {
       y: building.y + building.h * 0.5,
       cause: 'loss',
     });
+  }
+
+  // §11.9, v3.09: una riña de esta semana (§7.9). La crónica ya la guarda con
+  // su tick, así que no hace falta estado nuevo: se lee de ahí. En una aldea de
+  // cuarenta, dos gritándose en la plaza no es un asunto privado — se sale a
+  // mirar, y por eso la gente se junta donde ocurre.
+  const shouting = state.chronicle.some(
+    (e) => e.tick === state.tick && e.templateKey.startsWith('quarrel.'),
+  );
+  if (shouting) {
+    const at = valleyCore(state);
+    out.push({ x: at.x, y: at.y, cause: 'quarrel' });
   }
 
   const buried = state.people.villagers.some((v) => v.diedTick === state.tick && v.named);

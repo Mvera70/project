@@ -98,6 +98,51 @@ describe('cuando se muere alguien · §11.9', () => {
   });
 });
 
+describe('una riña se ve · §11.9, §7.9', () => {
+  it('la aldea sale a mirar', () => {
+    // En una aldea de cuarenta, dos gritándose no es un asunto privado. La
+    // crónica ya guarda la riña con su tick, así que no hace falta estado
+    // nuevo: se lee de ahí.
+    const state = village(20);
+    state.chronicle.push({
+      tick: state.tick,
+      kind: 'grudge',
+      templateKey: 'quarrel.blows',
+      params: { year: 20, season: 'spring', name: 'A', other: 'B' },
+      weight: 3,
+    });
+    const reactions = reactionsAt(state);
+    expect(reactions.some((r) => r.cause === 'quarrel')).toBe(true);
+  });
+
+  it('la del año pasado ya no', () => {
+    const state = village(20);
+    state.chronicle.push({
+      tick: state.tick - 48,
+      kind: 'grudge',
+      templateKey: 'quarrel.words',
+      params: { year: 19, season: 'spring', name: 'A', other: 'B' },
+      weight: 2,
+    });
+    expect(reactionsAt(state).some((r) => r.cause === 'quarrel')).toBe(false);
+  });
+
+  it('y una casa ardiendo manda sobre una discusión', () => {
+    // El orden de la urgencia otra vez: lo material antes que lo social.
+    const state = village(20);
+    const house = state.buildings.find((b) => b.kind === 'house' && b.lostTick === null)!;
+    house.lostTick = state.tick;
+    state.chronicle.push({
+      tick: state.tick,
+      kind: 'grudge',
+      templateKey: 'quarrel.blows',
+      params: { year: 20, season: 'spring', name: 'A', other: 'B' },
+      weight: 3,
+    });
+    expect(reactionsAt(state)[0]!.cause).toBe('loss');
+  });
+});
+
 describe('el orden de la urgencia · §11.9', () => {
   it('lo que arde manda sobre lo que el jugador decidió', () => {
     // Se comparan dos valles idénticos salvo por la pérdida, los dos con la
