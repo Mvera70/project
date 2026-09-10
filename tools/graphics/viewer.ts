@@ -24,6 +24,8 @@ import type { Material, Object3D } from 'three';
 interface ViewerReport {
   resourceUrl: string;
   viewport: { width: number; height: number; pixelRatio: number };
+  /** Cuánto se acercó la cámara. 1 es la parcela entera. */
+  zoom: number;
   camera: string;
   presentationSeconds: number;
   threeRevision: string;
@@ -69,7 +71,22 @@ function boxCorners(box: Box3): Vector3[] {
   ];
 }
 
-function frame(camera: OrthographicCamera, box: Box3, aspect: number, direction: Vector3): void {
+/**
+ * Encuadra el objeto. `zoom` mayor que 1 acerca: divide el alto encuadrado, así
+ * que el encuadre se estrecha alrededor del mismo centro. §D.2 · P1 pide el
+ * rincón «general y cerca», y hasta G-03 sólo existía el general.
+ *
+ * Acercar recortando el encuadre y no moviendo la cámara mantiene la
+ * ortográfica y el ángulo exactos: las dos vistas son la misma escena vista con
+ * el mismo ojo, que es lo que permite compararlas.
+ */
+function frame(
+  camera: OrthographicCamera,
+  box: Box3,
+  aspect: number,
+  direction: Vector3,
+  zoom: number,
+): void {
   const sphere = box.getBoundingSphere(new Sphere());
   const radius = Math.max(sphere.radius, 0.01);
   camera.position.copy(sphere.center).addScaledVector(direction.normalize(), radius * 4);
@@ -83,7 +100,8 @@ function frame(camera: OrthographicCamera, box: Box3, aspect: number, direction:
   const points = boxCorners(box).map((point) => point.applyMatrix4(inverse));
   const halfWidth = Math.max(...points.map((point) => Math.abs(point.x)));
   const halfHeight = Math.max(...points.map((point) => Math.abs(point.y)));
-  const framedHalfHeight = Math.max(halfHeight, halfWidth / aspect, radius * 0.1) * 1.14;
+  const fitted = Math.max(halfHeight, halfWidth / aspect, radius * 0.1) * 1.14;
+  const framedHalfHeight = fitted / Math.max(0.01, zoom);
   camera.left = -framedHalfHeight * aspect;
   camera.right = framedHalfHeight * aspect;
   camera.top = framedHalfHeight;
@@ -112,6 +130,7 @@ async function main(): Promise<void> {
   const pixelRatio = numericParameter('pixelRatio', 1, 0.5, 4);
   const presentationSeconds = numericParameter('time', 0, 0, 1_000_000);
   const cameraId = params.get('camera') ?? 'iso-ne';
+  const zoom = numericParameter('zoom', 1, 0.1, 20);
   const cameraDirections: Record<string, Vector3> = {
     'iso-ne': new Vector3(1, 0.9, 1.15),
     'iso-nw': new Vector3(-1, 0.9, 1.15),
@@ -192,7 +211,7 @@ async function main(): Promise<void> {
   ground.receiveShadow = true;
   owned.add(ground);
 
-  frame(camera, bounds, width / height, direction);
+  frame(camera, bounds, width / height, direction, zoom);
   const sphere = bounds.getBoundingSphere(new Sphere());
   sun.position.copy(sphere.center).add(new Vector3(-sphere.radius * 2, sphere.radius * 4, sphere.radius * 2));
   sun.target.position.copy(sphere.center);
@@ -218,6 +237,7 @@ async function main(): Promise<void> {
   window.valleyGraphicsReport = {
     resourceUrl: new URL(resource, location.href).href,
     viewport: { width, height, pixelRatio },
+    zoom,
     camera: cameraId,
     presentationSeconds,
     threeRevision: REVISION,

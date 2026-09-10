@@ -109,6 +109,9 @@ async function main(): Promise<void> {
   const height = numericArgument('height', 640, 64, 4096);
   const pixelRatio = numericArgument('pixelRatio', 1, 0.5, 4);
   const camera = argument('camera', 'iso-ne');
+  // §D.2 · P1 pide el rincón «general y cerca». 1 es la parcela entera.
+  const zoom = Number(argument('zoom', '1'));
+  if (!Number.isFinite(zoom) || zoom <= 0) throw new Error(`Bad --zoom '${zoom}'.`);
   const presentationSeconds = numericArgument('time', 0, 0, 1_000_000);
   const grayscale = argument('grayscale', 'false') === 'true';
   const output = resolve(ROOT, argument('output', DEFAULT_OUTPUT));
@@ -151,7 +154,8 @@ async function main(): Promise<void> {
     const viewerPath = '/tools/graphics/viewer.html';
     const query = new URLSearchParams({
       asset: assetUrl, width: String(width), height: String(height),
-      pixelRatio: String(pixelRatio), camera, time: String(presentationSeconds),
+      pixelRatio: String(pixelRatio), camera, zoom: String(zoom),
+      time: String(presentationSeconds),
     });
     const validUrl = new URL(`${viewerPath}?${query.toString()}`, base).href;
     const captures = [
@@ -184,7 +188,10 @@ async function main(): Promise<void> {
       schemaVersion: 1,
       generatedAt: new Date().toISOString(),
       invocation: 'npx tsx tools/graphics/capture.ts',
-      input: { assetPath, assetUrl, viewport: { width, height, pixelRatio }, camera, presentationSeconds, grayscale },
+      input: {
+        assetPath, assetUrl, viewport: { width, height, pixelRatio },
+        camera, zoom, presentationSeconds, grayscale,
+      },
       environment: { node: process.version, browser: browserVersion, three: threePackage.version ?? 'unknown' },
       captures,
       deterministicOnThisHost: true,

@@ -1,7 +1,42 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "note": "P1 decidida (design.md D.2.1, v3.15). Las direcciones A y B de G-03 dejan de competir: el valle es uno solo y lo que varía es el material de cada casa.",
   "roles": ["sky", "ground", "soil", "path", "timber", "timberDark", "plaster", "roof", "foliage", "foliageLight", "trunk", "skin", "cloth", "clothAccent"],
+
+  "valley": {
+    "note": "Común a toda la aldea. Sale de la dirección B: formas suaves y verdes vivos, que separan mejor la casa del campo.",
+    "sky": "#DDE3C4",
+    "ground": "#94AE68",
+    "soil": "#866044",
+    "path": "#C4A16B",
+    "foliage": "#62864F",
+    "foliageLight": "#7F9F64",
+    "trunk": "#735338",
+    "skin": "#C98A63",
+    "cloth": "#71885E",
+    "clothAccent": "#A96146"
+  },
+
+  "houses": {
+    "note": "Lo que varía de una casa a otra. Cada edificio elige uno de forma estable, nunca al azar en cada pintada.",
+    "tiled": {
+      "label": "Teja",
+      "roof": "#7A382B",
+      "plaster": "#D2B98A",
+      "timber": "#6B4932",
+      "timberDark": "#3F2B22"
+    },
+    "thatched": {
+      "label": "Paja",
+      "roof": "#C7984A",
+      "plaster": "#E2CC9B",
+      "timber": "#9A744C",
+      "timberDark": "#6B4C32"
+    }
+  },
+
   "directions": {
+    "note": "Se conservan tal cual las produjo G-03 para que sus recetas y sus artefactos aprobados sigan reconstruyéndose. No se usan para decidir nada: la decisión está en `valley` y `houses`.",
     "A": {
       "sky": "#C9D2B2", "ground": "#73834F", "soil": "#6B4931", "path": "#A0794F",
       "timber": "#6B4932", "timberDark": "#3F2B22", "plaster": "#D2B98A", "roof": "#7A382B",

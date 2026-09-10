@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.15** | 13 sep 2026, 10:30 | P1 cerrada · dirección artística decidida | **Las dos direcciones de G-03 dejan de competir y pasan a ser materiales de casa: teja y paja conviven en la misma aldea.** El valle es uno solo, con las formas suaves de B. La ropa se integra en la paleta por decisión del usuario, con la legibilidad de la gente resuelta por silueta y no por color. Vista de cerca producida: P1 tenía las dos escalas pendientes y ya no. |
 | **3.14** | 13 sep 2026, 02:00 | Las dos deudas, atacadas con perfilador | **Suite rápida de 34 s a 30,6 s**, partiendo el fichero que sola tardaba 35 y no se podía repartir. El banco sigue en 18 min: perfilado, el Aê es el 29 % y se llama 20.474 veces por partida **porque el suelo cambia 631 veces y cada cambio vacía la caché de rutas entera**. Bajarlo exige tocar el tráfico, que es balance. Tres optimizaciones probadas y **dos revertidas por medirlas**. |
 | **3.12** | 12 sep 2026, 23:20 | Los guardas espantan cuervos de verdad | **Mandabas gente a espantar pájaros y veías los mismos pájaros.** §7.7 descontaba la vigilancia del mordisco desde v2.93 y en la imagen no se notaba. Con un hallazgo anotado: en una partida corriente la cobertura está casi siempre al máximo, así que la diferencia apenas se ve. |
 | **3.11** | 12 sep 2026, 22:40 | La densidad, medida contra el veredicto | **El problema que abrió §11.6 está resuelto y se puede enseñar.** La primera sesión humana veía entre 0,0 y 0,6 sucesos notables en cinco minutos. Ahora son **2,8 a ×1** y 21 a ×4. Algo digno de contarse cada dos minutos a velocidad normal, donde antes cabía una sesión entera sin nada. |
@@ -7790,6 +7791,46 @@ El orquestador puede iterar autónomamente dentro de una dirección aprobada.
 Para P1 y P5 pide una decisión remota sobre un resultado concreto. Mientras no
 llegue, puede completar validaciones independientes, pero no registrar aprobación
 por silencio. No se requiere al usuario delante del ordenador.
+
+#### D.2.1 · P1, decidida (v3.15)
+
+**Puerta P1 cerrada.** El usuario vio las cuatro imágenes de G-03 —las dos
+direcciones, de lejos y de cerca— y decidió. Esto es la decisión remota que D.2
+exige y que no puede darse por silencio.
+
+**Las dos direcciones dejan de competir.** No se elige A ni B: pasan a ser **dos
+materiales de casa** dentro de un mismo estilo. Una aldea con casas de teja y
+casas de paja es más creíble que una uniforme, y de paso aprovecha las dos
+producciones de G-03 en vez de tirar una.
+
+| Qué | Decisión |
+|---|---|
+| **Varía por casa** | Tejado (teja `#7A382B` o paja `#C7984A`), yeso, entramado |
+| **Común a todo el valle** | Árboles suavizados de 16 caras, prado `#94AE68`, luz clara |
+| **Variedad, por ahora** | Material y color únicamente |
+| **Variedad, más adelante** | Cuatro o cinco formas de casa distintas |
+| **Ropa** | Integrada en los tonos tierra del pueblo |
+
+**Lo que la vista de cerca destapó, y por eso hacía falta.** De lejos parecía que
+A y B sólo se diferenciaban en el tejado. De cerca se vio que difieren también
+en cosas que **no son de la casa**: las copas de los árboles son de 7 caras sin
+suavizar en A y de 16 suavizadas en B, y los verdes del prado no son los mismos.
+Eso no puede convivir — no hay árboles facetados junto a árboles redondeados
+según qué casa tengan al lado. De ahí la separación entre lo que varía y lo
+común.
+
+**Una tensión declarada, no resuelta con la paleta.** El usuario pidió también
+que la escena se lea de lejos, y de cerca se ve que el aldeano de A **se camufla
+con su propia casa** porque viste el tono de la madera. Con la ropa integrada,
+el color no va a separar a la gente del fondo.
+
+**Se resuelve por silueta, no por color, y es criterio de entrada de G-04:** un
+aldeano tiene que reconocerse por su forma y su tamaño a la escala de juego, con
+la paleta en contra. Si G-04 no lo consigue, la decisión de ropa vuelve a estar
+sobre la mesa — pero se decide con una imagen, no antes.
+
+**Qué falsaría esta decisión:** que a 390 px de ancho, con la aldea entera en
+pantalla, no se distinga a una persona del suelo que pisa.
 
 ### D.3 Dirección artística y criterios de lectura
 
