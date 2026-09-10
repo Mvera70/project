@@ -13,6 +13,8 @@ import {
   Color, DirectionalLight, Group, HemisphereLight, PCFSoftShadowMap,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Object3D,
 } from 'three';
+import { clockOf } from '@engine/time';
+import { paletteFor } from '@render/palette';
 import { createValleyCamera } from './camera';
 import type { GameState, VillagerId } from '@engine/state';
 import { actorsFor, createActorMemory, type Actor } from './actors';
@@ -24,6 +26,7 @@ import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, type Ground } from './world/ground';
 import { Village } from './world/buildings';
 import { Cast } from './world/cast';
+import { Tells } from './effects/tells';
 import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 
 const VILLAGER = 'villager';
@@ -78,7 +81,8 @@ export async function createGraphicsRenderer(
 
   const village = new Village();
   const cast = new Cast(villager, () => library.instance(VILLAGER));
-  world.add(village.group, cast.group);
+  const tells = new Tells();
+  world.add(village.group, cast.group, tells.group);
 
   let ground: Ground | null = null;
   let plan: ScenePlan | null = null;
@@ -146,7 +150,9 @@ export async function createGraphicsRenderer(
       world.remove(ground.mesh);
       ground.dispose();
     }
-    ground = buildGround(state.map);
+    // §10.3 · la paleta de la estación, la misma que usa el render 2D.
+    const clock = clockOf(state.tick);
+    ground = buildGround(state.map, paletteFor(clock.season, clock.seasonWeek));
     world.add(ground.mesh);
     mapWidth = state.map.width;
     mapHeight = state.map.height;
@@ -175,6 +181,7 @@ export async function createGraphicsRenderer(
         // otherwise survive into a game it never belonged to.
         village.clear();
         cast.clear();
+        tells.clear();
       }
       if (change.ground || change.cleared) rebuildGround(state as GameState);
       for (const id of change.removed) village.remove(id);
@@ -188,6 +195,9 @@ export async function createGraphicsRenderer(
       // village is not, because it changes a few times a year.
       lastActors = actorsFor(state as GameState, frame, { tracked, memory });
       cast.show(lastActors);
+      // Las señales cambian con la semana, no con el fotograma: `update` se sale
+      // solo cuando nada ha cambiado.
+      tells.update(state as GameState);
 
       renderer.render(scene, camera);
     },
@@ -248,6 +258,7 @@ export async function createGraphicsRenderer(
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      tells.dispose();
       cast.dispose();
       village.dispose();
       if (ground !== null) {

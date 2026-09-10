@@ -111,13 +111,15 @@ ronda, y es poco: probar en el móvil de verdad que el relevo de Canvas a WebGL
 no parpadea, y decidir si el interruptor merece un botón en vez de un
 parámetro de dirección.
 
-**Lo siguiente es G-08: estaciones y consecuencias visibles.** El campo verde y
-luego segado, la nieve, la casa que arde y queda en ruina. Es lo que más ataca
-lo de que la aldea se sienta viva, y ya hay dónde colgarlo: el plan de escena
-distingue ruina de casa y el suelo se rehace cuando cambia.
+**G-08 está hecha.** El valle cambia de estación —capturas de las cuatro en
+`artifacts/graphics/G-08/`— y las señales de `tellsFor` se ven en 3D. Lo que
+queda de esa ronda: los efectos que necesitan recurso propio (`art/recipes/
+effects/`), que dependen del catálogo, y la paridad de capturas contra Canvas.
 
-Después, G-09 (presupuesto móvil) y G-10 (catálogo completo), que es cuando las
-cajas con tejado se convierten en casas.
+**Lo siguiente es G-09: banco y presupuesto móvil.** Medir qué cuesta el piloto
+en un teléfono antes de añadirle nada más, que es lo que D.9 pide con esas
+palabras. Después G-10, el catálogo completo, que es cuando las cajas con tejado
+se convierten en casas.
 
 El brief original de G-07, para lo que quede de él:
 

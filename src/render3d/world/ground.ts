@@ -13,7 +13,8 @@ import {
   BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial,
 } from 'three';
 import type { ValleyMap } from '@engine/state';
-import { GROUND_BIAS, PATH_COLOURS, TERRAIN_COLOURS, VALLEY_COLOURS } from '../visual-config';
+import type { Palette } from '@render/palette';
+import { GROUND_BIAS } from '../visual-config';
 
 /**
  * How much a cell's colour varies from its neighbours of the same kind.
@@ -30,11 +31,37 @@ function mottleOf(cell: number): number {
   return ((mixed % 1000) / 999 - 0.5) * 2 * MOTTLE;
 }
 
-/** The colour of one cell: its terrain, or the path worn over it. */
-export function cellColour(map: ValleyMap, cell: number): string {
-  const path = PATH_COLOURS[map.path[cell] ?? 0];
-  if (path !== null && path !== undefined) return path;
-  return TERRAIN_COLOURS[map.terrain[cell] ?? 0] ?? VALLEY_COLOURS.ground;
+/**
+ * El color de una celda: su terreno, o el camino gastado encima.
+ *
+ * Los colores salen de la paleta de la estación, que es la de §10.3 y la que el
+ * render 2D ya usa. Duplicarla aquí habría hecho que los dos valles se
+ * separaran en cuanto alguien retocara un verde, y G-08 pide expresamente
+ * reutilizar el significado existente en vez de repetir las reglas.
+ */
+export function cellColour(map: ValleyMap, cell: number, palette: Palette): string {
+  const wear = map.path[cell] ?? 0;
+  if (wear > 0) {
+    // Un camino más pisado es más claro: de la senda al camino real.
+    return wear >= 3 ? palette.accent : wear === 2 ? palette.path : mixed(palette.path, palette.meadowAlt);
+  }
+  switch (map.terrain[cell] ?? 0) {
+    case 1: return palette.forest;
+    case 2: return palette.water;
+    case 3: return palette.rock;
+    case 4: return palette.forestDark;
+    case 5: return palette.field;
+    default: return palette.meadow;
+  }
+}
+
+/** Media de dos colores, para el escalón que la paleta no nombra. */
+function mixed(from: string, to: string): string {
+  const parse = (hex: string): number[] => [1, 3, 5].map((at) => Number.parseInt(hex.slice(at, at + 2), 16));
+  const a = parse(from);
+  const b = parse(to);
+  return `#${a.map((value, index) => Math.round((value + (b[index] ?? value)) / 2)
+    .toString(16).padStart(2, '0')).join('')}`;
 }
 
 export interface Ground {
@@ -42,7 +69,7 @@ export interface Ground {
   dispose(): void;
 }
 
-export function buildGround(map: ValleyMap): Ground {
+export function buildGround(map: ValleyMap, palette: Palette): Ground {
   const cells = map.width * map.height;
   const positions = new Float32Array(cells * 4 * 3);
   const colours = new Float32Array(cells * 4 * 3);
@@ -53,7 +80,7 @@ export function buildGround(map: ValleyMap): Ground {
   for (let cell = 0; cell < cells; cell += 1) {
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
-    tint.set(cellColour(map, cell));
+    tint.set(cellColour(map, cell, palette));
     const shade = 1 + mottleOf(cell);
     const corner = cell * 4;
 

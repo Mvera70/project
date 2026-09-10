@@ -13,6 +13,7 @@
 // nothing. The picture still needs looking at. The bookkeeping does not.
 
 import type { Building, BuildingId, BuildingKind, GameState, ValleyMap } from '@engine/state';
+import { SEASONS, clockOf } from '@engine/time';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 
 export interface PlannedBuilding {
@@ -59,12 +60,19 @@ export interface PlanChange {
  * exists, and a field whose only reader is a renderer is exactly the kind of
  * thing D.5 forbids adding.
  */
-export function groundSignature(map: ValleyMap): number {
+export function groundSignature(map: ValleyMap, tick: number): number {
   let hash = 2_166_136_261;
   for (let index = 0; index < map.terrain.length; index += 1) {
     hash = Math.imul(hash ^ (map.terrain[index] ?? 0), 16_777_619);
     hash = Math.imul(hash ^ (map.path[index] ?? 0), 16_777_619);
   }
+  // G-08 · la estación cambia el color del suelo sin cambiar el terreno, y las
+  // dos primeras semanas de cada estación la nueva crece de la vieja (§10.3).
+  // Sin esto, el valle seguía verde en enero: el suelo sólo se reconstruía
+  // cuando alguien talaba un árbol.
+  const clock = clockOf(tick);
+  hash = Math.imul(hash ^ SEASONS.indexOf(clock.season), 16_777_619);
+  hash = Math.imul(hash ^ Math.min(2, clock.seasonWeek), 16_777_619);
   return hash >>> 0;
 }
 
@@ -97,7 +105,7 @@ function plannedFrom(building: Building): PlannedBuilding {
 export function planFor(state: GameState): ScenePlan {
   return {
     game: `${state.seed}:${state.terrainSeed}`,
-    ground: groundSignature(state.map),
+    ground: groundSignature(state.map, state.tick),
     buildings: state.buildings.map(plannedFrom).sort((a, b) => a.id - b.id),
   };
 }

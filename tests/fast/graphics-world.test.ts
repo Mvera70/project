@@ -21,6 +21,7 @@ import { loadAssets } from '../../src/render3d/assets';
 import { SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
 import { Village } from '../../src/render3d/world/buildings';
+import { PALETTES } from '@render/palette';
 import { buildGround, cellColour } from '../../src/render3d/world/ground';
 import { groundSignature, isQuiet, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
@@ -151,10 +152,10 @@ describe('G-06 · el plan de escena', () => {
 
   it('un camino nuevo también cambia el suelo', () => {
     const state = village(10);
-    const before = groundSignature(state.map);
+    const before = groundSignature(state.map, state.tick);
     const worn = structuredClone(state);
     worn.map.path[100] = 3;
-    expect(groundSignature(worn.map)).not.toBe(before);
+    expect(groundSignature(worn.map, worn.tick)).not.toBe(before);
   });
 
   it('otra partida se tira entera, no se actualiza', () => {
@@ -172,7 +173,7 @@ describe('G-06 · el plan de escena', () => {
 describe('G-06 · el suelo', () => {
   it('tiene un cuadrado por celda y ni uno más', () => {
     const state = village(6);
-    const ground = buildGround(state.map);
+    const ground = buildGround(state.map, PALETTES.summer);
     const cells = state.map.width * state.map.height;
     expect(ground.mesh.geometry.getIndex()?.count).toBe(cells * 6);
     expect(ground.mesh.geometry.getAttribute('position').count).toBe(cells * 4);
@@ -185,7 +186,7 @@ describe('G-06 · el suelo', () => {
     expect(cell).toBeGreaterThanOrEqual(0);
     const bare = structuredClone(state);
     bare.map.path[cell] = 0;
-    expect(cellColour(state.map, cell)).not.toBe(cellColour(bare.map, cell));
+    expect(cellColour(state.map, cell, PALETTES.summer)).not.toBe(cellColour(bare.map, cell, PALETTES.summer));
   });
 
   it('usa los colores que P1 decidió', () => {

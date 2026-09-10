@@ -60,6 +60,10 @@ async function main(): Promise<void> {
   say('loading', `Founding seed ${seed} and running ${years} years`);
   const state = foundGame(seed);
   run(state, Math.round(years * 48), 'prudent', CATALOG);
+  // Adelantar hasta la semana del año que se pida, para poder ver el mismo
+  // valle en las cuatro estaciones sin fundar cuatro aldeas distintas.
+  const week = number('week', -1);
+  if (week >= 0) run(state, ((week - (state.tick % 48)) + 48) % 48, 'prudent', CATALOG);
 
   const canvas = document.querySelector<HTMLCanvasElement>('#stage');
   if (canvas === null) throw new Error('No canvas.');
