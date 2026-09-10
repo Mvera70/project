@@ -713,6 +713,17 @@ export const DAY = {
   // tampoco pasan la jornada codo con codo como si nada. Se dan la espalda, y
   // eso se ve sin leer una línea de crónica.
   SHUN: 1.8,
+  /**
+   * TUNE (§11.9, v3.13): lo más lejos que alguien puede acabar de su destino.
+   *
+   * Reparto, apartarse de un enemigo y el vaivén del trabajo se suman, y la
+   * suma no la controlaba nadie: medido sobre una captura, había figuras a
+   * **13,4 celdas** de su sitio, solas en medio del prado. Un campo mide tres
+   * por dos; a más de dos celdas ya no estás en él.
+   *
+   * Esto no lo vio ninguna prueba. Lo vio una imagen.
+   */
+  MAX_DRIFT: 2.4,
 } as const;
 
 export const MARKS = {

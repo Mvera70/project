@@ -412,6 +412,22 @@ export function crowdPositions(state: GameState, tickFraction: number): Figure[]
       point = onPath(cells, 0, state.map.width);
     }
 
+    // §11.9, v3.13: y nadie se va más allá de la correa. Todo lo que aparta a
+    // una figura de su destino —el reparto del puesto, esquivar a un enemigo,
+    // el ir y venir del trabajo— se suma, y la suma sacaba gente a pasear por
+    // el prado. La correa se aplica al final, sobre el total.
+    const anchor = cells[cells.length - 1];
+    if (anchor !== undefined && fraction >= day.arrive && fraction < day.depart) {
+      const ax = (anchor % state.map.width) + 0.5;
+      const ay = Math.floor(anchor / state.map.width) + 0.5;
+      const dx = point.x - ax;
+      const dy = point.y - ay;
+      const gap = Math.hypot(dx, dy);
+      if (gap > DAY.MAX_DRIFT) {
+        point = { x: ax + (dx / gap) * DAY.MAX_DRIFT, y: ay + (dy / gap) * DAY.MAX_DRIFT };
+      }
+    }
+
     const placed = clampFigure(point, state);
     figures.push({
       id: person.id,
