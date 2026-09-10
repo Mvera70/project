@@ -34,6 +34,15 @@ interface ValidationReport {
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const CATALOG_PATH = resolve(ROOT, 'art', 'catalog.json');
 const GENERATOR = resolve(import.meta.dirname, 'blender-build.py');
+/**
+ * G-04 · Los módulos que el generador importa.
+ *
+ * D.4 exige que crear geometría, rig y animación sean pasos separados, y el
+ * generador se copia a un directorio temporal antes de dárselo a Blender. Si
+ * los hermanos no viajan con él, el `import` falla dentro de Blender y el
+ * fallo llega como "faltan los productos", que no dice nada.
+ */
+const GENERATOR_MODULES = ['rig.py', 'animate.py'];
 
 async function json(path: string): Promise<unknown> {
   return JSON.parse(await readFile(path, 'utf8')) as unknown;
@@ -129,6 +138,9 @@ async function build(assetId: string): Promise<LatestRun> {
   const generatedScript = resolve(temporary, 'build.py');
   const resolvedRecipe = resolve(temporary, 'resolved-recipe.json');
   await copyFile(GENERATOR, generatedScript);
+  for (const moduleName of GENERATOR_MODULES) {
+    await copyFile(resolve(import.meta.dirname, moduleName), resolve(temporary, moduleName));
+  }
   await writeFile(resolvedRecipe, `${JSON.stringify(recipe, null, 2)}\n`, 'utf8');
   const result = spawnSync(blender.path, [
     '--background', '--factory-startup', '--python', generatedScript, '--', resolvedRecipe, candidate, assetId,

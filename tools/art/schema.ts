@@ -62,7 +62,9 @@ export interface ArtRecipe {
   primitives: ArtPrimitive[];
   connectors: string[];
   clips: string[];
-  metadata: { cellUnit: 1; kind: 'axis' | 'village-corner' | 'villager-study'; direction: 'neutral' | 'A' | 'B'; footprint: [number, number] };
+  clipDefinitions: RecipeClip[];
+  rig: RecipeRig | null;
+  metadata: { cellUnit: 1; kind: 'axis' | 'village-corner' | 'villager-study' | 'villager'; direction: 'neutral' | 'A' | 'B'; footprint: [number, number] };
   referenceRender: {
     width: number;
     height: number;
@@ -146,6 +148,133 @@ function stringArray(value: unknown, label: string): string[] {
   return result;
 }
 
+/**
+ * G-04 · Los clips de una receta.
+ *
+ * El catálogo los lista por nombre —es un índice— y la receta los define
+ * enteros, con sus huesos y sus fotogramas. Son dos cosas distintas que hasta
+ * aquí compartían nombre de campo, y una receta con clips de verdad no pasaba
+ * la validación del índice.
+ */
+function clipDefinitions(value: unknown): RecipeClip[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new Error('recipe.clips must be an array.');
+  if (value.every((entry) => typeof entry === 'string')) return [];
+
+  return value.map((entry, index) => {
+    const clip = record(entry, `recipe.clips[${index}]`);
+    const name = stringValue(clip.name, `recipe.clips[${index}].name`);
+    const frames = integer(clip.frames, `recipe.clips[${index}].frames`, 2);
+    if (!Array.isArray(clip.tracks) || clip.tracks.length === 0) {
+      throw new Error(`recipe.clips[${index}].tracks must be a non-empty array.`);
+    }
+    const tracks = clip.tracks.map((trackEntry, trackIndex) => {
+      const label = `recipe.clips[${index}].tracks[${trackIndex}]`;
+      const track = record(trackEntry, label);
+      const bone = stringValue(track.bone, `${label}.bone`);
+      if (!Array.isArray(track.keys) || track.keys.length === 0) {
+        throw new Error(`${label}.keys must be a non-empty array.`);
+      }
+      const keys = track.keys.map((keyEntry, keyIndex) => {
+        const keyLabel = `${label}.keys[${keyIndex}]`;
+        const key = record(keyEntry, keyLabel);
+        return {
+          frame: integer(key.frame, `${keyLabel}.frame`, 1),
+          rotation: vec3(key.rotation, `${keyLabel}.rotation`),
+        };
+      });
+      // Un clip que cicla y no vuelve a su primer fotograma da un salto
+      // visible. Se comprueba aquí, sobre la fuente, además de en la
+      // auditoría del GLB: cuanto antes se vea, más barato sale.
+      if (clip.loop !== false) {
+        const first = keys[0];
+        const last = keys[keys.length - 1];
+        if (first !== undefined && last !== undefined && last.frame === frames) {
+          const same = first.rotation.every((n, axis) => Math.abs(n - (last.rotation[axis] ?? 0)) < 1e-6);
+          if (!same) throw new Error(`${label} loops but its last key does not match its first.`);
+        }
+      }
+      return { bone, keys };
+    });
+    // D.4 · un clip de locomocion lleva su zancada: el controlador la necesita
+    // para casar la velocidad del cuerpo con la del desplazamiento y que los
+    // pies no patinen. Aqui solo se valida y se conserva; quien la use es el
+    // juego, en una ronda posterior.
+    const stride = clip.strideLength;
+    if (stride !== undefined && (typeof stride !== 'number' || !Number.isFinite(stride) || stride <= 0)) {
+      throw new Error(`recipe.clips[${index}].strideLength must be a positive number.`);
+    }
+    return {
+      name, frames, loop: clip.loop !== false, tracks,
+      strideLength: stride === undefined ? null : stride,
+    };
+  });
+}
+
+function clipNames(value: unknown): string[] {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) throw new Error('recipe.clips must be an array.');
+  if (value.every((entry) => typeof entry === 'string')) return value as string[];
+  return clipDefinitions(value).map((clip) => clip.name);
+}
+
+/** G-04 · El esqueleto, si la receta lo declara. */
+function rigOf(value: unknown): RecipeRig | null {
+  if (value === undefined || value === null) return null;
+  const rig = record(value, 'recipe.rig');
+  if (!Array.isArray(rig.bones) || rig.bones.length === 0) {
+    throw new Error('recipe.rig.bones must be a non-empty array.');
+  }
+  const names = new Set<string>();
+  const bones = rig.bones.map((entry, index) => {
+    const bone = record(entry, `recipe.rig.bones[${index}]`);
+    const name = stringValue(bone.name, `recipe.rig.bones[${index}].name`);
+    if (names.has(name)) throw new Error(`recipe.rig.bones has a duplicate '${name}'.`);
+    names.add(name);
+    return {
+      name,
+      head: vec3(bone.head, `recipe.rig.bones[${index}].head`),
+      tail: vec3(bone.tail, `recipe.rig.bones[${index}].tail`),
+      parent: bone.parent === undefined || bone.parent === null
+        ? null
+        : stringValue(bone.parent, `recipe.rig.bones[${index}].parent`),
+    };
+  });
+  for (const bone of bones) {
+    if (bone.parent !== null && !names.has(bone.parent)) {
+      throw new Error(`recipe.rig: bone '${bone.name}' has unknown parent '${bone.parent}'.`);
+    }
+    if (bone.head.every((n, axis) => n === bone.tail[axis])) {
+      throw new Error(`recipe.rig: bone '${bone.name}' has zero length.`);
+    }
+  }
+  const bind = record(rig.bind, 'recipe.rig.bind');
+  for (const [piece, bone] of Object.entries(bind)) {
+    if (typeof bone !== 'string' || !names.has(bone)) {
+      throw new Error(`recipe.rig.bind['${piece}'] names an unknown bone.`);
+    }
+  }
+  return { bones, bind: bind as Record<string, string> };
+}
+
+export interface RecipeClipKey { frame: number; rotation: [number, number, number] }
+export interface RecipeClipTrack { bone: string; keys: RecipeClipKey[] }
+export interface RecipeClip {
+  name: string;
+  frames: number;
+  loop: boolean;
+  /** Metros que avanza el cuerpo en un ciclo, o `null` si el clip no camina. */
+  strideLength: number | null;
+  tracks: RecipeClipTrack[];
+}
+export interface RecipeBone {
+  name: string;
+  head: [number, number, number];
+  tail: [number, number, number];
+  parent: string | null;
+}
+export interface RecipeRig { bones: RecipeBone[]; bind: Record<string, string> }
+
 export function parseRecipe(value: unknown): ArtRecipe {
   const root = record(value, 'recipe');
   if (root.schemaVersion !== 1) throw new Error('recipe.schemaVersion must be 1.');
@@ -210,13 +339,15 @@ export function parseRecipe(value: unknown): ArtRecipe {
   const metadataValue = root.metadata === undefined ? null : record(root.metadata, 'recipe.metadata');
   const kind = metadataValue?.kind ?? 'axis';
   const direction = metadataValue?.direction ?? 'neutral';
-  if (kind !== 'axis' && kind !== 'village-corner' && kind !== 'villager-study') throw new Error('recipe.metadata.kind is invalid.');
+  if (kind !== 'axis' && kind !== 'village-corner' && kind !== 'villager-study' && kind !== 'villager') throw new Error('recipe.metadata.kind is invalid.');
   if (direction !== 'neutral' && direction !== 'A' && direction !== 'B') throw new Error('recipe.metadata.direction is invalid.');
   const footprint = metadataValue === null ? [1, 1] as [number, number] : vec2Positive(metadataValue.footprint, 'recipe.metadata.footprint');
   return {
     schemaVersion: 1, id, materials, groups, primitives,
     connectors: stringArray(root.connectors, 'recipe.connectors'),
-    clips: stringArray(root.clips, 'recipe.clips'),
+    clips: clipNames(root.clips),
+    clipDefinitions: clipDefinitions(root.clips),
+    rig: rigOf(root.rig),
     metadata: { cellUnit: 1, kind, direction, footprint },
     referenceRender: {
       width: integer(render.width, 'recipe.referenceRender.width', 64),

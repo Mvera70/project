@@ -26,6 +26,8 @@ interface ViewerReport {
   viewport: { width: number; height: number; pixelRatio: number };
   /** Cuánto se acercó la cámara. 1 es la parcela entera. */
   zoom: number;
+  /** Qué clip se estaba reproduciendo, y cuánto dura. */
+  clip: { name: string; duration: number } | null;
   camera: string;
   presentationSeconds: number;
   threeRevision: string;
@@ -34,9 +36,39 @@ interface ViewerReport {
   loadDurationMs: number;
 }
 
-declare global {
-  interface Window { valleyGraphicsReport?: ViewerReport }
+/**
+ * G-04 · La sonda de animacion.
+ *
+ * El visor rinde una imagen y se calla. Para juzgar un clip hace falta ademas
+ * medirlo: donde esta cada hueso en cada instante. `animation-audit.ts` lo pide
+ * por aqui en vez de reimplementar la carga de GLB en Node, que seria una
+ * segunda verdad sobre el mismo fichero — y D.4 pide medir lo que el navegador
+ * ve, no lo que Blender creia estar exportando.
+ */
+interface ViewerProbe {
+  clips: Array<{ name: string; duration: number; tracks: string[] }>;
+  /** Deja el recurso en ese instante de ese clip y lo rinde. */
+  show: (clip: string, seconds: number) => void;
+  /**
+   * Donde esta cada nodo con nombre, tras el ultimo `show`.
+   *
+   * `joint` es su origen y `lever` un punto fijo a 25 cm por su eje propio.
+   * Hacen falta los dos: el origen de un hueso no se mueve cuando el hueso
+   * gira, asi que una cabeza que se vuelve entera marcaria cero desplazamiento
+   * y un clip perfectamente visible pareceria vacio.
+   */
+  pose: () => Record<string, { joint: [number, number, number]; lever: [number, number, number] }>;
 }
+
+declare global {
+  interface Window {
+    valleyGraphicsReport?: ViewerReport;
+    valleyGraphicsProbe?: ViewerProbe;
+  }
+}
+
+/** Brazo de palanca de la sonda, en metros. Ver `ViewerProbe.pose`. */
+const LEVER = 0.25;
 
 const root = document.documentElement;
 const status = document.querySelector<HTMLOutputElement>('#status');
@@ -125,15 +157,28 @@ function disposeObject(rootObject: Object3D): void {
 
 async function main(): Promise<void> {
   const resource = params.get('asset') ?? '/artifacts/graphics/G-00/axis-marker.glb';
-  const width = numericParameter('width', 640, 64, 4096);
-  const height = numericParameter('height', 640, 64, 4096);
+  // El suelo baja de 64 a 16 px en G-04. No es para colar una prueba: a 390 px
+  // de ancho la celda del valle mide 10 px (`cellFor`, §11), asi que un aldeano
+  // ocupa unos veinte. La prueba de silueta que P1 dejo como condicion de
+  // entrada consiste justo en rendirlo a ese tamano, y con el suelo en 64 habia
+  // que rendirlo grande y encogerlo, que mide el filtro de reduccion del
+  // navegador y no la silueta. 16 sigue cazando un cero de mas.
+  const width = numericParameter('width', 640, 16, 4096);
+  const height = numericParameter('height', 640, 16, 4096);
   const pixelRatio = numericParameter('pixelRatio', 1, 0.5, 4);
   const presentationSeconds = numericParameter('time', 0, 0, 1_000_000);
   const cameraId = params.get('camera') ?? 'iso-ne';
   const zoom = numericParameter('zoom', 1, 0.1, 20);
+  let playing: { name: string; duration: number } | null = null;
+  // Las cuatro esquinas. Hasta G-04 solo existian las dos del norte, y las dos
+  // bastaban con una casa: mirar una casa por detras sigue siendo mirar la
+  // casa. Un aldeano no: juzgar una pose por la espalda hace ver un doblez
+  // donde solo hay escorzo, y G-04 tiene que juzgar poses.
   const cameraDirections: Record<string, Vector3> = {
     'iso-ne': new Vector3(1, 0.9, 1.15),
     'iso-nw': new Vector3(-1, 0.9, 1.15),
+    'iso-se': new Vector3(1, 0.9, -1.15),
+    'iso-sw': new Vector3(-1, 0.9, -1.15),
   };
   const direction = cameraDirections[cameraId];
   if (direction === undefined) throw new Error(`Unknown camera '${cameraId}'.`);
@@ -225,19 +270,68 @@ async function main(): Promise<void> {
   sun.shadow.camera.updateProjectionMatrix();
   scene.add(sun.target);
 
-  if (gltf.animations.length > 0) {
+  // G-04 · Un clip cada vez.
+  //
+  // Antes se reproducían todos a la vez sobre el mismo esqueleto, y cuatro
+  // acciones mezcladas dan una pose que no es ninguna de las cuatro. Con un
+  // recurso sin animar daba igual; con el aldeano de G-04 hacía imposible
+  // juzgar un clip, que es justo lo que la ronda tiene que juzgar.
+  const show = (wanted: string | null, seconds: number): void => {
+    if (gltf.animations.length === 0) return;
+    const chosen = wanted === null
+      ? gltf.animations[0]
+      : gltf.animations.find((animation) => animation.name === wanted);
+    if (chosen === undefined) {
+      throw new Error(
+        `Unknown clip '${wanted ?? ''}'. The asset has: ${gltf.animations.map((a) => a.name).join(', ')}.`,
+      );
+    }
+    // Un mezclador nuevo por instante. Reaprovechar uno obliga a llevar la
+    // cuenta del desfase entre su reloj y el de cada accion, y una captura que
+    // sale un fotograma corrida no se distingue a ojo de una animacion mala.
+    for (const previous of mixers) {
+      previous.stopAllAction();
+      previous.uncacheRoot(previous.getRoot());
+    }
+    mixers.length = 0;
     const mixer = new AnimationMixer(asset);
     mixers.push(mixer);
-    for (const clip of gltf.animations) mixer.clipAction(clip).play();
-    mixer.setTime(presentationSeconds);
-  }
+    mixer.clipAction(chosen).play();
+    mixer.setTime(seconds);
+    playing = { name: chosen.name, duration: chosen.duration };
+    renderer.render(scene, camera);
+  };
+
+  show(params.get('clip'), presentationSeconds);
   // There is deliberately one render at the explicit presentation time.
   renderer.render(scene, camera);
+
+  window.valleyGraphicsProbe = {
+    clips: gltf.animations.map((animation) => ({
+      name: animation.name,
+      duration: animation.duration,
+      tracks: animation.tracks.map((track) => track.name),
+    })),
+    show: (clip, seconds) => { show(clip, seconds); },
+    pose: () => {
+      asset.updateMatrixWorld(true);
+      const positions: Record<string, { joint: [number, number, number]; lever: [number, number, number] }> = {};
+      asset.traverse((object) => {
+        if (!object.name) return;
+        positions[object.name] = {
+          joint: tuple(object.getWorldPosition(new Vector3())),
+          lever: tuple(object.localToWorld(new Vector3(0, LEVER, 0))),
+        };
+      });
+      return positions;
+    },
+  };
 
   window.valleyGraphicsReport = {
     resourceUrl: new URL(resource, location.href).href,
     viewport: { width, height, pixelRatio },
     zoom,
+    clip: playing,
     camera: cameraId,
     presentationSeconds,
     threeRevision: REVISION,

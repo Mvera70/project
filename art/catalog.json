@@ -241,6 +241,71 @@
         "source": "Original Maqueta serena villager study authored for The Valley G-03",
         "license": "Project original"
       }
+    },
+    {
+      "id": "villager",
+      "artifactRound": "G-04",
+      "status": "study",
+      "recipe": "art/recipes/villager/villager.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T08-51-48-967Z-31364",
+        "directory": "artifacts/graphics/G-04/approved/888b19deb619c65a"
+      },
+      "bounds": {
+        "min": [
+          -0.513449,
+          0.03,
+          -0.28
+        ],
+        "max": [
+          0.513449,
+          2,
+          0.28
+        ],
+        "size": [
+          1.026898,
+          1.97,
+          0.56
+        ]
+      },
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 34,
+        "meshes": 14,
+        "materials": 3,
+        "triangles": 916
+      },
+      "hashes": {
+        "villager.blend": "92235B179A16319F7F51A9920BDCABFCD6E6BAACB20BC35CAA46FA7CA944C535",
+        "villager.glb": "888B19DEB619C65A76ACF557A17319687BBB50AC9F2646B61A877193A1E455B9",
+        "villager-blender.png": "0DAB5B0606E605BE8CA6C17301747A328194532597B6717D3E3C28CC45E77460",
+        "capture-1.png": "8269F4ABF5DFEE338EF092CB4F99FDCC8B9220ECE328F95B04FA4A84268CCD82",
+        "capture-1-gray.png": "1E8AB9C77012EAE73168C8EBD1D4D2DCFF7EDB48A0B0A26B07A85513A82685B0",
+        "capture.json": "5FB81DFBFB8E103019A4AC507DE225760C41399E5177C8018DF1E26709B3C22A",
+        "build.json": "0B1BB95BD7564B65494AAC67354FA9F8B99CD4FFD920CB027B03174930465CAA",
+        "validation.json": "84F9CEC32578B84F279ACE2EF37CAB837484666113583868C2CA5E942AA14837"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager rig and initial clips authored for The Valley G-04",
+        "license": "Project original"
+      }
     }
   ]
 }

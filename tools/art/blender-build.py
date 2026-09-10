@@ -86,10 +86,21 @@ def point_at(obj, target):
     obj.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
 
 
+# G-04: los módulos hermanos viven junto a este script, y Blender no los tiene
+# en su ruta de importación por estar arrancado desde otro sitio.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import rig as rig_module          # noqa: E402
+import animate as animate_module  # noqa: E402
+
 args = sys.argv[sys.argv.index('--') + 1:]
 recipe_path = os.path.abspath(args[0])
 output_dir = os.path.abspath(args[1])
 asset_id = args[2]
+# G-04 · 'rigid' o 'smooth'. Lo normal es rígida; `skin-bench.ts` pide la otra
+# para poder comparar las dos con la misma receta, que es lo que D.4 exige.
+skin_mode = args[3] if len(args) > 3 else 'rigid'
+if skin_mode not in ('rigid', 'smooth'):
+    raise SystemExit("Unknown skin mode '%s'." % skin_mode)
 os.makedirs(output_dir, exist_ok=True)
 
 with open(recipe_path, 'r', encoding='utf-8') as source:
@@ -107,10 +118,30 @@ for spec in recipe['groups']:
 for spec in recipe['groups']:
     if spec['parent'] is not None:
         groups[spec['name']].parent = groups[spec['parent']]
+pieces = {}
 for primitive in recipe['primitives']:
     obj = create_primitive(primitive, materials)
     if primitive['parent'] is not None:
         obj.parent = groups[primitive['parent']]
+    pieces[primitive['name']] = obj
+
+# G-04 · rig y clips, sólo si la receta los declara. Un recurso sin `rig` se
+# construye exactamente igual que antes: G-03 tiene que seguir reproduciéndose.
+built_clips = []
+if recipe.get('rig') is not None:
+    armature = rig_module.build_armature(recipe['rig'], recipe['rig'].get('name', asset_id + '_Rig'))
+    if recipe['rig'].get('parent') is not None:
+        armature.parent = groups[recipe['rig']['parent']]
+    # Los conectores de D.4 son puntos de la escena, y tienen que seguir a su
+    # hueso: una herramienta en la mano se mueve con la mano.
+    bindable = dict(pieces)
+    bindable.update(groups)
+    rig_module.bind_rigid(armature, bindable, recipe['rig']['bind'], smooth=skin_mode == 'smooth')
+    # `clips` son los nombres —el índice que va al catálogo— y
+    # `clipDefinitions` son los clips de verdad, con sus huesos y fotogramas.
+    definitions = recipe.get('clipDefinitions') or []
+    if definitions:
+        built_clips = animate_module.build_clips(armature, definitions)
 
 render = recipe['referenceRender']
 bpy.ops.object.light_add(type='AREA', location=(-3.5, -4.0, 7.0))
@@ -139,9 +170,23 @@ scene.world = bpy.data.worlds.new('ValleyWorld')
 scene.world.color = hex_rgba(render['worldColor'])[:3]
 
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(output_dir, asset_id + '.blend'))
-bpy.ops.export_scene.gltf(
+# `export_animations` con acciones sueltas necesita el modo por NLA/acciones:
+# sin él sólo viaja la acción activa y los otros tres clips se quedan en el
+# `.blend`, que es justo el fallo que D.4 avisa de no dar por bueno.
+export_kwargs = dict(
     filepath=os.path.join(output_dir, asset_id + '.glb'),
     export_format='GLB', export_yup=True, export_cameras=False, export_lights=False,
 )
+if built_clips:
+    export_kwargs.update(
+        export_animations=True,
+        export_animation_mode='ACTIONS',
+        export_force_sampling=True,
+        export_frame_range=False,
+        export_optimize_animation_size=False,
+    )
+bpy.ops.export_scene.gltf(**export_kwargs)
 bpy.ops.render.render(write_still=True)
+if built_clips:
+    print('VALLEY_ART_CLIPS:' + json.dumps(built_clips))
 print('VALLEY_ART_BUILD_OK:' + asset_id)
