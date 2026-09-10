@@ -23,25 +23,26 @@ import type { GraphicsFrame } from './contracts';
  * TUNE, calibrated in G-05 and recorded in D.9. Sixty seconds, and the number
  * is not a taste: it is what the walk cycle costs.
  *
- * A villager's own gait covers 0.713 cells per second — that is the walk clip's
- * measured stride over its measured duration, from G-04. Journeys in this valley
- * run 3 to 13 cells with a median of 6, and D.6's day spends 15 % of itself
- * travelling. Six cells at that gait is 8.4 seconds, so the day has to last
- * around a minute for people to arrive at a walking pace.
+ * A villager's own gait covers 0.238 cells per second — that is the walk clip's
+ * measured stride over its measured duration, from G-04, once the villager is
+ * scaled to the size of a person against a three-metre cell (D.6.2). Journeys in
+ * this valley run 3 to 13 cells with a median of 6, and D.6's day spends 15 % of
+ * itself travelling. Six cells at that gait is 25 seconds, which would want a day
+ * of 168. A hundred and twenty is the compromise: the median walk plays at 1,4
+ * times the clip's own cadence, a brisk walk rather than a stroll, and the day
+ * stays short enough that a player sees a whole one.
  *
  * The first attempt tied the day to the week, at 15 seconds. It made every
- * villager cross the valley in two and a quarter seconds: 2.7 cells a second,
- * which the clip would have to play at nearly five leg cycles a second. Sprinting
- * to the field and back, all day, for ever.
+ * villager cross the valley in two and a quarter seconds, which the clip would
+ * have to play at nearly five leg cycles a second: sprinting to the field and
+ * back, all day, for ever.
  *
- * The cost of the decision, stated plainly: at ×1 roughly four weeks pass per
- * scenic day, so the day no longer maps to the week. D.6 allows exactly that and
- * says a sped-up week owes the player no complete journey. The alternative was a
- * village of sprinters, and there is no third option without changing how big a
- * villager is against a map cell — which is a question about the asset, not
- * about the clock, and is written down as such.
+ * The cost of the decision, stated plainly: at ×1 eight weeks pass per scenic
+ * day, so the day no longer maps to the week. D.6 allows exactly that and says a
+ * sped-up week owes the player no complete journey. The alternative was a village
+ * of sprinters.
  */
-export const SCENIC_DAY_SECONDS = 60;
+export const SCENIC_DAY_SECONDS = 120;
 
 /**
  * The longest scenic step a single frame may take, in seconds.
@@ -168,8 +169,8 @@ export function createPresentationClock(): PresentationClock {
  *
  * Separate from `tickFraction` on purpose, and D.6 says captures must state the
  * two apart. The tick says what the world is doing this week; this says what
- * time of day the village is living. They never coincide: a scenic day is four
- * weeks at ×1 and sixty-four at ×16. That is the decision, not a slip.
+ * time of day the village is living. They never coincide: a scenic day is eight
+ * weeks at ×1 and a hundred and twenty-eight at ×16. That is the decision.
  */
 export function dayPhase(presentationSeconds: number): number {
   const phase = (presentationSeconds / SCENIC_DAY_SECONDS) % 1;

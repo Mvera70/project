@@ -64,12 +64,19 @@ const SYSTEM_BROWSERS = [
 
 /** Blender exporta a los fps de la escena de fábrica. */
 const FPS = ANIMATION_FPS;
-/** Cuánto puede moverse la raíz y seguir llamándose quieta, en metros. */
-const ROOT_DRIFT = 0.005;
-/** Cuánto tiene que moverse el hueso más vivo para que el clip cuente, en metros. */
-const MIN_TRAVEL = 0.02;
-/** Cuánto puede separarse el bucle de su primera pose, en metros. */
-const LOOP_GAP = 0.002;
+// Los tres umbrales de abajo van **en proporción al alto del recurso**, no en
+// unidades. Estuvieron en unidades y al escalar el aldeano a un tercio —una
+// celda del mapa son tres metros, D.6.2— la auditoría empezó a denunciar
+// clips que no habían cambiado: lo que medía era el tamaño de la figura y no
+// su animación. Un umbral absoluto en una cadena que escala recursos es un
+// umbral que caduca.
+
+/** Cuánto puede moverse la raíz y seguir llamándose quieta. */
+const ROOT_DRIFT = 0.0026;
+/** Cuánto tiene que moverse el hueso más vivo para que el clip cuente. */
+const MIN_TRAVEL = 0.01;
+/** Cuánto puede separarse el bucle de su primera pose. */
+const LOOP_GAP = 0.001;
 /** Cuántas veces la caja en reposo puede ocupar un hueso antes de ser un miembro suelto. */
 const BOUNDS_SLACK = 1.6;
 /**
@@ -364,6 +371,11 @@ async function main(): Promise<void> {
     // La caja en reposo, para reconocer un miembro que se ha ido de viaje.
     const rest = report.bounds;
     const span = Math.max(...rest.size) * BOUNDS_SLACK;
+    // La talla del recurso, contra la que se miden los tres umbrales.
+    const tall = Math.max(rest.size[1], 1e-6);
+    const rootDriftLimit = ROOT_DRIFT * tall;
+    const minTravel = MIN_TRAVEL * tall;
+    const loopGapLimit = LOOP_GAP * tall;
     const centre = rest.min.map((low, axis) => (low + (rest.max[axis] ?? low)) / 2) as Vec3;
 
     for (const clip of declared) {
@@ -403,7 +415,7 @@ async function main(): Promise<void> {
             if (here !== undefined) rootDrift = Math.max(rootDrift, distance(origin.joint, here.joint));
           }
         }
-        if (rootDrift > ROOT_DRIFT) {
+        if (rootDrift > rootDriftLimit) {
           problems.push(
             `Clip '${clip.name}' moves its root ${rootDrift.toFixed(4)}m. Locomotion must be in place.`,
           );
@@ -426,7 +438,7 @@ async function main(): Promise<void> {
         }
         if (travel > liveliest.travel) liveliest = { node, travel };
       }
-      if (liveliest.travel < MIN_TRAVEL) {
+      if (liveliest.travel < minTravel) {
         problems.push(`Clip '${clip.name}' barely moves: its liveliest node travels ${liveliest.travel.toFixed(4)}m.`);
       }
       if (outOfBounds.length > 0) {
@@ -441,7 +453,7 @@ async function main(): Promise<void> {
         const end = last[node];
         if (start !== undefined && end !== undefined) loopGap = Math.max(loopGap, distance(start.lever, end.lever));
       }
-      if (clip.loop && loopGap > LOOP_GAP) {
+      if (clip.loop && loopGap > loopGapLimit) {
         problems.push(`Clip '${clip.name}' loops but ends ${loopGap.toFixed(4)}m away from its first pose.`);
       }
 

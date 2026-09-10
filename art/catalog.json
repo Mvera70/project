@@ -260,27 +260,27 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T14-27-52-857Z-49380",
-        "directory": "artifacts/graphics/G-04/approved/2b30b3a15800284c"
+        "runId": "2026-09-10T15-47-21-683Z-25516",
+        "directory": "artifacts/graphics/G-04/approved/ed86ca72e72f2534"
       },
       "bounds": {
         "min": [
-          -0.513449,
-          0.03,
-          -0.28
+          -0.17115,
+          0.01,
+          -0.093333
         ],
         "max": [
-          0.513449,
-          2,
-          0.28
+          0.17115,
+          0.666667,
+          0.093333
         ],
         "size": [
-          1.026898,
-          1.97,
-          0.56
+          0.342299,
+          0.656667,
+          0.186667
         ]
       },
-      "recipeSha256": "A30784E1640B53EC0FDECC7044576EF50DE2AC7C41D1F18CA7142D6290BA627E",
+      "recipeSha256": "41AAC059BFFBC5B8D32769937FA45F0D579C900BDA96F3EA6A4E66D72326C201",
       "materials": [
         "skin",
         "cloth",
@@ -303,7 +303,7 @@
           "name": "walk",
           "seconds": 1.3333333333333333,
           "loop": true,
-          "strideLength": 0.95
+          "strideLength": 0.317
         },
         {
           "name": "work_hoe",
@@ -315,7 +315,7 @@
           "name": "carry_walk",
           "seconds": 1.3333333333333333,
           "loop": true,
-          "strideLength": 0.78
+          "strideLength": 0.26
         }
       ],
       "connectors": [
@@ -329,14 +329,14 @@
         "triangles": 1236
       },
       "hashes": {
-        "villager.blend": "1B5A996DCC5BDA8FD7332CF6BB997B942455DF28AF6540E10312EAAC774CD6D6",
-        "villager.glb": "2B30B3A15800284C9CA2D6C3BF2224EF85E0A25866A0C8F183A7DE0DCCD7F496",
-        "villager-blender.png": "64898BFE6352802B6012FC4619275A9968D30EA15DA46F141C2792C857557929",
-        "capture-1.png": "03E519E3278F782E01CA0206DB53F7188EC97848B78804D0F5F987D0A5653F38",
-        "capture-1-gray.png": "F43674133B261C439E2B894AD711A4B492DF4D928D7951B905206A4E338A5377",
-        "capture.json": "85C7A998EFA1C530A3BFADC0E6BAA809F29A435CC743BC0CA281820244372D87",
-        "build.json": "2482CA845FEEC2EB3FED2A0CC247F7022E56205B984E7B8DD48D5607280BE05E",
-        "validation.json": "A7463E3F5C75E5D8B2CA2DC9335333077C9BE29CC2A0E82EDE188159E8AB2CFB"
+        "villager.blend": "FE6AD9CB48E1B729E534FE6F28C50EB8F1450B110FF963B7F23919850DC6C5A6",
+        "villager.glb": "ED86CA72E72F25342F9D9F760E2197470DBEE41797D346153A11F2B2BDAACAF9",
+        "villager-blender.png": "E429CD0DE40AB38A67324D8002E5E5484A126A8FC6ADC6D29A1E76B0A247011B",
+        "capture-1.png": "2D3DE0C34A5978D407B125ADE1DB4FD33C9F26389D7EA57E181A738C7FC38A23",
+        "capture-1-gray.png": "424319B09D0FDB55F761AC7C5540426B9566053D080DA77FC86AB2472AC53C9A",
+        "capture.json": "9B0E75A62438E914F4561AC694C31576424360E631A99279ECD9E0388271A012",
+        "build.json": "A9BA615C9FA5987E6CD00081056D7E9CF815919C54B3C5BE5E01368346C7A789",
+        "validation.json": "66714962552B3EEE4C8E4D242FF32021656D97F7E684E7B601C32186609B1C6C"
       },
       "provenance": {
         "kind": "original",

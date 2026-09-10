@@ -61,6 +61,8 @@ export interface ArtRecipe {
   groups: ArtGroup[];
   primitives: ArtPrimitive[];
   connectors: string[];
+  /** Cuántas unidades de escena vale una unidad de la receta. Ver `scaleOf`. */
+  scale: number;
   clips: string[];
   clipDefinitions: RecipeClip[];
   rig: RecipeRig | null;
@@ -440,6 +442,25 @@ function motionOf(
   });
 }
 
+/**
+ * G-06 · De las unidades de la receta a las del juego.
+ *
+ * Una receta se escribe en metros, porque un aldeano de 1,95 se dibuja mejor
+ * que uno de 0,65. Una unidad de escena, en cambio, es **una celda del mapa**
+ * (D.4), y una celda de este valle son unos tres metros: una casa ocupa dos por
+ * dos y una casa mide seis metros de lado.
+ *
+ * Sin esta conversión el aldeano medía dos celdas, o sea tanto como el ancho de
+ * la casa en la que vivía, y el valle entero medía dieciocho aldeanos de ancho.
+ */
+function scaleOf(value: unknown): number {
+  if (value === undefined || value === null) return 1;
+  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+    throw new Error('recipe.scale must be a positive number.');
+  }
+  return value;
+}
+
 export function parseRecipe(value: unknown): ArtRecipe {
   const root = record(value, 'recipe');
   if (root.schemaVersion !== 1) throw new Error('recipe.schemaVersion must be 1.');
@@ -510,6 +531,7 @@ export function parseRecipe(value: unknown): ArtRecipe {
   return {
     schemaVersion: 1, id, materials, groups, primitives,
     connectors: stringArray(root.connectors, 'recipe.connectors'),
+    scale: scaleOf(root.scale),
     clips: clipNames(root.clips),
     clipDefinitions: clipDefinitions(root.clips),
     rig: rigOf(root.rig),

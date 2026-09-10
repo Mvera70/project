@@ -143,6 +143,17 @@ if recipe.get('rig') is not None:
     if definitions:
         built_clips = animate_module.build_clips(armature, definitions)
 
+# G-06 · de metros a celdas. Se aplica al final y sobre las raices, que arrastran
+# a todo lo que cuelga de ellas: piezas, esqueleto y las traslaciones de hueso de
+# los clips. Antes de esto el aldeano medi'a dos celdas, tanto como el ancho de
+# la casa en la que vivia.
+scale = recipe.get('scale', 1)
+if scale != 1:
+    for obj in list(bpy.context.scene.objects):
+        if obj.parent is None:
+            obj.scale = (obj.scale[0] * scale, obj.scale[1] * scale, obj.scale[2] * scale)
+            obj.location = tuple(component * scale for component in obj.location)
+
 render = recipe['referenceRender']
 bpy.ops.object.light_add(type='AREA', location=(-3.5, -4.0, 7.0))
 bpy.context.object.data.energy = 900

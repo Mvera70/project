@@ -1,6 +1,8 @@
 {
   "schemaVersion": 1,
   "id": "villager",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
   "palette": "../palette.json",
   "metadata": {
     "cellUnit": 1,
@@ -1028,7 +1030,7 @@
       "name": "walk",
       "frames": 32,
       "loop": true,
-      "strideLength": 0.95,
+      "strideLength": 0.317,
       "note": "Marcha con apoyo y vuelo: la pierna de apoyo casi recta con el pie en el suelo, la de vuelo plegando la rodilla hasta unos 62 grados para que el pie levante hasta unos 46 grados de espinilla. La primera version las escribia en negativo y la rodilla se abria hacia delante como la de un pajaro, que se veia como un balanceo de pendulo. La cadera sube en el paso y baja en el contacto. La zancada no se elige: es la que dan las piernas, medida sobre el GLB por el recorrido del pie que pisa.",
       "tracks": [
         {
@@ -2481,7 +2483,7 @@
       "name": "carry_walk",
       "frames": 32,
       "loop": true,
-      "strideLength": 0.78,
+      "strideLength": 0.26,
       "note": "El mismo paso mas corto, con los brazos ocupados por delante y el torso echado atras para compensar el peso. La carga es un accesorio y no un segundo cuerpo (D.4). Las piernas van al 82 por ciento, y la zancada medida sale exactamente en esa proporcion.",
       "tracks": [
         {

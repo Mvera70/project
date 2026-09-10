@@ -16,6 +16,10 @@ export interface ClipMotion {
   /**
    * Ground covered in one cycle, in scene units. One unit is one map cell (D.4).
    *
+   * Un aldeano mide 0,65 celdas y su zancada 0,32, porque una celda de este
+   * valle son unos tres metros: una casa ocupa dos por dos y una casa mide seis
+   * metros de lado. Ver D.6.2.
+   *
    * `null` for a clip that stays put. For one that walks, this is what stops the
    * feet sliding: the clip is played at `speed / strideLength` cycles per
    * second, so the ground passes under the foot exactly as fast as the foot
@@ -29,9 +33,9 @@ export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk';
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   idle: { seconds: 4, loop: true, strideLength: null },
-  walk: { seconds: 4 / 3, loop: true, strideLength: 0.95 },
+  walk: { seconds: 4 / 3, loop: true, strideLength: 0.317 },
   work_hoe: { seconds: 2, loop: true, strideLength: null },
-  carry_walk: { seconds: 4 / 3, loop: true, strideLength: 0.78 },
+  carry_walk: { seconds: 4 / 3, loop: true, strideLength: 0.26 },
 };
 
 /**

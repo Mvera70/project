@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.20** | 10 sep 2026 | Decisión del usuario sobre la escala | **Un aldeano mide 0,65 celdas, no dos.** La aldea se ve entera al entrar y la gente se ve muy pequeña; para el detalle se acerca la cámara. El número sale de lo construido: una casa ocupa dos por dos celdas y mide seis metros de lado, así que una celda son tres metros y una persona 0,65. A 390 px de ancho, seis píxeles. La receta sigue en metros y declara un `scale` que el generador aplica a las raíces antes de exportar, así que la zancada baja de 0,95 a 0,32 sin tocar una sola clave. Arrastra la recalibración del día escénico a 120 s (D.6.1) y convierte los umbrales de la auditoría de animación en proporción del alto del recurso: en unidades absolutas denunciaban clips que no habían cambiado. |
 | **3.19** | 10 sep 2026 | Ejecución G-05 | **Hay reloj de presentación y actores derivados: el piloto ya sabe qué hace cada aldeano en cada instante.** El reloj es dueño único del tiempo escénico, no toca el acumulador del motor, congela en pausa, suspende con la pestaña oculta y marca `discontinuity` cuando un letargo trae semanas de golpe. Los actores son función pura del estado y el instante: no guardan ruta, así que una muerte o una mudanza no pueden dejar a nadie andando un camino viejo. **El clip lo mueve el suelo recorrido y no el reloj**, que es lo que impide que los pies patinen, y eso obligó a calibrar el día escénico (D.6.1) en sesenta segundos. Por el camino, tres defectos que el render de Canvas también tiene: el reparto de la ruta iba por índice de celda y el aldeano aceleraba en las diagonales; el desvío del carril giraba de golpe en cada esquina; y un crío «jugando» se movía a doce veces la velocidad a la que nadie anda. |
 | **3.18** | 10 sep 2026 | Segundo repaso de G-04, en el móvil | **Los codos doblaban al revés en andar y cargar.** El mismo error de signo que las rodillas pero espejado: la rodilla lleva el talón atrás y vive en positivo, el codo lleva la mano adelante y vive en negativo. Azadonar los tenía bien, y por eso era el único clip cuyos brazos se veían bien, lo que descartó la cámara como explicación. La auditoría gana la comprobación de **sentido** de cada bisagra, porque el ángulo por sí solo no distingue una rodilla de una rodilla del revés; verificada contra el artefacto defectuoso, denuncia los dos clips malos y deja en paz el bueno. |
 | **3.17** | 10 sep 2026 | Repaso de G-04 tras verlo en movimiento | **Las rodillas del aldeano se doblaban al revés.** En huesos que apuntan hacia abajo el signo negativo es hacia delante, y las espinillas estaban en negativo: la rodilla se abría como la de un pájaro y el paso se veía como un balanceo de péndulo. Con apoyo y vuelo de verdad la flexión pasa de 25 a 41 grados. Andar no tocaba la columna, así que heredaba la inclinación de azadonar; ahora los cuatro clips mueven el mismo juego de huesos y un clip se basta solo. Cuentas esféricas en codo y rodilla, porque dos cilindros que se juntan en un punto enseñan sus tapas al doblar. La zancada declarada no era la que daban las piernas (0,62 contra 0,95) y pasa a medirse por el recorrido del pie que pisa. Y la promoción sólo exige equivalencia con lo aprobado si la receta no ha cambiado: sin eso, ningún cambio de forma era promovible. |
@@ -8208,16 +8209,46 @@ dice que una semana acelerada no le debe al jugador un trayecto completo. No
 había tercera opción sin cambiar **cuánto mide un aldeano contra una celda del
 mapa**, que es una pregunta sobre el recurso y no sobre el reloj.
 
-**Y esa pregunta queda abierta.** El aldeano de G-04 mide dos unidades de escena,
-o sea dos celdas. Un valle de 36 celdas de ancho es entonces dieciocho aldeanos
-de ancho, que para una aldea con campos, bosque y río es poco. Si el aldeano
-midiera media celda —que es lo que haría del valle un sitio con distancias— la
-zancada bajaría en la misma proporción y el día escénico tendría que alargarse
-todavía más. Es una decisión de dirección artística con consecuencias en el
-reloj, y se toma con el usuario delante de una imagen, no aquí.
+**Esa pregunta quedó abierta y se cerró enseguida:** D.6.2 fija el aldeano en
+0,65 celdas, la zancada baja a 0,32 y el día escénico se recalibra a **ciento
+veinte segundos**. Seis celdas a 0,238 celdas por segundo son 25 segundos de
+marcha, que querrían un día de 168; ciento veinte es el punto medio, con la
+jornada mediana andando a 1,4 veces la cadencia del clip —paso vivo, no
+paseo— y un día que un jugador todavía llega a ver entero.
 
 Medido tras calibrar: el más rápido del valle en su instante más rápido va a
-2,01 celdas por segundo, 2,8 veces su propia cadencia. La mediana anda a su paso.
+1,00 celdas por segundo. La mediana anda a su paso.
+
+#### D.6.2 · Cuánto mide un aldeano, decidido (v3.20)
+
+**Una celda del mapa son tres metros, y un aldeano mide 0,65 celdas.** El
+usuario lo decidió mirando el piloto: quiere que al entrar se vea la aldea
+entera y la gente se vea muy pequeña, y que haya que acercarse para verla con
+detalle. Panorámica primero, zoom para el detalle.
+
+El número no es una preferencia, sale de lo que ya hay construido. Una casa
+ocupa **dos por dos celdas** y una casa de aldea mide unos seis metros de lado,
+así que una celda son tres metros. Una persona de 1,95 son 0,65 celdas. A 390 px
+de ancho la celda mide 10 px, de modo que un aldeano ocupa unos **seis
+píxeles**: la personita que se pidió.
+
+Antes de esto el aldeano medía **dos celdas**, o sea tanto como el ancho de la
+casa en la que vivía, y el valle entero medía dieciocho aldeanos de ancho.
+
+**Cómo se aplica.** La receta se sigue escribiendo en metros, porque un aldeano
+de 1,95 se dibuja mejor que uno de 0,65, y declara un `scale` que el generador
+aplica a las raíces al final, antes de exportar. Arrastra a todo: piezas,
+esqueleto y las traslaciones de hueso de los clips. La zancada medida baja en la
+misma proporción, de 0,95 a 0,32 celdas, sin tocar ninguna clave.
+
+**Lo que arrastró.** El día escénico de D.6.1 se recalibra de sesenta a **ciento
+veinte segundos**: el ciclo de andar pasa a dar 0,238 celdas por segundo y la
+jornada mediana de seis celdas cuesta 25 segundos de marcha. Y los umbrales de
+la auditoría de animación, que estaban en unidades absolutas, pasan a ser
+proporción del alto del recurso: al escalar, empezaron a denunciar clips que no
+habían cambiado, porque lo que medían era el tamaño de la figura y no su
+animación. **Un umbral absoluto en una cadena que escala recursos es un umbral
+que caduca.**
 
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
