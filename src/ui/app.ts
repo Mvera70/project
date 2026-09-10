@@ -9,9 +9,9 @@ import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save'
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
-import { createRenderer } from '@render/renderer';
+import { attachBackend, backendFrom } from './backend';
 import { persistSave } from './idb';
-import { inspectAt, panelFor, type InspectTarget } from './inspect';
+import { panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
@@ -148,7 +148,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   panel.setAttribute('aria-live', 'polite');
   root.append(panel);
 
-  const renderer = createRenderer(canvas, root);
+  // G-07 · Canvas pinta desde el primer fotograma, siempre. Si el jugador pidió
+  // el piloto 3D con `?render=3d`, se carga por detrás y releva cuando esté;
+  // si falla, el valle sigue en 2D en vez de quedarse en un error.
+  const backend = attachBackend(canvas, root, {
+    kind: backendFrom(location.search, localStorage.getItem('valley.render')),
+  });
+  const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
+    track: (id: number | null): void => { backend.live.track(id); } };
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
@@ -173,10 +180,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const trace = new Map<number, Point[]>();
   let pinchStart: number | null = null;
   let zoom = 1;
-  const mapPoint = (event: PointerEvent): { x: number; y: number } => {
-    const box = canvas.getBoundingClientRect();
-    return { x: (event.clientX - box.left) * 36 / box.width, y: (event.clientY - box.top) * 56 / box.height };
-  };
   canvas.addEventListener('pointerdown', (event) => {
     canvas.setPointerCapture(event.pointerId);
     trace.set(event.pointerId, [{ x: event.clientX, y: event.clientY, atMs: event.timeStamp }]);
@@ -187,13 +190,33 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   });
   canvas.addEventListener('pointermove', (event) => {
     const points = trace.get(event.pointerId); if (points === undefined) return;
+    const previous = points.at(-1);
     points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
+    // Un dedo solo arrastra el valle, cuando hay valle que arrastrar.
+    if (trace.size === 1 && previous !== undefined && backend.live.movesCamera) {
+      backend.live.pan(event.clientX - previous.x, event.clientY - previous.y);
+    }
     if (pinchStart !== null && trace.size === 2) {
       const ends = [...trace.values()].map((items) => items.at(-1)!);
       const distance = Math.hypot(ends[1]!.x - ends[0]!.x, ends[1]!.y - ends[0]!.y);
-      zoom = Math.max(1, Math.min(2.5, zoom * distance / pinchStart));
+      if (backend.live.movesCamera) {
+        // D.7 · zoom de verdad, no CSS: se cambia el volumen ortográfico y el
+        // punto bajo los dedos se queda donde estaba. Escalar el elemento
+        // agranda píxeles ya pintados; esto pinta más cerca.
+        const mid = [...trace.values()].map((items) => items.at(-1)!);
+        const first = mid[0]!;
+        const second = mid[1]!;
+        const box = canvas.getBoundingClientRect();
+        backend.live.zoom(
+          pinchStart / distance,
+          (first.x + second.x) / 2 - box.left,
+          (first.y + second.y) / 2 - box.top,
+        );
+      } else {
+        zoom = Math.max(1, Math.min(2.5, zoom * distance / pinchStart));
+        canvas.style.transform = `scale(${zoom})`;
+      }
       pinchStart = distance;
-      canvas.style.transform = `scale(${zoom})`;
     }
   });
   canvas.addEventListener('pointerup', (event) => {
@@ -202,7 +225,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     const gesture = recogniseGesture({ points });
     trace.delete(event.pointerId); if (trace.size < 2) pinchStart = null;
     if (gesture === 'tap' || gesture === 'hold') {
-      const point = mapPoint(event); const target = inspectAt(state, point.x, point.y, lastFraction);
+      // Cada backend sabe qué hay bajo un punto de su propia pantalla: el 2D
+      // por proporción de la rejilla, el 3D lanzando un rayo. `mapPoint` se
+      // queda para el 2D y no vale para el otro.
+      const box = canvas.getBoundingClientRect();
+      const target = backend.live.pick(
+        state, event.clientX - box.left, event.clientY - box.top, lastFraction,
+      );
       if (target !== null) {
         showPanel(target);
         if (gesture === 'hold' && target.kind === 'villager') renderer.track(target.id);

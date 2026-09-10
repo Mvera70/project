@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { createValleyCamera, CLOSEST_HEIGHT } from '../../src/render3d/camera';
+import { backendFrom } from '../../src/ui/backend';
 
 const VALLEY = { minX: 0, minZ: 0, maxX: 36, maxZ: 56 };
 const VILLAGE = { minX: 8, minZ: 18, maxX: 26, maxZ: 38 };
@@ -171,6 +172,28 @@ describe('G-07 · la cámara del valle', () => {
       expect(back.x).toBeCloseTo(x ?? 0, 3);
       expect(back.z).toBeCloseTo(z ?? 0, 3);
     }
+  });
+});
+
+describe('G-07 · qué backend pinta el valle', () => {
+  it('Canvas por defecto, y ante la duda también', () => {
+    // D.5 · el piloto no sustituye a `src/render/` antes de P3, y G-12 es la
+    // ronda que decide si alguna vez lo hace. Un interruptor de desarrollo no
+    // puede dejar a nadie sin valle por una errata en la dirección.
+    expect(backendFrom('', null)).toBe('canvas');
+    expect(backendFrom('?render=', null)).toBe('canvas');
+    expect(backendFrom('?render=webgl', null)).toBe('canvas');
+    expect(backendFrom('?render=3d', null)).toBe('pilot3d');
+    expect(backendFrom('?render=pilot3d', null)).toBe('pilot3d');
+  });
+
+  it('lo pedido en la dirección manda sobre lo recordado', () => {
+    // Volver a 2D tiene que ser posible sin borrar nada, que es lo que se hace
+    // cuando el piloto deja de arrancar en un teléfono concreto.
+    expect(backendFrom('?render=canvas', 'pilot3d')).toBe('canvas');
+    expect(backendFrom('', 'pilot3d')).toBe('pilot3d');
+    expect(backendFrom('', 'canvas')).toBe('canvas');
+    expect(backendFrom('', 'lo que sea')).toBe('canvas');
   });
 });
 

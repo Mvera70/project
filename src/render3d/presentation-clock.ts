@@ -89,7 +89,7 @@ const LETHARGY_SLACK_TICKS = 2;
  * el suelo recorrido, la cadencia sube sola con el paso, que es justo lo que
  * hace una grabacion acelerada.
  */
-function scenicRate(speed: 0 | 1 | 4 | 16): number {
+function scenicRate(speed: 0 | 1 | 4 | 16 | 64): number {
   return Math.sqrt(speed);
 }
 
@@ -103,7 +103,7 @@ export interface ClockInput {
   readonly tick: number;
   /** How far into the current week the engine is, from its own accumulator. */
   readonly tickFraction: number;
-  readonly speed: 0 | 1 | 4 | 16;
+  readonly speed: 0 | 1 | 4 | 16 | 64;
   readonly reducedMotion: boolean;
   /** Whether the document is hidden. Presentation suspends while it is. */
   readonly hidden: boolean;

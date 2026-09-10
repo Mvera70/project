@@ -11,7 +11,15 @@ export interface GraphicsFrame {
   readonly tickFraction: number;
   readonly presentationSeconds: number;
   readonly deltaSeconds: number;
-  readonly speed: 0 | 1 | 4 | 16;
+  /**
+   * G-07 · El juego tiene ×64 y este contrato llegaba a ×16.
+   *
+   * Lo añadió §11 cuando el jugador dijo que ×16 se le quedaba corto para
+   * probar, y el Anexo D se escribió antes. No es un caso raro: es el que más
+   * exige al reloj de presentación, porque es donde más se separan el ritmo del
+   * mundo y el de la gente.
+   */
+  readonly speed: 0 | 1 | 4 | 16 | 64;
   readonly reducedMotion: boolean;
   readonly discontinuity: boolean;
 }
