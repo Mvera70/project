@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.11** | 12 sep 2026, 22:40 | La densidad, medida contra el veredicto | **El problema que abrió §11.6 está resuelto y se puede enseñar.** La primera sesión humana veía entre 0,0 y 0,6 sucesos notables en cinco minutos. Ahora son **2,8 a ×1** y 21 a ×4. Algo digno de contarse cada dos minutos a velocidad normal, donde antes cabía una sesión entera sin nada. |
 | **3.10** | 12 sep 2026, 22:00 | El banco después de la vida nueva | **`forest_cut` entra en banda por primera vez desde v2.47** — el invierno en el bosque hizo lo que años de ajustes no consiguieron. A cambio `smith_feud` pasa de fallar en una política a fallar en las cuatro, y la extinción adversa vuelve de 15,0 % a 11,7 %. El tiempo del banco baja de 43 a **18,1 min**, todavía por encima de los 15. Diez fallos. |
 | **3.09** | 12 sep 2026, 20:15 | La convivencia, y el freno que hacía falta | **Todas las fuerzas sobre las opiniones empujaban hacia abajo**, así que un valle largo acababa siendo siempre un valle de gente que no se aprecia. Trabajar en el mismo sitio ahora acerca. Y se destapa un bucle: sin freno, las riñas pasaron de 21 a **224** en cinco partidas, porque cada una hundía la opinión y los enemigos no trabajan juntos. |
 | **3.08** | 12 sep 2026, 18:45 | Los rencores se ven | **Dos que se detestan dejan de trabajar codo con codo como si nada.** No pararse a hablar era sólo la mitad; la otra es darse la espalda, y eso se ve sin leer una línea de crónica. Un rencor de §6.4 pasa de ser una fila en un registro a algo que se nota todos los días. |
@@ -5453,6 +5454,26 @@ estado nuevo — el recuerdo que dejó la última riña hace de marca de tiempo.
 Dieciocho es lo que había antes de que la convivencia existiera (21), así que el
 equilibrio se conserva: la aldea tiene ahora afectos **y** enemistades, y ni una
 cosa ni la otra se desbocan.
+
+#### La densidad, contra el veredicto que la motivó (v3.11)
+
+§11.6 nació de una cuenta: en la primera sesión humana (§16.3) pasaban entre
+**0,0 y 0,6** sucesos notables cada cinco minutos, y el jugador dijo que no
+pasaba nada. Es la misma cuenta, con todo lo que §7.7, §7.8 y §7.9 han añadido:
+
+| Velocidad | Semanas en 5 min | Sucesos de peso ≥2 |
+|---|---|---|
+| ×1 | 20 | **2,8** |
+| ×4 | 80 | 21,2 |
+| ×16 | 320 | 99,0 |
+| ×64 | 1280 | 397,4 |
+
+A velocidad normal sale algo digno de contarse **cada dos minutos**. A ×16 casi
+uno cada tres segundos, que ya es más de lo que nadie lee — pero a esa velocidad
+no se juega para leer, se juega para ver pasar los años.
+
+**Qué falsaría esto:** que una sesión de cinco minutos a ×1 sobre una aldea
+asentada volviera a caer por debajo de uno.
 
 #### El banco después de la vida nueva (v3.10)
 
