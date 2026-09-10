@@ -21,6 +21,7 @@ interface CaptureResult {
   file: string;
   sha256: string;
   dimensions: { width: number; height: number };
+  grayscale: null | { file: string; sha256: string; dimensions: { width: number; height: number } };
   durationMs: number;
   viewer: ViewerReport;
 }
@@ -81,7 +82,7 @@ async function waitForResult(page: Page): Promise<'ready' | 'error'> {
   return state;
 }
 
-async function captureValid(page: Page, url: string, file: string): Promise<CaptureResult> {
+async function captureValid(page: Page, url: string, file: string, grayscale: boolean): Promise<CaptureResult> {
   const started = performance.now();
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   const state = await waitForResult(page);
@@ -90,7 +91,17 @@ async function captureValid(page: Page, url: string, file: string): Promise<Capt
   const viewer = await page.evaluate(() => window.valleyGraphicsReport);
   if (viewer === undefined) throw new Error('Viewer became ready without structured metadata.');
   const png = await page.screenshot({ path: file });
-  return { file, sha256: sha256(png), dimensions: pngDimensions(png), durationMs: Math.round(performance.now() - started), viewer };
+  let grayEvidence: CaptureResult['grayscale'] = null;
+  if (grayscale) {
+    await page.locator('html').evaluate((element) => { element.style.filter = 'grayscale(1)'; });
+    const grayFile = file.replace(/\.png$/u, '-gray.png');
+    const gray = await page.screenshot({ path: grayFile });
+    grayEvidence = { file: grayFile, sha256: sha256(gray), dimensions: pngDimensions(gray) };
+  }
+  return {
+    file, sha256: sha256(png), dimensions: pngDimensions(png), grayscale: grayEvidence,
+    durationMs: Math.round(performance.now() - started), viewer,
+  };
 }
 
 async function main(): Promise<void> {
@@ -99,6 +110,7 @@ async function main(): Promise<void> {
   const pixelRatio = numericArgument('pixelRatio', 1, 0.5, 4);
   const camera = argument('camera', 'iso-ne');
   const presentationSeconds = numericArgument('time', 0, 0, 1_000_000);
+  const grayscale = argument('grayscale', 'false') === 'true';
   const output = resolve(ROOT, argument('output', DEFAULT_OUTPUT));
   const outputRelative = relative(ROOT, output);
   if (outputRelative.startsWith(`..${sep}`) || outputRelative === '..') {
@@ -112,7 +124,7 @@ async function main(): Promise<void> {
   if (!existsSync(assetPath)) throw new Error(`Asset does not exist: ${assetPath}`);
 
   await mkdir(output, { recursive: true });
-  for (const name of ['capture-1.png', 'capture-2.png', 'missing-resource.png', 'capture.json']) {
+  for (const name of ['capture-1.png', 'capture-1-gray.png', 'capture-2.png', 'capture-2-gray.png', 'missing-resource.png', 'capture.json']) {
     await rm(resolve(output, name), { force: true });
   }
 
@@ -143,8 +155,8 @@ async function main(): Promise<void> {
     });
     const validUrl = new URL(`${viewerPath}?${query.toString()}`, base).href;
     const captures = [
-      await captureValid(page, validUrl, resolve(output, 'capture-1.png')),
-      await captureValid(page, validUrl, resolve(output, 'capture-2.png')),
+      await captureValid(page, validUrl, resolve(output, 'capture-1.png'), grayscale),
+      await captureValid(page, validUrl, resolve(output, 'capture-2.png'), grayscale),
     ];
     if (captures[0]?.sha256 !== captures[1]?.sha256) {
       throw new Error(`Determinism failure: ${captures[0]?.sha256} != ${captures[1]?.sha256}`);
@@ -152,6 +164,9 @@ async function main(): Promise<void> {
     if (captures[0]?.dimensions.width !== captures[1]?.dimensions.width
       || captures[0]?.dimensions.height !== captures[1]?.dimensions.height) {
       throw new Error('Determinism failure: repeated captures have different dimensions.');
+    }
+    if (grayscale && captures[0]?.grayscale?.sha256 !== captures[1]?.grayscale?.sha256) {
+      throw new Error('Determinism failure: repeated grayscale captures differ.');
     }
 
     const missingQuery = new URLSearchParams(query);
@@ -169,7 +184,7 @@ async function main(): Promise<void> {
       schemaVersion: 1,
       generatedAt: new Date().toISOString(),
       invocation: 'npx tsx tools/graphics/capture.ts',
-      input: { assetPath, assetUrl, viewport: { width, height, pixelRatio }, camera, presentationSeconds },
+      input: { assetPath, assetUrl, viewport: { width, height, pixelRatio }, camera, presentationSeconds, grayscale },
       environment: { node: process.version, browser: browserVersion, three: threePackage.version ?? 'unknown' },
       captures,
       deterministicOnThisHost: true,

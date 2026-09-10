@@ -10,6 +10,10 @@ interface PrimitiveBase {
   name: string;
   location: Vec3;
   material: string;
+  parent: string | null;
+  rotationDegrees: Vec3;
+  bevel: number;
+  smooth: boolean;
 }
 
 export interface CubePrimitive extends PrimitiveBase {
@@ -25,6 +29,20 @@ export interface ConePrimitive extends PrimitiveBase {
   rotationDegrees: Vec3;
 }
 
+export interface CylinderPrimitive extends PrimitiveBase {
+  type: 'cylinder';
+  radius: number;
+  depth: number;
+  vertices: number;
+}
+
+export interface GablePrimitive extends PrimitiveBase {
+  type: 'gable';
+  width: number;
+  depth: number;
+  height: number;
+}
+
 export interface SpherePrimitive extends PrimitiveBase {
   type: 'sphere';
   radius: number;
@@ -32,15 +50,19 @@ export interface SpherePrimitive extends PrimitiveBase {
   rings: number;
 }
 
-export type ArtPrimitive = CubePrimitive | ConePrimitive | SpherePrimitive;
+export type ArtPrimitive = CubePrimitive | ConePrimitive | CylinderPrimitive | GablePrimitive | SpherePrimitive;
+
+export interface ArtGroup { name: string; location: Vec3; parent: string | null }
 
 export interface ArtRecipe {
   schemaVersion: 1;
   id: string;
   materials: ArtMaterial[];
+  groups: ArtGroup[];
   primitives: ArtPrimitive[];
   connectors: string[];
   clips: string[];
+  metadata: { cellUnit: 1; kind: 'axis' | 'village-corner' | 'villager-study'; direction: 'neutral' | 'A' | 'B'; footprint: [number, number] };
   referenceRender: {
     width: number;
     height: number;
@@ -53,6 +75,7 @@ export interface ArtRecipe {
 
 export interface CatalogAsset {
   id: string;
+  artifactRound: string;
   status: 'study' | 'approved';
   recipe: string;
   generator: string;
@@ -97,6 +120,25 @@ function vec3(value: unknown, label: string, positive = false): Vec3 {
   return value.map((item, index) => numberValue(item, `${label}[${index}]`, positive)) as Vec3;
 }
 
+function vec2Positive(value: unknown, label: string): [number, number] {
+  if (!Array.isArray(value) || value.length !== 2) throw new Error(`${label} must contain exactly two numbers.`);
+  return [numberValue(value[0], `${label}[0]`, true), numberValue(value[1], `${label}[1]`, true)];
+}
+
+function objectsForGroups(value: unknown): ArtGroup[] {
+  if (!Array.isArray(value)) throw new Error('recipe.groups must be an array.');
+  const groups = value.map((entry, index): ArtGroup => {
+    const item = record(entry, `recipe.groups[${index}]`);
+    return {
+      name: stringValue(item.name, `recipe.groups[${index}].name`, /^[A-Za-z][A-Za-z0-9_]*$/u),
+      location: vec3(item.location, `recipe.groups[${index}].location`),
+      parent: item.parent === undefined || item.parent === null ? null : stringValue(item.parent, `recipe.groups[${index}].parent`, /^[A-Za-z][A-Za-z0-9_]*$/u),
+    };
+  });
+  if (new Set(groups.map((item) => item.name)).size !== groups.length) throw new Error('recipe.groups contains duplicate names.');
+  return groups;
+}
+
 function stringArray(value: unknown, label: string): string[] {
   if (!Array.isArray(value)) throw new Error(`${label} must be an array.`);
   const result = value.map((item, index) => stringValue(item, `${label}[${index}]`, /^[A-Za-z][A-Za-z0-9_-]*$/u));
@@ -127,6 +169,10 @@ export function parseRecipe(value: unknown): ArtRecipe {
       name: stringValue(item.name, `recipe.primitives[${index}].name`, /^[A-Za-z][A-Za-z0-9_]*$/u),
       location: vec3(item.location, `recipe.primitives[${index}].location`),
       material: stringValue(item.material, `recipe.primitives[${index}].material`, /^[a-z][a-z0-9-]*$/u),
+      parent: item.parent === undefined || item.parent === null ? null : stringValue(item.parent, `recipe.primitives[${index}].parent`, /^[A-Za-z][A-Za-z0-9_]*$/u),
+      rotationDegrees: item.rotationDegrees === undefined ? [0, 0, 0] as Vec3 : vec3(item.rotationDegrees, `recipe.primitives[${index}].rotationDegrees`),
+      bevel: item.bevel === undefined ? 0 : numberValue(item.bevel, `recipe.primitives[${index}].bevel`),
+      smooth: item.smooth === true,
     };
     if (!materialNames.includes(base.material)) throw new Error(`recipe.primitives[${index}].material '${base.material}' is not declared.`);
     if (type === 'cube') return { ...base, type, dimensions: vec3(item.dimensions, `recipe.primitives[${index}].dimensions`, true) };
@@ -134,7 +180,16 @@ export function parseRecipe(value: unknown): ArtRecipe {
       ...base, type, radius: numberValue(item.radius, `recipe.primitives[${index}].radius`, true),
       depth: numberValue(item.depth, `recipe.primitives[${index}].depth`, true),
       vertices: integer(item.vertices, `recipe.primitives[${index}].vertices`, 3),
-      rotationDegrees: vec3(item.rotationDegrees, `recipe.primitives[${index}].rotationDegrees`),
+    };
+    if (type === 'cylinder') return {
+      ...base, type, radius: numberValue(item.radius, `recipe.primitives[${index}].radius`, true),
+      depth: numberValue(item.depth, `recipe.primitives[${index}].depth`, true),
+      vertices: integer(item.vertices, `recipe.primitives[${index}].vertices`, 3),
+    };
+    if (type === 'gable') return {
+      ...base, type, width: numberValue(item.width, `recipe.primitives[${index}].width`, true),
+      depth: numberValue(item.depth, `recipe.primitives[${index}].depth`, true),
+      height: numberValue(item.height, `recipe.primitives[${index}].height`, true),
     };
     if (type === 'sphere') return {
       ...base, type, radius: numberValue(item.radius, `recipe.primitives[${index}].radius`, true),
@@ -146,10 +201,23 @@ export function parseRecipe(value: unknown): ArtRecipe {
   const primitiveNames = primitives.map((item) => item.name);
   if (new Set(primitiveNames).size !== primitiveNames.length) throw new Error('recipe.primitives contains duplicate names.');
   const render = record(root.referenceRender, 'recipe.referenceRender');
+  const groups = root.groups === undefined ? [] : objectsForGroups(root.groups);
+  const allNames = new Set([...groups.map((item) => item.name), ...primitiveNames]);
+  if (allNames.size !== groups.length + primitiveNames.length) throw new Error('recipe groups and primitives contain duplicate names.');
+  for (const item of [...groups, ...primitives]) {
+    if (item.parent !== null && !allNames.has(item.parent)) throw new Error(`Parent '${item.parent}' for '${item.name}' is not declared.`);
+  }
+  const metadataValue = root.metadata === undefined ? null : record(root.metadata, 'recipe.metadata');
+  const kind = metadataValue?.kind ?? 'axis';
+  const direction = metadataValue?.direction ?? 'neutral';
+  if (kind !== 'axis' && kind !== 'village-corner' && kind !== 'villager-study') throw new Error('recipe.metadata.kind is invalid.');
+  if (direction !== 'neutral' && direction !== 'A' && direction !== 'B') throw new Error('recipe.metadata.direction is invalid.');
+  const footprint = metadataValue === null ? [1, 1] as [number, number] : vec2Positive(metadataValue.footprint, 'recipe.metadata.footprint');
   return {
-    schemaVersion: 1, id, materials, primitives,
+    schemaVersion: 1, id, materials, groups, primitives,
     connectors: stringArray(root.connectors, 'recipe.connectors'),
     clips: stringArray(root.clips, 'recipe.clips'),
+    metadata: { cellUnit: 1, kind, direction, footprint },
     referenceRender: {
       width: integer(render.width, 'recipe.referenceRender.width', 64),
       height: integer(render.height, 'recipe.referenceRender.height', 64),
@@ -187,6 +255,7 @@ export function parseCatalog(value: unknown): ArtCatalog {
     }
     return {
       id: stringValue(item.id, `catalog.assets[${index}].id`, /^[a-z][a-z0-9-]*$/u),
+      artifactRound: stringValue(item.artifactRound, `catalog.assets[${index}].artifactRound`, /^G-[0-9]{2}$/u),
       status: item.status,
       recipe: stringValue(item.recipe, `catalog.assets[${index}].recipe`),
       generator: stringValue(item.generator, `catalog.assets[${index}].generator`),

@@ -37,12 +37,47 @@ def create_primitive(spec, materials):
             segments=spec['segments'], ring_count=spec['rings'],
             radius=spec['radius'], location=location,
         )
+    elif spec['type'] == 'cylinder':
+        bpy.ops.mesh.primitive_cylinder_add(
+            vertices=spec['vertices'], radius=spec['radius'], depth=spec['depth'],
+            location=location, rotation=tuple(math.radians(value) for value in spec['rotationDegrees']),
+        )
+    elif spec['type'] == 'gable':
+        width = spec['width']
+        depth = spec['depth']
+        height = spec['height']
+        vertices = [
+            (-width / 2, -depth / 2, 0), (width / 2, -depth / 2, 0),
+            (0, -depth / 2, height), (-width / 2, depth / 2, 0),
+            (width / 2, depth / 2, 0), (0, depth / 2, height),
+        ]
+        faces = [(0, 1, 2), (3, 5, 4), (0, 3, 4, 1), (1, 4, 5, 2), (2, 5, 3, 0)]
+        mesh = bpy.data.meshes.new(spec['name'] + '_Mesh')
+        mesh.from_pydata(vertices, [], faces)
+        mesh.update()
+        obj = bpy.data.objects.new(spec['name'], mesh)
+        bpy.context.collection.objects.link(obj)
+        obj.location = location
+        obj.rotation_euler = tuple(math.radians(value) for value in spec['rotationDegrees'])
     else:
         raise ValueError('Unsupported primitive: ' + spec['type'])
-    obj = bpy.context.object
+    obj = bpy.context.object if spec['type'] != 'gable' else obj
     obj.name = spec['name']
     obj.data.materials.append(materials[spec['material']])
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
     bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+    if spec['smooth']:
+        for polygon in obj.data.polygons:
+            polygon.use_smooth = True
+    if spec['bevel'] > 0:
+        bevel = obj.modifiers.new(name='Soft_Edges', type='BEVEL')
+        bevel.width = spec['bevel']
+        bevel.segments = 2
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+        bpy.ops.object.modifier_apply(modifier=bevel.name)
     return obj
 
 
@@ -62,8 +97,20 @@ with open(recipe_path, 'r', encoding='utf-8') as source:
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 materials = {spec['name']: make_material(spec) for spec in recipe['materials']}
+groups = {}
+for spec in recipe['groups']:
+    group = bpy.data.objects.new(spec['name'], None)
+    group.empty_display_type = 'PLAIN_AXES'
+    group.location = tuple(spec['location'])
+    bpy.context.collection.objects.link(group)
+    groups[spec['name']] = group
+for spec in recipe['groups']:
+    if spec['parent'] is not None:
+        groups[spec['name']].parent = groups[spec['parent']]
 for primitive in recipe['primitives']:
-    create_primitive(primitive, materials)
+    obj = create_primitive(primitive, materials)
+    if primitive['parent'] is not None:
+        obj.parent = groups[primitive['parent']]
 
 render = recipe['referenceRender']
 bpy.ops.object.light_add(type='AREA', location=(-3.5, -4.0, 7.0))

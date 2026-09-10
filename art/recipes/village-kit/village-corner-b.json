@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "village-corner-b",
+  "palette": "../palette.json",
+  "direction": "B",
+  "materials": [
+    {"name":"ground","role":"ground","roughness":1}, {"name":"soil","role":"soil","roughness":1},
+    {"name":"path","role":"path","roughness":1}, {"name":"timber","role":"timber","roughness":0.9},
+    {"name":"timber-dark","role":"timberDark","roughness":0.92}, {"name":"plaster","role":"plaster","roughness":0.95},
+    {"name":"roof","role":"roof","roughness":1}, {"name":"foliage","role":"foliage","roughness":1},
+    {"name":"foliage-light","role":"foliageLight","roughness":1}, {"name":"trunk","role":"trunk","roughness":1},
+    {"name":"skin","role":"skin","roughness":0.88}, {"name":"cloth","role":"cloth","roughness":1},
+    {"name":"cloth-accent","role":"clothAccent","roughness":1}
+  ],
+  "groups": [
+    {"name":"VillageCorner_B","location":[0,0,0],"parent":null},
+    {"name":"House_Root","location":[-2.5,0,0],"parent":"VillageCorner_B"},
+    {"name":"Field_Root","location":[2.35,0.8,0],"parent":"VillageCorner_B"},
+    {"name":"Villager_Root","location":[-1.15,-0.85,0],"parent":"VillageCorner_B"}
+  ],
+  "primitives": [
+    {"type":"cube","name":"Parcel_Ground","location":[0,0,-0.12],"dimensions":[10,8,0.24],"material":"ground","bevel":0.14,"parent":"VillageCorner_B"},
+    {"type":"cube","name":"Path_To_Door","location":[-2.5,-1.85,0.035],"dimensions":[0.9,3.7,0.07],"material":"path","bevel":0.18,"parent":"VillageCorner_B"},
+    {"type":"cube","name":"Path_Turn","location":[0,-3.25,0.04],"dimensions":[5.7,0.85,0.08],"material":"path","bevel":0.18,"parent":"VillageCorner_B"},
+
+    {"type":"cube","name":"House_Walls","location":[0,1,0.9],"dimensions":[4,3,1.8],"material":"plaster","bevel":0.14,"parent":"House_Root"},
+    {"type":"gable","name":"House_Roof","location":[0,1,1.8],"width":4.7,"depth":3.65,"height":1.12,"material":"roof","bevel":0.1,"parent":"House_Root"},
+    {"type":"cube","name":"Door","location":[0,-0.53,0.72],"dimensions":[0.82,0.16,1.44],"material":"timber-dark","bevel":0.1,"parent":"House_Root"},
+    {"type":"cube","name":"Door_Lintel","location":[0,-0.64,1.48],"dimensions":[1.06,0.18,0.16],"material":"timber","bevel":0.06,"parent":"House_Root"},
+    {"type":"cube","name":"Beam_Left","location":[-1.72,-0.57,0.92],"dimensions":[0.15,0.18,1.82],"material":"timber","bevel":0.04,"parent":"House_Root"},
+    {"type":"cube","name":"Beam_Right","location":[1.72,-0.57,0.92],"dimensions":[0.15,0.18,1.82],"material":"timber","bevel":0.04,"parent":"House_Root"},
+    {"type":"cube","name":"Beam_Cross","location":[0,-0.59,1.62],"dimensions":[3.65,0.17,0.13],"material":"timber","bevel":0.04,"parent":"House_Root"},
+    {"type":"cube","name":"Beam_Sill","location":[0,-0.59,0.22],"dimensions":[3.65,0.17,0.12],"material":"timber","bevel":0.04,"parent":"House_Root"},
+
+    {"type":"cube","name":"Field_Bed","location":[0,0,0.02],"dimensions":[3.7,3.15,0.12],"material":"soil","bevel":0.15,"parent":"Field_Root"},
+    {"type":"cylinder","name":"Furrow_1","location":[-1.38,0,0.14],"radius":0.14,"depth":2.8,"vertices":12,"material":"soil","rotationDegrees":[90,0,0],"smooth":true,"parent":"Field_Root"},
+    {"type":"cylinder","name":"Furrow_2","location":[-0.7,0,0.14],"radius":0.14,"depth":2.72,"vertices":12,"material":"soil","rotationDegrees":[90,0,0],"smooth":true,"parent":"Field_Root"},
+    {"type":"cylinder","name":"Furrow_3","location":[0,0,0.14],"radius":0.14,"depth":2.82,"vertices":12,"material":"soil","rotationDegrees":[90,0,0],"smooth":true,"parent":"Field_Root"},
+    {"type":"cylinder","name":"Furrow_4","location":[0.7,0,0.14],"radius":0.14,"depth":2.7,"vertices":12,"material":"soil","rotationDegrees":[90,0,0],"smooth":true,"parent":"Field_Root"},
+    {"type":"cylinder","name":"Furrow_5","location":[1.38,0,0.14],"radius":0.14,"depth":2.8,"vertices":12,"material":"soil","rotationDegrees":[90,0,0],"smooth":true,"parent":"Field_Root"},
+
+    {"type":"cylinder","name":"Tree_1_Trunk","location":[-4.05,2.9,0.72],"radius":0.23,"depth":1.44,"vertices":12,"material":"trunk","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"sphere","name":"Tree_1_Crown","location":[-4.05,2.9,1.72],"radius":1.12,"segments":16,"rings":8,"material":"foliage","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"sphere","name":"Tree_1_CrownLight","location":[-3.66,2.63,2.02],"radius":0.66,"segments":14,"rings":7,"material":"foliage-light","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"cylinder","name":"Tree_2_Trunk","location":[0.25,3.22,0.62],"radius":0.2,"depth":1.24,"vertices":12,"material":"trunk","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"sphere","name":"Tree_2_Crown","location":[0.2,3.28,1.52],"radius":0.98,"segments":16,"rings":8,"material":"foliage","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"sphere","name":"Tree_2_CrownLight","location":[0.55,3.03,1.78],"radius":0.58,"segments":14,"rings":7,"material":"foliage-light","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"cylinder","name":"Tree_3_Trunk","location":[4.05,-1.55,0.68],"radius":0.22,"depth":1.36,"vertices":12,"material":"trunk","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"sphere","name":"Tree_3_Crown","location":[4,-1.52,1.65],"radius":1.05,"segments":16,"rings":8,"material":"foliage","smooth":true,"parent":"VillageCorner_B"},
+    {"type":"sphere","name":"Tree_3_CrownLight","location":[4.38,-1.76,1.92],"radius":0.61,"segments":14,"rings":7,"material":"foliage-light","smooth":true,"parent":"VillageCorner_B"},
+
+    {"type":"cube","name":"Villager_Torso","location":[0,0,1.08],"dimensions":[0.46,0.28,0.68],"material":"cloth","bevel":0.13,"parent":"Villager_Root"},
+    {"type":"sphere","name":"Villager_Head","location":[0,0,1.67],"radius":0.23,"segments":16,"rings":8,"material":"skin","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_UpperArm_L","location":[-0.3,0,1.2],"radius":0.075,"depth":0.42,"vertices":12,"material":"cloth-accent","rotationDegrees":[0,-8,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Forearm_L","location":[-0.34,0,0.84],"radius":0.065,"depth":0.34,"vertices":12,"material":"skin","rotationDegrees":[0,-4,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"sphere","name":"Villager_Hand_L","location":[-0.36,0,0.64],"radius":0.09,"segments":12,"rings":6,"material":"skin","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_UpperArm_R","location":[0.3,0,1.2],"radius":0.075,"depth":0.42,"vertices":12,"material":"cloth-accent","rotationDegrees":[0,8,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Forearm_R","location":[0.34,0,0.84],"radius":0.065,"depth":0.34,"vertices":12,"material":"skin","rotationDegrees":[0,4,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"sphere","name":"Villager_Hand_R","location":[0.36,0,0.64],"radius":0.09,"segments":12,"rings":6,"material":"skin","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Thigh_L","location":[-0.13,0,0.68],"radius":0.09,"depth":0.48,"vertices":12,"material":"cloth","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Shin_L","location":[-0.13,0,0.28],"radius":0.07,"depth":0.36,"vertices":12,"material":"cloth-accent","smooth":true,"parent":"Villager_Root"},
+    {"type":"cube","name":"Villager_Foot_L","location":[-0.13,-0.06,0.09],"dimensions":[0.18,0.34,0.18],"material":"timber-dark","bevel":0.07,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Thigh_R","location":[0.13,0,0.68],"radius":0.09,"depth":0.48,"vertices":12,"material":"cloth","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Shin_R","location":[0.13,0,0.28],"radius":0.07,"depth":0.36,"vertices":12,"material":"cloth-accent","smooth":true,"parent":"Villager_Root"},
+    {"type":"cube","name":"Villager_Foot_R","location":[0.13,-0.06,0.09],"dimensions":[0.18,0.34,0.18],"material":"timber-dark","bevel":0.07,"parent":"Villager_Root"}
+  ],
+  "connectors": [], "clips": [],
+  "metadata": {"cellUnit":1,"kind":"village-corner","direction":"B","footprint":[10,8]},
+  "referenceRender": {"width":390,"height":640,"cameraLocation":[10,-12,10],"cameraTarget":[0,0,1],"orthoScale":12,"worldRole":"sky"}
+}

@@ -5,7 +5,8 @@ import { existsSync, readdirSync } from 'node:fs';
 import { basename, join, relative, resolve } from 'node:path';
 import { atomicWriteJson, assertInside } from './files';
 import { validateGlb, type GlbInspection } from './glb';
-import { parseCatalog, parseRecipe, type ArtCatalog, type ArtRecipe, type CatalogAsset, type Vec3 } from './schema';
+import { loadRecipe } from './recipe';
+import { parseCatalog, type ArtCatalog, type ArtRecipe, type CatalogAsset, type Vec3 } from './schema';
 
 type Command = 'build' | 'validate' | 'report' | 'all';
 interface LatestRun { schemaVersion: 1; assetId: string; runId: string; directory: string }
@@ -14,6 +15,7 @@ interface CaptureReport {
   environment: { node: string; browser: string; three: string };
   captures: Array<{
     file: string; sha256: string; dimensions: { width: number; height: number }; durationMs: number;
+    grayscale: null | { file: string; sha256: string; dimensions: { width: number; height: number } };
     viewer: { objectNames: string[]; bounds: { min: Vec3; max: Vec3; size: Vec3 }; loadDurationMs: number };
   }>;
   deterministicOnThisHost: boolean;
@@ -30,12 +32,8 @@ interface ValidationReport {
 }
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
-const ARTIFACT_ROOT = resolve(ROOT, 'artifacts', 'graphics', 'G-02');
-const RUNS = resolve(ARTIFACT_ROOT, 'runs');
-const APPROVED = resolve(ARTIFACT_ROOT, 'approved');
 const CATALOG_PATH = resolve(ROOT, 'art', 'catalog.json');
 const GENERATOR = resolve(import.meta.dirname, 'blender-build.py');
-const LATEST = resolve(ARTIFACT_ROOT, 'latest-run.json');
 
 async function json(path: string): Promise<unknown> {
   return JSON.parse(await readFile(path, 'utf8')) as unknown;
@@ -75,33 +73,47 @@ function locateBlender(): { path: string; version: string } {
   throw new Error('Blender was not found. Set VALLEY_BLENDER_PATH to its executable.');
 }
 
-function recipePath(assetId: string): string {
+function validateAssetId(assetId: string): void {
   if (!/^[a-z][a-z0-9-]*$/u.test(assetId)) throw new Error(`Invalid asset id '${assetId}'.`);
-  return resolve(ROOT, 'art', 'recipes', `${assetId}.json`);
 }
 
-async function recipeFor(assetId: string): Promise<{ recipe: ArtRecipe; path: string }> {
-  const path = recipePath(assetId);
-  const recipe = parseRecipe(await json(path));
+interface AssetSource { catalog: ArtCatalog; declaration: CatalogAsset; recipe: ArtRecipe; path: string }
+interface ArtifactPaths { root: string; runs: string; approved: string; latest: string }
+
+function artifactPaths(declaration: CatalogAsset): ArtifactPaths {
+  const root = resolve(ROOT, 'artifacts', 'graphics', declaration.artifactRound);
+  return {
+    root,
+    runs: resolve(root, 'runs'),
+    approved: resolve(root, 'approved'),
+    latest: resolve(root, `latest-${declaration.id}.json`),
+  };
+}
+
+async function sourceFor(assetId: string): Promise<AssetSource> {
+  validateAssetId(assetId);
+  const catalog = parseCatalog(await json(CATALOG_PATH));
+  const declaration = catalog.assets.find((item) => item.id === assetId);
+  if (declaration === undefined) throw new Error(`Catalog does not declare '${assetId}'.`);
+  const path = assertInside(resolve(ROOT, 'art', 'recipes'), resolve(ROOT, declaration.recipe));
+  const recipe = await loadRecipe(path);
   if (recipe.id !== assetId) throw new Error(`Recipe id '${recipe.id}' does not match requested asset '${assetId}'.`);
-  return { recipe, path };
+  return { catalog, declaration, recipe, path };
 }
 
-async function latestFor(assetId: string): Promise<LatestRun> {
-  const latest = await json(LATEST) as Partial<LatestRun>;
+async function latestFor(assetId: string, paths: ArtifactPaths): Promise<LatestRun> {
+  const latest = await json(paths.latest) as Partial<LatestRun>;
   if (latest.schemaVersion !== 1 || latest.assetId !== assetId || typeof latest.runId !== 'string' || typeof latest.directory !== 'string') {
     throw new Error(`No valid latest build exists for '${assetId}'.`);
   }
-  const directory = assertInside(RUNS, resolve(ROOT, latest.directory));
+  const directory = assertInside(paths.runs, resolve(ROOT, latest.directory));
   return { schemaVersion: 1, assetId, runId: latest.runId, directory };
 }
 
 async function build(assetId: string): Promise<LatestRun> {
   const started = performance.now();
-  const { path } = await recipeFor(assetId);
-  const catalog = parseCatalog(await json(CATALOG_PATH));
-  const declaration = catalog.assets.find((item) => item.id === assetId);
-  if (declaration === undefined) throw new Error(`Catalog does not declare '${assetId}'.`);
+  const { declaration, path, recipe } = await sourceFor(assetId);
+  const paths = artifactPaths(declaration);
   if (resolve(ROOT, declaration.recipe) !== path) throw new Error(`Catalog recipe for '${assetId}' does not match its canonical path.`);
   if (resolve(ROOT, declaration.generator) !== GENERATOR) throw new Error(`Catalog generator for '${assetId}' does not match the runner.`);
   const blender = locateBlender();
@@ -109,15 +121,17 @@ async function build(assetId: string): Promise<LatestRun> {
     throw new Error(`Blender version mismatch: catalog requires '${declaration.blenderVersion}', found '${blender.version}'.`);
   }
   const runId = `${new Date().toISOString().replace(/[:.]/gu, '-')}-${process.pid}`;
-  const directory = assertInside(RUNS, resolve(RUNS, runId));
+  const directory = assertInside(paths.runs, resolve(paths.runs, runId));
   const temporary = assertInside(directory, resolve(directory, 'temporary'));
   const candidate = assertInside(directory, resolve(directory, 'candidate'));
   await mkdir(temporary, { recursive: true });
   await mkdir(candidate, { recursive: true });
   const generatedScript = resolve(temporary, 'build.py');
+  const resolvedRecipe = resolve(temporary, 'resolved-recipe.json');
   await copyFile(GENERATOR, generatedScript);
+  await writeFile(resolvedRecipe, `${JSON.stringify(recipe, null, 2)}\n`, 'utf8');
   const result = spawnSync(blender.path, [
-    '--background', '--factory-startup', '--python', generatedScript, '--', path, candidate, assetId,
+    '--background', '--factory-startup', '--python', generatedScript, '--', resolvedRecipe, candidate, assetId,
   ], { cwd: ROOT, encoding: 'utf8', windowsHide: true });
   const log = `${result.stdout}\n${result.stderr}`;
   await writeFile(resolve(directory, 'blender.log'), log, 'utf8');
@@ -135,6 +149,7 @@ async function build(assetId: string): Promise<LatestRun> {
   for (const [name, product] of Object.entries(products)) files[name] = await evidence(product);
   files.log = await evidence(resolve(directory, 'blender.log'));
   files.generatedScript = await evidence(generatedScript);
+  files.resolvedRecipe = await evidence(resolvedRecipe);
   const report: BuildReport = {
     schemaVersion: 1, assetId, runId,
     recipe: relative(ROOT, path).replaceAll('\\', '/'), blender: blender.path,
@@ -143,16 +158,17 @@ async function build(assetId: string): Promise<LatestRun> {
   };
   await atomicWriteJson(resolve(directory, 'build.json'), report);
   const latest: LatestRun = { schemaVersion: 1, assetId, runId, directory: relative(ROOT, directory).replaceAll('\\', '/') };
-  await mkdir(ARTIFACT_ROOT, { recursive: true });
-  await atomicWriteJson(LATEST, latest);
+  await mkdir(paths.root, { recursive: true });
+  await atomicWriteJson(paths.latest, latest);
   process.stdout.write(`Built ${assetId} in ${relative(ROOT, directory)}\n`);
   return latest;
 }
 
 async function validate(assetId: string): Promise<ValidationReport> {
   const started = performance.now();
-  const { recipe } = await recipeFor(assetId);
-  const latest = await latestFor(assetId);
+  const { declaration, recipe } = await sourceFor(assetId);
+  const paths = artifactPaths(declaration);
+  const latest = await latestFor(assetId, paths);
   const candidate = resolve(latest.directory, 'candidate', `${assetId}.glb`);
   const buffer = await readFile(candidate);
   const inspection = validateGlb(recipe, buffer);
@@ -162,7 +178,7 @@ async function validate(assetId: string): Promise<ValidationReport> {
   const captureResult = spawnSync(process.execPath, [
     tsx, capture, '--asset', candidate, '--output', captureOutput,
     '--width', String(recipe.referenceRender.width), '--height', String(recipe.referenceRender.height),
-    '--pixelRatio', '1', '--camera', 'iso-ne', '--time', '0',
+    '--pixelRatio', '1', '--camera', 'iso-ne', '--time', '0', '--grayscale', 'true',
   ], { cwd: ROOT, encoding: 'utf8', windowsHide: true });
   await writeFile(resolve(latest.directory, 'capture.log'), `${captureResult.stdout}\n${captureResult.stderr}`, 'utf8');
   if (captureResult.status !== 0) throw new Error(`Three.js capture failed; see ${resolve(latest.directory, 'capture.log')}`);
@@ -197,12 +213,11 @@ async function copyPromotionFile(source: string, targetDirectory: string): Promi
 
 async function report(assetId: string): Promise<void> {
   const started = performance.now();
-  const { recipe } = await recipeFor(assetId);
-  const catalog = parseCatalog(await json(CATALOG_PATH));
+  const { catalog, declaration: current, recipe } = await sourceFor(assetId);
+  const paths = artifactPaths(current);
   const index = catalog.assets.findIndex((item) => item.id === assetId);
   if (index < 0) throw new Error(`Catalog does not declare '${assetId}'.`);
-  const current = catalog.assets[index] as CatalogAsset;
-  const latest = await latestFor(assetId);
+  const latest = await latestFor(assetId, paths);
   const buildReport = await json(resolve(latest.directory, 'build.json')) as BuildReport;
   const validation = await json(resolve(latest.directory, 'validation.json')) as ValidationReport;
   if (validation.status !== 'pass' || validation.assetId !== assetId || validation.runId !== latest.runId) {
@@ -211,17 +226,23 @@ async function report(assetId: string): Promise<void> {
   const candidateGlb = resolve(latest.directory, 'candidate', `${assetId}.glb`);
   if (hash(await readFile(candidateGlb)) !== validation.candidateSha256) throw new Error('Candidate changed after validation; rebuild and validate again.');
   const key = validation.candidateSha256.slice(0, 16).toLowerCase();
-  const approvedDirectory = assertInside(APPROVED, resolve(APPROVED, key));
-  const stage = assertInside(ARTIFACT_ROOT, resolve(ARTIFACT_ROOT, `.stage-${latest.runId}`));
-  await mkdir(APPROVED, { recursive: true });
+  const approvedDirectory = assertInside(paths.approved, resolve(paths.approved, key));
+  const stage = assertInside(paths.root, resolve(paths.root, `.stage-${latest.runId}`));
+  await mkdir(paths.approved, { recursive: true });
   const promotedFiles: Record<string, FileEvidence> = {};
-  const promotedNames = [`${assetId}.blend`, `${assetId}.glb`, `${assetId}-blender.png`, 'capture-1.png', 'capture.json', 'build.json', 'validation.json'];
+  const grayCapture = resolve(latest.directory, 'three', 'capture-1-gray.png');
+  const promotedNames = [
+    `${assetId}.blend`, `${assetId}.glb`, `${assetId}-blender.png`,
+    'capture-1.png', ...(existsSync(grayCapture) ? ['capture-1-gray.png'] : []),
+    'capture.json', 'build.json', 'validation.json',
+  ];
   if (!existsSync(approvedDirectory)) {
     await mkdir(stage, { recursive: false });
     const sources = [
       resolve(latest.directory, 'candidate', `${assetId}.blend`), candidateGlb,
       resolve(latest.directory, 'candidate', `${assetId}-blender.png`),
-      resolve(latest.directory, 'three', 'capture-1.png'), resolve(latest.directory, 'three', 'capture.json'),
+      resolve(latest.directory, 'three', 'capture-1.png'), ...(existsSync(grayCapture) ? [grayCapture] : []),
+      resolve(latest.directory, 'three', 'capture.json'),
       resolve(latest.directory, 'build.json'), resolve(latest.directory, 'validation.json'),
     ];
     for (const source of sources) await copyPromotionFile(source, stage);

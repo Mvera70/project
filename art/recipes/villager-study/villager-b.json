@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "villager-study-b",
+  "palette": "../palette.json",
+  "direction": "B",
+  "materials": [
+    {"name":"skin","role":"skin","roughness":0.88}, {"name":"cloth","role":"cloth","roughness":1},
+    {"name":"cloth-accent","role":"clothAccent","roughness":1}, {"name":"timber-dark","role":"timberDark","roughness":0.93}
+  ],
+  "groups": [{"name":"Villager_Root","location":[0,0,0],"parent":null}],
+  "primitives": [
+    {"type":"cube","name":"Villager_Torso","location":[0,0,1.08],"dimensions":[0.46,0.28,0.68],"material":"cloth","bevel":0.13,"parent":"Villager_Root"},
+    {"type":"sphere","name":"Villager_Head","location":[0,0,1.67],"radius":0.23,"segments":16,"rings":8,"material":"skin","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_UpperArm_L","location":[-0.3,0,1.2],"radius":0.075,"depth":0.42,"vertices":12,"material":"cloth-accent","rotationDegrees":[0,-8,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Forearm_L","location":[-0.34,0,0.84],"radius":0.065,"depth":0.34,"vertices":12,"material":"skin","rotationDegrees":[0,-4,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"sphere","name":"Villager_Hand_L","location":[-0.36,0,0.64],"radius":0.09,"segments":12,"rings":6,"material":"skin","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_UpperArm_R","location":[0.3,0,1.2],"radius":0.075,"depth":0.42,"vertices":12,"material":"cloth-accent","rotationDegrees":[0,8,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Forearm_R","location":[0.34,0,0.84],"radius":0.065,"depth":0.34,"vertices":12,"material":"skin","rotationDegrees":[0,4,0],"smooth":true,"parent":"Villager_Root"},
+    {"type":"sphere","name":"Villager_Hand_R","location":[0.36,0,0.64],"radius":0.09,"segments":12,"rings":6,"material":"skin","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Thigh_L","location":[-0.13,0,0.68],"radius":0.09,"depth":0.48,"vertices":12,"material":"cloth","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Shin_L","location":[-0.13,0,0.28],"radius":0.07,"depth":0.36,"vertices":12,"material":"cloth-accent","smooth":true,"parent":"Villager_Root"},
+    {"type":"cube","name":"Villager_Foot_L","location":[-0.13,-0.06,0.09],"dimensions":[0.18,0.34,0.18],"material":"timber-dark","bevel":0.07,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Thigh_R","location":[0.13,0,0.68],"radius":0.09,"depth":0.48,"vertices":12,"material":"cloth","smooth":true,"parent":"Villager_Root"},
+    {"type":"cylinder","name":"Villager_Shin_R","location":[0.13,0,0.28],"radius":0.07,"depth":0.36,"vertices":12,"material":"cloth-accent","smooth":true,"parent":"Villager_Root"},
+    {"type":"cube","name":"Villager_Foot_R","location":[0.13,-0.06,0.09],"dimensions":[0.18,0.34,0.18],"material":"timber-dark","bevel":0.07,"parent":"Villager_Root"}
+  ],
+  "connectors": [], "clips": [],
+  "metadata": {"cellUnit":1,"kind":"villager-study","direction":"B","footprint":[1,1]},
+  "referenceRender": {"width":640,"height":640,"cameraLocation":[3,-5,2.8],"cameraTarget":[0,0,0.95],"orthoScale":2.5,"worldRole":"sky"}
+}

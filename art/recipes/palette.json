@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "roles": ["sky", "ground", "soil", "path", "timber", "timberDark", "plaster", "roof", "foliage", "foliageLight", "trunk", "skin", "cloth", "clothAccent"],
+  "directions": {
+    "A": {
+      "sky": "#C9D2B2", "ground": "#73834F", "soil": "#6B4931", "path": "#A0794F",
+      "timber": "#6B4932", "timberDark": "#3F2B22", "plaster": "#D2B98A", "roof": "#7A382B",
+      "foliage": "#3F5E38", "foliageLight": "#587747", "trunk": "#543B2B",
+      "skin": "#B97852", "cloth": "#6E4C37", "clothAccent": "#874B38"
+    },
+    "B": {
+      "sky": "#DDE3C4", "ground": "#94AE68", "soil": "#866044", "path": "#C4A16B",
+      "timber": "#9A744C", "timberDark": "#6B4C32", "plaster": "#E2CC9B", "roof": "#C7984A",
+      "foliage": "#62864F", "foliageLight": "#7F9F64", "trunk": "#735338",
+      "skin": "#C98A63", "cloth": "#71885E", "clothAccent": "#A96146"
+    }
+  }
+}

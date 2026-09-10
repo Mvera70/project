@@ -3,6 +3,7 @@
   "assets": [
     {
       "id": "axis-marker",
+      "artifactRound": "G-02",
       "status": "study",
       "recipe": "art/recipes/axis-marker.json",
       "generator": "tools/art/blender-build.py",
@@ -54,6 +55,190 @@
       "provenance": {
         "kind": "original",
         "source": "Axis convention study authored for The Valley G-00/G-02",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "village-corner-a",
+      "artifactRound": "G-03",
+      "status": "study",
+      "recipe": "art/recipes/village-kit/village-corner-a.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-09T18-29-01-126Z-35720",
+        "directory": "artifacts/graphics/G-03/approved/97cd165b1713778f"
+      },
+      "bounds": {
+        "min": [
+          -5.044427,
+          -0.24,
+          -4.16
+        ],
+        "max": [
+          5,
+          3.23873,
+          4
+        ],
+        "size": [
+          10.044427,
+          3.47873,
+          8.16
+        ]
+      },
+      "materials": [
+        "ground",
+        "soil",
+        "path",
+        "timber",
+        "timber-dark",
+        "plaster",
+        "roof",
+        "foliage",
+        "foliage-light",
+        "trunk",
+        "skin",
+        "cloth",
+        "cloth-accent"
+      ],
+      "clips": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 45,
+        "meshes": 41,
+        "materials": 13,
+        "triangles": 2262
+      },
+      "hashes": {
+        "village-corner-a.blend": "1F0FB37FD9967B929C1850D1AE9A9EEBC5E236A66E650AC768534923E4475C74",
+        "village-corner-a.glb": "97CD165B1713778F92F10DBBB20A24BA9005134DECD6CBED7BAE37C39BFF0CE1",
+        "village-corner-a-blender.png": "DBBD441C17BAD3FC0F9F1D5DF4CD9E32EED5550426BEE3EE2E0649AF2F936260",
+        "capture-1.png": "C487A727C7F33AA40D9CFBA44D39D90012F4E341BEF9897C46103C1F6716820E",
+        "capture-1-gray.png": "B6DE9235354E5AB479CBC99585B9CDA8081DCACE722DBDED347C25A8EABA100D",
+        "capture.json": "C2AB56052E25FD5FB772B1C18D0A90A76E3D83226A40ADC681793376B7FF82BD",
+        "build.json": "E472F9B7C17F0199623F29B19037B75ECCD02A26C5D5D4385136AFED497CACF4",
+        "validation.json": "41D84A095F7D158EA37CB9F574A1EB6CF39286891AEFD4A0E83EA103CD169AE2"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original Cuento tallado study authored for The Valley G-03",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "village-corner-b",
+      "artifactRound": "G-03",
+      "status": "study",
+      "recipe": "art/recipes/village-kit/village-corner-b.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-09T18-29-45-965Z-46636",
+        "directory": "artifacts/graphics/G-03/approved/445d8579e62204d8"
+      },
+      "bounds": {
+        "min": [
+          -5.17,
+          -0.24,
+          -4.26
+        ],
+        "max": [
+          5.05,
+          2.899919,
+          4
+        ],
+        "size": [
+          10.22,
+          3.139919,
+          8.26
+        ]
+      },
+      "materials": [
+        "ground",
+        "soil",
+        "path",
+        "timber",
+        "timber-dark",
+        "plaster",
+        "roof",
+        "foliage",
+        "foliage-light",
+        "trunk",
+        "skin",
+        "cloth",
+        "cloth-accent"
+      ],
+      "clips": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 44,
+        "meshes": 40,
+        "materials": 13,
+        "triangles": 3936
+      },
+      "hashes": {
+        "village-corner-b.blend": "588FE787B186C63F05142CE112B69A644A2DF5C89208DFDE5C11E040AD5A9A10",
+        "village-corner-b.glb": "445D8579E62204D8262260E480F7105E264FDA3F14471BE8F254D3979563E82D",
+        "village-corner-b-blender.png": "EBFFBFA225A709176EA185A41DACFFFF43EEC33BB7EDAA3468121C62883FC1DC",
+        "capture-1.png": "63CAA6F0B4C5A68ABCF3A479838D888EE967B2F2C6F723775B6084DDAF83C443",
+        "capture-1-gray.png": "34597A5C434CD8230527A1FED3F9ED6F9D0CA78A8353742598A912D84266920F",
+        "capture.json": "14B7DAF7E02C1FAA4D62BA4538B5BF1CBFB77151C8C48C3176D15D4181979018",
+        "build.json": "11B71E1F3D015D6BB62D8C2880A337EF59A5DA0A645F839ACEC55484B06AC6DE",
+        "validation.json": "F860F1D2992B1995B19F5AF332E38CA6A890288C5D7FA81AC2E74C4A63F059D0"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original Maqueta serena study authored for The Valley G-03",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-study-a",
+      "artifactRound": "G-03",
+      "status": "study",
+      "recipe": "art/recipes/villager-study/villager-a.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": null,
+      "bounds": null,
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "timber-dark"
+      ],
+      "clips": [],
+      "connectors": [],
+      "statistics": null,
+      "hashes": null,
+      "provenance": {
+        "kind": "original",
+        "source": "Original Cuento tallado villager study authored for The Valley G-03",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-study-b",
+      "artifactRound": "G-03",
+      "status": "study",
+      "recipe": "art/recipes/villager-study/villager-b.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": null,
+      "bounds": null,
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "timber-dark"
+      ],
+      "clips": [],
+      "connectors": [],
+      "statistics": null,
+      "hashes": null,
+      "provenance": {
+        "kind": "original",
+        "source": "Original Maqueta serena villager study authored for The Valley G-03",
         "license": "Project original"
       }
     }
