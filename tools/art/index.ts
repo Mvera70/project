@@ -197,8 +197,15 @@ async function validate(assetId: string): Promise<ValidationReport> {
   const captureReport = await json(resolve(captureOutput, 'capture.json')) as CaptureReport;
   const first = captureReport.captures[0];
   if (first === undefined || !captureReport.deterministicOnThisHost) throw new Error('Three.js capture did not produce repeatable evidence.');
-  for (const primitive of recipe.primitives) {
-    if (!first.viewer.objectNames.includes(primitive.name)) throw new Error(`Three.js scene is missing '${primitive.name}'.`);
+  // La misma comprobación que hace `validateGlb`, pero sobre lo que Three.js
+  // acabó teniendo en la escena: el GLB puede estar bien y el cargador perder
+  // algo por el camino. Con las mallas unidas por material, lo que tiene que
+  // llegar es un nodo por material.
+  const expected = recipe.mergeByMaterial
+    ? [...new Set(recipe.primitives.map((piece) => `${recipe.id}_${piece.material}`))]
+    : recipe.primitives.map((piece) => piece.name);
+  for (const name of expected) {
+    if (!first.viewer.objectNames.includes(name)) throw new Error(`Three.js scene is missing '${name}'.`);
   }
   if (captureReport.browserErrors.length > 0) throw new Error(`Three.js emitted browser errors: ${captureReport.browserErrors.join('; ')}`);
   if (!first.viewer.bounds.size.every((value) => Number.isFinite(value) && value > 0)) throw new Error('Three.js reported invalid scene bounds.');

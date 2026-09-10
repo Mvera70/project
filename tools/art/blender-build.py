@@ -154,6 +154,35 @@ if scale != 1:
             obj.scale = (obj.scale[0] * scale, obj.scale[1] * scale, obj.scale[2] * scale)
             obj.location = tuple(component * scale for component in obj.location)
 
+# G-09 - unir las mallas por material, despues de atar y de animar.
+#
+# Un aldeano son dieciocho mallas y tres materiales, y medido en el banco los
+# aldeanos eran el 87 % de las llamadas de dibujo. Unir no cambia un triangulo
+# ni un peso: los grupos de vertices y el modificador de armadura viajan con
+# cada malla al unirse, asi que el esqueleto sigue moviendo lo mismo.
+#
+# Va DESPUES del atado a proposito. Unir antes dejaria una sola malla a la que
+# atar entera a un solo hueso, que es la figura rigida de una pieza.
+if recipe.get('mergeByMaterial') and recipe.get('rig') is not None:
+    by_material = {}
+    for name, obj in pieces.items():
+        if obj.type != 'MESH' or not obj.data.materials:
+            continue
+        by_material.setdefault(obj.data.materials[0].name, []).append(obj)
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for material_name, group in sorted(by_material.items()):
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in group:
+            obj.select_set(True)
+        head = group[0]
+        bpy.context.view_layer.objects.active = head
+        if len(group) > 1:
+            bpy.ops.object.join()
+        head.name = asset_id + '_' + material_name
+        head.data.name = head.name + '_Mesh'
+    bpy.ops.object.select_all(action='DESELECT')
+
 render = recipe['referenceRender']
 bpy.ops.object.light_add(type='AREA', location=(-3.5, -4.0, 7.0))
 bpy.context.object.data.energy = 900

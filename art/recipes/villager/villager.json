@@ -3,6 +3,8 @@
   "id": "villager",
   "scale": 0.3333333333333333,
   "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
+  "mergeByMaterial": true,
+  "mergeNote": "G-09: dieciocho mallas y tres materiales. Medido en el banco, los aldeanos eran el 87 % de las llamadas de dibujo. Unir por material los deja en tres y no cambia ni un triángulo ni un peso.",
   "palette": "../palette.json",
   "metadata": {
     "cellUnit": 1,

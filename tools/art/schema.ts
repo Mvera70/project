@@ -63,6 +63,20 @@ export interface ArtRecipe {
   connectors: string[];
   /** Cuántas unidades de escena vale una unidad de la receta. Ver `scaleOf`. */
   scale: number;
+  /**
+   * G-09 · Unir las mallas por material antes de exportar.
+   *
+   * Un aldeano se dibujaba con dieciocho mallas y tiene tres materiales. Medido
+   * en el banco, los aldeanos eran el **87 % de las llamadas de dibujo**: en una
+   * escena de bosque, cincuenta y cinco de ellos ponían 990 de las 1 143. Unir
+   * por material es lo primero del orden de optimización de D.9 y no cambia ni
+   * un triángulo ni un peso.
+   *
+   * Con esto puesto, los nodos del GLB dejan de llamarse como las piezas de la
+   * receta y pasan a llamarse por su material, así que la validación comprueba
+   * lo uno o lo otro según el caso.
+   */
+  mergeByMaterial: boolean;
   clips: string[];
   clipDefinitions: RecipeClip[];
   rig: RecipeRig | null;
@@ -532,6 +546,7 @@ export function parseRecipe(value: unknown): ArtRecipe {
     schemaVersion: 1, id, materials, groups, primitives,
     connectors: stringArray(root.connectors, 'recipe.connectors'),
     scale: scaleOf(root.scale),
+    mergeByMaterial: root.mergeByMaterial === true,
     clips: clipNames(root.clips),
     clipDefinitions: clipDefinitions(root.clips),
     rig: rigOf(root.rig),

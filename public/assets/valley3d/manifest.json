@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T16:00:19.107Z",
+  "generatedAt": "2026-09-10T22:46:18.735Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -24,7 +24,7 @@
     {
       "id": "villager",
       "file": "villager.glb",
-      "sha256": "ED86CA72E72F25342F9D9F760E2197470DBEE41797D346153A11F2B2BDAACAF9",
+      "sha256": "98F7AD35633A037A67ED49D8F5020F9B6F9E3FAA9E5BD371B4FA5E3B25C1AF9C",
       "motion": [
         {
           "name": "idle",

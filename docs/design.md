@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.28** | 11 sep 2026 | G-09, la optimización que el banco señaló | **El aldeano se une por material antes de exportar: de dieciocho mallas a tres.** Es lo primero del orden de optimización de D.9 y lo que el banco señaló, con los aldeanos poniendo el 87 % de las llamadas de dibujo. Medido antes y después en el mismo equipo: 914 llamadas a **269** en la escena de comparación, 1 143 a **318** en la peor, y el tiempo de CPU de 3,60 a **1,30 ms** de mediana. **Ni un triángulo se mueve** y la auditoría de animación da los mismos números dígito a dígito, porque los grupos de vértices y el modificador de armadura viajan con cada malla al unirse. La unión va después del atado: antes dejaría una sola malla atada entera a un solo hueso. Los nodos pasan a llamarse por su material, así que las dos validaciones —binario y escena de Three.js— comprueban lo uno o lo otro según lo que la receta pida. Los dos objetivos de D.9.1 quedan cumplidos con margen, y ese margen es el presupuesto de G-10. |
 | **3.27** | 10 sep 2026 | Ejecución G-09 | **Hay banco y hay presupuesto propuesto (D.9.1), medido sin dispositivo real y declarado como parcial.** Siete escenas de las que D.9 nombra, seis segundos cada una, con tiempo de CPU, cadencia, llamadas, triángulos, geometrías, programas, bytes por la red y deriva en sesión sostenida. No se informa tiempo de GPU porque no hay acceso fiable, y D.9 prohíbe llamarlo así. **El hallazgo: los aldeanos son el 87 % de las llamadas de dibujo**, dieciocho mallas cada uno, y unirlos por material los dejaría en tres. Se asigna al dueño del módulo medido en vez de apañarse aquí. Ninguna fuga: la deriva se queda en ruido, y las pruebas montan y desmontan pueblo y señales cien veces sin dejar nada. El renderer gana `stats()`, porque nadie fuera de él puede contar llamadas ni triángulos. |
 | **3.26** | 10 sep 2026 | Ejecución G-08 | **El valle cambia de estación y dice lo que le pasa sin abrir una ficha.** El suelo se pinta con la paleta de §10.3, la misma que usa el render 2D: reutilizada, no duplicada, porque dos copias se separan en cuanto alguien retoca un verde. La estación entra en la firma del suelo, que antes sólo cambiaba si alguien talaba un árbol —el valle seguía verde en enero— y las dos semanas de transición de §10.3 también, así que hay doce reconstrucciones al año y ni una más. Las señales —humo, luz, peste, velas, estandartes, nivel del granero— salen de `tellsFor`, el mismo del 2D, y **ninguna tiene temporizador propio**: se leen del estado y desaparecen cuando el estado deja de decirlas. La forma y el sitio son la señal y el color acompaña, que es lo que D.3 pide para que se lea en grises. |
 | **3.25** | 10 sep 2026 | G-07, segunda mitad | **El piloto 3D se puede jugar dentro del juego**, detrás de `?render=3d` y con Canvas por defecto. Canvas pinta desde el primer fotograma y el piloto releva cuando termina de cargar; si falla, el valle sigue en 2D en vez de quedarse en un error. **Dos lienzos, no uno**: un canvas no cambia de tipo de contexto una vez lo tiene. Cada backend sabe qué hay bajo un punto de su propia pantalla —el 2D por proporción de la rejilla, el 3D lanzando un rayo— y el pellizco pasa a ser zoom de verdad en vez de escalar el elemento con CSS, que es lo que D.7 pedía. Three.js se carga con `import()` diferido: quien juega en 2D no lo descarga. Y el contrato de D.5 gana **×64**, que el juego tenía desde que §11 lo añadió y el Anexo D no recogía. |
@@ -8367,12 +8368,12 @@ vale de ellas es lo que no depende de la máquina.
 
 | Métrica | Objetivo | Límite | Medido |
 |---|---|---|---|
-| Llamadas de dibujo, escena de comparación | ≤ 400 | 950 | 914 |
-| Llamadas de dibujo, peor escena | ≤ 500 | 1 200 | 1 143 (bosque) |
+| Llamadas de dibujo, escena de comparación | ≤ 400 | 950 | **269** |
+| Llamadas de dibujo, peor escena | ≤ 500 | 1 200 | **318** (bosque) |
 | Triángulos, peor escena | ≤ 90 000 | 120 000 | 74 196 |
-| Bytes por la red al arrancar | ≤ 600 KB | 1 MB | 509 KB |
+| Bytes por la red al arrancar | ≤ 600 KB | 1 MB | 482 KB |
 | Programas de shader | ≤ 8 | 12 | 6 |
-| Deriva en sesión sostenida | ≈ 0 | ±1 ms | −0,32 a +0,41 ms |
+| Deriva en sesión sostenida | ≈ 0 | ±1 ms | −0,19 a +0,07 ms |
 
 **Los tiempos de fotograma quedan sin presupuestar hasta medir en un teléfono.**
 Un número de milisegundos sacado de una tarjeta de escritorio sería inventado.
@@ -8381,14 +8382,18 @@ cadencia salió clavada a 56 fps en las siete escenas, que es lo que un navegado
 sin ventana entrega y no lo que la escena permite: **la cadencia de este banco
 no dice nada.**
 
-**El hallazgo que ordena el trabajo siguiente.** Los aldeanos son el **87 % de
-las llamadas de dibujo**: cada uno son dieciocho mallas, y en la escena de
-bosque cincuenta y cinco aldeanos ponen 990 de las 1 143 llamadas. Esa cuenta es
-la misma en un teléfono. El aldeano tiene tres materiales, así que unir sus
-mallas por material antes de exportar lo llevaría de dieciocho a tres. Es lo
-primero del orden de optimización de D.9 y se asigna al dueño del módulo medido,
-que es la cadena de fabricación de G-04. Informe completo en
-`docs/graphics-rounds/G-09.md`.
+**El hallazgo, y lo que se hizo con él.** Los aldeanos eran el **87 % de las
+llamadas de dibujo**: dieciocho mallas cada uno, y en la escena de bosque
+cincuenta y cinco aldeanos ponían 990 de las 1 143. Esa cuenta es la misma en un
+teléfono. Una receta puede declarar ahora `mergeByMaterial`, y el generador une
+las mallas por material **después de atar y de animar** —unir antes dejaría una
+sola malla atada entera a un solo hueso—.
+
+Medido antes y después, como D.9 exige: de 18 mallas a **3**, de 914 llamadas a
+**269**, y el tiempo de CPU de la escena de comparación de 3,60 a **1,30 ms** de
+mediana. **Los triángulos no se mueven ni uno** y la auditoría de animación
+devuelve los mismos números dígito a dígito: lo que cambia es en cuántas tandas
+se envía lo mismo. Informe completo en `docs/graphics-rounds/G-09.md`.
 
 Perfil bajo degrada sombra, vegetación decorativa, resolución y efectos en ese
 orden a validar, manteniendo personas y señales de crisis. Los valores visuales

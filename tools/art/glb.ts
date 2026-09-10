@@ -117,8 +117,20 @@ function sameMembers(actual: readonly string[], expected: readonly string[], lab
 
 export function validateGlb(recipe: ArtRecipe, buffer: Buffer): GlbInspection {
   const inspection = inspectGlb(buffer);
-  for (const primitive of recipe.primitives) {
-    if (!inspection.nodeNames.includes(primitive.name)) throw new Error(`GLB is missing object '${primitive.name}'.`);
+  if (recipe.mergeByMaterial) {
+    // Unido por material: las piezas ya no son nodos, y comprobar que siguen
+    // ahí pediría deshacer justo lo que se acaba de hacer. Lo que sí tiene que
+    // seguir estando es un nodo por material que alguna pieza use, porque una
+    // pieza que se pierda por el camino se llevaría su material con ella.
+    const used = new Set(recipe.primitives.map((piece) => piece.material));
+    for (const material of used) {
+      const node = `${recipe.id}_${material}`;
+      if (!inspection.nodeNames.includes(node)) throw new Error(`GLB is missing merged object '${node}'.`);
+    }
+  } else {
+    for (const primitive of recipe.primitives) {
+      if (!inspection.nodeNames.includes(primitive.name)) throw new Error(`GLB is missing object '${primitive.name}'.`);
+    }
   }
   for (const connector of recipe.connectors) {
     if (!inspection.nodeNames.includes(connector)) throw new Error(`GLB is missing connector '${connector}'.`);

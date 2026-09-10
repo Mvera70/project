@@ -122,16 +122,16 @@ informe en `docs/graphics-rounds/G-09.md`.
 
 **Lo siguiente, en este orden:**
 
-1. **Unir el aldeano por material.** Es el hallazgo de G-09: los aldeanos son el
-   87 % de las llamadas de dibujo, dieciocho mallas cada uno, y tienen tres
-   materiales. Unirlos en Blender después del atado los deja en tres. Ojo con la
-   validación: comprueba que cada primitiva de la receta tiene su nodo en el
-   GLB, y unir mallas cambia esos nombres. Medir antes y después con
-   `npx tsx tools/graphics/benchmark.ts --seconds 6`.
-2. **Correr el banco en un móvil** con `--real true` y llenar las filas de
-   tiempo de D.9.1, que hoy están sin presupuestar a propósito.
-3. **G-10, el catálogo completo**, que es cuando las cajas con tejado se
-   convierten en casas.
+1. **Correr el banco en un móvil** con `--real true` y llenar las filas de
+   tiempo de D.9.1, que hoy están sin presupuestar a propósito. Es lo único que
+   falta para poder cerrar P3.
+2. **G-10, el catálogo completo**, que es cuando las cajas con tejado se
+   convierten en casas. Hay margen de presupuesto para gastarlo ahí: la peor
+   escena está en 318 llamadas contra un límite de 1 200.
+
+Hecho ya, y no hay que repetirlo: la unión del aldeano por material. De 914
+llamadas a 269 y de 3,60 a 1,30 ms de CPU, sin mover un triángulo. Una receta
+lo pide con `mergeByMaterial: true`.
 
 El brief original de G-07, para lo que quede de él:
 
