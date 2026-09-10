@@ -125,9 +125,15 @@ informe en `docs/graphics-rounds/G-09.md`.
 1. **Correr el banco en un móvil** con `--real true` y llenar las filas de
    tiempo de D.9.1, que hoy están sin presupuestar a propósito. Es lo único que
    falta para poder cerrar P3.
-2. **G-10, el catálogo completo**, que es cuando las cajas con tejado se
-   convierten en casas. Hay margen de presupuesto para gastarlo ahí: la peor
-   escena está en 318 llamadas contra un límite de 1 200.
+2. **G-10, los lotes que faltan.** El del mundo está empezado: hay árboles
+   instanciados y el valle se lee como un valle. Faltan **casa, campo y camino**,
+   que son los que quitarían las cajas con tejado, y después el resto de
+   familias de la matriz de D.8. Hay margen: la peor escena está en 324 llamadas
+   contra un límite de 1 200.
+
+   Ojo con una cosa aprendida ahí: el presupuesto de triángulos hubo que
+   corregirlo de 120 000 a 450 000 porque el primero se midió sobre un valle sin
+   árboles. Con instanciación los triángulos dejan de seguir al coste.
 
 Hecho ya, y no hay que repetirlo: la unión del aldeano por material. De 914
 llamadas a 269 y de 3,60 a 1,30 ms de CPU, sin mover un triángulo. Una receta

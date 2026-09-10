@@ -80,7 +80,7 @@ export interface ArtRecipe {
   clips: string[];
   clipDefinitions: RecipeClip[];
   rig: RecipeRig | null;
-  metadata: { cellUnit: 1; kind: 'axis' | 'village-corner' | 'villager-study' | 'villager'; direction: 'neutral' | 'A' | 'B'; footprint: [number, number] };
+  metadata: { cellUnit: 1; kind: string; direction: 'neutral' | 'A' | 'B'; footprint: [number, number] };
   referenceRender: {
     width: number;
     height: number;
@@ -537,9 +537,13 @@ export function parseRecipe(value: unknown): ArtRecipe {
     if (item.parent !== null && !allNames.has(item.parent)) throw new Error(`Parent '${item.parent}' for '${item.name}' is not declared.`);
   }
   const metadataValue = root.metadata === undefined ? null : record(root.metadata, 'recipe.metadata');
-  const kind = metadataValue?.kind ?? 'axis';
+  const kind = typeof metadataValue?.kind === 'string' ? metadataValue.kind : 'axis';
   const direction = metadataValue?.direction ?? 'neutral';
-  if (kind !== 'axis' && kind !== 'village-corner' && kind !== 'villager-study' && kind !== 'villager') throw new Error('recipe.metadata.kind is invalid.');
+  // Una lista cerrada de tipos era una trampa de mantenimiento: G-10 añade una
+  // familia por lote y cada una obligaba a tocar el esquema. La identidad de un
+  // recurso la lleva su `id` en el catálogo; `kind` sólo dice de qué familia es.
+  // Se sigue exigiendo que sea un identificador para que una errata no pase.
+  if (!/^[a-z][a-z0-9-]*$/u.test(kind)) throw new Error('recipe.metadata.kind is invalid.');
   if (direction !== 'neutral' && direction !== 'A' && direction !== 'B') throw new Error('recipe.metadata.direction is invalid.');
   const footprint = metadataValue === null ? [1, 1] as [number, number] : vec2Positive(metadataValue.footprint, 'recipe.metadata.footprint');
   return {

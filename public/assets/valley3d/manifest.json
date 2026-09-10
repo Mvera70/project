@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T22:46:18.735Z",
+  "generatedAt": "2026-09-10T22:54:02.090Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -51,6 +51,12 @@
           "strideLength": 0.26
         }
       ]
+    },
+    {
+      "id": "tree",
+      "file": "tree.glb",
+      "sha256": "76C3E850D8876F022116B87309332250E2833D34AF10C7CD37EA6BFCD7838C01",
+      "motion": []
     }
   ]
 }

@@ -163,7 +163,10 @@ if scale != 1:
 #
 # Va DESPUES del atado a proposito. Unir antes dejaria una sola malla a la que
 # atar entera a un solo hueso, que es la figura rigida de una pieza.
-if recipe.get('mergeByMaterial') and recipe.get('rig') is not None:
+# Vale con esqueleto y sin el. La condicion de que hubiera rig sobraba: lo que
+# importa es que la union ocurra despues de atar, y un recurso sin rig no tiene
+# nada que atar. Con ella puesta, un arbol pedia unirse y no se unia.
+if recipe.get('mergeByMaterial'):
     by_material = {}
     for name, obj in pieces.items():
         if obj.type != 'MESH' or not obj.data.materials:

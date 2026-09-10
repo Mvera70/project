@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "id": "tree",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "tree",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote del mundo. Un tronco y tres masas de copa, que es lo que hace falta para que la silueta se lea a la escala del valle: a 390 px de ancho un arbol ocupa unos treinta pixeles. Dos tonos de follaje para que la copa tenga volumen sin costar una textura. La copa va a siete por cinco: a esa talla las facetas no se ven y cada arbol se paga casi novecientas veces."
+  },
+  "materials": [
+    {
+      "name": "bark",
+      "role": "trunk",
+      "roughness": 0.95
+    },
+    {
+      "name": "leaf",
+      "role": "foliage",
+      "roughness": 0.9
+    },
+    {
+      "name": "leaf-light",
+      "role": "foliageLight",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Tree_Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Tree_Trunk",
+      "location": [
+        0,
+        0,
+        1.7
+      ],
+      "radius": 0.34,
+      "depth": 3.4,
+      "smooth": true,
+      "vertices": 6,
+      "material": "bark",
+      "parent": "Tree_Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Tree_Crown_Low",
+      "location": [
+        0.35,
+        -0.2,
+        4.3
+      ],
+      "radius": 1.75,
+      "segments": 7,
+      "rings": 5,
+      "smooth": true,
+      "material": "leaf",
+      "parent": "Tree_Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Tree_Crown_Mid",
+      "location": [
+        -0.5,
+        0.35,
+        5.5
+      ],
+      "radius": 1.95,
+      "segments": 7,
+      "rings": 5,
+      "smooth": true,
+      "material": "leaf",
+      "parent": "Tree_Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Tree_Crown_Top",
+      "location": [
+        0.25,
+        0.1,
+        7.0
+      ],
+      "radius": 1.45,
+      "segments": 7,
+      "rings": 5,
+      "smooth": true,
+      "material": "leaf-light",
+      "parent": "Tree_Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      12.0,
+      -15.0,
+      10.0
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      4.5
+    ],
+    "orthoScale": 12.0,
+    "worldRole": "sky"
+  }
+}

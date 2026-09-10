@@ -25,12 +25,14 @@ import type {
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, type Ground } from './world/ground';
+import { buildForest, type Forest } from './world/forest';
 import { Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { Tells } from './effects/tells';
 import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 
 const VILLAGER = 'villager';
+const TREE = 'tree';
 
 /**
  * Cuanto campo se deja alrededor de lo construido, en celdas.
@@ -76,7 +78,7 @@ export async function createGraphicsRenderer(
   // whoever else is using it.
   const borrowed = options.library !== undefined;
   const library: AssetLibrary = (options.library as AssetLibrary | undefined)
-    ?? await loadAssets({ baseUrl: options.assetBaseUrl, wanted: [VILLAGER] });
+    ?? await loadAssets({ baseUrl: options.assetBaseUrl, wanted: [VILLAGER, TREE] });
   const villager = library.get(VILLAGER);
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
@@ -86,6 +88,7 @@ export async function createGraphicsRenderer(
   world.add(village.group, cast.group, tells.group);
 
   let ground: Ground | null = null;
+  let forest: Forest | null = null;
   let plan: ScenePlan | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
@@ -155,6 +158,18 @@ export async function createGraphicsRenderer(
     const clock = clockOf(state.tick);
     ground = buildGround(state.map, paletteFor(clock.season, clock.seasonWeek));
     world.add(ground.mesh);
+
+    // El bosque se replanta con el suelo, que es cuando alguien tala.
+    if (forest !== null) {
+      world.remove(forest.group);
+      forest.dispose();
+      forest = null;
+    }
+    const sapling = library.get(TREE);
+    if (sapling !== undefined) {
+      forest = buildForest(state.map, sapling.original as Object3D);
+      world.add(forest.group);
+    }
     mapWidth = state.map.width;
     mapHeight = state.map.height;
     frameCamera();
@@ -279,6 +294,11 @@ export async function createGraphicsRenderer(
         world.remove(ground.mesh);
         ground.dispose();
         ground = null;
+      }
+      if (forest !== null) {
+        world.remove(forest.group);
+        forest.dispose();
+        forest = null;
       }
       if (!borrowed) library.dispose();
       lastActors = [];

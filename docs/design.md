@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.29** | 11 sep 2026 | G-10, lote del mundo | **El valle tiene árboles.** Un tronco y tres masas de copa, 188 triángulos, casi tres celdas de alto, instanciados: novecientos árboles cuestan **tres** llamadas de dibujo, que es el caso que D.9 nombra por su nombre. Dónde va cada uno sale de su celda y de nada más, así que el mismo valle da siempre el mismo bosque y talar quita exactamente los árboles talados. **Y el presupuesto de triángulos de D.9.1 se corrige de 120 000 a 450 000**: los 90 000 de objetivo salían de medir un valle sin un solo árbol. Al plantarlo, los triángulos se multiplican por tres y el coste no se mueve —1,40 ms de mediana antes y después, seis llamadas más— porque van instanciados. Con instanciación, el número de triángulos deja de seguir al coste; lo siguen las llamadas y el tiempo de CPU. Y la lista cerrada de `metadata.kind` se abre: era una trampa de mantenimiento con una familia por lote. |
 | **3.28** | 11 sep 2026 | G-09, la optimización que el banco señaló | **El aldeano se une por material antes de exportar: de dieciocho mallas a tres.** Es lo primero del orden de optimización de D.9 y lo que el banco señaló, con los aldeanos poniendo el 87 % de las llamadas de dibujo. Medido antes y después en el mismo equipo: 914 llamadas a **269** en la escena de comparación, 1 143 a **318** en la peor, y el tiempo de CPU de 3,60 a **1,30 ms** de mediana. **Ni un triángulo se mueve** y la auditoría de animación da los mismos números dígito a dígito, porque los grupos de vértices y el modificador de armadura viajan con cada malla al unirse. La unión va después del atado: antes dejaría una sola malla atada entera a un solo hueso. Los nodos pasan a llamarse por su material, así que las dos validaciones —binario y escena de Three.js— comprueban lo uno o lo otro según lo que la receta pida. Los dos objetivos de D.9.1 quedan cumplidos con margen, y ese margen es el presupuesto de G-10. |
 | **3.27** | 10 sep 2026 | Ejecución G-09 | **Hay banco y hay presupuesto propuesto (D.9.1), medido sin dispositivo real y declarado como parcial.** Siete escenas de las que D.9 nombra, seis segundos cada una, con tiempo de CPU, cadencia, llamadas, triángulos, geometrías, programas, bytes por la red y deriva en sesión sostenida. No se informa tiempo de GPU porque no hay acceso fiable, y D.9 prohíbe llamarlo así. **El hallazgo: los aldeanos son el 87 % de las llamadas de dibujo**, dieciocho mallas cada uno, y unirlos por material los dejaría en tres. Se asigna al dueño del módulo medido en vez de apañarse aquí. Ninguna fuga: la deriva se queda en ruido, y las pruebas montan y desmontan pueblo y señales cien veces sin dejar nada. El renderer gana `stats()`, porque nadie fuera de él puede contar llamadas ni triángulos. |
 | **3.26** | 10 sep 2026 | Ejecución G-08 | **El valle cambia de estación y dice lo que le pasa sin abrir una ficha.** El suelo se pinta con la paleta de §10.3, la misma que usa el render 2D: reutilizada, no duplicada, porque dos copias se separan en cuanto alguien retoca un verde. La estación entra en la firma del suelo, que antes sólo cambiaba si alguien talaba un árbol —el valle seguía verde en enero— y las dos semanas de transición de §10.3 también, así que hay doce reconstrucciones al año y ni una más. Las señales —humo, luz, peste, velas, estandartes, nivel del granero— salen de `tellsFor`, el mismo del 2D, y **ninguna tiene temporizador propio**: se leen del estado y desaparecen cuando el estado deja de decirlas. La forma y el sitio son la señal y el color acompaña, que es lo que D.3 pide para que se lea en grises. |
@@ -8368,12 +8369,25 @@ vale de ellas es lo que no depende de la máquina.
 
 | Métrica | Objetivo | Límite | Medido |
 |---|---|---|---|
-| Llamadas de dibujo, escena de comparación | ≤ 400 | 950 | **269** |
-| Llamadas de dibujo, peor escena | ≤ 500 | 1 200 | **318** (bosque) |
-| Triángulos, peor escena | ≤ 90 000 | 120 000 | 74 196 |
-| Bytes por la red al arrancar | ≤ 600 KB | 1 MB | 482 KB |
+| Llamadas de dibujo, escena de comparación | ≤ 400 | 950 | 275 |
+| Llamadas de dibujo, peor escena | ≤ 500 | 1 200 | 324 (bosque) |
+| Triángulos, peor escena | ≤ 300 000 | 450 000 | 249 412 |
+| Bytes por la red al arrancar | ≤ 600 KB | 1 MB | 502 KB |
 | Programas de shader | ≤ 8 | 12 | 6 |
-| Deriva en sesión sostenida | ≈ 0 | ±1 ms | −0,19 a +0,07 ms |
+| Deriva en sesión sostenida | ≈ 0 | ±1 ms | −0,19 a +0,09 ms |
+
+**El presupuesto de triángulos se corrigió, y el motivo importa.** La primera
+propuesta lo puso en 90 000 de objetivo y 120 000 de límite, medido sobre un
+valle **que no tenía un solo árbol**: era un número sacado de una escena a la
+que le faltaba el mundo. Al plantar el bosque, la peor escena pasó a 249 412
+triángulos y el coste **no se movió**: 1,40 ms de CPU de mediana antes y después,
+y seis llamadas de dibujo más en total, porque los árboles van instanciados.
+
+La lección, escrita para que nadie revierta la corrección creyendo que arregla
+algo: **con instanciación, el número de triángulos deja de ser un buen indicio
+del coste.** Lo que sigue siguiendo al coste son las llamadas de dibujo y el
+tiempo de CPU. El límite de triángulos se conserva porque la memoria de vértices
+sí es real, no porque prediga los milisegundos.
 
 **Los tiempos de fotograma quedan sin presupuestar hasta medir en un teléfono.**
 Un número de milisegundos sacado de una tarjeta de escritorio sería inventado.

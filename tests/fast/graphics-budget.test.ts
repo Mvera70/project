@@ -14,7 +14,10 @@ import { SCENES } from '../../tools/graphics/bench-scenes';
 import { Tells } from '../../src/render3d/effects/tells';
 import { Village } from '../../src/render3d/world/buildings';
 import { buildGround } from '../../src/render3d/world/ground';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
+import { TERRAIN_CODE } from '@engine/state';
 import { PALETTES } from '@render/palette';
+import { buildForest } from '../../src/render3d/world/forest';
 import { planFor } from '../../src/render3d/world/plan';
 
 const grown = new Map<string, GameState>();
@@ -53,6 +56,82 @@ describe('G-09 · las escenas del banco', () => {
     expect(SCENES.some((scene) => scene.week >= 36)).toBe(true);
     expect(SCENES.some((scene) => scene.crisis)).toBe(true);
     expect(SCENES.some((scene) => scene.close < 1)).toBe(true);
+  });
+});
+
+describe('G-10 · el bosque', () => {
+  /** Un arbolito de mentira: tres mallas, como el de verdad. */
+  function sapling(): Group {
+    const tree = new Group();
+    for (let piece = 0; piece < 3; piece += 1) {
+      const mesh = new Mesh(new BoxGeometry(1, 2, 1), new MeshStandardMaterial());
+      mesh.position.set(0, 1 + piece, 0);
+      tree.add(mesh);
+    }
+    return tree;
+  }
+
+  it('cuesta una malla por material, no una por árbol', () => {
+    // D.9 nombra este caso: instanciar árboles. Un objeto suelto por celda de
+    // bosque serían varios cientos de llamadas de dibujo en un valle maduro.
+    const state = village(16);
+    const forest = buildForest(state.map, sapling());
+    expect(forest.count).toBeGreaterThan(200);
+    expect(forest.group.children.length).toBe(3);
+    for (const child of forest.group.children) {
+      expect((child as { isInstancedMesh?: boolean }).isInstancedMesh).toBe(true);
+    }
+    forest.dispose();
+    expect(forest.group.children.length).toBe(0);
+  });
+
+  it('hay un árbol por celda de bosque y ni uno fuera', () => {
+    const state = village(16);
+    let woods = 0;
+    for (const code of state.map.terrain) if (code === TERRAIN_CODE.forest) woods += 1;
+    const forest = buildForest(state.map, sapling());
+    expect(forest.count).toBe(woods);
+    forest.dispose();
+  });
+
+  it('el mismo valle da siempre el mismo bosque', () => {
+    // §4.3 · el render no consume azar. Un bosque que se resembrara en cada
+    // pintada sería peor que uno alineado.
+    const state = village(16);
+    const first = buildForest(state.map, sapling());
+    const second = buildForest(state.map, sapling());
+    const matrixOf = (forest: ReturnType<typeof buildForest>, at: number): number[] => {
+      const mesh = forest.group.children[0] as unknown as { instanceMatrix: { array: ArrayLike<number> } };
+      return [...Array.from({ length: 16 }, (_, index) => mesh.instanceMatrix.array[at * 16 + index] ?? 0)];
+    };
+    for (const at of [0, 7, 50]) expect(matrixOf(second, at)).toEqual(matrixOf(first, at));
+    first.dispose();
+    second.dispose();
+  });
+
+  it('talar quita árboles', () => {
+    const state = village(16);
+    const before = buildForest(state.map, sapling()).count;
+    const felled = structuredClone(state);
+    let cut = 0;
+    for (let cell = 0; cell < felled.map.terrain.length && cut < 30; cell += 1) {
+      if (felled.map.terrain[cell] === TERRAIN_CODE.forest) {
+        felled.map.terrain[cell] = TERRAIN_CODE.cleared;
+        cut += 1;
+      }
+    }
+    const after = buildForest(felled.map, sapling());
+    expect(after.count).toBe(before - cut);
+    after.dispose();
+  });
+
+  it('plantar y talar cien veces no deja nada', () => {
+    const state = village(16);
+    for (let round = 0; round < 100; round += 1) {
+      const forest = buildForest(state.map, sapling());
+      forest.dispose();
+      forest.dispose();
+    }
   });
 });
 
