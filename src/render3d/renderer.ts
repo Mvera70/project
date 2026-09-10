@@ -25,7 +25,7 @@ import type {
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, type Ground } from './world/ground';
-import { buildForest, scatterOn, type Forest } from './world/forest';
+import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { Tells } from './effects/tells';
@@ -34,9 +34,10 @@ import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 const VILLAGER = 'villager';
 const TREE = 'tree';
 const ROCK = 'rock';
+const REED = 'reed';
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
 const WANTED = [
-  VILLAGER, TREE, ROCK, 'field-cut', 'ruin-wood', 'ruin-stone',
+  VILLAGER, TREE, ROCK, REED, 'field-cut', 'ruin-wood', 'ruin-stone',
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
 
@@ -96,6 +97,7 @@ export async function createGraphicsRenderer(
   let ground: Ground | null = null;
   let forest: Forest | null = null;
   let stones: Forest | null = null;
+  let reeds: Forest | null = null;
   let plan: ScenePlan | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
@@ -168,13 +170,14 @@ export async function createGraphicsRenderer(
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
-    for (const scattered of [forest, stones]) {
+    for (const scattered of [forest, stones, reeds]) {
       if (scattered === null) continue;
       world.remove(scattered.group);
       scattered.dispose();
     }
     forest = null;
     stones = null;
+    reeds = null;
 
     const sapling = library.get(TREE);
     if (sapling !== undefined) {
@@ -186,6 +189,14 @@ export async function createGraphicsRenderer(
       stones = scatterOn(state.map, boulder.original as Object3D, TERRAIN_CODE.rock);
       stones.group.name = 'Valley_Rocks';
       world.add(stones.group);
+    }
+    const reed = library.get(REED);
+    if (reed !== undefined) {
+      // La orilla se replanta con el suelo por el mismo motivo que el bosque: el
+      // rio no se mueve, pero un camino nuevo pegado al agua si le quita sitio.
+      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map));
+      reeds.group.name = 'Valley_Reeds';
+      world.add(reeds.group);
     }
     mapWidth = state.map.width;
     mapHeight = state.map.height;
@@ -312,13 +323,14 @@ export async function createGraphicsRenderer(
         ground.dispose();
         ground = null;
       }
-      for (const scattered of [forest, stones]) {
+      for (const scattered of [forest, stones, reeds]) {
         if (scattered === null) continue;
         world.remove(scattered.group);
         scattered.dispose();
       }
       forest = null;
       stones = null;
+      reeds = null;
       if (!borrowed) library.dispose();
       lastActors = [];
       renderer.dispose();

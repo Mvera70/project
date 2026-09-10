@@ -22,6 +22,7 @@ import { SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
 import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
+import { shoreCells } from '../../src/render3d/world/forest';
 import { buildGround, cellColour } from '../../src/render3d/world/ground';
 import { groundSignature, isQuiet, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
@@ -245,6 +246,24 @@ describe('G-06 · el suelo', () => {
     expect(surface.parent).toBe(ground.mesh);
     ground.dispose();
     expect(surface.parent).toBeNull();
+  });
+
+  it('los juncos crecen en la orilla y en ningún otro sitio', () => {
+    const state = village(6);
+    const { width, terrain, path } = state.map;
+    const shore = shoreCells(state.map);
+    expect(shore.length).toBeGreaterThan(0);
+    for (const cell of shore) {
+      expect(terrain[cell]).toBe(0);
+      // Nada crece en mitad de un camino pisado.
+      expect(path[cell] ?? 0).toBe(0);
+      const touchesWater = [cell - 1, cell + 1, cell - width, cell + width]
+        .some((side) => terrain[side] === 2);
+      expect(touchesWater).toBe(true);
+    }
+    // Y no está toda la pradera en la orilla: si lo estuviera, la comprobación
+    // de arriba pasaría sin decir nada.
+    expect(shore.length).toBeLessThan(terrain.length / 4);
   });
 
   it('un camino tapa el terreno que hay debajo', () => {

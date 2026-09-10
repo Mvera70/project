@@ -80,12 +80,40 @@ export function buildForest(map: ValleyMap, tree: Object3D): Forest {
  * problema, y separarlos habria sido tener dos veces la misma cuenta.
  */
 export function scatterOn(map: ValleyMap, source: Object3D, terrain: number): Forest {
-  const tree = source;
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
     if (map.terrain[cell] === terrain) cells.push(cell);
   }
+  return scatterCells(map, source, cells);
+}
 
+/**
+ * Las celdas de prado que tocan el agua, que es donde crecen los juncos.
+ *
+ * La orilla no es un terreno: el mapa no la nombra y no tiene por que. Es la
+ * frontera entre dos que si nombra, y sale de mirar los cuatro vecinos.
+ */
+export function shoreCells(map: ValleyMap): number[] {
+  const cells: number[] = [];
+  for (let cell = 0; cell < map.terrain.length; cell += 1) {
+    if (map.terrain[cell] !== TERRAIN_CODE.meadow) continue;
+    // Nada crece en mitad de un camino pisado.
+    if ((map.path[cell] ?? 0) > 0) continue;
+    const x = cell % map.width;
+    const wet = [
+      x > 0 ? cell - 1 : -1,
+      x < map.width - 1 ? cell + 1 : -1,
+      cell - map.width,
+      cell + map.width,
+    ].some((side) => side >= 0 && map.terrain[side] === TERRAIN_CODE.water);
+    if (wet) cells.push(cell);
+  }
+  return cells;
+}
+
+/** Lo mismo sobre una lista de celdas ya elegida. */
+export function scatterCells(map: ValleyMap, source: Object3D, cells: readonly number[]): Forest {
+  const tree = source;
   const group = new Group();
   group.name = 'Valley_Forest';
   const pieces = piecesOf(tree);
