@@ -75,6 +75,16 @@ export interface ArtRecipe {
   };
 }
 
+/**
+ * G-04 · Los fotogramas por segundo de la escena de Blender.
+ *
+ * Es el de fábrica, y `blender-build.py` arranca con `--factory-startup`, así
+ * que no hay dos verdades. Vive aquí porque lo necesitan tres sitios: quien
+ * escribe la duración en el catálogo, quien la audita sobre el GLB y quien lea
+ * el catálogo mañana para saber de dónde salió el número.
+ */
+export const ANIMATION_FPS = 24;
+
 export interface CatalogAsset {
   id: string;
   artifactRound: string;
@@ -86,6 +96,23 @@ export interface CatalogAsset {
   bounds: null | { min: Vec3; max: Vec3; size: Vec3 };
   materials: string[];
   clips: string[];
+  /**
+   * G-04 · Lo que el juego necesita para reproducir cada clip. design.md D.4.
+   *
+   * `clips` es el índice: los nombres, y nada más. `motion` son los hechos de
+   * reproducción. Son dos cosas distintas y por eso son dos campos: al índice
+   * le basta saber que existe `walk`, y al controlador no.
+   *
+   * `strideLength` es cuánto avanzaría el cuerpo en un ciclo si los pies
+   * agarraran el suelo. El clip es *in-place* —quien desplaza al aldeano por el
+   * valle es el juego— así que el controlador tiene que reproducirlo a
+   * `velocidad / strideLength` ciclos por segundo. Con cualquier otro ritmo los
+   * pies patinan, que es el fallo que D.4 nombra por su nombre.
+   *
+   * Campo añadido, nunca exigido: un recurso sin clips lo deja vacío y los
+   * cinco que existían antes de G-04 siguen siendo válidos sin tocarlos.
+   */
+  motion: Array<{ name: string; seconds: number; loop: boolean; strideLength: number | null }>;
   connectors: string[];
   statistics: null | { objects: number; meshes: number; materials: number; triangles: number };
   hashes: null | Record<string, string>;
@@ -275,6 +302,40 @@ export interface RecipeBone {
 }
 export interface RecipeRig { bones: RecipeBone[]; bind: Record<string, string> }
 
+/**
+ * G-04 · Los hechos de reproducción de cada clip del catálogo.
+ *
+ * Se comprueba que nombran clips que el índice conoce. Un `motion` que hable de
+ * un clip inexistente sería un número que nadie puede usar y que nadie
+ * descubriría, porque el juego pediría el que sí existe y se encontraría sin
+ * zancada justo cuando la necesita.
+ */
+function motionOf(
+  value: unknown, clips: unknown, label: string,
+): Array<{ name: string; seconds: number; loop: boolean; strideLength: number | null }> {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) throw new Error(`${label}.motion must be an array.`);
+  const known = new Set(Array.isArray(clips) ? clips.filter((clip) => typeof clip === 'string') : []);
+  return value.map((entry, index) => {
+    const motion = record(entry, `${label}.motion[${index}]`);
+    const name = stringValue(motion.name, `${label}.motion[${index}].name`);
+    if (!known.has(name)) throw new Error(`${label}.motion[${index}] names an unlisted clip '${name}'.`);
+    const seconds = motion.seconds;
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {
+      throw new Error(`${label}.motion[${index}].seconds must be a positive number.`);
+    }
+    const stride = motion.strideLength;
+    if (stride !== null && stride !== undefined
+      && (typeof stride !== 'number' || !Number.isFinite(stride) || stride <= 0)) {
+      throw new Error(`${label}.motion[${index}].strideLength must be a positive number or null.`);
+    }
+    return {
+      name, seconds, loop: motion.loop !== false,
+      strideLength: stride === undefined || stride === null ? null : stride,
+    };
+  });
+}
+
 export function parseRecipe(value: unknown): ArtRecipe {
   const root = record(value, 'recipe');
   if (root.schemaVersion !== 1) throw new Error('recipe.schemaVersion must be 1.');
@@ -402,6 +463,7 @@ export function parseCatalog(value: unknown): ArtCatalog {
       },
       materials: stringArray(item.materials, `catalog.assets[${index}].materials`),
       clips: stringArray(item.clips, `catalog.assets[${index}].clips`),
+      motion: motionOf(item.motion, item.clips, `catalog.assets[${index}]`),
       connectors: stringArray(item.connectors, `catalog.assets[${index}].connectors`),
       statistics: statistics === null ? null : {
         objects: integer(statistics.objects, `catalog.assets[${index}].statistics.objects`, 0),

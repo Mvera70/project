@@ -31,7 +31,7 @@ import { relative, resolve, sep } from 'node:path';
 import { chromium, type Browser } from '@playwright/test';
 import { createServer, type ViteDevServer } from 'vite';
 import { loadRecipe } from '../art/recipe';
-import type { RecipeClip } from '../art/schema';
+import { ANIMATION_FPS, type RecipeClip } from '../art/schema';
 
 type Vec3 = [number, number, number];
 /** Por nodo: su origen y un punto a 25 cm por su eje. Ver `ViewerProbe.pose`. */
@@ -58,8 +58,8 @@ const SYSTEM_BROWSERS = [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
 ];
 
-/** Blender exporta a los 24 fps de la escena de fábrica. */
-const FPS = 24;
+/** Blender exporta a los fps de la escena de fábrica. */
+const FPS = ANIMATION_FPS;
 /** Cuánto puede moverse la raíz y seguir llamándose quieta, en metros. */
 const ROOT_DRIFT = 0.005;
 /** Cuánto tiene que moverse el hueso más vivo para que el clip cuente, en metros. */
@@ -106,10 +106,16 @@ async function freePort(): Promise<number> {
   }
 }
 
-/** El span de fotogramas que la receta declara, en segundos. */
+/**
+ * Lo que un clip debería durar, en segundos.
+ *
+ * Es `frames / fps`, no el span entre la primera clave y la última. Un ciclo de
+ * 32 fotogramas dura 32 tiempos aunque sus claves vayan del 1 al 32: el último
+ * fotograma no es el mismo instante que el primero, es el instante justo antes
+ * de volver a él. Medido sobre el GLB, `walk` dura 1,3333 s = 32/24.
+ */
 function expectedSeconds(clip: RecipeClip): number {
-  const frames = clip.tracks.flatMap((track) => track.keys.map((key) => key.frame));
-  return (Math.max(...frames) - Math.min(...frames)) / FPS;
+  return clip.frames / FPS;
 }
 
 /**
@@ -250,7 +256,7 @@ async function main(): Promise<void> {
 
       // 2 · dura lo que dicen sus fotogramas.
       const expected = expectedSeconds(clip);
-      if (Math.abs(exported.duration - expected) > 1.5 / FPS) {
+      if (Math.abs(exported.duration - expected) > 0.5 / FPS) {
         problems.push(
           `Clip '${clip.name}' lasts ${exported.duration.toFixed(3)}s but its keys span ${expected.toFixed(3)}s.`,
         );

@@ -36,6 +36,7 @@
         "ground"
       ],
       "clips": [],
+      "motion": [],
       "connectors": [],
       "statistics": {
         "objects": 7,
@@ -102,6 +103,7 @@
         "cloth-accent"
       ],
       "clips": [],
+      "motion": [],
       "connectors": [],
       "statistics": {
         "objects": 45,
@@ -169,6 +171,7 @@
         "cloth-accent"
       ],
       "clips": [],
+      "motion": [],
       "connectors": [],
       "statistics": {
         "objects": 44,
@@ -208,6 +211,7 @@
         "timber-dark"
       ],
       "clips": [],
+      "motion": [],
       "connectors": [],
       "statistics": null,
       "hashes": null,
@@ -233,6 +237,7 @@
         "timber-dark"
       ],
       "clips": [],
+      "motion": [],
       "connectors": [],
       "statistics": null,
       "hashes": null,
@@ -280,6 +285,32 @@
         "walk",
         "work_hoe",
         "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.62
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.52
+        }
       ],
       "connectors": [
         "hand_l",

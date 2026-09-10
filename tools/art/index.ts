@@ -6,7 +6,7 @@ import { basename, join, relative, resolve } from 'node:path';
 import { atomicWriteJson, assertInside } from './files';
 import { validateGlb, type GlbInspection } from './glb';
 import { loadRecipe } from './recipe';
-import { parseCatalog, type ArtCatalog, type ArtRecipe, type CatalogAsset, type Vec3 } from './schema';
+import { ANIMATION_FPS, parseCatalog, type ArtCatalog, type ArtRecipe, type CatalogAsset, type Vec3 } from './schema';
 
 type Command = 'build' | 'validate' | 'report' | 'all';
 interface LatestRun { schemaVersion: 1; assetId: string; runId: string; directory: string }
@@ -294,6 +294,15 @@ async function report(assetId: string): Promise<void> {
     approved: { runId: latest.runId, directory: relative(ROOT, approvedDirectory).replaceAll('\\', '/') },
     bounds: firstCapture.viewer.bounds,
     materials: recipe.materials.map((item) => item.name), clips: recipe.clips, connectors: recipe.connectors,
+    // D.4 · el índice de clips no basta para reproducirlos. La zancada la
+    // necesita el controlador para no deslizar los pies, y hasta aquí se
+    // quedaba escrita en la receta sin llegar a nadie.
+    motion: recipe.clipDefinitions.map((clip) => ({
+      name: clip.name,
+      seconds: clip.frames / ANIMATION_FPS,
+      loop: clip.loop,
+      strideLength: clip.strideLength,
+    })),
     statistics: validation.glb.statistics,
     hashes: Object.fromEntries(Object.entries(promotedFiles).map(([name, item]) => [name, item.sha256])),
   };

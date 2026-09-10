@@ -28,7 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
-| **3.16** | 10 sep 2026 | Ejecución G-04 | **Existe un aldeano articulado con cuatro clips, construido por la misma cadena declarativa que un edificio.** 916 triángulos, 16 huesos, conectores en las dos manos. D.4.1 fija la piel rígida tras un banco común que dio coste idéntico y aspecto peor en la deformable. El atado va por grupo de vértices porque emparentar al hueso pivota por su cola y desprendía la cabeza con la validación en verde. `animation-audit.ts` mide los clips en el navegador —duración, deriva de raíz, cierre de bucle— y deja hojas de contactos, incluida una a 18×26 px que es el tamaño real del aldeano a 390 px de ancho. Queda anotado que el aldeano no tiene frente y que la zancada no llega al catálogo. |
+| **3.16** | 10 sep 2026 | Ejecución G-04 | **Existe un aldeano articulado con cuatro clips, construido por la misma cadena declarativa que un edificio.** 916 triángulos, 16 huesos, conectores en las dos manos. D.4.1 fija la piel rígida tras un banco común que dio coste idéntico y aspecto peor en la deformable. El atado va por grupo de vértices porque emparentar al hueso pivota por su cola y desprendía la cabeza con la validación en verde. `animation-audit.ts` mide los clips en el navegador —duración, deriva de raíz, cierre de bucle— y deja hojas de contactos, incluida una a 18×26 px que es el tamaño real del aldeano a 390 px de ancho. El catálogo gana un campo `motion` añadido —duración, bucle y zancada por clip— para que el controlador pueda casar su velocidad con la del clip y no deslizar los pies. Queda anotado que el aldeano no tiene frente. |
 | **2.92** | 9 sep 2026, 20:08 | Ejecución G-02 | **Una receta declarativa ya genera, valida y promueve un recurso sin editar Blender.** Dos builds distintos conservaron 7 objetos, 4 materiales, 504 triángulos, caja y captura Three.js idénticos aunque sus binarios difirieran. El catálogo apunta a una promoción inmutable y guarda hashes concretos; los clips y conectores vacíos solo son válidos para el marcador. |
 | **2.91** | 9 sep 2026, 17:26 | Ejecución G-01 | **El GLB de Blender carga directamente en Three.js r185 y dos capturas del mismo host coinciden byte a byte.** Se ratifican el encuadre ortográfico por caja, tiempo explícito y estados de carga; sombra y sesgo se derivan de escala. Three 0.185.0 + tipos 0.185.4 sustituyen r186 por compatibilidad. La cadena local de P0 queda cerrada; solo falta comprobar la recuperación desde otro dispositivo. |
 | **2.90** | 9 sep 2026, 14:54 | Ejecución G-00 | **Blender 5.2.1 LTS fabrica `.blend`, `.glb` y PNG en segundo plano y sin GUI.** El éxito exige una marca explícita y comprobar artefactos porque Blender devolvió 0 ante dos excepciones Python durante el diagnóstico. Chrome del sistema cubre Playwright. P0 queda parcial hasta cargar el GLB en Three.js y abrir la evidencia desde un segundo dispositivo. |
@@ -7979,12 +7979,18 @@ sobre el GLB cargado, no sobre la acción de Blender, porque entre las dos hay u
 exportador, un muestreo y un cargador —y ya se perdieron tres clips por ahí una
 vez. La deriva de la raíz de los cuatro clips es 0,0000 m.
 
+**La zancada llega al catálogo.** El catálogo gana un campo `motion`, separado
+del índice `clips`: el índice son los nombres y `motion` son los hechos de
+reproducción —duración, bucle y zancada—. El controlador reproducirá a
+`velocidad / zancada` ciclos por segundo; con cualquier otro ritmo los pies
+patinan. El campo es añadido y nunca exigido: los cinco recursos anteriores lo
+dejan vacío y siguen siendo válidos sin tocarlos, y la validación rechaza un
+`motion` que hable de un clip que el índice no lista.
+
 **Deuda anotada.** El aldeano no tiene frente: por delante y por detrás es casi
 la misma silueta, y en el valle giran hacia donde caminan. Es asunto de
-geometría y de P1, no del rig. Y `strideLength` se valida en la receta pero no
-llega al catálogo, cuyo índice de clips es una lista de nombres; meterle números
-obliga a migrar los otros cinco recursos, y eso se hace cuando el controlador la
-necesite. Informe completo en `docs/graphics-rounds/G-04.md`.
+geometría y de P1, no del rig. Informe completo en
+`docs/graphics-rounds/G-04.md`.
 
 ### D.5 Fronteras de software y contrato propuesto
 

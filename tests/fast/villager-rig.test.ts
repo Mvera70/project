@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseCatalog, parseRecipe } from '../../tools/art/schema';
+import { ANIMATION_FPS, parseCatalog, parseRecipe } from '../../tools/art/schema';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 
@@ -92,6 +92,40 @@ describe('G-04 · el rig del aldeano', () => {
     const free = walking.find((clip) => clip.name === 'walk')?.strideLength ?? 0;
     const laden = walking.find((clip) => clip.name === 'carry_walk')?.strideLength ?? 0;
     expect(laden).toBeLessThan(free);
+  });
+
+  it('lleva la zancada hasta el catálogo, que es donde el juego la lee', () => {
+    // La receta no la lee nadie en tiempo de ejecución. Si el número se queda
+    // ahí, el controlador no puede casar su velocidad con la del clip y los
+    // pies patinan —y nadie se entera hasta verlo.
+    const catalog = parseCatalog(source('art/catalog.json'));
+    const asset = catalog.assets.find((item) => item.id === recipe.id);
+
+    expect(asset?.motion.map((clip) => clip.name)).toEqual(recipe.clips);
+    for (const clip of recipe.clipDefinitions) {
+      const motion = asset?.motion.find((candidate) => candidate.name === clip.name);
+      expect(motion?.strideLength, `${clip.name} stride`).toBe(clip.strideLength);
+      expect(motion?.seconds, `${clip.name} duration`).toBeCloseTo(clip.frames / ANIMATION_FPS, 6);
+      expect(motion?.loop).toBe(clip.loop);
+    }
+  });
+
+  it('deja en paz a los recursos que no se mueven', () => {
+    // El campo es añadido, nunca exigido: los cinco recursos anteriores a G-04
+    // siguen siendo válidos sin tocarlos.
+    const catalog = parseCatalog(source('art/catalog.json'));
+    for (const asset of catalog.assets.filter((item) => item.clips.length === 0)) {
+      expect(asset.motion, `${asset.id}`).toEqual([]);
+    }
+  });
+
+  it('rechaza un catálogo que dé zancada a un clip que no existe', () => {
+    const raw = source('art/catalog.json') as { assets: Array<Record<string, unknown>> };
+    const broken = structuredClone(raw);
+    const asset = broken.assets.find((item) => item.id === recipe.id);
+    if (asset === undefined) throw new Error('The villager left the catalog.');
+    asset.motion = [{ name: 'work_scythe', seconds: 1, loop: true, strideLength: 0.6 }];
+    expect(() => parseCatalog(broken)).toThrow("names an unlisted clip 'work_scythe'");
   });
 
   it('rechaza una zancada imposible', () => {
