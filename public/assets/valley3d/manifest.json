@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T23:17:55.582Z",
+  "generatedAt": "2026-09-10T23:26:45.142Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -152,6 +152,18 @@
       "id": "grave-yard",
       "file": "grave-yard.glb",
       "sha256": "3975478F357C908E5F9A8E3920454737FD7E053C9F0B72B9C9CDDF37ACE20567",
+      "motion": []
+    },
+    {
+      "id": "ruin-wood",
+      "file": "ruin-wood.glb",
+      "sha256": "8EFA0FF692BE6D91A0B1998135EE242E120517B0E762F4DABF86ED986B49D653",
+      "motion": []
+    },
+    {
+      "id": "ruin-stone",
+      "file": "ruin-stone.glb",
+      "sha256": "38A7D566A14FD0BA8C3D3DBFB789F698ED4979EDDB815B05C4652BD30901F098",
       "motion": []
     }
   ]

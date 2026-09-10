@@ -233,7 +233,7 @@ describe('G-06 · el suelo', () => {
     const water = ground.water;
     expect(water).not.toBeNull();
     const surface = water as NonNullable<typeof water>;
-    const material = surface.material as { roughness: number };
+    const material = surface.material as unknown as { roughness: number };
     expect(material.roughness).toBeLessThan(0.5);
     const position = surface.geometry.getAttribute('position');
     const level = position.getY(0);

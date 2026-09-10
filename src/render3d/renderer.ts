@@ -36,7 +36,7 @@ const TREE = 'tree';
 const ROCK = 'rock';
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
 const WANTED = [
-  VILLAGER, TREE, ROCK, 'field-cut',
+  VILLAGER, TREE, ROCK, 'field-cut', 'ruin-wood', 'ruin-stone',
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
 

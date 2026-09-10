@@ -244,16 +244,21 @@ describe('G-08 · las consecuencias', () => {
     for (const building of change.changed) expect(building.kind).toBe('field');
   });
 
-  it('una ruina no usa el recurso de lo que fue', () => {
+  it('una ruina usa el recurso de ruina, no el de lo que fue', () => {
     // §7.4 la deja en el mapa, y lo que tiene que leerse es que ya no es una
-    // casa. Ponerle su modelo intacto diría lo contrario.
+    // casa. Ponerle su modelo intacto diría lo contrario, y dejarla sin recurso
+    // la devolvía a la caja gris de reserva, que no dice nada.
     const state = village(14);
     const burnt = structuredClone(state);
-    const home = burnt.buildings.find((building) => building.lostTick === null);
+    const home = burnt.buildings.find((building) => building.lostTick === null && building.kind !== 'field');
     if (home !== undefined) home.lostTick = burnt.tick;
+    const before = planFor(state).buildings.find((building) => building.id === home?.id);
     const ruin = planFor(burnt).buildings.find((building) => building.id === home?.id);
     expect(ruin?.ruin).toBe(true);
-    expect(ruin?.asset).toBeNull();
+    expect(ruin?.asset).not.toBe(before?.asset);
+    // De madera o de piedra: el juego trata las dos ruinas distinto y lo que se
+    // ve tiene que ser lo que el juego hace.
+    expect(ruin?.asset).toBe(home?.tier === 1 ? 'ruin-stone' : 'ruin-wood');
   });
 
   it('la estación que se pinta es la del tick, no la de ninguna otra cuenta', () => {

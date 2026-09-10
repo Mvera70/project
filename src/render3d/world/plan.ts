@@ -102,8 +102,22 @@ const SOWN_FROM = 6;
  * sale de `TIME.HARVEST_WEEK`, la misma semana en la que el motor recoge el
  * grano, así que si alguien mueve la cosecha el campo cambia con ella.
  */
+/**
+ * En que se queda una casa perdida.
+ *
+ * De madera o de piedra, porque §7.4 las trata distinto: sobre la de madera se
+ * vuelve a construir y sobre la de piedra no, y lo que el jugador ve tiene que
+ * ser lo que el juego hace. Un campo perdido no es una ruina, es un rastrojo.
+ */
+const RUIN_ASSETS: Readonly<Record<0 | 1, string>> = {
+  0: 'ruin-wood',
+  1: 'ruin-stone',
+};
+
 function assetFor(building: Building, tick: number): string | null {
-  if (building.lostTick !== null) return null;
+  if (building.lostTick !== null) {
+    return building.kind === 'field' ? 'field-cut' : RUIN_ASSETS[building.tier];
+  }
   if (building.kind === 'field') {
     const week = weekOf(tick);
     return week >= SOWN_FROM && week < TIME.HARVEST_WEEK ? 'field' : 'field-cut';

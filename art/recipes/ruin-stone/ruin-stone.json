@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "id": "ruin-stone",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "ruin-stone",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de la ruina. Una casa de piedra caida: tres lienzos de muro de alturas muy distintas y dos monton de cascote. Desiguales a proposito, porque cuatro muros parejos serian un edificio en obras."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 1.0
+    },
+    {
+      "name": "soil",
+      "role": "soil",
+      "roughness": 1.0
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Ruin_Floor",
+      "location": [
+        3.0,
+        3.0,
+        0.05
+      ],
+      "dimensions": [
+        6.2,
+        6.2,
+        0.1
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Wall_N",
+      "location": [
+        3.0,
+        0.5,
+        0.95
+      ],
+      "dimensions": [
+        6.0,
+        0.6,
+        1.9
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Wall_W",
+      "location": [
+        0.5,
+        2.2,
+        0.65
+      ],
+      "dimensions": [
+        0.6,
+        3.0,
+        1.3
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Wall_E",
+      "location": [
+        5.5,
+        3.8,
+        0.4
+      ],
+      "dimensions": [
+        0.6,
+        2.4,
+        0.8
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Stub",
+      "location": [
+        4.6,
+        5.5,
+        0.3
+      ],
+      "dimensions": [
+        1.6,
+        0.6,
+        0.6
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Rubble_A",
+      "location": [
+        2.4,
+        4.4,
+        0.18
+      ],
+      "dimensions": [
+        1.1,
+        0.9,
+        0.36
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Rubble_B",
+      "location": [
+        4.0,
+        2.0,
+        0.14
+      ],
+      "dimensions": [
+        0.8,
+        0.8,
+        0.28
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      8.0,
+      -10.0,
+      6.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.9
+    ],
+    "orthoScale": 11.2,
+    "worldRole": "sky"
+  }
+}

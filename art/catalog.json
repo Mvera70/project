@@ -1336,6 +1336,121 @@
         "source": "Original grave-yard authored for The Valley G-10",
         "license": "Project original"
       }
+    },
+    {
+      "id": "ruin-wood",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/ruin-wood/ruin-wood.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-26-12-358Z-17080",
+        "directory": "artifacts/graphics/G-10/approved/8efa0ff692be6d91"
+      },
+      "bounds": {
+        "min": [
+          -0.033333,
+          0,
+          -2.033333
+        ],
+        "max": [
+          2.033333,
+          0.666667,
+          0.033333
+        ],
+        "size": [
+          2.066667,
+          0.666667,
+          2.066667
+        ]
+      },
+      "recipeSha256": "66037ACA3EECC07CE3A949E1B1B94691E4BC13083660EB8655D00173DD8901BD",
+      "materials": [
+        "char"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 128
+      },
+      "hashes": {
+        "ruin-wood.blend": "5C98FE29BCAF6C00FAA9D740B06291EF5C0C33872379387874AF1E330DFB9A35",
+        "ruin-wood.glb": "8EFA0FF692BE6D91A0B1998135EE242E120517B0E762F4DABF86ED986B49D653",
+        "ruin-wood-blender.png": "C102F9215A56B0E55970334BABAF14031C25ADF2BE2D8481BCCE89254955A49D",
+        "capture-1.png": "8A3B8F627BC56D3C17E677B3D1D7B02F613C7EC595799EDA0DE49A1394865401",
+        "capture-1-gray.png": "41D42E6809C1FCC28C96BA1CD60A6DE9C75375257FE8DE0A170A49EAF688388E",
+        "capture.json": "739DEA4A0DF11F8FB46A234DF7650222475013188E65F2AB43E0619C997A4728",
+        "build.json": "32F83B672DD0791B46703D19971EB211F5069EDF2328D7B7275D4EF7873811A1",
+        "validation.json": "5F025DA415C4AF6D0E6AD99941C55AC6BB936CD63A69D977CC6C2CACC5ED0445"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original ruin-wood authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "ruin-stone",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/ruin-stone/ruin-stone.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-25-31-230Z-52400",
+        "directory": "artifacts/graphics/G-10/approved/38a7d566a14fd0ba"
+      },
+      "bounds": {
+        "min": [
+          -0.033333,
+          0,
+          -2.033333
+        ],
+        "max": [
+          2.033333,
+          0.633333,
+          0.033333
+        ],
+        "size": [
+          2.066667,
+          0.633333,
+          2.066667
+        ]
+      },
+      "recipeSha256": "887EE871609093412AD1A462A80E742B990CECD1B8495F275AE11FF5D0D0A058",
+      "materials": [
+        "stone",
+        "soil"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 84
+      },
+      "hashes": {
+        "ruin-stone.blend": "066F1867EB466AB27A9A4061E9E66FC1328DF446178CC63B92F60FBF91851B11",
+        "ruin-stone.glb": "38A7D566A14FD0BA8C3D3DBFB789F698ED4979EDDB815B05C4652BD30901F098",
+        "ruin-stone-blender.png": "EF3BBE2E7DBA96B82DF6AEC31FCA786F3F2D1241ADDB64BCF6EC3509E5C4EF56",
+        "capture-1.png": "A1987813A79676997B33B1E2C0CF293E591C6DC9CD7278A9A5AC19C90E3C83AA",
+        "capture-1-gray.png": "0BD4C2C0BEC166EE515AF0EE34C39268F2E240D67C01A33424F22EDD1E0AAB5D",
+        "capture.json": "A0A262B56FD369634FF5623D4B231E4D6CDD9A2D14162240FEBA8A32860CCB44",
+        "build.json": "7C1BDCDFE69B5D016B93EABC6B5EA9C679000A64138B3AE0A63C9DFF69707BD6",
+        "validation.json": "7A7D71987D0881A24AA984C695A09897355F4C44EA9EBFA28FEBD674E9EA9077"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original ruin-stone authored for The Valley G-10",
+        "license": "Project original"
+      }
     }
   ]
 }
