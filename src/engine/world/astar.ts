@@ -49,8 +49,14 @@ class Frontier {
   }
 
   private swap(a: number, b: number): void {
-    [this.f[a], this.f[b]] = [this.f[b] as number, this.f[a] as number];
-    [this.cell[a], this.cell[b]] = [this.cell[b] as number, this.cell[a] as number];
+    // Sin desestructurar: `[x, y] = [y, x]` reserva un array por intercambio, y
+    // esto corre una vez por nivel del montículo en cada empuje y cada saque.
+    const f = this.f[a] as number;
+    this.f[a] = this.f[b] as number;
+    this.f[b] = f;
+    const cell = this.cell[a] as number;
+    this.cell[a] = this.cell[b] as number;
+    this.cell[b] = cell;
   }
 
   push(cell: number, f: number): void {

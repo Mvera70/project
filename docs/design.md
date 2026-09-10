@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.14** | 13 sep 2026, 02:00 | Las dos deudas, atacadas con perfilador | **Suite rápida de 34 s a 30,6 s**, partiendo el fichero que sola tardaba 35 y no se podía repartir. El banco sigue en 18 min: perfilado, el Aê es el 29 % y se llama 20.474 veces por partida **porque el suelo cambia 631 veces y cada cambio vacía la caché de rutas entera**. Bajarlo exige tocar el tráfico, que es balance. Tres optimizaciones probadas y **dos revertidas por medirlas**. |
 | **3.12** | 12 sep 2026, 23:20 | Los guardas espantan cuervos de verdad | **Mandabas gente a espantar pájaros y veías los mismos pájaros.** §7.7 descontaba la vigilancia del mordisco desde v2.93 y en la imagen no se notaba. Con un hallazgo anotado: en una partida corriente la cobertura está casi siempre al máximo, así que la diferencia apenas se ve. |
 | **3.11** | 12 sep 2026, 22:40 | La densidad, medida contra el veredicto | **El problema que abrió §11.6 está resuelto y se puede enseñar.** La primera sesión humana veía entre 0,0 y 0,6 sucesos notables en cinco minutos. Ahora son **2,8 a ×1** y 21 a ×4. Algo digno de contarse cada dos minutos a velocidad normal, donde antes cabía una sesión entera sin nada. |
 | **3.10** | 12 sep 2026, 22:00 | El banco después de la vida nueva | **`forest_cut` entra en banda por primera vez desde v2.47** — el invierno en el bosque hizo lo que años de ajustes no consiguieron. A cambio `smith_feud` pasa de fallar en una política a fallar en las cuatro, y la extinción adversa vuelve de 15,0 % a 11,7 %. El tiempo del banco baja de 43 a **18,1 min**, todavía por encima de los 15. Diez fallos. |
@@ -5455,6 +5456,62 @@ estado nuevo — el recuerdo que dejó la última riña hace de marca de tiempo.
 Dieciocho es lo que había antes de que la convivencia existiera (21), así que el
 equilibrio se conserva: la aldea tiene ahora afectos **y** enemistades, y ni una
 cosa ni la otra se desbocan.
+
+#### Las dos deudas de rendimiento (v3.14)
+
+**Perfilado de verdad**, con `--cpu-prof`, en vez de a ojo. Tres partidas de 150
+años:
+
+| Qué | Cuánto |
+|---|---|
+| `route` + su montículo (Aê) | **29 %** |
+| `tick` | 4,9 % |
+| `banksOf` | 2,1 % |
+| El resto | repartido en trozos de menos del 2 % |
+
+**El Aê se llama 20.474 veces por partida de 150 años**, 2,84 por tick. No es
+que se llame de más: es que la caché por par de celdas se vacía entera cada vez
+que cambia el coste del suelo, y **el suelo cambia 631 veces por partida** —una
+cada once ticks— porque los caminos se refuerzan solos (§7.6). 631 × 30 rutas
+≈ las 20.000 medidas.
+
+**Bajar eso exige tocar el tráfico, que es balance.** No invalidar, invalidar
+menos a menudo, o invalidar sólo las rutas afectadas: las tres cambian qué
+celdas se pisan, y después de un siglo eso es otra aldea. Queda como decisión
+abierta y no se toca sin decidirlo.
+
+**Tres optimizaciones probadas, dos revertidas por medirlas:**
+
+1. **Reutilizar los tableros del Aê** entre llamadas, con un sello de
+   generación, para no reservar tres `Int32Array` por ruta. **Peor**: 5,7 s
+   pasaron a 7,6. Reservar un array en V8 sale más barato que comprobar un
+   sello en cada acceso. Revertida.
+2. **Escribir ese acceso en línea** para quitar las closures. Mejor que el
+   punto 1 pero peor que no hacer nada. Revertida también.
+3. **El intercambio del montículo sin desestructurar.** `[x, y] = [y, x]`
+   reserva un array por intercambio y eso corre una vez por nivel en cada
+   empuje. **Un 6 %**, y se conserva.
+
+**Y una lección sobre medir:** la línea base se movió de 5,7 s a 7,7 s entre dos
+tandas sin cambiar nada, por carga de la máquina. Cualquier comparación de
+rendimiento aquí necesita medirse **en la misma tanda** y por mínimos, no por
+una sola lectura.
+
+#### La suite rápida (v3.14)
+
+De 34 s a **30,6 s**, partiendo `sim.test.ts` en tres. Vitest reparte por
+fichero y no por prueba, así que un fichero de 35 s era un suelo que no bajaba
+por muchos núcleos que hubiera — y el primer reparto dejó 33 s de 35 en un solo
+lado, que es no repartir.
+
+**No se ha tocado ni una aserción, y las 840 pruebas siguen siendo 840.** Mover
+una prueba para que corra en paralelo es legítimo; recortarla para que tarde
+menos sería esconder el problema.
+
+**Lo que queda es carga, no ejecución:** 20,9 s de los 30,6 son `collect`, es
+decir transformar y cargar los módulos. Compartir el módulo entre ficheros
+(`isolate: false`) se probó y **no mejoró** — 31,2 s —, así que se descartó.
+Sigue por encima de los 20 s de `CLAUDE.md`.
 
 #### Los guardas se ven (v3.12)
 
