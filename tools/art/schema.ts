@@ -339,19 +339,28 @@ function gaitOf(value: unknown, bones: Set<string>): RecipeGait | null {
     }
     return foot;
   });
-  const knees: Record<string, [string, string, string]> = {};
-  for (const [name, chain] of Object.entries(record(gait.knees, 'recipe.rig.gait.knees'))) {
+  const hinges: Record<string, RecipeHinge> = {};
+  for (const [name, raw] of Object.entries(record(gait.hinges, 'recipe.rig.gait.hinges'))) {
+    const hinge = record(raw, `recipe.rig.gait.hinges['${name}']`);
+    const chain = hinge.bones;
     if (!Array.isArray(chain) || chain.length !== 3) {
-      throw new Error(`recipe.rig.gait.knees['${name}'] must name three bones.`);
+      throw new Error(`recipe.rig.gait.hinges['${name}'].bones must name three bones.`);
     }
     for (const bone of chain) {
       if (typeof bone !== 'string' || !bones.has(bone)) {
-        throw new Error(`recipe.rig.gait.knees['${name}'] names an unknown bone.`);
+        throw new Error(`recipe.rig.gait.hinges['${name}'].bones names an unknown bone.`);
       }
     }
-    knees[name] = chain as [string, string, string];
+    if (hinge.bends !== 'front' && hinge.bends !== 'back') {
+      throw new Error(`recipe.rig.gait.hinges['${name}'].bends must be 'front' or 'back'.`);
+    }
+    hinges[name] = {
+      bones: chain as [string, string, string],
+      bends: hinge.bends,
+      walking: hinge.walking === true,
+    };
   }
-  return { feet, knees };
+  return { feet, hinges };
 }
 
 export interface RecipeClipKey { frame: number; rotation: [number, number, number] }
@@ -376,7 +385,21 @@ export interface RecipeBone {
   tail: [number, number, number];
   parent: string | null;
 }
-export interface RecipeGait { feet: string[]; knees: Record<string, [string, string, string]> }
+/**
+ * Una bisagra del esqueleto y hacia dónde dobla.
+ *
+ * Un codo y una rodilla doblan en sentidos opuestos, y cada uno **sólo hacia el
+ * suyo**. Es la clase de cosa que en la receta se escribe con un signo y que un
+ * signo cambiado convierte en una pierna de pájaro o un codo del revés: las dos
+ * pasaron por aquí. `walking` marca las que un clip con zancada tiene que
+ * plegar de verdad.
+ */
+export interface RecipeHinge {
+  bones: [string, string, string];
+  bends: 'front' | 'back';
+  walking: boolean;
+}
+export interface RecipeGait { feet: string[]; hinges: Record<string, RecipeHinge> }
 export interface RecipeRig {
   bones: RecipeBone[];
   bind: Record<string, string>;

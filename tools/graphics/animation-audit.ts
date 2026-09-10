@@ -47,8 +47,8 @@ interface ClipFinding {
   rootDrift: number;
   liveliest: { node: string; travel: number };
   loopGap: number;
-  /** Grados que se pliega cada rodilla a lo largo del clip. */
-  knees: Record<string, { least: number; most: number }>;
+  /** Grados que abre cada bisagra a lo largo del clip, y cuánto dobla al revés. */
+  joints: Record<string, { least: number; most: number; wrongWay: number }>;
   /** Zancada por ciclo que dan las piernas, medida, o `null` si el clip no anda. */
   measuredStride: number | null;
   outOfBounds: string[];
@@ -82,6 +82,14 @@ const BOUNDS_SLACK = 1.6;
  * treinta es el suelo por debajo del cual no hay rodilla que valga.
  */
 const KNEE_FLEXION = 30;
+/**
+ * Cuánto puede doblar una bisagra hacia su lado prohibido, en grados.
+ *
+ * No es cero porque cerca de recta el sentido no significa nada: dos grados de
+ * ruido en una pierna casi estirada cambian el signo sin que se vea nada. Ocho
+ * grados de hiperextensión sí se ven, y es lo que hacían los codos de andar.
+ */
+const HINGE_SLACK = 8;
 /** Cuánto puede desviarse la zancada declarada de la que las piernas dan, en tanto por uno. */
 const STRIDE_SLACK = 0.2;
 /** Instantes de la hoja de contactos, en fracción del clip. */
@@ -139,7 +147,7 @@ function nodeFor(pose: Pose, bone: string): { joint: Vec3; lever: Vec3 } | undef
   return pose[bone] ?? pose[bone.replaceAll('.', '')];
 }
 
-/** El ángulo en `b` del codo o la rodilla `a-b-c`, en grados. */
+/** El ángulo en `b` del codo o la rodilla `a-b-c`, en grados. 180 es recto. */
 function angleAt(a: Vec3, b: Vec3, c: Vec3): number {
   const u: Vec3 = [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
   const v: Vec3 = [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
@@ -147,6 +155,30 @@ function angleAt(a: Vec3, b: Vec3, c: Vec3): number {
   const sizes = Math.hypot(...u) * Math.hypot(...v);
   if (sizes === 0) return 180;
   return (Math.acos(Math.max(-1, Math.min(1, dot / sizes))) * 180) / Math.PI;
+}
+
+/**
+ * Hacia dónde dobla la bisagra `a-b-c`: **negativo si el segmento de abajo se va
+ * hacia delante**, positivo si se va hacia atrás.
+ *
+ * El signo sale de la cuenta y no se elige. Con el segmento de arriba apuntando
+ * hacia abajo, (0,−1,0), y el de abajo yendo hacia delante, (0,−cos,+sen), la
+ * componente X del producto vectorial es −sen. Escribirlo al revés hizo que la
+ * comprobación denunciara justo los clips que estaban bien.
+ *
+ * El aldeano mira a +Z y se sostiene sobre +Y, así que el eje de una bisagra es
+ * el lateral, X. Vale mientras la raíz no gire, que es justo lo que garantiza la
+ * locomoción in-place: el clip no la toca nunca.
+ *
+ * Existe porque el ángulo solo no distingue una rodilla de una rodilla al
+ * revés. En G-04 el signo estuvo cambiado dos veces —las espinillas primero, los
+ * antebrazos después— y las dos veces todo lo demás pasó en verde.
+ */
+function bendOf(a: Vec3, b: Vec3, c: Vec3): number {
+  const upper: Vec3 = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+  const lower: Vec3 = [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
+  // La componente X del producto vectorial upper x lower.
+  return upper[1] * lower[2] - upper[2] * lower[1];
 }
 
 /**
@@ -413,26 +445,40 @@ async function main(): Promise<void> {
         problems.push(`Clip '${clip.name}' loops but ends ${loopGap.toFixed(4)}m away from its first pose.`);
       }
 
-      // Las rodillas y la zancada. Las dos son propiedades de una marcha, no
+      // Las bisagras y la zancada. Las dos son propiedades de una marcha, no
       // del esqueleto, así que se miden por clip y sólo si la receta declara
-      // qué huesos son pies y cuáles forman una rodilla.
-      const knees: Record<string, { least: number; most: number }> = {};
+      // qué huesos son pies y cuáles forman una bisagra.
+      const joints: Record<string, { least: number; most: number; wrongWay: number }> = {};
       const gait = recipe.rig?.gait ?? null;
       if (gait !== null) {
-        for (const [joint, chain] of Object.entries(gait.knees)) {
+        for (const [joint, hinge] of Object.entries(gait.hinges)) {
           const angles: number[] = [];
+          let wrongWay = 0;
           for (const pose of poses) {
-            const [a, b, c] = chain.map((bone) => nodeFor(pose, bone)?.joint);
+            const [a, b, c] = hinge.bones.map((bone) => nodeFor(pose, bone)?.joint);
             if (a === undefined || b === undefined || c === undefined) continue;
-            angles.push(angleAt(a, b, c));
+            const angle = angleAt(a, b, c);
+            angles.push(angle);
+            // Cerca de recta el sentido no significa nada y el signo baila.
+            if (angle > 176) continue;
+            const bend = bendOf(a, b, c);
+            const forwards = bend < 0;
+            if (forwards !== (hinge.bends === 'front')) wrongWay = Math.max(wrongWay, 180 - angle);
           }
           if (angles.length === 0) {
             problems.push(`Clip '${clip.name}' cannot be measured: '${joint}' names bones the GLB lacks.`);
             continue;
           }
-          knees[joint] = {
+          if (wrongWay > HINGE_SLACK) {
+            problems.push(
+              `Clip '${clip.name}' bends '${joint}' ${wrongWay.toFixed(0)} degrees the wrong way. `
+              + `It is declared to bend ${hinge.bends === 'front' ? 'forwards' : 'backwards'}.`,
+            );
+          }
+          joints[joint] = {
             least: Number(Math.min(...angles).toFixed(1)),
             most: Number(Math.max(...angles).toFixed(1)),
+            wrongWay: Number(wrongWay.toFixed(1)),
           };
         }
       }
@@ -441,7 +487,9 @@ async function main(): Promise<void> {
       if (gait !== null && clip.strideLength !== null) {
         measuredStride = measureStride(poses, gait.feet);
         // Una pierna que se balancea entera desde la cadera parece un péndulo.
-        for (const [joint, range] of Object.entries(knees)) {
+        for (const [joint, hinge] of Object.entries(gait.hinges)) {
+          const range = joints[joint];
+          if (!hinge.walking || range === undefined) continue;
           const flexion = range.most - range.least;
           if (flexion < KNEE_FLEXION) {
             problems.push(
@@ -489,7 +537,7 @@ async function main(): Promise<void> {
         rootDrift: Number(rootDrift.toFixed(5)),
         liveliest: { node: liveliest.node, travel: Number(liveliest.travel.toFixed(4)) },
         loopGap: Number(loopGap.toFixed(5)),
-        knees,
+        joints,
         measuredStride: measuredStride === null ? null : Number(measuredStride.toFixed(3)),
         outOfBounds,
         contactSheet: relative(ROOT, sheet).replaceAll('\\', '/'),
@@ -512,6 +560,7 @@ async function main(): Promise<void> {
     thresholds: {
       fps: FPS, rootDrift: ROOT_DRIFT, minTravel: MIN_TRAVEL, loopGap: LOOP_GAP,
       boundsSlack: BOUNDS_SLACK, kneeFlexion: KNEE_FLEXION, strideSlack: STRIDE_SLACK,
+      hingeSlack: HINGE_SLACK,
     },
     status: problems.length === 0 ? 'pass' : 'fail',
     problems,
@@ -524,7 +573,7 @@ async function main(): Promise<void> {
       `${finding.clip.padEnd(12)} ${finding.durationSeconds.toFixed(2)}s  `
       + `root ${finding.rootDrift.toFixed(4)}m  liveliest ${finding.liveliest.node} ${finding.liveliest.travel.toFixed(3)}m  `
       + `loop ${finding.loopGap.toFixed(4)}m`
-      + Object.entries(finding.knees)
+      + Object.entries(finding.joints)
         .map(([joint, range]) => `  ${joint} ${(range.most - range.least).toFixed(0)}deg`).join('')
       + (finding.measuredStride === null ? '' : `  stride ${finding.measuredStride.toFixed(2)}m`)
       + `\n`,

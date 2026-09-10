@@ -92,7 +92,7 @@ describe('G-04 · el rig del aldeano', () => {
     expect(sets[0]?.split(',').length).toBeGreaterThanOrEqual(12);
   });
 
-  it('declara que huesos son pies y cuales forman una rodilla', () => {
+  it('declara que huesos son pies y cuales son bisagras, con su sentido', () => {
     // Sin esto la auditoria no puede juzgar una marcha, y una pierna que se
     // balancea entera desde la cadera pasa todas las demas comprobaciones.
     const gait = rig?.gait;
@@ -100,26 +100,41 @@ describe('G-04 · el rig del aldeano', () => {
     expect(gait).not.toBeNull();
     expect(gait?.feet.length).toBe(2);
     for (const foot of gait?.feet ?? []) expect(bones.has(foot)).toBe(true);
-    expect(Object.keys(gait?.knees ?? {}).length).toBe(2);
-    for (const chain of Object.values(gait?.knees ?? {})) {
-      expect(chain.length).toBe(3);
-      for (const bone of chain) expect(bones.has(bone)).toBe(true);
+
+    const hinges = gait?.hinges ?? {};
+    expect(Object.keys(hinges).length).toBe(4);
+    for (const hinge of Object.values(hinges)) {
+      expect(hinge.bones.length).toBe(3);
+      for (const bone of hinge.bones) expect(bones.has(bone)).toBe(true);
     }
+    // Un codo y una rodilla doblan en sentidos opuestos.
+    expect(hinges['knee.L']?.bends).toBe('back');
+    expect(hinges['elbow.L']?.bends).toBe('front');
   });
 
-  it('pliega la rodilla hacia atras, no hacia delante', () => {
+  it('dobla rodillas y codos, cada uno solo hacia su lado', () => {
     // Medido con la sonda del visor: en estos huesos, que apuntan hacia abajo,
-    // el signo NEGATIVO es hacia delante. Las espinillas de la primera marcha
-    // estaban en negativo, asi que la rodilla se abria hacia delante como la de
-    // un pajaro y el paso se veia como un balanceo de pendulo. La flexion vive
-    // en positivo, y ningun fotograma puede pasarse al otro lado.
-    for (const clip of recipe.clipDefinitions.filter((candidate) => candidate.strideLength !== null)) {
-      for (const track of clip.tracks.filter((candidate) => candidate.bone.startsWith('shin'))) {
-        const pitches = track.keys.map((key) => key.rotation[0]);
-        for (const pitch of pitches) {
-          expect(pitch, `${clip.name}/${track.bone} extends the knee forwards`).toBeGreaterThanOrEqual(0);
+    // el signo NEGATIVO lleva el extremo hacia delante. La rodilla lleva el
+    // talon ATRAS, asi que su flexion vive en positivo; el codo lleva la mano
+    // ADELANTE, asi que la suya vive en negativo. Los dos estuvieron escritos
+    // del reves, en dos rondas distintas, y las dos veces todo lo demas paso en
+    // verde: las espinillas daban una pierna de pajaro y los antebrazos un codo
+    // que se doblaba hacia dentro.
+    const sides = [
+      { prefix: 'shin', sign: 1, least: 30 },
+      { prefix: 'forearm', sign: -1, least: 8 },
+    ];
+    for (const clip of recipe.clipDefinitions) {
+      for (const { prefix, sign, least } of sides) {
+        for (const track of clip.tracks.filter((candidate) => candidate.bone.startsWith(prefix))) {
+          const bends = track.keys.map((key) => key.rotation[0] * sign);
+          for (const bend of bends) {
+            expect(bend, `${clip.name}/${track.bone} bends the wrong way`).toBeGreaterThanOrEqual(0);
+          }
+          if (clip.strideLength !== null) {
+            expect(Math.max(...bends), `${clip.name}/${track.bone} barely bends`).toBeGreaterThanOrEqual(least);
+          }
         }
-        expect(Math.max(...pitches), `${clip.name}/${track.bone} barely bends`).toBeGreaterThanOrEqual(30);
       }
     }
   });
