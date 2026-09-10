@@ -116,10 +116,22 @@ parámetro de dirección.
 queda de esa ronda: los efectos que necesitan recurso propio (`art/recipes/
 effects/`), que dependen del catálogo, y la paridad de capturas contra Canvas.
 
-**Lo siguiente es G-09: banco y presupuesto móvil.** Medir qué cuesta el piloto
-en un teléfono antes de añadirle nada más, que es lo que D.9 pide con esas
-palabras. Después G-10, el catálogo completo, que es cuando las cajas con tejado
-se convierten en casas.
+**G-09 está medida y es parcial a propósito**: no hay dispositivo real, y D.9 no
+acepta emulación para cerrar P3. El presupuesto propuesto está en D.9.1 y el
+informe en `docs/graphics-rounds/G-09.md`.
+
+**Lo siguiente, en este orden:**
+
+1. **Unir el aldeano por material.** Es el hallazgo de G-09: los aldeanos son el
+   87 % de las llamadas de dibujo, dieciocho mallas cada uno, y tienen tres
+   materiales. Unirlos en Blender después del atado los deja en tres. Ojo con la
+   validación: comprueba que cada primitiva de la receta tiene su nodo en el
+   GLB, y unir mallas cambia esos nombres. Medir antes y después con
+   `npx tsx tools/graphics/benchmark.ts --seconds 6`.
+2. **Correr el banco en un móvil** con `--real true` y llenar las filas de
+   tiempo de D.9.1, que hoy están sin presupuestar a propósito.
+3. **G-10, el catálogo completo**, que es cuando las cajas con tejado se
+   convierten en casas.
 
 El brief original de G-07, para lo que quede de él:
 

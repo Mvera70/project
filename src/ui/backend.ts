@@ -11,6 +11,7 @@
 // that looks like a blank screen rather than an error.
 
 import type { GameState } from '@engine/state';
+import type { GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
 import { inspectAt } from './inspect';
 import { createRenderer, type ValleyRenderer } from '@render/renderer';
@@ -33,6 +34,8 @@ export interface ValleyBackend {
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
   resetView(): void;
+  /** Lo que cuesta la escena, o `null` en Canvas, que no tiene de donde sacarlo. */
+  stats(): GraphicsStats | null;
   dispose(): void;
 }
 
@@ -72,6 +75,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
     pan() { /* idem */ },
     resetView() { /* idem */ },
+    stats() { return null; },
     dispose() { /* The 2D renderer owns nothing that outlives its canvas. */ },
   };
 }
@@ -187,6 +191,7 @@ export function attachBackend(
         zoom(factor, atX, atY) { renderer.zoom(factor, atX, atY); },
         pan(dx, dy) { renderer.pan(dx, dy); },
         resetView() { renderer.resetView(); },
+        stats() { return renderer.stats(); },
         dispose() {
           window.removeEventListener('resize', size);
           renderer.dispose();

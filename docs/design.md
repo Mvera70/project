@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.27** | 10 sep 2026 | Ejecución G-09 | **Hay banco y hay presupuesto propuesto (D.9.1), medido sin dispositivo real y declarado como parcial.** Siete escenas de las que D.9 nombra, seis segundos cada una, con tiempo de CPU, cadencia, llamadas, triángulos, geometrías, programas, bytes por la red y deriva en sesión sostenida. No se informa tiempo de GPU porque no hay acceso fiable, y D.9 prohíbe llamarlo así. **El hallazgo: los aldeanos son el 87 % de las llamadas de dibujo**, dieciocho mallas cada uno, y unirlos por material los dejaría en tres. Se asigna al dueño del módulo medido en vez de apañarse aquí. Ninguna fuga: la deriva se queda en ruido, y las pruebas montan y desmontan pueblo y señales cien veces sin dejar nada. El renderer gana `stats()`, porque nadie fuera de él puede contar llamadas ni triángulos. |
 | **3.26** | 10 sep 2026 | Ejecución G-08 | **El valle cambia de estación y dice lo que le pasa sin abrir una ficha.** El suelo se pinta con la paleta de §10.3, la misma que usa el render 2D: reutilizada, no duplicada, porque dos copias se separan en cuanto alguien retoca un verde. La estación entra en la firma del suelo, que antes sólo cambiaba si alguien talaba un árbol —el valle seguía verde en enero— y las dos semanas de transición de §10.3 también, así que hay doce reconstrucciones al año y ni una más. Las señales —humo, luz, peste, velas, estandartes, nivel del granero— salen de `tellsFor`, el mismo del 2D, y **ninguna tiene temporizador propio**: se leen del estado y desaparecen cuando el estado deja de decirlas. La forma y el sitio son la señal y el color acompaña, que es lo que D.3 pide para que se lea en grises. |
 | **3.25** | 10 sep 2026 | G-07, segunda mitad | **El piloto 3D se puede jugar dentro del juego**, detrás de `?render=3d` y con Canvas por defecto. Canvas pinta desde el primer fotograma y el piloto releva cuando termina de cargar; si falla, el valle sigue en 2D en vez de quedarse en un error. **Dos lienzos, no uno**: un canvas no cambia de tipo de contexto una vez lo tiene. Cada backend sabe qué hay bajo un punto de su propia pantalla —el 2D por proporción de la rejilla, el 3D lanzando un rayo— y el pellizco pasa a ser zoom de verdad en vez de escalar el elemento con CSS, que es lo que D.7 pedía. Three.js se carga con `import()` diferido: quien juega en 2D no lo descarga. Y el contrato de D.5 gana **×64**, que el juego tenía desde que §11 lo añadió y el Anexo D no recogía. |
 | **3.24** | 10 sep 2026 | G-07, primera mitad | **La cámara se puede acercar y arrastrar**, que es lo que faltaba desde que D.6.2 hizo al aldeano de 0,65 celdas: se ve la aldea entera y hay que acercarse para ver a la gente. `camera.ts` guarda su propio estado —centro y alto visible en celdas— y el renderer expone `zoom`, `pan` y `resetView`, porque D.7 dice que las acciones de cámara no son decisiones del juego. Acercar mantiene bajo el dedo el punto que estaba bajo el dedo; el arrastre no saca el centro del valle; girar el móvil recalcula cuánto cabe sin devolver al jugador al encuadre de partida. Diez pruebas sin GPU. Cuando las dos reglas de D.7 se cruzan —pellizcar sobre el cielo de al lado exigiría sacar la vista del mapa— manda el límite de arrastre. Falta la mitad de la ronda: los gestos y las fichas dentro de `src/ui/`, que hoy sólo existen en la página del piloto. |
@@ -8356,6 +8357,38 @@ ratio; comparar sombras sencillas y sombras dinámicas; reducir animación lejan
 solo después compresión o shaders especializados. Instanciar árboles no implica
 que 80 mallas con esqueletos puedan compartir animación con la misma técnica.
 Prueba específica compara coste de rig/variantes antes de cerrar producción.
+
+#### D.9.1 · Presupuesto propuesto por G-09 (v3.27)
+
+**Medido sin dispositivo real, y por eso parcial.** El banco corrió en un Chrome
+de escritorio sin ventana sobre una RTX 4080. D.9 dice que la emulación no
+sustituye al hardware, así que **ninguna de estas cifras cierra P3**. Lo que sí
+vale de ellas es lo que no depende de la máquina.
+
+| Métrica | Objetivo | Límite | Medido |
+|---|---|---|---|
+| Llamadas de dibujo, escena de comparación | ≤ 400 | 950 | 914 |
+| Llamadas de dibujo, peor escena | ≤ 500 | 1 200 | 1 143 (bosque) |
+| Triángulos, peor escena | ≤ 90 000 | 120 000 | 74 196 |
+| Bytes por la red al arrancar | ≤ 600 KB | 1 MB | 509 KB |
+| Programas de shader | ≤ 8 | 12 | 6 |
+| Deriva en sesión sostenida | ≈ 0 | ±1 ms | −0,32 a +0,41 ms |
+
+**Los tiempos de fotograma quedan sin presupuestar hasta medir en un teléfono.**
+Un número de milisegundos sacado de una tarjeta de escritorio sería inventado.
+Lo medido aquí: 3,0 a 4,7 ms de CPU de mediana y 4,8 a 8,5 en el p95. La
+cadencia salió clavada a 56 fps en las siete escenas, que es lo que un navegador
+sin ventana entrega y no lo que la escena permite: **la cadencia de este banco
+no dice nada.**
+
+**El hallazgo que ordena el trabajo siguiente.** Los aldeanos son el **87 % de
+las llamadas de dibujo**: cada uno son dieciocho mallas, y en la escena de
+bosque cincuenta y cinco aldeanos ponen 990 de las 1 143 llamadas. Esa cuenta es
+la misma en un teléfono. El aldeano tiene tres materiales, así que unir sus
+mallas por material antes de exportar lo llevaría de dieciocho a tres. Es lo
+primero del orden de optimización de D.9 y se asigna al dueño del módulo medido,
+que es la cadena de fabricación de G-04. Informe completo en
+`docs/graphics-rounds/G-09.md`.
 
 Perfil bajo degrada sombra, vegetación decorativa, resolución y efectos en ese
 orden a validar, manteniendo personas y señales de crisis. Los valores visuales

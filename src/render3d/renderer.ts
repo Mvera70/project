@@ -20,7 +20,8 @@ import type { GameState, VillagerId } from '@engine/state';
 import { actorsFor, createActorMemory, type Actor } from './actors';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
-  GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsTarget, GraphicsViewport,
+  GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
+  GraphicsViewport,
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, type Ground } from './world/ground';
@@ -253,6 +254,19 @@ export async function createGraphicsRenderer(
     resetView(): void {
       if (disposed) return;
       view.reset();
+    },
+
+    stats(): GraphicsStats {
+      const info = renderer.info;
+      return {
+        drawCalls: info.render.calls,
+        triangles: info.render.triangles,
+        geometries: info.memory.geometries,
+        textures: info.memory.textures,
+        programs: info.programs?.length ?? 0,
+        actors: cast.count,
+        buildings: village.count,
+      };
     },
 
     dispose(): void {

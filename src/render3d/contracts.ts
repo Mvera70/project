@@ -52,6 +52,26 @@ export interface GraphicsRenderer {
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
   resetView(): void;
+
+  /**
+   * G-09 · Lo que la escena cuesta ahora mismo. design.md D.9.
+   *
+   * D.9 exige llamadas de dibujo, triángulos y texturas en el informe de
+   * presupuesto, y nadie fuera del renderer puede saberlos: el contexto WebGL es
+   * suyo. Leer, nunca escribir; llamarlo no dibuja nada.
+   */
+  stats(): GraphicsStats;
+}
+
+export interface GraphicsStats {
+  readonly drawCalls: number;
+  readonly triangles: number;
+  readonly geometries: number;
+  readonly textures: number;
+  readonly programs: number;
+  /** Cuántos aldeanos y edificios hay en escena, para poner el resto en contexto. */
+  readonly actors: number;
+  readonly buildings: number;
 }
 
 export interface GraphicsRendererOptions {
