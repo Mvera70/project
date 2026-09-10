@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.17** | 10 sep 2026 | Repaso de G-04 tras verlo en movimiento | **Las rodillas del aldeano se doblaban al revés.** En huesos que apuntan hacia abajo el signo negativo es hacia delante, y las espinillas estaban en negativo: la rodilla se abría como la de un pájaro y el paso se veía como un balanceo de péndulo. Con apoyo y vuelo de verdad la flexión pasa de 25 a 41 grados. Andar no tocaba la columna, así que heredaba la inclinación de azadonar; ahora los cuatro clips mueven el mismo juego de huesos y un clip se basta solo. Cuentas esféricas en codo y rodilla, porque dos cilindros que se juntan en un punto enseñan sus tapas al doblar. La zancada declarada no era la que daban las piernas (0,62 contra 0,95) y pasa a medirse por el recorrido del pie que pisa. Y la promoción sólo exige equivalencia con lo aprobado si la receta no ha cambiado: sin eso, ningún cambio de forma era promovible. |
 | **3.16** | 10 sep 2026 | Ejecución G-04 | **Existe un aldeano articulado con cuatro clips, construido por la misma cadena declarativa que un edificio.** 916 triángulos, 16 huesos, conectores en las dos manos. D.4.1 fija la piel rígida tras un banco común que dio coste idéntico y aspecto peor en la deformable. El atado va por grupo de vértices porque emparentar al hueso pivota por su cola y desprendía la cabeza con la validación en verde. `animation-audit.ts` mide los clips en el navegador —duración, deriva de raíz, cierre de bucle— y deja hojas de contactos, incluida una a 18×26 px que es el tamaño real del aldeano a 390 px de ancho. El catálogo gana un campo `motion` añadido —duración, bucle y zancada por clip— para que el controlador pueda casar su velocidad con la del clip y no deslizar los pies. Queda anotado que el aldeano no tiene frente. |
 | **2.92** | 9 sep 2026, 20:08 | Ejecución G-02 | **Una receta declarativa ya genera, valida y promueve un recurso sin editar Blender.** Dos builds distintos conservaron 7 objetos, 4 materiales, 504 triángulos, caja y captura Three.js idénticos aunque sus binarios difirieran. El catálogo apunta a una promoción inmutable y guarda hashes concretos; los clips y conectores vacíos solo son válidos para el marcador. |
 | **2.91** | 9 sep 2026, 17:26 | Ejecución G-01 | **El GLB de Blender carga directamente en Three.js r185 y dos capturas del mismo host coinciden byte a byte.** Se ratifican el encuadre ortográfico por caja, tiempo explícito y estados de carga; sombra y sesgo se derivan de escala. Three 0.185.0 + tipos 0.185.4 sustituyen r186 por compatibilidad. La cadena local de P0 queda cerrada; solo falta comprobar la recuperación desde otro dispositivo. |
@@ -7950,7 +7951,7 @@ con la cámara del juego. Reconstrucción reproducible significa equivalencia
 de geometría/material/animación; no exigir bytes idénticos de `.blend` si sus
 metadatos cambian. Registrar hashes de los artefactos concretos entregados.
 
-#### D.4.1 · Piel del aldeano, decidida (v3.16)
+#### D.4.1 · Piel y marcha del aldeano, decididas (v3.16, repasado en v3.17)
 
 **El aldeano se ata rígido.** Cada pieza pesa 1 sobre un solo hueso. D.4 pedía
 comparar piezas rígidas frente a piel sencilla en un banco común antes de fijar
@@ -7986,6 +7987,26 @@ reproducción —duración, bucle y zancada—. El controlador reproducirá a
 patinan. El campo es añadido y nunca exigido: los cinco recursos anteriores lo
 dejan vacío y siguen siendo válidos sin tocarlos, y la validación rechaza un
 `motion` que hable de un clip que el índice no lista.
+
+**Un clip tiene que bastarse solo.** Un hueso sin clave conserva la pose que
+dejó el clip anterior, así que un clip que no toca la columna hereda la del que
+venía: al pasar de azadonar a andar, el aldeano andaba encorvado. No es un
+defecto del reproductor, porque el juego encadenará clips en un orden que nadie
+decide de antemano. Los cuatro mueven el mismo juego de huesos y el torso al
+andar queda a 0,0 grados de la vertical venga de donde venga.
+
+**La zancada se mide, no se elige.** Es la que dan las piernas, y la medida
+correcta es la única que no se puede falsear: en cada instante el pie que está
+más abajo es el que pisa, y lo que ese pie retrocede es lo que el cuerpo avanza.
+Las dos medidas anteriores —separación máxima entre tobillos, y recorrido de un
+pie por debajo de un umbral de altura— daban números plausibles y falsos, y
+ninguna se desmentía a ojo.
+
+**La equivalencia con lo aprobado presupone la misma receta.** El catálogo
+guarda el hash de la receta con la que se hizo lo aprobado y sólo compara cuando
+no ha cambiado. Sin esa condición, ningún cambio deliberado de geometría podía
+promoverse: al añadir las cuentas de codo y rodilla, la promoción se negó a
+seguir porque el artefacto anterior no tenía esas piezas.
 
 **Deuda anotada.** El aldeano no tiene frente: por delante y por detrás es casi
 la misma silueta, y en el valle giran hacia donde caminan. Es asunto de

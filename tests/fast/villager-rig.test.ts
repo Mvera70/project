@@ -79,6 +79,51 @@ describe('G-04 · el rig del aldeano', () => {
     expect(recipe.connectors.length).toBeGreaterThanOrEqual(2);
   });
 
+  it('cada clip se basta solo: los cuatro mueven los mismos huesos', () => {
+    // Un hueso sin clave conserva la pose que dejo el clip anterior. Andar no
+    // tocaba la columna, asi que al pasar de azadonar a andar el torso se
+    // quedaba doblado 26 grados y el aldeano caminaba encorvado. No es un
+    // defecto del reproductor: un clip tiene que bastarse solo, porque el juego
+    // encadenara clips en un orden que nadie decide de antemano.
+    const sets = recipe.clipDefinitions.map(
+      (clip) => [...new Set(clip.tracks.map((track) => track.bone))].sort().join(','),
+    );
+    expect(new Set(sets).size, `bone sets: ${sets.join(' | ')}`).toBe(1);
+    expect(sets[0]?.split(',').length).toBeGreaterThanOrEqual(12);
+  });
+
+  it('declara que huesos son pies y cuales forman una rodilla', () => {
+    // Sin esto la auditoria no puede juzgar una marcha, y una pierna que se
+    // balancea entera desde la cadera pasa todas las demas comprobaciones.
+    const gait = rig?.gait;
+    const bones = new Set(rig?.bones.map((bone) => bone.name) ?? []);
+    expect(gait).not.toBeNull();
+    expect(gait?.feet.length).toBe(2);
+    for (const foot of gait?.feet ?? []) expect(bones.has(foot)).toBe(true);
+    expect(Object.keys(gait?.knees ?? {}).length).toBe(2);
+    for (const chain of Object.values(gait?.knees ?? {})) {
+      expect(chain.length).toBe(3);
+      for (const bone of chain) expect(bones.has(bone)).toBe(true);
+    }
+  });
+
+  it('pliega la rodilla hacia atras, no hacia delante', () => {
+    // Medido con la sonda del visor: en estos huesos, que apuntan hacia abajo,
+    // el signo NEGATIVO es hacia delante. Las espinillas de la primera marcha
+    // estaban en negativo, asi que la rodilla se abria hacia delante como la de
+    // un pajaro y el paso se veia como un balanceo de pendulo. La flexion vive
+    // en positivo, y ningun fotograma puede pasarse al otro lado.
+    for (const clip of recipe.clipDefinitions.filter((candidate) => candidate.strideLength !== null)) {
+      for (const track of clip.tracks.filter((candidate) => candidate.bone.startsWith('shin'))) {
+        const pitches = track.keys.map((key) => key.rotation[0]);
+        for (const pitch of pitches) {
+          expect(pitch, `${clip.name}/${track.bone} extends the knee forwards`).toBeGreaterThanOrEqual(0);
+        }
+        expect(Math.max(...pitches), `${clip.name}/${track.bone} barely bends`).toBeGreaterThanOrEqual(30);
+      }
+    }
+  });
+
   it('lleva la zancada de cada clip que camina', () => {
     // D.4 · el controlador mueve al aldeano por el valle y el clip mueve el
     // cuerpo. Sin la zancada no hay forma de casar las dos velocidades, y unos
@@ -88,7 +133,8 @@ describe('G-04 · el rig del aldeano', () => {
     for (const clip of walking) {
       expect(clip.strideLength, `${clip.name} has no stride`).toBeGreaterThan(0);
     }
-    // Cargado se anda más corto que con las manos libres.
+    // Cargado se anda más corto que con las manos libres. Las dos zancadas
+    // salen de medir el GLB, no de elegirlas: es lo que dan las piernas.
     const free = walking.find((clip) => clip.name === 'walk')?.strideLength ?? 0;
     const laden = walking.find((clip) => clip.name === 'carry_walk')?.strideLength ?? 0;
     expect(laden).toBeLessThan(free);

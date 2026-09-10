@@ -29,6 +29,7 @@
           4.65
         ]
       },
+      "recipeSha256": null,
       "materials": [
         "direction-red",
         "front-gold",
@@ -87,6 +88,7 @@
           8.16
         ]
       },
+      "recipeSha256": null,
       "materials": [
         "ground",
         "soil",
@@ -155,6 +157,7 @@
           8.26
         ]
       },
+      "recipeSha256": null,
       "materials": [
         "ground",
         "soil",
@@ -204,6 +207,7 @@
       "blenderVersion": "5.2.1 LTS",
       "approved": null,
       "bounds": null,
+      "recipeSha256": null,
       "materials": [
         "skin",
         "cloth",
@@ -230,6 +234,7 @@
       "blenderVersion": "5.2.1 LTS",
       "approved": null,
       "bounds": null,
+      "recipeSha256": null,
       "materials": [
         "skin",
         "cloth",
@@ -255,8 +260,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T08-51-48-967Z-31364",
-        "directory": "artifacts/graphics/G-04/approved/888b19deb619c65a"
+        "runId": "2026-09-10T09-56-34-089Z-45092",
+        "directory": "artifacts/graphics/G-04/approved/d58936e7df30cf96"
       },
       "bounds": {
         "min": [
@@ -275,6 +280,7 @@
           0.56
         ]
       },
+      "recipeSha256": "24C02835C973678DF682FEC9BB7B3E87E6B64EBFC43720E53D313E029094F56F",
       "materials": [
         "skin",
         "cloth",
@@ -297,7 +303,7 @@
           "name": "walk",
           "seconds": 1.3333333333333333,
           "loop": true,
-          "strideLength": 0.62
+          "strideLength": 0.95
         },
         {
           "name": "work_hoe",
@@ -309,7 +315,7 @@
           "name": "carry_walk",
           "seconds": 1.3333333333333333,
           "loop": true,
-          "strideLength": 0.52
+          "strideLength": 0.78
         }
       ],
       "connectors": [
@@ -317,20 +323,20 @@
         "hand_r"
       ],
       "statistics": {
-        "objects": 34,
-        "meshes": 14,
+        "objects": 38,
+        "meshes": 18,
         "materials": 3,
-        "triangles": 916
+        "triangles": 1236
       },
       "hashes": {
-        "villager.blend": "92235B179A16319F7F51A9920BDCABFCD6E6BAACB20BC35CAA46FA7CA944C535",
-        "villager.glb": "888B19DEB619C65A76ACF557A17319687BBB50AC9F2646B61A877193A1E455B9",
-        "villager-blender.png": "0DAB5B0606E605BE8CA6C17301747A328194532597B6717D3E3C28CC45E77460",
-        "capture-1.png": "8269F4ABF5DFEE338EF092CB4F99FDCC8B9220ECE328F95B04FA4A84268CCD82",
-        "capture-1-gray.png": "1E8AB9C77012EAE73168C8EBD1D4D2DCFF7EDB48A0B0A26B07A85513A82685B0",
-        "capture.json": "5FB81DFBFB8E103019A4AC507DE225760C41399E5177C8018DF1E26709B3C22A",
-        "build.json": "0B1BB95BD7564B65494AAC67354FA9F8B99CD4FFD920CB027B03174930465CAA",
-        "validation.json": "84F9CEC32578B84F279ACE2EF37CAB837484666113583868C2CA5E942AA14837"
+        "villager.blend": "34408225C6073206CAD36A368EEEE07842789EA2DC6FAB1CCAEE53D9A5D030CA",
+        "villager.glb": "D58936E7DF30CF9679DEB4E1785A51B81712A5962B47EA80EEAADB0EFF564D3D",
+        "villager-blender.png": "BFCC8EA78DAADE1F56BE66828C76ECF2683483889581BAE5937E895FA00CDEE6",
+        "capture-1.png": "B5224DAE46CD19CAEFF528D7FC3909F5A9E9B2BC11266CADAA57ADBD5558145B",
+        "capture-1-gray.png": "A7E1CB83DE44BB48665069A84EC9368046F6EED23C1AEE79EE90EDB9440E5577",
+        "capture.json": "E997D49AADFE69F4C0A3D0EBF795B9EDA929908C2E9BD301D25859EE53E78107",
+        "build.json": "2418C1358BE223238C0A46DE0583A85834A0BB5B773B366022D05BD7DA432417",
+        "validation.json": "15019187191D1F51572647CFCF6B601AB0771D63D8C9F738054F9B05E5F7A0CA"
       },
       "provenance": {
         "kind": "original",

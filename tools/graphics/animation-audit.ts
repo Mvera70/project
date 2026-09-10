@@ -47,6 +47,10 @@ interface ClipFinding {
   rootDrift: number;
   liveliest: { node: string; travel: number };
   loopGap: number;
+  /** Grados que se pliega cada rodilla a lo largo del clip. */
+  knees: Record<string, { least: number; most: number }>;
+  /** Zancada por ciclo que dan las piernas, medida, o `null` si el clip no anda. */
+  measuredStride: number | null;
   outOfBounds: string[];
   contactSheet: string;
 }
@@ -68,10 +72,28 @@ const MIN_TRAVEL = 0.02;
 const LOOP_GAP = 0.002;
 /** Cuántas veces la caja en reposo puede ocupar un hueso antes de ser un miembro suelto. */
 const BOUNDS_SLACK = 1.6;
+/**
+ * Cuánto tiene que plegarse una rodilla en un clip que anda, en grados.
+ *
+ * Una pierna que se balancea entera desde la cadera parece un péndulo, y así
+ * estuvo la primera marcha de G-04: las espinillas tenían el signo cambiado y
+ * la rodilla se abría hacia delante en vez de plegarse. Llegaba a 25 grados y
+ * pasaba todas las demás comprobaciones. Andar de verdad pliega unos sesenta;
+ * treinta es el suelo por debajo del cual no hay rodilla que valga.
+ */
+const KNEE_FLEXION = 30;
+/** Cuánto puede desviarse la zancada declarada de la que las piernas dan, en tanto por uno. */
+const STRIDE_SLACK = 0.2;
 /** Instantes de la hoja de contactos, en fracción del clip. */
 const SHEET_AT = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875];
-/** Instantes que se miden. Más que la hoja: medir es barato, rendir no. */
-const SAMPLES = 24;
+/**
+ * Instantes que se miden. Más que la hoja: medir es barato, rendir no.
+ *
+ * Cuarenta y ocho y no veinticuatro porque la zancada se suma tramo a tramo, y
+ * los tramos que se pierden son los del cambio de apoyo, donde la medida no
+ * vale. Cuantos más tramos, menos peso tiene cada cambio.
+ */
+const SAMPLES = 48;
 
 function argument(name: string, fallback: string): string {
   const index = process.argv.indexOf(`--${name}`);
@@ -104,6 +126,68 @@ async function freePort(): Promise<number> {
   } finally {
     await new Promise<void>((done, reject) => server.close((error) => error ? reject(error) : done()));
   }
+}
+
+/**
+ * El nodo del GLB que corresponde a un hueso de la receta.
+ *
+ * glTF no admite puntos en los nombres, así que el exportador convierte
+ * `foot.L` en `footL`. Es la clase de detalle que rompe una comprobación en
+ * silencio: la búsqueda no encuentra nada, la medida sale vacía y el clip pasa.
+ */
+function nodeFor(pose: Pose, bone: string): { joint: Vec3; lever: Vec3 } | undefined {
+  return pose[bone] ?? pose[bone.replaceAll('.', '')];
+}
+
+/** El ángulo en `b` del codo o la rodilla `a-b-c`, en grados. */
+function angleAt(a: Vec3, b: Vec3, c: Vec3): number {
+  const u: Vec3 = [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const v: Vec3 = [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
+  const dot = u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+  const sizes = Math.hypot(...u) * Math.hypot(...v);
+  if (sizes === 0) return 180;
+  return (Math.acos(Math.max(-1, Math.min(1, dot / sizes))) * 180) / Math.PI;
+}
+
+/**
+ * La zancada que las piernas dan de verdad, por ciclo.
+ *
+ * Definición: **en cada instante el pie que está más abajo es el que pisa, y lo
+ * que ese pie retrocede es lo que el cuerpo avanza.** Sumado a lo largo del
+ * ciclo da la zancada. En un clip in-place el pie apoyado se desliza hacia
+ * atrás exactamente a la velocidad de avance, así que la suma es justo lo que
+ * el controlador tiene que recorrer mientras el clip da una vuelta. Si declara
+ * otra cosa, los pies patinan.
+ *
+ * Costó dos intentos. El primero midió la separación máxima entre tobillos: dio
+ * 1,50 m donde la marcha da 0,59, porque cuando el pie de vuelo está arriba y
+ * adelante esa separación es grande y no significa nada. El segundo tomó lo que
+ * recorre un pie mientras está por debajo de un umbral de altura, y dijo que
+ * cargado se anda más largo que suelto, porque con la zancada corta los pies
+ * quedan todos dentro del umbral y el de vuelo entraba en la cuenta. Ninguna de
+ * las dos era falsable a ojo; la tercera se apoya en lo único que define un
+ * apoyo, que es cuál de los dos pies está en el suelo.
+ */
+function measureStride(poses: Pose[], feet: string[]): number | null {
+  if (feet.length < 2 || poses.length < 3) return null;
+  let advanced = 0;
+  for (let index = 0; index + 1 < poses.length; index += 1) {
+    const here = poses[index];
+    const next = poses[index + 1];
+    if (here === undefined || next === undefined) continue;
+    const grounded = feet
+      .map((foot) => ({ foot, node: nodeFor(here, foot) }))
+      .filter((entry) => entry.node !== undefined)
+      .sort((a, b) => (a.node?.joint[1] ?? 0) - (b.node?.joint[1] ?? 0))[0];
+    if (grounded === undefined) continue;
+    const from = grounded.node?.joint[2];
+    const to = nodeFor(next, grounded.foot)?.joint[2];
+    if (from === undefined || to === undefined) continue;
+    // El aldeano mira a +Z, así que el pie que pisa va hacia −Z. Un tramo en el
+    // que avance es un cambio de apoyo, y no cuenta.
+    advanced += Math.max(0, from - to);
+  }
+  return advanced;
 }
 
 /**
@@ -329,6 +413,55 @@ async function main(): Promise<void> {
         problems.push(`Clip '${clip.name}' loops but ends ${loopGap.toFixed(4)}m away from its first pose.`);
       }
 
+      // Las rodillas y la zancada. Las dos son propiedades de una marcha, no
+      // del esqueleto, así que se miden por clip y sólo si la receta declara
+      // qué huesos son pies y cuáles forman una rodilla.
+      const knees: Record<string, { least: number; most: number }> = {};
+      const gait = recipe.rig?.gait ?? null;
+      if (gait !== null) {
+        for (const [joint, chain] of Object.entries(gait.knees)) {
+          const angles: number[] = [];
+          for (const pose of poses) {
+            const [a, b, c] = chain.map((bone) => nodeFor(pose, bone)?.joint);
+            if (a === undefined || b === undefined || c === undefined) continue;
+            angles.push(angleAt(a, b, c));
+          }
+          if (angles.length === 0) {
+            problems.push(`Clip '${clip.name}' cannot be measured: '${joint}' names bones the GLB lacks.`);
+            continue;
+          }
+          knees[joint] = {
+            least: Number(Math.min(...angles).toFixed(1)),
+            most: Number(Math.max(...angles).toFixed(1)),
+          };
+        }
+      }
+
+      let measuredStride: number | null = null;
+      if (gait !== null && clip.strideLength !== null) {
+        measuredStride = measureStride(poses, gait.feet);
+        // Una pierna que se balancea entera desde la cadera parece un péndulo.
+        for (const [joint, range] of Object.entries(knees)) {
+          const flexion = range.most - range.least;
+          if (flexion < KNEE_FLEXION) {
+            problems.push(
+              `Clip '${clip.name}' walks but '${joint}' only bends ${flexion.toFixed(0)} degrees. `
+              + 'A leg that swings whole from the hip reads as a pendulum.',
+            );
+          }
+        }
+        // Y una zancada declarada que no case con la que las piernas dan hace
+        // que el controlador reproduzca a otro ritmo y los pies patinen.
+        if (measuredStride === null) {
+          problems.push(`Clip '${clip.name}' declares a stride but no foot ever plants.`);
+        } else if (Math.abs(measuredStride - clip.strideLength) > clip.strideLength * STRIDE_SLACK) {
+          problems.push(
+            `Clip '${clip.name}' declares a stride of ${clip.strideLength.toFixed(2)}m `
+            + `but its legs give ${measuredStride.toFixed(2)}m. The feet would slide.`,
+          );
+        }
+      }
+
       const frames: string[] = [];
       for (const fraction of SHEET_AT) {
         const seconds = exported.duration * fraction;
@@ -356,6 +489,8 @@ async function main(): Promise<void> {
         rootDrift: Number(rootDrift.toFixed(5)),
         liveliest: { node: liveliest.node, travel: Number(liveliest.travel.toFixed(4)) },
         loopGap: Number(loopGap.toFixed(5)),
+        knees,
+        measuredStride: measuredStride === null ? null : Number(measuredStride.toFixed(3)),
         outOfBounds,
         contactSheet: relative(ROOT, sheet).replaceAll('\\', '/'),
       });
@@ -374,7 +509,10 @@ async function main(): Promise<void> {
     asset: relative(ROOT, glbPath).replaceAll('\\', '/'),
     recipe: relative(ROOT, recipePath).replaceAll('\\', '/'),
     camera,
-    thresholds: { fps: FPS, rootDrift: ROOT_DRIFT, minTravel: MIN_TRAVEL, loopGap: LOOP_GAP, boundsSlack: BOUNDS_SLACK },
+    thresholds: {
+      fps: FPS, rootDrift: ROOT_DRIFT, minTravel: MIN_TRAVEL, loopGap: LOOP_GAP,
+      boundsSlack: BOUNDS_SLACK, kneeFlexion: KNEE_FLEXION, strideSlack: STRIDE_SLACK,
+    },
     status: problems.length === 0 ? 'pass' : 'fail',
     problems,
     clips: findings,
@@ -385,7 +523,11 @@ async function main(): Promise<void> {
     process.stdout.write(
       `${finding.clip.padEnd(12)} ${finding.durationSeconds.toFixed(2)}s  `
       + `root ${finding.rootDrift.toFixed(4)}m  liveliest ${finding.liveliest.node} ${finding.liveliest.travel.toFixed(3)}m  `
-      + `loop ${finding.loopGap.toFixed(4)}m\n`,
+      + `loop ${finding.loopGap.toFixed(4)}m`
+      + Object.entries(finding.knees)
+        .map(([joint, range]) => `  ${joint} ${(range.most - range.least).toFixed(0)}deg`).join('')
+      + (finding.measuredStride === null ? '' : `  stride ${finding.measuredStride.toFixed(2)}m`)
+      + `\n`,
     );
   }
   if (problems.length > 0) {

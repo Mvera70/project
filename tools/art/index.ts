@@ -261,8 +261,16 @@ async function report(assetId: string): Promise<void> {
     await rename(stage, approvedDirectory);
   }
   for (const name of promotedNames) promotedFiles[name] = await evidence(resolve(approvedDirectory, name));
-  let equivalence: { compared: false } | { compared: true; previous: string; equivalent: boolean } = { compared: false };
-  if (current.approved !== null && existsSync(resolve(ROOT, current.approved.directory, `${assetId}.glb`))) {
+  // La equivalencia con lo aprobado se comprueba **solo si la receta es la
+  // misma**. Una receta distinta describe otro recurso, y pedirle que se
+  // parezca al anterior impide cualquier cambio deliberado de forma.
+  const recipeSha256 = hash(await readFile(resolve(ROOT, current.recipe)));
+  const sameRecipe = current.recipeSha256 === recipeSha256;
+  let equivalence:
+    | { compared: false; reason: 'no prior build' | 'the recipe changed' }
+    | { compared: true; previous: string; equivalent: boolean } =
+    { compared: false, reason: current.approved === null ? 'no prior build' : 'the recipe changed' };
+  if (sameRecipe && current.approved !== null && existsSync(resolve(ROOT, current.approved.directory, `${assetId}.glb`))) {
     const previous = validateGlb(recipe, await readFile(resolve(ROOT, current.approved.directory, `${assetId}.glb`)));
     const equivalent = JSON.stringify({
       nodes: previous.nodeNames.sort(), materials: previous.materialNames.sort(), clips: previous.animationNames.sort(),
@@ -292,6 +300,7 @@ async function report(assetId: string): Promise<void> {
   const updated: CatalogAsset = {
     ...current, status: 'study',
     approved: { runId: latest.runId, directory: relative(ROOT, approvedDirectory).replaceAll('\\', '/') },
+    recipeSha256,
     bounds: firstCapture.viewer.bounds,
     materials: recipe.materials.map((item) => item.name), clips: recipe.clips, connectors: recipe.connectors,
     // D.4 · el índice de clips no basta para reproducirlos. La zancada la

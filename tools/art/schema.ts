@@ -93,6 +93,20 @@ export interface CatalogAsset {
   generator: string;
   blenderVersion: string;
   approved: null | { runId: string; directory: string };
+  /**
+   * G-04 · La receta con la que se hizo lo aprobado.
+   *
+   * D.4 pide que una reconstrucción sea equivalente en geometría, material y
+   * animación, y `report` lo comprueba contra el artefacto anterior. Pero la
+   * misma receta es la premisa de esa comparación: con una receta distinta el
+   * recurso es otro, y exigirle equivalencia hacía **imposible promover
+   * cualquier cambio deliberado de geometría**. Con el añadido de las cuentas
+   * de codo y rodilla, la promoción se negó a seguir.
+   *
+   * `null` en un recurso aprobado antes de que este campo existiera: entonces
+   * no se compara, que es lo prudente cuando no se sabe.
+   */
+  recipeSha256: string | null;
   bounds: null | { min: Vec3; max: Vec3; size: Vec3 };
   materials: string[];
   clips: string[];
@@ -221,7 +235,26 @@ function clipDefinitions(value: unknown): RecipeClip[] {
           if (!same) throw new Error(`${label} loops but its last key does not match its first.`);
         }
       }
-      return { bone, keys };
+      // G-04 · claves de posición, además de las de giro.
+      //
+      // La cadera sube en el paso y baja en el contacto, y eso es una
+      // traslación, no un giro. Mover la cadera mueve el cuerpo y no la raíz,
+      // así que la locomoción sigue siendo in-place. El campo estuvo un rato
+      // escrito en la receta y leído por `animate.py` pero no por este esquema,
+      // que es quien escribe la receta resuelta que Blender acaba leyendo: el
+      // bote se perdía por el camino sin que nada se quejara.
+      const location = track.location === undefined ? [] : (() => {
+        if (!Array.isArray(track.location)) throw new Error(`${label}.location must be an array.`);
+        return track.location.map((moveEntry, moveIndex) => {
+          const moveLabel = `${label}.location[${moveIndex}]`;
+          const move = record(moveEntry, moveLabel);
+          return {
+            frame: integer(move.frame, `${moveLabel}.frame`, 1),
+            offset: vec3(move.offset, `${moveLabel}.offset`),
+          };
+        });
+      })();
+      return { bone, keys, location };
     });
     // D.4 · un clip de locomocion lleva su zancada: el controlador la necesita
     // para casar la velocidad del cuerpo con la del desplazamiento y que los
@@ -281,11 +314,54 @@ function rigOf(value: unknown): RecipeRig | null {
       throw new Error(`recipe.rig.bind['${piece}'] names an unknown bone.`);
     }
   }
-  return { bones, bind: bind as Record<string, string> };
+  return { bones, bind: bind as Record<string, string>, gait: gaitOf(rig.gait, names) };
+}
+
+/**
+ * G-04 · Qué huesos son pies y cuáles forman una rodilla.
+ *
+ * La auditoría tiene que poder juzgar una marcha —que la rodilla se pliega,
+ * que el paso mide lo que dice la zancada— sin saber que este esqueleto es un
+ * humano. Lo dice la receta, que es quien sí lo sabe. Un recurso sin marcha lo
+ * omite y no se le mide nada.
+ */
+function gaitOf(value: unknown, bones: Set<string>): RecipeGait | null {
+  if (value === undefined || value === null) return null;
+  const gait = record(value, 'recipe.rig.gait');
+  // Nombres de hueso, no identificadores: llevan punto (`foot.L`), y
+  // `stringArray` rechaza el punto porque valida nombres de material y de clip.
+  if (!Array.isArray(gait.feet) || gait.feet.length === 0) {
+    throw new Error('recipe.rig.gait.feet must be a non-empty array.');
+  }
+  const feet = gait.feet.map((foot, index) => {
+    if (typeof foot !== 'string' || !bones.has(foot)) {
+      throw new Error(`recipe.rig.gait.feet[${index}] names an unknown bone.`);
+    }
+    return foot;
+  });
+  const knees: Record<string, [string, string, string]> = {};
+  for (const [name, chain] of Object.entries(record(gait.knees, 'recipe.rig.gait.knees'))) {
+    if (!Array.isArray(chain) || chain.length !== 3) {
+      throw new Error(`recipe.rig.gait.knees['${name}'] must name three bones.`);
+    }
+    for (const bone of chain) {
+      if (typeof bone !== 'string' || !bones.has(bone)) {
+        throw new Error(`recipe.rig.gait.knees['${name}'] names an unknown bone.`);
+      }
+    }
+    knees[name] = chain as [string, string, string];
+  }
+  return { feet, knees };
 }
 
 export interface RecipeClipKey { frame: number; rotation: [number, number, number] }
-export interface RecipeClipTrack { bone: string; keys: RecipeClipKey[] }
+export interface RecipeClipMove { frame: number; offset: [number, number, number] }
+export interface RecipeClipTrack {
+  bone: string;
+  keys: RecipeClipKey[];
+  /** Desplazamientos del hueso, en su propio eje. Vacío salvo que el clip los pida. */
+  location: RecipeClipMove[];
+}
 export interface RecipeClip {
   name: string;
   frames: number;
@@ -300,7 +376,12 @@ export interface RecipeBone {
   tail: [number, number, number];
   parent: string | null;
 }
-export interface RecipeRig { bones: RecipeBone[]; bind: Record<string, string> }
+export interface RecipeGait { feet: string[]; knees: Record<string, [string, string, string]> }
+export interface RecipeRig {
+  bones: RecipeBone[];
+  bind: Record<string, string>;
+  gait: RecipeGait | null;
+}
 
 /**
  * G-04 · Los hechos de reproducción de cada clip del catálogo.
@@ -461,6 +542,7 @@ export function parseCatalog(value: unknown): ArtCatalog {
         max: vec3(bounds.max, `catalog.assets[${index}].bounds.max`),
         size: vec3(bounds.size, `catalog.assets[${index}].bounds.size`, true),
       },
+      recipeSha256: typeof item.recipeSha256 === 'string' ? item.recipeSha256 : null,
       materials: stringArray(item.materials, `catalog.assets[${index}].materials`),
       clips: stringArray(item.clips, `catalog.assets[${index}].clips`),
       motion: motionOf(item.motion, item.clips, `catalog.assets[${index}]`),
