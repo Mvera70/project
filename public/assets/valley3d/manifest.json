@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-10T16:00:19.107Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts",
+  "assets": [
+    {
+      "id": "axis-marker",
+      "file": "axis-marker.glb",
+      "sha256": "F5AE6356E7B3C39676A12222A5786E36304BE22E45ED2F9753ACBC9D1ACA2684",
+      "motion": []
+    },
+    {
+      "id": "village-corner-a",
+      "file": "village-corner-a.glb",
+      "sha256": "97CD165B1713778F92F10DBBB20A24BA9005134DECD6CBED7BAE37C39BFF0CE1",
+      "motion": []
+    },
+    {
+      "id": "village-corner-b",
+      "file": "village-corner-b.glb",
+      "sha256": "445D8579E62204D8262260E480F7105E264FDA3F14471BE8F254D3979563E82D",
+      "motion": []
+    },
+    {
+      "id": "villager",
+      "file": "villager.glb",
+      "sha256": "ED86CA72E72F25342F9D9F760E2197470DBEE41797D346153A11F2B2BDAACAF9",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    }
+  ]
+}

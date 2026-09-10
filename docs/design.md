@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.21** | 10 sep 2026 | Ejecución G-06 | **Una partida real produce una escena: el valle, el río, el bosque, treinta y cinco edificios y veinticinco aldeanos andando por él.** `createGraphicsRenderer` queda implementado entero, sin métodos vacíos: `pick` prioriza aldeano, edificio y terreno en ese orden, y `track` encuadra. La contabilidad de la escena vive separada de Three.js como un **plan** —función pura del estado— y un **diff**, que es lo que hace comprobable en la suite rápida lo que D.6 pide: que una ruina deje de ser una casa, que demoler retire sólo a ése, que talar mueva el suelo sin tocar un edificio y que otra partida se tire entera en vez de actualizarse. La propiedad de los recursos es explícita: la biblioteca posee geometría, materiales y clips, y un actor sólo su esqueleto y su mezclador, de modo que el primero que muere no se lleva por delante al resto. Los recursos aprobados se publican a `public/assets/valley3d/` con manifiesto y hash, y una prueba comprueba que lo publicado es lo que el catálogo aprobó. D.6.3 fija el encuadre de partida. Los edificios son cajas con tejado hasta que G-10 traiga el catálogo: lo que hay que juzgar ahora es si un valle de estas proporciones se lee desde arriba, y eso no necesita el arte final para leerse mal. |
 | **3.20** | 10 sep 2026 | Decisión del usuario sobre la escala | **Un aldeano mide 0,65 celdas, no dos.** La aldea se ve entera al entrar y la gente se ve muy pequeña; para el detalle se acerca la cámara. El número sale de lo construido: una casa ocupa dos por dos celdas y mide seis metros de lado, así que una celda son tres metros y una persona 0,65. A 390 px de ancho, seis píxeles. La receta sigue en metros y declara un `scale` que el generador aplica a las raíces antes de exportar, así que la zancada baja de 0,95 a 0,32 sin tocar una sola clave. Arrastra la recalibración del día escénico a 120 s (D.6.1) y convierte los umbrales de la auditoría de animación en proporción del alto del recurso: en unidades absolutas denunciaban clips que no habían cambiado. |
 | **3.19** | 10 sep 2026 | Ejecución G-05 | **Hay reloj de presentación y actores derivados: el piloto ya sabe qué hace cada aldeano en cada instante.** El reloj es dueño único del tiempo escénico, no toca el acumulador del motor, congela en pausa, suspende con la pestaña oculta y marca `discontinuity` cuando un letargo trae semanas de golpe. Los actores son función pura del estado y el instante: no guardan ruta, así que una muerte o una mudanza no pueden dejar a nadie andando un camino viejo. **El clip lo mueve el suelo recorrido y no el reloj**, que es lo que impide que los pies patinen, y eso obligó a calibrar el día escénico (D.6.1) en sesenta segundos. Por el camino, tres defectos que el render de Canvas también tiene: el reparto de la ruta iba por índice de celda y el aldeano aceleraba en las diagonales; el desvío del carril giraba de golpe en cada esquina; y un crío «jugando» se movía a doce veces la velocidad a la que nadie anda. |
 | **3.18** | 10 sep 2026 | Segundo repaso de G-04, en el móvil | **Los codos doblaban al revés en andar y cargar.** El mismo error de signo que las rodillas pero espejado: la rodilla lleva el talón atrás y vive en positivo, el codo lleva la mano adelante y vive en negativo. Azadonar los tenía bien, y por eso era el único clip cuyos brazos se veían bien, lo que descartó la cámara como explicación. La auditoría gana la comprobación de **sentido** de cada bisagra, porque el ángulo por sí solo no distingue una rodilla de una rodilla del revés; verificada contra el artefacto defectuoso, denuncia los dos clips malos y deja en paz el bueno. |
@@ -8249,6 +8250,25 @@ proporción del alto del recurso: al escalar, empezaron a denunciar clips que no
 habían cambiado, porque lo que medían era el tamaño de la figura y no su
 animación. **Un umbral absoluto en una cadena que escala recursos es un umbral
 que caduca.**
+
+#### D.6.3 · El encuadre de partida, decidido (v3.21)
+
+**Lo que se encuadra al entrar es la aldea con su entorno, no el mapa entero.**
+Casi todo el valle es prado vacío. Encuadrar las treinta y seis por cincuenta y
+seis celdas dejaba el pueblo del tamaño de una moneda en el centro de una
+pantalla vertical, ocupando menos de la sexta parte del alto.
+
+El encuadre toma la caja de lo construido, la ensancha nueve celdas por cada
+lado y la recorta al mapa. Se rehace cuando el pueblo cambia de forma, que son
+unas pocas veces al año, y no en cada fotograma. Así el pueblo llena la pantalla
+y un aldeano de 0,65 celdas cae en unos pocos píxeles: la ciudad entera con la
+gente muy pequeña, que es lo que D.6.2 pidió. Acercarse es trabajo de gestos y
+es de G-07.
+
+Y se ajusta **proyectando las esquinas de esa caja** al espacio de la cámara, no
+por el radio de la escena. Una zona rectangular vista en isométrica no es un
+círculo sino un rombo mucho más ancho que alto, y ajustar por radio deja
+márgenes que no hacen falta.
 
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
