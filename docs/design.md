@@ -93,6 +93,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 | **2.43** | 9 sep 2026, 19:35 | Composición de `story` | **Dos protecciones no se multiplican: gana la más fuerte.** Muro y reputación dejaban `lord` en 0,2 justo en la fase tardía, que es donde el catálogo ya no tenía dientes. Suelo de 0,25 como red. |
 | **2.42** | 9 sep 2026, 02:20 | Instrumento de políticas | **Una marcha cuenta como población perdida al decidir.** `prudent` filtra expulsiones igual que muertes y `worst` las valora con el mismo peso, sin convertirlas en mortalidad. |
 | **2.45** | 9 sep 2026, 22:55 | La aldea madura | **El catálogo está escrito para una aldea que crece y enmudece cuando ha crecido.** `forest_cut` a cero y `faith` desplomada son el mismo fallo. Los dientes no faltan: la gente se regenera y la capacidad no se toca. Presupuesto a 15 min, la última vez. |
+| **3.10** | 12 sep 2026, 22:00 | El banco después de la vida nueva | **`forest_cut` entra en banda por primera vez desde v2.47** — el invierno en el bosque hizo lo que años de ajustes no consiguieron. A cambio `smith_feud` pasa de fallar en una política a fallar en las cuatro, y la extinción adversa vuelve de 15,0 % a 11,7 %. El tiempo del banco baja de 43 a **18,1 min**, todavía por encima de los 15. Diez fallos. |
 | **3.09** | 12 sep 2026, 20:15 | La convivencia, y el freno que hacía falta | **Todas las fuerzas sobre las opiniones empujaban hacia abajo**, así que un valle largo acababa siendo siempre un valle de gente que no se aprecia. Trabajar en el mismo sitio ahora acerca. Y se destapa un bucle: sin freno, las riñas pasaron de 21 a **224** en cinco partidas, porque cada una hundía la opinión y los enemigos no trabajan juntos. |
 | **3.08** | 12 sep 2026, 18:45 | Los rencores se ven | **Dos que se detestan dejan de trabajar codo con codo como si nada.** No pararse a hablar era sólo la mitad; la otra es darse la espalda, y eso se ve sin leer una línea de crónica. Un rencor de §6.4 pasa de ser una fila en un registro a algo que se nota todos los días. |
 | **3.07** | 12 sep 2026, 17:30 | M-39 · las riñas, y lo que costó la vida nueva | **El valle escribía rencores desde M-05 y no hacía nada con ellos**: un rencor abierto era una fila en un registro y nadie discutía jamás. Ahora dos que se detestan acaban teniendo un mal día, con nombres y con consecuencias. Y se paga la factura de rendimiento de v3.03: mandar a la aldea entera al bosque en invierno había llevado el banco de once minutos a **cuarenta y tres**. |
@@ -5452,6 +5453,34 @@ estado nuevo — el recuerdo que dejó la última riña hace de marca de tiempo.
 Dieciocho es lo que había antes de que la convivencia existiera (21), así que el
 equilibrio se conserva: la aldea tiene ahora afectos **y** enemistades, y ni una
 cosa ni la otra se desbocan.
+
+#### El banco después de la vida nueva (v3.10)
+
+| Medida | Antes de §11.9 | Con la vida nueva | Banda |
+|---|---|---|---|
+| Tiempo del banco | ~11 min | **18,1 min** | ≤ 15 min |
+| `forest_cut` elegible | 2,6–4,5 % | **en banda** | < 1 % |
+| `smith_feud` elegible | falla en 1 política | **falla en 4** (1,3–4,0 %) | < 1 % |
+| Extinción con `worst` | 15,0 % | 11,7 % | ≥ 25 % |
+| Separación `prudent`–`worst` | 13,3 pts | 10,0 pts | ≥ 20 pts |
+| Cadencia media, `worst` | 5,07 | 5,02 | 1–5 |
+| Fallos totales | 9 | 10 | 0 |
+
+**Lo mejor no se buscaba.** `forest_cut` llevaba fuera de banda desde v2.47, y
+ninguno de los ajustes de aquella fase lo movió. Lo ha arreglado el invierno:
+mandar a la aldea al bosque cuatro meses al año tala más, el bosque baja antes,
+y la plantilla sale en vez de quedarse esperando elegible.
+
+**Lo peor tampoco.** `smith_feud` pasa de fallar en una política a fallar en las
+cuatro. La explicación más probable es que ahora hay más rencores vivos (§7.9)
+y esa plantilla los mira, pero **es una hipótesis y no está medida por separado**.
+
+**Y el desenlace vuelve a la línea base.** La extinción adversa y la separación
+pierden lo que habían ganado con el canal de comerciantes. No se toca nada para
+recuperarlo: sigue siendo la decisión de diseño abierta de §7.8.
+
+**El tiempo es deuda declarada.** 18,1 minutos contra 15. Tres optimizaciones lo
+bajaron desde 43, y la siguiente exigiría medir con perfilador en vez de a ojo.
 
 #### Lo que dio el bloque entero, medido
 

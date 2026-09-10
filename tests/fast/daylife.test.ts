@@ -10,6 +10,7 @@ import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
 import { routesFor } from '@engine/world/paths';
+import { encountersAmong } from '@render/encounters';
 import { seasonOf } from '@engine/time';
 import { fingerprint } from '../helpers/fingerprint';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
@@ -227,15 +228,32 @@ describe('los oficios se ven · §11.9', () => {
 
 describe('se habla en corro, no sólo de dos en dos · §11.9', () => {
   it('hay grupos de más de dos', () => {
-    // Una plaza con dos parejas y nadie más parece un tablero.
+    // Con posiciones controladas y separadas, porque medirlo sobre la partida
+    // no discrimina: cuatro personas en el MISMO destino dan dos parejas con
+    // idéntico punto medio, y eso se cuenta como un corro de cuatro sin que
+    // nadie se haya unido a nada. Lo destaparon dos mutaciones seguidas.
     const state = workweek(village(20));
-    const figures = crowdPositions(state, 0.3);
-    let biggest = 0;
-    for (const f of figures) {
-      const near = figures.filter((o) => Math.hypot(o.x - f.x, o.y - f.y) < 1.1).length;
-      biggest = Math.max(biggest, near);
+    const named = state.people.villagers
+      .filter((v) => v.named && v.diedTick === null)
+      .slice(0, 4);
+    expect(named.length, 'hacen falta cuatro nombrados').toBe(4);
+    // Que se aprecien, para que quieran juntarse.
+    for (const a of named) {
+      for (const b of named) if (a.id !== b.id) a.opinions[b.id] = 70;
     }
-    expect(biggest, 'algún corro tiene que pasar de dos').toBeGreaterThan(2);
+
+    // Cuatro puntos cercanos pero distintos: así dos parejas nunca comparten
+    // punto medio por casualidad.
+    const spots = named.map((v, i) => ({ id: v.id, x: 10 + i * 0.7, y: 10 + i * 0.3 }));
+    const talks = encountersAmong(state, spots);
+
+    const bySpot = new Map<string, number>();
+    for (const talk of talks.values()) {
+      const key = `${talk.x.toFixed(3)},${talk.y.toFixed(3)}`;
+      bySpot.set(key, (bySpot.get(key) ?? 0) + 1);
+    }
+    expect(talks.size, 'tienen que hablar').toBeGreaterThan(0);
+    expect(Math.max(...bySpot.values()), 'y algún corro pasa de dos').toBeGreaterThan(2);
   });
 
   it('pero no se junta la aldea entera en un punto', () => {
