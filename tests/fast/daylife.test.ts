@@ -4,7 +4,6 @@
 // hicieran lo mismo a la vez, todos los días, apilados en la misma celda y sin
 // hablar con nadie. Cada prueba es una de esas cuatro cosas.
 import { describe, expect, it } from 'vitest';
-import { ENCOUNTER } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
