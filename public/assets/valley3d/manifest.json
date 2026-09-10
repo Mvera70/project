@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T22:54:02.090Z",
+  "generatedAt": "2026-09-10T23:06:41.123Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -56,6 +56,66 @@
       "id": "tree",
       "file": "tree.glb",
       "sha256": "76C3E850D8876F022116B87309332250E2833D34AF10C7CD37EA6BFCD7838C01",
+      "motion": []
+    },
+    {
+      "id": "rock",
+      "file": "rock.glb",
+      "sha256": "AEA5E25ACBFAAEE0EE7C909BC5BCDAE055AE0F97C4579B2DD9A26843B9591426",
+      "motion": []
+    },
+    {
+      "id": "house",
+      "file": "house.glb",
+      "sha256": "B7398FC2EB0CB88CD2907F90F20768CE31E9CACD2E62D47202D288F1F5AC118F",
+      "motion": []
+    },
+    {
+      "id": "granary",
+      "file": "granary.glb",
+      "sha256": "4CA8F8EF337EF8EB7BF88A05DF2C778CE1328AAAEBF53200BDD0A9A9966BD8AD",
+      "motion": []
+    },
+    {
+      "id": "mill",
+      "file": "mill.glb",
+      "sha256": "3E23D151263A67452FE183CDAB5EC2DBA9D278E4D8BC3E36E0F676EE0BAF9E00",
+      "motion": []
+    },
+    {
+      "id": "smithy",
+      "file": "smithy.glb",
+      "sha256": "88982D4E2D28E6A92E90E85C201AD731FDFBDF0801466495FCCD18B62489C63B",
+      "motion": []
+    },
+    {
+      "id": "chapel",
+      "file": "chapel.glb",
+      "sha256": "BE38606B095C0FF6A1259C42C627DF450D16C99717E1C0D400BA72638DA61059",
+      "motion": []
+    },
+    {
+      "id": "church",
+      "file": "church.glb",
+      "sha256": "4C1E58B6DB2559854C445EAE32590CD7BD0B27CD12C261A027712395941AFB9C",
+      "motion": []
+    },
+    {
+      "id": "well",
+      "file": "well.glb",
+      "sha256": "C6CB07DF6B06C9D879F7F689C88DF73ABE275B96D764EEB4F75E1F6E6754C7D1",
+      "motion": []
+    },
+    {
+      "id": "shed",
+      "file": "shed.glb",
+      "sha256": "B2974DECD482D81BCD0277898073F007520480C39CE7F5ED111A25FFDA4B9E49",
+      "motion": []
+    },
+    {
+      "id": "stone-house",
+      "file": "stone-house.glb",
+      "sha256": "16BC53B170903BE50216515799CA9008335502FC7ABB4C7B99A58ACA9AB6BBF2",
       "motion": []
     }
   ]

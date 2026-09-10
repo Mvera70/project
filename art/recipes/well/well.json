@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "id": "well",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "well",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de comunidad. Una celda entera, brocal de piedra y tejadillo. Es lo mas pequeno del catalogo y aun asi tiene que leerse: un cilindro suelto en el prado no dice pozo."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Well_Ring",
+      "location": [
+        1.5,
+        1.5,
+        0.4
+      ],
+      "radius": 0.85,
+      "depth": 0.8,
+      "vertices": 10,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Well_Post_A",
+      "location": [
+        0.85,
+        1.5,
+        1.4
+      ],
+      "radius": 0.12,
+      "depth": 2.0,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Well_Post_B",
+      "location": [
+        2.15,
+        1.5,
+        1.4
+      ],
+      "radius": 0.12,
+      "depth": 2.0,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Well_Roof",
+      "location": [
+        1.5,
+        1.5,
+        2.4
+      ],
+      "width": 2.0,
+      "depth": 1.5,
+      "height": 0.7,
+      "rotationDegrees": [
+        0,
+        0,
+        90.0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      4.5,
+      -5.625,
+      3.6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      1.2
+    ],
+    "orthoScale": 6.3,
+    "worldRole": "sky"
+  }
+}

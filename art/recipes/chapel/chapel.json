@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "id": "chapel",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "tiled",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "chapel",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de comunidad. Estrecha y alta, con una cruz en el caballete. La proporcion es la senal: nada mas del valle es mas alto que ancho."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.85
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Chapel_Nave",
+      "location": [
+        3,
+        3,
+        1.5
+      ],
+      "dimensions": [
+        4.2,
+        5.6,
+        3.0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Chapel_Roof",
+      "location": [
+        3,
+        3,
+        3.0
+      ],
+      "width": 4.8,
+      "depth": 6.0,
+      "height": 1.8,
+      "rotationDegrees": [
+        0,
+        0,
+        0.0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Chapel_Door",
+      "location": [
+        3,
+        0.15,
+        1.0
+      ],
+      "dimensions": [
+        1.1,
+        0.2,
+        2.0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Chapel_Cross_V",
+      "location": [
+        3,
+        3,
+        5.6
+      ],
+      "dimensions": [
+        0.18,
+        0.18,
+        1.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Chapel_Cross_H",
+      "location": [
+        3,
+        3,
+        5.75
+      ],
+      "dimensions": [
+        0.9,
+        0.18,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      10.0,
+      -12.5,
+      8.0
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      3.0
+    ],
+    "orthoScale": 14.0,
+    "worldRole": "sky"
+  }
+}

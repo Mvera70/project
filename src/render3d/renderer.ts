@@ -16,7 +16,7 @@ import {
 import { clockOf } from '@engine/time';
 import { paletteFor } from '@render/palette';
 import { createValleyCamera } from './camera';
-import type { GameState, VillagerId } from '@engine/state';
+import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
 import { actorsFor, createActorMemory, type Actor } from './actors';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
@@ -25,14 +25,17 @@ import type {
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, type Ground } from './world/ground';
-import { buildForest, type Forest } from './world/forest';
-import { Village } from './world/buildings';
+import { buildForest, scatterOn, type Forest } from './world/forest';
+import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { Tells } from './effects/tells';
 import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 
 const VILLAGER = 'villager';
 const TREE = 'tree';
+const ROCK = 'rock';
+/** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
+const WANTED = [VILLAGER, TREE, ROCK, ...new Set(Object.values(BUILDING_ASSETS))];
 
 /**
  * Cuanto campo se deja alrededor de lo construido, en celdas.
@@ -78,17 +81,18 @@ export async function createGraphicsRenderer(
   // whoever else is using it.
   const borrowed = options.library !== undefined;
   const library: AssetLibrary = (options.library as AssetLibrary | undefined)
-    ?? await loadAssets({ baseUrl: options.assetBaseUrl, wanted: [VILLAGER, TREE] });
+    ?? await loadAssets({ baseUrl: options.assetBaseUrl, wanted: WANTED });
   const villager = library.get(VILLAGER);
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
-  const village = new Village();
+  const village = new Village((id) => library.instance(id));
   const cast = new Cast(villager, () => library.instance(VILLAGER));
   const tells = new Tells();
   world.add(village.group, cast.group, tells.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
+  let stones: Forest | null = null;
   let plan: ScenePlan | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
@@ -159,16 +163,26 @@ export async function createGraphicsRenderer(
     ground = buildGround(state.map, paletteFor(clock.season, clock.seasonWeek));
     world.add(ground.mesh);
 
-    // El bosque se replanta con el suelo, que es cuando alguien tala.
-    if (forest !== null) {
-      world.remove(forest.group);
-      forest.dispose();
-      forest = null;
+    // El bosque y los pedregales se replantan con el suelo, que es cuando
+    // alguien tala o el terreno cambia.
+    for (const scattered of [forest, stones]) {
+      if (scattered === null) continue;
+      world.remove(scattered.group);
+      scattered.dispose();
     }
+    forest = null;
+    stones = null;
+
     const sapling = library.get(TREE);
     if (sapling !== undefined) {
       forest = buildForest(state.map, sapling.original as Object3D);
       world.add(forest.group);
+    }
+    const boulder = library.get(ROCK);
+    if (boulder !== undefined) {
+      stones = scatterOn(state.map, boulder.original as Object3D, TERRAIN_CODE.rock);
+      stones.group.name = 'Valley_Rocks';
+      world.add(stones.group);
     }
     mapWidth = state.map.width;
     mapHeight = state.map.height;
@@ -295,11 +309,13 @@ export async function createGraphicsRenderer(
         ground.dispose();
         ground = null;
       }
-      if (forest !== null) {
-        world.remove(forest.group);
-        forest.dispose();
-        forest = null;
+      for (const scattered of [forest, stones]) {
+        if (scattered === null) continue;
+        world.remove(scattered.group);
+        scattered.dispose();
       }
+      forest = null;
+      stones = null;
       if (!borrowed) library.dispose();
       lastActors = [];
       renderer.dispose();

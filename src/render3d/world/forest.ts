@@ -71,9 +71,19 @@ export interface Forest {
  * al año, no sesenta veces por segundo.
  */
 export function buildForest(map: ValleyMap, tree: Object3D): Forest {
+  return scatterOn(map, tree, TERRAIN_CODE.forest);
+}
+
+/**
+ * Lo mismo para cualquier terreno: un recurso repetido sobre las celdas de un
+ * tipo. Los arboles sobre el bosque y las rocas sobre la roca son el mismo
+ * problema, y separarlos habria sido tener dos veces la misma cuenta.
+ */
+export function scatterOn(map: ValleyMap, source: Object3D, terrain: number): Forest {
+  const tree = source;
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
-    if (map.terrain[cell] === TERRAIN_CODE.forest) cells.push(cell);
+    if (map.terrain[cell] === terrain) cells.push(cell);
   }
 
   const group = new Group();

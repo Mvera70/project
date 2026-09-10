@@ -19,8 +19,14 @@ import { createPresentationClock } from '../../src/render3d/presentation-clock';
 import { createGraphicsRenderer } from '../../src/render3d/renderer';
 import type { GraphicsRenderer } from '../../src/render3d/contracts';
 
-declare const VALLEY_VILLAGER_GLB: string;
-declare const VALLEY_TREE_GLB: string;
+/**
+ * Los recursos aprobados, en base64, inyectados al empaquetar.
+ *
+ * Uno por asset y no una lista fija: el catalogo crece por lotes y una lista
+ * escrita a mano se queda corta en el lote siguiente sin que nadie lo note
+ * hasta ver un valle al que le falta la iglesia.
+ */
+declare const VALLEY_ASSETS: Record<string, string>;
 
 function bytesOf(base64: string): ArrayBuffer {
   const binary = atob(base64);
@@ -222,16 +228,14 @@ async function main(): Promise<void> {
 let library: Awaited<ReturnType<typeof loadAssets>>;
 
 void (async (): Promise<void> => {
+  const ids = Object.keys(VALLEY_ASSETS);
   library = await loadAssets({
     baseUrl: '',
     manifest: {
       schemaVersion: 1,
-      assets: [
-        { id: 'villager', file: 'villager.glb', sha256: 'embedded', motion: [] },
-        { id: 'tree', file: 'tree.glb', sha256: 'embedded', motion: [] },
-      ],
+      assets: ids.map((id) => ({ id, file: `${id}.glb`, sha256: 'embedded', motion: [] })),
     },
-    bytes: { villager: bytesOf(VALLEY_VILLAGER_GLB), tree: bytesOf(VALLEY_TREE_GLB) },
+    bytes: Object.fromEntries(ids.map((id) => [id, bytesOf(VALLEY_ASSETS[id] ?? '')])),
   });
   await main();
 })().catch((error: unknown) => {

@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "id": "house",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "house",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de vivienda. Yeso y paja: la mitad de las casas del valle. La puerta mira a -Y, que es el frente local, para que el aldeano que sale se lea saliendo por algun sitio."
+  },
+  "materials": [
+    {
+      "name": "plaster",
+      "role": "plaster",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.9
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "House_Walls",
+      "location": [
+        3,
+        3,
+        1.15
+      ],
+      "dimensions": [
+        5.4,
+        5.4,
+        2.3
+      ],
+      "material": "plaster",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "House_Roof",
+      "location": [
+        3,
+        3,
+        2.3
+      ],
+      "width": 6.0,
+      "depth": 6.0,
+      "height": 2.1,
+      "rotationDegrees": [
+        0,
+        0,
+        0.0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Door",
+      "location": [
+        3,
+        0.28,
+        0.85
+      ],
+      "dimensions": [
+        1.0,
+        0.16,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "House_Chimney",
+      "location": [
+        4.4,
+        4.4,
+        3.1
+      ],
+      "radius": 0.28,
+      "depth": 1.6,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "plaster",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      9.0,
+      -11.25,
+      7.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      2.0
+    ],
+    "orthoScale": 12.6,
+    "worldRole": "sky"
+  }
+}

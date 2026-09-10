@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "id": "rock",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "rock",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote del mundo. Dos masas de piedra, sin simetria, para que un afloramiento no parezca una pelota. Se instancia sobre el terreno rocoso."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "dark",
+      "role": "soil",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Rock_Big",
+      "location": [
+        0,
+        0,
+        0.55
+      ],
+      "radius": 1.05,
+      "segments": 6,
+      "rings": 4,
+      "smooth": true,
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Rock_Small",
+      "location": [
+        1.05,
+        0.5,
+        0.35
+      ],
+      "radius": 0.62,
+      "segments": 6,
+      "rings": 4,
+      "smooth": true,
+      "material": "dark",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      4.0,
+      -5.0,
+      3.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.6
+    ],
+    "orthoScale": 5.6,
+    "worldRole": "sky"
+  }
+}

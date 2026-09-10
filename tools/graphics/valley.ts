@@ -85,6 +85,10 @@ async function main(): Promise<void> {
   // Dos veces a propósito: el mismo instante tiene que dar la misma imagen, y
   // la segunda pintada es la que prueba que la primera no dejó nada a medias.
   renderer.paint(state, frame);
+  // Acercarse antes de la segunda pintada, para poder juzgar el catalogo de
+  // cerca sin montar otra pagina.
+  const close = number('close', 1);
+  if (close !== 1) renderer.zoom(close, width / 2, height / 2);
   renderer.paint(state, { ...frame, discontinuity: false });
 
   const actors = actorsFor(state, frame);

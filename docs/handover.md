@@ -125,11 +125,19 @@ informe en `docs/graphics-rounds/G-09.md`.
 1. **Correr el banco en un móvil** con `--real true` y llenar las filas de
    tiempo de D.9.1, que hoy están sin presupuestar a propósito. Es lo único que
    falta para poder cerrar P3.
-2. **G-10, los lotes que faltan.** El del mundo está empezado: hay árboles
-   instanciados y el valle se lee como un valle. Faltan **casa, campo y camino**,
-   que son los que quitarían las cajas con tejado, y después el resto de
-   familias de la matriz de D.8. Hay margen: la peor escena está en 324 llamadas
+2. **G-10, los lotes que faltan.** Hechos: mundo (árbol, roca), vivienda (casa,
+   casa de piedra, cobertizo), sustento (granero, molino, herrería) y comunidad
+   (capilla, iglesia, pozo). **Faltan el campo, el camino y la familia de
+   defensa** —empalizada, muralla, atalaya— más el cementerio. El campo y el
+   camino son terreno, no edificio: se pintan desde el suelo y aún no tienen
+   geometría propia. Hay margen de sobra: la peor escena está en 364 llamadas
    contra un límite de 1 200.
+
+   Cómo se añade uno: `art/recipes/<id>/<id>.json`, entrada en `art/catalog.json`,
+   `build` → `validate` → `report`, `publish-assets.ts`, y la correspondencia
+   con su `BuildingKind` en `BUILDING_ASSETS` de `world/buildings.ts`. La receta
+   se escribe en metros con `scale: 1/3` y la huella hacia +X y +Z desde la
+   esquina.
 
    Ojo con una cosa aprendida ahí: el presupuesto de triángulos hubo que
    corregirlo de 120 000 a 450 000 porque el primero se midió sobre un valle sin

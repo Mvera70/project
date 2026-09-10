@@ -14,7 +14,7 @@
 import {
   BoxGeometry, BufferAttribute, BufferGeometry, Group, Mesh, MeshStandardMaterial, type Object3D,
 } from 'three';
-import type { BuildingId } from '@engine/state';
+import type { BuildingId, BuildingKind } from '@engine/state';
 import type { PlannedBuilding } from './plan';
 
 /**
@@ -42,6 +42,57 @@ function roofGeometry(w: number, h: number, rise: number): BufferGeometry {
 export interface BuildingModel {
   readonly object: Object3D;
   dispose(): void;
+}
+
+/**
+ * Que recurso del catalogo corresponde a cada tipo de edificio.
+ *
+ * El motor escribe `stone_house` con guion bajo y el catalogo no lo admite en
+ * un identificador, asi que la correspondencia se escribe una vez aqui en vez
+ * de repetirse en cada sitio que la necesite.
+ */
+export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
+  house: 'house',
+  stone_house: 'stone-house',
+  granary: 'granary',
+  mill: 'mill',
+  smithy: 'smithy',
+  chapel: 'chapel',
+  church: 'church',
+  well: 'well',
+};
+
+/**
+ * Un edificio con su recurso de verdad, colocado sobre su huella.
+ *
+ * La receta se escribe con la esquina en el origen y la huella hacia +X y +Z,
+ * igual que el motor guarda la suya (D.4), asi que colocar es poner el grupo en
+ * la esquina y nada mas. Una ruina nunca usa recurso: §7.4 la deja en el mapa y
+ * lo que tiene que leerse es que ya no es una casa.
+ */
+export function buildFromAsset(planned: PlannedBuilding, source: Object3D): BuildingModel {
+  const group = new Group();
+  group.name = `Building_${planned.id}`;
+  group.position.set(planned.x, 0, planned.z);
+  group.userData.buildingId = planned.id;
+  const model = source;
+  model.traverse((object) => {
+    object.userData.buildingId = planned.id;
+    const mesh = object as Object3D & { isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean };
+    if (mesh.isMesh === true) {
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+    }
+  });
+  group.add(model);
+  return {
+    object: group,
+    dispose(): void {
+      // La geometria y los materiales son del recurso compartido: soltarlos
+      // aqui dejaria sin casa a todas las demas casas del valle.
+      group.clear();
+    },
+  };
 }
 
 export function buildBuilding(planned: PlannedBuilding): BuildingModel {
@@ -94,13 +145,20 @@ export class Village {
   readonly group = new Group();
   private readonly models = new Map<BuildingId, BuildingModel>();
 
-  constructor() {
+  /**
+   * `instance` da una copia del recurso que se le pida, o `undefined` si el
+   * catalogo no lo tiene. Sin el, o para una familia sin recurso, se cae a la
+   * caja con tejado: un valle a medio catalogar sigue siendo un valle.
+   */
+  constructor(private readonly instance?: (id: string) => Object3D | undefined) {
     this.group.name = 'Valley_Buildings';
   }
 
   add(planned: PlannedBuilding): void {
     this.remove(planned.id);
-    const model = buildBuilding(planned);
+    const asset = planned.ruin ? undefined : BUILDING_ASSETS[planned.kind];
+    const source = asset === undefined ? undefined : this.instance?.(asset);
+    const model = source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source);
     this.models.set(planned.id, model);
     this.group.add(model.object);
   }

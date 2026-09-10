@@ -402,6 +402,594 @@
         "source": "Original tree authored for The Valley G-10, world batch",
         "license": "Project original"
       }
+    },
+    {
+      "id": "rock",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/rock/rock.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-03-254Z-53604",
+        "directory": "artifacts/graphics/G-10/approved/aea5e25acbfaaee0"
+      },
+      "bounds": {
+        "min": [
+          -0.303109,
+          -0.166667,
+          -0.373333
+        ],
+        "max": [
+          0.528979,
+          0.533333,
+          0.35
+        ],
+        "size": [
+          0.832088,
+          0.7,
+          0.723333
+        ]
+      },
+      "recipeSha256": "E94AD4466491C38D1F0943905E6685C7C5F719DA465DDA00DA2DD99886EBE277",
+      "materials": [
+        "stone",
+        "dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 72
+      },
+      "hashes": {
+        "rock.blend": "B6723AF745D3AF37C9794617D5B2F64BEAA6CF25AED17E457991DF97D3990F3D",
+        "rock.glb": "AEA5E25ACBFAAEE0EE7C909BC5BCDAE055AE0F97C4579B2DD9A26843B9591426",
+        "rock-blender.png": "FE1B35994C1234CDFE329B432B8AD836D293892C4EC9C6FC132479BD70AE91F9",
+        "capture-1.png": "49EA0A66861366ADD60D7529E1833D48F29E261B280AB738EDFC34C7163BA416",
+        "capture-1-gray.png": "CB441B7F7C55AB4BB0304CD99A8DE361DF49C809E8172D0E2556B0524C4C94F1",
+        "capture.json": "F16EE259BEB6F9FD8509CFDA6C0E8A22430EC0775B75613A9C0BCBDCFF2F18E2",
+        "build.json": "BE61A4664AC2FCDFD135F5DF88538BB694D8149F3B2A6170617285D40657A5E6",
+        "validation.json": "86A9E4A49E8C0FE07FE127A76073599D4F36EBD80A1554618928FFB2341D9C81"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original rock authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "house",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/house/house.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-10-270Z-48316",
+        "directory": "artifacts/graphics/G-10/approved/b7398fc2eb0cb88c"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          2,
+          1.466667,
+          0
+        ],
+        "size": [
+          2,
+          1.466667,
+          2
+        ]
+      },
+      "recipeSha256": "4C292A451FD31A642AB8785717AC396289A77FA1ABEB409FE2B4680EC15A7FA9",
+      "materials": [
+        "plaster",
+        "roof",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 52
+      },
+      "hashes": {
+        "house.blend": "5BD7D14155690DA3083B23147713204BB9F5E526EB1FEB677942CE01B165A66C",
+        "house.glb": "B7398FC2EB0CB88CD2907F90F20768CE31E9CACD2E62D47202D288F1F5AC118F",
+        "house-blender.png": "2CFC6BCC7F6AE66CA5CF234D20A370B70A044AE9192CCBA702004B2033E6944E",
+        "capture-1.png": "30611511ABB1623FE028794022CB1EFEA65E2F2C38877C2F2866CBE41EEF36AA",
+        "capture-1-gray.png": "12AE3BB04B020E27FD037155144ED4CEFECA9A5AD0B3B675FC80E69FAB115606",
+        "capture.json": "CC4158BA3DAF74C83B51A95D900E121305B58EFD0962964545A8701FB5C4F35A",
+        "build.json": "390438DC91593104B93186C11632C756B0BF367D704CA210D62692B057F79066",
+        "validation.json": "586013DF92A97663416CF9F751EF61E6387E7C1141FB8077EEF157FC65641B08"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original house authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "granary",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/granary/granary.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-24-036Z-40080",
+        "directory": "artifacts/graphics/G-10/approved/4ca8f8ef337ef8eb"
+      },
+      "bounds": {
+        "min": [
+          0.033333,
+          0,
+          -1.966667
+        ],
+        "max": [
+          1.966667,
+          1.733333,
+          -0.033333
+        ],
+        "size": [
+          1.933333,
+          1.733333,
+          1.933333
+        ]
+      },
+      "recipeSha256": "9EAB19A7E96E0A3C94E84C424ECEC629959AA75C39A2C65324C867938196D0F0",
+      "materials": [
+        "wood",
+        "roof",
+        "grain"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 112
+      },
+      "hashes": {
+        "granary.blend": "11CBA6A6B308189A46342257857CDDAB03D67A63B85717B6D609BEC729544BF9",
+        "granary.glb": "4CA8F8EF337EF8EB7BF88A05DF2C778CE1328AAAEBF53200BDD0A9A9966BD8AD",
+        "granary-blender.png": "1412EDDF549B342ADAECDC24EEA76936B37CA4A4C0C2CE990001D22DC6472968",
+        "capture-1.png": "C4AC4857919EE73157D58BF4FA9071F56286DFAE91650997F97E2972AA095814",
+        "capture-1-gray.png": "9FD6B621CC0BB5CBC78AA8912DC548511A8C1648485DE5571577FB0E5D0DBD58",
+        "capture.json": "CF2C3A54C79314371E6CAED46C7EF5D6D286DAA315C32AB3DFF216619750A0C3",
+        "build.json": "BCB027711A58B996E0EC3D3D163C927D0FA11E53DA6381B2D44CE304D3A0E12F",
+        "validation.json": "43DE4265076C85B4A28B75F833FCC7C9AC64740B7ED52BE1BA8C357CCE04578E"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original granary authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "mill",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/mill/mill.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-05-14-326Z-50220",
+        "directory": "artifacts/graphics/G-10/approved/3e23d151263a6745"
+      },
+      "bounds": {
+        "min": [
+          0.066667,
+          0,
+          -1.833333
+        ],
+        "max": [
+          1.933333,
+          2.666667,
+          -0.083333
+        ],
+        "size": [
+          1.866667,
+          2.666667,
+          1.75
+        ]
+      },
+      "recipeSha256": "870FAE8E1D760B9FB503B3112441EDC8D285B1A0C5C0F75F20A1F11911979A8A",
+      "materials": [
+        "stone",
+        "roof",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 90
+      },
+      "hashes": {
+        "mill.blend": "7858A114EA5AE7216A2C8F5D9EDBCE04F09881D83EC7F2DB34A5D842F984CD3A",
+        "mill.glb": "3E23D151263A67452FE183CDAB5EC2DBA9D278E4D8BC3E36E0F676EE0BAF9E00",
+        "mill-blender.png": "6F4B5538C2DFB573ACD2DFF556B18E93E70EC0B1A2B749620C4A7BEB2E91A695",
+        "capture-1.png": "0093D182C6F9556C3C098979A7F83BE728927AAD517457709F0E0114530368E6",
+        "capture-1-gray.png": "2EEB0A677FECD99BEC63094569BD05225ADC7258B87E688D2FC8C7E603F63E4C",
+        "capture.json": "9E5F5A8B2985CBF339732CB1B770355753A73A1512BDAA9E4EFE9EBA38BB7276",
+        "build.json": "7890F4F560264345DD9CFD8631A638FD8864D5D615F80D25FCCD4D38BBAB614E",
+        "validation.json": "E1A5CFFCD3AF04520ACA5C98109BD9CC2BD87050DB20DCA85E3245B920460718"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original mill authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "smithy",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/smithy/smithy.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-31-790Z-40148",
+        "directory": "artifacts/graphics/G-10/approved/88982d4e2d28e6a9"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -1.933333
+        ],
+        "max": [
+          2,
+          1.4,
+          -0.066667
+        ],
+        "size": [
+          2,
+          1.4,
+          1.866667
+        ]
+      },
+      "recipeSha256": "9C7662749EF1253089E8A1F29857625BC9C6CE4EA71C867B04D697687623682B",
+      "materials": [
+        "stone",
+        "roof",
+        "dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 52
+      },
+      "hashes": {
+        "smithy.blend": "80F230391ADAF3AB2ED2769525AB3C7C79702D6D90CA1722DEA5300F3ED75D20",
+        "smithy.glb": "88982D4E2D28E6A92E90E85C201AD731FDFBDF0801466495FCCD18B62489C63B",
+        "smithy-blender.png": "5BA46F86C4FA33004550DE81F765294E7FCAC590C6A97CB8CA9B518CE20EA43A",
+        "capture-1.png": "C5DE75616443216FFF3D52A5A7D65F6DCA5D582FF5D5404D9D937D15BB28B938",
+        "capture-1-gray.png": "1B9CDBDE40761EA3E360E3A3020599331650CEB4610FF4FA07BFD02CBD12BAC4",
+        "capture.json": "BA62CAF51C3F0DD91CEAF5BF53B50189E685501B6D9620CBC8F15FB1035F7376",
+        "build.json": "220833866DD84563D718F741243710D326547C50F478D5E855264BA477052544",
+        "validation.json": "DC6C8040A3C0442BE27D44A1F7D04B7AB83D378637F03F6052C846AE2ABCC4EF"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original smithy authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "chapel",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/chapel/chapel.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-38-716Z-45296",
+        "directory": "artifacts/graphics/G-10/approved/be38606b095c0ff6"
+      },
+      "bounds": {
+        "min": [
+          0.2,
+          0,
+          -2
+        ],
+        "max": [
+          1.8,
+          2.1,
+          0
+        ],
+        "size": [
+          1.6,
+          2.1,
+          2
+        ]
+      },
+      "recipeSha256": "B0C2421A7416763E1EC185CE6F3CF29CD47742D219C50B3C14F8AB4E8A74E2E2",
+      "materials": [
+        "stone",
+        "roof",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 56
+      },
+      "hashes": {
+        "chapel.blend": "B7EE8C05EC5B80256551A751153D1DDAEFC6610224BB21BA55E8B21E88D49441",
+        "chapel.glb": "BE38606B095C0FF6A1259C42C627DF450D16C99717E1C0D400BA72638DA61059",
+        "chapel-blender.png": "E94EA8DA02369722EC8CA17823CEF50E245E0FB7025EC400DA90048EC05E031D",
+        "capture-1.png": "E2C21AE08A4E7F93C2FBB9E02431BC63AD669052D33A278092411D476BCD8A86",
+        "capture-1-gray.png": "A74D9A09C47F7692A530B1122A3180712B756BEA6D1CF4CA1F6CBC82C6829DD1",
+        "capture.json": "2CCA037A4C76946E9EDC61C1400792CCD0FD07337ADE5822E5F17269F9A4CA71",
+        "build.json": "2BB3749D875BE7F8D359A56D6401F65661F487FE38E3C149785E68B283085ABC",
+        "validation.json": "B3F10328D9EFA9B8FF9076A2A7DB64CCB030FDE495A406A93578FA2818005099"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original chapel authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "church",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/church/church.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-05-21-257Z-33532",
+        "directory": "artifacts/graphics/G-10/approved/4c1e58b6db255985"
+      },
+      "bounds": {
+        "min": [
+          0.1,
+          0,
+          -2.266667
+        ],
+        "max": [
+          1.9,
+          3.716667,
+          0.3
+        ],
+        "size": [
+          1.8,
+          3.716667,
+          2.566667
+        ]
+      },
+      "recipeSha256": "B40E627EAD9FFE5935FACD62D14E3D6A28B1A1B07C90492FAF7264ABE0148F81",
+      "materials": [
+        "stone",
+        "roof",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 74
+      },
+      "hashes": {
+        "church.blend": "B6DE3DA7D528DA8744A79E423A05D14A5540F114FFF877F38EEE00ABBEDC2B97",
+        "church.glb": "4C1E58B6DB2559854C445EAE32590CD7BD0B27CD12C261A027712395941AFB9C",
+        "church-blender.png": "F63F726FD51175E9C14F74AD6467A55B0D752BC534E9B33287F51C4ED8F9AD4B",
+        "capture-1.png": "27311384718FE592AE83E0599A11FCD4E64197903DE178205F2209DAC3229E83",
+        "capture-1-gray.png": "6ADABF7250B34A5AEE6E874371B32EE92352FFDC6EE7689431AEFBF9F2D9B48E",
+        "capture.json": "8475E8812CC8253B225F56848BED954B2B306B0D56FA7A51A1EC1D72113C368B",
+        "build.json": "518C87EE84CDED6929755E3527366BD86245F1DED1857284A65D0F410F35328E",
+        "validation.json": "37D06AC18B965D247511B9FD1615B281664E5702AB0F334F0938896FFB6C36D6"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original church authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "well",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/well/well.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-05-28-268Z-28368",
+        "directory": "artifacts/graphics/G-10/approved/c6cb07df6b06c9d8"
+      },
+      "bounds": {
+        "min": [
+          0.230534,
+          0,
+          -0.833333
+        ],
+        "max": [
+          0.769466,
+          1.033333,
+          -0.166667
+        ],
+        "size": [
+          0.538932,
+          1.033333,
+          0.666667
+        ]
+      },
+      "recipeSha256": "70ABAB496FA7DFC6A6A256B4A306290D56DCC2E3D304A5372FEBBB0D578C1661",
+      "materials": [
+        "stone",
+        "wood",
+        "roof"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 84
+      },
+      "hashes": {
+        "well.blend": "DC3E3C3081201D6AC4F793A12F2BA65D813D267A4ACE3589E09C3E9D890DF08D",
+        "well.glb": "C6CB07DF6B06C9D879F7F689C88DF73ABE275B96D764EEB4F75E1F6E6754C7D1",
+        "well-blender.png": "80861C39ABB47C934EB987CA9537C051BE0BD5246A8E5F2AAE8C5AACF37A305D",
+        "capture-1.png": "6530C30F1D9602D94EBABA5AD9DC23B03A990075E3BFA59EE25EAC1F78A0D233",
+        "capture-1-gray.png": "DDB5CD6F1DA388CF18DD5ECA4D1921326BE3841D966A5E1BCB01A9A1443FAA3F",
+        "capture.json": "A82E12EBDA4071C0D8DD632D9AD612B81293BA3A2A94A2DAF42AEBDE93B90C80",
+        "build.json": "6E743CCF1B77EDC769EABBBA3113BCFBF934FF57225DE07E0339E7FE9AE88ED3",
+        "validation.json": "8B640BB4B62012ED38E125116BBACFF22C3B28F8F5512CAB143E0AF16B4A104E"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original well authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "shed",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/shed/shed.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-47-343Z-53004",
+        "directory": "artifacts/graphics/G-10/approved/b2974decd482d81b"
+      },
+      "bounds": {
+        "min": [
+          0.033333,
+          0,
+          -0.966667
+        ],
+        "max": [
+          0.966667,
+          0.9,
+          -0.033333
+        ],
+        "size": [
+          0.933333,
+          0.9,
+          0.933333
+        ]
+      },
+      "recipeSha256": "3ACDB1770A4BF4847E01536221474BD9AA612D3C2000905DBA542CEEA544769B",
+      "materials": [
+        "wood",
+        "roof"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 20
+      },
+      "hashes": {
+        "shed.blend": "F3FAA08747CC27EB527CF046AF030D134C75FA01A5E4E488CCFDCF3EA4942771",
+        "shed.glb": "B2974DECD482D81BCD0277898073F007520480C39CE7F5ED111A25FFDA4B9E49",
+        "shed-blender.png": "EFB04FB6462EE3CC3ADDE8770F0427EAE5AC94933EF119398009A8CAA96C3412",
+        "capture-1.png": "720EEF7E6F42B233C41735914043825E3A7C59F87535AB6964A0FD894B151C50",
+        "capture-1-gray.png": "823E89E2EF3576C826F893C0F3654118B9BC42B7BBF2BC30A3E016C6FFC7C9A7",
+        "capture.json": "EFA67E052F0DC24A4709BA53BB49052599DED636EA8F57D14895786E9B1DB6A2",
+        "build.json": "903AC4783AE3AC5D074EFB5B22CCE7080B2326C36931CCA5CDBECDB24158BEA9",
+        "validation.json": "B83EEB654167B47CA1893C03989E66E3DA95655B4BD2C849E46B66A1FBFACC28"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original shed authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stone-house",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/stone-house/stone-house.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-10T23-04-17-160Z-53972",
+        "directory": "artifacts/graphics/G-10/approved/16bc53b170903be5"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          2,
+          1.533333,
+          0
+        ],
+        "size": [
+          2,
+          1.533333,
+          2
+        ]
+      },
+      "recipeSha256": "AE0E99FA61F0D7FF064F39FCBA4A8A77FC4F098ED35B35773EC3F4DED25DE6A7",
+      "materials": [
+        "stone",
+        "roof",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 52
+      },
+      "hashes": {
+        "stone-house.blend": "42B2617DF4F7880F9570F6C9963D8609B946D6AB3F7584326FFEF3E9F9CE0AD8",
+        "stone-house.glb": "16BC53B170903BE50216515799CA9008335502FC7ABB4C7B99A58ACA9AB6BBF2",
+        "stone-house-blender.png": "83FD31B3A6F32FC3920888C787DDCD1C0AA23207D3004FF6E19778A7E1E6AA79",
+        "capture-1.png": "71A406015C062E4A113BA20D1A7EC53712FB6839AC37D6763BE70B664FA3220C",
+        "capture-1-gray.png": "FFD2BD411B273F8E33A38186C046003FFC49694C53A6FDF4A2D3E722E2BA07F3",
+        "capture.json": "FF83546A8E6B9B7904E5EDEC5DDC39C4C9AAD30D22FB3299613546BB0E8265DB",
+        "build.json": "26789AC5B0F43B515C4009502268FE1C470108DD19F465D4AFC94EDCCC3AA59C",
+        "validation.json": "9D65024FB3DBBB413B4E121B1C0B287D932BAB0434DC4A61D31915971FAFC0DB"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original stone-house authored for The Valley G-10",
+        "license": "Project original"
+      }
     }
   ]
 }
