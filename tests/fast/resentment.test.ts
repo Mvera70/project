@@ -5,12 +5,13 @@
 // hasta el final** — de un mal año a un rencor con nombre y causa, que es lo
 // que §6.4 ya sabía contar y nadie alimentaba.
 import { describe, expect, it } from 'vitest';
-import { OPINION, TIME } from '@engine/balance';
+import { NEIGHBOUR, OPINION, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { opinionOf } from '@engine/people/opinions';
 import { scarFire, scarHunger } from '@engine/people/scars';
+import { workedTogether } from '@engine/people/neighbours';
 import type { GameState, Villager } from '@engine/state';
 
 const grown = new Map<string, GameState>();
@@ -156,6 +157,49 @@ describe('la cadena entera · §6.4, §7.9', () => {
     for (const v of othersOf(state)) {
       expect(opinionOf(state, v.id, leader.id), v.name).toBeGreaterThanOrEqual(OPINION.MIN);
     }
+  });
+});
+
+describe('la convivencia acerca · §7.9', () => {
+  it('trabajar en el mismo sitio sube la opinión', () => {
+    const state = village(20);
+    const [a, b] = othersOf(state);
+    a!.opinions[b!.id] = 0;
+    b!.opinions[a!.id] = 0;
+    workedTogether(state, [[a!.id, b!.id]]);
+    expect(opinionOf(state, a!.id, b!.id)).toBeGreaterThan(0);
+    expect(opinionOf(state, b!.id, a!.id)).toBeGreaterThan(0);
+  });
+
+  it('y gana al olvido de §6.4, que si no no serviría de nada', () => {
+    // El primer valor probado (0,04) estaba por debajo de DRIFT_PER_WEEK
+    // (0,05), así que la convivencia no llegaba nunca a superar al olvido: la
+    // mejor opinión de cinco partidas de 120 años era 0,6.
+    expect(NEIGHBOUR.PER_WEEK).toBeGreaterThan(OPINION.DRIFT_PER_WEEK);
+  });
+
+  it('pero no sube sin techo', () => {
+    const state = village(20);
+    const [a, b] = othersOf(state);
+    for (let week = 0; week < 5000; week += 1) workedTogether(state, [[a!.id, b!.id]]);
+    expect(opinionOf(state, a!.id, b!.id)).toBeLessThan(NEIGHBOUR.CEILING + NEIGHBOUR.PER_WEEK * 2);
+  });
+
+  it('el que trabaja solo no se hace amigo de nadie', () => {
+    const state = village(20);
+    const [a, b] = othersOf(state);
+    a!.opinions[b!.id] = 0;
+    // Cada uno en su sitio: dos cuadrillas de uno.
+    workedTogether(state, [[a!.id], [b!.id]]);
+    expect(opinionOf(state, a!.id, b!.id)).toBe(0);
+  });
+
+  it('acercarse no consume una tirada de azar', () => {
+    const state = village(20);
+    const [a, b] = othersOf(state);
+    const before = { ...state.rng };
+    workedTogether(state, [[a!.id, b!.id]]);
+    expect(state.rng).toEqual(before);
   });
 });
 

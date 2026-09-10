@@ -123,23 +123,25 @@ describe('con rencor, acaba pasando · §7.9', () => {
     // todo. Y con la proporción, no con el orden — comparar sólo «antes que»
     // pasaba aunque el rasgo del genio vivo no hiciera nada, porque el manso
     // frena por su cuenta. Lo destapó una mutación.
-    const fightsIn = (trait: 'hot_tempered' | 'kind'): number => {
+    // Se cuentan semanas hasta la PRIMERA riña, no riñas en una ventana: desde
+    // v3.09 los mismos dos no pueden repetir antes de `REPEAT_TICKS`, así que
+    // contar en una ventana mide el freno y no el carácter.
+    const weeksUntil = (trait: 'hot_tempered' | 'kind'): number => {
       const state = village(20);
       const [a, b] = feuding(state);
       a.traits = [trait];
       b.traits = [trait];
-      let n = 0;
-      for (let week = 0; week < 600; week += 1) {
-        if (quarrelOf(state) !== null) n += 1;
+      for (let week = 0; week < 3000; week += 1) {
+        if (quarrelOf(state) !== null) return week;
         state.tick += 1;
       }
-      return n;
+      return 3000;
     };
 
-    const hot = fightsIn('hot_tempered');
-    const mild = fightsIn('kind');
-    expect(hot, 'el de mal genio riñe').toBeGreaterThan(0);
-    expect(hot / Math.max(1, mild), 'y muchísimo más que el manso').toBeGreaterThan(8);
+    const hot = weeksUntil('hot_tempered');
+    const mild = weeksUntil('kind');
+    expect(hot, 'el de mal genio riñe pronto').toBeLessThan(600);
+    expect(mild / Math.max(1, hot), 'el manso aguanta muchísimo más').toBeGreaterThan(8);
   });
 });
 
@@ -177,10 +179,15 @@ describe('no rompe las reglas · §4.3, §6.4', () => {
   it('en una partida de verdad se riñe, pero no todas las semanas', () => {
     // Medido: unas seis por siglo y partida. Ni cero —el sistema estaría
     // muerto— ni una taberna.
-    const state = foundGame(11);
-    run(state, 120 * 48, 'prudent', CATALOG);
-    const fights = state.chronicle.filter((e) => e.templateKey.startsWith('quarrel.'));
-    expect(fights.length).toBeGreaterThan(0);
-    expect(fights.length).toBeLessThan(120 * TIME.WEEKS_PER_YEAR * 0.01);
+    // Con varias semillas, que una sola es ruido: medido, unas tres o cuatro
+    // riñas por siglo y partida, y hay semillas que no riñen en cien años.
+    let fights = 0;
+    for (const seed of [3, 7, 11]) {
+      const state = foundGame(seed);
+      run(state, 120 * 48, 'prudent', CATALOG);
+      fights += state.chronicle.filter((e) => e.templateKey.startsWith('quarrel.')).length;
+    }
+    expect(fights, 'en tres siglos de aldea algo tiene que pasar').toBeGreaterThan(0);
+    expect(fights, 'pero no es una taberna').toBeLessThan(3 * 120 * TIME.WEEKS_PER_YEAR * 0.01);
   });
 });

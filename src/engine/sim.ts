@@ -15,6 +15,7 @@ import {
 import { decayMemories } from './people/memories';
 import { driftOpinions, opinionOf } from './people/opinions';
 import { quarrelOf } from './people/quarrels';
+import { workedTogether } from './people/neighbours';
 import { ageOf, minAgeFor, promoteToNamed } from './people/villagers';
 import { pick } from './rng';
 import type {
@@ -49,7 +50,7 @@ import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
 import { neighbours4 } from './world/tiles';
-import { accrueTraffic, upgradePaths } from './world/paths';
+import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
 import { holderOf, ratioOf } from './crossroads/conditions';
 import { selectCrossroad, selectTrader } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
@@ -937,6 +938,20 @@ export function tick(
   // The week's living-together, which §6.4 puts nowhere in particular and which
   // has to happen once a week and only once.
   driftOpinions(state);
+
+  // §7.9, v3.09: y lo que hace trabajar codo con codo. Antes que la riña, para
+  // que un año de convivencia pueda evitar que un rencor llegue a estallar.
+  const crews = new Map<number, VillagerId[]>();
+  for (const [id, cells] of routesFor(state)) {
+    const at = cells[cells.length - 1];
+    if (at === undefined) continue;
+    const person = state.people.villagers.find((v) => v.id === id);
+    if (person === undefined || !person.named) continue;
+    const crew = crews.get(at);
+    if (crew === undefined) crews.set(at, [id]);
+    else crew.push(id);
+  }
+  workedTogether(state, [...crews.values()]);
 
   // §7.9, v3.07: y lo que pasa cuando dos ya no se aguantan. Va después del
   // roce de la semana y antes de la encrucijada, porque una riña de hoy tiene

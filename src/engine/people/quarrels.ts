@@ -58,6 +58,14 @@ export function quarrelOf(state: GameState): Quarrel | null {
     // El rencor tiene que seguir vivo hoy, no sólo estar escrito.
     if (opinionOf(state, a.id, b.id) > OPINION.GRUDGE_HEALS_AT) continue;
 
+    // Y no otra vez tan pronto. El recuerdo que dejó la última hace de freno,
+    // así que no hace falta estado nuevo: si `a` guarda algo reciente sobre
+    // `b`, ya tuvieron su día.
+    const recent = a.memories.some(
+      (m) => m.aboutId === b.id && state.tick - m.tick < QUARREL.REPEAT_TICKS,
+    );
+    if (recent) continue;
+
     const chance = QUARREL.WEEKLY * temper(a) * temper(b);
     if (next(state.rng, 'quarrels') >= chance) continue;
 

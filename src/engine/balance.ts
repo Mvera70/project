@@ -731,12 +731,42 @@ export const QUARREL = {
   // TUNE: lo que hay que esperar desde que nace el rencor. Un rencor recién
   // escrito no estalla la misma semana: se cuece.
   COOLING_TICKS: 24,
+  /**
+   * TUNE: y lo que los mismos dos tardan en volver a las andadas.
+   *
+   * Sin esto hay un bucle: la riña hunde la opinión, una opinión más baja hace
+   * más probable la riña siguiente, y los que ya se detestan no trabajan juntos
+   * —se apartan (§11.9)— así que la convivencia no les llega nunca. Medido: sin
+   * freno, 224 riñas en cinco partidas de 120 años, contra las 21 que hubo
+   * antes de que la convivencia existiera. Dos que se pelean cada tres semanas
+   * durante treinta años no son dos enemigos: son un mecanismo atascado.
+   */
+  REPEAT_TICKS: 2 * 48,
   // TUNE: lo que la riña le resta a lo que ya se tenían.
   AFTER_WORDS: -8,
   AFTER_BLOWS: -20,
   // TUNE: y el peso del recuerdo que deja cada uno del otro.
   MEMORY_WORDS: 2,
   MEMORY_BLOWS: 4,
+} as const;
+
+/**
+ * La convivencia (§6.4, §7.9, v3.09). El contrapeso que faltaba: hasta aquí
+ * todas las fuerzas sobre las opiniones empujaban hacia abajo, y un valle así
+ * acaba siempre siendo un valle de gente que no se aprecia. Todo TUNE.
+ */
+export const NEIGHBOUR = {
+  // TUNE: lo que sube por semana entre dos que trabajan en el mismo sitio.
+  //
+  // Tiene que ser MAYOR que OPINION.DRIFT_PER_WEEK, que es 0,05 y lleva todo
+  // hacia cero: con 0,04 —el primer valor probado— la convivencia no llegaba
+  // nunca a superar al olvido y la mejor opinión de cinco partidas de 120 años
+  // era 0,6. Aun así es diminuto al lado de una riña (−8) o del hambre (−18).
+  PER_WEEK: 0.12,
+  // TUNE: el techo al que llega la convivencia sola. Se puede apreciar a
+  // alguien de tanto segar a su lado; para quererlo hace falta que pase algo,
+  // y eso lo cuenta el catálogo.
+  CEILING: 35,
 } as const;
 
 export const MEMORY = {
