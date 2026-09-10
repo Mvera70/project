@@ -138,14 +138,81 @@ async function main(): Promise<void> {
     found();
   });
 
-  canvas.addEventListener('pointerdown', (event) => {
-    if (renderer === null) return;
+  // --- gestos ---------------------------------------------------------------
+  //
+  // Un dedo arrastra, dos pellizcan, y un toque que no arrastra selecciona.
+  // Distinguir el toque del arrastre por distancia recorrida y no por tiempo:
+  // un dedo siempre se mueve un poco, y un umbral de tiempo convierte un
+  // arrastre lento en una selección que nadie pidió.
+  const TAP = 8;
+  const touching = new Map<number, { x: number; y: number }>();
+  let dragged = 0;
+  let pinch = 0;
+
+  const localOf = (event: PointerEvent): { x: number; y: number } => {
     const box = canvas.getBoundingClientRect();
-    const hit = renderer.pick(event.clientX - box.left, event.clientY - box.top);
-    if (hit === null) return;
-    const said = hit.kind === 'terrain' ? `terreno ${hit.x},${hit.y}` : `${hit.kind} ${hit.id}`;
+    return { x: event.clientX - box.left, y: event.clientY - box.top };
+  };
+  const spread = (): { gap: number; x: number; y: number } => {
+    const [a, b] = [...touching.values()];
+    if (a === undefined || b === undefined) return { gap: 0, x: 0, y: 0 };
+    return { gap: Math.hypot(b.x - a.x, b.y - a.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  };
+
+  canvas.addEventListener('pointerdown', (event) => {
+    canvas.setPointerCapture(event.pointerId);
+    touching.set(event.pointerId, localOf(event));
+    dragged = 0;
+    if (touching.size === 2) pinch = spread().gap;
+  });
+
+  canvas.addEventListener('pointermove', (event) => {
+    if (renderer === null || !touching.has(event.pointerId)) return;
+    const was = touching.get(event.pointerId);
+    const now = localOf(event);
+    touching.set(event.pointerId, now);
+    if (was === undefined) return;
+
+    if (touching.size >= 2) {
+      const { gap, x, y } = spread();
+      if (pinch > 0 && gap > 0) renderer.zoom(pinch / gap, x, y);
+      pinch = gap;
+      dragged = TAP + 1;
+      return;
+    }
+    const dx = now.x - was.x;
+    const dy = now.y - was.y;
+    dragged += Math.hypot(dx, dy);
+    renderer.pan(dx, dy);
+  });
+
+  const lift = (event: PointerEvent): void => {
+    const was = touching.get(event.pointerId);
+    touching.delete(event.pointerId);
+    if (touching.size < 2) pinch = 0;
+    if (renderer === null || was === undefined || dragged > TAP) return;
+    const hit = renderer.pick(was.x, was.y);
     const note = document.querySelector<HTMLElement>('#touched');
-    if (note !== null) note.textContent = `tocaste: ${said}`;
+    if (note === null) return;
+    note.textContent = hit === null
+      ? ''
+      : `tocaste: ${hit.kind === 'terrain' ? `terreno ${hit.x},${hit.y}` : `${hit.kind} ${hit.id}`}`;
+  };
+  canvas.addEventListener('pointerup', lift);
+  canvas.addEventListener('pointercancel', (event) => {
+    touching.delete(event.pointerId);
+    if (touching.size < 2) pinch = 0;
+  });
+
+  canvas.addEventListener('wheel', (event) => {
+    if (renderer === null) return;
+    event.preventDefault();
+    const box = canvas.getBoundingClientRect();
+    renderer.zoom(event.deltaY > 0 ? 1.12 : 1 / 1.12, event.clientX - box.left, event.clientY - box.top);
+  }, { passive: false });
+
+  document.querySelector<HTMLButtonElement>('#reset-view')?.addEventListener('click', () => {
+    renderer?.resetView();
   });
 }
 

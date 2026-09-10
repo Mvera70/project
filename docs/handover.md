@@ -105,6 +105,19 @@ Puertas: P0 y P1 cerradas. **P2 pendiente de tu juicio sobre la demo.**
 
 ## 3. Qué hacer a continuación
 
+**G-07, segunda mitad: los gestos y las fichas dentro de `src/ui/`.**
+
+La primera mitad está hecha: `src/render3d/camera.ts` tiene zoom acotado,
+arrastre recortado al valle y vuelta al encuadre de partida, con diez pruebas
+sin GPU en `tests/fast/graphics-picking.test.ts`. El renderer expone `zoom`,
+`pan` y `resetView`. Los gestos —un dedo arrastra, dos pellizcan, un toque que
+no arrastra selecciona— están **sólo en `tools/graphics/pilot.ts`**, que es la
+página de pruebas y no el juego. Lo que falta es llevarlos a `src/ui/gestures.ts`
+y conectar la selección con las fichas de `src/ui/inspect.ts`, que hoy existen
+para el render 2D.
+
+El brief original de la ronda decía:
+
 **G-07: cámara, tacto e integración de interfaz.** Es la ronda que hace jugable
 el piloto desde el móvil, y la que el usuario está esperando: hoy la cámara no
 se mueve ni se acerca, y él pidió expresamente poder acercarse a ver la gente.

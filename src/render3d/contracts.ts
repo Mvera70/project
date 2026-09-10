@@ -28,6 +28,22 @@ export interface GraphicsRenderer {
   pick(localXCss: number, localYCss: number): GraphicsTarget | null;
   track(id: number | null): void;
   dispose(): void;
+
+  /**
+   * G-07 · La cámara. design.md D.7.
+   *
+   * Acercarse y moverse no son decisiones del juego: no gastan tiempo, no tocan
+   * el estado y no entran en el guardado. Por eso viven en el renderer y no en
+   * la API de juego.
+   *
+   * `zoom` multiplica lo que se ve por `factor` —por debajo de uno acerca—
+   * manteniendo bajo el dedo el punto que estaba en `(atX, atY)`, en píxeles CSS
+   * locales al lienzo. `pan` arrastra el valle. `resetView` vuelve al encuadre
+   * de partida, que es la aldea con su entorno (D.6.3).
+   */
+  zoom(factor: number, atXCss: number, atYCss: number): void;
+  pan(dxCss: number, dyCss: number): void;
+  resetView(): void;
 }
 
 export interface GraphicsRendererOptions {

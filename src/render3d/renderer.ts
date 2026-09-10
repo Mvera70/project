@@ -10,9 +10,10 @@
 // same instant derives the same answer however many times it is asked.
 
 import {
-  Color, DirectionalLight, Group, HemisphereLight, OrthographicCamera, PCFSoftShadowMap,
+  Color, DirectionalLight, Group, HemisphereLight, PCFSoftShadowMap,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Object3D,
 } from 'three';
+import { createValleyCamera } from './camera';
 import type { GameState, VillagerId } from '@engine/state';
 import { actorsFor, createActorMemory, type Actor } from './actors';
 import { loadAssets, type AssetLibrary } from './assets';
@@ -41,9 +42,6 @@ const VILLAGER = 'villager';
  */
 const FRAME_MARGIN = 9;
 
-/** The camera's direction, matching the study captures of G-01 to G-04. */
-const VIEW = new Vector3(1, 0.9, 1.15);
-
 export async function createGraphicsRenderer(
   options: GraphicsRendererOptions,
 ): Promise<GraphicsRenderer> {
@@ -55,7 +53,8 @@ export async function createGraphicsRenderer(
 
   const scene = new Scene();
   scene.background = new Color(VALLEY_COLOURS.sky);
-  const camera = new OrthographicCamera(-1, 1, 1, -1, 0.01, 500);
+  const view = createValleyCamera();
+  const camera = view.camera;
   const world = new Group();
   world.name = 'Valley';
   scene.add(world);
@@ -123,43 +122,13 @@ export async function createGraphicsRenderer(
 
   function frameCamera(): void {
     if (mapWidth === 0 || mapHeight === 0) return;
-    const aspect = Math.max(0.01, viewport.widthCss / Math.max(1, viewport.heightCss));
     const box = framed();
-    const centre = new Vector3((box.minX + box.maxX) / 2, 0, (box.minZ + box.maxZ) / 2);
-    const radius = Math.hypot(box.maxX - box.minX, box.maxZ - box.minZ) / 2 + 1;
-    camera.position.copy(centre).addScaledVector(VIEW.clone().normalize(), radius * 3);
-    camera.up.set(0, 1, 0);
-    camera.lookAt(centre);
-    // Encuadre por proyeccion de las esquinas, no por radio.
-    //
-    // Un valle de 36 por 56 visto en isometrica no es un circulo: es un rombo
-    // mucho mas ancho que alto. Encuadrarlo por su radio deja la mitad de la
-    // pantalla vacia por arriba y por abajo, que es exactamente lo que hacia la
-    // primera captura de esta ronda. Proyectar las cuatro esquinas al espacio de
-    // la camara y ajustar a lo que ocupan de verdad usa la pantalla entera.
-    camera.near = 0.1;
-    camera.far = radius * 8;
-    camera.updateMatrixWorld(true);
-    const inverse = camera.matrixWorldInverse;
-    let halfWidth = 0;
-    let halfHeight = 0;
-    for (const corner of [
-      new Vector3(box.minX, 0, box.minZ), new Vector3(box.maxX, 0, box.minZ),
-      new Vector3(box.minX, 0, box.maxZ), new Vector3(box.maxX, 0, box.maxZ),
-    ]) {
-      const seen = corner.applyMatrix4(inverse);
-      halfWidth = Math.max(halfWidth, Math.abs(seen.x));
-      halfHeight = Math.max(halfHeight, Math.abs(seen.y));
-    }
-    // El que no quepa manda, y un margen para que el valle no toque los bordes.
-    const half = Math.max(halfHeight, halfWidth / aspect) * 1.06;
-    camera.left = -half * aspect;
-    camera.right = half * aspect;
-    camera.top = half;
-    camera.bottom = -half;
-    camera.updateProjectionMatrix();
-    camera.updateMatrixWorld(true);
+    view.frame(box, { width: viewport.widthCss, height: viewport.heightCss });
 
+    // El sol alumbra el valle entero, no lo que se ve: acercarse no puede
+    // cambiar donde caen las sombras.
+    const centre = new Vector3(mapWidth / 2, 0, mapHeight / 2);
+    const radius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
     sun.position.copy(centre).add(new Vector3(-radius, radius * 2.2, radius * 0.8));
     sun.target.position.copy(centre);
     const reach = radius * 1.2;
@@ -190,7 +159,9 @@ export async function createGraphicsRenderer(
       viewport = next;
       renderer.setPixelRatio(Math.min(next.pixelRatio, 2));
       renderer.setSize(next.widthCss, next.heightCss, false);
-      frameCamera();
+      // Girar el movil cambia cuanto valle cabe, pero no tiene por que
+      // devolver al jugador al encuadre de partida si se habia acercado.
+      view.resize({ width: next.widthCss, height: next.heightCss });
     },
 
     paint(state: Readonly<GameState>, frame: GraphicsFrame): void {
@@ -252,6 +223,26 @@ export async function createGraphicsRenderer(
 
     track(id: number | null): void {
       tracked = id;
+      if (id === null) return;
+      // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
+      // el jugador y no se le quita de las manos.
+      const followed = lastActors.find((actor) => actor.id === id);
+      if (followed !== undefined) view.look(followed.x, followed.z);
+    },
+
+    zoom(factor: number, atXCss: number, atYCss: number): void {
+      if (disposed) return;
+      view.zoom(factor, atXCss, atYCss);
+    },
+
+    pan(dxCss: number, dyCss: number): void {
+      if (disposed) return;
+      view.pan(dxCss, dyCss);
+    },
+
+    resetView(): void {
+      if (disposed) return;
+      view.reset();
     },
 
     dispose(): void {
