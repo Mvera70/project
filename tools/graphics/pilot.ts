@@ -20,6 +20,7 @@ import { createGraphicsRenderer } from '../../src/render3d/renderer';
 import type { GraphicsRenderer } from '../../src/render3d/contracts';
 
 declare const VALLEY_VILLAGER_GLB: string;
+declare const VALLEY_TREE_GLB: string;
 
 function bytesOf(base64: string): ArrayBuffer {
   const binary = atob(base64);
@@ -225,9 +226,12 @@ void (async (): Promise<void> => {
     baseUrl: '',
     manifest: {
       schemaVersion: 1,
-      assets: [{ id: 'villager', file: 'villager.glb', sha256: 'embedded', motion: [] }],
+      assets: [
+        { id: 'villager', file: 'villager.glb', sha256: 'embedded', motion: [] },
+        { id: 'tree', file: 'tree.glb', sha256: 'embedded', motion: [] },
+      ],
     },
-    bytes: { villager: bytesOf(VALLEY_VILLAGER_GLB) },
+    bytes: { villager: bytesOf(VALLEY_VILLAGER_GLB), tree: bytesOf(VALLEY_TREE_GLB) },
   });
   await main();
 })().catch((error: unknown) => {
