@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.19** | 10 sep 2026 | Ejecución G-05 | **Hay reloj de presentación y actores derivados: el piloto ya sabe qué hace cada aldeano en cada instante.** El reloj es dueño único del tiempo escénico, no toca el acumulador del motor, congela en pausa, suspende con la pestaña oculta y marca `discontinuity` cuando un letargo trae semanas de golpe. Los actores son función pura del estado y el instante: no guardan ruta, así que una muerte o una mudanza no pueden dejar a nadie andando un camino viejo. **El clip lo mueve el suelo recorrido y no el reloj**, que es lo que impide que los pies patinen, y eso obligó a calibrar el día escénico (D.6.1) en sesenta segundos. Por el camino, tres defectos que el render de Canvas también tiene: el reparto de la ruta iba por índice de celda y el aldeano aceleraba en las diagonales; el desvío del carril giraba de golpe en cada esquina; y un crío «jugando» se movía a doce veces la velocidad a la que nadie anda. |
 | **3.18** | 10 sep 2026 | Segundo repaso de G-04, en el móvil | **Los codos doblaban al revés en andar y cargar.** El mismo error de signo que las rodillas pero espejado: la rodilla lleva el talón atrás y vive en positivo, el codo lleva la mano adelante y vive en negativo. Azadonar los tenía bien, y por eso era el único clip cuyos brazos se veían bien, lo que descartó la cámara como explicación. La auditoría gana la comprobación de **sentido** de cada bisagra, porque el ángulo por sí solo no distingue una rodilla de una rodilla del revés; verificada contra el artefacto defectuoso, denuncia los dos clips malos y deja en paz el bueno. |
 | **3.17** | 10 sep 2026 | Repaso de G-04 tras verlo en movimiento | **Las rodillas del aldeano se doblaban al revés.** En huesos que apuntan hacia abajo el signo negativo es hacia delante, y las espinillas estaban en negativo: la rodilla se abría como la de un pájaro y el paso se veía como un balanceo de péndulo. Con apoyo y vuelo de verdad la flexión pasa de 25 a 41 grados. Andar no tocaba la columna, así que heredaba la inclinación de azadonar; ahora los cuatro clips mueven el mismo juego de huesos y un clip se basta solo. Cuentas esféricas en codo y rodilla, porque dos cilindros que se juntan en un punto enseñan sus tapas al doblar. La zancada declarada no era la que daban las piernas (0,62 contra 0,95) y pasa a medirse por el recorrido del pie que pisa. Y la promoción sólo exige equivalencia con lo aprobado si la receta no ha cambiado: sin eso, ningún cambio de forma era promovible. |
 | **3.16** | 10 sep 2026 | Ejecución G-04 | **Existe un aldeano articulado con cuatro clips, construido por la misma cadena declarativa que un edificio.** 916 triángulos, 16 huesos, conectores en las dos manos. D.4.1 fija la piel rígida tras un banco común que dio coste idéntico y aspecto peor en la deformable. El atado va por grupo de vértices porque emparentar al hueso pivota por su cola y desprendía la cabeza con la validación en verde. `animation-audit.ts` mide los clips en el navegador —duración, deriva de raíz, cierre de bucle— y deja hojas de contactos, incluida una a 18×26 px que es el tamaño real del aldeano a 390 px de ancho. El catálogo gana un campo `motion` añadido —duración, bucle y zancada por clip— para que el controlador pueda casar su velocidad con la del clip y no deslizar los pies. Queda anotado que el aldeano no tiene frente. |
@@ -8183,6 +8184,40 @@ Cada fila se cruza con obras, desaparición y efectos de §8/§11 que le afecten
 Si el estado no contiene un detalle, el arte no lo presenta como dato exacto.
 Por ejemplo, no inventar una reserva individual transportada porque el juego
 solo tenga una cantidad global. Cada lote declara qué cubre y qué falta.
+
+#### D.6.1 · El día escénico, calibrado (v3.19)
+
+**Un día escénico dura sesenta segundos reales, a cualquier velocidad.** D.6
+dejó la duración para calibrar en G-05 y éste es el número, que no es una
+preferencia sino lo que cuesta el ciclo de andar.
+
+El ciclo de andar del aldeano cubre **0,713 celdas por segundo**: es su zancada
+medida sobre el GLB dividida por su duración medida, las dos de G-04. Los viajes
+de este valle van de 3 a 13 celdas, con mediana 6, y la jornada de §11.9 dedica
+el 15 % de sí misma a viajar. Seis celdas a ese paso son 8,4 segundos, así que
+el día tiene que durar cerca de un minuto para que la gente llegue andando.
+
+**Lo que se descartó y por qué.** Atar el día a la semana —quince segundos, que
+es lo que dura un tick a ×1— hacía que cada aldeano cruzara el valle en dos
+segundos y cuarto: 2,7 celdas por segundo, casi cinco ciclos de piernas por
+segundo. Una aldea de esprínters, todo el día, para siempre.
+
+**El precio, dicho claro:** a ×1 pasan unas cuatro semanas por día escénico, así
+que el día ya no se corresponde con la semana. D.6 lo autoriza expresamente y
+dice que una semana acelerada no le debe al jugador un trayecto completo. No
+había tercera opción sin cambiar **cuánto mide un aldeano contra una celda del
+mapa**, que es una pregunta sobre el recurso y no sobre el reloj.
+
+**Y esa pregunta queda abierta.** El aldeano de G-04 mide dos unidades de escena,
+o sea dos celdas. Un valle de 36 celdas de ancho es entonces dieciocho aldeanos
+de ancho, que para una aldea con campos, bosque y río es poco. Si el aldeano
+midiera media celda —que es lo que haría del valle un sitio con distancias— la
+zancada bajaría en la misma proporción y el día escénico tendría que alargarse
+todavía más. Es una decisión de dirección artística con consecuencias en el
+reloj, y se toma con el usuario delante de una imagen, no aquí.
+
+Medido tras calibrar: el más rápido del valle en su instante más rápido va a
+2,01 celdas por segundo, 2,8 veces su propia cadencia. La mediana anda a su paso.
 
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
