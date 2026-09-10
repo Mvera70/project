@@ -16,7 +16,7 @@ import { isHere } from '@engine/people/demography';
 import type { Building, GameState, Villager, VillagerId } from '@engine/state';
 import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
-import { dayNumber, dayPhase, SCENIC_DAY_SECONDS } from '../presentation-clock';
+import { dayNumber, dayPhase } from '../presentation-clock';
 import { clipTime, VILLAGER_CLIPS, type ClipName } from './clips';
 import { dayOf, energyOf, progressOf, stable, type Activity } from './day';
 
@@ -209,45 +209,6 @@ function window(t: number): number {
   return eased * eased;
 }
 
-/**
- * Working is not standing still: it is going up and down the same piece of
- * field, at a pace and a bearing of one's own so that two neighbours do not
- * keep time like a mechanism.
- */
-function workWander(
-  person: Villager, tick: number, through: number, spanSeconds: number,
-): { offset: Point; heading: number; travelled: number } {
-  const energy = energyOf(person, tick);
-  const laps = DAY.WORK_LAPS * energy;
-  // Nadie se mueve más deprisa de lo que su propio ciclo de andar permite.
-  //
-  // Sin este tope, un crío —que juega en vez de trabajar, y por eso da más
-  // vueltas y más amplias— cruzaba cuatro celdas de ida y vuelta cinco veces
-  // por jornada: 8,6 celdas por segundo escénico, doce veces la velocidad a la
-  // que anda un aldeano. En Canvas no se notaba porque un sprite no tiene
-  // piernas; con un clip de andar movido por el suelo, se veía patinar.
-  const wanted = DAY.WORK_REACH * energy;
-  const peak = spanSeconds <= 0 ? 0 : (wanted * 2 * Math.PI * laps) / spanSeconds;
-  const amplitude = peak > WALK_SPEED ? wanted * (WALK_SPEED / peak) : wanted;
-
-  const swing = Math.sin(through * Math.PI * 2 * laps + person.id * 1.7) * window(through);
-  const heading = stable(person.id, 31_337) * Math.PI * 2;
-  return {
-    offset: {
-      x: Math.cos(heading) * swing * amplitude,
-      z: Math.sin(heading) * swing * amplitude,
-    },
-    // Facing follows the furrow, and flips when the furrow does.
-    heading: swing >= 0 ? heading : heading + Math.PI,
-    // Cada vuelta recorre cuatro veces la amplitud. Basta para que el clip de
-    // quien va y viene por su parcela avance con el suelo y no con el reloj.
-    travelled: amplitude * 4 * laps * Math.max(0, Math.min(1, through)),
-  };
-}
-
-/** Celdas por segundo escénico que da el ciclo de andar del aldeano. */
-const WALK_SPEED = (VILLAGER_CLIPS.walk.strideLength ?? 1) / VILLAGER_CLIPS.walk.seconds;
-
 interface Plot { x: number; z: number; w: number; h: number }
 
 /**
@@ -272,6 +233,78 @@ function plotSpot(plot: Plot, slot: number, count: number): Point {
   };
 }
 
+/**
+ * Cuantos surcos hace alguien a lo largo de su jornada, y cuanto del tramo se
+ * le va en cambiar de uno al siguiente.
+ *
+ * TUNE: seis surcos deja unos veinte segundos escenicos de faena en cada uno,
+ * que es tiempo de sobra para que se lea el golpe de azada. Y un cuarto del
+ * tramo andando da un par de pasos, no una excursion.
+ */
+const FURROWS = 6;
+const STEPPING = 0.25;
+
+interface Working {
+  readonly at: Point;
+  readonly heading: number;
+  readonly moving: boolean;
+  readonly travelled: number;
+}
+
+/**
+ * Que hace alguien durante su jornada en la parcela.
+ *
+ * **Cava quieto, da unos pasos al surco siguiente, y vuelve a cavar.** No es un
+ * adorno: la version anterior reproducia el golpe de azada en el sitio mientras
+ * el cuerpo se deslizaba de un lado a otro, y eso siempre se lee como patinar,
+ * por poco que sea el desplazamiento. Un clip en el sitio exige un cuerpo en el
+ * sitio; en cuanto el cuerpo se mueve, el clip tiene que ser el de andar.
+ *
+ * Los surcos salen del identificador, asi que dos vecinos no recorren el campo
+ * al mismo compas, y cada uno tiene el suyo.
+ */
+function working(
+  person: Villager, tick: number, through: number, spot: Point, reach: number,
+): Working {
+  const energy = energyOf(person, tick);
+  // Un crio no cava: juega, y por eso cambia de sitio mas veces.
+  const furrows = Math.max(2, Math.round(FURROWS * energy));
+  const bearing = stable(person.id, 31_337) * Math.PI * 2;
+
+  const furrow = (index: number): Point => {
+    // Ida y vuelta por el mismo trozo de campo, **empezando y acabando en el
+    // puesto**. Con una fase por persona, el primer surco caia lejos del punto
+    // al que se acababa de llegar andando y la llegada era un salto con el
+    // golpe de azada puesto. Lo que separa a dos vecinos es la direccion del
+    // surco, que si es suya, no el momento en que empiezan.
+    const swing = Math.sin(((index % furrows) / furrows) * Math.PI * 2);
+    return {
+      x: spot.x + Math.cos(bearing) * swing * reach,
+      z: spot.z + Math.sin(bearing) * swing * reach,
+    };
+  };
+
+  const walked = Math.max(0, Math.min(1, through)) * furrows;
+  const index = Math.min(furrows - 1, Math.floor(walked));
+  const local = walked - index;
+  const from = furrow(index);
+  const to = furrow(index + 1);
+  const leg = Math.hypot(to.x - from.x, to.z - from.z);
+
+  if (local < 1 - STEPPING) {
+    return { at: from, heading: bearing, moving: false, travelled: index * leg };
+  }
+  const along = (local - (1 - STEPPING)) / STEPPING;
+  const dx = to.x - from.x;
+  const dz = to.z - from.z;
+  return {
+    at: { x: from.x + dx * along, z: from.z + dz * along },
+    heading: dx === 0 && dz === 0 ? bearing : Math.atan2(dx, dz),
+    moving: true,
+    travelled: index * leg + leg * along,
+  };
+}
+
 /** Nobody strays further than the leash from where they are supposed to be. */
 function leash(point: Point, anchor: Point): Point {
   const dx = point.x - anchor.x;
@@ -288,9 +321,7 @@ function clipFor(activity: Activity, person: Villager, tick: number): ClipName {
   // fourth clip earn its place. A child plays instead of working, so a child
   // carries nothing home.
   if (activity === 'returning') return energyOf(person, tick) > 1 ? 'walk' : 'carry_walk';
-  // Un crío no azadona: juega, y anda. Reproducir un golpe de azada mientras se
-  // desplaza es exactamente la figura sin vida que hay que evitar.
-  if (activity === 'working') return energyOf(person, tick) > 1 ? 'walk' : 'work_hoe';
+  if (activity === 'working') return 'work_hoe';
   return 'idle';
 }
 
@@ -452,14 +483,17 @@ export function actorsFor(
     let point: Point;
     let facing: number;
     let travelled: number;
+    // Si el cuerpo se mueve, el clip tiene que ser el de andar. Siempre.
+    let stepping = false;
 
     if (activity === 'working') {
       const span = Math.max(1e-6, day.depart - day.arrive);
       const through = (phase - day.arrive) / span;
-      const wander = workWander(person, state.tick, through, span * SCENIC_DAY_SECONDS);
-      point = leash({ x: spot.x + wander.offset.x, z: spot.z + wander.offset.z }, spot);
-      facing = wander.heading;
-      travelled = wander.travelled;
+      const turn = working(person, state.tick, through, spot, DAY.WORK_REACH);
+      point = leash(turn.at, spot);
+      facing = turn.heading;
+      travelled = turn.travelled;
+      stepping = turn.moving;
     } else if (activity === 'walking' || activity === 'returning') {
       const step = along(line, progress, total);
       const heading = headingAround(line, progress, total);
@@ -482,7 +516,7 @@ export function actorsFor(
       travelled = 0;
     }
 
-    const clip = clipFor(activity, person, state.tick);
+    const clip = stepping ? 'walk' : clipFor(activity, person, state.tick);
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(point.x)));
     const cellZ = Math.max(0, Math.min(state.map.height - 1, Math.floor(point.z)));
 

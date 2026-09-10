@@ -5,15 +5,14 @@
 // never reads the wall clock. It is told how much real time passed and answers
 // with the `GraphicsFrame` that the renderer paints.
 //
-// **The scenic day is decoupled from the week, at every speed.** D.6 decides it
-// and this round calibrates it. A week is 15 real seconds at ×1 and under a
-// second at ×16, so tying the day to the week would make the villagers sprint
-// when the player speeds up, and a sprinting village reads as a glitch rather
-// than as haste. Scenic time therefore advances at one second per real second
-// whenever the game is running, whatever the speed. What speeds up is the
-// world: harvests, deaths and decisions still land on their tick. Nobody
-// finishes a day's walk in a week, and D.6 says that is fine — a week does not
-// owe the player a complete journey.
+// **The scenic day is decoupled from the week.** D.6 decides it and this round
+// calibrates it. A week is 15 real seconds at ×1 and under a second at ×16, so
+// tying the day to the week would make the villagers sprint when the player
+// speeds up, and a sprinting village reads as a glitch rather than as haste.
+// Scenic time runs on its own, and quickens with the speed by its square root:
+// see `scenicRate`. What speeds up faster is the world — harvests, deaths and
+// decisions still land on their tick. Nobody finishes a day's walk in a week,
+// and D.6 says that is fine: a week does not owe the player a complete journey.
 
 import type { GraphicsFrame } from './contracts';
 
@@ -72,6 +71,27 @@ const SUSPEND_GAP_SECONDS = 1;
  * ordinary slow frame at ×16 without absorbing a real jump.
  */
 const LETHARGY_SLACK_TICKS = 2;
+
+/**
+ * Cuanto se acelera el dia escenico con la velocidad del juego. D.6.1.
+ *
+ * La raiz cuadrada, ni uno ni la velocidad entera. Las dos puntas estaban mal y
+ * las dos se probaron:
+ *
+ * - **Atado a la velocidad**, a x16 la gente cruzaba el valle a dieciseis veces
+ *   su paso, con las piernas a dieciseis ciclos por segundo. Un borron.
+ * - **Sin atar**, apretar x16 no cambiaba nada visible salvo el marcador: el
+ *   mundo corria y la gente andaba igual. El boton parecia roto, y asi lo
+ *   describio quien lo probo.
+ *
+ * Con la raiz, x4 mueve al doble y x16 al cuadruple: se ve que el tiempo corre
+ * sin que el valle se convierta en un vibrar de piernas. Y como el clip lo mueve
+ * el suelo recorrido, la cadencia sube sola con el paso, que es justo lo que
+ * hace una grabacion acelerada.
+ */
+function scenicRate(speed: 0 | 1 | 4 | 16): number {
+  return Math.sqrt(speed);
+}
 
 /** Real milliseconds per engine tick at ×1. Mirrors `TIME.REAL_MS_PER_TICK`. */
 const REAL_MS_PER_TICK = 15_000;
@@ -149,7 +169,9 @@ export function createPresentationClock(): PresentationClock {
       // working, which is the caller's business, not the clock's. Suspension
       // freezes them too, and so does a gap long enough to be an absence.
       const running = input.speed !== 0 && !suspended;
-      const deltaSeconds = running ? Math.min(gapSeconds, MAX_STEP_SECONDS) : 0;
+      const deltaSeconds = running
+        ? Math.min(gapSeconds, MAX_STEP_SECONDS) * scenicRate(input.speed)
+        : 0;
       memory.seconds += deltaSeconds;
 
       return {
@@ -170,7 +192,7 @@ export function createPresentationClock(): PresentationClock {
  * Separate from `tickFraction` on purpose, and D.6 says captures must state the
  * two apart. The tick says what the world is doing this week; this says what
  * time of day the village is living. They never coincide: a scenic day is eight
- * weeks at ×1 and a hundred and twenty-eight at ×16. That is the decision.
+ * weeks at ×1 and thirty-two at ×16. That is the decision.
  */
 export function dayPhase(presentationSeconds: number): number {
   const phase = (presentationSeconds / SCENIC_DAY_SECONDS) % 1;

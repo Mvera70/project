@@ -19,7 +19,9 @@ import type { GraphicsFrame } from '../../src/render3d/contracts';
 import {
   createPresentationClock, dayPhase, SCENIC_DAY_SECONDS,
 } from '../../src/render3d/presentation-clock';
-import { actorsFor, createActorMemory, MAX_ACTORS, VILLAGER_CLIPS } from '../../src/render3d/actors';
+import {
+  actorsFor, createActorMemory, MAX_ACTORS, VILLAGER_CLIPS, type ClipName,
+} from '../../src/render3d/actors';
 import { dayOf } from '../../src/render3d/actors/day';
 import { fingerprint } from '../helpers/fingerprint';
 
@@ -68,10 +70,11 @@ describe('G-05 · el reloj de presentación', () => {
     expect(clock.seconds).toBe(before);
   });
 
-  it('el día escénico no se acelera con la velocidad', () => {
-    // D.6 lo decide y G-05 lo calibra: a ×16 la semana dura menos de un segundo,
-    // y atar el día a la semana haría que los aldeanos corrieran. Lo que se
-    // acelera es el mundo, no la gente.
+  it('el día escénico se acelera con la raíz de la velocidad, no con ella', () => {
+    // Las dos puntas estaban mal y las dos se probaron. Atado a la velocidad, a
+    // ×16 la gente cruzaba el valle con las piernas a dieciséis ciclos por
+    // segundo. Sin atar, apretar ×16 no cambiaba nada visible y el botón
+    // parecía roto: así lo describió quien lo probó.
     const advanced = (speed: 0 | 1 | 4 | 16): number => {
       const clock = createPresentationClock();
       clock.frame({ realMs: 0, tick: 0, tickFraction: 0, speed, reducedMotion: false, hidden: false });
@@ -83,9 +86,12 @@ describe('G-05 · el reloj de presentación', () => {
       }
       return clock.seconds;
     };
-    expect(advanced(4)).toBeCloseTo(advanced(1), 6);
-    expect(advanced(16)).toBeCloseTo(advanced(1), 6);
+    const base = advanced(1);
+    expect(advanced(4)).toBeCloseTo(base * 2, 6);
+    expect(advanced(16)).toBeCloseTo(base * 4, 6);
     expect(advanced(0)).toBe(0);
+    // Y por debajo de la velocidad del juego, que es lo que evita el borrón.
+    expect(advanced(16)).toBeLessThan(base * 16);
   });
 
   it('un letargo no se representa: se salta y se avisa', () => {
@@ -416,6 +422,67 @@ describe('G-05 · los actores', () => {
     }
     // Y cambia al amanecer siguiente, que es lo que le da variedad.
     expect(dayOf(person, 500, 4).leave).not.toBe(same.leave);
+  });
+
+  it('un clip en el sitio exige un cuerpo en el sitio', () => {
+    // El fallo que esto guarda también se vio jugando: al trabajar, el aldeano
+    // reproducía el golpe de azada mientras el cuerpo se desplazaba de un lado
+    // a otro. Por poco que fuera, se leía como patinar. Ahora cava quieto y da
+    // unos pasos al surco siguiente, y esos pasos son el clip de andar.
+    const state = village(12);
+    const memory = createActorMemory();
+    const still = new Set<ClipName>(['work_hoe', 'idle']);
+    let checked = 0;
+    let worst = 0;
+    let previous = new Map<VillagerId, { x: number; z: number; clip: ClipName }>();
+
+    for (let step = 0; step <= 600; step += 1) {
+      const seconds = (step / 600) * SCENIC_DAY_SECONDS;
+      const now = new Map<VillagerId, { x: number; z: number; clip: ClipName }>();
+      for (const actor of actorsFor(state, frameAt(seconds), { memory })) {
+        now.set(actor.id, { x: actor.x, z: actor.z, clip: actor.clip });
+        const was = previous.get(actor.id);
+        if (was === undefined || !still.has(actor.clip) || was.clip !== actor.clip) continue;
+        const moved = Math.hypot(actor.x - was.x, actor.z - was.z);
+        worst = Math.max(worst, moved);
+        checked += 1;
+      }
+      previous = now;
+    }
+
+    expect(checked, 'nadie llega a estar quieto').toBeGreaterThan(200);
+    // Una centésima de celda entre dos muestras es tres centímetros: por debajo
+    // de lo que un píxel puede enseñar. Antes de esto daba media celda.
+    expect(worst, `se desplazó ${worst.toFixed(3)} celdas con un clip quieto`).toBeLessThan(0.01);
+  });
+
+  it('quien anda reproduce el clip de andar, trabaje o no', () => {
+    // La otra mitad de la misma propiedad: si el cuerpo se mueve, el clip es
+    // el de andar aunque la actividad sea trabajar.
+    const state = village(12);
+    const memory = createActorMemory();
+    let stepping = 0;
+    let previous = new Map<VillagerId, { x: number; z: number; activity: string; clip: ClipName }>();
+    for (let step = 0; step <= 600; step += 1) {
+      const seconds = (step / 600) * SCENIC_DAY_SECONDS;
+      const now = new Map<VillagerId, { x: number; z: number; activity: string; clip: ClipName }>();
+      for (const actor of actorsFor(state, frameAt(seconds), { memory })) {
+        now.set(actor.id, { x: actor.x, z: actor.z, activity: actor.activity, clip: actor.clip });
+        const was = previous.get(actor.id);
+        // Las dos muestras tienen que caer dentro de la misma faena y con el
+        // mismo clip. En la frontera, lo que el cuerpo recorrió durante el
+        // intervalo fue con el clip anterior, no con el que se ve al final.
+        if (was === undefined || actor.activity !== 'working' || was.activity !== 'working') continue;
+        if (was.clip !== actor.clip) continue;
+        const moved = Math.hypot(actor.x - was.x, actor.z - was.z);
+        if (moved > 0.02) {
+          expect(actor.clip, `el aldeano ${actor.id} se mueve trabajando`).toBe('walk');
+          stepping += 1;
+        }
+      }
+      previous = now;
+    }
+    expect(stepping, 'nadie cambia de surco en toda la jornada').toBeGreaterThan(20);
   });
 
   it('no salen más de los que caben, y el seguido va primero', () => {

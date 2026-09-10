@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.23** | 10 sep 2026 | Dos fallos más vistos jugando la demo | **Un clip en el sitio exige un cuerpo en el sitio.** Al trabajar se reproducía el golpe de azada mientras el cuerpo se desplazaba alrededor del puesto, y eso se lee como deslizarse por poco que se mueva. Ahora se cava quieto y se dan unos pasos al surco siguiente, y esos pasos son el clip de andar; los surcos empiezan y acaban en el puesto para que llegar y marcharse sean continuos. Y **el día escénico se acelera con la raíz de la velocidad** (D.6.5): atado a la velocidad entera ponía las piernas a dieciséis ciclos por segundo, y sin atar el botón de ×16 no cambiaba nada visible. Dos pruebas nuevas guardan la regla desde los dos lados. |
 | **3.22** | 10 sep 2026 | Tres fallos vistos jugando la demo de G-06 | **La jornada de un aldeano pertenece al día escénico, no a la semana.** El plan se sorteaba con el tick, que dura quince segundos frente a los ciento veinte del día, así que se rehacía ocho veces por día a ×1 y ciento veintiocho a ×16: cada rehecho era un teletransporte, y a velocidad alta la gente parpadeaba por el valle. El destino se congela también al amanecer, porque el motor reasigna el 6,7 % de las persona-semanas con saltos de nueve celdas de mediana; el tráfico y la economía siguen siendo del motor, lo único que cambia es cuándo se entera el actor. Es el estado efímero que D.6 ya concedía. Y el puesto de trabajo se reparte por la huella de la parcela en vez de amontonar a todo el mundo en la celda final de la ruta, formando parte de la ruta y no como un desvío al llegar. |
 | **3.21** | 10 sep 2026 | Ejecución G-06 | **Una partida real produce una escena: el valle, el río, el bosque, treinta y cinco edificios y veinticinco aldeanos andando por él.** `createGraphicsRenderer` queda implementado entero, sin métodos vacíos: `pick` prioriza aldeano, edificio y terreno en ese orden, y `track` encuadra. La contabilidad de la escena vive separada de Three.js como un **plan** —función pura del estado— y un **diff**, que es lo que hace comprobable en la suite rápida lo que D.6 pide: que una ruina deje de ser una casa, que demoler retire sólo a ése, que talar mueva el suelo sin tocar un edificio y que otra partida se tire entera en vez de actualizarse. La propiedad de los recursos es explícita: la biblioteca posee geometría, materiales y clips, y un actor sólo su esqueleto y su mezclador, de modo que el primero que muere no se lleva por delante al resto. Los recursos aprobados se publican a `public/assets/valley3d/` con manifiesto y hash, y una prueba comprueba que lo publicado es lo que el catálogo aprobó. D.6.3 fija el encuadre de partida. Los edificios son cajas con tejado hasta que G-10 traiga el catálogo: lo que hay que juzgar ahora es si un valle de estas proporciones se lee desde arriba, y eso no necesita el arte final para leerse mal. |
 | **3.20** | 10 sep 2026 | Decisión del usuario sobre la escala | **Un aldeano mide 0,65 celdas, no dos.** La aldea se ve entera al entrar y la gente se ve muy pequeña; para el detalle se acerca la cámara. El número sale de lo construido: una casa ocupa dos por dos celdas y mide seis metros de lado, así que una celda son tres metros y una persona 0,65. A 390 px de ancho, seis píxeles. La receta sigue en metros y declara un `scale` que el generador aplica a las raíces antes de exportar, así que la zancada baja de 0,95 a 0,32 sin tocar una sola clave. Arrastra la recalibración del día escénico a 120 s (D.6.1) y convierte los umbrales de la auditoría de animación en proporción del alto del recurso: en unidades absolutas denunciaban clips que no habían cambiado. |
@@ -8304,6 +8305,25 @@ lo que se reparte ahora es esa huella. El puesto **forma parte de la ruta**, no
 es un desvío añadido al llegar: contarlo aparte hacía que el suelo recorrido no
 cuadrara con el camino hasta en un veinte por ciento en un viaje corto, que es
 exactamente el patinaje que la zancada existe para evitar.
+
+#### D.6.5 · La faena y la velocidad, corregidas (v3.23)
+
+**Se cava quieto y se dan unos pasos al surco siguiente.** La versión anterior
+reproducía el golpe de azada en el sitio mientras el cuerpo se desplazaba
+alrededor del puesto, y eso se lee como deslizarse por poco que sea el
+desplazamiento. La regla, dicha entera: **un clip en el sitio exige un cuerpo en
+el sitio, y un cuerpo que se mueve exige el clip de andar**, sea cual sea la
+actividad. Los surcos empiezan y acaban en el puesto, de modo que llegar y
+marcharse son continuos.
+
+**El día escénico se acelera con la raíz de la velocidad**, no con la velocidad
+y no con nada. Las dos puntas se probaron y las dos estaban mal: atado a la
+velocidad, a ×16 la gente cruzaba el valle con las piernas a dieciséis ciclos
+por segundo; sin atar, apretar ×16 no cambiaba nada visible salvo el marcador y
+el botón parecía roto. Con la raíz, ×4 mueve al doble y ×16 al cuádruple
+mientras el mundo corre cuatro y dieciséis veces más. Como el clip lo mueve el
+suelo recorrido, la cadencia sube sola con el paso, que es lo que hace una
+grabación acelerada.
 
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
