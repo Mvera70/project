@@ -50,49 +50,90 @@ medición.
 
 ## 2. Estado del proyecto
 
-**Motor completo hasta M-15.** Mapa, edificios, obras, caminos, bosque,
-personas, subsistencia, encrucijadas con las 17 plantillas, crónica, y el
-orquestador del tick. Suite rápida y banco de balance funcionando.
+**Fecha de este corte: 10 de septiembre de 2026.** Rama de trabajo:
+`graphics/g-04-villager-rig`. Puerta en verde: `npm run typecheck`, `npm test`
+(903 pruebas, unos 31 s) y `npm run lint`.
 
-**Hito 0 entregado técnicamente y SIN VALIDAR.** Las tres crónicas se generan
-(74, 150 y 147 líneas, legibles desde el filtro de pesos de la v2.14) y **nadie
-ajeno al proyecto las ha leído.** El criterio de §9.4 dice que eso es lo que
-decide si el proyecto sigue. Es la deuda más antigua y la única que ningún
-agente puede saldar.
+### El juego
 
-**Hito 1 (render) sin empezar.** M-16 a M-19. Y recuerda §14.3: **M-19, las
-capturas automáticas, va antes que M-17.** No es orden de conveniencia, es la
-mitigación del riesgo número uno de `valle.md` §12.
+**Hitos 0 a 5 entregados; el hito 0 sigue sin juez.** El motor está completo
+—demografía, subsistencia, opiniones, encrucijadas, animales, comerciantes,
+crónica— y el render 2D en Canvas es el que se juega hoy y el que está
+desplegado en GitHub Pages como PWA.
 
-### Lo que está fuera de banda, y por qué se deja así
+**El hito 0 no lo ha validado nadie ajeno al proyecto, y el hito 6 tampoco.** Son
+los dos criterios humanos y **no se declaran superados ni se sustituyen por
+pruebas automáticas.** Es la deuda más antigua y la única que ningún agente
+puede saldar.
 
-| Métrica | Medido | §12.9 |
-|---|---|---|
-| Partidas terminadas, `prudent` | 1,7 % | 2–12 % |
-| Partidas terminadas, `worst` | 10,0 % | ≥ 25 % |
-| Horquilla | 8,3 pts | ≥ 20 pts |
+### El programa gráfico
 
-**Dos hipótesis falsadas seguidas** (la puerta de ocho habitantes, la capacidad
-como palanca) significan que falta evidencia, no que falte una tercera
-conjetura. La fase de balance se cerró en la v2.47 y el banco queda como red de
-regresión. Las tres pistas vivas están anotadas en §2.47 del diseño, sin tocar.
+Un piloto 3D en `src/render3d/`, aparte del juego, que **no sustituye a
+`src/render/`** hasta G-12. Rondas cerradas:
+
+| Ronda | Qué dejó |
+|---|---|
+| G-00 a G-03 | Cadena Blender → GLB → Three.js, catálogo con hashes, dos direcciones artísticas |
+| **G-04** | Aldeano articulado, 1 236 triángulos, 16 huesos, cuatro clips, piel rígida decidida en banco común |
+| **G-05** | Reloj de presentación y actores derivados: quién hace qué en cada instante |
+| **G-06** | Escena alimentada por una partida real: terreno, edificios, gente andando |
+
+Puertas: P0 y P1 cerradas. **P2 pendiente de tu juicio sobre la demo.**
+
+### Lo que se puede mirar sin arrancar nada
+
+- **El aldeano suelto**, girable, con sus cuatro clips y una ventana al tamaño
+  real que tiene en el móvil:
+  `https://claude.ai/code/artifact/b30ce40b-7f40-4840-bdf9-11a60f2bfb4f`
+- **El valle en marcha**, una partida real corriendo con el motor y el renderer
+  de verdad en una sola página:
+  `https://claude.ai/code/artifact/2e1d7a40-93a2-4406-a0f6-4651caeb380c`
+- Capturas y auditorías en `artifacts/graphics/G-04/` y `G-06/`.
+
+### Decisiones tomadas que enmarcan lo que viene
+
+- **D.2.1** · teja y paja conviven; no hay dirección A contra B.
+- **D.4.1** · piel rígida, decidida en banco común con coste idéntico.
+- **D.6.1** · un día escénico dura 120 s y se acelera con la **raíz** de la
+  velocidad, no con ella.
+- **D.6.2** · un aldeano mide **0,65 celdas**; una celda son unos tres metros.
+- **D.6.3** · al entrar se encuadra la aldea con su entorno, no el mapa entero.
+- **D.6.4** · la jornada y el destino pertenecen al día escénico, no a la semana.
+- **D.6.5** · un clip en el sitio exige un cuerpo en el sitio.
 
 ---
 
 ## 3. Qué hacer a continuación
 
-**El render, y en este orden: M-19 → M-16 → M-17 → M-18.**
+**G-07: cámara, tacto e integración de interfaz.** Es la ronda que hace jugable
+el piloto desde el móvil, y la que el usuario está esperando: hoy la cámara no
+se mueve ni se acerca, y él pidió expresamente poder acercarse a ver la gente.
 
-Dos motivos, y ninguno es que el balance esté resuelto:
+Lee `docs/design.md` §11, D.5 y D.7 antes de tocar nada. Ficheros del brief:
+`src/render3d/camera.ts`, `src/render3d/picking.ts`, `src/ui/app.ts`,
+`src/ui/inspect.ts`, `src/ui/gestures.ts`, `src/ui/loop.ts`,
+`tools/graphics.shots.ts` y `tests/fast/graphics-picking.test.ts`.
 
-- **§16.2 ya lo dice:** el ritmo «solo se puede resolver jugando». Lo que falta
-  por saber no es qué constante mover, sino si un jugador *siente* la diferencia
-  entre jugar bien y jugar mal. Eso no lo produce ningún banco.
-- **El hito 0 sigue sin juez**, y una crónica se lee mejor cuando existe el
-  valle que la acompaña.
+Lo que ya está hecho y no hay que rehacer:
 
-Antes de empezar, dos arreglos de una línea que la v2.47 dejó decididos y sin
-aplicar: `forest_cut` con `forestLeft > 0.12` y `relic_pedlar` sin tope de fe.
+- `pick` funciona y prioriza aldeano, edificio y terreno en ese orden. G-07 lo
+  perfecciona, no lo empieza.
+- El encuadre inicial vive en `renderer.ts`, en `frameCamera`. Sácalo a
+  `camera.ts` con el zoom y el arrastre; el encuadre por proyección de las
+  esquinas de la caja construida es el que hay que conservar.
+- La página `tools/graphics/pilot.ts` es el banco de pruebas más rápido que
+  existe: cambia algo, reconstruye y míralo. No es parte del juego.
+
+**Cómo republicar la demo tras un cambio.** El bundle se arma con Vite sobre
+`tools/graphics/pilot.html`, con el GLB del aldeano inyectado en base64 por
+`define: { VALLEY_VILLAGER_GLB }`, y se mete en una plantilla HTML que vive en
+el scratchpad de la sesión. Si la plantilla se ha perdido, cualquier página que
+tenga los identificadores `#stage`, `#stage-wrap`, `#readout`, `#touched`,
+`[data-speed]`, `#seed`, `#years` y `#refound` sirve.
+
+**Antes de publicar recursos nuevos:** `npx tsx tools/graphics/publish-assets.ts`
+copia lo aprobado a `public/assets/valley3d/` con manifiesto y hash. Un
+candidato sin promoción no llega al juego.
 
 ---
 
@@ -119,13 +160,65 @@ No son teoría: cada una se pagó con al menos una ronda.
 
 ---
 
+### Las que ha costado el programa gráfico
+
+- **Un umbral absoluto en una cadena que escala recursos caduca.** Al llevar el
+  aldeano a 0,65 celdas, la auditoría de animación empezó a denunciar clips que
+  no habían cambiado: medía el tamaño de la figura, no su animación. Los
+  umbrales van en proporción al alto del recurso.
+- **Un ángulo no distingue una rodilla de una rodilla del revés.** El signo de
+  la flexión estuvo cambiado dos veces —espinillas primero, antebrazos
+  después— y las dos veces todo lo demás pasó en verde. Se mide el **sentido**,
+  no solo la amplitud. Y verifica la comprobación contra el artefacto
+  defectuoso, no contra el arreglado: mi primera versión denunciaba justo los
+  clips que estaban bien.
+- **La validación en verde no ve una cabeza suelta.** El atado emparentaba cada
+  pieza a la cola de su hueso y la cabeza flotaba separada del torso, con GLB
+  bien formado, clips presentes, materiales correctos y captura repetible. Se vio
+  mirando una hoja de contactos. §14.3 no es retórica.
+- **Tres formas de medir una zancada dan tres números y dos son falsos.** La
+  separación máxima entre tobillos dio 1,50 m donde la marcha da 0,95; el
+  recorrido bajo un umbral de altura dijo que cargado se anda más largo que
+  suelto. La buena: el pie más bajo es el que pisa, y lo que retrocede es lo que
+  el cuerpo avanza. Ninguna de las tres se desmentía a ojo.
+- **La promoción presupone la misma receta.** `report` comparaba el candidato con
+  el artefacto aprobado usando la receta nueva, así que ningún cambio deliberado
+  de geometría podía promoverse jamás. El catálogo guarda ahora el hash de la
+  receta.
+- **Los fallos de animación se ven jugando, no en una prueba.** Los cinco últimos
+  —teletransporte al trabajar, parpadeo a velocidad alta, gente amontonada en
+  una celda, deslizamiento con la azada, botón de velocidad sin efecto— los
+  encontró el usuario mirando la demo, con la suite entera en verde. Cada uno
+  tiene ya su prueba; ninguna existía antes de que él lo viera.
+
+---
+
 ## 5. Deudas sin dueño
 
 1. **La lectura del hito 0 por un tercero.** Las tres crónicas, sin contexto y
    sin el documento de diseño, y una sola pregunta: *«¿en qué se diferencian
    estas tres aldeas?»*. Ni quien diseñó el juego ni quien lo programó sirven.
+   **El hito 6 está en la misma situación y tampoco se declara superado.**
 2. **El presupuesto del banco.** 638 s de los 900 tras la subida de la v2.45, que
    queda escrita como la última sin optimizar.
 3. **Cuatro plantillas al filo del 1 % de elegibilidad** (§12.9), entre 1,0 % y
    2,5 %.
 4. **Los hitos 4, 5 y 6** siguen esbozados en §16, a propósito.
+5. **El aldeano no tiene frente.** El torso es un cajón liso y la cabeza una
+   esfera: por delante y por detrás es casi la misma silueta, y en el valle
+   giran hacia donde caminan. Es asunto de geometría y de P1. La vía que propuse
+   y nadie ha decidido aún: un peto de color en el pecho, en el terracota que la
+   paleta ya tiene, más una cuña en la cabeza. A veinte píxeles el color separa
+   mucho mejor que la forma.
+6. **Azadonar no se distingue de cargar a la escala de juego.** Lo que las
+   separaría es la herramienta, no la pose. Por eso el rig lleva conectores en
+   las dos manos, y por eso D.4 dice que la herramienta es un accesorio. Espera
+   a la ronda de la biblioteca de herramientas.
+7. **La suite rápida tarda 31 s contra los 20 que fija `CLAUDE.md`**, y unos 21
+   son de carga de módulos. El banco de balance sigue en 18,1 min contra el
+   techo de 15; la causa medida es que el coste del suelo cambia 631 veces por
+   partida y cada cambio vacía la caché de pares de ruta. Bajarlo obliga a tocar
+   el tráfico, que es balance, y esa decisión sigue abierta.
+8. **Los edificios del piloto son cajas con tejado.** El catálogo de verdad es
+   G-10. Es deliberado: lo que hay que juzgar antes es si un valle de estas
+   proporciones se lee desde arriba.

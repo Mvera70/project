@@ -79,8 +79,20 @@ Antes de dar un módulo por terminado: `npm run typecheck && npm test && npm run
 
 ## Estado del proyecto
 
-Andamiaje (M-00) hecho. **Siguiente: M-01 (rng y tiempo) → M-02 (tipos y
-balance) → M-03…**
+El motor está completo y el juego 2D en Canvas se juega y está desplegado.
+**Lo que está en marcha es el programa gráfico del Anexo D: un piloto 3D en
+`src/render3d/`, aparte, que no sustituye a `src/render/` hasta G-12.**
+
+Cerradas G-00 a G-06. **Siguiente: G-07 (cámara, tacto e interfaz).**
+
+`docs/handover.md` dice en qué estado exacto está todo, qué decisiones se han
+tomado, qué trampas ya han costado tiempo y por dónde seguir. **Léelo antes de
+empezar una ronda gráfica.**
+
+Los hitos humanos 0 y 6 siguen **sin validar**, y no se declaran superados ni se
+sustituyen por pruebas automáticas.
+
+La ruta original del motor, ya recorrida:
 
 Ruta hasta el hito 0, que es el que decide si el proyecto sigue:
 
