@@ -180,6 +180,73 @@ describe('G-06 · el suelo', () => {
     ground.dispose();
   });
 
+  it('el rio va por un cauce y no pintado en el prado', () => {
+    // La comprobacion es de diseno, no de numeros: el agua tiene que estar por
+    // debajo del prado. Un rio a la misma altura es una alfombra azul, que es
+    // exactamente lo que habia antes de esto.
+    const state = village(6);
+    const ground = buildGround(state.map, PALETTES.summer);
+    const position = ground.mesh.geometry.getAttribute('position');
+    const water = state.map.terrain.findIndex((kind) => kind === 2);
+    expect(water).toBeGreaterThanOrEqual(0);
+    const meadow = state.map.terrain.findIndex((kind) => kind === 0);
+
+    const lowest = (cell: number): number => {
+      let value = Infinity;
+      for (let vertex = 0; vertex < 4; vertex += 1) value = Math.min(value, position.getY(cell * 4 + vertex));
+      return value;
+    };
+    expect(lowest(water)).toBeLessThan(lowest(meadow));
+    ground.dispose();
+  });
+
+  it('la orilla baja, no cae de golpe', () => {
+    // Las esquinas de una celda de agua que toca prado no estan tan hondas como
+    // las de una celda rodeada de agua: eso es la orilla. Sin promediar, el
+    // cauce tendria paredes verticales y un escalon en cada borde.
+    const state = village(6);
+    const ground = buildGround(state.map, PALETTES.summer);
+    const position = ground.mesh.geometry.getAttribute('position');
+    const { width, terrain } = state.map;
+    let sloped = 0;
+    for (let cell = 0; cell < terrain.length; cell += 1) {
+      if (terrain[cell] !== 2) continue;
+      const shore = [-1, 1, -width, width].some((step) => (terrain[cell + step] ?? 2) !== 2);
+      if (!shore) continue;
+      let deep = Infinity;
+      let shallow = -Infinity;
+      for (let vertex = 0; vertex < 4; vertex += 1) {
+        deep = Math.min(deep, position.getY(cell * 4 + vertex));
+        shallow = Math.max(shallow, position.getY(cell * 4 + vertex));
+      }
+      if (shallow > deep) sloped += 1;
+    }
+    expect(sloped).toBeGreaterThan(0);
+    ground.dispose();
+  });
+
+  it('el agua es una lamina propia, lisa y plana', () => {
+    // Lo que separa el agua de la hierba no es el color, es que brilla. Y es
+    // plana mientras el cauce baja: de esa diferencia sale la ribera.
+    const state = village(6);
+    const ground = buildGround(state.map, PALETTES.summer);
+    const water = ground.water;
+    expect(water).not.toBeNull();
+    const surface = water as NonNullable<typeof water>;
+    const material = surface.material as { roughness: number };
+    expect(material.roughness).toBeLessThan(0.5);
+    const position = surface.geometry.getAttribute('position');
+    const level = position.getY(0);
+    for (let vertex = 1; vertex < position.count; vertex += 1) {
+      expect(position.getY(vertex)).toBeCloseTo(level, 6);
+    }
+    // Cuelga del suelo: quien pone el valle en la escena no tiene que saber
+    // ademas que hay un rio.
+    expect(surface.parent).toBe(ground.mesh);
+    ground.dispose();
+    expect(surface.parent).toBeNull();
+  });
+
   it('un camino tapa el terreno que hay debajo', () => {
     const state = village(6);
     const cell = state.map.path.findIndex((wear) => wear > 0);

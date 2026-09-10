@@ -10,7 +10,7 @@
 // rebuild.
 
 import {
-  BufferAttribute, BufferGeometry, Color, Mesh, MeshStandardMaterial,
+  BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial,
 } from 'three';
 import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@render/palette';
@@ -64,8 +64,120 @@ function mixed(from: string, to: string): string {
     .toString(16).padStart(2, '0')).join('')}`;
 }
 
+/**
+ * Cuanto sube o baja cada terreno respecto al prado, en celdas.
+ *
+ * El rio era color plano: agua y prado a la misma altura, y desde arriba se
+ * leia como una alfombra azul. Un cauce hundido hace que el rio corte el valle
+ * y que el prado tenga orilla. La roca sube un poco por el mismo motivo: un
+ * afloramiento que no sobresale no aflora.
+ *
+ * TUNE: catorce centesimas de celda son cuarenta centimetros (D.6.2). Poco es
+ * suficiente porque lo que hace el cauce no es la profundidad, es la sombra
+ * que proyecta el borde.
+ */
+const RELIEF: Readonly<Record<number, number>> = {
+  2: -0.14,   // agua
+  4: -0.05,   // marisma
+  3: 0.09,    // roca
+};
+
+/**
+ * La altura de una esquina de celda, promediando las celdas que la tocan.
+ *
+ * Promediar es lo que da la orilla. Bajando la celda entera de golpe, el rio
+ * queda con paredes verticales y un escalon en cada borde; promediando, el
+ * prado baja hacia el agua y sube desde ella.
+ */
+function heightAt(map: ValleyMap, x: number, z: number): number {
+  let total = 0;
+  let seen = 0;
+  for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
+    const cx = x + dx;
+    const cz = z + dz;
+    if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
+    total += RELIEF[map.terrain[cz * map.width + cx] ?? 0] ?? 0;
+    seen += 1;
+  }
+  return seen === 0 ? 0 : total / seen;
+}
+
+/**
+ * A que altura esta la lamina de agua, en celdas.
+ *
+ * Por encima del fondo del cauce y por debajo de la orilla, que es lo que hace
+ * que el borde del prado asome dentro del agua y se lea como ribera en vez de
+ * como un corte.
+ */
+const WATER_LEVEL = -0.10;
+
+/**
+ * La lamina de agua sobre las celdas de rio.
+ *
+ * El suelo esta pintado con color por vertice y un solo material mate: un rio
+ * pintado ahi es hierba azul. El agua necesita ser otra superficie porque lo
+ * que la distingue no es el color, es que brilla y el prado no. Va aparte
+ * tambien porque es plana: el cauce baja, ella no, y esa diferencia es la que
+ * dibuja la orilla.
+ */
+function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
+  const cells: number[] = [];
+  for (let cell = 0; cell < map.terrain.length; cell += 1) {
+    if (map.terrain[cell] === 2) cells.push(cell);
+  }
+  if (cells.length === 0) return null;
+
+  const positions = new Float32Array(cells.length * 4 * 3);
+  const indices = new Uint32Array(cells.length * 6);
+  for (let index = 0; index < cells.length; index += 1) {
+    const cell = cells[index] ?? 0;
+    const x = cell % map.width;
+    const z = Math.floor(cell / map.width);
+    const corner = index * 4;
+    const points = [[x, z], [x + 1, z], [x + 1, z + 1], [x, z + 1]] as const;
+    for (let vertex = 0; vertex < 4; vertex += 1) {
+      const at = (corner + vertex) * 3;
+      positions[at] = points[vertex]?.[0] ?? 0;
+      positions[at + 1] = GROUND_BIAS + WATER_LEVEL;
+      positions[at + 2] = points[vertex]?.[1] ?? 0;
+    }
+    const face = index * 6;
+    indices[face] = corner;
+    indices[face + 1] = corner + 2;
+    indices[face + 2] = corner + 1;
+    indices[face + 3] = corner;
+    indices[face + 4] = corner + 3;
+    indices[face + 5] = corner + 2;
+  }
+
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  geometry.setIndex(new BufferAttribute(indices, 1));
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+
+  const material = new MeshStandardMaterial({
+    color: palette.water,
+    roughness: 0.18,
+    metalness: 0.1,
+    // Translucida lo justo para que el fondo del cauce se intuya. Del todo
+    // opaca el rio es una chapa; del todo clara no hay rio.
+    transparent: true,
+    opacity: 0.86,
+    side: DoubleSide,
+  });
+  const mesh = new Mesh(geometry, material);
+  mesh.name = 'Valley_Water';
+  // No recibe sombra: un rio a la sombra de sus propios arboles se veia negro,
+  // y el agua de un valle refleja el cielo aunque tenga un roble encima.
+  mesh.receiveShadow = false;
+  return mesh;
+}
+
 export interface Ground {
   readonly mesh: Mesh;
+  /** La lamina de agua, o `null` si el mapa no tiene rio. */
+  readonly water: Mesh | null;
   dispose(): void;
 }
 
@@ -90,9 +202,11 @@ export function buildGround(map: ValleyMap, palette: Palette): Ground {
     ] as const;
     for (let vertex = 0; vertex < 4; vertex += 1) {
       const at = (corner + vertex) * 3;
-      positions[at] = points[vertex]?.[0] ?? 0;
-      positions[at + 1] = GROUND_BIAS;
-      positions[at + 2] = points[vertex]?.[1] ?? 0;
+      const px = points[vertex]?.[0] ?? 0;
+      const pz = points[vertex]?.[1] ?? 0;
+      positions[at] = px;
+      positions[at + 1] = GROUND_BIAS + heightAt(map, px, pz);
+      positions[at + 2] = pz;
       normals[at] = 0;
       normals[at + 1] = 1;
       normals[at + 2] = 0;
@@ -117,16 +231,31 @@ export function buildGround(map: ValleyMap, palette: Palette): Ground {
   geometry.setIndex(new BufferAttribute(indices, 1));
   geometry.computeBoundingSphere();
 
+  // Las normales se recalculan porque el suelo dejo de ser plano en cuanto el
+  // rio se hundio: con todas apuntando arriba, la orilla no coge luz y el cauce
+  // no se ve.
+  geometry.computeVertexNormals();
   const material = new MeshStandardMaterial({ vertexColors: true, roughness: 1 });
   const mesh = new Mesh(geometry, material);
   mesh.name = 'Valley_Ground';
   mesh.receiveShadow = true;
 
+  // El agua cuelga del suelo para que quien pone el suelo en la escena no tenga
+  // que saber que ademas hay un rio: se mueven y se sueltan juntos siempre.
+  const water = buildWater(map, palette);
+  if (water !== null) mesh.add(water);
+
   return {
     mesh,
+    water,
     dispose(): void {
       geometry.dispose();
       material.dispose();
+      if (water !== null) {
+        mesh.remove(water);
+        water.geometry.dispose();
+        (water.material as MeshStandardMaterial).dispose();
+      }
     },
   };
 }
