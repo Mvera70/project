@@ -19,7 +19,8 @@ import type { GraphicsFrame } from '../../src/render3d/contracts';
 import {
   createPresentationClock, dayPhase, SCENIC_DAY_SECONDS,
 } from '../../src/render3d/presentation-clock';
-import { actorsFor, MAX_ACTORS, VILLAGER_CLIPS } from '../../src/render3d/actors';
+import { actorsFor, createActorMemory, MAX_ACTORS, VILLAGER_CLIPS } from '../../src/render3d/actors';
+import { dayOf } from '../../src/render3d/actors/day';
 import { fingerprint } from '../helpers/fingerprint';
 
 const grown = new Map<string, GameState>();
@@ -359,12 +360,62 @@ describe('G-05 · los actores', () => {
     for (const leg of measured) {
       const excess = (leg.chords - leg.ground) / leg.ground;
       const label = `${(excess * 100).toFixed(1)} % de exceso sobre ${leg.ground.toFixed(2)} celdas`;
-      // Por debajo, la cuerda entre dos muestras corta las esquinas y sale algo
-      // corta. Por arriba, el barrido del carril. Las dos son geometría y las
-      // dos son pequeñas; un reparto de ruta equivocado se sale de largo.
-      expect(excess, label).toBeGreaterThan(-0.05);
+      // Dos cosas separan las dos cifras y las dos son geometría: la cuerda
+      // entre dos muestras corta las esquinas, y el carril barre un arco al
+      // girarlas. Ninguna llega al quince por ciento. Un reparto de ruta
+      // equivocado da un tercio, y puede darlo en cualquier sentido.
+      expect(excess, label).toBeGreaterThan(-0.06);
       expect(excess, label).toBeLessThan(0.15);
     }
+  });
+
+  it('correr las semanas no teletransporta a nadie', () => {
+    // El fallo que esto guarda se vio jugando, no en una prueba: a x16 la gente
+    // parpadeaba por el valle. La jornada estaba sorteada con el tick, y un tick
+    // dura quince segundos reales mientras que un dia escenico dura ciento
+    // veinte, asi que el plan de cada uno se rehacia ocho veces por dia a x1 y
+    // ciento veintiocho a x16. Cada rehecho era un salto.
+    //
+    // A x16 pasa cerca de un tick por segundo escenico. Se simula eso: avanzar
+    // la semana mientras el dia escenico corre, y mirar si alguien salta.
+    const state = village(10);
+    const memory = createActorMemory();
+    let biggest = 0;
+    let previous = new Map<VillagerId, { x: number; z: number }>();
+    for (let step = 0; step <= 240; step += 1) {
+      const seconds = (step / 240) * SCENIC_DAY_SECONDS;
+      // Una semana por segundo escenico, que es el ritmo de x16.
+      const weeks = Math.floor(seconds);
+      while (state.tick < 480 + weeks) run(state, 1, 'prudent', CATALOG);
+
+      const now = new Map<VillagerId, { x: number; z: number }>();
+      for (const actor of actorsFor(state, frameAt(seconds), { memory })) {
+        now.set(actor.id, { x: actor.x, z: actor.z });
+        const was = previous.get(actor.id);
+        if (was !== undefined) {
+          biggest = Math.max(biggest, Math.hypot(actor.x - was.x, actor.z - was.z));
+        }
+      }
+      previous = now;
+    }
+    // Medio segundo escenico de camino a paso vivo es una celda escasa. Lo que
+    // esto tiene que cazar es un salto de valle a valle, no un paso largo.
+    expect(biggest, `el mayor salto es ${biggest.toFixed(2)} celdas`).toBeLessThan(2);
+  });
+
+  it('la jornada de alguien no cambia por dentro del dia', () => {
+    // La propiedad de la que cuelga lo anterior: dentro de un mismo dia
+    // escenico, el plan es el mismo aunque pasen semanas.
+    const person = village(10).people.villagers[0];
+    expect(person).toBeDefined();
+    if (person === undefined) return;
+    const same = dayOf(person, 500, 3);
+    for (const tick of [500, 501, 520, 900]) {
+      expect(dayOf(person, tick, 3).leave).toBe(same.leave);
+      expect(dayOf(person, tick, 3).arrive).toBe(same.arrive);
+    }
+    // Y cambia al amanecer siguiente, que es lo que le da variedad.
+    expect(dayOf(person, 500, 4).leave).not.toBe(same.leave);
   });
 
   it('no salen más de los que caben, y el seguido va primero', () => {

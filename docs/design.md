@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.22** | 10 sep 2026 | Tres fallos vistos jugando la demo de G-06 | **La jornada de un aldeano pertenece al día escénico, no a la semana.** El plan se sorteaba con el tick, que dura quince segundos frente a los ciento veinte del día, así que se rehacía ocho veces por día a ×1 y ciento veintiocho a ×16: cada rehecho era un teletransporte, y a velocidad alta la gente parpadeaba por el valle. El destino se congela también al amanecer, porque el motor reasigna el 6,7 % de las persona-semanas con saltos de nueve celdas de mediana; el tráfico y la economía siguen siendo del motor, lo único que cambia es cuándo se entera el actor. Es el estado efímero que D.6 ya concedía. Y el puesto de trabajo se reparte por la huella de la parcela en vez de amontonar a todo el mundo en la celda final de la ruta, formando parte de la ruta y no como un desvío al llegar. |
 | **3.21** | 10 sep 2026 | Ejecución G-06 | **Una partida real produce una escena: el valle, el río, el bosque, treinta y cinco edificios y veinticinco aldeanos andando por él.** `createGraphicsRenderer` queda implementado entero, sin métodos vacíos: `pick` prioriza aldeano, edificio y terreno en ese orden, y `track` encuadra. La contabilidad de la escena vive separada de Three.js como un **plan** —función pura del estado— y un **diff**, que es lo que hace comprobable en la suite rápida lo que D.6 pide: que una ruina deje de ser una casa, que demoler retire sólo a ése, que talar mueva el suelo sin tocar un edificio y que otra partida se tire entera en vez de actualizarse. La propiedad de los recursos es explícita: la biblioteca posee geometría, materiales y clips, y un actor sólo su esqueleto y su mezclador, de modo que el primero que muere no se lleva por delante al resto. Los recursos aprobados se publican a `public/assets/valley3d/` con manifiesto y hash, y una prueba comprueba que lo publicado es lo que el catálogo aprobó. D.6.3 fija el encuadre de partida. Los edificios son cajas con tejado hasta que G-10 traiga el catálogo: lo que hay que juzgar ahora es si un valle de estas proporciones se lee desde arriba, y eso no necesita el arte final para leerse mal. |
 | **3.20** | 10 sep 2026 | Decisión del usuario sobre la escala | **Un aldeano mide 0,65 celdas, no dos.** La aldea se ve entera al entrar y la gente se ve muy pequeña; para el detalle se acerca la cámara. El número sale de lo construido: una casa ocupa dos por dos celdas y mide seis metros de lado, así que una celda son tres metros y una persona 0,65. A 390 px de ancho, seis píxeles. La receta sigue en metros y declara un `scale` que el generador aplica a las raíces antes de exportar, así que la zancada baja de 0,95 a 0,32 sin tocar una sola clave. Arrastra la recalibración del día escénico a 120 s (D.6.1) y convierte los umbrales de la auditoría de animación en proporción del alto del recurso: en unidades absolutas denunciaban clips que no habían cambiado. |
 | **3.19** | 10 sep 2026 | Ejecución G-05 | **Hay reloj de presentación y actores derivados: el piloto ya sabe qué hace cada aldeano en cada instante.** El reloj es dueño único del tiempo escénico, no toca el acumulador del motor, congela en pausa, suspende con la pestaña oculta y marca `discontinuity` cuando un letargo trae semanas de golpe. Los actores son función pura del estado y el instante: no guardan ruta, así que una muerte o una mudanza no pueden dejar a nadie andando un camino viejo. **El clip lo mueve el suelo recorrido y no el reloj**, que es lo que impide que los pies patinen, y eso obligó a calibrar el día escénico (D.6.1) en sesenta segundos. Por el camino, tres defectos que el render de Canvas también tiene: el reparto de la ruta iba por índice de celda y el aldeano aceleraba en las diagonales; el desvío del carril giraba de golpe en cada esquina; y un crío «jugando» se movía a doce veces la velocidad a la que nadie anda. |
@@ -8269,6 +8270,40 @@ Y se ajusta **proyectando las esquinas de esa caja** al espacio de la cámara, n
 por el radio de la escena. Una zona rectangular vista en isométrica no es un
 círculo sino un rombo mucho más ancho que alto, y ajustar por radio deja
 márgenes que no hacen falta.
+
+#### D.6.4 · La jornada pertenece al día, no a la semana (v3.22)
+
+Tres fallos vistos jugando la demo, dos de ellos con la misma causa.
+
+**El plan de la jornada se sortea con el día escénico, no con el tick.** Un tick
+es una semana y dura quince segundos reales; un día escénico dura ciento veinte.
+Sorteando con el tick, el plan de cada aldeano —a qué hora sale, a qué paso
+anda, cuándo vuelve— se rehacía **ocho veces por día escénico a ×1 y ciento
+veintiocho a ×16**, y cada rehecho lo teletransportaba a donde le tocara estar
+con el plan nuevo. Lo que se veía era gente parpadeando por el valle.
+
+**El destino se congela al amanecer.** El motor reasigna quién trabaja qué campo
+cada semana: medido, el 6,7 % de las persona-semanas cambia de destino, con
+saltos de nueve celdas de mediana. Alguien no cambia de opinión sobre qué campo
+está arando a media mañana, así que la decisión se toma al amanecer y dura el
+día. Lo que el motor reasigne durante la semana entra al día siguiente. **El
+tráfico y la economía no se tocan**: sigue decidiendo el motor, y esto sólo
+elige cuándo se entera.
+
+Esto es el «estado efímero de representación» que D.6 ya concedía a cada actor.
+No entra en el guardado, no produce recursos y se rehace solo al amanecer, en
+una partida nueva y en cualquier fotograma marcado como discontinuo. Quien no
+tenía destino al amanecer reposa en su casa y sale mañana: darle uno a media
+jornada lo hacía aparecer de golpe en el tajo, que es el mismo teletransporte
+por otra puerta.
+
+**Y el puesto de trabajo se reparte por la parcela.** Todos los que iban al mismo
+campo terminaban su ruta en la misma celda y trabajaban amontonados en un punto
+mientras el resto del campo quedaba vacío. Un campo mide tres por dos celdas, y
+lo que se reparte ahora es esa huella. El puesto **forma parte de la ruta**, no
+es un desvío añadido al llegar: contarlo aparte hacía que el suelo recorrido no
+cuadrara con el camino hasta en un veinte por ciento en un viaje corto, que es
+exactamente el patinaje que la zancada existe para evitar.
 
 ### D.9 Rendimiento: presupuesto antes de ampliar
 

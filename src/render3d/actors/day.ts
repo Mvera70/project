@@ -55,15 +55,29 @@ function stable(a: number, b: number): number {
   return (mixed % 100_003) / 100_003;
 }
 
-export function dayOf(person: Villager, tick: number): Day {
-  const leave = stable(person.id, tick) * DAY.LEAVE_SPAN;
+/**
+ * La jornada de una persona en un dia escenico.
+ *
+ * **Se sortea con el numero de dia escenico, no con el tick.** Es la clase de
+ * detalle que parece bookkeeping y no lo es: un tick es una semana y dura
+ * quince segundos reales, mientras que un dia escenico dura ciento veinte
+ * (D.6.1). Sorteando con el tick, el plan de cada aldeano —a que hora sale, a
+ * que paso anda, cuando vuelve— se rehacia ocho veces por dia a x1, y cada vez
+ * lo teletransportaba a donde le tocara estar con el plan nuevo. A x16 pasaba
+ * una vez por segundo, y lo que se veia era gente parpadeando por el valle.
+ *
+ * `tick` sigue haciendo falta, pero solo para la edad: cuantos anos tiene
+ * decide si su jornada es corta, y eso si es cosa de la semana.
+ */
+export function dayOf(person: Villager, tick: number, day: number): Day {
+  const leave = stable(person.id, day) * DAY.LEAVE_SPAN;
   // Each at their own pace. With a fixed journey, two who left together arrived
   // together, and the village marched in step.
-  const gait = 1 + (stable(person.id, tick + 977) - 0.5) * 2 * DAY.GAIT;
+  const gait = 1 + (stable(person.id, day + 977) - 0.5) * 2 * DAY.GAIT;
   const arrive = leave + DAY.TRAVEL * gait;
   const age = Math.floor((tick - person.bornTick) / TIME.WEEKS_PER_YEAR);
   const short = age < DAY.CHILD_UNDER || age >= DAY.ELDER_OVER;
-  const full = DAY.RETURN_EARLIEST + stable(tick, person.id) * DAY.RETURN_SPAN;
+  const full = DAY.RETURN_EARLIEST + stable(day, person.id) * DAY.RETURN_SPAN;
   const depart = short ? arrive + (full - arrive) * DAY.SHORT_DAY : full;
   return { leave, arrive, depart, home: depart + DAY.TRAVEL * gait };
 }

@@ -14,7 +14,7 @@ import {
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Object3D,
 } from 'three';
 import type { GameState, VillagerId } from '@engine/state';
-import { actorsFor, type Actor } from './actors';
+import { actorsFor, createActorMemory, type Actor } from './actors';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
   GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsTarget, GraphicsViewport,
@@ -86,6 +86,9 @@ export async function createGraphicsRenderer(
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
   let lastActors: Actor[] = [];
+  // D.6 · el estado efimero de los actores. Vive aqui, no en `GameState`, y se
+  // rehace al amanecer de cada dia escenico y en cada partida nueva.
+  const memory = createActorMemory();
   let mapWidth = 0;
   let mapHeight = 0;
   let disposed = false;
@@ -212,7 +215,7 @@ export async function createGraphicsRenderer(
 
       // Actors are derived every frame because they change every frame; the
       // village is not, because it changes a few times a year.
-      lastActors = actorsFor(state as GameState, frame, { tracked });
+      lastActors = actorsFor(state as GameState, frame, { tracked, memory });
       cast.show(lastActors);
 
       renderer.render(scene, camera);

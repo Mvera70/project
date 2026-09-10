@@ -11,12 +11,12 @@
 // death or a move never leave an actor walking an old path; nothing can, because
 // every path is worked out again from the state that is in front of us.
 
-import { DAY } from '@engine/balance';
+import { DAY, ENCOUNTER } from '@engine/balance';
 import { isHere } from '@engine/people/demography';
 import type { Building, GameState, Villager, VillagerId } from '@engine/state';
 import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
-import { dayPhase, SCENIC_DAY_SECONDS } from '../presentation-clock';
+import { dayNumber, dayPhase, SCENIC_DAY_SECONDS } from '../presentation-clock';
 import { clipTime, VILLAGER_CLIPS, type ClipName } from './clips';
 import { dayOf, energyOf, progressOf, stable, type Activity } from './day';
 
@@ -59,6 +59,37 @@ export interface ActorPlan {
   readonly routes: Map<VillagerId, number[]>;
 }
 
+/**
+ * Lo que un actor recuerda de su propia jornada. design.md D.6.
+ *
+ * D.6 dice que cada actor posee estado efimero de representacion, y esto es
+ * ese estado: **a donde decidio ir hoy**. No entra en el guardado, no produce
+ * recursos y se rehace solo al amanecer siguiente.
+ *
+ * Existe por un fallo que se vio jugando. El motor reasigna quien trabaja que
+ * campo cada semana, y el 6,7 % de las persona-semanas cambia de destino, con
+ * saltos de nueve celdas de mediana. A x1 eso son ocho reasignaciones por dia
+ * escenico; a x16, ciento veintiocho. Lo que se veia era gente cruzando el
+ * valle de un parpadeo cada pocos segundos.
+ *
+ * Alguien no cambia de opinion sobre que campo esta arando a media manana. La
+ * decision se toma al amanecer y dura el dia; lo que el motor reasigne durante
+ * la semana entra manana. El trafico y la economia no se tocan: es el motor
+ * quien decide, y esto solo elige cuando se entera.
+ *
+ * El duenno es quien pinta, no esta funcion, para que siga habiendo una manera
+ * de derivar actores sin memoria ninguna: las pruebas la usan asi.
+ */
+export interface ActorMemory {
+  game: string;
+  day: number;
+  routes: Map<VillagerId, number[]>;
+}
+
+export function createActorMemory(): ActorMemory {
+  return { game: '', day: -1, routes: new Map() };
+}
+
 interface Point { x: number; z: number }
 
 /** The cell a building sits on, taken at its middle. */
@@ -78,11 +109,10 @@ function cellPoint(cell: number, width: number): Point {
  * made of walkable cells, so a straight line between two consecutive centres
  * cannot leave them.
  */
-function along(cells: readonly number[], t: number, width: number, total: number): { at: Point; heading: number } {
-  if (cells.length === 0) return { at: { x: 0, z: 0 }, heading: 0 };
-  if (cells.length === 1 || total === 0) {
-    const only = cells[0] ?? 0;
-    return { at: cellPoint(only, width), heading: 0 };
+function along(line: readonly Point[], t: number, total: number): { at: Point; heading: number } {
+  if (line.length === 0) return { at: { x: 0, z: 0 }, heading: 0 };
+  if (line.length === 1 || total === 0) {
+    return { at: line[0] ?? { x: 0, z: 0 }, heading: 0 };
   }
   // Repartido por LONGITUD, no por indice de celda. Una ruta mezcla tramos
   // rectos y diagonales, que miden 1 y 1,41, asi que repartir por indice hace
@@ -90,13 +120,13 @@ function along(cells: readonly number[], t: number, width: number, total: number
   // el reloj del clip: el paso avanzaba dos tercios de lo que el cuerpo se
   // movia justo en esos tramos, que es exactamente lo que significa patinar.
   let want = Math.max(0, Math.min(1, t)) * total;
-  for (let index = 0; index + 1 < cells.length; index += 1) {
-    const from = cellPoint(cells[index] ?? 0, width);
-    const to = cellPoint(cells[index + 1] ?? 0, width);
+  for (let index = 0; index + 1 < line.length; index += 1) {
+    const from = line[index] ?? { x: 0, z: 0 };
+    const to = line[index + 1] ?? from;
     const dx = to.x - from.x;
     const dz = to.z - from.z;
     const step = Math.hypot(dx, dz);
-    if (want <= step || index + 2 === cells.length) {
+    if (want <= step || index + 2 === line.length) {
       const local = step === 0 ? 0 : Math.min(1, want / step);
       return {
         at: { x: from.x + dx * local, z: from.z + dz * local },
@@ -105,8 +135,7 @@ function along(cells: readonly number[], t: number, width: number, total: number
     }
     want -= step;
   }
-  const last = cells[cells.length - 1] ?? 0;
-  return { at: cellPoint(last, width), heading: 0 };
+  return { at: line[line.length - 1] ?? { x: 0, z: 0 }, heading: 0 };
 }
 
 /**
@@ -118,23 +147,23 @@ function along(cells: readonly number[], t: number, width: number, total: number
  * el carril deja de dar un tirón lateral al cambiar de tramo. Ese tirón era
  * medible: en una esquina el aldeano se desplazaba el doble de lo que avanzaba.
  */
-function headingAround(cells: readonly number[], t: number, width: number, total: number): number {
+function headingAround(line: readonly Point[], t: number, total: number): number {
   if (total === 0) return 0;
   const reach = Math.min(0.5, 0.9 / total);
-  const back = along(cells, t - reach, width, total).at;
-  const ahead = along(cells, t + reach, width, total).at;
+  const back = along(line, t - reach, total).at;
+  const ahead = along(line, t + reach, total).at;
   const dx = ahead.x - back.x;
   const dz = ahead.z - back.z;
-  if (dx === 0 && dz === 0) return along(cells, t, width, total).heading;
+  if (dx === 0 && dz === 0) return along(line, t, total).heading;
   return Math.atan2(dx, dz);
 }
 
 /** How long a route is, in cells. Feeds the clip phase, so the feet do not slide. */
-function lengthOf(cells: readonly number[], width: number): number {
+function lengthOf(line: readonly Point[]): number {
   let total = 0;
-  for (let index = 0; index + 1 < cells.length; index += 1) {
-    const from = cellPoint(cells[index] ?? 0, width);
-    const to = cellPoint(cells[index + 1] ?? 0, width);
+  for (let index = 0; index + 1 < line.length; index += 1) {
+    const from = line[index] ?? { x: 0, z: 0 };
+    const to = line[index + 1] ?? from;
     total += Math.hypot(to.x - from.x, to.z - from.z);
   }
   return total;
@@ -219,6 +248,30 @@ function workWander(
 /** Celdas por segundo escénico que da el ciclo de andar del aldeano. */
 const WALK_SPEED = (VILLAGER_CLIPS.walk.strideLength ?? 1) / VILLAGER_CLIPS.walk.seconds;
 
+interface Plot { x: number; z: number; w: number; h: number }
+
+/**
+ * El puesto de trabajo de uno entre los `count` que comparten la misma parcela.
+ *
+ * Todos los que van al mismo campo terminaban su ruta en la misma celda, asi
+ * que trabajaban amontonados en un punto mientras el resto del campo quedaba
+ * vacio. Una parcela es un edificio con huella —un campo mide tres por dos— y
+ * lo que se reparte es esa huella, no un circulo alrededor de una celda.
+ *
+ * El reparto es una rejilla, y el orden dentro de ella sale del identificador,
+ * asi que dos vecinos no se cambian de sitio de un fotograma al siguiente.
+ */
+function plotSpot(plot: Plot, slot: number, count: number): Point {
+  const columns = Math.max(1, Math.min(count, Math.round(Math.sqrt(count * (plot.w / Math.max(0.001, plot.h))))));
+  const rows = Math.max(1, Math.ceil(count / columns));
+  const column = slot % columns;
+  const row = Math.floor(slot / columns) % rows;
+  return {
+    x: plot.x + plot.w * ((column + 0.5) / columns),
+    z: plot.z + plot.h * ((row + 0.5) / rows),
+  };
+}
+
 /** Nobody strays further than the leash from where they are supposed to be. */
 function leash(point: Point, anchor: Point): Point {
   const dx = point.x - anchor.x;
@@ -266,21 +319,106 @@ function cast(state: GameState, tracked: VillagerId | null): Villager[] {
   return [...followed, ...rest.sort(byRank)].slice(0, MAX_ACTORS);
 }
 
+/**
+ * Donde trabaja alguien que ha llegado a `cell`.
+ *
+ * Si la celda es de una parcela, un puesto dentro de ella, repartido entre
+ * todos los que van al mismo sitio. Si no —un claro del bosque, la orilla del
+ * rio— un puesto en corro alrededor de la celda, que es lo unico que hay.
+ */
+function workSpot(
+  cell: number, id: VillagerId, width: number,
+  plots: Map<number, Plot>, sharing: Map<number, VillagerId[]>,
+): Point {
+  const group = sharing.get(cell) ?? [id];
+  const slot = Math.max(0, group.indexOf(id));
+  const plot = plots.get(cell);
+  if (plot !== undefined) return plotSpot(plot, slot, group.length);
+
+  const here = cellPoint(cell, width);
+  if (group.length <= 1) return here;
+  const angle = (slot / group.length) * Math.PI * 2;
+  const reach = ENCOUNTER.SPREAD * Math.sqrt(group.length);
+  return { x: here.x + Math.cos(angle) * reach, z: here.z + Math.sin(angle) * reach };
+}
+
+/**
+ * Las rutas de hoy: las del motor, congeladas al amanecer si hay memoria.
+ *
+ * Sin memoria devuelve las de este instante, que es lo que hacia antes y lo que
+ * las pruebas necesitan para ser puras. Con memoria, las del amanecer de hoy,
+ * salvo que el fotograma venga marcado como discontinuo: un letargo reconstruye
+ * desde el estado final y no tiene sentido honrar una decision de hace ochenta
+ * semanas.
+ */
+function routesFrom(
+  state: GameState, frame: GraphicsFrame, today: number, memory?: ActorMemory,
+): Map<VillagerId, number[]> {
+  const live = routesFor(state);
+  if (memory === undefined) return live;
+
+  const game = `${state.seed}:${state.terrainSeed}`;
+  if (memory.game !== game || memory.day !== today || frame.discontinuity) {
+    memory.game = game;
+    memory.day = today;
+    memory.routes = new Map(live);
+    return memory.routes;
+  }
+
+  // Quien no tenia destino al amanecer no lo tiene hoy: reposa en su casa y
+  // sale manana. Darselo a media jornada lo hacia aparecer de golpe en el tajo,
+  // a once celdas de donde estaba, que es el mismo teletransporte por otra
+  // puerta. Un dia en casa es una respuesta honesta; un salto no lo es.
+  //
+  // Y quien ya no esta se olvida, para que la memoria no crezca con los muertos
+  // de sesenta anos de partida.
+  for (const id of [...memory.routes.keys()]) {
+    if (!live.has(id)) memory.routes.delete(id);
+  }
+  return memory.routes;
+}
+
 export function actorsFor(
   state: GameState,
   frame: GraphicsFrame,
-  options: { tracked?: VillagerId | null; plan?: ActorPlan } = {},
+  options: { tracked?: VillagerId | null; plan?: ActorPlan; memory?: ActorMemory } = {},
 ): Actor[] {
   const width = state.map.width;
   const phase = dayPhase(frame.presentationSeconds);
-  const routes = options.plan?.routes ?? routesFor(state);
+  const today = dayNumber(frame.presentationSeconds);
+  const routes = options.plan?.routes ?? routesFrom(state, frame, today, options.memory);
   const standing = new Map(state.buildings.filter((building) => building.lostTick === null)
     .map((building) => [building.id, centre(building, width)]));
+
+  // Que parcela ocupa cada celda, para saber donde puede repartirse la gente.
+  const plots = new Map<number, Plot>();
+  for (const building of state.buildings) {
+    if (building.lostTick !== null) continue;
+    const plot: Plot = { x: building.x, z: building.y, w: building.w, h: building.h };
+    for (let row = 0; row < building.h; row += 1) {
+      for (let column = 0; column < building.w; column += 1) {
+        plots.set((building.y + row) * width + building.x + column, plot);
+      }
+    }
+  }
+
+  // Quien comparte destino con quien. Se cuenta una vez, sobre los destinos y
+  // no sobre las posiciones, porque el destino no cambia durante la jornada.
+  const sharing = new Map<number, VillagerId[]>();
+  for (const [id, cells] of routes) {
+    const last = cells[cells.length - 1];
+    if (last === undefined) continue;
+    const group = sharing.get(last);
+    if (group === undefined) sharing.set(last, [id]);
+    else group.push(id);
+  }
+  for (const group of sharing.values()) group.sort((a, b) => a - b);
+
   const actors: Actor[] = [];
 
   for (const person of cast(state, options.tracked ?? null)) {
     const cells = routes.get(person.id);
-    const day = dayOf(person, state.tick);
+    const day = dayOf(person, state.tick, today);
 
     // D.6 · no reachable destination is not an excuse to invent a workshop.
     // Someone with nowhere to go rests where they are, and the frame says so.
@@ -299,12 +437,18 @@ export function actorsFor(
     }
 
     const { activity, along: progress } = progressOf(day, phase);
-    const total = lengthOf(cells, width);
-    const anchorCell = activity === 'working' || activity === 'returning'
-      ? cells[cells.length - 1] ?? 0
-      : cells[0] ?? 0;
-    const anchor = cellPoint(anchorCell, width);
-
+    // El camino termina **en su puesto**, no en la celda de destino.
+    //
+    // El puesto se sabe antes de salir de casa, asi que forma parte de la ruta
+    // en vez de ser un desvio anadido al final. Con el desvio anadido, al
+    // llegar se daba un salto de dos celdas; y contarlo aparte hacia que el
+    // suelo recorrido no cuadrara con el camino, hasta un veinte por ciento en
+    // un viaje corto, que es exactamente el patinaje que la zancada evita.
+    const target = cells[cells.length - 1] ?? 0;
+    const spot = workSpot(target, person.id, width, plots, sharing);
+    const line = cells.map((cell) => cellPoint(cell, width));
+    if (line.length > 0) line[line.length - 1] = spot;
+    const total = lengthOf(line);
     let point: Point;
     let facing: number;
     let travelled: number;
@@ -313,13 +457,12 @@ export function actorsFor(
       const span = Math.max(1e-6, day.depart - day.arrive);
       const through = (phase - day.arrive) / span;
       const wander = workWander(person, state.tick, through, span * SCENIC_DAY_SECONDS);
-      const spot = cellPoint(cells[cells.length - 1] ?? 0, width);
-      point = leash({ x: spot.x + wander.offset.x, z: spot.z + wander.offset.z }, anchor);
+      point = leash({ x: spot.x + wander.offset.x, z: spot.z + wander.offset.z }, spot);
       facing = wander.heading;
       travelled = wander.travelled;
     } else if (activity === 'walking' || activity === 'returning') {
-      const step = along(cells, progress, width, total);
-      const heading = headingAround(cells, progress, width, total);
+      const step = along(line, progress, total);
+      const heading = headingAround(line, progress, total);
       const side = lane(heading, person.id, window(progress), total);
       point = { x: step.at.x + side.x, z: step.at.z + side.z };
       // Going home is going the other way, so the figure turns round.
@@ -334,8 +477,8 @@ export function actorsFor(
     } else {
       // At home or on the doorstep. Facing outwards, along the first step of
       // the journey, so that stepping out is a step and not a spin.
-      point = cellPoint(cells[0] ?? 0, width);
-      facing = headingAround(cells, 0, width, total);
+      point = line[0] ?? { x: 0, z: 0 };
+      facing = headingAround(line, 0, total);
       travelled = 0;
     }
 
