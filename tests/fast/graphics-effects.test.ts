@@ -433,15 +433,57 @@ describe('G-10 · la luz de las casas', () => {
       );
       expect(home).toBeDefined();
       if (home === undefined) continue;
-      // El punto que da el 2D está dentro de las paredes; el de la escena, en
-      // la fachada, que es la cara de -Y donde la receta pone puerta y ventanas.
+      // El punto que da el 2D está dentro de las paredes; el de la escena está
+      // pegado por fuera, en la cara que esté libre. Cuál de las cuatro depende
+      // de si el vecino está pegado, así que no se comprueba cuál: se comprueba
+      // que está fuera y a un palmo.
       expect(tell.y).toBeGreaterThan(home.y);
+      const near = (thing: { position: { x: number; z: number } }): boolean =>
+        thing.position.x > home.x - 0.5 && thing.position.x < home.x + home.w + 0.5
+        && thing.position.z > home.y - 0.5 && thing.position.z < home.y + home.h + 0.5;
+      const outside = (thing: { position: { x: number; z: number } }): boolean =>
+        thing.position.x < home.x || thing.position.x > home.x + home.w
+        || thing.position.z < home.y || thing.position.z > home.y + home.h;
+      // Y si las cuatro caras están ocupadas —en esta aldea las casas se
+      // tocan— la luz se va por encima de los tejados, que desde ahí se ve
+      // siempre. Lo que no puede es quedarse enterrada a media pared.
       const lit = tells.group.children.some(
-        (thing) => Math.abs(thing.position.x - (home.x + home.w / 2)) < 0.01
-          && thing.position.z < home.y
-          && thing.position.z > home.y - 0.5,
+        (thing) => thing.userData.lamp !== undefined && near(thing)
+          && (outside(thing) || thing.position.y > 1.5),
       );
       expect(lit).toBe(true);
+    }
+    tells.dispose();
+  });
+});
+
+describe('G-10 · ninguna señal enterrada', () => {
+  it('toda señal se ve: o fuera de las paredes, o por encima del tejado', () => {
+    // La lección de la ronda, convertida en aserto. `tellsFor` da posiciones en
+    // coordenadas de mapa, pensadas para un dibujo plano donde la casa es una
+    // mancha. Aquí la casa es un volumen, y cuatro señales de seis caían dentro
+    // de sus paredes: estaban en la escena y no se veían.
+    //
+    // Lo que esto impide es que nazca la quinta.
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+    expect(tells.count).toBeGreaterThan(0);
+
+    // Lo alto que llega el caballete de lo más alto del valle, en celdas. Por
+    // encima de eso ya no hay nada que tape.
+    const OVER_THE_ROOFS = 1.5;
+    const standing = state.buildings.filter((building) => building.lostTick === null);
+
+    for (const mark of tells.group.children) {
+      const { x, y, z } = mark.position;
+      if (y >= OVER_THE_ROOFS) continue;
+      const buried = standing.some(
+        (building) => x > building.x && x < building.x + building.w
+          && z > building.y && z < building.y + building.h,
+      );
+      expect(buried, `una señal en (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}) está dentro de un edificio`)
+        .toBe(false);
     }
     tells.dispose();
   });

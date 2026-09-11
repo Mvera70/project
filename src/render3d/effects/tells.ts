@@ -25,6 +25,8 @@ const HEIGHT = {
   smoke: 1.55,
   light: 0.47,
   plague: 1.62,
+  // Justo sobre el caballete, para la luz que no encuentra fachada libre.
+  roofGlow: 1.42,
   candles: 0.42,
   banner: 1.1,
   grain: 0.05,
@@ -59,6 +61,33 @@ function signatureOf(tells: readonly Tell[]): string {
     if (tell.kind === 'banner') return `${at}:${tell.colour}`;
     return at;
   }).join('|');
+}
+
+/**
+ * Un punto justo fuera del edificio, en una cara que no tape nadie.
+ *
+ * La fachada —la cara de -Y, donde la receta pone la puerta— es la primera
+ * opción, pero en este valle **las casas se tocan**: la de delante puede estar
+ * pegada, y entonces la luz cae dentro de su pared trasera y vuelve a estar
+ * enterrada. Se prueban las cuatro caras y se elige la que esté libre.
+ *
+ * Si no hay ninguna libre, no hay sitio en el suelo: la señal se va por encima
+ * de los tejados, que desde ahí se ve siempre.
+ */
+const FACES = [[0, -1], [1, 0], [-1, 0], [0, 1]] as const;
+const CLEAR = 0.12;
+
+function outsideOf(
+  home: Building, at: (x: number, y: number) => Building | undefined,
+): { x: number; z: number; free: boolean } {
+  const x = home.x + home.w / 2;
+  const z = home.y + home.h / 2;
+  for (const [dx, dz] of FACES) {
+    const px = dx === 0 ? x : home.x + (dx > 0 ? home.w + CLEAR : -CLEAR);
+    const pz = dz === 0 ? z : home.y + (dz > 0 ? home.h + CLEAR : -CLEAR);
+    if (at(px, pz) === undefined) return { x: px, z: pz, free: true };
+  }
+  return { x, z, free: false };
 }
 
 /** Un cuerpo pequeño que no proyecta sombra: es una señal, no un objeto. */
@@ -123,10 +152,21 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
       // puerta y las ventanas. La casa se busca por el punto, y si no aparece
       // —porque alguien mueva el ancla del 2D— se deja donde venía, que es peor
       // pero no es un fallo.
-      const home = at?.(tell.x, tell.y);
-      const x = home === undefined ? tell.x : home.x + home.w / 2;
-      const z = home === undefined ? tell.y : home.y - 0.12;
-      const lit = mark(new BoxGeometry(0.7, 0.42, 0.06), TONE.light, true, x, HEIGHT.light, z, 0.85);
+      const home = at === undefined ? undefined : at(tell.x, tell.y);
+      const spot = home === undefined
+        ? { x: tell.x, z: tell.y, free: true }
+        : outsideOf(home, at as (x: number, y: number) => Building | undefined);
+      // Sin cara libre, la luz sube al caballete: encerrada entre dos casas no
+      // la ve nadie, y la señal existe para verse. Arriba es **un resplandor
+      // pequeño y no la ventana**: una ventana de tres metros flotando sobre el
+      // tejado se lee como un panel encendido, no como una casa habitada. Lo
+      // que sale por el caballete de una casa medieval es la luz del hogar por
+      // el agujero del humo, y eso es del tamaño de un puño.
+      const height = spot.free ? HEIGHT.light : HEIGHT.roofGlow;
+      const shape = spot.free
+        ? new BoxGeometry(0.7, 0.42, 0.06)
+        : new BoxGeometry(0.22, 0.1, 0.22);
+      const lit = mark(shape, TONE.light, true, spot.x, height, spot.z, 0.85);
       lit.object.userData.lamp = 0.85;
       return [lit];
     }
@@ -138,13 +178,15 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
     case 'candles': {
       // Las velas se ponen en la fachada de la capilla por el mismo motivo que
       // la luz: dentro no las ve nadie.
-      const chapel = at?.(tell.x, tell.y);
-      const x = chapel === undefined ? tell.x : chapel.x + chapel.w / 2;
-      const z = chapel === undefined ? tell.y : chapel.y - 0.1;
+      const chapel = at === undefined ? undefined : at(tell.x, tell.y);
+      const spot = chapel === undefined
+        ? { x: tell.x, z: tell.y, free: true }
+        : outsideOf(chapel, at as (x: number, y: number) => Building | undefined);
+      const height = spot.free ? HEIGHT.candles : HEIGHT.roofGlow;
       return Array.from({ length: Math.max(1, Math.min(5, tell.count)) }, (_, index) => {
         const candle = mark(
           new BoxGeometry(0.05, 0.16, 0.05), TONE.candles, true,
-          x + (index - 2) * 0.13, HEIGHT.candles, z, 0.95,
+          spot.x + (index - 2) * 0.13, height, spot.z, 0.95,
         );
         candle.object.userData.lamp = 0.95;
         return candle;
@@ -161,13 +203,17 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
       // Y sube **delante** del granero, no en su centro: en el centro quedaba
       // debajo del granero, que va sobre postes, y desde arriba no se veía
       // crecer nada. Delante es donde se apila el grano de todas formas.
-      const barn = at?.(tell.x + 1, tell.y + 1);
+      const barn = at === undefined ? undefined : at(tell.x + 1, tell.y + 1);
       const tall = Math.max(0.04, tell.fraction * 0.5);
-      const x = barn === undefined ? tell.x + 1 : barn.x + barn.w / 2;
-      const z = barn === undefined ? tell.y + 1 : barn.y - 0.42;
+      const spot = barn === undefined
+        ? { x: tell.x + 1, z: tell.y + 1, free: true }
+        : outsideOf(barn, at as (x: number, y: number) => Building | undefined);
+      // El montón no se va al tejado cuando no hay cara libre: se queda pegado
+      // al granero, que va sobre postes y por debajo se ve algo. Un montón de
+      // grano flotando sobre el caballete no sería una señal, sería un error.
       return [mark(
         new BoxGeometry(1.15, tall, 0.6), TONE.grain, false,
-        x, HEIGHT.grain + tall / 2, z,
+        spot.x, HEIGHT.grain + tall / 2, spot.z,
       )];
     }
     default:
