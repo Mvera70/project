@@ -64,6 +64,14 @@ agente puede saldar.
 capturas automáticas, va antes que M-17.** No es orden de conveniencia, es la
 mitigación del riesgo número uno de `valle.md` §12.
 
+**Programa gráfico (anexo D) en marcha, en paralelo y sin tocar el juego.**
+G-00 a G-03 cerradas y P1 decidida (`e7ab614`): las dos direcciones se quedan
+como dos materiales de casa dentro de un mismo estilo. **G-04 quedó a medias
+cuando el equipo que la ejecutaba se volvió inalcanzable el 11 sep 2026**, con
+la rama `graphics/g-04-villager-rig` sin publicar. El cierre, lo que hay en
+riesgo y el orden de recuperación están en
+`docs/graphics-rounds/G-04-INTERRUMPIDA.md`.
+
 ### Lo que está fuera de banda, y por qué se deja así
 
 | Métrica | Medido | §12.9 |
@@ -91,8 +99,11 @@ Dos motivos, y ninguno es que el balance esté resuelto:
 - **El hito 0 sigue sin juez**, y una crónica se lee mejor cuando existe el
   valle que la acompaña.
 
-Antes de empezar, dos arreglos de una línea que la v2.47 dejó decididos y sin
-aplicar: `forest_cut` con `forestLeft > 0.12` y `relic_pedlar` sin tope de fe.
+~~Antes de empezar, dos arreglos de una línea que la v2.47 dejó decididos y sin
+aplicar: `forest_cut` con `forestLeft > 0.12` y `relic_pedlar` sin tope de fe.~~
+**Hechos.** Comprobado el 11 sep 2026: ambos entraron en `8680956`.
+`forest_cut` lleva el `> 0.12` en `catalog/forest.ts:20`, y `relic_pedlar` sólo
+conserva el suelo `faith > 30`, sin tope. No hay nada que aplicar aquí.
 
 ---
 
