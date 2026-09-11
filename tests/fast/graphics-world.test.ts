@@ -14,7 +14,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { run } from '@engine/sim';
+import { ford, run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { actorsFor } from '../../src/render3d/actors';
 import { loadAssets } from '../../src/render3d/assets';
@@ -24,9 +24,10 @@ import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 't
 import type { Actor } from '../../src/render3d/actors';
 import type { LoadedAsset } from '../../src/render3d/assets';
 import { BUILDINGS } from '@engine/balance';
-import type { BuildingKind } from '@engine/state';
+import { TERRAIN_CODE, type BuildingKind } from '@engine/state';
 import { BUILDING_ASSETS } from '../../src/render3d/world/buildings';
 import { Cast } from '../../src/render3d/world/cast';
+import { buildFord, fordCells } from '../../src/render3d/world/ford';
 import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
 import { buildForest, shoreCells } from '../../src/render3d/world/forest';
@@ -758,5 +759,47 @@ describe('G-10 · lo que pisa el valle sigue su cota', () => {
     const [onPath, onGrass] = cast.group.children;
     expect(onPath?.position.y).toBeLessThan(onGrass?.position.y ?? 0);
     cast.dispose();
+  });
+});
+
+describe('G-10 · el vado', () => {
+  it('cruza el agua y llega a tierra firme', () => {
+    // El motor sabe dónde está el vado desde M-10 y en la escena no había nada
+    // ahí: el río se cruzaba por el aire.
+    const state = village(14);
+    const at = ford(state);
+    const cells = fordCells(state.map, at.x, at.y);
+    expect(cells.length).toBeGreaterThan(0);
+    for (const cell of cells) expect(state.map.terrain[cell]).toBe(TERRAIN_CODE.water);
+
+    // En línea recta, sin saltos: un vado torcido no es un vado.
+    const steps = new Set(cells.slice(1).map((cell, index) => cell - (cells[index] ?? 0)));
+    expect(steps.size).toBeLessThanOrEqual(1);
+  });
+
+  it('donde no se cruza a ninguna parte no pone piedras', () => {
+    // Mejor ningún vado que uno que no lleva al otro lado.
+    const state = village(14);
+    const sea = structuredClone(state);
+    sea.map.terrain.fill(TERRAIN_CODE.water);
+    const built = buildFord(sea.map, 10, 10, () => new Group());
+    expect(built.count).toBe(0);
+    built.dispose();
+  });
+
+  it('el vado que dibuja la escena es el que dice el motor', () => {
+    // Calcularlo aquí sería tener dos vados, y en este proyecto ya hay uno de
+    // más: `render/gatherings.ts` tiene su propia conjetura y apunta a otro
+    // sitio.
+    const state = village(14);
+    const at = ford(state);
+    const built = buildFord(state.map, at.x, at.y, () => new Group());
+    expect(built.count).toBe(fordCells(state.map, at.x, at.y).length);
+    expect(built.count).toBeGreaterThan(0);
+    for (const slab of built.group.children) {
+      expect(state.map.terrain[Math.round(slab.position.z) * state.map.width + Math.round(slab.position.x)])
+        .toBe(TERRAIN_CODE.water);
+    }
+    built.dispose();
   });
 });

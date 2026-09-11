@@ -13,6 +13,7 @@ import {
   Color, DirectionalLight, Fog, Group, HemisphereLight, PCFSoftShadowMap,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Object3D,
 } from 'three';
+import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
 import { paletteFor } from '@render/palette';
 import { createValleyCamera } from './camera';
@@ -25,6 +26,7 @@ import type {
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, type Ground } from './world/ground';
+import { buildFord, type Ford } from './world/ford';
 import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
@@ -38,6 +40,7 @@ const VILLAGER = 'villager';
 const TREE = 'tree';
 const ROCK = 'rock';
 const REED = 'reed';
+const FORD = 'ford-stone';
 
 /**
  * Las clases de §7.7, cada una con su recurso. El nombre del recurso es el de
@@ -54,7 +57,7 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
  * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
  */
 export const WANTED = [
-  VILLAGER, TREE, ROCK, REED, 'hoe', 'bundle', 'field-cut', 'ruin-wood', 'ruin-stone',
+  VILLAGER, TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
@@ -170,6 +173,7 @@ export async function createGraphicsRenderer(
   let forest: Forest | null = null;
   let stones: Forest | null = null;
   let reeds: Forest | null = null;
+  let crossing: Ford | null = null;
   let plan: ScenePlan | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
@@ -249,7 +253,7 @@ export async function createGraphicsRenderer(
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
-    for (const scattered of [forest, stones, reeds]) {
+    for (const scattered of [forest, stones, reeds, crossing]) {
       if (scattered === null) continue;
       world.remove(scattered.group);
       scattered.dispose();
@@ -257,6 +261,7 @@ export async function createGraphicsRenderer(
     forest = null;
     stones = null;
     reeds = null;
+    crossing = null;
 
     const sapling = library.get(TREE);
     if (sapling !== undefined) {
@@ -277,6 +282,11 @@ export async function createGraphicsRenderer(
       reeds.group.name = 'Valley_Reeds';
       world.add(reeds.group);
     }
+    // El vado. Donde esta lo dice el motor, que es quien lo define: calcularlo
+    // aqui seria tener dos vados, y ya hay uno de mas en el render 2D.
+    const crossingAt = ford(state);
+    crossing = buildFord(state.map, crossingAt.x, crossingAt.y, () => library.instance(FORD));
+    world.add(crossing.group);
     // Todo lo que pisa el valle pregunta al suelo por su cota. Antes no hacia
     // falta porque el suelo era plano.
     const map = state.map;
@@ -426,7 +436,7 @@ export async function createGraphicsRenderer(
         ground.dispose();
         ground = null;
       }
-      for (const scattered of [forest, stones, reeds]) {
+      for (const scattered of [forest, stones, reeds, crossing]) {
         if (scattered === null) continue;
         world.remove(scattered.group);
         scattered.dispose();
@@ -434,6 +444,7 @@ export async function createGraphicsRenderer(
       forest = null;
       stones = null;
       reeds = null;
+      crossing = null;
       if (!borrowed) library.dispose();
       lastActors = [];
       renderer.dispose();

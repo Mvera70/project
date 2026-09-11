@@ -444,8 +444,14 @@ function centreOf(b: { x: number; y: number; w: number; h: number }): { x: numbe
  * The landward end of the ford road: walkable ground beside water, nearest the
  * village core, then lower cell index. Paths cannot occupy water (§7.6), so a
  * literal "path cell crossing the river" cannot exist in this map model.
+ *
+ * Exported because the 3D render draws stepping stones there, and G-10 found
+ * out the hard way what happens when a place the fiction names is worked out
+ * twice: `render/gatherings.ts` has its own guess and it is a different place.
+ * This is the one the game means — where strangers arrive, where the wolves are
+ * hunted from. It reads the state and writes nothing.
  */
-function ford(state: GameState): { x: number; y: number } {
+export function ford(state: GameState): { x: number; y: number } {
   const core = valleyCore(state);
   let best = -1;
   let bestDistance = Number.POSITIVE_INFINITY;

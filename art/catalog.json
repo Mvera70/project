@@ -1976,6 +1976,63 @@
         "source": "Original bundle authored for The Valley G-10",
         "license": "Project original"
       }
+    },
+    {
+      "id": "ford-stone",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/ford-stone/ford-stone.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T01-33-46-140Z-46784",
+        "directory": "artifacts/graphics/G-10/approved/dae1d742c7d0ac91"
+      },
+      "bounds": {
+        "min": [
+          0.11209,
+          0,
+          -0.84
+        ],
+        "max": [
+          0.966667,
+          0.106667,
+          -0.233333
+        ],
+        "size": [
+          0.854577,
+          0.106667,
+          0.606667
+        ]
+      },
+      "recipeSha256": "8F3C7CA66F6F45F6B9C18AFBE1C78CACD5C2A14E8356E39AA9F8D3548935D427",
+      "materials": [
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 44
+      },
+      "hashes": {
+        "ford-stone.blend": "F1C59CA65E00D5494D97C864DDC8D8A28E04223438FD47D5835265DCE8ACB591",
+        "ford-stone.glb": "DAE1D742C7D0AC9170098D2EE71D850446D5D43C2236289852B0084A5587880B",
+        "ford-stone-blender.png": "94406C09E38655D2B15BC3968C9AD8B5BCC4C8D4613C3FB949469F66E5DC8839",
+        "capture-1.png": "259600A19A59832B355AFB86C377DCCF9098BDEA339AF50D88B39C8B9FF5F87D",
+        "capture-1-gray.png": "C8D0936A3D17AB79A5FB6B4AF248E3C1529B095795A8B2C5200C657E3C06A80F",
+        "capture.json": "D10491D6559761A83D8E07A458D959E64E05FD031AF976A5CA62B845E9C07573",
+        "build.json": "02542598BFB6759DC0ED21E4A5FB557833902DC961F0F35FA4776A4E3D98BD95",
+        "validation.json": "C99FED436AF85F7DFA3C8310DC619A5D70DBFFE660284D21033882E9F33BCC98"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original ford-stone authored for The Valley G-10",
+        "license": "Project original"
+      }
     }
   ]
 }

@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "id": "ford-stone",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "ford-stone",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10. Losa de paso del vado. El motor sabe donde esta el vado desde M-10 -es donde llegan los forasteros y de donde sale la caceria del lobo- y en la escena no habia nada ahi: el rio se cruzaba por el aire."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 1.0
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Ford_Slab",
+      "location": [
+        1.5,
+        1.5,
+        0.16
+      ],
+      "dimensions": [
+        1.9,
+        1.5,
+        0.32
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ford_Chip",
+      "location": [
+        2.5,
+        1.05,
+        0.1
+      ],
+      "dimensions": [
+        0.8,
+        0.7,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ford_Round",
+      "location": [
+        0.7,
+        2.1,
+        0.11
+      ],
+      "radius": 0.42,
+      "depth": 0.22,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      2.4,
+      -3.0,
+      1.92
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.2
+    ],
+    "orthoScale": 3.36,
+    "worldRole": "sky"
+  }
+}
