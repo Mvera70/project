@@ -111,6 +111,19 @@ export class Cast {
   }
 
   /**
+   * Que cota tiene el suelo en cada punto.
+   *
+   * Lo pone quien construye el valle, y cambia cuando cambia el terreno. Por
+   * defecto el suelo es plano, que es lo que era hasta que el rio tuvo cauce:
+   * sin esto un aldeano flota sobre el camino hundido y se mete en la orilla.
+   */
+  standOn(ground: (x: number, z: number) => number): void {
+    this.ground = ground;
+  }
+
+  private ground: (x: number, z: number) => number = () => 0;
+
+  /**
    * Put the stage in the state these actors describe.
    *
    * Whoever is not in the list goes: D.6 asks that a death or a departure remove
@@ -138,7 +151,7 @@ export class Cast {
         this.group.add(object);
       }
 
-      player.object.position.set(actor.x, 0, actor.z);
+      player.object.position.set(actor.x, this.ground(actor.x, actor.z), actor.z);
       player.object.rotation.set(0, actor.facing, 0);
       // La talla se pone en cada pasada y no al crear: un nino cumple anos sin
       // dejar de ser el mismo actor, y tiene que ir creciendo.

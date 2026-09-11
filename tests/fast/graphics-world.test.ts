@@ -30,7 +30,7 @@ import { Cast } from '../../src/render3d/world/cast';
 import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
 import { buildForest, shoreCells } from '../../src/render3d/world/forest';
-import { buildGround, cellColour } from '../../src/render3d/world/ground';
+import { buildGround, cellColour, elevationAt } from '../../src/render3d/world/ground';
 import type { PlannedBuilding } from '../../src/render3d/world/plan';
 import { groundSignature, isQuiet, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
@@ -729,5 +729,34 @@ describe('G-10 · nieva en los tejados', () => {
     });
     expect(original).toBe('c7984a');
     built.dispose();
+  });
+});
+
+describe('G-10 · lo que pisa el valle sigue su cota', () => {
+  it('un aldeano no flota sobre el camino hundido', () => {
+    // En cuanto el suelo dejó de ser plano dejó de valer ponerlo todo a cero.
+    const state = village(14);
+    const model = (): Object3D => {
+      const group = new Group();
+      group.add(new Mesh(new BoxGeometry(0.2, 0.6, 0.2), new MeshStandardMaterial()));
+      return group;
+    };
+    const person = (id: number, x: number, z: number): Actor => ({
+      id: id as Actor['id'], x, z, facing: 0, activity: 'resting',
+      clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named: false, age: 30,
+    });
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);
+    cast.standOn((x, z) => elevationAt(state.map, x, z));
+
+    const worn = state.map.path.findIndex((wear, cell) => wear >= 2 && state.map.terrain[cell] === 0);
+    const bare = state.map.terrain.findIndex((kind, cell) => kind === 0 && (state.map.path[cell] ?? 0) === 0);
+    expect(worn).toBeGreaterThanOrEqual(0);
+    const at = (cell: number): [number, number] => [
+      (cell % state.map.width) + 0.5, Math.floor(cell / state.map.width) + 0.5,
+    ];
+    cast.show([person(1, ...at(worn)), person(2, ...at(bare))]);
+    const [onPath, onGrass] = cast.group.children;
+    expect(onPath?.position.y).toBeLessThan(onGrass?.position.y ?? 0);
+    cast.dispose();
   });
 });

@@ -24,7 +24,7 @@ import type {
   GraphicsViewport,
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
-import { buildGround, type Ground } from './world/ground';
+import { buildGround, elevationAt, type Ground } from './world/ground';
 import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
@@ -277,6 +277,12 @@ export async function createGraphicsRenderer(
       reeds.group.name = 'Valley_Reeds';
       world.add(reeds.group);
     }
+    // Todo lo que pisa el valle pregunta al suelo por su cota. Antes no hacia
+    // falta porque el suelo era plano.
+    const map = state.map;
+    const floor = (x: number, z: number): number => elevationAt(map, x, z);
+    cast.standOn(floor);
+    fauna.standOn(floor);
     mapWidth = state.map.width;
     mapHeight = state.map.height;
     frameCamera();

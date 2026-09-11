@@ -98,6 +98,7 @@ const RELIEF: Readonly<Record<number, number>> = {
  */
 const RUT: readonly number[] = [0, -0.02, -0.035, -0.05];
 
+/** La cota de una **esquina** de celda, promediando las celdas que la tocan. */
 function heightAt(map: ValleyMap, x: number, z: number): number {
   let total = 0;
   let seen = 0;
@@ -198,6 +199,29 @@ const RIPPLE = 0.02;
 
 /** Cuanto tarda la onda en recorrer una celda, en segundos. */
 const RIPPLE_SECONDS = 2.2;
+
+/**
+ * La cota del suelo en un punto cualquiera, en celdas.
+ *
+ * `heightAt` vale para esquinas de celda, que son los vertices de la malla. Un
+ * aldeano no anda por las esquinas: anda por el medio, asi que aqui se
+ * interpola entre las cuatro que le rodean. Es exactamente la superficie que se
+ * dibuja, asi que nadie flota ni se hunde.
+ *
+ * Se exporta porque en cuanto el suelo dejo de ser plano dejo de valer poner
+ * las cosas a cero. Todo lo que pisa el valle pregunta aqui.
+ */
+export function elevationAt(map: ValleyMap, x: number, z: number): number {
+  const cx = Math.floor(x);
+  const cz = Math.floor(z);
+  const fx = x - cx;
+  const fz = z - cz;
+  const a = heightAt(map, cx, cz);
+  const b = heightAt(map, cx + 1, cz);
+  const c = heightAt(map, cx, cz + 1);
+  const d = heightAt(map, cx + 1, cz + 1);
+  return (a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz;
+}
 
 export interface Ground {
   readonly mesh: Mesh;

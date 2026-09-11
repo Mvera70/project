@@ -29,6 +29,14 @@ import { piecesOf, type Piece } from '../world/forest';
 const TURN_FLOOR = 0.02;
 
 /**
+ * A que altura nada un pez, en celdas.
+ *
+ * La lamina de agua esta diez centesimas por debajo del prado, y el pez saca la
+ * aleta: un poco por debajo de ella es donde va el lomo.
+ */
+const FISH_LEVEL = -0.14;
+
+/**
  * Saca de la corriente a un animal de tierra.
  *
  * Las posiciones vienen de las anclas de §7.7 —la gallina al umbral, la vaca al
@@ -100,6 +108,13 @@ export class Fauna {
   constructor(private readonly source: (kind: AnimalKind) => Object3D | undefined) {
     this.group.name = 'Valley_Fauna';
   }
+
+  /** La cota del suelo, por el mismo motivo que en el reparto. */
+  standOn(ground: (x: number, z: number) => number): void {
+    this.ground = ground;
+  }
+
+  private ground: (x: number, z: number) => number = () => 0;
 
   /**
    * Coloca la fauna que corresponde a este instante.
@@ -180,7 +195,10 @@ export class Fauna {
           piece.setMatrixAt(slot, this.matrix);
           continue;
         }
-        this.position.set(animal.x, 0, animal.y);
+        // El pez no se apoya en el fondo: nada en la lamina, que esta por
+        // encima del cauce.
+        const floor = animal.kind === 'fish' ? FISH_LEVEL : this.ground(animal.x, animal.y);
+        this.position.set(animal.x, floor, animal.y);
         this.turn.setFromAxisAngle(this.up, this.headingOf(animal));
         this.matrix.compose(this.position, this.turn, this.size);
         piece.setMatrixAt(slot, this.matrix);
