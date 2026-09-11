@@ -31,6 +31,7 @@ import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
 import { buildForest, shoreCells } from '../../src/render3d/world/forest';
 import { buildGround, cellColour } from '../../src/render3d/world/ground';
+import type { PlannedBuilding } from '../../src/render3d/world/plan';
 import { groundSignature, isQuiet, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
 
@@ -657,5 +658,76 @@ describe('G-10 · cobertura del catálogo', () => {
     const [anon, named] = cast.group.children;
     expect(named?.scale.y).toBeGreaterThan(anon?.scale.y ?? 0);
     cast.dispose();
+  });
+});
+
+describe('G-10 · nieva en los tejados', () => {
+  function houseModel(): Object3D {
+    const group = new Group();
+    const roof = new MeshStandardMaterial({ color: '#c7984a' });
+    roof.name = 'house_roof';
+    const wall = new MeshStandardMaterial({ color: '#e2cc9b' });
+    wall.name = 'house_plaster';
+    group.add(new Mesh(new BoxGeometry(1, 1, 1), roof), new Mesh(new BoxGeometry(1, 1, 1), wall));
+    return group;
+  }
+
+  function colours(village: Village): Record<string, string> {
+    const seen: Record<string, string> = {};
+    village.group.traverse((child) => {
+      const mesh = child as Object3D & { isMesh?: boolean; material?: MeshStandardMaterial };
+      if (mesh.isMesh === true && mesh.material !== undefined) {
+        seen[mesh.material.name] = mesh.material.color.getHexString();
+      }
+    });
+    return seen;
+  }
+
+  const planned = (id: number) => ({
+    ...planFor(village(6)).buildings[0]!, id: id as PlannedBuilding['id'], asset: 'house',
+  });
+
+  it('el tejado se cubre y la pared no', () => {
+    // El suelo cambiaba de estación desde G-08 y el bosque desde v3.40; los
+    // tejados seguían de agosto en enero. La nieve cuaja arriba: una casa
+    // blanca entera es una casa de otro color.
+    const built = new Village(() => houseModel());
+    built.add(planned(1));
+    const summer = colours(built);
+    built.season(0.72, '#f2f4f6');
+    const winter = colours(built);
+    expect(winter.house_roof).not.toBe(summer.house_roof);
+    expect(winter.house_plaster).toBe(summer.house_plaster);
+    built.dispose();
+  });
+
+  it('una casa levantada en enero nace nevada', () => {
+    const built = new Village(() => houseModel());
+    built.season(0.72, '#f2f4f6');
+    built.add(planned(2));
+    const snowed = colours(built).house_roof;
+    const bare = new Village(() => houseModel());
+    bare.add(planned(3));
+    expect(snowed).not.toBe(colours(bare).house_roof);
+    built.dispose();
+    bare.dispose();
+  });
+
+  it('nevar en una casa no nieva en el catálogo', () => {
+    // El material del recurso es de la biblioteca, y una copia del recurso lo
+    // comparte con él: nevar sobre él nevaría sobre todas las casas del valle a
+    // la vez, incluidas las de otra partida abierta al lado.
+    const shared = houseModel();
+    const built = new Village(() => shared.clone());
+    built.add(planned(4));
+    built.add(planned(5));
+    built.season(1, '#ffffff');
+    let original = '';
+    shared.traverse((child) => {
+      const mesh = child as Object3D & { isMesh?: boolean; material?: MeshStandardMaterial };
+      if (mesh.isMesh === true && mesh.material?.name === 'house_roof') original = mesh.material.color.getHexString();
+    });
+    expect(original).toBe('c7984a');
+    built.dispose();
   });
 });

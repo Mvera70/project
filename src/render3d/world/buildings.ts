@@ -12,7 +12,8 @@
 // need the final art to be judged wrong.
 
 import {
-  BoxGeometry, BufferAttribute, BufferGeometry, Group, Mesh, MeshStandardMaterial, type Object3D,
+  BoxGeometry, BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshStandardMaterial,
+  type Material, type Object3D,
 } from 'three';
 import type { BuildingId, BuildingKind } from '@engine/state';
 import type { PlannedBuilding } from './plan';
@@ -41,7 +42,39 @@ function roofGeometry(w: number, h: number, rise: number): BufferGeometry {
 
 export interface BuildingModel {
   readonly object: Object3D;
+  /**
+   * Pinta el tejado de este edificio con la nieve que le toque.
+   *
+   * `snow` va de 0 a 1 y es cuánta hay puesta. La nieve no la decide esto: la
+   * decide la estación, igual que el color del suelo y el del bosque.
+   */
+  weather(snow: number, colour: string): void;
   dispose(): void;
+}
+
+/**
+ * Los materiales de tejado de un recurso, copiados para poder pintarlos.
+ *
+ * Copiados porque los del recurso son de la biblioteca: nevar sobre ellos
+ * nevaría sobre todas las casas del valle a la vez, incluidas las de otra
+ * partida abierta al lado. **No cuesta una llamada de dibujo más**, que es la
+ * misma cuenta que la ropa del aldeano: la llamada la cuenta la malla.
+ */
+function roofsOf(model: Object3D): Array<{ material: MeshStandardMaterial; base: Color }> {
+  const roofs: Array<{ material: MeshStandardMaterial; base: Color }> = [];
+  model.traverse((child) => {
+    const mesh = child as Object3D & { isMesh?: boolean; material?: Material | Material[] };
+    if (mesh.isMesh !== true || mesh.material === undefined || Array.isArray(mesh.material)) return;
+    const source = mesh.material as MeshStandardMaterial;
+    // El tejado se conoce por el nombre de su material, que es el papel de la
+    // paleta con el que se autorizó la receta. No se nieva sobre la pared: la
+    // nieve cuaja arriba, y una casa blanca entera es una casa de otro color.
+    if (!source.name.includes('roof')) return;
+    const copy = source.clone();
+    mesh.material = copy;
+    roofs.push({ material: copy, base: copy.color.clone() });
+  });
+  return roofs;
 }
 
 /**
@@ -90,11 +123,21 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
     }
   });
   group.add(model);
+  const roofs = roofsOf(model);
+  const snowy = new Color();
   return {
     object: group,
+    weather(snow: number, colour: string): void {
+      for (const roof of roofs) {
+        roof.material.color.copy(roof.base).lerp(snowy.set(colour), Math.max(0, Math.min(1, snow)));
+      }
+    },
     dispose(): void {
-      // La geometria y los materiales son del recurso compartido: soltarlos
-      // aqui dejaria sin casa a todas las demas casas del valle.
+      // La geometria es del recurso compartido: soltarla aqui dejaria sin casa
+      // a todas las demas casas del valle. Los materiales de tejado si son
+      // nuestros, porque se copiaron para poder nevar sobre ellos.
+      for (const roof of roofs) roof.material.dispose();
+      roofs.length = 0;
       group.clear();
     },
   };
@@ -134,6 +177,10 @@ export function buildBuilding(planned: PlannedBuilding): BuildingModel {
 
   return {
     object: group,
+    weather(): void {
+      // La caja de reserva no nieva. Es geometria provisional y pintarla de
+      // blanco no la haria menos provisional.
+    },
     dispose(): void {
       for (const thing of owned) thing.dispose();
     },
@@ -159,6 +206,23 @@ export class Village {
     this.group.name = 'Valley_Buildings';
   }
 
+  /** Cuánta nieve hay puesta ahora mismo, y de qué color. */
+  private snow = 0;
+  private snowColour = '#f2f4f6';
+
+  /**
+   * Pone la estación sobre los tejados.
+   *
+   * El suelo cambiaba de estación desde G-08 y el bosque desde v3.40; los
+   * tejados seguían de agosto en enero. Se llama cuando cambia el suelo, que es
+   * cuando cambia la estación, y no en cada fotograma.
+   */
+  season(snow: number, colour: string): void {
+    this.snow = snow;
+    this.snowColour = colour;
+    for (const model of this.models.values()) model.weather(snow, colour);
+  }
+
   add(planned: PlannedBuilding): void {
     this.remove(planned.id);
     // Quien decide el recurso es el plan, no esto: el campo cambia con la
@@ -166,6 +230,9 @@ export class Village {
     const source = planned.asset === null ? undefined : this.instance?.(planned.asset);
     const model = source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source);
     this.models.set(planned.id, model);
+    // Una casa levantada en enero nace nevada, no en verano hasta que cambie la
+    // estación.
+    model.weather(this.snow, this.snowColour);
     this.group.add(model.object);
   }
 

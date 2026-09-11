@@ -239,6 +239,12 @@ export async function createGraphicsRenderer(
     const clock = clockOf(state.tick);
     const palette = paletteFor(clock.season, clock.seasonWeek);
     ground = buildGround(state.map, palette);
+    // La nieve en los tejados sale de la misma paleta que la del suelo: cuando
+    // §10.3 pone el prado blanco es que ha nevado, y la nieve no elige donde
+    // cuajar. TUNE: 0,72 y no 1, que un tejado del color exacto del prado
+    // nevado deja de leerse como tejado.
+    const snowing = clock.season === 'winter' ? 0.72 : 0;
+    village.season(snowing, palette.accent);
     world.add(ground.mesh);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
