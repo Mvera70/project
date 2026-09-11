@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T01:34:43.629Z",
+  "generatedAt": "2026-09-11T01:38:07.060Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -217,7 +217,7 @@
     {
       "id": "bundle",
       "file": "bundle.glb",
-      "sha256": "C52644F9DD2D2079145A15B087FDA15B7FA176E7B74C1CF546A43A26E00745DC",
+      "sha256": "B12A90A6C76BDFD0C8788EB7EE1F1B8797A02A5966D074E50349C694C03C17D8",
       "motion": []
     },
     {

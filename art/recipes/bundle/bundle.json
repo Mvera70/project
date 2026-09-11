@@ -17,7 +17,7 @@
   "materials": [
     {
       "name": "sack",
-      "role": "plaster",
+      "role": "timber",
       "roughness": 1.0
     },
     {

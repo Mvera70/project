@@ -18,7 +18,9 @@ from lot_village import cube, cyl, recipe, mat, D  # noqa: E402
 
 WOOD = mat('wood', 'timber', 0.9)
 IRON = mat('iron', 'timberDark', 0.55)
-SACK = mat('sack', 'plaster', 1.0)
+# Arpillera, no lienzo: con el papel claro de la paleta, de lejos parecia que
+# la gente volvia del campo con un folio en la mano.
+SACK = mat('sack', 'timber', 1.0)
 
 RECIPES = []
 
