@@ -590,3 +590,78 @@ describe('G-10 · la reunión (§11.8)', () => {
     expect(worst).toBeLessThan(0.5);
   });
 });
+
+describe('G-10 · la gente se para a hablar (§11.9)', () => {
+  it('a media jornada hay quien está parado con alguien', () => {
+    // Una aldea donde cuarenta personas coinciden en un campo y ninguna habla
+    // con otra no parece una aldea. Quién se para con quién lo decide
+    // `encountersAmong`, el mismo del render 2D, y lo decide la opinión: dos
+    // que se aprecian se paran a menudo y dos que se detestan no se paran nunca.
+    const state = village(14);
+    const memory = createActorMemory();
+    let talking = 0;
+    for (let step = 0; step <= 80; step += 1) {
+      const seconds = (step / 80) * SCENIC_DAY_SECONDS;
+      const actors = actorsFor(state, frameAt(seconds), { memory });
+      talking = Math.max(talking, actors.filter(
+        (actor) => actor.activity === 'working' && actor.clip === 'idle',
+      ).length);
+    }
+    expect(talking).toBeGreaterThan(0);
+  });
+
+  it('se acerca andando, no aparece de golpe ni echa a correr', () => {
+    // Tres defectos que costó encontrar y que esta sola medida caza.
+    //
+    // Sin congelar el emparejamiento al amanecer, la conversación cambiaba de
+    // sitio ocho veces al día: 5,88 celdas. Repartiendo la ida en una fracción
+    // fija de la charla, la gente cruzaba el campo a seis veces su paso. Y
+    // midiendo la distancia desde el centro del puesto en vez de desde donde se
+    // está cavando, una charla a un palmo se daba por alcanzada al instante y
+    // el aldeano aparecía allí: 0,78.
+    const state = village(14);
+    const memory = createActorMemory();
+    let biggest = 0;
+    const last = new Map<VillagerId, { x: number; z: number }>();
+    // **A ritmo de fotograma**, no a saltos de medio segundo: muestreando cada
+    // 0,4 s, andar parece saltar. Un décimo de segundo son seis fotogramas.
+    const STEPS = 1200;
+    for (let step = 0; step <= STEPS; step += 1) {
+      const seconds = (step / STEPS) * SCENIC_DAY_SECONDS;
+      for (const actor of actorsFor(state, frameAt(seconds), { memory })) {
+        const before = last.get(actor.id);
+        if (before !== undefined) {
+          biggest = Math.max(biggest, Math.hypot(actor.x - before.x, actor.z - before.z));
+        }
+        last.set(actor.id, { x: actor.x, z: actor.z });
+      }
+    }
+    // El paso mayor de la jornada es el del camino de ida, que es anterior a
+    // esto y es andar continuo: una décima de celda por décima de segundo.
+    // Medido con conversaciones y sin ellas da lo mismo, y ése es el punto: la
+    // charla no añade ni un salto.
+    expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(0.15);
+  });
+
+  it('quien está parado está parado', () => {
+    // La regla de siempre: un clip en el sitio exige un cuerpo en el sitio.
+    const state = village(14);
+    const memory = createActorMemory();
+    const moved = new Map<VillagerId, { x: number; z: number; clip: string }>();
+    let slid = 0;
+    for (let step = 0; step <= 600; step += 1) {
+      const seconds = (step / 600) * SCENIC_DAY_SECONDS;
+      for (const actor of actorsFor(state, frameAt(seconds), { memory })) {
+        const before = moved.get(actor.id);
+        // Dos fotogramas seguidos **los dos quietos**: el primero de la parada
+        // viene de andar, y ese paso lo dio andando.
+        if (before !== undefined && actor.clip === 'idle' && before.clip === 'idle') {
+          const step2 = Math.hypot(actor.x - before.x, actor.z - before.z);
+          if (step2 > 0.004) slid += 1;
+        }
+        moved.set(actor.id, { x: actor.x, z: actor.z, clip: actor.clip });
+      }
+    }
+    expect(slid).toBe(0);
+  });
+});

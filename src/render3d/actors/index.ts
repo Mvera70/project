@@ -18,6 +18,7 @@ import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { gatheringsAt } from '@render/gatherings';
+import { encountersAmong, type Encounter } from '@render/encounters';
 import { ageOf } from '@engine/people/villagers';
 import { dayNumber, dayPhase } from '../presentation-clock';
 import { clipTime, VILLAGER_CLIPS, type ClipName } from './clips';
@@ -105,10 +106,23 @@ export interface ActorMemory {
   gathering: number | null;
   /** En que tick estabamos en el amanecer anterior, para no perderse nada. */
   tick: number;
+  /**
+   * Con quien se para hoy cada uno, y donde.
+   *
+   * Congelado al amanecer por el mismo motivo que los destinos: `encountersAmong`
+   * decide el emparejamiento a partir del tick, y una jornada escenica dura ocho
+   * ticks a x1. Sin congelarlo, la conversacion cambiaba de sitio ocho veces al
+   * dia y la gente daba saltos de seis celdas. Medido: 5,88.
+   */
+  meetings: Map<VillagerId, Encounter>;
+  meetingsDay: number;
 }
 
 export function createActorMemory(): ActorMemory {
-  return { game: '', day: -1, routes: new Map(), gathering: null, tick: 0 };
+  return {
+    game: '', day: -1, routes: new Map(), gathering: null, tick: 0,
+    meetings: new Map(), meetingsDay: -1,
+  };
 }
 
 interface Point { x: number; z: number }
@@ -395,6 +409,42 @@ function workSpot(
 }
 
 /**
+ * Cuanto de acercado esta alguien a su conversacion, y si esta andando.
+ *
+ * TUNE: la sexta parte del encuentro se va en ir y otra sexta en volver. Menos
+ * es un salto; mas y la conversacion es un paseo. Devuelve `null` fuera del
+ * tramo, que es la mayor parte del dia.
+ */
+const APPROACH = 0.4;
+
+/**
+ * A que ritmo se anda, en celdas por dia escenico.
+ *
+ * TUNE: cuarenta. Es el paso vivo con el que la jornada de §11.9 cubre sus
+ * viajes: seis celdas de mediana en el quince por ciento del dia. El primer
+ * intento repartia la ida en una sexta parte de la conversacion pasara lo que
+ * pasara, y eso mandaba a la gente a la carrera —dos celdas y cuarto en segundo
+ * y medio, seis veces su propio paso— que en pantalla es un salto.
+ */
+const CHAT_PACE = 40;
+
+function talking(
+  phase: number, from: number, to: number, reach: number,
+): { there: number; moving: boolean } | null {
+  if (phase < from || phase > to) return null;
+  const span = Math.max(1e-6, to - from);
+  // Lo que tarda en llegar andando, en tanto por uno de la conversacion. Si no
+  // le da tiempo a ir, estarse y volver, no va: mejor seguir cavando que
+  // cruzar el campo a la carrera para no llegar.
+  const approach = reach / CHAT_PACE / span;
+  if (approach > APPROACH) return null;
+  const through = (phase - from) / span;
+  if (through < approach) return { there: approach <= 0 ? 1 : through / approach, moving: true };
+  if (through > 1 - approach) return { there: approach <= 0 ? 1 : (1 - through) / approach, moving: true };
+  return { there: 1, moving: false };
+}
+
+/**
  * Las rutas de hoy: las del motor, congeladas al amanecer si hay memoria.
  *
  * Sin memoria devuelve las de este instante, que es lo que hacia antes y lo que
@@ -508,6 +558,36 @@ export function actorsFor(
   }
   for (const group of sharing.values()) group.sort((a, b) => a - b);
 
+  // Quien se para con quien, y donde.
+  //
+  // §11.9: una aldea donde cuarenta personas coinciden en un campo y ninguna
+  // habla con otra no parece una aldea. Quien se para con quien lo decide
+  // `encountersAmong`, **el mismo del render 2D**, y lo decide la opinion: dos
+  // que se aprecian se paran a menudo y dos que se detestan no se paran nunca.
+  // Aqui solo se dibuja.
+  //
+  // Hace falta saber antes donde trabaja cada uno, porque el encuentro se
+  // decide sobre los puestos y no sobre las posiciones: dos que pasan cerca un
+  // instante no se quedan pegados.
+  const memory = options.memory;
+  let meetings: Map<VillagerId, Encounter>;
+  if (memory !== undefined && memory.meetingsDay === today) {
+    meetings = memory.meetings;
+  } else {
+    const spots = new Map<VillagerId, Point>();
+    for (const person of cast(state, options.tracked ?? null)) {
+      const cells = routes.get(person.id);
+      const target = cells?.[cells.length - 1];
+      if (target === undefined) continue;
+      spots.set(person.id, workSpot(target, person.id, width, plots, sharing));
+    }
+    meetings = encountersAmong(state, [...spots].map(([id, at]) => ({ id, x: at.x, y: at.z })));
+    if (memory !== undefined) {
+      memory.meetings = meetings;
+      memory.meetingsDay = today;
+    }
+  }
+
   const actors: Actor[] = [];
 
   for (const person of cast(state, options.tracked ?? null)) {
@@ -550,7 +630,51 @@ export function actorsFor(
     // Si el cuerpo se mueve, el clip tiene que ser el de andar. Siempre.
     let stepping = false;
 
-    if (activity === 'working' && summoned) {
+    const meeting = summoned ? undefined : meetings.get(person.id);
+    // El tramo de charla se recorta a **la jornada de esta persona**.
+    //
+    // Los limites de §11.9 son fracciones de tick iguales para todos, y la
+    // jornada no: cada uno sale y vuelve a su hora. Sin recortar, a quien
+    // llegaba tarde al tajo le empezaba la conversacion antes de llegar, y al
+    // llegar aparecia de golpe en mitad del corro. Medido: 0,86 celdas de
+    // salto, contra 0,50 que da la jornada sin conversaciones.
+    const opens = meeting === undefined ? 0 : Math.max(meeting.from, day.arrive);
+    const shuts = meeting === undefined ? 0 : Math.min(meeting.to, day.depart);
+    // Lo que hay que andar hasta la conversacion, contando que **no se sale del
+    // centro del puesto**: cavando uno se aparta hasta `WORK_REACH` de el. Sin
+    // contarlo, una conversacion a un palmo del puesto se daba por alcanzada al
+    // instante y el aldeano aparecia alli desde donde estuviera cavando, que
+    // eran 0,78 celdas de salto.
+    const away = meeting === undefined
+      ? 0
+      : Math.max(Math.hypot(meeting.x - spot.x, meeting.y - spot.z), DAY.WORK_REACH);
+    const talk = meeting === undefined || activity !== 'working' || shuts <= opens
+      ? null
+      : talking(phase, opens, shuts, away);
+
+    if (talk !== null) {
+      // Se acerca, se queda un rato y vuelve a lo suyo. Los dos extremos se
+      // andan de verdad: el punto de encuentro esta a un par de celdas, y
+      // aparecer alli de golpe seria el teletransporte de siempre.
+      //
+      // Y se sale **de donde se estaba**, no del centro de la parcela: cavando
+      // uno se aparta hasta casi una celda de su puesto, asi que arrancar desde
+      // el puesto daba un salto de esa celda justo al empezar a hablar. Medido:
+      // 1,05.
+      const span = Math.max(1e-6, day.depart - day.arrive);
+      const through = (phase - day.arrive) / span;
+      const turn = working(person, state.tick, through, spot, DAY.WORK_REACH);
+      const base = leash(turn.at, spot);
+      const meet = { x: meeting?.x ?? base.x, z: meeting?.y ?? base.z };
+      point = {
+        x: base.x + (meet.x - base.x) * talk.there,
+        z: base.z + (meet.z - base.z) * talk.there,
+      };
+      // Mirando al centro del encuentro, que es mirarse el uno al otro.
+      facing = Math.atan2(meet.x - base.x, meet.z - base.z);
+      travelled = turn.travelled + Math.hypot(meet.x - base.x, meet.z - base.z) * talk.there;
+      stepping = talk.moving;
+    } else if (activity === 'working' && summoned) {
       // En una reunion no se trabaja: se esta. Quieto, mirando al centro del
       // corro, que es lo que convierte a doce personas sueltas en una reunion.
       point = spot;
@@ -587,9 +711,12 @@ export function actorsFor(
       travelled = 0;
     }
 
+    // Parado es parado: ni cavando ni andando. Una conversacion con la azada
+    // en la mano no es una conversacion.
     const clip = stepping ? 'walk'
-      : summoned && activity === 'working' ? 'idle'
-        : clipFor(activity, person, state.tick);
+      : talk !== null ? 'idle'
+        : summoned && activity === 'working' ? 'idle'
+          : clipFor(activity, person, state.tick);
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(point.x)));
     const cellZ = Math.max(0, Math.min(state.map.height - 1, Math.floor(point.z)));
 
