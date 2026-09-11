@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "id": "wolf",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "wolf",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de fauna. Lobo: mas largo y mas bajo que la vaca, oscuro, con las orejas de punta y la cola caida. Lo que tiene que leerse desde arriba es que no es del pueblo."
+  },
+  "materials": [
+    {
+      "name": "hide-dark",
+      "role": "timberDark",
+      "roughness": 0.95
+    },
+    {
+      "name": "pale",
+      "role": "plaster",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Wolf_Leg_0",
+      "location": [
+        -0.4,
+        -0.16,
+        0.22
+      ],
+      "dimensions": [
+        0.07,
+        0.07,
+        0.44
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Wolf_Leg_1",
+      "location": [
+        0.4,
+        -0.16,
+        0.22
+      ],
+      "dimensions": [
+        0.07,
+        0.07,
+        0.44
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Wolf_Leg_2",
+      "location": [
+        -0.4,
+        0.16,
+        0.22
+      ],
+      "dimensions": [
+        0.07,
+        0.07,
+        0.44
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Wolf_Leg_3",
+      "location": [
+        0.4,
+        0.16,
+        0.22
+      ],
+      "dimensions": [
+        0.07,
+        0.07,
+        0.44
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Wolf_Body",
+      "location": [
+        0.0,
+        0.0,
+        0.62
+      ],
+      "dimensions": [
+        1.05,
+        0.34,
+        0.34
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Wolf_Head",
+      "location": [
+        -0.62,
+        0.0,
+        0.66
+      ],
+      "dimensions": [
+        0.34,
+        0.26,
+        0.26
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Wolf_Snout",
+      "location": [
+        -0.84,
+        0.0,
+        0.62
+      ],
+      "radius": 0.1,
+      "depth": 0.2,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Wolf_Ear_A",
+      "location": [
+        -0.6,
+        -0.09,
+        0.83
+      ],
+      "radius": 0.06,
+      "depth": 0.12,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Wolf_Ear_B",
+      "location": [
+        -0.6,
+        0.09,
+        0.83
+      ],
+      "radius": 0.06,
+      "depth": 0.12,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Wolf_Tail",
+      "location": [
+        0.62,
+        0.0,
+        0.5
+      ],
+      "radius": 0.06,
+      "depth": 0.42,
+      "vertices": 5,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        60,
+        0
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      2.0,
+      -2.5,
+      1.6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.5
+    ],
+    "orthoScale": 2.8,
+    "worldRole": "sky"
+  }
+}

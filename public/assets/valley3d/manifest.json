@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-10T23:30:00.705Z",
+  "generatedAt": "2026-09-11T00:25:16.511Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -170,6 +170,42 @@
       "id": "reed",
       "file": "reed.glb",
       "sha256": "31B2B1B0A7F7933FB95A1FE9161C01AA7DB35357783FBE35902F656602CA9027",
+      "motion": []
+    },
+    {
+      "id": "cow",
+      "file": "cow.glb",
+      "sha256": "8F931CF3E1E34C55EE3CB51EDB345DDB8137A45E82646F76866CC72CEB64465F",
+      "motion": []
+    },
+    {
+      "id": "pig",
+      "file": "pig.glb",
+      "sha256": "348C0670102F2435177463FC5F9EB62CA9AF49CC255B982AFC11FE0D9B1DF161",
+      "motion": []
+    },
+    {
+      "id": "hen",
+      "file": "hen.glb",
+      "sha256": "1FD725E724F157877310608663022149E343B515A29DF5B4A4525FDF39DF2F9E",
+      "motion": []
+    },
+    {
+      "id": "wolf",
+      "file": "wolf.glb",
+      "sha256": "98ED20BC75E1339DF7F90AB2F7B069936E04AA6B288D0A8A321C903393F45AC8",
+      "motion": []
+    },
+    {
+      "id": "crow",
+      "file": "crow.glb",
+      "sha256": "1524B0E09484040A3F90A2607C251CE1B5F4C1085860264161A2D8B9C4E7C32C",
+      "motion": []
+    },
+    {
+      "id": "fish",
+      "file": "fish.glb",
+      "sha256": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
       "motion": []
     }
   ]

@@ -36,13 +36,13 @@ function stable(cell: number, salt: number): number {
   return (mixed % 100_003) / 100_003;
 }
 
-interface Piece {
+export interface Piece {
   readonly geometry: BufferGeometry;
   readonly material: Material;
 }
 
 /** Las mallas de un recurso, aplanadas y con su transformación ya incorporada. */
-function piecesOf(source: Object3D): Piece[] {
+export function piecesOf(source: Object3D): Piece[] {
   const pieces: Piece[] = [];
   source.updateMatrixWorld(true);
   source.traverse((object) => {

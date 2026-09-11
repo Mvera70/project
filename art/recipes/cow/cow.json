@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 1,
+  "id": "cow",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "cow",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de fauna. Vaca: metro y medio de largo, cuerpo con mancha clara, cuello aparte y cola. La mancha es lo que la separa del cerdo cuando las dos son manchas pardas de cuatro pixeles."
+  },
+  "materials": [
+    {
+      "name": "hide",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "pale",
+      "role": "plaster",
+      "roughness": 0.9
+    },
+    {
+      "name": "hide-dark",
+      "role": "timberDark",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Cow_Leg_0",
+      "location": [
+        -0.55,
+        -0.28,
+        0.31
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        0.62
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Leg_1",
+      "location": [
+        0.55,
+        -0.28,
+        0.31
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        0.62
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Leg_2",
+      "location": [
+        -0.55,
+        0.28,
+        0.31
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        0.62
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Leg_3",
+      "location": [
+        0.55,
+        0.28,
+        0.31
+      ],
+      "dimensions": [
+        0.11,
+        0.11,
+        0.62
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Body",
+      "location": [
+        0.0,
+        0.0,
+        0.95
+      ],
+      "dimensions": [
+        1.55,
+        0.62,
+        0.66
+      ],
+      "material": "hide",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Patch",
+      "location": [
+        0.18,
+        0.0,
+        0.97
+      ],
+      "dimensions": [
+        0.55,
+        0.64,
+        0.5
+      ],
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Neck",
+      "location": [
+        -0.82,
+        0.0,
+        0.98
+      ],
+      "dimensions": [
+        0.35,
+        0.4,
+        0.42
+      ],
+      "material": "hide",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Cow_Head",
+      "location": [
+        -1.06,
+        0.0,
+        1.02
+      ],
+      "dimensions": [
+        0.36,
+        0.32,
+        0.34
+      ],
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Cow_Tail",
+      "location": [
+        0.8,
+        0.0,
+        0.72
+      ],
+      "radius": 0.05,
+      "depth": 0.55,
+      "vertices": 5,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      2.6,
+      -3.25,
+      2.08
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.7
+    ],
+    "orthoScale": 3.6399999999999997,
+    "worldRole": "sky"
+  }
+}

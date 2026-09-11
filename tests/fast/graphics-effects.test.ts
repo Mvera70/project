@@ -19,6 +19,10 @@ import { clockOf, SEASONS } from '@engine/time';
 import type { GameState } from '@engine/state';
 import { PALETTES, paletteFor } from '@render/palette';
 import { tellsFor } from '@render/layers/tells';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import { TERRAIN_CODE } from '@engine/state';
+import { animalPositions, wildlifePositions } from '@render/animals';
+import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
 import { Tells } from '../../src/render3d/effects/tells';
 import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
@@ -270,5 +274,87 @@ describe('G-08 · las consecuencias', () => {
         .toBe(groundSignature(moment.map, week));
       expect(SEASONS).toContain(clock.season);
     }
+  });
+});
+
+describe('G-10 · la fauna (§7.7)', () => {
+  /** Un recurso de mentira: dos mallas, que es lo que la fauna instancia. */
+  function model(): Object3D {
+    const group = new Group();
+    for (let part = 0; part < 2; part += 1) {
+      group.add(new Mesh(new BoxGeometry(0.2, 0.2, 0.2), new MeshStandardMaterial()));
+    }
+    return group;
+  }
+
+  it('pone en la escena lo que el 2D dice y ni una cabeza más', () => {
+    // La regla es la misma que con las señales: no hay reglas nuevas aquí. Si
+    // esto contara sus propios animales, las dos aldeas se separarían en cuanto
+    // alguien tocara §7.7.
+    const state = village(14);
+    const fauna = new Fauna(() => model());
+    fauna.update(state, 0.4);
+    const said = [...animalPositions(state, 0.4), ...wildlifePositions(state, 0.4)];
+    expect(said.length).toBeGreaterThan(0);
+    expect(fauna.count).toBeLessThanOrEqual(said.length);
+    fauna.dispose();
+  });
+
+  it('al anochecer la cabaña se recoge', () => {
+    // §10.6: pasadas las ocho décimas del día todo el mundo está dentro, y el
+    // corral también. Ese patio vacío al anochecer no es decoración: es la
+    // ventana por la que entran los lobos de §7.7.
+    const state = village(14);
+    const fauna = new Fauna(() => model());
+    fauna.update(state, 0.4);
+    const byDay = fauna.count;
+    fauna.update(state, 0.95);
+    expect(byDay).toBeGreaterThan(0);
+    expect(fauna.count).toBeLessThan(byDay);
+    fauna.dispose();
+  });
+
+  it('ninguna vaca se mete en el río, y ningún pez sale de él', () => {
+    const state = village(14);
+    const { width, terrain } = state.map;
+    const wet = (x: number, y: number): boolean =>
+      terrain[Math.floor(y) * width + Math.floor(x)] === TERRAIN_CODE.water;
+    let land = 0;
+    for (let step = 0; step < 12; step += 1) {
+      const phase = step / 12;
+      for (const animal of animalPositions(state, phase)) {
+        // Lo que se comprueba no es el 2D, que coloca por anclas y no mira el
+        // terreno, sino que el 3D lo corrige: aquí el río tiene cauce.
+        const dry = ashoreOf(state.map, animal.x, animal.y);
+        if (dry === null) continue;
+        expect(wet(dry.x, dry.y)).toBe(false);
+        land += 1;
+      }
+    }
+    expect(land).toBeGreaterThan(0);
+  });
+
+  it('no rehace las mallas en cada fotograma', () => {
+    // Los animales se mueven en cada fotograma y la geometría no. D.9 dice que
+    // lo que no se puede hacer es reconstruir objetos sesenta veces por segundo.
+    const state = village(14);
+    const fauna = new Fauna(() => model());
+    fauna.update(state, 0.3);
+    const before = [...fauna.group.children];
+    expect(before.length).toBeGreaterThan(0);
+    for (let step = 1; step <= 6; step += 1) fauna.update(state, 0.3 + step * 0.02);
+    const after = [...fauna.group.children];
+    expect(after.length).toBe(before.length);
+    for (let index = 0; index < after.length; index += 1) expect(after[index]).toBe(before[index]);
+    fauna.dispose();
+  });
+
+  it('lo suelta todo al terminar', () => {
+    const state = village(14);
+    const fauna = new Fauna(() => model());
+    fauna.update(state, 0.4);
+    fauna.dispose();
+    expect(fauna.group.children.length).toBe(0);
+    expect(fauna.count).toBe(0);
   });
 });

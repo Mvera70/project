@@ -28,6 +28,8 @@ import { buildGround, type Ground } from './world/ground';
 import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
+import { dayPhase } from './presentation-clock';
+import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
 import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 
@@ -35,9 +37,16 @@ const VILLAGER = 'villager';
 const TREE = 'tree';
 const ROCK = 'rock';
 const REED = 'reed';
+
+/**
+ * Las clases de §7.7, cada una con su recurso. El nombre del recurso es el de
+ * la clase: no hay correspondencia que escribir porque no hace falta.
+ */
+const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
 const WANTED = [
   VILLAGER, TREE, ROCK, REED, 'field-cut', 'ruin-wood', 'ruin-stone',
+  ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
 
@@ -92,7 +101,8 @@ export async function createGraphicsRenderer(
   const village = new Village((id) => library.instance(id));
   const cast = new Cast(villager, () => library.instance(VILLAGER));
   const tells = new Tells();
-  world.add(village.group, cast.group, tells.group);
+  const fauna = new Fauna((kind) => library.instance(kind));
+  world.add(village.group, cast.group, tells.group, fauna.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -226,6 +236,7 @@ export async function createGraphicsRenderer(
         village.clear();
         cast.clear();
         tells.clear();
+        fauna.clear();
       }
       if (change.ground || change.cleared) rebuildGround(state as GameState);
       for (const id of change.removed) village.remove(id);
@@ -242,6 +253,9 @@ export async function createGraphicsRenderer(
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
       tells.update(state as GameState);
+      // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
+      // congelado entre semana y semana sería peor que no tenerlo.
+      fauna.update(state as GameState, dayPhase(frame.presentationSeconds));
 
       renderer.render(scene, camera);
     },
@@ -316,6 +330,7 @@ export async function createGraphicsRenderer(
       if (disposed) return;
       disposed = true;
       tells.dispose();
+      fauna.dispose();
       cast.dispose();
       village.dispose();
       if (ground !== null) {

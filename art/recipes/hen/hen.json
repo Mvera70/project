@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "id": "hen",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "hen",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de fauna. Gallina: cuarenta centimetros con la cola alta. La cola levantada y la cresta son la silueta; el cuerpo por si solo seria una piedra pequena."
+  },
+  "materials": [
+    {
+      "name": "pale",
+      "role": "plaster",
+      "roughness": 0.9
+    },
+    {
+      "name": "comb",
+      "role": "clothAccent",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Hen_Leg_A",
+      "location": [
+        -0.03,
+        -0.05,
+        0.06
+      ],
+      "dimensions": [
+        0.035,
+        0.035,
+        0.12
+      ],
+      "material": "comb",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hen_Leg_B",
+      "location": [
+        -0.03,
+        0.05,
+        0.06
+      ],
+      "dimensions": [
+        0.035,
+        0.035,
+        0.12
+      ],
+      "material": "comb",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Hen_Body",
+      "location": [
+        0.0,
+        0.0,
+        0.24
+      ],
+      "radius": 0.15,
+      "segments": 7,
+      "rings": 5,
+      "smooth": true,
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Hen_Head",
+      "location": [
+        -0.17,
+        0.0,
+        0.36
+      ],
+      "radius": 0.075,
+      "segments": 6,
+      "rings": 4,
+      "smooth": true,
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hen_Comb",
+      "location": [
+        -0.17,
+        0.0,
+        0.44
+      ],
+      "dimensions": [
+        0.06,
+        0.03,
+        0.06
+      ],
+      "material": "comb",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Hen_Tail",
+      "location": [
+        0.17,
+        0.0,
+        0.32
+      ],
+      "radius": 0.09,
+      "depth": 0.18,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Hen_Beak",
+      "location": [
+        -0.24,
+        0.0,
+        0.35
+      ],
+      "radius": 0.035,
+      "depth": 0.08,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "comb",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      0.9,
+      -1.125,
+      0.7200000000000001
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.25
+    ],
+    "orthoScale": 1.26,
+    "worldRole": "sky"
+  }
+}

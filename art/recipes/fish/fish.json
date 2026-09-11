@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "id": "fish",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "fish",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de fauna. Pez: cuarenta centimetros con la aleta fuera. La aleta es lo unico que se ve desde arriba, y por eso sobresale del lomo."
+  },
+  "materials": [
+    {
+      "name": "fin",
+      "role": "stone",
+      "roughness": 0.6
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Fish_Body",
+      "location": [
+        0.0,
+        0.0,
+        0.1
+      ],
+      "radius": 0.09,
+      "segments": 7,
+      "rings": 5,
+      "smooth": true,
+      "material": "fin",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Fish_Trunk",
+      "location": [
+        0.0,
+        0.0,
+        0.1
+      ],
+      "dimensions": [
+        0.34,
+        0.1,
+        0.14
+      ],
+      "material": "fin",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Fish_Tail",
+      "location": [
+        0.22,
+        0.0,
+        0.1
+      ],
+      "radius": 0.11,
+      "depth": 0.16,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "fin",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Fish_Fin",
+      "location": [
+        0.0,
+        0.0,
+        0.19
+      ],
+      "dimensions": [
+        0.14,
+        0.03,
+        0.1
+      ],
+      "material": "fin",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      0.8,
+      -1.0,
+      0.6400000000000001
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.15
+    ],
+    "orthoScale": 1.1199999999999999,
+    "worldRole": "sky"
+  }
+}

@@ -1509,6 +1509,353 @@
         "source": "Original reed authored for The Valley G-10",
         "license": "Project original"
       }
+    },
+    {
+      "id": "cow",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/cow/cow.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T00-23-06-984Z-52520",
+        "directory": "artifacts/graphics/G-10/approved/8f931cf3e1e34c55"
+      },
+      "bounds": {
+        "min": [
+          -0.413333,
+          0,
+          -0.111667
+        ],
+        "max": [
+          0.282518,
+          0.426667,
+          0.111667
+        ],
+        "size": [
+          0.695851,
+          0.426667,
+          0.223333
+        ]
+      },
+      "recipeSha256": "6A9EA2BD0CFB0A1AB8EDA6342FEC20845ED72BB2EF0E8A5D4D0600777B8B686F",
+      "materials": [
+        "hide",
+        "pale",
+        "hide-dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 112
+      },
+      "hashes": {
+        "cow.blend": "B52218C0470A227C88A5FB1459B4A02FA61C82CEAE020EC0683385B1EF166CB7",
+        "cow.glb": "8F931CF3E1E34C55EE3CB51EDB345DDB8137A45E82646F76866CC72CEB64465F",
+        "cow-blender.png": "6C7D844DF26E230A55584354972E1F43DA4A68073244B58DBA2FABD32732CA38",
+        "capture-1.png": "A70C6A45A28C81998F2016FA0A2EECB9C12D05419570BAF64BB7745FDC685803",
+        "capture-1-gray.png": "F745E4A794BD3063ECC852E69DD080DDE2D3FC3B8DCE68B2FAA19B63A71A6390",
+        "capture.json": "8A0070E3F803C64C4BC2D187375A4475CA41D259C907A7416F5FFED59B87FA8E",
+        "build.json": "79F33B3B651891470DA27BD129C12ED67B585FCEF5CF325495E8551E888426A7",
+        "validation.json": "FB4137C36196FD5126D469FAD2A6F356C6379B27BF682CD5C30A1AA3F4A25D7B"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original cow authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "pig",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/pig/pig.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T00-23-12-503Z-53488",
+        "directory": "artifacts/graphics/G-10/approved/348c0670102f2435"
+      },
+      "bounds": {
+        "min": [
+          -0.196635,
+          0,
+          -0.106667
+        ],
+        "max": [
+          0.151667,
+          0.253333,
+          0.106667
+        ],
+        "size": [
+          0.348301,
+          0.253333,
+          0.213333
+        ]
+      },
+      "recipeSha256": "D262F5713DCD3F06441290F5A2710671876E69E1ADD64584BF77A73CA50CC7FE",
+      "materials": [
+        "pale",
+        "hide-dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 162
+      },
+      "hashes": {
+        "pig.blend": "723B9E6306869D03FD26DCDFE1C5EA2D77C6466404848099EF6AF66AFA1CF981",
+        "pig.glb": "348C0670102F2435177463FC5F9EB62CA9AF49CC255B982AFC11FE0D9B1DF161",
+        "pig-blender.png": "0A89B79EC042793DBA243B75B724FDF3044629E860CA658DDC8C87930C14BA78",
+        "capture-1.png": "4645DE57DC4D0B02DD1AEA8471DF0B9908DEB908CDC42B28B1D3C7BEF3717CF1",
+        "capture-1-gray.png": "F369CDFF3B024E068FC464E48450F6DFD6E52E172960A47134E425C28ECD790A",
+        "capture.json": "AC65E6FDF78A3713F5A267E57F43265622BC0AB1A6E32A42EA618F0D464F6753",
+        "build.json": "CC31D202B4BCD85BB92A9EB6C0084F92AFA3E8D9B7681094BCE3AD7A37700675",
+        "validation.json": "4D89DEBE735226990427D5DCB64E9B3FA40E755BB1C1C2A97F889A9774DEE1CC"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original pig authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "hen",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/hen/hen.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T00-23-17-942Z-48528",
+        "directory": "artifacts/graphics/G-10/approved/1fd725e724f15787"
+      },
+      "bounds": {
+        "min": [
+          -0.091667,
+          0,
+          -0.047553
+        ],
+        "max": [
+          0.085198,
+          0.156667,
+          0.042844
+        ],
+        "size": [
+          0.176865,
+          0.156667,
+          0.090396
+        ]
+      },
+      "recipeSha256": "1905B4F526F523AF567655D15F974BE95EFA4010062867AB2955D258FA5B135C",
+      "materials": [
+        "pale",
+        "comb"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 142
+      },
+      "hashes": {
+        "hen.blend": "FFF2A5D939CBD6E7BCB47CA06D0AC5089F71AA4580F5B7141407BB6D0F5C82C6",
+        "hen.glb": "1FD725E724F157877310608663022149E343B515A29DF5B4A4525FDF39DF2F9E",
+        "hen-blender.png": "07B9F6B2EAEA453A4216EA7AAA3CE19ABB0E36BCFFBFDD6ACACC83B0BCFB358E",
+        "capture-1.png": "BD103E5AA9FC0BC4D06BC16D5D7FF92C1C370666B573F4362D1C4222255B22DE",
+        "capture-1-gray.png": "F44AB973AA6A4234E714C78323134A95DC41BC8928A95B22431A26371FB22D28",
+        "capture.json": "13DF539F90BFD4A3E74693206DF46BCAD83EFAFF01F26ABE0DF433EEADF5E0D9",
+        "build.json": "7F48340F2F6E39208A80BE466B2A241925D29BD10534EB3650F77B6A52222ED5",
+        "validation.json": "8E812901BFB9B6A264F46A1DAFCC79F97DCDCB33CCDF6D7669E6D4B10DFDA6D5"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original hen authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "wolf",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/wolf/wolf.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T00-23-23-356Z-50588",
+        "directory": "artifacts/graphics/G-10/approved/98ed20bc75e1339d"
+      },
+      "bounds": {
+        "min": [
+          -0.311702,
+          0,
+          -0.065
+        ],
+        "max": [
+          0.276799,
+          0.296667,
+          0.065
+        ],
+        "size": [
+          0.588501,
+          0.296667,
+          0.13
+        ]
+      },
+      "recipeSha256": "778CF05FE9D8E99ECC4162253753797753DE1AA1577FB399E7141E668F910562",
+      "materials": [
+        "hide-dark",
+        "pale"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 108
+      },
+      "hashes": {
+        "wolf.blend": "02402E69E8B29C8B37D7D50EA0F63157DBEB79D369E8C1896E922BAA8D269103",
+        "wolf.glb": "98ED20BC75E1339DF7F90AB2F7B069936E04AA6B288D0A8A321C903393F45AC8",
+        "wolf-blender.png": "5310294BDFB359638E93EC2E634F96583959A53EFB691C4EF98D4EE4B7160CF7",
+        "capture-1.png": "F4C15BFCAEE36731C859DCA6079F916BF6425F2043C3EF3D1A75DC0DF90C533C",
+        "capture-1-gray.png": "26E2CF89422A2EB2DAEC116F4FEB70EC58C3F01F4CB793D94F9D4A92D76BEA0A",
+        "capture.json": "46192751BA0DE98834C6982F3BA5B9398BE1CB6D2A688076565E175FC323C9EE",
+        "build.json": "7186B4907A9371BE83FDFAC667B8FAA6BFF645C38AC90CDF6B43DA5FF3FF2F21",
+        "validation.json": "7C7CB328CF5D40491C1AF96E36270F88483318564393FBB01392FA4FA26E6BB5"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original wolf authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "crow",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/crow/crow.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T00-23-28-809Z-42176",
+        "directory": "artifacts/graphics/G-10/approved/1524b0e09484040a"
+      },
+      "bounds": {
+        "min": [
+          -0.08,
+          0,
+          -0.034872
+        ],
+        "max": [
+          0.076667,
+          0.11,
+          0.034872
+        ],
+        "size": [
+          0.156667,
+          0.11,
+          0.069744
+        ]
+      },
+      "recipeSha256": "4D510C8E209B55DB67E8622908564EB61DB06E61CFD9C96B1FC6DE2816363129",
+      "materials": [
+        "hide-dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 120
+      },
+      "hashes": {
+        "crow.blend": "32E70E5AA3194B3FBFEAA2AC7013F78F2F43541FFAB099BBE78BB23A111AC454",
+        "crow.glb": "1524B0E09484040A3F90A2607C251CE1B5F4C1085860264161A2D8B9C4E7C32C",
+        "crow-blender.png": "68D87EDDAA46321D9727B2DEFF515F1B44A6DA442F5E1B85811C6EB6A05F0A1C",
+        "capture-1.png": "AF3341D8C76EE57319BFA80E9D5DD04FB8A3269EC7BBEADA944ABBC14041BEE9",
+        "capture-1-gray.png": "36D31868709F88C24FD2D9AF7DFE7967330434FA4F64D293F36DBE181C21BB50",
+        "capture.json": "5FBE58D0192C0FBDBFA1CDE604F3CEA75D12C42FEACD548F737F4DA4FB127CE4",
+        "build.json": "5C2D9F73C025CFD04831210E08C03FEED7C5714C738D3CC946F1A0D6CA032B40",
+        "validation.json": "3F81E7B5AA88BD50E96F484ADA0C7FE3E3A5563315E1A5062795DEA6E5F15AB9"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original crow authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "fish",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/fish/fish.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T00-23-34-253Z-33664",
+        "directory": "artifacts/graphics/G-10/approved/edf544ad22d99bb5"
+      },
+      "bounds": {
+        "min": [
+          -0.056667,
+          0.003333,
+          -0.036667
+        ],
+        "max": [
+          0.11,
+          0.08,
+          0.036667
+        ],
+        "size": [
+          0.166667,
+          0.076667,
+          0.073333
+        ]
+      },
+      "recipeSha256": "A9864DB4E4AB9ACA26BCFB2FAE32152882FBD72037FE86B6D775B235E621AD38",
+      "materials": [
+        "fin"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 86
+      },
+      "hashes": {
+        "fish.blend": "F9B7E017041B4DD1C11B87336389CB09AAF5DE15BE8E5909690D247EB5DA484A",
+        "fish.glb": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
+        "fish-blender.png": "B3082493F084B512B6B5E5647CEF4BC892489838F2327CF2413A746749E1E3CE",
+        "capture-1.png": "69643E86845B2D09A1ED50DF5D8CFFD2927EE5BEAB086A659C23F891DE6D6FDF",
+        "capture-1-gray.png": "F3DEB459526772E6D8CF3B55E09BA2BA655F6A4AF660FB321F8CC2D5B0466712",
+        "capture.json": "59AB8A694F6E367A8C53A55383EF84605973AB4E12D5EF7166374BA0A765562F",
+        "build.json": "39C0D5CC77CD1D7D41F1688C3137B9FD3D0391C2B8B41546BD8247B1B0E5A01C",
+        "validation.json": "38A3E25C14976BEE3BF1EEB70A3EA7082992D9B965D9DF0989E9DEDE483E5D47"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original fish authored for The Valley G-10",
+        "license": "Project original"
+      }
     }
   ]
 }

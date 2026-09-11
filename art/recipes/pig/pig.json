@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "id": "pig",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "pig",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de fauna. Cerdo: ochenta centimetros, bajo y redondo. Redondo a proposito, porque lo bajo y lo ancho es lo unico que lo distingue de la vaca a esta distancia."
+  },
+  "materials": [
+    {
+      "name": "pale",
+      "role": "plaster",
+      "roughness": 0.9
+    },
+    {
+      "name": "hide-dark",
+      "role": "timberDark",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Pig_Leg_0",
+      "location": [
+        -0.3,
+        -0.16,
+        0.13
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        0.26
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Pig_Leg_1",
+      "location": [
+        0.3,
+        -0.16,
+        0.13
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        0.26
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Pig_Leg_2",
+      "location": [
+        -0.3,
+        0.16,
+        0.13
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        0.26
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Pig_Leg_3",
+      "location": [
+        0.3,
+        0.16,
+        0.13
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        0.26
+      ],
+      "material": "hide-dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Pig_Body",
+      "location": [
+        0.0,
+        0.0,
+        0.44
+      ],
+      "radius": 0.32,
+      "segments": 8,
+      "rings": 6,
+      "smooth": true,
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Pig_Trunk",
+      "location": [
+        0.0,
+        0.0,
+        0.44
+      ],
+      "dimensions": [
+        0.78,
+        0.42,
+        0.42
+      ],
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Pig_Snout",
+      "location": [
+        -0.46,
+        0.0,
+        0.42
+      ],
+      "radius": 0.15,
+      "depth": 0.26,
+      "vertices": 6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "pale",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Pig_Tail",
+      "location": [
+        0.42,
+        0.0,
+        0.52
+      ],
+      "radius": 0.035,
+      "depth": 0.18,
+      "vertices": 4,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "pale",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      1.6,
+      -2.0,
+      1.2800000000000002
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.4
+    ],
+    "orthoScale": 2.2399999999999998,
+    "worldRole": "sky"
+  }
+}
