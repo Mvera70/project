@@ -16,13 +16,13 @@ import {
   BoxGeometry, Color, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial,
   SphereGeometry, type Object3D,
 } from 'three';
-import type { GameState } from '@engine/state';
+import type { Building, GameState } from '@engine/state';
 import { tellsFor, type Tell } from '@render/layers/tells';
 
 /** Alturas en celdas. Una celda son unos tres metros (D.6.2). */
 const HEIGHT = {
   smoke: 1.55,
-  light: 0.35,
+  light: 0.47,
   plague: 0.55,
   candles: 0.6,
   banner: 1.1,
@@ -86,7 +86,7 @@ function mark(
  * color: el humo va arriba, la luz en la puerta, la peste en una esquina, las
  * velas en fila. **La posición y la forma son la señal; el color acompaña.**
  */
-function bodyOf(tell: Tell): Array<{ object: Object3D; dispose(): void }> {
+function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined): Array<{ object: Object3D; dispose(): void }> {
   switch (tell.kind) {
     case 'smoke': {
       // Tres bolas cada vez más altas y más tenues: una columna, no una mancha.
@@ -112,8 +112,21 @@ function bodyOf(tell: Tell): Array<{ object: Object3D; dispose(): void }> {
         return piece;
       });
     }
-    case 'light':
-      return [mark(new BoxGeometry(0.16, 0.2, 0.06), TONE.light, true, tell.x, HEIGHT.light, tell.y)];
+    case 'light': {
+      // **Esta señal se había perdido al pasar a tres dimensiones.** En 2D la
+      // luz se pinta sobre el dibujo de la casa; aquí la casa es un volumen, y
+      // el punto que da `tellsFor` cae dentro de sus paredes, así que el
+      // resplandor quedaba encerrado y no se veía ni una luz en todo el valle.
+      //
+      // Se saca a la fachada, que es la cara de -Y: es donde la receta pone la
+      // puerta y las ventanas. La casa se busca por el punto, y si no aparece
+      // —porque alguien mueva el ancla del 2D— se deja donde venía, que es peor
+      // pero no es un fallo.
+      const home = at?.(tell.x, tell.y);
+      const x = home === undefined ? tell.x : home.x + home.w / 2;
+      const z = home === undefined ? tell.y : home.y - 0.12;
+      return [mark(new BoxGeometry(0.7, 0.42, 0.06), TONE.light, true, x, HEIGHT.light, z, 0.85)];
+    }
     case 'plague':
       return [mark(new SphereGeometry(0.11, 6, 5), TONE.plague, false, tell.x, HEIGHT.plague, tell.y)];
     case 'candles':
@@ -177,8 +190,16 @@ export class Tells {
     // comparando si el primer objeto seguía siendo el mismo.
     this.clear();
     this.signature = signature;
+    // Qué casa hay en un punto. Se arma una vez por reconstrucción, no una por
+    // señal: son unas pocas decenas de edificios y unas pocas señales, pero
+    // buscar dentro del bucle sería multiplicarlos.
+    const standing = state.buildings.filter((building) => building.lostTick === null);
+    const at = (x: number, y: number): Building | undefined => standing.find(
+      (building) => x >= building.x && x < building.x + building.w
+        && y >= building.y && y < building.y + building.h,
+    );
     for (const tell of tells) {
-      for (const piece of bodyOf(tell)) {
+      for (const piece of bodyOf(tell, at)) {
         this.group.add(piece.object);
         this.owned.push(piece);
         const plume = piece.object.userData.plume as Omit<Plume, 'mesh'> | undefined;

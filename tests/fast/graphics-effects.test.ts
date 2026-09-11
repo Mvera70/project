@@ -410,6 +410,43 @@ describe('G-10 · la luz del día escénico', () => {
   });
 });
 
+describe('G-10 · la luz de las casas', () => {
+  it('sale a la fachada y no se queda dentro del muro', () => {
+    // En 2D la luz se pinta sobre el dibujo de la casa. Aquí la casa es un
+    // volumen, y el punto que da `tellsFor` cae dentro de sus paredes: el
+    // resplandor quedaba encerrado y no se veía ni una luz en todo el valle.
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+
+    const homes = state.buildings.filter(
+      (building) => building.lostTick === null
+        && (building.kind === 'house' || building.kind === 'stone_house'),
+    );
+    const said = tellsFor(state).filter((tell) => tell.kind === 'light');
+    expect(said.length).toBeGreaterThan(0);
+
+    for (const tell of said) {
+      const home = homes.find(
+        (building) => tell.x > building.x && tell.x < building.x + building.w
+          && tell.y > building.y && tell.y < building.y + building.h,
+      );
+      expect(home).toBeDefined();
+      if (home === undefined) continue;
+      // El punto que da el 2D está dentro de las paredes; el de la escena, en
+      // la fachada, que es la cara de -Y donde la receta pone puerta y ventanas.
+      expect(tell.y).toBeGreaterThan(home.y);
+      const lit = tells.group.children.some(
+        (thing) => Math.abs(thing.position.x - (home.x + home.w / 2)) < 0.01
+          && thing.position.z < home.y
+          && thing.position.z > home.y - 0.5,
+      );
+      expect(lit).toBe(true);
+    }
+    tells.dispose();
+  });
+});
+
 describe('G-10 · el humo se mueve', () => {
   it('sube, se deshace y vuelve a empezar', () => {
     const state = village(14);
