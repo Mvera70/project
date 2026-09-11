@@ -16,6 +16,7 @@ import { isHere } from '@engine/people/demography';
 import type { Building, GameState, Villager, VillagerId } from '@engine/state';
 import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
+import { ageOf } from '@engine/people/villagers';
 import { dayNumber, dayPhase } from '../presentation-clock';
 import { clipTime, VILLAGER_CLIPS, type ClipName } from './clips';
 import { dayOf, energyOf, progressOf, stable, type Activity } from './day';
@@ -52,6 +53,15 @@ export interface Actor {
   /** The cell this actor belongs to right now. A door or an anchor hangs off it. */
   readonly cell: number;
   readonly named: boolean;
+  /**
+   * Los anos que tiene. Sirven para la talla y para nada mas.
+   *
+   * Un valle de adultos identicos no es un valle: los ninos tienen que verse
+   * ninos desde arriba, que es donde no hay fichas que leer. La talla sale de
+   * aqui y el resto de la variacion sale del `id`, porque el estado no guarda
+   * de que color viste nadie ni tiene por que.
+   */
+  readonly age: number;
 }
 
 export interface ActorPlan {
@@ -462,7 +472,7 @@ export function actorsFor(
       actors.push({
         id: person.id, x: at.x, z: at.z, facing: 0, activity: 'resting',
         clip: 'idle', clipSeconds: clipTime('idle', 0, frame.presentationSeconds, stable(person.id, 11)),
-        cell: home, named: person.named, travelled: 0,
+        cell: home, named: person.named, age: ageOf(person, state.tick), travelled: 0,
       });
       continue;
     }
@@ -531,6 +541,7 @@ export function actorsFor(
       travelled,
       cell: cellZ * width + cellX,
       named: person.named,
+      age: ageOf(person, state.tick),
     });
   }
 

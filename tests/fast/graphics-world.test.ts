@@ -20,6 +20,10 @@ import { actorsFor } from '../../src/render3d/actors';
 import { loadAssets } from '../../src/render3d/assets';
 import { SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import type { Actor } from '../../src/render3d/actors';
+import type { LoadedAsset } from '../../src/render3d/assets';
+import { Cast } from '../../src/render3d/world/cast';
 import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
 import { shoreCells } from '../../src/render3d/world/forest';
@@ -433,5 +437,87 @@ describe('G-06 · el manifiesto de recursos', () => {
     expect(library.instance('villager')).toBeUndefined();
     library.dispose();
     library.dispose();
+  });
+});
+
+describe('G-10 · el reparto no son clones', () => {
+  function villagerModel(): Object3D {
+    const group = new Group();
+    const mesh = new Mesh(new BoxGeometry(0.2, 0.6, 0.2), new MeshStandardMaterial({ color: '#71885E' }));
+    group.add(mesh);
+    return group;
+  }
+
+  function actorAt(id: number, age: number): Actor {
+    return {
+      id: id as Actor['id'], x: 1, z: 1, facing: 0, activity: 'resting',
+      clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named: false, age,
+    };
+  }
+
+  it('un niño se ve más pequeño que un adulto', () => {
+    // Desde arriba no hay fichas que leer: el tamaño es lo único que dice que
+    // ahí hay un niño.
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    cast.show([actorAt(1, 6), actorAt(2, 30), actorAt(3, 72)]);
+    const [child, adult, elder] = cast.group.children;
+    expect(child?.scale.y).toBeLessThan(adult?.scale.y ?? 0);
+    expect(elder?.scale.y).toBeLessThan(adult?.scale.y ?? 0);
+    cast.dispose();
+  });
+
+  it('crece: la talla se pone en cada pasada, no al nacer', () => {
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    cast.show([actorAt(1, 4)]);
+    const small = cast.group.children[0]?.scale.y ?? 0;
+    cast.show([actorAt(1, 14)]);
+    expect(cast.group.children[0]?.scale.y).toBeGreaterThan(small);
+    cast.dispose();
+  });
+
+  it('cada uno viste lo suyo, y siempre lo mismo', () => {
+    // Veintisiete personas en pantalla eran veintisiete copias del mismo señor.
+    // Y §4.3: sin azar, así que el mismo aldeano viste igual en toda máquina.
+    const colourOf = (object: Object3D | undefined): string => {
+      let hex = '';
+      object?.traverse((child) => {
+        const mesh = child as Object3D & { isMesh?: boolean; material?: { color?: { getHexString(): string } } };
+        if (mesh.isMesh === true && mesh.material?.color !== undefined) hex = mesh.material.color.getHexString();
+      });
+      return hex;
+    };
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    cast.show([actorAt(1, 30), actorAt(2, 30), actorAt(3, 30)]);
+    const worn = cast.group.children.map((person) => colourOf(person));
+    expect(new Set(worn).size).toBe(worn.length);
+    cast.dispose();
+
+    const again = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    again.show([actorAt(1, 30)]);
+    expect(colourOf(again.group.children[0])).toBe(worn[0]);
+    again.dispose();
+  });
+
+  it('la ropa se suelta con quien la llevaba, y la malla compartida no', () => {
+    const shared = villagerModel();
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    cast.show([actorAt(1, 30)]);
+    const person = cast.group.children[0];
+    let clothes: { color?: unknown } | undefined;
+    person?.traverse((child) => {
+      const mesh = child as Object3D & { isMesh?: boolean; material?: { color?: unknown } };
+      if (mesh.isMesh === true) clothes = mesh.material;
+    });
+    expect(clothes).toBeDefined();
+    cast.show([]);
+    expect(cast.count).toBe(0);
+    // Y el original sigue teniendo su material: la copia era del actor.
+    let intact = false;
+    shared.traverse((child) => {
+      const mesh = child as Object3D & { isMesh?: boolean; material?: unknown };
+      if (mesh.isMesh === true && mesh.material !== undefined) intact = true;
+    });
+    expect(intact).toBe(true);
+    cast.dispose();
   });
 });

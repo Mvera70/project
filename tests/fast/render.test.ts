@@ -101,9 +101,23 @@ describe('M-18 · multitud derivada', () => {
       const source = originals[state.people.villagers.length % originals.length]!;
       state.people.villagers.push({ ...source, id: state.people.nextId++, named: false, name: '' });
     }
-    const started = performance.now();
-    for (let i = 0; i < 1_000; i += 1) crowdPositions(state, 0.45);
-    expect(performance.now() - started).toBeLessThan(100);
+    // **Se toma la mejor de tres pasadas, no una.** Esto mide tiempo de pared en
+    // una máquina que está haciendo otras cosas, así que una sola medida no mide
+    // el código: mide lo ocupado que estaba el equipo ese segundo. Fallaba una
+    // vez de cada cuatro con 103 ms contra un límite de 100, siempre con la
+    // suite entera compilando al lado, y un fallo que aparece y desaparece es
+    // peor que no tener prueba, porque enseña a ignorarla.
+    //
+    // La mejor de tres sigue cazando lo que esta prueba existe para cazar: que
+    // alguien meta un bucle de más en la multitud y esto se vaya al doble. Lo
+    // que deja de cazar es el ruido de la máquina, que nunca fue el objetivo.
+    let best = Infinity;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const started = performance.now();
+      for (let i = 0; i < 1_000; i += 1) crowdPositions(state, 0.45);
+      best = Math.min(best, performance.now() - started);
+    }
+    expect(best).toBeLessThan(100);
   });
 });
 
