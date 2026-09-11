@@ -137,6 +137,14 @@ effects/`), que dependen del catálogo, y la paridad de capturas contra Canvas.
 acepta emulación para cerrar P3. El presupuesto propuesto está en D.9.1 y el
 informe en `docs/graphics-rounds/G-09.md`.
 
+**Lo que G-10 deja encima de la mesa y es lo más grande:** las reuniones de
+§11.8 no existen en 3D. Veinticinco opciones del catálogo declaran `gather`, en
+2D la aldea se junta y en 3D no pasa nada, lo que choca de frente con el
+principio 1. No es un parche: los destinos se congelan al amanecer para que la
+gente no se teletransporte, y una reunión dura menos que un día escénico. Hace
+falta que cada actor recuerde **dónde está** y no sólo a dónde iba. El análisis
+entero está en `docs/graphics-rounds/G-10.md`.
+
 **Lo siguiente, en este orden:**
 
 1. **Correr el banco en un móvil** con `--real true` y llenar las filas de
