@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T01:01:10.994Z",
+  "generatedAt": "2026-09-11T01:04:46.091Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -67,7 +67,7 @@
     {
       "id": "house",
       "file": "house.glb",
-      "sha256": "408935BC299BA447623C5F1C06D5E4357196935416A3032468881D97F4E8EB4E",
+      "sha256": "8D974884B42D275ACEAC63D73613E102150BEB0C362A3583CD0BB852BB934528",
       "motion": []
     },
     {
@@ -115,7 +115,7 @@
     {
       "id": "stone-house",
       "file": "stone-house.glb",
-      "sha256": "16BC53B170903BE50216515799CA9008335502FC7ABB4C7B99A58ACA9AB6BBF2",
+      "sha256": "8C71B136695B48593CF33303C3091F361944B66A338AF90EF9E30036FF62BE22",
       "motion": []
     },
     {

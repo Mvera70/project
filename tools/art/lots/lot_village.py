@@ -79,6 +79,9 @@ TILE = mat('roof', 'roof', 0.85)
 WOOD = mat('wood', 'timber', 0.95)
 GRAIN = mat('grain', 'grain', 0.9)
 DARK = mat('dark', 'soil', 0.9)
+# El hueco de una ventana no es un color: es la sombra de dentro. El papel mas
+# oscuro de la paleta es lo mas parecido que hay sin inventar uno nuevo.
+WINDOW = mat('window', 'timberDark', 1.0)
 
 RECIPES = []
 
@@ -93,10 +96,17 @@ RECIPES.append(recipe(
 
 # --- vivienda ---------------------------------------------------------------
 RECIPES.append(recipe(
-    'house', 'house', [2, 2], [PLASTER, THATCH, WOOD, STONE],
+    'house', 'house', [2, 2], [PLASTER, THATCH, WOOD, STONE, WINDOW],
     [cube('House_Walls', 3, 3, 1.15, 5.4, 5.4, 2.3, 'plaster'),
      gable('House_Roof', 3, 3, 2.3, 6.0, 6.0, 2.1, 'roof'),
      cube('House_Door', 3, 0.28, 0.85, 1.0, 0.16, 1.7, 'wood'),
+     # Dos ventanucos en la fachada y uno en el costado. Pequenos, altos y de
+     # madera oscura: una casa de yeso sin un solo hueco es una caja de yeso, y
+     # de cerca se notaba. Van hundidos en el muro, no pegados encima, para que
+     # el borde haga sombra y se lean como huecos.
+     cube('House_Window_A', 1.45, 0.36, 1.4, 0.8, 0.12, 0.7, 'window'),
+     cube('House_Window_B', 4.55, 0.36, 1.4, 0.8, 0.12, 0.7, 'window'),
+     cube('House_Window_C', 0.36, 3.4, 1.4, 0.12, 0.8, 0.7, 'window'),
      # La chimenea es de piedra y no de yeso, y mas alta que ancha. De yeso y
      # achaparrada, bajo el sol de este valle salia blanca: desde arriba cada
      # casa parecia tener un huevo puesto en el tejado.
@@ -106,10 +116,13 @@ RECIPES.append(recipe(
     'lea saliendo por algun sitio.'))
 
 RECIPES.append(recipe(
-    'stone-house', 'stone-house', [2, 2], [STONE, TILE, WOOD],
+    'stone-house', 'stone-house', [2, 2], [STONE, TILE, WOOD, WINDOW],
     [cube('Stone_Walls', 3, 3, 1.3, 5.5, 5.5, 2.6, 'stone'),
      gable('Stone_Roof', 3, 3, 2.6, 6.0, 6.0, 2.0, 'roof'),
      cube('Stone_Door', 3, 0.25, 0.9, 1.05, 0.16, 1.8, 'wood'),
+     cube('Stone_Window_A', 1.4, 0.31, 1.55, 0.75, 0.12, 0.8, 'window'),
+     cube('Stone_Window_B', 4.6, 0.31, 1.55, 0.75, 0.12, 0.8, 'window'),
+     cube('Stone_Window_C', 0.31, 3.5, 1.55, 0.12, 0.75, 0.8, 'window'),
      cyl('Stone_Chimney', 4.5, 4.4, 3.4, 0.3, 1.8, 'stone', 6)],
     'G-10, lote de vivienda. La otra mitad: piedra y teja, mas alta y con la '
     'chimenea mas larga. D.2.1 decidio que los dos materiales conviven.',

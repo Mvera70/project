@@ -34,6 +34,11 @@
       "name": "stone",
       "role": "stone",
       "roughness": 0.95
+    },
+    {
+      "name": "window",
+      "role": "timberDark",
+      "roughness": 1.0
     }
   ],
   "groups": [
@@ -97,6 +102,54 @@
         1.7
       ],
       "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Window_A",
+      "location": [
+        1.45,
+        0.36,
+        1.4
+      ],
+      "dimensions": [
+        0.8,
+        0.12,
+        0.7
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Window_B",
+      "location": [
+        4.55,
+        0.36,
+        1.4
+      ],
+      "dimensions": [
+        0.8,
+        0.12,
+        0.7
+      ],
+      "material": "window",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "House_Window_C",
+      "location": [
+        0.36,
+        3.4,
+        1.4
+      ],
+      "dimensions": [
+        0.12,
+        0.8,
+        0.7
+      ],
+      "material": "window",
       "parent": "Root"
     },
     {
