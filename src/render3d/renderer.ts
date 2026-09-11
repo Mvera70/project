@@ -237,7 +237,8 @@ export async function createGraphicsRenderer(
     }
     // §10.3 · la paleta de la estación, la misma que usa el render 2D.
     const clock = clockOf(state.tick);
-    ground = buildGround(state.map, paletteFor(clock.season, clock.seasonWeek));
+    const palette = paletteFor(clock.season, clock.seasonWeek);
+    ground = buildGround(state.map, palette);
     world.add(ground.mesh);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
@@ -253,7 +254,7 @@ export async function createGraphicsRenderer(
 
     const sapling = library.get(TREE);
     if (sapling !== undefined) {
-      forest = buildForest(state.map, sapling.original as Object3D);
+      forest = buildForest(state.map, sapling.original as Object3D, palette);
       world.add(forest.group);
     }
     const boulder = library.get(ROCK);
@@ -266,7 +267,7 @@ export async function createGraphicsRenderer(
     if (reed !== undefined) {
       // La orilla se replanta con el suelo por el mismo motivo que el bosque: el
       // rio no se mueve, pero un camino nuevo pegado al agua si le quita sitio.
-      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map));
+      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map), palette);
       reeds.group.name = 'Valley_Reeds';
       world.add(reeds.group);
     }

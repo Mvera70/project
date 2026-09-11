@@ -26,7 +26,7 @@ import type { LoadedAsset } from '../../src/render3d/assets';
 import { Cast } from '../../src/render3d/world/cast';
 import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
-import { shoreCells } from '../../src/render3d/world/forest';
+import { buildForest, shoreCells } from '../../src/render3d/world/forest';
 import { buildGround, cellColour } from '../../src/render3d/world/ground';
 import { groundSignature, isQuiet, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
@@ -317,6 +317,38 @@ describe('G-06 · el suelo', () => {
     );
     expect(lowest(worn)).toBeLessThan(lowest(bare));
     ground.dispose();
+  });
+
+  it('el bosque cambia con la estación, y la corteza no', () => {
+    // El suelo cambiaba de estación desde G-08 y el bosque no: en octubre el
+    // valle se ponía de oro y los árboles seguían de mayo. El color lo pone
+    // §10.3, el mismo que pinta el suelo; aquí no se decide ningún verde.
+    const state = village(6);
+    const tree = new Group();
+    const leaf = new MeshStandardMaterial({ color: '#62864F' });
+    leaf.name = 'leaf';
+    const bark = new MeshStandardMaterial({ color: '#735338' });
+    bark.name = 'bark';
+    tree.add(new Mesh(new BoxGeometry(1, 1, 1), leaf), new Mesh(new BoxGeometry(1, 1, 1), bark));
+
+    const paintedIn = (palette: typeof PALETTES.summer): Record<string, string> => {
+      const forest = buildForest(state.map, tree, palette);
+      const seen: Record<string, string> = {};
+      for (const piece of forest.group.children) {
+        const mesh = piece as Mesh;
+        const material = mesh.material as MeshStandardMaterial;
+        seen[material.name] = material.color.getHexString();
+      }
+      forest.dispose();
+      return seen;
+    };
+    const summer = paintedIn(PALETTES.summer);
+    const autumn = paintedIn(PALETTES.autumn);
+    expect(summer.leaf).not.toBe(autumn.leaf);
+    // La corteza no cambia con el año.
+    expect(summer.bark).toBe(autumn.bark);
+    // Y el recurso compartido sale intacto: se tiñó una copia, no el original.
+    expect(leaf.color.getHexString()).toBe('62864f');
   });
 
   it('usa los colores que P1 decidió', () => {

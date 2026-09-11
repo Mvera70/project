@@ -10,11 +10,12 @@
 // peor que uno alineado: aquí el mismo valle da siempre el mismo bosque.
 
 import {
-  InstancedMesh, Group, Matrix4, Quaternion, Vector3,
+  Color, InstancedMesh, Group, Matrix4, Quaternion, Vector3,
   type BufferGeometry, type Material, type Object3D,
 } from 'three';
 import type { ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
+import type { Palette } from '@render/palette';
 
 /**
  * Cuántos árboles caben en una celda de bosque.
@@ -70,8 +71,28 @@ export interface Forest {
  * Se rehace cuando el suelo cambia, que es cuando alguien tala: unas pocas veces
  * al año, no sesenta veces por segundo.
  */
-export function buildForest(map: ValleyMap, tree: Object3D): Forest {
-  return scatterOn(map, tree, TERRAIN_CODE.forest);
+export function buildForest(map: ValleyMap, tree: Object3D, palette?: Palette): Forest {
+  return scatterOn(map, tree, TERRAIN_CODE.forest, palette);
+}
+
+/**
+ * Tine el follaje con el verde de la estación.
+ *
+ * El suelo cambiaba de color con la estación desde G-08 y el bosque no: en
+ * octubre el valle se ponía de oro y los árboles seguían de mayo. **El color lo
+ * pone §10.3**, el mismo que pinta el suelo y el mismo que usa el render 2D:
+ * aquí no se decide ningún verde, sólo se aplica el que ya estaba decidido.
+ *
+ * Sólo toca el follaje, nunca el tronco: la corteza no cambia con el año.
+ */
+function tintFoliage(material: Material, palette: Palette): void {
+  const painted = material as Material & { name: string; color?: Color };
+  if (painted.color === undefined) return;
+  if (painted.name.includes('leaf-light') || painted.name.includes('reed-light')) {
+    painted.color.set(palette.forest);
+  } else if (painted.name.includes('leaf') || painted.name.includes('reed')) {
+    painted.color.set(palette.forestDark);
+  }
 }
 
 /**
@@ -79,12 +100,12 @@ export function buildForest(map: ValleyMap, tree: Object3D): Forest {
  * tipo. Los arboles sobre el bosque y las rocas sobre la roca son el mismo
  * problema, y separarlos habria sido tener dos veces la misma cuenta.
  */
-export function scatterOn(map: ValleyMap, source: Object3D, terrain: number): Forest {
+export function scatterOn(map: ValleyMap, source: Object3D, terrain: number, palette?: Palette): Forest {
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
     if (map.terrain[cell] === terrain) cells.push(cell);
   }
-  return scatterCells(map, source, cells);
+  return scatterCells(map, source, cells, palette);
 }
 
 /**
@@ -112,12 +133,15 @@ export function shoreCells(map: ValleyMap): number[] {
 }
 
 /** Lo mismo sobre una lista de celdas ya elegida. */
-export function scatterCells(map: ValleyMap, source: Object3D, cells: readonly number[]): Forest {
+export function scatterCells(
+  map: ValleyMap, source: Object3D, cells: readonly number[], palette?: Palette,
+): Forest {
   const tree = source;
   const group = new Group();
   group.name = 'Valley_Forest';
   const pieces = piecesOf(tree);
   const owned: InstancedMesh[] = [];
+  const tinted: Material[] = [];
   const total = cells.length * PER_CELL;
 
   if (total > 0) {
@@ -128,7 +152,11 @@ export function scatterCells(map: ValleyMap, source: Object3D, cells: readonly n
     const up = new Vector3(0, 1, 0);
 
     for (const piece of pieces) {
-      const instanced = new InstancedMesh(piece.geometry, piece.material, total);
+      // El material se copia cuando hay estación que aplicar: el del recurso es
+      // de la biblioteca y pintarlo aquí se lo pintaría a todo el que lo use.
+      const material = palette === undefined ? piece.material : piece.material.clone();
+      if (palette !== undefined) tintFoliage(material, palette);
+      const instanced = new InstancedMesh(piece.geometry, material, total);
       instanced.castShadow = true;
       instanced.receiveShadow = true;
       let slot = 0;
@@ -152,6 +180,7 @@ export function scatterCells(map: ValleyMap, source: Object3D, cells: readonly n
       instanced.computeBoundingSphere();
       group.add(instanced);
       owned.push(instanced);
+      if (palette !== undefined) tinted.push(material);
     }
   }
 
@@ -167,6 +196,10 @@ export function scatterCells(map: ValleyMap, source: Object3D, cells: readonly n
         // otro que estuviera usando el mismo árbol.
         instanced.geometry.dispose();
       }
+      // Los materiales teñidos sí eran nuestros, y se sueltan. El del recurso,
+      // cuando no hay estación que aplicar, no.
+      for (const material of tinted) material.dispose();
+      tinted.length = 0;
       owned.length = 0;
     },
   };
