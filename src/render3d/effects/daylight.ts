@@ -51,6 +51,14 @@ export interface Daylight {
   readonly ambientIntensity: number;
   /** El fondo, que es también el color al que se va la niebla. */
   readonly background: string;
+  /**
+   * Cuánto día hay, de 0 a 1.
+   *
+   * Lo usan las señales que sólo tienen sentido de noche: §10.3 pide **luz al
+   * caer el día**, y una ventana encendida a mediodía no dice que haya alguien
+   * en casa, dice que el render no sabe qué hora es.
+   */
+  readonly daylight: number;
 }
 
 const SUN_HIGH = new Color('#FFF4D8');
@@ -127,6 +135,7 @@ export function daylightAt(phase: number): Daylight {
     groundBounce: blend(BOUNCE_DAY, BOUNCE_NIGHT, dark),
     ambientIntensity: 1.5 * (NIGHT_FLOOR + (1 - NIGHT_FLOOR) * light),
     background,
+    daylight: light,
   };
 }
 

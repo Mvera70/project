@@ -17,14 +17,15 @@ import {
   SphereGeometry, type Object3D,
 } from 'three';
 import type { Building, GameState } from '@engine/state';
+import { daylightAt } from './daylight';
 import { tellsFor, type Tell } from '@render/layers/tells';
 
 /** Alturas en celdas. Una celda son unos tres metros (D.6.2). */
 const HEIGHT = {
   smoke: 1.55,
   light: 0.47,
-  plague: 0.55,
-  candles: 0.6,
+  plague: 1.62,
+  candles: 0.42,
   banner: 1.1,
   grain: 0.05,
 } as const;
@@ -125,26 +126,48 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
       const home = at?.(tell.x, tell.y);
       const x = home === undefined ? tell.x : home.x + home.w / 2;
       const z = home === undefined ? tell.y : home.y - 0.12;
-      return [mark(new BoxGeometry(0.7, 0.42, 0.06), TONE.light, true, x, HEIGHT.light, z, 0.85)];
+      const lit = mark(new BoxGeometry(0.7, 0.42, 0.06), TONE.light, true, x, HEIGHT.light, z, 0.85);
+      lit.object.userData.lamp = 0.85;
+      return [lit];
     }
     case 'plague':
-      return [mark(new SphereGeometry(0.11, 6, 5), TONE.plague, false, tell.x, HEIGHT.plague, tell.y)];
-    case 'candles':
-      return Array.from({ length: Math.max(1, Math.min(5, tell.count)) }, (_, index) => mark(
-        new BoxGeometry(0.05, 0.12, 0.05), TONE.candles, true,
-        tell.x + (index - 2) * 0.11, HEIGHT.candles, tell.y,
-      ));
+      // Por encima del caballete, no a media altura de la pared. A media altura
+      // quedaba dentro de la casa, como la luz: la peste es una alarma y una
+      // alarma que hay que buscar no es una alarma.
+      return [mark(new SphereGeometry(0.13, 6, 5), TONE.plague, false, tell.x, HEIGHT.plague, tell.y)];
+    case 'candles': {
+      // Las velas se ponen en la fachada de la capilla por el mismo motivo que
+      // la luz: dentro no las ve nadie.
+      const chapel = at?.(tell.x, tell.y);
+      const x = chapel === undefined ? tell.x : chapel.x + chapel.w / 2;
+      const z = chapel === undefined ? tell.y : chapel.y - 0.1;
+      return Array.from({ length: Math.max(1, Math.min(5, tell.count)) }, (_, index) => {
+        const candle = mark(
+          new BoxGeometry(0.05, 0.16, 0.05), TONE.candles, true,
+          x + (index - 2) * 0.13, HEIGHT.candles, z, 0.95,
+        );
+        candle.object.userData.lamp = 0.95;
+        return candle;
+      });
+    }
     case 'banner':
       return [mark(
         new BoxGeometry(0.07, 0.42, 0.02), BANNER_TONES[tell.colour] ?? '#8C3B34', false,
         tell.x, HEIGHT.banner, tell.y,
       )];
     case 'granary': {
-      // El grano se ve por cuánto llena, no por su color: una caja que sube.
-      const tall = Math.max(0.04, tell.fraction * 0.55);
+      // El grano se ve por cuánto llena, no por su color: un montón que sube.
+      //
+      // Y sube **delante** del granero, no en su centro: en el centro quedaba
+      // debajo del granero, que va sobre postes, y desde arriba no se veía
+      // crecer nada. Delante es donde se apila el grano de todas formas.
+      const barn = at?.(tell.x + 1, tell.y + 1);
+      const tall = Math.max(0.04, tell.fraction * 0.5);
+      const x = barn === undefined ? tell.x + 1 : barn.x + barn.w / 2;
+      const z = barn === undefined ? tell.y + 1 : barn.y - 0.42;
       return [mark(
-        new BoxGeometry(1.2, tall, 1.2), TONE.grain, false,
-        tell.x + 1, HEIGHT.grain + tall / 2, tell.y + 1,
+        new BoxGeometry(1.15, tall, 0.6), TONE.grain, false,
+        x, HEIGHT.grain + tall / 2, z,
       )];
     }
     default:
@@ -170,10 +193,17 @@ interface Plume {
   readonly phase: number;
 }
 
+/** Una señal que sólo alumbra de noche, con la opacidad que le toca de pleno. */
+interface Lamp {
+  readonly mesh: Object3D;
+  readonly peak: number;
+}
+
 export class Tells {
   readonly group = new Group();
   private owned: Array<{ dispose(): void }> = [];
   private plumes: Plume[] = [];
+  private lamps: Lamp[] = [];
   private signature = '';
 
   constructor() {
@@ -204,6 +234,8 @@ export class Tells {
         this.owned.push(piece);
         const plume = piece.object.userData.plume as Omit<Plume, 'mesh'> | undefined;
         if (plume !== undefined) this.plumes.push({ mesh: piece.object, ...plume });
+        const lamp = piece.object.userData.lamp as number | undefined;
+        if (lamp !== undefined) this.lamps.push({ mesh: piece.object, peak: lamp });
       }
     }
   }
@@ -219,7 +251,20 @@ export class Tells {
    * Una columna quieta era lo que delataba que el valle era una maqueta: todo
    * lo demás se movía menos lo que por definición no puede estarse quieto.
    */
-  drift(presentationSeconds: number): void {
+  drift(presentationSeconds: number, dayPhase = 1): void {
+    // Las luces se encienden cuando cae el día y se apagan al salir el sol.
+    // §10.3 dice **luz al caer el día**, y una ventana encendida a mediodía no
+    // dice que haya alguien en casa: dice que el render no sabe qué hora es.
+    const dusk = 1 - daylightAt(dayPhase).daylight;
+    for (const lamp of this.lamps) {
+      const material = (lamp.mesh as Object3D & { material?: { opacity: number; transparent: boolean } }).material;
+      lamp.mesh.visible = dusk > 0.02;
+      if (material !== undefined) {
+        material.transparent = true;
+        material.opacity = lamp.peak * dusk;
+      }
+    }
+
     for (const plume of this.plumes) {
       const turn = (presentationSeconds / PLUME_SECONDS + plume.phase) % 1;
       plume.mesh.position.y = plume.base + turn * PLUME_RISE;
@@ -246,6 +291,7 @@ export class Tells {
     for (const piece of this.owned) piece.dispose();
     this.owned = [];
     this.plumes = [];
+    this.lamps = [];
     this.signature = '';
   }
 

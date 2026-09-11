@@ -313,16 +313,18 @@ export async function createGraphicsRenderer(
       // village is not, because it changes a few times a year.
       lastActors = actorsFor(state as GameState, frame, { tracked, memory });
       cast.show(lastActors);
+      // La hora escenica: la piden el rebano, las luces y el sol.
+      const phase = dayPhase(frame.presentationSeconds);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
       tells.update(state as GameState);
-      // Y el humo, que es lo unico de las senales que se mueve por fotograma.
-      tells.drift(frame.presentationSeconds);
+      // El humo y las luces si son de cada fotograma: uno sube y las otras se
+      // encienden cuando cae el dia.
+      tells.drift(frame.presentationSeconds, phase);
       // Y el rio corre. Un rio quieto es un suelo azul.
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
-      const phase = dayPhase(frame.presentationSeconds);
       fauna.update(state as GameState, phase);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.

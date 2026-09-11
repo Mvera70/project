@@ -447,6 +447,25 @@ describe('G-10 · la luz de las casas', () => {
   });
 });
 
+describe('G-10 · las luces saben qué hora es', () => {
+  it('encendidas de noche, apagadas a mediodía', () => {
+    // §10.3 pide **luz al caer el día**. Una ventana encendida a mediodía no
+    // dice que haya alguien en casa: dice que el render no sabe qué hora es.
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+    const lamps = tells.group.children.filter((thing) => thing.userData.lamp !== undefined);
+    expect(lamps.length).toBeGreaterThan(0);
+
+    tells.drift(0, NOON);
+    expect(lamps.every((lamp) => !lamp.visible)).toBe(true);
+
+    tells.drift(0, 0.97);
+    expect(lamps.every((lamp) => lamp.visible)).toBe(true);
+    tells.dispose();
+  });
+});
+
 describe('G-10 · el humo se mueve', () => {
   it('sube, se deshace y vuelve a empezar', () => {
     const state = village(14);
