@@ -16,6 +16,8 @@ import { isHere } from '@engine/people/demography';
 import type { Building, GameState, Villager, VillagerId } from '@engine/state';
 import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { gatheringsAt } from '@render/gatherings';
 import { ageOf } from '@engine/people/villagers';
 import { dayNumber, dayPhase } from '../presentation-clock';
 import { clipTime, VILLAGER_CLIPS, type ClipName } from './clips';
@@ -94,10 +96,19 @@ export interface ActorMemory {
   game: string;
   day: number;
   routes: Map<VillagerId, number[]>;
+  /**
+   * La celda donde la aldea se junta hoy, o `null` si hoy no hay reunion.
+   *
+   * Se decide al amanecer como los destinos y por el mismo motivo: cambiarla a
+   * media jornada teletransporta.
+   */
+  gathering: number | null;
+  /** En que tick estabamos en el amanecer anterior, para no perderse nada. */
+  tick: number;
 }
 
 export function createActorMemory(): ActorMemory {
-  return { game: '', day: -1, routes: new Map() };
+  return { game: '', day: -1, routes: new Map(), gathering: null, tick: 0 };
 }
 
 interface Point { x: number; z: number }
@@ -392,6 +403,28 @@ function workSpot(
  * desde el estado final y no tiene sentido honrar una decision de hace ochenta
  * semanas.
  */
+/**
+ * Donde se junta hoy la aldea, si es que se junta.
+ *
+ * §11.8: veinticinco de las cincuenta y seis opciones del catalogo convocan a
+ * la gente, y el principio 1 del juego dice que **toda opcion cambia algo en
+ * pantalla**. Quien decide si hay reunion y donde es `gatheringsAt`, el mismo
+ * del render 2D; aqui solo se pregunta, y se pregunta **desde el amanecer
+ * anterior** porque una reunion de cuatro semanas cabe entera entre dos
+ * amaneceres.
+ *
+ * Si hay varias a la vez se toma la primera, que es la mas antigua: la aldea no
+ * puede juntarse en dos sitios.
+ */
+function gatheringCell(state: GameState, since: number, width: number): number | null {
+  const live = gatheringsAt(state, CATALOG, since);
+  const first = live[0];
+  if (first === undefined) return null;
+  const x = Math.max(0, Math.min(width - 1, Math.floor(first.x)));
+  const y = Math.max(0, Math.min(state.map.height - 1, Math.floor(first.y)));
+  return y * width + x;
+}
+
 function routesFrom(
   state: GameState, frame: GraphicsFrame, today: number, memory?: ActorMemory,
 ): Map<VillagerId, number[]> {
@@ -400,9 +433,26 @@ function routesFrom(
 
   const game = `${state.seed}:${state.terrainSeed}`;
   if (memory.game !== game || memory.day !== today || frame.discontinuity) {
+    const since = memory.game === game && !frame.discontinuity ? memory.tick : state.tick;
     memory.game = game;
     memory.day = today;
+    memory.tick = state.tick;
+    memory.gathering = gatheringCell(state, since, state.map.width);
     memory.routes = new Map(live);
+    if (memory.gathering !== null) {
+      // Hoy nadie va al tajo: se va a la plaza, a la capilla o al vado. La ruta
+      // es la puerta de casa y el sitio de la reunion, en linea recta, que es
+      // lo mismo que hace el render 2D —donde tampoco hay camino calculado— y
+      // lo unico que se puede hacer sin pedirle rutas al motor: su cache de
+      // rutas es la que el motor usa para desgastar caminos, y escribir en ella
+      // seria que el render moviera la simulacion.
+      const where = memory.gathering;
+      for (const [id, cells] of memory.routes) {
+        const door = cells[0];
+        if (door === undefined || door === where) continue;
+        memory.routes.set(id, [door, where]);
+      }
+    }
     return memory.routes;
   }
 
@@ -428,6 +478,9 @@ export function actorsFor(
   const phase = dayPhase(frame.presentationSeconds);
   const today = dayNumber(frame.presentationSeconds);
   const routes = options.plan?.routes ?? routesFrom(state, frame, today, options.memory);
+  // Donde se junta la aldea hoy, decidido al amanecer. Sin memoria no hay
+  // reunion: las rutas son las del motor y nadie las ha cambiado.
+  const gathering = options.memory?.gathering ?? null;
   const standing = new Map(state.buildings.filter((building) => building.lostTick === null)
     .map((building) => [building.id, centre(building, width)]));
 
@@ -486,6 +539,7 @@ export function actorsFor(
     // suelo recorrido no cuadrara con el camino, hasta un veinte por ciento en
     // un viaje corto, que es exactamente el patinaje que la zancada evita.
     const target = cells[cells.length - 1] ?? 0;
+    const summoned = gathering !== null && target === gathering;
     const spot = workSpot(target, person.id, width, plots, sharing);
     const line = cells.map((cell) => cellPoint(cell, width));
     if (line.length > 0) line[line.length - 1] = spot;
@@ -496,7 +550,14 @@ export function actorsFor(
     // Si el cuerpo se mueve, el clip tiene que ser el de andar. Siempre.
     let stepping = false;
 
-    if (activity === 'working') {
+    if (activity === 'working' && summoned) {
+      // En una reunion no se trabaja: se esta. Quieto, mirando al centro del
+      // corro, que es lo que convierte a doce personas sueltas en una reunion.
+      point = spot;
+      const centre = cellPoint(target, width);
+      facing = Math.atan2(centre.x - spot.x, centre.z - spot.z);
+      travelled = 0;
+    } else if (activity === 'working') {
       const span = Math.max(1e-6, day.depart - day.arrive);
       const through = (phase - day.arrive) / span;
       const turn = working(person, state.tick, through, spot, DAY.WORK_REACH);
@@ -526,7 +587,9 @@ export function actorsFor(
       travelled = 0;
     }
 
-    const clip = stepping ? 'walk' : clipFor(activity, person, state.tick);
+    const clip = stepping ? 'walk'
+      : summoned && activity === 'working' ? 'idle'
+        : clipFor(activity, person, state.tick);
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(point.x)));
     const cellZ = Math.max(0, Math.min(state.map.height - 1, Math.floor(point.z)));
 

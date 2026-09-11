@@ -57,7 +57,9 @@ function placeOf(state: GameState, where: 'square' | 'chapel' | 'ford'): { x: nu
  * pantalla (§10.6): una reunión de cuatro días que durase medio tick no se
  * vería nunca. Queda anotada en §11.8 para la revisión artística.
  */
-export function gatheringsAt(state: GameState, catalogue: Catalogue): Gathering[] {
+export function gatheringsAt(
+  state: GameState, catalogue: Catalogue, sinceTick: number = state.tick,
+): Gathering[] {
   const out: Gathering[] = [];
   for (const decision of state.history) {
     if (decision.tick > state.tick) continue;
@@ -66,7 +68,14 @@ export function gatheringsAt(state: GameState, catalogue: Catalogue): Gathering[
     if (option === undefined) continue;
     for (const effect of option.visible) {
       if (effect.k !== 'gather') continue;
-      if (state.tick - decision.tick >= effect.days) continue;
+      // Viva ahora, o viva en algún momento desde `sinceTick`.
+      //
+      // El render 2D pregunta por ahora mismo y no pasa el tercer argumento, así
+      // que para él no cambia nada. El 3D pregunta por «desde el amanecer
+      // anterior», porque allí los destinos del día se deciden al amanecer y una
+      // reunión de cuatro semanas cabe entera entre dos amaneceres: preguntando
+      // sólo por ahora, la mitad de las reuniones no se verían nunca.
+      if (decision.tick + effect.days <= sinceTick) continue;
       const point = placeOf(state, effect.where);
       out.push({ x: point.x, y: point.y, sinceTick: decision.tick, ticks: effect.days });
     }

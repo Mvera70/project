@@ -519,3 +519,74 @@ describe('G-05 · los actores', () => {
     expect(Object.keys(VILLAGER_CLIPS).length).toBe(villager?.motion.length);
   });
 });
+
+describe('G-10 · la reunión (§11.8)', () => {
+  /** Una decisión con `gather` puesta a mano, para no simular veinte años. */
+  function summon(state: GameState): GameState {
+    const called = structuredClone(state);
+    const template = CATALOG.find((candidate) => candidate.options.some(
+      (option) => option.visible.some((effect) => effect.k === 'gather'),
+    ));
+    expect(template).toBeDefined();
+    const option = template?.options.find(
+      (candidate) => candidate.visible.some((effect) => effect.k === 'gather'),
+    );
+    called.history.push({
+      tick: called.tick, templateId: template?.id ?? '', optionId: option?.id ?? '', cast: {},
+    });
+    return called;
+  }
+
+  it('la aldea se junta donde la decisión dijo', () => {
+    // El principio 1 del juego: toda opción de encrucijada cambia algo en
+    // pantalla. Veinticinco de las cincuenta y seis convocan a la gente, y
+    // hasta ahora en tres dimensiones no pasaba nada.
+    const state = village(12);
+    const called = summon(state);
+
+    const before = actorsFor(state, frameAt(0), { memory: createActorMemory() });
+    const after = actorsFor(called, frameAt(0), { memory: createActorMemory() });
+    expect(before.length).toBeGreaterThan(4);
+    expect(after.length).toBe(before.length);
+
+    // Durante la jornada todos comparten destino, que es el sitio de la
+    // reunión. Sin ella cada uno va a lo suyo.
+    const midday = frameAt(SCENIC_DAY_SECONDS * 0.2);
+    const scattered = new Set(
+      actorsFor(state, midday, { memory: createActorMemory() }).map((actor) => actor.cell),
+    );
+    const gathered = new Set(
+      actorsFor(called, midday, { memory: createActorMemory() }).map((actor) => actor.cell),
+    );
+    expect(gathered.size).toBeLessThan(scattered.size);
+  });
+
+  it('en la reunión se está, no se cava', () => {
+    const called = summon(village(12));
+    const memory = createActorMemory();
+    const actors = actorsFor(called, frameAt(SCENIC_DAY_SECONDS * 0.35), { memory });
+    const working = actors.filter((actor) => actor.activity === 'working');
+    expect(working.length).toBeGreaterThan(0);
+    for (const actor of working) expect(actor.clip).not.toBe('work_hoe');
+  });
+
+  it('nadie se teletransporta al juntarse', () => {
+    // La reunión se decide al amanecer, como los destinos, y por el mismo
+    // motivo: cambiarla a media jornada dejaría a la gente en otro sitio de
+    // golpe, que es el defecto que costó dos rondas arreglar.
+    const called = summon(village(12));
+    const memory = createActorMemory();
+    let worst = 0;
+    const where = new Map<number, { x: number; z: number }>();
+    for (let step = 0; step <= 240; step += 1) {
+      const seconds = (step / 240) * SCENIC_DAY_SECONDS;
+      for (const actor of actorsFor(called, frameAt(seconds), { memory })) {
+        const last = where.get(actor.id);
+        if (last !== undefined) worst = Math.max(worst, Math.hypot(actor.x - last.x, actor.z - last.z));
+        where.set(actor.id, { x: actor.x, z: actor.z });
+      }
+    }
+    // Medio segundo de día escénico a paso vivo no llega a media celda.
+    expect(worst).toBeLessThan(0.5);
+  });
+});

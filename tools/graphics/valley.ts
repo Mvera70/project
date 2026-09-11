@@ -65,6 +65,25 @@ async function main(): Promise<void> {
   const week = number('week', -1);
   if (week >= 0) run(state, ((week - (state.tick % 48)) + 48) % 48, 'prudent', CATALOG);
 
+  // `?gather=1` convoca a la aldea a mano.
+  //
+  // Las reuniones de §11.8 son raras —dos en treinta años en una partida
+  // medida— así que esperar a que salga una para mirarla no es un método. Esto
+  // empuja una decisión con `gather` al historial, que es de donde
+  // `gatheringsAt` las lee: no hay camino especial ni estado nuevo, es una
+  // partida en la que se acaba de decidir algo.
+  if (number('gather', 0) > 0) {
+    const template = CATALOG.find((candidate) => candidate.options.some(
+      (option) => option.visible.some((effect) => effect.k === 'gather'),
+    ));
+    const option = template?.options.find(
+      (candidate) => candidate.visible.some((effect) => effect.k === 'gather'),
+    );
+    if (template !== undefined && option !== undefined) {
+      state.history.push({ tick: state.tick, templateId: template.id, optionId: option.id, cast: {} });
+    }
+  }
+
   const canvas = document.querySelector<HTMLCanvasElement>('#stage');
   if (canvas === null) throw new Error('No canvas.');
   document.body.style.width = `${width}px`;
