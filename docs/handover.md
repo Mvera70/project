@@ -77,8 +77,25 @@ Un piloto 3D en `src/render3d/`, aparte del juego, que **no sustituye a
 | **G-04** | Aldeano articulado, 1 236 triángulos, 16 huesos, cuatro clips, piel rígida decidida en banco común |
 | **G-05** | Reloj de presentación y actores derivados: quién hace qué en cada instante |
 | **G-06** | Escena alimentada por una partida real: terreno, edificios, gente andando |
+| **G-07** | Cámara, tacto e interfaz: se juega dentro del juego con `?render=3d` |
+| **G-08** | Estaciones y señales: el valle dice lo que le pasa sin abrir una ficha |
+| **G-09** | Banco de medida y presupuesto propuesto (D.9.1), parcial por falta de móvil |
+| **G-10** | Catálogo: 31 recursos, río con cauce, ruinas, fauna, luz del día y gente distinta |
 
 Puertas: P0 y P1 cerradas. **P2 pendiente de tu juicio sobre la demo.**
+
+**Dónde vive cada cosa de G-10.** Los guiones que escriben las recetas están en
+`tools/art/lots/` con su README; la plantilla y el armador de la demo
+publicable, en `tools/graphics/pilot-page.html` y `bundle-pilot.ts`. Los tres
+vivían en el scratchpad de la sesión y se perdieron dos veces.
+
+**Lo que G-10 dejó y no es catálogo**, porque no se ve en la lista de recursos:
+el relieve del suelo (`world/ground.ts`: el agua baja, la roca sube, el camino
+se hunde con lo pisado que esté, y las esquinas promedian, que es lo que da la
+orilla); la lámina de agua con su onda; la luz del día escénico
+(`effects/daylight.ts`, función pura de la hora); la fauna de §7.7 instanciada
+(`effects/fauna.ts`), que reutiliza `animalPositions` del render 2D; el humo que
+sube; y la variación de talla y ropa del reparto (`world/cast.ts`).
 
 ### Lo que se puede mirar sin arrancar nada
 
