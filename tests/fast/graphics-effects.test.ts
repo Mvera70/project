@@ -409,3 +409,59 @@ describe('G-10 · la luz del día escénico', () => {
     }
   });
 });
+
+describe('G-10 · el humo se mueve', () => {
+  it('sube, se deshace y vuelve a empezar', () => {
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+    const smoke = tells.group.children.find((thing) => thing.userData.plume !== undefined);
+    expect(smoke).toBeDefined();
+    const puff = smoke as NonNullable<typeof smoke>;
+
+    // A lo largo de una vuelta sube siempre, menos una vez: cuando se deshace
+    // y vuelve a salir por la chimenea. Cuál es ese momento depende del desfase
+    // de esta casa, así que no se busca por reloj, se cuenta.
+    tells.drift(0);
+    const start = puff.position.y;
+    let falls = 0;
+    let before = start;
+    for (let step = 1; step <= 60; step += 1) {
+      tells.drift(step / 10);
+      if (puff.position.y < before) falls += 1;
+      before = puff.position.y;
+    }
+    expect(falls).toBe(1);
+    // Y la vuelta se cierra: seis segundos después está donde estaba.
+    tells.drift(6);
+    expect(puff.position.y).toBeCloseTo(start, 5);
+    tells.dispose();
+  });
+
+  it('el humo no reconstruye nada al moverse', () => {
+    // D.6 lo dice con estas palabras: no rehacer todo en cada fotograma. Mover
+    // una señal tiene que ser mover una señal.
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+    const before = tells.group.children[0];
+    for (let step = 0; step < 30; step += 1) tells.drift(step * 0.016);
+    expect(tells.group.children[0]).toBe(before);
+    tells.dispose();
+  });
+
+  it('dos casas no humean al unísono', () => {
+    // Un valle donde todas las chimeneas laten a la vez se lee como un latido,
+    // no como un pueblo. El desfase sale de dónde está cada casa.
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+    tells.drift(1.3);
+    const heights = tells.group.children
+      .filter((thing) => thing.userData.plume !== undefined)
+      .map((thing) => thing.position.y.toFixed(3));
+    expect(heights.length).toBeGreaterThan(3);
+    expect(new Set(heights).size).toBeGreaterThan(1);
+    tells.dispose();
+  });
+});

@@ -45,7 +45,15 @@ const REED = 'reed';
  */
 const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
 /** Todo lo que el valle sabe pintar hoy. Lo que no este aqui, no se descarga. */
-const WANTED = [
+/**
+ * Los recursos que este renderer pide al catalogo.
+ *
+ * Se exporta porque hay dos sitios que necesitan saberlo: el que los carga y el
+ * que arma la demo publicable metiendolos dentro de la pagina. La demo lo
+ * raspaba de este fichero a base de expresiones regulares, y se dejo los juncos
+ * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
+ */
+export const WANTED = [
   VILLAGER, TREE, ROCK, REED, 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
@@ -307,6 +315,8 @@ export async function createGraphicsRenderer(
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
       tells.update(state as GameState);
+      // Y el humo, que es lo unico de las senales que se mueve por fotograma.
+      tells.drift(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
       const phase = dayPhase(frame.presentationSeconds);

@@ -1,0 +1,236 @@
+<title>El valle, en marcha</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Karla:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #232a1c;
+    --ink-soft: #5c6650;
+    --ground: #eef0e4;
+    --panel: #e2e6d3;
+    --edge: #c6cdb0;
+    --meadow: #6f8c46;
+    --clay: #a96146;
+    --sky: #dde3c4;
+    --display: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+    --body: 'Karla', 'Segoe UI', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', 'Consolas', ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ink: #e6e9db; --ink-soft: #9aa389; --ground: #1b1f16;
+      --panel: #262b1e; --edge: #3b422e; --meadow: #9dbb6c; --clay: #c97b5c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ink: #e6e9db; --ink-soft: #9aa389; --ground: #1b1f16;
+    --panel: #262b1e; --edge: #3b422e; --meadow: #9dbb6c; --clay: #c97b5c;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--body); font-size: 15px; line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 0 44px; }
+
+  header { padding: 20px 18px 14px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--ink-soft); margin: 0 0 6px;
+  }
+  h1 {
+    font-family: var(--display); font-weight: 700; margin: 0;
+    font-size: clamp(25px, 7vw, 36px); line-height: 1.05; letter-spacing: -.02em;
+  }
+  header p { margin: 9px 0 0; max-width: 56ch; color: var(--ink-soft); }
+
+  #stage-wrap {
+    background: var(--sky);
+    border-top: 1px solid var(--edge);
+    border-bottom: 1px solid var(--edge);
+    line-height: 0;
+    touch-action: manipulation;
+  }
+  #stage { display: block; margin: 0 auto; }
+
+  .bar { padding: 14px 18px 0; display: flex; flex-direction: column; gap: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  button {
+    font-family: var(--display); font-weight: 600; font-size: 14px;
+    color: var(--ink); background: var(--panel);
+    border: 1px solid var(--edge); border-radius: 2px; padding: 9px 14px; cursor: pointer;
+  }
+  button:hover { border-color: var(--meadow); }
+  button:focus-visible { outline: 2px solid var(--meadow); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--meadow); border-color: var(--meadow); color: var(--sky); }
+  input[type="number"] {
+    font-family: var(--mono); font-size: 14px; width: 5.2em;
+    color: var(--ink); background: var(--panel);
+    border: 1px solid var(--edge); border-radius: 2px; padding: 8px 9px;
+  }
+  label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft);
+    display: flex; align-items: center; gap: 7px;
+  }
+
+  #readout, #touched {
+    margin: 0; font-family: var(--mono); font-size: 12px; color: var(--ink-soft);
+    min-height: 1.4em;
+  }
+  #touched { color: var(--clay); }
+
+  section { padding: 24px 18px 0; }
+  h2 {
+    font-family: var(--display); font-weight: 600; font-size: 13px;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft);
+    margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--edge);
+  }
+  .notes { display: grid; gap: 15px; }
+  .note { display: grid; grid-template-columns: 3px 1fr; gap: 12px; }
+  .note i { background: var(--edge); border-radius: 2px; }
+  .note.flag i { background: var(--clay); }
+  .note h3 { font-family: var(--display); font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+  .note p { margin: 0; color: var(--ink-soft); max-width: 58ch; }
+  .note p b { color: var(--ink); font-weight: 500; }
+  footer {
+    padding: 26px 18px 0; font-family: var(--mono); font-size: 11px;
+    letter-spacing: .05em; color: var(--ink-soft);
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">The Valley · piloto 3D · ronda G-10</p>
+    <h1>El valle, en marcha</h1>
+    <p>
+      Una partida de verdad, corriendo en tu pantalla: el mismo motor, el mismo
+      renderer y el mismo aldeano que valida la ronda. Nada está pregrabado.
+      <b>Pellizca para acercarte</b>, arrastra para moverte y toca para
+      seleccionar.
+    </p>
+  </header>
+
+  <div id="stage-wrap"><canvas id="stage"></canvas></div>
+
+  <div class="bar">
+    <p id="readout">Fundando la aldea…</p>
+    <p id="touched"></p>
+    <div class="row">
+      <button data-speed="0" type="button">Pausa</button>
+      <button data-speed="1" type="button" aria-pressed="true">×1</button>
+      <button data-speed="4" type="button">×4</button>
+      <button data-speed="16" type="button">×16</button>
+    </div>
+    <div class="row">
+      <label>Semilla <input id="seed" type="number" value="7" min="1" max="99999"></label>
+      <label>Años <input id="years" type="number" value="14" min="1" max="60"></label>
+      <button id="refound" type="button">Fundar de nuevo</button>
+      <button id="reset-view" type="button">Vista inicial</button>
+    </div>
+  </div>
+
+  <section>
+    <h2>Qué mirar</h2>
+    <div class="notes">
+      <div class="note">
+        <i></i>
+        <div>
+          <h3>La escala que decidiste</h3>
+          <p>
+            Un aldeano mide <b>0,65 celdas</b>, y una celda del valle son unos
+            tres metros porque una casa ocupa dos por dos. De lejos la gente son
+            motas que van y vienen; <b>acércate</b> y se les ve trabajar. El tope
+            de cerca deja ocho celdas en pantalla, que es un aldeano ocupando un
+            doceavo del alto.
+          </p>
+        </div>
+      </div>
+      <div class="note">
+        <i></i>
+        <div>
+          <h3>La jornada, no la semana</h3>
+          <p>
+            Un día escénico dura dos minutos y se acelera con la <b>raíz</b> de la
+            velocidad: ×4 mueve a la gente al doble y ×16 al cuádruple, mientras
+            el mundo corre cuatro y dieciséis veces más. Atarlo a la velocidad
+            entera ponía las piernas a dieciséis ciclos por segundo; no atarlo
+            hacía que el botón pareciera roto.
+          </p>
+        </div>
+      </div>
+      <div class="note">
+        <i></i>
+        <div>
+          <h3>El paso lo marca el suelo</h3>
+          <p>
+            El ciclo de piernas avanza una vuelta por cada zancada de terreno
+            pisado, así que <b>los pies no pueden patinar</b>. Y en la parcela se
+            cava quieto y se dan unos pasos al surco siguiente: un clip en el
+            sitio exige un cuerpo en el sitio, o se lee como deslizarse.
+          </p>
+        </div>
+      </div>
+      <div class="note flag">
+        <i></i>
+        <div>
+          <h3>Las estaciones y lo que le pasa a la aldea</h3>
+          <p>
+            El suelo se pinta con la paleta de la estación, la misma que usa el
+            juego en 2D. Ponle ×16 y verás <b>nevar y deshelar</b>. Y el valle
+            dice lo que le pasa sin abrir una ficha: humo en las casas
+            habitadas, luz en la puerta al caer el día, velas en la capilla
+            según la fe, y el granero subiendo y bajando con el grano.
+          </p>
+        </div>
+      </div>
+      <div class="note flag">
+        <i></i>
+        <div>
+          <h3>El d&iacute;a, la noche y el r&iacute;o</h3>
+          <p>
+            El sol sale por el este, cruza y se pone: c&aacute;lido cuando est&aacute; bajo,
+            con el cielo encendido justo antes de irse. <b>La noche es de luna
+            llena a prop&oacute;sito</b>, porque el granero se tiene que poder leer a
+            las tres de la madrugada. Y el r&iacute;o ya no es un color: va por un
+            cauce hundido, con la orilla bajando hacia el agua y juncos donde el
+            prado la toca.
+          </p>
+        </div>
+      </div>
+      <div class="note flag">
+        <i></i>
+        <div>
+          <h3>La cabaña y lo que ronda</h3>
+          <p>
+            Vaca, cerdo, gallina, lobo, cuervo y pez. <b>Cu&aacute;ntos hay sale del
+            estado</b>, no de la decoraci&oacute;n: si un lobo se llev&oacute; la vaca, hay
+            una vaca menos en pantalla. Los cuervos s&oacute;lo aparecen con la mies
+            en pie, y menos si la aldea paga guardas. Al anochecer se recogen
+            con la gente.
+          </p>
+        </div>
+      </div>
+      <div class="note">
+        <i></i>
+        <div>
+          <h3>Y lo que todav&iacute;a no es</h3>
+          <p>
+            Treinta recursos en el cat&aacute;logo y ninguna ficha al seleccionar: por
+            ahora el toque s&oacute;lo dice qu&eacute; has tocado. El aldeano <b>no tiene
+            frente</b>, as&iacute; que de espaldas y de cara se parece demasiado.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Motor determinista · Blender 5.2.1 → glTF → Three.js · misma semilla, misma partida</footer>
+</div>
+
+<script type="module">
+__PILOT_BUNDLE__
+</script>

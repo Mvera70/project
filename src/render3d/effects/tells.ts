@@ -91,11 +91,23 @@ function bodyOf(tell: Tell): Array<{ object: Object3D; dispose(): void }> {
     case 'smoke': {
       // Tres bolas cada vez más altas y más tenues: una columna, no una mancha.
       // La intensidad viene del ánimo, y una aldea hundida humea poco.
-      return [0, 1, 2].map((step) => mark(
-        new SphereGeometry(0.09 + step * 0.035, 6, 5), TONE.smoke, false,
-        tell.x, HEIGHT.smoke + step * 0.22, tell.y,
-        (0.18 + tell.intensity * 0.45) * (1 - step * 0.25),
-      ));
+      return [0, 1, 2].map((step) => {
+        const piece = mark(
+          new SphereGeometry(0.09 + step * 0.035, 6, 5), TONE.smoke, false,
+          tell.x, HEIGHT.smoke, tell.y,
+          (0.18 + tell.intensity * 0.45),
+        );
+        // Cada bola sube por su cuenta, desfasada un tercio de vuelta: eso es
+        // lo que hace columna en vez de tres bolas que suben a la vez. El
+        // desfase de la chimenea viene de dónde está, así que dos casas no
+        // humean al unísono como un coro.
+        piece.object.userData.plume = {
+          base: HEIGHT.smoke,
+          peak: 0.18 + tell.intensity * 0.45,
+          phase: (step / 3 + (tell.x * 0.37 + tell.y * 0.19)) % 1,
+        };
+        return piece;
+      });
     }
     case 'light':
       return [mark(new BoxGeometry(0.16, 0.2, 0.06), TONE.light, true, tell.x, HEIGHT.light, tell.y)];
@@ -124,9 +136,28 @@ function bodyOf(tell: Tell): Array<{ object: Object3D; dispose(): void }> {
   }
 }
 
+/**
+ * Cuánto tarda una bocanada en subir y deshacerse, en segundos.
+ *
+ * TUNE: seis. Es humo de leña visto desde lejos, no vapor de una locomotora:
+ * más rápido parece que la casa arde, y la casa que arde ya tiene su señal.
+ */
+const PLUME_SECONDS = 6;
+
+/** Lo que sube una bocanada antes de deshacerse, en celdas. */
+const PLUME_RISE = 0.85;
+
+interface Plume {
+  readonly mesh: Object3D;
+  readonly base: number;
+  readonly peak: number;
+  readonly phase: number;
+}
+
 export class Tells {
   readonly group = new Group();
   private owned: Array<{ dispose(): void }> = [];
+  private plumes: Plume[] = [];
   private signature = '';
 
   constructor() {
@@ -147,6 +178,34 @@ export class Tells {
       for (const piece of bodyOf(tell)) {
         this.group.add(piece.object);
         this.owned.push(piece);
+        const plume = piece.object.userData.plume as Omit<Plume, 'mesh'> | undefined;
+        if (plume !== undefined) this.plumes.push({ mesh: piece.object, ...plume });
+      }
+    }
+  }
+
+  /**
+   * Mueve el humo.
+   *
+   * Esto sí es de cada fotograma, y es lo único que lo es: el resto de señales
+   * cambia con la semana. Una bocanada sube, se hincha y se deshace, y vuelve a
+   * empezar. La hora sale del reloj de presentación y de nada más, así que dos
+   * máquinas en el mismo instante dibujan el mismo humo (§4.3).
+   *
+   * Una columna quieta era lo que delataba que el valle era una maqueta: todo
+   * lo demás se movía menos lo que por definición no puede estarse quieto.
+   */
+  drift(presentationSeconds: number): void {
+    for (const plume of this.plumes) {
+      const turn = (presentationSeconds / PLUME_SECONDS + plume.phase) % 1;
+      plume.mesh.position.y = plume.base + turn * PLUME_RISE;
+      // Se hincha al subir, como el humo de verdad, y se apaga al final.
+      const swell = 1 + turn * 1.6;
+      plume.mesh.scale.setScalar(swell);
+      const mesh = plume.mesh as Object3D & { material?: { opacity: number; transparent: boolean } };
+      if (mesh.material !== undefined) {
+        mesh.material.transparent = true;
+        mesh.material.opacity = plume.peak * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
       }
     }
   }
@@ -159,6 +218,7 @@ export class Tells {
     this.group.clear();
     for (const piece of this.owned) piece.dispose();
     this.owned = [];
+    this.plumes = [];
     this.signature = '';
   }
 
