@@ -44,6 +44,13 @@ PLATES = [
       ('otono', u'Otoño', u'Segado. Los mismos surcos, rasos y del color de la tierra, y el bosque con ellos.'),
       ('invierno', u'Invierno', u'Nieva en el prado y cuaja en los tejados, al 72 %: del todo, un tejado '
        u'deja de leerse como tejado.')]),
+    ('gente', u'La gente', u'Lo que decide el motor, visto desde arriba. Ninguna de estas dos '
+     u'imágenes está montada: es la misma partida y el mismo instante, y lo único que cambia es que '
+     u'en la segunda se acaba de tomar una decisión que convoca a la aldea.',
+     [('jornada', u'Un día cualquiera', u'Cada uno en su campo. Los que se aprecian se paran a '
+       u'hablar por el camino; los que se detestan, nunca.'),
+      ('reunion', u'El día que se convoca', u'Nadie va al tajo: la aldea se junta donde dijo la '
+       u'decisión, en la plaza, en la capilla o en el vado.')]),
     ('mundo', u'El mundo', u'Lo que no es catálogo y es la mitad del trabajo.',
      [('rio', u'El río', u'Va por un cauce hundido, con la orilla bajando hacia el agua y juncos donde el '
        u'prado la toca. La lámina brilla y se mueve: lo que distingue el agua de la hierba no es el color.')]),
