@@ -53,6 +53,16 @@ const HELD: Readonly<Record<string, { asset: string; hand: string }>> = {
  * TUNE: de 0,62 al nacer a 1 a los dieciseis. Curva y no recta porque un nino
  * crece deprisa de pequeno; con una recta, los de ocho anos parecian enanos.
  */
+/**
+ * Lo que levanta del suelo tener nombre.
+ *
+ * TUNE: un 8 %. El render 2D ya dibuja al nombrado mas alto que al anonimo
+ * —1,8 contra 1,5— y esto es lo mismo dicho en tres dimensiones. D.8 pide que
+ * los nombrados se distingan, y la aldea ya tenia un lenguaje para decirlo: no
+ * hacia falta inventar otro.
+ */
+const NAMED_TALLER = 1.08;
+
 function statureAt(age: number): number {
   if (age >= 60) return 0.97 - Math.min(0.05, (age - 60) * 0.003);
   if (age >= 16) return 1;
@@ -132,7 +142,7 @@ export class Cast {
       player.object.rotation.set(0, actor.facing, 0);
       // La talla se pone en cada pasada y no al crear: un nino cumple anos sin
       // dejar de ser el mismo actor, y tiene que ir creciendo.
-      player.object.scale.setScalar(statureAt(actor.age));
+      player.object.scale.setScalar(statureAt(actor.age) * (actor.named ? NAMED_TALLER : 1));
       this.pose(player, actor.clip, actor.clipSeconds);
       this.equip(player, actor.clip);
     }

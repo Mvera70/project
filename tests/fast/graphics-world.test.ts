@@ -23,6 +23,9 @@ import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
 import type { Actor } from '../../src/render3d/actors';
 import type { LoadedAsset } from '../../src/render3d/assets';
+import { BUILDINGS } from '@engine/balance';
+import type { BuildingKind } from '@engine/state';
+import { BUILDING_ASSETS } from '../../src/render3d/world/buildings';
 import { Cast } from '../../src/render3d/world/cast';
 import { Village } from '../../src/render3d/world/buildings';
 import { PALETTES } from '@render/palette';
@@ -603,6 +606,56 @@ describe('G-10 · el reparto no son clones', () => {
       if (mesh.isMesh === true && mesh.material !== undefined) intact = true;
     });
     expect(intact).toBe(true);
+    cast.dispose();
+  });
+});
+
+describe('G-10 · cobertura del catálogo', () => {
+  it('ningún tipo de edificio se queda en la caja de reserva', () => {
+    // El criterio de terminado de G-10 con estas palabras: cobertura sin
+    // placeholders. La caja con tejado sigue existiendo y sigue siendo lo
+    // correcto para un valle a medio catalogar, pero hoy no la usa nadie.
+    const kinds = Object.keys(BUILDINGS) as BuildingKind[];
+    expect(kinds.length).toBeGreaterThan(10);
+    for (const kind of kinds) {
+      expect(BUILDING_ASSETS[kind], `${kind} no tiene recurso`).toBeDefined();
+    }
+  });
+
+  it('y todos esos recursos están publicados', () => {
+    // Un recurso nombrado que nadie promovió no llega al juego: la casa
+    // aparecería como caja gris y nadie sabría por qué.
+    const manifest = JSON.parse(readFileSync(
+      resolve(ROOT, 'public', 'assets', 'valley3d', 'manifest.json'), 'utf8',
+    )) as { assets: { id: string }[] };
+    const published = new Set(manifest.assets.map((asset) => asset.id));
+    for (const id of Object.values(BUILDING_ASSETS)) {
+      if (id === undefined) continue;
+      expect(published.has(id), `${id} no está publicado`).toBe(true);
+    }
+    // Y los que no son edificios pero el renderer pide igualmente.
+    for (const id of ['villager', 'tree', 'rock', 'reed', 'hoe', 'bundle',
+      'ruin-wood', 'ruin-stone', 'field-cut', 'cow', 'pig', 'hen', 'wolf', 'crow', 'fish']) {
+      expect(published.has(id), `${id} no está publicado`).toBe(true);
+    }
+  });
+
+  it('quien tiene nombre se ve más alto, como en el 2D', () => {
+    // D.8 pide que los nombrados se distingan, y la aldea ya tenía un lenguaje
+    // para decirlo: el render 2D los dibuja más altos desde M-18.
+    const model = (): Object3D => {
+      const group = new Group();
+      group.add(new Mesh(new BoxGeometry(0.2, 0.6, 0.2), new MeshStandardMaterial()));
+      return group;
+    };
+    const person = (id: number, named: boolean): Actor => ({
+      id: id as Actor['id'], x: 1, z: 1, facing: 0, activity: 'resting',
+      clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named, age: 30,
+    });
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);
+    cast.show([person(1, false), person(2, true)]);
+    const [anon, named] = cast.group.children;
+    expect(named?.scale.y).toBeGreaterThan(anon?.scale.y ?? 0);
     cast.dispose();
   });
 });
