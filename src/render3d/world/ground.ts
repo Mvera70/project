@@ -89,6 +89,15 @@ const RELIEF: Readonly<Record<number, number>> = {
  * queda con paredes verticales y un escalon en cada borde; promediando, el
  * prado baja hacia el agua y sube desde ella.
  */
+/**
+ * Cuanto se hunde un camino segun lo pisado que este, en celdas.
+ *
+ * Un camino era solo un color mas claro. Un camino de verdad es una rodada: el
+ * paso se lleva la hierba y luego la tierra, y lo que se ve desde arriba es la
+ * sombra del borde. TUNE: seis centimetros la senda, quince el camino real.
+ */
+const RUT: readonly number[] = [0, -0.02, -0.035, -0.05];
+
 function heightAt(map: ValleyMap, x: number, z: number): number {
   let total = 0;
   let seen = 0;
@@ -96,7 +105,11 @@ function heightAt(map: ValleyMap, x: number, z: number): number {
     const cx = x + dx;
     const cz = z + dz;
     if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
-    total += RELIEF[map.terrain[cz * map.width + cx] ?? 0] ?? 0;
+    const cell = cz * map.width + cx;
+    total += RELIEF[map.terrain[cell] ?? 0] ?? 0;
+    // La rodada se suma al terreno, no lo sustituye: un vado es camino sobre
+    // agua y tiene que seguir estando mas bajo que el prado.
+    total += RUT[Math.min(RUT.length - 1, map.path[cell] ?? 0)] ?? 0;
     seen += 1;
   }
   return seen === 0 ? 0 : total / seen;
@@ -174,10 +187,33 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
   return mesh;
 }
 
+/**
+ * Cuanto sube y baja la superficie del agua, en celdas.
+ *
+ * TUNE: dos centesimas, seis centimetros. Lo que se ve desde arriba no es la
+ * ola: es que la luz cambia al inclinarse la superficie, y con seis centimetros
+ * ya cambia. Con mas, el rio parece el mar.
+ */
+const RIPPLE = 0.02;
+
+/** Cuanto tarda la onda en recorrer una celda, en segundos. */
+const RIPPLE_SECONDS = 2.2;
+
 export interface Ground {
   readonly mesh: Mesh;
   /** La lamina de agua, o `null` si el mapa no tiene rio. */
   readonly water: Mesh | null;
+  /**
+   * Hace correr el agua.
+   *
+   * Un rio quieto es un suelo azul, por bien hecho que este el cauce. Lo que
+   * dice que eso es agua y no piedra pintada es que se mueve, y basta con que
+   * la superficie se incline un poco para que la luz haga el resto.
+   *
+   * La hora sale del reloj de presentacion y de nada mas, asi que el mismo
+   * instante da siempre la misma onda (§4.3).
+   */
+  ripple(presentationSeconds: number): void;
   dispose(): void;
 }
 
@@ -244,10 +280,31 @@ export function buildGround(map: ValleyMap, palette: Palette): Ground {
   // que saber que ademas hay un rio: se mueven y se sueltan juntos siempre.
   const water = buildWater(map, palette);
   if (water !== null) mesh.add(water);
+  // El reposo se guarda una vez: la onda se calcula desde el, no desde donde
+  // quedo el fotograma anterior, que acumularia error hasta hundir el rio.
+  const still = water === null
+    ? null
+    : Float32Array.from((water.geometry.getAttribute('position') as BufferAttribute).array);
 
   return {
     mesh,
     water,
+    ripple(presentationSeconds: number): void {
+      if (water === null || still === null) return;
+      const surface = water.geometry.getAttribute('position') as BufferAttribute;
+      const turn = (presentationSeconds / RIPPLE_SECONDS) * Math.PI * 2;
+      for (let vertex = 0; vertex < surface.count; vertex += 1) {
+        const at = vertex * 3;
+        const px = still[at] ?? 0;
+        const pz = still[at + 2] ?? 0;
+        // La onda viaja en diagonal y lleva dos frecuencias: una sola deja un
+        // oleaje de piscina, con dos el patron tarda en repetirse.
+        const wave = Math.sin((px + pz) * 1.7 - turn) + 0.5 * Math.sin((px - pz * 1.3) * 0.9 - turn * 0.6);
+        surface.setY(vertex, (still[at + 1] ?? 0) + wave * RIPPLE * 0.5);
+      }
+      surface.needsUpdate = true;
+      water.geometry.computeVertexNormals();
+    },
     dispose(): void {
       geometry.dispose();
       material.dispose();

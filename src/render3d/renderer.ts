@@ -317,6 +317,8 @@ export async function createGraphicsRenderer(
       tells.update(state as GameState);
       // Y el humo, que es lo unico de las senales que se mueve por fotograma.
       tells.drift(frame.presentationSeconds);
+      // Y el rio corre. Un rio quieto es un suelo azul.
+      ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
       const phase = dayPhase(frame.presentationSeconds);

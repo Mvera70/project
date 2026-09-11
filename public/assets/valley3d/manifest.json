@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T00:25:16.511Z",
+  "generatedAt": "2026-09-11T00:46:24.293Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -67,7 +67,7 @@
     {
       "id": "house",
       "file": "house.glb",
-      "sha256": "B7398FC2EB0CB88CD2907F90F20768CE31E9CACD2E62D47202D288F1F5AC118F",
+      "sha256": "408935BC299BA447623C5F1C06D5E4357196935416A3032468881D97F4E8EB4E",
       "motion": []
     },
     {

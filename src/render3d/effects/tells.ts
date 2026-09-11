@@ -21,7 +21,7 @@ import { tellsFor, type Tell } from '@render/layers/tells';
 
 /** Alturas en celdas. Una celda son unos tres metros (D.6.2). */
 const HEIGHT = {
-  smoke: 1.35,
+  smoke: 1.55,
   light: 0.35,
   plague: 0.55,
   candles: 0.6,
@@ -93,7 +93,10 @@ function bodyOf(tell: Tell): Array<{ object: Object3D; dispose(): void }> {
       // La intensidad viene del ánimo, y una aldea hundida humea poco.
       return [0, 1, 2].map((step) => {
         const piece = mark(
-          new SphereGeometry(0.09 + step * 0.035, 6, 5), TONE.smoke, false,
+          // Material sin luz a proposito. Con luz, un gris oscuro bajo el sol de
+          // este valle sale blanco: las bocanadas se veian como huevos puestos
+          // en el tejado. El humo no se ilumina, se ve.
+          new SphereGeometry(0.09 + step * 0.035, 6, 5), TONE.smoke, true,
           tell.x, HEIGHT.smoke, tell.y,
           (0.18 + tell.intensity * 0.45),
         );
@@ -145,7 +148,7 @@ function bodyOf(tell: Tell): Array<{ object: Object3D; dispose(): void }> {
 const PLUME_SECONDS = 6;
 
 /** Lo que sube una bocanada antes de deshacerse, en celdas. */
-const PLUME_RISE = 0.85;
+const PLUME_RISE = 1.05;
 
 interface Plume {
   readonly mesh: Object3D;
@@ -200,12 +203,15 @@ export class Tells {
       const turn = (presentationSeconds / PLUME_SECONDS + plume.phase) % 1;
       plume.mesh.position.y = plume.base + turn * PLUME_RISE;
       // Se hincha al subir, como el humo de verdad, y se apaga al final.
-      const swell = 1 + turn * 1.6;
-      plume.mesh.scale.setScalar(swell);
+      //
+      // Poco, y menos de lo que pedia el primer intento: hinchandose al doble y
+      // medio, de cerca eran discos grises del tamano de un tejado. El humo
+      // tiene que verse de lejos y no taparle la casa a nadie de cerca.
+      plume.mesh.scale.setScalar(1 + turn * 0.7);
       const mesh = plume.mesh as Object3D & { material?: { opacity: number; transparent: boolean } };
       if (mesh.material !== undefined) {
         mesh.material.transparent = true;
-        mesh.material.opacity = plume.peak * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
+        mesh.material.opacity = plume.peak * 0.55 * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
       }
     }
   }

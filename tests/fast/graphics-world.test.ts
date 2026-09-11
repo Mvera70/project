@@ -241,6 +241,24 @@ describe('G-06 · el suelo', () => {
     for (let vertex = 1; vertex < position.count; vertex += 1) {
       expect(position.getY(vertex)).toBeCloseTo(level, 6);
     }
+    // Plana en reposo, no quieta: el río corre, y lo que se ve desde arriba no
+    // es la ola sino que la luz cambia al inclinarse la superficie.
+    ground.ripple(0.8);
+    let moved = 0;
+    for (let vertex = 0; vertex < position.count; vertex += 1) {
+      if (Math.abs(position.getY(vertex) - level) > 1e-4) moved += 1;
+    }
+    expect(moved).toBeGreaterThan(position.count / 2);
+    // Y la onda se calcula desde el reposo: si se acumulara sobre el fotograma
+    // anterior, el río se iría hundiendo hasta desaparecer.
+    let deepest = 0;
+    for (let step = 0; step < 200; step += 1) {
+      ground.ripple(step * 0.05);
+      for (let vertex = 0; vertex < position.count; vertex += 1) {
+        deepest = Math.max(deepest, Math.abs(position.getY(vertex) - level));
+      }
+    }
+    expect(deepest).toBeLessThan(0.05);
     // Cuelga del suelo: quien pone el valle en la escena no tiene que saber
     // ademas que hay un rio.
     expect(surface.parent).toBe(ground.mesh);
@@ -273,6 +291,28 @@ describe('G-06 · el suelo', () => {
     const bare = structuredClone(state);
     bare.map.path[cell] = 0;
     expect(cellColour(state.map, cell, PALETTES.summer)).not.toBe(cellColour(bare.map, cell, PALETTES.summer));
+  });
+
+  it('un camino muy pisado deja rodada', () => {
+    // El paso se lleva la hierba y luego la tierra. Lo que se ve desde arriba
+    // no es el hundimiento, es la sombra de su borde.
+    const state = village(14);
+    const ground = buildGround(state.map, PALETTES.summer);
+    const position = ground.mesh.geometry.getAttribute('position');
+    const lowest = (cell: number): number => {
+      let value = Infinity;
+      for (let vertex = 0; vertex < 4; vertex += 1) value = Math.min(value, position.getY(cell * 4 + vertex));
+      return value;
+    };
+    const worn = state.map.path.findIndex(
+      (wear, cell) => wear >= 2 && state.map.terrain[cell] === 0,
+    );
+    expect(worn).toBeGreaterThanOrEqual(0);
+    const bare = state.map.terrain.findIndex(
+      (kind, cell) => kind === 0 && (state.map.path[cell] ?? 0) === 0,
+    );
+    expect(lowest(worn)).toBeLessThan(lowest(bare));
+    ground.dispose();
   });
 
   it('usa los colores que P1 decidió', () => {
