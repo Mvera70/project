@@ -231,7 +231,10 @@ describe('G-05 · los actores', () => {
     const person = moved.people.villagers.find((candidate) => candidate.id === id);
     if (person !== undefined && other !== undefined) person.homeId = other.id;
 
-    const atHome = frameAt(0);
+    // De madrugada, que es cuando alguien está en su casa. El instante se pide
+    // por la hora escénica y no por el segundo cero: desde v3.46 la partida
+    // empieza a media mañana, con todo el mundo ya en la calle.
+    const atHome = frameAt(SCENIC_DAY_SECONDS * 0.67);
     const wasAt = actorsFor(state, atHome).find((actor) => actor.id === id);
     const nowAt = actorsFor(moved, atHome).find((actor) => actor.id === id);
     expect(wasAt).toBeDefined();

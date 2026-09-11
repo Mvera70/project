@@ -187,6 +187,20 @@ export function createPresentationClock(): PresentationClock {
 }
 
 /**
+ * A que hora del dia empieza la partida.
+ *
+ * TUNE: 0,28, media manana. El reloj escenico empezaba en cero, que con la luz
+ * de v3.34 es **antes del amanecer**: abrir el juego y encontrarse el valle a
+ * oscuras, con todo el mundo dentro de casa y nada que mirar, es la peor
+ * primera impresion posible de un sitio que se vende por estar vivo.
+ *
+ * Media manana es cuando la aldea esta entera en la calle. Desplaza el origen y
+ * nada mas: el dia sigue durando lo mismo y sigue siendo funcion del reloj, asi
+ * que la misma partida da la misma imagen.
+ */
+const DAY_START = 0.28;
+
+/**
  * Where the scenic day stands, from 0 at dawn to 1 at nightfall.
  *
  * Separate from `tickFraction` on purpose, and D.6 says captures must state the
@@ -195,11 +209,11 @@ export function createPresentationClock(): PresentationClock {
  * weeks at ×1 and thirty-two at ×16. That is the decision.
  */
 export function dayPhase(presentationSeconds: number): number {
-  const phase = (presentationSeconds / SCENIC_DAY_SECONDS) % 1;
+  const phase = (presentationSeconds / SCENIC_DAY_SECONDS + DAY_START) % 1;
   return phase < 0 ? phase + 1 : phase;
 }
 
 /** Which scenic day we are in. Changes when `dayPhase` wraps. */
 export function dayNumber(presentationSeconds: number): number {
-  return Math.floor(presentationSeconds / SCENIC_DAY_SECONDS);
+  return Math.floor(presentationSeconds / SCENIC_DAY_SECONDS + DAY_START);
 }
