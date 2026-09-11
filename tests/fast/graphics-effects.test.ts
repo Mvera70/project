@@ -22,6 +22,7 @@ import { tellsFor } from '@render/layers/tells';
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
 import { TERRAIN_CODE } from '@engine/state';
 import { animalPositions, wildlifePositions } from '@render/animals';
+import { daylightAt, NIGHT_FLOOR, NOON } from '../../src/render3d/effects/daylight';
 import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
 import { Tells } from '../../src/render3d/effects/tells';
 import { cellColour } from '../../src/render3d/world/ground';
@@ -356,5 +357,55 @@ describe('G-10 · la fauna (§7.7)', () => {
     fauna.dispose();
     expect(fauna.group.children.length).toBe(0);
     expect(fauna.count).toBe(0);
+  });
+});
+
+describe('G-10 · la luz del día escénico', () => {
+  it('el sol sube, cruza y se pone', () => {
+    const dawn = daylightAt(0.06);
+    const noon = daylightAt(0.45);
+    const dusk = daylightAt(0.85);
+    expect(noon.sun.y).toBeGreaterThan(dawn.sun.y);
+    expect(noon.sun.y).toBeGreaterThan(dusk.sun.y);
+    // De este a oeste: la componente que cruza el valle cambia de signo.
+    expect(Math.sign(dawn.sun.x)).not.toBe(Math.sign(dusk.sun.x));
+  });
+
+  it('de noche baja la luz pero no se apaga', () => {
+    // §10.3 quiere el valle como HUD, y eso vale a las tres de la madrugada
+    // también. Una noche de verdad dejaría el granero ilegible.
+    const noon = daylightAt(NOON);
+    const night = daylightAt(0.98);
+    expect(night.sunIntensity).toBeLessThan(noon.sunIntensity * 0.6);
+    expect(night.sunIntensity).toBeGreaterThan(noon.sunIntensity * NIGHT_FLOOR * 0.9);
+    expect(night.ambientIntensity).toBeGreaterThan(0);
+  });
+
+  it('no da saltos de un fotograma al siguiente', () => {
+    // El día escénico avanza continuo, y la luz con él. Un escalón en el
+    // amanecer se vería como un parpadeo del valle entero.
+    //
+    // El paso es el de un fotograma de verdad: un día escénico dura ciento
+    // veinte segundos (D.6.1), así que a sesenta por segundo son 7 200 pasos.
+    // Medirlo con pasos más gordos mide la curva, no el parpadeo.
+    const frames = 7200;
+    let worst = 0;
+    let before = daylightAt(0);
+    for (let step = 1; step <= frames; step += 1) {
+      const now = daylightAt(step / frames);
+      worst = Math.max(worst, Math.abs(now.sunIntensity - before.sunIntensity));
+      before = now;
+    }
+    expect(worst).toBeLessThan(0.01);
+  });
+
+  it('es la misma luz para el mismo instante, siempre', () => {
+    // §4.3: el mismo instante da siempre la misma imagen. Si esto consumiera
+    // azar, dos partidas iguales se verían distintas.
+    for (const phase of [0, 0.13, 0.45, 0.79, 0.99]) {
+      expect(daylightAt(phase)).toEqual(daylightAt(phase));
+      // Y el día da la vuelta: la medianoche de hoy es la de mañana.
+      expect(daylightAt(phase + 1)).toEqual(daylightAt(phase));
+    }
   });
 });

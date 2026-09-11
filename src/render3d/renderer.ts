@@ -10,7 +10,7 @@
 // same instant derives the same answer however many times it is asked.
 
 import {
-  Color, DirectionalLight, Group, HemisphereLight, PCFSoftShadowMap,
+  Color, DirectionalLight, Fog, Group, HemisphereLight, PCFSoftShadowMap,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Object3D,
 } from 'three';
 import { clockOf } from '@engine/time';
@@ -29,6 +29,7 @@ import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from '.
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { dayPhase } from './presentation-clock';
+import { daylightAt } from './effects/daylight';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
 import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
@@ -84,7 +85,60 @@ export async function createGraphicsRenderer(
   const sun = new DirectionalLight('#FFF4D8', 2.6);
   sun.castShadow = options.quality !== 'low';
   sun.shadow.mapSize.set(1024, 1024);
-  scene.add(new HemisphereLight('#FFF6DF', '#776F62', 1.5), sun, sun.target);
+  const ambient = new HemisphereLight('#FFF6DF', '#776F62', 1.5);
+  scene.add(ambient, sun, sun.target);
+
+  /**
+   * Lo lejos que hay que estar para que la niebla se coma el valle.
+   *
+   * El fondo es un color plano, asi que sin niebla el borde del mapa es un
+   * corte limpio contra el cielo y el valle parece una maqueta sobre una mesa.
+   * La niebla lo funde, y de paso da la profundidad que un encuadre casi
+   * cenital no tiene por si mismo. Se calibra con el tamano del mapa al
+   * encuadrar, no aqui: un valle mas grande necesita mas aire.
+   */
+  scene.fog = new Fog(VALLEY_COLOURS.sky, 1, 1000);
+
+  /**
+   * Donde empieza y acaba la niebla.
+   *
+   * Se mide **desde la camara**, no desde el mapa. Calibrarla con el radio del
+   * valle dejaba la niebla empezando a treinta y seis unidades cuando la camara
+   * panoramica esta a mas de cien: el valle entero desaparecia y quedaba una
+   * pantalla del color del cielo. Lo que hay que fundir es el borde lejano, y
+   * eso esta siempre un poco mas lejos que el sitio al que se mira.
+   */
+  function fogAround(centre: Vector3): void {
+    if (scene.fog === null) return;
+    const fog = scene.fog as Fog;
+    const distance = camera.position.distanceTo(centre);
+    fog.near = distance * 0.85;
+    fog.far = distance * 2.3;
+  }
+
+  /** De que color es la luz a esta hora del dia escenico. */
+  function light(phase: number): void {
+    const day = daylightAt(phase);
+    sun.color.set(day.sunColour);
+    sun.intensity = day.sunIntensity;
+    ambient.color.set(day.skyColour);
+    ambient.groundColor.set(day.groundBounce);
+    ambient.intensity = day.ambientIntensity;
+    (scene.background as Color).set(day.background);
+    if (scene.fog !== null) (scene.fog as Fog).color.set(day.background);
+    renderer.setClearColor(new Color(day.background));
+    // El sol gira alrededor del valle, y con el las sombras. Lo que no cambia es
+    // a que apunta: alumbra el valle entero y no lo que se ve, asi que
+    // acercarse no puede mover una sombra.
+    if (mapWidth > 0) {
+      const centre = new Vector3(mapWidth / 2, 0, mapHeight / 2);
+      const radius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
+      sun.position.copy(centre).add(
+        new Vector3(day.sun.x, Math.max(0.35, day.sun.y), day.sun.z).multiplyScalar(radius * 2.2),
+      );
+      sun.target.position.copy(centre);
+    }
+  }
 
   // Only the villager, and only because that is all the catalogue holds. Loading
   // the whole of it to show one asset is the waste D.9 asks the pilot not to do.
@@ -156,8 +210,8 @@ export async function createGraphicsRenderer(
     // cambiar donde caen las sombras.
     const centre = new Vector3(mapWidth / 2, 0, mapHeight / 2);
     const radius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
-    sun.position.copy(centre).add(new Vector3(-radius, radius * 2.2, radius * 0.8));
     sun.target.position.copy(centre);
+    fogAround(centre);
     const reach = radius * 1.2;
     sun.shadow.camera.left = -reach;
     sun.shadow.camera.right = reach;
@@ -255,7 +309,14 @@ export async function createGraphicsRenderer(
       tells.update(state as GameState);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
-      fauna.update(state as GameState, dayPhase(frame.presentationSeconds));
+      const phase = dayPhase(frame.presentationSeconds);
+      fauna.update(state as GameState, phase);
+      // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
+      // no depende de nada de ello: solo de la hora.
+      light(phase);
+      // El zoom mueve la camara, asi que la niebla se recalibra con ella: si no,
+      // acercarse metia el pueblo dentro de la bruma.
+      if (mapWidth > 0) fogAround(new Vector3(mapWidth / 2, 0, mapHeight / 2));
 
       renderer.render(scene, camera);
     },
