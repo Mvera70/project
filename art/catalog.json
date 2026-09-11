@@ -260,8 +260,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T22-45-18-749Z-48664",
-        "directory": "artifacts/graphics/G-04/approved/98f7ad35633a037a"
+        "runId": "2026-09-11T01-06-43-335Z-35364",
+        "directory": "artifacts/graphics/G-04/approved/bd6a178e2335d7f0"
       },
       "bounds": {
         "min": [
@@ -272,19 +272,20 @@
         "max": [
           0.17115,
           0.666667,
-          0.093333
+          0.095
         ],
         "size": [
           0.342299,
           0.656667,
-          0.186667
+          0.188333
         ]
       },
-      "recipeSha256": "58EE655A61C21608E2479D32545E471CF2E57DCF83D7563C22F2276467279C44",
+      "recipeSha256": "DA0CDFD46F209482638D265012075B01CB1B248AEB103D87F2EA4F68C8CAED12",
       "materials": [
         "skin",
         "cloth",
-        "cloth-accent"
+        "cloth-accent",
+        "dark"
       ],
       "clips": [
         "idle",
@@ -323,20 +324,20 @@
         "hand_r"
       ],
       "statistics": {
-        "objects": 23,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 1236
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
       },
       "hashes": {
-        "villager.blend": "573456367DE065211CBF4CE4FE236EF6BAE4A326C3D427C2205A0DFE4BF5103C",
-        "villager.glb": "98F7AD35633A037A67ED49D8F5020F9B6F9E3FAA9E5BD371B4FA5E3B25C1AF9C",
-        "villager-blender.png": "3D7FCE38D028EE01CB346823D593E408DB885A17F13017017E60CE0164C888E3",
-        "capture-1.png": "4E0D0D350414B1FC06CE07252A29ABF95A915C4E9BBA9BCBF7A40487A4D30AC4",
-        "capture-1-gray.png": "DC3FA11D2C36E46EA15765FC339C17F401460010A56D5D6B28AA2E999F04CE54",
-        "capture.json": "2D0D336364F7AEEA89DB172D41347D184093660484711F1336F583E7BEB8B082",
-        "build.json": "91A2A784C9FE89F34FDE424449ED6AE3A1F3D5378FD620B1AC6F37DB35FB6934",
-        "validation.json": "7D6A549B435B082E7E7072663EAB3EB8B92C026B1271F29209B69FCD5F3E94D8"
+        "villager.blend": "7B51A65B9FC3EA5E09D12421438F015478D94732A644C30E81E9FA46CCD853ED",
+        "villager.glb": "BD6A178E2335D7F0C863C3A869DF2ED044DAD9CFC8B4BD878ADC982E44A4003C",
+        "villager-blender.png": "1536C0C2269C2EE4FA9F4C67E3B9962281F297C5D3BE5FDC36170E0BE1F067F1",
+        "capture-1.png": "BBC8D4B46663C3828B52C93E12949259CD33E89EBB029458F55FFB1BEE56BEB5",
+        "capture-1-gray.png": "CA300F80BC5333936321ADE75748E3E17376AA492D400D371865920A14B00587",
+        "capture.json": "9ECC791F946D0FBA956ADAB1C0526052E5946B35B56968E706B1FBF31B470A79",
+        "build.json": "6ED41DA651A9602BD418AA5DD50E326357F245E20AA9B884B6ABBE523E773CF3",
+        "validation.json": "9FEBD89A2F8011CC35FBE515BC5B0B1752D30023C44EE62B2E3ADB7D4889556E"
       },
       "provenance": {
         "kind": "original",

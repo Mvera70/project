@@ -30,6 +30,11 @@
       "name": "cloth-accent",
       "role": "clothAccent",
       "roughness": 0.95
+    },
+    {
+      "name": "dark",
+      "role": "trunk",
+      "roughness": 0.9
     }
   ],
   "groups": [
@@ -334,6 +339,52 @@
       "smooth": true,
       "material": "cloth-accent",
       "parent": "Villager_Root"
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Apron",
+      "location": [
+        0.0,
+        -0.16,
+        1.02
+      ],
+      "dimensions": [
+        0.42,
+        0.05,
+        0.46
+      ],
+      "material": "cloth-accent",
+      "parent": "Villager_Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Villager_Eye_L",
+      "location": [
+        -0.1,
+        -0.24,
+        1.76
+      ],
+      "radius": 0.045,
+      "segments": 6,
+      "rings": 4,
+      "smooth": true,
+      "material": "dark",
+      "parent": "Villager_Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Villager_Eye_R",
+      "location": [
+        0.1,
+        -0.24,
+        1.76
+      ],
+      "radius": 0.045,
+      "segments": 6,
+      "rings": 4,
+      "smooth": true,
+      "material": "dark",
+      "parent": "Villager_Root"
     }
   ],
   "rig": {
@@ -586,7 +637,10 @@
       "Villager_Elbow_L": "upperarm.L",
       "Villager_Elbow_R": "upperarm.R",
       "Villager_Knee_L": "thigh.L",
-      "Villager_Knee_R": "thigh.R"
+      "Villager_Knee_R": "thigh.R",
+      "Villager_Apron": "spine",
+      "Villager_Eye_L": "head",
+      "Villager_Eye_R": "head"
     },
     "gait": {
       "note": "Lo que la auditoria necesita para juzgar una marcha sin saber que esto es un humano: que huesos son pies, y que tercias forman una bisagra y hacia que lado dobla cada una. Un codo y una rodilla doblan en sentidos opuestos, y cada uno solo hacia el suyo.",
