@@ -10,8 +10,8 @@
 // peor que uno alineado: aquí el mismo valle da siempre el mismo bosque.
 
 import {
-  Color, InstancedMesh, Group, Matrix4, Quaternion, Vector3,
-  type BufferGeometry, type Material, type Object3D,
+  InstancedMesh, Group, Matrix4, Quaternion, Vector3,
+  type BufferGeometry, type Color, type Material, type Object3D,
 } from 'three';
 import type { ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
