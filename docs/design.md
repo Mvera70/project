@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.48** | 11 sep 2026 | Deuda saldada en el render 2D | Las reuniones «en el vado» se dibujaban **en el centro de la aldea**, que es donde no está el vado. §11.8 lo llevaba anotado como deuda con estas palabras: «repetir el cálculo exacto del motor exigiría exportarlo». G-10 lo exportó para poner las piedras de paso en su sitio, así que la deuda se paga de camino y con una línea. Es la tercera vez en esta ronda que la respuesta es la misma: **un sitio que la ficción nombra se calcula una vez**. |
 | **3.47** | 11 sep 2026 | G-10, el vado | **El río se cruzaba por el aire.** El motor sabe dónde está el vado desde M-10 —la orilla firme más cercana al centro de la aldea— y es un sitio con historia: ahí llegan los forasteros, de ahí sale la cacería del lobo, ahí se despide a quien se va. En la escena no había nada. Ahora hay una losa de paso por cada celda de agua del cruce. **El sitio se le pregunta al motor**, que pasa a exportar su `ford`: calcularlo aquí sería tener dos vados, y en este proyecto **ya hay uno de más** —`render/gatherings.ts` tiene su propia conjetura y apunta a otro sitio—. Es la misma leccion de las cuatro señales perdidas: lo que viaja del 2D al 3D es el significado. Lo que sí se decide en la escena es por dónde cruza: desde la orilla, derecho al otro lado, y si no se llega a tierra firme no se pone nada, que mejor ningún vado que uno que no lleva a ninguna parte. |
 | **3.46** | 11 sep 2026 | G-10, la partida ya no empieza de noche | El reloj escénico empezaba en cero, que con la luz de v3.34 es **antes del amanecer**. Abrir el juego y encontrarse el valle a oscuras, con todo el mundo dentro de casa y nada que mirar, es la peor primera impresión posible de un sitio que se vende por estar vivo. Ahora arranca a media mañana, con la aldea entera en la calle. **Desplaza el origen y nada más**: el día dura lo mismo y sigue siendo función del reloj, así que la misma partida da la misma imagen. Salió de mirar el juego de verdad con `?render=3d`, no el banco de pruebas; una prueba que pedía «el segundo cero» queriendo decir «de madrugada» pasa a pedir la hora. |
 | **3.45** | 11 sep 2026 | G-10, lo que pisa el valle sigue su cota | El suelo dejó de ser plano en v3.32 y **todo lo que anda sobre él se quedó puesto a cero**: sobre un camino hundido la gente flotaba, y en la orilla se metía en el barro. Ahora el reparto y el rebaño preguntan al suelo por su cota. Hacía falta una función nueva: la que ya había vale para **esquinas de celda**, que son los vértices de la malla, y un aldeano no anda por las esquinas, anda por el medio; se interpola entre las cuatro que le rodean, que es exactamente la superficie que se dibuja. El pez es la excepción y no pregunta: nada en la lámina, no se apoya en el fondo. |
@@ -5320,9 +5321,10 @@ trabaja. Queda anotado porque un lector futuro puede tomarlo por un descuido.
 - **`scar` sigue sin representarse.** De sus tres variantes sólo `grave_row` es
   reconstruible; `burnt_field` y `felled_wood` dependen de qué ardió o se taló
   aquella semana concreta y no se pueden derivar del historial sin guardarlas.
-- **El vado se aproxima por el núcleo.** El motor calcula la orilla transitable
-  (§11.5, v2.66) y repetirlo aquí exigiría exportar ese cálculo. La diferencia
-  es de unas celdas sobre un mapa que se ve entero.
+- ~~**El vado se aproxima por el núcleo.**~~ **Saldado en v3.48.** El motor
+  exporta su `ford` desde G-10, porque el render 3D necesitaba poner las piedras
+  de paso donde el vado está de verdad, y el 2D lo usa de camino. Las reuniones
+  en el vado se dibujaban en el centro de la aldea, que es donde no está.
 - **Arte de prueba.** Todo lo de esta sección es geometría y posiciones, sin
   sprites nuevos. El aspecto definitivo lo gobierna el Anexo D.
 

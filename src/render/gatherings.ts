@@ -14,6 +14,7 @@
 
 import type { Catalogue } from '@engine/crossroads/schema';
 import type { GameState } from '@engine/state';
+import { ford } from '@engine/sim';
 import { standing, valleyCore } from './anchors';
 
 export interface Gathering {
@@ -25,15 +26,13 @@ export interface Gathering {
   ticks: number;
 }
 
-/**
- * El vado: la orilla transitable más cercana al núcleo (§11.5, v2.66). Aquí se
- * aproxima por el núcleo, y está declarado como deuda en §11.8 — repetir el
- * cálculo exacto del motor exigiría exportarlo, y de momento la diferencia es
- * de unas pocas celdas sobre un mapa que se ve entero.
- */
-function ford(state: GameState): { x: number; y: number } {
-  return valleyCore(state);
-}
+// El vado ya no se aproxima: es el del motor.
+//
+// §11.8 lo llevaba declarado como deuda con estas palabras: «repetir el cálculo
+// exacto del motor exigiría exportarlo». G-10 lo exportó, porque el render 3D
+// necesitaba poner las piedras de paso en el sitio de verdad, así que la deuda
+// se paga de camino. Las reuniones en el vado se dibujaban en el centro de la
+// aldea, que es donde no está el vado.
 
 /**
  * Dónde se junta la gente para un `gather`. Se recalcula desde el estado de
