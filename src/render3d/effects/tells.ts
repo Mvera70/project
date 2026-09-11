@@ -25,8 +25,10 @@ const HEIGHT = {
   smoke: 1.55,
   light: 0.47,
   plague: 1.62,
-  // Justo sobre el caballete, para la luz que no encuentra fachada libre.
-  roofGlow: 1.42,
+  // Justo sobre el caballete, para la luz que no encuentra fachada libre. La
+  // casa mide 2,3 de pared y 2,1 de tejado, o sea 1,47 celdas: por debajo de
+  // eso el resplandor se mete dentro del tejado y se apaga.
+  roofGlow: 1.55,
   candles: 0.42,
   banner: 1.1,
   grain: 0.05,
