@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T00:46:24.293Z",
+  "generatedAt": "2026-09-11T01:01:10.994Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -206,6 +206,18 @@
       "id": "fish",
       "file": "fish.glb",
       "sha256": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
+      "motion": []
+    },
+    {
+      "id": "hoe",
+      "file": "hoe.glb",
+      "sha256": "85051DC5A63C834F7428927E71F0B31D71E8C4A8FC8C9288858913C4DE88439C",
+      "motion": []
+    },
+    {
+      "id": "bundle",
+      "file": "bundle.glb",
+      "sha256": "C52644F9DD2D2079145A15B087FDA15B7FA176E7B74C1CF546A43A26E00745DC",
       "motion": []
     }
   ]

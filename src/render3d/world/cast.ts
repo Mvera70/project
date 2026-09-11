@@ -24,8 +24,23 @@ interface Player {
   readonly actions: Map<string, Action>;
   /** Los materiales propios de este aldeano, que hay que soltar con el. */
   readonly owned: Material[];
+  /** Lo que lleva en la mano, por clip. Vacio si el catalogo no lo tiene. */
+  readonly held: Map<string, Object3D>;
   playing: string | null;
 }
+
+/**
+ * Que se lleva en la mano en cada clip, y en cual.
+ *
+ * El clip de cavar esta bien hecho —la espalda se dobla, los brazos bajan— y aun
+ * asi no se leia como cavar, porque cavar sin azada no es cavar: es agacharse.
+ * Los conectores `hand_l` y `hand_r` los dejo G-04 en el aldeano justo para
+ * esto, y hasta ahora no colgaba nada de ellos.
+ */
+const HELD: Readonly<Record<string, { asset: string; hand: string }>> = {
+  work_hoe: { asset: 'hoe', hand: 'hand_r' },
+  carry_walk: { asset: 'bundle', hand: 'hand_l' },
+};
 
 /**
  * La talla de alguien de esta edad, contra la de un adulto.
@@ -72,9 +87,15 @@ export class Cast {
   readonly group = new Group();
   private readonly players = new Map<VillagerId, Player>();
 
+  /**
+   * `prop` da una copia de una herramienta del catalogo, o `undefined` si no la
+   * tiene. Sin ella el aldeano trabaja con las manos vacias, que es lo que
+   * hacia hasta ahora: un valle a medio catalogar sigue siendo un valle.
+   */
   constructor(
     private readonly asset: LoadedAsset,
     private readonly instance: () => Object3D | undefined,
+    private readonly prop?: (id: string) => Object3D | undefined,
   ) {
     this.group.name = 'Valley_Cast';
   }
@@ -99,7 +120,10 @@ export class Cast {
         object.name = `Villager_${actor.id}`;
         object.traverse((child) => { child.userData.villagerId = actor.id; });
         const mixer = new AnimationMixer(object);
-        player = { object, mixer, actions: new Map(), owned: dress(object, actor.id), playing: null };
+        player = {
+          object, mixer, actions: new Map(), owned: dress(object, actor.id),
+          held: new Map(), playing: null,
+        };
         this.players.set(actor.id, player);
         this.group.add(object);
       }
@@ -110,6 +134,7 @@ export class Cast {
       // dejar de ser el mismo actor, y tiene que ir creciendo.
       player.object.scale.setScalar(statureAt(actor.age));
       this.pose(player, actor.clip, actor.clipSeconds);
+      this.equip(player, actor.clip);
     }
 
     for (const id of [...this.players.keys()]) {
@@ -142,6 +167,31 @@ export class Cast {
     }
     action.time = seconds;
     player.mixer.setTime(seconds);
+  }
+
+  /**
+   * Le pone en la mano lo que pide el clip, y le quita lo demas.
+   *
+   * La herramienta se cuelga del conector una sola vez y luego solo se enciende
+   * y se apaga: colgarla y descolgarla en cada cambio de clip seria rehacer
+   * objetos por fotograma, que es lo que D.6 prohibe. Y cuelga del hueso, asi
+   * que la anima el mismo esqueleto sin que nadie la mueva a mano.
+   */
+  private equip(player: Player, clip: string): void {
+    const wanted = HELD[clip];
+    if (wanted !== undefined && !player.held.has(clip) && this.prop !== undefined) {
+      const tool = this.prop(wanted.asset);
+      const hand = player.object.getObjectByName(wanted.hand);
+      if (tool !== undefined && hand !== undefined) {
+        tool.name = `Held_${clip}`;
+        // La herramienta no se selecciona: quien la lleva si. Sin esto, tocar la
+        // azada no devolvia a nadie.
+        tool.traverse((child) => { child.userData.villagerId = player.object.userData.villagerId; });
+        hand.add(tool);
+        player.held.set(clip, tool);
+      }
+    }
+    for (const [name, tool] of player.held) tool.visible = name === clip;
   }
 
   private retire(id: VillagerId): void {

@@ -498,6 +498,59 @@ describe('G-10 · el reparto no son clones', () => {
     again.dispose();
   });
 
+  it('cava con azada, y la suelta al dejar de cavar', () => {
+    // El clip de cavar está bien hecho y aun así no se leía como cavar, porque
+    // cavar sin azada es agacharse. Los conectores que G-04 dejó en las manos
+    // existían justo para esto y no colgaba nada de ellos.
+    const villager = (): Object3D => {
+      const group = villagerModel();
+      const hand = new Group();
+      hand.name = 'hand_r';
+      group.add(hand);
+      return group;
+    };
+    const tool = (): Object3D => {
+      const hoe = new Group();
+      hoe.name = 'hoe-prueba';
+      return hoe;
+    };
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, villager, () => tool());
+    cast.show([{ ...actorAt(1, 30), clip: 'work_hoe' }]);
+    const hand = cast.group.children[0]?.getObjectByName('hand_r');
+    expect(hand?.children.length).toBe(1);
+    expect(hand?.children[0]?.visible).toBe(true);
+
+    cast.show([{ ...actorAt(1, 30), clip: 'walk' }]);
+    expect(hand?.children[0]?.visible).toBe(false);
+    // Y no se descuelga: colgarla y descolgarla en cada cambio de clip sería
+    // rehacer objetos por fotograma, que es lo que D.6 prohíbe.
+    expect(hand?.children.length).toBe(1);
+    cast.dispose();
+  });
+
+  it('tocar la azada devuelve a quien la lleva', () => {
+    const villager = (): Object3D => {
+      const group = villagerModel();
+      const hand = new Group();
+      hand.name = 'hand_r';
+      group.add(hand);
+      return group;
+    };
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, villager, () => new Group());
+    cast.show([{ ...actorAt(7, 30), clip: 'work_hoe' }]);
+    const held = cast.group.children[0]?.getObjectByName('hand_r')?.children[0];
+    expect(held?.userData.villagerId).toBe(7);
+    cast.dispose();
+  });
+
+  it('sin catálogo de herramienta se trabaja con las manos vacías', () => {
+    // Un valle a medio catalogar sigue siendo un valle.
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    expect(() => cast.show([{ ...actorAt(1, 30), clip: 'work_hoe' }])).not.toThrow();
+    expect(cast.count).toBe(1);
+    cast.dispose();
+  });
+
   it('la ropa se suelta con quien la llevaba, y la malla compartida no', () => {
     const shared = villagerModel();
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());

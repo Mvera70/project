@@ -54,7 +54,7 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
  * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
  */
 export const WANTED = [
-  VILLAGER, TREE, ROCK, REED, 'field-cut', 'ruin-wood', 'ruin-stone',
+  VILLAGER, TREE, ROCK, REED, 'hoe', 'bundle', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
@@ -161,7 +161,7 @@ export async function createGraphicsRenderer(
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
   const village = new Village((id) => library.instance(id));
-  const cast = new Cast(villager, () => library.instance(VILLAGER));
+  const cast = new Cast(villager, () => library.instance(VILLAGER), (id) => library.instance(id));
   const tells = new Tells();
   const fauna = new Fauna((kind) => library.instance(kind));
   world.add(village.group, cast.group, tells.group, fauna.group);

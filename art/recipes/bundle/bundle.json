@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "id": "bundle",
+  "scale": 1.0,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "bundle",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de carga. Fardo atado que cuelga de la mano mientras alguien vuelve del campo. Ancho y corto: es lo que se lleva a casa, no una maleta."
+  },
+  "materials": [
+    {
+      "name": "sack",
+      "role": "plaster",
+      "roughness": 1.0
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Bundle_Body",
+      "location": [
+        0.0,
+        0.0,
+        -0.34
+      ],
+      "dimensions": [
+        0.44,
+        0.3,
+        0.46
+      ],
+      "material": "sack",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Bundle_Tie",
+      "location": [
+        0.0,
+        0.0,
+        -0.34
+      ],
+      "dimensions": [
+        0.47,
+        0.33,
+        0.07
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Bundle_Neck",
+      "location": [
+        0.0,
+        0.0,
+        -0.09
+      ],
+      "dimensions": [
+        0.1,
+        0.1,
+        0.14
+      ],
+      "material": "sack",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      1.2,
+      -1.5,
+      0.96
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      -0.3
+    ],
+    "orthoScale": 1.68,
+    "worldRole": "sky"
+  }
+}

@@ -1857,6 +1857,122 @@
         "source": "Original fish authored for The Valley G-10",
         "license": "Project original"
       }
+    },
+    {
+      "id": "hoe",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/hoe/hoe.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T01-01-00-041Z-53652",
+        "directory": "artifacts/graphics/G-10/approved/85051dc5a63c834f"
+      },
+      "bounds": {
+        "min": [
+          -0.11,
+          -1.37,
+          -0.029314
+        ],
+        "max": [
+          0.11,
+          0.02004,
+          1.005
+        ],
+        "size": [
+          0.22,
+          1.39004,
+          1.034314
+        ]
+      },
+      "recipeSha256": "07A8CED6449910C61C4943E8644E61D1532922C51917D82F04FFBDB7E28D6E96",
+      "materials": [
+        "wood",
+        "iron"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 44
+      },
+      "hashes": {
+        "hoe.blend": "56565C1F845B259C86194B7E70551CF03D9626621FC4BB58DE44118AB333C234",
+        "hoe.glb": "85051DC5A63C834F7428927E71F0B31D71E8C4A8FC8C9288858913C4DE88439C",
+        "hoe-blender.png": "355F393574EFEECEB4A10C101C52C8FB103D1C05B56B030A84390923F6A52D8E",
+        "capture-1.png": "750677493DBF5F9A11D375D806EF00B8E6C999D6CEB357EDF68D82B334DD5A8C",
+        "capture-1-gray.png": "F6EC648B39EC2E8DB3D1133B2C61D1736313825FA546682A951197789EDE70CE",
+        "capture.json": "81707846C840AD623876FCE2ECF1D8CDE9FF6E91E773A2E44FF81B63228F12A8",
+        "build.json": "23924BB49C5CA156C2E1CFE186A0EDC050C209090AEF40DC55C76822BC40E938",
+        "validation.json": "457C9C24058C8272EA7A4378543FE3E8EDD293C87224AA3986DE7D1699E805F9"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original hoe authored for The Valley G-10",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bundle",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/bundle/bundle.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-11T01-01-05-553Z-10196",
+        "directory": "artifacts/graphics/G-10/approved/c52644f9dd2d2079"
+      },
+      "bounds": {
+        "min": [
+          -0.235,
+          -0.57,
+          -0.165
+        ],
+        "max": [
+          0.235,
+          -0.02,
+          0.165
+        ],
+        "size": [
+          0.47,
+          0.55,
+          0.33
+        ]
+      },
+      "recipeSha256": "FEF2AADBBD469F371F81353FDFE812D33BBFDD4C3B99087A7AFD2FEDB6240A37",
+      "materials": [
+        "sack",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 36
+      },
+      "hashes": {
+        "bundle.blend": "42693DA6AE5702BF20A1F6962543C69353B5CE3B07683D34493A15B51ACA3BAE",
+        "bundle.glb": "C52644F9DD2D2079145A15B087FDA15B7FA176E7B74C1CF546A43A26E00745DC",
+        "bundle-blender.png": "69C5513415C7F11153C8E982F2E5ED0CD3379DF408A5AC0B8510B7D362732012",
+        "capture-1.png": "022C24770B5E31101F9883A07AE3288A4B16A0EFC3F14E1D77FB01B0B60CA447",
+        "capture-1-gray.png": "5DE0E9741A0765C2E54F0A389A938B29F47102A79D7A3910A746A5B0928A0185",
+        "capture.json": "041DDEEC41EED68C46356355DAFBF89555C8BAAEFECDF3857F87395C95DAC0AF",
+        "build.json": "288ADD3518681CC44C266B885E9D99D02F817ECBC09E1F43A2C13E498C72369F",
+        "validation.json": "6259FB513100DF4BAD34178A519E10DFAAFD89AE9C3C16E5601C6FAFAFC54B4C"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original bundle authored for The Valley G-10",
+        "license": "Project original"
+      }
     }
   ]
 }
