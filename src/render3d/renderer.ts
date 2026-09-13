@@ -85,6 +85,16 @@ export const WANTED = [
  */
 const FRAME_MARGIN = 2.5;
 
+/**
+ * Que parte de lo construido entra en el encuadre de partida.
+ *
+ * TUNE: cuatro quintos. Deja fuera el campo perdido al otro lado del rio y la
+ * atalaya del cerro, que son los que estiran la caja, y deja dentro la aldea
+ * con sus campos. Quien quiera verlo todo se aleja con los dedos: el limite de
+ * zoom sigue siendo el mapa.
+ */
+const CORE_SHARE = 0.8;
+
 export async function createGraphicsRenderer(
   options: GraphicsRendererOptions,
 ): Promise<GraphicsRenderer> {
@@ -208,11 +218,38 @@ export async function createGraphicsRenderer(
   function framed(): { minX: number; minZ: number; maxX: number; maxZ: number } {
     const buildings = plan?.buildings ?? [];
     if (buildings.length === 0) return { minX: 0, minZ: 0, maxX: mapWidth, maxZ: mapHeight };
+
+    // **El nucleo, no todo lo construido.**
+    //
+    // Un campo nuevo al otro lado del rio estiraba la caja hasta que la camara
+    // enseñaba el mapa entero con la aldea del tamano de un sello: en una
+    // pantalla de movil, cada celda de ancho cuesta dos de alto. Se encuadra
+    // donde esta la aldea y lo de fuera se deja fuera, que para eso estan los
+    // dedos. Se descarta por distancia a la mediana y no por tipo de edificio:
+    // un campo pegado a las casas es aldea, y uno a quince celdas no.
+    const centres = buildings.map((building) => ({
+      x: building.x + building.w / 2,
+      z: building.z + building.h / 2,
+      building,
+    }));
+    const middle = (values: number[]): number => {
+      const sorted = [...values].sort((a, b) => a - b);
+      return sorted[Math.floor(sorted.length / 2)] ?? 0;
+    };
+    const heartX = middle(centres.map((item) => item.x));
+    const heartZ = middle(centres.map((item) => item.z));
+    const byDistance = [...centres].sort((a, b) => (
+      (a.x - heartX) ** 2 + (a.z - heartZ) ** 2
+    ) - (
+      (b.x - heartX) ** 2 + (b.z - heartZ) ** 2
+    ));
+    const core = byDistance.slice(0, Math.max(1, Math.ceil(byDistance.length * CORE_SHARE)));
+
     let minX = Number.MAX_SAFE_INTEGER;
     let minZ = Number.MAX_SAFE_INTEGER;
     let maxX = 0;
     let maxZ = 0;
-    for (const building of buildings) {
+    for (const { building } of core) {
       minX = Math.min(minX, building.x);
       minZ = Math.min(minZ, building.z);
       maxX = Math.max(maxX, building.x + building.w);

@@ -82,15 +82,6 @@ export interface ValleyCamera {
  */
 const AIR = 5;
 
-/**
- * Lo mas lejos que se coloca la camara al empezar, en celdas de alto.
- *
- * TUNE: treinta. La aldea con sus campos cabe en veinticinco a lo largo de una
- * partida de sesenta años, asi que treinta la deja entera con aire. El jugador
- * puede alejarse mas con los dedos: esto es donde se abre, no hasta donde se
- * puede mirar.
- */
-const RESTING_HEIGHT = 30;
 
 function clamp(value: number, low: number, high: number): number {
   return Math.max(low, Math.min(high, value));
@@ -179,13 +170,7 @@ export function createValleyCamera(): ValleyCamera {
       furthest = Math.max(CLOSEST_HEIGHT, fitting(box));
       resting = {
         centre: { x: (box.minX + box.maxX) / 2, z: (box.minZ + box.maxZ) / 2 },
-        // **La vista de partida tiene tope; alejarse a mano, no.**
-        //
-        // Lo construido incluye los campos, y un campo nuevo al otro lado del
-        // rio estiraba la caja hasta que la camara enseñaba el mapa entero con
-        // la aldea del tamano de un sello. Encuadrar lo construido sigue siendo
-        // lo correcto —es lo que hay que ver— pero no a cualquier precio.
-        height: Math.min(furthest, RESTING_HEIGHT),
+        height: furthest,
       };
       settle(resting);
     },
