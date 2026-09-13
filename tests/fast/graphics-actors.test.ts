@@ -637,10 +637,16 @@ describe('G-10 · la gente se para a hablar (§11.9)', () => {
       }
     }
     // El paso mayor de la jornada es el del camino de ida, que es anterior a
-    // esto y es andar continuo: una décima de celda por décima de segundo.
-    // Medido con conversaciones y sin ellas da lo mismo, y ése es el punto: la
-    // charla no añade ni un salto.
-    expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(0.15);
+    // esto y es andar continuo. Medido con conversaciones y sin ellas da lo
+    // mismo, y ése es el punto: la charla no añade ni un salto.
+    //
+    // Dos décimas y no una y media desde que hay calle entre las casas: el
+    // trecho se anda en la misma fracción del día, así que quien vive más
+    // lejos anda más deprisa. Medido en cuatro partidas de catorce años,
+    // semillas 7, 11, 23 y 41: 0,173 · 0,164 · 0,141 · 0,140, y los cuatro son
+    // el mismo paso sostenido durante decenas de fotogramas seguidos, que es
+    // justo lo que un salto no es.
+    expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(0.2);
   });
 
   it('quien está parado está parado', () => {

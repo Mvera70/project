@@ -849,6 +849,38 @@ function skirt(
 }
 
 /**
+ * Quita las puas: los vertices por los que la linea va y vuelve.
+ *
+ * `skirt` rodea una esquina metiendo puntos de paso, y rodeando puede dejar la
+ * linea pasada de largo: sale `13,23 12,23 15,23`, o sea andar al oeste una
+ * celda y desandarla. En el suelo eso es una vuelta en redondo, y como el
+ * carril se lleva a la derecha de la marcha, al cambiar de sentido el cuerpo se
+ * corre dos decimas de celda de lado: un brinco donde tendria que haber un paso.
+ *
+ * Se quita el vertice solo si sus dos vecinos se ven entre si. Un fondo de saco
+ * de verdad —entrar y salir por el mismo sitio porque no hay otro— no se ve, y
+ * ese se queda: no es una pua, es el camino.
+ */
+function unwind(cells: readonly number[], blocked: Set<number>, width: number): number[] {
+  const out = [...cells];
+  for (let index = out.length - 2; index > 0; index -= 1) {
+    const before = out[index - 1] as number;
+    const here = out[index] as number;
+    const after = out[index + 1] as number;
+    const inx = (here % width) - (before % width);
+    const iny = Math.floor(here / width) - Math.floor(before / width);
+    const outx = (after % width) - (here % width);
+    const outy = Math.floor(after / width) - Math.floor(here / width);
+    // Vuelve sobre sus pasos: el producto escalar de entrada y salida es
+    // negativo, o sea mas de noventa grados de giro.
+    if (inx * outx + iny * outy >= 0) continue;
+    if (!clearBetween(before, after, blocked, width)) continue;
+    out.splice(index, 1);
+  }
+  return out;
+}
+
+/**
  * Cuanto de acercado esta alguien a su conversacion, y si esta andando.
  *
  * TUNE: la sexta parte del encuentro se va en ir y otra sexta en volver. Menos
@@ -947,9 +979,12 @@ function routesFrom(
     const walk = [...trimmed];
     if (doorIn !== undefined && walk[0] !== doorIn) walk.unshift(doorIn);
     if (doorOut !== undefined && walk[walk.length - 1] !== doorOut) walk.push(doorOut);
-    live.set(id, skirt(
-      pullString(aroundWalls(walk, blocked, state.map.width, state.map.height), blocked, state.map.width),
-      blocked, state.map.width, state.map.height,
+    live.set(id, unwind(
+      skirt(
+        pullString(aroundWalls(walk, blocked, state.map.width, state.map.height), blocked, state.map.width),
+        blocked, state.map.width, state.map.height,
+      ),
+      blocked, state.map.width,
     ));
   }
   if (memory === undefined) return live;
@@ -985,9 +1020,16 @@ function routesFrom(
   // puerta. Un dia en casa es una respuesta honesta; un salto no lo es.
   //
   // Y quien ya no esta se olvida, para que la memoria no crezca con los muertos
-  // de sesenta anos de partida.
+  // de sesenta anos de partida. **Solo quien ya no esta**: la primera version
+  // borraba a todo el que hubiera dejado de tener ruta, y perder el tajo a
+  // media semana —el campo que se pierde, el oficio que cambia— no es morirse.
+  // A quien le pasaba se le acababa la jornada de golpe y aparecia sentado en
+  // la puerta de su casa; medido, siete celdas y media de salto. El destino de
+  // hoy se decidio al amanecer y aguanta hasta el siguiente, como todo lo
+  // demas que cambia con el tick dentro de un dia escenico.
+  const still = new Set(state.people.villagers.filter(isHere).map((person) => person.id));
   for (const id of [...memory.routes.keys()]) {
-    if (!live.has(id)) memory.routes.delete(id);
+    if (!still.has(id)) memory.routes.delete(id);
   }
   return memory.routes;
 }

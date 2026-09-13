@@ -123,6 +123,7 @@ export class Fauna {
   private week = 0;
   private dark = false;
   private herd: GameState['herd'] | null = null;
+  private buildings: GameState['buildings'] | null = null;
 
   /**
    * `instance` da una copia del recurso de cada clase, o `undefined` si el
@@ -181,13 +182,26 @@ export class Fauna {
       // número y se mueven de sitio de golpe. Con la cabaña congelada, lo que
       // se lleve el lobo se nota al día siguiente, que es cuando se cuenta.
       this.herd = { ...state.herd };
+      // **Y el pueblo con ella, por lo mismo.** La gallina cuelga de la casa
+      // que le toca por su puesto en la fila de casas, y la fila se recorre en
+      // circulo: una casa nueva a media jornada cambia el reparto entero y el
+      // corral se muda de golpe. Medido, dos celdas justas. Que la casa nueva
+      // estrene sus gallinas manana no lo nota nadie.
+      // Copia, no referencia: el motor construye empujando sobre el mismo
+      // array y derriba escribiendo en el mismo edificio, asi que guardar el
+      // array no guarda nada.
+      this.buildings = state.buildings.map((building) => ({ ...building }));
     }
     this.dark = dark;
-    // Una copia superficial con la semana y la cabaña de anoche. Lo demás —los
-    // edificios, el mapa, el brote— es el estado de ahora.
-    const frozen = this.week === state.tick && this.herd === null
+    // Una copia superficial con la semana, la cabaña y el pueblo de anoche. Lo
+    // demás —el mapa, el brote— es el estado de ahora.
+    const frozen = this.week === state.tick && this.herd === null && this.buildings === null
       ? state
-      : { ...state, tick: this.week, herd: this.herd ?? state.herd };
+      : {
+        ...state, tick: this.week,
+        herd: this.herd ?? state.herd,
+        buildings: this.buildings ?? state.buildings,
+      };
     const animals: Animal[] = [];
     for (const animal of [...animalPositions(frozen, dayPhase), ...wildlifePositions(frozen, dayPhase)]) {
       if (animal.kind === 'fish') {
