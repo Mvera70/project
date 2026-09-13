@@ -60,6 +60,14 @@ export interface Actor {
   readonly cell: number;
   readonly named: boolean;
   /**
+   * Si ahora mismo esta parado con alguien (§11.9).
+   *
+   * Lo sabe quien coloca a la gente, y lo necesita quien dibuja la burbuja de
+   * §11.1.1: deducirlo del clip —«trabajando pero con el clip de estarse»— era
+   * adivinar desde fuera algo que aqui se sabe.
+   */
+  readonly talking: boolean;
+  /**
    * Los anos que tiene. Sirven para la talla y para nada mas.
    *
    * Un valle de adultos identicos no es un valle: los ninos tienen que verse
@@ -1076,6 +1084,7 @@ export function actorsFor(
         id: person.id, x: at.x, z: at.z, facing: 0, activity: 'resting',
         clip: 'idle', clipSeconds: clipTime('idle', 0, frame.presentationSeconds, stable(person.id, 11)),
         cell: home, named: person.named, age: ageOf(person, state.tick), travelled: 0,
+        talking: false,
       });
       continue;
     }
@@ -1230,6 +1239,7 @@ export function actorsFor(
       travelled,
       cell: cellZ * width + cellX,
       named: person.named,
+      talking: talk !== null,
       age: ageOf(person, state.tick),
     });
   }

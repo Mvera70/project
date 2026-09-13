@@ -626,6 +626,21 @@ export const SCARS = {
  * un fichero suelto — y cuánto dura un apagón es un número.
  */
 /**
+ * Las burbujas de estado (§11.1.1, v3.53). Igual que los encuentros: sólo de
+ * presentación, sin azar y sin guardarse. Aquí porque §2 no deja que un número
+ * del juego viva suelto en un fichero de dibujo.
+ */
+export const BUBBLE = {
+  // TUNE: cuántas semanas se le queda a alguien la cara de lo que le ha pasado.
+  // Seis es una estación y media: bastante para verlo a ×16 sin que la aldea se
+  // pase la partida entera de luto.
+  WEEKS: 6,
+  // TUNE: qué escasez hay que tener para que se le note en la cara. Por debajo
+  // de un cuarto la aldea aprieta el cinturón y sigue; por encima, pasa hambre.
+  HUNGRY_AT: 0.25,
+} as const;
+
+/**
  * Los encuentros de la jornada (§11.9, v3.03). Sólo de presentación: no mueven
  * un número del juego, no se guardan y no consumen azar. Están aquí porque
  * §2 dice que ningún número del juego vive suelto en un fichero de dibujo.

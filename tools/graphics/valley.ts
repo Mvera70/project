@@ -84,6 +84,23 @@ async function main(): Promise<void> {
     }
   }
 
+  // `?stir=1` revuelve la aldea a mano, para poder mirar las burbujas.
+  //
+  // Las de §11.1.1 salen de sucesos que son raros a proposito —2,6 % de
+  // persona-semana medido en cuarenta anos—, asi que esperar a que salga un
+  // duelo para ver como queda el icono no es un metodo. Esto pone un brote y
+  // entierra a alguien; el resto lo deriva `moodsFor` como siempre.
+  if (number('stir', 0) > 0) {
+    state.outbreak = { startedTick: state.tick, endsTick: state.tick + 8, deaths: 0 };
+    const child = state.people.villagers.find(
+      (person) => person.diedTick === null && person.parentIds.some((id) => id !== null),
+    );
+    if (child !== undefined) {
+      child.diedTick = state.tick;
+      child.causeOfDeath = 'plague';
+    }
+  }
+
   const canvas = document.querySelector<HTMLCanvasElement>('#stage');
   if (canvas === null) throw new Error('No canvas.');
   document.body.style.width = `${width}px`;

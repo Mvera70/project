@@ -229,11 +229,27 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
         return lit;
       });
     }
-    case 'plague':
-      // Por encima del caballete, no a media altura de la pared. A media altura
-      // quedaba dentro de la casa, como la luz: la peste es una alarma y una
-      // alarma que hay que buscar no es una alarma.
-      return [mark(new SphereGeometry(0.13, 6, 5), TONE.plague, false, tell.x, HEIGHT.plague, tell.y)];
+    case 'plague': {
+      // **Una cruz en la pared, junto a la puerta**, que es lo que §11.1 dice
+      // con esas palabras. Estuvo dentro del muro hasta v3.42 y encima del
+      // caballete despues, y encima del caballete era una bola morada flotando
+      // sobre el tejado: se leia como un globo, no como una casa marcada.
+      //
+      // Va siempre en la fachada, la cara de -Y, **sin mirar si el vecino esta
+      // pegado**. Es la diferencia con la luz: la luz encerrada entre dos casas
+      // no la ve nadie, pero una cruz es pintura sobre el muro y se ve desde
+      // donde se ve el muro, que es de donde mira la camara.
+      const home = at === undefined ? undefined : at(tell.x, tell.y);
+      if (home === undefined) {
+        return [mark(new SphereGeometry(0.12, 6, 5), TONE.plague, false, tell.x, HEIGHT.plague, tell.y)];
+      }
+      const x = home.x + home.w * 0.78;
+      const z = home.y - GLASS;
+      const arm = mark(new BoxGeometry(0.26, 0.07, GLASS), TONE.plague, false, x, 0.52, z, 1);
+      const post = mark(new BoxGeometry(0.08, 0.32, GLASS), TONE.plague, false, x, 0.52, z, 1);
+      for (const piece of [arm, post]) piece.object.userData.mounted = true;
+      return [post, arm];
+    }
     case 'candles': {
       // Las velas se ponen en la fachada de la capilla por el mismo motivo que
       // la luz: dentro no las ve nadie.

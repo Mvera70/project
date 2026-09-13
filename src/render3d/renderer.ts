@@ -16,6 +16,7 @@ import {
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
 import { paletteFor } from '@render/palette';
+import { moodsFor } from '@render/moods';
 import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
 import { actorsFor, createActorMemory, type Actor } from './actors';
@@ -32,6 +33,7 @@ import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { dayPhase } from './presentation-clock';
 import { daylightAt } from './effects/daylight';
+import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
 import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
@@ -174,7 +176,8 @@ export async function createGraphicsRenderer(
   const cast = new Cast(villager, () => library.instance(VILLAGER), (id) => library.instance(id));
   const tells = new Tells();
   const fauna = new Fauna((kind) => library.instance(kind));
-  world.add(village.group, cast.group, tells.group, fauna.group);
+  const bubbles = new Bubbles();
+  world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -184,6 +187,9 @@ export async function createGraphicsRenderer(
   let plan: ScenePlan | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
+  // La cota del suelo, que la burbuja necesita para flotar sobre la cabeza y no
+  // sobre el nivel del mar.
+  let groundFloor: (x: number, z: number) => number = () => 0;
   let lastActors: Actor[] = [];
   // D.6 · el estado efimero de los actores. Vive aqui, no en `GameState`, y se
   // rehace al amanecer de cada dia escenico y en cada partida nueva.
@@ -298,6 +304,7 @@ export async function createGraphicsRenderer(
     // falta porque el suelo era plano.
     const map = state.map;
     const floor = (x: number, z: number): number => elevationAt(map, x, z);
+    groundFloor = floor;
     cast.standOn(floor);
     fauna.standOn(floor);
     mapWidth = state.map.width;
@@ -329,6 +336,7 @@ export async function createGraphicsRenderer(
         cast.clear();
         tells.clear();
         fauna.clear();
+        bubbles.clear();
       }
       if (change.ground || change.cleared) rebuildGround(state as GameState);
       for (const id of change.removed) village.remove(id);
@@ -342,6 +350,20 @@ export async function createGraphicsRenderer(
       // village is not, because it changes a few times a year.
       lastActors = actorsFor(state as GameState, frame, { tracked, memory });
       cast.show(lastActors);
+
+      // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
+      // lleva sale del estado; que este parado hablando lo dice el actor.
+      const moods = moodsFor(state as GameState);
+      const carried = new Map<VillagerId, Bubble>();
+      const heads = new Map<VillagerId, { x: number; y: number; z: number }>();
+      for (const actor of lastActors) {
+        const mood = moods.get(actor.id);
+        const bubble: Bubble | undefined = mood ?? (actor.talking ? 'chat' : undefined);
+        if (bubble === undefined) continue;
+        carried.set(actor.id, bubble);
+        heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });
+      }
+      bubbles.update(heads, carried);
       // La hora escenica: la piden el rebano, las luces y el sol.
       const phase = dayPhase(frame.presentationSeconds);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
@@ -436,6 +458,7 @@ export async function createGraphicsRenderer(
       disposed = true;
       tells.dispose();
       fauna.dispose();
+      bubbles.dispose();
       cast.dispose();
       village.dispose();
       if (ground !== null) {
