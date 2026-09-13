@@ -5148,15 +5148,20 @@ tirada del render (§4.3):
 
 | Burbuja | De dónde sale |
 |---|---|
-| Riña | Un rencor de §6.4 formado hace pocas semanas (`formedTick`) |
 | Duelo | Una muerte reciente de padre, madre o hijo (`diedTick` y `parentIds`) |
 | Nacimiento | Un hijo nacido hace pocas semanas (`bornTick`) |
-| Hambre | `hungerSeverity` por encima de su umbral |
-| Peste | Un brote vivo (§5.8) |
+| Riña | Un rencor de §6.4 formado hace pocas semanas (`formedTick`) |
 | Charla | Los encuentros de §11.9, que ya se derivan para mover a la gente |
 
 **El orden importa y es el de arriba**: quien acaba de enterrar a un hijo no
-enseña que tiene hambre. Una persona lleva una burbuja o ninguna.
+enseña que acaba de ser padre. Una persona lleva una burbuja o ninguna.
+
+**Nada de lo que le pasa a la aldea entera va en la burbuja**, y se probó al
+revés: con un brote puesto, los cuarenta llevaban una cruz sobre la cabeza y la
+pantalla dejaba de decir nada. El hambre y la peste son de la aldea, y la tabla
+de §11.1 ya las cuenta donde se leen — la peste vuelve a ser **una cruz pintada
+en la pared junto a la puerta**, que es lo que esa tabla dice con esas palabras
+y lo que dejó de ser cuando hubo que sacarla del muro en v3.42.
 
 **Lo que esto no es.** No es un panel de estadísticas ni un árbol de menús. Las
 cifras exactas siguen estando a un toque, la ficha sigue siendo la de §11.2, y

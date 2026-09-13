@@ -142,6 +142,14 @@ va al tajo. Se decide al amanecer, como los destinos, y por eso no teletransport
 a nadie; `valley.html?gather=1` convoca una a mano para poder mirarla, porque
 salen dos veces en treinta años.
 
+**Y un hallazgo que no es de gráficos y es el más gordo de todos:** dos sistemas
+del motor no se disparan nunca. Los rencores de §6.4 no se forman ni una vez en
+cuarenta años, lo que deja muertas las riñas de M-39 y las dos encrucijadas que
+las exigen; y el jugador toma **entre siete y doce decisiones en cuarenta años**
+sobre la mitad del catálogo, porque diez de las veinte plantillas no salieron ni
+una vez en cinco partidas. Medido y escrito en `docs/findings-drama.md`. Ninguna
+cantidad de arte tapa eso.
+
 **Lo siguiente, en este orden:**
 
 1. **Correr el banco en un móvil** con `--real true` y llenar las filas de
