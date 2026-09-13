@@ -20,7 +20,7 @@ import { actorsFor } from '../../src/render3d/actors';
 import { loadAssets } from '../../src/render3d/assets';
 import { SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import { BoxGeometry, Color, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
 import type { Actor } from '../../src/render3d/actors';
 import type { LoadedAsset } from '../../src/render3d/assets';
 import { BUILDINGS } from '@engine/balance';
@@ -187,6 +187,85 @@ describe('G-06 · el suelo', () => {
     const cells = state.map.width * state.map.height;
     expect(ground.mesh.geometry.getIndex()?.count).toBe(cells * 6);
     expect(ground.mesh.geometry.getAttribute('position').count).toBe(cells * 4);
+    ground.dispose();
+  });
+
+  it('el borde de un terreno no es recto, y la malla no se abre', () => {
+    // §11.7, v3.58. El valle estaba dibujado con cuadrados perfectos y con
+    // arboles y casas en tres dimensiones encima la cuadricula se leia como
+    // papel milimetrado. Las esquinas se mueven de sitio; la condicion es que
+    // **las cuatro celdas que tocan una esquina la muevan igual**, o entre
+    // celda y celda se abre un agujero por el que se ve el cielo.
+    const state = village(6);
+    const ground = buildGround(state.map, PALETTES.summer);
+    const position = ground.mesh.geometry.getAttribute('position');
+    const width = state.map.width;
+
+    // La esquina de arriba a la izquierda de cada celda del interior, que es
+    // tambien la de abajo a la derecha de su vecina en diagonal.
+    const cornerOf = (cell: number, vertex: number): [number, number] => {
+      const at = cell * 4 + vertex;
+      return [position.getX(at), position.getZ(at)];
+    };
+    let moved = 0;
+    for (let z = 1; z < state.map.height - 1; z += 1) {
+      for (let x = 1; x < width - 1; x += 1) {
+        const cell = z * width + x;
+        const mine = cornerOf(cell, 0);
+        const theirs = cornerOf(cell - width - 1, 2);
+        expect(Math.hypot(mine[0] - theirs[0], mine[1] - theirs[1]),
+          `la esquina ${x},${z} no cuadra entre sus celdas`).toBeLessThan(1e-6);
+        if (Math.hypot(mine[0] - x, mine[1] - z) > 0.02) moved += 1;
+      }
+    }
+    // Y se mueven casi todas: si no, no hay borde irregular que valga.
+    expect(moved).toBeGreaterThan((width - 2) * (state.map.height - 2) * 0.9);
+
+    // El contorno del valle si es recto: es el limite del mundo.
+    for (let x = 0; x < width; x += 1) {
+      expect(position.getZ(x * 4)).toBe(0);
+    }
+    ground.dispose();
+  });
+
+  it('la linde entre dos terrenos es un degradado, no un escalon', () => {
+    // El tablero de ajedrez: dos celdas vecinas de terreno distinto se
+    // encontraban en un salto de color de golpe. Ahora cada esquina lleva algo
+    // del color de las celdas que la tocan, asi que el salto que quedaba entre
+    // dos vertices pegados es menos de la mitad del que hay entre los centros
+    // de las dos celdas.
+    const state = village(6);
+    const ground = buildGround(state.map, PALETTES.summer);
+    const colour = ground.mesh.geometry.getAttribute('color');
+    const width = state.map.width;
+    const plain = new Color();
+    const other = new Color();
+
+    let pairs = 0;
+    let softened = 0;
+    for (let z = 1; z < state.map.height - 1; z += 1) {
+      for (let x = 1; x < width - 1; x += 1) {
+        const cell = z * width + x;
+        const right = cell + 1;
+        if (state.map.terrain[cell] === state.map.terrain[right]) continue;
+        plain.set(cellColour(state.map, cell, PALETTES.summer));
+        other.set(cellColour(state.map, right, PALETTES.summer));
+        const flat = Math.hypot(plain.r - other.r, plain.g - other.g, plain.b - other.b);
+        // Los dos vertices que se tocan en la linde: el de la derecha de esta
+        // celda y el de la izquierda de la de al lado.
+        const a = cell * 4 + 1;
+        const b = right * 4;
+        const seam = Math.hypot(
+          colour.getX(a) - colour.getX(b),
+          colour.getY(a) - colour.getY(b),
+          colour.getZ(a) - colour.getZ(b),
+        );
+        pairs += 1;
+        if (seam < flat * 0.5) softened += 1;
+      }
+    }
+    expect(pairs, 'un valle sin lindes no prueba nada').toBeGreaterThan(50);
+    expect(softened / pairs).toBeGreaterThan(0.95);
     ground.dispose();
   });
 

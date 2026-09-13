@@ -26,9 +26,142 @@ import { GROUND_BIAS } from '../visual-config';
  */
 const MOTTLE = 0.05;
 
-function mottleOf(cell: number): number {
-  const mixed = Math.imul(cell + 1, 2_654_435_761) >>> 0;
+/**
+ * El moteado, por esquina de la cuadricula.
+ *
+ * Antes iba por celda, y asi es un tono plano por cuadrado: cuarenta filas de
+ * cuadrados de tono ligeramente distinto **son** la cuadricula: era lo ultimo
+ * que quedaba de ella cuando los bordes ya no eran rectos. Por esquina, el tono
+ * va cambiando dentro de la propia celda y lo que se ve es un prado desigual.
+ *
+ * Sale de las coordenadas de la esquina, asi que las cuatro celdas que la tocan
+ * leen el mismo valor y la mancha cruza de una a otra sin costura.
+ */
+function mottleAt(x: number, z: number): number {
+  const mixed = Math.imul(x * 374_761_393 + z * 668_265_263 + 1, 2_246_822_519) >>> 0;
   return ((mixed % 1000) / 999 - 0.5) * 2 * MOTTLE;
+}
+
+/**
+ * Cuanto cambia de tono el suelo de una zona a otra, y cada cuantas celdas.
+ *
+ * El moteado de al lado varia de esquina a esquina, y a la distancia a la que
+ * se juega eso se promedia y desaparece: el prado vuelve a ser una sabana de un
+ * verde. Un prado de verdad tiene manchas mas grandes que sus hierbas —lo seco
+ * de la loma, lo hondo que retiene el agua—, asi que encima va una segunda
+ * variacion mas lenta.
+ *
+ * TUNE: siete centesimas cada seis celdas, dieciocho metros (D.6.2). Al doble
+ * de amplitud se ven las manchas y no el prado.
+ */
+const PATCH = 0.07;
+const PATCH_CELLS = 6;
+
+/** Un valor entre cero y uno, siempre el mismo para el mismo par. */
+function hash(x: number, z: number): number {
+  const mixed = Math.imul(x * 668_265_263 + z * 374_761_393 + 1, 2_654_435_761) >>> 0;
+  return (mixed % 1000) / 999;
+}
+
+/**
+ * La mancha lenta en un punto: ruido de rejilla, interpolado suave.
+ *
+ * La rejilla va de seis en seis celdas y entre nudo y nudo se interpola con una
+ * curva suave, no con una recta: con la recta se ven las aristas de la rejilla,
+ * que seria cambiar una cuadricula por otra mas grande.
+ */
+function patchAt(x: number, z: number): number {
+  const gx = x / PATCH_CELLS;
+  const gz = z / PATCH_CELLS;
+  const x0 = Math.floor(gx);
+  const z0 = Math.floor(gz);
+  const fx = gx - x0;
+  const fz = gz - z0;
+  const smooth = (t: number): number => t * t * (3 - 2 * t);
+  const sx = smooth(fx);
+  const sz = smooth(fz);
+  const top = hash(x0, z0) * (1 - sx) + hash(x0 + 1, z0) * sx;
+  const bottom = hash(x0, z0 + 1) * (1 - sx) + hash(x0 + 1, z0 + 1) * sx;
+  return ((top * (1 - sz) + bottom * sz) - 0.5) * 2 * PATCH;
+}
+
+/**
+ * Cuanto se desplaza de su sitio una esquina de celda, en celdas.
+ *
+ * TUNE: veintidos centesimas, sesenta y cinco centimetros (D.6.2). El valle
+ * estaba dibujado con cuadrados perfectos y desde que hay arboles y casas en
+ * tres dimensiones encima, la cuadricula se lee como lo que es: papel
+ * milimetrado verde. Un terreno no tiene el borde recto. Moviendo las esquinas
+ * un poco, la linde entre el prado y el bosque deja de ser una escalera de
+ * peldanos iguales y pasa a ser un borde irregular, que es lo que separa dos
+ * terrenos de verdad. Mas de un cuarto de celda y los triangulos se cruzan.
+ */
+const WOBBLE = 0.22;
+
+/**
+ * A donde se mueve la esquina `(x, z)` de la cuadricula.
+ *
+ * **Depende solo de la esquina**, no de la celda que la usa. Es la condicion de
+ * que esto funcione: las cuatro celdas que tocan una esquina tienen cada una su
+ * propio vertice ahi, y si cada uno se moviera a su aire se abririan agujeros
+ * entre celda y celda. Saliendo del mismo par de coordenadas, los cuatro se
+ * mueven juntos y la malla sigue cerrada.
+ *
+ * El borde del mapa no se mueve: el valle sigue siendo un rectangulo y su
+ * contorno es el limite del mundo, no un accidente del terreno.
+ */
+function wobbleAt(map: ValleyMap, x: number, z: number): { x: number; z: number } {
+  if (x <= 0 || z <= 0 || x >= map.width || z >= map.height) return { x, z };
+  const mixed = Math.imul(x * 73_856_093 + z * 19_349_663 + 1, 2_654_435_761) >>> 0;
+  const other = Math.imul(mixed ^ 0x9e37_79b9, 2_246_822_519) >>> 0;
+  return {
+    x: x + ((mixed % 1000) / 999 - 0.5) * 2 * WOBBLE,
+    z: z + ((other % 1000) / 999 - 0.5) * 2 * WOBBLE,
+  };
+}
+
+/**
+ * Cuanto pesa la propia celda en el color de sus esquinas.
+ *
+ * TUNE: cuarenta y seis centesimas contra dieciocho de cada vecina. Con el
+ * color plano por celda, dos terrenos vecinos se encuentran en un escalon recto
+ * y el valle entero es un tablero de ajedrez. Promediando del todo se pierde el
+ * campo de cultivo, que mide tres por dos y se disolveria en el prado. Con la
+ * celda pesando algo mas de lo que suman sus vecinas, la linde es un degradado
+ * de una celda de ancho y lo que hay a cada lado sigue siendo reconocible.
+ */
+const OWN_CELL = 0.46;
+
+/**
+ * El color de una esquina de celda: el suyo, mezclado con el de las vecinas.
+ *
+ * `own` es la celda a la que pertenece este vertice; las otras tres que tocan
+ * la esquina entran con el peso que sobra.
+ */
+function cornerColour(
+  map: ValleyMap, own: number, x: number, z: number, palette: Palette, into: Color,
+): void {
+  const rest = (1 - OWN_CELL) / 3;
+  const ownX = own % map.width;
+  const ownZ = Math.floor(own / map.width);
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  const sample = new Color();
+  for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
+    const cx = x + dx;
+    const cz = z + dz;
+    const mine = cx === ownX && cz === ownZ;
+    // Fuera del mapa no hay terreno que mezclar: esa parte de la mezcla la pone
+    // la propia celda, y asi los pesos siguen sumando uno.
+    const inside = cx >= 0 && cz >= 0 && cx < map.width && cz < map.height;
+    sample.set(cellColour(map, inside ? cz * map.width + cx : own, palette));
+    const weight = mine ? OWN_CELL : rest;
+    r += sample.r * weight;
+    g += sample.g * weight;
+    b += sample.b * weight;
+  }
+  into.setRGB(r, g, b);
 }
 
 /**
@@ -151,9 +284,12 @@ function buildWater(map: ValleyMap, palette: Palette): Mesh | null {
     const points = [[x, z], [x + 1, z], [x + 1, z + 1], [x, z + 1]] as const;
     for (let vertex = 0; vertex < 4; vertex += 1) {
       const at = (corner + vertex) * 3;
-      positions[at] = points[vertex]?.[0] ?? 0;
+      // La misma esquina movida que el suelo: si la lamina se quedara en la
+      // cuadricula, el agua asomaria por fuera del cauce.
+      const moved = wobbleAt(map, points[vertex]?.[0] ?? 0, points[vertex]?.[1] ?? 0);
+      positions[at] = moved.x;
       positions[at + 1] = GROUND_BIAS + WATER_LEVEL;
-      positions[at + 2] = points[vertex]?.[1] ?? 0;
+      positions[at + 2] = moved.z;
     }
     const face = index * 6;
     indices[face] = corner;
@@ -252,8 +388,6 @@ export function buildGround(map: ValleyMap, palette: Palette): Ground {
   for (let cell = 0; cell < cells; cell += 1) {
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
-    tint.set(cellColour(map, cell, palette));
-    const shade = 1 + mottleOf(cell);
     const corner = cell * 4;
 
     // Map (x, y) becomes scene (x, 0, y), per D.4's spatial convention.
@@ -264,12 +398,17 @@ export function buildGround(map: ValleyMap, palette: Palette): Ground {
       const at = (corner + vertex) * 3;
       const px = points[vertex]?.[0] ?? 0;
       const pz = points[vertex]?.[1] ?? 0;
-      positions[at] = px;
+      // La cota se toma en la esquina de la cuadricula y el vertice se dibuja
+      // movido: el relieve es el mismo, el borde no es recto.
+      const moved = wobbleAt(map, px, pz);
+      positions[at] = moved.x;
       positions[at + 1] = GROUND_BIAS + heightAt(map, px, pz);
-      positions[at + 2] = pz;
+      positions[at + 2] = moved.z;
       normals[at] = 0;
       normals[at + 1] = 1;
       normals[at + 2] = 0;
+      cornerColour(map, cell, px, pz, palette, tint);
+      const shade = 1 + mottleAt(px, pz) + patchAt(px, pz);
       colours[at] = tint.r * shade;
       colours[at + 1] = tint.g * shade;
       colours[at + 2] = tint.b * shade;

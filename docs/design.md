@@ -28,6 +28,9 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.58** | 13 sep 2026 | G-10, el suelo cuadriculado | **El valle estaba dibujado con un cuadrado de color plano por celda** y con elementos en tres dimensiones encima se leía como papel milimetrado. Las esquinas de la cuadrícula se mueven de sitio, cada esquina lleva algo del color de las celdas que la tocan, y el tono varía en dos escalas: una fina y otra lenta cada seis celdas. Ni el mapa ni el terreno cambian —esto es cómo se pinta, no qué hay—, y la malla sigue cerrada porque el desplazamiento sale de la esquina y no de la celda. Detalle en D.6.6. |
+| **3.57** | 13 sep 2026 | G-10, la aldea no tenía calles | **Entre dos edificios con paredes queda ahora una celda de calle** (`BUILDING_RULES.STREET_GAP`, §7.2). Hasta aquí el motor pegaba las casas unas a otras —seis seguidas sin un hueco en la partida medida— y eso no era una fealdad: la puerta de la de en medio daba a la pared de la de al lado, y nadie podía entrar en su casa sin cruzar la del vecino. Los campos, la empalizada, el pozo y el camposanto están exentos: no tienen dentro, se pisan. Lo que esto mueve: la aldea ocupa más suelo y el reparto de destinos baja de 7,50 a 6,67 de media en seis partidas de veinte años —el mismo reparto en un pueblo más ancho—, y ni las decisiones ni la población cambian en cinco partidas de cuarenta años. **Y destapó dos teletransportes que llevaban tiempo escondidos**, los dos por lo mismo de siempre: algo que cambia con el tick, leído dentro de una jornada escénica que dura muchos ticks. (1) Al que perdía el tajo a media semana se le borraba la ruta y se le acababa el día de golpe en la puerta de su casa: siete celdas y media de salto. Ahora sólo se olvida a quien ya no está. (2) La gallina cuelga de la casa que le toca por su puesto en la fila, y una casa nueva cambiaba el reparto entero: dos celdas. La fila se congela al anochecer, como la cabaña. |
+| **3.56** | 13 sep 2026 | G-10, los edificios estaban dos celdas al norte | **Todo lo construido se dibujaba desplazado el fondo de su huella.** El exportador de Blender convierte poniendo `z_glTF = −y_blender`, así que una receta que ocupa de 0 a 6 metros en Y sale ocupando de −6 a 0 en Z: el modelo se plantaba con su fondo en el origen. Llevaba así desde G-06 y no se veía porque el pueblo entero estaba desplazado igual; lo delató la gente, que sí sale de las coordenadas del motor. Era la causa de tres defectos que se estaban persiguiendo por separado: las ventanas encendidas donde no hay ventana, los aldeanos trabajando fuera del campo y los juncos creciendo debajo de lo construido. |
 | **3.55** | 13 sep 2026 | G-10, el rebaño se teletransportaba | **El mismo fallo que la gente tuvo dos rondas, en los animales, y por la misma razón:** la querencia de cada bicho se sortea **con la semana** (§11.9, v3.06) para que no repita el mismo círculo desde la fundación. En el render 2D está bien —allí un tick es un día en pantalla y el salto se lee como «se ha ido a otra mata»— pero una jornada escénica dura **ocho semanas a ×1 y ciento veintiocho a ×16**: la querencia se re-sorteaba ciento veintiocho veces al día. Medido, **2,90 celdas de salto**. Se congela la semana, **y se cambia al anochecer, no al amanecer**: es la única hora en la que no se ve a nadie moverse, porque el ganado, los cuervos y los peces dejan de dibujarse en esa misma línea (§10.6) y el lobo empieza justo ahí, o sea que aparece ya en su sitio nuevo. Congelada al amanecer quedaba un salto al día, y con el ganado en pantalla. Con la cabaña se congela también el recuento, porque **el identificador de un animal es su puesto en la fila** y de ese número salen su fase, su radio y su querencia: naciendo una gallina a media jornada, todos los cerdos y todas las vacas cambiaban de número. Y al medirlo apareció un tercer salto, este de la ronda anterior: sacar de un empujón fijo a quien pisaba el agua costaba 0,61 celdas en el borde mismo; ahora se le deja pegado a la orilla y el desplazamiento crece desde cero. Queda en **0,04 celdas**, que son doce centímetros. |
 | **3.54** | 13 sep 2026 | G-07, los gestos estaban colgados de un lienzo oculto | **En 3D no funcionaba ningún gesto, y no daba ningún error.** Ni arrastrar, ni pellizcar, ni tocar para abrir la ficha, ni mantener para seguir a alguien. La causa: los gestos se enganchan una vez al arrancar y **el relevo cambia de lienzo** —cuando el piloto entra, el de Canvas se oculta con `display: none` y aparece otro encima—, y un elemento oculto no recibe eventos. Ahora van en la raíz, que no cambia, y las coordenadas se miden contra el lienzo que el backend declara vivo. **Y entra la rueda del ratón**, que en un móvil no existe y en un navegador de escritorio era la única manera de acercarse, porque allí no hay dos dedos que pellizcar. Se normaliza a muescas, que unas ruedas dan píxeles y otras líneas. Las dos cosas salieron de jugar la demo en el ordenador; ninguna prueba las hubiera encontrado, y la que se deja puesta vigila el enganche sobre el código porque montar el juego entero pide un DOM que la suite rápida no tiene. |
 | **3.53** | 13 sep 2026 | Decisión de diseño: §11.1.1 | **«El valle es el HUD y por defecto no hay ni una cifra» se relaja, por decisión del dueño del diseño y por lo que se vio jugando:** con el catálogo puesto, el valle está lleno y el jugador sigue sin saber qué pasa. Las señales diegeticas son lentas —el granero tarda una estación en vaciarse— y mudas sobre las personas. Entran **dos elementos y sólo dos**: una tira con gente, comida, leña y ánimo, y una burbuja de estado sobre quien está viviendo algo. **La comida se enseña en semanas y no en unidades**, porque la unidad es «una persona una semana» y la división la puede hacer el juego. **Y no hay contador de oro ni de piedra**: ninguno de los dos existe en la simulación —el comercio es trueque y la piedra se convierte en puntos de obra sin almacenarse nunca—, así que ponerlos sería inventar un número. Si hay moneda algún día, se decide en el motor y llega después. La burbuja **sólo sale de estado con fecha** —rencor formado, muerte de un allegado, hijo nacido, hambre, brote, y los encuentros de §11.9— y va en ese orden de prioridad: quien acaba de enterrar a un hijo no enseña que tiene hambre. |
@@ -3961,6 +3964,19 @@ borde a borde, entre el 18 % y el 30 % de bosque, y un sitio de fundación váli
 | `stone_house` | 2×2 | 0 + 50 piedra | 70 | Mejora de `house`; no arde | — |
 | `church` | 3×3 | 0 + 120 piedra | 200 | Mejora de `chapel` | 1 |
 | `watchtower` | 2×2 | 0 + 60 piedra | 90 | Solo por encrucijada | 2 |
+
+**Una celda de calle entre lo que tiene paredes (v3.57).** Dos edificios con
+dentro —casa, casa de piedra, granero, capilla, iglesia, fragua, molino,
+atalaya— no pueden compartir borde: queda entre ellos una celda libre,
+`BUILDING_RULES.STREET_GAP`. El resto de la tabla está exento porque se pisa: un
+campo, la empalizada, el pozo y el camposanto son suelo, no interior.
+
+El motivo no es el gusto. Sin la calle la aldea crecía como un bloque macizo
+—seis casas seguidas sin un hueco en la partida medida—, y entonces la puerta de
+la casa de en medio da a la pared de la de al lado: nadie puede entrar en su
+casa sin cruzar la del vecino. Lo que cuesta: la aldea ocupa más suelo, así que
+en un valle apretado se llena antes y el punto 9 de §7.3 —las mejoras a piedra—
+llega unos años antes.
 
 La piedra no es un sexto recurso. Con `smithy` y roca en el mapa, su extracción
 añade `stone / WORLD.STONE_PER_BP` a los puntos de obra del proyecto; se paga la
@@ -8411,6 +8427,39 @@ el botón parecía roto. Con la raíz, ×4 mueve al doble y ×16 al cuádruple
 mientras el mundo corre cuatro y dieciséis veces más. Como el clip lo mueve el
 suelo recorrido, la cadencia sube sola con el paso, que es lo que hace una
 grabación acelerada.
+
+#### D.6.6 · El suelo no es una cuadricula (v3.58)
+
+El valle estaba dibujado con un cuadrado de color plano por celda. Mientras todo
+era plano se pasaba; con arboles, casas y gente en tres dimensiones encima, lo
+que se lee es papel milimetrado verde, y el dueno del diseno lo dijo asi: «queda
+fatal esa base verde con formas cuadradas… el suelo debe tener diferentes
+colores y formas, en funcion del terreno, pero no puede ser cuadrado».
+
+Tres reglas, y ninguna cambia el mapa: el terreno que dice el motor es el mismo,
+lo que cambia es como se pinta.
+
+1. **Las esquinas de la cuadricula se mueven de su sitio** hasta 0,22 celdas, y
+   la linde entre dos terrenos deja de ser una escalera de peldanos iguales. El
+   desplazamiento sale de las coordenadas de la esquina y no de la celda, que es
+   la condicion de que las cuatro celdas que la tocan la muevan igual y la malla
+   no se abra. El borde del mapa no se mueve: el valle sigue siendo un
+   rectangulo porque ahi se acaba el mundo.
+2. **Cada esquina lleva algo del color de las celdas que la tocan** —la suya
+   pesa 0,46 y las otras tres 0,18 cada una—, asi que dos terrenos vecinos se
+   encuentran en un degradado de una celda en vez de en un escalon. Promediar
+   del todo disolveria un campo de tres por dos en el prado; por eso la propia
+   celda pesa mas que sus vecinas juntas.
+3. **La variacion de tono va por esquina y en dos escalas**: una fina, de
+   esquina a esquina, y otra lenta cada seis celdas. La fina sola se promedia a
+   la distancia a la que se juega y el prado vuelve a ser una sabana de un solo
+   verde; la lenta es la que hace que un prado tenga zonas.
+
+La lamina de agua usa las mismas esquinas movidas, o el rio asomaria por fuera
+de su cauce. `elevationAt` sigue devolviendo la cota de la cuadricula sin mover:
+el desplazamiento es horizontal y lo que separa la superficie dibujada de la
+calculada no llega a diez centimetros, que es menos que el grosor de una bota.
+
 
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
