@@ -74,6 +74,14 @@ export interface ValleyCamera {
   readonly limits: { closest: number; furthest: number };
 }
 
+/**
+ * El aire que se deja alrededor de lo encuadrado, en celdas de alto.
+ *
+ * TUNE: cinco. Es lo justo para que la aldea no toque los bordes de la pantalla
+ * sin que parezca perdida en medio del prado.
+ */
+const AIR = 5;
+
 function clamp(value: number, low: number, high: number): number {
   return Math.max(low, Math.min(high, value));
 }
@@ -107,7 +115,10 @@ export function createValleyCamera(): ValleyCamera {
       halfWidth = Math.max(halfWidth, Math.abs(seen.x));
       halfHeight = Math.max(halfHeight, Math.abs(seen.y));
     }
-    return Math.max(halfHeight, halfWidth / aspect) * 2 * 1.06;
+    // El aire de alrededor se **suma**, no se multiplica: metido en la caja, el
+    // margen horizontal se divide por la proporcion de la pantalla y en un
+    // movil vertical vale el doble que el vertical.
+    return Math.max(halfHeight, halfWidth / aspect) * 2 + AIR;
   }
 
   /** Put the camera above `centre`, showing `height` cells of valley. */

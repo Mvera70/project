@@ -142,6 +142,10 @@ export function attachBackend(
       const webgl = document.createElement('canvas');
       webgl.id = 'valley3d';
       webgl.style.display = 'block';
+      // Encima del hueco y por debajo de los controles.
+      webgl.style.position = 'absolute';
+      webgl.style.inset = '0';
+      webgl.style.zIndex = '0';
       canvas.after(webgl);
 
       const renderer = await createGraphicsRenderer({
@@ -159,10 +163,18 @@ export function attachBackend(
 
       solid = webgl;
       canvas.style.display = 'none';
+      // **El valle 3D ocupa la pantalla entera.**
+      //
+      // Aqui habia un `box.height - 180` heredado del render 2D, que dibuja el
+      // mapa entero con una proporcion fija de 36 por 56 y deja el resto en
+      // hueco. El piloto tiene camara: no necesita reservar nada, y reservando
+      // dejaba un tercio de la pantalla de gris muerto debajo del valle. Los
+      // controles de velocidad y el año van en posicion absoluta y flotan por
+      // encima, que es donde §11.2 los pone.
       const size = (): void => {
         const box = viewport.getBoundingClientRect();
         const width = Math.max(1, Math.round(box.width));
-        const height = Math.max(1, Math.round(Math.max(160, box.height - 180)));
+        const height = Math.max(1, Math.round(box.height));
         webgl.style.width = `${width}px`;
         webgl.style.height = `${height}px`;
         renderer.resize({ widthCss: width, heightCss: height, pixelRatio: window.devicePixelRatio });

@@ -65,6 +65,13 @@ export const WANTED = [
 /**
  * Cuanto campo se deja alrededor de lo construido, en celdas.
  *
+ * **Era nueve y se quedo en dos y media**, porque el margen se inflaba en la
+ * caja y la caja se ajusta a la pantalla por el lado que peor cabe. En un movil
+ * de 390 por 844 el ancho se divide por una proporcion de 0,46, asi que cada
+ * celda de margen a lo ancho costaba **dos celdas de alto**: la aldea entera
+ * quedaba del tamano de un sello en medio de un cielo vacio. El aire de
+ * alrededor lo pone ahora la camara, que lo suma igual en los dos lados.
+ *
  * El encuadre de partida es **la aldea con su entorno**, no el mapa entero. Casi
  * todo el mapa es prado vacio, y encuadrarlo entero dejaba el pueblo del tamano
  * de una moneda en el centro de una pantalla vertical: medido, ocupaba menos de
@@ -74,7 +81,7 @@ export const WANTED = [
  * eso: el pueblo llena la pantalla y un aldeano de 0,65 celdas cae en unos pocos
  * pixeles. Acercarse mas es el trabajo de gestos de G-07.
  */
-const FRAME_MARGIN = 9;
+const FRAME_MARGIN = 2.5;
 
 export async function createGraphicsRenderer(
   options: GraphicsRendererOptions,
