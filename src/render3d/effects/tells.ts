@@ -17,6 +17,7 @@ import {
   SphereGeometry, type Object3D,
 } from 'three';
 import type { Building, GameState } from '@engine/state';
+import { BUILDING_ASSETS } from '../world/buildings';
 import { daylightAt } from './daylight';
 import { tellsFor, type Tell } from '@render/layers/tells';
 
@@ -66,6 +67,45 @@ function signatureOf(tells: readonly Tell[]): string {
 }
 
 /**
+ * Donde tiene ventanas cada casa, en celdas desde su esquina.
+ *
+ * **La luz sale por las ventanas.** Antes era un rectangulo pegado a la
+ * fachada, del tamano de medio muro y sin relacion con ningun hueco: se leia
+ * como un cartel encendido, no como una casa con alguien dentro.
+ *
+ * Los numeros son los de la receta divididos por tres, porque la receta se
+ * escribe en metros y una celda son tres (D.6.2). Estan aqui **repetidos a
+ * proposito**, y hay una prueba que los compara con la receta: la alternativa
+ * era leer el GLB en tiempo de ejecucion para sacar la posicion de un hueco,
+ * que es mucho aparato para seis numeros que no cambian.
+ *
+ * `face` dice a que pared da: -1 es la cara de -Y —la fachada, donde esta la
+ * puerta— y 1 seria la de +Y; `side` hace lo mismo en X.
+ */
+export interface Window {
+  readonly x: number;
+  readonly z: number;
+  readonly up: number;
+  readonly wide: number;
+  readonly tall: number;
+  /** Hacia donde mira, para sacar el resplandor un dedo del muro. */
+  readonly out: readonly [number, number];
+}
+
+export const WINDOWS: Readonly<Record<string, readonly Window[]>> = {
+  house: [
+    { x: 0.483, z: 0.12, up: 0.467, wide: 0.267, tall: 0.233, out: [0, -1] },
+    { x: 1.517, z: 0.12, up: 0.467, wide: 0.267, tall: 0.233, out: [0, -1] },
+    { x: 0.12, z: 1.133, up: 0.467, wide: 0.267, tall: 0.233, out: [-1, 0] },
+  ],
+  'stone-house': [
+    { x: 0.467, z: 0.103, up: 0.517, wide: 0.25, tall: 0.267, out: [0, -1] },
+    { x: 1.533, z: 0.103, up: 0.517, wide: 0.25, tall: 0.267, out: [0, -1] },
+    { x: 0.103, z: 1.167, up: 0.517, wide: 0.25, tall: 0.267, out: [-1, 0] },
+  ],
+};
+
+/**
  * Un punto justo fuera del edificio, en una cara que no tape nadie.
  *
  * La fachada —la cara de -Y, donde la receta pone la puerta— es la primera
@@ -78,6 +118,9 @@ function signatureOf(tells: readonly Tell[]): string {
  */
 const FACES = [[0, -1], [1, 0], [-1, 0], [0, 1]] as const;
 const CLEAR = 0.12;
+
+/** Lo que sobresale del muro un cristal encendido, en celdas: un dedo. */
+const GLASS = 0.03;
 
 function outsideOf(
   home: Building, at: (x: number, y: number) => Building | undefined,
@@ -145,32 +188,46 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
       });
     }
     case 'light': {
-      // **Esta señal se había perdido al pasar a tres dimensiones.** En 2D la
-      // luz se pinta sobre el dibujo de la casa; aquí la casa es un volumen, y
-      // el punto que da `tellsFor` cae dentro de sus paredes, así que el
-      // resplandor quedaba encerrado y no se veía ni una luz en todo el valle.
+      // **Esta senal se habia perdido al pasar a tres dimensiones.** En 2D la
+      // luz se pinta sobre el dibujo de la casa; aqui la casa es un volumen, y
+      // el punto que da `tellsFor` cae dentro de sus paredes, asi que el
+      // resplandor quedaba encerrado y no se veia ni una luz en todo el valle.
       //
-      // Se saca a la fachada, que es la cara de -Y: es donde la receta pone la
-      // puerta y las ventanas. La casa se busca por el punto, y si no aparece
-      // —porque alguien mueva el ancla del 2D— se deja donde venía, que es peor
-      // pero no es un fallo.
+      // Ahora sale **por las ventanas**, una por hueco, del tamano del hueco y
+      // un dedo por fuera del muro. La primera version la sacaba a la fachada
+      // como un solo rectangulo de medio muro, y se leia como un cartel.
       const home = at === undefined ? undefined : at(tell.x, tell.y);
-      const spot = home === undefined
-        ? { x: tell.x, z: tell.y, free: true }
-        : outsideOf(home, at as (x: number, y: number) => Building | undefined);
-      // Sin cara libre, la luz sube al caballete: encerrada entre dos casas no
-      // la ve nadie, y la señal existe para verse. Arriba es **un resplandor
-      // pequeño y no la ventana**: una ventana de tres metros flotando sobre el
-      // tejado se lee como un panel encendido, no como una casa habitada. Lo
-      // que sale por el caballete de una casa medieval es la luz del hogar por
-      // el agujero del humo, y eso es del tamaño de un puño.
-      const height = spot.free ? HEIGHT.light : HEIGHT.roofGlow;
-      const shape = spot.free
-        ? new BoxGeometry(0.7, 0.42, 0.06)
-        : new BoxGeometry(0.22, 0.1, 0.22);
-      const lit = mark(shape, TONE.light, true, spot.x, height, spot.z, 0.85);
-      lit.object.userData.lamp = 0.85;
-      return [lit];
+      const holes = home === undefined ? undefined : WINDOWS[BUILDING_ASSETS[home.kind] ?? ''];
+      if (home === undefined || holes === undefined) {
+        // Una familia sin ventanas catalogadas —o un ancla que ya no cae en
+        // ninguna casa— conserva el resplandor sobre el caballete, que es
+        // pequeno y siempre se ve.
+        const glow = mark(
+          new BoxGeometry(0.22, 0.1, 0.22), TONE.light, true,
+          tell.x, HEIGHT.roofGlow, tell.y, 0.85,
+        );
+        glow.object.userData.lamp = 0.85;
+        return [glow];
+      }
+      return holes.map((hole) => {
+        const lit = mark(
+          new BoxGeometry(
+            hole.out[0] === 0 ? hole.wide : GLASS,
+            hole.tall,
+            hole.out[1] === 0 ? hole.wide : GLASS,
+          ),
+          TONE.light, true,
+          home.x + hole.x + hole.out[0] * GLASS,
+          hole.up,
+          home.y + hole.z + hole.out[1] * GLASS,
+          0.95,
+        );
+        lit.object.userData.lamp = 0.95;
+        // Va sobre el muro, que es donde van las ventanas: la prueba que exige
+        // que ninguna senal quede enterrada tiene que saberlo.
+        lit.object.userData.mounted = true;
+        return lit;
+      });
     }
     case 'plague':
       // Por encima del caballete, no a media altura de la pared. A media altura

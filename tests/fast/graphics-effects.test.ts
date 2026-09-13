@@ -24,11 +24,15 @@ import { TERRAIN_CODE } from '@engine/state';
 import { animalPositions, wildlifePositions } from '@render/animals';
 import { daylightAt, NIGHT_FLOOR, NOON } from '../../src/render3d/effects/daylight';
 import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
-import { Tells } from '../../src/render3d/effects/tells';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { Tells, WINDOWS } from '../../src/render3d/effects/tells';
 import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
 import { groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
+
+const ROOT = resolve(import.meta.dirname, '..', '..');
 
 const grown = new Map<string, GameState>();
 function village(years: number, seed = 7): GameState {
@@ -478,6 +482,9 @@ describe('G-10 · ninguna señal enterrada', () => {
     for (const mark of tells.group.children) {
       const { x, y, z } = mark.position;
       if (y >= OVER_THE_ROOFS) continue;
+      // Una ventana encendida va **sobre el muro**, que es donde van las
+      // ventanas. No está enterrada: está puesta.
+      if (mark.userData.mounted === true) continue;
       const buried = standing.some(
         (building) => x > building.x && x < building.x + building.w
           && z > building.y && z < building.y + building.h,
@@ -560,6 +567,45 @@ describe('G-10 · el humo se mueve', () => {
       .map((thing) => thing.position.y.toFixed(3));
     expect(heights.length).toBeGreaterThan(3);
     expect(new Set(heights).size).toBeGreaterThan(1);
+    tells.dispose();
+  });
+});
+
+describe('G-10 · la luz sale por las ventanas', () => {
+  it('los huecos que dice la escena son los que tiene la receta', () => {
+    // Las posiciones están escritas dos veces: en la receta, en metros, y en la
+    // escena, en celdas. La alternativa era leer el GLB en marcha para sacar
+    // dónde está un hueco, que es mucho aparato para seis números. Lo que no
+    // puede pasar es que se separen: una ventana encendida donde no hay ventana
+    // es peor que ninguna luz.
+    for (const [asset, holes] of Object.entries(WINDOWS)) {
+      const recipe = JSON.parse(readFileSync(
+        resolve(ROOT, 'art', 'recipes', asset, `${asset}.json`), 'utf8',
+      )) as { scale: number; primitives: { name: string; location: number[]; dimensions: number[] }[] };
+      const windows = recipe.primitives.filter((piece) => piece.name.includes('Window'));
+      expect(windows.length).toBe(holes.length);
+      for (let index = 0; index < windows.length; index += 1) {
+        const piece = windows[index] as { location: number[]; dimensions: number[] };
+        const hole = holes[index] as (typeof holes)[number];
+        expect(hole.x).toBeCloseTo((piece.location[0] ?? 0) * recipe.scale, 2);
+        expect(hole.z).toBeCloseTo((piece.location[1] ?? 0) * recipe.scale, 2);
+        expect(hole.up).toBeCloseTo((piece.location[2] ?? 0) * recipe.scale, 2);
+        // El ancho es el lado largo del hueco, que depende de a qué pared da.
+        const wide = Math.max(piece.dimensions[0] ?? 0, piece.dimensions[1] ?? 0);
+        expect(hole.wide).toBeCloseTo(wide * recipe.scale, 2);
+        expect(hole.tall).toBeCloseTo((piece.dimensions[2] ?? 0) * recipe.scale, 2);
+      }
+    }
+  });
+
+  it('cada casa habitada enciende sus tres ventanas', () => {
+    const state = village(14);
+    const tells = new Tells();
+    tells.update(state);
+    const lit = tells.group.children.filter((thing) => thing.userData.mounted === true);
+    const lights = tellsFor(state).filter((tell) => tell.kind === 'light');
+    expect(lights.length).toBeGreaterThan(0);
+    expect(lit.length).toBe(lights.length * 3);
     tells.dispose();
   });
 });

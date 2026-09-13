@@ -13,7 +13,10 @@
 
 import { DAY, ENCOUNTER } from '@engine/balance';
 import { isHere } from '@engine/people/demography';
-import type { Building, GameState, Villager, VillagerId } from '@engine/state';
+import {
+  TERRAIN_CODE,
+  type Building, type BuildingId, type BuildingKind, type GameState, type Villager, type VillagerId,
+} from '@engine/state';
 import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -244,7 +247,166 @@ function window(t: number): number {
   return eased * eased;
 }
 
-interface Plot { x: number; z: number; w: number; h: number }
+interface Plot { id: BuildingId; x: number; z: number; w: number; h: number; enclosed: boolean }
+
+/**
+ * Que edificios tienen paredes.
+ *
+ * Dentro de una casa no se anda, y en la puerta si. El campo es lo contrario:
+ * se trabaja dentro de la huella, que para eso es un campo. Un pozo, un
+ * cementerio o una empalizada no tienen interior en el que meterse.
+ *
+ * Esto se ve mirando y se veia mal: la gente se plantaba en el centro del salon
+ * de su casa y cruzaba las paredes de las del vecino como si no estuvieran.
+ */
+const ENCLOSED: ReadonlySet<BuildingKind> = new Set<BuildingKind>([
+  'house', 'stone_house', 'granary', 'chapel', 'church', 'smithy', 'mill', 'watchtower',
+]);
+
+
+/**
+ * La parcela de la casa de alguien, si la tiene y si tiene paredes.
+ *
+ * Se busca por `homeId` y no por la ruta: la casa de uno no cambia de semana en
+ * semana y la ruta si.
+ */
+function homePlot(
+  person: Villager, standing: Map<BuildingId, number>, plots: Map<number, Plot>,
+): Plot | undefined {
+  if (person.homeId === null) return undefined;
+  const cell = standing.get(person.homeId);
+  if (cell === undefined) return undefined;
+  const plot = plots.get(cell);
+  return plot !== undefined && plot.enclosed ? plot : undefined;
+}
+
+/**
+ * Por donde se entra y se sale de cada edificio con paredes.
+ *
+ * **Una puerta por edificio y siempre la misma.** Sale de las huellas y de nada
+ * mas: ni de quien entra, ni de por donde venia, ni de la semana. Las tres
+ * versiones anteriores de esto la elegian por la ruta de cada uno, y la ruta
+ * cambia cada semana: al amanecer la gente aparecia en otra cara de su propia
+ * casa, hasta dos celdas y media mas alla, sin haberse movido nadie.
+ *
+ * La fachada —la cara de -Y, donde las recetas ponen la puerta— es la primera
+ * opcion. En este valle las casas se tocan, asi que cuando esta tapada se
+ * prueban las otras tres en orden fijo.
+ */
+interface Door {
+  readonly face: readonly [number, number];
+  /** La celda de fuera, por donde se pasa. */
+  readonly cell: number;
+}
+
+function doorsFor(state: GameState, plots: Map<number, Plot>): Map<BuildingId, Door> {
+  const width = state.map.width;
+  const height = state.map.height;
+  const walled = (cell: number): boolean => plots.get(cell)?.enclosed === true;
+
+  // **Las casas de este valle se tocan.** El motor las coloca pegadas y sin
+  // dejar calle: en una partida medida, seis casas seguidas sin un hueco. Eso
+  // significa que la puerta de la de en medio da a la pared de la de al lado, y
+  // que no hay manera de entrar ni de salir sin cruzar la casa del vecino.
+  //
+  // No es un fallo del dibujo y no se arregla dibujando: se ha anotado para
+  // quien lleve la colocacion de §7.2. Lo que se puede hacer aqui es lo que
+  // hace una hilera de casas de verdad: **la puerta da a la calle**, aunque la
+  // calle este al final de la hilera. Se agrupan las huellas que se tocan y se
+  // busca la salida del grupo mas cercana a cada edificio.
+  const group = new Map<number, number>();
+  let groups = 0;
+  for (const [cell, plot] of plots) {
+    if (!plot.enclosed || group.has(cell)) continue;
+    const id = groups;
+    groups += 1;
+    const queue = [cell];
+    group.set(cell, id);
+    while (queue.length > 0) {
+      const here = queue.pop() as number;
+      const x = here % width;
+      for (const [dx, dz] of FACES) {
+        const nx = x + dx;
+        const nz = Math.floor(here / width) + dz;
+        if (nx < 0 || nz < 0 || nx >= width || nz >= height) continue;
+        const next = nz * width + nx;
+        if (!walled(next) || group.has(next)) continue;
+        group.set(next, id);
+        queue.push(next);
+      }
+    }
+  }
+
+  // Las salidas de cada grupo: una celda de fuera pegada a una de dentro.
+  const exits = new Map<number, { cell: number; face: readonly [number, number] }[]>();
+  for (const [cell, id] of group) {
+    const x = cell % width;
+    const z = Math.floor(cell / width);
+    for (const face of FACES) {
+      const nx = x + face[0];
+      const nz = z + face[1];
+      if (nx < 0 || nz < 0 || nx >= width || nz >= height) continue;
+      const next = nz * width + nx;
+      if (walled(next)) continue;
+      const list = exits.get(id);
+      if (list === undefined) exits.set(id, [{ cell: next, face }]);
+      else list.push({ cell: next, face });
+    }
+  }
+
+  const doors = new Map<BuildingId, Door>();
+  for (const building of state.buildings) {
+    if (building.lostTick !== null || !ENCLOSED.has(building.kind)) continue;
+    const id = group.get(building.y * width + building.x);
+    const ways = id === undefined ? undefined : exits.get(id);
+    if (ways === undefined || ways.length === 0) continue;
+    const cx = building.x + building.w / 2;
+    const cz = building.y + building.h / 2;
+    let best = ways[0] as { cell: number; face: readonly [number, number] };
+    let bestCost = Infinity;
+    for (const way of ways) {
+      const wx = (way.cell % width) + 0.5;
+      const wz = Math.floor(way.cell / width) + 0.5;
+      // La mas cercana, y a igualdad la de la fachada: es donde esta la puerta
+      // dibujada, y salir por ahi es lo que se espera ver.
+      const cost = (wx - cx) ** 2 + (wz - cz) ** 2 + (way.face[1] === -1 ? -0.3 : 0);
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = way;
+      }
+    }
+    doors.set(building.id, { face: best.face, cell: best.cell });
+  }
+  return doors;
+}
+
+/**
+ * El sitio de una persona en el umbral de un edificio.
+ *
+ * La cara la pone la puerta, que es del edificio; el sitio a lo ancho sale del
+ * identificador, que no cambia. Asi dos vecinos no se pisan en el umbral y
+ * ninguno se mueve el dia que se muda un tercero.
+ */
+function doorPoint(_plot: Plot, door: Door, who: VillagerId, width: number): Point {
+  // El umbral es la celda de salida del grupo. Repartidos dentro de ella por el
+  // identificador, que no cambia: asi dos vecinos no se pisan y ninguno se
+  // mueve el dia que se muda un tercero.
+  const spread = 0.55;
+  return {
+    x: (door.cell % width) + 0.5 + (stable(who, 7) - 0.5) * spread,
+    z: Math.floor(door.cell / width) + 0.5 + (stable(who, 13) - 0.5) * spread,
+  };
+}
+
+/**
+ * Las cuatro caras, empezando por la fachada.
+ *
+ * En este valle **las casas se tocan**: la puerta de una cae dentro del vecino
+ * de delante, y entonces el umbral vuelve a estar dentro de un muro, sólo que
+ * del muro de otro. Se prueban las cuatro y se sale por la que esté libre. Si
+ * ninguna lo está —una casa rodeada— se sale por la fachada y ya.
+ */
+const FACES = [[0, -1], [1, 0], [-1, 0], [0, 1]] as const;
 
 /**
  * El puesto de trabajo de uno entre los `count` que comparten la misma parcela.
@@ -399,13 +561,276 @@ function workSpot(
   const group = sharing.get(cell) ?? [id];
   const slot = Math.max(0, group.indexOf(id));
   const plot = plots.get(cell);
-  if (plot !== undefined) return plotSpot(plot, slot, group.length);
+  if (plot !== undefined) {
+    return plotSpot(plot, slot, group.length);
+  }
 
   const here = cellPoint(cell, width);
   if (group.length <= 1) return here;
-  const angle = (slot / group.length) * Math.PI * 2;
   const reach = ENCOUNTER.SPREAD * Math.sqrt(group.length);
-  return { x: here.x + Math.cos(angle) * reach, z: here.z + Math.sin(angle) * reach };
+  // El corro puede ser mas ancho que la celda y meterse en la casa de al lado,
+  // que es de donde salia una parte de la gente que se veia dentro de un muro.
+  // Se prueban ocho sitios del corro empezando por el suyo y se coge el primero
+  // que este a campo abierto.
+  for (let turn = 0; turn < 8; turn += 1) {
+    const angle = ((slot + turn) / group.length) * Math.PI * 2;
+    const at = { x: here.x + Math.cos(angle) * reach, z: here.z + Math.sin(angle) * reach };
+    const there = plots.get(Math.floor(at.z) * width + Math.floor(at.x));
+    if (there === undefined || !there.enclosed) return at;
+  }
+  return here;
+}
+
+/**
+ * Las celdas que no se pisan: el interior de todo lo que tiene paredes.
+ *
+ * El motor no las evita, y tiene razon: su camino es el que desgasta la senda y
+ * la senda pasa por donde pasa la gente, no por donde cabe un muro. Pero
+ * **dibujar a alguien atravesando una casa es dibujar mal**, y era lo que se
+ * veia.
+ */
+function walledCells(state: GameState): Set<number> {
+  const blocked = new Set<number>();
+  for (const building of state.buildings) {
+    if (building.lostTick !== null || !ENCLOSED.has(building.kind)) continue;
+    for (let row = 0; row < building.h; row += 1) {
+      for (let column = 0; column < building.w; column += 1) {
+        blocked.add((building.y + row) * state.map.width + building.x + column);
+      }
+    }
+  }
+  // Y el agua, que tampoco se pisa. No hace falta para esquivar —el motor ya
+  // rodea el rio— pero si para tensar la cuerda: un atajo en linea recta entre
+  // dos puntos de la misma orilla puede cruzar el cauce.
+  for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+    const kind = state.map.terrain[cell];
+    if (kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.marsh) blocked.add(cell);
+  }
+  return blocked;
+}
+
+/**
+ * Quita de los extremos las celdas que caen dentro del propio edificio.
+ *
+ * La ruta del motor va del centro de la casa al centro del campo, y con huellas
+ * de dos por dos eso deja una o dos celdas **dentro de las paredes** en cada
+ * punta. Como la salida se dibuja en la puerta, el primer tramo volvia a
+ * meterse en la casa para salir por el otro lado: se veia a la gente cruzar su
+ * propia pared nada mas salir, y ademas descuadraba el suelo recorrido.
+ */
+function trimIndoors(cells: readonly number[], blocked: Set<number>): number[] {
+  let from = 0;
+  while (from < cells.length - 1 && blocked.has(cells[from] as number)) from += 1;
+  let to = cells.length - 1;
+  while (to > from && blocked.has(cells[to] as number)) to -= 1;
+  // Si todo el camino esta tapado —una casa pegada a otra— se deja como venia:
+  // mejor un tramo feo que ningun tramo.
+  return to <= from ? [...cells] : cells.slice(from, to + 1);
+}
+
+/**
+ * Tensa la cuerda: quita los vertices que no hacen falta.
+ *
+ * El motor busca camino por celdas, asi que sus rutas suben en escalera —un
+ * paso al lado, uno arriba, uno al lado— y **eso se ve**: la gente andaba a
+ * zigzag por un prado vacio. Si el tramo recto entre el punto anterior y el
+ * siguiente no pisa nada prohibido, el vertice de en medio sobra.
+ *
+ * Ademas arregla lo que el rodeo estropeaba: cada esquina que se quita es un
+ * sitio menos donde el carril lateral recorta y el suelo recorrido deja de
+ * cuadrar con lo andado.
+ */
+/** Si el tramo recto entre dos celdas pasa por algo prohibido. */
+function clearBetween(from: number, to: number, blocked: Set<number>, width: number): boolean {
+  const ax = (from % width) + 0.5;
+  const ay = Math.floor(from / width) + 0.5;
+  const bx = (to % width) + 0.5;
+  const by = Math.floor(to / width) + 0.5;
+  const steps = Math.max(2, Math.ceil(Math.hypot(bx - ax, by - ay) * 6));
+  for (let step = 0; step <= steps; step += 1) {
+    const t = step / steps;
+    const cell = Math.floor(ay + (by - ay) * t) * width + Math.floor(ax + (bx - ax) * t);
+    if (blocked.has(cell)) return false;
+  }
+  return true;
+}
+
+function pullString(cells: readonly number[], blocked: Set<number>, width: number): number[] {
+  const out = [...cells];
+  const clear = (from: number, to: number): boolean => clearBetween(from, to, blocked, width);
+  // Dos pasadas bastan: la primera se lleva las escaleras y la segunda los
+  // codos que quedan. Mas pasadas dejarian la ruta en una recta, que ya no
+  // seria el camino que el motor dice que anda esta persona.
+  for (let pass = 0; pass < 2; pass += 1) {
+    for (let index = out.length - 2; index > 0; index -= 1) {
+      const before = out[index - 1] as number;
+      const after = out[index + 1] as number;
+      if (clear(before, after)) out.splice(index, 1);
+    }
+  }
+  return out;
+}
+
+/**
+ * La misma ruta, rodeando lo que tiene paredes.
+ *
+ * Cada celda tapada se cambia por la mas cercana que este libre. Con huellas de
+ * dos por dos eso es un paso de lado: se bordea el muro en vez de cruzarlo.
+ *
+ * **Se hace al amanecer, sobre la ruta que se congela**, y no en cada
+ * fotograma: la linea queda hecha para todo el dia y quien la anda no nota
+ * nada. Corrigiendo la posicion en cada pintada, el aldeano saltaria de un lado
+ * del muro al otro cada vez que la correccion cambiara de pared.
+ *
+ * La primera celda y la ultima no se tocan: son la casa de la que se sale y el
+ * sitio al que se va, y de esas dos ya se encarga la puerta.
+ */
+function aroundWalls(
+  cells: readonly number[], blocked: Set<number>, width: number, height: number,
+): number[] {
+  if (cells.length < 2) return [...cells];
+  const out: number[] = [];
+  for (let index = 0; index < cells.length; index += 1) {
+    const cell = cells[index] as number;
+    // Los extremos no se tocan: son la puerta de la que se sale y el sitio al
+    // que se va, y de esos se encarga el mapa de puertas.
+    if (!blocked.has(cell) || index === 0 || index === cells.length - 1) {
+      out.push(cell);
+      continue;
+    }
+    // Un tramo tapado: se busca la vuelta desde lo ultimo bueno hasta lo
+    // siguiente bueno. Sustituir la celda por la vecina libre, que era lo que
+    // hacia esto antes, no basta cuando lo que hay delante es una hilera de
+    // casas de seis celdas: no hay vecina libre que sirva.
+    let next = index;
+    while (next < cells.length && blocked.has(cells[next] as number)) next += 1;
+    const target = cells[Math.min(next, cells.length - 1)] as number;
+    const from = out[out.length - 1] as number;
+    for (const step of detour(from, target, blocked, width, height)) out.push(step);
+    index = next - 1;
+  }
+  return out;
+}
+
+/**
+ * La vuelta mas corta entre dos celdas sin pisar lo prohibido.
+ *
+ * Una anchura primero, con tope: si en cuatrocientas celdas no ha salido, es
+ * que no hay salida, y entonces se va en linea recta como se iba antes. Mejor
+ * un tramo feo que una persona parada en el sitio.
+ *
+ * Esto **no es el camino del motor**: el suyo decide donde se desgasta la
+ * senda y es cosa de la simulacion. Este solo decide por donde pasa el dibujo
+ * en el ultimo tramo, y nunca se le devuelve a nadie.
+ */
+function detour(
+  from: number, to: number, blocked: Set<number>, width: number, height: number,
+): number[] {
+  if (from === to) return [];
+  const seen = new Map<number, number>([[from, -1]]);
+  const queue = [from];
+  let head = 0;
+  while (head < queue.length && queue.length < 400) {
+    const here = queue[head] as number;
+    head += 1;
+    if (here === to) break;
+    const x = here % width;
+    const z = Math.floor(here / width);
+    for (const [dx, dz] of FACES) {
+      const nx = x + dx;
+      const nz = z + dz;
+      if (nx < 0 || nz < 0 || nx >= width || nz >= height) continue;
+      const next = nz * width + nx;
+      if (seen.has(next)) continue;
+      if (next !== to && blocked.has(next)) continue;
+      seen.set(next, here);
+      queue.push(next);
+    }
+  }
+  if (!seen.has(to)) return [to];
+  const path: number[] = [];
+  let step = to;
+  while (step !== from && step !== -1) {
+    path.unshift(step);
+    step = seen.get(step) ?? -1;
+  }
+  return path;
+}
+
+
+/**
+ * Cuanto se puede apartar de su puesto quien cava, sin meterse en una casa.
+ *
+ * Cavando uno se aparta hasta `WORK_REACH` —casi una celda— y con un campo
+ * pegado a una casa eso le metia dentro del salon del vecino: medido, 0,92
+ * celdas adentro. Se acota al hueco que hay de verdad.
+ *
+ * **Es una cuenta por turno, no por fotograma**: el puesto no se mueve mientras
+ * se trabaja, asi que el radio tampoco, y por eso no introduce ningun salto.
+ * Recortar el paso ya dado si que lo introducia: 0,78 celdas de un fotograma al
+ * siguiente, cada vez que el vaiven rozaba la pared.
+ */
+function elbowRoom(spot: Point, plots: Map<number, Plot>, width: number): number {
+  let room: number = DAY.WORK_REACH;
+  const cx = Math.floor(spot.x);
+  const cz = Math.floor(spot.z);
+  for (let dz = -1; dz <= 1; dz += 1) {
+    for (let dx = -1; dx <= 1; dx += 1) {
+      const plot = plots.get((cz + dz) * width + cx + dx);
+      if (plot === undefined || !plot.enclosed) continue;
+      // Distancia del punto al rectangulo de la huella.
+      const gap = Math.hypot(
+        Math.max(plot.x - spot.x, 0, spot.x - (plot.x + plot.w)),
+        Math.max(plot.z - spot.z, 0, spot.z - (plot.z + plot.h)),
+      );
+      room = Math.min(room, gap);
+    }
+  }
+  // Un minimo, o quien trabaja pegado a un muro se queda clavado y el clip de
+  // cavar se lee como un maniqui.
+  return Math.max(0.18, room);
+}
+
+/**
+ * Mete un punto de paso donde la recta entre dos celdas roza una esquina.
+ *
+ * Ninguna celda de la ruta esta tapada y aun asi el tramo entre dos puede pasar
+ * por encima de una casa: dos celdas libres en diagonal, con la esquina del
+ * edificio en medio. Se rodea por la esquina del rectangulo que forman, que es
+ * la que un peaton toma de todas formas.
+ */
+function skirt(
+  cells: readonly number[], blocked: Set<number>, width: number, height: number,
+): number[] {
+  const out = [...cells];
+  for (let index = 0; index < out.length - 1; index += 1) {
+    const from = out[index] as number;
+    const to = out[index + 1] as number;
+    if (clearBetween(from, to, blocked, width)) continue;
+    const fx = from % width;
+    const fy = Math.floor(from / width);
+    const tx = to % width;
+    const ty = Math.floor(to / width);
+    let fixed = false;
+    for (const corner of [ty * width + fx, fy * width + tx]) {
+      if (blocked.has(corner) || corner === from || corner === to) continue;
+      if (!clearBetween(from, corner, blocked, width)) continue;
+      if (!clearBetween(corner, to, blocked, width)) continue;
+      out.splice(index + 1, 0, corner);
+      index += 1;
+      fixed = true;
+      break;
+    }
+    if (fixed) continue;
+    // Ninguna de las dos esquinas sirve: el tramo no roza un edificio, lo cruza
+    // entero. Se pide la vuelta completa, que es lo mismo que se hace cuando la
+    // ruta trae una celda tapada.
+    const around = detour(from, to, blocked, width, height).slice(0, -1);
+    if (around.length === 0) continue;
+    out.splice(index + 1, 0, ...around);
+    index += around.length;
+  }
+  return out;
 }
 
 /**
@@ -476,9 +901,42 @@ function gatheringCell(state: GameState, since: number, width: number): number |
 }
 
 function routesFrom(
-  state: GameState, frame: GraphicsFrame, today: number, memory?: ActorMemory,
+  state: GameState, frame: GraphicsFrame, today: number,
+  doors: Map<BuildingId, Door>, memory?: ActorMemory,
 ): Map<VillagerId, number[]> {
-  const live = routesFor(state);
+  const blocked = walledCells(state);
+  // Por que celda se entra y se sale de cada edificio, indexado por la celda de
+  // dentro que el motor usa como extremo de la ruta.
+  const ways = new Map<number, number>();
+  for (const building of state.buildings) {
+    const door = doors.get(building.id);
+    if (door === undefined) continue;
+    for (let row = 0; row < building.h; row += 1) {
+      for (let column = 0; column < building.w; column += 1) {
+        ways.set((building.y + row) * state.map.width + building.x + column, door.cell);
+      }
+    }
+  }
+
+  const live = new Map<VillagerId, number[]>();
+  for (const [id, cells] of routesFor(state)) {
+    // **La ruta empieza y acaba en la puerta.** El motor la da de centro a
+    // centro de edificio, que es lo que necesita para desgastar caminos; quien
+    // la anda tiene que salir por donde se sale. Sin esto, el ultimo tramo iba
+    // de la puerta al centro de la casa y se veia a la gente cruzar su pared.
+    const first = cells[0];
+    const last = cells[cells.length - 1];
+    const trimmed = trimIndoors(cells, blocked);
+    const doorIn = first === undefined ? undefined : ways.get(first);
+    const doorOut = last === undefined ? undefined : ways.get(last);
+    const walk = [...trimmed];
+    if (doorIn !== undefined && walk[0] !== doorIn) walk.unshift(doorIn);
+    if (doorOut !== undefined && walk[walk.length - 1] !== doorOut) walk.push(doorOut);
+    live.set(id, skirt(
+      pullString(aroundWalls(walk, blocked, state.map.width, state.map.height), blocked, state.map.width),
+      blocked, state.map.width, state.map.height,
+    ));
+  }
   if (memory === undefined) return live;
 
   const game = `${state.seed}:${state.terrainSeed}`;
@@ -527,18 +985,14 @@ export function actorsFor(
   const width = state.map.width;
   const phase = dayPhase(frame.presentationSeconds);
   const today = dayNumber(frame.presentationSeconds);
-  const routes = options.plan?.routes ?? routesFrom(state, frame, today, options.memory);
-  // Donde se junta la aldea hoy, decidido al amanecer. Sin memoria no hay
-  // reunion: las rutas son las del motor y nadie las ha cambiado.
-  const gathering = options.memory?.gathering ?? null;
-  const standing = new Map(state.buildings.filter((building) => building.lostTick === null)
-    .map((building) => [building.id, centre(building, width)]));
-
   // Que parcela ocupa cada celda, para saber donde puede repartirse la gente.
   const plots = new Map<number, Plot>();
   for (const building of state.buildings) {
     if (building.lostTick !== null) continue;
-    const plot: Plot = { x: building.x, z: building.y, w: building.w, h: building.h };
+    const plot: Plot = {
+      id: building.id, x: building.x, z: building.y, w: building.w, h: building.h,
+      enclosed: ENCLOSED.has(building.kind),
+    };
     for (let row = 0; row < building.h; row += 1) {
       for (let column = 0; column < building.w; column += 1) {
         plots.set((building.y + row) * width + building.x + column, plot);
@@ -546,15 +1000,27 @@ export function actorsFor(
     }
   }
 
+  // Por donde se entra y se sale de cada edificio. Antes que nada, porque las
+  // rutas del dia se recortan a las puertas.
+  const doors = doorsFor(state, plots);
+
+  const routes = options.plan?.routes ?? routesFrom(state, frame, today, doors, options.memory);
+  // Donde se junta la aldea hoy, decidido al amanecer. Sin memoria no hay
+  // reunion: las rutas son las del motor y nadie las ha cambiado.
+  const gathering = options.memory?.gathering ?? null;
+  const standing = new Map(state.buildings.filter((building) => building.lostTick === null)
+    .map((building) => [building.id, centre(building, width)]));
+
   // Quien comparte destino con quien. Se cuenta una vez, sobre los destinos y
   // no sobre las posiciones, porque el destino no cambia durante la jornada.
   const sharing = new Map<number, VillagerId[]>();
   for (const [id, cells] of routes) {
     const last = cells[cells.length - 1];
-    if (last === undefined) continue;
-    const group = sharing.get(last);
-    if (group === undefined) sharing.set(last, [id]);
-    else group.push(id);
+    if (last !== undefined) {
+      const group = sharing.get(last);
+      if (group === undefined) sharing.set(last, [id]);
+      else group.push(id);
+    }
   }
   for (const group of sharing.values()) group.sort((a, b) => a - b);
 
@@ -601,7 +1067,11 @@ export function actorsFor(
       // doorstep. There is nowhere honest to draw them, so they are not drawn.
       const home = person.homeId === null ? undefined : standing.get(person.homeId);
       if (home === undefined) continue;
-      const at = cellPoint(home, width);
+      const shelter = homePlot(person, standing, plots);
+      const shelterDoor = person.homeId === null ? undefined : doors.get(person.homeId);
+      const at = shelter === undefined || shelterDoor === undefined
+        ? cellPoint(home, width)
+        : doorPoint(shelter, shelterDoor, person.id, width);
       actors.push({
         id: person.id, x: at.x, z: at.z, facing: 0, activity: 'resting',
         clip: 'idle', clipSeconds: clipTime('idle', 0, frame.presentationSeconds, stable(person.id, 11)),
@@ -620,9 +1090,21 @@ export function actorsFor(
     // un viaje corto, que es exactamente el patinaje que la zancada evita.
     const target = cells[cells.length - 1] ?? 0;
     const summoned = gathering !== null && target === gathering;
-    const spot = workSpot(target, person.id, width, plots, sharing);
+    const shed = plots.get(target);
+    const shedDoor = shed === undefined ? undefined : doors.get(shed.id);
+    const spot = shed !== undefined && shed.enclosed && shedDoor !== undefined
+      ? doorPoint(shed, shedDoor, person.id, width)
+      : workSpot(target, person.id, width, plots, sharing);
     const line = cells.map((cell) => cellPoint(cell, width));
     if (line.length > 0) line[line.length - 1] = spot;
+    // Y empieza **en la puerta de su casa**, no en el salon. La ruta del motor
+    // arranca en la celda del centro de la casa, que es donde se guarda la casa
+    // y no donde se esta: la gente aparecia plantada dentro de su vivienda.
+    const doorway = homePlot(person, standing, plots);
+    const homeDoor = person.homeId === null ? undefined : doors.get(person.homeId);
+    if (doorway !== undefined && homeDoor !== undefined && line.length > 0) {
+      line[0] = doorPoint(doorway, homeDoor, person.id, width);
+    }
     const total = lengthOf(line);
     let point: Point;
     let facing: number;
@@ -652,7 +1134,15 @@ export function actorsFor(
       ? null
       : talking(phase, opens, shuts, away);
 
-    if (talk !== null) {
+    const indoors = plots.get(target)?.enclosed === true;
+    if (activity === 'working' && indoors && talk === null) {
+      // A cubierto no se ve trabajar a nadie: lo que se ve es a alguien en la
+      // puerta de la fragua. Y el golpe de azada dentro de una fragua era, de
+      // paso, una imagen equivocada.
+      point = spot;
+      facing = Math.atan2(cellPoint(target, width).x - spot.x, cellPoint(target, width).z - spot.z);
+      travelled = 0;
+    } else if (talk !== null) {
       // Se acerca, se queda un rato y vuelve a lo suyo. Los dos extremos se
       // andan de verdad: el punto de encuentro esta a un par de celdas, y
       // aparecer alli de golpe seria el teletransporte de siempre.
@@ -663,7 +1153,9 @@ export function actorsFor(
       // 1,05.
       const span = Math.max(1e-6, day.depart - day.arrive);
       const through = (phase - day.arrive) / span;
-      const turn = working(person, state.tick, through, spot, DAY.WORK_REACH);
+      // El mismo radio que fuera de la conversacion: con uno distinto, el
+      // cuerpo saltaba un tercio de celda justo al empezar a hablar.
+      const turn = working(person, state.tick, through, spot, elbowRoom(spot, plots, width));
       const base = leash(turn.at, spot);
       const meet = { x: meeting?.x ?? base.x, z: meeting?.y ?? base.z };
       point = {
@@ -684,7 +1176,7 @@ export function actorsFor(
     } else if (activity === 'working') {
       const span = Math.max(1e-6, day.depart - day.arrive);
       const through = (phase - day.arrive) / span;
-      const turn = working(person, state.tick, through, spot, DAY.WORK_REACH);
+      const turn = working(person, state.tick, through, spot, elbowRoom(spot, plots, width));
       point = leash(turn.at, spot);
       facing = turn.heading;
       travelled = turn.travelled;
@@ -693,7 +1185,14 @@ export function actorsFor(
       const step = along(line, progress, total);
       const heading = headingAround(line, progress, total);
       const side = lane(heading, person.id, window(progress), total);
-      point = { x: step.at.x + side.x, z: step.at.z + side.z };
+      // El carril aparta a cada uno del eje del camino para que dos no anden
+      // pisandose. Pegado a una casa, ese apartarse le metia dentro. Se recorta
+      // al hueco que queda, y como el hueco cambia de forma continua segun se
+      // avanza, recortarlo no da ningun salto.
+      const room = elbowRoom(step.at, plots, width);
+      const width0 = Math.hypot(side.x, side.z);
+      const fit = width0 <= room ? 1 : room / Math.max(1e-6, width0);
+      point = { x: step.at.x + side.x * fit, z: step.at.z + side.z * fit };
       // Going home is going the other way, so the figure turns round.
       facing = activity === 'returning' ? heading + Math.PI : heading;
       // Suelo a lo largo de la ruta. El carril añade algo más —al girar una
@@ -715,7 +1214,7 @@ export function actorsFor(
     // en la mano no es una conversacion.
     const clip = stepping ? 'walk'
       : talk !== null ? 'idle'
-        : summoned && activity === 'working' ? 'idle'
+        : (summoned || indoors) && activity === 'working' ? 'idle'
           : clipFor(activity, person, state.tick);
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(point.x)));
     const cellZ = Math.max(0, Math.min(state.map.height - 1, Math.floor(point.z)));
