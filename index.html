@@ -17,6 +17,11 @@
       .valley-app { --valley-void: #b9c9cf; position: relative; display: grid; place-items: start center; width: min(100vw, 390px); height: min(100dvh, 844px); overflow: hidden; background: var(--valley-void); }
       #valley { display: block; margin-top: max(22px, env(safe-area-inset-top)); border: 2px solid transparent; touch-action: none; }
       .valley-year { position: absolute; top: max(7px, env(safe-area-inset-top)); left: 15px; color: #303029; font: 600 11px/1.2 Georgia, serif; letter-spacing: .12em; }
+      /* §11.1.1 · la tira de la aldea, bajo el año y sobre el valle. */
+      .valley-vitals { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 17px); left: 13px; display: flex; gap: 4px; }
+      .valley-vital { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px 3px 6px; border-radius: 10px; background: rgba(242,244,246,.76); color: #303029; font: 600 11px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+      .valley-vital b { font-weight: 700; }
+      .valley-vital.thin { background: rgba(169,97,70,.86); color: #f8f4ee; }
       .valley-speeds { position: absolute; right: max(10px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: flex; gap: 6px; }
       .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 8px; border: 1px solid rgba(48,48,41,.35); border-radius: 50%; background: rgba(242,244,246,.76); color: #303029; font: 600 12px/1 system-ui,sans-serif; }
       .valley-speeds button[aria-pressed="true"] { background: #303029; color: #f2f4f6; }

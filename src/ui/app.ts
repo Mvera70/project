@@ -3,6 +3,8 @@
 import { TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderUiText } from '@engine/chronicle/render';
+import { vitalsOf } from './vitals';
+import { VITAL_ICONS } from './icons';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
@@ -125,6 +127,26 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   canvas.setAttribute('aria-label', renderUiText('app.valley'));
   const year = document.createElement('div');
   year.className = 'valley-year';
+  // §11.1.1 · la tira de la aldea: cuatro cifras, arriba, siempre visibles.
+  const vitals = document.createElement('div');
+  vitals.className = 'valley-vitals';
+  vitals.setAttribute('aria-label', renderUiText('app.vitals'));
+  const vital = (icon: string): { cell: HTMLElement; value: HTMLElement } => {
+    const cell = document.createElement('span');
+    cell.className = 'valley-vital';
+    cell.innerHTML = icon;
+    const value = document.createElement('b');
+    cell.append(value);
+    vitals.append(cell);
+    return { cell, value };
+  };
+  // Los iconos van dibujados, no escritos: un glifo de texto depende de la
+  // fuente que tenga el telefono y aqui hay cuatro dibujos de tres trazos.
+  const people = vital(VITAL_ICONS.people);
+  const food = vital(VITAL_ICONS.food);
+  const wood = vital(VITAL_ICONS.wood);
+  const spirits = vital(VITAL_ICONS.morale);
+
   const controls = document.createElement('div');
   controls.className = 'valley-speeds';
   controls.setAttribute('aria-label', renderUiText('app.speed.controls'));
@@ -137,7 +159,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     controls.append(button);
     return [value, button] as const;
   });
-  root.append(canvas, year, controls);
+  root.append(canvas, year, vitals, controls);
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
@@ -159,6 +181,18 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
+    const now = vitalsOf(state);
+    people.value.textContent = String(now.people);
+    food.value.textContent = String(now.weeks);
+    wood.value.textContent = String(now.wood);
+    spirits.value.textContent = String(now.morale);
+    people.cell.title = renderUiText('app.vitals.people', { count: now.people });
+    food.cell.title = renderUiText('app.vitals.food', { weeks: now.weeks });
+    wood.cell.title = renderUiText('app.vitals.wood', { count: now.wood });
+    spirits.cell.title = renderUiText('app.vitals.morale', { value: now.morale });
+    // La comida es la unica que avisa: §5.3 mata de hambre, y una aldea con
+    // menos de un mes de reserva esta a un mal invierno de eso.
+    food.cell.classList.toggle('thin', now.weeks < 4);
     // The same kind of observability hook as `data-app-ready` (M-19): the year
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.

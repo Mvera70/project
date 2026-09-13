@@ -1478,6 +1478,13 @@ export const UI_BANK: Record<string, string> = {
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',
   'app.speed.multiplier': '{speed}×',
+  // §11.1.1 · la tira de la aldea. Cuatro cifras y sus nombres para el lector
+  // de pantalla; lo que se ve es el icono y el número.
+  'app.vitals': 'The village at a glance',
+  'app.vitals.people': '{count} villagers',
+  'app.vitals.food': 'Food for {weeks} weeks',
+  'app.vitals.wood': '{count} wood',
+  'app.vitals.morale': 'Spirits {value} of 100',
   'crossroad.waiting': 'A crossroad is waiting',
   'welcome.title': 'While you were gone',
   'epitaph.title': 'The valley is empty',
