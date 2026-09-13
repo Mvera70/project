@@ -7,7 +7,11 @@
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
 import { createValleyCamera, CLOSEST_HEIGHT } from '../../src/render3d/camera';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { backendFrom } from '../../src/ui/backend';
+
+const ROOT = resolve(import.meta.dirname, '..', '..');
 
 const VALLEY = { minX: 0, minZ: 0, maxX: 36, maxZ: 56 };
 const VILLAGE = { minX: 8, minZ: 18, maxX: 26, maxZ: 38 };
@@ -204,3 +208,28 @@ function screenOf(
   const projected = new Vector3(x, 0, z).project(camera.camera);
   return { x: projected.x, y: projected.y };
 }
+
+describe('G-07 · el relevo de lienzo', () => {
+  it('los gestos no se enganchan al lienzo, que puede quedarse oculto', () => {
+    // El fallo que esto guarda se vio jugando en el ordenador: en 3D no
+    // funcionaba **nada** —ni arrastrar, ni pellizcar, ni tocar para abrir la
+    // ficha— y no daba ningún error.
+    //
+    // La causa: los gestos se enganchan una vez al arrancar, y el relevo cambia
+    // de lienzo. Cuando el piloto 3D entra, el lienzo de Canvas se oculta con
+    // `display: none` y aparece otro encima; un elemento oculto no recibe
+    // eventos, así que los gestos se quedaban colgados de nada.
+    //
+    // Se comprueba sobre el código porque el contrato ya lo fuerza el tipo
+    // —`ValleyBackend` exige `surface`— y lo que puede volver a romperse en
+    // silencio es el enganche. Montar el juego de verdad necesita un DOM, y la
+    // suite rápida no lo tiene.
+    const app = readFileSync(resolve(ROOT, 'src', 'ui', 'app.ts'), 'utf8');
+    for (const gesture of ['pointerdown', 'pointermove', 'pointerup', 'wheel']) {
+      expect(app, `los gestos de ${gesture} van en la raíz, no en el lienzo`)
+        .not.toContain(`canvas.addEventListener('${gesture}'`);
+    }
+    // Y el que hay que usar para medir es el vivo, no el de Canvas.
+    expect(app).toContain('backend.live.surface');
+  });
+});

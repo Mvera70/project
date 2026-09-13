@@ -114,6 +114,14 @@ function freshSeed(excluding: ReadonlySet<number> = new Set()): number {
   return nextUnusedSeed(value[0] as number, excluding);
 }
 
+/**
+ * Cuanto se aleja el valle por cada muesca de rueda.
+ *
+ * TUNE: 1,18. Cinco muescas doblan lo que se ve, que es lo que se espera de una
+ * rueda; con 1,5 una sola muesca saltaba del pueblo al valle entero.
+ */
+const WHEEL_STEP = 1.18;
+
 export function boot(root: HTMLElement, save?: SaveFile): App {
   let state = save?.state ?? foundGame(freshSeed());
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
@@ -214,15 +222,31 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const trace = new Map<number, Point[]>();
   let pinchStart: number | null = null;
   let zoom = 1;
-  canvas.addEventListener('pointerdown', (event) => {
-    canvas.setPointerCapture(event.pointerId);
+
+  // **Los gestos van en la raiz, no en un lienzo.**
+  //
+  // Estaban enganchados al lienzo de Canvas, y cuando el piloto 3D releva, ese
+  // lienzo se oculta y aparece otro encima: los gestos se quedaban colgados de
+  // un elemento con `display: none`, que no recibe nada. En 3D no funcionaba ni
+  // arrastrar, ni pellizcar, ni tocar para abrir la ficha.
+  //
+  // Enganchados a la raiz da igual cual sea el lienzo vivo, porque los eventos
+  // suben. Lo que hay que mirar es que vengan de un lienzo y no de un boton de
+  // velocidad, que tambien esta ahi dentro.
+  const onValley = (event: Event): boolean => event.target instanceof HTMLCanvasElement;
+  /** El lienzo que hay delante ahora mismo, para medir contra su caja. */
+  const surface = (): HTMLCanvasElement => backend.live.surface;
+
+  root.addEventListener('pointerdown', (event) => {
+    if (!onValley(event)) return;
+    root.setPointerCapture(event.pointerId);
     trace.set(event.pointerId, [{ x: event.clientX, y: event.clientY, atMs: event.timeStamp }]);
     if (trace.size === 2) {
       const starts = [...trace.values()].map((points) => points[0]!);
       pinchStart = Math.hypot(starts[1]!.x - starts[0]!.x, starts[1]!.y - starts[0]!.y);
     }
   });
-  canvas.addEventListener('pointermove', (event) => {
+  root.addEventListener('pointermove', (event) => {
     const points = trace.get(event.pointerId); if (points === undefined) return;
     const previous = points.at(-1);
     points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
@@ -240,7 +264,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         const mid = [...trace.values()].map((items) => items.at(-1)!);
         const first = mid[0]!;
         const second = mid[1]!;
-        const box = canvas.getBoundingClientRect();
+        const box = surface().getBoundingClientRect();
         backend.live.zoom(
           pinchStart / distance,
           (first.x + second.x) / 2 - box.left,
@@ -253,7 +277,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       pinchStart = distance;
     }
   });
-  canvas.addEventListener('pointerup', (event) => {
+  root.addEventListener('pointerup', (event) => {
     const points = trace.get(event.pointerId) ?? [];
     points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
     const gesture = recogniseGesture({ points });
@@ -262,7 +286,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // Cada backend sabe qué hay bajo un punto de su propia pantalla: el 2D
       // por proporción de la rejilla, el 3D lanzando un rayo. `mapPoint` se
       // queda para el 2D y no vale para el otro.
-      const box = canvas.getBoundingClientRect();
+      const box = surface().getBoundingClientRect();
       const target = backend.live.pick(
         state, event.clientX - box.left, event.clientY - box.top, lastFraction,
       );
@@ -274,6 +298,25 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     else if (gesture === 'swipe_up') openChronicle(app);
   });
   root.addEventListener('pointerdown', (event) => { if (event.target === root) panel.hidden = true; });
+
+  // La rueda del raton, que en un movil no existe y en un navegador de
+  // escritorio es **la unica manera de acercarse**: alli no hay dos dedos que
+  // pellizcar. Se vio jugando la demo en el ordenador.
+  root.addEventListener('wheel', (event) => {
+    if (!onValley(event) || !backend.live.movesCamera) return;
+    // Sin esto la pagina entera se mueve debajo del valle.
+    event.preventDefault();
+    // Las ruedas dan pixeles, lineas o paginas segun el navegador y el raton.
+    // Se normaliza a muescas para que una vuelta valga lo mismo en todas.
+    const lines = event.deltaMode === 1 ? event.deltaY : event.deltaY / 53;
+    const notches = Math.max(-3, Math.min(3, event.deltaMode === 2 ? event.deltaY * 10 : lines));
+    const box = surface().getBoundingClientRect();
+    backend.live.zoom(
+      WHEEL_STEP ** notches,
+      event.clientX - box.left,
+      event.clientY - box.top,
+    );
+  }, { passive: false });
 
   // §13.1: a snapshot and the decision log, every 20 ticks and whenever the
   // tab is hidden. M-25 also writes immediately on ending and beginning again.

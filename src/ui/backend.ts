@@ -23,6 +23,16 @@ export interface ValleyBackend {
   /** Whether this backend moves its own camera. Canvas does not. */
   readonly movesCamera: boolean;
   /**
+   * El lienzo que el jugador tiene delante.
+   *
+   * Hace falta porque **el relevo cambia de lienzo**: al entrar el piloto 3D, el
+   * de Canvas se oculta y aparece otro encima. Los gestos se enganchan una vez
+   * al arrancar, asi que si se enganchan al elemento en vez de preguntar por el
+   * vivo, al relevar se quedan colgados de uno oculto — que es lo que pasaba: en
+   * 3D no funcionaba ni arrastrar, ni pellizcar, ni tocar para abrir la ficha.
+   */
+  readonly surface: HTMLCanvasElement;
+  /**
    * `speed` viaja hasta aqui porque el piloto 3D tiene reloj propio y D.6 dice
    * que la pausa congela el desplazamiento y los clips. Canvas lo ignora: su
    * animacion es la fraccion de tick y nada mas.
@@ -68,6 +78,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
   return {
     kind: 'canvas',
     movesCamera: false,
+    surface: canvas,
     paint(state, tickFraction) { renderer.paint(state, tickFraction); },
     pick(state, xCss, yCss, tickFraction) {
       const box = canvas.getBoundingClientRect();
@@ -230,6 +241,7 @@ export function attachBackend(
       live = {
         kind: 'pilot3d',
         movesCamera: true,
+        surface: webgl,
         paint(state, tickFraction, speed) {
           // El reloj de presentacion es dueno unico del tiempo escenico y no
           // toca el acumulador del juego: quien avanza los ticks sigue siendo
