@@ -443,23 +443,23 @@ describe('G-10 · la luz de las casas', () => {
       );
       expect(home).toBeDefined();
       if (home === undefined) continue;
-      // El punto que da el 2D está dentro de las paredes; el de la escena está
-      // pegado por fuera, en la cara que esté libre. Cuál de las cuatro depende
-      // de si el vecino está pegado, así que no se comprueba cuál: se comprueba
-      // que está fuera y a un palmo.
+      // El punto que da el 2D cae en mitad de la planta; el de la escena va
+      // **en el muro**, en el hueco de una ventana. O sea: dentro de la huella
+      // —un muro es parte de la casa— pero pegado a uno de sus bordes, y nunca
+      // en el centro, que es donde estaba y donde no lo veía nadie.
       expect(tell.y).toBeGreaterThan(home.y);
-      const near = (thing: { position: { x: number; z: number } }): boolean =>
-        thing.position.x > home.x - 0.5 && thing.position.x < home.x + home.w + 0.5
-        && thing.position.z > home.y - 0.5 && thing.position.z < home.y + home.h + 0.5;
-      const outside = (thing: { position: { x: number; z: number } }): boolean =>
-        thing.position.x < home.x || thing.position.x > home.x + home.w
-        || thing.position.z < home.y || thing.position.z > home.y + home.h;
-      // Y si las cuatro caras están ocupadas —en esta aldea las casas se
-      // tocan— la luz se va por encima de los tejados, que desde ahí se ve
-      // siempre. Lo que no puede es quedarse enterrada a media pared.
+      const onTheWall = (thing: { position: { x: number; y: number; z: number } }): boolean => {
+        const inside = thing.position.x > home.x - 0.2 && thing.position.x < home.x + home.w + 0.2
+          && thing.position.z > home.y - 0.2 && thing.position.z < home.y + home.h + 0.2;
+        const edge = Math.min(
+          Math.abs(thing.position.x - home.x), Math.abs(thing.position.x - (home.x + home.w)),
+          Math.abs(thing.position.z - home.y), Math.abs(thing.position.z - (home.y + home.h)),
+        );
+        // A media altura de la pared, no por el suelo ni sobre el tejado.
+        return inside && edge < 0.25 && thing.position.y > 0.2 && thing.position.y < 0.8;
+      };
       const lit = tells.group.children.some(
-        (thing) => thing.userData.lamp !== undefined && near(thing)
-          && (outside(thing) || thing.position.y > 1.5),
+        (thing) => thing.userData.lamp !== undefined && onTheWall(thing),
       );
       expect(lit).toBe(true);
     }
@@ -664,5 +664,34 @@ describe('G-10 · el rebaño no se teletransporta', () => {
     // veintiocho veces por jornada.
     expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(0.06);
     fauna.dispose();
+  });
+});
+
+describe('G-10 · el sol da la vuelta entera', () => {
+  it('no salta al amanecer, que es donde cierra la vuelta', () => {
+    // Iba de este a oeste durante el día y volvía de un salto: ciento
+    // veintiséis grados de golpe, con las sombras del valle girando con él. Se
+    // vio jugando, y es lo único de la luz que cantaba.
+    const frames = 7200;
+    let worst = 0;
+    let before = daylightAt(0);
+    for (let step = 1; step <= frames; step += 1) {
+      const now = daylightAt(step / frames);
+      worst = Math.max(worst, Math.hypot(
+        now.sun.x - before.sun.x, now.sun.y - before.sun.y, now.sun.z - before.sun.z,
+      ));
+      before = now;
+    }
+    // Un fotograma de giro es una milésima larga. Un salto de vuelta es dos.
+    expect(worst, `el mayor salto del sol es ${worst.toFixed(4)}`).toBeLessThan(0.01);
+  });
+
+  it('sale por un lado y se pone por el otro', () => {
+    // Media vuelta entre el amanecer y el ocaso: lo que se ve de día sigue
+    // siendo un sol que cruza, no uno que da vueltas.
+    const dawn = daylightAt(0.08);
+    const dusk = daylightAt(0.76);
+    expect(Math.sign(dawn.sun.x)).not.toBe(Math.sign(dusk.sun.x));
+    expect(daylightAt(NOON).sun.y).toBeGreaterThan(dawn.sun.y);
   });
 });

@@ -13,7 +13,7 @@ import {
   InstancedMesh, Group, Matrix4, Quaternion, Vector3,
   type BufferGeometry, type Color, type Material, type Object3D,
 } from 'three';
-import type { ValleyMap } from '@engine/state';
+import type { Building, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@render/palette';
 
@@ -71,8 +71,10 @@ export interface Forest {
  * Se rehace cuando el suelo cambia, que es cuando alguien tala: unas pocas veces
  * al año, no sesenta veces por segundo.
  */
-export function buildForest(map: ValleyMap, tree: Object3D, palette?: Palette): Forest {
-  return scatterOn(map, tree, TERRAIN_CODE.forest, palette);
+export function buildForest(
+  map: ValleyMap, tree: Object3D, palette?: Palette, taken?: ReadonlySet<number>,
+): Forest {
+  return scatterOn(map, tree, TERRAIN_CODE.forest, palette, taken);
 }
 
 /**
@@ -100,12 +102,35 @@ function tintFoliage(material: Material, palette: Palette): void {
  * tipo. Los arboles sobre el bosque y las rocas sobre la roca son el mismo
  * problema, y separarlos habria sido tener dos veces la misma cuenta.
  */
-export function scatterOn(map: ValleyMap, source: Object3D, terrain: number, palette?: Palette): Forest {
+export function scatterOn(
+  map: ValleyMap, source: Object3D, terrain: number, palette?: Palette, taken?: ReadonlySet<number>,
+): Forest {
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
-    if (map.terrain[cell] === terrain) cells.push(cell);
+    // Un arbol dentro de una casa es un arbol dentro de una casa. El motor deja
+    // levantar sobre bosque talado sin cambiar el terreno de la celda, asi que
+    // esto hay que mirarlo aqui.
+    if (map.terrain[cell] === terrain && taken?.has(cell) !== true) cells.push(cell);
   }
   return scatterCells(map, source, cells, palette);
+}
+
+/**
+ * Las celdas que ocupa lo construido.
+ *
+ * Incluye las ruinas: §7.4 las deja en el mapa, y un junco creciendo entre los
+ * postes quemados de una casa es exactamente igual de raro.
+ */
+export function builtCells(state: { buildings: readonly Building[]; map: ValleyMap }): Set<number> {
+  const taken = new Set<number>();
+  for (const building of state.buildings) {
+    for (let row = 0; row < building.h; row += 1) {
+      for (let column = 0; column < building.w; column += 1) {
+        taken.add((building.y + row) * state.map.width + building.x + column);
+      }
+    }
+  }
+  return taken;
 }
 
 /**
@@ -114,12 +139,14 @@ export function scatterOn(map: ValleyMap, source: Object3D, terrain: number, pal
  * La orilla no es un terreno: el mapa no la nombra y no tiene por que. Es la
  * frontera entre dos que si nombra, y sale de mirar los cuatro vecinos.
  */
-export function shoreCells(map: ValleyMap): number[] {
+export function shoreCells(map: ValleyMap, taken?: ReadonlySet<number>): number[] {
   const cells: number[] = [];
   for (let cell = 0; cell < map.terrain.length; cell += 1) {
     if (map.terrain[cell] !== TERRAIN_CODE.meadow) continue;
-    // Nada crece en mitad de un camino pisado.
+    // Nada crece en mitad de un camino pisado, ni debajo de lo construido: se
+    // veian juncos saliendo por el suelo del molino y del embarcadero.
     if ((map.path[cell] ?? 0) > 0) continue;
+    if (taken?.has(cell) === true) continue;
     const x = cell % map.width;
     const wet = [
       x > 0 ? cell - 1 : -1,

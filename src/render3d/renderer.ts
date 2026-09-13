@@ -28,7 +28,9 @@ import type {
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, type Ground } from './world/ground';
 import { buildFord, type Ford } from './world/ford';
-import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from './world/forest';
+import {
+  buildForest, builtCells, scatterCells, scatterOn, shoreCells, type Forest,
+} from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { dayNumber, dayPhase } from './presentation-clock';
@@ -313,14 +315,16 @@ export async function createGraphicsRenderer(
     reeds = null;
     crossing = null;
 
+    // Lo construido no lleva vegetacion encima.
+    const taken = builtCells(state);
     const sapling = library.get(TREE);
     if (sapling !== undefined) {
-      forest = buildForest(state.map, sapling.original as Object3D, palette);
+      forest = buildForest(state.map, sapling.original as Object3D, palette, taken);
       world.add(forest.group);
     }
     const boulder = library.get(ROCK);
     if (boulder !== undefined) {
-      stones = scatterOn(state.map, boulder.original as Object3D, TERRAIN_CODE.rock);
+      stones = scatterOn(state.map, boulder.original as Object3D, TERRAIN_CODE.rock, undefined, taken);
       stones.group.name = 'Valley_Rocks';
       world.add(stones.group);
     }
@@ -328,7 +332,7 @@ export async function createGraphicsRenderer(
     if (reed !== undefined) {
       // La orilla se replanta con el suelo por el mismo motivo que el bosque: el
       // rio no se mueve, pero un camino nuevo pegado al agua si le quita sitio.
-      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map), palette);
+      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map, taken), palette);
       reeds.group.name = 'Valley_Reeds';
       world.add(reeds.group);
     }

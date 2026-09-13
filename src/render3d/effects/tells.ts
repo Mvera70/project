@@ -79,8 +79,12 @@ function signatureOf(tells: readonly Tell[]): string {
  * era leer el GLB en tiempo de ejecucion para sacar la posicion de un hueco,
  * que es mucho aparato para seis numeros que no cambian.
  *
- * `face` dice a que pared da: -1 es la cara de -Y —la fachada, donde esta la
- * puerta— y 1 seria la de +Y; `side` hace lo mismo en X.
+ * Los numeros estan **en coordenadas de la receta**, o sea las de Blender, que
+ * es donde se escribieron y con las que la prueba los compara. La escena no usa
+ * las mismas: el exportador de glTF pone `z_escena = -y_blender`, asi que un
+ * edificio ocupa de `-fondo` a `0` en Z y se coloca sumandole su fondo. La
+ * conversion se hace en un solo sitio, `atFace`, en vez de dejar los numeros ya
+ * girados aqui y que nadie sepa de donde salieron.
  */
 export interface Window {
   readonly x: number;
@@ -104,6 +108,20 @@ export const WINDOWS: Readonly<Record<string, readonly Window[]>> = {
     { x: 0.103, z: 1.167, up: 0.517, wide: 0.25, tall: 0.267, out: [-1, 0] },
   ],
 };
+
+/**
+ * Donde cae en la escena un punto escrito en coordenadas de la receta.
+ *
+ * La fachada —la cara de la puerta, `y = 0` en Blender— es el **borde de +Z**
+ * del edificio en la escena, que es el que mira a la camara.
+ */
+function atFace(home: Building, hole: Window): { x: number; z: number; out: readonly [number, number] } {
+  return {
+    x: home.x + hole.x,
+    z: home.y + home.h - hole.z,
+    out: [hole.out[0], -hole.out[1]] as const,
+  };
+}
 
 /**
  * Un punto justo fuera del edificio, en una cara que no tape nadie.
@@ -210,16 +228,17 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
         return [glow];
       }
       return holes.map((hole) => {
+        const at = atFace(home, hole);
         const lit = mark(
           new BoxGeometry(
-            hole.out[0] === 0 ? hole.wide : GLASS,
+            at.out[0] === 0 ? hole.wide : GLASS,
             hole.tall,
-            hole.out[1] === 0 ? hole.wide : GLASS,
+            at.out[1] === 0 ? hole.wide : GLASS,
           ),
           TONE.light, true,
-          home.x + hole.x + hole.out[0] * GLASS,
+          at.x + at.out[0] * GLASS,
           hole.up,
-          home.y + hole.z + hole.out[1] * GLASS,
+          at.z + at.out[1] * GLASS,
           0.95,
         );
         lit.object.userData.lamp = 0.95;
@@ -244,7 +263,8 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
         return [mark(new SphereGeometry(0.12, 6, 5), TONE.plague, false, tell.x, HEIGHT.plague, tell.y)];
       }
       const x = home.x + home.w * 0.78;
-      const z = home.y - GLASS;
+      // La fachada es el borde de +Z, que es el que mira a la camara.
+      const z = home.y + home.h + GLASS;
       const arm = mark(new BoxGeometry(0.26, 0.07, GLASS), TONE.plague, false, x, 0.52, z, 1);
       const post = mark(new BoxGeometry(0.08, 0.32, GLASS), TONE.plague, false, x, 0.52, z, 1);
       for (const piece of [arm, post]) piece.object.userData.mounted = true;

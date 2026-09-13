@@ -377,7 +377,7 @@ function doorsFor(state: GameState, plots: Map<number, Plot>): Map<BuildingId, D
       const wz = Math.floor(way.cell / width) + 0.5;
       // La mas cercana, y a igualdad la de la fachada: es donde esta la puerta
       // dibujada, y salir por ahi es lo que se espera ver.
-      const cost = (wx - cx) ** 2 + (wz - cz) ** 2 + (way.face[1] === -1 ? -0.3 : 0);
+      const cost = (wx - cx) ** 2 + (wz - cz) ** 2 + (way.face[1] === 1 ? -0.3 : 0);
       if (cost < bestCost) {
         bestCost = cost;
         best = way;
@@ -414,7 +414,14 @@ function doorPoint(_plot: Plot, door: Door, who: VillagerId, width: number): Poi
  * del muro de otro. Se prueban las cuatro y se sale por la que esté libre. Si
  * ninguna lo está —una casa rodeada— se sale por la fachada y ya.
  */
-const FACES = [[0, -1], [1, 0], [-1, 0], [0, 1]] as const;
+/**
+ * Las cuatro caras, empezando por **la fachada, que es la de +Z**.
+ *
+ * La puerta se dibuja en el borde de +Z del edificio: la receta la pone en
+ * `y = 0` de Blender y el exportador convierte esa cara en la de +Z (v3.56).
+ * Antes esta lista empezaba por -Z, o sea por la pared de atras.
+ */
+const FACES = [[0, 1], [1, 0], [-1, 0], [0, -1]] as const;
 
 /**
  * El puesto de trabajo de uno entre los `count` que comparten la misma parcela.

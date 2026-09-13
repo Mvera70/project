@@ -111,7 +111,20 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
 export function buildFromAsset(planned: PlannedBuilding, source: Object3D): BuildingModel {
   const group = new Group();
   group.name = `Building_${planned.id}`;
-  group.position.set(planned.x, 0, planned.z);
+  // **El fondo de la huella se suma a la Z, y esto es un arreglo, no un ajuste.**
+  //
+  // Las recetas se escriben en Blender, que tiene la Z arriba; glTF tiene la Y
+  // arriba, y el exportador convierte poniendo `z_glTF = -y_blender`. Una
+  // receta que ocupa de 0 a 6 metros en Y sale ocupando **de -6 a 0** en Z, asi
+  // que colocando el grupo en la esquina que dice el motor, el edificio se
+  // dibujaba dos celdas al norte de donde esta.
+  //
+  // Llevaba asi desde G-06 y no se veia, porque **el pueblo entero estaba
+  // desplazado igual**: lo que lo delato fue la gente, que si sale de las
+  // coordenadas del motor. De ahi venian tres cosas que parecian tres fallos
+  // distintos: los aldeanos cavando fuera del campo, las ventanas encendidas
+  // donde no habia ventana, y la gente cruzando paredes.
+  group.position.set(planned.x, 0, planned.z + planned.h);
   group.userData.buildingId = planned.id;
   const model = source;
   model.traverse((object) => {

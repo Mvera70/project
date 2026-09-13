@@ -104,9 +104,21 @@ export function daylightAt(phase: number): Daylight {
   // amanecer y el atardecer son cortos, que es lo que los hace bonitos.
   const arc = Math.sin(Math.PI * Math.max(0, Math.min(1, (day - DAWN) / (NIGHT - DAWN))));
   const elevation = (NIGHT_ELEVATION + (NOON_ELEVATION - NIGHT_ELEVATION) * arc * light) * Math.PI / 180;
-  // Y por dónde. De este a oeste: media vuelta a lo largo del día, empezando
-  // detrás del hombro izquierdo de la cámara para que las fachadas cojan luz.
-  const compass = Math.PI * (0.15 + 0.7 * Math.max(0, Math.min(1, (day - DAWN) / (NIGHT - DAWN))));
+  // Y por dónde. **La vuelta es entera, no media.**
+  //
+  // Antes iba de este a oeste durante el día y volvía de un salto al amanecer:
+  // ciento veintiséis grados de golpe, y las sombras del valle giraban con él.
+  // Se veía jugando y era lo único de la luz que cantaba.
+  //
+  // Ahora el sol hace media vuelta de día —sale por el este y se pone por el
+  // oeste, igual que antes— y la otra media de noche, por debajo del mundo,
+  // que es por donde vuelve. En el amanecer siguiente llega al mismo sitio del
+  // que salió sin pasar por ninguna parte: la vuelta cierra.
+  const round = day < DAWN ? day + 1 : day;
+  const turn = round <= DUSK
+    ? ((round - DAWN) / (DUSK - DAWN)) * 0.5
+    : 0.5 + ((round - DUSK) / (1 + DAWN - DUSK)) * 0.5;
+  const compass = Math.PI * 0.15 + turn * Math.PI * 2;
 
   const height = Math.sin(elevation);
   const reach = Math.cos(elevation);
