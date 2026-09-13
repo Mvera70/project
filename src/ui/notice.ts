@@ -41,6 +41,10 @@ const STYLE = `
   border-bottom: 1px solid rgba(242,244,246,.18);
   color: #f2f4f6; font: 15px/1.35 Georgia, serif; text-wrap: pretty; }
 .valley-notice[hidden] { display: none !important; }
+/* §11.2 · la encrucijada ocupa la pantalla entera, y eso incluye no tener una
+   banda de crónica asomando entre las opciones. Se vio en una captura: el
+   aviso se leía a través de las tarjetas, que son translúcidas. */
+html.crossroad-open .valley-notice { display: none !important; }
 `;
 
 function ensureStyle(): void {
