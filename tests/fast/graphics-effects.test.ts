@@ -19,13 +19,19 @@ import { clockOf, SEASONS } from '@engine/time';
 import type { GameState } from '@engine/state';
 import { PALETTES, paletteFor } from '@render/palette';
 import { tellsFor } from '@render/layers/tells';
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
+import {
+  BoxGeometry, Group, Matrix4, Mesh, MeshStandardMaterial, Vector3,
+  type InstancedMesh, type Object3D,
+} from 'three';
 import { TERRAIN_CODE } from '@engine/state';
 import { animalPositions, wildlifePositions } from '@render/animals';
 import { daylightAt, NIGHT_FLOOR, NOON } from '../../src/render3d/effects/daylight';
 import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import {
+  dayNumber, dayPhase, SCENIC_DAY_SECONDS,
+} from '../../src/render3d/presentation-clock';
 import { Tells, WINDOWS } from '../../src/render3d/effects/tells';
 import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
@@ -298,7 +304,7 @@ describe('G-10 · la fauna (§7.7)', () => {
     // alguien tocara §7.7.
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.4);
+    fauna.update(state, 0.4, 0);
     const said = [...animalPositions(state, 0.4), ...wildlifePositions(state, 0.4)];
     expect(said.length).toBeGreaterThan(0);
     expect(fauna.count).toBeLessThanOrEqual(said.length);
@@ -311,9 +317,9 @@ describe('G-10 · la fauna (§7.7)', () => {
     // ventana por la que entran los lobos de §7.7.
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.4);
+    fauna.update(state, 0.4, 0);
     const byDay = fauna.count;
-    fauna.update(state, 0.95);
+    fauna.update(state, 0.95, 0);
     expect(byDay).toBeGreaterThan(0);
     expect(fauna.count).toBeLessThan(byDay);
     fauna.dispose();
@@ -344,10 +350,10 @@ describe('G-10 · la fauna (§7.7)', () => {
     // lo que no se puede hacer es reconstruir objetos sesenta veces por segundo.
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.3);
+    fauna.update(state, 0.3, 0);
     const before = [...fauna.group.children];
     expect(before.length).toBeGreaterThan(0);
-    for (let step = 1; step <= 6; step += 1) fauna.update(state, 0.3 + step * 0.02);
+    for (let step = 1; step <= 6; step += 1) fauna.update(state, 0.3 + step * 0.02, 0);
     const after = [...fauna.group.children];
     expect(after.length).toBe(before.length);
     for (let index = 0; index < after.length; index += 1) expect(after[index]).toBe(before[index]);
@@ -357,7 +363,7 @@ describe('G-10 · la fauna (§7.7)', () => {
   it('lo suelta todo al terminar', () => {
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.4);
+    fauna.update(state, 0.4, 0);
     fauna.dispose();
     expect(fauna.group.children.length).toBe(0);
     expect(fauna.count).toBe(0);
@@ -607,5 +613,56 @@ describe('G-10 · la luz sale por las ventanas', () => {
     expect(lights.length).toBeGreaterThan(0);
     expect(lit.length).toBe(lights.length * 3);
     tells.dispose();
+  });
+});
+
+describe('G-10 · el rebaño no se teletransporta', () => {
+  function model(): Object3D {
+    const group = new Group();
+    group.add(new Mesh(new BoxGeometry(0.2, 0.2, 0.2), new MeshStandardMaterial()));
+    return group;
+  }
+
+  it('correr las semanas no salta a los animales de sitio', () => {
+    // El mismo fallo que la gente tuvo dos rondas, por la misma razón: la
+    // querencia de cada animal se sortea con la semana (§11.9), y una jornada
+    // escénica dura ocho semanas a ×1 y ciento veintiocho a ×16. Sin congelar
+    // la semana al amanecer, el rebaño parpadeaba por el valle.
+    //
+    // Se simula el ritmo de ×16: una semana por segundo escénico.
+    const state = village(14);
+    const fauna = new Fauna(() => model());
+    const seen = new Map<number, { x: number; z: number; step: number }>();
+    let biggest = 0;
+    for (let step = 0; step <= 240; step += 1) {
+      const seconds = (step / 240) * SCENIC_DAY_SECONDS;
+      while (state.tick < 672 + Math.floor(seconds)) run(state, 1, 'prudent', CATALOG);
+      fauna.update(state, dayPhase(seconds), dayNumber(seconds));
+      for (const piece of fauna.group.children) {
+        const mesh = piece as InstancedMesh;
+        const matrix = new Matrix4();
+        for (let slot = 0; slot < mesh.count; slot += 1) {
+          mesh.getMatrixAt(slot, matrix);
+          const at = new Vector3().setFromMatrixPosition(matrix);
+          // Las plazas que sobran se esconden bajo el suelo.
+          if (at.y < -1) continue;
+          const key = mesh.id * 1000 + slot;
+          const was = seen.get(key);
+          // Sólo cuenta el salto entre dos fotogramas **seguidos y los dos
+          // visibles**: lo que pase mientras el bicho no está en pantalla no lo
+          // ve nadie, y ahí es justo donde cambia de querencia.
+          if (was !== undefined && was.step === step - 1) {
+            biggest = Math.max(biggest, Math.hypot(at.x - was.x, at.z - was.z));
+          }
+          seen.set(key, { x: at.x, z: at.z, step });
+        }
+      }
+    }
+    // Medido: cuatro centésimas de celda, que son doce centímetros, y es el
+    // margen con el que se separa del agua quien acaba de salir de ella. Antes
+    // de esto eran **2,90 celdas**: la querencia se re-sorteaba ciento
+    // veintiocho veces por jornada.
+    expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(0.06);
+    fauna.dispose();
   });
 });

@@ -30,8 +30,14 @@ export interface Animal {
   y: number;
 }
 
-/** Dusk, the same threshold the crowd uses to go home (§10.6). */
-const NIGHT = 0.8;
+/**
+ * Dusk, the same threshold the crowd uses to go home (§10.6).
+ *
+ * Exported because the 3D scene needs the same line: it is where the livestock
+ * stops being drawn and the wolves start, and therefore the only moment in the
+ * day when an animal can change its patch without anybody seeing it move.
+ */
+export const NIGHT = 0.8;
 
 
 

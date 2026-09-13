@@ -16,7 +16,9 @@
 
 import { Group, InstancedMesh, Matrix4, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState, type ValleyMap } from '@engine/state';
-import { animalPositions, wildlifePositions, type Animal, type AnimalKind } from '@render/animals';
+import {
+  animalPositions, NIGHT, wildlifePositions, type Animal, type AnimalKind,
+} from '@render/animals';
 import { piecesOf, type Piece } from '../world/forest';
 
 /**
@@ -55,17 +57,34 @@ export function ashore(map: ValleyMap, x: number, y: number): { x: number; y: nu
     return map.terrain[iy * map.width + ix];
   };
   if (cellAt(x, y) !== TERRAIN_CODE.water) return { x, y };
-  // Medio paso en cada dirección. Medio y no uno entero porque lo que hay que
-  // salvar es el borde, y un salto de celda entera se ve como un salto.
-  for (const [dx, dy] of [[0.6, 0], [-0.6, 0], [0, 0.6], [0, -0.6],
-                          [1.2, 0], [-1.2, 0], [0, 1.2], [0, -1.2]] as const) {
-    const kind = cellAt(x + dx, y + dy);
-    if (kind !== undefined && kind !== TERRAIN_CODE.water) return { x: x + dx, y: y + dy };
+
+  // **Se le saca por la orilla más cercana, no de un empujón fijo.**
+  //
+  // El primer intento lo movía media celda a un lado en cuanto pisaba el agua,
+  // y eso es un salto de 0,61 celdas justo al borde: el animal pastando junto
+  // al río daba un brinco cada vez que la querencia le acercaba al cauce. Así
+  // se queda pegado a la orilla y el movimiento es continuo, porque el
+  // desplazamiento crece desde cero según se mete.
+  const left = x - Math.floor(x);
+  const top = y - Math.floor(y);
+  const outs: Array<{ x: number; y: number; gap: number }> = [
+    { x: Math.floor(x) - MARGIN, y, gap: left },
+    { x: Math.floor(x) + 1 + MARGIN, y, gap: 1 - left },
+    { x, y: Math.floor(y) - MARGIN, gap: top },
+    { x, y: Math.floor(y) + 1 + MARGIN, gap: 1 - top },
+  ];
+  outs.sort((a, b) => a.gap - b.gap);
+  for (const out of outs) {
+    const kind = cellAt(out.x, out.y);
+    if (kind !== undefined && kind !== TERRAIN_CODE.water) return { x: out.x, y: out.y };
   }
   // Un bicho en mitad del río y sin orilla cerca no se dibuja. Es mejor que no
   // esté a que nade.
   return null;
 }
+
+/** Lo que se separa del agua quien acaba de salir de ella, en celdas. */
+const MARGIN = 0.04;
 
 /** Cuántos animales de una clase caben antes de rehacer su malla. */
 function capacityFor(count: number): number {
@@ -99,6 +118,11 @@ export class Fauna {
   private readonly up = new Vector3(0, 1, 0);
   private readonly hidden = new Vector3(0, 0, 0);
   private readonly last = new Map<number, { x: number; y: number }>();
+  /** El día escénico que se está dibujando, y la semana con la que se dibuja. */
+  private day = -1;
+  private week = 0;
+  private dark = false;
+  private herd: GameState['herd'] | null = null;
 
   /**
    * `instance` da una copia del recurso de cada clase, o `undefined` si el
@@ -122,10 +146,50 @@ export class Fauna {
    * `dayPhase` es la hora escénica y no la fracción del tick: los animales se
    * recogen al anochecer igual que la gente (§10.6), y usar el tick los habría
    * metido en casa cuatro veces por día escénico a ×1.
+   *
+   * **`day` es el número de día escénico, y con él se congela la semana.**
+   *
+   * La querencia de cada animal se sortea con la semana (§11.9, v3.06): sin
+   * eso, el mismo bicho repetía el mismo círculo desde la fundación hasta el
+   * final de la partida. En el render 2D está bien, porque allí un tick es un
+   * día en pantalla y el salto se lee como «se ha ido a otra mata». Aquí una
+   * jornada dura **ocho semanas a ×1 y ciento veintiocho a ×16**, así que la
+   * querencia se re-sorteaba ciento veintiocho veces por día y el rebaño se
+   * teletransportaba: el mismo fallo que costó dos rondas en la gente, por la
+   * misma razón y con la misma cura.
+   *
+   * Se congela al amanecer, igual que los destinos de la jornada. Lo que el
+   * motor decida durante el día entra mañana.
    */
-  update(state: GameState, dayPhase: number): void {
+  update(state: GameState, dayPhase: number, day: number): void {
+    // **La semana cambia al anochecer, no al amanecer.**
+    //
+    // Congelarla al amanecer quitaba los ciento veintiocho saltos por día, pero
+    // dejaba uno: la querencia cambia hasta dos celdas, y al amanecer el ganado
+    // está en pantalla, así que se veía dar el salto. Al anochecer no se ve
+    // ninguno: el ganado, los cuervos y los peces dejan de dibujarse en esa
+    // misma línea (§10.6) y el lobo empieza justo ahí, o sea que aparece ya en
+    // su sitio nuevo. Quien no está no salta.
+    const dark = dayPhase >= NIGHT;
+    if (this.day !== day || (dark && !this.dark)) {
+      this.day = day;
+      this.week = state.tick;
+      // **Y la cabaña con ella.** El identificador de cada animal es su puesto
+      // en la fila —primero las gallinas, luego los cerdos, luego las vacas— y
+      // de ese número salen su fase, su radio y su querencia. Si nace una
+      // gallina a media jornada, todos los cerdos y todas las vacas cambian de
+      // número y se mueven de sitio de golpe. Con la cabaña congelada, lo que
+      // se lleve el lobo se nota al día siguiente, que es cuando se cuenta.
+      this.herd = { ...state.herd };
+    }
+    this.dark = dark;
+    // Una copia superficial con la semana y la cabaña de anoche. Lo demás —los
+    // edificios, el mapa, el brote— es el estado de ahora.
+    const frozen = this.week === state.tick && this.herd === null
+      ? state
+      : { ...state, tick: this.week, herd: this.herd ?? state.herd };
     const animals: Animal[] = [];
-    for (const animal of [...animalPositions(state, dayPhase), ...wildlifePositions(state, dayPhase)]) {
+    for (const animal of [...animalPositions(frozen, dayPhase), ...wildlifePositions(frozen, dayPhase)]) {
       if (animal.kind === 'fish') {
         animals.push(animal);
         continue;
@@ -251,6 +315,10 @@ export class Fauna {
     for (const kind of [...this.herds.keys()]) this.drop(kind);
     this.last.clear();
     this.facing.clear();
+    // Otra partida es otra semana: sin esto, el valle nuevo heredaría la
+    // querencia del viejo hasta el amanecer siguiente.
+    this.day = -1;
+    this.herd = null;
   }
 
   dispose(): void {

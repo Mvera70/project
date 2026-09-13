@@ -31,7 +31,7 @@ import { buildFord, type Ford } from './world/ford';
 import { buildForest, scatterCells, scatterOn, shoreCells, type Forest } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
-import { dayPhase } from './presentation-clock';
+import { dayNumber, dayPhase } from './presentation-clock';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
@@ -403,6 +403,7 @@ export async function createGraphicsRenderer(
       bubbles.update(heads, carried);
       // La hora escenica: la piden el rebano, las luces y el sol.
       const phase = dayPhase(frame.presentationSeconds);
+      const today = dayNumber(frame.presentationSeconds);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
       tells.update(state as GameState);
@@ -413,7 +414,7 @@ export async function createGraphicsRenderer(
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
-      fauna.update(state as GameState, phase);
+      fauna.update(state as GameState, phase, today);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
       light(phase);
