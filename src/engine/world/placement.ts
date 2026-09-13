@@ -67,18 +67,52 @@ function onEnvelope(point: Point, hull: Point[]): boolean {
   return d > BUILDING_RULES.PALISADE_DILATION - 1 && d <= BUILDING_RULES.PALISADE_DILATION;
 }
 
-function occupiedCells(state: GameState): Uint8Array {
+/**
+ * The kinds that have an inside, and therefore a door and a wall.
+ *
+ * §7.2's table says how big each building is; what it does not say is which of
+ * them you can walk across. A field, a palisade, a graveyard and a well are
+ * ground: people walk over them. A house is not.
+ */
+const WALLED = new Set<BuildingKind>([
+  'house', 'stone_house', 'granary', 'chapel', 'church', 'smithy', 'mill', 'watchtower',
+]);
+
+/**
+ * Which cells a new building may not use.
+ *
+ * `occupied` is what stands there. `reserved` is that plus a street: the ring
+ * of cells around anything with walls, which only another walled building is
+ * kept out of.
+ *
+ * Without the street the village grew as one solid block — six houses in a row
+ * with no gap between them in a measured game — and that is not a stylistic
+ * complaint: the door of the middle house opened onto the neighbour's wall, and
+ * no villager could reach their own home without walking through somebody
+ * else's. The 3D valley showed it plainly; the flat one had been hiding it
+ * since M-14.
+ */
+function occupiedCells(state: GameState): { occupied: Uint8Array; reserved: Uint8Array } {
   const occupied = new Uint8Array(state.map.terrain.length);
-  const mark = (rect: Rect): void => {
-    for (let y = rect.y; y < rect.y + rect.h; y += 1) {
-      for (let x = rect.x; x < rect.x + rect.w; x += 1) occupied[y * state.map.width + x] = 1;
+  const reserved = new Uint8Array(state.map.terrain.length);
+  const mark = (into: Uint8Array, rect: Rect, grow: number): void => {
+    for (let y = rect.y - grow; y < rect.y + rect.h + grow; y += 1) {
+      for (let x = rect.x - grow; x < rect.x + rect.w + grow; x += 1) {
+        if (x < 0 || y < 0 || x >= state.map.width || y >= state.map.height) continue;
+        into[y * state.map.width + x] = 1;
+      }
     }
   };
   for (const building of state.buildings) {
-    if (standsInTheWay(building, state.tick)) mark(building);
+    if (!standsInTheWay(building, state.tick)) continue;
+    mark(occupied, building, 0);
+    if (WALLED.has(building.kind)) mark(reserved, building, BUILDING_RULES.STREET_GAP);
   }
-  for (const work of state.works) mark(work);
-  return occupied;
+  for (const work of state.works) {
+    mark(occupied, work, 0);
+    if (WALLED.has(work.kind)) mark(reserved, work, BUILDING_RULES.STREET_GAP);
+  }
+  return { occupied, reserved };
 }
 
 function fitsEmptyGround(
@@ -86,14 +120,18 @@ function fitsEmptyGround(
   kind: BuildingKind,
   x: number,
   y: number,
-  occupied: Uint8Array,
+  ground: { occupied: Uint8Array; reserved: Uint8Array },
 ): boolean {
   const { w, h } = BUILDINGS[kind];
+  // Only a building with walls has to keep its distance. A field may lie
+  // against a house; you walk over a field.
+  const keepsAway = WALLED.has(kind);
   for (let row = y; row < y + h; row += 1) {
     for (let col = x; col < x + w; col += 1) {
       const cell = row * state.map.width + col;
       const tile = state.map.terrain[cell];
-      if (occupied[cell] !== 0 || tile === TERRAIN_CODE.water || tile === TERRAIN_CODE.marsh) return false;
+      if (ground.occupied[cell] !== 0 || tile === TERRAIN_CODE.water || tile === TERRAIN_CODE.marsh) return false;
+      if (keepsAway && ground.reserved[cell] !== 0) return false;
       if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
     }
   }

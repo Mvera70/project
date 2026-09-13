@@ -288,11 +288,19 @@ No son teoría: cada una se pagó con al menos una ronda.
    separaría es la herramienta, no la pose. Por eso el rig lleva conectores en
    las dos manos, y por eso D.4 dice que la herramienta es un accesorio. Espera
    a la ronda de la biblioteca de herramientas.
-7. **La suite rápida tarda 31 s contra los 20 que fija `CLAUDE.md`**, y unos 21
+7. **La suite de balance falla diez pruebas de §12.9, y ya fallaba antes de
+   esta ronda.** Medido con dos pasadas completas el 13 sep 2026, una con el
+   motor tal cual y otra con la calle de §7.2: las mismas diez en las dos. La
+   de fondo es que jugar mal y jugar bien se parecen demasiado —la política
+   adversa mata el 13 % de las aldeas y el diseño pide 25 %, y la distancia
+   entre prudente y mala es de 11,7 puntos contra los 20 pedidos—. Está medido
+   entero en `docs/findings-drama.md` §3. **No lo arregla una ronda gráfica:
+   es balance del motor y lo decide el dueño del diseño.**
+8. **La suite rápida tarda 31 s contra los 20 que fija `CLAUDE.md`**, y unos 21
    son de carga de módulos. El banco de balance sigue en 18,1 min contra el
    techo de 15; la causa medida es que el coste del suelo cambia 631 veces por
    partida y cada cambio vacía la caché de pares de ruta. Bajarlo obliga a tocar
    el tráfico, que es balance, y esa decisión sigue abierta.
-8. **Los edificios del piloto son cajas con tejado.** El catálogo de verdad es
+9. **Los edificios del piloto son cajas con tejado.** El catálogo de verdad es
    G-10. Es deliberado: lo que hay que juzgar antes es si un valle de estas
    proporciones se lee desde arriba.

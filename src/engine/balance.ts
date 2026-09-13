@@ -535,6 +535,13 @@ export const BUILDING_RULES = {
   GRANARY_HOUSE_DISTANCE: 6, // §7.4: "a menos de 6 celdas de una casa"
   PALISADE_DILATION: 2, // §7.4: "envolvente convexa del núcleo, dilatada 2 celdas"
   CHAPEL_SET_BACK: 2, // TUNE: §7.4 wants the chapel "algo apartada"; cells past the core rim.
+  // TUNE: cells of street left between two buildings that have walls. One is
+  // enough for a lane: at three metres a cell (design.md D.6.2) that is a cart
+  // wide. Without it the village grew as one solid block — six houses in a row
+  // with no gap in a measured game — so a door opened onto the neighbour's wall
+  // and nobody could reach their own house without walking through somebody
+  // else's. Fields, walls and graveyards are exempt: they have no inside.
+  STREET_GAP: 1,
 } as const;
 
 // ---------------------------------------------------------------------------

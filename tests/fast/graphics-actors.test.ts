@@ -701,16 +701,15 @@ describe('G-10 · nadie atraviesa una pared', () => {
       }
     }
     expect(samples).toBeGreaterThan(1000);
-    // Ni un uno por mil. El carril lateral puede rozar un muro en una esquina
-    // muy cerrada; meterse dentro, no.
-    // **Medido, no deseado.** Antes de esta ronda era el 48 % de la jornada: la
-    // gente se plantaba dentro de su salón y cruzaba las casas del vecino de
-    // camino al campo. Ahora es el 5 %, y lo que queda tiene una causa que el
-    // dibujo no puede arreglar: el motor coloca las casas **pegadas y sin dejar
-    // calle** —seis seguidas sin un hueco en la partida medida—, así que hay
-    // puestos y umbrales que dan contra la pared del vecino porque no hay otro
-    // sitio donde darlos. Está anotado para quien lleve §7.2.
-    expect(inside / samples, `${inside} de ${samples} dentro de un muro`).toBeLessThan(0.07);
+    // **Medido, no deseado**, y en tres tramos. Antes de esta ronda era el 48 %
+    // de la jornada: la gente se plantaba dentro de su salón y cruzaba las
+    // casas del vecino de camino al campo. Con la puerta y el rodeo bajó al
+    // 5 %, y lo que quedaba no era de dibujo: el motor colocaba las casas
+    // pegadas, así que había umbrales que daban contra la pared de al lado
+    // porque no había otro sitio donde darlos. Con la calle de §7.2 baja al
+    // 0,2 – 0,9 % según la partida (semillas 7, 11, 23 y 41), y lo que queda es
+    // el carril lateral rozando un muro en una esquina muy cerrada.
+    expect(inside / samples, `${inside} de ${samples} dentro de un muro`).toBeLessThan(0.015);
   });
 });
 

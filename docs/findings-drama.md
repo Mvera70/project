@@ -63,6 +63,42 @@ juego es *tomar decisiones con consecuencias*, y el jugador toma una decisión
 cada cuatro años sobre la mitad de un catálogo. Ninguna cantidad de arte tapa
 eso.
 
+## 3. Y la suite de balance ya estaba en rojo
+
+**Medido:** 13 sep 2026, dos pasadas completas de `npm run test:balance` —60
+semillas por politica, 200 anos cada una, unos 18 minutos por pasada— una con
+el motor tal cual y otra con la calle de §7.2 puesta. **Fallan las mismas diez
+pruebas en las dos.** La calle no las rompio: ya estaban rotas.
+
+| Prueba de §12.9 | Lo que pide | Sin calle | Con calle |
+|---|---|---|---|
+| Extincion jugando `prudent` | 2 % – 12 % | **1,7 %** | 1,7 % |
+| Extincion jugando `worst` | >= 25 % | **13,3 %** | 11,7 % |
+| Distancia entre las dos | >= 20 puntos | **11,7** | 10,0 |
+| Cadencia media `worst` | <= 5 | **5,08** | 5,04 |
+| Peor cadencia `last` | <= 7 | **7,59** | 7,59 |
+| `smith_feud` elegible | < 1 % | **3,9 %** | 3,7 % |
+| `feud_inherited` elegible en `worst` | < 1 % | **1,09 %** | 1,00 % |
+| La pasada entera | < 15 min | **17,9 min** | 19,5 min |
+
+Lo que dicen juntas es una sola cosa, y es la misma del apartado 2: **jugar mal
+y jugar bien se parecen demasiado.** El diseno pide que una politica adversa
+mate una de cada cuatro aldeas y mata una de cada ocho; pide veinte puntos de
+diferencia entre la prudente y la mala y hay once. Un juego cuyo asunto es
+tomar decisiones con consecuencias tiene aqui la medida de sus consecuencias, y
+sale corta.
+
+Las dos de elegibilidad son de otro orden: `smith_feud` y `feud_inherited`
+**pueden salir** el 4 % de las semanas —cuatro veces el techo— y aun asi no
+salen nunca, porque lo que les falta es el rencor del apartado 1. Una plantilla
+elegible que no se elige es peso muerto en el reparto del catalogo.
+
+**Lo que la calle mueve, dicho aparte para que nadie lo confunda:** todo lo de
+la columna derecha se mueve entre una y dos decimas en la misma direccion —la
+aldea ocupa mas suelo, se llena antes y pasa antes a la piedra, o sea algo mas
+facil—, menos el tiempo de la pasada, que sube un 9 %. Ninguna de las diez
+cambia de lado por ella.
+
 ## Lo que habría que mirar, sin decidirlo aquí
 
 1. **El ritmo.** `CROSSROADS.MIN_TICKS_BETWEEN` son 120 semanas —dos años y
@@ -72,7 +108,9 @@ eso.
    cuál de sus condiciones es la que nunca se da. Un test que corra N partidas y
    liste las plantillas nunca vistas convertiría esto en una regresión vigilada
    en vez de un hallazgo de una tarde.
-3. **El empujón que falta a las opiniones.** Sin una vía por la que dos vecinos
+3. **La distancia entre jugar bien y jugar mal.** Es la medida del apartado 3 y
+   es la que decide si el juego es un juego. Tocarla es balance mayor.
+4. **El empujón que falta a las opiniones.** Sin una vía por la que dos vecinos
    se caigan mal sin haber pasado antes por una encrucijada, §6.4 y M-39 son
    código que no se ejecuta.
 
