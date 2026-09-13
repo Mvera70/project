@@ -28,6 +28,7 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.53** | 13 sep 2026 | Decisión de diseño: §11.1.1 | **«El valle es el HUD y por defecto no hay ni una cifra» se relaja, por decisión del dueño del diseño y por lo que se vio jugando:** con el catálogo puesto, el valle está lleno y el jugador sigue sin saber qué pasa. Las señales diegeticas son lentas —el granero tarda una estación en vaciarse— y mudas sobre las personas. Entran **dos elementos y sólo dos**: una tira con gente, comida, leña y ánimo, y una burbuja de estado sobre quien está viviendo algo. **La comida se enseña en semanas y no en unidades**, porque la unidad es «una persona una semana» y la división la puede hacer el juego. **Y no hay contador de oro ni de piedra**: ninguno de los dos existe en la simulación —el comercio es trueque y la piedra se convierte en puntos de obra sin almacenarse nunca—, así que ponerlos sería inventar un número. Si hay moneda algún día, se decide en el motor y llega después. La burbuja **sólo sale de estado con fecha** —rencor formado, muerte de un allegado, hijo nacido, hambre, brote, y los encuentros de §11.9— y va en ese orden de prioridad: quien acaba de enterrar a un hijo no enseña que tiene hambre. |
 | **3.52** | 13 sep 2026 | G-10, la luz por las ventanas y la puerta de casa | Tres cosas vistas jugando. **(1) La luz de noche era un rectángulo pegado a la fachada**, del tamaño de medio muro y sin relación con ningún hueco: se leía como un cartel encendido. Ahora sale **por las ventanas**, una por hueco y del tamaño del hueco. Las posiciones están escritas dos veces —en la receta en metros y en la escena en celdas— y hay prueba que las compara: una ventana encendida donde no hay ventana es peor que ninguna luz. **(2) La gente atravesaba las paredes y no usaba las puertas.** La ruta del motor va de centro a centro de edificio, que es lo que necesita para desgastar caminos, y el dibujo la seguía tal cual: el 48 % de la jornada transcurría **dentro de un muro**, empezando por el propio salón. Ahora cada edificio con paredes tiene **una puerta, fija y suya**, la ruta empieza y acaba en ella, y lo que quedaba dentro se rodea con una búsqueda corta. Baja al 5 %. **(3) Y ahí está el hallazgo que el dibujo no puede arreglar: esta aldea no tiene calles.** El motor coloca las casas pegadas —seis seguidas sin un hueco en la partida medida—, así que la puerta de la de en medio da a la pared de la de al lado. Lo que hace el render es lo que hace una hilera de casas de verdad: agrupa las huellas que se tocan y **saca la puerta al borde del grupo**. El resto es de §7.2 y queda anotado. |
 | **3.51** | 11 sep 2026 | G-10, la gente se para a hablar | §11.9 en tres dimensiones: **quien se cruza con quien se para, y lo decide la opinión**. Dos que se aprecian se paran a menudo y dos que se detestan no se paran nunca, que es lo que hace que dos partidas con los mismos sucesos cuenten historias distintas. Lo decide `encountersAmong`, el mismo del render 2D; aquí sólo se dibuja. Se acerca, se está y se vuelve, con la azada guardada: una conversación con la azada en la mano no es una conversación. **Tres saltos costaron encontrarse, y los tres los caza la misma medida.** El emparejamiento sale del tick y una jornada escénica dura ocho ticks a ×1: sin congelarlo al amanecer, la conversación cambiaba de sitio ocho veces al día —**5,88 celdas**—. Repartiendo la ida en una fracción fija de la charla, la gente cruzaba el campo a **seis veces su paso**; ahora la ida dura lo que se tarda en andarla, y si no da tiempo a ir, estarse y volver, no se va. Y midiendo la distancia desde el centro del puesto en vez de desde donde se está cavando, una charla a un palmo se daba por alcanzada al instante y el aldeano aparecía allí —**0,78**—. La medida, de paso, aprendió algo: **muestreando cada 0,4 s, andar parece saltar**. La primera versión de la prueba medía 0,50 celdas en una jornada sin conversaciones y creía estar viendo un defecto. A ritmo de fotograma, el paso mayor del día es el camino de ida y vale 0,1. |
 | **3.50** | 11 sep 2026 | G-10, la aldea se junta | **El principio 1 del juego, cumplido también en tres dimensiones.** Veinticinco de las cincuenta y seis opciones del catálogo convocan a la gente (§11.8); el render 2D las obedece desde M-32 y en 3D no pasaba nada. Ahora, el día que hay reunión, **nadie va al tajo**: salen de casa, van al sitio y se quedan quietos mirando al centro del corro, que es lo que convierte a doce personas sueltas en una reunión. En la reunión no se cava, y hay prueba que lo dice. Tres decisiones, y las tres son de presentación: **(1)** se decide al amanecer como los destinos, porque cambiarla a media jornada teletransporta —hay prueba que mide el salto mayor de doscientos cuarenta fotogramas y exige menos de media celda—; **(2)** `gatheringsAt` gana un tercer argumento opcional para preguntar *desde el amanecer anterior*, porque una reunión de cuatro semanas cabe entera entre dos amaneceres y preguntando sólo por ahora la mitad no se vería nunca —el render 2D no lo pasa y para él no cambia nada—; **(3)** la ruta es la puerta de casa y el sitio, **en línea recta**, que es lo mismo que hace el 2D y lo único posible sin pedirle rutas al motor: su caché de rutas es la que usa para desgastar caminos, y escribir en ella sería que el render moviera la simulación. El repartidor de puestos ya sabía poner a la gente en corro cuando el destino no es un edificio, así que la plaza no necesitó nada nuevo. Y `valley.html` gana `?gather=1`: las reuniones salen dos veces en treinta años, y esperar a que salga una para mirarla no es un método. |
@@ -5111,6 +5112,55 @@ no esconde datos: los pone a un toque de distancia en vez de a cero.
 **Esta tabla es de estados, y por sí sola no basta** (§11.6, v2.84): ninguna de
 sus filas dice que algo *acabe de ocurrir*, y una aldea donde solo se ven
 condiciones es una aldea donde el jugador no se entera de nada.
+
+#### 11.1.1 · Dos excepciones a «ni una cifra» (v3.53)
+
+**La regla se relaja, y se relaja por lo que se vio jugando.** Con el catálogo
+de G-10 puesto, el valle está lleno y aun así el jugador mira la pantalla y no
+sabe qué está pasando: sabe que hay gente andando. Las señales diegéticas de la
+tabla de arriba son **lentas** —el granero tarda una estación en vaciarse— y
+**mudas sobre las personas**: dos vecinos que se odian desde hace diez años se
+cruzan en el campo y no se nota nada.
+
+Se añaden dos elementos, y **sólo dos**:
+
+**1. La tira de la aldea.** Cuatro cifras, arriba, pequeñas y siempre visibles:
+**gente**, **comida** en semanas, **leña** y **ánimo**. Son las cuatro que
+deciden si la aldea vive: la gente es el juego, la comida es la muerte por
+hambre de §5.3, la leña es el invierno de §5.5 y las obras de §7.3, y el ánimo
+mueve la migración de §5.7 y el peso de las encrucijadas de §8.
+
+El grano se enseña **en semanas de comida y no en unidades**, porque la unidad
+es «una persona una semana» y lo que el jugador decide con ella es cuántas
+semanas aguanta: la división ya la hace el juego en vez de pedírsela a él.
+
+**Lo que no entra, y por qué.** *Oro* y *piedra* no existen en la simulación. La
+economía de este valle es grano, leña y brazos; el comercio de §8 es trueque, y
+la piedra de §7.2 no se almacena nunca —se convierte en puntos de obra al
+levantar el muro—. Un contador de monedas sería un número inventado, que §12 y
+`CLAUDE.md` prohíben con esas palabras. Si algún día hay moneda, se decide en el
+motor y llega aquí después. La **fe** tampoco entra en la tira: sigue siendo las
+velas de la capilla, que es donde se lee bien.
+
+**2. La burbuja de estado.** Una nube pequeña sobre la cabeza de quien está
+viviendo algo, con un icono. **Sólo sale de estado con fecha**, nunca de una
+tirada del render (§4.3):
+
+| Burbuja | De dónde sale |
+|---|---|
+| Riña | Un rencor de §6.4 formado hace pocas semanas (`formedTick`) |
+| Duelo | Una muerte reciente de padre, madre o hijo (`diedTick` y `parentIds`) |
+| Nacimiento | Un hijo nacido hace pocas semanas (`bornTick`) |
+| Hambre | `hungerSeverity` por encima de su umbral |
+| Peste | Un brote vivo (§5.8) |
+| Charla | Los encuentros de §11.9, que ya se derivan para mover a la gente |
+
+**El orden importa y es el de arriba**: quien acaba de enterrar a un hijo no
+enseña que tiene hambre. Una persona lleva una burbuja o ninguna.
+
+**Lo que esto no es.** No es un panel de estadísticas ni un árbol de menús. Las
+cifras exactas siguen estando a un toque, la ficha sigue siendo la de §11.2, y
+la pantalla del valle sigue sin tener más controles que la velocidad.
 
 ### 11.2 Pantallas
 
