@@ -46,6 +46,15 @@ export interface ValleyBackend {
  * a value kept from the last time. Anything unrecognised means Canvas, because
  * a typo must not leave someone with a valley they cannot see.
  */
+/**
+ * Los recursos 3D metidos dentro de la pagina, si los hay.
+ *
+ * Lo declara el empaquetador de la demo (`tools/graphics/bundle-game.ts`) con
+ * un `define`. En el juego servido no existe, y entonces los recursos se piden
+ * por la red como siempre.
+ */
+declare const VALLEY_ASSETS: Record<string, string> | undefined;
+
 export function backendFrom(search: string, stored: string | null): BackendKind {
   const asked = new URLSearchParams(search).get('render');
   if (asked === '3d' || asked === 'pilot3d') return 'pilot3d';
@@ -148,7 +157,43 @@ export function attachBackend(
       webgl.style.zIndex = '0';
       canvas.after(webgl);
 
+      // Los recursos pueden venir **dentro de la pagina**.
+      //
+      // El juego los pide por la red desde `/assets/valley3d/`, que es lo
+      // correcto cuando hay servidor. Para la demo que el jugador abre en el
+      // movil no lo hay: la pagina es un fichero suelto, y los GLB viajan
+      // dentro en base64. Si estan, se monta la biblioteca con ellos y el
+      // renderer la toma prestada; si no, todo sigue igual.
+      const { loadAssets } = await import('../render3d/assets');
+      const bytesOf = (base64: string): ArrayBuffer => {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+        return bytes.buffer;
+      };
+      // Se lee por el **nombre a secas** y no como propiedad de `globalThis`:
+      // quien lo sustituye al empaquetar es el `define` de Vite, y ese cambia
+      // identificadores, no accesos a propiedad. Leyendolo del objeto global la
+      // pagina se construia sin un solo recurso dentro y pedia los GLB por una
+      // red que no existe.
+      const embedded: Record<string, string> | undefined = typeof VALLEY_ASSETS === 'undefined'
+        ? undefined
+        : VALLEY_ASSETS;
+      let library: Awaited<ReturnType<typeof loadAssets>> | undefined;
+      if (embedded !== undefined) {
+        const ids = Object.keys(embedded);
+        library = await loadAssets({
+          baseUrl: '',
+          manifest: {
+            schemaVersion: 1,
+            assets: ids.map((id) => ({ id, file: `${id}.glb`, sha256: 'embedded', motion: [] })),
+          },
+          bytes: Object.fromEntries(ids.map((id) => [id, bytesOf(embedded[id] ?? '')])),
+        });
+      }
+
       const renderer = await createGraphicsRenderer({
+        ...(library === undefined ? {} : { library }),
         canvas: webgl,
         assetBaseUrl: options.assetBaseUrl ?? './assets/valley3d/',
         quality: 'standard',
