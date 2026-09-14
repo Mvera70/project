@@ -167,3 +167,24 @@ export function offersNear(
 export function seatKey(place: Place, offer: Offer): string {
   return `${place.id}/${offer.id}`;
 }
+
+/**
+ * Dónde se pone el que ocupa la plaza número `n` de una oferta.
+ *
+ * **Cada plaza tiene su sitio**, y no tenerlo era la causa del apiñamiento que
+ * se veía: una oferta de cuatro plazas tenía un solo punto, así que las cuatro
+ * personas iban exactamente al mismo palmo de suelo y se pasaban el rato
+ * empujándose. Medido antes de esto: 1 478 pasos con velocidad y sin avanzar,
+ * y gente a 0,55 celdas cuando dos radios son 0,64.
+ *
+ * Se reparten en corro alrededor del punto, que además es lo que hace la gente
+ * cuando hay algo que mirar: se ponen en círculo, no en fila india.
+ */
+export function seatAt(offer: Offer, seat: number): Point {
+  if (seat <= 0 || offer.seats <= 1) return offer.at;
+  // El ángulo de oro reparte sin alinear a nadie, y el radio crece despacio
+  // para que un corro de seis no se convierta en una rueda de carro.
+  const angle = seat * 2.39996;
+  const ring = 0.55 + Math.floor(seat / 4) * 0.5;
+  return { x: offer.at.x + Math.sin(angle) * ring, z: offer.at.z + Math.cos(angle) * ring };
+}

@@ -18,7 +18,7 @@ import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
-import { placesOf, seatKey, type Place } from './offers';
+import { placesOf, seatAt, seatKey, type Place } from './offers';
 import { decide, satisfy, RETHINK, type Intent } from './decide';
 import { LIFE_STEP, seedOfDay } from './clock';
 
@@ -165,6 +165,7 @@ export function createVillage(state: GameState, day: number): Village {
 
     step(): void {
       const taken = seats();
+      // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(bodies);
 
       for (const dweller of dwellers) {
@@ -186,10 +187,24 @@ export function createVillage(state: GameState, day: number): Village {
         const tooLong = dweller.doing !== null && steps - dweller.doing.since > GIVE_UP;
         if (steps >= dweller.rethinkAt && (!onTheWay || tooLong)) {
           dweller.rethinkAt = steps + RETHINK;
+          const before = dweller.doing;
           dweller.doing = decide(
-            { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: dweller.doing },
+            { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before },
             mine, taken, land, router, seed, steps,
           );
+          // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
+          // que se veía en pantalla: el aforo se contaba una vez al empezar el
+          // paso, así que los veinte que decidían en ese instante veían el mismo
+          // pozo libre y se iban los veinte. Medido: setenta y cinco veces más
+          // gente de la que cabe yendo al mismo sitio en una sola jornada.
+          if (before !== null) {
+            const old = seatKey(before.place, before.offer);
+            taken.set(old, Math.max(0, (taken.get(old) ?? 1) - 1));
+          }
+          if (dweller.doing !== null) {
+            const now = seatKey(dweller.doing.place, dweller.doing.offer);
+            taken.set(now, (taken.get(now) ?? 0) + 1);
+          }
         }
 
         // 2 · ¿Se acabó lo que estaba haciendo?
@@ -206,8 +221,8 @@ export function createVillage(state: GameState, day: number): Village {
         //     empujón de las paredes impide clavarse en el punto exacto y la
         //     gente se quedaba dando vueltas al lado de donde quería estar.
         if (dweller.doing !== null && !dweller.doing.there) {
-          const spot = dweller.doing.offer.at;
-          if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach) {
+          const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
+          if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
             dweller.doing.there = true;
             dweller.doing.route.length = 0;
           }

@@ -17,7 +17,7 @@ import type { Point, Terrain } from './body';
 import type { Needs } from './needs';
 import { NEED_NAMES } from './needs';
 import type { Offer, Place } from './offers';
-import { seatKey } from './offers';
+import { seatAt, seatKey } from './offers';
 import type { Router, Waypoint } from './navigate';
 
 /** Lo que alguien está haciendo o yendo a hacer. */
@@ -32,6 +32,8 @@ export interface Intent {
   until: number;
   /** Si ya está en el sitio haciendo lo suyo, o todavía yendo. */
   there: boolean;
+  /** Qué plaza ocupa, para no ponerse todos en el mismo palmo de suelo. */
+  readonly seat: number;
 }
 
 /**
@@ -194,7 +196,11 @@ export function decide(
     return who.doing;
   }
 
-  const route = router.to(land, who.at, best.offer.at);
+  // La plaza que queda libre en ese sitio, y con ella el palmo de suelo donde
+  // ponerse: un corro y no un montón.
+  const seat = taken.get(seatKey(best.place, best.offer)) ?? 0;
+  const spot = seatAt(best.offer, seat);
+  const route = router.to(land, who.at, spot);
   if (route === null) return who.doing;
 
   const span = best.offer.seconds;
@@ -203,6 +209,7 @@ export function decide(
     place: best.place,
     offer: best.offer,
     route: [...route],
+    seat,
     since: step,
     until: step + Math.round((span[0] + dice * (span[1] - span[0])) * 30),
     there: false,

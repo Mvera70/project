@@ -54,8 +54,25 @@ export function separate(body: Body, around: Neighbourhood): Push {
     const touching = body.radius + other.radius + ELBOW;
     if (apart >= touching || apart < 1e-6) return;
     const push = (touching - apart) / touching;
-    x += (body.x - other.x) / apart * push * body.pace * 1.8;
-    z += (body.z - other.z) / apart * push * body.pace * 1.8;
+    const awayX = (body.x - other.x) / apart;
+    const awayZ = (body.z - other.z) / apart;
+    x += awayX * push * body.pace * 1.8;
+    z += awayZ * push * body.pace * 1.8;
+
+    // **Y se cede siempre por el mismo lado.**
+    //
+    // Dos que se cruzan de frente se empujan en línea recta el uno contra el
+    // otro: la fuerza es simétrica, ninguno gana y los dos se quedan
+    // forcejeando. Es lo que se veía como quedarse pillados —medido, 691 pasos
+    // con velocidad y sin avanzar en una jornada— y lo que la gente de verdad
+    // resuelve apartándose todos hacia el mismo lado.
+    //
+    // Sólo cuando vienen de frente: a quien va en la misma dirección no hay
+    // que esquivarlo, hay que seguirlo.
+    const closing = body.vx * (other.x - body.x) + body.vz * (other.z - body.z);
+    if (closing <= 0) return;
+    x += -awayZ * push * body.pace * 1.1;
+    z += awayX * push * body.pace * 1.1;
   });
   return { x, z };
 }

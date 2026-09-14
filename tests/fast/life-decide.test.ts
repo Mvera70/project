@@ -160,4 +160,64 @@ describe('V-06 · elegir', () => {
     expect(spent, `una jornada de ${life.dwellers.length} personas cuesta ${spent.toFixed(0)} ms`)
       .toBeLessThan(2500);
   });
+
+  it('nadie se apiña, nadie se pasa del aforo y nadie se queda forcejeando', () => {
+    // **Los tres síntomas que el dueño del diseño vio en pantalla**, cada uno
+    // con su número, para que no vuelvan sin avisar. Lo que dijo fue: «se
+    // quedan pillados, dando vueltas, no se chocan, tienen como un imán entre
+    // ellos». Tenía razón en los tres, y los tres tenían causa:
+    //
+    // - El imán: el aforo se contaba una vez al empezar el paso, así que los
+    //   veinte que decidían a la vez veían el mismo pozo libre.
+    // - El apiñamiento: una oferta de cuatro plazas tenía un solo punto.
+    // - El forcejeo: dos que se cruzan de frente se empujan en línea recta y
+    //   ninguno gana.
+    const life = createVillage(village(7), 0);
+    const people = life.dwellers.length;
+
+    let overCapacity = 0;
+    let jammed = 0;
+    let tightest = Infinity;
+    const was = new Map<number, { x: number; z: number }>();
+
+    for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+      life.step();
+      for (let i = 0; i < people; i += 1) {
+        for (let j = i + 1; j < people; j += 1) {
+          const a = life.dwellers[i]?.body;
+          const b = life.dwellers[j]?.body;
+          if (a === undefined || b === undefined) continue;
+          tightest = Math.min(tightest, Math.hypot(a.x - b.x, a.z - b.z));
+        }
+      }
+      if (n % 30 !== 0) continue;
+
+      const heading = new Map<string, number>();
+      for (const dweller of life.dwellers) {
+        if (dweller.doing === null) continue;
+        const key = `${dweller.doing.place.id}/${dweller.doing.offer.id}`;
+        const count = (heading.get(key) ?? 0) + 1;
+        heading.set(key, count);
+        if (count > dweller.doing.offer.seats) overCapacity += 1;
+      }
+      for (const dweller of life.dwellers) {
+        const before = was.get(dweller.body.id);
+        const speed = Math.hypot(dweller.body.vx, dweller.body.vz);
+        if (before !== undefined && speed > 0.3
+          && Math.hypot(dweller.body.x - before.x, dweller.body.z - before.z) < 0.15) jammed += 1;
+        was.set(dweller.body.id, { x: dweller.body.x, z: dweller.body.z });
+      }
+    }
+
+    expect(overCapacity, `${overCapacity} veces más gente de la que cabe en un sitio`).toBe(0);
+    // Dos radios son 0,64. Medido tras los arreglos: 0,60, o sea que se rozan
+    // sin llegar a meterse. Antes bajaba a 0,55.
+    expect(tightest, `lo más cerca que llegan dos es ${tightest.toFixed(3)}`)
+      .toBeGreaterThan(0.58);
+    // Forcejeos: 369 de 9 600 comprobaciones tras ceder el paso por un lado,
+    // contra 1 003 antes. Alguno es inevitable —una calle estrecha es estrecha—
+    // pero no puede ser la tónica.
+    expect(jammed, `${jammed} forcejeos de ${people * 120} comprobaciones`)
+      .toBeLessThan(people * 120 * 0.08);
+  });
 });
