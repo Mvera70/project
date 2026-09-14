@@ -12,23 +12,75 @@
     <meta name="apple-mobile-web-app-title" content="The Valley" />
     <title>The Valley</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #20201d; overscroll-behavior: none; }
-      body { display: grid; place-items: center; font: 14px/1.4 system-ui, sans-serif; color: #3c3a34; }
-      .valley-app { --valley-void: #b9c9cf; position: relative; display: grid; place-items: start center; width: min(100vw, 390px); height: min(100dvh, 844px); overflow: hidden; background: var(--valley-void); }
+      /* U-01 · La piel. design.md §11.1, §11.1.1, §11.2.
+         El valle sigue siendo el HUD: esto no añade ni un elemento, viste los
+         que §11.1.1 ya autorizó. Pergamino y tinta, que es de lo que está hecha
+         la crónica, en vez de las pastillas blancas de sistema que tenía.
+         Ni una fuente de red: la demo se abre sin servidor detrás, así que todo
+         son pilas del sistema y no `system-ui` a secas, que no es una elección.
+         Y ni una animación sobre el reloj de pared (§11.4): lo único que se
+         mueve aquí responde al dedo. */
+      :root {
+        --ink: #221d18;          /* tinta, no negro: el valle es cálido */
+        --ink-soft: #57493c;
+        --parchment: #f2e9d8;
+        --plate: rgba(242,233,216,.90);
+        --edge: rgba(34,29,24,.16);
+        --gild: #7d5c2e;         /* latón viejo, para el año */
+        --alarm: #9e4a34;        /* el hambre de §5.3 */
+        --void: #b9c9cf;         /* el cielo tras el valle */
+        --voice: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+        --plain: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      html, body { margin: 0; height: 100%; background: var(--ink); overscroll-behavior: none; }
+      body { display: grid; place-items: center; font: 14px/1.45 var(--plain); color: var(--ink); }
+      .valley-app { --valley-void: var(--void); position: relative; display: grid; place-items: start center;
+        width: min(100vw, 390px); height: min(100dvh, 844px); overflow: hidden; background: var(--valley-void); }
       #valley { display: block; margin-top: max(22px, env(safe-area-inset-top)); border: 2px solid transparent; touch-action: none; }
-      .valley-year { position: absolute; top: max(7px, env(safe-area-inset-top)); left: 15px; color: #303029; font: 600 11px/1.2 Georgia, serif; letter-spacing: .12em; }
-      /* §11.1.1 · la tira de la aldea, bajo el año y sobre el valle. */
-      .valley-vitals { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 17px); left: 13px; display: flex; gap: 4px; }
-      .valley-vital { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px 3px 6px; border-radius: 10px; background: rgba(242,244,246,.76); color: #303029; font: 600 11px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; }
-      .valley-vital b { font-weight: 700; }
-      .valley-vital.thin { background: rgba(169,97,70,.86); color: #f8f4ee; }
-      .valley-speeds { position: absolute; right: max(10px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: flex; gap: 6px; }
-      .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 8px; border: 1px solid rgba(48,48,41,.35); border-radius: 50%; background: rgba(242,244,246,.76); color: #303029; font: 600 12px/1 system-ui,sans-serif; }
-      .valley-speeds button[aria-pressed="true"] { background: #303029; color: #f2f4f6; }
-      .valley-panel { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; box-sizing: border-box; max-height: 48%; overflow: auto; padding: 18px 20px max(20px, env(safe-area-inset-bottom)); background: rgba(242,244,246,.96); border-top: 2px solid #3c3a34; }
+
+      /* El año es la identidad del juego, no una etiqueta de depuración. */
+      .valley-year { position: absolute; z-index: 2; top: max(7px, env(safe-area-inset-top)); left: 15px;
+        color: var(--gild); font: 600 15px/1.1 var(--voice); letter-spacing: .2em;
+        text-shadow: 0 1px 0 rgba(242,233,216,.55); }
+
+      /* §11.1.1 · la tira de la aldea. **Una placa, no cuatro insignias**: son
+         cuatro lecturas del mismo instrumento, y separadas se leían como cuatro
+         cosas sin relación. Filetes en medio, y la gente primero porque es el
+         juego. */
+      .valley-vitals { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 22px); left: 13px;
+        display: flex; align-items: stretch; padding: 1px; border: 1px solid var(--edge); border-radius: 7px;
+        background: var(--plate); box-shadow: 0 1px 3px rgba(34,29,24,.18); backdrop-filter: blur(2px); }
+      .valley-vital { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; color: var(--ink);
+        font: 600 11px/1 var(--plain); font-variant-numeric: tabular-nums; }
+      .valley-vital + .valley-vital { border-left: 1px solid var(--edge); }
+      .valley-vital b { font-weight: 700; letter-spacing: .01em; }
+      .valley-vital.thin { color: var(--alarm); }
+      .valley-vital.thin b { font-weight: 800; }
+
+      /* La velocidad, en una sola regleta: son tres posiciones de un mando, no
+         tres botones distintos. Sigue cumpliendo los 44 px de §11.3. */
+      .valley-speeds { position: absolute; z-index: 2; right: max(10px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom)); display: flex; padding: 2px; gap: 2px;
+        border: 1px solid var(--edge); border-radius: 24px; background: var(--plate);
+        box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px); }
+      .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 6px; border: 0; border-radius: 21px;
+        background: transparent; color: var(--ink-soft); font: 650 13px/1 var(--plain);
+        font-variant-numeric: tabular-nums; letter-spacing: .02em; cursor: pointer;
+        -webkit-tap-highlight-color: transparent; }
+      .valley-speeds button:active { background: rgba(34,29,24,.10); }
+      .valley-speeds button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
+      .valley-speeds button:focus-visible, .valley-panel:focus-visible { outline: 2px solid var(--gild); outline-offset: 2px; }
+
+      /* §11.2 · la ficha. Sube del borde de abajo como una hoja, con un filete
+         y no con el trazo de dos píxeles que tenía. */
+      .valley-panel { position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; box-sizing: border-box;
+        max-height: 48%; overflow: auto; padding: 16px 20px max(20px, env(safe-area-inset-bottom));
+        background: var(--parchment); border-top: 1px solid var(--edge);
+        box-shadow: 0 -6px 18px rgba(34,29,24,.22); color: var(--ink); }
       .valley-panel[hidden] { display: none; }
-      .valley-panel h2 { margin: 0 0 8px; text-transform: capitalize; font: 600 20px/1.2 Georgia,serif; }
-      .valley-panel p { margin: 4px 0; }
+      .valley-panel h2 { margin: 0 0 6px; text-transform: capitalize; color: var(--ink);
+        font: 600 21px/1.15 var(--voice); letter-spacing: .01em; text-wrap: balance; }
+      .valley-panel p { margin: 3px 0; color: var(--ink-soft); font: 14px/1.5 var(--plain); }
     </style>
   </head>
   <body>

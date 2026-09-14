@@ -34,12 +34,18 @@ const STYLE_ID = 'valley-notice-style';
 const STYLE = `
 /* Sits clear of the speed controls of §11.2 rather than over them: 44 px of
    button plus its own bottom inset, plus a gap. */
+/* U-01 · la voz de la crónica, vestida como tal: tinta con un filete de latón
+   arriba, y la misma serif con la que está escrito el resto del pasado de la
+   aldea. Sigue siendo corte seco y nada que cerrar (§11.6). */
 .valley-notice { position: absolute; z-index: 4; left: 0; right: 0;
-  bottom: calc(56px + max(12px, env(safe-area-inset-bottom)));
-  box-sizing: border-box; padding: 12px 16px;
-  background: rgba(18,17,14,.9); border-top: 1px solid rgba(242,244,246,.18);
-  border-bottom: 1px solid rgba(242,244,246,.18);
-  color: #f2f4f6; font: 15px/1.35 Georgia, serif; text-wrap: pretty; }
+  bottom: calc(60px + max(12px, env(safe-area-inset-bottom)));
+  box-sizing: border-box; padding: 13px 18px 14px;
+  background: rgba(28,23,19,.93);
+  border-top: 1px solid rgba(125,92,46,.75);
+  border-bottom: 1px solid rgba(242,233,216,.14);
+  box-shadow: 0 4px 14px rgba(20,16,13,.28);
+  color: #f2e9d8; text-wrap: pretty; letter-spacing: .005em;
+  font: 15px/1.42 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; }
 .valley-notice[hidden] { display: none !important; }
 /* §11.2 · la encrucijada ocupa la pantalla entera, y eso incluye no tener una
    banda de crónica asomando entre las opciones. Se vio en una captura: el
