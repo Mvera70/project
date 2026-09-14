@@ -52,12 +52,17 @@ export const NEED_NAMES: readonly NeedName[] = [
  * impulso entre media jornada y tres, que es donde se cruzan.
  */
 const RISE: Readonly<Record<NeedName, number>> = {
-  rest: 1 / 200,
-  thirst: 1 / 150,
-  company: 1 / 90,
-  boredom: 1 / 110,
+  rest: 1 / 150,
+  thirst: 1 / 110,
+  company: 1 / 80,
+  boredom: 1 / 90,
   irritation: 1 / 320,
-  duty: 1 / 60,
+  // **El deber no puede correr más que los demás.** Con 1/60 era el más rápido
+  // de los seis, ganaba siempre la elección y la aldea entera se iba a los
+  // campos: medido, hasta el 34 % trabajando y el resto andando hacia allí,
+  // porque los campos están lejos. Un impulso que siempre gana no es un impulso,
+  // es una orden.
+  duty: 1 / 130,
 };
 
 /**

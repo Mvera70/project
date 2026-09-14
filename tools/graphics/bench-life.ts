@@ -9,8 +9,8 @@ import { readFileSync, readdirSync, writeFileSync, rmSync, existsSync, mkdirSync
 import { resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
-const OUT = resolve(ROOT, 'artifacts', 'graphics', 'V-00');
-const PAGE = resolve(ROOT, 'tools', 'graphics', 'bench-life.html');
+const OUT = resolve(ROOT, 'artifacts', 'graphics', process.argv[2] === 'village' ? 'V-06' : 'V-00');
+const PAGE = resolve(ROOT, 'tools', 'graphics', process.argv[2] === 'village' ? 'bench-village.html' : 'bench-life.html');
 
 mkdirSync(OUT, { recursive: true });
 
@@ -36,7 +36,8 @@ await build({
 // Vite deja el HTML pidiendo su javascript por la red; aquí se mete dentro para
 // que la página viaje sola. Se corta y se pega a mano en vez de `replace`: el
 // código minificado lleva secuencias como `$&` que `replace` interpretaría.
-let page = readFileSync(resolve(OUT, 'bench-life.html'), 'utf8');
+const NAME = process.argv[2] === 'village' ? 'bench-village.html' : 'bench-life.html';
+let page = readFileSync(resolve(OUT, NAME), 'utf8');
 const assets = resolve(OUT, 'assets');
 
 if (existsSync(assets)) {
@@ -53,7 +54,7 @@ if (existsSync(assets)) {
   rmSync(assets, { recursive: true, force: true });
 }
 
-const target = resolve(OUT, 'life.html');
+const target = resolve(OUT, process.argv[2] === 'village' ? 'village.html' : 'life.html');
 writeFileSync(target, page);
-rmSync(resolve(OUT, 'bench-life.html'), { force: true });
+rmSync(resolve(OUT, NAME), { force: true });
 process.stdout.write(`${(page.length / 1024).toFixed(0)} kB · ${target}\n`);

@@ -17,7 +17,7 @@
 
 import type { GameState } from '@engine/state';
 import type { Point, Terrain } from './body';
-import { blockedAt } from './body';
+import { blockedAt, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
 
 /** Algo que se puede hacer, y dónde. */
@@ -93,12 +93,18 @@ export interface Place {
  * entiende, y sólo si no hay puerta libre se recurre al medio.
  */
 function doorOf(land: Terrain, x: number, z: number, w: number, h: number): Point | null {
+  // **A la distancia a la que un cuerpo puede estar de verdad**, y ése fue el
+  // fallo de la primera versión: la oferta se ponía a 0,6 celdas de la fachada
+  // y `avoid` mantiene a la gente a `radius + WALL_CLEAR` = 0,94. El punto era
+  // inalcanzable, así que nadie llegaba nunca y la aldea se pasaba entre el
+  // 72 % y el 92 % de la jornada andando. Un sitio al que no se puede llegar no
+  // es un sitio.
+  const STAND = 0.32 + WALL_CLEAR + 0.25;
   const tries: Point[] = [
-    { x: x + w / 2, z: z + h + 0.6 },
-    { x: x - 0.6, z: z + h / 2 },
-    { x: x + w + 0.6, z: z + h / 2 },
-    { x: x + w / 2, z: z - 0.6 },
-    { x: x + w / 2, z: z + h / 2 },
+    { x: x + w / 2, z: z + h + STAND },
+    { x: x - STAND, z: z + h / 2 },
+    { x: x + w + STAND, z: z + h / 2 },
+    { x: x + w / 2, z: z - STAND },
   ];
   for (const at of tries) {
     if (at.x <= 0.5 || at.z <= 0.5) continue;
