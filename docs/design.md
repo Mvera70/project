@@ -28,6 +28,12 @@ revierta dentro de seis meses creyendo que arregla algo.
 
 | Versión | Fecha | Origen | Qué cambió |
 |---|---|---|---|
+| **3.64** | 14 sep 2026 | Anexo E, documentación | **El plan de la vida del valle pasa al documento.** Vivía en una página publicada fuera del repositorio y un agente que llegara al código no podía encontrarlo. Anexo E: diagnóstico (el valle no se simula, se dibuja), tres capas, seis innegociables, el mecanismo de ofertas e impulsos, lo hecho con sus medidas (V-00 a V-06, V-14), **por qué la demo en el juego es hoy peor que el descarte** (E.6: faltan V-07 y V-09, que son lo que se ve; se enseñó lo vistoso y se construyó lo invisible), las trampas ya pagadas (E.7) y los briefs de V-07 a V-16 en el formato de §17. Informes en `docs/life-rounds/`. |
+| **3.63** | 14 sep 2026 | V-14, el cuenco | **Hay sierra alrededor del valle y vive fuera del mapa.** Levantar el borde del propio mapa se midió antes de escribirlo: en las dos celdas del contorno viven el 32 % del bosque, trece edificios y el cauce por donde el río entra y sale. Así que el cuenco empieza donde el mapa acaba y el motor no sabe que existe. La cámara gana dos cajas —reposa en la aldea, alcanza la sierra—, porque con una sola tenía prohibido llegar a verla. Detalle en D.6.8. |
+| **3.62** | 14 sep 2026 | G-11, dos reglas a medias | **En casa es dentro de casa, y de noche el sol está puesto.** `progressOf` marcaba `home` y se dibujaba en el umbral: los veinte vecinos pasaban la noche de pie en su puerta. Ahora quien está en casa no se pinta, como los animales al recogerse (§10.6), y la aldea se vacía a tirones. Y `NIGHT_FLOOR` era el suelo de las dos luces, así que el sol seguía al 38 % de noche proyectando sombras de árboles a medianoche; ahora se pone del todo y el hemisférico sostiene la noche, con el día exactamente igual que antes. |
+| **3.61** | 14 sep 2026 | Motor, el carácter | **Todos los aldeanos nacen con carácter, y cuatro rasgos dejan de ser etiquetas.** Los rasgos se repartían al nombrar, así que la personalidad la fabricaba el cargo; ahora se nace con ellos (flujo `minds`) y el oficio va a quien encaja (`suitsRole`). `ambitious`, `craven`, `cunning` y `secretive` no cambiaban ningún resultado fuera del catálogo; deciden quién se va, quién aguanta el hambre, a quién le sienta mal el puesto de otro y quién no se ata. Medido: rencores en ocho de diez partidas donde antes no había ninguno. Balance: 12 pruebas rojas contra 10 — la extinción prudente entra por fin en banda (1,7 % → 6,67 %), la distancia entre políticas cae a 5 puntos y `smith_feud` se triplica. Es la contradicción de `findings-drama.md` §4, medida. |
+| **3.60** | 14 sep 2026 | Motor, §7.9 | **La convivencia deja de acercar siempre.** `workedTogether` era la única fuerza continua sobre las opiniones y era incondicionalmente positiva: el valle derivaba hacia la concordia y el −50 de `GRUDGE_AT` era inalcanzable, así que §6.4 y M-39 eran código que no se ejecutaba. Ahora se agria por carácter (dos ásperos se desgastan; uno amable lo desactiva) y por hambre. El roce va sobre todos los nombrados, no sobre la cuadrilla: contra una fuerza que actúa siempre hay que poner otra que actúe siempre. `NEIGHBOUR.FRICTION`, `HARSH`, `GENTLE`, `SOURS`, `FLOOR`. |
+| **3.59** | 14 sep 2026 | G-11, el estado de la jornada | **Un solo sitio sostiene el estado que se pinta.** Dentro de una jornada escénica pasan ocho semanas a ×1 y sesenta y cuatro a ×64, y cada sistema del render se defendía por su cuenta congelando lo suyo; un sistema nuevo nacía con el teletransporte dentro sin que nada se quejara. Ahora `paint` releva el estado al anochecer y reparte ése (`scenic-state.ts`); el defecto se invierte: hay que pedir lo vivo. No arregla el desfase, sólo que ya no se ve; afinar el tick tampoco lo arreglaría (56 pasos por jornada en vez de 8), porque nace de D.6.1. Coste de afinarlo, medido, en `docs/brief-reloj.md`. Detalle en D.6.7. |
 | **3.58** | 13 sep 2026 | G-10, el suelo cuadriculado | **El valle estaba dibujado con un cuadrado de color plano por celda** y con elementos en tres dimensiones encima se leía como papel milimetrado. Las esquinas de la cuadrícula se mueven de sitio, cada esquina lleva algo del color de las celdas que la tocan, y el tono varía en dos escalas: una fina y otra lenta cada seis celdas. Ni el mapa ni el terreno cambian —esto es cómo se pinta, no qué hay—, y la malla sigue cerrada porque el desplazamiento sale de la esquina y no de la celda. Detalle en D.6.6. |
 | **3.57** | 13 sep 2026 | G-10, la aldea no tenía calles | **Entre dos edificios con paredes queda ahora una celda de calle** (`BUILDING_RULES.STREET_GAP`, §7.2). Hasta aquí el motor pegaba las casas unas a otras —seis seguidas sin un hueco en la partida medida— y eso no era una fealdad: la puerta de la de en medio daba a la pared de la de al lado, y nadie podía entrar en su casa sin cruzar la del vecino. Los campos, la empalizada, el pozo y el camposanto están exentos: no tienen dentro, se pisan. Lo que esto mueve: la aldea ocupa más suelo y el reparto de destinos baja de 7,50 a 6,67 de media en seis partidas de veinte años —el mismo reparto en un pueblo más ancho—, y ni las decisiones ni la población cambian en cinco partidas de cuarenta años. **Y destapó dos teletransportes que llevaban tiempo escondidos**, los dos por lo mismo de siempre: algo que cambia con el tick, leído dentro de una jornada escénica que dura muchos ticks. (1) Al que perdía el tajo a media semana se le borraba la ruta y se le acababa el día de golpe en la puerta de su casa: siete celdas y media de salto. Ahora sólo se olvida a quien ya no está. (2) La gallina cuelga de la casa que le toca por su puesto en la fila, y una casa nueva cambiaba el reparto entero: dos celdas. La fila se congela al anochecer, como la cabaña. |
 | **3.56** | 13 sep 2026 | G-10, los edificios estaban dos celdas al norte | **Todo lo construido se dibujaba desplazado el fondo de su huella.** El exportador de Blender convierte poniendo `z_glTF = −y_blender`, así que una receta que ocupa de 0 a 6 metros en Y sale ocupando de −6 a 0 en Z: el modelo se plantaba con su fondo en el origen. Llevaba así desde G-06 y no se veía porque el pueblo entero estaba desplazado igual; lo delató la gente, que sí sale de las coordenadas del motor. Era la causa de tres defectos que se estaban persiguiendo por separado: las ventanas encendidas donde no hay ventana, los aldeanos trabajando fuera del campo y los juncos creciendo debajo de lo construido. |
@@ -3120,6 +3126,7 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 |---|---|---|
 | Título | **The Valley** | El contenido va en inglés; el título acompaña |
 | Evolución gráfica | Piloto 3D estilizado con cámara ortográfica; Anexo D | Validar belleza, animación, legibilidad y coste móvil antes de reemplazar Canvas; conservar motor y guardados |
+| Vida del valle | Una capa de agentes deterministas y efímera entre motor y render; Anexo E | El render dibujaba una fórmula del tiempo y por eso nadie podía chocar, perseguir ni encontrarse; una capa que simula cuerpos con paso fijo lo da, sin escribir en el motor ni romper partidas |
 | Producción de arte | Fuentes reproducibles, Blender por scripts y revisión en el navegador | Permitir iteración y revisión remotas sin depender de operaciones manuales en el escritorio |
 | Idioma del contenido | Inglés (crónica, UI, nombres, topónimos) | Decisión de producto |
 | Idioma del código | Inglés (identificadores, ficheros, comentarios) | Convención estándar; evita mezclas |
@@ -9010,6 +9017,647 @@ y sus pruebas. No se declara completado ningún trabajo pendiente anterior.
 La base incorporaba revisiones hasta v2.88; se conserva íntegra y se añade este
 anexo. El sello temporal usa la fecha observada del entorno, aunque el historial
 anterior tenga fechas posteriores.
+
+## Anexo E · La vida del valle: cuerpos, impulsos y elección
+
+### E.0 Autoridad, estado y lectura
+
+Este anexo es normativo para todo lo que vive en `src/render3d/life/`. Nace de
+una queja del dueño del diseño que el Anexo D no podía resolver: *«el pueblo no
+se siente vivo»*. Se ratificó con un descarte medido (V-00) y se está
+construyendo por fases. **Estado al escribirlo: V-00 a V-06 hechas y V-14 hecha;
+V-07 a V-13, V-15 y V-16 pendientes.** El juego no usa nada de esto salvo detrás
+de la bandera `valley.life`; la demo publicable la enciende.
+
+**Lectura obligatoria antes de tocar la capa:** E.1 (el diagnóstico, para no
+volver a construir lo que se retira), E.3 (los innegociables, que son seis y
+cortos), E.6 (por qué lo que hay en el juego hoy es peor que el descarte, que es
+lo primero que un agente nuevo va a ver) y E.7 (las trampas ya pagadas, para no
+pagarlas dos veces). Después, el brief de la fase que se despacha en E.8.
+
+Los informes de ronda están en `docs/life-rounds/V-XX.md` y **no son fuente
+normativa**: cuentan qué pasó y qué se midió. Lo que manda es este anexo.
+
+### E.1 Diagnóstico: el valle no se simula, se dibuja
+
+`src/render3d/actors/index.ts` —1 328 líneas, 32 funciones— es una función pura
+que responde a una pregunta: *«¿dónde estaría esta persona en este instante?»*.
+Nadie anda. Es animación paramétrica, una curva que se evalúa en el segundo 37,
+y no una simulación.
+
+Se ve en los nombres de sus ayudantes: `lane`, `laneWidth`, `elbowRoom`,
+`leash`, `skirt`, `unwind`, `pullString`, `aroundWalls`, `detour`,
+`trimIndoors`, `clearBetween`. **Todo eso emula lo que un cuerpo con posición y
+velocidad hace solo.** `lane` existe para que dos no se solapen, porque no
+pueden chocar. `detour` rodea una pared, porque no hay colisión. `leash` ata a
+alguien a su puesto, porque no tiene voluntad.
+
+Y de ahí sale la lista de defectos de G-05 a G-11. Los teletransportes de
+aldeanos, de animales, de puertas, de rutas, el brinco de `ashore`: **no son
+doce fallos, son uno, doce veces**. Cuando la posición es `f(tick, fase)` y el
+tick cambia a media jornada, la fórmula da otro resultado y el cuerpo aparece en
+otro sitio. El estado de la jornada (D.6.7) tapa el síntoma; no toca la causa.
+
+Lo que el dueño del diseño pide —que se choquen, que uno persiga a otro, que
+se encuentren y hablen, que uno tire una pelota, que acaricien a un perro—
+**no es difícil con esa arquitectura: es imposible**, caso por caso:
+
+| Lo que se quiere | Por qué no puede ser con `actorsFor` |
+|---|---|
+| Que se choquen | No hay dos cuerpos: hay dos evaluaciones independientes de una fórmula |
+| Que uno persiga a otro | El destino se fija al amanecer y no cambia en toda la jornada |
+| Que se encuentren y hablen | Los encuentros se precalculan al amanecer; no ocurren, se recitan |
+| Tirar una pelota | Sólo existen las entidades que el motor conoce; una pelota no está en `GameState` |
+| Acariciar un perro | Gente y animales se calculan en sistemas separados que no se ven |
+| Caos, sorpresa, cada aldea otra | Una función determinista del reloj da siempre la misma coreografía |
+
+Y encima hay un muro: el render no puede escribir en `GameState` (§4.3). Así que
+con dos capas, cualquier cosa que pase entre dos personas tendría que existir
+en el motor, y el motor avanza una semana por tick. Lo que se quiere pasa en
+segundos.
+
+### E.2 Las tres capas
+
+Hay dos capas donde debería haber tres. La que falta es la del medio, y es la
+que se ve.
+
+| Capa | Ritmo | ¿Se guarda? | Manda sobre | Estado |
+|---|---|---|---|---|
+| **1 · El motor** (`src/engine/`) | 1 tick = 1 semana | Sí, es la partida | Quién nace, quién muere, cuánto grano | Existe y no se toca |
+| **2 · La vida** (`src/render3d/life/`) | paso fijo de 1/30 s escénico | **No.** Se reconstruye | Dónde está cada cuerpo y qué hace ahora | En construcción |
+| **3 · El render** (`src/render3d/`) | por fotograma | No | Pintar lo que la capa 2 dice | Existe; hoy hace además el trabajo de la 2 |
+
+La clave que lo hace viable: **la capa 2 no escribe en `GameState`**. Tiene
+estado propio, efímero, que no viaja en el fichero de guardado. Corre a paso
+fijo desde un estado congelado (el de la jornada, D.6.7) con una semilla
+derivada del día, así que es reproducible sin guardarse. Perderla no pierde
+nada: se vuelve a vivir el día, y vivir un día entero de ochenta personas
+cuesta **8 ms** medidos.
+
+Lo que esto cuesta y hay que aceptar por escrito: **el caos que se ve no tiene
+consecuencias mecánicas**. Dos que se empujan en la plaza no cambian sus
+opiniones. Las consecuencias siguen viniendo del motor —riñas de §7.9, rencores
+de §6.4— y la vida las escenifica (V-11), añadiendo encima textura que no
+cuenta. Es a propósito: el día que la vida escriba en el motor, la partida deja
+de reproducirse desde su semilla, porque dependería de cuánto tiempo real
+estuvo abierta la pestaña. Si algún día se quiere cruzar esa línea, se diseña
+aparte y con su ronda de balance.
+
+### E.3 Innegociables de la capa
+
+Seis reglas. Romper cualquiera convierte el refactor en una deuda peor que la
+que sustituye.
+
+1. **La vida nunca escribe en `GameState`.** Ni una propiedad. Lo que necesita
+   del motor lo lee del estado de la jornada.
+2. **La vida nunca consume el azar del motor.** Flujo propio, sembrado con
+   `seedOfDay(seed, día)` = `hash32(seed, "life:" + día)`. Todo azar de la
+   capa sale de ahí por funciones puras. Tener la pestaña abierta más rato no
+   desplaza una sola tirada de la simulación.
+3. **Paso fijo, siempre.** `LIFE_STEP = 1/30` s escénico. Nada depende de
+   cuántos fotogramas por segundo dé el móvil. Acumulador con tope de 240 pasos
+   por fotograma y **sin arrastre**: lo que un fotograma atragantado no pudo
+   simular se tira, porque una deuda impagable crece sola y deja el valle a
+   cámara lenta para siempre.
+4. **Reconstruible.** Perder el estado no puede perder nada: se vuelve a vivir
+   la jornada desde su amanecer (`rebuildTo`). Es la cura del letargo.
+5. **Determinista dentro de la jornada.** Mismo estado congelado + mismo día +
+   mismo número de pasos = misma aldea, cuerpo a cuerpo. Hay prueba.
+6. **Se apaga entera.** La bandera `valley.life` en `localStorage` devuelve el
+   render al camino de hoy. Existe hasta V-12. Mientras exista, el refactor es
+   reversible en una línea.
+
+Y una séptima que no es de la capa sino del método, aprendida a golpes en E.6:
+**no se ajusta una constante a ciegas más de dos veces seguidas.** Si a la
+tercera no cuadra, es el modelo y no el número, y se para a mirar.
+
+### E.4 El mecanismo: el mundo ofrece, el agente elige
+
+De la combinación de cuatro entidades y un mecanismo sale el caos sin escribir
+un guion.
+
+**Entidades:**
+
+- **Cuerpo** (`body.ts`): posición, velocidad, radio, orientación. Colisiona.
+  Lo tienen personas y animales por igual.
+- **Agente** (`village.ts`, `Dweller`): un cuerpo con impulsos, carácter e
+  intención. Elige.
+- **Trasto** (V-09, pendiente): pelota, cubo, jarra, leña. Se coge, se suelta,
+  rueda. No decide nada.
+- **Sitio** (`offers.ts`, `Place`): el pozo, la fragua, la era, la capilla.
+  Fijo, con aforo, y *ofrece cosas que hacer*.
+
+**El mecanismo.** Cada sitio, trasto o persona ofrece acciones a quien pase
+cerca (`Offer`: qué, dónde, cuánto cabe, qué calma, cuánto dura). Cada agente
+lleva seis impulsos que suben solos y bajan al satisfacerse (`Needs`: cansancio,
+sed, compañía, aburrimiento, irritación, deber). La elección (`decide.ts`) es
+por **utilidad, no por árbol**:
+
+```
+score = Σ needs[k] · offer.gives[k]   ×   biasOf(traits, offer)   ×   falloff(distancia)   ×   (0,85 + dado · 0,3)
+```
+
+Un árbol diría «si tiene sed, al pozo», y entonces todo el que tenga sed va al
+pozo siempre. Con utilidad, el sediento que además está agotado y tiene el pozo
+a veinte pasos se sienta, y eso no lo ha escrito nadie.
+
+**Por qué esto da caos:** la misma persona con el mismo carácter hace cosas
+distintas según cómo lleve el día, quién pase cerca y qué haya a mano. Dos
+aldeas con la misma semilla divergen en cuanto un cuerpo se aparta un palmo. Y
+añadir una `Offer` nueva añade comportamiento a **todo el mundo** sin tocar a
+nadie: «lavar en el río» es una entrada en una tabla, no una rama en un árbol.
+
+**La regla que sostiene esto, con prueba que la vigila:** ninguna oferta
+conoce a ningún agente concreto. En cuanto una diga «si pasa Aelric, entonces…»
+esto deja de ser un mundo con cosas y es un guion con disfraz. La prueba mira la
+forma del catálogo —una oferta es qué, dónde, cuánto cabe y qué calma— y salta
+si alguna gana un campo que nombre a una persona, un oficio o una decisión.
+
+**Dónde entra el carácter, y son dos sitios distintos:**
+
+1. En la *velocidad* a la que suben los impulsos (`needs.ts`, tabla `TEMPER`):
+   un `hot_tempered` acumula irritación tres veces más rápido, un `secretive`
+   echa de menos a la gente a un tercio de lo normal.
+2. En la *inclinación* hacia una acción (`decide.ts`, tabla `LEANING`): un
+   `devout` va a rezar aunque no le apriete nada; un `secretive` esquiva el
+   corro.
+
+Un rasgo que no aparece en esas tablas no cambia la vida, y eso está bien: los
+rasgos ya deciden otras cosas en el motor (§6.3). Los rasgos vienen del motor y
+todo el mundo los tiene desde v3.61.
+
+### E.5 Lo construido, con sus medidas
+
+Cada fase cerrada tiene su informe en `docs/life-rounds/`. Aquí, lo que
+entregó y el número que lo prueba.
+
+| Fase | Ficheros | Lo que entregó | Medido |
+|---|---|---|---|
+| **V-00** | `life/spike/*` | El descarte: ocho cuerpos, charlas, empujones, palos, pelota, en un prado; luego el mismo `step` sobre el valle real con 80 y 200 | 80 cuerpos: 236 µs por paso, 0 en muros, paso máx 0,109. Jornada reconstruida en 8 ms. Aldeas de paz (0 empujones) y de bronca (7–8) según quién vive |
+| **V-01** | `life/clock.ts` | Paso fijo con acumulador, semilla por jornada, `rebuildTo` | 300 pasos por 10 s tanto a 60 Hz como a sorbos desiguales. `NaN` no envenena el acumulador |
+| **V-02** | `life/body.ts`, `grid.ts`, `steering.ts` | Cuerpos con radio, separación, evitación de muros, resolución de solapes con tope, **rejilla espacial** | Coste por cuerpo plano con la multitud: 1,5 µs con 80, 2,1 µs con 200 (el descarte, n², daba 6,9). Nadie en un muro en 6 valles |
+| **V-03** | `life/navigate.ts`, `terrain.ts` | A* propio sobre la máscara (8 direcciones, sin cortar esquinas, coste entero), recorte por línea de vista, caché por par de celdas, `reachableFrom` | 80 personas, jornada entera, >200 viajes completados, 0 en muros |
+| **V-04** | `life/needs.ts` | Seis impulsos, velocidad por carácter, remedio por acción, el hambre agria | Dos caracteres distintos acaban el día distintos; ninguno se sale de 0..1 en seis jornadas |
+| **V-05** | `life/offers.ts` | Catálogo de ofertas, sitios sacados de los edificios, aforo, **cada plaza con su sitio** | Todo edificio del catálogo ofrece algo; ninguna oferta en pared ni fuera del mapa |
+| **V-06** | `life/decide.ts`, `village.ts`, `cast.ts` | Utilidad, inercia, reserva de plaza al decidir, la aldea entera ensamblada, el puente a `Cast` | Misma jornada = misma aldea cuerpo a cuerpo; dos jornadas ≠. Aforo: 0 excesos. Forcejeos 1 003 → 369 |
+| **V-14** | `world/ridge.ts` | El cuenco, fuera del mapa | 0 celdas del valle tocadas; 32 % del bosque vive en el borde y habría desaparecido |
+
+El total en producción son **1 873 líneas** en once ficheros, con 60 pruebas
+propias que corren en la suite rápida. El descarte son otras 1 715 en
+`life/spike/`, que **V-12 borra** cuando V-07 y V-09 hayan portado de él lo que
+falta.
+
+### E.6 Por qué la demo en el juego es peor que el descarte
+
+Lo primero que va a ver quien coja esto es que la aldea viva dentro del juego
+parece rota al lado del descarte de V-00, y el dueño del diseño lo dijo así:
+*«no tiene nada que ver; se quedan pillados, dando vueltas, no se chocan,
+tienen como un imán entre ellos; no interactúan con los objetos»*. Tres de esas
+cosas eran fallos con causa y están arregladas (E.7). La cuarta no es un fallo:
+**es que faltan las fases.**
+
+El descarte tiene *todo* en un fichero: cuerpos, charlas, empujones, palos,
+pelota, coger, tirar, golpear. Se construyó para responder «¿se ve vivo?», y
+respondió que sí. Luego se rehízo en serio, fase a fase: reloj, cuerpos,
+navegación, impulsos, ofertas, elección. Eso es la fontanería. **Ninguna de las
+cosas que hacían que el descarte pareciera vivo —las escenas y los trastos—
+está en producción todavía**: son V-07 y V-09. Así que en el juego la gente
+sólo puede andar de una puerta a otra y quedarse de pie, y eso, comparado con
+gente que se para a hablar, se empuja y se pasa una pelota, es menos. Es
+exactamente lo que se ve.
+
+El error fue de método y conviene nombrarlo para no repetirlo: **se enseñó lo
+vistoso, se construyó lo invisible, y se presentó como progreso.** Seis fases
+sin volver a enseñar nada, y la primera demo tras ellas es una regresión desde
+el asiento del que mira. La regla que sale de aquí: **cada fase que cambie lo
+que se ve se enseña antes de cerrar la siguiente**, y una fase de fontanería no
+se presenta sola.
+
+Lo que además sigue abierto y no está resuelto:
+
+**El reparto entre andar y hacer.** Medido a lo largo de una jornada de ochenta
+personas, entre el 74 % y el 81 % del tiempo la gente está en tránsito. Se han
+probado cuatro ajustes —no replantearse de camino, ofertas a distancia
+alcanzable, el deber sin ganar siempre, radio de búsqueda de doce a cinco— y
+ninguno lo ha bajado del 74 %. Por la regla séptima de E.3, eso quiere decir
+que no es el número: **es el modelo**. La hipótesis que hay que comprobar
+mirando, no midiendo: el descarte parecía vivo porque la gente iba de un sitio
+a otro *y se la interrumpía* —una charla, un empujón, una pelota que pasa—, y
+el tránsito con interrupciones se lee como vida. El tránsito sin
+interrupciones se lee como hormigas. Si es así, no hay que bajar el andar: hay
+que hacer V-07 y V-09, y volver a mirar. Si tras ellas sigue leyéndose como
+hormigas, entonces sí es el reparto, y se retoca con el dueño del diseño
+delante y no a ciegas.
+
+**«No se desplazan como en la demo».** Sin poder verlo no se ha podido
+confirmar si es percepción —la gente de producción anda a paso más corto y
+para más— o un fallo del puente `cast.ts` en cómo alimenta el clip de andar.
+Quien coja V-07 lo comprueba primero: que un `Dweller` andando en línea recta
+produzca un `Actor` cuyo `travelled` crezca de forma continua y cuyo `clip` sea
+`walk`. Hay prueba en `graphics-actors.test.ts` de que el clip no patina para
+`actorsFor`; hace falta la misma para `castOf`.
+
+### E.7 Trampas ya pagadas
+
+Cada una costó entre una vuelta y una tarde, y **todas se encontraron
+midiendo, ninguna leyendo el código**. Están aquí para que no se paguen dos
+veces. Cuando un agente crea que está viendo un fallo nuevo, que mire primero
+si es uno de éstos.
+
+**Del terreno y la navegación**
+
+- **El río parte el valle y eso es el valle.** `ford()` no es un puente:
+  devuelve tierra junto al agua. El `stepCost` del motor da `null` para agua.
+  Ninguna celda de agua lleva camino en ninguna semilla. Sólo el **37 %** del
+  suelo libre está conectado con el centro. Lo que hace falta no es abrir el
+  agua —se probó y fue peor— sino `reachableFrom` y no mandar a nadie a la
+  otra orilla. Quien piense «falta el vado» está a punto de perder una tarde.
+- **El A\* del motor no sirve para la gente.** Navega el terreno para §7.6 y no
+  sabe que hay edificios. La capa tiene el suyo sobre la máscara. Lo único que
+  se le copia es que todo coste es entero.
+- **La máscara del terreno vive en un sitio.** `terrainOf(state)` en
+  `terrain.ts`. Se copió tres veces en pruebas antes de tener casa y cada copia
+  perdía un detalle. No se vuelve a copiar.
+- **Una diagonal no corta una esquina.** Sin la comprobación de las dos celdas
+  adyacentes, la ruta pasa por el vértice donde se tocan dos paredes y en
+  pantalla se lee como atravesar la casa.
+
+**De los cuerpos**
+
+- **La rejilla se rehace dentro de `resolve`**, no se hereda del principio del
+  paso: entre medias los cuerpos se han movido y una rejilla caducada esconde a
+  los vecinos que acaban de acercarse. Medido: dos cuerpos a 0,295 celdas con
+  radios de 0,32.
+- **La corrección de solapes lleva tope** (`FIX_CAP = 0,06`). Sin él, en una
+  plaza llena un cuerpo recibe empujón de cinco vecinos en la misma pasada y se
+  va de golpe: 0,26 celdas por paso con ochenta, 1,06 con doscientos. Es el
+  teletransporte de siempre por la puerta de atrás, y sólo aparece con
+  multitud. Lo que no cabe corregir hoy se corrige mañana.
+- **Quien trastabilla también choca.** El primer empujón integraba velocidad
+  sin mirar paredes y metía al empujado dentro de una casa.
+- **Separar no puede meter a nadie en una pared.** Quien no tiene sitio se
+  queda y el otro carga con todo el apartarse.
+- **Se cede el paso por un lado, y sólo a quien viene de frente.** Dos que se
+  cruzan se empujan en línea recta, la fuerza es simétrica y ninguno gana. Con
+  un componente lateral al que viene de frente (producto escalar de la
+  velocidad con la separación > 0), forcejeos de 1 003 a 369 en una jornada.
+- **El margen de pared es 0,62** (`WALL_CLEAR`). Con 0,45 se pegaban tanto que
+  acababan cruzando la esquina de una casa.
+
+**De las ofertas y la elección**
+
+- **Las ofertas se ponen donde un cuerpo puede estar.** A 0,6 de la fachada
+  eran inalcanzables porque `avoid` mantiene a la gente a `radio + 0,62`.
+  Nadie llegaba nunca. Ahora a `0,32 + WALL_CLEAR + 0,25`.
+- **Se llega al alcance (`reach`), no al punto.** En sitios apretados entre
+  casas el punto exacto no se puede pisar.
+- **La plaza se reserva al decidir, no al llegar.** El aforo se contaba una vez
+  al empezar el paso, así que los veinte que decidían en ese instante veían el
+  mismo pozo libre y se iban los veinte. Es *el imán*. Setenta y cinco excesos
+  de aforo por jornada, ahora cero.
+- **Cada plaza tiene su sitio** (`seatAt`, en corro con el ángulo de oro). Una
+  oferta de cuatro plazas con un solo punto es cuatro personas empujándose en
+  el mismo palmo de suelo.
+- **No se replantea uno la vida de camino.** Con `RETHINK = 45` pasos, la gente
+  cambiaba de destino antes de llegar. Se replantea al llegar, al terminar, o
+  si el viaje se ha hecho eterno (`GIVE_UP = 600`).
+- **El deber no puede correr más que los demás.** Con `duty` a 1/60 era el
+  impulso más rápido, ganaba siempre, y la aldea entera se iba a los campos. Un
+  impulso que siempre gana es una orden.
+- **Todos en la misma orilla.** El corazón del valle es el sitio con más
+  vecinos a mano, no el primero de la lista, y sólo cuentan los sitios de esa
+  orilla. Alguien dejado en la otra anda para siempre sin llegar.
+
+**Del reloj**
+
+- **`Math.max(0, NaN)` es `NaN`.** Un delta inválido envenenaba el acumulador y
+  el reloj se quedaba parado para siempre. Se descarta antes de sumar. La
+  prueba comprueba que el reloj sigue vivo *después* del dato malo, que es lo
+  que ninguna prueba miraba.
+- **El estado de la jornada se releva una vez, al anochecer.** La primera
+  versión relevaba también al cambiar el número de día, que ocurre al amanecer
+  a la vista de todos. Y **congela el mapa**: el motor tala y desgasta caminos
+  escribiendo en los mismos arrays.
+
+**Del método**
+
+- **Un umbral sobre una muestra es ruido.** `CLAUDE.md` lo dice para las
+  semillas y vale igual para el tiempo: una prueba que mire una ventana de
+  veinte semanas o un solo rebaño acusa al motor de lo que es suerte del
+  escenario. Seis pruebas cayeron a la vez por esto en v3.61 y ninguna por un
+  fallo del código.
+- **Medir antes de tocar.** Cuatro diagnósticos equivocados seguidos en V-03
+  («se atascan», «falta el vado», «es congestión», «es el radio de búsqueda»)
+  y los cuatro se habrían evitado con la sonda que se acabó escribiendo al
+  final. Se escribe la sonda primero.
+- **Un fotograma atragantado tira, no arrastra.** Ver E.3.3.
+
+### E.8 Briefs por módulo
+
+Los ficheros indicados son el alcance autorizado. Todos entregan informe en
+`docs/life-rounds/V-XX.md` con lo medido, y **todos los que cambien lo que se
+ve entregan además la demo publicada** antes de cerrar (regla de E.6). Cada
+brief lista lo que existe para reutilizar y lo que no se debe reinventar.
+
+Convenciones comunes a todos: código en `src/render3d/life/`, pruebas en
+`tests/fast/life-*.test.ts`, constantes de la capa en el propio módulo con
+`// TUNE:` (no en `engine/balance.ts`: esto es presentación y no toca una cifra
+de la simulación, igual que `SCENIC_DAY_SECONDS` vive en
+`presentation-clock.ts`). El motor no se toca en ninguna fase; si hace falta
+algo de él, se lee.
+
+---
+
+#### V-07 · Escenas de dos
+
+**Objetivo.** Que dos personas que se cruzan puedan pararse a hablar,
+encararse, empujarse o pelear, con papeles distintos para cada una. Es el
+corazón del encargo y **lo que hace que el tránsito se lea como vida y no como
+hormigas** (E.6).
+**Depende de.** V-06. **Lectura:** E.4, E.6, E.7 y `life/spike/life.ts` entero,
+que ya tiene esto funcionando y medido.
+**Ficheros.** Nuevo `life/scenes.ts`; toca `life/village.ts` (el enganche en
+`step`) y `life/cast.ts` (para que `talking` y el clip salgan de la escena).
+**Lo que existe y se porta, no se reinventa:** en `spike/life.ts`, el bloque
+`bout`/`role`/`talkingTo`/`shoveAt`/`reelUntil`/`paidBack`, las constantes
+`CHAT_GAP = 0,95`, `SHOVE_GAP = 0,72`, `WIND_UP = 0,7`, `BOUT = 3,4`,
+`SHOVE_PUSH = 2,8`, `REEL = 0,75`, `HOT_ENOUGH = 0,62`, `SHOVE_ODDS = 0,22`, y
+la decisión de encuentro con umbral (no proporcional). Están medidos: aldeas
+de paz con cero empujones y aldeas de bronca con siete u ocho, según quién
+vive en ellas, y hablar siempre por encima de pegar.
+**Contrato.**
+```ts
+export type SceneKind = 'chat' | 'shove' | 'brawl';
+export interface Scene {
+  readonly kind: SceneKind;
+  readonly a: number; readonly b: number;      // ids de cuerpo
+  roleA: 'gives' | 'takes' | 'peer';
+  roleB: 'gives' | 'takes' | 'peer';
+  readonly since: number;                     // paso
+  until: number;
+  beat: number;                               // en qué compás va la escena
+}
+/** Si estos dos, al cruzarse, tienen algo. Determinista con `seed` y `step`. */
+export function propose(a: Dweller, b: Dweller, opinion: number,
+  seed: number, step: number): Scene | null;
+/** Un paso de la escena: coloca, empuja, hace trastabillar, termina. */
+export function play(scene: Scene, a: Dweller, b: Dweller, step: number): void;
+/** Si la escena sigue en pie: nadie se ha muerto, nadie se ha ido. */
+export function alive(scene: Scene, dwellers: readonly Dweller[]): boolean;
+```
+**Reglas.** Uno propone y el otro **acepta o rechaza** según carácter, opinión
+(`opinionOf` del motor, sólo lectura) e impulsos: un rechazo también es una
+escena (apartar la vista y seguir). Mientras dura, los dos cuerpos quedan bajo
+la misma escena con papeles distintos. El empujón **da velocidad, no
+posición**: lo integra el mismo `integrate` que todo lo demás, y por eso se ve
+como un trastabilleo y no como un salto (prueba de saltos en pie: `< 0,12`
+por paso). Se devuelve una vez, no se monta una trifulca; si esto llegara a
+más, en el juego lo dirá el motor (V-11). Ninguna escena conoce a nadie por
+nombre: propone por rasgos y opinión.
+**Trampas de esta fase** (E.7 aplica entero, y además): los que hablan **se
+colocan**, no se congelan — la primera versión del descarte los dejaba quietos
+donde les pillara y quedaban metidos el uno en el otro. Y comprobar lo primero
+lo de E.6: que `castOf` alimente el clip de andar (`travelled` continuo, `clip
+= 'walk'`), con prueba.
+**Tests exigidos.** Nadie queda atrapado en una escena que no termina; una
+escena rota a medias (uno muere o se va) deja al otro libre y en pie; dos que
+se detestan rechazan más que dos que se aprecian, medido; las escenas por
+jornada caen en una banda (ni cero ni guirigay) en seis semillas; hay aldeas
+sin un empujón en todo el día y aldeas con varios; hablar sigue siendo lo
+corriente; el paso máximo no pasa de 0,12.
+**Terminado cuando.** Se mira una jornada entera en el juego —modelos reales,
+detrás de la bandera— y se ven encuentros que nadie escribió. **Y se enseña
+antes de empezar V-09.**
+
+---
+
+#### V-08 · Los animales, iguales que la gente
+
+**Objetivo.** Que un perro sea un agente con otros impulsos, y entonces se le
+pueda acariciar. Y que nadie vuelva a salir del agua de un brinco.
+**Depende de.** V-07. **Lectura:** E.4, §7.7, §10.6, `effects/fauna.ts` y
+`render/animals.ts`.
+**Ficheros.** Nuevo `life/beasts.ts`; adelgaza `render3d/effects/fauna.ts` a
+pintar instancias; toca `life/village.ts` y `life/offers.ts` (un animal ofrece
+`pet`).
+**Contrato.** Los animales pasan a ser `Dweller` con `traits: []` y una tabla de
+impulsos propia (`BEAST_RISE`): la gallina picotea, el cerdo hoza, la vaca
+pasta, el perro busca gente. Cada uno es una `Place` móvil con una oferta
+(`pet`, `chase`, `feed`) y aforo uno.
+**Reglas.** La cuenta por clase sale del estado congelado (`state.herd`), no del
+tick vivo (D.6.7). Un cuerpo que colisiona con el agua **no se mete** en ella,
+así que `ashore` desaparece con su brinco de 1,08 celdas. Los cuervos y los
+peces siguen en `fauna.ts` como lo que son: decorado que no elige.
+**Tests exigidos.** Ningún animal de tierra pisa el agua en una jornada, seis
+semillas; la cuenta por clase coincide con la cabaña del estado; existe al
+menos una escena persona–animal y ocurre; el rebaño no salta (la prueba de
+G-10 sigue en pie con el umbral de 0,06 restaurado, y se borra la nota del 1,1).
+**Terminado cuando.** Un niño acariciando un perro, visto en pantalla sin que
+nadie lo guionizara.
+
+---
+
+#### V-09 · Trastos
+
+**Objetivo.** La pelota, el cubo, la jarra, el haz de leña. Cosas que se cogen,
+se sueltan, se tiran y ruedan. La tercera clase de cosa del valle.
+**Depende de.** V-07. **Lectura:** E.4, `spike/life.ts` (bloque `Prop`, `fling`,
+`loose`, la física de los pasos 7b), D.4 para los GLB.
+**Ficheros.** Nuevo `life/props.ts`; toca `life/offers.ts` (un trasto en el
+suelo es una `Place` con oferta `play`/`carry`), `life/village.ts`,
+`life/cast.ts` (qué lleva cada uno en la mano); recursos nuevos por la vía de
+producción de D.4.
+**Lo que existe y se porta:** en `spike/life.ts`, `Prop`, `GRAVITY = 14`,
+`ROLL_DRAG = 1,6`, `PICKUP = 0,75`, `FETCH = 7`, `THROW = 5,2`, `LOFT = 3,4`,
+`PLAYED_OUT = [11, 26]` (el descanso tras jugar, sin el cual salían 58 pases
+por jornada). Y las tres lecciones: la pelota se **va a buscar** cuando se ve,
+no sólo se coge al pisarla; el que la lleva se encara a quien se la va a
+tirar; y nadie hereda la pelota del martes.
+**Contrato.**
+```ts
+export interface Prop {
+  readonly id: number; readonly kind: 'ball' | 'stick' | 'bucket' | 'bundle';
+  x: number; z: number; y: number; vx: number; vz: number; vy: number;
+  held: number | null; restUntil: number;
+}
+export function scatter(state: GameState, land: Terrain, seed: number): Prop[];
+export function settle(props: Prop[], land: Terrain, seconds: number): void; // física
+export function take(prop: Prop, by: Dweller): boolean;
+export function drop(prop: Prop, by: Dweller, land: Terrain): void;
+export function fling(prop: Prop, from: Dweller, at: Point, force: number, loft: number): void;
+```
+**Reglas.** Efímeros como todo lo de la capa: se reparten al amanecer con la
+semilla del día y desaparecen al acabar. Un trasto no está en dos manos. Soltar
+lo deja en suelo pisable, nunca en pared ni en río. Quien muere, entra en casa
+o empieza una escena suelta lo que llevaba.
+**Tests exigidos.** Un trasto no está en dos manos a la vez; soltar lo deja en
+suelo pisable; quien se va o entra en casa suelta lo que llevaba; se juega
+(pases > 0) y no se come la jornada (pases < 30 por persona); una pelota que
+cae al río acaba en la orilla o se pierde, nunca rueda por debajo del agua.
+**Terminado cuando.** Dos críos pasándose una pelota un rato largo, en el
+juego, sin que se quede pegada ni se pierda.
+
+---
+
+#### V-10 · Sitios con vida
+
+**Objetivo.** La plaza, el pozo, la era, el vado, la taberna. Donde la aldea se
+junta sin que nadie la convoque, y a su hora.
+**Depende de.** V-06. Puede ir en paralelo con V-07/V-09. **Lectura:** E.4,
+§7.2, `life/offers.ts`.
+**Ficheros.** Toca `life/offers.ts` (hora punta por oferta) y nuevo
+`life/places.ts` (sitios que no son un edificio: la plaza como celdas libres
+rodeadas de casas, la orilla del vado, el claro del bosque).
+**Contrato.**
+```ts
+export interface Place { /* + */ readonly hours?: readonly [number, number]; } // fase de la jornada
+export function commons(state: GameState, land: Terrain): Place[]; // plaza, vado, claro
+```
+**Reglas.** Cada sitio tiene su hora: el pozo por la mañana, la era al
+mediodía, la plaza al caer la tarde. Fuera de su hora una oferta vale menos, no
+cero. Eso da forma a la jornada sin guionizar a nadie: la gente va porque le
+apetece y coincide porque a muchos les apetece a la vez. Si la taberna no existe
+como edificio, es motor y va aparte; mientras, la plaza hace de taberna.
+**Tests exigidos.** Ningún sitio se pasa de aforo; la aldea se reparte (nadie
+va todo el mundo al mismo sitio a la misma hora); cada sitio recibe visita en
+una jornada, seis semillas; la plaza se detecta en las seis y está en suelo
+libre.
+**Terminado cuando.** Una jornada donde se ve a la aldea juntarse y dispersarse
+sola, tres veces y en tres sitios.
+
+---
+
+#### V-11 · Lo que el motor manda
+
+**Objetivo.** Que una riña de §7.9 se escenifique de verdad, y que una reunión
+de §11.8 reúna. La dirección del dato es de una sola mano: el motor manda, la
+vida obedece.
+**Depende de.** V-07, V-10. **Lectura:** E.2 (la consecuencia aceptada), §7.9,
+§11.8, `render/gatherings.ts` (o donde viva `gatheringsAt`), `engine/sim.ts`
+(la crónica de `quarrel.*`).
+**Ficheros.** Nuevo `life/staging.ts`; toca `life/village.ts`.
+**Contrato.**
+```ts
+export type Order =
+  | { kind: 'quarrel'; a: VillagerId; b: VillagerId; blows: boolean }
+  | { kind: 'gather'; at: Point; days: number }
+  | { kind: 'mourn'; who: VillagerId };
+export function ordersOf(state: GameState, since: number): Order[]; // del estado congelado
+export function stage(order: Order, life: Village, seed: number): void;
+```
+**Reglas.** Órdenes que bajan, nunca suben. Una riña que el motor decidió se
+convierte en una escena `brawl` con sus papeles y su sitio, a la hora que la
+vida decida dentro de la jornada. Una reunión es una `Place` temporal con aforo
+alto y hora fija. Nadie de `life/` importa de `engine/` salvo tipos y funciones
+de lectura; hay una prueba en `module-graph.test.ts` que lo vigila.
+**Tests exigidos.** Toda riña de la crónica de la jornada se ve como escena;
+toda reunión del catálogo junta gente donde dice §11.8; la prueba de grafo pasa;
+las señales visibles de §11.8 que ya existían siguen viéndose.
+**Terminado cuando.** Las señales de §11.8 se ven igual que antes, y las riñas
+además.
+
+---
+
+#### V-12 · Retirada
+
+**Objetivo.** Borrar la capa vieja y el descarte. La fase más agradecida.
+**Depende de.** V-07 a V-11 cerradas y **aprobadas viéndolas**. **Lectura:**
+E.1, `actors/index.ts`.
+**Ficheros.** Borra la mayor parte de `render3d/actors/index.ts` (conserva
+`clips.ts`, `day.ts` y lo que `Cast` necesite), borra `life/spike/` entero,
+borra `tools/graphics/bench-life.*` y `bench-village.html`, quita la bandera
+`valley.life` de `renderer.ts` y de `bundle-game.ts`.
+**Reglas.** Se retira por partes y con la bandera puesta hasta el último
+commit. Cada ayudante que se borra se borra con su prueba: si algo lo
+necesitaba, salta. `scenic-state.ts` **se queda**: la vida lee de él.
+**Tests exigidos.** La suite entera en verde sin `actorsFor`; ningún fichero
+importa de `actors/index` salvo `Cast`; `module-graph` pasa.
+**Terminado cuando.** La bandera no existe y el juego pinta la vida por el único
+camino que queda. Se apunta cuántas líneas se fueron.
+
+---
+
+#### V-13 · Que corra en el móvil
+
+**Objetivo.** Transversal, se mide desde V-02 y se cierra aquí.
+**Presupuesto.** Ochenta agentes y treinta trastos a 60 fps en el móvil de
+referencia de D.9. Reconstruir una jornada entera por debajo de 120 ms (hoy 8
+ms sin escenas ni trastos). El paso de vida por debajo de 1 000 µs con todo
+(hoy 236 sin escenas).
+**Ficheros.** `tools/graphics/bench-life.ts` (hasta V-12) y una prueba en
+`life-*.test.ts` que falle si el coste por cuerpo deja de ser plano.
+**Terminado cuando.** Medido en el móvil de verdad, no en el portátil, y
+escrito en `docs/life-rounds/V-13.md`.
+
+---
+
+#### V-15 · El valle grande
+
+**Aparcada a propósito, con el coste medido para cuando toque.** A los cien
+años la aldea entera cabe en 23×21 de un mapa de 36×56 y ocupa el 11,7 % del
+suelo. Agrandarlo hoy da prado vacío y obliga a recalibrar un balance que ya
+falla diez pruebas. Primero lo que llena el mapa; el mapa crece cuando se le
+quede pequeño. Crecer son dos constantes (`WORLD.WIDTH/HEIGHT`) y un tipo
+literal (`width: 36` en `state.ts`). Una ruta que cruza el valle cuesta 0,09
+ms; con un mapa nueve veces mayor, ~1 ms, y con cincuenta rutas por tick, 50 ms
+contra los 234 de un tick a ×64. `MAX_FIELDS` y `MAX_HOUSES` son topes absolutos
+y no escalan.
+
+#### V-16 · La comarca
+
+**Aparcada, y va con V-15.** Relieve de verdad dentro del mapa. Es una ronda de
+motor: capa `relief` en `ValleyMap` (sube `SCHEMA_VERSION` a 4, rompe
+partidas), `mapgen` casi entero, A\* con coste de subida, `placement` sin
+ladera, diez módulos del motor que leen el terreno, dieciséis del render,
+veintitrés pruebas, y una pasada completa de balance. No antes que la capa de
+vida: el relieve obliga a repasar cómo anda la gente, y hacerlo antes es
+escribir el andar dos veces. **El valle real es plano** hoy (0,23 celdas de
+desnivel en todo el mapa) y el cuenco de V-14 es una silueta fuera del mapa que
+el motor no conoce.
+
+### E.9 Dependencias, paralelismo y próximo paso
+
+```text
+V-00 → V-01 → V-02 → V-03 → V-04 ─┐
+                       └→ V-05 ─┤→ V-06 ─→ V-07 ─→ V-08 ─┐
+                                          │           ├→ V-11 → V-12
+                                          ├→ V-09 ────┤
+                                          └→ V-10 ────┘
+V-14 ✓ (independiente)          V-13 transversal desde V-02
+V-15 ═ V-16 (juntas, después de V-12)
+```
+
+**Estado:** V-00 a V-06 y V-14 cerradas. **Siguiente: V-07**, y es la que
+decide. Tras ella se vuelve a enseñar la demo en el juego, y sólo entonces se
+juzga el reparto entre andar y hacer (E.6). V-10 puede ir en paralelo con V-07
+sin pisarse: V-07 estrena `scenes.ts` y V-10 estrena `places.ts`; las dos tocan
+`village.ts` en sitios distintos y quien integre serializa ese fichero.
+
+**Reparto sugerido con varios agentes:**
+
+| Carril | Fases | Notas |
+|---|---|---|
+| A · el camino crítico | V-07 → V-09 → V-11 → V-12 | La mano con más contexto; porta del descarte |
+| B · los sitios | V-10 → V-08 | No toca `scenes.ts` |
+| C · la medida | V-13 continuo | Sólo mide; no cambia comportamiento |
+
+**Cuándo parar:** tras V-07, si con escenas el valle sigue leyéndose como
+hormigas, el problema es el modelo de ofertas y se para a rediseñar con el
+dueño del diseño delante, no a mover constantes. En cualquier punto, si no
+cabe en el móvil.
+
+### E.10 Registro de esta revisión
+
+v3.64 escribe este anexo. Hasta aquí el plan vivía en una página publicada
+fuera del repositorio, y un agente que llegara al código no podía encontrarlo.
+Se ratifican las tres capas, los seis innegociables y el mecanismo de ofertas.
+Se registran V-00 a V-06 y V-14 como hechas con sus medidas, y se escribe E.6
+—por qué la demo en el juego es hoy peor que el descarte— como la primera cosa
+que hay que leer, porque es la primera cosa que se va a ver. Se añade la regla
+séptima de método (no ajustar a ciegas más de dos veces) y la regla de E.6
+(cada fase que cambie lo que se ve, se enseña antes de cerrar la siguiente),
+las dos aprendidas en esta misma ronda. Informes: `docs/life-rounds/V-00.md` a
+`V-06.md`.
 
 ---
 

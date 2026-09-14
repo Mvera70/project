@@ -79,15 +79,24 @@ Antes de dar un módulo por terminado: `npm run typecheck && npm test && npm run
 
 ## Estado del proyecto
 
-El motor está completo y el juego 2D en Canvas se juega y está desplegado.
-**Lo que está en marcha es el programa gráfico del Anexo D: un piloto 3D en
-`src/render3d/`, aparte, que no sustituye a `src/render/` hasta G-12.**
+El motor está completo y el juego 2D en Canvas se juega y está desplegado. El
+piloto 3D del Anexo D (`src/render3d/`) está en G-11 y ya se juega detrás de
+`?render=pilot3d`.
 
-Cerradas G-00 a G-06. **Siguiente: G-07 (cámara, tacto e interfaz).**
+**Lo que está en marcha es la vida del valle, Anexo E de `docs/design.md`:**
+una capa de agentes deterministas y efímera en `src/render3d/life/`, entre el
+motor y el render, que sustituye a `src/render3d/actors/` fase a fase. Cerradas
+V-00 a V-06 y V-14. **Siguiente: V-07 (escenas de dos).** Va detrás de la
+bandera `valley.life`; el juego normal no la usa todavía.
+
+**Antes de tocar `life/`, lee E.1, E.3, E.6 y E.7 del anexo** — el diagnóstico,
+los seis innegociables, por qué la demo en el juego es hoy peor que el descarte,
+y las trampas que ya han costado una tarde cada una. Después, el brief de tu
+fase en E.8. Los informes de ronda están en `docs/life-rounds/`.
 
 `docs/handover.md` dice en qué estado exacto está todo, qué decisiones se han
 tomado, qué trampas ya han costado tiempo y por dónde seguir. **Léelo antes de
-empezar una ronda gráfica.**
+empezar cualquier ronda.**
 
 Los hitos humanos 0 y 6 siguen **sin validar**, y no se declaran superados ni se
 sustituyen por pruebas automáticas.

@@ -304,97 +304,67 @@ No son teoría: cada una se pagó con al menos una ronda.
 9. **Los edificios del piloto son cajas con tejado.** El catálogo de verdad es
    G-10. Es deliberado: lo que hay que juzgar antes es si un valle de estas
    proporciones se lee desde arriba.
-10. **El desfase entre el reloj del mundo y el de la jornada es estructural, y
-    ya no se ve.** Un tick es una semana y una jornada escénica dura ciento
-    veinte segundos, así que dentro de un amanecer-anochecer pasan ocho semanas
-    a ×1 y sesenta y cuatro a ×64. Eso hacía saltar todo lo que el render deriva
-    del tick, y costó tres rondas en tres sistemas distintos, cada uno
-    defendiéndose por su cuenta. Desde v3.59 lo sostiene **un solo sitio**:
-    `src/render3d/scenic-state.ts`, que releva el estado al anochecer y se lo
-    reparte a todos desde `paint`. **Un sistema nuevo lo hereda sin escribir
-    nada**, y ése es el punto: antes había que acordarse de congelar y olvidarlo
-    no daba error, sólo un salto.
 
-    Lo que **no** arregla: el desfase sigue existiendo, sólo que nadie lo ve. Y
-    afinar el tick tampoco lo arreglaría —con tick diario serían 56 pasos por
-    jornada en vez de 8—, porque nace de D.6.1 (la jornada corre a √velocidad y
-    el mundo a la velocidad entera) y no del tamaño del paso. Si algún día se
-    afina el tick, que sea por razones de simulación y no de dibujo: el
-    argumento visual se quedó sin objeto. El coste está medido constante a
-    constante en `docs/brief-reloj.md`, con el orden que menos duele —arreglar
-    antes las diez pruebas de balance que ya están rojas, o no habrá referencia
-    contra la que medir el cambio de paso—.
-11. **Todos los aldeanos tienen carácter desde v3.61, y cuatro rasgos han
-    dejado de ser etiquetas.** Hasta aquí los rasgos se repartían al nombrar a
-    alguien, así que **la personalidad la fabricaba el cargo** —el herrero salía
-    terco porque era herrero— y los setenta y dos vecinos sin nombre no eran
-    nadie: ni rasgos, ni memoria, ni opiniones, sólo aritmética de población.
-    Ahora se nace con él (flujo `minds`, propio), el oficio va a parar a quien
-    ya encaja (`suitsRole`) y `promoteToNamed` conserva a la persona que había.
+## 5. La vida del valle (Anexo E) — el estado exacto
 
-    `ambitious`, `craven`, `cunning` y `secretive` no cambiaban **ningún**
-    resultado fuera de los pesos del catálogo; hoy deciden quién se marcha
-    cuando el ánimo cae, quién aguanta el hambre, a quién le sienta mal que el
-    puesto sea de otro y quién no llega a atarse a nadie. Lo que vive en
-    `people/minds.ts` es lo que ningún otro módulo podía tener sin morderse la
-    cola; nadie lo importa salvo el tick.
+**Lo que hay que saber en una frase:** el render dibujaba una fórmula del
+tiempo y por eso nadie podía chocar, perseguir ni encontrarse; se está
+construyendo una capa de agentes con paso fijo (`src/render3d/life/`) que lo
+da sin escribir en el motor. **Todo lo normativo está en `docs/design.md`,
+Anexo E.** Esto es sólo el estado.
 
-    Medido sobre diez partidas de cuarenta años: carácter en el 100 % de los
-    vecinos (antes 8 de 80) y rencores en ocho de cada diez partidas, donde
-    antes **no había ninguno en ninguna**. El ambicioso al que pasan por alto
-    resiente entre una y cinco veces por partida, y ése es el empujón que a §6.4
-    le faltaba: llega por el carácter de alguien y no por una decisión del
-    jugador.
+**Hecho (v3.59–v3.64):** V-00 el descarte, V-01 reloj, V-02 cuerpos y rejilla,
+V-03 navegación, V-04 impulsos, V-05 ofertas, V-06 elección y la aldea entera
+ensamblada dentro del juego detrás de `valley.life`; V-14 el cuenco. 1 873
+líneas de producción, 60 pruebas propias en la suite rápida (1 068 en total, en
+verde). Informes con lo medido en `docs/life-rounds/`.
 
-    **Sin validar contra la suite de balance**, y con la contradicción de
-    `findings-drama.md` §4 todavía encima: más rencores empujan hacia arriba la
-    elegibilidad de `smith_feud` y `feud_inherited`, que ya rozaban el techo del
-    1 % sin que existiera un solo rencor.
+**Siguiente: V-07, escenas de dos.** Y es la que decide: tras ella se vuelve a
+enseñar en el juego y sólo entonces se juzga lo demás.
 
-12. **Deuda nueva: `ashore` saca al animal de un salto de una celda.** Cuando la
-    cara de su celda que tenía más cerca deja de ser tierra, lo saca por otra, y
-    el punto de salida cruza la celda de un fotograma al siguiente: medido 1,08
-    celdas, que es una celda justa más el margen. Es de G-10 y no de esta ronda;
-    apareció ahora porque el carácter cambió las partidas y algún animal empezó
-    a meterse más en el cauce. Está comprobado aparte que `animalPositions` es
-    continua: lo que salta es la corrección, no el rebaño. El techo de la prueba
-    quedó en 1,1 para vigilar que no empeora, con la causa escrita al lado.
-    Arreglarlo es geometría —sacarlo por un punto que varíe de forma continua—,
-    no un número.
+**Lo que el dueño del diseño ve hoy, y por qué.** Vio la aldea viva dentro del
+juego y dijo que parece rota comparada con el descarte —«se quedan pillados,
+dando vueltas, no se chocan, tienen como un imán; no interactúan con los
+objetos»—. Tres de esas cosas eran fallos y están arreglados con sus números
+(E.7). La cuarta no es un fallo: **faltan V-07 y V-09**, que son las charlas,
+los empujones y los trastos, o sea todo lo que hacía que el descarte pareciera
+vivo. Se enseñó lo vistoso, se construyó lo invisible durante seis fases sin
+volver a enseñar nada, y la primera demo tras ellas fue una regresión desde el
+asiento del que mira. Está escrito en E.6 con la regla que sale de ahí: cada
+fase que cambie lo que se ve, se enseña antes de cerrar la siguiente.
 
-13. **Media docena de pruebas medían el escenario y no la propiedad.** Al
-    cambiar las partidas cayeron seis a la vez, y ninguna por un fallo del
-    motor: la sal se probaba con un solo rebaño y saturaba; el apagón elegía la
-    primera casa de la lista y salió deshabitada; el seguimiento seguía al
-    último vivo, que a media mañana estaba dentro de casa; dos pruebas del suelo
-    daban por hecho que la semilla 7 abría camino de nivel 2; y la densidad
-    narrativa miraba **una** ventana de veinte semanas. Todas se han reescrito
-    para medir lo que dicen medir, y varias son ahora más fuertes que antes —la
-    sal se prueba en trece escenarios en vez de uno—. Merece la pena mirar con
-    esa lupa cualquier prueba que se caiga tras un cambio de balance: la mitad
-    no acusan al cambio, acusan a su propio decorado.
-14. **El valle ya se cierra: hay sierra alrededor, y vive fuera del mapa.**
-    `render3d/world/ridge.ts`, §D.6.8. La decisión está medida y conviene no
-    revisarla a ojo: en las dos celdas del contorno del mapa viven **el 32 % del
-    bosque** (135 de 419), trece edificios de una partida de cuarenta años y el
-    cauce por donde el río entra y sale. Levantar el borde habría costado leña,
-    río y casas —balance del motor— por una montaña que es decorado. Así que la
-    sierra empieza donde el mapa acaba, el motor no sabe que existe, y hay una
-    prueba que lo vigila celda a celda.
+**Abierto y sin resolver, para no volver a tantear a ciegas:**
 
-    Lo que **no** resuelve: relieve jugable. El interior del valle sigue plano
-    (0,23 celdas de desnivel), así que una roca rodando por una ladera sigue sin
-    tener dónde ocurrir. Eso pide una capa de altura en `ValleyMap` y es trabajo
-    de `mapgen`.
+- **El reparto entre andar y hacer**: 74–81 % del tiempo en tránsito, tras
+  cuatro ajustes que no lo bajaron. Por la regla séptima de E.3 no es el número,
+  es el modelo. La hipótesis (E.6) es que el tránsito con interrupciones se lee
+  como vida y sin ellas como hormigas: se comprueba haciendo V-07, no moviendo
+  otra constante.
+- **«No se desplazan como en la demo»**: sin poder verlo, no se sabe si es
+  percepción o un fallo del clip en `life/cast.ts`. V-07 lo comprueba primero,
+  con prueba.
+- **El descarte y la producción son dos códigos** (`life/spike/`, 1 715 líneas,
+  contra `life/*.ts`). V-07 y V-09 **portan** del descarte lo que ya está
+  medido; V-12 lo borra.
 
-15. **El mapa no se queda pequeño: sobra.** A los cien años la aldea entera cabe
-    en una caja de 23×21 dentro de 36×56 y ocupa el **11,7 %** del suelo. Antes
-    de agrandarlo hay que tener con qué llenarlo —caza, otros asentamientos—, o
-    sólo se gana prado vacío y una recalibración del balance.
+**Deudas que siguen en pie de antes** (los puntos 1–9 de arriba) más éstas:
 
-    El coste de crecer, ya medido para cuando toque: son **dos constantes y un
-    tipo literal** (`width: 36` vive en `state.ts`, no sólo en `balance.ts`).
-    Una ruta que cruza el valle cuesta hoy 0,09 ms; con un mapa nueve veces
-    mayor serían ~1 ms, y con cincuenta rutas por tick, 50 ms contra los 234 que
-    dura un tick a ×64. No hay muro técnico. Ojo con `MAX_FIELDS` y
-    `MAX_HOUSES`, que son topes absolutos y no escalan con el mapa.
+- **`ashore` da un brinco de 1,08 celdas** al sacar un animal del agua. La
+  prueba de G-10 tiene el techo en 1,1 con la causa escrita al lado. Lo arregla
+  V-08 al hacer a los animales cuerpos que no llegan a meterse.
+- **El río parte el valle y no se cruza**: sólo el 37 % del suelo libre está
+  conectado con el centro. No es un fallo, es el motor. Condiciona la caza y
+  los asentamientos que vengan: o el mapa gana un puente (motor) o van del
+  mismo lado. `reachableFrom` en `life/terrain.ts` es lo que hay.
+- **El balance del motor está peor que antes de v3.60–v3.61**: doce pruebas
+  rojas contra diez. La extinción prudente entró por fin en banda, pero la
+  distancia entre políticas cayó a cinco puntos y `smith_feud` se triplicó. Es
+  la contradicción de `findings-drama.md` §4–§6 medida, y la decide el dueño
+  del diseño: o los rencores sanan más rápido, o la prueba de elegibilidad
+  mide salidas en vez de ticks elegibles.
+- **El cuenco es decorado**, no relieve. El valle sigue plano por dentro y una
+  roca rodando sigue sin tener dónde. V-15 y V-16 van juntas, después de la
+  vida, y son una ronda de motor con `SCHEMA_VERSION` a 4.
+- **Afinar el tick a día no arregla el desfase con la jornada** (sería 56 pasos
+  por jornada en vez de 8) y su coste está medido constante a constante en
+  `docs/brief-reloj.md`. Si se hace, que sea por simulación y no por dibujo.
