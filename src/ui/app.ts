@@ -418,6 +418,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // Ya vienen ordenados por peso: si coinciden dos, manda el mayor.
       const best = passed[0];
       if (best !== undefined) {
+        // **Una voz cada vez.** El aviso y la cartela se pintan a dos dedos el
+        // uno del otro, y visto en captura se leen como un bloque de texto
+        // apilado. Cuando hay hito, el hito es el titular de ese tick: la
+        // banda de §11.6 se retira y vuelve en el siguiente.
+        notices.clear();
         moments.show(
           renderUiText(`milestone.kind.${best.kind}`),
           renderEntry(

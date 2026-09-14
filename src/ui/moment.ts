@@ -24,7 +24,7 @@ import { TIME } from '@engine/balance';
 const STYLE_ID = 'valley-moment-style';
 const STYLE = `
 .valley-moment { position: absolute; z-index: 5; left: 50%; transform: translateX(-50%);
-  bottom: calc(122px + max(12px, env(safe-area-inset-bottom)));
+  bottom: calc(140px + max(12px, env(safe-area-inset-bottom)));
   box-sizing: border-box; width: min(84%, 320px); padding: 14px 18px 15px;
   background: var(--parchment, #f2e9d8); color: var(--ink, #221d18);
   border: 1px solid rgba(125,92,46,.55); border-radius: 3px;
