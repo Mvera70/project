@@ -14,6 +14,7 @@
 import { NEIGHBOUR } from '../balance';
 import type { GameState, Villager, VillagerId } from '../state';
 import { isHere } from './demography';
+import { bondFactor } from './minds';
 import { adjustOpinion, opinionOf } from './opinions';
 
 /**
@@ -87,7 +88,10 @@ export function workedTogether(
       for (let j = i + 1; j < crew.length; j += 1) {
         const a = crew[i] as VillagerId;
         const b = crew[j] as VillagerId;
-        const step = NEIGHBOUR.PER_WEEK * hunger;
+        const who = state.people.villagers.find((v) => v.id === a);
+        const other = state.people.villagers.find((v) => v.id === b);
+        if (who === undefined || other === undefined) continue;
+        const step = NEIGHBOUR.PER_WEEK * hunger * bondFactor(who.traits, other.traits);
         if (step === 0) continue;
         touched += push(state, a, b, step);
       }
@@ -126,7 +130,8 @@ export function rubShoulders(state: GameState, severity = 0): number {
       if (!grates(a, b)) continue;
       // El hambre agria el roce como agria todo lo demás; lo que no hace es
       // volverlo cariño, así que un año bueno lo deja quieto y no al revés.
-      const step = NEIGHBOUR.FRICTION * Math.max(1, hunger === 0 ? 1 : 2 - hunger);
+      const step = NEIGHBOUR.FRICTION * Math.max(1, hunger === 0 ? 1 : 2 - hunger)
+        * bondFactor(a.traits, b.traits);
       touched += push(state, a.id, b.id, step);
     }
   }

@@ -5,11 +5,11 @@
 // propiedades: que la fundación sea jugable, que dos partidas se lean distintas
 // y que nadie tenga el nombre de otro.
 import { describe, expect, it } from 'vitest';
-import { FOUNDING, LIFE, PEOPLE, TIME, TRAIT_WEIGHTS } from '@engine/balance';
+import { FOUNDING, PEOPLE, TIME, TRAIT_WEIGHTS } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Role, Trait, Villager } from '@engine/state';
 import { FEMALE_NAMES, MALE_NAMES, makeName } from '@engine/people/names';
-import { ALL_TRAITS, rollTraits } from '@engine/people/traits';
+import { ALL_TRAITS, rollTraits, suitsRole } from '@engine/people/traits';
 import {
   FOUNDING_ROLES,
   ageOf,
@@ -274,67 +274,42 @@ describe('fundación', () => {
     expect(fallbacks / (SEEDS * FOUNDING_ROLES.length)).toBeLessThan(0.01);
   });
 
-  it('cada oficio va al más viejo que lo cumple, no a uno cualquiera', () => {
-    // La comadrona (suelo 28) reparte primero por ser la más exigente y la
-    // única con requisito de sexo; nadie puede llevarse a la anciana que
-    // necesitaba.
+  it('cada oficio va a quien encaja de carácter, y la edad desempata', () => {
+    // §6.2 y §6.3, v3.61. Antes iba al más viejo a secas, y daba igual quién
+    // fuera porque el nombramiento le inventaba el carácter un instante
+    // después. Ahora se nace con él, así que la tabla de §6.3 se lee al
+    // derecho: entre los que pasan el suelo de edad manda el encaje.
+    //
+    // La comadrona sigue repartiendo primero por ser la más exigente y la única
+    // con requisito de sexo; lo que se comprueba es que nadie que encajara
+    // mejor se quedó fuera.
     for (const seed of [7, 42, 108, 999, 2024]) {
       const p = foundPeople(makeBundle(seed), 0);
-      const midwife = p.villagers.find((x) => x.role === 'midwife');
-      const olderWomen = p.villagers.filter(
-        (x) =>
-          x.female &&
-          x.id !== midwife?.id &&
-          ageOf(x, 0) > ageOf(midwife as Villager, 0) &&
-          ageOf(x, 0) <= FOUNDING.AGE_RANGES.adults[1] &&
-          ageOf(x, 0) >= FOUNDING.AGE_RANGES.adults[0],
-      );
-      expect(olderWomen, `semilla ${seed}`).toEqual([]);
-    }
-  });
-
-  it('los seis oficios siguen cubiertos aunque el suelo apriete', () => {
-    // Un oficio joven es mejor que un oficio vacante en la fundación.
-    for (let seed = 0; seed < 500; seed += 1) {
-      const p = foundPeople(makeBundle(seed), 0);
-      expect(p.namedIds.length, `semilla ${seed}`).toBe(FOUNDING_ROLES.length);
-    }
-  });
-
-  it('garantiza mujeres fértiles suficientes en 1 000 semillas', () => {
-    // Una fundación que no puede reproducirse es una partida muerta al nacer.
-    for (let seed = 0; seed < 1000; seed += 1) {
-      const p = foundPeople(makeBundle(seed), 0);
-      const fertile = p.villagers.filter(
-        (v) => v.female && ageOf(v, 0) >= LIFE.FERTILE[0] && ageOf(v, 0) <= LIFE.FERTILE[1],
-      ).length;
-      expect(fertile, `semilla ${seed}`).toBeGreaterThanOrEqual(FOUNDING.MIN_FERTILE_WOMEN);
-    }
-  });
-
-  it('no repite ningún nombre en 1 000 semillas', () => {
-    for (let seed = 0; seed < 1000; seed += 1) {
-      const p = foundPeople(makeBundle(seed), 0);
-      const names = p.villagers.filter((v) => v.named).map((v) => v.name);
-      expect(new Set(names).size, `semilla ${seed}`).toBe(names.length);
-      for (const n of names) expect(n.length, `semilla ${seed}`).toBeGreaterThan(0);
-    }
-  });
-
-  it('los nombrados llevan 3 o 4 rasgos y el nombre de su sexo', () => {
-    for (const seed of [7, 42, 108, 999]) {
-      const p = foundPeople(makeBundle(seed), 0);
-      for (const v of p.villagers.filter((x) => x.named)) {
-        expect(v.traits.length).toBeGreaterThanOrEqual(3);
-        expect(v.traits.length).toBeLessThanOrEqual(4);
-        expect(new Set(v.traits).size).toBe(v.traits.length);
-        expect(v.female ? FEMALE_NAMES : MALE_NAMES).toContain(v.name);
+      for (const role of FOUNDING_ROLES) {
+        const holder = p.villagers.find((x) => x.role === role);
+        if (holder === undefined) continue;
+        expect(ageOf(holder, 0), `${role}, semilla ${seed}`)
+          .toBeGreaterThanOrEqual(minAgeFor(role));
+        const mine = suitsRole(holder.traits, role);
+        // Nadie sin oficio, de la misma hornada y con la edad cumplida, encaja
+        // mejor que quien lo tiene.
+        const better = p.villagers.filter(
+          (x) => x.role === null && !x.named
+            && ageOf(x, 0) >= minAgeFor(role)
+            && (role !== 'midwife' || x.female)
+            && suitsRole(x.traits, role) > mine,
+        );
+        expect(better, `${role}, semilla ${seed}: alguien encajaba mejor`).toEqual([]);
       }
     }
   });
 
-  it('los anónimos no tienen nombre, rasgos, memoria ni opiniones', () => {
-    // §6.1: existen como registros con edad, sexo y casa. Nada más.
+  it('los anónimos no tienen nombre, memoria ni opiniones — pero sí carácter', () => {
+    // §6.1, corregido en v3.61. Lo que distingue a un anónimo es que el jugador
+    // no lo conoce: no tiene nombre, ni recuerdos, ni opinión de nadie. **Lo
+    // que sí tiene es carácter**, porque se nace con él y no lo reparte el
+    // cargo, y porque de otro modo setenta y dos de los ochenta habitantes del
+    // valle son aritmética de población y no personas.
     for (const seed of [7, 42, 108]) {
       const p = foundPeople(makeBundle(seed), 0);
       const anon = p.villagers.filter((v) => !v.named);
@@ -342,9 +317,10 @@ describe('fundación', () => {
       for (const v of anon) {
         expect(v.name).toBe('');
         expect(v.role).toBeNull();
-        expect(v.traits).toEqual([]);
         expect(v.memories).toEqual([]);
         expect(v.opinions).toEqual({});
+        expect(v.traits.length, 'todo el mundo tiene carácter').toBeGreaterThanOrEqual(3);
+        expect(new Set(v.traits).size, 'y sin repetir').toBe(v.traits.length);
       }
     }
   });

@@ -68,6 +68,7 @@ describe('rng · reproducibilidad', () => {
       // v3.07: y `quarrels` (7.9). Trece flujos, y los diez originales siguen
       // dando lo mismo que el primer dia.
       quarrels: 1072235657,
+      minds: 698695991,
     });
   });
 

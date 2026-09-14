@@ -324,3 +324,52 @@ No son teoría: cada una se pagó con al menos una ronda.
     constante en `docs/brief-reloj.md`, con el orden que menos duele —arreglar
     antes las diez pruebas de balance que ya están rojas, o no habrá referencia
     contra la que medir el cambio de paso—.
+11. **Todos los aldeanos tienen carácter desde v3.61, y cuatro rasgos han
+    dejado de ser etiquetas.** Hasta aquí los rasgos se repartían al nombrar a
+    alguien, así que **la personalidad la fabricaba el cargo** —el herrero salía
+    terco porque era herrero— y los setenta y dos vecinos sin nombre no eran
+    nadie: ni rasgos, ni memoria, ni opiniones, sólo aritmética de población.
+    Ahora se nace con él (flujo `minds`, propio), el oficio va a parar a quien
+    ya encaja (`suitsRole`) y `promoteToNamed` conserva a la persona que había.
+
+    `ambitious`, `craven`, `cunning` y `secretive` no cambiaban **ningún**
+    resultado fuera de los pesos del catálogo; hoy deciden quién se marcha
+    cuando el ánimo cae, quién aguanta el hambre, a quién le sienta mal que el
+    puesto sea de otro y quién no llega a atarse a nadie. Lo que vive en
+    `people/minds.ts` es lo que ningún otro módulo podía tener sin morderse la
+    cola; nadie lo importa salvo el tick.
+
+    Medido sobre diez partidas de cuarenta años: carácter en el 100 % de los
+    vecinos (antes 8 de 80) y rencores en ocho de cada diez partidas, donde
+    antes **no había ninguno en ninguna**. El ambicioso al que pasan por alto
+    resiente entre una y cinco veces por partida, y ése es el empujón que a §6.4
+    le faltaba: llega por el carácter de alguien y no por una decisión del
+    jugador.
+
+    **Sin validar contra la suite de balance**, y con la contradicción de
+    `findings-drama.md` §4 todavía encima: más rencores empujan hacia arriba la
+    elegibilidad de `smith_feud` y `feud_inherited`, que ya rozaban el techo del
+    1 % sin que existiera un solo rencor.
+
+12. **Deuda nueva: `ashore` saca al animal de un salto de una celda.** Cuando la
+    cara de su celda que tenía más cerca deja de ser tierra, lo saca por otra, y
+    el punto de salida cruza la celda de un fotograma al siguiente: medido 1,08
+    celdas, que es una celda justa más el margen. Es de G-10 y no de esta ronda;
+    apareció ahora porque el carácter cambió las partidas y algún animal empezó
+    a meterse más en el cauce. Está comprobado aparte que `animalPositions` es
+    continua: lo que salta es la corrección, no el rebaño. El techo de la prueba
+    quedó en 1,1 para vigilar que no empeora, con la causa escrita al lado.
+    Arreglarlo es geometría —sacarlo por un punto que varíe de forma continua—,
+    no un número.
+
+13. **Media docena de pruebas medían el escenario y no la propiedad.** Al
+    cambiar las partidas cayeron seis a la vez, y ninguna por un fallo del
+    motor: la sal se probaba con un solo rebaño y saturaba; el apagón elegía la
+    primera casa de la lista y salió deshabitada; el seguimiento seguía al
+    último vivo, que a media mañana estaba dentro de casa; dos pruebas del suelo
+    daban por hecho que la semilla 7 abría camino de nivel 2; y la densidad
+    narrativa miraba **una** ventana de veinte semanas. Todas se han reescrito
+    para medir lo que dicen medir, y varias son ahora más fuertes que antes —la
+    sal se prueba en trece escenarios en vez de uno—. Merece la pena mirar con
+    esa lupa cualquier prueba que se caiga tras un cambio de balance: la mitad
+    no acusan al cambio, acusan a su propio decorado.

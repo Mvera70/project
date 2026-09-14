@@ -165,11 +165,25 @@ describe('el apagón · §11.8', () => {
 
   it('apagar le quita el humo y la luz a ese edificio', () => {
     // Lo único que de verdad importa: que el apagón se note en la imagen.
-    const state = village(20);
-    state.history = [];
-    const before = tellsFor(state).length;
-    record(state, 'douse', 'house');
-    expect(tellsFor(state).length).toBeLessThan(before);
+    //
+    // Sobre varias semillas y no sobre una: apagar «una casa» no quita nada si
+    // en esa aldea concreta las casas no tenían señal que quitar, y entonces la
+    // prueba no mide el apagón sino la suerte del escenario. Pasó en v3.61,
+    // cuando el carácter cambió las partidas.
+    let quieted = 0;
+    let tried = 0;
+    for (const seed of [7, 11, 23, 41, 97]) {
+      const state = village(20, seed);
+      state.history = [];
+      const before = tellsFor(state).length;
+      record(state, 'douse', 'house');
+      const after = tellsFor(state).length;
+      expect(after, `semilla ${seed}: apagar nunca añade señales`).toBeLessThanOrEqual(before);
+      if (after < before) quieted += 1;
+      tried += 1;
+    }
+    expect(quieted, `apagar se nota en la imagen (${quieted}/${tried} aldeas)`)
+      .toBeGreaterThan(0);
   });
 
   it('con `who`, apaga la casa de esa persona', () => {

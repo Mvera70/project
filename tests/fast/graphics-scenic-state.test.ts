@@ -27,14 +27,14 @@ describe('G-11 · el estado de la jornada', () => {
     // amanecer-anochecer. Ninguna de ellas puede mover lo que se está pintando.
     const state = village(14);
     const scenic = createScenicState();
-    const opened = scenic.of(state, 0.0, 0);
+    const opened = scenic.of(state, 0.0);
     const startedAt = opened.tick;
 
     for (let step = 1; step <= 64; step += 1) {
       run(state, 1, 'prudent', CATALOG);
       // Hasta el filo de la noche, y sin llegar a ella.
       const phase = (step / 64) * (NIGHT - 0.001);
-      const shown = scenic.of(state, phase, 0);
+      const shown = scenic.of(state, phase);
       expect(shown, 'la jornada entrega siempre el mismo objeto').toBe(opened);
       expect(shown.tick, 'y el motor no se lo ha movido por debajo').toBe(startedAt);
     }
@@ -48,7 +48,7 @@ describe('G-11 · el estado de la jornada', () => {
     // copia superficial no guarda nada.
     const state = village(14);
     const scenic = createScenicState();
-    const shown = scenic.of(state, 0.1, 0);
+    const shown = scenic.of(state, 0.1);
     const houses = shown.buildings.length;
     const alive = shown.people.villagers.filter((who) => who.diedTick === null).length;
     const herd = { ...shown.herd };
@@ -65,11 +65,11 @@ describe('G-11 · el estado de la jornada', () => {
   it('releva al caer la noche, que es cuando no lo ve nadie', () => {
     const state = village(14);
     const scenic = createScenicState();
-    const day = scenic.of(state, 0.3, 0);
+    const day = scenic.of(state, 0.3);
     run(state, 10, 'prudent', CATALOG);
 
-    expect(scenic.of(state, NIGHT - 0.01, 0), 'antes de la noche, lo de la jornada').toBe(day);
-    const night = scenic.of(state, NIGHT + 0.01, 0);
+    expect(scenic.of(state, NIGHT - 0.01), 'antes de la noche, lo de la jornada').toBe(day);
+    const night = scenic.of(state, NIGHT + 0.01);
     expect(night, 'cruzada la línea, se estrena').not.toBe(day);
     expect(night.tick, 'y lo estrenado es lo de ahora').toBe(state.tick);
   });
@@ -77,13 +77,13 @@ describe('G-11 · el estado de la jornada', () => {
   it('una partida nueva no hereda la jornada de la anterior', () => {
     const first = village(14);
     const scenic = createScenicState();
-    const before = scenic.of(first, 0.3, 0);
+    const before = scenic.of(first, 0.3);
 
     // Otro valle: otra gente, otras casas. Nada de lo de antes vale, y sin el
     // olvido el jugador vería el pueblo viejo hasta el anochecer.
     const second = village(6, 23);
     scenic.reset();
-    const after = scenic.of(second, 0.3, 0);
+    const after = scenic.of(second, 0.3);
 
     expect(after, 'la jornada se estrena entera').not.toBe(before);
     expect(after.tick).toBe(second.tick);

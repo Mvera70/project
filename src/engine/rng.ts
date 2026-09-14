@@ -23,7 +23,8 @@ export type RngStream =
   | 'animals'
   | 'murrain'
   | 'traders'
-  | 'quarrels';
+  | 'quarrels'
+  | 'minds';
 
 /**
  * The 32-bit state of every stream. Part of GameState, so it is flat and
@@ -48,6 +49,7 @@ export const RNG_STREAMS: readonly RngStream[] = [
   'murrain',
   'traders',
   'quarrels',
+  'minds',
 ] as const;
 
 /**
@@ -92,6 +94,7 @@ export function makeBundle(seed: number): RngBundle {
     murrain: hash32(seed, 'murrain'),
     traders: hash32(seed, 'traders'),
     quarrels: hash32(seed, 'quarrels'),
+    minds: hash32(seed, 'minds'),
   };
 }
 

@@ -5,10 +5,10 @@
 // harvest is eaten first and reaped afterwards, which is what makes a bad
 // autumn show up in the granary before the winter rather than after it.
 
-import { FOOD, LABOUR } from '../balance';
+import { CHARACTER, FOOD, LABOUR } from '../balance';
 import { isHere, population } from '../people/demography';
 import { ageOf } from '../people/villagers';
-import { next, pick } from '../rng';
+import { next, weighted } from '../rng';
 import type { GameState, Villager, VillagerId } from '../state';
 import { seasonOf } from '../time';
 import { feedAndSlaughter, type HerdReport } from './herd';
@@ -82,7 +82,10 @@ export function consume(state: GameState): {
   for (const tier of tiers) {
     const pool = [...tier];
     while (starved.length < toll && pool.length > 0) {
-      const v = pick(state.rng, 'deaths', pool);
+      // §6.3, v3.61 · dentro del tramo que toca, el astuto es el que menos cae:
+      // se las arregla para comer cuando no hay. El orden de §5.3 no se toca.
+      const v = weighted(state.rng, 'deaths', pool, (who) =>
+        (who.traits.includes('cunning') ? CHARACTER.CUNNING_SURVIVES : 1));
       pool.splice(pool.indexOf(v), 1);
       v.diedTick = state.tick;
       v.causeOfDeath = 'hunger';

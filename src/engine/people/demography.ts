@@ -9,8 +9,8 @@
 // Every step photographs its list before it starts (§4.2): a newborn cannot
 // die in the tick it is born, and somebody who dies this tick fathers nobody.
 
-import { BIRTH, DEATH, DISASTER, FOUNDING, LABOUR, LIFE, MIGRATION, MOOD, TIME } from '../balance';
-import { int, next, pick } from '../rng';
+import { CHARACTER, BIRTH, DEATH, DISASTER, FOUNDING, LABOUR, LIFE, MIGRATION, MOOD, TIME } from '../balance';
+import { int, next, pick, weighted } from '../rng';
 import type {
   BirthEvent,
   DeathCause,
@@ -23,6 +23,7 @@ import type {
 } from '../state';
 import { weekOf } from '../time';
 import { ageOf, makeVillager } from './villagers';
+import { rollCharacter } from './traits';
 
 // ---------------------------------------------------------------------------
 // Counting heads
@@ -238,6 +239,8 @@ export function resolveBirths(state: GameState, ctx: TickContext): BirthEvent[] 
       bornTick: state.tick,
       parentIds: [mother.id, father?.id ?? null],
       homeId: mother.homeId,
+      // §6.3, v3.61 · se nace con carácter, no se recibe con el cargo.
+      traits: rollCharacter(state.rng),
     });
     state.people.nextId += 1;
     state.people.villagers.push(child);
@@ -346,6 +349,7 @@ function arrive(state: GameState): MigrationEvent {
       id: state.people.nextId,
       female,
       bornTick: state.tick - age * TIME.WEEKS_PER_YEAR,
+      traits: rollCharacter(state.rng),
     });
     state.people.nextId += 1;
     state.people.villagers.push(v);
@@ -380,7 +384,15 @@ function depart(state: GameState, multiplier: 1 | 2 = 1): MigrationEvent | null 
   const ids: VillagerId[] = [];
   const pool = [...leavers];
   for (let i = 0; i < count; i += 1) {
-    const v = pick(state.rng, 'births', pool);
+    // §6.3, v3.61 · no se va cualquiera: se va el que es de irse. El cobarde de
+    // los primeros y el leal de los últimos, que es lo que significan los dos
+    // rasgos. Consume una tirada igual que el sorteo uniforme que había aquí.
+    const v = weighted(state.rng, 'births', pool, (who) => {
+      let want = 1;
+      if (who.traits.includes('craven')) want *= CHARACTER.CRAVEN_LEAVES;
+      if (who.traits.includes('loyal')) want *= CHARACTER.LOYAL_STAYS;
+      return want;
+    });
     pool.splice(pool.indexOf(v), 1);
     v.leftTick = state.tick;
     ids.push(v.id);

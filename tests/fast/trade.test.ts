@@ -107,21 +107,38 @@ describe('la sal cumple lo que promete · §7.8', () => {
     // métrica equivocada — con sal se para de matar antes, así que el total
     // puede salir menor. Lo que la sal salva son cabezas, y eso es lo que se
     // mide aquí.
-    const make = (): GameState => {
+    // **Se barre el hueco que hay que tapar, no el tamaño del rebaño.**
+    //
+    // La sal no da carne: hace que cada res cunda un 35 % más, y las reses se
+    // matan de una en una hasta cubrir la semana. Así que la sal salva una
+    // cabeza sólo cuando el déficit cae donde los dos redondeos difieren: con
+    // un hueco de 40 hacen falta dos reses con sal y sin ella (40/25 y 40/33,75
+    // suben las dos a 2), y con uno de 30 hacen falta dos sin sal y una con.
+    //
+    // La primera versión fijaba un solo escenario y medía, sin saberlo, si ese
+    // escenario caía en el tramo bueno. En v3.61 el carácter cambió la
+    // población, el hueco se movió y la prueba acusó a la sal de no funcionar.
+    const make = (grain: number): GameState => {
       const s = village(20);
-      s.village.grain = 0;
-      s.herd = { hens: 0, pigs: 4, cows: 0 };
+      s.village.grain = grain;
+      s.herd = { hens: 0, pigs: 40, cows: 0 };
       return s;
     };
 
-    const plain = make();
-    consume(plain);
+    let saved = 0;
+    for (let grain = 0; grain <= 60; grain += 5) {
+      const plain = make(grain);
+      consume(plain);
 
-    const salted = make();
-    salted.flags['salted'] = salted.tick + 5 * TIME.WEEKS_PER_YEAR;
-    consume(salted);
+      const salted = make(grain);
+      salted.flags['salted'] = salted.tick + 5 * TIME.WEEKS_PER_YEAR;
+      consume(salted);
 
-    expect(salted.herd.pigs).toBeGreaterThan(plain.herd.pigs);
+      expect(salted.herd.pigs, `con ${grain} de grano, la sal nunca cuesta cabezas`)
+        .toBeGreaterThanOrEqual(plain.herd.pigs);
+      saved += salted.herd.pigs - plain.herd.pigs;
+    }
+    expect(saved, 'barriendo el hueco, la sal salva cabezas').toBeGreaterThan(0);
   });
 
   it('una sola res salada alimenta más que una sin salar', () => {

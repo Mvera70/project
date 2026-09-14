@@ -50,6 +50,28 @@ function village(years: number, seed = 7): GameState {
   return structuredClone(base);
 }
 
+/**
+ * Un valle que haya tenido tiempo de abrir camino de verdad (§7.6).
+ *
+ * Buscando entre semillas en vez de fiando en una: cuánto se pisa depende de
+ * por dónde reparte la gente sus destinos, y eso cambia de partida en partida.
+ * En v3.61 el carácter movió las rutas y la semilla 7 dejó de tener ninguna
+ * celda de nivel 2 a los catorce años, con lo que dos pruebas del suelo se
+ * quedaron sin sitio que medir y acusaron al dibujo de un fallo que no era.
+ */
+function trodden(): { state: GameState; cell: number } {
+  for (const seed of [7, 11, 23, 41, 97, 3]) {
+    for (const years of [14, 30, 60]) {
+      const state = village(years, seed);
+      const cell = state.map.path.findIndex(
+        (wear, at) => wear >= 2 && state.map.terrain[at] === 0,
+      );
+      if (cell >= 0) return { state, cell };
+    }
+  }
+  throw new Error('ninguna partida abrió camino de nivel 2');
+}
+
 function frameAt(seconds: number) {
   return {
     tickFraction: 0.5, presentationSeconds: seconds, deltaSeconds: 1 / 60,
@@ -384,7 +406,7 @@ describe('G-06 · el suelo', () => {
   it('un camino muy pisado deja rodada', () => {
     // El paso se lleva la hierba y luego la tierra. Lo que se ve desde arriba
     // no es el hundimiento, es la sombra de su borde.
-    const state = village(14);
+    const { state, cell: worn } = trodden();
     const ground = buildGround(state.map, PALETTES.summer);
     const position = ground.mesh.geometry.getAttribute('position');
     const lowest = (cell: number): number => {
@@ -392,9 +414,6 @@ describe('G-06 · el suelo', () => {
       for (let vertex = 0; vertex < 4; vertex += 1) value = Math.min(value, position.getY(cell * 4 + vertex));
       return value;
     };
-    const worn = state.map.path.findIndex(
-      (wear, cell) => wear >= 2 && state.map.terrain[cell] === 0,
-    );
     expect(worn).toBeGreaterThanOrEqual(0);
     const bare = state.map.terrain.findIndex(
       (kind, cell) => kind === 0 && (state.map.path[cell] ?? 0) === 0,
@@ -815,7 +834,7 @@ describe('G-10 · nieva en los tejados', () => {
 describe('G-10 · lo que pisa el valle sigue su cota', () => {
   it('un aldeano no flota sobre el camino hundido', () => {
     // En cuanto el suelo dejó de ser plano dejó de valer ponerlo todo a cero.
-    const state = village(14);
+    const { state, cell: worn } = trodden();
     const model = (): Object3D => {
       const group = new Group();
       group.add(new Mesh(new BoxGeometry(0.2, 0.6, 0.2), new MeshStandardMaterial()));
@@ -828,7 +847,7 @@ describe('G-10 · lo que pisa el valle sigue su cota', () => {
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);
     cast.standOn((x, z) => elevationAt(state.map, x, z));
 
-    const worn = state.map.path.findIndex((wear, cell) => wear >= 2 && state.map.terrain[cell] === 0);
+
     const bare = state.map.terrain.findIndex((kind, cell) => kind === 0 && (state.map.path[cell] ?? 0) === 0);
     expect(worn).toBeGreaterThanOrEqual(0);
     const at = (cell: number): [number, number] => [

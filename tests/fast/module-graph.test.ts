@@ -68,6 +68,7 @@ describe('grafo de módulos del motor', () => {
       'rng',
       'state',
       'time',
+      'traits',
       'villagers',
     ]);
     expect(importsOf('state.ts')).not.toContain('people/villagers');
@@ -79,6 +80,18 @@ describe('grafo de módulos del motor', () => {
       'memories',
       'state',
     ]);
+    // M-43, v3.61 · el cerebro es la hoja de arriba: usa a los tres de abajo y
+    // no lo usa nadie de `people/`, sólo el tick. Por eso puede juntar lo que
+    // ninguno de los tres podía juntar sin morderse la cola.
+    expect(importsOf('people/minds.ts')).toEqual([
+      'balance',
+      'demography',
+      'memories',
+      'opinions',
+      'state',
+    ]);
+    expect(importsOf('people/opinions.ts')).not.toContain('minds');
+    expect(importsOf('people/demography.ts')).not.toContain('minds');
   });
 
   it('subsistence/ cuelga de people/ y de las hojas, nunca al revés', () => {

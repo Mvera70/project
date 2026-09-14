@@ -22,7 +22,7 @@ import type {
 } from '../state';
 import { yearOf } from '../time';
 import { makeName } from './names';
-import { rollTraits } from './traits';
+import { rollCharacter, suitsRole } from './traits';
 
 /** The six offices the village is founded with, in the order of §6.2. */
 export const FOUNDING_ROLES: readonly Role[] = [
@@ -61,9 +61,18 @@ export function minAgeFor(role: Role): number {
 }
 
 /**
- * The oldest of `ids` who clears the role's floor; if nobody does, the oldest
- * of them anyway — an office held young beats an office left vacant at the
- * founding. Ties go to the lowest id, so the choice is total and deterministic.
+ * Quién se queda con el oficio. §6.2, §6.3 v3.61.
+ *
+ * Entre los que pasan el suelo de edad, **el que mejor encaja de carácter**, y
+ * la edad decide los empates. Antes era sólo el más viejo y daba igual quién
+ * fuera, porque el carácter se lo inventaba el nombramiento un instante después
+ * (`rollTraits(b, role)`); ahora que se nace con él, la tabla de §6.3 se lee al
+ * derecho: la fragua va a parar al terco que ya había, y si no hay ninguno, al
+ * que menos desencaje.
+ *
+ * Si nadie pasa el suelo, el más viejo de todos: un oficio en manos jóvenes es
+ * mejor que un oficio vacante en la fundación. Los empates van al id más bajo,
+ * así que la elección es total y determinista y no consume azar.
  */
 function oldestFor(
   villagers: readonly Villager[],
@@ -72,12 +81,14 @@ function oldestFor(
   tick: number,
 ): VillagerId | undefined {
   const floor = minAgeFor(role);
-  const byAge = [...ids].sort((a, b) => {
-    const ageA = ageOf(villagers[a] as Villager, tick);
-    const ageB = ageOf(villagers[b] as Villager, tick);
-    return ageB - ageA || a - b;
-  });
-  return byAge.find((id) => ageOf(villagers[id] as Villager, tick) >= floor) ?? byAge[0];
+  const age = (id: VillagerId): number => ageOf(villagers[id] as Villager, tick);
+  const fit = (id: VillagerId): number => suitsRole((villagers[id] as Villager).traits, role);
+
+  const grown = [...ids].filter((id) => age(id) >= floor);
+  if (grown.length > 0) {
+    return grown.sort((a, b) => fit(b) - fit(a) || age(b) - age(a) || a - b)[0];
+  }
+  return [...ids].sort((a, b) => age(b) - age(a) || a - b)[0];
 }
 
 export interface VillagerSpec {
@@ -184,6 +195,7 @@ export function foundPeople(b: RngBundle, tick: number): PeopleState {
       id: i,
       female: d.female,
       bornTick: tick - d.age * TIME.WEEKS_PER_YEAR,
+      traits: rollCharacter(b),
     }),
   );
 
@@ -220,7 +232,6 @@ export function foundPeople(b: RngBundle, tick: number): PeopleState {
     v.role = role;
     v.name = makeName(b, v.female, used);
     used.add(v.name);
-    v.traits = rollTraits(b, role);
     namedIds.push(id);
   }
 
@@ -262,7 +273,6 @@ export function promoteToNamed(state: GameState, id: VillagerId, role: Role): vo
   v.named = true;
   v.role = role;
   v.name = makeName(state.rng, v.female, new Set(living.map((x) => x.name)));
-  v.traits = rollTraits(state.rng, role);
 
   // Opinions only among the living: the dead are remembered by the chronicle,
   // not by an opinion that could still drift.

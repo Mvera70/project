@@ -9,6 +9,7 @@ import { isHere, population } from '../people/demography';
 import { remember } from '../people/memories';
 import { adjustOpinion } from '../people/opinions';
 import { ageOf, makeVillager } from '../people/villagers';
+import { rollCharacter } from '../people/traits';
 import { int, next, pick } from '../rng';
 import { herdCapacity } from '../subsistence/herd';
 import type { GameState, Villager, VillagerId } from '../state';
@@ -129,6 +130,7 @@ export function applyEffect(
           id: state.people.nextId,
           female: next(state.rng, 'names') < 0.5,
           bornTick: state.tick - age * 48,
+          traits: rollCharacter(state.rng),
         });
         state.people.nextId += 1;
         state.people.villagers.push(v);

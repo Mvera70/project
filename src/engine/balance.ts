@@ -873,6 +873,46 @@ export const NEIGHBOUR = {
   FLOOR: -60,
 } as const;
 
+/**
+ * §6.3, v3.61 · Lo que el carácter decide fuera del catálogo.
+ *
+ * Hasta aquí `ambitious`, `craven`, `cunning` y `secretive` no hacían **nada**:
+ * estaban en la declaración de tipos y en los pesos de las encrucijadas, y
+ * fuera de una decisión del jugador no cambiaban un solo resultado. Cuatro de
+ * los quince rasgos eran etiquetas.
+ *
+ * Esto los pone a decidir, y cada uno en el sitio donde ese carácter se nota de
+ * verdad: quién se va cuando la cosa se tuerce, quién aguanta el hambre, quién
+ * se toma a mal que el puesto sea de otro, quién no llega a atarse a nadie.
+ * Todo TUNE, y todo sobre sorteos que ya existían: antes eran uniformes —daba
+ * igual quién fueras— y ahora pesan.
+ */
+export const CHARACTER = {
+  /** TUNE: el cobarde se marcha de los primeros cuando el ánimo cae (§5.7). */
+  CRAVEN_LEAVES: 2.5,
+  /** TUNE: y el leal es de los últimos en irse. */
+  LOYAL_STAYS: 0.4,
+  /**
+   * TUNE: lo que el astuto se las arregla para comer cuando no hay (§5.3).
+   *
+   * No es inmunidad: es la mitad de probabilidad de ser el que cae dentro de su
+   * propio tramo de edad. El orden de §5.3 —primero los viejos, luego los
+   * niños— no se toca; lo que cambia es a quién de ellos le toca.
+   */
+  CUNNING_SURVIVES: 0.5,
+  /**
+   * TUNE: lo que le sienta al ambicioso que el puesto sea de otro (§6.2).
+   *
+   * Más que una acusación pública no, pero se acumula: un ambicioso al que
+   * pasan por alto tres veces acaba detestando a quien se lo quedó, y ahí está
+   * el empujón que §6.4 nunca tuvo. Es la mitad del catálogo de feudos
+   * llegando por donde tenía que llegar: por el carácter de alguien.
+   */
+  AMBITIOUS_PASSED_OVER: -22,
+  /** TUNE: lo poco que ata el reservado, para bien y para mal (§7.9). */
+  SECRETIVE_BOND: 0.45,
+} as const;
+
 export const MEMORY = {
   MAX: 12, // per named villager
   WEIGHT_MIN: 1,

@@ -28,7 +28,7 @@
 // nunca se consume azar.
 
 import { NIGHT } from '@render/animals';
-import type { Building, GameState, Villager } from '@engine/state';
+import type { Building, GameState, ValleyMap, Villager } from '@engine/state';
 
 /**
  * A qué hora de la jornada se releva el estado.
@@ -62,7 +62,7 @@ export interface ScenicState {
    * Devuelve siempre el de la jornada en curso: el mismo objeto mientras dure,
    * así que quien quiera saber si cambió puede compararlo por identidad.
    */
-  of(state: GameState, dayPhase: number, day: number): GameState;
+  of(state: GameState, dayPhase: number): GameState;
   /**
    * Olvidar la jornada. Partida nueva, carga, o un fotograma discontinuo: lo
    * que se congeló pertenece a otra cosa y honrarlo sería peor que no tenerlo.
@@ -79,6 +79,14 @@ export interface ScenicState {
  * array no guarda nada. Lo mismo con la gente: morir es escribir `diedTick` en
  * el aldeano que ya estaba.
  *
+ * **Y el mapa con ellos**, que fue lo que se me pasó en la primera versión: el
+ * motor tala, construye y desgasta caminos escribiendo dentro de los mismos
+ * arrays, así que el terreno cambiaba bajo los pies de una jornada ya
+ * congelada. Se notaba donde menos se esperaba —un animal al que `ashore`
+ * apartaba del agua aparecía 1,08 celdas más allá en pleno mediodía, sin que
+ * ninguna posición hubiese saltado— y costó encontrarlo justamente porque
+ * `animalPositions` era continua: lo que se movía era el suelo.
+ *
  * Lo que no se copia es lo que el motor no muta en sitio o el valle no dibuja
  * —la crónica, el historial, los flujos de azar—: van por referencia porque
  * copiarlos sería pagar por nada.
@@ -88,6 +96,15 @@ function freeze(state: GameState): GameState {
     ...state,
     herd: { ...state.herd },
     village: { ...state.village },
+    map: {
+      ...state.map,
+      terrain: state.map.terrain.slice(),
+      traffic: state.map.traffic.slice(),
+      path: state.map.path.slice(),
+      ruins: state.map.ruins.slice(),
+      forestAge: state.map.forestAge.slice(),
+      forestStock: state.map.forestStock.slice(),
+    } as ValleyMap,
     buildings: state.buildings.map((building): Building => ({ ...building })),
     people: {
       ...state.people,
@@ -97,24 +114,30 @@ function freeze(state: GameState): GameState {
 }
 
 export function createScenicState(): ScenicState {
-  let day = Number.NaN;
   let dark = false;
   let held: GameState | null = null;
 
   return {
     reset(): void {
-      day = Number.NaN;
       dark = false;
       held = null;
     },
 
-    of(state: GameState, dayPhase: number, today: number): GameState {
+    of(state: GameState, dayPhase: number): GameState {
       const night = dayPhase >= NIGHTFALL;
-      // Se releva al caer la noche, y también al estrenar jornada: lo segundo
-      // es lo que cubre el primer fotograma de la partida y el que llega
-      // después de un salto, donde no ha habido anochecer que mirar.
-      if (held === null || day !== today || (night && !dark)) {
-        day = today;
+      // **Una sola vez por jornada, y al caer la noche.**
+      //
+      // La primera versión relevaba también al cambiar el número de día, «por
+      // cubrir el primer fotograma». Pero el número de día cambia cuando la
+      // fase pasa por cero, o sea **al amanecer**, con el valle entero a la
+      // vista: eran dos relevos por jornada y el segundo se veía. Medido, el
+      // ganado daba un salto de 1,08 celdas justo al clarear — exactamente el
+      // fallo que este fichero existe para quitar, reintroducido por la línea
+      // que pretendía ser cuidadosa.
+      //
+      // El arranque no lo cubre el día: lo cubre `held === null`, que es lo que
+      // hay tras un `reset` y en el primer fotograma de la partida.
+      if (held === null || (night && !dark)) {
         held = freeze(state);
       }
       dark = night;

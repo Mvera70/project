@@ -493,8 +493,13 @@ describe('G-05 · los actores', () => {
     const plain = actorsFor(state, frameAt(5));
     expect(plain.length).toBeLessThanOrEqual(MAX_ACTORS);
 
-    const last = state.people.villagers.filter(isHere).at(-1);
-    expect(last).toBeDefined();
+    // **Se sigue a alguien que esté en la calle a esa hora.** Antes se cogía al
+    // último de la lista de vivos, y a media mañana ése puede estar dentro de
+    // casa: entonces no sale —seguirle no le saca, y así debe ser— y la prueba
+    // acusaba al seguimiento de no poner primero a quien ni siquiera se dibuja.
+    // El último de los que **salen** prueba lo mismo sin depender de la hora.
+    const last = plain.at(-1);
+    expect(last, 'alguien a la vista a quien seguir').toBeDefined();
     const tracked = actorsFor(state, frameAt(5), { tracked: last?.id ?? null });
     expect(tracked[0]?.id).toBe(last?.id);
   });

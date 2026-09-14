@@ -295,12 +295,20 @@ describe('el catálogo · cobertura rápida', () => {
   let seen: Map<string, number>;
   beforeAll(() => { seen = sweep(12, 100); });
 
-  // Estas siete necesitan siglos o estados muy concretos y no salen en doce
-  // partidas de cien años. Que no falten de verdad lo comprueba el barrido
-  // completo de tests/balance/, no esta prueba.
+  // Estas necesitan siglos o estados muy concretos y no salen en doce partidas
+  // de cien años. Que no falten de verdad lo comprueba el barrido completo de
+  // tests/balance/, no esta prueba.
+  //
+  // `quiet_years` está aquí por lo contrario que las demás, y conviene no
+  // confundirlo: es la **reserva** de §8.6, la que sale cuando no hay ninguna
+  // otra elegible, y su propio fichero dice que existe para que la garantía no
+  // falle y no para ser interesante. Desde v3.61 el valle tiene bastante que
+  // preguntar por su cuenta —los rencores del carácter dan de comer a las
+  // plantillas de rencilla— y la reserva deja de hacer falta. **Que no salga es
+  // la señal buena**: significa que había algo mejor que preguntar.
   const SLOW = [
     'plague_blame', 'forest_cut', 'wolf_winter', 'first_stone',
-    'chapel_or_granary', 'feud_inherited', 'smith_feud',
+    'chapel_or_granary', 'feud_inherited', 'smith_feud', 'quiet_years',
   ];
 
   it('ninguna plantilla corriente se queda a cero en 12 semillas × 100 años', () => {

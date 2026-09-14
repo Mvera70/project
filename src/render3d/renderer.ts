@@ -33,7 +33,7 @@ import {
 } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
-import { dayNumber, dayPhase } from './presentation-clock';
+import { dayPhase } from './presentation-clock';
 import { createScenicState } from './scenic-state';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
@@ -373,7 +373,6 @@ export async function createGraphicsRenderer(
       // La hora escenica primero, porque de ella cuelga todo lo demas: es la
       // que dice que jornada se esta pintando y, con ella, que estado.
       const phase = dayPhase(frame.presentationSeconds);
-      const today = dayNumber(frame.presentationSeconds);
       // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
       // que no es la continuacion del anterior, asi que la jornada guardada no
       // vale: se estrena una. `presentation-clock` ya distingue los tres casos.
@@ -381,7 +380,7 @@ export async function createGraphicsRenderer(
       // **Y a partir de aqui se pinta esto y no `state`.** El de la jornada,
       // quieto desde anoche: ver `scenic-state.ts` para por que. Lo vivo solo lo
       // mira quien tenga una razon para mirarlo, y hoy no la tiene nadie.
-      const shown = scenic.of(state as GameState, phase, today);
+      const shown = scenic.of(state as GameState, phase);
 
       const next = planFor(shown);
       const change = planChange(plan, next);

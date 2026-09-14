@@ -423,7 +423,9 @@ describe('nacimientos', () => {
         expect(ageOf(baby, s.tick)).toBe(0);
         expect(baby.named).toBe(false);
         expect(baby.name).toBe('');
-        expect(baby.traits).toEqual([]);
+        // v3.61 · se nace con carácter (§6.3). Lo que no se tiene al nacer es
+        // nombre, oficio ni memoria: eso llega, o no llega, con la vida.
+        expect(baby.traits.length).toBeGreaterThanOrEqual(3);
         expect(baby.parentIds[0]).toBe(e.motherId);
         expect(baby.parentIds[1]).toBe(e.fatherId);
       }
@@ -573,7 +575,8 @@ describe('migración · las puertas de §5.7', () => {
           const v = s.people.villagers.find((x) => x.id === id) as Villager;
           expect(v.named).toBe(false);
           expect(v.role).toBeNull();
-          expect(v.traits).toEqual([]);
+          // v3.61 · quien llega trae su carácter puesto, como cualquiera.
+          expect(v.traits.length).toBeGreaterThanOrEqual(3);
           const age = ageOf(v, s.tick);
           expect(age).toBeGreaterThanOrEqual(FOUNDING.AGE_RANGES.children[0]);
           expect(age).toBeLessThanOrEqual(MIGRATION.ARRIVE_ADULT_AGE[1]);

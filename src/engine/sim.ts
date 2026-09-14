@@ -13,6 +13,7 @@ import {
   resolveMigration,
 } from './people/demography';
 import { decayMemories } from './people/memories';
+import { passedOver } from './people/minds';
 import { driftOpinions, opinionOf } from './people/opinions';
 import { quarrelOf } from './people/quarrels';
 import { rubShoulders, workedTogether } from './people/neighbours';
@@ -141,7 +142,12 @@ export function fillVacancies(state: GameState): void {
         ageOf(a, state.tick) - ageOf(b, state.tick) ||
         a.id - b.id,
     )[0];
-    if (best !== undefined) promoteToNamed(state, best.id, role);
+    if (best !== undefined) {
+      promoteToNamed(state, best.id, role);
+      // §6.3, v3.61 · y a quien se creia con derecho le sienta mal. Va despues
+      // de la promocion porque resiente al que se lo quedo, no al puesto.
+      passedOver(state, best.id);
+    }
   }
 }
 
