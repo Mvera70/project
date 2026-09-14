@@ -4,6 +4,7 @@
 // valley interrupts for. §9.2 already answered it for the chronicle screen,
 // and this must not invent a second answer.
 import { describe, expect, it } from 'vitest';
+import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { tick } from '@engine/sim';
@@ -37,5 +38,18 @@ describe('noticeworthy · §9.2', () => {
     }
     expect(noticed).toBeGreaterThan(0); // ...pero alguna vez tiene que hablar
     expect(noticed / ticks).toBeLessThan(0.25);
+  });
+});
+
+describe('U-02 · el hito pesa más que el aviso', () => {
+  it('una cosa que pasa una vez se lee más rato que una que pasa a menudo', () => {
+    // Las dos cosas que asoman sobre el valle y se retiran solas (§11.6) son el
+    // aviso —lo que acaba de pasar, y pasa mucho— y el hito —lo que pasa una
+    // vez: la primera casa de piedra, la muralla cerrada, el siglo del valle—.
+    // Si el hito no durase más, se leería como un aviso cualquiera y el momento
+    // no sería un momento. Los dos en reloj de pared y a corte seco, por §11.4.
+    expect(TIME.MOMENT_MS).toBeGreaterThan(TIME.NOTICE_MS);
+    // Y ninguno tanto como para que haya que quitarlo de en medio.
+    expect(TIME.MOMENT_MS).toBeLessThan(12_000);
   });
 });

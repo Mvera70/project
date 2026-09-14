@@ -29,6 +29,13 @@ export const TIME = {
   // faded: §11.4 forbids an interface animation that a clock jump can catch
   // half-way.
   NOTICE_MS: 5_000,
+  // TUNE: how long a milestone holds the screen (§11.6, U-02). Longer than a
+  // notice because it is rarer and worth reading twice — the first stone house,
+  // the wall closed, a hundred years of the valley — and short enough that it
+  // never becomes something to dismiss. Real time and cut hard, like the
+  // notice, for the same reason: §11.4 forbids an interface animation a clock
+  // jump can catch half-way.
+  MOMENT_MS: 7_000,
   SAVE_EVERY_TICKS: 20, // §13.1
 } as const;
 
