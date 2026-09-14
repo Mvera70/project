@@ -1650,6 +1650,10 @@ export const UI_BANK: Record<string, string> = {
   'app.season.summer': 'Summer',
   'app.season.autumn': 'Autumn',
   'app.season.winter': 'Winter',
+  // U-09 · el botón de sonido, junto a la regleta de velocidad (`app.ts`). El
+  // dibujo cambia solo; esto es lo que anuncia un lector de pantalla.
+  'app.sound.on': 'Sound on',
+  'app.sound.off': 'Sound off',
   'crossroad.waiting': 'A crossroad is waiting',
   // U-07 · el texto visible de la píldora que reemplaza al punto rojo
   // (`screens/crossroad.ts`, `.crossroad-marker`). Distinto del aria-label de

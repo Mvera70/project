@@ -87,9 +87,13 @@
       /* La velocidad, en una sola regleta: son tres posiciones de un mando, no
          tres botones distintos. Sigue cumpliendo los 44 px de §11.3.
          U-05 · sube y se queda a la derecha, encima de la barra de abajo, sin
-         taparla: el hueco es la altura de esa barra más un respiro. */
-      .valley-speeds { position: absolute; z-index: 2; right: max(10px, env(safe-area-inset-right));
-        bottom: calc(60px + env(safe-area-inset-bottom)); display: flex; padding: 2px; gap: 2px;
+         taparla: el hueco es la altura de esa barra más un respiro.
+         U-09 · la regleta ya no se posiciona sola: comparte fila con el botón
+         de sonido dentro de `.valley-hud-right`, que es quien ahora ancla el
+         rincón. */
+      .valley-hud-right { position: absolute; z-index: 2; right: max(10px, env(safe-area-inset-right));
+        bottom: calc(60px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; }
+      .valley-speeds { display: flex; padding: 2px; gap: 2px;
         border: 1px solid var(--edge); border-radius: 24px; background: var(--plate);
         box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px); }
       .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 6px; border: 0; border-radius: 21px;
@@ -98,8 +102,22 @@
         -webkit-tap-highlight-color: transparent; }
       .valley-speeds button:active { background: rgba(34,29,24,.10); }
       .valley-speeds button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
-      .valley-speeds button:focus-visible, .valley-panel:focus-visible, .valley-tab:focus-visible {
+      .valley-speeds button:focus-visible, .valley-panel:focus-visible, .valley-tab:focus-visible,
+      .valley-sound:focus-visible {
         outline: 2px solid var(--gild); outline-offset: 2px; }
+
+      /* U-09 · el botón de sonido: un círculo del mismo tamaño mínimo que un
+         botón de velocidad (§11.3), con la misma piel de instrumento que la
+         regleta que tiene al lado — tinta sobre pergamino cuando está
+         apagado, el dibujo lo dice todo, nada de texto (CLAUDE.md). */
+      .valley-sound { width: 44px; height: 44px; padding: 0; display: flex; align-items: center;
+        justify-content: center; border: 1px solid var(--edge); border-radius: 50%; background: var(--plate);
+        color: var(--ink-soft); cursor: pointer; box-shadow: 0 2px 6px rgba(34,29,24,.20);
+        backdrop-filter: blur(2px); -webkit-tap-highlight-color: transparent; }
+      .valley-sound:active { background: rgba(34,29,24,.10); }
+      .valley-sound[aria-pressed="false"] { color: var(--ink-soft); opacity: .55; }
+      .valley-sound[aria-pressed="true"] .valley-sound-off,
+      .valley-sound[aria-pressed="false"] .valley-sound-on { display: none; }
 
       /* U-05 · La barra de abajo: los tres destinos, siempre a la vista. Misma
          piel que la regleta de velocidad —tinta sobre pergamino cuando algo

@@ -1010,3 +1010,56 @@ export const MILESTONES = {
   // against the population the balance tables put in a mature valley.
   PEAK_PEOPLE_STEP: 10,
 } as const;
+
+// ---------------------------------------------------------------------------
+// `src/ui/sound.ts` — U-09, design.md §11.1, §11.4, §11.6
+//
+// Presentation only, the same standing as BUBBLE, ENCOUNTER and DAY above:
+// none of this moves a number of the game and none of it is saved, but §2
+// still forbids a number of the game living loose in a drawing file, and a
+// duration or a gain is a number. Everything here is synthesised with Web
+// Audio — no file, ever (CLAUDE.md) — so what needs fixing is timings and
+// levels, never a byte count.
+// ---------------------------------------------------------------------------
+
+export const SOUND = {
+  // TUNE: gain of the wind bed, 0..1, by season. No source in §12 sets a
+  // mood for the seasons in sound; the valley already reads winter as the
+  // hard season (§5.5's wood, §12.3's cold) and summer as the easy one, so
+  // the wind follows that same shape — loudest in autumn and winter, softest
+  // in summer — rather than inventing a second one.
+  WIND_BY_SEASON: { spring: 0.32, summer: 0.18, autumn: 0.5, winter: 0.75 },
+  // TUNE: the river's own gain. Constant and modest — it must sit under the
+  // wind, never compete with it, the way a real river does at the distance a
+  // village stands from its bank.
+  RIVER_GAIN: 0.22,
+  // TUNE: how loud one anvil strike or one toll of the bell is against the
+  // ambient bed.
+  FORGE_GAIN: 0.5,
+  BELL_GAIN: 0.4,
+  // TUNE: real seconds between one anvil strike and the next, and between one
+  // toll and the next — wall clock on purpose, like NOTICE_MS and MOMENT_MS
+  // above: this is decorated background, not a schedule the chronicle keeps,
+  // and no seed has to reproduce it. Wide enough apart that neither reads as
+  // a metronome; the forge quicker than the bell because a smith's hammer
+  // falls far oftener than a chapel calls anyone to anything.
+  FORGE_INTERVAL_S: [7, 14],
+  BELL_INTERVAL_S: [40, 70],
+  // TUNE: how long a layer takes to fade in or out when what it represents
+  // appears or disappears (a smithy lighting its forge, a chapel going up).
+  // A jump would read as a splice; this is long enough to be a fade and short
+  // enough that the change still lands near the moment that caused it.
+  AMBIENT_FADE_S: 2.5,
+  // TUNE: the accent's own gain and length (§11.6, §11.8's "raro" principle
+  // read onto sound): a beat, not a fanfare, over in about a second.
+  ACCENT_GAIN: 0.55,
+  ACCENT_DURATION_S: 1.1,
+  // TUNE: the minimum real time between two accents. §11.4's own case — a
+  // speed jump, or the batch a single animation frame can run — can call the
+  // trigger more than once before any sound has actually played; this is the
+  // wall-clock floor that keeps two of those from stacking into one ugly
+  // instant rather than the rare, single beat the design asks for. Wall clock
+  // on purpose: what this guards against is a playback artefact, not
+  // something that happened in the game.
+  ACCENT_MIN_GAP_MS: 2_500,
+} as const;

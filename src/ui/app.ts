@@ -25,6 +25,7 @@ import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { openPeople } from './screens/people';
 import { isSpeed, speedLabel, type Speed } from './speed';
+import { accentFor, ambientFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
 
 export interface App {
@@ -194,6 +195,35 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     return [value, button] as const;
   });
 
+  // U-09 · el sonido: sintetizado con Web Audio, nunca un fichero (§ ficha del
+  // encargo, CLAUDE.md). No suena nada hasta el primer toque (más abajo,
+  // junto a los demás gestos) ni si quien juega lo apaga, aquí, junto a la
+  // regleta de velocidad — el mismo sitio y la misma piel que ella.
+  const sound = createSoundEngine();
+  const soundToggle = document.createElement('button');
+  soundToggle.type = 'button';
+  soundToggle.className = 'valley-sound';
+  // Dibujado y no escrito, como `VITAL_ICONS`: dos trazos de más para la
+  // fuente que le toque al teléfono no son una opción a este tamaño. Las dos
+  // versiones —sonando y en silencio— están las dos en el DOM; el CSS
+  // enseña una u otra según `aria-pressed`, nunca cambia el texto.
+  soundToggle.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false"'
+    + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+    + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
+    + '<path class="valley-sound-on" d="M10.7 5.3c1 .9 1 4.5 0 5.4"/>'
+    + '<path class="valley-sound-on" d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
+    + '<path class="valley-sound-off" d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>'
+    + '</svg>';
+  const updateSoundToggle = (): void => {
+    soundToggle.setAttribute('aria-pressed', String(sound.enabled));
+    soundToggle.setAttribute('aria-label', renderUiText(sound.enabled ? 'app.sound.on' : 'app.sound.off'));
+  };
+  soundToggle.addEventListener('click', () => { sound.setEnabled(!sound.enabled); updateSoundToggle(); });
+  updateSoundToggle();
+  const hudRight = document.createElement('div');
+  hudRight.className = 'valley-hud-right';
+  hudRight.append(soundToggle, controls);
+
   // U-05 · La barra de abajo: los tres destinos del juego, siempre a la vista
   // en vez de detrás de un gesto que nadie descubre (§11 del plan siguiente).
   const tabbar = document.createElement('nav');
@@ -222,7 +252,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // U-08 · la pantalla de la gente: la lista de los nombrados vivos y, al
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
   peopleTab.addEventListener('click', () => openPeople(app));
-  root.append(canvas, year, season, vitals, controls, tabbar);
+  // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
+  root.append(canvas, year, season, vitals, hudRight, tabbar);
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
@@ -312,6 +343,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.
     document.documentElement.dataset.tick = String(state.tick);
+    // U-09 · el ambiente sigue el estado, no los sucesos: se recalcula cada
+    // pintado y `SoundEngine.update` es quien decide si de verdad cambia algo
+    // (no suena hasta el primer toque, §11's silencio por defecto).
+    sound.update(ambientFor(state));
     // U-05 · qué destino está abierto ahora mismo. La crónica no guarda su
     // propio estado hacia aquí (`screens/chronicle.ts` no se toca), así que se
     // lee de la propia pantalla: sólo existe mientras está montada.
@@ -351,6 +386,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const surface = (): HTMLCanvasElement => backend.live.surface;
 
   root.addEventListener('pointerdown', (event) => {
+    // U-09 · el único sitio que crea o reanuda el `AudioContext`: nunca antes
+    // del primer toque, porque el navegador no lo deja arrancar solo. Vale
+    // cualquier toque de la raíz, no sólo el del botón de sonido — incluido
+    // el del propio botón, cuyo `click` lo enciende un instante después.
+    sound.arm();
     if (!onValley(event)) return;
     root.setPointerCapture(event.pointerId);
     trace.set(event.pointerId, [{ x: event.clientX, y: event.clientY, atMs: event.timeStamp }]);
@@ -526,6 +566,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       lastMilestoneTick = state.tick;
       // Ya vienen ordenados por peso: si coinciden dos, manda el mayor.
       const best = passed[0];
+      // U-09 · el acento: un hito gana a una encrucijada planteada si
+      // coinciden, la misma prioridad que la cartela ya tiene sobre el
+      // aviso dos líneas más abajo. `accentFor` no dispara durante un
+      // letargo (`catchingUp` es `false` aquí siempre, por construcción de
+      // este bloque) y `sound.accent` aplica el fusible de reloj de pared de
+      // §11.4 antes de sonar de verdad.
+      const kind = accentFor(report.posed, best !== undefined, catchingUp);
+      if (kind !== null) sound.accent(kind, Date.now());
       if (best !== undefined) {
         // **Una voz cada vez.** El aviso y la cartela se pintan a dos dedos el
         // uno del otro, y visto en captura se leen como un bloque de texto
