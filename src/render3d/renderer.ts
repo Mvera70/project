@@ -380,13 +380,27 @@ export async function createGraphicsRenderer(
     sun.shadow.camera.updateProjectionMatrix();
   }
 
-  function rebuildGround(state: GameState): void {
+  /**
+   * El color del valle sale del reloj **vivo**, no del de la jornada.
+   *
+   * Es la única cosa que se pinta del estado vivo, y es a propósito. La cabecera
+   * dice la estación de ahora (U-06) y el valle se pintaba con la paleta del
+   * estado congelado, que a ×64 es de hasta sesenta y cuatro semanas atrás: el
+   * juego se contradecía a sí mismo en pantalla —«aparece que es invierno y no
+   * se ve que sea invierno», dicho por el dueño del diseño probando la demo—.
+   *
+   * Y es lo único que puede seguir al reloj vivo sin romper nada, porque **un
+   * cambio de color no mueve a nadie de sitio**. Relevar el estado entero más a
+   * menudo sí: se midió, y el rebaño saltaba 5,096 celdas (ver `scenic-state.ts`).
+   */
+  let painted = '';
+
+  function rebuildGround(state: GameState, clock: ReturnType<typeof clockOf>): void {
     if (ground !== null) {
       world.remove(ground.mesh);
       ground.dispose();
     }
     // §10.3 · la paleta de la estación, la misma que usa el render 2D.
-    const clock = clockOf(state.tick);
     const palette = paletteFor(clock.season, clock.seasonWeek);
     ground = buildGround(state.map, palette);
     // La nieve en los tejados sale de la misma paleta que la del suelo: cuando
@@ -498,7 +512,16 @@ export async function createGraphicsRenderer(
         bubbles.clear();
         props.clear();
       }
-      if (change.ground || change.cleared) rebuildGround(shown);
+      // El suelo se rehace cuando cambia el terreno **o cuando cambia la
+      // estación del reloj vivo**, que es lo que le da el color. La clave lleva
+      // la semana dentro de la estación porque §10.3 deshiela mezclando durante
+      // las dos primeras.
+      const live = clockOf(state.tick);
+      const colour = `${live.season}:${Math.min(2, live.seasonWeek)}`;
+      if (change.ground || change.cleared || colour !== painted) {
+        rebuildGround(shown, live);
+        painted = colour;
+      }
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
       plan = next;

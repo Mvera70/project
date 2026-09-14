@@ -109,14 +109,63 @@ if (waitFor) {
   }
   console.log(found === null ? `no salió «${waitFor}» en 150 s` : `esperado «${waitFor}»: ${found}`);
 } else if (runSeconds > 0) {
-  await tab.waitForTimeout(runSeconds * 1000);
+  // **Y se cierran las encrucijadas que salgan.** Corriendo a velocidad alta
+  // aparece una cada pocos segundos, y una captura del valle con el velo de una
+  // decisión encima no enseña el valle. Se deslizan igual que lo hace el dedo,
+  // que es lo que §11.2 pide para cerrarla sin contestarla.
+  const until = Date.now() + runSeconds * 1000;
+  while (Date.now() < until) {
+    await tab.waitForTimeout(500);
+    const open = await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'));
+    if (open) await swipeDown();
+  }
 }
 
-await tab.screenshot({ path: out });
+const shot = await tab.screenshot({ path: out });
+
+// Y a qué estación corresponde lo que se acaba de fotografiar, que es la mitad
+// de lo que hace falta para juzgar si el reloj cuadra.
+const season = await tab.evaluate(() => document.querySelector('.valley-season')?.textContent ?? '');
+
+/**
+ * El brillo medio de la captura, de 0 a 1.
+ *
+ * Sin un número, «no se ve» es una opinión y «se ve oscuro» no se puede
+ * comparar entre dos capturas. Se mide sobre **el PNG que se acaba de escribir**
+ * y no sobre el lienzo: un lienzo de WebGL sin `preserveDrawingBuffer` está
+ * vacío en cuanto acaba la llamada de dibujo, así que copiarlo daba cero
+ * siempre — medido, y por eso está escrito aquí. La imagen se devuelve al
+ * navegador en base64 y él la promedia, con el mismo peso de luminancia que usa
+ * la regla de silueta de §10.4.
+ *
+ * Sirve para lo que el reloj destapó: a ×64 el valle parpadea entre día y noche
+ * cada quince segundos, y hace falta saber cuánto es «noche».
+ */
+const brightness = await tab.evaluate(async (base64) => {
+  const image = new Image();
+  await new Promise((done, fail) => {
+    image.onload = done;
+    image.onerror = fail;
+    image.src = `data:image/png;base64,${base64}`;
+  });
+  const flat = document.createElement('canvas');
+  flat.width = 128;
+  flat.height = 128;
+  const ctx = flat.getContext('2d');
+  if (ctx === null) return null;
+  ctx.drawImage(image, 0, 0, flat.width, flat.height);
+  const { data } = ctx.getImageData(0, 0, flat.width, flat.height);
+  let total = 0;
+  for (let at = 0; at < data.length; at += 4) {
+    total += (0.2126 * data[at] + 0.7152 * data[at + 1] + 0.0722 * data[at + 2]) / 255;
+  }
+  return Number((total / (data.length / 4)).toFixed(3));
+}, shot.toString('base64'));
+
 const hud = await tab.evaluate(() => ({
   year: document.querySelector('.valley-year')?.textContent ?? null,
   vitals: [...document.querySelectorAll('.valley-vital')].map((e) => e.textContent),
 }));
-console.log(JSON.stringify(hud), '→', out);
+console.log(JSON.stringify({ ...hud, season, brightness }), '→', out);
 console.log('errores de página:', errors.length === 0 ? 'ninguno' : errors.slice(0, 5));
 await browser.close();

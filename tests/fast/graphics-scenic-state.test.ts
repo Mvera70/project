@@ -12,6 +12,8 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { NIGHT } from '@derive/animals';
 import { createScenicState } from '../../src/render3d/scenic-state';
 
@@ -25,6 +27,12 @@ describe('G-11 · el estado de la jornada', () => {
   it('no cambia mientras la jornada está a la vista, por muchas semanas que corran', () => {
     // El caso de ×64: sesenta y cuatro semanas dentro de un solo
     // amanecer-anochecer. Ninguna de ellas puede mover lo que se está pintando.
+    //
+    // **Se intentó acotarlo y se revirtió, medido.** Relevar cada ocho semanas
+    // y al cambiar de estación hacía saltar al rebaño 5,096 celdas contra un
+    // techo de 0,4: un relevo sólo es invisible cuando el bicho no está en
+    // pantalla, y eso sólo pasa de noche. El desfase se ataca por el color, que
+    // no mueve a nadie — ver la prueba de abajo.
     const state = village(14);
     const scenic = createScenicState();
     const opened = scenic.of(state, 0.0);
@@ -66,12 +74,34 @@ describe('G-11 · el estado de la jornada', () => {
     const state = village(14);
     const scenic = createScenicState();
     const day = scenic.of(state, 0.3);
-    run(state, 10, 'prudent', CATALOG);
+    run(state, 7, 'prudent', CATALOG);
 
+    // Siete semanas y no diez: con ocho salta el tope y el relevo sería ése y
+    // no el de la noche, que es lo que esta prueba mira.
     expect(scenic.of(state, NIGHT - 0.01), 'antes de la noche, lo de la jornada').toBe(day);
     const night = scenic.of(state, NIGHT + 0.01);
     expect(night, 'cruzada la línea, se estrena').not.toBe(day);
     expect(night.tick, 'y lo estrenado es lo de ahora').toBe(state.tick);
+  });
+
+  it('el color del valle lo elige el reloj vivo, no el de la jornada', () => {
+    // **La contradicción que el jugador veía**, y donde se arregla. La cabecera
+    // saca la estación del estado vivo (U-06) y el valle se pintaba con la
+    // paleta del congelado (§10.3), que a ×64 es de hasta sesenta y cuatro
+    // semanas atrás: WINTER arriba y el prado verde debajo.
+    //
+    // Se comprueba sobre el fuente porque montar el renderer pide una GPU que
+    // la suite rápida no tiene, y lo que puede volver a romperse en silencio es
+    // de dónde sale el reloj — el cálculo ya lo cubre `paletteFor`.
+    const renderer = readFileSync(
+      resolve(import.meta.dirname, '..', '..', 'src', 'render3d', 'renderer.ts'), 'utf8',
+    );
+    expect(renderer, 'la clave del color sale del tick vivo')
+      .toMatch(/const live = clockOf\(state\.tick\)/u);
+    expect(renderer, 'y el suelo se rehace cuando esa clave cambia')
+      .toMatch(/colour !== painted/u);
+    expect(renderer, 'y no del tick de la jornada')
+      .not.toMatch(/paletteFor\(clockOf\(shown\.tick\)/u);
   });
 
   it('una partida nueva no hereda la jornada de la anterior', () => {

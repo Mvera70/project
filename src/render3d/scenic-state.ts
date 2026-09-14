@@ -55,6 +55,39 @@ import type { Building, GameState, ValleyMap, Villager } from '@engine/state';
  */
 const NIGHTFALL = NIGHT;
 
+/**
+ * **Y lo que NO se releva más a menudo, aunque se quedara corto.**
+ *
+ * «Una vez por jornada escénica» suena a intervalo y no lo es: una jornada dura
+ * ciento veinte segundos de pantalla, pero el motor corre a la velocidad
+ * **entera** mientras la jornada corre a la raíz (D.6.1), así que cuántas
+ * semanas caben en un amanecer depende del botón — ocho a ×1, dieciséis a ×4,
+ * treinta y dos a ×16 y **sesenta y cuatro a ×64**. A la velocidad alta, lo que
+ * se pinta lleva año y pico de retraso sobre la cabecera.
+ *
+ * Se probó a acotarlo: relevar además cada ocho semanas y al cambiar de
+ * estación. **Medido y revertido.** El rebaño saltó hasta **5,096 celdas**
+ * —quince metros— contra un techo de 0,4, y por la razón que este fichero ya
+ * tenía escrita tres párrafos arriba: un relevo sólo es invisible **cuando el
+ * bicho no está en pantalla**, y eso sólo pasa de noche. Relevar de día es
+ * exactamente el teletransporte que esto existe para quitar.
+ *
+ * Así que el desfase se ataca por donde no teletransporta a nadie: **el color
+ * de la estación lo toma el render del reloj vivo** y no del congelado
+ * (`renderer.ts`, la paleta). Un cambio de color no mueve a nadie de sitio, y
+ * era la mitad que el jugador veía — «aparece que es invierno y no se ve que
+ * sea invierno».
+ *
+ * Lo que queda abierto, y es una decisión de diseño con su fork escrito en
+ * `docs/next-plan.md`: a ×64 la gente y las casas que se pintan siguen siendo
+ * de hasta sesenta y cuatro semanas atrás. Arreglarlo de verdad pide o que la
+ * jornada escénica siga a la velocidad entera (y entonces la gente corre), o
+ * que a velocidad alta no se dibujen los individuos (y entonces no hay salto
+ * que ver, que es el principio del anochecer generalizado), o enganchar el
+ * rebaño a la capa de vida, donde un cuerpo no puede teletransportarse porque
+ * no evalúa una fórmula.
+ */
+
 export interface ScenicState {
   /**
    * El estado que hay que pintar en este instante.
