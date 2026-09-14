@@ -118,3 +118,92 @@ de luz combinada— y además toda partida nueva abría pintada con la paleta de
 invierno. **Cualquier juicio de color o de material hecho sobre una captura
 anterior a hoy está viciado.** Está explicado en `docs/dos-sesiones.md`, con
 cómo volver a mirar cualquier cosa con el render actual.
+
+---
+
+# Segunda ronda: la escala de los props, contestada con números
+
+La sesión de Blender preguntó qué escala usar para los cuatro trastos de V-09
+(pelota, palo, cubo, haz de leña) y qué convención de nombres. Esto es lo
+contestado, sacado del código y no estimado.
+
+## La unidad es la celda, y las recetas se escriben en metros
+
+Está documentado dentro de la propia receta del aldeano
+(`art/recipes/villager/villager.json`), y conviene citarlo entero porque
+contesta la pregunta sola:
+
+> `"scale": 0.3333333333333333`
+> *«Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas
+> y una casa mide seis metros de lado. La receta se escribe en metros y esto la
+> lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía
+> dos celdas, tanto como el ancho de su casa.»*
+
+Así que: **modelar en metros y poner `"scale": 0.3333333333333333`**. El
+aldeano mide 0,65 celdas = **1,95 m**, y es la referencia humana de todo lo
+demás.
+
+(La receta de `bundle` usa `"scale": 1.0` porque se escribió directamente en
+celdas. Las dos formas funcionan — `scale` es sólo el multiplicador a la unidad
+de escena — pero para props nuevos conviene la del aldeano, que es la
+documentada y la que un modelador piensa.)
+
+## Tamaños objetivo
+
+| Prop | Metros | Celdas | Proporción del aldeano |
+|---|---|---|---|
+| Pelota | 0,22 de diámetro | 0,073 | 11 % |
+| Palo | 0,90 largo × 0,045 grueso | 0,30 | 46 % |
+| Cubo | 0,30 alto × 0,26 de boca | 0,10 | 15 % |
+| Haz de leña | 0,70 largo × 0,28 de diámetro | 0,23 | 36 % |
+
+**No copiar los tamaños de las primitivas que hay hoy**
+(`src/render3d/world/props.ts`): la esfera de relleno mide 0,84 m de diámetro,
+que es una pelota de playa. Está inflada para que se lea a la escala de reposo,
+y eso es una decisión de **dibujo** que vive en el render, no algo que deba
+hornearse en el modelo. Se modela a tamaño verdadero; si hace falta exagerarlo
+para que se vea, lo hace `world/props.ts` y se escribe por qué.
+
+## Convención de nombres
+
+Una carpeta por recurso, con su id — **no** una carpeta `props/` común:
+
+```
+art/recipes/ball/ball.json
+art/recipes/stick/stick.json
+art/recipes/bucket/bucket.json
+```
+
+Y el id nuevo entra en `WANTED` (`src/render3d/renderer.ts`), que es la lista de
+lo que se descarga y lo que la demo empotra. Esa lista es zona de frontera entre
+las dos sesiones: tocar sólo esa lista, y decirlo.
+
+**`bundle` ya existe.** Hay `art/recipes/bundle/bundle.json` y
+`public/assets/valley3d/bundle.glb` desde G-10 (el fardo de carga que ya llevan
+los aldeanos). Conviene mirarlo antes de modelar el haz de leña otra vez.
+
+## Un fallo que salió buscando estos datos
+
+`HAND_HEIGHT` y `THROW_HEIGHT` (`src/render3d/life/props.ts`) se portaron del
+descarte **con su cifra literal**. Allí el cuerpo medía 1,05 de alto, así que
+0,72 era el 69 % de la persona: la mano. Aquí el aldeano mide 0,65, de modo que
+**el trasto se llevaba por encima de su cabeza**. Corregido conservando la
+proporción (0,45 y 0,53). Si los modelos buenos hubieran llegado antes que este
+arreglo, habría parecido culpa de los modelos.
+
+Es el tercer caso del mismo error esta tarde —las plazas del corro, `ashore`, y
+esto—: **una cifra del descarte sólo vale si se trae con la escala a la que
+estaba medida.**
+
+## Sobre los doce aldeanos por oficio
+
+Merece la pena, pero no todavía y no así. A la escala de reposo un aldeano ocupa
+**seis píxeles**: el colgante del cura y el martillo del herrero no existen para
+el jugador. Lo que sí se lee a esa escala es el **color**.
+
+La vía que yo propondría: adaptarlos a 0,65 celdas y resolver el oficio con dos
+o tres manchas de color de la paleta que ya existe
+(`art/recipes/palette.json`), guardando el detalle fino para cuando el jugador
+se acerque. **Pero antes hay que hablar de `src/render3d/world/cast.ts`**: hoy
+hay un aldeano que se clona y ese fichero le da talla y ropa por persona; doce
+modelos separados cambian su forma, y la capa de vida depende de su contrato.
