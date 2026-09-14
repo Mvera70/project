@@ -155,9 +155,20 @@ export function buildRidge(map: ValleyMap, seed: number): Mesh {
     }
   }
 
-  // Sólo se cosen los cuadros que tienen algo de altura: el interior del valle
-  // lo pinta el suelo de siempre, y solaparlos daría el parpadeo de dos
-  // superficies peleándose por el mismo píxel.
+  // **Se cose todo lo que está fuera del rectángulo jugable, tenga altura o
+  // no.** El interior se salta porque ahí pinta el suelo de siempre, y una
+  // segunda superficie a cota cero asomaría por el cauce del río, que baja
+  // catorce centésimas.
+  //
+  // Antes la condición era «tiene algo de altura», y eso dejaba un hueco: entre
+  // el borde del mapa y el punto donde la ladera empieza a subir no se dibujaba
+  // nada, así que **se veía el fondo de la página por debajo del valle** y el
+  // primer anillo de cuadros con altura dibujaba una silueta triangular con
+  // aristas duras. Se vio en la primera captura de G-13 sin saber qué era: una
+  // cuña marrón enorme sobre el río. Y encima mentía la luz — `computeVertexNormals`
+  // sobre una malla con un agujero le da a los vértices del borde una normal
+  // sacada sólo de los cuadros que sí están, así que el pie de la sierra cogía
+  // luz como si fuera una pared.
   const faces: number[] = [];
   for (let row = 0; row < rows - 1; row += 1) {
     for (let col = 0; col < cols - 1; col += 1) {
@@ -165,11 +176,10 @@ export function buildRidge(map: ValleyMap, seed: number): Mesh {
       const b = a + 1;
       const c = a + cols;
       const d = c + 1;
-      const tallest = Math.max(
-        points[a * 3 + 1] ?? 0, points[b * 3 + 1] ?? 0,
-        points[c * 3 + 1] ?? 0, points[d * 3 + 1] ?? 0,
-      );
-      if (tallest <= 0.001) continue;
+      const x = from + col * STRIDE;
+      const z = from + row * STRIDE;
+      const inside = x >= 0 && z >= 0 && x + STRIDE <= map.width && z + STRIDE <= map.height;
+      if (inside) continue;
       faces.push(a, c, b, b, c, d);
     }
   }

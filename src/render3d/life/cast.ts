@@ -99,8 +99,14 @@ export function castOf(
       cell: cellZ * width + cellX,
       named: named.has(dweller.villager),
       age: ages.get(dweller.villager) ?? 30,
-      talking: talkingOf(dweller)
-        || (dweller.doing?.there === true && dweller.doing.offer.id === 'gossip'),
+      // **Sólo una escena de verdad.** Aquí había además «o está en una oferta
+      // de cotilleo», que contradecía el comentario de `talkingOf` tres
+      // párrafos arriba —«`talking` sale de la escena, no de la oferta»— y se
+      // vio en la primera captura de G-13: **doce de veinte aldeanos llevaban
+      // nube de diálogo a la vez**, porque el corro de cotilleo tiene plazas
+      // para media aldea y estar sentado en una no es estar hablando. Una señal
+      // que marca al 60 % de la gente no señala a nadie (§11.1.1).
+      talking: talkingOf(dweller),
       // TUNE: la capa de vida todavía no trae el `Role` de nadie hasta aquí
       // (V-11 añadió los ocho modelos en `world/cast.ts`, no este puente); con
       // `null` todo el mundo se sigue viendo con el aldeano base, que es lo

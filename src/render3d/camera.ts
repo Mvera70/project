@@ -147,8 +147,29 @@ export function createValleyCamera(): ValleyCamera {
   const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
   let viewport: Viewport = { width: 1, height: 1 };
   let bounds: Bounds = { minX: 0, minZ: 0, maxX: 1, maxZ: 1 };
+  /**
+   * La caja que hay que **encuadrar**, aparte de la de alcance.
+   *
+   * `resize` no la recordaba, y para no dejar el valle cortado al girar el
+   * móvil hacía una cosa rara: ponía la altura de reposo igual al tope de
+   * alejarse. O sea que después de una rotación «volver» no volvía a la aldea,
+   * volvía a ver el valle entero. Guardándola, cada límite se recalcula con la
+   * caja que le toca y el apaño desaparece.
+   */
+  let framed: Bounds = { minX: 0, minZ: 0, maxX: 1, maxZ: 1 };
   let resting: View = { centre: { x: 0.5, z: 0.5 }, height: 1 };
   let view: View = resting;
+  /**
+   * La altura que el jugador pidió, antes de recortarla.
+   *
+   * Hace falta porque los topes se mueven al girar: un rombo visto de canto
+   * ocupa menos alto que de frente, así que el tope de alejarse baja en algunos
+   * ángulos. Recortando `view.height` y volviendo a recortar el recortado, el
+   * giro se comía la distancia **en un solo sentido** y dar la vuelta entera no
+   * devolvía la vista de partida — medido, 0,0036 de deriva en ocho octavos.
+   * Con la altura pedida guardada aparte, girar y volver deja lo que había.
+   */
+  let wanted = 1;
   let furthest = 1;
   let angles: Angles = { yaw: BASE_YAW, pitch: BASE_PITCH };
 
@@ -163,13 +184,28 @@ export function createValleyCamera(): ValleyCamera {
   }
 
   /**
-   * The visible height that fits `bounds` on this viewport.
+   * Lo alto que hay que ver para que `box` quepa, o para que llene la pantalla.
    *
-   * Measured by projecting the box's corners into camera space, not by its
-   * radius. A rectangular area seen in isometric is a lozenge much wider than it
-   * is tall, and fitting a radius leaves margins nobody asked for.
+   * Se mide proyectando las cuatro esquinas al espacio de la cámara y no por el
+   * radio: un rectángulo visto en isométrica es un rombo mucho más ancho que
+   * alto, y encajar un radio deja márgenes que nadie ha pedido.
+   *
+   * **Y hay dos maneras de encajarlo, no una** (v3.67). `contain` mete la caja
+   * entera dentro de la pantalla; `cover` busca la vista más alejada en la que
+   * la caja **sigue llenando** la pantalla, dejando que se salga por el lado
+   * largo.
+   *
+   * La diferencia no es cosmética y se vio en una captura. Al reposo hay que
+   * contener —la aldea tiene que caber—, pero usar `contain` también para el
+   * tope de alejarse daba esto: en un móvil vertical la proporción es 0,46, así
+   * que caber **a lo ancho** exige `anchura / 0,46` = 2,16 veces más alto de lo
+   * que la caja mide. El valle entero con su sierra, que son 88 celdas de
+   * fondo, pedía 243 celdas de alto: el mundo quedaba como un sello en medio de
+   * una pantalla vacía, y eso es la mitad de la queja de «el mapa sigue siendo
+   * muy pequeño». Con `cover` se ve valle de borde a borde y lo que falta se
+   * alcanza arrastrando, que es como funciona cualquier mapa grande.
    */
-  function fitting(box: Bounds): number {
+  function fitting(box: Bounds, mode: 'contain' | 'cover' = 'contain'): number {
     const aspect = Math.max(0.01, viewport.width / Math.max(1, viewport.height));
     place({ x: (box.minX + box.maxX) / 2, z: (box.minZ + box.maxZ) / 2 }, 1);
     const inverse = camera.matrixWorldInverse;
@@ -186,7 +222,8 @@ export function createValleyCamera(): ValleyCamera {
     // El aire de alrededor se **suma**, no se multiplica: metido en la caja, el
     // margen horizontal se divide por la proporcion de la pantalla y en un
     // movil vertical vale el doble que el vertical.
-    return Math.max(halfHeight, halfWidth / aspect) * 2 + AIR;
+    const both = mode === 'contain' ? Math.max : Math.min;
+    return both(halfHeight, halfWidth / aspect) * 2 + AIR;
   }
 
   /** Put the camera above `centre`, showing `height` cells of valley. */
@@ -210,6 +247,21 @@ export function createValleyCamera(): ValleyCamera {
   }
 
   /**
+   * Los dos límites, cada uno con su caja.
+   *
+   * El reposo **contiene** lo encuadrado —la aldea tiene que caber entera— y el
+   * tope de alejarse **cubre** la caja de alcance, para que la pantalla siga
+   * llena de valle en vez de enseñar un sello en medio del prado. Y el tope
+   * nunca queda por debajo del reposo, o `reset()` no podría volver: `settle`
+   * recorta la altura al tope, así que un tope más cerca que la vista de
+   * partida hace imposible volver a ella.
+   */
+  function limits(): void {
+    resting = { ...resting, height: Math.max(CLOSEST_HEIGHT, fitting(framed)) };
+    furthest = Math.max(resting.height, fitting(bounds, 'cover'));
+  }
+
+  /**
    * Keep the middle inside the valley.
    *
    * D.7 asks that dragging stay within the valley. The clamp is on the centre
@@ -218,6 +270,7 @@ export function createValleyCamera(): ValleyCamera {
    * resting view.
    */
   function settle(next: View): void {
+    wanted = next.height;
     view = {
       centre: {
         x: clamp(next.centre.x, bounds.minX, bounds.maxX),
@@ -233,25 +286,23 @@ export function createValleyCamera(): ValleyCamera {
 
     frame(box: Bounds, next: Viewport, reach?: Bounds): void {
       viewport = next;
+      framed = box;
       bounds = reach ?? box;
-      // El reposo encuadra la aldea; el tope de alejarse alcanza la sierra.
-      const rest = Math.max(CLOSEST_HEIGHT, fitting(box));
-      furthest = Math.max(rest, fitting(bounds));
       resting = {
         centre: { x: (box.minX + box.maxX) / 2, z: (box.minZ + box.maxZ) / 2 },
-        height: rest,
+        height: 1,
       };
+      limits();
       settle(resting);
     },
 
     resize(next: Viewport): void {
       viewport = next;
-      // The furthest view depends on the shape of the screen, so a rotation
-      // changes it. Keeping the same visible height across a rotation would
-      // crop the valley on one of the two orientations.
-      furthest = Math.max(CLOSEST_HEIGHT, fitting(bounds));
-      resting = { ...resting, height: furthest };
-      settle(view);
+      // **Lo que hace falta ver depende de la forma de la pantalla**, así que
+      // una rotación lo cambia todo: conservar la altura visible dejaría el
+      // valle cortado en una de las dos orientaciones.
+      limits();
+      settle({ centre: view.centre, height: wanted });
     },
 
     zoom(factor: number, atX: number, atY: number): void {
@@ -292,15 +343,18 @@ export function createValleyCamera(): ValleyCamera {
       // visto de frente. Sin recalcularlo, girar recortaba el valle por un lado
       // o dejaba de poder alejarse por el otro — el mismo fallo que `resize` ya
       // tenía resuelto, con la misma cura.
-      furthest = Math.max(CLOSEST_HEIGHT, fitting(bounds));
-      settle(view);
+      limits();
+      // Con la altura **pedida** y no la recortada: si no, girar se comía la
+      // distancia en un solo sentido y dar la vuelta entera no devolvía la
+      // vista de partida.
+      settle({ centre: view.centre, height: wanted });
     },
 
     reset(): void {
       // Vuelve también el ángulo: «volver» significa la vista de partida, y la
       // de partida es la de `VIEW`, la que todas las capturas han juzgado.
       angles = { yaw: BASE_YAW, pitch: BASE_PITCH };
-      furthest = Math.max(CLOSEST_HEIGHT, fitting(bounds));
+      limits();
       settle(resting);
     },
 

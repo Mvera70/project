@@ -33,6 +33,8 @@ const waitFor = opt('wait', '');
 //   --tilt 25        y la levanta veinticinco más
 const turn = Number(opt('turn', '0'));
 const tilt = Number(opt('tilt', '0'));
+//   --zoom -6       aleja seis muescas de rueda (positivo acerca)
+const zoomNotches = Number(opt('zoom', '0'));
 const out = resolve(opt('out', 'artifacts/graphics/G-10/shot.png'));
 const page = resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html'));
 
@@ -74,6 +76,15 @@ if (turn !== 0 || tilt !== 0) {
   await tab.mouse.up();
   await tab.keyboard.up('Shift');
   await tab.waitForTimeout(600);
+}
+
+if (zoomNotches !== 0) {
+  await tab.mouse.move(195, 420);
+  for (let i = 0; i < Math.abs(zoomNotches); i += 1) {
+    await tab.mouse.wheel(0, zoomNotches > 0 ? -120 : 120);
+    await tab.waitForTimeout(60);
+  }
+  await tab.waitForTimeout(400);
 }
 
 const swipeDown = async () => {
