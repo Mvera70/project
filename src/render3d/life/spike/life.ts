@@ -34,6 +34,16 @@ export interface Body {
   readonly sociable: number;
   /** Lo fácil que salta. 0 a 1. En el juego saldría de `hot_tempered`. */
   readonly temper: number;
+  /** Las ganas de enredar con lo que haya por ahí. */
+  readonly playful: number;
+  /** Qué lleva en la mano, si lleva algo. */
+  holding: number | null;
+  /** Cuándo suelta lo que lleva: un pase, un golpe. */
+  useAt: number;
+  /** A quién va dirigido lo que va a hacer. */
+  aimAt: number | null;
+  /** Hasta cuándo se le ha pasado la gana de jugar. */
+  playedUntil: number;
   /** A dónde va ahora, o nada si acaba de llegar. */
   goal: Point | null;
   /**
@@ -57,6 +67,30 @@ export interface Body {
   cooldown: number;
 }
 
+/**
+ * Un trasto: la pelota, el palo. **La tercera clase de cosa que hay en el
+ * valle**, después de los cuerpos y las paredes, y la que hoy no puede existir
+ * porque el motor no la conoce y el render sólo dibuja lo que el motor dice.
+ *
+ * Aquí sí puede: es estado efímero de la jornada, como todo lo de esta capa.
+ * Nadie hereda la pelota del martes.
+ */
+export interface Prop {
+  readonly id: number;
+  readonly kind: 'ball' | 'stick';
+  x: number;
+  z: number;
+  /** Altura. Cero es el suelo; por encima, va por el aire. */
+  y: number;
+  vx: number;
+  vz: number;
+  vy: number;
+  /** Quién lo lleva en la mano, o nada si está por el suelo. */
+  held: number | null;
+  /** Hasta cuándo no se le puede echar mano: lo que acaba de salir volando. */
+  restUntil: number;
+}
+
 export interface World {
   readonly seed: number;
   readonly width: number;
@@ -64,11 +98,16 @@ export interface World {
   readonly obstacles: readonly Obstacle[];
   readonly haunts: readonly Point[];
   bodies: Body[];
+  props: Prop[];
   /** Pasos dados. Es el reloj de este mundo: nada mira el de la pared. */
   steps: number;
   /** Lo que ha pasado, para poder contarlo en pantalla. */
   chats: number;
   shoves: number;
+  /** Pases de pelota, que es lo que sale de jugar. */
+  passes: number;
+  /** Golpes de palo dados. */
+  blows: number;
   bumps: number;
 }
 
@@ -132,6 +171,11 @@ export function createWorld(seed: number, count = 8): World {
       // en el juego saldría de `traits`, aquí de un dado.
       sociable: roll(seed, id, 5),
       temper: roll(seed, id, 6),
+      playful: roll(seed, id, 7),
+      holding: null,
+      useAt: 0,
+      aimAt: null,
+      playedUntil: 0,
       goal: null,
       talkingTo: null,
       bout: null,
@@ -143,10 +187,28 @@ export function createWorld(seed: number, count = 8): World {
       cooldown: 0,
     });
   }
+  // Dos pelotas y tres palos tirados por el valle, repartidos con la semilla.
+  // Los palos importan más de lo que parece: son lo que convierte un
+  // encontronazo en una pelea, y que haya o no haya uno cerca cuando alguien se
+  // enfada es de las cosas que hacen distintas dos jornadas.
+  const props: Prop[] = [];
+  const SCATTER: Array<Prop['kind']> = ['ball', 'ball', 'stick', 'stick', 'stick'];
+  SCATTER.forEach((kind, i) => {
+    let x = 3 + roll(seed, 500 + i, 1) * (WIDTH - 6);
+    let z = 3 + roll(seed, 500 + i, 2) * (HEIGHT - 6);
+    for (let tries = 0; tries < 12; tries += 1) {
+      if (!HOUSES.some((o) => x > o.x - 1 && x < o.x + o.w + 1
+        && z > o.z - 1 && z < o.z + o.h + 1)) break;
+      x = 3 + roll(seed, 500 + i, 10 + tries) * (WIDTH - 6);
+      z = 3 + roll(seed, 500 + i, 40 + tries) * (HEIGHT - 6);
+    }
+    props.push({ id: i, kind, x, z, y: 0, vx: 0, vz: 0, vy: 0, held: null, restUntil: 0 });
+  });
+
   return {
     seed, width: WIDTH, height: HEIGHT,
     obstacles: HOUSES, haunts: HAUNTS,
-    bodies, steps: 0, chats: 0, shoves: 0, bumps: 0,
+    bodies, props, steps: 0, chats: 0, shoves: 0, passes: 0, blows: 0, bumps: 0,
   };
 }
 
@@ -194,6 +256,35 @@ const REEL = 0.75;
 const HOT_ENOUGH = 0.62;
 /** Y cuánto salta el que pasa de ahí, por encuentro. */
 const SHOVE_ODDS = 0.22;
+/** Lo que cae un trasto por segundo al cuadrado. No es la Tierra: es lo que se lee bien. */
+const GRAVITY = 14;
+/** Lo que frena una pelota rodando por la hierba, por segundo. */
+const ROLL_DRAG = 1.6;
+/** A qué distancia se le echa mano a algo del suelo. */
+const PICKUP = 0.75;
+/** Y desde cuál se va a por ello, que es distinto: una cosa es tropezarse con
+ *  una pelota y otra querer cogerla. Sin esto había que pasar justo por encima,
+ *  y en la mitad de las jornadas no jugaba nadie. */
+const FETCH = 7;
+/**
+ * Lo que se tarda en volver a tener ganas de jugar, tras un pase.
+ *
+ * TUNE: sin esto salían cincuenta y ocho pases en dos minutos —uno cada dos
+ * segundos, y la aldea entera detrás de una pelota— porque nada cansaba a
+ * nadie. En el juego esto lo llevaría un impulso que sube y baja (V-04); aquí
+ * basta un descanso, y de paso la pelota cambia de manos en vez de quedarse
+ * entre los dos mismos.
+ */
+const PLAYED_OUT = [11, 26] as const;
+/** Lo lejos que se tira una pelota, y lo alto que va. */
+const THROW = 5.2;
+const LOFT = 3.4;
+/** Cada cuánto se sacude un palo. */
+const SWING = 0.85;
+/** Lo que retrocede quien se come un palo. */
+const BLOW_PUSH = 2.2;
+/** A partir de qué genio se busca un palo en vez de conformarse con empujar. */
+const ARMED_ENOUGH = 0.78;
 /** A qué distancia se considera llegado un destino. */
 const ARRIVED = 0.55;
 /** Desde dónde se empieza a frenar, para no clavar el freno al llegar. */
@@ -210,6 +301,31 @@ export function inside(world: World, x: number, z: number, margin = 0): boolean 
       && z > o.z - margin && z < o.z + o.h + margin) return true;
   }
   return false;
+}
+
+/** El trasto libre más cercano de esta clase, si hay alguno a mano. */
+function loose(world: World, body: Body, kind: Prop['kind'], within: number): Prop | null {
+  const now = world.steps * STEP;
+  let best: Prop | null = null;
+  let near = within;
+  for (const prop of world.props) {
+    if (prop.kind !== kind || prop.held !== null || now < prop.restUntil) continue;
+    const gap = Math.hypot(prop.x - body.x, prop.z - body.z);
+    if (gap < near) { near = gap; best = prop; }
+  }
+  return best;
+}
+
+/** Lanza un trasto hacia un punto, con su arco. */
+function fling(prop: Prop, from: Body, at: Point, force: number, loft: number): void {
+  const gap = Math.max(0.5, Math.hypot(at.x - from.x, at.z - from.z));
+  prop.held = null;
+  prop.x = from.x + Math.sin(from.facing) * 0.4;
+  prop.z = from.z + Math.cos(from.facing) * 0.4;
+  prop.y = 0.85;
+  prop.vx = (at.x - from.x) / gap * force;
+  prop.vz = (at.z - from.z) / gap * force;
+  prop.vy = loft;
 }
 
 /** Elige adónde ir ahora: un sitio de los de siempre, y no el que ya pisa. */
@@ -242,6 +358,18 @@ export function step(world: World): void {
         body.role = null;
         body.paidBack = false;
         body.cooldown = now + COOLDOWN;
+        // Y se suelta el palo: la pelea se acaba y nadie se pasea armado el
+        // resto del día.
+        if (body.holding !== null) {
+          const dropped = world.props[body.holding];
+          if (dropped !== undefined && dropped.kind === 'stick') {
+            dropped.held = null;
+            dropped.restUntil = now + 3;
+            body.holding = null;
+            body.useAt = 0;
+            body.aimAt = null;
+          }
+        }
       } else {
         partner = other;
       }
@@ -298,7 +426,67 @@ export function step(world: World): void {
     let dx = 0;
     let dz = 0;
 
-    if (partner !== null) {
+    // 1c-bis · Camino de la pelea se recoge el palo al pasar por encima.
+    if (body.holding === null && body.bout === 'shove' && body.role === 'gives'
+      && body.temper > ARMED_ENOUGH) {
+      const stick = loose(world, body, 'stick', PICKUP);
+      if (stick !== null) {
+        stick.held = body.id;
+        body.holding = stick.id;
+        body.useAt = now + SWING;
+        body.aimAt = body.talkingTo;
+        body.goal = null;
+      }
+    }
+
+    // 1d · Lo que se lleva en la mano, y qué se hace con ello.
+    const carried = body.holding === null ? null : world.props[body.holding] ?? null;
+    if (carried !== null && body.useAt > 0 && now >= body.useAt) {
+      const mark = body.aimAt === null ? null : world.bodies[body.aimAt] ?? null;
+      if (carried.kind === 'ball') {
+        // Un pase. Si no hay a quién, se tira hacia delante por gusto.
+        const at = mark ?? { x: body.x + Math.sin(body.facing) * 5, z: body.z + Math.cos(body.facing) * 5 };
+        fling(carried, body, at, THROW, LOFT);
+        carried.restUntil = now + 0.45;
+        body.holding = null;
+        body.useAt = 0;
+        body.aimAt = null;
+        body.playedUntil = now + PLAYED_OUT[0]
+          + roll(world.seed, body.id, world.steps) * (PLAYED_OUT[1] - PLAYED_OUT[0]);
+        world.passes += 1;
+      } else if (mark !== null && distance(mark, body) < 1.6) {
+        // Un palo. El otro lo acusa: retrocede y pierde pie, igual que con el
+        // empujón pero más. Sigue siendo velocidad y no posición.
+        const gap = Math.max(1e-6, distance(mark, body));
+        mark.vx = (mark.x - body.x) / gap * BLOW_PUSH;
+        mark.vz = (mark.z - body.z) / gap * BLOW_PUSH;
+        mark.reelUntil = now + REEL * 0.8;
+        world.blows += 1;
+        // Y se sigue sacudiendo mientras dure la pelea.
+        body.useAt = now + SWING;
+      } else {
+        body.useAt = now + SWING;
+      }
+    }
+
+    // 2a-bis · **Primero el palo.** Quien se ha enfadado y va a buscar con qué
+    //          pegar tiene que poder darse la vuelta e ir: si se le deja en la
+    //          rama de encararse, se queda plantado delante del otro y no llega
+    //          nunca al palo. Era el fallo por el que casi ninguna jornada
+    //          acababa en pelea aunque el genio y los palos estuvieran ahí.
+    //
+    //          Y de paso es de las imágenes que mejor cuentan lo que pasa: uno
+    //          se encara, se da media vuelta, cruza el prado a por un palo y
+    //          vuelve. Eso no lo ha escrito nadie.
+    const fetching = partner !== null && body.role === 'gives' && body.holding === null
+      && body.temper > ARMED_ENOUGH && body.goal !== null;
+
+    if (fetching && body.goal !== null) {
+      const gap = Math.max(1e-6, distance(body.goal, body));
+      const want = body.pace * 1.5 * Math.min(1, gap / BRAKE);
+      dx = (body.goal.x - body.x) / gap * want;
+      dz = (body.goal.z - body.z) / gap * want;
+    } else if (partner !== null) {
       // 2a · Hablando: **colocarse**, no congelarse. Se busca la distancia de
       //      conversación, acercándose si se está lejos y apartándose si se ha
       //      quedado encima. Y siguen valiendo el empujón de los demás y el de
@@ -313,7 +501,51 @@ export function step(world: World): void {
         dz = (partner.z - body.z) / gap * off * body.pace * urge;
       }
     } else {
-      // 2b · Si no hay a dónde ir, o ya se llegó, se elige sitio nuevo.
+      // 2b · ¿Hay algo con lo que enredar? Quien es de enredar coge la pelota
+      //      que se encuentra, y si ve a alguien cerca se la tira. Eso es todo
+      //      el juego: no hay reglas de «jugar a la pelota» escritas en ningún
+      //      sitio, hay gente a la que le apetece y una pelota que vuela.
+      if (body.holding === null && body.playful > 0.6 && now >= body.playedUntil) {
+        const ball = loose(world, body, 'ball', PICKUP);
+        // Si no la tiene a mano pero la ve, va a por ella. Eso es querer jugar,
+        // y es lo que separa a alguien de enredo de alguien que tropieza con
+        // una pelota.
+        if (ball === null) {
+          const seen = loose(world, body, 'ball', FETCH);
+          if (seen !== null) body.goal = { x: seen.x, z: seen.z };
+        }
+        if (ball !== null) {
+          ball.held = body.id;
+          body.holding = ball.id;
+          // Busca a quien pasársela: el más cercano que también ande de enredo.
+          let mate: Body | null = null;
+          let near = 9;
+          for (const other of world.bodies) {
+            if (other.id === body.id || other.playful < 0.35) continue;
+            const gap = distance(other, body);
+            if (gap < near) { near = gap; mate = other; }
+          }
+          body.aimAt = mate?.id ?? null;
+          body.useAt = now + 0.6;
+          body.goal = null;
+        }
+      }
+      // Si lleva la pelota y espera para tirarla, se encara a quien va dirigida.
+      if (carried !== null && carried.kind === 'ball' && body.aimAt !== null) {
+        const mate = world.bodies[body.aimAt];
+        if (mate !== undefined) {
+          const look = Math.atan2(mate.x - body.x, mate.z - body.z);
+          let turn = look - body.facing;
+          while (turn > Math.PI) turn -= Math.PI * 2;
+          while (turn < -Math.PI) turn += Math.PI * 2;
+          body.facing += turn * 0.3;
+        }
+        body.vx *= 0.8;
+        body.vz *= 0.8;
+        continue;
+      }
+
+      // 2c · Si no hay a dónde ir, o ya se llegó, se elige sitio nuevo.
       if (body.goal === null || distance(body.goal, body) < ARRIVED) {
         body.goal = pickGoal(world, body);
       }
@@ -389,6 +621,53 @@ export function step(world: World): void {
     }
   }
 
+  // 7b · Los trastos. Los que alguien lleva van en su mano; los que vuelan
+  //      caen; los que ruedan frenan. Nada de esto sabe de nadie: es física de
+  //      tres líneas, y de ahí sale que una pelota se pueda tirar.
+  for (const prop of world.props) {
+    if (prop.held !== null) {
+      const hand = world.bodies[prop.held];
+      if (hand === undefined || hand.holding !== prop.id) {
+        prop.held = null;
+      } else {
+        // En la mano, un poco por delante y a la altura del pecho.
+        prop.x = hand.x + Math.sin(hand.facing) * 0.38;
+        prop.z = hand.z + Math.cos(hand.facing) * 0.38;
+        prop.y = 0.72;
+        prop.vx = 0; prop.vz = 0; prop.vy = 0;
+        continue;
+      }
+    }
+    if (prop.y > 0 || prop.vy > 0) {
+      prop.vy -= GRAVITY * STEP;
+      prop.y += prop.vy * STEP;
+      if (prop.y <= 0) {
+        prop.y = 0;
+        // Bota poco: es hierba, no un patio.
+        prop.vy = prop.kind === 'ball' ? -prop.vy * 0.32 : 0;
+        if (Math.abs(prop.vy) < 0.6) prop.vy = 0;
+      }
+    }
+    if (prop.y <= 0.001) {
+      const speed = Math.hypot(prop.vx, prop.vz);
+      if (speed > 0.01) {
+        const slow = Math.max(0, speed - ROLL_DRAG * STEP) / speed;
+        prop.vx *= slow;
+        prop.vz *= slow;
+      } else { prop.vx = 0; prop.vz = 0; }
+    }
+    prop.x += prop.vx * STEP;
+    prop.z += prop.vz * STEP;
+    // No se cuela dentro de una casa ni se sale del valle: rebota.
+    if (inside(world, prop.x, prop.z, 0.1) || prop.x < 0.5 || prop.x > world.width - 0.5
+      || prop.z < 0.5 || prop.z > world.height - 0.5) {
+      prop.x -= prop.vx * STEP;
+      prop.z -= prop.vz * STEP;
+      prop.vx *= -0.4;
+      prop.vz *= -0.4;
+    }
+  }
+
   // 8 · Y después de mover a todos, **separar a los que hayan quedado
   //     encima**. La fuerza del paso 4 es lo que hace el comportamiento —se
   //     ven venir y se apartan— pero no garantiza nada: dos que llegan a la vez
@@ -442,7 +721,18 @@ export function step(world: World): void {
         && spark < (hot.temper - HOT_ENOUGH) * SHOVE_ODDS;
 
       if (angry) {
-        const span = BOUT;
+        // **¿Se conforma con empujar, o va a por un palo?** Lo segundo sólo si
+        // tiene muy mal genio y hay uno a mano, y ese «hay uno a mano» es de lo
+        // que hace que dos jornadas no se parezcan: el mismo hombre con el
+        // mismo humor arma una pelea o no según dónde quedó tirado un palo esa
+        // mañana. Nadie lo ha escrito; ha salido de dónde cayó una cosa.
+        const stick = hot.temper > ARMED_ENOUGH ? loose(world, hot, 'stick', 9) : null;
+        const span = stick === null ? BOUT : BOUT * 2.2;
+        if (stick !== null) {
+          // No aparece en la mano: hay que ir a por él. El palo es el destino, y
+          // hasta que no lo tenga no empieza la pelea.
+          hot.goal = { x: stick.x, z: stick.z };
+        }
         hot.talkingTo = cold.id;
         cold.talkingTo = hot.id;
         hot.bout = 'shove';
@@ -453,7 +743,11 @@ export function step(world: World): void {
         cold.shoveAt = 0;
         hot.talkUntil = now + span;
         cold.talkUntil = now + span;
-        hot.goal = null;
+        // **El que va a por un palo conserva su destino.** Esta línea lo
+        // borraba dos después de asignarlo, y por eso de ciento setenta y nueve
+        // enfados con genio de sobra sólo cuatro acababan en palos: el hombre
+        // se quedaba plantado delante del otro con el palo a veinte pasos.
+        if (stick === null) hot.goal = null;
         cold.goal = null;
         break;
       }

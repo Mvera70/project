@@ -233,6 +233,70 @@ describe('V-00 · la vida se sostiene', () => {
     expect(biggest, `y nadie pasa de ${biggest.toFixed(3)}`).toBeLessThan(0.12);
   });
 
+  it('los trastos no se pierden, ni se cuelan en una casa, ni están en dos manos', () => {
+    // La tercera clase de cosa del valle, que hoy no puede existir porque el
+    // motor no la conoce. Lo que hay que garantizar es lo de siempre: que no
+    // aparezca donde no cabe y que no se duplique.
+    for (const seed of SEEDS) {
+      const world = createWorld(seed);
+      const steps = Math.round(120 / STEP);
+      for (let n = 0; n < steps; n += 1) {
+        step(world);
+        const hands = new Map<number, number>();
+        for (const prop of world.props) {
+          expect(inside(world, prop.x, prop.z, 0), `semilla ${seed}: un trasto dentro de una casa`)
+            .toBe(false);
+          expect(prop.x).toBeGreaterThan(0);
+          expect(prop.x).toBeLessThan(world.width);
+          expect(prop.z).toBeGreaterThan(0);
+          expect(prop.z).toBeLessThan(world.height);
+          expect(prop.y).toBeGreaterThanOrEqual(0);
+          if (prop.held !== null) {
+            expect(hands.has(prop.held), 'nadie lleva dos cosas a la vez').toBe(false);
+            hands.set(prop.held, prop.id);
+          }
+        }
+      }
+    }
+  });
+
+  it('se juega y se pega, pero ninguna de las dos cosas se come la jornada', () => {
+    // El equilibrio que costó tres intentos. Sin cansancio salían cincuenta y
+    // ocho pases por jornada —la aldea entera detrás de una pelota— y con la
+    // primera versión del palo, ninguna pelea en cuatrocientas semillas.
+    const passes: number[] = [];
+    const blows: number[] = [];
+    const chats: number[] = [];
+    for (const seed of SEEDS) {
+      const world = createWorld(seed);
+      live(world, 120);
+      passes.push(world.passes);
+      blows.push(world.blows);
+      chats.push(world.chats);
+    }
+    const sum = (xs: number[]): number => xs.reduce((n, x) => n + x, 0);
+    expect(sum(passes), `pases: ${passes.join(', ')}`).toBeGreaterThan(0);
+    expect(Math.max(...passes), 'nadie se pasa la jornada con la pelota').toBeLessThan(30);
+    // Y hablar sigue siendo lo corriente, por encima de jugar y de pegar.
+    expect(sum(chats), `charlas ${sum(chats)} contra ${sum(passes)} pases y ${sum(blows)} palos`)
+      .toBeGreaterThan(sum(blows));
+  });
+
+  it('hay pueblos que no ven un palo en todo el día, y pueblos que sí', () => {
+    // Lo mismo que con los empujones, un escalón más arriba: la pelea seria
+    // depende del genio de quien vive allí **y** de si quedó un palo a mano.
+    // Que dependa de las dos cosas es lo que hace que no se pueda predecir.
+    let peaceful = 0;
+    let rough = 0;
+    for (let seed = 1; seed <= 30; seed += 1) {
+      const world = createWorld(seed);
+      live(world, 120);
+      if (world.blows === 0) peaceful += 1; else rough += 1;
+    }
+    expect(peaceful, `de 30 aldeas, ${peaceful} en paz y ${rough} con palos`).toBeGreaterThan(4);
+    expect(rough).toBeGreaterThan(4);
+  });
+
   it('una jornada entera se reconstruye en un abrir y cerrar de ojos', () => {
     // La propiedad que salva el letargo: si volver a vivir el día es barato, la
     // capa no necesita guardar nada y por eso no puede corromper una partida.

@@ -10,7 +10,7 @@ import {
   DirectionalLight, Group, Mesh, MeshStandardMaterial, OrthographicCamera,
   PCFSoftShadowMap, PlaneGeometry, Scene, SphereGeometry, WebGLRenderer,
 } from 'three';
-import { advance, createWorld, STEP, type Body } from './life';
+import { advance, createWorld, STEP, type Body, type Prop } from './life';
 
 const SKIN = ['#C8553D', '#4A7C59', '#3E6B8A', '#B58A3C', '#7A4E8C', '#2F6F6B', '#A34F6D', '#5C6B3A'];
 
@@ -101,6 +101,28 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
     slab.position.set(h.x, 0.04, h.z);
     slab.receiveShadow = true;
     scene.add(slab);
+  }
+
+  // --- los trastos -----------------------------------------------------------
+  //
+  // Una pelota y un palo, que son la tercera clase de cosa del valle. Se
+  // dibujan donde la simulación diga y nada más: si están en una mano, es
+  // porque la simulación los ha puesto ahí.
+  const things = new Map<number, Mesh>();
+
+  function makeThing(prop: Prop): Mesh {
+    const mesh = prop.kind === 'ball'
+      ? new Mesh(
+        new SphereGeometry(0.18, 14, 12),
+        new MeshStandardMaterial({ color: '#D9C18B' }),
+      )
+      : new Mesh(
+        new CylinderGeometry(0.055, 0.07, 1.05, 8),
+        new MeshStandardMaterial({ color: '#6B4A2E' }),
+      );
+    mesh.castShadow = true;
+    scene.add(mesh);
+    return mesh;
   }
 
   // --- la gente --------------------------------------------------------------
@@ -213,12 +235,30 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
     }
     if (trails && world.steps - crumbAt > 6) crumbAt = world.steps;
 
+    for (const prop of world.props) {
+      let mesh = things.get(prop.id);
+      if (mesh === undefined) { mesh = makeThing(prop); things.set(prop.id, mesh); }
+      mesh.position.set(prop.x, prop.y + (prop.kind === 'ball' ? 0.18 : 0.08), prop.z);
+      if (prop.kind === 'stick') {
+        // El palo va tumbado en el suelo y en alto cuando alguien lo empuña:
+        // es lo que hace que se vea que va a caer sobre alguien.
+        const wielded = prop.held !== null;
+        mesh.rotation.set(wielded ? -0.9 : Math.PI / 2, prop.held ?? prop.id, 0);
+        mesh.position.y = wielded ? 1.15 : 0.07;
+      } else if (prop.held === null) {
+        // La pelota rueda: gira según lo que se mueve.
+        mesh.rotation.x += prop.vz * STEP * 3;
+        mesh.rotation.z -= prop.vx * STEP * 3;
+      }
+    }
+
     const talking = world.bodies.filter((b) => b.bout === 'chat').length;
     const scrapping = world.bodies.filter((b) => b.bout === 'shove').length;
     hud.textContent = `día ${(world.steps * STEP).toFixed(0)} s · `
       + `${world.bodies.length} vecinos · `
       + `${talking} hablando · ${scrapping} a malas · `
-      + `${world.chats} charlas · ${world.shoves} empujones`;
+      + `${world.chats} charlas · ${world.shoves} empujones · `
+      + `${world.passes} pases · ${world.blows} palos`;
 
     resize();
     renderer.render(scene, camera);
@@ -239,13 +279,21 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
       }
     });
   }
-  control('again', () => {
+  function reseed(seed: number): void {
     for (const figure of figures.values()) scene.remove(figure.group);
     figures.clear();
+    for (const mesh of things.values()) scene.remove(mesh);
+    things.clear();
     clearTrails();
-    world = createWorld(Math.floor(Math.random() * 10_000));
+    world = createWorld(seed);
     carry = 0;
-  });
+  }
+  control('again', () => reseed(Math.floor(Math.random() * 10_000)));
+  // Aldeas donde se sabe que va a haber pelea. La bronca es rara a propósito
+  // —la mitad de los pueblos no ve un palo en todo el día— y sin esto habría
+  // que darle diez veces a «otra aldea» para verla una.
+  const ROUGH = [1, 45, 62, 395, 11, 41];
+  control('rough', () => reseed(ROUGH[Math.floor(Math.random() * ROUGH.length)] as number));
   control('trails', () => {
     trails = !trails;
     document.getElementById('trails')?.setAttribute('aria-pressed', String(trails));
