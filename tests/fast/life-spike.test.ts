@@ -181,6 +181,58 @@ describe('V-00 · la vida se sostiene', () => {
       .toBeGreaterThan(shyChats);
   });
 
+  it('hay aldeas de paz y aldeas de bronca, y lo decide quién vive en ellas', () => {
+    // El encargo dicho como medida: que dos aldeas no se parezcan. Si el
+    // empujón fuera un dado igual para todos, todas darían la misma cuenta y
+    // esto no serviría de nada. Sale del genio de la gente, así que un pueblo
+    // sin nadie de mal temple no pega a nadie en todo el día.
+    const scraps: number[] = [];
+    const talks: number[] = [];
+    for (const seed of SEEDS) {
+      const world = createWorld(seed);
+      live(world, 120);
+      scraps.push(world.shoves);
+      talks.push(world.chats);
+    }
+    expect(Math.min(...scraps), `empujones por aldea: ${scraps.join(', ')}`)
+      .toBeLessThanOrEqual(1);
+    expect(Math.max(...scraps), 'alguna aldea tiene que ser de bronca').toBeGreaterThan(2);
+    // Y hablar sigue siendo lo corriente: una aldea donde se pega más que se
+    // habla no es una aldea, es una taberna a las tres de la mañana.
+    const talked = talks.reduce((n, x) => n + x, 0);
+    const shoved = scraps.reduce((n, x) => n + x, 0);
+    expect(talked, `${talked} charlas contra ${shoved} empujones`).toBeGreaterThan(shoved);
+  });
+
+  it('un empujón mueve de verdad, y aun así nadie se teletransporta', () => {
+    // Las dos mitades del mismo asunto. Un empujón que no se nota no es un
+    // empujón; uno que salta media celda de golpe es el defecto que este banco
+    // existe para no repetir. La cura es que empujar dé **velocidad**, y que la
+    // integre el mismo paso que todo lo demás.
+    let flung = 0;
+    let biggest = 0;
+    for (const seed of SEEDS) {
+      const world = createWorld(seed);
+      let was = world.bodies.map((b) => ({ x: b.x, z: b.z }));
+      const steps = Math.round(120 / STEP);
+      for (let n = 0; n < steps; n += 1) {
+        step(world);
+        const now = world.steps * STEP;
+        world.bodies.forEach((body, i) => {
+          const old = was[i];
+          if (old === undefined) return;
+          const moved = Math.hypot(body.x - old.x, body.z - old.z);
+          biggest = Math.max(biggest, moved);
+          if (now < body.reelUntil) flung = Math.max(flung, moved);
+        });
+        was = world.bodies.map((b) => ({ x: b.x, z: b.z }));
+      }
+    }
+    expect(flung, `el empujado se mueve ${flung.toFixed(3)} celdas por paso`)
+      .toBeGreaterThan(0.06);
+    expect(biggest, `y nadie pasa de ${biggest.toFixed(3)}`).toBeLessThan(0.12);
+  });
+
   it('una jornada entera se reconstruye en un abrir y cerrar de ojos', () => {
     // La propiedad que salva el letargo: si volver a vivir el día es barato, la
     // capa no necesita guardar nada y por eso no puede corromper una partida.

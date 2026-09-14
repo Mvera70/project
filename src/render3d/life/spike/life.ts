@@ -32,11 +32,27 @@ export interface Body {
   readonly pace: number;
   /** Cuánto le apetece pararse con quien se cruza. 0 a 1. */
   readonly sociable: number;
+  /** Lo fácil que salta. 0 a 1. En el juego saldría de `hot_tempered`. */
+  readonly temper: number;
   /** A dónde va ahora, o nada si acaba de llegar. */
   goal: Point | null;
-  /** Con quién está hablando, y hasta cuándo. */
+  /**
+   * Con quién está teniendo algo, de qué clase y hasta cuándo.
+   *
+   * **Dos papeles y no dos copias del mismo**: en un empujón hay quien empuja y
+   * quien lo recibe, y ésa es toda la diferencia entre una escena y dos
+   * personas haciendo lo mismo a la vez. Es lo que V-07 generaliza.
+   */
   talkingTo: number | null;
+  bout: 'chat' | 'shove' | null;
+  role: 'gives' | 'takes' | null;
   talkUntil: number;
+  /** Cuándo suelta el empujón, si es que le toca soltarlo. */
+  shoveAt: number;
+  /** Hasta cuándo va trastabillando, sin gobierno de sus piernas. */
+  reelUntil: number;
+  /** Si ya devolvió el empujón: se devuelve una vez, no se monta una trifulca. */
+  paidBack: boolean;
   /** Para no volver a engancharse con el mismo al separarse. */
   cooldown: number;
 }
@@ -52,6 +68,7 @@ export interface World {
   steps: number;
   /** Lo que ha pasado, para poder contarlo en pantalla. */
   chats: number;
+  shoves: number;
   bumps: number;
 }
 
@@ -114,16 +131,22 @@ export function createWorld(seed: number, count = 8): World {
       // Y cada uno con sus ganas de hablar. Esto es el carácter, en pequeño:
       // en el juego saldría de `traits`, aquí de un dado.
       sociable: roll(seed, id, 5),
+      temper: roll(seed, id, 6),
       goal: null,
       talkingTo: null,
+      bout: null,
+      role: null,
       talkUntil: 0,
+      shoveAt: 0,
+      reelUntil: 0,
+      paidBack: false,
       cooldown: 0,
     });
   }
   return {
     seed, width: WIDTH, height: HEIGHT,
     obstacles: HOUSES, haunts: HAUNTS,
-    bodies, steps: 0, chats: 0, bumps: 0,
+    bodies, steps: 0, chats: 0, shoves: 0, bumps: 0,
   };
 }
 
@@ -147,6 +170,30 @@ const CHAT_GAP = 0.95;
 const CHAT = [3, 9] as const;
 /** Lo que se tarda en volver a tener ganas de parar con alguien. */
 const COOLDOWN = 14;
+/**
+ * A qué distancia se planta uno para empujar a otro. Más cerca que para hablar:
+ * encararse **es** acercarse más de la cuenta, y eso ya se lee antes del empujón.
+ */
+const SHOVE_GAP = 0.72;
+/** Lo que se tarda en soltarlo desde que se plantan. El instante de tensión. */
+const WIND_UP = 0.7;
+/** Lo que dura el encontronazo entero, empujón y recomposición incluidos. */
+const BOUT = 3.4;
+/**
+ * La fuerza del empujón, en celdas por segundo.
+ *
+ * TUNE: 2,8. Tiene que verse —por debajo de dos parece un roce— y no puede
+ * teletransportar: a treinta pasos por segundo son menos de diez centésimas de
+ * celda por paso, o sea que el trastabilleo sigue siendo movimiento continuo y
+ * no un salto. Es el mismo límite que vigila la prueba de los saltos.
+ */
+const SHOVE_PUSH = 2.8;
+/** Lo que se tarda en recomponerse tras recibirlo. */
+const REEL = 0.75;
+/** A partir de qué genio salta uno. Por debajo, se aguanta y sigue su camino. */
+const HOT_ENOUGH = 0.62;
+/** Y cuánto salta el que pasa de ahí, por encuentro. */
+const SHOVE_ODDS = 0.22;
 /** A qué distancia se considera llegado un destino. */
 const ARRIVED = 0.55;
 /** Desde dónde se empieza a frenar, para no clavar el freno al llegar. */
@@ -191,10 +238,61 @@ export function step(world: World): void {
       const other = world.bodies[body.talkingTo];
       if (other === undefined || now >= body.talkUntil) {
         body.talkingTo = null;
+        body.bout = null;
+        body.role = null;
+        body.paidBack = false;
         body.cooldown = now + COOLDOWN;
       } else {
         partner = other;
       }
+    }
+
+    // 1b · El empujón, cuando toca soltarlo. Se planta, se encara, y al cabo de
+    //      un instante de tensión lo suelta: el otro sale despedido hacia atrás
+    //      y pierde el gobierno de sus piernas un momento.
+    //
+    //      **No se teletransporta a nadie**: lo que el empujón hace es dar
+    //      velocidad, y la velocidad la integra el mismo paso que todo lo demás.
+    //      Por eso el trastabilleo se ve como un trastabilleo.
+    if (partner !== null && body.bout === 'shove' && body.role === 'gives'
+      && body.shoveAt > 0 && now >= body.shoveAt) {
+      const gap = Math.max(1e-6, distance(partner, body));
+      partner.vx = (partner.x - body.x) / gap * SHOVE_PUSH;
+      partner.vz = (partner.z - body.z) / gap * SHOVE_PUSH;
+      partner.reelUntil = now + REEL;
+      body.shoveAt = 0;
+      world.shoves += 1;
+
+      // Y el que lo recibe decide si lo devuelve. Una vez, no una trifulca: en
+      // el juego, si esto llegara a más, lo diría el motor y no el empujón.
+      if (!partner.paidBack) {
+        const back = roll(world.seed, partner.id * 31 + body.id, world.steps);
+        if (back < partner.temper * 0.8) {
+          partner.paidBack = true;
+          partner.role = 'gives';
+          partner.shoveAt = now + REEL + WIND_UP * 0.6;
+          body.role = 'takes';
+        }
+      }
+    }
+
+    // 1c · Trastabillando: las piernas no obedecen. Se deja correr la velocidad
+    //      que le dieron, frenando, y no se decide nada.
+    if (now < body.reelUntil) {
+      body.vx *= 0.94;
+      body.vz *= 0.94;
+      body.x += body.vx * STEP;
+      body.z += body.vz * STEP;
+      body.x = Math.max(0.5, Math.min(world.width - 0.5, body.x));
+      body.z = Math.max(0.5, Math.min(world.height - 0.5, body.z));
+      if (partner !== null) {
+        const look = Math.atan2(partner.x - body.x, partner.z - body.z);
+        let turn = look - body.facing;
+        while (turn > Math.PI) turn -= Math.PI * 2;
+        while (turn < -Math.PI) turn += Math.PI * 2;
+        body.facing += turn * 0.12;
+      }
+      continue;
     }
 
     let dx = 0;
@@ -206,10 +304,13 @@ export function step(world: World): void {
       //      quedado encima. Y siguen valiendo el empujón de los demás y el de
       //      las paredes, que es lo que impide que dos charlando se solapen.
       const gap = distance(partner, body);
+      const want = body.bout === 'shove' ? SHOVE_GAP : CHAT_GAP;
       if (gap > 1e-6) {
-        const off = (gap - CHAT_GAP) / Math.max(CHAT_GAP, gap);
-        dx = (partner.x - body.x) / gap * off * body.pace;
-        dz = (partner.z - body.z) / gap * off * body.pace;
+        const off = (gap - want) / Math.max(want, gap);
+        // El que va a empujar se acerca con más decisión que el que charla.
+        const urge = body.bout === 'shove' ? 1.7 : 1;
+        dx = (partner.x - body.x) / gap * off * body.pace * urge;
+        dz = (partner.z - body.z) / gap * off * body.pace * urge;
       }
     } else {
       // 2b · Si no hay a dónde ir, o ya se llegó, se elige sitio nuevo.
@@ -324,8 +425,41 @@ export function step(world: World): void {
       if (b.talkingTo !== null || now < b.cooldown) continue;
       if (distance(a, b) > EARSHOT) continue;
 
-      // Los dos tienen que querer. Uno solitario deja pasar de largo al más
-      // hablador del valle, y eso ya es carácter asomando.
+      // **¿Qué clase de encuentro es éste?** Aquí está el carácter decidiendo,
+      // que es de donde sale que dos aldeas no se parezcan. Salta el más
+      // irascible de los dos, y salta contra quien se le cruza: no hace falta
+      // que el otro tenga nada que ver, que es justo como empiezan estas cosas.
+      const hot = a.temper > b.temper ? a : b;
+      const cold = hot === a ? b : a;
+      const spark = roll(world.seed, a.id * 131 + b.id, world.steps + 3);
+      // **Con umbral, no proporcional.** La primera versión hacía que empujara
+      // todo el mundo un poco —diez a diecisiete encontronazos por jornada, más
+      // que charlas: una taberna y no una aldea— porque la probabilidad crecía
+      // desde cero con el carácter. Así sólo salta quien tiene mal genio de
+      // verdad, y de paso una aldea sin gente de ese temple no pega a nadie en
+      // todo el día. Que dos aldeas se distingan en esto es medio encargo.
+      const angry = hot.temper > HOT_ENOUGH
+        && spark < (hot.temper - HOT_ENOUGH) * SHOVE_ODDS;
+
+      if (angry) {
+        const span = BOUT;
+        hot.talkingTo = cold.id;
+        cold.talkingTo = hot.id;
+        hot.bout = 'shove';
+        cold.bout = 'shove';
+        hot.role = 'gives';
+        cold.role = 'takes';
+        hot.shoveAt = now + WIND_UP;
+        cold.shoveAt = 0;
+        hot.talkUntil = now + span;
+        cold.talkUntil = now + span;
+        hot.goal = null;
+        cold.goal = null;
+        break;
+      }
+
+      // Y si no hay chispa, los dos tienen que querer pararse. Uno solitario
+      // deja pasar de largo al más hablador del valle, y eso ya es carácter.
       const dice = roll(world.seed, a.id * 97 + b.id, world.steps);
       const willing = (a.sociable + b.sociable) / 2;
       if (dice > willing * 0.35) continue;
@@ -333,6 +467,10 @@ export function step(world: World): void {
       const span = CHAT[0] + roll(world.seed, a.id + b.id, world.steps + 7) * (CHAT[1] - CHAT[0]);
       a.talkingTo = b.id;
       b.talkingTo = a.id;
+      a.bout = 'chat';
+      b.bout = 'chat';
+      a.role = null;
+      b.role = null;
       a.talkUntil = now + span;
       b.talkUntil = now + span;
       a.goal = null;

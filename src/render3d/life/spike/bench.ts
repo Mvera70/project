@@ -130,6 +130,9 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
     front.position.set(0, 0.72, body.radius + 0.02);
     group.add(torso, head, front);
 
+    // La marca sobre la cabeza dice **qué** está pasando, no sólo que pasa
+    // algo: charlar y encararse se leen distinto desde arriba, y a esta escala
+    // el color separa mucho antes que la postura.
     const mark = new Mesh(
       new SphereGeometry(0.15, 12, 10),
       new MeshStandardMaterial({ color: '#FFFFFF', emissive: new Color('#FFD98A') }),
@@ -196,14 +199,26 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
       figure.group.position.set(body.x, 0, body.z);
       figure.group.rotation.y = body.facing;
       figure.mark.visible = body.talkingTo !== null;
+      if (body.talkingTo !== null) {
+        const stuff = figure.mark.material as MeshStandardMaterial;
+        const angry = body.bout === 'shove';
+        stuff.color.set(angry ? '#E8503A' : '#FFFFFF');
+        stuff.emissive.set(angry ? '#C42D18' : '#FFD98A');
+      }
+      // Quien va trastabillando se inclina: es lo que hace que un empujón se
+      // lea como un empujón y no como alguien que se aparta deprisa.
+      const reeling = body.reelUntil > world.steps * STEP;
+      figure.group.rotation.x = reeling ? -0.28 : 0;
       if (trails && world.steps - crumbAt > 6) dropCrumb(body, figure);
     }
     if (trails && world.steps - crumbAt > 6) crumbAt = world.steps;
 
-    const talking = world.bodies.filter((b) => b.talkingTo !== null).length;
+    const talking = world.bodies.filter((b) => b.bout === 'chat').length;
+    const scrapping = world.bodies.filter((b) => b.bout === 'shove').length;
     hud.textContent = `día ${(world.steps * STEP).toFixed(0)} s · `
-      + `${world.bodies.length} vecinos · ${talking} hablando ahora · `
-      + `${world.chats} encuentros`;
+      + `${world.bodies.length} vecinos · `
+      + `${talking} hablando · ${scrapping} a malas · `
+      + `${world.chats} charlas · ${world.shoves} empujones`;
 
     resize();
     renderer.render(scene, camera);
