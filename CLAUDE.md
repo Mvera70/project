@@ -91,10 +91,12 @@ juega, con la causa medida en `docs/life-rounds/V-09.md`. Todo va detrás de la
 bandera `valley.life`; el juego normal no la usa todavía.
 
 **El plan de lo que viene, con briefs listos para agentes, está en
-`docs/next-plan.md`.** Cómo se delega y se audita, en `docs/agents.md`. Para
-mirar el juego montado: `npx tsx tools/graphics/bundle-game.ts` y luego
-`node tools/graphics/shot.mjs`. **Ninguna ronda de interfaz se cierra sin
-captura.**
+`docs/next-plan.md`.** Qué le falta al proyecto **en total** para ser un juego,
+y qué no puede hacer ningún agente porque depende de una decisión o de una
+persona mirando: `docs/roadmap.md`. Cómo se delega y se audita, en
+`docs/agents.md`. Para mirar el juego montado:
+`npx tsx tools/graphics/bundle-game.ts` y luego `node tools/graphics/shot.mjs`.
+**Ninguna ronda de interfaz se cierra sin captura.**
 
 El reparto entre andar y hacer que E.6 daba por abierto **está contestado**: la
 producción anda el 75 % de la jornada, igual que el descarte que gustó, y ya no
