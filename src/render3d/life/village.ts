@@ -40,6 +40,14 @@ export interface Dweller {
   doing: Intent | null;
   /** En qué paso le toca replantearse la vida. Escalonado, no todos a la vez. */
   rethinkAt: number;
+  /**
+   * Suelo recorrido desde que empezó a andar, en celdas.
+   *
+   * Lo que mueve el clip de la zancada (G-04): la animación avanza con el suelo
+   * que se pisa, no con el reloj, y por eso los pies no patinan. Se pone a cero
+   * al pararse, que es cuando empieza otra caminata.
+   */
+  travelled: number;
 }
 
 export interface Village {
@@ -118,6 +126,7 @@ export function createVillage(state: GameState, day: number): Village {
       traits: villager.traits,
       needs: freshNeeds(),
       doing: null,
+      travelled: 0,
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -217,7 +226,12 @@ export function createVillage(state: GameState, day: number): Village {
         integrate(body, land, LIFE_STEP);
 
         const speed = Math.hypot(body.vx, body.vz);
-        if (speed > 0.05) turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
+        if (speed > 0.05) {
+          turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
+          dweller.travelled += speed * LIFE_STEP;
+        } else {
+          dweller.travelled = 0;
+        }
 
         // 4 · Y lo que eso le hace por dentro.
         let company = false;

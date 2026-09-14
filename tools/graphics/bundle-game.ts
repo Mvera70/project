@@ -101,7 +101,8 @@ page = page.replace(/\s*<link rel="manifest"[^>]*>/u, '')
 
 // El render 3D, sin tener que escribir `?render=3d` a mano: quien abre esta
 // pagina viene a ver el piloto.
-page = page.replace('</head>', "<script>try{localStorage.setItem('valley.render','pilot3d');}catch(e){}</script></head>");
+// Y la capa de vida del Anexo E encendida: es lo que esta demo viene a ensenar.
+page = page.replace('</head>', "<script>try{localStorage.setItem('valley.render','pilot3d');localStorage.setItem('valley.life','on');}catch(e){}</script></head>");
 
 const target = resolve(OUT, 'valley.html');
 writeFileSync(target, page);

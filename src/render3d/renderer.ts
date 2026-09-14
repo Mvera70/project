@@ -34,8 +34,11 @@ import {
 } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
-import { dayPhase } from './presentation-clock';
+import { dayNumber, dayPhase } from './presentation-clock';
 import { createScenicState } from './scenic-state';
+import { createVillage, type Village as LifeVillage } from './life/village';
+import { castOf } from './life/cast';
+import { LIFE_STEP } from './life/clock';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
@@ -227,6 +230,21 @@ export async function createGraphicsRenderer(
   // El estado de la jornada, quieto desde anoche. Es lo que se pinta: ver
   // `scenic-state.ts` para por que no se pinta el vivo.
   const scenic = createScenicState();
+
+  /**
+   * Anexo E · la capa de vida, detrás de bandera.
+   *
+   * Mientras exista esta bandera el juego puede volver al camino de hoy en una
+   * línea, y ninguna partida se entera de nada: el motor no se toca en ninguna
+   * fase del anexo. V-12 la quitará, y con ella el camino viejo.
+   */
+  const useLife = (() => {
+    try { return globalThis.localStorage?.getItem('valley.life') === 'on'; }
+    catch { return false; }
+  })();
+  let life: LifeVillage | null = null;
+  let lifeDay = -1;
+  let lifeCarry = 0;
   let mapWidth = 0;
   let mapHeight = 0;
   let disposed = false;
@@ -408,6 +426,7 @@ export async function createGraphicsRenderer(
       // La hora escenica primero, porque de ella cuelga todo lo demas: es la
       // que dice que jornada se esta pintando y, con ella, que estado.
       const phase = dayPhase(frame.presentationSeconds);
+      const today = dayNumber(frame.presentationSeconds);
       // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
       // que no es la continuacion del anterior, asi que la jornada guardada no
       // vale: se estrena una. `presentation-clock` ya distingue los tres casos.
@@ -440,7 +459,31 @@ export async function createGraphicsRenderer(
 
       // Actors are derived every frame because they change every frame; the
       // village is not, because it changes a few times a year.
-      lastActors = actorsFor(shown, frame, { tracked, memory });
+      if (useLife) {
+        // La aldea vive por su cuenta: una jornada es una vida, y al amanecer
+        // se estrena otra con la gente que el motor diga.
+        if (life === null || lifeDay !== today || frame.discontinuity) {
+          life = createVillage(shown, today);
+          lifeDay = today;
+          lifeCarry = 0;
+        }
+        lifeCarry += frame.deltaSeconds;
+        let given = 0;
+        while (lifeCarry >= LIFE_STEP && given < 240) {
+          life.step();
+          lifeCarry -= LIFE_STEP;
+          given += 1;
+        }
+        const ages = new Map<VillagerId, number>();
+        const named = new Set<VillagerId>();
+        for (const villager of shown.people.villagers) {
+          ages.set(villager.id, clockOf(shown.tick).year - clockOf(villager.bornTick).year);
+          if (villager.named) named.add(villager.id);
+        }
+        lastActors = castOf(life, frame.presentationSeconds, ages, named);
+      } else {
+        lastActors = actorsFor(shown, frame, { tracked, memory });
+      }
       cast.show(lastActors);
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
