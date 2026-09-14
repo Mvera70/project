@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { TIME } from '@engine/balance';
 import { UI_BANK } from '@engine/chronicle/bank.en';
 import { foundGame } from '@engine/found';
+import { seasonOf } from '@engine/time';
+import { seasonLabel } from '@ui/app';
 import { inspectAt, panelFor } from '@ui/inspect';
 import { recogniseGesture } from '@ui/gestures';
 import { hungerSeverity, tellsFor } from '@render/layers/tells';
@@ -85,6 +88,16 @@ describe('M-21 · inspección y señales', () => {
     // texto visible en la píldora, no la misma frase repetida dos veces.
     expect(UI_BANK['crossroad.waiting']).toBeTruthy();
     expect(UI_BANK['crossroad.pending_pill']).not.toBe(UI_BANK['crossroad.waiting']);
+  });
+
+  it('U-06 · la estación tiene sus cuatro claves en el banco y sale de seasonOf', () => {
+    const seasons = ['spring', 'summer', 'autumn', 'winter'] as const;
+    for (const kind of seasons) expect(UI_BANK[`app.season.${kind}`]).toBeTruthy();
+    // Un año entero de ticks, no un tick suelto: cada uno tiene que coincidir
+    // con lo que `seasonOf` ya decide, nunca con un literal escrito aparte.
+    for (let tick = 0; tick < TIME.WEEKS_PER_YEAR; tick += 1) {
+      expect(seasonLabel(tick)).toBe(UI_BANK[`app.season.${seasonOf(tick)}`]);
+    }
   });
 
   it('una ficha compuesta no filtra claves ni identificadores internos', () => {

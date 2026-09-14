@@ -49,11 +49,18 @@
         color: var(--gild); font: 600 15px/1.1 var(--voice); letter-spacing: .2em;
         text-shadow: 0 1px 0 rgba(242,233,216,.55); }
 
+      /* U-06 · la estación, bajo el año. Versalitas de verdad
+         (`font-variant-caps`), no mayúsculas forzadas: el texto del banco va en
+         mayúscula-minúscula normal y es esta regla la que lo dibuja pequeño. */
+      .valley-season { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 17px); left: 15px;
+        color: var(--ink-soft); font: 600 10px/1.1 var(--plain); letter-spacing: .13em;
+        font-variant-caps: all-small-caps; text-shadow: 0 1px 0 rgba(242,233,216,.4); }
+
       /* §11.1.1 · la tira de la aldea. **Una placa, no cuatro insignias**: son
          cuatro lecturas del mismo instrumento, y separadas se leían como cuatro
          cosas sin relación. Filetes en medio, y la gente primero porque es el
-         juego. */
-      .valley-vitals { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 22px); left: 13px;
+         juego. Baja un poco desde U-06 para dejar sitio a la línea de estación. */
+      .valley-vitals { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 32px); left: 13px;
         display: flex; align-items: stretch; padding: 1px; border: 1px solid var(--edge); border-radius: 7px;
         background: var(--plate); box-shadow: 0 1px 3px rgba(34,29,24,.18); backdrop-filter: blur(2px); }
       .valley-vital { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; color: var(--ink);
@@ -62,6 +69,20 @@
       .valley-vital b { font-weight: 700; letter-spacing: .01em; }
       .valley-vital.thin { color: var(--alarm); }
       .valley-vital.thin b { font-weight: 800; }
+      /* La comida en aviso lo dice también el trazo del icono, no sólo el
+         color (§11.1.1, U-06): quien no distingue el color ve el dibujo más
+         grueso igual. */
+      .valley-vital.thin svg { stroke-width: 2.4; }
+
+      /* U-06 · el bump de una cifra que acaba de cambiar. La duración la
+         manda `TIME.VITAL_BUMP_MS` desde `app.ts` (`animationDuration` en
+         línea, nada de un número aquí) y `animationend` retira la clase sola:
+         nunca una transición colgada del reloj del juego (§11.4). */
+      @keyframes valley-vital-bump { 0% { transform: scale(1); } 40% { transform: scale(1.22); } 100% { transform: scale(1); } }
+      .valley-vital.bump { animation-name: valley-vital-bump; animation-timing-function: ease-out; }
+      @media (prefers-reduced-motion: reduce) {
+        .valley-vital.bump { animation: none; }
+      }
 
       /* La velocidad, en una sola regleta: son tres posiciones de un mando, no
          tres botones distintos. Sigue cumpliendo los 44 px de §11.3.

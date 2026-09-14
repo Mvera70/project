@@ -9,7 +9,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
-import type { ArchivedGame, Decision, GameState, SaveFile } from '@engine/state';
+import type { ArchivedGame, Decision, GameState, SaveFile, Season } from '@engine/state';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom } from './backend';
 import { persistSave } from './idb';
@@ -103,6 +103,19 @@ export function roman(value: number): string {
   return result;
 }
 
+/** U-06 · una clave del banco por estación: `seasonOf` decide, nunca un literal. */
+const SEASON_KEY: Record<Season, string> = {
+  spring: 'app.season.spring',
+  summer: 'app.season.summer',
+  autumn: 'app.season.autumn',
+  winter: 'app.season.winter',
+};
+
+/** La línea bajo el año (§11.1.1, U-06): la estación del tick, en su frase del banco. */
+export function seasonLabel(tick: number): string {
+  return renderUiText(SEASON_KEY[seasonOf(tick)]);
+}
+
 /** Keep archive identity unambiguous even if the random draw repeats. */
 export function nextUnusedSeed(drawn: number, excluded: ReadonlySet<number>): number {
   let candidate = drawn >>> 0;
@@ -140,6 +153,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   canvas.setAttribute('aria-label', renderUiText('app.valley'));
   const year = document.createElement('div');
   year.className = 'valley-year';
+  // U-06 · bajo el año, la estación: `seasonLabel` la saca de `seasonOf`.
+  const season = document.createElement('div');
+  season.className = 'valley-season';
   // §11.1.1 · la tira de la aldea: cuatro cifras, arriba, siempre visibles.
   const vitals = document.createElement('div');
   vitals.className = 'valley-vitals';
@@ -148,6 +164,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     const cell = document.createElement('span');
     cell.className = 'valley-vital';
     cell.innerHTML = icon;
+    // U-06 · el bump se apaga solo: `animationend`, nunca un temporizador
+    // atado al tick (§11.4). `animation-name` es el único que corre en
+    // `.valley-vital.bump` (index.html), así que no hay ambigüedad con otra
+    // animación de la misma celda.
+    cell.addEventListener('animationend', (event) => {
+      if (event.animationName === 'valley-vital-bump') cell.classList.remove('bump');
+    });
     const value = document.createElement('b');
     cell.append(value);
     vitals.append(cell);
@@ -203,7 +226,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   peopleTab.addEventListener('click', () => {
     if (lastNamedTouchedId !== null) showPanel({ kind: 'villager', id: lastNamedTouchedId });
   });
-  root.append(canvas, year, vitals, controls, tabbar);
+  root.append(canvas, year, season, vitals, controls, tabbar);
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
@@ -253,10 +276,31 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   });
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
+  // U-06 · si una cifra cambia, su celda hace un bump breve (§11.1.1). Quien
+  // pide no ver movimiento no lo ve: la clase ni se llega a poner.
+  const reducesMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let lastVitals = vitalsOf(state);
+  const bump = (cell: HTMLElement, changed: boolean): void => {
+    if (!changed || reducesMotion.matches) return;
+    // La clase se pone y se quita sola (`animationend` en `vital()`), nunca
+    // una transición colgada del tick — §11.4. Quitarla y forzar reflujo
+    // antes de re-ponerla es lo que reinicia el bump si la cifra vuelve a
+    // cambiar antes de que el anterior haya acabado.
+    cell.classList.remove('bump');
+    void cell.offsetWidth;
+    cell.style.animationDuration = `${TIME.VITAL_BUMP_MS}ms`;
+    cell.classList.add('bump');
+  };
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
+    season.textContent = seasonLabel(state.tick);
     const now = vitalsOf(state);
+    bump(people.cell, now.people !== lastVitals.people);
+    bump(food.cell, now.weeks !== lastVitals.weeks);
+    bump(wood.cell, now.wood !== lastVitals.wood);
+    bump(spirits.cell, now.morale !== lastVitals.morale);
+    lastVitals = now;
     people.value.textContent = String(now.people);
     food.value.textContent = String(now.weeks);
     wood.value.textContent = String(now.wood);
@@ -455,6 +499,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       state = foundSuccessor(game, freshSeed(new Set(archive.map((item) => item.seed))));
       pendingDecision = undefined;
       lastFraction = 0;
+      // La aldea nueva no "cambia" respecto a la que se acaba de cerrar: sin
+      // esto, sus cuatro cifras nacían con un bump que no correspondía a nada.
+      lastVitals = vitalsOf(state);
       app.setSpeed(1);
       paint(0);
       persist();

@@ -1644,6 +1644,12 @@ export const UI_BANK: Record<string, string> = {
   'app.vitals.food': 'Food for {weeks} weeks',
   'app.vitals.wood': '{count} wood',
   'app.vitals.morale': 'Spirits {value} of 100',
+  // U-06 · la línea de estación bajo el año (`src/ui/app.ts`, `seasonLabel`):
+  // una clave por estación, nunca un literal junto a `seasonOf`.
+  'app.season.spring': 'Spring',
+  'app.season.summer': 'Summer',
+  'app.season.autumn': 'Autumn',
+  'app.season.winter': 'Winter',
   'crossroad.waiting': 'A crossroad is waiting',
   // U-07 · el texto visible de la píldora que reemplaza al punto rojo
   // (`screens/crossroad.ts`, `.crossroad-marker`). Distinto del aria-label de

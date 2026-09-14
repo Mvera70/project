@@ -36,6 +36,11 @@ export const TIME = {
   // notice, for the same reason: §11.4 forbids an interface animation a clock
   // jump can catch half-way.
   MOMENT_MS: 7_000,
+  // TUNE: how long the vitals strip's "bump" lasts when a figure changes
+  // (§11.1.1, U-06). Real time and cut hard like NOTICE_MS and MOMENT_MS, for
+  // the same reason: §11.4 forbids an interface animation a clock jump can
+  // catch half-way. Short enough to read as a pulse, not a fade.
+  VITAL_BUMP_MS: 150,
   SAVE_EVERY_TICKS: 20, // §13.1
 } as const;
 
