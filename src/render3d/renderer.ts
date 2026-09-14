@@ -19,7 +19,7 @@ import { clockOf } from '@engine/time';
 import { paletteFor } from '@render/palette';
 import { moodsFor } from '@render/moods';
 import { createValleyCamera } from './camera';
-import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
+import { TERRAIN_CODE, type GameState, type Role, type VillagerId } from '@engine/state';
 import { actorsFor, createActorMemory, type Actor } from './actors';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
@@ -54,6 +54,24 @@ const REED = 'reed';
 const FORD = 'ford-stone';
 
 /**
+ * Que recurso clona cada oficio con nombre. design.md D.6.2.
+ *
+ * Los siete son los que existen de verdad en el estado (§3.4); `stranger` no
+ * tiene modelo propio porque es "sin oficio todavia" y no un oficio. Todos
+ * comparten huesos y clips con el aldeano base, asi que solo cambia que malla
+ * se clona.
+ */
+const VILLAGER_BY_ROLE: Readonly<Record<Exclude<Role, 'stranger'>, string>> = {
+  leader: 'villager-leader',
+  smith: 'villager-smith',
+  midwife: 'villager-midwife',
+  priest: 'villager-priest',
+  woodward: 'villager-woodward',
+  reeve: 'villager-reeve',
+  herbalist: 'villager-herbalist',
+};
+
+/**
  * Las clases de §7.7, cada una con su recurso. El nombre del recurso es el de
  * la clase: no hay correspondencia que escribir porque no hace falta.
  */
@@ -68,7 +86,7 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
  * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
  */
 export const WANTED = [
-  VILLAGER, TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  VILLAGER, ...Object.values(VILLAGER_BY_ROLE), TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
@@ -235,7 +253,13 @@ export async function createGraphicsRenderer(
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
   const village = new Village((id) => library.instance(id));
-  const cast = new Cast(villager, () => library.instance(VILLAGER), (id) => library.instance(id));
+  // El oficio elige el recurso; sin oficio, o si el catálogo aún no tiene el
+  // suyo, cae al aldeano base — que es el mismo criterio que ya usaba todo el
+  // mundo antes de que hubiera más de un modelo.
+  const cast = new Cast(villager, (role) => {
+    const wanted = role === null || role === 'stranger' ? undefined : VILLAGER_BY_ROLE[role];
+    return (wanted === undefined ? undefined : library.instance(wanted)) ?? library.instance(VILLAGER);
+  }, (id) => library.instance(id));
   const tells = new Tells();
   const fauna = new Fauna((kind) => library.instance(kind));
   const bubbles = new Bubbles();

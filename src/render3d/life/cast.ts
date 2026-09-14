@@ -101,6 +101,11 @@ export function castOf(
       age: ages.get(dweller.villager) ?? 30,
       talking: talkingOf(dweller)
         || (dweller.doing?.there === true && dweller.doing.offer.id === 'gossip'),
+      // TUNE: la capa de vida todavía no trae el `Role` de nadie hasta aquí
+      // (V-11 añadió los ocho modelos en `world/cast.ts`, no este puente); con
+      // `null` todo el mundo se sigue viendo con el aldeano base, que es lo
+      // mismo que hacía antes de que hubiera más de un modelo.
+      role: null,
     });
   }
   return actors;

@@ -15,7 +15,7 @@ import { DAY, ENCOUNTER } from '@engine/balance';
 import { isHere } from '@engine/people/demography';
 import {
   TERRAIN_CODE,
-  type Building, type BuildingId, type BuildingKind, type GameState, type Villager, type VillagerId,
+  type Building, type BuildingId, type BuildingKind, type GameState, type Role, type Villager, type VillagerId,
 } from '@engine/state';
 import { routesFor } from '@engine/world/paths';
 import type { GraphicsFrame } from '../contracts';
@@ -76,6 +76,14 @@ export interface Actor {
    * de que color viste nadie ni tiene por que.
    */
   readonly age: number;
+  /**
+   * El oficio con nombre que lleva, o `null` si es un campesino anonimo.
+   *
+   * `null` es la mayoria: sólo los aldeanos con nombre llevan `Role` (§3.4).
+   * Quien pinta decide con esto qué modelo usa (D.6.2, `world/cast.ts`); antes
+   * de esto sólo se sabía `named`, que no dice cuál de los siete oficios es.
+   */
+  readonly role: Role | null;
 }
 
 export interface ActorPlan {
@@ -1149,7 +1157,7 @@ export function actorsFor(
         id: person.id, x: at.x, z: at.z, facing: 0, activity: 'resting',
         clip: 'idle', clipSeconds: clipTime('idle', 0, frame.presentationSeconds, stable(person.id, 11)),
         cell: home, named: person.named, age: ageOf(person, state.tick), travelled: 0,
-        talking: false,
+        talking: false, role: person.role,
       });
       continue;
     }
@@ -1317,6 +1325,7 @@ export function actorsFor(
       named: person.named,
       talking: talk !== null,
       age: ageOf(person, state.tick),
+      role: person.role,
     });
   }
 

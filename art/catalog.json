@@ -2205,6 +2205,657 @@
         "source": "Original bucket authored for The Valley G-10 (V-09 props)",
         "license": "Project original"
       }
+    },
+    {
+      "id": "villager-leader",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-leader/villager-leader.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-08-39-325Z-30668",
+        "directory": "artifacts/graphics/G-10/approved/c18503b111433ed5"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "49C4A02656E7A9F42EC60B3FF3FA799D2F161453CD02EBC0150EA1D8030368B5",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-leader.blend": "FE789B594463A4F4F73FA9EB94C2910D59A3ED0761AB464D69B773ED3505960F",
+        "villager-leader.glb": "C18503B111433ED53417EDD551ECEACBF4EC3C3153E6ACC2767C9ACBCCB47173",
+        "villager-leader-blender.png": "E1DEE38C31081D5F7D3CBFD6E0804FB7650E9339CA109D2AC44AB82894EB6E31",
+        "capture-1.png": "3AED7E5AD7D976A12E47F50737ECC8C11E4CCE9D9155B451FC0FB88C4E4BA6BC",
+        "capture-1-gray.png": "4A97499D1BEF989694426B7A7511BE33F97BF38E74052B0058D439FE78E15126",
+        "capture.json": "7DE00ED391B0F39DFF30B037FC7A5068186C0F97156D39F2A288D5C8022FFB62",
+        "build.json": "824E56C2134EC33FCB3C4657539E0B2E78F65037FA4B029D76EE6C3ED404CB30",
+        "validation.json": "1DB531E48C3AD710A0096F927C94813FF1EC8DFF1C9337362D61A4DE9CBD6452"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-leader authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-smith",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-smith/villager-smith.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-08-49-796Z-26320",
+        "directory": "artifacts/graphics/G-10/approved/8bf53d92d7145f43"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "028AEA10FCE31A40CFD3B9F95704D5FC838460A1278A6BFDA20F3EAFFCCDDABB",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-smith.blend": "C51A89C50C17F705DD85951F4ACDBE2A09D28C4302394FCA29A50AD65623083B",
+        "villager-smith.glb": "8BF53D92D7145F432166026AD2C96D8423CB41EC84F3BA591877249AE4989E30",
+        "villager-smith-blender.png": "ACE123224313A5DC486351056C84D58D1C7AF49BF22DE8C04B749ABCAC568330",
+        "capture-1.png": "57B3BEA62AF2889AD0AFFD36D2E5350591A79FEC561288B320B9B5A04A9570E1",
+        "capture-1-gray.png": "AF3EADC952FB0EE6F95936A9329590A686F6E2AF831B6F69728B8DD043A8A184",
+        "capture.json": "88DD58AEE9662DEAB1ADE44B00CB2E9BD74D13477C74EA944ED5EE27749B9241",
+        "build.json": "23F7EF8DD8174F8F312BDE0CBDD2A700360001BBD8416E9743738B388B77D299",
+        "validation.json": "FE12BE7DDA4B8A69C03D37971FE240AD65FE48CCB9DA4876EC898F5A50B2890C"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-smith authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-midwife",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-midwife/villager-midwife.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-08-55-326Z-29864",
+        "directory": "artifacts/graphics/G-10/approved/760eb20249249e9a"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "61F22CC61299667D9839E1EFE2D5489693E587C2104C083A00C1C7C93A64FD73",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-midwife.blend": "535BF2D23D61599CBAA86A76A841193827B354E9B6BC40ABFA2F26B48AC400F0",
+        "villager-midwife.glb": "760EB20249249E9A890E75B7131DBA18ED7F40BBA3A313CC3A736DF61BC795B5",
+        "villager-midwife-blender.png": "D3DCA9D2598E7750B4723EA10C551FAEEE1F57176BA22AD0D3A63B6CB9442FC2",
+        "capture-1.png": "981C5466F3AA0355E8D5033E1A4AF3DB0A9D76A9114118468C030C6540BC6C51",
+        "capture-1-gray.png": "C07DA08580BF193A770CD94AEEB9360F8B55B0671920534BED3DE0843ECE7D77",
+        "capture.json": "CD4AFB08F47E9FFE41A0A51A6D7E41DF3863CC1463F100D83C4E81F92CFF1C03",
+        "build.json": "609D0039B808593FC13B46ADCD109D968A12810DBA2B43B879969AE0D91450EA",
+        "validation.json": "575716756BA3E9E7F5E93B291E013C67D45B0B10869F3037B6B782E11F7D299A"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-midwife authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-priest",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-priest/villager-priest.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-09-00-857Z-16056",
+        "directory": "artifacts/graphics/G-10/approved/86212fa9f1a79746"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "D9EA8D9EB525CD2304B7D23CAA4573F56D0B8AA5EBD304BA9016CC11498B7CF0",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-priest.blend": "2310B5C441ABED13E86AF8903D88ACBB9B26345BE3BD620AAC67DD0DF4010165",
+        "villager-priest.glb": "86212FA9F1A79746779C1C6390DABD9C1B9B9400B1EC26E3731272FFA0017586",
+        "villager-priest-blender.png": "D7972D3CCDB976D032BF9BC27314EDB70B9B167A598DA6416961D4E746C9E5A2",
+        "capture-1.png": "B3C3A9CE71C37E333CC948FAC1C04CAA82EEE90FD6FB0E2439E404344AB19533",
+        "capture-1-gray.png": "7A7E80F8A2DF2BB0F247F568132832CE23E236F985D783A742671A884C9C3057",
+        "capture.json": "F3D6A2232966E395C172F642F247F97F84CAE1D50991BD6274E6265A15F50E8A",
+        "build.json": "6F1EA582D8B0198E47C3261E717F456C28F07D172D0C9AFB75FC656ED406980C",
+        "validation.json": "B531222C61B8B641F7AFF335212F686070E39FE9FCFC706B341962F6AD93DD47"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-priest authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-woodward",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-woodward/villager-woodward.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-09-07-193Z-6884",
+        "directory": "artifacts/graphics/G-10/approved/1907a330784a352c"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "E2DB2978CD1867314E90FCF51D2C8BA596DAC049A0178A8FE9AC222144309D06",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-woodward.blend": "C5DDF5A1CF909F148113DEB5EDB8A9893F53A9F7A4E94D91E31D5E0E5FC28F64",
+        "villager-woodward.glb": "1907A330784A352C646D3ECEE842F4DAD50BAA83D4AC504841268E601A2DBA49",
+        "villager-woodward-blender.png": "EE6F6E5B808EE9395421706149CD62E54296CDE7CA0217A92057A4C08EAA6B81",
+        "capture-1.png": "4D92032B8747590F2362091F231C865CB7F76CC8E82EEE207AFB204501F9C61C",
+        "capture-1-gray.png": "CF662C47F521455EE70BBF6A70800D248EE79F63E0DC4369C8E222E7F1BC9CA9",
+        "capture.json": "5234596761C8721F4AB8C77BB582306415E80A36EB37FF664390420C95897F08",
+        "build.json": "59F1ED267AB1DA3EE8C627C8B5DD026617A39D23BC05AB9C1567F017EC1545FD",
+        "validation.json": "FE44CAE0EDF4AFAEBEDEF660B1C69EEF6628A8DF32329BA3F3EFAD67C53EFDDA"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-woodward authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-reeve",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-reeve/villager-reeve.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-09-13-357Z-6156",
+        "directory": "artifacts/graphics/G-10/approved/7e3934563d2ddefd"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "C21C7B444A9F7788135C8319DD5DE4AAB3B987302759FE160F602ADA8DD26520",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-reeve.blend": "FE5CAF3C9E5E4319D6ECA380D4D5A1ED6DC5085B7EE85CA479A855A490A3574A",
+        "villager-reeve.glb": "7E3934563D2DDEFD2CDBF24EAE66C54ABE689C6036C58EAFCF7849D0805B2D86",
+        "villager-reeve-blender.png": "AB925AEDFE4B753A805E55596682382CD6CE42077DE945A41475E745712A4EFD",
+        "capture-1.png": "D8D8DE8C2E8DB0215807AAA72E1ECE19C2AD9600F528A7D084F4A3F07176833D",
+        "capture-1-gray.png": "17A5DC6C7CE6CC7E86D24EB8D3559508D93D3E3B0770E3E9EFDF4476962284F4",
+        "capture.json": "C6260C745E8C0AEA84F6E7B9E5B2B1B3F6AF90452FE83243001C2872204EAE64",
+        "build.json": "0BF9C8DBDB5FB1F8ECF7C8FB251EFD15A409E0E421BFE003EE3F7412B1303474",
+        "validation.json": "60A6D59DB5FC17002AC97CDCFB9FF075976DDDD5EAF35FF41A6906C887051514"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-reeve authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-herbalist",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/villager-herbalist/villager-herbalist.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T19-09-19-518Z-29376",
+        "directory": "artifacts/graphics/G-10/approved/edf9f80ef4566e1d"
+      },
+      "bounds": {
+        "min": [
+          -0.17115,
+          0.01,
+          -0.093333
+        ],
+        "max": [
+          0.17115,
+          0.666667,
+          0.095
+        ],
+        "size": [
+          0.342299,
+          0.656667,
+          0.188333
+        ]
+      },
+      "recipeSha256": "8B6CEFFD9DD35645D004A94A821778149BBB32BC1100C67B69278A49E003BB3A",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1320
+      },
+      "hashes": {
+        "villager-herbalist.blend": "565759E81FB99D97DB33F6BA5D4C6A808058A606D2CD7F76C6B44BFAD2CDCA1C",
+        "villager-herbalist.glb": "EDF9F80EF4566E1D79550ED11FF8A4A8B55837C6B932E459D01D44F27F13328F",
+        "villager-herbalist-blender.png": "E937155448DC26396742A20B32E1B86F4F80446833E78584EDF0EC713EAB84FF",
+        "capture-1.png": "AD1954ACFA5D9CE7682D37FC1232FE5C94785F029141D912C7007CAB08D76BF4",
+        "capture-1-gray.png": "504C9D1584DE14E718BE77A421892E80C013FE4FFEB14E927ABCCF7E81E12A7F",
+        "capture.json": "CDEEC271450C102FDDE08A263594A05B00F25BCC98B83A227BCF7D57F48D2A9D",
+        "build.json": "1558A3224A93B223AC29B5BC49D0B7E749E7770E932C430AF534980E38E33787",
+        "validation.json": "28E9D52562E30024AA938EFDB51A9B7250C2CAF57E94CBC29A6233281886EEE8"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-herbalist authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "license": "Project original"
+      }
     }
   ]
 }

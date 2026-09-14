@@ -592,6 +592,7 @@ describe('G-10 · el reparto no son clones', () => {
     return {
       id: id as Actor['id'], x: 1, z: 1, facing: 0, activity: 'resting',
       clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named: false, age, talking: false,
+      role: null,
     };
   }
 
@@ -756,6 +757,7 @@ describe('G-10 · cobertura del catálogo', () => {
     const person = (id: number, named: boolean): Actor => ({
       id: id as Actor['id'], x: 1, z: 1, facing: 0, activity: 'resting',
       clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named, age: 30, talking: false,
+      role: null,
     });
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);
     cast.show([person(1, false), person(2, true)]);
@@ -848,6 +850,7 @@ describe('G-10 · lo que pisa el valle sigue su cota', () => {
     const person = (id: number, x: number, z: number): Actor => ({
       id: id as Actor['id'], x, z, facing: 0, activity: 'resting',
       clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named: false, age: 30, talking: false,
+      role: null,
     });
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);
     cast.standOn((x, z) => elevationAt(state.map, x, z));

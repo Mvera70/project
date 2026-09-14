@@ -12,7 +12,7 @@
 import {
   AnimationMixer, Color, Group, type AnimationClip, type Material, type Object3D,
 } from 'three';
-import type { VillagerId } from '@engine/state';
+import type { Role, VillagerId } from '@engine/state';
 import type { Actor } from '../actors';
 import type { LoadedAsset } from '../assets';
 
@@ -101,10 +101,17 @@ export class Cast {
    * `prop` da una copia de una herramienta del catalogo, o `undefined` si no la
    * tiene. Sin ella el aldeano trabaja con las manos vacias, que es lo que
    * hacia hasta ahora: un valle a medio catalogar sigue siendo un valle.
+   *
+   * `instance` recibe el `role` del actor y decide qué modelo clonar —
+   * `villager-smith`, `villager-priest`... — y `undefined` si el catálogo no
+   * tiene ese oficio todavía, en cuyo caso quien llama cae al aldeano base.
+   * `asset` sigue siendo uno solo: los ocho recursos comparten huesos y clips
+   * con el mismo nombre (D.4), así que un `AnimationClip` sacado de cualquiera
+   * de ellos anima a los demás sin retocar nada.
    */
   constructor(
     private readonly asset: LoadedAsset,
-    private readonly instance: () => Object3D | undefined,
+    private readonly instance: (role: Role | null) => Object3D | undefined,
     private readonly prop?: (id: string) => Object3D | undefined,
   ) {
     this.group.name = 'Valley_Cast';
@@ -138,7 +145,7 @@ export class Cast {
       present.add(actor.id);
       let player = this.players.get(actor.id);
       if (player === undefined) {
-        const object = this.instance();
+        const object = this.instance(actor.role);
         if (object === undefined) continue;
         object.name = `Villager_${actor.id}`;
         object.traverse((child) => { child.userData.villagerId = actor.id; });

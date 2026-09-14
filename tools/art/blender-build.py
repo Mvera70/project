@@ -25,7 +25,7 @@ def create_primitive(spec, materials):
     location = tuple(spec['location'])
     if spec['type'] == 'cube':
         bpy.ops.mesh.primitive_cube_add(location=location)
-        bpy.context.object.dimensions = tuple(spec['dimensions'])
+        bpy.context.view_layer.objects.active.dimensions = tuple(spec['dimensions'])
     elif spec['type'] == 'cone':
         rotation = tuple(math.radians(value) for value in spec['rotationDegrees'])
         bpy.ops.mesh.primitive_cone_add(
@@ -61,7 +61,7 @@ def create_primitive(spec, materials):
         obj.rotation_euler = tuple(math.radians(value) for value in spec['rotationDegrees'])
     else:
         raise ValueError('Unsupported primitive: ' + spec['type'])
-    obj = bpy.context.object if spec['type'] != 'gable' else obj
+    obj = bpy.context.view_layer.objects.active if spec['type'] != 'gable' else obj
     obj.name = spec['name']
     obj.data.materials.append(materials[spec['material']])
     bpy.ops.object.select_all(action='DESELECT')
@@ -188,14 +188,14 @@ if recipe.get('mergeByMaterial'):
 
 render = recipe['referenceRender']
 bpy.ops.object.light_add(type='AREA', location=(-3.5, -4.0, 7.0))
-bpy.context.object.data.energy = 900
-bpy.context.object.data.shape = 'DISK'
-bpy.context.object.data.size = 5.0
+bpy.context.view_layer.objects.active.data.energy = 900
+bpy.context.view_layer.objects.active.data.shape = 'DISK'
+bpy.context.view_layer.objects.active.data.size = 5.0
 bpy.ops.object.light_add(type='AREA', location=(4.0, 1.0, 4.0))
-bpy.context.object.data.energy = 350
-bpy.context.object.data.size = 3.0
+bpy.context.view_layer.objects.active.data.energy = 350
+bpy.context.view_layer.objects.active.data.size = 3.0
 bpy.ops.object.camera_add(location=tuple(render['cameraLocation']))
-camera = bpy.context.object
+camera = bpy.context.view_layer.objects.active
 bpy.context.scene.camera = camera
 camera.data.type = 'ORTHO'
 camera.data.ortho_scale = render['orthoScale']
