@@ -1634,6 +1634,11 @@ export const UI_BANK: Record<string, string> = {
   'milestone.kind.peak_people': 'Never so many',
   'milestone.kind.turn_of_decade': 'A turn of the years',
   'milestone.kind.work_done': 'The work is finished',
+  // U-05 · la barra de abajo (`src/ui/app.ts`): tres destinos, etiqueta corta.
+  'nav.bar': 'Where to look',
+  'nav.valley': 'Valley',
+  'nav.chronicle': 'Chronicle',
+  'nav.people': 'People',
   'app.vitals': 'The village at a glance',
   'app.vitals.people': '{count} villagers',
   'app.vitals.food': 'Food for {weeks} weeks',

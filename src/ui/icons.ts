@@ -8,8 +8,8 @@
 // `currentColor` a propósito: el color lo pone la hoja de estilo, que es la que
 // sabe si la cifra está en aviso.
 
-const SVG = (body: string): string =>
-  `<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false"`
+const SVG = (body: string, size = 12): string =>
+  `<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true" focusable="false"`
   + ` fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"`
   + ` stroke-linejoin="round">${body}</svg>`;
 
@@ -38,4 +38,27 @@ export const VITAL_ICONS = {
   /** Una cara: el ánimo. */
   morale: SVG('<circle cx="8" cy="8" r="6.2"/><path d="M5.6 9.6c.7 1.1 1.6 1.6 2.4 1.6s1.7-.5 2.4-1.6"/>'
     + '<path d="M6 6.2v.6"/><path d="M10 6.2v.6"/>'),
+} as const;
+
+// U-05 · Los tres destinos de la barra de abajo. Mismo trato de tres trazos
+// que `VITAL_ICONS`, a 18 px porque aquí no comparten sitio con una cifra: son
+// el dibujo entero del botón.
+export const NAV_ICONS = {
+  /** El valle: dos laderas y el sol, el propio HUD de §11.1. */
+  valley: SVG(
+    '<path d="M2 12.6 6.2 5.6 9 9.4 11.6 5 14 12.6"/><circle cx="6.6" cy="3.4" r="1.15"/>',
+    18,
+  ),
+  /** Un libro abierto: la crónica. */
+  chronicle: SVG(
+    '<path d="M8 4.6c-1.4-1.1-3.2-1.4-4.9-1v9c1.7-.4 3.5-.1 4.9 1 1.4-1.1 3.2-1.4 4.9-1v-9c-1.7-.4-3.5-.1-4.9 1z"/>'
+    + '<path d="M8 4.6v9"/>',
+    18,
+  ),
+  /** Dos figuras, como `VITAL_ICONS.people` pero de cuerpo entero: la gente. */
+  people: SVG(
+    '<circle cx="5.6" cy="4.6" r="2.1"/><path d="M2.2 13.4c0-2.1 1.5-3.4 3.4-3.4s3.4 1.3 3.4 3.4"/>'
+    + '<circle cx="11.3" cy="5.6" r="1.65"/><path d="M9.8 13.4c0-1.85 1-2.9 2.3-2.9s2.4 1.05 2.4 2.9"/>',
+    18,
+  ),
 } as const;

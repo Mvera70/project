@@ -46,7 +46,8 @@ describe('M-21 · inspección y señales', () => {
   it('el banco cubre el armazón y cada identificador que llega a una ficha', () => {
     const fixed = [
       'app.valley', 'app.year', 'app.speed.controls', 'app.speed.pause',
-      'app.speed.multiplier', 'crossroad.waiting', 'welcome.title',
+      'app.speed.multiplier', 'nav.bar', 'nav.valley', 'nav.chronicle', 'nav.people',
+      'crossroad.waiting', 'welcome.title',
       'inspect.raised', 'inspect.granary', 'inspect.house', 'inspect.house.named',
       'inspect.role.empty', 'inspect.role.holder', 'inspect.villager',
       'inspect.opinion.trusts', 'inspect.opinion.resents', 'inspect.memory',
@@ -70,6 +71,12 @@ describe('M-21 · inspección y señales', () => {
 
     expect([...fixed, ...buildings, ...terrain, ...traits, ...memories]
       .filter((key) => UI_BANK[key] === undefined)).toEqual([]);
+  });
+
+  it('U-05 · la barra de abajo tiene sus tres etiquetas en el banco, no en el código', () => {
+    expect(UI_BANK['nav.valley']).toBeTruthy();
+    expect(UI_BANK['nav.chronicle']).toBeTruthy();
+    expect(UI_BANK['nav.people']).toBeTruthy();
   });
 
   it('una ficha compuesta no filtra claves ni identificadores internos', () => {

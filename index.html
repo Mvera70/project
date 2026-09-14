@@ -64,9 +64,11 @@
       .valley-vital.thin b { font-weight: 800; }
 
       /* La velocidad, en una sola regleta: son tres posiciones de un mando, no
-         tres botones distintos. Sigue cumpliendo los 44 px de §11.3. */
+         tres botones distintos. Sigue cumpliendo los 44 px de §11.3.
+         U-05 · sube y se queda a la derecha, encima de la barra de abajo, sin
+         taparla: el hueco es la altura de esa barra más un respiro. */
       .valley-speeds { position: absolute; z-index: 2; right: max(10px, env(safe-area-inset-right));
-        bottom: max(12px, env(safe-area-inset-bottom)); display: flex; padding: 2px; gap: 2px;
+        bottom: calc(60px + env(safe-area-inset-bottom)); display: flex; padding: 2px; gap: 2px;
         border: 1px solid var(--edge); border-radius: 24px; background: var(--plate);
         box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px); }
       .valley-speeds button { min-width: 44px; min-height: 44px; padding: 0 6px; border: 0; border-radius: 21px;
@@ -75,7 +77,26 @@
         -webkit-tap-highlight-color: transparent; }
       .valley-speeds button:active { background: rgba(34,29,24,.10); }
       .valley-speeds button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
-      .valley-speeds button:focus-visible, .valley-panel:focus-visible { outline: 2px solid var(--gild); outline-offset: 2px; }
+      .valley-speeds button:focus-visible, .valley-panel:focus-visible, .valley-tab:focus-visible {
+        outline: 2px solid var(--gild); outline-offset: 2px; }
+
+      /* U-05 · La barra de abajo: los tres destinos, siempre a la vista. Misma
+         piel que la regleta de velocidad —tinta sobre pergamino cuando algo
+         está activo— porque es el mismo tipo de instrumento: un mando de
+         estado, no un menú. */
+      .valley-tabbar { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; display: flex;
+        padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+        background: var(--plate); border-top: 1px solid var(--edge);
+        box-shadow: 0 -2px 8px rgba(34,29,24,.16); backdrop-filter: blur(2px); }
+      .valley-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 2px; min-height: 44px; padding: 4px 2px; border: 0; border-radius: 10px; background: transparent;
+        color: var(--ink-soft); font: 650 10px/1.1 var(--plain); letter-spacing: .02em; cursor: pointer;
+        -webkit-tap-highlight-color: transparent; }
+      .valley-tab:active { background: rgba(34,29,24,.08); }
+      .valley-tab[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
+      /* Cubierta por la encrucijada y el epitafio (§11.2), y oculta también a
+         quien navega con teclado, igual que ya hace `.valley-speeds`. */
+      html.crossroad-open .valley-tabbar, html.epitaph-open .valley-tabbar { visibility: hidden; }
 
       /* §11.2 · la ficha. Sube del borde de abajo como una hoja, con un filete
          y no con el trazo de dos píxeles que tenía. */

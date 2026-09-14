@@ -4,7 +4,7 @@ import { TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { vitalsOf } from './vitals';
-import { VITAL_ICONS } from './icons';
+import { NAV_ICONS, VITAL_ICONS } from './icons';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
@@ -129,6 +129,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
   let lastFraction = 0;
+  // U-05 · People (U-08) todavía no tiene pantalla propia: mientras tanto su
+  // pestaña abre la ficha del último nombrado que se ha tocado, si hay uno.
+  let lastNamedTouchedId: number | null = null;
   root.replaceChildren();
   root.className = 'valley-app';
 
@@ -169,7 +172,38 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     controls.append(button);
     return [value, button] as const;
   });
-  root.append(canvas, year, vitals, controls);
+
+  // U-05 · La barra de abajo: los tres destinos del juego, siempre a la vista
+  // en vez de detrás de un gesto que nadie descubre (§11 del plan siguiente).
+  const tabbar = document.createElement('nav');
+  tabbar.className = 'valley-tabbar';
+  // Su propia etiqueta, no la del lienzo: quien navega a oídas oía «el valle»
+  // dos veces y no sabía que la segunda era una barra de destinos.
+  tabbar.setAttribute('aria-label', renderUiText('nav.bar'));
+  const tab = (icon: string, label: string): HTMLButtonElement => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'valley-tab';
+    button.innerHTML = icon;
+    const caption = document.createElement('span');
+    caption.textContent = label;
+    button.append(caption);
+    button.setAttribute('aria-pressed', 'false');
+    button.setAttribute('aria-label', label);
+    tabbar.append(button);
+    return button;
+  };
+  const valleyTab = tab(NAV_ICONS.valley, renderUiText('nav.valley'));
+  const chronicleTab = tab(NAV_ICONS.chronicle, renderUiText('nav.chronicle'));
+  const peopleTab = tab(NAV_ICONS.people, renderUiText('nav.people'));
+  valleyTab.setAttribute('aria-pressed', 'true');
+  chronicleTab.addEventListener('click', () => openChronicle(app));
+  // U-08 todavía no existe (`docs/next-plan.md`): mientras tanto, esto abre la
+  // ficha del último nombrado tocado si hay uno, y si no, no hace nada.
+  peopleTab.addEventListener('click', () => {
+    if (lastNamedTouchedId !== null) showPanel({ kind: 'villager', id: lastNamedTouchedId });
+  });
+  root.append(canvas, year, vitals, controls, tabbar);
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
@@ -238,6 +272,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.
     document.documentElement.dataset.tick = String(state.tick);
+    // U-05 · qué destino está abierto ahora mismo. La crónica no guarda su
+    // propio estado hacia aquí (`screens/chronicle.ts` no se toca), así que se
+    // lee de la propia pantalla: sólo existe mientras está montada.
+    const chronicleOpen = document.querySelector('.chronicle-scrim') !== null;
+    valleyTab.setAttribute('aria-pressed', String(!chronicleOpen));
+    chronicleTab.setAttribute('aria-pressed', String(chronicleOpen));
     renderer.paint(state, fraction);
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
@@ -247,6 +287,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
 
   const showPanel = (target: InspectTarget): void => {
+    // U-05 · lo que People (aún sin pantalla propia) reabre: el último
+    // nombrado que se ha tocado, no cualquier vecino sin nombre.
+    if (target.kind === 'villager') {
+      const person = state.people.villagers.find((item) => item.id === target.id);
+      if (person !== undefined && person.named) lastNamedTouchedId = person.id;
+    }
     const model = panelFor(target, state);
     const heading = document.createElement('h2'); heading.textContent = model.title;
     panel.replaceChildren(heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));

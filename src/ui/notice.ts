@@ -32,13 +32,13 @@ export function noticeworthy(entries: readonly ChronicleEntry[]): ChronicleEntry
 
 const STYLE_ID = 'valley-notice-style';
 const STYLE = `
-/* Sits clear of the speed controls of §11.2 rather than over them: 44 px of
-   button plus its own bottom inset, plus a gap. */
+/* Sits clear of the speed controls of §11.2 rather than over them, which since
+   U-05 sit clear of the tab bar in turn: bar, then speeds, then this. */
 /* U-01 · la voz de la crónica, vestida como tal: tinta con un filete de latón
    arriba, y la misma serif con la que está escrito el resto del pasado de la
    aldea. Sigue siendo corte seco y nada que cerrar (§11.6). */
 .valley-notice { position: absolute; z-index: 4; left: 0; right: 0;
-  bottom: calc(60px + max(12px, env(safe-area-inset-bottom)));
+  bottom: calc(118px + env(safe-area-inset-bottom));
   box-sizing: border-box; padding: 13px 18px 14px;
   background: rgba(28,23,19,.93);
   border-top: 1px solid rgba(125,92,46,.75);
