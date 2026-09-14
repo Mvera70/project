@@ -17,6 +17,29 @@
  * **La reja visual del 3D está pendiente y no la cubre esto.** Hoy se mira a
  * mano con `npm run shot` (`tools/graphics/shot.mjs`, que sí pide swiftshader);
  * automatizarla es una ronda con alguien mirando capturas, no un ajuste.
+ *
+ * ---------------------------------------------------------------------------
+ * **Esta reja estaba roja y nadie lo sabía.** Medido el 15 sep 2026 sobre el
+ * commit 1f8abd8, antes de tocar nada: **8 de 13 recorridos fallaban.** Llevaba
+ * así todo el programa de interfaz (U-01 a U-09), y no se vio porque `ci.yml`
+ * sólo dispara en `main` o en un pull request, y esta rama va 167 commits por
+ * delante de `main` sin haberse abierto nunca como PR.
+ *
+ * §14.3 llama a estas capturas «la mitigación del riesgo número uno del
+ * proyecto». Una reja roja que nadie mira no mitiga nada.
+ *
+ * Lo que falla, y por qué, no es un ajuste: cada recorrido fija una constante
+ * de diseño o un tick exacto que las rondas de interfaz y de motor movieron
+ * —el color del velo lo cambió U-01 (rgb(18,17,14) → rgb(26,21,17)), y la
+ * encrucijada de la semilla 7 ya no se planta a los 58 s de reloj virtual
+ * porque v3.60 y v3.61 cambiaron la trayectoria—. Recalibrarlos pide medir de
+ * nuevo y **mirar las capturas**, que es justo lo que ningún agente puede hacer
+ * solo. Bajarles el listón hasta que pasen sería peor que tenerlos rojos.
+ *
+ * Así que quedan declarados, con el patrón que `docs/roadmap.md` fija para lo
+ * que no llega: se escribe lo medido y se deja la propiedad intacta. El brief
+ * de la ronda que los recalibra está en `docs/next-plan.md`.
+ * ---------------------------------------------------------------------------
  */
 import { test } from '@playwright/test';
 
@@ -87,6 +110,10 @@ test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
 });
 
 test('la encrucijada muestra el precio de las tres opciones sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
+  // Declarado: la encrucijada ya no se planta a los 58 s de reloj virtual en
+  // esta semilla. Pide remedir el tick, o mejor, esperar a que el motor plante
+  // una en vez de fijar un número. Ver la cabecera.
+  test.fail();
   // Semilla 7, año 80: exactamente 60 ticks a 16× (§17 M-22, medido con un
   // sondeo de un solo uso) plantan `forest_cut` sin que nadie la conteste —
   // esta aplicación real, a diferencia del banco, nunca decide sola.
@@ -119,6 +146,10 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
 });
 
 test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, hito 6)', async ({ page }) => {
+  // Declarado: U-01 cambió el color del velo y esta prueba fija el anterior
+  // como literal. Lo que hay que comprobar es la propiedad —que el velo tapa y
+  // sale de la paleta— y no un rgb. Ver la cabecera.
+  test.fail();
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
@@ -194,6 +225,9 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
+  // Declarado: `#valley` no da caja al refundar, y hace falta mirar la página
+  // para saber por qué. Ver la cabecera.
+  test.fail();
   await page.goto('/?debug=1&live=1&ended=1&seed=7&year=80&season=autumn');
   await page.locator('html[data-app-ready="true"]').waitFor();
   const epitaph = page.locator('.epitaph-scrim');
@@ -296,6 +330,10 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
 });
 
 test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)', async ({ page }) => {
+  // Declarado: el aviso de §11.6 convive ahora con la cartela de hito (U-02) y
+  // con la píldora de decisión (U-07), y esta prueba es de antes de las dos.
+  // Ver la cabecera.
+  test.fail();
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
