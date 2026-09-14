@@ -17,7 +17,17 @@
 //   2. El `model` que venga en la llamada.
 //   3. Las palabras del prompt.
 //   4. Sonnet.
-// El paso de seguridad (2) se aplica *después* de todos ellos, nunca antes.
+//
+// **La etiqueta manda sobre el paso de seguridad, y lo demás no.** En la primera
+// llamada real, una tarea de pura medida etiquetada `Tier: medir` —y que decía
+// con todas las letras «esta tarea no escribe código fuente ni pruebas»— subió a
+// Sonnet porque el prompt *nombra* `src/` y `tests/` para prohibirlos. El
+// heurístico lee palabras, no intención, y no distingue «escribe en src/» de «no
+// toques src/». Se corrige donde estaba el error: la etiqueta la escribe quien
+// orquesta, a mano y sabiendo lo que pide, así que es una decisión y no una
+// pista. El paso de seguridad sigue entero para lo que sí es una pista — un
+// `model: 'haiku'` en la llamada con un prompt que habla de escribir código —,
+// que es el caso que de verdad se quería atrapar.
 
 import { readFileSync, appendFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -75,9 +85,9 @@ function decide(input) {
     else { tier = 'construir'; why = 'sin señales claras, se sube por defecto'; }
   }
 
-  // El paso de seguridad, el último y el único que no se puede saltar.
+  // El paso de seguridad. No se aplica a una etiqueta explícita: ver cabecera.
   let raised = null;
-  if (tier === 'medir' && codeHits.length > 0) {
+  if (tier === 'medir' && tagged === null && codeHits.length > 0) {
     raised = `pedía Haiku pero la tarea escribe código (${codeHits.length} señales); se sube a Sonnet`;
     tier = 'construir';
   }
