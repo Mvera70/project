@@ -50,10 +50,20 @@ const STYLE = `
 /* El precio no es una nota al pie: es la mitad de la decisión. */
 .crossroad-cost { display: block; margin-top: 5px; color: var(--gild-lit, #c9ab6b);
   font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+/* U-07 · la marca discreta de §11.2 pasaba por un punto rojo de 14 px que
+   nadie lee como "lo mas importante que el juego tiene que pedirte". Misma
+   piel que la regleta de velocidad y la barra de abajo (index.html,
+   .valley-speeds, .valley-tabbar): pergamino (--plate) con un filete de
+   latón, porque es el mismo tipo de mando de estado, no un aviso de sistema. */
 .crossroad-marker { position: fixed; z-index: 9; top: max(9px, env(safe-area-inset-top));
-  right: max(12px, env(safe-area-inset-right)); width: 14px; height: 14px; border-radius: 50%;
-  background: #c9463c; border: 2px solid var(--parchment, #f2e9d8); padding: 0; min-width: 0; min-height: 0;
-  box-shadow: 0 0 0 3px rgba(201,70,60,.28); }
+  right: max(12px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 0 14px; border: 1.5px solid var(--gild, #7d5c2e); border-radius: 22px;
+  background: var(--plate, rgba(242,233,216,.90)); color: var(--ink, #221d18);
+  font: 650 12px/1 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
+  letter-spacing: .02em; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px); }
+.crossroad-marker:active { background: rgba(217,207,188,.55); transform: translateY(1px); }
+.crossroad-marker:focus-visible { outline: 2px solid var(--gild, #7d5c2e); outline-offset: 2px; }
 .crossroad-open .valley-speeds { visibility: hidden; }
 `;
 
@@ -120,7 +130,14 @@ function mountMarker(app: App, p: PendingCrossroad): void {
   const marker = document.createElement('button');
   marker.type = 'button';
   marker.className = 'crossroad-marker';
+  // The visible label and the screen-reader label answer different questions
+  // — the pill's own text is the affordance ("what is this"), the aria-label
+  // is the summons ("a crossroad is waiting") that already had its wording
+  // and was not to change.
   marker.setAttribute('aria-label', renderUiText('crossroad.waiting'));
+  const text = document.createElement('span');
+  text.textContent = renderUiText('crossroad.pending_pill');
+  marker.append(text);
   marker.addEventListener('click', () => {
     marker.remove();
     mountOverlay(app, p);

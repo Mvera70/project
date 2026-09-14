@@ -1645,6 +1645,11 @@ export const UI_BANK: Record<string, string> = {
   'app.vitals.wood': '{count} wood',
   'app.vitals.morale': 'Spirits {value} of 100',
   'crossroad.waiting': 'A crossroad is waiting',
+  // U-07 · el texto visible de la píldora que reemplaza al punto rojo
+  // (`screens/crossroad.ts`, `.crossroad-marker`). Distinto del aria-label de
+  // arriba a propósito: éste es lo que se lee en pantalla, aquél lo que
+  // anuncia un lector de pantalla, y no tenían por qué decir lo mismo.
+  'crossroad.pending_pill': 'A decision waits',
   'welcome.title': 'While you were gone',
   'epitaph.title': 'The valley is empty',
   'epitaph.extinction': 'The last of them died in year {year}.',

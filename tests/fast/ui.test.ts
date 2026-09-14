@@ -47,7 +47,7 @@ describe('M-21 · inspección y señales', () => {
     const fixed = [
       'app.valley', 'app.year', 'app.speed.controls', 'app.speed.pause',
       'app.speed.multiplier', 'nav.bar', 'nav.valley', 'nav.chronicle', 'nav.people',
-      'crossroad.waiting', 'welcome.title',
+      'crossroad.waiting', 'crossroad.pending_pill', 'welcome.title',
       'inspect.raised', 'inspect.granary', 'inspect.house', 'inspect.house.named',
       'inspect.role.empty', 'inspect.role.holder', 'inspect.villager',
       'inspect.opinion.trusts', 'inspect.opinion.resents', 'inspect.memory',
@@ -77,6 +77,14 @@ describe('M-21 · inspección y señales', () => {
     expect(UI_BANK['nav.valley']).toBeTruthy();
     expect(UI_BANK['nav.chronicle']).toBeTruthy();
     expect(UI_BANK['nav.people']).toBeTruthy();
+  });
+
+  it('U-07 · la píldora de la encrucijada pendiente saca su texto del banco', () => {
+    expect(UI_BANK['crossroad.pending_pill']).toBe('A decision waits');
+    // El aria-label sigue siendo el de siempre: es un anuncio distinto del
+    // texto visible en la píldora, no la misma frase repetida dos veces.
+    expect(UI_BANK['crossroad.waiting']).toBeTruthy();
+    expect(UI_BANK['crossroad.pending_pill']).not.toBe(UI_BANK['crossroad.waiting']);
   });
 
   it('una ficha compuesta no filtra claves ni identificadores internos', () => {
