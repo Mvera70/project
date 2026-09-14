@@ -86,9 +86,15 @@ piloto 3D del Anexo D (`src/render3d/`) está en G-11 y ya se juega detrás de
 **Lo que está en marcha es la vida del valle, Anexo E de `docs/design.md`:**
 una capa de agentes deterministas y efímera en `src/render3d/life/`, entre el
 motor y el render, que sustituye a `src/render3d/actors/` fase a fase. Cerradas
-V-00 a V-10, V-13 y V-14 — V-09 **abierta**: los trastos existen y casi nadie
-juega, con la causa medida en `docs/life-rounds/V-09.md`. Todo va detrás de la
-bandera `valley.life`; el juego normal no la usa todavía.
+V-00 a V-10, V-13 y V-14, con V-09b cerrando los trastos: se juega en las seis
+semillas, aunque a un tercio del ritmo del descarte y con la causa medida en
+`docs/life-rounds/V-09.md`. **Siguiente: V-11.** Todo va detrás de la bandera
+`valley.life`; el juego normal no la usa todavía.
+
+**Y una regla que cuesta tiempo cada vez que se olvida: en la capa de vida, un
+umbral no se fija con una jornada, igual que no se fija con una semilla.** Cada
+jornada tiene su propia semilla (`seedOfDay`), así que el día 0 de seis semillas
+son seis muestras, no seis aldeas.
 
 **El plan de lo que viene, con briefs listos para agentes, está en
 `docs/next-plan.md`.** Qué le falta al proyecto **en total** para ser un juego,

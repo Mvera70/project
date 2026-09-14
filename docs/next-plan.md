@@ -31,18 +31,30 @@ tocar, y nunca con una sola semilla.**
 
 | Carril | Rondas | Modelo | Por qué ese modelo |
 |---|---|---|---|
-| **A · Interfaz** | U-05 → U-06 → U-07 → U-08 | Sonnet (`Tier: construir`) | Construye contra una dirección ya escrita, con captura obligatoria |
-| **B · Vida** | V-09b → V-11 | Sonnet (`Tier: construir`) | Porta del descarte y engancha; la causa está diagnosticada |
+| **A · Interfaz** | U-05 ✓ → U-06 → U-07 → U-08 → U-09 (sonido) | Sonnet (`Tier: construir`) | Construye contra una dirección ya escrita, con captura obligatoria |
+| **B · Vida** | V-09b ✓ → V-11 → V-12 | Sonnet (`Tier: construir`) | Porta del descarte y engancha; la causa está diagnosticada |
 | **C · Medida** | Sonda tras cada ronda de B | Haiku (`Tier: medir`) | No escribe código: corre la sonda y escribe la tabla |
 | **D · Auditoría** | Tras cada entrega de A o B | Sonnet, con `docs/agents.md` §«Cómo se audita» | Primera pasada barata; la sesión cara sólo revisa lo que la auditoría marque |
 
 A y B no se pisan: A vive en `src/ui/` e `index.html`; B en `src/render3d/`.
 Pueden correr a la vez. C y D van detrás de cada entrega.
 
-**Antes de lanzar cualquiera:** el mecanismo de worktrees ancla mal a veces. El
-brief exige comprobar que existen `src/ui/moment.ts` **y**
-`src/render3d/life/props.ts` — los dos son de hoy; `notice.ts` existe desde
-hace meses y no sirve para comprobar nada.
+**Antes de lanzar cualquiera, dos cosas que ya han costado tiempo:**
+
+1. **El worktree ancla mal a menudo** (cuatro veces de seis). El brief tiene que
+   exigir comprobar que existe un fichero **reciente** — hoy sirven
+   `src/ui/milestones.ts`, `src/render3d/life/props.ts` o
+   `src/render3d/world/props.ts`; `notice.ts` existe desde hace meses y no
+   discrimina. Y tiene que decir **cómo** corregirlo: `git merge --ff-only
+   <hash de la punta>` sobre un árbol limpio. `git reset --hard` está denegado
+   por el candado a propósito, y los dos agentes que se toparon con él
+   encontraron esta vía en vez de rodear la intención — pero decírselo de
+   antemano les ahorra el rodeo.
+2. **Una jornada sola es ruido**, igual que una semilla sola. Cada jornada de
+   la capa de vida tiene su propia semilla (`seedOfDay`), así que medir el día 0
+   de seis semillas son seis muestras y no seis aldeas. V-09b concluyó que su
+   propio trabajo no servía por medir así; remedido en diez jornadas, sí
+   servía. Todo brief de la capa de vida tiene que pedir varias jornadas.
 
 ---
 
