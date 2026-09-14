@@ -164,3 +164,86 @@ que entrega. Lo aprendido y que conviene no olvidar:
 - Y cuando algo no llega, se escribe lo que se midió y se deja la prueba como
   `it.fails` con la propiedad del brief intacta, en vez de bajar el listón. Está
   hecho así en `life-props.test.ts` y es el patrón a repetir.
+
+---
+
+# Decisiones tomadas el 14 sep 2026
+
+Cuatro preguntas que estaban bloqueando áreas enteras, contestadas por el dueño
+del diseño. Lo que sigue es lo que se hace con cada una.
+
+## 1 · El ritmo de decisión: **las dos cosas**
+
+Arreglar los dos fallos **y** relajar condiciones **y** escribir plantillas
+nuevas de menor peso. Se acepta el riesgo de pasarse al otro lado.
+
+Orden, porque importa: primero los dos fallos (son bugs y no cambian balance),
+después medir de nuevo con `tools/eligibility-report.ts`, después relajar, y
+sólo entonces escribir plantillas nuevas — **cada paso remidiendo**, porque
+relajar y añadir a la vez hace imposible saber cuál de los dos movió qué.
+
+Y un tope que hay que vigilar: **un idle que interrumpe cada dos minutos deja de
+ser un idle.** El número al que se apunta es del orden de seis a ocho decisiones
+por década, no treinta. Si la suite de balance de §12.9 empeora, es señal de que
+se ha pasado.
+
+## 2 · El aldeano: **que diseñen libre**
+
+No se impone dirección a la sesión de Blender. Queda dicho, para cuando haya que
+juzgar lo que traigan, que a la escala de reposo un aldeano mide **seis
+píxeles** y que hoy su silueta es casi la misma por delante y por detrás.
+
+## 3 · El sonido: **ambiente y acentos**
+
+Se abre el área. Viento por estación, el río, el yunque, campana de capilla; y
+un acento corto en el hito y en la encrucijada. Silencio por defecto hasta que
+el jugador toque. Es un área que no choca con nada y puede ser una sesión
+aparte.
+
+## 4 · La migración: **el 3D es el juego**
+
+Se quitan las banderas y se borra el camino viejo (V-12 + G-12). **El riesgo
+queda dicho una vez y aceptado**: todo lo medido de rendimiento es de un
+portátil, G-09 quedó parcial por no haber un dispositivo real, y al migrar deja
+de haber un 2D al que volver si en un móvil de verdad no va.
+
+De ahí sale una prioridad nueva que antes era una deuda vieja: **probarlo en un
+móvil de verdad pasa a ser urgente**, y va antes de borrar `src/render/`.
+
+---
+
+## Sobre mezclar 2D y 3D, que se preguntó al decidir la migración
+
+La intuición es buena y la respuesta corta es: **sí, pero al revés de como
+suena**. Conviene que quede escrito porque la versión ingenua es una trampa.
+
+**Lo que no funciona: fondo 2D con personajes 3D.** El fondo es la parte
+*barata* —una malla de suelo con color por vértice, y árboles, rocas y juncos
+como instancias, que la GPU dibuja de una tacada—. Hornearlo a una imagen
+ahorraría poco y rompería todo lo que el suelo hace de verdad: cambia de color
+con la estación, el bosque **encoge** según se tala, el camino se **desgasta**
+con el tráfico de §7.6, los edificios se levantan y se arruinan. Una imagen
+horneada no puede hacer nada de eso sin volver a hornearse.
+
+**Lo que sí funciona: personajes 2D cuando son pequeños.** Lo caro son los
+ochenta aldeanos, cada uno un clon con su propio esqueleto de dieciséis huesos,
+más las sombras. Y aquí está el dato que lo decide: **en el encuadre de reposo
+un aldeano ocupa seis píxeles**. Dibujar una malla con esqueleto para una figura
+de seis píxeles es absurdo — a esa escala nadie distingue un esqueleto animado
+de un sprite. Cambiarlos por carteles planos (*impostors*) por debajo de un
+tamaño en pantalla, y volver al modelo de verdad al acercarse, es la palanca más
+grande que hay y es exactamente «mezclar 2D con 3D», bien aplicado.
+
+Las otras dos palancas, por orden de lo que dan:
+
+1. **Las sombras.** `PCFSoftShadowMap` con mapa de 1024 es normalmente el primer
+   gasto de una escena así. Ya hay una puerta (`options.quality !== 'low'`).
+2. **Menos esqueletos a la vez**, aunque no se cambien por carteles: los que
+   están dentro de casa ya no se pintan (v3.62); los muy lejanos podrían
+   compartir animación en vez de tener esqueleto propio.
+
+**Pero nada de esto se hace todavía, y la razón es de método:** no sabemos que
+vaya pesado. Todo lo medido es de un portátil. Optimizar sin medir es la forma
+más cara de no arreglar nada — y este proyecto ya tiene escrito lo que pasa
+cuando se ajusta a ciegas (E.3, regla séptima). **Primero un móvil de verdad**,
+y con el número delante se decide si hace falta alguna de las tres.
