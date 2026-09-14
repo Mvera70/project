@@ -8512,6 +8512,53 @@ ve cambiar. Hacer el tick mas fino tampoco lo arreglaria —con tick diario seri
 cincuenta y seis pasos por jornada en vez de ocho—, porque el desfase es
 estructural a D.6.1 y no al tamano del paso.
 
+#### D.6.8 · El cuenco: las montanas van fuera del mapa (v3.63)
+
+El valle se llamaba valle y no lo parecia: el mapa acababa en un corte recto
+contra el cielo, y la niebla de D.5 estaba puesta ahi para disimularlo. Lo que
+faltaba eran las montanas que lo cierran.
+
+**Se midio antes de escribir nada, y la primera idea no salia.** Levantar el
+borde del propio mapa —roca intransitable en el contorno— cuesta esto:
+
+| Anillo | Celdas | Del bosque | Edificios afectados |
+|---|---|---|---|
+| 2 celdas | 352 (17 %) | **135 de 419 (32 %)** | 13 |
+| 3 celdas | 516 (26 %) | 191 (46 %) | 26 |
+| 4 celdas | 672 (33 %) | 240 (57 %) | 42 |
+
+Un tercio de la lena del valle vive en las dos celdas del contorno, mas trece
+edificios de una partida de cuarenta anos, mas el cauce por donde el rio entra y
+sale. Cerrar el borde habria quitado la lena, tapiado el rio y derribado casas:
+todo eso es balance del motor, y por una montana decorativa.
+
+**La regla, por tanto: el cuenco empieza donde el mapa acaba.** La sierra vive
+en coordenadas de fuera del rectangulo jugable, en `render3d/world/ridge.ts`, y
+el motor no sabe que existe — ni una constante de §12, ni un tick, ni un byte
+del fichero de guardado. Hay una prueba que lo vigila celda a celda, porque el
+dia que alguien la meta dentro «para que se vea mejor» estara quitandole al
+valle un tercio de su bosque.
+
+Tres decisiones dentro de eso:
+
+1. **La falda sube en coseno y no en recta.** Con una recta, el pie de la sierra
+   hace un doblez justo en el borde del mapa y se lee como el corte que se venia
+   a quitar. Hay una prueba con el escalon maximo por celda.
+2. **El ruido va interpolado.** La primera version tomaba el nudo mas cercano y
+   la ladera daba escalones de 3,47 celdas de una a la siguiente: un muro, no
+   una montana.
+3. **El color sale de la altura**, no de un `TERRAIN_CODE` nuevo: del prado del
+   pie al monte bajo y de ahi a la roca. Anadir un terreno habria tocado
+   paletas, colores y todas las pruebas que cuentan terrenos, para nada.
+
+La sierra **no proyecta sombra**: con el sol bajo, la del este echaria una
+sombra sobre medio pueblo, y lo que hay que ver es el pueblo.
+
+**Lo que esto no es:** relieve jugable. El valle sigue siendo plano por dentro
+—0,23 celdas de desnivel en todo el mapa, derivadas del tipo de terreno— y una
+roca rodando por una ladera sigue sin tener donde ocurrir. Eso pide una capa de
+altura en `ValleyMap` y es trabajo del generador de mapas.
+
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
 §10.7 contiene objetivos del Canvas, no mediciones ni garantías trasladables

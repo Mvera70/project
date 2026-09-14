@@ -11,7 +11,7 @@
 
 import {
   Color, DirectionalLight, Fog, Group, HemisphereLight, PCFSoftShadowMap,
-  Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Object3D,
+  Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Mesh, type Object3D,
 } from 'three';
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
@@ -27,6 +27,7 @@ import type {
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, type Ground } from './world/ground';
+import { buildRidge } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
 import {
   buildForest, builtCells, scatterCells, scatterOn, shoreCells, type Forest,
@@ -203,6 +204,8 @@ export async function createGraphicsRenderer(
   let reeds: Forest | null = null;
   let crossing: Ford | null = null;
   let plan: ScenePlan | null = null;
+  /** La sierra de V-14. Vive con el valle y se rehace sólo si cambia el mapa. */
+  let ridge: Mesh | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   let tracked: VillagerId | null = null;
   // La cota del suelo, que la burbuja necesita para flotar sobre la cabeza y no
@@ -311,6 +314,17 @@ export async function createGraphicsRenderer(
     const snowing = clock.season === 'winter' ? 0.72 : 0;
     village.season(snowing, palette.accent);
     world.add(ground.mesh);
+
+    // V-14 · la sierra que cierra el valle. Fuera del mapa jugable y por tanto
+    // fuera del motor: no cuesta una constante de balance ni un byte de
+    // guardado. Se arma una vez con el valle, porque no cambia nunca.
+    if (ridge !== null) {
+      world.remove(ridge);
+      ridge.geometry.dispose();
+      (ridge.material as { dispose(): void }).dispose();
+    }
+    ridge = buildRidge(state.map, state.terrainSeed);
+    world.add(ridge);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.

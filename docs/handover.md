@@ -373,3 +373,28 @@ No son teoría: cada una se pagó con al menos una ronda.
     sal se prueba en trece escenarios en vez de uno—. Merece la pena mirar con
     esa lupa cualquier prueba que se caiga tras un cambio de balance: la mitad
     no acusan al cambio, acusan a su propio decorado.
+14. **El valle ya se cierra: hay sierra alrededor, y vive fuera del mapa.**
+    `render3d/world/ridge.ts`, §D.6.8. La decisión está medida y conviene no
+    revisarla a ojo: en las dos celdas del contorno del mapa viven **el 32 % del
+    bosque** (135 de 419), trece edificios de una partida de cuarenta años y el
+    cauce por donde el río entra y sale. Levantar el borde habría costado leña,
+    río y casas —balance del motor— por una montaña que es decorado. Así que la
+    sierra empieza donde el mapa acaba, el motor no sabe que existe, y hay una
+    prueba que lo vigila celda a celda.
+
+    Lo que **no** resuelve: relieve jugable. El interior del valle sigue plano
+    (0,23 celdas de desnivel), así que una roca rodando por una ladera sigue sin
+    tener dónde ocurrir. Eso pide una capa de altura en `ValleyMap` y es trabajo
+    de `mapgen`.
+
+15. **El mapa no se queda pequeño: sobra.** A los cien años la aldea entera cabe
+    en una caja de 23×21 dentro de 36×56 y ocupa el **11,7 %** del suelo. Antes
+    de agrandarlo hay que tener con qué llenarlo —caza, otros asentamientos—, o
+    sólo se gana prado vacío y una recalibración del balance.
+
+    El coste de crecer, ya medido para cuando toque: son **dos constantes y un
+    tipo literal** (`width: 36` vive en `state.ts`, no sólo en `balance.ts`).
+    Una ruta que cruza el valle cuesta hoy 0,09 ms; con un mapa nueve veces
+    mayor serían ~1 ms, y con cincuenta rutas por tick, 50 ms contra los 234 que
+    dura un tick a ×64. No hay muro técnico. Ojo con `MAX_FIELDS` y
+    `MAX_HOUSES`, que son topes absolutos y no escalan con el mapa.
