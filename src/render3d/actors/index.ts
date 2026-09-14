@@ -25,7 +25,7 @@ import { encountersAmong, type Encounter } from '@render/encounters';
 import { ageOf } from '@engine/people/villagers';
 import { dayNumber, dayPhase } from '../presentation-clock';
 import { clipTime, VILLAGER_CLIPS, type ClipName } from './clips';
-import { dayOf, energyOf, progressOf, stable, type Activity } from './day';
+import { dayOf, energyOf, progressOf, stable, type Activity, type Day } from './day';
 
 /**
  * The most villagers on stage at once.
@@ -1034,6 +1034,17 @@ function routesFrom(
   return memory.routes;
 }
 
+/**
+ * Si a esta hora esta dentro de casa, y por tanto no se le ve.
+ *
+ * Se pregunta a **su** jornada y no al reloj del valle: cada uno vuelve a la
+ * suya —el nino y el viejo antes, y cada cual a su paso (§11.9)—, asi que la
+ * aldea no se apaga de golpe como si alguien tocara una campana.
+ */
+function indoorsAt(day: Day, phase: number): boolean {
+  return progressOf(day, phase).activity === 'home';
+}
+
 export function actorsFor(
   state: GameState,
   frame: GraphicsFrame,
@@ -1120,6 +1131,11 @@ export function actorsFor(
     // D.6 · no reachable destination is not an excuse to invent a workshop.
     // Someone with nowhere to go rests where they are, and the frame says so.
     if (cells === undefined || cells.length === 0) {
+      // Y de noche, dentro. Quien no tiene a donde ir se queda por la aldea
+      // mientras hay luz, pero cuando los demas se recogen el tambien: un
+      // aldeano plantado en el umbral toda la noche es lo que el dueno del
+      // diseno vio y llamo «se quedan a dormir fuera de las casas».
+      if (indoorsAt(day, phase)) continue;
       // Someone whose house burned down this week has neither a route nor a
       // doorstep. There is nowhere honest to draw them, so they are not drawn.
       const home = person.homeId === null ? undefined : standing.get(person.homeId);
@@ -1139,6 +1155,17 @@ export function actorsFor(
     }
 
     const { activity, along: progress } = progressOf(day, phase);
+    // **En casa es dentro de casa, y dentro de casa no se ve a nadie.**
+    //
+    // `progressOf` marca `home` desde que se vuelve del tajo hasta que se sale
+    // al dia siguiente, y hasta aqui eso se dibujaba en `line[0]`, que es el
+    // umbral: los veinte vecinos pasaban la noche de pie en su puerta. Es la
+    // misma regla que ya siguen los animales, que dejan de dibujarse cuando se
+    // recogen (§10.6) — quien esta dentro no se pinta.
+    //
+    // `leaving` si se dibuja: ese es el que esta saliendo, y es el momento en
+    // que la aldea despierta.
+    if (activity === 'home') continue;
     // El camino termina **en su puesto**, no en la celda de destino.
     //
     // El puesto se sabe antes de salir de casa, asi que forma parte de la ruta

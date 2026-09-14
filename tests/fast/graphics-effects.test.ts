@@ -397,7 +397,14 @@ describe('G-10 · la luz del día escénico', () => {
     const noon = daylightAt(NOON);
     const night = daylightAt(0.98);
     expect(night.sunIntensity).toBeLessThan(noon.sunIntensity * 0.6);
-    expect(night.sunIntensity).toBeGreaterThan(noon.sunIntensity * NIGHT_FLOOR * 0.9);
+    // **De noche el sol está puesto, y puesto quiere decir cero** (v3.62).
+    // Antes se le dejaba un suelo del 38 %, que en una direccional es una
+    // intensidad de casi uno: los árboles y los tejados seguían proyectando
+    // sombras largas a medianoche. Lo que sostiene el valle a oscuras es el
+    // cielo, no un sol que no está.
+    expect(night.sunIntensity, 'sin sol no hay sombra').toBe(0);
+    expect(night.ambientIntensity, 'y el cielo recoge lo que el sol suelta')
+      .toBeGreaterThan(noon.ambientIntensity * NIGHT_FLOOR * 0.9);
     expect(night.ambientIntensity).toBeGreaterThan(0);
   });
 

@@ -154,6 +154,11 @@ export async function createGraphicsRenderer(
     const day = daylightAt(phase);
     sun.color.set(day.sunColour);
     sun.intensity = day.sunIntensity;
+    // Puesto el sol no hay sombra que echar, asi que tampoco hay mapa de
+    // sombras que calcular: se apaga la pasada entera mientras dura la noche.
+    // Con intensidad cero no oscurecia nada de todos modos; esto es el ahorro,
+    // no el arreglo.
+    sun.castShadow = options.quality !== 'low' && day.sunIntensity > 0;
     ambient.color.set(day.skyColour);
     ambient.groundColor.set(day.groundBounce);
     ambient.intensity = day.ambientIntensity;

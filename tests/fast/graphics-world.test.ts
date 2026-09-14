@@ -102,10 +102,15 @@ describe('G-06 · el plan de escena', () => {
     // partida al volver de un letargo.
     const state = village(10);
     const once = planFor(state);
+    let drawn = 0;
     for (let step = 0; step < 100; step += 1) {
-      const actors = actorsFor(state, frameAt((step / 100) * SCENIC_DAY_SECONDS));
-      expect(actors.length).toBeGreaterThan(0);
+      drawn += actorsFor(state, frameAt((step / 100) * SCENIC_DAY_SECONDS)).length;
     }
+    // Que se haya dibujado gente **en el día**, no en cada fotograma: desde
+    // v3.62 la noche no tiene a nadie fuera, y exigir un actor en todos los
+    // instantes era pedir que alguien durmiera en la calle. Lo que esta prueba
+    // guarda es lo de la última línea: pintar no cambia el plan.
+    expect(drawn, 'a lo largo del día se dibuja gente').toBeGreaterThan(0);
     expect(JSON.stringify(planFor(state))).toBe(JSON.stringify(once));
   });
 

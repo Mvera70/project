@@ -32,8 +32,27 @@ const NIGHT = 0.92;
  * TUNE: 0,38. Por debajo de un tercio el granero deja de leerse y el valle
  * pierde su papel de HUD; por encima de la mitad la noche no se distingue de
  * una tarde nublada y la jornada deja de tener forma.
+ *
+ * **Es el suelo del cielo, no el del sol** (v3.62). Hasta aquí lo era de los
+ * dos, y eso dejaba el sol al 38 % con la noche cerrada: una direccional de
+ * intensidad casi uno que seguía proyectando sombras largas y marcadas de
+ * árboles y tejados. El dueño del diseño lo dijo en una línea —«de noche los
+ * árboles generan sombra, sería imposible sin sol»— y tiene toda la razón: de
+ * noche no hay una luz que venga de un sitio, hay claridad. Lo que sostiene el
+ * valle a oscuras es el hemisférico, y el sol se apaga del todo.
  */
 const NIGHT_FLOOR = 0.38;
+
+/**
+ * Lo que sube el cielo nocturno para cubrir lo que el sol deja de poner.
+ *
+ * TUNE: 1,9. El sol nocturno aportaba 0,99 de intensidad direccional y ahora
+ * aporta cero, así que el hemisférico tiene que recoger esa luz o la noche se
+ * vuelve un pozo. No es la misma cantidad porque no es la misma clase de luz:
+ * la direccional alumbraba una cara y dejaba la otra negra, y el hemisférico
+ * llega a todas, así que con menos se ve más.
+ */
+const NIGHT_SKY_GAIN = 1.9;
 
 /** Lo alto que llega el sol al mediodía, en grados sobre el horizonte. */
 const NOON_ELEVATION = 62;
@@ -142,10 +161,16 @@ export function daylightAt(phase: number): Daylight {
   return {
     sun,
     sunColour,
-    sunIntensity: 2.6 * (NIGHT_FLOOR + (1 - NIGHT_FLOOR) * light),
+    // Sin suelo: el sol se pone del todo, y una direccional de intensidad cero
+    // no ilumina y por tanto no proyecta sombra de nada.
+    sunIntensity: 2.6 * light,
     skyColour: background,
     groundBounce: blend(BOUNCE_DAY, BOUNCE_NIGHT, dark),
-    ambientIntensity: 1.5 * (NIGHT_FLOOR + (1 - NIGHT_FLOOR) * light),
+    // Y el cielo recoge lo que el sol suelta, que es lo que deja ver el valle
+    // de noche sin que nada proyecte sombra.
+    ambientIntensity: 1.5 * (
+      NIGHT_FLOOR * NIGHT_SKY_GAIN + (1 - NIGHT_FLOOR * NIGHT_SKY_GAIN) * light
+    ),
     background,
     daylight: light,
   };

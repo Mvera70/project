@@ -175,9 +175,15 @@ describe('G-05 · los actores', () => {
     expect(JSON.stringify(twice)).toBe(JSON.stringify(once));
   });
 
-  it('recorre las cinco actividades a lo largo del día', () => {
+  it('recorre a lo largo del día las cuatro actividades que se ven', () => {
     // D.6 nombra cinco estados efímeros. Si alguno no aparece nunca, o es que
     // sobra o es que la jornada no llega hasta él.
+    //
+    // **`home` es la excepción, y desde v3.62 lo es a propósito: estar en casa
+    // es estar dentro, y dentro no se ve a nadie.** Hasta entonces se dibujaba
+    // en el umbral, y lo que se veía era a los veinte vecinos de pie en su
+    // puerta toda la noche. Aquí se comprueba las dos mitades: que las cuatro
+    // que se ven salen, y que la quinta **no** sale nunca.
     const state = village(8);
     const seen = new Set<string>();
     for (let step = 0; step < 240; step += 1) {
@@ -185,9 +191,27 @@ describe('G-05 · los actores', () => {
         seen.add(actor.activity);
       }
     }
-    for (const activity of ['home', 'leaving', 'walking', 'working', 'returning']) {
+    for (const activity of ['leaving', 'walking', 'working', 'returning']) {
       expect(seen.has(activity), `nadie llega a '${activity}'`).toBe(true);
     }
+    expect(seen.has('home'), 'a quien está en casa no se le dibuja').toBe(false);
+  });
+
+  it('de madrugada no hay un alma en la calle, y al amanecer sale la aldea', () => {
+    // La otra mitad de lo mismo, dicha en lo que se ve: el valle se vacía de
+    // noche y se llena por la mañana. Y **se vacía poco a poco**, cada uno a su
+    // hora (§11.9), porque una aldea que se apaga de golpe parece una campana.
+    const state = village(8);
+    const at = (phase: number): number =>
+      actorsFor(state, frameAt(((phase - 0.28 + 1) % 1) * SCENIC_DAY_SECONDS)).length;
+
+    expect(at(0.45), 'a media tarde la aldea está fuera').toBeGreaterThan(10);
+    expect(at(0.92), 'de madrugada no hay nadie fuera').toBe(0);
+    expect(at(0.14), 'y por la mañana ha vuelto a salir').toBeGreaterThan(10);
+    // Escalonado: entre el pleno y el vacío hay horas con unos pocos fuera.
+    const dusk = [0.65, 0.70, 0.75, 0.80].map(at);
+    expect(dusk.some((n) => n > 0 && n < 10), `el anochecer se vacía a tirones: ${dusk.join(', ')}`)
+      .toBe(true);
   });
 
   it('un muerto no sale a trabajar', () => {
@@ -231,14 +255,29 @@ describe('G-05 · los actores', () => {
     const person = moved.people.villagers.find((candidate) => candidate.id === id);
     if (person !== undefined && other !== undefined) person.homeId = other.id;
 
-    // De madrugada, que es cuando alguien está en su casa. El instante se pide
-    // por la hora escénica y no por el segundo cero: desde v3.46 la partida
-    // empieza a media mañana, con todo el mundo ya en la calle.
-    const atHome = frameAt(SCENIC_DAY_SECONDS * 0.67);
-    const wasAt = actorsFor(state, atHome).find((actor) => actor.id === id);
-    const nowAt = actorsFor(moved, atHome).find((actor) => actor.id === id);
-    expect(wasAt).toBeDefined();
-    expect(nowAt).toBeDefined();
+    // **En cuanto asoma**, que es cuando se sabe de qué puerta ha salido.
+    //
+    // Antes se le buscaba de madrugada, «que es cuando alguien está en su
+    // casa». Desde v3.62 estar en casa es estar dentro y no se dibuja a nadie,
+    // así que de madrugada no hay a quién mirar: el primer instante en que
+    // aparece es su propio umbral, y ése dice lo mismo y además es lo que el
+    // jugador ve.
+    // Recorriendo la jornada **desde el amanecer**, que no es el segundo cero:
+    // la partida abre a media mañana (v3.46) y con todo el mundo ya en la
+    // calle, así que barrer desde ahí se salta justo el momento de salir.
+    const firstSeen = (game: GameState): { cell: number } | undefined => {
+      for (let step = 0; step < 240; step += 1) {
+        const phase = step / 240;
+        const seconds = ((phase - 0.28 + 1) % 1) * SCENIC_DAY_SECONDS;
+        const at = actorsFor(game, frameAt(seconds)).find((actor) => actor.id === id);
+        if (at !== undefined) return at;
+      }
+      return undefined;
+    };
+    const wasAt = firstSeen(state);
+    const nowAt = firstSeen(moved);
+    expect(wasAt, 'sale de casa en algún momento del día').toBeDefined();
+    expect(nowAt, 'y desde la casa nueva también').toBeDefined();
     expect(nowAt?.cell).not.toBe(wasAt?.cell);
   });
 
