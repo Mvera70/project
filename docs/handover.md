@@ -314,16 +314,27 @@ da sin escribir en el motor. **Todo lo normativo está en `docs/design.md`,
 Anexo E.** Esto es sólo el estado.
 
 **Hecho (v3.59–v3.65):** V-00 el descarte, V-01 reloj, V-02 cuerpos y rejilla,
-V-03 navegación, V-04 impulsos, V-05 ofertas, V-06 elección, **V-07 escenas de
-dos, V-08 los animales como agentes, V-10 los sitios comunes, V-13 la medida**;
-V-14 el cuenco. Todo dentro del juego detrás de `valley.life`. Informes con lo
-medido en `docs/life-rounds/`, más `sonda-linea-base.md` con ocho semillas.
+V-03 navegación, V-04 impulsos, V-05 ofertas, V-06 elección, V-07 escenas de
+dos, V-08 los animales como agentes, **V-09 y V-09b los trastos**, V-10 los
+sitios comunes, V-13 la medida; V-14 el cuenco. Informes con lo medido en
+`docs/life-rounds/`, más `sonda-linea-base.md` con ocho semillas.
 
-**V-09, los trastos, está abierta.** Existen, se cogen, se sueltan y se tiran
-con la física del descarte, pero casi nadie juega: 0–0,20 pases por persona
-contra 0,30 del descarte, con la causa medida en `docs/life-rounds/V-09.md` y
-lo que hay que hacer en `docs/next-plan.md` (V-09b). No se pintan todavía: no
-hay modelo.
+**Y desde G-12 ya no va detrás de una bandera: la vida es cómo se mueve la
+aldea.** Apagarla sigue siendo `valley.life = 'off'` mientras el camino viejo
+exista, que es hasta que V-12 lo borre.
+
+**V-09b cerró los trastos, y su lección es de método.** Se juega en las seis
+semillas —recibir un pase pasó a ser una reacción y no una elección, con cadenas
+de hasta cinco pases—, aunque a un tercio del ritmo del descarte (0,095 pases
+por persona contra 0,30) con la causa medida y sin tocar por la regla séptima.
+Lo que hay que recordar: el informe del agente concluyó que su propio trabajo no
+servía **porque midió el día 0**, y cada jornada tiene su propia semilla
+(`seedOfDay`). Remedido en diez jornadas, ninguna semilla estaba muerta.
+**En la capa de vida, un umbral no se fija con una jornada, igual que no se fija
+con una semilla.**
+
+**Siguiente: V-11** (lo que el motor manda) y después V-12 (borrar
+`actors/index.ts` y `life/spike/`, la mitad irreversible).
 
 **Lo que viene, con briefs para agentes, está en `docs/next-plan.md`**, y la
 hoja de ruta completa —los seis frentes que separan esto de un juego de móvil,
@@ -383,7 +394,7 @@ cifra de una sola semilla.*
   contra `life/*.ts`). V-09 **porta** del descarte lo que ya está medido; V-12
   lo borra.
 
-## 6. La interfaz (U-01…U-04) — en marcha
+## 6. La interfaz (U-01…U-09) — cerrada
 
 El encargo es que la demo se lea como un juego de móvil de verdad. **Las edades
 tecnológicas no existen en este motor y no se inventan**: lo que se celebra son
@@ -391,18 +402,40 @@ hitos con fecha real, empezando por el primer edificio de cada clase (la primera
 capilla, la primera fragua, la primera casa de piedra), la muralla cerrada, un
 récord de población y las décadas.
 
-- **U-01, hecha.** Paleta de pergamino y tinta en `index.html` como tokens, una
-  pila de serifa real para la voz del juego, la tira de la aldea como una placa
-  con filetes en vez de cuatro insignias, y la velocidad como una regleta. **Ni
-  una fuente de red**: la demo se abre sin servidor detrás.
-- **U-02, a medias.** `src/ui/moment.ts` presenta la cartela de un hito y está
-  listo; falta engancharlo a la derivación de qué merece celebrarse.
-- **U-03, hecha.** Crónica, encrucijada y epitafio con los mismos tokens, y la
-  encrucijada subida: filete sobre el título, opciones como cartas, el precio en
-  versalitas porque es la mitad de la decisión.
-- **U-04, pendiente.** El arranque: que los primeros veinte segundos expliquen
-  el juego sin un tutorial. `welcome.ts` **no** es esto: es el parte del
-  letargo.
+- **U-01 · la piel.** Paleta de pergamino y tinta en `index.html` como tokens,
+  una pila de serifa real para la voz del juego, la tira de la aldea como una
+  placa con filetes, y la velocidad como una regleta. **Ni una fuente de red**:
+  la demo se abre sin servidor detrás.
+- **U-02 · los hitos.** `src/ui/moment.ts` presenta la cartela y
+  `src/ui/milestones.ts` deriva qué merece celebrarse, de estado con fecha real:
+  el primer edificio de cada clase, un récord de población, las décadas, una obra
+  terminada. Una voz cada vez: cuando hay hito, el aviso de §11.6 se retira.
+- **U-03 · las tres pantallas.** Crónica, encrucijada y epitafio con los mismos
+  tokens, y la encrucijada subida: filete sobre el título, opciones como cartas,
+  el precio en versalitas porque es la mitad de la decisión.
+- **U-04 · el arranque.** Una frase, no un tutorial: la cartela de la fundación
+  al empezar partida nueva. `welcome.ts` **no** es esto: es el parte del letargo.
+- **U-05 · la barra de abajo.** Valley · Chronicle · People, siempre a la vista,
+  porque la crónica y la gente se abrían con gestos que nadie descubre. Es el
+  cambio que más acercó esto a un juego de móvil.
+- **U-06 · la cabecera reacciona.** La estación bajo el año, y las cuatro cifras
+  dan un pulso al cambiar — la clase se la quita la propia celda con
+  `animationend`, nunca un temporizador colgado del tick.
+- **U-07 · la decisión pendiente.** Era un punto rojo de catorce píxeles para lo
+  más importante que el juego tiene que pedirte; ahora es una píldora con su
+  texto.
+- **U-08 · la gente.** La lista de los nombrados vivos y su ficha, reusando
+  `panelFor`. Destapó que cinco oficios no tenían palabra en el banco y habrían
+  salido en pantalla como `[role.leader]`.
+- **U-09 · el sonido.** Ambiente y acentos, **todo sintetizado con Web Audio**:
+  ni un fichero de audio, +0,41 % de peso en la demo. Silencio hasta el primer
+  toque —que además es lo que el navegador exige— y un botón para apagarlo.
+
+**Y buena parte de «se ve muy pobre» no era la interfaz**, lo que conviene
+recordar antes de repintar nada: el valle abría pintado con la paleta de
+invierno (la mezcla devolvía la estación anterior entera en la semana cero, y el
+juego empieza en primavera semana cero) y estaba sobreexpuesto sin mapeo de
+tonos. Las dos cosas corregidas, y el efecto es mayor que el de toda la piel.
 
 Regla que gobierna todo esto y que es fácil romper sin darse cuenta: **§11.4
 prohíbe animar sobre el reloj del navegador** si un salto del reloj del juego
