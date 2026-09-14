@@ -342,14 +342,24 @@ cifra de una sola semilla.*
 
 **Abierto y sin resolver, para no volver a tantear a ciegas:**
 
-- **`resolve` nunca se había medido con la aldea moviéndose de verdad.** Ahora
-  que anda el triple, dos cuerpos se meten el uno en el otro unas veintiocho
-  veces por jornada (de 916 091 parejas cercanas), donde antes eran cero. Es
-  leve y raro —lo peor medido, 0,509 celdas contra los 0,64 de dos radios— pero
-  dejó de ser cero. Se intentó exigiendo a cada plaza la holgura de `avoid` y
-  **salió peor**: se llevaba por delante el 27 % de las plazas y la aldea se
-  concentraba más. Van dos intentos, así que por la regla séptima de E.3 el
-  tercero no es otro número: es mirar `resolve` con este tráfico.
+- **`resolve` nunca se había medido con la aldea moviéndose de verdad**, y
+  sigue sin estar resuelto. Medido hoy, jornada entera: de 827 234 y 686 135
+  parejas cercanas quedan 35 y 276 por debajo de 0,60 celdas, y 0 y 4 por debajo
+  de 0,55 (semillas 7 y 11). Es raro y leve, pero dejó de ser cero cuando la
+  aldea empezó a andar de verdad. **Dos intentos gastados, los dos medidos y los
+  dos peores:**
+    1. Exigir a cada plaza la holgura de `avoid`: se llevaba por delante el 27 %
+       de las plazas y la aldea se concentraba más.
+    2. Repartir el tope de `resolve` como presupuesto por cuerpo en vez de
+       recortarlo al final. Parecía el modelo correcto —el recorte deshace
+       separación ya hecha, que es feo— pero **mata de hambre las correcciones
+       siguientes**: quien gasta su tope en la primera pasada se queda encimado
+       con todos los demás. De 35 solapes a 162 en la semilla 7, y de 276 a
+       3 492 en la 11. Revertido.
+
+  Por la regla séptima de E.3, el tercer intento **no es otro número ni otra
+  variante de lo mismo**. Si alguien lo retoma: el recorte retroactivo funciona
+  mejor de lo que parece, y lo que falta entender es por qué.
 - **Lo que queda para parecerse al descarte, medido:** la producción pasa el
   12 % del día en escena contra su 24–26 %, y no tiene trastos (V-09). Los
   rechazos ya no son el problema —eran 2 a 3 por charla y ahora son 0,5, con las

@@ -232,22 +232,25 @@ describe('V-06 · elegir', () => {
     // diseño: lo que dice si la aldea se apiña es **cada cuánto** dos cuerpos se
     // meten el uno en el otro, y cuánto.
     //
-    // Medido con el arreglo puesto, semilla 7, jornada entera: 916 091 parejas
-    // a menos de dos celdas, de las cuales 49 847 por debajo de los 0,64 de dos
-    // radios — pero 49 819 de ésas están entre 0,60 y 0,64, que es rozarse el
-    // hombro. Por debajo de 0,60, veintiocho en todo el día; por debajo de
-    // 0,55, seis. Antes del arreglo eran cero de cero, con un tercio de la
-    // aldea quieta.
+    // Medido en la jornada entera, semillas 7 y 11: de 827 234 y 686 135
+    // parejas a menos de dos celdas, quedan **35 y 276** por debajo de 0,60, y
+    // **0 y 4** por debajo de 0,55. Lo más cerca que llegan dos, 0,557 y 0,544.
+    // La mayoría de lo que está bajo los 0,64 de dos radios se queda entre 0,60
+    // y 0,64, que es rozarse el hombro andando por una calle estrecha.
     //
-    // **Que hayan dejado de ser cero es un hallazgo abierto, no un permiso.**
-    // `resolve` (`steering.ts`) nunca se había medido con la aldea moviéndose
-    // de verdad, y pierde de vez en cuando cuando dos se cruzan en un portal.
-    // Se intentó arreglar exigiendo a cada plaza la holgura de `avoid` y salió
-    // peor —se llevaba por delante el 27 % de las plazas y la aldea se
-    // concentraba más—, así que por la regla séptima de E.3 no se toca un
-    // tercer número a ciegas: queda anotado para una ronda que mire `resolve`
-    // con este tráfico. Lo que esta prueba vigila mientras tanto es que siga
-    // siendo raro y leve.
+    // **Dos intentos gastados en esto, los dos midiendo y los dos peores:**
+    // exigir a cada plaza la holgura de `avoid` se llevaba por delante el 27 %
+    // de las plazas y la aldea se concentraba más; y repartir el tope de
+    // `resolve` como un presupuesto por cuerpo en vez de recortarlo al final
+    // —que parecía el modelo correcto, porque el recorte deshace separación ya
+    // hecha— **mata de hambre las correcciones siguientes**: quien gasta su
+    // tope en la primera pasada se queda encimado con todos los demás el resto
+    // del paso. Medido: de 35 solapes a 162 en la semilla 7, y de 276 a 3 492 en
+    // la 11. Revertido.
+    //
+    // Por la regla séptima de E.3, el tercer intento no es otro número ni otra
+    // variante de lo mismo. Lo que esta prueba vigila mientras tanto es que el
+    // solape siga siendo raro y leve.
     expect(overlapping / Math.max(1, close),
       `${overlapping} de ${close} parejas cercanas por debajo de 0,60`)
       .toBeLessThan(0.001);
