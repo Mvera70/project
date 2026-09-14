@@ -1,9 +1,14 @@
 # Dos sesiones a la vez: quién toca qué
 
-**14 sep 2026.** Hay dos sesiones trabajando sobre este repositorio al mismo
-tiempo: una en **diseño de aldeanos en Blender** y otra en **la vida del valle y
-la interfaz**. Este fichero existe para que no se pisen. Si estás leyendo esto y
-sólo hay una sesión, bórralo.
+**14 sep 2026 · repasado el 15 tras la auditoría.** Hubo dos sesiones trabajando
+sobre este repositorio al mismo tiempo: una en **diseño de aldeanos en Blender**
+y otra en **la vida del valle y la interfaz**. Este fichero existe para que no se
+pisen.
+
+**Si estás leyendo esto y sólo hay una sesión, bórralo.** Señal de que la de
+Blender estuvo aquí: `tools/art/_test_build_priest.py`, sin seguimiento y con
+rutas absolutas a `D:\`. Es suyo y se deja donde está; no lo commitees ni lo
+borres sin preguntarle.
 
 ## El reparto
 
@@ -11,6 +16,7 @@ sólo hay una sesión, bórralo.
 |---|---|---|
 | **Arte** | Sesión Blender | `art/recipes/**`, `art/catalog.json`, `tools/art/**`, `public/assets/valley3d/*.glb` |
 | **Vida** | Sesión vida/UI | `src/render3d/life/**`, `src/render3d/world/{ground,forest,ridge,ford,props}.ts` |
+| **Derivación** | Sesión vida/UI | `src/derive/**` — nueva el 15 sep; la leen los dos renders, así que un cambio aquí se nota en los dos |
 | **Interfaz** | Sesión vida/UI | `src/ui/**`, `index.html`, `UI_BANK` de `bank.en.ts` |
 | **Documentos** | Ambas, con cuidado | `docs/**` — cada una en sus propios ficheros |
 
@@ -21,6 +27,12 @@ dueños distintos: `WANTED` (la lista de recursos que se cargan, que es de arte)
 y el montaje de la escena y las luces (que es de la vida). Si Blender añade un
 aldeano nuevo hay que meterlo en `WANTED` **y** en
 `tools/graphics/bundle-game.ts`, que los empotra en la demo publicable.
+
+**Y desde el 15 sep hay un tercer sitio:** el service worker precachea todo lo
+que `public/assets/valley3d/manifest.json` nombre, así que **un modelo nuevo
+cuesta descarga en la instalación**. Son 2,7 MB hoy. No hace falta tocar nada
+—`publish-assets.ts` escribe el manifiesto y el trabajador lo lee— pero sí
+saberlo antes de añadir treinta recetas.
 
 Regla: **quien toque `WANTED` que toque sólo esa lista**, y lo diga. No es un
 fichero que se pueda reescribir entero desde dos lados.

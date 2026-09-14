@@ -1,7 +1,7 @@
 # Hoja de ruta: qué le falta a esto para ser un juego
 
-**14 sep 2026.** `docs/next-plan.md` dice qué se hace **ahora** y con qué
-agente. Esto dice qué falta **en total**, en qué orden, y —lo más importante—
+**14 sep 2026 · estado actualizado el 15 sep, tras la auditoría.**
+`docs/next-plan.md` dice qué se hace **ahora** y con qué agente. Esto dice qué falta **en total**, en qué orden, y —lo más importante—
 **qué no puede hacer ningún agente**, porque depende de una decisión o de una
 persona mirando.
 
@@ -78,26 +78,51 @@ color: falta **que se vea qué se puede hacer**. Después de esas cuatro quedan:
   llegando pronto y de forma fiable, y que la primera vez que aparece la
   píldora de decisión pendiente se note más que las siguientes.
 
-### 3 · La vida — **carril B, casi cerrada**
+### 3 · La vida — **V-12 cerrada; queda V-11, y no es opcional**
 
-Queda V-09b (que se juegue de verdad, en marcha), **V-11** (lo que el motor
-manda: las riñas de §7.9 y las reuniones de §11.8 pasan a ser escenas de la capa
-de vida) y **V-12** (borrar `actors/index.ts` y `life/spike/`, quitar la bandera
-`valley.life`). V-12 es la única fase que el Anexo E condiciona a **aprobación
-humana viéndolo**, y con razón: borra el camino de vuelta.
+**V-12 se cerró el 15 sep**, antes que V-11 y contra el orden del Anexo E, por
+una razón medida: el camino viejo **ya no se ejecutaba** desde G-12. No era una
+capa de repuesto, era código muerto con treinta pruebas verdes vigilándolo.
+Fuera 6 011 líneas, y con ellas la bandera `valley.life`.
 
-Después de V-12, la vida está hecha y el valle se pinta por un solo camino.
+Y borrarlo dejó a la vista lo que el juego había perdido sin decirlo: **las
+reuniones de §11.8 no ocurren desde el 14 sep.** Sólo existían en `actorsFor`.
+Medido: con una reunión convocada, a media jornada el más lejano está a 12,4
+celdas del sitio. **Eso es V-11**, está declarado en
+`tests/fast/life-staging.test.ts`, y es lo primero del carril.
+
+Después de V-11 y del enganche del rebaño, la vida está hecha.
 
 ### 4 · Que corra y se instale en un móvil de verdad
 
 - **G-09 quedó parcial a propósito**: no había dispositivo real y D.9 no acepta
-  emulación. Sigue sin haberlo. **Esto es un bloqueo para «juego de móvil»**, no
-  un detalle: todo lo medido de rendimiento es de un portátil.
-- **G-11** (PWA, distribución, recuperación) está cerrada para el piloto. Lo que
-  falta es **G-12**: la migración, que el 3D deje de estar detrás de
-  `?render=pilot3d` y sea el juego. Depende de aceptación visual.
-- La suite rápida tarda 31 s contra los 20 que fija `CLAUDE.md`, y el banco de
-  balance 18 min contra 15. Deuda vieja y conocida.
+  emulación. Sigue sin haberlo, y desde la migración **ya no es una deuda: es lo
+  que decide si el 3D se sostiene**, porque no queda un 2D al que volver más allá
+  de `?render=canvas`. Va antes de borrar `src/render/`.
+- **G-11 y G-12 están cerradas.** G-12 en dos mitades: la activación el 14 sep y
+  la migración de la especificación el 15, que es el día que separó las dos y
+  costó cuatro regresiones invisibles.
+- **La suite rápida vuelve a cumplir su presupuesto** (17,5 s contra 20): no
+  había que bajar el listón, había que separar los siete ficheros que vivían
+  jornadas enteras dentro de ella. El banco de balance sigue en 18,1 min contra
+  15, con la causa medida.
+- **Y hay demo que se puede abrir en un teléfono sin servidor:** `npm run shot`
+  la arma en una sola página con los treinta y nueve modelos dentro.
+
+### 4.1 · Que las rejas midan el juego — **nuevo, del 15 sep**
+
+Lo encontró la auditoría y no estaba en ninguna hoja de ruta:
+
+- **La reja de capturas de §14.3 llevaba roja desde U-01**, 8 de 13 recorridos,
+  y nadie lo sabía porque CI sólo dispara en `main` o en un pull request y el
+  trabajo lleva 167 commits en una rama. Siete quedan declarados con su medición
+  y son el carril C de `next-plan.md`.
+- **Los dos recorridos de navegador medían el Canvas creyendo medir el juego**,
+  porque no pasaban las banderas de WebGL y el relevo a 3D falla en silencio.
+  Arreglado en la reja de PWA, que ahora exige `data-render`.
+- **No existe reja visual del 3D.** Hoy se mira a mano. Automatizarla pide
+  decidir qué se compara, porque píxeles sobre WebGL por software dan falsos
+  rojos.
 
 ### 5 · Lo que se ve — arte y escala
 
@@ -129,18 +154,23 @@ Después de V-12, la vida está hecha y el valle se pinta por un solo camino.
 
 ---
 
-## El orden que yo propondría
+## El orden que yo propondría — reescrito el 15 sep
 
-1. **Terminar el carril A y el B** (U-05–U-08, V-09b, V-11). Está en marcha y
-   son agentes baratos con briefs escritos.
-2. **Mirar la demo y decidir la escala.** Es una sesión de diez minutos del
-   dueño del diseño y desbloquea o cierra el frente 5 entero.
-3. **Atacar el ritmo de decisión.** Primero la instrumentación (agente barato),
-   luego la decisión de diseño con los números delante. Es lo que convierte esto
-   en un juego.
-4. **Sonido** (U-09), que es lo que más cambia la sensación por lo que cuesta.
-5. **V-12** y después **G-12**: borrar el camino viejo y migrar.
-6. **Un móvil de verdad** para cerrar G-09, y **el hito 0 con un tercero**.
+Los cinco primeros puntos del orden anterior están hechos: U-05 a U-09, V-09b,
+el sonido, V-12 y G-12. Lo que queda, por lo que pesa:
+
+1. **Un teléfono.** Diez minutos de alguien con la demo de `npm run shot`
+   abierta. Es lo único que dice si el 3D se sostiene, y hasta que se sepa no se
+   puede borrar `src/render/` ni decidir si hacen falta las tres palancas de
+   abajo. Pasó de deuda vieja a bloqueo el día de la migración.
+2. **V-11**, que salda una regresión del juego y no una fase pendiente.
+3. **El ritmo de decisión.** `wolf_winter` primero —hecho y sin fusionar, y
+   cuesta una ronda entera por las trece pruebas que mueve—, luego relajar, luego
+   escribir. Un paso y remedir. **Es lo que convierte esto en un juego.**
+4. **La escala**, si con la interfaz nueva el valle se sigue viendo pobre. Es
+   D.6.2 y son seis píxeles por persona, medidos.
+5. **La reja visual**: los siete recorridos declarados, y una para el 3D.
+6. **El hito 0 con un tercero**, y el hito 6 detrás.
 
 Y aparcado a propósito, después de todo eso: **V-15 y V-16** (el mapa grande y
 la comarca con relieve). Son una ronda de motor con `SCHEMA_VERSION` a 4 y

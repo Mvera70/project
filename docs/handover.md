@@ -1,14 +1,11 @@
 # The Valley — Traspaso
 
-**10 de septiembre de 2026 · Al cerrar la dirección desde Cowork**
+**15 de septiembre de 2026 · Al cerrar la auditoría del proyecto**
 
-Hasta aquí el proyecto ha tenido dos papeles separados: alguien que diseñaba y
-arbitraba, y alguien que programaba y medía. A partir de ahora los asume el mismo
-agente. Este documento existe para que esa fusión no se lleve por delante lo que
-hacía funcionar el método.
-
-**La fuente de verdad sigue siendo `docs/design.md`.** Este fichero no la
-sustituye: dice cómo trabajarla y en qué estado está.
+**La fuente de verdad es `docs/design.md`**, y su historial `docs/changelog.md`.
+Este fichero no los sustituye: dice **en qué estado exacto está todo, qué
+decisiones ya están tomadas y qué trampas ya han costado tiempo.** Léelo antes de
+empezar cualquier ronda.
 
 ---
 
@@ -17,7 +14,7 @@ sustituye: dice cómo trabajarla y en qué estado está.
 Funciona porque invierte la relación habitual: **el código no es el resultado de
 la especificación, es su prueba experimental.** Cada módulo implementado destapa
 algo que la spec decía mal, y esa corrección es el producto real de la ronda.
-Cuarenta y siete revisiones lo confirman.
+Sesenta y cuatro revisiones lo confirman.
 
 1. **Cada ronda termina en evidencia, no en un visto bueno.** Una medición que
    contrastar o una salida que leer, y por escrito **qué resultado falsaría la
@@ -36,6 +33,11 @@ Cuarenta y siete revisiones lo confirman.
    evita que alguien lo revierta dentro de seis meses creyendo que arregla algo.
    Y verificar la edición no es verificar la escritura: **relee del disco**.
 
+**La regla 5 se rompió y se pagó.** Nueve rondas de interfaz (U-01 a U-09), la
+activación de G-12 y V-09b se entregaron **sin una sola entrada en el registro**.
+La auditoría del 15 sep las apuntó de golpe, y de ese desfase salieron cuatro
+regresiones que nadie podía ver. Detalle en §3.
+
 ### El riesgo de fusionar los papeles
 
 Un implementador que también dirige **optimiza lo que puede medir solo**. Se ve
@@ -50,170 +52,92 @@ medición.
 
 ## 2. Estado del proyecto
 
-**Fecha de este corte: 10 de septiembre de 2026.** Rama de trabajo:
-`graphics/g-04-villager-rig`. Puerta en verde: `npm run typecheck`, `npm test`
-(903 pruebas, unos 31 s) y `npm run lint`.
+**Rama de trabajo:** `graphics/g-04-villager-rig`, **167 commits por delante de
+`main`** y sin haberse abierto nunca como pull request. Eso importa y no es un
+detalle de contabilidad: ver §3.
 
-### El juego
+**Puerta en verde:** `npm run typecheck`, `npm test` (1 004 pruebas, 17,5 s),
+`npm run test:journeys` (94 pruebas, 83 s), `npm run lint`, `npm run test:pwa`
+(6 recorridos) y `npm run test:shots` (10 pasan, 3 declaradas).
 
-**Hitos 0 a 5 entregados; el hito 0 sigue sin juez.** El motor está completo
-—demografía, subsistencia, opiniones, encrucijadas, animales, comerciantes,
-crónica— y el render 2D en Canvas es el que se juega hoy y el que está
-desplegado en GitHub Pages como PWA.
+### Qué es el juego hoy
 
-**El hito 0 no lo ha validado nadie ajeno al proyecto, y el hito 6 tampoco.** Son
-los dos criterios humanos y **no se declaran superados ni se sustituyen por
-pruebas automáticas.** Es la deuda más antigua y la única que ningún agente
-puede saldar.
-
-### El programa gráfico
-
-Un piloto 3D en `src/render3d/`, aparte del juego, que **no sustituye a
-`src/render/`** hasta G-12. Rondas cerradas:
-
-| Ronda | Qué dejó |
+| Capa | Estado |
 |---|---|
-| G-00 a G-03 | Cadena Blender → GLB → Three.js, catálogo con hashes, dos direcciones artísticas |
-| **G-04** | Aldeano articulado, 1 236 triángulos, 16 huesos, cuatro clips, piel rígida decidida en banco común |
-| **G-05** | Reloj de presentación y actores derivados: quién hace qué en cada instante |
-| **G-06** | Escena alimentada por una partida real: terreno, edificios, gente andando |
-| **G-07** | Cámara, tacto e interfaz: se juega dentro del juego con `?render=3d` |
-| **G-08** | Estaciones y señales: el valle dice lo que le pasa sin abrir una ficha |
-| **G-09** | Banco de medida y presupuesto propuesto (D.9.1), parcial por falta de móvil |
-| **G-10** | Catálogo: 31 recursos, río con cauce, ruinas, fauna, luz del día y gente distinta |
+| **Motor** (`src/engine/`) | Completo. M-01 a M-39. Demografía, subsistencia, opiniones, encrucijadas, animales, comerciantes, crónica |
+| **Derivación** (`src/derive/`) | Nueva en v3.66. Lo que el estado dice antes de pintarlo, compartido por los dos renders |
+| **Vida** (`src/render3d/life/`) | V-00 a V-10, V-12, V-13, V-14. **Es cómo se mueve la aldea**, sin bandera. Falta V-11 |
+| **Render 3D** (`src/render3d/`) | G-00 a G-12. **Es el juego** desde el 14 sep 2026 |
+| **Render 2D** (`src/render/`) | La puerta de vuelta, en `?render=canvas`. Se queda hasta que alguien pruebe en un móvil |
+| **Interfaz** (`src/ui/`) | U-01 a U-09. Piel, hitos, tres pantallas, arranque, barra de destinos, cabecera, decisión pendiente, pantalla de la gente, sonido |
 
-Puertas: P0 y P1 cerradas. **P2 pendiente de tu juicio sobre la demo.**
+**Los hitos 0 y 6 siguen sin juez.** Son los dos criterios humanos y **no se
+declaran superados ni se sustituyen por pruebas automáticas.** Es la deuda más
+antigua y la única que ningún agente puede saldar.
 
-**Dónde vive cada cosa de G-10.** Los guiones que escriben las recetas están en
-`tools/art/lots/` con su README; la plantilla y el armador de la demo
-publicable, en `tools/graphics/pilot-page.html` y `bundle-pilot.ts`. Los tres
-vivían en el scratchpad de la sesión y se perdieron dos veces.
+### Decisiones que enmarcan lo que viene
 
-**Lo que G-10 dejó y no es catálogo**, porque no se ve en la lista de recursos:
-el relieve del suelo (`world/ground.ts`: el agua baja, la roca sube, el camino
-se hunde con lo pisado que esté, y las esquinas promedian, que es lo que da la
-orilla); la lámina de agua con su onda; la luz del día escénico
-(`effects/daylight.ts`, función pura de la hora); la fauna de §7.7 instanciada
-(`effects/fauna.ts`), que reutiliza `animalPositions` del render 2D; el humo que
-sube; y la variación de talla y ropa del reparto (`world/cast.ts`).
+Tomadas por el dueño del diseño el 14 sep 2026 (`docs/roadmap.md`):
 
-### Lo que se puede mirar sin arrancar nada
+- **El 3D es el juego**, con el riesgo escrito y aceptado: todo lo medido de
+  rendimiento es de un portátil. **Probarlo en un móvil pasó a ser urgente.**
+- **El ritmo de decisión: las dos cosas.** Arreglar los fallos, relajar
+  condiciones **y** escribir plantillas de menor peso, un paso y remedir. El
+  número al que se apunta es seis a ocho decisiones por década, no treinta.
+- **El aldeano: que diseñen libre.** No se impone dirección a la sesión de
+  Blender.
+- **El sonido: ambiente y acentos.** Hecho en U-09.
 
-- **El aldeano suelto**, girable, con sus cuatro clips y una ventana al tamaño
-  real que tiene en el móvil:
-  `https://claude.ai/code/artifact/b30ce40b-7f40-4840-bdf9-11a60f2bfb4f`
-- **El valle en marcha**, una partida real corriendo con el motor y el renderer
-  de verdad en una sola página:
-  `https://claude.ai/code/artifact/2e1d7a40-93a2-4406-a0f6-4651caeb380c`
-- Capturas y auditorías en `artifacts/graphics/G-04/` y `G-06/`.
-
-### Decisiones tomadas que enmarcan lo que viene
-
-- **D.2.1** · teja y paja conviven; no hay dirección A contra B.
-- **D.4.1** · piel rígida, decidida en banco común con coste idéntico.
-- **D.6.1** · un día escénico dura 120 s y se acelera con la **raíz** de la
-  velocidad, no con ella.
-- **D.6.2** · un aldeano mide **0,65 celdas**; una celda son unos tres metros.
-- **D.6.3** · al entrar se encuadra la aldea con su entorno, no el mapa entero.
-- **D.6.4** · la jornada y el destino pertenecen al día escénico, no a la semana.
-- **D.6.5** · un clip en el sitio exige un cuerpo en el sitio.
+Y las del Anexo D que siguen en pie: **D.2.1** teja y paja conviven; **D.4.1**
+piel rígida; **D.6.1** un día escénico dura 120 s y se acelera con la raíz de la
+velocidad; **D.6.2** un aldeano mide 0,65 celdas y una celda son tres metros;
+**D.6.3** al entrar se encuadra la aldea con su entorno; **D.6.4** la jornada
+pertenece al día escénico; **D.6.5** un clip en el sitio exige un cuerpo en el
+sitio.
 
 ---
 
-## 3. Qué hacer a continuación
+## 3. Lo que la auditoría del 15 sep encontró, y por qué importa
 
-**G-07 está hecha.** El piloto se juega dentro del juego con `?render=3d`, con
-Canvas por defecto, gestos conectados y fichas al tocar. Lo que queda de la
-ronda, y es poco: probar en el móvil de verdad que el relevo de Canvas a WebGL
-no parpadea, y decidir si el interruptor merece un botón en vez de un
-parámetro de dirección.
+El encargo fue: *«hemos dado muchos palos de ciego, hay que eliminar código
+muerto y decisiones antiguas, establecer unas bases sólidas.»* Lo que salió no
+fue código muerto suelto: fue **un día de desfase con cuatro consecuencias
+invisibles.**
 
-**G-08 está hecha.** El valle cambia de estación —capturas de las cuatro en
-`artifacts/graphics/G-08/`— y las señales de `tellsFor` se ven en 3D. Lo que
-queda de esa ronda: los efectos que necesitan recurso propio (`art/recipes/
-effects/`), que dependen del catálogo, y la paridad de capturas contra Canvas.
+G-12 activó el 3D el 14 sep tocando cinco ficheros de código y ninguno de
+documentación. Su propio brief pedía las dos cosas en la misma ronda. De ahí:
 
-**G-09 está medida y es parcial a propósito**: no hay dispositivo real, y D.9 no
-acepta emulación para cerrar P3. El presupuesto propuesto está en D.9.1 y el
-informe en `docs/graphics-rounds/G-09.md`.
+1. **Las reuniones de §11.8 dejaron de ocurrir.** Sólo existían en
+   `actorsFor`, el camino viejo, que desde G-12 no se ejecuta. `life/` no conoce
+   la palabra `gather`. Nadie lo vio porque la prueba que las vigilaba llamaba a
+   `actorsFor` directamente y siguió verde sobre un camino muerto. Medido: con
+   una reunión convocada, a media jornada el más lejano está a **12,4 celdas**
+   del sitio. **Es lo que V-11 debe**, y está declarado en
+   `tests/fast/life-staging.test.ts`.
+2. **La reja de capturas de §14.3 llevaba roja desde U-01**: 8 de 13 recorridos.
+   No se veía porque `ci.yml` sólo dispara en `main` o en un PR. Y los que
+   pasaban lo hacían **por no tener WebGL**: el relevo a 3D fallaba en silencio y
+   medían el Canvas creyendo medir el juego.
+3. **Los modelos 3D no se precacheaban.** Sin red, el valle abría en 2D. La
+   promesa de §13.4 se cumplía a la letra y no en espíritu, y el día que no haya
+   Canvas al que caer, no habría abierto.
+4. **El render nuevo importaba ocho módulos del viejo** para saber qué contar.
+   Eso convertía retirar el Canvas en imposible.
 
-**Las reuniones de §11.8 ya se ven en 3D** (v3.50). El día que hay reunión nadie
-va al tajo. Se decide al amanecer, como los destinos, y por eso no teletransporta
-a nadie; `valley.html?gather=1` convoca una a mano para poder mirarla, porque
-salen dos veces en treinta años.
+**Lo que se arregló:** V-12 (6 011 líneas fuera), la segunda mitad de G-12 en la
+spec, `src/derive/`, la suite en tres niveles, WebGL en la reja de PWA con
+`data-render` como señal, el precacheo, y siete exports muertos.
 
-**Y un hallazgo que no es de gráficos y es el más gordo de todos:** dos sistemas
-del motor no se disparan nunca. Los rencores de §6.4 no se forman ni una vez en
-cuarenta años, lo que deja muertas las riñas de M-39 y las dos encrucijadas que
-las exigen; y el jugador toma **entre siete y doce decisiones en cuarenta años**
-sobre la mitad del catálogo, porque diez de las veinte plantillas no salieron ni
-una vez en cinco partidas. Medido y escrito en `docs/findings-drama.md`. Ninguna
-cantidad de arte tapa eso.
-
-**Lo siguiente, en este orden:**
-
-1. **Correr el banco en un móvil** con `--real true` y llenar las filas de
-   tiempo de D.9.1, que hoy están sin presupuestar a propósito. Es lo único que
-   falta para poder cerrar P3.
-2. **G-10, los lotes que faltan.** Hechos: mundo (árbol, roca), vivienda (casa,
-   casa de piedra, cobertizo), sustento (granero, molino, herrería) y comunidad
-   (capilla, iglesia, pozo). **Faltan el campo, el camino y la familia de
-   defensa** —empalizada, muralla, atalaya— más el cementerio. El campo y el
-   camino son terreno, no edificio: se pintan desde el suelo y aún no tienen
-   geometría propia. Hay margen de sobra: la peor escena está en 364 llamadas
-   contra un límite de 1 200.
-
-   Cómo se añade uno: `art/recipes/<id>/<id>.json`, entrada en `art/catalog.json`,
-   `build` → `validate` → `report`, `publish-assets.ts`, y la correspondencia
-   con su `BuildingKind` en `BUILDING_ASSETS` de `world/buildings.ts`. La receta
-   se escribe en metros con `scale: 1/3` y la huella hacia +X y +Z desde la
-   esquina.
-
-   Ojo con una cosa aprendida ahí: el presupuesto de triángulos hubo que
-   corregirlo de 120 000 a 450 000 porque el primero se midió sobre un valle sin
-   árboles. Con instanciación los triángulos dejan de seguir al coste.
-
-Hecho ya, y no hay que repetirlo: la unión del aldeano por material. De 914
-llamadas a 269 y de 3,60 a 1,30 ms de CPU, sin mover un triángulo. Una receta
-lo pide con `mergeByMaterial: true`.
-
-El brief original de G-07, para lo que quede de él:
-
-**G-07: cámara, tacto e integración de interfaz.** Es la ronda que hace jugable
-el piloto desde el móvil, y la que el usuario está esperando: hoy la cámara no
-se mueve ni se acerca, y él pidió expresamente poder acercarse a ver la gente.
-
-Lee `docs/design.md` §11, D.5 y D.7 antes de tocar nada. Ficheros del brief:
-`src/render3d/camera.ts`, `src/render3d/picking.ts`, `src/ui/app.ts`,
-`src/ui/inspect.ts`, `src/ui/gestures.ts`, `src/ui/loop.ts`,
-`tools/graphics.shots.ts` y `tests/fast/graphics-picking.test.ts`.
-
-Lo que ya está hecho y no hay que rehacer:
-
-- `pick` funciona y prioriza aldeano, edificio y terreno en ese orden. G-07 lo
-  perfecciona, no lo empieza.
-- El encuadre inicial vive en `renderer.ts`, en `frameCamera`. Sácalo a
-  `camera.ts` con el zoom y el arrastre; el encuadre por proyección de las
-  esquinas de la caja construida es el que hay que conservar.
-- La página `tools/graphics/pilot.ts` es el banco de pruebas más rápido que
-  existe: cambia algo, reconstruye y míralo. No es parte del juego.
-
-**Cómo republicar la demo tras un cambio.** El bundle se arma con Vite sobre
-`tools/graphics/pilot.html`, con el GLB del aldeano inyectado en base64 por
-`define: { VALLEY_VILLAGER_GLB }`, y se mete en una plantilla HTML que vive en
-el scratchpad de la sesión. Si la plantilla se ha perdido, cualquier página que
-tenga los identificadores `#stage`, `#stage-wrap`, `#readout`, `#touched`,
-`[data-speed]`, `#seed`, `#years` y `#refound` sirve.
-
-**Antes de publicar recursos nuevos:** `npx tsx tools/graphics/publish-assets.ts`
-copia lo aprobado a `public/assets/valley3d/` con manifiesto y hash. Un
-candidato sin promoción no llega al juego.
+**Lo que no, y es de quien lea esto:** V-11, y recalibrar los siete recorridos de
+captura declarados — que pide **mirar las capturas**, no ajustar números.
 
 ---
 
 ## 4. Trampas que ya han costado tiempo
 
 No son teoría: cada una se pagó con al menos una ronda.
+
+### Del motor y el balance
 
 - **El invierno es el momento más lleno del granero.** La cosecha es la semana 35
   y el invierno empieza en la 36. Ninguna plantilla de escasez se apoya en la
@@ -227,14 +151,16 @@ No son teoría: cada una se pagó con al menos una ronda.
 - **El precio escrito es un contrato** (§8.1). De 48 opciones auditadas, 13
   mentían. Si el texto promete un coste y los efectos no lo entregan, el jugador
   aprende que las opciones duras son palabrería.
+- **Tocar la elegibilidad de una sola plantilla mueve el balance entero.** El
+  recalibrado de `wolf_winter` está hecho y sin fusionar por eso: mete veintiuna
+  encrucijadas nuevas en la ventana medida y **trece pruebas calibradas sobre
+  semillas concretas pasan a fallar**. Detalle en `docs/next-plan.md`.
 - **Nunca un umbral con una sola semilla.** Dos partidas divergen desde el primer
   tick.
 - **Dos copias de la spec divergen.** Se sincroniza reemplazando, nunca
   parcheando, y siempre construyendo sobre la copia del repositorio.
 
----
-
-### Las que ha costado el programa gráfico
+### Del render y el arte
 
 - **Un umbral absoluto en una cadena que escala recursos caduca.** Al llevar el
   aldeano a 0,65 celdas, la auditoría de animación empezó a denunciar clips que
@@ -244,231 +170,108 @@ No son teoría: cada una se pagó con al menos una ronda.
   la flexión estuvo cambiado dos veces —espinillas primero, antebrazos
   después— y las dos veces todo lo demás pasó en verde. Se mide el **sentido**,
   no solo la amplitud. Y verifica la comprobación contra el artefacto
-  defectuoso, no contra el arreglado: mi primera versión denunciaba justo los
-  clips que estaban bien.
+  defectuoso, no contra el arreglado.
 - **La validación en verde no ve una cabeza suelta.** El atado emparentaba cada
   pieza a la cola de su hueso y la cabeza flotaba separada del torso, con GLB
-  bien formado, clips presentes, materiales correctos y captura repetible. Se vio
-  mirando una hoja de contactos. §14.3 no es retórica.
+  bien formado, clips presentes y captura repetible. Se vio mirando una hoja de
+  contactos. §14.3 no es retórica.
 - **Tres formas de medir una zancada dan tres números y dos son falsos.** La
-  separación máxima entre tobillos dio 1,50 m donde la marcha da 0,95; el
-  recorrido bajo un umbral de altura dijo que cargado se anda más largo que
-  suelto. La buena: el pie más bajo es el que pisa, y lo que retrocede es lo que
-  el cuerpo avanza. Ninguna de las tres se desmentía a ojo.
+  buena: el pie más bajo es el que pisa, y lo que retrocede es lo que el cuerpo
+  avanza. Ninguna de las tres se desmentía a ojo.
 - **La promoción presupone la misma receta.** `report` comparaba el candidato con
-  el artefacto aprobado usando la receta nueva, así que ningún cambio deliberado
-  de geometría podía promoverse jamás. El catálogo guarda ahora el hash de la
-  receta.
-- **Los fallos de animación se ven jugando, no en una prueba.** Los cinco últimos
-  —teletransporte al trabajar, parpadeo a velocidad alta, gente amontonada en
-  una celda, deslizamiento con la azada, botón de velocidad sin efecto— los
-  encontró el usuario mirando la demo, con la suite entera en verde. Cada uno
-  tiene ya su prueba; ninguna existía antes de que él lo viera.
+  el aprobado usando la receta nueva, así que ningún cambio deliberado de
+  geometría podía promoverse. El catálogo guarda ahora el hash de la receta.
+- **Los fallos de animación se ven jugando, no en una prueba.** Teletransporte al
+  trabajar, parpadeo a velocidad alta, gente amontonada, deslizamiento con la
+  azada, botón de velocidad sin efecto: los cinco los encontró el usuario
+  mirando la demo, con la suite entera en verde.
+
+### De las pruebas y la infraestructura — nuevas, del 15 sep
+
+- **Una prueba que llama a una función directamente no sabe si el juego la
+  llama.** Treinta pruebas verdes vigilaban `actorsFor` mientras el camino vivo
+  no tenía ninguna. **Cuando un camino se vuelve opcional, sus pruebas se mudan
+  el mismo día.**
+- **Un recorrido de navegador tiene que decir contra qué render corre.** Un
+  relevo que falla en silencio es lo correcto para el jugador y desastroso para
+  una prueba: pasaba en 730 ms sin esperar a nada.
+- **Una prueba que congela una lista literal se rompe sin que nada se rompa.**
+  La frontera de G-01 comparaba los imports de `contracts.ts` contra una copia
+  congelada. Se comprueba la propiedad —sólo tipos, nada que se ejecute— no la
+  lista.
+- **Una bandera de convivencia es una deuda con fecha.** Mientras existe, cada
+  prueba que corre por el lado apagado es una prueba que no vigila el juego.
+- **Una migración sin su documentación no está hecha, está escondida.**
 
 ---
 
-## 5. Deudas sin dueño
+## 5. Deudas, por lo que pesan
 
 1. **La lectura del hito 0 por un tercero.** Las tres crónicas, sin contexto y
    sin el documento de diseño, y una sola pregunta: *«¿en qué se diferencian
    estas tres aldeas?»*. Ni quien diseñó el juego ni quien lo programó sirven.
-   **El hito 6 está en la misma situación y tampoco se declara superado.**
-2. **El presupuesto del banco.** 638 s de los 900 tras la subida de la v2.45, que
-   queda escrita como la última sin optimizar.
-3. **Cuatro plantillas al filo del 1 % de elegibilidad** (§12.9), entre 1,0 % y
-   2,5 %.
-4. **Los hitos 4, 5 y 6** siguen esbozados en §16, a propósito.
-5. **El aldeano no tiene frente.** El torso es un cajón liso y la cabeza una
-   esfera: por delante y por detrás es casi la misma silueta, y en el valle
-   giran hacia donde caminan. Es asunto de geometría y de P1. La vía que propuse
-   y nadie ha decidido aún: un peto de color en el pecho, en el terracota que la
-   paleta ya tiene, más una cuña en la cabeza. A veinte píxeles el color separa
-   mucho mejor que la forma.
-6. **Azadonar no se distingue de cargar a la escala de juego.** Lo que las
-   separaría es la herramienta, no la pose. Por eso el rig lleva conectores en
-   las dos manos, y por eso D.4 dice que la herramienta es un accesorio. Espera
-   a la ronda de la biblioteca de herramientas.
-7. **La suite de balance falla diez pruebas de §12.9, y ya fallaba antes de
-   esta ronda.** Medido con dos pasadas completas el 13 sep 2026, una con el
-   motor tal cual y otra con la calle de §7.2: las mismas diez en las dos. La
-   de fondo es que jugar mal y jugar bien se parecen demasiado —la política
-   adversa mata el 13 % de las aldeas y el diseño pide 25 %, y la distancia
-   entre prudente y mala es de 11,7 puntos contra los 20 pedidos—. Está medido
-   entero en `docs/findings-drama.md` §3. **No lo arregla una ronda gráfica:
-   es balance del motor y lo decide el dueño del diseño.**
-8. **La suite rápida tarda 31 s contra los 20 que fija `CLAUDE.md`**, y unos 21
-   son de carga de módulos. El banco de balance sigue en 18,1 min contra el
-   techo de 15; la causa medida es que el coste del suelo cambia 631 veces por
-   partida y cada cambio vacía la caché de pares de ruta. Bajarlo obliga a tocar
-   el tráfico, que es balance, y esa decisión sigue abierta.
-9. **Los edificios del piloto son cajas con tejado.** El catálogo de verdad es
-   G-10. Es deliberado: lo que hay que juzgar antes es si un valle de estas
-   proporciones se lee desde arriba.
+   `npm run reader:packet` genera el paquete. **El hito 6 está igual.**
+2. **Un móvil de verdad.** G-09 quedó parcial a propósito y D.9 no acepta
+   emulación. Es lo único que falta para cerrar P3, y desde la migración es
+   además lo que decide si el 3D se sostiene. **Hay demo publicada, de una sola
+   página y sin servidor:** `npm run shot` la arma.
+3. **V-11**, que salda la regresión de §11.8. Ver §3.
+4. **El ritmo de decisión.** Siete a doce decisiones en cuarenta años, medio
+   catálogo muerto, cuatro plantillas al filo del 1 %. La decisión está tomada;
+   la ronda no. Empieza por `npm run eligibility`.
+5. **La suite de balance falla doce pruebas de §12.9**, y ya fallaba antes de
+   todo esto. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
+   distancia entre políticas cayó a cinco puntos contra los veinte que pide el
+   diseño, y `smith_feud` se triplicó. **No lo arregla una ronda gráfica: es
+   balance del motor y lo decide el dueño del diseño.** Medido en
+   `docs/findings-drama.md` §3–§6.
+6. **Los siete recorridos de captura declarados.** Pide mirar capturas.
+7. **La reja visual del 3D no existe.** Hoy se mira a mano con `npm run shot`.
+   Automatizarla es una ronda con alguien delante.
+8. **El rebaño sigue siendo una función de la hora.** V-08 partió `fauna.ts` en
+   dos para que la capa de vida entrara por la segunda mitad —`life/beasts.ts` ya
+   da animales con cuerpo— y **ese enganche no se ha hecho**: los animales que se
+   ven se calculan del estado mientras la gente a su lado son cuerpos que andan.
+9. **El aldeano no tiene frente.** Por delante y por detrás es casi la misma
+   silueta, y en el valle giran hacia donde caminan. A seis píxeles —lo que mide
+   en el encuadre de reposo— la forma no separa nada. La vía propuesta y nunca
+   decidida: un peto terracota y una cuña en la cabeza.
+10. **El banco de balance tarda 18,1 min contra el techo de 15.** La causa está
+    medida: el coste del suelo cambia 631 veces por partida y cada cambio vacía
+    la caché de pares de ruta. Bajarlo obliga a tocar el tráfico, que es balance.
+11. **`resolve` nunca se había medido con la aldea moviéndose**, y sigue sin
+    resolverse. De 827 234 y 686 135 parejas cercanas quedan 35 y 276 por debajo
+    de 0,60 celdas (semillas 7 y 11). **Dos intentos gastados, los dos medidos y
+    los dos peores** —exigir a cada plaza la holgura de `avoid` se llevaba el
+    27 % de las plazas; repartir el tope como presupuesto por cuerpo mató las
+    correcciones siguientes—. Por la regla séptima de E.3, el tercer intento **no
+    es otro número**: el recorte retroactivo funciona mejor de lo que parece, y
+    lo que falta es entender por qué.
+12. **El río parte el valle y no se cruza:** sólo el 37 % del suelo libre está
+    conectado con el centro. No es un fallo, es el motor. O el mapa gana un
+    puente, o los asentamientos van del mismo lado.
+13. **V-15 y V-16**, el mapa grande y el relieve, aparcadas a propósito. Son
+    motor, suben `SCHEMA_VERSION` a 4 y rompen partidas guardadas. El cuenco de
+    V-14 es decorado: el valle sigue plano por dentro.
+14. **Afinar el tick a día no arregla el desfase con la jornada** y su coste está
+    medido constante a constante en `docs/brief-reloj.md`. Si se hace, que sea
+    por simulación y no por dibujo.
 
-## 5. La vida del valle (Anexo E) — el estado exacto
+---
 
-**Lo que hay que saber en una frase:** el render dibujaba una fórmula del
-tiempo y por eso nadie podía chocar, perseguir ni encontrarse; se está
-construyendo una capa de agentes con paso fijo (`src/render3d/life/`) que lo
-da sin escribir en el motor. **Todo lo normativo está en `docs/design.md`,
-Anexo E.** Esto es sólo el estado.
+## 6. Cómo se mira el juego
 
-**Hecho (v3.59–v3.65):** V-00 el descarte, V-01 reloj, V-02 cuerpos y rejilla,
-V-03 navegación, V-04 impulsos, V-05 ofertas, V-06 elección, V-07 escenas de
-dos, V-08 los animales como agentes, **V-09 y V-09b los trastos**, V-10 los
-sitios comunes, V-13 la medida; V-14 el cuenco. Informes con lo medido en
-`docs/life-rounds/`, más `sonda-linea-base.md` con ocho semillas.
+```bash
+npm run shot          # empaqueta el juego en una página y lo fotografía
+npm run dev           # y jugarlo, en 390 × 844
+npm run dev           # ?render=canvas para la puerta de vuelta
+```
 
-**Y desde G-12 ya no va detrás de una bandera: la vida es cómo se mueve la
-aldea.** Apagarla sigue siendo `valley.life = 'off'` mientras el camino viejo
-exista, que es hasta que V-12 lo borre.
+`tools/graphics/shot.mjs` funciona **sin red**, con los navegadores instalados en
+la máquina, y pide WebGL por software (`--use-gl=swiftshader`). Playwright no
+puede descargar el suyo aquí.
 
-**V-09b cerró los trastos, y su lección es de método.** Se juega en las seis
-semillas —recibir un pase pasó a ser una reacción y no una elección, con cadenas
-de hasta cinco pases—, aunque a un tercio del ritmo del descarte (0,095 pases
-por persona contra 0,30) con la causa medida y sin tocar por la regla séptima.
-Lo que hay que recordar: el informe del agente concluyó que su propio trabajo no
-servía **porque midió el día 0**, y cada jornada tiene su propia semilla
-(`seedOfDay`). Remedido en diez jornadas, ninguna semilla estaba muerta.
-**En la capa de vida, un umbral no se fija con una jornada, igual que no se fija
-con una semilla.**
-
-**Siguiente: V-11** (lo que el motor manda) y después V-12 (borrar
-`actors/index.ts` y `life/spike/`, la mitad irreversible).
-
-**Lo que viene, con briefs para agentes, está en `docs/next-plan.md`**, y la
-hoja de ruta completa —los seis frentes que separan esto de un juego de móvil,
-por lo que pesan— en **`docs/roadmap.md`**. El primero de esos frentes no es
-gráfico ni de interfaz: el jugador toma entre siete y doce decisiones en
-cuarenta años y medio catálogo no sale nunca (`findings-drama.md` §2), y eso lo
-decide el dueño del diseño. Y ahora se puede mirar el juego montado sin red:
-`tools/graphics/shot.mjs`.
-
-**El diagnóstico de E.6 estaba equivocado, y esto es lo importante que hay que
-saber antes de tocar nada.** Decía que la aldea se pasaba el 74–81 % del día en
-tránsito y que «no es el número, es el modelo». Las dos mitades eran falsas: la
-cifra salía de una sola semilla, y para cuando se escribió ya se había dado la
-vuelta por un fallo. El arreglo del imán de V-06 repartió las plazas de cada
-oferta en corro **sin comprobar el suelo**, así que muchas caían en una pared o
-en el río; `decide` pedía ruta, no había, y devolvía nada sin probar otra
-oferta. Con la elección siendo determinista, al replantearse ganaba la misma
-oferta y volvía a no haber camino: la persona se quedaba clavada. Medido en ocho
-semillas, entre el 51 % y el 96 % del tiempo «sin nada que hacer» salía de ahí.
-
-Arreglado (`seatsOn` en `offers.ts`, y `decide` probando hasta cuatro ofertas),
-**la producción iguala al descarte**: 75 % del día andando contra su 74–76 %, y
-0 % sin nada que hacer. La lección de método, que es la que vale para la próxima
-vez: *se estuvo discutiendo el reparto de una aldea que estaba rota, con una
-cifra de una sola semilla.*
-
-**Abierto y sin resolver, para no volver a tantear a ciegas:**
-
-- **`resolve` nunca se había medido con la aldea moviéndose de verdad**, y
-  sigue sin estar resuelto. Medido hoy, jornada entera: de 827 234 y 686 135
-  parejas cercanas quedan 35 y 276 por debajo de 0,60 celdas, y 0 y 4 por debajo
-  de 0,55 (semillas 7 y 11). Es raro y leve, pero dejó de ser cero cuando la
-  aldea empezó a andar de verdad. **Dos intentos gastados, los dos medidos y los
-  dos peores:**
-    1. Exigir a cada plaza la holgura de `avoid`: se llevaba por delante el 27 %
-       de las plazas y la aldea se concentraba más.
-    2. Repartir el tope de `resolve` como presupuesto por cuerpo en vez de
-       recortarlo al final. Parecía el modelo correcto —el recorte deshace
-       separación ya hecha, que es feo— pero **mata de hambre las correcciones
-       siguientes**: quien gasta su tope en la primera pasada se queda encimado
-       con todos los demás. De 35 solapes a 162 en la semilla 7, y de 276 a
-       3 492 en la 11. Revertido.
-
-  Por la regla séptima de E.3, el tercer intento **no es otro número ni otra
-  variante de lo mismo**. Si alguien lo retoma: el recorte retroactivo funciona
-  mejor de lo que parece, y lo que falta entender es por qué.
-- **Lo que queda para parecerse al descarte, medido:** la producción pasa el
-  12 % del día en escena contra su 24–26 %, y no tiene trastos (V-09). Los
-  rechazos ya no son el problema —eran 2 a 3 por charla y ahora son 0,5, con las
-  charlas en el rango del descarte: 1,86 por persona contra 1,99.
-- **«No se desplazan como en la demo»: la mitad técnica, descartada** por V-07
-  con número (3 290 tramos, desajuste de orden 10⁻¹⁴ s). Queda la percepción — y
-  una cosa medida que no lo es: en el encuadre de reposo **una persona ocupa
-  seis píxeles**. A esa escala no se puede juzgar una charla. Quien enseñe la
-  demo, que se acerque.
-- **El descarte y la producción son dos códigos** (`life/spike/`, 1 715 líneas,
-  contra `life/*.ts`). V-09 **porta** del descarte lo que ya está medido; V-12
-  lo borra.
-
-## 6. La interfaz (U-01…U-09) — cerrada
-
-El encargo es que la demo se lea como un juego de móvil de verdad. **Las edades
-tecnológicas no existen en este motor y no se inventan**: lo que se celebra son
-hitos con fecha real, empezando por el primer edificio de cada clase (la primera
-capilla, la primera fragua, la primera casa de piedra), la muralla cerrada, un
-récord de población y las décadas.
-
-- **U-01 · la piel.** Paleta de pergamino y tinta en `index.html` como tokens,
-  una pila de serifa real para la voz del juego, la tira de la aldea como una
-  placa con filetes, y la velocidad como una regleta. **Ni una fuente de red**:
-  la demo se abre sin servidor detrás.
-- **U-02 · los hitos.** `src/ui/moment.ts` presenta la cartela y
-  `src/ui/milestones.ts` deriva qué merece celebrarse, de estado con fecha real:
-  el primer edificio de cada clase, un récord de población, las décadas, una obra
-  terminada. Una voz cada vez: cuando hay hito, el aviso de §11.6 se retira.
-- **U-03 · las tres pantallas.** Crónica, encrucijada y epitafio con los mismos
-  tokens, y la encrucijada subida: filete sobre el título, opciones como cartas,
-  el precio en versalitas porque es la mitad de la decisión.
-- **U-04 · el arranque.** Una frase, no un tutorial: la cartela de la fundación
-  al empezar partida nueva. `welcome.ts` **no** es esto: es el parte del letargo.
-- **U-05 · la barra de abajo.** Valley · Chronicle · People, siempre a la vista,
-  porque la crónica y la gente se abrían con gestos que nadie descubre. Es el
-  cambio que más acercó esto a un juego de móvil.
-- **U-06 · la cabecera reacciona.** La estación bajo el año, y las cuatro cifras
-  dan un pulso al cambiar — la clase se la quita la propia celda con
-  `animationend`, nunca un temporizador colgado del tick.
-- **U-07 · la decisión pendiente.** Era un punto rojo de catorce píxeles para lo
-  más importante que el juego tiene que pedirte; ahora es una píldora con su
-  texto.
-- **U-08 · la gente.** La lista de los nombrados vivos y su ficha, reusando
-  `panelFor`. Destapó que cinco oficios no tenían palabra en el banco y habrían
-  salido en pantalla como `[role.leader]`.
-- **U-09 · el sonido.** Ambiente y acentos, **todo sintetizado con Web Audio**:
-  ni un fichero de audio, +0,41 % de peso en la demo. Silencio hasta el primer
-  toque —que además es lo que el navegador exige— y un botón para apagarlo.
-
-**Y buena parte de «se ve muy pobre» no era la interfaz**, lo que conviene
-recordar antes de repintar nada: el valle abría pintado con la paleta de
-invierno (la mezcla devolvía la estación anterior entera en la semana cero, y el
-juego empieza en primavera semana cero) y estaba sobreexpuesto sin mapeo de
-tonos. Las dos cosas corregidas, y el efecto es mayor que el de toda la piel.
-
-Regla que gobierna todo esto y que es fácil romper sin darse cuenta: **§11.4
-prohíbe animar sobre el reloj del navegador** si un salto del reloj del juego
-puede pillar la animación a medias. La cartela y el aviso cumplen porque están o
-no están. Las motas de `moment.ts` son decorado que se retira solo y se apagan
-con `prefers-reduced-motion`.
-
-**Deudas que siguen en pie de antes** (los puntos 1–9 de arriba) más éstas:
-
-- **`ashore` bajó de 1,08 a 0,326 celdas (V-08), no a 0,06.** El defecto que
-  hacía saltar al rebaño una celda entera —repartir por la cara más cercana de
-  la propia celda, que cambia de bando de golpe— está arreglado: ahora busca
-  el punto de tierra más cercano de verdad en un entorno (`fauna.ts`,
-  `ashore`). Lo que queda es un empate más raro entre dos orillas de un recodo
-  ancho del río, y arreglarlo del todo pediría un A* por tierra en vez de
-  geometría de un punto — desproporcionado para una vía cosmética que
-  `life/beasts.ts` ya vuelve innecesaria en cuanto la bandera `valley.life` se
-  generaliza: un animal-`Dweller` no llega a pisar el agua porque colisiona con
-  ella, así que no necesita corrección ninguna. La prueba de G-10 tiene el
-  techo en 0,4.
-- **El río parte el valle y no se cruza**: sólo el 37 % del suelo libre está
-  conectado con el centro. No es un fallo, es el motor. Condiciona la caza y
-  los asentamientos que vengan: o el mapa gana un puente (motor) o van del
-  mismo lado. `reachableFrom` en `life/terrain.ts` es lo que hay.
-- **El balance del motor está peor que antes de v3.60–v3.61**: doce pruebas
-  rojas contra diez. La extinción prudente entró por fin en banda, pero la
-  distancia entre políticas cayó a cinco puntos y `smith_feud` se triplicó. Es
-  la contradicción de `findings-drama.md` §4–§6 medida, y la decide el dueño
-  del diseño: o los rencores sanan más rápido, o la prueba de elegibilidad
-  mide salidas en vez de ticks elegibles.
-- **El cuenco es decorado**, no relieve. El valle sigue plano por dentro y una
-  roca rodando sigue sin tener dónde. V-15 y V-16 van juntas, después de la
-  vida, y son una ronda de motor con `SCHEMA_VERSION` a 4.
-- **Afinar el tick a día no arregla el desfase con la jornada** (sería 56 pasos
-  por jornada en vez de 8) y su coste está medido constante a constante en
-  `docs/brief-reloj.md`. Si se hace, que sea por simulación y no por dibujo.
+**Antes de publicar recursos nuevos:** `npm run assets:publish` copia lo aprobado
+a `public/assets/valley3d/` con manifiesto y hash. Un candidato sin promoción no
+llega al juego — y desde v3.66 el service worker precachea lo que ese manifiesto
+nombre, así que añadir un modelo cuesta descarga en la instalación.
