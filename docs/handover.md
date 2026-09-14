@@ -313,39 +313,82 @@ construyendo una capa de agentes con paso fijo (`src/render3d/life/`) que lo
 da sin escribir en el motor. **Todo lo normativo está en `docs/design.md`,
 Anexo E.** Esto es sólo el estado.
 
-**Hecho (v3.59–v3.64):** V-00 el descarte, V-01 reloj, V-02 cuerpos y rejilla,
-V-03 navegación, V-04 impulsos, V-05 ofertas, V-06 elección y la aldea entera
-ensamblada dentro del juego detrás de `valley.life`; V-14 el cuenco. 1 873
-líneas de producción, 60 pruebas propias en la suite rápida (1 068 en total, en
-verde). Informes con lo medido en `docs/life-rounds/`.
+**Hecho (v3.59–v3.65):** V-00 el descarte, V-01 reloj, V-02 cuerpos y rejilla,
+V-03 navegación, V-04 impulsos, V-05 ofertas, V-06 elección, **V-07 escenas de
+dos, V-08 los animales como agentes, V-10 los sitios comunes, V-13 la medida**;
+V-14 el cuenco. Todo dentro del juego detrás de `valley.life`. Informes con lo
+medido en `docs/life-rounds/`, más `sonda-linea-base.md` con ocho semillas.
 
-**Siguiente: V-07, escenas de dos.** Y es la que decide: tras ella se vuelve a
-enseñar en el juego y sólo entonces se juzga lo demás.
+**Siguiente: V-09, los trastos.** Es lo que más falta para parecerse al
+descarte: allí los pases de pelota y los golpes son 0,56 por persona y jornada,
+y aquí no existen.
 
-**Lo que el dueño del diseño ve hoy, y por qué.** Vio la aldea viva dentro del
-juego y dijo que parece rota comparada con el descarte —«se quedan pillados,
-dando vueltas, no se chocan, tienen como un imán; no interactúan con los
-objetos»—. Tres de esas cosas eran fallos y están arreglados con sus números
-(E.7). La cuarta no es un fallo: **faltan V-07 y V-09**, que son las charlas,
-los empujones y los trastos, o sea todo lo que hacía que el descarte pareciera
-vivo. Se enseñó lo vistoso, se construyó lo invisible durante seis fases sin
-volver a enseñar nada, y la primera demo tras ellas fue una regresión desde el
-asiento del que mira. Está escrito en E.6 con la regla que sale de ahí: cada
-fase que cambie lo que se ve, se enseña antes de cerrar la siguiente.
+**El diagnóstico de E.6 estaba equivocado, y esto es lo importante que hay que
+saber antes de tocar nada.** Decía que la aldea se pasaba el 74–81 % del día en
+tránsito y que «no es el número, es el modelo». Las dos mitades eran falsas: la
+cifra salía de una sola semilla, y para cuando se escribió ya se había dado la
+vuelta por un fallo. El arreglo del imán de V-06 repartió las plazas de cada
+oferta en corro **sin comprobar el suelo**, así que muchas caían en una pared o
+en el río; `decide` pedía ruta, no había, y devolvía nada sin probar otra
+oferta. Con la elección siendo determinista, al replantearse ganaba la misma
+oferta y volvía a no haber camino: la persona se quedaba clavada. Medido en ocho
+semillas, entre el 51 % y el 96 % del tiempo «sin nada que hacer» salía de ahí.
+
+Arreglado (`seatsOn` en `offers.ts`, y `decide` probando hasta cuatro ofertas),
+**la producción iguala al descarte**: 75 % del día andando contra su 74–76 %, y
+0 % sin nada que hacer. La lección de método, que es la que vale para la próxima
+vez: *se estuvo discutiendo el reparto de una aldea que estaba rota, con una
+cifra de una sola semilla.*
 
 **Abierto y sin resolver, para no volver a tantear a ciegas:**
 
-- **El reparto entre andar y hacer**: 74–81 % del tiempo en tránsito, tras
-  cuatro ajustes que no lo bajaron. Por la regla séptima de E.3 no es el número,
-  es el modelo. La hipótesis (E.6) es que el tránsito con interrupciones se lee
-  como vida y sin ellas como hormigas: se comprueba haciendo V-07, no moviendo
-  otra constante.
-- **«No se desplazan como en la demo»**: sin poder verlo, no se sabe si es
-  percepción o un fallo del clip en `life/cast.ts`. V-07 lo comprueba primero,
-  con prueba.
+- **`resolve` nunca se había medido con la aldea moviéndose de verdad.** Ahora
+  que anda el triple, dos cuerpos se meten el uno en el otro unas veintiocho
+  veces por jornada (de 916 091 parejas cercanas), donde antes eran cero. Es
+  leve y raro —lo peor medido, 0,509 celdas contra los 0,64 de dos radios— pero
+  dejó de ser cero. Se intentó exigiendo a cada plaza la holgura de `avoid` y
+  **salió peor**: se llevaba por delante el 27 % de las plazas y la aldea se
+  concentraba más. Van dos intentos, así que por la regla séptima de E.3 el
+  tercero no es otro número: es mirar `resolve` con este tráfico.
+- **Lo que queda para parecerse al descarte, medido:** la producción pasa el
+  12 % del día en escena contra su 24–26 %, y no tiene trastos (V-09). Los
+  rechazos ya no son el problema —eran 2 a 3 por charla y ahora son 0,5, con las
+  charlas en el rango del descarte: 1,86 por persona contra 1,99.
+- **«No se desplazan como en la demo»: la mitad técnica, descartada** por V-07
+  con número (3 290 tramos, desajuste de orden 10⁻¹⁴ s). Queda la percepción — y
+  una cosa medida que no lo es: en el encuadre de reposo **una persona ocupa
+  seis píxeles**. A esa escala no se puede juzgar una charla. Quien enseñe la
+  demo, que se acerque.
 - **El descarte y la producción son dos códigos** (`life/spike/`, 1 715 líneas,
-  contra `life/*.ts`). V-07 y V-09 **portan** del descarte lo que ya está
-  medido; V-12 lo borra.
+  contra `life/*.ts`). V-09 **porta** del descarte lo que ya está medido; V-12
+  lo borra.
+
+## 6. La interfaz (U-01…U-04) — en marcha
+
+El encargo es que la demo se lea como un juego de móvil de verdad. **Las edades
+tecnológicas no existen en este motor y no se inventan**: lo que se celebra son
+hitos con fecha real, empezando por el primer edificio de cada clase (la primera
+capilla, la primera fragua, la primera casa de piedra), la muralla cerrada, un
+récord de población y las décadas.
+
+- **U-01, hecha.** Paleta de pergamino y tinta en `index.html` como tokens, una
+  pila de serifa real para la voz del juego, la tira de la aldea como una placa
+  con filetes en vez de cuatro insignias, y la velocidad como una regleta. **Ni
+  una fuente de red**: la demo se abre sin servidor detrás.
+- **U-02, a medias.** `src/ui/moment.ts` presenta la cartela de un hito y está
+  listo; falta engancharlo a la derivación de qué merece celebrarse.
+- **U-03, hecha.** Crónica, encrucijada y epitafio con los mismos tokens, y la
+  encrucijada subida: filete sobre el título, opciones como cartas, el precio en
+  versalitas porque es la mitad de la decisión.
+- **U-04, pendiente.** El arranque: que los primeros veinte segundos expliquen
+  el juego sin un tutorial. `welcome.ts` **no** es esto: es el parte del
+  letargo.
+
+Regla que gobierna todo esto y que es fácil romper sin darse cuenta: **§11.4
+prohíbe animar sobre el reloj del navegador** si un salto del reloj del juego
+puede pillar la animación a medias. La cartela y el aviso cumplen porque están o
+no están. Las motas de `moment.ts` son decorado que se retira solo y se apagan
+con `prefers-reduced-motion`.
 
 **Deudas que siguen en pie de antes** (los puntos 1–9 de arriba) más éstas:
 
