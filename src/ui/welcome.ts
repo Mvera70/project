@@ -12,14 +12,25 @@ import { recogniseGesture, type Point } from './gestures';
 
 const STYLE_ID = 'valley-welcome-style';
 const STYLE = `
+/* U-01 · la misma piel que el resto: el parte del letargo es una página de la
+   crónica puesta al día, no un cuadro de diálogo. */
 .welcome-scrim { position: fixed; inset: 0; z-index: 11; display: flex; align-items: flex-end;
-  background: #12110e; color: #f2f4f6; font: 14px/1.4 system-ui, sans-serif; }
+  background: var(--night, #1a1511); color: var(--parchment, #f2e9d8);
+  font: 14px/1.45 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
 .welcome { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
   padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom)); }
-.welcome h1 { margin: 0 0 14px; font: 600 20px/1.2 Georgia, serif; }
-.welcome p { margin: 6px 0; color: #d7dadd; }
-.welcome p.welcome-headline { color: #f2f4f6; font-weight: 600; }
-.welcome p.welcome-count { color: #c9b46b; margin-top: 14px; }
+.welcome h1 { margin: 0 0 14px; padding-top: 13px; text-wrap: balance;
+  border-top: 2px solid var(--gild-lit, #c9ab6b); color: var(--parchment, #f2e9d8);
+  font: 600 21px/1.18 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
+.welcome p { margin: 7px 0; color: var(--paper-dim, #d9cfbc); text-wrap: pretty;
+  font: 15px/1.5 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
+.welcome p.welcome-headline { color: var(--parchment, #f2e9d8); font-weight: 600; }
+/* Las cifras no son crónica: van en la letra llana y separadas por un filete. */
+.welcome p.welcome-count { margin-top: 16px; padding-top: 12px;
+  border-top: 1px solid rgba(201,171,107,.3); color: var(--gild-lit, #c9ab6b);
+  font: 13px/1.45 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
+  font-variant-numeric: tabular-nums; }
+.welcome p.welcome-count ~ p.welcome-count { margin-top: 2px; padding-top: 0; border-top: 0; }
 `;
 
 function ensureStyle(): void {
