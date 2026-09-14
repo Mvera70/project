@@ -350,10 +350,19 @@ export function settle(props: Prop[], land: Terrain, seconds: number): void {
 // Coger, soltar, tirar.
 // ---------------------------------------------------------------------------
 
-/** A la altura de la mano, un poco por delante. Ported de spike (rama `held`
- *  del paso 7b: `hand.x + sin(facing)*0.38`, `y = 0.72`). */
+/**
+ * A la altura de la mano, un poco por delante.
+ *
+ * **Portado de spike y rescalado, que es lo que faltaba.** Allí la altura era
+ * 0,72 y el cuerpo del banco medía 1,05 de alto (`spike/bench.ts`, la cápsula
+ * del aldeano), así que la mano caía al 69 % de la persona, que es donde está
+ * una mano. Aquí el aldeano del catálogo mide **0,65 celdas** (D.6.2), así que
+ * copiar el 0,72 tal cual ponía el trasto **por encima de su cabeza**: un cubo
+ * flotando dos palmos sobre el sombrero. El número se porta conservando la
+ * proporción, no la cifra — 0,69 de 0,65.
+ */
 const HAND_FORWARD = 0.38;
-const HAND_HEIGHT = 0.72;
+const HAND_HEIGHT = 0.45;
 
 /**
  * Pone el trasto en la mano de quien lo lleva, a la altura del pecho.
@@ -416,10 +425,14 @@ export function drop(prop: Prop, by: Dweller, land: Terrain): void {
   prop.z = spot.z;
 }
 
-/** Un poco por delante de la mano, a la altura de un pase. Ported de spike
- *  (`fling`: `from.x + sin(facing)*0.4`, `y = 0.85`). */
+/**
+ * Un poco por delante de la mano, a la altura de un pase. Ported de spike
+ * (`fling`), **rescalado por la misma razón que `HAND_HEIGHT`**: allí 0,85
+ * sobre un cuerpo de 1,05 es el 81 % de la persona —a la altura del pecho, que
+ * es desde donde se tira— y aquí el aldeano mide 0,65.
+ */
 const THROW_FORWARD = 0.4;
-const THROW_HEIGHT = 0.85;
+const THROW_HEIGHT = 0.53;
 
 /** Lo lejos que se tira una pelota, y lo alto que va. Ported de spike
  *  (`THROW`, `LOFT`). */
