@@ -166,3 +166,60 @@ pasa para siempre.
 La segunda es probablemente la correcta, porque la prueba existe para vigilar la
 variedad del catálogo y hoy castiga algo distinto: que el mundo tenga estados
 duraderos. Pero es §12.9 y la toca el dueño del diseño.
+
+---
+
+## 5. Lo que pasó al dar cerebro a todos (14 sep 2026, v3.61)
+
+Pasada completa de `npm run test:balance` con el carácter repartido a los
+ochenta vecinos y los cuatro rasgos muertos decidiendo. **Doce pruebas en rojo
+contra las diez de la línea base**, y el detalle importa más que la cuenta:
+
+| Prueba de §12.9 | Pide | Base | v3.61 | |
+|---|---|---|---|---|
+| Extinción jugando `prudent` | 2 % – 12 % | 1,7 % | **6,67 %** | ✅ arreglada |
+| Extinción jugando `worst` | ≥ 25 % | 11,7 % | 11,7 % | = |
+| Distancia entre las dos | ≥ 20 pts | 10,0 | **5,0** | ✗ peor |
+| `smith_feud` elegible | < 1 % | 1,56 % | **5,30 %** | ✗ mucho peor |
+| `quiet_years` sale alguna vez | sí | sí | **nunca** | ✗ nuevo |
+
+**Lo que se arregló de verdad:** la extinción jugando bien estaba *por debajo*
+del suelo del diseño —una aldea prudente casi no moría— y ahora cae dentro de la
+banda. El valle es más duro, y lo es porque la gente tiene carácter: el cobarde
+se marcha cuando debe, el hambre enemista, y una aldea rota por dentro aguanta
+menos.
+
+**Lo que empeoró, y por qué era previsible.** La distancia entre jugar bien y
+jugar mal se ha reducido a la mitad, pero no porque jugar mal salga más barato:
+`worst` está clavada en 11,7 %. Es que **jugar bien salió más caro**. El carácter
+castiga a las dos políticas por igual, y esta prueba no mide dureza: mide
+*discriminación*. Subir el suelo sin subir el techo la acerca.
+
+Y `smith_feud` al 5,3 % es exactamente la contradicción del apartado 4, ahora
+medida en vez de deducida: había un 1,56 % de elegibilidad **sin que existiera un
+solo rencor** —le llegaba por el flag `feud_ripe`—, y en cuanto los rencores
+existen se triplica. Un rencor abierto dura doce años y medio; un techo del 1 %
+sobre una partida de doscientos años no cabe con eso de ninguna manera.
+
+`quiet_years` es la cara amable del mismo hecho: es la reserva que sale cuando
+no hay nada más elegible, y ya nunca hace falta.
+
+## 6. Y por tanto
+
+El cerebro está bien y el balance está peor. Las dos cosas son ciertas y no se
+arreglan la una a la otra, porque **lo que falla no es el coeficiente sino dos
+pruebas que miden lo que ya no es**:
+
+1. **La de elegibilidad** castiga que el mundo tenga estados duraderos, cuando lo
+   que quería vigilar es que una plantilla no domine el reparto. Medir cuántas
+   veces **sale** en lugar de cuántas **podría salir** la devolvería a su
+   propósito sin tocar el motor.
+2. **La de distancia** pide veinte puntos entre políticas y hoy hay cinco. Eso no
+   se arregla con carácter, porque el carácter no sabe si el jugador está
+   jugando bien: hace falta que **las decisiones malas cuesten más**, que es
+   balance del catálogo y de §12.
+
+Mover `NEIGHBOUR.FRICTION` o `CHARACTER.AMBITIOUS_PASSED_OVER` hacia abajo
+devolvería los números viejos y con ellos el valle sin rencores del apartado 1.
+No es un cambio pendiente: es la decisión de qué se quiere, y la toma el dueño
+del diseño.
