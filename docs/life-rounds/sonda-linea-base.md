@@ -2,7 +2,13 @@
 
 **Ejecución:** 14 sep 2026 · **Semillas:** 7, 11, 23, 31, 37, 41, 13, 25
 
-Se ejecutó `tools/graphics/probe-models.ts` en ocho semillas para medir la producción contra el descarte, usando la misma aldea simulada (80 personas en el juego, 36×56 celdas). Las ocho completaron sin error. La semilla 25 produce una aldea muy pequeña (17 personas) y la 31 algo pequeña (31), lo que explica varios de los extremos en la tabla.
+Se ejecutó `tools/graphics/probe-models.ts` en ocho semillas para medir la
+producción contra el descarte. Cada semilla funda una partida y le corre
+cuarenta años de motor antes de soltar a la gente, así que **la aldea no es la
+misma en las ocho**: la población es salida de la demografía, no un parámetro,
+y va de 17 a 80 personas. Las ocho completaron sin error. La semilla 25 produce
+una aldea muy pequeña (17) y la 31 algo pequeña (31), lo que explica varios de
+los extremos de la tabla.
 
 ## Producción (life/village.ts)
 
@@ -70,15 +76,50 @@ Cada semilla recopila cuándo alguien no puede hacer su tarea propuesta y regist
 
 **Estables (convergen a rango estrecho):**
 
-- **Reparto del día en producción**: El porcentaje de «alguien a <1,9» oscila entre 79% y 98%, mediana 94.5%. Las otras tres categorías (escena, ocio, trabajo) tienen variación media.
+- **Tener a alguien al lado, en producción**: el porcentaje del tiempo con
+  alguien a menos de 1,9 celdas oscila entre 79 % y 98 %, mediana 94,5 %. Y las
+  dos semillas que bajan de 80 % son justo las dos aldeas pequeñas (25 y 31):
+  en las seis aldeas de tamaño normal no baja del 89 %.
 - **Vecino más cerca en ambos modelos**: En producción 0,86–1,33 celdas (mediana 0,92), en descarte 0,79–1,09 (mediana 0,92). Casi idéntico entre modelos, aunque el descarte anda más y debería crear más densidad local — las ocho semillas coinciden en que la proximidad media es prácticamente la misma.
 - **Chat por persona**: Producción 0,55–1,13 (mediana 1,00), descarte 1,99–2,60 (mediana 2,34). Estable dentro de su modelo.
 
 **Muy inestables (ancho rango):**
 
-- **Número de personas**: Oscila entre 17 y 80 según semilla. No es un parámetro de entrada, sino salida de la demografía del motor en cien años.
+- **Número de personas**: Oscila entre 17 y 80 según semilla. No es un parámetro de entrada, sino salida de la demografía del motor en cuarenta años.
 - **Viajes por persona en producción**: 2,3–10,3 (mediana 4,1). Seis semillas entre 2,7 y 4,2, luego saltos a 7,8 y 10,3 (semillas 25, 31).
 - **Viajes por persona en descarte**: 20,1–139,7 (mediana 52,95). Extrema variación, de ahí que no haya un único «descarte de referencia»; el rango es más que la mediana.
 - **Gente a menos de 6 celdas, con 17 personas (semilla 25)**: 7,66 personas de media, contra 16,07–37,75 en las demás. Tamaño de la aldea manda.
 
 **Resumen**: Las métricas de proximidad y encuentros por tipo son robustas entre semillas (chat, rechazo, empujón, pelea varían menos del doble de una punta a la otra). El comportamiento diario en producción es coherente (94–98% del tiempo con alguien cercano, viajes cortos). El descarte anda un orden de magnitud más, lo que espera del modelo; los encuentros ascienden en proporción, pero el rango de viajes es tan ancho que no hay un comportamiento «típico» único — la semilla 31 viaja ciento doce veces por persona al día, la 11 apenas veinte.
+
+## Lo que estas ocho semillas cambian de lo que se creía
+
+**El bug de las plazas es de todas, no de la semilla 7.** La línea de «sin nada
+que hacer» de **las ocho** semillas está dominada por `sin-camino (…,
+plaza-en-pared/agua, …)`: entre el 51 % y el 96 % de ese tiempo, según semilla.
+No hay una sola en la que la causa principal sea otra. Era la duda que
+justificaba medir ocho: contestada, y en contra del beneficio de la duda.
+
+**Y corrige por cuánto.** El diagnóstico se escribió con la semilla 7 —«el 60 %
+del día parada, el 26 % andando»— y la semilla 7 resulta ser de las peores del
+lote. Las medianas de las ocho:
+
+| | Semilla 7 sola | Mediana de ocho | Descarte |
+|---|---|---|---|
+| Sin nada que hacer | 33 % | **24 %** | 0 % |
+| Plantado en una oferta | 27 % | **23 %** | — |
+| Andando | 26 % | **40 %** | 74 % |
+| En escena | 14 % | **13 %** | 26 % |
+
+La dirección se sostiene y el bug sigue siendo el bug —24 % del día sin nada que
+hacer contra el 0 % del descarte no se explica de otra manera—, pero la aldea
+está parada el 47 % del día, no el 60 %. La diferencia entre una cifra y la otra
+es exactamente lo que `CLAUDE.md` quiere decir con que una sola semilla es ruido.
+
+*Auditoría: la fila de la semilla 7 de las dos tablas coincide dígito a dígito
+con una medición independiente hecha antes de encargar esto, y el commit no toca
+una línea de código. Se corrigieron tres afirmaciones que no salían de ninguna
+medición: que las ocho aldeas tenían 80 personas y 36×56 celdas (son de 17 a 80,
+y ése era el mapa de la semilla 7), que el motor corre cien años antes de medir
+(son cuarenta), y un epígrafe que llamaba «reparto del día» a una métrica de
+proximidad.*
