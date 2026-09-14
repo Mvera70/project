@@ -254,9 +254,22 @@ queda del bosque original*; el valle nace con un 24 % de bosque, así que el
 umbral está por encima del máximo posible. No es una plantilla rara: es una
 plantilla muerta, y lleva así desde que se escribió.
 
-**2. `tithe_demand` cuelga de una cadena rota.** Exige la bandera `vassal`, que
-falla el **100 %** de los ticks porque nada la pone nunca. Hay que ver qué
-debía ponerla.
+**2. `tithe_demand` NO cuelga de una cadena rota — esto estaba mal escrito.**
+La primera versión de esta sección decía que la bandera `vassal` no la pone
+nada. Es falso, y lo encontró quien fue a arreglarlo: la opción `kneel` de
+`winter_grain_debt` la pone (`catalog/lord.ts`), y se comprobó disparando esa
+opción a mano — `state.flags.vassal` queda puesta y permanente.
+
+Lo que pasa es otra cosa: `winter_grain_debt` es elegible el **0,2 %** de los
+ticks (pide `grainToHarvest < 0.9` en pleno invierno) y sólo una de sus tres
+opciones se arrodilla. La cadena existe y funciona; lo que casi nunca ocurre es
+el primer eslabón. No es un fallo, es el mismo problema de ritmo del resto.
+
+**La lección del error, que vale más que el dato:** la sonda mide que una
+condición no se cumple nunca, y de ahí no se sigue que el mecanismo esté roto.
+«Nadie pone esta bandera» y «nadie llega a la encrucijada que la pone» se ven
+igual desde fuera y se arreglan de maneras opuestas. Antes de llamar rota a una
+cadena, hay que abrir el código que debería recorrerla.
 
 **3. `quiet_years`, que es el `FALLBACK_ID`, no se plantea ni una vez.** El
 recurso para cuando no hay nada que contar no llega a usarse: exige
@@ -272,8 +285,19 @@ imposible para que el catálogo se quede en dos plantillas repitiéndose.
 
 ### Qué decidir, y no se decide aquí
 
-- Los dos fallos (1 y 2) se arreglan sin tocar diseño: el umbral de
-  `forestLeft` y la cadena de `vassal`.
+- **Sólo había un fallo, no dos**, y arreglarlo no es gratis. `wolf_winter` sí
+  es imposible y el umbral hay que bajarlo (a 0,15, que es exactamente la misma
+  errata que `forest_cut` tuvo con su 0,3 y se corrigió así en v2.47). Pero
+  hacerlo elegible mete veintiuna encrucijadas nuevas en la ventana medida, y
+  **eso cambia la trayectoria de cada partida**: otras decisiones, otra
+  población, otro valle. Medido: trece pruebas calibradas sobre semillas
+  concretas pasan a fallar — no por ruido, comprobado con y sin el cambio en los
+  mismos ficheros seguidos.
+
+  Así que el arreglo es correcto y **cuesta una ronda de recalibrado**, no un
+  commit. Está hecho y esperando en la rama `worktree-agent-afdfba3b92d4bb7ee`.
+  Es lo primero que hay que retomar, y confirma con número lo que la decisión de
+  ritmo ya avisaba: tocar la elegibilidad mueve el balance entero.
 - Lo otro es la pregunta de `docs/roadmap.md` §1: **¿cada cuánto quiere el juego
   que decidas?** Hoy son tres veces por década y dos de cada cuatro son la misma
   plantilla. Relajar las estaciones, bajar umbrales o añadir plantillas ligeras
