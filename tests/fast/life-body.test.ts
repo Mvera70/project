@@ -9,12 +9,13 @@ import { describe, expect, it } from 'vitest';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { TERRAIN_CODE, type GameState } from '@engine/state';
+import type { GameState } from '@engine/state';
 import { hash32 } from '@engine/rng';
 import {
   blockedAt, gap, integrate, turnTo, type Body, type Terrain,
 } from '../../src/render3d/life/body';
 import { createNeighbourhood } from '../../src/render3d/life/grid';
+import { terrainOf } from '../../src/render3d/life/terrain';
 import { avoid, drive, resolve, seek, separate } from '../../src/render3d/life/steering';
 import { LIFE_STEP } from '../../src/render3d/life/clock';
 
@@ -31,22 +32,7 @@ function meadow(width = 24, height = 24): Terrain {
 function valley(seed: number, years = 40): { land: Terrain; state: GameState } {
   const state = foundGame(seed);
   run(state, years * 48, 'prudent', CATALOG);
-  const { width, height } = state.map;
-  const blocked = new Uint8Array(width * height);
-  for (let c = 0; c < state.map.terrain.length; c += 1) {
-    const kind = state.map.terrain[c];
-    if (kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.rock) blocked[c] = 1;
-  }
-  const WALLED = new Set(['house', 'stone_house', 'granary', 'chapel', 'church', 'smithy', 'mill']);
-  for (const building of state.buildings) {
-    if (building.lostTick !== null || !WALLED.has(building.kind)) continue;
-    for (let z = building.y; z < building.y + building.h; z += 1) {
-      for (let x = building.x; x < building.x + building.w; x += 1) {
-        if (x >= 0 && z >= 0 && x < width && z < height) blocked[z * width + x] = 1;
-      }
-    }
-  }
-  return { land: { width, height, blocked }, state };
+  return { land: terrainOf(state), state };
 }
 
 /**
