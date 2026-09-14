@@ -11,6 +11,7 @@
 
 import {
   Color, DirectionalLight, Fog, Group, HemisphereLight, PCFSoftShadowMap,
+  ACESFilmicToneMapping,
   Raycaster, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer, type Mesh, type Object3D,
 } from 'three';
 import { ford } from '@engine/sim';
@@ -111,11 +112,40 @@ const CORE_SHARE = 0.8;
  */
 const RIDGE_REACH = 14;
 
+/**
+ * La exposición con la que se revela el valle.
+ *
+ * TUNE: 0,62. La escena estaba iluminada para un recorte duro —4,1 de luz
+ * combinada a mediodía— así que al poner ACES hay que bajar la exposición o el
+ * blanco vuelve por otra puerta. Con esto el prado de primavera llega a
+ * pantalla como verde y la noche sigue leyéndose.
+ */
+const TONE_EXPOSURE = 0.62;
+
+
 export async function createGraphicsRenderer(
   options: GraphicsRendererOptions,
 ): Promise<GraphicsRenderer> {
   const renderer = new WebGLRenderer({ canvas: options.canvas, antialias: options.quality !== 'low' });
   renderer.outputColorSpace = SRGBColorSpace;
+  // **El valle estaba sobreexpuesto, y era la causa de que se viera lavado.**
+  //
+  // Sin mapeo de tonos, Three recorta en seco todo lo que pase de 1,0. A
+  // mediodía el sol vale 2,60 y el cielo 1,50 (`effects/daylight.ts`): 4,1 de
+  // luz combinada. Un prado de primavera —`#96b562`, que es verde de verdad en
+  // la paleta de §10.3— multiplicado por eso se sale de rango en los tres
+  // canales y llega a pantalla como blanco roto. Sólo sobrevivían las cosas
+  // oscuras: las copas de los árboles y los tejados. Medido mirando: el suelo
+  // del valle, que es la mayor superficie de la pantalla, salía casi blanco en
+  // todas las capturas desde G-06, y con él se perdía el desgaste del camino,
+  // el relieve de la orilla y la diferencia entre prado y campo.
+  //
+  // ACES comprime las altas luces en vez de cortarlas, así que el mismo sol
+  // deja de quemar y el verde llega. La exposición se compensa hacia abajo
+  // porque la escena estaba iluminada para un recorte duro: subirla devolvería
+  // el problema por otra puerta.
+  renderer.toneMapping = ACESFilmicToneMapping;
+  renderer.toneMappingExposure = TONE_EXPOSURE;
   renderer.shadowMap.enabled = options.quality !== 'low';
   renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(new Color(VALLEY_COLOURS.sky));

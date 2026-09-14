@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { TIME } from '@engine/balance';
 import type { Season, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import { cellFor } from '@render/canvas';
@@ -24,14 +25,40 @@ describe('M-16 · paletas', () => {
     }
   });
 
-  it('entra en cada estación sin un corte de color', () => {
+  it('cada estación lleva su propio color desde el primer día', () => {
+    // **Esta prueba decía lo contrario y por eso el fallo duró tanto.** Exigía
+    // `paletteFor(season, 0) === paletteFor(anterior)`, o sea que la primera
+    // semana de cada estación llevara la estación anterior entera. Comprobaba
+    // que no hubiera corte y de paso convertía en requisito que el valle
+    // mintiera sobre en qué estación está. Como la partida empieza en primavera
+    // semana cero, **todo juego nuevo abría pintado de invierno** —prado
+    // `#d9dde0`, el gris de la nieve— durante dos semanas, que a quince
+    // segundos por semana son los primeros treinta segundos de cada partida y
+    // de cada captura.
     const order: Season[] = ['spring', 'summer', 'autumn', 'winter'];
+    for (const season of order) {
+      expect(paletteFor(season, 0), `${season} no empieza siendo ${season}`)
+        .toEqual(PALETTES[season]);
+    }
+  });
+
+  it('y se deshiela hacia la siguiente sin un corte de color', () => {
+    // La propiedad que la prueba anterior quería proteger, escrita de forma que
+    // no obligue a mentir: la transición existe, va al final de la estación, y
+    // la costura entre dos estaciones no salta — la última semana de una es ya
+    // exactamente la paleta con la que empieza la siguiente.
+    const order: Season[] = ['spring', 'summer', 'autumn', 'winter'];
+    const last = TIME.WEEKS_PER_SEASON - 1;
     order.forEach((season, index) => {
-      const previous = PALETTES[order[(index + 3) % 4] as Season];
-      expect(paletteFor(season, 0)).toEqual(previous);
-      expect(paletteFor(season, 2)).toEqual(PALETTES[season]);
-      expect(paletteFor(season, 1)).not.toEqual(previous);
-      expect(paletteFor(season, 1)).not.toEqual(PALETTES[season]);
+      const following = order[(index + 1) % 4] as Season;
+      expect(paletteFor(season, last), `la costura ${season}→${following} salta`)
+        .toEqual(paletteFor(following, 0));
+      // Y hay deshielo de verdad: la penúltima no es ni una cosa ni la otra.
+      expect(paletteFor(season, last - 1)).not.toEqual(PALETTES[season]);
+      expect(paletteFor(season, last - 1)).not.toEqual(PALETTES[following]);
+      // Que no se convierta en un degradado de toda la estación: diez de las
+      // doce semanas son la estación misma.
+      expect(paletteFor(season, last - 3)).toEqual(PALETTES[season]);
     });
   });
 

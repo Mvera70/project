@@ -87,13 +87,21 @@ describe('G-08 · las estaciones', () => {
     expect(different).toBe(checked);
   });
 
-  it('la estación nueva crece de la vieja durante dos semanas', () => {
+  it('la estación se deshiela hacia la siguiente durante sus dos últimas semanas', () => {
     // §10.3. Un cambio de golpe se lee como un fallo de dibujo; el degradado se
     // lee como que ha pasado el tiempo.
-    const winter = paletteFor('winter', 0);
-    const settled = paletteFor('winter', 6);
-    expect(winter.meadow).not.toBe(settled.meadow);
-    expect(paletteFor('winter', 2).meadow).toBe(settled.meadow);
+    //
+    // **El degradado iba al principio y se ha movido al final** (ver
+    // `render.test.ts`, «cada estación lleva su propio color desde el primer
+    // día»): al principio obligaba a que la primera semana de cada estación
+    // llevara la anterior entera, y como la partida arranca en primavera semana
+    // cero, todo juego nuevo abría pintado de invierno.
+    const settled = paletteFor('winter', 0);
+    const thawing = paletteFor('winter', TIME.WEEKS_PER_SEASON - 1);
+    expect(settled.meadow, 'el invierno empieza siendo invierno').toBe(PALETTES.winter.meadow);
+    expect(thawing.meadow, 'y acaba habiéndose vuelto primavera').not.toBe(settled.meadow);
+    expect(paletteFor('winter', TIME.WEEKS_PER_SEASON - 4).meadow,
+      'sin degradar la estación entera').toBe(settled.meadow);
   });
 
   it('mirar el valle no lo cambia, en ninguna estación', () => {
