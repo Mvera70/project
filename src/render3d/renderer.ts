@@ -38,7 +38,8 @@ import { Cast } from './world/cast';
 import { dayNumber, dayPhase } from './presentation-clock';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
-import { castOf } from './life/cast';
+import { castOf, propsOf } from './life/cast';
+import { Props } from './world/props';
 import { LIFE_STEP } from './life/clock';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
@@ -238,7 +239,8 @@ export async function createGraphicsRenderer(
   const tells = new Tells();
   const fauna = new Fauna((kind) => library.instance(kind));
   const bubbles = new Bubbles();
-  world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group);
+  const props = new Props();
+  world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -478,6 +480,7 @@ export async function createGraphicsRenderer(
         tells.clear();
         fauna.clear();
         bubbles.clear();
+        props.clear();
       }
       if (change.ground || change.cleared) rebuildGround(shown);
       for (const id of change.removed) village.remove(id);
@@ -511,8 +514,14 @@ export async function createGraphicsRenderer(
           if (villager.named) named.add(villager.id);
         }
         lastActors = castOf(life, frame.presentationSeconds, ages, named);
+        // V-09b: la pelota, el palo, el cubo, el haz de leña — sólo existen en
+        // la capa de vida, así que sólo se pintan detrás de esta bandera.
+        props.update(propsOf(life), groundFloor);
       } else {
         lastActors = actorsFor(shown, frame, { tracked, memory });
+        // Sin la capa de vida no hay trastos que pintar: si la bandera se
+        // apagara a media partida, no se quedaría uno flotando del día anterior.
+        if (props.count > 0) props.clear();
       }
       cast.show(lastActors);
 
@@ -622,6 +631,7 @@ export async function createGraphicsRenderer(
       tells.dispose();
       fauna.dispose();
       bubbles.dispose();
+      props.dispose();
       cast.dispose();
       village.dispose();
       if (ground !== null) {

@@ -80,7 +80,7 @@ describe('V-09 · trastos', () => {
 
   it('take() no deja coger un trasto que ya lleva otro', () => {
     const prop: Prop = {
-      id: 1, kind: 'ball', x: 5, z: 5, y: 0, vx: 0, vz: 0, vy: 0, held: 42, restUntil: 0,
+      id: 1, kind: 'ball', x: 5, z: 5, y: 0, vx: 0, vz: 0, vy: 0, held: 42, restUntil: 0, for: null,
     };
     const other = fakeDweller(7, 5, 5);
     const ok = take(prop, other);
@@ -141,7 +141,7 @@ describe('V-09 · trastos', () => {
     expect(blockedAt(land, bx, bz), 'el punto de partida no estaba en un bloqueo').toBe(true);
 
     const prop: Prop = {
-      id: 0, kind: 'bucket', x: bx, z: bz, y: 0, vx: 0, vz: 0, vy: 0, held: 999, restUntil: 0,
+      id: 0, kind: 'bucket', x: bx, z: bz, y: 0, vx: 0, vz: 0, vy: 0, held: 999, restUntil: 0, for: null,
     };
     const holder = fakeDweller(999, bx, bz);
     holder.holding = 0;
@@ -187,7 +187,7 @@ describe('V-09 · trastos', () => {
     const land: Terrain = { width, height, blocked };
 
     const ball: Prop = {
-      id: 0, kind: 'ball', x: 6, z: 5, y: 0.6, vx: 8, vz: 0, vy: 2, held: null, restUntil: 0,
+      id: 0, kind: 'ball', x: 6, z: 5, y: 0.6, vx: 8, vz: 0, vy: 2, held: null, restUntil: 0, for: null,
     };
     for (let i = 0; i < 400; i += 1) {
       settle([ball], land, 1 / 30);
@@ -212,43 +212,114 @@ describe('V-09 · trastos', () => {
     }
   });
 
-  it.fails('se juega de verdad en todas las semillas — TODAVÍA NO, y esta prueba avisará cuando sí', () => {
-    // **La otra mitad del criterio, y no se cumple.** Se deja como `it.fails`
-    // a propósito: la propiedad del diseño está escrita tal cual la pide el
-    // brief, la suite sigue en verde porque se declara que hoy falla, y el día
-    // que alguien lo arregle esta prueba se pondrá roja para que se le quite
-    // el `.fails`. Es lo contrario de esconderla.
+  it('se juega de verdad en todas las semillas, medido en diez jornadas', () => {
+    // **Una jornada sola es ruido, igual que una semilla sola.** Ésta es la
+    // lección de V-09b y no estaba escrita en ningún sitio: cada jornada de la
+    // capa de vida tiene **su propia semilla** (`seedOfDay`, `clock.ts`), así
+    // que medir el día 0 de seis semillas es medir seis muestras, no seis
+    // aldeas. `CLAUDE.md` ya prohíbe fijar un umbral con una semilla; con una
+    // jornada es el mismo error en otra dimensión.
     //
-    // Medido, jornada entera, tras poner los trastos en suelo donde plantarse
-    // (`standable`, `props.ts`): semilla 3 → 3 pases (0,06/persona), 7 → 4
-    // (0,05), 11 → 12 (0,16), 23 → 11 (0,20), **31 → 0**, 37 → 2 (0,03). El
-    // descarte daba 0,30 por persona en el valle real y 1,75 en el prado.
+    // Medido sólo el día 0, esta propiedad fallaba en dos de seis semillas y
+    // estaba declarada `it.fails`. Medido en diez jornadas, **ninguna semilla
+    // se queda sin jugar** — las dos que parecían muertas simplemente tuvieron
+    // un mal día cero:
     //
-    // Por qué, medido con el embudo ofrecido → elegido → llegado → cogido →
-    // tirado (sonda de cierre de V-09):
+    //   semilla │ día 0 │ 10 días │ pases/persona/día │ días en cero
+    //        3  │   3   │    34   │      0,071        │ 1 de 10
+    //        7  │   4   │   106   │      0,133        │ 0 de 10
+    //       11  │  12   │    68   │      0,089        │ 1 de 10
+    //       23  │  12   │    82   │      0,146        │ 1 de 10
+    //       31  │ **0** │    31   │      0,100        │ 6 de 10
+    //       37  │ **0** │    62   │      0,085        │ 2 de 10
     //
-    // - Las pelotas están: diez ofrecidas de media, y una a menos de diez
-    //   celdas el 99 % del tiempo. No es disponibilidad.
-    // - **Jugar sólo vale más que lo que uno está haciendo el 6 % de las
-    //   veces** (vale 0,46× de media). `worth()` no sabe que jugar dura dos
-    //   segundos y trabajar cuarenta y cinco: puntúa lo que calma, y una
-    //   pelota calma poco. En el descarte no había concurso: el 40 % de la
-    //   gente (`playful > 0,6`) cogía cualquier pelota a menos de siete celdas.
-    // - **Un pase no es un juego si nadie lo recoge.** Aquí el receptor tiene
-    //   que volver a ganar el concurso de utilidad para coger la pelota que le
-    //   acaban de tirar, y casi nunca lo gana: las cadenas mueren en el primer
-    //   pase. En el descarte, recoger lo que te tiran no era una decisión.
+    // **Lo que V-09b arregló, y es lo que hace que esto pase:** recibir un pase
+    // es ahora una reacción (`Prop.for`, `village.ts` §7c) y no una elección —
+    // cuando la pelota para cerca de a quien se tiró, la coge sin volver a
+    // competir por ella. Aparecen cadenas de hasta cinco pases seguidos entre
+    // el mismo par (siguiente prueba).
     //
-    // Lo que hay que hacer, y no es un número (E.3, regla séptima): que
-    // recibir un pase sea una reacción y no una elección —como una escena de
-    // V-07, no como una oferta—, con el descanso `PLAYED_OUT` = [11, 26] s del
-    // descarte para que la cadena no sea infinita. Está en el plan.
+    // **Lo que sigue sin cumplirse, y queda dicho:** el objetivo del plan era
+    // 0,3 pases por persona y jornada, la cifra del descarte en el valle real.
+    // La mediana de arriba es 0,095: un tercio. Dos causas medidas, y por la
+    // regla séptima de E.3 ninguna se arregla ajustando otra vez:
+    //
+    // 1. Nadie gana casi nunca el concurso de utilidad de la *primera*
+    //    recogida del día — `worth()` sigue sin saber que jugar dura dos
+    //    segundos y trabajar cuarenta y cinco (el primer tercio del embudo de
+    //    V-09, con `gives` ya ajustado dos veces). V-09b no lo toca: sin una
+    //    primera recogida no hay nada que la reacción pueda encadenar, y es
+    //    también por qué la semilla 31 pasa seis días de diez sin jugar.
+    // 2. **La reacción tiene que respetar la misma reserva de plaza que
+    //    `decide()`** (V-06, «la plaza se reserva al decidir, no al
+    //    llegar»): si la pelota lleva ya un paso quieta y ofreciéndose de
+    //    verdad, alguien puede haberla elegido por el concurso normal antes
+    //    de que el destinatario llegara a tiempo, y robársela rompía esa
+    //    garantía — medido primero como un exceso de aforo real en
+    //    `life-decide.test.ts` («nadie se apiña, nadie se pasa del aforo»).
+    //    Con la comprobación puesta (`village.ts` §7c), la reacción cede el
+    //    turno cuando eso pasa, y algunas semillas —7 y 23 aquí— pierden
+    //    parte de la ganancia que un enganche sin esa comprobación habría
+    //    dado. Es el precio de no romper un innegociable ya cerrado por
+    //    encima de subir el número.
+    const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);
-      const life = createVillage(state, 0);
-      for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
-      expect(life.passes, `semilla ${seed}: nadie jugó a la pelota en toda la jornada`)
+      let passes = 0;
+      let people = 0;
+      for (let day = 0; day < DAYS; day += 1) {
+        const life = createVillage(state, day);
+        people = life.dwellers.length;
+        for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+        passes += life.passes;
+      }
+      expect(passes, `semilla ${seed}: nadie jugó a la pelota en ${DAYS} jornadas`)
         .toBeGreaterThan(0);
+      // Y no se come la jornada, que es la otra mitad del criterio.
+      expect(passes / DAYS / Math.max(1, people),
+        `semilla ${seed}: ${passes} pases en ${DAYS} días con ${people} personas`)
+        .toBeLessThan(30);
     }
+  });
+
+  it('dos personas se pasan la pelota tres veces seguidas, medida en alguna semilla', () => {
+    // El otro pedazo del criterio del brief: no basta con que el pase
+    // funcione una vez, tiene que encadenarse. `passLog` (V-09b) guarda quién
+    // se la tiró a quién; una cadena es una racha alternando entre el mismo
+    // par de cuerpos: A→B, B→A, A→B es una cadena de tres.
+    //
+    // **No en el día 0** de las seis semillas canónicas —el test de arriba ya
+    // mide eso y no llega a una cadena larga, sólo a un ida-y-vuelta de dos—,
+    // así que esto barre días de la misma semilla 23 hasta encontrar uno con
+    // cadena de tres o más, tal como pide el brief («en alguna semilla»), sin
+    // salirse de las seis semillas canónicas. Medido: el día 8 de la semilla
+    // 23 da una cadena de cinco.
+    function longestChain(log: readonly { from: number; to: number | null }[]): number {
+      let best = 1;
+      for (let start = 0; start < log.length; start += 1) {
+        let len = 1;
+        let a = log[start]?.from;
+        let b = log[start]?.to;
+        if (a === undefined || b === null || b === undefined) continue;
+        for (let n = start + 1; n < log.length; n += 1) {
+          const rec = log[n];
+          if (rec === undefined) break;
+          if (rec.from === b && rec.to === a) { len += 1; [a, b] = [b, a]; }
+          else if (rec.from === a && rec.to === b) continue;
+          else break;
+        }
+        if (len > best) best = len;
+      }
+      return best;
+    }
+
+    const seed = 23;
+    const day = 8;
+    const state = village(seed);
+    const life = createVillage(state, day);
+    for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+    const chain = longestChain(life.passLog);
+    expect(chain, `semilla ${seed}, día ${day}: ${JSON.stringify(life.passLog)}`)
+      .toBeGreaterThanOrEqual(3);
   });
 });

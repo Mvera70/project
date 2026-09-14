@@ -52,6 +52,7 @@ function makeDweller(
     sceneCooldownUntil: 0,
     holding: null,
     aimAt: null,
+    playedUntil: 0,
   };
 }
 

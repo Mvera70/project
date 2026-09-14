@@ -26,12 +26,22 @@
 //    jornada con la semilla del día, y como `Village` es efímero (E.2), no hay
 //    dónde guardar uno de un día para otro aunque se quisiera.
 //
-// Y una cuarta, medida en el descarte: sin un descanso tras jugar salían 58
-// pases por jornada y persona. Aquí no hace falta portar `PLAYED_OUT` aparte:
-// la misma `satisfy()`/`drift()` de `needs.ts` que gobierna cualquier otra
-// oferta ya vacía el aburrimiento al jugar y lo vuelve a llenar despacio
-// (E.3.7: primero se mide si el mecanismo que ya existe basta, antes de portar
-// uno nuevo). Medido en el informe de ronda.
+// Y una cuarta: sin un descanso tras jugar salían 58 pases por jornada y
+// persona en el descarte. V-09 confió en que la misma `satisfy()`/`drift()`
+// de `needs.ts` bastara sin portar `PLAYED_OUT` aparte (E.3.7); medido, no
+// bastó, así que V-09b lo porta (`PLAYED_OUT`, abajo) y añade `Dweller.
+// playedUntil` (`village.ts`). Informe de ronda: `docs/life-rounds/V-09.md`
+// y su sección V-09b.
+//
+// **V-09b añade la quinta lección, y es la que faltaba para que se jugara de
+// verdad:** en el descarte, recibir un pase no era una elección — la pelota
+// paraba cerca de alguien con dueño y ese alguien la cogía sin volver a
+// competir por ella. Aquí el receptor tenía que ganar el mismo concurso de
+// utilidad que cualquier otra oferta, y casi nunca lo ganaba: la cadena
+// moría en el primer pase (medido: 6 % de las veces jugar valía más que lo
+// que ya se hacía). `Prop.for` y el bloque de `village.ts` que lo lee tras
+// `settle()` son ese arreglo: una interacción entre dos, como una escena de
+// V-07, que no pasa por `decide`.
 
 import { hash32 } from '@engine/rng';
 import { population } from '@engine/people/demography';
@@ -61,6 +71,17 @@ export interface Prop {
   held: number | null;
   /** Hasta cuándo no se le puede echar mano: lo que acaba de salir volando. */
   restUntil: number;
+  /**
+   * V-09b: id de *cuerpo* a quien se lanzó éste, o nada. Lo pone `fling`;
+   * `drop` y `scatter` lo dejan a `null`.
+   *
+   * **Recibir un pase es una reacción, no una elección** (E.4: sigue sin ser
+   * una oferta que nombre a nadie — `propPlaces` no lee este campo). Es
+   * `village.ts` quien, tras `settle()`, mira si la pelota parada tiene
+   * dueño y se lo entrega directamente, como una escena de V-07: una
+   * interacción entre dos que no pasa por `decide`.
+   */
+  for: number | null;
 }
 
 function roll(seed: number, key: string): number {
@@ -251,7 +272,7 @@ export function scatter(state: GameState, land: Terrain, seed: number): Prop[] {
       if (!standable(land, tryX, tryZ)) continue;
       x = tryX; z = tryZ; break;
     }
-    props.push({ id: i, kind, x, z, y: 0, vx: 0, vz: 0, vy: 0, held: null, restUntil: 0 });
+    props.push({ id: i, kind, x, z, y: 0, vx: 0, vz: 0, vy: 0, held: null, restUntil: 0, for: null });
   }
   return props;
 }
@@ -385,6 +406,8 @@ export function drop(prop: Prop, by: Dweller, land: Terrain): void {
   prop.vz = 0;
   prop.vy = 0;
   prop.y = 0;
+  // V-09b: lo que se suelta ya no es un pase de nadie a nadie.
+  prop.for = null;
 
   // Donde se pueda volver a coger: quien lo suelta está en suelo pisable, pero
   // puede estar pegado a una pared, y ahí nadie llegaría a recogerlo después.
@@ -417,14 +440,39 @@ export const THROW_AHEAD = 5;
 export const REST_AFTER_THROW = 0.45;
 
 /**
+ * Lo que se tarda en volver a tener ganas de jugar, tras un pase. Ported de
+ * spike (`PLAYED_OUT`), sin retocar.
+ *
+ * Sin esto salían 58 pases por jornada y persona en el descarte —uno cada
+ * dos segundos, la aldea entera detrás de una pelota— porque nada cansaba a
+ * nadie de jugar. La primera versión de V-09 confió en que `satisfy()`
+ * vaciara el aburrimiento y bastara (E.3.7: primero se mide si el mecanismo
+ * que ya existe basta, antes de portar uno nuevo); no bastó — el rethink de
+ * en medio volvía a ganar en cuanto el aburrimiento se vaciaba, con la
+ * pelota pegada en la mano el resto del día (medido en `village.ts`) — así
+ * que V-09b porta el descanso tal cual estaba en el descarte. Quien acaba
+ * de tirar no vuelve a recoger ni a que `decide` le ofrezca `play` hasta
+ * que pase (`village.ts`, filtrado al construir las opciones de éste, no
+ * dentro de `decide`: E.4 sigue en pie).
+ */
+export const PLAYED_OUT = [11, 26] as const;
+
+/**
  * Lanza un trasto hacia un punto, con su arco. **Velocidad, nunca posición**
  * (E.3, E.7): quien reciba el trasto lo ve volar y aterrizar, no aparecer.
+ *
+ * `forId` es V-09b: el id de *cuerpo* a quien se apunta, o nada si se tira
+ * hacia delante por gusto porque no había con quién jugar. Queda anotado en
+ * `prop.for` para que `village.ts` sepa, tras `settle()`, a quién entregarle
+ * la pelota cuando pare — sin que eso pase por `decide` (E.4).
  */
 export function fling(
   prop: Prop, from: Dweller, at: Point, force: number, loft: number, land: Terrain,
+  forId: number | null,
 ): void {
   const away = Math.max(0.5, Math.hypot(at.x - from.body.x, at.z - from.body.z));
   prop.held = null;
+  prop.for = forId;
   if (from.holding === prop.id) from.holding = null;
   // Un poco por delante de la mano — **salvo que por delante haya una pared.**
   // `avoid` es una fuerza y no una garantía: un cuerpo puede estar a tres

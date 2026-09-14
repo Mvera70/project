@@ -19,14 +19,14 @@ import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
-import { placesOf, seatAt, seatKey, type Place } from './offers';
+import { OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { commons } from './places';
 import { decide, satisfy, RETHINK, type Intent } from './decide';
 import { alive as sceneAlive, play, propose, SCENE_COOLDOWN, SCENE_EARSHOT, type Scene } from './scenes';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, type Beast } from './beasts';
 import {
-  carryAt, drop, findMate, fling, LOFT, propPlaces, PROP_PLACE_PREFIX,
+  carryAt, drop, findMate, fling, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
   REST_AFTER_THROW, scatter, settle, take, THROW, THROW_AHEAD, type Prop,
 } from './props';
 
@@ -38,6 +38,16 @@ import {
  * se iba, o hay medio pueblo cortando el paso.
  */
 const GIVE_UP = 600;
+
+/**
+ * A qué distancia se coge un pase sin pasar por `decide`. V-09b.
+ *
+ * El número lo da el brief tal cual («a menos de dos celdas de ese cuerpo»),
+ * no una medida: es el umbral con el que `fling` ya tira —`THROW` manda la
+ * pelota a por lo menos varias celdas— así que un receptor que se ha quedado
+ * quieto donde estaba cuando se la tiraron cae dentro sin más ajuste.
+ */
+const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
@@ -79,6 +89,29 @@ export interface Dweller {
   /** V-09: a quién apunta mientras espera para tirar lo que lleva. Id de
    *  cuerpo. */
   aimAt: number | null;
+  /**
+   * V-09b: hasta qué instante escénico no le apetece volver a jugar, tras el
+   * último pase. Ported de spike (`playedUntil`, `PLAYED_OUT` en `props.ts`).
+   *
+   * Obligatorio, como `holding`/`aimAt` (E.3.7 aprendido en la primera
+   * versión de V-09: un campo opcional obliga a preguntar `?? 0` en cada
+   * lectura). La cabaña (`beasts.ts`) no juega nunca y lo lleva a `0` para
+   * siempre.
+   */
+  playedUntil: number;
+}
+
+/**
+ * Un pase, para poder medir una cadena. V-09b.
+ *
+ * `to` es nada cuando se tiró hacia delante por gusto porque no había con
+ * quién jugar (`THROW_AHEAD`): eso cuenta como pase pero no puede ser parte
+ * de una cadena, porque no hay un segundo cuerpo al que seguirle la pista.
+ */
+export interface PassRecord {
+  readonly from: number;
+  readonly to: number | null;
+  readonly step: number;
 }
 
 export interface Village {
@@ -97,6 +130,9 @@ export interface Village {
   readonly steps: number;
   /** Pases de pelota dados en la jornada, V-09: lo que sale de jugar. */
   readonly passes: number;
+  /** Cada pase, en orden, con quién lo dio y a quién iba. V-09b: lo que hace
+   *  falta para medir una cadena — `passes` sólo da el total. */
+  readonly passLog: readonly PassRecord[];
   /** Qué está haciendo la aldea ahora, para poder contarlo. */
   tally(): Record<string, number>;
 }
@@ -185,6 +221,7 @@ export function createVillage(state: GameState, day: number): Village {
       sceneCooldownUntil: 0,
       holding: null,
       aimAt: null,
+      playedUntil: 0,
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -206,6 +243,9 @@ export function createVillage(state: GameState, day: number): Village {
   // alguien cuenta, aunque no haya nadie a quien apuntar y se tire hacia
   // delante por gusto (`finishHolding`, más abajo).
   let passes = 0;
+  // V-09b: el registro de cada pase, para poder medir una cadena — `passes`
+  // por sí solo no dice quién se la pasó a quién.
+  const passLog: PassRecord[] = [];
 
   /** Cuánta gente hay en cada oferta ahora mismo. */
   function seats(): Map<string, number> {
@@ -226,6 +266,7 @@ export function createVillage(state: GameState, day: number): Village {
     props,
     get steps(): number { return steps; },
     get passes(): number { return passes; },
+    get passLog(): readonly PassRecord[] { return passLog; },
 
     tally(): Record<string, number> {
       const count: Record<string, number> = {};
@@ -246,8 +287,11 @@ export function createVillage(state: GameState, day: number): Village {
       // V-09: los trastos sueltos ahora mismo, como opciones más para decidir
       // — se rehace cada paso porque un trasto deja de ofrecer nada en cuanto
       // alguien lo coge, cosa que un edificio nunca hace (`propPlaces`,
-      // `props.ts`).
-      const options = props.length === 0 ? mine : [...mine, ...propPlaces(props, now, land)];
+      // `props.ts`). Compartido entre todos: lo que cambia persona a persona
+      // (V-09b, `PLAYED_OUT`) se filtra más abajo, al llamar a `decide` por
+      // cada uno — no aquí, que es de todos, y no dentro de `decide`, que no
+      // puede saber quién pregunta (E.4).
+      const propOptions = props.length === 0 ? [] : propPlaces(props, now, land);
 
       // 0 · Vivir las escenas que ya estaban en marcha. V-07.
       //
@@ -333,6 +377,15 @@ export function createVillage(state: GameState, day: number): Village {
         if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong)) {
           dweller.rethinkAt = steps + RETHINK;
           const before = dweller.doing;
+          // V-09b · Hasta que se le pasen las ganas (`PLAYED_OUT`), a éste no
+          // se le ofrece `play`: se filtra aquí, al montar las opciones de
+          // *este* dweller, no dentro de `decide` — una oferta no puede saber
+          // quién pregunta (E.4). El resto de la aldea sigue viendo la pelota
+          // como siempre.
+          const playedOut = now < dweller.playedUntil;
+          const options = !playedOut || propOptions.length === 0
+            ? [...mine, ...propOptions]
+            : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
           dweller.doing = decide(
             { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before },
             options, taken, land, router, seed, steps,
@@ -368,9 +421,16 @@ export function createVillage(state: GameState, day: number): Village {
                     x: body.x + Math.sin(body.facing) * THROW_AHEAD,
                     z: body.z + Math.cos(body.facing) * THROW_AHEAD,
                   };
-                fling(held, dweller, at, THROW, LOFT, land);
+                fling(held, dweller, at, THROW, LOFT, land, mate?.body.id ?? null);
                 held.restUntil = now + REST_AFTER_THROW;
                 passes += 1;
+                passLog.push({ from: dweller.body.id, to: mate?.body.id ?? null, step: steps });
+                // V-09b · Se le pasan las ganas por un rato, como en el
+                // descarte: sin esto el rethink de en medio ganaba en cuanto
+                // `satisfy()` vaciaba el aburrimiento, y la pelota volvía a la
+                // misma mano una y otra vez.
+                const rest = hash32(seed, `playedout:${dweller.body.id}:${steps}`) / 4_294_967_296;
+                dweller.playedUntil = now + PLAYED_OUT[0] + rest * (PLAYED_OUT[1] - PLAYED_OUT[0]);
               } else {
                 drop(held, dweller, land);
               }
@@ -465,6 +525,66 @@ export function createVillage(state: GameState, day: number): Village {
         if (dweller.holding === null) continue;
         const held = propsById.get(dweller.holding);
         if (held !== undefined) carryAt(held, dweller);
+      }
+
+      // 7c · Recibir un pase es una reacción, no una elección. V-09b.
+      //
+      //    Después de la física del paso (7b), con la pelota ya parada donde
+      //    va a parar: si una pelota lanzada a alguien (`Prop.for`) está
+      //    quieta a menos de dos celdas de ese cuerpo, y ese `Dweller` no está
+      //    en escena, no lleva nada ya y no está en `PLAYED_OUT`, la coge y se
+      //    pone a jugar directamente — **sin pasar por `decide`**, la misma
+      //    clase de cosa que una escena de V-07: una interacción entre dos que
+      //    no es una oferta y por tanto no nombra a nadie (E.4, `propPlaces`
+      //    no cambia). Sin esto el receptor tenía que volver a ganar el mismo
+      //    concurso de utilidad que cualquier otra oferta para coger lo que le
+      //    acababan de tirar, y casi nunca lo ganaba: la cadena moría en el
+      //    primer pase (medido, `docs/life-rounds/V-09.md`).
+      //
+      //    **La plaza se sigue reservando al decidir, no al llegar** (V-06,
+      //    E.7): si la pelota lleva ya un paso quieta y ofreciéndose de
+      //    verdad (`propPlaces`), alguien puede haberla elegido por el
+      //    concurso normal de utilidad antes de que el destinatario llegara a
+      //    tiempo. Robársela igualmente rompía esa garantía — medido: un
+      //    exceso de aforo en `life-decide.test.ts` («nadie se apiña, nadie
+      //    se pasa del aforo»), el mismo síntoma que V-06 ya cerró una vez
+      //    para los sitios normales. Aquí no hay `taken` que consultar
+      //    (7c corre después del reparto de plazas del paso), así que se
+      //    mira directamente si alguien más ya tiene esta plaza como destino.
+      for (const prop of props) {
+        if (prop.kind !== 'ball' || prop.for === null || prop.held !== null) continue;
+        // Quieta: mismo criterio que `propPlaces` para «se puede coger».
+        if (prop.y > 0.001 || Math.hypot(prop.vx, prop.vz) > 0.05) continue;
+        const target = byId.get(prop.for);
+        if (target === undefined || target.scene !== null || target.holding !== null) continue;
+        if (now < target.playedUntil) continue;
+        const gap = Math.hypot(target.body.x - prop.x, target.body.z - prop.z);
+        if (gap >= CATCH_RANGE) continue;
+        const placeId = `${PROP_PLACE_PREFIX}${prop.id}`;
+        const claimed = dwellers.some((other) => other.body.id !== target.body.id
+          && other.doing !== null && other.doing.place.id === placeId);
+        if (claimed) continue;
+        // Vive en el catálogo (`offers.ts`) y no puede faltar, pero `OFFERS`
+        // es un `Record<string, OfferSpec>` y TypeScript no lo sabe estático.
+        const spec = OFFERS.play;
+        if (spec === undefined) continue;
+        if (!take(prop, target)) continue;
+
+        const dice = hash32(seed, `catch:${target.body.id}:${steps}`) / 4_294_967_296;
+        const span = Math.round((spec.seconds[0] + dice * (spec.seconds[1] - spec.seconds[0])) * 30);
+        const at = { x: target.body.x, z: target.body.z };
+        const offer: Offer = { ...spec, at };
+        target.doing = {
+          place: { id: placeId, at, offers: [offer] },
+          offer,
+          route: [],
+          seat: 0,
+          since: steps,
+          until: steps + span,
+          there: true,
+        };
+        target.rethinkAt = steps + RETHINK;
+        target.aimAt = findMate(target, dwellers)?.body.id ?? null;
       }
 
       // 8 · La cabaña vive su propio paso. V-08.
