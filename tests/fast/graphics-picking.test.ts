@@ -180,24 +180,34 @@ describe('G-07 · la cámara del valle', () => {
 });
 
 describe('G-07 · qué backend pinta el valle', () => {
-  it('Canvas por defecto, y ante la duda también', () => {
-    // D.5 · el piloto no sustituye a `src/render/` antes de P3, y G-12 es la
-    // ronda que decide si alguna vez lo hace. Un interruptor de desarrollo no
-    // puede dejar a nadie sin valle por una errata en la dirección.
-    expect(backendFrom('', null)).toBe('canvas');
-    expect(backendFrom('?render=', null)).toBe('canvas');
-    expect(backendFrom('?render=webgl', null)).toBe('canvas');
+  it('el 3D por defecto, y ante la duda también', () => {
+    // **G-12: el piloto deja de ser el piloto.** Hasta aquí esta prueba exigía
+    // Canvas por defecto, porque D.5 prohibía que el piloto sustituyera a
+    // `src/render/` antes de P3. El dueño del diseño cerró esa puerta el 14 sep
+    // 2026 con el riesgo escrito delante (`docs/roadmap.md`): el 3D es el
+    // juego. La prueba cambia de lado porque cambió la decisión, no para que
+    // pasara.
+    expect(backendFrom('', null)).toBe('pilot3d');
+    expect(backendFrom('?render=', null)).toBe('pilot3d');
+    expect(backendFrom('?render=webgl', null)).toBe('pilot3d');
     expect(backendFrom('?render=3d', null)).toBe('pilot3d');
     expect(backendFrom('?render=pilot3d', null)).toBe('pilot3d');
   });
 
-  it('lo pedido en la dirección manda sobre lo recordado', () => {
-    // Volver a 2D tiene que ser posible sin borrar nada, que es lo que se hace
-    // cuando el piloto deja de arrancar en un teléfono concreto.
+  it('y la puerta de vuelta al Canvas sigue abierta', () => {
+    // **Esto es lo que no cambia, y es lo que hace la migración reversible.**
+    // Todo lo medido de rendimiento es de un portátil —G-09 quedó parcial por
+    // no haber un móvil de verdad— así que si el 3D no arranca en un teléfono
+    // concreto tiene que haber algo a lo que volver esa misma tarde, sin
+    // borrar ni desplegar nada. Quitar esta puerta es el paso irreversible y
+    // no se da hasta que alguien lo abra en un móvil real.
+    expect(backendFrom('?render=canvas', null)).toBe('canvas');
+    expect(backendFrom('?render=2d', null)).toBe('canvas');
     expect(backendFrom('?render=canvas', 'pilot3d')).toBe('canvas');
-    expect(backendFrom('', 'pilot3d')).toBe('pilot3d');
     expect(backendFrom('', 'canvas')).toBe('canvas');
-    expect(backendFrom('', 'lo que sea')).toBe('canvas');
+    // Y lo pedido en la dirección manda sobre lo recordado, en los dos sentidos.
+    expect(backendFrom('?render=3d', 'canvas')).toBe('pilot3d');
+    expect(backendFrom('', 'lo que sea')).toBe('pilot3d');
   });
 });
 

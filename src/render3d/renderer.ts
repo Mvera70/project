@@ -271,8 +271,12 @@ export async function createGraphicsRenderer(
    * fase del anexo. V-12 la quitará, y con ella el camino viejo.
    */
   const useLife = (() => {
-    try { return globalThis.localStorage?.getItem('valley.life') === 'on'; }
-    catch { return false; }
+    // **Encendida por defecto desde G-12**: la vida del valle dejó de ser un
+    // experimento detrás de una bandera y es cómo se mueve la aldea. Apagarla
+    // sigue siendo una línea (`valley.life = 'off'`) mientras el camino viejo
+    // exista, que es hasta que V-12 lo borre.
+    try { return globalThis.localStorage?.getItem('valley.life') !== 'off'; }
+    catch { return true; }
   })();
   let life: LifeVillage | null = null;
   let lifeDay = -1;

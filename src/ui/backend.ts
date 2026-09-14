@@ -65,11 +65,24 @@ export interface ValleyBackend {
  */
 declare const VALLEY_ASSETS: Record<string, string> | undefined;
 
+/**
+ * Qué pinta el valle. **Desde G-12, el 3D: ya no es el piloto, es el juego.**
+ *
+ * Lo decidió el dueño del diseño el 14 sep 2026 con el riesgo escrito delante
+ * (`docs/roadmap.md`, «Decisiones tomadas»): todo lo medido de rendimiento es
+ * de un portátil, porque G-09 quedó parcial por no haber un móvil de verdad.
+ *
+ * **La puerta de vuelta se queda puesta, y a propósito.** `?render=canvas`
+ * sigue devolviendo el Canvas de `src/render/`, que es lo que este juego ha
+ * usado desde M-16 y sigue entero. Quitarla es el paso irreversible y no se da
+ * hasta que alguien lo abra en un teléfono: si en un móvil real no va, se
+ * necesita algo a lo que volver esa misma tarde.
+ */
 export function backendFrom(search: string, stored: string | null): BackendKind {
   const asked = new URLSearchParams(search).get('render');
-  if (asked === '3d' || asked === 'pilot3d') return 'pilot3d';
-  if (asked !== null) return 'canvas';
-  return stored === 'pilot3d' ? 'pilot3d' : 'canvas';
+  if (asked === 'canvas' || asked === '2d') return 'canvas';
+  if (asked !== null) return 'pilot3d';
+  return stored === 'canvas' ? 'canvas' : 'pilot3d';
 }
 
 /** The Canvas backend: what the game has been using all along. */
