@@ -9627,19 +9627,19 @@ V-14 ✓ (independiente)          V-13 transversal desde V-02
 V-15 ═ V-16 (juntas, después de V-12)
 ```
 
-**Estado:** V-00 a V-06 y V-14 cerradas. **Siguiente: V-07**, y es la que
-decide. Tras ella se vuelve a enseñar la demo en el juego, y sólo entonces se
-juzga el reparto entre andar y hacer (E.6). V-10 puede ir en paralelo con V-07
-sin pisarse: V-07 estrena `scenes.ts` y V-10 estrena `places.ts`; las dos tocan
-`village.ts` en sitios distintos y quien integre serializa ese fichero.
+**Estado:** V-00 a V-07, V-10 y V-14 cerradas. La demo se ha vuelto a enseñar
+en el juego (build jugable, no capturas), y el reparto entre andar y hacer
+(E.6) está pendiente del veredicto de quien la mira: la regla de «cuándo
+parar» de abajo sigue en pie hasta entonces. **En marcha: V-08.** V-09 va por
+el camino crítico y no arranca hasta que ese veredicto llegue.
 
 **Reparto sugerido con varios agentes:**
 
 | Carril | Fases | Notas |
 |---|---|---|
-| A · el camino crítico | V-07 → V-09 → V-11 → V-12 | La mano con más contexto; porta del descarte |
-| B · los sitios | V-10 → V-08 | No toca `scenes.ts` |
-| C · la medida | V-13 continuo | Sólo mide; no cambia comportamiento |
+| A · el camino crítico | V-07 ✓ → V-09 → V-11 → V-12 | La mano con más contexto; porta del descarte |
+| B · los sitios | V-10 ✓ → V-08 | No toca `scenes.ts` |
+| C · la medida | V-13 ✓, y sigue si hace falta | Sólo mide; no cambia comportamiento |
 
 **Cuándo parar:** tras V-07, si con escenas el valle sigue leyéndose como
 hormigas, el problema es el modelo de ofertas y se para a rediseñar con el
