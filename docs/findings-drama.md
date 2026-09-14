@@ -117,3 +117,52 @@ cambia de lado por ella.
 **Dicho para que conste:** nada de esto es una propuesta de cambio de balance.
 Es una medida. Cambiar cualquiera de los tres números de arriba mueve el
 equilibrio del juego y toca correr la suite de balance entera.
+
+---
+
+## 4. La contradicción que hay debajo (14 sep 2026)
+
+Al arreglar el apartado 1 —la convivencia ya puede agriarse, y los rencores se
+forman— apareció la razón de fondo por la que no se formaban. **No era un
+número mal puesto: son dos requisitos del diseño que no caben juntos.**
+
+La aritmética, que no depende de ninguna semilla:
+
+| | |
+|---|---|
+| Un rencor se abre al cruzar −50 y sana al subir de −20 | 30 puntos |
+| La deriva de §6.4 los recorre a 0,05 por semana | **600 semanas = 12,5 años** |
+| Una partida de la suite de balance | 200 años = 9 600 ticks |
+| Fracción de la partida con **un solo** rencor abierto | **6,25 %** |
+| Lo que la prueba de §12.9 permite por plantilla | **1 %** |
+
+Para caber en ese 1 %, un rencor tendría que durar **menos de dos años**. Con la
+deriva de §6.4 dura doce y medio. De modo que la única manera de pasar la prueba
+de elegibilidad es que los rencores **casi nunca se formen**, que es exactamente
+el estado en que estaba el juego y exactamente la queja del jugador.
+
+El motor no está roto: **está cumpliendo la especificación al pie de la letra, y
+la especificación pide dos cosas incompatibles.** Que haya feudos, y que los
+feudos sean raros. Con las opiniones modeladas como un número que deriva
+despacio hacia cero, un feudo no es un episodio: es un estado que dura
+décadas, y un estado que dura décadas satura cualquier techo de elegibilidad.
+
+**Lo que esto descarta:** seguir moviendo `NEIGHBOUR.FRICTION` hasta que salga.
+Está medido que con roce fuerte (−0,18) salen veintitrés rencores por partida y
+el valle es una taberna; con roce flojo (−0,09) seis de cada diez partidas
+vuelven a cero. Y en los dos casos, en cuanto uno cruza, las riñas lo hunden a
+−100 y ya no vuelve, porque la riña resta entre 8 y 20 de golpe y la deriva
+devuelve 2,4 al año. **El sistema no tiene zona intermedia**: o no pasa nada, o
+pasa para siempre.
+
+**Lo que habría que decidir, y no se decide aquí:**
+
+1. **O los rencores se curan mucho más rápido** —la deriva de §6.4 sube, o hay
+   una reconciliación explícita— y entonces son episodios y caben en el 1 %.
+2. **O la prueba de elegibilidad deja de medir «ticks en que la plantilla podría
+   salir»** y pasa a medir lo que de verdad quería evitar, que es que una
+   plantilla domine el reparto: cuántas veces sale, no cuántas podría salir.
+
+La segunda es probablemente la correcta, porque la prueba existe para vigilar la
+variedad del catálogo y hoy castiga algo distinto: que el mundo tenga estados
+duraderos. Pero es §12.9 y la toca el dueño del diseño.
