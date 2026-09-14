@@ -9,13 +9,13 @@ import { openChronicle } from './chronicle';
 const STYLE_ID = 'valley-epitaph-style';
 const STYLE = `
 .epitaph-scrim { position: fixed; inset: 0; z-index: 12; display: flex; align-items: flex-end;
-  background: rgba(18,17,14,.78); color: #f2f4f6; font: 14px/1.4 system-ui, sans-serif; }
+  background: rgba(26,21,17,.84); color: var(--parchment, #f2e9d8); font: 14px/1.4 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
 .epitaph { box-sizing: border-box; width: 100%; padding: max(24px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom)); }
-.epitaph h1 { margin: 0 0 12px; font: 600 23px/1.2 Georgia, serif; }
-.epitaph p { margin: 6px 0; color: #d7dadd; }
+.epitaph h1 { margin: 0 0 12px; font: 600 23px/1.2 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
+.epitaph p { margin: 6px 0; color: var(--paper-dim, #d9cfbc); }
 .epitaph-actions { display: grid; gap: 10px; margin-top: 22px; }
 .epitaph-actions button { min-height: 48px; padding: 12px 14px; border: 1px solid rgba(242,244,246,.4);
-  border-radius: 10px; background: rgba(242,244,246,.1); color: inherit; font: 600 15px/1.2 Georgia, serif; }
+  border-radius: 10px; background: rgba(242,244,246,.1); color: inherit; font: 600 15px/1.2 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
 .epitaph-actions button:last-child { background: #d8c574; color: #242016; border-color: #d8c574; }
 .epitaph-open .valley-speeds { visibility: hidden; }
 `;

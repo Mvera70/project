@@ -18,21 +18,37 @@ import { recogniseGesture, type Point } from '../gestures';
 const STYLE_ID = 'valley-crossroad-style';
 const STYLE = `
 .crossroad-scrim { position: fixed; inset: 0; z-index: 10; display: flex; align-items: flex-end;
-  background: rgba(18,17,14,.82); color: #f2f4f6; font: 14px/1.35 system-ui, sans-serif; }
+  background: rgba(26,21,17,.86); color: var(--parchment, #f2e9d8); font: 14px/1.35 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
 .crossroad { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(18px, env(safe-area-inset-bottom)); }
-.crossroad h1 { margin: 0 0 10px; font: 600 21px/1.2 Georgia, serif; }
-.crossroad p.crossroad-body { margin: 0 0 16px; color: #d7dadd; }
-.crossroad-options { display: flex; flex-direction: column; gap: 10px; }
+  padding: max(22px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); }
+/* U-01 · La encrucijada es el momento en que el jugador decide, y tiene que
+   pesar como tal: un filete de latón encima del título, como el encabezamiento
+   de un capítulo, y el cuerpo en la misma voz con que está escrita la crónica. */
+.crossroad h1 { margin: 0 0 12px; padding-top: 14px; text-wrap: balance;
+  border-top: 2px solid var(--gild-lit, #c9ab6b); color: var(--parchment, #f2e9d8);
+  font: 600 23px/1.18 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
+.crossroad p.crossroad-body { margin: 0 0 20px; color: var(--paper-dim, #d9cfbc);
+  font: 15px/1.5 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif);
+  text-wrap: pretty; }
+.crossroad-options { display: flex; flex-direction: column; gap: 9px; }
+/* Cada opción es una carta que se levanta: un canto claro a la izquierda la
+   marca como elegible, y al pulsarla se hunde en vez de cambiar de color. */
 .crossroad-options button { display: block; width: 100%; box-sizing: border-box; text-align: left;
-  padding: 12px 14px; border: 1px solid rgba(242,244,246,.35); border-radius: 10px;
-  background: rgba(242,244,246,.08); color: inherit; font: inherit; min-height: 44px; }
-.crossroad-options button:active { background: rgba(242,244,246,.2); }
-.crossroad-label { display: block; font: 600 15px/1.2 Georgia, serif; }
-.crossroad-cost { display: block; margin-top: 4px; color: #c9b46b; font-size: 13px; }
+  padding: 13px 15px 13px 14px; border: 1px solid rgba(217,207,188,.28);
+  border-left: 3px solid var(--gild-lit, #c9ab6b); border-radius: 4px;
+  background: rgba(217,207,188,.07); color: inherit; font: inherit; min-height: 44px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.crossroad-options button:active { background: rgba(217,207,188,.16); transform: translateY(1px); }
+.crossroad-options button:focus-visible { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 2px; }
+.crossroad-label { display: block; color: var(--parchment, #f2e9d8);
+  font: 600 16px/1.25 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
+/* El precio no es una nota al pie: es la mitad de la decisión. */
+.crossroad-cost { display: block; margin-top: 5px; color: var(--gild-lit, #c9ab6b);
+  font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
 .crossroad-marker { position: fixed; z-index: 9; top: max(9px, env(safe-area-inset-top));
   right: max(12px, env(safe-area-inset-right)); width: 14px; height: 14px; border-radius: 50%;
-  background: #c9463c; border: 2px solid #f2f4f6; padding: 0; min-width: 0; min-height: 0; }
+  background: #c9463c; border: 2px solid var(--parchment, #f2e9d8); padding: 0; min-width: 0; min-height: 0;
+  box-shadow: 0 0 0 3px rgba(201,70,60,.28); }
 .crossroad-open .valley-speeds { visibility: hidden; }
 `;
 
