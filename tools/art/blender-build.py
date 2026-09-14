@@ -96,8 +96,9 @@ args = sys.argv[sys.argv.index('--') + 1:]
 recipe_path = os.path.abspath(args[0])
 output_dir = os.path.abspath(args[1])
 asset_id = args[2]
-# G-04 · 'rigid' o 'smooth'. Lo normal es rígida; `skin-bench.ts` pide la otra
-# para poder comparar las dos con la misma receta, que es lo que D.4 exige.
+# G-04 · 'rigid' o 'smooth'. Lo normal es rígida: D.4.1 la decidió comparando
+# las dos con la misma receta en un banco común, que es lo que D.4 exige. El
+# parámetro se queda para poder repetir esa comparación.
 skin_mode = args[3] if len(args) > 3 else 'rigid'
 if skin_mode not in ('rigid', 'smooth'):
     raise SystemExit("Unknown skin mode '%s'." % skin_mode)

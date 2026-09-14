@@ -21,7 +21,7 @@ import { alive, play, propose, type Scene } from '../../src/render3d/life/scenes
 import { createVillage, type Dweller } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 import { LIFE_STEP, STEPS_PER_DAY } from '../../src/render3d/life/clock';
-import { VILLAGER_CLIPS } from '../../src/render3d/actors/clips';
+import { VILLAGER_CLIPS } from '../../src/render3d/clips';
 
 const grown = new Map<number, GameState>();
 function village(seed: number): GameState {

@@ -173,15 +173,14 @@ export class Fauna {
    * `scenic-state.ts`, para todos y de una vez, y este método vuelve a ser lo
    * que debía: una función de la hora.
    *
-   * **Sigue derivando del estado, sin tocar `valley.life`.** V-08 adelgaza la
-   * clase separando «de dónde salen las posiciones» de «cómo se pintan»
-   * (`paint`, abajo): esto es el primer camino, el del juego de hoy, que no
-   * conoce la capa de vida. Cuando `valley.life` esté encendida, quien pinte
-   * puede construir la lista de animales a partir de `life/beasts.ts` —vivos,
-   * con cuerpo y sin `ashore`— y llamar a `paint` directamente; ese enganche
-   * queda para quien integre el renderer, fuera del alcance de V-08 (E.8: los
-   * ficheros de esta fase son `beasts.ts`, `village.ts`, `offers.ts` y este,
-   * no `renderer.ts`).
+   * **Y sigue derivando del estado, que es la deuda que queda aquí.** V-08
+   * partió la clase en dos —«de dónde salen las posiciones» y «cómo se
+   * pintan», `paint` abajo— para que la capa de vida pudiera entrar por la
+   * segunda mitad: `life/beasts.ts` ya da animales vivos, con cuerpo y sin
+   * necesidad de `ashore`. Ese enganche **no se ha hecho**, así que el rebaño
+   * que se ve es todavía una función de la hora mientras la gente a su lado
+   * son cuerpos que andan. Es trabajo de la ronda que integre el renderer, y
+   * no estaba en el alcance de V-08 (E.8) ni en el de V-12.
    */
   update(state: GameState, dayPhase: number): void {
     const animals: Animal[] = [];

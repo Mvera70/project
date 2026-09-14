@@ -20,10 +20,9 @@ import { paletteFor } from '@render/palette';
 import { moodsFor } from '@render/moods';
 import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type Role, type VillagerId } from '@engine/state';
-import { actorsFor, createActorMemory, type Actor } from './actors';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
-  GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
+  Actor, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
   GraphicsViewport,
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
@@ -275,33 +274,22 @@ export async function createGraphicsRenderer(
   /** La sierra de V-14. Vive con el valle y se rehace sólo si cambia el mapa. */
   let ridge: Mesh | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
-  let tracked: VillagerId | null = null;
   // La cota del suelo, que la burbuja necesita para flotar sobre la cabeza y no
   // sobre el nivel del mar.
   let groundFloor: (x: number, z: number) => number = () => 0;
   let lastActors: Actor[] = [];
-  // D.6 · el estado efimero de los actores. Vive aqui, no en `GameState`, y se
-  // rehace al amanecer de cada dia escenico y en cada partida nueva.
-  const memory = createActorMemory();
   // El estado de la jornada, quieto desde anoche. Es lo que se pinta: ver
   // `scenic-state.ts` para por que no se pinta el vivo.
   const scenic = createScenicState();
 
   /**
-   * Anexo E · la capa de vida, detrás de bandera.
+   * Anexo E · la capa de vida. **El único camino desde V-12.**
    *
-   * Mientras exista esta bandera el juego puede volver al camino de hoy en una
-   * línea, y ninguna partida se entera de nada: el motor no se toca en ninguna
-   * fase del anexo. V-12 la quitará, y con ella el camino viejo.
+   * La bandera `valley.life` existió mientras hubo un camino de vuelta: una
+   * línea devolvía el valle a `actors/index.ts`, la función que evaluaba una
+   * curva del reloj. V-12 borró esa función, así que la bandera ya no tenía
+   * nada que apagar y se fue con ella.
    */
-  const useLife = (() => {
-    // **Encendida por defecto desde G-12**: la vida del valle dejó de ser un
-    // experimento detrás de una bandera y es cómo se mueve la aldea. Apagarla
-    // sigue siendo una línea (`valley.life = 'off'`) mientras el camino viejo
-    // exista, que es hasta que V-12 lo borre.
-    try { return globalThis.localStorage?.getItem('valley.life') !== 'off'; }
-    catch { return true; }
-  })();
   let life: LifeVillage | null = null;
   let lifeDay = -1;
   let lifeCarry = 0;
@@ -518,39 +506,32 @@ export async function createGraphicsRenderer(
       // cambia de forma y no en cada fotograma.
       if (!isQuiet(change)) frameCamera();
 
-      // Actors are derived every frame because they change every frame; the
-      // village is not, because it changes a few times a year.
-      if (useLife) {
-        // La aldea vive por su cuenta: una jornada es una vida, y al amanecer
-        // se estrena otra con la gente que el motor diga.
-        if (life === null || lifeDay !== today || frame.discontinuity) {
-          life = createVillage(shown, today);
-          lifeDay = today;
-          lifeCarry = 0;
-        }
-        lifeCarry += frame.deltaSeconds;
-        let given = 0;
-        while (lifeCarry >= LIFE_STEP && given < 240) {
-          life.step();
-          lifeCarry -= LIFE_STEP;
-          given += 1;
-        }
-        const ages = new Map<VillagerId, number>();
-        const named = new Set<VillagerId>();
-        for (const villager of shown.people.villagers) {
-          ages.set(villager.id, clockOf(shown.tick).year - clockOf(villager.bornTick).year);
-          if (villager.named) named.add(villager.id);
-        }
-        lastActors = castOf(life, frame.presentationSeconds, ages, named);
-        // V-09b: la pelota, el palo, el cubo, el haz de leña — sólo existen en
-        // la capa de vida, así que sólo se pintan detrás de esta bandera.
-        props.update(propsOf(life), groundFloor);
-      } else {
-        lastActors = actorsFor(shown, frame, { tracked, memory });
-        // Sin la capa de vida no hay trastos que pintar: si la bandera se
-        // apagara a media partida, no se quedaría uno flotando del día anterior.
-        if (props.count > 0) props.clear();
+      // La gente se recoloca en cada fotograma porque en cada fotograma se ha
+      // movido; la aldea no, porque cambia unas cuantas veces al año.
+      //
+      // La aldea vive por su cuenta: una jornada es una vida, y al amanecer se
+      // estrena otra con la gente que el motor diga.
+      if (life === null || lifeDay !== today || frame.discontinuity) {
+        life = createVillage(shown, today);
+        lifeDay = today;
+        lifeCarry = 0;
       }
+      lifeCarry += frame.deltaSeconds;
+      let given = 0;
+      while (lifeCarry >= LIFE_STEP && given < 240) {
+        life.step();
+        lifeCarry -= LIFE_STEP;
+        given += 1;
+      }
+      const ages = new Map<VillagerId, number>();
+      const named = new Set<VillagerId>();
+      for (const villager of shown.people.villagers) {
+        ages.set(villager.id, clockOf(shown.tick).year - clockOf(villager.bornTick).year);
+        if (villager.named) named.add(villager.id);
+      }
+      lastActors = castOf(life, frame.presentationSeconds, ages, named);
+      // V-09b: la pelota, el palo, el cubo, el haz de leña.
+      props.update(propsOf(life), groundFloor);
       cast.show(lastActors);
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
@@ -617,7 +598,6 @@ export async function createGraphicsRenderer(
     },
 
     track(id: number | null): void {
-      tracked = id;
       if (id === null) return;
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
       // el jugador y no se le quita de las manos.

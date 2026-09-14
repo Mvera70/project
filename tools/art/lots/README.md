@@ -25,7 +25,7 @@ también los ids del otro.
 Retocar la chimenea de la casa obligaba a editarlos allí, y una receta cuyo
 autor se pierde es una receta que sólo se puede tocar a mano en su JSON. Lo
 mismo que pasó con la plantilla de la demo, que ya está en
-`tools/graphics/pilot-page.html`.
+`tools/graphics/bundle-game.ts`.
 
 **Todo va en metros** y `scale` lo lleva a celdas (design.md D.6.2): una celda
 son tres metros, así que una huella de 2×2 celdas es una casa de seis por seis.

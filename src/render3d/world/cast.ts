@@ -13,7 +13,7 @@ import {
   AnimationMixer, Color, Group, type AnimationClip, type Material, type Object3D,
 } from 'three';
 import type { Role, VillagerId } from '@engine/state';
-import type { Actor } from '../actors';
+import type { Actor } from '../contracts';
 import type { LoadedAsset } from '../assets';
 
 type Action = NonNullable<ReturnType<AnimationMixer['clipAction']>>;

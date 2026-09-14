@@ -12,12 +12,26 @@ describe('G-01 · graphics boundary', () => {
     expectTypeOf<GraphicsTarget>().toEqualTypeOf<InspectTarget>();
   });
 
-  it('depends on the engine through a type-only GameState import', () => {
+  it('depends on the engine through type-only imports, and on nothing that runs', () => {
+    // La propiedad, y no la lista.
+    //
+    // Esto comparaba la lista literal de imports contra una copia congelada, asi
+    // que anadir un tipo —`Role`, o el `ClipName` que V-12 trajo aqui con el
+    // contrato de figura— rompia la prueba sin que nada de lo que guarda hubiera
+    // cambiado. Lo que D.5 pide es que este fichero sea **solo tipos**: que no
+    // importe nada que se ejecute, que del motor solo lea tipos, y que Three no
+    // aparezca. Eso es lo que se comprueba ahora.
     const source = readFileSync(CONTRACTS, 'utf8');
     const imports = [...source.matchAll(/import\s+([^;]+)\s+from\s+['"]([^'"]+)['"]/gu)]
       .map((match) => ({ clause: match[1] ?? '', target: match[2] ?? '' }));
 
-    expect(imports).toEqual([{ clause: 'type { GameState }', target: '../engine/state' }]);
+    expect(imports.length).toBeGreaterThan(0);
+    for (const line of imports) {
+      expect(line.clause, `'${line.target}' entra como valor y no como tipo`)
+        .toMatch(/^type\s/u);
+    }
+    const engine = imports.filter((line) => line.target.includes('engine'));
+    expect(engine.map((line) => line.target)).toEqual(['../engine/state']);
     expect(source).not.toMatch(/from\s+['"]three(?:\/|['"])/u);
   });
 

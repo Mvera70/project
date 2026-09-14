@@ -6,14 +6,14 @@
 // cubo y una casa de dos por dos sale como cuatro bloques pegados, que es
 // imposible de juzgar.
 //
-// Es la pieza que V-12 convertirá en el camino único cuando se retire la capa
-// vieja. Hasta entonces convive con ella detrás de una bandera.
+// **Desde V-12 es el camino único.** La capa vieja —`actors/index.ts`, una
+// función que evaluaba una curva del reloj— ya no existe, y con ella se fue la
+// bandera que permitía volver a ella.
 
 import type { VillagerId } from '@engine/state';
-import type { Actor } from '../actors';
-import type { ClipName } from '../actors/clips';
-import { clipTime } from '../actors/clips';
-import type { Activity } from '../actors/day';
+import type { Activity, Actor } from '../contracts';
+import type { ClipName } from '../clips';
+import { clipTime } from '../clips';
 import type { Prop } from './props';
 import type { Dweller, Village } from './village';
 

@@ -4,8 +4,9 @@
 // encararse, empujarse o pelear, con papeles distintos para cada uno. Es lo
 // que hace que el tránsito se lea como vida y no como hormigas (E.6).
 //
-// Esto no inventa el mecanismo: lo porta de `life/spike/life.ts`, el banco que
-// el dueño del diseño ya vio funcionar y midió. Lo que cambia es de dónde sale
+// Esto no inventó el mecanismo: lo portó del descarte de V-00, el banco que el
+// dueño del diseño vio funcionar y midió (V-12 borró aquel código, y el informe
+// de la ronda es lo que queda de él). Lo que cambia es de dónde sale
 // el carácter — allí un cuerpo llevaba un `temper`/`sociable` fijo tirado a
 // dados; aquí eso ya existe y se llama `needs.irritation` y `needs.company`
 // (E.4: el carácter entra por la velocidad a la que suben los impulsos, así

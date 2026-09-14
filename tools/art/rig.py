@@ -70,7 +70,7 @@ def bind_rigid(armature, objects, bindings, smooth=False):
     Con `smooth=True` los pesos los reparte Blender por proximidad al hueso, y
     una pieza puede seguir a dos a la vez: la piel se dobla en los codos en vez
     de articularse a bloques. D.4 pide comparar las dos antes de fijar una, y
-    `tools/graphics/skin-bench.ts` construye las dos con esta misma receta.
+    D.4.1 las comparó en un banco común con esta misma receta y coste idéntico.
     """
     if smooth:
         return _bind_smooth(armature, objects, bindings)

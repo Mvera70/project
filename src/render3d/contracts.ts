@@ -1,6 +1,75 @@
 // G-01 · Public boundary between the simulation, presentation owner and 3D renderer.
 
-import type { GameState } from '../engine/state';
+import type { GameState, Role, VillagerId } from '../engine/state';
+import type { ClipName } from './clips';
+
+/**
+ * Qué está haciendo una figura, de las seis cosas que el render distingue.
+ *
+ * Nace en G-05 como la salida de los actores derivados y **sobrevive a V-12**
+ * porque el nombre sigue describiendo lo que el render necesita saber: no cómo
+ * se ha llegado a esa postura, sino cuál es. Hoy lo produce la capa de vida
+ * (`life/cast.ts`), que lo deduce de un cuerpo que anda de verdad.
+ */
+export type Activity = 'home' | 'leaving' | 'walking' | 'working' | 'returning' | 'resting';
+
+/**
+ * Una figura en la escena, lista para pintarse. design.md D.5, Anexo E.
+ *
+ * **Es el contrato entre la capa 2 y la capa 3** (E.2): la vida lo produce en
+ * `life/cast.ts` y `world/cast.ts` lo consume para posar un modelo. Nada de
+ * aquí entra en el guardado ni vuelve al motor.
+ *
+ * Vivía en `actors/index.ts` junto a la función que lo derivaba del reloj. V-12
+ * borró esa función —el valle ya no evalúa una curva, simula cuerpos— y el tipo
+ * se quedó, que es lo que el brief de la fase pedía conservar.
+ */
+export interface Actor {
+  readonly id: VillagerId;
+  /** Posición en la escena. El `(x, y)` del mapa es `(x, 0, z)` con `z = y` (D.4). */
+  readonly x: number;
+  readonly z: number;
+  /** Hacia dónde mira, en radianes sobre la vertical. Cero mira a `+z`. */
+  readonly facing: number;
+  readonly activity: Activity;
+  readonly clip: ClipName;
+  /** En qué segundo de su propio clip hay que ponerlo. */
+  readonly clipSeconds: number;
+  /**
+   * Suelo recorrido desde que empezó este tramo, en celdas.
+   *
+   * Es lo que mueve el clip de andar, y por eso los pies no patinan: cuenta
+   * distancia recorrida, no desplazamiento neto.
+   */
+  readonly travelled: number;
+  /** La celda a la que pertenece ahora mismo. De ella cuelgan una puerta o un ancla. */
+  readonly cell: number;
+  readonly named: boolean;
+  /**
+   * Si ahora mismo está parado con alguien (§11.9).
+   *
+   * Lo sabe quien coloca a la gente, y lo necesita quien dibuja la burbuja de
+   * §11.1.1: deducirlo del clip —«trabajando pero con el clip de estarse»— era
+   * adivinar desde fuera algo que aquí se sabe.
+   */
+  readonly talking: boolean;
+  /**
+   * Los años que tiene. Sirven para la talla y para nada más.
+   *
+   * Un valle de adultos idénticos no es un valle: los niños tienen que verse
+   * niños desde arriba, que es donde no hay fichas que leer. La talla sale de
+   * aquí y el resto de la variación sale del `id`, porque el estado no guarda
+   * de qué color viste nadie ni tiene por qué.
+   */
+  readonly age: number;
+  /**
+   * El oficio con nombre que lleva, o `null` si es un campesino anónimo.
+   *
+   * `null` es la mayoría: sólo los aldeanos con nombre llevan `Role` (§3.4).
+   * Quien pinta decide con esto qué modelo usa (D.6.2, `world/cast.ts`).
+   */
+  readonly role: Role | null;
+}
 
 export type GraphicsTarget =
   | { kind: 'building'; id: number }

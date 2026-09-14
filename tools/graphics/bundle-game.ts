@@ -1,12 +1,13 @@
 // G-07 · El juego entero en una pagina, para jugarlo desde el movil.
 //
-// `bundle-pilot.ts` arma el banco de pruebas: un lienzo, unos botones y nada
-// mas. Sirve para mirar el valle y no sirve para lo otro que hace falta mirar,
-// que es **si se entiende lo que pasa**: la tira de §11.1.1, las encrucijadas
-// de §11.2, la cronica, la ficha al tocar. Todo eso esta en el juego y no en el
-// banco.
+// Hubo un tiempo en que esto tenia un hermano, `bundle-pilot.ts`, que armaba el
+// banco del piloto: un lienzo, unos botones y nada mas. Servia para mirar el
+// valle y no para lo otro que hace falta mirar, que es **si se entiende lo que
+// pasa**: la tira de §11.1.1, las encrucijadas de §11.2, la cronica, la ficha al
+// tocar. Desde G-12 el juego es el 3D y el piloto no existe, asi que el banco
+// se fue con el (V-12) y esto quedo como la unica via.
 //
-// Esto empaqueta el juego de verdad: `index.html` con el render 3D forzado, los
+// Esto empaqueta el juego de verdad: `index.html`, los
 // GLB dentro en base64 y el javascript incrustado, para que la pagina se abra
 // sola sin servidor detras.
 

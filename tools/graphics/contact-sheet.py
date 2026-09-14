@@ -5,7 +5,7 @@ El jugador no esta delante del equipo. Las capturas sueltas en `artifacts/` no
 le sirven de nada, y la demo jugable pide paciencia y bateria: la hoja se mira
 en un minuto y dice en que ha quedado la ronda.
 
-Las capturas se toman antes con Playwright sobre `tools/graphics/valley.html`, a
+Las capturas se toman antes con `tools/graphics/shot.mjs` sobre el juego, a
 340x480 y sin escala doble, y se incrustan en base64 para que la pagina se
 publique sola. Todas salen de la misma partida: lo que cambia de una a otra es
 la distancia, la hora o la estacion, y por eso valen para comparar.

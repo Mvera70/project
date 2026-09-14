@@ -16,12 +16,10 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { ford, run } from '@engine/sim';
 import type { GameState } from '@engine/state';
-import { actorsFor } from '../../src/render3d/actors';
 import { loadAssets } from '../../src/render3d/assets';
-import { SCENIC_DAY_SECONDS } from '../../src/render3d/presentation-clock';
 import { VALLEY_COLOURS } from '../../src/render3d/visual-config';
 import { BoxGeometry, Color, Group, Mesh, MeshStandardMaterial, type Object3D } from 'three';
-import type { Actor } from '../../src/render3d/actors';
+import type { Actor } from '../../src/render3d/contracts';
 import type { LoadedAsset } from '../../src/render3d/assets';
 import { BUILDINGS } from '@engine/balance';
 import { TERRAIN_CODE, type BuildingKind } from '@engine/state';
@@ -29,6 +27,9 @@ import { BUILDING_ASSETS } from '../../src/render3d/world/buildings';
 import { Cast } from '../../src/render3d/world/cast';
 import { buildFord, fordCells } from '../../src/render3d/world/ford';
 import { Village } from '../../src/render3d/world/buildings';
+import { createVillage } from '../../src/render3d/life/village';
+import { castOf } from '../../src/render3d/life/cast';
+import { LIFE_STEP } from '../../src/render3d/life/clock';
 import { PALETTES } from '@render/palette';
 import { buildForest, shoreCells } from '../../src/render3d/world/forest';
 import { buildGround, cellColour, elevationAt } from '../../src/render3d/world/ground';
@@ -72,13 +73,6 @@ function trodden(): { state: GameState; cell: number } {
   throw new Error('ninguna partida abrió camino de nivel 2');
 }
 
-function frameAt(seconds: number) {
-  return {
-    tickFraction: 0.5, presentationSeconds: seconds, deltaSeconds: 1 / 60,
-    speed: 1 as const, reducedMotion: false, discontinuity: false,
-  };
-}
-
 describe('G-06 · el plan de escena', () => {
   it('planificar no escribe en el estado ni consume una tirada', () => {
     const state = village(10);
@@ -103,8 +97,14 @@ describe('G-06 · el plan de escena', () => {
     const state = village(10);
     const once = planFor(state);
     let drawn = 0;
+    // V-12: quien produce el reparto es la capa de vida, no una fórmula del
+    // reloj. La propiedad que esta prueba guarda no cambia —vivir la jornada no
+    // puede tocar el plan— pero ahora se comprueba sobre quien de verdad la
+    // vive, que es el único camino que queda.
+    const life = createVillage(state, 0);
     for (let step = 0; step < 100; step += 1) {
-      drawn += actorsFor(state, frameAt((step / 100) * SCENIC_DAY_SECONDS)).length;
+      life.step();
+      drawn += castOf(life, step * LIFE_STEP, new Map(), new Set()).length;
     }
     // Que se haya dibujado gente **en el día**, no en cada fotograma: desde
     // v3.62 la noche no tiene a nadie fuera, y exigir un actor en todos los
