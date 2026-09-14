@@ -304,3 +304,23 @@ No son teoría: cada una se pagó con al menos una ronda.
 9. **Los edificios del piloto son cajas con tejado.** El catálogo de verdad es
    G-10. Es deliberado: lo que hay que juzgar antes es si un valle de estas
    proporciones se lee desde arriba.
+10. **El desfase entre el reloj del mundo y el de la jornada es estructural, y
+    ya no se ve.** Un tick es una semana y una jornada escénica dura ciento
+    veinte segundos, así que dentro de un amanecer-anochecer pasan ocho semanas
+    a ×1 y sesenta y cuatro a ×64. Eso hacía saltar todo lo que el render deriva
+    del tick, y costó tres rondas en tres sistemas distintos, cada uno
+    defendiéndose por su cuenta. Desde v3.59 lo sostiene **un solo sitio**:
+    `src/render3d/scenic-state.ts`, que releva el estado al anochecer y se lo
+    reparte a todos desde `paint`. **Un sistema nuevo lo hereda sin escribir
+    nada**, y ése es el punto: antes había que acordarse de congelar y olvidarlo
+    no daba error, sólo un salto.
+
+    Lo que **no** arregla: el desfase sigue existiendo, sólo que nadie lo ve. Y
+    afinar el tick tampoco lo arreglaría —con tick diario serían 56 pasos por
+    jornada en vez de 8—, porque nace de D.6.1 (la jornada corre a √velocidad y
+    el mundo a la velocidad entera) y no del tamaño del paso. Si algún día se
+    afina el tick, que sea por razones de simulación y no de dibujo: el
+    argumento visual se quedó sin objeto. El coste está medido constante a
+    constante en `docs/brief-reloj.md`, con el orden que menos duele —arreglar
+    antes las diez pruebas de balance que ya están rojas, o no habrá referencia
+    contra la que medir el cambio de paso—.

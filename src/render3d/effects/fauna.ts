@@ -17,7 +17,7 @@
 import { Group, InstancedMesh, Matrix4, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState, type ValleyMap } from '@engine/state';
 import {
-  animalPositions, NIGHT, wildlifePositions, type Animal, type AnimalKind,
+  animalPositions, wildlifePositions, type Animal, type AnimalKind,
 } from '@render/animals';
 import { piecesOf, type Piece } from '../world/forest';
 
@@ -119,11 +119,6 @@ export class Fauna {
   private readonly hidden = new Vector3(0, 0, 0);
   private readonly last = new Map<number, { x: number; y: number }>();
   /** El día escénico que se está dibujando, y la semana con la que se dibuja. */
-  private day = -1;
-  private week = 0;
-  private dark = false;
-  private herd: GameState['herd'] | null = null;
-  private buildings: GameState['buildings'] | null = null;
 
   /**
    * `instance` da una copia del recurso de cada clase, o `undefined` si el
@@ -148,62 +143,18 @@ export class Fauna {
    * recogen al anochecer igual que la gente (§10.6), y usar el tick los habría
    * metido en casa cuatro veces por día escénico a ×1.
    *
-   * **`day` es el número de día escénico, y con él se congela la semana.**
-   *
-   * La querencia de cada animal se sortea con la semana (§11.9, v3.06): sin
-   * eso, el mismo bicho repetía el mismo círculo desde la fundación hasta el
-   * final de la partida. En el render 2D está bien, porque allí un tick es un
-   * día en pantalla y el salto se lee como «se ha ido a otra mata». Aquí una
-   * jornada dura **ocho semanas a ×1 y ciento veintiocho a ×16**, así que la
-   * querencia se re-sorteaba ciento veintiocho veces por día y el rebaño se
-   * teletransportaba: el mismo fallo que costó dos rondas en la gente, por la
-   * misma razón y con la misma cura.
-   *
-   * Se congela al amanecer, igual que los destinos de la jornada. Lo que el
-   * motor decida durante el día entra mañana.
+   * **El estado llega quieto y por eso aquí ya no se congela nada.** La
+   * querencia de cada animal se sortea con la semana (§11.9, v3.06), y el
+   * identificador de cada bicho es su puesto en la fila de la cabaña, así que
+   * los dos se movían solos dentro de una misma jornada —ocho semanas a ×1,
+   * sesenta y cuatro a ×64— y el rebaño se teletransportaba. La cura era
+   * guardar aquí la semana, la cabaña y el pueblo de anoche; hoy la trae hecha
+   * `scenic-state.ts`, para todos y de una vez, y este método vuelve a ser lo
+   * que debía: una función de la hora.
    */
-  update(state: GameState, dayPhase: number, day: number): void {
-    // **La semana cambia al anochecer, no al amanecer.**
-    //
-    // Congelarla al amanecer quitaba los ciento veintiocho saltos por día, pero
-    // dejaba uno: la querencia cambia hasta dos celdas, y al amanecer el ganado
-    // está en pantalla, así que se veía dar el salto. Al anochecer no se ve
-    // ninguno: el ganado, los cuervos y los peces dejan de dibujarse en esa
-    // misma línea (§10.6) y el lobo empieza justo ahí, o sea que aparece ya en
-    // su sitio nuevo. Quien no está no salta.
-    const dark = dayPhase >= NIGHT;
-    if (this.day !== day || (dark && !this.dark)) {
-      this.day = day;
-      this.week = state.tick;
-      // **Y la cabaña con ella.** El identificador de cada animal es su puesto
-      // en la fila —primero las gallinas, luego los cerdos, luego las vacas— y
-      // de ese número salen su fase, su radio y su querencia. Si nace una
-      // gallina a media jornada, todos los cerdos y todas las vacas cambian de
-      // número y se mueven de sitio de golpe. Con la cabaña congelada, lo que
-      // se lleve el lobo se nota al día siguiente, que es cuando se cuenta.
-      this.herd = { ...state.herd };
-      // **Y el pueblo con ella, por lo mismo.** La gallina cuelga de la casa
-      // que le toca por su puesto en la fila de casas, y la fila se recorre en
-      // circulo: una casa nueva a media jornada cambia el reparto entero y el
-      // corral se muda de golpe. Medido, dos celdas justas. Que la casa nueva
-      // estrene sus gallinas manana no lo nota nadie.
-      // Copia, no referencia: el motor construye empujando sobre el mismo
-      // array y derriba escribiendo en el mismo edificio, asi que guardar el
-      // array no guarda nada.
-      this.buildings = state.buildings.map((building) => ({ ...building }));
-    }
-    this.dark = dark;
-    // Una copia superficial con la semana, la cabaña y el pueblo de anoche. Lo
-    // demás —el mapa, el brote— es el estado de ahora.
-    const frozen = this.week === state.tick && this.herd === null && this.buildings === null
-      ? state
-      : {
-        ...state, tick: this.week,
-        herd: this.herd ?? state.herd,
-        buildings: this.buildings ?? state.buildings,
-      };
+  update(state: GameState, dayPhase: number): void {
     const animals: Animal[] = [];
-    for (const animal of [...animalPositions(frozen, dayPhase), ...wildlifePositions(frozen, dayPhase)]) {
+    for (const animal of [...animalPositions(state, dayPhase), ...wildlifePositions(state, dayPhase)]) {
       if (animal.kind === 'fish') {
         animals.push(animal);
         continue;
@@ -329,10 +280,6 @@ export class Fauna {
     for (const kind of [...this.herds.keys()]) this.drop(kind);
     this.last.clear();
     this.facing.clear();
-    // Otra partida es otra semana: sin esto, el valle nuevo heredaría la
-    // querencia del viejo hasta el amanecer siguiente.
-    this.day = -1;
-    this.herd = null;
   }
 
   dispose(): void {

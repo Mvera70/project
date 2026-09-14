@@ -33,6 +33,7 @@ import {
   dayNumber, dayPhase, SCENIC_DAY_SECONDS,
 } from '../../src/render3d/presentation-clock';
 import { Tells, WINDOWS } from '../../src/render3d/effects/tells';
+import { createScenicState } from '../../src/render3d/scenic-state';
 import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
 import { groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
@@ -304,7 +305,7 @@ describe('G-10 · la fauna (§7.7)', () => {
     // alguien tocara §7.7.
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.4, 0);
+    fauna.update(state, 0.4);
     const said = [...animalPositions(state, 0.4), ...wildlifePositions(state, 0.4)];
     expect(said.length).toBeGreaterThan(0);
     expect(fauna.count).toBeLessThanOrEqual(said.length);
@@ -317,9 +318,9 @@ describe('G-10 · la fauna (§7.7)', () => {
     // ventana por la que entran los lobos de §7.7.
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.4, 0);
+    fauna.update(state, 0.4);
     const byDay = fauna.count;
-    fauna.update(state, 0.95, 0);
+    fauna.update(state, 0.95);
     expect(byDay).toBeGreaterThan(0);
     expect(fauna.count).toBeLessThan(byDay);
     fauna.dispose();
@@ -350,10 +351,10 @@ describe('G-10 · la fauna (§7.7)', () => {
     // lo que no se puede hacer es reconstruir objetos sesenta veces por segundo.
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.3, 0);
+    fauna.update(state, 0.3);
     const before = [...fauna.group.children];
     expect(before.length).toBeGreaterThan(0);
-    for (let step = 1; step <= 6; step += 1) fauna.update(state, 0.3 + step * 0.02, 0);
+    for (let step = 1; step <= 6; step += 1) fauna.update(state, 0.3 + step * 0.02);
     const after = [...fauna.group.children];
     expect(after.length).toBe(before.length);
     for (let index = 0; index < after.length; index += 1) expect(after[index]).toBe(before[index]);
@@ -363,7 +364,7 @@ describe('G-10 · la fauna (§7.7)', () => {
   it('lo suelta todo al terminar', () => {
     const state = village(14);
     const fauna = new Fauna(() => model());
-    fauna.update(state, 0.4, 0);
+    fauna.update(state, 0.4);
     fauna.dispose();
     expect(fauna.group.children.length).toBe(0);
     expect(fauna.count).toBe(0);
@@ -632,12 +633,17 @@ describe('G-10 · el rebaño no se teletransporta', () => {
     // Se simula el ritmo de ×16: una semana por segundo escénico.
     const state = village(14);
     const fauna = new Fauna(() => model());
+    // Por el mismo sitio que el renderer: quien sostiene la jornada quieta ya
+    // no es `fauna`, es el estado escénico, y lo que esta prueba describe es la
+    // propiedad —el rebaño no salta— y no quién la cumple.
+    const scenic = createScenicState();
     const seen = new Map<number, { x: number; z: number; step: number }>();
     let biggest = 0;
     for (let step = 0; step <= 240; step += 1) {
       const seconds = (step / 240) * SCENIC_DAY_SECONDS;
       while (state.tick < 672 + Math.floor(seconds)) run(state, 1, 'prudent', CATALOG);
-      fauna.update(state, dayPhase(seconds), dayNumber(seconds));
+      const phase = dayPhase(seconds);
+      fauna.update(scenic.of(state, phase, dayNumber(seconds)), phase);
       for (const piece of fauna.group.children) {
         const mesh = piece as InstancedMesh;
         const matrix = new Matrix4();

@@ -8461,6 +8461,57 @@ el desplazamiento es horizontal y lo que separa la superficie dibujada de la
 calculada no llega a diez centimetros, que es menos que el grosor de una bota.
 
 
+#### D.6.7 · El estado de la jornada (v3.59)
+
+Un tick es una semana y una jornada escenica dura ciento veinte segundos. Como
+la jornada corre a la raiz de la velocidad y el mundo a la velocidad entera
+(D.6.1), **dentro de un solo amanecer-anochecer la aldea vive ocho semanas a x1
+y sesenta y cuatro a x64**, y la cuenta empeora segun se acelera:
+
+| | x1 | x4 | x16 | x64 |
+|---|---|---|---|---|
+| Semanas por jornada visible | 8 | 16 | 32 | 64 |
+
+Todo lo que el render deriva del tick cambia, por tanto, **a media vista**: la
+querencia de una vaca, el puesto de una gallina en la fila de la cabana, la ruta
+de un aldeano, la casa que estrena corral. En un valle que se mira eso no se lee
+como «ha pasado una semana»: se lee como un teletransporte, y costo tres rondas
+en tres sistemas distintos.
+
+Hasta v3.58 cada sistema se defendia solo —`fauna` guardaba su semana, su cabana
+y su pueblo; los actores guardaban sus rutas; la reunion se preguntaba desde el
+amanecer anterior—, y eso tenia un coste que no se ve en pantalla: **un sistema
+nuevo nacia con el fallo dentro y nada se quejaba.** No hay error de tipos ni
+prueba que salte; solo un salto que hay que ver para saber que esta.
+
+**La regla, ahora:** `paint` pide el estado de la jornada y reparte ese. Lo que
+llega a los sistemas viene quieto, y el sistema que se escriba manana lo hereda
+sin enterarse. El defecto se invierte: antes habia que acordarse de congelar,
+ahora hay que pedir lo vivo, que es lo raro y se ve al leerlo.
+
+**El relevo es al anochecer, no al amanecer.** Es el unico numero de la decision
+y se toma de `NIGHT`, la misma linea en la que los animales se recogen, en vez
+de escribirlo otra vez. Al amanecer el ganado esta en pantalla cuando le cambia
+la querencia —hasta dos celdas— y el salto se ve: uno por jornada en vez de
+ciento veintiocho, pero se ve. Al anochecer no se ve ninguno, porque el ganado,
+los cuervos y los peces dejan de dibujarse en esa misma linea (§10.6), la gente
+esta dentro y el lobo empieza ya en su sitio nuevo. **Quien no esta no salta.** Y
+como entre el anochecer y el amanecer siguiente no se releva nada, las rutas que
+los actores tomaban «al amanecer» son exactamente estas: los dos momentos son el
+mismo, y por eso un solo relevo sirve a los dos sistemas que antes lo hacian
+cada uno por su lado.
+
+La copia es superficial donde basta y profunda donde el motor **escribe dentro**
+—edificios y aldeanos—, que es lo que hace fallar a la copia ingenua: construir
+empuja sobre el mismo array y morir escribe en el aldeano que ya estaba. §4.3
+sigue intacto: aqui se lee y se copia, nunca se escribe ni se consume azar.
+
+**Lo que esto no arregla, dicho para que nadie lo confunda:** el desfase sigue
+ahi. La jornada sigue durando ocho semanas; lo unico que cambia es que ya no se
+ve cambiar. Hacer el tick mas fino tampoco lo arreglaria —con tick diario serian
+cincuenta y seis pasos por jornada en vez de ocho—, porque el desfase es
+estructural a D.6.1 y no al tamano del paso.
+
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
 §10.7 contiene objetivos del Canvas, no mediciones ni garantías trasladables

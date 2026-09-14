@@ -34,6 +34,7 @@ import {
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Cast } from './world/cast';
 import { dayNumber, dayPhase } from './presentation-clock';
+import { createScenicState } from './scenic-state';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
@@ -206,6 +207,9 @@ export async function createGraphicsRenderer(
   // D.6 · el estado efimero de los actores. Vive aqui, no en `GameState`, y se
   // rehace al amanecer de cada dia escenico y en cada partida nueva.
   const memory = createActorMemory();
+  // El estado de la jornada, quieto desde anoche. Es lo que se pinta: ver
+  // `scenic-state.ts` para por que no se pinta el vivo.
+  const scenic = createScenicState();
   let mapWidth = 0;
   let mapHeight = 0;
   let disposed = false;
@@ -366,7 +370,20 @@ export async function createGraphicsRenderer(
 
     paint(state: Readonly<GameState>, frame: GraphicsFrame): void {
       if (disposed) return;
-      const next = planFor(state as GameState);
+      // La hora escenica primero, porque de ella cuelga todo lo demas: es la
+      // que dice que jornada se esta pintando y, con ella, que estado.
+      const phase = dayPhase(frame.presentationSeconds);
+      const today = dayNumber(frame.presentationSeconds);
+      // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
+      // que no es la continuacion del anterior, asi que la jornada guardada no
+      // vale: se estrena una. `presentation-clock` ya distingue los tres casos.
+      if (frame.discontinuity) scenic.reset();
+      // **Y a partir de aqui se pinta esto y no `state`.** El de la jornada,
+      // quieto desde anoche: ver `scenic-state.ts` para por que. Lo vivo solo lo
+      // mira quien tenga una razon para mirarlo, y hoy no la tiene nadie.
+      const shown = scenic.of(state as GameState, phase, today);
+
+      const next = planFor(shown);
       const change = planChange(plan, next);
 
       if (change.cleared) {
@@ -379,7 +396,7 @@ export async function createGraphicsRenderer(
         fauna.clear();
         bubbles.clear();
       }
-      if (change.ground || change.cleared) rebuildGround(state as GameState);
+      if (change.ground || change.cleared) rebuildGround(shown);
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
       plan = next;
@@ -389,12 +406,12 @@ export async function createGraphicsRenderer(
 
       // Actors are derived every frame because they change every frame; the
       // village is not, because it changes a few times a year.
-      lastActors = actorsFor(state as GameState, frame, { tracked, memory });
+      lastActors = actorsFor(shown, frame, { tracked, memory });
       cast.show(lastActors);
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
       // lleva sale del estado; que este parado hablando lo dice el actor.
-      const moods = moodsFor(state as GameState);
+      const moods = moodsFor(shown);
       const carried = new Map<VillagerId, Bubble>();
       const heads = new Map<VillagerId, { x: number; y: number; z: number }>();
       for (const actor of lastActors) {
@@ -405,12 +422,9 @@ export async function createGraphicsRenderer(
         heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });
       }
       bubbles.update(heads, carried);
-      // La hora escenica: la piden el rebano, las luces y el sol.
-      const phase = dayPhase(frame.presentationSeconds);
-      const today = dayNumber(frame.presentationSeconds);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
-      tells.update(state as GameState);
+      tells.update(shown);
       // El humo y las luces si son de cada fotograma: uno sube y las otras se
       // encienden cuando cae el dia.
       tells.drift(frame.presentationSeconds, phase);
@@ -418,7 +432,7 @@ export async function createGraphicsRenderer(
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
-      fauna.update(state as GameState, phase, today);
+      fauna.update(shown, phase);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
       light(phase);
