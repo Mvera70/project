@@ -1470,6 +1470,19 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'Building: {built} raised, {lost} lost.',
   ],
 
+  // --- the founding (U-04) ---
+  //
+  // The first thing a new game says, and the only thing it says unasked. Not a
+  // tutorial: the sentence names the place, the year and how many they are, and
+  // the four figures of §11.1.1 sit on screen underneath it. The head count is a
+  // param read off the state, not a number written into the prose, so the line
+  // cannot drift from the founding it describes.
+  'founding.settled': [
+    'They stopped where the river turns, {people} of them, in the {season} of year {year}.',
+    'They came up the valley in year {year}, {people} of them, and did not go on.',
+    'The valley had nobody in it until year {year}, and then it had {people}.',
+  ],
+
   // --- milestones (§11.6) ---
   //
   // `src/ui/milestones.ts`. Not what a tick did (that is the rest of this
@@ -1616,6 +1629,7 @@ export const UI_BANK: Record<string, string> = {
   // celebración — es una etiqueta en una página de la crónica, y por eso vive
   // aquí y no en el banco de frases, cuya forma exige tres variantes y punto
   // final.
+  'founding.label': 'The valley is settled',
   'milestone.kind.first_of_kind': 'The first of its kind',
   'milestone.kind.peak_people': 'Never so many',
   'milestone.kind.turn_of_decade': 'A turn of the years',

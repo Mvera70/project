@@ -10,7 +10,7 @@ import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile } from '@engine/state';
-import { yearOf } from '@engine/time';
+import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom } from './backend';
 import { persistSave } from './idb';
 import { panelFor, type InspectTarget } from './inspect';
@@ -178,6 +178,32 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // Desde qué tick se buscan hitos. Arranca donde arranca la partida, así que
   // una partida cargada no vuelve a celebrar lo que ya celebró.
   let lastMilestoneTick = state.tick;
+
+  // U-04 · Lo primero que ve quien empieza, y lo único que el juego dice sin
+  // que se lo pidan. **No es un tutorial**: es la misma cartela de los hitos
+  // con la frase de la fundación, y debajo, en la pantalla, están ya las cuatro
+  // cifras de §11.1.1 y el valle andando. Quien lea la línea sabe dónde está,
+  // en qué año, y cuántos son; lo demás lo enseña la primera encrucijada, que
+  // es el juego enseñándose a sí mismo en vez de explicándose.
+  //
+  // Sólo en una partida nueva de verdad: no al recargar, que trae `save`, ni al
+  // heredar, que arranca con el tick corrido.
+  if (save === undefined && state.tick === 0) {
+    moments.show(
+      renderUiText('founding.label'),
+      renderEntry(
+        {
+          tick: 0,
+          kind: 'season',
+          templateKey: 'founding.settled',
+          params: { people: vitalsOf(state).people, year: yearOf(state.tick) + 1, season: seasonOf(state.tick) },
+          weight: 3,
+        },
+        state.rng,
+      ),
+      true,
+    );
+  }
 
   const panel = document.createElement('section');
   panel.className = 'valley-panel';
