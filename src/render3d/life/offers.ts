@@ -36,6 +36,14 @@ export interface Offer {
   readonly seconds: readonly [number, number];
   /** Hora punta, como fase de la jornada [0, 1]. Fuera vale menos, nunca cero. */
   readonly hours?: readonly [number, number];
+  /**
+   * Dónde se pone cada uno de los que caben, ya comprobado que es suelo
+   * pisable. Una por plaza, y `seats` es su cuenta.
+   *
+   * **Comprobado al montar el sitio y no al llegar**, que es lo que distingue
+   * un corro de una fila de gente clavada mirando una pared.
+   */
+  readonly spots?: readonly Point[];
 }
 
 /** El molde de una oferta, sin sitio: el sitio lo pone el edificio. */
@@ -135,7 +143,8 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
     for (const name of menu) {
       const spec = OFFERS[name];
       if (spec === undefined) continue;
-      offers.push({ ...spec, at });
+      const offer = placedOffer(spec, at, land);
+      if (offer !== null) offers.push(offer);
     }
     if (offers.length > 0) places.push({ id: `${building.kind}:${building.id}`, at, offers });
   }
@@ -166,6 +175,71 @@ export function offersNear(
   return found;
 }
 
+
+/**
+ * Los sitios donde de verdad se puede poner la gente alrededor de un punto.
+ *
+ * **El corro, pero sólo sobre suelo que se pisa.** Es el mismo reparto de
+ * siempre —ángulo de oro, el radio creciendo despacio— con una diferencia que
+ * resultó valer un tercio de la jornada: la plaza que cae en una pared o en el
+ * río **no se ofrece**, y el barrido sigue a los anillos de más afuera hasta
+ * juntar las que caben.
+ *
+ * Sin esto, `seatAt` devolvía un punto que podía estar dentro de un muro;
+ * `decide` pedía la ruta hasta allí, `pathTo` contestaba que no hay camino
+ * —porque no lo hay— y la persona se quedaba clavada hasta que se le pasaran
+ * las ganas. Medido en ocho semillas: entre el 51 % y el 96 % del tiempo que
+ * la aldea pasaba sin nada que hacer salía exactamente de aquí.
+ *
+ * **Y pisable basta: se probó pedir más y salió peor.** El segundo intento
+ * exigía además que la plaza estuviera a `radius + WALL_CLEAR` de todo muro —el
+ * mismo criterio que `doorOf` usa para la puerta— con el argumento de que una
+ * plaza pegada a la pared es una plaza donde `avoid` te está echando siempre.
+ * Medido, el argumento era cierto y la consecuencia al revés: ese criterio se
+ * llevaba por delante siete sitios y 42 de las 159 plazas de la semilla 7, la
+ * aldea se concentraba en lo que quedaba, y el apiñamiento que venía a evitar
+ * **subió**. Una aldea con menos sitios donde estar es una aldea más apretada,
+ * y eso pesa más que la holgura de cada plaza.
+ */
+export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
+  const found: Point[] = [];
+  if (!blockedAt(land, at.x, at.z)) found.push(at);
+  // Cuarenta intentos para llenar como mucho seis plazas: de sobra para rodear
+  // un pozo encajonado, y un tope para no barrer el valle entero buscando.
+  for (let ring = 1; found.length < want && ring < 40; ring += 1) {
+    const angle = ring * 2.39996;
+    const reach = 0.55 + Math.floor(ring / 4) * 0.5;
+    const spot = { x: at.x + Math.sin(angle) * reach, z: at.z + Math.cos(angle) * reach };
+    if (spot.x <= 0.5 || spot.z <= 0.5) continue;
+    if (spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
+    if (blockedAt(land, spot.x, spot.z)) continue;
+    found.push(spot);
+  }
+  return found;
+}
+
+/**
+ * Una oferta puesta en un sitio, con sus plazas ya comprobadas.
+ *
+ * Devuelve nada si no cabe nadie: un sitio al que no se puede llegar no es un
+ * sitio, y es mejor que no exista a que exista y no se pueda usar.
+ */
+export function placedOffer(
+  spec: OfferSpec, at: Point, land: Terrain, hours?: readonly [number, number],
+): Offer | null {
+  const spots = seatsOn(land, at, spec.seats);
+  const first = spots[0];
+  if (first === undefined) return null;
+  return {
+    ...spec,
+    at: first,
+    spots,
+    // El aforo es lo que de verdad cabe, no lo que el catálogo querría.
+    seats: spots.length,
+    ...(hours === undefined ? {} : { hours }),
+  };
+}
+
 /** La clave con la que se cuenta el aforo de una oferta en un sitio. */
 export function seatKey(place: Place, offer: Offer): string {
   return `${place.id}/${offer.id}`;
@@ -184,6 +258,13 @@ export function seatKey(place: Place, offer: Offer): string {
  * cuando hay algo que mirar: se ponen en círculo, no en fila india.
  */
 export function seatAt(offer: Offer, seat: number): Point {
+  // Las plazas comprobadas mandan: `seatsOn` ya descartó las que caían en una
+  // pared o en el río.
+  const { spots } = offer;
+  if (spots !== undefined && spots.length > 0) {
+    const at = seat <= 0 ? 0 : seat % spots.length;
+    return spots[at] as Point;
+  }
   if (seat <= 0 || offer.seats <= 1) return offer.at;
   // El ángulo de oro reparte sin alinear a nadie, y el radio crece despacio
   // para que un corro de seis no se convierta en una rueda de carro.

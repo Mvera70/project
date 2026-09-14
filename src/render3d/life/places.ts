@@ -14,7 +14,7 @@ import type { GameState } from '@engine/state';
 import { TERRAIN_CODE as CODES } from '@engine/state';
 import type { Point, Terrain } from './body';
 import type { Place } from './offers';
-import { OFFERS, placesOf } from './offers';
+import { OFFERS, placedOffer, placesOf } from './offers';
 import { canReach, reachableFrom } from './terrain';
 
 /**
@@ -140,17 +140,9 @@ function detectSquare(state: GameState, land: Terrain, shore: Uint8Array): Place
   const gossipSpec = OFFERS.gossip;
   if (gossipSpec === undefined) return null;
 
-  return {
-    id: 'square:common',
-    at: best.center,
-    offers: [
-      {
-        ...gossipSpec,
-        at: best.center,
-        hours: [0.6, 1.0],
-      },
-    ],
-  };
+  const offer = placedOffer(gossipSpec, best.center, land, [0.6, 1.0]);
+  if (offer === null) return null;
+  return { id: 'square:common', at: offer.at, offers: [offer] };
 }
 
 /**
@@ -205,17 +197,9 @@ function detectFord(state: GameState, land: Terrain, shore: Uint8Array): Place |
   if (loiterSpec === undefined) return null;
 
   // El vado ofrece un lugar tranquilo, con hora punta por la mañana.
-  return {
-    id: 'ford:crossing',
-    at,
-    offers: [
-      {
-        ...loiterSpec,
-        at,
-        hours: [0.0, 0.4],
-      },
-    ],
-  };
+  const offer = placedOffer(loiterSpec, at, land, [0.0, 0.4]);
+  if (offer === null) return null;
+  return { id: 'ford:crossing', at: offer.at, offers: [offer] };
 }
 
 /**
@@ -324,17 +308,9 @@ function detectGlade(state: GameState, land: Terrain, shore: Uint8Array): Place 
   if (workSpec === undefined) return null;
 
   // El claro ofrece trabajo, con hora punta al mediodía.
-  return {
-    id: 'glade:meadow',
-    at: best.center,
-    offers: [
-      {
-        ...workSpec,
-        at: best.center,
-        hours: [0.3, 0.7],
-      },
-    ],
-  };
+  const offer = placedOffer(workSpec, best.center, land, [0.3, 0.7]);
+  if (offer === null) return null;
+  return { id: 'glade:meadow', at: offer.at, offers: [offer] };
 }
 
 /**

@@ -174,6 +174,17 @@ export const RETHINK = 45;
  */
 const STICKY = 1.35;
 
+/**
+ * Cuántas ofertas se prueban antes de darse por vencido.
+ *
+ * TUNE: cuatro. Pedir una ruta cuesta, así que no se pueden probar todas; pero
+ * con una sola, cualquier oferta inalcanzable dejaba a alguien sin hacer nada
+ * el resto del rato. Cuatro cubre el caso real —la mejor y sus vecinas
+ * inmediatas suelen estar en el mismo rincón, y si ese rincón está cortado hay
+ * que salir de él— sin convertir cada replanteo en un barrido del valle.
+ */
+const TRY = 4;
+
 /** Lo que decide alguien, con todo lo suyo delante. */
 export interface Chooser {
   readonly traits: readonly Trait[];
@@ -205,7 +216,7 @@ export function decide(
   step: number,
 ): Intent | null {
   const dayPhase = (step % STEPS_PER_DAY) / STEPS_PER_DAY;
-  let best: { place: Place; offer: Offer; score: number } | null = null;
+  const options: { place: Place; offer: Offer; score: number; key: string }[] = [];
 
   for (const place of places) {
     const away = Math.hypot(place.at.x - who.at.x, place.at.z - who.at.z);
@@ -233,36 +244,49 @@ export function decide(
       const dice = hash32(seed, `pick:${who.id}:${step}:${place.id}:${offer.id}`) / 4_294_967_296;
       score *= 0.85 + dice * 0.3;
 
-      if (best === null || score > best.score) best = { place, offer, score };
+      options.push({ place, offer, score, key: seatKey(place, offer) });
     }
   }
 
-  if (best === null) return null;
-  if (who.doing !== null
-    && who.doing.place.id === best.place.id
-    && who.doing.offer.id === best.offer.id) {
-    // Lo mismo que ya hacía: se sigue, sin recalcular el camino.
-    return who.doing;
+  if (options.length === 0) return null;
+  // De mejor a peor, y con desempate por clave para que dos ofertas que puntúen
+  // exactamente igual no dependan del orden en que se recorrió el valle (§4.3).
+  options.sort((a, b) => (b.score - a.score) || (a.key < b.key ? -1 : 1));
+
+  for (const pick of options.slice(0, TRY)) {
+    if (who.doing !== null
+      && who.doing.place.id === pick.place.id
+      && who.doing.offer.id === pick.offer.id) {
+      // Lo mismo que ya hacía: se sigue, sin recalcular el camino.
+      return who.doing;
+    }
+
+    // La plaza que queda libre en ese sitio, y con ella el palmo de suelo donde
+    // ponerse: un corro y no un montón.
+    const seat = taken.get(pick.key) ?? 0;
+    const spot = seatAt(pick.offer, seat);
+    const route = router.to(land, who.at, spot);
+    // **Sin camino se prueba la siguiente, no se abandona el día.** Era la otra
+    // mitad del fallo de las plazas en pared: bastaba con que la mejor oferta
+    // fuera inalcanzable para que la persona se quedara sin hacer nada, y como
+    // la elección es determinista, al replantearse volvía a ganar la misma y
+    // volvía a no haber camino. Clavado hasta que se le pasaran las ganas.
+    if (route === null) continue;
+
+    const span = pick.offer.seconds;
+    const dice = hash32(seed, `span:${who.id}:${step}`) / 4_294_967_296;
+    return {
+      place: pick.place,
+      offer: pick.offer,
+      route: [...route],
+      seat,
+      since: step,
+      until: step + Math.round((span[0] + dice * (span[1] - span[0])) * 30),
+      there: false,
+    };
   }
 
-  // La plaza que queda libre en ese sitio, y con ella el palmo de suelo donde
-  // ponerse: un corro y no un montón.
-  const seat = taken.get(seatKey(best.place, best.offer)) ?? 0;
-  const spot = seatAt(best.offer, seat);
-  const route = router.to(land, who.at, spot);
-  if (route === null) return who.doing;
-
-  const span = best.offer.seconds;
-  const dice = hash32(seed, `span:${who.id}:${step}`) / 4_294_967_296;
-  return {
-    place: best.place,
-    offer: best.offer,
-    route: [...route],
-    seat,
-    since: step,
-    until: step + Math.round((span[0] + dice * (span[1] - span[0])) * 30),
-    there: false,
-  };
+  return who.doing;
 }
 
 /** Lo que una oferta calma, aplicado a quien la está haciendo. */
