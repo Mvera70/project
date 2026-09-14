@@ -19,6 +19,7 @@ import { createRouter, follow, type Router } from './navigate';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { placesOf, seatAt, seatKey, type Place } from './offers';
+import { commons } from './places';
 import { decide, satisfy, RETHINK, type Intent } from './decide';
 import { LIFE_STEP, seedOfDay } from './clock';
 
@@ -71,7 +72,7 @@ export interface Village {
 export function createVillage(state: GameState, day: number): Village {
   const land = terrainOf(state);
   const seed = seedOfDay(state.seed, day);
-  const places = placesOf(state, land);
+  const places = [...placesOf(state, land), ...commons(state, land)];
   const around: Neighbourhood = createNeighbourhood(land.width, land.height);
   const router: Router = createRouter();
 

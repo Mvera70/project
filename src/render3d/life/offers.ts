@@ -34,6 +34,8 @@ export interface Offer {
   readonly gives: Partial<Record<NeedName, number>>;
   /** Lo que dura, en segundos escénicos: mínimo y máximo. */
   readonly seconds: readonly [number, number];
+  /** Hora punta, como fase de la jornada [0, 1]. Fuera vale menos, nunca cero. */
+  readonly hours?: readonly [number, number];
 }
 
 /** El molde de una oferta, sin sitio: el sitio lo pone el edificio. */
@@ -43,6 +45,7 @@ interface OfferSpec {
   readonly seats: number;
   readonly gives: Partial<Record<NeedName, number>>;
   readonly seconds: readonly [number, number];
+  readonly hours?: readonly [number, number];
 }
 
 /**

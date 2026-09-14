@@ -8,3 +8,4 @@ artifacts/*
 .vite/
 __pycache__/
 *.pyc
+.claude/worktrees/

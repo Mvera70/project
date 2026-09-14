@@ -19,6 +19,7 @@ import { NEED_NAMES } from './needs';
 import type { Offer, Place } from './offers';
 import { seatAt, seatKey } from './offers';
 import type { Router, Waypoint } from './navigate';
+import { STEPS_PER_DAY } from './clock';
 
 /** Lo que alguien está haciendo o yendo a hacer. */
 export interface Intent {
@@ -93,6 +94,45 @@ function leanOf(traits: readonly Trait[], offer: string): number {
 }
 
 /**
+ * Cuánto vale una oferta en función de la hora del día.
+ *
+ * **Tiene que dar ventaja en su hora, no sólo penalizar fuera de ella.** La
+ * primera versión topaba en 1,0 dentro de la franja punta y caía por debajo
+ * fuera: así una oferta con hora nunca podía ganarle a una oferta idéntica sin
+ * restricción horaria, porque ésa vale 1,0 siempre. Medido: la plaza (`gossip`
+ * con hora) pierde casi siempre contra el pozo (`gossip` sin hora), y el claro
+ * (`work` con hora) casi siempre contra un campo normal — en seis semillas,
+ * la plaza no recibía visita en cuatro y el claro en dos. Con la hora como
+ * puro lastre, los sitios comunes de V-10 no aportaban nada.
+ *
+ * TUNE: 1,4 dentro de la franja punta, 0,6 como mínimo fuera. Dentro gana a
+ * cualquier alternativa sin hora que dé lo mismo; fuera sigue siendo viable,
+ * porque nunca es cero.
+ */
+function hourFactor(offer: Offer, dayPhase: number): number {
+  if (offer.hours === undefined) return 1;
+
+  const [start, end] = offer.hours;
+  // Cierra el intervalo: si es [0.6, 1.0] y la jornada es cíclica, hay que
+  // considerar que [0.95, 1.0] y [0.0, 0.05] son adyacentes.
+  const inRange = (dayPhase >= start && dayPhase <= end)
+    || (start > end && (dayPhase >= start || dayPhase <= end));
+
+  if (inRange) return 1.4;
+
+  // Fuera de hora, vale menos pero no cero. Usa una caída suave según la
+  // distancia: lo más lejano de la ventana vale menos.
+  const mid = (start + end) / 2;
+  let distance = Math.abs(dayPhase - mid);
+  // Si la ventana cruza el borde del día, la distancia es la más corta en el
+  // ciclo (acordeón).
+  if (start > end && distance > 0.5) distance = 1 - distance;
+
+  // Caída suave: lejos de la hora punta, valor base bajo.
+  return 0.6 + 0.4 / (1 + distance * 5);
+}
+
+/**
  * Cuánto vale para alguien hacer esto, ahora.
  *
  * Lo que calma, pesado por lo que aprieta. Una oferta que da mucho de algo que
@@ -164,11 +204,19 @@ export function decide(
   seed: number,
   step: number,
 ): Intent | null {
+  const dayPhase = (step % STEPS_PER_DAY) / STEPS_PER_DAY;
   let best: { place: Place; offer: Offer; score: number } | null = null;
 
   for (const place of places) {
     const away = Math.hypot(place.at.x - who.at.x, place.at.z - who.at.z);
-    if (away > LOOK * 2) continue;
+    // Un sitio con hora punta se busca más lejos que uno corriente: es un
+    // punto de encuentro deliberado (la plaza, el vado, el claro de V-10) y no
+    // un pozo cualquiera, así que vale la pena caminar un poco más para
+    // llegar a él. Sin esto, la plaza y el claro quedaban fuera del alcance de
+    // casi todo el mundo —medido, sin visita en cuatro y dos semillas de seis
+    // respectivamente— porque suelen caer en el borde del núcleo construido.
+    const hasHour = place.offers.some((offer) => offer.hours !== undefined);
+    if (away > LOOK * (hasHour ? 4 : 2)) continue;
     for (const offer of place.offers) {
       const key = seatKey(place, offer);
       // El aforo, salvo para quien ya está dentro: no se echa a nadie de su
@@ -178,6 +226,7 @@ export function decide(
 
       let score = worth(offer, who.needs, who.traits, who.at);
       if (score <= 0) continue;
+      score *= hourFactor(offer, dayPhase);
       if (inside) score *= STICKY;
       // Un pellizco de azar, para que dos vecinos idénticos frente al mismo
       // pozo no se muevan como un solo cuerpo.
