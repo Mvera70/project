@@ -1,0 +1,393 @@
+// V-07 · Escenas de dos. design.md Anexo E.
+//
+// **El corazón del encargo.** Dos que se cruzan pueden pararse a hablar,
+// encararse, empujarse o pelear, con papeles distintos para cada uno. Es lo
+// que hace que el tránsito se lea como vida y no como hormigas (E.6).
+//
+// Esto no inventa el mecanismo: lo porta de `life/spike/life.ts`, el banco que
+// el dueño del diseño ya vio funcionar y midió. Lo que cambia es de dónde sale
+// el carácter — allí un cuerpo llevaba un `temper`/`sociable` fijo tirado a
+// dados; aquí eso ya existe y se llama `needs.irritation` y `needs.company`
+// (E.4: el carácter entra por la velocidad a la que suben los impulsos, así
+// que un `hot_tempered` llega solo a `HOT_ENOUGH` sin que esta capa tenga que
+// saber que es un `hot_tempered`) — y de que un rechazo también dibuja algo en
+// pantalla, que el descarte no necesitaba porque allí un «no» era simplemente
+// no crear ningún bout.
+//
+// **Ninguna oferta —y una escena es una oferta espontánea— conoce a nadie por
+// nombre** (E.4): todo lo de aquí se decide por rasgos, impulsos y opinión, y
+// el azar sale de `hash32(seed, ...)`, nunca de `Math.random` ni del reloj.
+
+import type { Trait } from '@engine/state';
+import { hash32 } from '@engine/rng';
+import { drive } from './steering';
+import { turnTo, type Body } from './body';
+import { LIFE_STEP } from './clock';
+import type { Dweller } from './village';
+
+export type SceneKind = 'chat' | 'shove' | 'brawl';
+
+/** Dos personas, algo entre ellas, y un papel distinto para cada una. */
+export interface Scene {
+  readonly kind: SceneKind;
+  readonly a: number; readonly b: number; // ids de cuerpo
+  roleA: 'gives' | 'takes' | 'peer';
+  roleB: 'gives' | 'takes' | 'peer';
+  readonly since: number; // paso
+  until: number; // paso
+  /** En qué compás va la escena. Informativo: nada de la lógica lo necesita
+   *  leer, todo se recalcula de `since` y `step`, porque eso es lo que permite
+   *  reconstruir una escena a medias sin haber guardado nada (E.3.4). */
+  beat: number;
+}
+
+// ---------------------------------------------------------------------------
+// Lo que se porta de `spike/life.ts`, tal cual, con su comentario de origen.
+// ---------------------------------------------------------------------------
+
+/** A qué distancia se oye a alguien y se le puede parar. Ported de spike. */
+const EARSHOT = 1.9;
+/** A qué distancia se ponen dos que hablan. Ported de spike (`CHAT_GAP`). */
+const CHAT_GAP = 0.95;
+/** Lo que dura una charla aceptada, en segundos escénicos. Ported (`CHAT`). */
+const CHAT_SPAN = [3, 9] as const;
+/** Lo que se tarda en volver a tener ganas de parar con alguien. Ported (`COOLDOWN`). */
+const COOLDOWN = 14;
+/** A qué distancia se planta uno para empujar. Ported de spike (`SHOVE_GAP`). */
+const SHOVE_GAP = 0.72;
+/** El instante de tensión antes de soltarlo. Ported de spike (`WIND_UP`). */
+const WIND_UP = 0.7;
+/** Lo que dura el encontronazo entero, empujón y recomposición incluidos.
+ *  Ported de spike (`BOUT`). */
+const BOUT = 3.4;
+/** La fuerza del empujón, en celdas por segundo. Ported de spike
+ *  (`SHOVE_PUSH`): a treinta pasos por segundo son menos de diez centésimas
+ *  de celda por paso, así que el trastabilleo se integra y no teletransporta. */
+const SHOVE_PUSH = 2.8;
+/** Lo que se tarda en recomponerse tras recibirlo. Ported de spike (`REEL`). */
+const REEL = 0.75;
+/** A partir de qué genio salta uno. Ported de spike (`HOT_ENOUGH`). */
+const HOT_ENOUGH = 0.62;
+/** Cuánto salta el que pasa de ahí, por encuentro. Ported de spike (`SHOVE_ODDS`). */
+const SHOVE_ODDS = 0.22;
+/** Lo que decae la velocidad de quien trastabilla, por paso. Ported de spike
+ *  (`body.vx *= 0.94` en la rama de `reelUntil`). */
+const REEL_DRAG = 0.94;
+/** Cuánto más decidido se acerca el que va a empujar que el que charla.
+ *  Ported de spike (`urge = body.bout === 'shove' ? 1.7 : 1`). */
+const SHOVE_URGE = 1.7;
+const CHAT_URGE = 1;
+/** El umbral de las ganas de charlar. Ported de spike (`dice > willing * 0.35`). */
+const CHAT_WILLING = 0.35;
+/** Cuánto pesa el genio de quien recibe el empujón a la hora de devolverlo.
+ *  Ported de spike (`back < partner.temper * 0.8`). */
+const RETALIATE_AT = 0.8;
+
+/**
+ * Lo que dura un rechazo: apartar la vista y seguir.
+ *
+ * TUNE: 0,4 a 0,9 s. No sale de spike —allí un «no» no dejaba rastro, y aquí
+ * la regla de V-07 pide que sí— así que se ha elegido corto a propósito:
+ * bastante para leerse en pantalla como un cruce de miradas, no tanto que se
+ * confunda con una charla de verdad.
+ */
+const REJECT_SPAN = [0.4, 0.9] as const;
+
+/** Pasos escénicos que caben en estos segundos, con el paso fijo de la vida. */
+function stepsOf(seconds: number): number {
+  return Math.max(1, Math.round(seconds / LIFE_STEP));
+}
+
+const WIND_UP_STEPS = stepsOf(WIND_UP);
+const REEL_STEPS = stepsOf(REEL);
+
+// ---------------------------------------------------------------------------
+// El carácter, leído de lo que ya existe — nunca un campo nuevo por persona.
+// ---------------------------------------------------------------------------
+
+/**
+ * Cuánto empuja un rasgo hacia pararse a hablar.
+ *
+ * Los mismos números que `decide.ts` usa para el corro de cotilleo
+ * (`LEANING.gossip`): es la misma gana, aquí espontánea en vez de ir a
+ * buscarla a la era.
+ */
+const TALK_LEAN: Partial<Record<Trait, number>> = {
+  kind: 1.5,
+  generous: 1.6,
+  secretive: 0.3,
+  spiteful: 0.6,
+  proud: 0.7,
+};
+
+function talkLean(traits: readonly Trait[]): number {
+  let lean = 1;
+  for (const trait of traits) {
+    const bias = TALK_LEAN[trait];
+    if (bias !== undefined) lean *= bias;
+  }
+  return lean;
+}
+
+function clamp01(value: number): number {
+  return value < 0 ? 0 : value > 1 ? 1 : value;
+}
+
+/**
+ * Cuánto le apetece a éste pararse a hablar ahora mismo.
+ *
+ * Spike tiraba un dado fijo por cuerpo (`sociable`, uniforme 0..1, promedio
+ * 0,5) para toda la jornada; aquí no hay ese rasgo, así que se parte de la
+ * misma base —0,5— y las ganas de compañía (`needs.company`) la mueven para
+ * un lado o el otro, no la sustituyen entera: medido, `company` pasa la mayor
+ * parte del día bajo, porque en una aldea apretada casi siempre hay alguien
+ * cerca y eso ya lo calma (`needs.ts`, `withOthers`). Sustituir la base por
+ * `company` a secas dejaba a casi todo el mundo sin ganas nunca —medido, un
+ * aldeano hablando por cada doscientos rechazos— que es justo lo que la regla
+ * séptima de E.3 llama «es el modelo, no el número».
+ */
+function willing(who: Dweller): number {
+  const base = 0.5 + (who.needs.company - 0.3) * 0.6;
+  return clamp01(base * talkLean(who.traits));
+}
+
+function roll(seed: number, key: string): number {
+  return hash32(seed, key) / 4_294_967_296;
+}
+
+// ---------------------------------------------------------------------------
+// Proponer
+// ---------------------------------------------------------------------------
+
+/**
+ * Si estos dos, al cruzarse, tienen algo. Determinista con `seed` y `step`.
+ *
+ * **Ninguna escena conoce a nadie por nombre**: sólo mira rasgos, impulsos y
+ * `opinion`, nunca compara contra un `VillagerId` concreto. `opinion` llega ya
+ * calculada por quien llama (`village.ts`, con `opinionOf` del motor, sólo
+ * lectura) porque esta función no toca `GameState`.
+ *
+ * **Con umbral, no proporcional**: un intento anterior con probabilidad
+ * proporcional al genio daba diez a diecisiete encontronazos por jornada —una
+ * taberna, no una aldea. Sólo salta quien tiene mal genio de verdad
+ * (`HOT_ENOUGH`), y una aldea sin gente de ese temple no empuja a nadie en
+ * todo el día. `needs.irritation` es el `temper` de spike, pero vivo: ya sube
+ * más deprisa en quien es `hot_tempered` (E.4, `needs.ts`), así que el
+ * carácter entra sin que esta función necesite saber de rasgos para eso.
+ */
+export function propose(
+  a: Dweller, b: Dweller, opinion: number, seed: number, step: number,
+): Scene | null {
+  const hot = a.needs.irritation >= b.needs.irritation ? a : b;
+  const cold = hot === a ? b : a;
+  const key = `${a.body.id}:${b.body.id}:${step}`;
+
+  const spark = roll(seed, `spark:${key}`);
+  const angry = hot.needs.irritation > HOT_ENOUGH
+    && spark < (hot.needs.irritation - HOT_ENOUGH) * SHOVE_ODDS;
+
+  if (angry) {
+    // **¿Se devuelve el empujón?** Se decide aquí y no al soltarlo, porque
+    // `kind` no cambia una vez nacida la escena (E.3.5: misma jornada, mismas
+    // decisiones, sin campos ocultos que la propia escena no pueda reconstruir
+    // de `since`). Una `brawl` es exactamente eso: un empujón devuelto una
+    // vez. «Se devuelve una vez, no se monta una trifulca» — nunca hay una
+    // tercera vez, y si esto tuviera que llegar a más, lo diría el motor
+    // (V-11), no esta capa.
+    const back = roll(seed, `back:${key}`);
+    const brawl = back < cold.needs.irritation * RETALIATE_AT;
+    const giverIsA = hot === a;
+    const span = stepsOf(brawl ? BOUT + WIND_UP + REEL : BOUT);
+    return {
+      kind: brawl ? 'brawl' : 'shove',
+      a: a.body.id,
+      b: b.body.id,
+      roleA: giverIsA ? 'gives' : 'takes',
+      roleB: giverIsA ? 'takes' : 'gives',
+      since: step,
+      until: step + span,
+      beat: 0,
+    };
+  }
+
+  // Ni chispa: ¿les apetece pararse? `opinion` corre −100..100 (§6.4) y aquí
+  // se lee como medio punto de más o de menos ganas por cada cien.
+  const social = clamp01((willing(a) + willing(b)) / 2 + opinion / 200);
+  const dice = roll(seed, `chat:${key}`);
+
+  // **Dos cortes, no uno.** Por debajo de `social·CHAT_WILLING`, hablan. Por
+  // encima de `CHAT_WILLING` a secas, ni se plantean pararse y no pasa nada
+  // —dos que se cruzan sin mirarse no son una escena, son dos que andaban por
+  // ahí. Sólo la banda de en medio —tenían alguna gana, no la bastante— es el
+  // rechazo: apartar la vista y seguir. Sin este segundo corte, todo cruce sin
+  // química acababa en un rechazo visible y la aldea parecía un lugar donde
+  // todo el mundo desaira a todo el mundo; medido, doscientos rechazos por
+  // cada charla lograda.
+  if (dice >= CHAT_WILLING) return null;
+
+  if (dice > social * CHAT_WILLING) {
+    // **Un rechazo también es una escena**: apartar la vista y seguir. Quien
+    // más ganas tenía es quien propuso; el otro se la queda y sigue su
+    // camino, y por eso los papeles no son iguales aunque los dos acaben sin
+    // hablar.
+    const proposerIsA = willing(a) >= willing(b);
+    const span = stepsOf(REJECT_SPAN[0]
+      + roll(seed, `reject:${key}`) * (REJECT_SPAN[1] - REJECT_SPAN[0]));
+    return {
+      kind: 'chat',
+      a: a.body.id,
+      b: b.body.id,
+      roleA: proposerIsA ? 'gives' : 'takes',
+      roleB: proposerIsA ? 'takes' : 'gives',
+      since: step,
+      until: step + span,
+      beat: 0,
+    };
+  }
+
+  const span = stepsOf(CHAT_SPAN[0]
+    + roll(seed, `span:${key}`) * (CHAT_SPAN[1] - CHAT_SPAN[0]));
+  return {
+    kind: 'chat',
+    a: a.body.id,
+    b: b.body.id,
+    roleA: 'peer',
+    roleB: 'peer',
+    since: step,
+    until: step + span,
+    beat: 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Vivirla
+// ---------------------------------------------------------------------------
+
+/**
+ * Se coloca a la distancia que toque, sin congelarse donde le pillara.
+ *
+ * **Da velocidad, no posición**: `drive` sólo suaviza `vx`/`vz` hacia lo que
+ * se quiere, y es `village.ts` quien la integra con el mismo `integrate` de
+ * `body.ts` que usa todo el mundo. Es la trampa de esta fase (E.7 y E.8): la
+ * primera versión del descarte dejaba a los que hablaban quietos donde les
+ * pillara y quedaban metidos el uno en el otro.
+ *
+ * **Nunca más cerca que dos radios**, aunque el hueco pedido sea menor —no lo
+ * es, `SHOVE_GAP` y `CHAT_GAP` son mayores que dos radios— porque `drive` no
+ * frena en seco: el acercamiento decidido de un encaro (`SHOVE_URGE`) puede
+ * pasarse de largo el instante antes de que el cálculo del paso siguiente
+ * empiece a frenar. Medido sin este suelo: dos que se encaraban llegaban a
+ * 0,517 celdas, por debajo de los dos radios (0,64) — el mismo apiñamiento
+ * que `separate()` (`steering.ts`) evita para el resto de la aldea, pero aquí
+ * no se puede usar esa función tal cual: su holgura (`ELBOW`) empujaría a los
+ * dos antes incluso de llegar a `SHOVE_GAP`.
+ */
+function position(body: Body, partner: Body, gapWant: number, urge: number): void {
+  const away = Math.hypot(partner.x - body.x, partner.z - body.z);
+  if (away < 1e-6) { drive(body, { x: 0, z: 0 }); return; }
+  const floor = body.radius + partner.radius;
+  if (away < floor) {
+    const push = (floor - away) / floor;
+    drive(body, {
+      x: (body.x - partner.x) / away * push * body.pace * urge,
+      z: (body.z - partner.z) / away * push * body.pace * urge,
+    });
+    return;
+  }
+  const off = (away - gapWant) / Math.max(gapWant, away);
+  drive(body, {
+    x: (partner.x - body.x) / away * off * body.pace * urge,
+    z: (partner.z - body.z) / away * off * body.pace * urge,
+  });
+}
+
+/** Mira a quien le habla, sin tirón: el mismo `turnTo` de todo el mundo. */
+function face(body: Body, partner: Body): void {
+  turnTo(body, Math.atan2(partner.x - body.x, partner.z - body.z), LIFE_STEP);
+}
+
+/** Trastabillando: las piernas no obedecen, sólo se deja correr y frenar. */
+function reel(body: Body): void {
+  body.vx *= REEL_DRAG;
+  body.vz *= REEL_DRAG;
+}
+
+/**
+ * Suelta el empujón: **velocidad, nunca posición.** `village.ts` es quien la
+ * integra, así que esto nunca escribe `x`/`z`.
+ */
+function shove(giver: Body, taker: Body): void {
+  const away = Math.max(1e-6, Math.hypot(taker.x - giver.x, taker.z - giver.z));
+  taker.vx = (taker.x - giver.x) / away * SHOVE_PUSH;
+  taker.vz = (taker.z - giver.z) / away * SHOVE_PUSH;
+}
+
+/**
+ * Lo que le toca a un cuerpo en su propio empujón: colocarse mientras espera
+ * su turno, trastabillar justo después de recibirlo, y quedarse quieto —ni lo
+ * uno ni lo otro— en el paso exacto en que la velocidad ya viene puesta.
+ */
+function shoveTick(body: Body, partner: Body, hit: number, step: number): void {
+  if (step === hit) return;
+  if (step > hit && step < hit + REEL_STEPS) { reel(body); return; }
+  position(body, partner, SHOVE_GAP, SHOVE_URGE);
+  face(body, partner);
+}
+
+/**
+ * Un paso de la escena: coloca, empuja, hace trastabillar, termina.
+ *
+ * `a` y `b` deben corresponder a `scene.a` y `scene.b`, en ese orden — es
+ * `village.ts` quien los busca por id, porque esta función no sabe nada de
+ * quién es cada uno más allá de eso.
+ */
+export function play(scene: Scene, a: Dweller, b: Dweller, step: number): void {
+  if (scene.kind === 'chat') {
+    position(a.body, b.body, CHAT_GAP, CHAT_URGE);
+    position(b.body, a.body, CHAT_GAP, CHAT_URGE);
+    face(a.body, b.body);
+    face(b.body, a.body);
+    scene.beat = 1;
+    return;
+  }
+
+  const giver = scene.roleA === 'gives' ? a : b;
+  const taker = giver === a ? b : a;
+  const hit = scene.since + WIND_UP_STEPS;
+  const counter = hit + REEL_STEPS + WIND_UP_STEPS;
+  const takerBusy = scene.kind === 'brawl' && step === counter;
+
+  if (!takerBusy) shoveTick(taker.body, giver.body, hit, step);
+  if (step === hit) shove(giver.body, taker.body);
+
+  if (scene.kind === 'brawl') {
+    shoveTick(giver.body, taker.body, counter, step);
+    if (step === counter) shove(taker.body, giver.body);
+  } else if (step !== hit) {
+    position(giver.body, taker.body, SHOVE_GAP, SHOVE_URGE);
+    face(giver.body, taker.body);
+  }
+
+  scene.beat = step < hit ? 0
+    : step < hit + REEL_STEPS ? 1
+    : scene.kind !== 'brawl' || step < counter ? 2
+    : step < counter + REEL_STEPS ? 3 : 4;
+}
+
+/** Si la escena sigue en pie: nadie se ha muerto, nadie se ha ido. */
+export function alive(scene: Scene, dwellers: readonly Dweller[]): boolean {
+  let foundA = false;
+  let foundB = false;
+  for (const dweller of dwellers) {
+    if (dweller.body.id === scene.a) foundA = true;
+    else if (dweller.body.id === scene.b) foundB = true;
+    if (foundA && foundB) return true;
+  }
+  return false;
+}
+
+/** A qué distancia dos que se cruzan pueden llegar a proponerse algo. */
+export const SCENE_EARSHOT = EARSHOT;
+/** Lo que se tarda en volver a tener ganas de parar con quien se acaba de
+ *  separar de una escena. */
+export const SCENE_COOLDOWN = COOLDOWN;

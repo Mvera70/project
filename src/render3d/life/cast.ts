@@ -16,18 +16,50 @@ import { clipTime } from '../actors/clips';
 import type { Activity } from '../actors/day';
 import type { Dweller, Village } from './village';
 
-/** Qué clip le toca a lo que uno está haciendo. */
+/**
+ * Qué clip le toca a lo que uno está haciendo.
+ *
+ * V-07: **el clip también sale de la escena**, no sólo de la oferta. Mientras
+ * dura, lo que `doing` recuerde queda en pausa (`village.ts` no lo toca) y
+ * puede ser un tajo a medias; sin este primer corte, alguien parado a media
+ * charla seguiría cavando con la azada.
+ */
 function clipOf(dweller: Dweller, moving: boolean): ClipName {
   if (moving) return 'walk';
-  if (dweller.doing?.there === true && dweller.doing.offer.id === 'work') return 'work_hoe';
+  if (dweller.scene === null && dweller.doing?.there === true
+    && dweller.doing.offer.id === 'work') return 'work_hoe';
   return 'idle';
 }
 
 /** Y qué actividad, de las cinco que el render conoce. */
 function activityOf(dweller: Dweller, moving: boolean): Activity {
   if (moving) return 'walking';
-  if (dweller.doing === null) return 'resting';
+  if (dweller.scene !== null || dweller.doing === null) return 'resting';
   return dweller.doing.offer.id === 'work' ? 'working' : 'resting';
+}
+
+/**
+ * El papel de éste en su propia escena, si tiene una. V-07.
+ *
+ * `Scene` guarda `roleA`/`roleB` por posición (`scene.a`/`scene.b`, ids de
+ * cuerpo), no por persona: hay que mirar de qué lado está éste.
+ */
+function roleOf(dweller: Dweller): 'gives' | 'takes' | 'peer' | null {
+  const { scene } = dweller;
+  if (scene === null) return null;
+  return dweller.body.id === scene.a ? scene.roleA : scene.roleB;
+}
+
+/**
+ * Si esto se lee como una charla, y no como un empujón o un rechazo.
+ *
+ * V-07: **`talking` sale de la escena**, no de la oferta de cotilleo. Sólo un
+ * `chat` con los dos de igual a igual —`peer`— es una conversación de verdad:
+ * un `chat` con `gives`/`takes` es el rechazo, «apartar la vista y seguir», y
+ * eso no lleva nube de diálogo encima porque no ha habido diálogo.
+ */
+function talkingOf(dweller: Dweller): boolean {
+  return dweller.scene !== null && dweller.scene.kind === 'chat' && roleOf(dweller) === 'peer';
 }
 
 /**
@@ -66,7 +98,8 @@ export function castOf(
       cell: cellZ * width + cellX,
       named: named.has(dweller.villager),
       age: ages.get(dweller.villager) ?? 30,
-      talking: dweller.doing?.there === true && dweller.doing.offer.id === 'gossip',
+      talking: talkingOf(dweller)
+        || (dweller.doing?.there === true && dweller.doing.offer.id === 'gossip'),
     });
   }
   return actors;

@@ -11,6 +11,7 @@
 import type { GameState, Trait, VillagerId } from '@engine/state';
 import { FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
+import { opinionOf } from '@engine/people/opinions';
 import { hash32 } from '@engine/rng';
 import { integrate, turnTo, type Body, type Terrain } from './body';
 import { createNeighbourhood, type Neighbourhood } from './grid';
@@ -21,6 +22,7 @@ import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { placesOf, seatAt, seatKey, type Place } from './offers';
 import { commons } from './places';
 import { decide, satisfy, RETHINK, type Intent } from './decide';
+import { alive as sceneAlive, play, propose, SCENE_COOLDOWN, SCENE_EARSHOT, type Scene } from './scenes';
 import { LIFE_STEP, seedOfDay } from './clock';
 
 /**
@@ -49,6 +51,17 @@ export interface Dweller {
    * al pararse, que es cuando empieza otra caminata.
    */
   travelled: number;
+  /**
+   * Con quién tiene algo ahora mismo, si tiene. V-07.
+   *
+   * El mismo objeto vive en los dos `Dweller` que participan: no hay copia,
+   * hay referencia compartida, que es lo que le deja a `alive()` comprobar por
+   * `id` de cuerpo en vez de llevar la cuenta por separado.
+   */
+  scene: Scene | null;
+  /** Hasta qué paso no le apetece volver a pararse con nadie, tras la última
+   *  escena. V-07, ported de `spike/life.ts` (`cooldown`). */
+  sceneCooldownUntil: number;
 }
 
 export interface Village {
@@ -128,6 +141,8 @@ export function createVillage(state: GameState, day: number): Village {
       needs: freshNeeds(),
       doing: null,
       travelled: 0,
+      scene: null,
+      sceneCooldownUntil: 0,
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -135,6 +150,11 @@ export function createVillage(state: GameState, day: number): Village {
   });
 
   const bodies = dwellers.map((d) => d.body);
+  const byId = new Map(dwellers.map((d) => [d.body.id, d]));
+  // Las escenas vivas ahora mismo. Un mismo objeto lo referencian los dos
+  // `Dweller` que participan (ver `Dweller.scene`); esta lista es sólo para no
+  // tener que recorrer a toda la aldea buscando quién está en una.
+  let scenes: Scene[] = [];
   let steps = 0;
 
   /** Cuánta gente hay en cada oferta ahora mismo. */
@@ -169,8 +189,64 @@ export function createVillage(state: GameState, day: number): Village {
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(bodies);
 
+      // 0 · Vivir las escenas que ya estaban en marcha. V-07.
+      //
+      //    Antes que nada, porque lo que una escena decida esta vez —colocar,
+      //    empujar, hacer trastabillar— es lo que el resto del paso tiene que
+      //    respetar para esos dos cuerpos: ninguno de los dos vuelve a pasar
+      //    por el `want`/`push`/`wall`/`drive` normal más abajo.
+      //
+      //    Cerrarla no puede dejar a nadie atrapado: si el paso ya pasó de
+      //    `until`, o si uno de los dos ha dejado de estar en la aldea —se
+      //    murió, se fue— se suelta a quien quede, con su enfriamiento, y
+      //    sigue su vida en el mismo paso.
+      const done: Scene[] = [];
+      for (const scene of scenes) {
+        const dwA = byId.get(scene.a);
+        const dwB = byId.get(scene.b);
+        if (dwA === undefined || dwB === undefined || !sceneAlive(scene, dwellers)
+          || steps >= scene.until) {
+          if (dwA !== undefined && dwA.scene === scene) {
+            dwA.scene = null;
+            dwA.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+            dwA.rethinkAt = steps;
+          }
+          if (dwB !== undefined && dwB.scene === scene) {
+            dwB.scene = null;
+            dwB.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+            dwB.rethinkAt = steps;
+          }
+          done.push(scene);
+          continue;
+        }
+        play(scene, dwA, dwB, steps);
+      }
+      if (done.length > 0) scenes = scenes.filter((scene) => !done.includes(scene));
+
       for (const dweller of dwellers) {
         const { body } = dweller;
+
+        // Quien está en una escena ya ha recibido su velocidad de `play`: sólo
+        // falta integrarla —**nunca se escribe `x`/`z` a mano**, es el mismo
+        // `integrate` de `body.ts` el que la mueve, chocando con lo que haya— y
+        // contar el suelo que eso pisa, para que el clip de andar no patine si
+        // el encuentro incluye un traspié. No se replantea la vida mientras
+        // dura: es quien decide dejar de andar un momento, no quien decide su
+        // día entero.
+        if (dweller.scene !== null) {
+          integrate(body, land, LIFE_STEP);
+          const speed = Math.hypot(body.vx, body.vz);
+          dweller.travelled = speed > 0.05 ? dweller.travelled + speed * LIFE_STEP : 0;
+
+          let company = false;
+          around.near(body, (other) => {
+            if (!company && Math.hypot(other.x - body.x, other.z - body.z) < 2.2) company = true;
+          });
+          drift(dweller.needs, dweller.traits, {
+            moving: speed > 0.25, withOthers: company, working: false, hunger,
+          }, LIFE_STEP);
+          continue;
+        }
 
         // 1 · ¿Toca replantearse?
         //
@@ -265,6 +341,38 @@ export function createVillage(state: GameState, day: number): Village {
       }
 
       resolve(bodies, around, land);
+
+      // 9 · ¿Quién se ha encontrado con quién? V-07.
+      //
+      //    Después de mover y resolver a todos, con las posiciones ya
+      //    definitivas del paso: un encuentro que no estaba escrito al
+      //    amanecer, ocurre porque dos cuerpos se han acercado andando. Cada
+      //    pareja se mira una vez (`other.id > body.id`), y sólo entran los
+      //    que no están ya en algo y no acaban de salir de otra cosa.
+      around.rebuild(bodies);
+      for (const dweller of dwellers) {
+        if (dweller.scene !== null || steps < dweller.sceneCooldownUntil) continue;
+        around.near(dweller.body, (otherBody) => {
+          if (dweller.scene !== null || otherBody.id <= dweller.body.id) return;
+          const other = byId.get(otherBody.id);
+          if (other === undefined || other.scene !== null
+            || steps < other.sceneCooldownUntil) return;
+          const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
+          if (apart > SCENE_EARSHOT) return;
+
+          // Sólo lectura del motor, y de los dos sentidos: ninguna escena
+          // conoce a nadie por nombre, pero el trato entre estos dos sí puede
+          // pesar en si se paran o no.
+          const opinion = (opinionOf(state, dweller.villager, other.villager)
+            + opinionOf(state, other.villager, dweller.villager)) / 2;
+          const scene = propose(dweller, other, opinion, seed, steps);
+          if (scene === null) return;
+          dweller.scene = scene;
+          other.scene = scene;
+          scenes.push(scene);
+        });
+      }
+
       steps += 1;
     },
   };
