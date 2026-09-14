@@ -79,6 +79,15 @@ const SHOVE_URGE = 1.7;
 const CHAT_URGE = 1;
 /** El umbral de las ganas de charlar. Ported de spike (`dice > willing * 0.35`). */
 const CHAT_WILLING = 0.35;
+
+/**
+ * Cuánto por encima de las ganas sigue contando como «casi».
+ *
+ * TUNE: la mitad. Es lo que hace que el rechazo sea una escena rara al lado de
+ * la charla en vez de la escena corriente: por construcción salen del orden de
+ * un rechazo por cada dos charlas, y no dos o tres por cada una.
+ */
+const NEAR_MISS = 0.5;
 /** Cuánto pesa el genio de quien recibe el empujón a la hora de devolverlo.
  *  Ported de spike (`back < partner.temper * 0.8`). */
 const RETALIATE_AT = 0.8;
@@ -214,18 +223,25 @@ export function propose(
   // se lee como medio punto de más o de menos ganas por cada cien.
   const social = clamp01((willing(a) + willing(b)) / 2 + opinion / 200);
   const dice = roll(seed, `chat:${key}`);
+  const want = social * CHAT_WILLING;
 
-  // **Dos cortes, no uno.** Por debajo de `social·CHAT_WILLING`, hablan. Por
-  // encima de `CHAT_WILLING` a secas, ni se plantean pararse y no pasa nada
-  // —dos que se cruzan sin mirarse no son una escena, son dos que andaban por
-  // ahí. Sólo la banda de en medio —tenían alguna gana, no la bastante— es el
-  // rechazo: apartar la vista y seguir. Sin este segundo corte, todo cruce sin
-  // química acababa en un rechazo visible y la aldea parecía un lugar donde
-  // todo el mundo desaira a todo el mundo; medido, doscientos rechazos por
-  // cada charla lograda.
-  if (dice >= CHAT_WILLING) return null;
+  // **Un rechazo es un casi, no todo lo que no es un sí.** Por debajo de
+  // `want`, hablan. Justo por encima —un margen corto— es el rechazo: tenían
+  // ganas y no llegaron, que es lo que se lee como apartar la vista y seguir.
+  // Más arriba no pasa nada, y ésa es la respuesta corriente: dos que se cruzan
+  // sin mirarse no son una escena, son dos que andaban por ahí.
+  //
+  // La primera versión de V-07 hacía del rechazo **toda** la banda entre las
+  // ganas y `CHAT_WILLING`, y como las ganas rondan 0,38, eso era casi dos
+  // tercios de la ventana. Medido en tres semillas: de 2,0 a 3,0 rechazos por
+  // cada charla, y a esa proporción la aldea se lee como un sitio donde todo el
+  // mundo desaira a todo el mundo — que es justo lo que ese segundo corte venía
+  // a evitar, resuelto a medias. El descarte que gustó no tenía ni un rechazo;
+  // la respuesta no es volver a cero —un «no» invisible fue lo que se quiso
+  // arreglar— sino que sea raro al lado de las charlas.
+  if (dice >= want * (1 + NEAR_MISS)) return null;
 
-  if (dice > social * CHAT_WILLING) {
+  if (dice >= want) {
     // **Un rechazo también es una escena**: apartar la vista y seguir. Quien
     // más ganas tenía es quien propuso; el otro se la queda y sigue su
     // camino, y por eso los papeles no son iguales aunque los dos acaben sin

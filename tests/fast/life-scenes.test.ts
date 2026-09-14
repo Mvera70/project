@@ -289,6 +289,40 @@ describe('V-07 · escenas de dos', () => {
     }
   });
 
+  it('un rechazo es raro al lado de una charla, y no al revés', () => {
+    // La primera versión de V-07 hacía del rechazo toda la banda entre las
+    // ganas y `CHAT_WILLING`. Como las ganas rondan 0,38, eso era casi dos
+    // tercios de la ventana: medido, **de 2,0 a 3,0 rechazos por cada charla**,
+    // y a esa proporción la aldea se lee como un sitio donde todo el mundo
+    // desaira a todo el mundo. El descarte que gustó no tenía ni un rechazo.
+    //
+    // Con el rechazo como «casi» —un margen corto por encima de las ganas— y no
+    // como todo lo que no es un sí: 0,52, 0,48 y 0,50 rechazos por charla en las
+    // semillas 7, 11 y 23, y las charlas más que se duplican (67 → 149 en la 7),
+    // que las pone en el rango del descarte: 1,86 por persona contra sus 1,99.
+    for (const seed of [7, 11, 23]) {
+      const life = createVillage(village(seed), 0);
+      if (life.dwellers.length < 10) continue;
+      const seen = new Set<Scene>();
+      let chats = 0;
+      let rejects = 0;
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+        life.step();
+        for (const dweller of life.dwellers) {
+          const scene = dweller.scene;
+          if (scene === null || seen.has(scene) || scene.kind !== 'chat') continue;
+          seen.add(scene);
+          if (scene.roleA === 'peer') chats += 1; else rejects += 1;
+        }
+      }
+      expect(rejects, `semilla ${seed}: ${rejects} rechazos y ${chats} charlas`)
+        .toBeGreaterThan(0);
+      expect(rejects / Math.max(1, chats),
+        `semilla ${seed}: ${rejects} rechazos por ${chats} charlas`)
+        .toBeLessThan(1);
+    }
+  });
+
   it('hablar sigue siendo lo corriente, y no pegar', () => {
     // Medido: cientos de charlas por docenas de empujones, en todas las
     // semillas comprobadas — nunca al revés.
