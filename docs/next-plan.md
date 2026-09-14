@@ -16,11 +16,12 @@ tocar, y nunca con una sola semilla.**
   la gente se para a hablar en la proporción correcta (medio rechazo por charla)
   y los animales son agentes. Los trastos existen pero casi nadie juega
   (V-09.md): dos causas medidas y ninguna es un número.
-- **La interfaz tiene piel pero no es un juego todavía.** El dueño del diseño la
-  ve «muy, muy pobre» con las capturas delante. Lo que falta no es más color:
-  es que **se vea qué se puede hacer** — hoy la crónica y la gente se abren
-  con gestos invisibles, la decisión pendiente es un punto rojo, no hay
-  estación ni nombre, y nada reacciona cuando una cifra cambia.
+- **La interfaz está cerrada de U-01 a U-09** y el diagnóstico de «se ve muy
+  pobre» está atendido: ya se ve qué se puede hacer (barra de destinos), la
+  cabecera dice la estación y reacciona, la decisión pendiente es una píldora y
+  no una mota, hay pantalla de gente, y el valle suena. **Y buena parte del
+  problema no era la interfaz**: el valle abría pintado de invierno y estaba
+  sobreexpuesto, las dos cosas corregidas.
 - **Los hitos se celebran** con una cartela sobria (U-02) y el arranque dice
   quién llegó y cuándo (U-04). Verificado en captura.
 - **Ahora se puede mirar:** `tools/graphics/shot.mjs` hace capturas del juego
@@ -31,8 +32,8 @@ tocar, y nunca con una sola semilla.**
 
 | Carril | Rondas | Modelo | Por qué ese modelo |
 |---|---|---|---|
-| **A · Interfaz** | U-05 ✓ → U-06 → U-07 → U-08 → U-09 (sonido) | Sonnet (`Tier: construir`) | Construye contra una dirección ya escrita, con captura obligatoria |
-| **B · Vida** | V-09b ✓ → V-11 → V-12 | Sonnet (`Tier: construir`) | Porta del descarte y engancha; la causa está diagnosticada |
+| **A · Interfaz** | U-05 ✓ U-06 ✓ U-07 ✓ U-08 ✓ U-09 ✓ — **cerrado** | Sonnet (`Tier: construir`) | Construye contra una dirección ya escrita, con captura obligatoria |
+| **B · Vida** | V-09b ✓ → **V-11** → V-12 (la mitad que borra) | Sonnet (`Tier: construir`) | Porta del descarte y engancha; la causa está diagnosticada |
 | **C · Medida** | Sonda tras cada ronda de B | Haiku (`Tier: medir`) | No escribe código: corre la sonda y escribe la tabla |
 | **D · Auditoría** | Tras cada entrega de A o B | Sonnet, con `docs/agents.md` §«Cómo se audita» | Primera pasada barata; la sesión cara sólo revisa lo que la auditoría marque |
 

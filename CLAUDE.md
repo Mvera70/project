@@ -79,9 +79,11 @@ Antes de dar un módulo por terminado: `npm run typecheck && npm test && npm run
 
 ## Estado del proyecto
 
-El motor está completo y el juego 2D en Canvas se juega y está desplegado. El
-piloto 3D del Anexo D (`src/render3d/`) está en G-11 y ya se juega detrás de
-`?render=pilot3d`.
+El motor está completo. **Desde G-12 el juego es el 3D** (`src/render3d/`): ya
+no es un piloto detrás de una bandera. El Canvas de `src/render/` sigue entero y
+se alcanza con `?render=canvas` — **esa puerta se queda puesta a propósito**
+hasta que alguien abra esto en un móvil de verdad, porque todo lo medido de
+rendimiento es de un portátil (G-09 quedó parcial por no haber dispositivo).
 
 **Lo que está en marcha es la vida del valle, Anexo E de `docs/design.md`:**
 una capa de agentes deterministas y efímera en `src/render3d/life/`, entre el
@@ -115,12 +117,16 @@ se queda nadie clavado. Lo que falta para parecerse a él son los trastos (V-09)
 y que los encuentros no sean tres rechazos por cada charla. El hito humano sigue
 sin validar: nadie lo ha visto todavía.
 
-**Y en marcha aparte, la interfaz (U-01 a U-04).** El encargo es que la demo se
-lea como un juego de móvil de verdad y no como un banco de pruebas: piel
-(U-01, hecha), momentos de hito (U-02), las tres pantallas (U-03) y el arranque
-(U-04). Las edades tecnológicas **no existen** en este motor y no se inventan;
-lo que se celebra son hitos con fecha real, empezando por el primer edificio de
-cada clase.
+**La interfaz: U-01 a U-09 cerradas.** Piel de pergamino y tinta, cartela de
+hitos, las tres pantallas, el arranque, la barra de destinos abajo, la cabecera
+con la estación y cifras que reaccionan, la decisión pendiente como píldora, la
+pantalla de la gente, y **el sonido** —ambiente y acentos, todo sintetizado con
+Web Audio, ni un fichero de audio y +0,41 % de peso—. Las edades tecnológicas
+**no existen** en este motor y no se inventan; lo que se celebra son hitos con
+fecha real, empezando por el primer edificio de cada clase.
+
+**Ninguna ronda de interfaz se cierra sin captura**, y ahora se puede:
+`npx tsx tools/graphics/bundle-game.ts` y `node tools/graphics/shot.mjs`.
 
 **Antes de tocar `life/`, lee E.1, E.3, E.6 y E.7 del anexo** — el diagnóstico,
 los seis innegociables, por qué la demo en el juego es hoy peor que el descarte,
