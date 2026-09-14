@@ -24,6 +24,7 @@ import { commons } from './places';
 import { decide, satisfy, RETHINK, type Intent } from './decide';
 import { alive as sceneAlive, play, propose, SCENE_COOLDOWN, SCENE_EARSHOT, type Scene } from './scenes';
 import { LIFE_STEP, seedOfDay } from './clock';
+import { createBeasts, stepBeasts, type Beast } from './beasts';
 
 /**
  * Lo que se aguanta yendo a un sitio antes de pensárselo otra vez, en pasos.
@@ -68,6 +69,8 @@ export interface Village {
   readonly land: Terrain;
   readonly places: readonly Place[];
   readonly dwellers: readonly Dweller[];
+  /** La cabaña, V-08: gallinas, cerdos y vacas, con el mismo trato que la gente. */
+  readonly beasts: readonly Beast[];
   /** Un paso de vida para todos. */
   step(): void;
   /** Cuántos pasos lleva la jornada. */
@@ -115,7 +118,16 @@ export function createVillage(state: GameState, day: number): Village {
   // sitio del otro lado no es un sitio para esta gente: dejar a alguien allí era
   // condenarle a andar sin llegar nunca, y se veía — medido, hasta el 83 % de la
   // jornada en tránsito en las semillas donde el pueblo queda partido.
-  const mine = places.filter((place) => canReach(land, shore, place.at));
+  //
+  // V-08: la cabaña se crea aquí, no antes, porque su ancla (`doorOf`, junto a
+  // casa o campo) no depende de `mine` pero lo que ofrece a la gente —`pet`,
+  // `chase`, `feed`— sí entra en la misma lista que el resto de sitios: para
+  // `decide()` un animal cerca no es distinto de un pozo cerca.
+  const beasts = createBeasts(state, land, heart, seed);
+  const mine = [
+    ...places.filter((place) => canReach(land, shore, place.at)),
+    ...beasts.map((beast) => beast.gift),
+  ];
 
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
   alive.forEach((villager, n) => {
@@ -149,7 +161,10 @@ export function createVillage(state: GameState, day: number): Village {
     });
   });
 
-  const bodies = dwellers.map((d) => d.body);
+  // V-08: la cabaña colisiona con la gente y con ella misma — la misma rejilla
+  // y la misma `resolve()`, así que un niño y una gallina se apartan el uno del
+  // otro exactamente como se apartarían dos personas.
+  const bodies = [...dwellers.map((d) => d.body), ...beasts.map((b) => b.dweller.body)];
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
   // Las escenas vivas ahora mismo. Un mismo objeto lo referencian los dos
   // `Dweller` que participan (ver `Dweller.scene`); esta lista es sólo para no
@@ -172,6 +187,7 @@ export function createVillage(state: GameState, day: number): Village {
     land,
     places: mine,
     dwellers,
+    beasts,
     get steps(): number { return steps; },
 
     tally(): Record<string, number> {
@@ -339,6 +355,16 @@ export function createVillage(state: GameState, day: number): Village {
         drift(dweller.needs, dweller.traits, doing, LIFE_STEP);
         if (dweller.doing?.there === true) satisfy(dweller.needs, dweller.doing.offer, LIFE_STEP);
       }
+
+      // 8 · La cabaña vive su propio paso. V-08.
+      //
+      //    Después de la gente y antes de `resolve()`, para que la corrección
+      //    final de solapes vea las posiciones ya movidas de todo el mundo —
+      //    persona y animal por igual. No entra en escenas (eso sigue siendo
+      //    cosa de `dwellers`, sólo personas): lo que un animal ofrece a quien
+      //    pase ya está en `mine`, y quien lo elige es la gente decidiendo,
+      //    no una escena de dos.
+      stepBeasts(beasts, land, around, router, seed, steps);
 
       resolve(bodies, around, land);
 

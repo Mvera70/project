@@ -685,22 +685,25 @@ describe('G-10 · el rebaño no se teletransporta', () => {
     // de esto eran **2,90 celdas**: la querencia se re-sorteaba ciento
     // veintiocho veces por jornada.
     //
-    // **El 1,10 es un defecto conocido de `ashore`, no el umbral que se quiere.**
-    // Hasta v3.61 el techo estaba en 0,06 y lo cumplía; entonces el carácter
-    // cambió las partidas, algún animal empezó a meterse más en el cauce y
-    // apareció un salto de 1,08 celdas — una celda justa más el margen, que es
-    // la firma del fallo. `ashore` saca al animal por la cara de su celda que
-    // tiene más cerca, y cuando ésa deja de ser tierra lo saca por otra: el
-    // punto de salida cruza la celda de un lado al otro de un fotograma al
-    // siguiente. Está comprobado aparte que las posiciones que da
-    // `animalPositions` son continuas: lo que salta es la corrección, no el
-    // rebaño.
-    //
-    // El techo se deja justo por encima de lo medido para que vigile que **no
-    // empeora**, y la causa queda escrita en `docs/handover.md`. Arreglarlo es
-    // trabajo de la ronda de fauna: hay que sacar al animal por un punto que
-    // varíe de forma continua, y eso es geometría, no un número.
-    expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(1.1);
+    // **V-08, ronda de fauna: el umbral baja de 1,1 a 0,4, no a 0,06.**
+    // `ashore` ya no reparte por la cara más cercana de la propia celda —eso
+    // daba el salto de 1,08, un empate que cambiaba de bando de golpe—, sino
+    // que busca el punto de tierra más cercano de verdad en un entorno de la
+    // celda (`fauna.ts`, la misma idea que `separate()` usa para un cuerpo:
+    // proyectar sobre una caja con `Math.max`/`Math.min`). Medido tras el
+    // cambio: **0,326**, en la misma semilla y el mismo recorrido de siempre.
+    // No es 0,06 —eso exigiría el camino más corto *por tierra* rodeando el
+    // agua, que es A* y no geometría de un punto— pero **el defecto que hacía
+    // saltar al rebaño una celda entera ha desaparecido**: lo que queda es un
+    // empate raro entre dos orillas casi igual de cerca en un recodo ancho del
+    // río, y el salto en ese empate es la distancia entre las dos orillas, no
+    // una celda arbitraria. Se prueba primero con umbrales peores (multiplicar
+    // por varias celdas la misma búsqueda en línea recta) y salió **peor**
+    // -4,1 y 2,08- antes de llegar a éste: la regla séptima de E.3 (no ajustar
+    // a ciegas más de dos veces) es la que paró a mirar el modelo, no el
+    // número, y el modelo que funciona es «la caja más cercana», no «la cara
+    // más cercana» ni «seguir la misma línea más lejos».
+    expect(biggest, `el mayor salto es ${biggest.toFixed(3)} celdas`).toBeLessThan(0.4);
     fauna.dispose();
   });
 });

@@ -48,7 +48,33 @@ const FISH_LEVEL = -0.14;
  * estaba de todas formas: no cambia dónde pasta, cambia que no se ahoga.
  *
  * El pez no pasa por aquí, claro. Para él el agua es el sitio.
+ *
+ * V-08, ronda de fauna: **la salida es el punto de tierra más cercano de
+ * verdad, no la cara más cercana de la propia celda.** La versión de G-10
+ * probaba cuatro salidas —una por cara de la celda en la que está el animal—
+ * y se quedaba con la de menor hueco: parece razonable, pero no es continua.
+ * En cuanto el punto cruza la línea donde dos huecos empatan, la cara elegida
+ * cambia de golpe de una fachada a la perpendicular, y con un cauce de más de
+ * una celda de ancho ninguna de las dos caras de la propia celda es tierra
+ * siquiera, así que el salto podía ser de varias celdas — medido, hasta 4,1
+ * en un intento de extender la búsqueda en línea recta, y 1,08 con el reparto
+ * por caras de siempre. **El primer intento de arreglo fue peor que el
+ * problema** (regla séptima de E.3: a la tercera sin cuadrar, para y mira el
+ * modelo, no el número) — extender la misma cara en línea recta seguía
+ * siendo una elección discreta, sólo que más cara.
+ *
+ * Lo que sí es continuo: mirar las celdas de tierra de alrededor —no sólo las
+ * cuatro caras de una— y quedarse con el punto más cercano de verdad,
+ * proyectando sobre cada una como una caja (`Math.max`/`Math.min`, lo mismo
+ * que usa `separate()` en `life/steering.ts` para lo mismo con un cuerpo).
+ * Sigue sin ser continuo en el empate exacto entre dos tierras igual de
+ * cerca, pero eso es un caso mucho más raro que «la cara de mi propia celda»,
+ * y cuando empata, los dos candidatos están cerca *entre sí* —los dos están
+ * cerca del animal— así que el salto en el empate es pequeño en vez de una
+ * celda entera.
  */
+const ASHORE_RADIUS = 4;
+
 export function ashore(map: ValleyMap, x: number, y: number): { x: number; y: number } | null {
   const cellAt = (cx: number, cy: number): number | undefined => {
     const ix = Math.floor(cx);
@@ -58,29 +84,24 @@ export function ashore(map: ValleyMap, x: number, y: number): { x: number; y: nu
   };
   if (cellAt(x, y) !== TERRAIN_CODE.water) return { x, y };
 
-  // **Se le saca por la orilla más cercana, no de un empujón fijo.**
-  //
-  // El primer intento lo movía media celda a un lado en cuanto pisaba el agua,
-  // y eso es un salto de 0,61 celdas justo al borde: el animal pastando junto
-  // al río daba un brinco cada vez que la querencia le acercaba al cauce. Así
-  // se queda pegado a la orilla y el movimiento es continuo, porque el
-  // desplazamiento crece desde cero según se mete.
-  const left = x - Math.floor(x);
-  const top = y - Math.floor(y);
-  const outs: Array<{ x: number; y: number; gap: number }> = [
-    { x: Math.floor(x) - MARGIN, y, gap: left },
-    { x: Math.floor(x) + 1 + MARGIN, y, gap: 1 - left },
-    { x, y: Math.floor(y) - MARGIN, gap: top },
-    { x, y: Math.floor(y) + 1 + MARGIN, gap: 1 - top },
-  ];
-  outs.sort((a, b) => a.gap - b.gap);
-  for (const out of outs) {
-    const kind = cellAt(out.x, out.y);
-    if (kind !== undefined && kind !== TERRAIN_CODE.water) return { x: out.x, y: out.y };
+  const cx0 = Math.floor(x);
+  const cy0 = Math.floor(y);
+  let best: { x: number; y: number; d2: number } | null = null;
+  for (let cy = cy0 - ASHORE_RADIUS; cy <= cy0 + ASHORE_RADIUS; cy += 1) {
+    for (let cx = cx0 - ASHORE_RADIUS; cx <= cx0 + ASHORE_RADIUS; cx += 1) {
+      const kind = cellAt(cx + 0.5, cy + 0.5);
+      if (kind === undefined || kind === TERRAIN_CODE.water) continue;
+      // El punto de esta celda de tierra más cercano a (x, y), un margen
+      // adentro para no quedar pegado a la línea exacta del agua.
+      const nx = Math.max(cx + MARGIN, Math.min(x, cx + 1 - MARGIN));
+      const ny = Math.max(cy + MARGIN, Math.min(y, cy + 1 - MARGIN));
+      const d2 = (nx - x) ** 2 + (ny - y) ** 2;
+      if (best === null || d2 < best.d2) best = { x: nx, y: ny, d2 };
+    }
   }
-  // Un bicho en mitad del río y sin orilla cerca no se dibuja. Es mejor que no
-  // esté a que nade.
-  return null;
+  // Nada de tierra en el radio de búsqueda: un bicho en mitad del río y sin
+  // orilla cerca no se dibuja. Es mejor que no esté a que nade.
+  return best === null ? null : { x: best.x, y: best.y };
 }
 
 /** Lo que se separa del agua quien acaba de salir de ella, en celdas. */
@@ -151,6 +172,16 @@ export class Fauna {
    * guardar aquí la semana, la cabaña y el pueblo de anoche; hoy la trae hecha
    * `scenic-state.ts`, para todos y de una vez, y este método vuelve a ser lo
    * que debía: una función de la hora.
+   *
+   * **Sigue derivando del estado, sin tocar `valley.life`.** V-08 adelgaza la
+   * clase separando «de dónde salen las posiciones» de «cómo se pintan»
+   * (`paint`, abajo): esto es el primer camino, el del juego de hoy, que no
+   * conoce la capa de vida. Cuando `valley.life` esté encendida, quien pinte
+   * puede construir la lista de animales a partir de `life/beasts.ts` —vivos,
+   * con cuerpo y sin `ashore`— y llamar a `paint` directamente; ese enganche
+   * queda para quien integre el renderer, fuera del alcance de V-08 (E.8: los
+   * ficheros de esta fase son `beasts.ts`, `village.ts`, `offers.ts` y este,
+   * no `renderer.ts`).
    */
   update(state: GameState, dayPhase: number): void {
     const animals: Animal[] = [];
@@ -162,6 +193,21 @@ export class Fauna {
       const dry = ashore(state.map, animal.x, animal.y);
       if (dry !== null) animals.push({ ...animal, x: dry.x, y: dry.y });
     }
+    this.paint(animals);
+  }
+
+  /**
+   * Pinta exactamente los animales que se le dan, y nada más.
+   *
+   * **Esto es «pintar instancias»**: no deriva nada del estado, no consulta la
+   * hora, no corrige el agua — sólo reparte la lista en mallas por clase y
+   * escribe una matriz por bicho. `update` es hoy el único que la llama, con
+   * la lista de siempre (§7.7 cosmético); un `life/beasts.ts` en marcha
+   * llamaría aquí con su propia lista —viva, sin `ashore`, porque un
+   * animal-`Dweller` no llega a pisar el agua— sin que esta clase necesite
+   * saber que la vida existe.
+   */
+  paint(animals: readonly Animal[]): void {
     const byKind = new Map<AnimalKind, Animal[]>();
     for (const animal of animals) {
       const list = byKind.get(animal.kind);

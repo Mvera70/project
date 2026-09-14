@@ -349,9 +349,17 @@ fase que cambie lo que se ve, se enseña antes de cerrar la siguiente.
 
 **Deudas que siguen en pie de antes** (los puntos 1–9 de arriba) más éstas:
 
-- **`ashore` da un brinco de 1,08 celdas** al sacar un animal del agua. La
-  prueba de G-10 tiene el techo en 1,1 con la causa escrita al lado. Lo arregla
-  V-08 al hacer a los animales cuerpos que no llegan a meterse.
+- **`ashore` bajó de 1,08 a 0,326 celdas (V-08), no a 0,06.** El defecto que
+  hacía saltar al rebaño una celda entera —repartir por la cara más cercana de
+  la propia celda, que cambia de bando de golpe— está arreglado: ahora busca
+  el punto de tierra más cercano de verdad en un entorno (`fauna.ts`,
+  `ashore`). Lo que queda es un empate más raro entre dos orillas de un recodo
+  ancho del río, y arreglarlo del todo pediría un A* por tierra en vez de
+  geometría de un punto — desproporcionado para una vía cosmética que
+  `life/beasts.ts` ya vuelve innecesaria en cuanto la bandera `valley.life` se
+  generaliza: un animal-`Dweller` no llega a pisar el agua porque colisiona con
+  ella, así que no necesita corrección ninguna. La prueba de G-10 tiene el
+  techo en 0,4.
 - **El río parte el valle y no se cruza**: sólo el 37 % del suelo libre está
   conectado con el centro. No es un fallo, es el motor. Condiciona la caza y
   los asentamientos que vengan: o el mapa gana un puente (motor) o van del

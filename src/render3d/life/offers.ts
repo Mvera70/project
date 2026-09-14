@@ -72,6 +72,19 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   gossip: { id: 'gossip', reach: 1.3, seats: 4, gives: { company: 0.9, boredom: 0.4 }, seconds: [6, 18] },
   /** Mirar correr el agua. No calma nada del cuerpo y despeja la cabeza. */
   loiter: { id: 'loiter', reach: 1.5, seats: 3, gives: { boredom: 0.5, irritation: 0.3 }, seconds: [8, 18] },
+
+  // V-08 · Lo que un animal ofrece a quien pasa cerca. `life/beasts.ts` las usa
+  // para montar la `Place` móvil de cada bicho: aforo uno, porque no se junta
+  // un corro alrededor de una gallina. Magnitudes en la misma escala que el
+  // resto de la tabla (`gives` entre 0,4 y 0,9, `seconds` de unos pocos a
+  // veinte) porque no hay otra referencia de la que partir: ni el brief ni
+  // `spike/life.ts` dan un número para esto.
+  /** Corretear tras la gallina. Aburrimiento y un poco de compañía infantil. */
+  chase: { id: 'chase', reach: 1.0, seats: 1, gives: { boredom: 0.5, company: 0.2 }, seconds: [3, 8] },
+  /** Echarle las sobras al cerdo. Un pellizco de deber cumplido. */
+  feed: { id: 'feed', reach: 1.0, seats: 1, gives: { duty: 0.15, boredom: 0.3 }, seconds: [3, 7] },
+  /** Acariciar a la vaca. Compañía, sin la carga de hablar con nadie. */
+  pet: { id: 'pet', reach: 1.0, seats: 1, gives: { company: 0.4, boredom: 0.3 }, seconds: [4, 10] },
 };
 
 /** Qué ofrece cada clase de edificio. */
@@ -102,8 +115,12 @@ export interface Place {
  * Se prueban las cuatro caras y luego el centro. Lo de las caras primero no es
  * capricho: lo que hay que ofrecer es **la puerta**, que es donde la escena se
  * entiende, y sólo si no hay puerta libre se recurre al medio.
+ *
+ * Exportada desde V-08: `life/beasts.ts` la reutiliza tal cual para anclar a
+ * cada animal junto a su casa o su campo, en vez de reinventar «un punto
+ * pisable cerca de un rectángulo», que es el mismo problema con otro nombre.
  */
-function doorOf(land: Terrain, x: number, z: number, w: number, h: number): Point | null {
+export function doorOf(land: Terrain, x: number, z: number, w: number, h: number): Point | null {
   // **A la distancia a la que un cuerpo puede estar de verdad**, y ése fue el
   // fallo de la primera versión: la oferta se ponía a 0,6 celdas de la fachada
   // y `avoid` mantiene a la gente a `radius + WALL_CLEAR` = 0,94. El punto era
