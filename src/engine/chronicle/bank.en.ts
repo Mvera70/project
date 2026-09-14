@@ -1681,8 +1681,20 @@ export const UI_BANK: Record<string, string> = {
   'inspect.traits.none': 'No named traits.',
   'inspect.gone': 'Gone',
   'inspect.terrain.people': '{people} people live in the valley.',
+  // U-08 · la pantalla People (`src/ui/screens/people.ts`): la lista en sí no
+  // lleva frase propia (usa `nav.people`, ya en el banco), sólo lo que le
+  // falta a la ficha reusada: el vacío de una aldea sin nadie con nombre
+  // todavía, y volver de una ficha a la lista.
+  'people.empty': 'Nobody in the valley has a name yet.',
+  'people.back': 'Back to the list',
+  'role.leader': 'leader',
   'role.smith': 'smith',
+  'role.midwife': 'midwife',
   'role.priest': 'priest',
+  'role.woodward': 'woodward',
+  'role.reeve': 'reeve',
+  'role.herbalist': 'herbalist',
+  'role.stranger': 'stranger',
   'terrain.meadow': 'meadow',
   'terrain.forest': 'forest',
   'terrain.water': 'water',

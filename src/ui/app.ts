@@ -23,6 +23,7 @@ import { mountNotices } from './notice';
 import { openChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
+import { openPeople } from './screens/people';
 import { isSpeed, speedLabel, type Speed } from './speed';
 import { openWelcome } from './welcome';
 
@@ -142,9 +143,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const archive: ArchivedGame[] = save !== undefined ? [...save.archive] : [];
   let speed: Speed = 1;
   let lastFraction = 0;
-  // U-05 · People (U-08) todavía no tiene pantalla propia: mientras tanto su
-  // pestaña abre la ficha del último nombrado que se ha tocado, si hay uno.
-  let lastNamedTouchedId: number | null = null;
   root.replaceChildren();
   root.className = 'valley-app';
 
@@ -221,11 +219,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const peopleTab = tab(NAV_ICONS.people, renderUiText('nav.people'));
   valleyTab.setAttribute('aria-pressed', 'true');
   chronicleTab.addEventListener('click', () => openChronicle(app));
-  // U-08 todavía no existe (`docs/next-plan.md`): mientras tanto, esto abre la
-  // ficha del último nombrado tocado si hay uno, y si no, no hace nada.
-  peopleTab.addEventListener('click', () => {
-    if (lastNamedTouchedId !== null) showPanel({ kind: 'villager', id: lastNamedTouchedId });
-  });
+  // U-08 · la pantalla de la gente: la lista de los nombrados vivos y, al
+  // tocar uno, su ficha (`src/ui/screens/people.ts`).
+  peopleTab.addEventListener('click', () => openPeople(app));
   root.append(canvas, year, season, vitals, controls, tabbar);
 
   // §11.6: the band that says what just happened, over the valley itself.
@@ -331,12 +327,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
 
   const showPanel = (target: InspectTarget): void => {
-    // U-05 · lo que People (aún sin pantalla propia) reabre: el último
-    // nombrado que se ha tocado, no cualquier vecino sin nombre.
-    if (target.kind === 'villager') {
-      const person = state.people.villagers.find((item) => item.id === target.id);
-      if (person !== undefined && person.named) lastNamedTouchedId = person.id;
-    }
     const model = panelFor(target, state);
     const heading = document.createElement('h2'); heading.textContent = model.title;
     panel.replaceChildren(heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
