@@ -383,15 +383,63 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     if (state.crossroad !== null && state.ended === null) openCrossroad(app, state.crossroad);
   };
 
+  /**
+   * Cerrar la ficha, que era imposible.
+   *
+   * Lo dijo el dueño del diseño al probar la demo: *«si seleccionas algo del
+   * mapa, nunca se puede deseleccionar lo que aparece seleccionado.»* Tenía tres
+   * causas a la vez, y hacían falta las tres para que no hubiera salida: el
+   * `pointerdown` que la escondía exigía `event.target === root` y el lienzo
+   * está **dentro** de la raíz, así que tocar el valle nunca era tocar la raíz;
+   * tocar suelo vacío devolvía un objetivo `terrain` y abría otra ficha en vez
+   * de cerrar la anterior; y el único gesto que la cerraba, el deslizamiento
+   * hacia abajo, es el mismo movimiento con el que se arrastra el mapa.
+   */
+  const closePanel = (): void => { panel.hidden = true; };
+
   const showPanel = (target: InspectTarget): void => {
     const model = panelFor(target, state);
     const heading = document.createElement('h2'); heading.textContent = model.title;
-    panel.replaceChildren(heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
+    // Una cruz, que es la salida que se ve. No sustituye a tocar fuera: la
+    // sustituye al revés — tocar fuera es lo que se descubre solo, y esto es lo
+    // que se ve cuando no se ha descubierto.
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'valley-panel-close';
+    close.setAttribute('aria-label', renderUiText('app.close'));
+    close.textContent = '×';
+    close.addEventListener('click', closePanel);
+    panel.replaceChildren(close, heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
     panel.hidden = false;
   };
   const trace = new Map<number, Point[]>();
   let pinchStart: number | null = null;
+  /** El ángulo entre los dos dedos al empezar, para girar. */
+  let twistStart: number | null = null;
+  /** Dónde estaba el punto medio de los dos dedos, para levantar la vista. */
+  let midStart: number | null = null;
+  let lastTapMs = -Infinity;
   let zoom = 1;
+
+  /**
+   * Cuánto se tarda como mucho entre dos toques para que cuenten como uno doble.
+   *
+   * TUNE: 320 ms. Es el umbral corriente en un móvil; por encima, un segundo
+   * toque deliberado en otro sitio se confundía con un doble.
+   */
+  const DOUBLE_TAP_MS = 320;
+
+  /**
+   * Cuánto gira el valle por píxel de giro de los dedos, y por píxel de
+   * arrastre con mayúsculas.
+   *
+   * TUNE: el giro con dos dedos va **uno a uno** con el ángulo de la mano, que
+   * es lo único que no se siente raro; el de mayúsculas, 0,4° por píxel, para
+   * que media pantalla sea media vuelta.
+   */
+  const ORBIT_PER_PX = (0.4 * Math.PI) / 180;
+  /** Y cuánto se levanta la vista por píxel vertical del punto medio. */
+  const PITCH_PER_PX = (0.25 * Math.PI) / 180;
 
   // **Los gestos van en la raiz, no en un lienzo.**
   //
@@ -418,16 +466,30 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     trace.set(event.pointerId, [{ x: event.clientX, y: event.clientY, atMs: event.timeStamp }]);
     if (trace.size === 2) {
       const starts = [...trace.values()].map((points) => points[0]!);
-      pinchStart = Math.hypot(starts[1]!.x - starts[0]!.x, starts[1]!.y - starts[0]!.y);
+      const a = starts[0]!;
+      const b = starts[1]!;
+      pinchStart = Math.hypot(b.x - a.x, b.y - a.y);
+      // **Los tres números de una mano de dos dedos.** Cuánto se separan
+      // (acercar), cuánto giran (rumbo) y a dónde va su punto medio (levantar
+      // la vista). Son medidas independientes del mismo movimiento, así que se
+      // pueden aplicar las tres a la vez sin que se peleen — es la
+      // descomposición de una semejanza, no tres gestos compitiendo.
+      twistStart = Math.atan2(b.y - a.y, b.x - a.x);
+      midStart = (a.y + b.y) / 2;
     }
   });
   root.addEventListener('pointermove', (event) => {
     const points = trace.get(event.pointerId); if (points === undefined) return;
     const previous = points.at(-1);
     points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-    // Un dedo solo arrastra el valle, cuando hay valle que arrastrar.
+    // Un dedo solo arrastra el valle, cuando hay valle que arrastrar. Y con
+    // mayúsculas pulsadas **gira**, que es la única forma de girar con un ratón
+    // de un botón: en un escritorio no hay dos dedos que retorcer.
     if (trace.size === 1 && previous !== undefined && backend.live.movesCamera) {
-      backend.live.pan(event.clientX - previous.x, event.clientY - previous.y);
+      const dx = event.clientX - previous.x;
+      const dy = event.clientY - previous.y;
+      if (event.shiftKey) backend.live.orbit(-dx * ORBIT_PER_PX, dy * PITCH_PER_PX);
+      else backend.live.pan(dx, dy);
     }
     if (pinchStart !== null && trace.size === 2) {
       const ends = [...trace.values()].map((items) => items.at(-1)!);
@@ -449,6 +511,26 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         zoom = Math.max(1, Math.min(2.5, zoom * distance / pinchStart));
         canvas.style.transform = `scale(${zoom})`;
       }
+      // El rumbo, uno a uno con el ángulo de la mano. Va en negativo porque
+      // girar la mano a la derecha tiene que llevar el valle a la izquierda:
+      // se gira la vista alrededor del valle, no el valle delante de la vista.
+      if (twistStart !== null && backend.live.movesCamera) {
+        const angle = Math.atan2(ends[1]!.y - ends[0]!.y, ends[1]!.x - ends[0]!.x);
+        let turn = angle - twistStart;
+        // Al cruzar ±π el ángulo salta una vuelta entera y el valle daba un
+        // latigazo. Se trae la diferencia al tramo corto.
+        while (turn > Math.PI) turn -= 2 * Math.PI;
+        while (turn < -Math.PI) turn += 2 * Math.PI;
+        backend.live.orbit(-turn, 0);
+        twistStart = angle;
+      }
+      // Y el punto medio subiendo o bajando levanta la vista. Queda libre para
+      // esto porque arrastrar ya es cosa de un dedo solo.
+      if (midStart !== null && backend.live.movesCamera) {
+        const mid = (ends[0]!.y + ends[1]!.y) / 2;
+        backend.live.orbit(0, (mid - midStart) * PITCH_PER_PX);
+        midStart = mid;
+      }
       pinchStart = distance;
     }
   });
@@ -456,8 +538,19 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     const points = trace.get(event.pointerId) ?? [];
     points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
     const gesture = recogniseGesture({ points });
-    trace.delete(event.pointerId); if (trace.size < 2) pinchStart = null;
+    trace.delete(event.pointerId);
+    if (trace.size < 2) { pinchStart = null; twistStart = null; midStart = null; }
     if (gesture === 'tap' || gesture === 'hold') {
+      // **Dos toques seguidos vuelven a la vista de partida.** Es la salida de
+      // emergencia de poder girar: quien se pierde dando vueltas al valle
+      // necesita una tecla de vuelta, y en un móvil no hay teclas.
+      const doubleTap = event.timeStamp - lastTapMs < DOUBLE_TAP_MS;
+      lastTapMs = event.timeStamp;
+      if (doubleTap && backend.live.movesCamera) {
+        backend.live.resetView();
+        closePanel();
+        return;
+      }
       // Cada backend sabe qué hay bajo un punto de su propia pantalla: el 2D
       // por proporción de la rejilla, el 3D lanzando un rayo. `mapPoint` se
       // queda para el 2D y no vale para el otro.
@@ -465,14 +558,25 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       const target = backend.live.pick(
         state, event.clientX - box.left, event.clientY - box.top, lastFraction,
       );
-      if (target !== null) {
+      // **Tocar el suelo deselecciona.** Un objetivo `terrain` es «aquí no hay
+      // nada»: abrir una ficha del prado con la anterior detrás era lo que
+      // hacía que la selección no tuviera salida.
+      if (target === null || target.kind === 'terrain') closePanel();
+      else {
         showPanel(target);
         if (gesture === 'hold' && target.kind === 'villager') renderer.track(target.id);
       }
-    } else if (gesture === 'swipe_down') panel.hidden = true;
-    else if (gesture === 'swipe_up') openChronicle(app);
+    } else if (!backend.live.movesCamera) {
+      // **Los deslizamientos verticales sólo valen donde no hay cámara.**
+      //
+      // Eran el modo de abrir la crónica y cerrar la ficha antes de que U-05
+      // pusiera la barra de destinos abajo. Con cámara son el mismo movimiento
+      // que arrastrar el mapa: el valle se movía **y** al soltar se abría la
+      // crónica encima. «No se puede bien mover el mapa», y era esto.
+      if (gesture === 'swipe_down') closePanel();
+      else if (gesture === 'swipe_up') openChronicle(app);
+    }
   });
-  root.addEventListener('pointerdown', (event) => { if (event.target === root) panel.hidden = true; });
 
   // La rueda del raton, que en un movil no existe y en un navegador de
   // escritorio es **la unica manera de acercarse**: alli no hay dos dedos que

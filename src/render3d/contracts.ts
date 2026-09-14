@@ -120,6 +120,15 @@ export interface GraphicsRenderer {
    */
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
+  /**
+   * Gira la vista alrededor de lo que se está mirando, en radianes.
+   *
+   * Lo pidió el dueño del diseño al probar la demo: *«solamente tenemos una
+   * visión de un plano»*. `dYaw` da la vuelta al valle y `dPitch` levanta o baja
+   * la vista, dentro de una banda. No entra en el guardado, no gasta tiempo de
+   * juego y no toca el estado, igual que `zoom` y `pan`.
+   */
+  orbit(dYaw: number, dPitch: number): void;
   resetView(): void;
 
   /**

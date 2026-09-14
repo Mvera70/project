@@ -1618,6 +1618,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 /** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
 export const UI_BANK: Record<string, string> = {
   'app.valley': 'The valley',
+  'app.close': 'Close',
   'app.year': 'ANNO {year}',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',

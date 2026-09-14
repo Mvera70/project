@@ -6,15 +6,50 @@
 // it. Both are here, and both are checkable without a GPU, which is why this
 // lives apart from the renderer.
 //
-// The tilt is not adjustable. D.7 says to calibrate it against the river, the
-// density of houses and the reading of people rather than assume forty-five
-// degrees is right; the angle that G-01 to G-06 used is the one every study
-// capture was judged on, so it stays until someone judges a different one.
+// **El ángulo ya sí se mueve, y lo pidió el dueño del diseño** (15 sep 2026):
+// *«aunque tengamos 3D, solamente tenemos una visión de un plano. Deberíamos
+// poder mirar desde diferentes ángulos.»* Tenía razón y era un agujero honesto:
+// D.7 se escribió cuando el 3D era un piloto que había que juzgar contra unas
+// capturas de estudio, y para eso la dirección **tenía** que ser fija. Desde
+// G-12 el 3D es el juego y una dirección fija es una maqueta.
+//
+// Lo que no cambia: **la dirección de partida es exactamente la de siempre.**
+// `VIEW` sigue siendo el vector con el que se juzgó todo desde G-01, y el giro
+// se guarda como un desvío sobre él. Así una captura nueva es comparable con
+// una vieja mientras nadie toque los dedos, y `reset()` vuelve a ese ángulo.
 
 import { OrthographicCamera, Vector3 } from 'three';
 
 /** The direction the camera looks from. Matches every study capture since G-01. */
 export const VIEW = new Vector3(1, 0.9, 1.15);
+
+/**
+ * `VIEW` en los dos ángulos que el jugador puede mover.
+ *
+ * `yaw` es el rumbo alrededor del eje vertical y `pitch` cuánto se mira desde
+ * arriba. Se derivan del vector en vez de escribirse a mano justo para que la
+ * vista de partida sea **la misma al bit** que antes de que esto existiera: si
+ * alguien ajusta `VIEW`, los dos ángulos le siguen.
+ */
+const BASE_YAW = Math.atan2(VIEW.x, VIEW.z);
+const BASE_PITCH = Math.atan2(VIEW.y, Math.hypot(VIEW.x, VIEW.z));
+
+/**
+ * Hasta dónde se puede levantar y bajar la vista.
+ *
+ * TUNE: entre 12° y 78°. Por debajo de 12° la cámara está casi en el suelo, no
+ * se ve la aldea y el valle se convierte en una línea; por encima de 78° es una
+ * planta y las fachadas —que es donde está el trabajo de G-10— desaparecen. La
+ * de partida son 30,6°, que es la que `VIEW` da.
+ */
+const PITCH_LOW = (12 * Math.PI) / 180;
+const PITCH_HIGH = (78 * Math.PI) / 180;
+
+/** El rumbo y la inclinación, en radianes. `yaw` da la vuelta completa. */
+export interface Angles {
+  readonly yaw: number;
+  readonly pitch: number;
+}
 
 /**
  * How close the player may get, in cells of visible height.
@@ -75,6 +110,17 @@ export interface ValleyCamera {
   pan(dxCss: number, dyCss: number): void;
   /** Put this point in the middle without changing how close we are. */
   look(x: number, z: number): void;
+  /**
+   * Gira la vista: `dYaw` alrededor del valle, `dPitch` levantándola.
+   *
+   * Gira **alrededor de lo que se está mirando**, no sobre la propia cámara: lo
+   * que hay en el centro de la pantalla se queda en el centro. Es lo que hace
+   * que girar sirva para «mírame esto desde el otro lado» en vez de para
+   * perderse. `dPitch` se recorta a la banda de `PITCH_LOW`/`PITCH_HIGH`; `dYaw`
+   * no se recorta porque dar la vuelta entera es legítimo.
+   */
+  orbit(dYaw: number, dPitch: number): void;
+  readonly angles: Angles;
   /** Back to the framing `frame` last established. */
   reset(): void;
   /** Where a point on the screen lands on the ground plane, in cells. */
@@ -104,6 +150,17 @@ export function createValleyCamera(): ValleyCamera {
   let resting: View = { centre: { x: 0.5, z: 0.5 }, height: 1 };
   let view: View = resting;
   let furthest = 1;
+  let angles: Angles = { yaw: BASE_YAW, pitch: BASE_PITCH };
+
+  /** La dirección desde la que se mira, con el giro de ahora mismo aplicado. */
+  function direction(): Vector3 {
+    const flat = Math.cos(angles.pitch);
+    return new Vector3(
+      Math.sin(angles.yaw) * flat,
+      Math.sin(angles.pitch),
+      Math.cos(angles.yaw) * flat,
+    );
+  }
 
   /**
    * The visible height that fits `bounds` on this viewport.
@@ -137,7 +194,7 @@ export function createValleyCamera(): ValleyCamera {
     const span = Math.max(bounds.maxX - bounds.minX, bounds.maxZ - bounds.minZ, 1);
     const away = span * 4;
     const at = new Vector3(centre.x, 0, centre.z);
-    camera.position.copy(at).addScaledVector(VIEW.clone().normalize(), away);
+    camera.position.copy(at).addScaledVector(direction(), away);
     camera.up.set(0, 1, 0);
     camera.lookAt(at);
     const aspect = Math.max(0.01, viewport.width / Math.max(1, viewport.height));
@@ -225,7 +282,25 @@ export function createValleyCamera(): ValleyCamera {
       settle({ centre: { x, z }, height: view.height });
     },
 
+    orbit(dYaw: number, dPitch: number): void {
+      angles = {
+        yaw: angles.yaw + dYaw,
+        pitch: clamp(angles.pitch + dPitch, PITCH_LOW, PITCH_HIGH),
+      };
+      // **El tope de alejarse depende del ángulo**, igual que depende de la
+      // forma de la pantalla: un rectángulo visto de canto ocupa menos alto que
+      // visto de frente. Sin recalcularlo, girar recortaba el valle por un lado
+      // o dejaba de poder alejarse por el otro — el mismo fallo que `resize` ya
+      // tenía resuelto, con la misma cura.
+      furthest = Math.max(CLOSEST_HEIGHT, fitting(bounds));
+      settle(view);
+    },
+
     reset(): void {
+      // Vuelve también el ángulo: «volver» significa la vista de partida, y la
+      // de partida es la de `VIEW`, la que todas las capturas han juzgado.
+      angles = { yaw: BASE_YAW, pitch: BASE_PITCH };
+      furthest = Math.max(CLOSEST_HEIGHT, fitting(bounds));
       settle(resting);
     },
 
@@ -248,6 +323,10 @@ export function createValleyCamera(): ValleyCamera {
 
     get view(): View {
       return view;
+    },
+
+    get angles(): Angles {
+      return angles;
     },
 
     get limits(): { closest: number; furthest: number } {

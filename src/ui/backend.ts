@@ -43,6 +43,8 @@ export interface ValleyBackend {
   track(id: number | null): void;
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
+  /** Gira la vista, en radianes. Canvas no puede: no tiene desde dónde mirar. */
+  orbit(dYaw: number, dPitch: number): void;
   resetView(): void;
   /** Lo que cuesta la escena, o `null` en Canvas, que no tiene de donde sacarlo. */
   stats(): GraphicsStats | null;
@@ -107,6 +109,9 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     track(id) { renderer.track(id); },
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
     pan() { /* idem */ },
+    // El 2D es una proyección fija de 36 × 56 dibujada a mano: no hay ángulo
+    // que girar, y por eso `movesCamera` es `false` y quien llama no lo intenta.
+    orbit() { /* idem */ },
     resetView() { /* idem */ },
     stats() { return null; },
     dispose() { /* The 2D renderer owns nothing that outlives its canvas. */ },
@@ -272,6 +277,7 @@ export function attachBackend(
         track(id) { renderer.track(id); },
         zoom(factor, atX, atY) { renderer.zoom(factor, atX, atY); },
         pan(dx, dy) { renderer.pan(dx, dy); },
+        orbit(dYaw, dPitch) { renderer.orbit(dYaw, dPitch); },
         resetView() { renderer.resetView(); },
         stats() { return renderer.stats(); },
         dispose() {

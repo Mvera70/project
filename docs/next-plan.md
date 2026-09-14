@@ -102,7 +102,20 @@ el mapa**, que no estaban en ningún brief y son nuevos.
 
 ### El orden que sale de esto
 
-1. **La cámara** (girar, mover, zoom, deseleccionar). Prerrequisito del mapa.
+1. ~~**La cámara**~~ — **hecha, G-13.** Gira con dos dedos o con mayúsculas, se
+   levanta la vista, dos toques vuelven al principio, tocar el suelo
+   deselecciona, y arrastrar el mapa ya no abre la crónica encima. Informe en
+   `docs/graphics-rounds/G-13.md`, con tres capturas desde tres ángulos.
+
+   **Y mirarlas destapó tres cosas que nadie había apuntado:**
+   - **Una cuña marrón enorme sobre el río** en la vista de reposo, con el color
+     del suelo pisado, tapando el agua. Geometría del suelo o del cuenco de V-14
+     saliendo donde no debe. **Va con el mapa grande**, que rehace el terreno.
+   - **Doce de veinte aldeanos llevan nube de diálogo a la vez.** §11.1.1 la puso
+     para «quien está viviendo algo»; con el 60 % de la aldea marcada no señala
+     nada. Es parte de «los mensajes son horrorosos» y es barato.
+   - **El mapa se ve entero desde el reposo**, con borde de prado vacío
+     alrededor. Confirma la queja: no hay nada que descubrir moviéndose.
 2. **El reloj a ×4 y ×64.** Separar los dos síntomas y medir.
 3. **El mapa grande, con más generación.** V-15 + V-16, ampliadas.
 4. **Los textos y los iconos.** Es voz y dibujo, no arquitectura.

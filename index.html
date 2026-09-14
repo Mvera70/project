@@ -103,6 +103,7 @@
       .valley-speeds button:active { background: rgba(34,29,24,.10); }
       .valley-speeds button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
       .valley-speeds button:focus-visible, .valley-panel:focus-visible, .valley-tab:focus-visible,
+      .valley-panel-close:focus-visible,
       .valley-sound:focus-visible {
         outline: 2px solid var(--gild); outline-offset: 2px; }
 
@@ -147,6 +148,15 @@
       .valley-panel h2 { margin: 0 0 6px; text-transform: capitalize; color: var(--ink);
         font: 600 21px/1.15 var(--voice); letter-spacing: .01em; text-wrap: balance; }
       .valley-panel p { margin: 3px 0; color: var(--ink-soft); font: 14px/1.5 var(--plain); }
+      /* La salida de la ficha, que no tenía ninguna. 44 px de área táctil
+         —§11.7— sobre un cuadro de 24, para que se vea ligera y se toque fácil.
+         Va arriba a la derecha y en el hueco del título: la ficha es una
+         cartela de pergamino, no un cuadro de diálogo, y una barra de título
+         con una cruz la convertiría en lo segundo. */
+      .valley-panel-close { position: absolute; top: 6px; right: 8px; width: 44px; height: 44px;
+        display: grid; place-items: center; padding: 0; border: 0; background: transparent;
+        color: var(--ink-soft); font: 400 26px/1 var(--voice); cursor: pointer; }
+      .valley-panel-close:hover { color: var(--ink); }
     </style>
   </head>
   <body>

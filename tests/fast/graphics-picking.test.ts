@@ -243,3 +243,145 @@ describe('G-07 · el relevo de lienzo', () => {
     expect(app).toContain('backend.live.surface');
   });
 });
+
+describe('La cámara gira · el veredicto del 15 sep 2026', () => {
+  // *«Aunque tengamos 3D ahora mismo, solamente tenemos una visión de un plano.
+  // Deberíamos poder mirar desde diferentes ángulos.»* — el dueño del diseño,
+  // probando la demo. Lo que sigue es esa frase convertida en asertos.
+
+  it('la vista de partida es exactamente la de siempre', () => {
+    // **Lo primero, porque es lo que hace comparable una captura nueva con una
+    // vieja.** Girar es un desvío sobre `VIEW`, no una dirección nueva: si esto
+    // falla, todas las capturas de estudio desde G-01 dejan de servir de
+    // referencia y nadie se enteraría.
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE, VALLEY);
+    const before = screenOf(camera, 18, 28);
+    camera.orbit(1.2, 0.3);
+    camera.reset();
+    const after = screenOf(camera, 18, 28);
+    expect(after.x).toBeCloseTo(before.x, 9);
+    expect(after.y).toBeCloseTo(before.y, 9);
+  });
+
+  it('girar mueve de sitio lo que se ve, y el centro se queda en el centro', () => {
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE, VALLEY);
+    const centre = camera.view.centre;
+    const cornerBefore = screenOf(camera, VILLAGE.minX, VILLAGE.minZ);
+    const middleBefore = screenOf(camera, centre.x, centre.z);
+
+    camera.orbit(Math.PI / 2, 0);
+
+    // Media vuelta: una esquina que estaba a un lado tiene que estar al otro.
+    const cornerAfter = screenOf(camera, VILLAGE.minX, VILLAGE.minZ);
+    expect(Math.hypot(cornerAfter.x - cornerBefore.x, cornerAfter.y - cornerBefore.y))
+      .toBeGreaterThan(0.2);
+    // Y lo que estaba en el medio sigue en el medio: se gira alrededor de lo
+    // que se mira, que es lo que evita perderse.
+    const middleAfter = screenOf(camera, centre.x, centre.z);
+    expect(middleAfter.x).toBeCloseTo(middleBefore.x, 6);
+    expect(middleAfter.y).toBeCloseTo(middleBefore.y, 6);
+  });
+
+  it('dar la vuelta entera vuelve al mismo sitio', () => {
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE, VALLEY);
+    const before = screenOf(camera, 12, 22);
+    for (let step = 0; step < 8; step += 1) camera.orbit(Math.PI / 4, 0);
+    const after = screenOf(camera, 12, 22);
+    expect(after.x).toBeCloseTo(before.x, 6);
+    expect(after.y).toBeCloseTo(before.y, 6);
+  });
+
+  it('la vista no se puede tumbar al suelo ni poner en planta', () => {
+    // Por debajo de la banda el valle es una línea; por encima desaparecen las
+    // fachadas, que es donde está todo el trabajo de G-10.
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE, VALLEY);
+    camera.orbit(0, -10);
+    expect(camera.angles.pitch).toBeGreaterThan(0.2);
+    camera.orbit(0, 10);
+    expect(camera.angles.pitch).toBeLessThan(Math.PI / 2 - 0.2);
+  });
+
+  it('girar no deja el valle sin poder alejarse', () => {
+    // El tope de alejarse se mide proyectando las esquinas, así que depende del
+    // ángulo: un rectángulo visto de canto ocupa menos alto que de frente. Sin
+    // recalcularlo, girar recortaba el valle. Es el mismo fallo que `resize`
+    // tuvo, y la prueba es la misma idea.
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE, VALLEY);
+    for (const turn of [0, Math.PI / 6, Math.PI / 3, Math.PI / 2, 2.5]) {
+      camera.orbit(turn, 0);
+      const { furthest } = camera.limits;
+      camera.zoom(1000, PHONE.width / 2, PHONE.height / 2);
+      expect(camera.view.height).toBeCloseTo(furthest, 6);
+      // Y desde ahí se ve el valle entero: las cuatro esquinas caen dentro.
+      for (const [x, z] of [
+        [VALLEY.minX, VALLEY.minZ], [VALLEY.maxX, VALLEY.minZ],
+        [VALLEY.minX, VALLEY.maxZ], [VALLEY.maxX, VALLEY.maxZ],
+      ]) {
+        const at = screenOf(camera, x!, z!);
+        expect(Math.abs(at.y), `esquina (${x}, ${z}) con giro ${turn.toFixed(2)}`)
+          .toBeLessThanOrEqual(1.001);
+      }
+    }
+  });
+
+  it('arrastrar sigue al dedo después de girar', () => {
+    // `pan` traduce píxeles a celdas pasando por el suelo, así que tiene que
+    // seguir funcionando con la vista girada sin saber que se ha girado.
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE, VALLEY);
+    camera.orbit(1.1, 0.2);
+    const before = camera.groundAt(PHONE.width / 2, PHONE.height / 2);
+    camera.pan(40, 0);
+    const after = camera.groundAt(PHONE.width / 2 + 40, PHONE.height / 2);
+    expect(after.x).toBeCloseTo(before.x, 4);
+    expect(after.z).toBeCloseTo(before.z, 4);
+  });
+});
+
+describe('Los gestos del valle · el veredicto del 15 sep 2026', () => {
+  // *«No se puede bien mover el mapa»* y *«si seleccionas algo del mapa, nunca
+  // se puede deseleccionar»*. Las dos cosas se comprueban sobre el código, por
+  // el mismo motivo que la prueba del relevo de lienzo: montar el juego pide un
+  // DOM que la suite rápida no tiene, y lo que puede volver a romperse en
+  // silencio es el enganche, no el cálculo.
+  const app = readFileSync(resolve(ROOT, 'src', 'ui', 'app.ts'), 'utf8');
+
+  it('arrastrar el valle no abre la crónica', () => {
+    // Un deslizamiento vertical era el modo de abrir la crónica antes de que
+    // U-05 pusiera la barra de destinos. Con cámara es **el mismo movimiento**
+    // que arrastrar el mapa: el valle se movía y al soltar se abría la crónica
+    // encima. Los deslizamientos quedan sólo donde no hay cámara.
+    const swipes = app.slice(app.indexOf("gesture === 'swipe_down'"));
+    expect(app, 'los deslizamientos van tras comprobar que no hay cámara')
+      .toMatch(/!backend\.live\.movesCamera\)\s*\{[\s\S]{0,900}?swipe_down/u);
+    expect(swipes.length).toBeGreaterThan(0);
+  });
+
+  it('tocar el suelo cierra la ficha en vez de abrir otra', () => {
+    expect(app, 'un objetivo de terreno o ninguno cierra')
+      .toMatch(/target === null \|\| target\.kind === 'terrain'\)\s*closePanel\(\)/u);
+  });
+
+  it('la ficha lleva su propia salida', () => {
+    expect(app).toContain("className = 'valley-panel-close'");
+    expect(app).toContain(`close.addEventListener('click', closePanel)`);
+    const html = readFileSync(resolve(ROOT, 'index.html'), 'utf8');
+    expect(html, 'con área táctil de §11.7').toMatch(/\.valley-panel-close \{[^}]*44px/u);
+  });
+
+  it('dos toques seguidos devuelven la vista de partida', () => {
+    expect(app).toContain('DOUBLE_TAP_MS');
+    expect(app).toMatch(/doubleTap && backend\.live\.movesCamera\)\s*\{[\s\S]{0,200}resetView\(\)/u);
+  });
+
+  it('se puede girar con dos dedos y con mayúsculas', () => {
+    expect(app, 'el retorcer de dos dedos gira').toContain('twistStart');
+    expect(app, 'y el punto medio levanta la vista').toContain('midStart');
+    expect(app, 'y con un ratón de un botón, mayúsculas').toMatch(/event\.shiftKey.*orbit/su);
+  });
+});

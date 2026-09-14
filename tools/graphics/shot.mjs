@@ -26,6 +26,13 @@ const opt = (name, fallback) => {
 const runSeconds = Number(opt('run', '0'));
 const speed = opt('speed', '1');
 const waitFor = opt('wait', '');
+// **Girar la vista antes de disparar.** Sin esto la única forma de comprobar
+// que la cámara gira era mirar a ojo con el dedo encima, y una cámara que gira
+// mal se ve igual que una que no gira en una captura de frente.
+//   --turn 90        gira noventa grados alrededor del valle
+//   --tilt 25        y la levanta veinticinco más
+const turn = Number(opt('turn', '0'));
+const tilt = Number(opt('tilt', '0'));
 const out = resolve(opt('out', 'artifacts/graphics/G-10/shot.png'));
 const page = resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html'));
 
@@ -53,6 +60,21 @@ await tab.goto(`file:///${page.replace(/\\/g, '/')}`);
 await tab.waitForTimeout(8000);
 
 if (speed !== '1') await tab.getByRole('button', { name: `${speed}×` }).click().catch(() => {});
+
+// Se gira arrastrando con mayúsculas, que es el gesto de escritorio, en vez de
+// llamar al renderer por dentro: así lo que la captura prueba es **el camino
+// del jugador** y no una función a la que nadie llega con el dedo.
+if (turn !== 0 || tilt !== 0) {
+  const perPx = 0.4;              // grados por píxel, igual que `ORBIT_PER_PX`
+  const perPxTilt = 0.25;
+  await tab.keyboard.down('Shift');
+  await tab.mouse.move(195, 420);
+  await tab.mouse.down();
+  await tab.mouse.move(195 - turn / perPx, 420 + tilt / perPxTilt, { steps: 24 });
+  await tab.mouse.up();
+  await tab.keyboard.up('Shift');
+  await tab.waitForTimeout(600);
+}
 
 const swipeDown = async () => {
   await tab.mouse.move(195, 300); await tab.mouse.down();

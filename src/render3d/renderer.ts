@@ -615,6 +615,11 @@ export async function createGraphicsRenderer(
       view.pan(dxCss, dyCss);
     },
 
+    orbit(dYaw: number, dPitch: number): void {
+      if (disposed) return;
+      view.orbit(dYaw, dPitch);
+    },
+
     resetView(): void {
       if (disposed) return;
       view.reset();
