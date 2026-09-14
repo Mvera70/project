@@ -15,7 +15,7 @@ import { herdCapacity } from '../subsistence/herd';
 import type { GameState, Villager, VillagerId } from '../state';
 import { yearOf } from '../time';
 import { standing } from '../subsistence/building-counts';
-import type { AppliedEffects, Catalogue, CrossroadTemplate, Effect } from './schema';
+import type { AppliedEffects, Catalogue, Effect } from './schema';
 
 const clampStat = (name: string, x: number): number =>
   name === 'morale' || name === 'faith' ? Math.max(0, Math.min(100, x)) : Math.max(0, x);
@@ -300,16 +300,8 @@ export function namesOf(
   return out;
 }
 
-/** The entry that announces a crossroad has been posed. §8.7, §9. */
-export function recordPosed(state: GameState, template: CrossroadTemplate): void {
-  if (state.crossroad === null) return;
-  state.chronicle.push({
-    tick: state.tick,
-    kind: 'crossroad_posed',
-    templateKey: template.title,
-    params: { year: yearOf(state.tick), ...namesOf(state, state.crossroad.cast) },
-    // §9.2, v2.14: a crossroad is weight 3. The question the player was asked
-    // is the spine of the chronicle; it was reading below the harvest.
-    weight: 3,
-  });
-}
+// Aquí vivía `recordPosed`, que componía la entrada de «se plantea una
+// encrucijada». Nadie la llamaba: el paso 15 del tick la escribe él mismo
+// (`sim.ts`), así que eran dos copias de la misma entrada de crónica y sólo una
+// se ejecutaba. Borrada al auditar el proyecto; si alguna vez hace falta
+// sacarla de `sim.ts`, sale de ahí y no de una segunda copia.

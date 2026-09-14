@@ -17,7 +17,7 @@
 // Otherwise every named villager ends up carrying an identical set of twelve
 // memories and the whole system says nothing.
 
-import { MEMORY, OPINION, SCARS, TIME } from '../balance';
+import { MEMORY, OPINION, SCARS } from '../balance';
 import { remember } from './memories';
 import { adjustOpinion } from './opinions';
 import { isHere } from './demography';
@@ -118,9 +118,4 @@ export function scarFire(state: GameState, homeId: BuildingId): void {
       adjustOpinion(state, a.id, b.id, OPINION.SHARED_LOSS);
     }
   }
-}
-
-/** Years a memory of this weight survives the decay of §6.4, for the tests. */
-export function memoryLifespan(weight: number): number {
-  return weight / MEMORY.DECAY_PER_YEAR / TIME.WEEKS_PER_YEAR * TIME.WEEKS_PER_YEAR;
 }

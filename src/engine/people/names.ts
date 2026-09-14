@@ -44,11 +44,9 @@ export const FEMALE_NAMES: readonly string[] = [
   'Wulfhild', 'Wynflaed', 'Bertha', 'Aelfwynn', 'Beorhtwynn', 'Cynegifu',
 ];
 
-/** The lord of Wealdmere and the places beyond the ridge. Annex B.1. */
-export const PLACE_NAMES: readonly string[] = [
-  'Wealdmere', 'Ashford', 'Netherby', 'Longmoor', 'Crowhurst',
-  'Stanbeck', 'Thornleigh', 'Fenwick', 'Ravensden',
-];
+// Los topónimos de B.1 no viven aquí y no tienen por qué: el texto que lee el
+// jugador sale del banco (`chronicle/bank.en.ts`), que los nombra donde toca.
+// Había una lista exportada que nadie leía; la fuente es el Anexo B.1.
 
 /**
  * A name nobody living carries. `used` is the caller's set of taken names —

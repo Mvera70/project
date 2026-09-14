@@ -15,9 +15,12 @@
 // The cache NAME is the only invalidation this has. Bump it and every older
 // cache is dropped on activate.
 
-const CACHE = 'valley-v1';
+const CACHE = 'valley-v2';
 
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
+
+/** Dónde vive el manifiesto de los modelos 3D. `assets.ts` pide por aquí. */
+const ASSET_MANIFEST = './assets/valley3d/manifest.json';
 
 /**
  * Everything the document references, read out of the document itself.
@@ -62,6 +65,36 @@ async function shellAssets(cache) {
   return [...urls];
 }
 
+/**
+ * Los modelos 3D, que el documento no referencia y el juego necesita.
+ *
+ * `index.html` no los nombra: los pide el renderer en marcha, leyendo este
+ * manifiesto. Con la política de «caché primero, y se guarda al traerlo» eso
+ * bastaba *si la primera visita duraba lo suficiente* para que los 2,7 MB
+ * terminaran de bajar. Medido: abriendo y recargando sin esperar, los GLB no
+ * llegan a guardarse, y entonces sin red el relevo a 3D falla y el valle abre
+ * en 2D. Abre —§13.4 se cumple a la letra— pero no es el juego.
+ *
+ * Así que se precachean en la instalación, como el resto del casco. Cuesta
+ * 2,7 MB de una vez, y es el precio de que «abre en modo avión» signifique lo
+ * mismo el día que ya no haya un Canvas al que caer.
+ */
+async function modelAssets(cache) {
+  try {
+    await store(cache, ASSET_MANIFEST);
+    const response = await cache.match(new Request(ASSET_MANIFEST, { mode: 'cors', credentials: 'omit' }));
+    if (response === undefined) return [];
+    const manifest = await response.json();
+    const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
+    return assets
+      .map((asset) => (typeof asset.file === 'string' ? `./assets/valley3d/${asset.file}` : null))
+      .filter((url) => url !== null);
+  } catch {
+    // Sin manifiesto no hay modelos que precachear, y el casco sigue entero.
+    return [];
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE)
@@ -71,6 +104,8 @@ self.addEventListener('install', (event) => {
         await Promise.all(SHELL.map((url) => cache.add(url).catch(() => undefined)));
         const assets = await shellAssets(cache);
         await Promise.all(assets.map((url) => store(cache, url)));
+        const models = await modelAssets(cache);
+        await Promise.all(models.map((url) => store(cache, url)));
       })
       .then(() => self.skipWaiting()),
   );

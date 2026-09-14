@@ -27,23 +27,11 @@ export const VALLEY_COLOURS = {
   clothAccent: '#A96146',
 } as const;
 
-/** Terrain by its engine code. The index is `TERRAIN_CODE`. */
-export const TERRAIN_COLOURS = [
-  VALLEY_COLOURS.ground, // meadow
-  VALLEY_COLOURS.foliage, // forest
-  '#6E8CA0', // water
-  '#8C8378', // rock
-  '#7C8560', // marsh
-  VALLEY_COLOURS.soil, // cleared
-] as const;
-
-/** A trodden way, a track and a road. Index 0 is no path at all. */
-export const PATH_COLOURS = [
-  null,
-  '#A89066',
-  VALLEY_COLOURS.path,
-  '#D2B588',
-] as const;
+// Aquí había dos tablas de color —el terreno por su código de motor y los tres
+// niveles de camino— que nadie usaba ya. Quien pinta el suelo lo hace con la
+// paleta de las estaciones (`world/ground.ts` → `@derive/palette`), que cambia
+// con la semana; dos tablas fijas al lado eran la versión de antes de que el
+// suelo tuviera estaciones, y una de las dos mentía.
 
 export interface BuildingLook {
   /** Height of the walls, in cells. */

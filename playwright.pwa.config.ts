@@ -18,9 +18,20 @@ export default defineConfig({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
     serviceWorkers: 'allow',
-    launchOptions: !existsSync(bundledChromium) && existsSync(systemChrome)
-      ? { executablePath: systemChrome }
-      : {},
+    // **WebGL, o esto no prueba el juego que se publica.**
+    //
+    // Desde G-12 el valle se pinta en 3D y el Canvas es sólo la puerta de
+    // vuelta. Sin estas dos banderas el navegador no tiene WebGL, el relevo a
+    // 3D falla y `backend.ts` deja el Canvas puesto — que es exactamente lo
+    // que estos recorridos venían comprobando sin decirlo: pasaban en 730 ms
+    // porque nunca esperaban a que cargara nada. `shot.mjs` las lleva desde el
+    // primer día y por el mismo motivo.
+    launchOptions: {
+      args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
+      ...(!existsSync(bundledChromium) && existsSync(systemChrome)
+        ? { executablePath: systemChrome }
+        : {}),
+    },
   },
   // Dos servidores: el build en la raíz, y el mismo build bajo `/project/`
   // para el recorrido de subdirectorio. El segundo devuelve 404 hasta que

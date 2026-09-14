@@ -1,8 +1,27 @@
 /**
  * Capturas automáticas — design.md §14.3 y M-19.
  * OBLIGATORIO antes de empezar M-17. Es la mitigación del riesgo principal.
+ *
+ * **Lo que esta reja fotografía es la interfaz, sobre el Canvas, y eso es
+ * deliberado desde que se auditó el proyecto.** Lo que mira son la tira de
+ * §11.1.1, las encrucijadas, la crónica, el epitafio y la herencia: pantallas
+ * compartidas por los dos renders. El valle de debajo lo pinta el Canvas, que
+ * es estable, barato y no necesita GPU en un runner.
+ *
+ * Y va escrito en la dirección (`?render=canvas`) en vez de salir por descarte.
+ * Antes no: el navegador de la reja no tenía WebGL, el relevo a 3D fallaba en
+ * silencio y estas aserciones sobre `#valley` pasaban por casualidad. El día que
+ * el runner tuviera WebGL, la suite entera se habría caído sin que nadie
+ * hubiera cambiado nada.
+ *
+ * **La reja visual del 3D está pendiente y no la cubre esto.** Hoy se mira a
+ * mano con `npm run shot` (`tools/graphics/shot.mjs`, que sí pide swiftshader);
+ * automatizarla es una ronda con alguien mirando capturas, no un ajuste.
  */
 import { test } from '@playwright/test';
+
+/** La puerta de vuelta, pedida a propósito. Ver la cabecera. */
+const CANVAS = '/?render=canvas';
 
 test('la ruta de depuración llega al lienzo móvil sin interacción', async ({ page }) => {
   await page.goto('/?debug=1&seed=7&year=1&season=spring');
@@ -25,7 +44,7 @@ test('cada edificio pinta dentro de su caja a 9 y 10 px sobre claro y oscuro', a
 
 test('la aplicación abre el valle con año y cuatro velocidades táctiles', async ({ page }) => {
   await page.clock.install();
-  await page.goto('/');
+  await page.goto(CANVAS);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.screenshot({ path: 'artifacts/app-shell.png', fullPage: true });
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
@@ -102,7 +121,7 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
 test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, hito 6)', async ({ page }) => {
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
-  await page.goto('/'); // sin parámetros de depuración: la ruta real, guardado incluido
+  await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.getByRole('button', { name: '16×', exact: true }).click();
   // Menos de 20 ticks: este estado no puede llegar al disco por el autoguardado.
@@ -239,7 +258,7 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
     db.close();
     return save?.state?.tick === 0 && save.state.ended === null && save.archive?.length === 1;
   })).toBe(true);
-  await page.goto('/');
+  await page.goto(CANVAS);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await test.expect(page.locator('.epitaph-scrim')).toBeHidden();
 });
@@ -250,7 +269,7 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
   // que solo duerme perdía el tiempo entero.
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
-  await page.goto('/');
+  await page.goto(CANVAS);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.getByRole('button', { name: '16×', exact: true }).click();
   await page.clock.runFor(5_000);

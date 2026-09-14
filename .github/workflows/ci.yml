@@ -25,6 +25,10 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      # El tercer nivel de §14: jornadas y siglos en varias semillas. Fuera del
+      # bucle de trabajo por lo que cuesta, dentro de la puerta porque es lo que
+      # prueba la capa que hoy mueve la aldea.
+      - run: npm run test:journeys
       - run: npm run build
       - run: npm run lint
 

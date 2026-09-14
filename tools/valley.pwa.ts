@@ -51,14 +51,26 @@ test('el manifest declara una aplicación instalable', async ({ page, request })
  * bundle está en la caché y `fetch` lo sirve sin red, pero cargarlo como módulo
  * falla igualmente. La segunda apertura es la frontera que sí se sostiene.
  */
-async function warmed(page: Page): Promise<void> {
-  await page.goto('/');
+async function warmed(page: Page, query = ''): Promise<void> {
+  await page.goto(`/${query}`);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
   await page.reload();
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
 }
+
+/**
+ * El Canvas, a propósito, para lo que no va de pintar.
+ *
+ * Desde G-12 el juego es el 3D y esta reja lo prueba con WebGL de software
+ * (`--use-gl=swiftshader`). Eso vale para comprobar que el valle abre sin red,
+ * y no vale para un recorrido que corre veinticuatro segundos de reloj virtual:
+ * cada fotograma pinta una escena entera por CPU y la prueba no termina. Lo que
+ * ese recorrido mira es IndexedDB, que es de §13.1 y no del render, así que se
+ * corre por la puerta de vuelta — que para esto está.
+ */
+const NO_PAINT = '?render=canvas';
 
 test('a partir de la segunda apertura, el valle abre en modo avión', async ({ page, context }) => {
   await warmed(page);
@@ -68,7 +80,16 @@ test('a partir de la segunda apertura, el valle abre en modo avión', async ({ p
 
   // Esto es §13.4 entero: sin red, la aldea sigue abriendo.
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
-  await test.expect(page.locator('#valley')).toBeVisible();
+  // Y abre **con el render que se publica**, que desde G-12 es el 3D.
+  //
+  // Aquí se comprobaba que el lienzo 2D estuviera visible, lo que sólo puede
+  // pasar si el relevo a WebGL no ocurrió. Y no valía mirar `#valley3d`: ese
+  // lienzo se crea antes de que el renderer cargue y se queda puesto aunque
+  // falle. Lo que dice la verdad es `data-render`, que `app.ts` sella con lo
+  // que de verdad está pintando. Si los GLB no estuvieran en la caché del
+  // trabajador, sin red el relevo fallaría y esto diría `canvas`: el valle
+  // abriría, sí, pero no sería el juego.
+  await page.locator('html[data-render="pilot3d"]').waitFor({ timeout: 30_000 });
   await test.expect(page.locator('.valley-year')).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m27-offline.png', fullPage: true });
 
@@ -95,7 +116,7 @@ function savedTick(page: Page): Promise<number> {
 
 test('la partida guardada sobrevive a quedarse sin red', async ({ page, context }) => {
   await page.clock.install({ time: Date.now() });
-  await warmed(page);
+  await warmed(page, NO_PAINT);
   await page.getByRole('button', { name: '16×', exact: true }).click();
   // Más de 20 ticks: cruza el autoguardado de §13.1.
   await page.clock.runFor((25 * 15_000) / 16 + 500);

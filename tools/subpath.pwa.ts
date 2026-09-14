@@ -40,6 +40,12 @@ test('bajo un subdirectorio arranca, el worker se limita a él y abre sin red', 
   await context.setOffline(true);
   await page.reload();
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
-  await test.expect(page.locator('#valley')).toBeVisible();
+  // **Y abre con el render que se publica.** Aquí se miraba el lienzo 2D, que
+  // sólo está visible cuando el relevo a WebGL no ha ocurrido — así que la
+  // prueba pasaba precisamente por no esperar a nada. Que `data-render` diga
+  // `pilot3d` bajo un prefijo es lo que demuestra lo que §13.4 promete: los
+  // treinta y un GLB se piden por ruta relativa y resuelven igual desde un
+  // subdirectorio, que es el fallo que sólo se ve desplegado.
+  await page.locator('html[data-render="pilot3d"]').waitFor({ timeout: 30_000 });
   await context.setOffline(false);
 });

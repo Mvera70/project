@@ -359,10 +359,3 @@ export interface BeastSighting {
   readonly x: number;
   readonly y: number;
 }
-
-/** La cabaña, traducida a lo único que hace falta para pintarla. */
-export function beastSightings(beasts: readonly Beast[]): BeastSighting[] {
-  return beasts.map((beast) => ({
-    id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
-  }));
-}

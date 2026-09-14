@@ -20,9 +20,6 @@ import { seasonOf, weekOf } from '@engine/time';
 
 export type AnimalKind = 'hen' | 'pig' | 'cow' | 'crow' | 'wolf' | 'fish';
 
-/** The village's own, which go indoors at dusk. The rest is wildlife. */
-export const LIVESTOCK: readonly AnimalKind[] = ['hen', 'pig', 'cow'];
-
 export interface Animal {
   id: number;
   kind: AnimalKind;

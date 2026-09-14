@@ -87,9 +87,3 @@ export function outbreakActive(state: GameState, outbreak: Outbreak | null): boo
   if (outbreak === null) return false;
   return state.tick >= outbreak.startedTick && state.tick < outbreak.endsTick;
 }
-
-/** How many weeks an outbreak has left to run. Zero once it is over. */
-export function outbreakWeeksLeft(state: GameState, outbreak: Outbreak | null): number {
-  if (outbreak === null) return 0;
-  return Math.max(0, outbreak.endsTick - state.tick);
-}

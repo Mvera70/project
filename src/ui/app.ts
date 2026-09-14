@@ -11,7 +11,7 @@ import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save'
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile, Season } from '@engine/state';
 import { seasonOf, yearOf } from '@engine/time';
-import { attachBackend, backendFrom } from './backend';
+import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
 import { panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
@@ -295,12 +295,34 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   panel.setAttribute('aria-live', 'polite');
   root.append(panel);
 
-  // G-07 · Canvas pinta desde el primer fotograma, siempre. Si el jugador pidió
-  // el piloto 3D con `?render=3d`, se carga por detrás y releva cuando esté;
-  // si falla, el valle sigue en 2D en vez de quedarse en un error.
+  /**
+   * Qué render está pintando, dicho en voz alta.
+   *
+   * `attachBackend` ofrecía `onSwap` desde G-07 y nadie lo enganchaba, así que
+   * **no había forma de saber qué render estaba vivo**: ni desde una prueba, ni
+   * mirando la página en un teléfono. Y el relevo falla en silencio a
+   * propósito —si WebGL no va, el valle sigue en 2D en vez de quedarse en un
+   * error—, que es la combinación que hace falta para que un fallo dure
+   * semanas. Lo destapó la auditoría: los recorridos de navegador comprobaban
+   * el lienzo 2D y pasaban en 730 ms porque el navegador no tenía WebGL, así
+   * que la reja llevaba desde G-12 midiendo un juego que ya no se publica.
+   *
+   * Mismo patrón de observación que `data-app-ready` y `data-tick`: un atributo
+   * en la raíz, que no cambia nada de lo que se pinta.
+   */
+  const stampRender = (handle: BackendHandle): void => {
+    document.documentElement.dataset.render = handle.live.kind;
+    if (handle.failure !== null) document.documentElement.dataset.renderFailure = handle.failure;
+  };
+
+  // G-07 · Canvas pinta desde el primer fotograma, siempre. El 3D —que desde
+  // G-12 es el juego— se carga por detrás y releva cuando esté; si falla, el
+  // valle sigue en 2D en vez de quedarse en un error.
   const backend = attachBackend(canvas, root, {
     kind: backendFrom(location.search, localStorage.getItem('valley.render')),
+    onSwap: stampRender,
   });
+  stampRender(backend);
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
   // U-06 · si una cifra cambia, su celda hace un bump breve (§11.1.1). Quien
