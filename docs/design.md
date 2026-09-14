@@ -9200,7 +9200,12 @@ entregó y el número que lo prueba.
 | **V-04** | `life/needs.ts` | Seis impulsos, velocidad por carácter, remedio por acción, el hambre agria | Dos caracteres distintos acaban el día distintos; ninguno se sale de 0..1 en seis jornadas |
 | **V-05** | `life/offers.ts` | Catálogo de ofertas, sitios sacados de los edificios, aforo, **cada plaza con su sitio** | Todo edificio del catálogo ofrece algo; ninguna oferta en pared ni fuera del mapa |
 | **V-06** | `life/decide.ts`, `village.ts`, `cast.ts` | Utilidad, inercia, reserva de plaza al decidir, la aldea entera ensamblada, el puente a `Cast` | Misma jornada = misma aldea cuerpo a cuerpo; dos jornadas ≠. Aforo: 0 excesos. Forcejeos 1 003 → 369 |
+| **V-07** | `life/scenes.ts` | Escenas de dos: charla, rechazo, encaro, pelea devuelta, con papeles distintos | Ninguna aldea de 38 se queda en cero encontronazos, pero varían de 1 a 17 según quién vive en ella. `castOf` no patina: 3 290 tramos, desajuste de orden 10⁻¹⁴ s |
+| **V-08** | `life/beasts.ts` | Gallinas, cerdos y vacas como `Dweller` con impulso propio, y una `Place` móvil que ofrece `pet`/`chase`/`feed` | 0 animales en el agua en 6 semillas; interacción persona-animal en todas las semillas con cabaña (1 411 a 4 895 instantes); `ashore` de 1,08 a 0,326 celdas |
+| **V-10** | `life/places.ts` | La plaza, el vado y el claro: sitios que no son un edificio | Los tres se detectan y son alcanzables en 6 de 6 semillas; visitados en la mayoría (plaza 4/6, claro 5/6, vado 3/6) |
+| **V-13** | `tests/fast/life-perf.test.ts` | La medida del coste por cuerpo, continua | 0,75 µs con 80, 1,02 µs con 200: sube un 36 % al multiplicar por 2,5 la gente |
 | **V-14** | `world/ridge.ts` | El cuenco, fuera del mapa | 0 celdas del valle tocadas; 32 % del bosque vive en el borde y habría desaparecido |
+| **(arreglo)** | `life/offers.ts`, `decide.ts` | Las plazas del corro se comprueban al montar el sitio, y `decide` prueba la siguiente oferta si no hay camino | Sin nada que hacer, 33 % → **0 %**; andando, 26 % → **75 %**, que es la cifra del descarte |
 
 El total en producción son **1 873 líneas** en once ficheros, con 60 pruebas
 propias que corren en la suite rápida. El descarte son otras 1 715 en
@@ -9235,27 +9240,51 @@ se presenta sola.
 
 Lo que además sigue abierto y no está resuelto:
 
-**El reparto entre andar y hacer.** Medido a lo largo de una jornada de ochenta
-personas, entre el 74 % y el 81 % del tiempo la gente está en tránsito. Se han
-probado cuatro ajustes —no replantearse de camino, ofertas a distancia
-alcanzable, el deber sin ganar siempre, radio de búsqueda de doce a cinco— y
-ninguno lo ha bajado del 74 %. Por la regla séptima de E.3, eso quiere decir
-que no es el número: **es el modelo**. La hipótesis que hay que comprobar
-mirando, no midiendo: el descarte parecía vivo porque la gente iba de un sitio
-a otro *y se la interrumpía* —una charla, un empujón, una pelota que pasa—, y
-el tránsito con interrupciones se lee como vida. El tránsito sin
-interrupciones se lee como hormigas. Si es así, no hay que bajar el andar: hay
-que hacer V-07 y V-09, y volver a mirar. Si tras ellas sigue leyéndose como
-hormigas, entonces sí es el reparto, y se retoca con el dueño del diseño
-delante y no a ciegas.
+**El reparto entre andar y hacer: contestado, y no como se creía.** Esta
+sección decía que entre el 74 % y el 81 % de la jornada se iba en tránsito, que
+cuatro ajustes no lo habían bajado y que por tanto «no es el número, es el
+modelo». **Las dos mitades resultaron falsas**, y conviene dejarlo escrito
+porque es la clase de error que se repite:
 
-**«No se desplazan como en la demo».** Sin poder verlo no se ha podido
-confirmar si es percepción —la gente de producción anda a paso más corto y
-para más— o un fallo del puente `cast.ts` en cómo alimenta el clip de andar.
-Quien coja V-07 lo comprueba primero: que un `Dweller` andando en línea recta
-produzca un `Actor` cuyo `travelled` crezca de forma continua y cuyo `clip` sea
-`walk`. Hay prueba en `graphics-actors.test.ts` de que el clip no patina para
-`actorsFor`; hace falta la misma para `castOf`.
+- **El 74–81 % era de una sola semilla.** Medido luego en ocho (`docs/
+  life-rounds/sonda-linea-base.md`), la mediana era otra cosa. `CLAUDE.md` ya
+  dice que un umbral no se fija con una semilla; un diagnóstico, tampoco.
+- **Y para cuando se escribió, la cifra ya se había dado la vuelta por un
+  fallo.** El arreglo del imán de V-06 repartió las plazas de cada oferta en
+  corro sin comprobar el suelo, así que muchas caían en una pared o en el río:
+  `decide` pedía ruta, no había, y devolvía nada sin probar otra oferta. La
+  aldea pasó de andar demasiado a **quedarse clavada** entre el 24 % y el 33 %
+  del día. Se estaba discutiendo el reparto de una aldea que estaba rota.
+
+Con las plazas comprobadas al montarlas (`seatsOn`, `offers.ts`) y `decide`
+probando la siguiente oferta cuando no hay camino, la producción **iguala al
+descarte**: 75 % del día andando contra su 74–76 %, y 0 % sin nada que hacer.
+
+Así que la hipótesis de esta sección se sostiene entera: **no hay que bajar el
+andar**. Andar es lo que hace el descarte que gustó. Lo que falta es lo otro
+que hace, y ahí sí queda distancia medida:
+
+| Por persona y jornada | Producción | Descarte |
+|---|---|---|
+| Tiempo en escena | 12 % | 24–26 % |
+| Charlas de verdad | 0,84 | 1,99 |
+| Rechazos | 2,48 | no existen |
+| Pases de pelota y golpes | — (V-09) | 0,56 |
+
+**Tres de cada cuatro encuentros acaban en un rechazo**, que es lo que V-07
+introdujo para que un «no» dejara rastro, y a esta proporción la aldea se lee
+como un sitio donde todo el mundo desaira a todo el mundo. Eso y los trastos
+que faltan (V-09) son la diferencia que queda con el descarte, y son cosas
+concretas, no «el modelo».
+
+**«No se desplazan como en la demo»: la mitad técnica, descartada.** V-07 midió
+`castOf` sobre una jornada entera de ochenta personas —3 290 tramos de camino— y
+el mayor desajuste entre lo que el clip de andar debería avanzar y lo que avanza
+es de orden 10⁻¹⁴ segundos: coma flotante, no un fallo. La prueba queda en
+`life-scenes.test.ts`. La otra mitad —percepción— sólo se contesta mirando, y a
+eso se añade desde U-01 una cosa medida que no es percepción: en el encuadre de
+reposo **una persona ocupa seis píxeles**, así que juzgar una charla o un encaro
+a esa escala no es posible. Quien enseñe la demo, que se acerque.
 
 ### E.7 Trampas ya pagadas
 

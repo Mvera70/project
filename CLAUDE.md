@@ -86,11 +86,21 @@ piloto 3D del Anexo D (`src/render3d/`) está en G-11 y ya se juega detrás de
 **Lo que está en marcha es la vida del valle, Anexo E de `docs/design.md`:**
 una capa de agentes deterministas y efímera en `src/render3d/life/`, entre el
 motor y el render, que sustituye a `src/render3d/actors/` fase a fase. Cerradas
-V-00 a V-07, V-10 y V-14. **En marcha: V-08 (animales).** V-09 va por el
-camino crítico (E.9) y espera a que se juzgue en pantalla si con escenas el
-valle deja de leerse como hormigas — el hito humano de V-07 sigue sin
-validar. Todo va detrás de la bandera `valley.life`; el juego normal no la
-usa todavía.
+V-00 a V-08, V-10, V-13 y V-14. **Siguiente: V-09 (trastos).** Todo va detrás
+de la bandera `valley.life`; el juego normal no la usa todavía.
+
+El reparto entre andar y hacer que E.6 daba por abierto **está contestado**: la
+producción anda el 75 % de la jornada, igual que el descarte que gustó, y ya no
+se queda nadie clavado. Lo que falta para parecerse a él son los trastos (V-09)
+y que los encuentros no sean tres rechazos por cada charla. El hito humano sigue
+sin validar: nadie lo ha visto todavía.
+
+**Y en marcha aparte, la interfaz (U-01 a U-04).** El encargo es que la demo se
+lea como un juego de móvil de verdad y no como un banco de pruebas: piel
+(U-01, hecha), momentos de hito (U-02), las tres pantallas (U-03) y el arranque
+(U-04). Las edades tecnológicas **no existen** en este motor y no se inventan;
+lo que se celebra son hitos con fecha real, empezando por el primer edificio de
+cada clase.
 
 **Antes de tocar `life/`, lee E.1, E.3, E.6 y E.7 del anexo** — el diagnóstico,
 los seis innegociables, por qué la demo en el juego es hoy peor que el descarte,
