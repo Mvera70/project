@@ -99,6 +99,15 @@ const FRAME_MARGIN = 2.5;
  */
 const CORE_SHARE = 0.8;
 
+/**
+ * Cuánta sierra alcanza la vista al alejarse del todo, en celdas fuera del mapa.
+ *
+ * TUNE: catorce de las dieciséis que mide la falda (§D.6.8). Alcanzar la cresta
+ * entera dejaría la aldea del tamaño de un sello, y lo que cierra el valle no es
+ * la cumbre: es la ladera subiendo detrás de los tejados.
+ */
+const RIDGE_REACH = 14;
+
 export async function createGraphicsRenderer(
   options: GraphicsRendererOptions,
 ): Promise<GraphicsRenderer> {
@@ -280,7 +289,14 @@ export async function createGraphicsRenderer(
   function frameCamera(): void {
     if (mapWidth === 0 || mapHeight === 0) return;
     const box = framed();
-    view.frame(box, { width: viewport.widthCss, height: viewport.heightCss });
+    // Hasta dónde puede apartarse la vista: el valle con su sierra alrededor
+    // (§D.6.8). Sin esto, alejarse del todo seguía enseñando la aldea y las
+    // montañas quedaban fuera de cámara para siempre.
+    const ridgeBox = {
+      minX: -RIDGE_REACH, minZ: -RIDGE_REACH,
+      maxX: mapWidth + RIDGE_REACH, maxZ: mapHeight + RIDGE_REACH,
+    };
+    view.frame(box, { width: viewport.widthCss, height: viewport.heightCss }, ridgeBox);
 
     // El sol alumbra el valle entero, no lo que se ve: acercarse no puede
     // cambiar donde caen las sombras.

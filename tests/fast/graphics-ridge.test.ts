@@ -62,17 +62,23 @@ describe('V-14 · el cuenco', () => {
   it('sube sin escalón: el pie de la sierra no deja una arruga en el borde', () => {
     // Con una recta en vez de la curva, el pie hacía un doblez justo donde
     // acaba el mapa y se leía como el corte que la sierra venía a quitar.
+    //
+    // **Se mide el pie y no la sierra entera**, que es donde está la propiedad:
+    // arriba una ladera escarpada es lo propio de una montaña —y desde v3.64 lo
+    // es a propósito, porque una falda larga y baja no se lee como desnivel—,
+    // pero el arranque tiene que salir del prado sin que se vea dónde.
     const state = village(7);
     let worst = 0;
     for (let z = 0; z < state.map.height; z += 4) {
-      for (let out = 0; out < 20; out += 1) {
+      for (let out = 0; out < 5; out += 1) {
         const a = ridgeAt(state.map, state.terrainSeed, -out, z);
         const b = ridgeAt(state.map, state.terrainSeed, -(out + 1), z);
         worst = Math.max(worst, Math.abs(b - a));
       }
     }
-    // Menos de dos celdas de subida por celda andada: una ladera, no un muro.
-    expect(worst, `el mayor escalón es ${worst.toFixed(2)} celdas`).toBeLessThan(2);
+    // Menos de media celda de subida por celda andada en las cinco primeras: el
+    // pie se confunde con el prado.
+    expect(worst, `el mayor escalón del pie es ${worst.toFixed(2)} celdas`).toBeLessThan(0.5);
   });
 
   it('la misma partida da siempre la misma sierra', () => {

@@ -54,7 +54,17 @@ export interface View {
 export interface ValleyCamera {
   readonly camera: OrthographicCamera;
   /** Fit this box on the screen and remember it as the resting view. */
-  frame(box: Bounds, viewport: Viewport): void;
+  /**
+   * Encuadra `box` y deja llegar hasta `reach`.
+   *
+   * **Dos cajas y no una.** La de reposo es la aldea, porque es lo que hay que
+   * mirar al abrir; la de alcance es el valle con su sierra, porque es hasta
+   * donde se puede apartar la vista. Con una sola, alejarse todo lo posible
+   * seguía enseñando la aldea y nada más: las montañas de V-14 estaban a
+   * cuarenta celdas de una caja que medía veintitrés, o sea que la cámara tenía
+   * prohibido llegar a verlas. `reach` se omite cuando son la misma.
+   */
+  frame(box: Bounds, viewport: Viewport, reach?: Bounds): void;
   resize(viewport: Viewport): void;
   /**
    * Multiply how much is visible by `factor`, keeping the point under
@@ -164,13 +174,15 @@ export function createValleyCamera(): ValleyCamera {
   return {
     camera,
 
-    frame(box: Bounds, next: Viewport): void {
+    frame(box: Bounds, next: Viewport, reach?: Bounds): void {
       viewport = next;
-      bounds = box;
-      furthest = Math.max(CLOSEST_HEIGHT, fitting(box));
+      bounds = reach ?? box;
+      // El reposo encuadra la aldea; el tope de alejarse alcanza la sierra.
+      const rest = Math.max(CLOSEST_HEIGHT, fitting(box));
+      furthest = Math.max(rest, fitting(bounds));
       resting = {
         centre: { x: (box.minX + box.maxX) / 2, z: (box.minZ + box.maxZ) / 2 },
-        height: furthest,
+        height: rest,
       };
       settle(resting);
     },

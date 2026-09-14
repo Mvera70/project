@@ -27,18 +27,26 @@ import {
 import { hash32 } from '@engine/rng';
 import type { ValleyMap } from '@engine/state';
 
-/** Lo ancho que es la falda, en celdas, desde el borde del mapa hacia fuera. */
-const SKIRT = 26;
+/**
+ * Lo ancho que es la falda, en celdas, desde el borde del mapa hacia fuera.
+ *
+ * TUNE: dieciséis, y empezó en veintiséis. Con la falda larga la sierra sube
+ * tan despacio que desde la aldea no se ve montaña ninguna: se ve el prado
+ * inclinándose, que es justo lo que el dueño del diseño dijo —«el cuenco no
+ * parece un cuenco, no aprecio el desnivel»—. Una ladera corta y alta se lee
+ * como ladera; una larga y baja se lee como nada.
+ */
+const SKIRT = 16;
 
 /**
  * Lo alto que llega la cumbre, en celdas.
  *
- * TUNE: doce. Una celda es tres metros (D.6.2), así que son treinta y seis: una
- * loma alta, no un pico alpino. Más arriba, en una vista casi cenital, la
- * ladera del sur empieza a comerse el pueblo; más abajo no cierra nada y el
- * valle sigue pareciendo una alfombra sobre una mesa.
+ * TUNE: quince. Una celda es tres metros (D.6.2), así que son cuarenta y cinco:
+ * una loma alta, no un pico alpino. Más arriba, la ladera del sur —que queda
+ * entre la cámara y el pueblo— empieza a comérselo; más abajo no cierra nada y
+ * el valle sigue pareciendo una alfombra sobre una mesa.
  */
-const PEAK = 12;
+const PEAK = 15;
 
 /** Cada cuántas celdas se toma un vértice de la sierra. */
 const STRIDE = 2;
@@ -86,8 +94,13 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   const out = Math.hypot(outX, outZ);
   if (out <= 0) return 0;
 
+  // **Arranca plana y se empina.** El coseno sube ya en la primera celda —1,35
+  // de golpe con la falda corta— y eso es el doblez en el borde del mapa que la
+  // sierra venía a quitar. Con el cubo suavizado, el pie sale del prado sin que
+  // se vea dónde y la pendiente se guarda para arriba, que es donde una ladera
+  // escarpada se lee como montaña en vez de como error.
   const climb = Math.min(1, out / SKIRT);
-  const eased = (1 - Math.cos(climb * Math.PI)) / 2;
+  const eased = climb * climb * climb;
 
   // Y la cresta no es lisa: dos escalas de ruido, una para los macizos y otra
   // para que la silueta no sea un arco de circunferencia.
