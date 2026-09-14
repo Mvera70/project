@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T01:38:07.060Z",
+  "generatedAt": "2026-09-14T18:45:25.696Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -224,6 +224,24 @@
       "id": "ford-stone",
       "file": "ford-stone.glb",
       "sha256": "DAE1D742C7D0AC9170098D2EE71D850446D5D43C2236289852B0084A5587880B",
+      "motion": []
+    },
+    {
+      "id": "ball",
+      "file": "ball.glb",
+      "sha256": "CAC2F8D9FCBA4F24A2362C8DA0AE7D10C2EFF8A6975566AD0E3C8DF5B4125F31",
+      "motion": []
+    },
+    {
+      "id": "stick",
+      "file": "stick.glb",
+      "sha256": "08D8DBB24D8AEB4894772DCF10B5072F6E108D66A58A8F74A9E2BAF97EBDCF21",
+      "motion": []
+    },
+    {
+      "id": "bucket",
+      "file": "bucket.glb",
+      "sha256": "6CA65D90E57D45518FA178C4C9ED3C05660D4E6C6BC92BAF10057550E7260B6B",
       "motion": []
     }
   ]

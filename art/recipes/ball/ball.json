@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "ball",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "ball",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "V-09, trasto. Pelota de cuero, 0,22 m de diámetro (docs/respuesta-sesion-blender.md, tabla de tamaños objetivo). El origen queda en el suelo bajo la esfera, como los pies del aldeano, para que `y = 0` la apoye sin hundirla."
+  },
+  "materials": [
+    {
+      "name": "leather",
+      "role": "clothAccent",
+      "roughness": 0.75
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Ball_Body",
+      "location": [
+        0,
+        0,
+        0.11
+      ],
+      "radius": 0.11,
+      "segments": 12,
+      "rings": 8,
+      "smooth": true,
+      "material": "leather",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      0.55,
+      -0.68,
+      0.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.11
+    ],
+    "orthoScale": 0.5,
+    "worldRole": "sky"
+  }
+}

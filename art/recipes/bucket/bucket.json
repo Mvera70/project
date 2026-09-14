@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "id": "bucket",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "bucket",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "V-09, trasto. Cubo de duelas, 0,30 m de alto y 0,26 m de boca (docs/respuesta-sesion-blender.md). Dos aros más claros cerca del borde y de la base, como los que ciñen las duelas. El origen queda bajo el cubo para que `y = 0` lo apoye en el suelo."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "trunk",
+      "roughness": 0.9
+    },
+    {
+      "name": "hoop",
+      "role": "stone",
+      "roughness": 0.55
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Bucket_Body",
+      "location": [
+        0,
+        0,
+        0.15
+      ],
+      "radius": 0.13,
+      "depth": 0.3,
+      "vertices": 10,
+      "smooth": true,
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Bucket_Hoop_Low",
+      "location": [
+        0,
+        0,
+        0.035
+      ],
+      "radius": 0.133,
+      "depth": 0.03,
+      "vertices": 10,
+      "smooth": true,
+      "material": "hoop",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Bucket_Hoop_High",
+      "location": [
+        0,
+        0,
+        0.265
+      ],
+      "radius": 0.133,
+      "depth": 0.03,
+      "vertices": 10,
+      "smooth": true,
+      "material": "hoop",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      0.6,
+      -0.75,
+      0.35
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.15
+    ],
+    "orthoScale": 0.5,
+    "worldRole": "sky"
+  }
+}

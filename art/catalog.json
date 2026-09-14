@@ -2033,6 +2033,178 @@
         "source": "Original ford-stone authored for The Valley G-10",
         "license": "Project original"
       }
+    },
+    {
+      "id": "ball",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/ball/ball.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T18-43-49-779Z-54900",
+        "directory": "artifacts/graphics/G-10/approved/cac2f8d9fcba4f24"
+      },
+      "bounds": {
+        "min": [
+          -0.036667,
+          0,
+          -0.036667
+        ],
+        "max": [
+          0.036667,
+          0.073333,
+          0.036667
+        ],
+        "size": [
+          0.073333,
+          0.073333,
+          0.073333
+        ]
+      },
+      "recipeSha256": "FAC036F65E504029A465A6BE60977B8A72B581F8275B5ADEEF3CC51AC9584E17",
+      "materials": [
+        "leather"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 168
+      },
+      "hashes": {
+        "ball.blend": "78FF7E87F8E02F69401B9774F3D45356D765C46A187A6ECB1C2F9C76B9084667",
+        "ball.glb": "CAC2F8D9FCBA4F24A2362C8DA0AE7D10C2EFF8A6975566AD0E3C8DF5B4125F31",
+        "ball-blender.png": "B79BED94601BE21805FC5FCFE3D23FAE4447F86EE8661239EDA86462B110D00A",
+        "capture-1.png": "82E468AD05F4F7C146F863C438C7B6395015EFE38D5C3B60AD58EA331F32862F",
+        "capture-1-gray.png": "25264B98D5D723EEA1AF1AB5DE25B5E58AA82438AFBC822A05A5B969B9CA5CD7",
+        "capture.json": "A140EB4D64BE0F871152494CA2EF3F455AFF479E2CE32301D84486C7CA5AEEB4",
+        "build.json": "322A4770DABA14A3C141306AD1AD8F61A83F1146CEC66DCBC30EF1CC87FCFCFF",
+        "validation.json": "4CFAD20E6BA9D9DEFBB71A0085BB046E8F22E7ADB78BE0B8D44B36E760A283D0"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original ball authored for The Valley G-10 (V-09 props)",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "stick",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/stick/stick.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T18-44-14-486Z-40948",
+        "directory": "artifacts/graphics/G-10/approved/08d8dbb24d8aeb48"
+      },
+      "bounds": {
+        "min": [
+          -0.0075,
+          0,
+          -0.15
+        ],
+        "max": [
+          0.0075,
+          0.015,
+          0.15
+        ],
+        "size": [
+          0.015,
+          0.015,
+          0.3
+        ]
+      },
+      "recipeSha256": "CCE738B95F5370CE325467CAAC8DBB0B2FE4489897C88B89202FE62152C21DAC",
+      "materials": [
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 2,
+        "meshes": 1,
+        "materials": 1,
+        "triangles": 28
+      },
+      "hashes": {
+        "stick.blend": "3370D2A444E014831425C3BBD0776231FDE6F98E8AA90C485A48C83FDB48AE14",
+        "stick.glb": "08D8DBB24D8AEB4894772DCF10B5072F6E108D66A58A8F74A9E2BAF97EBDCF21",
+        "stick-blender.png": "892E42F6844A020F7277A6D2F9A756E2E99E5BFD97BDFE13776B2DD1A0BB989E",
+        "capture-1.png": "DA2E6122BB985F809F8034C973BE559EE77DA3B7213D5D8E6FB3364A101CA1E0",
+        "capture-1-gray.png": "E3BBD9BC6AEFA126439BE05917501FAAE8AAD41DD2EFE7957502EE246DF49085",
+        "capture.json": "B0156650BC983BE5BF0ACB2933564885CB9C0668F11F357CB672C40760A8CCA7",
+        "build.json": "CBB6BC8DF2F0F79DA65444AEC0CFDC5DA64452612E282A67D58C54CF67F7427B",
+        "validation.json": "16E215D6B951D13DD10A2835391A93CCD51E0455D1D5D0C2ED9AE13D6CF169E7"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original stick authored for The Valley G-10 (V-09 props)",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bucket",
+      "artifactRound": "G-10",
+      "status": "study",
+      "recipe": "art/recipes/bucket/bucket.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-14T18-44-24-696Z-49268",
+        "directory": "artifacts/graphics/G-10/approved/6ca65d90e57d4551"
+      },
+      "bounds": {
+        "min": [
+          -0.042164,
+          0,
+          -0.044333
+        ],
+        "max": [
+          0.042164,
+          0.1,
+          0.044333
+        ],
+        "size": [
+          0.084327,
+          0.1,
+          0.088667
+        ]
+      },
+      "recipeSha256": "49D420BBEA9A4AE02E97C595159782BD57F1A78A1C2417B9B2722965CD55BF67",
+      "materials": [
+        "wood",
+        "hoop"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 108
+      },
+      "hashes": {
+        "bucket.blend": "84C255797CAD5688F1B4C27A998351C7331B90B2424FB8784257DCB038905211",
+        "bucket.glb": "6CA65D90E57D45518FA178C4C9ED3C05660D4E6C6BC92BAF10057550E7260B6B",
+        "bucket-blender.png": "CC29232004C27221B542182C8132D3D9274FE1719AF8F88059B1853772ED2FE3",
+        "capture-1.png": "2B6FA1D5D77591453B43E674F4195D2A351646E3A6BDCD1845B106D5AEB67398",
+        "capture-1-gray.png": "0B4A10B42DD443D365CFA2693D297ADD1807047919C09B22A7DBC60CC2C3CB24",
+        "capture.json": "E64A8A9D169F4627DB3739D422EC8070871BA4E5ED7B30538ECE8D71FCDBFC2B",
+        "build.json": "1E8A6B8861ECE234AFDE1B32B8DFD2B62E5EC1AA56A55D8751C3685D40DAC020",
+        "validation.json": "8A94718EBCE4A3B42493B645BDC677F432609A62325DC4C0E5C63F11CC17DF57"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original bucket authored for The Valley G-10 (V-09 props)",
+        "license": "Project original"
+      }
     }
   ]
 }

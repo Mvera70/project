@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "id": "stick",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "stick",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "V-09, trasto. Palo caído: 0,90 m de largo, 0,045 m de grueso (docs/respuesta-sesion-blender.md). Tumbado en el suelo con su eje sobre Y, elevado sólo lo que mide su propio grosor para que `y = 0` lo apoye sin hundirlo."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "trunk",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Stick_Body",
+      "location": [
+        0,
+        0,
+        0.0225
+      ],
+      "radius": 0.0225,
+      "depth": 0.9,
+      "vertices": 8,
+      "smooth": true,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      0.95,
+      -1.1,
+      0.35
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.045
+    ],
+    "orthoScale": 1.05,
+    "worldRole": "sky"
+  }
+}

@@ -68,7 +68,7 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
  * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
  */
 export const WANTED = [
-  VILLAGER, TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'field-cut', 'ruin-wood', 'ruin-stone',
+  VILLAGER, TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
