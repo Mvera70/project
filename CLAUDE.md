@@ -96,6 +96,11 @@ umbral no se fija con una jornada, igual que no se fija con una semilla.** Cada
 jornada tiene su propia semilla (`seedOfDay`), así que el día 0 de seis semillas
 son seis muestras, no seis aldeas.
 
+**Hay dos sesiones trabajando a la vez** (diseño de aldeanos en Blender, y
+vida del valle + interfaz). **Lee `docs/dos-sesiones.md` antes de tocar
+`src/render3d/renderer.ts`, `src/render3d/world/cast.ts`, `art/**` o
+`public/assets/`**: dice quién es dueño de qué y dónde se puede chocar.
+
 **El plan de lo que viene, con briefs listos para agentes, está en
 `docs/next-plan.md`.** Qué le falta al proyecto **en total** para ser un juego,
 y qué no puede hacer ningún agente porque depende de una decisión o de una
