@@ -7,10 +7,13 @@
 
 import {
   AmbientLight, BoxGeometry, CapsuleGeometry, Color, CylinderGeometry,
-  DirectionalLight, Group, Mesh, MeshStandardMaterial, OrthographicCamera,
-  PCFSoftShadowMap, PlaneGeometry, Scene, SphereGeometry, WebGLRenderer,
+  DirectionalLight, Group, InstancedMesh as InstancedMeshCtor, Matrix4, Mesh,
+  MeshStandardMaterial, type Object3D, OrthographicCamera, PCFSoftShadowMap,
+  PlaneGeometry, Scene, SphereGeometry, WebGLRenderer,
 } from 'three';
-import { advance, createWorld, STEP, type Body, type Prop } from './life';
+import { advance, createWorld, STEP, type Body, type Prop, type World } from './life';
+import { createValley } from './valley';
+import type { GameState } from '@engine/state';
 
 const SKIN = ['#C8553D', '#4A7C59', '#3E6B8A', '#B58A3C', '#7A4E8C', '#2F6F6B', '#A34F6D', '#5C6B3A'];
 
@@ -40,11 +43,23 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
   camera.position.set(world.width / 2 + 26, 30, world.height / 2 + 26);
   camera.lookAt(world.width / 2, 0, world.height / 2);
 
+  function frameWorld(): void {
+    camera.position.set(world.width / 2 + 26, 30, world.height / 2 + 26);
+    camera.lookAt(world.width / 2, 0, world.height / 2);
+    sun.position.set(world.width / 2 + 20, 40, world.height / 2 - 16);
+    sun.target.position.set(world.width / 2, 0, world.height / 2);
+    const reach = Math.max(world.width, world.height) * 0.75 + 6;
+    const shadow = sun.shadow.camera;
+    shadow.left = -reach; shadow.right = reach;
+    shadow.top = reach; shadow.bottom = -reach; shadow.far = 120;
+    shadow.updateProjectionMatrix();
+  }
+
   function resize(): void {
     const w = canvas.clientWidth || 800;
     const h = canvas.clientHeight || 600;
     renderer.setSize(w, h, false);
-    const span = 21;
+    const span = Math.max(world.width, world.height) * 0.62;
     const aspect = w / h;
     camera.left = -span * aspect;
     camera.right = span * aspect;
@@ -64,44 +79,98 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
   shade.updateProjectionMatrix();
   scene.add(sun, sun.target, new AmbientLight('#CFE0E4', 1.5));
 
-  // --- suelo y casas ---------------------------------------------------------
-  const ground = new Mesh(
-    new PlaneGeometry(world.width, world.height),
-    new MeshStandardMaterial({ color: '#7E9B5B' }),
-  );
-  ground.rotation.x = -Math.PI / 2;
-  ground.position.set(world.width / 2, 0, world.height / 2);
-  ground.receiveShadow = true;
-  scene.add(ground);
+  // --- el suelo, dibujado desde la máscara -----------------------------------
+  //
+  // Lo mismo vale para el prado de cinco casas y para el valle entero: se
+  // recorre lo que no se pisa y se levanta. Sin esto habría dos vistas, y dos
+  // vistas es donde una se queda atrás sin que nadie lo note.
+  let terrain: Object3D[] = [];
 
-  for (const o of world.obstacles) {
-    const wall = new Mesh(
-      new BoxGeometry(o.w, 2.1, o.h),
-      new MeshStandardMaterial({ color: '#A08A6F' }),
+  function paintGround(w: World, colourOf?: (cell: number) => string | null): void {
+    for (const thing of terrain) {
+      scene.remove(thing);
+      if (thing instanceof Mesh) {
+        thing.geometry.dispose();
+        (thing.material as MeshStandardMaterial).dispose();
+      }
+    }
+    terrain = [];
+
+    const ground = new Mesh(
+      new PlaneGeometry(w.width, w.height),
+      new MeshStandardMaterial({ color: '#7E9B5B' }),
     );
-    wall.position.set(o.x + o.w / 2, 1.05, o.z + o.h / 2);
-    wall.castShadow = true;
-    wall.receiveShadow = true;
-    const roof = new Mesh(
-      new BoxGeometry(o.w + 0.5, 0.35, o.h + 0.5),
-      new MeshStandardMaterial({ color: '#8B5E3C' }),
-    );
-    roof.position.set(o.x + o.w / 2, 2.28, o.z + o.h / 2);
-    roof.castShadow = true;
-    scene.add(wall, roof);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.set(w.width / 2, -0.01, w.height / 2);
+    ground.receiveShadow = true;
+    scene.add(ground);
+    terrain.push(ground);
+
+    // Las celdas que tienen color propio —agua, bosque, roqueda— van en una
+    // sola malla instanciada: dos mil celdas no pueden ser dos mil objetos.
+    if (colourOf !== undefined) {
+      const tint = new Map<string, number[]>();
+      for (let cell = 0; cell < w.width * w.height; cell += 1) {
+        const colour = colourOf(cell);
+        if (colour === null) continue;
+        const list = tint.get(colour) ?? [];
+        list.push(cell);
+        tint.set(colour, list);
+      }
+      for (const [colour, cells] of tint) {
+        const patch = new InstancedMeshCtor(
+          new BoxGeometry(1, 0.06, 1),
+          new MeshStandardMaterial({ color: colour }),
+          cells.length,
+        );
+        const at = new Matrix4();
+        cells.forEach((cell, i) => {
+          at.makeTranslation((cell % w.width) + 0.5, 0.02, Math.floor(cell / w.width) + 0.5);
+          patch.setMatrixAt(i, at);
+        });
+        patch.receiveShadow = true;
+        scene.add(patch);
+        terrain.push(patch);
+      }
+    }
+
+    // Y lo que corta el paso, levantado. Una sola malla para todo.
+    const walls: number[] = [];
+    for (let cell = 0; cell < w.width * w.height; cell += 1) {
+      if (w.blocked[cell] === 1 && (colourOf === undefined || colourOf(cell) === null)) {
+        walls.push(cell);
+      }
+    }
+    if (walls.length > 0) {
+      const built = new InstancedMeshCtor(
+        new BoxGeometry(1, 2.1, 1),
+        new MeshStandardMaterial({ color: '#A08A6F' }),
+        walls.length,
+      );
+      const at = new Matrix4();
+      walls.forEach((cell, i) => {
+        at.makeTranslation((cell % w.width) + 0.5, 1.05, Math.floor(cell / w.width) + 0.5);
+        built.setMatrixAt(i, at);
+      });
+      built.castShadow = true;
+      built.receiveShadow = true;
+      scene.add(built);
+      terrain.push(built);
+    }
+
+    for (const h of w.haunts) {
+      const slab = new Mesh(
+        new CylinderGeometry(0.4, 0.4, 0.06, 12),
+        new MeshStandardMaterial({ color: '#9AA98B' }),
+      );
+      slab.position.set(h.x, 0.05, h.z);
+      slab.receiveShadow = true;
+      scene.add(slab);
+      terrain.push(slab);
+    }
   }
 
-  // Los sitios de siempre, marcados con una losa para entender adónde va todo
-  // el mundo. En el juego serían el pozo, la era y el vado.
-  for (const h of world.haunts) {
-    const slab = new Mesh(
-      new CylinderGeometry(0.85, 0.85, 0.08, 20),
-      new MeshStandardMaterial({ color: '#9AA98B' }),
-    );
-    slab.position.set(h.x, 0.04, h.z);
-    slab.receiveShadow = true;
-    scene.add(slab);
-  }
+  paintGround(world);
 
   // --- los trastos -----------------------------------------------------------
   //
@@ -202,6 +271,10 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
   // --- bucle -----------------------------------------------------------------
   let running = true;
   let crumbAt = 0;
+  let cost = 0;
+  let fps = 0;
+  let frames = 0;
+  let fpsAt = performance.now();
 
   function frame(): void {
     if (!running) return;
@@ -210,7 +283,12 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
     const real = Math.min((now - last) / 1000, 0.25);
     last = now;
 
+    const before = performance.now();
     carry = advance(world, real * rate, carry);
+    const spent = performance.now() - before;
+    cost = cost * 0.92 + spent * 0.08;
+    frames += 1;
+    if (now - fpsAt > 500) { fps = frames * 1000 / (now - fpsAt); frames = 0; fpsAt = now; }
 
     for (const body of world.bodies) {
       let figure = figures.get(body.id);
@@ -254,16 +332,18 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
 
     const talking = world.bodies.filter((b) => b.bout === 'chat').length;
     const scrapping = world.bodies.filter((b) => b.bout === 'shove').length;
-    hud.textContent = `día ${(world.steps * STEP).toFixed(0)} s · `
+    hud.innerHTML = `día ${(world.steps * STEP).toFixed(0)} s · `
       + `${world.bodies.length} vecinos · `
       + `${talking} hablando · ${scrapping} a malas · `
       + `${world.chats} charlas · ${world.shoves} empujones · `
-      + `${world.passes} pases · ${world.blows} palos`;
+      + `${world.passes} pases · ${world.blows} palos<br>`
+      + `<b>${fps.toFixed(0)} fps · ${(cost * 1000).toFixed(0)} µs de simulación por fotograma</b>`;
 
     resize();
     renderer.render(scene, camera);
   }
 
+  frameWorld();
   resize();
   frame();
 
@@ -294,6 +374,41 @@ export function mount(canvas: HTMLCanvasElement, hud: HTMLElement): () => void {
   // que darle diez veces a «otra aldea» para verla una.
   const ROUGH = [1, 45, 62, 395, 11, 41];
   control('rough', () => reseed(ROUGH[Math.floor(Math.random() * ROUGH.length)] as number));
+
+  // El valle de verdad, con su río, su bosque y sus noventa y nueve edificios.
+  // La partida se simula aquí mismo: cuarenta años de motor tardan un momento y
+  // es lo que hace que esto sea el mapa real y no una maqueta parecida.
+  let valley: GameState | null = null;
+  async function toValley(count: number): Promise<void> {
+    hud.innerHTML = '<b>fundando el valle y corriendo cuarenta años…</b>';
+    await new Promise((wake) => setTimeout(wake, 30));
+    if (valley === null) {
+      const { foundGame } = await import('@engine/found');
+      const { run } = await import('@engine/sim');
+      const { CATALOG } = await import('@engine/crossroads/catalog');
+      const game = foundGame(7);
+      run(game, 40 * 48, 'prudent', CATALOG);
+      valley = game;
+    }
+    for (const figure of figures.values()) scene.remove(figure.group);
+    figures.clear();
+    for (const mesh of things.values()) scene.remove(mesh);
+    things.clear();
+    clearTrails();
+    world = createValley(valley, 7, count);
+    carry = 0;
+    const map = valley.map;
+    paintGround(world, (cell) => {
+      const kind = map.terrain[cell];
+      if (kind === 2) return '#5C7E92';
+      if (kind === 1) return '#3F5B35';
+      if (kind === 4) return '#6E7A55';
+      return null;
+    });
+    frameWorld();
+  }
+  control('valley', () => { void toValley(80); });
+  control('crowd', () => { void toValley(200); });
   control('trails', () => {
     trails = !trails;
     document.getElementById('trails')?.setAttribute('aria-pressed', String(trails));

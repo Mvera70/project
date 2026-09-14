@@ -96,6 +96,15 @@ export interface World {
   readonly width: number;
   readonly height: number;
   readonly obstacles: readonly Obstacle[];
+  /**
+   * Qué celdas no se pisan, una por casilla del mapa. 1 es no.
+   *
+   * **Una máscara y no una lista de rectángulos**, porque el valle de verdad no
+   * son cinco casas en un prado: es un río con su cauce, un bosque, roqueda y
+   * noventa y nueve edificios. Mirar las ocho casillas de alrededor es barato y
+   * da igual cuántas cosas haya; recorrer una lista de obstáculos no.
+   */
+  readonly blocked: Uint8Array;
   readonly haunts: readonly Point[];
   bodies: Body[];
   props: Prop[];
@@ -207,7 +216,7 @@ export function createWorld(seed: number, count = 8): World {
 
   return {
     seed, width: WIDTH, height: HEIGHT,
-    obstacles: HOUSES, haunts: HAUNTS,
+    obstacles: HOUSES, blocked: maskOf(WIDTH, HEIGHT, HOUSES), haunts: HAUNTS,
     bodies, props, steps: 0, chats: 0, shoves: 0, passes: 0, blows: 0, bumps: 0,
   };
 }
@@ -294,13 +303,31 @@ function distance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.z - b.z);
 }
 
-/** Si este punto cae dentro de una casa. */
+/** Si este punto cae donde no se puede estar. */
 export function inside(world: World, x: number, z: number, margin = 0): boolean {
-  for (const o of world.obstacles) {
-    if (x > o.x - margin && x < o.x + o.w + margin
-      && z > o.z - margin && z < o.z + o.h + margin) return true;
+  if (margin > 0) {
+    for (const o of world.obstacles) {
+      if (x > o.x - margin && x < o.x + o.w + margin
+        && z > o.z - margin && z < o.z + o.h + margin) return true;
+    }
   }
-  return false;
+  const cx = Math.floor(x);
+  const cz = Math.floor(z);
+  if (cx < 0 || cz < 0 || cx >= world.width || cz >= world.height) return true;
+  return world.blocked[cz * world.width + cx] === 1;
+}
+
+/** La máscara de un valle de rectángulos, que es lo que usa el banco simple. */
+export function maskOf(width: number, height: number, walls: readonly Obstacle[]): Uint8Array {
+  const blocked = new Uint8Array(width * height);
+  for (const o of walls) {
+    for (let z = Math.floor(o.z); z < o.z + o.h; z += 1) {
+      for (let x = Math.floor(o.x); x < o.x + o.w; x += 1) {
+        if (x >= 0 && z >= 0 && x < width && z < height) blocked[z * width + x] = 1;
+      }
+    }
+  }
+  return blocked;
 }
 
 /** El trasto libre más cercano de esta clase, si hay alguno a mano. */
@@ -409,8 +436,14 @@ export function step(world: World): void {
     if (now < body.reelUntil) {
       body.vx *= 0.94;
       body.vz *= 0.94;
-      body.x += body.vx * STEP;
-      body.z += body.vz * STEP;
+      // **Y se choca con lo que haya detrás.** Quien va sin gobierno de sus
+      // piernas no atraviesa una pared: se da contra ella y se queda ahí. Sin
+      // esto, un empujón contra una casa metía al empujado dentro, que es el
+      // único sitio del banco donde alguien podía acabar donde no cabe.
+      const nextX = body.x + body.vx * STEP;
+      const nextZ = body.z + body.vz * STEP;
+      if (!inside(world, nextX, body.z)) body.x = nextX; else body.vx = 0;
+      if (!inside(world, body.x, nextZ)) body.z = nextZ; else body.vz = 0;
       body.x = Math.max(0.5, Math.min(world.width - 0.5, body.x));
       body.z = Math.max(0.5, Math.min(world.height - 0.5, body.z));
       if (partner !== null) {
@@ -574,18 +607,32 @@ export function step(world: World): void {
       if (apart < body.radius + other.radius) world.bumps += 1;
     }
 
-    // 5 · Y de las paredes, por lo mismo. `detour` y `aroundWalls` eran esto
-    //     escrito a mano sobre una ruta que no podía cambiar.
-    for (const o of world.obstacles) {
-      const nx = Math.max(o.x, Math.min(body.x, o.x + o.w));
-      const nz = Math.max(o.z, Math.min(body.z, o.z + o.h));
-      const apart = Math.hypot(body.x - nx, body.z - nz);
-      const clear = body.radius + 0.6;
-      if (apart >= clear) continue;
-      if (apart < 1e-6) { dx += 1; continue; }
-      const push = (clear - apart) / clear;
-      dx += (body.x - nx) / apart * push * body.pace * 3.2;
-      dz += (body.z - nz) / apart * push * body.pace * 3.2;
+    // 5 · Y de lo que no se pisa, por lo mismo. `detour` y `aroundWalls` eran
+    //     esto escrito a mano sobre una ruta que no podía cambiar.
+    //
+    //     Se miran las ocho casillas de alrededor y nada más: cueste lo que
+    //     cueste el valle —cinco casas o noventa y nueve, con río y roqueda—,
+    //     esto vale lo mismo. Es la diferencia entre que la escala importe y
+    //     que no importe.
+    const hereX = Math.floor(body.x);
+    const hereZ = Math.floor(body.z);
+    for (let oz = -1; oz <= 1; oz += 1) {
+      for (let ox = -1; ox <= 1; ox += 1) {
+        const cx = hereX + ox;
+        const cz = hereZ + oz;
+        const off = cx < 0 || cz < 0 || cx >= world.width || cz >= world.height;
+        if (!off && world.blocked[cz * world.width + cx] !== 1) continue;
+        // El punto de esa casilla más cercano al cuerpo.
+        const nx = Math.max(cx, Math.min(body.x, cx + 1));
+        const nz = Math.max(cz, Math.min(body.z, cz + 1));
+        const apart = Math.hypot(body.x - nx, body.z - nz);
+        const clear = body.radius + 0.62;
+        if (apart >= clear) continue;
+        if (apart < 1e-6) { dx += 1; continue; }
+        const push = (clear - apart) / clear;
+        dx += (body.x - nx) / apart * push * body.pace * 3.2;
+        dz += (body.z - nz) / apart * push * body.pace * 3.2;
+      }
     }
 
     // 6 · Suavizado: la velocidad persigue a lo que se quiere, no salta a ello.
@@ -676,6 +723,17 @@ export function step(world: World): void {
   //
   //     Medido sin esto: dos centros a 0,31 celdas con radios de 0,32, o sea un
   //     solape de medio cuerpo que en pantalla se lee como un error de dibujo.
+  //
+  //     **Con tope.** Sin él, en una plaza llena un cuerpo recibe empujón de
+  //     cinco vecinos en la misma pasada y se va de golpe: medido en el valle
+  //     real, 0,26 celdas por paso con ochenta personas y 1,06 con doscientas,
+  //     contra las 0,06 de quien anda. Eso es un teletransporte, el mismo
+  //     defecto de siempre entrando por la puerta de atrás. Lo que se corrige
+  //     por paso se limita a lo que un cuerpo puede moverse andando, y lo que
+  //     no cabe hoy se corrige mañana: el solape dura un fotograma más y no lo
+  //     ve nadie.
+  const fixX = new Float64Array(world.bodies.length);
+  const fixZ = new Float64Array(world.bodies.length);
   for (let pass = 0; pass < 2; pass += 1) {
     for (let i = 0; i < world.bodies.length; i += 1) {
       for (let j = i + 1; j < world.bodies.length; j += 1) {
@@ -687,10 +745,31 @@ export function step(world: World): void {
         const half = (room - apart) / 2;
         const ux = (b.x - a.x) / apart;
         const uz = (b.z - a.z) / apart;
-        a.x -= ux * half; a.z -= uz * half;
-        b.x += ux * half; b.z += uz * half;
+        const ax = a.x - ux * half;
+        const az = a.z - uz * half;
+        const bx = b.x + ux * half;
+        const bz = b.z + uz * half;
+        const aFits = !inside(world, ax, az);
+        const bFits = !inside(world, bx, bz);
+        if (aFits) { fixX[i] = (fixX[i] ?? 0) - ux * half; fixZ[i] = (fixZ[i] ?? 0) - uz * half; a.x = ax; a.z = az; }
+        if (bFits) { fixX[j] = (fixX[j] ?? 0) + ux * half; fixZ[j] = (fixZ[j] ?? 0) + uz * half; b.x = bx; b.z = bz; }
       }
     }
+  }
+  // Y se recorta lo que se haya pasado, devolviendo al cuerpo hacia donde
+  // estaba. El tope es el paso de alguien corriendo: por encima de eso ya no
+  // es separarse, es aparecer en otro sitio.
+  const CAP = 0.06;
+  for (let i = 0; i < world.bodies.length; i += 1) {
+    const moved = Math.hypot(fixX[i] ?? 0, fixZ[i] ?? 0);
+    if (moved <= CAP) continue;
+    const body = world.bodies[i] as Body;
+    const back = (moved - CAP) / moved;
+    // Devolverle no puede ser meterle: si donde estaba ya no se pisa —porque
+    // otro le empujó contra una pared— se le deja donde está, que es fuera.
+    const backX = body.x - (fixX[i] ?? 0) * back;
+    const backZ = body.z - (fixZ[i] ?? 0) * back;
+    if (!inside(world, backX, backZ)) { body.x = backX; body.z = backZ; }
   }
 
   // 9 · ¿Quién se ha encontrado con quién? **Esto es lo que hoy no puede

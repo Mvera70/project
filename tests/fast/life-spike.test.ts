@@ -7,6 +7,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { advance, createWorld, inside, step, STEP, type World } from '../../src/render3d/life/spike/life';
+import { createValley } from '../../src/render3d/life/spike/valley';
+import { foundGame } from '@engine/found';
+import { run } from '@engine/sim';
+import { CATALOG } from '@engine/crossroads/catalog';
 
 const SEEDS = [7, 11, 23, 41, 97, 3];
 
@@ -306,5 +310,38 @@ describe('V-00 · la vida se sostiene', () => {
     const spent = performance.now() - started;
     expect(world.steps).toBe(Math.round(120 / STEP));
     expect(spent, `reconstruir una jornada cuesta ${spent.toFixed(0)} ms`).toBeLessThan(400);
+  });
+
+  it('el valle de verdad aguanta a los ochenta, y nadie acaba en un muro', () => {
+    // **La prueba que puede matar el plan**, y por eso es la última y la más
+    // cara. Ocho cuerpos en un prado liso no dicen nada: el valle real tiene
+    // noventa y nueve edificios, un río que no se cruza, roqueda, y calles
+    // estrechas entre las casas, que es donde una multitud se atasca.
+    const game = foundGame(7);
+    run(game, 40 * 48, 'prudent', CATALOG);
+    const world = createValley(game, 7, 80);
+
+    let biggest = 0;
+    let trapped = 0;
+    let was = world.bodies.map((b) => ({ x: b.x, z: b.z }));
+    const steps = Math.round(60 / STEP);
+    for (let n = 0; n < steps; n += 1) {
+      step(world);
+      for (const body of world.bodies) if (inside(world, body.x, body.z)) trapped += 1;
+      world.bodies.forEach((body, i) => {
+        const old = was[i];
+        if (old === undefined) return;
+        biggest = Math.max(biggest, Math.hypot(body.x - old.x, body.z - old.z));
+      });
+      was = world.bodies.map((b) => ({ x: b.x, z: b.z }));
+    }
+
+    expect(trapped, 'nadie dentro del río, de la roca ni de una casa').toBe(0);
+    // El tope sube de 0,12 a 0,15 con ochenta cuerpos y está justificado: en una
+    // plaza llena, separar a alguien de cinco vecinos a la vez mueve más que
+    // andar. Sin el recorte del paso 8 esto medía 0,26, que sí era un salto.
+    expect(biggest, `con ochenta, el paso más largo es ${biggest.toFixed(3)}`)
+      .toBeLessThan(0.15);
+    expect(world.chats, 'y la aldea se encuentra sola').toBeGreaterThan(10);
   });
 });
