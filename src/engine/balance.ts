@@ -992,3 +992,16 @@ export const PEOPLE = {
    */
   ROLE_MAX_PREFERRED: 55,
 } as const;
+
+// ---------------------------------------------------------------------------
+// `src/ui/milestones.ts` — design.md §11.6
+// ---------------------------------------------------------------------------
+
+export const MILESTONES = {
+  // TUNE: `milestonesAt`'s peak_people only fires on a round multiple of this
+  // many people, so a growing village does not celebrate a new record every
+  // week it takes in one more mouth. No source in §12 gives this number; ten
+  // is the smallest step that still reads as "a while since the last one"
+  // against the population the balance tables put in a mature valley.
+  PEAK_PEOPLE_STEP: 10,
+} as const;

@@ -17,8 +17,13 @@ import { recogniseGesture, type Point } from '../gestures';
 
 const STYLE_ID = 'valley-crossroad-style';
 const STYLE = `
+/* §11.2 pide el valle atenuado y no tapado, pero **el valle no es un fondo
+   uniforme**: su suelo es claro y las opciones caen justo encima. Visto en
+   captura, el coste de cada opción perdía contraste contra el prado. Se deja
+   ver arriba, donde no hay letra, y se cierra hacia abajo, donde sí. */
 .crossroad-scrim { position: fixed; inset: 0; z-index: 10; display: flex; align-items: flex-end;
-  background: rgba(26,21,17,.86); color: var(--parchment, #f2e9d8); font: 14px/1.35 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
+  background: linear-gradient(to bottom, rgba(26,21,17,.72) 0%, rgba(26,21,17,.93) 38%, rgba(26,21,17,.97) 100%);
+  color: var(--parchment, #f2e9d8); font: 14px/1.35 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
 .crossroad { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
   padding: max(22px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); }
 /* U-01 · La encrucijada es el momento en que el jugador decide, y tiene que

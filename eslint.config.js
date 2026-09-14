@@ -5,7 +5,11 @@ import tseslint from 'typescript-eslint';
 const ENGINE_BANNED_GLOBALS = ['document', 'window', 'navigator', 'localStorage', 'performance'];
 
 export default tseslint.config(
-  { ignores: ['dist', 'artifacts', 'node_modules', 'coverage'] },
+  // Las copias de trabajo de los agentes en background (.claude/worktrees)
+  // viven dentro del proyecto y están en .gitignore. Si eslint las recorre, el
+  // lint del árbol principal falla por código a medias que no es suyo — pasó
+  // con siete errores de un agente que aún estaba escribiendo.
+  { ignores: ['dist', 'artifacts', 'node_modules', 'coverage', '.claude/worktrees'] },
 
   ...tseslint.configs.recommended,
 

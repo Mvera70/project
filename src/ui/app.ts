@@ -2,7 +2,7 @@
 
 import { TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
-import { renderUiText } from '@engine/chronicle/render';
+import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { vitalsOf } from './vitals';
 import { VITAL_ICONS } from './icons';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -17,6 +17,8 @@ import { panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
+import { milestonesAt } from './milestones';
+import { mountMoments } from './moment';
 import { mountNotices } from './notice';
 import { openChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
@@ -171,6 +173,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
+  // U-02 · y la cartela de lo que pasa una vez, que es otra cosa.
+  const moments = mountMoments(root);
+  // Desde qué tick se buscan hitos. Arranca donde arranca la partida, así que
+  // una partida cargada no vuelve a celebrar lo que ya celebró.
+  let lastMilestoneTick = state.tick;
 
   const panel = document.createElement('section');
   panel.className = 'valley-panel';
@@ -363,6 +370,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     if (state.ended === null) return;
     loop?.stop();
     notices.clear();
+    moments.clear();
     closeCrossroad();
     let game = archive.find((item) =>
       item.seed === state.seed && item.endedTick === state.ended?.tick);
@@ -397,6 +405,29 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // already looking. Not during a catch-up — nine hundred ticks of notices
     // is a backlog, and the welcome report of §9.2 is what tells that story.
     if (!catchingUp) notices.show(state, report.entries);
+    // U-02 · Y lo que pasa una vez. **Después del aviso a propósito**: si en el
+    // mismo tick la aldea levanta su primera capilla y además se quema un
+    // cobertizo, lo que se queda en pantalla es la capilla, que es lo raro.
+    //
+    // Tampoco durante un letargo, y por la misma razón que el aviso: quien
+    // vuelve tras cuatro horas no quiere ver desfilar treinta hitos, y el parte
+    // de bienvenida de §9.2 es lo que cuenta esa ausencia.
+    if (!catchingUp) {
+      const passed = milestonesAt(state, lastMilestoneTick);
+      lastMilestoneTick = state.tick;
+      // Ya vienen ordenados por peso: si coinciden dos, manda el mayor.
+      const best = passed[0];
+      if (best !== undefined) {
+        moments.show(
+          renderUiText(`milestone.kind.${best.kind}`),
+          renderEntry(
+            { tick: best.tick, kind: 'season', templateKey: best.key, params: best.params, weight: best.weight },
+            state.rng,
+          ),
+          best.weight === 3,
+        );
+      }
+    }
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
   };
   const beginLoop = (): void => {

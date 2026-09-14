@@ -1469,6 +1469,137 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     '{built} went up, {lost} came down.',
     'Building: {built} raised, {lost} lost.',
   ],
+
+  // --- milestones (§11.6) ---
+  //
+  // `src/ui/milestones.ts`. Not what a tick did (that is the rest of this
+  // bank) but what the village has never done before: the first of a kind of
+  // building, a new peak of people, a decade or a century, a second stone
+  // upgrade after the first. Same rules as the rest of §9.3: short, concrete,
+  // no exclamation marks, the drama in the fact and not the prose.
+  'milestone.first_of_kind.house': [
+    'The first house went up in the {season} of year {year}.',
+    'There was a house standing by year {year}, the first the valley had raised.',
+    'They built their first house in the {season} of year {year}.',
+  ],
+  'milestone.first_of_kind.field': [
+    'The first field was broken in the {season} of year {year}.',
+    'They ploughed their first field in year {year}.',
+    'There was a field in the valley by the end of year {year}, the first of it.',
+  ],
+  'milestone.first_of_kind.granary': [
+    'The village raised its first granary in the {season} of year {year}.',
+    'There was somewhere to keep the grain, for the first time, in year {year}.',
+    'They finished their first granary that {season}, year {year}.',
+  ],
+  'milestone.first_of_kind.well': [
+    'They sank the valley’s first well in the {season} of year {year}.',
+    'Nobody had to carry from the river after year {year}: the first well was dug.',
+    'The first well was finished in year {year}.',
+  ],
+  'milestone.first_of_kind.chapel': [
+    'The valley raised its first chapel in the {season} of year {year}.',
+    'There had never been a chapel here before year {year}.',
+    'They finished the first chapel in year {year}, and had somewhere to pray.',
+  ],
+  'milestone.first_of_kind.smithy': [
+    'The forge was lit for the first time in the valley’s history, in the {season} of year {year}.',
+    'They had never had a smithy before year {year}.',
+    'The first smithy went up in year {year}.',
+  ],
+  'milestone.first_of_kind.mill': [
+    'The first mill turned in the {season} of year {year}.',
+    'They had never had a mill before year {year}.',
+    'The valley’s first mill was finished in year {year}.',
+  ],
+  'milestone.first_of_kind.palisade': [
+    'The first length of palisade went up in the {season} of year {year}.',
+    'They began fencing themselves in, in year {year}.',
+    'There was no palisade before year {year}; that {season} the first stretch went up.',
+  ],
+  'milestone.first_of_kind.wall': [
+    'The valley set its first stone wall in the {season} of year {year}.',
+    'They had never built in stone against attack before year {year}.',
+    'The first length of wall went up in year {year}, where the palisade had been.',
+  ],
+  'milestone.first_of_kind.church': [
+    'The valley had its first church by the end of year {year}, where the chapel had stood.',
+    'They raised the first church in the {season} of year {year}.',
+    'There was a church, for the first time, in year {year}.',
+  ],
+  'milestone.first_of_kind.stone_house': [
+    'The first house in stone was raised in the {season} of year {year}.',
+    'A house that would not burn stood for the first time in year {year}.',
+    'They rebuilt a house in stone for the first time in the {season} of year {year}.',
+  ],
+  'milestone.first_of_kind.watchtower': [
+    'The valley raised its first watchtower in the {season} of year {year}.',
+    'They had never watched the road from a tower before year {year}.',
+    'The first watchtower was finished in year {year}.',
+  ],
+  'milestone.first_of_kind.grave_yard': [
+    'The valley walled off its first burying ground in the {season} of year {year}.',
+    'There had been no graveyard before year {year}.',
+    'They marked out the first graveyard in year {year}.',
+  ],
+
+  'milestone.work_done.chapel': [
+    'Another chapel was finished in the {season} of year {year}.',
+    'They raised a further chapel in year {year}.',
+    'A further chapel stood by the end of year {year}.',
+  ],
+  'milestone.work_done.smithy': [
+    'Another smithy was finished in the {season} of year {year}.',
+    'They lit a further forge in year {year}.',
+    'A further smithy stood by the end of year {year}.',
+  ],
+  'milestone.work_done.well': [
+    'Another well was sunk in the {season} of year {year}.',
+    'They dug a further well in year {year}.',
+    'A further well stood by the end of year {year}.',
+  ],
+  'milestone.work_done.mill': [
+    'Another mill was finished in the {season} of year {year}.',
+    'They raised a further mill in year {year}.',
+    'A further mill stood by the end of year {year}.',
+  ],
+  'milestone.work_done.church': [
+    'Another church was finished in the {season} of year {year}.',
+    'They raised a further church in year {year}.',
+    'A further church stood by the end of year {year}.',
+  ],
+  'milestone.work_done.stone_house': [
+    'Another house was rebuilt in stone in the {season} of year {year}.',
+    'One more house would not burn, after the {season} of year {year}.',
+    'They put another house into stone in year {year}.',
+  ],
+  'milestone.work_done.watchtower': [
+    'Another watchtower was raised in the {season} of year {year}.',
+    'They finished another watchtower in year {year}.',
+    'One more tower over the valley, by the end of year {year}.',
+  ],
+  'milestone.work_done.grave_yard': [
+    'The burying ground was widened in the {season} of year {year}.',
+    'They walled off more ground for the dead in year {year}.',
+    'Another stretch of the graveyard was marked out that {season}.',
+  ],
+
+  'milestone.peak_people': [
+    'The valley had never held {people} people before, in year {year}.',
+    'By year {year} there were {people} in the valley, more than there had ever been.',
+    '{people} — the most the valley had ever counted, as of year {year}.',
+  ],
+
+  'milestone.turn_of_decade': [
+    'The valley had stood {years} years by year {year}.',
+    'Year {year} marked {years} years since the founding.',
+    '{years} years since they came over the ridge, as of year {year}.',
+  ],
+  'milestone.turn_of_century': [
+    'A century since the founding, by year {year}.',
+    'The valley had stood a hundred years by year {year}.',
+    'Year {year}: a hundred years since they came over the ridge.',
+  ],
 };
 
 /** Stable interface copy: unlike chronicle prose, labels do not vary by seed. */
@@ -1480,6 +1611,15 @@ export const UI_BANK: Record<string, string> = {
   'app.speed.multiplier': '{speed}×',
   // §11.1.1 · la tira de la aldea. Cuatro cifras y sus nombres para el lector
   // de pantalla; lo que se ve es el icono y el número.
+  // U-02 · el rótulo de la cartela de un hito (`src/ui/moment.ts`): qué clase
+  // de cosa es, en dos o tres palabras y en versalitas. No es un título ni una
+  // celebración — es una etiqueta en una página de la crónica, y por eso vive
+  // aquí y no en el banco de frases, cuya forma exige tres variantes y punto
+  // final.
+  'milestone.kind.first_of_kind': 'The first of its kind',
+  'milestone.kind.peak_people': 'Never so many',
+  'milestone.kind.turn_of_decade': 'A turn of the years',
+  'milestone.kind.work_done': 'The work is finished',
   'app.vitals': 'The village at a glance',
   'app.vitals.people': '{count} villagers',
   'app.vitals.food': 'Food for {weeks} weeks',
