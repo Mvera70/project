@@ -9,3 +9,6 @@ artifacts/*
 __pycache__/
 *.pyc
 .claude/worktrees/
+
+# El registro del router de agentes: es un diario local, no fuente.
+.claude/hooks/route-log.jsonl
