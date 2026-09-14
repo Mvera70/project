@@ -6,6 +6,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@engine': fileURLToPath(new URL('./src/engine', import.meta.url)),
+      '@derive': fileURLToPath(new URL('./src/derive', import.meta.url)),
       '@render': fileURLToPath(new URL('./src/render', import.meta.url)),
       '@ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
     },

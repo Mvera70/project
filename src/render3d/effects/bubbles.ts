@@ -18,7 +18,7 @@ import {
   CanvasTexture, Group, LinearFilter, Sprite, SpriteMaterial, type Texture,
 } from 'three';
 import type { VillagerId } from '@engine/state';
-import type { Mood } from '@render/moods';
+import type { Mood } from '@derive/moods';
 
 /** Lo que puede decir una burbuja: lo que el estado dice, más la charla. */
 export type Bubble = Mood | 'chat';

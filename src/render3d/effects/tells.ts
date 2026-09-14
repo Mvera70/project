@@ -19,7 +19,7 @@ import {
 import type { Building, GameState } from '@engine/state';
 import { BUILDING_ASSETS } from '../world/buildings';
 import { daylightAt } from './daylight';
-import { tellsFor, type Tell } from '@render/layers/tells';
+import { tellsFor, type Tell } from '@derive/tells';
 
 /** Alturas en celdas. Una celda son unos tres metros (D.6.2). */
 const HEIGHT = {

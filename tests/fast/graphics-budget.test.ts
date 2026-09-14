@@ -16,7 +16,7 @@ import { Village } from '../../src/render3d/world/buildings';
 import { buildGround } from '../../src/render3d/world/ground';
 import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
 import { TERRAIN_CODE } from '@engine/state';
-import { PALETTES } from '@render/palette';
+import { PALETTES } from '@derive/palette';
 import { buildForest } from '../../src/render3d/world/forest';
 import { planFor } from '../../src/render3d/world/plan';
 

@@ -1,7 +1,7 @@
 // Browser-side pixel audit used by the M-17 Playwright gate.
 
 import { BUILDINGS } from '@engine/balance';
-import { PALETTES } from '../palette';
+import { PALETTES } from '@derive/palette';
 import { BUILDING_SPRITES } from './index';
 
 export interface SpriteAudit {

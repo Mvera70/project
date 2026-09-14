@@ -27,6 +27,7 @@
     "baseUrl": ".",
     "paths": {
       "@engine/*": ["src/engine/*"],
+      "@derive/*": ["src/derive/*"],
       "@render/*": ["src/render/*"],
       "@ui/*": ["src/ui/*"]
     }

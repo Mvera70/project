@@ -8,7 +8,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
-import { gatheringsAt } from '@render/gatherings';
+import { gatheringsAt } from '@derive/gatherings';
 import { fingerprint } from '../helpers/fingerprint';
 import type { GameState } from '@engine/state';
 

@@ -11,7 +11,7 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { isHere } from '@engine/people/demography';
 import type { GameState, VillagerId } from '@engine/state';
-import { moodsFor, MOODS } from '@render/moods';
+import { moodsFor, MOODS } from '@derive/moods';
 
 function village(years: number, seed = 7): GameState {
   const state = foundGame(seed);

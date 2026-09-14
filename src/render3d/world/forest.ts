@@ -15,7 +15,7 @@ import {
 } from 'three';
 import type { Building, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
-import type { Palette } from '@render/palette';
+import type { Palette } from '@derive/palette';
 
 /**
  * Cuántos árboles caben en una celda de bosque.

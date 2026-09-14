@@ -17,14 +17,14 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { clockOf, SEASONS } from '@engine/time';
 import type { GameState } from '@engine/state';
-import { PALETTES, paletteFor } from '@render/palette';
-import { tellsFor } from '@render/layers/tells';
+import { PALETTES, paletteFor } from '@derive/palette';
+import { tellsFor } from '@derive/tells';
 import {
   BoxGeometry, Group, Matrix4, Mesh, MeshStandardMaterial, Vector3,
   type InstancedMesh, type Object3D,
 } from 'three';
 import { TERRAIN_CODE } from '@engine/state';
-import { animalPositions, wildlifePositions } from '@render/animals';
+import { animalPositions, wildlifePositions } from '@derive/animals';
 import { daylightAt, NIGHT_FLOOR, NOON } from '../../src/render3d/effects/daylight';
 import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
 import { readFileSync } from 'node:fs';

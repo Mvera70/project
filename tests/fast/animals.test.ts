@@ -10,7 +10,7 @@ import { ANIMALS, TIME } from '@engine/balance';
 import { foundGame } from '@engine/found';
 import type { GameState } from '@engine/state';
 import { run } from '@engine/sim';
-import { animalPositions, wildlifePositions } from '@render/animals';
+import { animalPositions, wildlifePositions } from '@derive/animals';
 import { herdCapacity } from '@engine/subsistence/herd';
 import { TERRAIN_CODE } from '@engine/state';
 import { fingerprint } from '../helpers/fingerprint';

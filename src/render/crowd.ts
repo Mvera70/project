@@ -5,10 +5,10 @@ import type { Building, GameState, Villager, VillagerId } from '@engine/state';
 import { route } from '@engine/world/astar';
 import { routesFor } from '@engine/world/paths';
 import type { Figure } from './layers/figures';
-import { hungerSeverity } from './layers/tells';
-import { gatheringsAt } from './gatherings';
+import { hungerSeverity } from '@derive/tells';
+import { gatheringsAt } from '@derive/gatherings';
 import { reactionsAt } from './reactions';
-import { encountersAmong, shunnedAmong, type Encounter } from './encounters';
+import { encountersAmong, shunnedAmong, type Encounter } from '@derive/encounters';
 import { DAY, ENCOUNTER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 

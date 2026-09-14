@@ -1,7 +1,7 @@
 // M-17 · Standing buildings over the cached terrain.
 
 import type { Building, GameState } from '@engine/state';
-import { outline, type Palette } from '../palette';
+import { outline, type Palette } from '@derive/palette';
 import { BUILDING_SPRITES, ruin, type DrawingContext } from '../sprites';
 
 function ordered(state: Readonly<GameState>): Building[] {

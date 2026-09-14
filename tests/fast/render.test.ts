@@ -3,7 +3,7 @@ import { TIME } from '@engine/balance';
 import type { Season, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import { cellFor } from '@render/canvas';
-import { luminance, outline, PALETTES, paletteFor } from '@render/palette';
+import { luminance, outline, PALETTES, paletteFor } from '@derive/palette';
 import { regionContours } from '@render/layers/terrain';
 import { BUILDING_SPRITES, NAMED_TONES } from '@render/sprites';
 import { crowdPositions } from '@render/crowd';

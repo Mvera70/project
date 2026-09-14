@@ -7,7 +7,7 @@ import { run } from '@engine/sim';
 import type { GameState, Season } from '@engine/state';
 import { SEASONS } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
-import { paletteFor } from '@render/palette';
+import { paletteFor } from '@derive/palette';
 import { auditSprites } from '@render/sprites/audit';
 import { crowdPositions } from '@render/crowd';
 import { paintFigures, paintFigureShadows } from '@render/layers/figures';

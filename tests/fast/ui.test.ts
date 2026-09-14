@@ -9,7 +9,7 @@ import { seasonOf } from '@engine/time';
 import { seasonLabel } from '@ui/app';
 import { inspectAt, panelFor } from '@ui/inspect';
 import { recogniseGesture } from '@ui/gestures';
-import { hungerSeverity, tellsFor } from '@render/layers/tells';
+import { hungerSeverity, tellsFor } from '@derive/tells';
 import { crowdPositions } from '@render/crowd';
 
 describe('M-21 · gestos puros', () => {

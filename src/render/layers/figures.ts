@@ -1,6 +1,6 @@
 // M-17 · Figure paint functions. M-18 supplies their moving positions.
 
-import type { Palette } from '../palette';
+import type { Palette } from '@derive/palette';
 import { NAMED_TONES, namedVillager, villager, type DrawingContext } from '../sprites';
 
 export interface Figure {

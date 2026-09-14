@@ -25,7 +25,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
-import { gatheringsAt } from '@render/gatherings';
+import { gatheringsAt } from '@derive/gatherings';
 import { createVillage } from '../../src/render3d/life/village';
 
 /** Una decisión con `gather` puesta a mano, para no simular veinte años. */

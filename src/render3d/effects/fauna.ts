@@ -18,7 +18,7 @@ import { Group, InstancedMesh, Matrix4, Quaternion, Vector3, type Object3D } fro
 import { TERRAIN_CODE, type GameState, type ValleyMap } from '@engine/state';
 import {
   animalPositions, wildlifePositions, type Animal, type AnimalKind,
-} from '@render/animals';
+} from '@derive/animals';
 import { piecesOf, type Piece } from '../world/forest';
 
 /**

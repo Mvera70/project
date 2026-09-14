@@ -49,8 +49,8 @@ export default tseslint.config(
         'error',
         {
           patterns: [
-            { group: ['@render/*', '@ui/*', '**/render/*', '**/ui/*'],
-              message: 'El motor no importa de render ni de ui. design.md §2.4' },
+            { group: ['@render/*', '@ui/*', '@derive/*', '**/render/*', '**/ui/*', '**/derive/*'],
+              message: 'El motor no importa de render, ui ni derive. design.md §2.4' },
           ],
         },
       ],

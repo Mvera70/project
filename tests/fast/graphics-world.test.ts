@@ -30,7 +30,7 @@ import { Village } from '../../src/render3d/world/buildings';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 import { LIFE_STEP } from '../../src/render3d/life/clock';
-import { PALETTES } from '@render/palette';
+import { PALETTES } from '@derive/palette';
 import { buildForest, shoreCells } from '../../src/render3d/world/forest';
 import { buildGround, cellColour, elevationAt } from '../../src/render3d/world/ground';
 import type { PlannedBuilding } from '../../src/render3d/world/plan';

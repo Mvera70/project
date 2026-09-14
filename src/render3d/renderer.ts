@@ -16,8 +16,8 @@ import {
 } from 'three';
 import { ford } from '@engine/sim';
 import { clockOf } from '@engine/time';
-import { paletteFor } from '@render/palette';
-import { moodsFor } from '@render/moods';
+import { paletteFor } from '@derive/palette';
+import { moodsFor } from '@derive/moods';
 import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type Role, type VillagerId } from '@engine/state';
 import { loadAssets, type AssetLibrary } from './assets';

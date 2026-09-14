@@ -9,8 +9,8 @@ import { MARKS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
-import { bannersAt, dousedAt } from '@render/marks';
-import { tellsFor } from '@render/layers/tells';
+import { bannersAt, dousedAt } from '@derive/marks';
+import { tellsFor } from '@derive/tells';
 import { fingerprint } from '../helpers/fingerprint';
 import type { GameState } from '@engine/state';
 

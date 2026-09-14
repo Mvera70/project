@@ -1,7 +1,7 @@
 // M-29 · Painting the livestock. design.md §7.7, §10.2.
 
-import type { Animal } from '../animals';
-import type { Palette } from '../palette';
+import type { Animal } from '@derive/animals';
+import type { Palette } from '@derive/palette';
 import { cow, crow, fish, hen, pig, wolf, type DrawingContext } from '../sprites';
 
 const SPRITES = { hen, pig, cow, crow, wolf, fish } as const;

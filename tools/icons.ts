@@ -14,7 +14,7 @@ import { mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { chromium, type Browser } from '@playwright/test';
-import { PALETTES } from '../src/render/palette';
+import { PALETTES } from '../src/derive/palette';
 
 const SYSTEM_CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const p = PALETTES.summer;

@@ -1,7 +1,7 @@
 // M-16 · Canvas geometry and the cached background.
 
 import type { GameState, ValleyMap } from '@engine/state';
-import type { Palette } from './palette';
+import type { Palette } from '@derive/palette';
 import { paintPaths, paintTerrain } from './layers/terrain';
 import { paintBuildings, paintBuildingShadows, paintRuins } from './layers/buildings';
 

@@ -13,7 +13,7 @@ import {
   BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial,
 } from 'three';
 import type { ValleyMap } from '@engine/state';
-import type { Palette } from '@render/palette';
+import type { Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
 
 /**

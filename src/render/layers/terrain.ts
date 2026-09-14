@@ -1,7 +1,7 @@
 // M-16 · Terrain regions and paths. The map is read, never mutated.
 
 import { TERRAIN_CODE, type ValleyMap } from '@engine/state';
-import type { Palette } from '../palette';
+import type { Palette } from '@derive/palette';
 
 interface Point { x: number; y: number }
 interface Edge { from: Point; to: Point }

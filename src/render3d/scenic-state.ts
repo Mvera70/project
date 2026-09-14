@@ -27,7 +27,7 @@
 // § 4.3 intacto: aquí se lee el estado y se copia, nunca se escribe en él y
 // nunca se consume azar.
 
-import { NIGHT } from '@render/animals';
+import { NIGHT } from '@derive/animals';
 import type { Building, GameState, ValleyMap, Villager } from '@engine/state';
 
 /**

@@ -5,11 +5,12 @@
 // verbatimModuleSyntax los `import type` se borran— pero sí rompe la posibilidad
 // de razonar sobre qué depende de qué, y es la clase de deuda que se nota
 // cuando ya la han heredado cinco módulos.
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const ENGINE = fileURLToPath(new URL('../../src/engine/', import.meta.url));
+const DERIVE = fileURLToPath(new URL('../../src/derive/', import.meta.url));
 
 /**
  * Los módulos del motor a los que apunta un fichero, sin repetir y ordenados.
@@ -282,6 +283,42 @@ describe('grafo de módulos del motor', () => {
       ['world/paths.ts', 'paths'],
     ] as const) {
       expect(importsOf(file), file).not.toContain(self);
+    }
+  });
+});
+
+describe('la derivación no dibuja', () => {
+  // `src/derive/` nació al migrar a 3D (G-12): el renderer nuevo importaba
+  // siete módulos del viejo para saber qué contar —la paleta, los animales, los
+  // ánimos, las señales, los encuentros, las reuniones—, así que el render que
+  // se juega dependía del que ya no se juega. Lo que lee el estado se separó de
+  // lo que pone tinta, y estas dos pruebas son lo que mantiene la separación:
+  // sin ellas, el primer `import` cómodo la deshace.
+  const files = readdirSync(DERIVE).filter((name) => name.endsWith('.ts'));
+
+  it('hay algo que comprobar', () => {
+    expect(files.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('ningún módulo de derive conoce un render, una interfaz ni Three', () => {
+    for (const file of files) {
+      const src = readFileSync(DERIVE + file, 'utf8');
+      const targets = [...src.matchAll(/from\s+'([^']+)'/g)].map((m) => m[1] ?? '');
+      for (const target of targets) {
+        expect(target, `${file} importa de '${target}'`).not.toMatch(
+          /render|@ui|\/ui\/|^three(\/|$)/u,
+        );
+      }
+    }
+  });
+
+  it('ni dibuja: no hay lienzo, ni contexto, ni DOM', () => {
+    for (const file of files) {
+      const src = readFileSync(DERIVE + file, 'utf8');
+      // `ctx`, `fillStyle`, `getContext`: la huella de haber pintado algo.
+      expect(src, `${file} parece dibujar`).not.toMatch(
+        /getContext|fillStyle|strokeStyle|document|OffscreenCanvas/u,
+      );
     }
   });
 });

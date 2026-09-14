@@ -12,7 +12,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
-import { NIGHT } from '@render/animals';
+import { NIGHT } from '@derive/animals';
 import { createScenicState } from '../../src/render3d/scenic-state';
 
 function village(years: number, seed = 7): GameState {

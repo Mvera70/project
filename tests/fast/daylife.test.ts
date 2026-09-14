@@ -9,7 +9,7 @@ import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
 import { routesFor } from '@engine/world/paths';
-import { encountersAmong } from '@render/encounters';
+import { encountersAmong } from '@derive/encounters';
 import { seasonOf } from '@engine/time';
 import { fingerprint } from '../helpers/fingerprint';
 import { TERRAIN_CODE, type GameState } from '@engine/state';

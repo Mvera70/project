@@ -1,7 +1,7 @@
 // M-17 · Code-drawn sprites. Coordinates are map cells; `cell` scales them.
 
 import type { BuildingKind } from '@engine/state';
-import { outline, type Palette } from '../palette';
+import { outline, type Palette } from '@derive/palette';
 
 export type DrawingContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 export type Sprite = (

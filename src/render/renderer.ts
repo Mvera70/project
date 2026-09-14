@@ -3,12 +3,13 @@
 import type { GameState } from '@engine/state';
 import { clockOf } from '@engine/time';
 import { cellFor, paintVillageBackground, sizeCanvas } from './canvas';
-import { animalPositions, wildlifePositions } from './animals';
+import { animalPositions, wildlifePositions } from '@derive/animals';
 import { crowdPositions } from './crowd';
 import { paintAnimals, paintAnimalShadows } from './layers/animals';
 import { paintFigures, paintFigureShadows } from './layers/figures';
-import { paintTells, tellsFor } from './layers/tells';
-import { paletteFor, type Palette } from './palette';
+import { tellsFor } from '@derive/tells';
+import { paintTells } from './layers/tells';
+import { paletteFor, type Palette } from '@derive/palette';
 
 function hashBytes(seed: number, bytes: ArrayLike<number>): number {
   let hash = seed;

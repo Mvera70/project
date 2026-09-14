@@ -11,7 +11,7 @@
 // derivado como todo lo demás: ni estado, ni azar, ni memoria entre pintadas.
 
 import type { GameState } from '@engine/state';
-import { standing, valleyCore } from './anchors';
+import { standing, valleyCore } from '@derive/anchors';
 
 export interface Reaction {
   x: number;
