@@ -24,6 +24,95 @@ cómo se delega y se audita. Y la regla que más veces ha ahorrado una tarde:
 - **Y lo que decide si esto corre no está medido:** todo lo de rendimiento es de
   un portátil. Hay demo de una sola página; falta un teléfono.
 
+## Lo que dijo el dueño del diseño al probar la demo · 15 sep 2026
+
+**Esto manda sobre el orden de abajo.** Es la primera vez que alguien juega la
+demo del 3D con la interfaz nueva puesta, y es la clase de veredicto que
+`docs/handover.md` §1 dice que no se puede sustituir por una medición. Transcrito
+por áreas, sin suavizarlo:
+
+### El mapa es pequeño, y tiene que ser el centro de algo más ancho
+
+> «el mapa sigue siendo muy pequeño, dijimos que iba a ser mucho más grande.
+> Vamos a expandir, vamos a meter más generación de diferentes cosas: bosques,
+> montañas, lago, etc. El valle es el centro del mapa pero debe ser más amplio,
+> para que podamos extender y hacer más cosas.»
+
+Es **V-15 y V-16**, que estaban aparcadas con el coste medido (`design.md` E.8).
+Dejan de estar aparcadas. Y llega con algo que los briefs no pedían: **más
+clases de terreno generado** —lago, montaña dentro del mapa, bosques
+distinguibles— no sólo más celdas del mismo prado. Sube `SCHEMA_VERSION` a 4 y
+rompe partidas guardadas, que es la razón por la que estaba aparcada y ya no
+basta.
+
+### La cámara sólo mira desde un sitio
+
+> «aunque tengamos 3D ahora mismo, solamente tenemos una visión de un plano.
+> Deberíamos poder mirar desde diferentes ángulos, ahora que tenemos 3D
+> implementado. Y el mapa en sí debe poder funcionar: cuando ya lo tengamos más
+> grande, poder moverlo, hacer zoom y esas cosas.»
+>
+> «no se puede bien mover el mapa.»
+>
+> «si seleccionas algo del mapa, nunca se puede deseleccionar lo que aparece
+> seleccionado.»
+
+**Va antes que el mapa grande**, por orden de dependencia: un mapa nueve veces
+mayor con una cámara que no gira ni se mueve bien es peor que el de ahora. `VIEW`
+es hoy una dirección fija (`camera.ts`, la misma de todas las capturas desde
+G-01) y D.7 nunca contempló girar.
+
+### El reloj no cuadra al acelerar
+
+> «cuando hacemos por 4 o por 64, hay muchas cosas que no se cuadran: aparece
+> que es invierno y no se ve que sea invierno, los personajes no van al ritmo que
+> deberían ir. Hay muchas cosas del reloj que están mal.»
+
+Dos síntomas distintos y hay que separarlos: **lo que se pinta no corresponde a
+la estación que dice la cabecera** (sospecha: el estado escénico de D.6.7 congela
+la jornada de anoche y a ×64 pasan ocho semanas dentro de una jornada, así que la
+cabecera va por delante de lo pintado), y **el ritmo de la gente**, que D.6.1
+acelera con la raíz de la velocidad a propósito. Lo segundo puede ser la decisión
+funcionando y viéndose mal; lo primero es un fallo.
+
+### La interfaz, y sobre todo los textos
+
+> «la interfaz sigue siendo bastante mala, aunque ya hemos avanzado un poco más.
+> Los mensajes que aparecen ahí son horrorosos, tanto los mensajes rápidos como
+> los mensajes entre eras.»
+>
+> «los botones de tiempo son provisionales, evidentemente. El líder no va a ser
+> así. Y los iconos de estadísticas también son muy pobres.»
+
+«Los mensajes entre eras» son las cartelas de hito de U-02. **Y aquí hay que
+recordar una regla antes de tocar nada: las edades tecnológicas no existen en
+este motor y no se inventan** (`design.md` §11, U-02); lo que se celebra son
+hitos con fecha real. Si lo que falla es que suenan a hito de otro juego, se
+arregla la voz, no se inventa una progresión.
+
+### Más modelos
+
+> «debemos seguir implementando también modelos en 3D. Son muy escasos: las
+> construcciones, los aldeanos, objetos que pueda haber por el mapa, como
+> herramientas.»
+
+Hay 39 recursos publicados. Lo que falta por D.8: el campo y el camino como
+terreno con geometría, la familia de defensa completa, y **objetos sueltos por
+el mapa**, que no estaban en ningún brief y son nuevos.
+
+### El orden que sale de esto
+
+1. **La cámara** (girar, mover, zoom, deseleccionar). Prerrequisito del mapa.
+2. **El reloj a ×4 y ×64.** Separar los dos síntomas y medir.
+3. **El mapa grande, con más generación.** V-15 + V-16, ampliadas.
+4. **Los textos y los iconos.** Es voz y dibujo, no arquitectura.
+5. **Más modelos**, que va en paralelo si hay Blender.
+
+Y lo que ya estaba y no se cae de la lista: **V-11** (las reuniones no ocurren) y
+**el ritmo de decisión** (siete a doce decisiones en cuarenta años).
+
+---
+
 ## Los carriles
 
 | Carril | Rondas | Modelo | Por qué ese modelo |
