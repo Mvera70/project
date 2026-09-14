@@ -14,6 +14,7 @@ import type { Actor } from '../actors';
 import type { ClipName } from '../actors/clips';
 import { clipTime } from '../actors/clips';
 import type { Activity } from '../actors/day';
+import type { Prop } from './props';
 import type { Dweller, Village } from './village';
 
 /**
@@ -103,4 +104,40 @@ export function castOf(
     });
   }
   return actors;
+}
+
+/**
+ * Un trasto, listo para pintarse: dónde está y quién lo lleva. V-09.
+ *
+ * `props.ts` sólo sabe de cuerpos —`held` es un id de cuerpo, para no
+ * conocer `VillagerId` (E.3: la vida no toca el motor)—; traducir ese id al
+ * `VillagerId` que el render sabe pintar es justo el trabajo de este fichero,
+ * el mismo que ya hace `castOf` con `dweller.villager`.
+ *
+ * **Sin modelo todavía** (alcance recortado de esta ronda, ver el informe):
+ * el render de hoy no dibuja nada con esto. Es el enganche para cuando haya
+ * un GLB de pelota/palo/cubo/haz de leña que pintar.
+ */
+export interface PropSighting {
+  readonly id: number;
+  readonly kind: Prop['kind'];
+  readonly x: number;
+  readonly z: number;
+  readonly y: number;
+  /** Quién lo lleva ahora, o nada si está por el suelo. */
+  readonly heldBy: VillagerId | null;
+}
+
+/** Los trastos de esta jornada, tal como el render los necesitaría. Puro,
+ *  igual que `castOf`: no toca la vida ni el estado, sólo los traduce. */
+export function propsOf(life: Village): PropSighting[] {
+  const byBody = new Map(life.dwellers.map((dweller) => [dweller.body.id, dweller.villager]));
+  return life.props.map((prop) => ({
+    id: prop.id,
+    kind: prop.kind,
+    x: prop.x,
+    z: prop.z,
+    y: prop.y,
+    heldBy: prop.held === null ? null : byBody.get(prop.held) ?? null,
+  }));
 }

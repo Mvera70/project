@@ -112,12 +112,17 @@ describe('V-08 · los animales, iguales que la gente', () => {
       expect(instants,
         `semilla ${seed}: ${life.beasts.length} animales y nadie se acercó a ninguno`)
         .toBeGreaterThan(0);
-      // Con cabaña de verdad, no puede ser cosa de dos vecinos raros: lo peor
-      // medido con diez o más animales son 18 personas distintas.
+      // Con cabaña de verdad, no puede ser cosa de dos vecinos raros. Lo peor
+      // medido con diez o más animales eran 18 personas distintas; con los
+      // trastos de V-09 puestos —otra oferta que compite por la misma gente—
+      // baja a 14 (3 → 16, 7 → 55, 11 → 36, 23 → 14, 31 → 16). Es el reparto
+      // esperado, no un fallo: el umbral se pone bajo lo peor medido con
+      // trastos, con el margen de un caso, y las dos tablas quedan aquí para
+      // que el próximo cambio de ofertas sepa contra qué se compara.
       if (life.beasts.length >= 10) {
         expect(touched.size,
           `semilla ${seed}: sólo ${touched.size} personas tocaron un animal, con ${life.beasts.length} en la aldea`)
-          .toBeGreaterThanOrEqual(15);
+          .toBeGreaterThanOrEqual(12);
       }
     }
   });

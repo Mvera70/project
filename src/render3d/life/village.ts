@@ -25,6 +25,10 @@ import { decide, satisfy, RETHINK, type Intent } from './decide';
 import { alive as sceneAlive, play, propose, SCENE_COOLDOWN, SCENE_EARSHOT, type Scene } from './scenes';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, type Beast } from './beasts';
+import {
+  carryAt, drop, findMate, fling, LOFT, propPlaces, PROP_PLACE_PREFIX,
+  REST_AFTER_THROW, scatter, settle, take, THROW, THROW_AHEAD, type Prop,
+} from './props';
 
 /**
  * Lo que se aguanta yendo a un sitio antes de pensárselo otra vez, en pasos.
@@ -63,6 +67,18 @@ export interface Dweller {
   /** Hasta qué paso no le apetece volver a pararse con nadie, tras la última
    *  escena. V-07, ported de `spike/life.ts` (`cooldown`). */
   sceneCooldownUntil: number;
+  /**
+   * V-09: qué trasto lleva en la mano ahora mismo, si lleva alguno. Id de
+   * `Prop`, no de cuerpo.
+   *
+   * La cabaña (`beasts.ts`, V-08) no coge nada y lo lleva siempre a `null`:
+   * mejor un campo obligatorio que nunca cambia que uno opcional que obliga a
+   * preguntar `?? null` en cada uso, que es lo que hacía la primera versión.
+   */
+  holding: number | null;
+  /** V-09: a quién apunta mientras espera para tirar lo que lleva. Id de
+   *  cuerpo. */
+  aimAt: number | null;
 }
 
 export interface Village {
@@ -71,10 +87,16 @@ export interface Village {
   readonly dwellers: readonly Dweller[];
   /** La cabaña, V-08: gallinas, cerdos y vacas, con el mismo trato que la gente. */
   readonly beasts: readonly Beast[];
+  /** Los trastos de la jornada, V-09: la pelota, el palo, el cubo, el haz de
+   *  leña. Repartidos al amanecer con la semilla del día (`scatter`), y como
+   *  el resto de esta capa, no sobreviven a la jornada. */
+  readonly props: readonly Prop[];
   /** Un paso de vida para todos. */
   step(): void;
   /** Cuántos pasos lleva la jornada. */
   readonly steps: number;
+  /** Pases de pelota dados en la jornada, V-09: lo que sale de jugar. */
+  readonly passes: number;
   /** Qué está haciendo la aldea ahora, para poder contarlo. */
   tally(): Record<string, number>;
 }
@@ -129,6 +151,12 @@ export function createVillage(state: GameState, day: number): Village {
     ...beasts.map((beast) => beast.gift),
   ];
 
+  // V-09: los trastos de la jornada, anclados a puertas de verdad y por tanto
+  // ya en la orilla que se usa (`scatter`, `props.ts`). `propsById` es cómo
+  // `village.ts` vuelve de «qué trasto lleva éste» (un id) al trasto mismo.
+  const props: Prop[] = scatter(state, land, seed);
+  const propsById = new Map(props.map((prop) => [prop.id, prop]));
+
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
   alive.forEach((villager, n) => {
     // Se le deja junto a un sitio de la aldea, repartidos.
@@ -155,6 +183,8 @@ export function createVillage(state: GameState, day: number): Village {
       travelled: 0,
       scene: null,
       sceneCooldownUntil: 0,
+      holding: null,
+      aimAt: null,
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -171,6 +201,11 @@ export function createVillage(state: GameState, day: number): Village {
   // tener que recorrer a toda la aldea buscando quién está en una.
   let scenes: Scene[] = [];
   let steps = 0;
+  // V-09: pases de pelota dados en la jornada. Contados igual que en
+  // `spike/life.ts` (`world.passes += 1`): cualquier tirada de una pelota a
+  // alguien cuenta, aunque no haya nadie a quien apuntar y se tire hacia
+  // delante por gusto (`finishHolding`, más abajo).
+  let passes = 0;
 
   /** Cuánta gente hay en cada oferta ahora mismo. */
   function seats(): Map<string, number> {
@@ -188,7 +223,9 @@ export function createVillage(state: GameState, day: number): Village {
     places: mine,
     dwellers,
     beasts,
+    props,
     get steps(): number { return steps; },
+    get passes(): number { return passes; },
 
     tally(): Record<string, number> {
       const count: Record<string, number> = {};
@@ -201,9 +238,16 @@ export function createVillage(state: GameState, day: number): Village {
     },
 
     step(): void {
+      const now = steps * LIFE_STEP;
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(bodies);
+
+      // V-09: los trastos sueltos ahora mismo, como opciones más para decidir
+      // — se rehace cada paso porque un trasto deja de ofrecer nada en cuanto
+      // alguien lo coge, cosa que un edificio nunca hace (`propPlaces`,
+      // `props.ts`).
+      const options = props.length === 0 ? mine : [...mine, ...propPlaces(props, now, land)];
 
       // 0 · Vivir las escenas que ya estaban en marcha. V-07.
       //
@@ -278,12 +322,20 @@ export function createVillage(state: GameState, day: number): Village {
         //     igual. Quedarse andando para siempre es el otro modo de fallar.
         const onTheWay = dweller.doing !== null && !dweller.doing.there;
         const tooLong = dweller.doing !== null && steps - dweller.doing.since > GIVE_UP;
-        if (steps >= dweller.rethinkAt && (!onTheWay || tooLong)) {
+        // V-09 · Con un trasto ya en la mano y a la espera de soltarlo, tampoco
+        // se replantea la vida: la jugada dura menos que `RETHINK` (1,5 s) a
+        // propósito —«no se come la jornada»—, y sin este freno el rethink de
+        // en medio ganaba casi siempre en cuanto `satisfy()` vaciaba el
+        // aburrimiento que hacía atractivo jugar, dejando a la pelota
+        // pegada en la mano para el resto del día. Medido: 3 139 pasos con la
+        // pelota en la mano y cero pases en la semilla 3, antes de este freno.
+        const heldSteady = dweller.holding !== null && dweller.doing?.there === true;
+        if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong)) {
           dweller.rethinkAt = steps + RETHINK;
           const before = dweller.doing;
           dweller.doing = decide(
             { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before },
-            mine, taken, land, router, seed, steps,
+            options, taken, land, router, seed, steps,
           );
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
@@ -302,6 +354,30 @@ export function createVillage(state: GameState, day: number): Village {
 
         // 2 · ¿Se acabó lo que estaba haciendo?
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
+          // V-09: si se acaba con un trasto en la mano, se resuelve. Una
+          // pelota se tira —encarado a quien tocara, o hacia delante si nadie
+          // quiso jugar— y cualquier otra cosa se suelta donde se está.
+          if (dweller.holding !== null) {
+            const held = propsById.get(dweller.holding);
+            if (held !== undefined) {
+              if (held.kind === 'ball') {
+                const mate = dweller.aimAt === null ? undefined : byId.get(dweller.aimAt);
+                const at = mate !== undefined
+                  ? { x: mate.body.x, z: mate.body.z }
+                  : {
+                    x: body.x + Math.sin(body.facing) * THROW_AHEAD,
+                    z: body.z + Math.cos(body.facing) * THROW_AHEAD,
+                  };
+                fling(held, dweller, at, THROW, LOFT, land);
+                held.restUntil = now + REST_AFTER_THROW;
+                passes += 1;
+              } else {
+                drop(held, dweller, land);
+              }
+            }
+            dweller.holding = null;
+          }
+          dweller.aimAt = null;
           dweller.doing = null;
           dweller.rethinkAt = steps;
         }
@@ -313,6 +389,7 @@ export function createVillage(state: GameState, day: number): Village {
         //     segunda mitad del mismo fallo: en sitios apretados entre casas, el
         //     empujón de las paredes impide clavarse en el punto exacto y la
         //     gente se quedaba dando vueltas al lado de donde quería estar.
+        const wasThere = dweller.doing?.there === true;
         if (dweller.doing !== null && !dweller.doing.there) {
           const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
           if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
@@ -325,6 +402,21 @@ export function createVillage(state: GameState, day: number): Village {
           : follow(body, dweller.doing.route);
         if (dweller.doing !== null && !dweller.doing.there && next === null) {
           dweller.doing.there = true;
+        }
+        // V-09 · Primera lección del descarte: al llegar junto a un trasto
+        // suelto se coge, no hace falta pisarlo. Sólo en el instante de
+        // llegar (`!wasThere`), y sólo si de verdad hay algo que ofrezca
+        // `play`/`carry` ahí: el aforo ya reservó la plaza al decidir, así
+        // que en condiciones normales sigue libre.
+        if (dweller.doing !== null && dweller.doing.there && !wasThere
+          && dweller.holding === null
+          && dweller.doing.place.id.startsWith(PROP_PLACE_PREFIX)) {
+          const prop = propsById.get(Number(dweller.doing.place.id.slice(PROP_PLACE_PREFIX.length)));
+          if (prop !== undefined && take(prop, dweller)) {
+            dweller.aimAt = dweller.doing.offer.id === 'play'
+              ? (findMate(dweller, dwellers)?.body.id ?? null)
+              : null;
+          }
         }
 
         const want = next === null ? { x: 0, z: 0 } : seek(body, next);
@@ -339,6 +431,15 @@ export function createVillage(state: GameState, day: number): Village {
           dweller.travelled += speed * LIFE_STEP;
         } else {
           dweller.travelled = 0;
+          // V-09 · Segunda lección del descarte: quien va a tirar la pelota
+          // se encara a quien se la va a tirar antes de soltarla.
+          if (dweller.doing?.there === true && dweller.doing.offer.id === 'play'
+            && dweller.aimAt !== null) {
+            const mate = byId.get(dweller.aimAt);
+            if (mate !== undefined) {
+              turnTo(body, Math.atan2(mate.body.x - body.x, mate.body.z - body.z), LIFE_STEP);
+            }
+          }
         }
 
         // 4 · Y lo que eso le hace por dentro.
@@ -354,6 +455,16 @@ export function createVillage(state: GameState, day: number): Village {
         };
         drift(dweller.needs, dweller.traits, doing, LIFE_STEP);
         if (dweller.doing?.there === true) satisfy(dweller.needs, dweller.doing.offer, LIFE_STEP);
+      }
+
+      // 7b · Los trastos. V-09. Los sueltos caen y ruedan (`settle`, física
+      //      pura); los que alguien lleva van en su mano (`carryAt`) — eso no
+      //      puede vivir dentro de `settle`, que no conoce los cuerpos.
+      settle(props, land, LIFE_STEP);
+      for (const dweller of dwellers) {
+        if (dweller.holding === null) continue;
+        const held = propsById.get(dweller.holding);
+        if (held !== undefined) carryAt(held, dweller);
       }
 
       // 8 · La cabaña vive su propio paso. V-08.
@@ -393,6 +504,16 @@ export function createVillage(state: GameState, day: number): Village {
             + opinionOf(state, other.villager, dweller.villager)) / 2;
           const scene = propose(dweller, other, opinion, seed, steps);
           if (scene === null) return;
+          // V-09 · Quien empieza una escena suelta lo que llevaba: no se
+          // habla, ni se empuja, ni se pelea con las manos ocupadas.
+          if (dweller.holding !== null) {
+            const held = propsById.get(dweller.holding);
+            if (held !== undefined) drop(held, dweller, land);
+          }
+          if (other.holding !== null) {
+            const held = propsById.get(other.holding);
+            if (held !== undefined) drop(held, other, land);
+          }
           dweller.scene = scene;
           other.scene = scene;
           scenes.push(scene);

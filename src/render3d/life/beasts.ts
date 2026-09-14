@@ -219,6 +219,9 @@ export function createBeasts(state: GameState, land: Terrain, heart: Point, seed
       travelled: 0,
       scene: null,
       sceneCooldownUntil: 0,
+      // V-09: la cabaña no coge trastos. Nunca cambian.
+      holding: null,
+      aimAt: null,
       rethinkAt: Math.floor((hash32(seed, `beast:think:${id}`) / 4_294_967_296) * RETHINK),
     };
     beasts.push({

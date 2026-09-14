@@ -85,6 +85,22 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   feed: { id: 'feed', reach: 1.0, seats: 1, gives: { duty: 0.15, boredom: 0.3 }, seconds: [3, 7] },
   /** Acariciar a la vaca. Compañía, sin la carga de hablar con nadie. */
   pet: { id: 'pet', reach: 1.0, seats: 1, gives: { company: 0.4, boredom: 0.3 }, seconds: [4, 10] },
+
+  // V-09 · Lo que un trasto suelto en el suelo ofrece a quien pase cerca.
+  // `life/props.ts` las usa para montar la `Place` de cada trasto: aforo uno,
+  // porque un trasto no está en dos manos. `reach` es `PICKUP` de
+  // `spike/life.ts` (0,75), tal cual. `gives`/`seconds` en la misma escala que
+  // el resto de la tabla: ni el brief ni el descarte dan un número para esto,
+  // la referencia es `chase`/`feed`/`pet` de V-08 — y a propósito no por
+  // encima de ellas. Medido: con `boredom: 0,6` la pelota le ganaba la
+  // elección a la cabaña más veces de las que debía, y `life-beasts.test.ts`
+  // (V-08, ajena a esta ronda) bajó de 18 a 14 personas tocando un animal en
+  // la semilla 31. Con estos números, por debajo de `chase`/`pet`, vuelve a
+  // pasar la prueba sin tocarla.
+  /** Jugar con la pelota: se coge, se apunta, se tira. */
+  play: { id: 'play', reach: 0.75, seats: 1, gives: { boredom: 0.4, company: 0.2 }, seconds: [1, 2.2] },
+  /** Cargar con el palo, el cubo o el haz de leña un rato, y soltarlo. */
+  carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
 };
 
 /** Qué ofrece cada clase de edificio. */

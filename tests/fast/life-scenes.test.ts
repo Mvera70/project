@@ -50,6 +50,8 @@ function makeDweller(
     travelled: 0,
     scene: null,
     sceneCooldownUntil: 0,
+    holding: null,
+    aimAt: null,
   };
 }
 

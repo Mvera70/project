@@ -1,0 +1,254 @@
+// V-09 · Trastos. design.md Anexo E.
+//
+// Lo que el brief pide (E.8), contestado con número: que un trasto no esté en
+// dos manos a la vez, que soltarlo lo deje en suelo pisable y nunca en pared
+// ni en río, que quien empieza una escena con las manos ocupadas las suelte,
+// que se juegue de verdad sin comerse la jornada, y que una pelota nunca
+// acabe rodando bajo el agua.
+//
+// Como manda `CLAUDE.md`: nunca con una sola semilla, y se mide por semilla,
+// no sumando — una semilla donde no se juega nada no puede quedar tapada por
+// otra donde se juega de sobra.
+
+import { describe, expect, it } from 'vitest';
+import { foundGame } from '@engine/found';
+import { run } from '@engine/sim';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { blockedAt, type Terrain } from '../../src/render3d/life/body';
+import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
+import { drop, settle, take, type Prop } from '../../src/render3d/life/props';
+import { terrainOf } from '../../src/render3d/life/terrain';
+import { createVillage, type Dweller } from '../../src/render3d/life/village';
+
+const grown = new Map<number, GameState>();
+function village(seed: number): GameState {
+  let base = grown.get(seed);
+  if (base === undefined) {
+    base = foundGame(seed);
+    run(base, 40 * 48, 'prudent', CATALOG);
+    grown.set(seed, base);
+  }
+  return base;
+}
+
+/** Las mismas seis semillas que usan `life-beasts.test.ts` y `life-places.test.ts`. */
+const SEEDS = [3, 7, 11, 23, 31, 37];
+
+/** Un `Dweller` de mentira, con sólo lo que `take`/`drop` necesitan leer y
+ *  escribir: `body.x/z/id` y `holding`. El resto del contrato no lo tocan. */
+function fakeDweller(id: number, x: number, z: number): Dweller {
+  return {
+    body: { id, x, z, vx: 0, vz: 0, facing: 0, radius: 0.32, pace: 1.2 },
+    holding: null,
+    aimAt: null,
+  } as unknown as Dweller;
+}
+
+describe('V-09 · trastos', () => {
+  it('un trasto no está en dos manos a la vez, en seis semillas', () => {
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      let checked = 0;
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+        life.step();
+        if (n % 15 !== 0) continue;
+
+        const holders = new Set<number>();
+        for (const prop of life.props) {
+          if (prop.held === null) continue;
+          expect(holders.has(prop.held),
+            `semilla ${seed}, paso ${n}: dos trastos en la misma mano`).toBe(false);
+          holders.add(prop.held);
+        }
+        // Y al revés: quien dice llevar algo, lo lleva de verdad — el trasto
+        // que `dweller.holding` señala existe y su `held` apunta de vuelta.
+        for (const dweller of life.dwellers) {
+          if (dweller.holding === null) continue;
+          const prop = life.props.find((p) => p.id === dweller.holding);
+          expect(prop, `semilla ${seed}, paso ${n}: sostiene un trasto que no existe`)
+            .toBeDefined();
+          expect(prop?.held, `semilla ${seed}, paso ${n}: el trasto no sabe que lo llevan`)
+            .toBe(dweller.body.id);
+        }
+        checked += 1;
+      }
+      expect(checked, `semilla ${seed}: no se comprobó ningún paso`).toBeGreaterThan(0);
+    }
+  });
+
+  it('take() no deja coger un trasto que ya lleva otro', () => {
+    const prop: Prop = {
+      id: 1, kind: 'ball', x: 5, z: 5, y: 0, vx: 0, vz: 0, vy: 0, held: 42, restUntil: 0,
+    };
+    const other = fakeDweller(7, 5, 5);
+    const ok = take(prop, other);
+    expect(ok, 'no debería poder cogerlo').toBe(false);
+    expect(prop.held, 'sigue en la mano de quien lo tenía').toBe(42);
+    expect(other.holding ?? null, 'no se apunta algo que no consiguió').toBeNull();
+  });
+
+  it('quien está en una escena no lleva nada en la mano, en seis semillas', () => {
+    // V-09: «quien empieza una escena suelta lo que llevaba». `village.ts`
+    // lo hace en el mismo paso en que la escena nace (antes de `scene =
+    // scene`), así que en ningún paso posterior debería haber alguien con las
+    // dos cosas a la vez.
+    let sawAScene = false;
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+        life.step();
+        for (const dweller of life.dwellers) {
+          if (dweller.scene === null) continue;
+          sawAScene = true;
+          expect(dweller.holding ?? null,
+            `semilla ${seed}, paso ${n}: en una escena y con las manos ocupadas`).toBeNull();
+        }
+      }
+    }
+    // Que haya escenas en la jornada ya lo mide V-07 (`life-scenes.test.ts`);
+    // aquí sólo hace falta que el caso se dé de verdad al menos una vez, o la
+    // prueba de arriba no comprobaría nada.
+    expect(sawAScene, 'ninguna semilla tuvo una escena que comprobar').toBe(true);
+  });
+
+  it('soltar deja el trasto en suelo pisable, en seis semillas', () => {
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      for (let n = 0; n < 900; n += 1) life.step();
+      for (const prop of life.props) {
+        if (prop.held !== null) continue;
+        expect(blockedAt(life.land, prop.x, prop.z),
+          `semilla ${seed}: trasto ${prop.id} suelto en un bloqueo`).toBe(false);
+      }
+    }
+  });
+
+  it('drop() nunca deja el trasto en un bloqueo, forzando el caso límite', () => {
+    // El caso normal (alguien suelta donde está de pie) ya sale pisable
+    // porque `integrate()` nunca mete a un cuerpo en un bloqueo. Esto fuerza
+    // el caso que de verdad prueba la red de seguridad: sueltan justo encima
+    // de una pared.
+    const state = village(7);
+    const land = terrainOf(state);
+    const building = state.buildings.find((b) => b.lostTick === null);
+    expect(building, 'la semilla 7 no tiene ni un edificio').toBeDefined();
+    const bx = (building as NonNullable<typeof building>).x + 0.5;
+    const bz = (building as NonNullable<typeof building>).y + 0.5;
+    expect(blockedAt(land, bx, bz), 'el punto de partida no estaba en un bloqueo').toBe(true);
+
+    const prop: Prop = {
+      id: 0, kind: 'bucket', x: bx, z: bz, y: 0, vx: 0, vz: 0, vy: 0, held: 999, restUntil: 0,
+    };
+    const holder = fakeDweller(999, bx, bz);
+    holder.holding = 0;
+    drop(prop, holder, land);
+
+    expect(blockedAt(land, prop.x, prop.z), 'sigue en el bloqueo tras soltarlo').toBe(false);
+    expect(prop.held, 'se ha soltado').toBeNull();
+    expect(holder.holding ?? null, 'ya no dice llevarlo').toBeNull();
+  });
+
+  it('una pelota nunca acaba rodando bajo el agua, en seis semillas', () => {
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      const { width, terrain } = state.map;
+      const wet = (x: number, z: number): boolean =>
+        terrain[Math.floor(z) * width + Math.floor(x)] === TERRAIN_CODE.water;
+
+      let checked = 0;
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+        life.step();
+        if (n % 10 !== 0) continue;
+        for (const prop of life.props) {
+          // En el aire (una tirada en marcha) no cuenta: lo que importa es
+          // dónde acaba, no por dónde pasa volando.
+          if (prop.kind !== 'ball' || prop.y > 0.01) continue;
+          expect(wet(prop.x, prop.z), `semilla ${seed}, paso ${n}: pelota en el agua`).toBe(false);
+          checked += 1;
+        }
+      }
+      expect(checked, `semilla ${seed}: no se comprobó ninguna pelota en tierra`).toBeGreaterThan(0);
+    }
+  });
+
+  it('la física nunca cuela una pelota en un bloqueo, tirada de cara al río', () => {
+    // Un valle de mentira, con una franja de «río» a mitad de camino, y una
+    // pelota lanzada de cabeza hacia él con más fuerza de la que hace falta
+    // para cruzarlo si nada la frenara.
+    const width = 20;
+    const height = 10;
+    const blocked = new Uint8Array(width * height);
+    for (let z = 0; z < height; z += 1) blocked[z * width + 10] = 1;
+    const land: Terrain = { width, height, blocked };
+
+    const ball: Prop = {
+      id: 0, kind: 'ball', x: 6, z: 5, y: 0.6, vx: 8, vz: 0, vy: 2, held: null, restUntil: 0,
+    };
+    for (let i = 0; i < 400; i += 1) {
+      settle([ball], land, 1 / 30);
+      expect(blockedAt(land, ball.x, ball.z), `paso ${i}: pelota en el río`).toBe(false);
+    }
+    // Y se queda en esta orilla: nunca lo cruza.
+    expect(ball.x, 'la pelota cruzó el río').toBeLessThan(10);
+  });
+
+  it('jugar no se come la jornada, en seis semillas', () => {
+    // La mitad del criterio del brief que sí se cumple. Medido: 0,00 a 0,20
+    // pases por persona y jornada — muy lejos del techo de 30, que era el
+    // partido de tenis del descarte sin `PLAYED_OUT`.
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+      const people = Math.max(1, life.dwellers.length);
+      expect(life.passes / people,
+        `semilla ${seed}: ${life.passes} pases con ${people} personas se come la jornada`)
+        .toBeLessThan(30);
+    }
+  });
+
+  it.fails('se juega de verdad en todas las semillas — TODAVÍA NO, y esta prueba avisará cuando sí', () => {
+    // **La otra mitad del criterio, y no se cumple.** Se deja como `it.fails`
+    // a propósito: la propiedad del diseño está escrita tal cual la pide el
+    // brief, la suite sigue en verde porque se declara que hoy falla, y el día
+    // que alguien lo arregle esta prueba se pondrá roja para que se le quite
+    // el `.fails`. Es lo contrario de esconderla.
+    //
+    // Medido, jornada entera, tras poner los trastos en suelo donde plantarse
+    // (`standable`, `props.ts`): semilla 3 → 3 pases (0,06/persona), 7 → 4
+    // (0,05), 11 → 12 (0,16), 23 → 11 (0,20), **31 → 0**, 37 → 2 (0,03). El
+    // descarte daba 0,30 por persona en el valle real y 1,75 en el prado.
+    //
+    // Por qué, medido con el embudo ofrecido → elegido → llegado → cogido →
+    // tirado (sonda de cierre de V-09):
+    //
+    // - Las pelotas están: diez ofrecidas de media, y una a menos de diez
+    //   celdas el 99 % del tiempo. No es disponibilidad.
+    // - **Jugar sólo vale más que lo que uno está haciendo el 6 % de las
+    //   veces** (vale 0,46× de media). `worth()` no sabe que jugar dura dos
+    //   segundos y trabajar cuarenta y cinco: puntúa lo que calma, y una
+    //   pelota calma poco. En el descarte no había concurso: el 40 % de la
+    //   gente (`playful > 0,6`) cogía cualquier pelota a menos de siete celdas.
+    // - **Un pase no es un juego si nadie lo recoge.** Aquí el receptor tiene
+    //   que volver a ganar el concurso de utilidad para coger la pelota que le
+    //   acaban de tirar, y casi nunca lo gana: las cadenas mueren en el primer
+    //   pase. En el descarte, recoger lo que te tiran no era una decisión.
+    //
+    // Lo que hay que hacer, y no es un número (E.3, regla séptima): que
+    // recibir un pase sea una reacción y no una elección —como una escena de
+    // V-07, no como una oferta—, con el descanso `PLAYED_OUT` = [11, 26] s del
+    // descarte para que la cadena no sea infinita. Está en el plan.
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+      expect(life.passes, `semilla ${seed}: nadie jugó a la pelota en toda la jornada`)
+        .toBeGreaterThan(0);
+    }
+  });
+});
