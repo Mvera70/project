@@ -223,3 +223,61 @@ Mover `NEIGHBOUR.FRICTION` o `CHARACTER.AMBITIOUS_PASSED_OVER` hacia abajo
 devolvería los números viejos y con ellos el valle sin rencores del apartado 1.
 No es un cambio pendiente: es la decisión de qué se quiere, y la toma el dueño
 del diseño.
+
+## 7. Por qué medio catálogo no sale, plantilla a plantilla (14 sep 2026)
+
+§2 midió que el jugador decide poco y que medio catálogo está muerto. Lo que
+faltaba era **por qué**, y «no sale» son tres cosas distintas que se arreglan de
+maneras distintas. `tools/eligibility-report.ts` las separa: recorre la partida
+tick a tick y, para cada plantilla, cuenta en cuántos cumple sus condiciones, en
+cuántos llega a ofrecerse, cuántas veces se plantea de verdad, y **qué condición
+concreta la bloquea** cuando falla.
+
+Medido en cuatro semillas × sesenta años (11 520 ticks), política `prudent`:
+
+**El ritmo: 19,3 encrucijadas por partida de sesenta años — 3,2 por década.**
+Coincide con lo que §2 midió a cuarenta años (siete a doce): el ritmo no ha
+cambiado, sólo está ahora medido con más semillas.
+
+**Siete de veinte plantillas no salen ni una vez.** Y de las que salen, dos se
+llevan la mitad de todas las decisiones de la partida: `succession` 22 veces y
+`forest_cut` 16, de 77 en total. La aldea no tiene medio catálogo: tiene dos
+plantillas que se repiten y un puñado de invitadas.
+
+### Tres hallazgos que no son «pocas veces», son fallos
+
+**1. `wolf_winter` es imposible por construcción.** Exige `forestLeft > 0.25`.
+Medido en tres semillas × sesenta años, `forestLeft` va de 0,177 a **0,244**: no
+llega al umbral **nunca, en ninguna partida**. La causa es que `forestLeft` es
+*bosque sobre el mapa entero* y la condición está escrita como si fuera *lo que
+queda del bosque original*; el valle nace con un 24 % de bosque, así que el
+umbral está por encima del máximo posible. No es una plantilla rara: es una
+plantilla muerta, y lleva así desde que se escribió.
+
+**2. `tithe_demand` cuelga de una cadena rota.** Exige la bandera `vassal`, que
+falla el **100 %** de los ticks porque nada la pone nunca. Hay que ver qué
+debía ponerla.
+
+**3. `quiet_years`, que es el `FALLBACK_ID`, no se plantea ni una vez.** El
+recurso para cuando no hay nada que contar no llega a usarse: exige
+`grainYears > 1`, que falla el 44 % de los ticks, y compite como una más.
+
+### Y un patrón que explica el resto
+
+Casi todas las plantillas llevan una condición de estación, que por sí sola
+cuesta el **75 % de los ticks**, sumada a otra condición rara. Las dos se
+multiplican: `strangers_at_the_ford` cumple todo el 3,18 % del tiempo,
+`first_stone` el 6,49 %, `bandits` el 0,02 %. No hace falta que ninguna sea
+imposible para que el catálogo se quede en dos plantillas repitiéndose.
+
+### Qué decidir, y no se decide aquí
+
+- Los dos fallos (1 y 2) se arreglan sin tocar diseño: el umbral de
+  `forestLeft` y la cadena de `vassal`.
+- Lo otro es la pregunta de `docs/roadmap.md` §1: **¿cada cuánto quiere el juego
+  que decidas?** Hoy son tres veces por década y dos de cada cuatro son la misma
+  plantilla. Relajar las estaciones, bajar umbrales o añadir plantillas ligeras
+  que salgan a menudo son tres respuestas distintas con consecuencias distintas
+  sobre el balance, y las decide el dueño del diseño con esta tabla delante.
+
+Para repetir la medida: `npx tsx tools/eligibility-report.ts 7 11 23 --years 60`.
