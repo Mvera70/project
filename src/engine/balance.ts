@@ -811,6 +811,66 @@ export const NEIGHBOUR = {
   // alguien de tanto segar a su lado; para quererlo hace falta que pase algo,
   // y eso lo cuenta el catálogo.
   CEILING: 35,
+
+  // --- §7.9, v3.60 · y la otra cara -----------------------------------------
+  //
+  // Hasta aquí la convivencia **siempre acercaba**, y era la única fuerza
+  // continua del mundo sobre las opiniones: todo lo demás —las tres de §6.4, la
+  // riña— necesita una encrucijada, y salen entre siete y doce en cuarenta años
+  // (`findings-drama.md` §2). El valle derivaba por tanto hacia la concordia sin
+  // remedio, ningún par llegaba jamás a −50, y sin ese cruce no hay rencor, sin
+  // rencor no hay riña y sin riña nada empuja una opinión hacia abajo. **Un ciclo
+  // que necesitaba un empujón que nadie daba.** Medido: cero rencores y cero
+  // riñas en tres partidas de cuarenta años.
+  //
+  // Esto es el empujón, y no es un número suelto: es que la convivencia deje de
+  // ser incondicional. Verse todos los días acerca o desgasta según con quién y
+  // según cómo venga el año, que es lo que pasa de verdad.
+
+  /**
+   * TUNE: lo que **resta** por semana el roce entre dos caracteres ásperos.
+   *
+   * Negativo y algo mayor que `PER_WEEK`, porque el desgaste tiene que ganarle
+   * al olvido de §6.4 (0,05 hacia cero) para llegar a alguna parte: neto −0,13
+   * por semana compartida. Ocho años de segar el mismo campo al lado del mismo
+   * hombre difícil para llegar a detestarlo. Un feudo se cuece despacio, y ése
+   * es justamente el punto: el catálogo da los estallidos, esto da el poso.
+   */
+  FRICTION: -0.12,
+  /**
+   * Los caracteres que se rozan. Son los cinco que el valle ya trataba como
+   * difíciles —`temper` en las riñas pesa tres de ellos—, así que esto no
+   * inventa una tipología nueva: la usa donde faltaba.
+   */
+  HARSH: ['spiteful', 'proud', 'stubborn', 'hot_tempered', 'greedy'],
+  /**
+   * Y los que la desactivan. Basta uno de los dos: alguien amable al lado
+   * aguanta a cualquiera, y eso ya es lo que `kind` hace en la riña (×0,4).
+   * Sin esta válvula, ocho nombrados con rasgos ásperos repartidos daban un
+   * valle donde nadie se aguanta, que es el error contrario al de partida.
+   */
+  GENTLE: ['kind', 'generous'],
+  /**
+   * TUNE: cuánto agria el hambre el roce de todos con todos.
+   *
+   * La convivencia se multiplica por `1 − severity · SOURS`, así que un tercio
+   * de hambre la anula y el hambre entera la vuelve del revés. Es la pieza que
+   * conecta jugar mal con que la aldea se rompa por dentro: pasar hambre no
+   * sólo mata gente, enemista a la que queda. §12.9 pide veinte puntos de
+   * distancia entre la política prudente y la adversa y había once; este es el
+   * bucle que faltaba, porque hasta ahora el hambre sólo le pasaba factura al
+   * líder (`OPINION.HUNGER_TO_LEADER`) y no a los vecinos entre sí.
+   */
+  SOURS: 3,
+  /**
+   * TUNE: hasta dónde puede hundir el trato diario, y no más.
+   *
+   * Simétrico a `CEILING` y con la misma razón: la convivencia sola llega a
+   * detestar —cruza el −50 de `OPINION.GRUDGE_AT`, que es lo que desbloquea el
+   * ciclo— pero no al odio de los cien puntos. Para eso tiene que **pasar**
+   * algo, y eso lo cuenta el catálogo.
+   */
+  FLOOR: -60,
 } as const;
 
 export const MEMORY = {

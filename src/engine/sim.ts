@@ -15,7 +15,7 @@ import {
 import { decayMemories } from './people/memories';
 import { driftOpinions, opinionOf } from './people/opinions';
 import { quarrelOf } from './people/quarrels';
-import { workedTogether } from './people/neighbours';
+import { rubShoulders, workedTogether } from './people/neighbours';
 import { ageOf, minAgeFor, promoteToNamed } from './people/villagers';
 import { pick } from './rng';
 import type {
@@ -957,7 +957,12 @@ export function tick(
     if (crew === undefined) crews.set(at, [id]);
     else crew.push(id);
   }
-  workedTogether(state, [...crews.values()]);
+  // El hambre de esta semana entra aqui: §7.9 v3.60, el ano que se pasa hambre
+  // el trato diario se agria con todos y no solo con el lider.
+  workedTogether(state, [...crews.values()], severity);
+  // Y el roce de vivir juntos, que no necesita compartir tarea: va sobre todos
+  // los nombrados porque el olvido de §6.4 tambien va sobre todos.
+  rubShoulders(state, severity);
 
   // §7.9, v3.07: y lo que pasa cuando dos ya no se aguantan. Va después del
   // roce de la semana y antes de la encrucijada, porque una riña de hoy tiene
