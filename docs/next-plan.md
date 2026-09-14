@@ -190,3 +190,41 @@ Tras cada entrega de A o B, un agente con `docs/agents.md` §«Cómo se audita l
 que entrega un agente» delante: ancla del worktree, diff entero, pruebas con
 desconfianza, remedir. Escribe su informe en `docs/life-rounds/<ronda>-audit.md`
 y **no fusiona**: marca lo que hay que mirar. La sesión cara sólo lee eso.
+
+
+---
+
+## Lo primero al retomar: el recalibrado de `wolf_winter`
+
+**Está hecho y sin fusionar, en la rama `worktree-agent-afdfba3b92d4bb7ee`**
+(commit `40708c7`). Baja el umbral de `forestLeft` de 0,25 a 0,15 en
+`src/engine/crossroads/catalog/forest.ts`, que es lo correcto: la condición era
+imposible por construcción y es la misma errata que `forest_cut` tuvo con su 0,3
+y se corrigió así en v2.47. Trae además una prueba nueva
+(`tests/fast/crossroads-reachability.test.ts`) que vigila que ninguna plantilla
+del catálogo tenga una condición inalcanzable — la prueba que habría cazado esto
+el día que se escribió.
+
+**Por qué no se fusionó:** hacerlo elegible mete veintiuna encrucijadas nuevas
+en la ventana medida, y eso cambia la trayectoria de cada partida. **Trece
+pruebas calibradas sobre semillas concretas pasan a fallar**, comprobado con y
+sin el cambio en los mismos ficheros seguidos (5 fallos con, 24 de 24 sin). No
+es ruido de carga, aunque lo parezca: el informe del agente lo dio por
+flakiness y no lo es.
+
+**Lo que cuesta retomarlo**, y es una ronda entera, no un commit:
+
+1. Fusionar la rama y correr la suite para tener la lista exacta de las trece.
+2. Para cada una, **remedir y recalibrar, no subir el número hasta que pase**.
+   Varias son de la capa de vida y miden propiedades sobre semillas concretas
+   (`life-props`, `marks`, `daylife`, `graphics-actors`, `life-spike`, `trade`);
+   dos están justo en el borde de su umbral por coma flotante y se arreglan
+   solas con la aldea nueva, pero hay que mirarlas una a una.
+3. Volver a pasar `tools/eligibility-report.ts` y anotar el ritmo nuevo: antes
+   3,2 encrucijadas por década, y con `wolf_winter` viva habrá que ver.
+
+Y la lección que deja, que es la que ordena el resto del carril del ritmo:
+**tocar la elegibilidad de una sola plantilla mueve el balance entero.** Las
+otras dos vías decididas —relajar condiciones y escribir plantillas nuevas— van
+a costar lo mismo o más, y por eso el orden escrito en `docs/roadmap.md` dice
+*un paso, remedir, siguiente paso*.
