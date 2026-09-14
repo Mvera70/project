@@ -319,9 +319,14 @@ dos, V-08 los animales como agentes, V-10 los sitios comunes, V-13 la medida**;
 V-14 el cuenco. Todo dentro del juego detrás de `valley.life`. Informes con lo
 medido en `docs/life-rounds/`, más `sonda-linea-base.md` con ocho semillas.
 
-**Siguiente: V-09, los trastos.** Es lo que más falta para parecerse al
-descarte: allí los pases de pelota y los golpes son 0,56 por persona y jornada,
-y aquí no existen.
+**V-09, los trastos, está abierta.** Existen, se cogen, se sueltan y se tiran
+con la física del descarte, pero casi nadie juega: 0–0,20 pases por persona
+contra 0,30 del descarte, con la causa medida en `docs/life-rounds/V-09.md` y
+lo que hay que hacer en `docs/next-plan.md` (V-09b). No se pintan todavía: no
+hay modelo.
+
+**Lo que viene, con briefs para agentes, está en `docs/next-plan.md`.** Y
+ahora se puede mirar el juego montado sin red: `tools/graphics/shot.mjs`.
 
 **El diagnóstico de E.6 estaba equivocado, y esto es lo importante que hay que
 saber antes de tocar nada.** Decía que la aldea se pasaba el 74–81 % del día en

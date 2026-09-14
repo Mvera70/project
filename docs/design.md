@@ -9204,6 +9204,7 @@ entregó y el número que lo prueba.
 | **V-08** | `life/beasts.ts` | Gallinas, cerdos y vacas como `Dweller` con impulso propio, y una `Place` móvil que ofrece `pet`/`chase`/`feed` | 0 animales en el agua en 6 semillas; interacción persona-animal en todas las semillas con cabaña (1 411 a 4 895 instantes); `ashore` de 1,08 a 0,326 celdas |
 | **V-10** | `life/places.ts` | La plaza, el vado y el claro: sitios que no son un edificio | Los tres se detectan y son alcanzables en 6 de 6 semillas; visitados en la mayoría (plaza 4/6, claro 5/6, vado 3/6) |
 | **V-13** | `tests/fast/life-perf.test.ts` | La medida del coste por cuerpo, continua | 0,75 µs con 80, 1,02 µs con 200: sube un 36 % al multiplicar por 2,5 la gente |
+| **V-09** (abierta) | `life/props.ts` | Pelota, palo, cubo, haz: se reparten, se cogen, se sueltan, se tiran y ruedan; física del descarte | Un trasto nunca en dos manos, nunca bajo el agua, 6 semillas. Pero 0–0,20 pases por persona contra 0,30 del descarte: jugar gana el concurso de utilidad el 6 % de las veces y el receptor no recoge. Está en `docs/next-plan.md` (V-09b) |
 | **V-14** | `world/ridge.ts` | El cuenco, fuera del mapa | 0 celdas del valle tocadas; 32 % del bosque vive en el borde y habría desaparecido |
 | **(arreglo)** | `life/offers.ts`, `decide.ts` | Las plazas del corro se comprueban al montar el sitio, y `decide` prueba la siguiente oferta si no hay camino | Sin nada que hacer, 33 % → **0 %**; andando, 26 % → **75 %**, que es la cifra del descarte |
 
