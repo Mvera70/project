@@ -41,17 +41,44 @@
  * de la ronda que los recalibra está en `docs/next-plan.md`.
  * ---------------------------------------------------------------------------
  */
-import { test } from '@playwright/test';
+import { test, type Page } from '@playwright/test';
 
 /** La puerta de vuelta, pedida a propósito. Ver la cabecera. */
 const CANVAS = '/?render=canvas';
+
+/**
+ * Contesta la encrucijada que hubiera planteada, si la hay.
+ *
+ * **Y hace falta desde el mapa grande** (v3.68): estas rutas fijan semilla y
+ * año —«semilla 7, año 80»— y el valle nuevo planta en ese punto una decisión
+ * que antes no estaba. §11.2 le da la pantalla entera y con ella esconde el
+ * mando de velocidad, así que `getByRole('16×')` se quedaba esperando los ciento
+ * veinte segundos del tope: cuatro recorridos tardando dos minutos cada uno en
+ * no hacer nada.
+ *
+ * Contestar es lo que haría el jugador, y deja la pantalla como la prueba la
+ * espera. Lo que no se puede es fijar otro año: cualquiera puede tener una
+ * decisión encima según el valle, que es precisamente la gracia del juego.
+ */
+async function answerAnyCrossroad(page: Page): Promise<void> {
+  const options = page.locator('.crossroad-options button');
+  if (await options.count() === 0) return;
+  await options.first().click();
+  await page.locator('.crossroad-scrim').waitFor({ state: 'detached' });
+}
 
 test('la ruta de depuración llega al lienzo móvil sin interacción', async ({ page }) => {
   await page.goto('/?debug=1&seed=7&year=1&season=spring');
   await page.locator('html[data-debug-ready="true"]').waitFor();
   await page.locator('#valley').screenshot({ path: 'artifacts/debug-route.png' });
-  await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
-  await test.expect(page.locator('#valley')).toHaveCSS('height', '560px');
+  // **El doble de ancho desde el mapa grande, y a propósito.** La ruta de
+  // depuración pinta a diez píxeles por celda fijos (`ui/debug.ts`) porque su
+  // trabajo es auditar los sprites a su tamaño de diseño, no caber en un
+  // teléfono: con el valle en 72 × 112 eso son 720 × 1 120. Quien quiera el
+  // lienzo que cabe en la pantalla, ésa es la ruta normal, que sigue usando
+  // `cellFor` y da cinco píxeles por celda.
+  await test.expect(page.locator('#valley')).toHaveCSS('width', '720px');
+  await test.expect(page.locator('#valley')).toHaveCSS('height', '1120px');
 });
 
 test('cada edificio pinta dentro de su caja a 9 y 10 px sobre claro y oscuro', async ({ page }) => {
@@ -92,9 +119,20 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
 test('la ruta viva abre un valle maduro determinista para revisar la multitud', async ({ page }) => {
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
   await test.expect(page.locator('.valley-year')).toHaveText('ANNO LXXXI');
+  // **El lienzo mide lo que mide el valle**, y desde el mapa grande son 72 × 112
+  // celdas: la ruta viva usa `cellFor`, que a 390 px de ancho da cinco píxeles
+  // por celda, así que el lienzo sigue cabiendo en la pantalla igual que antes.
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
-  await page.locator('#valley').click({ position: { x: 180, y: 280 } });
+  // **Y se toca el centro del lienzo, no un punto fijo.** Era (180, 280) —el
+  // centro del valle de 36 × 56 a diez píxeles— y con el mapa nuevo ese píxel
+  // cayó en el cuadrante noroeste, donde no hay nada que abrir. El centro es
+  // donde está la aldea, porque ahí se funda (§7.1) y de ahí no se mueve: los
+  // topes de §12 son absolutos y `placeBuilding` sólo construye en el corazón.
+  const canvas = page.locator('#valley');
+  const box = await canvas.boundingBox();
+  await canvas.click({ position: { x: (box?.width ?? 360) / 2, y: (box?.height ?? 560) / 2 } });
   await test.expect(page.locator('.valley-panel')).toBeVisible();
   await test.expect(page.locator('.valley-panel h2')).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
@@ -120,6 +158,7 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
   await page.getByRole('button', { name: '16×', exact: true }).click();
   await page.clock.runFor(58_000);
 
@@ -154,6 +193,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
   await page.getByRole('button', { name: '16×', exact: true }).click();
   // Menos de 20 ticks: este estado no puede llegar al disco por el autoguardado.
   // `pagehide` tiene que solicitar la instantánea antes de detener el bucle.
@@ -305,6 +345,7 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS);
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
   await page.getByRole('button', { name: '16×', exact: true }).click();
   await page.clock.runFor(5_000);
 
@@ -337,6 +378,7 @@ test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
   await page.getByRole('button', { name: '16×', exact: true }).click();
 
   const notice = page.locator('.valley-notice');
