@@ -78,6 +78,9 @@ const STYLE = `
    valen para la semana que viene, no para esto. El aviso de §11.6 ya se
    ocultaba por la misma razón (index.html). */
 .crossroad-open .valley-speeds,
+.crossroad-open .valley-speed-badge,
+.crossroad-open .valley-orders-now,
+.crossroad-open .valley-orders,
 .crossroad-open .valley-vitals,
 .crossroad-open .valley-orders,
 .crossroad-open .valley-doing,

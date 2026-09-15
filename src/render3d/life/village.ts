@@ -144,7 +144,23 @@ export interface Village {
  * El estado llega **congelado** (§D.6.7): lo que el motor decida durante el día
  * entra mañana. Aquí no se lee nada que pueda cambiar a media jornada.
  */
-export function createVillage(state: GameState, day: number): Village {
+/**
+ * Lo que una jornada puede llevar además de la gente y la cabaña.
+ *
+ * `props` son los trastos de V-09 —la pelota, el palo, el cubo, el haz—, y
+ * **en el juego van apagados** (15 sep 2026). Eran el descarte de físicas de
+ * `spike/life.ts` portado tal cual, y el dueño del diseño lo dijo sin rodeos:
+ * «esas pelotas eran de prueba, ahora mismo no tiene ningún sentido que haya
+ * pelotas por ahí, además están atravesando el suelo». Tenía razón en las dos
+ * cosas. La maquinaria se queda —se prueba con esta opción encendida— por si
+ * algún día un trasto tiene sentido en su sitio: un cubo junto al pozo, un haz
+ * junto a la leñera. Repartidos por el prado, no.
+ */
+export interface DayOptions {
+  readonly props?: boolean;
+}
+
+export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = terrainOf(state);
   const seed = seedOfDay(state.seed, day);
   // V-11 · **Y lo que el motor haya ordenado para hoy manda sobre todo esto.**
@@ -234,7 +250,7 @@ export function createVillage(state: GameState, day: number): Village {
   // V-09: los trastos de la jornada, anclados a puertas de verdad y por tanto
   // ya en la orilla que se usa (`scatter`, `props.ts`). `propsById` es cómo
   // `village.ts` vuelve de «qué trasto lleva éste» (un id) al trasto mismo.
-  const props: Prop[] = scatter(state, land, seed);
+  const props: Prop[] = options.props === true ? scatter(state, land, seed) : [];
   const propsById = new Map(props.map((prop) => [prop.id, prop]));
 
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);

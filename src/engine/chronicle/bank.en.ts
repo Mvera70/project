@@ -1730,6 +1730,12 @@ export const UI_BANK: Record<string, string> = {
   // una orden que un alguacil entendería, «1,5×» no. Tres posiciones cada una,
   // porque tres es una decisión y cinco es un dial.
   'app.orders': 'Standing orders',
+  // La línea que resume las tres órdenes con la hoja cerrada (`app.ts`). Las
+  // posiciones entran en minúscula porque van en mitad de una frase.
+  'app.orders.now': 'Sowing {sowing} · hands to {hands} · building {build}',
+  'app.orders.open': 'Change the standing orders',
+  // El botón de velocidad enseña la velocidad de ahora; esto es lo que anuncia.
+  'app.speed.open': 'Change the speed',
   'app.sowing': 'Sowing',
   'app.sowing.lean': 'Lean',
   'app.sowing.enough': 'Enough',

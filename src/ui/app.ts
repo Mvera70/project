@@ -227,9 +227,40 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const doing = document.createElement('p');
   doing.className = 'valley-doing';
 
-  const orders = document.createElement('div');
-  orders.className = 'valley-orders';
+  //
+  // **Y desde el 15 sep 2026 es una hoja, no tres filas a la vista.** Las tres
+  // filas de doce botones se comían el tercio de arriba de la pantalla, siempre
+  // abiertas, encima del valle: un panel de control de desarrollador y no un
+  // juego. El dueño del diseño lo dijo sin rodeos —«las nuevas acciones que has
+  // puesto ahí con los botones así, comiéndose media pantalla»— y tenía razón.
+  //
+  // Ahora hay **una línea** bajo la frase de estado que dice cómo están puestas
+  // las órdenes, y tocarla abre esta hoja desde abajo, con la misma piel que la
+  // ficha de un edificio. Cerrada no ocupa nada. Las tres palancas siguen siendo
+  // las mismas: lo que cambia es que el valle vuelve a ser la pantalla.
+  const orders = document.createElement('section');
+  orders.className = 'valley-panel valley-orders';
   orders.setAttribute('aria-label', renderUiText('app.orders'));
+  orders.hidden = true;
+  const ordersClose = document.createElement('button');
+  ordersClose.type = 'button';
+  ordersClose.className = 'valley-panel-close';
+  ordersClose.setAttribute('aria-label', renderUiText('app.close'));
+  ordersClose.textContent = '×';
+  ordersClose.addEventListener('click', () => { orders.hidden = true; });
+  const ordersTitle = document.createElement('h2');
+  ordersTitle.textContent = renderUiText('app.orders');
+  orders.append(ordersClose, ordersTitle);
+
+  /** La línea que resume las órdenes, y la puerta de la hoja. */
+  const ordersNow = document.createElement('button');
+  ordersNow.type = 'button';
+  ordersNow.className = 'valley-orders-now';
+  ordersNow.setAttribute('aria-label', renderUiText('app.orders.open'));
+  ordersNow.addEventListener('click', () => {
+    orders.hidden = !orders.hidden;
+    if (!orders.hidden) panel.hidden = true;
+  });
   interface Row {
     readonly current: () => string;
     readonly buttons: readonly (readonly [string, HTMLButtonElement])[];
@@ -311,6 +342,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         button.setAttribute('aria-pressed', String(key === now));
       }
     }
+    // Y la línea de resumen, con las posiciones en minúscula porque van en
+    // mitad de una frase.
+    const lower = (key: string): string => renderUiText(key).toLowerCase();
+    ordersNow.textContent = renderUiText('app.orders.now', {
+      sowing: lower(`app.sowing.${stopOf('fields', state.intent.fields)}`),
+      hands: lower(`app.hands.${stopOf('timber', state.intent.timber)}`),
+      build: lower(`app.build.${state.intent.priority}`),
+    });
   };
 
   const controls = document.createElement('div');
@@ -351,9 +390,23 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
   soundToggle.addEventListener('click', () => { sound.setEnabled(!sound.enabled); updateSoundToggle(); });
   updateSoundToggle();
+  /**
+   * **El tiempo, un control pequeño.** La regleta de cinco botones de 44 px era
+   * provisional —«los botones de tiempo son provisionales, evidentemente»— y
+   * ocupaba media anchura de la pantalla para algo que se toca dos veces por
+   * sesión. Ahora hay un botón que enseña la velocidad de ahora; tocarlo
+   * despliega la regleta de siempre a su lado, se elige, y se recoge sola.
+   */
+  const speedBadge = document.createElement('button');
+  speedBadge.type = 'button';
+  speedBadge.className = 'valley-speed-badge';
+  speedBadge.setAttribute('aria-label', renderUiText('app.speed.open'));
+  speedBadge.addEventListener('click', () => { controls.hidden = !controls.hidden; });
+  controls.hidden = true;
+
   const hudRight = document.createElement('div');
   hudRight.className = 'valley-hud-right';
-  hudRight.append(soundToggle, controls);
+  hudRight.append(soundToggle, controls, speedBadge);
 
   // U-05 · La barra de abajo: los tres destinos del juego, siempre a la vista
   // en vez de detrás de un gesto que nadie descubre (§11 del plan siguiente).
@@ -384,8 +437,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
   peopleTab.addEventListener('click', () => openPeople(app));
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, year, season, vitals, doing, orders, hudRight, tabbar);
+  root.append(canvas, year, season, vitals, doing, ordersNow, orders, hudRight, tabbar);
   paintOrders();
+  speedBadge.textContent = speedLabel(speed);
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
@@ -951,6 +1005,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       if (!isSpeed(value)) throw new Error(`Unsupported speed: ${value as number}`);
       speed = value;
       for (const [candidate, button] of buttons) button.setAttribute('aria-pressed', String(candidate === speed));
+      speedBadge.textContent = speedLabel(speed);
+      // Elegida, la regleta se recoge: es un desplegable, no un panel.
+      controls.hidden = true;
     },
     state(): Readonly<GameState> { return state; },
     archive(): readonly ArchivedGame[] { return archive; },

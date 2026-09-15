@@ -114,6 +114,9 @@ export const WANTED = [
  */
 const FRAME_MARGIN = 2.5;
 
+/** Cuántas nubes de §11.1.1 pueden verse a la vez. TUNE: tres; ver el uso. */
+const MOST_BUBBLES = 3;
+
 /**
  * Que parte de lo construido entra en el encuadre de partida.
  *
@@ -291,6 +294,17 @@ export async function createGraphicsRenderer(
   // sobre el nivel del mar.
   let groundFloor: (x: number, z: number) => number = () => 0;
   let lastActors: Actor[] = [];
+  /**
+   * Si el jugador ha movido la cámara desde el último encuadre automático.
+   *
+   * **El zoom se perdía solo**, y se vio mirando el juego como un vídeo: la
+   * cámara se reencuadra cada vez que la aldea cambia de forma —un campo que se
+   * termina— y con eso tiraba a la basura lo que el jugador acababa de acercar.
+   * Tres segundos después de hacer zoom, la vista saltaba afuera. Es la mitad de
+   * «no se puede mover bien el mapa». Desde que toca la cámara, el encuadre es
+   * suyo; volver a lo automático es `resetView`, que es el doble toque.
+   */
+  let disturbed = false;
   // El estado de la jornada, quieto desde anoche. Es lo que se pinta: ver
   // `scenic-state.ts` para por que no se pinta el vivo.
   const scenic = createScenicState();
@@ -550,7 +564,7 @@ export async function createGraphicsRenderer(
       plan = next;
       // El encuadre sigue a lo construido, asi que se rehace cuando el pueblo
       // cambia de forma y no en cada fotograma.
-      if (!isQuiet(change)) frameCamera();
+      if (!isQuiet(change) && !disturbed) frameCamera();
 
       // La gente se recoloca en cada fotograma porque en cada fotograma se ha
       // movido; la aldea no, porque cambia unas cuantas veces al año.
@@ -591,6 +605,30 @@ export async function createGraphicsRenderer(
         if (bubble === undefined) continue;
         carried.set(actor.id, bubble);
         heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });
+      }
+      // **Y como mucho tres a la vez.** Mirando diez frames seguidos, lo que más
+      // se movía en pantalla eran las nubes «…»: ocho o diez a la vez sobre la
+      // plaza, el glifo de relleno convertido en lo más visible del valle. Una
+      // nube dice «ahí pasa algo»; diez dicen «esto está roto». Se quedan las
+      // que llevan un estado de verdad —hambre, luto— antes que las de charla, y
+      // de las que quedan, las más cerca de donde se mira.
+      if (carried.size > MOST_BUBBLES) {
+        const centre = view.view.centre;
+        const kept = [...carried.entries()]
+          .sort(([idA, a], [idB, b]) => {
+            const stateA = a === 'chat' ? 1 : 0;
+            const stateB = b === 'chat' ? 1 : 0;
+            if (stateA !== stateB) return stateA - stateB;
+            const headA = heads.get(idA);
+            const headB = heads.get(idB);
+            const nearA = headA === undefined ? Infinity : Math.hypot(headA.x - centre.x, headA.z - centre.z);
+            const nearB = headB === undefined ? Infinity : Math.hypot(headB.x - centre.x, headB.z - centre.z);
+            return nearA - nearB;
+          })
+          .slice(0, MOST_BUBBLES);
+        carried.clear();
+        for (const [id, bubble] of kept) carried.set(id, bubble);
+        for (const id of [...heads.keys()]) if (!carried.has(id)) heads.delete(id);
       }
       bubbles.update(heads, carried);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
@@ -653,21 +691,26 @@ export async function createGraphicsRenderer(
 
     zoom(factor: number, atXCss: number, atYCss: number): void {
       if (disposed) return;
+      disturbed = true;
       view.zoom(factor, atXCss, atYCss);
     },
 
     pan(dxCss: number, dyCss: number): void {
       if (disposed) return;
+      disturbed = true;
       view.pan(dxCss, dyCss);
     },
 
     orbit(dYaw: number, dPitch: number): void {
       if (disposed) return;
+      disturbed = true;
       view.orbit(dYaw, dPitch);
     },
 
     resetView(): void {
       if (disposed) return;
+      disturbed = false;
+      frameCamera();
       view.reset();
     },
 

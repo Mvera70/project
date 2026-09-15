@@ -41,6 +41,14 @@ const zoomNotches = Number(opt('zoom', '0'));
 //   --orders "Wood"   pulsa esa posición del mando
 const orders = opt('orders', '');
 const out = resolve(opt('out', 'artifacts/graphics/G-10/shot.png'));
+// **Una secuencia, para mirar el juego como un vídeo.** El dueño del diseño lo
+// dijo así: «tienes que tomar muchas más capturas, una por cada frame, e ir
+// analizando una secuencia; hay muchos problemas que se ven a primera vista».
+// Una captura suelta enseña una composición; doce seguidas enseñan si la gente
+// se queda clavada, si algo parpadea, si un trasto atraviesa el suelo.
+//   --sequence 12 --every 2.5   → doce capturas, una cada 2,5 s, numeradas
+const sequence = Number(opt('sequence', '0'));
+const every = Number(opt('every', '2'));
 // `--page` acepta también una dirección `http://`. La demo partida en dos
 // (`bundle-game.ts --split`) pide su JSON de recursos por la red, y una página
 // abierta como `file://` no puede pedir nada: sin esto, la única manera de
@@ -73,7 +81,11 @@ tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 await tab.goto(page);
 await tab.waitForTimeout(8000);
 
-if (speed !== '1') await tab.getByRole('button', { name: `${speed}×` }).click().catch(() => {});
+// La regleta está recogida detrás del botón de velocidad, como para el dedo.
+if (speed !== '1') {
+  await tab.locator('.valley-speed-badge').click().catch(() => {});
+  await tab.getByRole('button', { name: `${speed}×` }).click().catch(() => {});
+}
 
 // Se gira arrastrando con mayúsculas, que es el gesto de escritorio, en vez de
 // llamar al renderer por dentro: así lo que la captura prueba es **el camino
@@ -91,12 +103,15 @@ if (turn !== 0 || tilt !== 0) {
 }
 
 if (orders) {
+  // Las órdenes viven en una hoja que se abre desde la línea de resumen.
+  await tab.locator('.valley-orders-now').click().catch(() => {});
   for (const label of orders.split(',')) {
     // Por nombre accesible parcial: el del botón es «Spare hands: Wood», porque
     // una posición del mando no significa nada sin su palanca.
     await tab.getByRole('button', { name: new RegExp(`: ${label.trim()}$`) }).click().catch(() => {});
     await tab.waitForTimeout(200);
   }
+  await tab.locator('.valley-orders .valley-panel-close').click().catch(() => {});
 }
 
 if (zoomNotches !== 0) {
@@ -142,11 +157,28 @@ if (waitFor) {
   }
 }
 
+if (sequence > 0) {
+  const stem = out.replace(/\.png$/u, '');
+  for (let n = 0; n < sequence; n += 1) {
+    await tab.screenshot({ path: `${stem}-${String(n + 1).padStart(2, '0')}.png` });
+    const open = await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'));
+    if (open) await swipeDown();
+    await tab.waitForTimeout(every * 1000);
+  }
+  console.log(`${sequence} capturas cada ${every} s → ${stem}-NN.png`);
+}
+
 const shot = await tab.screenshot({ path: out });
 
 // Y a qué estación corresponde lo que se acaba de fotografiar, que es la mitad
 // de lo que hace falta para juzgar si el reloj cuadra.
 const season = await tab.evaluate(() => document.querySelector('.valley-season')?.textContent ?? '');
+// Y la frase de estado y la línea de órdenes, que son lo que la cabecera dice.
+const doing = await tab.evaluate(() => {
+  const line = document.querySelector('.valley-doing');
+  return line === null ? null : { text: line.textContent, hidden: line.hidden, display: getComputedStyle(line).display };
+});
+const ordersNow = await tab.evaluate(() => document.querySelector('.valley-orders-now')?.textContent ?? '');
 
 /**
  * El brillo medio de la captura, de 0 a 1.
@@ -187,6 +219,6 @@ const hud = await tab.evaluate(() => ({
   year: document.querySelector('.valley-year')?.textContent ?? null,
   vitals: [...document.querySelectorAll('.valley-vital')].map((e) => e.textContent),
 }));
-console.log(JSON.stringify({ ...hud, season, brightness }), '→', out);
+console.log(JSON.stringify({ ...hud, season, doing, ordersNow, brightness }), '→', out);
 console.log('errores de página:', errors.length === 0 ? 'ninguno' : errors.slice(0, 5));
 await browser.close();

@@ -270,7 +270,7 @@ describe('V-07 · escenas de dos', () => {
     // encuentros por persona y jornada según quién vive en la aldea.
     for (const seed of [7, 11, 23, 31, 40, 12]) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       const people = life.dwellers.length;
       if (people < 10) continue; // una aldea casi vacía no dice nada de esto.
 
@@ -331,7 +331,7 @@ describe('V-07 · escenas de dos', () => {
     // semillas comprobadas — nunca al revés.
     for (const seed of [7, 11, 23]) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       if (life.dwellers.length < 10) continue;
 
       const seen = new Set<Scene>();

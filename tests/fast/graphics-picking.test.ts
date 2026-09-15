@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { Vector3 } from 'three';
-import { createValleyCamera, CLOSEST_HEIGHT } from '../../src/render3d/camera';
+import { createValleyCamera, CLOSEST_HEIGHT, RESTING_HEIGHT_MAX } from '../../src/render3d/camera';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { backendFrom } from '../../src/ui/backend';
@@ -20,15 +20,17 @@ const LANDSCAPE = { width: 640, height: 390 };
 
 describe('G-07 · la cámara del valle', () => {
   it('encuadra lo que se le pide, en vertical y en apaisado', () => {
+    // Una caja que cabe —la de una fundación— entra entera en la pantalla.
+    // Las cuatro esquinas de lo encuadrado tienen que caer dentro: con un
+    // ajuste por radio en vez de por proyección, en vertical se salían, porque
+    // un rectángulo visto en isométrica es un rombo.
+    const FOUNDING = { minX: 14, minZ: 24, maxX: 24, maxZ: 32 };
     for (const viewport of [PHONE, LANDSCAPE]) {
       const camera = createValleyCamera();
-      camera.frame(VILLAGE, viewport);
-      // Las cuatro esquinas de lo encuadrado tienen que caer dentro de la
-      // pantalla. Con un ajuste por radio en vez de por proyección, en vertical
-      // se salían: un rectángulo visto en isométrica es un rombo.
+      camera.frame(FOUNDING, viewport);
       for (const corner of [
-        [VILLAGE.minX, VILLAGE.minZ], [VILLAGE.maxX, VILLAGE.minZ],
-        [VILLAGE.minX, VILLAGE.maxZ], [VILLAGE.maxX, VILLAGE.maxZ],
+        [FOUNDING.minX, FOUNDING.minZ], [FOUNDING.maxX, FOUNDING.minZ],
+        [FOUNDING.minX, FOUNDING.maxZ], [FOUNDING.maxX, FOUNDING.maxZ],
       ]) {
         const seen = screenOf(camera, corner[0] ?? 0, corner[1] ?? 0);
         expect(seen.x, `${viewport.width}×${viewport.height}`).toBeGreaterThanOrEqual(-1);
@@ -37,6 +39,22 @@ describe('G-07 · la cámara del valle', () => {
         expect(seen.y).toBeLessThanOrEqual(1);
       }
     }
+  });
+
+  it('y una aldea grande no aleja la vista hasta hacerla ilegible', () => {
+    // **La otra mitad, y es la que se veía mal.** Encajar entera una caja ancha
+    // en un móvil vertical es una trampa aritmética: dieciocho celdas de ancho
+    // en una pantalla de proporción 0,6 piden treinta y tantas de alto, y lo
+    // medido en el juego eran cuarenta y siete — la aldea, una miniatura; un
+    // aldeano, doce píxeles. `RESTING_HEIGHT_MAX` corta ahí: la vista se queda
+    // a ese alto, **centrada en la caja**, y lo que no cabe se alcanza
+    // arrastrando. En apaisado la misma caja sí cabe y el tope no interviene.
+    const camera = createValleyCamera();
+    camera.frame(VILLAGE, PHONE);
+    expect(camera.view.height).toBeLessThanOrEqual(RESTING_HEIGHT_MAX);
+    const middle = screenOf(camera, (VILLAGE.minX + VILLAGE.maxX) / 2, (VILLAGE.minZ + VILLAGE.maxZ) / 2);
+    expect(Math.abs(middle.x), 'la aldea queda en el centro').toBeLessThan(0.15);
+    expect(Math.abs(middle.y)).toBeLessThan(0.15);
   });
 
   it('acercar mantiene bajo el dedo lo que había bajo el dedo', () => {

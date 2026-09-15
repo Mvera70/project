@@ -45,6 +45,10 @@ function fakeDweller(id: number, x: number, z: number): Dweller {
   } as unknown as Dweller;
 }
 
+// **`{ props: true }` en cada jornada de este fichero, y en el juego no.** Los
+// trastos van apagados en la partida desde el 15 sep 2026 —eran el descarte de
+// físicas y el dueño del diseño los sacó—; la maquinaria se sigue probando aquí
+// con la opción encendida, por si algún día un trasto tiene sitio de verdad.
 describe('V-09 · trastos', () => {
   // Compartida por las dos pruebas del peloteo: la cadena más larga de pases
   // de ida y vuelta entre dos personas en un registro de jornada.
@@ -70,7 +74,7 @@ describe('V-09 · trastos', () => {
   it('un trasto no está en dos manos a la vez, en seis semillas', () => {
     for (const seed of SEEDS) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       let checked = 0;
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
@@ -118,7 +122,7 @@ describe('V-09 · trastos', () => {
     let sawAScene = false;
     for (const seed of SEEDS) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
         for (const dweller of life.dwellers) {
@@ -138,7 +142,7 @@ describe('V-09 · trastos', () => {
   it('soltar deja el trasto en suelo pisable, en seis semillas', () => {
     for (const seed of SEEDS) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       for (let n = 0; n < 900; n += 1) life.step();
       for (const prop of life.props) {
         if (prop.held !== null) continue;
@@ -176,7 +180,7 @@ describe('V-09 · trastos', () => {
   it('una pelota nunca acaba rodando bajo el agua, en seis semillas', () => {
     for (const seed of SEEDS) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       const { width, terrain } = state.map;
       const wet = (x: number, z: number): boolean =>
         terrain[Math.floor(z) * width + Math.floor(x)] === TERRAIN_CODE.water;
@@ -224,7 +228,7 @@ describe('V-09 · trastos', () => {
     // partido de tenis del descarte sin `PLAYED_OUT`.
     for (const seed of SEEDS) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, 0, { props: true });
       for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
       const people = Math.max(1, life.dwellers.length);
       expect(life.passes / people,
@@ -310,7 +314,7 @@ describe('V-09 · trastos', () => {
       let passes = 0;
       let people = 0;
       for (let day = 0; day < DAYS; day += 1) {
-        const life = createVillage(state, day);
+        const life = createVillage(state, day, { props: true });
         people = life.dwellers.length;
         for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
         passes += life.passes;
@@ -336,7 +340,7 @@ describe('V-09 · trastos', () => {
       const state = village(seed);
       let passes = 0;
       for (let day = 0; day < DAYS; day += 1) {
-        const life = createVillage(state, day);
+        const life = createVillage(state, day, { props: true });
         for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
         passes += life.passes;
       }
@@ -387,7 +391,7 @@ describe('V-09 · trastos', () => {
     for (const seed of SEEDS) {
       const state = village(seed);
       for (const day of [0, 3, 8, 14, 21, 31]) {
-        const life = createVillage(state, day);
+        const life = createVillage(state, day, { props: true });
         for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
         const chain = longestChain(life.passLog);
         if (chain >= 2) returned += 1;
@@ -413,7 +417,7 @@ describe('V-09 · trastos', () => {
     for (const seed of SEEDS) {
       const state = village(seed);
       for (const day of [0, 3, 8, 14, 21, 31]) {
-        const life = createVillage(state, day);
+        const life = createVillage(state, day, { props: true });
         for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
         best = Math.max(best, longestChain(life.passLog));
       }

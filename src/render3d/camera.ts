@@ -62,6 +62,25 @@ export interface Angles {
  */
 export const CLOSEST_HEIGHT = 8;
 
+/**
+ * Lo lejos que puede quedar la vista **de reposo**, en celdas de alto.
+ *
+ * TUNE: veintiséis, y sale de mirar el juego como un vídeo (15 sep 2026). El
+ * reposo encajaba la aldea entera con `contain`, y en un móvil vertical eso es
+ * una trampa aritmética: la caja de la fundación mide unas quince celdas de
+ * ancho y caber a lo ancho en una pantalla de proporción 0,46 exige treinta y
+ * dos celdas de alto, más el aire. Medido en diez frames seguidos a ×1: **la
+ * vista de reposo estaba a unas cuarenta y siete celdas de alto**, la aldea era
+ * una miniatura en el centro y un aldeano medía doce píxeles. Así no hay vida
+ * que ver, y «la aldea no se siente viva» empieza aquí.
+ *
+ * A veintiséis, una celda son treinta y dos píxeles y un aldeano veintitrés:
+ * se ve quién va a dónde. Lo que no cabe se alcanza arrastrando, que es como
+ * funciona cualquier mapa. `fitting` sigue mandando cuando da menos que esto —
+ * una aldea recién fundada cabe más cerca— y el tope sólo corta lo de más.
+ */
+export const RESTING_HEIGHT_MAX = 26;
+
 export interface Bounds {
   readonly minX: number;
   readonly minZ: number;
@@ -257,7 +276,7 @@ export function createValleyCamera(): ValleyCamera {
    * partida hace imposible volver a ella.
    */
   function limits(): void {
-    resting = { ...resting, height: Math.max(CLOSEST_HEIGHT, fitting(framed)) };
+    resting = { ...resting, height: clamp(fitting(framed), CLOSEST_HEIGHT, RESTING_HEIGHT_MAX) };
     furthest = Math.max(resting.height, fitting(bounds, 'cover'));
   }
 

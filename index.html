@@ -83,20 +83,12 @@
         opacity: .72; }
       .valley-trend:empty { display: none; }
 
-      /* E1 · **El mando.** Dos órdenes permanentes, debajo de la tira y pegadas a
-         ella: la orden y su lectura tienen que estar juntas o el jugador no ata
-         una con la otra. Misma piel de instrumento que la regleta de velocidad
-         —placa de pergamino, filete, tinta— porque es la misma clase de cosa:
-         un mando, no un panel de estadísticas.
-         Compacto a propósito: son 44 px de alto en total sobre un valle que
-         sigue ocupando la pantalla (§11.1). Las etiquetas van en versalitas y
-         las posiciones en la llana, igual que en el resto de la piel. */
       /* **La línea de estado de la aldea** (`ui/doing.ts`): qué está haciendo,
-         entre la tira y el mando. Sin placa y sin filete a propósito: no es un
-         instrumento que se toque, es una frase, así que va como va la línea de
-         la estación —tinta sobre el valle, con el mismo relieve de pergamino
-         detrás para que se lea sobre el prado—. La serif de la crónica, porque
-         es la voz de la aldea y no una etiqueta de interfaz. */
+         bajo la tira. Sin placa y sin filete a propósito: no es un instrumento
+         que se toque, es una frase, así que va como va la línea de la estación
+         —tinta sobre el valle, con el relieve de pergamino detrás para que se
+         lea sobre el prado—. La serif de la crónica, porque es la voz de la
+         aldea y no una etiqueta de interfaz. */
       .valley-doing { position: absolute; z-index: 2; left: 14px; margin: 0;
         top: calc(max(7px, env(safe-area-inset-top)) + 62px);
         max-width: min(72vw, 300px); color: var(--ink); text-wrap: pretty;
@@ -104,23 +96,48 @@
         text-shadow: 0 1px 0 rgba(242,233,216,.65), 0 0 3px rgba(242,233,216,.5); }
       .valley-doing:empty, .valley-doing[hidden] { display: none; }
 
-      .valley-orders { position: absolute; z-index: 2; left: 13px;
-        top: calc(max(7px, env(safe-area-inset-top)) + 82px);
-        display: flex; flex-direction: column; gap: 3px; }
-      .valley-order { display: flex; align-items: center; gap: 6px; }
-      .valley-order-name { min-width: 62px; color: var(--ink-soft);
-        font: 600 9px/1.1 var(--plain); letter-spacing: .1em;
-        font-variant-caps: all-small-caps; text-shadow: 0 1px 0 rgba(242,233,216,.4); }
-      .valley-order-bar { display: flex; padding: 1px; gap: 1px;
-        border: 1px solid var(--edge); border-radius: 6px; background: var(--plate);
-        box-shadow: 0 1px 3px rgba(34,29,24,.18); backdrop-filter: blur(2px); }
-      .valley-order-bar button { min-width: 44px; min-height: 22px; padding: 0 7px;
-        border: 0; border-radius: 5px; background: transparent; color: var(--ink-soft);
-        font: 600 10px/1 var(--plain); letter-spacing: .03em; cursor: pointer;
+      /* E1 · **El mando**, y desde el 15 sep 2026 una hoja y no tres filas a la
+         vista. Las tres filas de doce botones se comían el tercio de arriba de
+         la pantalla siempre abiertas: «comiéndose media pantalla», dijo el dueño
+         del diseño. Ahora: **una línea** bajo la frase de estado dice cómo están
+         las órdenes, y tocarla abre la hoja desde abajo con la piel de la ficha
+         (`.valley-panel`). Cerrada no ocupa nada; el valle es la pantalla. */
+      .valley-orders-now { position: absolute; z-index: 2; left: 14px; margin: 0; padding: 2px 0;
+        top: calc(max(7px, env(safe-area-inset-top)) + 80px);
+        max-width: min(78vw, 320px); border: 0; background: transparent; text-align: left;
+        color: var(--ink-soft); cursor: pointer; text-wrap: pretty;
+        font: italic 12.5px/1.25 var(--voice); letter-spacing: .005em;
+        text-shadow: 0 1px 0 rgba(242,233,216,.65), 0 0 3px rgba(242,233,216,.5);
+        -webkit-tap-highlight-color: transparent; }
+      .valley-orders-now::before { content: '› '; font-style: normal; color: var(--gild); }
+      .valley-orders-now:focus-visible { outline: 2px solid var(--gild); outline-offset: 2px; }
+      /* La hoja: las tres palancas, una debajo de otra, cada una con su nombre
+         encima y sus posiciones debajo. Botones de 44 px de alto (§11.3): aquí
+         hay sitio, que es justo lo que arriba no había. */
+      .valley-orders .valley-order { display: flex; flex-direction: column; align-items: flex-start;
+        gap: 6px; margin: 12px 0 2px; }
+      .valley-order-name { color: var(--ink-soft); font: 600 11px/1.1 var(--plain);
+        letter-spacing: .1em; font-variant-caps: all-small-caps; }
+      .valley-order-bar { display: flex; flex-wrap: wrap; padding: 2px; gap: 2px;
+        border: 1px solid var(--edge); border-radius: 8px; background: rgba(34,29,24,.04); }
+      .valley-order-bar button { min-width: 44px; min-height: 40px; padding: 0 12px;
+        border: 0; border-radius: 6px; background: transparent; color: var(--ink-soft);
+        font: 600 13px/1 var(--plain); letter-spacing: .02em; cursor: pointer;
         -webkit-tap-highlight-color: transparent; }
       .valley-order-bar button:active { background: rgba(34,29,24,.10); }
       .valley-order-bar button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
       .valley-order-bar button:focus-visible { outline: 2px solid var(--gild); outline-offset: 2px; }
+      /* **El tiempo, un control pequeño.** Un botón con la velocidad de ahora;
+         tocarlo despliega la regleta a su lado y elegir la recoge. Misma piel
+         que el botón de sonido, porque son la misma clase de cosa. */
+      .valley-speed-badge { min-width: 44px; height: 44px; padding: 0 12px; border: 1px solid var(--edge);
+        border-radius: 22px; background: var(--plate); color: var(--ink);
+        font: 700 14px/1 var(--plain); font-variant-numeric: tabular-nums; cursor: pointer;
+        box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px);
+        -webkit-tap-highlight-color: transparent; }
+      .valley-speed-badge:active { background: rgba(34,29,24,.10); }
+      .valley-speed-badge:focus-visible { outline: 2px solid var(--gild); outline-offset: 2px; }
+      .valley-speeds[hidden] { display: none; }
 
       /* U-06 · el bump de una cifra que acaba de cambiar. La duración la
          manda `TIME.VITAL_BUMP_MS` desde `app.ts` (`animationDuration` en
