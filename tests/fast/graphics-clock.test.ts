@@ -39,28 +39,57 @@ describe('G-05 · el reloj de presentación', () => {
     expect(clock.seconds).toBe(before);
   });
 
-  it('el día escénico se acelera con la raíz de la velocidad, no con ella', () => {
-    // Las dos puntas estaban mal y las dos se probaron. Atado a la velocidad, a
-    // ×16 la gente cruzaba el valle con las piernas a dieciséis ciclos por
-    // segundo. Sin atar, apretar ×16 no cambiaba nada visible y el botón
-    // parecía roto: así lo describió quien lo probó.
-    const advanced = (speed: 0 | 1 | 4 | 16): number => {
+  it('cuántas semanas caben en una jornada no depende del botón', () => {
+    // D.6.1, decidido el 15 sep 2026: **la jornada sigue la velocidad entera.**
+    //
+    // Es la propiedad y no la fórmula. Lo que el jugador puede ver sin contar
+    // nada es que el calendario y el sol cuenten lo mismo, y con la raíz
+    // cuadrada que había antes no lo contaban: a ×1 pasaban ocho semanas por
+    // jornada y a ×16 pasaban treinta y dos, así que el sol cambiaba de ritmo
+    // cada vez que se tocaba la velocidad. Si alguien vuelve a meter un término
+    // medio aquí, esta prueba se pone roja por la razón correcta.
+    const perDay = (speed: 1 | 4 | 16 | 64): number => {
+      const clock = createPresentationClock();
+      clock.frame({ realMs: 0, tick: 0, tickFraction: 0, speed, reducedMotion: false, hidden: false });
+      // Fotogramas de 16 ms: por debajo del paso máximo del reloj, así que
+      // ninguno se recorta y lo que se mide es el reparto y no el tope.
+      let ticks = 0;
+      for (let step = 1; step <= 600; step += 1) {
+        ticks = (step * speed * 16) / 15_000;
+        clock.frame({
+          realMs: step * 16, tick: Math.floor(ticks),
+          tickFraction: 0, speed, reducedMotion: false, hidden: false,
+        });
+      }
+      // Semanas por jornada escénica.
+      return ticks / (clock.seconds / SCENIC_DAY_SECONDS);
+    };
+    const base = perDay(1);
+    for (const speed of [4, 16, 64] as const) {
+      expect(perDay(speed), `a ×${speed}`).toBeCloseTo(base, 6);
+    }
+    // Y la cuenta de verdad, que es la que hay que mirar si esto cambia: ocho
+    // semanas de mundo por cada día de sol, a cualquier velocidad.
+    expect(base).toBeCloseTo(SCENIC_DAY_SECONDS / 15, 6);
+  });
+
+  it('en pausa no hay jornada, y cada velocidad reparte lo suyo', () => {
+    const advanced = (speed: 0 | 1 | 4 | 16 | 64): number => {
       const clock = createPresentationClock();
       clock.frame({ realMs: 0, tick: 0, tickFraction: 0, speed, reducedMotion: false, hidden: false });
       for (let step = 1; step <= 60; step += 1) {
         clock.frame({
-          realMs: step * 16, tick: Math.floor(step * speed * 16 / 15_000),
+          realMs: step * 16, tick: Math.floor((step * speed * 16) / 15_000),
           tickFraction: 0, speed, reducedMotion: false, hidden: false,
         });
       }
       return clock.seconds;
     };
     const base = advanced(1);
-    expect(advanced(4)).toBeCloseTo(base * 2, 6);
-    expect(advanced(16)).toBeCloseTo(base * 4, 6);
     expect(advanced(0)).toBe(0);
-    // Y por debajo de la velocidad del juego, que es lo que evita el borrón.
-    expect(advanced(16)).toBeLessThan(base * 16);
+    expect(advanced(4)).toBeCloseTo(base * 4, 6);
+    expect(advanced(16)).toBeCloseTo(base * 16, 6);
+    expect(advanced(64)).toBeCloseTo(base * 64, 6);
   });
 
   it('un letargo no se representa: se salta y se avisa', () => {

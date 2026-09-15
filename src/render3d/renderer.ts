@@ -213,9 +213,15 @@ export async function createGraphicsRenderer(
     fog.far = distance * 2.3;
   }
 
-  /** De que color es la luz a esta hora del dia escenico. */
-  function light(phase: number): void {
-    const day = daylightAt(phase);
+  /**
+   * De que color es la luz a esta hora del dia escenico, a esta velocidad.
+   *
+   * La velocidad entra porque desde D.6.1 la jornada la sigue entera: a x64 el
+   * dia dura menos de dos segundos, y una jornada de luz de dos segundos es un
+   * parpadeo. `daylightAt` la aplana; aqui solo se le pasa el dato.
+   */
+  function light(phase: number, speed: GraphicsFrame['speed']): void {
+    const day = daylightAt(phase, speed);
     sun.color.set(day.sunColour);
     sun.intensity = day.sunIntensity;
     // Puesto el sol no hay sombra que echar, asi que tampoco hay mapa de
@@ -592,7 +598,7 @@ export async function createGraphicsRenderer(
       tells.update(shown);
       // El humo y las luces si son de cada fotograma: uno sube y las otras se
       // encienden cuando cae el dia.
-      tells.drift(frame.presentationSeconds, phase);
+      tells.drift(frame.presentationSeconds, phase, frame.speed);
       // Y el rio corre. Un rio quieto es un suelo azul.
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
@@ -600,7 +606,7 @@ export async function createGraphicsRenderer(
       fauna.update(shown, phase);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
-      light(phase);
+      light(phase, frame.speed);
       // El zoom mueve la camara, asi que la niebla se recalibra con ella: si no,
       // acercarse metia el pueblo dentro de la bruma.
       if (mapWidth > 0) fogAround(new Vector3(mapWidth / 2, 0, mapHeight / 2));

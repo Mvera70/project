@@ -392,11 +392,16 @@ export class Tells {
    * Una columna quieta era lo que delataba que el valle era una maqueta: todo
    * lo demás se movía menos lo que por definición no puede estarse quieto.
    */
-  drift(presentationSeconds: number, dayPhase = 1): void {
+  drift(presentationSeconds: number, dayPhase = 1, speed: 0 | 1 | 4 | 16 | 64 = 1): void {
     // Las luces se encienden cuando cae el día y se apagan al salir el sol.
     // §10.3 dice **luz al caer el día**, y una ventana encendida a mediodía no
     // dice que haya alguien en casa: dice que el render no sabe qué hora es.
-    const dusk = 1 - daylightAt(dayPhase).daylight;
+    //
+    // Con la velocidad, y no sólo con la hora: a ×64 la jornada de luz se queda
+    // quieta (D.6.1) y unas ventanas encendiéndose dos veces por segundo sobre
+    // un valle a pleno sol serían exactamente eso, un render que no sabe qué
+    // hora es.
+    const dusk = 1 - daylightAt(dayPhase, speed).daylight;
     for (const lamp of this.lamps) {
       const material = (lamp.mesh as Object3D & { material?: { opacity: number; transparent: boolean } }).material;
       lamp.mesh.visible = dusk > 0.02;

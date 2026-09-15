@@ -443,6 +443,50 @@ describe('G-10 · la luz del día escénico', () => {
       expect(daylightAt(phase + 1)).toEqual(daylightAt(phase));
     }
   });
+
+  it('a velocidad alta la jornada de luz se queda quieta', () => {
+    // D.6.1: desde que la jornada sigue la velocidad entera, a ×64 el día dura
+    // 1,9 segundos reales. Un valle que amanece y anochece dos veces cada cuatro
+    // segundos no cuenta la hora, parpadea — y tapa lo que uno mira a ×64, que
+    // es que el valle crece.
+    //
+    // Se mide como se ve: la diferencia entre lo más claro y lo más oscuro del
+    // día entero, a cada velocidad.
+    const swing = (speed: 0 | 1 | 4 | 16 | 64): number => {
+      let low = Number.POSITIVE_INFINITY;
+      let high = 0;
+      for (let step = 0; step < 240; step += 1) {
+        const light = daylightAt(step / 240, speed).daylight;
+        low = Math.min(low, light);
+        high = Math.max(high, light);
+      }
+      return high - low;
+    };
+    // A ×1 y a ×4 la jornada cuenta la hora entera: dos minutos y medio minuto
+    // de día son tiempo de sobra para verla.
+    expect(swing(1), 'a ×1 hay jornada').toBeGreaterThan(0.9);
+    expect(swing(4), 'a ×4 también').toBeCloseTo(swing(1), 6);
+    // Y a partir de ahí se aplana, sin llegar a mentir del todo a ×16.
+    expect(swing(16), 'a ×16 queda algo de jornada').toBeLessThan(swing(1) * 0.6);
+    expect(swing(16)).toBeGreaterThan(0.2);
+    expect(swing(64), 'a ×64 ya no parpadea').toBeLessThan(0.1);
+  });
+
+  it('y quieta quiere decir de día, no a oscuras', () => {
+    // Aplanar hacia la medianoche habría sido igual de estable y habría dejado
+    // el valle en penumbra permanente a ×64, que es el fallo contrario.
+    const fast = daylightAt(0.99, 64);
+    const noon = daylightAt(NOON);
+    expect(fast.daylight).toBeGreaterThan(0.9);
+    expect(fast.sunIntensity).toBeGreaterThan(noon.sunIntensity * 0.5);
+    // Y sigue siendo pura: misma hora y misma velocidad, misma luz.
+    expect(daylightAt(0.61, 16)).toEqual(daylightAt(0.61, 16));
+    // El vector del sol sigue siendo una dirección, no un vector cualquiera.
+    for (const speed of [1, 16, 64] as const) {
+      const sun = daylightAt(0.61, speed).sun;
+      expect(Math.hypot(sun.x, sun.y, sun.z)).toBeCloseTo(1, 6);
+    }
+  });
 });
 
 describe('G-10 · la luz de las casas', () => {

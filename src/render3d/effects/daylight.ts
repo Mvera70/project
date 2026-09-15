@@ -111,7 +111,7 @@ function blend(from: Color, to: Color, amount: number): string {
  * El sol sale por el este, cruza y se pone por el oeste; de noche no se apaga,
  * se queda bajo y azul, que es la luna de §10.3 puesta en práctica.
  */
-export function daylightAt(phase: number): Daylight {
+function lightAt(phase: number): Daylight {
   const day = ((phase % 1) + 1) % 1;
 
   // Cuánto día hay: sube de madrugada, se mantiene y cae al anochecer.
@@ -176,4 +176,75 @@ export function daylightAt(phase: number): Daylight {
   };
 }
 
-export { DAWN, DUSK, NIGHT_FLOOR, NOON };
+/**
+ * Cuánto se aplana la jornada de luz a cada velocidad. D.6.1.
+ *
+ * TUNE. Desde que la jornada sigue la velocidad entera, a ×64 el día escénico
+ * dura **1,9 segundos reales**: el sol sale y se pone dos veces cada cuatro
+ * segundos y las sombras dan la vuelta al valle en ese tiempo. No es una noche,
+ * es un parpadeo, y un parpadeo de media pantalla tapa justo lo que uno va a
+ * mirar a ×64 —que el valle crece, que aparecen tejados, que llega el invierno—.
+ *
+ * Así que a velocidades altas la luz **se queda quieta** en la de media mañana y
+ * deja de contar la hora. No es una concesión al realismo: §10.3 pide que el
+ * valle se lea como un instrumento, y a ×64 la hora del día ya no es
+ * información que nadie pueda seguir. A ×1 y a ×4, donde una jornada dura dos
+ * minutos y medio minuto, la luz cuenta la hora entera como siempre.
+ */
+const LIGHT_STEADY: Readonly<Record<0 | 1 | 4 | 16 | 64, number>> = {
+  0: 0, 1: 0, 4: 0, 16: 0.55, 64: 0.95,
+};
+
+/** La hora en la que se queda la luz cuando deja de contar la hora. */
+const STEADY_PHASE = 0.3;
+
+function mixNumber(from: number, to: number, amount: number): number {
+  return from + (to - from) * amount;
+}
+
+const fromColour = new Color();
+const toColour = new Color();
+function mixColour(from: string, to: string, amount: number): string {
+  return `#${fromColour.set(from).lerp(toColour.set(to), amount).getHexString()}`;
+}
+
+/**
+ * La luz que hace a esta hora del día escénico, a esta velocidad.
+ *
+ * `phase` es la fracción del día, la misma que decide quién está en la calle.
+ * El sol sale por el este, cruza y se pone por el oeste; de noche no se apaga,
+ * se queda bajo y azul, que es la luna de §10.3 puesta en práctica. Y a ×16 y
+ * ×64 la jornada de luz se aplana hacia la de media mañana: ver `LIGHT_STEADY`.
+ *
+ * Sigue siendo pura: la misma hora y la misma velocidad dan la misma luz, que es
+ * lo que §4.3 exige de todo lo que se dibuja.
+ */
+export function daylightAt(phase: number, speed: 0 | 1 | 4 | 16 | 64 = 1): Daylight {
+  const live = lightAt(phase);
+  const steady = LIGHT_STEADY[speed];
+  if (steady <= 0) return live;
+
+  const calm = lightAt(STEADY_PHASE);
+  const sun = {
+    x: mixNumber(live.sun.x, calm.sun.x, steady),
+    y: mixNumber(live.sun.y, calm.sun.y, steady),
+    z: mixNumber(live.sun.z, calm.sun.z, steady),
+  };
+  // Normalizado a mano: una direccional con un vector corto alumbra igual, pero
+  // `sun` es un contrato de dirección (`contracts.ts`) y devolverlo sin norma
+  // es dejar que cada consumidor decida si lo normaliza.
+  const length = Math.hypot(sun.x, sun.y, sun.z) || 1;
+  const background = mixColour(live.background, calm.background, steady);
+  return {
+    sun: { x: sun.x / length, y: sun.y / length, z: sun.z / length },
+    sunColour: mixColour(live.sunColour, calm.sunColour, steady),
+    sunIntensity: mixNumber(live.sunIntensity, calm.sunIntensity, steady),
+    skyColour: background,
+    groundBounce: mixColour(live.groundBounce, calm.groundBounce, steady),
+    ambientIntensity: mixNumber(live.ambientIntensity, calm.ambientIntensity, steady),
+    background,
+    daylight: mixNumber(live.daylight, calm.daylight, steady),
+  };
+}
+
+export { DAWN, DUSK, LIGHT_STEADY, NIGHT_FLOOR, NOON, STEADY_PHASE };

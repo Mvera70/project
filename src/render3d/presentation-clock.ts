@@ -75,22 +75,33 @@ const LETHARGY_SLACK_TICKS = 2;
 /**
  * Cuanto se acelera el dia escenico con la velocidad del juego. D.6.1.
  *
- * La raiz cuadrada, ni uno ni la velocidad entera. Las dos puntas estaban mal y
- * las dos se probaron:
+ * **La velocidad entera.** Lo decidio el dueño del diseño el 15 sep 2026, con
+ * las tres opciones delante y esta pregunta por medio: «hay muchas cosas del
+ * reloj que estan mal... los personajes no van al ritmo que deberian ir».
  *
- * - **Atado a la velocidad**, a x16 la gente cruzaba el valle a dieciseis veces
- *   su paso, con las piernas a dieciseis ciclos por segundo. Un borron.
- * - **Sin atar**, apretar x16 no cambiaba nada visible salvo el marcador: el
- *   mundo corria y la gente andaba igual. El boton parecia roto, y asi lo
- *   describio quien lo probo.
+ * Lo que arregla es la unica incoherencia que el jugador puede ver sin contar
+ * nada: **cuantas semanas cabe en una jornada ya no depende del boton**. Con la
+ * raiz cuadrada que habia antes, a x1 pasaban ocho semanas por jornada y a x16
+ * pasaban treinta y dos, asi que el calendario y el sol contaban dos historias
+ * distintas y la segunda cambiaba cada vez que se tocaba la velocidad. Ahora son
+ * ocho semanas por jornada a cualquier velocidad: una estacion son semana y
+ * media de sol, siempre.
  *
- * Con la raiz, x4 mueve al doble y x16 al cuadruple: se ve que el tiempo corre
- * sin que el valle se convierta en un vibrar de piernas. Y como el clip lo mueve
- * el suelo recorrido, la cadencia sube sola con el paso, que es justo lo que
- * hace una grabacion acelerada.
+ * Y las dos puntas que ya se habian probado, para que no se vuelvan a probar:
+ *
+ * - **Sin atar** (rate = 1), apretar x16 no cambiaba nada visible salvo el
+ *   marcador: el mundo corria y la gente andaba igual. El boton parecia roto, y
+ *   asi lo describio quien lo probo.
+ * - **Con la raiz**, el termino medio que esta ronda retira: se veia correr el
+ *   tiempo pero la jornada seguia sin cuadrar con el calendario.
+ *
+ * El coste, escrito: a x64 la gente cruza el valle en dos segundos y medio y el
+ * sol sale y se pone cada dos segundos. Lo primero es lo que es —una grabacion
+ * a sesenta y cuatro aumentos—; lo segundo se sostiene con el suelo de luz de
+ * `sky.ts`, que a velocidades altas no deja que la noche cierre del todo.
  */
 function scenicRate(speed: 0 | 1 | 4 | 16 | 64): number {
-  return Math.sqrt(speed);
+  return speed;
 }
 
 /** Real milliseconds per engine tick at ×1. Mirrors `TIME.REAL_MS_PER_TICK`. */
