@@ -68,6 +68,22 @@ export interface ValleyBackend {
 declare const VALLEY_ASSETS: Record<string, string> | undefined;
 
 /**
+ * Lo mismo, pero **al lado** de la página en vez de dentro.
+ *
+ * Una página de cuatro megas no se puede publicar en todas partes: el
+ * publicador de artefactos la rechaza por tamaño. Así que el empaquetador sabe
+ * partirla en dos —la página, pequeña, y un JSON con los mismos GLB en base64—
+ * y define esta ruta relativa para que la página lo pida al arrancar.
+ *
+ * Sigue siendo **un solo sitio de donde vienen los recursos**: el mismo mapa de
+ * `id` a base64 que `VALLEY_ASSETS`, sólo que traído por la red. Un JSON y no
+ * los GLB sueltos porque `model/gltf-binary` no es un tipo que el publicador
+ * sirva, y porque así el juego servido de siempre (`/assets/valley3d/`) no se
+ * toca.
+ */
+declare const VALLEY_ASSETS_URL: string | undefined;
+
+/**
  * Qué pinta el valle. **Desde G-12, el 3D: ya no es el piloto, es el juego.**
  *
  * Lo decidió el dueño del diseño el 14 sep 2026 con el riesgo escrito delante
@@ -205,9 +221,20 @@ export function attachBackend(
       // identificadores, no accesos a propiedad. Leyendolo del objeto global la
       // pagina se construia sin un solo recurso dentro y pedia los GLB por una
       // red que no existe.
-      const embedded: Record<string, string> | undefined = typeof VALLEY_ASSETS === 'undefined'
+      let embedded: Record<string, string> | undefined = typeof VALLEY_ASSETS === 'undefined'
         ? undefined
         : VALLEY_ASSETS;
+      // Y si no viajan dentro, puede que viajen al lado. Si esa petición falla
+      // no se cae nada: se sigue al camino de siempre, que pide los GLB uno a
+      // uno desde `assetBaseUrl`.
+      if (embedded === undefined && typeof VALLEY_ASSETS_URL !== 'undefined') {
+        try {
+          const response = await fetch(VALLEY_ASSETS_URL);
+          if (response.ok) embedded = (await response.json()) as Record<string, string>;
+        } catch {
+          embedded = undefined;
+        }
+      }
       let library: Awaited<ReturnType<typeof loadAssets>> | undefined;
       if (embedded !== undefined) {
         const ids = Object.keys(embedded);

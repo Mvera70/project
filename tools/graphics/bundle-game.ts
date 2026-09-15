@@ -16,6 +16,11 @@ import { readFileSync, readdirSync, writeFileSync, rmSync, existsSync } from 'no
 import { resolve } from 'node:path';
 import { WANTED } from '../../src/render3d/renderer';
 
+/** Con `--split`, la página y los recursos viajan en dos ficheros. */
+const SPLIT = process.argv.includes('--split');
+/** Cómo se llama el JSON de recursos, y por dónde lo pide la página. */
+const SIDECAR = 'valley-assets.json';
+
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const ASSETS = resolve(ROOT, 'public', 'assets', 'valley3d');
 const OUT = resolve(ROOT, 'artifacts', 'graphics', 'G-10', 'game');
@@ -34,7 +39,13 @@ await build({
   root: ROOT,
   base: './',
   logLevel: 'error',
-  define: { VALLEY_ASSETS: JSON.stringify(embedded) },
+  // `--split` deja los recursos **fuera** de la página, en un JSON al lado.
+  // Cuatro megas de base64 dentro del HTML es lo que hace que el publicador de
+  // artefactos rechace la página por tamaño, y sin un enlace la demo no se
+  // puede jugar desde el móvil — que es lo único para lo que existe.
+  define: SPLIT
+    ? { VALLEY_ASSETS_URL: JSON.stringify(SIDECAR) }
+    : { VALLEY_ASSETS: JSON.stringify(embedded) },
   build: {
     outDir: OUT,
     emptyOutDir: true,
@@ -110,6 +121,21 @@ page = page.replace(/\s*<link rel="manifest"[^>]*>/u, '')
 const target = resolve(OUT, 'valley.html');
 writeFileSync(target, page);
 rmSync(resolve(OUT, 'index.html'), { force: true });
+
+if (SPLIT) {
+  writeFileSync(resolve(OUT, SIDECAR), JSON.stringify(embedded));
+  // **Y la misma página sin su esqueleto**, que es lo que pide el publicador:
+  // él pone el `<!doctype>`, el `<head>` y el `<body>` por su cuenta, y dos
+  // juegos de etiquetas en la misma página es una página con dos cabeceras.
+  // El charset y el viewport los pone él también.
+  let bare = page;
+  for (const tag of [
+    /^\s*<!doctype html>\s*/iu, /<html[^>]*>\s*/iu, /\s*<head>\s*/iu,
+    /\s*<\/head>\s*/iu, /\s*<body>\s*/iu, /\s*<\/body>\s*/iu, /\s*<\/html>\s*$/iu,
+  ]) bare = bare.replace(tag, '\n');
+  bare = bare.slice(bare.indexOf('<title>'));
+  writeFileSync(resolve(OUT, 'artifact.html'), `${bare.trim()}\n`);
+}
 process.stdout.write(
   `${Object.keys(embedded).length} recursos · ${(page.length / 1024 / 1024).toFixed(2)} MB · ${target}\n`,
 );

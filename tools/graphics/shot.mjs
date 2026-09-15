@@ -41,7 +41,14 @@ const zoomNotches = Number(opt('zoom', '0'));
 //   --orders "Wood"   pulsa esa posición del mando
 const orders = opt('orders', '');
 const out = resolve(opt('out', 'artifacts/graphics/G-10/shot.png'));
-const page = resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html'));
+// `--page` acepta también una dirección `http://`. La demo partida en dos
+// (`bundle-game.ts --split`) pide su JSON de recursos por la red, y una página
+// abierta como `file://` no puede pedir nada: sin esto, la única manera de
+// comprobar que los modelos llegan era publicarla y mirar con el dedo.
+const pageArg = opt('page', 'artifacts/graphics/G-10/game/valley.html');
+const page = /^https?:\/\//u.test(pageArg)
+  ? pageArg
+  : `file:///${resolve(pageArg).replace(/\\/g, '/')}`;
 
 function browserExe() {
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
@@ -63,7 +70,7 @@ const tab = await browser.newPage({ viewport: { width: 390, height: 844 }, devic
 const errors = [];
 tab.on('pageerror', (e) => errors.push(String(e)));
 tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
-await tab.goto(`file:///${page.replace(/\\/g, '/')}`);
+await tab.goto(page);
 await tab.waitForTimeout(8000);
 
 if (speed !== '1') await tab.getByRole('button', { name: `${speed}×` }).click().catch(() => {});
