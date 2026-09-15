@@ -465,6 +465,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const toValley = (): void => {
     closeChronicle();
     closePeople();
+    // S-05 · el mismo fallo que U-14, más pequeño: la ficha de un edificio o
+    // un aldeano no es una cuarta pantalla, es una capa sobre el valle, pero
+    // se quedaba abierta detrás de la crónica o la gente y volvía a
+    // aparecer al salir de ellas. Tocar «Valley» cierra las tres.
+    closePanel();
     showing('valley');
   };
   showing('valley');
@@ -790,6 +795,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     close.addEventListener('click', closePanel);
     panel.replaceChildren(close, heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
     panel.hidden = false;
+    // S-05 · la ficha sólo se abre tocando el lienzo, y el lienzo sólo se toca
+    // en la pantalla del valle — pero `showing()` es lo único que enciende la
+    // pestaña correcta, y sin esta llamada la pestaña encendida podía seguir
+    // diciendo «Chronicle» o «People» si venía de ahí.
+    showing('valley');
   };
   const trace = new Map<number, Point[]>();
   let pinchStart: number | null = null;

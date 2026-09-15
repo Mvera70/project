@@ -188,6 +188,32 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   await test.expect(page.locator('.chronicle-scrim')).toHaveCount(0);
   // Y la pestaña encendida deja de estar encendida: no hay pantalla que valga.
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
+
+  // S-05 · la ficha de un edificio o un aldeano es el mismo fallo, más
+  // pequeño: se cerraba sólo con su cruz, no avisaba a la barra y podía
+  // reaparecer al volver de la crónica o la gente. Se abre tocando el
+  // lienzo —mismo barrido alrededor del centro que «la ruta viva abre un
+  // valle maduro», porque a un año de fundada la aldea sólo tiene una casa y
+  // un campo, no ochenta edificios— y «Valley» tiene que cerrarla igual que
+  // cierra las otras dos.
+  const canvas = page.locator('canvas:visible').first();
+  const box = await canvas.boundingBox();
+  const panel = page.locator('.valley-panel:not(.valley-orders)');
+  const cx = (box?.width ?? 360) / 2;
+  const cy = (box?.height ?? 560) / 2;
+  const around: [number, number][] = [];
+  for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
+  around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+  for (const [dx, dy] of around) {
+    await canvas.click({ position: { x: cx + dx, y: cy + dy }, force: true });
+    if (await panel.isVisible()) break;
+  }
+  await test.expect(panel).toBeVisible();
+  // Abrirla no deja la pestaña encendida diciendo otra cosa: sigue en Valley,
+  // que es donde está el lienzo que se acaba de tocar.
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
+  await page.getByRole('button', { name: 'Valley' }).click();
+  await test.expect(panel).toBeHidden();
 });
 
 test('la ruta de depuración llega al lienzo móvil sin interacción', async ({ page }) => {
@@ -302,7 +328,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
 
 test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ page }) => {
   // U-13 · el último de los cinco pasos del dueño del diseño. La ruta de
-  // depuración adelanta el valle hasta una jornada de tormenta (`runToStorm`),
+  // depuración adelanta el valle hasta una jornada de tormenta (`runToSky`),
   // porque salen en el 4 % de los días y esperarla no es una forma de
   // probarla.
   await page.clock.install();

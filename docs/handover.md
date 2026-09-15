@@ -521,11 +521,23 @@ dejó de estar partida en dos orillas.
 npm run shot          # empaqueta el juego en una página y lo fotografía
 npm run dev           # y jugarlo, en 390 × 844
 npm run dev           # ?render=canvas para la puerta de vuelta
+npm run serve:shots   # sirve artifacts/graphics/G-10/game en :8127 (S-06)
 ```
 
 `tools/graphics/shot.mjs` funciona **sin red**, con los navegadores instalados en
 la máquina, y pide WebGL por software (`--use-gl=swiftshader`). Playwright no
 puede descargar el suyo aquí.
+
+**`npm run serve:shots`** (`tools/graphics/serve.mjs`) es lo que antes era
+`python -m http.server 8127` a mano, en otra terminal, y cada sesión lo dejaba
+huérfano — no es un fallo del juego, es higiene. Sirve
+`artifacts/graphics/G-10/game` (la salida de
+`npx tsx tools/graphics/bundle-game.ts --split`, que es la que necesita un
+servidor detrás porque pide su JSON de recursos por la red) en el puerto 8127,
+sin dependencia nueva (`node:http`, `node:fs`), avisa por consola si el puerto
+ya está ocupado en vez de reventar con la traza de Node, y se cierra con
+Ctrl+C. Es lo que hace falta para capturar contra él:
+`node tools/graphics/shot.mjs --page http://127.0.0.1:8127/valley.html?...`.
 
 ### 6.1 Los `data-*` de la raíz (S-08)
 

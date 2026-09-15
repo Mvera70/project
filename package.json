@@ -17,6 +17,7 @@
     "chronicle": "tsx src/cli/chronicle.ts",
     "shots": "tsx tools/screenshots.ts",
     "shot": "tsx tools/graphics/bundle-game.ts && node tools/graphics/shot.mjs",
+    "serve:shots": "node tools/graphics/serve.mjs",
     "bundle": "tsx tools/graphics/bundle-game.ts",
     "assets:publish": "tsx tools/graphics/publish-assets.ts",
     "art": "tsx tools/art/index.ts",
