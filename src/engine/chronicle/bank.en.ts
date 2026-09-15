@@ -1812,6 +1812,16 @@ export const UI_BANK: Record<string, string> = {
   // dibujo cambia solo; esto es lo que anuncia un lector de pantalla.
   'app.sound.on': 'Sound on',
   'app.sound.off': 'Sound off',
+  // U-10 · el menú de inicio (`screens/title.ts`). Lo único que se configura
+  // es el número del valle, porque la gracia del juego es comparar valles.
+  'title.name': 'The Valley',
+  'title.tagline': 'Two come over the ridge with a hen basket and a sack of grain. What the years make of them is not up to them alone.',
+  'title.continue': 'Continue',
+  'title.continue.detail': 'Year {year} · {count} living',
+  'title.new': 'Found a new valley',
+  'title.seed': 'Valley number',
+  'title.seed.hint': 'The same number gives anyone the same valley to start with. Nobody leads it the same way.',
+  'title.reroll': 'Another',
   'crossroad.waiting': 'A crossroad is waiting',
   // U-07 · el texto visible de la píldora que reemplaza al punto rojo
   // (`screens/crossroad.ts`, `.crossroad-marker`). Distinto del aria-label de

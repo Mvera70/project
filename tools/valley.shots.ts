@@ -67,6 +67,44 @@ async function answerAnyCrossroad(page: Page): Promise<void> {
   await page.locator('.crossroad-scrim').waitFor({ state: 'detached' });
 }
 
+/**
+ * U-10 · la ruta real abre con el menú de inicio, y se pasa como lo pasa el
+ * dedo: continuar si hay partida, fundar un valle nuevo si no.
+ */
+async function passTitle(page: Page): Promise<void> {
+  const title = page.locator('.title-scrim');
+  await title.waitFor();
+  const cont = page.locator('.title-continue');
+  if (await cont.count() > 0) await cont.click();
+  else await page.locator('.title-new').click();
+  await title.waitFor({ state: 'detached' });
+}
+
+test('el juego abre con el menú de inicio: un valle nuevo con su número, y continuar sólo cuando hay partida', async ({ page }) => {
+  await page.goto(CANVAS);
+  const title = page.locator('.title-scrim');
+  await title.waitFor();
+  await page.screenshot({ path: 'artifacts/title.png', fullPage: true });
+  // Sin partida guardada no hay nada que continuar.
+  await test.expect(page.locator('.title-continue')).toHaveCount(0);
+  // El número del valle se puede escribir: es lo que se comparte para
+  // comparar valles, que es la gracia del juego según su dueño.
+  await page.locator('.title-seed').fill('7');
+  await page.locator('.title-new').click();
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  // Y lo que se funda es la pareja de v3.69: dos personas.
+  await test.expect(page.locator('.valley-vital').first()).toHaveText('2');
+  // Guardada la partida, el menú ofrece continuarla.
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
+  await page.waitForTimeout(600);
+  await page.goto(CANVAS);
+  await test.expect(page.locator('.title-continue')).toBeVisible();
+  await page.locator('.title-continue').click();
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+});
+
 test('la ruta de depuración llega al lienzo móvil sin interacción', async ({ page }) => {
   await page.goto('/?debug=1&seed=7&year=1&season=spring');
   await page.locator('html[data-debug-ready="true"]').waitFor();
@@ -95,6 +133,7 @@ test('cada edificio pinta dentro de su caja a 9 y 10 px sobre claro y oscuro', a
 test('la aplicación abre el valle con año y cuatro velocidades táctiles', async ({ page }) => {
   await page.clock.install();
   await page.goto(CANVAS);
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.screenshot({ path: 'artifacts/app-shell.png', fullPage: true });
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
@@ -229,6 +268,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await page.locator('.valley-speed-badge').click();
@@ -256,6 +296,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   // Cuatro horas después, con reloj falso — no se espera de verdad.
   await page.clock.setSystemTime(t0 + 4 * 60 * 60 * 1000);
   await page.reload();
+  await passTitle(page); // U-10: al volver, el menú ofrece continuar
   await page.locator('html[data-app-ready="true"]').waitFor();
 
   const welcome = page.locator('.welcome');
@@ -371,6 +412,7 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
     return save?.state?.tick === 0 && save.state.ended === null && save.archive?.length === 1;
   })).toBe(true);
   await page.goto(CANVAS);
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await test.expect(page.locator('.epitaph-scrim')).toBeHidden();
 });
@@ -382,6 +424,7 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS);
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await page.locator('.valley-speed-badge').click();

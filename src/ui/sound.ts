@@ -349,16 +349,17 @@ export interface SoundEngine {
 
 const STORAGE_KEY = 'valley.sound';
 
-function loadEnabled(): boolean {
+/** La preferencia guardada. U-10 la enseña en el menú de inicio, antes de que exista el motor. */
+export function soundPreference(): boolean {
   try { return localStorage.getItem(STORAGE_KEY) !== 'off'; } catch { return true; }
 }
 
-function saveEnabled(on: boolean): void {
+export function setSoundPreference(on: boolean): void {
   try { localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off'); } catch { /* modo privado, o similar: no hay nada que hacer */ }
 }
 
 export function createSoundEngine(): SoundEngine {
-  let enabled = loadEnabled();
+  let enabled = soundPreference();
   let ctx: AudioContext | null = null;
   let master: GainNode | null = null;
   let wind: Layer | null = null;
@@ -406,7 +407,7 @@ export function createSoundEngine(): SoundEngine {
     get enabled(): boolean { return enabled; },
     setEnabled(on: boolean): void {
       enabled = on;
-      saveEnabled(on);
+      setSoundPreference(on);
       // Encender es también un gesto del usuario — el propio toque del botón
       // —, así que puede ser la primera vez que se arranca el contexto.
       if (on) boot();

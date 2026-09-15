@@ -2274,7 +2274,23 @@ la pantalla del valle sigue sin tener más controles que la velocidad.
 
 ### 11.2 Pantallas
 
-Cinco, y solo cinco.
+Cinco en la partida, y una antes de ella.
+
+**0. El menú de inicio** (U-10, v3.70). Lo pidió el dueño del diseño el 15 sep
+2026 con la premisa del juego: la gracia es **comparar valles**, así que lo
+único que se configura es **el número del valle**, un entero de 32 bits que
+`makeBundle` toma tal cual. Dos personas con el mismo número fundan el mismo
+valle —misma pareja, mismo río, mismo bosque— y cada una lo lleva a su manera.
+Sobre la noche (`--night`), no sobre el valle, porque el juego no existe
+todavía: el filete y el nombre en latón arriba, y abajo el número (editable,
+con «Another» para echar otro que no repita ninguno jugado), «Found a new
+valley» en el mismo oro que «Begin again», y la preferencia de sonido. «Continue»
+sólo cuando hay una partida guardada **y no ha terminado**: si terminó, lo que
+toca es fundar de nuevo sobre sus ruinas (§13.3), y eso lo hace el menú por su
+cuenta. Vive en `screens/title.ts`, se abre desde `main.ts` antes de `boot` y
+sólo en la ruta normal: las rutas de depuración no la ven. Playwright la pasa
+como el dedo (`passTitle`) y `shot.mjs` acepta `--seed N` para escribir el
+número y `--open title` para fotografiar el menú.
 
 **1. El valle.** Por defecto. Arriba a la izquierda, el año en números romanos
 pequeños. Abajo a la derecha, los controles de velocidad. Nada más.

@@ -465,9 +465,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // en qué año, y cuántos son; lo demás lo enseña la primera encrucijada, que
   // es el juego enseñándose a sí mismo en vez de explicándose.
   //
-  // Sólo en una partida nueva de verdad: no al recargar, que trae `save`, ni al
-  // heredar, que arranca con el tick corrido.
-  if (save === undefined && state.tick === 0) {
+  // Sólo en una partida nueva de verdad: no al recargar una partida andada, ni
+  // al heredar, que arranca con el tick corrido. Desde U-10 el menú de inicio
+  // entrega la partida nueva **como un guardado** (tick 0, sin decisiones), así
+  // que lo que la distingue es eso y no que falte `save`.
+  const fresh = state.tick === 0 && state.history.length === 0;
+  if (fresh) {
     moments.show(
       renderUiText('founding.label'),
       renderEntry(

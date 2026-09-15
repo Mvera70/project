@@ -51,6 +51,8 @@ const sequence = Number(opt('sequence', '0'));
 //   --open orders|speed   deja abierta la hoja de órdenes o la regleta antes de disparar
 const open = opt('open', '');
 const every = Number(opt('every', '2'));
+//   --seed 7   el número del valle que se escribe en el menú de inicio
+const seedArg = opt('seed', '');
 // `--page` acepta también una dirección `http://`. La demo partida en dos
 // (`bundle-game.ts --split`) pide su JSON de recursos por la red, y una página
 // abierta como `file://` no puede pedir nada: sin esto, la única manera de
@@ -81,7 +83,13 @@ const errors = [];
 tab.on('pageerror', (e) => errors.push(String(e)));
 tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 await tab.goto(page);
-await tab.waitForTimeout(8000);
+// U-10 · el menú de inicio: se funda un valle nuevo, que es lo que hace el
+// dedo la primera vez. `--seed N` escribe ese número antes de fundar.
+await tab.locator('.title-scrim').waitFor({ timeout: 5000 }).catch(() => {});
+if (seedArg !== '') await tab.locator('.title-seed').fill(seedArg).catch(() => {});
+//   --open title   se queda en el menú, para fotografiarlo
+if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
+await tab.waitForTimeout(open === 'title' ? 1500 : 8000);
 
 // La regleta está recogida detrás del botón de velocidad, como para el dedo.
 if (speed !== '1') {

@@ -104,7 +104,7 @@ medido de rendimiento es de un portátil (G-09 quedó parcial por no haber
 dispositivo).
 
 **Cerrado:** el motor (M-01 a M-39), el render (G-00 a G-12), la interfaz (U-01 a
-U-09), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
+U-10), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
 
 **Y la versión 2.0, del 15 sep 2026, entregada** (`docs/plan-juego.md`, con sus
 medidas en `docs/handover.md` §2.1). El juego tiene un verbo: tres palancas de
@@ -134,8 +134,9 @@ cada valle salga distinto.** Lo que no se puede olvidar: `foundGame(seed)` es
 la pareja; las pruebas que reparten oficios o miden la subsistencia de una
 aldea hecha usan `foundTwenty` (`tests/helpers/founding.ts`), y lo que la
 pareja promete lo guarda `tests/journeys/founding.test.ts`. Detrás vienen, en
-este orden y pedidos por él: menú de inicio, inicio guiado desde lo alto,
-reloj con horas, tormentas con rayos.
+este orden y pedidos por él: el menú de inicio (U-10, hecho: `screens/title.ts`,
+sólo se configura el número del valle), el inicio guiado desde lo alto, el
+reloj con horas, las tormentas con rayos.
 
 **V-11 cerrada (15 sep 2026), y con ella el Anexo E entero.** Las reuniones de
 §11.8 habían dejado de ocurrir el día de G-12 —sólo existían en el camino
