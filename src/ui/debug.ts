@@ -1,5 +1,6 @@
 // M-19 · Deterministic debug route for automated screenshots.
 
+import { skyAt } from '../derive/weather';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
@@ -37,6 +38,24 @@ export function stateAt(request: DebugRequest): GameState {
   const targetTick = request.year * TIME.WEEKS_PER_YEAR + seasonIndex * TIME.WEEKS_PER_SEASON + 6;
   run(state, targetTick, 'prudent', CATALOG);
   return state;
+}
+
+/**
+ * U-13 · Adelanta el valle hasta una semana cuya **primera jornada** sea de
+ * tormenta, y devuelve cuántas semanas hizo falta.
+ *
+ * Una tormenta sale en el 4 % de las jornadas, así que esperarla mirando no es
+ * una forma de fotografiarla: esto es lo que le da a `?weather=storm` una
+ * tormenta segura en el primer fotograma. La jornada que el juego pinta al
+ * abrir es `tick · DAYS_PER_WEEK` —el tiempo escénico se lee del tick desde
+ * v3.72—, así que basta con probar semanas hasta que esa jornada truene.
+ */
+export function runToStorm(state: GameState, limitWeeks = 400): number {
+  for (let weeks = 0; weeks < limitWeeks; weeks += 1) {
+    if (skyAt(state, state.tick * TIME.DAYS_PER_WEEK).kind === 'storm') return weeks;
+    run(state, 1, 'prudent', CATALOG);
+  }
+  return limitWeeks;
 }
 
 function diagnosticCanvas(root: HTMLElement, state: GameState, request: DebugRequest): void {

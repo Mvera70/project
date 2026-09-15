@@ -213,6 +213,54 @@ export const WEATHER = [
   { f: 1.45, p: 0.1 }, // abundant
 ] as const;
 
+/**
+ * §10.8 · El cielo de cada jornada (U-13, v3.73).
+ *
+ * Lo pidió el dueño del diseño: «crear efectos meteorológicos, como tormentas
+ * con rayos». **Es presentación y no simulación**: el motor tira el clima una
+ * vez al año (`WEATHER`, §5.1) y de ahí sale la cosecha; esto sólo decide qué
+ * se ve por la ventana, se deriva en `derive/weather.ts` y no consume ni una
+ * tirada. Vive aquí porque ningún número del juego se inventa en otro sitio.
+ *
+ * Las probabilidades son **por jornada de sol**, que desde v3.72 es un día.
+ * Medidas con `tools/sky-report.ts` antes de fijarse: en un año normal salen
+ * unas dieciséis tormentas y sesenta y siete días de cielo cerrado de
+ * trescientos treinta y seis, o sea una tormenta cada tres semanas y lluvia una
+ * quinta parte del tiempo. Un valle ruinoso llueve el doble que uno abundante, y
+ * eso es lo que hace que dos valles del mismo año se vean distintos.
+ */
+export const SKY = {
+  // TUNE: probabilidad de cielo cerrado por jornada, por fila de `WEATHER`
+  // (ruinoso → abundante). Que el año malo llueva más no es una regla del
+  // motor: es lo que hace que el cielo cuente lo mismo que la cosecha.
+  WET_BY_YEAR: [0.34, 0.26, 0.2, 0.15, 0.1],
+  // TUNE: de las jornadas cerradas, cuántas son tormenta y cuántas sólo nubes.
+  // El resto es lluvia sin rayos. En invierno la tormenta no sale: nieva.
+  STORM_SHARE: 0.25,
+  OVERCAST_SHARE: 0.35,
+  // TUNE: por debajo de esto no se pinta. Un chispeo que no se ve es peor que
+  // un cielo claro: el jugador nota que algo pasa y no encuentra qué.
+  MIN_INTENSITY: 0.45,
+  // TUNE: cuánta luz tapa el cielo, de 0 a 1, a intensidad plena. La tormenta
+  // tapa más, y ni una ni otra llega a apagar el día: una tormenta que se lee
+  // como noche cerrada discute con el reloj de §11.2.
+  DIM_WET: 0.35,
+  DIM_STORM: 0.6,
+  // TUNE: cuántos rayos caen en una jornada de tormenta, de la más suave a la
+  // más fuerte. Con menos no es una tormenta; con más, es un estroboscopio.
+  BOLTS_MIN: 2,
+  BOLTS_MAX: 7,
+  // TUNE: cuánto dura el destello y cuánto tarda el trueno, en segundos reales.
+  // El trueno llega después porque el sonido va más despacio que la luz, y ese
+  // retardo es lo que hace que una tormenta se sienta lejos o encima.
+  FLASH_SECONDS: 0.12,
+  THUNDER_DELAY: [0.4, 2.2],
+  // TUNE: partículas a intensidad plena. Una sola malla para todas (D.9), así
+  // que esto es el techo de la escena entera y no por celda.
+  DROPS: 1200,
+  FLAKES: 800,
+} as const;
+
 // ---------------------------------------------------------------------------
 // §12.4 · Demography
 // ---------------------------------------------------------------------------
@@ -1262,6 +1310,11 @@ export const SOUND = {
   AMBIENT_FADE_S: 2.5,
   // TUNE: the accent's own gain and length (§11.6, §11.8's "raro" principle
   // read onto sound): a beat, not a fanfare, over in about a second.
+  // TUNE: el trueno de U-13. Más largo y más grave que los otros acentos
+  // —un trueno rueda, no repica— y algo más bajo, porque puede caer varias
+  // veces en la misma tormenta y un trueno al volumen de un hito cansa.
+  THUNDER_GAIN: 0.42,
+  THUNDER_DURATION_S: 2.4,
   ACCENT_GAIN: 0.55,
   ACCENT_DURATION_S: 1.1,
   // TUNE: the minimum real time between two accents. §11.4's own case — a

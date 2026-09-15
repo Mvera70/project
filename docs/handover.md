@@ -105,6 +105,34 @@ sitio.
 
 ## 2.1. La versión 2.0, del 15 sep 2026
 
+> **El cielo y la vuelta atrás, v3.73 — los cinco pasos, cerrados.** Llueve,
+> nieva y hay tormentas con rayos (§10.8): el cielo se **deriva** de la fila del
+> clima del año, la estación y un `hash32` de la jornada, sin consumir una
+> tirada del motor —hay prueba— y sin tocar el balance. Medido con
+> `tools/sky-report.ts`: 79 % de jornadas claras, una tormenta cada tres
+> semanas, y el cielo cerrado va del 34 % en un valle ruinoso al 9 % en uno
+> abundante, que es lo que hace que dos valles del mismo año se vean distintos.
+>
+> **Lo que la captura destapó, tres veces seguidas**, y vale como método: el
+> rayo caía **fuera de cámara** nueve de cada diez veces (el mapa son 72 × 112
+> celdas y la vista de reposo enseña 26; ahora cae en el corazón), **medía
+> cuarenta celdas** y la cámara isométrica lo proyectaba como una raya de
+> esquina a esquina (ahora veinte, y tres hebras en vez de una de un píxel), y
+> **caía uno en el primer fotograma** de cualquier jornada de tormenta porque la
+> búsqueda empezaba en el amanecer y la jornada abre a 0,28. Ninguna de las tres
+> la habría visto una prueba: las tres se vieron mirando.
+>
+> **Y U-14, que lo pidió el dueño al verlo:** «cuando entras a ver a los
+> aldeanos o el historial, no hay forma de volver atrás». Las dos pantallas se
+> cerraban sólo deslizando hacia abajo y su velo tapaba la barra de destinos.
+> Ahora la barra se queda encima (z-index 14), es una barra de pestañas de
+> verdad y cada pantalla lleva su botón de cerrar.
+>
+> **Lo que queda sin mirar de esto:** la nieve no se ha fotografiado (el valle
+> de las capturas era de verano), el trueno no se ha oído
+> (`tools/graphics/sound-check.mjs` no se ha usado con él) y nadie ha medido los
+> fotogramas con lluvia en un móvil de verdad.
+
 > **El reloj, v3.72 — y el cambio de ritmo que trae.** Cuarto paso del dueño:
 > «un contador con horas incluso; debe ser real el paso del tiempo». La cabecera
 > es un reloj de dos líneas y **la hora es la del sol que se ve**; para que eso

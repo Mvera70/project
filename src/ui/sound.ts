@@ -90,7 +90,7 @@ export function ambientFor(state: GameState): AmbientMix {
   };
 }
 
-export type AccentKind = 'milestone' | 'crossroad';
+export type AccentKind = 'milestone' | 'crossroad' | 'thunder';
 
 /**
  * Qué acento dispara un tick, si alguno. `milestoneFired` es si
@@ -274,6 +274,30 @@ function playBellToll(ctx: AudioContext, dest: AudioNode): void {
  */
 function playAccent(ctx: AudioContext, dest: AudioNode, kind: AccentKind): void {
   const total = SOUND.ACCENT_DURATION_S;
+  if (kind === 'thunder') {
+    // U-13 · un trueno: ruido rosa por un paso bajo que se va cerrando, con
+    // caída larga. Ni un fichero de audio, como todo lo demás de U-09.
+    const now = ctx.currentTime;
+    const seconds = SOUND.THUNDER_DURATION_S;
+    const source = ctx.createBufferSource();
+    source.buffer = noiseBuffer(ctx, seconds, true);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(420, now);
+    filter.frequency.exponentialRampToValueAtTime(90, now + seconds);
+    filter.Q.value = 0.7;
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0, now);
+    // El golpe primero y el retumbe después: sin la rampa de subida se oye
+    // como un clic, y un trueno no empieza de golpe ni acaba de golpe.
+    env.gain.linearRampToValueAtTime(SOUND.THUNDER_GAIN, now + 0.06);
+    env.gain.exponentialRampToValueAtTime(SOUND.THUNDER_GAIN * 0.35, now + seconds * 0.35);
+    env.gain.exponentialRampToValueAtTime(0.001, now + seconds);
+    source.connect(filter).connect(env).connect(dest);
+    source.start(now);
+    source.stop(now + seconds + 0.1);
+    return;
+  }
   if (kind === 'milestone') {
     const step = total * 0.16;
     const decay = total * 0.6;

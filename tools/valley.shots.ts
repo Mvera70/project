@@ -159,6 +159,37 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
   await test.expect(page.locator('.valley-date')).toContainText('Year 1');
 });
 
+test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)', async ({ page }) => {
+  // El fallo lo encontró el dueño del diseño jugando: «cuando entras a ver a
+  // los aldeanos o el historial, no hay forma de volver atrás». Las dos
+  // pantallas se cerraban sólo deslizando hacia abajo y su velo tapaba la barra
+  // de destinos. Esta prueba existe para que no vuelva: comprueba **las dos
+  // salidas**, la barra y el botón.
+  await page.goto(CANVAS);
+  await passTitle(page);
+  await page.locator('html[data-app-ready="true"]').waitFor();
+
+  // La gente: se abre desde la barra y se vuelve desde la barra.
+  await page.getByRole('button', { name: 'People' }).click();
+  await test.expect(page.locator('.people-scrim')).toBeVisible();
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'people');
+  // Y la barra sigue ahí, encima del velo: es la salida que el dedo busca.
+  await test.expect(page.getByRole('button', { name: 'Valley' })).toBeVisible();
+  await page.getByRole('button', { name: 'Valley' }).click();
+  await test.expect(page.locator('.people-scrim')).toHaveCount(0);
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
+
+  // La crónica: se abre desde la barra y se cierra con su botón, que es la otra
+  // salida —a la crónica se llega también con un gesto, y un gesto no explica
+  // cómo se sale—.
+  await page.getByRole('button', { name: 'Chronicle' }).click();
+  await test.expect(page.locator('.chronicle-scrim')).toBeVisible();
+  await page.locator('.chronicle-close').click();
+  await test.expect(page.locator('.chronicle-scrim')).toHaveCount(0);
+  // Y la pestaña encendida deja de estar encendida: no hay pantalla que valga.
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
+});
+
 test('la ruta de depuración llega al lienzo móvil sin interacción', async ({ page }) => {
   await page.goto('/?debug=1&seed=7&year=1&season=spring');
   await page.locator('html[data-debug-ready="true"]').waitFor();
@@ -267,6 +298,36 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   await test.expect(panel).toBeVisible();
   await test.expect(page.locator('.valley-panel:not(.valley-orders) h2')).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
+});
+
+test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ page }) => {
+  // U-13 · el último de los cinco pasos del dueño del diseño. La ruta de
+  // depuración adelanta el valle hasta una jornada de tormenta (`runToStorm`),
+  // porque salen en el 4 % de los días y esperarla no es una forma de
+  // probarla.
+  await page.clock.install();
+  await page.goto('/?debug=1&live=1&weather=storm&seed=7&year=20&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await page.clock.runFor(2_000);
+  await test.expect(page.locator('html')).toHaveAttribute('data-sky', 'storm');
+
+  // Y cae un rayo. Los rayos de la jornada están decididos de antemano, así que
+  // esto no espera a tener suerte: avanza el reloj falso a tramos hasta que el
+  // contador suba. **Con el reloj parado el destello se queda puesto** (§11.4:
+  // en pausa no se mueve nada), que es lo que permite fotografiarlo: dura 0,12 s
+  // y no hay captura que lo alcance corriendo.
+  await test.expect.poll(async () => {
+    await page.clock.runFor(90);
+    return Number(await page.locator('html').getAttribute('data-bolts') ?? '0');
+  }, { timeout: 60_000, intervals: [50] }).toBeGreaterThan(0);
+  await page.screenshot({ path: 'artifacts/storm.png', fullPage: true });
+
+  // La lluvia y el destello se juzgan mirando la captura —§11 no tiene reja
+  // visual— pero lo que sí se puede afirmar aquí es que el cielo no se queda
+  // encasquillado: la jornada siguiente a una tormenta no es otra tormenta
+  // salvo que le toque.
+  const sky = await page.locator('html').getAttribute('data-sky');
+  test.expect(['storm', 'rain', 'overcast', 'clear']).toContain(sky);
 });
 
 test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {

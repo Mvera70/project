@@ -84,6 +84,8 @@ const SUN_NIGHT = new Color('#9FB4D8');
 const SKY_DAY = new Color('#DDE3C4');
 const SKY_EVENING = new Color('#E8C39A');
 const SKY_NIGHT = new Color('#5A6780');
+/** U-13 · el gris al que se va el cielo con nubes. Plomo, no negro: llueve, no anochece. */
+const STORM_GREY = '#5F646B';
 const BOUNCE_DAY = new Color('#776F62');
 const BOUNCE_NIGHT = new Color('#2E3644');
 
@@ -207,6 +209,38 @@ function mixColour(from: string, to: string, amount: number): string {
 }
 
 /**
+ * La misma luz con el cielo cerrado encima. U-13, §10.8.
+ *
+ * `overcast` va de 0 (cielo limpio) a 1, y lo decide `derive/weather.ts`. Se
+ * aplica **antes** del aplanado por velocidad, para que una tormenta a ×64 siga
+ * siendo una tormenta: lo que `LIGHT_STEADY` aplana es la hora del día, no el
+ * tiempo que hace.
+ *
+ * Tres cosas y en este orden: el sol pierde intensidad —es lo que quita las
+ * sombras duras y hace que una tormenta se lea como tormenta—, el ambiente
+ * pierde bastante menos, porque un valle bajo la lluvia sigue viéndose, y el
+ * cielo se va al gris. `daylight` baja con ella, así que las ventanas se
+ * encienden de día en plena tormenta (§10.3), que es exactamente lo que hace
+ * una casa cuando se pone oscuro a mediodía.
+ */
+function clouded(day: Daylight, overcast: number): Daylight {
+  const grey = Math.max(0, Math.min(1, overcast));
+  if (grey <= 0) return day;
+  return {
+    ...day,
+    sunColour: mixColour(day.sunColour, STORM_GREY, grey * 0.7),
+    sunIntensity: day.sunIntensity * (1 - grey),
+    // El cielo y el fondo se van al plomo más deprisa que el resto: es lo
+    // primero que se ve de una tormenta, y con la mezcla lineal el fondo se
+    // quedaba en un verde turbio que no decía nada (medido a ojo en captura).
+    skyColour: mixColour(day.skyColour, STORM_GREY, Math.min(1, grey * 1.25)),
+    ambientIntensity: day.ambientIntensity * (1 - grey * 0.3),
+    background: mixColour(day.background, STORM_GREY, Math.min(1, grey * 1.25)),
+    daylight: day.daylight * (1 - grey * 0.8),
+  };
+}
+
+/**
  * La luz que hace a esta hora del día escénico, a esta velocidad.
  *
  * `phase` es la fracción del día, la misma que decide quién está en la calle.
@@ -217,12 +251,14 @@ function mixColour(from: string, to: string, amount: number): string {
  * Sigue siendo pura: la misma hora y la misma velocidad dan la misma luz, que es
  * lo que §4.3 exige de todo lo que se dibuja.
  */
-export function daylightAt(phase: number, speed: 0 | 1 | 4 | 16 | 64 = 1): Daylight {
-  const live = lightAt(phase);
+export function daylightAt(
+  phase: number, speed: 0 | 1 | 4 | 16 | 64 = 1, overcast = 0,
+): Daylight {
+  const live = clouded(lightAt(phase), overcast);
   const steady = LIGHT_STEADY[speed];
   if (steady <= 0) return live;
 
-  const calm = lightAt(STEADY_PHASE);
+  const calm = clouded(lightAt(STEADY_PHASE), overcast);
   const sun = {
     x: mixNumber(live.sun.x, calm.sun.x, steady),
     y: mixNumber(live.sun.y, calm.sun.y, steady),

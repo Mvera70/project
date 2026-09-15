@@ -175,6 +175,15 @@ export interface GraphicsStats {
    * conectaba, que es exactamente cómo se cuelan las regresiones invisibles.
    */
   readonly sunPhase: number;
+  /**
+   * U-13 · qué cielo hace y cuántos rayos han caído desde que se abrió.
+   *
+   * El contador sólo sube. Es lo que deja que `app.ts` suene el trueno sin que
+   * el renderer sepa que existe el sonido, y lo que permite comprobar una
+   * tormenta desde fuera igual que `sunPhase` permite comprobar el reloj.
+   */
+  readonly sky: string;
+  readonly bolts: number;
 }
 
 export interface GraphicsRendererOptions {

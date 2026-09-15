@@ -32,8 +32,11 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
      **hecho** (v3.71, el commit que sigue a éste en `git log`).
   4. **El tiempo como contador con horas** en vez del título «ANNO», con paso
      de tiempo «real, como si fuese la vida real» — **hecho** (v3.72).
-  5. **Efectos meteorológicos: tormentas con rayos** — **pendiente, y es lo
-     único que queda; brief abajo**.
+  5. **Efectos meteorológicos: tormentas con rayos** — **hecho** (v3.73, §10.8).
+
+  **Los cinco están entregados.** Y uno más que el dueño pidió al verlo, U-14:
+  la crónica y la pantalla de la gente se podían abrir y no cerrar («no hay
+  forma de volver atrás»).
 - **Cómo juzga.** Mira el juego **como un vídeo**: secuencias de capturas, no
   una captura suelta (`node tools/graphics/shot.mjs --sequence 12 --every 0.8`).
   «Hay muchos problemas que se ven a primera vista.» Cada paso se cierra con
@@ -45,12 +48,12 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
 
 | Qué | Estado | Cómo se comprueba |
 |---|---|---|
-| Suite rápida | 66 ficheros, 1 064 verdes, ~20 s | `npm test` |
+| Suite rápida | 67 ficheros, 1 073 verdes, ~25 s | `npm test` |
 | Jornadas | 111 + `founding.test.ts` verdes (~6 min) | `npm run test:journeys` |
 | Playwright | 11 verdes + 3 declaradas (`test.fail`) | `npm run test:shots` |
 | Balance | **16 rojas de 37** — antes de la pareja eran 11 | `npm run test:balance`, 25 min; `docs/handover.md` §5.5 dice cuáles y por qué |
 | Demo publicada | https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK (versión 12, con menú, inicio guiado y reloj) | ver §4 abajo |
-| Rama | `graphics/g-04-villager-rig`, ~31 commits sin subir | `git log --oneline main..HEAD` |
+| Rama | `graphics/g-04-villager-rig`, ~32 commits sin subir | `git log --oneline main..HEAD` |
 
 **Y lo que el reloj de v3.72 cambió para cualquiera que mida algo:** una semana
 del motor dura **catorce minutos a ×1** y no quince segundos, así que **lo que
@@ -197,10 +200,47 @@ en D.6.1 y **remide** el letargo.
 
 </details>
 
-### 3. Paso 5 · Tormentas con rayos — brief
+### 3. Paso 5 · Tormentas con rayos — **hecho** (v3.73)
 
 **Lo que pidió:** «El siguiente paso es crear efectos meteorológicos, como
 tormentas con rayos.»
+
+**Lo que se hizo** está contado entero en `docs/design.md` §10.8, con sus
+medidas. En corto: el cielo se **deriva** (`src/derive/weather.ts`) de la fila
+del clima del año, la estación y un `hash32` de la jornada, sin consumir una
+tirada del motor; `SKY` en `balance.ts` lleva los números y
+`tools/sky-report.ts` los midió (79 % de jornadas claras, una tormenta cada tres
+semanas, y el cielo cerrado va del 34 % en un valle ruinoso al 9 % en uno
+abundante). Se pinta con tres mallas (`effects/weather.ts`), la luz la aplica
+`daylightAt(phase, speed, overcast)`, el trueno es ruido rosa filtrado en
+`sound.ts` y lo dispara `app.ts` contando los rayos que cuenta el renderer.
+`?debug=1&live=1&weather=storm` adelanta el valle hasta una tormenta y hay
+recorrido de Playwright.
+
+**Tres cosas que se arreglaron mirando capturas, y que valen como aviso:**
+
+- **El rayo caía fuera de cámara** nueve de cada diez veces (mapa 72 × 112,
+  vista de reposo 26 celdas). Ahora cae en el corazón del valle.
+- **Medía cuarenta celdas de alto** y la cámara isométrica lo proyectaba como
+  una raya de esquina a esquina. Veinte, y tres hebras en vez de una.
+- **Un rayo caía en el primer fotograma** de cualquier jornada de tormenta,
+  porque la jornada abre en 0,28 y la búsqueda de rayos cruzados empezaba en
+  cero.
+
+**Lo que quedó sin hacer, y el dueño no lo ha visto aún:**
+
+- **La nieve no se ha mirado en captura.** Es el mismo camino que la lluvia
+  (`set('snow')`), pero nadie ha abierto un invierno a mirarla: el valle de las
+  capturas era de verano. Son dos minutos con
+  `?debug=1&live=1&weather=storm&season=winter`.
+- **El trueno no se ha oído.** `tools/graphics/sound-check.mjs` abre la página y
+  mira el `AudioContext` de verdad, y no se ha usado con esto.
+- **Nadie ha medido los fotogramas con lluvia** en un móvil. Son mil doscientos
+  segmentos en una malla: en el portátil no se nota, y eso es lo único que se
+  sabe (G-09 sigue pendiente de dispositivo).
+
+<details>
+<summary>El brief con el que se hizo, por si hay que rehacerlo</summary>
 
 **Lo que hay hoy:**
 
@@ -288,6 +328,161 @@ Qué toca, en orden:
 **Lo que no hagas:** clima por semana en el motor; tirar del flujo `weather`
 desde el render; partículas por celda (son 8 064 celdas); sonido con ficheros
 de audio (U-09: todo sintetizado, +0,41 % de peso fue el trato).
+
+</details>
+
+### 3b. Lo corto que queda pendiente, una tarea por entrada
+
+Cada una está acotada a propósito: los ficheros que toca, cómo se comprueba y
+cuándo está hecha. **Si en una aparece una decisión** —un número de
+`balance.ts`, un color, un «¿esto se ve bien?»— es que estaba mal cortada:
+apúntalo y déjala, porque eso lo decide el dueño del diseño.
+
+#### S-01 · La nieve, fotografiada
+
+**Por qué.** El cielo de v3.73 pinta nieve en invierno y **nadie la ha mirado**:
+las capturas de la ronda eran de verano. El código es el mismo camino que la
+lluvia, así que esto es mirar, no programar.
+
+**Qué hacer.**
+
+1. Levanta el servidor de capturas: `npx tsx tools/graphics/bundle-game.ts --split`
+   y, desde `artifacts/graphics/G-10/game`, `python -m http.server 8127 --bind 127.0.0.1`.
+2. Captura un invierno con cielo cerrado:
+   ```
+   node tools/graphics/shot.mjs --page "http://127.0.0.1:8127/valley.html?debug=1&live=1&weather=storm&seed=7&year=20&season=winter" --settle 6 --sequence 8 --every 4 --out artifacts/graphics/G-10/storm/snow.png
+   ```
+   (`weather=storm` adelanta el valle hasta una jornada de cielo cerrado; en
+   invierno eso es nieve, porque §10.8 no deja tronar en invierno.)
+3. Mira las ocho capturas. Lo que hay que ver: copos, lentos, con vaivén, y la
+   luz más baja que en un día claro. Si la nieve **no se ve**, apunta en el PR
+   qué dice `data-sky` en la raíz —debería decir `snow`— y **no toques
+   `SKY`**: eso es un número de balance.
+4. Manda al dueño la mejor captura con `SendUserFile` y una frase.
+
+**Hecho cuando** hay capturas en `artifacts/graphics/G-10/storm/` y el dueño las
+tiene. Si algo no se ve, la tarea acaba igual: con lo medido escrito.
+
+---
+
+#### S-02 · El trueno, oído
+
+**Por qué.** El trueno de v3.73 está escrito y probado como acento, pero nadie
+lo ha oído sonar en la página.
+
+**Qué hacer.** `tools/graphics/sound-check.mjs` abre el juego y mira el
+`AudioContext` de verdad. Léelo, y añádele —o escribe al lado— una comprobación
+que abra `?debug=1&live=1&weather=storm&seed=7&year=20&season=summer`, arme el
+sonido con un toque en la pantalla, espere a que `data-bolts` suba y compruebe
+que algo suena (el número de nodos, la ganancia del máster, lo que la
+herramienta ya sepa mirar). Apunta en el PR **qué** comprobaste, no que «suena».
+
+**No hagas**: cambiar `SOUND.THUNDER_*`. Son números de balance.
+
+**Hecho cuando** la herramienta dice sí o dice no, y queda escrito.
+
+---
+
+#### S-03 · Los fotogramas con lluvia
+
+**Por qué.** La lluvia son mil doscientos segmentos en una malla. En el portátil
+no se nota; nadie ha medido cuánto cuesta.
+
+**Qué hacer.** `tests/fast/graphics-budget.test.ts` ya cuenta llamadas de dibujo
+y triángulos con la escena montada. Añade **un** caso: una escena con lluvia a
+intensidad plena no pasa de una llamada de dibujo más que la misma escena con
+cielo claro (es una malla), y apunta los triángulos de las dos. El patrón está
+en el propio fichero; `createWeather` se usa igual que en
+`tests/fast/weather.test.ts`.
+
+**Hecho cuando** la prueba pasa y el PR dice los dos números.
+
+---
+
+#### S-04 · Las horas, en la pantalla de la gente y en la crónica
+
+**Por qué.** El reloj de v3.72 puso horas en la cabecera, pero la crónica sigue
+fechando por años («ANNO III») y la ficha de un aldeano dice su edad en años.
+Eso está **bien** y no se toca. Lo que falta es más pequeño: la cartela de hito
+(`src/ui/moment.ts`) y el aviso (`src/ui/notice.ts`) no dicen cuándo pasó lo que
+cuentan, y ahora que hay reloj se puede.
+
+**Qué hacer.** Mira si merece la pena: abre el juego, deja correr a ×16 y mira
+un aviso. Si añadirle la hora lo mejora, añádela con una clave nueva en el banco
+(`app.notice.at` o similar, con `{time}`) y `valleyClock` +`hourAt` como hace
+`src/ui/app.ts`. **Si no lo mejora, no lo hagas** y escribe por qué en el PR:
+media pantalla de texto para decir «a las 14:00» es peor que no decirlo.
+
+**Hecho cuando** hay decisión escrita, con captura si se cambió algo.
+
+---
+
+#### S-05 · Cerrar la ficha de un edificio con la barra
+
+**Por qué.** U-14 arregló la crónica y la pantalla de la gente. La **ficha** que
+se abre al tocar un edificio (`.valley-panel`, en `src/ui/app.ts`) se cierra con
+su botón, que está bien, pero no avisa a la barra de destinos ni se cierra al
+tocar «Valley». Es el mismo fallo, más pequeño.
+
+**Qué hacer.** En `src/ui/app.ts`, que `toValley()` cierre también la ficha
+(`closePanel()`, que ya existe) y que abrir la ficha no deje la pestaña
+encendida en otra pantalla. Añade el caso al recorrido
+«la crónica y la gente se abren y se cierran» de `tools/valley.shots.ts`.
+
+**Hecho cuando** `npm run test:shots` pasa con el caso nuevo.
+
+---
+
+#### S-06 · El servidor huérfano del puerto 8127
+
+**Por qué.** Las capturas necesitan un servidor estático en
+`artifacts/graphics/G-10/game`, y las sesiones lo dejan corriendo. No es un
+fallo del juego, es higiene.
+
+**Qué hacer.** Escribe `tools/graphics/serve.mjs`: sirve ese directorio en el
+8127, **avisa si el puerto ya está ocupado en vez de fallar** y se cierra con
+Ctrl+C. Añádelo a `package.json` como `npm run serve:shots` y menciónalo en
+`docs/handover.md` §6, donde están los comandos de mirar el juego.
+
+**Hecho cuando** `npm run serve:shots` sirve la página y `shot.mjs` la
+fotografía.
+
+---
+
+#### S-07 · Las pruebas que cuentan tiempo, revisadas
+
+**Por qué.** v3.72 cambió cuánto dura una semana (15 s → 840 s) y **tres
+recorridos** se cayeron porque escribían sus milisegundos a mano. Se arreglaron
+derivándolos de la constante (`msFor`, `advanceWeeks` en `tools/valley.shots.ts`),
+pero puede quedar alguno.
+
+**Qué hacer.** `grep -rn "60_000\|15_000\|_000)" tests tools --include=*.ts` y
+revisa cada número que sea *tiempo real*: si viene de `TIME.REAL_MS_PER_TICK`,
+que lo derive; si es tiempo de pared de una animación (`NOTICE_MS`,
+`MOMENT_MS`), déjalo y escribe al lado por qué es de pared. No cambies el
+significado de ninguna prueba.
+
+**Hecho cuando** `npm test && npm run test:shots` pasan y el PR lista qué
+números eran de tick y cuáles de pared.
+
+---
+
+#### S-08 · `data-*` de la raíz, documentados en un sitio
+
+**Por qué.** La raíz lleva ya `data-app-ready`, `data-tick`, `data-render`,
+`data-render-failure`, `data-intro`, `data-view-height`, `data-sun-phase`,
+`data-sky`, `data-bolts` y `data-screen`. Es el mecanismo con el que se
+comprueba el juego desde fuera, y no hay una lista.
+
+**Qué hacer.** Una tabla en `docs/handover.md` §6 con cada atributo, qué dice,
+quién lo escribe y para qué prueba existe. Sácalos con
+`grep -rn "dataset\." src/ui src/render3d`.
+
+**Hecho cuando** la tabla está y no falta ninguno.
+
+---
+
+---
 
 ### 4. Operativa que cuesta tiempo si no se sabe
 

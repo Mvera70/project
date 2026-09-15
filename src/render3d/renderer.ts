@@ -36,6 +36,9 @@ import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { Cast } from './world/cast';
 import { dayNumber, dayPhase } from './presentation-clock';
+import { SKY } from '@engine/balance';
+import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../derive/weather';
+import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
 import { castOf, propsOf } from './life/cast';
@@ -223,8 +226,8 @@ export async function createGraphicsRenderer(
    * dia dura menos de dos segundos, y una jornada de luz de dos segundos es un
    * parpadeo. `daylightAt` la aplana; aqui solo se le pasa el dato.
    */
-  function light(phase: number, speed: GraphicsFrame['speed']): void {
-    const day = daylightAt(phase, speed);
+  function light(phase: number, speed: GraphicsFrame['speed'], overcast = 0): void {
+    const day = daylightAt(phase, speed, overcast);
     sun.color.set(day.sunColour);
     sun.intensity = day.sunIntensity;
     // Puesto el sol no hay sombra que echar, asi que tampoco hay mapa de
@@ -275,6 +278,8 @@ export async function createGraphicsRenderer(
     const wanted = role === null || role === 'stranger' ? undefined : VILLAGER_BY_ROLE[role];
     return (wanted === undefined ? undefined : library.instance(wanted)) ?? library.instance(VILLAGER);
   }, (id) => library.instance(id));
+  // U-13 · la lluvia, la nieve y el rayo. Tres mallas, creadas una vez.
+  const weather = createWeather(scene);
   const tells = new Tells();
   const fauna = new Fauna((kind) => library.instance(kind));
   const bubbles = new Bubbles();
@@ -367,6 +372,14 @@ export async function createGraphicsRenderer(
   let mapHeight = 0;
   // U-12 · la fase de la última jornada pintada, para poder mirarla desde fuera.
   let paintedPhase = 0;
+  // U-13 · el cielo de la jornada que se está pintando, y los rayos que han
+  // caído. `bolts` sólo sube: `app.ts` mira cuánto ha subido para tronar.
+  let paintedSky: SkyKind = 'clear';
+  let bolts = 0;
+  let boltPhase = 0;
+  let boltDay = -1;
+  let flashLeft = 0;
+  const FLASH_WHITE = new Color('#FFFDF2');
   let disposed = false;
 
   const raycaster = new Raycaster();
@@ -594,6 +607,8 @@ export async function createGraphicsRenderer(
         fauna.clear();
         bubbles.clear();
         props.clear();
+        weather.clear();
+        paintedSky = 'clear';
       }
       // El suelo se rehace cuando cambia el terreno **o cuando cambia la
       // estación del reloj vivo**, que es lo que le da el color. La clave lleva
@@ -698,7 +713,53 @@ export async function createGraphicsRenderer(
       fauna.update(shown, phase);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
-      light(phase, frame.speed);
+      // **U-13 · el cielo.** Se deriva (`derive/weather.ts`): la fila del clima
+      // del año dice cuánto llueve en este valle y un `hash32` de la jornada
+      // dice qué toca hoy, sin tocar el motor ni consumir una tirada.
+      const sky = skyAt(shown, today);
+      if (sky.kind !== paintedSky) {
+        weather.set(sky.kind, sky.intensity);
+        paintedSky = sky.kind;
+      }
+      // Los rayos de la jornada están decididos de antemano —fases fijas—, así
+      // que aquí sólo se mira cuáles se han cruzado desde el fotograma
+      // anterior. A ×64 un fotograma puede cruzar dos: cuentan los dos y se
+      // dibuja el último, que es lo que se vería.
+      if (today !== boltDay) {
+        boltDay = today;
+        // Desde **aquí**, no desde el amanecer: al abrir el juego la jornada ya
+        // va por 0,28 (`DAY_START_PHASE`), y arrancando en cero caía un rayo en
+        // el primer fotograma de cualquier día de tormenta. Los que cayeron
+        // antes de mirar, cayeron sin nadie delante.
+        boltPhase = phase;
+      }
+      for (const [index, at] of boltsInDay(shown, today).entries()) {
+        if (at <= boltPhase || at > phase) continue;
+        const where = boltPlace(shown, today, index);
+        weather.strike(where.x, where.z, index);
+        flashLeft = SKY.FLASH_SECONDS;
+        bolts += 1;
+      }
+      boltPhase = phase;
+      // En pausa no se apaga: el destello y la lluvia se quedan como están,
+      // igual que todo lo que se mueve (§11.4). Y así se puede fotografiar un
+      // rayo, que dura 0,12 s y no hay captura que lo alcance corriendo.
+      const flashDelta = frame.speed === 0 ? 0 : frame.realDeltaSeconds;
+      weather.step(frame.deltaSeconds, view.view.centre, flashDelta);
+      // Y la luz que hace a esa hora, con el cielo que haga encima.
+      light(phase, frame.speed, overcastOf(sky));
+      if (flashLeft > 0) {
+        // El destello: el hemisférico a tope y el fondo casi blanco mientras
+        // dura. Se hace **después** de `light` a propósito, porque es un
+        // instante y no una hora: la hora vuelve sola en el fotograma
+        // siguiente sin que nadie tenga que restaurar nada.
+        flashLeft -= flashDelta;
+        ambient.intensity *= 2.4;
+        sun.intensity *= 1.6;
+        (scene.background as Color).lerp(FLASH_WHITE, 0.55);
+        if (scene.fog !== null) (scene.fog as Fog).color.copy(scene.background as Color);
+        renderer.setClearColor(scene.background as Color);
+      }
       // El zoom mueve la camara, asi que la niebla se recalibra con ella: si no,
       // acercarse metia el pueblo dentro de la bruma.
       if (mapWidth > 0) fogAround(new Vector3(mapWidth / 2, 0, mapHeight / 2));
@@ -790,12 +851,15 @@ export async function createGraphicsRenderer(
         buildings: village.count,
         viewHeight: view.view.height,
         sunPhase: paintedPhase,
+        sky: paintedSky,
+        bolts,
       };
     },
 
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      weather.dispose();
       tells.dispose();
       fauna.dispose();
       bubbles.dispose();

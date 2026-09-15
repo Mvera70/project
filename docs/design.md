@@ -2192,6 +2192,72 @@ concreto durante veinte minutos.
 - El fondo cacheado se regenera en menos de 30 ms.
 - Un tick del motor, menos de 2 ms con 80 aldeanos. Un siglo, menos de 10 s.
 
+### 10.8 El cielo (U-13, v3.73)
+
+Lo pidió el dueño del diseño el 15 sep 2026, y es el último de sus cinco pasos:
+«el siguiente paso es crear efectos meteorológicos, como tormentas con rayos».
+
+**Es presentación, y el motor no se entera.** El clima del motor se tira una vez
+al año (§5.1, `rollWeather`, flujo `weather`) y de ahí sale el factor de
+cosecha; meter clima semanal en el motor movería el balance de sesenta semillas
+y rompería los guardados para pintar nubes. Así que el cielo se **deriva**
+(`src/derive/weather.ts`): la fila del año dice cuánto llueve en este valle, la
+estación dice si cae agua o nieve, y un `hash32` de la jornada dice qué toca
+hoy. No consume ni una tirada —hay prueba— así que añadir esto no desplaza una
+sola cosecha, y dos partidas con la misma semilla llueven igual.
+
+| Cielo | Cuándo | Qué se ve |
+|---|---|---|
+| `clear` | el 79 % de las jornadas | nada |
+| `overcast` | 7 % | la luz baja y el cielo se va al plomo |
+| `rain` | 6 % | mil doscientas rayas cayendo torcidas |
+| `storm` | 4 %, nunca en invierno | lluvia, la luz al 40 %, de dos a siete rayos |
+| `snow` | 3,5 %, sólo en invierno | ochocientos copos, lentos y con vaivén |
+
+Medido con `tools/sky-report.ts` (seis semillas, sesenta años): unas dieciséis
+tormentas al año, o una cada tres semanas. Y **el año manda**: un valle ruinoso
+tiene el cielo cerrado el 33,9 % de las jornadas y uno abundante el 9,2 %, así
+que el cielo cuenta lo mismo que la cosecha y dos valles del mismo año se ven
+distintos — que es la esencia del juego según su dueño.
+
+**La luz.** `daylightAt(phase, speed, overcast)` aplica el cielo **antes** del
+aplanado por velocidad, para que una tormenta a ×64 siga siendo una tormenta: lo
+que `LIGHT_STEADY` aplana es la hora, no el tiempo que hace. El sol pierde toda
+su intensidad a tope de tormenta —es lo que quita las sombras duras—, el
+ambiente pierde mucho menos (un valle bajo la lluvia se sigue viendo) y el cielo
+se va al plomo un 25 % más deprisa que el resto, porque es lo primero que se ve
+de una tormenta. `daylight` baja con ella, así que **las ventanas se encienden
+de día**, que es lo que hace una casa cuando se pone oscuro a mediodía.
+
+**Lo que se dibuja.** Tres mallas y ni una más (`effects/weather.ts`, D.9): una
+tira de segmentos para la lluvia, un puñado de puntos para la nieve y una malla
+de tres hebras para el rayo. Se construyen al abrir y se reutilizan; lo que
+cambia con el cielo es cuántas se dibujan (`setDrawRange`), no cuántas existen.
+Con cielo claro están invisibles y no cuestan nada.
+
+**El rayo, con dos decisiones medidas en captura:**
+
+- **Cae en el corazón del valle** (§7.1, `HEART`) y no en cualquier punto del
+  mapa. El mapa son 72 × 112 celdas y la vista de reposo enseña unas 26: un rayo
+  repartido por todo el mapa caía fuera de cámara nueve de cada diez veces.
+- **Mide veinte celdas y son tres hebras.** Con cuarenta, la cámara isométrica
+  lo proyectaba como una raya que cruzaba la pantalla de esquina a esquina y
+  dejaba de leerse como un rayo; con una sola hebra de un píxel, a la distancia
+  de reposo era un pelo indistinguible del borde de un árbol.
+
+El destello dura `SKY.FLASH_SECONDS` de reloj **real** —un destello es un
+destello a cualquier velocidad— y **en pausa no se apaga**, como todo lo que se
+mueve (§11.4); eso es además lo que permite fotografiarlo, porque 0,12 s no los
+alcanza ninguna captura corriendo. El trueno llega entre 0,4 y 2,2 s después,
+porque el sonido va más despacio que la luz: el renderer **cuenta** los rayos
+(`GraphicsStats.bolts`) y `app.ts` truena, así que el render sigue sin saber que
+existe el sonido.
+
+**Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
+ruta de depuración acepta `&weather=storm` —que adelanta el valle hasta una
+jornada de tormenta, porque esperarla no es una forma de probarla— y hay un
+recorrido en `valley.shots.ts` que cuenta el rayo y deja la captura.
+
 ---
 
 ## 11. Interfaz
@@ -2345,6 +2411,21 @@ detrás. Título, tres o cuatro frases de contexto, y las opciones como bloques
 grandes con **el verbo y el precio**, siempre visible el precio. Sin botón de
 cerrar: se decide o se vuelve al valle con gesto, y la encrucijada sigue
 pendiente con una marca discreta.
+
+> **U-14, v3.73 — y hay forma de volver atrás.** Lo dijo el dueño del diseño
+> mirando el juego: «cuando entras a ver a los aldeanos o el historial, no hay
+> forma de volver atrás». Era cierto: las dos pantallas se cerraban **sólo**
+> deslizando hacia abajo, y su velo (z-index 13) tapaba la barra de destinos, de
+> modo que quien entraba se quedaba dentro. Tres cosas lo arreglan, y las tres
+> son lo que un dedo espera: **la barra de destinos se queda encima** de las dos
+> pantallas (z-index 14; la encrucijada y el epitafio la siguen escondiendo por
+> clase), **es una barra de pestañas de verdad** —la encendida dice dónde estás,
+> tocar «Valley» vuelve, tocar la otra cambia— y **cada pantalla lleva su botón
+> de cerrar**, porque a la crónica se llega también con un gesto y un gesto no
+> explica cómo se sale. El deslizamiento se queda: era correcto, estaba solo. Las
+> dos pantallas dejan un hueco abajo para la barra, y avisan al cerrarse
+> (`onClose`) para que la pestaña encendida no se quede encendida sin pantalla.
+> La raíz lleva `data-screen`, que es con lo que se comprueba desde fuera.
 
 **4. Crónica.** Lista desplazable por años. Al abrir tras una ausencia, encabeza
 el parte de bienvenida (§9.2). Si el archivo contiene aldeas anteriores, una

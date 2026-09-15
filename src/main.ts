@@ -2,7 +2,7 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { SCHEMA_VERSION, type SaveFile } from '@engine/state';
-import { mountDebug, parseDebugRequest, stateAt } from './ui/debug';
+import { mountDebug, parseDebugRequest, runToStorm, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -47,6 +47,9 @@ if (root) {
     });
   } else if (query.get('live') === '1') {
     const state = stateAt(request);
+    // U-13 · `&weather=storm` adelanta el valle hasta una jornada de tormenta,
+    // que es la única manera de fotografiar una: salen en el 4 % de los días.
+    if (query.get('weather') === 'storm') runToStorm(state);
     if (query.get('hunger') === '1') state.village.grain = 0;
     if (query.get('ended') === '1') {
       state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };

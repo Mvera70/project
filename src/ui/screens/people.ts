@@ -23,7 +23,9 @@ import { recogniseGesture, type Point } from '../gestures';
 const STYLE_ID = 'valley-people-style';
 const STYLE = `
 .people-scrim { position: fixed; inset: 0; z-index: 13; overflow: auto; box-sizing: border-box;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  /* El hueco de abajo es para la barra de destinos, que se queda encima: sin
+     él, la última ficha de la lista quedaba debajo de ella. */
+  padding: max(20px, env(safe-area-inset-top)) 20px calc(74px + env(safe-area-inset-bottom));
   background: var(--night, #1a1511); color: var(--parchment, #f2e9d8); font: 14px/1.4 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
 .people-scrim h2 { margin: 0 0 14px; font: 600 15px/1.2 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); color: var(--gild-lit, #c9ab6b); }
 .people-row { display: block; box-sizing: border-box; width: 100%; min-height: 44px; margin: 0 0 8px; padding: 9px 12px;
@@ -33,6 +35,17 @@ const STYLE = `
 .people-row b { display: block; font: 600 15px/1.2 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
 .people-row span { display: block; margin-top: 2px; color: var(--paper-dim, #d9cfbc); font-size: 12px; line-height: 1.4; }
 .people-empty { margin: 0; color: var(--paper-dim, #d9cfbc); }
+/* U-14 · **La salida, visible.** Las dos pantallas se cerraban sólo deslizando
+   hacia abajo, y el velo tapaba la barra de destinos: quien entraba a ver a los
+   aldeanos o la crónica se quedaba dentro. Lo dijo el dueño del diseño el 15
+   sep 2026: «no hay forma de volver atrás». Ahora hay un botón y la barra de
+   abajo sigue a la vista, que es lo que un dedo espera de una barra de
+   pestañas. El deslizamiento se queda: era correcto, sólo estaba solo. */
+.people-close { position: sticky; top: 0; float: right; min-height: 40px; margin: -4px -6px 0 8px;
+  padding: 6px 12px; border: 1px solid #756c55; border-radius: 8px; background: var(--night-soft, #262019);
+  color: var(--gild-lit, #c9ab6b); font: 600 13px/1 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.people-close:active { background: #322a20; }
 .people-back { display: inline-flex; align-items: center; box-sizing: border-box; min-height: 44px; margin: 0 0 16px;
   padding: 0 14px; border: 1px solid #756c55; border-radius: 8px; background: var(--night-soft, #262019);
   color: var(--gild-lit, #c9ab6b); font: 600 13px/1 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
@@ -67,10 +80,22 @@ function traitsLine(v: Villager): string {
 }
 
 let open: HTMLElement | null = null;
+/** A quién avisar cuando esta pantalla se cierre, se cierre como se cierre. */
+let closed: (() => void) | null = null;
 
-export function openPeople(app: App): void {
+/** Cierra la pantalla si está abierta. La barra de destinos la usa (U-14). */
+export function closePeople(): void {
+  open?.remove();
+  open = null;
+  const tell = closed;
+  closed = null;
+  tell?.();
+}
+
+export function openPeople(app: App, onClose?: () => void): void {
   if (open !== null) return;
   ensureStyle();
+  closed = onClose ?? null;
   const scrim = document.createElement('div');
   scrim.className = 'people-scrim';
 
@@ -129,7 +154,12 @@ export function openPeople(app: App): void {
   };
 
   renderList();
-  scrim.append(body);
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'people-close';
+  close.textContent = renderUiText('app.close');
+  close.addEventListener('click', closePeople);
+  scrim.append(close, body);
 
   const trace: Point[] = [];
   scrim.addEventListener('pointerdown', (event) => {
@@ -138,10 +168,7 @@ export function openPeople(app: App): void {
   });
   scrim.addEventListener('pointerup', (event) => {
     trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-    if (recogniseGesture({ points: trace }) === 'swipe_down') {
-      scrim.remove();
-      open = null;
-    }
+    if (recogniseGesture({ points: trace }) === 'swipe_down') closePeople();
   });
 
   document.body.append(scrim);

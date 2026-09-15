@@ -1,6 +1,6 @@
 // M-20 · The first running application shell.
 
-import { TIME } from '@engine/balance';
+import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { answerFor } from './answer';
@@ -26,10 +26,10 @@ import { doingNow } from './doing';
 import { milestonesAt } from './milestones';
 import { mountMoments } from './moment';
 import { mountNotices } from './notice';
-import { openChronicle } from './screens/chronicle';
+import { closeChronicle, openChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
-import { openPeople } from './screens/people';
+import { closePeople, openPeople } from './screens/people';
 import { isSpeed, speedLabel, type Speed } from './speed';
 import { accentFor, ambientFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
@@ -449,11 +449,38 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const valleyTab = tab(NAV_ICONS.valley, renderUiText('nav.valley'));
   const chronicleTab = tab(NAV_ICONS.chronicle, renderUiText('nav.chronicle'));
   const peopleTab = tab(NAV_ICONS.people, renderUiText('nav.people'));
-  valleyTab.setAttribute('aria-pressed', 'true');
-  chronicleTab.addEventListener('click', () => openChronicle(app));
+  // **U-14 · y la barra lleva de vuelta.** Las dos pantallas se cerraban sólo
+  // deslizando hacia abajo y su velo tapaba esta barra, así que quien entraba
+  // se quedaba dentro: «no hay forma de volver atrás», dueño del diseño, 15
+  // sep 2026. Ahora esto es una barra de pestañas de verdad —una está
+  // encendida, tocar otra cambia, tocar el valle vuelve— y cada pantalla lleva
+  // además su botón de cerrar, porque a la crónica se llega también con un
+  // gesto y un gesto no explica cómo se sale.
+  const showing = (which: 'valley' | 'chronicle' | 'people'): void => {
+    valleyTab.setAttribute('aria-pressed', String(which === 'valley'));
+    chronicleTab.setAttribute('aria-pressed', String(which === 'chronicle'));
+    peopleTab.setAttribute('aria-pressed', String(which === 'people'));
+    document.documentElement.dataset.screen = which;
+  };
+  const toValley = (): void => {
+    closeChronicle();
+    closePeople();
+    showing('valley');
+  };
+  showing('valley');
+  valleyTab.addEventListener('click', toValley);
+  chronicleTab.addEventListener('click', () => {
+    closePeople();
+    openChronicle(app, undefined, () => showing('valley'));
+    showing('chronicle');
+  });
   // U-08 · la pantalla de la gente: la lista de los nombrados vivos y, al
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
-  peopleTab.addEventListener('click', () => openPeople(app));
+  peopleTab.addEventListener('click', () => {
+    closeChronicle();
+    openPeople(app, () => showing('valley'));
+    showing('people');
+  });
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
   root.append(canvas, timeLine, dateLine, vitals, doing, ordersNow, hint, orders, hudRight, tabbar);
   paintOrders();
@@ -630,6 +657,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
   let paintedTime = '';
   let paintedDate = '';
+  let lastBolts = 0;
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
@@ -641,6 +669,22 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // U-12 · y en qué punto de la jornada va el sol, para poder comprobar
       // desde fuera que la hora de abajo es la que se ve por la ventana.
       document.documentElement.dataset.sunPhase = stats.sunPhase.toFixed(4);
+      // U-13 · qué cielo hace y cuántos rayos han caído, por lo mismo.
+      document.documentElement.dataset.sky = stats.sky;
+      document.documentElement.dataset.bolts = String(stats.bolts);
+      // **Y el trueno.** El renderer no sabe que existe el sonido —ni tiene por
+      // qué—, así que lo que hace es contar los rayos; aquí se mira cuánto ha
+      // subido la cuenta y se truena. Con retardo, porque el sonido va más
+      // despacio que la luz y ese retardo es lo que hace que una tormenta se
+      // sienta lejos o encima. Cuánto exactamente lo decide `Math.random`, y
+      // es legítimo por lo mismo que en `sound.ts`: es decorado del navegador,
+      // no una tirada de la partida (§4.3).
+      if (stats.bolts > lastBolts) {
+        lastBolts = stats.bolts;
+        const [near, far] = SKY.THUNDER_DELAY;
+        const delay = (near + Math.random() * (far - near)) * 1000;
+        window.setTimeout(() => sound.accent('thunder', Date.now()), delay);
+      }
     }
     // U-12 · el reloj. Se pinta sólo cuando cambia el texto: a ×64 la hora
     // cambia dos veces por segundo y escribir en el DOM cada fotograma es
@@ -909,7 +953,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // que arrastrar el mapa: el valle se movía **y** al soltar se abría la
       // crónica encima. «No se puede bien mover el mapa», y era esto.
       if (gesture === 'swipe_down') closePanel();
-      else if (gesture === 'swipe_up') openChronicle(app);
+      else if (gesture === 'swipe_up') {
+        openChronicle(app, undefined, () => showing('valley'));
+        showing('chronicle');
+      }
     }
   });
 

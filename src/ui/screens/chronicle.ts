@@ -16,7 +16,8 @@ import { recogniseGesture, type Point } from '../gestures';
 const STYLE_ID = 'valley-chronicle-style';
 const STYLE = `
 .chronicle-scrim { position: fixed; inset: 0; z-index: 13; overflow: auto; box-sizing: border-box;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  /* El hueco de abajo es para la barra de destinos, que se queda encima. */
+  padding: max(20px, env(safe-area-inset-top)) 20px calc(74px + env(safe-area-inset-bottom));
   background: var(--night, #1a1511); color: var(--parchment, #f2e9d8); font: 14px/1.4 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
 .chronicle-scrim h2 { margin: 20px 0 8px; font: 600 15px/1.2 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); color: var(--gild-lit, #c9ab6b); }
 .chronicle-scrim h2:first-child { margin-top: 0; }
@@ -27,6 +28,17 @@ const STYLE = `
 .chronicle-source select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 9px 34px 9px 11px;
   border: 1px solid #756c55; border-radius: 8px; background: var(--night-soft, #262019); color: var(--parchment, #f2e9d8);
   font: 14px/1.2 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
+/* U-14 · **La salida, visible.** Las dos pantallas se cerraban sólo deslizando
+   hacia abajo, y el velo tapaba la barra de destinos: quien entraba a ver a los
+   aldeanos o la crónica se quedaba dentro. Lo dijo el dueño del diseño el 15
+   sep 2026: «no hay forma de volver atrás». Ahora hay un botón y la barra de
+   abajo sigue a la vista, que es lo que un dedo espera de una barra de
+   pestañas. El deslizamiento se queda: era correcto, sólo estaba solo. */
+.chronicle-close { position: sticky; top: 0; float: right; min-height: 40px; margin: -4px -6px 0 8px;
+  padding: 6px 12px; border: 1px solid #756c55; border-radius: 8px; background: var(--night-soft, #262019);
+  color: var(--gild-lit, #c9ab6b); font: 600 13px/1 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.chronicle-close:active { background: #322a20; }
 `;
 
 function ensureStyle(): void {
@@ -58,6 +70,17 @@ function yearBlock(source: ChronicleSource, year: number): HTMLElement | null {
 }
 
 let open: HTMLElement | null = null;
+/** A quién avisar cuando esta pantalla se cierre, se cierre como se cierre. */
+let closed: (() => void) | null = null;
+
+/** Cierra la pantalla si está abierta. La barra de destinos la usa (U-14). */
+export function closeChronicle(): void {
+  open?.remove();
+  open = null;
+  const tell = closed;
+  closed = null;
+  tell?.();
+}
 
 function archivedSource(game: ArchivedGame): ChronicleSource {
   return { chronicle: game.chronicle, rng: makeBundle(game.seed), lastTick: game.endedTick };
@@ -68,9 +91,10 @@ function archivedSource(game: ArchivedGame): ChronicleSource {
  * once mounted — the most recent year still renders in full above it, since a
  * year is never split by the tick that happened to open the screen.
  */
-export function openChronicle(app: App, sinceTick?: number): void {
+export function openChronicle(app: App, sinceTick?: number, onClose?: () => void): void {
   if (open !== null) return;
   ensureStyle();
+  closed = onClose ?? null;
   const state = app.state();
   const previous = app.archive()
     .map((game, index) => ({ game, index }))
@@ -122,7 +146,12 @@ export function openChronicle(app: App, sinceTick?: number): void {
     label.append(select);
     scrim.append(label);
   }
-  scrim.append(body);
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'chronicle-close';
+  close.textContent = renderUiText('app.close');
+  close.addEventListener('click', closeChronicle);
+  scrim.append(close, body);
   const scrollTarget = renderSource(current, sinceTick);
 
   const trace: Point[] = [];
@@ -132,10 +161,7 @@ export function openChronicle(app: App, sinceTick?: number): void {
   });
   scrim.addEventListener('pointerup', (event) => {
     trace.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-    if (recogniseGesture({ points: trace }) === 'swipe_down') {
-      scrim.remove();
-      open = null;
-    }
+    if (recogniseGesture({ points: trace }) === 'swipe_down') closeChronicle();
   });
 
   document.body.append(scrim);
