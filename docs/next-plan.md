@@ -49,11 +49,16 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
 | Qué | Estado | Cómo se comprueba |
 |---|---|---|
 | Suite rápida | 67 ficheros, 1 073 verdes, ~25 s | `npm test` |
-| Jornadas | 111 + `founding.test.ts` verdes (~6 min) | `npm run test:journeys` |
-| Playwright | 11 verdes + 3 declaradas (`test.fail`) | `npm run test:shots` |
+| Jornadas | 116 verdes (~5 min) | `npm run test:journeys` |
+| Playwright | 12 verdes + 3 declaradas (`test.fail`) | `npm run test:shots` |
 | Balance | **16 rojas de 37** — antes de la pareja eran 11 | `npm run test:balance`, 25 min; `docs/handover.md` §5.5 dice cuáles y por qué |
-| Demo publicada | https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK (versión 12, con menú, inicio guiado y reloj) | ver §4 abajo |
-| Rama | `graphics/g-04-villager-rig`, ~32 commits sin subir | `git log --oneline main..HEAD` |
+
+**Nada de v3.70 a v3.73 vuelve a medir el balance, y es a propósito:** el menú,
+el inicio guiado, el reloj y el cielo no tocan el motor salvo la tabla de
+tiempos de §12.1, y la suite de balance cuenta **ticks**, no segundos. Las 16
+rojas son las de la pareja. Quien cambie una regla del motor, remídelas.
+| Demo publicada | https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK (versión 13, con los cinco pasos) | ver §4 abajo |
+| Rama | `graphics/g-04-villager-rig`, 32 commits sin subir | `git log --oneline main..HEAD` |
 
 **Y lo que el reloj de v3.72 cambió para cualquiera que mida algo:** una semana
 del motor dura **catorce minutos a ×1** y no quince segundos, así que **lo que
@@ -332,6 +337,11 @@ de audio (U-09: todo sintetizado, +0,41 % de peso fue el trato).
 </details>
 
 ### 3b. Lo corto que queda pendiente, una tarea por entrada
+
+> **En marcha el 15 sep por la tarde:** S-01 y S-02 (la nieve y el trueno) y
+> S-03 y S-08 (el coste de la lluvia y la tabla de `data-*`), en dos agentes
+> aparte. Si al retomar esto sus cambios están en el árbol sin commit, son de
+> ellos: revísalos antes de tocar los mismos ficheros.
 
 Cada una está acotada a propósito: los ficheros que toca, cómo se comprueba y
 cuándo está hecha. **Si en una aparece una decisión** —un número de
