@@ -176,6 +176,24 @@ A.16 se queda **exactamente como estaba**, y el comentario de
 `crossroads/catalog/succession.ts` cuenta por qué para que nadie lo vuelva a
 relajar con el informe roto en la mano.
 
+### Lo demás que entró en la ronda
+
+- **La línea de estado de la tira** (`src/ui/doing.ts`): una frase que dice qué
+  está haciendo la aldea —el hambre, el invierno sin leña, la obra en marcha, o
+  que no hay nada que construir—. Era la mitad que faltaba de «los recursos no
+  sirven para nada»: cuatro cifras y tres palancas no cierran el bucle sin una
+  frase que diga si la orden está pasando.
+- **V-11 cerrada**, la última fase del Anexo E: la reunión de §11.8 vuelve a
+  reunir. Del 77 % al 100 % de la aldea va donde la decisión dijo, y el más
+  lejano queda a 8-11 celdas contra más de dieciséis antes. Los tres errores que
+  costó están en el commit y en `life/staging.ts`.
+- **La encrucijada es la pantalla entera** y el precio de cada opción dejó de
+  ir en mayúsculas.
+- **Dos cuellos de rendimiento del mapa grande**, arreglados: A* rellenaba tres
+  arrays del tamaño del mapa por cada ruta y `placeBuilding` recorría el mapa
+  entero por cada solar. Y los presupuestos de prueba de §14 subidos con la
+  cuenta escrita, no en silencio.
+
 ### Lo que esta ronda midió y dejó abierto, de verdad
 
 - **La última década está vacía.** Con todo levantado —los dieciséis a piedra y

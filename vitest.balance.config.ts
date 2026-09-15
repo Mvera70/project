@@ -9,8 +9,14 @@ export default defineConfig({
   test: {
     globals: true,
     include: ['tests/balance/**/*.test.ts'],
-    testTimeout: 900_000, // §14.2, v2.45: budget up from 10 to 15 minutes
-    hookTimeout: 900_000,
+    // §14.2. v2.45 lo subió de 10 a 15 minutos; v3.68 a 45, y no por escribir
+    // código más lento: **el valle es cuatro veces mayor** (§7, el mapa grande)
+    // y un tick cuesta 1,67 veces lo que costaba. Este banco simula 240
+    // partidas de doscientos años —cuarenta y ocho mil años de aldea—, así que
+    // el reloj sube con el mundo. La cuenta está en §14, con las dos
+    // optimizaciones que ya se hicieron para no subirlo más.
+    testTimeout: 2_700_000,
+    hookTimeout: 2_700_000,
     reporters: 'default',
   },
 });

@@ -5,13 +5,21 @@ describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
   let result: ReturnType<typeof runBalance>;
   beforeAll(() => { result = runBalance(); });
 
-  it('runs all 60 seeds for each policy within fifteen minutes', () => {
-    // v2.45: budget up from 10 to 15, and the last raise without optimising —
+  it('runs all 60 seeds for each policy within the budget', () => {
+    // v2.45: budget up from 10 to 15, and that raise was without optimising —
     // adverse games surviving to the 200-year horizon instead of dispersing
     // near year 25 is the fixed world, not a slower calculation.
+    //
+    // v3.68: up to 45 minutes, and the reason is the map. **El valle es cuatro
+    // veces mayor** (§7) y un tick cuesta 1,67 veces lo que costaba —medido,
+    // 642 ms contra 1 073 por cuarenta años—, así que este banco, que simula
+    // 240 partidas de doscientos años, sube con él. Antes de subirlo se
+    // arreglaron los dos cuellos que sí eran desperdicio y están contados en
+    // §14: A* rellenaba tres arrays del tamaño del mapa por cada ruta, y
+    // `placeBuilding` recorría el mapa entero por cada solar.
     expect(result.trials).toHaveLength(60 * POLICIES.length);
     for (const policy of POLICIES) expect(result.trials.filter((t) => t.policy === policy)).toHaveLength(60);
-    expect(result.durationMs).toBeLessThan(900_000);
+    expect(result.durationMs).toBeLessThan(2_700_000);
   });
 
   for (const policy of POLICIES) {
