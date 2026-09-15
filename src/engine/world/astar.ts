@@ -26,6 +26,9 @@ export function stepCost(map: ValleyMap, cell: number): number | null {
   let cost = PATHING.STEP;
   if (terrain === TERRAIN_CODE.forest) cost += PATHING.FOREST;
   if (terrain === TERRAIN_CODE.rock) cost += PATHING.ROCK;
+  // Y el vado se cruza pagando. Es la única celda de agua que se pisa, y por
+  // eso existe como terreno propio: ver `TERRAIN_CODE.ford`.
+  if (terrain === TERRAIN_CODE.ford) cost += PATHING.FORD;
   // The discount is what makes paths self-reinforcing (§7.6): a trodden cell is
   // cheaper, so the next villager takes it too, so it gets more trodden.
   cost -= PATHING.PATH_DISCOUNT[map.path[cell] ?? 0] ?? 0;

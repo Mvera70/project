@@ -12,6 +12,7 @@
 import {
   BufferAttribute, BufferGeometry, Color, DoubleSide, Mesh, MeshStandardMaterial,
 } from 'three';
+import { TERRAIN_CODE } from '@engine/state';
 import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { GROUND_BIAS } from '../visual-config';
@@ -187,6 +188,11 @@ export function cellColour(map: ValleyMap, cell: number, palette: Palette): stri
     // El mapa grande: piedra desnuda y agua quieta (`docs/next-plan.md`).
     case 6: return palette.stone;
     case 7: return palette.lake;
+    // El vado: el agua del río aclarada con el color de los caminos, que es
+    // exactamente lo que es —agua somera con piedras puestas—. No pide color
+    // propio en la paleta porque no es un terreno nuevo del valle, es un río
+    // que se puede pisar.
+    case 8: return mixed(palette.water, palette.path);
     default: return palette.meadow;
   }
 }
@@ -216,15 +222,81 @@ const RELIEF: Readonly<Record<number, number>> = {
   2: -0.14,   // agua
   4: -0.05,   // marisma
   3: 0.09,    // roca
-  // El mapa grande, paso 1. TUNE: 2,4 celdas son siete metros, un macizo y no
-  // un pico —la sierra de `ridge.ts` llega a quince, y ésta es la roca que
-  // entra **dentro** del mapa—. Como `heightAt` promedia las cuatro celdas de
-  // cada esquina, una mancha de montaña sale con falda propia en vez de con
-  // paredes verticales; una sola celda suelta es un risco.
-  6: 2.4,     // montaña
+  // La montaña no está aquí: su cota **no es una constante por celda**, sube
+  // según lo adentro que esté del macizo. Ver `risesOf`.
   // Y el lago, más hondo que el río: un cauce se vadea y un lago no.
   7: -0.30,   // lago
+  // El vado, menos hondo que el cauce: las losas asoman sobre la corriente y
+  // por eso se puede cruzar. Si estuviera a la cota del agua, la gente cruzaría
+  // el río andando sobre el río.
+  8: -0.06,   // vado
 };
+
+/**
+ * Cuánto se levanta cada celda de montaña, en celdas de altura.
+ *
+ * **Y no es un número por celda, que fue el primer intento y se vio en una
+ * captura.** Con una cota fija —2,4 celdas para toda montaña— el cinturón de
+ * roca del mapa grande salía como una **meseta plana**: el valle se leía como
+ * una tarta de piedra con un rectángulo verde encima, y encima el rectángulo
+ * del corazón se veía dibujado a tiralíneas porque el borde de la meseta era su
+ * borde.
+ *
+ * Lo que una ladera hace es subir cuanto más adentro está del macizo, así que
+ * la cota sale de eso: la distancia de cada celda de montaña a la celda más
+ * cercana que **no** es montaña. En el borde del prado la roca asoma un palmo;
+ * catorce celdas adentro es una pared. Y así el macizo empalma con la sierra de
+ * `ridge.ts`, que arranca desde la cota del borde del mapa y sigue subiendo.
+ *
+ * Se calcula una vez por mapa y se guarda: es una anchura de BFS sobre ocho mil
+ * celdas, y `elevationAt` lo pregunta por cada cosa que pisa el valle y por cada
+ * fotograma.
+ */
+const RISES = new WeakMap<ValleyMap, Float32Array>();
+
+/** TUNE: cuánto sube la roca por cada celda adentro del macizo. */
+const MOUNTAIN_SLOPE = 0.6;
+/** TUNE: y hasta dónde. Seis celdas son dieciocho metros: una ladera, no un pico. */
+const MOUNTAIN_RISE = 6;
+
+function risesOf(map: ValleyMap): Float32Array {
+  const known = RISES.get(map);
+  if (known !== undefined) return known;
+
+  const cells = map.width * map.height;
+  const depth = new Int16Array(cells).fill(-1);
+  const queue: number[] = [];
+  for (let cell = 0; cell < cells; cell += 1) {
+    if (map.terrain[cell] === TERRAIN_CODE.mountain) continue;
+    depth[cell] = 0;
+    queue.push(cell);
+  }
+  for (let head = 0; head < queue.length; head += 1) {
+    const cell = queue[head] as number;
+    const x = cell % map.width;
+    const y = Math.floor(cell / map.width);
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue;
+      const next = ny * map.width + nx;
+      if (depth[next] !== -1) continue;
+      depth[next] = (depth[cell] as number) + 1;
+      queue.push(next);
+    }
+  }
+
+  const rises = new Float32Array(cells);
+  for (let cell = 0; cell < cells; cell += 1) {
+    // Una montaña rodeada de montaña hasta el borde del mapa no tiene fondo
+    // conocido: cuenta como lo más alto, que es lo que hay pegado a la sierra.
+    const deep = depth[cell] as number;
+    const from = deep < 0 ? MOUNTAIN_RISE / MOUNTAIN_SLOPE : deep;
+    rises[cell] = Math.min(MOUNTAIN_RISE, from * MOUNTAIN_SLOPE);
+  }
+  RISES.set(map, rises);
+  return rises;
+}
 
 /**
  * La altura de una esquina de celda, promediando las celdas que la tocan.
@@ -244,6 +316,7 @@ const RUT: readonly number[] = [0, -0.02, -0.035, -0.05];
 
 /** La cota de una **esquina** de celda, promediando las celdas que la tocan. */
 function heightAt(map: ValleyMap, x: number, z: number): number {
+  const rises = risesOf(map);
   let total = 0;
   let seen = 0;
   for (const [dx, dz] of [[-1, -1], [0, -1], [-1, 0], [0, 0]] as const) {
@@ -252,6 +325,8 @@ function heightAt(map: ValleyMap, x: number, z: number): number {
     if (cx < 0 || cz < 0 || cx >= map.width || cz >= map.height) continue;
     const cell = cz * map.width + cx;
     total += RELIEF[map.terrain[cell] ?? 0] ?? 0;
+    // Y lo que la montaña levanta, que depende de dónde está y no sólo de qué es.
+    if (map.terrain[cell] === TERRAIN_CODE.mountain) total += rises[cell] as number;
     // La rodada se suma al terreno, no lo sustituye: un vado es camino sobre
     // agua y tiene que seguir estando mas bajo que el prado.
     total += RUT[Math.min(RUT.length - 1, map.path[cell] ?? 0)] ?? 0;

@@ -4,6 +4,7 @@
 // una sola frase que juzgue al jugador rompe el principio del que cuelga todo
 // el capítulo 9: la crónica narra, no califica.
 import { describe, expect, it } from 'vitest';
+import { WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
@@ -31,7 +32,7 @@ import { adjustOpinion } from '@engine/people/opinions';
 import { remember } from '@engine/people/memories';
 import { welcomeDigest } from '@engine/chronicle/digest';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
 function village(seed: number): GameState {
   const rng = makeBundle(seed);
@@ -43,8 +44,8 @@ function village(seed: number): GameState {
     peakPeople: 20,
     rng,
     map: {
-      width: 36,
-      height: 56,
+      width: WORLD.WIDTH,
+      height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS),
       traffic: new Uint16Array(CELLS),
       path: new Uint8Array(CELLS),

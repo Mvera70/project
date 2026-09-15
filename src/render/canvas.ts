@@ -1,3 +1,4 @@
+import { WORLD } from '@engine/balance';
 // M-16 · Canvas geometry and the cached background.
 
 import type { GameState, ValleyMap } from '@engine/state';
@@ -6,14 +7,14 @@ import { paintPaths, paintTerrain } from './layers/terrain';
 import { paintBuildings, paintBuildingShadows, paintRuins } from './layers/buildings';
 
 export function cellFor(viewportWidth: number, viewportHeight: number): number {
-  return Math.max(1, Math.floor(Math.min(viewportWidth / 36, viewportHeight / 56)));
+  return Math.max(1, Math.floor(Math.min(viewportWidth / WORLD.WIDTH, viewportHeight / WORLD.HEIGHT)));
 }
 
 export function sizeCanvas(canvas: HTMLCanvasElement, cell: number, pixelRatio: number): void {
-  canvas.width = 36 * cell * pixelRatio;
-  canvas.height = 56 * cell * pixelRatio;
-  canvas.style.width = `${36 * cell}px`;
-  canvas.style.height = `${56 * cell}px`;
+  canvas.width = WORLD.WIDTH * cell * pixelRatio;
+  canvas.height = WORLD.HEIGHT * cell * pixelRatio;
+  canvas.style.width = `${WORLD.WIDTH * cell}px`;
+  canvas.style.height = `${WORLD.HEIGHT * cell}px`;
 }
 
 export function makeBackground(map: ValleyMap, palette: Palette, cell: number): OffscreenCanvas {

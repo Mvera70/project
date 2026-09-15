@@ -10,6 +10,7 @@
 // canvas for 2D returns nothing. The spec says so and it is the kind of thing
 // that looks like a blank screen rather than an error.
 
+import { WORLD } from '@engine/balance';
 import type { GameState } from '@engine/state';
 import type { GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
@@ -113,19 +114,19 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     paint(state, tickFraction) { renderer.paint(state, tickFraction); },
     pick(state, xCss, yCss, tickFraction) {
       const box = canvas.getBoundingClientRect();
-      // The 2D valley is drawn as a fixed 36 × 56 grid stretched to the canvas,
+      // The 2D valley is drawn as the whole map grid stretched to the canvas,
       // so a screen point is a proportion of it.
       return inspectAt(
         state,
-        (xCss * 36) / Math.max(1, box.width),
-        (yCss * 56) / Math.max(1, box.height),
+        (xCss * WORLD.WIDTH) / Math.max(1, box.width),
+        (yCss * WORLD.HEIGHT) / Math.max(1, box.height),
         tickFraction,
       );
     },
     track(id) { renderer.track(id); },
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
     pan() { /* idem */ },
-    // El 2D es una proyección fija de 36 × 56 dibujada a mano: no hay ángulo
+    // El 2D es una proyección fija del mapa entero dibujada a mano: no hay ángulo
     // que girar, y por eso `movesCamera` es `false` y quien llama no lo intenta.
     orbit() { /* idem */ },
     resetView() { /* idem */ },

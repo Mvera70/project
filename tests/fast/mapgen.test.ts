@@ -15,23 +15,45 @@ import { foundingSite, generateMap, idx, neighbours4 } from '@engine/world/mapge
 const SEEDS = Array.from({ length: 200 }, (_, i) => i);
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
+/**
+ * Qué parte del **corazón** del valle es de este terreno.
+ *
+ * Del corazón y no del mapa desde el mapa grande: el bosque, la roca y la
+ * marisma se generan dentro del rectángulo productivo y su cantidad no crece
+ * con el mapa (`WORLD.HEART_WIDTH`, y la trampa que está contada ahí). Medir
+ * contra el mapa entero daría 0,06 y diría que este valle se ha quedado sin
+ * árboles, cuando tiene exactamente los mismos que siempre.
+ */
 function fractionOf(map: ValleyMap, code: number): number {
   let n = 0;
   for (const t of map.terrain) if (t === code) n += 1;
-  return n / CELLS;
+  return n / (WORLD.HEART_WIDTH * WORLD.HEART_HEIGHT);
 }
 
-/** El agua alcanzable desde la fila 0 por vecindad cardinal. */
+/**
+ * El cauce: el agua del río, **contando el vado**.
+ *
+ * El vado es agua somera con piedras (`TERRAIN_CODE.ford`) y no un corte en el
+ * río: el agua sigue corriendo por debajo. Contarlo aparte rompía las dos
+ * propiedades de abajo —el río dejaba de llegar al sur y parecía bifurcarse—
+ * sin que el cauce hubiera cambiado ni una celda de sitio.
+ */
+function isRiver(map: ValleyMap, cell: number): boolean {
+  const kind = map.terrain[cell];
+  return kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.ford;
+}
+
+/** El cauce alcanzable desde la fila 0 por vecindad cardinal. */
 function riverReach(map: ValleyMap): Set<number> {
   const seen = new Set<number>();
   const queue: number[] = [];
   for (let x = 0; x < WORLD.WIDTH; x += 1) {
     const i = idx(x, 0);
-    if (map.terrain[i] === TERRAIN_CODE.water) { seen.add(i); queue.push(i); }
+    if (isRiver(map, i)) { seen.add(i); queue.push(i); }
   }
   for (let head = 0; head < queue.length; head += 1) {
     for (const n of neighbours4(queue[head] as number)) {
-      if (seen.has(n) || map.terrain[n] !== TERRAIN_CODE.water) continue;
+      if (seen.has(n) || !isRiver(map, n)) continue;
       seen.add(n);
       queue.push(n);
     }
@@ -54,7 +76,8 @@ describe('generación del mapa · §7.1', () => {
   it('el río no se bifurca: una sola masa de agua', () => {
     for (const seed of SEEDS) {
       const map = generateMap(makeBundle(seed));
-      const water = map.terrain.reduce((n, t) => n + (t === TERRAIN_CODE.water ? 1 : 0), 0);
+      const water = map.terrain.reduce(
+        (n, t) => n + (t === TERRAIN_CODE.water || t === TERRAIN_CODE.ford ? 1 : 0), 0);
       expect(riverReach(map).size, `semilla ${seed}`).toBe(water);
     }
   });

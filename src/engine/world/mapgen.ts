@@ -14,6 +14,42 @@ export { idx, neighbours4 } from './tiles';
 interface Site { x: number; y: number }
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
+/**
+ * El corazón del valle: el rectángulo productivo, centrado en el mapa.
+ *
+ * Todo lo que la economía cuenta vive aquí dentro —el bosque, la roca, la
+ * marisma, la fundación— y mide lo mismo que medía el mapa entero antes del
+ * paso 3 (`WORLD.HEART_WIDTH`). Lo de fuera es montaña y lago: paisaje que
+ * cierra y no produce.
+ *
+ * Centrado y no pegado a una esquina porque es literalmente lo que se pidió:
+ * «el valle es el centro del mapa, pero debe ser más amplio».
+ */
+const HEART = {
+  x0: Math.floor((WORLD.WIDTH - WORLD.HEART_WIDTH) / 2),
+  y0: Math.floor((WORLD.HEIGHT - WORLD.HEART_HEIGHT) / 2),
+} as const;
+const HEART_X1 = HEART.x0 + WORLD.HEART_WIDTH;
+const HEART_Y1 = HEART.y0 + WORLD.HEART_HEIGHT;
+
+/** Si una celda cae en el corazón. */
+function inHeart(x: number, y: number): boolean {
+  return x >= HEART.x0 && x < HEART_X1 && y >= HEART.y0 && y < HEART_Y1;
+}
+
+/**
+ * Lo lejos que una celda está del corazón, en celdas, y 0 dentro.
+ *
+ * Es lo que hace que la montaña suba hacia fuera en vez de caer en manchas
+ * sueltas: la sierra de `ridge.ts` empieza donde acaba el mapa, y esto es su
+ * pie dentro de él.
+ */
+function outOfHeart(x: number, y: number): number {
+  const dx = Math.max(0, Math.max(HEART.x0 - x, x - (HEART_X1 - 1)));
+  const dy = Math.max(0, Math.max(HEART.y0 - y, y - (HEART_Y1 - 1)));
+  return Math.hypot(dx, dy);
+}
+
 /** Manhattan distance to water, including water itself at zero. */
 function riverDistances(map: ValleyMap): Int16Array {
   const distance = new Int16Array(CELLS).fill(CELLS);
@@ -55,7 +91,13 @@ export function foundingSite(map: ValleyMap): Site {
   for (let y = 0; y <= WORLD.HEIGHT - size; y += 1) {
     // The clearing's centre, rather than its corner, lies in the central third.
     if (y + size / 2 < WORLD.HEIGHT / 3 || y + size / 2 >= 2 * WORLD.HEIGHT / 3) continue;
-    for (let x = 0; x <= WORLD.WIDTH - size; x += 1) {
+    // **Y el claro entero cae dentro del corazón.** Sin esto, un claro podía
+    // empezar en el corazón y acabar en la falda: medido en la semilla 197 de
+    // 200, el sitio reservado salía en x 45 con el corazón acabando en 53, y el
+    // lago se comía siete celdas de la plaza. La aldea es el centro del valle
+    // productivo, no un pueblo a medio camino de la sierra.
+    if (y < HEART.y0 || y + size > HEART_Y1) continue;
+    for (let x = Math.max(0, HEART.x0); x <= Math.min(WORLD.WIDTH - size, HEART_X1 - size); x += 1) {
       const occupied = blocked[(y + size) * stride + x + size]! - blocked[y * stride + x + size]!
         - blocked[(y + size) * stride + x]! + blocked[y * stride + x]!;
       if (occupied !== 0) continue;
@@ -88,6 +130,34 @@ function noiseGrid(b: RngBundle, scale: number): (x: number, y: number) => numbe
   };
 }
 
+/**
+ * El vado: las celdas de agua que se pisan para cruzar, desde una orilla.
+ *
+ * Recto, celda de agua a celda de agua, hasta tierra firme — un vado torcido no
+ * es un vado. Devuelve la lista vacía si desde ahí no se cruza a ninguna parte:
+ * un recodo donde el agua se ensancha, o una orilla que da a la marisma. Mejor
+ * ningún vado que uno que no lleva al otro lado.
+ *
+ * La geometría es la que el 3D ya dibujaba en `render3d/world/ford.ts`, traída
+ * al motor porque **el sitio que la ficción nombra no se calcula dos veces**:
+ * es la lección que G-10 ya pagó una vez con dos vados en dos sitios.
+ */
+function crossingFrom(map: ValleyMap, cx: number, cy: number): number[] {
+  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+    const crossing: number[] = [];
+    for (let step = 1; step <= MAPGEN.FORD_SPAN; step += 1) {
+      const nx = cx + dx * step;
+      const ny = cy + dy * step;
+      if (nx < 0 || ny < 0 || nx >= WORLD.WIDTH || ny >= WORLD.HEIGHT) break;
+      const cell = idx(nx, ny);
+      if (map.terrain[cell] === TERRAIN_CODE.water) { crossing.push(cell); continue; }
+      if (map.terrain[cell] !== TERRAIN_CODE.marsh && crossing.length > 0) return crossing;
+      break;
+    }
+  }
+  return [];
+}
+
 /** Uses a local copy: neither the supplied map stream nor any other stream advances. */
 export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap {
   // Los rasgos del valle se sortean de la semilla del terreno, igual que el
@@ -104,7 +174,7 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
     forestStock: new Uint16Array(CELLS),
   };
   // 2. RIVER: one continuous strip; a lateral move never skips a row.
-  const entry = int(b, 'map', ...MAPGEN.RIVER_ENTRY);
+  const entry = HEART.x0 + int(b, 'map', ...MAPGEN.RIVER_ENTRY);
   const river: number[] = [];
   let riverX = entry;
   for (let y = 0; y < WORLD.HEIGHT; y += 1) {
@@ -131,6 +201,11 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
   for (let y = 0; y < WORLD.HEIGHT; y += 1) {
     for (let x = 0; x < WORLD.WIDTH; x += 1) {
       const cell = idx(x, y);
+      // **Sólo el corazón.** Fuera de él no hay bosque que talar, porque el
+      // bosque es la madera del valle y su cantidad es fija: ver
+      // `WORLD.HEART_WIDTH`. Los árboles que se ven en las laderas de fuera son
+      // de `ridge.ts` y no tienen tronco que contar.
+      if (!inHeart(x, y)) continue;
       if (map.terrain[cell] !== TERRAIN_CODE.meadow || protectedCell(x, y) || distance[cell]! <= MAPGEN.MARSH_WIDTH[1]) continue;
       candidates.push({ cell, score: broad(x, y) + MAPGEN.FINE_NOISE_WEIGHT * fine(x, y)
         + MAPGEN.SLOPE_BIAS * Math.abs(2 * x / (WORLD.WIDTH - 1) - 1)
@@ -139,7 +214,9 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
   }
   candidates.sort((a, z) => z.score - a.score || a.cell - z.cell);
   const fraction = MAPGEN.FOREST_FRACTION[0] + next(b, 'map') * (MAPGEN.FOREST_FRACTION[1] - MAPGEN.FOREST_FRACTION[0]);
-  const forestCount = Math.round(CELLS * fraction);
+  // Del corazón del valle y no del mapa: ver `MAPGEN.HEART_CELLS`. Con el mapa
+  // de hoy es la misma cuenta que antes, celda por celda.
+  const forestCount = Math.round(WORLD.HEART_WIDTH * WORLD.HEART_HEIGHT * fraction);
   if (candidates.length < forestCount) throw new Error('Insufficient space for the forest target');
   for (const { cell } of candidates.slice(0, forestCount)) map.terrain[cell] = TERRAIN_CODE.forest;
 
@@ -153,6 +230,10 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
   for (let patch = 0; patch < rockCount; patch += 1) {
     const desired = int(b, 'map', ...MAPGEN.ROCK_SIZE);
     const eligible = Array.from({ length: CELLS }, (_, i) => i).filter((i) =>
+      // En el corazón: la piedra de un pedregal es la de las casas de piedra
+      // (§7.3), así que un pedregal a treinta celdas del pueblo no es un
+      // recurso, es decorado — y ya hay montaña para eso.
+      inHeart(i % WORLD.WIDTH, Math.floor(i / WORLD.WIDTH)) &&
       map.terrain[i] === TERRAIN_CODE.meadow && distance[i]! > MAPGEN.MARSH_WIDTH[1] &&
       !protectedCell(i % WORLD.WIDTH, Math.floor(i / WORLD.WIDTH)) &&
       !neighbours4(i).some((n) => map.terrain[n] === TERRAIN_CODE.rock));
@@ -187,6 +268,111 @@ export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap 
       if (distance[cell]! <= width && map.terrain[cell] === TERRAIN_CODE.meadow && !protectedCell(x, y)) {
         map.terrain[cell] = TERRAIN_CODE.marsh;
       }
+    }
+  }
+  // 6. FORD: por dónde se cruza el río, junto al claro de fundación.
+  //
+  // Después de la marisma a propósito: la marisma se dibuja sobre prado y no
+  // sobre agua, así que no puede tapar el paso, pero sí decide qué orillas son
+  // firmes — y un vado que sale a una marisma no lleva a ninguna parte.
+  const heartOfSite = {
+    x: site.x + MAPGEN.CLEARING_SIZE / 2,
+    y: site.y + MAPGEN.CLEARING_SIZE / 2,
+  };
+  let bank = -1;
+  let bankDistance = Number.POSITIVE_INFINITY;
+  for (let cell = 0; cell < CELLS; cell += 1) {
+    const kind = map.terrain[cell];
+    if (kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.marsh) continue;
+    if (!neighbours4(cell).some((n) => map.terrain[n] === TERRAIN_CODE.water)) continue;
+    const x = cell % WORLD.WIDTH;
+    const y = Math.floor(cell / WORLD.WIDTH);
+    const away = (x + 0.5 - heartOfSite.x) ** 2 + (y + 0.5 - heartOfSite.y) ** 2;
+    // La orilla más cercana al claro **que además cruce a alguna parte**: la
+    // más cercana a secas podía ser un recodo sin salida, y entonces la aldea
+    // se quedaba sin vado teniendo río.
+    if (away >= bankDistance) continue;
+    if (crossingFrom(map, x, y).length === 0) continue;
+    bank = cell;
+    bankDistance = away;
+  }
+  if (bank >= 0) {
+    for (const cell of crossingFrom(map, bank % WORLD.WIDTH, Math.floor(bank / WORLD.WIDTH))) {
+      map.terrain[cell] = TERRAIN_CODE.ford;
+    }
+  }
+  // 6. LAKE: una mancha de agua quieta en la falda, fuera del corazón.
+  //
+  // Antes que la montaña a propósito: así la roca crece alrededor del lago y no
+  // al revés, que es como se ven los lagos de montaña de verdad — el agua se
+  // queda en el hueco y la piedra la rodea.
+  const lakeWanted = int(b, 'map', ...MAPGEN.LAKE_SIZE);
+  const lakeSeeds: { cell: number; random: number }[] = [];
+  for (let y = 0; y < WORLD.HEIGHT; y += 1) {
+    for (let x = 0; x < WORLD.WIDTH; x += 1) {
+      const cell = idx(x, y);
+      if (map.terrain[cell] !== TERRAIN_CODE.meadow) continue;
+      // Ni dentro del corazón ni pegado al río: un lago sobre el cauce sería un
+      // embalse, y el río es la espina del valle y tiene que llegar entero.
+      const out = outOfHeart(x, y);
+      if (inHeart(x, y) || protectedCell(x, y)) continue;
+      if (out < MAPGEN.MOUNTAIN_FOOT || distance[cell]! <= MAPGEN.MARSH_WIDTH[1] + 1) continue;
+      lakeSeeds.push({ cell, random: next(b, 'map') });
+    }
+  }
+  lakeSeeds.sort((a, z) => a.random - z.random || a.cell - z.cell);
+  const lakeStart = lakeSeeds[0];
+  if (lakeStart !== undefined) {
+    // Se crece como un pedregal: frontera en anchura sobre celdas admisibles. Un
+    // lago no tiene por qué llegar al tamaño pedido —puede topar con el río o
+    // con el borde— y eso no es un fallo: es un lago pequeño.
+    // `protectedCell` y no sólo `inHeart`: el claro reservado puede asomar del
+    // corazón —no debería, y `foundingSite` ya no lo permite, pero esta función
+    // no es quien lo garantiza— y un lago dentro de la plaza del pueblo deja la
+    // fundación sin sitio donde ponerse.
+    const open = (cell: number): boolean => map.terrain[cell] === TERRAIN_CODE.meadow
+      && !inHeart(cell % WORLD.WIDTH, Math.floor(cell / WORLD.WIDTH))
+      && !protectedCell(cell % WORLD.WIDTH, Math.floor(cell / WORLD.WIDTH))
+      && distance[cell]! > MAPGEN.MARSH_WIDTH[1] + 1;
+    const shore = [lakeStart.cell];
+    const seen = new Set(shore);
+    for (let head = 0; head < shore.length && shore.length < lakeWanted; head += 1) {
+      for (const neighbour of neighbours4(shore[head]!)) {
+        if (seen.has(neighbour) || !open(neighbour)) continue;
+        shore.push(neighbour);
+        seen.add(neighbour);
+        if (shore.length === lakeWanted) break;
+      }
+    }
+    for (const cell of shore) map.terrain[cell] = TERRAIN_CODE.lake;
+  }
+
+  // 7. MOUNTAIN: la falda que cierra el valle, más maciza cuanto más lejos.
+  //
+  // Probabilidad y no umbral duro, y con ruido encima: un umbral daría un
+  // rectángulo de roca alrededor de un rectángulo de prado, y el valle se leería
+  // como una maqueta con marco. Lo que esto dibuja es una ladera que se cierra.
+  const relief = noiseGrid(b, MAPGEN.NOISE_SCALES[0]);
+  for (let y = 0; y < WORLD.HEIGHT; y += 1) {
+    for (let x = 0; x < WORLD.WIDTH; x += 1) {
+      const cell = idx(x, y);
+      if (map.terrain[cell] !== TERRAIN_CODE.meadow) continue;
+      // **Nunca dentro del corazón, y el ruido no puede colarla.** Primera
+      // versión: el ruido se sumaba a la distancia al corazón sin este guardia,
+      // así que una celda del centro con el ruido alto daba `out` de casi cinco
+      // y se convertía en montaña. Costó una celda del claro de fundación —143
+      // de 144— y con eso `foundingSite` dejaba de encontrar sitio y la
+      // generación se caía en la semilla 1 de 200. Un valle con un risco en
+      // medio de la plaza.
+      if (inHeart(x, y) || protectedCell(x, y)) continue;
+      // El río cruza la falda por el norte y por el sur, y tiene que seguir
+      // cruzándola: sin esta holgura la montaña lo embalsa en el borde.
+      if (distance[cell]! <= MAPGEN.MARSH_WIDTH[1]) continue;
+      const out = outOfHeart(x, y) + (relief(x, y) - 0.5) * 2 * MAPGEN.MOUNTAIN_ROUGH;
+      if (out <= MAPGEN.MOUNTAIN_FOOT) continue;
+      const climb = Math.min(1,
+        (out - MAPGEN.MOUNTAIN_FOOT) / (MAPGEN.MOUNTAIN_FULL - MAPGEN.MOUNTAIN_FOOT));
+      if (next(b, 'map') < climb) map.terrain[cell] = TERRAIN_CODE.mountain;
     }
   }
   // Every standing tree, counted. §7.5 gives each forest cell its own store,

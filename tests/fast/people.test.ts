@@ -5,7 +5,7 @@
 // propiedades: que la fundación sea jugable, que dos partidas se lean distintas
 // y que nadie tenga el nombre de otro.
 import { describe, expect, it } from 'vitest';
-import { FOUNDING, PEOPLE, TIME, TRAIT_WEIGHTS } from '@engine/balance';
+import { FOUNDING, PEOPLE, TIME, TRAIT_WEIGHTS, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Role, Trait, Villager } from '@engine/state';
 import { restingIntent } from '@engine/state';
@@ -20,7 +20,7 @@ import {
   promoteToNamed,
 } from '@engine/people/villagers';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
 /** Un estado mínimo pero completo, fundado con la semilla dada. */
 function stateOf(seed: number): GameState {
@@ -34,8 +34,8 @@ function stateOf(seed: number): GameState {
     peakPeople: 20,
     rng,
     map: {
-      width: 36,
-      height: 56,
+      width: WORLD.WIDTH,
+      height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS),
       traffic: new Uint16Array(CELLS),
       path: new Uint8Array(CELLS),

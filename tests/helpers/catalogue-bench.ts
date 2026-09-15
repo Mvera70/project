@@ -11,7 +11,7 @@
 // whole §14.1 budget — so it runs in tests/balance/. The fast suite runs a
 // smaller sweep off the same bench.
 
-import { FOUNDING, TIME } from '@engine/balance';
+import { FOUNDING, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { Building, GameState, TickContext } from '@engine/state';
 import { restingIntent } from '@engine/state';
@@ -39,7 +39,7 @@ import { applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds } from '@engine/crossroads/seeds';
 import { fellForest } from '@engine/world/forest';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const YEAR = TIME.WEEKS_PER_YEAR;
 
 let bid = 0;
@@ -58,7 +58,7 @@ function founded(seed: number): GameState {
   return {
     version: 2, seed, terrainSeed: seed, tick: 0, peakPeople: 20, rng,
     map: {
-      width: 36, height: 56,
+      width: WORLD.WIDTH, height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS).fill(1, 0, Math.floor(CELLS * 0.45)),
       traffic: new Uint16Array(CELLS), path: new Uint8Array(CELLS),
       ruins: new Uint8Array(CELLS), forestAge: new Uint8Array(CELLS),

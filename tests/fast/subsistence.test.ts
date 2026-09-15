@@ -4,7 +4,7 @@
 // de campos trabajados y la reserva de obras—, el orden comer-antes-de-cosechar,
 // los límites de ánimo y fe, y que el suelo de fe sostenga de verdad.
 import { describe, expect, it } from 'vitest';
-import { DISASTER, FOOD, FOUNDING, LABOUR, MOOD, TIME, WEATHER } from '@engine/balance';
+import { DISASTER, FOOD, FOUNDING, LABOUR, MOOD, TIME, WEATHER, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type {
   Building,
@@ -24,7 +24,7 @@ import { isUnexplained, updateMood } from '@engine/subsistence/mood';
 import { rollWeather } from '@engine/subsistence/seasons';
 import { outbreakActive, rollFire, rollPlague } from '@engine/subsistence/disasters';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const CALM: TickContext = {
   severity: 0,
   cold: false,
@@ -64,8 +64,8 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     peakPeople: 20,
     rng,
     map: {
-      width: 36,
-      height: 56,
+      width: WORLD.WIDTH,
+      height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS),
       traffic: new Uint16Array(CELLS),
       path: new Uint8Array(CELLS),

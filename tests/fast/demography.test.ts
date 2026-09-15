@@ -5,7 +5,7 @@
 // hambrienta deje de reproducirse, y que las seis puertas de §5.7 estén cada
 // una en su sitio.
 import { describe, expect, it } from 'vitest';
-import { FOOD, FOUNDING, LIFE, MIGRATION, TIME } from '@engine/balance';
+import { FOOD, FOUNDING, LIFE, MIGRATION, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { Building, GameState, TickContext, Villager } from '@engine/state';
 import { restingIntent } from '@engine/state';
@@ -22,7 +22,7 @@ import {
 } from '@engine/people/demography';
 import { ageOf, foundPeople, makeVillager } from '@engine/people/villagers';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const CALM: TickContext = { severity: 0, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 };
 
 function house(id: number): Building {
@@ -53,8 +53,8 @@ function village(seed: number, houses: number): GameState {
     peakPeople: 20,
     rng,
     map: {
-      width: 36,
-      height: 56,
+      width: WORLD.WIDTH,
+      height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS),
       traffic: new Uint16Array(CELLS),
       path: new Uint8Array(CELLS),

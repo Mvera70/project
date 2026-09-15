@@ -26,6 +26,7 @@ import {
 } from 'three';
 import { hash32 } from '@engine/rng';
 import type { ValleyMap } from '@engine/state';
+import { elevationAt } from './ground';
 
 /**
  * Lo ancho que es la falda, en celdas, desde el borde del mapa hacia fuera.
@@ -65,6 +66,11 @@ function knot(seed: number, a: number, b: number): number {
  * montaña, es un muro. La mezcla en coseno pasa de un nudo al otro sin que se
  * vea dónde.
  */
+/** Lo de siempre, para no salirse del mapa al preguntar por su borde. */
+function clamp(value: number, low: number, high: number): number {
+  return value < low ? low : value > high ? high : value;
+}
+
 function noise(seed: number, x: number, z: number, scale: number): number {
   const gx = x / scale;
   const gz = z / scale;
@@ -92,7 +98,19 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   const outX = Math.max(0, Math.max(-x, x - map.width));
   const outZ = Math.max(0, Math.max(-z, z - map.height));
   const out = Math.hypot(outX, outZ);
-  if (out <= 0) return 0;
+
+  // **Y arranca desde la cota del borde del mapa, no desde cero.** Desde el mapa
+  // grande el cinturón de montaña llega hasta el borde levantado seis celdas
+  // (`ground.ts`, `risesOf`), así que una sierra que empieza en cero dibujaba un
+  // escalón de dieciocho metros justo en el borde: la roca de dentro quedaba
+  // **más alta** que la sierra de fuera, y el valle se leía como una tarta. Se
+  // vio en una captura al alejarse del todo.
+  const edge = elevationAt(map, clamp(x, 0, map.width - 0.001), clamp(z, 0, map.height - 0.001));
+  // Dentro del rectángulo jugable, la sierra **es** el suelo: así el vértice del
+  // borde vale lo mismo en las dos mallas y la junta no existe. Devolver cero
+  // aquí era un escalón de seis celdas —los dieciocho metros que el cinturón de
+  // montaña se ha levantado— en el borde exacto del mapa.
+  if (out <= 0) return edge;
 
   // **Arranca plana y se empina.** El coseno sube ya en la primera celda —1,35
   // de golpe con la falda corta— y eso es el doblez en el borde del mapa que la
@@ -108,7 +126,9 @@ export function ridgeAt(map: ValleyMap, seed: number, x: number, z: number): num
   const fine = noise(seed + 811, x, z, 4);
   const rough = 0.62 + big * 0.55 + fine * 0.22;
 
-  return eased * PEAK * rough;
+  // Lo que la sierra pone se **suma** a la cota del borde: así el pie de la
+  // ladera es exactamente la roca que ya había dentro del mapa y no hay junta.
+  return edge + eased * PEAK * rough;
 }
 
 /**

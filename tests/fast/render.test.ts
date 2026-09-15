@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TIME } from '@engine/balance';
+import { TIME, WORLD } from '@engine/balance';
 import type { Season, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import { cellFor } from '@render/canvas';
@@ -68,16 +68,28 @@ describe('M-16 · paletas', () => {
 });
 
 describe('M-16 · geometría y regiones', () => {
-  it('da una celda de 10 px al mapa móvil de 390 por 664', () => {
-    expect(cellFor(390, 664)).toBe(10);
+  it('la celda es lo que cabe: el mapa entero en la pantalla', () => {
+    // Diez píxeles cuando el mapa medía 36 × 56; cinco desde que mide 72 × 112,
+    // que es la misma regla —el lado que primero se queda corto manda— sobre un
+    // valle cuatro veces mayor.
+    //
+    // **Y esto es una consecuencia declarada del mapa grande, no un descuido.**
+    // El Canvas de `src/render/` dibuja el valle **entero** en la pantalla, sin
+    // cámara: con un mapa cuatro veces mayor, cada celda mide la mitad. El 3D no
+    // tiene ese problema porque tiene cámara y enfoca la aldea. La puerta de
+    // `?render=canvas` se queda puesta igual, porque su razón de ser es tener
+    // algo a lo que volver si el 3D no va en un móvil de verdad (CLAUDE.md), y
+    // un valle pequeño se sigue viendo.
+    expect(cellFor(390, 664)).toBe(Math.floor(Math.min(390 / WORLD.WIDTH, 664 / WORLD.HEIGHT)));
+    expect(cellFor(390, 664)).toBe(5);
   });
 
   it('agrupa una mancha contigua en un solo contorno', () => {
     const map = {
-      width: 36, height: 56,
-      terrain: new Uint8Array(36 * 56), traffic: new Uint16Array(36 * 56),
-      path: new Uint8Array(36 * 56), ruins: new Uint8Array(36 * 56),
-      forestAge: new Uint8Array(36 * 56), forestStock: new Uint16Array(36 * 56),
+      width: WORLD.WIDTH, height: WORLD.HEIGHT,
+      terrain: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), traffic: new Uint16Array(WORLD.WIDTH * WORLD.HEIGHT),
+      path: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), ruins: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT),
+      forestAge: new Uint8Array(WORLD.WIDTH * WORLD.HEIGHT), forestStock: new Uint16Array(WORLD.WIDTH * WORLD.HEIGHT),
     } satisfies ValleyMap;
     map.terrain[0] = TERRAIN_CODE.forest;
     map.terrain[1] = TERRAIN_CODE.forest;

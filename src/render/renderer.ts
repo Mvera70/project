@@ -1,5 +1,6 @@
 // M-20 · Compose cached landscape and dynamic figures into the visible canvas.
 
+import { WORLD } from '@engine/balance';
 import type { GameState } from '@engine/state';
 import { clockOf } from '@engine/time';
 import { cellFor, paintVillageBackground, sizeCanvas } from './canvas';
@@ -40,10 +41,10 @@ export function createRenderer(canvas: HTMLCanvasElement, viewport: HTMLElement)
   return {
     track(id: number | null): void { trackedId = id; },
     paint(state: GameState, tickFraction: number): void {
-      const availableHeight = Math.max(56, viewport.clientHeight - 180);
-      const cell = cellFor(Math.max(36, viewport.clientWidth), availableHeight);
+      const availableHeight = Math.max(WORLD.HEIGHT, viewport.clientHeight - 180);
+      const cell = cellFor(Math.max(WORLD.WIDTH, viewport.clientWidth), availableHeight);
       const ratio = Math.max(1, window.devicePixelRatio || 1);
-      if (canvas.width !== 36 * cell * ratio || canvas.height !== 56 * cell * ratio) {
+      if (canvas.width !== WORLD.WIDTH * cell * ratio || canvas.height !== WORLD.HEIGHT * cell * ratio) {
         sizeCanvas(canvas, cell, ratio);
         cachedKey = '';
       }
@@ -59,7 +60,7 @@ export function createRenderer(canvas: HTMLCanvasElement, viewport: HTMLElement)
       const ctx = canvas.getContext('2d');
       if (ctx === null) throw new Error('Canvas 2D is unavailable.');
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      ctx.clearRect(0, 0, 36 * cell, 56 * cell);
+      ctx.clearRect(0, 0, WORLD.WIDTH * cell, WORLD.HEIGHT * cell);
       ctx.drawImage(background, 0, 0);
       paintTells(ctx, tellsFor(state), palette, cell, tickFraction);
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

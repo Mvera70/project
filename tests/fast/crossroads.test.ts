@@ -4,7 +4,7 @@
 // definido aquí, escogido para ejercitar cada variante del DSL, cada forma de
 // reparto y las dos reglas que se pelean: el techo y la garantía.
 import { describe, expect, it } from 'vitest';
-import { CROSSROADS, TIME } from '@engine/balance';
+import { CROSSROADS, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import { TERRAIN_CODE } from '@engine/state';
 import { restingIntent } from '@engine/state';
@@ -22,7 +22,7 @@ import { fireSeeds, pendingSeeds } from '@engine/crossroads/seeds';
 import { PLAGUE_BLAME } from '@engine/crossroads/catalog/plague';
 import { SMITH_FEUD } from '@engine/crossroads/catalog/feud';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const YEAR = TIME.WEEKS_PER_YEAR;
 
 let bid = 0;
@@ -42,8 +42,8 @@ function village(seed: number, houses = 12): GameState {
     peakPeople: 20,
     rng,
     map: {
-      width: 36,
-      height: 56,
+      width: WORLD.WIDTH,
+      height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS),
       traffic: new Uint16Array(CELLS),
       path: new Uint8Array(CELLS),
@@ -279,8 +279,14 @@ describe('condiciones · el DSL de §8.2', () => {
     expect(ratioOf(s, 'housingFree')).toBeGreaterThan(0);
     expect(evaluate({ k: 'ratio', ratio: 'housingFree', op: '>', v: 0 }, s)).toBe(true);
 
+    // **`forestLeft` se mide contra el corazón del valle, no contra el mapa**
+    // (`WORLD.HEART_WIDTH`). Desde el mapa grande el mapa es cuatro veces el
+    // corazón, así que la cuenta es la que la economía usa y no la que la
+    // geometría sugiere: con el mapa entero como divisor, el mismo bosque de
+    // siempre daría 0,06 y apagaría `forest_cut`, `wolf_winter` y la caza.
     expect(ratioOf(s, 'forestLeft')).toBe(0);
-    s.map.terrain.fill(TERRAIN_CODE.forest, 0, CELLS / 4);
+    const heart = WORLD.HEART_WIDTH * WORLD.HEART_HEIGHT;
+    s.map.terrain.fill(TERRAIN_CODE.forest, 0, heart / 4);
     expect(ratioOf(s, 'forestLeft')).toBeCloseTo(0.25, 6);
     expect(evaluate({ k: 'ratio', ratio: 'forestLeft', op: '<', v: 0.3 }, s)).toBe(true);
   });

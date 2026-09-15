@@ -272,16 +272,50 @@ export const MOOD = {
 
 /** Map-generation parameters from §7.1; unspecified choices are marked TUNE. */
 export const MAPGEN = {
+  // Por dónde entra el río, **en coordenadas del corazón** y no del mapa: el
+  // río es la espina del valle productivo, así que entra por donde entraba
+  // cuando el mapa era el corazón. `mapgen` le suma el margen.
   RIVER_ENTRY: [10, 26],
   RIVER_FORWARD_CHANCE: 0.65,
   RIVER_WIDTH: 2,
   RIVER_LOWER_WIDTH: 3,
   NOISE_SCALES: [8, 4],
+  // **Fracción del corazón, no del mapa** (`WORLD.HEART_WIDTH`). Era del mapa
+  // entero, y ahí estaba la trampa que tenía esta fase aparcada: ver el
+  // comentario de `WORLD.HEART_WIDTH`, que la cuenta con los números.
+  //
+  // La roca no necesita lo mismo: `ROCK_PATCHES` y `ROCK_SIZE` ya son cuentas
+  // absolutas. Y la marisma tampoco: es una franja a lo largo del río, así que
+  // depende de lo que el río corre y no de lo que el mapa mide — un río más
+  // largo merece más marisma.
   FOREST_FRACTION: [0.20, 0.26],
   ROCK_PATCHES: [3, 6],
   ROCK_SIZE: [6, 14],
   MARSH_WIDTH: [1, 2],
   CLEARING_SIZE: 12,
+  // --- El mapa grande, paso 3: lo que llena el valle fuera del corazón ---
+  //
+  // TUNE los cuatro, y los cuatro son geometría y no economía: ni la montaña ni
+  // el lago dan madera, forraje o solar, así que ninguno de estos números puede
+  // mover un solo número de §12.9. Lo que deciden es lo que se ve.
+  //
+  // Dónde empieza el pie de la montaña y dónde es ya roca maciza, en celdas
+  // desde el borde del corazón. Cuatro y catorce: quedan diez celdas de ladera
+  // —treinta metros— para que la roca salga del prado sin un escalón, que es la
+  // misma razón por la que la sierra de `ridge.ts` arranca plana y se empina.
+  MOUNTAIN_FOOT: 4,
+  MOUNTAIN_FULL: 14,
+  // Cuánto desordena el ruido ese límite, en celdas. Sin esto, el corazón se
+  // lee como un rectángulo dibujado con tiralíneas, que es exactamente lo que
+  // un valle no es.
+  MOUNTAIN_ROUGH: 5,
+  // El lago: una mancha, en celdas. Entre cuarenta y ochenta es un lago que se
+  // ve entero desde la aldea y que no se puede rodear de un paso.
+  LAKE_SIZE: [40, 80],
+  // TUNE: hasta dónde se busca la otra orilla al tallar el vado, en celdas.
+  // Catorce: más ancho que eso no es un río que se vadee. El mismo número que
+  // el 3D usaba para dibujar las losas, que es de donde sale la geometría.
+  FORD_SPAN: 14,
   SITE_RIVER_DISTANCE: [3, 6],
   RIVER_MEANDER: 3, // TUNE: bound lateral drift so either bank can hold a clearing.
   FINE_NOISE_WEIGHT: 0.5, // TUNE: relative amplitude of the second octave.
@@ -495,8 +529,43 @@ export const TRAITS = {
 } as const;
 
 export const WORLD = {
-  WIDTH: 36,
-  HEIGHT: 56,
+  /**
+   * El valle jugable, en celdas. Una celda son tres metros (D.6.2).
+   *
+   * **Setenta y dos por ciento doce desde el mapa grande** (paso 3,
+   * `docs/next-plan.md`): cuatro veces el mapa de 36 × 56 que el juego tuvo
+   * desde M-13. Lo pidió el dueño del diseño con estas palabras —«el mapa sigue
+   * siendo muy pequeño, dijimos que iba a ser mucho más grande; el valle es el
+   * centro del mapa pero debe ser más amplio»— y lo que hace que se pueda hacer
+   * sin tocar la economía es el corazón de abajo.
+   *
+   * El coste, contado antes de crecer: una ruta que cruza el valle costaba 0,09
+   * ms y con cuatro veces el área son unos 0,4; con cincuenta rutas por tick,
+   * 20 ms contra los 234 que dura un tick a ×64.
+   */
+  WIDTH: 72,
+  HEIGHT: 112,
+  /**
+   * El corazón: la superficie **productiva** del valle, alrededor de la
+   * fundación, y lo único que la economía mide.
+   *
+   * 36 × 56, que es exactamente el mapa entero de antes. Ahí van el bosque, la
+   * roca y la marisma, en las mismas cantidades que siempre; lo que llena el
+   * resto es montaña y lago, que no dan madera, ni forraje, ni solar, y que A*
+   * no cruza.
+   *
+   * **Esto es lo que desactiva la trampa medida del brief.** El bosque era una
+   * fracción del mapa entero (`forestCount = CELLS * fraction`), así que un mapa
+   * cuatro veces mayor cuadruplicaba la madera en pie, la madera dejaba de ser
+   * escasa para siempre y §5.4 —media economía— dejaba de apretar. Y
+   * `forestLeft`, que es lo que abre `forest_cut` y lo que gobierna la caza,
+   * dividía por el mapa entero: con el bosque quieto y el mapa cuatro veces
+   * mayor se habría hundido de 0,24 a 0,06, por debajo de los tres umbrales del
+   * catálogo y del suelo de `FORAGE.MIN_FOREST`. Las dos cuentas se hacen contra
+   * el corazón, y las dos dan hoy exactamente lo que daban ayer.
+   */
+  HEART_WIDTH: 36,
+  HEART_HEIGHT: 56,
   FOREST_TARGET: [0.18, 0.3],
   WOOD_PER_FOREST_TILE: 300,
   FOREST_REGROWTH_YEARS: 8,
@@ -524,6 +593,11 @@ export const PATHING = {
   STEP: 10, // TUNE: the cost of crossing an ordinary meadow cell.
   FOREST: 12, // TUNE: going round the wood is worth about two cells of detour.
   ROCK: 20, // TUNE: an outcrop is worth going round unless it is very close.
+  // TUNE: lo que cuesta cruzar el vado, sumado al paso. Treinta: cruzar de
+  // piedra en piedra con las manos ocupadas cuesta cuatro veces un prado, así
+  // que se cruza cuando hace falta y no por atajar. Un vado gratis convertiría
+  // el río en una calle; un vado prohibido es lo que había, y partía la aldea.
+  FORD: 30,
   // TUNE: what each level of `path` takes off the step. Index is map.path:
   // 0 none, 1 trodden, 2 track, 3 road.
   PATH_DISCOUNT: [0, 3, 5, 7],

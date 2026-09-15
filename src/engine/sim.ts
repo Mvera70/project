@@ -459,12 +459,22 @@ function centreOf(b: { x: number; y: number; w: number; h: number }): { x: numbe
  */
 export function ford(state: GameState): { x: number; y: number } {
   const core = valleyCore(state);
+  const hasFord = state.map.terrain.includes(TERRAIN_CODE.ford);
   let best = -1;
   let bestDistance = Number.POSITIVE_INFINITY;
   for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
     const terrain = state.map.terrain[cell];
     if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) continue;
-    if (!neighbours4(cell).some((next) => state.map.terrain[next] === TERRAIN_CODE.water)) continue;
+    // **La orilla del paso de verdad, si el valle tiene uno.** Desde que el
+    // vado es terreno (`TERRAIN_CODE.ford`), el sitio que la ficción nombra
+    // existe en el mapa y esta función ya no tiene que adivinarlo: se busca la
+    // orilla que da al vado, y sólo si no hay ninguna se cae a cualquier orilla
+    // del río, que es lo que hacía siempre.
+    const touchesFord = neighbours4(cell)
+      .some((next) => state.map.terrain[next] === TERRAIN_CODE.ford);
+    if (hasFord !== touchesFord) continue;
+    if (!touchesFord
+      && !neighbours4(cell).some((next) => state.map.terrain[next] === TERRAIN_CODE.water)) continue;
     const x = cell % state.map.width;
     const y = Math.floor(cell / state.map.width);
     const distance = (x + 0.5 - core.x) ** 2 + (y + 0.5 - core.y) ** 2;

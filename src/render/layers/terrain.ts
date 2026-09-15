@@ -80,6 +80,10 @@ function colourFor(code: number, palette: Palette): string {
   // así que pinta lo mismo que el 3D o el valle son dos valles distintos.
   if (code === TERRAIN_CODE.mountain) return palette.stone;
   if (code === TERRAIN_CODE.lake) return palette.lake;
+  // El vado se pinta con el color de los caminos y no con el del agua: en 2D no
+  // hay relieve ni losas, así que lo único que puede decir «por aquí se cruza»
+  // es el color, y el jugador ya sabe que ese ocre es por donde se anda.
+  if (code === TERRAIN_CODE.ford) return palette.path;
   return palette.meadow;
 }
 

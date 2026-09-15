@@ -1,6 +1,6 @@
 // M-23 · Save format and the catch-up that follows loading one. design.md §13.
 
-import { ANIMALS, BUILDINGS, TIME } from './balance';
+import { ANIMALS, BUILDINGS, TIME, WORLD } from './balance';
 import { CATALOG } from './crossroads/catalog';
 import { foundGame } from './found';
 import { population } from './people/demography';
@@ -111,8 +111,8 @@ function building(value: unknown): boolean {
   return record(value) && tickValue(value['id']) && typeof value['kind'] === 'string'
     && value['kind'] in BUILDINGS && ['x', 'y', 'builtTick'].every((key) => tickValue(value[key]))
     && tickValue(value['w']) && (value['w'] as number) > 0 && tickValue(value['h']) && (value['h'] as number) > 0
-    && (value['x'] as number) + (value['w'] as number) <= 36
-    && (value['y'] as number) + (value['h'] as number) <= 56
+    && (value['x'] as number) + (value['w'] as number) <= WORLD.WIDTH
+    && (value['y'] as number) + (value['h'] as number) <= WORLD.HEIGHT
     && nullableTick(value['lostTick']) && nullableTick(value['blockedUntil'])
     && (value['tier'] === 0 || value['tier'] === 1) && typeof value['lit'] === 'boolean';
 }
@@ -202,8 +202,11 @@ function plantedSeed(value: unknown): boolean {
 const TERRAIN_CODES = Object.keys(TERRAIN_CODE).length;
 
 function byteMap(value: unknown): boolean {
-  if (!record(value) || value['width'] !== 36 || value['height'] !== 56) return false;
-  const cells = 36 * 56;
+  // Las medidas salen de `WORLD` y no de dos números escritos aquí: con el mapa
+  // grande eran 72 × 112, y un validador con el tamaño de ayer dentro rechaza
+  // como corrupta cualquier partida del tamaño de hoy.
+  if (!record(value) || value['width'] !== WORLD.WIDTH || value['height'] !== WORLD.HEIGHT) return false;
+  const cells = WORLD.WIDTH * WORLD.HEIGHT;
   return value['terrain'] instanceof Uint8Array && value['terrain'].length === cells
     && value['traffic'] instanceof Uint16Array && value['traffic'].length === cells
     && value['path'] instanceof Uint8Array && value['path'].length === cells
@@ -223,7 +226,7 @@ function archivedGame(value: unknown): boolean {
     && tickValue(value['endedTick']) && ENDS.has(value['cause'] as string)
     && tickValue(value['peakPeople']) && Array.isArray(value['chronicle'])
     && value['chronicle'].every(chronicleEntry) && value['ruins'] instanceof Uint8Array
-    && value['ruins'].length === 36 * 56 && value['ruins'].every((cell) => cell <= 1);
+    && value['ruins'].length === WORLD.WIDTH * WORLD.HEIGHT && value['ruins'].every((cell) => cell <= 1);
 }
 
 /** Reject every persisted shape the running engine or renderer cannot consume. */

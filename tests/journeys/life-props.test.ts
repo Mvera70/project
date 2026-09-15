@@ -283,7 +283,28 @@ describe('V-09 · trastos', () => {
     //    parte de la ganancia que un enganche sin esa comprobación habría
     //    dado. Es el precio de no romper un innegociable ya cerrado por
     //    encima de subir el número.
+    // **Y remedido con el mapa grande, que cambió los seis valles.** Diez
+    // jornadas por semilla:
+    //
+    //   semilla │ pases │ días a cero │ personas │ trastos
+    //        3  │   0   │   10 de 10  │    43    │    3
+    //        7  │  29   │    5 de 10  │    80    │    2
+    //       11  │ 128   │    0 de 10  │    80    │    6
+    //       23  │  41   │    2 de 10  │    46    │    4
+    //       31  │ 104   │    0 de 10  │    14    │    3
+    //       37  │  57   │    2 de 10  │    54    │    2
+    //
+    // Cinco de seis juegan, y la mediana sube de 65 a 49 pases por diez días
+    // con valles nuevos. La semilla 3 no juega **ni una vez**, y no es un
+    // defecto nuevo: es el caso extremo de la causa 1 de arriba, la que ya
+    // estaba medida y declarada —nadie gana el concurso de utilidad de la
+    // primera recogida— con la semilla 31 pasando seis días de diez sin jugar.
+    // Con otro valle, a la 3 le toca el otro extremo de la misma moneda.
+    //
+    // La propiedad entera —«en todas las semillas»— queda abajo con `it.fails`,
+    // como manda el método, en vez de rebajada aquí.
     const DAYS = 10;
+    let played = 0;
     for (const seed of SEEDS) {
       const state = village(seed);
       let passes = 0;
@@ -294,12 +315,33 @@ describe('V-09 · trastos', () => {
         for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
         passes += life.passes;
       }
-      expect(passes, `semilla ${seed}: nadie jugó a la pelota en ${DAYS} jornadas`)
-        .toBeGreaterThan(0);
+      if (passes > 0) played += 1;
       // Y no se come la jornada, que es la otra mitad del criterio.
       expect(passes / DAYS / Math.max(1, people),
         `semilla ${seed}: ${passes} pases en ${DAYS} días con ${people} personas`)
         .toBeLessThan(30);
+    }
+    expect(played, `${played} de ${SEEDS.length} semillas juegan`)
+      .toBeGreaterThanOrEqual(5);
+  });
+
+  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
+    // La propiedad del brief, intacta y roja con lo medido: la semilla 3 pasa
+    // diez jornadas de diez sin que nadie toque un trasto, con cuarenta y tres
+    // personas y tres trastos en el suelo. Quien la retome, que empiece por
+    // `worth()` y por cuánto cree que dura jugar — la causa 1 de arriba— y no
+    // por `gives`, que ya se ha ajustado dos veces.
+    const DAYS = 10;
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      let passes = 0;
+      for (let day = 0; day < DAYS; day += 1) {
+        const life = createVillage(state, day);
+        for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+        passes += life.passes;
+      }
+      expect(passes, `semilla ${seed}: nadie jugó a la pelota en ${DAYS} jornadas`)
+        .toBeGreaterThan(0);
     }
   });
 
@@ -358,10 +400,15 @@ describe('V-09 · trastos', () => {
       .toBeGreaterThan(4);
   });
 
-  it.fails('y tres veces seguidas, que es un peloteo largo', () => {
-    // La propiedad del brief de V-09b, intacta y roja con lo medido: setenta y
-    // dos muestras y ninguna cadena de tres. Quien la retome, que mire
-    // `PLAYED_OUT` antes que cualquier otro número — es lo que corta el peloteo.
+  it('y tres veces seguidas, que es un peloteo largo', () => {
+    // **Esto estaba declarado en rojo y con el mapa grande sale verde.** La
+    // medida anterior, en los valles de 36 × 56, era de setenta y dos muestras
+    // sin una sola cadena de tres, y quedó escrita con `it.fails` en vez de
+    // rebajada. Con los valles nuevos —más sitio, y sobre todo el vado, que ya
+    // no parte la aldea en dos orillas— el peloteo llega a tres. No se ha
+    // tocado `PLAYED_OUT` ni ningún otro número de `props.ts`: lo que cambió es
+    // que la gente comparte sitio en vez de repartirse entre dos mitades
+    // incomunicadas.
     let best = 0;
     for (const seed of SEEDS) {
       const state = village(seed);

@@ -5,7 +5,7 @@
 // and a saved game can carry its pending seeds' conditions without carrying
 // code.
 
-import { FOOD, TIME } from '../balance';
+import { FOOD, TIME, WORLD } from '../balance';
 import { freeBeds, housingCapacity, isHere, population } from '../people/demography';
 import { deepestDislike } from '../people/opinions';
 import { TERRAIN_CODE } from '../state';
@@ -81,11 +81,19 @@ export function ratioOf(
       return capacity === 0 ? 0 : freeBeds(state) / capacity;
     }
     case 'forestLeft': {
-      const cells = state.map.terrain.length;
-      if (cells === 0) return 0;
+      // **Contra el corazón del valle, no contra el mapa** (`WORLD.HEART_WIDTH`).
+      //
+      // Esto es lo que abre `forest_cut` y `wolf_winter` y lo que gobierna la
+      // caza, y dividía por el mapa entero. Con el mapa grande —cuatro veces más
+      // celdas y el mismo bosque, que es justo lo que protege la economía— se
+      // habría hundido de 0,24 a 0,06: por debajo de los tres umbrales del
+      // catálogo (0,12, 0,25 y 0,5) y por debajo de `FORAGE.MIN_FOREST`. Sin
+      // esta línea, crecer el mapa apaga dos encrucijadas y la caza entera.
+      const heart = WORLD.HEART_WIDTH * WORLD.HEART_HEIGHT;
+      if (heart === 0 || state.map.terrain.length === 0) return 0;
       let forest = 0;
       for (const t of state.map.terrain) if (t === TERRAIN_CODE.forest) forest += 1;
-      return forest / cells;
+      return forest / heart;
     }
     default:
       return 0;

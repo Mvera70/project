@@ -222,16 +222,35 @@ describe('el desgaste del suelo · §7.6', () => {
   });
 
   it('cambiar de casa invalida el destino aunque la cuadrilla mida lo mismo', () => {
-    const s = foundGame(108);
-    const houses = s.buildings.filter((building) => building.kind === 'house');
-    const walker = s.people.villagers
-      .filter((villager) => villager.diedTick === null && villager.leftTick === null && villager.homeId !== null)
-      .sort((a, b) => a.id - b.id)[1]!;
-    walker.homeId = houses[0]!.id;
-    const before = routeFor(s, walker.id);
-    walker.homeId = houses[houses.length - 1]!.id;
-    const after = routeFor(s, walker.id);
-    expect(after[0]).not.toBe(before[0]);
+    // **Se busca a quien ande, no se clava a la segunda persona de la semilla
+    // 108.** Muchos aldeanos no tienen ruta ninguna y eso no es un fallo: si el
+    // campo toca la casa, no hay nada que recorrer. Medido en la fundación, 5 de
+    // 20 sin ruta en unas semillas y 16 de 20 en otras, según cómo caiga el
+    // pueblo. La versión anterior fijaba una persona y una semilla, y al cambiar
+    // el valle esa persona resultó ser de las que no andan: la prueba se puso
+    // roja sin que nada de lo que prueba se hubiera roto.
+    let checked = 0;
+    for (const seed of [108, 7, 11, 23, 41]) {
+      const s = foundGame(seed);
+      const houses = s.buildings.filter((building) => building.kind === 'house');
+      if (houses.length < 2) continue;
+      const walkers = s.people.villagers
+        .filter((villager) => villager.diedTick === null && villager.leftTick === null && villager.homeId !== null)
+        .sort((a, b) => a.id - b.id);
+      for (const walker of walkers) {
+        const home = walker.homeId;
+        walker.homeId = houses[0]!.id;
+        const before = routeFor(s, walker.id);
+        walker.homeId = houses[houses.length - 1]!.id;
+        const after = routeFor(s, walker.id);
+        walker.homeId = home;
+        // Sólo dice algo de quien recorre algo desde las dos casas.
+        if (before.length === 0 || after.length === 0) continue;
+        expect(after[0], `semilla ${seed}, persona ${walker.id}`).not.toBe(before[0]);
+        checked += 1;
+      }
+    }
+    expect(checked, 'hay alguien que ande desde las dos casas').toBeGreaterThan(0);
   });
 });
 

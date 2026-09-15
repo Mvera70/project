@@ -49,9 +49,15 @@ describe('la fundación', () => {
     const s = foundGame(7);
     const forest = [...s.map.terrain].filter((t) => t === 1).length;
     const water = [...s.map.terrain].filter((t) => t === 2).length;
-    expect(forest / s.map.terrain.length).toBeGreaterThanOrEqual(0.18);
-    expect(forest / s.map.terrain.length).toBeLessThanOrEqual(0.30);
+    // Del corazón del valle, que es donde se genera el bosque y lo que la
+    // economía mide: ver `WORLD.HEART_WIDTH`.
+    const heart = WORLD.HEART_WIDTH * WORLD.HEART_HEIGHT;
+    expect(forest / heart).toBeGreaterThanOrEqual(0.18);
+    expect(forest / heart).toBeLessThanOrEqual(0.30);
     expect(water).toBeGreaterThan(0);
+    // Y el valle grande tiene lo que el corazón no: montaña alrededor y un lago.
+    expect([...s.map.terrain].filter((t) => t === 6).length, 'montaña').toBeGreaterThan(0);
+    expect([...s.map.terrain].filter((t) => t === 7).length, 'lago').toBeGreaterThan(0);
   });
 });
 
@@ -198,7 +204,12 @@ describe('el orden del tick · §4.2', () => {
     const cell = Math.floor(gather?.y ?? -1) * s.map.width + Math.floor(gather?.x ?? -1);
     expect(s.map.terrain[cell]).not.toBe(TERRAIN_CODE.water);
     expect(s.map.terrain[cell]).not.toBe(TERRAIN_CODE.marsh);
-    expect(neighbours4(cell).some((next) => s.map.terrain[next] === TERRAIN_CODE.water)).toBe(true);
+    // **La orilla del paso, y no cualquier orilla del río.** Desde que el vado
+    // es terreno de verdad (`TERRAIN_CODE.ford`), el sitio que la ficción nombra
+    // existe en el mapa y `ford()` ya no lo adivina: la reunión cae donde de
+    // verdad se cruza. Antes era «la orilla firme más cercana al núcleo», que
+    // podía estar en un recodo sin salida a cien metros del paso.
+    expect(neighbours4(cell).some((next) => s.map.terrain[next] === TERRAIN_CODE.ford)).toBe(true);
 
     const standing = s.buildings.filter((building) => building.lostTick === null);
     const coreX = standing.reduce((sum, building) => sum + building.x + building.w / 2, 0) / standing.length;
@@ -207,7 +218,7 @@ describe('el orden del tick · §4.2', () => {
       + (Math.floor(gather?.y ?? -1) + 0.5 - coreY) ** 2;
     const nearerBank = [...s.map.terrain].some((terrain, candidate) => {
       if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) return false;
-      if (!neighbours4(candidate).some((next) => s.map.terrain[next] === TERRAIN_CODE.water)) return false;
+      if (!neighbours4(candidate).some((next) => s.map.terrain[next] === TERRAIN_CODE.ford)) return false;
       const x = candidate % s.map.width;
       const y = Math.floor(candidate / s.map.width);
       const candidateDistance = (x + 0.5 - coreX) ** 2 + (y + 0.5 - coreY) ** 2;

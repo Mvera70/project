@@ -10,6 +10,7 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { elevationAt } from '../../src/render3d/world/ground';
 import { buildRidge, ridgeAt } from '../../src/render3d/world/ridge';
 
 const grown = new Map<number, GameState>();
@@ -29,12 +30,22 @@ describe('V-14 · el cuenco', () => {
     // celdas del borde del mapa viven el 32 % del bosque, trece edificios de
     // una partida de cuarenta años y el cauce por donde el río entra y sale.
     // La sierra empieza donde el mapa acaba, y por eso no cuesta balance.
+    //
+    // **Y «no pisa» se dice contra el suelo, no contra el cero** (mapa grande).
+    // Dentro del rectángulo jugable `ridgeAt` **es** el suelo, para que el
+    // vértice del borde valga lo mismo en las dos mallas: con el cinturón de
+    // montaña levantado seis celdas, devolver cero ahí dejaba un escalón de
+    // dieciocho metros justo en el borde del mapa. Lo que esta prueba guarda
+    // sigue siendo lo mismo: la sierra **no añade nada** sobre el valle.
     for (const seed of [7, 11, 23]) {
       const state = village(seed);
       for (let z = 0; z <= state.map.height; z += 1) {
         for (let x = 0; x <= state.map.width; x += 1) {
+          const inside = Math.min(x, state.map.width - 0.001);
+          const alongZ = Math.min(z, state.map.height - 0.001);
           expect(ridgeAt(state.map, state.terrainSeed, x, z),
-            `semilla ${seed}: la sierra sube dentro del valle en ${x},${z}`).toBe(0);
+            `semilla ${seed}: la sierra sube dentro del valle en ${x},${z}`)
+            .toBe(elevationAt(state.map, inside, alongZ));
         }
       }
     }
@@ -109,14 +120,18 @@ describe('V-14 · el cuenco', () => {
     expect(position.count, 'tiene vértices').toBeGreaterThan(100);
     expect(index, 'y caras').not.toBeNull();
     expect(ridge.geometry.getAttribute('color'), 'el color va por vértice').toBeDefined();
-    // Y ningún vértice cae dentro del valle con altura: el suelo de siempre es
-    // quien pinta el interior, y dos superficies en el mismo sitio parpadean.
+    // Y ningún vértice de dentro del valle se despega del suelo: el suelo de
+    // siempre es quien pinta el interior, y dos superficies a distinta altura en
+    // el mismo sitio son una junta abierta. **Contra el suelo y no contra cero**
+    // desde el mapa grande: el cinturón de montaña levanta el borde, y la
+    // sierra tiene que empalmar con él. Ver la primera prueba de este fichero.
     let inside = 0;
     for (let i = 0; i < position.count; i += 1) {
       const x = position.getX(i);
       const z = position.getZ(i);
       if (x > 0 && z > 0 && x < state.map.width && z < state.map.height) {
-        expect(position.getY(i), 'un vértice levantado dentro del valle').toBe(0);
+        expect(position.getY(i), 'un vértice despegado del suelo dentro del valle')
+          .toBeCloseTo(elevationAt(state.map, x, z), 5);
         inside += 1;
       }
     }

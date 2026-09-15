@@ -179,7 +179,7 @@ export interface PeopleState {
 // ---------------------------------------------------------------------------
 
 export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared'
-  | 'mountain' | 'lake';
+  | 'mountain' | 'lake' | 'ford';
 
 /**
  * How a terrain is written into `map.terrain`. §3.5.
@@ -213,12 +213,28 @@ export const TERRAIN_CODE = {
   // y §5.4 dejaba de apretar.
   mountain: 6,
   lake: 7,
+  /**
+   * El vado: el paso de piedras por donde se cruza el río.
+   *
+   * **Es terreno y no un dibujo, y eso es un arreglo de fondo.** El río es
+   * intransitable para A* (`astar.ts`), así que hasta aquí **nadie cruzaba el
+   * río nunca**: una aldea con campos en las dos orillas dejaba a media aldea
+   * sin ruta —medido con el mapa grande: cuatro rutas para treinta y nueve
+   * personas en la semilla 7, con cincuenta y cuatro pares casa-campo a más de
+   * dos celdas—. Y mientras tanto la ficción hablaba del vado en veinte sitios
+   * («came up the ford road»), la crónica reunía gente ahí y el 3D dibujaba las
+   * losas: todos menos el que decide por dónde se anda.
+   *
+   * Sigue siendo agua para la vista y para la marisma; lo que cambia es que se
+   * puede pisar, pagando (`PATHING.FORD`). Y sigue sin poderse construir encima.
+   */
+  ford: 8,
 } as const;
 
 export interface ValleyMap {
-  width: 36;
-  height: 56;
-  terrain: Uint8Array; // 36*56, index = y*36 + x
+  width: 72;
+  height: 112;
+  terrain: Uint8Array; // WIDTH*HEIGHT, index = y*WIDTH + x
   traffic: Uint16Array; // accumulated wear per cell
   path: Uint8Array; // 0 none, 1 trodden, 2 track, 3 road
   ruins: Uint8Array; // 0 none, 1 ruin; permanent
@@ -543,7 +559,21 @@ export type MigrationEvent =
  * `save.ts` — which imports `found.ts` and would close a cycle. v2.93: it used
  * to be written by hand in two places, and they drifted apart.
  */
-export const SCHEMA_VERSION = 4;
+/**
+ * El esquema de la partida guardada. §13.1.
+ *
+ * **5 desde el mapa grande, y esta subida sí rompe las partidas guardadas.**
+ * Las cuatro anteriores se migraban porque lo que cambiaba eran campos; aquí lo
+ * que cambia es la forma del mapa —36 × 56 pasa a 72 × 112— y no hay migración
+ * honesta: un valle de 2 016 celdas no se convierte en uno de 8 064 sin
+ * inventar seis mil celdas de terreno que nadie generó.
+ *
+ * Se acepta ahora y no más adelante, y la razón está escrita en el brief: hoy
+ * no hay ningún móvil con una partida de varios días encima, y el hito 6 —que
+ * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
+ * no sería aceptable.
+ */
+export const SCHEMA_VERSION = 5;
 
 /**
  * La postura de la aldea: lo único que el jugador manda de forma continua.
@@ -824,7 +854,7 @@ export interface ArchivedGame {
   cause: EndState['cause'];
   peakPeople: number;
   chronicle: ChronicleEntry[];
-  ruins: Uint8Array; // building mask, 36*56
+  ruins: Uint8Array; // building mask, WIDTH*HEIGHT
 }
 
 /**

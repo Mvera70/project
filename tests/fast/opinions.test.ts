@@ -4,7 +4,7 @@
 // lo borre, que spiteful y loyal perdonen a velocidades distintas, y que la
 // memoria no crezca sin fin.
 import { describe, expect, it } from 'vitest';
-import { MEMORY, OPINION, TIME } from '@engine/balance';
+import { MEMORY, OPINION, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Memory, Trait, Villager, VillagerId } from '@engine/state';
 import { restingIntent } from '@engine/state';
@@ -18,7 +18,7 @@ import {
 } from '@engine/people/opinions';
 import { decayMemories, memoriesAbout, remember, yearsSince } from '@engine/people/memories';
 
-const CELLS = 36 * 56;
+const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
 function village(seed: number): GameState {
   const rng = makeBundle(seed);
@@ -30,8 +30,8 @@ function village(seed: number): GameState {
     peakPeople: 20,
     rng,
     map: {
-      width: 36,
-      height: 56,
+      width: WORLD.WIDTH,
+      height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS),
       traffic: new Uint16Array(CELLS),
       path: new Uint8Array(CELLS),

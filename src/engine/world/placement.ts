@@ -17,7 +17,9 @@ export const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + 
  */
 function buildable(tile: number | undefined): boolean {
   return tile !== TERRAIN_CODE.water && tile !== TERRAIN_CODE.marsh
-    && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake;
+    && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake
+    // El vado se anda, no se edifica: una casa sobre el paso cierra el paso.
+    && tile !== TERRAIN_CODE.ford;
 }
 
 export function canPlace(state: GameState, kind: BuildingKind, x: number, y: number, upgradeOf: number | null = null): boolean {
@@ -203,7 +205,10 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       if ((row === y - 1 || row === y + spec.h) && col >= x && col < x + spec.w ||
         (col === x - 1 || col === x + spec.w) && row >= y && row < y + spec.h) {
         const cell = row * state.map.width + col;
-        river ||= state.map.terrain[cell] === TERRAIN_CODE.water;
+        // El vado cuenta como río: una casa junto al paso está junto al agua,
+        // y además junto a por dónde se cruza, que es mejor sitio todavía.
+        river ||= state.map.terrain[cell] === TERRAIN_CODE.water
+          || state.map.terrain[cell] === TERRAIN_CODE.ford;
         touchesForest ||= state.map.terrain[cell] === TERRAIN_CODE.forest;
         path ||= (state.map.path[cell] ?? 0) > 0;
         touchesField ||= fieldCells[cell] !== 0;

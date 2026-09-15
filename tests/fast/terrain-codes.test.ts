@@ -41,13 +41,48 @@ const NO_BUILDING = ['water', 'marsh', 'mountain', 'lake'] as const;
 const NAMES = Object.keys(TERRAIN_CODE) as (keyof typeof TERRAIN_CODE)[];
 
 describe('TERRAIN_CODE · ningún terreno se cae por un default', () => {
-  it('los ocho códigos son los ocho números seguidos, y la tabla no se reordena', () => {
+  it('los códigos son los números seguidos, y la tabla no se reordena', () => {
     // §3.5: los bytes de cada partida guardada dependen de estos valores. Un
     // terreno nuevo coge el siguiente número libre; ninguno se mueve nunca.
-    expect(Object.values(TERRAIN_CODE)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+    expect(Object.values(TERRAIN_CODE))
+      .toEqual(Object.values(TERRAIN_CODE).map((_, n) => n));
     expect(TERRAIN_CODE.meadow).toBe(0);
     expect(TERRAIN_CODE.mountain).toBe(6);
     expect(TERRAIN_CODE.lake).toBe(7);
+    expect(TERRAIN_CODE.ford).toBe(8);
+  });
+
+  it('el vado se cruza, y es lo único de agua que se cruza', () => {
+    // El arreglo de fondo del mapa grande: hasta aquí el río partía la aldea y
+    // media aldea se quedaba sin ruta. Ver `TERRAIN_CODE.ford`.
+    const state = foundGame(7);
+    const x = state.map.width - 3;
+    const y = state.map.height - 3;
+    const cell = y * state.map.width + x;
+    state.map.terrain[cell] = TERRAIN_CODE.ford;
+    const cost = stepCost(state.map, cell);
+    expect(cost, 'A* cruza el vado').not.toBeNull();
+    state.map.terrain[cell] = TERRAIN_CODE.meadow;
+    const meadow = stepCost(state.map, cell);
+    expect(cost ?? 0, 'y cuesta más que un prado').toBeGreaterThan(meadow ?? 0);
+    // Pero no se construye encima: una casa sobre el paso cierra el paso.
+    state.map.terrain[cell] = TERRAIN_CODE.ford;
+    expect(canPlace(state, 'house', x, y)).toBe(false);
+    // Y un cuerpo sí puede estar de pie en él: es por donde se anda.
+    expect(terrainOf(state).blocked[cell]).toBe(0);
+  });
+
+  it('cada valle nuevo tiene su paso', () => {
+    // Un valle sin vado es un valle partido en dos, y eso ya se midió: cuatro
+    // rutas para treinta y nueve personas.
+    for (const seed of [7, 11, 23, 41, 97]) {
+      const state = foundGame(seed);
+      let cells = 0;
+      for (const t of state.map.terrain) if (t === TERRAIN_CODE.ford) cells += 1;
+      expect(cells, `semilla ${seed}: celdas de vado`).toBeGreaterThan(0);
+      // Y es un paso, no un puente de veinte celdas.
+      expect(cells, `semilla ${seed}`).toBeLessThanOrEqual(6);
+    }
   });
 
   it('cada terreno tiene su color, en las cuatro estaciones', () => {
