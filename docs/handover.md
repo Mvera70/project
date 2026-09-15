@@ -331,12 +331,22 @@ No son teoría: cada una se pagó con al menos una ronda.
    emulación. Es lo único que falta para cerrar P3, y desde la migración es
    además lo que decide si el 3D se sostiene. **Hay demo publicada, de una sola
    página y sin servidor:** `npm run shot` la arma.
-3. **V-11**, que salda la regresión de §11.8. Ver §3.
+3. ~~**V-11**, que salda la regresión de §11.8.~~ **Cerrada el 15 sep 2026.** Lo
+   que queda de ella son las otras dos órdenes de su contrato —la riña de §7.9 y
+   el duelo— y las dos esperan un cambio del **motor**: la crónica guarda los
+   nombres de quienes riñen y no sus `id`, y `quarrelOf` consume azar, así que
+   `life/` no puede llamarlo (§4.3). Añadir los dos `id` a la entrada de crónica
+   es todo lo que hace falta.
 4. **El ritmo de decisión.** Siete a doce decisiones en cuarenta años, medio
    catálogo muerto, cuatro plantillas al filo del 1 %. La decisión está tomada;
    la ronda no. Empieza por `npm run eligibility`.
-5. **La suite de balance falla doce pruebas de §12.9**, y ya fallaba antes de
-   todo esto. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
+5. **La suite de balance falla las mismas pruebas de §12.9 que antes del mapa
+   grande**, y ya fallaba antes de todo esto. Remedido el 15 sep con el valle
+   cuatro veces mayor: las mismas doce, con las mismas causas —la cadencia de
+   encrucijadas, la extinción adversa al 23,3 % contra el 25 % que pide el
+   diseño, y el bosque en banda en 34 de 59 valles—. Que no se mueva ni una es
+   justamente lo que dice que el mapa grande no tocó la economía, que es lo que
+   su brief exigía comprobar. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
    distancia entre políticas cayó a cinco puntos contra los veinte que pide el
    diseño, y `smith_feud` se triplicó. **No lo arregla una ronda gráfica: es
    balance del motor y lo decide el dueño del diseño.** Medido en
@@ -372,6 +382,22 @@ No son teoría: cada una se pagó con al menos una ronda.
 14. **Afinar el tick a día no arregla el desfase con la jornada** y su coste está
     medido constante a constante en `docs/brief-reloj.md`. Si se hace, que sea
     por simulación y no por dibujo.
+
+---
+
+### Lo que está rojo a propósito, y dónde
+
+Tres pruebas declaradas con `it.fails`, que es lo que el método manda cuando
+algo no llega al listón: se deja la propiedad entera y se escribe la medida.
+
+| Dónde | Qué pide | Lo medido |
+|---|---|---|
+| `tests/fast/chronicle.test.ts` | Ninguna entrada de crónica llega con un parámetro sin rellenar | El hueco `{B}` del reparto: arreglarlo mueve la trayectoria de todas las semillas, porque `fillCast` corre en la elegibilidad de cada tick |
+| `tests/journeys/life-props.test.ts` | Que se juegue a la pelota **en todas** las semillas | Cinco de seis; la semilla 3 pasa diez jornadas sin que nadie toque un trasto |
+
+Y una que **dejó de estar roja** con el mapa grande sin tocarle un número: la
+cadena de tres pases seguidos de V-09b. Lo que cambió fue el vado — la aldea
+dejó de estar partida en dos orillas.
 
 ---
 
