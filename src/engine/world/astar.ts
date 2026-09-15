@@ -16,7 +16,12 @@ import { neighbours4 } from './tiles';
 /** What it costs to step into a cell, or null if it cannot be stepped into. */
 export function stepCost(map: ValleyMap, cell: number): number | null {
   const terrain = map.terrain[cell];
-  if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) return null;
+  // Lo que no se cruza. La montaña y el lago se suman aquí y no en otro sitio
+  // porque **el brief del mapa grande los define por esto**: terreno que cierra
+  // en vez de terreno que produce (`docs/next-plan.md`). Un lago se cruza tan
+  // poco como el río, y una montaña menos.
+  if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh
+    || terrain === TERRAIN_CODE.mountain || terrain === TERRAIN_CODE.lake) return null;
 
   let cost = PATHING.STEP;
   if (terrain === TERRAIN_CODE.forest) cost += PATHING.FOREST;

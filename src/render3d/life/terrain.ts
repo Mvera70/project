@@ -51,7 +51,8 @@ export function terrainOf(state: GameState): Terrain {
     // Agua y roca, cerradas. La marisma la deja pasar el motor para andar
     // (`stepCost` la niega, pero `routesFor` nunca manda a nadie ahí), así que
     // aquí se deja abierta: cerrarla aislaría trozos de orilla sin motivo.
-    if (kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.rock) blocked[cell] = 1;
+    if (kind === TERRAIN_CODE.water || kind === TERRAIN_CODE.rock
+      || kind === TERRAIN_CODE.mountain || kind === TERRAIN_CODE.lake) blocked[cell] = 1;
   }
 
   for (const building of state.buildings) {

@@ -7,13 +7,26 @@ interface Point { x: number; y: number }
 export const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
 /** Existing works reserve their entire future footprint, including church growth. */
+/**
+ * Whether anything at all may stand on a terrain. §7.4.
+ *
+ * Los dos sitios que lo comprueban tenían la lista escrita a mano, y eso es lo
+ * que hace que añadir un terreno sea un fallo esperando: con la montaña y el
+ * lago del mapa grande (`docs/next-plan.md`) serían cuatro códigos repetidos en
+ * dos condiciones. Aquí, una vez.
+ */
+function buildable(tile: number | undefined): boolean {
+  return tile !== TERRAIN_CODE.water && tile !== TERRAIN_CODE.marsh
+    && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake;
+}
+
 export function canPlace(state: GameState, kind: BuildingKind, x: number, y: number, upgradeOf: number | null = null): boolean {
   const { w, h } = BUILDINGS[kind];
   const rect = { x, y, w, h };
   if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x + w > state.map.width || y + h > state.map.height) return false;
   for (let row = y; row < y + h; row += 1) for (let col = x; col < x + w; col += 1) {
     const tile = state.map.terrain[row * state.map.width + col];
-    if (tile === TERRAIN_CODE.water || tile === TERRAIN_CODE.marsh) return false;
+    if (!buildable(tile)) return false;
     if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
   }
   if (state.buildings.some((b) => b.id !== upgradeOf && standsInTheWay(b, state.tick) && overlaps(rect, b))) return false;
@@ -130,7 +143,7 @@ function fitsEmptyGround(
     for (let col = x; col < x + w; col += 1) {
       const cell = row * state.map.width + col;
       const tile = state.map.terrain[cell];
-      if (ground.occupied[cell] !== 0 || tile === TERRAIN_CODE.water || tile === TERRAIN_CODE.marsh) return false;
+      if (ground.occupied[cell] !== 0 || !buildable(tile)) return false;
       if (keepsAway && ground.reserved[cell] !== 0) return false;
       if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
     }

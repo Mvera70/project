@@ -178,7 +178,8 @@ export interface PeopleState {
 // §3.5 · The valley
 // ---------------------------------------------------------------------------
 
-export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared';
+export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared'
+  | 'mountain' | 'lake';
 
 /**
  * How a terrain is written into `map.terrain`. §3.5.
@@ -198,6 +199,20 @@ export const TERRAIN_CODE = {
   rock: 3,
   marsh: 4,
   cleared: 5,
+  // El mapa grande, paso 1 (`docs/next-plan.md`). **Nada los genera todavía**:
+  // esto es el tipo, el coste de A*, la prohibición de construir, el color y la
+  // cota, con el mapa al tamaño de hoy. Se hace en un paso propio justamente
+  // porque veinte ficheros miran esta tabla y unos cuantos daban por hecho que
+  // los códigos eran seis; si la suite se mueve con esto puesto y nada
+  // generado, ahí está el que lo daba por hecho.
+  //
+  // Los dos son **terreno que no produce**: ni madera, ni forraje, ni solar, y
+  // A* no los cruza. Eso es lo que permite que el valle crezca sin que la
+  // economía se entere — la trampa medida del brief: el bosque es una fracción
+  // del mapa, así que un mapa cuatro veces mayor cuadruplicaba la madera en pie
+  // y §5.4 dejaba de apretar.
+  mountain: 6,
+  lake: 7,
 } as const;
 
 export interface ValleyMap {

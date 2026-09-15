@@ -15,6 +15,10 @@ export interface Palette {
   forestDark: string;
   water: string;
   rock: string;
+  /** La piedra desnuda de la montaña: más fría y más oscura que un afloramiento. */
+  stone: string;
+  /** El agua quieta y honda de un lago, que no es la del río que corre. */
+  lake: string;
   path: string;
   wood: string;
   roof: string;
@@ -25,21 +29,25 @@ export const PALETTES: Readonly<Record<Season, Palette>> = {
   spring: {
     void: '#b9c9cf', meadow: '#96b562', meadowAlt: '#7fa050', field: '#95924a',
     forest: '#4f7a3c', forestDark: '#3c6030', water: '#6ca0ba', rock: '#9a968f',
+    stone: '#8b8a8a', lake: '#5b8aa6',
     path: '#b49e76', wood: '#8a6a45', roof: '#6d5236', accent: '#d9d2c2',
   },
   summer: {
     void: '#c9cfc2', meadow: '#99aa52', meadowAlt: '#8fa14c', field: '#d2b258',
     forest: '#46703a', forestDark: '#35562c', water: '#69a2b2', rock: '#a39e94',
+    stone: '#94918b', lake: '#588ea2',
     path: '#bfa77d', wood: '#8a6a45', roof: '#6d5236', accent: '#efe6cf',
   },
   autumn: {
     void: '#cfc4b2', meadow: '#a89a55', meadowAlt: '#98884a', field: '#d0b05a',
     forest: '#8a6f33', forestDark: '#6a5326', water: '#6c96a7', rock: '#a09a90',
+    stone: '#8f8a84', lake: '#5b8496',
     path: '#b89e75', wood: '#83643f', roof: '#654c32', accent: '#e8d9b8',
   },
   winter: {
     void: '#c6ccd2', meadow: '#d9dde0', meadowAlt: '#c9ced3', field: '#cfd4d6',
     forest: '#3d5544', forestDark: '#2e4235', water: '#aebfc6', rock: '#8e939a',
+    stone: '#7d838a', lake: '#9db2bd',
     path: '#b4b0a6', wood: '#6f563a', roof: '#55402a', accent: '#f2f4f6',
   },
 };

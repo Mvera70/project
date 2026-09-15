@@ -75,6 +75,11 @@ function colourFor(code: number, palette: Palette): string {
   if (code === TERRAIN_CODE.water) return palette.water;
   if (code === TERRAIN_CODE.rock) return palette.rock;
   if (code === TERRAIN_CODE.marsh || code === TERRAIN_CODE.cleared) return palette.meadowAlt;
+  // El mapa grande, paso 1: los dos terrenos que cierran el valle
+  // (`docs/next-plan.md`). El Canvas sigue entero detrás de `?render=canvas`,
+  // así que pinta lo mismo que el 3D o el valle son dos valles distintos.
+  if (code === TERRAIN_CODE.mountain) return palette.stone;
+  if (code === TERRAIN_CODE.lake) return palette.lake;
   return palette.meadow;
 }
 

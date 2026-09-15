@@ -184,6 +184,9 @@ export function cellColour(map: ValleyMap, cell: number, palette: Palette): stri
     case 3: return palette.rock;
     case 4: return palette.forestDark;
     case 5: return palette.field;
+    // El mapa grande: piedra desnuda y agua quieta (`docs/next-plan.md`).
+    case 6: return palette.stone;
+    case 7: return palette.lake;
     default: return palette.meadow;
   }
 }
@@ -213,6 +216,14 @@ const RELIEF: Readonly<Record<number, number>> = {
   2: -0.14,   // agua
   4: -0.05,   // marisma
   3: 0.09,    // roca
+  // El mapa grande, paso 1. TUNE: 2,4 celdas son siete metros, un macizo y no
+  // un pico —la sierra de `ridge.ts` llega a quince, y ésta es la roca que
+  // entra **dentro** del mapa—. Como `heightAt` promedia las cuatro celdas de
+  // cada esquina, una mancha de montaña sale con falda propia en vez de con
+  // paredes verticales; una sola celda suelta es un risco.
+  6: 2.4,     // montaña
+  // Y el lago, más hondo que el río: un cauce se vadea y un lago no.
+  7: -0.30,   // lago
 };
 
 /**

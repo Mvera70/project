@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HERD_KINDS, SCHEMA_VERSION, restingIntent, valleyTraits } from './state';
+import { HERD_KINDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -198,6 +198,9 @@ function plantedSeed(value: unknown): boolean {
     && condition(value['condition']) && nullableTick(value['firedTick']) && nullableTick(value['witheredTick']);
 }
 
+/** Cuántos códigos de terreno existen, para el validador de abajo. */
+const TERRAIN_CODES = Object.keys(TERRAIN_CODE).length;
+
 function byteMap(value: unknown): boolean {
   if (!record(value) || value['width'] !== 36 || value['height'] !== 56) return false;
   const cells = 36 * 56;
@@ -207,7 +210,10 @@ function byteMap(value: unknown): boolean {
     && value['ruins'] instanceof Uint8Array && value['ruins'].length === cells
     && value['forestAge'] instanceof Uint8Array && value['forestAge'].length === cells
     && value['forestStock'] instanceof Uint16Array && value['forestStock'].length === cells
-    && value['terrain'].every((cell) => cell <= 5)
+    // El tope sale de la tabla y no de un número escrito a mano: con la montaña
+    // y el lago del mapa grande eran seis y ocho, y un validador que se queda en
+    // cinco rechaza como corrupta una partida perfectamente válida.
+    && value['terrain'].every((cell) => cell < TERRAIN_CODES)
     && value['path'].every((cell) => cell <= 3)
     && value['ruins'].every((cell) => cell <= 1);
 }
