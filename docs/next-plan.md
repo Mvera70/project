@@ -100,6 +100,50 @@ Hay 39 recursos publicados. Lo que falta por D.8: el campo y el camino como
 terreno con geometría, la familia de defensa completa, y **objetos sueltos por
 el mapa**, que no estaban en ningún brief y son nuevos.
 
+### Lo que se ha hecho de esta lista, y lo que destapó
+
+| Ronda | Qué cerró |
+|---|---|
+| **G-13** | La cámara gira, se levanta, dos toques vuelven, tocar el suelo deselecciona, y arrastrar el mapa ya no abre la crónica encima |
+| **G-13b** | Al alejarse el valle **llena la pantalla** (del 25 % al 85 % de alto): el tope encajaba la caja entera y en vertical eso deja el mundo como un sello. Y la sierra tenía un agujero por el que se veía el fondo |
+| **G-14** | A ×64 el valle **pintaba otro año** que la cabecera. El color de la estación pasa a salir del reloj vivo |
+| **G-15** | Almiares, leña y carretas por el valle: los trece edificios ya tenían recurso, lo que no había era nada entre una casa y la siguiente |
+| **G-16** | Los mensajes: la pancarta a sangre pasa a tarjeta, «in year 0» y «No of them left the fields» |
+
+**Y cuatro cosas que salieron de mirar capturas, y son de quien siga:**
+
+1. **La noche es casi negra y a ×64 parpadea cada quince segundos.** Medido con
+   la herramienta nueva: brillo medio del día 0,458, atardecer 0,392, noche
+   0,208. No es un fallo —la noche es de noche— pero un ciclo día/noche cada
+   quince segundos de reloj de pared es un estrobo, y a esa velocidad el jugador
+   no está mirando a nadie en particular. Es la misma decisión que la de abajo.
+
+2. **A ×64 la gente y las casas siguen siendo de hasta 64 semanas atrás**, y
+   arreglarlo es un fork de diseño con tres salidas, ninguna gratis:
+   - la jornada escénica sigue a la velocidad **entera** (D.6.1 la puso a la
+     raíz a propósito, porque si no la gente corre a saltos);
+   - a velocidad alta **no se dibujan los individuos** — y entonces no hay salto
+     que ver, que es el principio del anochecer llevado al final;
+   - o se engancha el rebaño a la capa de vida, donde un cuerpo no se
+     teletransporta porque no evalúa una fórmula.
+
+   Lo que **no** vale es relevar el estado más a menudo: medido, el rebaño salta
+   5,096 celdas contra un techo de 0,4, porque un relevo sólo es invisible
+   cuando el bicho no está en pantalla.
+
+3. **Un hueco de reparto llega a la pantalla:** «{B} was given the forge in year
+   26», semilla 23. El arreglo cabe en tres líneas y mueve la trayectoria de
+   todas las semillas, así que va con el carril del ritmo de decisión. Declarado
+   con `it.fails`.
+
+4. **La cartela de hito habla en pasado y con fecha** —«The first house went up
+   in the spring of year 3»— mientras el jugador está viendo el año 3. Se lee
+   como una página de libro de historia sobre algo que está pasando ahora. **Y
+   es deliberado**: U-02 decidió que un hito es «una etiqueta en una página de
+   la crónica, no un título ni una celebración», y §9.3 gobierna la voz. Si lo
+   que chirría es eso, es una **decisión de voz y no un arreglo**, y hay que
+   tomarla antes de reescribir cincuenta plantillas.
+
 ### El orden que sale de esto
 
 1. ~~**La cámara**~~ — **hecha, G-13.** Gira con dos dedos o con mayúsculas, se
@@ -117,7 +161,8 @@ el mapa**, que no estaban en ningún brief y son nuevos.
    - **El mapa se ve entero desde el reposo**, con borde de prado vacío
      alrededor. Confirma la queja: no hay nada que descubrir moviéndose.
 2. **El reloj a ×4 y ×64.** Separar los dos síntomas y medir.
-3. **El mapa grande, con más generación.** V-15 + V-16, ampliadas.
+3. **El mapa grande, con más generación.** V-15 + V-16, ampliadas. **Brief
+   medido al final de este documento**, porque no es una constante.
 4. **Los textos y los iconos.** Es voz y dibujo, no arquitectura.
 5. **Más modelos**, que va en paralelo si hay Blender.
 
@@ -342,3 +387,65 @@ y **no fusiona**: marca lo que hay que mirar.
    píxeles**, medido. A esa escala no se ve una charla, ni un encaro, ni a quién
    mira nadie: toda la capa de vida es invisible por defecto. Es D.6.2 y no
    interfaz, y es una sesión de diez minutos mirando la demo.
+
+---
+
+## El mapa grande · brief, con la trampa medida
+
+**Lo que se pidió:** *«el mapa sigue siendo muy pequeño, dijimos que iba a ser
+mucho más grande. Vamos a meter más generación: bosques, montañas, lago. El
+valle es el centro del mapa pero debe ser más amplio, para que podamos extender
+y hacer más cosas.»*
+
+**Lo primero, porque cambia el plan: crecer el mapa NO es cambiar dos
+constantes.** El Anexo E lo daba por «dos constantes y un tipo literal», y eso
+es verdad de la geometría y falso de la economía. Medido al auditar:
+
+```
+mapgen.ts:  const forestCount = Math.round(CELLS * fraction);
+```
+
+**El bosque es una fracción del mapa entero.** Con un mapa cuatro veces mayor
+hay cuatro veces más bosque, o sea cuatro veces más madera en pie
+(`WOOD_PER_FOREST_TILE`), y la madera deja de ser escasa para siempre: se cae
+`forest_cut`, se cae `wolf_winter`, y §5.4 —media economía del valle— deja de
+apretar. Ésa es la recalibración que tenía la fase aparcada, dicha con el número.
+
+**La vía que no rompe la economía**, y es además lo que el encargo pide:
+
+1. **El bosque, la roca y la marisma pasan a ser cantidades absolutas**, no
+   fracciones. Mismo número de celdas productivas que hoy —entre 363 y 605 de
+   bosque, que es 0,18–0,30 × 2 016— concentradas alrededor de la fundación. La
+   economía no se entera: mismos árboles, misma madera, mismas condiciones.
+2. **Lo que llena el resto es terreno nuevo y no productivo.** Dos códigos de
+   `TERRAIN_CODE` nuevos —`mountain` y `lake`— que no dan madera, ni forraje, ni
+   solar, y que A* no cruza. Eso responde a «bosques, montañas, lago» sin tocar
+   una sola constante de balance, y de paso mete la sierra **dentro** del mapa,
+   donde hoy es decorado fuera de él (V-14).
+3. **`MAX_FIELDS` y `MAX_HOUSES` son topes absolutos y no escalan**, así que la
+   aldea no se desparrama: sigue siendo el centro de algo más ancho, que es
+   literalmente lo que se pidió.
+
+**El radio de explosión, contado:** 20 ficheros de `src/` miran `TERRAIN_CODE` y
+26 sitios usan `WORLD.WIDTH/HEIGHT`. Sube `SCHEMA_VERSION` a 4 y **rompe las
+partidas guardadas** — aceptable ahora y no cuando haya un móvil con una partida
+de varios días encima, así que si se hace, se hace **antes** del hito 6.
+
+**Orden, y cada paso con su medida:**
+
+1. Los dos códigos de terreno nuevos, con el mapa **al tamaño de hoy**: nada de
+   ellos generado todavía, sólo el tipo, el coste de A*, la prohibición de
+   construir, el color en las dos paletas y la altura en `RELIEF`. La suite
+   entera tiene que quedar idéntica: si algo se mueve, es que un módulo daba por
+   hecho que los códigos eran seis.
+2. El bosque, la roca y la marisma a cantidades absolutas, **también al tamaño
+   de hoy**. Aquí la suite de balance tiene que dar lo mismo que ahora: es una
+   reescritura sin cambio de comportamiento y se comprueba así.
+3. Y entonces el tamaño, con la montaña y el lago llenando lo nuevo. Pasada
+   completa de balance (18 min) y los números de §12.9 comparados contra los de
+   antes, uno a uno.
+
+**Lo que falsaría el paso 3:** que la madera en pie por habitante cambie, que la
+cadencia de encrucijadas se mueva, o que el coste de un tick a ×64 pase de los
+234 ms medidos — una ruta que cruza el valle cuesta 0,09 ms y con un mapa cuatro
+veces mayor son unos 0,4; con cincuenta rutas por tick, 20 ms.
