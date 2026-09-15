@@ -455,6 +455,9 @@ tick(state, decision?) :
    1.  ADVANCE      tick += 1; recalcular reloj
    2.  ANNUAL       si week == 0:  tirar clima del año, comprobar peste,
                     comprobar incendio, migración de primavera, envejecer a todos
+  2b.  FATE         rollFate(state): una tirada del flujo `fate` contra la tabla
+                    de sucesos de §7.10; si sale uno, ya está aplicado, se guarda
+                    en state.happenings y su línea va al búfer de crónica
    3.  DECISION     si hay decision del jugador, aplicar la opción elegida
                     (efectos inmediatos + plantar semillas)
    4.  SEEDS        disparar las semillas cuyo firesAtTick <= tick
@@ -480,6 +483,12 @@ Notas obligatorias:
   el granero antes del invierno.
 - Los pasos 12 y 13 se ejecutan sobre listas fotografiadas al empezar el paso.
   Un recién nacido no puede morir en el mismo tick en el que nace.
+- El paso **2b** (R-1, v3.75) va después del bloque anual y antes de la
+  decisión a propósito: un suceso es del mundo, no del jugador, y lo que el
+  jugador decide esa semana se decide **con el suceso ya encima** (una casa
+  quemada por el rayo cuenta para las condiciones del catálogo del paso 15).
+  Va después del anual para que el incendio de §5.9 y el rayo no se pisen: si
+  la semana 0 ya hubo incendio, el rayo sólo tiene lo que quede en pie.
 - El paso 16 no calcula nada. Los pasos anteriores empujan eventos a un búfer y
   este los vuelca. Ningún sistema escribe texto.
 - El búfer incluye las entradas que generan las APIs de resolución de M-07:
@@ -506,6 +515,11 @@ Rápido, sin dependencias, reproducible entre navegadores y Node.
 
 Regla: **un sistema solo consume de su flujo.** Añadir una tirada en el render
 o en un log jamás puede desplazar la simulación.
+
+La lista de arriba es la de M-01; desde entonces han entrado `minds` (el
+carácter, v3.61) y **`fate`** (los sucesos del valle, R-1, v3.75), siempre **al
+final** de `RNG_STREAMS`, que es lo que hace que un flujo nuevo no mueva ni una
+tirada de los anteriores (lo guarda el dorado de `tests/fast/rng.test.ts`).
 
 **Test de determinismo (obligatorio, suite rápida):** dos partidas con la misma
 semilla y la misma lista de decisiones producen estados idénticos byte a byte
@@ -1565,6 +1579,76 @@ que un mal rato pequeño marcara igual que una hambruna, que el fuego marcara a
 quien no vivía allí, que el peso no dependiera de la gravedad, o que escribir
 recuerdos consumiera una tirada de azar. Las cinco tienen prueba y cuatro están
 verificadas por mutación.
+
+### 7.10 Los sucesos del valle (R-1, v3.75)
+
+**El mundo pasa cosas por su cuenta.** Es la primera fase del rework que el
+dueño del diseño pidió el 15 sep 2026 («mucho más aleatorio y con mucha más
+vida»), y responde al diagnóstico de `docs/findings-drama.md`: todo lo
+dramático colgaba de las encrucijadas, y las encrucijadas salen diez veces en
+cuarenta años. Desde aquí, **cada semana el valle tira** (paso 2b de §4.2)
+contra una tabla de doce sucesos; el que sale cambia el estado, escribe en la
+crónica (`kind: 'happening'`, claves `fate.<id>`) y **se ve**, con los mismos
+efectos visibles de §11.5 que las opciones de encrucijada. No hay nada que
+decidir: pasan, como pasa un incendio.
+
+**El azar.** Un flujo propio, `fate`, y ningún suceso toca otro (hay prueba).
+El cielo de la semana —cuántas jornadas cerradas, de tormenta, de nieve— lo
+decide el motor en `src/engine/world/sky.ts` con `hash32` y **sin consumir
+tirada**, y la capa `derive` lo lee de ahí; así un rayo de §10.8 puede tener
+consecuencias sin que el decorado mueva la simulación.
+
+**La cadencia.** Una tirada por semana contra `FATE.WEEKLY_CHANCE`, y nunca dos
+sucesos a menos de `FATE.MIN_GAP_WEEKS` (un suceso pegado a otro no se lee, se
+apila). La fiesta de la cosecha es la excepción: **es un rito**, se celebra la
+semana después de la siega si hay grano y gente, sin tirar y sin respetar el
+hueco. Medido con seis semillas × cuarenta años (`tools/fate-report.ts`):
+**13,0 sucesos al año, mediana de tres semanas entre dos**, y una distancia
+media entre los repartos de dos valles de 0,16 (0 iguales, 1 nada en común).
+
+**Los doce sucesos.** Cada uno tiene condición (estación, cielo, lo que hay en
+pie), peso (multiplicado por los rasgos del valle: `old_forest` trae lobos y
+osos, `bare_hills` aleja la riada), efecto y efecto visible. La tabla completa,
+con los números, es §12.10; y el código que la lee es `weightOf` en
+`src/engine/world/fate.ts`, una rama por suceso.
+
+| Suceso | Cuándo | Qué hace | Se ve |
+|---|---|---|---|
+| El rayo | semana de tormenta, madera en pie | quema un edificio (casas antes) | la ruina |
+| La riada | primavera tras tres jornadas de lluvia | se lleva grano | la aldea en el vado |
+| Los lobos en el corral | invierno, con gallinas | una o dos gallinas menos | el corral vacío |
+| La boda | seis adultos | ánimo y fe | la aldea en la capilla, dos días |
+| El buhonero | verano, leña de sobra | leña por grano | la plaza |
+| La buena pesca | primavera o verano con cielo abierto | grano | el vado |
+| El tejado bajo la nieve | invierno, dos jornadas de nieve | una casa cerrada dos semanas, leña | — |
+| La fiesta de la cosecha | rito: la semana después de la siega | ánimo y fe | la capilla, dos días |
+| La riña en la plaza | dos nombrados | los dos que peor se llevan, peor todavía | la plaza |
+| El oso en el bosque | verano u otoño, bosque | una bandera dos semanas, ánimo | — |
+| El niño perdido | hay niños | ánimo; si es nombrado, con su nombre | el vado |
+| El forastero | salvo valle hostil | ánimo | la plaza |
+
+**Lo que esto cambia en el resto del sistema.** La riña de la plaza es **el
+empujón que las opiniones nunca recibían**: baja la opinión mutua de los dos
+nombrados que peor se llevan, y de ahí salen los rencores de §6.4 (de cero en
+tres partidas de cuarenta años a entre 4 y 11) y con ellos las plantillas del
+catálogo que los exigen. Las reuniones de suceso (`gather`) las sirve
+`derive/gatherings.ts` **después** de las de decisión: si el jugador convocó,
+manda el jugador. El estado guarda `happenings: HappeningRecord[]` (`tick`,
+`id`, lo visible, y `who`: los `id` de los nombrados implicados, que es lo que
+la capa de vida necesita para la riña de §7.9). `SCHEMA_VERSION` es 6.
+
+**Lo que el dueño decidió después, y está pendiente** (`docs/rework.md` §2.6):
+«que haya caos y que haya partidas que se rompan es la idea del juego». Las dos
+puertas del rayo (`LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE`), puestas
+porque el rayo quemaba la única casa de la pareja y tres aldeas de seis morían,
+**van contra esa decisión y hay que quitarlas**, con la prueba «el mundo sigue
+en pie» reescrita para medir que unas mueren y otras no.
+
+**Qué falsaría esto:** un suceso fuera de su estación o de su cielo; dos
+sucesos a menos del hueco (salvo la fiesta); un suceso que consumiera un
+flujo que no sea `fate`; una clave sin sus tres variantes en el banco; dos
+semillas con el mismo reparto; o una partida de treinta años sin un solo
+rencor. Las siete tienen prueba en `tests/fast/fate.test.ts`.
 
 ---
 
@@ -3469,6 +3553,47 @@ el caso. Lo que sigue fallando —la fila de arriba, y la cadencia máxima de
 `last`/`worst` en 9,37— es harina de otro costal: ambas políticas contestan
 `no_one` el 100 % de las veces que se les pregunta, por cómo deciden, no por lo
 que la plantilla ofrezca a cambio. Ver §2.23.
+
+**Y desde R-1 (v3.75) esta suite mide un juego que ya no existe:** sus 37
+aserciones se escribieron cuando sólo las encrucijadas movían el mundo. No se
+«arreglan»: se remiden con los sucesos dentro y se reescriben contra los
+números nuevos, **cuando el dueño lo pida** (`docs/rework.md` §5). Hasta
+entonces la puerta es la suite rápida y las jornadas.
+
+### 12.10 Los sucesos del valle (`FATE`, R-1)
+
+La tabla de §7.10 con sus números. Todo vive en `FATE` (`balance.ts`), con
+`// TUNE:` y lo medido al lado; el informe que los fijó es
+`tools/fate-report.ts` (seis semillas × cuarenta años, jugadas con `run` y la
+política prudente), y hay que pasarlo antes y después de mover cualquiera.
+
+| Constante | Valor | Por qué |
+|---|---|---|
+| `WEEKLY_CHANCE` | 0,35 | con `MIN_GAP_WEEKS` 2 salen 13 al año: uno cada tres o cuatro semanas, contable sin apilarse |
+| `MIN_GAP_WEEKS` | 2 | un suceso pegado a otro no se lee |
+| `FEAST_IS_A_RITE` | true | sorteada, la fiesta salía una vez cada veinte años |
+| `WEIGHT` | rayo 3 · riada 3 · lobos 3 · boda 0,6 · buhonero 2 · pesca 2 · tejado 3 · fiesta 1 (no se sortea) · riña 1 · oso 0,6 · niño 0,5 · forastero 1 | tercera vuelta; las dos anteriores en `docs/rework.md` §2.5 |
+| `LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE` | 2, 4 | **pendiente de quitar** (decisión del dueño, §7.10) |
+| `LIGHTNING_HOUSE_WEIGHT`, `LIGHTNING_MORALE` | 3, −4 | como el incendio de §5.9 |
+| `FLOOD_WET_DAYS`, `FLOOD_GRAIN_LOSS`, `FLOOD_MORALE` | 3, 0,08, −3 | tres jornadas cerradas de siete; el 8 % del granero |
+| `WOLVES_HENS`, `WOLVES_MORALE` | [1, 2], −1 | |
+| `WEDDING_MIN_ADULTS`, `WEDDING_MORALE`, `WEDDING_FAITH` | 6, +5, +2 | con 4 adultos había boda cada nueve meses |
+| `PEDLAR_WOOD`, `PEDLAR_GRAIN` | 15, 30 | sólo si hay el doble de leña |
+| `CATCH_GRAIN`, `CATCH_MORALE` | [15, 35], +2 | |
+| `ROOF_SNOW_DAYS`, `ROOF_BLOCK_WEEKS`, `ROOF_WOOD`, `ROOF_MORALE` | 2, 2, 15, −2 | |
+| `FEAST_MIN_PEOPLE`, `FEAST_MORALE`, `FEAST_FAITH` | 4, +6, +3 | |
+| `QUARREL_OPINION`, `QUARREL_MORALE` | −12, −1 | el empujón de §7.10; con −12 hay rencor a la cuarta riña entre los mismos |
+| `BEAR_FOREST`, `BEAR_WEEKS`, `BEAR_MORALE` | 0,2, 2, −3 | |
+| `CHILD_MORALE`, `STRANGER_MORALE` | −3, +1 | |
+
+Los factores por rasgo no son constantes sino ramas de `weightOf`: lobos ×1,6
+y oso ×2 en `old_forest`; riada y lobos ×0,5 en `bare_hills`. R-3 los
+multiplica (`docs/rework.md` §4).
+
+**Medido con esta tabla** (v3.75): 13,0 sucesos al año en 240 años de aldea;
+por año, riña 2,47, forastero 2,33, pesca 2,04, oso 1,05, niño 1,02, lobos
+0,89, fiesta 0,89, boda 0,86, rayo 0,58, buhonero 0,49, tejado 0,27, riada
+0,15; rencores en cuarenta años entre 4 y 11; distancia entre valles 0,16.
 
 ---
 

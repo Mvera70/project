@@ -50,6 +50,20 @@ escrito como si hiciera falta.
    sí conviene antes del rework es lo que sobrevive a cualquier rediseño: medir,
    dejar escrito lo que ya se sabe y no romper el motor.
 
+**Y tres más, del 15 sep por la noche**, ya con el rework empezado (R-1 en
+`main`, `docs/rework.md`):
+
+5. **La IA de animales y personas es lo siguiente.** «Sobre todo los humanos,
+   pero los animales ahora mismo es que están fatal, atraviesan paredes, dan
+   vueltas sobre sí mismos.» Brief con diagnóstico en `docs/rework.md` §3.
+6. **El caos es el juego.** «Que haya caos y que haya partidas que se rompan y
+   no se pueda seguir jugando es la idea del juego.» Ninguna puerta del motor
+   debe proteger a la aldea de morir; las dos que R-1 puso al rayo se quitan
+   (`docs/rework.md` §2.6).
+7. **Los planes de prueba y el nivelado van después**, y la documentación
+   tiene que bastar para que Opus o Sonnet sigan sin el modelo caro. «Deja de
+   hacer y dar vueltas.»
+
 ---
 
 ## Dónde está el proyecto, sin adornos

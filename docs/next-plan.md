@@ -17,6 +17,17 @@ haciendo, detallado para el siguiente agente»*. Está escrita para un agente qu
 no ha visto nada de esto. Si sólo lees una sección del proyecto, que sea ésta,
 y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
 
+> **Actualizado el 15 sep por la noche, al cerrar R-1 (v3.75).** El plan que
+> manda desde entonces es **`docs/rework.md`**: lo que el dueño ha decidido en
+> orden (§0), R-1 tal como está (§2, con las nueve jornadas rojas de §2.8 y la
+> contradicción de §2.6), **la IA de animales y personas como tarea siguiente**
+> (§3, con diagnóstico, medida y orden de arreglo), y los briefs de R-2, R-5 y
+> R-3 (§4). Lo de abajo sigue siendo verdad para los cinco pasos y para la
+> operativa (§4 de esta sección), pero el orden de trabajo es el de allí. El
+> estado exacto al cerrar: suite rápida 69 ficheros y 1 086 verdes; jornadas
+> 107 verdes y 9 rojas (listadas); Playwright sin pasar tras R-1; demo
+> publicada en la versión 14, de antes de R-1; todo en `main`.
+
 ### 0. Qué quiere el dueño, con sus palabras
 
 - **La premisa.** «Un idle donde la aldea sea bonita de ver de fondo … la gracia

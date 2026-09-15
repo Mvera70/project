@@ -4,10 +4,10 @@
 // escribe estado, no se guarda, no mueve un número, y dos partidas con la
 // misma semilla lo colocan igual. El día que sea comida, esta prueba tendrá
 // que cambiar a propósito y no por accidente.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { ANIMALS, TIME } from '@engine/balance';
-import { foundGame } from '@engine/found';
 import type { GameState } from '@engine/state';
 import { run } from '@engine/sim';
 import { animalPositions, wildlifePositions } from '@derive/animals';
@@ -24,7 +24,7 @@ function village(years: number, seed = 7) {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

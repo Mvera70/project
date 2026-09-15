@@ -3,10 +3,10 @@
 // Lo que se protege: que una hambruna larga no borre la vida entera de nadie,
 // que un incendio marque a quien vivía allí y a nadie más, y que los dos
 // epitafios que llevaban desde M-09 sin escritor puedan salir por fin.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { MEMORY, SCARS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { scarFire, scarHunger } from '@engine/people/scars';
 import { consume } from '@engine/subsistence/consumption';
@@ -17,7 +17,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

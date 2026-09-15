@@ -4,8 +4,10 @@
 // texto, que ningún trato deje a la aldea con más cabezas de las que puede
 // alimentar ni con menos de cero, que la sal cumpla lo que promete, y que los
 // tres comerciantes sean gente distinta y no un mismo menú con tres nombres.
+import { population } from '@engine/people/demography';
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { ANIMALS, TIME } from '@engine/balance';
+import { FOOD, ANIMALS, TIME } from '@engine/balance';
 import { BANK, CROSSROAD_BANK } from '@engine/chronicle/bank.en';
 import { CATALOG, TRADE_TEMPLATES } from '@engine/crossroads/catalog';
 import { applyEffect } from '@engine/crossroads/resolve';
@@ -14,7 +16,6 @@ import {
 } from '@engine/crossroads/select';
 import { all } from '@engine/crossroads/conditions';
 import { fillCast } from '@engine/crossroads/cast';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { herdCapacity } from '@engine/subsistence/herd';
 import { consume } from '@engine/subsistence/consumption';
@@ -26,7 +27,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }
@@ -118,15 +119,20 @@ describe('la sal cumple lo que promete · §7.8', () => {
     // La primera versión fijaba un solo escenario y medía, sin saberlo, si ese
     // escenario caía en el tramo bueno. En v3.61 el carácter cambió la
     // población, el hueco se movió y la prueba acusó a la sal de no funcionar.
+    // Y en R-1 volvió a pasar con cerdos: el hueco de una res de 25 está entre
+    // 25 y 33,75 de déficit, y una aldea de dieciséis no debe nunca tanto en
+    // una semana. Con gallinas —dos de carne, 2,7 saladas— el hueco se repite
+    // cada pocos celemines y el barrido lo cruza sea cual sea la población.
     const make = (grain: number): GameState => {
       const s = village(20);
       s.village.grain = grain;
-      s.herd = { hens: 0, pigs: 40, cows: 0 };
+      s.herd = { hens: 40, pigs: 0, cows: 0 };
       return s;
     };
 
     let saved = 0;
-    for (let grain = 0; grain <= 60; grain += 5) {
+    const demand = population(make(0)) * FOOD.GRAIN_PER_PERSON;
+    for (let grain = 0; grain <= demand; grain += 1) {
       const plain = make(grain);
       consume(plain);
 
@@ -134,9 +140,9 @@ describe('la sal cumple lo que promete · §7.8', () => {
       salted.flags['salted'] = salted.tick + 5 * TIME.WEEKS_PER_YEAR;
       consume(salted);
 
-      expect(salted.herd.pigs, `con ${grain} de grano, la sal nunca cuesta cabezas`)
-        .toBeGreaterThanOrEqual(plain.herd.pigs);
-      saved += salted.herd.pigs - plain.herd.pigs;
+      expect(salted.herd.hens, `con ${grain} de grano, la sal nunca cuesta cabezas`)
+        .toBeGreaterThanOrEqual(plain.herd.hens);
+      saved += salted.herd.hens - plain.herd.hens;
     }
     expect(saved, 'barriendo el hueco, la sal salva cabezas').toBeGreaterThan(0);
   });

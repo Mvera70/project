@@ -20,6 +20,7 @@ import { rubShoulders, workedTogether } from './people/neighbours';
 import { ageOf, minAgeFor, promoteToNamed } from './people/villagers';
 import { pick } from './rng';
 import type {
+  HappeningId,
   Building,
   BuildingKind,
   ChronicleEntry,
@@ -47,6 +48,7 @@ import { rollWeather } from './subsistence/seasons';
 import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { scarFire } from './people/scars';
 import { destroyBuilding } from './world/buildings';
+import { rollFate } from './world/fate';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
@@ -189,6 +191,8 @@ export interface TickReport {
   decided: AppliedEffects | null;
   /** `decided`'s own `visible`, each placed on the map. Empty if nothing was decided this tick. */
   visualEffects: PositionedVisualEffect[];
+  /** R-1 · el suceso del valle de este tick, si lo hubo (§7.10). */
+  happening: HappeningId | null;
   posed: string | null;
   entries: ChronicleEntry[];
   ended: boolean;
@@ -686,6 +690,16 @@ export function tick(
     fillVacancies(state);
   }
 
+  // ---- 2b · LOS SUCESOS DEL VALLE (R-1, §7.10) ------------------------------
+  // Después de los desastres anuales y antes de la decisión: lo que le pasa al
+  // valle esta semana por su cuenta. `rollFate` ya ha cambiado el estado
+  // cuando vuelve; aquí sólo se cuenta y se apunta lo que hay que enseñar.
+  const fated = rollFate(state);
+  if (fated !== null) {
+    state.happenings.push(fated.record);
+    say(fated.entry);
+  }
+
   // The turn of the season, at weight 1: the quiet ticking underneath.
   if (weekOf(state.tick) % 12 === 0) {
     say({ kind: 'season', templateKey: seasonKey(seasonOf(state.tick)), params: { year: year() }, weight: 1 });
@@ -1140,7 +1154,14 @@ export function tick(
     fired,
     herd: { ...fed, bred: herd.bred, wolved: herd.wolved },
     decided,
-    visualEffects,
+    // R-1 · lo visible de un suceso va por la misma cañería que lo de una
+    // decisión (§11.5): la interfaz enfoca, la capa de vida junta a la gente.
+    visualEffects: fated === null
+      ? visualEffects
+      : [...visualEffects, ...fated.record.visible.map((effect) => ({
+        effect, ...locate(state, effect, undefined, null),
+      }))],
+    happening: fated?.record.id ?? null,
     posed,
     entries: buffer,
     ended: state.ended !== null,

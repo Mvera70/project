@@ -261,6 +261,99 @@ export const SKY = {
   FLAKES: 800,
 } as const;
 
+/**
+ * §12.10 · Los sucesos del valle (R-1, v3.75).
+ *
+ * El primer paso del rework que pidió el dueño del diseño —«mucho más azar y
+ * mucha más vida»—: cada semana el valle tira contra esta tabla y lo que sale
+ * pasa sin que nadie decida nada (`world/fate.ts`). Los pesos son relativos
+ * entre los sucesos que **pueden** pasar esa semana; la estación, el cielo y
+ * los rasgos del valle abren, cierran y pesan. Todo TUNE, y todo medido con
+ * `tools/fate-report.ts` antes de escribirse aquí.
+ */
+export const FATE = {
+  // TUNE: la probabilidad semanal de que pase algo, y el hueco mínimo entre
+  // dos sucesos. Con 0,35 y dos semanas salen unos catorce al año: uno cada
+  // tres o cuatro semanas, que es lo que se puede contar sin que se apile.
+  WEEKLY_CHANCE: 0.35,
+  MIN_GAP_WEEKS: 2,
+  // TUNE: el peso de cada suceso entre los posibles. La fiesta pesa mucho
+  // porque sólo puede pasar una semana al año; el rayo se multiplica por las
+  // jornadas de tormenta de la semana.
+  // Medido en dos vueltas de seis semillas × cuarenta años: en la primera el
+  // forastero y el oso eran la mitad del libro y la fiesta salía una vez cada
+  // veinte años; en la segunda la riña era una entrada de cada cuatro y había
+  // boda cada nueve meses. Los pesos de abajo son la tercera. Ver §7.10.
+  WEIGHT: {
+    lightning_fire: 3,
+    river_flood: 3,
+    wolves_at_the_coop: 3,
+    wedding: 0.6,
+    pedlar: 2,
+    good_catch: 2,
+    roof_under_snow: 3,
+    harvest_feast: 1, // no se sortea: es un rito, ver `FEAST_IS_A_RITE`
+    quarrel_in_the_square: 1,
+    bear_in_the_wood: 0.6,
+    child_lost: 0.5,
+    stranger_passes: 1,
+  },
+  // La fiesta de la cosecha no es suerte: si hay grano y hay gente, la semana
+  // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
+  // porque una sola semana al año casi nunca coincidía con el sorteo.
+  FEAST_IS_A_RITE: true,
+  // TUNE: el rayo no quema la única casa de una aldea de dos: medido, eso mató
+  // tres aldeas de seis antes del año treinta. Pide dos casas y cuatro
+  // personas, como el incendio de §5.9 pide que haya algo que arder.
+  LIGHTNING_MIN_HOUSES: 2,
+  LIGHTNING_MIN_PEOPLE: 4,
+  // TUNE: el rayo quema como el incendio de §5.9, y prefiere las casas igual.
+  LIGHTNING_HOUSE_WEIGHT: 3,
+  LIGHTNING_MORALE: -4,
+  // TUNE: el río se sale en primavera tras una semana de agua: cuántas jornadas
+  // cerradas hacen falta, qué parte del granero se lleva, y el ánimo.
+  FLOOD_WET_DAYS: 3,
+  FLOOD_GRAIN_LOSS: 0.08,
+  FLOOD_MORALE: -3,
+  // TUNE: los lobos del corral, en invierno.
+  WOLVES_HENS: [1, 2],
+  WOLVES_MORALE: -1,
+  // TUNE: una boda pide gente; sube el ánimo y un poco la fe.
+  WEDDING_MIN_ADULTS: 6,
+  WEDDING_MORALE: 5,
+  WEDDING_FAITH: 2,
+  // TUNE: el buhonero cambia leña por grano a este precio, en verano y sólo si
+  // hay leña de sobra (el doble de lo que se lleva).
+  PEDLAR_WOOD: 15,
+  PEDLAR_GRAIN: 30,
+  // TUNE: una buena pesca, en primavera o verano con el cielo abierto.
+  CATCH_GRAIN: [15, 35],
+  CATCH_MORALE: 2,
+  // TUNE: un tejado cede bajo la nieve: cuántas jornadas de nieve hacen falta,
+  // cuánto tiempo queda la casa sin techo y qué cuesta arreglarlo.
+  ROOF_SNOW_DAYS: 2,
+  ROOF_BLOCK_WEEKS: 2,
+  ROOF_WOOD: 15,
+  ROOF_MORALE: -2,
+  // TUNE: la fiesta de la cosecha, la semana después de la siega.
+  FEAST_MIN_PEOPLE: 4,
+  FEAST_MORALE: 6,
+  FEAST_FAITH: 3,
+  // TUNE: la riña en la plaza baja la opinión mutua de los dos que peor se
+  // llevan. Es el empujón que `findings-drama.md` §1 dice que nadie daba: sin
+  // él ninguna opinión llegaba a −50 y no había rencores nunca.
+  QUARREL_OPINION: -12,
+  QUARREL_MORALE: -1,
+  // TUNE: el oso, si queda bosque; deja una bandera dos semanas para quien
+  // quiera leerla (la capa de vida, la caza) y baja el ánimo.
+  BEAR_FOREST: 0.2,
+  BEAR_WEEKS: 2,
+  BEAR_MORALE: -3,
+  // TUNE: un niño perdido y encontrado, y un forastero que pasa.
+  CHILD_MORALE: -3,
+  STRANGER_MORALE: 1,
+} as const;
+
 // ---------------------------------------------------------------------------
 // §12.4 · Demography
 // ---------------------------------------------------------------------------

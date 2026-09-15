@@ -37,7 +37,11 @@ describe('noticeworthy · §9.2', () => {
       if (noticeworthy(report.entries).length > 0) noticed += 1;
     }
     expect(noticed).toBeGreaterThan(0); // ...pero alguna vez tiene que hablar
-    expect(noticed / ticks).toBeLessThan(0.25);
+    // Un cuarto era la cota con el valle mudo; desde R-1 el valle pasa cosas
+    // por su cuenta —trece al año, medido en §12.10— y cada una es un aviso.
+    // «No en cada tick» sigue siendo la propiedad, y esto la guarda: menos de
+    // una semana de cada dos.
+    expect(noticed / ticks).toBeLessThan(0.5);
   });
 });
 

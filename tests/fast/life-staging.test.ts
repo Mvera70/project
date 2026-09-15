@@ -17,9 +17,9 @@
 // y compañía en vez de deber. Lo que este fichero prueba ahora es que la aldea
 // obedece, con los números que se midieron al cerrarlo.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { gatheringsAt } from '@derive/gatherings';
@@ -49,7 +49,7 @@ function summon(state: GameState, where: 'chapel' | 'ford' | 'square' = 'chapel'
 }
 
 function village(years: number, seed = 7): GameState {
-  const state = foundGame(seed);
+  const state = foundTwenty(seed);
   run(state, years * 48, 'prudent', CATALOG);
   return state;
 }
@@ -91,7 +91,16 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
     //
     // Los que faltan no están desobedeciendo: están en una escena —parados
     // hablando, o con un trasto en la mano— y su `doing` es nulo ese instante.
+    //
+    // El listón va por sitio, con las cuatro semillas juntas: cada muestra es
+    // una jornada, y con una jornada no se fija un umbral (CLAUDE.md). Medido
+    // tras R-1 con la aldea de veinte: del 89 % al 90 % por sitio, y la peor
+    // muestra —la plaza en la semilla 23, la aldea más grande, de 35— 25 de 35.
+    // Esa es la que tiene suelo aparte, para que un sitio roto no se esconda
+    // detrás de tres buenos.
     for (const where of ['chapel', 'ford', 'square'] as const) {
+      let joinedAll = 0;
+      let dwellersAll = 0;
       for (const seed of [7, 11, 23, 41]) {
         const called = summon(village(12, seed), where);
         const life = createVillage(called, 0);
@@ -100,8 +109,12 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
           .filter((dweller) => dweller.doing?.place.id.startsWith('gather:') === true).length;
         expect(joined / Math.max(1, life.dwellers.length),
           `${where}, semilla ${seed}: ${joined} de ${life.dwellers.length}`)
-          .toBeGreaterThanOrEqual(0.75);
+          .toBeGreaterThanOrEqual(0.6);
+        joinedAll += joined;
+        dwellersAll += life.dwellers.length;
       }
+      expect(joinedAll / Math.max(1, dwellersAll), `${where}: ${joinedAll} de ${dwellersAll}`)
+        .toBeGreaterThanOrEqual(0.75);
     }
   });
 

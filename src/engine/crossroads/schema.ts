@@ -123,18 +123,11 @@ export type Effect =
   | { k: 'herd'; kind: HerdKind; delta: number };
 
 /** What the option changes on screen. Never empty. */
-export type VisualEffect =
-  | { k: 'raise'; kind: BuildingKind }
-  | { k: 'ruin'; kind: BuildingKind }
-  | { k: 'banner'; colour: string; years: number } // a banner over the core
-  /**
-   * Put a building's fire out. `who`, when given, is a cast letter (§8.1,
-   * v2.62): the building is that person's own, not just any of `kind` — A.7
-   * promised "B's building" and the catalogue had no way to say so.
-   */
-  | { k: 'douse'; kind: BuildingKind; who?: string }
-  | { k: 'gather'; where: 'square' | 'chapel' | 'ford'; days: number }
-  | { k: 'scar'; what: 'burnt_field' | 'grave_row' | 'felled_wood' };
+// R-1 · `VisualEffect` vive en `state.ts` desde que un suceso del valle
+// (`HappeningRecord`) lo guarda: el estado no puede importar del catálogo. Se
+// reexporta aquí para que nada de lo que lo importaba cambie.
+export type { VisualEffect } from '../state';
+import type { VisualEffect } from '../state';
 
 // ---------------------------------------------------------------------------
 // §8.5 · Seeds — the deferred consequence

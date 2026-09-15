@@ -95,7 +95,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     seeds: [],
     flags: {},
     chronicle: [],
-    history: [],
+    history: [], happenings: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,

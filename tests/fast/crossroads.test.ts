@@ -65,6 +65,7 @@ function village(seed: number, houses = 12): GameState {
     flags: {},
     chronicle: [],
     history: [],
+    happenings: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,

@@ -69,6 +69,9 @@ describe('rng · reproducibilidad', () => {
       // dando lo mismo que el primer dia.
       quarrels: 1072235657,
       minds: 698695991,
+      // R-1: el flujo `fate` (§7.10) entra al final y no mueve ni uno de los de
+      // arriba, que es lo que esta prueba guarda.
+      fate: 1432707347,
     });
   });
 

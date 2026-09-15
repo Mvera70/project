@@ -159,7 +159,10 @@ directamente. `life/staging.ts` baja las órdenes del motor a la jornada: del
 77 % al 100 % de la aldea va donde la decisión dijo. Lo que **no** se sirve es
 la riña de §7.9, y por una razón medida: la crónica guarda los **nombres** de
 los dos, no sus `id`, y `quarrelOf` no se puede llamar desde `life/` porque
-consume azar del motor. Servirla es un cambio del motor.
+consume azar del motor. Servirla es un cambio del motor. **Desde R-1 hay un
+atajo:** la riña de la plaza (`quarrel_in_the_square`) guarda los `id` de los
+dos en `state.happenings[n].who`, y `staging.ts` puede leerlos sin tocar el
+motor (`docs/rework.md` §4, R-2).
 
 **Lo que decide si hay juego no es gráfico.** El jugador toma entre siete y doce
 decisiones en cuarenta años y diez de las veinte plantillas del catálogo no
@@ -190,12 +193,29 @@ el parte de bienvenida leído por quien no lo escribió— y dejan de bloquear: 
 se validan y no se sustituyen por pruebas. Siguen descritos en `docs/design.md`
 §9.5 y §15.1 como el criterio con el que se construyó el motor.
 
-**Y el sistema de encrucijadas se va a rehacer casi entero**, así que **no se
-afina**. Lo dijo el dueño el 15 sep: «el ritmo de decisiones tampoco afecta
-mucho… probablemente hay que hacer un rework, pero cargárselo casi entero»,
-y el rumbo es **mucho más azar y mucha más vida**. Con la iteración de Fable, más
-adelante. Hasta entonces: relajar condiciones, escribir plantillas de menor peso
-o fusionar `wolf_winter` es gastar dos veces — está en `docs/roadmap.md`, arriba.
+**El rework está en marcha, y `docs/rework.md` es el plan que manda.** El
+dueño lo pidió el 15 sep («mucho más aleatorio y con mucha más vida … cargárselo
+casi entero») y la primera fase está en `main`: **R-1, los sucesos del valle**
+(v3.75; §7.10, §12.10, paso 2b de §4.2). Cada semana el motor tira en el flujo
+`fate` contra doce sucesos —rayo, riada, lobos, boda, buhonero, pesca, tejado
+bajo la nieve, fiesta de la cosecha, riña en la plaza, oso, niño perdido,
+forastero— y el que sale cambia el estado, se cuenta y se ve. Medido: trece al
+año, rencores donde antes no había ninguno. **Lo siguiente es la IA de animales
+y personas** («atraviesan paredes, dan vueltas sobre sí mismos»: `rework.md`
+§3, con diagnóstico, medida y orden de arreglo), después R-2/R-5 (gente
+distinta, escenas) y R-3 (diez rasgos de valle). Las encrucijadas se quedan y
+**no se afinan**.
+
+Tres cosas del dueño que mandan sobre cualquier otra regla de este fichero:
+**el caos es el juego** («que haya partidas que se rompan es la idea»: las dos
+puertas del rayo que R-1 puso hay que quitarlas, `rework.md` §2.6); **los planes
+de prueba y el nivelado van después**, la puerta es la suite rápida y las
+jornadas y nada más; y **nueve jornadas están rojas por la trayectoria nueva**
+(`rework.md` §2.8, cada una con su causa), sin tocar porque pidió parar y
+documentar. **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
+es la de antes** (16 personas en la semilla 7): un cambio del motor mueve todas
+las pruebas que midan una aldea hecha, y cada listón movido lleva su causa
+escrita (`rework.md` §2.7).
 
 ---
 

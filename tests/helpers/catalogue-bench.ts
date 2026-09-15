@@ -77,7 +77,7 @@ function founded(seed: number): GameState {
       build('granary'),
       build('smithy'),
     ],
-    works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [],
+    works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [], happenings: [],
     weather: { year: 0, index: 2, factor: 1 }, outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null, ended: null,
   };

@@ -11,6 +11,7 @@ import { crowdPositions } from '@render/crowd';
 import { routesFor } from '@engine/world/paths';
 import { encountersAmong } from '@derive/encounters';
 import { seasonOf } from '@engine/time';
+import { ENCOUNTER, TIME } from '@engine/balance';
 import { fingerprint } from '../helpers/fingerprint';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 
@@ -29,6 +30,10 @@ function village(years: number, seed = 7): GameState {
 /** Una semana de trabajo, que no sea la de reunión del domingo. */
 function workweek(state: GameState): GameState {
   if (state.tick % 4 === 0) state.tick += 1;
+  // Sin sucesos del valle en marcha (R-1): una boda esa semana junta a todo el
+  // mundo en la plaza a la vez, y estas pruebas miden la jornada de trabajo,
+  // que es donde cada uno va a lo suyo.
+  state.happenings = [];
   return state;
 }
 
@@ -59,21 +64,30 @@ describe('no todos hacen lo mismo a la vez · §11.9', () => {
   });
 
   it('ni todos salen de casa en el mismo instante', () => {
-    const state = workweek(village(20));
     // Al principio del día tiene que haber gente ya fuera y gente aún dentro.
-    const early = crowdPositions(state, 0.08);
-    const later = crowdPositions(state, 0.2);
-    const moved = (a: typeof early, b: typeof later): number => {
-      const before = new Map(a.map((p) => [p.id, p]));
-      let n = 0;
-      for (const p of b) {
-        const was = before.get(p.id);
-        if (was !== undefined && Math.hypot(p.x - was.x, p.y - was.y) > 0.5) n += 1;
+    // Se mira a la hora en que se sale —entre el amanecer y `DAY.LEAVE_SPAN`—
+    // y no más tarde: la primera versión comparaba las 0,08 con las 0,2, y a
+    // las 0,2 ya ha salido todo el mundo por construcción, así que sólo
+    // pasaba cuando alguien con el campo pegado a casa había llegado ya. Con
+    // R-1 la aldea de veinte años tiene otra gente y ese alguien no estaba.
+    // Tres semanas, porque un umbral no se fija con una jornada.
+    const base = workweek(village(20));
+    for (let week = 0; week < 3; week += 1) {
+      const state = structuredClone(base);
+      state.tick += week;
+      if (state.tick % 4 === 0) state.tick += 1;
+      const home = new Map(crowdPositions(state, 0).map((p) => [p.id, p]));
+      let out = 0;
+      let inside = 0;
+      for (const p of crowdPositions(state, 0.08)) {
+        const was = home.get(p.id);
+        if (was === undefined) continue;
+        if (Math.hypot(p.x - was.x, p.y - was.y) > 0.5) out += 1;
+        else inside += 1;
       }
-      return n;
-    };
-    expect(moved(early, later)).toBeGreaterThan(0);
-    expect(moved(early, later)).toBeLessThan(early.length);
+      expect(out, `semana ${week}: alguien ya ha salido`).toBeGreaterThan(0);
+      expect(inside, `semana ${week}: alguien sigue en casa`).toBeGreaterThan(0);
+    }
   });
 });
 
@@ -329,20 +343,39 @@ describe('los rencores se ven · §11.9, §6.4', () => {
     // quien tienes al lado, y los dos primeros nombrados de la semilla 7
     // trabajan a siete celdas. La primera versión de esta prueba los cogía a
     // ciegas y daba exactamente el mismo número en los dos casos.
+    // Y cerca quiere decir en celdas distintas: dos que trabajan en la misma
+    // —los dos en el mismo taller— se apartan del mismo punto en el que
+    // están anclados, la correa de v3.13 los devuelve al mismo sitio, y la
+    // prueba daba el mismo número en los dos casos. Con R-1 la pareja que
+    // salía elegida por posición era de ésas; se elige por puesto de trabajo.
+    //
+    // Y sin oficio: el que tiene taller va al taller y no a donde el reparto
+    // lo cuenta, y tras R-1 los cinco nombrados de la semilla 7 tienen todos
+    // uno (herrero, cura, guardabosques, jefe, alguacil). El mecanismo lee la
+    // opinión de cualquiera —§11.9 no distingue—, así que la pareja se busca
+    // entre los adultos del campo, nombrados o no.
     const base = workweek(village(20));
-    const figures = crowdPositions(base, 0.35);
-    const namedIds = new Set(
-      base.people.villagers.filter((v) => v.named && v.diedTick === null).map((v) => v.id),
+    const fieldHands = new Set(
+      base.people.villagers
+        .filter((v) => v.diedTick === null && v.role === null
+          && base.tick - v.bornTick >= 16 * TIME.WEEKS_PER_YEAR)
+        .map((v) => v.id),
     );
+    const width = base.map.width;
+    const spots = [...routesFor(base)].flatMap(([id, cells]) => {
+      const last = cells[cells.length - 1];
+      if (last === undefined || !fieldHands.has(id)) return [];
+      return [{ id, x: last % width, y: Math.floor(last / width) }];
+    });
     let pair: [number, number] | null = null;
-    for (const one of figures) {
-      for (const two of figures) {
+    for (const one of spots) {
+      for (const two of spots) {
         if (one.id >= two.id) continue;
-        if (!namedIds.has(one.id) || !namedIds.has(two.id)) continue;
-        if (Math.hypot(one.x - two.x, one.y - two.y) < 3) pair = [one.id, two.id];
+        const apart = Math.hypot(one.x - two.x, one.y - two.y);
+        if (apart >= 1 && apart <= ENCOUNTER.RANGE) pair = [one.id, two.id];
       }
     }
-    expect(pair, 'la semilla debe tener dos nombrados trabajando cerca').not.toBeNull();
+    expect(pair, 'la semilla debe tener dos adultos trabajando cerca').not.toBeNull();
 
     const distanceBetween = (hate: boolean): number => {
       const state = workweek(village(20));
@@ -351,11 +384,21 @@ describe('los rencores se ven · §11.9, §6.4', () => {
       a.opinions[b.id] = hate ? -90 : 60;
       b.opinions[a.id] = hate ? -90 : 60;
 
-      const now = crowdPositions(state, 0.35);
-      const one = now.find((f) => f.id === a.id);
-      const two = now.find((f) => f.id === b.id);
-      if (one === undefined || two === undefined) return -1;
-      return Math.hypot(one.x - two.x, one.y - two.y);
+      // La media de la jornada de trabajo, y no un instante: a las 0,35 los
+      // dos podían estar parados hablando con un tercero —medido en la
+      // semilla 7, uno hasta las 0,42 y otro hasta las 0,38—, y hablando se
+      // está donde está la charla, se odie a quien se odie.
+      let total = 0;
+      let samples = 0;
+      for (let f = 0.3; f <= 0.66; f += 0.05) {
+        const now = crowdPositions(state, f);
+        const one = now.find((figure) => figure.id === a.id);
+        const two = now.find((figure) => figure.id === b.id);
+        if (one === undefined || two === undefined) return -1;
+        total += Math.hypot(one.x - two.x, one.y - two.y);
+        samples += 1;
+      }
+      return total / samples;
     };
 
     const apart = distanceBetween(true);

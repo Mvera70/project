@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HERD_KINDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
+import { HAPPENINGS, HERD_KINDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -98,6 +98,14 @@ function catalogueOption(templateId: unknown, optionId: unknown) {
 function cast(value: unknown, letters: readonly string[]): boolean {
   return record(value) && Object.values(value).every(tickValue)
     && letters.every((letter) => tickValue(value[letter]));
+}
+
+/** R-1 · un suceso guardado: su tick, un id de la lista y sus efectos visibles. */
+function happeningRecord(value: unknown): boolean {
+  if (!record(value) || !tickValue(value['tick'])) return false;
+  if (!(HAPPENINGS as readonly string[]).includes(value['id'] as string)) return false;
+  return Array.isArray(value['visible']) && value['visible'].every((v) => record(v) && typeof v['k'] === 'string')
+    && Array.isArray(value['who']) && value['who'].every(tickValue);
 }
 
 function decisionRecord(value: unknown): boolean {
@@ -267,6 +275,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && record(s['flags']) && Object.values(s['flags']).every(tickValue)
     && Array.isArray(s['chronicle']) && s['chronicle'].every(chronicleEntry)
     && Array.isArray(s['history']) && s['history'].every(decisionRecord)
+    && Array.isArray(s['happenings']) && s['happenings'].every(happeningRecord)
     && record(weather) && tickValue(weather['year']) && tickValue(weather['index']) && finite(weather['factor'])
     && (outbreak === null || (record(outbreak) && tickValue(outbreak['startedTick'])
       && tickValue(outbreak['endsTick']) && tickValue(outbreak['deaths'])))

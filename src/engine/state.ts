@@ -378,6 +378,55 @@ export interface DecisionRecord {
   cast: Record<string, VillagerId>;
 }
 
+/**
+ * §11.5 · Lo que una decisión —o un suceso del valle, desde R-1— cambia en la
+ * pantalla. Vivía en `crossroads/schema.ts`; está aquí porque el estado guarda
+ * los de cada suceso y el estado no importa del catálogo (grafo de §2).
+ */
+export type VisualEffect =
+  | { k: 'raise'; kind: BuildingKind }
+  | { k: 'ruin'; kind: BuildingKind }
+  | { k: 'banner'; colour: string; years: number } // a banner over the core
+  /**
+   * Put a building's fire out. `who`, when given, is a cast letter (§8.1,
+   * v2.62): the building is that person's own, not just any of `kind` — A.7
+   * promised "B's building" and the catalogue had no way to say so.
+   */
+  | { k: 'douse'; kind: BuildingKind; who?: string }
+  | { k: 'gather'; where: 'square' | 'chapel' | 'ford'; days: number }
+  | { k: 'scar'; what: 'burnt_field' | 'grave_row' | 'felled_wood' };
+
+/**
+ * R-1 · Los sucesos del valle, en orden estable: el sorteo de `world/fate.ts`
+ * recorre esta lista, y el guardado valida contra ella.
+ */
+export const HAPPENINGS = [
+  'lightning_fire',
+  'river_flood',
+  'wolves_at_the_coop',
+  'wedding',
+  'pedlar',
+  'good_catch',
+  'roof_under_snow',
+  'harvest_feast',
+  'quarrel_in_the_square',
+  'bear_in_the_wood',
+  'child_lost',
+  'stranger_passes',
+] as const;
+
+export type HappeningId = (typeof HAPPENINGS)[number];
+
+/** Lo que un suceso deja en el estado para que la pantalla lo sirva (§7.10). */
+export interface HappeningRecord {
+  tick: number;
+  id: HappeningId;
+  /** Efectos visibles de §11.5, los mismos que una opción de encrucijada. */
+  visible: VisualEffect[];
+  /** A quién le pasó, si le pasó a alguien con nombre. */
+  who: VillagerId[];
+}
+
 /** What the player hands to the tick. The recorded form is DecisionRecord. */
 export interface Decision {
   templateId: string;
@@ -446,7 +495,8 @@ export type ChronicleKind =
   | 'crossroad_taken'
   | 'consequence'
   | 'extinction'
-  | 'abandonment';
+  | 'abandonment'
+  | 'happening'; // R-1: un suceso del valle (§7.10), sin decisión detrás
 
 /**
  * The chronicle stores keys and parameters, never prose. The text is composed
@@ -607,7 +657,7 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6; // R-1: `happenings` y el flujo `fate`
 
 /**
  * La postura de la aldea: lo único que el jugador manda de forma continua.
@@ -820,6 +870,8 @@ export interface GameState {
   flags: Record<string, number>; // state flags, value = expiry tick (0 = permanent)
   chronicle: ChronicleEntry[];
   history: DecisionRecord[]; // record of the player's decisions
+  /** R-1 · lo que le ha pasado al valle por su cuenta (§7.10). Schema 6. */
+  happenings: HappeningRecord[];
   weather: YearWeather;
   outbreak: Outbreak | null;
   /**

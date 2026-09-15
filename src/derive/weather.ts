@@ -17,61 +17,28 @@
 // Y es lo que la esencia del juego pide: dos valles con el mismo año pueden
 // tener veranos distintos, y se comparan.
 
-import { SKY, TIME } from '../engine/balance';
-import { hash32 } from '../engine/rng';
+import { SKY } from '../engine/balance';
 import type { GameState } from '../engine/state';
-import { seasonOf } from '../engine/time';
+import { skyDice, skyOfDay, type Sky, type SkyKind } from '../engine/world/sky';
 import { HEART } from '../engine/world/tiles';
 
-/** Qué se ve en el cielo. `clear` es el caso normal y no pinta nada. */
-export type SkyKind = 'clear' | 'overcast' | 'rain' | 'storm' | 'snow';
+export type { Sky, SkyKind };
 
-export interface Sky {
-  readonly kind: SkyKind;
-  /** Cuánto arrecia, de 0 a 1. Manda cuántas gotas caen y cuánto tapa la luz. */
-  readonly intensity: number;
+/**
+ * El cielo de la jornada `day` en el valle que `state` describe.
+ *
+ * **Desde R-1 lo decide el motor** (`engine/world/sky.ts`, el mismo hash y el
+ * mismo reparto, sin consumir tiradas) y esta capa sólo lo lee: así un rayo
+ * puede quemar una casa (`world/fate.ts`) y el cielo que se ve es el mismo que
+ * el que el motor consultó. El contrato de aquí no cambia.
+ */
+export function skyAt(state: GameState, day: number): Sky {
+  return skyOfDay(state.seed, state.weather.index, day);
 }
-
-const CLEAR: Sky = { kind: 'clear', intensity: 0 };
 
 /** Un dado de 0 a 1 para esta jornada y este asunto, sin tocar el motor. */
 function dice(seed: number, day: number, what: string): number {
-  return hash32(seed, `sky:${what}:${day}`) / 4_294_967_296;
-}
-
-/**
- * El cielo de la jornada `day` —el día escénico absoluto, el que cuenta
- * `dayNumber`—, en el valle que `state` describe.
- *
- * Pura y sin estado: dos llamadas con lo mismo dan lo mismo, y por eso el
- * renderer puede preguntarla en cada fotograma sin guardar nada.
- */
-export function skyAt(state: GameState, day: number): Sky {
-  const row = Math.max(0, Math.min(SKY.WET_BY_YEAR.length - 1, state.weather.index));
-  const wet = SKY.WET_BY_YEAR[row] as number;
-  if (dice(state.seed, day, 'wet') >= wet) return CLEAR;
-
-  // Cuánto arrecia lo decide su propio dado, y nunca es un chispeo invisible:
-  // si el cielo se cierra, se tiene que ver.
-  const strength = SKY.MIN_INTENSITY
-    + dice(state.seed, day, 'how') * (1 - SKY.MIN_INTENSITY);
-  // La estación **de esa jornada**, no la del tick que el estado lleve ahora.
-  // Leerla de `state.tick` parecía igual —el juego pregunta siempre por hoy— y
-  // no lo era: `tools/sky-report.ts` mide un año de golpe y daba cero nieve
-  // porque preguntaba con el tick ya en la primavera siguiente. Una función
-  // pura que depende de cuándo se la llama es una trampa esperando.
-  const winter = seasonOf(Math.floor(day / TIME.DAYS_PER_WEEK)) === 'winter';
-  const draw = dice(state.seed, day, 'kind');
-  if (winter) {
-    // En invierno cae nieve, y no hay tormenta con rayos: una tronada de nieve
-    // existe pero es raro, y un valle que truena en enero se lee como un fallo.
-    return { kind: draw < SKY.OVERCAST_SHARE ? 'overcast' : 'snow', intensity: strength };
-  }
-  if (draw < SKY.STORM_SHARE) return { kind: 'storm', intensity: strength };
-  if (draw < SKY.STORM_SHARE + SKY.OVERCAST_SHARE) {
-    return { kind: 'overcast', intensity: strength };
-  }
-  return { kind: 'rain', intensity: strength };
+  return skyDice(seed, day, what);
 }
 
 /** Cuánto tapa la luz este cielo, de 0 (nada) a 1 (todo). §10.8. */

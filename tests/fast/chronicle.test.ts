@@ -65,6 +65,7 @@ function village(seed: number): GameState {
     flags: {},
     chronicle: [],
     history: [],
+    happenings: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
@@ -321,6 +322,7 @@ describe('render', () => {
       left: 0,
       built: 2,
       lost: 1,
+      wood: 15, // R-1: el buhonero y el tejado hablan de leña
     };
     const keys = bankKeys();
     let rendered = 0;

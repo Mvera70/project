@@ -207,3 +207,63 @@ o tres manchas de color de la paleta que ya existe
 se acerque. **Pero antes hay que hablar de `src/render3d/world/cast.ts`**: hoy
 hay un aldeano que se clona y ese fichero le da talla y ropa por persona; doce
 modelos separados cambian su forma, y la capa de vida depende de su contrato.
+
+---
+
+# Tercera ronda: accesorios de oficio y modo de trabajo — 15 sep 2026, noche
+
+Hablado por Dispatch, con Vera fuera de casa. Quería lanzar una tanda a la 1 am
+pero no podía garantizar el ordenador encendido, así que la sesión de trabajo
+queda **pendiente de fecha** y esto es lo hablado, para retomarlo entero.
+
+## El objetivo
+
+Más variedad en los aldeanos 3D. Estilo low-poly/voxel, y que cada oficio se
+distinga por un pequeño detalle identificativo. Ejemplos que dio Vera
+literalmente: **el cura con un colgante con una cruz, el granjero con un
+sombrero de paja, el herrero con un cinturón de herramientas.**
+
+## El razonamiento, cerrado
+
+Planteé la objeción de siempre en este documento — a la escala de reposo un
+aldeano ocupa unos seis píxeles y el oficio se distingue por **color**, no por
+forma (arriba, «Sobre los doce aldeanos por oficio», y `docs/design.md` D.4.1,
+G-04). Vera respondió que en el juego se puede hacer zoom y verlos de cerca,
+así que el detalle sí se aprovecha.
+
+**Conclusión acordada, y matiza lo de arriba sin contradecirlo:** los
+accesorios se leen al hacer zoom y refuerzan el color, no lo sustituyen; el
+color sigue siendo el discriminante a distancia. No cambia la recomendación de
+resolver el oficio con manchas de color primero; añade que el detalle fino
+tiene un momento real en que se ve, y por tanto vale la pena modelarlo.
+
+## Modo de trabajo
+
+Vera quiere que el modelado se haga **en directo en Blender**, con el addon MCP
+conectado y viendo la pantalla, porque considera que el resultado es
+claramente mejor que generarlo a ciegas. Requiere que ella esté presente para
+validar la estética — es su autoridad reservada, la misma que juzga el resto
+del juego mirando capturas (`docs/next-plan.md`, «Cómo juzga»). Queda
+**pendiente de fecha**: no pudo ser esta noche.
+
+## Cuestión abierta, sin resolver
+
+Esculpir a mano en Blender se sale del pipeline de recetas
+(`art/recipes/<nombre>.json` → `tools/art/blender-build.py` → catálogo, D.4
+arriba), y la siguiente build pisaría el trabajo hecho a mano: la comprobación
+de equivalencia de D.4 compara contra la receta, no contra un `.blend` tocado
+a mano.
+
+Se propuso modelar los accesorios en directo y, después, traducirlos a la
+receta para que el pipeline los reproduzca. **Vera no ha contestado a esto
+todavía — queda anotado como decisión pendiente, no como acordado.**
+
+## Pendiente también
+
+Sobre qué `.blend` se trabaja: sin decidir.
+
+## Aviso de coordinación
+
+`src/render3d/world/cast.ts` y `art/catalog.json` siguen siendo zona compartida
+con la otra sesión (`docs/dos-sesiones.md`). Esta ronda fue solo de
+conversación: no se tocó código ni assets.

@@ -497,6 +497,74 @@ export const BANK: Record<string, string[]> = {
     'They lost the {building} to fire in year {year}.',
   ],
 
+  // R-1 · Los sucesos del valle (§7.10). Pasan sin que nadie decida nada, y por
+  // eso se cuentan como se cuenta el tiempo: lo que pasó y a quién, sin juicio.
+  'fate.lightning_fire': [
+    'Lightning struck the {building} in the {season} of year {year}. It burned to the ground.',
+    'A storm in {season} brought the lightning down on the {building}. Nothing of it was saved.',
+    'The {building} burned in the storm of {season}, year {year}, struck from the sky.',
+  ],
+  'fate.river_flood': [
+    'The river came over its banks in the {season} of year {year}, and {grain} bushels were spoiled.',
+    'After a week of rain the ford went under and the low fields with it: {grain} bushels lost.',
+    'The spring flood of year {year} took {grain} bushels from the granary floor.',
+  ],
+  'fate.wolves_at_the_coop': [
+    'Wolves came to the coop one night in {season}, and {count} hens were gone by morning.',
+    'The wolves took {count} hens in the {season} of year {year}.',
+    'Tracks in the snow at the coop, and {count} hens fewer.',
+  ],
+  'fate.wedding': [
+    'There was a wedding in the {season} of year {year}. The whole valley came.',
+    'Two were married that {season}, and the village ate and danced till dark.',
+    'A wedding in year {year}, in the {season}: the first music heard in weeks.',
+  ],
+  'fate.pedlar': [
+    'A pedlar came through in {season} and took {wood} wood for {grain} bushels of grain.',
+    'The pedlar of year {year} traded {grain} bushels for {wood} wood and went on his way.',
+    'A cart came over the ridge that {season}: {wood} wood went out, {grain} bushels came in.',
+  ],
+  'fate.good_catch': [
+    'The river ran thick with fish that {season}: {grain} bushels worth, salted and stored.',
+    'A good catch in the {season} of year {year}: {grain} bushels the fields did not have to give.',
+    'They came back from the ford with baskets full, {grain} bushels once counted.',
+  ],
+  'fate.roof_under_snow': [
+    'A roof gave way under the snow in the {season} of year {year}, and {wood} wood went into mending it.',
+    'The snow brought a roof down. The family slept elsewhere while {wood} wood put it right.',
+    'Snow on the thatch, and one house open to the sky for a week: {wood} wood to mend it.',
+  ],
+  'fate.harvest_feast': [
+    'The harvest was in, and the valley kept the feast that {season}.',
+    'A feast after the harvest of year {year}: bread, ale, and every table carried outside.',
+    'They feasted the harvest in the {season} of year {year}, as the valley does when the grain is in.',
+  ],
+  'fate.quarrel_in_the_square': [
+    '{A} and {B} came to words in the square that {season}. The village heard every one.',
+    'A quarrel between {A} and {B} in year {year}, loud enough to stop the work.',
+    '{A} shouted at {B} in the square, and {B} shouted back. Nobody has forgotten it.',
+  ],
+  'fate.bear_in_the_wood': [
+    'A bear was seen in the wood in the {season} of year {year}. Nobody went far from the houses for a while.',
+    'Bear tracks at the wood edge that {season}. The gathering stopped until it moved on.',
+    'A bear in the wood in year {year}: two weeks with the axes at home.',
+  ],
+  'fate.child_lost': [
+    'A child wandered off in the {season} of year {year}. The valley searched the riverbank till it was found.',
+    'One of the children went missing for an afternoon that {season}. Found by the ford, cold and whole.',
+    'A child lost and found in year {year}, and the whole village out along the river looking.',
+  ],
+  'fate.child_lost.named': [
+    '{A} wandered off in the {season} of year {year}. The valley searched the riverbank till {A} was found.',
+    '{A} went missing for an afternoon that {season}. Found by the ford, cold and whole.',
+    '{A} was lost and found in year {year}, and the whole village out along the river looking.',
+  ],
+  'fate.stranger_passes': [
+    'A stranger came through the valley in {season} and stayed one night.',
+    'Someone passed along the road in the {season} of year {year}, stopped at the square, and went on.',
+    'A traveller in year {year}, gone by morning. They talked of it for a week.',
+  ],
+
   // -------------------------------------------------------------------------
   // Buildings raised
   // -------------------------------------------------------------------------

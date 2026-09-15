@@ -2,9 +2,9 @@
 //
 // Ardía una casa y la gente seguía camino del campo. Se moría alguien y nadie
 // levantaba la cabeza. Esto comprueba que ya no.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
 import { reactionsAt } from '@render/reactions';
@@ -16,7 +16,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }
@@ -62,9 +62,13 @@ describe('cuando se pierde algo · §11.9', () => {
     // Lo único que de verdad importa. Si las dos fotos fueran iguales, la
     // aldea seguiría sin enterarse.
     const quiet = village(20);
+    // Sin sucesos del valle en marcha (R-1): una boda esa misma semana junta a
+    // la aldea por su cuenta, y aquí lo que se mide es el fuego y nada más.
+    quiet.happenings = [];
     const before = crowdPositions(quiet, 0.35);
 
     const burnt = village(20);
+    burnt.happenings = [];
     const house = burnt.buildings.find((b) => b.kind === 'house' && b.lostTick === null)!;
     house.lostTick = burnt.tick;
     const after = crowdPositions(burnt, 0.35);

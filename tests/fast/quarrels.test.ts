@@ -188,6 +188,10 @@ describe('no rompe las reglas · §4.3, §6.4', () => {
       fights += state.chronicle.filter((e) => e.templateKey.startsWith('quarrel.')).length;
     }
     expect(fights, 'en tres siglos de aldea algo tiene que pasar').toBeGreaterThan(0);
-    expect(fights, 'pero no es una taberna').toBeLessThan(3 * 120 * TIME.WEEKS_PER_YEAR * 0.01);
+    // Un uno por ciento de las semanas era la cota cuando los rencores no se
+    // formaban nunca (`findings-drama.md` §1). Desde R-1 la riña de la plaza
+    // los empuja, y lo medido son 0,42–0,58 riñas al año por aldea: una cada
+    // dos años. Sigue sin ser una taberna; la cota sube al uno y medio.
+    expect(fights, 'pero no es una taberna').toBeLessThan(3 * 120 * TIME.WEEKS_PER_YEAR * 0.015);
   });
 });

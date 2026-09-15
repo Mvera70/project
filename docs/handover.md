@@ -101,6 +101,31 @@ el 15 sep 2026, ver abajo—; **D.6.2** un aldeano mide 0,65 celdas y una celda 
 pertenece al día escénico; **D.6.5** un clip en el sitio exige un cuerpo en el
 sitio.
 
+**Y las del 15 sep por la tarde y por la noche, que mandan sobre todo lo de
+arriba** (`docs/rework.md` §0, con sus palabras): (1) la premisa es un idle
+bonito de fondo cuya esencia es que cada valle salga distinto; (2) el sistema
+se rehace hacia «mucho más aleatorio y con mucha más vida»; (3) **lo siguiente
+es la IA de animales y personas** («atraviesan paredes, dan vueltas sobre sí
+mismos»); (4) **el caos es el juego**: partidas que se rompen son la idea, así
+que ninguna puerta del motor debe impedirlo; (5) los planes de prueba y el
+nivelado van después; (6) la documentación tiene que bastar para que Opus o
+Sonnet sigan. El plan entero, con los briefs, es `docs/rework.md`.
+
+---
+
+## 2.0. R-1, los sucesos del valle · 15 sep 2026, noche
+
+**Hecho y en `main` (v3.75).** El motor tira cada semana contra doce sucesos
+en el flujo `fate` (§7.10, §12.10, paso 2b). Medido con `tools/fate-report.ts`:
+13,0 sucesos al año en seis semillas × cuarenta años, mediana de tres semanas
+entre dos, rencores en cuarenta años entre 4 y 11 (antes, cero), distancia
+media entre valles 0,16. Suite rápida: 69 ficheros, 1 086 verdes, 25 s.
+**Jornadas: 107 verdes y 9 rojas**, todas por la trayectoria nueva y listadas
+con su causa en `docs/rework.md` §2.8. Playwright y la demo no se volvieron a
+pasar. Todo lo demás de R-1 —ficheros, API, tabla, las tres vueltas de pesos,
+las doce pruebas movidas y por qué— está en `docs/rework.md` §2, que es donde
+hay que leerlo.
+
 ---
 
 ## 2.1. La versión 2.0, del 15 sep 2026
@@ -397,6 +422,37 @@ No son teoría: cada una se pagó con al menos una ronda.
 - **Una bandera de convivencia es una deuda con fecha.** Mientras existe, cada
   prueba que corre por el lado apagado es una prueba que no vigila el juego.
 - **Una migración sin su documentación no está hecha, está escondida.**
+
+### De R-1, del 15 sep por la noche
+
+- **Un cambio del motor mueve la aldea de veinte años de todas las pruebas.**
+  Con los sucesos dentro, la semilla 7 tiene 16 personas a los veinte años en
+  vez de unas cuarenta, y sus cinco nombrados tienen todos oficio. Doce
+  pruebas medían, sin saberlo, propiedades de aquella aldea concreta: que el
+  déficit semanal llegara a 25 (la sal), que hubiera dos nombrados sin taller
+  cerca (los rencores), que alguien tuviera el campo pegado a casa (las
+  salidas escalonadas). Cada una está reescrita contra la propiedad que decía
+  guardar, con la causa en `docs/rework.md` §2.7. **Antes de tocar el motor,
+  cuenta con una tarde de pruebas movidas, y no bajes un listón sin escribir
+  el porqué.**
+- **Dos que trabajan en la misma celda no se pueden apartar.** El rechazo de
+  v3.08 empuja desde el punto de anclaje y la correa de v3.13 devuelve al
+  mismo sitio: distancias idénticas se odie o no. Una prueba de rencor tiene
+  que elegir dos con puestos **en celdas distintas** y dentro de
+  `ENCOUNTER.RANGE`.
+- **A las 0,35 de la jornada hay gente parada hablando.** Una medida de
+  posición en un instante puede caer en una charla; se mide la media de la
+  jornada de trabajo (0,30 a 0,65).
+- **Un umbral por sitio, no por jornada.** V-11 medía doce jornadas contra
+  0,75 cada una y la peor (35 personas en la plaza) daba 0,71 con un agregado
+  de 0,89. Se agregan por sitio, con un suelo por muestra.
+- **El rayo y la pareja.** La primera medida de R-1 mató tres aldeas de seis
+  antes del año treinta; el agente puso dos puertas y **el dueño dijo después
+  que eso es el juego**. Ver `docs/rework.md` §2.6 antes de proteger a la
+  aldea de nada.
+- **Un informe que avanza el mundo con `tick` no mide este juego** (ya estaba
+  en §2.1; sigue costando): `tools/fate-report.ts` juega con `run` y la
+  política prudente, y las pruebas de `fate.test.ts` también.
 
 ---
 

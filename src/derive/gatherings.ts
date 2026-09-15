@@ -80,5 +80,20 @@ export function gatheringsAt(
       out.push({ x: point.x, y: point.y, sinceTick: decision.tick, ticks: effect.days });
     }
   }
+  // R-1 · y los sucesos del valle (§7.10) juntan a la gente igual que una
+  // decisión: una boda, la fiesta de la cosecha, el corro de una riña. Mismo
+  // efecto visible, misma ventana, misma reunión para `staging.ts`. **Pero la
+  // reunión de una decisión manda**: es la del jugador, y §11.8 promete que la
+  // aldea va donde él dijo. Si hay una viva, la del suceso espera.
+  if (out.length > 0) return out;
+  for (const happening of state.happenings) {
+    if (happening.tick > state.tick) continue;
+    for (const effect of happening.visible) {
+      if (effect.k !== 'gather') continue;
+      if (happening.tick + effect.days <= sinceTick) continue;
+      const point = placeOf(state, effect.where);
+      out.push({ x: point.x, y: point.y, sinceTick: happening.tick, ticks: effect.days });
+    }
+  }
   return out;
 }
