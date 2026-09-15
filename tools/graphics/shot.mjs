@@ -35,6 +35,11 @@ const turn = Number(opt('turn', '0'));
 const tilt = Number(opt('tilt', '0'));
 //   --zoom -6       aleja seis muescas de rueda (positivo acerca)
 const zoomNotches = Number(opt('zoom', '0'));
+// E1/E2 · La orden con la que se juega antes de disparar. Se pulsa el botón del
+// mando, que es lo que hace el dedo: así la captura prueba el camino del jugador
+// y no una función a la que nadie llega.
+//   --orders "Wood"   pulsa esa posición del mando
+const orders = opt('orders', '');
 const out = resolve(opt('out', 'artifacts/graphics/G-10/shot.png'));
 const page = resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html'));
 
@@ -76,6 +81,15 @@ if (turn !== 0 || tilt !== 0) {
   await tab.mouse.up();
   await tab.keyboard.up('Shift');
   await tab.waitForTimeout(600);
+}
+
+if (orders) {
+  for (const label of orders.split(',')) {
+    // Por nombre accesible parcial: el del botón es «Spare hands: Wood», porque
+    // una posición del mando no significa nada sin su palanca.
+    await tab.getByRole('button', { name: new RegExp(`: ${label.trim()}$`) }).click().catch(() => {});
+    await tab.waitForTimeout(200);
+  }
 }
 
 if (zoomNotches !== 0) {

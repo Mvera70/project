@@ -15,7 +15,8 @@
 // da comportamiento a los ochenta a la vez**, sin tocar a nadie. Añadir «lavar
 // en el río» es una entrada en una tabla, no una rama en un árbol de decisión.
 
-import type { GameState } from '@engine/state';
+import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { allocateLabour } from '@engine/subsistence/labour';
 import type { Point, Terrain } from './body';
 import { blockedAt, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
@@ -118,6 +119,9 @@ const BY_BUILDING: Readonly<Record<string, readonly string[]>> = {
   watchtower: ['watch'],
 };
 
+/** La oferta de trabajo, de la que salen los tajos de E2 con otro aforo. */
+const WORK = OFFERS['work'] as OfferSpec;
+
 /** Un sitio del valle, con lo que da. */
 export interface Place {
   readonly id: string;
@@ -165,6 +169,25 @@ export function doorOf(land: Terrain, x: number, z: number, w: number, h: number
  */
 export function placesOf(state: GameState, land: Terrain): Place[] {
   const places: Place[] = [];
+
+  /**
+   * E2 · **El reparto del jugador, convertido en sitios donde estar.**
+   *
+   * Aquí faltaba la mitad del mundo y nadie lo había notado: `placesOf` saca los
+   * sitios de los **edificios**, y de los tres destinos que el jugador manda sólo
+   * uno es un edificio. Los campos sí (`kind: 'field'`); **talar y construir no
+   * tenían sitio ninguno en el valle**, así que los leñadores y los albañiles
+   * eran una abstracción de la hoja de cálculo: el motor contaba sus manos y en
+   * pantalla no había nadie haciéndolo. De ahí «no hay respuesta visual».
+   *
+   * `allocateLabour` es una función de lectura del motor y la capa de vida puede
+   * llamarla (E.3): lee el estado, no escribe nada y no consume azar. Lo que se
+   * hace con ella es traducir manos en **plazas**, que es la moneda de esta
+   * capa: más manos al bosque, más plazas en el tajo del bosque, más gente que
+   * la elige y se va allí andando. La orden se ve sin leer una cifra.
+   */
+  const hands = allocateLabour(state);
+
   for (const building of state.buildings) {
     if (building.lostTick !== null) continue;
     const menu = BY_BUILDING[building.kind];
@@ -181,7 +204,83 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
     }
     if (offers.length > 0) places.push({ id: `${building.kind}:${building.id}`, at, offers });
   }
+
+  // **El tajo del bosque.** Donde el pueblo tala: la celda de bosque más cercana
+  // al centro de lo construido, que es donde §7.6 dice que se tala —cerca, no en
+  // el confín del valle—. Las plazas son las manos que el jugador manda allí, así
+  // que con la orden en «a la obra» el tajo desaparece y con ella en «al bosque»
+  // se llena.
+  // **Techo y no redondeo**, y es una diferencia que se ve. Las manos sobrantes
+  // de una aldea de veinte personas son fracciones —0,60 con la orden en «a la
+  // obra» y 1,27 con ella en «al bosque», medido en la semilla 7 al año doce— y
+  // redondear las aplasta a la misma plaza: el tajo se veía idéntico con las dos
+  // órdenes. Con techo son una plaza y dos. Y es lo honesto además de lo
+  // legible: si hay 0,60 de semana-persona en el bosque, alguien va al bosque.
+  const felling = Math.ceil(hands.cutters);
+  if (felling > 0) {
+    const at = nearestOf(state, land, places, TERRAIN_CODE.forest);
+    if (at !== null) {
+      const offer = placedOffer({ ...WORK, seats: Math.min(felling, MOST_SEATS) }, at, land);
+      if (offer !== null) places.push({ id: 'felling', at, offers: [offer] });
+    }
+  }
+
+  // **La obra.** Donde se está levantando algo, si hay algo. Las plazas son los
+  // albañiles: una aldea que no construye no tiene andamio con gente encima, y
+  // eso también es la orden vista sin leer nada.
+  const building = Math.ceil(hands.builders);
+  const work = state.works[0];
+  if (building > 0 && work !== undefined) {
+    const at = doorOf(land, work.x, work.y, work.w, work.h);
+    if (at !== null) {
+      const offer = placedOffer({ ...WORK, seats: Math.min(building, MOST_SEATS) }, at, land);
+      if (offer !== null) places.push({ id: `works:${work.id}`, at, offers: [offer] });
+    }
+  }
+
   return places;
+}
+
+/**
+ * Cuántas plazas puede llegar a tener un tajo.
+ *
+ * TUNE: ocho. `seatsOn` reparte las plazas en corro alrededor del punto y un
+ * corro de más de ocho deja de leerse como un grupo trabajando: se lee como una
+ * aglomeración. Y una aldea de veinte personas no pone doce a talar el mismo
+ * árbol por mucho que la orden lo diga.
+ */
+const MOST_SEATS = 8;
+
+/**
+ * La celda de ese terreno más cercana a lo construido, o nada si no hay.
+ *
+ * El mapa del motor y no el de la capa de vida: `Terrain` sólo sabe si una celda
+ * se pisa, que es todo lo que necesita para mover un cuerpo. De qué **tipo** es
+ * una celda lo sabe `state.map`, y preguntárselo es leer del motor, que es lo
+ * que E.3 permite.
+ */
+function nearestOf(
+  state: GameState, land: Terrain, places: readonly Place[], kind: number,
+): Point | null {
+  if (places.length === 0) return null;
+  let cx = 0;
+  let cz = 0;
+  for (const place of places) { cx += place.at.x; cz += place.at.z; }
+  cx /= places.length;
+  cz /= places.length;
+
+  let best: Point | null = null;
+  let closest = Number.POSITIVE_INFINITY;
+  for (let z = 0; z < land.height; z += 1) {
+    for (let x = 0; x < land.width; x += 1) {
+      if (state.map.terrain[z * state.map.width + x] !== kind) continue;
+      // Y que se pueda estar ahí: un tajo dentro de una pared no es un tajo.
+      if (blockedAt(land, x + 0.5, z + 0.5)) continue;
+      const away = (x + 0.5 - cx) ** 2 + (z + 0.5 - cz) ** 2;
+      if (away < closest) { closest = away; best = { x: x + 0.5, z: z + 0.5 }; }
+    }
+  }
+  return best;
 }
 
 /**
