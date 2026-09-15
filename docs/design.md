@@ -4974,7 +4974,23 @@ todo.*
 ### A.12 `wolf_winter` · forest
 
 **Peso** 7 · **Reposo** 12 años
-**Requiere** `season = winter`, `forestLeft > 0.25`, `people > 15`
+**Requiere** `season = winter`, `forestLeft > 0.25`, `people > 15` — y ese 0.25
+es **inalcanzable**, la misma errata que el 0.3 de A.11: el valle fundaba entre
+0.20 y 0.26 (`MAPGEN.FOREST_FRACTION`) y `forestLeft` sólo baja desde ahí con la
+tala, así que ninguna semilla cruza el umbral (medido 0.177–0.244 en cuatro
+semillas × sesenta años, cero apariciones). El bosque es aquí una **puerta**
+—«queda bosque suficiente para que los lobos sean una amenaza»— y no el motor
+del episodio, que son el invierno y la gente.
+
+> **Y el mapa grande lo arregló solo** (medido el 15 sep 2026 al fusionar la
+> rama que venía a bajarlo). v3.68 redefinió `forestLeft` contra el corazón
+> productivo, y con eso el 0.25 **ya se cruza**: `crossroads-reachability.test.ts`
+> encuentra la plantilla elegible sin tocar el umbral. Así que el umbral se
+> queda, el cambio de la rama se deshizo, y lo que sí queda rojo es otra cosa
+> que esa misma prueba destapó: **`plague_blame` y `bandits` no cumplen
+> condiciones nunca** en seis semillas × sesenta años. Eso se queda escrito y
+> declarado —no se mete en la lista de excepciones— porque es un hallazgo, y el
+> sistema de encrucijadas se va a rehacer casi entero.
 **Reparto** `A = woodward`, `B = youngestNamed`
 
 > **Tracks at the Palisade**

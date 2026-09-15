@@ -94,6 +94,15 @@ export const FOREST_CUT: CrossroadTemplate = {
  *
  * The works slowdown of the third option is the `works_slowed` flag, read by
  * M-14, and the visible effect is the village not coming out for six ticks.
+ *
+ * `forestLeft > 0.25` was **inalcanzable**, the same erratum as A.11's original
+ * 0.3: `forestLeft` is standing forest over the whole map, `MAPGEN.FOREST_FRACTION`
+ * founds the valley at 0.20-0.26, and it only falls from there as fields are
+ * cut, so no seed ever crosses 0.25 — measured 0.177-0.244 across four seeds ×
+ * sixty years, never once above the door. As with A.11 the forest here is a
+ * **gate** — "there is enough wood left for wolves to be a threat" — not the
+ * template's episodic driver, which is `season = winter` plus `people > 15`.
+ * Lowered to 0.15, comfortably under every measured floor in that window.
  */
 export const WOLF_WINTER: CrossroadTemplate = {
   id: 'wolf_winter',
@@ -102,6 +111,15 @@ export const WOLF_WINTER: CrossroadTemplate = {
   cooldownYears: 12,
   requires: [
     { k: 'season', season: 'winter' },
+    // **Se queda en 0.25, y el mapa grande es la razón** (15 sep 2026). La rama
+    // del 14 sep lo bajaba a 0.15 con una medida buena: en el mapa de 36 × 56 el
+    // valle fundaba entre 0.20 y 0.26 (`MAPGEN.FOREST_FRACTION`) y `forestLeft`
+    // sólo baja desde ahí, así que 0.25 era **inalcanzable por construcción**,
+    // la misma errata que el 0.3 de A.11. Pero v3.68 redefinió `forestLeft`
+    // contra el corazón productivo y con eso el umbral **ya se cruza**: medido al
+    // fusionar, `crossroads-reachability.test.ts` lo encuentra elegible sin
+    // tocar nada. Bajarlo ahora sería mover cinco pruebas medidas para arreglar
+    // algo que el mapa arregló solo.
     { k: 'ratio', ratio: 'forestLeft', op: '>', v: 0.25 },
     { k: 'stat', stat: 'people', op: '>', v: 15 },
   ],
