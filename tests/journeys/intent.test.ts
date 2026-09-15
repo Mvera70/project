@@ -16,6 +16,7 @@
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
+import { foundTwenty } from '../helpers/founding';
 import { run } from '@engine/sim';
 import { LABOUR } from '@engine/balance';
 import { population } from '@engine/people/demography';
@@ -45,7 +46,7 @@ interface Outcome {
 }
 
 function played(seed: number, intent: Intent): Outcome {
-  const state = foundGame(seed);
+  const state = foundTwenty(seed);
   state.intent = { ...intent };
   run(state, YEARS * 48, 'prudent', CATALOG);
   return {
@@ -64,7 +65,7 @@ describe('E1 · la postura cambia la partida', () => {
     // comprueba donde se decide —el reparto de manos— y no en el resultado,
     // porque el resultado ya lo cubren las 1 026 pruebas de la suite rápida.
     for (const seed of SEEDS) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       run(state, 8 * 48, 'prudent', CATALOG);
       const mine = allocateLabour(state);
 
@@ -163,9 +164,9 @@ describe('E3 · la cola de obra', () => {
     // D-6 otra vez: la posición de reposo no mueve un solo elemento de la lista
     // de prioridad, y por eso las 1 031 pruebas siguen verdes sin tocar nada.
     for (const seed of SEEDS) {
-      const plain = foundGame(seed);
+      const plain = foundTwenty(seed);
       run(plain, 15 * 48, 'prudent', CATALOG);
-      const same = foundGame(seed);
+      const same = foundTwenty(seed);
       same.intent = { ...restingIntent(), priority: 'none' };
       run(same, 15 * 48, 'prudent', CATALOG);
       expect(same.buildings.length, `semilla ${seed}`).toBe(plain.buildings.length);
@@ -179,7 +180,7 @@ describe('E3 · la cola de obra', () => {
     let earlier = 0;
     for (const seed of SEEDS) {
       const when = (priority: 'none' | 'faith'): number => {
-        const state = foundGame(seed);
+        const state = foundTwenty(seed);
         state.intent = { ...restingIntent(), priority };
         run(state, 40 * 48, 'prudent', CATALOG);
         const chapel = state.buildings
@@ -222,7 +223,7 @@ describe('E3 · la cola de obra', () => {
     // valle —el pobre de las dos— apenas construye nada, que es E5 funcionando.
     let dominated = 0;
     for (const seed of SEEDS) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       run(state, 40 * 48, 'prudent', CATALOG);
       const standing = state.buildings.filter((one) => one.lostTick === null);
       const walls = standing.filter(

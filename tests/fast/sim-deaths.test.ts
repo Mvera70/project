@@ -1,7 +1,7 @@
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { FOOD, MOOD, TIME } from '@engine/balance';
 import type { Catalogue, CrossroadTemplate } from '@engine/crossroads/schema';
-import { foundGame } from '@engine/found';
 import { makeVillager } from '@engine/people/villagers';
 import { tick } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
@@ -26,7 +26,7 @@ function violentCatalogue(): Catalogue {
 
 describe('all deaths reach the weekly chronicle (§9.4)', () => {
   it('gives a starving named elder their epitaph, without counting them as anonymous', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     const elder = state.people.villagers.find((v) => v.named)!;
     for (const v of state.people.villagers) v.bornTick = -20 * TIME.WEEKS_PER_YEAR;
     elder.bornTick = -70 * TIME.WEEKS_PER_YEAR;
@@ -61,7 +61,7 @@ describe('all deaths reach the weekly chronicle (§9.4)', () => {
   });
 
   it('records decision and seed victims once, in order, and charges both to this week’s morale', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.tick = 11; // A season entry precedes the decision on the next tick.
     const [a, b] = state.people.villagers.filter((v) => v.named);
     if (a === undefined || b === undefined) throw new Error('Missing founding cast');

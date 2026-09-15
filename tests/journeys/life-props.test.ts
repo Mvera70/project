@@ -11,7 +11,7 @@
 // otra donde se juega de sobra.
 
 import { describe, expect, it } from 'vitest';
-import { foundGame } from '@engine/found';
+import { foundTwenty } from '../helpers/founding';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
@@ -25,7 +25,7 @@ const grown = new Map<number, GameState>();
 function village(seed: number): GameState {
   let base = grown.get(seed);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, 40 * 48, 'prudent', CATALOG);
     grown.set(seed, base);
   }
@@ -178,6 +178,7 @@ describe('V-09 · trastos', () => {
   });
 
   it('una pelota nunca acaba rodando bajo el agua, en seis semillas', () => {
+    let checked = 0;
     for (const seed of SEEDS) {
       const state = village(seed);
       const life = createVillage(state, 0, { props: true });
@@ -185,7 +186,6 @@ describe('V-09 · trastos', () => {
       const wet = (x: number, z: number): boolean =>
         terrain[Math.floor(z) * width + Math.floor(x)] === TERRAIN_CODE.water;
 
-      let checked = 0;
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
         if (n % 10 !== 0) continue;
@@ -197,8 +197,12 @@ describe('V-09 · trastos', () => {
           checked += 1;
         }
       }
-      expect(checked, `semilla ${seed}: no se comprobó ninguna pelota en tierra`).toBeGreaterThan(0);
     }
+    // Que no sea vacía: alguna pelota en tierra se ha mirado. Por semillas no
+    // se puede exigir —la jornada 0 de la semilla 3 reparte un palo y nada
+    // más desde v3.69, que cambió cómo crece la aldea y con ello el valle de
+    // cuarenta años—; en las seis juntas, sí.
+    expect(checked, 'no se comprobó ninguna pelota en tierra').toBeGreaterThan(0);
   });
 
   it('la física nunca cuela una pelota en un bloqueo, tirada de cara al río', () => {
@@ -329,12 +333,15 @@ describe('V-09 · trastos', () => {
       .toBeGreaterThanOrEqual(5);
   });
 
-  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
-    // La propiedad del brief, intacta y roja con lo medido: la semilla 3 pasa
-    // diez jornadas de diez sin que nadie toque un trasto, con cuarenta y tres
-    // personas y tres trastos en el suelo. Quien la retome, que empiece por
-    // `worth()` y por cuánto cree que dura jugar — la causa 1 de arriba— y no
-    // por `gives`, que ya se ha ajustado dos veces.
+  it('y en todas las semillas, sin una sola aldea muda', () => {
+    // La propiedad del brief. Estuvo roja y declarada `it.fails` con lo
+    // medido entonces: la semilla 3 pasaba diez jornadas de diez sin que nadie
+    // tocara un trasto, con cuarenta y tres personas y tres trastos. **Pasa
+    // desde v3.69 sin que nadie haya tocado `worth()` ni `gives`:** lo que
+    // cambió es la aldea de la semilla 3 —la migración de la aldea pequeña
+    // mueve la trayectoria de cuarenta años— y con ella su valle. Es decir,
+    // la causa 1 de arriba sigue ahí; sólo dejó de tocarle a esta semilla.
+    // Si vuelve a caer, la salida es la que dice el comentario de arriba.
     const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);

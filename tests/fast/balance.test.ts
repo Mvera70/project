@@ -12,6 +12,7 @@ import {
   FOOD,
   FOUNDING,
   LIFE,
+  MIGRATION,
   TIME,
   WEATHER,
 } from '@engine/balance';
@@ -25,27 +26,39 @@ describe('balance · fundación', () => {
     expect(FOUNDING.ADULTS + FOUNDING.CHILDREN + FOUNDING.ELDERS).toBe(FOUNDING.POPULATION);
   });
 
-  it('la fundación arranca con margen alimentario, pero poco', () => {
-    // design.md §12.2: dos campos contra veinte bocas. El margen tiene que
-    // dejar crecer y no perdonar un año malo seguido de otro.
-    const yielded = FOUNDING.FIELDS * FOOD.FIELD_YIELD;
-    const eaten = FOUNDING.POPULATION * TIME.WEEKS_PER_YEAR * FOOD.GRAIN_PER_PERSON;
-    const margin = yielded / eaten;
-    expect(margin).toBeGreaterThanOrEqual(1.2);
-    expect(margin).toBeLessThanOrEqual(1.35);
+  it('la aldea la fundan un hombre y una mujer', () => {
+    // v3.69, decisión del dueño del diseño (15 sep 2026): una pareja, y la
+    // aldea crece con los que llegan. Las garantías de `foundPeople` son
+    // numéricas, y con dos personas tienen que cubrir a los dos.
+    expect(FOUNDING.POPULATION).toBe(2);
+    expect(FOUNDING.ADULTS).toBe(2);
+    expect(FOUNDING.MIN_MEN).toBe(1);
+    expect(FOUNDING.MIN_FERTILE_WOMEN).toBe(1);
+    expect(FOUNDING.MIN_MEN + FOUNDING.MIN_FERTILE_WOMEN).toBeLessThanOrEqual(FOUNDING.ADULTS);
   });
 
-  it('el grano inicial cubre casi un año entero', () => {
+  it('el campo de la pareja les sobra a dos y no llega para veinte', () => {
+    // §12.2 con la pareja: el campo fundacional tiene que dejar crecer —a dos
+    // les sobra— y no puede alimentar por sí solo a la aldea pequeña entera,
+    // porque entonces nadie tendría por qué roturar y el valle no cambiaría.
+    const yielded = FOUNDING.FIELDS * FOOD.FIELD_YIELD;
+    const perHead = TIME.WEEKS_PER_YEAR * FOOD.GRAIN_PER_PERSON;
+    expect(yielded / (FOUNDING.POPULATION * perHead)).toBeGreaterThanOrEqual(1.2);
+    expect(yielded / (MIGRATION.ARRIVE_SMALL_BELOW * perHead)).toBeLessThan(1);
+  });
+
+  it('el grano inicial cubre más de un año, y menos de dos', () => {
+    // A dos personas una mala cosecha el primer año las mata si el granero no
+    // llega al segundo; y con dos años enteros no habría por qué sembrar.
     const yearOfFood = FOUNDING.POPULATION * TIME.WEEKS_PER_YEAR * FOOD.GRAIN_PER_PERSON;
-    expect(FOUNDING.GRAIN / yearOfFood).toBeGreaterThan(0.75);
-    expect(FOUNDING.GRAIN / yearOfFood).toBeLessThan(1.2);
+    expect(FOUNDING.GRAIN / yearOfFood).toBeGreaterThan(1);
+    expect(FOUNDING.GRAIN / yearOfFood).toBeLessThan(2);
   });
 
   it('la aldea no nace por encima de su propia capacidad', () => {
-    // §12.2: GRAIN es exactamente BASE_STORAGE. Con más, la merma de §5.3
-    // mordería desde el primer tick y se leería como un fallo.
+    // Con más grano que `BASE_STORAGE`, la merma de §5.3 mordería desde el
+    // primer tick y se leería como un fallo.
     expect(FOUNDING.GRAIN).toBeLessThanOrEqual(FOOD.BASE_STORAGE);
-    expect(FOUNDING.GRAIN).toBe(FOOD.BASE_STORAGE);
   });
 
   it('la aldea nace con casas de sobra para su gente', () => {

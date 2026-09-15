@@ -1,6 +1,7 @@
 // M-08 · The catalogue bench. design.md §14.1, §14.2.
 //
-// A village stood up with generous buildings and driven by a tick of its own,
+// A village of twenty (`TWENTY`, the founding the game had until 15 sep 2026 —
+// the couple founding is measured elsewhere) stood up with generous buildings and driven by a tick of its own,
 // so that the conditions of Annex A can actually come true and every template
 // gets a chance to fire. It is deliberately not the real game: the real one
 // takes centuries to visit some of these states, and a template that is dead
@@ -11,11 +12,11 @@
 // whole §14.1 budget — so it runs in tests/balance/. The fast suite runs a
 // smaller sweep off the same bench.
 
-import { FOUNDING, TIME, WORLD } from '@engine/balance';
+import { TIME, WORLD } from '@engine/balance';
+import { TWENTY, foundPeopleTwenty } from './founding';
 import { makeBundle } from '@engine/rng';
 import type { Building, GameState, TickContext } from '@engine/state';
 import { restingIntent } from '@engine/state';
-import { foundPeople } from '@engine/people/villagers';
 import {
   population,
   resolveBirths,
@@ -68,8 +69,8 @@ function founded(seed: number): GameState {
     crowBite: 0,
     intent: restingIntent(),
     traits: [],
-    village: { grain: FOUNDING.GRAIN, wood: 900, morale: FOUNDING.MORALE, faith: FOUNDING.FAITH },
-    people: foundPeople(rng, 0),
+    village: { grain: TWENTY.GRAIN, wood: 900, morale: TWENTY.MORALE, faith: TWENTY.FAITH },
+    people: foundPeopleTwenty(rng, 0),
     buildings: [
       ...Array.from({ length: 14 }, () => build('house')),
       ...Array.from({ length: 6 }, () => build('field')),

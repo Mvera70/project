@@ -3,12 +3,12 @@
 // Lo que hay que proteger: que un rencor se escriba una sola vez, que sanar no
 // lo borre, que spiteful y loyal perdonen a velocidades distintas, y que la
 // memoria no crezca sin fin.
+import { foundPeopleTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { MEMORY, OPINION, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Memory, Trait, Villager, VillagerId } from '@engine/state';
 import { restingIntent } from '@engine/state';
-import { foundPeople } from '@engine/people/villagers';
 import {
   adjustOpinion,
   driftOpinions,
@@ -44,7 +44,7 @@ function village(seed: number): GameState {
     intent: restingIntent(),
     traits: [],
     village: { grain: 800, wood: 200, morale: 55, faith: 50 },
-    people: foundPeople(rng, 0),
+    people: foundPeopleTwenty(rng, 0),
     buildings: [],
     works: [],
     crossroad: null,

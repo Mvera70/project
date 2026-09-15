@@ -114,6 +114,8 @@ export function evaluate(c: Condition, state: GameState): boolean {
     }
     case 'ratio':
       return compare(ratioOf(state, c.ratio), c.op, c.v);
+    case 'herd':
+      return compare(state.herd[c.kind], c.op, c.v);
     case 'season': {
       if (seasonOf(state.tick) !== c.season) return false;
       if (c.minWeek === undefined) return true;

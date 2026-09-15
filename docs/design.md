@@ -692,10 +692,20 @@ peligroso.
 
 Se comprueba una vez al año, en la semana 0.
 
-**Llegada.** Requiere `people ≥ 8`, `morale ≥ 50`, reservas de grano `≥ 0.5`
+**Llegada.** Requiere `people ≥ 2`, `morale ≥ 50`, reservas de grano `≥ 0.5`
 años, `hostile` sin activar, **un líder en el puesto (Anexo A.15, v2.22)** y al
 menos 2 huecos de vivienda. Probabilidad 0.30; llegan 2–4 personas, mezcla de
 adultos jóvenes y niños.
+
+**La aldea pequeña atrae más** (v3.69, con la fundación en pareja). Mientras
+hay menos de `ARRIVE_SMALL_BELOW` (20) personas, la probabilidad es 0,70, el
+ánimo que se pide es 35 y no hace falta cama libre: quien llega a un valle de
+cuatro acampa junto al río hasta que la casa esté, y el apretón lo cobra el
+ánimo (`MORALE_CROWDING`). Las tres se midieron antes de fijarse: con el umbral
+normal de ánimo la semilla 23 se quedó cinco años en dos personas con el ánimo
+en 49, y con la cama exigida la única casa se llenaba con la primera familia y
+nadie más llegaba en diez años. El hambre y la hostilidad siguen cerrando la
+puerta igual que a la aldea grande.
 
 **Marcha.** Si `morale < 30`, con probabilidad `(30 − morale)/60` se van 1–3
 personas, **el doble mientras el puesto de líder esté vacante** (Anexo A.15,
@@ -2920,16 +2930,28 @@ export const TIME = {
 
 ### 12.2 Fundación
 
+> **Revisión v3.69, 15 sep 2026 — la pareja.** Lo decidió el dueño del diseño:
+> «la aldea debe comenzar con una sola pareja, un hombre y una mujer». Hasta
+> aquí el valle lo fundaban veinte; ahora lo fundan dos y **la aldea crece con
+> los que llegan** (§5.7, `ARRIVE_SMALL_BELOW`). El perfil de veinte sigue
+> existiendo como `TWENTY` en `tests/helpers/founding.ts`, porque las pruebas
+> que reparten oficios o miden la subsistencia de una aldea hecha miden eso y
+> no la fundación; `foundGame` y `foundPeople` aceptan un `FoundingProfile`.
+
 ```ts
 export const FOUNDING = {
-  POPULATION: 20,          // 6 nombrados + 14 anónimos
-  ADULTS: 13, CHILDREN: 5, ELDERS: 2,
-  GRAIN: 800,
-  WOOD: 200,
+  POPULATION: 2,           // los dos nombrados: él manda, ella es la comadrona
+  ADULTS: 2, CHILDREN: 0, ELDERS: 0,
+  GRAIN: 150,
+  WOOD: 100,
   MORALE: 55,
   FAITH: 50,
-  HOUSES: 4,
-  FIELDS: 2,
+  HOUSES: 1,
+  FIELDS: 1,
+  HERD: { hens: 3, pigs: 0, cows: 0 },
+  AGE_RANGES: { adults: [18, 30], children: [1, 13], elders: [60, 70] },
+  MIN_FERTILE_WOMEN: 1,    // la corrección de §6.1 garantiza la mujer…
+  MIN_MEN: 1,              // …y, desde v3.69, también el hombre
 } as const;
 ```
 
@@ -2937,23 +2959,44 @@ Comprobación, con el cálculo explícito para que nadie lo «arregle» en ningu
 de las dos direcciones:
 
 ```
-consumo = 20 personas · 48 semanas · 1.0            =   960
-cosecha = 2 campos · 600 · 1.00 clima · 1.02 ánimo  = 1 224
-margen  = 1 224 / 960                               = 1.275
+consumo   = 2 personas · 48 semanas · 1.0            =    96
+cosecha   = 1 campo · 600 · 1.00 clima · 1.02 ánimo  =   612
+margen    = 612 / 96                                 =  6.4
+y a veinte = 612 / (20 · 48)                         =  0.64
 ```
 
-El 1.02 es el factor de ánimo de la fundación: `0.8 + 0.4 · 0.55`, con
-`MORALE = 55`. El cociente desnudo, sin ánimo, es `1 200 / 960 = 1.25`, y
-**también es correcto**: es el mismo margen visto sin el multiplicador. Los dos
-números aparecen en sitios distintos del proyecto y ninguno es una errata.
+A dos les sobra el campo —es lo que deja llegar a los primeros sin que nadie
+pase hambre— y **no alimenta a la aldea pequeña entera**: en cuanto llegan diez
+hay que roturar, y por eso el valle cambia. Los 150 de grano cubren año y medio
+de la pareja: una mala primera cosecha no la mata, y no tiene para dos años sin
+sembrar. `GRAIN` queda por debajo de `BASE_STORAGE` y el primer tick no merma.
 
-El margen es, pues, del 27 %, y el arranque de 800 de grano cubre casi un año
-entero. La primera hambruna es cuestión de cuándo, no de si.
+**Dos manos siempre pueden con un campo** (`labour.ts`, v3.69). La regla de
+v2.14 —`MIN_FIELD_CREW` sobre la mano de obra menos la reserva de obra— dejaba
+a la pareja en 1,7 brazos, y 1,7 entre 2 es cero campos: medido con
+`tools/founding-report.ts`, la pareja no cosechaba nada y moría de hambre en el
+año cuatro en cuatro semillas de seis. Lo que la regla quería impedir —dos
+supervivientes cosechando cuatro campos— sigue impedido.
 
-**`GRAIN` es exactamente `BASE_STORAGE`, y eso es a propósito.** Con 900 la
-aldea nacía por encima de su propia capacidad y perdía grano a merma desde el
-primer tick, que se lee como un fallo aunque no lo sea. El cambio no mueve la
-tasa de extinción, los años de extinción ni la mediana de pico.
+**Medido antes de fijarlo** (`tools/founding-report.ts`, seis semillas,
+cuarenta años, política prudente): ninguna pareja se extingue; población a los
+10 / 20 / 30 / 40 años: 14/28/34/56, 20/30/56/70, 11/25/37/53, 11/12/21/25,
+20/48/61/56 y 5/13/18/28. La semilla lenta (97) lo es por el ánimo, no por el
+grano. `tests/journeys/founding.test.ts` guarda estas propiedades.
+
+<details>
+<summary>Lo que había hasta v3.68: la fundación de veinte</summary>
+
+```ts
+POPULATION: 20, ADULTS: 13, CHILDREN: 5, ELDERS: 2, GRAIN: 800, WOOD: 200,
+HOUSES: 4, FIELDS: 2, HERD: { hens: 4, pigs: 0, cows: 1 }
+consumo = 960 · cosecha = 1 224 · margen = 1.275
+```
+
+El margen era del 27 % y los 800 de grano —exactamente `BASE_STORAGE`, para no
+nacer mermando— cubrían casi un año. Es el perfil `TWENTY` de las pruebas.
+
+</details>
 
 ### 12.3 Subsistencia
 
@@ -3026,12 +3069,15 @@ export const PEOPLE = {
 
 export const MIGRATION = {
   ARRIVE_CHANCE: 0.30,
-  ARRIVE_MIN_PEOPLE: 8,
+  ARRIVE_MIN_PEOPLE: 2,         // v3.69: dos desde la fundación en pareja
+  ARRIVE_SMALL_BELOW: 20,       // v3.69: por debajo, la aldea es «pequeña» y…
+  ARRIVE_CHANCE_SMALL: 0.70,    // …atrae más,
+  ARRIVE_MIN_MORALE_SMALL: 35,  // pide menos ánimo,
   ARRIVE_MIN_MORALE: 50,
   ARRIVE_MIN_GRAIN_YEARS: 0.5,
-  ARRIVE_MIN_FREE_BEDS: 2,
+  ARRIVE_MIN_FREE_BEDS: 2,      // y no exige cama libre (acampan junto al río)
   ARRIVE_COUNT: [2, 4],
-  VIABLE_POPULATION: 6,         // §5.7: por debajo, esto ya no es una aldea
+  VIABLE_POPULATION: 2,         // §5.7: por debajo, esto ya no es una aldea
   ABANDON_YEARS: 5,             // §5.7: años seguidos así antes de marcharse
   LEAVE_BELOW_MORALE: 30,
   LEAVE_COUNT: [1, 3],

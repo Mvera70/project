@@ -105,6 +105,19 @@ sitio.
 
 ## 2.1. La versión 2.0, del 15 sep 2026
 
+> **Añadido el mismo día, después de la versión 2.0: la pareja (v3.69).** El
+> dueño rechazó la demo «sólida» —trastos de prueba atravesando el suelo, tres
+> filas de botones— y dio la premisa: un idle bonito de mirar de fondo, con la
+> aleatoriedad como esencia, y cinco pasos en orden: **pareja fundadora, menú
+> de inicio, inicio guiado desde lo alto, reloj con horas, tormentas**. El
+> primero está hecho y medido (`tools/founding-report.ts`, §12.2): ninguna de
+> seis parejas se extingue en cuarenta años, 5 a 20 personas a los diez. Lo
+> que costó: la pareja no cosechaba (regla «dos manos, un campo» en
+> `labour.ts`), nadie llegaba (`ARRIVE_MIN_PEOPLE` 8 → 2, aldea pequeña sin
+> exigir cama), y sesenta pruebas escritas con veinte fundadores, que ahora
+> fundan con `foundTwenty` porque miden una aldea hecha. Los cuatro pasos
+> restantes están en la memoria del agente y en `CLAUDE.md`.
+
 El dueño del diseño estuvo a punto de desestimar el proyecto —«la aldea no se
 siente viva, no hay ninguna manera lógica de jugar, o paramos y establecemos
 objetivos muy claros o esta idea se va fuera»— y después delegó: «toma la

@@ -4,6 +4,7 @@
 // que la tabla de §12.4 dice que vive, que una aldea holgada crezca, que una
 // hambrienta deje de reproducirse, y que las seis puertas de §5.7 estén cada
 // una en su sitio.
+import { TWENTY, foundPeopleTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { FOOD, FOUNDING, LIFE, MIGRATION, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
@@ -20,7 +21,7 @@ import {
   resolveMigration,
   workforce,
 } from '@engine/people/demography';
-import { ageOf, foundPeople, makeVillager } from '@engine/people/villagers';
+import { ageOf, makeVillager } from '@engine/people/villagers';
 
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 const CALM: TickContext = { severity: 0, cold: false, outbreak: null, deaths: 0, unexplainedDeaths: 0 };
@@ -44,7 +45,7 @@ function house(id: number): Building {
 /** Una aldea fundada, con las casas que se le pidan y el granero lleno. */
 function village(seed: number, houses: number): GameState {
   const rng = makeBundle(seed);
-  const people = foundPeople(rng, 0);
+  const people = foundPeopleTwenty(rng, 0);
   return {
     version: 2,
     seed,
@@ -66,7 +67,7 @@ function village(seed: number, houses: number): GameState {
     crowBite: 0,
     intent: restingIntent(),
     traits: [],
-    village: { grain: 5000, wood: FOUNDING.WOOD, morale: FOUNDING.MORALE, faith: FOUNDING.FAITH },
+    village: { grain: 5000, wood: TWENTY.WOOD, morale: TWENTY.MORALE, faith: TWENTY.FAITH },
     people,
     buildings: Array.from({ length: houses }, (_, i) => house(i)),
     works: [],
@@ -111,18 +112,18 @@ function step(s: GameState, ctx: TickContext, starve?: { acc: number }): void {
 describe('recuento', () => {
   it('la población son los vivos que siguen en el valle', () => {
     const s = village(7, 6);
-    expect(population(s)).toBe(FOUNDING.POPULATION);
+    expect(population(s)).toBe(TWENTY.POPULATION);
 
     const [a, b] = s.people.villagers;
     (a as Villager).diedTick = 1;
     (b as Villager).leftTick = 1;
-    expect(population(s)).toBe(FOUNDING.POPULATION - 2);
+    expect(population(s)).toBe(TWENTY.POPULATION - 2);
   });
 
   it('el aforo cuenta las casas en pie, de madera o de piedra', () => {
     const s = village(7, 4);
     expect(housingCapacity(s)).toBe(4 * LIFE.HOUSE_CAPACITY);
-    expect(freeBeds(s)).toBe(4 * LIFE.HOUSE_CAPACITY - FOUNDING.POPULATION);
+    expect(freeBeds(s)).toBe(4 * LIFE.HOUSE_CAPACITY - TWENTY.POPULATION);
 
     (s.buildings[0] as Building).lostTick = 10; // una ruina no aloja a nadie
     expect(housingCapacity(s)).toBe(3 * LIFE.HOUSE_CAPACITY);

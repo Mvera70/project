@@ -127,6 +127,16 @@ relajar A.16 por eso. Jugada con `run` y la política prudente: **67 a 99 obras
 en sesenta años, piedra en los años 42 a 45, 1,45 sucesos por sesión.** Está
 contado en `docs/handover.md` §2.1.
 
+**Y desde v3.69 la aldea la fundan dos** —un hombre y una mujer— y crece con
+los que llegan (§12.2, §5.7). Es decisión del dueño del diseño, con la premisa
+del juego dicha por él: **un idle bonito de mirar de fondo, cuya esencia es que
+cada valle salga distinto.** Lo que no se puede olvidar: `foundGame(seed)` es
+la pareja; las pruebas que reparten oficios o miden la subsistencia de una
+aldea hecha usan `foundTwenty` (`tests/helpers/founding.ts`), y lo que la
+pareja promete lo guarda `tests/journeys/founding.test.ts`. Detrás vienen, en
+este orden y pedidos por él: menú de inicio, inicio guiado desde lo alto,
+reloj con horas, tormentas con rayos.
+
 **V-11 cerrada (15 sep 2026), y con ella el Anexo E entero.** Las reuniones de
 §11.8 habían dejado de ocurrir el día de G-12 —sólo existían en el camino
 viejo— y nadie lo vio porque la prueba que las vigilaba llamaba a `actorsFor`

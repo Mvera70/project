@@ -82,7 +82,17 @@ export function allocateLabour(state: GameState): Allocation {
   // bushels against ninety-six of consumption is the flat line §5.2 is written
   // to end — forty years of a village that neither dies nor recovers.
   const farmLabour = w * (1 - LABOUR.WORKS_RESERVE);
-  const crewable = Math.floor(farmLabour / FOOD.MIN_FIELD_CREW);
+  // **Y dos manos siempre pueden con un campo.** Con la fundación en pareja
+  // (15 sep 2026) esto salió el primer día: dos personas menos la reserva de
+  // obra son 1,7, y 1,7 entre `MIN_FIELD_CREW` = 2 es cero campos — la pareja
+  // no cosechaba nada y moría de hambre en el año cuatro en cuatro semillas de
+  // seis (`tools/founding-report.ts`). La regla de v2.14 sigue para todo lo
+  // demás; lo que cambia es que la reserva de obra no puede dejar a una aldea
+  // de dos sin su único campo, porque entonces no es una reserva, es la ruina.
+  const crewable = Math.max(
+    w >= FOOD.MIN_FIELD_CREW ? 1 : 0,
+    Math.floor(farmLabour / FOOD.MIN_FIELD_CREW),
+  );
   const workedFields = Math.min(count(state, 'field'), neededFields, crewable);
   const farmDemand = workedFields * FOOD.FIELD_CREW;
 

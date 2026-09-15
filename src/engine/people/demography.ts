@@ -303,16 +303,25 @@ export function resolveMigration(state: GameState): MigrationEvent[] {
     : Number.POSITIVE_INFINITY;
   const leaderless = !leaderPresent(state);
 
+  // Una aldea pequeña no exige cama libre: quien llega a un valle de cuatro
+  // acampa junto al río hasta que la casa esté, y el apretón lo cobra el ánimo
+  // (`MORALE_CROWDING`). Medido sin esto, con la fundación en pareja: la única
+  // casa se llenaba con la primera familia y nadie más llegaba en diez años,
+  // porque una casa nueva con 0,3 albañiles tarda dos de ellos.
+  const small = people < MIGRATION.ARRIVE_SMALL_BELOW;
   const gatesOpen =
     people >= MIGRATION.ARRIVE_MIN_PEOPLE &&
-    state.village.morale >= MIGRATION.ARRIVE_MIN_MORALE &&
+    state.village.morale >= (small ? MIGRATION.ARRIVE_MIN_MORALE_SMALL : MIGRATION.ARRIVE_MIN_MORALE) &&
     grainYears >= MIGRATION.ARRIVE_MIN_GRAIN_YEARS &&
     !flagSet(state, 'hostile') &&
     !leaderless &&
-    freeBeds(state) >= MIGRATION.ARRIVE_MIN_FREE_BEDS;
+    (small || freeBeds(state) >= MIGRATION.ARRIVE_MIN_FREE_BEDS);
 
   if (gatesOpen) {
-    if (next(state.rng, 'births') >= MIGRATION.ARRIVE_CHANCE) return [];
+    // Una aldea pequeña atrae más: es lo que hace que una pareja sea aldea en
+    // la primera década. Ver `MIGRATION.ARRIVE_SMALL_BELOW`.
+    const chance = small ? MIGRATION.ARRIVE_CHANCE_SMALL : MIGRATION.ARRIVE_CHANCE;
+    if (next(state.rng, 'births') >= chance) return [];
     return [arrive(state)];
   }
 

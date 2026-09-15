@@ -4,10 +4,10 @@
 // ni uno más, que apagar un edificio le quite de verdad el humo y la luz, que
 // `who` apague la casa de esa persona y no otra, y que nada de esto escriba
 // en el estado ni gaste una tirada.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { MARKS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { bannersAt, dousedAt } from '@derive/marks';
 import { tellsFor } from '@derive/tells';
@@ -19,7 +19,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

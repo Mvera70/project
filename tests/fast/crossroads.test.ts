@@ -3,13 +3,14 @@
 // El catálogo real es de M-08. Todo esto corre contra un catálogo falso
 // definido aquí, escogido para ejercitar cada variante del DSL, cada forma de
 // reparto y las dos reglas que se pelean: el techo y la garantía.
+import { foundPeopleTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CROSSROADS, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import { TERRAIN_CODE } from '@engine/state';
 import { restingIntent } from '@engine/state';
 import type { Building, Condition, GameState, Villager, VillagerId } from '@engine/state';
-import { foundPeople, ageOf } from '@engine/people/villagers';
+import { ageOf } from '@engine/people/villagers';
 import { isHere, population } from '@engine/people/demography';
 import { adjustOpinion } from '@engine/people/opinions';
 import { remember } from '@engine/people/memories';
@@ -56,7 +57,7 @@ function village(seed: number, houses = 12): GameState {
     intent: restingIntent(),
     traits: [],
     village: { grain: 4000, wood: 400, morale: 55, faith: 50 },
-    people: foundPeople(rng, 0),
+    people: foundPeopleTwenty(rng, 0),
     buildings: Array.from({ length: houses }, () => build('house')),
     works: [],
     crossroad: null,

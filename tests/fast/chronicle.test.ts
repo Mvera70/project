@@ -3,16 +3,15 @@
 // Lo que hay que proteger es la voz. Las prohibiciones de §9.3 son tests porque
 // una sola frase que juzgue al jugador rompe el principio del que cuelga todo
 // el capítulo 9: la crónica narra, no califica.
+import { foundTwenty, foundPeopleTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { yearOf } from '@engine/time';
 import type { ChronicleEntry, ChronicleKind, DeathCause, GameState, Villager } from '@engine/state';
 import { restingIntent } from '@engine/state';
-import { foundPeople } from '@engine/people/villagers';
 import { BANK } from '@engine/chronicle/bank.en';
 import {
   arrivalKey,
@@ -58,7 +57,7 @@ function village(seed: number): GameState {
     intent: restingIntent(),
     traits: [],
     village: { grain: 800, wood: 200, morale: 55, faith: 50 },
-    people: foundPeople(rng, 0),
+    people: foundPeopleTwenty(rng, 0),
     buildings: [],
     works: [],
     crossroad: null,
@@ -899,7 +898,7 @@ describe('Ninguna frase de la crónica sale rota', () => {
   it('en cuarenta años de cuatro semillas, ninguna dice «no of them»', () => {
     const bad = /no (?:of them|died|were born|left)/iu;
     for (const seed of [7, 11, 23, 41]) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       run(state, 40 * 48, 'prudent', CATALOG);
       const bundle = makeBundle(seed);
       state.chronicle.forEach((entry, at) => {
@@ -928,7 +927,7 @@ describe('Un hueco de reparto llega a la pantalla · declarado', () => {
 
   it.fails('ninguna entrada llega con un parámetro sin rellenar', () => {
     for (const seed of [7, 11, 23, 41]) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       run(state, 40 * 48, 'prudent', CATALOG);
       const bundle = makeBundle(seed);
       state.chronicle.forEach((entry, at) => {

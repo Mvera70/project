@@ -3,9 +3,9 @@
 // Este fichero mide lo que un jugador llamó «aburrido y repetitivo»: que todos
 // hicieran lo mismo a la vez, todos los días, apilados en la misma celda y sin
 // hablar con nadie. Cada prueba es una de esas cuatro cosas.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
 import { routesFor } from '@engine/world/paths';
@@ -19,7 +19,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

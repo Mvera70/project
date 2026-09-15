@@ -25,11 +25,12 @@ export const BANK: Record<string, string[]> = {
   // -------------------------------------------------------------------------
   // The founding
   // -------------------------------------------------------------------------
+  // Dos desde el 15 sep 2026: una pareja funda, y los demás llegan.
   founding: [
-    'Twenty came over the ridge and stopped where the river bends. Year one.',
+    'Two came over the ridge and stopped where the river bends. Year one.',
     'They stopped here because the water was clean and no one owned it. Year one.',
     'Nobody wrote down why they stopped. Year one.',
-    'Twenty of them, and a valley nobody had claimed. Year one.',
+    'A man and a woman, and a valley nobody had claimed. Year one.',
   ],
 
   // -------------------------------------------------------------------------
@@ -1511,9 +1512,9 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   // param read off the state, not a number written into the prose, so the line
   // cannot drift from the founding it describes.
   'founding.settled': [
-    'They stopped where the river turns, {people} of them, in the {season} of year {year}.',
-    'They came up the valley in year {year}, {people} of them, and did not go on.',
-    'The valley had nobody in it until year {year}, and then it had {people}.',
+    'They stopped where the river turns, the two of them, in the {season} of year {year}.',
+    'They came up the valley in year {year}, a man and a woman, and did not go on.',
+    'The valley had nobody in it until year {year}, and then it had two.',
   ],
 
   // --- E5 · qué valle es éste (docs/plan-juego.md) ---

@@ -3,10 +3,10 @@
 // El valle sabía escribir rencores desde M-05 y no hacía nada con ellos. Un
 // rencor abierto era una fila en un registro: nadie discutía, nadie se gritaba,
 // nadie dejaba de hablarse en la plaza.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { OPINION, QUARREL, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { opinionOf } from '@engine/people/opinions';
 import { quarrelOf } from '@engine/people/quarrels';
@@ -17,7 +17,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }
@@ -183,7 +183,7 @@ describe('no rompe las reglas · §4.3, §6.4', () => {
     // riñas por siglo y partida, y hay semillas que no riñen en cien años.
     let fights = 0;
     for (const seed of [3, 7, 11]) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       run(state, 120 * 48, 'prudent', CATALOG);
       fights += state.chronicle.filter((e) => e.templateKey.startsWith('quarrel.')).length;
     }

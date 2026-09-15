@@ -19,6 +19,7 @@ import type {
   Trait,
   Villager,
   VillagerId,
+  FoundingProfile,
 } from '../state';
 import { yearOf } from '../time';
 import { makeName } from './names';
@@ -135,14 +136,14 @@ interface AgeGroup {
   range: readonly [number, number];
 }
 
-const FOUNDING_GROUPS: readonly AgeGroup[] = [
-  { count: FOUNDING.ADULTS, range: [FOUNDING.AGE_RANGES.adults[0], FOUNDING.AGE_RANGES.adults[1]] },
-  {
-    count: FOUNDING.CHILDREN,
-    range: [FOUNDING.AGE_RANGES.children[0], FOUNDING.AGE_RANGES.children[1]],
-  },
-  { count: FOUNDING.ELDERS, range: [FOUNDING.AGE_RANGES.elders[0], FOUNDING.AGE_RANGES.elders[1]] },
-];
+/** Los grupos de edad de un perfil de fundación, en orden fijo. */
+function groupsOf(profile: FoundingProfile): readonly AgeGroup[] {
+  return [
+    { count: profile.ADULTS, range: profile.AGE_RANGES.adults },
+    { count: profile.CHILDREN, range: profile.AGE_RANGES.children },
+    { count: profile.ELDERS, range: profile.AGE_RANGES.elders },
+  ];
+}
 
 function isFertileWoman(female: boolean, age: number): boolean {
   return female && age >= LIFE.FERTILE[0] && age <= LIFE.FERTILE[1];
@@ -155,10 +156,10 @@ function isFertileWoman(female: boolean, age: number): boolean {
  * founding offices of §6.2 and are named. Nobody has parents: they are the ones
  * who arrived.
  */
-export function foundPeople(b: RngBundle, tick: number): PeopleState {
+export function foundPeople(b: RngBundle, tick: number, profile: FoundingProfile = FOUNDING): PeopleState {
   // 1 · Ages and sexes, group by group, in a fixed order.
   const draws: { age: number; female: boolean }[] = [];
-  for (const group of FOUNDING_GROUPS) {
+  for (const group of groupsOf(profile)) {
     for (let i = 0; i < group.count; i += 1) {
       const age = int(b, 'names', group.range[0], group.range[1]);
       draws.push({ age, female: next(b, 'names') < 0.5 });
@@ -169,11 +170,11 @@ export function foundPeople(b: RngBundle, tick: number): PeopleState {
   // interesting variance, it is a game dead on arrival, and it is the first
   // thing the player sees. The correction is deterministic and consumes no
   // draws, so a corrected founding does not shift the stream for the map.
-  const adults = draws.slice(0, FOUNDING.ADULTS);
+  const adults = draws.slice(0, profile.ADULTS);
   let fertile = adults.filter((d) => isFertileWoman(d.female, d.age)).length;
 
   for (const d of adults) {
-    if (fertile >= FOUNDING.MIN_FERTILE_WOMEN) break;
+    if (fertile >= profile.MIN_FERTILE_WOMEN) break;
     if (!d.female && d.age >= LIFE.FERTILE[0] && d.age <= LIFE.FERTILE[1]) {
       d.female = true;
       fertile += 1;
@@ -182,11 +183,24 @@ export function foundPeople(b: RngBundle, tick: number): PeopleState {
   for (const d of adults) {
     // Only reachable if fewer than MIN_FERTILE_WOMEN adults were of an age to
     // bear at all — vanishingly rare, but the guarantee has to be total.
-    if (fertile >= FOUNDING.MIN_FERTILE_WOMEN) break;
+    if (fertile >= profile.MIN_FERTILE_WOMEN) break;
     if (isFertileWoman(d.female, d.age)) continue;
     d.female = true;
     d.age = Math.min(d.age, LIFE.FERTILE[1]);
     fertile += 1;
+  }
+  // Y la otra mitad de poder reproducirse, que con trece adultos era
+  // estadística y con dos es un cuarto de las fundaciones: al menos `MIN_MEN`
+  // hombres. Se toma de las mujeres que sobran sobre `MIN_FERTILE_WOMEN`, de la
+  // última hacia atrás, para no deshacer la corrección de arriba.
+  let men = adults.filter((d) => !d.female).length;
+  for (let i = adults.length - 1; i >= 0 && men < profile.MIN_MEN; i -= 1) {
+    const d = adults[i];
+    if (d === undefined || !d.female) continue;
+    if (isFertileWoman(d.female, d.age) && fertile <= profile.MIN_FERTILE_WOMEN) continue;
+    d.female = false;
+    if (isFertileWoman(true, d.age)) fertile -= 1;
+    men += 1;
   }
 
   // 3 · The villagers themselves, anonymous for now.
@@ -205,7 +219,7 @@ export function foundPeople(b: RngBundle, tick: number): PeopleState {
   // decreasing demand so that the hardest to fill chooses first — the midwife
   // is both the oldest floor and the only one with a sex requirement (§6.2),
   // so she is served before anyone can take the elder she needed.
-  const free = new Set<VillagerId>(villagers.slice(0, FOUNDING.ADULTS).map((v) => v.id));
+  const free = new Set<VillagerId>(villagers.slice(0, profile.ADULTS).map((v) => v.id));
   const holder: Partial<Record<Role, VillagerId>> = {};
 
   for (const role of ROLES_BY_DEMAND) {

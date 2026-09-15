@@ -1,17 +1,18 @@
 // M-10 · The founding. design.md §12.2, §3.1.
 //
-// Twenty came over the ridge and stopped where the river bends.
+// Two came over the ridge and stopped where the river bends (una pareja desde
+// el 15 sep 2026; antes, veinte).
 
 import { BUILDINGS, FOUNDING, LIFE } from './balance';
 import { foundPeople } from './people/villagers';
 import { makeBundle } from './rng';
 import { SCHEMA_VERSION, restingIntent, valleyTraits } from './state';
-import type { BuildingKind, GameState } from './state';
+import type { BuildingKind, FoundingProfile, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
 
 /** Place completed founding buildings without charging the opening stores. */
-function foundingBuildings(state: GameState): void {
+function foundingBuildings(state: GameState, profile: FoundingProfile): void {
   const place = (kind: BuildingKind, n: number): void => {
     const spec = BUILDINGS[kind];
     for (let i = 0; i < n; i += 1) {
@@ -23,8 +24,8 @@ function foundingBuildings(state: GameState): void {
       });
     }
   };
-  place('house', FOUNDING.HOUSES);
-  place('field', FOUNDING.FIELDS);
+  place('house', profile.HOUSES);
+  place('field', profile.FIELDS);
   const homes = state.buildings.filter((b) => b.kind === 'house');
   for (const [index, villager] of state.people.villagers.entries()) {
     villager.homeId = homes[Math.floor(index / LIFE.HOUSE_CAPACITY)]?.id ?? null;
@@ -43,7 +44,9 @@ export interface InheritedValley {
   ruins: Uint8Array;
 }
 
-export function foundGame(seed: number, inherited?: InheritedValley): GameState {
+export function foundGame(
+  seed: number, inherited?: InheritedValley, profile: FoundingProfile = FOUNDING,
+): GameState {
   const rng = makeBundle(seed);
   const terrainSeed = inherited?.terrainSeed ?? seed;
   const mapRng = terrainSeed === seed ? rng : makeBundle(terrainSeed);
@@ -52,17 +55,17 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     seed,
     terrainSeed,
     tick: 0,
-    peakPeople: FOUNDING.POPULATION,
+    peakPeople: profile.POPULATION,
     rng,
     map: generateMap(mapRng, terrainSeed),
-    herd: { ...FOUNDING.HERD },
+    herd: { ...profile.HERD },
     village: {
-      grain: FOUNDING.GRAIN,
-      wood: FOUNDING.WOOD,
-      morale: FOUNDING.MORALE,
-      faith: FOUNDING.FAITH,
+      grain: profile.GRAIN,
+      wood: profile.WOOD,
+      morale: profile.MORALE,
+      faith: profile.FAITH,
     },
-    people: foundPeople(rng, 0),
+    people: foundPeople(rng, 0, profile),
     buildings: [],
     works: [],
     crossroad: null,
@@ -91,7 +94,7 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     traits: valleyTraits(terrainSeed),
     ended: null,
   };
-  foundingBuildings(state);
+  foundingBuildings(state, profile);
   if (inherited !== undefined) {
     if (inherited.ruins.length !== state.map.ruins.length) {
       throw new Error('Inherited ruin mask does not fit the valley.');

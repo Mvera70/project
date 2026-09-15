@@ -136,7 +136,11 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // cayó en el cuadrante noroeste, donde no hay nada que abrir. El centro es
   // donde está la aldea, porque ahí se funda (§7.1) y de ahí no se mueve: los
   // topes de §12 son absolutos y `placeBuilding` sólo construye en el corazón.
-  const canvas = page.locator('#valley');
+  // **Y se toca el lienzo que se ve.** El 3D releva al Canvas en cuanto carga
+  // (G-12) y esconde `#valley`: un toque que llegue después del relevo va a
+  // `#valley3d`, y un localizador clavado al 2D fallaba con «no visible» en
+  // mitad del barrido de abajo. Es lo que hace el dedo: toca lo que hay.
+  const canvas = page.locator('canvas:visible').first();
   const box = await canvas.boundingBox();
   // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
   // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la
@@ -144,8 +148,28 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // se quede quieto antes de tocarlo, y un lienzo que sigue a una persona no se
   // queda quieto nunca: ciento veinte segundos esperando. El toque va donde
   // iría el dedo, sin esperar a que el mundo se pare.
-  await canvas.click({ position: { x: (box?.width ?? 360) / 2, y: (box?.height ?? 560) / 2 }, force: true });
-  await test.expect(page.locator('.valley-panel:not(.valley-orders)')).toBeVisible();
+  //
+  // **Y si el centro exacto es un hueco, se prueba alrededor**, como haría el
+  // dedo. Con la fundación en pareja (v3.69) la aldea de la semilla 7 a los
+  // ochenta años tiene ochenta y tres edificios y el píxel central cae entre
+  // dos casas de piedra: el toque abría nada. Una rejilla de cinco píxeles
+  // —una celda— hasta cuatro celdas alrededor, del centro hacia fuera, y se
+  // para en el primer toque que abre algo.
+  const panel = page.locator('.valley-panel:not(.valley-orders)');
+  const cx = (box?.width ?? 360) / 2;
+  const cy = (box?.height ?? 560) / 2;
+  const around: [number, number][] = [];
+  for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
+  around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
+  for (const [dx, dy] of around) {
+    // A ×1 y con ochenta personas, una encrucijada puede abrirse entre dos
+    // toques y esconder el lienzo; se contesta y se sigue.
+    await answerAnyCrossroad(page);
+    await canvas.click({ position: { x: cx + dx, y: cy + dy }, force: true });
+    await page.waitForTimeout(120);
+    if (await panel.isVisible()) break;
+  }
+  await test.expect(panel).toBeVisible();
   await test.expect(page.locator('.valley-panel:not(.valley-orders) h2')).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
 });
@@ -386,10 +410,12 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
 });
 
 test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)', async ({ page }) => {
-  // Declarado: el aviso de §11.6 convive ahora con la cartela de hito (U-02) y
-  // con la píldora de decisión (U-07), y esta prueba es de antes de las dos.
-  // Ver la cabecera.
-  test.fail();
+  // Estuvo declarada rota: el aviso de §11.6 convive con la cartela de hito
+  // (U-02) y con la píldora de decisión (U-07), y en la aldea de la semilla 7 a
+  // los ochenta años una de las dos le ganaba el sitio. **Pasa desde v3.69
+  // sin tocar la interfaz**: la fundación en pareja cambia la trayectoria de
+  // ochenta años y con ella lo que la aldea tiene que decir en ese momento. Si
+  // vuelve a caer, la causa es la de arriba y no una regresión del aviso.
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();

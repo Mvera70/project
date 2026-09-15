@@ -11,9 +11,9 @@
 // plaza y se vaya andando ya lo prueban `life-decide` y `life-places`; que se
 // vea, lo prueba una captura.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState, Intent } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
@@ -21,7 +21,7 @@ import { placesOf } from '../../src/render3d/life/offers';
 import { terrainOf } from '../../src/render3d/life/terrain';
 
 function village(years: number, seed = 7, intent?: Intent): GameState {
-  const state = foundGame(seed);
+  const state = foundTwenty(seed);
   if (intent !== undefined) state.intent = { ...intent };
   run(state, years * 48, 'prudent', CATALOG);
   return state;

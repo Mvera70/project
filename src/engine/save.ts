@@ -168,6 +168,8 @@ function condition(value: unknown): boolean {
     case 'outbreak': return typeof value['active'] === 'boolean';
     case 'role': return ROLES.has(value['role'] as string) && typeof value['alive'] === 'boolean';
     case 'grudge': return finite(value['min']);
+    case 'herd': return (HERD_KINDS as readonly string[]).includes(value['kind'] as string)
+      && OPS.has(value['op'] as string) && finite(value['v']);
     case 'trait': return ROLES.has(value['role'] as string) && TRAITS.has(value['trait'] as string);
     case 'not': return condition(value['c']);
     case 'any': return Array.isArray(value['cs']) && value['cs'].every(condition);

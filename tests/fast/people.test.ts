@@ -4,8 +4,9 @@
 // que proteger no es que las funciones se llamen entre sí, sino tres
 // propiedades: que la fundación sea jugable, que dos partidas se lean distintas
 // y que nadie tenga el nombre de otro.
+import { TWENTY, foundPeopleTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { FOUNDING, PEOPLE, TIME, TRAIT_WEIGHTS, WORLD } from '@engine/balance';
+import { FOUNDING, LIFE, PEOPLE, TIME, TRAIT_WEIGHTS, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Role, Trait, Villager } from '@engine/state';
 import { restingIntent } from '@engine/state';
@@ -25,7 +26,7 @@ const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 /** Un estado mínimo pero completo, fundado con la semilla dada. */
 function stateOf(seed: number): GameState {
   const rng = makeBundle(seed);
-  const people = foundPeople(rng, 0);
+  const people = foundPeopleTwenty(rng, 0);
   return {
     version: 2,
     seed,
@@ -48,10 +49,10 @@ function stateOf(seed: number): GameState {
     traits: [],
     intent: restingIntent(),
     village: {
-      grain: FOUNDING.GRAIN,
-      wood: FOUNDING.WOOD,
-      morale: FOUNDING.MORALE,
-      faith: FOUNDING.FAITH,
+      grain: TWENTY.GRAIN,
+      wood: TWENTY.WOOD,
+      morale: TWENTY.MORALE,
+      faith: TWENTY.FAITH,
     },
     people,
     buildings: [],
@@ -195,12 +196,65 @@ describe('rasgos', () => {
   });
 });
 
-describe('fundación', () => {
-  it('produce exactamente FOUNDING.POPULATION personas', () => {
-    for (const seed of [7, 42, 108, 999]) {
+describe('fundación en pareja · v3.69', () => {
+  // Lo que el juego funda de verdad desde el 15 sep 2026: un hombre y una
+  // mujer. Las pruebas del bloque siguiente reparten oficios y carácter con la
+  // aldea de veinte, porque miden el reparto y no la fundación.
+  const SEEDS = 300;
+
+  it('son dos, un hombre y una mujer, y los dos en edad de tener hijos', () => {
+    for (let seed = 0; seed < SEEDS; seed += 1) {
       const p = foundPeople(makeBundle(seed), 0);
-      expect(p.villagers.length).toBe(FOUNDING.POPULATION);
-      expect(p.nextId).toBe(FOUNDING.POPULATION);
+      expect(p.villagers.length, `semilla ${seed}`).toBe(2);
+      expect(p.nextId).toBe(2);
+      const women = p.villagers.filter((v) => v.female);
+      expect(women.length, `semilla ${seed}`).toBe(1);
+      for (const v of p.villagers) {
+        const age = ageOf(v, 0);
+        expect(age, `semilla ${seed}`).toBeGreaterThanOrEqual(FOUNDING.AGE_RANGES.adults[0]);
+        expect(age, `semilla ${seed}`).toBeLessThanOrEqual(FOUNDING.AGE_RANGES.adults[1]);
+        expect(age).toBeGreaterThanOrEqual(LIFE.FERTILE[0]);
+        expect(age).toBeLessThanOrEqual(LIFE.FERTILE[1]);
+        expect(v.parentIds).toEqual([null, null]);
+      }
+    }
+  });
+
+  it('los dos tienen nombre y oficio, y él es quien manda', () => {
+    // Con dos personas sólo caben dos oficios, y los reparte la demanda de
+    // §6.2: la comadrona primero —la única con requisito de sexo— y después el
+    // liderazgo. Que haya líder no es cosmético: sin él no llega nadie al
+    // valle (`resolveMigration`), y llegar es como esta aldea crece.
+    for (let seed = 0; seed < SEEDS; seed += 1) {
+      const p = foundPeople(makeBundle(seed), 0);
+      expect(p.namedIds.length, `semilla ${seed}`).toBe(2);
+      const roles = p.villagers.map((v) => v.role);
+      expect(roles).toContain('leader');
+      expect(new Set(roles).size).toBe(2);
+      const leader = p.villagers.find((v) => v.role === 'leader');
+      expect(leader?.female, `semilla ${seed}`).toBe(false);
+      const midwife = p.villagers.find((v) => v.role === 'midwife');
+      expect(midwife?.female, `semilla ${seed}`).toBe(true);
+      for (const v of p.villagers) {
+        expect(v.named).toBe(true);
+        expect(v.name).not.toBe('');
+        expect(v.traits.length).toBeGreaterThanOrEqual(3);
+      }
+      expect(new Set(p.villagers.map((v) => v.name)).size).toBe(2);
+    }
+  });
+
+  it('la misma semilla funda a la misma pareja', () => {
+    expect(foundPeople(makeBundle(7), 0)).toEqual(foundPeople(makeBundle(7), 0));
+  });
+});
+
+describe('fundación', () => {
+  it('produce exactamente las personas del perfil', () => {
+    for (const seed of [7, 42, 108, 999]) {
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
+      expect(p.villagers.length).toBe(TWENTY.POPULATION);
+      expect(p.nextId).toBe(TWENTY.POPULATION);
       expect(p.grudges).toEqual([]);
     }
   });
@@ -208,22 +262,22 @@ describe('fundación', () => {
   it('reparte las edades como manda §12.2', () => {
     const inRange = (a: number, r: readonly [number, number]) => a >= r[0] && a <= r[1];
     for (const seed of [7, 42, 108, 999, 2024]) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       const ages = p.villagers.map((v) => ageOf(v, 0));
-      const adults = ages.filter((a) => inRange(a, FOUNDING.AGE_RANGES.adults)).length;
-      const children = ages.filter((a) => inRange(a, FOUNDING.AGE_RANGES.children)).length;
-      const elders = ages.filter((a) => inRange(a, FOUNDING.AGE_RANGES.elders)).length;
+      const adults = ages.filter((a) => inRange(a, TWENTY.AGE_RANGES.adults)).length;
+      const children = ages.filter((a) => inRange(a, TWENTY.AGE_RANGES.children)).length;
+      const elders = ages.filter((a) => inRange(a, TWENTY.AGE_RANGES.elders)).length;
       expect([adults, children, elders]).toEqual([
-        FOUNDING.ADULTS,
-        FOUNDING.CHILDREN,
-        FOUNDING.ELDERS,
+        TWENTY.ADULTS,
+        TWENTY.CHILDREN,
+        TWENTY.ELDERS,
       ]);
     }
   });
 
   it('cubre los seis oficios de §6.2, uno por persona y todos adultos', () => {
     for (const seed of [7, 42, 108, 999]) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       const named = p.namedIds.map((id) => p.villagers[id]);
       expect(named.length).toBe(FOUNDING_ROLES.length);
       expect(named.map((v) => v?.role).sort()).toEqual([...FOUNDING_ROLES].sort());
@@ -231,8 +285,8 @@ describe('fundación', () => {
       for (const v of named) {
         expect(v?.named).toBe(true);
         const age = ageOf(v as Villager, 0);
-        expect(age).toBeGreaterThanOrEqual(FOUNDING.AGE_RANGES.adults[0]);
-        expect(age).toBeLessThanOrEqual(FOUNDING.AGE_RANGES.adults[1]);
+        expect(age).toBeGreaterThanOrEqual(TWENTY.AGE_RANGES.adults[0]);
+        expect(age).toBeLessThanOrEqual(TWENTY.AGE_RANGES.adults[1]);
       }
     }
   });
@@ -240,7 +294,7 @@ describe('fundación', () => {
   it('la comadrona es una mujer', () => {
     // §6.2: "Una adulta lo hereda".
     for (let seed = 0; seed < 200; seed += 1) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       const midwife = p.villagers.find((v) => v.role === 'midwife');
       expect(midwife?.female, `semilla ${seed}`).toBe(true);
     }
@@ -254,7 +308,7 @@ describe('fundación', () => {
     let fallbacks = 0;
     const SEEDS = 500;
     for (let seed = 0; seed < SEEDS; seed += 1) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       for (const role of FOUNDING_ROLES) {
         const v = p.villagers.find((x) => x.role === role);
         expect(v, `semilla ${seed} · ${role}`).toBeDefined();
@@ -265,8 +319,8 @@ describe('fundación', () => {
         const spare = p.villagers.filter(
           (x) =>
             x.role === null &&
-            ageOf(x, 0) >= FOUNDING.AGE_RANGES.adults[0] &&
-            ageOf(x, 0) <= FOUNDING.AGE_RANGES.adults[1] &&
+            ageOf(x, 0) >= TWENTY.AGE_RANGES.adults[0] &&
+            ageOf(x, 0) <= TWENTY.AGE_RANGES.adults[1] &&
             (role !== 'midwife' || x.female) &&
             ageOf(x, 0) >= minAgeFor(role),
         );
@@ -287,7 +341,7 @@ describe('fundación', () => {
     // con requisito de sexo; lo que se comprueba es que nadie que encajara
     // mejor se quedó fuera.
     for (const seed of [7, 42, 108, 999, 2024]) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       for (const role of FOUNDING_ROLES) {
         const holder = p.villagers.find((x) => x.role === role);
         if (holder === undefined) continue;
@@ -314,9 +368,9 @@ describe('fundación', () => {
     // cargo, y porque de otro modo setenta y dos de los ochenta habitantes del
     // valle son aritmética de población y no personas.
     for (const seed of [7, 42, 108]) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       const anon = p.villagers.filter((v) => !v.named);
-      expect(anon.length).toBe(FOUNDING.POPULATION - FOUNDING_ROLES.length);
+      expect(anon.length).toBe(TWENTY.POPULATION - FOUNDING_ROLES.length);
       for (const v of anon) {
         expect(v.name).toBe('');
         expect(v.role).toBeNull();
@@ -329,7 +383,7 @@ describe('fundación', () => {
   });
 
   it('nadie tiene padres: son los que llegaron', () => {
-    const p = foundPeople(makeBundle(7), 0);
+    const p = foundPeopleTwenty(makeBundle(7), 0);
     for (const v of p.villagers) {
       expect(v.parentIds).toEqual([null, null]);
       expect(v.diedTick).toBeNull();
@@ -339,7 +393,7 @@ describe('fundación', () => {
   });
 
   it('los nombrados se opinan entre sí, neutralmente', () => {
-    const p = foundPeople(makeBundle(7), 0);
+    const p = foundPeopleTwenty(makeBundle(7), 0);
     for (const id of p.namedIds) {
       const v = p.villagers[id];
       expect(Object.keys(v?.opinions ?? {}).map(Number).sort()).toEqual(
@@ -352,14 +406,14 @@ describe('fundación', () => {
   it('nadie nace después del tick de fundación', () => {
     // Invariante de §14.1, comprobada ya en el origen.
     for (const tick of [0, 480, 5000]) {
-      for (const v of foundPeople(makeBundle(7), tick).villagers) {
+      for (const v of foundPeopleTwenty(makeBundle(7), tick).villagers) {
         expect(v.bornTick).toBeLessThanOrEqual(tick);
       }
     }
   });
 
   it('la misma semilla funda la misma aldea', () => {
-    expect(foundPeople(makeBundle(7), 0)).toEqual(foundPeople(makeBundle(7), 0));
+    expect(foundPeopleTwenty(makeBundle(7), 0)).toEqual(foundPeopleTwenty(makeBundle(7), 0));
   });
 });
 
@@ -367,7 +421,7 @@ describe('fundación · variedad', () => {
   it('dos semillas dan repartos claramente distintos', () => {
     // El criterio del brief: al menos 4 de los 6 nombres de rol difieren.
     const roleNames = (seed: number): Map<Role, string> => {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       const m = new Map<Role, string>();
       for (const id of p.namedIds) {
         const v = p.villagers[id];
@@ -396,7 +450,7 @@ describe('fundación · variedad', () => {
     const leaders = new Set<string>();
     const traitSets = new Set<string>();
     for (let seed = 0; seed < 100; seed += 1) {
-      const p = foundPeople(makeBundle(seed), 0);
+      const p = foundPeopleTwenty(makeBundle(seed), 0);
       const leader = p.villagers.find((v) => v.role === 'leader');
       if (leader) {
         leaders.add(leader.name);
@@ -411,7 +465,7 @@ describe('fundación · variedad', () => {
 describe('promoteToNamed', () => {
   const anonAdultId = (s: GameState): number => {
     const v = s.people.villagers.find(
-      (x) => !x.named && ageOf(x, s.tick) >= FOUNDING.AGE_RANGES.adults[0],
+      (x) => !x.named && ageOf(x, s.tick) >= TWENTY.AGE_RANGES.adults[0],
     );
     return v?.id ?? -1;
   };

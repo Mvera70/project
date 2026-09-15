@@ -55,6 +55,9 @@ export const CATTLE_DROVER: CrossroadTemplate = {
       cost: 'crossroad.cattle_drover.sell_him_pigs.cost',
       // The other direction, and the one that makes the herd a thing kept for
       // a reason: pigs are the cheap head, and he pays in bread.
+      // Y sólo se ofrece si hay dos cerdos que vender: a la pareja fundadora,
+      // con tres gallinas, se le ofrecía igual (captura del 15 sep 2026).
+      requires: [{ k: 'herd', kind: 'pigs', op: '>=', v: 2 }],
       effects: [
         { k: 'herd', kind: 'pigs', delta: -2 },
         { k: 'stat', stat: 'grain', delta: 90 },

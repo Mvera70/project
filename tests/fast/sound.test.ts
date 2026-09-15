@@ -7,10 +7,10 @@
 // prueba `noticeworthy` sin arrancar nada, esto prueba `ambientFor`,
 // `accentFor` y `accentAllowed` sin un `AudioContext` de por medio.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { SOUND } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { count, standing } from '@engine/subsistence/building-counts';
 import { seasonOf } from '@engine/time';
@@ -22,7 +22,7 @@ const SEEDS = [7, 42, 108, 999, 2024];
 describe('ambientFor · el viento sigue la estación', () => {
   it('la ganancia del viento es la de SOUND.WIND_BY_SEASON en cada estación', () => {
     for (const seed of SEEDS) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       // Las cuatro estaciones caben en el primer año: 0, 12, 24, 36 semanas.
       for (const week of [0, 12, 24, 36]) {
         state.tick = week;
@@ -36,7 +36,7 @@ describe('ambientFor · el viento sigue la estación', () => {
 describe('ambientFor · el río está, casi siempre', () => {
   it('un valle recién fundado ya tiene agua que sonar', () => {
     for (const seed of SEEDS) {
-      expect(ambientFor(foundGame(seed)).river).toBe(true);
+      expect(ambientFor(foundTwenty(seed)).river).toBe(true);
     }
   });
 });
@@ -46,7 +46,7 @@ describe('ambientFor · el río está, casi siempre', () => {
 // `ambientFor` es de sólo lectura, así que jugarla dos veces no cuenta nada
 // que jugarla una sola no cuente ya, y ochenta años es lo que hace falta para
 // que el motor levante una fragua de verdad (`BUILDING_RULES.SMITHY_PEOPLE`).
-const MATURE_VILLAGE = foundGame(7);
+const MATURE_VILLAGE = foundTwenty(7);
 run(MATURE_VILLAGE, 80 * 48, 'prudent', CATALOG);
 
 describe('ambientFor · la fragua y la campana siguen al edificio, no a un contador', () => {
@@ -134,7 +134,7 @@ describe('el acento, en una partida real: raro, no un teletipo', () => {
     // si esto se disparase en cada tick, «ha pasado algo» dejaría de
     // significar nada (§11.6, y el propio brief de U-09: "raro").
     for (const seed of SEEDS) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       let ticks = 0;
       let lastMilestoneTick = state.tick;
       let accents = 0;

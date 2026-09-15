@@ -80,7 +80,10 @@ describe('los avisos sobre el valle · §11.6', () => {
     // La clave concreta, con la cuenta que la delató. Cuarenta años dan unas
     // cuarenta temporadas —una al año, más o menos—, no quinientas.
     for (const seed of SEEDS) {
-      const spells = noticesOf(seed).filter((e) => e.kind === 'forage');
+      // Sólo las temporadas: los cuervos de §7.7 comparten `kind` con ellas y
+      // pueden caer en la misma semana de cosecha —la semilla 31 lo hizo con la
+      // fundación en pareja—, y esta prueba habla de la temporada de caza.
+      const spells = noticesOf(seed).filter((e) => e.templateKey.startsWith('forage.'));
       expect(spells.length, `semilla ${seed}: ${spells.length} temporadas`)
         .toBeLessThan(YEARS * 2);
       // Y dos temporadas nunca empiezan en semanas seguidas: entre una y la

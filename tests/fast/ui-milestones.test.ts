@@ -9,12 +9,12 @@
 // properties below — `run` and `foundGame` are the expensive part, and
 // `milestonesAt` is read-only, so five games played once cost the same as
 // five games played five times over.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { BANK } from '@engine/chronicle/bank.en';
 import { renderEntry } from '@engine/chronicle/render';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { yearOf } from '@engine/time';
 import type { Policy } from '@engine/sim';
@@ -29,7 +29,7 @@ const SEEDS = [7, 42, 108, 999, 2024];
 
 /** Plays a whole game in fixed-size chunks, collecting every milestone as it goes. */
 function sweep(seed: number, chunkTicks: number, totalTicks: number): { state: GameState; milestones: Milestone[] } {
-  const state = foundGame(seed);
+  const state = foundTwenty(seed);
   const milestones: Milestone[] = [];
   while (state.tick < totalTicks && state.ended === null) {
     const since = state.tick;
@@ -91,7 +91,7 @@ describe('milestonesAt · el mismo hito no se repite, se agrupe como se agrupe',
 
 describe('milestonesAt · función pura', () => {
   it('la misma llamada da lo mismo dos veces, y no toca el estado', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     run(state, 20 * TIME.WEEKS_PER_YEAR, POLICY, CATALOG);
     const sinceTick = 5 * TIME.WEEKS_PER_YEAR;
 
@@ -156,7 +156,7 @@ describe('el año que dice un hito es el año que dice la cabecera', () => {
     // Es exactamente la clase de fallo que hacía que los mensajes se leyeran
     // raros, y la razón de que se pruebe con los dos rendidos a la vez: por
     // separado los dos números están bien.
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     run(state, TIME.WEEKS_PER_YEAR * 3, POLICY, CATALOG);
     const passed = milestonesAt(state, 0);
     const dated = passed.filter((m) => typeof m.params['year'] === 'number');

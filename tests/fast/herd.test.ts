@@ -2,10 +2,10 @@
 //
 // «Comida almacenada que anda, come y puede perderse». Cada prueba de aquí es
 // una de esas tres cosas, y ninguna mira el dibujo.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { ANIMALS, FOOD, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { population } from '@engine/people/demography';
 import { run, tick } from '@engine/sim';
 import { herdCapacity, tendHerd, upkeep } from '@engine/subsistence/herd';
@@ -21,7 +21,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }
@@ -30,7 +30,7 @@ function village(years: number, seed = 7): GameState {
 
 describe('el rebaño come · §7.7', () => {
   it('cada cabeza cuesta grano cada semana', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.herd = { hens: 10, pigs: 4, cows: 2 };
     const expected = 10 * ANIMALS.UPKEEP.hens + 4 * ANIMALS.UPKEEP.pigs + 2 * ANIMALS.UPKEEP.cows;
     expect(upkeep(state)).toBeCloseTo(expected);
@@ -43,7 +43,7 @@ describe('el rebaño come · §7.7', () => {
   });
 
   it('un rebaño no puede comer grano que no hay', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.herd = { hens: 40, pigs: 20, cows: 10 };
     state.village.grain = 1;
     consume(state);
@@ -53,7 +53,7 @@ describe('el rebaño come · §7.7', () => {
 
 describe('el rebaño se come · §7.7', () => {
   it('la aldea sacrifica antes de dejar morir a nadie', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.village.grain = 0;
     state.herd = { hens: 6, pigs: 2, cows: 1 };
     const { starved, herd } = consume(state);
@@ -62,7 +62,7 @@ describe('el rebaño se come · §7.7', () => {
   });
 
   it('empieza por las gallinas y deja la vaca para el final', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.village.grain = 0;
     state.herd = { hens: 3, pigs: 1, cows: 1 };
     consume(state);
@@ -73,7 +73,7 @@ describe('el rebaño se come · §7.7', () => {
   });
 
   it('sin rebaño que sacrificar, el hambre sigue matando', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.village.grain = 0;
     state.herd = { hens: 0, pigs: 0, cows: 0 };
     const { severity } = consume(state);
@@ -81,7 +81,7 @@ describe('el rebaño se come · §7.7', () => {
   });
 
   it('no mata la vaca por una fanega que falta', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     const people = population(state);
     state.herd = { hens: 0, pigs: 0, cows: 4 };
     // Falta poco: una sola vaca cubre de sobra.
@@ -101,7 +101,7 @@ describe('el rebaño crece · §7.7', () => {
   });
 
   it('no cría con el granero vacío', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     state.tick = ANIMALS.BREED_EVERY * 4; // un tick de cría
     state.village.grain = 0;
     const before = { ...state.herd };
@@ -179,8 +179,8 @@ describe('los lobos · §7.7', () => {
   it('las tiradas de lobos no desplazan la demografía (§4.3)', () => {
     // Dos partidas iguales salvo por el flujo `animals`: todo lo demás tiene
     // que seguir siendo idéntico.
-    const a = foundGame(7);
-    const b = foundGame(7);
+    const a = foundTwenty(7);
+    const b = foundTwenty(7);
     b.rng.animals = (b.rng.animals + 12_345) >>> 0;
     for (let n = 0; n < 300; n += 1) { tick(a, CATALOG); tick(b, CATALOG); }
     expect(population(a)).toBe(population(b));

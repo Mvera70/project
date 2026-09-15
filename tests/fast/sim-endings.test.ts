@@ -23,10 +23,10 @@
 // El orden del tick es normativo: cambiarlo cambia el balance y rompe las
 // partidas guardadas. Lo que se protege aquí es ese orden, el determinismo del
 // que cuelga todo el proyecto, y que mil ticks no revienten.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { MIGRATION, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { population, resolveMigration } from '@engine/people/demography';
 import { holderOf } from '@engine/crossroads/conditions';
 import { decide, run, tick } from '@engine/sim';
@@ -57,7 +57,7 @@ describe('la política prudent · §12.9', () => {
     effects, visible: [{ k: 'gather', where: 'square', days: 1 }], seeds,
   });
 
-  const ask = (t: CrossroadTemplate, state = foundGame(7)): string | null => {
+  const ask = (t: CrossroadTemplate, state = foundTwenty(7)): string | null => {
     state.crossroad = {
       templateId: t.id, posedTick: state.tick, cast: {},
       optionIds: t.options.map((o) => o.id),
@@ -102,7 +102,7 @@ describe('la política prudent · §12.9', () => {
     ]);
     expect(ask(t)).toBe('pay');
 
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     s.crossroad = {
       templateId: t.id, posedTick: s.tick, cast: {},
       optionIds: t.options.map((o) => o.id),
@@ -159,10 +159,10 @@ describe('la política prudent · §12.9', () => {
       option('third', [{ k: 'stat', stat: 'grain', mul: 0.66 }]),
       option('flat', [{ k: 'stat', stat: 'grain', delta: -100 }]),
     ]);
-    const poor = foundGame(7);
+    const poor = foundTwenty(7);
     poor.village.grain = 60; // un tercio de 60 son 20: más barato que 100
     expect(ask(t, poor)).toBe('third');
-    const rich = foundGame(7);
+    const rich = foundTwenty(7);
     rich.village.grain = 3000; // un tercio de 3000 son 1020
     expect(ask(t, rich)).toBe('flat');
   });
@@ -177,7 +177,7 @@ describe('la política prudent · §12.9', () => {
   });
 
   it('es determinista y no consume aleatoriedad', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const t = template([
       option('a', [{ k: 'stat', stat: 'grain', delta: -10 }]),
       option('b', [{ k: 'stat', stat: 'morale', delta: -1 }]),
@@ -190,8 +190,8 @@ describe('la política prudent · §12.9', () => {
   });
 
   it('dos partidas con prudent y la misma semilla son idénticas', () => {
-    const a = foundGame(19);
-    const b = foundGame(19);
+    const a = foundTwenty(19);
+    const b = foundTwenty(19);
     run(a, 3000, 'prudent', CATALOG);
     run(b, 3000, 'prudent', CATALOG);
     expect(fingerprint(a)).toBe(fingerprint(b));
@@ -201,9 +201,15 @@ describe('la política prudent · §12.9', () => {
 describe('el abandono · §5.7, v2.16', () => {
   const YEARS = MIGRATION.ABANDON_YEARS;
 
+  // Uno menos de los que hacen falta para que la aldea siga siendo aldea. Con
+  // la fundación en pareja (v3.69) son dos, así que la aldea que se abandona
+  // es la de uno solo: nadie llega a un valle de una persona
+  // (`ARRIVE_MIN_PEOPLE`), y ese es exactamente el caso que §5.7 describe.
+  const BELOW = MIGRATION.VIABLE_POPULATION - 1;
+
   /** Una aldea reducida a `n` vivos, sin tocar nada más. */
   function shrunk(n: number): GameState {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     s.people.villagers.forEach((v, i) => {
       if (i >= n) {
         v.diedTick = 0;
@@ -217,8 +223,8 @@ describe('el abandono · §5.7, v2.16', () => {
     return s;
   }
 
-  it('cinco años seguidos por debajo de seis y se marchan', () => {
-    const s = shrunk(3);
+  it('cinco años seguidos por debajo de la población viable y se marchan', () => {
+    const s = shrunk(BELOW);
     for (let i = 0; i < (YEARS + 2) * YEAR && s.ended === null; i += 1) tick(s, CATALOG);
     expect(s.ended?.cause).toBe('abandoned');
     expect(population(s)).toBe(0);
@@ -229,9 +235,9 @@ describe('el abandono · §5.7, v2.16', () => {
   });
 
   it('ni una semana antes', () => {
-    // El reloj arranca la semana en que se les ve por debajo de seis, así que
+    // El reloj arranca la semana en que se les ve por debajo del mínimo, así que
     // se van cinco años completos después de esa semana y no antes.
-    const s = shrunk(3);
+    const s = shrunk(BELOW);
     for (let i = 0; i < YEARS * YEAR; i += 1) tick(s, CATALOG);
     expect(s.dwindlingSince).not.toBeNull();
     expect(s.tick - (s.dwindlingSince as number)).toBeLessThan(YEARS * YEAR);
@@ -242,10 +248,10 @@ describe('el abandono · §5.7, v2.16', () => {
   });
 
   it('el reloj se pone a cero si la aldea se recupera', () => {
-    const s = shrunk(3);
+    const s = shrunk(BELOW);
     for (let i = 0; i < 3 * YEAR; i += 1) tick(s, CATALOG);
     expect(s.dwindlingSince).not.toBeNull();
-    // Vuelven a ser seis: el contador se reinicia y los cinco años empiezan de
+    // Vuelven a ser viables: el contador se reinicia y los cinco años empiezan de
     // nuevo, que es lo que quiere decir "cinco años seguidos".
     for (const v of s.people.villagers.slice(0, MIGRATION.VIABLE_POPULATION)) {
       v.diedTick = null;
@@ -253,13 +259,13 @@ describe('el abandono · §5.7, v2.16', () => {
     }
     tick(s, CATALOG);
     expect(s.dwindlingSince).toBeNull();
-    for (const v of s.people.villagers.slice(3, MIGRATION.VIABLE_POPULATION)) v.diedTick = 0;
+    for (const v of s.people.villagers.slice(BELOW, MIGRATION.VIABLE_POPULATION)) v.diedTick = 0;
     for (let i = 0; i < 3 * YEAR; i += 1) tick(s, CATALOG);
     expect(s.ended).toBeNull();
   });
 
   it('una aldea viable no se abandona nunca', () => {
-    const s = foundGame(108);
+    const s = foundTwenty(108);
     run(s, 40 * YEAR, 'prudent', CATALOG);
     if (population(s) >= MIGRATION.VIABLE_POPULATION) {
       expect(s.ended).toBeNull();
@@ -268,7 +274,7 @@ describe('el abandono · §5.7, v2.16', () => {
   });
 
   it('deja su línea de peso 3 en la crónica, y no es la de extinción', () => {
-    const s = shrunk(3);
+    const s = shrunk(BELOW);
     for (let i = 0; i < (YEARS + 2) * YEAR && s.ended === null; i += 1) tick(s, CATALOG);
     const entry = s.chronicle.find((e) => e.kind === 'abandonment');
     expect(entry?.weight).toBe(3);
@@ -276,7 +282,7 @@ describe('el abandono · §5.7, v2.16', () => {
   });
 
   it('morir del todo sigue siendo extinción, no abandono', () => {
-    const s = foundGame(3);
+    const s = foundTwenty(3);
     for (const v of s.people.villagers) v.diedTick = 1;
     tick(s, CATALOG);
     expect(s.ended?.cause).toBe('extinction');
@@ -288,7 +294,7 @@ describe('el abandono · §5.7, v2.16', () => {
     // Seed 2 is the one natural terminal case in the v2.18 bank. More seeds
     // here became four full 200-year balance runs after the plague fix, while
     // the 60-seed bank already measures the population-level property.
-    const s = foundGame(2);
+    const s = foundTwenty(2);
     let longest = 0;
     for (let i = 0; i < 200 * YEAR && s.ended === null; i += 1) {
       tick(s, CATALOG);
@@ -304,7 +310,7 @@ describe('el abandono · §5.7, v2.16', () => {
 describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
   /** Un líder muerto, sin nada más tocado: la sucesión queda pendiente de responder. */
   function beheaded(seed: number): GameState {
-    const s = foundGame(seed);
+    const s = foundTwenty(seed);
     const leader = s.people.villagers.find((v) => v.role === 'leader');
     if (leader !== undefined) leader.diedTick = 0;
     return s;
@@ -325,7 +331,7 @@ describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
   });
 
   it('en cambio, con líder, llega gente en esas mismas condiciones', () => {
-    const s = foundGame(7); // líder vivo
+    const s = foundTwenty(7); // líder vivo
     s.village.morale = 80;
     s.village.grain = 100000;
     let arrived = false;
@@ -340,7 +346,7 @@ describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
     // Dos estados que comparten hasta el último bit de aleatoriedad: la única
     // diferencia es si hay líder. Si la marcha se duplica, la cuenta de quienes
     // se van tiene que ser exactamente el doble.
-    const base = foundGame(7);
+    const base = foundTwenty(7);
     base.tick = 0;
     base.village.morale = 5; // la marcha es casi segura
     const withLeader = structuredClone(base);
@@ -394,7 +400,7 @@ describe('quedarse sin líder duele · Anexo A.15, v2.22', () => {
 
   it('no cuenta como racha si nunca se pregunta por sucesión', () => {
     // Un `no_one` en una encrucijada cualquiera no es un `no_one` de A.15.
-    const s = foundGame(7); // líder vivo: succession nunca sale elegible
+    const s = foundTwenty(7); // líder vivo: succession nunca sale elegible
     run(s, 20 * YEAR, 'first', CATALOG);
     expect(s.noOneStreak).toBe(0);
   });

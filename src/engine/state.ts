@@ -192,6 +192,37 @@ export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleare
  * This is the one value in a file that is otherwise types only, and it earns
  * the exception by being the thing that gives those types a meaning on disk.
  */
+/**
+ * Cómo se funda un valle: cuántos vienen, qué traen, qué levantan.
+ *
+ * `FOUNDING` de `balance.ts` es el perfil del juego —una pareja desde el 15 sep
+ * 2026— y `foundGame`/`foundPeople` lo toman por defecto. El tipo existe para
+ * que las pruebas de **mecánica** —repartos, oficios, opiniones, subsistencia—
+ * sigan usando la fundación de veinte con la que se escribieron
+ * (`tests/helpers/founding.ts`): prueban cómo se comporta una aldea, no cómo
+ * nace, y una aldea de dos no tiene herrero ni cura que repartir.
+ */
+export interface FoundingProfile {
+  readonly POPULATION: number;
+  readonly ADULTS: number;
+  readonly CHILDREN: number;
+  readonly ELDERS: number;
+  readonly GRAIN: number;
+  readonly WOOD: number;
+  readonly MORALE: number;
+  readonly FAITH: number;
+  readonly HOUSES: number;
+  readonly FIELDS: number;
+  readonly HERD: Readonly<Record<HerdKind, number>>;
+  readonly AGE_RANGES: {
+    readonly adults: readonly [number, number];
+    readonly children: readonly [number, number];
+    readonly elders: readonly [number, number];
+  };
+  readonly MIN_FERTILE_WOMEN: number;
+  readonly MIN_MEN: number;
+}
+
 export const TERRAIN_CODE = {
   meadow: 0,
   forest: 1,
@@ -385,6 +416,9 @@ export type Condition =
   | { k: 'role'; role: Role; alive: boolean }
   | { k: 'grudge'; min: number } // a grudge of at least N exists
   | { k: 'trait'; role: Role; trait: Trait }
+  // v3.69 · cuántas cabezas hay en el corral. Nació de una captura: el tratante
+  // de §7.8 le ofrecía «vender dos cerdos» a una pareja que tenía tres gallinas.
+  | { k: 'herd'; kind: HerdKind; op: Op; v: number }
   | { k: 'not'; c: Condition }
   | { k: 'any'; cs: Condition[] };
 

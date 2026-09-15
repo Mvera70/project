@@ -3,8 +3,9 @@
 // Lo que hay que proteger son las dos ineficiencias defendidas de §5.2 —el tope
 // de campos trabajados y la reserva de obras—, el orden comer-antes-de-cosechar,
 // los límites de ánimo y fe, y que el suelo de fe sostenga de verdad.
+import { TWENTY, foundPeopleTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { DISASTER, FOOD, FOUNDING, LABOUR, MOOD, TIME, WEATHER, WORLD } from '@engine/balance';
+import { DISASTER, FOOD, LABOUR, MOOD, TIME, WEATHER, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type {
   Building,
@@ -15,7 +16,7 @@ import type {
 } from '@engine/state';
 import { restingIntent } from '@engine/state';
 import { isHere, population, workforce } from '@engine/people/demography';
-import { foundPeople, makeVillager } from '@engine/people/villagers';
+import { makeVillager } from '@engine/people/villagers';
 import { count, has, smithyWorking, standing } from '@engine/subsistence/building-counts';
 import { allocateLabour, produce } from '@engine/subsistence/labour';
 import { consume, overwinter } from '@engine/subsistence/consumption';
@@ -51,11 +52,11 @@ function build(kind: BuildingKind, tier: 0 | 1 = 0): Building {
   };
 }
 
-/** La aldea fundacional: 4 casas, 2 campos, 800 de grano. §12.2. */
+/** La aldea de veinte: 4 casas, 2 campos, 800 de grano. `TWENTY`, §12.2 hasta v3.68. */
 function founded(seed: number, extra: BuildingKind[] = []): GameState {
   nextBuildingId = 0;
   const rng = makeBundle(seed);
-  const people = foundPeople(rng, 0);
+  const people = foundPeopleTwenty(rng, 0);
   return {
     version: 2,
     seed,
@@ -78,15 +79,15 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     intent: restingIntent(),
     traits: [],
     village: {
-      grain: FOUNDING.GRAIN,
-      wood: FOUNDING.WOOD,
-      morale: FOUNDING.MORALE,
-      faith: FOUNDING.FAITH,
+      grain: TWENTY.GRAIN,
+      wood: TWENTY.WOOD,
+      morale: TWENTY.MORALE,
+      faith: TWENTY.FAITH,
     },
     people,
     buildings: [
-      ...Array.from({ length: FOUNDING.HOUSES }, () => build('house')),
-      ...Array.from({ length: FOUNDING.FIELDS }, () => build('field')),
+      ...Array.from({ length: TWENTY.HOUSES }, () => build('house')),
+      ...Array.from({ length: TWENTY.FIELDS }, () => build('field')),
       ...extra.map((k) => build(k)),
     ],
     works: [],
@@ -105,12 +106,12 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
 describe('edificios · un solo origen de verdad', () => {
   it('cuenta sólo los que siguen en pie', () => {
     const s = founded(7);
-    expect(count(s, 'house')).toBe(FOUNDING.HOUSES);
-    expect(count(s, 'field')).toBe(FOUNDING.FIELDS);
+    expect(count(s, 'house')).toBe(TWENTY.HOUSES);
+    expect(count(s, 'field')).toBe(TWENTY.FIELDS);
     expect(has(s, 'mill')).toBe(false);
 
     (s.buildings[0] as Building).lostTick = 5;
-    expect(count(s, 'house')).toBe(FOUNDING.HOUSES - 1);
+    expect(count(s, 'house')).toBe(TWENTY.HOUSES - 1);
     expect(standing(s, 'house').every((b) => b.lostTick === null)).toBe(true);
   });
 
@@ -129,7 +130,7 @@ describe('mano de obra · §5.2', () => {
     // neededFields = ceil(20 · 48 · 1.3 / 600) = ceil(2.08) = 3.
     const s = founded(7, ['field', 'field', 'field', 'field', 'field', 'field']);
     expect(count(s, 'field')).toBe(FOOD.MAX_FIELDS);
-    expect(population(s)).toBe(FOUNDING.POPULATION);
+    expect(population(s)).toBe(TWENTY.POPULATION);
 
     const a = allocateLabour(s);
     expect(a.workedFields).toBe(3);
@@ -156,7 +157,7 @@ describe('mano de obra · §5.2', () => {
     // cambia, que es el pecado capital del juego (§5.2).
     for (let seed = 0; seed < 40; seed += 1) {
       for (const fields of [1, 2, 4, 8]) {
-        const s = founded(seed, Array.from({ length: fields - FOUNDING.FIELDS }, () => 'field' as const));
+        const s = founded(seed, Array.from({ length: fields - TWENTY.FIELDS }, () => 'field' as const));
         const a = allocateLabour(s);
         const spare = a.cutters + a.builders;
         expect(spare, `semilla ${seed}, ${fields} campos`).toBeGreaterThanOrEqual(
@@ -263,7 +264,7 @@ describe('consumo · §5.3', () => {
     const r = consume(s);
     expect(r.severity).toBe(0);
     expect(r.starved).toEqual([]);
-    expect(s.village.grain).toBe(FOUNDING.GRAIN - FOUNDING.POPULATION * FOOD.GRAIN_PER_PERSON);
+    expect(s.village.grain).toBe(TWENTY.GRAIN - TWENTY.POPULATION * FOOD.GRAIN_PER_PERSON);
   });
 
   it('el grano nunca baja de cero y la severidad llega a 1', () => {
@@ -342,7 +343,7 @@ describe('consumo · §5.3', () => {
         v.causeOfDeath = null;
       }
     }
-    const expected = weeks * FOUNDING.POPULATION * FOOD.STARVATION_RATE;
+    const expected = weeks * TWENTY.POPULATION * FOOD.STARVATION_RATE;
     expect(toll).toBeGreaterThan(expected * 0.8);
     expect(toll).toBeLessThan(expected * 1.2);
   });
@@ -388,8 +389,8 @@ describe('invierno · §5.4', () => {
     cold.flags['cold_houses'] = cold.tick + 20 * TIME.WEEKS_PER_YEAR;
     overwinter(plain);
     overwinter(cold);
-    const plainSpent = FOUNDING.WOOD - plain.village.wood;
-    const coldSpent = FOUNDING.WOOD - cold.village.wood;
+    const plainSpent = TWENTY.WOOD - plain.village.wood;
+    const coldSpent = TWENTY.WOOD - cold.village.wood;
     expect(coldSpent).toBeCloseTo(plainSpent * LABOUR.COLD_HOUSES_WOOD_MULTIPLIER, 9);
   });
 
@@ -438,7 +439,7 @@ describe('cosecha y granero · §5.3', () => {
     for (let week = 0; week < TIME.WEEKS_PER_YEAR; week += 1) {
       s.tick = week;
       const a = allocateLabour(s);
-      s.village.morale = FOUNDING.MORALE; // el ánimo lo mueve mood.ts, no este test
+      s.village.morale = TWENTY.MORALE; // el ánimo lo mueve mood.ts, no este test
       consume(s); // paso 7, antes de la cosecha
       overwinter(s);
       const r = harvest(s, a); // paso 9
@@ -780,7 +781,7 @@ describe('desastres · §5.8, §5.9', () => {
       s.tick = TIME.WEEKS_PER_YEAR;
       if (rollPlague(s) !== null) outbreaks += 1;
     }
-    const expected = DISASTER.PLAGUE_BASE + FOUNDING.POPULATION / DISASTER.PLAGUE_PER_PEOPLE;
+    const expected = DISASTER.PLAGUE_BASE + TWENTY.POPULATION / DISASTER.PLAGUE_PER_PEOPLE;
     expect(outbreaks / SEEDS).toBeGreaterThan(expected - 0.01);
     expect(outbreaks / SEEDS).toBeLessThan(expected + 0.01);
   });
@@ -1016,29 +1017,44 @@ describe('tripulación mínima de campo · §5.2, v2.14', () => {
     return s;
   };
 
-  it('dos supervivientes no trabajan ningún campo', () => {
+  // v3.69: **dos manos siempre pueden con un campo.** La regla de v2.14 le
+  // quitaba a dos supervivientes hasta el único campo, porque la reserva de
+  // obra los dejaba en 1,7 brazos y 1,7 no tripula nada; con la fundación en
+  // pareja eso era morir de hambre en el año cuatro. Lo que la regla quería
+  // impedir —dos personas cosechando cuatro campos— sigue impedido.
+  it('dos supervivientes trabajan un campo, y sólo uno', () => {
     const a = allocateLabour(village(2, 4));
-    expect(a.workedFields).toBe(0);
-    expect(a.labourFactor).toBe(0);
+    expect(a.workedFields).toBe(1);
+    expect(a.labourFactor).toBeGreaterThan(0);
   });
 
-  it('y por tanto no cosechan nada', () => {
+  it('y cosechan lo de un campo, no lo de cuatro', () => {
     const s = village(2, 4);
     s.tick = TIME.HARVEST_WEEK;
     const reaped = harvest(s, allocateLabour(s));
     expect(reaped.happened).toBe(true);
-    expect(reaped.yielded).toBe(0);
+    expect(reaped.yielded).toBeGreaterThan(0);
+    expect(reaped.yielded).toBeLessThanOrEqual(FOOD.FIELD_YIELD);
+  });
+
+  it('uno solo no trabaja ninguno', () => {
+    const a = allocateLabour(village(1, 4));
+    expect(a.workedFields).toBe(0);
+    expect(a.labourFactor).toBe(0);
   });
 
   it('una aldea entera sí trabaja sus campos', () => {
     expect(allocateLabour(village(20, 4)).workedFields).toBeGreaterThan(0);
   });
 
-  it('nunca se trabajan más campos de los que hay brazos para tripular', () => {
+  it('nunca se trabajan más campos de los que hay brazos para tripular, salvo el primero', () => {
     for (const adults of [1, 2, 3, 4, 6, 8, 12, 20]) {
       const a = allocateLabour(village(adults, 8));
-      expect(a.workedFields * FOOD.MIN_FIELD_CREW, `${adults} adultos`)
-        .toBeLessThanOrEqual(a.farmers + 1e-9);
+      const crewable = Math.max(
+        a.workforce >= FOOD.MIN_FIELD_CREW ? 1 : 0,
+        Math.floor((a.farmers + 1e-9) / FOOD.MIN_FIELD_CREW),
+      );
+      expect(a.workedFields, `${adults} adultos`).toBeLessThanOrEqual(crewable);
     }
   });
 });

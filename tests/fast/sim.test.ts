@@ -3,10 +3,10 @@
 // El orden del tick es normativo: cambiarlo cambia el balance y rompe las
 // partidas guardadas. Lo que se protege aquí es ese orden, el determinismo del
 // que cuelga todo el proyecto, y que mil ticks no revienten.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it, vi } from 'vitest';
 import { LIFE, PEOPLE, TIME, WORLD } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { isHere, population } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import { holderOf } from '@engine/crossroads/conditions';
@@ -23,7 +23,7 @@ const YEAR = TIME.WEEKS_PER_YEAR;
 
 describe('la fundación', () => {
   it('empieza como manda §12.2', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     expect(s.tick).toBe(0);
     expect(population(s)).toBe(20);
     expect(s.village.grain).toBe(800);
@@ -40,13 +40,13 @@ describe('la fundación', () => {
   });
 
   it('la misma semilla funda la misma aldea', () => {
-    expect(fingerprint(foundGame(7))).toBe(fingerprint(foundGame(7)));
-    expect(fingerprint(foundGame(7))).not.toBe(fingerprint(foundGame(8)));
+    expect(fingerprint(foundTwenty(7))).toBe(fingerprint(foundTwenty(7)));
+    expect(fingerprint(foundTwenty(7))).not.toBe(fingerprint(foundTwenty(8)));
   });
 
   it('el valle tiene bosque y río', () => {
     // The integrated founding uses M-13's real valley.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const forest = [...s.map.terrain].filter((t) => t === 1).length;
     const water = [...s.map.terrain].filter((t) => t === 2).length;
     // Del corazón del valle, que es donde se genera el bosque y lo que la
@@ -86,7 +86,7 @@ describe('el orden del tick · §4.2', () => {
     await watch('@engine/crossroads/seeds', ['fireSeeds']);
     await watch('@engine/crossroads/select', ['selectCrossroad']);
 
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     s.tick = TIME.HARVEST_WEEK - 1; // para que la cosecha caiga dentro
     tick(s, CATALOG);
 
@@ -111,7 +111,7 @@ describe('el orden del tick · §4.2', () => {
     const mod = await import('@engine/subsistence/seasons');
     const spy = vi.spyOn(mod, 'rollWeather');
 
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     for (let i = 0; i < YEAR; i += 1) tick(s, CATALOG);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(s.tick % YEAR).toBe(0);
@@ -120,7 +120,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it('el tick avanza uno y sólo uno', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     for (let i = 1; i <= 50; i += 1) {
       tick(s, CATALOG);
       expect(s.tick).toBe(i);
@@ -130,7 +130,7 @@ describe('el orden del tick · §4.2', () => {
   it('la crónica se vuelca en el paso 16, no antes', () => {
     // El informe del tick trae las entradas de la semana, y son exactamente las
     // que acaban en la crónica.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     for (let i = 0; i < 400; i += 1) {
       const before = s.chronicle.length;
       const report = tick(s, CATALOG);
@@ -143,7 +143,7 @@ describe('el orden del tick · §4.2', () => {
   it('tick no escribe por consola', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     const err = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     for (let i = 0; i < 500; i += 1) tick(s, CATALOG);
     expect(log).not.toHaveBeenCalled();
     expect(err).not.toHaveBeenCalled();
@@ -151,7 +151,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it('una tala decidida modifica el bosque y aparece en el informe semanal', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const forest = CATALOG.find((t) => t.id === 'forest_cut') as CrossroadTemplate;
     const woodward = s.people.villagers.find((v) => v.role === 'woodward') as Villager;
     s.crossroad = {
@@ -188,7 +188,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it('una reunión en el vado señala la orilla transitable más cercana al núcleo (§11.5)', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const forest = CATALOG.find((t) => t.id === 'forest_cut') as CrossroadTemplate;
     const woodward = s.people.villagers.find((v) => v.role === 'woodward') as Villager;
     s.crossroad = {
@@ -228,7 +228,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it('el paso 3 aplica exactamente la decisión pendiente, y no antes (§2.60)', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const template = CATALOG.find((t) => t.id === 'chapel_or_granary') as CrossroadTemplate;
     s.crossroad = {
       templateId: template.id,
@@ -248,7 +248,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it('el TickReport trae coordenadas válidas para el efecto visible decidido', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const template = CATALOG.find((t) => t.id === 'chapel_or_granary') as CrossroadTemplate;
     s.crossroad = {
       templateId: template.id,
@@ -274,7 +274,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it('un efecto sin sitio natural cae en el centro de la aldea, no en un punto cualquiera', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const template = CATALOG.find((t) => t.id === 'winter_grain_debt') as CrossroadTemplate;
     s.crossroad = {
       templateId: template.id,
@@ -298,7 +298,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it("douse con 'who' apaga el edificio de esa persona, no una casa cualquiera (§11.5, v2.62)", () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     // Cuatro casas en pie con inquilinos distintos: sin `who`, `douse kind
     // house` no podría saber cuál — es justo lo que A.7 prometía y no cumplía.
     expect(s.buildings.filter((b) => b.kind === 'house' && b.lostTick === null).length).toBeGreaterThan(1);
@@ -325,7 +325,7 @@ describe('el orden del tick · §4.2', () => {
   });
 
   it("douse con 'who' cae en el centro de la aldea si la persona no tiene casa en pie", () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const a = s.people.villagers.find((v) => v.role === 'leader') as Villager;
     const b = s.people.villagers.find((v) => v.role === 'smith') as Villager;
     b.homeId = null; // homeless: no hay edificio suyo que localizar
@@ -354,7 +354,7 @@ describe('el orden del tick · §4.2', () => {
 
 describe('cobertura de vacantes · §6.2', () => {
   it('un oficio vacante se cubre en la semana 0', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const smith = s.people.villagers.find((v) => v.role === 'smith') as Villager;
     smith.diedTick = 1;
     s.people.namedIds = s.people.namedIds.filter((id) => id !== smith.id);
@@ -369,7 +369,7 @@ describe('cobertura de vacantes · §6.2', () => {
     // §6.2 v2.9: la lectura de "por edad" como "el mayor" envejecía el reparto
     // entero y disparaba la sucesión al doble de su ritmo.
     for (let seed = 0; seed < 30; seed += 1) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       const reeve = s.people.villagers.find((v) => v.role === 'reeve') as Villager;
       reeve.diedTick = 1;
       s.people.namedIds = s.people.namedIds.filter((id) => id !== reeve.id);
@@ -390,7 +390,7 @@ describe('cobertura de vacantes · §6.2', () => {
 
   it('el líder NO se cubre solo: eso es la sucesión', () => {
     // §6.6. Cubrirlo aquí mataría la plantilla que es el latido del bucle largo.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const leader = s.people.villagers.find((v) => v.role === 'leader') as Villager;
     leader.diedTick = 1;
     s.people.namedIds = s.people.namedIds.filter((id) => id !== leader.id);
@@ -401,7 +401,7 @@ describe('cobertura de vacantes · §6.2', () => {
   });
 
   it('sin capilla no hay cura', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const priest = s.people.villagers.find((v) => v.role === 'priest') as Villager;
     priest.diedTick = 1;
     s.people.namedIds = s.people.namedIds.filter((id) => id !== priest.id);
@@ -421,7 +421,7 @@ describe('cobertura de vacantes · §6.2', () => {
 
 describe('políticas · §12.9', () => {
   it('first toma la primera y last la última', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     run(s, 3000, 'first', CATALOG);
     if (s.crossroad !== null) {
       expect(decide(s, CATALOG, 'first')).toBe(s.crossroad.optionIds[0]);
@@ -432,14 +432,14 @@ describe('políticas · §12.9', () => {
   });
 
   it('sin encrucijada pendiente no hay nada que decidir', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     expect(decide(s, CATALOG, 'first')).toBeNull();
   });
 
   it('first es acomodaticia: nunca levanta la empalizada', () => {
     // §12.9 v2.10. Ninguna política es neutra, y ésta es la razón: `bandits`
     // tiene por interruptor una obra que `first` no elige jamás.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     run(s, 100 * YEAR, 'first', CATALOG);
     const walled = s.history.filter((d) => d.optionId === 'wall_the_village_first');
     expect(walled).toHaveLength(0);

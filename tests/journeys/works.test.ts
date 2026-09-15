@@ -11,7 +11,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, WORLD } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog/index';
-import { foundGame } from '@engine/found';
+import { foundTwenty } from '../helpers/founding';
 import { makeVillager } from '@engine/people/villagers';
 import { run, tick } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
@@ -90,19 +90,19 @@ function onForbiddenGround(state: GameState): string | null {
 
 describe('prioridad de construcción · §7.3', () => {
   it('1 · campos, mientras falten para lo que come la aldea', () => {
-    const s = foundGame(7); // 20 personas, 2 campos; neededFields = 3
+    const s = foundTwenty(7); // 20 personas, 2 campos; neededFields = 3
     expect(nextProject(s)).toBe('field');
   });
 
   it('2 · casas, cuando la gente pasa del aforo menos dos', () => {
-    const s = raise(foundGame(7), 'field', 1); // campos cubiertos
+    const s = raise(foundTwenty(7), 'field', 1); // campos cubiertos
     expect(s.people.villagers.filter((v) => v.diedTick === null).length)
       .toBeGreaterThan(LIFE.HOUSE_CAPACITY * 4 - 2);
     expect(nextProject(s)).toBe('house');
   });
 
   it('3 · graneros, sólo con el granero por encima del 80 %', () => {
-    const s = raise(raise(foundGame(7), 'field', 1), 'house', 1);
+    const s = raise(raise(foundTwenty(7), 'field', 1), 'house', 1);
     s.village.grain = 10;
     expect(nextProject(s)).not.toBe('granary');
     s.village.grain = FOOD.BASE_STORAGE * BUILDING_RULES.GRANARY_FULL + 1;
@@ -111,7 +111,7 @@ describe('prioridad de construcción · §7.3', () => {
 
   it('4 · el pozo a los 25, y no a los 24', () => {
     const base = (): GameState => {
-      const s = raise(raise(foundGame(7), 'field', 4), 'house', 4);
+      const s = raise(raise(foundTwenty(7), 'field', 4), 'house', 4);
       s.village.grain = 10;
       return s;
     };
@@ -123,7 +123,7 @@ describe('prioridad de construcción · §7.3', () => {
 
   it('5, 6 y 7 · capilla, fragua y molino, cada uno tras el anterior', () => {
     const base = (people: number): GameState => {
-      const s = populate(raise(raise(foundGame(7), 'field', 6), 'house', 12), people);
+      const s = populate(raise(raise(foundTwenty(7), 'field', 6), 'house', 12), people);
       s.village.grain = 10;
       s.village.faith = 60;
       return raise(s, 'well', 1);
@@ -136,7 +136,7 @@ describe('prioridad de construcción · §7.3', () => {
   });
 
   it('5 · sin fe suficiente no hay capilla', () => {
-    const s = populate(raise(raise(foundGame(7), 'field', 6), 'house', 12), BUILDING_RULES.CHAPEL_PEOPLE);
+    const s = populate(raise(raise(foundTwenty(7), 'field', 6), 'house', 12), BUILDING_RULES.CHAPEL_PEOPLE);
     s.village.grain = 10;
     s.village.faith = BUILDING_RULES.CHAPEL_FAITH - 1;
     raise(s, 'well', 1);
@@ -144,7 +144,7 @@ describe('prioridad de construcción · §7.3', () => {
   });
 
   it('8 · la empalizada quiere fragua y la bandera threatened', () => {
-    const s = populate(raise(raise(foundGame(7), 'field', 8), 'house', 12), 50);
+    const s = populate(raise(raise(foundTwenty(7), 'field', 8), 'house', 12), 50);
     s.village.grain = 10;
     s.village.faith = 60;
     raise(s, 'well', 1); raise(s, 'chapel', 1); raise(s, 'smithy', 1); raise(s, 'mill', 1);
@@ -154,7 +154,7 @@ describe('prioridad de construcción · §7.3', () => {
   });
 
   it('sin madera no se empieza: la obra espera, no se regala', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     s.village.wood = 0;
     // El campo no cuesta madera (§7.2), así que se sigue pudiendo empezar.
     expect(nextProject(s)).toBe('field');
@@ -165,7 +165,7 @@ describe('prioridad de construcción · §7.3', () => {
   });
 
   it('vuelve a buscar cuando se abre una puerta después de no hallar proyecto', () => {
-    const s = raise(foundGame(7), 'field', 1);
+    const s = raise(foundTwenty(7), 'field', 1);
     s.village.wood = 0;
     advanceWorks(s, 0);
     expect(s.works).toHaveLength(0);
@@ -201,7 +201,7 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
   }
 
   it('cuando no queda sitio devuelve mejoras y no edificios nuevos', () => {
-    const s = raise(foundGame(7), 'smithy', 1);
+    const s = raise(foundTwenty(7), 'smithy', 1);
     fillTheValley(s);
     expect(nextProject(s)).toBeNull();
     s.flags['stone_house_unlocked'] = 0;
@@ -212,14 +212,14 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
   });
 
   it('sin fragua no hay piedra, y entonces no hay nada que hacer', () => {
-    const s = fillTheValley(foundGame(7));
+    const s = fillTheValley(foundTwenty(7));
     expect(nextProject(s)).toBeNull();
   });
 
   it('las casas van antes que la empalizada y la empalizada antes que la capilla', () => {
     // El orden lo fija nextUpgrade, y se comprueba sobre él: llenar el valle
     // además de esto sólo añade una segunda causa a cada fallo.
-    const s = raise(raise(foundGame(7), 'palisade', 2), 'chapel', 1);
+    const s = raise(raise(foundTwenty(7), 'palisade', 2), 'chapel', 1);
     s.flags['stone_house_unlocked'] = 0;
     s.flags['wall_unlocked'] = 0;
     expect(nextUpgrade(s)?.kind).toBe('stone_house');
@@ -232,7 +232,7 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
   it('la iglesia crece sobre la capilla desde cualquiera de sus cuatro esquinas', () => {
     // 3×3 sobre 2×2: si sólo se probara la esquina superior izquierda, una
     // capilla con un vecino al sur o al este no podría llegar nunca a iglesia.
-    const s = raise(foundGame(7), 'chapel', 1);
+    const s = raise(foundTwenty(7), 'chapel', 1);
     const chapel = live(s).find((b) => b.kind === 'chapel')!;
     s.buildings.push({
       id: 900, kind: 'palisade', x: chapel.x + 2, y: chapel.y + 2, w: 1, h: 1,
@@ -258,7 +258,7 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
   });
 
   it('una mejora sustituye a su origen sin dejar ruina ni gente en la calle', () => {
-    const s = raise(foundGame(7), 'smithy', 1);
+    const s = raise(foundTwenty(7), 'smithy', 1);
     fillTheValley(s);
     s.flags['stone_house_unlocked'] = 0;
     const source = live(s).find((b) => b.kind === 'house')!;
@@ -279,14 +279,14 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
 describe('colocación · §7.4', () => {
   it('nunca sobre agua ni marisma, en 20 semillas', () => {
     for (const seed of Array.from({ length: 20 }, (_, i) => i)) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       expect(onForbiddenGround(s), `semilla ${seed}`).toBeNull();
       expect(overlapping(s), `semilla ${seed}`).toBeNull();
     }
   });
 
   it('no se puede edificar sobre una ruina de piedra, sí sobre una de madera', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const house = live(s).find((b) => b.kind === 'house')!;
     destroyBuilding(s, house.id);
     expect(canPlace(s, 'house', house.x, house.y)).toBe(true);
@@ -297,7 +297,7 @@ describe('colocación · §7.4', () => {
   });
 
   it('destruir deja lostTick y marca las celdas en map.ruins', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const doomed = live(s).find((b) => b.kind === 'house')!;
     const tenants = s.people.villagers.filter((v) => v.homeId === doomed.id).length;
     expect(tenants).toBeGreaterThan(0);
@@ -312,7 +312,7 @@ describe('colocación · §7.4', () => {
   });
 
   it('una obra reserva su parcela: nada se coloca encima mientras dura', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     advanceWorks(s, 0);
     const work = s.works[0];
     expect(work).toBeDefined();
@@ -322,7 +322,7 @@ describe('colocación · §7.4', () => {
 
 describe('topes de §7.2', () => {
   it('requestBuild respeta el tope y devuelve null cuando está lleno', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     expect(requestBuild(s, 'grave_yard')).not.toBeNull();
     advanceWorks(s, bpCostOf('grave_yard', true));
     expect(live(s).some((b) => b.kind === 'grave_yard')).toBe(true);
@@ -347,7 +347,7 @@ describe('las obras dentro del tick · §4.2 paso 6', () => {
   const played = new Map<number, Played>();
   beforeAll(() => {
     for (const seed of SEEDS) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       const atFounding = live(s).length;
       run(s, 150 * YEAR, 'first', CATALOG);
       const families = new Map<BuildingKind, number>();
@@ -388,7 +388,7 @@ describe('las obras dentro del tick · §4.2 paso 6', () => {
   });
 
   it('lo que una encrucijada regala hay que levantarlo, y la crónica lo cuenta al acabar', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     requestBuild(s, 'watchtower');
     expect(live(s).some((b) => b.kind === 'watchtower')).toBe(false);
     const before = s.chronicle.length;
@@ -403,7 +403,7 @@ describe('las obras dentro del tick · §4.2 paso 6', () => {
   });
 
   it('los puntos sobrantes de una obra terminada pasan a la siguiente de la cola', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     requestBuild(s, 'grave_yard');
     requestBuild(s, 'watchtower');
     expect(s.works).toHaveLength(2);
@@ -416,7 +416,7 @@ describe('las obras dentro del tick · §4.2 paso 6', () => {
 
 describe('el suelo quemado · §7.4, v2.25', () => {
   it('una ruina con plazo no se puede reconstruir mientras dure', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const house = live(s).find((b) => b.kind === 'house')!;
     destroyBuilding(s, house.id, 20);
     expect(canPlace(s, 'house', house.x, house.y)).toBe(false);
@@ -426,7 +426,7 @@ describe('el suelo quemado · §7.4, v2.25', () => {
   });
 
   it('cuando vence, el suelo vuelve a ser suelo', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const house = live(s).find((b) => b.kind === 'house')!;
     destroyBuilding(s, house.id, 20);
     s.tick = 20 * YEAR + 1;
@@ -434,14 +434,14 @@ describe('el suelo quemado · §7.4, v2.25', () => {
   });
 
   it('sin plazo, una ruina de madera se edifica encima como siempre', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const house = live(s).find((b) => b.kind === 'house')!;
     destroyBuilding(s, house.id);
     expect(canPlace(s, 'house', house.x, house.y)).toBe(true);
   });
 
   it('la aldea no coloca nada sobre suelo con plazo, ni al buscar sitio', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     for (const b of live(s).filter((x) => x.kind === 'house')) destroyBuilding(s, b.id, 20);
     const burnt = s.buildings.filter((b) => b.blockedUntil !== null);
     expect(burnt.length).toBeGreaterThan(0);

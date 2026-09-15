@@ -49,29 +49,41 @@ export const TIME = {
 // ---------------------------------------------------------------------------
 
 export const FOUNDING = {
-  POPULATION: 20, // 6 named + 14 anonymous
-  ADULTS: 13,
-  CHILDREN: 5,
-  ELDERS: 2,
-  GRAIN: 800, // exactly BASE_STORAGE: the village must not be born spoiling
-  WOOD: 200,
+  // **Una pareja, desde el 15 sep 2026.** Lo decidió el dueño del diseño: «la
+  // aldea debe comenzar con una sola pareja, un hombre y una mujer». Hasta
+  // aquí eran veinte —seis con nombre y catorce sin él— y todo el primer
+  // decenio del motor estaba calibrado para veinte: cuatro casas, dos campos,
+  // encrucijadas que piden diez habitantes. Con dos, **la aldea crece con los
+  // que llegan**: ver `MIGRATION.ARRIVE_SMALL_BELOW`. Los números de §12.2 que
+  // dependían de veinte se han recontado para dos, y cada uno dice cómo.
+  POPULATION: 2,
+  ADULTS: 2,
+  CHILDREN: 0,
+  ELDERS: 0,
+  // Un año de comida para dos (2 × 48 = 96) y la mitad de otro de margen: la
+  // primera cosecha llega en la semana 35 y un campo de dos manos da 600.
+  // Antes eran 800 —exactamente `BASE_STORAGE`, para no nacer pudriéndose—; con
+  // dos personas 800 serían ocho años de despensa y ninguna razón para sembrar.
+  GRAIN: 150,
+  // Leña para el primer invierno de dos (0,4 × 2 × 12 = 10) y una casa más (60)
+  // para cuando lleguen los primeros, que no tienen dónde dormir.
+  WOOD: 100,
   MORALE: 55,
   FAITH: 50,
-  HOUSES: 4,
-  FIELDS: 2,
-  // TUNE: §12.2 said nothing about animals. They arrive with what a party of
-  // twenty could drive: hens, and one milk cow — exactly the cow that two
-  // fields can pasture (§7.7), so the founding herd is already at its ceiling
-  // and the first growth has to wait for the third field.
-  HERD: { hens: 4, pigs: 0, cows: 1 },
-  // TUNE: §12.2 gives the head count of each age group but not the ages
-  // themselves, and M-03 has to draw them. Inclusive ranges, in years.
-  AGE_RANGES: { adults: [16, 45], children: [1, 13], elders: [60, 70] },
+  HOUSES: 1,
+  FIELDS: 1,
+  // TUNE: §12.2 said nothing about animals. Lo que dos pueden traer consigo:
+  // unas gallinas. La vaca la traerá quien venga.
+  HERD: { hens: 3, pigs: 0, cows: 0 },
+  // TUNE: una pareja joven. Inclusive, en años.
+  AGE_RANGES: { adults: [18, 30], children: [1, 13], elders: [60, 70] },
   // TUNE: a founding that cannot reproduce is not interesting variance, it is
   // a game dead on arrival — and it is the first thing the player sees. The
   // draw is corrected upwards until this many adult women fall inside
-  // LIFE.FERTILE.
-  MIN_FERTILE_WOMEN: 4,
+  // LIFE.FERTILE **y hay al menos `MIN_MEN` hombres**: con dos personas, «dos
+  // mujeres» salía una de cada cuatro veces.
+  MIN_FERTILE_WOMEN: 1,
+  MIN_MEN: 1,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -174,7 +186,23 @@ export const LIFE = {
 
 export const MIGRATION = {
   ARRIVE_CHANCE: 0.3,
-  ARRIVE_MIN_PEOPLE: 8,
+  // Dos desde la fundación en pareja: si hicieran falta ocho para que llegara
+  // alguien, nadie llegaría nunca.
+  ARRIVE_MIN_PEOPLE: 2,
+  // TUNE: mientras la aldea es más pequeña que los veinte con los que se fundaba
+  // antes, llega gente con esta probabilidad al año en vez de con
+  // `ARRIVE_CHANCE`. Un valle con sitio, agua y un techo atrae; es lo que
+  // convierte una pareja en aldea en la primera década y no en la tercera.
+  // Medido con `tools/founding-report.ts` antes de fijarlo.
+  ARRIVE_SMALL_BELOW: 20,
+  ARRIVE_CHANCE_SMALL: 0.7,
+  // TUNE: y el ánimo que se le pide a una aldea pequeña para que llegue gente.
+  // Con el umbral normal (50) y el ánimo derivando hacia 50, la puerta era una
+  // moneda al aire: medido, la semilla 23 se quedó cinco años en dos personas
+  // con el ánimo en 49. Quien viene a un valle con tierra libre no le pregunta
+  // a la pareja qué tal está; lo que sí le cierra el paso es el hambre y la
+  // hostilidad, que siguen mandando.
+  ARRIVE_MIN_MORALE_SMALL: 35,
   ARRIVE_MIN_MORALE: 50,
   ARRIVE_MIN_GRAIN_YEARS: 0.5,
   ARRIVE_MIN_FREE_BEDS: 2,
@@ -192,7 +220,9 @@ export const MIGRATION = {
   // village any more, and the people left in it walk out. MIN_FIELD_CREW does
   // not reach this case: two adults still crew one field, so the harvest keeps
   // coming and the hamlet neither dies nor recovers.
-  VIABLE_POPULATION: 6,
+  // Dos, y no seis: una pareja no es una aldea que se apaga, es una que empieza.
+  // Por debajo de dos —una persona sola— sí cuenta como apagarse (§5.7).
+  VIABLE_POPULATION: 2,
   ABANDON_YEARS: 5,
   // Annex A.15, v2.22 · Refusing a leader stops being free. Measured, `last`
   // and `worst` spent 93 % of every decision on `succession:no_one` and paid

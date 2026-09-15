@@ -3,11 +3,11 @@
 // Las propiedades son las del diseño: el bosque retrocede desde la aldea y
 // rebrota por detrás, el suelo se desgasta donde se pisa y se borra donde no.
 // Cómo esté escrito el A* da igual mientras sea determinista.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 
 import { PATHING, TIME, WORLD } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
 import type { GameState } from '@engine/state';
@@ -26,14 +26,14 @@ const YEAR = TIME.WEEKS_PER_YEAR;
 
 /** Una partida sin nadie que ande: `accrueTraffic` solo decae. */
 function empty(seed = 7): GameState {
-  const s = foundGame(seed);
+  const s = foundTwenty(seed);
   for (const v of s.people.villagers) v.diedTick = 0;
   return s;
 }
 
 describe('el coste del suelo · §7.6', () => {
   it('el agua y la marisma no se pisan', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const water = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.water);
     expect(stepCost(s.map, water)).toBeNull();
     const marsh = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.marsh);
@@ -41,7 +41,7 @@ describe('el coste del suelo · §7.6', () => {
   });
 
   it('el bosque y la roca son más caros que la pradera, y el camino más barato', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const meadow = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.meadow);
     const forest = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.forest);
     expect(stepCost(s.map, forest)).toBeGreaterThan(stepCost(s.map, meadow) as number);
@@ -54,7 +54,7 @@ describe('el coste del suelo · §7.6', () => {
   });
 
   it('ningún paso cuesta menos que la cota que usa la heurística', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     for (let level = 0; level <= 3; level += 1) {
       for (let i = 0; i < s.map.terrain.length; i += 1) s.map.path[i] = level;
       for (let i = 0; i < s.map.terrain.length; i += 1) {
@@ -67,7 +67,7 @@ describe('el coste del suelo · §7.6', () => {
 
 describe('el trayecto · §7.6', () => {
   it('es contiguo, empieza donde se pide y acaba donde se pide', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const houses = s.buildings.filter((b) => b.kind === 'house');
     const from = idx(houses[0]!.x, houses[0]!.y);
     const to = idx(houses[houses.length - 1]!.x, houses[houses.length - 1]!.y);
@@ -84,7 +84,7 @@ describe('el trayecto · §7.6', () => {
   });
 
   it('es determinista y no toca el estado', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const houses = s.buildings.filter((b) => b.kind === 'house');
     const from = idx(houses[0]!.x, houses[0]!.y);
     const to = idx(houses[2]!.x, houses[2]!.y);
@@ -94,7 +94,7 @@ describe('el trayecto · §7.6', () => {
   });
 
   it('devuelve vacío si no hay manera de llegar', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const houses = s.buildings.filter((b) => b.kind === 'house');
     const from = idx(houses[0]!.x, houses[0]!.y);
     // Un destino rodeado de agua no es un destino.
@@ -112,7 +112,7 @@ describe('el trayecto · §7.6', () => {
     // sur. Cruzar el muro son doce de coste extra por celda; rodear son muchas
     // más celdas pero a tres. Lo que se comprueba es que gana la calzada, que es
     // lo que hace que los caminos se refuercen solos.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     s.map.terrain.fill(TERRAIN_CODE.meadow);
     s.map.path.fill(0);
     const wall = 10;
@@ -210,7 +210,7 @@ describe('el desgaste del suelo · §7.6', () => {
   });
 
   it('en una partida real la gente acaba abriendo camino', () => {
-    const s = foundGame(108);
+    const s = foundTwenty(108);
     run(s, 60 * YEAR, 'prudent', CATALOG);
     const trodden = [...s.map.path].filter((p) => p > 0).length;
     expect(trodden).toBeGreaterThan(0);
@@ -231,7 +231,7 @@ describe('el desgaste del suelo · §7.6', () => {
     // roja sin que nada de lo que prueba se hubiera roto.
     let checked = 0;
     for (const seed of [108, 7, 11, 23, 41]) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       const houses = s.buildings.filter((building) => building.kind === 'house');
       if (houses.length < 2) continue;
       const walkers = s.people.villagers
@@ -256,7 +256,7 @@ describe('el desgaste del suelo · §7.6', () => {
 
 describe('el bosque · §7.5', () => {
   it('se tala la celda más cercana al núcleo', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const centre = {
       x: s.buildings.reduce((n, b) => n + b.x + b.w / 2, 0) / s.buildings.length,
       y: s.buildings.reduce((n, b) => n + b.y + b.h / 2, 0) / s.buildings.length,
@@ -280,7 +280,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('al vaciarse una celda pasa a cleared y empieza a contar', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const before = forestCells(s);
     // Vaciar **una** celda es quitarle lo que tenga, que depende del valle (E5).
     const first = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.forest);
@@ -292,7 +292,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('devuelve menos de lo pedido cuando el valle se acaba', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const all = woodStanding(s);
     expect(fellForest(s, all + 5000)).toBe(all);
     expect(woodStanding(s)).toBe(0);
@@ -302,7 +302,7 @@ describe('el bosque · §7.5', () => {
 
   it('nunca baja de cero ni sube del total inicial, en un siglo', () => {
     for (const seed of [0, 7, 42]) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       const initialCells = forestCells(s);
       const initialWood = woodStanding(s);
       for (let year = 0; year < 100; year += 1) {
@@ -317,7 +317,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('el rebrote necesita tres vecinas de bosque y ocho años', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     // Una celda despejada rodeada de bosque por tres lados.
     const cell = idx(4, 4);
     for (const n of [idx(3, 4), idx(5, 4), idx(4, 3)]) s.map.terrain[n] = TERRAIN_CODE.forest;
@@ -338,7 +338,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('una tala marcada de por vida no rebrota', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     // Lo que tenga la celda, no la constante: este valle puede ser de bosque
     // viejo y guardar más por celda (E5). Sin vaciarla del todo no se marca.
     const first = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.forest);
@@ -356,7 +356,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('con menos de tres vecinas no rebrota nunca', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const cell = idx(4, 4);
     for (const n of [idx(3, 4), idx(5, 4)]) s.map.terrain[n] = TERRAIN_CODE.forest;
     for (const n of [idx(4, 3), idx(4, 5)]) s.map.terrain[n] = TERRAIN_CODE.meadow;
@@ -369,7 +369,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('no rebrota debajo de un edificio', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const cell = idx(4, 4);
     for (const n of [idx(3, 4), idx(5, 4), idx(4, 3)]) s.map.terrain[n] = TERRAIN_CODE.forest;
     s.map.terrain[cell] = TERRAIN_CODE.cleared;
@@ -385,7 +385,7 @@ describe('el bosque · §7.5', () => {
   });
 
   it('el rebrote solo ocurre en la semana 0 del año', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const cell = idx(4, 4);
     for (const n of [idx(3, 4), idx(5, 4), idx(4, 3)]) s.map.terrain[n] = TERRAIN_CODE.forest;
     s.map.terrain[cell] = TERRAIN_CODE.cleared;
@@ -398,7 +398,7 @@ describe('el bosque · §7.5', () => {
   it('la madera de la aldea no puede pasar de lo que hay en pie', () => {
     // §5.2: `woodCap`. Un valle talado deja de dar madera en vez de darla de la
     // nada, que es lo que pasaba mientras el paso 5 no preguntaba al bosque.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     fellForest(s, woodStanding(s)); // valle raso
     const before = s.village.wood;
     run(s, 20, 'prudent', CATALOG);
@@ -408,7 +408,7 @@ describe('el bosque · §7.5', () => {
 
 describe('el bosque viejo · §9, v2.16', () => {
   it('nace todo marcado y la marca no vuelve', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     expect(virginForestCells(s)).toBe(forestCells(s));
     // Talarlo entero y dejar que rebrote no devuelve la marca: lo que crece no
     // es el bosque que encontraron.
@@ -417,13 +417,13 @@ describe('el bosque viejo · §9, v2.16', () => {
   });
 
   it('la última celda del bosque viejo deja línea de peso 2, una sola vez', () => {
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const before = s.chronicle.length;
     // Talar a mano hasta el final y luego dejar correr una semana del motor.
     fellForest(s, woodStanding(s));
     expect(s.flags['old_forest_gone']).toBe(0);
 
-    const t = foundGame(42);
+    const t = foundTwenty(42);
     const last = [...t.map.terrain].findIndex((terrain) => terrain === TERRAIN_CODE.forest);
     for (let cell = 0; cell < t.map.terrain.length; cell += 1) {
       if (t.map.terrain[cell] !== TERRAIN_CODE.forest) continue;
@@ -446,7 +446,7 @@ describe('el bosque viejo · §9, v2.16', () => {
     // El contador satura por debajo de la marca de bosque viejo en vez de
     // pararse: si se parase, una celda que esperó doscientos cincuenta y cinco
     // años a tener tres vecinas ya no rebrotaría nunca.
-    const s = foundGame(7);
+    const s = foundTwenty(7);
     const cell = idx(4, 4);
     s.map.terrain[cell] = TERRAIN_CODE.cleared;
     for (const n of [idx(3, 4), idx(5, 4), idx(4, 3)]) s.map.terrain[n] = TERRAIN_CODE.meadow;
