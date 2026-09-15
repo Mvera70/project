@@ -4,7 +4,7 @@
 // to somebody else; what lives here is the sequence, and the sequence is
 // normative — changing it changes the balance and breaks saved games.
 
-import { CROWS, LABOUR, MIGRATION, PEOPLE, TIME } from './balance';
+import { CROWS, FORAGE, LABOUR, MIGRATION, PEOPLE, TIME } from './balance';
 import {
   isHere,
   population,
@@ -774,11 +774,31 @@ export function tick(
   // reaping, where it can be compared with what came in.
   crowsPeck(state, allocation);
   const foraged = forage(state, allocation, ratioOf(state, 'forestLeft'));
+  // **Una temporada de caza se cuenta una vez, no cada semana.**
+  //
+  // Es la misma regla que las líneas de arriba aplican a los cuervos —«seis
+  // líneas sobre cuervos en seis semanas ahogarían la crónica»— y que aquí no
+  // se había aplicado. Medido con `tools/notice-report.ts` sobre cinco semillas
+  // y cuarenta años: **2 831 de los 3 309 avisos que el jugador ve sobre el
+  // valle eran éste**, el 86 %, quinientos sesenta y seis por partida. El valle
+  // decía la misma frase catorce veces al año durante cuarenta años, y ésa es
+  // la mitad de «los mensajes rápidos son horrorosos»: no la frase, la repetición.
+  //
+  // Cazar y pescar es un **estado** —el granero está bajo y hay gente en el
+  // monte—, y §11.6 dice que los estados van a la tira de §11.1 y los sucesos
+  // al aviso. El suceso es que la temporada **empieza**.
+  //
+  // La memoria es una bandera con las semanas de gracia justas para que una
+  // semana suelta sin cazar no cierre la temporada y abra otra la siguiente.
+  const spell = state.flags['foraging'];
   if (foraged.hunted + foraged.fished > 0) {
     // Weight 2: a village that has taken to the woods is the visible face of a
-    // bad year, and §11.6 should put it over the valley.
+    // bad year, and §11.6 should put it over the valley. Sólo al empezar.
     const both = foraged.hunted > 0 && foraged.fished > 0;
-    say({
+    const fresh = spell === undefined || spell <= state.tick;
+    state.flags['foraging'] = state.tick + FORAGE.SPELL_GRACE;
+    if (fresh) {
+      say({
       kind: 'forage',
       templateKey: both ? 'forage.both' : (foraged.hunted > 0 ? 'forage.hunt' : 'forage.fish'),
       params: {
@@ -793,6 +813,18 @@ export function tick(
         count: Math.max(1, Math.round(allocation.hunters + allocation.fishers)),
       },
       weight: 2,
+      });
+    }
+  } else if (spell === state.tick) {
+    // Y que la temporada se acabe también es un hecho, aunque sea de los
+    // tranquilos: peso 1, que es la crónica y no la pantalla. El tick exacto en
+    // el que caduca la bandera es el único en el que esto se dice, así que no
+    // hace falta borrarla ni guardar nada más.
+    say({
+      kind: 'forage',
+      templateKey: 'forage.ends',
+      params: { year: year(), season: season() },
+      weight: 1,
     });
   }
   // §9, v2.16: the one thing about the forest that is an event and not a state.

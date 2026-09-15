@@ -1437,20 +1437,42 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'Birds went through the ripe grain of year {year} and there was no one to move them on.',
     'They watched the crows take the year, and had nobody to spare for it.',
   ],
+  //
+  // **Cinco variantes cada una, y con causa.** Desde que la temporada se cuenta
+  // una vez y no cada semana, éstas son lo primero que el valle dice de un año
+  // malo, y el jugador las lee unas cuarenta veces en cuarenta años. Las tres
+  // primeras de cada grupo son las de siempre; las dos nuevas dicen **por qué**
+  // se va la gente al monte, que es lo que convierte un comentario en una
+  // noticia: el granero no llega a la siega.
   'forage.hunt': [
     '{count} of them went to the woods that {season}, and not for timber.',
     'They hunted the woods in year {year}. The fields would not be enough.',
     'The granary was low, so {count} took to the trees.',
+    '{count} went up into the trees, with the store this far from the reaping.',
+    'Short of bread in {season}, the valley sent {count} after meat.',
   ],
   'forage.fish': [
     'They fished the river that {season}.',
     '{count} of them worked the river in year {year}, for want of bread.',
     'The river fed them that {season}. It had not been asked before.',
+    'With the granary this low, {count} of them took to the water.',
+    'The fields came up short, so the river was asked instead.',
+  ],
+  // Y que la temporada se acabe. Peso 1: es la crónica, no la pantalla —el
+  // aviso de §11.6 sólo saca lo de peso 2 o más, y «se volvió a comer del
+  // campo» no es una noticia, es el final de una.
+  'forage.ends': [
+    'By {season} the fields were enough again.',
+    'They came back from the woods that {season}.',
+    'The hunting stopped in the {season} of year {year}. There was bread.',
+    'Nobody went to the trees after that {season}.',
   ],
   'forage.both': [
     'The woods and the river both, that {season}. It was that kind of year.',
     '{count} of them left the fields for the trees and the water.',
     'They took what the valley would give in year {year}, and it was not grain.',
+    'Bread ran short in {season}, and {count} went after whatever else there was.',
+    'The granary would not last the year. They hunted and they fished.',
   ],
 
   // --- M-23 · welcome digest, design.md §9.2, §13.2 ---

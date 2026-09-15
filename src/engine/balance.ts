@@ -450,6 +450,12 @@ export const FORAGE = {
   // valley opens at a hunting factor of about 1 and falls to about two thirds
   // by the second century, which is the decline this is meant to express.
   FULL_FOREST: 0.25,
+  // TUNE: cuántas semanas de gracia tiene una temporada de caza antes de
+  // considerarse acabada (§9.2, §11.6). Dos: una semana suelta en la que no
+  // sale nadie no cierra la temporada, así que el valle no anuncia una
+  // temporada nueva cada quince días. Con una, el aviso volvía a salir en
+  // cuanto el reparto de manos caía a cero una semana.
+  SPELL_GRACE: 2,
 } as const;
 
 /**
