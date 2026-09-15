@@ -148,14 +148,44 @@ es terreno ahora (`TERRAIN_CODE.ford`). Después: 20 rutas en esa misma semilla,
 el reparto de destinos de 6,00 a 8,17, y dos travesías que estaban declaradas
 en rojo se pusieron verdes solas.
 
-### Lo que esta ronda midió y no arregló
+### Una conclusión falsa, y cómo se destapó
 
-- **Una aldea madura no tiene nada que construir.** En los años 20 a 40 empieza
-  **de 0,3 a 0,5 obras al año**: ya llegó a `MAX_HOUSES`, a `MAX_FIELDS` y a un
-  oficio de cada clase. Por eso la palanca «qué se levanta antes» se queda sin
-  nada que ordenar y por eso el valle no tiene nada que contar: **1,04 sucesos
-  notables por sesión de cinco minutos**, justo en el suelo de §16.3. Es la
-  deuda de diseño más gorda que queda y pide una decisión, no un ajuste.
+Merece su propio apartado porque estuvo a punto de costar una decisión de
+diseño. A media sesión medí que **una aldea madura no tenía nada que
+construir** —de 0,3 a 0,5 obras al año, la piedra nunca desbloqueada— y que el
+valle no tenía nada que contar —1,04 sucesos por sesión de cinco minutos, justo
+en el suelo de §16.3—. Escribí las dos cosas en tres documentos y estuve a un
+paso de relajar las condiciones de A.16 para arreglarlo.
+
+**Las dos medidas estaban rotas por el mismo error**: el informe de obras y la
+prueba de densidad avanzaban el mundo con `tick` en vez de con `run`, así que
+nadie contestaba las encrucijadas. Y §8.6 no plantea dos a la vez: la primera se
+queda pendiente para siempre y con ella se van todas las demás, sus
+consecuencias, sus semillas y las obras que conceden. Estaba midiendo **una
+partida que nadie juega**.
+
+Jugada de verdad, con la política prudente:
+
+| | Roto | Medido de verdad |
+|---|---|---|
+| Obras en sesenta años (semillas 7, 11, 41) | 10 a 20 | **67 a 99** |
+| La piedra se desbloquea | nunca | **años 42, 42 y 45** |
+| Sucesos notables por sesión de cinco minutos | 1,04 | **1,45** |
+
+A.16 se queda **exactamente como estaba**, y el comentario de
+`crossroads/catalog/succession.ts` cuenta por qué para que nadie lo vuelva a
+relajar con el informe roto en la mano.
+
+### Lo que esta ronda midió y dejó abierto, de verdad
+
+- **La última década está vacía.** Con todo levantado —los dieciséis a piedra y
+  la empalizada— el 100 % de las semanas del año 50 al 60 no tienen nada que
+  querer construir. Antes de eso la cola está vacía entre el 54 % y el 93 % de
+  las semanas según la década, que es lo propio de una aldea que abre una obra
+  cada vez (§7.3), no un defecto.
+- **La regla que esto dejó escrita:** un informe que avanza el mundo sin
+  contestar las encrucijadas no mide este juego. Si una medida nueva usa `tick`
+  en un bucle, está midiendo otra cosa.
 - **La semilla 3 no juega a la pelota ni una vez en diez jornadas.** Caso
   extremo de la causa ya declarada en `life-props.test.ts`: nadie gana el
   concurso de utilidad de la primera recogida del día.

@@ -109,11 +109,16 @@ function sayWhat(state: GameState): Doing | null {
   }
 
   // 4 · **Y que no haya nada que levantar se dice.** No es un hueco que tapar:
-  // es el estado en el que una aldea de este juego pasa la mayor parte de su
-  // vida —medido con `tools/works-report.ts`: entre el 76 % y el 100 % de las
-  // semanas, según la década—, y el jugador tiene derecho a saber que su
-  // tercera palanca no tiene nada que ordenar. Esconderlo era la mitad de «las
-  // decisiones se sienten vacías».
+  // es un estado en el que la aldea pasa buena parte de su vida —medido con
+  // `tools/works-report.ts` sobre las semillas 7, 11 y 41: entre el 54 % y el
+  // 100 % de las semanas según la década, y el 100 % en la última—, y el
+  // jugador tiene derecho a saber que su tercera palanca no tiene ahora nada
+  // que ordenar. Esconderlo sería la mitad de «las decisiones se sienten
+  // vacías»; decirlo es la mitad de «hay una respuesta clara».
+  //
+  // Que eso **no** significa una aldea que no construye: las mismas semillas
+  // levantan de 67 a 99 obras en sesenta años. Una obra cada vez (§7.3) y
+  // semanas enteras sin nada pendiente son la misma cosa vista de dos maneras.
   if (nextProject(state) === null) {
     return { key: 'doing.nothing', params: {} };
   }

@@ -117,12 +117,15 @@ productivo de 36 × 56 en el centro, montañas, lago— y **el vado, que se cruz
 A* no cruzaba el agua, así que nadie cruzaba el río nunca y media aldea se
 quedaba sin ruta.
 
-**La pregunta más gorda que dejó abierta, medida: una aldea madura no tiene
-nada que construir.** De 0,3 a 0,5 obras al año a partir del año 20, porque ya
-llegó a `MAX_HOUSES`, a `MAX_FIELDS` y a un oficio de cada clase. Eso deja la
-palanca de la obra sin nada que ordenar y el valle sin nada que contar —1,04
-sucesos notables por sesión de cinco minutos, justo en el suelo de §16.3—. Pide
-una decisión de diseño, no un ajuste.
+**Y la trampa que esa ronda dejó escrita, porque costó media página de
+conclusiones falsas: un informe que avanza el mundo con `tick` en un bucle no
+mide este juego.** Nadie contesta las encrucijadas, la primera planteada se
+queda pendiente para siempre —§8.6 no plantea dos— y con ella se van sus
+consecuencias, sus semillas y las obras que conceden. Así medí «de 0,3 a 0,5
+obras al año, la piedra nunca, 1,04 sucesos por sesión» y estuve a un paso de
+relajar A.16 por eso. Jugada con `run` y la política prudente: **67 a 99 obras
+en sesenta años, piedra en los años 42 a 45, 1,45 sucesos por sesión.** Está
+contado en `docs/handover.md` §2.1.
 
 **Siguiente: V-11**, y no es opcional. Las reuniones de §11.8 dejaron de ocurrir
 el día de G-12 —sólo existían en el camino viejo— y nadie lo vio porque la

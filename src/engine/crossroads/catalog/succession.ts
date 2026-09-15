@@ -119,12 +119,27 @@ export const SUCCESSION: CrossroadTemplate = {
 export const FIRST_STONE: CrossroadTemplate = {
   id: 'first_stone',
   category: 'succession',
+  // **Medido y dejado como estaba, 15 sep 2026.** Estuve a punto de relajar
+  // esto —año 20 en vez de 40, treinta personas en vez de cuarenta y cinco—
+  // porque un informe decía que la piedra «no se desbloqueaba nunca» en las
+  // semillas 7, 11 y 41. El informe estaba roto: avanzaba el mundo con `tick`
+  // sin contestar las encrucijadas, así que la primera planteada se quedaba
+  // pendiente para siempre y ninguna otra podía plantearse.
+  //
+  // Con la partida jugada de verdad —`run` con la política prudente—, esto
+  // **sale y sale a su hora**: la piedra se desbloquea en los años 42, 42 y 45
+  // de esas mismas tres semillas, y la década de los cuarenta trae entre 16 y
+  // 18 obras. La puerta funciona como está escrita y el texto de A.16 dice la
+  // verdad: «no queda sitio donde construir hacia fuera» pasa de verdad al
+  // final, no al principio.
+  //
+  // Queda escrito porque la conclusión falsa ya se escribió una vez.
+  // v2.8: sus tres condiciones son permanentes una vez ciertas; la primavera
+  // es el disparador — una cantera se abre cuando el suelo deja de estar duro.
   weight: 6,
   cooldownYears: 50,
   maxPerGame: 1,
   minYear: 41,
-  // v2.8. Sus tres condiciones son permanentes una vez ciertas; la primavera
-  // es el disparador — una cantera se abre cuando el suelo deja de estar duro.
   requires: [
     { k: 'season', season: 'spring' },
     { k: 'stat', stat: 'people', op: '>=', v: 45 },

@@ -131,14 +131,16 @@ juega en `https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK`.
 tres defectos de los mensajes, el mapa grande y el vado. Todo con su medida en
 `docs/handover.md` §2.1.
 
-**Lo que esta ronda midió y dejó abierto**, y es ahora la pregunta más gorda del
-juego: **una aldea madura no tiene nada que construir** —de 0,3 a 0,5 obras al
-año entre los años 20 y 40, porque ya llegó a `MAX_HOUSES`, a `MAX_FIELDS` y a
-un oficio de cada clase—. Eso deja la tercera palanca sin nada que ordenar
-después de la primera generación, y deja el valle sin nada que contar: 1,04
-sucesos notables por sesión de cinco minutos, justo en el suelo que §16.3 puso.
-No es un ajuste: es una decisión de diseño sobre qué hace una aldea cuando ya
-está construida.
+**Lo que esta ronda midió y dejó abierto:** la última década de una partida de
+sesenta años está vacía —con los dieciséis a piedra y la empalizada levantados,
+el 100 % de las semanas no tienen nada que querer construir—. Antes de eso la
+aldea levanta de 67 a 99 obras y la piedra llega en los años 42 a 45, así que el
+problema es el final de la partida y no su medio.
+
+**Y una advertencia que costó media página de conclusiones falsas:** la primera
+versión de esa medida avanzaba el mundo con `tick` sin contestar las
+encrucijadas y decía «de 0,3 a 0,5 obras al año y la piedra nunca». Está contado
+en `docs/handover.md` §2.1.
 
 ---
 

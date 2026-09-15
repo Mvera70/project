@@ -1,14 +1,19 @@
 // Por qué una aldea deja de construir. design.md §7.3, §11.6.
 //
 // La palanca de «qué se levanta antes» (E3 de `docs/plan-juego.md`) sólo
-// significa algo si hay cola de obra. Y al medir la densidad de avisos salió
-// que **a partir del año veinte casi no hay**: de 0,3 a 0,5 obras al año, así
-// que el jugador ordena una prioridad sobre una lista vacía y el valle no tiene
-// nada que contar.
+// significa algo si hay cola de obra, así que esto cuenta por décadas cuánta
+// hay, de qué es, y **por qué está vacía cuando lo está** — que son tres causas
+// distintas y cada una se arregla de otra manera.
 //
-// Esto lo cuenta por décadas y dice **qué** se levanta y qué falta, para que la
-// decisión de diseño se tome sobre números y no sobre la sensación de que no
-// pasa nada.
+// **Y la primera versión de este informe dio una conclusión falsa**, que es la
+// razón de que el aviso esté aquí arriba: avanzaba el mundo con `tick` en vez de
+// con `run`, así que nadie contestaba las encrucijadas, la primera planteada se
+// quedaba pendiente para siempre y con ella se iban las demás, sus obras y sus
+// desbloqueos. Decía «de 0,3 a 0,5 obras al año y la piedra nunca». Jugada de
+// verdad, la misma aldea levanta **de 67 a 99 obras en sesenta años** y
+// desbloquea la piedra en los años 42 a 45.
+//
+// Si alguien añade aquí una medida nueva: que la partida se juegue.
 //
 //   npx tsx tools/works-report.ts [semillas...] [--years 60]
 //
@@ -16,7 +21,7 @@
 
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
-import { run, tick } from '@engine/sim';
+import { run } from '@engine/sim';
 import { BUILDING_RULES, FOOD, LIFE, TIME } from '@engine/balance';
 import { housingCapacity, population } from '@engine/people/demography';
 import { canQuarry, nextProject, woodCostOf } from '@engine/world/works';
@@ -84,7 +89,12 @@ for (const seed of seeds) {
     if (year % 10 === 0) decades.push({ begun: 0, nothingWanted: 0, noWood: 0, noRoom: 0, weeks: 0 });
     const decade = decades[decades.length - 1] as Decade;
     for (let week = 0; week < TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
-      tick(state, CATALOG);
+      // **`run` y no `tick`, y esto ya costó una conclusión falsa.** Con `tick`
+      // a secas nadie contesta las encrucijadas: la primera se queda planteada
+      // para siempre, ninguna otra puede plantearse, y este informe decía que
+      // «la piedra no se desbloquea nunca» cuando lo que pasaba era que nadie
+      // decidía nada. Una semana con la política del jugador razonable.
+      run(state, 1, 'prudent', CATALOG);
       decade.weeks += 1;
       for (const work of state.works) {
         if (work.startedTick !== state.tick) continue;
@@ -122,7 +132,3 @@ for (const seed of seeds) {
   process.stdout.write(`  ${line}\n`);
   process.stdout.write(`  ${[...kinds].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(', ')}\n`);
 }
-
-// `run` se importa para que el runner sirva también de humo del motor: si esto
-// compila, la firma del tick no ha cambiado.
-void run;
