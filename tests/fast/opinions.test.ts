@@ -42,6 +42,7 @@ function village(seed: number): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     intent: restingIntent(),
+    traits: [],
     village: { grain: 800, wood: 200, morale: 55, faith: 50 },
     people: foundPeople(rng, 0),
     buildings: [],

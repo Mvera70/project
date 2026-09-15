@@ -1,7 +1,8 @@
 // M-06 · Steps 9 and 10 of the tick: the harvest and the granary.
 // design.md §5.3.
 
-import { FOOD, TIME } from '../balance';
+import { FOOD, TRAITS, TIME } from '../balance';
+import { hasTrait } from '../state';
 import type { Allocation, GameState, HarvestResult } from '../state';
 import { weekOf } from '../time';
 import { count, has } from './building-counts';
@@ -60,9 +61,15 @@ export function harvest(state: GameState, a: Allocation): HarvestResult {
   const pecked = Math.max(0, 1 - state.crowBite);
   state.crowBite = 0;
 
+  // E5 · la tierra delgada de este valle, si la tiene. Un rasgo del valle y no
+  // una bandera: no lo puso una decisión y no caduca — es lo que el sitio era
+  // antes de que llegara nadie.
+  const soil = hasTrait(state, 'thin_soil') ? TRAITS.THIN_SOIL_YIELD : 1;
+
   const yielded =
     a.workedFields *
     FOOD.FIELD_YIELD *
+    soil *
     weatherFactor *
     moraleFactor *
     a.labourFactor *

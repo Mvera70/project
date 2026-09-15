@@ -45,6 +45,7 @@ function stateOf(seed: number): GameState {
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
+    traits: [],
     intent: restingIntent(),
     village: {
       grain: FOUNDING.GRAIN,

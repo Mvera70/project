@@ -9,8 +9,8 @@
 // crossroad's `build` joins the same queue rather than jumping it (§8.4), so
 // the only place that decides what gets built is this file.
 
-import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, WORLD } from '../balance';
-import { PRIORITY_FAMILIES } from '../state';
+import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, TRAITS, WORLD } from '../balance';
+import { hasTrait, PRIORITY_FAMILIES } from '../state';
 import { count, has, smithyWorking, standing } from '../subsistence/building-counts';
 import { housingCapacity, population } from '../people/demography';
 import { storageCapacity } from '../subsistence/harvest';
@@ -122,8 +122,18 @@ export function bpCostOf(kind: BuildingKind, free = false): number {
 
 /** Whether the valley can quarry at all: §7.2 wants a smithy and rock. */
 export function canQuarry(state: GameState): boolean {
+  // E5 · las lomas peladas no se notan aquí sino en el mapa: hay la mitad de
+  // pedregales, así que la piedra llega tarde en vez de no llegar. Prohibirla
+  // del todo fue mi primera versión y estaba medida como un acantilado — ver
+  // `TRAITS.BARE_HILLS_ROCK`.
   if (!smithyWorking(state)) return false;
   return state.map.terrain.includes(TERRAIN_CODE.rock);
+}
+
+/** Lo que cuesta de madera levantar algo en **este** valle. */
+export function woodCostOf(state: GameState, kind: BuildingKind): number {
+  const clay = hasTrait(state, 'good_clay') ? TRAITS.GOOD_CLAY_WOOD : 1;
+  return BUILDINGS[kind].wood * clay;
 }
 
 /**
@@ -195,7 +205,7 @@ export function nextProject(state: GameState): Project | null {
 
   for (const kind of ordered) {
     if (!withinCap(state, kind)) continue;
-    if (state.village.wood < BUILDINGS[kind].wood) continue;
+    if (state.village.wood < woodCostOf(state, kind)) continue;
     if (placeBuilding(state, kind) !== null) return kind;
   }
 
@@ -226,8 +236,9 @@ function open(state: GameState, project: Project, free = false): ConstructionWor
   }
 
   if (!free) {
-    if (state.village.wood < spec.wood) return null;
-    state.village.wood -= spec.wood;
+    const cost = woodCostOf(state, kind);
+    if (state.village.wood < cost) return null;
+    state.village.wood -= cost;
   }
 
   const work: ConstructionWork = {

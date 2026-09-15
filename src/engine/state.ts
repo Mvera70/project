@@ -7,6 +7,7 @@
 // Set, no circular references. Objects, arrays and references by id. That is
 // what makes saving a structuredClone and comparing two games a diff.
 
+import { hash32 } from './rng';
 import type { RngBundle } from './rng';
 
 // ---------------------------------------------------------------------------
@@ -616,6 +617,58 @@ export function restingIntent(): Intent {
   return { fields: 1, timber: 0.4, priority: 'none' };
 }
 
+/**
+ * Lo que **este** valle tiene y otro no. E5 de `docs/plan-juego.md`.
+ *
+ * *«La aldea no muta en diferentes partidas, siempre prácticamente es lo
+ * mismo.»* Y era verdad, con tres recetas fijas detrás: un mapa —río, fracción
+ * de bosque, manchas de roca, marisma—, un orden de construcción, y las mismas
+ * ocho o diez encrucijadas de veinte. Cambiaba el ruido, no la partida.
+ *
+ * Un rasgo del valle **cambia un número de la economía para siempre**, se sortea
+ * en la fundación y se cuenta en la crónica. No es una bandera de §8 —esas las
+ * pone una decisión y caducan— es lo que el valle era antes de que llegara
+ * nadie: dos rasgos por partida, de cuatro, y ninguno se pisa con otro.
+ *
+ * **Y cambian qué postura funciona**, que es lo que hace que importen: en un
+ * valle de tierra delgada sembrar de más no compensa y hay que ir al bosque; en
+ * uno sin piedra la aldea nunca pasa de la madera, así que la fe y los oficios
+ * llegan antes que las murallas. Es la misma palanca dando otra partida.
+ */
+export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills';
+
+/** Los cuatro, en orden estable: el sorteo de la fundación recorre esta lista. */
+export const VALLEY_TRAITS: readonly ValleyTrait[] = [
+  'good_clay', 'thin_soil', 'old_forest', 'bare_hills',
+];
+
+/**
+ * Los dos rasgos de un valle, sorteados de su semilla de terreno.
+ *
+ * **Dos de cuatro y sin repetir**, y el sorteo es una función pura de la semilla
+ * en vez de una tirada del `RngBundle`: así preguntar por los rasgos no consume
+ * azar y no desplaza la simulación (§4.3), y el mismo terreno da siempre el
+ * mismo valle — que es lo que hace que una partida heredada siga siendo el mismo
+ * sitio (§13.3).
+ *
+ * Vive aquí y no en `found.ts` porque `mapgen` también lo necesita —el bosque de
+ * un valle viejo es viejo desde antes de generarse— y `mapgen` no puede importar
+ * de `found` sin cerrar un ciclo. `state.ts` sólo importa de `rng.ts`, que es lo
+ * que el grafo de §2.4 permite.
+ */
+export function valleyTraits(terrainSeed: number): ValleyTrait[] {
+  return VALLEY_TRAITS
+    .map((trait) => ({ trait, draw: hash32(terrainSeed, `valley:${trait}`) }))
+    .sort((a, b) => a.draw - b.draw)
+    .slice(0, 2)
+    .map((one) => one.trait);
+}
+
+/** Si este valle tiene ese rasgo. */
+export function hasTrait(state: { traits: readonly ValleyTrait[] }, trait: ValleyTrait): boolean {
+  return state.traits.includes(trait);
+}
+
 /** Los límites de la postura. Fuera de ellos no es una elección, es un exploit. */
 export const INTENT_RANGE = {
   fields: { min: 0.5, max: 2 },
@@ -729,6 +782,14 @@ export interface GameState {
    * exactamente lo que esa partida estaba haciendo.
    */
   intent: Intent;
+  /**
+   * Lo que este valle tiene y otro no. Esquema 4.
+   *
+   * Se sortea con la semilla del **terreno** y no con la maestra, así que una
+   * aldea que hereda el valle de la anterior (§13.3) hereda también sus rasgos:
+   * el valle no cambia porque haya muerto la gente.
+   */
+  traits: ValleyTrait[];
   ended: EndState | null;
 }
 

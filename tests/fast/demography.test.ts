@@ -65,6 +65,7 @@ function village(seed: number, houses: number): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     intent: restingIntent(),
+    traits: [],
     village: { grain: 5000, wood: FOUNDING.WOOD, morale: FOUNDING.MORALE, faith: FOUNDING.FAITH },
     people,
     buildings: Array.from({ length: houses }, (_, i) => house(i)),

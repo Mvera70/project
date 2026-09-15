@@ -163,8 +163,16 @@ describe('el orden del tick · §4.2', () => {
     expect(beforeWood - woodStanding(s)).toBeGreaterThanOrEqual(900);
     expect(forestCells(s)).toBeLessThan(beforeCells);
     expect(report.felled).toBeGreaterThanOrEqual(900);
+    // **Cuántas celdas se llevan 900 de madera depende del valle** (E5): un
+    // bosque viejo guarda un 30 % más por celda, así que la misma tala arrasa
+    // menos celdas. Lo que la prueba guarda es que la tala **deja cicatriz de
+    // por vida**, no cuántas: el número exacto era una huella de un valle sin
+    // rasgos. Se calcula el mínimo que 900 de madera puede vaciar con lo que
+    // este valle tiene por celda.
+    const perCell = Math.max(1, s.map.forestStock.find((stock) => stock > 0)
+      ?? WORLD.WOOD_PER_FOREST_TILE);
     expect([...s.map.forestAge].filter((age) => age === WORLD.BARREN_CLEARING).length)
-      .toBeGreaterThanOrEqual(3);
+      .toBeGreaterThanOrEqual(Math.floor(900 / (perCell * 1.5)));
     const [scar] = report.visualEffects;
     expect(scar?.effect).toEqual({ k: 'scar', what: 'felled_wood' });
     const scarCell = Math.floor(scar?.y ?? -1) * s.map.width + Math.floor(scar?.x ?? -1);

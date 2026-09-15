@@ -5,7 +5,7 @@
 import { BUILDINGS, FOUNDING, LIFE } from './balance';
 import { foundPeople } from './people/villagers';
 import { makeBundle } from './rng';
-import { SCHEMA_VERSION, restingIntent } from './state';
+import { SCHEMA_VERSION, restingIntent, valleyTraits } from './state';
 import type { BuildingKind, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
@@ -54,7 +54,7 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     tick: 0,
     peakPeople: FOUNDING.POPULATION,
     rng,
-    map: generateMap(mapRng),
+    map: generateMap(mapRng, terrainSeed),
     herd: { ...FOUNDING.HERD },
     village: {
       grain: FOUNDING.GRAIN,
@@ -70,6 +70,14 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     flags: {},
     chronicle: [
       { tick: 0, kind: 'founding', templateKey: 'founding', params: {}, weight: 3 },
+      // E5 · y qué valle es éste. En la crónica y no sólo en un aviso, por dos
+      // razones: es un hecho de la fundación y la crónica es donde viven los
+      // hechos, y porque **es lo primero que distingue una partida de otra para
+      // quien la lea de fuera** — que es exactamente lo que el hito 0 pregunta.
+      ...valleyTraits(terrainSeed).map((trait) => ({
+        tick: 0, kind: 'founding' as const, templateKey: `valley.${trait}`,
+        params: {}, weight: 2 as const,
+      })),
     ],
     history: [],
     weather: { year: 0, index: 2, factor: 1 },
@@ -77,6 +85,10 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null, crowBite: 0,
     // La aldea arranca haciendo lo que hacía sola (§5.2, y D-6 del plan).
     intent: restingIntent(),
+    // E5 · Lo que este valle tiene y otro no. Con la semilla del **terreno**, así
+    // que una aldea que hereda el valle hereda sus rasgos: el valle no cambia
+    // porque haya muerto la gente (§13.3).
+    traits: valleyTraits(terrainSeed),
     ended: null,
   };
   foundingBuildings(state);

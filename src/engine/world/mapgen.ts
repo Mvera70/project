@@ -1,8 +1,8 @@
 // M-13: deterministic terrain, design.md §7.1.
-import { MAPGEN, WORLD } from '../balance';
+import { MAPGEN, TRAITS, WORLD } from '../balance';
 import { int, next } from '../rng';
 import type { RngBundle } from '../rng';
-import { TERRAIN_CODE } from '../state';
+import { TERRAIN_CODE, valleyTraits } from '../state';
 import type { ValleyMap } from '../state';
 import { idx, neighbours4 } from './tiles';
 
@@ -89,7 +89,11 @@ function noiseGrid(b: RngBundle, scale: number): (x: number, y: number) => numbe
 }
 
 /** Uses a local copy: neither the supplied map stream nor any other stream advances. */
-export function generateMap(bundle: RngBundle): ValleyMap {
+export function generateMap(bundle: RngBundle, terrainSeed?: number): ValleyMap {
+  // Los rasgos del valle se sortean de la semilla del terreno, igual que el
+  // mapa: el bosque de un valle viejo es viejo desde antes de generarse.
+  const traits = terrainSeed === undefined ? [] : valleyTraits(terrainSeed);
+  const woodPerCell = traits.includes('old_forest') ? TRAITS.OLD_FOREST_WOOD : 1;
   const b = { ...bundle };
   // 1. BASE: a meadow, with independent blank simulation overlays.
   const map: ValleyMap = {
@@ -141,7 +145,11 @@ export function generateMap(bundle: RngBundle): ValleyMap {
 
   // 4. ROCK: connected outcrops, with distant starts preferred. Never occupy
   // the reserved clearing, forest, water, or the future marsh strip.
-  const rockCount = int(b, 'map', ...MAPGEN.ROCK_PATCHES);
+  // E5 · un valle de lomas peladas tiene la mitad de pedregales, y se ve.
+  const rockCount = Math.max(1, Math.round(
+    int(b, 'map', ...MAPGEN.ROCK_PATCHES)
+    * (traits.includes('bare_hills') ? TRAITS.BARE_HILLS_ROCK : 1),
+  ));
   for (let patch = 0; patch < rockCount; patch += 1) {
     const desired = int(b, 'map', ...MAPGEN.ROCK_SIZE);
     const eligible = Array.from({ length: CELLS }, (_, i) => i).filter((i) =>
@@ -191,7 +199,9 @@ export function generateMap(bundle: RngBundle): ValleyMap {
   // gets it: what grows back is not the wood they found.
   for (let i = 0; i < CELLS; i += 1) {
     if (map.terrain[i] !== TERRAIN_CODE.forest) continue;
-    map.forestStock[i] = WORLD.WOOD_PER_FOREST_TILE;
+    // E5 · un bosque viejo guarda más leña por celda. Se aplica **al generar**
+    // y no al talar: es lo que el sitio era, no una bonificación que se cobra.
+    map.forestStock[i] = Math.round(WORLD.WOOD_PER_FOREST_TILE * woodPerCell);
     map.forestAge[i] = WORLD.VIRGIN_FOREST;
   }
   return map;

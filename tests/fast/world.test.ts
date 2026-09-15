@@ -250,14 +250,22 @@ describe('el bosque · §7.5', () => {
       .filter(({ t }) => t === TERRAIN_CODE.forest)
       .sort((a, b) => distance(a.i) - distance(b.i) || a.i - b.i)[0]!.i;
 
+    // Contra lo que la celda tenía, no contra la constante. E5 metió rasgos del
+    // valle y uno de ellos —el bosque viejo— hace que cada celda guarde un 30 %
+    // más, así que `WOOD_PER_FOREST_TILE` dejó de ser lo que hay en el suelo de
+    // **este** valle. Lo que la prueba guarda no es el número: es que se tala la
+    // celda más cercana y que se le quita exactamente lo pedido.
+    const had = s.map.forestStock[nearest] as number;
     fellForest(s, 10);
-    expect(s.map.forestStock[nearest]).toBe(WORLD.WOOD_PER_FOREST_TILE - 10);
+    expect(s.map.forestStock[nearest]).toBe(had - 10);
   });
 
   it('al vaciarse una celda pasa a cleared y empieza a contar', () => {
     const s = foundGame(7);
     const before = forestCells(s);
-    fellForest(s, WORLD.WOOD_PER_FOREST_TILE);
+    // Vaciar **una** celda es quitarle lo que tenga, que depende del valle (E5).
+    const first = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.forest);
+    fellForest(s, s.map.forestStock[first] as number);
     expect(forestCells(s)).toBe(before - 1);
     const cleared = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.cleared);
     expect(cleared).toBeGreaterThanOrEqual(0);
@@ -312,7 +320,10 @@ describe('el bosque · §7.5', () => {
 
   it('una tala marcada de por vida no rebrota', () => {
     const s = foundGame(7);
-    fellForest(s, WORLD.WOOD_PER_FOREST_TILE, true);
+    // Lo que tenga la celda, no la constante: este valle puede ser de bosque
+    // viejo y guardar más por celda (E5). Sin vaciarla del todo no se marca.
+    const first = [...s.map.terrain].findIndex((t) => t === TERRAIN_CODE.forest);
+    fellForest(s, s.map.forestStock[first] as number, true);
     const cell = [...s.map.forestAge].findIndex((age) => age === WORLD.BARREN_CLEARING);
     expect(cell).toBeGreaterThanOrEqual(0);
     expect(s.map.terrain[cell]).toBe(TERRAIN_CODE.cleared);

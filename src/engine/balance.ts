@@ -452,6 +452,42 @@ export const FORAGE = {
   FULL_FOREST: 0.25,
 } as const;
 
+/**
+ * Cuánto mueve cada rasgo del valle. E5 de `docs/plan-juego.md`.
+ *
+ * TUNE, los cuatro. Buscados para que **cambien la postura que funciona** y no
+ * sólo el ritmo: un 15 % de cosecha es la diferencia entre sembrar de más y no
+ * molestarse, y un 30 % de madera por celda es la diferencia entre poder mandar
+ * gente al bosque y tener que racionarlo. Por debajo de un 10 % nada de esto se
+ * nota en cuarenta años y el rasgo sería un adorno en la crónica.
+ *
+ * Dos suben y dos bajan a propósito: un valle con dos rasgos buenos y otro con
+ * dos malos son dos partidas, y eso es lo que se buscaba.
+ */
+export const TRAITS = {
+  /** Buena arcilla: lo que se levanta cuesta menos madera. */
+  GOOD_CLAY_WOOD: 0.8,
+  /** Tierra delgada: el campo da menos. */
+  THIN_SOIL_YIELD: 0.85,
+  /** Bosque viejo: cada celda arbolada guarda más leña. */
+  OLD_FOREST_WOOD: 1.3,
+  /**
+   * Lomas peladas: la mitad de pedregales en el mapa.
+   *
+   * **La primera versión de este rasgo prohibía cantear del todo y estaba mal.**
+   * Medido: cuatro de cinco semillas salían con él, y sin cantera desaparecen
+   * **todos** los hitos de obra —quince de treinta y seis en la semilla 2024,
+   * que son las casas que pasan a piedra— así que la partida normal pasaba a ser
+   * la pobre. Un rasgo tiene que cambiar la partida, no amputarla.
+   *
+   * Medio pedregal es proporcional, **se ve en el mapa** —hay la mitad de
+   * piedras por el prado— y sigue siendo una decisión: en un valle así la
+   * piedra llega tarde y conviene apostar por la fe y los oficios antes que por
+   * las murallas.
+   */
+  BARE_HILLS_ROCK: 0.5,
+} as const;
+
 export const WORLD = {
   WIDTH: 36,
   HEIGHT: 56,

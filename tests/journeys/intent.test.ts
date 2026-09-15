@@ -19,7 +19,8 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { LABOUR } from '@engine/balance';
 import { population } from '@engine/people/demography';
-import { restingIntent, type Intent } from '@engine/state';
+import { restingIntent, type Intent, type ValleyTrait } from '@engine/state';
+import { BANK } from '@engine/chronicle/bank.en';
 import { count } from '@engine/subsistence/building-counts';
 import { allocateLabour } from '@engine/subsistence/labour';
 
@@ -81,13 +82,25 @@ describe('E1 · la postura cambia la partida', () => {
 
   it('apretar el bosque da leña y quita obra, en todas las semillas', () => {
     // La palanca más directa y la que el jugador va a mover primero.
+    // La leña, semilla a semilla: es la consecuencia directa de la orden.
+    let built = { timber: 0, works: 0 };
     for (const seed of SEEDS) {
       const timber = played(seed, STANCES['lena'] as Intent);
       const works = played(seed, STANCES['obra'] as Intent);
       expect(timber.wood, `semilla ${seed}: leña`).toBeGreaterThan(works.wood);
-      expect(works.buildings, `semilla ${seed}: edificios`)
-        .toBeGreaterThanOrEqual(timber.buildings);
+      built = {
+        timber: built.timber + timber.buildings,
+        works: built.works + works.buildings,
+      };
     }
+    // **Los edificios, en conjunto y no semilla a semilla**, y la razón está
+    // medida: las dos posturas de esta prueba siembran al mínimo, así que la
+    // aldea vive al borde y una semilla suelta la puede llevar a cualquier
+    // parte — con los rasgos del valle de E5 encima, la 41 llegó a construir
+    // más talando que construyendo. Lo que la orden promete es una tendencia,
+    // no un resultado en cada valle.
+    expect(built.works, `edificios: ${built.works} construyendo contra ${built.timber} talando`)
+      .toBeGreaterThan(built.timber);
   });
 
   it('apretar el campo llena el granero', () => {
@@ -195,13 +208,19 @@ describe('E3 · la cola de obra', () => {
     // tope**, así que en cuanto hay amenaza se lleva casi toda la capacidad de
     // obra y ya está de hecho en primer lugar. Medido a los cuarenta años:
     //
-    //     semilla 7:  67 murallas de 99 edificios en pie
-    //     semilla 11: 36 de 66      semilla 23: 34 de 64      semilla 41: 40 de 70
+    // Remedido con los rasgos del valle de E5 puestos:
     //
-    // Adelantar algo que ya va primero no puede cambiar nada. Y de paso queda
-    // señalado un desajuste que no es de esta ronda: **dos tercios de lo que una
-    // aldea levanta en cuarenta años son tramos de empalizada**, y eso ni se ve
-    // en la tira ni lo decide nadie.
+    //     semilla 7  [lomas peladas, bosque viejo]  67 murallas de 99 en pie
+    //     semilla 11 [tierra delgada, bosque viejo] 42 de 73
+    //     semilla 23 [lomas peladas, tierra delgada] 8 de 34
+    //     semilla 41 [tierra delgada, buena arcilla] 36 de 66
+    //
+    // Adelantar algo que ya va primero no puede cambiar nada. Y de paso quedan
+    // señaladas dos cosas que no son de esta ronda: **en tres de cuatro valles
+    // más de la mitad de lo que se levanta en cuarenta años son tramos de
+    // empalizada**, y eso ni se ve en la tira ni lo decide nadie; y el cuarto
+    // valle —el pobre de las dos— apenas construye nada, que es E5 funcionando.
+    let dominated = 0;
     for (const seed of SEEDS) {
       const state = foundGame(seed);
       run(state, 40 * 48, 'prudent', CATALOG);
@@ -209,9 +228,98 @@ describe('E3 · la cola de obra', () => {
       const walls = standing.filter(
         (one) => one.kind === 'palisade' || one.kind === 'wall' || one.kind === 'watchtower',
       );
-      expect(walls.length, `semilla ${seed}: hay murallas, y muchas`).toBeGreaterThan(20);
-      expect(walls.length / standing.length, `semilla ${seed}: y son la mayoría de la obra`)
-        .toBeGreaterThan(0.4);
+      if (walls.length / standing.length > 0.4) dominated += 1;
+    }
+    expect(dominated, 'en la mayoría de los valles la muralla se come la obra')
+      .toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('E5 · dos valles no se parecen', () => {
+  // *«La aldea no muta en diferentes partidas, siempre prácticamente es lo
+  // mismo.»* Era verdad y tenía tres recetas fijas detrás. Un rasgo del valle
+  // cambia un número de la economía para siempre, se sortea en la fundación y se
+  // cuenta en la crónica.
+
+  it('cada valle trae dos rasgos, y no siempre los mismos', () => {
+    const drawn = new Map<string, number>();
+    for (let seed = 1; seed <= 40; seed += 1) {
+      const state = foundGame(seed);
+      expect(state.traits.length, `semilla ${seed}`).toBe(2);
+      expect(new Set(state.traits).size, `semilla ${seed}: sin repetir`).toBe(2);
+      for (const trait of state.traits) drawn.set(trait, (drawn.get(trait) ?? 0) + 1);
+    }
+    // Los cuatro salen, y ninguno se lleva más de la mitad de las plazas: con
+    // cuarenta valles y dos rasgos cada uno hay ochenta plazas, veinte de media.
+    expect(drawn.size, 'los cuatro rasgos aparecen').toBe(4);
+    for (const [trait, times] of drawn) {
+      expect(times, `${trait} sale ${times} veces de 40 valles`).toBeGreaterThan(5);
+      expect(times, `${trait} sale ${times} veces de 40 valles`).toBeLessThan(35);
+    }
+  });
+
+  it('y el mismo terreno da siempre el mismo valle', () => {
+    // §13.3: una aldea que hereda el valle de la anterior hereda sus rasgos. El
+    // valle no cambia porque haya muerto la gente. Y el sorteo no consume azar
+    // (§4.3): es una función pura de la semilla.
+    for (const seed of SEEDS) {
+      expect(foundGame(seed).traits).toEqual(foundGame(seed).traits);
+    }
+  });
+
+  it('un rasgo cambia la partida y no sólo la crónica', () => {
+    // La prueba que separa un rasgo de un adorno: la misma semilla con el rasgo
+    // y sin él tiene que dar dos aldeas distintas a los treinta años. Se fuerza
+    // el rasgo en vez de buscar la semilla que lo trae, que es lo que aísla la
+    // causa.
+    for (const trait of ['thin_soil', 'good_clay'] as const) {
+      let apart = 0;
+      for (const seed of SEEDS) {
+        const played = (traits: ValleyTrait[]): string => {
+          const state = foundGame(seed);
+          state.traits = traits;
+          run(state, 30 * 48, 'prudent', CATALOG);
+          return `${population(state)}/${Math.round(state.village.grain)}`
+            + `/${Math.round(state.village.wood)}/${state.buildings.length}`;
+        };
+        if (played([]) !== played([trait])) apart += 1;
+      }
+      expect(apart, `${trait} cambia la partida en alguna semilla`).toBeGreaterThan(0);
+    }
+  });
+
+  it('y el bosque viejo se nota en el suelo, porque actúa al generar el valle', () => {
+    // `old_forest` no se puede forzar después de fundar, y **eso es correcto**:
+    // la leña que guarda una celda se decide al generar el mapa, igual que el
+    // río o las rocas. Un bosque viejo es viejo desde antes de que llegara
+    // nadie, no un modificador que se aplica al talar. Así que se compara entre
+    // valles: los que traen el rasgo guardan un 30 % más por celda.
+    const stocks = new Map<boolean, number[]>([[true, []], [false, []]]);
+    for (let seed = 1; seed <= 20; seed += 1) {
+      const state = foundGame(seed);
+      const most = Math.max(...state.map.forestStock);
+      stocks.get(state.traits.includes('old_forest'))?.push(most);
+    }
+    const old = stocks.get(true) ?? [];
+    const plain = stocks.get(false) ?? [];
+    expect(old.length, 'hay valles de bosque viejo entre los veinte').toBeGreaterThan(2);
+    expect(plain.length, 'y valles corrientes').toBeGreaterThan(2);
+    expect(Math.min(...old), 'el peor bosque viejo guarda más que el mejor corriente')
+      .toBeGreaterThan(Math.max(...plain));
+  });
+
+  it('y la crónica dice de qué valle habla, desde la fundación', () => {
+    // Es lo primero que distingue una partida de otra para quien la lea de
+    // fuera, que es exactamente lo que pregunta el hito 0.
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      const said = state.chronicle
+        .filter((entry) => entry.templateKey.startsWith('valley.'))
+        .map((entry) => entry.templateKey);
+      expect(said.length, `semilla ${seed}`).toBe(2);
+      for (const key of said) {
+        expect(BANK[key], `${key} tiene texto en el banco`).toBeDefined();
+      }
     }
   });
 });

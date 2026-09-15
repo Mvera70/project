@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HERD_KINDS, SCHEMA_VERSION, restingIntent } from './state';
+import { HERD_KINDS, SCHEMA_VERSION, restingIntent, valleyTraits } from './state';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -244,6 +244,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && record(s['intent'])
     && ['fields', 'timber'].every((key) => finite((s['intent'] as Record<string, unknown>)[key]))
     && typeof (s['intent'] as Record<string, unknown>)['priority'] === 'string'
+    && Array.isArray(s['traits']) && s['traits'].every((one) => typeof one === 'string')
     && finite(s['crowBite']) && (s['crowBite'] as number) >= 0
     && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
     && tickValue(people['nextId']) && Array.isArray(people['namedIds']) && people['namedIds'].every(tickValue)
@@ -361,6 +362,13 @@ export function deserialize(raw: unknown): SaveFile {
   // arriba, cargar no puede cambiar lo que la aldea estaba haciendo.
   if (state.intent.priority === undefined) {
     state = { ...state, intent: { ...state.intent, priority: 'none' } };
+  }
+  // Y los rasgos del valle (E5). Se **derivan** de la semilla del terreno en vez
+  // de entrar vacíos: el valle de una partida guardada siempre tuvo esos rasgos,
+  // se hubieran guardado o no, así que ponerlos es recordar y no cambiar. Es la
+  // misma razón por la que el sorteo es una función pura de la semilla.
+  if ((state as Partial<GameState>).traits === undefined) {
+    state = { ...state, traits: valleyTraits(state.terrainSeed) };
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

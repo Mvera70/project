@@ -76,6 +76,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     intent: restingIntent(),
+    traits: [],
     village: {
       grain: FOUNDING.GRAIN,
       wood: FOUNDING.WOOD,

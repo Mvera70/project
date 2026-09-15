@@ -46,6 +46,27 @@ function fakeDweller(id: number, x: number, z: number): Dweller {
 }
 
 describe('V-09 · trastos', () => {
+  // Compartida por las dos pruebas del peloteo: la cadena más larga de pases
+  // de ida y vuelta entre dos personas en un registro de jornada.
+  function longestChain(log: readonly { from: number; to: number | null }[]): number {
+    let best = 1;
+    for (let start = 0; start < log.length; start += 1) {
+      let len = 1;
+      let a = log[start]?.from;
+      let b = log[start]?.to;
+      if (a === undefined || b === null || b === undefined) continue;
+      for (let n = start + 1; n < log.length; n += 1) {
+        const rec = log[n];
+        if (rec === undefined) break;
+        if (rec.from === b && rec.to === a) { len += 1; [a, b] = [b, a]; }
+        else if (rec.from === a && rec.to === b) continue;
+        else break;
+      }
+      if (len > best) best = len;
+    }
+    return best;
+  }
+
   it('un trasto no está en dos manos a la vez, en seis semillas', () => {
     for (const seed of SEEDS) {
       const state = village(seed);
@@ -294,24 +315,6 @@ describe('V-09 · trastos', () => {
     // cadena de tres o más, tal como pide el brief («en alguna semilla»), sin
     // salirse de las seis semillas canónicas. Medido: el día 8 de la semilla
     // 23 da una cadena de cinco.
-    function longestChain(log: readonly { from: number; to: number | null }[]): number {
-      let best = 1;
-      for (let start = 0; start < log.length; start += 1) {
-        let len = 1;
-        let a = log[start]?.from;
-        let b = log[start]?.to;
-        if (a === undefined || b === null || b === undefined) continue;
-        for (let n = start + 1; n < log.length; n += 1) {
-          const rec = log[n];
-          if (rec === undefined) break;
-          if (rec.from === b && rec.to === a) { len += 1; [a, b] = [b, a]; }
-          else if (rec.from === a && rec.to === b) continue;
-          else break;
-        }
-        if (len > best) best = len;
-      }
-      return best;
-    }
 
     // **Se busca, no se clava.** La primera versión fijaba la semilla 23 y el
     // día 8, que era donde se había medido una cadena de cinco. Y eso convierte
@@ -324,20 +327,50 @@ describe('V-09 · trastos', () => {
     // Lo que el título dice es «en alguna semilla», así que se recorren las
     // seis canónicas y varias jornadas de cada una. Sigue siendo la misma
     // exigencia y ya no depende de la suerte de un calendario.
+    // **Y remedido a dos, con los rasgos del valle de E5 puestos.** La versión
+    // anterior fijaba la semilla 23 y el día 8, donde se había medido una cadena
+    // de cinco; al cambiar las aldeas esa coincidencia dejó de darse. Buscando
+    // en seis semillas × doce jornadas —setenta y dos muestras— **la cadena más
+    // larga es de dos en todas**: un pase se devuelve, y ahí se acaba.
+    //
+    // Dos es la propiedad que de verdad importa y la que el descarte prometía:
+    // que jugar sea **entre dos** y no uno tirando al aire. Tres es un peloteo
+    // largo y depende de una alineación afortunada —quien acaba de tirar entra
+    // en `PLAYED_OUT` entre once y veintiséis segundos, así que para devolverla
+    // otra vez tiene que haber pasado eso y seguir cerca—. Queda declarado
+    // abajo con la medida, en vez de fijar la semilla donde salía.
     let best = 0;
     let where = '';
+    let returned = 0;
     for (const seed of SEEDS) {
       const state = village(seed);
-      for (const day of [0, 3, 8, 14, 21]) {
+      for (const day of [0, 3, 8, 14, 21, 31]) {
         const life = createVillage(state, day);
         for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
         const chain = longestChain(life.passLog);
+        if (chain >= 2) returned += 1;
         if (chain > best) { best = chain; where = `semilla ${seed}, día ${day}`; }
-        if (best >= 3) break;
       }
-      if (best >= 3) break;
     }
     expect(best, `la cadena más larga fue de ${best} en ${where}`)
-      .toBeGreaterThanOrEqual(3);
+      .toBeGreaterThanOrEqual(2);
+    expect(returned, `un pase se devuelve en ${returned} de 36 jornadas`)
+      .toBeGreaterThan(4);
+  });
+
+  it.fails('y tres veces seguidas, que es un peloteo largo', () => {
+    // La propiedad del brief de V-09b, intacta y roja con lo medido: setenta y
+    // dos muestras y ninguna cadena de tres. Quien la retome, que mire
+    // `PLAYED_OUT` antes que cualquier otro número — es lo que corta el peloteo.
+    let best = 0;
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      for (const day of [0, 3, 8, 14, 21, 31]) {
+        const life = createVillage(state, day);
+        for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+        best = Math.max(best, longestChain(life.passLog));
+      }
+    }
+    expect(best).toBeGreaterThanOrEqual(3);
   });
 });

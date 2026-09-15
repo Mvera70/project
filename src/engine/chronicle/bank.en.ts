@@ -1483,6 +1483,33 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The valley had nobody in it until year {year}, and then it had {people}.',
   ],
 
+  // --- E5 · qué valle es éste (docs/plan-juego.md) ---
+  //
+  // Se dice **una vez, en la fundación**, y es lo que hace que un rasgo sea una
+  // historia y no un modificador oculto: el jugador tiene que saber en qué sitio
+  // está para que su postura sea una decisión y no una apuesta. Voz de §9.3, y
+  // dicho como lo diría alguien que acaba de llegar y ha mirado el suelo.
+  'valley.good_clay': [
+    'The clay here takes a wall without complaint. That is worth knowing.',
+    'Good clay under the turf, the kind that holds a wall up.',
+    'Whatever else the valley wanted for, it had clay.',
+  ],
+  'valley.thin_soil': [
+    'The soil is thin over stone. It will give, but not much.',
+    'A spade goes down a hand and finds rock. The fields will be honest work.',
+    'Thin ground. Nobody said the valley was generous.',
+  ],
+  'valley.old_forest': [
+    'The trees here are old, and thick through. There is wood in them for years.',
+    'Old wood on the slopes, the kind that takes two days to fell and pays for it.',
+    'The forest has been standing a long time, and it shows in the trunks.',
+  ],
+  'valley.bare_hills': [
+    'The hills are bare. There is little stone lying about to build with.',
+    'Hardly an outcrop in sight. Stone will have to be looked for.',
+    'Bare slopes, and not a boulder field worth the name.',
+  ],
+
   // --- E4 · lo que la aldea contesta a una orden (docs/plan-juego.md) ---
   //
   // La voz de siempre (§9.3): concreta, sin exclamaciones, sin juzgar al

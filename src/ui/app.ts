@@ -416,6 +416,19 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       ),
       true,
     );
+    // E5 · y qué valle es éste, que es lo que hace que un rasgo sea una historia
+    // y no un modificador oculto: el jugador tiene que saber dónde está para que
+    // su postura sea una decisión y no una apuesta. Va en el aviso y no en la
+    // cartela porque es una frase de paso, no el titular de la partida.
+    // El aviso tiene **una sola voz**, así que se dice el primero y el otro se
+    // lee en la crónica, donde los dos están desde la fundación. Mostrar los dos
+    // seguidos sólo enseñaría el segundo: el aviso no tiene cola.
+    const [first] = state.traits;
+    if (first !== undefined) {
+      notices.show(state, [{
+        tick: 0, kind: 'founding', templateKey: `valley.${first}`, params: {}, weight: 2,
+      }]);
+    }
   }
 
   const panel = document.createElement('section');
