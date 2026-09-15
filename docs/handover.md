@@ -340,13 +340,33 @@ No son teoría: cada una se pagó con al menos una ronda.
 4. **El ritmo de decisión.** Siete a doce decisiones en cuarenta años, medio
    catálogo muerto, cuatro plantillas al filo del 1 %. La decisión está tomada;
    la ronda no. Empieza por `npm run eligibility`.
-5. **La suite de balance falla las mismas pruebas de §12.9 que antes del mapa
-   grande**, y ya fallaba antes de todo esto. Remedido el 15 sep con el valle
-   cuatro veces mayor: las mismas doce, con las mismas causas —la cadencia de
-   encrucijadas, la extinción adversa al 23,3 % contra el 25 % que pide el
-   diseño, y el bosque en banda en 34 de 59 valles—. Que no se mueva ni una es
-   justamente lo que dice que el mapa grande no tocó la economía, que es lo que
-   su brief exigía comprobar. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
+5. **La suite de balance falla once pruebas de §12.9**, y ya fallaba antes de
+   todo esto. **Remedida entera el 15 sep con el valle cuatro veces mayor** —22
+   minutos, 240 partidas de doscientos años— y salen **las mismas once y por las
+   mismas causas**. Ésa era la comprobación que el brief del mapa grande
+   exigía: crecer el valle **no tocó la economía**.
+
+   Las once: la cadencia de encrucijadas y el 1 % de ticks elegibles, en las
+   cuatro políticas (ocho pruebas); la extinción adversa en **23,3 %** contra el
+   25 % que pide el diseño; el bosque en banda del 40–70 % en sólo 34 de 59
+   valles; y `quiet_years` sin salir nunca en 30 semillas × 150 años —que su
+   propio fichero explica como la señal buena: es la reserva de §8.6 y que no
+   haga falta significa que había algo mejor que preguntar—.
+
+   Los números de §12.9 tal como salieron, para comparar la próxima vez:
+
+   | Política | Extinción | Pico mediano | Mapa lleno | Cadencia | Horizonte |
+   |---|---|---|---|---|---|
+   | `prudent` | 3,3 % | 82 | 88,3 % | 5,63 | 58/60 |
+   | `first` | 5,0 % | 83 | 90,0 % | 5,81 | 57/60 |
+   | `last` | 10,0 % | 81 | 66,7 % | 5,51 | 54/60 |
+   | `worst` | 23,3 % | 81 | 48,3 % | 5,56 | 46/60 |
+
+   **Y la de fondo sigue siendo la misma:** jugar bien y jugar mal se parecen
+   demasiado —veinte puntos justos de extinción entre `prudent` y `worst`, que
+   es el mínimo que el diseño pide—. No lo arregla una ronda gráfica: es balance
+   del motor y lo decide el dueño del diseño. Medido en
+   `docs/findings-drama.md` §3–§6. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
    distancia entre políticas cayó a cinco puntos contra los veinte que pide el
    diseño, y `smith_feud` se triplicó. **No lo arregla una ronda gráfica: es
    balance del motor y lo decide el dueño del diseño.** Medido en
