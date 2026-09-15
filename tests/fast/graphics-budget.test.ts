@@ -14,7 +14,8 @@ import { SCENES } from '../../tools/graphics/bench-scenes';
 import { Tells } from '../../src/render3d/effects/tells';
 import { Village } from '../../src/render3d/world/buildings';
 import { buildGround } from '../../src/render3d/world/ground';
-import { BoxGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
+import { BoxGeometry, Group, Mesh, MeshStandardMaterial, Scene, type Object3D } from 'three';
+import { createWeather } from '../../src/render3d/effects/weather';
 import { TERRAIN_CODE } from '@engine/state';
 import { PALETTES } from '@derive/palette';
 import { buildForest } from '../../src/render3d/world/forest';
@@ -186,5 +187,71 @@ describe('G-09 · el ciclo de recursos', () => {
     const roofed = plan.buildings.filter((building) => building.roofed && building.roof > 0).length;
     expect(meshes).toBe(plan.buildings.length + roofed);
     town.dispose();
+  });
+});
+
+describe('S-03 · la lluvia, en llamadas de dibujo', () => {
+  // Mismo criterio que arriba (`isMesh`), ampliado a las mallas de línea y de
+  // puntos que usa el cielo (`effects/weather.ts`): cada objeto dibujable
+  // visible es una llamada, esté hecho de triángulos, segmentos o puntos.
+  function drawCallsOf(root: Object3D): number {
+    let calls = 0;
+    root.traverse((object) => {
+      const drawable = object as { visible: boolean; isMesh?: boolean; isPoints?: boolean; isLineSegments?: boolean };
+      if (drawable.visible && (drawable.isMesh === true || drawable.isPoints === true || drawable.isLineSegments === true)) {
+        calls += 1;
+      }
+    });
+    return calls;
+  }
+
+  // Sólo las mallas de triángulos cuentan aquí: la lluvia y el rayo son
+  // segmentos y la nieve son puntos, y ninguno de los tres aporta un triángulo.
+  function trianglesOf(root: Object3D): number {
+    let triangles = 0;
+    root.traverse((object) => {
+      const mesh = object as { visible: boolean; isMesh?: boolean; geometry?: { getIndex(): { count: number } | null; getAttribute(name: string): { count: number } | undefined } };
+      if (!(mesh.visible && mesh.isMesh === true) || mesh.geometry === undefined) return;
+      const index = mesh.geometry.getIndex();
+      const count = index !== null ? index.count : (mesh.geometry.getAttribute('position')?.count ?? 0);
+      triangles += Math.floor(count / 3);
+    });
+    return triangles;
+  }
+
+  it('cuesta una llamada de dibujo más que el mismo valle con cielo claro, y ni una más', () => {
+    // design.md §10.8: la lluvia es una malla y ni una más. El valle es el
+    // mismo (suelo + pueblo de un valle maduro) en los dos casos; lo único que
+    // cambia es el cielo.
+    const state = village(16);
+    const plan = planFor(state);
+    const scene = new Scene();
+    const ground = buildGround(state.map, PALETTES.summer);
+    scene.add(ground.mesh);
+    const town = new Village();
+    for (const building of plan.buildings) town.add(building);
+    scene.add(town.group);
+    const weather = createWeather(scene);
+    const centre = { x: state.map.width / 2, z: state.map.height / 2 };
+
+    // Medido en un valle de 16 años (semilla 7): cielo claro, 23 llamadas de
+    // dibujo y 16 834 triángulos. Con lluvia a intensidad plena, 24 llamadas
+    // y los mismos 16 834 triángulos — la malla de la lluvia son segmentos,
+    // no caras, así que no añade ni un triángulo al presupuesto.
+    const clearCalls = drawCallsOf(scene);
+    const clearTriangles = trianglesOf(scene);
+
+    weather.set('rain', 1);
+    weather.step(0.1, centre, 0.016);
+
+    const rainCalls = drawCallsOf(scene);
+    const rainTriangles = trianglesOf(scene);
+
+    expect(rainCalls - clearCalls).toBe(1);
+    expect(rainTriangles).toBe(clearTriangles);
+
+    weather.dispose();
+    town.dispose();
+    ground.dispose();
   });
 });

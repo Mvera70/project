@@ -98,10 +98,12 @@ npm run eligibility  # por qué medio catálogo no sale nunca
 
 **El motor está completo. El juego es el 3D** (`src/render3d/`) desde G-12, y la
 vida del valle (`src/render3d/life/`) es cómo se mueve la aldea: no hay banderas
-y no hay camino de vuelta salvo `?render=canvas`, que **se queda puesto a
-propósito** hasta que alguien abra el juego en un móvil de verdad, porque todo lo
-medido de rendimiento es de un portátil (G-09 quedó parcial por no haber
-dispositivo).
+y no hay camino de vuelta salvo `?render=canvas`. **Y el juego ya se ha abierto
+en un móvil de verdad: el dueño del diseño lo probó en su iPad y su iPhone el 15
+sep 2026 y funciona.** Lo que sigue sin existir es una medida de fotogramas en
+dispositivo —todo lo medido de rendimiento es de un portátil, G-09 quedó parcial
+por no haber dispositivo—, pero eso es un dato que falta y no un riesgo: el 3D
+se sostiene. La puerta de vuelta se queda por si acaso, no porque haga falta.
 
 **Cerrado:** el motor (M-01 a M-39), el render (G-00 a G-12), la interfaz (U-01 a
 U-14), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
@@ -161,9 +163,8 @@ consume azar del motor. Servirla es un cambio del motor.
 
 **Lo que decide si hay juego no es gráfico.** El jugador toma entre siete y doce
 decisiones en cuarenta años y diez de las veinte plantillas del catálogo no
-salieron ni una vez en cinco partidas (`docs/findings-drama.md`). La decisión
-está tomada (`docs/roadmap.md`, 14 sep): arreglar los dos fallos, relajar
-condiciones y escribir plantillas de menor peso, **un paso y remedir**.
+salieron ni una vez en cinco partidas (`docs/findings-drama.md`). **La medida
+sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **Reglas que cuestan tiempo cada vez que se olvidan:**
 
@@ -183,8 +184,18 @@ condiciones y escribir plantillas de menor peso, **un paso y remedir**.
 - **Ninguna ronda de interfaz se cierra sin captura**, y ahora se puede:
   `npm run shot`.
 
-**Los hitos humanos 0 y 6 siguen sin validar**, y no se declaran superados ni se
-sustituyen por pruebas automáticas. Son la deuda más antigua del proyecto.
+**Los hitos humanos 0 y 6 se descartan** (dueño del diseño, 15 sep 2026). Eran
+la deuda más antigua del proyecto —una lectura de tres crónicas por un tercero y
+el parte de bienvenida leído por quien no lo escribió— y dejan de bloquear: no
+se validan y no se sustituyen por pruebas. Siguen descritos en `docs/design.md`
+§9.5 y §15.1 como el criterio con el que se construyó el motor.
+
+**Y el sistema de encrucijadas se va a rehacer casi entero**, así que **no se
+afina**. Lo dijo el dueño el 15 sep: «el ritmo de decisiones tampoco afecta
+mucho… probablemente hay que hacer un rework, pero cargárselo casi entero»,
+y el rumbo es **mucho más azar y mucha más vida**. Con la iteración de Fable, más
+adelante. Hasta entonces: relajar condiciones, escribir plantillas de menor peso
+o fusionar `wolf_winter` es gastar dos veces — está en `docs/roadmap.md`, arriba.
 
 ---
 

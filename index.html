@@ -194,7 +194,10 @@
          piel que la regleta de velocidad —tinta sobre pergamino cuando algo
          está activo— porque es el mismo tipo de instrumento: un mando de
          estado, no un menú. */
-      .valley-tabbar { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; display: flex;
+      /* U-14 · por encima de la crónica y de la gente (velos a 13), para que
+         siempre haya una salida a la vista; la encrucijada y el epitafio la
+         esconden por clase, un poco más abajo. */
+      .valley-tabbar { position: fixed; z-index: 14; left: 0; right: 0; bottom: 0; display: flex;
         padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
         background: var(--plate); border-top: 1px solid var(--edge);
         box-shadow: 0 -2px 8px rgba(34,29,24,.16); backdrop-filter: blur(2px); }

@@ -12,6 +12,46 @@ de hacer.
 
 ---
 
+## Cuatro decisiones del dueño del diseño · 15 sep 2026, tarde
+
+Dichas al repasar lo que quedaba pendiente, y **las cuatro cambian este
+documento**. Están aquí arriba porque cancelan trabajo que más abajo sigue
+escrito como si hiciera falta.
+
+1. **El juego ya se ha abierto en un móvil de verdad, y funciona.** «Lo probé
+   desde mi tablet y mi iPhone y funciona». Así que el bloqueo que ordenaba este
+   documento —«un teléfono, diez minutos»— **está resuelto**. Lo que sigue sin
+   existir es una medida de fotogramas en dispositivo, pero eso es un dato que
+   falta, no un riesgo abierto: el 3D se sostiene en un iPhone y en un iPad.
+
+2. **Los hitos humanos 0 y 6 se descartan.** «Se descartan», literal. Eran la
+   deuda más antigua del proyecto —una lectura de tres crónicas por un tercero,
+   y el parte de bienvenida leído por alguien que no lo escribió— y dejan de ser
+   deuda: no se validan, no se sustituyen por pruebas y no bloquean nada. Quien
+   los vea citados como pendientes en otro sitio, está leyendo algo viejo.
+
+3. **La riña de §7.9 hay que revisarla.** Es lo único de la lista de pendientes
+   que pidió mantener tal cual. No llega a la capa de vida porque la crónica
+   guarda los **nombres** de los dos y no sus `id`, y `quarrelOf` no se puede
+   llamar desde `life/` sin consumir azar del motor: servirla es un cambio del
+   motor (está en `CLAUDE.md` y en el Anexo E).
+
+4. **El ritmo de decisión deja de ser la prioridad, porque el sistema entero se
+   va a rehacer.** Sus palabras: «el ritmo de decisiones tampoco es algo que
+   afecte mucho… probablemente hay que hacer un rework, pero **cargárselo casi
+   entero**», y el rumbo del rework: **«esto tiene que ser mucho más aleatorio y
+   con mucha más vida»**. Cuándo: más adelante, con la iteración del modelo
+   Fable.
+
+   **Qué significa para lo que hay escrito abajo:** relajar condiciones del
+   catálogo, escribir plantillas de menor peso y fusionar `wolf_winter` —el
+   carril B, «lo que convierte esto en un juego»— **ya no se hace**. Invertir
+   una ronda en afinar un sistema que se va a tirar es gastar dos veces. Lo que
+   sí conviene antes del rework es lo que sobrevive a cualquier rediseño: medir,
+   dejar escrito lo que ya se sabe y no romper el motor.
+
+---
+
 ## Dónde está el proyecto, sin adornos
 
 El motor está completo y es bueno: demografía, subsistencia, opiniones,
@@ -141,16 +181,14 @@ Lo encontró la auditoría y no estaba en ninguna hoja de ruta:
   herramientas que tiene el proyecto**: se desbloquea abriendo una sesión con el
   conector de Blender activo.
 
-### 6 · Las dos deudas que ningún agente puede saldar
+### 6 · Las dos deudas que ningún agente podía saldar — **descartadas**
 
-1. **El hito 0 nunca ha sido leído por un tercero.** Tres crónicas, sin
-   contexto y sin el documento de diseño, y una pregunta: *«¿en qué se
-   diferencian estas tres aldeas?»*. Ni quien diseñó ni quien programó sirven.
-   Es la deuda más antigua del proyecto y la que más dice sobre si esto
-   funciona.
-2. **El hito 6 está igual.** Y ninguno de los dos se declara superado ni se
-   sustituye por una prueba automática. Está escrito en `CLAUDE.md` y sigue
-   siendo cierto.
+El hito 0 (tres crónicas leídas por un tercero) y el hito 6 (el parte de
+bienvenida leído por quien no lo escribió) **se descartan** por decisión del
+dueño del diseño el 15 sep 2026. Fueron la deuda más antigua del proyecto y
+llevaban desde el primer día sin saldarse; dejan de bloquear y dejan de
+contarse. Se quedan escritos en `docs/design.md` §9.5 y §15.1 como lo que
+fueron —el criterio con el que se construyó el motor—, no como algo pendiente.
 
 ---
 
@@ -159,18 +197,18 @@ Lo encontró la auditoría y no estaba en ninguna hoja de ruta:
 Los cinco primeros puntos del orden anterior están hechos: U-05 a U-09, V-09b,
 el sonido, V-12 y G-12. Lo que queda, por lo que pesa:
 
-1. **Un teléfono.** Diez minutos de alguien con la demo de `npm run shot`
-   abierta. Es lo único que dice si el 3D se sostiene, y hasta que se sepa no se
-   puede borrar `src/render/` ni decidir si hacen falta las tres palancas de
-   abajo. Pasó de deuda vieja a bloqueo el día de la migración.
-2. **V-11**, que salda una regresión del juego y no una fase pendiente.
-3. **El ritmo de decisión.** `wolf_winter` primero —hecho y sin fusionar, y
-   cuesta una ronda entera por las trece pruebas que mueve—, luego relajar, luego
-   escribir. Un paso y remedir. **Es lo que convierte esto en un juego.**
+1. ~~**Un teléfono.**~~ **Resuelto**: el dueño lo abrió en su iPad y su iPhone
+   el 15 sep y funciona. Lo que queda es una medida de fotogramas en
+   dispositivo, que es un dato y no un bloqueo.
+2. ~~**V-11**~~, cerrada el 15 sep.
+3. ~~**El ritmo de decisión.**~~ **Cancelado** por la decisión 4 de arriba: el
+   sistema de encrucijadas se va a rehacer casi entero, así que afinarlo ahora
+   es gastar dos veces. `wolf_winter` se queda sin fusionar a propósito.
 4. **La escala**, si con la interfaz nueva el valle se sigue viendo pobre. Es
    D.6.2 y son seis píxeles por persona, medidos.
-5. **La reja visual**: los siete recorridos declarados, y una para el 3D.
-6. **El hito 0 con un tercero**, y el hito 6 detrás.
+5. **La reja visual**: los recorridos declarados, y una para el 3D.
+6. **El rework**: mucho más azar y mucha más vida, con la iteración de Fable.
+   No hay brief todavía y no se empieza sin él.
 
 Y aparcado a propósito, después de todo eso: **V-15 y V-16** (el mapa grande y
 la comarca con relieve). Son una ronda de motor con `SCHEMA_VERSION` a 4 y

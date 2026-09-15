@@ -527,6 +527,32 @@ npm run dev           # ?render=canvas para la puerta de vuelta
 la máquina, y pide WebGL por software (`--use-gl=swiftshader`). Playwright no
 puede descargar el suyo aquí.
 
+### 6.1 Los `data-*` de la raíz (S-08)
+
+La raíz (`<html>`) lleva diez atributos que dicen qué está pasando sin abrir el
+renderer. Es el mecanismo con el que un recorrido de Playwright, una prueba PWA
+o una captura comprueban el juego desde fuera. Los diez los escribe
+`src/ui/app.ts`; el dato de `data-view-height` lo calcula
+`src/render3d/renderer.ts` y `app.ts` sólo lo copia a la raíz en cada pintado.
+
+| Atributo | Qué dice | Quién lo escribe | Para qué existe |
+|---|---|---|---|
+| `data-app-ready` | El primer pintado ya se hizo: la partida está lista para tocarse. | `boot()`, tras el primer `paint(0)` | Toda espera de un recorrido o de una prueba PWA empieza por `html[data-app-ready="true"]` (`tools/valley.shots.ts`, `tools/valley.pwa.ts`, `tools/subpath.pwa.ts`, `tools/stale.pwa.ts`, `tools/animals.shots.ts`, `tools/graphics/sound-check.mjs`): es la puerta antes de tocar nada. |
+| `data-tick` | El tick de simulación pintado en este fotograma. | `paint()`, en cada pintado | `tools/valley.shots.ts` lo sondea (`page.evaluate`) para esperar a que el reloj avance antes de seguir un recorrido. |
+| `data-render` | Qué backend está vivo: `canvas` o `pilot3d`. | `stampRender()`, al montar y en cada relevo | `npm run test:pwa` (`tools/valley.pwa.ts`, `tools/subpath.pwa.ts`) espera `pilot3d` para comprobar que el 3D relevó de verdad y la partida no se quedó en el 2D de arranque. |
+| `data-render-failure` | Por qué no relevó el 3D, cuando no releva. | `stampRender()`, sólo si `handle.failure !== null` | **Nadie lo lee.** Ninguna prueba ni herramienta lo consulta hoy; queda para mirarlo a mano en devtools cuando `data-render` se queda en `canvas` más de la cuenta. |
+| `data-intro` | En qué paso del vuelo de entrada está: `flight`, `hints` o `done`. | `flyIfWanted()` y `showStep()`, al fundar un valle nuevo | `tools/valley.shots.ts` comprueba que llega a `done` tras el vuelo guiado. |
+| `data-view-height` | La altura de la cámara del render vivo, en el fotograma actual. | `paint()`, con `stats.viewHeight` (calculado en `src/render3d/renderer.ts`) | **Nadie lo lee automáticamente.** Sirvió para medir a mano el vuelo de entrada (`docs/next-plan.md`, «el vuelo de entrada se midió con `data-view-height` en Chromium por software») y para destapar el enganche de la cámara con `zoom`; sigue ahí para la misma clase de depuración manual, no para una prueba. |
+| `data-sun-phase` | La fase del sol de la última jornada pintada (0–1). | `paint()`, con `stats.sunPhase` | `tools/valley.shots.ts` la contrasta con `hourAt()` para comprobar que la hora de la cabecera es la que se ve por la ventana; `tools/graphics/shot.mjs` la imprime junto a cada captura. |
+| `data-sky` | Qué cielo hace ahora: `clear`, `overcast`, `rain`, `storm` o `snow`. | `paint()`, con `stats.sky` | `tools/valley.shots.ts` comprueba que una jornada de tormenta forzada (`weather=storm`) pinta de verdad `storm` (o `snow` en invierno). |
+| `data-bolts` | Cuántos rayos han caído desde que arrancó el render. | `paint()`, con `stats.bolts` | `tools/valley.shots.ts` sondea que suba, para esperar a un rayo antes de fotografiarlo o de comprobar el trueno. |
+| `data-screen` | Qué pantalla está abierta: `valley`, `chronicle` o `people`. | `showing()`, al cambiar de pestaña | `tools/valley.shots.ts` comprueba que tocar una pestaña abre su pantalla y que cerrarla vuelve a `valley`. |
+
+Dos no los lee nadie todavía: `data-render-failure` y `data-view-height`. Los
+dos nacieron para depurar a mano un problema puntual (el relevo a 3D en
+silencio, el zoom de la cámara) y ninguno tiene hoy una prueba o herramienta
+que los consulte; no se les ha inventado un uso que no tengan.
+
 **Antes de publicar recursos nuevos:** `npm run assets:publish` copia lo aprobado
 a `public/assets/valley3d/` con manifiesto y hash. Un candidato sin promoción no
 llega al juego — y desde v3.66 el service worker precachea lo que ese manifiesto
