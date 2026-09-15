@@ -9,6 +9,8 @@ import { NAV_ICONS, VITAL_ICONS } from './icons';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
+import { valleyClock } from '../derive/clock';
+import { hourAt } from '../render3d/effects/day-phases';
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile, Season } from '@engine/state';
 import { INTENT_STOPS, PRIORITY_STOPS, stopOf } from '@engine/state';
@@ -92,7 +94,14 @@ export interface Resumption {
  */
 export function resumeAfterHidden(hiddenMs: number, speed: Speed): Resumption {
   if (speed === 0) return { ticks: 0, welcome: false };
-  const ticks = ticksOwed(hiddenMs);
+  // **A la velocidad que el jugador dejó puesta** (v3.72). `ticksOwed` cuenta a
+  // ×1, que es lo correcto para un arranque en frío —el guardado no lleva la
+  // velocidad—, pero una pestaña que se oculta sí sabe a qué iba: dejarla en
+  // ×16 y cambiar de aplicación catorce minutos devolvía una semana en vez de
+  // dieciséis. Con la semana en catorce minutos eso deja de ser una pérdida
+  // discutible y pasa a ser el reloj mintiendo, que es justo lo que v3.72
+  // vino a arreglar. El tope de una generación sigue mordiendo dentro.
+  const ticks = ticksOwed(hiddenMs, speed);
   return { ticks, welcome: ticks >= TIME.WEEKS_PER_SEASON };
 }
 
@@ -154,11 +163,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const canvas = document.createElement('canvas');
   canvas.id = 'valley';
   canvas.setAttribute('aria-label', renderUiText('app.valley'));
-  const year = document.createElement('div');
-  year.className = 'valley-year';
-  // U-06 · bajo el año, la estación: `seasonLabel` la saca de `seasonOf`.
-  const season = document.createElement('div');
-  season.className = 'valley-season';
+  // U-12 · el reloj, donde estaba el título del año. Dos líneas: la hora
+  // —«un contador con horas incluso», dueño del diseño— y debajo la fecha, que
+  // es el año, la estación y el día. Las dos salen de `valleyClock`, así que la
+  // hora que se lee es la del sol que se ve.
+  const timeLine = document.createElement('div');
+  timeLine.className = 'valley-time';
+  const dateLine = document.createElement('div');
+  dateLine.className = 'valley-date';
   // §11.1.1 · la tira de la aldea: cuatro cifras, arriba, siempre visibles.
   const vitals = document.createElement('div');
   vitals.className = 'valley-vitals';
@@ -443,7 +455,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
   peopleTab.addEventListener('click', () => openPeople(app));
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, year, season, vitals, doing, ordersNow, hint, orders, hudRight, tabbar);
+  root.append(canvas, timeLine, dateLine, vitals, doing, ordersNow, hint, orders, hudRight, tabbar);
   paintOrders();
   speedBadge.textContent = speedLabel(speed);
 
@@ -616,15 +628,39 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     cell.style.animationDuration = `${TIME.VITAL_BUMP_MS}ms`;
     cell.classList.add('bump');
   };
+  let paintedTime = '';
+  let paintedDate = '';
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
     // que permite mirar el vuelo de entrada desde una secuencia de capturas o
     // desde un recorrido, sin abrir el renderer.
-    const height = backend.live.stats()?.viewHeight;
-    if (height !== undefined) document.documentElement.dataset.viewHeight = height.toFixed(1);
-    year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
-    season.textContent = seasonLabel(state.tick);
+    const stats = backend.live.stats();
+    if (stats !== null) {
+      document.documentElement.dataset.viewHeight = stats.viewHeight.toFixed(1);
+      // U-12 · y en qué punto de la jornada va el sol, para poder comprobar
+      // desde fuera que la hora de abajo es la que se ve por la ventana.
+      document.documentElement.dataset.sunPhase = stats.sunPhase.toFixed(4);
+    }
+    // U-12 · el reloj. Se pinta sólo cuando cambia el texto: a ×64 la hora
+    // cambia dos veces por segundo y escribir en el DOM cada fotograma es
+    // trabajo de maquetación por nada.
+    const clock = valleyClock(state.tick, fraction);
+    const hour = hourAt(clock.sunPhase);
+    const time = renderUiText('app.clock.time', { hour: String(hour).padStart(2, '0') });
+    if (time !== paintedTime) {
+      timeLine.textContent = time;
+      paintedTime = time;
+    }
+    const date = renderUiText('app.clock.date', {
+      year: clock.year,
+      season: seasonLabel(state.tick),
+      day: clock.dayOfSeason,
+    });
+    if (date !== paintedDate) {
+      dateLine.textContent = date;
+      paintedDate = date;
+    }
     const now = vitalsOf(state);
     bump(people.cell, now.people !== lastVitals.people);
     bump(food.cell, now.weeks !== lastVitals.weeks);
@@ -926,7 +962,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     hiddenAtMs = null;
     if (since === null || catchingUp || state.ended !== null) return;
     const resumption = resumeAfterHidden(Date.now() - since, speed);
-    if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome);
+    // Y la velocidad viaja con la ausencia hasta el final. Sin esto,
+    // `resumeAfterHidden` decidía que había que recuperar dieciséis semanas y
+    // el letargo recuperaba una: lo destapó el recorrido de §13.2 de
+    // `valley.shots.ts`, que cuenta los ticks de verdad.
+    if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome, speed);
   });
   window.addEventListener('pagehide', () => { persist(); loop?.stop(); }, { once: true });
 
@@ -1040,7 +1080,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * once — and `paint` after every batch is the progress screen: the valley
    * is what fills in.
    */
-  const catchUpFor = (elapsedMs: number, showWelcome: boolean): void => {
+  const catchUpFor = (elapsedMs: number, showWelcome: boolean, atSpeed = 1): void => {
     loop?.stop();
     loop = undefined;
     catchingUp = true;
@@ -1062,7 +1102,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         }
         savedAtOverride = null;
       }
-    });
+    }, atSpeed);
   };
 
   const app: App = {

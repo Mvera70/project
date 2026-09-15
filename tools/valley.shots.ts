@@ -41,6 +41,8 @@
  * de la ronda que los recalibra está en `docs/next-plan.md`.
  * ---------------------------------------------------------------------------
  */
+import { TIME } from '@engine/balance';
+import { hourAt } from '../src/render3d/effects/day-phases';
 import { test, type Page } from '@playwright/test';
 
 /** La puerta de vuelta, pedida a propósito. Ver la cabecera. */
@@ -60,6 +62,33 @@ const CANVAS = '/?render=canvas';
  * espera. Lo que no se puede es fijar otro año: cualquiera puede tener una
  * decisión encima según el valle, que es precisamente la gracia del juego.
  */
+/**
+ * Cuánto reloj real hay que correr para que pasen `weeks` semanas a `speed`.
+ *
+ * Los tres recorridos que medían tiempo escribían sus milisegundos a mano —«30
+ * min / 15 s = 120 ticks»— y los tres se cayeron juntos cuando v3.72 puso la
+ * semana en catorce minutos. El número sale de la constante o no sale.
+ */
+function msFor(weeks: number, speed: 1 | 4 | 16 | 64): number {
+  return Math.ceil((weeks * TIME.REAL_MS_PER_TICK) / speed);
+}
+
+/**
+ * Adelanta el mundo `weeks` semanas sin pintar el camino.
+ *
+ * `clock.runFor` dispara **cada** fotograma del intervalo, y con la semana de
+ * v3.72 una estación a ×16 son diez minutos de reloj falso: casi cuarenta mil
+ * fotogramas, y el recorrido se quedaba sin página. `fastForward` salta el
+ * reloj de golpe y el bucle lo cobra en el siguiente fotograma —
+ * `advanceAccumulator` se queda con la deuda y la reparte en tandas de ocho—,
+ * así que unos pocos fotogramas bastan para ponerse al día. `runFor` corto es
+ * lo que los sirve.
+ */
+async function advanceWeeks(page: Page, weeks: number, speed: 1 | 4 | 16 | 64): Promise<void> {
+  await page.clock.fastForward(msFor(weeks, speed));
+  await page.clock.runFor(200);
+}
+
 async function answerAnyCrossroad(page: Page): Promise<void> {
   const options = page.locator('.crossroad-options button');
   if (await options.count() === 0) return;
@@ -92,9 +121,22 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
   await page.locator('.title-seed').fill('7');
   await page.locator('.title-new').click();
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-date')).toContainText('Year 1');
   // Y lo que se funda es la pareja de v3.69: dos personas.
   await test.expect(page.locator('.valley-vital').first()).toHaveText('2');
+  // U-12 · el reloj: la hora que dice la cabecera es la del sol que se pinta.
+  // `data-sun-phase` es la fase de la última jornada pintada y `hourAt` la
+  // convierte; si las dos cuentas se separan, el jugador ve mediodía con el
+  // reloj en la madrugada, que es la incoherencia que v3.72 cerró. Sólo con el
+  // 3D vivo: el render 2D no tiene sol y no estampa la fase.
+  await test.expect(page.locator('.valley-time')).toHaveText(/^\d\d:00$/u);
+  const sunPhase = await page.evaluate(() => document.documentElement.dataset['sunPhase']);
+  if (sunPhase !== undefined) {
+    const shown = Number((await page.locator('.valley-time').innerText()).slice(0, 2));
+    // Una hora de margen: entre leer la fase y leer el texto pasa un fotograma.
+    test.expect(Math.abs(shown - hourAt(Number(sunPhase)))).toBeLessThanOrEqual(1);
+  }
+
   // U-11 · la primera vez, dos pistas —órdenes y tiempo— que se tocan para
   // pasar. En Canvas no hay vuelo de entrada, así que llegan enseguida.
   const hint = page.locator('.valley-hint');
@@ -114,7 +156,7 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
   await test.expect(page.locator('.title-continue')).toBeVisible();
   await page.locator('.title-continue').click();
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-date')).toContainText('Year 1');
 });
 
 test('la ruta de depuración llega al lienzo móvil sin interacción', async ({ page }) => {
@@ -150,7 +192,7 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
   await page.screenshot({ path: 'artifacts/app-shell.png', fullPage: true });
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
   await test.expect(page.locator('#valley')).toHaveCSS('height', '560px');
-  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-date')).toContainText('Year 1');
   // Cinco: pausa y las cuatro velocidades de §12.1 (v2.85). Desde el 15 sep
   // viven recogidas detrás del botón de velocidad, así que se despliegan antes
   // de medirlas: cerradas no miden nada, y eso es lo correcto.
@@ -168,7 +210,9 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
   const spring = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
   await page.locator('.valley-speed-badge').click();
   await page.getByRole('button', { name: '16×', exact: true }).click();
-  await page.clock.runFor(12_000);
+  // Una estación entera, que es lo que hace falta para que el cielo cambie de
+  // color. Se salta el reloj en vez de correrlo: ver `advanceWeeks`.
+  await advanceWeeks(page, TIME.WEEKS_PER_SEASON + 1, 16);
   const summer = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
   test.expect(summer).not.toBe(spring);
 });
@@ -177,7 +221,7 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
-  await test.expect(page.locator('.valley-year')).toHaveText('ANNO LXXXI');
+  await test.expect(page.locator('.valley-date')).toContainText('Year 81');
   // **El lienzo mide lo que mide el valle**, y desde el mapa grande son 72 × 112
   // celdas: la ruta viva usa `cellFor`, que a 390 px de ancho da cinco píxeles
   // por celda, así que el lienzo sigue cabiendo en la pantalla igual que antes.
@@ -352,7 +396,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   // partida real que haya tocado esta vez.
   await welcome.click();
   await test.expect(welcome).toBeHidden();
-  await test.expect(page.locator('.valley-year')).not.toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-date')).not.toContainText('Year 1');
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
@@ -382,7 +426,7 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
 
   await epitaph.getByRole('button', { name: 'Begin again' }).click();
   await test.expect(epitaph).toBeHidden();
-  await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
+  await test.expect(page.locator('.valley-date')).toContainText('Year 1');
   await test.expect(page.locator('.valley-speeds')).toBeVisible();
   await page.screenshot({ path: 'artifacts/m25-inherited-valley.png', fullPage: true });
 
@@ -441,7 +485,7 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
   await answerAnyCrossroad(page);
   await page.locator('.valley-speed-badge').click();
   await page.getByRole('button', { name: '16×', exact: true }).click();
-  await page.clock.runFor(5_000);
+  await page.clock.runFor(msFor(1, 16));
 
   const tickBefore = await page.evaluate(() => Number(document.documentElement.dataset['tick'] ?? '-1'));
 
@@ -458,10 +502,19 @@ test('volver de segundo plano recupera el tiempo que la aldea vivió sin mirar (
     document.dispatchEvent(new Event('visibilitychange'));
   });
 
-  // 30 min / 15 s = 120 ticks debidos.
+  // Y unos fotogramas para que el letargo se cobre: corre en tandas dentro de
+  // `requestAnimationFrame`, y con el reloj falso instalado no hay fotogramas
+  // si nadie mueve el reloj.
+  await page.clock.runFor(300);
+
+  // Los ticks que esos treinta minutos deben **a la velocidad que estaba
+  // puesta** (v3.72, `resumeAfterHidden`): a ×16 son treinta y cuatro semanas.
+  // Antes de v3.72 eran ciento veinte y estaban escritos a mano aquí.
+  const owed = Math.floor((30 * 60_000 * 16) / TIME.REAL_MS_PER_TICK);
+  test.expect(owed).toBeGreaterThan(0);
   await test.expect
     .poll(() => page.evaluate(() => Number(document.documentElement.dataset['tick'] ?? '-1')), { timeout: 20_000 })
-    .toBeGreaterThanOrEqual(tickBefore + 120);
+    .toBeGreaterThanOrEqual(tickBefore + owed);
 });
 
 test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)', async ({ page }) => {
@@ -472,28 +525,39 @@ test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)
   // ochenta años y con ella lo que la aldea tiene que decir en ese momento. Si
   // vuelve a caer, la causa es la de arriba y no una regresión del aviso.
   await page.clock.install();
-  await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
+  // **Con el granero a cero**, que es lo que hace que pase algo seguro y
+  // pronto. Antes esto esperaba a que la aldea tuviera algo que contar por su
+  // cuenta, corriendo el reloj de cuatro en cuatro segundos; con la semana de
+  // v3.72 esos cuatro segundos son ocho centésimas de semana y la espera no
+  // acababa nunca. Lo que la prueba guarda es que **el suceso llega a la
+  // pantalla donde el jugador está mirando** (§11.6), no cuánto tarda el valle
+  // en tener hambre: `hunger=1` es la misma ruta que usa el recorrido del
+  // hambre de más arriba.
+  await page.goto('/?debug=1&live=1&hunger=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await page.locator('.valley-speed-badge').click();
-  await page.getByRole('button', { name: '16×', exact: true }).click();
+  await page.getByRole('button', { name: '64×', exact: true }).click();
 
   const notice = page.locator('.valley-notice');
   await test.expect(notice).toBeHidden(); // nada que decir todavía
 
-  // Se deja correr hasta que la aldea tenga algo que contar. Antes de M-28
-  // esto no aparecía nunca: el suceso existía solo en la crónica.
+  // Semana a semana, saltando el reloj: el aviso vive cinco segundos reales
+  // (§11.4), así que cada salto va seguido de fotogramas suficientes para
+  // verlo antes de que se retire.
   await test.expect.poll(async () => {
-    await page.clock.runFor(4_000);
+    await advanceWeeks(page, 1, 64);
     return notice.isVisible();
-  }, { timeout: 30_000 }).toBe(true);
+  }, { timeout: 60_000, intervals: [100] }).toBe(true);
 
   const text = await notice.innerText();
   test.expect(text.length).toBeGreaterThan(10);
   test.expect(text).not.toMatch(/\{\w+\}/); // una frase del banco, no una clave
   await page.screenshot({ path: 'artifacts/m28-notice.png', fullPage: true });
 
-  // Y se retira sola: es un aviso, no un panel que haya que cerrar.
-  await page.clock.runFor(6_000);
+  // Y se retira sola: es un aviso, no un panel que haya que cerrar. Su vida es
+  // tiempo real (`TIME.NOTICE_MS`, §11.4) y no semanas, así que aquí sí van
+  // segundos.
+  await page.clock.runFor(TIME.NOTICE_MS + 1_000);
   await test.expect(notice).toBeHidden();
 });

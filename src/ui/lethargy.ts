@@ -69,8 +69,9 @@ export function runLethargy(
   state: GameState,
   elapsedMs: number,
   onProgress: (progress: LethargyProgress) => void,
+  speed = 1,
 ): Lethargy {
-  const total = ticksOwed(elapsedMs);
+  const total = ticksOwed(elapsedMs, speed);
   let done = 0;
   let stopped = false;
   let frameId = 0;

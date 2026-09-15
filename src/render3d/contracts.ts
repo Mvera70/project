@@ -166,6 +166,15 @@ export interface GraphicsStats {
   readonly buildings: number;
   /** U-11 · a qué altura está la vista, en celdas: es lo que deja medir el vuelo de entrada desde fuera. */
   readonly viewHeight: number;
+  /**
+   * U-12 · qué fase de la jornada se acaba de pintar, de 0 a 1.
+   *
+   * Es lo que permite comprobar **desde fuera** que el reloj de la cabecera
+   * dice la hora del sol que se ve: sin esto, la coherencia sólo se podía
+   * afirmar mirando dos funciones puras y confiando en que el juego las
+   * conectaba, que es exactamente cómo se cuelan las regresiones invisibles.
+   */
+  readonly sunPhase: number;
 }
 
 export interface GraphicsRendererOptions {

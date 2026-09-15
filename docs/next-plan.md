@@ -31,8 +31,9 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
   3. **Inicio guiado** al fundar: la aldea se ve desde lo alto y se baja —
      **hecho** (v3.71, el commit que sigue a éste en `git log`).
   4. **El tiempo como contador con horas** en vez del título «ANNO», con paso
-     de tiempo «real, como si fuese la vida real» — **pendiente, brief abajo**.
-  5. **Efectos meteorológicos: tormentas con rayos** — **pendiente, brief abajo**.
+     de tiempo «real, como si fuese la vida real» — **hecho** (v3.72).
+  5. **Efectos meteorológicos: tormentas con rayos** — **pendiente, y es lo
+     único que queda; brief abajo**.
 - **Cómo juzga.** Mira el juego **como un vídeo**: secuencias de capturas, no
   una captura suelta (`node tools/graphics/shot.mjs --sequence 12 --every 0.8`).
   «Hay muchos problemas que se ven a primera vista.» Cada paso se cierra con
@@ -44,12 +45,19 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
 
 | Qué | Estado | Cómo se comprueba |
 |---|---|---|
-| Suite rápida | 65 ficheros, 1 055 verdes, ~20 s | `npm test` |
+| Suite rápida | 66 ficheros, 1 064 verdes, ~20 s | `npm test` |
 | Jornadas | 111 + `founding.test.ts` verdes (~6 min) | `npm run test:journeys` |
 | Playwright | 11 verdes + 3 declaradas (`test.fail`) | `npm run test:shots` |
 | Balance | **16 rojas de 37** — antes de la pareja eran 11 | `npm run test:balance`, 25 min; `docs/handover.md` §5.5 dice cuáles y por qué |
-| Demo publicada | https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK (versión 11, con menú e inicio guiado) | ver §4 abajo |
-| Rama | `graphics/g-04-villager-rig`, ~30 commits sin subir | `git log --oneline main..HEAD` |
+| Demo publicada | https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK (versión 12, con menú, inicio guiado y reloj) | ver §4 abajo |
+| Rama | `graphics/g-04-villager-rig`, ~31 commits sin subir | `git log --oneline main..HEAD` |
+
+**Y lo que el reloj de v3.72 cambió para cualquiera que mida algo:** una semana
+del motor dura **catorce minutos a ×1** y no quince segundos, así que **lo que
+antes pasaba a ×1 pasa ahora a ×64**. Un informe o una prueba que hable de «una
+sesión de cinco minutos» tiene que decir a qué velocidad (la densidad de §11.6
+se mide a ×64), y las cifras en minutos que quedaran escritas por ahí son de
+antes. Las suites del motor no se enteran: cuentan ticks, no segundos.
 
 **Lo que no está hecho de los tres pasos cerrados, y sabemos:**
 
@@ -66,11 +74,44 @@ y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
   la vía es fundar en silencio y enseñar el valle desde arriba **detrás** del
   menú — es exactamente el vuelo de U-11, sin bajar hasta que se pulse.
 
-### 2. Paso 4 · El reloj con horas — brief
+### 2. Paso 4 · El reloj con horas — **hecho** (v3.72)
 
 **Lo que pidió:** «El tiempo me gustaría que se visualizase en lugar del
 título de los años. Un contador con horas incluso; debe ser real el paso del
 tiempo, como si fuese la vida real.»
+
+**Lo que se hizo, y lo que hay que saber de ello.** La cabecera es un reloj de
+dos líneas —`HH:00` y «Year 1 · Spring, day 12»— y la hora **es la del sol que
+se ve**. Para que eso fuera posible la semana pasó a durar siete jornadas de
+sol (`REAL_MS_PER_TICK` 15 s → 840 s, §12.1): antes pasaban ocho amaneceres por
+semana y no había hora que decir sin mentir. El día y la fecha salen del motor
+(`src/derive/clock.ts`) y la hora de `hourAt` (`src/render3d/effects/day-phases.ts`),
+que interpola entre los momentos del cielo —alba 05:00, mediodía 12:00,
+anochecer 19:00, noche 22:00— porque la jornada comprime la noche; la primera
+versión multiplicaba la fase por veinticuatro y sacó **la 01:00 sobre un valle a
+pleno sol** en la primera captura. `data-sun-phase` en la raíz permite
+comprobarlo desde fuera, y hay un recorrido de Playwright que lo hace.
+
+Lo que se movió con ello, todo anotado en su sitio: la densidad de §11.6 se mide
+a ×64, el techo de §8.6 se dice en semanas, el tope del letargo sigue siendo una
+generación (960 ticks, nueve días de pared) y una pestaña oculta recupera a la
+velocidad que estaba puesta. Tres duplicados menos.
+
+**Lo que quedó sin hacer, y el dueño no lo ha visto aún:**
+
+- **La noche se ve clara.** El modelo apaga el sol a las 22:00 —está medido— pero
+  `NIGHT_FLOOR` (0,38) y `NIGHT_SKY_GAIN` (1,9) sostienen la noche al 72 % de la
+  luz del día a propósito (v3.62: «nadie quiere mirar un valle a oscuras»). Con
+  un reloj en pantalla el desajuste se lee: dice 22:00 y parece media tarde.
+  Bajar esos dos números es una decisión visual del dueño, y el paso 5 va a
+  tocar la luz de todas formas.
+- **El arranque en frío recupera a ×1**, porque el guardado no lleva la
+  velocidad. Meterla es un `SCHEMA_VERSION` nuevo.
+- **Las horas no duran todas lo mismo** de tiempo real, porque la noche está
+  comprimida. Es la consecuencia honesta de lo anterior.
+
+<details>
+<summary>El brief con el que se hizo, por si hay que rehacerlo</summary>
 
 **Lo que hay hoy (no lo cambies sin leer esto):**
 
@@ -154,6 +195,8 @@ acortar el día de sol (a menos de 60 s parpadea, medido en D.6.1) sino que la
 semana tenga menos días de sol (p. ej. 3): documenta lo que elijas en §12.1 y
 en D.6.1 y **remide** el letargo.
 
+</details>
+
 ### 3. Paso 5 · Tormentas con rayos — brief
 
 **Lo que pidió:** «El siguiente paso es crear efectos meteorológicos, como
@@ -169,8 +212,13 @@ tormentas con rayos.»
 - El render no puede tirar azar que mueva la simulación (innegociable). Puede
   usar `hash32` (`src/engine/rng.ts`) sobre `(seed, tick, …)`: determinista y
   sin tocar ningún flujo.
-- Luz: `src/render3d/daylight.ts` (`light(phase, speed)`, `LIGHT_STEADY`);
-  la niebla y el sol están en `renderer.ts` (`fogAround`, `sun`).
+- Luz: `src/render3d/effects/daylight.ts` (`daylightAt(phase, speed)`,
+  `LIGHT_STEADY`, `NIGHT_FLOOR`); los momentos de la jornada y la hora que son,
+  en `src/render3d/effects/day-phases.ts` (sin Three); la niebla y el sol están
+  en `renderer.ts` (`fogAround`, `sun`). **Y desde v3.72 hay un reloj en
+  pantalla**: si la tormenta oscurece el valle, el jugador va a comparar la
+  penumbra con la hora que marca la cabecera, así que la tormenta tiene que
+  leerse como tormenta —nubes, lluvia, un cielo bajo— y no como anochecer.
 - Sonido: `src/ui/sound.ts`, sintetizado con Web Audio, con **fusible** de
   acentos (`accentAllowed`, §11.4) y `AccentKind = 'milestone' | 'crossroad'`.
 - Presupuestos de escena: D.9 y `tests/fast/graphics-budget.test.ts` (llamadas

@@ -303,13 +303,35 @@ describe('catchUp · §13.2', () => {
     expect(elapsedMs).toBeLessThan(2_000);
   });
 
-  it('una ausencia más larga que el tope se recorta a los mismos 960 ticks', () => {
+  it('una ausencia a velocidad alta vale lo que habría valido mirándola', () => {
+    // v3.72: el letargo contaba a ×1 aunque el jugador hubiera dejado el juego
+    // a ×16, y con la semana en catorce minutos eso era perder quince de cada
+    // dieciséis semanas. El tope sigue siendo tiempo de **aldea**: por deprisa
+    // que fuera, nadie vuelve a más de una generación de distancia.
+    // Una semana justa de ausencia, para que el suelo de la división no
+    // enturbie la proporción: a ×16 son dieciséis semanas.
+    const week = TIME.REAL_MS_PER_TICK;
+    expect(ticksOwed(week, 1)).toBe(1);
+    expect(ticksOwed(week, 16)).toBe(16);
+    expect(ticksOwed(week, 64)).toBe(64);
+    const hour = 60 * 60 * 1000;
+    expect(ticksOwed(TIME.LETHARGY_CAP_MS, 64))
+      .toBe(TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR);
+    expect(ticksOwed(hour, 0)).toBe(0);
+  });
+
+  it('una ausencia más larga que el tope se recorta a una generación', () => {
+    // Novecientos sesenta ticks, que son los veinte años de §4.1. El tope se
+    // escribe en tiempo real (`LETHARGY_CAP_MS`) pero **vale una generación**,
+    // y eso es lo que esta prueba guarda: con el tick de 15 s eran cuatro horas
+    // y desde v3.72 son nueve días y medio, sin que cambie ni un tick.
+    const generation = TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR;
     const state = foundGame(7);
-    const oneWeek = 7 * 24 * 60 * 60 * 1000;
-    const report = catchUp(state, oneWeek);
-    expect(report.ticks).toBe(960);
+    const report = catchUp(state, 2 * TIME.LETHARGY_CAP_MS);
+    expect(report.ticks).toBe(generation);
     expect(report.capped).toBe(true);
-    expect(ticksOwed(oneWeek)).toBe(960);
+    expect(ticksOwed(2 * TIME.LETHARGY_CAP_MS)).toBe(generation);
+    expect(generation).toBe(960);
   });
 
   it('una encrucijada pendiente sigue pendiente al volver: no se resuelve, no caduca, no mata', () => {

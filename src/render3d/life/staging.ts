@@ -17,7 +17,6 @@
 // sitio de la reunión, porque la vida repartía a cada uno por sus propias
 // ofertas y no había oído la orden.
 
-import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { GameState, VillagerId } from '@engine/state';
 import { gatheringsAt } from '@derive/gatherings';
@@ -45,24 +44,21 @@ export type Order =
   | { readonly kind: 'mourn'; readonly who: VillagerId };
 
 /**
- * Cuántas semanas del motor cabe en una jornada escénica.
- *
- * Ocho, y sale de la aritmética y no de un número escrito: una jornada dura
- * `SCENIC_DAY_SECONDS` (120) de tiempo escénico y una semana `REAL_MS_PER_TICK`
- * (15 s), y desde D.6.1 la jornada sigue la velocidad entera, así que la cuenta
- * vale a cualquier velocidad. Es la ventana por la que hay que preguntar: una
- * reunión de cuatro semanas cabe **entera** entre dos amaneceres, y preguntando
- * sólo por «ahora mismo» la mitad de las reuniones no se verían nunca.
- */
-export const WEEKS_PER_DAY = Math.round(120_000 / TIME.REAL_MS_PER_TICK);
-
-/**
  * Las órdenes vivas para la jornada que empieza.
  *
  * Lee el estado congelado y nada más: es una función pura, no consume azar y no
  * toca la simulación.
+ *
+ * **La ventana es la semana en curso, y hasta v3.72 era de ocho.** Mientras una
+ * jornada escénica cubría ocho semanas del motor, había que preguntar por «las
+ * ocho últimas» o la mitad de las reuniones no se veían nunca: empezaban y
+ * acababan entre dos amaneceres. Ahora una semana son siete jornadas
+ * (`TIME.DAYS_PER_WEEK`), así que una reunión de una semana se ve **siete
+ * jornadas seguidas** y preguntar por ahora mismo es lo correcto. Si algún día
+ * la semana vuelve a durar menos que una jornada, esto vuelve a necesitar
+ * ventana.
  */
-export function ordersOf(state: GameState, since: number = state.tick - WEEKS_PER_DAY): Order[] {
+export function ordersOf(state: GameState, since: number = state.tick): Order[] {
   return gatheringsAt(state, CATALOG, since)
     .map((meeting): Order => ({
       kind: 'gather',

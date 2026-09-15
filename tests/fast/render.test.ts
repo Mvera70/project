@@ -161,17 +161,22 @@ describe('M-18 · multitud derivada', () => {
 });
 
 describe('M-20 · reloj de aplicación', () => {
-  it('a 4× y 60 fps, doce minutos reales producen 192 ticks', () => {
+  it('a 4× y 60 fps, doce minutos reales no pierden ni un tick por el camino', () => {
+    // Lo que se vigila es que sumar dos mil ciento sesenta fotogramas de 16,67
+    // ms no pierda nada por redondeo, no una cifra concreta: con el tick de
+    // quince segundos eran 192 ticks y con el de v3.72 son tres. El número
+    // sale de la constante.
+    const minutes = 12;
     let remainder = 0;
     let ticks = 0;
     let maximum = 0;
-    for (let frame = 0; frame < 12 * 60 * 60; frame += 1) {
+    for (let frame = 0; frame < minutes * 60 * 60; frame += 1) {
       const advance = advanceAccumulator(remainder, 1000 / 60, 4);
       remainder = advance.remainderMs;
       ticks += advance.ticks;
       maximum = Math.max(maximum, advance.ticks);
     }
-    expect(ticks).toBe(192);
+    expect(ticks).toBe(Math.floor((minutes * 60_000 * 4) / TIME.REAL_MS_PER_TICK));
     expect(maximum).toBeLessThanOrEqual(8);
   });
 

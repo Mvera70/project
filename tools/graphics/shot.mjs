@@ -175,20 +175,34 @@ if (open) await tab.waitForTimeout(300);
 
 if (sequence > 0) {
   const stem = out.replace(/\.png$/u, '');
+  // Y cada fotograma dice **qué hora era**, que es la mitad de lo que hace
+  // falta para juzgar el reloj de U-12: una secuencia en la que el sol baja
+  // mientras el reloj sube no se puede leer sin las horas al lado.
+  const when = [];
   for (let n = 0; n < sequence; n += 1) {
+    // La hora **antes** del disparo, no después: una captura tarda casi un
+    // segundo en esta máquina y a ×1 eso es una hora de valle, así que leerla
+    // después etiquetaba cada fotograma con la hora del siguiente.
+    when.push(await tab.evaluate(() => {
+      const time = document.querySelector('.valley-time')?.textContent ?? '';
+      const date = document.querySelector('.valley-date')?.textContent ?? '';
+      const phase = document.documentElement.dataset.sunPhase ?? '-';
+      return `${time} ${date} · fase ${phase}`;
+    }));
     await tab.screenshot({ path: `${stem}-${String(n + 1).padStart(2, '0')}.png` });
     const open = await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'));
     if (open) await swipeDown();
     await tab.waitForTimeout(every * 1000);
   }
   console.log(`${sequence} capturas cada ${every} s → ${stem}-NN.png`);
+  when.forEach((label, n) => console.log(`  ${String(n + 1).padStart(2, '0')} · ${label}`));
 }
 
 const shot = await tab.screenshot({ path: out });
 
 // Y a qué estación corresponde lo que se acaba de fotografiar, que es la mitad
 // de lo que hace falta para juzgar si el reloj cuadra.
-const season = await tab.evaluate(() => document.querySelector('.valley-season')?.textContent ?? '');
+const season = await tab.evaluate(() => document.querySelector('.valley-date')?.textContent ?? '');
 // Y la frase de estado y la línea de órdenes, que son lo que la cabecera dice.
 const doing = await tab.evaluate(() => {
   const line = document.querySelector('.valley-doing');
@@ -232,7 +246,7 @@ const brightness = await tab.evaluate(async (base64) => {
 }, shot.toString('base64'));
 
 const hud = await tab.evaluate(() => ({
-  year: document.querySelector('.valley-year')?.textContent ?? null,
+  year: document.querySelector('.valley-time')?.textContent ?? null,
   vitals: [...document.querySelectorAll('.valley-vital')].map((e) => e.textContent),
 }));
 console.log(JSON.stringify({ ...hud, season, doing, ordersNow, brightness }), '→', out);

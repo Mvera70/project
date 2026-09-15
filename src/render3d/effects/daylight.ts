@@ -19,12 +19,10 @@
 
 import { Color } from 'three';
 
-/** Los momentos del día escénico, en fracción de día. */
-const DAWN = 0.06;
-const MORNING = 0.18;
-const NOON = 0.45;
-const DUSK = 0.78;
-const NIGHT = 0.92;
+// Los momentos de la jornada viven en `day-phases.ts` desde v3.72: el reloj de
+// la cabecera necesita los mismos y no puede arrastrar Three consigo. Se siguen
+// reexportando aquí abajo, así que quien los importaba no cambia.
+import { DAWN, DUSK, MORNING, NIGHT, NOON } from './day-phases';
 
 /**
  * Cuánta luz queda de noche, contra el mediodía.
@@ -248,3 +246,4 @@ export function daylightAt(phase: number, speed: 0 | 1 | 4 | 16 | 64 = 1): Dayli
 }
 
 export { DAWN, DUSK, LIGHT_STEADY, NIGHT_FLOOR, NOON, STEADY_PHASE };
+export { hourAt } from './day-phases';

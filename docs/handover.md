@@ -105,6 +105,43 @@ sitio.
 
 ## 2.1. La versión 2.0, del 15 sep 2026
 
+> **El reloj, v3.72 — y el cambio de ritmo que trae.** Cuarto paso del dueño:
+> «un contador con horas incluso; debe ser real el paso del tiempo». La cabecera
+> es un reloj de dos líneas y **la hora es la del sol que se ve**; para que eso
+> fuera posible la semana pasó a durar siete jornadas de sol —`REAL_MS_PER_TICK`
+> de 15 s a 840 s, §12.1—, porque antes pasaban ocho amaneceres por semana.
+>
+> **Lo que hay que saber antes de medir nada:** a ×1 un año son once horas, así
+> que **lo que antes pasaba a ×1 pasa ahora a ×64**. Tres cosas se movieron con
+> ello y están anotadas donde viven: la densidad de §11.6 se mide a ×64, el
+> techo de §8.6 se dice en semanas (120) y no en minutos, y el tope del letargo
+> sigue siendo una generación (960 ticks) pero en la pared son nueve días y
+> medio. Y tres recorridos de Playwright que escribían sus milisegundos a mano
+> se cayeron juntos: ahora derivan el tiempo de la constante (`msFor`,
+> `advanceWeeks` en `valley.shots.ts`), y correr el reloj falso «por segundos»
+> ya no vale porque son decenas de miles de fotogramas.
+>
+> **Dos fallos que costaron la tarde y quedan escritos:**
+>
+> - **El reloj escénico se acumulaba por su cuenta** y se separaba del
+>   calendario: en esta máquina, a diez fotogramas por segundo, el tope de
+>   `MAX_STEP_SECONDS` le comía **casi la mitad** del día. En captura se veía a
+>   la primera —la cabecera decía la 01:00 y el cielo iba por las seis de la
+>   tarde—. Ahora hay **un solo reloj**: el tiempo escénico se lee del tick y su
+>   fracción (`scenicSecondsAt`), y lo único que sigue acotado por fotograma es
+>   cuánto andan los cuerpos.
+> - **La hora no es una regla de tres.** La jornada le da el 86 % de sí misma a
+>   la luz, así que multiplicar la fase por veinticuatro pone el alba a la
+>   01:26. `hourAt` interpola entre los momentos que el cielo ya tiene marcados
+>   (`effects/day-phases.ts`). El precio: las horas de la madrugada pasan en un
+>   segundo y medio a ×1 y las de la mañana tardan siete.
+>
+> **La deuda que deja:** el arranque en frío recupera a ×1 porque el guardado no
+> lleva la velocidad (meterla es un `SCHEMA_VERSION` nuevo); y la noche se
+> sostiene al 72 % de la luz del día a propósito (`NIGHT_FLOOR`, v3.62), lo que
+> con un reloj en pantalla se lee distinto —dice 22:00 y hay luz de tarde—.
+> Bajarla es decisión del dueño y el paso 5 va a tocar la luz de todos modos.
+
 > **Añadido el mismo día, después de la versión 2.0: la pareja (v3.69).** El
 > dueño rechazó la demo «sólida» —trastos de prueba atravesando el suelo, tres
 > filas de botones— y dio la premisa: un idle bonito de mirar de fondo, con la
@@ -132,7 +169,8 @@ partidas no se jueguen igual. Las cinco entregas están en el plan con su
 medida.
 
 **El reloj, decidido el 15 sep:** la jornada escénica **sigue la velocidad
-entera**, así que caben ocho semanas por jornada a cualquier velocidad —antes
+entera**, así que la proporción no depende del botón —caben ocho semanas por
+jornada hasta v3.72, y siete jornadas por semana desde ella; antes
 eran ocho a ×1 y treinta y dos a ×16, y el calendario y el sol contaban dos
 historias—. El coste: a ×64 el día dura 1,9 s, así que la jornada de **luz** se
 aplana hacia la de media mañana a ×16 y ×64 (`LIGHT_STEADY`), porque un

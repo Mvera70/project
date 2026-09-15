@@ -230,8 +230,14 @@ describe('balance · encrucijadas', () => {
     expect(CROSSROADS.GUARANTEE_TICKS).toBe(TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR);
   });
 
-  it('el techo son 30 minutos reales a ×1', () => {
-    expect(CROSSROADS.MIN_TICKS_BETWEEN * TIME.REAL_MS_PER_TICK).toBe(30 * 60 * 1000);
+  it('el techo son dos años y medio de aldea', () => {
+    // Estuvo escrito como «30 minutos reales a ×1», y era verdad mientras la
+    // semana durase quince segundos. Desde v3.72 dura catorce minutos, así que
+    // la misma decisión —ciento veinte semanas entre dos encrucijadas— se lee
+    // en la pared de otra manera según el botón: veintiséis minutos a ×64,
+    // veintiocho horas a ×1. Lo que el diseño fija son las semanas, y eso es lo
+    // que esta prueba guarda.
+    expect(CROSSROADS.MIN_TICKS_BETWEEN).toBe(2.5 * TIME.WEEKS_PER_YEAR);
   });
 
   it('el techo es mucho más estrecho que la garantía', () => {

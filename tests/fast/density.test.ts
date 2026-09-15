@@ -11,9 +11,18 @@ import { run } from '@engine/sim';
 import { milestonesAt } from '@ui/milestones';
 
 describe('la aldea tiene algo que contar · §11.6', () => {
-  it('una sesión de cinco minutos a ×1 trae varios sucesos notables', () => {
-    // Cinco minutos reales a velocidad normal son veinte semanas.
-    const weeks = Math.round((5 * 60 * 1000) / TIME.REAL_MS_PER_TICK);
+  it('una sesión de cinco minutos a ×64 trae varios sucesos notables', () => {
+    // **La velocidad cambió en v3.72, no el suelo.** §11.6 pedía veinte semanas
+    // en cinco minutos y las daba ×1, porque una semana duraba quince segundos.
+    // Desde que la semana son siete jornadas de sol —lo que el dueño del diseño
+    // pidió para que el reloj no mintiera— una semana dura catorce minutos a
+    // ×1, y las mismas veintitrés semanas por sesión las da **×64**. A ×1 el
+    // juego es una jornada de la aldea y lo notable pasa mientras no se mira,
+    // que es lo que tiene que hacer un idle; el suelo de §16.3 —«por debajo de
+    // uno el juego no valía»— se mide donde el jugador va a ver pasar el mundo.
+    const speed = 64;
+    const weeks = Math.round((5 * 60 * 1000 * speed) / TIME.REAL_MS_PER_TICK);
+    expect(weeks, 'semanas por sesión, que es lo que se está midiendo').toBeGreaterThan(19);
     const seeds = [3, 7, 11, 23, 41, 97];
     // **Y se miran muchas sesiones, no una.** La primera versión medía una sola
     // ventana de veinte semanas justo al cumplirse el año veinte, y eso es una
@@ -72,7 +81,7 @@ describe('la aldea tiene algo que contar · §11.6', () => {
     //
     // Sigue por encima del suelo de §16.3 —«por debajo de uno el juego no
     // valía»— y con margen, que es distinto de estar justo en él.
-    expect(notable / sessions, 'sucesos notables por sesión de cinco minutos a ×1')
+    expect(notable / sessions, 'sucesos notables por sesión de cinco minutos a ×64')
       .toBeGreaterThan(1);
     // La crónica sola, aparte y con su propia cota: si algún día los hitos
     // llevaran el peso de esto, se vería aquí.

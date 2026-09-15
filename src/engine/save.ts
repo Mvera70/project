@@ -429,9 +429,20 @@ export function foundSuccessor(game: ArchivedGame, seed: number): GameState {
   return foundGame(seed, { terrainSeed: game.terrainSeed, ruins: game.ruins });
 }
 
-/** How many ticks a gap of this length owes, capped at §12's four hours. */
-export function ticksOwed(elapsedMs: number): number {
-  const capped = Math.min(Math.max(0, elapsedMs), TIME.LETHARGY_CAP_MS);
+/**
+ * Cuántos ticks debe una ausencia de este tiempo, con el tope de §12.
+ *
+ * **`speed` es la velocidad a la que corría el juego** (v3.72). Por omisión ×1,
+ * que es lo único que un arranque en frío puede suponer: el guardado no lleva
+ * la velocidad. Una pestaña que se oculta sí sabe a qué iba, y ahí la ausencia
+ * vale lo que habría valido mirándola —a ×16, catorce minutos fuera son
+ * dieciséis semanas y no una—. El tope sigue siendo una generación de **tiempo
+ * de aldea**, así que se aplica después de multiplicar: por deprisa que fuera,
+ * nadie vuelve a más de novecientos sesenta ticks de distancia.
+ */
+export function ticksOwed(elapsedMs: number, speed = 1): number {
+  const lived = Math.max(0, elapsedMs) * Math.max(0, speed);
+  const capped = Math.min(lived, TIME.LETHARGY_CAP_MS);
   return Math.floor(capped / TIME.REAL_MS_PER_TICK);
 }
 

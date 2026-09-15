@@ -90,7 +90,7 @@ test('a partir de la segunda apertura, el valle abre en modo avión', async ({ p
   // trabajador, sin red el relevo fallaría y esto diría `canvas`: el valle
   // abriría, sí, pero no sería el juego.
   await page.locator('html[data-render="pilot3d"]').waitFor({ timeout: 30_000 });
-  await test.expect(page.locator('.valley-year')).not.toBeEmpty();
+  await test.expect(page.locator('.valley-time')).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m27-offline.png', fullPage: true });
 
   await context.setOffline(false);

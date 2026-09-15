@@ -104,7 +104,7 @@ medido de rendimiento es de un portátil (G-09 quedó parcial por no haber
 dispositivo).
 
 **Cerrado:** el motor (M-01 a M-39), el render (G-00 a G-12), la interfaz (U-01 a
-U-11), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
+U-12), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
 
 **Y la versión 2.0, del 15 sep 2026, entregada** (`docs/plan-juego.md`, con sus
 medidas en `docs/handover.md` §2.1). El juego tiene un verbo: tres palancas de
@@ -136,8 +136,18 @@ aldea hecha usan `foundTwenty` (`tests/helpers/founding.ts`), y lo que la
 pareja promete lo guarda `tests/journeys/founding.test.ts`. Detrás vienen, en
 este orden y pedidos por él: el menú de inicio (U-10, hecho: `screens/title.ts`,
 sólo se configura el número del valle), el inicio guiado desde lo alto (U-11,
-hecho: `flyIn` en el renderer y dos pistas en `app.ts`), el reloj con horas,
-las tormentas con rayos.
+hecho: `flyIn` en el renderer y dos pistas en `app.ts`), el reloj con horas
+(U-12, hecho) y **las tormentas con rayos, que es lo único que queda**; su
+brief paso a paso está en `docs/next-plan.md`, sección «Para quien siga».
+
+**Y con el reloj, el tick cambió de duración: una semana son catorce minutos a
+×1** (v3.72, §12.1). No es un ajuste de gusto: es lo que hace que una jornada de
+sol sea un día y que la cabecera pueda decir la hora. Lo que hay que saber antes
+de medir nada: **lo que antes pasaba a ×1 pasa ahora a ×64**, así que un informe
+o una prueba que hable de «una sesión de cinco minutos» tiene que decir a qué
+velocidad; la identidad `REAL_MS_PER_TICK = DAYS_PER_WEEK · SCENIC_DAY_SECONDS`
+la vigila `tests/fast/clock.test.ts` y romperla devuelve el juego a ocho
+amaneceres por semana.
 
 **V-11 cerrada (15 sep 2026), y con ella el Anexo E entero.** Las reuniones de
 §11.8 habían dejado de ocurrir el día de G-12 —sólo existían en el camino

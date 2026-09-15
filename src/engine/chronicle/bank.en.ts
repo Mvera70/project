@@ -1756,6 +1756,12 @@ export const UI_BANK: Record<string, string> = {
   'app.build.faith': 'Faith',
   'app.build.defence': 'Walls',
   'app.year': 'ANNO {year}',
+  // U-12 · el reloj de la cabecera (v3.72). Reemplaza al título «ANNO I», que
+  // se queda donde sigue teniendo sentido: las cabeceras de año de la crónica.
+  // Lo pidió el dueño del diseño: «un contador con horas incluso». La hora va
+  // rellena a dos dígitos por quien la pinta, para que no baile de ancho.
+  'app.clock.time': '{hour}:00',
+  'app.clock.date': 'Year {year} · {season}, day {day}',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',
   'app.speed.multiplier': '{speed}×',

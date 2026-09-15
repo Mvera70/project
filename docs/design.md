@@ -2308,8 +2308,33 @@ están las órdenes y dónde el tiempo, en la voz del juego, y se tocan para
 pasar. No es un tutorial (U-04 sigue): son dos frases. La raíz lleva
 `data-intro` (`flight` → `hints` → `done`) para poder mirarlo desde fuera.
 
-**1. El valle.** Por defecto. Arriba a la izquierda, el año en números romanos
-pequeños. Abajo a la derecha, los controles de velocidad. Nada más.
+**1. El valle.** Por defecto. Arriba a la izquierda, **el reloj** (U-12, v3.72);
+abajo a la derecha, los controles de velocidad. Nada más.
+
+El reloj son dos líneas y reemplaza al título «ANNO I», que se queda donde
+sigue teniendo sentido: las cabeceras de año de la crónica. Arriba **la hora**
+—`HH:00`, en la voz del juego y con cifras de ancho fijo, porque un reloj que
+baila al pasar de las 09:00 a las 10:00 se lee como un error—; debajo **la
+fecha**: año, estación y día de la estación, de 1 a 84 (doce semanas de siete).
+
+**La hora es la del sol que se ve, y eso es la mitad del trabajo.** El día y la
+fecha salen del motor (`derive/clock.ts`, del tick y su fracción); la hora sale
+de la fase de la jornada a través de `hourAt` (`render3d/effects/day-phases.ts`),
+que **interpola entre los momentos que el cielo ya tiene marcados** —alba 05:00,
+mediodía 12:00, anochecer 19:00, noche cerrada 22:00—. No es una regla de tres,
+y la razón está medida: la jornada escénica comprime la noche (le da el 86 % de
+sí misma a la luz), así que multiplicar la fase por veinticuatro pone el alba a
+la 01:26. La primera captura de U-12 salió con **la 01:00 sobre un valle a pleno
+sol**, y de ahí sale la interpolación.
+
+El precio de una noche corta: las horas no duran todas lo mismo de tiempo real
+—las de la madrugada pasan en un segundo y medio a ×1, las de la mañana tardan
+casi siete—. La alternativa era un reloj que no cuadra con lo que se ve.
+
+Y se puede comprobar desde fuera, que es lo que impide que esto se rompa en
+silencio: la raíz lleva `data-sun-phase` con la fase de la última jornada
+pintada, y un recorrido de `valley.shots.ts` compara `hourAt` de esa fase con lo
+que dice la cabecera.
 
 **2. Ficha.** Se despliega desde abajo al tocar. Para un edificio: qué es, cuándo
 se levantó, quién lo usa, la cifra relevante. Para un nombrado: nombre, edad,
@@ -2954,11 +2979,44 @@ export const TIME = {
   WEEKS_PER_YEAR: 48,
   HARVEST_WEEK: 35,
   GENERATION_YEARS: 20,
-  REAL_MS_PER_TICK: 15_000,
-  SPEEDS: [0, 1, 4, 16, 64],  // v2.85: 64x para poder probar el ritmo
-  LETHARGY_CAP_MS: 4 * 60 * 60 * 1000,
+  REAL_MS_PER_TICK: 840_000,      // v3.72: 7 jornadas de sol de 120 s
+  DAYS_PER_WEEK: 7,               // v3.72
+  DAY_START_PHASE: 0.28,          // v3.72: media mañana, donde abre el valle
+  SPEEDS: [0, 1, 4, 16, 64],      // v2.85: 64x para poder probar el ritmo
+  LETHARGY_CAP_MS: 20 * 48 * 840_000,  // una generación (§4.1)
 } as const;
 ```
+
+> **Revisión v3.72, 15 sep 2026 — el reloj que se puede leer.** Lo pidió el
+> dueño del diseño: «el tiempo me gustaría que se visualizase en lugar del
+> título de los años; me gustaría un contador con horas incluso, por eso quería
+> arreglar el reloj: **debe ser real el paso del tiempo, como si fuese la vida
+> real**». Lo que lo hacía imposible era esta tabla: con la semana en quince
+> segundos y la jornada de sol en 120, **pasaban ocho amaneceres por semana** y
+> no había hora que decir sin mentir.
+>
+> La identidad que lo cierra, y que vigila `tests/fast/clock.test.ts`:
+>
+> ```
+> REAL_MS_PER_TICK = DAYS_PER_WEEK · SCENIC_DAY_SECONDS · 1000 = 7 · 120 s
+> ```
+>
+> **Lo que cuesta, dicho entero.** A ×1 una semana son catorce minutos, una
+> estación siete horas y un año once; a ×64, una semana trece segundos y un año
+> diez minutos y medio. Es decir: **lo que antes pasaba a ×1 pasa ahora a ×64**,
+> y ×1 es la velocidad de mirar una jornada de la aldea. Tres cosas se mueven
+> con ello y están anotadas donde viven: la densidad de §11.6 se mide a ×64
+> (`tests/fast/density.test.ts`), el techo entre encrucijadas de §8.6 son ciento
+> veinte semanas y ya no «media hora real», y el tope del letargo sigue siendo
+> una generación —960 ticks, el caso de esfuerzo de §11.4— pero en la pared son
+> nueve días y medio en vez de cuatro horas. La pestaña oculta, además, recupera
+> **a la velocidad que el jugador dejó puesta** (`resumeAfterHidden`): a ×16,
+> catorce minutos fuera son dieciséis semanas y no una.
+>
+> **Los dos diales, si algún día hay que acelerar:** `SCENIC_DAY_SECONDS`
+> (120 → 60 es el suelo medido en D.6.1, por debajo la luz parpadea y la gente
+> esprinta) y `DAYS_PER_WEEK` (7 → 3 deja de parecerse a una semana). Cualquiera
+> de los dos arrastra `REAL_MS_PER_TICK` con él, o la identidad se rompe.
 
 ### 12.2 Fundación
 
@@ -3395,6 +3453,16 @@ Al cargar:
 elapsed = min(now − savedAtMs, LETHARGY_CAP_MS)
 ticks   = floor(elapsed / REAL_MS_PER_TICK)      // máx. 960
 ```
+
+**El tope son 960 ticks y eso no se ha movido en v3.72** —es una generación
+(§4.1) y es el caso de esfuerzo de §11.4—; lo que cambió es cuánto tiempo de
+pared valen: nueve días y medio a ×1 en vez de cuatro horas, porque la semana
+pasó de quince segundos a catorce minutos. Un idle que se mira de fondo pide
+justo eso: volver al día siguiente y encontrar dos años de crónica.
+
+**Y una pestaña que se oculta recupera a la velocidad que estaba puesta**
+(`resumeAfterHidden`, v3.72), no a ×1. El arranque en frío no puede: el guardado
+no lleva la velocidad. Queda anotado como deuda en `docs/handover.md`.
 
 Se ejecutan esos ticks en lotes de 64 dentro de `requestAnimationFrame`, con una
 pantalla de progreso que ya muestra el valle dibujándose. 960 ticks tardan menos
@@ -5715,9 +5783,16 @@ Lo que arregla es la única incoherencia del reloj que el jugador puede ver sin
 contar nada: **cuántas semanas caben en una jornada ya no depende del botón.**
 Con la raíz cuadrada que esto decía antes, pasaban ocho semanas por jornada a
 ×1 y treinta y dos a ×16, así que el calendario y el sol contaban dos historias
-distintas y la segunda cambiaba cada vez que se tocaba la velocidad. Ahora son
-ocho semanas por jornada a cualquier velocidad: una estación es semana y media
-de sol, siempre.
+distintas y la segunda cambiaba cada vez que se tocaba la velocidad.
+
+> **Y en v3.72 dejan de ser ocho semanas por jornada: son siete jornadas por
+> semana.** Con la velocidad entera ya resuelta, lo que quedaba por cuadrar era
+> la proporción, y no se arregla tocando la jornada —a menos de 60 s la luz
+> parpadea y la gente esprinta, medido aquí— sino **alargando la semana**:
+> `REAL_MS_PER_TICK` pasa de 15 s a 840 s, que son exactamente siete jornadas
+> (§12.1). Desde ahí una jornada de sol **es un día**, y la cabecera puede decir
+> la hora (§11.2). La jornada no se ha tocado: sigue durando 120 s escénicos y
+> `scenicRate` sigue siendo la velocidad entera.
 
 Las dos puntas que ya se habían probado, para que no se vuelvan a probar: **sin
 atar** (la jornada fija), apretar ×16 no cambiaba nada visible salvo el marcador

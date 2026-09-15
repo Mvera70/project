@@ -365,6 +365,8 @@ export async function createGraphicsRenderer(
   let lifeCarry = 0;
   let mapWidth = 0;
   let mapHeight = 0;
+  // U-12 · la fase de la última jornada pintada, para poder mirarla desde fuera.
+  let paintedPhase = 0;
   let disposed = false;
 
   const raycaster = new Raycaster();
@@ -568,6 +570,7 @@ export async function createGraphicsRenderer(
       // La hora escenica primero, porque de ella cuelga todo lo demas: es la
       // que dice que jornada se esta pintando y, con ella, que estado.
       const phase = dayPhase(frame.presentationSeconds);
+      paintedPhase = phase;
       const today = dayNumber(frame.presentationSeconds);
       // Un fotograma discontinuo —partida nueva, carga, letargo— trae un estado
       // que no es la continuacion del anterior, asi que la jornada guardada no
@@ -786,6 +789,7 @@ export async function createGraphicsRenderer(
         actors: cast.count,
         buildings: village.count,
         viewHeight: view.view.height,
+        sunPhase: paintedPhase,
       };
     },
 

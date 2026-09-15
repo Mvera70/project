@@ -44,17 +44,22 @@
         width: min(100vw, 390px); height: min(100dvh, 844px); overflow: hidden; background: var(--valley-void); }
       #valley { display: block; margin-top: max(22px, env(safe-area-inset-top)); border: 2px solid transparent; touch-action: none; }
 
-      /* El año es la identidad del juego, no una etiqueta de depuración. */
-      .valley-year { position: absolute; z-index: 2; top: max(7px, env(safe-area-inset-top)); left: 15px;
-        color: var(--gild); font: 600 15px/1.1 var(--voice); letter-spacing: .2em;
-        text-shadow: 0 1px 0 rgba(242,233,216,.55); }
+      /* U-12 · la hora, donde estaba el año. Es la identidad del juego y el
+         instrumento que dice a qué hora vive la aldea, así que va en la voz del
+         juego y con cifras de ancho fijo: un reloj que baila al pasar de las
+         09:00 a las 10:00 se lee como un error. */
+      .valley-time { position: absolute; z-index: 2; top: max(7px, env(safe-area-inset-top)); left: 15px;
+        color: var(--gild); font: 600 17px/1.1 var(--voice); letter-spacing: .08em;
+        font-variant-numeric: tabular-nums; text-shadow: 0 1px 0 rgba(242,233,216,.55); }
 
-      /* U-06 · la estación, bajo el año. Versalitas de verdad
-         (`font-variant-caps`), no mayúsculas forzadas: el texto del banco va en
-         mayúscula-minúscula normal y es esta regla la que lo dibuja pequeño. */
-      .valley-season { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 17px); left: 15px;
-        color: var(--ink-soft); font: 600 10px/1.1 var(--plain); letter-spacing: .13em;
-        font-variant-caps: all-small-caps; text-shadow: 0 1px 0 rgba(242,233,216,.4); }
+      /* U-12 · la fecha, bajo la hora: año, estación y día. Versalitas de
+         verdad (`font-variant-caps`), no mayúsculas forzadas: el texto del
+         banco va en mayúscula-minúscula normal y es esta regla la que lo dibuja
+         pequeño. Ocupaba esta línea la estación sola hasta v3.72. */
+      .valley-date { position: absolute; z-index: 2; top: calc(max(7px, env(safe-area-inset-top)) + 19px); left: 15px;
+        color: var(--ink-soft); font: 600 10px/1.1 var(--plain); letter-spacing: .1em;
+        font-variant-caps: all-small-caps; font-variant-numeric: tabular-nums;
+        text-shadow: 0 1px 0 rgba(242,233,216,.4); }
 
       /* §11.1.1 · la tira de la aldea. **Una placa, no cuatro insignias**: son
          cuatro lecturas del mismo instrumento, y separadas se leían como cuatro

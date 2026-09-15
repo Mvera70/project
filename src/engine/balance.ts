@@ -16,12 +16,56 @@ export const TIME = {
   WEEKS_PER_YEAR: 48,
   HARVEST_WEEK: 35,
   GENERATION_YEARS: 20,
-  REAL_MS_PER_TICK: 15_000,
+  // TUNE: **una semana son siete jornadas de sol** (v3.72, y lo pidió el dueño
+  // del diseño: «debe ser real el paso del tiempo, como si fuese la vida
+  // real»). De ahí sale este número y no de un gusto:
+  //
+  //     REAL_MS_PER_TICK = DAYS_PER_WEEK · SCENIC_DAY_SECONDS · 1000
+  //                      = 7 · 120 s = 840 s
+  //
+  // Hasta aquí eran 15 s, y con la jornada de sol en 120 s eso hacía **ocho
+  // semanas por amanecer**: el calendario corría por delante del sol y el
+  // reloj de la cabecera no podía decir una hora sin mentir. La identidad de
+  // arriba la vigila una prueba (`tests/fast/clock.test.ts`), porque romperla
+  // es volver a la incoherencia sin que nada falle.
+  //
+  // **El coste, escrito.** A ×1 una semana son catorce minutos y un año once
+  // horas: a esa velocidad el juego es una jornada de la aldea, no su
+  // historia. Lo que antes pasaba a ×1 pasa ahora a ×64 (un año en diez
+  // minutos y medio), y lo que pasa mientras el juego está cerrado lo paga el
+  // letargo, que llega hasta una generación entera. Es deliberado: §1 dice que
+  // esto es un idle para mirar de fondo.
+  //
+  // **Los dos diales, si hay que acelerar.** `SCENIC_DAY_SECONDS` (120 → 60 es
+  // el suelo medido en D.6.1: por debajo la luz parpadea y la gente esprinta) y
+  // `DAYS_PER_WEEK` (7 → 3 deja de parecerse a una semana). Cambiar cualquiera
+  // obliga a cambiar este número con él, o la identidad se rompe.
+  REAL_MS_PER_TICK: 840_000,
+  // TUNE: cuántas jornadas de sol tiene una semana del motor (v3.72). Siete,
+  // porque una semana tiene siete días y el reloj de §11.2 se lee como el de
+  // la vida real. El motor no sabe que existen: es el reparto del tiempo de
+  // presentación, y vive aquí porque `derive/clock.ts` y la jornada escénica
+  // tienen que estar de acuerdo en él.
+  DAYS_PER_WEEK: 7,
+  // TUNE: en qué punto de la jornada abre el valle, de 0 (alba) a 1 (alba
+  // siguiente). 0,28 es media mañana, cuando la aldea está entera en la calle:
+  // abrir el juego a oscuras, con todo el mundo dentro de casa, es la peor
+  // primera impresión posible de un sitio que se vende por estar vivo (v3.34).
+  // Vivía en `presentation-clock.ts`; desde v3.72 el reloj de la cabecera
+  // cuenta las horas desde el mismo origen que el sol, así que hay una sola.
+  DAY_START_PHASE: 0.28,
   // §12.1. Geometric, each one four times the last. 64x exists to make the
-  // pace question of §16.2 testable in a sitting: a year in eleven seconds
-  // instead of forty-five (v2.85).
+  // pace question of §16.2 testable in a sitting: a year in ten minutes and a
+  // half instead of eleven hours (v2.85, remedido en v3.72).
   SPEEDS: [0, 1, 4, 16, 64],
-  LETHARGY_CAP_MS: 4 * 60 * 60 * 1000,
+  // **Una generación, y esa identidad es la decisión** (§4.1, y hay prueba en
+  // `tests/fast/balance.test.ts`): volver tras la ausencia máxima es volver una
+  // generación después. Son 960 ticks, los mismos que antes de v3.72 —el caso
+  // de esfuerzo de §11.4, «960 ticks en dos segundos», sigue midiendo lo
+  // mismo—; lo que cambió es lo que duran en la pared: nueve días y medio a ×1
+  // en vez de cuatro horas. Escrito como el producto para que no se pueda
+  // cambiar el tick y dejar esto atrás.
+  LETHARGY_CAP_MS: 20 * 48 * 840_000,
   LETHARGY_BATCH: 64, // §13.2: ticks per requestAnimationFrame while catching up
   // TUNE: how long a notable event stays legible over the valley (§11.6,
   // v2.84). Long enough to read one sentence, short enough that a village at
@@ -47,7 +91,10 @@ export const TIME = {
   // dueño del diseño, 15 sep 2026— y cuánto espera la primera pista después.
   INTRO_FLIGHT_MS: 9000,
   INTRO_HINT_AFTER_MS: 800,
-  SAVE_EVERY_TICKS: 20, // §13.1
+  // §13.1. Uno, desde v3.72: con la semana en catorce minutos, veinte ticks
+  // son cuatro horas y media de juego, y un cierre que no pase por `pagehide`
+  // —un navegador que mata la pestaña— se llevaría la tarde entera.
+  SAVE_EVERY_TICKS: 1,
 } as const;
 
 // ---------------------------------------------------------------------------

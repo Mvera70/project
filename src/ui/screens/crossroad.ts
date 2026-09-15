@@ -84,8 +84,8 @@ const STYLE = `
 .crossroad-open .valley-vitals,
 .crossroad-open .valley-orders,
 .crossroad-open .valley-doing,
-.crossroad-open .valley-year,
-.crossroad-open .valley-season { visibility: hidden; }
+.crossroad-open .valley-time,
+.crossroad-open .valley-date { visibility: hidden; }
 `;
 
 function ensureStyle(): void {

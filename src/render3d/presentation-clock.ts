@@ -5,15 +5,28 @@
 // never reads the wall clock. It is told how much real time passed and answers
 // with the `GraphicsFrame` that the renderer paints.
 //
-// **The scenic day is decoupled from the week.** D.6 decides it and this round
-// calibrates it. A week is 15 real seconds at ×1 and under a second at ×16, so
-// tying the day to the week would make the villagers sprint when the player
-// speeds up, and a sprinting village reads as a glitch rather than as haste.
-// Scenic time runs on its own, and quickens with the speed by its square root:
-// see `scenicRate`. What speeds up faster is the world — harvests, deaths and
-// decisions still land on their tick. Nobody finishes a day's walk in a week,
-// and D.6 says that is fine: a week does not owe the player a complete journey.
+// **Y desde v3.72 la jornada vuelve a cuadrar con la semana: son siete.** Lo
+// pidió el dueño del diseño —«debe ser real el paso del tiempo, como si fuese
+// la vida real»— y lo que lo hace posible es que la semana dure lo que duran
+// siete jornadas (`TIME.REAL_MS_PER_TICK = DAYS_PER_WEEK · SCENIC_DAY_SECONDS`,
+// §12.1). La jornada no se ha tocado: sigue durando 120 s escénicos, la gente
+// sigue andando a su paso y `scenicRate` sigue siendo la velocidad entera. Lo
+// que se movió fue la semana, que antes duraba quince segundos y metía ocho
+// amaneceres dentro de una.
+//
+// Lo que había aquí escrito, y por qué ya no vale: «the scenic day is decoupled
+// from the week … a week does not owe the player a complete journey». Era
+// cierto mientras la semana durase quince segundos: atarlas obligaba a que la
+// jornada durase eso y la aldea entera esprintara. La salida no era atar la
+// jornada a la semana, era **alargar la semana**, y eso es lo que v3.72 hizo.
+//
+// El acuerdo se mantiene con dos piezas, y las dos están abajo: los dos relojes
+// corren al mismo ritmo por construcción, y este se **pone en hora** con el del
+// motor en cada discontinuidad (partida nueva, carga, letargo), que es lo único
+// que podría separarlos.
 
+import { TIME } from '@engine/balance';
+import { scenicSecondsAt } from '../derive/clock';
 import type { GraphicsFrame } from './contracts';
 
 /**
@@ -84,8 +97,10 @@ const LETHARGY_SLACK_TICKS = 2;
  * raiz cuadrada que habia antes, a x1 pasaban ocho semanas por jornada y a x16
  * pasaban treinta y dos, asi que el calendario y el sol contaban dos historias
  * distintas y la segunda cambiaba cada vez que se tocaba la velocidad. Ahora son
- * ocho semanas por jornada a cualquier velocidad: una estacion son semana y
- * media de sol, siempre.
+ * una proporcion fija a cualquier velocidad. Eran ocho semanas por jornada
+ * hasta v3.72, y desde v3.72 son **siete jornadas por semana**: lo que cambio
+ * no fue esta funcion, que sigue siendo la velocidad entera, sino lo que dura
+ * la semana (§12.1). Una estacion son ochenta y cuatro jornadas de sol.
  *
  * Y las dos puntas que ya se habian probado, para que no se vuelvan a probar:
  *
@@ -104,8 +119,15 @@ function scenicRate(speed: 0 | 1 | 4 | 16 | 64): number {
   return speed;
 }
 
-/** Real milliseconds per engine tick at ×1. Mirrors `TIME.REAL_MS_PER_TICK`. */
-const REAL_MS_PER_TICK = 15_000;
+/**
+ * Real milliseconds per engine tick at ×1.
+ *
+ * Se lee de `TIME` y no se copia. Estuvo copiado aquí —quince mil, a mano— y es
+ * la clase de duplicado que no falla: si el tick cambia y esta copia no, la
+ * detección de letargo de abajo llama salto a cada fotograma o no lo llama
+ * nunca, y en los dos casos el juego sigue pintando.
+ */
+const REAL_MS_PER_TICK = TIME.REAL_MS_PER_TICK;
 
 export interface ClockInput {
   /** Monotonic real milliseconds. `performance.now()` in the app, a number in tests. */
@@ -129,7 +151,11 @@ export interface PresentationClock {
    * starts again, because clip phases from another game mean nothing here.
    */
   reset(): void;
-  /** Scenic seconds since the last reset. Monotonic while running. */
+  /**
+   * Scenic seconds: los del motor, no una cuenta propia (v3.72). Suben con el
+   * tick y su fracción, así que sólo saltan cuando salta el mundo —una carga,
+   * el letargo, otro valle— y ese fotograma viene marcado `discontinuity`.
+   */
   readonly seconds: number;
 }
 
@@ -180,10 +206,25 @@ export function createPresentationClock(): PresentationClock {
       // working, which is the caller's business, not the clock's. Suspension
       // freezes them too, and so does a gap long enough to be an absence.
       const running = input.speed !== 0 && !suspended;
+      // **El tiempo escénico ES el del motor** (v3.72). No se acumula por su
+      // cuenta: se lee del tick y su fracción, que el bucle ya lleva. Los dos
+      // relojes corrían al mismo ritmo en teoría y se separaban en la práctica,
+      // y está medido: con el tope de `MAX_STEP_SECONDS` y esta máquina a diez
+      // fotogramas por segundo, el sol perdía **casi la mitad** del día contra
+      // el calendario. En una secuencia de capturas se veía sin contar nada —la
+      // cabecera decía la 01:00 y el cielo iba por las seis de la tarde—, que
+      // es exactamente la incoherencia que v3.72 vino a cerrar.
+      const scenicNow = scenicSecondsAt(input.tick, input.tickFraction, SCENIC_DAY_SECONDS);
+      // Y el paso de la animación sigue acotado, porque un fotograma perdido no
+      // puede teletransportar a nadie media jornada: lo que se recorta es
+      // **cuánto avanzan los cuerpos**, no qué hora es. El tope sube con la
+      // velocidad porque a ×64 un fotograma vale de verdad muchos segundos
+      // escénicos.
+      const step = first || discontinuity ? 0 : Math.max(0, scenicNow - memory.seconds);
       const deltaSeconds = running
-        ? Math.min(gapSeconds, MAX_STEP_SECONDS) * scenicRate(input.speed)
+        ? Math.min(step, MAX_STEP_SECONDS * scenicRate(input.speed))
         : 0;
-      memory.seconds += deltaSeconds;
+      memory.seconds = scenicNow;
 
       return {
         tickFraction: Math.max(0, Math.min(1, input.tickFraction)),
@@ -210,15 +251,17 @@ export function createPresentationClock(): PresentationClock {
  * nada mas: el dia sigue durando lo mismo y sigue siendo funcion del reloj, asi
  * que la misma partida da la misma imagen.
  */
-const DAY_START = 0.28;
+const DAY_START = TIME.DAY_START_PHASE;
 
 /**
  * Where the scenic day stands, from 0 at dawn to 1 at nightfall.
  *
- * Separate from `tickFraction` on purpose, and D.6 says captures must state the
- * two apart. The tick says what the world is doing this week; this says what
- * time of day the village is living. They never coincide: a scenic day is eight
- * weeks at ×1 and thirty-two at ×16. That is the decision.
+ * El tick dice qué está haciendo el mundo esta semana y esto qué hora del día
+ * vive la aldea. **Desde v3.72 las dos cuentas cuadran**: siete jornadas por
+ * semana a cualquier velocidad, así que esta fase es la misma que devuelve
+ * `valleyClock(tick, fraction).sunPhase` y hay una prueba que lo ata
+ * (`tests/fast/clock.test.ts`). Antes no cuadraban —ocho semanas por jornada— y
+ * D.6 pedía que las capturas dijeran las dos por separado.
  */
 export function dayPhase(presentationSeconds: number): number {
   const phase = (presentationSeconds / SCENIC_DAY_SECONDS + DAY_START) % 1;

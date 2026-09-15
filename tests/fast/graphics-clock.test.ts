@@ -13,6 +13,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { TIME } from '@engine/balance';
 import { resolve } from 'node:path';
 import {
   createPresentationClock, dayPhase, SCENIC_DAY_SECONDS,
@@ -55,10 +56,13 @@ describe('G-05 · el reloj de presentación', () => {
       // ninguno se recorta y lo que se mide es el reparto y no el tope.
       let ticks = 0;
       for (let step = 1; step <= 600; step += 1) {
-        ticks = (step * speed * 16) / 15_000;
+        ticks = (step * speed * 16) / TIME.REAL_MS_PER_TICK;
         clock.frame({
           realMs: step * 16, tick: Math.floor(ticks),
-          tickFraction: 0, speed, reducedMotion: false, hidden: false,
+          // La fracción de verdad, porque desde v3.72 es de donde sale la hora:
+          // con cero, este banco dejaba el reloj clavado en el amanecer del
+          // lunes y la cuenta de abajo dividía por cero.
+          tickFraction: ticks % 1, speed, reducedMotion: false, hidden: false,
         });
       }
       // Semanas por jornada escénica.
@@ -68,19 +72,28 @@ describe('G-05 · el reloj de presentación', () => {
     for (const speed of [4, 16, 64] as const) {
       expect(perDay(speed), `a ×${speed}`).toBeCloseTo(base, 6);
     }
-    // Y la cuenta de verdad, que es la que hay que mirar si esto cambia: ocho
-    // semanas de mundo por cada día de sol, a cualquier velocidad.
-    expect(base).toBeCloseTo(SCENIC_DAY_SECONDS / 15, 6);
+    // Y la cuenta de verdad, que es la que hay que mirar si esto cambia:
+    // **un séptimo de semana por jornada de sol**, a cualquier velocidad. Es la
+    // identidad de §12.1 vista desde el otro lado —siete jornadas por semana— y
+    // hasta v3.72 eran ocho semanas por jornada, que es la incoherencia que el
+    // dueño del diseño veía sin contar nada.
+    expect(base).toBeCloseTo(1 / TIME.DAYS_PER_WEEK, 6);
+    expect(base).toBeCloseTo((SCENIC_DAY_SECONDS * 1000) / TIME.REAL_MS_PER_TICK, 6);
   });
 
   it('en pausa no hay jornada, y cada velocidad reparte lo suyo', () => {
+    // El banco mueve el mundo como lo mueve el bucle: la velocidad decide
+    // cuántas semanas pasan, y desde v3.72 el tiempo escénico **es** ése. Con
+    // la fracción clavada en cero —como estaba escrito— el reloj no avanzaba y
+    // esto medía la nada.
     const advanced = (speed: 0 | 1 | 4 | 16 | 64): number => {
       const clock = createPresentationClock();
       clock.frame({ realMs: 0, tick: 0, tickFraction: 0, speed, reducedMotion: false, hidden: false });
       for (let step = 1; step <= 60; step += 1) {
+        const weeks = (step * speed * 16) / TIME.REAL_MS_PER_TICK;
         clock.frame({
-          realMs: step * 16, tick: Math.floor((step * speed * 16) / 15_000),
-          tickFraction: 0, speed, reducedMotion: false, hidden: false,
+          realMs: step * 16, tick: Math.floor(weeks),
+          tickFraction: weeks % 1, speed, reducedMotion: false, hidden: false,
         });
       }
       return clock.seconds;
@@ -123,14 +136,23 @@ describe('G-05 · el reloj de presentación', () => {
   });
 
   it('un fotograma lento avanza lo que puede, no lo que le falta', () => {
+    // Cuatrocientos milisegundos de fotograma son 0,4 s escénicos a ×1, y el
+    // paso se recorta a `MAX_STEP_SECONDS`: lo que se acota es **cuánto andan
+    // los cuerpos**, no qué hora es. Desde v3.72 la hora la lleva el motor, así
+    // que el mundo avanza esos 400 ms y `seconds` los recoge enteros; el que se
+    // queda corto es el paso de la animación, que es lo que dice el aserto.
     const clock = createPresentationClock();
     clock.frame({ realMs: 0, tick: 1, tickFraction: 0, speed: 1, reducedMotion: false, hidden: false });
-    const slow = clock.frame({ realMs: 400, tick: 1, tickFraction: 0, speed: 1, reducedMotion: false, hidden: false });
+    const slow = clock.frame({
+      realMs: 400, tick: 1, tickFraction: 400 / TIME.REAL_MS_PER_TICK,
+      speed: 1, reducedMotion: false, hidden: false,
+    });
     expect(slow.deltaSeconds).toBeCloseTo(0.1, 6);
+    expect(slow.presentationSeconds).toBeCloseTo(TIME.DAYS_PER_WEEK * SCENIC_DAY_SECONDS + 0.4, 6);
     expect(slow.discontinuity).toBe(false);
   });
 
-  it('el tiempo escénico sólo crece, y reset lo devuelve a cero', () => {
+  it('el tiempo escénico sólo crece, y reset lo pone en la hora del motor', () => {
     const clock = createPresentationClock();
     let last = -1;
     for (let step = 0; step <= 200; step += 1) {
@@ -142,9 +164,13 @@ describe('G-05 · el reloj de presentación', () => {
     }
     clock.reset();
     expect(clock.seconds).toBe(0);
+    // Y el primer fotograma tras el reset **se pone en hora con el tick**
+    // (v3.72): antes volvía a cero y el sol pintaba el alba de la semana uno
+    // sobre una partida de la semana tres. Cargar una partida de ochenta años
+    // es este mismo caso con otro número.
     const fresh = clock.frame({ realMs: 9_999, tick: 3, tickFraction: 0, speed: 1, reducedMotion: false, hidden: false });
     expect(fresh.discontinuity).toBe(true);
-    expect(fresh.presentationSeconds).toBe(0);
+    expect(fresh.presentationSeconds).toBe(3 * TIME.DAYS_PER_WEEK * SCENIC_DAY_SECONDS);
   });
 
   it('la fase del día da la vuelta y nunca sale de [0,1)', () => {
