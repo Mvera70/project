@@ -258,10 +258,19 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);
   // U-02 · y la cartela de lo que pasa una vez, que es otra cosa.
-  const moments = mountMoments(root);
   // Desde qué tick se buscan hitos. Arranca donde arranca la partida, así que
   // una partida cargada no vuelve a celebrar lo que ya celebró.
   let lastMilestoneTick = state.tick;
+  /**
+   * La cartela, y **sólo para el arranque**.
+   *
+   * U-02 la puso para los hitos y U-04 la reusó para la frase de la fundación.
+   * El dueño del diseño juzgó los hitos al probar la demo —«esto no aporta
+   * nada, mejorar o quitar»— y la cartela no era el problema: usarla cada vez
+   * que la aldea levanta su primera cualquier-cosa, sí. Una frase de apertura
+   * que se dice una vez por partida es otra cosa que una interrupción semanal.
+   */
+  const moments = mountMoments(root);
 
   // U-04 · Lo primero que ve quien empieza, y lo único que el juego dice sin
   // que se lo pidan. **No es un tutorial**: es la misma cartela de los hitos
@@ -701,19 +710,31 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       const kind = accentFor(report.posed, best !== undefined, catchingUp);
       if (kind !== null) sound.accent(kind, Date.now());
       if (best !== undefined) {
-        // **Una voz cada vez.** El aviso y la cartela se pintan a dos dedos el
-        // uno del otro, y visto en captura se leen como un bloque de texto
-        // apilado. Cuando hay hito, el hito es el titular de ese tick: la
-        // banda de §11.6 se retira y vuelve en el siguiente.
-        notices.clear();
-        moments.show(
-          renderUiText(`milestone.kind.${best.kind}`),
-          renderEntry(
-            { tick: best.tick, kind: 'season', templateKey: best.key, params: best.params, weight: best.weight },
-            state.rng,
-          ),
-          best.weight === 3,
-        );
+        // **Una voz, y es la del aviso.**
+        //
+        // U-02 le dio al hito una cartela propia —pergamino, filetes, motas—
+        // y el dueño del diseño la juzgó al probar la demo: *«esto no aporta
+        // nada, mejorar o quitar»*. Tenía razón, y la razón se lee en el
+        // comentario que este bloque tenía escrito: la cartela y el aviso
+        // competían por el mismo sitio, así que había que apagar uno para
+        // encender el otro. Dos lenguajes visuales para «ha pasado algo», y el
+        // segundo además interrumpía para contar en pasado y con fecha lo que
+        // el jugador estaba viendo ocurrir.
+        //
+        // Ahora el hito **es** el aviso de ese tick, con el mismo aspecto que
+        // cualquier otra cosa que pase, y lo que lo distingue es que queda
+        // **marcado en la crónica** (`screens/chronicle.ts`): ahí sí aporta,
+        // porque la crónica es donde vive el pasado de la aldea y donde un
+        // lector ajeno busca en qué se diferencia una partida de otra.
+        //
+        // Y un hito de peso 1 ya no interrumpe: `noticeworthy` filtra por
+        // debajo de 2, así que lo tranquilo se queda sólo en la crónica. Eso es
+        // ganancia, no pérdida.
+        notices.show(state, [{
+          tick: best.tick, kind: 'season', templateKey: best.key,
+          params: best.params, weight: best.weight,
+        }]);
+        moments.clear();
       }
     }
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();
