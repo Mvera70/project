@@ -48,7 +48,7 @@ export interface Offer {
 }
 
 /** El molde de una oferta, sin sitio: el sitio lo pone el edificio. */
-interface OfferSpec {
+export interface OfferSpec {
   readonly id: string;
   readonly reach: number;
   readonly seats: number;
@@ -102,6 +102,27 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   play: { id: 'play', reach: 0.75, seats: 1, gives: { boredom: 0.4, company: 0.2 }, seconds: [1, 2.2] },
   /** Cargar con el palo, el cubo o el haz de leña un rato, y soltarlo. */
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
+
+  // V-11 · La reunión que el motor convoca (§11.8). No es una oferta que nadie
+  // elija por gusto: es la orden de una decisión del jugador puesta en el sitio
+  // que el motor dice, y `life/staging.ts` es quien la monta.
+  //
+  // Los números son los de una aldea entera junta y no los de un corro:
+  //
+  //  · `seats: 40`, que es más gente de la que una aldea de este juego tiene
+  //    (`LIFE.MAX_HOUSES` × `HOUSE_CAPACITY` = 80, y nunca están todos fuera).
+  //    `seatsOn` recorta a lo que de verdad cabe en el suelo, así que pedir de
+  //    más no inventa sitio: sólo impide que el aforo sea lo que corte.
+  //  · `reach: 2.2`, el doble que cualquier otra. Una reunión es un gentío, no
+  //    una fila: quien llega al borde ya está en la reunión.
+  //  · `gives` lo llena de compañía y aburrimiento —es estar con todo el
+  //    mundo— y **no da deber**: nadie está trabajando en una reunión, y ésa es
+  //    la diferencia que se ve desde arriba.
+  //  · `seconds: [40, 120]`, de las más largas de la tabla: se está un rato.
+  gather: {
+    id: 'gather', reach: 2.2, seats: 40,
+    gives: { company: 1, boredom: 1 }, seconds: [40, 120],
+  },
 };
 
 /** Qué ofrece cada clase de edificio. */

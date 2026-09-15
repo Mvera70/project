@@ -14,6 +14,7 @@ import { population } from '@engine/people/demography';
 import { opinionOf } from '@engine/people/opinions';
 import { hash32 } from '@engine/rng';
 import { blockedAt, integrate, turnTo, type Body, type Terrain } from './body';
+import { meetingPlace, ordersOf } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
@@ -146,6 +147,25 @@ export interface Village {
 export function createVillage(state: GameState, day: number): Village {
   const land = terrainOf(state);
   const seed = seedOfDay(state.seed, day);
+  // V-11 · **Y lo que el motor haya ordenado para hoy manda sobre todo esto.**
+  //
+  // Si una decisión del jugador convocó a la aldea (§11.8), el sitio de la
+  // reunión **sustituye** a los destinos del día en vez de competir con ellos, y
+  // eso es deliberado: es lo que hacía el camino viejo que G-12 apagó —«el día
+  // que había reunión, nadie iba al tajo y todos compartían destino»— y es lo
+  // único que cumple el principio 1 del juego, que toda opción de encrucijada
+  // cambie algo en pantalla. Compitiendo no se cumple: medido en la prueba de
+  // V-11, con la reunión como una oferta más el más lejano se quedaba a más de
+  // tres celdas y la mitad de la aldea seguía en sus campos.
+  //
+  // Lo que sí sigue en pie es el cuerpo: la cabaña y los trastos entran en la
+  // lista igual que siempre (más abajo), porque un animal que pasa por delante
+  // no deja de estar ahí porque haya reunión. Y si el sitio de la reunión no
+  // admite a nadie —agua, roca— no se sustituye nada: mejor la jornada de
+  // siempre que una aldea sin ningún sitio adonde ir.
+  const meetings = ordersOf(state)
+    .map((order, index) => meetingPlace(order, land, index))
+    .filter((place): place is Place => place !== null);
   const places = [...placesOf(state, land), ...commons(state, land)];
   const around: Neighbourhood = createNeighbourhood(land.width, land.height);
   const router: Router = createRouter();
@@ -182,10 +202,34 @@ export function createVillage(state: GameState, day: number): Village {
   // `chase`, `feed`— sí entra en la misma lista que el resto de sitios: para
   // `decide()` un animal cerca no es distinto de un pozo cerca.
   const beasts = createBeasts(state, land, heart, seed);
-  const mine = [
-    ...places.filter((place) => canReach(land, shore, place.at)),
-    ...beasts.map((beast) => beast.gift),
-  ];
+  // V-11 · **Y cuando hay reunión, la reunión es lo único que se ofrece.**
+  //
+  // Medido, porque mi primera versión sólo sustituía los sitios del valle y
+  // dejaba la cabaña en la lista: de veinticuatro personas, **veinticuatro se
+  // fueron con los animales** y una a por un trasto. Ninguna a la reunión. Una
+  // oferta que da compañía entera a once celdas pierde contra una gallina que
+  // da un tercio a una celda, y así es como tiene que ser el resto del año.
+  //
+  // Lo que §11.8 pide no es que la reunión compita: es que la aldea esté ahí.
+  // Así que ese día la lista es la reunión, igual que en el camino que G-12
+  // apagó —«nadie iba al tajo y todos compartían destino»—. Los animales y los
+  // trastos siguen en el valle, con su cuerpo y su deriva; lo que no hacen es
+  // ofrecer nada mientras la aldea está convocada.
+  //
+  // Y **el sitio de la reunión tiene que estar en esta orilla**, como cualquier
+  // otro sitio: una reunión al otro lado del río es una orden que no se puede
+  // cumplir, y dejar la lista vacía por obedecerla fue mi segundo error —
+  // medido: veintitrés personas con `doing: null` toda la jornada, plantadas
+  // donde nacieron—. Si no se puede llegar, la jornada es la de siempre.
+  const summons = meetings.filter((place) => canReach(land, shore, place.at));
+  /** Si el motor ha convocado a la aldea hoy y hay dónde reunirse. */
+  const summoned = summons.length > 0;
+  const mine = summoned
+    ? summons
+    : [
+      ...places.filter((place) => canReach(land, shore, place.at)),
+      ...beasts.map((beast) => beast.gift),
+    ];
 
   // V-09: los trastos de la jornada, anclados a puertas de verdad y por tanto
   // ya en la orilla que se usa (`scatter`, `props.ts`). `propsById` es cómo
@@ -400,9 +444,13 @@ export function createVillage(state: GameState, day: number): Village {
           // quién pregunta (E.4). El resto de la aldea sigue viendo la pelota
           // como siempre.
           const playedOut = now < dweller.playedUntil;
-          const options = !playedOut || propOptions.length === 0
-            ? [...mine, ...propOptions]
-            : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
+          // V-11: con la aldea convocada no se ofrecen trastos, por lo mismo
+          // que no se ofrece la cabaña — ver `mine` arriba.
+          const options = summoned
+            ? mine
+            : !playedOut || propOptions.length === 0
+              ? [...mine, ...propOptions]
+              : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
           dweller.doing = decide(
             { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before },
             options, taken, land, router, seed, steps,
