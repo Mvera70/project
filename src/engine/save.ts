@@ -243,6 +243,7 @@ function isPlausibleState(value: unknown): value is GameState {
     // palanca fuera de sitio sería perder la aldea por un número.
     && record(s['intent'])
     && ['fields', 'timber'].every((key) => finite((s['intent'] as Record<string, unknown>)[key]))
+    && typeof (s['intent'] as Record<string, unknown>)['priority'] === 'string'
     && finite(s['crowBite']) && (s['crowBite'] as number) >= 0
     && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
     && tickValue(people['nextId']) && Array.isArray(people['namedIds']) && people['namedIds'].every(tickValue)
@@ -354,6 +355,12 @@ export function deserialize(raw: unknown): SaveFile {
   // cambiaría por debajo, que es la clase de cosa que §13.1 prohíbe.
   if ((state as Partial<GameState>).intent === undefined) {
     state = { ...state, version: SCHEMA_VERSION, intent: restingIntent() } as GameState;
+  }
+  // Y una partida guardada entre E1 y E3 trae la postura sin la tercera palanca.
+  // Entra en `none`, que es el orden de §7.3 de siempre: por la misma razón que
+  // arriba, cargar no puede cambiar lo que la aldea estaba haciendo.
+  if (state.intent.priority === undefined) {
+    state = { ...state, intent: { ...state.intent, priority: 'none' } };
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

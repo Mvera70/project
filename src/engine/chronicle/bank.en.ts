@@ -1632,6 +1632,16 @@ export const UI_BANK: Record<string, string> = {
   'app.hands.works': 'Build',
   'app.hands.both': 'Both',
   'app.hands.wood': 'Wood',
+  // E3 · La tercera orden: qué se levanta antes. Seis posiciones y no tres,
+  // porque aquí cada una no es «más o menos» de lo mismo, es otra cosa — quien
+  // quiere una capilla no quiere «algo más de capilla».
+  'app.build': 'Build first',
+  'app.build.none': 'As needed',
+  'app.build.food': 'Food',
+  'app.build.shelter': 'Roofs',
+  'app.build.craft': 'Trades',
+  'app.build.faith': 'Faith',
+  'app.build.defence': 'Walls',
   'app.year': 'ANNO {year}',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',

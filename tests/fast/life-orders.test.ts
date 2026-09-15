@@ -40,8 +40,8 @@ describe('E2 · la orden del jugador tiene sitio donde verse', () => {
     // Y mandarlas a la obra lo cierra. Es la respuesta visual más directa que
     // tiene el juego: la misma aldea, la misma semana, y gente en otro sitio.
     for (const seed of [7, 11, 23]) {
-      const wood = village(12, seed, { fields: 1, timber: 0.85 });
-      const works = village(12, seed, { fields: 1, timber: 0.1 });
+      const wood = village(12, seed, { fields: 1, timber: 0.85, priority: 'none' });
+      const works = village(12, seed, { fields: 1, timber: 0.1, priority: 'none' });
       expect(seatsAt(wood, 'felling'), `semilla ${seed}: plazas en el tajo`)
         .toBeGreaterThan(seatsAt(works, 'felling'));
       expect(seatsAt(wood, 'felling'), `semilla ${seed}: y hay tajo`).toBeGreaterThan(0);
@@ -50,8 +50,8 @@ describe('E2 · la orden del jugador tiene sitio donde verse', () => {
 
   it('y mandarlas a la obra pone gente en el andamio', () => {
     for (const seed of [7, 11, 23]) {
-      const works = village(12, seed, { fields: 1, timber: 0.1 });
-      const wood = village(12, seed, { fields: 1, timber: 0.85 });
+      const works = village(12, seed, { fields: 1, timber: 0.1, priority: 'none' });
+      const wood = village(12, seed, { fields: 1, timber: 0.85, priority: 'none' });
       // Sólo si hay algo levantándose: una aldea sin obra en marcha no tiene
       // andamio, y eso no es un fallo.
       if (works.works.length === 0) continue;
@@ -63,7 +63,7 @@ describe('E2 · la orden del jugador tiene sitio donde verse', () => {
   it('las plazas del tajo son las manos que el jugador manda, no un número fijo', () => {
     // La propiedad que hace que esto sea una respuesta y no una decoración: si
     // las plazas fueran fijas, el tajo se vería igual con cualquier orden.
-    const state = village(15, 7, { fields: 1, timber: 0.85 });
+    const state = village(15, 7, { fields: 1, timber: 0.85, priority: 'none' });
     const hands = allocateLabour(state);
     const seats = seatsAt(state, 'felling');
     expect(seats).toBeGreaterThan(0);
@@ -78,7 +78,7 @@ describe('E2 · la orden del jugador tiene sitio donde verse', () => {
     // del río o de una pared sería gente andando hacia el agua. Es el mismo
     // fallo que V-06 pagó con la aldea clavada, así que se comprueba.
     for (const seed of [7, 11, 23, 41]) {
-      const state = village(18, seed, { fields: 1, timber: 0.85 });
+      const state = village(18, seed, { fields: 1, timber: 0.85, priority: 'none' });
       const land = terrainOf(state);
       for (const place of placesOf(state, land)) {
         const x = Math.floor(place.at.x);

@@ -29,10 +29,10 @@ const YEARS = 20;
 /** Las cinco posturas que un jugador tomaría de verdad. */
 const STANCES: Readonly<Record<string, Intent>> = {
   reposo: restingIntent(),
-  granero: { fields: 2, timber: 0.4 },
-  lena: { fields: 0.5, timber: 0.9 },
-  obra: { fields: 0.5, timber: 0.05 },
-  aldea: { fields: 1.4, timber: 0.15 },
+  granero: { fields: 2, timber: 0.4, priority: 'none' },
+  lena: { fields: 0.5, timber: 0.9, priority: 'none' },
+  obra: { fields: 0.5, timber: 0.05, priority: 'none' },
+  aldea: { fields: 1.4, timber: 0.15, priority: 'none' },
 };
 
 interface Outcome {
@@ -69,7 +69,9 @@ describe('E1 · la postura cambia la partida', () => {
 
       // La fórmula de antes, escrita a mano: los campos que la población
       // necesita y `CUTTER_SHARE` de lo que sobra.
-      expect(state.intent).toEqual({ fields: 1, timber: LABOUR.CUTTER_SHARE });
+      expect(state.intent).toEqual({
+        fields: 1, timber: LABOUR.CUTTER_SHARE, priority: 'none',
+      });
       expect(mine.cutters + mine.builders, 'las manos sobrantes no se pierden')
         .toBeCloseTo(mine.cutters + mine.builders, 9);
       expect(mine.cutters, 'y se reparten en la proporción de siempre')
@@ -136,5 +138,80 @@ describe('E1 · la postura cambia la partida', () => {
     // hagas, y eso es un jardín con un mando encima.
     expect(buildings, `obra. ${detail}`).toBeGreaterThan(0.15);
     expect(people, `gente. ${detail}`).toBeGreaterThan(0.1);
+  });
+});
+
+describe('E3 · la cola de obra', () => {
+  // La palanca que da el lado bueno del triángulo. E1 midió que con las dos
+  // primeras el jugador podía hacerlo peor que la aldea sola pero casi nunca
+  // mejor, porque el **qué** construir no era suyo.
+
+  it('«none» deja el orden de §7.3 intacto', () => {
+    // D-6 otra vez: la posición de reposo no mueve un solo elemento de la lista
+    // de prioridad, y por eso las 1 031 pruebas siguen verdes sin tocar nada.
+    for (const seed of SEEDS) {
+      const plain = foundGame(seed);
+      run(plain, 15 * 48, 'prudent', CATALOG);
+      const same = foundGame(seed);
+      same.intent = { ...restingIntent(), priority: 'none' };
+      run(same, 15 * 48, 'prudent', CATALOG);
+      expect(same.buildings.length, `semilla ${seed}`).toBe(plain.buildings.length);
+    }
+  });
+
+  it('pedir fe levanta la capilla antes que la aldea sola', () => {
+    // La prueba de que la palanca manda: la capilla de §7.3 va sexta de ocho y
+    // exige fe y gente, así que la aldea sola tarda. Adelantándola, llega antes
+    // — o llega, en las semillas donde sola no llegaba nunca.
+    let earlier = 0;
+    for (const seed of SEEDS) {
+      const when = (priority: 'none' | 'faith'): number => {
+        const state = foundGame(seed);
+        state.intent = { ...restingIntent(), priority };
+        run(state, 40 * 48, 'prudent', CATALOG);
+        const chapel = state.buildings
+          .filter((one) => one.kind === 'chapel' || one.kind === 'church')
+          .map((one) => one.builtTick)
+          .sort((a, b) => a - b)[0];
+        return chapel ?? Number.POSITIVE_INFINITY;
+      };
+      const alone = when('none');
+      const asked = when('faith');
+      if (asked < alone) earlier += 1;
+      expect(asked, `semilla ${seed}: pedirla no puede retrasarla`)
+        .toBeLessThanOrEqual(alone);
+    }
+    expect(earlier, 'y en alguna semilla llega antes de verdad').toBeGreaterThan(0);
+  });
+
+  it('pedir murallas no cambia nada, y la causa medida es otra', () => {
+    // **La primera explicación que escribí era falsa y la medición la tiró.**
+    // Dije que la familia de defensa no entraba nunca en la lista porque la
+    // bandera `threatened` la pone una encrucijada de las que no salen. Medido:
+    // las cuatro semillas **sí** llegan a estar amenazadas, y las cuatro
+    // construyen murallas.
+    //
+    // Lo que pasa es lo contrario de lo que supuse: **la empalizada no tiene
+    // tope**, así que en cuanto hay amenaza se lleva casi toda la capacidad de
+    // obra y ya está de hecho en primer lugar. Medido a los cuarenta años:
+    //
+    //     semilla 7:  67 murallas de 99 edificios en pie
+    //     semilla 11: 36 de 66      semilla 23: 34 de 64      semilla 41: 40 de 70
+    //
+    // Adelantar algo que ya va primero no puede cambiar nada. Y de paso queda
+    // señalado un desajuste que no es de esta ronda: **dos tercios de lo que una
+    // aldea levanta en cuarenta años son tramos de empalizada**, y eso ni se ve
+    // en la tira ni lo decide nadie.
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      run(state, 40 * 48, 'prudent', CATALOG);
+      const standing = state.buildings.filter((one) => one.lostTick === null);
+      const walls = standing.filter(
+        (one) => one.kind === 'palisade' || one.kind === 'wall' || one.kind === 'watchtower',
+      );
+      expect(walls.length, `semilla ${seed}: hay murallas, y muchas`).toBeGreaterThan(20);
+      expect(walls.length / standing.length, `semilla ${seed}: y son la mayoría de la obra`)
+        .toBeGreaterThan(0.4);
+    }
   });
 });

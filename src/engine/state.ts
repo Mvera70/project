@@ -569,7 +569,41 @@ export interface Intent {
    * aldea, y las dos salen del mismo puñado de gente.
    */
   timber: number;
+  /**
+   * Qué le importa a la aldea ahora mismo, y por tanto qué levanta antes.
+   *
+   * §7.3 tiene un orden de prioridad fijo —campos, casas, granero, pozo,
+   * capilla, fragua, molino, empalizada— y era el motor quien lo recorría. Esta
+   * palanca **adelanta una familia entera** a la cabeza de esa lista sin borrar
+   * el resto: lo que la aldea no puede levantar todavía sigue esperando su
+   * turno, y lo que ya no hace falta sigue sin hacerse.
+   *
+   * `none` es el orden de siempre, y es el de reposo. **Es la palanca que da el
+   * lado bueno del triángulo**: E1 midió que con las dos primeras un jugador
+   * podía hacerlo peor que la aldea sola pero casi nunca mejor, porque el qué
+   * construir no era suyo. Aquí sí lo es.
+   */
+  priority: PriorityName;
 }
+
+/** Las familias de §7.3 que el jugador puede adelantar. */
+export type PriorityName = 'none' | 'food' | 'shelter' | 'faith' | 'craft' | 'defence';
+
+/**
+ * Qué entra en cada familia.
+ *
+ * Por lo que **hacen** y no por su material: una casa de piedra sigue siendo
+ * techo, y el pozo entra en oficios y no en comida porque lo que quita es un
+ * acarreo, no un hambre. La empalizada, la muralla y la atalaya van juntas
+ * porque quien las quiere las quiere por lo mismo.
+ */
+export const PRIORITY_FAMILIES: Readonly<Record<Exclude<PriorityName, 'none'>, readonly string[]>> = {
+  food: ['field', 'granary'],
+  shelter: ['house', 'stone_house'],
+  faith: ['chapel', 'church'],
+  craft: ['smithy', 'mill', 'well'],
+  defence: ['palisade', 'wall', 'watchtower'],
+};
 
 /**
  * La postura de reposo: exactamente lo que la aldea hacía sola.
@@ -579,7 +613,7 @@ export interface Intent {
  * ellos pueden importar sin invertir una flecha del grafo (§2.4).
  */
 export function restingIntent(): Intent {
-  return { fields: 1, timber: 0.4 };
+  return { fields: 1, timber: 0.4, priority: 'none' };
 }
 
 /** Los límites de la postura. Fuera de ellos no es una elección, es un exploit. */
@@ -613,6 +647,18 @@ export const INTENT_STOPS = {
     { key: 'wood', value: 0.85 },
   ],
 } as const;
+
+/**
+ * Las posiciones de la tercera palanca.
+ *
+ * Seis y no tres, y es la excepción: aquí cada posición no es «más o menos» de
+ * lo mismo, es **otra cosa**. Un jugador que quiere una capilla no quiere «algo
+ * más de capilla», quiere la capilla. Y siguen leyéndose de un vistazo porque
+ * son sustantivos.
+ */
+export const PRIORITY_STOPS: readonly PriorityName[] = [
+  'none', 'food', 'shelter', 'craft', 'faith', 'defence',
+];
 
 /** La posición más cercana a un valor, para pintar el mando de una partida cargada. */
 export function stopOf(lever: 'fields' | 'timber', value: number): string {

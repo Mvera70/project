@@ -10,6 +10,7 @@
 // the only place that decides what gets built is this file.
 
 import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, WORLD } from '../balance';
+import { PRIORITY_FAMILIES } from '../state';
 import { count, has, smithyWorking, standing } from '../subsistence/building-counts';
 import { housingCapacity, population } from '../people/demography';
 import { storageCapacity } from '../subsistence/harvest';
@@ -174,7 +175,25 @@ export function nextProject(state: GameState): Project | null {
   // 8 · the palisade
   if (has(state, 'smithy') && threatened) wanted.push('palisade');
 
-  for (const kind of wanted) {
+  // **E3 · lo que el jugador quiere antes va antes.**
+  //
+  // La lista de arriba es el orden de §7.3 y sigue siendo el de la aldea: lo que
+  // esta palanca hace es **adelantar una familia entera** sin borrar el resto,
+  // con un orden estable, así que lo que no se puede levantar todavía sigue
+  // esperando su turno y lo que ya no hace falta sigue sin hacerse. Con la
+  // palanca en `none` esto no mueve un solo elemento y §7.3 queda intacta.
+  //
+  // Es la palanca que da el lado bueno del triángulo: E1 midió que con las dos
+  // primeras el jugador podía hacerlo peor que la aldea sola pero casi nunca
+  // mejor, porque el **qué** construir no era suyo.
+  const family = state.intent.priority === 'none'
+    ? null
+    : PRIORITY_FAMILIES[state.intent.priority];
+  const ordered = family === null
+    ? wanted
+    : [...wanted].sort((a, b) => Number(family.includes(b)) - Number(family.includes(a)));
+
+  for (const kind of ordered) {
     if (!withinCap(state, kind)) continue;
     if (state.village.wood < BUILDINGS[kind].wood) continue;
     if (placeBuilding(state, kind) !== null) return kind;

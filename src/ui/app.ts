@@ -10,7 +10,8 @@ import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile, Season } from '@engine/state';
-import { INTENT_STOPS, stopOf } from '@engine/state';
+import { INTENT_STOPS, PRIORITY_STOPS, stopOf } from '@engine/state';
+import type { PriorityName } from '@engine/state';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
@@ -202,25 +203,35 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const orders = document.createElement('div');
   orders.className = 'valley-orders';
   orders.setAttribute('aria-label', renderUiText('app.orders'));
-  const leverRows: { lever: 'fields' | 'timber'; buttons: readonly (readonly [string, HTMLButtonElement])[] }[] = [];
-  for (const lever of ['fields', 'timber'] as const) {
+  interface Row {
+    readonly current: () => string;
+    readonly buttons: readonly (readonly [string, HTMLButtonElement])[];
+  }
+  const leverRows: Row[] = [];
+
+  /** Una fila del mando: su nombre y sus posiciones. */
+  const orderRow = (
+    name: string,
+    stops: readonly { key: string; label: string }[],
+    apply: (key: string) => void,
+    current: () => string,
+  ): void => {
     const row = document.createElement('div');
     row.className = 'valley-order';
     const label = document.createElement('span');
     label.className = 'valley-order-name';
-    label.textContent = renderUiText(lever === 'fields' ? 'app.sowing' : 'app.hands');
+    label.textContent = name;
     const bar = document.createElement('div');
     bar.className = 'valley-order-bar';
-    const buttons = INTENT_STOPS[lever].map((stop) => {
+    const buttons = stops.map((stop) => {
       const button = document.createElement('button');
       button.type = 'button';
-      const key = `app.${lever === 'fields' ? 'sowing' : 'hands'}.${stop.key}`;
-      button.textContent = renderUiText(key);
-      button.setAttribute('aria-label', `${label.textContent}: ${button.textContent}`);
+      button.textContent = stop.label;
+      button.setAttribute('aria-label', `${name}: ${stop.label}`);
       button.addEventListener('click', () => {
-        // La orden se da y la aldea la obedece desde el tick siguiente. No se
-        // recalcula nada aquí: `allocateLabour` lee `state.intent` cada semana.
-        state.intent = { ...state.intent, [lever]: stop.value };
+        // La orden se da y la aldea la obedece desde el tick siguiente: no se
+        // recalcula nada aquí, el motor lee `state.intent` cada semana.
+        apply(stop.key);
         paintOrders();
         // Y se guarda, porque es una decisión del jugador: al volver dos días
         // después la aldea tiene que seguir haciendo lo que se le dijo.
@@ -231,13 +242,36 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     });
     row.append(label, bar);
     orders.append(row);
-    leverRows.push({ lever, buttons });
+    leverRows.push({ current, buttons });
+  };
+
+  for (const lever of ['fields', 'timber'] as const) {
+    const prefix = lever === 'fields' ? 'sowing' : 'hands';
+    orderRow(
+      renderUiText(`app.${prefix}`),
+      INTENT_STOPS[lever].map((stop) => ({
+        key: stop.key, label: renderUiText(`app.${prefix}.${stop.key}`),
+      })),
+      (key) => {
+        const stop = INTENT_STOPS[lever].find((one) => one.key === key);
+        if (stop !== undefined) state.intent = { ...state.intent, [lever]: stop.value };
+      },
+      () => stopOf(lever, state.intent[lever]),
+    );
   }
+  // E3 · Y la tercera: qué se levanta antes.
+  orderRow(
+    renderUiText('app.build'),
+    PRIORITY_STOPS.map((key) => ({ key, label: renderUiText(`app.build.${key}`) })),
+    (key) => { state.intent = { ...state.intent, priority: key as PriorityName }; },
+    () => state.intent.priority,
+  );
+
   const paintOrders = (): void => {
-    for (const { lever, buttons } of leverRows) {
-      const current = stopOf(lever, state.intent[lever]);
+    for (const { current, buttons } of leverRows) {
+      const now = current();
       for (const [key, button] of buttons) {
-        button.setAttribute('aria-pressed', String(key === current));
+        button.setAttribute('aria-pressed', String(key === now));
       }
     }
   };
