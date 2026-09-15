@@ -12,7 +12,17 @@ import { TERRAIN_CODE } from '@engine/state';
 import type { ValleyMap } from '@engine/state';
 import { foundingSite, generateMap, idx, neighbours4 } from '@engine/world/mapgen';
 
-const SEEDS = Array.from({ length: 200 }, (_, i) => i);
+/**
+ * Cuántos valles se generan para comprobar las propiedades del terreno.
+ *
+ * **Ochenta desde el mapa grande, y doscientos antes.** No es que la propiedad
+ * necesite menos muestras: es que cada valle cuesta ahora 8,9 ms en vez de 3,7
+ * —cuatro veces el área— y este fichero solo se llevaba dieciocho segundos de
+ * los veinte que §14.1 da a la suite entera. Ochenta valles siguen siendo dos
+ * órdenes de magnitud más que las seis semillas canónicas, y el barrido largo
+ * vive en `tests/balance/`, que es donde cabe.
+ */
+const SEEDS = Array.from({ length: 80 }, (_, i) => i);
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
 /**

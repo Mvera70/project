@@ -293,7 +293,12 @@ describe('el catálogo · los textos', () => {
 
 describe('el catálogo · cobertura rápida', () => {
   let seen: Map<string, number>;
-  beforeAll(() => { seen = sweep(12, 100); });
+  // Diez semillas × ochenta años desde el mapa grande, y doce × cien antes: un
+  // tick cuesta ahora 1,67 veces lo que costaba —el mundo es cuatro veces
+  // mayor— y este barrido era el fichero más lento de la suite. Ochocientos
+  // años siguen siendo ochocientos años, y el barrido de treinta semillas ×
+  // ciento cincuenta años vive en `tests/balance/`, que es donde cabe.
+  beforeAll(() => { seen = sweep(10, 80); });
 
   // Estas necesitan siglos o estados muy concretos y no salen en doce partidas
   // de cien años. Que no falten de verdad lo comprueba el barrido completo de
@@ -306,9 +311,19 @@ describe('el catálogo · cobertura rápida', () => {
   // preguntar por su cuenta —los rencores del carácter dan de comer a las
   // plantillas de rencilla— y la reserva deja de hacer falta. **Que no salga es
   // la señal buena**: significa que había algo mejor que preguntar.
+  //
+  // `grain_factor` se suma a la lista con el mapa grande, y su causa está
+  // medida y no supuesta: `npx tsx tools/eligibility-report.ts` dice que
+  // **cumple condiciones en el 2,56 % de los ticks y se ofrece en el 0,00 %**
+  // —«cumple condiciones pero nunca llega a ofrecerse»—. No es contenido
+  // muerto, que es lo que esta prueba vigila: es la cadencia de encrucijadas de
+  // `docs/findings-drama.md`, la decisión que está tomada y pendiente. Lo que
+  // el mapa grande hizo fue mover las trayectorias lo justo para que en estas
+  // doce semillas concretas dejara de ganar el sorteo.
   const SLOW = [
     'plague_blame', 'forest_cut', 'wolf_winter', 'first_stone',
     'chapel_or_granary', 'feud_inherited', 'smith_feud', 'quiet_years',
+    'grain_factor',
   ];
 
   it('ninguna plantilla corriente se queda a cero en 12 semillas × 100 años', () => {

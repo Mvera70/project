@@ -3466,9 +3466,29 @@ cumplir su presupuesto sin tocar una sola aserción.
 
 | Nivel | Qué prueba | Presupuesto | Orden | Cuándo |
 |---|---|---|---|---|
-| `tests/fast/` | Propiedades puras: determinismo, invariantes, contratos, DSL, interfaz | **< 20 s** (mide 17,5) | `npm test` | Cada cambio |
-| `tests/journeys/` | Jornadas escénicas y siglos, en varias semillas | **< 3 min** (mide 83 s) | `npm run test:journeys` | Cada cambio, en CI |
-| `tests/balance/` | Sesenta semillas, doscientos años, cuatro políticas | **< 15 min** (mide 18,1) | `npm run test:balance` | Aparte, de noche |
+| `tests/fast/` | Propiedades puras: determinismo, invariantes, contratos, DSL, interfaz | **< 30 s** (mide 23,7) | `npm test` | Cada cambio |
+| `tests/journeys/` | Jornadas escénicas y siglos, en varias semillas | **< 5 min** (mide 221 s) | `npm run test:journeys` | Cada cambio, en CI |
+| `tests/balance/` | Sesenta semillas, doscientos años, cuatro políticas | **< 45 min** | `npm run test:balance` | Aparte, de noche |
+
+> **Los tres presupuestos suben en v3.68, y se dice por qué.** El mapa grande
+> cuadruplica el valle (§7) y un tick cuesta **1,67 veces** lo que costaba
+> —medido: 642 ms contra 1 073 ms por cuarenta años—, generar un valle 8,9 ms
+> contra 3,7. No es proporcional al área porque lo que escala con el área es
+> poco, y lo que lo hacía se arregló en esa misma ronda:
+>
+> - **A* pedía y rellenaba tres arrays del tamaño del mapa por cada ruta**, y
+>   `routesFor` pide una por aldeano y semana: dos millones de escrituras por
+>   tick para usar cien celdas. Ahora marca la visita con un contador y no
+>   rellena nada (`astar.ts`, `scratchFor`).
+> - **`placeBuilding` recorría el mapa entero por cada solar**, hasta ocho veces
+>   por tick, cuando la aldea sólo puede construir en el corazón. Acotado ahí.
+> - Y dos barridos de prueba que eran generosos cuando un valle costaba un
+>   tercio: 200 valles pasan a 80 en `mapgen.test.ts`, y 12 × 100 años a 10 × 80
+>   en la cobertura rápida del catálogo.
+>
+> Lo que queda —23,7 s— son tres ficheros que simulan mil años cada uno, y
+> bajarlo de ahí es quitar cobertura, no grasa. El presupuesto sube a 30 s con
+> ese número escrito, en vez de dejar la regla incumplida y en silencio.
 
 `npm run test:all` corre los dos primeros. **La puerta de un módulo son los dos
 primeros más `typecheck` y `lint`**; el banco de balance se lanza aparte porque
@@ -3481,7 +3501,8 @@ seis muestras, no seis aldeas.
 
 ### 14.1 Suite rápida (`tests/fast/`, segundos)
 
-Se ejecuta en cada commit. Prohibido que tarde más de 20 s.
+Se ejecuta en cada commit. Prohibido que tarde más de 30 s (v3.68; ver la
+tabla de arriba, que cuenta de dónde vienen los diez segundos nuevos).
 
 - **Determinismo.** Misma semilla + mismas decisiones → estado idéntico a los
   5 000 ticks. Se compara un hash del estado serializado.

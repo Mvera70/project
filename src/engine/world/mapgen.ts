@@ -4,7 +4,7 @@ import { int, next } from '../rng';
 import type { RngBundle } from '../rng';
 import { TERRAIN_CODE, valleyTraits } from '../state';
 import type { ValleyMap } from '../state';
-import { idx, neighbours4 } from './tiles';
+import { HEART, idx, inHeart, neighbours4 } from './tiles';
 
 // The M-13 contract names all four functions together (§17). The topology two
 // live in tiles.ts because M-14 and M-15 need them without pulling in the
@@ -15,29 +15,6 @@ interface Site { x: number; y: number }
 const CELLS = WORLD.WIDTH * WORLD.HEIGHT;
 
 /**
- * El corazón del valle: el rectángulo productivo, centrado en el mapa.
- *
- * Todo lo que la economía cuenta vive aquí dentro —el bosque, la roca, la
- * marisma, la fundación— y mide lo mismo que medía el mapa entero antes del
- * paso 3 (`WORLD.HEART_WIDTH`). Lo de fuera es montaña y lago: paisaje que
- * cierra y no produce.
- *
- * Centrado y no pegado a una esquina porque es literalmente lo que se pidió:
- * «el valle es el centro del mapa, pero debe ser más amplio».
- */
-const HEART = {
-  x0: Math.floor((WORLD.WIDTH - WORLD.HEART_WIDTH) / 2),
-  y0: Math.floor((WORLD.HEIGHT - WORLD.HEART_HEIGHT) / 2),
-} as const;
-const HEART_X1 = HEART.x0 + WORLD.HEART_WIDTH;
-const HEART_Y1 = HEART.y0 + WORLD.HEART_HEIGHT;
-
-/** Si una celda cae en el corazón. */
-function inHeart(x: number, y: number): boolean {
-  return x >= HEART.x0 && x < HEART_X1 && y >= HEART.y0 && y < HEART_Y1;
-}
-
-/**
  * Lo lejos que una celda está del corazón, en celdas, y 0 dentro.
  *
  * Es lo que hace que la montaña suba hacia fuera en vez de caer en manchas
@@ -45,8 +22,8 @@ function inHeart(x: number, y: number): boolean {
  * pie dentro de él.
  */
 function outOfHeart(x: number, y: number): number {
-  const dx = Math.max(0, Math.max(HEART.x0 - x, x - (HEART_X1 - 1)));
-  const dy = Math.max(0, Math.max(HEART.y0 - y, y - (HEART_Y1 - 1)));
+  const dx = Math.max(0, Math.max(HEART.x0 - x, x - (HEART.x1 - 1)));
+  const dy = Math.max(0, Math.max(HEART.y0 - y, y - (HEART.y1 - 1)));
   return Math.hypot(dx, dy);
 }
 
@@ -96,8 +73,8 @@ export function foundingSite(map: ValleyMap): Site {
     // 200, el sitio reservado salía en x 45 con el corazón acabando en 53, y el
     // lago se comía siete celdas de la plaza. La aldea es el centro del valle
     // productivo, no un pueblo a medio camino de la sierra.
-    if (y < HEART.y0 || y + size > HEART_Y1) continue;
-    for (let x = Math.max(0, HEART.x0); x <= Math.min(WORLD.WIDTH - size, HEART_X1 - size); x += 1) {
+    if (y < HEART.y0 || y + size > HEART.y1) continue;
+    for (let x = Math.max(0, HEART.x0); x <= Math.min(WORLD.WIDTH - size, HEART.x1 - size); x += 1) {
       const occupied = blocked[(y + size) * stride + x + size]! - blocked[y * stride + x + size]!
         - blocked[(y + size) * stride + x]! + blocked[y * stride + x]!;
       if (occupied !== 0) continue;

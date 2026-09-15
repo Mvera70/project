@@ -91,8 +91,21 @@
          Compacto a propósito: son 44 px de alto en total sobre un valle que
          sigue ocupando la pantalla (§11.1). Las etiquetas van en versalitas y
          las posiciones en la llana, igual que en el resto de la piel. */
-      .valley-orders { position: absolute; z-index: 2; left: 13px;
+      /* **La línea de estado de la aldea** (`ui/doing.ts`): qué está haciendo,
+         entre la tira y el mando. Sin placa y sin filete a propósito: no es un
+         instrumento que se toque, es una frase, así que va como va la línea de
+         la estación —tinta sobre el valle, con el mismo relieve de pergamino
+         detrás para que se lea sobre el prado—. La serif de la crónica, porque
+         es la voz de la aldea y no una etiqueta de interfaz. */
+      .valley-doing { position: absolute; z-index: 2; left: 14px; margin: 0;
         top: calc(max(7px, env(safe-area-inset-top)) + 62px);
+        max-width: min(72vw, 300px); color: var(--ink); text-wrap: pretty;
+        font: 13px/1.25 var(--voice); letter-spacing: .005em;
+        text-shadow: 0 1px 0 rgba(242,233,216,.65), 0 0 3px rgba(242,233,216,.5); }
+      .valley-doing:empty, .valley-doing[hidden] { display: none; }
+
+      .valley-orders { position: absolute; z-index: 2; left: 13px;
+        top: calc(max(7px, env(safe-area-inset-top)) + 82px);
         display: flex; flex-direction: column; gap: 3px; }
       .valley-order { display: flex; align-items: center; gap: 6px; }
       .valley-order-name { min-width: 62px; color: var(--ink-soft);

@@ -56,9 +56,15 @@ medición.
 `main`** y sin haberse abierto nunca como pull request. Eso importa y no es un
 detalle de contabilidad: ver §3.
 
-**Puerta en verde:** `npm run typecheck`, `npm test` (1 043 pruebas, 18,4 s),
-`npm run test:journeys` (111 pruebas, 130 s), `npm run lint`, `npm run test:pwa`
+**Puerta en verde:** `npm run typecheck`, `npm test` (1 047 pruebas, 23,7 s),
+`npm run test:journeys` (111 pruebas, 221 s), `npm run lint`, `npm run test:pwa`
 (6 recorridos) y `npm run test:shots` (10 pasan, 3 declaradas).
+
+**Los presupuestos de prueba subieron en v3.68 y está contado por qué**
+(`docs/design.md` §14): el valle es cuatro veces mayor y un tick cuesta 1,67
+veces lo que costaba, con dos cuellos ya arreglados —A* rellenaba tres arrays
+del tamaño del mapa por ruta; `placeBuilding` recorría el mapa entero por
+solar—. Lo que queda son tres ficheros que simulan mil años cada uno.
 
 ### Qué es el juego hoy
 

@@ -1,4 +1,5 @@
 import { BUILDINGS, BUILDING_RULES } from '../balance';
+import { HEART } from './tiles';
 import { TERRAIN_CODE } from '../state';
 import type { Building, BuildingKind, GameState } from '../state';
 
@@ -191,7 +192,20 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   let best: Point | null = null;
   let bestScore: number[] | null = null;
   const spec = BUILDINGS[kind];
-  for (let y = 0; y <= state.map.height - spec.h; y += 1) for (let x = 0; x <= state.map.width - spec.w; x += 1) {
+  // **Sólo el corazón del valle**, y por dos razones que apuntan al mismo sitio.
+  //
+  // La de diseño: fuera del corazón no hay terreno productivo —es montaña, lago
+  // y falda (§7)— y los topes de §12 son absolutos, así que una aldea de
+  // dieciséis casas y ocho campos no tiene por qué desparramarse por la sierra.
+  // «El valle es el centro del mapa» incluye que la aldea se quede en el centro.
+  //
+  // Y la de coste, medida: este bucle recorría el mapa entero por cada solar, y
+  // `nextProject` lo llama hasta ocho veces por tick. Con el mapa grande eso son
+  // cuatro veces más celdas por nada: la suite rápida pasó de 18,4 a 28,5
+  // segundos —su presupuesto son 20— y la de balance de 18 minutos a más de
+  // cincuenta. Acotar al corazón devuelve el coste que tenía.
+  for (let y = HEART.y0; y <= Math.min(HEART.y1, state.map.height) - spec.h; y += 1) {
+    for (let x = HEART.x0; x <= Math.min(HEART.x1, state.map.width) - spec.w; x += 1) {
     if (!fitsEmptyGround(state, kind, x, y, occupied)) continue;
     const rect = { x, y, w: spec.w, h: spec.h };
     const p = center(rect);
@@ -240,6 +254,7 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
     }
     if (bestScore === null || lowerScore(score, bestScore)) {
       best = { x, y }; bestScore = score;
+    }
     }
   }
   return best;

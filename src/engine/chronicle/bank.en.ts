@@ -1774,6 +1774,27 @@ export const UI_BANK: Record<string, string> = {
   'app.vitals.food': 'Food for {weeks} weeks',
   'app.vitals.wood': '{count} wood',
   'app.vitals.morale': 'Spirits {value} of 100',
+  // La línea de estado de la tira (`src/ui/doing.ts`). **Interfaz y no crónica**:
+  // una sola forma por clave, sin variantes, porque una etiqueta que cambia de
+  // palabras cada vez que se mira no es una etiqueta. Presente, corta, y dicha
+  // en lo que el jugador puede hacer con ella.
+  'doing.hungry': 'The granary is low.',
+  'doing.cold': 'The woodpile will not last the winter.',
+  'doing.nothing': 'Nothing is being built.',
+  'doing.waiting_wood': 'The next work is waiting on timber.',
+  'doing.raising.field': 'They are breaking a new field.',
+  'doing.raising.house': 'They are raising a house.',
+  'doing.raising.granary': 'They are raising a granary.',
+  'doing.raising.well': 'They are digging the well.',
+  'doing.raising.chapel': 'They are raising the chapel.',
+  'doing.raising.smithy': 'They are raising the smithy.',
+  'doing.raising.mill': 'They are raising the mill.',
+  'doing.raising.palisade': 'They are fencing the village.',
+  'doing.raising.grave_yard': 'They are walling the burying ground.',
+  'doing.raising.wall': 'They are setting the stone wall.',
+  'doing.raising.stone_house': 'They are rebuilding a house in stone.',
+  'doing.raising.church': 'They are raising the church.',
+  'doing.raising.watchtower': 'They are raising the watchtower.',
   // U-06 · la línea de estación bajo el año (`src/ui/app.ts`, `seasonLabel`):
   // una clave por estación, nunca un literal junto a `seasonOf`.
   'app.season.spring': 'Spring',

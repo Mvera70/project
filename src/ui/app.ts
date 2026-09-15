@@ -20,6 +20,7 @@ import { panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
+import { doingNow } from './doing';
 import { milestonesAt } from './milestones';
 import { mountMoments } from './moment';
 import { mountNotices } from './notice';
@@ -215,6 +216,17 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * esas cifras**: la orden y su lectura tienen que estar juntas o el jugador no
    * ata una con la otra. El valle sigue ocupando la pantalla.
    */
+  /**
+   * **La línea de estado: qué está haciendo la aldea.** `doing.ts`.
+   *
+   * Va entre la tira y el mando porque es la bisagra de los dos: la tira dice
+   * cómo está la aldea, esto dice qué está haciendo con ello, y el mando es lo
+   * que uno cambia después. Puesta encima del mando, la orden se lee como
+   * respuesta a esta frase, que es exactamente lo que es.
+   */
+  const doing = document.createElement('p');
+  doing.className = 'valley-doing';
+
   const orders = document.createElement('div');
   orders.className = 'valley-orders';
   orders.setAttribute('aria-label', renderUiText('app.orders'));
@@ -372,7 +384,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
   peopleTab.addEventListener('click', () => openPeople(app));
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, year, season, vitals, orders, hudRight, tabbar);
+  root.append(canvas, year, season, vitals, doing, orders, hudRight, tabbar);
   paintOrders();
 
   // §11.6: the band that says what just happened, over the valley itself.
@@ -523,6 +535,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // La comida es la unica que avisa: §5.3 mata de hambre, y una aldea con
     // menos de un mes de reserva esta a un mal invierno de eso.
     food.cell.classList.toggle('thin', now.weeks < 4);
+    // Y la línea de estado. Se recalcula en cada pintado porque `doingNow` es
+    // pura y barata —lee el estado y no consume nada— y porque la obra en
+    // marcha cambia a mitad de semana cuando se termina algo.
+    const said = doingNow(state);
+    doing.textContent = said === null ? '' : renderUiText(said.key, said.params);
+    doing.hidden = said === null;
     // The same kind of observability hook as `data-app-ready` (M-19): the year
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.

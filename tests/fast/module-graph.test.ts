@@ -150,7 +150,11 @@ describe('grafo de módulos del motor', () => {
     // el generador, para que M-14 y M-15 no arrastren el ruido.
     expect(importsOf('world/tiles.ts')).toEqual(['balance']);
     expect(importsOf('world/mapgen.ts')).toEqual(['balance', 'rng', 'state', 'tiles']);
-    expect(importsOf('world/placement.ts')).toEqual(['balance', 'state']);
+    // `tiles` desde el mapa grande: `placeBuilding` acota su barrido al
+    // corazón del valle (`HEART`), que es la misma geometría que el generador
+    // usa y que por eso vive en la hoja topológica. Tres módulos con su propia
+    // copia del rectángulo son tres rectángulos en cuanto alguien lo cambie.
+    expect(importsOf('world/placement.ts')).toEqual(['balance', 'state', 'tiles']);
     expect(importsOf('world/buildings.ts')).toEqual([
       'balance',
       'people/demography',

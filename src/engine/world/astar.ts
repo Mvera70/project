@@ -101,6 +101,47 @@ class Frontier {
 }
 
 /**
+ * Los tres arrays de trabajo de A*, reutilizados entre llamadas.
+ *
+ * **Esto no es micro-optimización: era el coste del tick.** A* pedía tres
+ * arrays del tamaño del mapa y los **rellenaba** en cada ruta —`fill(-1)` dos
+ * veces y un `Uint8Array` nuevo—, y `routesFor` pide una ruta por aldeano y por
+ * semana. Con el mapa grande son 8 064 celdas × 3 × ochenta aldeanos: dos
+ * millones de escrituras por tick para dejar a cero algo que se va a usar en
+ * las cien celdas de una ruta.
+ *
+ * Medido: la suite rápida se fue de 18,4 a 28,5 segundos con el mapa grande
+ * —su presupuesto son 20 (`CLAUDE.md`)— y la de balance de 18 minutos a más de
+ * cincuenta, y esto era la mitad.
+ *
+ * En vez de rellenar, **se marca la visita**: un contador que sube en cada ruta
+ * y una celda cuyo `seen` no es la marca de esta ruta cuenta como no vista. La
+ * función sigue siendo pura hacia fuera —misma entrada, misma salida, y ninguna
+ * ruta depende de la anterior— y sigue sin consumir azar (§4.3): lo único que
+ * se comparte es memoria de borrador.
+ */
+let VISIT = 0;
+interface Scratch {
+  gScore: Int32Array;
+  cameFrom: Int32Array;
+  seen: Int32Array;
+  done: Int32Array;
+}
+let SCRATCH: Scratch | null = null;
+
+function scratchFor(cells: number): Scratch {
+  if (SCRATCH === null || SCRATCH.gScore.length < cells) {
+    SCRATCH = {
+      gScore: new Int32Array(cells),
+      cameFrom: new Int32Array(cells),
+      seen: new Int32Array(cells),
+      done: new Int32Array(cells),
+    };
+  }
+  return SCRATCH;
+}
+
+/**
  * The cheapest route from `from` to `to`, both ends included, or an empty array
  * if there is no way through.
  *
@@ -115,9 +156,11 @@ export function route(map: ValleyMap, from: number, to: number): number[] {
 
   const cells = map.terrain.length;
   const width = map.width;
-  const gScore = new Int32Array(cells).fill(-1);
-  const cameFrom = new Int32Array(cells).fill(-1);
-  const done = new Uint8Array(cells);
+  const { gScore, cameFrom, seen, done } = scratchFor(cells);
+  // **La marca de visita, en vez de tres `fill` por ruta.** Ver `scratchFor`.
+  VISIT += 1;
+  const visit = VISIT;
+  const scoreOf = (cell: number): number => (seen[cell] === visit ? gScore[cell] as number : -1);
 
   const heuristic = (cell: number): number => {
     const dx = Math.abs((cell % width) - (to % width));
@@ -127,30 +170,32 @@ export function route(map: ValleyMap, from: number, to: number): number[] {
 
   const frontier = new Frontier();
   gScore[from] = 0;
+  seen[from] = visit;
   frontier.push(from, heuristic(from));
 
   while (frontier.size > 0) {
     const current = frontier.pop();
     if (current === to) break;
-    if (done[current] === 1) continue;
-    done[current] = 1;
+    if (done[current] === visit) continue;
+    done[current] = visit;
 
     for (const next of neighbours4(current)) {
-      if (done[next] === 1) continue;
+      if (done[next] === visit) continue;
       const cost = stepCost(map, next);
       if (cost === null) continue;
-      const tentative = (gScore[current] as number) + cost;
-      const known = gScore[next] as number;
+      const tentative = scoreOf(current) + cost;
+      const known = scoreOf(next);
       if (known !== -1 && tentative >= known) continue;
       gScore[next] = tentative;
+      seen[next] = visit;
       cameFrom[next] = current;
       frontier.push(next, tentative + heuristic(next));
     }
   }
 
-  if (gScore[to] === -1) return [];
+  if (scoreOf(to) === -1) return [];
   const path: number[] = [];
-  for (let at = to; at !== -1; at = cameFrom[at] as number) {
+  for (let at = to; at !== -1; at = seen[at] === visit ? cameFrom[at] as number : -1) {
     path.push(at);
     if (at === from) break;
   }

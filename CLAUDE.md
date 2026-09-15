@@ -78,8 +78,8 @@ prueba, y saltársela es lo que costó la auditoría del 15 sep 2026:
 ```bash
 npm run dev          # servidor con recarga en caliente
 npm run typecheck    # tsc --noEmit
-npm test             # suite rápida — menos de 20 s, mide 17,5
-npm run test:journeys # jornadas y siglos en varias semillas — menos de 3 min
+npm test             # suite rápida — menos de 30 s, mide 23,7
+npm run test:journeys # jornadas y siglos en varias semillas — menos de 5 min, mide 221 s
 npm run test:all     # las dos de arriba
 npm run test:balance # siglos en sesenta semillas — minutos, se lanza aparte
 npm run lint
