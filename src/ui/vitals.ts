@@ -18,6 +18,42 @@ import { FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import type { GameState } from '@engine/state';
 
+/**
+ * Hacia dónde va una cifra. E4 de `docs/plan-juego.md`.
+ *
+ * **La mitad que faltaba para que un número signifique algo.** «Comida 40» es
+ * ruido: cuarenta semanas subiendo es una aldea que va bien y cuarenta bajando
+ * es una aldea que se está comiendo la reserva, y son la misma cifra en
+ * pantalla. Con la dirección puesta, el jugador puede atribuir —la comida baja
+ * **porque** mandé las manos al bosque— y eso es el cierre del bucle: no hace
+ * falta explicarle el juego si el juego le contesta.
+ *
+ * `steady` cuando no se mueve, que en un idle es la mayoría del tiempo y por eso
+ * no se dibuja nada.
+ */
+export type Trend = 'up' | 'down' | 'steady';
+
+/**
+ * Una muestra de la tira, para comparar contra ella.
+ *
+ * La dirección se mide contra **un mes y no contra la semana anterior**: el
+ * grano baja cada semana y sube de golpe en la cosecha, así que una flecha
+ * semanal apuntaría hacia abajo once meses al año y no diría nada. Cuatro
+ * semanas es el horizonte en el que una decisión del jugador ya se ve.
+ */
+export const TREND_WEEKS = 4;
+
+/** La dirección de cada cifra entre dos muestras, con el mes de por medio. */
+export function trendsOf(now: Vitals, then: Vitals): Record<keyof Vitals, Trend> {
+  const of = (a: number, b: number): Trend => (a === b ? 'steady' : a > b ? 'up' : 'down');
+  return {
+    people: of(now.people, then.people),
+    weeks: of(now.weeks, then.weeks),
+    wood: of(now.wood, then.wood),
+    morale: of(now.morale, then.morale),
+  };
+}
+
 export interface Vitals {
   people: number;
   /** Semanas de comida que quedan al ritmo de hoy. */

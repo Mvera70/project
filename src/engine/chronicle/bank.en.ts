@@ -1483,6 +1483,39 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The valley had nobody in it until year {year}, and then it had {people}.',
   ],
 
+  // --- E4 · lo que la aldea contesta a una orden (docs/plan-juego.md) ---
+  //
+  // La voz de siempre (§9.3): concreta, sin exclamaciones, sin juzgar al
+  // jugador. **Y con alguien dentro** — no «no hay campos» sino «el alguacil
+  // dice que no hay campos», porque una orden se la da a alguien y quien
+  // contesta es ese alguien. Es la misma diferencia que hay entre un mensaje de
+  // error y una persona.
+  'answer.no_more_fields': [
+    'The reeve says there are {count} fields and no hands idle to break another.',
+    'There are {count} fields, and sowing heavier means breaking new ground first.',
+    'The reeve counted {count} fields and shrugged. Ground has to be broken before it is sown.',
+  ],
+  'answer.no_more_hands': [
+    'The reeve says a field cannot be worked by fewer than two, and there are no more pairs.',
+    'These hands can crew {count} fields, and no order changes that.',
+    'The reeve will not split the crews thinner. A half-worked field yields nothing.',
+  ],
+  'answer.all_the_land': [
+    'That is every acre the valley has, and there is no more ground to break.',
+    'The valley holds {count} fields and has no room for another.',
+    'The reeve says the ground has run out before the will did.',
+  ],
+  'answer.someone_must_build': [
+    'Someone has to keep building, or the valley stops being one.',
+    'The reeve keeps a few back from the wood. Roofs do not mend themselves.',
+    'Not everyone goes to the trees. Something always needs raising.',
+  ],
+  'answer.no_wood_to_build': [
+    'Nothing can be raised without timber, whatever it is meant to be.',
+    'The works wait on the wood.',
+    'The carpenters are standing about. There is no timber to give them.',
+  ],
+
   // --- milestones (§11.6) ---
   //
   // `src/ui/milestones.ts`. Not what a tick did (that is the rest of this

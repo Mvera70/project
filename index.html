@@ -73,6 +73,15 @@
          color (§11.1.1, U-06): quien no distingue el color ve el dibujo más
          grueso igual. */
       .valley-vital.thin svg { stroke-width: 2.4; }
+      /* E4 · La dirección de una cifra. Siete píxeles y sin color propio: hereda
+         la tinta de la celda, así que la comida en aviso la tiene roja como su
+         número y el resto en tinta. Subir y bajar **no son bueno y malo** —más
+         gente es mejor, más semanas de comida es mejor, pero eso lo sabe el
+         jugador— así que la flecha informa y no juzga, que es la regla de §9.3
+         llevada a un dibujo de siete píxeles. */
+      .valley-trend { display: inline-flex; align-items: center; margin-left: 1px;
+        opacity: .72; }
+      .valley-trend:empty { display: none; }
 
       /* E1 · **El mando.** Dos órdenes permanentes, debajo de la tira y pegadas a
          ella: la orden y su lectura tienen que estar juntas o el jugador no ata

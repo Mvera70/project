@@ -3,7 +3,8 @@
 import { TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
-import { vitalsOf } from './vitals';
+import { answerFor } from './answer';
+import { TREND_WEEKS, trendsOf, vitalsOf } from './vitals';
 import { NAV_ICONS, VITAL_ICONS } from './icons';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
@@ -161,7 +162,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const vitals = document.createElement('div');
   vitals.className = 'valley-vitals';
   vitals.setAttribute('aria-label', renderUiText('app.vitals'));
-  const vital = (icon: string): { cell: HTMLElement; value: HTMLElement } => {
+  const vital = (icon: string): { cell: HTMLElement; value: HTMLElement; arrow: HTMLElement } => {
     const cell = document.createElement('span');
     cell.className = 'valley-vital';
     cell.innerHTML = icon;
@@ -173,9 +174,23 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       if (event.animationName === 'valley-vital-bump') cell.classList.remove('bump');
     });
     const value = document.createElement('b');
-    cell.append(value);
+    // E4 · la dirección. Dibujada y no escrita, por lo mismo que los iconos: un
+    // glifo de flecha sale distinto en cada teléfono y aquí mide siete píxeles.
+    // Vacía cuando la cifra está quieta, que en un idle es la mayoría del
+    // tiempo — una flecha permanente deja de ser una señal.
+    const arrow = document.createElement('i');
+    arrow.className = 'valley-trend';
+    cell.append(value, arrow);
     vitals.append(cell);
-    return { cell, value };
+    return { cell, value, arrow };
+  };
+
+  /** Las dos flechas, dibujadas una vez. */
+  const TREND_MARK: Readonly<Record<'up' | 'down', string>> = {
+    up: '<svg viewBox="0 0 8 8" width="7" height="7" aria-hidden="true" focusable="false"'
+      + ' fill="currentColor"><path d="M4 1 7 6H1z"/></svg>',
+    down: '<svg viewBox="0 0 8 8" width="7" height="7" aria-hidden="true" focusable="false"'
+      + ' fill="currentColor"><path d="M4 7 1 2h6z"/></svg>',
   };
   // Los iconos van dibujados, no escritos: un glifo de texto depende de la
   // fuente que tenga el telefono y aqui hay cuatro dibujos de tres trazos.
@@ -233,6 +248,16 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         // recalcula nada aquí, el motor lee `state.intent` cada semana.
         apply(stop.key);
         paintOrders();
+        // E4 · **y la aldea contesta.** Si la orden no se puede cumplir, se dice
+        // ahora y una sola vez: un roce repetido cada semana deja de ser una
+        // respuesta y se convierte en una regañina.
+        const said = answerFor(state);
+        if (said !== null) {
+          notices.show(state, [{
+            tick: state.tick, kind: 'season', templateKey: said.key,
+            params: said.params, weight: 2,
+          }]);
+        }
         // Y se guarda, porque es una decisión del jugador: al volver dos días
         // después la aldea tiene que seguir haciendo lo que se le dijo.
         persist();
@@ -433,6 +458,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // pide no ver movimiento no lo ve: la clase ni se llega a poner.
   const reducesMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let lastVitals = vitalsOf(state);
+  /**
+   * La tira de hace un mes, y el tick en que se tomó.
+   *
+   * Contra un mes y no contra la semana anterior: el grano baja cada semana y
+   * sube de golpe en la cosecha, así que una flecha semanal apuntaría hacia
+   * abajo once meses al año y no diría nada (`vitals.ts`, `TREND_WEEKS`).
+   */
+  let monthAgo = { at: state.tick, vitals: lastVitals };
   const bump = (cell: HTMLElement, changed: boolean): void => {
     if (!changed || reducesMotion.matches) return;
     // La clase se pone y se quita sola (`animationend` en `vital()`), nunca
@@ -453,6 +486,18 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     bump(food.cell, now.weeks !== lastVitals.weeks);
     bump(wood.cell, now.wood !== lastVitals.wood);
     bump(spirits.cell, now.morale !== lastVitals.morale);
+    // La muestra del mes se releva cuando el mes ha pasado, no en cada
+    // fotograma: si se relevara siempre, la comparación sería contra sí misma y
+    // todas las flechas estarían quietas.
+    if (state.tick - monthAgo.at >= TREND_WEEKS) monthAgo = { at: state.tick, vitals: now };
+    const trends = trendsOf(now, monthAgo.vitals);
+    for (const [key, cell] of [
+      ['people', people], ['weeks', food], ['wood', wood], ['morale', spirits],
+    ] as const) {
+      const way = trends[key];
+      cell.arrow.innerHTML = way === 'steady' ? '' : TREND_MARK[way];
+      cell.arrow.dataset.way = way;
+    }
     lastVitals = now;
     people.value.textContent = String(now.people);
     food.value.textContent = String(now.weeks);
