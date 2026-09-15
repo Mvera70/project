@@ -13,7 +13,7 @@ import { FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import { opinionOf } from '@engine/people/opinions';
 import { hash32 } from '@engine/rng';
-import { integrate, turnTo, type Body, type Terrain } from './body';
+import { blockedAt, integrate, turnTo, type Body, type Terrain } from './body';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
@@ -197,8 +197,17 @@ export function createVillage(state: GameState, day: number): Village {
   alive.forEach((villager, n) => {
     // Se le deja junto a un sitio de la aldea, repartidos.
     const spot = mine[n % Math.max(1, mine.length)]?.at ?? heart;
-    let x = spot.x;
-    let z = spot.z;
+    // **El sitio de partida, si los cuarenta anillos fallan, ya no es el punto
+    // exacto del sitio.** Era `spot` a secas, y eso es un montón: dos personas
+    // cuyos anillos fallan los dos nacen en **la misma coordenada exacta**, que
+    // es el único solape que el separador de `steering.ts` no podía deshacer
+    // —el vector que separa dos puntos iguales es cero—. Con el mapa grande
+    // pasó de raro a visible. El sorteo sale de `hash32` y de la persona, así
+    // que dos máquinas colocan la misma aldea igual (§4.3).
+    const scatterAngle = (hash32(seed, `spawn:${villager.id}`) / 4_294_967_296) * Math.PI * 2;
+    let x = spot.x + Math.cos(scatterAngle) * 0.45;
+    let z = spot.z + Math.sin(scatterAngle) * 0.45;
+    if (blockedAt(land, x, z)) { x = spot.x; z = spot.z; }
     for (let ring = 0; ring < 40; ring += 1) {
       const angle = ring * 2.39996;
       const reach = 0.6 + ring * 0.35;
@@ -206,7 +215,15 @@ export function createVillage(state: GameState, day: number): Village {
       const tryZ = spot.z + Math.cos(angle) * reach;
       if (tryX <= 1 || tryZ <= 1 || tryX >= land.width - 1 || tryZ >= land.height - 1) continue;
       if (!canReach(land, shore, { x: tryX, z: tryZ })) continue;
+      // **Y las bestias también ocupan sitio.** Esto miraba sólo a la gente, y
+      // la cabaña se crea antes (V-08), así que alguien podía nacer **encima**
+      // de una vaca. Dos cuerpos en el mismo punto exacto son el único caso que
+      // el separador no puede arreglar: empuja a lo largo del vector que los
+      // separa, y ese vector es cero. Medido con el mapa grande: la bestia
+      // 10039 y la persona 52 en 23,03 / 67,13, las dos, seiscientos pasos
+      // después de empezar ahí.
       if (dwellers.some((d) => Math.hypot(d.body.x - tryX, d.body.z - tryZ) < 0.8)) continue;
+      if (beasts.some((b) => Math.hypot(b.dweller.body.x - tryX, b.dweller.body.z - tryZ) < 0.8)) continue;
       x = tryX; z = tryZ; break;
     }
     const pace = 1.05 + (hash32(seed, `pace:${villager.id}`) / 4_294_967_296) * 0.6;

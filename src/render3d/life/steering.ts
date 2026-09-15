@@ -14,6 +14,7 @@
 // necesita** que le repartan carriles ni que le tracen un rodeo. Se aparta
 // porque no cabe.
 
+import { hash32 } from '@engine/rng';
 import { blockedAt, WALL_CLEAR, type Body, type Point, type Terrain } from './body';
 import type { Neighbourhood } from './grid';
 
@@ -159,18 +160,48 @@ export function resolve(
         if (other.id < body.id) return;
         const apart = Math.hypot(other.x - body.x, other.z - body.z);
         const room = body.radius + other.radius;
-        if (apart >= room || apart < 1e-6) return;
+        if (apart >= room) return;
 
-        const half = (room - apart) / 2;
-        const ux = (other.x - body.x) / apart;
-        const uz = (other.z - body.z) / apart;
+        // **Dos cuerpos en el mismo punto exacto se separaban por una dirección
+        // inventada, o no se separaban nunca.** Esta línea decía
+        // `apart < 1e-6 → return`: rendirse. Y el vector que los separa es cero,
+        // así que no había por dónde empujar.
+        //
+        // Pasa de verdad y se midió: la oferta de acariciar un animal está
+        // **en** el punto del animal (`beasts.ts`, `giftPlaceOf`), así que quien
+        // va a acariciarlo acaba dentro de él —la bestia 10041 y la persona 54
+        // en 41,88 / 54,84, las dos, seiscientos pasos después—. Y ahí se
+        // quedaban para siempre, porque el separador se rendía.
+        //
+        // La dirección sale de los dos ids con `hash32`, no del reloj ni de un
+        // ángulo fijo: dos máquinas separan la misma pareja hacia el mismo lado
+        // (§4.3) y dos parejas distintas no se abren todas hacia el este.
+        const coincident = apart < 1e-6;
+        const turn = (hash32(body.id, `apart:${other.id}`) / 4_294_967_296) * Math.PI * 2;
+        const half = coincident ? room / 2 : (room - apart) / 2;
+        let ux = coincident ? Math.cos(turn) : (other.x - body.x) / apart;
+        let uz = coincident ? Math.sin(turn) : (other.z - body.z) / apart;
         const j = seat.get(other.id);
         if (j === undefined) return;
 
         // Separar no puede ser meter a nadie en una pared: quien no tiene sitio
         // se queda donde está y el otro carga con todo el apartarse.
-        const mineFits = !blockedAt(land, body.x - ux * half, body.z - uz * half);
-        const theirsFits = !blockedAt(land, other.x + ux * half, other.z + uz * half);
+        let mineFits = !blockedAt(land, body.x - ux * half, body.z - uz * half);
+        let theirsFits = !blockedAt(land, other.x + ux * half, other.z + uz * half);
+        // **Y en el mismo punto exacto, si esa dirección no cabe, se prueban las
+        // otras tres.** Con una sola dirección quedaba el caso peor sin
+        // arreglar: dos cuerpos dentro del mismo punto, contra un muro, y
+        // ninguno de los dos podía moverse hacia donde tocaba, así que se
+        // quedaban dentro el uno del otro para siempre. Cuatro cuartos de vuelta
+        // desde el ángulo sorteado: sigue siendo determinista y ya no depende de
+        // que la primera salga bien.
+        for (let quarter = 1; quarter < 4 && coincident && !mineFits && !theirsFits; quarter += 1) {
+          const angle = turn + quarter * (Math.PI / 2);
+          ux = Math.cos(angle);
+          uz = Math.sin(angle);
+          mineFits = !blockedAt(land, body.x - ux * half, body.z - uz * half);
+          theirsFits = !blockedAt(land, other.x + ux * half, other.z + uz * half);
+        }
         if (mineFits) {
           body.x -= ux * half; body.z -= uz * half;
           fixX[i] = (fixX[i] ?? 0) - ux * half;
