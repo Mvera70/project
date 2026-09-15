@@ -1619,6 +1619,19 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
 export const UI_BANK: Record<string, string> = {
   'app.valley': 'The valley',
   'app.close': 'Close',
+  // E1 · El mando. Las dos únicas cosas que el jugador manda de forma continua,
+  // y se nombran **con palabras y no con cifras** (§11.1): «sembrar de más» es
+  // una orden que un alguacil entendería, «1,5×» no. Tres posiciones cada una,
+  // porque tres es una decisión y cinco es un dial.
+  'app.orders': 'Standing orders',
+  'app.sowing': 'Sowing',
+  'app.sowing.lean': 'Lean',
+  'app.sowing.enough': 'Enough',
+  'app.sowing.heavy': 'Heavy',
+  'app.hands': 'Spare hands',
+  'app.hands.works': 'Build',
+  'app.hands.both': 'Both',
+  'app.hands.wood': 'Wood',
   'app.year': 'ANNO {year}',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',

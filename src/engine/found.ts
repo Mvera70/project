@@ -5,7 +5,7 @@
 import { BUILDINGS, FOUNDING, LIFE } from './balance';
 import { foundPeople } from './people/villagers';
 import { makeBundle } from './rng';
-import { SCHEMA_VERSION } from './state';
+import { SCHEMA_VERSION, restingIntent } from './state';
 import type { BuildingKind, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
@@ -75,6 +75,8 @@ export function foundGame(seed: number, inherited?: InheritedValley): GameState 
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null, crowBite: 0,
+    // La aldea arranca haciendo lo que hacía sola (§5.2, y D-6 del plan).
+    intent: restingIntent(),
     ended: null,
   };
   foundingBuildings(state);

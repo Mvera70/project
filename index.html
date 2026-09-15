@@ -74,6 +74,32 @@
          grueso igual. */
       .valley-vital.thin svg { stroke-width: 2.4; }
 
+      /* E1 · **El mando.** Dos órdenes permanentes, debajo de la tira y pegadas a
+         ella: la orden y su lectura tienen que estar juntas o el jugador no ata
+         una con la otra. Misma piel de instrumento que la regleta de velocidad
+         —placa de pergamino, filete, tinta— porque es la misma clase de cosa:
+         un mando, no un panel de estadísticas.
+         Compacto a propósito: son 44 px de alto en total sobre un valle que
+         sigue ocupando la pantalla (§11.1). Las etiquetas van en versalitas y
+         las posiciones en la llana, igual que en el resto de la piel. */
+      .valley-orders { position: absolute; z-index: 2; left: 13px;
+        top: calc(max(7px, env(safe-area-inset-top)) + 62px);
+        display: flex; flex-direction: column; gap: 3px; }
+      .valley-order { display: flex; align-items: center; gap: 6px; }
+      .valley-order-name { min-width: 62px; color: var(--ink-soft);
+        font: 600 9px/1.1 var(--plain); letter-spacing: .1em;
+        font-variant-caps: all-small-caps; text-shadow: 0 1px 0 rgba(242,233,216,.4); }
+      .valley-order-bar { display: flex; padding: 1px; gap: 1px;
+        border: 1px solid var(--edge); border-radius: 6px; background: var(--plate);
+        box-shadow: 0 1px 3px rgba(34,29,24,.18); backdrop-filter: blur(2px); }
+      .valley-order-bar button { min-width: 44px; min-height: 22px; padding: 0 7px;
+        border: 0; border-radius: 5px; background: transparent; color: var(--ink-soft);
+        font: 600 10px/1 var(--plain); letter-spacing: .03em; cursor: pointer;
+        -webkit-tap-highlight-color: transparent; }
+      .valley-order-bar button:active { background: rgba(34,29,24,.10); }
+      .valley-order-bar button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
+      .valley-order-bar button:focus-visible { outline: 2px solid var(--gild); outline-offset: 2px; }
+
       /* U-06 · el bump de una cifra que acaba de cambiar. La duración la
          manda `TIME.VITAL_BUMP_MS` desde `app.ts` (`animationDuration` en
          línea, nada de un número aquí) y `animationend` retira la clase sola:

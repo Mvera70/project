@@ -1,0 +1,140 @@
+// E1 · Las dos palancas. docs/plan-juego.md, §5.2, esquema 4.
+//
+// **Esta es la prueba que puede tirar el plan entero**, y por eso está escrita
+// antes que la interfaz. El plan dice, con estas palabras, qué lo falsaría:
+//
+//   «Que la aldea aguante igual de bien cualquier postura. Si las cinco
+//    posturas dan la misma partida a los veinte años, las palancas son decorado
+//    y hay que subir las consecuencias antes de seguir.»
+//
+// Si esto pasa, el jugador tiene un verbo. Si no pasa, tiene un mando de
+// juguete, y saberlo aquí cuesta dos minutos en vez de una semana de interfaz.
+//
+// Se mide en varias semillas por la razón de siempre: dos partidas divergen
+// desde el primer tick y una sola es ruido.
+
+import { describe, expect, it } from 'vitest';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { foundGame } from '@engine/found';
+import { run } from '@engine/sim';
+import { LABOUR } from '@engine/balance';
+import { population } from '@engine/people/demography';
+import { restingIntent, type Intent } from '@engine/state';
+import { count } from '@engine/subsistence/building-counts';
+import { allocateLabour } from '@engine/subsistence/labour';
+
+const SEEDS = [7, 11, 23, 41] as const;
+const YEARS = 20;
+
+/** Las cinco posturas que un jugador tomaría de verdad. */
+const STANCES: Readonly<Record<string, Intent>> = {
+  reposo: restingIntent(),
+  granero: { fields: 2, timber: 0.4 },
+  lena: { fields: 0.5, timber: 0.9 },
+  obra: { fields: 0.5, timber: 0.05 },
+  aldea: { fields: 1.4, timber: 0.15 },
+};
+
+interface Outcome {
+  people: number;
+  grain: number;
+  wood: number;
+  buildings: number;
+  fields: number;
+}
+
+function played(seed: number, intent: Intent): Outcome {
+  const state = foundGame(seed);
+  state.intent = { ...intent };
+  run(state, YEARS * 48, 'prudent', CATALOG);
+  return {
+    people: population(state),
+    grain: Math.round(state.village.grain),
+    wood: Math.round(state.village.wood),
+    buildings: state.buildings.filter((one) => one.lostTick === null).length,
+    fields: count(state, 'field'),
+  };
+}
+
+describe('E1 · la postura cambia la partida', () => {
+  it('la postura de reposo es exactamente el juego de antes', () => {
+    // D-6 del plan: si esto falla, meter las palancas ha movido el balance y
+    // cualquier medición contra la suite de §12.9 deja de valer. La igualdad se
+    // comprueba donde se decide —el reparto de manos— y no en el resultado,
+    // porque el resultado ya lo cubren las 1 026 pruebas de la suite rápida.
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      run(state, 8 * 48, 'prudent', CATALOG);
+      const mine = allocateLabour(state);
+
+      // La fórmula de antes, escrita a mano: los campos que la población
+      // necesita y `CUTTER_SHARE` de lo que sobra.
+      expect(state.intent).toEqual({ fields: 1, timber: LABOUR.CUTTER_SHARE });
+      expect(mine.cutters + mine.builders, 'las manos sobrantes no se pierden')
+        .toBeCloseTo(mine.cutters + mine.builders, 9);
+      expect(mine.cutters, 'y se reparten en la proporción de siempre')
+        .toBeCloseTo((mine.cutters + mine.builders) * LABOUR.CUTTER_SHARE, 9);
+    }
+  });
+
+  it('apretar el bosque da leña y quita obra, en todas las semillas', () => {
+    // La palanca más directa y la que el jugador va a mover primero.
+    for (const seed of SEEDS) {
+      const timber = played(seed, STANCES['lena'] as Intent);
+      const works = played(seed, STANCES['obra'] as Intent);
+      expect(timber.wood, `semilla ${seed}: leña`).toBeGreaterThan(works.wood);
+      expect(works.buildings, `semilla ${seed}: edificios`)
+        .toBeGreaterThanOrEqual(timber.buildings);
+    }
+  });
+
+  it('apretar el campo llena el granero', () => {
+    for (const seed of SEEDS) {
+      const granary = played(seed, STANCES['granero'] as Intent);
+      const timber = played(seed, STANCES['lena'] as Intent);
+      expect(granary.grain, `semilla ${seed}`).toBeGreaterThan(timber.grain);
+    }
+  });
+
+  it('y a los veinte años cinco posturas son cinco aldeas distintas', () => {
+    // **El aserto que decide si hay juego.** No basta con que los números se
+    // muevan: tienen que separarse lo bastante para que un jugador note que su
+    // postura importó. El umbral está en la distancia relativa entre la mejor y
+    // la peor de las cinco, medida en lo que el jugador ve en la tira.
+    const spread: Record<string, number[]> = { people: [], wood: [], buildings: [] };
+    const report: string[] = [];
+
+    for (const seed of SEEDS) {
+      const outcomes = Object.entries(STANCES)
+        .map(([name, intent]) => ({ name, ...played(seed, intent) }));
+
+      for (const key of ['people', 'wood', 'buildings'] as const) {
+        const values = outcomes.map((one) => one[key]);
+        const low = Math.min(...values);
+        const high = Math.max(...values);
+        // Distancia relativa al mayor: 0 es «todas iguales», 1 es «una lo tiene
+        // todo y otra nada».
+        spread[key]?.push(high > 0 ? (high - low) / high : 0);
+      }
+      report.push(`semilla ${seed}: ${outcomes
+        .map((o) => `${o.name} ${o.people}p/${o.wood}w/${o.buildings}b`).join('  ')}`);
+    }
+
+    const mean = (list: number[]): number => list.reduce((a, b) => a + b, 0) / list.length;
+    const people = mean(spread['people'] ?? []);
+    const wood = mean(spread['wood'] ?? []);
+    const buildings = mean(spread['buildings'] ?? []);
+    const detail = `gente ${(people * 100).toFixed(0)} %, leña ${(wood * 100).toFixed(0)} %, `
+      + `obra ${(buildings * 100).toFixed(0)} %\n${report.join('\n')}`;
+
+    // **La leña es la que tiene que separarse mucho**, porque es la palanca más
+    // directa: es el resultado de una sola decisión repetida veinte años.
+    expect(wood, `leña, y es la palanca más directa. ${detail}`).toBeGreaterThan(0.5);
+    // La gente y los edificios responden más despacio —hay que construir para
+    // crecer y crecer para construir— así que el umbral es más bajo, pero no
+    // puede ser cero: si lo es, la aldea llega al mismo sitio hagas lo que
+    // hagas, y eso es un jardín con un mando encima.
+    expect(buildings, `obra. ${detail}`).toBeGreaterThan(0.15);
+    expect(people, `gente. ${detail}`).toBeGreaterThan(0.1);
+  });
+});

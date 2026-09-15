@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { CROSSROADS, TIME } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import { TERRAIN_CODE } from '@engine/state';
+import { restingIntent } from '@engine/state';
 import type { Building, Condition, GameState, Villager, VillagerId } from '@engine/state';
 import { foundPeople, ageOf } from '@engine/people/villagers';
 import { isHere, population } from '@engine/people/demography';
@@ -52,6 +53,7 @@ function village(seed: number, houses = 12): GameState {
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
+    intent: restingIntent(),
     village: { grain: 4000, wood: 400, morale: 55, faith: 50 },
     people: foundPeople(rng, 0),
     buildings: Array.from({ length: houses }, () => build('house')),

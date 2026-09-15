@@ -12,13 +12,32 @@
 //     off the farmers if nothing is left over. Without it a village short of
 //     people puts everything into the fields, never builds, and the player
 //     watches a valley that does not change — the cardinal sin of this game.
+//
+// **Y desde el esquema 4 esto obedece al jugador** (`docs/plan-juego.md`, E1).
+// Hasta aquí era una fórmula cerrada: la aldea trabajaba exactamente los campos
+// que su población necesitaba y repartía lo que sobraba en una proporción fija.
+// Nadie decidía nada entre una encrucijada y la siguiente, que llegan dos veces
+// por década, y de ahí salía que las cuatro cifras de la tira no significaran
+// nada: un número sólo significa algo cuando se mueve porque tú hiciste algo.
+//
+// Lo que la postura del jugador mueve son dos cosas y sólo dos: **cuántos
+// campos se siembran** y **cómo se reparten las manos sobrantes entre el bosque
+// y la obra**. Lo que NO mueve, porque entonces dejaría de ser una simulación:
+// la dotación mínima de un campo, la reserva de obra como suelo, y los cuervos
+// y el forrajeo, que son emergencias y se sirven antes que cualquier postura.
+// Un jugador puede equivocarse; no puede saltarse la aritmética del hambre.
 
 import { FOOD, FORAGE, LABOUR, TIME } from '../balance';
 import { population, workforce } from '../people/demography';
+import { INTENT_RANGE } from '../state';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
 import { foragingUrgency, hasRiver } from './forage';
 import { wardensWanted } from './crows';
+
+function clamp(value: number, low: number, high: number): number {
+  return Number.isFinite(value) ? Math.max(low, Math.min(high, value)) : low;
+}
 
 /**
  * Step 5. Splits the week's labour. Pure: reads the state, writes nothing.
@@ -37,8 +56,21 @@ export function allocateLabour(state: GameState): Allocation {
   const w = workforce(state);
   const people = population(state);
 
+  // La postura, recortada a su rango: un estado cargado de un fichero puede
+  // traer cualquier cosa, y `intent` es lo primero de este juego que viene de
+  // fuera del motor.
+  const intent = {
+    fields: clamp(state.intent.fields, INTENT_RANGE.fields.min, INTENT_RANGE.fields.max),
+    timber: clamp(state.intent.timber, INTENT_RANGE.timber.min, INTENT_RANGE.timber.max),
+  };
+
+  // **Lo que hace falta, por lo que el jugador quiera esforzarse.** Con la
+  // postura en 1 esto es exactamente lo que la fórmula daba antes, y por eso la
+  // suite de balance tiene que quedarse quieta (D-6): el techo real sigue
+  // siendo `MAX_FIELDS` y los campos que existan, así que sembrar de más sin
+  // haber construido campos no hace nada — como debe ser.
   const neededFields = Math.ceil(
-    (people * TIME.WEEKS_PER_YEAR * FOOD.NEEDED_FIELDS_MARGIN) / FOOD.FIELD_YIELD,
+    (people * TIME.WEEKS_PER_YEAR * FOOD.NEEDED_FIELDS_MARGIN * intent.fields) / FOOD.FIELD_YIELD,
   );
   // §5.2, v2.14: a field with fewer than MIN_FIELD_CREW on it yields nothing —
   // one pair of hands cannot plough, sow and reap a field. So the village works
@@ -88,7 +120,12 @@ export function allocateLabour(state: GameState): Allocation {
   const hunters = river ? foragers * 0.5 : foragers;
   const fishers = river ? foragers - hunters : 0;
 
-  const cutters = spare * LABOUR.CUTTER_SHARE;
+  // **El reparto del jugador, y aquí sí manda entero.** Cero es todo a
+  // construir, uno es todo a leña. La obra no se queda sin nadie porque la
+  // reserva de arriba ya le ha apartado su suelo antes de llegar hasta aquí:
+  // eso es lo que impide que una postura extrema deje el valle sin cambiar
+  // nunca, que es el pecado capital de este juego y no una preferencia.
+  const cutters = spare * intent.timber;
   const builders = spare - cutters;
 
   return {

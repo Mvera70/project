@@ -10,6 +10,7 @@ import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, SaveFile, Season } from '@engine/state';
+import { INTENT_STOPS, stopOf } from '@engine/state';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
@@ -182,6 +183,65 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const wood = vital(VITAL_ICONS.wood);
   const spirits = vital(VITAL_ICONS.morale);
 
+  /**
+   * **El mando.** E1 de `docs/plan-juego.md`, y la razón de ser de esta ronda.
+   *
+   * Dos órdenes permanentes: cuánto se siembra y a qué van las manos que
+   * sobran. Es lo único que el jugador manda de forma continua, y por tanto lo
+   * que hace que las cuatro cifras de la tira signifiquen algo — un número sólo
+   * significa algo cuando se mueve porque tú hiciste algo.
+   *
+   * **Con palabras y no con cifras** (§11.1): «sembrar de más» es una orden que
+   * un alguacil entendería; «1,5×» es un ajuste de hoja de cálculo. Y tres
+   * posiciones por palanca, no cinco: tres es una decisión, cinco es un dial.
+   *
+   * Va debajo de la tira y no en un panel aparte porque es **el instrumento de
+   * esas cifras**: la orden y su lectura tienen que estar juntas o el jugador no
+   * ata una con la otra. El valle sigue ocupando la pantalla.
+   */
+  const orders = document.createElement('div');
+  orders.className = 'valley-orders';
+  orders.setAttribute('aria-label', renderUiText('app.orders'));
+  const leverRows: { lever: 'fields' | 'timber'; buttons: readonly (readonly [string, HTMLButtonElement])[] }[] = [];
+  for (const lever of ['fields', 'timber'] as const) {
+    const row = document.createElement('div');
+    row.className = 'valley-order';
+    const label = document.createElement('span');
+    label.className = 'valley-order-name';
+    label.textContent = renderUiText(lever === 'fields' ? 'app.sowing' : 'app.hands');
+    const bar = document.createElement('div');
+    bar.className = 'valley-order-bar';
+    const buttons = INTENT_STOPS[lever].map((stop) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      const key = `app.${lever === 'fields' ? 'sowing' : 'hands'}.${stop.key}`;
+      button.textContent = renderUiText(key);
+      button.setAttribute('aria-label', `${label.textContent}: ${button.textContent}`);
+      button.addEventListener('click', () => {
+        // La orden se da y la aldea la obedece desde el tick siguiente. No se
+        // recalcula nada aquí: `allocateLabour` lee `state.intent` cada semana.
+        state.intent = { ...state.intent, [lever]: stop.value };
+        paintOrders();
+        // Y se guarda, porque es una decisión del jugador: al volver dos días
+        // después la aldea tiene que seguir haciendo lo que se le dijo.
+        persist();
+      });
+      bar.append(button);
+      return [stop.key, button] as const;
+    });
+    row.append(label, bar);
+    orders.append(row);
+    leverRows.push({ lever, buttons });
+  }
+  const paintOrders = (): void => {
+    for (const { lever, buttons } of leverRows) {
+      const current = stopOf(lever, state.intent[lever]);
+      for (const [key, button] of buttons) {
+        button.setAttribute('aria-pressed', String(key === current));
+      }
+    }
+  };
+
   const controls = document.createElement('div');
   controls.className = 'valley-speeds';
   controls.setAttribute('aria-label', renderUiText('app.speed.controls'));
@@ -253,7 +313,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
   peopleTab.addEventListener('click', () => openPeople(app));
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, year, season, vitals, hudRight, tabbar);
+  root.append(canvas, year, season, vitals, orders, hudRight, tabbar);
+  paintOrders();
 
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(root);

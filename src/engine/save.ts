@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HERD_KINDS, SCHEMA_VERSION } from './state';
+import { HERD_KINDS, SCHEMA_VERSION, restingIntent } from './state';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -238,6 +238,11 @@ function isPlausibleState(value: unknown): value is GameState {
     && byteMap(s['map'])
     && record(village) && ['grain', 'wood', 'morale', 'faith'].every((key) => finite(village[key]))
     && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
+    // La postura. Se comprueba que sea finita y no que esté en rango:
+    // `allocateLabour` ya la recorta, y rechazar una partida entera por una
+    // palanca fuera de sitio sería perder la aldea por un número.
+    && record(s['intent'])
+    && ['fields', 'timber'].every((key) => finite((s['intent'] as Record<string, unknown>)[key]))
     && finite(s['crowBite']) && (s['crowBite'] as number) >= 0
     && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
     && tickValue(people['nextId']) && Array.isArray(people['namedIds']) && people['namedIds'].every(tickValue)
@@ -302,7 +307,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && candidate.schema !== 2) {
+  } else if (candidate.schema !== SCHEMA_VERSION && candidate.schema !== 2 && candidate.schema !== 3) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -338,6 +343,17 @@ export function deserialize(raw: unknown): SaveFile {
   // last year's birds a harvest it already reaped.
   if ((state as Partial<GameState>).crowBite === undefined) {
     state = { ...state, crowBite: 0 } as GameState;
+  }
+  // 3 -> 4 (E1 del plan): la postura del jugador.
+  //
+  // Entra en **reposo**, y no es una elección conservadora: es literalmente lo
+  // que esa aldea estaba haciendo. Antes del esquema 4 `allocateLabour` era una
+  // fórmula cerrada equivalente a `fields: 1, timber: CUTTER_SHARE`, así que una
+  // partida migrada sigue exactamente su curso y el jugador la encuentra donde
+  // la dejó. Si entrara con cualquier otra postura, cargar una partida vieja la
+  // cambiaría por debajo, que es la clase de cosa que §13.1 prohíbe.
+  if ((state as Partial<GameState>).intent === undefined) {
+    state = { ...state, version: SCHEMA_VERSION, intent: restingIntent() } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

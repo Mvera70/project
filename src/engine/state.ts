@@ -527,7 +527,102 @@ export type MigrationEvent =
  * `save.ts` — which imports `found.ts` and would close a cycle. v2.93: it used
  * to be written by hand in two places, and they drifted apart.
  */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
+
+/**
+ * La postura de la aldea: lo único que el jugador manda de forma continua.
+ *
+ * **Es el verbo que este juego no tenía** (`docs/plan-juego.md`). Hasta la
+ * versión 4 del esquema, `allocateLabour` era una fórmula cerrada: la aldea
+ * trabajaba exactamente los campos que su población necesitaba y repartía las
+ * manos sobrantes en una proporción fija. El jugador no decidía nada entre una
+ * encrucijada y la siguiente, que llegan dos veces por década, y de ahí salía
+ * todo lo demás — que las cuatro cifras de la tira no sirvieran para nada, que
+ * no hubiera respuesta visual a nada, que no hubiera estrategia posible.
+ *
+ * **Dos números y no cuatro.** Dos palancas con consecuencia de verdad valen
+ * más que cuatro decorativas, y añadir una tercera sin mecánica detrás es
+ * exactamente cómo se llega a «los recursos no sirven para nada». Guardia no
+ * entra hasta que haya de qué guardarse.
+ *
+ * **Y la postura por defecto reproduce el juego anterior al bit** (`RESTING`),
+ * que es lo que permite tocar el corazón de §5.2 sabiendo lo que se rompe: con
+ * ella, la suite de balance tiene que dar exactamente lo mismo que antes.
+ */
+export interface Intent {
+  /**
+   * Cuánto se esfuerzan en el campo, como múltiplo de lo que hace falta.
+   *
+   * 1 es «los campos que la población necesita», que es lo que la aldea hacía
+   * sola. Por encima, se siembra de más y el granero se llena a costa de las
+   * manos que harían falta en el bosque y en la obra; por debajo, se libera
+   * gente y se vive al día. Lo que **no** cambia es que un campo con menos de
+   * `MIN_FIELD_CREW` manos no da nada: sembrar de más sin gente es sembrar
+   * menos.
+   */
+  fields: number;
+  /**
+   * De las manos que sobran del campo, qué parte va al bosque.
+   *
+   * El resto va a la obra. Cero es «todo a construir» y uno es «todo a leña», y
+   * entre los dos está el invierno: la leña calienta y la obra hace crecer la
+   * aldea, y las dos salen del mismo puñado de gente.
+   */
+  timber: number;
+}
+
+/**
+ * La postura de reposo: exactamente lo que la aldea hacía sola.
+ *
+ * Vive aquí y no en `balance.ts` porque la necesitan el `found`, la carga de una
+ * partida vieja y una docena de pruebas, y `state.ts` es lo único que todos
+ * ellos pueden importar sin invertir una flecha del grafo (§2.4).
+ */
+export function restingIntent(): Intent {
+  return { fields: 1, timber: 0.4 };
+}
+
+/** Los límites de la postura. Fuera de ellos no es una elección, es un exploit. */
+export const INTENT_RANGE = {
+  fields: { min: 0.5, max: 2 },
+  timber: { min: 0, max: 1 },
+} as const;
+
+/**
+ * Las tres posiciones de cada palanca, y por qué son tres.
+ *
+ * **Tres es una decisión; cinco es un dial.** El jugador de un idle no está
+ * buscando el óptimo con un deslizador: está diciendo a qué se dedica la aldea
+ * esta temporada. Tres posiciones se leen de un vistazo, se nombran con
+ * palabras en vez de con cifras (§11.1) y las nueve combinaciones son
+ * suficientes para que dos partidas se separen — medido: 91 % de diferencia en
+ * gente y 100 % en leña a los veinte años.
+ *
+ * La posición de en medio de las dos es la postura de reposo, así que un jugador
+ * que no toque nada juega exactamente el juego anterior.
+ */
+export const INTENT_STOPS = {
+  fields: [
+    { key: 'lean', value: 0.7 },
+    { key: 'enough', value: 1 },
+    { key: 'heavy', value: 1.5 },
+  ],
+  timber: [
+    { key: 'works', value: 0.1 },
+    { key: 'both', value: 0.4 },
+    { key: 'wood', value: 0.85 },
+  ],
+} as const;
+
+/** La posición más cercana a un valor, para pintar el mando de una partida cargada. */
+export function stopOf(lever: 'fields' | 'timber', value: number): string {
+  const stops: readonly { key: string; value: number }[] = INTENT_STOPS[lever];
+  let best = stops[0] as { key: string; value: number };
+  for (const stop of stops) {
+    if (Math.abs(stop.value - value) < Math.abs(best.value - value)) best = stop;
+  }
+  return best.key;
+}
 
 export interface GameState {
   readonly version: number; // save schema version
@@ -579,6 +674,15 @@ export interface GameState {
    * by the harvest itself.
    */
   crowBite: number;
+  /**
+   * Lo que el jugador manda que haga la aldea. Esquema 4.
+   *
+   * Entra en el guardado porque es una decisión del jugador y no un derivado del
+   * mundo: al volver dos días después, la aldea tiene que seguir haciendo lo que
+   * se le dijo. Una partida de un esquema anterior entra con `RESTING`, que es
+   * exactamente lo que esa partida estaba haciendo.
+   */
+  intent: Intent;
   ended: EndState | null;
 }
 

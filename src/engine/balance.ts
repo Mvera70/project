@@ -109,6 +109,17 @@ export const LABOUR = {
   WORKS_RESERVE: 0.15, // minimum fraction of W given to works
   CUTTER_SHARE: 0.4, // of what is left after the fields
   /**
+   * La postura con la que arranca una aldea, y es la del juego de antes.
+   *
+   * `fields: 1` son «los campos que la población necesita» y `timber:
+   * CUTTER_SHARE` es el reparto fijo que la fórmula hacía sola. No es timidez:
+   * es lo que permite comprobar que meter las palancas no ha movido el balance
+   * —la suite tiene que dar lo mismo con esta postura— y por tanto lo que hace
+   * medible cualquier otra. Ver `docs/plan-juego.md`, decisión D-6.
+   */
+  RESTING_FIELDS: 1,
+  RESTING_TIMBER: 0.4, // el mismo valor que CUTTER_SHARE, y por eso está al lado
+  /**
    * TUNE (§7.6, v3.07): cuántas celdas de bosque se consideran como destino.
    *
    * Se tala cerca del pueblo, no en el confín del valle, así que mirar las
