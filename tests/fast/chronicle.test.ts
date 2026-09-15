@@ -5,6 +5,10 @@
 // el capítulo 9: la crónica narra, no califica.
 import { describe, expect, it } from 'vitest';
 import { makeBundle } from '@engine/rng';
+import { foundGame } from '@engine/found';
+import { run } from '@engine/sim';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { yearOf } from '@engine/time';
 import type { ChronicleEntry, ChronicleKind, DeathCause, GameState, Villager } from '@engine/state';
 import { foundPeople } from '@engine/people/villagers';
 import { BANK } from '@engine/chronicle/bank.en';
@@ -842,4 +846,91 @@ describe('pesos y agregación por año · §9.2, v2.14', () => {
     expect(lines[0]).toMatch(/palisade|fenced/i);
   });
 
+});
+
+describe('El año se guarda desde cero y se lee desde uno', () => {
+  // La cabecera escribía `ANNO I` en el año cero —nadie funda una aldea en el
+  // año cero— y la crónica escribía «in year 0» del mismo momento. La misma
+  // pantalla decía dos cosas distintas, y se vio en una captura mirando por qué
+  // los mensajes se leían raros.
+
+  it('la crónica dice el mismo año que la cabecera', () => {
+    // `roman(yearOf + 1)` es lo que pone la cabecera (`app.ts`). La crónica
+    // tiene que decir ese mismo número en cifras.
+    for (const [tick, shown] of [[0, 1], [47, 1], [48, 2], [480, 11]] as const) {
+      const text = renderEntry({
+        tick, kind: 'consequence', templateKey: 'consequence.whispers',
+        params: { year: yearOf(tick), sinceYear: yearOf(tick), years: 3 }, weight: 3,
+      }, makeBundle(7));
+      expect(text, `tick ${tick} se lee como año ${shown}`).toContain(String(shown));
+      expect(text, 'y nunca «year 0»').not.toMatch(/year 0/u);
+    }
+  });
+
+  it('pero una cuenta de años transcurridos no se toca', () => {
+    // `{years}` es una duración, no una fecha: sumarle uno la haría mentir.
+    const text = renderEntry({
+      tick: 480, kind: 'consequence', templateKey: 'consequence.whispers',
+      params: { years: 7, sinceYear: 3, year: 10 }, weight: 2,
+    }, makeBundle(7));
+    // Las tres variantes del banco mezclan fecha y duración; lo que se
+    // comprueba es que la duración no se desplaza y la fecha sí.
+    expect(text, 'la duración va tal cual').toContain('7 years');
+    expect(text, 'y ninguna fecha se queda en su valor de motor')
+      .not.toMatch(/year 3|year 10/u);
+  });
+});
+
+describe('Ninguna frase de la crónica sale rota', () => {
+  // **`numberWord(0)` es «no»**, y eso funciona en «no bread» y es una frase
+  // rota en «{count} of them» → «No of them left the fields for the trees and
+  // the water». Salió en pantalla, en una captura, en el año uno de la semilla
+  // siete: el reparto de mano de obra es fraccionario y `Math.round` lo dejaba
+  // en cero aunque alguien hubiera ido al río.
+  //
+  // El arreglo está en `sim.ts` —si la entrada se cuenta, alguien fue— y esto
+  // es lo que impide que vuelva por otra puerta: se leen las crónicas de
+  // partidas de verdad y se busca la familia entera del defecto.
+
+  it('en cuarenta años de cuatro semillas, ninguna dice «no of them»', () => {
+    const bad = /no (?:of them|died|were born|left)/iu;
+    for (const seed of [7, 11, 23, 41]) {
+      const state = foundGame(seed);
+      run(state, 40 * 48, 'prudent', CATALOG);
+      const bundle = makeBundle(seed);
+      state.chronicle.forEach((entry, at) => {
+        const text = renderEntry(entry, bundle, at);
+        expect(text, `semilla ${seed}, entrada ${at}: ${text}`).not.toMatch(bad);
+      });
+      expect(state.chronicle.length, 'y hay crónica que leer').toBeGreaterThan(20);
+    }
+  });
+});
+
+describe('Un hueco de reparto llega a la pantalla · declarado', () => {
+  // **Roja a propósito, con lo medido.** El banco no inventa nombres (§9.3) y
+  // `namesOf` deja el hueco tal cual, así que una plantilla cuyo texto escribe
+  // una letra repartida a un anónimo se lee con la llave puesta. Medido: la
+  // semilla 23 escribe «{B} was given the forge in year 26» con
+  // `feud_inherited`, cuyo `{as:'B', childOf:'A'}` acepta hijos sin nombre — y
+  // lo acepta a propósito, que hay prueba de §8.3 que lo exige.
+  //
+  // **El arreglo cabe en tres líneas y no se fusiona por método.** `fillCast`
+  // se evalúa en la elegibilidad de cada tick, así que cambiar su lista de
+  // candidatos cambia el flujo `crossroads` y con él la trayectoria de todas
+  // las semillas: medido, la cadena de pases de V-09 pasó de cinco a ninguna
+  // de tres en treinta muestras. Va con el carril del ritmo de decisión, donde
+  // el recalibrado está presupuestado (`docs/next-plan.md`).
+
+  it.fails('ninguna entrada llega con un parámetro sin rellenar', () => {
+    for (const seed of [7, 11, 23, 41]) {
+      const state = foundGame(seed);
+      run(state, 40 * 48, 'prudent', CATALOG);
+      const bundle = makeBundle(seed);
+      state.chronicle.forEach((entry, at) => {
+        expect(renderEntry(entry, bundle, at), `semilla ${seed}, entrada ${at}`)
+          .not.toMatch(/\{\w+\}/u);
+      });
+    }
+  });
 });

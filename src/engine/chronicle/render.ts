@@ -69,11 +69,29 @@ function variantOf(b: RngBundle, key: string, tick: number, discriminant: number
  * missing parameter is a bug in whatever pushed the entry, and it should be
  * visible in the text and catchable by a test rather than silently blank.
  */
+/**
+ * Los años se **guardan desde cero y se leen desde uno**.
+ *
+ * `yearOf` cuenta desde cero, que es lo correcto dentro del motor: el tick cero
+ * es el año cero. Y la cabecera ya sumaba uno para escribir `ANNO I`, porque
+ * nadie funda una aldea en el año cero. La crónica no lo sumaba, así que la
+ * misma pantalla decía **ANNO I arriba y «in year 0» abajo**. Se vio en una
+ * captura al mirar por qué los mensajes se leían raros.
+ *
+ * Se corrige al **presentar** y no al guardar: los parámetros almacenados en
+ * `state.chronicle` siguen siendo los del motor, así que una partida guardada de
+ * antes de esto se lee bien sin migrarla. Y sólo los años absolutos —`year` y
+ * `sinceYear`—, nunca `years`, que es una cuenta de años transcurridos y
+ * sumarle uno la haría mentir.
+ */
+const ABSOLUTE_YEARS: readonly string[] = ['year', 'sinceYear'];
+
 function fill(template: string, params: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (whole, key: string) => {
     const value = params[key];
     if (value === undefined) return whole;
     if (key === 'count' && typeof value === 'number') return numberWord(value);
+    if (ABSOLUTE_YEARS.includes(key) && typeof value === 'number') return String(value + 1);
     return String(value);
   });
 }

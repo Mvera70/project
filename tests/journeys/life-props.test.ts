@@ -313,13 +313,31 @@ describe('V-09 · trastos', () => {
       return best;
     }
 
-    const seed = 23;
-    const day = 8;
-    const state = village(seed);
-    const life = createVillage(state, day);
-    for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
-    const chain = longestChain(life.passLog);
-    expect(chain, `semilla ${seed}, día ${day}: ${JSON.stringify(life.passLog)}`)
+    // **Se busca, no se clava.** La primera versión fijaba la semilla 23 y el
+    // día 8, que era donde se había medido una cadena de cinco. Y eso convierte
+    // una propiedad del diseño —«se puede formar una cadena»— en una huella de
+    // una trayectoria concreta: el día que un cambio del motor mueve el reparto
+    // de una encrucijada, esta prueba se cae sin que nada de lo que guarda haya
+    // dejado de ser verdad. Pasó, y el cambio era de una letra de reparto que no
+    // tiene nada que ver con una pelota.
+    //
+    // Lo que el título dice es «en alguna semilla», así que se recorren las
+    // seis canónicas y varias jornadas de cada una. Sigue siendo la misma
+    // exigencia y ya no depende de la suerte de un calendario.
+    let best = 0;
+    let where = '';
+    for (const seed of SEEDS) {
+      const state = village(seed);
+      for (const day of [0, 3, 8, 14, 21]) {
+        const life = createVillage(state, day);
+        for (let n = 0; n < STEPS_PER_DAY; n += 1) life.step();
+        const chain = longestChain(life.passLog);
+        if (chain > best) { best = chain; where = `semilla ${seed}, día ${day}`; }
+        if (best >= 3) break;
+      }
+      if (best >= 3) break;
+    }
+    expect(best, `la cadena más larga fue de ${best} en ${where}`)
       .toBeGreaterThanOrEqual(3);
   });
 });

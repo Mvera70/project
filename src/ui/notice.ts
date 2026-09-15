@@ -37,15 +37,25 @@ const STYLE = `
 /* U-01 · la voz de la crónica, vestida como tal: tinta con un filete de latón
    arriba, y la misma serif con la que está escrito el resto del pasado de la
    aldea. Sigue siendo corte seco y nada que cerrar (§11.6). */
-.valley-notice { position: absolute; z-index: 4; left: 0; right: 0;
+/* **Una nota al margen, no una pancarta.**
+   Esto era una banda a sangre de borde a borde, casi opaca, y con el filete de
+   latón de la encrucijada encima. Tres cosas mal a la vez: tapaba un tercio del
+   valle —que es el HUD, §11.1—, pesaba lo mismo que la pantalla de una decisión
+   aunque sea un comentario de paso, y al ser tan ancha el ojo la leía antes que
+   el valle. Se vio en una captura de G-15 y el dueño del diseño ya lo había
+   dicho: «los mensajes que aparecen ahí son horrorosos».
+   Ahora es una tarjeta estrecha y centrada, del ancho de la cartela de hito
+   (moment.ts) para que las dos voces se reconozcan como parientes, con un
+   filete de latón **a la izquierda** en vez de arriba: el que va arriba es el
+   del capítulo, y un aviso no abre capítulo. */
+.valley-notice { position: absolute; z-index: 4; left: 50%; transform: translateX(-50%);
   bottom: calc(118px + env(safe-area-inset-bottom));
-  box-sizing: border-box; padding: 13px 18px 14px;
-  background: rgba(28,23,19,.93);
-  border-top: 1px solid rgba(125,92,46,.75);
-  border-bottom: 1px solid rgba(242,233,216,.14);
-  box-shadow: 0 4px 14px rgba(20,16,13,.28);
+  box-sizing: border-box; width: min(86%, 340px); padding: 10px 14px 11px;
+  background: rgba(28,23,19,.86); border-radius: 3px;
+  border-left: 2px solid rgba(125,92,46,.85);
+  box-shadow: 0 4px 14px rgba(20,16,13,.26);
   color: #f2e9d8; text-wrap: pretty; letter-spacing: .005em;
-  font: 15px/1.42 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; }
+  font: 14px/1.4 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; }
 .valley-notice[hidden] { display: none !important; }
 /* §11.2 · la encrucijada ocupa la pantalla entera, y eso incluye no tener una
    banda de crónica asomando entre las opciones. Se vio en una captura: el

@@ -784,7 +784,13 @@ export function tick(
       params: {
         year: year(),
         season: season(),
-        count: Math.round(allocation.hunters + allocation.fishers),
+        // **Nunca cero, y ésta es la razón.** La entrada sólo existe si alguien
+        // cazó o pescó, pero el reparto de mano de obra es fraccionario y
+        // `Math.round` lo dejaba en cero: `numberWord(0)` es «no», así que el
+        // valle anunciaba «**No of them** left the fields for the trees and the
+        // water». Una frase rota en pantalla, vista en una captura. Si la
+        // entrada se cuenta, alguien fue.
+        count: Math.max(1, Math.round(allocation.hunters + allocation.fishers)),
       },
       weight: 2,
     });

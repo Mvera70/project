@@ -1668,6 +1668,26 @@ export type CastSpec =
   | { as: string; youngestNamed: true; female?: boolean };
 ```
 
+**Un hueco de reparto puede llegar a la pantalla, y está medido** (v3.67). El
+banco no inventa nombres (§9.3) y `namesOf` deja el hueco tal cual, así que una
+plantilla cuyo texto escribe una letra repartida a un **anónimo** se lee con la
+llave puesta: el jugador leía «**{B}** was given the forge in year 26» en la
+crónica de la semilla 23, año 26, con `feud_inherited`. La mayoría de los hijos
+son anónimos —§6.1 deja ocho nombrados como mucho— y `childOf` reparte a
+cualquiera **a propósito**: un papel que sólo acepta nombrados casi nunca se
+cubre, y hay prueba de §8.3 que lo exige.
+
+**El arreglo está escrito y no fusionado, y el motivo es de método.** Añadir
+`named?: true` al `childOf` de esa plantilla lo cierra en tres líneas, pero
+`fillCast` se evalúa en la elegibilidad de **cada tick**, así que cambiar su
+lista de candidatos cambia el flujo `crossroads` y con él **la trayectoria de
+todas las semillas**: medido, la prueba de la cadena de pases de V-09 pasó de
+encontrar una cadena de cinco a no encontrar ninguna de tres en treinta
+muestras. Es la trampa que `docs/handover.md` §4 ya tenía escrita —*tocar la
+elegibilidad de una sola plantilla mueve el balance entero*— y por eso va con
+el carril del ritmo de decisión, donde el recalibrado está presupuestado, y no
+de propina en una ronda de texto. Queda declarado en `tests/fast/chronicle.test.ts`.
+
 El reparto se resuelve **en orden de dependencia, no de declaración**: una
 plantilla puede escribir `{as:'B', grudgeAgainst:'A'}` antes que `A` sin fallar
 en silencio. Un ciclo entre dos letras devuelve `null` — la plantilla no es
