@@ -25,6 +25,10 @@ const TERRAIN: Record<number, string> = {
   [TERRAIN_CODE.rock]: '^',
   [TERRAIN_CODE.marsh]: ',',
   [TERRAIN_CODE.cleared]: '-',
+  // El mapa grande: la falda que cierra el valle, el lago y el paso.
+  [TERRAIN_CODE.mountain]: 'M',
+  [TERRAIN_CODE.lake]: 'O',
+  [TERRAIN_CODE.ford]: '=',
 };
 
 const GLYPH: Record<BuildingKind, string> = {
