@@ -127,10 +127,14 @@ relajar A.16 por eso. Jugada con `run` y la política prudente: **67 a 99 obras
 en sesenta años, piedra en los años 42 a 45, 1,45 sucesos por sesión.** Está
 contado en `docs/handover.md` §2.1.
 
-**Siguiente: V-11**, y no es opcional. Las reuniones de §11.8 dejaron de ocurrir
-el día de G-12 —sólo existían en el camino viejo— y nadie lo vio porque la
-prueba que las vigilaba llamaba a `actorsFor` directamente. Está medido y
-declarado en `tests/fast/life-staging.test.ts`.
+**V-11 cerrada (15 sep 2026), y con ella el Anexo E entero.** Las reuniones de
+§11.8 habían dejado de ocurrir el día de G-12 —sólo existían en el camino
+viejo— y nadie lo vio porque la prueba que las vigilaba llamaba a `actorsFor`
+directamente. `life/staging.ts` baja las órdenes del motor a la jornada: del
+77 % al 100 % de la aldea va donde la decisión dijo. Lo que **no** se sirve es
+la riña de §7.9, y por una razón medida: la crónica guarda los **nombres** de
+los dos, no sus `id`, y `quarrelOf` no se puede llamar desde `life/` porque
+consume azar del motor. Servirla es un cambio del motor.
 
 **Lo que decide si hay juego no es gráfico.** El jugador toma entre siete y doce
 decisiones en cuarenta años y diez de las veinte plantillas del catálogo no

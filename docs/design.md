@@ -6278,18 +6278,28 @@ una queja del dueño del diseño que el Anexo D no podía resolver: *«el pueblo
 se siente vivo»*. Se ratificó con un descarte medido (V-00) y se construyó por
 fases.
 
-**Estado (v3.66): V-00 a V-10, V-12, V-13 y V-14 cerradas. Queda V-11**, y
-aparcadas a propósito V-15 y V-16. **La capa es cómo se mueve la aldea: ya no va
-detrás de bandera y no hay camino de vuelta.** V-12 borró `actors/index.ts` —la
-función que evaluaba una curva del reloj—, el descarte de V-00 y la bandera
-`valley.life`, que sin camino viejo no tenía nada que apagar.
+**Estado (v3.68): el Anexo E entero cerrado.** V-00 a V-14, con V-11 —«lo que
+el motor manda»— cerrada el 15 sep 2026: `life/staging.ts` convierte una
+reunión de §11.8 en un `Place` con aforo de aldea, hora fija y compañía en vez
+de deber, y del 77 % al 100 % de la aldea va donde la decisión dijo. De las tres
+órdenes del contrato sólo se sirve `gather`; la riña de §7.9 y el duelo esperan
+un cambio del motor —la crónica guarda los nombres y no los `id`, y `quarrelOf`
+consume azar, así que `life/` no puede llamarlo (§4.3).
 
-**Y V-12 destapó lo que V-11 debe:** las reuniones de §11.8 sólo existían en el
-camino viejo. Dejaron de ocurrir el día de G-12 y nadie lo vio, porque la prueba
-que las vigilaba llamaba a `actorsFor` directamente y siguió verde sobre un
-camino que el juego ya no recorría. `life/` no conoce la palabra `gather`.
-Medido: con una reunión convocada, a media jornada el más lejano está a 12,4
-celdas del sitio. Declarado en `tests/fast/life-staging.test.ts`.
+**Y cómo se destapó lo que V-11 arregló, que es la lección que queda:** las
+reuniones de §11.8 sólo existían en el camino viejo. Dejaron de ocurrir el día
+de G-12 y nadie lo vio, porque la prueba que las vigilaba llamaba a `actorsFor`
+directamente y siguió verde sobre un camino que el juego ya no recorría. V-12
+borró ese camino y la propiedad quedó roja y declarada, con el número: el más
+lejano a 12,4 celdas del sitio, y luego a más de dieciséis con el mapa grande.
+Cerrada V-11, entre 8,0 y 11,3 según la semilla y el sitio.
+
+**Las tres trampas que V-11 costó, medidas, porque ninguna era obvia:** dejar la
+cabaña en la lista de ofertas el día de la reunión manda a la aldea entera con
+los animales —una gallina a una celda gana a la aldea entera a once—; obedecer
+una orden imposible deja a veintitrés personas plantadas con `doing: null`; y el
+punto que el motor da para «en la capilla» cae **dentro** de la capilla, que
+para un cuerpo es una pared.
 
 **Lectura obligatoria antes de tocar la capa:** E.1 (el diagnóstico, para no
 volver a construir lo que se retira), E.3 (los innegociables, que son seis y
