@@ -41,18 +41,30 @@ export function stateAt(request: DebugRequest): GameState {
 }
 
 /**
- * U-13 · Adelanta el valle hasta una semana cuya **primera jornada** sea de
- * tormenta, y devuelve cuántas semanas hizo falta.
+ * U-13 · Adelanta el valle hasta una semana cuya **primera jornada** tenga el
+ * cielo que se pide, y devuelve cuántas semanas hizo falta.
  *
- * Una tormenta sale en el 4 % de las jornadas, así que esperarla mirando no es
- * una forma de fotografiarla: esto es lo que le da a `?weather=storm` una
- * tormenta segura en el primer fotograma. La jornada que el juego pinta al
- * abrir es `tick · DAYS_PER_WEEK` —el tiempo escénico se lee del tick desde
- * v3.72—, así que basta con probar semanas hasta que esa jornada truene.
+ * Una tormenta sale en el 4 % de las jornadas y la nieve en el 3,5 %, así que
+ * esperarlas mirando no es una forma de fotografiarlas: esto es lo que le da a
+ * `?weather=storm` y a `?weather=snow` su cielo en el primer fotograma. La
+ * jornada que el juego pinta al abrir es `tick · DAYS_PER_WEEK` —el tiempo
+ * escénico se lee del tick desde v3.72—, así que basta con probar semanas hasta
+ * que esa jornada la tenga.
+ *
+ * **Y pedir tormenta en invierno no tiene sentido**, que es el fallo con el que
+ * nació esto: §10.8 no deja tronar en invierno, así que buscar `storm` con
+ * `season=winter` se saltaba la estación entera —tres años de más en la medida
+ * que lo destapó— y acababa enseñando un verano. Pedir `snow` es lo que hay que
+ * hacer en invierno, y pedir `wet` sirve para las dos.
  */
-export function runToStorm(state: GameState, limitWeeks = 400): number {
+export function runToSky(
+  state: GameState, want: 'storm' | 'snow' | 'wet' = 'storm', limitWeeks = 400,
+): number {
+  const matches = (kind: string): boolean => (
+    want === 'wet' ? kind !== 'clear' : kind === want
+  );
   for (let weeks = 0; weeks < limitWeeks; weeks += 1) {
-    if (skyAt(state, state.tick * TIME.DAYS_PER_WEEK).kind === 'storm') return weeks;
+    if (matches(skyAt(state, state.tick * TIME.DAYS_PER_WEEK).kind)) return weeks;
     run(state, 1, 'prudent', CATALOG);
   }
   return limitWeeks;

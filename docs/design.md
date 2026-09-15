@@ -2254,9 +2254,14 @@ porque el sonido va más despacio que la luz: el renderer **cuenta** los rayos
 existe el sonido.
 
 **Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
-ruta de depuración acepta `&weather=storm` —que adelanta el valle hasta una
-jornada de tormenta, porque esperarla no es una forma de probarla— y hay un
-recorrido en `valley.shots.ts` que cuenta el rayo y deja la captura.
+ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
+—adelantan el valle hasta una jornada con ese cielo, porque esperarla no es una
+forma de probarla— y hay un recorrido en `valley.shots.ts` que cuenta el rayo y
+deja la captura. **En invierno hay que pedir `snow`**: aquí no truena, así que
+pedir tormenta en invierno se salta la estación entera buscando una que no puede
+haber, y eso costó tres años de valle en la primera medida de la nieve. El
+trueno se comprueba con `tools/graphics/thunder-check.mjs`, que engancha el
+`AudioContext` de verdad y cuenta los filtros que aparecen tras cada rayo.
 
 ---
 
