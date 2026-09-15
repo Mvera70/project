@@ -91,10 +91,11 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
   const w = FATE.WEIGHT[id];
   switch (id) {
     case 'lightning_fire':
-      return ctx.sky.storms > 0 && wooden(state).length > 0
-        && count(state, 'house') >= FATE.LIGHTNING_MIN_HOUSES
-        && ctx.people >= FATE.LIGHTNING_MIN_PEOPLE
-        ? w * ctx.sky.storms : 0;
+      // Sin puertas: el dueño del diseño pidió que el caos sea el juego y que
+      // una partida pueda romperse (`docs/rework.md` §2.6). El rayo pide sólo
+      // lo que la física pide, tormenta y algo de madera en pie, aunque eso
+      // sea la única casa de la pareja fundadora.
+      return ctx.sky.storms > 0 && wooden(state).length > 0 ? w * ctx.sky.storms : 0;
     case 'river_flood':
       return ctx.season === 'spring' && ctx.sky.wet >= FATE.FLOOD_WET_DAYS
         ? w * trait(state, 'bare_hills', 0.5) : 0;

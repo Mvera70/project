@@ -148,57 +148,77 @@ un sorteo ponderado entre los sucesos cuyo `weightOf` no es cero.
 Cada suceso consume azar **sólo** del flujo `fate` (hay prueba). El cielo de la
 semana lo da `weekWeather`, que no consume nada.
 
-### 2.5 Lo medido, con la tercera vuelta de pesos (la que está en `main`)
+### 2.5 Lo medido, con las puertas del rayo fuera (v3.76)
 
-`npx tsx tools/fate-report.ts` con seis semillas × cuarenta años, jugadas con
-`run` y la política prudente (nunca con `tick` a secas, ver `CLAUDE.md`):
+`npx tsx tools/fate-report.ts 3 7 11 23 31 41 53 67 79 83 89 97` con doce
+semillas × cuarenta años, jugadas con `run` y la política prudente (nunca con
+`tick` a secas, ver `CLAUDE.md`). Doce semillas y no seis, porque a partir de
+aquí la varianza —cuántas se rompen, cuántas siguen— es el objetivo del
+diseño, no ruido a promediar:
 
-| Semilla | Sucesos en 40 años | Al año | Mediana entre dos | Rencores | Fin |
-|---|---|---|---|---|---|
-| 3 | 527 | 13,2 | 3 semanas | 7 | sigue |
-| 7 | 533 | 13,3 | 3 | 7 | sigue |
-| 11 | 521 | 13,0 | 3 | 9 | sigue |
-| 23 | 532 | 13,3 | 3 | 4 | sigue |
-| 41 | 500 | 12,5 | 3 | 11 | sigue |
-| 97 | 518 | 12,9 | 3 | 6 | sigue |
+| Semilla | Sucesos | Años jugados | Al año | Mediana entre dos | Rencores | Fin |
+|---|---|---|---|---|---|---|
+| 3 | 138 | 11 | 12,5 | 3 semanas | 2 | abandoned |
+| 7 | 101 | 9 | 11,2 | 3 | 2 | extinction |
+| 11 | 522 | 40 | 13,1 | 3 | 2 | sigue |
+| 23 | 244 | 19 | 12,8 | 3 | 2 | abandoned |
+| 31 | 71 | 7 | 10,1 | 3 | 0 | abandoned |
+| 41 | 462 | 40 | 11,6 | 3 | 2 | abandoned |
+| 53 | 493 | 40 | 12,3 | 3 | 2 | sigue |
+| 67 | 502 | 40 | 12,6 | 3 | 4 | sigue |
+| 79 | 513 | 40 | 12,8 | 3 | 2 | sigue |
+| 83 | 134 | 10 | 13,4 | 3 | 2 | abandoned |
+| 89 | 20 | 3 | 6,7 | 4 semanas | 0 | extinction |
+| 97 | 329 | 27 | 12,2 | 3 | 2 | abandoned |
 
-Reparto por suceso (3 131 sucesos en 240 años de aldea, 13,0 al año):
+**8 de las 12 acaban antes de los cuarenta años** (6 `abandoned`, 2
+`extinction`); las otras 4 (11, 53, 67, 79) siguen. Es la medida de §2.6: el
+rayo sin puertas puede quemar la única casa de la pareja en la primera semana,
+y una aldea de dos no siempre se recupera. 3 529 sucesos en 286 años de aldea:
+**12,3 al año**, mediana de tres semanas entre dos —el ritmo apenas cambia
+respecto a la segunda vuelta—, rencores casi siempre en 2 por partida (0 en las
+dos que no llegan a los ocho años, 4 en la 67).
 
-| Suceso | Al año | Por semilla (3, 7, 11, 23, 41, 97) |
+Reparto por suceso (mismo orden de semillas que la tabla de arriba):
+
+| Suceso | Al año | Por semilla (3, 7, 11, 23, 31, 41, 53, 67, 79, 83, 89, 97) |
 |---|---|---|
-| quarrel_in_the_square | 2,47 | 96 106 79 104 75 133 |
-| stranger_passes | 2,33 | 97 69 93 106 80 115 |
-| good_catch | 2,04 | 80 78 72 88 80 91 |
-| bear_in_the_wood | 1,05 | 25 50 48 39 16 74 |
-| child_lost | 1,02 | 50 45 41 33 48 29 |
-| wolves_at_the_coop | 0,89 | 32 40 53 26 34 29 |
-| harvest_feast | 0,89 | 39 39 39 35 39 22 |
-| wedding | 0,86 | 34 53 31 33 55 0 |
-| lightning_fire | 0,58 | 33 24 28 19 36 **0** |
-| pedlar | 0,49 | 25 13 20 30 22 8 |
-| roof_under_snow | 0,27 | 10 14 10 12 11 7 |
-| river_flood | 0,15 | 6 2 7 7 4 10 |
+| stranger_passes | 3,57 | 47 25 100 84 34 138 153 145 139 42 7 107 |
+| quarrel_in_the_square | 2,96 | 22 29 75 53 3 151 121 171 123 14 4 80 |
+| good_catch | 2,26 | 31 19 72 51 13 91 91 99 83 31 1 63 |
+| bear_in_the_wood | 1,55 | 20 19 54 33 5 47 78 44 67 23 1 51 |
+| pedlar | 0,43 | 7 4 16 8 5 18 13 20 16 5 1 9 |
+| **lightning_fire** | **0,32** | **4 2 37 3 4 4 5 7 15 6 1 3** |
+| wolves_at_the_coop | 0,28 | 2 0 44 3 2 3 5 3 10 2 1 4 |
+| harvest_feast | 0,29 | 0 0 39 0 0 0 3 1 39 0 1 0 |
+| river_flood | 0,27 | 3 3 7 3 3 8 17 7 15 3 0 9 |
+| child_lost | 0,23 | 0 0 39 3 0 0 3 3 6 8 3 0 |
+| wedding | 0,10 | 0 0 27 0 0 0 2 0 0 0 0 0 |
+| roof_under_snow | 0,10 | 2 0 12 3 2 2 2 2 0 0 0 3 |
 
-Distancia media entre valles (0 iguales, 1 nada en común): **0,16**. Antes de
-R-1 no había rencores en tres partidas de cuarenta años (`findings-drama.md`);
-ahora hay entre 4 y 11.
+Distancia media entre valles (0 iguales, 1 nada en común): **0,22** (antes,
+con las puertas, 0,16): más alta porque ahora ocho historias se cortan en seco
+en años distintos, no sólo por el reparto de sucesos que sí llegan a jugarse.
 
-Lo que se ve en la tabla y **no se ha tocado** (decisión 5): la riña y el
-forastero son casi siempre elegibles y por eso encabezan el reparto aunque
-pesen 1; la semilla 97 no tiene ni un rayo ni una boda en cuarenta años (pocas
-casas, pocos adultos), que es exactamente la clase de diferencia que la premisa
-pide. Si alguien quiere mover pesos: `FATE.WEIGHT` en `balance.ts`, el informe
-de arriba antes y después, y las diez propiedades de `tests/fast/fate.test.ts`
-son la red.
+Lo que se ve en la tabla y **no se ha tocado** (decisión 5): el rayo ya sale en
+**las doce** semillas, incluida la 97 que antes no tenía ninguno —sin puertas
+no necesita dos casas ni cuatro personas, y por eso ahora es el suceso que
+decide si una aldea llega a los cuarenta años o no—; la boda, en cambio, sigue
+siendo rara (sólo 11 y 53 llegan a los seis adultos que pide), que es la otra
+cara de la misma clase de diferencia que la premisa pide: un valle que crece
+tiene bodas, uno que no las pasa mal, no las tiene nunca. Si alguien quiere
+mover pesos: `FATE.WEIGHT` en `balance.ts`, el informe de arriba antes y
+después, y las diez propiedades de `tests/fast/fate.test.ts` son la red.
 
 Las tres vueltas de pesos, para no repetirlas: (1) forastero 3 y oso siempre
 posible → la mitad del libro eran los dos, y la fiesta salía una vez cada
 veinte años porque una semana al año casi nunca coincidía con el sorteo → la
 fiesta pasa a rito; (2) riña 2 y boda 1 → una entrada de cada cuatro era riña y
 había boda cada nueve meses → riña 1, boda 0,6 con seis adultos; (3) la de
-arriba.
+arriba. Ninguna de las tres tocó `LIGHTNING_MIN_HOUSES`/`LIGHTNING_MIN_PEOPLE`:
+esas dos puertas se quitaron aparte, en v3.76, por la decisión de §2.6.
 
-### 2.6 Las dos puertas que contradicen al dueño, y el cambio exacto
+### 2.6 Las dos puertas que contradecían al dueño — **hecho** (v3.76)
 
 En la primera medida el rayo quemó la única casa de la pareja y **tres aldeas
 de seis murieron antes del año treinta**. El agente puso dos puertas —
@@ -208,22 +228,39 @@ mundo sigue en pie con los sucesos dentro» en `tests/fast/fate.test.ts`, que
 exige que las seis semillas lleguen al año treinta.
 
 **El dueño dijo después que eso es al revés:** «que haya caos y que haya
-partidas que se rompan y no se pueda seguir jugando es la idea del juego». Así
-que la tarea, para el primer agente que toque el motor:
+partidas que se rompan y no se pueda seguir jugando es la idea del juego». Las
+dos puertas se quitaron en v3.76, en los cuatro pasos que esta sección
+describía como pendientes:
 
-1. Quitar las dos puertas de `weightOf` (dejar `ctx.sky.storms > 0 && wooden(state).length > 0`) y borrar las dos constantes de `FATE`.
-2. Convertir la prueba «el mundo sigue en pie» en lo que el dueño quiere medir:
-   que **algunas** semillas mueran y otras no —por ejemplo, de doce semillas a
-   cuarenta años, entre dos y ocho acabadas— y que la causa esté en la crónica.
-3. Mirar `tests/journeys/founding.test.ts`, que guarda «lo que la pareja
-   promete» (entre otras cosas cuántas fundaciones sobreviven); si su cota de
-   extinción se rompe, **la cota es la que cambia**, con el número nuevo medido
-   en doce semillas y el motivo escrito (esta decisión).
-4. Volver a pasar `tools/fate-report.ts` y actualizar la tabla de §2.5 y la
-   fila de `docs/changelog.md`.
+1. **Quitadas.** `weightOf` para `lightning_fire` se quedó en
+   `ctx.sky.storms > 0 && wooden(state).length > 0`, sin mirar cuántas casas ni
+   cuánta gente hay; las dos constantes salieron de `FATE` en `balance.ts`, con
+   sus comentarios.
+2. **La prueba, dada la vuelta.** «El mundo sigue en pie con los sucesos
+   dentro» pasó a llamarse «el caos es el juego: unos valles se rompen y otros
+   no», en `tests/fast/fate.test.ts`. Mide, en doce semillas a cuarenta años,
+   que entre 3 y 11 acaben (medido: **8**) y que al menos una siga; que la
+   partida que acaba tenga su causa en la crónica (`kind: 'extinction'` o
+   `'abandonment'`); y que lo que no es protección —grano nunca negativo, ánimo
+   entre 0 y 100, gallinas nunca negativas— se mantenga.
+3. **`tests/journeys/founding.test.ts` remedido en doce semillas.** Su cota de
+   «ninguna pareja se extingue» y las otras tres que colgaban de que las seis
+   semillas viejas llegaran siempre a los cuarenta años se movieron; los
+   números y el motivo de cada una están en el propio fichero y en el informe
+   de este trabajo. Ninguna se borró y el motor no se tocó para hacerlas pasar.
+4. **Remedido y documentado.** La tabla de §2.5 es la de doce semillas con las
+   puertas fuera; `docs/changelog.md` tiene la fila 3.76; `docs/design.md`
+   §7.10 y §12.10 ya no dicen que las puertas están pendientes de quitar.
 
-No se hizo en la sesión de Fable porque el dueño pidió parar y documentar; es
-un cambio de una tarde para Sonnet.
+**Lo medido, la pregunta que abrió esto:** de doce semillas a cuarenta años,
+**8 acaban** (6 `abandoned`, 2 `extinction`) y **4 siguen** (11, 53, 67, 79);
+una de las que siguen, la 67, llega con una sola persona. El rayo ya sale en
+las doce semillas —antes, con las puertas, sólo en las que ya tenían dos casas
+y cuatro personas—, y es él quien decide casi siempre si una aldea llega a los
+cuarenta años: quien pierde su única casa pronto rara vez tiene tiempo de
+levantar otra antes de que la siguiente tormenta encuentre algo que quemar.
+Es la propiedad que el dueño pidió, medida: el caos rompe partidas, y las que
+no rompe, las hace suyas.
 
 ### 2.7 Lo que R-1 movió en las pruebas, y por qué (las trampas nuevas)
 

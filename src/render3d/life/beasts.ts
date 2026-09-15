@@ -24,7 +24,10 @@
 import { ANIMALS } from '@engine/balance';
 import { hash32 } from '@engine/rng';
 import type { GameState } from '@engine/state';
-import { blockedAt, integrate, turnTo, type Body, type Point, type Terrain } from './body';
+import {
+  blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
+  type Body, type Point, type Terrain,
+} from './body';
 import { LIFE_STEP } from './clock';
 import { decide, satisfy, RETHINK } from './decide';
 import type { Neighbourhood } from './grid';
@@ -217,6 +220,7 @@ export function createBeasts(state: GameState, land: Terrain, heart: Point, seed
       needs: freshNeeds(),
       doing: null,
       travelled: 0,
+      faceAnchor: { x: anchor.x, z: anchor.z },
       scene: null,
       sceneCooldownUntil: 0,
       // V-09: la cabaña no coge trastos. Nunca cambian.
@@ -329,15 +333,35 @@ export function stepBeasts(
     const want = next === null ? { x: 0, z: 0 } : seek(body, next);
     const push = separate(body, around);
     const wall = avoid(body, land);
+    // La intención cumplida frena de verdad, igual que la gente en
+    // `village.ts` (rework.md §3.5.3): `doing.there === true`, no «no hay
+    // ruta» —`next` también es nulo sin intención todavía, y frenar ahí de
+    // raíz le corta las alas a `avoid()` para sacar a la bestia de un mal
+    // sitio, dejándola arrastrarse sin escapar nunca del todo—. Sin este
+    // matiz, un animal que ya había llegado a su ancla seguía empujado por
+    // `separate`/`avoid` con la velocidad vieja de fondo y oscilaba apretado
+    // contra sus compañeros de corral.
+    if (dweller.doing?.there === true) { body.vx = 0; body.vz = 0; }
     drive(body, { x: want.x + push.x + wall.x, z: want.z + push.z + wall.z });
     integrate(body, land, LIFE_STEP);
 
     const speed = Math.hypot(body.vx, body.vz);
     if (speed > 0.05) {
-      turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
       dweller.travelled += speed * LIFE_STEP;
     } else {
       dweller.travelled = 0;
+    }
+
+    // La cara sólo sigue al cuerpo cuando el cuerpo anda de verdad: mismo
+    // criterio y mismas constantes que la gente (`body.ts`,
+    // `TURN_MIN_SPEED`/`TURN_MIN_PROGRESS`), porque una gallina apretada en la
+    // puerta con dos compañeras da la misma vuelta sobre sí misma que una
+    // persona en la misma aprieto.
+    if (speed <= TURN_MIN_SPEED * body.pace) {
+      dweller.faceAnchor = { x: body.x, z: body.z };
+    } else if (gap(dweller.faceAnchor, body) > TURN_MIN_PROGRESS) {
+      turnTo(body, Math.atan2(body.x - dweller.faceAnchor.x, body.z - dweller.faceAnchor.z), LIFE_STEP);
+      dweller.faceAnchor = { x: body.x, z: body.z };
     }
 
     driftBeast(dweller.needs, beast.kind, LIFE_STEP);

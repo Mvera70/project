@@ -13,7 +13,10 @@ import { FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import { opinionOf } from '@engine/people/opinions';
 import { hash32 } from '@engine/rng';
-import { blockedAt, integrate, turnTo, type Body, type Terrain } from './body';
+import {
+  blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
+  type Body, type Point, type Terrain,
+} from './body';
 import { meetingPlace, ordersOf } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { avoid, drive, resolve, seek, separate } from './steering';
@@ -67,6 +70,18 @@ export interface Dweller {
    * al pararse, que es cuando empieza otra caminata.
    */
   travelled: number;
+  /**
+   * Desde dónde se cuenta el recorrido para decidir si la cara sigue al
+   * cuerpo. rework.md §3.5.3.
+   *
+   * No es lo mismo que `travelled`: aquél es la longitud del camino —lo que
+   * mueve el clip de andar, y por eso cuenta aunque el cuerpo tiemble sin
+   * moverse de sitio— y esto es **desplazamiento neto** desde la última vez
+   * que se giró la cara. Un cuerpo apretado contra un muro o contra sus
+   * vecinos puede llevar velocidad de sobra y seguir sin alejarse de aquí:
+   * eso es lo que distingue andar de la vuelta sobre sí mismo.
+   */
+  faceAnchor: Point;
   /**
    * Con quién tiene algo ahora mismo, si tiene. V-07.
    *
@@ -294,6 +309,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       needs: freshNeeds(),
       doing: null,
       travelled: 0,
+      faceAnchor: { x, z },
       scene: null,
       sceneCooldownUntil: 0,
       holding: null,
@@ -418,6 +434,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           integrate(body, land, LIFE_STEP);
           const speed = Math.hypot(body.vx, body.vz);
           dweller.travelled = speed > 0.05 ? dweller.travelled + speed * LIFE_STEP : 0;
+          // La cara la gobierna `play()` mientras dura la escena (no el
+          // umbral de arriba): se resincroniza el ancla para que al volver a
+          // la vida normal el primer recorrido se cuente desde aquí, no desde
+          // dondequiera que estuviera antes de pararse a hablar.
+          dweller.faceAnchor = { x: body.x, z: body.z };
 
           let company = false;
           around.near(body, (other) => {
@@ -563,23 +584,54 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         const want = next === null ? { x: 0, z: 0 } : seek(body, next);
         const push = separate(body, around);
         const wall = avoid(body, land);
+        // **La intención cumplida frena de verdad** (rework.md §3.5.3):
+        // `doing.there === true`, no «no hay ruta que seguir» —`next` también
+        // es nulo sin intención todavía, recién llegado el día o entre una
+        // ocupación y la siguiente, y frenar ahí de raíz cada paso le corta
+        // las alas al empujón de `avoid()` para sacar a alguien de un mal
+        // sitio: la velocidad nunca llega a acumularse de un paso a otro y se
+        // queda arrastrándose. Sin esto, quien ya había llegado seguía
+        // empujado por `separate`/`avoid` con la velocidad vieja de fondo, y
+        // el forcejeo con un vecino apretado le hacía oscilar de velocidad
+        // cada paso: eso es la vuelta sobre sí mismo, no el andar.
+        if (dweller.doing?.there === true) { body.vx = 0; body.vz = 0; }
         drive(body, { x: want.x + push.x + wall.x, z: want.z + push.z + wall.z });
         integrate(body, land, LIFE_STEP);
 
         const speed = Math.hypot(body.vx, body.vz);
         if (speed > 0.05) {
-          turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
           dweller.travelled += speed * LIFE_STEP;
         } else {
           dweller.travelled = 0;
-          // V-09 · Segunda lección del descarte: quien va a tirar la pelota
-          // se encara a quien se la va a tirar antes de soltarla.
-          if (dweller.doing?.there === true && dweller.doing.offer.id === 'play'
-            && dweller.aimAt !== null) {
-            const mate = byId.get(dweller.aimAt);
-            if (mate !== undefined) {
-              turnTo(body, Math.atan2(mate.body.x - body.x, mate.body.z - body.z), LIFE_STEP);
-            }
+        }
+
+        // **La cara sólo sigue al cuerpo cuando el cuerpo anda de verdad**
+        // (rework.md §3.5.3). `speed > 0.05` bastaba para creer que alguien
+        // camina, pero un cuerpo apretado contra un muro o contra sus vecinos
+        // oscila por encima de eso sin cambiar de sitio, y el `facing` giraba
+        // detrás a los seis radianes por segundo de `TURN_RATE` cada vez que
+        // la velocidad cambiaba de signo — la vuelta sobre sí mismo que
+        // describe el dueño del diseño. Ahora hace falta velocidad relativa
+        // al paso propio (`TURN_MIN_SPEED`, para que una vaca lenta no pida lo
+        // mismo que una gallina) **y** recorrido neto desde la última vez que
+        // se giró la cara (`TURN_MIN_PROGRESS`, `dweller.faceAnchor`): quien
+        // tiembla en el sitio nunca se aleja lo bastante de su ancla.
+        if (speed <= TURN_MIN_SPEED * body.pace) {
+          dweller.faceAnchor = { x: body.x, z: body.z };
+        } else if (gap(dweller.faceAnchor, body) > TURN_MIN_PROGRESS) {
+          turnTo(body, Math.atan2(body.x - dweller.faceAnchor.x, body.z - dweller.faceAnchor.z), LIFE_STEP);
+          dweller.faceAnchor = { x: body.x, z: body.z };
+        }
+
+        // V-09 · Segunda lección del descarte: quien va a tirar la pelota se
+        // encara a quien se la va a tirar antes de soltarla. Esto es mirar a
+        // alguien a propósito y no el paso al andar, así que no pasa por el
+        // umbral de arriba: sólo hace falta estar parado.
+        if (speed <= 0.05 && dweller.doing?.there === true && dweller.doing.offer.id === 'play'
+          && dweller.aimAt !== null) {
+          const mate = byId.get(dweller.aimAt);
+          if (mate !== undefined) {
+            turnTo(body, Math.atan2(mate.body.x - body.x, mate.body.z - body.z), LIFE_STEP);
           }
         }
 

@@ -446,10 +446,19 @@ No son teoría: cada una se pagó con al menos una ronda.
 - **Un umbral por sitio, no por jornada.** V-11 medía doce jornadas contra
   0,75 cada una y la peor (35 personas en la plaza) daba 0,71 con un agregado
   de 0,89. Se agregan por sitio, con un suelo por muestra.
-- **El rayo y la pareja.** La primera medida de R-1 mató tres aldeas de seis
-  antes del año treinta; el agente puso dos puertas y **el dueño dijo después
-  que eso es el juego**. Ver `docs/rework.md` §2.6 antes de proteger a la
-  aldea de nada.
+- **El rayo y la pareja — hecho (v3.76).** La primera medida de R-1 mató tres
+  aldeas de seis antes del año treinta; el agente puso dos puertas y **el
+  dueño dijo después que eso es el juego**: «que haya caos y que haya
+  partidas que se rompan y no se pueda seguir jugando es la idea del juego».
+  Las dos puertas (`LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE`) se
+  quitaron de `weightOf` en `src/engine/world/fate.ts` y de `FATE` en
+  `balance.ts`: el rayo sólo pide tormenta y madera en pie. Medido en doce
+  semillas a cuarenta años: **8 de 12 acaban** (6 `abandoned`, 2
+  `extinction`), 4 siguen. La prueba «el mundo sigue en pie con los sucesos
+  dentro» se convirtió en «el caos es el juego: unos valles se rompen y otros
+  no» (`tests/fast/fate.test.ts`), y `tests/journeys/founding.test.ts` pasó a
+  doce semillas con cuatro de sus cinco pruebas remedidas y su cota nueva
+  escrita. Ver `docs/rework.md` §2.5 y §2.6 para los números completos.
 - **Un informe que avanza el mundo con `tick` no mide este juego** (ya estaba
   en §2.1; sigue costando): `tools/fate-report.ts` juega con `run` y la
   política prudente, y las pruebas de `fate.test.ts` también.

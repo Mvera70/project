@@ -302,11 +302,6 @@ export const FATE = {
   // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
   // porque una sola semana al año casi nunca coincidía con el sorteo.
   FEAST_IS_A_RITE: true,
-  // TUNE: el rayo no quema la única casa de una aldea de dos: medido, eso mató
-  // tres aldeas de seis antes del año treinta. Pide dos casas y cuatro
-  // personas, como el incendio de §5.9 pide que haya algo que arder.
-  LIGHTNING_MIN_HOUSES: 2,
-  LIGHTNING_MIN_PEOPLE: 4,
   // TUNE: el rayo quema como el incendio de §5.9, y prefiere las casas igual.
   LIGHTNING_HOUSE_WEIGHT: 3,
   LIGHTNING_MORALE: -4,

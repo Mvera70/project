@@ -99,18 +99,43 @@ function centreOf(land: Terrain, cell: number): Waypoint {
 }
 
 /**
+ * El radio con el que se comprueba un atajo, no el de quien pregunta.
+ *
+ * TUNE: 0,4 celdas — el cuerpo más ancho del valle (la vaca, `beasts.ts`,
+ * `RADIUS.cow`). El `Router` cachea por par de celdas y no por cuerpo (más
+ * abajo: «la misma pregunta se repite mucho»), así que persona y bestia
+ * comparten la misma ruta calculada: un atajo que le vale a una vaca le vale
+ * a cualquiera más estrecho, y uno que no le vale a la vaca no se ofrece a
+ * nadie.
+ */
+const ROUTE_CLEARANCE = 0.4;
+
+/**
  * Si de un punto se ve el otro sin que se cruce nada.
  *
  * Se usa para dos cosas: recortar la ruta y decidir si hace falta ruta siquiera.
  * Muestrea a pasos de media celda, que es menos de lo que mide el obstáculo más
  * fino del valle —una celda— así que no se le puede colar nada por en medio.
+ *
+ * **Y el radio, si se da, tiene que pasar también** (rework.md §3.5.1): sin
+ * él, la recta entre dos centros roza un muro que el cuerpo sí toca —el punto
+ * pasa, el cuerpo no— y eso es lo que se veía como cortar una esquina. Se
+ * comprueban los mismos cuatro puntos que la sonda de medida
+ * (`tools/life-report.ts`) en cada muestra de la recta, no sólo los dos del
+ * eje de avance: aquí no hay un solo eje, es una línea en cualquier ángulo.
  */
-export function clearBetween(land: Terrain, from: Point, to: Point): boolean {
+export function clearBetween(land: Terrain, from: Point, to: Point, radius = 0): boolean {
   const away = Math.hypot(to.x - from.x, to.z - from.z);
   const steps = Math.max(1, Math.ceil(away / 0.5));
   for (let n = 0; n <= steps; n += 1) {
     const t = n / steps;
-    if (blockedAt(land, from.x + (to.x - from.x) * t, from.z + (to.z - from.z) * t)) return false;
+    const x = from.x + (to.x - from.x) * t;
+    const z = from.z + (to.z - from.z) * t;
+    if (blockedAt(land, x, z)) return false;
+    if (radius > 0 && (
+      blockedAt(land, x - radius, z) || blockedAt(land, x + radius, z)
+      || blockedAt(land, x, z - radius) || blockedAt(land, x, z + radius)
+    )) return false;
   }
   return true;
 }
@@ -128,8 +153,9 @@ export function pathTo(land: Terrain, from: Point, to: Point): Waypoint[] | null
   const goal = cellOf(land, to);
   if (blockedAt(land, to.x, to.z)) return null;
   // En línea recta no hace falta nada más, y es el caso corriente: la mayoría
-  // de los pasos de una jornada son campo abierto.
-  if (clearBetween(land, from, to)) return [{ x: to.x, z: to.z }];
+  // de los pasos de una jornada son campo abierto. Con el radio de sobra
+  // (`ROUTE_CLEARANCE`), para que este atajo no corte una esquina.
+  if (clearBetween(land, from, to, ROUTE_CLEARANCE)) return [{ x: to.x, z: to.z }];
   if (start === goal) return [{ x: to.x, z: to.z }];
 
   const cells = land.width * land.height;
@@ -189,7 +215,7 @@ export function pathTo(land: Terrain, from: Point, to: Point): Waypoint[] | null
   for (let i = 1; i < chain.length; i += 1) {
     const here = centreOf(land, chain[i] as number);
     const next = i + 1 < chain.length ? centreOf(land, chain[i + 1] as number) : { x: to.x, z: to.z };
-    if (clearBetween(land, at, next)) continue;
+    if (clearBetween(land, at, next, ROUTE_CLEARANCE)) continue;
     route.push(here);
     at = here;
   }

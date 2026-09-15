@@ -89,8 +89,30 @@ export function avoid(body: Body, land: Terrain): Push {
   let z = 0;
   const hereX = Math.floor(body.x);
   const hereZ = Math.floor(body.z);
+
+  // **Quien nace atrapado en su propia celda no tiene «punto más cercano».**
+  // El resto de esta función busca el punto de una celda vecina cerrada más
+  // próximo al cuerpo, y ese punto sólo tiene sentido si el cuerpo está fuera
+  // de esa celda. Cuando la celda cerrada es la **propia** (E.7: el ancla de
+  // un animal, el punto de reunión dentro de una capilla), el cuerpo entero
+  // cae dentro de ella y ese punto coincide siempre con el cuerpo mismo —el
+  // vector que los separa es cero en cualquier instante, no sólo justo en el
+  // borde—, así que no hay fuerza que crezca al acercarse a un borde y morir
+  // en el otro (rework.md §3.5.1: probado, un cuerpo se quedaba clavado a
+  // 0,04 celdas de la salida porque la vecina que lo empujaba dejaba de
+  // hacerlo antes de que la propia celda aportara nada). Se empuja hacia el
+  // borde más próximo de la propia celda —el que menos queda por cruzar—, y
+  // el resto del bucle no vuelve a tratar esta celda como vecina.
+  if (blockedAt(land, hereX + 0.5, hereZ + 0.5)) {
+    const fx = body.x - hereX;
+    const fz = body.z - hereZ;
+    x += (fx < 0.5 ? -1 : 1) * body.pace * 3.2;
+    z += (fz < 0.5 ? -1 : 1) * body.pace * 3.2;
+  }
+
   for (let dz = -1; dz <= 1; dz += 1) {
     for (let dx = -1; dx <= 1; dx += 1) {
+      if (dx === 0 && dz === 0) continue;
       const cx = hereX + dx;
       const cz = hereZ + dz;
       if (!blockedAt(land, cx + 0.5, cz + 0.5)) continue;
@@ -100,7 +122,23 @@ export function avoid(body: Body, land: Terrain): Push {
       const apart = Math.hypot(body.x - nx, body.z - nz);
       const clear = body.radius + WALL_CLEAR;
       if (apart >= clear) continue;
-      if (apart < 1e-6) { x += 1; continue; }
+      // **Justo en el borde compartido, el punto más cercano es el propio
+      // cuerpo** (rework.md §3.5.1): con el círculo colisionando de verdad, un
+      // cuerpo puede quedarse parado exactamente en la línea que separa su
+      // celda de una cerrada — antes se cruzaba de largo y esto no se notaba
+      // nunca—. El vector `(cuerpo − punto)` es cero ahí y no dice hacia dónde
+      // empujar; **la casilla bloqueada sí lo dice**, es la de `(dx, dz)` de
+      // este mismo bucle —nunca `(0, 0)`, esa celda se trató aparte arriba—,
+      // así que empujar en `(-dx, -dz)` aparta siempre de ella y no siempre
+      // hacia +X como antes: medido, una gallina clavada en `z = 48,0000`
+      // para toda la jornada, con `avoid` sólo empujando en X mientras el
+      // muro estaba al norte.
+      if (apart < 1e-6) {
+        const away = Math.hypot(dx, dz);
+        x += -dx / away * body.pace * 3.2;
+        z += -dz / away * body.pace * 3.2;
+        continue;
+      }
       const push = (clear - apart) / clear;
       x += (body.x - nx) / apart * push * body.pace * 3.2;
       z += (body.z - nz) / apart * push * body.pace * 3.2;
@@ -122,6 +160,25 @@ export function avoid(body: Body, land: Terrain): Push {
  * un fotograma más y no lo ve nadie.
  */
 const FIX_CAP = 0.06;
+
+/**
+ * Si el círculo entero cabe ahí, no sólo el centro.
+ *
+ * rework.md §3.5.1: `resolve` corregía solapes mirando sólo si el centro de
+ * destino caía en celda cerrada, así que podía dejar el círculo —medio cuerpo—
+ * metido en un muro con el centro todavía en celda libre, justo lo que
+ * `integrate` (`body.ts`) ya no deja hacer al andar. Sin este mismo criterio
+ * aquí, la corrección de solapes deshacía en un paso lo que el andar tardaba
+ * en evitar: medido, una aldea entera de personas y bestias apretadas junto a
+ * un muro donde `integrate` las frenaba, siendo empujadas por `resolve` a
+ * posiciones con el círculo ya dentro — 13 % de los cuerpo-segundos contra el
+ * 1,3 % de antes de tocar nada.
+ */
+function fitsCircle(land: Terrain, x: number, z: number, radius: number): boolean {
+  return !blockedAt(land, x, z)
+    && !blockedAt(land, x - radius, z) && !blockedAt(land, x + radius, z)
+    && !blockedAt(land, x, z - radius) && !blockedAt(land, x, z + radius);
+}
 
 /**
  * Separa a los que hayan quedado encima, después de mover a todos.
@@ -185,9 +242,11 @@ export function resolve(
         if (j === undefined) return;
 
         // Separar no puede ser meter a nadie en una pared: quien no tiene sitio
-        // se queda donde está y el otro carga con todo el apartarse.
-        let mineFits = !blockedAt(land, body.x - ux * half, body.z - uz * half);
-        let theirsFits = !blockedAt(land, other.x + ux * half, other.z + uz * half);
+        // se queda donde está y el otro carga con todo el apartarse. Con el
+        // círculo entero (`fitsCircle`), no sólo el centro — ver el comentario
+        // de arriba.
+        let mineFits = fitsCircle(land, body.x - ux * half, body.z - uz * half, body.radius);
+        let theirsFits = fitsCircle(land, other.x + ux * half, other.z + uz * half, other.radius);
         // **Y en el mismo punto exacto, si esa dirección no cabe, se prueban las
         // otras tres.** Con una sola dirección quedaba el caso peor sin
         // arreglar: dos cuerpos dentro del mismo punto, contra un muro, y
@@ -199,8 +258,8 @@ export function resolve(
           const angle = turn + quarter * (Math.PI / 2);
           ux = Math.cos(angle);
           uz = Math.sin(angle);
-          mineFits = !blockedAt(land, body.x - ux * half, body.z - uz * half);
-          theirsFits = !blockedAt(land, other.x + ux * half, other.z + uz * half);
+          mineFits = fitsCircle(land, body.x - ux * half, body.z - uz * half, body.radius);
+          theirsFits = fitsCircle(land, other.x + ux * half, other.z + uz * half, other.radius);
         }
         if (mineFits) {
           body.x -= ux * half; body.z -= uz * half;
@@ -225,7 +284,7 @@ export function resolve(
     const back = (moved - FIX_CAP) / moved;
     const x = body.x - (fixX[i] ?? 0) * back;
     const z = body.z - (fixZ[i] ?? 0) * back;
-    if (!blockedAt(land, x, z)) { body.x = x; body.z = z; }
+    if (fitsCircle(land, x, z, body.radius)) { body.x = x; body.z = z; }
   }
 }
 

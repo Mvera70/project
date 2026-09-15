@@ -48,6 +48,7 @@ function makeDweller(
     doing: null,
     rethinkAt: 0,
     travelled: 0,
+    faceAnchor: { x: at.x, z: at.z },
     scene: null,
     sceneCooldownUntil: 0,
     holding: null,

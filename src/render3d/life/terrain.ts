@@ -29,9 +29,23 @@ import type { Point, Terrain } from './body';
  * Lo que tiene paredes y por tanto corta el paso.
  *
  * Los campos no están: por un campo se anda, y de hecho es donde se trabaja. Lo
- * que no se cruza es lo que tiene cuatro paredes y un tejado.
+ * que no se cruza es lo que tiene cuatro paredes y un tejado, más las dos
+ * clases de muralla (`palisade`, `wall`): no tienen puerta, pero tampoco se
+ * cruzan.
+ *
+ * **Exportado y comprobado contra `BuildingKind`** (rework.md §3.5.6,
+ * `tests/fast/life-terrain.test.ts`): de los trece tipos de edificio que
+ * existen hoy, sólo `field`, `well` y `grave_yard` quedan fuera de esta lista
+ * — el propio motor los llama «suelo, no interior» en
+ * `src/engine/world/placement.ts` y design.md §7.2 lo dice igual: «campo, la
+ * empalizada, el pozo y el camposanto son suelo, no interior» (la empalizada
+ * se queda aquí de todos modos, porque a diferencia de esos tres sí es un
+ * muro que no se cruza, aunque no tenga puerta). No hacía falta añadir ningún
+ * tipo — la lista ya estaba completa —, pero sí la prueba que lo dijera, para
+ * que el próximo tipo de edificio no se cuele sin que alguien decida de qué
+ * lado cae.
  */
-const WALLED: ReadonlySet<string> = new Set([
+export const WALLED: ReadonlySet<string> = new Set([
   'house', 'stone_house', 'granary', 'chapel', 'church',
   'smithy', 'mill', 'watchtower', 'palisade', 'wall',
 ]);

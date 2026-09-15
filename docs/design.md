@@ -1637,12 +1637,15 @@ manda el jugador. El estado guarda `happenings: HappeningRecord[]` (`tick`,
 `id`, lo visible, y `who`: los `id` de los nombrados implicados, que es lo que
 la capa de vida necesita para la riña de §7.9). `SCHEMA_VERSION` es 6.
 
-**Lo que el dueño decidió después, y está pendiente** (`docs/rework.md` §2.6):
-«que haya caos y que haya partidas que se rompan es la idea del juego». Las dos
-puertas del rayo (`LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE`), puestas
-porque el rayo quemaba la única casa de la pareja y tres aldeas de seis morían,
-**van contra esa decisión y hay que quitarlas**, con la prueba «el mundo sigue
-en pie» reescrita para medir que unas mueren y otras no.
+**Lo que el dueño decidió después, y ya está hecho** (v3.76, `docs/rework.md`
+§2.6): «que haya caos y que haya partidas que se rompan es la idea del juego».
+Las dos puertas del rayo (`LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE`),
+puestas porque el rayo quemaba la única casa de la pareja y tres aldeas de seis
+morían, **se quitaron**: `lightning_fire` sólo pide tormenta y madera en pie.
+Medido en doce semillas a cuarenta años: 8 de 12 acaban (6 `abandoned`, 2
+`extinction`) y 4 siguen. La prueba «el mundo sigue en pie» pasó a llamarse
+«el caos es el juego: unos valles se rompen y otros no» y mide exactamente
+eso.
 
 **Qué falsaría esto:** un suceso fuera de su estación o de su cielo; dos
 sucesos a menos del hueco (salvo la fiesta); un suceso que consumiera un
@@ -3573,8 +3576,7 @@ política prudente), y hay que pasarlo antes y después de mover cualquiera.
 | `MIN_GAP_WEEKS` | 2 | un suceso pegado a otro no se lee |
 | `FEAST_IS_A_RITE` | true | sorteada, la fiesta salía una vez cada veinte años |
 | `WEIGHT` | rayo 3 · riada 3 · lobos 3 · boda 0,6 · buhonero 2 · pesca 2 · tejado 3 · fiesta 1 (no se sortea) · riña 1 · oso 0,6 · niño 0,5 · forastero 1 | tercera vuelta; las dos anteriores en `docs/rework.md` §2.5 |
-| `LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE` | 2, 4 | **pendiente de quitar** (decisión del dueño, §7.10) |
-| `LIGHTNING_HOUSE_WEIGHT`, `LIGHTNING_MORALE` | 3, −4 | como el incendio de §5.9 |
+| `LIGHTNING_HOUSE_WEIGHT`, `LIGHTNING_MORALE` | 3, −4 | como el incendio de §5.9. **Sin puertas desde v3.76** (decisión del dueño, §7.10): `LIGHTNING_MIN_HOUSES`/`LIGHTNING_MIN_PEOPLE` existieron y se quitaron; el rayo sólo pide tormenta y madera en pie |
 | `FLOOD_WET_DAYS`, `FLOOD_GRAIN_LOSS`, `FLOOD_MORALE` | 3, 0,08, −3 | tres jornadas cerradas de siete; el 8 % del granero |
 | `WOLVES_HENS`, `WOLVES_MORALE` | [1, 2], −1 | |
 | `WEDDING_MIN_ADULTS`, `WEDDING_MORALE`, `WEDDING_FAITH` | 6, +5, +2 | con 4 adultos había boda cada nueve meses |
@@ -3590,10 +3592,20 @@ Los factores por rasgo no son constantes sino ramas de `weightOf`: lobos ×1,6
 y oso ×2 en `old_forest`; riada y lobos ×0,5 en `bare_hills`. R-3 los
 multiplica (`docs/rework.md` §4).
 
-**Medido con esta tabla** (v3.75): 13,0 sucesos al año en 240 años de aldea;
-por año, riña 2,47, forastero 2,33, pesca 2,04, oso 1,05, niño 1,02, lobos
-0,89, fiesta 0,89, boda 0,86, rayo 0,58, buhonero 0,49, tejado 0,27, riada
-0,15; rencores en cuarenta años entre 4 y 11; distancia entre valles 0,16.
+**Medido con esta tabla** (v3.75, con las puertas del rayo puestas): 13,0
+sucesos al año en 240 años de aldea; por año, riña 2,47, forastero 2,33, pesca
+2,04, oso 1,05, niño 1,02, lobos 0,89, fiesta 0,89, boda 0,86, rayo 0,58,
+buhonero 0,49, tejado 0,27, riada 0,15; rencores en cuarenta años entre 4 y 11;
+distancia entre valles 0,16.
+
+**Vuelto a medir sin las puertas del rayo** (v3.76, doce semillas × cuarenta
+años): 12,3 sucesos al año en 286 años de aldea —286 y no 480, porque 8 de las
+12 semillas acaban antes de los cuarenta años—; por año, forastero 3,57, riña
+2,96, pesca 2,26, oso 1,55, buhonero 0,43, **rayo 0,32**, lobos 0,28, fiesta
+0,29, riada 0,27, niño 0,23, boda 0,10, tejado 0,10; rencores casi siempre 2
+por partida (0 en las dos semillas que no llegan a los ocho años); distancia
+entre valles 0,22. El detalle y las causas de fin están en `docs/rework.md`
+§2.5 y §2.6.
 
 ---
 
