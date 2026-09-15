@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 1,
+  "id": "log-pile",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "log-pile",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Leña cortada y apilada, cinco troncos en dos hileras. Va junto a las casas y en el borde del bosque: es la prueba de que alguien taló, que es media economía del valle (§5.4) y no se veía en ninguna parte. Troncos de metro y medio, que es lo que se carga al hombro, con los cortes más claros para que se lean como troncos y no como un bulto."
+  },
+  "materials": [
+    {
+      "name": "bark",
+      "role": "trunk",
+      "roughness": 0.95
+    },
+    {
+      "name": "cut",
+      "role": "grain",
+      "roughness": 0.85
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Log_A",
+      "location": [
+        0,
+        -0.34,
+        0.17
+      ],
+      "material": "bark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "radius": 0.17,
+      "depth": 1.5,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Log_B",
+      "location": [
+        0,
+        0,
+        0.17
+      ],
+      "material": "bark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "radius": 0.17,
+      "depth": 1.5,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Log_C",
+      "location": [
+        0,
+        0.34,
+        0.17
+      ],
+      "material": "bark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "radius": 0.17,
+      "depth": 1.5,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Log_D",
+      "location": [
+        0.04,
+        -0.17,
+        0.48
+      ],
+      "material": "bark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "radius": 0.16,
+      "depth": 1.4,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Log_E",
+      "location": [
+        0.04,
+        0.17,
+        0.48
+      ],
+      "material": "bark",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "radius": 0.16,
+      "depth": 1.4,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Log_Cut_A",
+      "location": [
+        0.76,
+        0,
+        0.17
+      ],
+      "material": "cut",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.155,
+      "depth": 0.04,
+      "vertices": 8
+    },
+    {
+      "type": "cylinder",
+      "name": "Log_Cut_B",
+      "location": [
+        0.75,
+        0.17,
+        0.48
+      ],
+      "material": "cut",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        90,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.145,
+      "depth": 0.04,
+      "vertices": 8
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      2.4,
+      -2.8,
+      1.6
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.35
+    ],
+    "orthoScale": 2.6,
+    "worldRole": "sky"
+  }
+}

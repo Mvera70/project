@@ -33,6 +33,7 @@ import {
   buildForest, builtCells, scatterCells, scatterOn, shoreCells, type Forest,
 } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
+import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { Cast } from './world/cast';
 import { dayNumber, dayPhase } from './presentation-clock';
 import { createScenicState } from './scenic-state';
@@ -85,6 +86,8 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
  * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
  */
 export const WANTED = [
+  // G-15 · los trastos del corral, que es lo que dice que aquí vive alguien.
+  ...STEADING_ASSETS,
   VILLAGER, ...Object.values(VILLAGER_BY_ROLE), TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
@@ -252,6 +255,10 @@ export async function createGraphicsRenderer(
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
   const village = new Village((id) => library.instance(id));
+  // G-15 · el almiar, la leña y la carreta. Se montan con lo construido porque
+  // cuelgan de ello: un almiar toca un campo y la leña toca una casa.
+  const steading = new Steading();
+  world.add(steading.group);
   // El oficio elige el recurso; sin oficio, o si el catálogo aún no tiene el
   // suyo, cae al aldeano base — que es el mismo criterio que ya usaba todo el
   // mundo antes de que hubiera más de un modelo.
@@ -441,6 +448,16 @@ export async function createGraphicsRenderer(
       forest = buildForest(state.map, sapling.original as Object3D, palette, taken);
       world.add(forest.group);
     }
+    // G-15 · y los trastos del corral, que cuelgan de lo construido: el almiar
+    // toca un campo, la leña toca una casa, la carreta está en el camino. Se
+    // montan aquí porque se rehacen exactamente cuando eso cambia.
+    steading.build(
+      steadingOf(state, state.terrainSeed),
+      (asset) => library.get(asset)?.original as Object3D | undefined,
+      groundFloor,
+      state.map.width,
+    );
+
     const boulder = library.get(ROCK);
     if (boulder !== undefined) {
       stones = scatterOn(state.map, boulder.original as Object3D, TERRAIN_CODE.rock, undefined, taken);
@@ -670,6 +687,7 @@ export async function createGraphicsRenderer(
       props.dispose();
       cast.dispose();
       village.dispose();
+      steading.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
         ground.dispose();

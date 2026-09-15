@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T19:09:33.568Z",
+  "generatedAt": "2026-09-15T00:09:07.608Z",
   "invocation": "npx tsx tools/graphics/publish-assets.ts",
   "assets": [
     {
@@ -460,6 +460,24 @@
           "strideLength": 0.26
         }
       ]
+    },
+    {
+      "id": "haystack",
+      "file": "haystack.glb",
+      "sha256": "814AD600DA3C1E14D4E7E075657B234F7FA77D35B2CE181D8D297BE6A7E2EBF9",
+      "motion": []
+    },
+    {
+      "id": "log-pile",
+      "file": "log-pile.glb",
+      "sha256": "719D3301E2DB0FAE6FC040934A77861B429897E00C7CB4EEA265253B55127247",
+      "motion": []
+    },
+    {
+      "id": "handcart",
+      "file": "handcart.glb",
+      "sha256": "BE7CEBEDE684B4600CB90D42D5C2384E333AB0880D9E5A7C9698364315C1B962",
+      "motion": []
     }
   ]
 }

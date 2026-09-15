@@ -2856,6 +2856,180 @@
         "source": "Original villager-herbalist authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
         "license": "Project original"
       }
+    },
+    {
+      "id": "haystack",
+      "artifactRound": "G-15",
+      "status": "study",
+      "recipe": "art/recipes/haystack/haystack.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-15T00-09-00-882Z-8912",
+        "directory": "artifacts/graphics/G-15/approved/814ad600da3c1e14"
+      },
+      "bounds": {
+        "min": [
+          -0.295442,
+          0,
+          -0.3
+        ],
+        "max": [
+          0.295442,
+          0.666667,
+          0.281908
+        ],
+        "size": [
+          0.590885,
+          0.666667,
+          0.581908
+        ]
+      },
+      "recipeSha256": "DBB8463989C565E6F7B4DDDE5D4E5C402199B3D32E85219A30E5E8A21758C69D",
+      "materials": [
+        "hay",
+        "stake"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 68
+      },
+      "hashes": {
+        "haystack.blend": "825A5B0BFF94C10284431D1610DC846B276C8E6DF63FF83C3AF2D57E193AF3CF",
+        "haystack.glb": "814AD600DA3C1E14D4E7E075657B234F7FA77D35B2CE181D8D297BE6A7E2EBF9",
+        "haystack-blender.png": "E3A00B9BEE0FF9E3289EE413A427B01F4F3412D9582485B94FE5D86EF3037BE5",
+        "capture-1.png": "6E9E9CEF8781C63E9D70E5CBAB5CA5F9A20B8ABED33939E3C829C2A58BA13B85",
+        "capture-1-gray.png": "04820A306B9B61D217D57D0173EBCA54AFB721DB1E5970B4FE85594BF3B1180E",
+        "capture.json": "E36A942D486E649EAD3AA20B165325F1F4351A6459391FECED6CD664849155AC",
+        "build.json": "E5B566E1C0576683F119CD057ED635F05319877B12C9A67300118D23B89C2E71",
+        "validation.json": "1B549F6FB7143AE2CC534E2CD2A13272423640F7E1121EC3B34D8416F4128854"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original haystack authored for The Valley G-15 (scatter props)",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "log-pile",
+      "artifactRound": "G-15",
+      "status": "study",
+      "recipe": "art/recipes/log-pile/log-pile.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-15T00-03-50-190Z-16312",
+        "directory": "artifacts/graphics/G-15/approved/719d3301e2db0fae"
+      },
+      "bounds": {
+        "min": [
+          -0.25,
+          0,
+          -0.17
+        ],
+        "max": [
+          0.26,
+          0.213333,
+          0.17
+        ],
+        "size": [
+          0.51,
+          0.213333,
+          0.34
+        ]
+      },
+      "recipeSha256": "D50EB9694235195DF51B6E9FD372B63E1C83276A3B967B6836305BADE756AABC",
+      "materials": [
+        "bark",
+        "cut"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 196
+      },
+      "hashes": {
+        "log-pile.blend": "51FD78673080A808E7C33E127D88ED323CFE9A0B102FC81164A0DBF928FE4FFB",
+        "log-pile.glb": "719D3301E2DB0FAE6FC040934A77861B429897E00C7CB4EEA265253B55127247",
+        "log-pile-blender.png": "70EB50F409BE27BF32D10AF9E6F122935D5E0DBBE867E155B2EDFDCCBB7CFB60",
+        "capture-1.png": "DBBE26A05A02A084DB3FBD0F5278366B0454D52A328D12E2972478671C5BD32E",
+        "capture-1-gray.png": "08EBF614BE62C3F86707AAF16573C397DD65A4B1AE4CE44BDDF4DA3ADB82036F",
+        "capture.json": "A6155B6E64F4D89DD6DA04E90EA6BAA9623B3D8B629C9C8581DE7D9E3A1159FB",
+        "build.json": "DDD03F61C3C401AAD17DFCF5852C8D9BEA0E625D17798DA39E6DE18200246485",
+        "validation.json": "5AD9A8DD6461A9662274822D0B21A58769A967E2023D7A58182631A8E0CB9B72"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original log pile authored for The Valley G-15 (scatter props)",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "handcart",
+      "artifactRound": "G-15",
+      "status": "study",
+      "recipe": "art/recipes/handcart/handcart.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-15T00-04-43-459Z-18348",
+        "directory": "artifacts/graphics/G-15/approved/be7cebede684b460"
+      },
+      "bounds": {
+        "min": [
+          -0.50498,
+          0,
+          -0.153333
+        ],
+        "max": [
+          0.183333,
+          0.27,
+          0.153333
+        ],
+        "size": [
+          0.688313,
+          0.27,
+          0.306667
+        ]
+      },
+      "recipeSha256": "C4EBBE98BFE375CFBEEC6BAAB74AC99C3FCD07506AF578D279986A170430EDB0",
+      "materials": [
+        "wood",
+        "plank"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 580
+      },
+      "hashes": {
+        "handcart.blend": "305B108A6DAECD2B30AB2158278AD5FFCAEC2458DCBE80BFAE2946173FA5B3E4",
+        "handcart.glb": "BE7CEBEDE684B4600CB90D42D5C2384E333AB0880D9E5A7C9698364315C1B962",
+        "handcart-blender.png": "6253AADD3BE7A843CCAAB529078CB6AC5BCCF025FA429240CE57D30A8DCD6CE9",
+        "capture-1.png": "A2142143C7AF876660AF0254D9866FE33B8783B814FE3E2FF77C01C0A4415FC2",
+        "capture-1-gray.png": "188275D132848F62DFEE569C049323670FC074F5BDE9452AD8692F3030878015",
+        "capture.json": "5D8099B6DFF0C7EA506AFD88D131FE868AF31D4A9E287271F8175C791C234B3B",
+        "build.json": "DA55280905EC0684EDA8023C7ED2F7D116C14061993CF21B180F9351728E6170",
+        "validation.json": "EBD7CB11355948D7017008EF92BD781F8CDB9134C61EBCA84F53E53BBC821510"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original handcart authored for The Valley G-15 (scatter props)",
+        "license": "Project original"
+      }
     }
   ]
 }

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "id": "haystack",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "haystack",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Un almiar: el heno del año, apilado alrededor de una estaca. Es el objeto que más dice «aquí se siega» desde arriba, porque el amarillo del grano es lo único cálido en un prado verde. Dos metros y medio de alto, que es lo que un hombre puede echar con la horca. La estaca asoma por encima porque sin ella se lee como una piedra redonda. Bajado de 2,6 m a 1,8 tras verlo en el valle: a la altura anterior competia con el tejado de una casa, y un almiar mas alto que una puerta no es un almiar."
+  },
+  "materials": [
+    {
+      "name": "hay",
+      "role": "grain",
+      "roughness": 0.95
+    },
+    {
+      "name": "stake",
+      "role": "trunk",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Hay_Base",
+      "location": [
+        0,
+        0,
+        0.25
+      ],
+      "material": "hay",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "radius": 0.85,
+      "depth": 0.5,
+      "vertices": 9
+    },
+    {
+      "type": "cone",
+      "name": "Hay_Top",
+      "location": [
+        0,
+        0,
+        1.17
+      ],
+      "material": "hay",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": true,
+      "depth": 1.35,
+      "vertices": 9,
+      "radius": 0.9
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Stake",
+      "location": [
+        0,
+        0,
+        1.0
+      ],
+      "material": "stake",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.05,
+      "depth": 2.0,
+      "vertices": 6
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      3.2,
+      -3.8,
+      2.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      1.1
+    ],
+    "orthoScale": 3.4,
+    "worldRole": "sky"
+  }
+}
