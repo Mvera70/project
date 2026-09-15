@@ -106,6 +106,24 @@ dispositivo).
 **Cerrado:** el motor (M-01 a M-39), el render (G-00 a G-12), la interfaz (U-01 a
 U-09), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
 
+**Y la versión 2.0, del 15 sep 2026, entregada** (`docs/plan-juego.md`, con sus
+medidas en `docs/handover.md` §2.1). El juego tiene un verbo: tres palancas de
+órdenes permanentes —cuánto se siembra, dónde van las manos que sobran, qué se
+levanta antes—, la aldea contesta cuando no puede obedecer, cada cifra dice
+hacia dónde va, y cada valle saca dos rasgos de cuatro. Con ellas: el reloj a
+velocidad entera (ocho semanas por jornada a cualquier velocidad), los tres
+defectos de los mensajes, **el mapa grande** —72 × 112, con el corazón
+productivo de 36 × 56 en el centro, montañas, lago— y **el vado, que se cruza**:
+A* no cruzaba el agua, así que nadie cruzaba el río nunca y media aldea se
+quedaba sin ruta.
+
+**La pregunta más gorda que dejó abierta, medida: una aldea madura no tiene
+nada que construir.** De 0,3 a 0,5 obras al año a partir del año 20, porque ya
+llegó a `MAX_HOUSES`, a `MAX_FIELDS` y a un oficio de cada clase. Eso deja la
+palanca de la obra sin nada que ordenar y el valle sin nada que contar —1,04
+sucesos notables por sesión de cinco minutos, justo en el suelo de §16.3—. Pide
+una decisión de diseño, no un ajuste.
+
 **Siguiente: V-11**, y no es opcional. Las reuniones de §11.8 dejaron de ocurrir
 el día de G-12 —sólo existían en el camino viejo— y nadie lo vio porque la
 prueba que las vigilaba llamaba a `actorsFor` directamente. Está medido y
@@ -148,6 +166,7 @@ sustituyen por pruebas automáticas. Son la deuda más antigua del proyecto.
 | Cómo se llegó a ellas | `docs/changelog.md` — el motivo de cada revisión |
 | En qué estado exacto está todo, y qué trampas ya costaron tiempo | `docs/handover.md` |
 | Qué se hace ahora, con briefs listos para agentes | `docs/next-plan.md` |
+| El plan que sacó al proyecto del atasco, y qué entregó | `docs/plan-juego.md` |
 | Qué falta en total, y qué no puede hacer ningún agente | `docs/roadmap.md` |
 | Cómo se delega y se audita | `docs/agents.md` |
 | Por qué el catálogo no sale | `docs/findings-drama.md` |

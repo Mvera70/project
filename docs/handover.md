@@ -56,8 +56,8 @@ medición.
 `main`** y sin haberse abierto nunca como pull request. Eso importa y no es un
 detalle de contabilidad: ver §3.
 
-**Puerta en verde:** `npm run typecheck`, `npm test` (1 004 pruebas, 17,5 s),
-`npm run test:journeys` (94 pruebas, 83 s), `npm run lint`, `npm run test:pwa`
+**Puerta en verde:** `npm run typecheck`, `npm test` (1 043 pruebas, 18,4 s),
+`npm run test:journeys` (111 pruebas, 130 s), `npm run lint`, `npm run test:pwa`
 (6 recorridos) y `npm run test:shots` (10 pasan, 3 declaradas).
 
 ### Qué es el juego hoy
@@ -89,11 +89,73 @@ Tomadas por el dueño del diseño el 14 sep 2026 (`docs/roadmap.md`):
 - **El sonido: ambiente y acentos.** Hecho en U-09.
 
 Y las del Anexo D que siguen en pie: **D.2.1** teja y paja conviven; **D.4.1**
-piel rígida; **D.6.1** un día escénico dura 120 s y se acelera con la raíz de la
-velocidad; **D.6.2** un aldeano mide 0,65 celdas y una celda son tres metros;
+piel rígida; **D.6.1** un día escénico dura 120 s y **sigue la velocidad entera** —decidido
+el 15 sep 2026, ver abajo—; **D.6.2** un aldeano mide 0,65 celdas y una celda son tres metros;
 **D.6.3** al entrar se encuadra la aldea con su entorno; **D.6.4** la jornada
 pertenece al día escénico; **D.6.5** un clip en el sitio exige un cuerpo en el
 sitio.
+
+---
+
+## 2.1. La versión 2.0, del 15 sep 2026
+
+El dueño del diseño estuvo a punto de desestimar el proyecto —«la aldea no se
+siente viva, no hay ninguna manera lógica de jugar, o paramos y establecemos
+objetivos muy claros o esta idea se va fuera»— y después delegó: «toma la
+rienda y elige, toma todas tú las decisiones». De ahí salió
+`docs/plan-juego.md` y esto es lo que se hizo, en orden.
+
+**E1 a E5 · el juego tiene un verbo.** La aldea obedece al jugador: tres
+palancas de órdenes permanentes —cuánto se siembra, dónde van las manos que
+sobran, qué se levanta antes—, la aldea contesta cuando no puede obedecer, cada
+cifra dice hacia dónde va, y cada valle saca dos rasgos de cuatro para que dos
+partidas no se jueguen igual. Las cinco entregas están en el plan con su
+medida.
+
+**El reloj, decidido el 15 sep:** la jornada escénica **sigue la velocidad
+entera**, así que caben ocho semanas por jornada a cualquier velocidad —antes
+eran ocho a ×1 y treinta y dos a ×16, y el calendario y el sol contaban dos
+historias—. El coste: a ×64 el día dura 1,9 s, así que la jornada de **luz** se
+aplana hacia la de media mañana a ×16 y ×64 (`LIGHT_STEADY`), porque un
+parpadeo de media pantalla tapa lo que uno mira a ×64.
+
+**Los mensajes.** «Horrorosos», dos veces, y las dos veces se buscó en la
+redacción. No estaba ahí:
+
+- `tools/notice-report.ts` (nuevo) mide qué frases lee el jugador de verdad.
+  **2 831 de 3 309 avisos eran la misma clave**: la temporada de caza, catorce
+  veces al año. Ahora se cuenta al empezar la temporada, como los cuervos.
+- Las cartelas de hito hablaban **en pasado y con fecha** de algo que el
+  jugador estaba viendo ocurrir. Veinticuatro claves reescritas en presente.
+- Y decían **dos años más** que la cabecera: E4 movió el «+1» de los años
+  absolutos a la presentación y cinco sitios de la interfaz ya lo sumaban.
+
+**El mapa grande.** 72 × 112, cuatro veces el área, con el **corazón** de 36 ×
+56 centrado —el mapa entero de antes— como única superficie productiva.
+Montañas que suben hacia la sierra y un lago llenan el resto. La trampa que
+tenía la fase aparcada está contada con números en `WORLD.HEART_WIDTH`.
+
+**Y el vado, que es el arreglo de fondo de esta ronda.** A* no cruzaba el agua,
+así que **nadie cruzaba el río nunca**: con campos en las dos orillas, media
+aldea se quedaba sin ruta —cuatro rutas para treinta y nueve personas—. El vado
+es terreno ahora (`TERRAIN_CODE.ford`). Después: 20 rutas en esa misma semilla,
+el reparto de destinos de 6,00 a 8,17, y dos travesías que estaban declaradas
+en rojo se pusieron verdes solas.
+
+### Lo que esta ronda midió y no arregló
+
+- **Una aldea madura no tiene nada que construir.** En los años 20 a 40 empieza
+  **de 0,3 a 0,5 obras al año**: ya llegó a `MAX_HOUSES`, a `MAX_FIELDS` y a un
+  oficio de cada clase. Por eso la palanca «qué se levanta antes» se queda sin
+  nada que ordenar y por eso el valle no tiene nada que contar: **1,04 sucesos
+  notables por sesión de cinco minutos**, justo en el suelo de §16.3. Es la
+  deuda de diseño más gorda que queda y pide una decisión, no un ajuste.
+- **La semilla 3 no juega a la pelota ni una vez en diez jornadas.** Caso
+  extremo de la causa ya declarada en `life-props.test.ts`: nadie gana el
+  concurso de utilidad de la primera recogida del día.
+- La demo se publica **partida en dos** (`bundle-game.ts --split`): la página
+  de 0,95 MB y un JSON de 3 MB con los GLB. Una página de cuatro megas la
+  rechaza el publicador por tamaño.
 
 ---
 

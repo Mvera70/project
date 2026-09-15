@@ -114,6 +114,34 @@ El cuarto paso es la «respuesta visual» que falta y el primero es la
 
 ---
 
+## 3.1. Estado: E1 a E5 **entregadas**, 15 sep 2026
+
+Las cinco están en la rama, cada una con su commit y su medida, y la demo se
+juega en `https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK`.
+
+| Entrega | Commit | Lo que se mide |
+|---|---|---|
+| E1 · el verbo | `9c6726c` | `allocateLabour` obedece a `state.intent`; con la postura de reposo la suite de balance no se mueve (D-6) |
+| E2 · se ve | `c50534f` | Talar y construir no tenían **sitio** en el valle: `placesOf` saca los sitios de los edificios y dos de los tres destinos no son edificios |
+| E3 · la cola de obra | `a9d4ad4` | `nextProject` ordena por la familia que el jugador elige |
+| E4 · la aldea contesta | `aff4626` | Flechas de tendencia y `answer.ts`: «te he entendido y no puedo» |
+| E5 · dos valles distintos | `4c50ca4` | Dos rasgos de cuatro por valle; murallas de 8 a 99 tramos según el valle |
+
+**Lo que vino después, en la misma sesión:** el reloj a velocidad entera, los
+tres defectos de los mensajes, el mapa grande y el vado. Todo con su medida en
+`docs/handover.md` §2.1.
+
+**Lo que esta ronda midió y dejó abierto**, y es ahora la pregunta más gorda del
+juego: **una aldea madura no tiene nada que construir** —de 0,3 a 0,5 obras al
+año entre los años 20 y 40, porque ya llegó a `MAX_HOUSES`, a `MAX_FIELDS` y a
+un oficio de cada clase—. Eso deja la tercera palanca sin nada que ordenar
+después de la primera generación, y deja el valle sin nada que contar: 1,04
+sucesos notables por sesión de cinco minutos, justo en el suelo que §16.3 puso.
+No es un ajuste: es una decisión de diseño sobre qué hace una aldea cuando ya
+está construida.
+
+---
+
 ## 4. Las entregas. Cada una se juega y se juzga sola
 
 **La regla que ordena esto: ninguna entrega depende de la siguiente para tener

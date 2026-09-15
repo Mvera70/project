@@ -84,7 +84,7 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 | Presentación de datos | **Diegética primero** | El valle es el HUD; cifras solo al tocar |
 | Unidad de simulación | **La semana** | 48 semanas/año; barato de simular siglos |
 | Persistencia | IndexedDB, snapshot + registro de decisiones | Determinismo verificable |
-| Escala del mapa | **36 × 56**, transpuesto | 56 × 36 no cabe en vertical; mismas 2 016 celdas (§7) |
+| Escala del mapa | **72 × 112**, con corazón productivo de 36 × 56 | v3.68: el valle es el centro de algo más amplio, y la economía sólo mide el corazón (§7) |
 | Catálogo inicial | 16 plantillas de encrucijada | Suficiente para validar el hito 0 |
 | Fuente de letalidad | Las encrucijadas, no el mundo | Principio 2: el jugador es el cuello de botella |
 
@@ -328,13 +328,18 @@ nunca se borra. Cuando la opinión sube por encima de −20 se le pone
 ### 3.5 El valle
 
 ```ts
-export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared';
+export type Terrain = 'meadow' | 'forest' | 'water' | 'rock' | 'marsh' | 'cleared'
+  | 'mountain' | 'lake' | 'ford';
 
 /** Contrato de serialización. Vive en `state.ts`, NO en `balance.ts`: no es una
  *  perilla. Los bytes de toda partida guardada dependen de estos valores y el
  *  orden no se puede cambiar nunca. */
 export const TERRAIN_CODE = {
   meadow: 0, forest: 1, water: 2, rock: 3, marsh: 4, cleared: 5,
+  // v3.68, el mapa grande: el cinturón que cierra el valle, el lago de la falda
+  // y el paso por donde se cruza el río. Un terreno nuevo coge el siguiente
+  // número libre; ninguno de los anteriores se mueve nunca.
+  mountain: 6, lake: 7, ford: 8,
 } as const;
 
 export interface ValleyMap {
@@ -898,18 +903,42 @@ quien no fue elegido.
 
 ## 7. Sistema C — El valle
 
-**36 × 56 celdas = 2 016 celdas.** El valle corre norte-sur y el río baja por él.
-Cabe entero en un móvil vertical, sin desplazamiento de cámara.
+**72 × 112 celdas = 8 064 celdas, con un corazón productivo de 36 × 56 en el
+centro.** El valle corre norte-sur y el río baja por él.
 
-> **Cambio respecto a `valle.md` §7.** El documento original decía 56 × 36. Con
-> 390 px de ancho eso da celdas de 6,9 px, una franja apaisada en mitad de una
-> pantalla de 844 px y aldeanos de 10 px: ilegible. Transpuesto son las mismas
-> 2 016 celdas —mismo presupuesto de simulación y de figuras— con celda de
-> 10–11 px. Todo el arte del capítulo 10 está diseñado para esa cifra.
+> **Revisión v3.68, 15 sep 2026 — el mapa grande.** Lo pidió el dueño del
+> diseño: «el mapa sigue siendo muy pequeño, dijimos que iba a ser mucho más
+> grande; el valle es el centro del mapa pero debe ser más amplio». Cuatro veces
+> el área del mapa de 36 × 56 que el juego tuvo desde M-13.
+>
+> **Y lo que hace que crecer no toque la economía es el corazón.** El bosque, la
+> roca, la marisma y la fundación siguen viviendo en un rectángulo de 36 × 56
+> centrado en el mapa —exactamente el mapa entero de antes— y en las mismas
+> cantidades. Lo que llena el resto es `mountain` y `lake`: terreno que no da
+> madera, ni forraje, ni solar, y que A* no cruza.
+>
+> Las dos cuentas que había que mover, y las dos dan hoy lo de ayer: el bosque
+> era una fracción **del mapa** (`CELLS × fraction`), lo que habría cuadruplicado
+> la madera en pie; y `forestLeft` —lo que abre `forest_cut` y `wolf_winter` y lo
+> que gobierna la caza— dividía **por el mapa**, y con el bosque quieto se habría
+> hundido de 0,24 a 0,06, por debajo de los tres umbrales del catálogo. Las dos
+> se miden contra el corazón (`WORLD.HEART_WIDTH`).
+>
+> **Ya no cabe entero en un móvil vertical**, y por eso la cámara del Anexo D
+> encuadra la aldea y deja alejarse hasta ver el valle de borde a borde. El
+> Canvas de `src/render/`, que no tiene cámara, pinta el valle entero a cinco
+> píxeles por celda en vez de diez: es una consecuencia declarada de esta
+> revisión, y la puerta de `?render=canvas` se queda por lo que dice §D.5.
+
+> **Cambio respecto a `valle.md` §7.** El documento original decía 56 × 36, y
+> hasta v3.68 esto fueron 36 × 56 por la razón que sigue valiendo para el
+> corazón: con 390 px de ancho, 56 celdas de ancho dan celdas de 6,9 px, una
+> franja apaisada y aldeanos de 10 px. El valle corre a lo largo, no a lo ancho.
 
 ### 7.1 Generación del mapa
 
-Determinista a partir del flujo `map`. Cinco pasos, en orden:
+Determinista a partir del flujo `map`. **Ocho pasos** desde v3.68, en orden —los
+cinco de siempre dentro del corazón, y tres que llenan y abren el valle grande:
 
 1. **Base.** Todo `meadow`.
 2. **Río.** Entra por el borde norte en `x ∈ [10, 26]` y baja hasta el borde sur
@@ -922,7 +951,23 @@ Determinista a partir del flujo `map`. Cinco pasos, en orden:
    que la encierra.
 4. **Roca.** 3–6 afloramientos de 6–14 celdas, preferentemente lejos del río.
 5. **Marisma.** Franja de 1–2 celdas junto al río en los tramos de menor
-   pendiente. Terreno inservible, valor puramente visual.
+   pendiente. Terreno inservible, valor puramente visual. Va a lo largo del río
+   entero, dentro y fuera del corazón: depende de lo que el río corre y no de lo
+   que el mapa mide.
+6. **Vado.** El paso de piedras, tallado recto desde la orilla firme más cercana
+   al claro de fundación hasta la otra orilla, hasta 14 celdas. Es **terreno**
+   (`ford`) y no un dibujo: es la única celda de agua que se pisa, pagando
+   `PATHING.FORD`. Antes de v3.68 el río era intransitable para A* y **nadie
+   cruzaba el río nunca**: una aldea con campos en las dos orillas dejaba a media
+   aldea sin ruta —medido, cuatro rutas para treinta y nueve personas—, mientras
+   la ficción hablaba del vado en veinte líneas del banco.
+7. **Lago.** Una mancha de 40–80 celdas de agua quieta en la falda, fuera del
+   corazón y lejos del río. Antes que la montaña, para que la roca crezca
+   alrededor del agua y no al revés.
+8. **Montaña.** El cinturón que cierra el valle, fuera del corazón: probabilidad
+   creciente con la distancia al corazón —pie a 4 celdas, roca maciza a 14— con
+   ruido encima para que el borde no sea un rectángulo. Nunca dentro del corazón
+   ni sobre el claro reservado, y nunca sobre el cauce.
 
 **Sitio de fundación.** Se puntúa cada celda candidata por: distancia al río
 (óptimo 3–6 celdas), pradera contigua libre en 12×12, distancia al centro del
@@ -2331,6 +2376,30 @@ el valle unos segundos.** No es un HUD: §11.1 prohíbe cifras y aquí no hay
 ninguna, es la voz de §9 puesta donde el jugador ya está mirando en vez de
 detrás de un gesto que puede no hacer nunca. El filtro es el de §9.2 y no otro,
 para que «ha pasado algo» signifique lo mismo en la crónica y en el valle.
+
+**Y de ahí sale la regla que v3.68 tuvo que escribir después de romperla: un
+estado no se convierte en aviso repitiéndolo.** El dueño del diseño dijo dos
+veces que los mensajes eran «horrorosos» y las dos veces se buscó el fallo en la
+redacción. `tools/notice-report.ts` lo midió: **2 831 de los 3 309 avisos de
+cinco partidas de cuarenta años eran la misma clave** —la temporada de caza,
+quinientos sesenta y seis por partida, catorce al año—. La frase daba igual; a
+la décima vez cualquier frase es ruido.
+
+Cazar y pescar es un estado —el granero está bajo y hay gente en el monte—, y
+los estados van a la tira de §11.1. El **suceso** es que la temporada empiece.
+Escrito como regla, con sus dos cotas medidas en
+`tests/journeys/notices.test.ts`:
+
+- **Ninguna voz se queda con el valle:** ninguna clave puede pasar de un tercio
+  de los avisos de una partida. La más repetida se queda hoy en el 29 %.
+- **El valle no habla más de seis veces al año** en ninguna semilla. Medido:
+  entre 2,7 y 4,3.
+
+**Los hitos hablan en presente y sin fecha.** La cartela sale en el instante en
+que pasa la cosa, así que «the first house went up in the spring of year 4»
+—pasado, y con la fecha que la cabecera está mostrando— era un libro de
+historia interrumpiendo a quien lo está viendo ocurrir. La crónica sigue en
+pasado, que es donde el pasado es lo correcto.
 
 Reglas:
 
@@ -5538,14 +5607,34 @@ el sitio, y un cuerpo que se mueve exige el clip de andar**, sea cual sea la
 actividad. Los surcos empiezan y acaban en el puesto, de modo que llegar y
 marcharse son continuos.
 
-**El día escénico se acelera con la raíz de la velocidad**, no con la velocidad
-y no con nada. Las dos puntas se probaron y las dos estaban mal: atado a la
-velocidad, a ×16 la gente cruzaba el valle con las piernas a dieciséis ciclos
-por segundo; sin atar, apretar ×16 no cambiaba nada visible salvo el marcador y
-el botón parecía roto. Con la raíz, ×4 mueve al doble y ×16 al cuádruple
-mientras el mundo corre cuatro y dieciséis veces más. Como el clip lo mueve el
-suelo recorrido, la cadencia sube sola con el paso, que es lo que hace una
-grabación acelerada.
+**El día escénico sigue la velocidad entera** (v3.68, 15 sep 2026). Lo decidió
+el dueño del diseño con las tres opciones delante y esta queja por medio: «hay
+muchas cosas del reloj que están mal… los personajes no van al ritmo que
+deberían ir».
+
+Lo que arregla es la única incoherencia del reloj que el jugador puede ver sin
+contar nada: **cuántas semanas caben en una jornada ya no depende del botón.**
+Con la raíz cuadrada que esto decía antes, pasaban ocho semanas por jornada a
+×1 y treinta y dos a ×16, así que el calendario y el sol contaban dos historias
+distintas y la segunda cambiaba cada vez que se tocaba la velocidad. Ahora son
+ocho semanas por jornada a cualquier velocidad: una estación es semana y media
+de sol, siempre.
+
+Las dos puntas que ya se habían probado, para que no se vuelvan a probar: **sin
+atar** (la jornada fija), apretar ×16 no cambiaba nada visible salvo el marcador
+y el botón parecía roto; **con la raíz**, el término medio que esta revisión
+retira, se veía correr el tiempo pero la jornada seguía sin cuadrar con el
+calendario.
+
+**El coste, con su arreglo.** A ×64 la jornada dura 1,9 s reales: el sol saldría
+y se pondría dos veces cada cuatro segundos y las sombras darían la vuelta al
+valle en ese tiempo. No es una noche, es un parpadeo, y tapa justo lo que uno
+mira a ×64 —que el valle crece, que llega el invierno—. Así que a ×16 y ×64 la
+jornada de **luz** se aplana hacia la de media mañana (`LIGHT_STEADY`, 0,55 y
+0,95): a ×64 la luz deja de contar la hora, porque a ×64 la hora del día no es
+información que nadie pueda seguir (§10.3). A ×1 y ×4 la cuenta entera. Las
+ventanas encendidas van con la misma regla, o serían un render que no sabe qué
+hora es.
 
 #### D.6.6 · El suelo no es una cuadricula (v3.58)
 
@@ -5582,14 +5671,20 @@ calculada no llega a diez centimetros, que es menos que el grosor de una bota.
 
 #### D.6.7 · El estado de la jornada (v3.59)
 
-Un tick es una semana y una jornada escenica dura ciento veinte segundos. Como
-la jornada corre a la raiz de la velocidad y el mundo a la velocidad entera
-(D.6.1), **dentro de un solo amanecer-anochecer la aldea vive ocho semanas a x1
-y sesenta y cuatro a x64**, y la cuenta empeora segun se acelera:
+Un tick es una semana y una jornada escenica dura ciento veinte segundos de
+tiempo escenico. Como la jornada y el mundo corren los dos a la velocidad
+entera desde v3.68 (D.6.1), **dentro de un solo amanecer-anochecer la aldea vive
+ocho semanas, y ocho a cualquier velocidad** — que es exactamente lo que esa
+revision vino a arreglar:
 
 | | x1 | x4 | x16 | x64 |
 |---|---|---|---|---|
-| Semanas por jornada visible | 8 | 16 | 32 | 64 |
+| Semanas por jornada visible | 8 | 8 | 8 | 8 |
+| Segundos reales por jornada | 120 | 30 | 7,5 | 1,9 |
+
+La tabla de antes de v3.68 —8, 16, 32 y 64 semanas por jornada— es la
+incoherencia que se retiro: el sol cambiaba de ritmo respecto al calendario cada
+vez que se tocaba la velocidad.
 
 Todo lo que el render deriva del tick cambia, por tanto, **a media vista**: la
 querencia de una vaca, el puesto de una gallina en la fila de la cabana, la ruta
