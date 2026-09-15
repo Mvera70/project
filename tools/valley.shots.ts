@@ -418,7 +418,12 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   await page.getByRole('button', { name: '16×', exact: true }).click();
   // Menos de 20 ticks: este estado no puede llegar al disco por el autoguardado.
   // `pagehide` tiene que solicitar la instantánea antes de detener el bucle.
-  await page.clock.runFor((5 * 15_000) / 16 + 100);
+  // (Este número usaba la semana antigua de 15 s a mano: con la de 840 s
+  // apenas sumaba ticks y la prueba nunca llegaba a comprobar lo que dice
+  // comprobar — se caía antes, en el sondeo de más abajo.) Y se salta el
+  // reloj en vez de correrlo: cinco semanas a ×16 corridas fotograma a
+  // fotograma son quince mil fotogramas y la página se queda sin tiempo.
+  await advanceWeeks(page, 5, 16);
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
   await test.expect.poll(() => page.evaluate(async () => {
     const request = indexedDB.open('the-valley', 1);

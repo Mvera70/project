@@ -29,7 +29,13 @@ import { hash32 } from '@engine/rng';
 import type { SkyKind } from '../../derive/weather';
 
 /** El cubo de cielo que se llena de gotas, en celdas alrededor de lo que se mira. */
-const BOX = { width: 70, height: 34, depth: 70 };
+const RAIN_BOX = { width: 70, height: 34, depth: 70 };
+// La nieve usa una caja más corta y más baja que la de la lluvia: son 800
+// copos (frente a 1200 gotas, `SKY.FLAKES`/`SKY.DROPS`) y repartidos en el
+// mismo volumen de 70×34×70 casi todos caían fuera de encuadre o por encima
+// de la cámara — de ahí que sólo se vieran tres o cuatro. Una caja más
+// pequeña concentra los mismos copos donde la cámara mira.
+const SNOW_BOX = { width: 30, height: 16, depth: 30 };
 
 /** Cuánto cae una gota y un copo por segundo escénico, en celdas. */
 const RAIN_FALL = 34;
@@ -40,7 +46,11 @@ const RAIN_SLANT = 0.22;
 const DROP_LENGTH = 1.1;
 
 const RAIN_COLOUR = new Color('#AEC2D6');
-const SNOW_COLOUR = new Color('#F4F6F8');
+// Azulado, no blanco puro: el cielo y el suelo de invierno son casi blancos, y
+// un copo del mismo tono que el fondo no se ve aunque sea grande. El leve tinte
+// frío es lo que separa el copo del crema del suelo sin dejar de leerse como
+// nieve (comparado en captura contra `snow-01.png`..`snow-08.png`).
+const SNOW_COLOUR = new Color('#CFE0EC');
 const BOLT_COLOUR = new Color('#FFF8D8');
 
 /** Un número de 0 a 1 para esta partícula y este eje. */
@@ -76,6 +86,8 @@ interface Field {
   readonly x: Float32Array;
   readonly z: Float32Array;
   readonly count: number;
+  /** La caja de este campo: cada uno tiene la suya (ver `SNOW_BOX`). */
+  readonly box: { readonly width: number; readonly height: number; readonly depth: number };
 }
 
 /** Las gotas: dos vértices por gota, una raya vertical algo torcida. */
@@ -90,7 +102,7 @@ function makeRain(): Field {
   mesh.frustumCulled = false;
   mesh.visible = false;
   return {
-    mesh, geometry, position, count,
+    mesh, geometry, position, count, box: RAIN_BOX,
     x: new Float32Array(count), y: new Float32Array(count), z: new Float32Array(count),
   };
 }
@@ -103,22 +115,23 @@ function makeSnow(): Field {
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', position);
   const material = new PointsMaterial({
-    color: SNOW_COLOUR, size: 0.22, sizeAttenuation: true, transparent: true, opacity: 0.85,
+    color: SNOW_COLOUR, size: 0.62, sizeAttenuation: true, transparent: true, opacity: 1,
   });
   const mesh = new Points(geometry, material);
   mesh.frustumCulled = false;
   mesh.visible = false;
   return {
-    mesh, geometry, position, count,
+    mesh, geometry, position, count, box: SNOW_BOX,
     x: new Float32Array(count), y: new Float32Array(count), z: new Float32Array(count),
   };
 }
 
 function seed(field: Field): void {
+  const { box } = field;
   for (let n = 0; n < field.count; n += 1) {
-    field.x[n] = (dice(n, 'x') - 0.5) * BOX.width;
-    field.y[n] = dice(n, 'y') * BOX.height;
-    field.z[n] = (dice(n, 'z') - 0.5) * BOX.depth;
+    field.x[n] = (dice(n, 'x') - 0.5) * box.width;
+    field.y[n] = dice(n, 'y') * box.height;
+    field.z[n] = (dice(n, 'z') - 0.5) * box.depth;
   }
 }
 
@@ -230,7 +243,7 @@ export function createWeather(scene: Scene): WeatherLayer {
       const drops = Math.max(1, Math.round(field.count * strength));
       for (let n = 0; n < drops; n += 1) {
         let y = (field.y[n] as number) - fall;
-        if (y < 0) y += BOX.height;
+        if (y < 0) y += field.box.height;
         field.y[n] = y;
       }
       paint(field, centre, drops);
