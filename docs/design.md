@@ -2292,6 +2292,22 @@ sólo en la ruta normal: las rutas de depuración no la ven. Playwright la pasa
 como el dedo (`passTitle`) y `shot.mjs` acepta `--seed N` para escribir el
 número y `--open title` para fotografiar el menú.
 
+**0b. El inicio guiado** (U-11, v3.71). Al fundar un valle **la vista baja
+desde la sierra hasta la aldea** en `TIME.INTRO_FLIGHT_MS`: «la aldea al
+principio debe verse desde lo alto, así impresiona más ver lo grande que es el
+mapa» (dueño del diseño, 15 sep 2026). Es cámara y no juego —`flyIn` en el
+contrato del renderer, `lift` en la cámara para bajar la altura sin el recorte
+ni el desplazamiento de centro de `zoom`, y con el reloj **real**
+(`realDeltaSeconds`), no el escénico, que lleva la velocidad y se para en
+pausa—: arranca en `furthest` (la sierra, D.6.8), no toca el estado, no gasta
+tiempo, y cualquier gesto
+lo interrumpe donde esté porque la vista es del jugador. Aterriza exactamente
+en el reposo de D.6.3. Quien pide menos movimiento no vuela. Después, **dos
+pistas** la primera vez que se funda en ese navegador (`valley.guided`): dónde
+están las órdenes y dónde el tiempo, en la voz del juego, y se tocan para
+pasar. No es un tutorial (U-04 sigue): son dos frases. La raíz lleva
+`data-intro` (`flight` → `hints` → `done`) para poder mirarlo desde fuera.
+
 **1. El valle.** Por defecto. Arriba a la izquierda, el año en números romanos
 pequeños. Abajo a la derecha, los controles de velocidad. Nada más.
 

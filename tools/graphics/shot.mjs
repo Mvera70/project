@@ -89,7 +89,9 @@ await tab.locator('.title-scrim').waitFor({ timeout: 5000 }).catch(() => {});
 if (seedArg !== '') await tab.locator('.title-seed').fill(seedArg).catch(() => {});
 //   --open title   se queda en el menú, para fotografiarlo
 if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
-await tab.waitForTimeout(open === 'title' ? 1500 : 8000);
+//   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;
+//                0.5 para ver el vuelo de entrada de U-11 fotograma a fotograma)
+await tab.waitForTimeout(open === 'title' ? 1500 : Number(opt('settle', '8')) * 1000);
 
 // La regleta está recogida detrás del botón de velocidad, como para el dedo.
 if (speed !== '1') {

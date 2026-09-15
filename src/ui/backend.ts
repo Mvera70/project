@@ -47,6 +47,8 @@ export interface ValleyBackend {
   /** Gira la vista, en radianes. Canvas no puede: no tiene desde dónde mirar. */
   orbit(dYaw: number, dPitch: number): void;
   resetView(): void;
+  /** U-11 · el vuelo de entrada; el 2D, sin cámara, no hace nada. */
+  flyIn(seconds: number): void;
   /** Lo que cuesta la escena, o `null` en Canvas, que no tiene de donde sacarlo. */
   stats(): GraphicsStats | null;
   dispose(): void;
@@ -130,6 +132,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     // que girar, y por eso `movesCamera` es `false` y quien llama no lo intenta.
     orbit() { /* idem */ },
     resetView() { /* idem */ },
+    flyIn() { /* idem */ },
     stats() { return null; },
     dispose() { /* The 2D renderer owns nothing that outlives its canvas. */ },
   };
@@ -307,6 +310,7 @@ export function attachBackend(
         pan(dx, dy) { renderer.pan(dx, dy); },
         orbit(dYaw, dPitch) { renderer.orbit(dYaw, dPitch); },
         resetView() { renderer.resetView(); },
+        flyIn(seconds) { renderer.flyIn(seconds); },
         stats() { return renderer.stats(); },
         dispose() {
           window.removeEventListener('resize', size);

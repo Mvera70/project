@@ -189,6 +189,7 @@ export function createPresentationClock(): PresentationClock {
         tickFraction: Math.max(0, Math.min(1, input.tickFraction)),
         presentationSeconds: memory.seconds,
         deltaSeconds,
+        realDeltaSeconds: Math.min(gapSeconds, MAX_STEP_SECONDS),
         speed: input.speed,
         reducedMotion: input.reducedMotion,
         discontinuity,

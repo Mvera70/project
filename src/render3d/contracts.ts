@@ -81,6 +81,13 @@ export interface GraphicsFrame {
   readonly presentationSeconds: number;
   readonly deltaSeconds: number;
   /**
+   * U-11 · Lo que ha pasado de reloj **real** desde el fotograma anterior, con
+   * el mismo tope que `deltaSeconds` pero sin la velocidad ni la pausa: es
+   * para lo que no es escena —el vuelo de entrada de la cámara— y que no
+   * puede ir dieciséis veces más deprisa a ×16 ni quedarse quieto en pausa.
+   */
+  readonly realDeltaSeconds: number;
+  /**
    * G-07 · El juego tiene ×64 y este contrato llegaba a ×16.
    *
    * Lo añadió §11 cuando el jugador dijo que ×16 se le quedaba corto para
@@ -130,6 +137,13 @@ export interface GraphicsRenderer {
    */
   orbit(dYaw: number, dPitch: number): void;
   resetView(): void;
+  /**
+   * U-11 · El vuelo de entrada: la vista se aparta hasta la sierra y baja
+   * hasta el encuadre de reposo en `seconds`, con el centro quieto en la
+   * aldea. Es cámara, no juego: no toca el estado ni gasta tiempo. Cualquier
+   * gesto del jugador lo interrumpe donde esté, porque la vista es suya.
+   */
+  flyIn(seconds: number): void;
 
   /**
    * G-09 · Lo que la escena cuesta ahora mismo. design.md D.9.
@@ -150,6 +164,8 @@ export interface GraphicsStats {
   /** Cuántos aldeanos y edificios hay en escena, para poner el resto en contexto. */
   readonly actors: number;
   readonly buildings: number;
+  /** U-11 · a qué altura está la vista, en celdas: es lo que deja medir el vuelo de entrada desde fuera. */
+  readonly viewHeight: number;
 }
 
 export interface GraphicsRendererOptions {

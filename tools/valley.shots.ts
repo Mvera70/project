@@ -95,6 +95,18 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
   await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
   // Y lo que se funda es la pareja de v3.69: dos personas.
   await test.expect(page.locator('.valley-vital').first()).toHaveText('2');
+  // U-11 · la primera vez, dos pistas —órdenes y tiempo— que se tocan para
+  // pasar. En Canvas no hay vuelo de entrada, así que llegan enseguida.
+  const hint = page.locator('.valley-hint');
+  await test.expect(hint).toBeVisible({ timeout: 15_000 });
+  const first = await hint.innerText();
+  test.expect(first).not.toMatch(/\[intro\./u);
+  await hint.click();
+  await test.expect(hint).toBeVisible();
+  test.expect(await hint.innerText()).not.toBe(first);
+  await hint.click();
+  await test.expect(hint).toBeHidden();
+  await test.expect(page.locator('html')).toHaveAttribute('data-intro', 'done');
   // Guardada la partida, el menú ofrece continuarla.
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
   await page.waitForTimeout(600);

@@ -147,6 +147,14 @@ export interface ValleyCamera {
   readonly view: View;
   /** How much the player may still zoom out, and in. */
   readonly limits: { closest: number; furthest: number };
+  /**
+   * U-11 · Pone la vista a `height` sin más: sin recortar a `furthest` y sin
+   * mover el centro, que es lo que `zoom` hace para dejar quieto lo que hay
+   * bajo el dedo. Es para el vuelo de entrada, que no tiene dedo. Por encima
+   * de `furthest` se permite, y la excepción se deshace sola en cuanto la
+   * vista vuelve a estar por debajo, o al reencuadrar.
+   */
+  lift(height: number): void;
 }
 
 /**
@@ -190,6 +198,7 @@ export function createValleyCamera(): ValleyCamera {
    */
   let wanted = 1;
   let furthest = 1;
+  let lifted: number | null = null;
   let angles: Angles = { yaw: BASE_YAW, pitch: BASE_PITCH };
 
   /** La dirección desde la que se mira, con el giro de ahora mismo aplicado. */
@@ -290,13 +299,15 @@ export function createValleyCamera(): ValleyCamera {
    */
   function settle(next: View): void {
     wanted = next.height;
+    const ceiling = Math.max(furthest, lifted ?? 0);
     view = {
       centre: {
         x: clamp(next.centre.x, bounds.minX, bounds.maxX),
         z: clamp(next.centre.z, bounds.minZ, bounds.maxZ),
       },
-      height: clamp(next.height, CLOSEST_HEIGHT, furthest),
+      height: clamp(next.height, CLOSEST_HEIGHT, ceiling),
     };
+    if (view.height <= furthest) lifted = null;
     place(view.centre, view.height);
   }
 
@@ -305,6 +316,7 @@ export function createValleyCamera(): ValleyCamera {
 
     frame(box: Bounds, next: Viewport, reach?: Bounds): void {
       viewport = next;
+      lifted = null;
       framed = box;
       bounds = reach ?? box;
       resting = {
@@ -313,6 +325,11 @@ export function createValleyCamera(): ValleyCamera {
       };
       limits();
       settle(resting);
+    },
+
+    lift(height: number): void {
+      lifted = Math.max(furthest, height);
+      settle({ centre: view.centre, height });
     },
 
     resize(next: Viewport): void {

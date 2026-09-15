@@ -1822,6 +1822,10 @@ export const UI_BANK: Record<string, string> = {
   'title.seed': 'Valley number',
   'title.seed.hint': 'The same number gives anyone the same valley to start with. Nobody leads it the same way.',
   'title.reroll': 'Another',
+  // U-11 · el inicio guiado: dos pistas, una vez, después del vuelo de entrada.
+  // Se tocan para pasar. No son un tutorial: dicen dónde están los dos mandos.
+  'intro.orders': 'The line above is the standing orders: how much to sow, where spare hands go, what to raise first. Tap it when you want a change.',
+  'intro.time': 'The button at the right sets the pace. The valley goes on by itself; come back whenever you like.',
   'crossroad.waiting': 'A crossroad is waiting',
   // U-07 · el texto visible de la píldora que reemplaza al punto rojo
   // (`screens/crossroad.ts`, `.crossroad-marker`). Distinto del aria-label de

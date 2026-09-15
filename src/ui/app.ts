@@ -226,6 +226,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    */
   const doing = document.createElement('p');
   doing.className = 'valley-doing';
+  // U-11 · la pista del inicio guiado, bajo la línea de órdenes. Oculta salvo
+  // la primera vez, y se toca para pasar.
+  const hint = document.createElement('button');
+  hint.type = 'button';
+  hint.className = 'valley-hint';
+  hint.hidden = true;
 
   //
   // **Y desde el 15 sep 2026 es una hoja, no tres filas a la vista.** Las tres
@@ -437,7 +443,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // tocar uno, su ficha (`src/ui/screens/people.ts`).
   peopleTab.addEventListener('click', () => openPeople(app));
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, year, season, vitals, doing, ordersNow, orders, hudRight, tabbar);
+  root.append(canvas, year, season, vitals, doing, ordersNow, hint, orders, hudRight, tabbar);
   paintOrders();
   speedBadge.textContent = speedLabel(speed);
 
@@ -468,7 +474,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // Sólo en una partida nueva de verdad: no al recargar una partida andada, ni
   // al heredar, que arranca con el tick corrido. Desde U-10 el menú de inicio
   // entrega la partida nueva **como un guardado** (tick 0, sin decisiones), así
-  // que lo que la distingue es eso y no que falte `save`.
+  // que lo que la distingue es eso y no que falte `save`. El vuelo de entrada
+  // (U-11) lo lee más abajo.
   const fresh = state.tick === 0 && state.history.length === 0;
   if (fresh) {
     moments.show(
@@ -529,11 +536,61 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // G-07 · Canvas pinta desde el primer fotograma, siempre. El 3D —que desde
   // G-12 es el juego— se carga por detrás y releva cuando esté; si falla, el
   // valle sigue en 2D en vez de quedarse en un error.
+  /**
+   * U-11 · El inicio guiado. Al fundar un valle la vista baja desde la sierra
+   * hasta la aldea (`flyIn`), que es lo que el dueño pidió: «la aldea al
+   * principio debe verse desde lo alto, así impresiona más ver lo grande que
+   * es el mapa». El 3D llega asincrónico, así que el vuelo se pide en cuanto
+   * hay un render que sepa volar, y una sola vez. Quien pide menos movimiento
+   * no vuela: aterriza directamente.
+   */
+  let flightWanted = fresh && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Y la pista se programa dos veces si hace falta: al arrancar, por si nunca
+  // llega un render que vuele (el 2D, o WebGL caído), y otra vez cuando el
+  // vuelo arranca de verdad, que es asincrónico y puede llegar segundos
+  // después. La segunda sustituye a la primera.
+  let hintTimer: number | null = null;
+  let scheduleHint: ((afterMs: number) => void) | null = null;
+  const flyIfWanted = (handle: BackendHandle): void => {
+    if (!flightWanted || !handle.live.movesCamera) return;
+    flightWanted = false;
+    handle.live.flyIn(TIME.INTRO_FLIGHT_MS / 1000);
+    document.documentElement.dataset.intro = 'flight';
+    scheduleHint?.(TIME.INTRO_FLIGHT_MS + TIME.INTRO_HINT_AFTER_MS);
+  };
   const backend = attachBackend(canvas, root, {
     kind: backendFrom(location.search, localStorage.getItem('valley.render')),
-    onSwap: stampRender,
+    onSwap: (handle) => { stampRender(handle); flyIfWanted(handle); },
   });
   stampRender(backend);
+  flyIfWanted(backend);
+  // Y las dos pistas —dónde están las órdenes, dónde el tiempo—, la primera
+  // vez que se funda un valle en este navegador y después del vuelo. Se tocan
+  // para pasar; no hay más que eso, porque el juego se enseña solo (U-04).
+  const GUIDED_KEY = 'valley.guided';
+  let guided = true;
+  try { guided = localStorage.getItem(GUIDED_KEY) === 'done'; } catch { /* sin almacenamiento: se enseña igual */ }
+  if (fresh && !guided) {
+    const steps = ['intro.orders', 'intro.time'];
+    let at = 0;
+    const showStep = (): void => {
+      if (at >= steps.length) {
+        hint.hidden = true;
+        document.documentElement.dataset.intro = 'done';
+        try { localStorage.setItem(GUIDED_KEY, 'done'); } catch { /* idem */ }
+        return;
+      }
+      hint.textContent = renderUiText(steps[at] as string);
+      hint.hidden = false;
+      document.documentElement.dataset.intro = 'hints';
+    };
+    hint.addEventListener('click', () => { at += 1; showStep(); });
+    scheduleHint = (afterMs: number): void => {
+      if (hintTimer !== null) window.clearTimeout(hintTimer);
+      hintTimer = window.setTimeout(showStep, afterMs);
+    };
+    scheduleHint((flightWanted ? TIME.INTRO_FLIGHT_MS : 0) + TIME.INTRO_HINT_AFTER_MS);
+  }
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
   // U-06 · si una cifra cambia, su celda hace un bump breve (§11.1.1). Quien
@@ -561,6 +618,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
   const paint = (fraction: number): void => {
     lastFraction = fraction;
+    // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
+    // que permite mirar el vuelo de entrada desde una secuencia de capturas o
+    // desde un recorrido, sin abrir el renderer.
+    const height = backend.live.stats()?.viewHeight;
+    if (height !== undefined) document.documentElement.dataset.viewHeight = height.toFixed(1);
     year.textContent = renderUiText('app.year', { year: roman(yearOf(state.tick) + 1) });
     season.textContent = seasonLabel(state.tick);
     const now = vitalsOf(state);

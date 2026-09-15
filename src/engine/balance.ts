@@ -41,6 +41,12 @@ export const TIME = {
   // the same reason: §11.4 forbids an interface animation a clock jump can
   // catch half-way. Short enough to read as a pulse, not a fade.
   VITAL_BUMP_MS: 150,
+  // TUNE: U-11, el inicio guiado. Cuánto tarda la cámara en bajar desde la
+  // sierra hasta la aldea al fundar un valle —«la aldea al principio debe
+  // verse desde lo alto, así impresiona más ver lo grande que es el mapa»,
+  // dueño del diseño, 15 sep 2026— y cuánto espera la primera pista después.
+  INTRO_FLIGHT_MS: 9000,
+  INTRO_HINT_AFTER_MS: 800,
   SAVE_EVERY_TICKS: 20, // §13.1
 } as const;
 

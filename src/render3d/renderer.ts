@@ -305,6 +305,49 @@ export async function createGraphicsRenderer(
    * suyo; volver a lo automático es `resetView`, que es el doble toque.
    */
   let disturbed = false;
+  /**
+   * U-11 · El vuelo de entrada, si lo hay. `from` es la altura de la sierra y
+   * `to` la del reposo; la altura baja en progresión geométrica —lo que el ojo
+   * lee como velocidad constante al acercarse— con una suavizada en los dos
+   * extremos. `wantedFlight` guarda la petición hasta que haya un valle que
+   * encuadrar, porque `flyIn` puede llegar antes del primer fotograma.
+   */
+  let flight: { readonly seconds: number; elapsed: number; readonly from: number; readonly to: number } | null = null;
+  let wantedFlight: number | null = null;
+
+  function beginFlight(seconds: number): void {
+    frameCamera();
+    view.reset();
+    const to = view.view.height;
+    // Desde lo más lejos que el dedo puede apartarse (D.6.8, la sierra): en
+    // las capturas es el valle entero con sus montañas. Se probó `contain` del
+    // cuenco y salía a 367 celdas, una tira con el mapa de sello.
+    const from = view.limits.furthest;
+    if (seconds <= 0 || from <= to) return;
+    view.lift(from);
+    disturbed = true;
+    flight = { seconds, elapsed: 0, from, to };
+  }
+
+  function stepFlight(deltaSeconds: number): void {
+    if (flight === null) return;
+    flight.elapsed += deltaSeconds;
+    const t = Math.min(1, flight.elapsed / flight.seconds);
+    const eased = t * t * (3 - 2 * t);
+    const height = flight.from * Math.pow(flight.to / flight.from, eased);
+    // Directo a la altura, no por `zoom`: `zoom` recorta a `furthest` y mueve
+    // el centro para dejar quieto lo que hay bajo el dedo, y aquí no hay dedo.
+    // Medido con `data-view-height`: por `zoom`, la vista se quedaba clavada
+    // en la sierra cinco segundos y bajaba en cuatro.
+    view.lift(height);
+    if (t >= 1) {
+      // Aterriza exactamente en el reposo, y la vista vuelve a ser automática.
+      flight = null;
+      disturbed = false;
+      frameCamera();
+      view.reset();
+    }
+  }
   // El estado de la jornada, quieto desde anoche. Es lo que se pinta: ver
   // `scenic-state.ts` para por que no se pinta el vivo.
   const scenic = createScenicState();
@@ -565,6 +608,14 @@ export async function createGraphicsRenderer(
       // El encuadre sigue a lo construido, asi que se rehace cuando el pueblo
       // cambia de forma y no en cada fotograma.
       if (!isQuiet(change) && !disturbed) frameCamera();
+      if (wantedFlight !== null && mapWidth > 0) {
+        beginFlight(wantedFlight);
+        wantedFlight = null;
+      }
+      // El vuelo va con el reloj real: la primera versión iba con el escénico
+      // y se veía en la secuencia —tres fotogramas quietos y un salto—, porque
+      // ese reloj lleva la velocidad y se para en pausa.
+      stepFlight(frame.realDeltaSeconds);
 
       // La gente se recoloca en cada fotograma porque en cada fotograma se ha
       // movido; la aldea no, porque cambia unas cuantas veces al año.
@@ -691,27 +742,37 @@ export async function createGraphicsRenderer(
 
     zoom(factor: number, atXCss: number, atYCss: number): void {
       if (disposed) return;
+      flight = null;
       disturbed = true;
       view.zoom(factor, atXCss, atYCss);
     },
 
     pan(dxCss: number, dyCss: number): void {
       if (disposed) return;
+      flight = null;
       disturbed = true;
       view.pan(dxCss, dyCss);
     },
 
     orbit(dYaw: number, dPitch: number): void {
       if (disposed) return;
+      flight = null;
       disturbed = true;
       view.orbit(dYaw, dPitch);
     },
 
     resetView(): void {
       if (disposed) return;
+      flight = null;
+      wantedFlight = null;
       disturbed = false;
       frameCamera();
       view.reset();
+    },
+
+    flyIn(seconds: number): void {
+      if (disposed) return;
+      wantedFlight = seconds;
     },
 
     stats(): GraphicsStats {
@@ -724,6 +785,7 @@ export async function createGraphicsRenderer(
         programs: info.programs?.length ?? 0,
         actors: cast.count,
         buildings: village.count,
+        viewHeight: view.view.height,
       };
     },
 

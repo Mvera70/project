@@ -9,6 +9,293 @@ el render, Anexo E para la vida, §11 para la interfaz), `docs/agents.md` para
 cómo se delega y se audita. Y la regla que más veces ha ahorrado una tarde:
 **medir antes de tocar, y nunca con una sola semilla.**
 
+## Para quien siga · 15 sep 2026, tarde — léelo entero antes de tocar nada
+
+Esta sección la escribió el agente que cerró los tres primeros pasos del dueño
+del diseño, a petición suya: *«deja anotado todo lo que tengas en mente seguir
+haciendo, detallado para el siguiente agente»*. Está escrita para un agente que
+no ha visto nada de esto. Si sólo lees una sección del proyecto, que sea ésta,
+y después `CLAUDE.md` y `docs/handover.md` §2.1 y §4.
+
+### 0. Qué quiere el dueño, con sus palabras
+
+- **La premisa.** «Un idle donde la aldea sea bonita de ver de fondo … la gracia
+  es que la gente pueda comparar entre ellos y ver diferentes aldeas porque sean
+  tan aleatorias. Es la esencia en sí.» Ante dos opciones, elige la que aumenta
+  la variedad entre valles y la que se ve bien mirando sin tocar.
+- **Cinco pasos, en este orden, y «no dejes de hacer todo lo que te he pedido
+  en orden»:**
+  1. La aldea empieza con **una pareja, un hombre y una mujer** — **hecho**
+     (v3.69, commit `e6abd4e`).
+  2. **Menú de inicio** con alguna configuración — **hecho** (v3.70, `403a1c5`).
+  3. **Inicio guiado** al fundar: la aldea se ve desde lo alto y se baja —
+     **hecho** (v3.71, el commit que sigue a éste en `git log`).
+  4. **El tiempo como contador con horas** en vez del título «ANNO», con paso
+     de tiempo «real, como si fuese la vida real» — **pendiente, brief abajo**.
+  5. **Efectos meteorológicos: tormentas con rayos** — **pendiente, brief abajo**.
+- **Cómo juzga.** Mira el juego **como un vídeo**: secuencias de capturas, no
+  una captura suelta (`node tools/graphics/shot.mjs --sequence 12 --every 0.8`).
+  «Hay muchos problemas que se ven a primera vista.» Cada paso se cierra con
+  una captura enviada a él y **nunca se declara nada «sólido»**: la última vez
+  que un agente lo hizo, él encontró trastos de prueba atravesando el suelo y
+  tres filas de botones. Ve él, no tú.
+
+### 1. El estado exacto al cerrar
+
+| Qué | Estado | Cómo se comprueba |
+|---|---|---|
+| Suite rápida | 65 ficheros, 1 055 verdes, ~20 s | `npm test` |
+| Jornadas | 111 + `founding.test.ts` verdes (~6 min) | `npm run test:journeys` |
+| Playwright | 11 verdes + 3 declaradas (`test.fail`) | `npm run test:shots` |
+| Balance | **16 rojas de 37** — antes de la pareja eran 11 | `npm run test:balance`, 25 min; `docs/handover.md` §5.5 dice cuáles y por qué |
+| Demo publicada | https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK (versión 11, con menú e inicio guiado) | ver §4 abajo |
+| Rama | `graphics/g-04-villager-rig`, ~30 commits sin subir | `git log --oneline main..HEAD` |
+
+**Lo que no está hecho de los tres pasos cerrados, y sabemos:**
+
+- El vuelo de entrada se midió con `data-view-height` en Chromium por software
+  (92 → 26 celdas en nueve segundos, suave). **No se ha visto en un móvil.**
+- Las dos pistas del inicio guiado (`valley.guided` en `localStorage`) salen
+  sólo la primera vez por navegador; si el dueño quiere verlas otra vez, hay
+  que borrar esa clave. No hay botón para ello: decide si lo añades al menú.
+- Durante el vuelo salen a la vez la cartela de fundación y el aviso del rasgo
+  del valle («Bare slopes…»). Es mucho texto para nueve segundos bonitos. No
+  se tocó porque el dueño no lo ha visto aún; míralo con él.
+- El menú es sobrio (noche, latón, un número). No tiene el valle detrás
+  porque el juego no existe antes de `boot`. Si se quiere algo más vistoso,
+  la vía es fundar en silencio y enseñar el valle desde arriba **detrás** del
+  menú — es exactamente el vuelo de U-11, sin bajar hasta que se pulse.
+
+### 2. Paso 4 · El reloj con horas — brief
+
+**Lo que pidió:** «El tiempo me gustaría que se visualizase en lugar del
+título de los años. Un contador con horas incluso; debe ser real el paso del
+tiempo, como si fuese la vida real.»
+
+**Lo que hay hoy (no lo cambies sin leer esto):**
+
+- El motor no tiene horas ni días: **1 tick = 1 semana** (`TIME.WEEKS_PER_YEAR
+  = 48`, cuatro estaciones de doce). El estado guardado sólo conoce `tick`.
+  **No metas horas en el motor**: rompería la determinación y los guardados
+  por nada, porque las horas son presentación.
+- A ×1 un tick dura `TIME.REAL_MS_PER_TICK` = 15 000 ms (`balance.ts`). Las
+  velocidades son 0/1/4/16/64.
+- Hay un **reloj escénico** aparte (`src/render3d/presentation-clock.ts`): un
+  «día» de sol dura 120 s reales y corre a `scenicRate(speed) = speed`, así
+  que **caben ocho semanas por día de sol a cualquier velocidad**
+  (`life/staging.ts`, `WEEKS_PER_DAY = 8`; decisión v3.67, D.6.1). La luz sale
+  de `daylight.ts` (`dayPhase`), y a ×16/×64 se aplana (`LIGHT_STEADY`).
+- La cabecera pinta `app.year` = «ANNO {year}» en romanos y la estación
+  (`.valley-year`, `.valley-season`, `src/ui/app.ts` ~línea 150 y `paint`).
+
+**La decisión tomada y no implementada** (la tomó el agente anterior porque el
+dueño no contestó a la pregunta; puedes preguntarle antes de hacerla, él
+prefiere que se le pregunte poco y se decida):
+
+> **Una semana = siete días de sol.** El día de sol sigue durando 120 s a ×1,
+> así que un tick pasa a durar 7 × 120 s = **840 s a ×1** (`REAL_MS_PER_TICK:
+> 840_000`) y el reloj escénico y el del motor cuentan la misma historia. El
+> juego se hace lento a ×1 —un año son once horas— y eso es a propósito: es
+> un idle «de fondo». A ×64 un año son diez minutos.
+
+Qué toca, en orden, con la prueba de cada cosa:
+
+1. `src/engine/balance.ts` · `TIME.REAL_MS_PER_TICK` 15 000 → 840 000, con su
+   `// TUNE:` y el porqué. Busca **todo** lo que dependa de él: `ticksOwed` y
+   el letargo (`src/engine/save.ts`, `LETHARGY_CAP_MS` en `balance.ts`, hoy cuatro horas — el tope de tiempo
+   que se recupera al volver: con ticks de 14 minutos, cuatro horas fuera son
+   17 ticks, ya no 960; decide si el tope sigue teniendo sentido),
+   `src/ui/loop.ts` (`advanceAccumulator`), y las pruebas: `tests/fast/time.test.ts`,
+   `tests/fast/graphics-clock.test.ts`, `tests/fast/life-clock.test.ts`,
+   `tests/journeys/…` que cuenten ticks por segundo, y en `tools/valley.shots.ts`
+   la prueba «volver de segundo plano» que escribe «30 min / 15 s = 120 ticks»
+   **a mano** — reescríbela para que derive el número de la constante.
+2. `src/render3d/life/staging.ts` · `WEEKS_PER_DAY` 8 → **1/7** o, mejor,
+   invierte el nombre: `DAYS_PER_WEEK = 7`. Lee `ordersOf` y `meetingPlace`:
+   reparten las ofertas del día según cuántas semanas caben en un día; con un
+   séptimo de semana por día, la reunión de una decisión (§11.8) tiene que
+   durar **los siete días** de esa semana, no repetirse siete veces. Prueba:
+   `tests/fast/life-orders.test.ts` y `tests/journeys/life-decide.test.ts`.
+3. `src/render3d/presentation-clock.ts` · nada cambia en el día de 120 s. Lo
+   que hace falta es **exponer** el día y la hora: `dayNumber` y `dayPhase`
+   ya existen en `daylight.ts`; añade a `GraphicsFrame` o a un getter del
+   renderer `clock(): { dayOfWeek: 0..6; hour: 0..23 }` derivado de
+   `presentationSeconds` **y** de `tickFraction` (ojo: son dos relojes; con
+   840 s por tick y 120 s por día cuadran, pero al cambiar de velocidad o al
+   volver del letargo se descuadran — `discontinuity` en el reloj escénico
+   dice cuándo reengancharlos; la regla sencilla es que el día de la semana lo
+   diga `tickFraction` (`floor(tickFraction · 7)`) y la hora la diga el reloj
+   escénico dentro de ese día, y que en cada `discontinuity` el escénico se
+   ponga a la hora que `tickFraction` diga).
+4. `src/ui/backend.ts` · añade `clock()` a `ValleyBackend` (el 2D devuelve
+   `null`: no tiene sol) y pásalo en `pilot3d`.
+5. `src/ui/app.ts` · sustituye `year` + `season` por un `clock` con cuatro
+   piezas: **Year 3 · Spring · Day 12 · 14:00** (el día es el de la estación,
+   1–84 = 12 semanas × 7; o el de la semana, 1–7, si queda más claro; pregunta
+   al dueño con una captura de cada). Claves nuevas en
+   `src/engine/chronicle/bank.en.ts`: `app.clock.year`, `app.clock.day`,
+   `app.clock.hour` — con `{year}`, `{day}`, `{hour}` y **sin** placeholder
+   abriendo segunda frase. Cifras con `font-variant-numeric: tabular-nums`
+   para que no bailen. CSS en `index.html` (`.valley-year` → `.valley-clock`).
+   `tools/graphics/shot.mjs` imprime `.valley-year`: cámbialo. Y **todas** las
+   pruebas de Playwright que esperan `ANNO I` / `ANNO LXXXI`
+   (`grep -n "ANNO" tools/valley.shots.ts`).
+6. Captura en secuencia a ×1 y a ×16 (`--sequence 12 --every 1`): las horas
+   tienen que avanzar de una en una a ×1 sin saltos y el cambio de día tiene
+   que coincidir con la noche del sol. Envíasela al dueño con `SendUserFile`.
+
+**Trampa conocida:** la prueba «volver de segundo plano recupera el tiempo» y
+la del parte de bienvenida (§13.2) usan `page.clock` de Playwright con
+minutos falsos y **contarán ticks distintos** con el tick de 840 s. Están en
+`tools/valley.shots.ts`; una es `test.fail()` declarada (ver su cabecera).
+
+**Si el dueño prefiere que a ×1 pase más rápido**, la alternativa honesta no es
+acortar el día de sol (a menos de 60 s parpadea, medido en D.6.1) sino que la
+semana tenga menos días de sol (p. ej. 3): documenta lo que elijas en §12.1 y
+en D.6.1 y **remide** el letargo.
+
+### 3. Paso 5 · Tormentas con rayos — brief
+
+**Lo que pidió:** «El siguiente paso es crear efectos meteorológicos, como
+tormentas con rayos.»
+
+**Lo que hay hoy:**
+
+- El motor tira el clima **una vez al año**, en la semana 0: `state.weather =
+  { year, index, factor }` con la tabla `WEATHER` de `balance.ts` (§12.3; `index`
+  es la fila, `factor` el multiplicador de cosecha). `rollWeather` en
+  `src/engine/subsistence/seasons.ts`, flujo `weather`. **No hay clima por
+  semana** y no lo va a haber en el motor: cambiaría el balance y los guardados.
+- El render no puede tirar azar que mueva la simulación (innegociable). Puede
+  usar `hash32` (`src/engine/rng.ts`) sobre `(seed, tick, …)`: determinista y
+  sin tocar ningún flujo.
+- Luz: `src/render3d/daylight.ts` (`light(phase, speed)`, `LIGHT_STEADY`);
+  la niebla y el sol están en `renderer.ts` (`fogAround`, `sun`).
+- Sonido: `src/ui/sound.ts`, sintetizado con Web Audio, con **fusible** de
+  acentos (`accentAllowed`, §11.4) y `AccentKind = 'milestone' | 'crossroad'`.
+- Presupuestos de escena: D.9 y `tests/fast/graphics-budget.test.ts` (llamadas
+  de dibujo, triángulos). Una tormenta no puede costar más de **una** malla
+  de partículas y **una** de rayo.
+
+Qué toca, en orden:
+
+1. **Derivar, no simular.** `src/derive/weather.ts` (nuevo, puro, sin Three):
+   `weatherAt(state, tick): { kind: 'clear' | 'overcast' | 'rain' | 'storm' |
+   'snow'; intensity: 0..1 }`. Entradas: `state.weather.index` (el año malo
+   trae más tormentas), `seasonOf(tick)` (`src/engine/time.ts`; nieve sólo en
+   invierno, tormentas sobre todo en verano y otoño), y `hash32(state.seed,
+   tick)` para que cada semana sea distinta **y siempre la misma** para esa
+   semilla. Las probabilidades van a `balance.ts` como `SKY = { … } // TUNE`
+   con su tabla en §12 de `docs/design.md`, medida antes de fijarla (un
+   informe en `tools/` que cuente semanas de cada clase en 60 semillas × 100
+   años; que una aldea tenga tormenta **una o dos veces al mes de verano**, no
+   cada semana: si llueve siempre, no es tiempo, es decorado).
+   Prueba: `tests/fast/weather-derive.test.ts` — misma semilla y tick, mismo
+   cielo; nieve nunca fuera de invierno; en 60 semillas la fracción de
+   tormentas está en la banda de `SKY`; **no consume ninguna tirada** (compara
+   `state.rng` antes y después, como hace `graphics-world.test.ts` con
+   «planificar no consume una tirada»).
+2. **La luz del cielo.** En `renderer.ts`, `paint` ya calcula `phase` y `shown`
+   (el estado de la jornada); calcula `sky = weatherAt(shown, shown.tick)` una
+   vez por jornada (cambia con `today`) y pásaselo a `light(...)` de
+   `daylight.ts` como un factor de nublado (0,55–0,7 de luz en tormenta, menos
+   contraste en las sombras; `LIGHT_STEADY` sigue mandando a ×16/×64). Prueba
+   en `tests/fast/graphics-effects.test.ts`: con tormenta la luz es menor que
+   con cielo claro **a la misma hora**, y mirar el valle no cambia nada.
+3. **Lluvia y nieve.** `src/render3d/weather.ts` (nuevo): una sola `Points`
+   con `BufferGeometry` de N partículas (N por intensidad, tope 1 500; ver
+   D.9) dentro de una caja que sigue al centro de la vista
+   (`view.view.centre`), cayendo con `frame.deltaSeconds` (reloj escénico: en
+   pausa se para, a ×64 cae deprisa y se ve como cortina, que está bien) y
+   reapareciendo arriba por módulo. Nieve: más lenta, con vaivén por seno.
+   Materiales: uno por clase, `sizeAttenuation`, sin texturas de red. Se
+   descarta entera con `dispose()` del renderer.
+4. **Rayos.** En `storm`, un destello cada `hash32(seed, tick, n)` segundos
+   escénicos (entre 6 y 25): dos fotogramas con la luz hemisférica ×3 y el sol
+   ×0 (el flash), y una malla de rayo —`Line` con 6–9 vértices en zigzag desde
+   `y = 40` hasta un punto del suelo elegido con el mismo hash, dentro del
+   mapa— visible 80–120 ms. Nunca `Math.random`. Prueba: con la misma semilla
+   y los mismos segundos escénicos, los destellos caen en los mismos instantes
+   (`tests/fast/weather-render.test.ts` sin GPU, si lo escribes como función
+   pura `flashesBetween(seed, tick, fromS, toS)` en `derive/` y el renderer
+   sólo la consulta — hazlo así).
+5. **Trueno.** `sound.ts`: `AccentKind` gana `'thunder'`; ruido blanco
+   filtrado por paso bajo con caída de 1,5–3 s, con retardo de 0,4–2 s tras
+   el destello (más retardo, más lejos). Pasa por `accentAllowed`. Prueba en
+   `tests/fast/sound.test.ts` como las de ahora: el fusible lo respeta, y sin
+   tormenta no suena.
+6. **Ruta de depuración y captura.** `src/ui/debug.ts` (`stateAt`,
+   `parseDebugRequest`): admite `&weather=storm` que pone `state.weather.index`
+   en la fila peor y avanza `tick` hasta la primera semana en que
+   `weatherAt` diga tormenta. Añade a `tools/valley.shots.ts` un recorrido que
+   abra `?debug=1&live=1&seed=7&year=3&weather=storm`, corra 20 s y compruebe
+   que el brillo de dos capturas seguidas difiere (un destello) — el brillo
+   ya lo mide `shot.mjs`; en Playwright copia la función. Captura de noche
+   con rayo para el dueño: `node tools/graphics/shot.mjs --page
+   http://127.0.0.1:8127/valley.html --seed 7 --run 40 --speed 16 --sequence
+   16 --every 0.5` y busca el fotograma blanco.
+7. **Documenta**: §10 (luz) y un §10.7 nuevo «El cielo» en `docs/design.md`,
+   fila 3.72 en `docs/changelog.md`, `CLAUDE.md` (estado), y este fichero.
+
+**Lo que no hagas:** clima por semana en el motor; tirar del flujo `weather`
+desde el render; partículas por celda (son 8 064 celdas); sonido con ficheros
+de audio (U-09: todo sintetizado, +0,41 % de peso fue el trato).
+
+### 4. Operativa que cuesta tiempo si no se sabe
+
+- **La puerta de un paso:** `npm run typecheck && npm test && npm run lint`,
+  después `npm run test:journeys` (6 min) y `npm run test:shots` (2 min;
+  Playwright falla por carga de máquina si `test:balance` corre a la vez —
+  pasó dos veces hoy: repite el que falle **aislado** con `-g "nombre"` antes
+  de tocarlo).
+- **`test:balance` tarda 25–45 min y el `Bash` de la herramienta se corta a
+  10.** Lánzalo desapegado:
+  `Start-Process cmd -ArgumentList '/c npm run test:balance > log 2>&1' -WindowStyle Hidden`
+  y lee el log. Las 16 rojas actuales están explicadas en `docs/handover.md`
+  §5.5; no las «arregles» tocando números sin el dueño.
+- **Publicar la demo:** `npx tsx tools/graphics/bundle-game.ts --split` escribe
+  `artifacts/graphics/G-10/game/artifact.html` (0,97 MB) y
+  `valley-assets.json` (3 MB). Publica con la herramienta `Artifact` pasando
+  `url: https://claude.ai/artifact/CbbvpwDfa5NUoog9E7XiMK` y
+  `files: { "valley-assets.json": "<ruta absoluta>" }`. Sin `--split` la
+  página pesa 4 MB y la publicación la rechaza. Los `.glb` no se pueden servir
+  como ficheros de apoyo.
+- **Capturas:** `node tools/graphics/shot.mjs --page http://127.0.0.1:8127/valley.html …`
+  necesita un servidor estático en el directorio del juego:
+  `python -m http.server 8127 --bind 127.0.0.1` desde
+  `artifacts/graphics/G-10/game` (hoy hay uno huérfano corriendo; si el
+  puerto está ocupado, es ése; mátalo o úsalo). Opciones útiles: `--seed 7`
+  (escribe el número en el menú), `--open title` (fotografía el menú),
+  `--settle 0.3` (no esperar ocho segundos tras fundar), `--sequence N
+  --every S`, `--speed 16 --run 60`, `--open orders|speed`. Imprime la
+  cabecera, la línea de estado y el brillo medio. En Chromium por software
+  cada captura tarda ~1 s: **el tiempo entre fotogramas es `every` + 1 s**.
+- **`data-*` en la raíz para mirar sin abrir nada:** `data-app-ready`,
+  `data-tick`, `data-render` (`canvas`/`pilot3d`), `data-intro`
+  (`flight`/`hints`/`done`), `data-view-height` (altura de la cámara en
+  celdas). Añade los que necesites por el mismo patrón; es lo que salvó el
+  vuelo de U-11.
+- **El menú de inicio está delante de la ruta real** (`/` y `/?render=canvas`).
+  En Playwright, `passTitle(page)` tras cada `goto` y cada `reload`; en
+  `shot.mjs` se pasa solo. Las rutas `?debug=1…` no lo ven.
+- **`tools/art/_test_build_priest.py` es de otra sesión: no lo añadas nunca a
+  un commit.** `git add` por rutas (`CLAUDE.md docs src tests tools/x`), no `-A`.
+- **Mensajes de commit** en español, con lo medido, y al final la línea
+  `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>` (o la que te
+  indique tu sesión). El dueño no ha pedido subir la rama: no hagas `push`.
+- **Fundación de veinte en las pruebas:** `foundTwenty` /
+  `foundPeopleTwenty` (`tests/helpers/founding.ts`) para pruebas de mecánica
+  de una aldea hecha; `foundGame` (la pareja) para lo que mide el juego que se
+  juega. Si una prueba nueva necesita gente, elige a conciencia y dilo en el
+  comentario.
+- **Nunca midas el juego con `tick()` en bucle**: `run(state, n, 'prudent',
+  CATALOG)`. Está en `CLAUDE.md`, y costó media página de conclusiones falsas.
+- La memoria del agente vive en
+  `C:\Users\mvera\.claude\projects\d--DESARROLLO-PROYECTOS-VALLEY-project\memory\`
+  (`esencia-del-juego.md`, `valley-debe-sentirse-viva.md`): léela.
+
+---
+
 ## El estado, en cinco frases
 
 - **El juego es el 3D y la aldea se mueve por la capa de vida.** Sin banderas.

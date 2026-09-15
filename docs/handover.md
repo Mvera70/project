@@ -375,6 +375,21 @@ No son teoría: cada una se pagó con al menos una ronda.
    | `last` | 10,0 % | 81 | 66,7 % | 5,51 | 54/60 |
    | `worst` | 23,3 % | 81 | 48,3 % | 5,56 | 46/60 |
 
+   > **Remedida con la fundación en pareja (v3.69, 15 sep, 25 minutos): 16
+   > rojas, no 11.** Las once de antes siguen, y se suman cinco **del mismo
+   > lado**: la extinción prudente cae al **1,7 %** (banda 2–12 %), la
+   > extinción tras el golpe del 90 % a los cuarenta años se queda en 17 / 10 /
+   > 22 % según política (pide 25), la adversa baja a **20 %**, la distancia
+   > `prudent`–`worst` a **18 puntos** (pide 20) y el bosque queda en banda en
+   > sólo el 27 % de los valles. Leído junto: **la pareja hace el juego más
+   > seguro y más talador** —dos bocas no pasan hambre, y una aldea que crece
+   > con los que llegan rotura y tala más que una que nace hecha—. No se ha
+   > tocado un número por esto: el dueño pidió cinco pasos en orden y éste era
+   > el primero; el balance de §12.9 con la pareja es una decisión suya, y
+   > choca de frente con su esencia (aldeas muy distintas): una extinción del
+   > 1,7 % es sesenta valles que se parecen. Es lo primero que habría que
+   > remedir cuando acaben los cinco pasos.
+
    **Y la de fondo sigue siendo la misma:** jugar bien y jugar mal se parecen
    demasiado —veinte puntos justos de extinción entre `prudent` y `worst`, que
    es el mínimo que el diseño pide—. No lo arregla una ronda gráfica: es balance

@@ -202,6 +202,13 @@
       /* Cubierta por la encrucijada y el epitafio (§11.2), y oculta también a
          quien navega con teclado, igual que ya hace `.valley-speeds`. */
       html.crossroad-open .valley-tabbar, html.epitaph-open .valley-tabbar { visibility: hidden; }
+      /* U-11 · la pista del inicio guiado: latón sobre tinta, la voz del juego, y se toca para pasar. */
+      .valley-hint { position: absolute; left: 12px; right: 118px; bottom: 82px; z-index: 3;
+        padding: 10px 14px 10px 12px; border: 0; border-left: 3px solid var(--gild-lit);
+        border-radius: 0 10px 10px 0; background: var(--night); color: var(--parchment); text-align: left;
+        font: italic 15px/1.4 var(--voice); text-wrap: pretty; box-shadow: 0 6px 18px rgba(26,21,17,.35); }
+      .valley-hint::after { content: ' ›'; color: var(--gild-lit); font-style: normal; }
+      html.crossroad-open .valley-hint { visibility: hidden; }
 
       /* §11.2 · la ficha. Sube del borde de abajo como una hoja, con un filete
          y no con el trazo de dos píxeles que tenía. */
