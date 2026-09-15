@@ -48,6 +48,8 @@ const out = resolve(opt('out', 'artifacts/graphics/G-10/shot.png'));
 // se queda clavada, si algo parpadea, si un trasto atraviesa el suelo.
 //   --sequence 12 --every 2.5   → doce capturas, una cada 2,5 s, numeradas
 const sequence = Number(opt('sequence', '0'));
+//   --open orders|speed   deja abierta la hoja de órdenes o la regleta antes de disparar
+const open = opt('open', '');
 const every = Number(opt('every', '2'));
 // `--page` acepta también una dirección `http://`. La demo partida en dos
 // (`bundle-game.ts --split`) pide su JSON de recursos por la red, y una página
@@ -156,6 +158,10 @@ if (waitFor) {
     if (open) await swipeDown();
   }
 }
+
+if (open === 'orders') await tab.locator('.valley-orders-now').click().catch(() => {});
+if (open === 'speed') await tab.locator('.valley-speed-badge').click().catch(() => {});
+if (open) await tab.waitForTimeout(300);
 
 if (sequence > 0) {
   const stem = out.replace(/\.png$/u, '');

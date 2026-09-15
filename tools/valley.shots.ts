@@ -100,7 +100,10 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
   await test.expect(page.locator('#valley')).toHaveCSS('width', '360px');
   await test.expect(page.locator('#valley')).toHaveCSS('height', '560px');
   await test.expect(page.locator('.valley-year')).toHaveText('ANNO I');
-  // Cinco: pausa y las cuatro velocidades de §12.1 (v2.85).
+  // Cinco: pausa y las cuatro velocidades de §12.1 (v2.85). Desde el 15 sep
+  // viven recogidas detrás del botón de velocidad, así que se despliegan antes
+  // de medirlas: cerradas no miden nada, y eso es lo correcto.
+  await page.locator('.valley-speed-badge').click();
   await test.expect(page.locator('.valley-speeds button')).toHaveCount(5);
   for (const button of await page.locator('.valley-speeds button').all()) {
     const box = await button.boundingBox();
@@ -108,7 +111,9 @@ test('la aplicación abre el valle con año y cuatro velocidades táctiles', asy
     test.expect(box?.height).toBeGreaterThanOrEqual(44);
   }
   await page.getByRole('button', { name: '4×', exact: true }).click();
-  await test.expect(page.getByRole('button', { name: '4×', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  // Elegida, la regleta se recoge y lo que queda a la vista es el botón con la
+  // velocidad de ahora: eso es lo que el jugador ve, y eso es lo que se mira.
+  await test.expect(page.locator('.valley-speed-badge')).toHaveText('4×');
   const spring = await page.locator('#root').evaluate((node) => getComputedStyle(node).getPropertyValue('--valley-void'));
   await page.locator('.valley-speed-badge').click();
   await page.getByRole('button', { name: '16×', exact: true }).click();
@@ -133,9 +138,15 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // topes de §12 son absolutos y `placeBuilding` sólo construye en el corazón.
   const canvas = page.locator('#valley');
   const box = await canvas.boundingBox();
-  await canvas.click({ position: { x: (box?.width ?? 360) / 2, y: (box?.height ?? 560) / 2 } });
-  await test.expect(page.locator('.valley-panel')).toBeVisible();
-  await test.expect(page.locator('.valley-panel h2')).not.toBeEmpty();
+  // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
+  // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la
+  // escala del lienzo en cada fotograma. Playwright espera a que el elemento
+  // se quede quieto antes de tocarlo, y un lienzo que sigue a una persona no se
+  // queda quieto nunca: ciento veinte segundos esperando. El toque va donde
+  // iría el dedo, sin esperar a que el mundo se pare.
+  await canvas.click({ position: { x: (box?.width ?? 360) / 2, y: (box?.height ?? 560) / 2 }, force: true });
+  await test.expect(page.locator('.valley-panel:not(.valley-orders)')).toBeVisible();
+  await test.expect(page.locator('.valley-panel:not(.valley-orders) h2')).not.toBeEmpty();
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
 });
 
@@ -145,7 +156,7 @@ test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
   await page.locator('html[data-app-ready="true"]').waitFor();
   await page.clock.runFor(5_000);
   await page.screenshot({ path: 'artifacts/m21-hunger.png', fullPage: true });
-  await test.expect(page.locator('.valley-panel')).toBeHidden();
+  await test.expect(page.locator('.valley-panel:not(.valley-orders)')).toBeHidden();
 });
 
 test('la encrucijada muestra el precio de las tres opciones sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
