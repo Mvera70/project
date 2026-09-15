@@ -22,7 +22,10 @@ describe('welcomeLines · §9.2', () => {
 
     for (const line of lines) expect(line, line).not.toMatch(/\{\w+\}/);
     expect(lines[0]).toContain('house'); // el titular: el incendio, peso 3
-    expect(lines.at(-3)).toMatch(/weeks/);
+    // La línea del tiempo, en semanas o en años: cien ticks son dos años, y
+    // una ausencia de años se cuenta en años porque «96 weeks passed» es una
+    // división que el jugador tendría que hacer él.
+    expect(lines.at(-3)).toMatch(/weeks|years/);
     expect(lines.at(-2)).toMatch(/\bpeople\b|valley/);
     expect(lines.at(-1)).toMatch(/raised|went up|Building/);
   });
@@ -50,5 +53,27 @@ describe('welcomeLines · §9.2', () => {
     const peopleLine = lines.at(-2) as string;
     expect(peopleLine).toMatch(/\b3\b/); // nacidos
     expect(peopleLine).toMatch(/\b1\b/); // muertos
+  });
+});
+
+describe('welcomeLines · cuánto tiempo se ha perdido', () => {
+  it('una ausencia larga se cuenta en años, no en novecientas semanas', () => {
+    // El letargo llega a cuatro horas de reloj de pared (§13.4), que son 960
+    // semanas. «960 weeks passed» es un número que nadie puede sentir.
+    const state = foundGame(7);
+    state.tick = 960;
+    const lines = welcomeLines(state, welcomeDigest(state, 0));
+    const time = lines.at(-3) ?? '';
+    expect(time).toMatch(/\b20 years\b/);
+    expect(time).not.toMatch(/weeks/);
+  });
+
+  it('y una corta sigue contándose en semanas', () => {
+    // Dos años es la frontera: por debajo, «un año y cuarto» redondeado a un
+    // año pierde más de lo que aclara, y las semanas se sienten bien.
+    const state = foundGame(7);
+    state.tick = 30;
+    const lines = welcomeLines(state, welcomeDigest(state, 0));
+    expect(lines.at(-3) ?? '').toMatch(/\b30 weeks\b/);
   });
 });

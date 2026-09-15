@@ -4,6 +4,7 @@
 // and the numbers — never the whole chronicle, and never a screen the player
 // has to reconstruct by hand to know what happened while they were gone.
 
+import { TIME } from '@engine/balance';
 import type { Digest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import type { ChronicleEntry, GameState } from '@engine/state';
@@ -59,7 +60,14 @@ export function welcomeLines(state: GameState, digest: Digest): string[] {
   digest.entries.forEach((e, i) => lines.push(renderEntry(e, state.rng, i + 1)));
 
   const s = digest.summary;
-  lines.push(renderEntry(synthetic(state.tick, 'welcome.time', { weeks: s.weeks }), state.rng, 900));
+  // En años cuando la ausencia se cuenta en años. El letargo llega a cuatro
+  // horas de reloj de pared, que son novecientas sesenta semanas (§13.4), y
+  // «960 weeks passed» es un número que nadie puede sentir: el jugador que
+  // vuelve quiere saber cuánto ha perdido, no hacer la división.
+  const years = Math.floor(s.weeks / TIME.WEEKS_PER_YEAR);
+  lines.push(years >= 2
+    ? renderEntry(synthetic(state.tick, 'welcome.time.years', { years }), state.rng, 900)
+    : renderEntry(synthetic(state.tick, 'welcome.time', { weeks: s.weeks }), state.rng, 900));
   lines.push(renderEntry(synthetic(state.tick, 'welcome.people', {
     people: s.people, born: s.born, died: s.died, arrived: s.arrived, left: s.left,
   }), state.rng, 901));

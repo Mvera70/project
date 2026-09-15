@@ -41,7 +41,7 @@ export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void
   const heading = document.createElement('h1');
   heading.textContent = renderUiText('epitaph.title');
   const cause = document.createElement('p');
-  cause.textContent = renderUiText(`epitaph.${game.cause}`, { year: yearOf(game.endedTick) + 1 });
+  cause.textContent = renderUiText(`epitaph.${game.cause}`, { year: yearOf(game.endedTick) });
   const summary = document.createElement('p');
   summary.textContent = renderUiText('epitaph.summary', {
     years: yearOf(game.endedTick),

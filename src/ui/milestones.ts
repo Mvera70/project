@@ -75,7 +75,7 @@ function firstOfKindMilestones(state: GameState, sinceTick: number, firstId: Rea
     out.push({
       kind: 'first_of_kind',
       key: `milestone.first_of_kind.${building.kind}`,
-      params: { year: yearOf(building.builtTick) + 1, season: seasonOf(building.builtTick) },
+      params: { year: yearOf(building.builtTick), season: seasonOf(building.builtTick) },
       tick: building.builtTick,
       weight: TRANSFORMATIVE_KINDS.has(building.kind) ? 3 : 2,
     });
@@ -101,7 +101,7 @@ function workDoneMilestones(state: GameState, sinceTick: number, firstId: Readon
     out.push({
       kind: 'work_done',
       key: `milestone.work_done.${building.kind}`,
-      params: { year: yearOf(building.builtTick) + 1, season: seasonOf(building.builtTick) },
+      params: { year: yearOf(building.builtTick), season: seasonOf(building.builtTick) },
       tick: building.builtTick,
       weight: 2,
     });
@@ -139,7 +139,7 @@ function peakPeopleMilestones(state: GameState, sinceTick: number): Milestone[] 
         out.push({
           kind: 'peak_people',
           key: 'milestone.peak_people',
-          params: { people, year: yearOf(entry.tick) + 1 },
+          params: { people, year: yearOf(entry.tick) },
           tick: entry.tick,
           weight: 2,
         });
@@ -168,7 +168,7 @@ function turnOfDecadeMilestones(state: GameState, sinceTick: number): Milestone[
     out.push({
       kind: 'turn_of_decade',
       key: isCentury ? 'milestone.turn_of_century' : 'milestone.turn_of_decade',
-      params: { years, year: yearOf(tick) + 1, season: seasonOf(tick) },
+      params: { years, year: yearOf(tick), season: seasonOf(tick) },
       tick,
       weight: isCentury ? 3 : 2,
     });

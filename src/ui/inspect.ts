@@ -29,7 +29,7 @@ export function inspectAt(state: GameState, x: number, y: number, tickFraction =
 
 function buildingPanel(building: Building, state: GameState): PanelModel {
   const residents = state.people.villagers.filter((person) => isHere(person) && person.homeId === building.id);
-  const lines = [renderUiText('inspect.raised', { year: yearOf(building.builtTick) + 1 })];
+  const lines = [renderUiText('inspect.raised', { year: yearOf(building.builtTick) })];
   if (building.kind === 'granary') lines.push(renderUiText('inspect.granary', {
     grain: Math.floor(state.village.grain), capacity: capacityOf(state).storage,
   }));
@@ -60,7 +60,7 @@ function villagerPanel(person: Villager, state: GameState): PanelModel {
     .slice(0, 2);
   const memories = [...person.memories].sort((a, b) => b.weight - a.weight || b.tick - a.tick).slice(0, 2)
     .map((memory) => renderUiText('inspect.memory', {
-      memory: renderUiText(`memory.${memory.kind}`), year: yearOf(memory.tick) + 1,
+      memory: renderUiText(`memory.${memory.kind}`), year: yearOf(memory.tick),
     }));
   return { title: person.name || renderUiText('inspect.villager', { id: person.id }), lines: [
     renderUiText('inspect.age', { age: ageOf(person, state.tick) }),

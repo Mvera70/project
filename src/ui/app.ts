@@ -409,7 +409,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
           tick: 0,
           kind: 'season',
           templateKey: 'founding.settled',
-          params: { people: vitalsOf(state).people, year: yearOf(state.tick) + 1, season: seasonOf(state.tick) },
+          params: { people: vitalsOf(state).people, year: yearOf(state.tick), season: seasonOf(state.tick) },
           weight: 3,
         },
         state.rng,

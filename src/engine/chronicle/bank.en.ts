@@ -1481,6 +1481,17 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'It has been {weeks} weeks.',
     '{weeks} weeks, and nobody was watching.',
   ],
+  // Y la misma línea cuando la ausencia se mide en años. El letargo llega a
+  // cuatro horas de reloj de pared (§13.4), que son novecientas sesenta
+  // semanas: «960 weeks passed» no es una frase que nadie pueda sentir.
+  // `years` es una cuenta de años transcurridos, no un año absoluto, así que
+  // `render.ts` no le suma uno — ver `ABSOLUTE_YEARS`.
+  'welcome.time.years': [
+    '{years} years passed.',
+    'It has been {years} years.',
+    '{years} years, and nobody was watching.',
+    'The valley went {years} years without anyone looking.',
+  ],
   'welcome.people': [
     '{people} people now. {born} born, {died} died, {arrived} arrived, {left} left.',
     '{people} in the valley now — {born} born, {died} died, {arrived} arrived, {left} left since.',
@@ -1572,128 +1583,141 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   // building, a new peak of people, a decade or a century, a second stone
   // upgrade after the first. Same rules as the rest of §9.3: short, concrete,
   // no exclamation marks, the drama in the fact and not the prose.
+  // **En presente, y sin fecha.** Éste era el otro lado de «los mensajes entre
+  // eras son horrorosos», y no era la prosa: era el **tiempo verbal**. Un hito
+  // sale en pantalla en el instante en que pasa, y decía «the first house went
+  // up in the spring of year 4» —en pasado, y con la fecha que la cabecera ya
+  // está mostrando dos centímetros más arriba—. Era un libro de historia
+  // interrumpiendo a un jugador que está viendo ocurrir la cosa.
+  //
+  // Estas claves las lee **sólo** la cartela de §11.6, nunca la crónica (que
+  // tiene sus propias `built.*` en pasado, donde el pasado es lo correcto), así
+  // que aquí el presente no choca con nada. La fecha se quita entera: el año lo
+  // dice la cabecera y la estación también.
   'milestone.first_of_kind.house': [
-    'The first house went up in the {season} of year {year}.',
-    'There was a house standing by year {year}, the first the valley had raised.',
-    'They built their first house in the {season} of year {year}.',
+    'There is a house in the valley, the first anyone here has raised.',
+    'The first roof is up.',
+    'A house stands where there was grass.',
   ],
   'milestone.first_of_kind.field': [
-    'The first field was broken in the {season} of year {year}.',
-    'They ploughed their first field in year {year}.',
-    'There was a field in the valley by the end of year {year}, the first of it.',
+    'The first field is broken and sown.',
+    'There is ploughed ground in the valley now.',
+    'The first furrows are cut.',
   ],
   'milestone.first_of_kind.granary': [
-    'The village raised its first granary in the {season} of year {year}.',
-    'There was somewhere to keep the grain, for the first time, in year {year}.',
-    'They finished their first granary that {season}, year {year}.',
+    'There is somewhere to keep the grain now.',
+    'The first granary stands.',
+    'The grain has a roof over it now.',
   ],
   'milestone.first_of_kind.well': [
-    'They sank the valley’s first well in the {season} of year {year}.',
-    'Nobody had to carry from the river after year {year}: the first well was dug.',
-    'The first well was finished in year {year}.',
+    'The first well is dug. Nobody carries from the river.',
+    'There is water inside the village now.',
+    'The well is sunk, and the walk to the river is over.',
   ],
   'milestone.first_of_kind.chapel': [
-    'The valley raised its first chapel in the {season} of year {year}.',
-    'There had never been a chapel here before year {year}.',
-    'They finished the first chapel in year {year}, and had somewhere to pray.',
+    'There is a chapel — somewhere to pray that is not an open field.',
+    'The first chapel stands.',
+    'The valley has a chapel now.',
   ],
   'milestone.first_of_kind.smithy': [
-    'The forge was lit for the first time in the valley’s history, in the {season} of year {year}.',
-    'They had never had a smithy before year {year}.',
-    'The first smithy went up in year {year}.',
+    'The forge is lit for the first time.',
+    'There is a smith at work in the valley.',
+    'The first smithy stands, and the hammer carries.',
   ],
   'milestone.first_of_kind.mill': [
-    'The first mill turned in the {season} of year {year}.',
-    'They had never had a mill before year {year}.',
-    'The valley’s first mill was finished in year {year}.',
+    'The mill is turning.',
+    'The first mill stands over the water.',
+    'There is a mill now, and the grain goes further.',
   ],
   'milestone.first_of_kind.palisade': [
-    'The first length of palisade went up in the {season} of year {year}.',
-    'They began fencing themselves in, in year {year}.',
-    'There was no palisade before year {year}; that {season} the first stretch went up.',
+    'The first stretch of palisade is up.',
+    'There are stakes where there was open ground.',
+    'The valley is fenced, in part.',
   ],
   'milestone.first_of_kind.wall': [
-    'The valley set its first stone wall in the {season} of year {year}.',
-    'They had never built in stone against attack before year {year}.',
-    'The first length of wall went up in year {year}, where the palisade had been.',
+    'The first stone wall stands where the stakes did.',
+    'They are building in stone against attack now.',
+    'The first length of wall is set.',
   ],
   'milestone.first_of_kind.church': [
-    'The valley had its first church by the end of year {year}, where the chapel had stood.',
-    'They raised the first church in the {season} of year {year}.',
-    'There was a church, for the first time, in year {year}.',
+    'The chapel is a church now.',
+    'There is a church where the chapel stood.',
+    'The first church stands over the valley.',
   ],
   'milestone.first_of_kind.stone_house': [
-    'The first house in stone was raised in the {season} of year {year}.',
-    'A house that would not burn stood for the first time in year {year}.',
-    'They rebuilt a house in stone for the first time in the {season} of year {year}.',
+    'The first house in stone. It will not burn.',
+    'A house that fire cannot take now stands.',
+    'One roof is stone from here on.',
   ],
   'milestone.first_of_kind.watchtower': [
-    'The valley raised its first watchtower in the {season} of year {year}.',
-    'They had never watched the road from a tower before year {year}.',
-    'The first watchtower was finished in year {year}.',
+    'There is a tower watching the road.',
+    'The first watchtower stands.',
+    'Someone is above the valley now, watching.',
   ],
   'milestone.first_of_kind.grave_yard': [
-    'The valley walled off its first burying ground in the {season} of year {year}.',
-    'There had been no graveyard before year {year}.',
-    'They marked out the first graveyard in year {year}.',
+    'The dead have ground of their own now.',
+    'The first burying ground is walled off.',
+    'There is a graveyard in the valley.',
   ],
 
   'milestone.work_done.chapel': [
-    'Another chapel was finished in the {season} of year {year}.',
-    'They raised a further chapel in year {year}.',
-    'A further chapel stood by the end of year {year}.',
+    'A second chapel stands.',
+    'Another chapel is finished.',
+    'There is more than one chapel now.',
   ],
   'milestone.work_done.smithy': [
-    'Another smithy was finished in the {season} of year {year}.',
-    'They lit a further forge in year {year}.',
-    'A further smithy stood by the end of year {year}.',
+    'Another forge is lit.',
+    'A second smithy stands.',
+    'There is more than one hammer in the valley.',
   ],
   'milestone.work_done.well': [
-    'Another well was sunk in the {season} of year {year}.',
-    'They dug a further well in year {year}.',
-    'A further well stood by the end of year {year}.',
+    'Another well is dug.',
+    'A second well, and shorter walks with the buckets.',
+    'There is more water within reach.',
   ],
   'milestone.work_done.mill': [
-    'Another mill was finished in the {season} of year {year}.',
-    'They raised a further mill in year {year}.',
-    'A further mill stood by the end of year {year}.',
+    'Another mill is turning.',
+    'A second mill stands.',
+    'There is more than one mill now.',
   ],
   'milestone.work_done.church': [
-    'Another church was finished in the {season} of year {year}.',
-    'They raised a further church in year {year}.',
-    'A further church stood by the end of year {year}.',
+    'Another church is finished.',
+    'A second church stands.',
+    'There is more than one church in the valley.',
   ],
   'milestone.work_done.stone_house': [
-    'Another house was rebuilt in stone in the {season} of year {year}.',
-    'One more house would not burn, after the {season} of year {year}.',
-    'They put another house into stone in year {year}.',
+    'Another house is stone now. It will not burn.',
+    'One more roof out of the reach of fire.',
+    'A second house has been rebuilt in stone.',
   ],
   'milestone.work_done.watchtower': [
-    'Another watchtower was raised in the {season} of year {year}.',
-    'They finished another watchtower in year {year}.',
-    'One more tower over the valley, by the end of year {year}.',
+    'Another tower watches the valley.',
+    'A second watchtower stands.',
+    'There is one more tower over the road.',
   ],
   'milestone.work_done.grave_yard': [
-    'The burying ground was widened in the {season} of year {year}.',
-    'They walled off more ground for the dead in year {year}.',
-    'Another stretch of the graveyard was marked out that {season}.',
+    'The burying ground is wider now.',
+    'More ground has been walled off for the dead.',
+    'The graveyard has been widened.',
   ],
 
   'milestone.peak_people': [
-    'The valley had never held {people} people before, in year {year}.',
-    'By year {year} there were {people} in the valley, more than there had ever been.',
-    '{people} — the most the valley had ever counted, as of year {year}.',
+    '{people} in the valley. It has never held so many.',
+    'There have never been {people} here before.',
+    'The valley is {people} strong, and it has never been more.',
   ],
 
+  // `{years}` es una cuenta de años transcurridos, no un año absoluto, así que
+  // `render.ts` no le suma uno — y no debe sumárselo. Ver `ABSOLUTE_YEARS`.
   'milestone.turn_of_decade': [
-    'The valley had stood {years} years by year {year}.',
-    'Year {year} marked {years} years since the founding.',
-    '{years} years since they came over the ridge, as of year {year}.',
+    '{years} years since they came over the ridge.',
+    'The valley has stood {years} years.',
+    '{years} years, and the village is still here.',
   ],
   'milestone.turn_of_century': [
-    'A century since the founding, by year {year}.',
-    'The valley had stood a hundred years by year {year}.',
-    'Year {year}: a hundred years since they came over the ridge.',
+    'A hundred years since they came over the ridge.',
+    'The valley has stood a century.',
+    'A century, and the village is still here.',
   ],
 };
 
