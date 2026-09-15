@@ -47,9 +47,16 @@ const STYLE = `
 .crossroad-options button:focus-visible { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 2px; }
 .crossroad-label { display: block; color: var(--parchment, #f2e9d8);
   font: 600 16px/1.25 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-/* El precio no es una nota al pie: es la mitad de la decisión. */
+/* El precio no es una nota al pie: es la mitad de la decisión.
+   **Y no va en mayúsculas**, que era como estaba y se vio en una captura: «A
+   HUNDRED AND TWENTY OF GRAIN, AND SHE IS THIN» grita, y el precio de una
+   decisión no grita, se dice. El banco lo escribe en minúscula con su
+   mayúscula inicial (§9.3) y la hoja de estilo lo estaba reescribiendo. En
+   cursiva y en la misma serif de la crónica: es la voz de quien te vende la
+   vaca, no una etiqueta de sistema. */
 .crossroad-cost { display: block; margin-top: 5px; color: var(--gild-lit, #c9ab6b);
-  font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+  font: italic 13.5px/1.35 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif);
+  letter-spacing: .005em; }
 /* U-07 · la marca discreta de §11.2 pasaba por un punto rojo de 14 px que
    nadie lee como "lo mas importante que el juego tiene que pedirte". Misma
    piel que la regleta de velocidad y la barra de abajo (index.html,
@@ -64,7 +71,18 @@ const STYLE = `
   box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px); }
 .crossroad-marker:active { background: rgba(217,207,188,.55); transform: translateY(1px); }
 .crossroad-marker:focus-visible { outline: 2px solid var(--gild, #7d5c2e); outline-offset: 2px; }
-.crossroad-open .valley-speeds { visibility: hidden; }
+/* **La pantalla entera es de la decisión** (§11.2), y eso incluye la cabecera.
+   Se vio en una captura: la tira, las tres palancas y la línea de estado se
+   leían a través de la encrucijada —las tarjetas son translúcidas—, y ahí
+   arriba no hay nada que hacer mientras se contesta: las órdenes permanentes
+   valen para la semana que viene, no para esto. El aviso de §11.6 ya se
+   ocultaba por la misma razón (index.html). */
+.crossroad-open .valley-speeds,
+.crossroad-open .valley-vitals,
+.crossroad-open .valley-orders,
+.crossroad-open .valley-doing,
+.crossroad-open .valley-year,
+.crossroad-open .valley-season { visibility: hidden; }
 `;
 
 function ensureStyle(): void {
