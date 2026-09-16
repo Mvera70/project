@@ -242,8 +242,21 @@ describe('V-07 · escenas de dos', () => {
     // arriba («nadie salta... quien lo tiene de sobra sí») aísla la causa con
     // carácter controlado; ésta comprueba lo que de verdad se puede pedir a
     // aldeas reales: que varíen mucho, no que alguna llegue a cero.
+    //
+    // **Las seis semillas originales dejaron de servir.** Con el equilibrado
+    // de la densidad de sucesos (v3.78) la pareja fundadora se rompe más a
+    // menudo, y de `[36, 13, 25, 33, 24, 38]` sólo la 13 sigue llegando a los
+    // cuarenta años con quince habitantes o más (medido al cerrar C-1: 36 → 3,
+    // 25 → 0 abandonada, 33 → 10, 24 → 0 abandonada, 38 → 0 extinguida). La
+    // propiedad («varía mucho según quién vive ahí») no ha cambiado; lo que ya
+    // no vale es la lista fija de semillas que la ponía a prueba. Así que se
+    // amplía el muestreo —el mismo patrón que `villageWhere`, de más semillas
+    // a las primeras que cumplan— hasta reunir al menos cuatro aldeas reales,
+    // en vez de clavar seis concretas que hoy dan tres aldeas muertas.
+    const CANDIDATE_SEEDS = [36, 13, 25, 33, 24, 38, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14];
+    const MIN_VILLAGES = 4;
     const counts: number[] = [];
-    for (const seed of [36, 13, 25, 33, 24, 38]) {
+    for (const seed of CANDIDATE_SEEDS) {
       const life = createVillage(village(seed), 0);
       if (life.dwellers.length < 15) continue;
       const seen = new Set<Scene>();
@@ -258,8 +271,11 @@ describe('V-07 · escenas de dos', () => {
         }
       }
       counts.push(fights);
+      // Basta con reunir unas cuantas aldeas reales; no hace falta agotar la
+      // lista de candidatas si ya hay de sobra para comparar.
+      if (counts.length >= 8) break;
     }
-    expect(counts.length, 'no hubo bastantes aldeas que mirar').toBeGreaterThanOrEqual(4);
+    expect(counts.length, 'no hubo bastantes aldeas que mirar').toBeGreaterThanOrEqual(MIN_VILLAGES);
     const calmest = Math.min(...counts);
     const rowdiest = Math.max(...counts);
     expect(rowdiest, `de ${calmest} a ${rowdiest} empujones/peleas según la aldea`)

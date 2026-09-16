@@ -7,7 +7,7 @@
 // verdad, no sólo en el catálogo.
 
 import { describe, expect, it } from 'vitest';
-import { foundGame } from '@engine/found';
+import { foundTwenty } from '../helpers/founding';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
@@ -15,11 +15,17 @@ import { blockedAt } from '../../src/render3d/life/body';
 import { createVillage } from '../../src/render3d/life/village';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 
+// `foundGame` (la pareja) se rompe a menudo desde el equilibrado de la
+// densidad de sucesos (v3.78, `rework.md` §2.8 punto 4): tres de doce
+// semillas llegan extinguidas o abandonadas a los cuarenta años, y esta
+// familia de pruebas mide un mecanismo (la cabaña, el terreno), no la
+// fundación. Sigue la convención de `CLAUDE.md`: lo que mide una aldea hecha
+// se funda con `foundTwenty`.
 const grown = new Map<number, GameState>();
 function village(seed: number): GameState {
   let base = grown.get(seed);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, 40 * 48, 'prudent', CATALOG);
     grown.set(seed, base);
   }
@@ -79,52 +85,65 @@ describe('V-08 · los animales, iguales que la gente', () => {
     // un animal es una `Place` móvil que ofrece `pet`/`chase`/`feed`, y una
     // persona la elige exactamente igual que elegiría el pozo o el banco. Se
     // mide que eso pase, no que el catálogo lo permita.
-    // **Y se mide por semilla, no sumando.** Sumar deja pasar que una semilla
-    // entera no toque un animal en todo el día —la cuenta de otra la tapa— y
-    // eso es exactamente el defecto que se busca: bichos que existen pero que
-    // nadie puede alcanzar, o que pierden siempre la elección.
     //
-    // Medido, jornada entera: 3 → 39 bichos, 1 526 instantes, 25 personas
-    // distintas · 7 → 44, 4 895, 52 · 11 → 40, 3 757, 38 · 23 → 11, 1 411, 19 ·
-    // 31 → 19, 1 445, 18 · 37 → **1 bicho**, 199 instantes, 2 personas. Una
-    // aldea con un solo animal no puede dar mucho más que eso, y por eso el
-    // listón de cuánta gente participa sólo se le pide a las que tienen cabaña
-    // de verdad.
+    // **La medida de arriba (una jornada, por semilla) es de antes de la
+    // consolidación de IA-4**, que condicionó la reacción del animal a que la
+    // persona esté de verdad consumiendo `feed`/`pet`/`chase` — antes bastaba
+    // estar cerca y quieto, y el cerdo pasaba el 38 % de la jornada congelado
+    // por gente que rezaba a un metro. Medido después de ese cambio: las
+    // interacciones bajan de 402 a 6 en dos jornadas (`life-rounds/IA-4.md`).
+    // Es realista y queda pendiente de nivelado, pero exigir «una jornada, una
+    // semilla, siempre» convierte la ausencia en la norma: dos de las seis
+    // semillas canónicas se quedan en cero incluso mirando **cinco** jornadas
+    // seguidas (medido al cerrar C-1, 16 sep 2026):
+    //
+    //   semilla │ animales │ instantes en 5 jornadas │ personas
+    //        3  │    5     │           173           │    3
+    //        7  │   32     │         1 555           │   15
+    //       11  │   29     │             0           │    0
+    //       23  │    5     │           266           │    5
+    //       31  │    1     │             0            │    0
+    //       37  │    0     │             —            │    —
+    //
+    // El brief pide que **exista**, no que cada aldea la tenga — es la vía que
+    // el encargo de C-1 deja escrita: «que exista alguna en vez de una por
+    // semilla». Así que se mide sobre el conjunto de las seis semillas
+    // canónicas y cinco jornadas cada una, no semilla a semilla ni jornada a
+    // jornada.
     const seeds = [3, 7, 11, 23, 31, 37];
+    const DAYS = 5;
+    let totalInstants = 0;
+    const touched = new Set<string>();
+    let herds = 0;
     for (const seed of seeds) {
       const state = village(seed);
-      const life = createVillage(state, 0);
-      if (life.beasts.length === 0) continue;
-
-      let instants = 0;
-      const touched = new Set<number>();
-      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
-        life.step();
-        for (const dweller of life.dwellers) {
-          if (dweller.doing?.there === true
-            && ['pet', 'chase', 'feed'].includes(dweller.doing.offer.id)) {
-            instants += 1;
-            touched.add(dweller.body.id);
+      for (let day = 0; day < DAYS; day += 1) {
+        const life = createVillage(state, day);
+        if (life.beasts.length === 0) continue;
+        herds += 1;
+        for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+          life.step();
+          for (const dweller of life.dwellers) {
+            if (dweller.doing?.there === true
+              && ['pet', 'chase', 'feed'].includes(dweller.doing.offer.id)) {
+              totalInstants += 1;
+              touched.add(`${seed}:${dweller.body.id}`);
+            }
           }
         }
       }
-
-      expect(instants,
-        `semilla ${seed}: ${life.beasts.length} animales y nadie se acercó a ninguno`)
-        .toBeGreaterThan(0);
-      // Con cabaña de verdad, no puede ser cosa de dos vecinos raros. Lo peor
-      // medido con diez o más animales eran 18 personas distintas; con los
-      // trastos de V-09 puestos —otra oferta que compite por la misma gente—
-      // baja a 14 (3 → 16, 7 → 55, 11 → 36, 23 → 14, 31 → 16). Es el reparto
-      // esperado, no un fallo: el umbral se pone bajo lo peor medido con
-      // trastos, con el margen de un caso, y las dos tablas quedan aquí para
-      // que el próximo cambio de ofertas sepa contra qué se compara.
-      if (life.beasts.length >= 10) {
-        expect(touched.size,
-          `semilla ${seed}: sólo ${touched.size} personas tocaron un animal, con ${life.beasts.length} en la aldea`)
-          .toBeGreaterThanOrEqual(12);
-      }
     }
+
+    expect(herds, 'ninguna de las seis semillas tuvo cabaña en ningún día').toBeGreaterThan(0);
+    expect(totalInstants,
+      `${totalInstants} instantes de contacto persona-animal en 6 semillas × ${DAYS} jornadas`)
+      .toBeGreaterThan(0);
+    // El umbral se pone bajo lo peor medido (23 personas distintas sumando las
+    // seis semillas), con margen: sigue exigiendo que no sea cosa de un único
+    // vecino raro, sin fijar la cifra exacta de una medida que ya sabemos que
+    // se mueve con la trayectoria de cada valle.
+    expect(touched.size, `${touched.size} personas distintas tocaron un animal en total`)
+      .toBeGreaterThanOrEqual(10);
   });
 
   it('un animal se coloca junto a su casa o su campo, no en mitad de la nada', () => {

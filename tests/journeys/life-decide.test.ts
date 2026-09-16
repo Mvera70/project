@@ -9,7 +9,7 @@
 // no pasa siempre lo mismo, y que pasa por una razón**.
 
 import { describe, expect, it } from 'vitest';
-import { foundGame } from '@engine/found';
+import { foundTwenty } from '../helpers/founding';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { GameState } from '@engine/state';
@@ -20,11 +20,17 @@ import { freshNeeds } from '../../src/render3d/life/needs';
 import { OFFERS } from '../../src/render3d/life/offers';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 
+// `foundGame` (la pareja) se rompe a menudo desde el equilibrado de la
+// densidad de sucesos (v3.78, `rework.md` §2.8 punto 4): tres de doce
+// semillas llegan extinguidas o abandonadas a los cuarenta años, y esta
+// familia de pruebas mide un mecanismo (cómo elige la aldea), no la
+// fundación. Sigue la convención de `CLAUDE.md`: lo que mide una aldea hecha
+// se funda con `foundTwenty`.
 const grown = new Map<number, GameState>();
 function village(seed: number): GameState {
   let base = grown.get(seed);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, 40 * 48, 'prudent', CATALOG);
     grown.set(seed, base);
   }

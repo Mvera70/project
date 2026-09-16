@@ -24,7 +24,7 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | **C-1.3**, las once jornadas rojas, un agente de Sonnet sobre `tests/journeys/*` y nada más. **No tocar esos ficheros.** |
+| **En vuelo ahora** | nada. **C-1 está completa** salvo el punto 7, aplazado con motivo. Lo siguiente es UI-R1 |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
@@ -45,12 +45,12 @@ dependencias, no el de lo que apetece.
 |---|---|---|---|---|
 | 1 | ~~Aterrizar IA-5~~ **HECHO**. Y reclamó bien: las cuatro rojas de `graphics-effects.test.ts` que le mandé **no eran suyas**, lo comprobó revirtiendo sus ficheros y lo verifiqué yo con `git stash`. Pasan a ser el punto 8 | yo | — | **hecho** |
 | 2 | ~~V-15b · enganchar el renderer~~ **HECHO**. Y al hacerlo apareció un fallo que habría empeorado el juego: con un solo respaldo al base, **un jefe anciano perdía su malla de jefe**. Ahora es una **cadena** —anciano, luego jefe, luego base— y hay una prueba que exige que **con las mallas de hoy nadie cambie de figura**, barriendo las 294 combinaciones contra lo que daba la regla vieja | yo | — | **hecho** |
-| 3 | **Las nueve jornadas rojas** (`rework.md` §2.8). Ya se pueden tocar: la tanda de IA ha terminado y sus números están quietos | Sonnet | 1 y 2 | `npm run test:journeys` verde, o `it.fails` con la medida escrita y la propiedad intacta. **Sin bajar un solo listón sin motivo escrito** |
+| 3 | ~~Las jornadas rojas~~ **HECHO**: eran once, quedan **128 de 130** en 284 s. Siete eran deriva del fixture (la pareja se rompe desde v3.78: `foundTwenty`, y en `life-scenes` seis semillas fijas de las que sólo una seguía siendo aldea). Dos eran decisiones mías con la prueba vieja: el vado sin hora punta queda como excepción declarada, y la escena persona-animal se mide como **existencia agregada** sobre 5 jornadas × 6 semillas, porque la consolidación de IA-4 la hizo rara de verdad (dos semillas en cero). Un `it.fails` nuevo: la pelota en la semilla 11, la misma causa de siempre (`worth()` no sabe que jugar es barato) en otra semilla. **Dos rojas a propósito**: la de los catorce avisos (decisión del dueño, punto 10) y la de la palanca del bosque, que es el punto 0 de abajo | Sonnet | — | **hecho** |
 | 4 | ~~El trabajador de vitest que se cae~~ **HECHO, y era bueno**: no se reproduce. Dos pasadas completas de `tests/fast` en paralelo, sin flags, terminaron limpias. Se fue al mover las cuatro partidas largas a las jornadas. **Y de paso destapó la causa probable de las caídas pasadas:** no era ninguna prueba, era **contención por runs huérfanos** —encontró 29 procesos de una hora de antigüedad ocupando los 28 núcleos—. Si vuelve a aparecer, mirar los procesos antes de tocar un solo fichero de prueba | Sonnet | — | **hecho** |
 | 5 | ~~La demo~~ **HECHA**: publicada como **versión 15** en el artefacto de siempre, y secuencia de ocho fotogramas de la semilla 11 en el año 19 enviada al dueño (`artifacts/graphics/C-1/demo/`). **Mismo valle y misma semana que la captura de antes del equilibrado**, así que es un antes/después: 9 personas y ánimo 9 entonces, **15 y ánimo 55** ahora. Se ve la riña con su burbuja propia, terminando y soltándose cinco segundos después. Lo que sigue mal y se ve: el aviso pisando la pista de las órdenes (punto 10). Un 404 único en cada captura, el mismo desde la primera del proyecto, sin identificar porque el servidor no registra rutas; no es de esta tanda | yo | — | **hecho** |
 | 6 | **`main` al día** tras cada uno de los puntos anteriores, no al final | yo | cada punto | `git log -1 main` es el último tramo verde |
 | 8 | ~~Las cuatro rojas de `graphics-effects.test.ts`~~ **HECHAS**, y con un solo cambio: el fixture fundaba con la pareja y esas pruebas miden lo que el valle **enseña** —humo de fragua, luz de capilla, nivel del granero, vacas y peces—, así que necesitan una aldea que los tenga. Misma causa que las 42 de IA-0. Incluso la de «una señal dentro de un edificio», que parecía un fallo de colocación, era deriva del fixture | yo | — | **hecho** |
-| 7 | **El plazo vencido de las personas**, que está retirado con su medida (`IA-6.md` §4.3): falta poder descartar una plaza que ya falló. Entra si cabe; si no, se queda escrito donde está | yo | 3 | «parados con impulso ≥ 0,9» no empeora del 0,06 % |
+| 7 | ~~El plazo vencido de las personas~~ **aplazado con motivo**: no cabe en C-1 porque necesita la pieza que no existe —descartar una plaza que ya falló— y sin ella el arreglo **empeora** la cifra (0,06 → 0,20 %, medido y retirado en `IA-6.md` §4.3). Sigue como punto 1 de la lista abierta | yo | — | aplazado |
 
 **Lo que esta fase deja fuera a propósito**, para que no se cuele: R-3 (los diez
 rasgos), R-5b y R-6 (los datos que le faltan al motor), G-18 (Blender, que el
@@ -158,6 +158,23 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+0. **La palanca «apretar el bosque» hace lo contrario de lo que dice, y es el
+   verbo del juego.** Lo destapó C-1.3 al medir la jornada `intent.test.ts`,
+   que fallaba «al filo» (27 contra 28): **no es al filo, es sistemático**. Con
+   30 semillas, la postura «obra» (`timber: 0.05`) da 174 edificios contra 225
+   de la postura «leña» (`timber: 0.9`), y sólo 11 de 30 semillas cumplen la
+   propiedad por separado. La causa, mirada en las peores: **con «obra» la
+   aldea no libera manos para construir, se muere de hambre y de frío**
+   —población a 3–5, madera a 0— mientras «leña» sostiene 7–25 habitantes y
+   acumula miles de unidades. Una aldea que colapsa construye menos por
+   definición, y eso invierte la palanca. Es balance del motor, no un fixture,
+   y **es la más grave de esta lista** porque las tres órdenes permanentes son
+   lo que `CLAUDE.md` llama «el verbo del juego». El agente no tocó nada, que
+   es lo correcto. Queda roja en las jornadas hasta que se decida con el dueño:
+   o `timber: 0.05` no es una postura de referencia válida, o la subsistencia
+   no puede depender tanto de la leña. Ronda propia, medida, antes del rediseño
+   de interfaz o en paralelo con él, pero **no dentro de C-1**.
 
 1. **Falta poder descartar una plaza que ya falló.** Es la pieza que bloquea
    dos cosas a la vez. El plazo vencido de las personas (`village.ts`) tiene el

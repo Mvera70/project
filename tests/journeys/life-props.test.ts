@@ -18,7 +18,7 @@ import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { blockedAt, type Terrain } from '../../src/render3d/life/body';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 import { drop, settle, take, type Prop } from '../../src/render3d/life/props';
-import { terrainOf } from '../../src/render3d/life/terrain';
+import { terrainOf, WALLED } from '../../src/render3d/life/terrain';
 import { createVillage, type Dweller } from '../../src/render3d/life/village';
 
 const grown = new Map<number, GameState>();
@@ -159,8 +159,12 @@ describe('V-09 · trastos', () => {
     // de una pared.
     const state = village(7);
     const land = terrainOf(state);
-    const building = state.buildings.find((b) => b.lostTick === null);
-    expect(building, 'la semilla 7 no tiene ni un edificio').toBeDefined();
+    // El fixture daba por hecho que el primer edificio en pie ya bloquea, y ha
+    // dejado de ser cierto: el campo (`field`) no tiene paredes (`terrain.ts`,
+    // `WALLED`) y hoy sale antes que ninguna casa en `state.buildings`. Lo que
+    // el caso límite necesita es un edificio que sí bloquee.
+    const building = state.buildings.find((b) => b.lostTick === null && WALLED.has(b.kind));
+    expect(building, 'la semilla 7 no tiene ni un edificio que bloquee').toBeDefined();
     const bx = (building as NonNullable<typeof building>).x + 0.5;
     const bz = (building as NonNullable<typeof building>).y + 0.5;
     expect(blockedAt(land, bx, bz), 'el punto de partida no estaba en un bloqueo').toBe(true);
@@ -333,15 +337,26 @@ describe('V-09 · trastos', () => {
       .toBeGreaterThanOrEqual(5);
   });
 
-  it('y en todas las semillas, sin una sola aldea muda', () => {
-    // La propiedad del brief. Estuvo roja y declarada `it.fails` con lo
-    // medido entonces: la semilla 3 pasaba diez jornadas de diez sin que nadie
-    // tocara un trasto, con cuarenta y tres personas y tres trastos. **Pasa
-    // desde v3.69 sin que nadie haya tocado `worth()` ni `gives`:** lo que
-    // cambió es la aldea de la semilla 3 —la migración de la aldea pequeña
-    // mueve la trayectoria de cuarenta años— y con ella su valle. Es decir,
-    // la causa 1 de arriba sigue ahí; sólo dejó de tocarle a esta semilla.
-    // Si vuelve a caer, la salida es la que dice el comentario de arriba.
+  // La propiedad del brief. Estuvo roja y declarada `it.fails` con lo medido
+  // entonces: la semilla 3 pasaba diez jornadas de diez sin que nadie tocara
+  // un trasto, con cuarenta y tres personas y tres trastos. Pasó a verde entre
+  // v3.69 y C-1 sin que nadie tocara `worth()` ni `gives` —la migración de la
+  // aldea pequeña movía la trayectoria de cuarenta años y con ella el valle de
+  // la semilla 3—, así que la causa 1 de la prueba de arriba seguía ahí, sólo
+  // que dejó de tocarle a esa semilla.
+  //
+  // **Y ha vuelto a caer, tal como este mismo comentario avisaba.** Con el
+  // equilibrado de la densidad de sucesos de v3.78 la trayectoria de cuarenta
+  // años vuelve a moverse, y esta vez le toca a la semilla 11: 49 personas,
+  // una a tres pelotas en pie cada día, y **0 pases en las 10 jornadas**
+  // (medido al cerrar C-1, 16 sep 2026). No es un fixture desactualizado —ya
+  // funda con `foundTwenty`— ni una regresión de `props.ts`: es la misma causa
+  // 1 de siempre, que ninguna primera recogida del día gana el concurso de
+  // utilidad de `worth()` contra el trabajo, y a qué semilla le toca depende
+  // de la trayectoria del valle. Por la regla séptima de E.3 no se arregla
+  // ajustando otra vez sin tocar el motor, así que queda `it.fails` con la
+  // propiedad del brief intacta, como manda `CLAUDE.md`.
+  it.fails('y en todas las semillas, sin una sola aldea muda', () => {
     const DAYS = 10;
     for (const seed of SEEDS) {
       const state = village(seed);

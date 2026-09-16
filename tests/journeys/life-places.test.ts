@@ -189,6 +189,18 @@ describe('V-10 · sitios con vida', () => {
 
     for (const place of common) {
       for (const offer of place.offers) {
+        // La excepción, a propósito y no un olvido: `ford:crossing/drink` no
+        // tiene hora de punta desde IA-1. Antes toda la aldea bebía en un
+        // único pozo de dos plazas y se medía gente de pie con la sed al
+        // máximo; el vado se abrió sin hora porque al río se va cuando se
+        // tiene sed, no a una hora del día — ponerle una habría reintroducido
+        // el mismo síntoma por otra vía. Lo que esta prueba vigila es que
+        // **la excepción no crezca sin que alguien la escriba aquí**.
+        if (place.id === 'ford:crossing' && offer.id === 'drink') {
+          expect(offer.hours, `${place.id}/${offer.id}: sigue sin horas, a propósito`)
+            .toBeUndefined();
+          continue;
+        }
         // Los sitios comunes tienen horas de punta.
         expect(offer.hours, `${place.id}/${offer.id}: tiene horas`).toBeDefined();
         if (offer.hours !== undefined) {
