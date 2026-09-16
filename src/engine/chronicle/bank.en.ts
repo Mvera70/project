@@ -1867,6 +1867,9 @@ export const UI_BANK: Record<string, string> = {
   // UI-R1 · la bandeja de la carcasa (`src/ui/redesign/shell.ts`): una región
   // etiquetada, no un diálogo, así que necesita su propio nombre accesible.
   'app.sheet': 'Details',
+  // UI-V1 · el círculo ▶/⏸ de la piel (plan-piel.md §3.1) necesita las dos
+  // etiquetas: qué va a pasar si se toca, no lo que está pasando ahora.
+  'app.speed.resume': 'Resume',
   'app.vitals': 'The village at a glance',
   'app.vitals.people': '{count} villagers',
   'app.vitals.food': 'Food for {weeks} weeks',

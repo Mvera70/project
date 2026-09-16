@@ -466,4 +466,270 @@
 @media (prefers-reduced-motion: reduce) {
   .skin-button--wood:active,
   .skin-button--parchment:active { transform: none; }
+  .hud-round-btn:active { transform: none; }
+}
+
+/* --------------------------------------------------------------- la HUD */
+/* UI-V1 · la cabecera del valle, plan-piel.md §3.1 y la primera fila de §3.2.
+   `hud.ts` es la única mano que escribe aquí (plan §5). `index.html` (U-01)
+   sigue posicionando `.valley-time`, `.valley-date`, `.valley-vitals`,
+   `.valley-vital` y `.valley-speed-badge` con su piel de antes de esta ronda
+   —no se toca en UI-V1—, así que cada uno de esos elementos lleva una
+   **segunda clase propia** (`.hud-date-text`, `.hud-clock-sr`,
+   `.hud-chips-row`, `.skin-plate--chip`/`.hud-figure`, `.hud-round-btn`) y las
+   reglas de abajo la combinan con la de siempre: dos clases en el selector
+   pesan más que una sin importar en qué orden cargue cada hoja, así que la
+   piel nueva gana siempre, venga `index.html` antes o después en el documento
+   final. La única excepción es `.valley-vital + .valley-vital` (un
+   combinador entre dos clases, mismo peso que la nuestra): ahí hace falta
+   `!important`, marcado abajo con el motivo.
+
+   **Y una segunda trampa, cazada con la primera captura.** `hud.ts` apaga la
+   cabecera del valle o la compacta con el atributo `hidden` (`paint`, según
+   la ruta). El navegador sólo respeta ese atributo con `display: none` desde
+   una regla del UA sin especificidad; en cuanto una hoja de autor pone
+   `display: flex` sin condición en el mismo elemento —lo que hacen
+   `.hud-plate-date`, `.valley-vitals.hud-chips-row` y `.hud-compact-header`,
+   las tres de abajo—, esa regla gana y `hidden` deja de ocultar nada: las dos
+   cabeceras se pintaban una encima de otra, fecha a dos líneas incluida.
+   Cada bloque lleva su propio `&[hidden] { display: none; }` para que el
+   atributo siga mandando. */
+
+/** La hora sigue existiendo —U-12, la sigue leyendo `tools/valley.pwa.ts` y
+    `tools/valley.shots.ts`— pero el prototipo no dibuja un reloj digital,
+    sólo el arco del sol: se oculta visualmente sin quitarla del documento
+    (patrón «sr-only»), que es lo que un lector de pantalla necesita para
+    seguir anunciándola. */
+.valley-time.hud-clock-sr {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/** La placa de fecha (plan §3.1): x 27–361, y 16–50, alto 34. */
+.hud-plate-date {
+  position: absolute;
+  z-index: 2;
+  left: 27px;
+  top: 16px;
+  width: 334px;
+  height: 34px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 16px;
+}
+/* El atributo `hidden` (`hud.ts`, `paint`) sólo apaga esto si nadie más ha
+   puesto `display` sin condición encima — ver la nota de arriba. */
+.hud-plate-date[hidden] { display: none; }
+.valley-date.hud-date-text {
+  position: static;
+  top: auto;
+  left: auto;
+  margin: 0;
+  color: var(--skin-ink-faded);
+  font-size: var(--skin-text-inscription);
+  text-shadow: none;
+  font-variant-caps: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/** El arco del sol, `sunArcPoint` en `hud.ts`: 90 de ancho, el punto es el sol. */
+.hud-sun-arc {
+  width: 90px;
+  height: 28px;
+  flex: 0 0 auto;
+  display: block;
+  overflow: visible;
+}
+.hud-sun-arc-track {
+  fill: none;
+  stroke: var(--skin-gold);
+  stroke-width: 1;
+  opacity: .5;
+}
+.hud-sun-arc-dot {
+  fill: var(--skin-gold);
+}
+
+/** Las cuatro cifras, en su fila de chips (plan §3.1): y 57–90, desde x 43. */
+.valley-vitals.hud-chips-row {
+  position: absolute;
+  z-index: 2;
+  left: 43px;
+  top: 57px;
+  width: 318px;
+  height: 33px;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.valley-vitals.hud-chips-row[hidden] { display: none; }
+.valley-vital.skin-plate--chip {
+  position: static;
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  /* `.valley-vital + .valley-vital` (index.html) empata en especificidad:
+     sin esto, el filete viejo entre chips sobrevive a la piel nueva. */
+  border-left: 0 !important;
+  color: var(--skin-ink-soft);
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  font-size: var(--skin-text-figure);
+  font-variant-numeric: tabular-nums;
+}
+.valley-vital.skin-plate--chip.thin { color: var(--ui-alarm); }
+.valley-vital.skin-plate--chip .skin-icon { width: 16px; height: 16px; }
+.valley-vital.skin-plate--chip b { font-weight: 600; }
+
+/** La misma cifra, sin chip, para la cabecera compacta de la crónica. */
+.valley-vital.hud-figure {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 4px;
+  border-left: 0 !important;
+  color: var(--skin-ink-soft);
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.valley-vital.hud-figure.thin { color: var(--ui-alarm); }
+.valley-vital.hud-figure .skin-icon { width: 16px; height: 16px; }
+
+/** La cabecera compacta de la crónica (plan §3.2, primera fila): dos placas,
+    x 27–170 la fecha (con el sol a la izquierda) y x 178–361 las cifras. */
+.hud-compact-header {
+  position: absolute;
+  z-index: 2;
+  left: 27px;
+  top: 16px;
+  width: 334px;
+  height: 50px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.hud-compact-header[hidden] { display: none; }
+.hud-compact-date {
+  flex: 0 0 143px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+.hud-compact-date .skin-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--skin-gold);
+}
+.hud-compact-date-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  color: var(--skin-ink-faded);
+}
+.hud-compact-date-text > * {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hud-compact-figures-plate {
+  flex: 1 1 183px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+.hud-compact-figures {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+.hud-compact-figures .skin-rule-v { height: 16px; flex: 0 0 auto; }
+
+/** Los dos círculos de velocidad (plan §3.1): ⌀ 40 dibujados, en un blanco
+    táctil de 44 (`--ui-tap-min`, §11.7/§6.4 del plan): el relleno de la
+    piel se recorta al recuadro de contenido (`background-clip`) y dentro
+    queda un círculo de 40, mientras el botón entero —también 44 de alto y
+    ancho— sigue siendo lo que el dedo puede tocar. Ni se rebaja el tacto por
+    el pixel del prototipo, ni se agranda el dibujo por la regla de toque. */
+.hud-speed-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hud-round-btn {
+  width: var(--ui-tap-min);
+  height: var(--ui-tap-min);
+  min-width: var(--ui-tap-min);
+  min-height: var(--ui-tap-min);
+  box-sizing: border-box;
+  padding: 2px;
+  border: 0;
+  border-radius: 50%;
+  background-clip: content-box;
+  display: grid;
+  place-items: center;
+  color: var(--skin-ink-soft);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hud-round-btn svg { display: block; }
+.valley-speed-badge.hud-round-btn {
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.hud-round-btn:active { transform: translateY(1px); }
+.hud-round-btn:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+
+/** La fila de chips (y 57–90) es más alta que la tira estrecha que había antes
+    de esta ronda, y `.valley-doing`/`.valley-orders-now` (`index.html`) se
+    quedaron en el sitio de la tira vieja: sin mover, la frase de estado
+    pisaba los chips. El prototipo pone esa frase junto a la bandeja (§3.1,
+    y 738) — sitio de UI-V2, no de esta ronda —, así que esto es un empujón
+    de altura para no dejar el valle roto mientras tanto, no una pieza de la
+    piel: cuando la bandeja baje la frase del todo, este ajuste sobra. */
+.valley-doing.hud-doing-line {
+  top: calc(max(7px, env(safe-area-inset-top)) + 98px);
+}
+.valley-orders-now.hud-orders-line {
+  top: calc(max(7px, env(safe-area-inset-top)) + 116px);
 }
