@@ -17,6 +17,7 @@ import {
 } from 'three';
 import type { BuildingId, BuildingKind } from '@engine/state';
 import type { PlannedBuilding } from './plan';
+import { buildDefence } from './defences';
 
 /**
  * A four-sided pyramid over a `w × h` footprint, `rise` tall.
@@ -109,6 +110,7 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
  * lo que tiene que leerse es que ya no es una casa.
  */
 export function buildFromAsset(planned: PlannedBuilding, source: Object3D): BuildingModel {
+  if (!planned.ruin && planned.connections !== undefined) return buildDefence(planned, source);
   const group = new Group();
   group.name = `Building_${planned.id}`;
   // **El fondo de la huella se suma a la Z, y esto es un arreglo, no un ajuste.**

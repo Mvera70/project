@@ -17,6 +17,7 @@ import { TIME } from '@engine/balance';
 import { SEASONS, clockOf, weekOf } from '@engine/time';
 import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
+import { defenceConnections } from './defences';
 
 export interface PlannedBuilding {
   readonly id: BuildingId;
@@ -41,6 +42,8 @@ export interface PlannedBuilding {
    * y sólo ese la semana de la siega.
    */
   readonly asset: string | null;
+  /** Vecinos cardinales de una defensa viva; ausente en los demás edificios. */
+  readonly connections?: number;
 }
 
 export interface ScenePlan {
@@ -154,10 +157,13 @@ function plannedFrom(building: Building, tick: number): PlannedBuilding {
 }
 
 export function planFor(state: GameState): ScenePlan {
+  const connections = defenceConnections(state.buildings);
   return {
     game: `${state.seed}:${state.terrainSeed}`,
     ground: groundSignature(state.map, state.tick),
-    buildings: state.buildings.map((building) => plannedFrom(building, state.tick))
+    buildings: state.buildings.map((building) => ({ ...plannedFrom(building, state.tick),
+      ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
+    }))
       .sort((a, b) => a.id - b.id),
   };
 }
@@ -166,7 +172,7 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
   return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
     && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
-    && a.asset === b.asset;
+    && a.asset === b.asset && a.connections === b.connections;
 }
 
 /**
