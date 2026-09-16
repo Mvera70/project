@@ -58,6 +58,15 @@ export const VILLAGER_BY_ROLE: Readonly<Record<Exclude<Role, 'stranger'>, string
 export const BASE_VILLAGER = 'villager';
 
 /**
+ * La figura del forastero, que **no es un oficio** aunque el motor lo guarde en
+ * `role`: es «sin oficio todavía». Por eso no está en `VILLAGER_BY_ROLE` y entra
+ * aquí, como los tipos que se eligen por lo que se hace. Es la figura que más
+ * se nota en un valle —un desconocido entre conocidos— y mientras el taller no
+ * la entregue, cae al base como siempre.
+ */
+export const STRANGER_VILLAGER = 'villager-stranger';
+
+/**
  * **Todos los nombres que la cadena puede pedir**, incluidos los que el taller
  * todavía no ha entregado.
  *
@@ -73,7 +82,7 @@ export const BASE_VILLAGER = 'villager';
 export const VILLAGER_MODELS: readonly string[] = [
   BASE_VILLAGER,
   ...Object.values(VILLAGER_BY_ROLE),
-  'villager-child', 'villager-elder',
+  'villager-child', 'villager-elder', STRANGER_VILLAGER,
   'villager-farmer', 'villager-woodcutter', 'villager-mason', 'villager-shepherd', 'villager-fisher',
 ];
 
@@ -152,9 +161,8 @@ export function modelChainFor(actor: Actor): readonly string[] {
   if (actor.age < CHILD_UNDER) chain.push('villager-child');
   else if (actor.age > ELDER_OVER) chain.push('villager-elder');
 
-  if (actor.role !== null && actor.role !== 'stranger') {
-    chain.push(VILLAGER_BY_ROLE[actor.role]);
-  }
+  if (actor.role === 'stranger') chain.push(STRANGER_VILLAGER);
+  else if (actor.role !== null) chain.push(VILLAGER_BY_ROLE[actor.role]);
 
   switch (actor.occupation) {
     case 'field': chain.push('villager-farmer'); break;
