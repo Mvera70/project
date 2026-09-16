@@ -73,7 +73,7 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 |---|---|---|
 | Título | **The Valley** | El contenido va en inglés; el título acompaña |
 | Evolución gráfica | **3D estilizado con cámara ortográfica, y es el juego** desde G-12 (14 sep 2026); Anexo D | Se validó por rondas —belleza, animación, legibilidad— conservando motor y guardados. El coste móvil sigue **sin medir en un dispositivo real**, y el riesgo se aceptó por escrito al migrar (`docs/roadmap.md`) |
-| Render 2D | **Se queda como puerta de vuelta**, en `?render=canvas` | Todo lo medido de rendimiento es de un portátil. Borrarlo es el paso irreversible y no se da hasta que alguien abra el juego en un teléfono |
+| Render 2D | **Se queda como puerta de vuelta**, en `?render=canvas` | **La condición que justificaba esta fila ya se cumplió** (UI-R0, 16 sep 2026): el dueño del diseño abrió el juego en su iPad y su iPhone el 15 sep y funciona. Lo que sigue sin existir es una medida de fotogramas en dispositivo, así que la puerta se queda **por si acaso y no porque haga falta**, y borrarla dejó de ser un paso bloqueado: es una decisión suya cuando quiera tomarla |
 | Vida del valle | Una capa de agentes deterministas y efímera entre motor y render; Anexo E | El render dibujaba una fórmula del tiempo y por eso nadie podía chocar, perseguir ni encontrarse; una capa que simula cuerpos con paso fijo lo da, sin escribir en el motor ni romper partidas |
 | Producción de arte | Fuentes reproducibles, Blender por scripts y revisión en el navegador | Permitir iteración y revisión remotas sin depender de operaciones manuales en el escritorio |
 | Idioma del contenido | Inglés (crónica, UI, nombres, topónimos) | Decisión de producto |
@@ -2432,7 +2432,23 @@ la pantalla del valle sigue sin tener más controles que la velocidad.
 
 ### 11.2 Pantallas
 
-Cinco en la partida, y una antes de ella.
+Cinco en la partida, y una antes de ella. **Y dos de esas cinco no son rutas,
+son superposiciones**, que es la distinción que el rediseño de interfaz obligó a
+escribir (UI-R0, 16 sep 2026): hasta entonces la lista de abajo mezclaba las dos
+cosas y una carcasa de navegación no se puede construir sobre una lista así.
+
+- **Rutas**, lo que la bandeja enseña y entre lo que se navega: **el valle**, la
+  **crónica**, la **gente** (U-08, que esta lista no contaba y existe desde
+  entonces), la **ficha** y las **órdenes** (v2.0, tres palancas permanentes).
+  Son las cinco de `SheetRoute` en `src/ui/redesign/contracts.ts`.
+- **Superposiciones**, que no son rutas porque no se navega a ellas ni se sale
+  de ellas al valle por la barra: la **encrucijada**, que ocupa la pantalla
+  entera y manda sobre cualquier ruta (punto 3 de abajo), y el **epitafio**, que
+  sólo existe cuando la aldea ha terminado (punto 5).
+
+**Y de toda ruta se sale, siempre** (U-14, v3.73, pedido por el dueño del
+diseño: «no hay forma de volver atrás»). No es una anécdota de una ronda: es la
+regla, y cualquier panel nuevo la cumple o está roto.
 
 **0. El menú de inicio** (U-10, v3.70). Lo pidió el dueño del diseño el 15 sep
 2026 con la premisa del juego: la gracia es **comparar valles**, así que lo
