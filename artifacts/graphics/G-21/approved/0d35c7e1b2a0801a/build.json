@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "granary",
+  "runId": "2026-09-16T17-46-45-051Z-43184",
+  "recipe": "art/recipes/granary/granary.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11811,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/candidate/granary.blend",
+      "bytes": 107019,
+      "sha256": "52B86C9DDE72B3FBFB362968B9B8D0458E523F924AE679A7FD9A4DBDF99952B6"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/candidate/granary.glb",
+      "bytes": 89972,
+      "sha256": "0D35C7E1B2A0801A963F15CEB634D76A020B53506422BC80725B26FE0162283A"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/candidate/granary-blender.png",
+      "bytes": 482001,
+      "sha256": "B8D367660A040E0CE67AD0366DD0CBDDFC1CBBED138865EBFB854435A5853ADC"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/blender.log",
+      "bytes": 1368,
+      "sha256": "D973E30A7E6C915B4F64E64E34E37F1FEC517F1DE44550D9C937CD6E30EEF0A4"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/temporary/resolved-recipe.json",
+      "bytes": 39193,
+      "sha256": "F8128E632BABD87E38C05F44DC83828EBFF64D8FFF09BE4A3E1DE126EA8358AA"
+    }
+  }
+}

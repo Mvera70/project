@@ -525,60 +525,61 @@
     },
     {
       "id": "granary",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/granary/granary.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-04-24-036Z-40080",
-        "directory": "artifacts/graphics/G-10/approved/4ca8f8ef337ef8eb"
+        "runId": "2026-09-16T17-46-45-051Z-43184",
+        "directory": "artifacts/graphics/G-21/approved/0d35c7e1b2a0801a"
       },
       "bounds": {
         "min": [
-          0.033333,
+          0.015,
           0,
-          -1.966667
+          -1.983333
         ],
         "max": [
-          1.966667,
-          1.733333,
-          -0.033333
+          1.985,
+          1.765,
+          0
         ],
         "size": [
-          1.933333,
-          1.733333,
-          1.933333
+          1.97,
+          1.765,
+          1.983333
         ]
       },
-      "recipeSha256": "9EAB19A7E96E0A3C94E84C424ECEC629959AA75C39A2C65324C867938196D0F0",
+      "recipeSha256": "AF6C5A087B3CBB4BE00C032A901460FE692E311A908BCF08E50B12E12A75CA5B",
       "materials": [
         "wood",
         "roof",
-        "grain"
+        "frame",
+        "stone"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 112
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1220
       },
       "hashes": {
-        "granary.blend": "11CBA6A6B308189A46342257857CDDAB03D67A63B85717B6D609BEC729544BF9",
-        "granary.glb": "4CA8F8EF337EF8EB7BF88A05DF2C778CE1328AAAEBF53200BDD0A9A9966BD8AD",
-        "granary-blender.png": "1412EDDF549B342ADAECDC24EEA76936B37CA4A4C0C2CE990001D22DC6472968",
-        "capture-1.png": "C4AC4857919EE73157D58BF4FA9071F56286DFAE91650997F97E2972AA095814",
-        "capture-1-gray.png": "9FD6B621CC0BB5CBC78AA8912DC548511A8C1648485DE5571577FB0E5D0DBD58",
-        "capture.json": "CF2C3A54C79314371E6CAED46C7EF5D6D286DAA315C32AB3DFF216619750A0C3",
-        "build.json": "BCB027711A58B996E0EC3D3D163C927D0FA11E53DA6381B2D44CE304D3A0E12F",
-        "validation.json": "43DE4265076C85B4A28B75F833FCC7C9AC64740B7ED52BE1BA8C357CCE04578E"
+        "granary.blend": "52B86C9DDE72B3FBFB362968B9B8D0458E523F924AE679A7FD9A4DBDF99952B6",
+        "granary.glb": "0D35C7E1B2A0801A963F15CEB634D76A020B53506422BC80725B26FE0162283A",
+        "granary-blender.png": "B8D367660A040E0CE67AD0366DD0CBDDFC1CBBED138865EBFB854435A5853ADC",
+        "capture-1.png": "7C0EC72E8E13552F1E48566E973687211FDFD50065A259A3D83CA783BFEBEB87",
+        "capture-1-gray.png": "794B7146B1D1778B925590519348F64BAF1171C4EFB128A698E66508C9171381",
+        "capture.json": "EC1CE626BA4067E7EBC4CC8AA33F33CBF4AF1DE8C94BE0BD14C9104B0D1C533E",
+        "build.json": "FE176C2104122966E184CA70FF5EF011BAF84E090819394CCBF49A4279BEB674",
+        "validation.json": "63D5A498950BCABD8F0B82F2852812C3DD17348A3F89B2102D193E3BAB098CD6"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original granary authored for The Valley G-10",
+        "source": "Original G-21: granero elevado de madera, portón doble y cubierta de paja.",
         "license": "Project original"
       }
     },

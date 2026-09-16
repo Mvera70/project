@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T17:22:46.938Z",
+  "generatedAt": "2026-09-16T17:47:15.841Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -73,7 +73,7 @@
     {
       "id": "granary",
       "file": "granary.glb",
-      "sha256": "4CA8F8EF337EF8EB7BF88A05DF2C778CE1328AAAEBF53200BDD0A9A9966BD8AD",
+      "sha256": "0D35C7E1B2A0801A963F15CEB634D76A020B53506422BC80725B26FE0162283A",
       "motion": []
     },
     {

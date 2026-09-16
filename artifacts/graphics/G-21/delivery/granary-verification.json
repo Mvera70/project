@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "granary",
+  "statistics": {
+    "objects": 5,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 1220
+  },
+  "bounds": {
+    "min": [
+      0.015,
+      0,
+      -1.983333
+    ],
+    "max": [
+      1.985,
+      1.765,
+      0
+    ],
+    "size": [
+      1.97,
+      1.765,
+      1.983333
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T17-46-45-051Z-43184",
+    "directory": "artifacts/graphics/G-21/approved/0d35c7e1b2a0801a"
+  },
+  "sha256": "0D35C7E1B2A0801A963F15CEB634D76A020B53506422BC80725B26FE0162283A",
+  "otherPublishedFilesUnchanged": true
+}
