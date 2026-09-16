@@ -17,13 +17,14 @@ import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save'
 import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, Intent, SaveFile } from '@engine/state';
 import { createHud } from './redesign/hud';
+import { createInspectPanel } from './redesign/inspect-panel';
 import { ordersPanel } from './redesign/orders';
+import { peoplePanel } from './redesign/people-panel';
 import { createShell, resolveMessageSlot } from './redesign/shell';
-import type { SheetRoute, UiActions, UiSnapshot } from './redesign/contracts';
+import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
-import { panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
@@ -33,7 +34,6 @@ import { mountNotices } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
-import { closePeople, openPeople } from './screens/people';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, ambientFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
@@ -188,19 +188,29 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * — el cuerpo de una función no se ejecuta hasta que se llama.
    */
   let currentRoute: SheetRoute = { kind: 'valley' };
+  // UI-R4 · la ficha es el único panel que se crea de nuevo en cada
+  // navegación (lleva un `target` distinto cada vez, a diferencia de
+  // `orders`/`people`, que son la misma instancia siempre) — `mountedInspect`
+  // es la referencia a la que hay que avisar antes de sustituirla, para que
+  // `dispose()` cancele el seguimiento que ella misma pudiera haber empezado
+  // (§2.5: «cerrar la ficha termina el seguimiento iniciado desde ella»).
+  let mountedInspect: UiPanel | null = null;
   function navigate(route: SheetRoute): void {
     currentRoute = route;
     // S-05, U-14 · crónica, gente, ficha y órdenes no coexisten: la ruta que
     // llega cierra a las demás antes de abrirse, y siempre a través de este
     // único punto — nunca dentro de un manejador suelto.
     closeChronicle();
-    closePeople();
-    closePanel();
-    // UI-R2 · la hoja de órdenes vive de verdad en `shell.content` desde esta
-    // ronda (antes era un `<section>` suelto anclado a `bottom: 0`, por debajo
-    // de la barra — el defecto §3.5 del informe de UI-R1, con «Build first»
-    // cortado tras la navegación nueva). Vaciar la bandeja en cada navegación
-    // es lo que impide que se quede pegada al abrir otra cosa justo después.
+    mountedInspect?.dispose();
+    mountedInspect = null;
+    // UI-R2/UI-R4 · la hoja de órdenes, la lista de gente y la ficha viven de
+    // verdad en `shell.content` desde estas rondas (antes de UI-R2 la hoja de
+    // órdenes era un `<section>` suelto anclado a `bottom: 0`, por debajo de
+    // la barra — el defecto §3.5 del informe de UI-R1, con «Build first»
+    // cortado tras la navegación nueva; antes de UI-R4 la gente y la ficha
+    // vivían cada una en su propio velo o panel suelto). Vaciar la bandeja en
+    // cada navegación es lo que impide que se quede pegada al abrir otra cosa
+    // justo después.
     shell.content.replaceChildren();
     shell.setRoute(route);
     if (route.kind === 'chronicle') {
@@ -223,11 +233,24 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       shell.content.append(chronicle.element);
       chronicle.update(snapshot());
     } else if (route.kind === 'people') {
-      // U-08 · la pantalla de la gente: la lista de los nombrados vivos y,
-      // al tocar uno, su ficha (`src/ui/screens/people.ts`).
-      openPeople(app, () => navigate({ kind: 'valley' }));
+      // U-08/UI-R4 · la lista de los nombrados presentes; tocar uno abre su
+      // ficha por la misma ruta `inspect` que el valle (`redesign/
+      // people-panel.ts`).
+      shell.content.append(people.element);
+      people.update(snapshot());
+      // `contentRouteFor` (`shell.ts`, congelado durante esta ronda: UI-R3
+      // trabaja en paralelo sobre el mismo contrato) todavía sólo conoce
+      // 'orders' e 'inspect', así que `shell.setRoute` de arriba dejó la
+      // bandeja oculta para 'people'. Se fuerza su visibilidad leyendo el DOM
+      // de la carcasa por su clase estable — el mismo camino que ya usa
+      // `messageSlot` más abajo para la ranura del aviso — sin tocar
+      // `shell.ts`. Documentado en `docs/ui-redesign/rounds/UI-R4.md`.
+      sheetContent.hidden = false;
     } else if (route.kind === 'inspect') {
-      showPanel(route.target);
+      const inspect = createInspectPanel(actions, route.target, route.from);
+      mountedInspect = inspect;
+      shell.content.append(inspect.element);
+      inspect.update(snapshot());
     } else if (route.kind === 'orders') {
       // `shell.content` ya ha quedado vacía arriba: es seguro montar aquí.
       shell.content.append(orders.element);
@@ -263,17 +286,22 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     },
     track(id): void { renderer.track(id); },
   };
-  // UI-R2 · `hud.ts` cría la hora, la fecha, la tira, la frase de estado y el
-  // resumen/acceso a las órdenes; `orders.ts` la hoja de las tres palancas,
-  // migrada a `shell.content` (ver el comentario de `navigate`, arriba).
-  // Ninguno de los dos conoce `state` por sí mismo: `hud.paint`/`orders.
-  // update` lo reciben en cada llamada, nunca lo capturan por su cuenta.
+  // UI-R2/UI-R4 · `hud.ts` cría la hora, la fecha, la tira, la frase de estado
+  // y el resumen/acceso a las órdenes; `orders.ts` la hoja de las tres
+  // palancas y `people-panel.ts` la lista de la gente, las dos migradas a
+  // `shell.content` (ver el comentario de `navigate`, arriba). Ninguno de los
+  // tres conoce `state` por sí mismo: `hud.paint`/`orders.update`/`people.
+  // update` lo reciben en cada llamada, nunca lo capturan por su cuenta. La
+  // ficha (`inspect-panel.ts`) es la excepción: se crea de nuevo por cada
+  // navegación porque lleva un `target` distinto cada vez (ver `navigate`).
   const hud = createHud(actions, () => currentRoute);
   const orders = ordersPanel(actions);
-  // UI-R3 · la crónica, migrada a `shell.content` (ver el comentario de
-  // `navigate`, arriba). Igual que `orders`: se crea una vez y su `element`
-  // se monta/desmonta de la bandeja en cada navegación.
+  // UI-R3/UI-R4 · la crónica y la lista de la gente, migradas a
+  // `shell.content` (ver el comentario de `navigate`, arriba). Igual que
+  // `orders`: se crean una vez y su `element` se monta/desmonta de la
+  // bandeja en cada navegación.
   const chronicle = chroniclePanel(actions);
+  const people = peoplePanel(actions);
   const shell = createShell(actions);
 
   // U-09 · el sonido: sintetizado con Web Audio, nunca un fichero (§ ficha del
@@ -329,6 +357,18 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    */
   const messageSlot = shell.element.querySelector<HTMLElement>('.ui-shell-message');
   if (messageSlot === null) throw new Error('UI-R1 · la carcasa no trae ranura de mensaje');
+  // UI-R4 · el mismo camino que `messageSlot`: leer el DOM de la carcasa por
+  // su clase estable para hacer algo que `shell.ts` (congelado esta ronda,
+  // ver el comentario de `navigate`) todavía no sabe hacer por sí mismo —
+  // enseñar la bandeja para la ruta 'people'.
+  const sheetContentOrNull = shell.element.querySelector<HTMLElement>('.ui-shell-content');
+  if (sheetContentOrNull === null) throw new Error('UI-R4 · la carcasa no trae bandeja');
+  // Reasignado a un tipo sin `null`: `navigate` es una `function` elevada
+  // (arriba del todo) que lo usa dentro de su cuerpo, y TypeScript no lleva el
+  // estrechamiento de un `if` de esta línea a una función distinta — el mismo
+  // motivo por el que `notices`/`persist` se declaran después de `navigate` y
+  // se usan dentro sin problema: el cuerpo no se ejecuta hasta que se llama.
+  const sheetContent: HTMLElement = sheetContentOrNull;
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(messageSlot);
   const noticeBand = messageSlot.querySelector<HTMLElement>('.valley-notice');
@@ -409,12 +449,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       }]);
     }
   }
-
-  const panel = document.createElement('section');
-  panel.className = 'valley-panel';
-  panel.hidden = true;
-  panel.setAttribute('aria-live', 'polite');
-  root.append(panel);
 
   /**
    * Qué render está pintando, dicho en voz alta.
@@ -547,7 +581,15 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // verdad hace falta tocar el DOM (ver su comentario en `screens/
     // chronicle.ts`), así que llamarla en cada fotograma no reconstruye nada
     // de más.
-    if (currentRoute.kind === 'chronicle') chronicle.update(snapshot());
+    else if (currentRoute.kind === 'chronicle') chronicle.update(snapshot());
+    else if (currentRoute.kind === 'people') people.update(snapshot());
+    // UI-R4, AC-11 · una ficha abierta tiene que enterarse de que quien mira
+    // acaba de morir o marcharse **sin que nadie navegue**: el motor tira
+    // cada semana con el reloj corriendo, no sólo cuando se abre la ruta. Sin
+    // este refresco por fotograma la ficha se habría quedado congelada en el
+    // último `panelFor` calculado al entrar, y un seguimiento activo nunca se
+    // habría cancelado solo.
+    else if (currentRoute.kind === 'inspect') mountedInspect?.update(snapshot());
     // The same kind of observability hook as `data-app-ready` (M-19): the year
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.
@@ -569,7 +611,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
 
   /**
-   * Cerrar la ficha, que era imposible.
+   * Cerrar la ficha, que era imposible — el fallo que dio origen a S-05.
    *
    * Lo dijo el dueño del diseño al probar la demo: *«si seleccionas algo del
    * mapa, nunca se puede deseleccionar lo que aparece seleccionado.»* Tenía tres
@@ -578,30 +620,15 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * está **dentro** de la raíz, así que tocar el valle nunca era tocar la raíz;
    * tocar suelo vacío devolvía un objetivo `terrain` y abría otra ficha en vez
    * de cerrar la anterior; y el único gesto que la cerraba, el deslizamiento
-   * hacia abajo, es el mismo movimiento con el que se arrastra el mapa.
+   * hacia abajo, es el mismo movimiento con el que se arrastra el mapa. Las
+   * tres correcciones siguen vivas más abajo (tocar suelo vacío vuelve a
+   * 'valley', el deslizamiento sólo actúa sin cámara); lo que UI-R4 retira es
+   * `showPanel`/`closePanel`: la ficha ya no es un `<section>` propio que este
+   * fichero pinte a mano, es `redesign/inspect-panel.ts` montada en
+   * `shell.content` por `navigate` (arriba), y cerrarla siempre pasa por
+   * `actions.navigate`, nunca por tocar su visibilidad a secas — el mismo
+   * motivo por el que existía esta nota.
    */
-  const closePanel = (): void => { panel.hidden = true; };
-
-  const showPanel = (target: InspectTarget): void => {
-    const model = panelFor(target, state);
-    const heading = document.createElement('h2'); heading.textContent = model.title;
-    // Una cruz, que es la salida que se ve. No sustituye a tocar fuera: la
-    // sustituye al revés — tocar fuera es lo que se descubre solo, y esto es lo
-    // que se ve cuando no se ha descubierto.
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'valley-panel-close';
-    close.setAttribute('aria-label', renderUiText('app.close'));
-    close.textContent = '×';
-    // UI-R1 · el cierre visible pasa por `actions.navigate`, no por
-    // `closePanel` a secas: S-05 era exactamente esto — cerrar la ficha sin
-    // avisar a la barra dejaba la pestaña encendida diciendo «Chronicle» o
-    // «People» si se había llegado desde ahí. `navigate` cierra el panel y
-    // pone la ruta en orden en el mismo paso.
-    close.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
-    panel.replaceChildren(close, heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
-    panel.hidden = false;
-  };
   const trace = new Map<number, Point[]>();
   let pinchStart: number | null = null;
   /** El ángulo entre los dos dedos al empezar, para girar. */
