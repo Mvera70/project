@@ -214,38 +214,29 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     shell.content.replaceChildren();
     shell.setRoute(route);
     if (route.kind === 'chronicle') {
-      // UI-R3 · migrada de verdad a `shell.content`. `contentRouteFor`
-      // (`redesign/shell.ts`, UI-R1) sólo conoce `orders`/`inspect` —esta
-      // ronda no puede tocar `shell.ts`/`contracts.ts`—, así que
-      // `shell.setRoute` de arriba ha dejado la bandeja oculta
-      // (`content.hidden = true`) aunque la crónica ya vaya a montarse
-      // dentro. Se destapa a mano, por la misma vía que UI-R1 ya usó para la
-      // ranura del mensaje (querySelector sobre una clase pública y estable,
-      // nunca una API nueva de `shell.ts`). Visualmente no cambia nada: la
-      // crónica sigue siendo `position: fixed; inset: 0` con su mismo
-      // z-index de siempre (13), así que cubre la pantalla entera y el «×»
-      // genérico de la bandeja (`.ui-shell-content-close`) queda debajo sin
-      // que nadie lo esconda a propósito — la barra de navegación (z-index
-      // 14) se sigue viendo encima, como pide U-14. Ver el comentario de
-      // cabecera de `chroniclePanel` en `screens/chronicle.ts`.
-      const sheet = shell.element.querySelector<HTMLElement>('.ui-shell-content');
-      if (sheet !== null) sheet.hidden = false;
+      // UI-R3/UI-R5 · migrada de verdad a `shell.content`. Hasta UI-R5,
+      // `contentRouteFor` (`redesign/shell.ts`) sólo conocía `orders`/
+      // `inspect` y esta rama tenía que destapar `.ui-shell-content` a mano
+      // (leyendo el DOM por su clase estable, igual que la ranura del
+      // mensaje) porque `shell.ts` estaba fuera de su alcance. UI-R5 extendió
+      // `contentRouteFor` para que también sepa de `chronicle`/`people`, así
+      // que `shell.setRoute` de arriba ya ha dejado la bandeja visible: no
+      // hace falta ningún rodeo. Visualmente no cambia nada: la crónica sigue
+      // siendo `position: fixed; inset: 0` con su mismo z-index de siempre
+      // (13), así que cubre la pantalla entera y la barra de navegación
+      // (z-index 14) se sigue viendo encima, como pide U-14. Ver el
+      // comentario de cabecera de `chroniclePanel` en `screens/chronicle.ts`.
       shell.content.append(chronicle.element);
       chronicle.update(snapshot());
     } else if (route.kind === 'people') {
-      // U-08/UI-R4 · la lista de los nombrados presentes; tocar uno abre su
-      // ficha por la misma ruta `inspect` que el valle (`redesign/
-      // people-panel.ts`).
+      // U-08/UI-R4/UI-R5 · la lista de los nombrados presentes; tocar uno
+      // abre su ficha por la misma ruta `inspect` que el valle (`redesign/
+      // people-panel.ts`). Igual que la crónica de arriba: desde UI-R5
+      // `contentRouteFor` ya conoce esta ruta y `shell.setRoute` deja la
+      // bandeja visible por su cuenta — el rodeo de UI-R4 (`sheetContent.
+      // hidden = false`) ya no hace falta.
       shell.content.append(people.element);
       people.update(snapshot());
-      // `contentRouteFor` (`shell.ts`, congelado durante esta ronda: UI-R3
-      // trabaja en paralelo sobre el mismo contrato) todavía sólo conoce
-      // 'orders' e 'inspect', así que `shell.setRoute` de arriba dejó la
-      // bandeja oculta para 'people'. Se fuerza su visibilidad leyendo el DOM
-      // de la carcasa por su clase estable — el mismo camino que ya usa
-      // `messageSlot` más abajo para la ranura del aviso — sin tocar
-      // `shell.ts`. Documentado en `docs/ui-redesign/rounds/UI-R4.md`.
-      sheetContent.hidden = false;
     } else if (route.kind === 'inspect') {
       const inspect = createInspectPanel(actions, route.target, route.from);
       mountedInspect = inspect;
@@ -357,18 +348,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    */
   const messageSlot = shell.element.querySelector<HTMLElement>('.ui-shell-message');
   if (messageSlot === null) throw new Error('UI-R1 · la carcasa no trae ranura de mensaje');
-  // UI-R4 · el mismo camino que `messageSlot`: leer el DOM de la carcasa por
-  // su clase estable para hacer algo que `shell.ts` (congelado esta ronda,
-  // ver el comentario de `navigate`) todavía no sabe hacer por sí mismo —
-  // enseñar la bandeja para la ruta 'people'.
-  const sheetContentOrNull = shell.element.querySelector<HTMLElement>('.ui-shell-content');
-  if (sheetContentOrNull === null) throw new Error('UI-R4 · la carcasa no trae bandeja');
-  // Reasignado a un tipo sin `null`: `navigate` es una `function` elevada
-  // (arriba del todo) que lo usa dentro de su cuerpo, y TypeScript no lleva el
-  // estrechamiento de un `if` de esta línea a una función distinta — el mismo
-  // motivo por el que `notices`/`persist` se declaran después de `navigate` y
-  // se usan dentro sin problema: el cuerpo no se ejecuta hasta que se llama.
-  const sheetContent: HTMLElement = sheetContentOrNull;
+  // UI-R5 · el rodeo que UI-R4 necesitaba aquí (leer `.ui-shell-content` a
+  // mano para destapar la bandeja de 'people') se retiró: `contentRouteFor`
+  // ya sabe de esa ruta (ver `navigate`, arriba, y `redesign/shell.ts`).
   // §11.6: the band that says what just happened, over the valley itself.
   const notices = mountNotices(messageSlot);
   const noticeBand = messageSlot.querySelector<HTMLElement>('.valley-notice');
@@ -607,7 +589,26 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // answer — including the very first paint, for a save or a debug
     // fast-forward that already lands on a posed crossroad. `openCrossroad`
     // is its own no-op once this one is already on screen.
-    if (state.crossroad !== null && state.ended === null) openCrossroad(app, state.crossroad);
+    //
+    // UI-R5 · **y la encrucijada tiene que ganar a una bandeja que ya
+    // estuviera abierta**, no sólo a la que se abra después. `.crossroad-
+    // scrim` (`screens/crossroad.ts`, z-index 10) y `.ui-shell-content`
+    // (`redesign/shell.css`, z-index 13) compiten en el mismo contexto de
+    // apilamiento (el de `document.body`, a propósito: ver el comentario de
+    // `shell.css` sobre `.ui-shell` sin `z-index` propio) — así que una
+    // bandeja abierta **antes** de que la decisión madure se queda encima,
+    // tapándola casi entera, y `.crossroad-open .valley-orders {visibility:
+    // hidden}` (crossroad.ts) sólo vacía el contenido de las órdenes, nunca
+    // la caja de `.ui-shell-content` en sí ni las otras tres rutas. Medido
+    // con un recorrido real (`docs/ui-redesign/rounds/UI-R5.md`): People
+    // abierta desde antes de la primera encrucijada dejaba sólo un borde del
+    // texto asomando por debajo del panel, opciones y precio incluidos.
+    // Volver al valle es lo mismo que ya hace deslizar hacia abajo para
+    // aplazarla (S-05, U-14): la decisión se queda pendiente, no se pierde.
+    if (state.crossroad !== null && state.ended === null) {
+      if (currentRoute.kind !== 'valley') navigate({ kind: 'valley' });
+      openCrossroad(app, state.crossroad);
+    }
   };
 
   /**

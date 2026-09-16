@@ -1974,6 +1974,11 @@ export const UI_BANK: Record<string, string> = {
   'people.empty': 'Nobody in the valley has a name yet.',
   'people.back': 'Back to the list',
   'people.scope': '{named} named, of {population} in the valley.',
+  // UI-R5 · el nombre de alguien dentro de una línea de crónica, cuando el
+  // suceso que la escribió deja un id real detrás (`world/fate.ts`,
+  // `state.happenings[n].who`): la etiqueta accesible del enlace en línea
+  // (`src/ui/screens/chronicle.ts`, `linkNamesInParagraph`).
+  'chronicle.person.link': "Open {name}'s page.",
   'role.leader': 'leader',
   'role.smith': 'smith',
   'role.midwife': 'midwife',
