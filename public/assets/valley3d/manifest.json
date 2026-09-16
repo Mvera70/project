@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T19:33:14.055Z",
+  "generatedAt": "2026-09-16T19:44:11.909Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -133,13 +133,13 @@
     {
       "id": "palisade",
       "file": "palisade.glb",
-      "sha256": "49C65821CCA0AD0A505854DD56B0EF420A89F6F4141970A7B3486B3E20F9B133",
+      "sha256": "E69EBD0E9C12BAD7BC453CAECECE0EEEDB12B280B284F67D267972BCDFF822A4",
       "motion": []
     },
     {
       "id": "wall",
       "file": "wall.glb",
-      "sha256": "93067586949FABCDC849983A14175FF2D81818480D226ABA5290018816B431BF",
+      "sha256": "E4DC13B81B51A5E4CEBF8E41EFB6EE96A6651BE41CF06BC95649BA30601581A7",
       "motion": []
     },
     {

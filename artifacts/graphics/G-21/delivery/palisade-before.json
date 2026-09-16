@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "id": "palisade",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "palisade",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "G-10, lote de defensa. Tres estacas de alturas distintas y un travesano. Desiguales a proposito: una empalizada pareja se lee como una valla de jardin, y esto es madera clavada deprisa."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Pale_A",
+      "location": [
+        0.55,
+        1.5,
+        1.1
+      ],
+      "radius": 0.22,
+      "depth": 2.2,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Pale_B",
+      "location": [
+        1.5,
+        1.5,
+        1.2
+      ],
+      "radius": 0.22,
+      "depth": 2.4,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Pale_C",
+      "location": [
+        2.45,
+        1.5,
+        1.05
+      ],
+      "radius": 0.22,
+      "depth": 2.1,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Pale_Rail",
+      "location": [
+        1.5,
+        1.5,
+        1.7
+      ],
+      "dimensions": [
+        3,
+        0.16,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      4,
+      -5,
+      3.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      1.2
+    ],
+    "orthoScale": 5.6,
+    "worldRole": "sky"
+  }
+}

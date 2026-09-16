@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "palisade",
+  "statistics": {
+    "objects": 3,
+    "meshes": 2,
+    "materials": 2,
+    "triangles": 318
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -0.596667
+    ],
+    "max": [
+      1,
+      0.866667,
+      -0.43
+    ],
+    "size": [
+      1,
+      0.866667,
+      0.166667
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T19-43-03-412Z-39728",
+    "directory": "artifacts/graphics/G-21/approved/e69ebd0e9c12bad7"
+  },
+  "sha256": "E69EBD0E9C12BAD7BC453CAECECE0EEEDB12B280B284F67D267972BCDFF822A4",
+  "otherPublishedFilesUnchanged": true
+}

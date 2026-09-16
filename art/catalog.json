@@ -1120,115 +1120,117 @@
     },
     {
       "id": "palisade",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/palisade/palisade.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-48-379Z-52660",
-        "directory": "artifacts/graphics/G-10/approved/49c65821cca0ad0a"
+        "runId": "2026-09-16T19-43-03-412Z-39728",
+        "directory": "artifacts/graphics/G-21/approved/e69ebd0e9c12bad7"
       },
       "bounds": {
         "min": [
           0,
           0,
-          -0.573333
+          -0.596667
         ],
         "max": [
           1,
-          0.8,
-          -0.426667
+          0.866667,
+          -0.43
         ],
         "size": [
           1,
-          0.8,
-          0.146667
+          0.866667,
+          0.166667
         ]
       },
-      "recipeSha256": "7903871E3ADD9D34894790888691383045F82A7E65C7A3B25D6868ACE5130A08",
+      "recipeSha256": "1F0F5639EA64DD55DB2B1EA028BD316F8FFDC61660CD64F6121651D8E84B5FD7",
       "materials": [
-        "wood"
+        "wood",
+        "frame"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 72
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 318
       },
       "hashes": {
-        "palisade.blend": "B4694522FC2DA174D4EBF48A0B486D7BBCDE7C4DA940E72C953AFDFAC015BA5B",
-        "palisade.glb": "49C65821CCA0AD0A505854DD56B0EF420A89F6F4141970A7B3486B3E20F9B133",
-        "palisade-blender.png": "9CC42BBFCFC04DEDE8497CA920EA9233280FCB4CA2A44A64B53F5698962C45AB",
-        "capture-1.png": "6A934E6EFAC23F8DE686C519F66B3B9C58A44061A206266BB5F247F4C1AE5448",
-        "capture-1-gray.png": "3798E736AE81C28AFE4F807CAC415B3A08B0F4F9A9B976AE5AF119B6D57ED3C5",
-        "capture.json": "987BD10A33E62B1F8E42674D00E12BDBB473DAA52135134830010B538DE770A7",
-        "build.json": "F91A70D1F126867B398F1ADD8F48FBB2E7B2D1FE5043C8B30AFDEEA5D689860B",
-        "validation.json": "27DB15B48778881ABF6C0E12EA00EDB2278BC2663AB99A082174C9903FDAE5EA"
+        "palisade.blend": "0ED31B4E13B93BFE4B8FD85ABBF772316DF2057A6B93CE2EF9BDA34627590A4D",
+        "palisade.glb": "E69EBD0E9C12BAD7BC453CAECECE0EEEDB12B280B284F67D267972BCDFF822A4",
+        "palisade-blender.png": "970C5EDDBFAECAB51518B7752D7E11D31F7F1FDA1B7D3ACE4DE7473578B477E7",
+        "capture-1.png": "89DC4912F8CC9DCE408B57CD7D62D097B7C8018142EFA6066ABB823DE24D6A91",
+        "capture-1-gray.png": "0B56A8146FA4CDE0C1FFF89075E106DB0ABDE83E79BAF2E2EC2940F5E2EE2A13",
+        "capture.json": "74BC75DB9F84C9F191CB5B151AD8915F2C77AAC21A290E6E2BA6F4915EEF2DEE",
+        "build.json": "572667176CDC70E41DA93E04709BA65F3DDE3823E90E22AE865276EFBAEF0071",
+        "validation.json": "6C0246FCE8F0248F41E5C0B3FFA43CF9AEC158A9A8F5238767B7C5474E4E82CC"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original palisade authored for The Valley G-10",
+        "source": "Original G-21: palisade modular con conexiones cardinales en el render.",
         "license": "Project original"
       }
     },
     {
       "id": "wall",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/wall/wall.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-55-432Z-29576",
-        "directory": "artifacts/graphics/G-10/approved/93067586949fabcd"
+        "runId": "2026-09-16T19-43-18-182Z-19612",
+        "directory": "artifacts/graphics/G-21/approved/e4dc13b81b51a5e4"
       },
       "bounds": {
         "min": [
           0,
           0,
-          -0.683333
+          -0.68
         ],
         "max": [
           1,
-          0.875,
-          -0.316667
+          0.885,
+          -0.32
         ],
         "size": [
           1,
-          0.875,
-          0.366667
+          0.885,
+          0.36
         ]
       },
-      "recipeSha256": "8C694D80C19639F15173B29FF3BDE2C5A29F1CFDCBB4C563909DB6CE117E8054",
+      "recipeSha256": "F193BC47769962967D7663EC23444909AB7BF8E33F95488B3479A992AA82BAA0",
       "materials": [
-        "stone"
+        "stone",
+        "mortar"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 36
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 276
       },
       "hashes": {
-        "wall.blend": "9B4E00D3DA788D262432A286FEF9E76FA27C7E8C694A3C6EF8B6C422D79F955C",
-        "wall.glb": "93067586949FABCDC849983A14175FF2D81818480D226ABA5290018816B431BF",
-        "wall-blender.png": "4D61B55C7F24E64ED76B1FB7B50EDB1DDFA6E39CD9D51C05C02C93D1CFF64B58",
-        "capture-1.png": "83E90F28112AE9972C5171AAB31A1B80FE4228DD8F1327B9B2B4BFE3C1FC5FBB",
-        "capture-1-gray.png": "F39761ACF36A6ABB510CA7687798DE037189C4123096EB4D6B5B468D7A9FC423",
-        "capture.json": "1A807BAF0F8C4A943E99B8E53FF63D8B8AC8112CEBC86FD439ED8A6F863FF550",
-        "build.json": "559A7E52CCB8A84823411CC43367BEE4232CED71EA4DFCB5A3C0177135D64E23",
-        "validation.json": "42BF23E7B4ED428ED94ECA28054D2E608B35BB97F3802DED966816AFC3A195E3"
+        "wall.blend": "EA973EE7143B4548E6C8149B0035AA29661DBF8D7514CE0A82C21EEA63BD32F4",
+        "wall.glb": "E4DC13B81B51A5E4CEBF8E41EFB6EE96A6651BE41CF06BC95649BA30601581A7",
+        "wall-blender.png": "DB46F69010B6D687E054BCFCEF037D778273F899A3391C181A9DD7A843085457",
+        "capture-1.png": "E381D31211662B91407F3FB164B247845918FA7D1FC12360884A875E6925F7AE",
+        "capture-1-gray.png": "EE9031FF2FE59E317F92033CD53D75ED523274623B2DA3CABB314469938AAE6F",
+        "capture.json": "F859BEEB59F85D5B740E90207751C58BEABBFDF6D13B47D164CA9DB89C1E9342",
+        "build.json": "7C439B58BCA40AEF807492EE66CE8097126DD8731C3578A30C3B41D5308E5FED",
+        "validation.json": "BCD94E0BE3F1045B712DA879440E72AD92F361E44F5CD8258404F995F45A697F"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original wall authored for The Valley G-10",
+        "source": "Original G-21: wall modular con conexiones cardinales en el render.",
         "license": "Project original"
       }
     },

@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "assetId": "palisade",
+  "runId": "2026-09-16T19-43-03-412Z-39728",
+  "status": "pass",
+  "durationMs": 2758,
+  "candidateSha256": "E69EBD0E9C12BAD7BC453CAECECE0EEEDB12B280B284F67D267972BCDFF822A4",
+  "glb": {
+    "version": 2,
+    "declaredLength": 23808,
+    "nodeNames": [
+      "palisade_frame",
+      "palisade_wood",
+      "Root"
+    ],
+    "meshNames": [
+      "palisade_frame_Mesh",
+      "palisade_wood_Mesh"
+    ],
+    "materialNames": [
+      "frame",
+      "wood"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 2,
+    "statistics": {
+      "objects": 3,
+      "meshes": 2,
+      "materials": 2,
+      "triangles": 318
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T19:43:17.315Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-43-03-412Z-39728\\candidate\\palisade.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T19-43-03-412Z-39728/candidate/palisade.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-43-03-412Z-39728\\three\\capture-1.png",
+        "sha256": "89DC4912F8CC9DCE408B57CD7D62D097B7C8018142EFA6066ABB823DE24D6A91",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-43-03-412Z-39728\\three\\capture-1-gray.png",
+          "sha256": "0B56A8146FA4CDE0C1FFF89075E106DB0ABDE83E79BAF2E2EC2940F5E2EE2A13",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 698,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:53310/artifacts/graphics/G-21/runs/2026-09-16T19-43-03-412Z-39728/candidate/palisade.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "palisade_frame",
+            "palisade_wood"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -0.596667
+            ],
+            "max": [
+              1,
+              0.866667,
+              -0.43
+            ],
+            "size": [
+              1,
+              0.866667,
+              0.166667
+            ]
+          },
+          "loadDurationMs": 133
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-43-03-412Z-39728\\three\\capture-2.png",
+        "sha256": "89DC4912F8CC9DCE408B57CD7D62D097B7C8018142EFA6066ABB823DE24D6A91",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-43-03-412Z-39728\\three\\capture-2-gray.png",
+          "sha256": "0B56A8146FA4CDE0C1FFF89075E106DB0ABDE83E79BAF2E2EC2940F5E2EE2A13",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 139,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:53310/artifacts/graphics/G-21/runs/2026-09-16T19-43-03-412Z-39728/candidate/palisade.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "palisade_frame",
+            "palisade_wood"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -0.596667
+            ],
+            "max": [
+              1,
+              0.866667,
+              -0.43
+            ],
+            "size": [
+              1,
+              0.866667,
+              0.166667
+            ]
+          },
+          "loadDurationMs": 31
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:53310/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 174,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-43-03-412Z-39728\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}
