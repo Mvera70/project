@@ -45,6 +45,10 @@
   --skin-gold: #7C5C1F;             /* 02, puntos de la línea de tiempo */
   --skin-gold-lit: #F1DEAE;         /* 03, etiqueta activa sobre madera */
   --skin-ochre: #765833;            /* 01, subrayado de la pestaña activa */
+  /* El sol y su arco de la placa de fecha, muestreados aparte porque no son
+     papel ni tinta: el disco del sol y el trazo del arco del prototipo 01. */
+  --skin-sun: #C39A3F;              /* 01, el disco del sol */
+  --skin-arc: #9F845D;              /* 01, el trazo del arco, lejos del sol */
 
   /* --------------------------------------------------------------- madera */
   --skin-wood: #2B1F17;             /* 03, barra de navegación */

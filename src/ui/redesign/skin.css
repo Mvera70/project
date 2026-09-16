@@ -547,21 +547,40 @@
 }
 
 /** El arco del sol, `sunArcPoint` en `hud.ts`: 90 de ancho, el punto es el sol. */
+/* El arco del sol de la placa de fecha. Tres capas, y las tres medidas en el
+   prototipo 01 (ver `hud.ts` para la geometría):
+
+   · **el trazo**, finísimo y taupe (`--skin-arc`, muestreado del propio arco):
+     la primera versión lo puso en oro y a media opacidad y salía un arco
+     pesado que no se parecía a nada;
+   · **las cuentas**, que jalonan las horas sin escribirlas;
+   · **el sol**, un disco ámbar con doce rayos — antes era un punto marrón del
+     color del arco y no se leía como un sol. */
 .hud-sun-arc {
   width: 90px;
-  height: 28px;
+  height: 29px;
   flex: 0 0 auto;
   display: block;
   overflow: visible;
 }
 .hud-sun-arc-track {
   fill: none;
-  stroke: var(--skin-gold);
+  stroke: var(--skin-arc);
   stroke-width: 1;
-  opacity: .5;
+  stroke-linecap: round;
+  opacity: .75;
 }
-.hud-sun-arc-dot {
-  fill: var(--skin-gold);
+.hud-sun-arc-bead {
+  fill: var(--skin-arc);
+  opacity: .35;
+}
+.hud-sun-arc-sun line {
+  stroke: var(--skin-sun);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.hud-sun-arc-disc {
+  fill: var(--skin-sun);
 }
 
 /** Las cuatro cifras, en su fila de chips (plan §3.1): y 57–90, desde x 43. */

@@ -133,23 +133,54 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
  * cabecera, no el reloj, y `hourAt` ya se encarga de decir qué hora parece.
  */
 export const SUN_ARC_WIDTH = 90;
-export const SUN_ARC_HEIGHT = 20;
-const SUN_ARC_MARGIN = 4;
+/**
+ * Lo que sube el sol de un extremo al mediodía.
+ *
+ * **Once y no veinte**, medido en el prototipo: su arco es una curva muy
+ * tendida —172 px de vano y 25 de flecha sobre el PNG, que a 390 de ancho son
+ * 79 y 11— y con veinte salía una cúpula que no se parecía a nada.
+ */
+export const SUN_ARC_HEIGHT = 11;
+/**
+ * El aire de arriba y de abajo del `viewBox`.
+ *
+ * Nueve, que es lo que el sol necesita para no salirse: su disco mide diez de
+ * diámetro y sus rayos llegan a dieciséis, así que en el mediodía sobresale
+ * ocho por encima del trazo.
+ */
+const SUN_ARC_MARGIN = 9;
 const SUN_ARC_VIEW_HEIGHT = SUN_ARC_HEIGHT + SUN_ARC_MARGIN * 2;
+/** Cuántas cuentas jalonan el arco, contando las dos de los extremos. */
+const SUN_ARC_BEADS = 5;
 
 export interface SunArcPoint {
   readonly x: number;
   readonly y: number;
 }
 
+/**
+ * El punto del arco para una fracción de día ya normalizada, de 0 a 1.
+ *
+ * **Existe separado de `sunArcPoint` por un fallo que se vio en la captura:**
+ * el trazo se dibujaba muestreando `sunArcPoint`, que da la vuelta al ciclo
+ * (`phase - floor(phase)`), así que al pedirle el último punto —fase 1— volvía
+ * al origen y la polilínea se cerraba. Eso pintaba una cuerda de un extremo al
+ * otro y el arco se leía como una cúpula rellena, no como el camino del sol.
+ * Aquí 1 es el extremo derecho, que es lo que un trazo necesita; la vuelta al
+ * ciclo se queda donde hace falta, en la posición del sol.
+ */
+function arcPointAt(day: number): SunArcPoint {
+  return { x: day * SUN_ARC_WIDTH, y: SUN_ARC_HEIGHT * (1 - Math.sin(day * Math.PI)) };
+}
+
 export function sunArcPoint(phase: number): SunArcPoint {
   const day = Number.isFinite(phase) ? phase - Math.floor(phase) : 0;
-  return { x: day * SUN_ARC_WIDTH, y: SUN_ARC_HEIGHT * (1 - Math.sin(day * Math.PI)) };
+  return arcPointAt(day);
 }
 
 interface SunArc {
   readonly svg: SVGSVGElement;
-  readonly dot: SVGCircleElement;
+  readonly dot: SVGGElement;
 }
 
 function createSunArc(): SunArc {
@@ -159,23 +190,54 @@ function createSunArc(): SunArc {
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
 
-  // El trazo del arco: una polilínea que muestrea `sunArcPoint`, así que la
-  // curva dibujada y el punto que se mueve encima nunca pueden discrepar —son
-  // la misma función, no dos aproximaciones distintas.
-  const steps = 12;
+  // El trazo: una polilínea que muestrea `arcPointAt`, la misma función que
+  // coloca el sol, así que la curva dibujada y lo que se mueve encima no
+  // pueden discrepar. **Abierta**: el último punto es el extremo derecho y no
+  // el origen — ver el comentario de `arcPointAt`.
+  const steps = 24;
   const points = Array.from({ length: steps + 1 }, (_, index) => {
-    const point = sunArcPoint(index / steps);
+    const point = arcPointAt(index / steps);
     return `${point.x.toFixed(2)},${(point.y + SUN_ARC_MARGIN).toFixed(2)}`;
   }).join(' ');
   const track = document.createElementNS(SVG_NS, 'polyline');
   track.setAttribute('points', points);
   track.setAttribute('class', 'hud-sun-arc-track');
+  svg.append(track);
 
-  const dot = document.createElementNS(SVG_NS, 'circle') as SVGCircleElement;
-  dot.setAttribute('r', '3.5');
-  dot.setAttribute('class', 'hud-sun-arc-dot');
+  // Las cuentas que jalonan el camino, como en el prototipo: marcan las horas
+  // sin escribirlas. Van debajo del sol, así que se montan antes.
+  for (let index = 0; index < SUN_ARC_BEADS; index += 1) {
+    const point = arcPointAt(index / (SUN_ARC_BEADS - 1));
+    const bead = document.createElementNS(SVG_NS, 'circle');
+    bead.setAttribute('r', '2');
+    bead.setAttribute('cx', point.x.toFixed(2));
+    bead.setAttribute('cy', (point.y + SUN_ARC_MARGIN).toFixed(2));
+    bead.setAttribute('class', 'hud-sun-arc-bead');
+    svg.append(bead);
+  }
 
-  svg.append(track, dot);
+  // **El sol es un sol y no un punto.** En el prototipo es un disco ámbar con
+  // doce rayos cortos; la primera versión de esta ronda puso un círculo
+  // marrón del color del arco y no se leía como nada. Los rayos van en un
+  // grupo que se traslada entero, para mover una sola cosa por fotograma.
+  const dot = document.createElementNS(SVG_NS, 'g') as SVGGElement;
+  dot.setAttribute('class', 'hud-sun-arc-sun');
+  const rays = 12;
+  for (let index = 0; index < rays; index += 1) {
+    const angle = (index / rays) * Math.PI * 2;
+    const ray = document.createElementNS(SVG_NS, 'line');
+    ray.setAttribute('x1', (Math.cos(angle) * 6.4).toFixed(2));
+    ray.setAttribute('y1', (Math.sin(angle) * 6.4).toFixed(2));
+    ray.setAttribute('x2', (Math.cos(angle) * 8.4).toFixed(2));
+    ray.setAttribute('y2', (Math.sin(angle) * 8.4).toFixed(2));
+    dot.append(ray);
+  }
+  const disc = document.createElementNS(SVG_NS, 'circle');
+  disc.setAttribute('r', '5');
+  disc.setAttribute('class', 'hud-sun-arc-disc');
+  dot.append(disc);
+
+  svg.append(dot);
   return { svg, dot };
 }
 
@@ -476,8 +538,13 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     // `backend.live.stats()` evita depender del renderer activo: con Canvas
     // 2D `stats()` da `null` y el arco se quedaría quieto.
     const sun = sunArcPoint(clock.sunPhase);
-    sunArc.dot.setAttribute('cx', sun.x.toFixed(2));
-    sunArc.dot.setAttribute('cy', (sun.y + SUN_ARC_MARGIN).toFixed(2));
+    // Un grupo no tiene `cx`/`cy`: se traslada. Y se traslada **el grupo
+    // entero**, así que el disco y sus doce rayos se mueven como una pieza y
+    // el navegador sólo recalcula una transformación por fotograma.
+    sunArc.dot.setAttribute(
+      'transform',
+      `translate(${sun.x.toFixed(2)} ${(sun.y + SUN_ARC_MARGIN).toFixed(2)})`,
+    );
 
     const now = vitalsOf(state);
     if (monthAgo === null || state.tick - monthAgo.at >= TREND_WEEKS) monthAgo = { at: state.tick, vitals: now };
