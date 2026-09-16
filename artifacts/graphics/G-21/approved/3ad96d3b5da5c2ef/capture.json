@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T19:04:55.654Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-04-41-693Z-39676\\candidate\\handcart.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T19-04-41-693Z-39676/candidate/handcart.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-04-41-693Z-39676\\three\\capture-1.png",
+      "sha256": "50A69813BFADA83D3CDF9F822E044CE1D68F4DA438C20E5F6EBD844A0CE21001",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-04-41-693Z-39676\\three\\capture-1-gray.png",
+        "sha256": "806D174F9325B5A925C7BEDB19620FD7546FB818370D0DAEB12708280174C7F3",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 672,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:54651/artifacts/graphics/G-21/runs/2026-09-16T19-04-41-693Z-39676/candidate/handcart.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "handcart_iron",
+          "handcart_plank",
+          "handcart_wood"
+        ],
+        "bounds": {
+          "min": [
+            -0.50498,
+            0.000107,
+            -0.175333
+          ],
+          "max": [
+            0.191667,
+            0.3,
+            0.175333
+          ],
+          "size": [
+            0.696646,
+            0.299893,
+            0.350667
+          ]
+        },
+        "loadDurationMs": 132
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-04-41-693Z-39676\\three\\capture-2.png",
+      "sha256": "50A69813BFADA83D3CDF9F822E044CE1D68F4DA438C20E5F6EBD844A0CE21001",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-04-41-693Z-39676\\three\\capture-2-gray.png",
+        "sha256": "806D174F9325B5A925C7BEDB19620FD7546FB818370D0DAEB12708280174C7F3",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 110,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:54651/artifacts/graphics/G-21/runs/2026-09-16T19-04-41-693Z-39676/candidate/handcart.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "handcart_iron",
+          "handcart_plank",
+          "handcart_wood"
+        ],
+        "bounds": {
+          "min": [
+            -0.50498,
+            0.000107,
+            -0.175333
+          ],
+          "max": [
+            0.191667,
+            0.3,
+            0.175333
+          ],
+          "size": [
+            0.696646,
+            0.299893,
+            0.350667
+          ]
+        },
+        "loadDurationMs": 32
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:54651/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 156,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-04-41-693Z-39676\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

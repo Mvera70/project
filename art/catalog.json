@@ -2982,59 +2982,60 @@
     },
     {
       "id": "handcart",
-      "artifactRound": "G-15",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/handcart/handcart.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-15T00-04-43-459Z-18348",
-        "directory": "artifacts/graphics/G-15/approved/be7cebede684b460"
+        "runId": "2026-09-16T19-04-41-693Z-39676",
+        "directory": "artifacts/graphics/G-21/approved/3ad96d3b5da5c2ef"
       },
       "bounds": {
         "min": [
           -0.50498,
-          0,
-          -0.153333
+          0.000107,
+          -0.175333
         ],
         "max": [
-          0.183333,
-          0.27,
-          0.153333
+          0.191667,
+          0.3,
+          0.175333
         ],
         "size": [
-          0.688313,
-          0.27,
-          0.306667
+          0.696646,
+          0.299893,
+          0.350667
         ]
       },
-      "recipeSha256": "C4EBBE98BFE375CFBEEC6BAAB74AC99C3FCD07506AF578D279986A170430EDB0",
+      "recipeSha256": "F3F55A0B744CB4EB499EE900B30C91D9A337829E633A0B0FDDBE2A7DD3F9D13D",
       "materials": [
         "wood",
-        "plank"
+        "plank",
+        "iron"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 580
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 888
       },
       "hashes": {
-        "handcart.blend": "305B108A6DAECD2B30AB2158278AD5FFCAEC2458DCBE80BFAE2946173FA5B3E4",
-        "handcart.glb": "BE7CEBEDE684B4600CB90D42D5C2384E333AB0880D9E5A7C9698364315C1B962",
-        "handcart-blender.png": "6253AADD3BE7A843CCAAB529078CB6AC5BCCF025FA429240CE57D30A8DCD6CE9",
-        "capture-1.png": "A2142143C7AF876660AF0254D9866FE33B8783B814FE3E2FF77C01C0A4415FC2",
-        "capture-1-gray.png": "188275D132848F62DFEE569C049323670FC074F5BDE9452AD8692F3030878015",
-        "capture.json": "5D8099B6DFF0C7EA506AFD88D131FE868AF31D4A9E287271F8175C791C234B3B",
-        "build.json": "DA55280905EC0684EDA8023C7ED2F7D116C14061993CF21B180F9351728E6170",
-        "validation.json": "EBD7CB11355948D7017008EF92BD781F8CDB9134C61EBCA84F53E53BBC821510"
+        "handcart.blend": "63D2D0804F6082F75ADD35B1EFC4E3011F2BFC1B1FAC237E0CA387A9D5E99FF9",
+        "handcart.glb": "3AD96D3B5DA5C2EFCC08D326B8272B41BABB60D8674D093F661F4D5AB23FC1DD",
+        "handcart-blender.png": "441E02D4694D8E4E535ECDBE746131BF6FCD6CA603AD4482C6759DCB07A4BE4C",
+        "capture-1.png": "50A69813BFADA83D3CDF9F822E044CE1D68F4DA438C20E5F6EBD844A0CE21001",
+        "capture-1-gray.png": "806D174F9325B5A925C7BEDB19620FD7546FB818370D0DAEB12708280174C7F3",
+        "capture.json": "EF3A80C50DBCC1F18ED2E56693D484FEA418BEE1C5DD5269740D2FCA4466DBDD",
+        "build.json": "AB11BE3B88C4458104A8EE4AA6BB1377AC4918FEE4DCF027CF961DB17E4D5635",
+        "validation.json": "56D854E0530A2175DF0AAB57454E072AB870B8F2DB3C3446AFA5DE1B764CA327"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original handcart authored for The Valley G-15 (scatter props)",
+        "source": "Original G-21: carro de tablas con ruedas abiertas, radios y aros de hierro.",
         "license": "Project original"
       }
     },

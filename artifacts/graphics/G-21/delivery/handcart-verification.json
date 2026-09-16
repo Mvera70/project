@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "handcart",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 888
+  },
+  "bounds": {
+    "min": [
+      -0.50498,
+      0.000107,
+      -0.175333
+    ],
+    "max": [
+      0.191667,
+      0.3,
+      0.175333
+    ],
+    "size": [
+      0.696646,
+      0.299893,
+      0.350667
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T19-04-41-693Z-39676",
+    "directory": "artifacts/graphics/G-21/approved/3ad96d3b5da5c2ef"
+  },
+  "sha256": "3AD96D3B5DA5C2EFCC08D326B8272B41BABB60D8674D093F661F4D5AB23FC1DD",
+  "otherPublishedFilesUnchanged": true
+}

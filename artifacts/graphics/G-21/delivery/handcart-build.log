@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all handcart
+
+Built handcart in artifacts\graphics\G-21\runs\2026-09-16T19-04-41-693Z-39676
+Validated handcart from run 2026-09-16T19-04-41-693Z-39676
+Reported and promoted handcart to artifacts\graphics\G-21\approved\3ad96d3b5da5c2ef

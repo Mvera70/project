@@ -92,7 +92,10 @@ Coles subidas en `0edca57`. Puerros terminados y conectados: trigo, coles y
 puerros aparecen en parcelas distintas, con selección estable y cosecha intacta.
 88 pruebas verdes y captura conjunta revisada; pendiente de valoración estética.
 Puerros subidos en `d096f83`. Campo segado terminado y revisado después de la
-cosecha; 88 pruebas verdes. Sigue el carro. **Avisar al dueño antes de los muros.**
+cosecha; 88 pruebas verdes. Campo segado subido en `4aa61c5`.
+Carro G-21 terminado: caja de tablas, ruedas abiertas con radios y varales;
+94 pruebas verdes, typecheck y lint. Capturas reales revisadas, entrega
+individual validada para commit y subida. Sigue el almiar. **Avisar al dueño antes de los muros.**
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -204,6 +207,8 @@ G-22 sustituye ese campo por trigo de 4 732 triángulos y tres materiales/mallas
 Coles G-22: 2 292 triángulos y tres materiales/mallas.
 Puerros G-22: 2 212 triángulos y tres materiales/mallas; 52 recursos empaquetados.
 Campo segado G-22: 232 triángulos, un material/malla y GLB de 17 856 bytes.
+Carro G-21: 888 triángulos, tres materiales/mallas y GLB de 64 556 bytes;
+94 pruebas verdes, incluidas las seis de colocación de adornos.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -252,7 +257,8 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 ## 4. Lo abierto, por orden de lo que más duele
 
 **G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
-Campo segado también terminado y revisado tras la cosecha; sigue el carro.
+Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado
+y revisado en juego; sigue el almiar (`haystack`) tras subir el carro.
 **Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y
