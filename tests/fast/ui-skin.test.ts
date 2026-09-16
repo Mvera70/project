@@ -158,6 +158,22 @@ describe('UI-V0 · los activos que el plan promete', () => {
     expect(sprite, 'sin colores propios').not.toMatch(/(?:fill|stroke)="#/u);
   });
 
+  it('el sprite del documento dice lo mismo que el fichero', () => {
+    // **Están en dos sitios y es a propósito** (UI-V2): `<use>` a un SVG
+    // externo no carga bajo `file://`, que es como `shot.mjs` abre la demo
+    // para las capturas, así que el sprite va incrustado en `index.html`; y
+    // `public/ui/icons.svg` se queda porque es el fichero que la sesión de
+    // arte edita (`encargo-arte-piel.md` §4). Esta prueba es lo que impide
+    // que se separen: si alguien mejora un icono en uno y no en el otro, la
+    // interfaz enseñaría el viejo y nadie sabría por qué.
+    const sprite = readFileSync(resolve(ROOT, 'public/ui/icons.svg'), 'utf8');
+    const html = readFileSync(resolve(ROOT, 'index.html'), 'utf8');
+    const shapes = (text: string): string[] => [...text.matchAll(/<symbol id="([^"]+)"[\s\S]*?<\/symbol>/gu)]
+      .map(([block, id]) => `${id}:${[...block.matchAll(/ d="([^"]+)"/gu)].map((m) => m[1]).join('|')}`)
+      .sort();
+    expect(shapes(html)).toEqual(shapes(sprite));
+  });
+
   it('el índice de arte existe y está vacío: el arte aparece cuando llega', () => {
     // Igual que las mallas de V-15: la interfaz usa lo que esté listado y cae
     // al respaldo con lo que falte, así que una ronda cierra sin dibujos.

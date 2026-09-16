@@ -17,9 +17,26 @@
 // geometría —una sola pila de abajo arriba, y cuando dos mensajes coinciden
 // uno cede el sitio y vuelve— y `resolveMessageSlot` es esa regla hecha
 // función pura, para el único caso que hoy tiene dos emisores reales.
+//
+// **UI-V2 · la piel de la bandeja y la navegación** (`docs/ui-redesign/piel/
+// plan-piel.md` §3.4). Los tres iconos de la barra ya no son los trazos de
+// `../icons` (`NAV_ICONS`, U-05): son los mismos cuatro dibujos del sprite
+// grabado de UI-V0 (`public/ui/icons.svg`) — `icons.ts` se queda sin tocar,
+// con `NAV_ICONS` vivo pero sin más consumidores que éste. Y la navegación
+// cambia de piel según la ruta —papel con subrayado en el valle, placa de
+// madera en la crónica, madera entera en la gente/la ficha—, que es lo que
+// los tres prototipos hacen y `navSkinFor` es esa regla, pura y probada sin
+// DOM como sus vecinas `navTabFor`/`contentRouteFor`.
+//
+// **Los iconos salen del sprite incrustado en `index.html`.** UI-V2 midió que
+// `<use href="./ui/icons.svg#id">` no carga cuando la página se abre con
+// `file://` —Chromium bloquea la referencia entre documentos— y así es como
+// `shot.mjs` abre la demo para las capturas de cada ronda. La primera versión
+// de esta ronda lo sorteó copiando los trazos a mano aquí; el coordinador puso
+// el sprite dentro del documento, que deja **una sola fuente** y hace que
+// cualquier ronda escriba sólo `<use href="#id">`.
 
 import { renderUiText } from '@engine/chronicle/render';
-import { NAV_ICONS } from '../icons';
 import type { SheetRoute, UiActions, ShellHandle } from './contracts';
 
 /** Las tres pestañas de la barra. Encrucijada y epitafio no son rutas (§11.2). */
@@ -70,6 +87,24 @@ export function contentRouteFor(route: SheetRoute): 'orders' | 'inspect' | 'chro
 }
 
 /**
+ * Qué piel lleva la barra de navegación para esta ruta (plan-piel.md §3.4,
+ * §3.2, §3.3): pergamino con el subrayado de ocre por defecto (prototipo 01,
+ * el valle y las órdenes, que se abren desde ahí); una placa de madera en la
+ * pestaña activa cuando la ruta es la crónica (prototipo 02); y madera
+ * entera cuando es la gente o una ficha —de persona o de edificio, el plan no
+ * distingue— (prototipo 03). Pura, como `navTabFor`, de la que es vecina.
+ */
+export type NavSkin = 'default' | 'plaque' | 'wood';
+export function navSkinFor(route: SheetRoute): NavSkin {
+  switch (route.kind) {
+    case 'chronicle': return 'plaque';
+    case 'people':
+    case 'inspect': return 'wood';
+    default: return 'default';
+  }
+}
+
+/**
  * La pila del mensaje (visual-reference §5, tabla de coincidencias, primera
  * fila): el aviso de la crónica **cuenta algo que acaba de pasar** y tiene
  * prioridad; la pista del inicio guiado espera **sin marcarse como vista** —
@@ -86,12 +121,31 @@ export function resolveMessageSlot(noticeWantsToShow: boolean, hintWantsToShow: 
   return { noticeVisible: noticeWantsToShow, hintVisible: hintWantsToShow && !noticeWantsToShow };
 }
 
+/** Qué símbolo del sprite lleva cada pestaña. Los ids son los de `icons.svg`. */
+const NAV_TAB_ICON: Record<NavTab, string> = {
+  valley: 'mountains',
+  chronicle: 'book',
+  people: 'people',
+};
+const OAK_LEAF = 'oak-leaf';
+
+/**
+ * Un icono del sprite del documento. `id`, no trazos: ver la cabecera.
+ *
+ * `viewBox` va aquí y no en el `<use>` porque el `<symbol>` ya lo trae y el
+ * navegador lo hereda; dejarlo puesto no estorba y hace que el hueco mida lo
+ * mismo antes de que el sprite resuelva.
+ */
+const inlineIcon = (id: string): string =>
+  `<svg class="skin-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#${id}"/></svg>`;
+
 const tapButton = (label: string, icon: string, className: string): HTMLButtonElement => {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = className;
-  button.innerHTML = icon;
+  button.innerHTML = inlineIcon(icon);
   const caption = document.createElement('span');
+  caption.className = 'skin-label';
   caption.textContent = label;
   button.append(caption);
   button.setAttribute('aria-label', label);
@@ -141,27 +195,53 @@ export function createShell(actions: UiActions): ShellHandle {
 
   // El hueco del mensaje: `notice.ts` y la pista del inicio guiado se montan
   // aquí desde `app.ts` (`shell.element.querySelector('.ui-shell-message')`),
-  // y `resolveMessageSlot` decide cuál de los dos se ve.
+  // y `resolveMessageSlot` decide cuál de los dos se ve. UI-V2 le añade el
+  // borde curvado de la bandeja y el ornamento (plan §3.4): los dos son
+  // decorativos y van **antes** que el aviso/la pista en el DOM, para que se
+  // pinten arriba del todo del hueco compartido — `notice.ts`/`app.ts` siguen
+  // usando `root.append(...)`/`messageSlot.append(hint)`, que añaden al
+  // final, así que el orden de pintado queda: borde, hoja, aviso o pista.
   const message = document.createElement('div');
   message.className = 'ui-shell-message';
 
+  const trayEdge = document.createElement('div');
+  trayEdge.className = 'skin-scroll-edge';
+  const ornament = document.createElement('div');
+  ornament.className = 'skin-ornament';
+  ornament.setAttribute('aria-hidden', 'true');
+  ornament.innerHTML = inlineIcon(OAK_LEAF);
+  message.append(trayEdge, ornament);
+
   const nav = document.createElement('nav');
-  nav.className = 'ui-shell-nav';
+  // `ui-shell-nav` sólo aporta ya el respiro del área segura (`shell.css`);
+  // toda la piel —papel, filetes, la placa o la madera de la pestaña activa—
+  // es `skin-nav` y sus variantes, del kit de UI-V0.
+  nav.className = 'ui-shell-nav skin-nav';
   nav.setAttribute('aria-label', renderUiText('nav.bar'));
 
   const buttons = new Map<NavTab, HTMLButtonElement>();
+  // Los filetes verticales entre celdas (plan §3.4): `.skin-rule-v` ya existe
+  // en el kit de UI-V0, sólo hacía falta usarlo aquí, entre cada dos botones
+  // (dos filetes para tres pestañas, ninguno en los bordes exteriores).
+  const rules: HTMLDivElement[] = [];
   const labels: Record<NavTab, string> = {
     valley: renderUiText('nav.valley'),
     chronicle: renderUiText('nav.chronicle'),
     people: renderUiText('nav.people'),
   };
-  for (const tabName of NAV_TABS) {
-    const button = tapButton(labels[tabName], NAV_ICONS[tabName], 'ui-shell-tab');
+  NAV_TABS.forEach((tabName, index) => {
+    if (index > 0) {
+      const rule = document.createElement('div');
+      rule.className = 'skin-rule-v';
+      nav.append(rule);
+      rules.push(rule);
+    }
+    const button = tapButton(labels[tabName], NAV_TAB_ICON[tabName], 'skin-nav-tab');
     button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => { actions.navigate({ kind: tabName }); });
     nav.append(button);
     buttons.set(tabName, button);
-  }
+  });
 
   stack.append(message, nav);
   element.append(content, stack);
@@ -176,6 +256,13 @@ export function createShell(actions: UiActions): ShellHandle {
     document.documentElement.dataset.screen = active;
     const inShell = contentRouteFor(route);
     content.hidden = inShell === null;
+    // UI-V2 · la piel de la navegación sigue a la ruta, no a la pestaña
+    // encendida: `chronicle`/`people`/`inspect` tienen cada una su prototipo
+    // (§3.2, §3.3), y `valley`/`orders` comparten el pergamino por defecto.
+    const skin = navSkinFor(route);
+    nav.classList.toggle('skin-nav--plaque', skin === 'plaque');
+    nav.classList.toggle('skin-nav--wood', skin === 'wood');
+    for (const rule of rules) rule.classList.toggle('skin-rule-v--on-wood', skin === 'wood');
   };
   paintRoute({ kind: 'valley' });
 
