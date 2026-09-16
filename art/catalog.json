@@ -1355,58 +1355,60 @@
     },
     {
       "id": "ruin-wood",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/ruin-wood/ruin-wood.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-26-12-358Z-17080",
-        "directory": "artifacts/graphics/G-10/approved/8efa0ff692be6d91"
+        "runId": "2026-09-16T20-43-57-190Z-5400",
+        "directory": "artifacts/graphics/G-21/approved/0e3deb6554dbc55c"
       },
       "bounds": {
         "min": [
-          -0.033333,
           0,
-          -2.033333
+          0,
+          -2
         ],
         "max": [
-          2.033333,
-          0.666667,
-          0.033333
+          2,
+          0.643333,
+          0
         ],
         "size": [
-          2.066667,
-          0.666667,
-          2.066667
+          2,
+          0.643333,
+          2
         ]
       },
-      "recipeSha256": "66037ACA3EECC07CE3A949E1B1B94691E4BC13083660EB8655D00173DD8901BD",
+      "recipeSha256": "34DD61585577AA190038D5AF06FD5E64EBD1E4AAC8449EC9DCF990A6C7B418A3",
       "materials": [
-        "char"
+        "char",
+        "ash",
+        "stone"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 128
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 792
       },
       "hashes": {
-        "ruin-wood.blend": "5C98FE29BCAF6C00FAA9D740B06291EF5C0C33872379387874AF1E330DFB9A35",
-        "ruin-wood.glb": "8EFA0FF692BE6D91A0B1998135EE242E120517B0E762F4DABF86ED986B49D653",
-        "ruin-wood-blender.png": "C102F9215A56B0E55970334BABAF14031C25ADF2BE2D8481BCCE89254955A49D",
-        "capture-1.png": "8A3B8F627BC56D3C17E677B3D1D7B02F613C7EC595799EDA0DE49A1394865401",
-        "capture-1-gray.png": "41D42E6809C1FCC28C96BA1CD60A6DE9C75375257FE8DE0A170A49EAF688388E",
-        "capture.json": "739DEA4A0DF11F8FB46A234DF7650222475013188E65F2AB43E0619C997A4728",
-        "build.json": "32F83B672DD0791B46703D19971EB211F5069EDF2328D7B7275D4EF7873811A1",
-        "validation.json": "5F025DA415C4AF6D0E6AD99941C55AC6BB936CD63A69D977CC6C2CACC5ED0445"
+        "ruin-wood.blend": "67DB33298482DF329BD86893ACBF5BF30F9CE269F8FFFBD924265C8E3E16C516",
+        "ruin-wood.glb": "0E3DEB6554DBC55C802561AB4A56920F6CC0B6C74CFA75B94C6A2C4167678063",
+        "ruin-wood-blender.png": "F37B46D41DDDA536502EE92EC1C39E2DA7EA3B9D8133D9CEE98EA86BB42F05CE",
+        "capture-1.png": "8AE8C59F08D9DB2F8105E848AA916D84FEB1B3ED4FD60C72CB12D751D28A9D3C",
+        "capture-1-gray.png": "80E0CA7E18FA0E06BE9D30534F0CEBF87E5A05D9761AF29251E1EA8361D1379D",
+        "capture.json": "3E80B38B4258C8906FF95EBFE7B85844F59F80DCEBA1473793C01B6CF8D1C473",
+        "build.json": "C5EAC78FE1D9E6DA1F6C1E4B43EF0F3FF5729FE9106FC6E01BD0753F3892FBC8",
+        "validation.json": "AF686E08AD16C598EDD42CA53213C874216B75245C9A2CD38531CF15EBA0F95B"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original ruin-wood authored for The Valley G-10",
+        "source": "Original G-21: ruina de madera con vigas quemadas, ceniza y hogar.",
         "license": "Project original"
       }
     },

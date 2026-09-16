@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "ruin-wood",
+  "runId": "2026-09-16T20-43-57-190Z-5400",
+  "recipe": "art/recipes/ruin-wood/ruin-wood.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11393,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/candidate/ruin-wood.blend",
+      "bytes": 102309,
+      "sha256": "67DB33298482DF329BD86893ACBF5BF30F9CE269F8FFFBD924265C8E3E16C516"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/candidate/ruin-wood.glb",
+      "bytes": 57084,
+      "sha256": "0E3DEB6554DBC55C802561AB4A56920F6CC0B6C74CFA75B94C6A2C4167678063"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/candidate/ruin-wood-blender.png",
+      "bytes": 545132,
+      "sha256": "F37B46D41DDDA536502EE92EC1C39E2DA7EA3B9D8133D9CEE98EA86BB42F05CE"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/blender.log",
+      "bytes": 1280,
+      "sha256": "FD69EADEAD141228E63A3987B1765A45228A45442C657B9BD33B7805F923A557"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/temporary/resolved-recipe.json",
+      "bytes": 22140,
+      "sha256": "851861669DEFA8124C4D30E1407D76610524D53A8938BC322956474B46D54C75"
+    }
+  }
+}

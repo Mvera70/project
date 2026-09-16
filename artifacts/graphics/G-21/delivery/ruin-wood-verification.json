@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "ruin-wood",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 792
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -2
+    ],
+    "max": [
+      2,
+      0.643333,
+      0
+    ],
+    "size": [
+      2,
+      0.643333,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T20-43-57-190Z-5400",
+    "directory": "artifacts/graphics/G-21/approved/0e3deb6554dbc55c"
+  },
+  "sha256": "0E3DEB6554DBC55C802561AB4A56920F6CC0B6C74CFA75B94C6A2C4167678063",
+  "otherPublishedFilesUnchanged": true
+}

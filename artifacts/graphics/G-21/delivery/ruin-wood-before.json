@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "id": "ruin-wood",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "tiled",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "ruin-wood",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de la ruina. Una casa de madera despues del fuego: la tierra quemada, cuatro postes rotos a alturas distintas y dos vigas caidas. §7.4 deja la ruina en el mapa, asi que tiene que leerse que ahi hubo una casa y que ya no la hay."
+  },
+  "materials": [
+    {
+      "name": "char",
+      "role": "timberDark",
+      "roughness": 1
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Ruin_Scorch",
+      "location": [
+        3,
+        3,
+        0.03
+      ],
+      "dimensions": [
+        6.2,
+        6.2,
+        0.06
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ruin_Post_A",
+      "location": [
+        0.8,
+        0.8,
+        0.85
+      ],
+      "radius": 0.2,
+      "depth": 1.7,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ruin_Post_B",
+      "location": [
+        5.2,
+        0.9,
+        0.55
+      ],
+      "radius": 0.2,
+      "depth": 1.1,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ruin_Post_C",
+      "location": [
+        0.9,
+        5.1,
+        0.4
+      ],
+      "radius": 0.2,
+      "depth": 0.8,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ruin_Post_D",
+      "location": [
+        5.1,
+        5.2,
+        1
+      ],
+      "radius": 0.2,
+      "depth": 2,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Beam_A",
+      "location": [
+        3,
+        2.2,
+        0.28
+      ],
+      "dimensions": [
+        4.6,
+        0.28,
+        0.28
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Beam_B",
+      "location": [
+        2.4,
+        3.6,
+        0.2
+      ],
+      "dimensions": [
+        0.26,
+        3.4,
+        0.26
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Ruin_Sill",
+      "location": [
+        3,
+        0.85,
+        0.22
+      ],
+      "dimensions": [
+        4.2,
+        0.3,
+        0.35
+      ],
+      "material": "char",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      8,
+      -10,
+      6.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.8
+    ],
+    "orthoScale": 11.2,
+    "worldRole": "sky"
+  }
+}

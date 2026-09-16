@@ -12,7 +12,7 @@
 // need the final art to be judged wrong.
 
 import {
-  BoxGeometry, BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshStandardMaterial,
+  Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshStandardMaterial, Vector3,
   type Material, type Object3D,
 } from 'three';
 import type { BuildingId, BuildingKind } from '@engine/state';
@@ -128,7 +128,22 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   // donde no habia ventana, y la gente cruzando paredes.
   group.position.set(planned.x, 0, planned.z + planned.h);
   group.userData.buildingId = planned.id;
-  const model = source;
+  let model = source;
+  if (planned.ruin && planned.asset?.startsWith('ruin-')) {
+    // La misma ruina sustituye parcelas de 1×1, 2×2, 3×2 o 3×3. Ajustar solo
+    // su huella evita invadir al vecino; la altura del cascote se conserva.
+    const bounds = new Box3().setFromObject(source);
+    const size = bounds.getSize(new Vector3());
+    if (size.x > 0 && size.z > 0) {
+      const origin = new Group();
+      origin.position.set(-bounds.min.x, -bounds.min.y, -bounds.max.z);
+      origin.add(source);
+      const fitted = new Group();
+      fitted.scale.set(planned.w / size.x, 1, planned.h / size.z);
+      fitted.add(origin);
+      model = fitted;
+    }
+  }
   model.traverse((object) => {
     object.userData.buildingId = planned.id;
     const mesh = object as Object3D & { isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean };
