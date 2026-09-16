@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T17:04:34.546Z",
+  "generatedAt": "2026-09-16T17:22:46.938Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -85,7 +85,7 @@
     {
       "id": "smithy",
       "file": "smithy.glb",
-      "sha256": "88982D4E2D28E6A92E90E85C201AD731FDFBDF0801466495FCCD18B62489C63B",
+      "sha256": "BB1CB2FC6312C38C3F5B61F9B0E6F7BA81797B5A446816AED00F8D77773DBC5F",
       "motion": []
     },
     {

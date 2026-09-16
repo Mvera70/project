@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "smithy",
+  "statistics": {
+    "objects": 5,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 894
+  },
+  "bounds": {
+    "min": [
+      0.001667,
+      0,
+      -1.958333
+    ],
+    "max": [
+      1.998333,
+      1.404167,
+      -0.06
+    ],
+    "size": [
+      1.996667,
+      1.404167,
+      1.898333
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T17-22-18-021Z-40400",
+    "directory": "artifacts/graphics/G-21/approved/bb1cb2fc6312c38c"
+  },
+  "sha256": "BB1CB2FC6312C38C3F5B61F9B0E6F7BA81797B5A446816AED00F8D77773DBC5F",
+  "otherPublishedFilesUnchanged": true
+}

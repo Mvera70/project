@@ -644,60 +644,61 @@
     },
     {
       "id": "smithy",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/smithy/smithy.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-04-31-790Z-40148",
-        "directory": "artifacts/graphics/G-10/approved/88982d4e2d28e6a9"
+        "runId": "2026-09-16T17-22-18-021Z-40400",
+        "directory": "artifacts/graphics/G-21/approved/bb1cb2fc6312c38c"
       },
       "bounds": {
         "min": [
+          0.001667,
           0,
-          0,
-          -1.933333
+          -1.958333
         ],
         "max": [
-          2,
-          1.4,
-          -0.066667
+          1.998333,
+          1.404167,
+          -0.06
         ],
         "size": [
-          2,
-          1.4,
-          1.866667
+          1.996667,
+          1.404167,
+          1.898333
         ]
       },
-      "recipeSha256": "9C7662749EF1253089E8A1F29857625BC9C6CE4EA71C867B04D697687623682B",
+      "recipeSha256": "620AF34B8E2ABCD5E9D04E46E13DC757AC7EEEC8D4DEFF8EEEB175C62947FC3A",
       "materials": [
         "stone",
         "roof",
-        "dark"
+        "dark",
+        "wood"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 52
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 894
       },
       "hashes": {
-        "smithy.blend": "80F230391ADAF3AB2ED2769525AB3C7C79702D6D90CA1722DEA5300F3ED75D20",
-        "smithy.glb": "88982D4E2D28E6A92E90E85C201AD731FDFBDF0801466495FCCD18B62489C63B",
-        "smithy-blender.png": "5BA46F86C4FA33004550DE81F765294E7FCAC590C6A97CB8CA9B518CE20EA43A",
-        "capture-1.png": "C5DE75616443216FFF3D52A5A7D65F6DCA5D582FF5D5404D9D937D15BB28B938",
-        "capture-1-gray.png": "1B9CDBDE40761EA3E360E3A3020599331650CEB4610FF4FA07BFD02CBD12BAC4",
-        "capture.json": "BA62CAF51C3F0DD91CEAF5BF53B50189E685501B6D9620CBC8F15FB1035F7376",
-        "build.json": "220833866DD84563D718F741243710D326547C50F478D5E855264BA477052544",
-        "validation.json": "DC6C8040A3C0442BE27D44A1F7D04B7AB83D378637F03F6052C846AE2ABCC4EF"
+        "smithy.blend": "902D988C72F74B7D080B344D5ABFC48070842D35EAB8EAE87FFA006798D95731",
+        "smithy.glb": "BB1CB2FC6312C38C3F5B61F9B0E6F7BA81797B5A446816AED00F8D77773DBC5F",
+        "smithy-blender.png": "0FF6BB7AF2D3456BFD87D4D2B825E241641A5238797B3663AED820C98B4714B5",
+        "capture-1.png": "E32082CCECA4DE57A33CF4E3223A55D239D3251B0C631F0AA586953D120971FB",
+        "capture-1-gray.png": "87414E95AD0F7B7443A1D610175975EED5DD414EC82F163DDDC03451E5D62BC3",
+        "capture.json": "0017CF8DDF873E860C162E27B6D263596536EFA2BED1DDFAB92B0078370DE4BD",
+        "build.json": "329EAB4266DC3A05343FE68DA3CAB30A3A923D6A03570C5EDA9949EB2B32D00D",
+        "validation.json": "1D9382105C4153F1B5D5E048588B6C03996C97BD46CACF9C796EF4962B807CEF"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original smithy authored for The Valley G-10",
+        "source": "Original G-21: herrería abierta, tejado de teja, fragua y yunque de formas facetadas.",
         "license": "Project original"
       }
     },

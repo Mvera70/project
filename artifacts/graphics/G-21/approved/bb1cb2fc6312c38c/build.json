@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "smithy",
+  "runId": "2026-09-16T17-22-18-021Z-40400",
+  "recipe": "art/recipes/smithy/smithy.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11473,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-22-18-021Z-40400/candidate/smithy.blend",
+      "bytes": 103125,
+      "sha256": "902D988C72F74B7D080B344D5ABFC48070842D35EAB8EAE87FFA006798D95731"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-22-18-021Z-40400/candidate/smithy.glb",
+      "bytes": 67080,
+      "sha256": "BB1CB2FC6312C38C3F5B61F9B0E6F7BA81797B5A446816AED00F8D77773DBC5F"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-22-18-021Z-40400/candidate/smithy-blender.png",
+      "bytes": 503292,
+      "sha256": "0FF6BB7AF2D3456BFD87D4D2B825E241641A5238797B3663AED820C98B4714B5"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-22-18-021Z-40400/blender.log",
+      "bytes": 1361,
+      "sha256": "2FF1D409D12BCAEAC1219EB35BB9B6A85CADE122BF216A6408B1712992315145"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-22-18-021Z-40400/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T17-22-18-021Z-40400/temporary/resolved-recipe.json",
+      "bytes": 28658,
+      "sha256": "ACBBA3B6C547D8132667A8E9D05B13748BA53E8CB7FEAE8E6DC282280E11A6A6"
+    }
+  }
+}
