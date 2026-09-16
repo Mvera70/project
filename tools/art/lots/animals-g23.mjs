@@ -91,9 +91,11 @@ if (['cow','pig','wolf'].includes(id)) {
     for(let k=0;k<3;k++)piece('Flight_'+(side<0?'L':'R')+k,[.14+k*.024,side*.135,.31-k*.026],[.18,.04,.035],hen?'dark':'coat','wing'+side,.012);
   }
   bone('tail',[.19,0,.36],'body');
-  for(let k=0;k<3;k++)piece('TailFeather'+k,[.25+k*.04,(k-1)*.045,hen?.44+k*.03:.31],[.18,.045,hen?.16:.055],'dark','tail',.018);
+  piece('Rump',[.19,0,.35],[.18,.18,.17],'coat','tail',.035);
+  for(let k=0;k<3;k++)piece('TailFeather'+k,[.23+k*.035,(k-1)*.045,hen?.40+k*.025:.31],[.18,.055,hen?.16:.055],'dark','tail',.018);
   if(hen){for(let k=0;k<3;k++)piece('Comb'+k,[-.25+k*.045,0,.63],[.052,.035,.065-k*.006],'accent','head',.015);piece('Wattle',[-.27,0,.455],[.04,.06,.08],'accent','head',.015);}
   r.referenceRender={width:600,height:600,cameraLocation:[-1.3,-1.8,1.15],cameraTarget:[0,0,.3],orthoScale:1.1,worldColor:'#bec9c0'};
+  for(const primitive of r.primitives)if(primitive.dimensions&&Math.min(...primitive.dimensions)<.09)primitive.bevel=0;
 } else {
   stride=.13;
   piece('Body',[0,0,.02],[.32,.12,.17],'coat','body',.05);

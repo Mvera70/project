@@ -1684,60 +1684,78 @@
     },
     {
       "id": "hen",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/hen/hen.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-17-942Z-48528",
-        "directory": "artifacts/graphics/G-10/approved/1fd725e724f15787"
+        "runId": "2026-09-16T21-14-49-709Z-6100",
+        "directory": "artifacts/graphics/G-23/approved/e08f6d310277de6d"
       },
       "bounds": {
         "min": [
-          -0.091667,
-          0,
-          -0.047553
+          -0.126667,
+          0.000333,
+          -0.054167
         ],
         "max": [
-          0.085198,
-          0.156667,
-          0.042844
+          0.13,
+          0.220833,
+          0.054167
         ],
         "size": [
-          0.176865,
-          0.156667,
-          0.090396
+          0.256667,
+          0.2205,
+          0.108333
         ]
       },
-      "recipeSha256": "1905B4F526F523AF567655D15F974BE95EFA4010062867AB2955D258FA5B135C",
+      "recipeSha256": "B04DB6AA872A4213BE4691400F64A0705154309912BFBD10A326AD17F33422E0",
       "materials": [
-        "pale",
-        "comb"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.075
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 142
+        "objects": 18,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 874
       },
       "hashes": {
-        "hen.blend": "FFF2A5D939CBD6E7BCB47CA06D0AC5089F71AA4580F5B7141407BB6D0F5C82C6",
-        "hen.glb": "1FD725E724F157877310608663022149E343B515A29DF5B4A4525FDF39DF2F9E",
-        "hen-blender.png": "07B9F6B2EAEA453A4216EA7AAA3CE19ABB0E36BCFFBFDD6ACACC83B0BCFB358E",
-        "capture-1.png": "BD103E5AA9FC0BC4D06BC16D5D7FF92C1C370666B573F4362D1C4222255B22DE",
-        "capture-1-gray.png": "F44AB973AA6A4234E714C78323134A95DC41BC8928A95B22431A26371FB22D28",
-        "capture.json": "13DF539F90BFD4A3E74693206DF46BCAD83EFAFF01F26ABE0DF433EEADF5E0D9",
-        "build.json": "7F48340F2F6E39208A80BE466B2A241925D29BD10534EB3650F77B6A52222ED5",
-        "validation.json": "8E812901BFB9B6A264F46A1DAFCC79F97DCDCB33CCDF6D7669E6D4B10DFDA6D5"
+        "hen.blend": "8EE12596BAAFE9C062609273E7997F0494D34F3FAF33A90517FAB358EE73E6FA",
+        "hen.glb": "E08F6D310277DE6D4749F33CAD8EE56CBB4877A7973F0E8ED727CA393BB251F1",
+        "hen-blender.png": "4BAC2A10DB0A645FCFF2BAEA7CD9F99193A63AB2DCB18BB3B337FE26F9CFEC0B",
+        "capture-1.png": "BB30B086C86C0C6F595DBFB8E22C847143410F910B5771A9720CF09214D7C0A8",
+        "capture-1-gray.png": "B331EFE24ADD6FBF1FD5A35B0087D3AC945EC5F1322BDC09CFDF8894C6E43895",
+        "capture.json": "33495836B46F4513F361F975533A59116AEED4EA4A949AB22AF7C47E196A72EA",
+        "build.json": "6489426A61B1FD693053584DF581EAE892605166ABE1E62EE06F6D714E5012C8",
+        "validation.json": "987B857F5C073DAD45E75A4E3ACABA6AF7468E3D58D52492B9BF175E6F116B8E"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original hen authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {

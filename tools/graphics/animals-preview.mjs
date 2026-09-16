@@ -27,6 +27,10 @@ try{
  }
  for(const t of [3.5,4,6,8])samples.push(await page.evaluate(t=>window.sample(t,false),t));
  writeFileSync(`${dir}/${id}-idle.png`,Buffer.from((await page.evaluate(()=>document.querySelector('canvas').toDataURL('image/png'))).split(',')[1],'base64'));
+ if(process.argv.includes('--benchmark')){
+   const runs=[];for(const count of [40,120])for(const animated of [false,true])runs.push(await page.evaluate(({count,animated})=>window.benchmark(count,animated),{count,animated}));
+   writeFileSync(`${dir}/${id}-benchmark.json`,JSON.stringify({context:'Chromium headless, ANGLE SwiftShader, portátil; no FPS móvil',runs},null,2)+'\n');
+ }
  await page.setContent('<body style="margin:0;background:#b7c3b2">'+images.filter((_,i)=>i%2===0).map((x,i)=>`<div style="display:inline-block;width:360px"><img style="width:360px" src="data:image/png;base64,${x}"><div>walk ${(i*.6).toFixed(1)} s</div></div>`).join('')+'</body>');
  await page.setViewportSize({width:1080,height:640});await page.evaluate(()=>Promise.all([...document.images].map(img=>img.decode())));await page.screenshot({path:`${dir}/${id}-walk-sheet.png`});
  if(errors.length||samples.some(s=>!s.finite))throw Error(JSON.stringify({errors,samples}));

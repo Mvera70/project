@@ -1,0 +1,37 @@
+{
+  "context": "Chromium headless, ANGLE SwiftShader, portátil; no FPS móvil",
+  "runs": [
+    {
+      "count": 40,
+      "animated": false,
+      "medianMs": 0.09999999403953552,
+      "p95Ms": 0.20000001788139343,
+      "calls": 5,
+      "triangles": 179714
+    },
+    {
+      "count": 40,
+      "animated": true,
+      "medianMs": 1.5999999940395355,
+      "p95Ms": 3.7999999821186066,
+      "calls": 161,
+      "triangles": 112322
+    },
+    {
+      "count": 120,
+      "animated": false,
+      "medianMs": 0.09999999403953552,
+      "p95Ms": 0.29999998211860657,
+      "calls": 5,
+      "triangles": 359426
+    },
+    {
+      "count": 120,
+      "animated": true,
+      "medianMs": 4.4000000059604645,
+      "p95Ms": 5.600000023841858,
+      "calls": 481,
+      "triangles": 336962
+    }
+  ]
+}

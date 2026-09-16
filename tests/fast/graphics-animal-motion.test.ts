@@ -49,4 +49,13 @@ describe('G-23 · animales publicados, articulados en el camino vivo',()=>{
     fauna.paint([],3);expect(fauna.count).toBe(0);expect(fauna.group.children).toHaveLength(0);
     fauna.dispose();lib.dispose();
   });
+  it('la pose de marcha no depende de dibujar a 30 o 60 fotogramas por segundo',async()=>{
+    const lib=await library('cow');
+    const run=(fps:number)=>{
+      const fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+      for(let i=0;i<=fps*4;i++)fauna.paint([{id:71,kind:'cow',x:-i/fps*.09,y:0}],i/fps);
+      const pose=fauna.group.children[0]!.getObjectByName('foreL')!.quaternion.toArray();fauna.dispose();return pose;
+    };
+    const a=run(30),b=run(60);a.forEach((v,i)=>expect(v).toBeCloseTo(b[i]!,5));lib.dispose();
+  });
 });

@@ -6,7 +6,7 @@ import type { AnimalKind } from '../../src/derive/animals';
 declare const PREVIEW_BYTES: Record<string,string>;
 declare const PREVIEW_MANIFEST: AssetManifest;
 declare const PREVIEW_ID: AnimalKind;
-declare global { interface Window { previewReady: boolean; sample: (t:number,moving:boolean)=>unknown } }
+declare global { interface Window { previewReady: boolean; sample: (t:number,moving:boolean)=>unknown; benchmark: (count:number,animated:boolean)=>unknown } }
 const held=Object.fromEntries(Object.entries(PREVIEW_BYTES).map(([id,b64])=>[id,Uint8Array.from(atob(b64),c=>c.charCodeAt(0)).buffer]));
 const library=await loadAssets({baseUrl:'/',manifest:PREVIEW_MANIFEST,bytes:held});
 const renderer=new WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
@@ -31,3 +31,16 @@ window.sample=(t,moving)=>{
   return {time,x,joints,vertices,finite,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles};
 };
 fauna.paint([{id:71,kind:PREVIEW_ID,x:0,y:0}],0);window.sample(0,false);window.previewReady=true;
+window.benchmark=(count,animated)=>{
+  scene.remove(fauna.group);
+  const herd=new Fauna(k=>library.instance(k),animated?k=>library.get(k):undefined);scene.add(herd.group);
+  const times:number[]=[];
+  for(let frame=0;frame<180;frame++){
+    const start=performance.now();
+    herd.paint(Array.from({length:count},(_,id)=>({id,kind:PREVIEW_ID,x:(id%10)*.5-frame*.001,y:Math.floor(id/10)*.5})),frame/60);
+    renderer.render(scene,camera);if(frame>=30)times.push(performance.now()-start);
+  }
+  times.sort((a,b)=>a-b);
+  const result={count,animated,medianMs:times[75],p95Ms:times[142],calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};
+  herd.dispose();scene.add(fauna.group);return result;
+};
