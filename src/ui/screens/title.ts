@@ -118,13 +118,25 @@ const YEAR_MAX = 120;
  * pedir mil años sería un minuto de espera con la pantalla congelada, y eso se
  * lee como un juego roto y no como una herramienta. El año va como lo lee la
  * cabecera: 1 es el valle recién fundado, y por eso el vacío vale 1.
+ *
+ * **Y un número por encima del techo se recorta al techo, no se ignora.** La
+ * primera versión se caía al año 1 en silencio, y eso fue exactamente el fallo
+ * que el dueño encontró a los diez minutos: el campo venía con un «1» puesto,
+ * escribió 50 detrás, quedó «150», pasó el techo y se abrió el año 1 con la
+ * pareja fundadora. Una herramienta que hace lo contrario de lo que le pides
+ * sin decir nada es peor que no tenerla. Basura sí vuelve al año 1: de «siete»
+ * no se puede adivinar un año.
  */
 export function parseYear(text: string, fallback = 1): number {
   const trimmed = text.trim();
   if (trimmed === '') return fallback;
-  if (!/^\d{1,3}$/u.test(trimmed)) return fallback;
+  // Hasta diez dígitos y luego se recorta, en vez de tres y descartar: «9999»
+  // es un número, no basura, y quien lo escribe está pidiendo «lo más lejos
+  // que se pueda». Lo que vuelve al año 1 es lo que no es un número.
+  if (!/^\d{1,10}$/u.test(trimmed)) return fallback;
   const value = Number(trimmed);
-  return value >= 1 && value <= YEAR_MAX ? value : fallback;
+  if (value < 1) return fallback;
+  return Math.min(value, YEAR_MAX);
 }
 
 /** Si el interruptor de taller está puesto. Se recuerda, como el sonido. */
@@ -240,7 +252,15 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   year.inputMode = 'numeric';
   year.autocomplete = 'off';
   year.spellcheck = false;
-  year.value = '1';
+  // **Vacío, con el año 1 como pista, y se selecciona al tocarlo.** Las dos
+  // cosas son el arreglo del mismo fallo: con un «1» dentro, un dedo escribe
+  // detrás y no encima. Con el campo vacío no hay nada a lo que pegarse, y si
+  // uno vuelve a tocarlo para cambiar 50 por 40, la selección hace que el
+  // primer dígito reemplace en vez de sumar.
+  year.value = '';
+  year.placeholder = '1';
+  year.maxLength = 3;
+  year.addEventListener('focus', () => { year.select(); });
   const devHint = document.createElement('p');
   devHint.className = 'title-hint';
   devHint.textContent = renderUiText('title.dev.hint');

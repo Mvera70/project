@@ -32,12 +32,24 @@ describe('el año de taller · U-10b', () => {
   });
 
   it('y con cualquier otra cosa se queda en el año 1, en vez de congelar la pantalla', () => {
-    // El techo es lo que impide que un dedo torpe pida mil años y el menú se
-    // quede un minuto sin responder, que se lee como un juego roto. Y el cero
-    // no existe: el valle recién fundado ya está en el año 1.
-    for (const text of [' ', '0', '-5', '7.5', '1e3', 'veinte', '121', '9999', '2 0']) {
+    // El cero no existe: el valle recién fundado ya está en el año 1. Y de
+    // «veinte» no se puede adivinar un año, así que se funda y se mira.
+    for (const text of [' ', '0', '-5', '7.5', '1e3', 'veinte', '2 0']) {
       expect(parseYear(text), JSON.stringify(text)).toBe(1);
     }
+  });
+
+  it('un año por encima del techo se recorta al techo, y no se ignora en silencio', () => {
+    // **El fallo que el dueño encontró a los diez minutos.** El campo traía un
+    // «1» puesto, escribió 50 detrás, quedó «150», y el menú abría el año 1
+    // con la pareja fundadora: hacía lo contrario de lo que le pedía, callado.
+    // Ahora el campo va vacío y se selecciona al tocarlo —eso es lo que
+    // impide que vuelva a pasar— y, si aun así se cuela un número grande, se
+    // recorta: pedir mucho da mucho, nunca nada.
+    expect(parseYear('150')).toBe(120);
+    expect(parseYear('9999')).toBe(120);
+    expect(parseYear('121')).toBe(120);
+    expect(parseYear('120')).toBe(120);
   });
 
   it('abrir en un año da una partida de verdad de ese año, no un decorado', () => {
