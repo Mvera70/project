@@ -58,6 +58,26 @@ export const VILLAGER_BY_ROLE: Readonly<Record<Exclude<Role, 'stranger'>, string
 export const BASE_VILLAGER = 'villager';
 
 /**
+ * **Todos los nombres que la cadena puede pedir**, incluidos los que el taller
+ * todavía no ha entregado.
+ *
+ * Existe por un fallo que habría sido invisible: el cargador (`assets.ts`) sólo
+ * trae los ids de la lista `WANTED` del renderer, y **un id que no está en esa
+ * lista no se carga aunque exista en el catálogo**. Sin esto, `villager-farmer`
+ * habría entrado en `art/catalog.json`, la cadena lo habría pedido, el cargador
+ * lo habría ignorado, y la cadena habría caído al aldeano base para siempre sin
+ * que nadie supiera por qué. El renderer mete esta lista en `WANTED`; un id que
+ * aún no existe en el manifiesto simplemente se salta, así que no cuesta nada
+ * pedirlo antes de tiempo.
+ */
+export const VILLAGER_MODELS: readonly string[] = [
+  BASE_VILLAGER,
+  ...Object.values(VILLAGER_BY_ROLE),
+  'villager-child', 'villager-elder',
+  'villager-farmer', 'villager-woodcutter', 'villager-mason', 'villager-shepherd', 'villager-fisher',
+];
+
+/**
  * Hasta qué edad se es un crío y desde cuál se es un mayor, **leídos del motor**
  * (`LIFE.ADULT`) y no escritos aquí.
  *

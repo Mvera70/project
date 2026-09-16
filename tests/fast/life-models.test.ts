@@ -11,8 +11,9 @@ import { describe, expect, it } from 'vitest';
 import { LIFE } from '@engine/balance';
 import type { Actor } from '../../src/render3d/contracts';
 import {
-  BASE_VILLAGER, VILLAGER_BY_ROLE, modelChainFor, modelFor, occupationOf,
+  BASE_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, modelChainFor, modelFor, occupationOf,
 } from '../../src/render3d/world/models';
+import { WANTED } from '../../src/render3d/renderer';
 
 /** Un actor cualquiera, adulto, sin oficio y sin nada que hacer. */
 function actor(over: Partial<Actor> = {}): Actor {
@@ -149,5 +150,23 @@ describe('V-15b · la cadena de respaldo, que es lo que hace segura la mudanza',
         expect(chain[chain.length - 1]).toBe(BASE_VILLAGER);
       }
     }
+  });
+});
+
+describe('V-15b · el cargador pide todo lo que la cadena puede nombrar', () => {
+  it('cada nombre que la cadena puede devolver está en la lista que se carga', () => {
+    // Un id que no está en `WANTED` no se carga aunque esté en el catálogo:
+    // sin esto, un modelo recién entregado se ignoraría en silencio y la cadena
+    // caería al base para siempre. Se barre lo que la cadena puede pedir de
+    // verdad, no una lista escrita a mano.
+    const ages = [3, 30, 72];
+    const roles = [null, 'stranger', ...Object.keys(VILLAGER_BY_ROLE)] as Actor['role'][];
+    const jobs = [null, 'field', 'felling', 'building', 'herding', 'water'] as Actor['occupation'][];
+    const asked = new Set<string>();
+    for (const age of ages) for (const role of roles) for (const occupation of jobs) {
+      for (const name of modelChainFor(actor({ age, role, occupation }))) asked.add(name);
+    }
+    for (const name of asked) expect(WANTED, name).toContain(name);
+    for (const name of VILLAGER_MODELS) expect(WANTED, name).toContain(name);
   });
 });

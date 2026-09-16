@@ -35,7 +35,7 @@ import {
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { Cast } from './world/cast';
-import { VILLAGER_BY_ROLE, modelChainFor } from './world/models';
+import { VILLAGER_MODELS, modelChainFor } from './world/models';
 import { dayNumber, dayPhase } from './presentation-clock';
 import { SKY } from '@engine/balance';
 import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../derive/weather';
@@ -75,7 +75,8 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
 export const WANTED = [
   // G-15 · los trastos del corral, que es lo que dice que aquí vive alguien.
   ...STEADING_ASSETS,
-  VILLAGER, ...Object.values(VILLAGER_BY_ROLE), TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
+  ...VILLAGER_MODELS, TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
