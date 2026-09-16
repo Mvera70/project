@@ -1952,12 +1952,28 @@ export const UI_BANK: Record<string, string> = {
   'inspect.traits.none': 'No named traits.',
   'inspect.gone': 'Gone',
   'inspect.terrain.people': '{people} people live in the valley.',
-  // U-08 · la pantalla People (`src/ui/screens/people.ts`): la lista en sí no
-  // lleva frase propia (usa `nav.people`, ya en el banco), sólo lo que le
-  // falta a la ficha reusada: el vacío de una aldea sin nadie con nombre
-  // todavía, y volver de una ficha a la lista.
+  // UI-R4 · quien ya no está no se enseña como si siguiera aquí (§2.5 del
+  // plan de rediseño): la edad de un fallecido se cuenta hasta su muerte, no
+  // hasta hoy, y un emigrado no lleva ni edad ni rasgos porque ninguno de los
+  // dos describe ya a nadie presente.
+  'inspect.died': 'Died in ANNO {year}, {age} winters old.',
+  'inspect.left': 'Left the valley in ANNO {year}.',
+  // UI-R4 · el control de seguimiento de la ficha. `track` marca un cuerpo,
+  // no mueve la cámara de forma continua (`src/render3d/renderer.ts` apunta
+  // una vez y no vuelve a tocarla sola; el 2D sólo dibuja un aro) — el texto
+  // lo dice para no prometer un centrado que ningún backend cumple.
+  'inspect.follow': 'Follow',
+  'inspect.unfollow': 'Stop following',
+  'inspect.track.note': 'Marks {name} on the map. It does not promise to keep the view on them.',
+  // U-08 · la pantalla People (`src/ui/redesign/people-panel.ts` desde
+  // UI-R4): la lista en sí no lleva frase propia (usa `nav.people`, ya en el
+  // banco), sólo lo que le falta a la ficha reusada: el vacío de una aldea
+  // sin nadie con nombre todavía, y volver de una ficha a la lista. UI-R4
+  // añade `people.scope`: la lista sólo enseña nombrados y presentes, y la
+  // población total puede ser mayor (los anónimos no salen nunca).
   'people.empty': 'Nobody in the valley has a name yet.',
   'people.back': 'Back to the list',
+  'people.scope': '{named} named, of {population} in the valley.',
   'role.leader': 'leader',
   'role.smith': 'smith',
   'role.midwife': 'midwife',

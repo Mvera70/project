@@ -53,6 +53,23 @@ function buildingPanel(building: Building, state: GameState): PanelModel {
 }
 
 function villagerPanel(person: Villager, state: GameState): PanelModel {
+  const title = person.name || renderUiText('inspect.villager', { id: person.id });
+  // UI-R4 · un fallecido o un emigrado no es un vivo con un dato de más:
+  // enseñarle su edad de hoy, o las opiniones que los demás le tienen, sería
+  // inventar un presente que ya no existe (CLAUDE.md, "ningún número se
+  // inventa"; brief UI-R4, "las fichas... sólo muestran datos reales"). La
+  // edad se cuenta hasta el tick en que ocurrió, no hasta el de ahora mismo —
+  // si no, alguien muerto hace veinte años seguiría "envejeciendo" en su
+  // propia ficha. `panelFor` es la única fuente que consultan tanto la lista
+  // de People como la ficha del valle: arreglarlo aquí basta para las dos.
+  if (person.diedTick !== null) {
+    return { title, lines: [renderUiText('inspect.died', {
+      year: yearOf(person.diedTick), age: ageOf(person, person.diedTick),
+    })] };
+  }
+  if (person.leftTick !== null) {
+    return { title, lines: [renderUiText('inspect.left', { year: yearOf(person.leftTick) })] };
+  }
   const strong = Object.entries(person.opinions).filter(([, value]) => Math.abs(value) >= 40)
     .map(([id, value]) => renderUiText(value > 0 ? 'inspect.opinion.trusts' : 'inspect.opinion.resents', {
       name: state.people.villagers.find((v) => v.id === Number(id))?.name || `#${id}`, value,
@@ -62,7 +79,7 @@ function villagerPanel(person: Villager, state: GameState): PanelModel {
     .map((memory) => renderUiText('inspect.memory', {
       memory: renderUiText(`memory.${memory.kind}`), year: yearOf(memory.tick),
     }));
-  return { title: person.name || renderUiText('inspect.villager', { id: person.id }), lines: [
+  return { title, lines: [
     renderUiText('inspect.age', { age: ageOf(person, state.tick) }),
     person.traits.length > 0
       ? person.traits.map((trait) => renderUiText(`trait.${trait}`)).join(', ')
