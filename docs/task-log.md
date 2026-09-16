@@ -27,7 +27,7 @@ nadie va a encontrar.
 | **En vuelo ahora** | **UI-R1** (agente Sonnet, `src/ui/redesign/`, `app.ts`, `index.html`; no tocar). **C-1 está completa** salvo el punto 7, aplazado con motivo |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
-| Lo que acabo de cerrar | **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. Antes, G-17 verificado (`9f33582`) |
+| Lo que acabo de cerrar | **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
 
 ## 1b. La fase en curso: C-1 · Cierre de la tanda de IA
 
@@ -63,6 +63,15 @@ refleja. Anunciar algo como hecho o en vuelo sin que lo esté es lo que nos ha
 traído aquí.
 
 ## 2. El tablero
+
+**Demo v16 (16 sep):** publicada en el artefacto de siempre con los cuatro
+aldeanos de G-17. Empaquetada desde un **worktree limpio en HEAD** (`git
+worktree add`, `node_modules` enlazado) porque el agente de UI-R1 tiene
+`app.ts` a medias y no compila. `shot.mjs` gana `--answer N`: la primera
+encrucijada planteada se queda abierta para siempre y tapaba el valle en toda
+captura con `--advance`; ahora la contesta como el dedo. Ojo: el empaquetado
+completo **vacía** el directorio y borra la forma partida; `--split` va al
+final.
 
 **G-17 · Blender, entrega terminada (16 sep):** `villager`, `villager-smith`,
 `villager-priest` y `villager-farmer`, recetas canónicas, catálogo y cuatro GLB

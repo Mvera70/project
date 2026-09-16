@@ -126,6 +126,23 @@ if (advanceWeeks > 0) {
   await tab.waitForTimeout(1500);
 }
 
+// **Contestar la encrucijada que tapa el valle.** Es la trampa que `CLAUDE.md`
+// documenta para los informes, vista desde la cámara: la primera encrucijada
+// planteada se queda abierta para siempre si nadie contesta, y con `--advance`
+// de veinte años **siempre hay una**. Con la hoja abierta la regleta está
+// oculta, así que `--speed` tampoco entraba. Se pulsa la opción pedida
+// (1 = la primera) las veces que haga falta, como haría el dedo.
+//   --answer 1   contesta con la primera opción cada encrucijada abierta
+const answer = Number(opt('answer', '0'));
+if (answer > 0) {
+  for (let round = 0; round < 6; round += 1) {
+    const button = tab.locator('.crossroad-options button').nth(answer - 1);
+    if (!(await button.isVisible().catch(() => false))) break;
+    await button.click().catch(() => {});
+    await tab.waitForTimeout(800);
+  }
+}
+
 // La regleta está recogida detrás del botón de velocidad, como para el dedo.
 if (speed !== '1') {
   await tab.locator('.valley-speed-badge').click().catch(() => {});
