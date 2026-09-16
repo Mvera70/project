@@ -18,7 +18,7 @@ import {
   blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
 } from './body';
-import { meetingPlace, ordersOf } from './staging';
+import { meetingPlace, ordersOf, quarrelToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
@@ -31,8 +31,9 @@ import {
   type Intent, type ProgressState,
 } from './decide';
 import {
-  alive as sceneAlive, play, playGreet, playYield, propose, proposeGreet, proposeYield,
-  SCENE_COOLDOWN, SCENE_EARSHOT, type Greeting, type Scene, type Yielding,
+  alive as sceneAlive, play, playGreet, playQuarrel, playYield, propose, proposeGreet,
+  proposeQuarrel, proposeYield, SCENE_COOLDOWN, SCENE_EARSHOT,
+  type Greeting, type QuarrelScene, type Scene, type Yielding,
 } from './scenes';
 import { createCommitmentRegistry, type ActorRef } from './commitments';
 import { LIFE_STEP, seedOfDay } from './clock';
@@ -98,6 +99,17 @@ export interface Dweller {
    * `id` de cuerpo en vez de llevar la cuenta por separado.
    */
   scene: Scene | null;
+  /**
+   * IA-6: con quién está en la riña real ahora mismo, si está. Campo propio y
+   * no una ampliación de `scene`, porque `QuarrelScene` no comparte el
+   * `SceneKind` de `chat`/`shove`/`brawl` (`scenes.ts` explica por qué:
+   * ensancharlo habría roto pruebas de otras fases que enumeran esos tres por
+   * nombre). Opcional por la misma razón que `ageGroup`/`home` — un
+   * `Dweller` construido a mano en `tests/journeys/life-scenes.test.ts`, fuera
+   * del alcance de esta fase, no lo rellena y no tiene por qué; `undefined` se
+   * trata igual que `null`, nadie en una riña.
+   */
+  quarrel?: QuarrelScene | null | undefined;
   /** Hasta qué paso no le apetece volver a pararse con nadie, tras la última
    *  escena. V-07, ported de `spike/life.ts` (`cooldown`). */
   sceneCooldownUntil: number;
@@ -190,6 +202,23 @@ export interface Village {
     readonly completed: number;
     readonly invalidated: number;
     readonly stuck: number;
+  };
+  /**
+   * IA-6: la cuenta de las escenas de historia —hoy sólo la riña, `quarrel`—,
+   * las que salen de un hecho real de `state.happenings` y no de un cruce
+   * cualquiera. Mismo criterio que `interactions`, aparte para poder demostrar
+   * en el informe que lo que se monta viene de un suceso concreto.
+   */
+  readonly stories: {
+    readonly started: number;
+    readonly completed: number;
+    readonly invalidated: number;
+    readonly stuck: number;
+    /** El tick del motor en el que ocurrió el suceso que puede disparar una
+     *  historia hoy, o nada si esta semana no tiene ninguno de los que esta
+     *  fase sabe escenificar. Sirve para comprobar que lo que se cuenta sale
+     *  de un hecho real y en qué semana pasó. */
+    readonly triggerTick: number | null;
   };
   /** Qué está haciendo la aldea ahora, para poder contarlo. */
   tally(): Record<string, number>;
@@ -314,10 +343,20 @@ function closeScene(dweller: Dweller | undefined, scene: Scene, steps: number): 
 interface ActiveGreet { readonly id: string; readonly greeting: Greeting }
 /** Una cesión de paso, viva, con el id que la guarda en el registro. IA-2. */
 interface ActiveYield { readonly id: string; readonly yielding: Yielding }
+/** La riña de la plaza, viva, con el id que la guarda en el registro. IA-6.
+ *  A lo sumo una por jornada (`quarrelStaged`), así que basta con un valor
+ *  nulable y no una lista. */
+interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
 
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = terrainOf(state);
   const seed = seedOfDay(state.seed, day);
+  // IA-6 · La riña de la plaza (§7.10, `docs/rework.md` §4 R-2 punto 1): si el
+  // motor tiró `quarrel_in_the_square` esta semana, éstos son los dos `id` de
+  // verdad — nunca una pareja que esta capa se invente. `null` si esta semana
+  // no hubo ninguno, o si el suceso no llegó a tener dos nombrados vivos
+  // (`worstPair` en `fate.ts` puede devolver nada).
+  const quarrelPair = quarrelToday(state);
   // V-11 · **Y lo que el motor haya ordenado para hoy manda sobre todo esto.**
   //
   // Si una decisión del jugador convocó a la aldea (§11.8), el sitio de la
@@ -465,6 +504,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       travelled: 0,
       faceAnchor: { x, z },
       scene: null,
+      quarrel: null,
       sceneCooldownUntil: 0,
       holding: null,
       aimAt: null,
@@ -499,6 +539,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const commitments = createCommitmentRegistry();
   let greetings: ActiveGreet[] = [];
   let yieldings: ActiveYield[] = [];
+  // IA-6: la riña real, si se ha llegado a montar hoy. Ver `ActiveQuarrel`.
+  let activeQuarrel: ActiveQuarrel | null = null;
   // La cuenta de esta fase, para el informe: cuántas interacciones nuevas
   // (chat/shove/brawl/greet/yield) han empezado, cuántas han llegado a su
   // final natural, cuántas se han invalidado (nunca llegan a `there`/`act`
@@ -509,6 +551,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   let interactionsCompleted = 0;
   let interactionsInvalidated = 0;
   let interactionsStuck = 0;
+  // IA-6: la misma cuenta, pero sólo de las escenas de historia (`quarrel`
+  // hoy). `quarrelStaged` es lo que evita escenificar la misma riña real una y
+  // otra vez cada vez que los dos se cruzan en la jornada — el hecho pasó una
+  // vez esta semana en el motor, no cada pocos pasos en pantalla.
+  let quarrelStaged = false;
+  let storiesStarted = 0;
+  let storiesCompleted = 0;
+  let storiesInvalidated = 0;
+  let storiesStuck = 0;
   let steps = 0;
   // V-09: pases de pelota dados en la jornada. Contados igual que en
   // `spike/life.ts` (`world.passes += 1`): cualquier tirada de una pelota a
@@ -558,6 +609,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         completed: interactionsCompleted,
         invalidated: interactionsInvalidated,
         stuck: interactionsStuck,
+      };
+    },
+
+    get stories() {
+      return {
+        started: storiesStarted,
+        completed: storiesCompleted,
+        invalidated: storiesInvalidated,
+        stuck: storiesStuck,
+        triggerTick: quarrelPair === null ? null : state.tick,
       };
     },
 
@@ -658,6 +719,35 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       }
       if (doneGreets.length > 0) greetings = greetings.filter((g) => !doneGreets.includes(g.id));
 
+      // 0d · IA-6 · Vivir y cerrar la riña real, si hay una montada hoy.
+      //
+      //      Mismo trato que las escenas de `scenes` (arriba): se vive antes
+      //      de que nadie más decida nada este paso, y se cierra —liberando
+      //      compromiso y actor— en cuanto pasa de `until` o le falta uno de
+      //      los dos. A lo sumo una a la vez, así que no hace falta un array.
+      if (activeQuarrel !== null) {
+        const dwA = byId.get(activeQuarrel.scene.a);
+        const dwB = byId.get(activeQuarrel.scene.b);
+        const quarrelInvalid = dwA === undefined || dwB === undefined;
+        if (quarrelInvalid || steps >= activeQuarrel.scene.until) {
+          commitments.release(activeQuarrel.id);
+          if (dwA !== undefined && dwA.quarrel === activeQuarrel.scene) {
+            dwA.quarrel = null;
+            dwA.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+            dwA.rethinkAt = steps;
+          }
+          if (dwB !== undefined && dwB.quarrel === activeQuarrel.scene) {
+            dwB.quarrel = null;
+            dwB.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+            dwB.rethinkAt = steps;
+          }
+          if (quarrelInvalid) storiesInvalidated += 1; else storiesCompleted += 1;
+          activeQuarrel = null;
+        } else {
+          playQuarrel(activeQuarrel.scene, dwA, dwB, steps);
+        }
+      }
+
       // **Red de seguridad, no cierre normal**: todo lo de arriba ya libera lo
       // suyo por su propio `until`/`expiresAtStep`, así que esto no debería
       // encontrar nunca nada — si encuentra algo, es que un cierre se ha
@@ -672,6 +762,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // que exige cero tenía razón en exigirlo.
       interactionsStuck += commitments.entries().filter((entry) => entry.expiresAtStep <= steps
         && entry.participants.every((who) => who.kind === 'villager')).length;
+      // IA-6: la misma red de seguridad, contada aparte para las historias.
+      storiesStuck += commitments.entries().filter((entry) => entry.expiresAtStep <= steps
+        && entry.kind === 'quarrel').length;
       commitments.expire(steps);
 
       for (const dweller of dwellers) {
@@ -691,6 +784,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           // volver a la vida normal el primer recorrido se cuente desde aquí,
           // no desde dondequiera que estuviera antes de pararse a hablar —
           // `settleHeldBody` ya hace exactamente eso.
+          settleHeldBody(dweller, land, around, hunger);
+          continue;
+        }
+
+        // IA-6 · Quien está en la riña real: su velocidad ya la ha puesto
+        // `playQuarrel` en la sección 0d, con el mismo criterio que cualquier
+        // otra escena de arriba — sólo falta integrarla, y tampoco se
+        // replantea la vida mientras dura.
+        if (dweller.quarrel !== null && dweller.quarrel !== undefined) {
+          integrate(body, land, LIFE_STEP);
           settleHeldBody(dweller, land, around, hunger);
           continue;
         }
@@ -783,6 +886,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         }
 
         // 2 · ¿Se acabó lo que estaba haciendo?
+        // **Pendiente, y medido: el plazo vencido de las personas no se
+        // arregla todavía.** El mismo hueco que se cerró para los animales
+        // —`until` sólo se comprobaba después de haber llegado, así que quien
+        // no llegaba se quedaba con el viaje puesto— está aquí igual. Se probó
+        // el arreglo y **empeora lo que importa**: «parados con un impulso al
+        // máximo» subió de 0,06 % a 0,20 %, que es la cifra de partida, porque
+        // choca con las estancias fijas de `SEAT_DWELL`: al soltar el viaje se
+        // vuelve a elegir **la misma plaza inalcanzable** —la llave del sorteo
+        // es la misma durante treinta segundos— y se reintenta en bucle con la
+        // necesidad a tope.
+        //
+        // Falta la pieza que no existe: que una plaza que ya falló se descarte
+        // para la siguiente elección. Con eso, el arreglo entra solo. Está en
+        // `docs/task-log.md` §4 con este número al lado.
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
           // pelota se tira —encarado a quien tocara, o hacia delante si nadie
@@ -1070,12 +1187,21 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
       type Candidate =
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'yield'; readonly data: Yielding }
+        | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'quarrel'; readonly data: QuarrelScene }
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'chat'; readonly data: Scene }
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'conflict'; readonly data: Scene }
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
 
       const freeToPropose = (d: Dweller): boolean => d.scene === null
         && steps >= d.sceneCooldownUntil && !commitments.busy(actorOf(d));
+
+      // IA-6: si estos dos son, en cualquier orden, los `id` de la riña real
+      // de esta semana. `quarrelPair` sale de `state.happenings[].who`
+      // (`quarrelToday`), nunca de si están enfadados ahora mismo — eso ya lo
+      // decidió el motor, no esta capa.
+      const isQuarrelPair = (x: Dweller, y: Dweller): boolean => quarrelPair !== null
+        && ((x.villager === quarrelPair[0] && y.villager === quarrelPair[1])
+          || (x.villager === quarrelPair[1] && y.villager === quarrelPair[0]));
 
       const candidates: Candidate[] = [];
       for (const dweller of dwellers) {
@@ -1096,6 +1222,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           if (yielding !== null) {
             candidates.push({ a: dweller, b: other, tag: 'yield', data: yielding });
             return;
+          }
+
+          // IA-6: la riña real manda sobre cualquier `chat`/`greet` genérico
+          // entre estos dos —es un hecho que ya ocurrió esta semana, no dos
+          // vecinos que se cruzan— pero no sobre `yield`: cederse el paso
+          // sigue siendo primero, un cruce físico no espera a que dos se
+          // pongan a discutir. `!quarrelStaged` es lo que impide montarla más
+          // de una vez al día una vez que ya se ha vivido.
+          if (!quarrelStaged && isQuarrelPair(dweller, other)) {
+            const scene = proposeQuarrel(dweller, other, seed, steps);
+            if (scene !== null) {
+              candidates.push({ a: dweller, b: other, tag: 'quarrel', data: scene });
+              return;
+            }
           }
 
           const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
@@ -1159,6 +1299,38 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             id, kind: 'greet', initiator: refA, recipient: refB, spots, expiresAtStep: g.until,
           }, steps);
           if (lease !== null) { greetings.push({ id, greeting: g }); interactionsStarted += 1; }
+          continue;
+        }
+
+        if (candidate.tag === 'quarrel') {
+          // IA-6 · Aparte de `chat`/`conflict`: `QuarrelScene` no comparte su
+          // tipo (`scenes.ts` explica por qué), así que no puede pasar por
+          // `sceneCommitmentId`/`scenes.push` sin ensanchar ese tipo para
+          // todo el mundo. Mismo mecanismo igualmente — `reserveRaw`, un
+          // campo del `Dweller` que lo aparta del `decide()` normal — sólo
+          // que es `Dweller.quarrel` y no `Dweller.scene`, y se guarda en
+          // `activeQuarrel` en vez de en la lista `scenes`.
+          const q = candidate.data;
+          const id = `quarrel:${lowId}:${highId}:${steps}`;
+          const lease = commitments.reserveRaw('quarrel', [refA, refB], spots, q.until, steps, id);
+          if (lease === null) continue;
+          if (candidate.a.holding !== null) {
+            const held = propsById.get(candidate.a.holding);
+            if (held !== undefined) drop(held, candidate.a, land);
+          }
+          if (candidate.b.holding !== null) {
+            const held = propsById.get(candidate.b.holding);
+            if (held !== undefined) drop(held, candidate.b, land);
+          }
+          candidate.a.quarrel = q;
+          candidate.b.quarrel = q;
+          activeQuarrel = { id, scene: q };
+          // No se cuenta en `interactionsStarted`: esa cifra es de las cinco
+          // clases de IA-1/IA-2 (chat/shove/brawl/greet/yield), y la riña real
+          // tiene su propio recuento aparte, `stories`, para poder demostrar
+          // en el informe que sale de un hecho concreto y no de un cruce más.
+          storiesStarted += 1;
+          quarrelStaged = true;
           continue;
         }
 

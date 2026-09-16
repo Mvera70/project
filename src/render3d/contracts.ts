@@ -54,6 +54,13 @@ export interface Actor {
    */
   readonly talking: boolean;
   /**
+   * IA-6: está en la riña de la plaza de §7.10, no en una charla. Va aparte de
+   * `talking` porque **son cosas distintas en pantalla**: sin esto, dos que se
+   * gritan se dibujaban exactamente igual que dos que cotillean, y la fase de
+   * la historia visible era invisible.
+   */
+  readonly arguing: boolean;
+  /**
    * Los años que tiene. Sirven para la talla y para nada más.
    *
    * Un valle de adultos idénticos no es un valle: los niños tienen que verse

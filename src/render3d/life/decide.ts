@@ -50,6 +50,20 @@ export interface Intent {
 const LOOK = 5;
 
 /**
+ * El suelo que se le da a una reunión convocada por el motor, y el límite por
+ * encima del cual una necesidad propia manda sobre ella.
+ *
+ * TUNE: suelo 0,8 y límite 0,95. El suelo está por encima de lo que puntúa la
+ * pausa de reserva —que es lo único que competía con la reunión— y por debajo
+ * de una oferta que de verdad haga falta, así que no tapa una necesidad real.
+ * El límite en 0,95 y no en 0,9 a propósito: 0,9 es la cota con la que se mide
+ * «parado con un impulso al máximo» (`tools/life-report.ts`), y si la reunión
+ * cediera ahí, media aldea con sed se quedaría sin ir por un vaso de agua.
+ */
+const GATHER_FLOOR = 0.8;
+const GATHER_URGENT = 0.95;
+
+/**
  * Cuánto pesa lo lejos que está algo.
  *
  * TUNE: a doce celdas, una oferta vale la mitad que la misma al lado. Sin esto,
@@ -404,7 +418,18 @@ export function decide(
     // puede pisar (más abajo, en el bucle de `TRY`).
     const hasChapel = devout && place.offers.some((offer) => offer.id === 'pray');
     const reachMult = hasHour ? 4 : hasChapel ? DEVOUT_REACH_MULT : 2;
-    if (away > personalReach * reachMult) continue;
+    // **Una convocatoria no se busca, se obedece.** El alcance de un sitio con
+    // hora —la reunión que el motor ordena, §11.8— se mide **sin** el recorte
+    // por edad que IA-3 introdujo: «los niños y los mayores buscan más corto»
+    // vale para elegir dónde jugar o dónde sentarse, no para oír una llamada de
+    // la aldea. Con el recorte puesto, un crío veía la reunión a doce celdas y
+    // un mayor a catorce en vez de a veinte, así que en una aldea grande
+    // **literalmente no se enteraban**: V-11 midió 18 de 33 en la capilla de la
+    // semilla 23, por debajo del suelo de 0,6 que esa prueba guarda, y la
+    // propiedad que V-11 existe para vigilar es justamente que la orden del
+    // motor llegue a toda la aldea.
+    const searchReach = hasHour ? LOOK * reachMult : personalReach * reachMult;
+    if (away > searchReach) continue;
     for (const offer of place.offers) {
       const key = seatKey(place, offer);
       // El aforo, salvo para quien ya está dentro: no se echa a nadie de su
@@ -413,6 +438,25 @@ export function decide(
       if (!inside && (taken.get(key) ?? 0) >= offer.seats) continue;
 
       let score = worth(offer, who.needs, who.traits, who.at, personalReach);
+      // **La convocatoria se obedece, no se sopesa** (§11.8, V-11). La reunión
+      // que el motor ordena da compañía y quita aburrimiento, así que a quien
+      // no le falte ninguna de las dos **no le ofrece nada** y `worth` le da
+      // cero: se queda donde está. Y desde que la pausa de reserva es local
+      // —la ronda anterior, para que «no hacer nada» dejara de ser un viaje—
+      // la pausa además le mantiene el aburrimiento bajo, así que nunca vuelve
+      // a tener ganas. Medido: **18 de 33 en la capilla de la semilla 23, y
+      // los quince que faltaban estaban a tres o cinco celdas del sitio, en
+      // pausa.** Lo veían y no iban.
+      //
+      // El suelo hace que la orden gane a estar de brazos cruzados sin
+      // convertirla en obligación ciega: `GATHER_URGENT` deja fuera a quien
+      // tiene una necesidad al límite, que es lo que el brief de IA-3 prohíbe
+      // pisar («no ignores necesidades urgentes para forzar una escena»).
+      const summoned = place.id.startsWith('gather:');
+      if (summoned) {
+        const urgent = Math.max(...NEED_NAMES.map((need) => who.needs[need]));
+        if (urgent < GATHER_URGENT) score = Math.max(score, GATHER_FLOOR);
+      }
       if (score <= 0) continue;
       score *= hourFactor(offer, dayPhase);
       score *= ageLeanOf(who.ageGroup, offer.id);

@@ -24,8 +24,8 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | **IA-6 (historia visible)**, un agente de Sonnet sobre `scenes.ts`, `staging.ts`, `village.ts`, `commitments.ts`, `props.ts`. **No tocar esos ficheros hasta que vuelva.** |
-| Lo que acabo de cerrar | El nivelado de las estancias y el plazo vencido, en `beasts.ts` y `decide.ts` |
+| **En vuelo ahora** | nada |
+| Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
 
 ## 2. El tablero
 
@@ -41,8 +41,8 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
 | IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `life-rounds/IA-3.md` |
 | IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
-| IA-5 · fauna silvestre (cuervos, lobos) | **siguiente** | — | — |
-| IA-6 · historia visible | **en vuelo** | — | — |
+| IA-5 · fauna silvestre (cuervos, lobos) | **la única que queda de la tanda** | — | — |
+| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | (este commit) | `life-rounds/IA-6.md` |
 
 ### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)
 
@@ -93,18 +93,24 @@ el cuerpo más lento y el de parches más anchos— y el siguiente nivel está e
 duraciones y distancias del cuaderno del dueño.
 
 **Interacciones** (IA-2): 1 144 empiezan, 1 122 terminan, **0 colgadas**.
+**Historia visible** (IA-6): 80–91 riñas reales por semilla en 40 años, de ellas
+6–20 montadas, terminadas y liberadas el mismo día del suceso; **0 canceladas,
+0 colgadas** en las ~514 revisadas.
 **Sucesos del valle** (R-1, `tools/fate-report.ts`): 12,3 al año, mediana de 3
 semanas, y **8 de 12 valles se rompen a los 40 años** (el caos que el dueño
 pidió).
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-1. **El mismo fallo del plazo vencido está en las personas.** Lo arreglé para
-   los animales (`beasts.ts`): una intención que no llega a su hora se
-   abandonaba nunca, y por eso una vaca se quedaba clavada con un viaje muerto.
-   **`village.ts` hace lo mismo con la gente** y no lo he tocado porque IA-6 lo
-   tiene abierto. Es lo primero cuando lo suelte: la comprobación de `until`
-   tiene que valer también con `there === false`.
+1. **Falta poder descartar una plaza que ya falló.** Es la pieza que bloquea
+   dos cosas a la vez. El plazo vencido de las personas (`village.ts`) tiene el
+   mismo fallo que tenían los animales, **pero aplicar el arreglo empeora la
+   cifra**: «parados con un impulso al máximo» sube de 0,06 % a 0,20 %, la de
+   partida, porque con las estancias fijas de `SEAT_DWELL` se vuelve a elegir
+   la misma plaza inalcanzable y se reintenta en bucle. Probado, medido y
+   **retirado**, con el número escrito en el propio sitio del código
+   (`village.ts`) y en `life-rounds/IA-6.md` §4.3. Con el descarte, el arreglo
+   entra solo.
 2. **Las duraciones y distancias de las actividades**, con los tiempos del
    cuaderno (`visual-reference` §2 y §3) como referencia declarada como
    hipótesis. La vaca sigue andando el 82,5 %: sus cinco parches están a 1,2–3,2
@@ -150,10 +156,16 @@ De método, y cada una costó tiempo:
   forma segura de comparar antes/después es `git show HEAD:<fichero> > tmp`.
 - **Reparto de ficheros por escrito antes de lanzar dos agentes en paralelo**, y
   decirle a cada uno qué ficheros son del otro. Funcionó con IA-3 e IA-4.
-- **Medir antes de afirmar.** Dos veces esta sesión tuve una hipótesis
-  convincente y falsa, y lo supe porque la medida no se movió. Y una vez estuve
-  a punto de informar de que el mundo era incoherente por contar sólo las casas
-  de madera: eran de piedra.
+- **Medir antes de afirmar.** **Cinco veces** esta sesión tuve una hipótesis
+  convincente y falsa, y las cinco lo supe porque la medida no se movió. Lo que
+  sí funciona, siempre: **seguir un solo cuerpo paso a paso** imprimiendo su
+  intención, su destino y su distancia. Así salieron las cuatro causas del
+  defecto de los animales y la de V-11. Y una vez estuve a punto de informar de
+  que el mundo era incoherente por contar sólo las casas de madera: eran de
+  piedra.
+- **Un arreglo que empeora la cifra no se queda «porque es correcto en
+  principio».** Se retira, se escribe el número en el sitio del código y se
+  nombra la pieza que falta. Pasó con el plazo vencido de las personas.
 
 De diseño, y son las que más valen:
 
@@ -166,6 +178,10 @@ De diseño, y son las que más valen:
   porque la llave llevaba el paso: con p repetida n veces sale 1 − (1 − p)^n.
 - **Un compromiso es una interacción de verdad, no una cercanía.** Reservarlo
   por proximidad dejaba a los animales esperando en `approach` hasta caducar.
+- **Una convocatoria se obedece, no se sopesa.** La reunión de §11.8 daba
+  compañía y quitaba aburrimiento, así que a quien no le faltaba ninguna de las
+  dos no le ofrecía nada y se quedaba en su sitio, viéndola a cuatro celdas.
+  Lo que el motor ordena no compite por utilidad con estar de brazos cruzados.
 - **Tapar el síntoma mejora la cifra y empeora el juego.** Hacer que estar
   parado saciara la sed quitaba a los sedientos de la estadística y les quitaba
   las ganas de ir al agua. El hueco real era que **sólo se podía beber en un

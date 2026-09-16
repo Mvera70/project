@@ -64,6 +64,21 @@ function talkingOf(dweller: Dweller): boolean {
 }
 
 /**
+ * IA-6 · Si está en la riña de la plaza.
+ *
+ * `Dweller.quarrel` lo pone `village.ts` con los dos `id` que el motor guardó
+ * en `happenings[].who` (§7.10), así que esto es un hecho real y no una
+ * inferencia. Va aparte de `talkingOf` porque **nadie del render lo leía**: la
+ * riña se montaba, se movía y terminaba, y se veía igual que dos vecinos
+ * charlando. Ya existía el icono (`quarrel` en `effects/bubbles.ts`), pero lo
+ * disparaba `derive/moods.ts` por rencores viejos, que es otra cosa: un rencor
+ * es un estado y esto es un suceso.
+ */
+function arguingOf(dweller: Dweller): boolean {
+  return (dweller.quarrel ?? null) !== null;
+}
+
+/**
  * El reparto de esta jornada, tal como el render lo espera.
  *
  * Puro: no toca la vida ni el estado, sólo los traduce. Se llama una vez por
@@ -107,6 +122,7 @@ export function castOf(
       // para media aldea y estar sentado en una no es estar hablando. Una señal
       // que marca al 60 % de la gente no señala a nadie (§11.1.1).
       talking: talkingOf(dweller),
+      arguing: arguingOf(dweller),
       // TUNE: la capa de vida todavía no trae el `Role` de nadie hasta aquí
       // (V-11 añadió los ocho modelos en `world/cast.ts`, no este puente); con
       // `null` todo el mundo se sigue viendo con el aldeano base, que es lo

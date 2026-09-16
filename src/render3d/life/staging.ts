@@ -94,6 +94,34 @@ export function meetingPlace(order: Order, land: Terrain, index: number): Place 
 }
 
 /**
+ * IA-6 · La riña de la plaza, con los dos que de verdad discutieron.
+ *
+ * R-1 guarda en `state.happenings` un registro por suceso con `who`: los `id`
+ * de los nombrados implicados, cuando el suceso tiene nombrados (§7.10). Antes
+ * de R-1 sólo existía el nombre en la crónica de texto
+ * (`quarrel.words`/`quarrel.blows`, `sim.ts`) y esta capa no tenía manera de
+ * saber de quién hablaba sin tocar el motor. Con `who` ya no hace falta: es
+ * el atajo que `docs/rework.md` §4 (R-2, punto 1) describe.
+ *
+ * **Sólo la semana en la que ocurrió** (`happening.tick === state.tick`), el
+ * mismo criterio que ya usa `render/reactions.ts` para `lostTick`/`diedTick`:
+ * el estado de una jornada está congelado a la semana del motor (§D.6.7), así
+ * que esto vale igual los siete días de esa semana y desaparece la siguiente.
+ *
+ * Pura lectura del estado, sin azar y sin tocar el motor (E.3).
+ */
+export function quarrelToday(state: GameState): readonly [VillagerId, VillagerId] | null {
+  for (const happening of state.happenings) {
+    if (happening.tick !== state.tick) continue;
+    if (happening.id !== 'quarrel_in_the_square') continue;
+    const [a, b] = happening.who;
+    if (a === undefined || b === undefined) continue;
+    return [a, b];
+  }
+  return null;
+}
+
+/**
  * La hora de la reunión, como fase de la jornada.
  *
  * TUNE: de 0,25 a 0,75. Fija porque el brief lo pide —«una `Place` temporal con

@@ -670,7 +670,12 @@ export async function createGraphicsRenderer(
       const heads = new Map<VillagerId, { x: number; y: number; z: number }>();
       for (const actor of lastActors) {
         const mood = moods.get(actor.id);
-        const bubble: Bubble | undefined = mood ?? (actor.talking ? 'chat' : undefined);
+        // IA-6: la riña de §7.10 manda sobre el humor y sobre la charla. Es un
+        // suceso que está pasando ahora y con dos nombres detrás; un humor es
+        // un estado de fondo y una charla es lo corriente.
+        const bubble: Bubble | undefined = actor.arguing
+          ? 'quarrel'
+          : mood ?? (actor.talking ? 'chat' : undefined);
         if (bubble === undefined) continue;
         carried.set(actor.id, bubble);
         heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });

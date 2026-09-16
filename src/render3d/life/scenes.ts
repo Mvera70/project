@@ -650,3 +650,187 @@ export function playYield(yielding: Yielding, yielder: Dweller): void {
     z: (dz / dist) * yielder.body.pace * 0.6,
   });
 }
+
+// ---------------------------------------------------------------------------
+// IA-6 · La riña de la plaza. docs/design.md §7.10, docs/rework.md §4 (R-2,
+// punto 1), docs/visual-reference/README.md §2.
+//
+// **Esta es la única de las cuatro historias de IA-6 con dato completo**: R-1
+// guarda en `state.happenings[n].who` los `id` de los dos nombrados que peor
+// se llevan cuando sale `quarrel_in_the_square`. `village.ts` lee eso —vía
+// `staging.quarrelToday`— y sólo llama a `proposeQuarrel` para esos dos `id`
+// de verdad, nunca para una pareja cualquiera que se cruce enfadada: **esto no
+// es `shove`/`brawl`** (que sí puede tocarle a cualquiera con mal genio, sin
+// nombre) sino la escenificación de un hecho concreto que ya ocurrió en el
+// motor esta semana.
+//
+// **Lo que el cuaderno pide y lo que esto entrega.** El cuaderno visual
+// (`docs/visual-reference/README.md` §2, lámina `evidence/preview-quarrel.png`)
+// describe la coreografía en cuatro tiempos —aproximación, encuentro,
+// resolución, vuelta— y dice explícitamente lo que **no** hay que añadir:
+// golpes, heridas, reconciliación ni público obligatorio. Se respeta al pie de
+// la letra: no hay `shove()` (nunca se toca la velocidad del otro contra su
+// voluntad, sólo la propia), no hay tirada de vuelta a la amistad, y a quién
+// se junte alrededor lo decide cada cual por su cuenta —vía la reunión de
+// `gather square` que el propio suceso ya provoca en `derive/gatherings.ts`—,
+// nunca esta escena.
+//
+// Los tiempos del cuaderno (1,6/1,6/2,0/1,2 s) son, en sus propias palabras,
+// «una hipótesis de montaje, no una medida»: aquí no se copian tal cual. Se
+// parte de lo que ya existe en esta capa para una tensión entre dos —`WIND_UP`
+// (0,7 s) demuestra que un instante de tensión se lee sin necesitar un segundo
+// entero, y `REEL` (0,75 s) que recomponerse tampoco— y se recorta porque aquí
+// no hay contacto físico que integrar antes de reaccionar, sólo encaro y
+// retirada. Queda para quien mida con la captura de esta ronda decidir si hace
+// falta alargarlo.
+//
+// **No es un `SceneKind` más, adrede.** `chat`/`shove`/`brawl` son lo que le
+// puede tocar a cualquier pareja que se cruce, y `tests/journeys/
+// life-scenes.test.ts` — fuera del alcance de esta fase (el brief cierra los
+// ficheros autorizados) — enumera esos tres por nombre al contar lo que sale
+// de `propose()`. Meter `quarrel` en ese mismo enum le habría añadido un cuarto
+// caso que `propose()` nunca produce, y esa prueba ajena se habría roto sin
+// que nada suyo hubiera cambiado. `QuarrelScene` es su propio tipo, con la
+// misma forma que necesita `village.ts` para tratarla como cualquier otra
+// escena (un `Dweller.scene` que no es `null` mientras dura), pero sin
+// compartir el tipo cerrado de las otras tres.
+
+/** Riña de la plaza, IA-6: misma forma que `Scene` —dos ids de cuerpo, papel
+ *  para cada uno, compás propio— pero sin `kind` de `SceneKind`, por lo de
+ *  arriba. */
+export interface QuarrelScene {
+  readonly a: number; readonly b: number; // ids de cuerpo
+  readonly roleA: 'gives' | 'takes';
+  readonly roleB: 'gives' | 'takes';
+  readonly since: number; // paso
+  readonly until: number; // paso
+  beat: number;
+}
+
+/**
+ * A qué distancia se paran a encararse. Ni el hueco de una charla (`CHAT_GAP`,
+ * 0,95 — demasiado cerca, se leería como conversación) ni el de un empujón
+ * (`SHOVE_GAP`, 0,72 — a esa distancia `separate()` ya casi los solapa):
+ *
+ * TUNE: 1,0. Un paso más que hablar, para que la distancia sola diga «esto no
+ * es una charla» antes de que nadie mire lo que hacen los brazos.
+ */
+const QUARREL_GAP = 1.0;
+
+/**
+ * Cuánto de decidido es el acercamiento a encararse.
+ *
+ * TUNE: 1,3, entre `CHAT_URGE` (1) y `SHOVE_URGE` (1,7): van a discutir, no a
+ * charlar de paso, pero tampoco cargan a empujar.
+ */
+const QUARREL_URGE = 1.3;
+
+/**
+ * Cuánto dura el encaro —gesto de quien reclama, el otro aguanta la mirada—
+ * antes de que éste dé el paso atrás.
+ *
+ * TUNE: 1,2 s. El cuaderno propone 1,6 para todo el «encuentro»; aquí basta
+ * menos porque no hay que integrar ningún contacto antes de reaccionar, sólo
+ * sostener la postura — el mismo motivo por el que `WIND_UP` (0,7 s) le basta
+ * a un empujón para leerse como tensión.
+ */
+const QUARREL_FACE = 1.2;
+
+/**
+ * El paso atrás de quien responde, en celdas.
+ *
+ * TUNE: 0,6. El mismo orden que `YIELD_ASIDE` (0,6): un paso corto y claro,
+ * no una huida.
+ */
+const QUARREL_BACK = 0.6;
+
+/** Cuánto tarda el paso atrás, en segundos escénicos. */
+const QUARREL_BACK_SPAN = 0.8;
+
+/**
+ * Bajan los brazos y se sueltan: un respiro antes de que la escena termine y
+ * cada uno tome su propio camino (`village.ts`, `decide()` normal en cuanto
+ * `dweller.scene` vuelve a `null` — **esta capa no elige a dónde va cada uno
+ * después**, sólo hasta aquí llega la escena).
+ *
+ * TUNE: 0,7 s, como `REEL` (0,75): tan corto como recomponerse de un empujón,
+ * porque aquí tampoco hay un golpe del que recuperarse, sólo dejar de mirarse.
+ */
+const QUARREL_EXIT = 0.7;
+
+const QUARREL_FACE_STEPS = stepsOf(QUARREL_FACE);
+const QUARREL_BACK_STEPS = stepsOf(QUARREL_BACK_SPAN);
+const QUARREL_EXIT_STEPS = stepsOf(QUARREL_EXIT);
+
+/**
+ * Si estos dos —ya identificados por `village.ts` como los `id` de la riña de
+ * verdad— están lo bastante cerca para escenificarla. Determinista con `seed`
+ * y `step`, igual que el resto de esta capa; no mira genio ni opinión, porque
+ * el hecho de que discuten ya lo decidió el motor esta semana, no un dado de
+ * aquí.
+ */
+export function proposeQuarrel(a: Dweller, b: Dweller, seed: number, step: number): QuarrelScene | null {
+  const apart = Math.hypot(b.body.x - a.body.x, b.body.z - a.body.z);
+  if (apart > EARSHOT) return null;
+  const key = `quarrel:${Math.min(a.body.id, b.body.id)}:${Math.max(a.body.id, b.body.id)}:${step}`;
+  const confronterIsA = roll(seed, key) < 0.5;
+  const span = QUARREL_FACE_STEPS + QUARREL_BACK_STEPS + QUARREL_EXIT_STEPS;
+  return {
+    a: a.body.id,
+    b: b.body.id,
+    roleA: confronterIsA ? 'gives' : 'takes',
+    roleB: confronterIsA ? 'takes' : 'gives',
+    since: step,
+    until: step + span,
+    beat: 0,
+  };
+}
+
+/**
+ * Un paso de la riña: se encaran, uno gesticula, el otro da un paso atrás,
+ * bajan los brazos. **Nunca toca la velocidad del otro** —a diferencia de
+ * `shove`, no hay `body.vx`/`vz` puestos contra la voluntad de nadie— porque
+ * el boceto no añade contacto (`docs/visual-reference/README.md` §2).
+ */
+export function playQuarrel(scene: QuarrelScene, a: Dweller, b: Dweller, step: number): void {
+  const confronter = scene.roleA === 'gives' ? a : b;
+  const responder = confronter === a ? b : a;
+  const faceEnd = scene.since + QUARREL_FACE_STEPS;
+  const backEnd = faceEnd + QUARREL_BACK_STEPS;
+
+  if (step < faceEnd) {
+    // Aproximación y encaro: se cierran hasta `QUARREL_GAP`, mirándose.
+    position(confronter.body, responder.body, QUARREL_GAP, QUARREL_URGE);
+    position(responder.body, confronter.body, QUARREL_GAP, QUARREL_URGE);
+    face(confronter.body, responder.body);
+    face(responder.body, confronter.body);
+    scene.beat = 0;
+    return;
+  }
+
+  if (step < backEnd) {
+    // Quien responde da un paso atrás; quien reclama se queda plantado.
+    const away = Math.max(1e-6, Math.hypot(
+      responder.body.x - confronter.body.x, responder.body.z - confronter.body.z,
+    ));
+    drive(responder.body, {
+      x: (responder.body.x - confronter.body.x) / away * responder.body.pace
+        * (QUARREL_BACK / QUARREL_BACK_SPAN),
+      z: (responder.body.z - confronter.body.z) / away * responder.body.pace
+        * (QUARREL_BACK / QUARREL_BACK_SPAN),
+    });
+    drive(confronter.body, { x: 0, z: 0 });
+    face(confronter.body, responder.body);
+    face(responder.body, confronter.body);
+    scene.beat = 1;
+    return;
+  }
+
+  // Bajan los brazos: nadie se mueve a propósito. La salida por caminos
+  // distintos la da `decide()` en cuanto `village.ts` cierra la escena, no
+  // esta función — aquí no hay ni pareja que reconciliar ni sitio al que
+  // mandarlos, sólo dejar de encararse.
+  drive(confronter.body, { x: 0, z: 0 });
+  drive(responder.body, { x: 0, z: 0 });
+  scene.beat = 2;
+}
