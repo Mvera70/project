@@ -7,11 +7,11 @@
 // prueba `noticeworthy` sin arrancar nada, esto prueba `ambientFor`,
 // `accentFor` y `accentAllowed` sin un `AudioContext` de por medio.
 
-import { foundTwenty } from '../helpers/founding';
+import { foundTwenty, villageWhere } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { SOUND } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { run, tick } from '@engine/sim';
+import { tick } from '@engine/sim';
 import { count, standing } from '@engine/subsistence/building-counts';
 import { seasonOf } from '@engine/time';
 import { milestonesAt } from '@ui/milestones';
@@ -46,8 +46,12 @@ describe('ambientFor · el río está, casi siempre', () => {
 // `ambientFor` es de sólo lectura, así que jugarla dos veces no cuenta nada
 // que jugarla una sola no cuente ya, y ochenta años es lo que hace falta para
 // que el motor levante una fragua de verdad (`BUILDING_RULES.SMITHY_PEOPLE`).
-const MATURE_VILLAGE = foundTwenty(7);
-run(MATURE_VILLAGE, 80 * 48, 'prudent', CATALOG);
+// **Y la semilla se elige por tener fragua, no por su número** (R-1 §2.6): el
+// rayo quema la fragua de la semilla 7 antes de los ochenta años, y esta
+// prueba medía justamente esa fragua. `villageWhere` busca un valle que la
+// tenga en pie; si ninguno la tiene, la prueba de abajo falla diciéndolo.
+const MATURE_VILLAGE = villageWhere(80, (s) => standing(s, 'smithy').length > 0)
+  ?? foundTwenty(7);
 
 describe('ambientFor · la fragua y la campana siguen al edificio, no a un contador', () => {
   it('coincide con lo que el propio motor tiene en pie', () => {

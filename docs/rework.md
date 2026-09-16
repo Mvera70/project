@@ -477,6 +477,13 @@ libre, o ninguna con ruta. Es el síntoma humano que el dueño llama «IA».
 
 ### 3.5 Qué arreglar, en orden, y con qué criterio
 
+> **Estado (v3.76): los puntos 1, 3 y 6 están hechos y medidos** (§3.6).
+> Quedan el **2** (un ancla que no se alcanza se cambia, y `SELF_OFFER` con
+> varios sitios y asientos de verdad), el **4** (que nadie se quede parado con
+> un impulso al máximo: oferta de reserva siempre alcanzable, y el pozo y la
+> orilla con muchos asientos) y el **5** (la malla y el radio se corresponden,
+> que es trabajo de `render3d/` y no de `life/`). Son la ronda siguiente.
+
 1. **El círculo colisiona, no el punto** (`body.ts`, `integrate`). Al mover en
    X, comprueba `blockedAt(nextX ± radius, z)`; al mover en Z, lo mismo. Y en
    `navigate.ts`, `clearBetween` con el radio (dos líneas paralelas a ±radio, o
@@ -520,12 +527,37 @@ secuencia de capturas para el dueño** con animales delante de una casa
 (`--seed 7 --settle 20 --sequence 12 --every 0.8`). Lo que no llegue, se deja
 como `it.fails` con la medida, no se baja el listón.
 
-### 3.6 Medidas (a rellenar por quien haga §3.4)
+### 3.6 Medidas · hecho (v3.76)
 
-| Jornada | Centro en muro | Círculo en muro (cuerpo-pasos) | Giros/seg parado | Parados con impulso ≥ 0,9 |
+`npx tsx tools/life-report.ts 3 7 11 23 41 97 --days 4`, sobre personas **y**
+animales a la vez: seis semillas × cuatro jornadas = **92 160 cuerpo-segundos**
+por columna. El «antes» es la capa de vida de `main` medida con el mismo
+informe (los seis ficheros revertidos y restaurados después), así que las dos
+filas son la misma medida sobre el mismo mundo y se pueden comparar.
+
+| | Centro en muro | Círculo en muro | Giros > π/2 parado | Parados con impulso ≥ 0,9 |
 |---|---|---|---|---|
-| antes | — | — | — | — |
-| después | — | — | — | — |
+| **antes** | 0 | 1 211 · **1,31 %** | 4 377 · **4,75 %** | 182 · 0,20 % |
+| **después** | 0 | 91 · **0,10 %** | 313 · **0,34 %** | 174 · 0,19 % |
+
+**Las dos cosas que el dueño ve bajan un orden de magnitud**: atravesar paredes
+de 1,31 % a 0,10 % de los cuerpo-segundos (trece veces menos), y dar vueltas
+sobre sí mismo de 4,75 % a 0,34 % (catorce veces menos). Por semilla, la peor
+era la 23 con el 3,87 % de los cuerpo-segundos dentro de un muro; ahora es la
+misma con el 0,24 %.
+
+**Los parados con un impulso al máximo no se mueven, y es lo correcto:** de
+0,20 % a 0,19 %. Ése es el punto 4 de §3.5, que no entraba en esta ronda —lo
+que falla ahí no es la colisión ni el giro, sino que `decide` conserva una
+intención inalcanzable y no hay oferta de reserva—. Queda para la siguiente,
+con la medida ya escrita y el informe listo para volver a pasarlo.
+
+**Lo que queda por debajo de cero no está a cero, y no se ha bajado el listón
+para disimularlo:** el 0,10 % que sigue metiéndose en un muro es, casi todo, de
+cuerpos que **nacen** dentro de uno (el ancla de un animal, el punto de
+reunión que cae dentro de un edificio) y tardan unos pasos en salir. Es la
+trampa de E.7, y arreglarla de verdad es el punto 2 de §3.5: el ancla se busca
+en celda libre al crear, no se corrige al andar.
 
 ---
 
@@ -690,7 +722,8 @@ podar cuando toque, no un problema que resolver.
 | Fase | Estado | Dónde |
 |---|---|---|
 | R-1 | **hecho, v3.75, en `main`** (queda §2.6 y la captura de §2.8) | `src/engine/world/fate.ts`, `sky.ts`; `tools/fate-report.ts`; §4.2 2b, §7.10, §12.10 |
-| §3 IA | **siguiente** — medir (§3.4), arreglar (§3.5), capturas | `src/render3d/life/` |
+| §3 IA · puntos 1, 3, 6 | **hecho, v3.76** — paredes 1,31 % → 0,10 %, vueltas 4,75 % → 0,34 % (§3.6) | `life/body.ts`, `steering.ts`, `navigate.ts`, `beasts.ts`, `terrain.ts`, `village.ts`, `tools/life-report.ts` |
+| §3 IA · puntos 2, 4, 5 | **siguiente** — anclas, oferta de reserva, malla contra radio | `src/render3d/life/`, `src/render3d/` |
 | R-2 + R-5 | después de §3 | Anexo E, `scenes.ts`, `staging.ts`, `offers.ts`, §7.9 |
 | R-3 | después | `found.ts`, `TRAITS`, `fate.ts`, mapa |
 | R-4 | no es trabajo | §8 |

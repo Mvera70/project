@@ -296,6 +296,20 @@ export const BANK: Record<string, string[]> = {
     '{count} more granaries stood by the end of year {year}.',
     'Year {year} gave the valley {count} places to keep its grain.',
   ],
+  // R-1 · Con los veinte de §12.2 la aldea levanta más de una fragua y más de
+  // un molino en el mismo año, y §9.2 exige forma anual para toda familia que
+  // se repita dentro de un año. Antes no hacían falta porque la aldea nunca
+  // llegaba a dos de ninguna de las dos cosas en doce meses.
+  'built.smithy.year': [
+    '{count} forges were lit in year {year}.',
+    'They raised {count} smithies that year.',
+    'Year {year} gave the valley {count} more anvils.',
+  ],
+  'built.mill.year': [
+    '{count} mills began turning in year {year}.',
+    'They finished {count} mills that year.',
+    'Year {year} set {count} more millstones to work.',
+  ],
   'built.palisade.year': [
     'The palisade closed around the village in year {year}.',
     '{count} lengths of palisade went up that year.',

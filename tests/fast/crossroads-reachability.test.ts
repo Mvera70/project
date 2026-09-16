@@ -15,10 +15,10 @@
 // condición que nunca se cumple en ninguna partida real, sea cual sea la
 // semilla, es un error de construcción: un umbral fuera del rango que el motor
 // puede alcanzar. Una condición que se cumple poco no lo es.
+import { foundTwenty } from '../helpers/founding';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { all } from '@engine/crossroads/conditions';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { Policy } from '@engine/sim';
 import { TIME } from '@engine/balance';
@@ -39,7 +39,7 @@ function passesByTemplate(): Map<string, number> {
   for (const t of CATALOG) passes.set(t.id, 0);
 
   for (const seed of SEEDS) {
-    const state: GameState = foundGame(seed);
+    const state: GameState = foundTwenty(seed);
     const wanted = YEARS * TIME.WEEKS_PER_YEAR;
     while (state.tick < wanted && state.ended === null) {
       for (const t of CATALOG) {

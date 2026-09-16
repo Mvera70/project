@@ -3,9 +3,9 @@
 // Lo que se protege: que tras decidir algo con `gather` la gente esté de
 // verdad en otro sitio, que la reunión se acabe cuando dice el catálogo, y que
 // todo esto siga siendo derivado — ni un byte de estado, ni una tirada.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { crowdPositions } from '@render/crowd';
 import { gatheringsAt } from '@derive/gatherings';
@@ -17,7 +17,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

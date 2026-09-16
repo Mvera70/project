@@ -7,9 +7,9 @@
 // garantía sin escribir una línea; si alguien las rompe, el valle vuelve a dar
 // saltos y esta vez se entera alguien antes que el jugador.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { readFileSync } from 'node:fs';
@@ -18,7 +18,7 @@ import { NIGHT } from '@derive/animals';
 import { createScenicState } from '../../src/render3d/scenic-state';
 
 function village(years: number, seed = 7): GameState {
-  const state = foundGame(seed);
+  const state = foundTwenty(seed);
   run(state, years * 48, 'prudent', CATALOG);
   return state;
 }

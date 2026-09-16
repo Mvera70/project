@@ -3,10 +3,10 @@
 // Lo que hay que proteger son tres cosas y ninguna es un número concreto:
 // que la aldea harta NO salga, que la aldea hambrienta SÍ salga sin dejar de
 // construir, y que lo que trae dependa de lo que el valle tiene todavía.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { FOOD, FORAGE, LABOUR, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { population } from '@engine/people/demography';
 import { run } from '@engine/sim';
 import { forage, foragingUrgency, hasRiver } from '@engine/subsistence/forage';
@@ -22,7 +22,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

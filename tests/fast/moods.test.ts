@@ -4,17 +4,17 @@
 // fecha**, que una persona lleva una o ninguna, y que no las lleva todo el
 // mundo: una aldea donde los cuarenta enseñan una nube encima no dice nada.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { BUBBLE } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { isHere } from '@engine/people/demography';
 import type { GameState, VillagerId } from '@engine/state';
 import { moodsFor, MOODS } from '@derive/moods';
 
 function village(years: number, seed = 7): GameState {
-  const state = foundGame(seed);
+  const state = foundTwenty(seed);
   run(state, years * 48, 'prudent', CATALOG);
   return state;
 }
@@ -107,7 +107,11 @@ describe('§11.1.1 · las burbujas de estado', () => {
   it('no la lleva toda la aldea en un año cualquiera', () => {
     // Si todo el mundo lleva una, no dice nada. Se mide sobre veinte años de
     // una partida normal, no sobre un instante: un instante es ruido.
-    const state = foundGame(7);
+    //
+    // Con los veinte de §12.2 y no con la pareja: hacen falta veinte años con
+    // gente dentro para que haya veinte muestras, y desde R-1 §2.6 una pareja
+    // puede romperse por el camino (medido: ocho muestras de veinte).
+    const state = foundTwenty(7);
     let crowded = 0;
     let looked = 0;
     for (let year = 0; year < 20; year += 1) {

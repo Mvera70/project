@@ -4,7 +4,9 @@
 // ni uno más, que apagar un edificio le quite de verdad el humo y la luz, que
 // `who` apague la casa de esa persona y no otra, y que nada de esto escriba
 // en el estado ni gaste una tirada.
-import { foundTwenty } from '../helpers/founding';
+import { standing } from '@engine/subsistence/building-counts';
+import type { BuildingKind } from '@engine/state';
+import { foundTwenty, villageWhere } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { MARKS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -137,6 +139,30 @@ describe('el estandarte · §11.8', () => {
   });
 });
 
+/**
+ * Una aldea con en pie **el tipo de edificio que apaga la opción que esta
+ * prueba usa**, leído del propio catálogo y no escrito a mano: si mañana el
+ * primer `douse` del catálogo apaga otra cosa, esto sigue midiendo lo mismo.
+ *
+ * Hace falta desde R-1 §2.6, porque el rayo quema y ninguna puerta lo impide:
+ * la semilla 7 llegaba a los veinte años sin el edificio, `dousedAt` no tenía
+ * nada que apagar y la prueba fallaba por la suerte de un valle. Ver
+ * `villageWhere` (`tests/helpers/founding.ts`).
+ */
+function dousedKind(): BuildingKind {
+  const { templateId, optionId } = optionWith('douse');
+  const option = CATALOG.find((t) => t.id === templateId)?.options.find((o) => o.id === optionId);
+  const effect = option?.visible.find((v) => v.k === 'douse');
+  return effect !== undefined && effect.k === 'douse' ? (effect.kind as BuildingKind) : 'house';
+}
+
+function doused(): GameState {
+  const kind = dousedKind();
+  const found = villageWhere(20, (s) => standing(s, kind).length > 0);
+  expect(found, `alguna semilla debe llegar a los 20 años con ${kind} en pie`).not.toBeNull();
+  return found as GameState;
+}
+
 describe('el apagón · §11.8', () => {
   it('sin decisiones no hay nada apagado', () => {
     const state = village(20);
@@ -145,14 +171,17 @@ describe('el apagón · §11.8', () => {
   });
 
   it('una decisión apaga un edificio', () => {
-    const state = village(20);
+    // El valle se elige por tener algo encendido que apagar, no por su número
+    // (R-1 §2.6: el rayo quema fraguas y capillas, y la semilla 7 se queda sin
+    // ninguna). La propiedad medida no cambia.
+    const state = doused();
     state.history = [];
     record(state, 'douse');
     expect(dousedAt(state, CATALOG).size).toBeGreaterThan(0);
   });
 
   it('se vuelve a encender pasado su plazo', () => {
-    const state = village(20);
+    const state = doused();
     state.history = [];
     record(state, 'douse');
 

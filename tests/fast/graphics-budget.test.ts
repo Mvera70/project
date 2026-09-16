@@ -5,9 +5,9 @@
 // una y otra vez no deje nada detrás. Una fuga no se ve en un fotograma: se ve
 // en la sesión sostenida, y para entonces ya está pagada.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { SCENES } from '../../tools/graphics/bench-scenes';
@@ -26,7 +26,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

@@ -9,11 +9,11 @@
 // que es una función pura del estado, y las dos piezas que gestionan objetos:
 // el pueblo y el reparto.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { ford, run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 import { loadAssets } from '../../src/render3d/assets';
@@ -44,7 +44,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

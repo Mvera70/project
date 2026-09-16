@@ -3,6 +3,7 @@
 // Lo que se protege: que muerdan solo cuando el grano está en pie, que la
 // vigilancia sirva, que vigilar cueste brazos de verdad, y que un año no pague
 // nunca los pájaros del anterior.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { ANIMALS, CROWS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -22,7 +23,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

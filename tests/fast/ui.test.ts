@@ -1,3 +1,4 @@
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { UI_BANK } from '@engine/chronicle/bank.en';
@@ -131,7 +132,7 @@ describe('U-08 · la pantalla People', () => {
     const seenTraits = new Set<string>();
     const seenRoles = new Set<string>();
     for (const [seed, policy] of seeds) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       run(state, 60 * TIME.WEEKS_PER_YEAR, policy, CATALOG);
       // Toda la partida, no sólo quien sigue vivo al final: la lista de U-08
       // sólo enseña a los nombrados vivos en cada momento, pero el rasgo y el
@@ -155,7 +156,10 @@ describe('U-08 · la pantalla People', () => {
   });
 
   it('la lista sólo enseña a los nombrados vivos, y su edad y oficio salen del banco', () => {
-    const state = foundGame(7);
+    // Con los veinte de §12.2 y no con la pareja: la prueba pide nombrados
+    // vivos **y** nombrados muertos a los veinte años, y desde R-1 §2.6 una
+    // pareja no siempre llega hasta ahí.
+    const state = foundTwenty(7);
     run(state, 20 * TIME.WEEKS_PER_YEAR, 'first', CATALOG);
     const living = state.people.villagers.filter((v) => v.named && isHere(v));
     expect(living.length).toBeGreaterThan(0);

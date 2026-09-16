@@ -5,6 +5,7 @@
 // una etiqueta de estado que se equivoca es peor que no tenerla: el jugador
 // aprende a no mirarla y con ella deja de mirar el resto.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { renderUiText } from '@engine/chronicle/render';
@@ -19,7 +20,7 @@ const SEEDS = [7, 11, 23, 41];
 describe('doingNow · la aldea dice qué está haciendo', () => {
   it('siempre tiene algo que decir mientras la aldea viva, y siempre está en el banco', () => {
     for (const seed of SEEDS) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       for (let year = 0; year < 40 && state.ended === null; year += 1) {
         run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
         const said = doingNow(state);
@@ -46,7 +47,7 @@ describe('doingNow · la aldea dice qué está haciendo', () => {
     // La propiedad no necesita más muestras: es una contradicción lógica, así
     // que basta con que ocurra la situación.
     for (const seed of SEEDS.slice(0, 2)) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       for (let week = 0; week < 20 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
         tick(state, CATALOG);
         const said = doingNow(state);
@@ -79,7 +80,7 @@ describe('doingNow · la aldea dice qué está haciendo', () => {
     // línea tiene que poder decirlo.
     const seen = new Map<string, number>();
     for (const seed of SEEDS.slice(0, 2)) {
-      const state = foundGame(seed);
+      const state = foundTwenty(seed);
       for (let week = 0; week < 20 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
         tick(state, CATALOG);
         const said = doingNow(state);

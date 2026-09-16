@@ -232,18 +232,36 @@ describe('los oficios se ven · §11.9', () => {
     return b === undefined ? undefined : { x: b.x + b.w / 2, y: b.y + b.h / 2 };
   };
 
+  /**
+   * Una aldea de veinticinco años **que tenga herrero y fragua en pie**, de
+   * entre varias semillas.
+   *
+   * Antes se cogía la semilla 7 y se daba por hecho que a los veinticinco años
+   * tendría las dos cosas. Desde que el caos es el juego (R-1 §2.6, «que haya
+   * partidas que se rompan y no se pueda seguir jugando es la idea del
+   * juego»), el rayo puede quemar la fragua de cualquier valle y en la 7 la
+   * quema: la prueba fallaba por la suerte de un valle, no por lo que dice
+   * medir. Lo que se guarda es «el que tiene taller trabaja en su taller», y
+   * para eso hace falta un valle con taller, no uno concreto.
+   */
+  const forgeVillage = (): { state: GameState; smithId: number; forge: { x: number; y: number } } | null => {
+    for (const seed of [7, 11, 23, 41, 97]) {
+      const state = workweek(village(25, seed));
+      const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null);
+      const forge = centreOf(state, 'smithy');
+      if (smith !== undefined && forge !== undefined) return { state, smithId: smith.id, forge };
+    }
+    return null;
+  };
+
   it('el herrero pasa el día en la fragua, no en el campo', () => {
     // El reparto de §5.2 cuenta brazos, no personas, así que el herrero era un
     // labrador más. Los ocho con nombre son los únicos que el jugador sigue.
-    const state = workweek(village(25));
-    const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null);
-    const forge = centreOf(state, 'smithy');
-    expect(smith, 'la aldea de 25 años debe tener herrero').toBeDefined();
-    expect(forge, 'y fragua').toBeDefined();
-
-    const at = spotOf(state, smith!.id);
+    const found = forgeVillage();
+    expect(found, 'alguna de las cinco semillas debe llegar a los 25 años con herrero y fragua').not.toBeNull();
+    const at = spotOf(found!.state, found!.smithId);
     expect(at).toBeDefined();
-    expect(Math.hypot(at!.x - forge!.x, at!.y - forge!.y)).toBeLessThan(4);
+    expect(Math.hypot(at!.x - found!.forge.x, at!.y - found!.forge.y)).toBeLessThan(4);
   });
 
   it('el alguacil, junto al granero', () => {
@@ -268,15 +286,17 @@ describe('los oficios se ven · §11.9', () => {
   });
 
   it('y si la fragua se pierde, el herrero vuelve al campo', () => {
-    // Sin taller no hay sitio propio: no se le deja plantado en un solar.
-    const state = workweek(village(25));
-    const smith = state.people.villagers.find((v) => v.role === 'smith' && v.diedTick === null);
-    if (smith === undefined) return;
-    const withForge = spotOf(state, smith.id);
+    // Sin taller no hay sitio propio: no se le deja plantado en un solar. Y la
+    // fragua la tira la prueba a mano, que es el punto: se compara el mismo
+    // herrero del mismo valle con y sin ella. El valle lo elige
+    // `forgeVillage()` porque desde R-1 §2.6 no todos llegan con fragua.
+    const found = forgeVillage();
+    expect(found, 'alguna de las cinco semillas debe llegar a los 25 años con herrero y fragua').not.toBeNull();
+    const withForge = spotOf(found!.state, found!.smithId);
 
-    const razed = workweek(village(25));
+    const razed = structuredClone(found!.state);
     for (const b of razed.buildings) if (b.kind === 'smithy') b.lostTick = razed.tick - 100;
-    const without = spotOf(razed, smith.id);
+    const without = spotOf(razed, found!.smithId);
 
     expect(withForge).toBeDefined();
     expect(without).toBeDefined();

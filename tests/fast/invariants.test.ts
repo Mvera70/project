@@ -1,7 +1,7 @@
 // M-11: integrated state properties from design.md §14.1.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { next } from '@engine/rng';
 import { run } from '@engine/sim';
 import { yearKey } from '@engine/chronicle/events';
@@ -11,7 +11,7 @@ import { TERRAIN_CODE } from '@engine/state';
 
 describe('M-11 · integrated invariants', () => {
   it.each([0, 6, 7, 42, 108])('keeps valid state at every tick, seed %i', (seed) => {
-    const state = foundGame(seed);
+    const state = foundTwenty(seed);
     for (let week = 1; week <= 200; week += 1) {
       run(state, 1, 'first', CATALOG);
       expect(state.tick).toBe(week);
@@ -49,8 +49,8 @@ describe('M-11 · integrated invariants', () => {
   // full structured-clone round trip with a fingerprint of every state field.
 
   it('isolates 1,000 chronicle draws from the complete subsequent simulation', () => {
-    const baseline = foundGame(6);
-    const noisy = foundGame(6);
+    const baseline = foundTwenty(6);
+    const noisy = foundTwenty(6);
     run(baseline, 1000, 'first', CATALOG);
     run(noisy, 1000, 'first', CATALOG);
     for (let i = 0; i < 1000; i += 1) next(noisy.rng, 'chronicle');
@@ -77,7 +77,7 @@ describe('la crónica de una partida entera · §9.2', () => {
     // repetirse y nadie le escribe su línea anual, esto lo dice.
     const missing = new Set<string>();
     for (const seed of [7, 19, 108]) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       run(s, 100 * YEAR_TICKS, 'prudent', CATALOG);
       const perYear = new Map<string, number>();
       for (const e of s.chronicle) {
@@ -97,7 +97,7 @@ describe('la crónica de una partida entera · §9.2', () => {
 
   it('ningún volcado de año deja una clave sin resolver', () => {
     for (const seed of [7, 108]) {
-      const s = foundGame(seed);
+      const s = foundTwenty(seed);
       run(s, 40 * YEAR_TICKS, 'prudent', CATALOG);
       for (let y = 0; y <= 40; y += 1) {
         for (const weight of [1, 2, 3] as const) {

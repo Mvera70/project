@@ -3,6 +3,7 @@
 // Lo que se protege: que un rebaño apretado enferme más que uno holgado, que
 // el pozo sirva, que la peste no acabe nunca con toda una especie de golpe, y
 // que su flujo propio no desplace ni un lobo ni una muerte.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -21,7 +22,7 @@ function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

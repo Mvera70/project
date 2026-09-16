@@ -4,10 +4,11 @@
 // round trip through storage, a corrupt blob nobody asked for, and a balance
 // change that would otherwise sink every game in progress. Each test protects
 // one of those, not the code that happens to implement them.
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
+
 import { population } from '@engine/people/demography';
 import {
   archiveGame,
@@ -24,7 +25,7 @@ import { fingerprint } from '../helpers/fingerprint';
 
 describe('serialize / deserialize · §13.1', () => {
   it('la ida y vuelta por un almacén real (clonado estructurado) es idéntica', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     run(state, 300, 'prudent', CATALOG);
     const saved = serialize(state, state.history, [], 1_726_000_000_000);
 
@@ -45,22 +46,22 @@ describe('serialize / deserialize · §13.1', () => {
       'not a save',
       {},
       { schema: 1 },
-      { schema: 99, savedAtMs: 0, state: foundGame(1), decisions: [], archive: [] },
+      { schema: 99, savedAtMs: 0, state: foundTwenty(1), decisions: [], archive: [] },
       { schema: 1, savedAtMs: 0, state: { tick: 'seis' }, decisions: [], archive: [] },
-      { schema: 1, savedAtMs: 0, state: foundGame(1), decisions: 'no', archive: [] },
+      { schema: 1, savedAtMs: 0, state: foundTwenty(1), decisions: 'no', archive: [] },
     ]) {
       expect(() => deserialize(garbage)).toThrow();
     }
   });
 
   it('un guardado válido nunca se rechaza', () => {
-    const state = foundGame(3);
+    const state = foundTwenty(3);
     const saved = serialize(state, state.history, [], Date.now());
     expect(() => deserialize(structuredClone(saved))).not.toThrow();
   });
 
   it('rechaza contenedores parciales antes de que lleguen al motor o al render', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     const base = serialize(state, state.history, [], 10);
     const brokenMap = structuredClone(base);
     (brokenMap.state as unknown as Record<string, unknown>)['map'] = {};
@@ -105,7 +106,7 @@ describe('serialize / deserialize · §13.1', () => {
       witheredTick: null,
     });
 
-    const ended = foundGame(8);
+    const ended = foundTwenty(8);
     ended.ended = { tick: ended.tick, cause: 'abandoned', lastId: null };
     const badArchive = structuredClone(serialize(state, state.history, [archiveGame(ended)], 10));
     badArchive.archive[0]!.ruins = new Uint8Array(1);
@@ -128,7 +129,7 @@ describe('serialize / deserialize · §13.1', () => {
     // §8.2 no tiene: el motor la leería como `undefined` y la compararía
     // contra un número, de modo que la consecuencia prometida no vencería
     // nunca y nada lo diría.
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     const base = serialize(state, state.history, [], 10);
     const template = CATALOG.find((t) => t.options.some((o) => o.seeds.length > 0))!;
     const option = template.options.find((o) => o.seeds.length > 0)!;
@@ -206,7 +207,7 @@ describe('serialize / deserialize · §13.1', () => {
   });
 
   it('migra el esquema 1 conservando su semilla de terreno y el pico observable', () => {
-    const current = foundGame(7);
+    const current = foundTwenty(7);
     current.chronicle.push({
       tick: 1,
       kind: 'arrival',
@@ -237,7 +238,7 @@ describe('serialize / deserialize · §13.1', () => {
 
 describe('herencia entre partidas · §13.3', () => {
   it('registra el pico de los estados semanales que llegaron a completarse', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     let observed = population(state);
     for (let i = 0; i < 500 && state.ended === null; i += 1) {
       tick(state, CATALOG);
@@ -247,7 +248,7 @@ describe('herencia entre partidas · §13.3', () => {
   });
 
   it('archiva la crónica y toda la huella visible, sin aceptar una aldea viva', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     expect(() => archiveGame(state)).toThrow();
     state.map.ruins[0] = 1;
     state.peakPeople = 37;
@@ -268,7 +269,7 @@ describe('herencia entre partidas · §13.3', () => {
   });
 
   it('funda otra gente sobre el mismo terreno y siembra las ruinas sin hacerlas ocupación', () => {
-    const ended = foundGame(7);
+    const ended = foundTwenty(7);
     const originalTerrain = Uint8Array.from(ended.map.terrain);
     const altered = ended.map.terrain.findIndex((terrain) => terrain === TERRAIN_CODE.forest);
     ended.map.terrain[altered] = TERRAIN_CODE.cleared;
@@ -292,7 +293,7 @@ describe('herencia entre partidas · §13.3', () => {
 
 describe('catchUp · §13.2', () => {
   it('cuatro horas ejecutan exactamente 960 ticks en menos de 2 s', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     const start = performance.now();
     const report = catchUp(state, TIME.LETHARGY_CAP_MS);
     const elapsedMs = performance.now() - start;
@@ -326,7 +327,7 @@ describe('catchUp · §13.2', () => {
     // y eso es lo que esta prueba guarda: con el tick de 15 s eran cuatro horas
     // y desde v3.72 son nueve días y medio, sin que cambie ni un tick.
     const generation = TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR;
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     const report = catchUp(state, 2 * TIME.LETHARGY_CAP_MS);
     expect(report.ticks).toBe(generation);
     expect(report.capped).toBe(true);
@@ -335,7 +336,7 @@ describe('catchUp · §13.2', () => {
   });
 
   it('una encrucijada pendiente sigue pendiente al volver: no se resuelve, no caduca, no mata', () => {
-    const state = foundGame(7);
+    const state = foundTwenty(7);
     // Se fuerza una encrucijada con las plantillas reales, sin decisión.
     const template = CATALOG.find((t) => t.options.length >= 2)!;
     state.crossroad = {
@@ -367,11 +368,14 @@ describe('reproducir el registro de decisiones · §13.1', () => {
     const seed = 7;
     const ticks = 3_000; // suficiente para que el catálogo real pregunte varias veces
 
-    const original = foundGame(seed);
+    // Los veinte de §12.2: el rejugado compara dos partidas con el mismo
+    // registro de decisiones, y hace falta que haya decisiones. Desde R-1 §2.6
+    // la pareja puede romperse antes de que el catálogo pregunte.
+    const original = foundTwenty(seed);
     run(original, ticks, 'prudent', CATALOG);
     expect(original.history.length).toBeGreaterThan(0); // si esto falla, la prueba no prueba nada
 
-    const replay = foundGame(seed);
+    const replay = foundTwenty(seed);
     run(replay, ticks, replayPolicy(original.history), CATALOG);
 
     expect(fingerprint(replay)).toBe(fingerprint(original));

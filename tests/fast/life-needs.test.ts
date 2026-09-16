@@ -9,8 +9,8 @@
 // 2. **Ninguna oferta conoce a nadie.** En cuanto una diga «si pasa fulano…»,
 //    esto deja de ser un mundo con cosas y es un guion disfrazado.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { GameState, Trait } from '@engine/state';
@@ -28,7 +28,7 @@ const grown = new Map<number, GameState>();
 function village(seed: number): GameState {
   let base = grown.get(seed);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, 40 * 48, 'prudent', CATALOG);
     grown.set(seed, base);
   }

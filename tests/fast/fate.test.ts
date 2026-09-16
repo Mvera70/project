@@ -140,44 +140,20 @@ describe('los sucesos del valle · R-1', () => {
     expect(withGrudges).toBeGreaterThanOrEqual(4);
   });
 
-  it('el caos es el juego: unos valles se rompen y otros no', () => {
-    // Hasta v3.75 esta prueba exigía que las seis semillas llegaran vivas al
-    // año treinta, y dos puertas en `weightOf` (`LIGHTNING_MIN_HOUSES`,
-    // `LIGHTNING_MIN_PEOPLE`) lo garantizaban quitándole al rayo la única casa
-    // de la pareja fundadora. El dueño del diseño dijo después, con estas
-    // palabras, que eso es exactamente lo contrario de lo que quiere: «que
-    // haya caos y que haya partidas que se rompan y no se pueda seguir
-    // jugando es la idea del juego» (`docs/rework.md` §2.6). Las puertas se
-    // quitaron: el rayo ya sólo pide tormenta y madera en pie, así que puede
-    // quemar la única casa de dos en la semana 1. Lo que esta prueba mide
-    // ahora es la propiedad nueva: que un valle se pueda romper, no que nunca
-    // se rompa.
-    //
-    // Medido en doce semillas a cuarenta años, jugadas con `run` y la política
-    // prudente: 8 de 12 acaban (6 `abandoned`, 2 `extinction`), las otras 4
-    // siguen. La horquilla dejar sitio a que los pesos se muevan sin perder la
-    // propiedad: que existan valles que acaban y valles que siguen.
-    const seeds = [3, 7, 11, 23, 31, 41, 53, 67, 79, 83, 89, 97];
-    const states = seeds.map((seed) => played(seed, 40));
-    const finished = states.filter((state) => state.ended !== null);
-    const alive = states.filter((state) => state.ended === null);
-    expect(finished.length, `acabaron: ${finished.length} de ${seeds.length}`).toBeGreaterThanOrEqual(3);
-    expect(finished.length, `acabaron: ${finished.length} de ${seeds.length}`).toBeLessThanOrEqual(11);
-    expect(alive.length, `siguen: ${alive.length} de ${seeds.length}`).toBeGreaterThan(0);
-
-    for (const state of states) {
-      // La partida que acaba lo cuenta: causa y crónica, no un final mudo.
-      if (state.ended !== null) {
-        const kind = state.ended.cause === 'extinction' ? 'extinction' : 'abandonment';
-        expect(state.chronicle.some((e) => e.kind === kind)).toBe(true);
-      }
-      // Lo que sigue sin negociarse es la integridad, no la supervivencia:
-      // el grano nunca es negativo, el ánimo se queda entre 0 y 100 y las
-      // gallinas nunca bajan de cero, rompa el valle o no.
-      expect(state.village.grain).toBeGreaterThanOrEqual(0);
-      expect(state.village.morale).toBeGreaterThanOrEqual(0);
-      expect(state.village.morale).toBeLessThanOrEqual(100);
-      expect(state.herd.hens).toBeGreaterThanOrEqual(0);
+  it('el valle se rompa o no, el estado sigue siendo válido', () => {
+    // Integridad, no supervivencia. **Que unos valles se rompan y otros no es
+    // ahora la propiedad del diseño** —el dueño lo pidió con estas palabras,
+    // «que haya caos y que haya partidas que se rompan y no se pueda seguir
+    // jugando es la idea del juego» (`docs/rework.md` §2.6)— y medirla pide
+    // doce semillas a cuarenta años, que son minutos: vive en
+    // `tests/journeys/fate-chaos.test.ts`, no aquí. La suite rápida tiene que
+    // caber en treinta segundos (`CLAUDE.md`), y lo que guarda es lo barato:
+    // que ninguna cifra se salga de su rango, rompa la aldea o no.
+    for (const [i, state] of worlds.entries()) {
+      expect(state.village.grain, `semilla ${SEEDS[i]}`).toBeGreaterThanOrEqual(0);
+      expect(state.village.morale, `semilla ${SEEDS[i]}`).toBeGreaterThanOrEqual(0);
+      expect(state.village.morale, `semilla ${SEEDS[i]}`).toBeLessThanOrEqual(100);
+      expect(state.herd.hens, `semilla ${SEEDS[i]}`).toBeGreaterThanOrEqual(0);
     }
   });
 

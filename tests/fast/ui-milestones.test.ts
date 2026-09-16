@@ -128,17 +128,38 @@ describe('milestonesAt · ni una aldea sin historia ni un teletipo', () => {
     // baje de veinte o pase de sesenta ha cambiado de comportamiento y hay que
     // enterarse. Una cota floja aquí deja pasar exactamente lo que esta prueba
     // dice vigilar.
-    for (const { seed, milestones } of GAMES) {
+    //
+    // **Y desde R-1 §2.6 no todas las partidas llegan a los sesenta años.** El
+    // dueño del diseño lo pidió así: «que haya caos y que haya partidas que se
+    // rompan y no se pueda seguir jugando es la idea del juego». Una partida
+    // que se rompió en el año 49 —la semilla 999— tiene menos historia porque
+    // tuvo menos vida, y medirla contra la cota de sesenta años era medir el
+    // caos como si fuera un fallo. Así que la cota de arriba se pide a las que
+    // llegan, y a las que se rompen se les pide lo que sí prometen: que su
+    // historia sea proporcional a lo que vivieron y nunca cero.
+    const full = GAMES.filter(({ state }) => state.tick >= TOTAL_TICKS);
+    const broken = GAMES.filter(({ state }) => state.tick < TOTAL_TICKS);
+    expect(full.length, 'alguna de las cinco semillas debe llegar a los sesenta años').toBeGreaterThan(0);
+    for (const { seed, milestones } of full) {
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos`)
         .toBeGreaterThanOrEqual(20);
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos`)
         .toBeLessThanOrEqual(60);
     }
+    for (const { seed, state, milestones } of broken) {
+      const lived = state.tick / TIME.WEEKS_PER_YEAR;
+      expect(milestones.length, `seed ${seed}: ${milestones.length} hitos en ${lived.toFixed(0)} años`)
+        .toBeGreaterThan(0);
+      expect(milestones.length, `seed ${seed}: ${milestones.length} hitos en ${lived.toFixed(0)} años`)
+        .toBeLessThanOrEqual(60);
+    }
     // turn_of_decade es el mismo reloj para cualquier partida que llegue a los
     // sesenta años: seis décadas, ningún siglo.
-    for (const { seed, milestones } of GAMES) {
+    for (const { seed, state, milestones } of GAMES) {
       const decades = milestones.filter((m) => m.kind === 'turn_of_decade');
-      expect(decades.length, `seed ${seed}`).toBe(6);
+      // Seis décadas para quien llega; para quien se rompe, las que vivió.
+      const lived = Math.floor(state.tick / (10 * TIME.WEEKS_PER_YEAR));
+      expect(decades.length, `seed ${seed}`).toBe(state.tick >= TOTAL_TICKS ? 6 : lived);
     }
   });
 });
