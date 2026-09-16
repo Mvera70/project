@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T18:02:34.198Z",
+  "generatedAt": "2026-09-16T18:10:03.901Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -103,7 +103,7 @@
     {
       "id": "well",
       "file": "well.glb",
-      "sha256": "C6CB07DF6B06C9D879F7F689C88DF73ABE275B96D764EEB4F75E1F6E6754C7D1",
+      "sha256": "A07AFDC2D123322B8792706051A5FC0F7EA29C09177A50F14CA436116C417FE2",
       "motion": []
     },
     {

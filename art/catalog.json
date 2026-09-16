@@ -825,60 +825,61 @@
     },
     {
       "id": "well",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/well/well.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-05-28-268Z-28368",
-        "directory": "artifacts/graphics/G-10/approved/c6cb07df6b06c9d8"
+        "runId": "2026-09-16T18-09-35-894Z-28336",
+        "directory": "artifacts/graphics/G-21/approved/a07afdc2d123322b"
       },
       "bounds": {
         "min": [
-          0.230534,
+          0.128333,
           0,
-          -0.833333
+          -0.9
         ],
         "max": [
-          0.769466,
+          0.952667,
           1.033333,
-          -0.166667
+          -0.1
         ],
         "size": [
-          0.538932,
+          0.824333,
           1.033333,
-          0.666667
+          0.8
         ]
       },
-      "recipeSha256": "70ABAB496FA7DFC6A6A256B4A306290D56DCC2E3D304A5372FEBBB0D578C1661",
+      "recipeSha256": "815DF7052F7338B286EF8D6274BE8CC4559302F2ED80A6271AD96DA48A9AB73C",
       "materials": [
         "stone",
         "wood",
-        "roof"
+        "roof",
+        "dark"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 84
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1108
       },
       "hashes": {
-        "well.blend": "DC3E3C3081201D6AC4F793A12F2BA65D813D267A4ACE3589E09C3E9D890DF08D",
-        "well.glb": "C6CB07DF6B06C9D879F7F689C88DF73ABE275B96D764EEB4F75E1F6E6754C7D1",
-        "well-blender.png": "80861C39ABB47C934EB987CA9537C051BE0BD5246A8E5F2AAE8C5AACF37A305D",
-        "capture-1.png": "6530C30F1D9602D94EBABA5AD9DC23B03A990075E3BFA59EE25EAC1F78A0D233",
-        "capture-1-gray.png": "DDB5CD6F1DA388CF18DD5ECA4D1921326BE3841D966A5E1BCB01A9A1443FAA3F",
-        "capture.json": "A82E12EBDA4071C0D8DD632D9AD612B81293BA3A2A94A2DAF42AEBDE93B90C80",
-        "build.json": "6E743CCF1B77EDC769EABBBA3113BCFBF934FF57225DE07E0339E7FE9AE88ED3",
-        "validation.json": "8B640BB4B62012ED38E125116BBACFF22C3B28F8F5512CAB143E0AF16B4A104E"
+        "well.blend": "894835732C2FFAD80F1AEBB691D84E21F4AE721C996787F8C74D63E6CA4F7AC0",
+        "well.glb": "A07AFDC2D123322B8792706051A5FC0F7EA29C09177A50F14CA436116C417FE2",
+        "well-blender.png": "1D8CC0D10B40D13DD29A159E31589B8A120F180A6D61C08E08C910F78F48E690",
+        "capture-1.png": "F6CBF291EB51182690E5CBCF3127D4FCCF2A2B5C23E9616024D1FC241AE43688",
+        "capture-1-gray.png": "961D0C5A4D1E8C9FABB2033491D55F06E02BFD19B3C08BE5A697C312AC8A1AF2",
+        "capture.json": "6A6D1EA4947A918E4F0EEA8C0ACA7C8B5164D9010B5795EBA434C0760E9BE9C3",
+        "build.json": "9ACEDBF97A29D190DA08E18F8CF0B01DAA93415082438450262C4E705E13EA56",
+        "validation.json": "9E1E7075E359F6D33BCC9BC603E064B4245A102F0F44B1F4CBB056C68A06E698"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original well authored for The Valley G-10",
+        "source": "Original G-21: pozo de brocal hueco, torno, cuerda y cubo bajo cubierta de paja.",
         "license": "Project original"
       }
     },

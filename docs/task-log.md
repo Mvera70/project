@@ -79,6 +79,8 @@ Granero subido en `a90c54e`. Capilla terminada, validada y revisada dentro del
 juego; conserva las velas dinámicas. Entrega individual G-21.
 Capilla subida en `0561f34`. Iglesia terminada y revisada en el juego, con
 campanario abierto y puerta visible; validación técnica verde. Sigue el pozo.
+Iglesia subida en `1dd19df`. Pozo terminado, validado y revisado en juego;
+conserva su celda y añade brocal hueco, torno y cubo. Sigue el campo cultivado.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -184,6 +186,7 @@ Molino: 966 triángulos y cuatro materiales/mallas; herrería: 894 y cuatro.
 Granero: 1 220 triángulos, cuatro materiales/mallas y GLB de 89 972 bytes.
 Capilla: 776 triángulos, cuatro materiales/mallas y GLB de 57 672 bytes.
 Iglesia: 1 230 triángulos, cuatro materiales/mallas y GLB de 89 412 bytes.
+Pozo: 1 108 triángulos, cuatro materiales/mallas y GLB de 78 572 bytes.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -233,7 +236,7 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y
 validada técnicamente y revisada de frente en juego. Granero y capilla terminados;
-iglesia terminada y revisada en juego; sigue el pozo. Las variantes
+iglesia y pozo terminados y revisados en juego; sigue el campo cultivado. Las variantes
 adicionales, los adornos nuevos y la aparición de `shed` requieren conexión del
 equipo del juego; reemplazar los ids ya seleccionados encaja directamente.
 
