@@ -1062,14 +1062,14 @@
     },
     {
       "id": "field-cut",
-      "artifactRound": "G-10",
+      "artifactRound": "G-22",
       "status": "study",
       "recipe": "art/recipes/field-cut/field-cut.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-41-310Z-52588",
-        "directory": "artifacts/graphics/G-10/approved/29100c79fbf74ca6"
+        "runId": "2026-09-16T18-53-19-368Z-49192",
+        "directory": "artifacts/graphics/G-22/approved/ad935893a9ad52cf"
       },
       "bounds": {
         "min": [
@@ -1088,7 +1088,7 @@
           2
         ]
       },
-      "recipeSha256": "45AE24294D7225661EAC81616CD26451D3535CE336DDC898401A1C326280428B",
+      "recipeSha256": "29C31A9BD67956B6810B2C352BD71CB65CF8AA255975391E510E6CE00F3E2654",
       "materials": [
         "soil"
       ],
@@ -1099,21 +1099,21 @@
         "objects": 2,
         "meshes": 1,
         "materials": 1,
-        "triangles": 72
+        "triangles": 232
       },
       "hashes": {
-        "field-cut.blend": "22630904FF705ABA71490B1A863DBEC886ADB454716575C9602E731DF04C17F0",
-        "field-cut.glb": "29100C79FBF74CA646909A650113EDCBC1B079FBDD61D7ECC4BEEB35013FFE58",
-        "field-cut-blender.png": "85C3E6386AAD51922753CD6347AA2A70EB7BED41D4F965CDFE3A0BF783B0A786",
-        "capture-1.png": "3F820BD9930DA65EA2058070B520426CC3A9F78C1FCEFCDBECDDA18B01FE6D62",
-        "capture-1-gray.png": "76D9467533E495A24AA9DEEC6F4BF08A51530F61143BC7585C4D175FA841BB38",
-        "capture.json": "E1AD564180392EB64ADF6F62A0DA3DE2A050BB99E024B4B901E4ADCDB8A5D2E9",
-        "build.json": "0EE703B904634DA323A800E771888C3FCCCDB0ADB118E209AD6E9F1AC9D7DB76",
-        "validation.json": "E8448CDB2F56FBC9150D79BE871B662FE046194F976D9D4E4111560D155CEDEE"
+        "field-cut.blend": "4B1DEAECB5BFA5AEADC1711DB1CAE4FA20D8BD536CDE4D6E53BC8C0678DC232A",
+        "field-cut.glb": "AD935893A9AD52CF4DBBC0EAB4977CD134718139E4EA6BD1BE983A0BD08708BD",
+        "field-cut-blender.png": "063104F2AD768614AF6BE92629C3685336C3A089810B0E84C50F0C3825A4BC5C",
+        "capture-1.png": "29E2FBDECAF0A2B86650B22D9FE39822FA6741352087CE0E5D0FC9177B4F99DC",
+        "capture-1-gray.png": "4769C20D0323B0CEF46AB9A95BB09BC275EDEA6439C488F1977213B3BC34BD8E",
+        "capture.json": "17F5C4026E9EF3AA3C6D621AFBFCE90AB32668C7233FCFA9BBB4D1FA423DB39B",
+        "build.json": "349339C2C59AA658F1FF02B6F479181886C759BAB1AC0DCE460C0E9E600E2B33",
+        "validation.json": "0BD6884A0772603DE0177B6E8A972DD12AFA52D78D74C67CD86078FC857C25EB"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original field-cut authored for The Valley G-10",
+        "source": "Original G-22: terreno cosechado, surcos continuos y terrones bajos.",
         "license": "Project original"
       }
     },

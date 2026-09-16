@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T18:35:03.141Z",
+  "generatedAt": "2026-09-16T18:53:43.774Z",
   "invocation": "G-22: publicación selectiva por modelo",
   "assets": [
     {
@@ -127,7 +127,7 @@
     {
       "id": "field-cut",
       "file": "field-cut.glb",
-      "sha256": "29100C79FBF74CA646909A650113EDCBC1B079FBDD61D7ECC4BEEB35013FFE58",
+      "sha256": "AD935893A9AD52CF4DBBC0EAB4977CD134718139E4EA6BD1BE983A0BD08708BD",
       "motion": []
     },
     {

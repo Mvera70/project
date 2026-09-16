@@ -30,6 +30,9 @@ una miniatura de taller con su legibilidad sobre el terreno y luz del juego.
 No se incluyen en este encargo los aldeanos ni la fauna. Los árboles, rocas,
 juncos y río pueden ser otra ronda; no son necesarios para cerrar los edificios.
 
+**Aviso solicitado por el dueño:** avisarle al llegar a los muros, antes de
+comenzar esa parte de la tanda 4. Recordarlo al terminar campo y trabajo.
+
 ## Ficheros y contrato
 
 Modelado: `art/recipes/<id>/<id>.json`, paleta sólo si hace falta un color
