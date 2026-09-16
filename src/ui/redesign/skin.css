@@ -622,7 +622,12 @@
   font-variant-numeric: tabular-nums;
 }
 .valley-vital.skin-plate--chip.thin { color: var(--ui-alarm); }
-.valley-vital.skin-plate--chip .skin-icon { width: 16px; height: 16px; }
+/* **21 y no 16, y está medido.** En el prototipo el glifo del chip ocupa
+   18,3 px de alto (40 px del PNG × 0,457) sobre un chip de 31,5; el nuestro
+   se quedaba en 12,5 y los iconos se leían como adornos diminutos al lado de
+   la cifra. Con la caja a 21 y el dibujo llenándola de verdad, el glifo sale
+   en 18,4. */
+.valley-vital.skin-plate--chip .skin-icon { width: 21px; height: 21px; }
 .valley-vital.skin-plate--chip b { font-weight: 600; }
 
 /** La misma cifra, sin chip, para la cabecera compacta de la crónica. */
@@ -640,7 +645,7 @@
   font-variant-numeric: tabular-nums;
 }
 .valley-vital.hud-figure.thin { color: var(--ui-alarm); }
-.valley-vital.hud-figure .skin-icon { width: 16px; height: 16px; }
+.valley-vital.hud-figure .skin-icon { width: 18px; height: 18px; }
 
 /** La cabecera compacta de la crónica (plan §3.2, primera fila): dos placas,
     x 27–170 la fecha (con el sol a la izquierda) y x 178–361 las cifras. */
