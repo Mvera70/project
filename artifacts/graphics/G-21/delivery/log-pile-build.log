@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all log-pile
+
+Built log-pile in artifacts\graphics\G-21\runs\2026-09-16T19-21-57-950Z-50284
+Validated log-pile from run 2026-09-16T19-21-57-950Z-50284
+Reported and promoted log-pile to artifacts\graphics\G-21\approved\3ec2dfbe987f7f2e

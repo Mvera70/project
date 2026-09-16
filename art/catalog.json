@@ -2925,33 +2925,33 @@
     },
     {
       "id": "log-pile",
-      "artifactRound": "G-15",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/log-pile/log-pile.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-15T00-03-50-190Z-16312",
-        "directory": "artifacts/graphics/G-15/approved/719d3301e2db0fae"
+        "runId": "2026-09-16T19-21-57-950Z-50284",
+        "directory": "artifacts/graphics/G-21/approved/3ec2dfbe987f7f2e"
       },
       "bounds": {
         "min": [
-          -0.25,
-          0,
+          -0.266667,
+          -0.000333,
           -0.17
         ],
         "max": [
-          0.26,
-          0.213333,
+          0.263333,
+          0.2072,
           0.17
         ],
         "size": [
-          0.51,
-          0.213333,
+          0.53,
+          0.207533,
           0.34
         ]
       },
-      "recipeSha256": "D50EB9694235195DF51B6E9FD372B63E1C83276A3B967B6836305BADE756AABC",
+      "recipeSha256": "C244B8FB6E1DB09B5A40FBC5D1F11AC0ED34FF60613F689A67EE2A7E9E60898E",
       "materials": [
         "bark",
         "cut"
@@ -2963,21 +2963,21 @@
         "objects": 3,
         "meshes": 2,
         "materials": 2,
-        "triangles": 196
+        "triangles": 1544
       },
       "hashes": {
-        "log-pile.blend": "51FD78673080A808E7C33E127D88ED323CFE9A0B102FC81164A0DBF928FE4FFB",
-        "log-pile.glb": "719D3301E2DB0FAE6FC040934A77861B429897E00C7CB4EEA265253B55127247",
-        "log-pile-blender.png": "70EB50F409BE27BF32D10AF9E6F122935D5E0DBBE867E155B2EDFDCCBB7CFB60",
-        "capture-1.png": "DBBE26A05A02A084DB3FBD0F5278366B0454D52A328D12E2972478671C5BD32E",
-        "capture-1-gray.png": "08EBF614BE62C3F86707AAF16573C397DD65A4B1AE4CE44BDDF4DA3ADB82036F",
-        "capture.json": "A6155B6E64F4D89DD6DA04E90EA6BAA9623B3D8B629C9C8581DE7D9E3A1159FB",
-        "build.json": "DDD03F61C3C401AAD17DFCF5852C8D9BEA0E625D17798DA39E6DE18200246485",
-        "validation.json": "5AD9A8DD6461A9662274822D0B21A58769A967E2023D7A58182631A8E0CB9B72"
+        "log-pile.blend": "D15B7218C193B4D63B7B644B1F3FDEEA339031999476CC8F86D24525EBB07FA8",
+        "log-pile.glb": "3EC2DFBE987F7F2ECD0CBB958461C9669AD5EEFEB301BC4BEE52EC5F9CB3C883",
+        "log-pile-blender.png": "48B169A982FAF62B0919B6A3386A1BC9B51C2537EEFB1AEB857499047729D21C",
+        "capture-1.png": "E77F76A18F80BBA7D11BC69D0A59FF2549E49CCFE9C0A4C89C92C145D9748775",
+        "capture-1-gray.png": "34287BAEBAAD601B9E66E89D81DED868EEC846B2A3FF39EB7C6F2668BD6A48C9",
+        "capture.json": "974662977D6897E9B97595E643750AB7321511E415FC1A798FBA62F598881358",
+        "build.json": "73BB4B9C2A7AB3EA8A0E22730E193C6C6EA523C1F21BF3D734DEB447F3C32EA8",
+        "validation.json": "731AC71ADECCC785DA73939BD47C9499B14E39718EF177C42CF5DEA495BE21DA"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original log pile authored for The Valley G-15 (scatter props)",
+        "source": "Original G-21: leña apilada con corteza, cortes, duramen y grietas.",
         "license": "Project original"
       }
     },

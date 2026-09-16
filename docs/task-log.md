@@ -97,7 +97,9 @@ Carro G-21 terminado: caja de tablas, ruedas abiertas con radios y varales;
 94 pruebas verdes, typecheck y lint. Capturas reales revisadas, entrega
 individual subida en `5e6b070`. Almiar G-21 terminado y revisado en juego:
 capas de heno, haces y estaca central; 94 pruebas, typecheck y lint verdes.
-Entrega individual validada para commit y subida. Sigue `log-pile`.
+Almiar subido en `f0e933f`. Pila de leña G-21 terminada y revisada en juego;
+94 pruebas, typecheck y lint verdes. Entrega individual validada para commit
+y subida. Sigue el cobertizo (`shed`).
 **Avisar al dueño antes de los muros.**
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
@@ -214,6 +216,8 @@ Carro G-21: 888 triángulos, tres materiales/mallas y GLB de 64 556 bytes;
 94 pruebas verdes, incluidas las seis de colocación de adornos.
 Almiar G-21: 958 triángulos, tres materiales/mallas; altura 0,666667 celdas
 conservada y 94 pruebas verdes.
+Pila de leña G-21: 1 544 triángulos, dos materiales/mallas, 97 652 bytes;
+94 pruebas verdes y captura real revisada.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -264,7 +268,8 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 **G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
 Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado
 y revisado en juego y subido. Almiar (`haystack`) terminado y revisado;
-sigue la pila de leña (`log-pile`) tras subir el almiar.
+almiar subido. Pila de leña (`log-pile`) terminada y revisada en juego;
+sigue el cobertizo (`shed`) tras subir la leña.
 **Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y

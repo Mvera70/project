@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "log-pile",
+  "statistics": {
+    "objects": 3,
+    "meshes": 2,
+    "materials": 2,
+    "triangles": 1544
+  },
+  "bounds": {
+    "min": [
+      -0.266667,
+      -0.000333,
+      -0.17
+    ],
+    "max": [
+      0.263333,
+      0.2072,
+      0.17
+    ],
+    "size": [
+      0.53,
+      0.207533,
+      0.34
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T19-21-57-950Z-50284",
+    "directory": "artifacts/graphics/G-21/approved/3ec2dfbe987f7f2e"
+  },
+  "sha256": "3EC2DFBE987F7F2ECD0CBB958461C9669AD5EEFEB301BC4BEE52EC5F9CB3C883",
+  "otherPublishedFilesUnchanged": true
+}
