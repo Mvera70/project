@@ -119,11 +119,14 @@ pidió).
    de vida y sus números cambian con cada fase, así que se tocan **al final de
    la tanda de IA**, no antes.
 4. **Un trabajador de vitest se cae en la suite rápida en paralelo**
-   («Worker exited unexpectedly»; no es montículo, con 4 GB cae igual), y **la
-   suite ya no cabe en treinta segundos** como promete `CLAUDE.md`. Hay que
-   decidir si las tres pruebas caras del motor (bosque de un siglo 19 s, riñas
-   25 s, crónica anual 12 s) se mudan a las jornadas o si se reescribe la
-   promesa. Bloquea UI-R6, que pide la suite entera.
+   («Worker exited unexpectedly»; no es montículo, con 4 GB cae igual). Sigue
+   abierto y bloquea UI-R6, que pide la suite entera. **Lo que ya está hecho:**
+   las cuatro partidas largas del motor se mudaron a
+   `tests/journeys/engine-long.test.ts` por decisión del dueño («si las pruebas
+   no son posibles hay que cambiar cómo las hacemos»), y con eso esos tres
+   ficheros bajan de **45 s a 9 s**: bosque 15,9 → 1,25 s, riñas 15,5 → 1,09 s,
+   invariantes → 7 s. Las cuatro siguen corriendo, en 42 s, donde tardar es
+   legítimo.
 5. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
    se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
    e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.

@@ -209,17 +209,6 @@ describe('el desgaste del suelo · §7.6', () => {
     }
   });
 
-  it('en una partida real la gente acaba abriendo camino', () => {
-    const s = foundTwenty(108);
-    run(s, 60 * YEAR, 'prudent', CATALOG);
-    const trodden = [...s.map.path].filter((p) => p > 0).length;
-    expect(trodden).toBeGreaterThan(0);
-    // Y quien tiene casa y trabajo tiene por dónde ir.
-    const walker = s.people.villagers.find(
-      (v) => v.diedTick === null && v.leftTick === null && v.homeId !== null,
-    );
-    if (walker !== undefined) expect(routeFor(s, walker.id).length).toBeGreaterThanOrEqual(0);
-  });
 
   it('cambiar de casa invalida el destino aunque la cuadrilla mida lo mismo', () => {
     // **Se busca a quien ande, no se clava a la segunda persona de la semilla
@@ -300,21 +289,6 @@ describe('el bosque · §7.5', () => {
     expect(fellForest(s, 100)).toBe(0);
   });
 
-  it('nunca baja de cero ni sube del total inicial, en un siglo', () => {
-    for (const seed of [0, 7, 42]) {
-      const s = foundTwenty(seed);
-      const initialCells = forestCells(s);
-      const initialWood = woodStanding(s);
-      for (let year = 0; year < 100; year += 1) {
-        run(s, YEAR, 'prudent', CATALOG);
-        expect(woodStanding(s), `semilla ${seed}, año ${year}`).toBeGreaterThanOrEqual(0);
-        expect(woodStanding(s)).toBeLessThanOrEqual(initialWood);
-        expect(forestCells(s)).toBeGreaterThanOrEqual(0);
-        expect(forestCells(s)).toBeLessThanOrEqual(initialCells);
-        if (s.ended !== null) break;
-      }
-    }
-  });
 
   it('el rebrote necesita tres vecinas de bosque y ocho años', () => {
     const s = foundTwenty(7);

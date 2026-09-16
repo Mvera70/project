@@ -78,7 +78,8 @@ prueba, y saltársela es lo que costó la auditoría del 15 sep 2026:
 ```bash
 npm run dev          # servidor con recarga en caliente
 npm run typecheck    # tsc --noEmit
-npm test             # suite rápida — menos de 30 s, mide 23,7
+npm test             # suite rápida — **y rápida de verdad**: las cuatro partidas
+                     # largas del motor viven en las jornadas (ver abajo)
 npm run test:journeys # jornadas y siglos en varias semillas — menos de 5 min, mide 221 s
 npm run test:all     # las dos de arriba
 npm run test:balance # siglos en sesenta semillas — minutos, se lanza aparte
@@ -91,6 +92,18 @@ npm run eligibility  # por qué medio catálogo no sale nunca
 ```
 
 **La puerta de un módulo:** `npm run typecheck && npm run test:all && npm run lint`.
+
+**Y una regla del dueño del diseño, del 16 sep 2026, que manda sobre todo lo de
+arriba:** «hay que evitar a toda costa estar separado más de media hora haciendo
+pruebas; si las pruebas no son posibles, hay que cambiar cómo las hacemos».
+Durante una ronda de trabajo la verificación es **typecheck, lint y los ficheros
+que se tocan**, y nada más; la suite entera se deja para el cierre de una tanda.
+Y si una prueba no cabe en la suite rápida, **se muda a las jornadas** —donde los
+minutos están permitidos por diseño— en vez de dejar que la suite rápida deje de
+serlo: las cuatro partidas largas del motor (un siglo de bosque, cien años de
+riñas, la crónica de una vida, el desgaste del suelo) se comían cuarenta y cinco
+segundos y viven desde entonces en `tests/journeys/engine-long.test.ts`, con el
+mismo cuerpo y el mismo umbral.
 
 ---
 

@@ -5,7 +5,7 @@
 // nadie dejaba de hablarse en la plaza.
 import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
-import { OPINION, QUARREL, TIME } from '@engine/balance';
+import { OPINION, QUARREL } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import { opinionOf } from '@engine/people/opinions';
@@ -176,22 +176,4 @@ describe('no rompe las reglas · §4.3, §6.4', () => {
     expect(quarrelWithin(a, 500)).toEqual(quarrelWithin(b, 500));
   });
 
-  it('en una partida de verdad se riñe, pero no todas las semanas', () => {
-    // Medido: unas seis por siglo y partida. Ni cero —el sistema estaría
-    // muerto— ni una taberna.
-    // Con varias semillas, que una sola es ruido: medido, unas tres o cuatro
-    // riñas por siglo y partida, y hay semillas que no riñen en cien años.
-    let fights = 0;
-    for (const seed of [3, 7, 11]) {
-      const state = foundTwenty(seed);
-      run(state, 120 * 48, 'prudent', CATALOG);
-      fights += state.chronicle.filter((e) => e.templateKey.startsWith('quarrel.')).length;
-    }
-    expect(fights, 'en tres siglos de aldea algo tiene que pasar').toBeGreaterThan(0);
-    // Un uno por ciento de las semanas era la cota cuando los rencores no se
-    // formaban nunca (`findings-drama.md` §1). Desde R-1 la riña de la plaza
-    // los empuja, y lo medido son 0,42–0,58 riñas al año por aldea: una cada
-    // dos años. Sigue sin ser una taberna; la cota sube al uno y medio.
-    expect(fights, 'pero no es una taberna').toBeLessThan(3 * 120 * TIME.WEEKS_PER_YEAR * 0.015);
-  });
 });
