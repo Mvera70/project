@@ -24,7 +24,7 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | **UI-R1** (agente Sonnet, `src/ui/redesign/`, `app.ts`, `index.html`; no tocar). Al cierre del 16 sep llevaba más de una hora sin reportar y `app.ts` no compilaba; se le pidió dejar el árbol compilando y reportar. **Nada de UI-R1 está en `main`.** Informe de cierre: `sesiones/2026-09-16-cierre.md`. **C-1 está completa** salvo el punto 7, aplazado con motivo |
+| **En vuelo ahora** | nada. **UI-R1 aterrizada** al cierre del 16 sep (el agente reportó con el árbol compilando: typecheck y lint limpios, 10/10 en `ui-redesign-shell`, 12 capturas en `artifacts/graphics/UI/R1/`). Lo siguiente es **UI-R2**. Informe de cierre: `sesiones/2026-09-16-cierre.md` |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | **G-18 entregado y verificado** (`9cc97af`: los doce aldeanos de Blender, sin tocar `src/`; pendiente de aprobación estética del dueño). **IA-8**: el descarte de la plaza que falló, el plazo propio del viaje (`arriveBy`) y el labrador a su puesto (fuera del campo 6,5 %, parados 0,08 %, giros 0,39 %). Antes: **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
@@ -107,7 +107,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | Ronda | Estado | Commit |
 |---|---|---|
 | UI-R0 · auditoría y cierre de especificación | **hecha** | `f9f2df4` |
-| UI-R1 · carcasa, tokens y navegación | **en vuelo** (Sonnet) | — |
+| UI-R1 · carcasa, tokens y navegación | **hecha** — carcasa, tokens, un solo dueño de la navegación, aviso y pista comparten ranura y nunca se pisan (era el defecto visible de la demo v15); las pantallas **no** se dan por migradas, a propósito | (este commit) · `ui-redesign/rounds/UI-R1.md` |
 | UI-R2 · cabecera, actividad, órdenes, velocidad | pendiente | — |
 | UI-R3 · crónica · UI-R4 · personas | pendientes (pueden ir en paralelo tras congelar UI-R2) | — |
 | UI-R5 · integración y decisiones · UI-R6 · validación | pendientes | — |
@@ -216,6 +216,12 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
 
 0b. **~~El 13,6 % de labradores que cavan la linde~~ HECHO en IA-8**: 6,5 %
    con `PARCEL_REACH` 0,9 y temblor ±0,15.
+
+0d. **`ui-milestones` está roja y no es de nadie de hoy**: «una partida de
+   sesenta años da entre unos pocos y unas docenas de hitos», semilla 999 da
+   18 contra 20. Falla igual en HEAD limpio (`4145cfc`). Es deriva de la
+   trayectoria nueva, como las de `rework.md` §2.8, y va con la decisión del
+   peso de los avisos (punto 10).
 
 0c. **El devoto se mide con una muestra que no lo ve.** `el devoto reza al
    menos el doble` (IA-3) pasa por poco con dos semillas y su proporción va

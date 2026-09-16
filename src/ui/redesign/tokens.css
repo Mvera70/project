@@ -1,0 +1,65 @@
+/* UI-R1 · Los tokens del rediseño de interfaz.
+   docs/ui-redesign/implementation-plan.md §3 y docs/visual-reference §5.
+
+   Punto de partida de maquetación, no medidas de rendimiento ni constantes de
+   balance (el plan lo dice explícito): el coordinador puede corregirlos tras
+   las capturas, y el motivo del cambio se registra en el propio plan §3, no
+   aquí. Un solo sitio para toda la paleta — nada tiene su única definición
+   dentro de un bloque de `prefers-color-scheme`, aunque el juego de hoy no
+   cambia de tema con el sistema: los dos juegos de color (papel/oscuro) son
+   los dos usos que ya existían en `index.html`, ahora nombrados una vez. */
+
+:root {
+  /* Papel, para el valle y sus fichas. */
+  --ui-paper-bg: #f2e9d8;
+  --ui-paper-ink: #221d18;
+  --ui-paper-ink-soft: #57493c;
+  --ui-accent-on-paper: #7d5c2e;
+
+  /* Superficie oscura, para la crónica, la encrucijada y el epitafio. */
+  --ui-dark-surface: #1a1511;
+  --ui-dark-surface-soft: #262019;
+  --ui-dark-ink: #f2e9d8;
+  --ui-dark-ink-dim: #d9cfbc;
+  --ui-accent-on-dark: #c9ab6b;
+
+  --ui-alarm: #9e4a34;
+  --ui-edge: rgba(34, 29, 24, .16);
+  --ui-edge-dark: rgba(242, 233, 216, .18);
+
+  /* Tipografía: las mismas dos pilas que ya vestían el juego (U-01), sin
+     descarga de fuentes — CLAUDE.md prohíbe una fuente de red aquí. */
+  --ui-font-voice: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --ui-font-plain: ui-sans-serif, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --ui-text-reading-size: 16px;
+  --ui-text-reading-line: 1.5;
+  --ui-text-control-size: 14px;
+  --ui-text-control-line: 1.4;
+  --ui-sheet-title-size: 22px;
+  --ui-sheet-title-line: 1.2;
+
+  /* Escala 4/8/12/16/24 del plan §3. */
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 24px;
+
+  --ui-tap-min: 44px;
+  --ui-margin-mobile: 12px;
+  --ui-radius-sheet: 16px;
+  --ui-radius-control: 8px;
+
+  /* §5 del cuaderno del dueño: la franja inferior, una sola pila de abajo
+     arriba. Medidas de prototipo a 390 × 844, safe area 0: navegación
+     y=788–844, controles y=728–780, mensaje y=664–720 — de ahí salen estas
+     alturas mínimas; el mensaje crece hacia arriba con el texto. */
+  --ui-nav-height: 56px;
+  --ui-controls-min-height: 52px;
+  --ui-message-min-height: 56px;
+  --ui-stack-gap: var(--ui-space-2);
+
+  /* Apertura y cierre inmediatos (plan §3): nada de aquí depende de una
+     duración de transición, así que no hay un token de tiempo que animar. */
+}

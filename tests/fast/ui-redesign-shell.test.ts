@@ -1,0 +1,83 @@
+// UI-R1 · La carcasa: propiedades puras de `src/ui/redesign/shell.ts`.
+//
+// `boot()` necesita un DOM real que esta suite no abre (`tests/fast/app.test.ts`
+// ya lo dice de `App.decide`), y este proyecto no trae jsdom: por eso lo que se
+// comprueba aquí es la lógica que `shell.ts` deja pura a propósito —qué pestaña
+// corresponde a una ruta, y qué mensaje gana el hueco compartido— siguiendo el
+// mismo patrón que separó `attemptDecision` de `boot` en M-20. La integración
+// real (un solo canvas, foco, `data-screen`) se acredita con capturas, no aquí.
+
+import { describe, expect, it } from 'vitest';
+import { contentRouteFor, navTabFor, resolveMessageSlot } from '@ui/redesign/shell';
+import type { SheetRoute } from '@ui/redesign/contracts';
+
+describe('navTabFor · docs/design.md §11.2, cinco rutas', () => {
+  it('el valle y la crónica y la gente encienden su propia pestaña', () => {
+    expect(navTabFor({ kind: 'valley' })).toBe('valley');
+    expect(navTabFor({ kind: 'chronicle' })).toBe('chronicle');
+    expect(navTabFor({ kind: 'people' })).toBe('people');
+  });
+
+  it('las órdenes se abren desde el valle: no tienen pestaña propia (§11.2 punto 1)', () => {
+    expect(navTabFor({ kind: 'orders' })).toBe('valley');
+  });
+
+  it('la ficha enciende la pestaña de donde vino, no una cuarta (regla de S-05)', () => {
+    const target = { kind: 'terrain', x: 0, y: 0 } as const;
+    expect(navTabFor({ kind: 'inspect', target, from: 'valley' })).toBe('valley');
+    expect(navTabFor({ kind: 'inspect', target, from: 'people' })).toBe('people');
+  });
+
+  it('cubre las cinco variantes de SheetRoute sin caer al valor por defecto por accidente', () => {
+    const target = { kind: 'building', id: 1 } as const;
+    const routes: SheetRoute[] = [
+      { kind: 'valley' },
+      { kind: 'chronicle' },
+      { kind: 'people' },
+      { kind: 'orders' },
+      { kind: 'inspect', target, from: 'valley' },
+    ];
+    for (const route of routes) expect(['valley', 'chronicle', 'people']).toContain(navTabFor(route));
+  });
+});
+
+describe('contentRouteFor · qué monta la bandeja de la carcasa en esta ronda', () => {
+  it('sólo órdenes y ficha piden un panel dentro de `content`', () => {
+    const target = { kind: 'terrain', x: 0, y: 0 } as const;
+    expect(contentRouteFor({ kind: 'orders' })).toBe('orders');
+    expect(contentRouteFor({ kind: 'inspect', target, from: 'valley' })).toBe('inspect');
+  });
+
+  it('crónica, gente y valle no montan nada en la bandeja — siguen sin migrar (plan §6)', () => {
+    expect(contentRouteFor({ kind: 'valley' })).toBeNull();
+    expect(contentRouteFor({ kind: 'chronicle' })).toBeNull();
+    expect(contentRouteFor({ kind: 'people' })).toBeNull();
+  });
+});
+
+describe('resolveMessageSlot · visual-reference §5, tabla de coincidencias', () => {
+  it('sin nadie pidiendo el hueco, no se ve nada', () => {
+    expect(resolveMessageSlot(false, false)).toEqual({ noticeVisible: false, hintVisible: false });
+  });
+
+  it('el aviso solo, se ve', () => {
+    expect(resolveMessageSlot(true, false)).toEqual({ noticeVisible: true, hintVisible: false });
+  });
+
+  it('la pista sola, se ve', () => {
+    expect(resolveMessageSlot(false, true)).toEqual({ noticeVisible: false, hintVisible: true });
+  });
+
+  it(
+    'el fallo fotografiado en evidencia-capturas.md §3: los dos a la vez, y el aviso gana',
+    () => {
+      // «Pista de órdenes + aviso de crónica → Ocupa el mensaje: Aviso de
+      // crónica; Pista pendiente, sin marcar como vista» — primera fila de la
+      // tabla de coincidencias del cuaderno del dueño. La propiedad que hace
+      // imposible el pisado: nunca `noticeVisible && hintVisible` a la vez.
+      const resolved = resolveMessageSlot(true, true);
+      expect(resolved).toEqual({ noticeVisible: true, hintVisible: false });
+      expect(resolved.noticeVisible && resolved.hintVisible).toBe(false);
+    },
+  );
+});

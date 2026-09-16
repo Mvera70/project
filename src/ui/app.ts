@@ -1,20 +1,28 @@
 // M-20 · The first running application shell.
 
+// UI-R1 · los tokens y la piel de la carcasa nueva. Importados desde aquí y no
+// enlazados a mano en `index.html`: Vite los recoge igual en `npm run dev` y en
+// `tools/graphics/bundle-game.ts`, que ya sabe volver `<link>` en `<style>`
+// inline para la demo sin red (`inline()` en ese fichero).
+import './redesign/tokens.css';
+import './redesign/shell.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { answerFor } from './answer';
 import { TREND_WEEKS, trendsOf, vitalsOf } from './vitals';
-import { NAV_ICONS, VITAL_ICONS } from './icons';
+import { VITAL_ICONS } from './icons';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { valleyClock } from '../derive/clock';
 import { hourAt } from '../render3d/effects/day-phases';
 import { tick, type TickReport } from '@engine/sim';
-import type { ArchivedGame, Decision, GameState, SaveFile, Season } from '@engine/state';
+import type { ArchivedGame, Decision, GameState, Intent, SaveFile, Season } from '@engine/state';
 import { INTENT_STOPS, PRIORITY_STOPS, stopOf } from '@engine/state';
 import type { PriorityName } from '@engine/state';
+import { createShell, resolveMessageSlot } from './redesign/shell';
+import type { SheetRoute, UiActions } from './redesign/contracts';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
@@ -265,7 +273,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   ordersClose.className = 'valley-panel-close';
   ordersClose.setAttribute('aria-label', renderUiText('app.close'));
   ordersClose.textContent = '×';
-  ordersClose.addEventListener('click', () => { orders.hidden = true; });
+  ordersClose.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
   const ordersTitle = document.createElement('h2');
   ordersTitle.textContent = renderUiText('app.orders');
   orders.append(ordersClose, ordersTitle);
@@ -276,8 +284,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   ordersNow.className = 'valley-orders-now';
   ordersNow.setAttribute('aria-label', renderUiText('app.orders.open'));
   ordersNow.addEventListener('click', () => {
-    orders.hidden = !orders.hidden;
-    if (!orders.hidden) panel.hidden = true;
+    // UI-R1 · un único propietario de la ruta: si ya estaban abiertas, tocar
+    // otra vez vuelve al valle; si no, las abre y cierra lo que hubiera.
+    actions.navigate(currentRoute.kind === 'orders' ? { kind: 'valley' } : { kind: 'orders' });
   });
   interface Row {
     readonly current: () => string;
@@ -340,7 +349,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       })),
       (key) => {
         const stop = INTENT_STOPS[lever].find((one) => one.key === key);
-        if (stop !== undefined) state.intent = { ...state.intent, [lever]: stop.value };
+        // UI-R1 · la mutación pasa por `UiActions.setIntent`, el único punto
+        // de escritura que el plan concede a un panel (`contracts.ts`); esta
+        // orden todavía vive dentro de `app.ts` y no en un `PanelFactory`
+        // propio (eso es UI-R2), pero ya usa el mismo contrato.
+        if (stop !== undefined) actions.setIntent({ ...state.intent, [lever]: stop.value });
       },
       () => stopOf(lever, state.intent[lever]),
     );
@@ -349,7 +362,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   orderRow(
     renderUiText('app.build'),
     PRIORITY_STOPS.map((key) => ({ key, label: renderUiText(`app.build.${key}`) })),
-    (key) => { state.intent = { ...state.intent, priority: key as PriorityName }; },
+    (key) => { actions.setIntent({ ...state.intent, priority: key as PriorityName }); },
     () => state.intent.priority,
   );
 
@@ -426,73 +439,109 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   hudRight.className = 'valley-hud-right';
   hudRight.append(soundToggle, controls, speedBadge);
 
-  // U-05 · La barra de abajo: los tres destinos del juego, siempre a la vista
-  // en vez de detrás de un gesto que nadie descubre (§11 del plan siguiente).
-  const tabbar = document.createElement('nav');
-  tabbar.className = 'valley-tabbar';
-  // Su propia etiqueta, no la del lienzo: quien navega a oídas oía «el valle»
-  // dos veces y no sabía que la segunda era una barra de destinos.
-  tabbar.setAttribute('aria-label', renderUiText('nav.bar'));
-  const tab = (icon: string, label: string): HTMLButtonElement => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'valley-tab';
-    button.innerHTML = icon;
-    const caption = document.createElement('span');
-    caption.textContent = label;
-    button.append(caption);
-    button.setAttribute('aria-pressed', 'false');
-    button.setAttribute('aria-label', label);
-    tabbar.append(button);
-    return button;
-  };
-  const valleyTab = tab(NAV_ICONS.valley, renderUiText('nav.valley'));
-  const chronicleTab = tab(NAV_ICONS.chronicle, renderUiText('nav.chronicle'));
-  const peopleTab = tab(NAV_ICONS.people, renderUiText('nav.people'));
-  // **U-14 · y la barra lleva de vuelta.** Las dos pantallas se cerraban sólo
-  // deslizando hacia abajo y su velo tapaba esta barra, así que quien entraba
-  // se quedaba dentro: «no hay forma de volver atrás», dueño del diseño, 15
-  // sep 2026. Ahora esto es una barra de pestañas de verdad —una está
-  // encendida, tocar otra cambia, tocar el valle vuelve— y cada pantalla lleva
-  // además su botón de cerrar, porque a la crónica se llega también con un
-  // gesto y un gesto no explica cómo se sale.
-  const showing = (which: 'valley' | 'chronicle' | 'people'): void => {
-    valleyTab.setAttribute('aria-pressed', String(which === 'valley'));
-    chronicleTab.setAttribute('aria-pressed', String(which === 'chronicle'));
-    peopleTab.setAttribute('aria-pressed', String(which === 'people'));
-    document.documentElement.dataset.screen = which;
-  };
-  const toValley = (): void => {
+  /**
+   * **UI-R1 · la carcasa, y el único propietario del estado de navegación.**
+   *
+   * Antes de esta ronda la pestaña encendida se decidía en tres sitios que no
+   * se conocían entre sí —`showing()`, cada manejador de clic de la barra, y
+   * `showPanel` llamando a `showing('valley')` para arreglar S-05— y una
+   * cuarta ruta (las órdenes) no pasaba por ninguno: `orders.hidden` se
+   * alternaba a mano sin tocar la barra. `docs/ui-redesign/contracts.ts`
+   * (§4 del plan) da la forma; `createShell` la construye una vez, con la
+   * misma piel y los mismos textos del banco que llevaba `.valley-tabbar`.
+   *
+   * `actions.navigate` es ahora el único camino: cierra lo que hubiera y abre
+   * lo que toque, así que un panel —incluida la hoja de órdenes, que sigue
+   * viviendo aquí hasta que UI-R2 le dé su propio fichero— nunca vuelve a
+   * decidir la pestaña por su cuenta.
+   */
+  let currentRoute: SheetRoute = { kind: 'valley' };
+  // `navigate` es `function` y no una `const` que capture `shell`: así puede
+  // declararse (izable por la elevación de `function`) antes de que `shell`
+  // exista, que es lo que rompe el huevo y la gallina entre «`actions`
+  // necesita `shell.setRoute`» y «`createShell` necesita `actions»» sin dejar
+  // `shell` como un `let` que sólo se asigna una vez.
+  function navigate(route: SheetRoute): void {
+    currentRoute = route;
+    // S-05, U-14 · crónica, gente, ficha y órdenes no coexisten: la ruta que
+    // llega cierra a las demás antes de abrirse, y siempre a través de este
+    // único punto — nunca dentro de un manejador suelto.
     closeChronicle();
     closePeople();
-    // S-05 · el mismo fallo que U-14, más pequeño: la ficha de un edificio o
-    // un aldeano no es una cuarta pantalla, es una capa sobre el valle, pero
-    // se quedaba abierta detrás de la crónica o la gente y volvía a
-    // aparecer al salir de ellas. Tocar «Valley» cierra las tres.
     closePanel();
-    showing('valley');
+    orders.hidden = true;
+    shell.setRoute(route);
+    if (route.kind === 'chronicle') {
+      openChronicle(app, undefined, () => navigate({ kind: 'valley' }));
+    } else if (route.kind === 'people') {
+      // U-08 · la pantalla de la gente: la lista de los nombrados vivos y,
+      // al tocar uno, su ficha (`src/ui/screens/people.ts`).
+      openPeople(app, () => navigate({ kind: 'valley' }));
+    } else if (route.kind === 'inspect') {
+      showPanel(route.target);
+    } else if (route.kind === 'orders') {
+      orders.hidden = false;
+    }
+  }
+  const actions: UiActions = {
+    navigate,
+    setSpeed(value): void { app.setSpeed(value); },
+    // UI-R1 · la única escritura que un panel puede hacer sobre las órdenes
+    // (`contracts.ts`); ver los `orderRow` de más arriba, que ya pasan por
+    // aquí en vez de mutar `state.intent` directamente.
+    setIntent(intent: Intent): void { state.intent = intent; },
+    track(id): void { renderer.track(id); },
   };
-  showing('valley');
-  valleyTab.addEventListener('click', toValley);
-  chronicleTab.addEventListener('click', () => {
-    closePeople();
-    openChronicle(app, undefined, () => showing('valley'));
-    showing('chronicle');
-  });
-  // U-08 · la pantalla de la gente: la lista de los nombrados vivos y, al
-  // tocar uno, su ficha (`src/ui/screens/people.ts`).
-  peopleTab.addEventListener('click', () => {
-    closeChronicle();
-    openPeople(app, () => showing('valley'));
-    showing('people');
-  });
+  const shell = createShell(actions);
   // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, timeLine, dateLine, vitals, doing, ordersNow, hint, orders, hudRight, tabbar);
+  root.append(canvas, timeLine, dateLine, vitals, doing, ordersNow, orders, hudRight, shell.element);
   paintOrders();
   speedBadge.textContent = speedLabel(speed);
 
+  /**
+   * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
+   * que dejar imposible.**
+   *
+   * El aviso de §11.6 (`notice.ts`) y la pista del inicio guiado (más abajo)
+   * vivían sueltos, cada uno con su propio `bottom` fijo en `index.html`
+   * (82px la pista, 118px el aviso): en cuanto la pista crecía a dos líneas
+   * se pisaban, fotografiado en `docs/life-rounds/evidencia-capturas.md` §3.
+   * Ninguno sabía del otro.
+   *
+   * Ahora los dos se montan dentro de la misma ranura de la carcasa
+   * (`.ui-shell-message`, `shell.css`) y `resolveMessageSlot` —pura, sin DOM—
+   * decide cuál se ve: el aviso cuenta algo que **acaba de pasar** y gana
+   * siempre; la pista cede **sin marcarse como vista** y vuelve sola en
+   * cuanto el aviso se retira (visual-reference §5, tabla de coincidencias).
+   * No hace falta tocar `notice.ts`: `mountNotices` acepta cualquier
+   * contenedor, y el `MutationObserver` de abajo mira el único atributo que
+   * ese módulo cambia (`hidden`) para saber cuándo el aviso se apaga solo.
+   */
+  const messageSlot = shell.element.querySelector<HTMLElement>('.ui-shell-message');
+  if (messageSlot === null) throw new Error('UI-R1 · la carcasa no trae ranura de mensaje');
   // §11.6: the band that says what just happened, over the valley itself.
-  const notices = mountNotices(root);
+  const notices = mountNotices(messageSlot);
+  const noticeBand = messageSlot.querySelector<HTMLElement>('.valley-notice');
+  if (noticeBand === null) throw new Error('UI-R1 · notice.ts no montó su banda donde se esperaba');
+  messageSlot.append(hint);
+  let hintWantsToShow = false;
+  const updateHintVisibility = (): void => {
+    hint.hidden = !resolveMessageSlot(!noticeBand.hidden, hintWantsToShow).hintVisible;
+  };
+  // **Se observa sólo la banda del aviso, nunca `messageSlot` entero con
+  // `subtree: true`.** La primera versión de esta ronda sí lo hacía, y era un
+  // fallo real y no una hipótesis: `updateHintVisibility` escribe
+  // `hint.hidden`, y como `hint` es descendiente del contenedor observado,
+  // esa misma escritura vuelve a encolar una mutación —`setAttribute` encola
+  // un registro aunque el valor no cambie— y el observador se vuelve a
+  // llamar a sí mismo. En microtareas, no en la misma pila, así que no lanza
+  // ni un error: solo mantiene el hilo principal ocupado para siempre. Se
+  // reprodujo con el juego de verdad (`tools/graphics/shot.mjs`, tres veces
+  // seguidas): el clic de «Found a new valley» no volvía nunca y la pestaña
+  // acababa cayéndose («Target crashed») unos noventa segundos después.
+  // Observando sólo `noticeBand` —que `hint` no toca— el bucle es imposible.
+  new MutationObserver(updateHintVisibility)
+    .observe(noticeBand, { attributes: true, attributeFilter: ['hidden'] });
   // U-02 · y la cartela de lo que pasa una vez, que es otra cosa.
   // Desde qué tick se buscan hitos. Arranca donde arranca la partida, así que
   // una partida cargada no vuelve a celebrar lo que ya celebró.
@@ -619,13 +668,19 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     let at = 0;
     const showStep = (): void => {
       if (at >= steps.length) {
-        hint.hidden = true;
+        hintWantsToShow = false;
+        updateHintVisibility();
         document.documentElement.dataset.intro = 'done';
         try { localStorage.setItem(GUIDED_KEY, 'done'); } catch { /* idem */ }
         return;
       }
       hint.textContent = renderUiText(steps[at] as string);
-      hint.hidden = false;
+      // UI-R1 · `hintWantsToShow` es lo que el paso pide; `updateHintVisibility`
+      // decide si de verdad se ve, cediendo el hueco al aviso si éste lo ocupa
+      // (`resolveMessageSlot`). El paso no se marca visto por ceder: sigue en
+      // `at` hasta que el jugador lo toque.
+      hintWantsToShow = true;
+      updateHintVisibility();
       document.documentElement.dataset.intro = 'hints';
     };
     hint.addEventListener('click', () => { at += 1; showStep(); });
@@ -753,12 +808,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // pintado y `SoundEngine.update` es quien decide si de verdad cambia algo
     // (no suena hasta el primer toque, §11's silencio por defecto).
     sound.update(ambientFor(state));
-    // U-05 · qué destino está abierto ahora mismo. La crónica no guarda su
-    // propio estado hacia aquí (`screens/chronicle.ts` no se toca), así que se
-    // lee de la propia pantalla: sólo existe mientras está montada.
-    const chronicleOpen = document.querySelector('.chronicle-scrim') !== null;
-    valleyTab.setAttribute('aria-pressed', String(!chronicleOpen));
-    chronicleTab.setAttribute('aria-pressed', String(chronicleOpen));
+    // UI-R1 · qué destino está abierto ahora mismo ya lo sabe `shell` en un
+    // único sitio (`actions.navigate`): antes de esta ronda había que releer
+    // el DOM de la crónica en cada fotograma porque ese adaptador no avisaba
+    // a la barra por su cuenta (`screens/chronicle.ts` no se toca).
     renderer.paint(state, fraction);
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
@@ -792,14 +845,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     close.className = 'valley-panel-close';
     close.setAttribute('aria-label', renderUiText('app.close'));
     close.textContent = '×';
-    close.addEventListener('click', closePanel);
+    // UI-R1 · el cierre visible pasa por `actions.navigate`, no por
+    // `closePanel` a secas: S-05 era exactamente esto — cerrar la ficha sin
+    // avisar a la barra dejaba la pestaña encendida diciendo «Chronicle» o
+    // «People» si se había llegado desde ahí. `navigate` cierra el panel y
+    // pone la ruta en orden en el mismo paso.
+    close.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
     panel.replaceChildren(close, heading, ...model.lines.map((line) => { const p = document.createElement('p'); p.textContent = line; return p; }));
     panel.hidden = false;
-    // S-05 · la ficha sólo se abre tocando el lienzo, y el lienzo sólo se toca
-    // en la pantalla del valle — pero `showing()` es lo único que enciende la
-    // pestaña correcta, y sin esta llamada la pestaña encendida podía seguir
-    // diciendo «Chronicle» o «People» si venía de ahí.
-    showing('valley');
   };
   const trace = new Map<number, Point[]>();
   let pinchStart: number | null = null;
@@ -937,7 +990,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       lastTapMs = event.timeStamp;
       if (doubleTap && backend.live.movesCamera) {
         backend.live.resetView();
-        closePanel();
+        actions.navigate({ kind: 'valley' });
         return;
       }
       // Cada backend sabe qué hay bajo un punto de su propia pantalla: el 2D
@@ -950,10 +1003,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // **Tocar el suelo deselecciona.** Un objetivo `terrain` es «aquí no hay
       // nada»: abrir una ficha del prado con la anterior detrás era lo que
       // hacía que la selección no tuviera salida.
-      if (target === null || target.kind === 'terrain') closePanel();
+      if (target === null || target.kind === 'terrain') actions.navigate({ kind: 'valley' });
       else {
-        showPanel(target);
-        if (gesture === 'hold' && target.kind === 'villager') renderer.track(target.id);
+        actions.navigate({ kind: 'inspect', target, from: 'valley' });
+        if (gesture === 'hold' && target.kind === 'villager') actions.track(target.id);
       }
     } else if (!backend.live.movesCamera) {
       // **Los deslizamientos verticales sólo valen donde no hay cámara.**
@@ -962,11 +1015,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // pusiera la barra de destinos abajo. Con cámara son el mismo movimiento
       // que arrastrar el mapa: el valle se movía **y** al soltar se abría la
       // crónica encima. «No se puede bien mover el mapa», y era esto.
-      if (gesture === 'swipe_down') closePanel();
-      else if (gesture === 'swipe_up') {
-        openChronicle(app, undefined, () => showing('valley'));
-        showing('chronicle');
-      }
+      if (gesture === 'swipe_down') actions.navigate({ kind: 'valley' });
+      else if (gesture === 'swipe_up') actions.navigate({ kind: 'chronicle' });
     }
   });
 

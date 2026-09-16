@@ -1864,6 +1864,9 @@ export const UI_BANK: Record<string, string> = {
   'nav.valley': 'Valley',
   'nav.chronicle': 'Chronicle',
   'nav.people': 'People',
+  // UI-R1 · la bandeja de la carcasa (`src/ui/redesign/shell.ts`): una región
+  // etiquetada, no un diálogo, así que necesita su propio nombre accesible.
+  'app.sheet': 'Details',
   'app.vitals': 'The village at a glance',
   'app.vitals.people': '{count} villagers',
   'app.vitals.food': 'Food for {weeks} weeks',

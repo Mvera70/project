@@ -172,7 +172,7 @@
         -webkit-tap-highlight-color: transparent; }
       .valley-speeds button:active { background: rgba(34,29,24,.10); }
       .valley-speeds button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
-      .valley-speeds button:focus-visible, .valley-panel:focus-visible, .valley-tab:focus-visible,
+      .valley-speeds button:focus-visible, .valley-panel:focus-visible,
       .valley-panel-close:focus-visible,
       .valley-sound:focus-visible {
         outline: 2px solid var(--gild); outline-offset: 2px; }
@@ -190,29 +190,21 @@
       .valley-sound[aria-pressed="true"] .valley-sound-off,
       .valley-sound[aria-pressed="false"] .valley-sound-on { display: none; }
 
-      /* U-05 · La barra de abajo: los tres destinos, siempre a la vista. Misma
-         piel que la regleta de velocidad —tinta sobre pergamino cuando algo
-         está activo— porque es el mismo tipo de instrumento: un mando de
-         estado, no un menú. */
-      /* U-14 · por encima de la crónica y de la gente (velos a 13), para que
-         siempre haya una salida a la vista; la encrucijada y el epitafio la
-         esconden por clase, un poco más abajo. */
-      .valley-tabbar { position: fixed; z-index: 14; left: 0; right: 0; bottom: 0; display: flex;
-        padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
-        background: var(--plate); border-top: 1px solid var(--edge);
-        box-shadow: 0 -2px 8px rgba(34,29,24,.16); backdrop-filter: blur(2px); }
-      .valley-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 2px; min-height: 44px; padding: 4px 2px; border: 0; border-radius: 10px; background: transparent;
-        color: var(--ink-soft); font: 650 10px/1.1 var(--plain); letter-spacing: .02em; cursor: pointer;
-        -webkit-tap-highlight-color: transparent; }
-      .valley-tab:active { background: rgba(34,29,24,.08); }
-      .valley-tab[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
-      /* Cubierta por la encrucijada y el epitafio (§11.2), y oculta también a
-         quien navega con teclado, igual que ya hace `.valley-speeds`. */
-      html.crossroad-open .valley-tabbar, html.epitaph-open .valley-tabbar { visibility: hidden; }
-      /* U-11 · la pista del inicio guiado: latón sobre tinta, la voz del juego, y se toca para pasar. */
-      .valley-hint { position: absolute; left: 12px; right: 118px; bottom: 82px; z-index: 3;
-        padding: 10px 14px 10px 12px; border: 0; border-left: 3px solid var(--gild-lit);
+      /* U-05 · los tres destinos de abajo. **Reemplazada por UI-R1**: la barra
+         que iba aquí (`.valley-tabbar`/`.valley-tab`) es ahora `.ui-shell-nav`/
+         `.ui-shell-tab` en `src/ui/redesign/shell.css`, con la misma piel y
+         la misma regla de U-14 (por encima de la crónica y de la gente,
+         escondida por la encrucijada y el epitafio). Se retira de aquí y no se
+         duplica: es justo lo que el plan pide («retirar del HTML sólo los
+         estilos ya reemplazados»). */
+      /* U-11 · la pista del inicio guiado: latón sobre tinta, la voz del
+         juego, y se toca para pasar. **Su posición la fija UI-R1** en
+         `.ui-shell-message .valley-hint` (`shell.css`): antes vivía suelta en
+         `bottom: 82px` y se pisaba con el aviso de la crónica en cuanto
+         crecía a dos líneas (`docs/life-rounds/evidencia-capturas.md` §3).
+         Lo que queda aquí es sólo su piel — colores, tipografía, sombra —,
+         no su sitio en la pantalla. */
+      .valley-hint { padding: 10px 14px 10px 12px; border: 0; border-left: 3px solid var(--gild-lit);
         border-radius: 0 10px 10px 0; background: var(--night); color: var(--parchment); text-align: left;
         font: italic 15px/1.4 var(--voice); text-wrap: pretty; box-shadow: 0 6px 18px rgba(26,21,17,.35); }
       .valley-hint::after { content: ' ›'; color: var(--gild-lit); font-style: normal; }
