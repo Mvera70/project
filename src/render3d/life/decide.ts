@@ -54,9 +54,14 @@ const LOOK = 5;
  * TUNE: a doce celdas, una oferta vale la mitad que la misma al lado. Sin esto,
  * la aldea entera cruza el valle a por lo mejor y lo que se ve son ochenta
  * personas haciendo el mismo viaje.
+ *
+ * IA-3: `reach` es opcional y por defecto `LOOK`, igual que siempre — pero
+ * quien llama puede dar uno más corto. Es el mismo mecanismo con el que un
+ * mayor deja de cruzar el pueblo por una oferta que un adulto sí cogería: no
+ * hace falta un camino aparte, sólo que la distancia pese más para él.
  */
-function falloff(away: number): number {
-  return 1 / (1 + away / LOOK);
+function falloff(away: number, reach: number = LOOK): number {
+  return 1 / (1 + away / reach);
 }
 
 /**
@@ -91,6 +96,32 @@ function leanOf(traits: readonly Trait[], offer: string): number {
     if (bias !== undefined) lean *= bias;
   }
   return lean;
+}
+
+/**
+ * A quién más le pesa el sitio, si no es exactamente el carácter.
+ *
+ * IA-3: «los niños juegan cerca de casa; los mayores prefieren pausas
+ * próximas» (brief) no es un rasgo — es la edad, que el motor ya lleva
+ * (`ageOf`, `@engine/people/villagers`) y que `village.ts` traduce a esta
+ * categoría antes de que `decide()` la vea, para que este fichero no tenga
+ * que importar los umbrales de `@engine/balance` (`DAY.CHILD_UNDER`,
+ * `DAY.ELDER_OVER`) sólo para esto.
+ *
+ * Un crío inclinado a `work` en 0,35 y no en 0 **a propósito**: si la única
+ * oferta a mano es el tajo y el deber aprieta, un niño real también acaba
+ * ahí un rato — lo que no hace es preferirlo, y con 0,35 nunca gana a `play`
+ * si `play` está a mano y da algo parecido (regla del brief: no ignorar una
+ * necesidad urgente por una etiqueta de edad).
+ */
+const AGE_LEANING: Readonly<Record<'child' | 'elder', Partial<Record<string, number>>>> = {
+  child: { play: 1.8, chase: 1.6, pet: 1.2, gossip: 0.6, pray: 0.5, work: 0.35 },
+  elder: { sit: 1.6, watch: 1.4, pray: 1.2, work: 0.6 },
+};
+
+function ageLeanOf(group: 'child' | 'elder' | undefined, offer: string): number {
+  if (group === undefined) return 1;
+  return AGE_LEANING[group][offer] ?? 1;
 }
 
 /**
@@ -138,12 +169,17 @@ function hourFactor(offer: Offer, dayPhase: number): number {
  * Lo que calma, pesado por lo que aprieta. Una oferta que da mucho de algo que
  * a uno no le pide nada vale poco, y ahí está lo que hace que dos personas
  * frente al mismo pozo hagan cosas distintas.
+ *
+ * `reach` (IA-3): opcional, por defecto `LOOK` — el mismo alcance de siempre.
+ * `decide()` da uno más corto para un crío o un mayor, así que la lejanía les
+ * pesa más sin que la fórmula tenga que cambiar de forma.
  */
 export function worth(
   offer: Offer,
   needs: Needs,
   traits: readonly Trait[],
   from: Point,
+  reach: number = LOOK,
 ): number {
   let value = 0;
   for (const name of NEED_NAMES) {
@@ -153,7 +189,55 @@ export function worth(
   }
   if (value <= 0) return 0;
   const away = Math.hypot(offer.at.x - from.x, offer.at.z - from.z);
-  return value * leanOf(traits, offer.id) * falloff(away);
+  return value * leanOf(traits, offer.id) * falloff(away, reach);
+}
+
+/**
+ * Cuánto más corto busca un crío o un mayor, en fracción de `LOOK`.
+ *
+ * TUNE: 0,6 y 0,7. No es que no puedan llegar más lejos —si la sed aprieta,
+ * `worth()` ya deja que la necesidad gane a la distancia (§ arriba)— es que,
+ * a igualdad de necesidad, un crío o un mayor se conforma con lo de al lado
+ * antes que un adulto. Menos que 0,5 dejaba a los mayores sin nada que hacer
+ * en aldeas poco densas —midiendo, `doing === null` subía—, así que no se
+ * aprieta más.
+ */
+const CHILD_RANGE_SCALE = 0.6;
+const ELDER_RANGE_SCALE = 0.7;
+
+/**
+ * Cuánto más lejos busca un `devout` una capilla, comparado con cualquier otra
+ * cosa sin hora fija.
+ *
+ * TUNE: 3, entre el 2 de una oferta corriente y el 4 de una con hora punta
+ * (`hourFactor`): una capilla no convoca a una hora, pero para quien de
+ * verdad la busca vale la pena caminar más que por un pozo cualquiera — «la
+ * capilla alcanzable» del brief es exactamente esto, que el radio de
+ * búsqueda se estire hasta donde de verdad se puede llegar, y `route === null`
+ * en el bucle de abajo sigue descartando la que no se puede.
+ */
+const DEVOUT_REACH_MULT = 3;
+
+/**
+ * Un tirón extra hacia el punto de casa, sólo para críos.
+ *
+ * IA-3, «los niños juegan cerca de casa»: además de la distancia normal desde
+ * donde el crío está ahora (`worth()`, de sobra para que no cruce el valle por
+ * un capricho), esto pesa lo lejos que el sitio cae **de su puerta**, así que
+ * un niño que ha salido a jugar prefiere quedarse por el barrio aunque en ese
+ * instante esté más cerca de otra cosa. `home` puede faltar (sin casa, o es
+ * una bestia sin rasgos): entonces no pesa nada, `1`.
+ *
+ * TUNE: nueve celdas — un poco más que `LOOK` (5), porque el radio de casa no
+ * tiene que ser tan estrecho como el de «qué hay a mano ahora mismo»: es «no
+ * salir del barrio», no «no moverse».
+ */
+const HOME_RANGE = 9;
+
+function homePull(group: 'child' | 'elder' | undefined, home: Point | undefined, at: Point): number {
+  if (group !== 'child' || home === undefined) return 1;
+  const away = Math.hypot(at.x - home.x, at.z - home.z);
+  return falloff(away, HOME_RANGE);
 }
 
 /**
@@ -175,6 +259,56 @@ export const RETHINK = 45;
 const STICKY = 1.35;
 
 /**
+ * Los rasgos que se quedan más al tajo, del brief IA-3: «más persistencia en
+ * trabajo válido». No es que trabajen mejor —eso sería un número mecánico
+ * que §6.3 prohíbe fuera de la lista cerrada— es que, ya puestos, no lo
+ * sueltan por cualquier cosa que empate.
+ */
+const WORK_STICKY_TRAITS: readonly Trait[] = ['ambitious', 'stubborn', 'loyal'];
+
+/**
+ * Cuánto más se aferra uno de esos rasgos al tajo, encima de `STICKY`.
+ *
+ * TUNE: la mitad más. Con `STICKY` a secas los tres rasgos ya ganaban algo de
+ * persistencia por el mero hecho de que `LEANING.work` los hace elegir el tajo
+ * más a menudo (§ arriba), pero eso es «lo eligen más», no «lo sueltan menos»
+ * — dos cosas distintas que el brief separa. Medido: sin este segundo empujón
+ * la media de cambios de actividad al día de un `stubborn` en el tajo no se
+ * distinguía de la de nadie más; con él, sí (ver la tabla de estabilidad del
+ * informe de esta ronda).
+ */
+const WORK_STICKY_BONUS = 1.5;
+
+function sticksToWork(traits: readonly Trait[]): boolean {
+  return traits.some((trait) => WORK_STICKY_TRAITS.includes(trait));
+}
+
+/**
+ * Cuánto se empuja hacia la plaza de más número (el borde del corro) un
+ * `secretive`, del brief IA-3.
+ *
+ * TUNE: 2,4. Con 1 no habría sesgo (el dado de toda la vida); por debajo de 2
+ * el borde ganaba demasiado poco para notarse al lado del resto de la aldea
+ * —medido, la plaza media de un `secretive` casi no se distinguía de la de
+ * cualquiera—; por encima de 3 casi siempre saca la última plaza exacta, lo
+ * que en un corro de pocas plazas se lee como «siempre en el mismo sitio»,
+ * justo el defecto que IA-1 quitó para las bestias. 2,4 deja un borde marcado
+ * sin caer en eso.
+ */
+const SECRETIVE_EDGE_POWER = 2.4;
+
+/**
+ * Cuánto se acorta un encuentro social para un `secretive`, del brief IA-3.
+ *
+ * TUNE: 0,6. Bastante para que la diferencia se note contando cuerpo-segundos
+ * por jornada (la medida de esta ronda) sin caer tan bajo que el encuentro se
+ * confunda con un cruce sin más — `offer.seconds` ya tiene un mínimo (por
+ * ejemplo `gossip: [6, 18]`) y 0,6 de eso sigue siendo una parada de verdad,
+ * no un parpadeo.
+ */
+const SECRETIVE_SHORT = 0.6;
+
+/**
  * Cuántas ofertas se prueban antes de darse por vencido.
  *
  * TUNE: cuatro. Pedir una ruta cuesta, así que no se pueden probar todas; pero
@@ -193,6 +327,21 @@ export interface Chooser {
   readonly id: number;
   /** Lo que ya está haciendo, si es que hace algo. */
   readonly doing: Intent | null;
+  /**
+   * IA-3: si es un crío o un mayor, para lo que el brief pide («los niños
+   * juegan cerca de casa; los mayores prefieren pausas próximas») y que no es
+   * un rasgo — es la edad, que `village.ts` ya convierte a esta categoría con
+   * los umbrales del motor (`@engine/balance`, `DAY.CHILD_UNDER`/
+   * `DAY.ELDER_OVER`) antes de llegar aquí. `undefined` es un adulto, y
+   * también lo que sigue siendo cualquier bestia (`beasts.ts` no la da).
+   */
+  readonly ageGroup?: 'child' | 'elder' | undefined;
+  /**
+   * IA-3: la puerta de su propia casa, sólo para el tirón de «cerca de casa»
+   * de un crío (`homePull`, arriba). Falta si no tiene casa asignada o si
+   * quien decide es una bestia; entonces no pesa nada.
+   */
+  readonly home?: Point | undefined;
 }
 
 /**
@@ -218,6 +367,15 @@ export function decide(
   const dayPhase = (step % STEPS_PER_DAY) / STEPS_PER_DAY;
   const options: { place: Place; offer: Offer; score: number; key: string }[] = [];
 
+  // IA-3: un crío o un mayor busca más corto, a igualdad de necesidad — ver
+  // `CHILD_RANGE_SCALE`/`ELDER_RANGE_SCALE`. Un adulto sigue con `LOOK` tal
+  // cual, así que nada de esto cambia una sola cifra para quien ya tenía
+  // medidas las suyas (rework.md, IA-1 e IA-2).
+  const rangeScale = who.ageGroup === 'child' ? CHILD_RANGE_SCALE
+    : who.ageGroup === 'elder' ? ELDER_RANGE_SCALE : 1;
+  const personalReach = LOOK * rangeScale;
+  const devout = who.traits.includes('devout');
+
   for (const place of places) {
     const away = Math.hypot(place.at.x - who.at.x, place.at.z - who.at.z);
     // Un sitio con hora punta se busca más lejos que uno corriente: es un
@@ -227,7 +385,13 @@ export function decide(
     // casi todo el mundo —medido, sin visita en cuatro y dos semillas de seis
     // respectivamente— porque suelen caer en el borde del núcleo construido.
     const hasHour = place.offers.some((offer) => offer.hours !== undefined);
-    if (away > LOOK * (hasHour ? 4 : 2)) continue;
+    // IA-3: y un `devout` busca una capilla igual de lejos — «preferencia
+    // contextual por capilla alcanzable» del brief: el radio se estira, pero
+    // sigue siendo `route === null` quien descarta la que de verdad no se
+    // puede pisar (más abajo, en el bucle de `TRY`).
+    const hasChapel = devout && place.offers.some((offer) => offer.id === 'pray');
+    const reachMult = hasHour ? 4 : hasChapel ? DEVOUT_REACH_MULT : 2;
+    if (away > personalReach * reachMult) continue;
     for (const offer of place.offers) {
       const key = seatKey(place, offer);
       // El aforo, salvo para quien ya está dentro: no se echa a nadie de su
@@ -235,10 +399,15 @@ export function decide(
       const inside = who.doing?.place.id === place.id && who.doing?.offer.id === offer.id;
       if (!inside && (taken.get(key) ?? 0) >= offer.seats) continue;
 
-      let score = worth(offer, who.needs, who.traits, who.at);
+      let score = worth(offer, who.needs, who.traits, who.at, personalReach);
       if (score <= 0) continue;
       score *= hourFactor(offer, dayPhase);
-      if (inside) score *= STICKY;
+      score *= ageLeanOf(who.ageGroup, offer.id);
+      score *= homePull(who.ageGroup, who.home, place.at);
+      if (inside) {
+        score *= STICKY;
+        if (offer.id === 'work' && sticksToWork(who.traits)) score *= WORK_STICKY_BONUS;
+      }
       // Un pellizco de azar, para que dos vecinos idénticos frente al mismo
       // pozo no se muevan como un solo cuerpo.
       const dice = hash32(seed, `pick:${who.id}:${step}:${place.id}:${offer.id}`) / 4_294_967_296;
@@ -275,9 +444,17 @@ export function decide(
     // aforo: el hueco es sólo entre las plazas que quedan libres.
     const already = taken.get(pick.key) ?? 0;
     const free = pick.offer.seats - already;
-    const jitter = free <= 1 ? 0 : Math.floor(
-      (hash32(seed, `seat:${who.id}:${step}:${pick.key}`) / 4_294_967_296) * free,
-    );
+    const rawDice = hash32(seed, `seat:${who.id}:${step}:${pick.key}`) / 4_294_967_296;
+    // IA-3: «bordes del corro» para un `secretive`, del brief. Elevar el dado a
+    // una potencia mayor que uno lo empuja hacia 1 y no hacia 0, así que en vez
+    // de repartirse uniforme entre todas las plazas libres, un reservado casi
+    // siempre saca la de más número — y `seatsOn()` (`offers.ts`) ya construye
+    // `spots` de dentro a fuera, así que la de más número es la del anillo más
+    // alejado del centro del corro. No cambia nada del aforo ni de si hay
+    // plaza: sólo cuál, de las que ya estaban libres.
+    const secretive = who.traits.includes('secretive');
+    const shaped = secretive ? 1 - (1 - rawDice) ** SECRETIVE_EDGE_POWER : rawDice;
+    const jitter = free <= 1 ? 0 : Math.floor(shaped * free);
     const seat = already + jitter;
     const spot = seatAt(pick.offer, seat);
     const route = router.to(land, who.at, spot);
@@ -290,13 +467,19 @@ export function decide(
 
     const span = pick.offer.seconds;
     const dice = hash32(seed, `span:${who.id}:${step}`) / 4_294_967_296;
+    let seconds = span[0] + dice * (span[1] - span[0]);
+    // IA-3: «encuentros breves» para un `secretive` — del brief, la otra mitad
+    // de la misma frase que los bordes del corro. Sólo en lo que de verdad es
+    // un encuentro (la oferta da compañía, `gives.company`): beber o rezar no
+    // se acortan, porque no son encuentros con nadie.
+    if (secretive && pick.offer.gives.company !== undefined) seconds *= SECRETIVE_SHORT;
     return {
       place: pick.place,
       offer: pick.offer,
       route: [...route],
       seat,
       since: step,
-      until: step + Math.round((span[0] + dice * (span[1] - span[0])) * 30),
+      until: step + Math.round(seconds * 30),
       there: false,
     };
   }
@@ -431,6 +614,31 @@ export function noProgress(
  */
 const PAUSE_SPOTS = 3;
 
+/** Lo que dura una pausa para quien no es ni `hardy` ni `frail`, en segundos
+ *  escénicos. Lo mismo que ya daba `pauseHere` antes de IA-3. */
+const PAUSE_SPAN: readonly [number, number] = [4, 9];
+
+/**
+ * Cuánto escala la pausa un `hardy` o un `frail`, del brief IA-3: «pausas y
+ * ritmo distintos, sin bloquear el cuerpo».
+ *
+ * TUNE: 0,7 más corto para el `hardy` (aguanta, no necesita tanto), 1,4 más
+ * largo para el `frail` (se repone más despacio) — la misma proporción que
+ * `TEMPER.rest` ya usa en `needs.ts` para lo contrario (cuánto le cuesta
+ * cansarse), leída aquí del revés para cuánto tarda en reponerse una vez
+ * parado. **Sin bloquear el cuerpo**: esto sólo cambia `offer.seconds`, nunca
+ * el mecanismo — `RETHINK`, `GIVE_UP` y `noProgress()` siguen mandando igual,
+ * así que un `frail` sigue sin poder quedarse pausado para siempre.
+ */
+const PAUSE_HARDY_SCALE = 0.7;
+const PAUSE_FRAIL_SCALE = 1.4;
+
+function pauseSpan(traits: readonly Trait[]): readonly [number, number] {
+  const scale = traits.includes('hardy') ? PAUSE_HARDY_SCALE
+    : traits.includes('frail') ? PAUSE_FRAIL_SCALE : 1;
+  return [PAUSE_SPAN[0] * scale, PAUSE_SPAN[1] * scale];
+}
+
 /**
  * Libera la plaza de lo que se dejaba y ocupa la de lo nuevo, en el mismo
  * mapa de aforo.
@@ -455,6 +663,10 @@ export function moveSeat(
 
 export function pauseHere(
   at: Point, land: Terrain, router: Router, seed: number, id: number, step: number,
+  // IA-3: opcional y al final, por defecto sin rasgos — así `beasts.ts`
+  // (que llama sin este argumento, «un animal no tiene rasgos») sigue
+  // compilando y comportándose exactamente igual que antes de esta ronda.
+  traits: readonly Trait[] = [],
 ): Intent {
   const spots: Point[] = [];
   for (let n = 0; n < PAUSE_SPOTS; n += 1) {
@@ -481,7 +693,7 @@ export function pauseHere(
     // (`places.ts`, `OFFERS.drink`). Aquí sólo lo que de verdad da estar
     // parado un rato: descansar, dejar de aburrirse y templarse.
     gives: { rest: 0.2, boredom: 0.2, irritation: 0.15 },
-    seconds: [4, 9],
+    seconds: pauseSpan(traits),
     spots,
   };
   const place: Place = { id: `pause:${id}`, at: anchor, offers: [offer] };

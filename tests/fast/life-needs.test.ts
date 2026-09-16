@@ -23,6 +23,9 @@ import {
   OFFERS, offersNear, placesOf, seatKey, type Place,
 } from '../../src/render3d/life/offers';
 import { LIFE_STEP, STEPS_PER_DAY } from '../../src/render3d/life/clock';
+import { pauseHere, worth } from '../../src/render3d/life/decide';
+import { createRouter } from '../../src/render3d/life/navigate';
+import { createVillage, type Dweller } from '../../src/render3d/life/village';
 
 const grown = new Map<number, GameState>();
 function village(seed: number): GameState {
@@ -243,5 +246,172 @@ describe('V-05 · lo que el mundo ofrece', () => {
     expect(near.length, 'en medio del valle hay algo que hacer').toBeGreaterThan(0);
     // Todo lo ofrecido está en el catálogo: nada se inventa por el camino.
     for (const offer of near) expect(OFFERS[offer.id], `${offer.id} no está en el catálogo`).toBeDefined();
+  });
+});
+
+describe('IA-3 · aldeanos con hábitos', () => {
+  it('hardy y frail no descansan el mismo rato, y ninguno se queda clavado', () => {
+    // «Pausas y ritmo distintos, sin bloquear el cuerpo» (brief IA-3). No hace
+    // falta una aldea entera: `pauseHere` es una función pura, igual que
+    // `worth` en la descripción de más arriba.
+    const state = village(7);
+    const land = terrainOf(state);
+    const router = createRouter();
+    // Un punto donde de verdad se pueda estar: el de un sitio del valle, no el
+    // centro del mapa a ciegas (puede caer en el río).
+    const at = placesOf(state, land)[0]?.at ?? { x: land.width / 2, z: land.height / 2 };
+
+    const span = (traits: Trait[]): number => {
+      const intent = pauseHere(at, land, router, 11, 1, 0, traits);
+      return intent.until - intent.since;
+    };
+    const plain = span([]);
+    const hardy = span(['hardy']);
+    const frail = span(['frail']);
+
+    expect(hardy, 'el hardy descansa menos rato que quien no tiene el rasgo').toBeLessThan(plain);
+    expect(frail, 'el frail descansa más rato').toBeGreaterThan(plain);
+    // Y «sin bloquear el cuerpo»: ninguna pausa se sale de lo que una pausa
+    // puede durar como mucho — `PAUSE_FRAIL_SCALE` está pensado para no
+    // acercarse a `GIVE_UP` (rework.md, checklist IA-1).
+    expect(frail, 'una pausa sigue siendo una pausa, no media jornada')
+      .toBeLessThan(20 * 30);
+  });
+
+  it('un devoto busca la capilla más lejos que un pozo cualquiera', () => {
+    // «Preferencia contextual por capilla alcanzable» (brief IA-3): el radio
+    // de búsqueda de `decide()` se estira para un `devout` frente a una
+    // capilla, y no frente a cualquier otra cosa. Se comprueba con `worth()`,
+    // que es la pieza pública que puntúa: a la misma distancia e igualdad de
+    // necesidad, un `devout` valora rezar por encima de cualquiera sin el
+    // rasgo — la propiedad de la que depende que le compense caminar más.
+    const needs = { ...freshNeeds(), irritation: 0.6, boredom: 0.4 };
+    const pray = OFFERS.pray;
+    expect(pray).toBeDefined();
+    if (pray === undefined) return;
+    const offer = { ...pray, at: { x: 10, z: 10 }, spots: [{ x: 10, z: 10 }] };
+    const from = { x: 10, z: 4 };
+    const scorePlain = worth(offer, needs, [], from);
+    const scoreDevout = worth(offer, needs, ['devout'], from);
+    expect(scoreDevout, 'la capilla vale más para el devoto a la misma distancia')
+      .toBeGreaterThan(scorePlain);
+  });
+
+  /**
+   * Una sola pasada de simulación para las dos propiedades de abajo — devoto
+   * que reza y genio que se enzarza — en vez de dos, que es lo que costaba
+   * antes de agruparlas: `createVillage`/`life.step()` para una jornada entera
+   * (3 600 pasos) cuesta de verdad, y la suite rápida tiene que quedarse por
+   * debajo de treinta segundos (`CLAUDE.md`). Memoizado con `village()` para
+   * no rehacerlo si vitest reejecuta el fichero.
+   *
+   * Dos semillas y una jornada cada una: pequeño a propósito para una prueba
+   * rápida — «varias, nunca una» (`CLAUDE.md`), pero la muestra grande que de
+   * verdad demuestra la fase (varias semillas × varios días) vive en
+   * `docs/life-rounds/IA-3.md`, medida con `tools/life-traits-report.ts`.
+   */
+  interface HabitSample {
+    readonly byTrait: Map<Trait, { pray: number; total: number }>;
+    readonly anyThirstIgnored: boolean;
+    readonly fieryConflictDays: number;
+    readonly fieryPersonDays: number;
+    readonly calmConflictDays: number;
+    readonly calmPersonDays: number;
+  }
+  let sample: HabitSample | null = null;
+  function habitSample(): HabitSample {
+    if (sample !== null) return sample;
+    const seeds = [7, 23];
+    const fiery: Trait[] = ['hot_tempered', 'spiteful'];
+    const calm: Trait[] = ['kind', 'generous'];
+    const byTrait = new Map<Trait, { pray: number; total: number }>();
+    let anyThirstIgnored = false;
+    let fieryConflictDays = 0;
+    let fieryPersonDays = 0;
+    let calmConflictDays = 0;
+    let calmPersonDays = 0;
+
+    for (const seed of seeds) {
+      const state = village(seed);
+      const life = createVillage(state, 0);
+      const hadConflict = new Set<number>();
+      for (let n = 0; n < STEPS_PER_DAY; n += 1) {
+        life.step();
+        for (const d of life.dwellers as readonly Dweller[]) {
+          if (d.scene !== null && (d.scene.kind === 'shove' || d.scene.kind === 'brawl')) {
+            hadConflict.add(d.body.id);
+          }
+          if ((n + 1) % 30 !== 0) continue;
+          const praying = d.doing !== null && d.doing.there && d.doing.offer.id === 'pray';
+          for (const trait of d.traits) {
+            const row = byTrait.get(trait) ?? { pray: 0, total: 0 };
+            row.total += 1;
+            if (praying) row.pray += 1;
+            byTrait.set(trait, row);
+          }
+          // «No ignora necesidades urgentes para forzar una escena»: nunca se
+          // ve a alguien con la sed al máximo sin ir a beber — `thirst` no
+          // baja salvo en `drink` o en el vado. Si esto se ve, un sesgo de
+          // rasgo o edad está ganándole la partida a una necesidad real.
+          if (d.needs.thirst > 0.9 && d.doing?.offer.id !== 'drink'
+            && d.doing?.offer.gives.thirst !== undefined) {
+            anyThirstIgnored = true;
+          }
+        }
+      }
+      for (const d of life.dwellers as readonly Dweller[]) {
+        if (d.traits.some((t) => fiery.includes(t))) {
+          fieryPersonDays += 1;
+          if (hadConflict.has(d.body.id)) fieryConflictDays += 1;
+        }
+        if (d.traits.some((t) => calm.includes(t))) {
+          calmPersonDays += 1;
+          if (hadConflict.has(d.body.id)) calmConflictDays += 1;
+        }
+      }
+    }
+
+    sample = {
+      byTrait, anyThirstIgnored, fieryConflictDays, fieryPersonDays, calmConflictDays, calmPersonDays,
+    };
+    return sample;
+  }
+
+  it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
+    const { byTrait, anyThirstIgnored } = habitSample();
+    expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
+
+    const devout = byTrait.get('devout');
+    expect(devout, 'tiene que haber al menos un devoto en la muestra').toBeDefined();
+    if (devout === undefined) return;
+    const devoutShare = devout.pray / devout.total;
+
+    let othersPray = 0;
+    let othersTotal = 0;
+    for (const [trait, row] of byTrait) {
+      if (trait === 'devout') continue;
+      othersPray += row.pray;
+      othersTotal += row.total;
+    }
+    const othersShare = othersTotal === 0 ? 0 : othersPray / othersTotal;
+    expect(devoutShare, `devoto ${(devoutShare * 100).toFixed(1)}% contra el resto ${(othersShare * 100).toFixed(1)}%`)
+      .toBeGreaterThan(othersShare * 2);
+  });
+
+  it('hot_tempered y spiteful se enzarzan más que kind y generous, pero no todo el rato', () => {
+    // «Tensión más rápido, sin peleas constantes» (brief IA-3). Encontronazo
+    // es `shove`/`brawl`, nunca `chat`.
+    const { fieryConflictDays, fieryPersonDays, calmConflictDays, calmPersonDays } = habitSample();
+    expect(fieryPersonDays, 'tiene que haber al menos un hot_tempered/spiteful en la muestra')
+      .toBeGreaterThan(0);
+    expect(calmPersonDays, 'tiene que haber al menos un kind/generous en la muestra')
+      .toBeGreaterThan(0);
+    const fieryRate = fieryConflictDays / fieryPersonDays;
+    const calmRate = calmPersonDays === 0 ? 0 : calmConflictDays / calmPersonDays;
+    expect(fieryRate, `hot_tempered/spiteful ${(fieryRate * 100).toFixed(0)}% de jornadas con encontronazo`)
+      .toBeGreaterThan(calmRate);
+    // Y «no constantes»: ni siquiera el más propenso se enzarza la mayoría de
+    // sus jornadas.
+    expect(fieryRate, 'ni el más propenso se pelea la mayoría de sus días').toBeLessThan(0.6);
   });
 });

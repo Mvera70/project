@@ -9,9 +9,10 @@
 // una coma en `GameState`.
 
 import type { GameState, Trait, VillagerId } from '@engine/state';
-import { FOOD } from '@engine/balance';
+import { DAY, FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import { opinionOf } from '@engine/people/opinions';
+import { ageOf } from '@engine/people/villagers';
 import { hash32 } from '@engine/rng';
 import {
   blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
@@ -23,7 +24,7 @@ import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
-import { OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
+import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { commons } from './places';
 import {
   decide, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
@@ -122,6 +123,24 @@ export interface Dweller {
    * siempre.
    */
   playedUntil: number;
+  /**
+   * IA-3: si es un crío o un mayor, del brief («los niños juegan cerca de
+   * casa; los mayores prefieren pausas próximas»). Sale de `ageOf` (motor,
+   * sólo lectura) contra los mismos umbrales que ya usaba el camino viejo
+   * (`@engine/balance`, `DAY.CHILD_UNDER`/`DAY.ELDER_OVER`) para lo mismo.
+   *
+   * Opcional y no obligatorio, a propósito: `tests/journeys/life-scenes.test.ts`
+   * construye un `Dweller` a mano y no está entre los ficheros autorizados de
+   * esta fase (mismo motivo que `Beast.progress` en IA-1, `decide.ts` §4.2).
+   * `undefined` es un adulto, y también lo que sigue siendo cualquier bestia.
+   */
+  readonly ageGroup?: 'child' | 'elder' | undefined;
+  /**
+   * IA-3: la puerta de su propia casa, si tiene una en pie. Sólo se usa para
+   * el tirón de «cerca de casa» de un crío (`decide.ts`, `homePull`).
+   * Opcional por la misma razón que `ageGroup`.
+   */
+  readonly home?: Point | undefined;
 }
 
 /**
@@ -248,6 +267,33 @@ function settleHeldBody(dweller: Dweller, land: Terrain, around: Neighbourhood, 
 }
 
 /**
+ * Cuánto más tarda en volver a tener ganas de pararse un `hot_tempered` o un
+ * `spiteful`, tras un encontronazo (`shove`/`brawl`, nunca un `chat`).
+ *
+ * IA-3, «tensión más rápido, sin peleas constantes»: `needs.ts` ya hace que a
+ * estos dos les suba la irritación más deprisa (`TEMPER.irritation`, ×3 y
+ * ×1,8), y eso es lo que dispara el encontronazo en `scenes.ts` — sin tocar
+ * ese fichero, que es de otra fase. Lo que sí es de aquí es que no encadenen
+ * uno detrás de otro: un enfriamiento más largo tras el empujón hace que la
+ * misma persona no vuelva a saltar con el primero que se cruce dos segundos
+ * después. Un `chat` no se alarga: hablar no necesita el mismo respiro que un
+ * empujón.
+ *
+ * TUNE: 1,6. Con 1 (sin cambio) la tabla de esta ronda mostraba a
+ * `hot_tempered` encadenando `shove` tras `shove` en la misma jornada más a
+ * menudo que el resto — ver la tabla de estabilidad del informe. Por encima
+ * de 2 el enfriamiento empezaba a notarse como una pausa forzada más que
+ * como carácter.
+ */
+const FIERY_COOLDOWN_MULT = 1.6;
+
+function fieryCooldown(dweller: Dweller, scene: Scene): number {
+  const fiery = scene.kind !== 'chat'
+    && (dweller.traits.includes('hot_tempered') || dweller.traits.includes('spiteful'));
+  return SCENE_COOLDOWN * (fiery ? FIERY_COOLDOWN_MULT : 1);
+}
+
+/**
  * Cierra la parte de una escena que le toca a uno de los dos, si es que
  * sigue siendo suya.
  *
@@ -260,7 +306,7 @@ function settleHeldBody(dweller: Dweller, land: Terrain, around: Neighbourhood, 
 function closeScene(dweller: Dweller | undefined, scene: Scene, steps: number): void {
   if (dweller === undefined || dweller.scene !== scene) return;
   dweller.scene = null;
-  dweller.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+  dweller.sceneCooldownUntil = steps + Math.round(fieryCooldown(dweller, scene) / LIFE_STEP);
   dweller.rethinkAt = steps;
 }
 
@@ -396,6 +442,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       x = tryX; z = tryZ; break;
     }
     const pace = 1.05 + (hash32(seed, `pace:${villager.id}`) / 4_294_967_296) * 0.6;
+    // IA-3: la edad es del motor, sólo lectura (`ageOf`), y aquí se convierte
+    // en categoría de una vez por jornada — no en cada paso de `decide()` — con
+    // los mismos umbrales que ya usaba el camino que G-12 apagó
+    // (`@engine/balance`, `DAY.CHILD_UNDER`/`DAY.ELDER_OVER`).
+    const age = ageOf(villager, state.tick);
+    const ageGroup: 'child' | 'elder' | undefined = age < DAY.CHILD_UNDER ? 'child'
+      : age > DAY.ELDER_OVER ? 'elder' : undefined;
+    // Y la puerta de su casa, si tiene una en pie: falta si nunca se le asignó
+    // una o si se perdió (`lostTick`), y entonces el tirón de «cerca de casa»
+    // (`decide.ts`, `homePull`) simplemente no pesa nada.
+    const homeBuilding = villager.homeId === null ? undefined
+      : state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
+    const home = homeBuilding === undefined ? undefined
+      : doorOf(land, homeBuilding.x, homeBuilding.y, homeBuilding.w, homeBuilding.h) ?? undefined;
     dwellers.push({
       body: { id: n, x, z, vx: 0, vz: 0, facing: 0, radius: 0.32, pace },
       villager: villager.id,
@@ -409,6 +469,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       holding: null,
       aimAt: null,
       playedUntil: 0,
+      ageGroup,
+      home,
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -689,9 +751,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           // medida que rework.md §3.6 dejó sin mover, parados con un impulso
           // ≥ 0,9.
           dweller.doing = decide(
-            { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before },
+            {
+              traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before,
+              ageGroup: dweller.ageGroup, home: dweller.home,
+            },
             options, taken, land, router, seed, steps,
-          ) ?? pauseHere(body, land, router, seed, body.id, steps);
+          ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
           // paso, así que los veinte que decidían en ese instante veían el mismo
