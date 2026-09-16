@@ -22,7 +22,8 @@
 import type { Trait } from '@engine/state';
 import { hash32 } from '@engine/rng';
 import { drive } from './steering';
-import { turnTo, type Body } from './body';
+import { blockedAt, turnTo, type Body, type Point, type Terrain } from './body';
+import { clearBetween } from './navigate';
 import { LIFE_STEP } from './clock';
 import type { Dweller } from './village';
 
@@ -408,3 +409,231 @@ export const SCENE_EARSHOT = EARSHOT;
 /** Lo que se tarda en volver a tener ganas de parar con quien se acaba de
  *  separar de una escena. */
 export const SCENE_COOLDOWN = COOLDOWN;
+
+// ---------------------------------------------------------------------------
+// IA-2 · Saludo de paso. docs/life-ai-proposal.md §7: «Mirada, gesto, siguen
+// andando.» A diferencia de `chat`/`shove`/`brawl`, esto no para a nadie: es
+// el gesto más ligero del catálogo, y por eso sólo se ofrece cuando `propose`
+// ya ha mirado la pareja y no ha encontrado ni charla ni encontronazo
+// (`village.ts`) — un saludo no compite con una charla de verdad, la
+// completa para los cruces que no llegan a parar a nadie.
+// ---------------------------------------------------------------------------
+
+/**
+ * A qué distancia dos que se cruzan **sin pararse** llegan a saludarse.
+ *
+ * TUNE: 1,6 celdas, por debajo de `SCENE_EARSHOT` (1,9): un saludo se ve, no
+ * hace falta oírlo, y como no frena a nadie el margen puede ser más corto —da
+ * tiempo de sobra a que el gesto se lea antes de que se crucen del todo.
+ */
+const GREET_RANGE = 1.6;
+
+/** Cuánto dura el gesto de un saludo, en segundos escénicos.
+ *
+ * TUNE: 0,3 a 0,6 — un cruce de miradas, más corto que el rechazo más breve
+ * de V-07 (`REJECT_SPAN`, 0,4 a 0,9) porque aquí ni siquiera se reduce el
+ * paso: sólo gira la cara un instante.
+ */
+const GREET_SPAN = [0.3, 0.6] as const;
+
+/**
+ * Uno de cada cuántos cruces sin charla ni encontronazo se vuelve saludo.
+ *
+ * TUNE: uno de cinco. No hay medida de spike ni cifra del brief de la que
+ * partir — es la primera y se corrige con la captura de esta ronda (IA-2,
+ * §método obligatorio, punto 7): bastante para que se vea de vez en cuando,
+ * poco para que sea el gesto por defecto de cualquier cruce y banalice el
+ * gesto frente a una charla de verdad.
+ */
+const GREET_ODDS = 0.2;
+
+/** Lo que se tarda en tener ganas de volver a saludar a quien se acaba de
+ *  cruzar. Mismo criterio que `SCENE_COOLDOWN`. */
+const GREET_COOLDOWN = 8;
+
+/** Un saludo de paso, IA-2: sin roles — el gesto es el mismo para los dos. */
+export interface Greeting {
+  readonly a: number;
+  readonly b: number;
+  readonly since: number;
+  readonly until: number;
+}
+
+/**
+ * Si estos dos, cruzándose sin más, llegan a saludarse. Determinista con
+ * `seed` y `step`, igual que `propose`.
+ *
+ * Se llama sólo cuando `propose` ya ha dicho que no hay charla ni
+ * encontronazo (`village.ts`): el saludo es el gesto de reserva para un cruce
+ * que si no, no dejaría nada en pantalla.
+ */
+export function proposeGreet(a: Dweller, b: Dweller, seed: number, step: number): Greeting | null {
+  const apart = Math.hypot(b.body.x - a.body.x, b.body.z - a.body.z);
+  if (apart > GREET_RANGE) return null;
+  const key = `greet:${a.body.id}:${b.body.id}:${step}`;
+  if (roll(seed, key) >= GREET_ODDS) return null;
+  const span = stepsOf(GREET_SPAN[0] + roll(seed, `${key}:span`) * (GREET_SPAN[1] - GREET_SPAN[0]));
+  return { a: a.body.id, b: b.body.id, since: step, until: step + span };
+}
+
+/**
+ * El gesto de un saludo: mirar a quien se cruza, sin frenar ni desviarse.
+ *
+ * **Nunca toca velocidad ni posición** — «siguen andando» (§7): el `seek`/
+ * `separate`/`avoid`/`drive`/`integrate` normal de `village.ts` sigue
+ * corriendo igual que para cualquiera que no esté en nada; esto sólo
+ * sobrescribe la cara al final del paso, después de que la marcha normal ya
+ * la haya puesto mirando hacia donde se anda.
+ */
+export function playGreet(a: Dweller, b: Dweller): void {
+  face(a.body, b.body);
+  face(b.body, a.body);
+}
+
+/** A qué distancia se saludan dos que se cruzan de largo. */
+export const GREET_REACH = GREET_RANGE;
+/** Lo que se tarda en volver a tener ganas de saludar a quien se acaba de
+ *  cruzar. */
+export const GREET_COOLDOWN_SPAN = GREET_COOLDOWN;
+
+// ---------------------------------------------------------------------------
+// IA-2 · Cesión de paso. docs/life-ai-proposal.md §7: «Uno espera, otro pasa,
+// primero continúa.» Es de las cosas que más se notan en pantalla, porque hoy
+// dos que se cruzan en un hueco estrecho se empujan sin más (`separate`,
+// `steering.ts`) en vez de leerse como dos personas que se ceden el paso.
+// ---------------------------------------------------------------------------
+
+/**
+ * Qué tan ancho tiene que ser el hueco para que nadie tenga que ceder.
+ *
+ * TUNE: 1,2 celdas. `ROUTE_CLEARANCE` (`navigate.ts`) ya usa 0,4 —el radio de
+ * una vaca, el cuerpo más ancho del valle— como margen de una ruta para uno
+ * solo; el doble más un margen es lo que hace falta para que **dos** cuerpos
+ * anchos se crucen sin rozarse.
+ */
+const YIELD_WIDE = 1.2;
+
+/**
+ * A qué distancia dos que van el uno hacia el otro se consideran un cruce.
+ *
+ * TUNE: 1,1 celdas, algo menos que `SCENE_EARSHOT` (1,9): un cruce en un
+ * hueco estrecho se nota más cerca que una charla al aire libre, porque hay
+ * menos sitio para verlo venir.
+ */
+const YIELD_RANGE = 1.1;
+
+/**
+ * Cuánto se aparta quien cede, en celdas.
+ *
+ * TUNE: 0,6. El radio de una vaca (0,4, `beasts.ts`) más un margen corto: de
+ * sobra para dejar un pasillo libre sin salirse del hueco que se estaba
+ * cruzando.
+ */
+const YIELD_ASIDE = 0.6;
+
+/** Lo que dura el paso a un lado, en segundos escénicos. */
+const YIELD_ACT_SPAN = [0.5, 0.9] as const;
+/** La cola de recuperación tras el paso a un lado: nadie vuelve a intentar
+ *  cederle el paso al mismo cruce en el mismo aliento. */
+const YIELD_RECOVER_SPAN = [0.2, 0.35] as const;
+
+/** Una cesión de paso, IA-2: papeles distintos — quien cede y quien pasa. */
+export interface Yielding {
+  readonly yielder: number;
+  readonly passer: number;
+  readonly since: number;
+  /** Hasta cuándo dura el paso a un lado. Desde aquí a `until`, es sólo
+   *  enfriamiento: nadie mueve nada a mano. */
+  readonly actUntil: number;
+  readonly until: number;
+  /** A dónde se aparta. Nada si no había hueco al lado: entonces cede
+   *  quedándose quieto donde está — «uno espera» es una cesión tan válida
+   *  como «uno se aparta» (§7). */
+  readonly aside: Point | null;
+}
+
+/**
+ * Si estos dos van de frente por un hueco tan estrecho que uno tiene que
+ * ceder. Determinista con `seed` y `step`.
+ *
+ * Tres condiciones, las tres necesarias: cerca, yendo el uno hacia el otro de
+ * verdad (no sólo cerca por casualidad) y por un hueco que, en línea recta,
+ * dos cuerpos anchos no se cruzarían sin rozarse — reutilizando `clearBetween`
+ * (`navigate.ts`) con el radio de una vaca y con el doble, tal como `pathTo`
+ * ya lo usa para las rutas.
+ */
+export function proposeYield(
+  land: Terrain, a: Dweller, b: Dweller, seed: number, step: number,
+): Yielding | null {
+  const apart = Math.hypot(b.body.x - a.body.x, b.body.z - a.body.z);
+  if (apart > YIELD_RANGE || apart < 1e-6) return null;
+
+  const towardB = ((b.body.x - a.body.x) * a.body.vx + (b.body.z - a.body.z) * a.body.vz) / apart;
+  const towardA = ((a.body.x - b.body.x) * b.body.vx + (a.body.z - b.body.z) * b.body.vz) / apart;
+  if (towardB < 0.15 || towardA < 0.15) return null;
+
+  // Ancho de sobra para uno, no para dos: si por el doble ya se pasa sin
+  // rozar, esto no es un hueco estrecho y no hace falta que nadie ceda.
+  if (clearBetween(land, a.body, b.body, YIELD_WIDE)) return null;
+  // Y si ni por el hueco justo hay paso, esto no es un cruce: es que no hay
+  // camino, y eso ya lo resuelve `pathTo` en otro sitio.
+  if (!clearBetween(land, a.body, b.body, 0)) return null;
+
+  const lowId = Math.min(a.body.id, b.body.id);
+  const highId = Math.max(a.body.id, b.body.id);
+  const key = `yield:${lowId}:${highId}:${step}`;
+  const yielderIsA = roll(seed, key) < 0.5;
+  const yielder = yielderIsA ? a : b;
+  const passer = yielderIsA ? b : a;
+
+  // Perpendicular a por dónde viene quien pasa, a un lado o al otro: el que
+  // caiga libre. Si ninguno cae libre, cede quedándose quieto (`aside: null`).
+  const dx = passer.body.x - yielder.body.x;
+  const dz = passer.body.z - yielder.body.z;
+  const along = Math.hypot(dx, dz) || 1;
+  const sideX = -dz / along;
+  const sideZ = dx / along;
+  let aside: Point | null = null;
+  for (const sign of [1, -1] as const) {
+    const at = {
+      x: yielder.body.x + sideX * YIELD_ASIDE * sign,
+      z: yielder.body.z + sideZ * YIELD_ASIDE * sign,
+    };
+    if (at.x <= 0.5 || at.z <= 0.5 || at.x >= land.width - 0.5 || at.z >= land.height - 0.5) continue;
+    if (blockedAt(land, at.x, at.z)) continue;
+    aside = at;
+    break;
+  }
+
+  const actSpan = stepsOf(YIELD_ACT_SPAN[0]
+    + roll(seed, `${key}:act`) * (YIELD_ACT_SPAN[1] - YIELD_ACT_SPAN[0]));
+  const recoverSpan = stepsOf(YIELD_RECOVER_SPAN[0]
+    + roll(seed, `${key}:rec`) * (YIELD_RECOVER_SPAN[1] - YIELD_RECOVER_SPAN[0]));
+  return {
+    yielder: yielder.body.id,
+    passer: passer.body.id,
+    since: step,
+    actUntil: step + actSpan,
+    until: step + actSpan + recoverSpan,
+    aside,
+  };
+}
+
+/**
+ * El paso a un lado de quien cede. Sólo se llama mientras `step < actUntil`;
+ * pasado eso es la cola de recuperación, y ahí no se toca nada — el `seek`/
+ * `separate`/`avoid` normal de `village.ts` ya lleva a quien cedió de vuelta
+ * a lo suyo, y el compromiso sigue vivo un rato más sólo para el
+ * enfriamiento. Nunca mueve a quien pasa: pasar es no cambiar de plan.
+ */
+export function playYield(yielding: Yielding, yielder: Dweller): void {
+  if (yielding.aside === null) { drive(yielder.body, { x: 0, z: 0 }); return; }
+  const dx = yielding.aside.x - yielder.body.x;
+  const dz = yielding.aside.z - yielder.body.z;
+  const dist = Math.hypot(dx, dz);
+  if (dist < 0.05) { drive(yielder.body, { x: 0, z: 0 }); return; }
+  drive(yielder.body, {
+    x: (dx / dist) * yielder.body.pace * 0.6,
+    z: (dz / dist) * yielder.body.pace * 0.6,
+  });
+}

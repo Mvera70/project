@@ -431,6 +431,28 @@ export function noProgress(
  */
 const PAUSE_SPOTS = 3;
 
+/**
+ * Libera la plaza de lo que se dejaba y ocupa la de lo nuevo, en el mismo
+ * mapa de aforo.
+ *
+ * IA-2: `village.ts` y `beasts.ts` tenían estas mismas tres líneas escritas a
+ * mano y por duplicado cada vez que `decide()` cambiaba de intención — la
+ * misma clase de limpieza a mano que el registro de compromisos
+ * (`commitments.ts`) viene a quitar de las escenas. Aquí y no en `offers.ts`:
+ * `Intent` es de este fichero, y `offers.ts` no importa de aquí para no
+ * cerrar un ciclo (`decide.ts` sí importa de `offers.ts`).
+ */
+export function moveSeat(
+  taken: Map<string, number>, before: Intent | null, doing: Intent,
+): void {
+  if (before !== null) {
+    const old = seatKey(before.place, before.offer);
+    taken.set(old, Math.max(0, (taken.get(old) ?? 1) - 1));
+  }
+  const now = seatKey(doing.place, doing.offer);
+  taken.set(now, (taken.get(now) ?? 0) + 1);
+}
+
 export function pauseHere(
   at: Point, land: Terrain, router: Router, seed: number, id: number, step: number,
 ): Intent {

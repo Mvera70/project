@@ -30,13 +30,13 @@ import {
 } from './body';
 import { LIFE_STEP } from './clock';
 import {
-  decide, freshProgress, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
+  decide, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
   type ProgressState,
 } from './decide';
 import type { Neighbourhood } from './grid';
 import { freshNeeds, type Needs, type NeedName } from './needs';
 import { follow, type Router } from './navigate';
-import { doorOf, OFFERS, seatAt, seatKey, type Offer, type Place } from './offers';
+import { doorOf, OFFERS, seatAt, type Offer, type Place } from './offers';
 import { avoid, drive, seek, separate } from './steering';
 import { canReach, nearestReachable } from './terrain';
 import type { Dweller } from './village';
@@ -405,12 +405,7 @@ export function stepBeasts(
         { traits: [], needs: dweller.needs, at: body, id: body.id, doing: before },
         [self], taken, land, router, seed, step,
       ) ?? pauseHere(body, land, router, seed, body.id, step);
-      if (before !== null) {
-        const old = seatKey(before.place, before.offer);
-        taken.set(old, Math.max(0, (taken.get(old) ?? 1) - 1));
-      }
-      const seatNow = seatKey(dweller.doing.place, dweller.doing.offer);
-      taken.set(seatNow, (taken.get(seatNow) ?? 0) + 1);
+      moveSeat(taken, before, dweller.doing);
       if (dweller.doing !== before) {
         progress.at = step + PROGRESS_CHECK;
         progress.gap = Number.POSITIVE_INFINITY;

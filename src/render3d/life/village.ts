@@ -26,10 +26,14 @@ import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { commons } from './places';
 import {
-  decide, freshProgress, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
+  decide, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
   type Intent, type ProgressState,
 } from './decide';
-import { alive as sceneAlive, play, propose, SCENE_COOLDOWN, SCENE_EARSHOT, type Scene } from './scenes';
+import {
+  alive as sceneAlive, play, playGreet, playYield, propose, proposeGreet, proposeYield,
+  SCENE_COOLDOWN, SCENE_EARSHOT, type Greeting, type Scene, type Yielding,
+} from './scenes';
+import { createCommitmentRegistry, type ActorRef } from './commitments';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, type Beast } from './beasts';
 import {
@@ -152,6 +156,22 @@ export interface Village {
   /** Cada pase, en orden, con quién lo dio y a quién iba. V-09b: lo que hace
    *  falta para medir una cadena — `passes` sólo da el total. */
   readonly passLog: readonly PassRecord[];
+  /**
+   * IA-2: la cuenta de interacciones de la jornada (chat, shove, brawl,
+   * greet, yield). `completed` es quien llega a su `until` con los dos
+   * participantes todavía en la aldea; `invalidated` es quien se cierra
+   * porque uno de los dos ha dejado de estar (E.3: dentro de una jornada
+   * congelada esto no ocurre hoy, pero el cierre lo distingue igual, por si
+   * un día deja de ser cierto). `stuck` tiene que ser siempre cero — es lo
+   * que cuenta el `expire()` de emergencia del registro, que sólo encuentra
+   * algo si el cierre normal de una interacción ha fallado.
+   */
+  readonly interactions: {
+    readonly started: number;
+    readonly completed: number;
+    readonly invalidated: number;
+    readonly stuck: number;
+  };
   /** Qué está haciendo la aldea ahora, para poder contarlo. */
   tally(): Record<string, number>;
 }
@@ -177,6 +197,77 @@ export interface Village {
 export interface DayOptions {
   readonly props?: boolean;
 }
+
+/**
+ * La referencia de un `Dweller` para el registro de compromisos (IA-2,
+ * `commitments.ts`). No hay campo nuevo que leer: `villager < 0` es ya la
+ * marca que distingue a un animal de una persona (`beasts.ts`,
+ * `villager: -1 - id`), así que esto no inventa nada, sólo lo traduce a
+ * `ActorRef`.
+ */
+export function actorOf(dweller: Dweller): ActorRef {
+  return { kind: dweller.villager < 0 ? 'beast' : 'villager', id: dweller.body.id };
+}
+
+/**
+ * El id con el que una escena de dos (`scenes.ts`, chat/shove/brawl) vive en
+ * el registro de compromisos.
+ *
+ * Determinista de lo que la propia `Scene` ya guarda —los dos ids de cuerpo,
+ * ordenados, y el paso en que nació—, así que no hace falta guardar nada más
+ * en `Scene` para poder liberarla por este camino.
+ */
+function sceneCommitmentId(scene: Scene): string {
+  return `scene:${Math.min(scene.a, scene.b)}:${Math.max(scene.a, scene.b)}:${scene.since}`;
+}
+
+/**
+ * Lo que le toca a un cuerpo cuyo movimiento no gobierna `village.ts` este
+ * paso —está en una escena, o cediendo el paso— salvo integrar la velocidad
+ * que ya se le ha puesto y seguir sintiendo la jornada: sed, cansancio,
+ * compañía.
+ *
+ * IA-2: antes esto estaba escrito una sola vez, dentro de la rama de
+ * `dweller.scene !== null`; con la cesión de paso hacía falta la misma
+ * media docena de líneas una segunda vez, y es justo la clase de bloque
+ * duplicado que el brief pide dejar de escribir a mano.
+ */
+function settleHeldBody(dweller: Dweller, land: Terrain, around: Neighbourhood, hunger: number): void {
+  const { body } = dweller;
+  integrate(body, land, LIFE_STEP);
+  const speed = Math.hypot(body.vx, body.vz);
+  dweller.travelled = speed > 0.05 ? dweller.travelled + speed * LIFE_STEP : 0;
+  dweller.faceAnchor = { x: body.x, z: body.z };
+  let company = false;
+  around.near(body, (other) => {
+    if (!company && Math.hypot(other.x - body.x, other.z - body.z) < 2.2) company = true;
+  });
+  drift(dweller.needs, dweller.traits, {
+    moving: speed > 0.25, withOthers: company, working: false, hunger,
+  }, LIFE_STEP);
+}
+
+/**
+ * Cierra la parte de una escena que le toca a uno de los dos, si es que
+ * sigue siendo suya.
+ *
+ * IA-2: la única función de liberación para chat/shove/brawl, llamada desde
+ * el único sitio de `village.ts` que cierra escenas — antes eran dos bloques
+ * `if` casi iguales, escritos a mano, uno por participante (`IA-0.md` §2).
+ * `dweller.scene !== scene` de guarda es lo que hace esto seguro de llamar
+ * con alguien que ya no está, o que ya ha entrado en otra cosa.
+ */
+function closeScene(dweller: Dweller | undefined, scene: Scene, steps: number): void {
+  if (dweller === undefined || dweller.scene !== scene) return;
+  dweller.scene = null;
+  dweller.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+  dweller.rethinkAt = steps;
+}
+
+/** Un saludo de paso, vivo, con el id que lo guarda en el registro. IA-2. */
+interface ActiveGreet { readonly id: string; readonly greeting: Greeting }
+/** Una cesión de paso, viva, con el id que la guarda en el registro. IA-2. */
+interface ActiveYield { readonly id: string; readonly yielding: Yielding }
 
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = terrainOf(state);
@@ -338,6 +429,24 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // `Dweller` que participan (ver `Dweller.scene`); esta lista es sólo para no
   // tener que recorrer a toda la aldea buscando quién está en una.
   let scenes: Scene[] = [];
+  // IA-2: el registro común de compromisos (`commitments.ts`) y las dos
+  // interacciones nuevas que lo usan de principio a fin. `scenes` (arriba)
+  // sigue siendo quien mueve los cuerpos de un chat/empujón/pelea; esto es
+  // quién puede empezar algo con quién, y hasta cuándo — de personas, y de
+  // bestias el día que las haya (IA-4).
+  const commitments = createCommitmentRegistry();
+  let greetings: ActiveGreet[] = [];
+  let yieldings: ActiveYield[] = [];
+  // La cuenta de esta fase, para el informe: cuántas interacciones nuevas
+  // (chat/shove/brawl/greet/yield) han empezado, cuántas han llegado a su
+  // final natural, cuántas se han invalidado (nunca llegan a `there`/`act`
+  // por falta de ruta o de hueco) y cuántas ha tenido que barrer el `expire`
+  // de emergencia en vez de su propio cierre — que tiene que quedarse en
+  // cero, porque si no es cero es que algo se ha quedado colgado.
+  let interactionsStarted = 0;
+  let interactionsCompleted = 0;
+  let interactionsInvalidated = 0;
+  let interactionsStuck = 0;
   let steps = 0;
   // V-09: pases de pelota dados en la jornada. Contados igual que en
   // `spike/life.ts` (`world.passes += 1`): cualquier tirada de una pelota a
@@ -381,6 +490,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get steps(): number { return steps; },
     get passes(): number { return passes; },
     get passLog(): readonly PassRecord[] { return passLog; },
+    get interactions() {
+      return {
+        started: interactionsStarted,
+        completed: interactionsCompleted,
+        invalidated: interactionsInvalidated,
+        stuck: interactionsStuck,
+      };
+    },
 
     tally(): Record<string, number> {
       const count: Record<string, number> = {};
@@ -422,24 +539,70 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       for (const scene of scenes) {
         const dwA = byId.get(scene.a);
         const dwB = byId.get(scene.b);
-        if (dwA === undefined || dwB === undefined || !sceneAlive(scene, dwellers)
-          || steps >= scene.until) {
-          if (dwA !== undefined && dwA.scene === scene) {
-            dwA.scene = null;
-            dwA.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
-            dwA.rethinkAt = steps;
-          }
-          if (dwB !== undefined && dwB.scene === scene) {
-            dwB.scene = null;
-            dwB.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
-            dwB.rethinkAt = steps;
-          }
+        const sceneInvalid = dwA === undefined || dwB === undefined || !sceneAlive(scene, dwellers);
+        if (sceneInvalid || steps >= scene.until) {
+          closeScene(dwA, scene, steps);
+          closeScene(dwB, scene, steps);
+          commitments.release(sceneCommitmentId(scene));
+          if (sceneInvalid) interactionsInvalidated += 1; else interactionsCompleted += 1;
           done.push(scene);
           continue;
         }
         play(scene, dwA, dwB, steps);
       }
       if (done.length > 0) scenes = scenes.filter((scene) => !done.includes(scene));
+
+      // 0b · IA-2 · Cerrar las cesiones de paso que ya han cumplido su plazo
+      //      —el paso a un lado más su cola de recuperación— y las que ya no
+      //      tienen a los dos participantes.
+      const doneYields: string[] = [];
+      for (const active of yieldings) {
+        const yielder = byId.get(active.yielding.yielder);
+        const passer = byId.get(active.yielding.passer);
+        const yieldInvalid = yielder === undefined || passer === undefined;
+        if (yieldInvalid || steps >= active.yielding.until) {
+          commitments.release(active.id);
+          if (yielder !== undefined) {
+            yielder.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+          }
+          if (passer !== undefined) {
+            passer.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+          }
+          if (yieldInvalid) interactionsInvalidated += 1; else interactionsCompleted += 1;
+          doneYields.push(active.id);
+        }
+      }
+      if (doneYields.length > 0) yieldings = yieldings.filter((y) => !doneYields.includes(y.id));
+      // Consultado por cuerpo dentro del bucle principal, más abajo: quien
+      // cede tiene su movimiento gobernado por `playYield` mientras dure el
+      // paso a un lado (`actUntil`), y el resto de la cesión es sólo cola de
+      // enfriamiento — el `seek`/`separate`/`avoid` normal ya lo trae de
+      // vuelta a lo suyo.
+      const yieldingByYielder = new Map(yieldings.map((active) => [active.yielding.yielder, active]));
+
+      // 0c · IA-2 · Cerrar los saludos que ya han durado lo suyo.
+      const doneGreets: string[] = [];
+      for (const active of greetings) {
+        const a = byId.get(active.greeting.a);
+        const b = byId.get(active.greeting.b);
+        const greetInvalid = a === undefined || b === undefined;
+        if (greetInvalid || steps >= active.greeting.until) {
+          commitments.release(active.id);
+          if (a !== undefined) a.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+          if (b !== undefined) b.sceneCooldownUntil = steps + Math.round(SCENE_COOLDOWN / LIFE_STEP);
+          if (greetInvalid) interactionsInvalidated += 1; else interactionsCompleted += 1;
+          doneGreets.push(active.id);
+        }
+      }
+      if (doneGreets.length > 0) greetings = greetings.filter((g) => !doneGreets.includes(g.id));
+
+      // **Red de seguridad, no cierre normal**: todo lo de arriba ya libera lo
+      // suyo por su propio `until`/`expiresAtStep`, así que esto no debería
+      // encontrar nunca nada — si encuentra algo, es que un cierre se ha
+      // saltado su compromiso, y `interactionsStuck` (expuesto en
+      // `tally`/`interactions`) es la cifra que lo delata.
+      interactionsStuck += commitments.entries().filter((entry) => entry.expiresAtStep <= steps).length;
+      commitments.expire(steps);
 
       for (const dweller of dwellers) {
         const { body } = dweller;
@@ -453,21 +616,25 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // día entero.
         if (dweller.scene !== null) {
           integrate(body, land, LIFE_STEP);
-          const speed = Math.hypot(body.vx, body.vz);
-          dweller.travelled = speed > 0.05 ? dweller.travelled + speed * LIFE_STEP : 0;
           // La cara la gobierna `play()` mientras dura la escena (no el
-          // umbral de arriba): se resincroniza el ancla para que al volver a
-          // la vida normal el primer recorrido se cuente desde aquí, no desde
-          // dondequiera que estuviera antes de pararse a hablar.
-          dweller.faceAnchor = { x: body.x, z: body.z };
+          // umbral normal de más abajo): se resincroniza el ancla para que al
+          // volver a la vida normal el primer recorrido se cuente desde aquí,
+          // no desde dondequiera que estuviera antes de pararse a hablar —
+          // `settleHeldBody` ya hace exactamente eso.
+          settleHeldBody(dweller, land, around, hunger);
+          continue;
+        }
 
-          let company = false;
-          around.near(body, (other) => {
-            if (!company && Math.hypot(other.x - body.x, other.z - body.z) < 2.2) company = true;
-          });
-          drift(dweller.needs, dweller.traits, {
-            moving: speed > 0.25, withOthers: company, working: false, hunger,
-          }, LIFE_STEP);
+        // IA-2 · Quien cede el paso, mientras dura el paso a un lado: su
+        // velocidad la pone `playYield`, no el `want`/`push`/`wall` normal de
+        // más abajo. Pasada `actUntil` (la cola de recuperación) ya no entra
+        // aquí y sigue su vida como cualquiera, con la ruta intacta —no se ha
+        // tocado `follow()` mientras cedía, así que retoma justo donde se
+        // había quedado.
+        const yielding = yieldingByYielder.get(body.id);
+        if (yielding !== undefined && steps < yielding.yielding.actUntil) {
+          playYield(yielding.yielding, dweller);
+          settleHeldBody(dweller, land, around, hunger);
           continue;
         }
 
@@ -530,12 +697,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           // paso, así que los veinte que decidían en ese instante veían el mismo
           // pozo libre y se iban los veinte. Medido: setenta y cinco veces más
           // gente de la que cabe yendo al mismo sitio en una sola jornada.
-          if (before !== null) {
-            const old = seatKey(before.place, before.offer);
-            taken.set(old, Math.max(0, (taken.get(old) ?? 1) - 1));
-          }
-          const seatNow = seatKey(dweller.doing.place, dweller.doing.offer);
-          taken.set(seatNow, (taken.get(seatNow) ?? 0) + 1);
+          moveSeat(taken, before, dweller.doing);
           // Sólo se reinicia el reloj de progreso cuando la intención cambia
           // de verdad: `decide()` devuelve la misma referencia cuando sigue
           // con lo mismo (arriba, «se sigue, sin recalcular el camino»), y
@@ -697,6 +859,30 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         if (dweller.doing?.there === true) satisfy(dweller.needs, dweller.doing.offer, LIFE_STEP);
       }
 
+      // 6b · IA-2 · El gesto de un saludo, después de que la marcha normal ya
+      //      haya puesto la cara mirando hacia donde se anda: esto la
+      //      sobrescribe un instante. Nunca toca velocidad ni posición —
+      //      «siguen andando» (docs/life-ai-proposal.md §7) — así que va
+      //      después del bucle principal y no dentro, sin ganarle la mano a
+      //      nada de lo que ya ha decidido este paso.
+      for (const active of greetings) {
+        const a = byId.get(active.greeting.a);
+        const b = byId.get(active.greeting.b);
+        if (a === undefined || b === undefined) continue;
+        // **El mismo umbral contra la vuelta sobre sí mismo que el resto del
+        // valle** (rework.md §3.5.3, `TURN_MIN_SPEED`): un saludo es un gesto
+        // de quien anda, y sobrescribir la cara de quien está casi parado
+        // —por ejemplo, a un paso de que `decide()` le mande a otra cosa— es
+        // justo el defecto que esa regla existe para evitar. Medido: sin este
+        // umbral, `tools/life-report.ts` subía los giros de 0,34 % a 0,43 %;
+        // con él, se quedan donde estaban.
+        const speedA = Math.hypot(a.body.vx, a.body.vz);
+        const speedB = Math.hypot(b.body.vx, b.body.vz);
+        if (speedA > TURN_MIN_SPEED * a.body.pace && speedB > TURN_MIN_SPEED * b.body.pace) {
+          playGreet(a, b);
+        }
+      }
+
       // 7b · Los trastos. V-09. Los sueltos caen y ruedan (`settle`, física
       //      pura); los que alguien lleva van en su mano (`carryAt`) — eso no
       //      puede vivir dentro de `settle`, que no conoce los cuerpos.
@@ -783,45 +969,146 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
       resolve(bodies, around, land);
 
-      // 9 · ¿Quién se ha encontrado con quién? V-07.
+      // 9 · ¿Quién se ha encontrado con quién? V-07, ampliado en IA-2.
       //
       //    Después de mover y resolver a todos, con las posiciones ya
       //    definitivas del paso: un encuentro que no estaba escrito al
       //    amanecer, ocurre porque dos cuerpos se han acercado andando. Cada
       //    pareja se mira una vez (`other.id > body.id`), y sólo entran los
-      //    que no están ya en algo y no acaban de salir de otra cosa.
+      //    que no están ya en algo y no acaban de salir de otra cosa — contra
+      //    el registro de compromisos, no sólo contra `.scene`, porque un
+      //    saludo o una cesión de paso también ocupan a alguien sin que
+      //    `.scene` lo sepa.
+      //
+      //    **Se recogen todas las propuestas del paso antes de conceder
+      //    ninguna, y se conceden en orden canónico por id de cuerpo** — no
+      //    por el orden en que `around.near` las haya encontrado (§8 del
+      //    brief): así reconstruir el mismo día da las mismas parejas, y dos
+      //    propuestas que compitan por el mismo cuerpo en el mismo paso no
+      //    dependen de quién se mirara primero.
       around.rebuild(bodies);
-      for (const dweller of dwellers) {
-        if (dweller.scene !== null || steps < dweller.sceneCooldownUntil) continue;
-        around.near(dweller.body, (otherBody) => {
-          if (dweller.scene !== null || otherBody.id <= dweller.body.id) return;
-          const other = byId.get(otherBody.id);
-          if (other === undefined || other.scene !== null
-            || steps < other.sceneCooldownUntil) return;
-          const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
-          if (apart > SCENE_EARSHOT) return;
 
-          // Sólo lectura del motor, y de los dos sentidos: ninguna escena
-          // conoce a nadie por nombre, pero el trato entre estos dos sí puede
-          // pesar en si se paran o no.
-          const opinion = (opinionOf(state, dweller.villager, other.villager)
-            + opinionOf(state, other.villager, dweller.villager)) / 2;
-          const scene = propose(dweller, other, opinion, seed, steps);
-          if (scene === null) return;
-          // V-09 · Quien empieza una escena suelta lo que llevaba: no se
-          // habla, ni se empuja, ni se pelea con las manos ocupadas.
-          if (dweller.holding !== null) {
-            const held = propsById.get(dweller.holding);
-            if (held !== undefined) drop(held, dweller, land);
+      type Candidate =
+        | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'yield'; readonly data: Yielding }
+        | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'chat'; readonly data: Scene }
+        | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'conflict'; readonly data: Scene }
+        | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
+
+      const freeToPropose = (d: Dweller): boolean => d.scene === null
+        && steps >= d.sceneCooldownUntil && !commitments.busy(actorOf(d));
+
+      const candidates: Candidate[] = [];
+      for (const dweller of dwellers) {
+        if (!freeToPropose(dweller)) continue;
+        around.near(dweller.body, (otherBody) => {
+          if (otherBody.id <= dweller.body.id) return;
+          const other = byId.get(otherBody.id);
+          if (other === undefined || !freeToPropose(other)) return;
+
+          // Orden de prioridad, docs/life-ai-proposal.md §3.2: primero el
+          // paso físico (`yield` — un cruce que si no se resuelve se ve como
+          // un empujón mudo), luego una escena de verdad (`propose`, con
+          // genio y disposición de por medio) y sólo si no hay ni una cosa ni
+          // la otra, el gesto más ligero de todos (`greet`) — para que un
+          // saludo nunca le quite el sitio a un encuentro que de verdad tenía
+          // algo que decir.
+          const yielding = proposeYield(land, dweller, other, seed, steps);
+          if (yielding !== null) {
+            candidates.push({ a: dweller, b: other, tag: 'yield', data: yielding });
+            return;
           }
-          if (other.holding !== null) {
-            const held = propsById.get(other.holding);
-            if (held !== undefined) drop(held, other, land);
+
+          const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
+          if (apart <= SCENE_EARSHOT) {
+            // Sólo lectura del motor, y de los dos sentidos: ninguna escena
+            // conoce a nadie por nombre, pero el trato entre estos dos sí
+            // puede pesar en si se paran o no.
+            const opinion = (opinionOf(state, dweller.villager, other.villager)
+              + opinionOf(state, other.villager, dweller.villager)) / 2;
+            const scene = propose(dweller, other, opinion, seed, steps);
+            if (scene !== null) {
+              candidates.push({
+                a: dweller, b: other, tag: scene.kind === 'chat' ? 'chat' : 'conflict', data: scene,
+              });
+              return;
+            }
           }
-          dweller.scene = scene;
-          other.scene = scene;
-          scenes.push(scene);
+
+          const greeting = proposeGreet(dweller, other, seed, steps);
+          if (greeting !== null) candidates.push({ a: dweller, b: other, tag: 'greet', data: greeting });
         });
+      }
+
+      candidates.sort((p, q) => {
+        const pk = `${Math.min(p.a.body.id, p.b.body.id)}:${Math.max(p.a.body.id, p.b.body.id)}`;
+        const qk = `${Math.min(q.a.body.id, q.b.body.id)}:${Math.max(q.a.body.id, q.b.body.id)}`;
+        return pk < qk ? -1 : pk > qk ? 1 : 0;
+      });
+
+      for (const candidate of candidates) {
+        const refA = actorOf(candidate.a);
+        const refB = actorOf(candidate.b);
+        const spots: readonly [Point, Point] = [
+          { x: candidate.a.body.x, z: candidate.a.body.z },
+          { x: candidate.b.body.x, z: candidate.b.body.z },
+        ];
+        const lowId = Math.min(candidate.a.body.id, candidate.b.body.id);
+        const highId = Math.max(candidate.a.body.id, candidate.b.body.id);
+
+        if (candidate.tag === 'yield') {
+          const y = candidate.data;
+          const aIsYielder = y.yielder === candidate.a.body.id;
+          const yielderRef = aIsYielder ? refA : refB;
+          const passerRef = aIsYielder ? refB : refA;
+          const yielderPos = aIsYielder ? spots[0] : spots[1];
+          const passerPos = aIsYielder ? spots[1] : spots[0];
+          const id = `yield:${lowId}:${highId}:${steps}`;
+          const ySpots: readonly [Point, Point] = [y.aside ?? yielderPos, passerPos];
+          const lease = commitments.tryReserve({
+            id, kind: 'yield', initiator: yielderRef, recipient: passerRef,
+            spots: ySpots, expiresAtStep: y.until,
+          }, steps);
+          if (lease !== null) { yieldings.push({ id, yielding: y }); interactionsStarted += 1; }
+          continue;
+        }
+
+        if (candidate.tag === 'greet') {
+          const g = candidate.data;
+          const id = `greet:${lowId}:${highId}:${steps}`;
+          const lease = commitments.tryReserve({
+            id, kind: 'greet', initiator: refA, recipient: refB, spots, expiresAtStep: g.until,
+          }, steps);
+          if (lease !== null) { greetings.push({ id, greeting: g }); interactionsStarted += 1; }
+          continue;
+        }
+
+        // `chat` o `conflict`: una escena de dos, mecánica de `scenes.ts` sin
+        // tocar. `chat` sí es una interacción del catálogo §8 y pasa por
+        // `tryReserve`; `shove`/`brawl` son el conflicto que ya existía antes
+        // de esta fase y usan `reserveRaw` — mismo almacén, misma liberación.
+        const scene = candidate.data;
+        const id = sceneCommitmentId(scene);
+        const lease = candidate.tag === 'chat'
+          ? commitments.tryReserve(
+            { id, kind: 'chat', initiator: refA, recipient: refB, spots, expiresAtStep: scene.until }, steps,
+          )
+          : commitments.reserveRaw(scene.kind, [refA, refB], spots, scene.until, steps, id);
+        if (lease === null) continue;
+
+        // V-09 · Quien empieza una escena suelta lo que llevaba: no se habla,
+        // ni se empuja, ni se pelea con las manos ocupadas.
+        if (candidate.a.holding !== null) {
+          const held = propsById.get(candidate.a.holding);
+          if (held !== undefined) drop(held, candidate.a, land);
+        }
+        if (candidate.b.holding !== null) {
+          const held = propsById.get(candidate.b.holding);
+          if (held !== undefined) drop(held, candidate.b, land);
+        }
+        candidate.a.scene = scene;
+        candidate.b.scene = scene;
+        scenes.push(scene);
+        interactionsStarted += 1;
       }
 
       steps += 1;
