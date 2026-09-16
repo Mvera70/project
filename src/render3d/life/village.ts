@@ -947,6 +947,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             {
               traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before,
               ageGroup: dweller.ageGroup, home: dweller.home, shunned, pace: body.pace,
+              // IA-9 · si el viaje no avanza o se le pasó el plazo, que no se
+              // conserve: es justo el caso en que conservarlo deja a alguien de
+              // pie para siempre.
+              restart: tooLong || overdue,
             },
             options, taken, land, router, seed, steps,
           ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);

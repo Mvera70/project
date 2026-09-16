@@ -562,6 +562,80 @@ export async function createGraphicsRenderer(
     frameCamera();
   }
 
+  // **El enganche de taller: poder mirar el juego como si fuera un vídeo.**
+  //
+  // Lo pidió el dueño del diseño el 16 sep 2026, y el problema que resuelve es
+  // real: quien revisa este juego no puede ver la pantalla en movimiento, sólo
+  // capturas, y «la IA se ve torpe» es imposible de arreglar mirando fotos
+  // sueltas. Con esto, `tools/graphics/film.mjs` toma decenas de fotogramas
+  // seguidos y, en cada uno, **pregunta al juego dónde está cada cuerpo y qué
+  // está haciendo**. Los píxeles dicen si algo se ve mal; esto dice qué es.
+  //
+  // **No puede desplazar la simulación, y eso es lo que lo hace admisible**
+  // (§4.3, y el innegociable de `CLAUDE.md`): sólo lee valores que el
+  // fotograma acaba de calcular, no tira ningún dado, no toca el estado y no
+  // existe para el juego —nadie de `src/` lo llama—. Si se borrara, no
+  // cambiaría un solo píxel.
+  //
+  // Va sin puerta, como `window.__valleySound`, por el mismo motivo: una
+  // bandera que hay que encender es una bandera que un día no está encendida
+  // cuando hace falta, y lo que se quiere mirar casi nunca se repite a la
+  // segunda.
+  window.__valleyLife = () => {
+    if (life === null) return null;
+    const round = (value: number): number => Math.round(value * 1000) / 1000;
+    return {
+      day: lifeDay,
+      steps: life.steps,
+      phase: round(paintedPhase),
+      interactions: { ...life.interactions },
+      people: life.dwellers.map((dweller) => ({
+        id: dweller.villager,
+        x: round(dweller.body.x),
+        z: round(dweller.body.z),
+        vx: round(dweller.body.vx),
+        vz: round(dweller.body.vz),
+        facing: round(dweller.body.facing),
+        pace: round(dweller.body.pace),
+        needs: Object.fromEntries(
+          Object.entries(dweller.needs).map(([name, value]) => [name, round(value as number)]),
+        ) as Record<string, number>,
+        // Lo que está haciendo, con el sitio y la oferta por su nombre: es lo
+        // que convierte «no se mueve» en «lleva ciento veinte pasos yendo a
+        // la plaza 3 del campo 7 y no llega».
+        doing: dweller.doing === null ? null : {
+          place: dweller.doing.place.id,
+          offer: dweller.doing.offer.id,
+          seat: dweller.doing.seat,
+          there: dweller.doing.there,
+          until: dweller.doing.until,
+          route: dweller.doing.route.length,
+        },
+        scene: dweller.scene === null ? null : dweller.scene.kind,
+        quarrel: dweller.quarrel !== null,
+        holding: dweller.holding,
+      })),
+      beasts: life.beasts.map((beast) => ({
+        id: beast.dweller.body.id,
+        kind: beast.kind,
+        x: round(beast.dweller.body.x),
+        z: round(beast.dweller.body.z),
+        doing: beast.dweller.doing === null ? null : beast.dweller.doing.offer.id,
+      })),
+      // Del reparto sólo lo que la capa de vida no sabe: qué clip se está
+      // pintando y qué burbuja lleva. Es la única forma de cazar un cuerpo que
+      // se mueve con el clip de estarse quieto, o al revés.
+      actors: lastActors.map((actor) => ({
+        id: actor.id,
+        clip: actor.clip,
+        activity: actor.activity,
+        talking: actor.talking,
+        arguing: actor.arguing,
+        occupation: actor.occupation,
+      })),
+    };
+  };
+
   return {
     resize(next: GraphicsViewport): void {
       if (disposed) return;
@@ -901,4 +975,45 @@ function idOf(object: Object3D, key: 'villagerId' | 'buildingId'): number | unde
     node = node.parent;
   }
   return undefined;
+}
+
+declare global {
+  interface Window {
+    /**
+     * El enganche de taller de arriba. Opcional porque el juego no lo necesita
+     * y porque una prueba que corra sin renderer no lo tiene.
+     */
+    __valleyLife?: () => LifeSnapshot | null;
+  }
+}
+
+/** Lo que el enganche devuelve. Nada de esto se usa dentro del juego. */
+export interface LifeSnapshot {
+  readonly day: number;
+  readonly steps: number;
+  readonly phase: number;
+  readonly interactions: Readonly<Record<string, number>>;
+  readonly people: readonly {
+    readonly id: number;
+    readonly x: number; readonly z: number;
+    readonly vx: number; readonly vz: number;
+    readonly facing: number; readonly pace: number;
+    readonly needs: Readonly<Record<string, number>>;
+    readonly doing: {
+      readonly place: string; readonly offer: string; readonly seat: number;
+      readonly there: boolean; readonly until: number; readonly route: number;
+    } | null;
+    readonly scene: string | null;
+    readonly quarrel: boolean;
+    readonly holding: number | null;
+  }[];
+  readonly beasts: readonly {
+    readonly id: number; readonly kind: string;
+    readonly x: number; readonly z: number; readonly doing: string | null;
+  }[];
+  readonly actors: readonly {
+    readonly id: number; readonly clip: string; readonly activity: string;
+    readonly talking: boolean; readonly arguing: boolean;
+    readonly occupation: string | null;
+  }[];
 }

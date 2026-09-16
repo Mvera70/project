@@ -402,6 +402,13 @@ export interface Chooser {
   readonly shunned?: ReadonlySet<string> | undefined;
   /** Celdas por segundo de quien decide, para el plazo del viaje. Sin él no hay plazo. */
   readonly pace?: number | undefined;
+  /**
+   * **La intención de ahora ha fallado: no la conserves.** Lo pone `village.ts`
+   * cuando el viaje no avanza (`noProgress`) o se le ha pasado el plazo
+   * (`arriveBy`), y sin esto el replanteo no servía de nada en el único caso
+   * en que hace falta — ver la viabilidad de abajo.
+   */
+  readonly restart?: boolean | undefined;
 }
 
 /**
@@ -536,12 +543,33 @@ export function decide(
   options.sort((a, b) => (b.score - a.score) || (a.key < b.key ? -1 : 1));
 
   for (const pick of options.slice(0, TRY)) {
-    if (who.doing !== null
+    const same = who.doing !== null
       && who.doing.place.id === pick.place.id
-      && who.doing.offer.id === pick.offer.id) {
-      // Lo mismo que ya hacía: se sigue, sin recalcular el camino.
-      return who.doing;
-    }
+      && who.doing.offer.id === pick.offer.id;
+    // **Se sigue con lo mismo sólo si lo mismo todavía sirve**, y esto es el
+    // arreglo de IA-9. Antes se devolvía la intención tal cual —«se sigue, sin
+    // recalcular el camino»—, que es lo correcto para un viaje que avanza y
+    // ruinoso para uno que no: con la ruta gastada sin haber llegado, `want`
+    // vale cero y el cuerpo **se queda de pie para siempre**, porque cada
+    // replanteo vuelve a elegir el mismo sitio y vuelve a devolver la misma
+    // intención muerta. El descarte de plaza de IA-8 y el plazo del viaje
+    // tampoco podían entrar: este atajo estaba antes que ellos.
+    //
+    // Medido en el navegador con `tools/graphics/film.mjs` (semilla 11, año 50,
+    // 30 s de aldea, 44 personas): **una de cada cinco muestras era un cuerpo
+    // con intención, sin llegar y a velocidad cero**, sin estar en ninguna
+    // escena. El 91 pasó los 907 pasos de la película clavado en el mismo
+    // punto persiguiendo una gallina, con la ruta a cero y la sed subiendo de
+    // 0,22 a 0,58. Nada de eso se veía en el informe de fuera del navegador,
+    // que sólo contaba a quien no tenía intención ninguna.
+    //
+    // Dos motivos para soltarla, y los dos vienen de fuera o de ella misma:
+    // que la ruta esté gastada sin haber llegado, y que quien pregunta diga
+    // que este viaje ya ha fallado (`restart`).
+    const usable = who.doing !== null
+      && who.restart !== true
+      && (who.doing.there || who.doing.route.length > 0);
+    if (same && usable) return who.doing;
 
     // La plaza que queda libre en ese sitio, y con ella el palmo de suelo donde
     // ponerse: un corro y no un montón.
