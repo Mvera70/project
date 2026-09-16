@@ -69,6 +69,10 @@ y materiales y justificar el coste del detalle visible.
 
 Los cambios en `src/` corresponden al equipo de integración y se entregarán
 como una lista concreta de requisitos, después de verificar el contrato vigente.
+Excepción autorizada por el dueño el 16 sep: corregir junto a los modelos de
+defensa las uniones, direcciones y esquinas. Esta entrega toca
+`world/defences.ts`, `world/plan.ts`, `world/buildings.ts` y sus pruebas;
+no cambia el motor ni las reglas de paso.
 
 ## Verificación y evidencia
 

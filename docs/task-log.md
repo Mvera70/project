@@ -104,7 +104,11 @@ y subida. Leña subida en `15b7f5b`; ajuste posterior solicitado por el dueño:
 Cobertizo (`shed`) G-21 terminado y validado en Blender y visor GLB; aún no
 seleccionado por el juego. 94 pruebas y typecheck verdes; lint global falla
 en `compare.mjs:55` ajeno (variable `row` sin uso). Entrega lista para subir.
-**Avisar al dueño antes de los muros.**
+Cobertizo subido en `f23ffa5`. Avisado el dueño antes de los muros;
+autoriza resolver también las uniones en código. Defensas G-21 terminadas:
+empalizada y piedra, conexiones cardinales, esquinas, T y cruces mixtos.
+86 pruebas, typecheck y lint verdes; captura del juego y banco de uniones
+revisados. Listas para commits y subida; siguiente modelo `watchtower`.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -226,6 +230,9 @@ Pila de leña G-21: 1 544 triángulos, dos materiales/mallas, 97 652 bytes;
 Leña: geometría reducida un 10 %, conservando la escala de exportación 1/3.
 Cobertizo G-21: 844 triángulos, tres materiales/mallas y 62 564 bytes;
 parcela 1×1, altura máxima 0,912712 celdas.
+Defensas G-21: empalizada 318 triángulos / 23 808 bytes; piedra 276 /
+21 636 bytes; dos materiales cada recurso. 16 máscaras cardinales cubiertas
+por pruebas. Las esquinas añaden geometría recortada propia del render.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -278,7 +285,8 @@ Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado
 y revisado en juego y subido. Almiar (`haystack`) terminado y revisado;
 almiar subido. Pila de leña (`log-pile`) terminada y revisada en juego;
 cobertizo (`shed`) terminado como recurso de catálogo; falta selección runtime.
-Tras subirlo empieza la tanda de defensas: avisar antes de modelar los muros.
+Defensas modeladas y conectadas por petición del dueño; subir la entrega
+antes de seguir con la torre de vigilancia. El aviso previo ya se cumplió.
 **Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y
