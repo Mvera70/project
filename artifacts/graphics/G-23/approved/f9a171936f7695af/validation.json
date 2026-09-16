@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "assetId": "crow",
+  "runId": "2026-09-16T21-22-40-671Z-47264",
+  "status": "pass",
+  "durationMs": 3407,
+  "candidateSha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
+  "glb": {
+    "version": 2,
+    "declaredLength": 192212,
+    "nodeNames": [
+      "legLFoot",
+      "legLLower",
+      "legL",
+      "legRFoot",
+      "legRLower",
+      "legR",
+      "head",
+      "neck",
+      "tail",
+      "wing1",
+      "wing-1",
+      "body",
+      "crow_accent",
+      "crow_coat",
+      "crow_dark",
+      "crow_light",
+      "crow_Rig",
+      "Root"
+    ],
+    "meshNames": [
+      "crow_accent_Mesh",
+      "crow_coat_Mesh",
+      "crow_dark_Mesh",
+      "crow_light_Mesh"
+    ],
+    "materialNames": [
+      "accent",
+      "coat",
+      "dark",
+      "light"
+    ],
+    "animationNames": [
+      "idle",
+      "walk"
+    ],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 18,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 826
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T21:22:57.857Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-22-40-671Z-47264\\candidate\\crow.glb",
+      "assetUrl": "/artifacts/graphics/G-23/runs/2026-09-16T21-22-40-671Z-47264/candidate/crow.glb",
+      "viewport": {
+        "width": 600,
+        "height": 600,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-22-40-671Z-47264\\three\\capture-1.png",
+        "sha256": "3335470C66B72853CD6BBA1D5A4C06B7C374B15FCAEC2DCC424E15D75753A299",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-22-40-671Z-47264\\three\\capture-1-gray.png",
+          "sha256": "393B7E5F2E3374292A4D829950A91D1263700D969DDC88E6ADACBFD8815285D5",
+          "dimensions": {
+            "width": 600,
+            "height": 600
+          }
+        },
+        "durationMs": 1707,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:49207/artifacts/graphics/G-23/runs/2026-09-16T21-22-40-671Z-47264/candidate/crow.glb",
+          "viewport": {
+            "width": 600,
+            "height": 600,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "idle",
+            "duration": 8.041666984558105
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "body",
+            "crow_Rig",
+            "crow_accent",
+            "crow_coat",
+            "crow_dark",
+            "crow_light",
+            "head",
+            "legL",
+            "legLFoot",
+            "legLLower",
+            "legR",
+            "legRFoot",
+            "legRLower",
+            "neck",
+            "tail",
+            "wing-1",
+            "wing1"
+          ],
+          "bounds": {
+            "min": [
+              -0.136667,
+              0.000333,
+              -0.054167
+            ],
+            "max": [
+              0.173333,
+              0.203333,
+              0.054167
+            ],
+            "size": [
+              0.31,
+              0.203,
+              0.108333
+            ]
+          },
+          "loadDurationMs": 279
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-22-40-671Z-47264\\three\\capture-2.png",
+        "sha256": "3335470C66B72853CD6BBA1D5A4C06B7C374B15FCAEC2DCC424E15D75753A299",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-22-40-671Z-47264\\three\\capture-2-gray.png",
+          "sha256": "393B7E5F2E3374292A4D829950A91D1263700D969DDC88E6ADACBFD8815285D5",
+          "dimensions": {
+            "width": 600,
+            "height": 600
+          }
+        },
+        "durationMs": 125,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:49207/artifacts/graphics/G-23/runs/2026-09-16T21-22-40-671Z-47264/candidate/crow.glb",
+          "viewport": {
+            "width": 600,
+            "height": 600,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "idle",
+            "duration": 8.041666984558105
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "body",
+            "crow_Rig",
+            "crow_accent",
+            "crow_coat",
+            "crow_dark",
+            "crow_light",
+            "head",
+            "legL",
+            "legLFoot",
+            "legLLower",
+            "legR",
+            "legRFoot",
+            "legRLower",
+            "neck",
+            "tail",
+            "wing-1",
+            "wing1"
+          ],
+          "bounds": {
+            "min": [
+              -0.136667,
+              0.000333,
+              -0.054167
+            ],
+            "max": [
+              0.173333,
+              0.203333,
+              0.054167
+            ],
+            "size": [
+              0.31,
+              0.203,
+              0.108333
+            ]
+          },
+          "loadDurationMs": 50
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:49207/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=600&height=600&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 162,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-22-40-671Z-47264\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

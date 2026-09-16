@@ -1836,59 +1836,78 @@
     },
     {
       "id": "crow",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/crow/crow.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-28-809Z-42176",
-        "directory": "artifacts/graphics/G-10/approved/1524b0e09484040a"
+        "runId": "2026-09-16T21-22-40-671Z-47264",
+        "directory": "artifacts/graphics/G-23/approved/f9a171936f7695af"
       },
       "bounds": {
         "min": [
-          -0.08,
-          0,
-          -0.034872
+          -0.136667,
+          0.000333,
+          -0.054167
         ],
         "max": [
-          0.076667,
-          0.11,
-          0.034872
+          0.173333,
+          0.203333,
+          0.054167
         ],
         "size": [
-          0.156667,
-          0.11,
-          0.069744
+          0.31,
+          0.203,
+          0.108333
         ]
       },
-      "recipeSha256": "4D510C8E209B55DB67E8622908564EB61DB06E61CFD9C96B1FC6DE2816363129",
+      "recipeSha256": "51C58D0DF6C60BBA00B027D36AA8BF3A602DB29EF61CA91F42837AA221CDC9B8",
       "materials": [
-        "hide-dark"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.08
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 120
+        "objects": 18,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 826
       },
       "hashes": {
-        "crow.blend": "32E70E5AA3194B3FBFEAA2AC7013F78F2F43541FFAB099BBE78BB23A111AC454",
-        "crow.glb": "1524B0E09484040A3F90A2607C251CE1B5F4C1085860264161A2D8B9C4E7C32C",
-        "crow-blender.png": "68D87EDDAA46321D9727B2DEFF515F1B44A6DA442F5E1B85811C6EB6A05F0A1C",
-        "capture-1.png": "AF3341D8C76EE57319BFA80E9D5DD04FB8A3269EC7BBEADA944ABBC14041BEE9",
-        "capture-1-gray.png": "36D31868709F88C24FD2D9AF7DFE7967330434FA4F64D293F36DBE181C21BB50",
-        "capture.json": "5FBE58D0192C0FBDBFA1CDE604F3CEA75D12C42FEACD548F737F4DA4FB127CE4",
-        "build.json": "5C2D9F73C025CFD04831210E08C03FEED7C5714C738D3CC946F1A0D6CA032B40",
-        "validation.json": "3F81E7B5AA88BD50E96F484ADA0C7FE3E3A5563315E1A5062795DEA6E5F15AB9"
+        "crow.blend": "30164B0ABEDB741CA03C3FDDFB23F4AAC3E88ADEDF00C5E6A35383FD8E768AEE",
+        "crow.glb": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
+        "crow-blender.png": "A6A54B718E222A9F76A72290B32F8255F7920A53F99BEB064DB94899986E4F56",
+        "capture-1.png": "3335470C66B72853CD6BBA1D5A4C06B7C374B15FCAEC2DCC424E15D75753A299",
+        "capture-1-gray.png": "393B7E5F2E3374292A4D829950A91D1263700D969DDC88E6ADACBFD8815285D5",
+        "capture.json": "78600F8E6C0CA2B5268A144328D2D38449EF4EFC96FBCF631A479FFF3BA88967",
+        "build.json": "639E9261AAA8B54A74E617A2270FA18DDED91FEF180459DAFC4F7BBC4BE2D6AD",
+        "validation.json": "90D27A7EC07B60825B3B416C7DBDA96A37E754F86E4F65769D7F91770F213DD4"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original crow authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {

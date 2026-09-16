@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T21:19:19.277Z",
+  "generatedAt": "2026-09-16T21:23:22.975Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -251,8 +251,21 @@
     {
       "id": "crow",
       "file": "crow.glb",
-      "sha256": "1524B0E09484040A3F90A2607C251CE1B5F4C1085860264161A2D8B9C4E7C32C",
-      "motion": []
+      "sha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.08
+        }
+      ]
     },
     {
       "id": "fish",

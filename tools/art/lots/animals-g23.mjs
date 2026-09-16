@@ -96,7 +96,7 @@ if (['cow','pig','wolf'].includes(id)) {
   }
   bone('tail',[.19,0,.36],'body');
   piece('Rump',[.19,0,.35],[.18,.18,.17],'coat','tail',.035);
-  for(let k=0;k<3;k++)piece('TailFeather'+k,[.23+k*.035,(k-1)*.045,hen?.40+k*.025:.31],[.18,.055,hen?.16:.055],'dark','tail',.018);
+  for(let k=0;k<3;k++)piece('TailFeather'+k,[(hen?.23:.31)+k*.035,(k-1)*.045,hen?.40+k*.025:.31],[hen?.18:.28,.055,hen?.16:.055],'dark','tail',.018);
   if(hen){for(let k=0;k<3;k++)piece('Comb'+k,[-.25+k*.045,0,.63],[.052,.035,.065-k*.006],'accent','head',.015);piece('Wattle',[-.27,0,.455],[.04,.06,.08],'accent','head',.015);}
   r.referenceRender={width:600,height:600,cameraLocation:[-1.3,-1.8,1.15],cameraTarget:[0,0,.3],orthoScale:1.1,worldColor:'#bec9c0'};
   for(const primitive of r.primitives)if(primitive.dimensions&&Math.min(...primitive.dimensions)<.09)primitive.bevel=0;
