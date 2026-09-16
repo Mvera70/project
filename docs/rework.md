@@ -663,6 +663,28 @@ Seis propuestos, cada uno con **un efecto de suceso** (pesos en `weightOf`),
 | `spring_valley` | `river_flood` 0, `good_catch` 0 | manantial en vez de río: sin vado |
 | `wide_ford` | `pedlar` ×2, `stranger_passes` ×1,5 | el vado ancho: el camino de fuera llega |
 
+**Dos parejas que no se sortean juntas, decidido el 16 sep 2026 por el dueño del
+diseño.** El cuaderno de referencia visual (`docs/visual-reference` §4) destapó
+que algunos rasgos se contradicen entre sí, y como cada valle saca dos, pueden
+salir juntos:
+
+- **`spring_valley` + `wide_ford`**: uno es un valle **sin río** que cruce el
+  mapa y el otro es un vado ancho con camino de cruce. Contradicción literal.
+- **`spring_valley` + `marsh_valley`**: la marisma está definida «junto al río»,
+  y ahí no hay río. Pero el problema gordo no es ése —una turbera de manantial
+  existe— sino que **los dos rasgos tocan los mismos dos sucesos en sentidos
+  opuestos**: el manantial pone la riada y la buena pesca a cero, y la marisma
+  dobla la riada y sube la pesca. Cero por dos sigue siendo cero, o sea que el
+  jugador saca **un rasgo que no hace nada**, y eso es peor que una
+  contradicción que se ve.
+
+**Las dos se excluyen en el sorteo**, y no se inventa un efecto nuevo para la
+marisma. Se consideró darle uno que no dependiera del río —agua estancada que
+enferma al rebaño, o caminos más lentos— y sería el valle más reconocible de los
+diez, pero es abrir diseño para un problema que no existe hasta que R-3 se
+construya. Si alguien lo retoma, ésa es la vía; mientras, la exclusión es la
+regla y está aquí para que nadie la reintroduzca sin saberlo.
+
 **Criterio.** `tools/fate-report.ts` con seis semillas: la distancia media
 entre valles sube de **0,16** a más de 0,25; dos capturas de dos valles con
 rasgos distintos que se distinguen a primera vista; cada rasgo tiene prueba de

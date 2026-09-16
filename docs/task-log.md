@@ -132,10 +132,11 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 5. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
    se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
    e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.
-6. **`spring_valley` + `marsh_valley`** sigue sin acordar (`visual-reference`
-   §4). Lo de `spring_valley` + `wide_ford` **ya lo decidió**: se excluye la
-   pareja en el sorteo y se declara en la especificación. Y el nivel de caos
-   **ya lo decidió** también: ver §3, tres de doce.
+6. ~~Rasgos incompatibles~~ **cerrado el 16 sep**: las **dos** parejas
+   —`spring_valley` con `wide_ford` y con `marsh_valley`— se excluyen del
+   sorteo, y no se le inventa un efecto nuevo a la marisma. Escrito en
+   `docs/rework.md` (R-3) con el motivo y con la vía que se descartó, por si
+   alguien la retoma. El nivel de caos también está cerrado: ver §3.
 7. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
    «siempre» (ver §5), pero cuántos saludos al día hay es cosa del ojo.
 8. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
