@@ -184,11 +184,25 @@ describe('IA-4 · feed/pet/chase como interacción, no como oferta pasiva', () =
       const router = createRouter();
       const taken = new Map<string, number>();
 
+      // **Un registro para toda la jornada, no uno por paso.** La primera
+      // versión creaba uno nuevo en cada `stepBeasts`, que no es lo que hace
+      // el juego —`village.ts` tiene uno y lo pasa— y con eso la reserva nunca
+      // persistía: el animal se reiniciaba en bucle y la prueba pasaba por el
+      // motivo equivocado. Con el registro compartido, lo que la saca del
+      // apuro es lo que de verdad lo hace en el juego: el tope de `act` y el
+      // enfriamiento de después.
+      const shared = registry();
+      // **Cada especie con su regalo.** La primera versión pasaba «dar de
+      // comer» para las dos, y a una vaca se la acaricia: con el regalo
+      // equivocado la reacción no llega a empezar (desde la consolidación de
+      // IA-4 hace falta que la persona venga **a eso**), así que la prueba no
+      // medía lo que dice medir.
+      const gift = kind === 'pig' ? 'feed' : 'pet';
       let everMoved = false;
       let everReleased = false;
       for (let step = 0; step < 3000; step += 1) {
         around.rebuild([beast.dweller.body, visitor]);
-        stepBeasts([beast], land, around, router, 7, step, taken, registry(), () => GIFT_FOR_TEST);
+        stepBeasts([beast], land, around, router, 7, step, taken, shared, () => gift);
         if (Math.hypot(beast.dweller.body.vx, beast.dweller.body.vz) > 0.05) everMoved = true;
         if (beast.reaction.stage === null) everReleased = true;
       }

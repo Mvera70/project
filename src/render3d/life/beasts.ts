@@ -657,6 +657,19 @@ function flee(body: Body, from: Point): Push {
  */
 function herdPullOf(beast: Beast, beasts: readonly Beast[], suppress: boolean): Push {
   if (suppress || beast.kind !== 'cow') return { x: 0, z: 0 };
+  // **Y no mientras va a algún sitio.** El tirón era constante, así que dos
+  // vacas ancladas en campos distintos —y con dos vacas en el rebaño eso es lo
+  // normal— se atraían la una a la otra **sin parar** mientras su parche de
+  // pasto las tiraba en sentido contrario. Las dos fuerzas se anulaban y la
+  // vaca se arrastraba sin llegar a ninguna de las dos cosas: medido, **el
+  // 95 % de la jornada andando y el 2,8 % pastando**, la peor cifra de las tres
+  // especies y la única que no mejoró con los arreglos anteriores.
+  //
+  // Juntarse con las otras es lo que se hace cuando no hay nada mejor, no algo
+  // que se hace **además** de ir a comer. Así que sólo tira cuando no hay
+  // destino pendiente: sin intención, o ya en el sitio.
+  const going = beast.dweller.doing;
+  if (going !== null && !going.there) return { x: 0, z: 0 };
   const { body } = beast.dweller;
   let near = 0;
   let cx = 0;
@@ -970,7 +983,27 @@ export function stepBeasts(
         }
       }
 
-      if (dweller.doing !== null && dweller.doing.there && step >= dweller.doing.until) {
+      // **Un viaje que no llega a su hora se abandona.** `until` es la hora en
+    // que la intención termina, y sólo se comprobaba **después de haber
+    // llegado**: si el cuerpo no llegaba, la intención se quedaba puesta para
+    // siempre. Medido siguiendo una vaca paso a paso: decidía beber a cinco
+    // celdas en el paso 26 con plazo hasta el 247, se acercaba hasta 3,16,
+    // retrocedía, se quedaba clavada a 3,9 con velocidad 0,01 — y en el paso
+    // 840 **seguía con la misma intención de beber**, ruta intacta y plazo
+    // vencido hacía seiscientos pasos. De ahí salía su 95 % de jornada
+    // «andando»: no andaba, estaba atascada con un viaje que nadie cerraba.
+    //
+    // `noProgress()` no la salvaba porque su espera se dobla en cada atasco
+    // (IA-1) y acaba en `GIVE_UP`: pensado para no dar bandazos, pero con el
+    // efecto de dejar un cuerpo parado veinte segundos. El plazo es la red
+    // buena, porque no depende de medir el avance.
+    if (dweller.doing !== null && !dweller.doing.there && step >= dweller.doing.until) {
+      dweller.doing = null;
+      dweller.rethinkAt = step;
+      progress.stalls = 0;
+    }
+
+    if (dweller.doing !== null && dweller.doing.there && step >= dweller.doing.until) {
         dweller.doing = null;
         dweller.rethinkAt = step;
       }

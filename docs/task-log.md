@@ -19,13 +19,13 @@ nadie va a encontrar.
 | Qué | Valor |
 |---|---|
 | Rama | `rework/parada-a-media` |
-| HEAD | `7822454` · «Los animales se pasaban el día andando hacia el sitio donde no hacer nada» |
-| `main` | `d2b85b7` — **nada de este rework está en `main` todavía** |
+| HEAD | ver `git log -1`; la última ronda mía es el nivelado de las estancias y el plazo vencido |
+| `main` | **`5e34e5c`, al día** — 16 commits del rework subidos el 16 sep a petición del dueño; la rama también está en el remoto |
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
 | **En vuelo ahora** | **IA-6 (historia visible)**, un agente de Sonnet sobre `scenes.ts`, `staging.ts`, `village.ts`, `commitments.ts`, `props.ts`. **No tocar esos ficheros hasta que vuelva.** |
-| Lo que estaba haciendo yo | El nivelado de la vaca (§4, punto 1) en `beasts.ts`, `decide.ts`, `steering.ts` |
+| Lo que acabo de cerrar | El nivelado de las estancias y el plazo vencido, en `beasts.ts` y `decide.ts` |
 
 ## 2. El tablero
 
@@ -83,9 +83,14 @@ animal que ahora se queda quieto en su sitio gira ahí. **Vigilar.**
 
 | | andando | quieta sin nada | lo suyo |
 |---|---|---|---|
-| gallina | 51,5 % | 40,7 % | 7,6 % |
-| cerdo | 65 % | — | 34,6 % |
-| **vaca** | **93 %** | — | **5,1 %** ← el problema abierto |
+| gallina | 35,7 % | 51,3 % | **13,0 %** |
+| cerdo | 28,5 % | 30,6 % | **40,9 %** |
+| vaca | 82,5 % | 0,7 % | **16,9 %** |
+
+De partida eran: gallina 88,7 % andando y 8,9 % lo suyo; cerdo 65 % y 34,6 %;
+**vaca 95 % andando y 2,8 % pastando**. La vaca sigue siendo la que más anda —es
+el cuerpo más lento y el de parches más anchos— y el siguiente nivel está en las
+duraciones y distancias del cuaderno del dueño.
 
 **Interacciones** (IA-2): 1 144 empiezan, 1 122 terminan, **0 colgadas**.
 **Sucesos del valle** (R-1, `tools/fate-report.ts`): 12,3 al año, mediana de 3
@@ -94,35 +99,40 @@ pidió).
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-1. **La vaca anda el 93 % del día y pasta el 5 %.** Su pausa ya es mínima; lo
-   que queda son sus parches de pasto, a 1,2–3,2 celdas del ancla, a 0,32 celdas
-   por segundo: hasta diez segundos de ida para un pasto de catorce. El cuaderno
-   dice que «por parches» es **quedarse en un parche** y avanzar poco entre
-   tandas, no hacer viajes entre puntos. **Es lo siguiente que hago yo.**
-2. **Las nueve jornadas rojas de `rework.md` §2.8.** Casi todas son de la capa
+1. **El mismo fallo del plazo vencido está en las personas.** Lo arreglé para
+   los animales (`beasts.ts`): una intención que no llega a su hora se
+   abandonaba nunca, y por eso una vaca se quedaba clavada con un viaje muerto.
+   **`village.ts` hace lo mismo con la gente** y no lo he tocado porque IA-6 lo
+   tiene abierto. Es lo primero cuando lo suelte: la comprobación de `until`
+   tiene que valer también con `there === false`.
+2. **Las duraciones y distancias de las actividades**, con los tiempos del
+   cuaderno (`visual-reference` §2 y §3) como referencia declarada como
+   hipótesis. La vaca sigue andando el 82,5 %: sus cinco parches están a 1,2–3,2
+   celdas y anda a 0,32 celdas por segundo.
+3. **Las nueve jornadas rojas de `rework.md` §2.8.** Casi todas son de la capa
    de vida y sus números cambian con cada fase, así que se tocan **al final de
    la tanda de IA**, no antes.
-3. **Un trabajador de vitest se cae en la suite rápida en paralelo**
+4. **Un trabajador de vitest se cae en la suite rápida en paralelo**
    («Worker exited unexpectedly»; no es montículo, con 4 GB cae igual), y **la
    suite ya no cabe en treinta segundos** como promete `CLAUDE.md`. Hay que
    decidir si las tres pruebas caras del motor (bosque de un siglo 19 s, riñas
    25 s, crónica anual 12 s) se mudan a las jornadas o si se reescribe la
    promesa. Bloquea UI-R6, que pide la suite entera.
-4. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
+5. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
    se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
    e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.
-5. **Dos decisiones del dueño, pendientes de él**: `spring_valley` y
+6. **Dos decisiones del dueño, pendientes de él**: `spring_valley` y
    `wide_ford` se contradicen literalmente como pareja de rasgos, y
    `spring_valley` con `marsh_valley` hay que acordarla (`visual-reference`
    §4). Y si el caos actual —ocho de doce valles roto— es el juego que quiere.
-6. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
+7. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
    «siempre» (ver §5), pero cuántos saludos al día hay es cosa del ojo.
-7. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
+8. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
    `village.ts` y en `Beast` en vez de en `Dweller`. Arreglo escrito allí.
-8. **§3.5 punto 5 de `rework.md`**: la malla contra el radio. Una vaca colisiona
+9. **§3.5 punto 5 de `rework.md`**: la malla contra el radio. Una vaca colisiona
    con radio 0,4 y su malla mide más de una celda. Es de `render3d/`, no de
    `life/`.
-9. **El aviso de la crónica y la pista de las órdenes se pintan encima uno del
+10. **El aviso de la crónica y la pista de las órdenes se pintan encima uno del
    otro** en la franja de abajo. Captura que lo prueba en
    `life-rounds/evidencia-capturas.md`. Va al rediseño; el cuaderno del dueño da
    la geometría (`visual-reference` §5).

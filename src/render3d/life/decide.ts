@@ -252,6 +252,18 @@ function homePull(group: 'child' | 'elder' | undefined, home: Point | undefined,
 export const RETHINK = 45;
 
 /**
+ * Cuánto se queda un cuerpo en la misma plaza de un sitio antes de que el
+ * sorteo le ofrezca otra, en pasos de la vida.
+ *
+ * TUNE: 900 pasos, treinta segundos escénicos — un cuarto de jornada. Elegido
+ * contra la actividad más larga que hay (`ruminate`, 26 a 45 s en `beasts.ts`)
+ * y contra la más corta (`peck`, 3 a 7 s): con esto, una tanda corta se repite
+ * varias veces en el mismo palmo y una larga cabe entera, que es lo que hace
+ * que «estar en un parche» se vea como estar y no como pasar.
+ */
+export const SEAT_DWELL = 900;
+
+/**
  * Cuánto se prefiere lo que ya se está haciendo.
  *
  * TUNE: un tercio más. Sin inercia nadie termina nada: en cuanto otra oferta
@@ -445,7 +457,24 @@ export function decide(
     // aforo: el hueco es sólo entre las plazas que quedan libres.
     const already = taken.get(pick.key) ?? 0;
     const free = pick.offer.seats - already;
-    const rawDice = hash32(seed, `seat:${who.id}:${step}:${pick.key}`) / 4_294_967_296;
+    // **La plaza se sortea una vez por estancia, no una por replanteo.** La
+    // llave llevaba el paso, así que cada vez que alguien se replanteaba —cada
+    // `RETHINK`, segundo y medio— salía **otra** plaza del mismo sitio y había
+    // que ir hasta ella. Para una persona es un roce; para un cuerpo lento es
+    // la jornada entera: medido, **la vaca andaba el 93 % del día y pastaba el
+    // 5 %**, con sus cinco parches de pasto a entre 1,2 y 3,2 celdas del ancla
+    // y un paso de 0,32 celdas por segundo, o sea hasta diez segundos de ida
+    // para un pasto de catorce. Iba de parche en parche sin llegar a comer en
+    // ninguno.
+    //
+    // Es el mismo error que `GREET_ODDS` (`scenes.ts`): una tirada con el paso
+    // en la llave no es una tirada, son treinta por segundo. Y con la ventana
+    // puesta sale gratis lo que el cuaderno de referencia visual pide para la
+    // vaca —«pastar **por parches**», quedarse en uno y avanzar poco entre
+    // tandas (`docs/visual-reference` §3)—: dentro de la estancia se vuelve al
+    // mismo sitio, y al cambiar de ventana se pasa al siguiente.
+    const dwell = Math.floor(step / SEAT_DWELL);
+    const rawDice = hash32(seed, `seat:${who.id}:d${dwell}:${pick.key}`) / 4_294_967_296;
     // IA-3: «bordes del corro» para un `secretive`, del brief. Elevar el dado a
     // una potencia mayor que uno lo empuja hacia 1 y no hacia 0, así que en vez
     // de repartirse uniforme entre todas las plazas libres, un reservado casi
