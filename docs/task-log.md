@@ -24,10 +24,10 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | nada. **C-1 está completa** salvo el punto 7, aplazado con motivo. Lo siguiente es UI-R1 |
+| **En vuelo ahora** | **UI-R1** (agente Sonnet, `src/ui/redesign/`, `app.ts`, `index.html`; no tocar). **C-1 está completa** salvo el punto 7, aplazado con motivo |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
-| Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
+| Lo que acabo de cerrar | **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. Antes, G-17 verificado (`9f33582`) |
 
 ## 1b. La fase en curso: C-1 · Cierre de la tanda de IA
 
@@ -82,14 +82,15 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `life-rounds/IA-3.md` |
 | IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
 | IA-5 · fauna silvestre | **hecha** — el lobo migra y sólo sale la semana del suceso; el cuervo y el pez se quedan, con el motivo escrito | (este commit) | `life-rounds/IA-5.md` |
-| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | (este commit) | `life-rounds/IA-6.md` |
+| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | `e20eeb5` y anteriores | `life-rounds/IA-6.md` |
+| IA-7 · los labradores, dentro de su campo | **hecha** — lo vio el dueño en la demo v15; de rebote, el suelo de V-11 se multiplicaba después y no era un suelo | (este commit) | `life-rounds/IA-7.md` |
 
 ### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)
 
 | Ronda | Estado | Commit |
 |---|---|---|
 | UI-R0 · auditoría y cierre de especificación | **hecha** | `f9f2df4` |
-| UI-R1 · carcasa, tokens y navegación | pendiente | — |
+| UI-R1 · carcasa, tokens y navegación | **en vuelo** (Sonnet) | — |
 | UI-R2 · cabecera, actividad, órdenes, velocidad | pendiente | — |
 | UI-R3 · crónica · UI-R4 · personas | pendientes (pueden ir en paralelo tras congelar UI-R2) | — |
 | UI-R5 · integración y decisiones · UI-R6 · validación | pendientes | — |
@@ -104,7 +105,7 @@ dato que hoy no tiene.
 
 | Fase | Qué | Depende de | Estado |
 |---|---|---|---|
-| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, buhonero, forastero, leñador, albañil, pastor, pescador, novios— | De nada. Es la sesión de Blender | **en marcha** (base, herrero, cura, granjero) |
+| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, buhonero, forastero, leñador, albañil, pastor, pescador, novios— | De nada. Es la sesión de Blender | **G-17 entregado** (base, herrero, cura, granjero, `9f33582`). El encargo del resto: `graphics-rounds/encargo-blender-aldeanos-2.md` |
 | **V-15 · el modelo se elige por lo que se hace** | La regla está escrita y probada en `src/render3d/world/models.ts`: manda la edad, luego el oficio, luego lo que se está haciendo. `Actor` gana `occupation` y la capa de vida la calcula del sitio y la oferta. Nueve pruebas en `tests/fast/life-models.test.ts` | — | **hecha, menos el último enganche** |
 | ~~V-15b~~ **hecha** | `renderer.ts` sigue teniendo su propio `VILLAGER_BY_ROLE` y elige por oficio. Hay que **borrarlo de ahí**, llamar a `modelFor(actor)` y **caer al aldeano base si el recurso no existe**, que es lo que permite que las mallas se enciendan una a una sin tocar código. No se hizo porque IA-5 tenía `renderer.ts` abierto | De que IA-5 suelte `renderer.ts` | **lo siguiente** |
 | **R-5b · quién acude a un funeral y a un incendio** | El motor sabe quién murió y qué edificio se quemó, pero **no sabe quién asiste**, y por eso IA-6 se negó a inventar espectadores. Falta el dato en el estado: un puñado de `id` de acompañantes en el suceso, como la riña ya trae los suyos en `who` | Cambio del motor (§7.10) | pendiente |
@@ -189,6 +190,12 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
    o `timber: 0.05` no es una postura de referencia válida, o la subsistencia
    no puede depender tanto de la leña. Ronda propia, medida, antes del rediseño
    de interfaz o en paralelo con él, pero **no dentro de C-1**.
+
+0b. **El 13,6 % de labradores que cavan la linde.** Queda de IA-7: la
+   tolerancia de llegada (`reach`, 1,6 × 0,6 celdas) deja a quien tiene puesto
+   en la primera fila a 0,86 celdas fuera del campo. Arreglo pequeño —una
+   tolerancia menor sólo para las plazas de parcela— y se mide con la quinta
+   cifra de `tools/life-report.ts`.
 
 1. **Falta poder descartar una plaza que ya falló.** Es la pieza que bloquea
    dos cosas a la vez. El plazo vencido de las personas (`village.ts`) tiene el

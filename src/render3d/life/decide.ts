@@ -453,10 +453,10 @@ export function decide(
       // tiene una necesidad al límite, que es lo que el brief de IA-3 prohíbe
       // pisar («no ignores necesidades urgentes para forzar una escena»).
       const summoned = place.id.startsWith('gather:');
-      if (summoned) {
-        const urgent = Math.max(...NEED_NAMES.map((need) => who.needs[need]));
-        if (urgent < GATHER_URGENT) score = Math.max(score, GATHER_FLOOR);
-      }
+      // El suelo se aplica **al final**, después de la hora, la edad, la casa,
+      // lo pegajoso y el dado — ver abajo. Aquí sólo se evita descartar la
+      // reunión por valer cero.
+      if (summoned && score <= 0) score = Number.EPSILON;
       if (score <= 0) continue;
       score *= hourFactor(offer, dayPhase);
       score *= ageLeanOf(who.ageGroup, offer.id);
@@ -469,6 +469,18 @@ export function decide(
       // pozo no se muevan como un solo cuerpo.
       const dice = hash32(seed, `pick:${who.id}:${step}:${place.id}:${offer.id}`) / 4_294_967_296;
       score *= 0.85 + dice * 0.3;
+      // **Un suelo que se multiplica después no es un suelo.** La primera
+      // versión ponía `GATHER_FLOOR` antes de los factores de hora, edad y
+      // casa y de lo pegajoso de la intención actual, así que 0,8 acababa en
+      // 0,3 y la pausa —ya elegida, y por tanto ×1,35— ganaba. V-11 volvió a
+      // caer con otra muestra (capilla, semilla 7: 14 de 26, los doce que no
+      // iban en pausa a cuatro o seis celdas) en cuanto el arreglo de los
+      // campos movió a la gente de sitio. La orden del motor se aplica sobre
+      // el resultado final, con la única excepción de una necesidad al límite.
+      if (summoned) {
+        const urgent = Math.max(...NEED_NAMES.map((need) => who.needs[need]));
+        if (urgent < GATHER_URGENT) score = Math.max(score, GATHER_FLOOR);
+      }
 
       options.push({ place, offer, score, key: seatKey(place, offer) });
     }
