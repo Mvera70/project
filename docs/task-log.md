@@ -111,6 +111,8 @@ empalizada y piedra, conexiones cardinales, esquinas, T y cruces mixtos.
 revisados. Defensas subidas en `8a1011e`, `a2e9c8b` y `24b94b1`.
 Encargo de completar los cuatro restantes sin parar: torre terminada y
 validada, lista para subida individual; siguen cementerio y ambas ruinas.
+Torre subida en `128f357`. Cementerio terminado, revisado en el renderer y
+en partida (semilla 43, año 60), listo para subir; siguen las dos ruinas.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -237,6 +239,8 @@ Defensas G-21: empalizada 318 triángulos / 23 808 bytes; piedra 276 /
 por pruebas. Las esquinas añaden geometría recortada propia del render.
 Torre G-21: 1 638 triángulos, cuatro materiales, 119 384 bytes; 86 pruebas,
 typecheck y lint verdes. Banco con renderer real y estado de prueba revisado.
+Cementerio G-21: 936 triángulos, tres materiales, 68 260 bytes; 86 pruebas,
+typecheck y lint verdes, captura natural bajo lluvia y banco de integración.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -293,6 +297,7 @@ Defensas modeladas y conectadas por petición del dueño; subir la entrega
 antes de seguir con la torre de vigilancia. El aviso previo ya se cumplió.
 Torre terminada; continuar con cementerio, ruina de madera y ruina de piedra,
 con commit y subida individual de cada modelo.
+Cementerio terminado; tras subirlo quedan las ruinas de madera y piedra.
 **Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y

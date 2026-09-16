@@ -1296,59 +1296,60 @@
     },
     {
       "id": "grave-yard",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/grave-yard/grave-yard.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-16-09-563Z-52492",
-        "directory": "artifacts/graphics/G-10/approved/3975478f357c908e"
+        "runId": "2026-09-16T20-39-10-308Z-40616",
+        "directory": "artifacts/graphics/G-21/approved/d628290b250a0114"
       },
       "bounds": {
         "min": [
           0.033333,
-          -0.001667,
+          0,
           -1.966667
         ],
         "max": [
           1.966667,
-          0.5,
+          0.52,
           -0.033333
         ],
         "size": [
           1.933333,
-          0.501667,
+          0.52,
           1.933333
         ]
       },
-      "recipeSha256": "9C9B42F1BB2A5C9D6C0D268A1B8FEFA87A6FF0DAC7E71FF6FA2269665BDF20A8",
+      "recipeSha256": "55FFE7D03B2826A110BF89F8A72A5F865700310CE0E5F099221C80897C46348B",
       "materials": [
         "stone",
-        "soil"
+        "soil",
+        "wood"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 96
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 936
       },
       "hashes": {
-        "grave-yard.blend": "A176F1700BC983D48C452340B457B59F1885DEEAC3D1BE45AC67653A2452E6D8",
-        "grave-yard.glb": "3975478F357C908E5F9A8E3920454737FD7E053C9F0B72B9C9CDDF37ACE20567",
-        "grave-yard-blender.png": "5D2F12B2DBE0DD97BAD3686359E6612CA0C4433AE89F87CAF91FD06D0F4407DC",
-        "capture-1.png": "D6B7FF49A81390966F1EE02B9F5151B99BD3B5A5192AF32EB600FE93071DA030",
-        "capture-1-gray.png": "6050328E737E7D2999758BD8E1157DB382E958E70CE52EFC24BC784F532A2DA6",
-        "capture.json": "7AAB577CF56E3AB087331D4274285180239DDBB75E27460097AE649722827D3C",
-        "build.json": "217BF5548F6AEFE1ECBB01D465ADFF64ACF5AF350482F9D16E98E68E6A31BA60",
-        "validation.json": "41280514F096A547EC520525844A315036EE8A6BB189EC63D5F6959CA6480127"
+        "grave-yard.blend": "01D3E41CCBAD2473FA75A9CDC774851D38B44104E6080DF32F6D1BF90C9B2B3E",
+        "grave-yard.glb": "D628290B250A0114938AEA22106C750C01E98BF054E6391B94F10A4C25B1FDE2",
+        "grave-yard-blender.png": "062DB1275F04C2719595EB89675A51D1985400EE1E7D222F6F803E9E82201143",
+        "capture-1.png": "9550269888046571C2D60362F35148CB98B5A6C6A6E7698C8EDA5C7F18AE6E44",
+        "capture-1-gray.png": "AA9D4481A230C13F9752BE4426E2468072616DD1B51EF19F3AF5919044F51859",
+        "capture.json": "9C435D192827C2B2BBFAC8C936D07E450BC89D2DD5D4716BA40AC48504924655",
+        "build.json": "2330A9F4F796E6AFF7DBD91D6EC7A9CFE5CA7DA0D9331E1EDBCD0050A72C1B03",
+        "validation.json": "A168C67CF2C0BDD2CF5C21C701D44DD233334B99CADF93EEF075F8075F730FCD"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original grave-yard authored for The Valley G-10",
+        "source": "Original G-21: cementerio con lápidas, cruces de madera y sepulturas bajas.",
         "license": "Project original"
       }
     },

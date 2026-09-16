@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "grave-yard",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 936
+  },
+  "bounds": {
+    "min": [
+      0.033333,
+      0,
+      -1.966667
+    ],
+    "max": [
+      1.966667,
+      0.52,
+      -0.033333
+    ],
+    "size": [
+      1.933333,
+      0.52,
+      1.933333
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T20-39-10-308Z-40616",
+    "directory": "artifacts/graphics/G-21/approved/d628290b250a0114"
+  },
+  "sha256": "D628290B250A0114938AEA22106C750C01E98BF054E6391B94F10A4C25B1FDE2",
+  "otherPublishedFilesUnchanged": true
+}

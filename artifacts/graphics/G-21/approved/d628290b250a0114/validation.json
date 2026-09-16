@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "assetId": "grave-yard",
+  "runId": "2026-09-16T20-39-10-308Z-40616",
+  "status": "pass",
+  "durationMs": 3154,
+  "candidateSha256": "D628290B250A0114938AEA22106C750C01E98BF054E6391B94F10A4C25B1FDE2",
+  "glb": {
+    "version": 2,
+    "declaredLength": 68260,
+    "nodeNames": [
+      "grave-yard_soil",
+      "grave-yard_stone",
+      "grave-yard_wood",
+      "Root"
+    ],
+    "meshNames": [
+      "grave-yard_soil_Mesh",
+      "grave-yard_stone_Mesh",
+      "grave-yard_wood_Mesh"
+    ],
+    "materialNames": [
+      "soil",
+      "stone",
+      "wood"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 3,
+    "statistics": {
+      "objects": 4,
+      "meshes": 3,
+      "materials": 3,
+      "triangles": 936
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T20:39:24.689Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-39-10-308Z-40616\\candidate\\grave-yard.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/candidate/grave-yard.glb",
+      "viewport": {
+        "width": 900,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-39-10-308Z-40616\\three\\capture-1.png",
+        "sha256": "9550269888046571C2D60362F35148CB98B5A6C6A6E7698C8EDA5C7F18AE6E44",
+        "dimensions": {
+          "width": 900,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-39-10-308Z-40616\\three\\capture-1-gray.png",
+          "sha256": "AA9D4481A230C13F9752BE4426E2468072616DD1B51EF19F3AF5919044F51859",
+          "dimensions": {
+            "width": 900,
+            "height": 800
+          }
+        },
+        "durationMs": 716,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:56516/artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/candidate/grave-yard.glb",
+          "viewport": {
+            "width": 900,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "grave-yard_soil",
+            "grave-yard_stone",
+            "grave-yard_wood"
+          ],
+          "bounds": {
+            "min": [
+              0.033333,
+              0,
+              -1.966667
+            ],
+            "max": [
+              1.966667,
+              0.52,
+              -0.033333
+            ],
+            "size": [
+              1.933333,
+              0.52,
+              1.933333
+            ]
+          },
+          "loadDurationMs": 135
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-39-10-308Z-40616\\three\\capture-2.png",
+        "sha256": "9550269888046571C2D60362F35148CB98B5A6C6A6E7698C8EDA5C7F18AE6E44",
+        "dimensions": {
+          "width": 900,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-39-10-308Z-40616\\three\\capture-2-gray.png",
+          "sha256": "AA9D4481A230C13F9752BE4426E2468072616DD1B51EF19F3AF5919044F51859",
+          "dimensions": {
+            "width": 900,
+            "height": 800
+          }
+        },
+        "durationMs": 118,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:56516/artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/candidate/grave-yard.glb",
+          "viewport": {
+            "width": 900,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "grave-yard_soil",
+            "grave-yard_stone",
+            "grave-yard_wood"
+          ],
+          "bounds": {
+            "min": [
+              0.033333,
+              0,
+              -1.966667
+            ],
+            "max": [
+              1.966667,
+              0.52,
+              -0.033333
+            ],
+            "size": [
+              1.933333,
+              0.52,
+              1.933333
+            ]
+          },
+          "loadDurationMs": 31
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:56516/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=900&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 569,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-39-10-308Z-40616\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}
