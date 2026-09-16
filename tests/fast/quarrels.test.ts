@@ -61,9 +61,18 @@ describe('sin rencor no hay riña · §7.9', () => {
   });
 
   it('ni con un rencor ya curado', () => {
+    // **Se cura el rencor y se apagan los demás.** La prueba pedía que no
+    // hubiera **ninguna** riña en cuatrocientas semanas tras curar el rencor
+    // que ella misma había creado, y eso sólo era verdad mientras la aldea de
+    // veinte años no tuviera otro rencor propio. Desde que la densidad de
+    // sucesos va con la población (R-1, `FATED_FULL_PEOPLE`), la aldea llega
+    // con otra historia y aparecía una riña de **otra** pareja: la prueba
+    // fallaba por lo que no medía. Ahora se curan todos, así que lo que se
+    // vigila es lo que dice el título — un rencor curado no discute — y no la
+    // biografía de una semilla.
     const state = village(20);
     const [a, b] = feuding(state);
-    state.people.grudges[state.people.grudges.length - 1]!.healedTick = state.tick;
+    for (const grudge of state.people.grudges) grudge.healedTick = state.tick;
     expect(quarrelWithin(state, 400)).toBeNull();
     expect(a.id).not.toBe(b.id);
   });

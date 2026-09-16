@@ -277,6 +277,24 @@ export const FATE = {
   // tres o cuatro semanas, que es lo que se puede contar sin que se apile.
   WEEKLY_CHANCE: 0.35,
   MIN_GAP_WEEKS: 2,
+  // TUNE: la probabilidad de arriba es la de una aldea hecha. **En un caserío
+  // se reparte a la baja, en proporción a la gente que hay**, y no por
+  // protegerlo: por proporción. Con la tirada plana, una pareja y una aldea de
+  // cuarenta tenían la misma densidad de sucesos —doce al año—, o sea que la
+  // pareja recibía una catástrofe por trimestre y no se recuperaba nunca:
+  // medido en doce semillas a cuarenta años, **ocho se rompían** y el ánimo
+  // pasaba por debajo de 25 entre dieciocho y treinta y siete años de cada
+  // cuarenta. Y eso no es lo que el dueño del diseño pidió: «que una partida
+  // salga mal por casualidad está bien, que casi todas se vayan a romper no es
+  // la idea; no hay que poner límites, hay que equilibrar».
+  //
+  // No es una puerta: no impide **ningún** suceso, ni siquiera el rayo sobre la
+  // única casa. Sólo hace que en un caserío de tres pase algo cada muchas
+  // semanas y en una aldea de cuarenta cada dos, que además es más variedad
+  // entre valles y no menos: el caserío tiene una vida callada y la aldea un
+  // noticiario, y eso se compara.
+  FATED_FULL_PEOPLE: 20,
+  FATED_LEAST_SHARE: 0.25,
   // TUNE: el peso de cada suceso entre los posibles. La fiesta pesa mucho
   // porque sólo puede pasar una semana al año; el rayo se multiplica por las
   // jornadas de tormenta de la semana.

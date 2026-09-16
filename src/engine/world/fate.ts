@@ -316,7 +316,14 @@ export function rollFate(state: GameState): FateOutcome | null {
 
   const last = state.happenings[state.happenings.length - 1];
   if (last !== undefined && state.tick - last.tick < FATE.MIN_GAP_WEEKS) return null;
-  if (next(state.rng, 'fate') >= FATE.WEEKLY_CHANCE) return null;
+  // La densidad va con la gente que hay (`FATED_FULL_PEOPLE`,
+  // `FATED_LEAST_SHARE`, y el motivo largo está en `balance.ts`): la tirada
+  // plana daba la misma cadencia a una pareja que a una aldea de cuarenta.
+  const share = Math.max(
+    FATE.FATED_LEAST_SHARE,
+    Math.min(1, ctx.people / FATE.FATED_FULL_PEOPLE),
+  );
+  if (next(state.rng, 'fate') >= FATE.WEEKLY_CHANCE * share) return null;
   const candidates = HAPPENINGS.filter((id) => weightOf(state, id, ctx) > 0);
   if (candidates.length === 0) return null;
   const id = weighted(state.rng, 'fate', candidates, (c) => weightOf(state, c, ctx));

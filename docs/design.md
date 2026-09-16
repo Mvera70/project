@@ -1608,8 +1608,26 @@ decide el motor en `src/engine/world/sky.ts` con `hash32` y **sin consumir
 tirada**, y la capa `derive` lo lee de ahí; así un rayo de §10.8 puede tener
 consecuencias sin que el decorado mueva la simulación.
 
-**La cadencia.** Una tirada por semana contra `FATE.WEEKLY_CHANCE`, y nunca dos
-sucesos a menos de `FATE.MIN_GAP_WEEKS` (un suceso pegado a otro no se lee, se
+**La cadencia va con el tamaño de la aldea.** Una tirada por semana contra
+`FATE.WEEKLY_CHANCE`, **repartida en proporción a la gente que hay**
+(`FATED_FULL_PEOPLE`, `FATED_LEAST_SHARE`): un caserío de tres tiene una vida
+callada y una aldea de cuarenta un noticiario. **No es un techo y no prohíbe
+ningún suceso** —el rayo puede caer sobre la única casa de la pareja—, es una
+proporción, y además es más variedad entre valles y no menos: una aldea que no
+crece tiene otra historia que una que crece, y eso se compara.
+
+Se escribió el 16 sep 2026 después de medir lo que pasaba sin ella, y por una
+decisión del dueño del diseño: con la tirada plana, una pareja recibía los mismos
+doce sucesos al año que una aldea de cuarenta —una catástrofe por trimestre— y
+**ocho valles de doce se rompían antes de los cuarenta años**, con el ánimo por
+debajo de 25 entre dieciocho y treinta y siete años de cada cuarenta. Sus
+palabras: «que una partida salga mal por casualidad está bien, es parte del
+juego, pero que casi todas se vayan a romper no es la idea; no hay que poner
+límites, pero que tampoco sea una locura, hay que equilibrar». Con la proporción
+puesta: **tres de doce se rompen** y los que aguantan llegan con entre 20 y 57
+habitantes, en vez de 22, 9, 4 y 1.
+
+Y nunca dos sucesos a menos de `FATE.MIN_GAP_WEEKS` (un suceso pegado a otro no se lee, se
 apila). La fiesta de la cosecha es la excepción: **es un rito**, se celebra la
 semana después de la siega si hay grano y gente, sin tirar y sin respetar el
 hueco. Medido con seis semillas × cuarenta años (`tools/fate-report.ts`):
@@ -3598,7 +3616,9 @@ política prudente), y hay que pasarlo antes y después de mover cualquiera.
 
 | Constante | Valor | Por qué |
 |---|---|---|
-| `WEEKLY_CHANCE` | 0,35 | con `MIN_GAP_WEEKS` 2 salen 13 al año: uno cada tres o cuatro semanas, contable sin apilarse |
+| `WEEKLY_CHANCE` | 0,35 | la de una **aldea hecha**: con `MIN_GAP_WEEKS` 2 salen 13 al año, uno cada tres o cuatro semanas |
+| `FATED_FULL_PEOPLE` | 20 | la población a la que la cadencia es la de arriba; por debajo se reparte en proporción |
+| `FATED_LEAST_SHARE` | 0,25 | el suelo de esa proporción, para que un caserío tenga vida y no silencio |
 | `MIN_GAP_WEEKS` | 2 | un suceso pegado a otro no se lee |
 | `FEAST_IS_A_RITE` | true | sorteada, la fiesta salía una vez cada veinte años |
 | `WEIGHT` | rayo 3 · riada 3 · lobos 3 · boda 0,6 · buhonero 2 · pesca 2 · tejado 3 · fiesta 1 (no se sortea) · riña 1 · oso 0,6 · niño 0,5 · forastero 1 | tercera vuelta; las dos anteriores en `docs/rework.md` §2.5 |
@@ -3618,7 +3638,13 @@ Los factores por rasgo no son constantes sino ramas de `weightOf`: lobos ×1,6
 y oso ×2 en `old_forest`; riada y lobos ×0,5 en `bare_hills`. R-3 los
 multiplica (`docs/rework.md` §4).
 
-**Medido con esta tabla** (v3.75, con las puertas del rayo puestas): 13,0
+**Medido con la proporción puesta** (v3.78, doce semillas × cuarenta años,
+`foundGame`): **tres valles de doce se rompen** —uno por extinción, dos por
+abandono— y los nueve que aguantan llegan con 57, 48, 44, 39, 34, 34, 34, 31 y
+20 habitantes. Los sucesos por partida van de 22 en el valle que muere en el año
+seis a 502 en el que llega a los cuarenta.
+
+**Medido sin la proporción** (v3.75, con las puertas del rayo puestas): 13,0
 sucesos al año en 240 años de aldea; por año, riña 2,47, forastero 2,33, pesca
 2,04, oso 1,05, niño 1,02, lobos 0,89, fiesta 0,89, boda 0,86, rayo 0,58,
 buhonero 0,49, tejado 0,27, riada 0,15; rencores en cuarenta años entre 4 y 11;

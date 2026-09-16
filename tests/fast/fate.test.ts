@@ -35,15 +35,46 @@ function played(seed: number, years = YEARS): GameState {
 describe('los sucesos del valle · R-1', () => {
   const worlds = SEEDS.map((seed) => played(seed));
 
-  it('pasa algo cada tres o cuatro semanas, en todas las semillas', () => {
+  it('la cadencia va con el tamaño de la aldea, no es la misma para dos que para cuarenta', () => {
+    // **La propiedad cambió a propósito** (16 sep 2026, decisión del dueño del
+    // diseño: «que una partida salga mal por casualidad está bien, que casi
+    // todas se vayan a romper no es la idea; no hay que poner límites, hay que
+    // equilibrar»). Con la tirada plana, una pareja y una aldea de cuarenta
+    // recibían los mismos doce sucesos al año, o sea que la pareja se comía una
+    // catástrofe por trimestre: medido, ocho valles de doce se rompían.
+    //
+    // Ahora la densidad va con la gente (`FATE.FATED_FULL_PEOPLE`,
+    // `FATED_LEAST_SHARE`), y eso es lo que se mide aquí: una aldea hecha tiene
+    // un noticiario y un caserío una vida callada. No es un techo — ningún
+    // suceso está prohibido — es una proporción.
+    const made = foundTwenty(7);
+    run(made, 10 * TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+    const madeRate = made.happenings.length / 10;
+
+    const young = foundGame(7);
+    run(young, 4 * TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+    const youngRate = young.happenings.length / 4;
+
+    expect(madeRate, `aldea hecha: ${madeRate.toFixed(1)} al año`).toBeGreaterThan(6);
+    expect(madeRate, `aldea hecha: ${madeRate.toFixed(1)} al año`).toBeLessThan(24);
+    expect(youngRate, `caserío: ${youngRate.toFixed(1)} contra ${madeRate.toFixed(1)}`)
+      .toBeLessThan(madeRate);
+  });
+
+  it('y una aldea hecha tiene algo que contar todos los años', () => {
     // Medido en tres vueltas de pesos (§12.10): trece al año, mediana de tres
     // semanas entre dos. La banda deja sitio a que los pesos se muevan sin que
     // el valle enmudezca ni se convierta en un noticiario.
-    for (const [i, state] of worlds.entries()) {
-      const years = Math.max(1, state.tick / TIME.WEEKS_PER_YEAR);
-      const perYear = state.happenings.length / years;
-      expect(perYear, `semilla ${SEEDS[i]}: ${perYear.toFixed(1)} al año`).toBeGreaterThan(6);
-      expect(perYear, `semilla ${SEEDS[i]}: ${perYear.toFixed(1)} al año`).toBeLessThan(24);
+    // Sobre las seis semillas jugadas de arriba, y con el suelo bajo a
+    // propósito: una de ellas puede ser un caserío que no crece, y ésa habla
+    // poco **por diseño**. Lo que no puede pasar es que ninguna hable.
+    const rates = worlds.map((state) => state.happenings.length
+      / Math.max(1, state.tick / TIME.WEEKS_PER_YEAR));
+    const best = Math.max(...rates);
+    expect(best, `la más hablada: ${best.toFixed(1)} al año`).toBeGreaterThan(6);
+    expect(best, `la más hablada: ${best.toFixed(1)} al año`).toBeLessThan(24);
+    for (const [i, rate] of rates.entries()) {
+      expect(rate, `semilla ${SEEDS[i]}: ${rate.toFixed(1)} al año`).toBeGreaterThan(1);
     }
   });
 

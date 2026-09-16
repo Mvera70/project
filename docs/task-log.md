@@ -24,7 +24,8 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | nada |
+| **En vuelo ahora** | **IA-5** (fauna silvestre) sobre `derive/animals.ts`, `effects/fauna.ts`, `life/wildlife.ts`, `contracts.ts`, `renderer.ts`; y **UI-R1** (carcasa) sobre `src/ui/` e `index.html`. **No tocar esos ficheros.** |
+| Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
 
 ## 2. El tablero
@@ -96,9 +97,10 @@ duraciones y distancias del cuaderno del dueño.
 **Historia visible** (IA-6): 80–91 riñas reales por semilla en 40 años, de ellas
 6–20 montadas, terminadas y liberadas el mismo día del suceso; **0 canceladas,
 0 colgadas** en las ~514 revisadas.
-**Sucesos del valle** (R-1, `tools/fate-report.ts`): 12,3 al año, mediana de 3
-semanas, y **8 de 12 valles se rompen a los 40 años** (el caos que el dueño
-pidió).
+**Sucesos del valle** (R-1): en una aldea hecha, unos 12 al año; en un caserío,
+menos, porque la cadencia va con la población desde v3.78. **3 de 12 valles se
+rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan con
+entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
@@ -130,10 +132,10 @@ pidió).
 5. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
    se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
    e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.
-6. **Dos decisiones del dueño, pendientes de él**: `spring_valley` y
-   `wide_ford` se contradicen literalmente como pareja de rasgos, y
-   `spring_valley` con `marsh_valley` hay que acordarla (`visual-reference`
-   §4). Y si el caos actual —ocho de doce valles roto— es el juego que quiere.
+6. **`spring_valley` + `marsh_valley`** sigue sin acordar (`visual-reference`
+   §4). Lo de `spring_valley` + `wide_ford` **ya lo decidió**: se excluye la
+   pareja en el sorteo y se declara en la especificación. Y el nivel de caos
+   **ya lo decidió** también: ver §3, tres de doce.
 7. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
    «siempre» (ver §5), pero cuántos saludos al día hay es cosa del ojo.
 8. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
