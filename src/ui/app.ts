@@ -30,7 +30,7 @@ import { startLoop, type Loop } from './loop';
 import { milestonesAt } from './milestones';
 import { mountMoments } from './moment';
 import { mountNotices } from './notice';
-import { closeChronicle, openChronicle } from './screens/chronicle';
+import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { closePeople, openPeople } from './screens/people';
@@ -204,7 +204,24 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     shell.content.replaceChildren();
     shell.setRoute(route);
     if (route.kind === 'chronicle') {
-      openChronicle(app, undefined, () => navigate({ kind: 'valley' }));
+      // UI-R3 · migrada de verdad a `shell.content`. `contentRouteFor`
+      // (`redesign/shell.ts`, UI-R1) sólo conoce `orders`/`inspect` —esta
+      // ronda no puede tocar `shell.ts`/`contracts.ts`—, así que
+      // `shell.setRoute` de arriba ha dejado la bandeja oculta
+      // (`content.hidden = true`) aunque la crónica ya vaya a montarse
+      // dentro. Se destapa a mano, por la misma vía que UI-R1 ya usó para la
+      // ranura del mensaje (querySelector sobre una clase pública y estable,
+      // nunca una API nueva de `shell.ts`). Visualmente no cambia nada: la
+      // crónica sigue siendo `position: fixed; inset: 0` con su mismo
+      // z-index de siempre (13), así que cubre la pantalla entera y el «×»
+      // genérico de la bandeja (`.ui-shell-content-close`) queda debajo sin
+      // que nadie lo esconda a propósito — la barra de navegación (z-index
+      // 14) se sigue viendo encima, como pide U-14. Ver el comentario de
+      // cabecera de `chroniclePanel` en `screens/chronicle.ts`.
+      const sheet = shell.element.querySelector<HTMLElement>('.ui-shell-content');
+      if (sheet !== null) sheet.hidden = false;
+      shell.content.append(chronicle.element);
+      chronicle.update(snapshot());
     } else if (route.kind === 'people') {
       // U-08 · la pantalla de la gente: la lista de los nombrados vivos y,
       // al tocar uno, su ficha (`src/ui/screens/people.ts`).
@@ -253,6 +270,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // update` lo reciben en cada llamada, nunca lo capturan por su cuenta.
   const hud = createHud(actions, () => currentRoute);
   const orders = ordersPanel(actions);
+  // UI-R3 · la crónica, migrada a `shell.content` (ver el comentario de
+  // `navigate`, arriba). Igual que `orders`: se crea una vez y su `element`
+  // se monta/desmonta de la bandeja en cada navegación.
+  const chronicle = chroniclePanel(actions);
   const shell = createShell(actions);
 
   // U-09 · el sonido: sintetizado con Web Audio, nunca un fichero (§ ficha del
@@ -520,6 +541,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // entrar — pero un panel no debe fiarse de que nadie más vaya a tocar el
     // estado mientras está montado.
     if (currentRoute.kind === 'orders') orders.update(snapshot());
+    // UI-R3 · la crónica lee entradas nuevas mientras está abierta —a
+    // diferencia de la vieja `openChronicle`, que pintaba una vez y no volvía
+    // a mirar el estado—; `chroniclePanel.update` decide sola cuándo de
+    // verdad hace falta tocar el DOM (ver su comentario en `screens/
+    // chronicle.ts`), así que llamarla en cada fotograma no reconstruye nada
+    // de más.
+    if (currentRoute.kind === 'chronicle') chronicle.update(snapshot());
     // The same kind of observability hook as `data-app-ready` (M-19): the year
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.
