@@ -1608,60 +1608,78 @@
     },
     {
       "id": "pig",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/pig/pig.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-12-503Z-53488",
-        "directory": "artifacts/graphics/G-10/approved/348c0670102f2435"
+        "runId": "2026-09-16T21-10-44-636Z-16096",
+        "directory": "artifacts/graphics/G-23/approved/3d0ed448cf7f75a1"
       },
       "bounds": {
         "min": [
-          -0.196635,
+          -0.332,
           0,
-          -0.106667
+          -0.117867
         ],
         "max": [
-          0.151667,
-          0.253333,
-          0.106667
+          0.219133,
+          0.2931,
+          0.117867
         ],
         "size": [
-          0.348301,
-          0.253333,
-          0.213333
+          0.551133,
+          0.2931,
+          0.235733
         ]
       },
-      "recipeSha256": "D262F5713DCD3F06441290F5A2710671876E69E1ADD64584BF77A73CA50CC7FE",
+      "recipeSha256": "E6846AC9BFC9DFBAEB9B69C80612CFC9A92BB539CBBE0CF08D63B8D75210ED0E",
       "materials": [
-        "pale",
-        "hide-dark"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.115
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 162
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 2808
       },
       "hashes": {
-        "pig.blend": "723B9E6306869D03FD26DCDFE1C5EA2D77C6466404848099EF6AF66AFA1CF981",
-        "pig.glb": "348C0670102F2435177463FC5F9EB62CA9AF49CC255B982AFC11FE0D9B1DF161",
-        "pig-blender.png": "0A89B79EC042793DBA243B75B724FDF3044629E860CA658DDC8C87930C14BA78",
-        "capture-1.png": "4645DE57DC4D0B02DD1AEA8471DF0B9908DEB908CDC42B28B1D3C7BEF3717CF1",
-        "capture-1-gray.png": "F369CDFF3B024E068FC464E48450F6DFD6E52E172960A47134E425C28ECD790A",
-        "capture.json": "AC65E6FDF78A3713F5A267E57F43265622BC0AB1A6E32A42EA618F0D464F6753",
-        "build.json": "CC31D202B4BCD85BB92A9EB6C0084F92AFA3E8D9B7681094BCE3AD7A37700675",
-        "validation.json": "4D89DEBE735226990427D5DCB64E9B3FA40E755BB1C1C2A97F889A9774DEE1CC"
+        "pig.blend": "244CE9AA2048655936F86EE78BB04C382F25B66ED41F93A6CCD54058AEEC8909",
+        "pig.glb": "3D0ED448CF7F75A18783CAC8047666381E6F9C90DA1BFC44F9736DDFA40D3524",
+        "pig-blender.png": "49EA1DB82679BCDBDCC34DAC195FBB0CDBEA06A1357C9B52C0AE2D7133229A5B",
+        "capture-1.png": "332F6DC6BBB42FD851E6DF3300B77AB915E862D019DDEFFBCEE0E66705663AE0",
+        "capture-1-gray.png": "DEACA16C58CEC873E3371102A217E420FA8822D8619E9FF6AE813517403CBBAF",
+        "capture.json": "EAE3475D16529A68EFC46F139F9A8A8861A5882DDB876D76FF1B294DCCFD9552",
+        "build.json": "FAD7AAAA2AED508508E728D9DCEBF3B32A0F1E174FF42911C4678C43EB29F21C",
+        "validation.json": "8A9780B3A7DDAEC88293A865952DFA152212FD8BE2B0614598C02CE5681E2360"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original pig authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {

@@ -65,6 +65,8 @@ traído aquí.
 ## 2. El tablero
 
 **G-23 · animales:** encargo de rehacer las seis especies y sus animaciones.
+Vaca subida en `df0ac66`. Cerdo terminado y revisado en movimiento; preparado
+para entrega individual. Siguen gallina, lobo, cuervo y pez.
 Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
 verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
 subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](graphics-rounds/G-23.md).
@@ -227,6 +229,7 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 G-23: vaca de 3476 triángulos, cuatro materiales; clips idle/walk y controlador
 por distancia. 42 pruebas pertinentes verdes. Cuatro llamadas por vaca visible;
 sin nueva medida de FPS móvil.
+Cerdo: 2808 triángulos, cuatro materiales y 18 huesos; 43 pruebas pertinentes.
 
 **Inventario del nuevo encargo de aldea:** 21 ids existentes en cuatro tandas;
 las variantes de vivienda y adornos nuevos se definirán con su integración.
@@ -309,7 +312,7 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-G-23: completar cerdo, gallina, lobo, cuervo y pez con entrega individual.
+G-23: completar gallina, lobo, cuervo y pez con entrega individual.
 La articulación requiere esqueletos propios; medir coste conjunto al cerrar.
 
 **G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.

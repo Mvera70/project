@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T21:04:11.548Z",
+  "generatedAt": "2026-09-16T21:11:16.129Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -194,8 +194,21 @@
     {
       "id": "pig",
       "file": "pig.glb",
-      "sha256": "348C0670102F2435177463FC5F9EB62CA9AF49CC255B982AFC11FE0D9B1DF161",
-      "motion": []
+      "sha256": "3D0ED448CF7F75A18783CAC8047666381E6F9C90DA1BFC44F9736DDFA40D3524",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.115
+        }
+      ]
     },
     {
       "id": "hen",
