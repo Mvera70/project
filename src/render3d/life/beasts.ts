@@ -42,7 +42,6 @@ import {
 } from './body';
 import { LIFE_STEP } from './clock';
 import {
-  createCommitmentRegistry,
   type ActorRef, type CommitmentRegistry, type CommitmentStage, type InteractionKind,
 } from './commitments';
 import {
@@ -620,16 +619,6 @@ export function createBeasts(
  * así que la propiedad de E.3.5 (misma jornada, misma aldea) no se rompe: el
  * registro es tan puro función de la semilla y los pasos como todo lo demás.
  */
-const beastEncounters = new WeakMap<readonly Beast[], CommitmentRegistry>();
-
-function encountersOf(beasts: readonly Beast[]): CommitmentRegistry {
-  let registry = beastEncounters.get(beasts);
-  if (registry === undefined) {
-    registry = createCommitmentRegistry();
-    beastEncounters.set(beasts, registry);
-  }
-  return registry;
-}
 
 /** La persona más cercana a este cuerpo, dentro de `radius`, o nada. */
 function nearestPerson(around: Neighbourhood, body: Body, radius: number): Body | null {
@@ -701,7 +690,8 @@ function herdPullOf(beast: Beast, beasts: readonly Beast[], suppress: boolean): 
  * persona ni un animal arrastra dos compromisos a la vez (`busy()`, IA-2).
  */
 function updateReaction(
-  beast: Beast, visitor: Body | null, inClose: boolean, registry: CommitmentRegistry, step: number,
+  beast: Beast, visitor: Body | null, inClose: boolean, came: boolean,
+  registry: CommitmentRegistry, step: number,
 ): void {
   const { reaction } = beast;
   const beastRef: ActorRef = { kind: 'beast', id: beast.dweller.body.id };
@@ -714,6 +704,16 @@ function updateReaction(
     // episodios.
     if (step < reaction.cooldownUntil) return;
     if (visitor === null) return;
+    // **Un compromiso es una interacción de verdad, no una cercanía**
+    // (consolidación de IA-4, segunda vuelta). Crearlo en cuanto alguien
+    // entraba en `NOTICE_RADIUS` dejaba al cerdo y a la vaca esperando en
+    // `approach` hasta que la reserva caducaba —y caduca a los sesenta
+    // segundos, media jornada—: medido, **el 48 % de la jornada del cerdo y el
+    // 37 % de la de la vaca en `approach`**, con la vaca rumiando el 0,1 %.
+    // Ahora sólo se reserva cuando la persona está haciendo justamente el
+    // regalo de esta especie. La cautela de la gallina no pasa por aquí: es un
+    // reflejo y se resuelve sin reserva (ver `fleeing` en `stepBeasts`).
+    if (!came) return;
     if (registry.busy(beastRef)) return;
     const personRef: ActorRef = { kind: 'villager', id: visitor.id };
     if (registry.busy(personRef)) return; // ya está en algo con otro animal.
@@ -733,6 +733,30 @@ function updateReaction(
   }
 
   const id = reaction.commitmentId;
+
+  // **Una reserva caducada se suelta aquí, no en la red de seguridad de la
+  // aldea** (consolidación de IA-4). Con el registro compartido, cualquier
+  // reserva que siguiera puesta al caducar la contaba `village.ts` como
+  // interacción colgada, y colgada quiere decir «alguien se saltó su cierre»,
+  // que no es el caso: una reacción cuya visita se fue y cuyo plazo venció es
+  // un final normal. Medido: una por jornada en la semilla 7, y la prueba de
+  // IA-2 exige cero con razón.
+  if (registry.get(id) === undefined || step >= REACTION_TIMEOUT + (reaction.actSince ?? step)) {
+    const lease = registry.get(id);
+    if (lease !== undefined && step >= lease.expiresAtStep) {
+      registry.release(id);
+      reaction.commitmentId = null;
+      reaction.stage = null;
+      reaction.cooldownUntil = step + COOLDOWN_STEPS;
+      return;
+    }
+    if (lease === undefined) {
+      reaction.commitmentId = null;
+      reaction.stage = null;
+      reaction.cooldownUntil = step + COOLDOWN_STEPS;
+      return;
+    }
+  }
 
   // **`recover` es firme**: una vez dentro no hay marcha atrás a `act` aunque
   // la visita se quede al lado o vuelva a acercarse. Es lo que de verdad
@@ -810,8 +834,25 @@ export function stepBeasts(
   seed: number,
   step: number,
   taken: Map<string, number>,
+  /**
+   * **El registro de compromisos de la aldea, no uno propio** (consolidación de
+   * IA-4). La primera versión de esta fase se creaba el suyo en un `WeakMap`
+   * porque `village.ts` estaba en manos de otra fase, y eso contradice
+   * exactamente lo que IA-2 existe para garantizar: que una persona y un animal
+   * no puedan reservarse por separado. Con dos registros, «un actor está en un
+   * compromiso como mucho» dejaba de ser verdad en cuanto el actor era una
+   * persona vista desde los dos lados.
+   */
+  registry: CommitmentRegistry,
+  /**
+   * Qué está haciendo **ahora** la persona de este cuerpo, o `null` si no ha
+   * llegado a su sitio todavía. Es una ventana estrecha a propósito: la capa de
+   * vida ya tiene los `Dweller` en `village.ts` y los animales sólo necesitan
+   * saber si el que tienen al lado viene a ellos o pasaba por ahí.
+   */
+  intentOf: (bodyId: number) => string | null,
 ): void {
-  const encounters = encountersOf(beasts);
+  const encounters = registry;
   encounters.expire(step);
 
   for (const beast of beasts) {
@@ -833,11 +874,28 @@ export function stepBeasts(
     // abajo) no pasa por aquí: eso reacciona a que se acerquen, se paren o no.
     const visitorStill = visitor !== null
       && Math.hypot(visitor.vx, visitor.vz) <= visitor.pace * STILL_FACTOR;
-    const inClose = visitor !== null && visitorStill
+    // **Y que la persona venga de verdad a eso** (consolidación de IA-4). Con
+    // cercanía y quietud bastaba, y eso medía mal lo que quería medir: quien se
+    // sienta a cotillear, reza en la capilla de al lado o bebe en el pozo está
+    // cerca y está quieto, y el cerdo se paraba a mirarle igual que a quien le
+    // trae de comer. Medido con `tools/life-report-species.ts` en las semillas
+    // 7 y 23: **el cerdo pasaba el 38 % de la jornada reaccionando y el 12 %
+    // hozando, y la vaca el 43 % reaccionando, el 6 % pastando y el 0,4 %
+    // rumiando**. Un rebaño pendiente de la gente en vez de comiendo, que es lo
+    // contrario de lo que pide el brief.
+    //
+    // Ahora el contacto exige que lo que la persona está haciendo sea
+    // justamente el regalo de esta especie (`GIFT_OFFER`: dar de comer al
+    // cerdo, acariciar a la vaca, espantar a la gallina). **La cautela de la
+    // gallina no pasa por aquí y sigue siendo un reflejo**: huye durante
+    // `approach`, que se dispara por cercanía, porque una gallina se aparta de
+    // quien pasa y no sólo de quien viene a por ella.
+    const visitorCame = visitor !== null && intentOf(visitor.id) === GIFT_OFFER[beast.kind];
+    const inClose = visitor !== null && visitorStill && visitorCame
       && Math.hypot(visitor.x - body.x, visitor.z - body.z) <= closeRadius;
 
     const wasReacting = reaction.stage !== null;
-    updateReaction(beast, visitor, inClose, encounters, step);
+    updateReaction(beast, visitor, inClose, visitorCame, encounters, step);
     const stillReacting = reaction.stage !== null;
     if (wasReacting && !stillReacting) {
       // Se acaba de soltar la reacción del todo: lo que se estuviera
@@ -874,7 +932,14 @@ export function stepBeasts(
     // La gallina se aparta en cuanto nota a alguien —«si una persona se le
     // acerca, se aparta» (brief IA-4)—; el cerdo y la vaca sólo se paran
     // cuando la visita ya está encima, dándoles de comer o acariciándolos.
-    const fleeing = beast.kind === 'hen' && reaction.stage !== null && reaction.stage !== 'recover';
+    // **La gallina huye por reflejo y sin reserva** (consolidación de IA-4). Se
+    // apartaba sólo mientras hubiera un compromiso puesto, y desde que el
+    // compromiso pide que la persona venga a por ella, eso habría dejado a las
+    // gallinas impasibles ante quien pasa — que es lo contrario de una gallina.
+    // Apartarse no es un compromiso: no reserva a nadie, no tiene final que
+    // negociar y no puede fallar.
+    const fleeing = beast.kind === 'hen' && visitor !== null
+      && Math.hypot(visitor.x - body.x, visitor.z - body.z) <= NOTICE_RADIUS.hen;
     const holdingStill = beast.kind !== 'hen' && reaction.stage === 'act';
     const calming = reaction.stage === 'recover';
     const overridden = fleeing || holdingStill || calming;

@@ -663,7 +663,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // encontrar nunca nada — si encuentra algo, es que un cierre se ha
       // saltado su compromiso, y `interactionsStuck` (expuesto en
       // `tally`/`interactions`) es la cifra que lo delata.
-      interactionsStuck += commitments.entries().filter((entry) => entry.expiresAtStep <= steps).length;
+      // **Sólo lo que esta red cierra**, o sea los compromisos entre personas
+      // (consolidación de IA-4). Desde que el registro es uno solo, dentro
+      // viven también las reacciones de los animales, y ésas las suelta
+      // `stepBeasts`, que corre **después** de este contador en el mismo paso:
+      // contarlas aquí marcaba como colgada una reserva que se soltaba un
+      // instante después. Medido: una por jornada en la semilla 7, y la prueba
+      // que exige cero tenía razón en exigirlo.
+      interactionsStuck += commitments.entries().filter((entry) => entry.expiresAtStep <= steps
+        && entry.participants.every((who) => who.kind === 'villager')).length;
       commitments.expire(steps);
 
       for (const dweller of dwellers) {
@@ -1030,7 +1038,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // `seats()` ya cuenta personas y bestias, y lo que la gente decidió
       // arriba ya está reflejado aquí, así que la cabaña ve el aforo real y
       // no un mapa vacío.
-      stepBeasts(beasts, land, around, router, seed, steps, taken);
+      // El registro es el de la aldea y la ventana de intención sale de los
+      // `Dweller` que ya tenemos aquí: un animal sólo necesita saber si quien
+      // tiene al lado viene a él (consolidación de IA-4).
+      stepBeasts(beasts, land, around, router, seed, steps, taken, commitments,
+        (bodyId) => {
+          const person = byId.get(bodyId);
+          return person?.doing?.there === true ? person.doing.offer.id : null;
+        });
 
       resolve(bodies, around, land);
 

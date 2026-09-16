@@ -12,6 +12,7 @@
 // partida diverge desde el primer tick, y con poblaciones pequeñas de cerdo o
 // vaca una sola muestra es ruido.
 
+import { createCommitmentRegistry, type CommitmentRegistry } from '../../src/render3d/life/commitments';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { TIME } from '@engine/balance';
@@ -84,6 +85,22 @@ function surveySpecies(): { activities: Map<BeastKind, Set<string>>; spotsPerAni
   }
   return { activities, spotsPerAnimalDay };
 }
+
+/**
+ * El registro de la aldea, que `stepBeasts` recibe desde la consolidación de
+ * IA-4 en vez de hacerse el suyo. Aquí se crea uno por llamada porque cada
+ * prueba es una aldea de mentira independiente.
+ */
+function registry(): CommitmentRegistry {
+  return createCommitmentRegistry();
+}
+
+/**
+ * La ventana de intención: en estas pruebas la persona **sí** viene a lo que el
+ * animal ofrece, que es justamente lo que se quiere medir. En el juego la da
+ * `village.ts` leyendo el `Dweller`.
+ */
+const GIFT_FOR_TEST = 'feed';
 
 describe('IA-4 · cada especie hace más de una cosa consigo misma, y usa más de un sitio', () => {
   const { activities, spotsPerAnimalDay } = surveySpecies();
@@ -171,7 +188,7 @@ describe('IA-4 · feed/pet/chase como interacción, no como oferta pasiva', () =
       let everReleased = false;
       for (let step = 0; step < 3000; step += 1) {
         around.rebuild([beast.dweller.body, visitor]);
-        stepBeasts([beast], land, around, router, 7, step, taken);
+        stepBeasts([beast], land, around, router, 7, step, taken, registry(), () => GIFT_FOR_TEST);
         if (Math.hypot(beast.dweller.body.vx, beast.dweller.body.vz) > 0.05) everMoved = true;
         if (beast.reaction.stage === null) everReleased = true;
       }
@@ -190,22 +207,35 @@ describe('IA-4 · feed/pet/chase como interacción, no como oferta pasiva', () =
     // Cerca al principio: tiene que apartarse (velocidad de huida) en vez de
     // seguir clavada.
     const visitorClose = { id: 4, x: 10.6, z: 10, vx: 0, vz: 0, facing: 0, radius: 0.32, pace: 1.3 };
-    let fled = false;
+    // **Se mide que se aleja, no que haya un compromiso puesto.** La primera
+    // versión miraba `beast.reaction.stage`, o sea el mecanismo, y dejó de
+    // valer al convertir la cautela en un reflejo sin reserva (consolidación
+    // de IA-4): apartarse de quien pasa no reserva a nadie, no tiene final que
+    // negociar y no puede fallar, así que no es un compromiso. La propiedad que
+    // esta prueba dice guardar es la de la gallina, y es ésta.
+    const shared = registry();
+    const gap = (): number => Math.hypot(
+      beast.dweller.body.x - visitorClose.x, beast.dweller.body.z - visitorClose.z,
+    );
+    const before = gap();
+    let farthest = before;
     for (let step = 0; step < 90; step += 1) {
       around.rebuild([beast.dweller.body, visitorClose]);
-      stepBeasts([beast], land, around, router, 7, step, taken);
-      if (beast.reaction.stage !== null) fled = true;
+      stepBeasts([beast], land, around, router, 7, step, taken, shared, () => GIFT_FOR_TEST);
+      farthest = Math.max(farthest, gap());
     }
-    expect(fled, 'la gallina no llegó a notar la visita').toBe(true);
+    expect(farthest, `la gallina no se apartó: de ${before.toFixed(2)} a ${farthest.toFixed(2)} celdas`)
+      .toBeGreaterThan(before + 0.3);
 
     // Y lejos después: tiene que acabar en calma otra vez.
+    // Y sin nadie cerca vuelve a lo suyo: deja de huir y elige una actividad.
     let calmed = false;
     for (let step = 90; step < 400; step += 1) {
       around.rebuild([beast.dweller.body]);
-      stepBeasts([beast], land, around, router, 7, step, taken);
-      if (beast.reaction.stage === null) calmed = true;
+      stepBeasts([beast], land, around, router, 7, step, taken, shared, () => GIFT_FOR_TEST);
+      if (beast.reaction.stage === null && beast.dweller.doing !== null) calmed = true;
     }
-    expect(calmed, 'la gallina se quedó reaccionando sin nadie cerca').toBe(true);
+    expect(calmed, 'la gallina se quedó sin volver a lo suyo con nadie cerca').toBe(true);
   });
 
   it('es determinista: la misma visita, en el mismo terreno, da la misma reacción', () => {
@@ -223,8 +253,8 @@ describe('IA-4 · feed/pet/chase como interacción, no como oferta pasiva', () =
     for (let step = 0; step < 500; step += 1) {
       around1.rebuild([run1.dweller.body, visitor]);
       around2.rebuild([run2.dweller.body, { ...visitor }]);
-      stepBeasts([run1], land, around1, router1, 7, step, taken1);
-      stepBeasts([run2], land, around2, router2, 7, step, taken2);
+      stepBeasts([run1], land, around1, router1, 7, step, taken1, registry(), () => GIFT_FOR_TEST);
+      stepBeasts([run2], land, around2, router2, 7, step, taken2, registry(), () => GIFT_FOR_TEST);
     }
     expect(run1.dweller.body.x).toBeCloseTo(run2.dweller.body.x, 9);
     expect(run1.dweller.body.z).toBeCloseTo(run2.dweller.body.z, 9);
@@ -253,7 +283,7 @@ describe('IA-4 · la vaca sola busca al rebaño', () => {
 
     for (let step = 0; step < 60; step += 1) {
       around.rebuild(all.map((b) => b.dweller.body));
-      stepBeasts(all, land, around, router, 7, step, taken);
+      stepBeasts(all, land, around, router, 7, step, taken, registry(), () => GIFT_FOR_TEST);
     }
 
     const moved = Math.hypot(lone.dweller.body.x - 5, lone.dweller.body.z - 5);
