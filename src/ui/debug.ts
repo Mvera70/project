@@ -70,6 +70,39 @@ export function runToSky(
   return limitWeeks;
 }
 
+/**
+ * Juega el valle hasta el **año que se pide**, contestando las encrucijadas.
+ *
+ * `year` es el año tal como lo lee la cabecera del juego y lo escribe la
+ * cronica -«Year 1», «ANNO I»-, no un numero de anos transcurridos: el valle
+ * recien fundado **ya esta en el ano 1**, asi que 0 y 1 son los dos fundar y
+ * mirar, y el ano 21 es el tick 960. Era la primera version de esto y estaba
+ * mal por un ano: se escribia 20 y la cabecera contestaba «Year 21». El numero
+ * que se escribe tiene que ser el que se lee.
+ *
+ * Es lo que hay detrás del campo de año del menú de inicio (U-10b, pedido por
+ * el dueño el 16 sep 2026: «tardo mucho en poder ver las demos y avanzar
+ * muchos años porque no tengo manera de elegir el año»). Antes de esto la
+ * única forma de ver una aldea hecha era mirar, o falsear el reloj del
+ * navegador desde el capturador.
+ *
+ * **Y no es un bucle de `tick`, a propósito.** Es la trampa que `CLAUDE.md`
+ * documenta y que costó media página de conclusiones falsas: sin contestar,
+ * la primera encrucijada planteada se queda pendiente para siempre, §8.6 no
+ * plantea dos, y con ella se van sus consecuencias, sus semillas y las obras
+ * que conceden. Con `prudent` —la política de referencia de §12.9, la misma
+ * que usa `stateAt`— lo que se abre es una partida de verdad.
+ *
+ * Determinista: misma semilla y mismos años, mismo valle. Y puede acabarse por
+ * el camino (§13.3), que es el juego: entonces se abre lo que quedó.
+ *
+ * Medido en el portátil: 5 años 59 ms, 20 años 296 ms, 60 años 1,3 s.
+ */
+export function openAtYear(state: GameState, year: number): void {
+  const weeks = Math.max(0, Math.floor(year) - 1) * TIME.WEEKS_PER_YEAR;
+  if (weeks > 0) run(state, weeks, 'prudent', CATALOG);
+}
+
 function diagnosticCanvas(root: HTMLElement, state: GameState, request: DebugRequest): void {
   root.replaceChildren();
   const shell = document.createElement('main');

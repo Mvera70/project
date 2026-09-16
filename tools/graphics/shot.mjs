@@ -62,6 +62,16 @@ const open = opt('open', '');
 const every = Number(opt('every', '2'));
 //   --seed 7   el número del valle que se escribe en el menú de inicio
 const seedArg = opt('seed', '');
+// **U-10b · `--year N`: el valle se abre en ese año, jugado por el propio
+// juego.** Es la vía buena desde el 16 sep 2026 y deja `--advance` para lo que
+// de verdad necesite reloj de pared. Dos motivos medidos:
+//   · `--advance` falsea el reloj año a año con medio segundo de espera por
+//     salto: diecinueve años eran veinte segundos de captura. Esto tarda
+//     trescientos milisegundos porque los ticks los cuenta el motor.
+//   · y `--advance` no contesta las encrucijadas —de ahí `--answer`—, mientras
+//     que el campo de año juega con la política de referencia, que es la
+//     trayectoria contra la que están medidas las cifras del proyecto.
+const yearArg = opt('year', '');
 // `--page` acepta también una dirección `http://`. La demo partida en dos
 // (`bundle-game.ts --split`) pide su JSON de recursos por la red, y una página
 // abierta como `file://` no puede pedir nada: sin esto, la única manera de
@@ -98,7 +108,18 @@ await tab.goto(page);
 // U-10 · el menú de inicio: se funda un valle nuevo, que es lo que hace el
 // dedo la primera vez. `--seed N` escribe ese número antes de fundar.
 await tab.locator('.title-scrim').waitFor({ timeout: 5000 }).catch(() => {});
-if (seedArg !== '') await tab.locator('.title-seed').fill(seedArg).catch(() => {});
+if (seedArg !== '') await tab.locator('#valley-seed').fill(seedArg).catch(() => {});
+// El campo del año vive detrás del interruptor de taller, que es donde tiene
+// que estar: lo que este menú configura para quien juega sigue siendo sólo el
+// número del valle. Se pulsa si está apagado — la preferencia se recuerda en
+// `localStorage`, y en un navegador recién abierto empieza apagada.
+if (yearArg !== '') {
+  const toggle = tab.locator('.title-dev');
+  if (await toggle.getAttribute('aria-pressed').catch(() => null) === 'false') {
+    await toggle.click().catch(() => {});
+  }
+  await tab.locator('#valley-year').fill(yearArg).catch(() => {});
+}
 //   --open title   se queda en el menú, para fotografiarlo
 if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
 //   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;

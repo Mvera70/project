@@ -2,7 +2,7 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { SCHEMA_VERSION, type SaveFile } from '@engine/state';
-import { mountDebug, parseDebugRequest, runToSky, stateAt } from './ui/debug';
+import { mountDebug, openAtYear, parseDebugRequest, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -13,6 +13,13 @@ import { openTitle, type TitleChoice } from './ui/screens/title';
  * valle nuevo conserva el archivo —y, si la partida guardada había terminado,
  * se funda sobre sus ruinas, como manda §13.3—; continuar es la partida tal
  * cual se guardó, con su letargo (§13.2) a cargo de `boot`.
+ *
+ * **U-10b · y si el menú pidió un año, el valle se juega hasta ahí antes de
+ * abrirlo** (`openAtYear`, con la política de referencia). Lo que entra
+ * en `boot` es una partida normal de ese año: sus decisiones contestadas en
+ * `decisions`, su crónica entera, y su encrucijada pendiente si el año cae en
+ * una —`boot` ya sabe abrirla, que es lo que hacía falta para el camino de
+ * `?live=1`—. No hay estado inventado y no hay nada que limpiar después.
  */
 function saveFor(choice: TitleChoice, save: SaveFile | null): SaveFile | undefined {
   if (choice.kind === 'continue') return save ?? undefined;
@@ -20,11 +27,13 @@ function saveFor(choice: TitleChoice, save: SaveFile | null): SaveFile | undefin
   const ended = save !== null && save.state.ended !== null
     ? archive.find((game) => game.seed === save.state.seed)
     : undefined;
+  const state = ended !== undefined ? foundSuccessor(ended, choice.seed) : foundGame(choice.seed);
+  openAtYear(state, choice.year);
   return {
     schema: SCHEMA_VERSION,
     savedAtMs: Date.now(),
-    state: ended !== undefined ? foundSuccessor(ended, choice.seed) : foundGame(choice.seed),
-    decisions: [],
+    state,
+    decisions: [...state.history],
     archive: [...archive],
   };
 }

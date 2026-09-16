@@ -7,6 +7,14 @@
 // pareja, mismo río, mismo bosque— y a partir de ahí cada una lo lleva a su
 // manera. Todo lo demás (sonido) es una preferencia, no una opción de partida.
 //
+// **U-10b, 16 sep 2026: y un año, detrás de un interruptor de taller.** Lo
+// pidió el dueño del diseño para poder probar («tardo mucho en poder ver las
+// demos y avanzar muchos años porque no tengo manera de elegir el año o
+// solamente la semilla»). Va detrás de «Dev» y no a la vista porque lo único
+// que este menú configura para quien juega sigue siendo el número del valle
+// (§11.10): el año no es una opción de partida, es una herramienta. El
+// interruptor se recuerda, como el sonido, así que se toca una vez y se queda.
+//
 // Es una pantalla antes de `boot`, no dentro: el juego no existe todavía y no
 // hay estado que pintar. Por eso va sobre la noche (`--night`) y no sobre el
 // valle; lo que viene después, el inicio guiado (U-11), es quien baja al valle.
@@ -49,10 +57,20 @@ const STYLE = `
 .title-seed:focus { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 1px; }
 .title-reroll { min-height: 44px !important; padding: 8px 14px !important; font-size: 14px !important; }
 .title-hint { grid-column: 1 / -1; margin: 0; color: var(--paper-dim, #d9cfbc); font-size: 13px; text-wrap: pretty; }
+.title-dev-row { display: grid; gap: 8px; }
+.title-dev-row label { color: var(--paper-dim, #d9cfbc); font-size: 12px;
+  letter-spacing: .08em; text-transform: uppercase; }
+.title-dev-row[hidden] { display: none; }
+.title-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .title-sound { justify-self: start; min-height: 40px !important; padding: 8px 12px !important;
   border-color: transparent !important; background: transparent !important; font-size: 14px !important;
   color: var(--paper-dim, #d9cfbc) !important; }
 .title-sound[aria-pressed="true"] { color: var(--gild-lit, #c9ab6b) !important; }
+.title-dev { min-height: 40px !important; padding: 8px 12px !important;
+  border-color: transparent !important; background: transparent !important; font-size: 13px !important;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(217,207,188,.55) !important; }
+.title-dev[aria-pressed="true"] { color: var(--gild-lit, #c9ab6b) !important; }
 @media (prefers-reduced-motion: no-preference) {
   .title-scrim { animation: title-in .6s ease-out both; }
   @keyframes title-in { from { opacity: 0; } to { opacity: 1; } }
@@ -62,7 +80,14 @@ const STYLE = `
 /** Lo que el jugador eligió en el menú. */
 export type TitleChoice =
   | { readonly kind: 'continue' }
-  | { readonly kind: 'new'; readonly seed: number };
+  /**
+   * Un valle nuevo, y **en qué año se abre**, contado como lo lee la cabecera:
+   * el año 1 es fundarlo y verlo nacer, que es lo que hace el juego siempre, y
+   * más es jugarlo hacia delante antes de mirarlo (U-10b, el interruptor de
+   * taller). No es una opción de partida —quien juega no la ve— y por eso vive
+   * aquí y no en el estado.
+   */
+  | { readonly kind: 'new'; readonly seed: number; readonly year: number };
 
 /** La semilla es un entero de 32 bits sin signo, que es lo que `makeBundle` toma. */
 const SEED_MAX = 0xffffffff;
@@ -78,6 +103,40 @@ export function parseSeed(text: string, fallback: number): number {
   const value = Number(trimmed);
   return value <= SEED_MAX ? value : fallback;
 }
+
+/**
+ * Hasta qué año se puede pedir abrir. Sesenta es la partida entera de §9.5 y
+ * ciento veinte, dos; más allá no queda nada que mirar que no se vea a los
+ * sesenta, y cada año cuesta unos 22 ms.
+ */
+const YEAR_MAX = 120;
+
+/**
+ * El año que se escribió en el campo de taller, o `fallback` si no vale.
+ *
+ * Mismas reglas que `parseSeed` —sólo dígitos, sin signo— y además un techo:
+ * pedir mil años sería un minuto de espera con la pantalla congelada, y eso se
+ * lee como un juego roto y no como una herramienta. El año va como lo lee la
+ * cabecera: 1 es el valle recién fundado, y por eso el vacío vale 1.
+ */
+export function parseYear(text: string, fallback = 1): number {
+  const trimmed = text.trim();
+  if (trimmed === '') return fallback;
+  if (!/^\d{1,3}$/u.test(trimmed)) return fallback;
+  const value = Number(trimmed);
+  return value >= 1 && value <= YEAR_MAX ? value : fallback;
+}
+
+/** Si el interruptor de taller está puesto. Se recuerda, como el sonido. */
+export function devPreference(): boolean {
+  try { return localStorage.getItem(DEV_KEY) === 'on'; } catch { return false; }
+}
+
+export function setDevPreference(on: boolean): void {
+  try { localStorage.setItem(DEV_KEY, on ? 'on' : 'off'); } catch { /* modo privado: nada que hacer */ }
+}
+
+const DEV_KEY = 'valley.dev';
 
 /** Un número de valle al azar que no repita ninguno de los ya jugados. */
 export function rollSeed(excluded: ReadonlySet<number>): number {
@@ -168,12 +227,49 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   hint.textContent = renderUiText('title.seed.hint');
   seedRow.append(seedLabel, seed, reroll, hint);
 
+  // U-10b · la fila de taller: en qué año se abre el valle. Oculta salvo que
+  // el interruptor de abajo esté puesto.
+  const devRow = document.createElement('div');
+  devRow.className = 'title-dev-row';
+  const yearLabel = document.createElement('label');
+  yearLabel.textContent = renderUiText('title.dev.year');
+  yearLabel.htmlFor = 'valley-year';
+  const year = document.createElement('input');
+  year.id = 'valley-year';
+  year.className = 'title-seed';
+  year.inputMode = 'numeric';
+  year.autocomplete = 'off';
+  year.spellcheck = false;
+  year.value = '1';
+  const devHint = document.createElement('p');
+  devHint.className = 'title-hint';
+  devHint.textContent = renderUiText('title.dev.hint');
+  devRow.append(yearLabel, year, devHint);
+  devRow.hidden = !devPreference();
+
   const begin = document.createElement('button');
   begin.type = 'button';
   begin.className = 'title-new';
   begin.textContent = renderUiText('title.new');
   begin.addEventListener('click', () => {
-    finish({ kind: 'new', seed: parseSeed(seed.value, rollSeed(played)) });
+    const choice: TitleChoice = {
+      kind: 'new',
+      seed: parseSeed(seed.value, rollSeed(played)),
+      year: devRow.hidden ? 1 : parseYear(year.value),
+    };
+    // **Un fotograma de aviso antes de congelarse.** Jugar sesenta años es más
+    // de un segundo de reloj de verdad, y quien lo pide en el menú se queda
+    // mirando un botón que no responde: eso se lee como un juego roto. Con el
+    // texto puesto y un `requestAnimationFrame` de por medio, el aviso se
+    // pinta **antes** de que empiece la cuenta, porque el cuadro siguiente es
+    // justo después del pintado.
+    if (choice.year > 1) {
+      begin.textContent = renderUiText('title.new.working');
+      begin.disabled = true;
+      requestAnimationFrame(() => { finish(choice); });
+      return;
+    }
+    finish(choice);
   });
 
   const sound = document.createElement('button');
@@ -187,7 +283,25 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   sound.addEventListener('click', () => { setSoundPreference(!soundPreference()); paintSound(); });
   paintSound();
 
-  actions.append(seedRow, begin, sound);
+  const dev = document.createElement('button');
+  dev.type = 'button';
+  dev.className = 'title-dev';
+  dev.textContent = renderUiText('title.dev');
+  const paintDev = (): void => {
+    dev.setAttribute('aria-pressed', String(!devRow.hidden));
+  };
+  dev.addEventListener('click', () => {
+    devRow.hidden = !devRow.hidden;
+    setDevPreference(!devRow.hidden);
+    paintDev();
+  });
+  paintDev();
+
+  const bottom = document.createElement('div');
+  bottom.className = 'title-bottom';
+  bottom.append(sound, dev);
+
+  actions.append(seedRow, devRow, begin, bottom);
   scrim.append(head, actions);
   document.body.append(scrim);
 }
