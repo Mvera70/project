@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "church",
+  "runId": "2026-09-16T18-02-14-568Z-40260",
+  "recipe": "art/recipes/church/church.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11610,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T18-02-14-568Z-40260/candidate/church.blend",
+      "bytes": 108262,
+      "sha256": "9F21AB980BC5CFEF4A8420FECC8655C9053E77ACF14B1D5D7E4839F6D4CD3855"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T18-02-14-568Z-40260/candidate/church.glb",
+      "bytes": 89412,
+      "sha256": "92B8DBFFC122146175E12944630D8170678078D3DBC661DDC46761E5560A6AB1"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T18-02-14-568Z-40260/candidate/church-blender.png",
+      "bytes": 463044,
+      "sha256": "675D4C118048C40C8C9B8B7EA4B66B98C6AB34C4564630CEC9B84219B1220AC0"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T18-02-14-568Z-40260/blender.log",
+      "bytes": 1361,
+      "sha256": "569E78CEA44A57DE5EFA5581B1EEFAF1ABF707927F4AB12EBE2D14DF89052681"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T18-02-14-568Z-40260/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T18-02-14-568Z-40260/temporary/resolved-recipe.json",
+      "bytes": 36716,
+      "sha256": "1AA0E5A6D3F575BCBC76C5866508360F8A0C86B2C0CB7FA5D93ADF6775CC42F4"
+    }
+  }
+}

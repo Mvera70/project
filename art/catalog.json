@@ -765,60 +765,61 @@
     },
     {
       "id": "church",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/church/church.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-05-21-257Z-33532",
-        "directory": "artifacts/graphics/G-10/approved/4c1e58b6db255985"
+        "runId": "2026-09-16T18-02-14-568Z-40260",
+        "directory": "artifacts/graphics/G-21/approved/92b8dbffc1221461"
       },
       "bounds": {
         "min": [
-          0.1,
+          0.078333,
           0,
-          -2.266667
+          -2
         ],
         "max": [
-          1.9,
+          1.921667,
           3.716667,
-          0.3
+          0
         ],
         "size": [
-          1.8,
+          1.843333,
           3.716667,
-          2.566667
+          2
         ]
       },
-      "recipeSha256": "B40E627EAD9FFE5935FACD62D14E3D6A28B1A1B07C90492FAF7264ABE0148F81",
+      "recipeSha256": "62BCF27C10E9536E629454D23A1FF0EF6683F84BFF2D6D41E21EB677A332704C",
       "materials": [
         "stone",
         "roof",
-        "wood"
+        "wood",
+        "dark"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 74
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1230
       },
       "hashes": {
-        "church.blend": "B6DE3DA7D528DA8744A79E423A05D14A5540F114FFF877F38EEE00ABBEDC2B97",
-        "church.glb": "4C1E58B6DB2559854C445EAE32590CD7BD0B27CD12C261A027712395941AFB9C",
-        "church-blender.png": "F63F726FD51175E9C14F74AD6467A55B0D752BC534E9B33287F51C4ED8F9AD4B",
-        "capture-1.png": "27311384718FE592AE83E0599A11FCD4E64197903DE178205F2209DAC3229E83",
-        "capture-1-gray.png": "6ADABF7250B34A5AEE6E874371B32EE92352FFDC6EE7689431AEFBF9F2D9B48E",
-        "capture.json": "8475E8812CC8253B225F56848BED954B2B306B0D56FA7A51A1EC1D72113C368B",
-        "build.json": "518C87EE84CDED6929755E3527366BD86245F1DED1857284A65D0F410F35328E",
-        "validation.json": "37D06AC18B965D247511B9FD1615B281664E5702AB0F334F0938896FFB6C36D6"
+        "church.blend": "9F21AB980BC5CFEF4A8420FECC8655C9053E77ACF14B1D5D7E4839F6D4CD3855",
+        "church.glb": "92B8DBFFC122146175E12944630D8170678078D3DBC661DDC46761E5560A6AB1",
+        "church-blender.png": "675D4C118048C40C8C9B8B7EA4B66B98C6AB34C4564630CEC9B84219B1220AC0",
+        "capture-1.png": "541A4D860AD17974908A6B5864EEAD70F69AD290EF3DD2D1387111DFF4F6547F",
+        "capture-1-gray.png": "C92B8E9C29E18136ED382DD3F232EA3A5E3EF51336929D0704F69111D0059410",
+        "capture.json": "D1410BB9F4C4CB99B90220074621E8C810A83B2CF080B12B27CD44A69D4864E7",
+        "build.json": "D500F20FA0792B48F8B310F526488829FE256258C99625B8733C75A6C427A02B",
+        "validation.json": "8EF3BF607A6B9FC56D4E1246BAAF9CA9D20A455F58E100BDC27E43732E5F4705"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original church authored for The Valley G-10",
+        "source": "Original G-21: iglesia de piedra con campanario abierto y chapitel cuadrado.",
         "license": "Project original"
       }
     },

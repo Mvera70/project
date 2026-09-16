@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T17:54:13.302Z",
+  "generatedAt": "2026-09-16T18:02:34.198Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -97,7 +97,7 @@
     {
       "id": "church",
       "file": "church.glb",
-      "sha256": "4C1E58B6DB2559854C445EAE32590CD7BD0B27CD12C261A027712395941AFB9C",
+      "sha256": "92B8DBFFC122146175E12944630D8170678078D3DBC661DDC46761E5560A6AB1",
       "motion": []
     },
     {

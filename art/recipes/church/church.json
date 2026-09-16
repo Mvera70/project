@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "G-10, lote de comunidad. La torre es lo que se ve desde el otro lado del valle, y por eso el campanario sube por delante de la nave en vez de quedarse dentro de la huella comun."
+    "note": "G-21: iglesia con torre cuadrada, campanario abierto, chapitel, contrafuertes y nave de teja. Se corrige el desbordamiento antiguo de la parcela 2x2 y la puerta enterrada en la torre. Altura máxima, escala, id y orientación conservados; velas dinámicas intactas."
   },
   "materials": [
     {
@@ -29,6 +29,11 @@
       "name": "wood",
       "role": "timber",
       "roughness": 0.95
+    },
+    {
+      "name": "dark",
+      "role": "clericalBlack",
+      "roughness": 0.85
     }
   ],
   "groups": [
@@ -48,63 +53,46 @@
       "name": "Church_Nave",
       "location": [
         3,
-        3.4,
-        2.0
+        3,
+        2
       ],
       "dimensions": [
         4.8,
-        6.4,
-        4.0
+        5.6,
+        4
       ],
       "material": "stone",
-      "parent": "Root"
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Plinth",
+      "location": [
+        3,
+        3,
+        0.16
+      ],
+      "dimensions": [
+        5.04,
+        5.78,
+        0.32
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
     },
     {
       "type": "gable",
       "name": "Church_Roof",
       "location": [
         3,
-        3.4,
-        4.0
+        4.2,
+        4
       ],
       "width": 5.4,
-      "depth": 6.8,
+      "depth": 3.6,
       "height": 2.2,
-      "rotationDegrees": [
-        0,
-        0,
-        0.0
-      ],
-      "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Church_Tower",
-      "location": [
-        3,
-        0.9,
-        3.6
-      ],
-      "dimensions": [
-        2.4,
-        2.4,
-        7.2
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cone",
-      "name": "Church_Spire",
-      "location": [
-        3,
-        0.9,
-        8.4
-      ],
-      "radius": 1.8,
-      "depth": 2.6,
-      "vertices": 4,
       "rotationDegrees": [
         0,
         0,
@@ -115,26 +103,1351 @@
     },
     {
       "type": "cube",
-      "name": "Church_Door",
+      "name": "Church_Ridge",
       "location": [
         3,
-        0.1,
-        1.2
+        4.2,
+        6.21
       ],
       "dimensions": [
+        0.18,
+        3.58,
+        0.14
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_1_L",
+      "location": [
+        2.5300000000000002,
+        4.2,
+        5.842037037037038
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_1_R",
+      "location": [
+        3.4699999999999998,
+        4.2,
+        5.842037037037038
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_2_L",
+      "location": [
+        2.06,
+        4.2,
+        5.459074074074074
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_2_R",
+      "location": [
+        3.94,
+        4.2,
+        5.459074074074074
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_3_L",
+      "location": [
+        1.59,
+        4.2,
+        5.0761111111111115
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_3_R",
+      "location": [
+        4.41,
+        4.2,
+        5.0761111111111115
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_4_L",
+      "location": [
+        1.12,
+        4.2,
+        4.693148148148149
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_4_R",
+      "location": [
+        4.88,
+        4.2,
+        4.693148148148149
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_5_L",
+      "location": [
+        0.6500000000000004,
+        4.2,
+        4.310185185185186
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tiles_5_R",
+      "location": [
+        5.35,
+        4.2,
+        4.310185185185186
+      ],
+      "dimensions": [
+        0.075,
+        3.58,
+        0.07
+      ],
+      "material": "roof",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Buttress_0_0",
+      "location": [
+        0.5,
+        0.65,
+        1.55
+      ],
+      "dimensions": [
+        0.46,
+        0.48,
+        3.1
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_ButtressCap_0_0",
+      "location": [
+        0.5,
+        0.65,
+        3.18
+      ],
+      "dimensions": [
+        0.53,
+        0.56,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Buttress_0_1",
+      "location": [
+        0.5,
+        2.9,
+        1.55
+      ],
+      "dimensions": [
+        0.46,
+        0.48,
+        3.1
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_ButtressCap_0_1",
+      "location": [
+        0.5,
+        2.9,
+        3.18
+      ],
+      "dimensions": [
+        0.53,
+        0.56,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Buttress_0_2",
+      "location": [
+        0.5,
+        5.15,
+        1.55
+      ],
+      "dimensions": [
+        0.46,
+        0.48,
+        3.1
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_ButtressCap_0_2",
+      "location": [
+        0.5,
+        5.15,
+        3.18
+      ],
+      "dimensions": [
+        0.53,
+        0.56,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lancet_0_0",
+      "location": [
+        0.585,
+        1.77,
+        2.55
+      ],
+      "dimensions": [
+        0.045,
+        0.44,
+        1.45
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Sill_0_0",
+      "location": [
+        0.53,
+        1.77,
+        1.77
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lintel_0_0",
+      "location": [
+        0.53,
+        1.77,
+        3.34
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.16
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lancet_0_1",
+      "location": [
+        0.585,
+        4.02,
+        2.55
+      ],
+      "dimensions": [
+        0.045,
+        0.44,
+        1.45
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Sill_0_1",
+      "location": [
+        0.53,
+        4.02,
+        1.77
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lintel_0_1",
+      "location": [
+        0.53,
+        4.02,
+        3.34
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.16
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Buttress_1_0",
+      "location": [
+        5.5,
+        0.65,
+        1.55
+      ],
+      "dimensions": [
+        0.46,
+        0.48,
+        3.1
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_ButtressCap_1_0",
+      "location": [
+        5.5,
+        0.65,
+        3.18
+      ],
+      "dimensions": [
+        0.53,
+        0.56,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Buttress_1_1",
+      "location": [
+        5.5,
+        2.9,
+        1.55
+      ],
+      "dimensions": [
+        0.46,
+        0.48,
+        3.1
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_ButtressCap_1_1",
+      "location": [
+        5.5,
+        2.9,
+        3.18
+      ],
+      "dimensions": [
+        0.53,
+        0.56,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Buttress_1_2",
+      "location": [
+        5.5,
+        5.15,
+        1.55
+      ],
+      "dimensions": [
+        0.46,
+        0.48,
+        3.1
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_ButtressCap_1_2",
+      "location": [
+        5.5,
+        5.15,
+        3.18
+      ],
+      "dimensions": [
+        0.53,
+        0.56,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lancet_1_0",
+      "location": [
+        5.415,
+        1.77,
+        2.55
+      ],
+      "dimensions": [
+        0.045,
+        0.44,
+        1.45
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Sill_1_0",
+      "location": [
+        5.47,
+        1.77,
+        1.77
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lintel_1_0",
+      "location": [
+        5.47,
+        1.77,
+        3.34
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.16
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lancet_1_1",
+      "location": [
+        5.415,
+        4.02,
+        2.55
+      ],
+      "dimensions": [
+        0.045,
+        0.44,
+        1.45
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Sill_1_1",
+      "location": [
+        5.47,
+        4.02,
+        1.77
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Lintel_1_1",
+      "location": [
+        5.47,
+        4.02,
+        3.34
+      ],
+      "dimensions": [
+        0.18,
+        0.7,
+        0.16
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tower",
+      "location": [
+        3,
         1.3,
-        0.2,
-        2.4
+        2.8
+      ],
+      "dimensions": [
+        2.2,
+        2.2,
+        5.6
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_TowerCornice_20",
+      "location": [
+        3,
+        1.3,
+        0.2
+      ],
+      "dimensions": [
+        2.46,
+        2.46,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_TowerCornice_370",
+      "location": [
+        3,
+        1.3,
+        3.7
+      ],
+      "dimensions": [
+        2.46,
+        2.46,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_TowerCornice_553",
+      "location": [
+        3,
+        1.3,
+        5.53
+      ],
+      "dimensions": [
+        2.46,
+        2.46,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_TowerCornice_717",
+      "location": [
+        3,
+        1.3,
+        7.17
+      ],
+      "dimensions": [
+        2.46,
+        2.46,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_BellPier_0",
+      "location": [
+        2.08,
+        0.38,
+        6.34
+      ],
+      "dimensions": [
+        0.36,
+        0.36,
+        1.65
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_0",
+      "location": [
+        2.08,
+        0.38,
+        0.55
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_1",
+      "location": [
+        2.08,
+        0.38,
+        1.24
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_2",
+      "location": [
+        2.08,
+        0.38,
+        1.93
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_3",
+      "location": [
+        2.08,
+        0.38,
+        2.62
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_4",
+      "location": [
+        2.08,
+        0.38,
+        3.3099999999999996
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_5",
+      "location": [
+        2.08,
+        0.38,
+        4
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_0_6",
+      "location": [
+        2.08,
+        0.38,
+        4.6899999999999995
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_BellPier_1",
+      "location": [
+        3.92,
+        0.38,
+        6.34
+      ],
+      "dimensions": [
+        0.36,
+        0.36,
+        1.65
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_0",
+      "location": [
+        3.92,
+        0.38,
+        0.55
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_1",
+      "location": [
+        3.92,
+        0.38,
+        1.24
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_2",
+      "location": [
+        3.92,
+        0.38,
+        1.93
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_3",
+      "location": [
+        3.92,
+        0.38,
+        2.62
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_4",
+      "location": [
+        3.92,
+        0.38,
+        3.3099999999999996
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_5",
+      "location": [
+        3.92,
+        0.38,
+        4
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_1_6",
+      "location": [
+        3.92,
+        0.38,
+        4.6899999999999995
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_BellPier_2",
+      "location": [
+        2.08,
+        2.22,
+        6.34
+      ],
+      "dimensions": [
+        0.36,
+        0.36,
+        1.65
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_0",
+      "location": [
+        2.08,
+        2.22,
+        0.55
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_1",
+      "location": [
+        2.08,
+        2.22,
+        1.24
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_2",
+      "location": [
+        2.08,
+        2.22,
+        1.93
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_3",
+      "location": [
+        2.08,
+        2.22,
+        2.62
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_4",
+      "location": [
+        2.08,
+        2.22,
+        3.3099999999999996
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_5",
+      "location": [
+        2.08,
+        2.22,
+        4
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_2_6",
+      "location": [
+        2.08,
+        2.22,
+        4.6899999999999995
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_BellPier_3",
+      "location": [
+        3.92,
+        2.22,
+        6.34
+      ],
+      "dimensions": [
+        0.36,
+        0.36,
+        1.65
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_0",
+      "location": [
+        3.92,
+        2.22,
+        0.55
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_1",
+      "location": [
+        3.92,
+        2.22,
+        1.24
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_2",
+      "location": [
+        3.92,
+        2.22,
+        1.93
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_3",
+      "location": [
+        3.92,
+        2.22,
+        2.62
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_4",
+      "location": [
+        3.92,
+        2.22,
+        3.3099999999999996
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_5",
+      "location": [
+        3.92,
+        2.22,
+        4
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Quoin_3_6",
+      "location": [
+        3.92,
+        2.22,
+        4.6899999999999995
+      ],
+      "dimensions": [
+        0.43,
+        0.43,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_BellBeam",
+      "location": [
+        3,
+        1.3,
+        6.99
+      ],
+      "dimensions": [
+        1.8,
+        0.19,
+        0.18
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cylinder",
+      "name": "Church_BellHanger",
+      "location": [
+        3,
+        1.3,
+        6.7
+      ],
+      "radius": 0.07,
+      "depth": 0.48,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Church_BellBody",
+      "location": [
+        3,
+        1.3,
+        6.33
+      ],
+      "radius": 0.33,
+      "depth": 0.49,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
       ],
       "material": "wood",
       "parent": "Root"
     },
     {
-      "type": "cube",
-      "name": "Church_Cross_V",
+      "type": "cylinder",
+      "name": "Church_BellLip",
       "location": [
         3,
-        0.9,
+        1.3,
+        6.07
+      ],
+      "radius": 0.46,
+      "depth": 0.12,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Church_BellClapper",
+      "location": [
+        3,
+        1.3,
+        5.9
+      ],
+      "radius": 0.08,
+      "depth": 0.25,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Church_Spire",
+      "location": [
+        3,
+        1.3,
+        8.4
+      ],
+      "radius": 1.73,
+      "depth": 2.6,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_CrossVertical",
+      "location": [
+        3,
+        1.3,
         10.4
       ],
       "dimensions": [
@@ -143,41 +1456,274 @@
         1.5
       ],
       "material": "wood",
-      "parent": "Root"
+      "parent": "Root",
+      "bevel": 0
     },
     {
       "type": "cube",
-      "name": "Church_Cross_H",
+      "name": "Church_CrossHorizontal",
       "location": [
         3,
-        0.9,
+        1.3,
         10.6
       ],
       "dimensions": [
-        1.0,
+        1,
         0.2,
         0.2
       ],
       "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_Door",
+      "location": [
+        3,
+        0.13,
+        1.2
+      ],
+      "dimensions": [
+        1.3,
+        0.2,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_PortalPier_223",
+      "location": [
+        2.23,
+        0.12,
+        1.28
+      ],
+      "dimensions": [
+        0.22,
+        0.23,
+        2.56
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_PortalPier_377",
+      "location": [
+        3.77,
+        0.12,
+        1.28
+      ],
+      "dimensions": [
+        0.22,
+        0.23,
+        2.56
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_PortalLintel",
+      "location": [
+        3,
+        0.12,
+        2.59
+      ],
+      "dimensions": [
+        1.75,
+        0.23,
+        0.23
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "gable",
+      "name": "Church_PortalPediment",
+      "location": [
+        3,
+        0.16,
+        2.71
+      ],
+      "width": 1.96,
+      "depth": 0.3,
+      "height": 0.46,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_DoorBrace_65",
+      "location": [
+        3,
+        0.012,
+        0.65
+      ],
+      "dimensions": [
+        1.22,
+        0.023,
+        0.1
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_DoorBrace_180",
+      "location": [
+        3,
+        0.012,
+        1.8
+      ],
+      "dimensions": [
+        1.22,
+        0.023,
+        0.1
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_DoorDivision",
+      "location": [
+        3,
+        0.012,
+        1.2
+      ],
+      "dimensions": [
+        0.07,
+        0.023,
+        2.28
+      ],
+      "material": "dark",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cylinder",
+      "name": "Church_RoundFrame",
+      "location": [
+        3,
+        0.13,
+        4.95
+      ],
+      "radius": 0.26,
+      "depth": 0.18,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Church_RoundOpening",
+      "location": [
+        3,
+        0.033,
+        4.95
+      ],
+      "radius": 0.18,
+      "depth": 0.02,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_RoundCrossV",
+      "location": [
+        3,
+        0.017,
+        4.95
+      ],
+      "dimensions": [
+        0.065,
+        0.008,
+        0.34
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Church_RoundCrossH",
+      "location": [
+        3,
+        0.017,
+        4.95
+      ],
+      "dimensions": [
+        0.34,
+        0.008,
+        0.065
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "gable",
+      "name": "Church_LowerRoof",
+      "location": [
+        3,
+        1.2,
+        4
+      ],
+      "width": 5.4,
+      "depth": 2.4,
+      "height": 0.6,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
       "parent": "Root"
     }
   ],
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 800,
+    "height": 800,
     "cameraLocation": [
-      14.0,
-      -17.5,
-      11.200000000000001
+      4.2,
+      -4.8,
+      4.1
     ],
     "cameraTarget": [
-      0,
-      0,
-      5.0
+      1,
+      1,
+      1.75
     ],
-    "orthoScale": 19.599999999999998,
+    "orthoScale": 5.2,
     "worldRole": "sky"
   }
 }
