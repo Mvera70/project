@@ -83,6 +83,9 @@ Iglesia subida en `1dd19df`. Pozo terminado, validado y revisado en juego;
 conserva su celda y añade brocal hueco, torno y cubo. Sigue el campo cultivado.
 Pozo subido en `6f8876f`. Campo cultivado terminado, validado y revisado en
 verano dentro del juego; conserva la alternancia estacional. Sigue `field-cut`.
+**G-22 · cultivos:** el dueño rechaza las espigas de G-21 por parecer flechas.
+Trigo rehecho con granos laterales y tallos verdes, validado y revisado en juego.
+Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](graphics-rounds/G-22.md).
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -190,6 +193,7 @@ Capilla: 776 triángulos, cuatro materiales/mallas y GLB de 57 672 bytes.
 Iglesia: 1 230 triángulos, cuatro materiales/mallas y GLB de 89 412 bytes.
 Pozo: 1 108 triángulos, cuatro materiales/mallas y GLB de 78 572 bytes.
 Campo cultivado: 2 056 triángulos, dos materiales/mallas y GLB de 160 704 bytes.
+G-22 sustituye ese campo por trigo de 4 732 triángulos y tres materiales/mallas.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092

@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "field",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 4732
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -2
+    ],
+    "max": [
+      3,
+      0.356667,
+      0
+    ],
+    "size": [
+      3,
+      0.356667,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T18-25-17-403Z-37028",
+    "directory": "artifacts/graphics/G-22/approved/e717b101d051aae6"
+  },
+  "sha256": "E717B101D051AAE69D265BDC736EAF5DF72470F0CEE2C13FDF5105869D60F629",
+  "otherPublishedFilesUnchanged": true
+}

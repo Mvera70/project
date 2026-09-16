@@ -1003,14 +1003,14 @@
     },
     {
       "id": "field",
-      "artifactRound": "G-21",
+      "artifactRound": "G-22",
       "status": "study",
       "recipe": "art/recipes/field/field.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T18-20-16-403Z-47820",
-        "directory": "artifacts/graphics/G-21/approved/989feea131186480"
+        "runId": "2026-09-16T18-25-17-403Z-37028",
+        "directory": "artifacts/graphics/G-22/approved/e717b101d051aae6"
       },
       "bounds": {
         "min": [
@@ -1020,42 +1020,43 @@
         ],
         "max": [
           3,
-          0.281667,
+          0.356667,
           0
         ],
         "size": [
           3,
-          0.281667,
+          0.356667,
           2
         ]
       },
-      "recipeSha256": "D35D1764917BB9DD38374E1F7A473C5D689F7725FDAF9C4D680269A4F25FEEAF",
+      "recipeSha256": "8C6D802DB936107E0F6364F46A133F8459071B587065CF7BA9E84F13FB03FBE2",
       "materials": [
         "soil",
-        "grain"
+        "leaf",
+        "crop"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 2056
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 4732
       },
       "hashes": {
-        "field.blend": "8C437B30CB1BB3770BB525FF03F6B7EC39F8BC314E63681F4641A48766B7EF6B",
-        "field.glb": "989FEEA131186480AF20F82EFF5BC9E4BC5618498ABDCB5487465E929B89EAC0",
-        "field-blender.png": "87D2DAB240E119CA220A3B97D3E17830F7529D56FFEF1A52C67BED56AEDFE47A",
-        "capture-1.png": "A45D5823CFBA628440CDF3C9873E482592077D83ABA6296664D6DE93BB71704B",
-        "capture-1-gray.png": "201D0D6AF41D84031B1B859BCB32728271F944BC291931EA2730913E6C558B32",
-        "capture.json": "33C3007612C8F0BDBACDEC541CD3C171E4FC0B49394E4DF0D81A12068015FFE1",
-        "build.json": "C1EFB66D1A44EAABDF13F3FC74D0926ECAC11FE48ED6CE7097DB1AC2AC1B2ADE",
-        "validation.json": "0E119D687A6A4F447708D1FE294505CEEAB7C7873E31EF444CC1D88BB02FD8DF"
+        "field.blend": "937CA0C145FD02AD0DD60437177DE693431E970BA58DE13D6E0216283F361A19",
+        "field.glb": "E717B101D051AAE69D265BDC736EAF5DF72470F0CEE2C13FDF5105869D60F629",
+        "field-blender.png": "18B4F72EAF3A54E1BCB8965294602ADEDA7976E3A1EE01526C52857030ADDE42",
+        "capture-1.png": "E7F3180D968DAEA542ABE5583952DC3CBDEA0E541A63C5C6878C520815536315",
+        "capture-1-gray.png": "AE0D891F767AAF4803DCC7459EF569E8B40A65C58E5DA19ABB3143CD955AE648",
+        "capture.json": "50E81E27FEF4EE5EFAB66BC2B1BDA72E22039EBC3BA33FFEFA194E2F099F48BC",
+        "build.json": "248C4FDAE5BF29A3A9AF4718A58866F3367C647ADBC9E8B5A7759C6BCC949738",
+        "validation.json": "F2A2CF810D040DC27283E5A8A606D10ABE9F1629B0E6D137B669C270F73C8174"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-21: campo con cinco surcos y espigas facetadas, dos materiales.",
+        "source": "Original G-22: cultivo de trigo con espigas de granos laterales.",
         "license": "Project original"
       }
     },

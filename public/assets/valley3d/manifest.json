@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T18:20:33.175Z",
-  "invocation": "G-21: publicación selectiva por modelo",
+  "generatedAt": "2026-09-16T18:25:50.726Z",
+  "invocation": "G-22: publicación selectiva por modelo",
   "assets": [
     {
       "id": "axis-marker",
@@ -121,7 +121,7 @@
     {
       "id": "field",
       "file": "field.glb",
-      "sha256": "989FEEA131186480AF20F82EFF5BC9E4BC5618498ABDCB5487465E929B89EAC0",
+      "sha256": "E717B101D051AAE69D265BDC736EAF5DF72470F0CEE2C13FDF5105869D60F629",
       "motion": []
     },
     {

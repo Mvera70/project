@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T18:25:38.168Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-25-17-403Z-37028\\candidate\\field.glb",
+    "assetUrl": "/artifacts/graphics/G-22/runs/2026-09-16T18-25-17-403Z-37028/candidate/field.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-25-17-403Z-37028\\three\\capture-1.png",
+      "sha256": "E7F3180D968DAEA542ABE5583952DC3CBDEA0E541A63C5C6878C520815536315",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-25-17-403Z-37028\\three\\capture-1-gray.png",
+        "sha256": "AE0D891F767AAF4803DCC7459EF569E8B40A65C58E5DA19ABB3143CD955AE648",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 773,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:60982/artifacts/graphics/G-22/runs/2026-09-16T18-25-17-403Z-37028/candidate/field.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "field_crop",
+          "field_leaf",
+          "field_soil"
+        ],
+        "bounds": {
+          "min": [
+            0,
+            0,
+            -2
+          ],
+          "max": [
+            3,
+            0.356667,
+            0
+          ],
+          "size": [
+            3,
+            0.356667,
+            2
+          ]
+        },
+        "loadDurationMs": 175
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-25-17-403Z-37028\\three\\capture-2.png",
+      "sha256": "E7F3180D968DAEA542ABE5583952DC3CBDEA0E541A63C5C6878C520815536315",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-25-17-403Z-37028\\three\\capture-2-gray.png",
+        "sha256": "AE0D891F767AAF4803DCC7459EF569E8B40A65C58E5DA19ABB3143CD955AE648",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 160,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:60982/artifacts/graphics/G-22/runs/2026-09-16T18-25-17-403Z-37028/candidate/field.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "field_crop",
+          "field_leaf",
+          "field_soil"
+        ],
+        "bounds": {
+          "min": [
+            0,
+            0,
+            -2
+          ],
+          "max": [
+            3,
+            0.356667,
+            0
+          ],
+          "size": [
+            3,
+            0.356667,
+            2
+          ]
+        },
+        "loadDurationMs": 52
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:60982/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 174,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-25-17-403Z-37028\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}
