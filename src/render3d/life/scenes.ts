@@ -470,7 +470,20 @@ export interface Greeting {
 export function proposeGreet(a: Dweller, b: Dweller, seed: number, step: number): Greeting | null {
   const apart = Math.hypot(b.body.x - a.body.x, b.body.z - a.body.z);
   if (apart > GREET_RANGE) return null;
-  const key = `greet:${a.body.id}:${b.body.id}:${step}`;
+  // **Una tirada por ventana, no una por paso.** La llave llevaba `step`, así
+  // que mientras dos siguieran a menos de `GREET_RANGE` se tiraba **treinta
+  // veces por segundo**: con p = 0,2 repetida n veces la probabilidad
+  // acumulada es 1 − (1 − p)^n, o sea que a los diez intentos ya va por el
+  // 89 % y a los treinta es prácticamente uno. `GREET_ODDS = 0.2` se leía como
+  // «uno de cada cinco cruces» y de hecho era «siempre». Lo cazó el cuaderno
+  // de referencia visual del dueño del diseño (`docs/visual-reference`
+  // §2), haciendo la cuenta que nadie había hecho.
+  //
+  // Ahora la ventana es la del propio enfriamiento (`GREET_COOLDOWN`): una
+  // oportunidad por pareja y por ventana, y la llave no lleva el paso sino el
+  // número de ventana, así que sigue siendo reconstruible con la semilla.
+  const window = Math.floor(step / stepsOf(GREET_COOLDOWN));
+  const key = `greet:${a.body.id}:${b.body.id}:w${window}`;
   if (roll(seed, key) >= GREET_ODDS) return null;
   const span = stepsOf(GREET_SPAN[0] + roll(seed, `${key}:span`) * (GREET_SPAN[1] - GREET_SPAN[0]));
   return { a: a.body.id, b: b.body.id, since: step, until: step + span };

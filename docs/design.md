@@ -429,21 +429,31 @@ guardadas, y traducirlo sin tocar el motor.
 
 ### 4.1 Unidades
 
+**Esta tabla decía 15 s por semana hasta el 16 sep 2026 y llevaba desde v3.72
+sin ser verdad.** Lo destapó el cuaderno de referencia visual
+(`docs/visual-reference` §1) al cotejarla con `balance.ts`. Los números de
+abajo son los de `TIME` (§12.1), que es la fuente:
+
 | Unidad | Equivale a | Tiempo real a ×1 |
 |---|---|---|
-| Tick | 1 semana | 15 s |
-| Estación | 12 ticks | 3 min |
-| Año | 48 ticks | 12 min |
-| Generación | 20 años = 960 ticks | 4 h |
-| Ventana de letargo | — | 4 h |
+| Tick | 1 semana | **14 min** (840 000 ms) |
+| Estación | 12 ticks | 2 h 48 min |
+| Año | 48 ticks | 11 h 12 min |
+| Generación | 20 años = 960 ticks | 9 días y pico |
+| Ventana de letargo | 960 ticks | la misma generación |
 
-Velocidades disponibles: **pausa, ×1, ×4, ×16**. A ×16 un año son 45 segundos,
-que es lo que hace tolerable revisar una partida larga.
+Velocidades disponibles: **pausa, ×1, ×4, ×16, ×64** (`TIME.SPEEDS`). A ×64 una
+semana son trece segundos y un año diez minutos y medio, y **lo que antes pasaba
+a ×1 pasa ahora a ×64**: cualquier medida en minutos escrita antes de v3.72 está
+en la escala vieja.
 
-El render tiene su propio reloj cosmético: **cada tick se representa como un día
-completo** — amanecer, marcha al campo, regreso, noche. Un tick a ×1 dura 15 s y
-ese es el ciclo de la multitud ambiental. No hay ninguna relación entre ese
-reloj y la simulación más allá de la duración; el motor no sabe que existe.
+El render tiene su propio reloj cosmético, y desde v3.72 **está atado a éste y
+no suelto**: una semana son **siete jornadas de sol** de ciento veinte segundos
+escénicos cada una (`SCENIC_DAY_SECONDS`), y la identidad
+`REAL_MS_PER_TICK = DAYS_PER_WEEK · SCENIC_DAY_SECONDS` la vigila
+`tests/fast/clock.test.ts`. Romperla devuelve el juego a ocho amaneceres por
+semana, que es lo que había antes del reloj con horas. El motor sigue sin saber
+que ese reloj existe: lo lee la presentación, no al contrario.
 
 ### 4.2 Orden de resolución del tick
 

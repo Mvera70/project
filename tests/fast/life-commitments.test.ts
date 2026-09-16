@@ -244,15 +244,34 @@ describe('IA-2 · saludo de paso', () => {
   });
 
   it('salta de vez en cuando, no siempre ni nunca', () => {
+    // **Se cuenta una oportunidad por ventana, no una por paso.** La primera
+    // versión recorría cuatrocientos pasos seguidos de la misma pareja y
+    // contaba cada paso como una tirada: eso pasaba porque la llave llevaba el
+    // paso y se tiraba treinta veces por segundo, que es el fallo que el
+    // cuaderno de referencia visual destapó (`docs/visual-reference` §2) — con
+    // p = 0,2 repetida, la probabilidad acumulada es 1 − (1 − p)^n y a los
+    // treinta intentos es prácticamente uno. Arreglado eso, cuatrocientos pasos
+    // son **dos** oportunidades y cero aciertos es un resultado legítimo, así
+    // que la prueba medía el fallo y no la propiedad.
+    //
+    // Ahora se barren parejas y ventanas separadas, que es lo que de verdad son
+    // oportunidades, y se exige que la frecuencia se parezca a `GREET_ODDS`
+    // sin ser ni cero ni todo.
     let hits = 0;
-    const total = 400;
-    for (let step = 0; step < total; step += 1) {
-      const a = makeDweller(1, { x: 0, z: 0 });
-      const b = makeDweller(2, { x: 1, z: 0 });
-      if (proposeGreet(a, b, 7, step) !== null) hits += 1;
+    let chances = 0;
+    for (let pair = 0; pair < 40; pair += 1) {
+      for (let window = 0; window < 10; window += 1) {
+        const a = makeDweller(1 + pair * 2, { x: 0, z: 0 });
+        const b = makeDweller(2 + pair * 2, { x: 1, z: 0 });
+        // Muy separados en el tiempo: una ventana de saludo dura ocho segundos
+        // escénicos, o sea doscientas cuarenta muestras de la vida.
+        chances += 1;
+        if (proposeGreet(a, b, 7, window * 600) !== null) hits += 1;
+      }
     }
-    expect(hits, `${hits} de ${total}`).toBeGreaterThan(0);
-    expect(hits, `${hits} de ${total}`).toBeLessThan(total);
+    const rate = hits / chances;
+    expect(rate, `${hits} de ${chances} oportunidades`).toBeGreaterThan(0.05);
+    expect(rate, `${hits} de ${chances} oportunidades`).toBeLessThan(0.5);
   });
 });
 
