@@ -36,7 +36,23 @@ html.crossroad-open .ui-shell-stack, html.epitaph-open .ui-shell-stack { visibil
    posicionamiento, nunca su piel ni su texto. */
 .ui-shell-message { box-sizing: border-box; min-height: var(--ui-message-min-height);
   display: flex; align-items: flex-end; justify-content: center;
-  padding: 0 var(--ui-margin-mobile) var(--ui-stack-gap); }
+  padding: 0 var(--ui-margin-mobile) var(--ui-stack-gap);
+  /* UI-R2 · sin aviso ni pista, este hueco sigue habiendo: `notice.ts` monta su
+     banda (oculta con `hidden`) y `app.ts` mete aquí la pista del inicio
+     guiado (también oculta) desde el primer pintado, así que el contenedor
+     nunca está `:empty` en el sentido de CSS —tiene hijos, sólo que no se
+     ven— y la regla de abajo no llegaba a aplicar nunca. El contenedor
+     heredaba `pointer-events: auto` de `.ui-shell-stack > *` (más arriba) y
+     se quedaba **tragándose los toques** de todo lo que hay debajo en esa
+     franja aunque no se viera nada: medido con un click de Playwright real
+     sobre `.valley-speed-badge` (que vive ahí debajo, en `.valley-hud-right`,
+     bottom: 60px) — «intercepts pointer events» del `<div class=
+     "ui-shell-message">`, y el botón de velocidad no se puede tocar en el
+     juego de verdad. Quitar el paso por aquí y dejarlo sólo en los hijos de
+     verdad (el aviso, la pista) es lo que deja pasar el toque a lo que haya
+     debajo cuando no hay nada que leer. */
+  pointer-events: none; }
+.ui-shell-message > * { pointer-events: auto; }
 .ui-shell-message:empty { min-height: 0; padding: 0; }
 /* El mensaje habla del valle —la crónica que acaba de pasar, la pista de las
    órdenes—, así que sólo tiene sitio con el valle en pantalla. Antes de este
@@ -81,14 +97,29 @@ html:has(.valley-panel:not([hidden])) .ui-shell-message { visibility: hidden; }
 .ui-shell-tab[aria-pressed="true"] { background: var(--ui-paper-ink); color: var(--ui-paper-bg); }
 .ui-shell-tab:focus-visible { outline: 2px solid var(--ui-accent-on-paper); outline-offset: 2px; }
 
-/* La bandeja (`content` de `ShellHandle`). Vacía en esta ronda — orders/inspect
-   siguen viviendo en sus propios nodos de `app.ts`, sin migrar todavía — pero
-   la geometría ya es la de la especificación: hasta 60% de la altura útil en
-   móvil, lateral de 360px a partir de 900px (plan §3). Región etiquetada, no
-   modal (plan §3): no atrapa el foco ni deshabilita el valle detrás. */
+/* La bandeja (`content` de `ShellHandle`). Desde UI-R2 aloja la hoja de
+   órdenes de verdad (`orders.ts`); la geometría ya es la de la especificación:
+   hasta 60% de la altura útil en móvil, lateral de 360px a partir de 900px
+   (plan §3). Región etiquetada, no modal (plan §3): no atrapa el foco ni
+   deshabilita el valle detrás.
+   `pointer-events: auto` explícito, y no algo que dé por hecho: `.ui-shell`
+   (el contenedor común, más arriba) lo pone a `none` para que el hueco vacío
+   entre navegación y bandeja no tape el valle, y `pointer-events` se hereda.
+   `.ui-shell-stack` resuelve esto para sus hijos con `.ui-shell-stack > *`,
+   pero `.ui-shell-content` es el otro hijo directo de `.ui-shell` y esa regla
+   no lo alcanza — nada lo devolvía a `auto`. Encontrado con un click de
+   Playwright de verdad (no una hipótesis): `elementsFromPoint` sobre el
+   centro del botón «×» de la hoja de órdenes ni siquiera incluía
+   `.ui-shell-content` en la pila de aciertos —`pointer-events: none` saca al
+   elemento entero de la comprobación de impacto—, así que ni el cierre ni
+   ninguna de las tres palancas de `orders.ts` podían tocarse: parecían
+   funcionar porque la ronda anterior nunca llegó a montar contenido de verdad
+   ahí (§3.1 de `docs/ui-redesign/rounds/UI-R1.md`) y las capturas de esta
+   misma ronda sólo habían comprobado que la hoja se **veía**, no que
+   respondiera al dedo. */
 .ui-shell-content { position: fixed; left: 0; right: 0; z-index: 13;
   bottom: calc(var(--ui-nav-height) + env(safe-area-inset-bottom));
-  box-sizing: border-box; max-height: 60vh; overflow: auto;
+  box-sizing: border-box; max-height: 60vh; overflow: auto; pointer-events: auto;
   padding: var(--ui-space-4) var(--ui-margin-mobile);
   background: var(--ui-paper-bg); border-top: 1px solid var(--ui-edge);
   border-radius: var(--ui-radius-sheet) var(--ui-radius-sheet) 0 0;
@@ -102,6 +133,13 @@ html:has(.valley-panel:not([hidden])) .ui-shell-message { visibility: hidden; }
 .ui-shell-content-close:focus-visible { outline: 2px solid var(--ui-accent-on-paper); outline-offset: 2px; }
 .ui-shell-content-body p { margin: 3px 0; color: var(--ui-paper-ink-soft);
   font: var(--ui-text-control-size)/var(--ui-text-control-line) var(--ui-font-plain); }
+/* UI-R2 · el título de cualquier hoja montada en la bandeja (por ahora sólo
+   `orders.ts`; la ficha de UI-R4 lo hereda igual). Mismo trazo que llevaba
+   `.valley-panel h2` cuando la hoja de órdenes vivía suelta — sólo cambia el
+   selector, para que compita con la nueva superficie y no con la vieja. */
+.ui-shell-content-body h2 { margin: 0 0 6px; text-transform: capitalize;
+  color: var(--ui-paper-ink); font: 600 21px/1.15 var(--ui-font-voice);
+  letter-spacing: .01em; text-wrap: balance; }
 
 @media (min-width: 900px) {
   .ui-shell-content { left: auto; right: 0; top: 0; width: 360px; max-height: none;

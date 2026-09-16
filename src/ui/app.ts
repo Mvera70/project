@@ -10,19 +10,16 @@ import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { answerFor } from './answer';
-import { TREND_WEEKS, trendsOf, vitalsOf } from './vitals';
-import { VITAL_ICONS } from './icons';
+import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
-import { valleyClock } from '../derive/clock';
-import { hourAt } from '../render3d/effects/day-phases';
 import { tick, type TickReport } from '@engine/sim';
-import type { ArchivedGame, Decision, GameState, Intent, SaveFile, Season } from '@engine/state';
-import { INTENT_STOPS, PRIORITY_STOPS, stopOf } from '@engine/state';
-import type { PriorityName } from '@engine/state';
+import type { ArchivedGame, Decision, GameState, Intent, SaveFile } from '@engine/state';
+import { createHud } from './redesign/hud';
+import { ordersPanel } from './redesign/orders';
 import { createShell, resolveMessageSlot } from './redesign/shell';
-import type { SheetRoute, UiActions } from './redesign/contracts';
+import type { SheetRoute, UiActions, UiSnapshot } from './redesign/contracts';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
 import { persistSave } from './idb';
@@ -30,7 +27,6 @@ import { panelFor, type InspectTarget } from './inspect';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
-import { doingNow } from './doing';
 import { milestonesAt } from './milestones';
 import { mountMoments } from './moment';
 import { mountNotices } from './notice';
@@ -38,7 +34,7 @@ import { closeChronicle, openChronicle } from './screens/chronicle';
 import { closeCrossroad, openCrossroad } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { closePeople, openPeople } from './screens/people';
-import { isSpeed, speedLabel, type Speed } from './speed';
+import { isSpeed, type Speed } from './speed';
 import { accentFor, ambientFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
 
@@ -126,18 +122,11 @@ export function roman(value: number): string {
   return result;
 }
 
-/** U-06 · una clave del banco por estación: `seasonOf` decide, nunca un literal. */
-const SEASON_KEY: Record<Season, string> = {
-  spring: 'app.season.spring',
-  summer: 'app.season.summer',
-  autumn: 'app.season.autumn',
-  winter: 'app.season.winter',
-};
-
-/** La línea bajo el año (§11.1.1, U-06): la estación del tick, en su frase del banco. */
-export function seasonLabel(tick: number): string {
-  return renderUiText(SEASON_KEY[seasonOf(tick)]);
-}
+// UI-R2 · `seasonLabel` se mudó a `redesign/hud.ts`, que es quien pinta la
+// fecha ahora; se reexporta aquí para no mover el punto de entrada que ya usa
+// `screens/chronicle.ts` (`roman`, que sí se queda en este fichero) y
+// `tests/fast/ui.test.ts` (`seasonLabel`, importado de `@ui/app`).
+export { seasonLabel } from './redesign/hud';
 
 /** Keep archive identity unambiguous even if the random draw repeats. */
 export function nextUnusedSeed(drawn: number, excluded: ReadonlySet<number>): number {
@@ -171,81 +160,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const canvas = document.createElement('canvas');
   canvas.id = 'valley';
   canvas.setAttribute('aria-label', renderUiText('app.valley'));
-  // U-12 · el reloj, donde estaba el título del año. Dos líneas: la hora
-  // —«un contador con horas incluso», dueño del diseño— y debajo la fecha, que
-  // es el año, la estación y el día. Las dos salen de `valleyClock`, así que la
-  // hora que se lee es la del sol que se ve.
-  const timeLine = document.createElement('div');
-  timeLine.className = 'valley-time';
-  const dateLine = document.createElement('div');
-  dateLine.className = 'valley-date';
-  // §11.1.1 · la tira de la aldea: cuatro cifras, arriba, siempre visibles.
-  const vitals = document.createElement('div');
-  vitals.className = 'valley-vitals';
-  vitals.setAttribute('aria-label', renderUiText('app.vitals'));
-  const vital = (icon: string): { cell: HTMLElement; value: HTMLElement; arrow: HTMLElement } => {
-    const cell = document.createElement('span');
-    cell.className = 'valley-vital';
-    cell.innerHTML = icon;
-    // U-06 · el bump se apaga solo: `animationend`, nunca un temporizador
-    // atado al tick (§11.4). `animation-name` es el único que corre en
-    // `.valley-vital.bump` (index.html), así que no hay ambigüedad con otra
-    // animación de la misma celda.
-    cell.addEventListener('animationend', (event) => {
-      if (event.animationName === 'valley-vital-bump') cell.classList.remove('bump');
-    });
-    const value = document.createElement('b');
-    // E4 · la dirección. Dibujada y no escrita, por lo mismo que los iconos: un
-    // glifo de flecha sale distinto en cada teléfono y aquí mide siete píxeles.
-    // Vacía cuando la cifra está quieta, que en un idle es la mayoría del
-    // tiempo — una flecha permanente deja de ser una señal.
-    const arrow = document.createElement('i');
-    arrow.className = 'valley-trend';
-    cell.append(value, arrow);
-    vitals.append(cell);
-    return { cell, value, arrow };
-  };
 
-  /** Las dos flechas, dibujadas una vez. */
-  const TREND_MARK: Readonly<Record<'up' | 'down', string>> = {
-    up: '<svg viewBox="0 0 8 8" width="7" height="7" aria-hidden="true" focusable="false"'
-      + ' fill="currentColor"><path d="M4 1 7 6H1z"/></svg>',
-    down: '<svg viewBox="0 0 8 8" width="7" height="7" aria-hidden="true" focusable="false"'
-      + ' fill="currentColor"><path d="M4 7 1 2h6z"/></svg>',
-  };
-  // Los iconos van dibujados, no escritos: un glifo de texto depende de la
-  // fuente que tenga el telefono y aqui hay cuatro dibujos de tres trazos.
-  const people = vital(VITAL_ICONS.people);
-  const food = vital(VITAL_ICONS.food);
-  const wood = vital(VITAL_ICONS.wood);
-  const spirits = vital(VITAL_ICONS.morale);
-
-  /**
-   * **El mando.** E1 de `docs/plan-juego.md`, y la razón de ser de esta ronda.
-   *
-   * Dos órdenes permanentes: cuánto se siembra y a qué van las manos que
-   * sobran. Es lo único que el jugador manda de forma continua, y por tanto lo
-   * que hace que las cuatro cifras de la tira signifiquen algo — un número sólo
-   * significa algo cuando se mueve porque tú hiciste algo.
-   *
-   * **Con palabras y no con cifras** (§11.1): «sembrar de más» es una orden que
-   * un alguacil entendería; «1,5×» es un ajuste de hoja de cálculo. Y tres
-   * posiciones por palanca, no cinco: tres es una decisión, cinco es un dial.
-   *
-   * Va debajo de la tira y no en un panel aparte porque es **el instrumento de
-   * esas cifras**: la orden y su lectura tienen que estar juntas o el jugador no
-   * ata una con la otra. El valle sigue ocupando la pantalla.
-   */
-  /**
-   * **La línea de estado: qué está haciendo la aldea.** `doing.ts`.
-   *
-   * Va entre la tira y el mando porque es la bisagra de los dos: la tira dice
-   * cómo está la aldea, esto dice qué está haciendo con ello, y el mando es lo
-   * que uno cambia después. Puesta encima del mando, la orden se lee como
-   * respuesta a esta frase, que es exactamente lo que es.
-   */
-  const doing = document.createElement('p');
-  doing.className = 'valley-doing';
   // U-11 · la pista del inicio guiado, bajo la línea de órdenes. Oculta salvo
   // la primera vez, y se toca para pasar.
   const hint = document.createElement('button');
@@ -253,148 +168,92 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   hint.className = 'valley-hint';
   hint.hidden = true;
 
-  //
-  // **Y desde el 15 sep 2026 es una hoja, no tres filas a la vista.** Las tres
-  // filas de doce botones se comían el tercio de arriba de la pantalla, siempre
-  // abiertas, encima del valle: un panel de control de desarrollador y no un
-  // juego. El dueño del diseño lo dijo sin rodeos —«las nuevas acciones que has
-  // puesto ahí con los botones así, comiéndose media pantalla»— y tenía razón.
-  //
-  // Ahora hay **una línea** bajo la frase de estado que dice cómo están puestas
-  // las órdenes, y tocarla abre esta hoja desde abajo, con la misma piel que la
-  // ficha de un edificio. Cerrada no ocupa nada. Las tres palancas siguen siendo
-  // las mismas: lo que cambia es que el valle vuelve a ser la pantalla.
-  const orders = document.createElement('section');
-  orders.className = 'valley-panel valley-orders';
-  orders.setAttribute('aria-label', renderUiText('app.orders'));
-  orders.hidden = true;
-  const ordersClose = document.createElement('button');
-  ordersClose.type = 'button';
-  ordersClose.className = 'valley-panel-close';
-  ordersClose.setAttribute('aria-label', renderUiText('app.close'));
-  ordersClose.textContent = '×';
-  ordersClose.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
-  const ordersTitle = document.createElement('h2');
-  ordersTitle.textContent = renderUiText('app.orders');
-  orders.append(ordersClose, ordersTitle);
-
-  /** La línea que resume las órdenes, y la puerta de la hoja. */
-  const ordersNow = document.createElement('button');
-  ordersNow.type = 'button';
-  ordersNow.className = 'valley-orders-now';
-  ordersNow.setAttribute('aria-label', renderUiText('app.orders.open'));
-  ordersNow.addEventListener('click', () => {
-    // UI-R1 · un único propietario de la ruta: si ya estaban abiertas, tocar
-    // otra vez vuelve al valle; si no, las abre y cierra lo que hubiera.
-    actions.navigate(currentRoute.kind === 'orders' ? { kind: 'valley' } : { kind: 'orders' });
-  });
-  interface Row {
-    readonly current: () => string;
-    readonly buttons: readonly (readonly [string, HTMLButtonElement])[];
-  }
-  const leverRows: Row[] = [];
-
-  /** Una fila del mando: su nombre y sus posiciones. */
-  const orderRow = (
-    name: string,
-    stops: readonly { key: string; label: string }[],
-    apply: (key: string) => void,
-    current: () => string,
-  ): void => {
-    const row = document.createElement('div');
-    row.className = 'valley-order';
-    const label = document.createElement('span');
-    label.className = 'valley-order-name';
-    label.textContent = name;
-    const bar = document.createElement('div');
-    bar.className = 'valley-order-bar';
-    const buttons = stops.map((stop) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.textContent = stop.label;
-      button.setAttribute('aria-label', `${name}: ${stop.label}`);
-      button.addEventListener('click', () => {
-        // La orden se da y la aldea la obedece desde el tick siguiente: no se
-        // recalcula nada aquí, el motor lee `state.intent` cada semana.
-        apply(stop.key);
-        paintOrders();
-        // E4 · **y la aldea contesta.** Si la orden no se puede cumplir, se dice
-        // ahora y una sola vez: un roce repetido cada semana deja de ser una
-        // respuesta y se convierte en una regañina.
-        const said = answerFor(state);
-        if (said !== null) {
-          notices.show(state, [{
-            tick: state.tick, kind: 'season', templateKey: said.key,
-            params: said.params, weight: 2,
-          }]);
-        }
-        // Y se guarda, porque es una decisión del jugador: al volver dos días
-        // después la aldea tiene que seguir haciendo lo que se le dijo.
-        persist();
-      });
-      bar.append(button);
-      return [stop.key, button] as const;
-    });
-    row.append(label, bar);
-    orders.append(row);
-    leverRows.push({ current, buttons });
-  };
-
-  for (const lever of ['fields', 'timber'] as const) {
-    const prefix = lever === 'fields' ? 'sowing' : 'hands';
-    orderRow(
-      renderUiText(`app.${prefix}`),
-      INTENT_STOPS[lever].map((stop) => ({
-        key: stop.key, label: renderUiText(`app.${prefix}.${stop.key}`),
-      })),
-      (key) => {
-        const stop = INTENT_STOPS[lever].find((one) => one.key === key);
-        // UI-R1 · la mutación pasa por `UiActions.setIntent`, el único punto
-        // de escritura que el plan concede a un panel (`contracts.ts`); esta
-        // orden todavía vive dentro de `app.ts` y no en un `PanelFactory`
-        // propio (eso es UI-R2), pero ya usa el mismo contrato.
-        if (stop !== undefined) actions.setIntent({ ...state.intent, [lever]: stop.value });
-      },
-      () => stopOf(lever, state.intent[lever]),
-    );
-  }
-  // E3 · Y la tercera: qué se levanta antes.
-  orderRow(
-    renderUiText('app.build'),
-    PRIORITY_STOPS.map((key) => ({ key, label: renderUiText(`app.build.${key}`) })),
-    (key) => { actions.setIntent({ ...state.intent, priority: key as PriorityName }); },
-    () => state.intent.priority,
-  );
-
-  const paintOrders = (): void => {
-    for (const { current, buttons } of leverRows) {
-      const now = current();
-      for (const [key, button] of buttons) {
-        button.setAttribute('aria-pressed', String(key === now));
-      }
+  /**
+   * **UI-R1 · la carcasa, y el único propietario del estado de navegación.**
+   *
+   * Antes de UI-R1 la pestaña encendida se decidía en tres sitios que no se
+   * conocían entre sí —`showing()`, cada manejador de clic de la barra, y
+   * `showPanel` llamando a `showing('valley')` para arreglar S-05— y una
+   * cuarta ruta (las órdenes) no pasaba por ninguno: `orders.hidden` se
+   * alternaba a mano sin tocar la barra. `docs/ui-redesign/redesign/
+   * contracts.ts` da la forma; `createShell` la construye una vez.
+   *
+   * `actions.navigate` es el único camino: cierra lo que hubiera y abre lo
+   * que toque. Se declara con `let`/`function` —y no con los `const` de
+   * `hud`/`orders`/`shell`, que lo necesitan— porque la elevación de
+   * `function` es lo que rompe el huevo y la gallina: `actions` necesita
+   * `shell.setRoute`, y `createShell`/`createHud`/`ordersPanel` necesitan
+   * `actions`. Ídem para `notices`/`persist` dentro de `setIntent`: se
+   * declaran más abajo, pero para cuando alguien pulsa una orden ya existen
+   * — el cuerpo de una función no se ejecuta hasta que se llama.
+   */
+  let currentRoute: SheetRoute = { kind: 'valley' };
+  function navigate(route: SheetRoute): void {
+    currentRoute = route;
+    // S-05, U-14 · crónica, gente, ficha y órdenes no coexisten: la ruta que
+    // llega cierra a las demás antes de abrirse, y siempre a través de este
+    // único punto — nunca dentro de un manejador suelto.
+    closeChronicle();
+    closePeople();
+    closePanel();
+    // UI-R2 · la hoja de órdenes vive de verdad en `shell.content` desde esta
+    // ronda (antes era un `<section>` suelto anclado a `bottom: 0`, por debajo
+    // de la barra — el defecto §3.5 del informe de UI-R1, con «Build first»
+    // cortado tras la navegación nueva). Vaciar la bandeja en cada navegación
+    // es lo que impide que se quede pegada al abrir otra cosa justo después.
+    shell.content.replaceChildren();
+    shell.setRoute(route);
+    if (route.kind === 'chronicle') {
+      openChronicle(app, undefined, () => navigate({ kind: 'valley' }));
+    } else if (route.kind === 'people') {
+      // U-08 · la pantalla de la gente: la lista de los nombrados vivos y,
+      // al tocar uno, su ficha (`src/ui/screens/people.ts`).
+      openPeople(app, () => navigate({ kind: 'valley' }));
+    } else if (route.kind === 'inspect') {
+      showPanel(route.target);
+    } else if (route.kind === 'orders') {
+      // `shell.content` ya ha quedado vacía arriba: es seguro montar aquí.
+      shell.content.append(orders.element);
+      orders.update(snapshot());
     }
-    // Y la línea de resumen, con las posiciones en minúscula porque van en
-    // mitad de una frase.
-    const lower = (key: string): string => renderUiText(key).toLowerCase();
-    ordersNow.textContent = renderUiText('app.orders.now', {
-      sowing: lower(`app.sowing.${stopOf('fields', state.intent.fields)}`),
-      hands: lower(`app.hands.${stopOf('timber', state.intent.timber)}`),
-      build: lower(`app.build.${state.intent.priority}`),
-    });
+  }
+  /** Lo que cualquier `UiPanel` necesita para pintarse (`contracts.ts`). */
+  const snapshot = (): UiSnapshot => ({ state, archive, speed });
+  const actions: UiActions = {
+    navigate,
+    setSpeed(value): void { app.setSpeed(value); },
+    // UI-R2 · la única escritura que un panel puede hacer sobre las órdenes
+    // (`contracts.ts`), y desde esta ronda el único sitio donde se aplica la
+    // respuesta de §11.6: antes vivía repetida en el manejador de clic de
+    // cada palanca (`orderRow`, que vivía en este fichero); ahora está una vez,
+    // en el punto que de verdad decide qué pasa cuando cambia una orden —
+    // `orders.ts` sólo emite la intención nueva.
+    setIntent(intent: Intent): void {
+      state.intent = intent;
+      // E4 · **y la aldea contesta.** Si la orden no se puede cumplir, se dice
+      // ahora y una sola vez: un roce repetido cada semana deja de ser una
+      // respuesta y se convierte en una regañina.
+      const said = answerFor(state);
+      if (said !== null) {
+        notices.show(state, [{
+          tick: state.tick, kind: 'season', templateKey: said.key,
+          params: said.params, weight: 2,
+        }]);
+      }
+      // Y se guarda, porque es una decisión del jugador: al volver dos días
+      // después la aldea tiene que seguir haciendo lo que se le dijo.
+      persist();
+    },
+    track(id): void { renderer.track(id); },
   };
-
-  const controls = document.createElement('div');
-  controls.className = 'valley-speeds';
-  controls.setAttribute('aria-label', renderUiText('app.speed.controls'));
-  const buttons = TIME.SPEEDS.map((value) => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = speedLabel(value);
-    button.setAttribute('aria-label', speedLabel(value));
-    button.addEventListener('click', () => app.setSpeed(value));
-    controls.append(button);
-    return [value, button] as const;
-  });
+  // UI-R2 · `hud.ts` cría la hora, la fecha, la tira, la frase de estado y el
+  // resumen/acceso a las órdenes; `orders.ts` la hoja de las tres palancas,
+  // migrada a `shell.content` (ver el comentario de `navigate`, arriba).
+  // Ninguno de los dos conoce `state` por sí mismo: `hud.paint`/`orders.
+  // update` lo reciben en cada llamada, nunca lo capturan por su cuenta.
+  const hud = createHud(actions, () => currentRoute);
+  const orders = ordersPanel(actions);
+  const shell = createShell(actions);
 
   // U-09 · el sonido: sintetizado con Web Audio, nunca un fichero (§ ficha del
   // encargo, CLAUDE.md). No suena nada hasta el primer toque (más abajo,
@@ -404,10 +263,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const soundToggle = document.createElement('button');
   soundToggle.type = 'button';
   soundToggle.className = 'valley-sound';
-  // Dibujado y no escrito, como `VITAL_ICONS`: dos trazos de más para la
-  // fuente que le toque al teléfono no son una opción a este tamaño. Las dos
-  // versiones —sonando y en silencio— están las dos en el DOM; el CSS
-  // enseña una u otra según `aria-pressed`, nunca cambia el texto.
+  // Dibujado y no escrito: dos trazos de más para la fuente que le toque al
+  // teléfono no son una opción a este tamaño. Las dos versiones —sonando y en
+  // silencio— están las dos en el DOM; el CSS enseña una u otra según
+  // `aria-pressed`, nunca cambia el texto.
   soundToggle.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false"'
     + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
     + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
@@ -421,82 +280,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   };
   soundToggle.addEventListener('click', () => { sound.setEnabled(!sound.enabled); updateSoundToggle(); });
   updateSoundToggle();
-  /**
-   * **El tiempo, un control pequeño.** La regleta de cinco botones de 44 px era
-   * provisional —«los botones de tiempo son provisionales, evidentemente»— y
-   * ocupaba media anchura de la pantalla para algo que se toca dos veces por
-   * sesión. Ahora hay un botón que enseña la velocidad de ahora; tocarlo
-   * despliega la regleta de siempre a su lado, se elige, y se recoge sola.
-   */
-  const speedBadge = document.createElement('button');
-  speedBadge.type = 'button';
-  speedBadge.className = 'valley-speed-badge';
-  speedBadge.setAttribute('aria-label', renderUiText('app.speed.open'));
-  speedBadge.addEventListener('click', () => { controls.hidden = !controls.hidden; });
-  controls.hidden = true;
 
   const hudRight = document.createElement('div');
   hudRight.className = 'valley-hud-right';
-  hudRight.append(soundToggle, controls, speedBadge);
+  hudRight.append(soundToggle, hud.speedControls, hud.speedBadge);
 
-  /**
-   * **UI-R1 · la carcasa, y el único propietario del estado de navegación.**
-   *
-   * Antes de esta ronda la pestaña encendida se decidía en tres sitios que no
-   * se conocían entre sí —`showing()`, cada manejador de clic de la barra, y
-   * `showPanel` llamando a `showing('valley')` para arreglar S-05— y una
-   * cuarta ruta (las órdenes) no pasaba por ninguno: `orders.hidden` se
-   * alternaba a mano sin tocar la barra. `docs/ui-redesign/contracts.ts`
-   * (§4 del plan) da la forma; `createShell` la construye una vez, con la
-   * misma piel y los mismos textos del banco que llevaba `.valley-tabbar`.
-   *
-   * `actions.navigate` es ahora el único camino: cierra lo que hubiera y abre
-   * lo que toque, así que un panel —incluida la hoja de órdenes, que sigue
-   * viviendo aquí hasta que UI-R2 le dé su propio fichero— nunca vuelve a
-   * decidir la pestaña por su cuenta.
-   */
-  let currentRoute: SheetRoute = { kind: 'valley' };
-  // `navigate` es `function` y no una `const` que capture `shell`: así puede
-  // declararse (izable por la elevación de `function`) antes de que `shell`
-  // exista, que es lo que rompe el huevo y la gallina entre «`actions`
-  // necesita `shell.setRoute`» y «`createShell` necesita `actions»» sin dejar
-  // `shell` como un `let` que sólo se asigna una vez.
-  function navigate(route: SheetRoute): void {
-    currentRoute = route;
-    // S-05, U-14 · crónica, gente, ficha y órdenes no coexisten: la ruta que
-    // llega cierra a las demás antes de abrirse, y siempre a través de este
-    // único punto — nunca dentro de un manejador suelto.
-    closeChronicle();
-    closePeople();
-    closePanel();
-    orders.hidden = true;
-    shell.setRoute(route);
-    if (route.kind === 'chronicle') {
-      openChronicle(app, undefined, () => navigate({ kind: 'valley' }));
-    } else if (route.kind === 'people') {
-      // U-08 · la pantalla de la gente: la lista de los nombrados vivos y,
-      // al tocar uno, su ficha (`src/ui/screens/people.ts`).
-      openPeople(app, () => navigate({ kind: 'valley' }));
-    } else if (route.kind === 'inspect') {
-      showPanel(route.target);
-    } else if (route.kind === 'orders') {
-      orders.hidden = false;
-    }
-  }
-  const actions: UiActions = {
-    navigate,
-    setSpeed(value): void { app.setSpeed(value); },
-    // UI-R1 · la única escritura que un panel puede hacer sobre las órdenes
-    // (`contracts.ts`); ver los `orderRow` de más arriba, que ya pasan por
-    // aquí en vez de mutar `state.intent` directamente.
-    setIntent(intent: Intent): void { state.intent = intent; },
-    track(id): void { renderer.track(id); },
-  };
-  const shell = createShell(actions);
-  // `hudRight` es la regleta de velocidad y el botón de sonido juntos (U-09).
-  root.append(canvas, timeLine, dateLine, vitals, doing, ordersNow, orders, hudRight, shell.element);
-  paintOrders();
-  speedBadge.textContent = speedLabel(speed);
+  root.append(canvas, hud.header, hudRight, shell.element);
 
   /**
    * **UI-R1 · la pila del mensaje, y el fallo concreto que esta ronda tiene
@@ -692,31 +481,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   }
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
-  // U-06 · si una cifra cambia, su celda hace un bump breve (§11.1.1). Quien
-  // pide no ver movimiento no lo ve: la clase ni se llega a poner.
-  const reducesMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  let lastVitals = vitalsOf(state);
-  /**
-   * La tira de hace un mes, y el tick en que se tomó.
-   *
-   * Contra un mes y no contra la semana anterior: el grano baja cada semana y
-   * sube de golpe en la cosecha, así que una flecha semanal apuntaría hacia
-   * abajo once meses al año y no diría nada (`vitals.ts`, `TREND_WEEKS`).
-   */
-  let monthAgo = { at: state.tick, vitals: lastVitals };
-  const bump = (cell: HTMLElement, changed: boolean): void => {
-    if (!changed || reducesMotion.matches) return;
-    // La clase se pone y se quita sola (`animationend` en `vital()`), nunca
-    // una transición colgada del tick — §11.4. Quitarla y forzar reflujo
-    // antes de re-ponerla es lo que reinicia el bump si la cifra vuelve a
-    // cambiar antes de que el anterior haya acabado.
-    cell.classList.remove('bump');
-    void cell.offsetWidth;
-    cell.style.animationDuration = `${TIME.VITAL_BUMP_MS}ms`;
-    cell.classList.add('bump');
-  };
-  let paintedTime = '';
-  let paintedDate = '';
   let lastBolts = 0;
   const paint = (fraction: number): void => {
     lastFraction = fraction;
@@ -746,60 +510,16 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         window.setTimeout(() => sound.accent('thunder', Date.now()), delay);
       }
     }
-    // U-12 · el reloj. Se pinta sólo cuando cambia el texto: a ×64 la hora
-    // cambia dos veces por segundo y escribir en el DOM cada fotograma es
-    // trabajo de maquetación por nada.
-    const clock = valleyClock(state.tick, fraction);
-    const hour = hourAt(clock.sunPhase);
-    const time = renderUiText('app.clock.time', { hour: String(hour).padStart(2, '0') });
-    if (time !== paintedTime) {
-      timeLine.textContent = time;
-      paintedTime = time;
-    }
-    const date = renderUiText('app.clock.date', {
-      year: clock.year,
-      season: seasonLabel(state.tick),
-      day: clock.dayOfSeason,
-    });
-    if (date !== paintedDate) {
-      dateLine.textContent = date;
-      paintedDate = date;
-    }
-    const now = vitalsOf(state);
-    bump(people.cell, now.people !== lastVitals.people);
-    bump(food.cell, now.weeks !== lastVitals.weeks);
-    bump(wood.cell, now.wood !== lastVitals.wood);
-    bump(spirits.cell, now.morale !== lastVitals.morale);
-    // La muestra del mes se releva cuando el mes ha pasado, no en cada
-    // fotograma: si se relevara siempre, la comparación sería contra sí misma y
-    // todas las flechas estarían quietas.
-    if (state.tick - monthAgo.at >= TREND_WEEKS) monthAgo = { at: state.tick, vitals: now };
-    const trends = trendsOf(now, monthAgo.vitals);
-    for (const [key, cell] of [
-      ['people', people], ['weeks', food], ['wood', wood], ['morale', spirits],
-    ] as const) {
-      const way = trends[key];
-      cell.arrow.innerHTML = way === 'steady' ? '' : TREND_MARK[way];
-      cell.arrow.dataset.way = way;
-    }
-    lastVitals = now;
-    people.value.textContent = String(now.people);
-    food.value.textContent = String(now.weeks);
-    wood.value.textContent = String(now.wood);
-    spirits.value.textContent = String(now.morale);
-    people.cell.title = renderUiText('app.vitals.people', { count: now.people });
-    food.cell.title = renderUiText('app.vitals.food', { weeks: now.weeks });
-    wood.cell.title = renderUiText('app.vitals.wood', { count: now.wood });
-    spirits.cell.title = renderUiText('app.vitals.morale', { value: now.morale });
-    // La comida es la unica que avisa: §5.3 mata de hambre, y una aldea con
-    // menos de un mes de reserva esta a un mal invierno de eso.
-    food.cell.classList.toggle('thin', now.weeks < 4);
-    // Y la línea de estado. Se recalcula en cada pintado porque `doingNow` es
-    // pura y barata —lee el estado y no consume nada— y porque la obra en
-    // marcha cambia a mitad de semana cuando se termina algo.
-    const said = doingNow(state);
-    doing.textContent = said === null ? '' : renderUiText(said.key, said.params);
-    doing.hidden = said === null;
+    // UI-R2 · hora, fecha, tira, tendencias, actividad y resumen de órdenes:
+    // todo lo que antes eran quince líneas sueltas por fotograma es ahora una
+    // sola llamada, pura respecto al DOM que no le pertenece (`hud.ts`).
+    hud.paint(state, fraction);
+    // Y si la hoja de órdenes está abierta, que sus botones sigan lo que diga
+    // el estado: el único escritor es `actions.setIntent`, así que en la
+    // práctica de hoy esto nunca discrepa de lo que ya pintó `navigate` al
+    // entrar — pero un panel no debe fiarse de que nadie más vaya a tocar el
+    // estado mientras está montado.
+    if (currentRoute.kind === 'orders') orders.update(snapshot());
     // The same kind of observability hook as `data-app-ready` (M-19): the year
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.
@@ -977,11 +697,30 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     }
   });
   root.addEventListener('pointerup', (event) => {
-    const points = trace.get(event.pointerId) ?? [];
-    points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
-    const gesture = recogniseGesture({ points });
+    const points = trace.get(event.pointerId);
     trace.delete(event.pointerId);
     if (trace.size < 2) { pinchStart = null; twistStart = null; midStart = null; }
+    // UI-R2 · sin un `pointerdown` de este mismo dedo capturado antes —es
+    // decir, sin que `onValley` diera cierto entonces—, no hay gesto del
+    // valle que reconocer. Antes de este cambio se seguía adelante con
+    // `trace.get(...) ?? []` y un único punto empujado a mano: con un solo
+    // punto, `first === last` siempre, así que `recogniseGesture` daba
+    // siempre 'tap' (distancia y duración cero) — **cualquier clic en
+    // cualquier botón de la interfaz**, no sólo el lienzo, acababa lanzando
+    // `backend.live.pick` sobre el punto de la pantalla y navegando a lo que
+    // hubiera debajo. Para un botón que también llama a `actions.navigate`
+    // (las pestañas, por ejemplo) el `click` real llegaba después y
+    // corregía el resultado sin que se notara; para uno que no lo hace —los
+    // botones de `orders.ts`, montados dentro de `shell.content`— el pick
+    // espurio disparaba `navigate({kind:'inspect',…})`, que vacía
+    // `shell.content` y **retira el propio botón del árbol antes de que
+    // llegue su `click`**, así que la orden nunca se aplicaba. Medido con un
+    // clic de Playwright de verdad sobre «Sowing: Heavy»: la hoja entera
+    // desaparecía y el juego navegaba a la ficha de un edificio cualquiera
+    // bajo el dedo, sin que ninguna orden cambiase.
+    if (points === undefined) return;
+    points.push({ x: event.clientX, y: event.clientY, atMs: event.timeStamp });
+    const gesture = recogniseGesture({ points });
     if (gesture === 'tap' || gesture === 'hold') {
       // **Dos toques seguidos vuelven a la vista de partida.** Es la salida de
       // emergencia de poder girar: quien se pierde dando vueltas al valle
@@ -1103,7 +842,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       lastFraction = 0;
       // La aldea nueva no "cambia" respecto a la que se acaba de cerrar: sin
       // esto, sus cuatro cifras nacían con un bump que no correspondía a nada.
-      lastVitals = vitalsOf(state);
+      hud.reset();
       app.setSpeed(1);
       paint(0);
       persist();
@@ -1216,10 +955,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     setSpeed(value: Speed): void {
       if (!isSpeed(value)) throw new Error(`Unsupported speed: ${value as number}`);
       speed = value;
-      for (const [candidate, button] of buttons) button.setAttribute('aria-pressed', String(candidate === speed));
-      speedBadge.textContent = speedLabel(speed);
-      // Elegida, la regleta se recoge: es un desplegable, no un panel.
-      controls.hidden = true;
+      hud.setSpeed(speed);
     },
     state(): Readonly<GameState> { return state; },
     archive(): readonly ArchivedGame[] { return archive; },
