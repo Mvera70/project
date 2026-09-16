@@ -51,15 +51,22 @@ export function navTabFor(route: SheetRoute): NavTab {
 
 /**
  * Si el contenedor de la bandeja (`content`) debe estar visible para esta
- * ruta. Sólo `orders` e `inspect` montan un panel dentro de la carcasa en
- * esta ronda: `chronicle` y `people` siguen sirviéndose por los adaptadores
- * de pantalla completa de `src/ui/screens/`, que UI-R3/UI-R4 migran (plan
- * §6, «los adaptadores existentes siguen atendiendo las pantallas que aún no
- * se han migrado»). Sacarlo a función pura es lo que permite comprobar esa
- * frontera sin levantar DOM.
+ * ruta, y cuál.
+ *
+ * **UI-R5.** Hasta esta ronda sólo conocía `orders`/`inspect`: `chronicle` y
+ * `people` ya vivían dentro de `shell.content` desde UI-R3/UI-R4, pero esas
+ * rondas no podían tocar este fichero (congelado mientras corrían en
+ * paralelo sobre el mismo contrato) y tuvieron que destapar la bandeja a
+ * mano desde `app.ts` —`shell.element.querySelector('.ui-shell-content')` +
+ * `hidden = false`—, dos rodeos documentados en `docs/ui-redesign/
+ * rounds/UI-R3.md` §3.2 y `UI-R4.md` §5.1. El integrador de UI-R5 sí puede
+ * tocar `shell.ts`, así que las cuatro rutas que montan algo dentro de la
+ * carcasa quedan aquí, en un solo sitio, y `app.ts` deja de leer el DOM de
+ * la carcasa por su cuenta para decidir su propia visibilidad. `valley` es
+ * la única ruta que no monta nada: es el valle mismo, sin bandeja encima.
  */
-export function contentRouteFor(route: SheetRoute): 'orders' | 'inspect' | null {
-  return route.kind === 'orders' || route.kind === 'inspect' ? route.kind : null;
+export function contentRouteFor(route: SheetRoute): 'orders' | 'inspect' | 'chronicle' | 'people' | null {
+  return route.kind === 'valley' ? null : route.kind;
 }
 
 /**

@@ -41,17 +41,17 @@ describe('navTabFor · docs/design.md §11.2, cinco rutas', () => {
   });
 });
 
-describe('contentRouteFor · qué monta la bandeja de la carcasa en esta ronda', () => {
-  it('sólo órdenes y ficha piden un panel dentro de `content`', () => {
+describe('contentRouteFor · qué monta la bandeja de la carcasa (UI-R5)', () => {
+  it('órdenes, ficha, crónica y gente piden un panel dentro de `content`', () => {
     const target = { kind: 'terrain', x: 0, y: 0 } as const;
     expect(contentRouteFor({ kind: 'orders' })).toBe('orders');
     expect(contentRouteFor({ kind: 'inspect', target, from: 'valley' })).toBe('inspect');
+    expect(contentRouteFor({ kind: 'chronicle' })).toBe('chronicle');
+    expect(contentRouteFor({ kind: 'people' })).toBe('people');
   });
 
-  it('crónica, gente y valle no montan nada en la bandeja — siguen sin migrar (plan §6)', () => {
+  it('sólo el valle no monta nada en la bandeja: es el valle mismo, sin hoja encima', () => {
     expect(contentRouteFor({ kind: 'valley' })).toBeNull();
-    expect(contentRouteFor({ kind: 'chronicle' })).toBeNull();
-    expect(contentRouteFor({ kind: 'people' })).toBeNull();
   });
 });
 

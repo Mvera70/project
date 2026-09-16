@@ -5,14 +5,14 @@
 // welcome digest of a return from absence (§9.2, §13.2) is M-23's `sinceTick`
 // to spend; today it only decides where the list opens.
 
-import { renderChronicleYear, renderUiText } from '@engine/chronicle/render';
+import { renderChronicleYear, renderEntry, renderUiText } from '@engine/chronicle/render';
 import { makeBundle, type RngBundle } from '@engine/rng';
-import type { ArchivedGame, ChronicleEntry } from '@engine/state';
+import type { ArchivedGame, ChronicleEntry, HappeningRecord } from '@engine/state';
 import { yearOf } from '@engine/time';
 import type { App } from '../app';
 import { roman } from '../app';
 import { recogniseGesture, type Point } from '../gestures';
-import type { PanelFactory, UiSnapshot } from '../redesign/contracts';
+import type { PanelFactory, UiActions, UiSnapshot } from '../redesign/contracts';
 
 const STYLE_ID = 'valley-chronicle-style';
 const STYLE = `
@@ -46,6 +46,15 @@ const STYLE = `
    piel de la crónica no dependa de una regla ajena que un día podría
    cambiar — el mismo criterio que \`shell.css\` ya sigue consigo mismo. */
 .chronicle-scrim { pointer-events: auto; }
+/* UI-R5 · el nombre de un vivo dentro de una línea de crónica, cuando el
+   motor da un identificador real (ver \`personLinksFor\`, más abajo): un
+   trazo de texto en línea, nunca un botón en bloque — es una palabra dentro
+   de una frase, no una fila de lista. */
+.chronicle-name-link { display: inline; margin: 0; padding: 0; border: 0; background: transparent;
+  color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 2px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.chronicle-name-link:hover, .chronicle-name-link:focus-visible { color: var(--gild-lit, #c9ab6b); }
+.chronicle-name-link:focus-visible { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 2px; }
 `;
 
 function ensureStyle(): void {
@@ -60,6 +69,15 @@ interface ChronicleSource {
   chronicle: readonly ChronicleEntry[];
   rng: RngBundle;
   lastTick: number;
+  /**
+   * UI-R5 · sólo la partida en curso lo trae — `ArchivedGame` no guarda
+   * `happenings` (§13.1: el archivo guarda la crónica, no los registros
+   * efímeros del tick) —, así que enlazar un nombre a su ficha sólo
+   * funciona leyendo «esta partida», nunca una archivada. `undefined` es
+   * «no hay con qué enlazar», no «no enlaces nada a propósito»: las dos se
+   * comportan igual (`linkChronicleNames` no hace nada sin esto).
+   */
+  happenings?: readonly HappeningRecord[];
 }
 
 function yearBlock(source: ChronicleSource, year: number): HTMLElement | null {
@@ -74,6 +92,120 @@ function yearBlock(source: ChronicleSource, year: number): HTMLElement | null {
     return p;
   }));
   return section;
+}
+
+/**
+ * UI-R5 · El único identificador real y estable que una entrada de la
+ * crónica puede llevar hasta hoy, y por qué no es un texto adivinado.
+ *
+ * `ChronicleEntry.params` (`src/engine/state.ts`) es texto ya compuesto —
+ * nombres, no ids—; UI-R3 lo comprobó (§3.4 de su informe) y no enlazó nada
+ * por eso. Pero un suceso del valle (R-1, `kind: 'happening'`) sí deja un
+ * rastro con id de verdad: `sim.ts`, paso 2b, empuja **en el mismo tick** la
+ * línea de crónica (`say(fated.entry)`) y el registro (`state.happenings.
+ * push(fated.record)`), y `world/fate.ts` sólo llena `record.who` —
+ * `VillagerId[]`, nunca un nombre— para `quarrel_in_the_square` (los dos
+ * implicados) y `child_lost` cuando el niño está nombrado. Como el motor
+ * tira `fate` como mucho una vez por semana (`FATE.MIN_GAP_WEEKS`), el tick
+ * identifica el registro sin ambigüedad: no hace falta comparar texto para
+ * saber a quién pertenece.
+ *
+ * Empareja cada nombre de `entry.params` (`A`, `B`, en ese orden, el mismo
+ * en que `fate.ts` los escribe) con el id que ocupa su misma posición en
+ * `record.who` — la convención que hoy siguen los dos únicos sucesos que
+ * nombran a alguien. Si algún día un suceso nuevo no la sigue, esta función
+ * simplemente no encuentra pareja para ese nombre y no enlaza nada: el
+ * fallo seguro es no enlazar, nunca enlazar mal.
+ */
+export function personLinksFor(
+  entry: ChronicleEntry,
+  record: HappeningRecord,
+): readonly { readonly name: string; readonly id: number }[] {
+  const links: { name: string; id: number }[] = [];
+  (['A', 'B'] as const).forEach((key, index) => {
+    const name = entry.params[key];
+    const id = record.who[index];
+    if (typeof name === 'string' && name.length > 0 && id !== undefined) links.push({ name, id });
+  });
+  return links;
+}
+
+/**
+ * Envuelve cada aparición de un nombre enlazable dentro de un párrafo ya
+ * escrito, sin tocar el resto del texto. No es "analizar la frase para
+ * adivinar quién es quién" (lo que el brief prohíbe): el párrafo ya viene
+ * emparejado uno a uno con la entrada exacta que lo escribió (ver
+ * `linkChronicleNames`), así que cualquier aparición literal de ese nombre
+ * dentro de **este** párrafo concreto es, con certeza, esa persona — el
+ * mismo nombre puede repetirse dentro de una sola plantilla (`{A} ... {A}`,
+ * `fate.child_lost.named`) y las dos tienen que enlazar igual.
+ *
+ * Los nombres más largos se prueban antes que los cortos para que un nombre
+ * que sea prefijo de otro (poco frecuente, pero el catálogo de nombres no lo
+ * prohíbe) no se coma la mitad del más largo.
+ */
+function linkNamesInParagraph(
+  p: HTMLParagraphElement,
+  links: readonly { readonly name: string; readonly id: number }[],
+  actions: UiActions,
+): void {
+  const names = [...links].sort((a, b) => b.name.length - a.name.length);
+  const pattern = new RegExp(`(${names.map((n) => n.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+  const text = p.textContent ?? '';
+  const parts = text.split(pattern);
+  if (parts.length <= 1) return; // ninguna coincidencia: el párrafo se deja tal cual
+  const idByName = new Map(names.map((n) => [n.name, n.id] as const));
+  p.replaceChildren(...parts.map((part) => {
+    const id = idByName.get(part);
+    if (id === undefined) return document.createTextNode(part);
+    const link = document.createElement('button');
+    link.type = 'button';
+    link.className = 'chronicle-name-link';
+    link.textContent = part;
+    link.setAttribute('aria-label', renderUiText('chronicle.person.link', { name: part }));
+    // No debe disparar además el gesto de deslizar/cerrar del contenedor.
+    link.addEventListener('click', (event) => {
+      event.stopPropagation();
+      actions.navigate({ kind: 'inspect', target: { kind: 'villager', id }, from: 'valley' });
+    });
+    return link;
+  }));
+}
+
+/**
+ * Recorre un bloque de año ya construido (`yearBlock`, sin tocar) y enlaza
+ * los nombres que tengan un id real detrás. Para cada suceso del valle de
+ * ese año con alguien implicado, calcula el texto exacto que
+ * `renderChronicleYear` habría producido para él —`renderEntry` con el
+ * mismo índice absoluto en `source.chronicle`, porque un suceso de §7.10
+ * nunca se agrupa (`yearKey`, `chronicle/events.ts`, no reconoce ninguna
+ * plantilla `fate.*`: siempre sale en su propia línea, palabra por
+ * palabra)— y busca el único párrafo que dice exactamente eso. Sin
+ * `source.happenings` (una partida archivada) no hay nada que hacer.
+ */
+function linkChronicleNames(
+  block: HTMLElement,
+  source: ChronicleSource,
+  year: number,
+  actions: UiActions,
+): void {
+  const happenings = source.happenings;
+  if (happenings === undefined || happenings.length === 0) return;
+  const paragraphs = [...block.querySelectorAll('p')];
+  const claimed = new Set<HTMLParagraphElement>();
+  for (const entry of source.chronicle) {
+    if (entry.kind !== 'happening' || entry.weight < 2 || yearOf(entry.tick) !== year) continue;
+    const record = happenings.find((h) => h.tick === entry.tick);
+    if (record === undefined) continue;
+    const links = personLinksFor(entry, record);
+    if (links.length === 0) continue;
+    const index = source.chronicle.indexOf(entry);
+    const expected = renderEntry(entry, source.rng, index);
+    const p = paragraphs.find((el) => !claimed.has(el) && el.textContent === expected);
+    if (p === undefined) continue; // agrupado o ya reclamado por otra entrada idéntica: no se enlaza
+    claimed.add(p);
+    linkNamesInParagraph(p, links, actions);
+  }
 }
 
 let open: HTMLElement | null = null;
@@ -283,14 +415,22 @@ export const chroniclePanel: PanelFactory = (actions) => {
   const sourceFor = (snapshot: UiSnapshot): ChronicleSource => {
     const game = selectedArchive === null ? undefined : snapshot.archive[selectedArchive];
     if (game !== undefined) return archivedSource(game);
-    return { chronicle: snapshot.state.chronicle, rng: snapshot.state.rng, lastTick: snapshot.state.tick };
+    // UI-R5 · `happenings` viaja aquí y sólo aquí (nunca en `archivedSource`,
+    // que no lo tiene) — es lo que permite enlazar un nombre real a su
+    // ficha (`linkChronicleNames`), sólo para la partida que se está jugando.
+    return {
+      chronicle: snapshot.state.chronicle,
+      rng: snapshot.state.rng,
+      lastTick: snapshot.state.tick,
+      happenings: snapshot.state.happenings,
+    };
   };
 
   const fullRender = (source: ChronicleSource): void => {
     body.replaceChildren();
     for (let year = yearOf(source.lastTick); year >= 0; year -= 1) {
       const block = yearBlock(source, year);
-      if (block !== null) body.append(block);
+      if (block !== null) { linkChronicleNames(block, source, year, actions); body.append(block); }
     }
     renderedYear = yearOf(source.lastTick);
     renderedTick = source.lastTick;
@@ -308,6 +448,7 @@ export const chroniclePanel: PanelFactory = (actions) => {
     if (year === renderedYear) {
       const block = yearBlock(source, year);
       if (block !== null) {
+        linkChronicleNames(block, source, year, actions);
         const first = body.firstElementChild;
         if (first !== null) first.replaceWith(block); else body.prepend(block);
       }
@@ -317,7 +458,7 @@ export const chroniclePanel: PanelFactory = (actions) => {
       const blocks: HTMLElement[] = [];
       for (let y = year; y > (renderedYear ?? -1); y -= 1) {
         const block = yearBlock(source, y);
-        if (block !== null) blocks.push(block);
+        if (block !== null) { linkChronicleNames(block, source, y, actions); blocks.push(block); }
       }
       if (blocks.length > 0) body.prepend(...blocks);
     }
