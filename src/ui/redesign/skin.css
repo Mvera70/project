@@ -1,0 +1,452 @@
+/* UI-V0 · Las primitivas de la piel. `docs/ui-redesign/piel/plan-piel.md` §2.
+
+   Este fichero es **el vocabulario** de las seis rondas siguientes: una clase
+   por pieza del prototipo, con su papel, su borde rasgado, su sombra y su
+   tipografía ya puestos. UI-V1 a UI-V5 componen con estas clases y **no
+   redefinen colores ni fuentes**: si algo no se puede hacer con lo que hay
+   aquí, la pieza que falta se añade aquí y se dice en el informe.
+
+   Por qué así: la tanda anterior (UI-R1 a UI-R6) dio la estructura de los
+   prototipos y no su aspecto, en parte porque cada ronda decidía su propia
+   piel sobre tokens que venían del juego viejo (`plan-piel.md` §1). Con un
+   kit, «se parece al prototipo» deja de ser criterio de cada agente.
+
+   Todo lo de aquí se mide en el prototipo y está convertido a 390 px de ancho
+   en `plan-piel.md` §3. Nada se inventa a ojo. */
+
+/* --------------------------------------------------------------- fuentes */
+/* Empaquetadas, sin red (`CLAUDE.md`: la demo abre sin servidor). Son
+   **variables**, así que un fichero cubre todos los pesos y se declara el
+   rango: el navegador interpola 400 y 600 del mismo woff2. `swap` para que el
+   texto se lea con la pila de respaldo mientras llegan — nunca invisible.
+
+   **Viven junto a este fichero y no en `public/`, y es por §13.4.** Un fichero
+   de `public/` se referencia por ruta absoluta (`/fonts/...`), y eso funciona
+   en la raíz de un dominio y se rompe en el subdirectorio de Pages, que es el
+   fallo que `tools/subpath.pwa.ts` existe para cazar. Pasando por Vite, la
+   ruta la escribe el empaquetador y resuelve en desarrollo, en la raíz y en
+   `/project/` sin tocar nada.
+
+   El precio de esa decisión, dicho: como el nombre del fichero lleva huella,
+   `index.html` no puede precargarlas con un `<link rel=preload>` de ruta
+   fija, así que **no se precachean en la instalación**; las guarda
+   `cacheFirst` (`public/sw.js`) en la primera visita. Eso cumple lo que §13.4
+   promete —«a partir de la segunda apertura, sin red»— y en la primera el
+   texto se lee con la pila de respaldo mientras llegan los 93 KB. */
+@font-face {
+  font-family: 'Cinzel';
+  src: url('./fonts/cinzel.woff2') format('woff2-variations'),
+       url('./fonts/cinzel.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('./fonts/garamond.woff2') format('woff2-variations'),
+       url('./fonts/garamond.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'EB Garamond';
+  src: url('./fonts/garamond-italic.woff2') format('woff2-variations'),
+       url('./fonts/garamond-italic.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------- papeles */
+
+/**
+ * El pergamino: un color de la paleta con la textura multiplicada encima.
+ *
+ * `background-blend-mode: multiply` es lo que deja que el tono lo siga
+ * mandando el token y la textura sólo aporte grano — si la textura llevara
+ * color, cada superficie tendría dos fuentes de color discutiendo.
+ */
+.skin-paper {
+  background-color: var(--skin-parchment);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  color: var(--skin-ink);
+}
+.skin-paper--deep { background-color: var(--skin-parchment-deep); }
+.skin-paper--page { background-color: var(--skin-page); }
+.skin-paper--aged { background-color: var(--skin-parchment-aged); }
+
+/**
+ * Una placa: papel recortado a mano, ligeramente girado, con su sombra.
+ *
+ * El giro va por token y no al azar: el prototipo las tiene inclinadas, y una
+ * rotación que cambiara en cada pintado sería un tic, no un papel.
+ */
+.skin-plate {
+  background-color: var(--skin-parchment);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  color: var(--skin-ink);
+  clip-path: var(--skin-deckle-plate);
+  filter: drop-shadow(0 2px 3px rgba(27, 22, 19, .3));
+  box-sizing: border-box;
+}
+/* La sombra va en `filter` y no en `box-shadow` a propósito: con `clip-path`,
+   una `box-shadow` dibuja la sombra del rectángulo entero y se ve el borde
+   recto que el rasgado acababa de quitar. */
+
+.skin-plate--chip {
+  background-color: var(--skin-parchment-deep);
+  clip-path: var(--skin-deckle-chip);
+}
+.skin-plate--chip:nth-of-type(2) { clip-path: var(--skin-deckle-chip-b); transform: rotate(var(--skin-tilt-b)); }
+.skin-plate--chip:nth-of-type(3) { clip-path: var(--skin-deckle-chip-c); transform: rotate(var(--skin-tilt-c)); }
+.skin-plate--chip:nth-of-type(4) { clip-path: var(--skin-deckle-chip-d); transform: rotate(var(--skin-tilt-d)); }
+.skin-plate--chip:nth-of-type(1) { transform: rotate(var(--skin-tilt-a)); }
+
+.skin-plate--card {
+  clip-path: var(--skin-deckle-card);
+  transform: rotate(var(--skin-tilt-card));
+}
+.skin-plate--sealed {
+  background-color: var(--skin-parchment-deep);
+  clip-path: var(--skin-deckle-card);
+  transform: rotate(var(--skin-tilt-sealed));
+}
+.skin-plate--sheet {
+  background-color: var(--skin-parchment-deep);
+  clip-path: var(--skin-deckle-sheet);
+  transform: none;
+}
+/* Un control redondo (velocidad, sonido): sin rasgado, con sombra real. */
+.skin-plate--round {
+  clip-path: none;
+  border-radius: 50%;
+  filter: none;
+  box-shadow: var(--skin-shadow);
+}
+
+/* ------------------------------------------------------------ tipografía */
+
+/** La inscripción: fechas, cifras, ANNO, nombres. Versalitas de Cinzel. */
+.skin-inscription {
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  letter-spacing: var(--skin-track-inscription);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+/** Una etiqueta pequeña: navegación, chips de rasgo. */
+.skin-label {
+  font-family: var(--skin-font-voice);
+  font-weight: 400;
+  font-size: var(--skin-text-label);
+  letter-spacing: var(--skin-track-label);
+  text-transform: uppercase;
+}
+/** Lo que se lee seguido: la crónica, la frase de la bandeja. */
+.skin-read {
+  font-family: var(--skin-font-read);
+  font-weight: 400;
+  font-size: var(--ui-text-reading-size);
+  line-height: var(--ui-text-reading-line);
+  text-wrap: pretty;
+}
+.skin-read--aside {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--skin-ink-faded);
+}
+
+/* ---------------------------------------------------------------- filetes */
+
+/** Un filete con un rombo en medio, como los del prototipo 02. */
+.skin-rule {
+  border: 0;
+  height: 1px;
+  margin: 0;
+  background: var(--skin-rule-gold);
+  position: relative;
+}
+.skin-rule::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--skin-gold);
+}
+.skin-rule--plain::after { display: none; }
+/** Un filete vertical, para separar cifras o pestañas. */
+.skin-rule-v {
+  width: 1px;
+  align-self: stretch;
+  background: var(--skin-rule-on-paper);
+}
+.skin-rule-v--on-wood { background: var(--skin-rule-on-wood); }
+
+/* ----------------------------------------------------- capitular y sello */
+
+/**
+ * La capitular de la crónica: cuadrado rojo, filete de oro dentro, la letra
+ * en oro claro. 54 × 54 en el prototipo 02.
+ */
+.skin-capital {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  display: grid;
+  place-items: center;
+  background: var(--skin-red);
+  box-shadow: inset 0 0 0 2px var(--skin-gold);
+  color: var(--skin-gold-lit);
+  font-family: var(--skin-font-voice);
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1;
+}
+.skin-capital--dark { background: var(--skin-wood-plaque); }
+
+/**
+ * El sello de lacre de una decisión. ⌀ 48, colgando del borde de la tarjeta.
+ * El borde irregular es el mismo rasgado de los chips, que a este tamaño se
+ * lee como lacre apretado.
+ */
+.skin-seal {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: grid;
+  place-items: center;
+  background: var(--skin-red-deep);
+  clip-path: var(--skin-deckle-chip);
+  color: var(--skin-gold-lit);
+  filter: drop-shadow(0 1px 2px rgba(27, 22, 19, .45));
+}
+.skin-seal .skin-icon { width: 26px; height: 26px; }
+
+/* ------------------------------------------------------- medallón y chips */
+
+/** El retrato del prototipo 03. Sin dibujo, lleva el monograma (§3.3). */
+.skin-medallion {
+  width: 90px;
+  height: 90px;
+  flex: 0 0 90px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  box-shadow: inset 0 0 0 2px var(--skin-ink), var(--skin-shadow);
+  color: var(--skin-ink);
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 1;
+}
+.skin-medallion--small {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  font-size: 20px;
+  box-shadow: inset 0 0 0 1.5px var(--skin-ink);
+}
+
+/** Un chip de rasgo: pergamino con borde curtido, en versalitas. */
+.skin-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  background: var(--skin-parchment-deep);
+  border: 1px solid var(--skin-parchment-aged);
+  color: var(--skin-ink-soft);
+  font-family: var(--skin-font-voice);
+  font-weight: 400;
+  font-size: var(--skin-text-label);
+  letter-spacing: var(--skin-track-label);
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------- botones */
+
+/** El botón de madera del prototipo 03 (FOLLOW). */
+.skin-button--wood {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--skin-wood-soft);
+  color: var(--skin-gold-lit);
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: var(--skin-track-inscription);
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--skin-shadow);
+}
+/** Y el de pergamino que lo acompaña (LIFE STORY). */
+.skin-button--parchment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid var(--skin-parchment-aged);
+  border-radius: 10px;
+  background-color: var(--skin-parchment);
+  background-image: var(--skin-parchment-texture);
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  color: var(--skin-ink);
+  font-family: var(--skin-font-voice);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: var(--skin-track-inscription);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.skin-button--wood:active,
+.skin-button--parchment:active { transform: translateY(1px); }
+.skin-button--wood:focus-visible,
+.skin-button--parchment:focus-visible {
+  outline: 2px solid var(--skin-gold);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------- navegación */
+
+/**
+ * La barra de abajo: tres celdas con icono y etiqueta, filetes entre ellas.
+ * La activa se marca con subrayado de ocre sobre papel (prototipo 01) o con
+ * una placa de madera (prototipos 02 y 03) — las dos variantes existen porque
+ * el prototipo usa una u otra según la pantalla, y `plan-piel.md` §3.4 dice
+ * cuál va en cada ruta.
+ */
+.skin-nav {
+  display: flex;
+  align-items: stretch;
+  min-height: var(--ui-nav-height);
+  background-color: var(--skin-parchment);
+  background-image: var(--skin-parchment-texture);
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  border-top: 1px solid var(--skin-rule-on-paper);
+}
+.skin-nav--wood {
+  background-color: var(--skin-wood);
+  background-image: none;
+  border-top: 1px solid var(--skin-rule-on-wood);
+}
+.skin-nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: var(--ui-tap-min);
+  padding: var(--ui-space-1) 2px;
+  border: 0;
+  background: transparent;
+  color: var(--skin-ink-soft);
+  cursor: pointer;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.skin-nav--wood .skin-nav-tab { color: var(--skin-parchment-deep); }
+.skin-nav-tab .skin-icon { width: 22px; height: 22px; }
+/* El subrayado de la pestaña activa: 40 px de ocre bajo la etiqueta. */
+.skin-nav-tab[aria-pressed="true"]::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  width: 40px;
+  height: 2px;
+  background: var(--skin-ochre);
+}
+.skin-nav--wood .skin-nav-tab[aria-pressed="true"] { color: var(--skin-gold-lit); }
+.skin-nav--wood .skin-nav-tab[aria-pressed="true"]::after { background: var(--skin-gold-lit); }
+/* La placa de madera del prototipo 02, para la pestaña activa sobre papel. */
+.skin-nav--plaque .skin-nav-tab[aria-pressed="true"] {
+  background: var(--skin-wood-plaque);
+  color: var(--skin-gold-lit);
+  border-radius: 6px;
+  margin: 6px 4px;
+}
+.skin-nav--plaque .skin-nav-tab[aria-pressed="true"]::after { display: none; }
+.skin-nav-tab:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: -3px; }
+
+/* ------------------------------------------------- borde de la bandeja */
+
+/**
+ * El borde curvado superior de la bandeja (prototipo 01).
+ *
+ * Respaldo mientras `public/ui/art/scroll-edge.svg` no exista
+ * (`encargo-arte-piel.md` §3): una franja de madera de 6 px con las esquinas
+ * redondeadas. La clase es la misma, así que el día que llegue el SVG basta
+ * darle `mask-image` aquí y ninguna ronda tiene que cambiar de marcado.
+ */
+.skin-scroll-edge {
+  height: 6px;
+  background: var(--skin-wood);
+  border-radius: 18px 18px 0 0;
+}
+
+/** El ornamento de la bandeja: la hoja entre dos filetes cortos. */
+.skin-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2);
+  color: var(--skin-gold);
+}
+.skin-ornament::before,
+.skin-ornament::after {
+  content: '';
+  width: 40px;
+  height: 1px;
+  background: var(--skin-rule-gold);
+}
+.skin-ornament .skin-icon { width: 22px; height: 22px; }
+
+/* ----------------------------------------------------------------- iconos */
+
+/**
+ * Un icono del sprite. Se usa así, y el `href` es **relativo al documento**
+ * (§13.4: el mismo build sirve desde la raíz y desde `/project/`):
+ *
+ *   <svg class="skin-icon" aria-hidden="true"><use href="./ui/icons.svg#people"/></svg>
+ */
+.skin-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+}
+/* El árbol del sello va relleno, no de trazo: es una silueta. */
+.skin-seal .skin-icon { fill: currentColor; stroke: none; }
+
+/* ------------------------------------------------------------ movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .skin-button--wood:active,
+  .skin-button--parchment:active { transform: none; }
+}

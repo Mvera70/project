@@ -5,6 +5,11 @@
 // `tools/graphics/bundle-game.ts`, que ya sabe volver `<link>` en `<style>`
 // inline para la demo sin red (`inline()` en ese fichero).
 import './redesign/tokens.css';
+// UI-V0 · el kit de la piel (`plan-piel.md` §2): papeles, placas, versalitas,
+// capitular, sello, medallón, botones y navegación. Va **antes** de
+// `shell.css` a propósito: el kit define las primitivas y la carcasa las
+// compone, así que si las dos tocan lo mismo manda la de la carcasa.
+import './redesign/skin.css';
 import './redesign/shell.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
