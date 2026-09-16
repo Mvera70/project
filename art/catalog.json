@@ -584,60 +584,61 @@
     },
     {
       "id": "mill",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/mill/mill.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-05-14-326Z-50220",
-        "directory": "artifacts/graphics/G-10/approved/3e23d151263a6745"
+        "runId": "2026-09-16T17-04-10-583Z-48892",
+        "directory": "artifacts/graphics/G-21/approved/2aad24fd4802a4a1"
       },
       "bounds": {
         "min": [
-          0.066667,
+          0.076667,
           0,
           -1.833333
         ],
         "max": [
-          1.933333,
-          2.666667,
-          -0.083333
+          1.923333,
+          2.656667,
+          -0.001167
         ],
         "size": [
-          1.866667,
-          2.666667,
-          1.75
+          1.846667,
+          2.656667,
+          1.832167
         ]
       },
-      "recipeSha256": "870FAE8E1D760B9FB503B3112441EDC8D285B1A0C5C0F75F20A1F11911979A8A",
+      "recipeSha256": "796A56B9CB8A14133CC9F2E3950A858030868AC6B9248DC11B49B7152E527A43",
       "materials": [
         "stone",
         "roof",
-        "wood"
+        "wood",
+        "sail"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 90
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 966
       },
       "hashes": {
-        "mill.blend": "7858A114EA5AE7216A2C8F5D9EDBCE04F09881D83EC7F2DB34A5D842F984CD3A",
-        "mill.glb": "3E23D151263A67452FE183CDAB5EC2DBA9D278E4D8BC3E36E0F676EE0BAF9E00",
-        "mill-blender.png": "6F4B5538C2DFB573ACD2DFF556B18E93E70EC0B1A2B749620C4A7BEB2E91A695",
-        "capture-1.png": "0093D182C6F9556C3C098979A7F83BE728927AAD517457709F0E0114530368E6",
-        "capture-1-gray.png": "2EEB0A677FECD99BEC63094569BD05225ADC7258B87E688D2FC8C7E603F63E4C",
-        "capture.json": "9E5F5A8B2985CBF339732CB1B770355753A73A1512BDAA9E4EFE9EBA38BB7276",
-        "build.json": "7890F4F560264345DD9CFD8631A638FD8864D5D615F80D25FCCD4D38BBAB614E",
-        "validation.json": "E1A5CFFCD3AF04520ACA5C98109BD9CC2BD87050DB20DCA85E3245B920460718"
+        "mill.blend": "2F8984BD8EF63382F3DE2C12134DDE5FE6F31FFB2CC8087159F324EBAC6B70B1",
+        "mill.glb": "2AAD24FD4802A4A1B748430EE1FF01B9B2AE08E9A60C93309285179CAEA157A4",
+        "mill-blender.png": "28F5ADAD57A68BF19F7B0D74455CED8BFC1C74EF393FD429624789E2E207C231",
+        "capture-1.png": "5ED45324F7DAF7B9E780CF432C0CB39F39305E492ECADA9B0A088A75EB60465A",
+        "capture-1-gray.png": "85777AE878AEA945598FAEB1288D7E7D673D02E8388E3662618AF654645E561E",
+        "capture.json": "50B80759A32BEEED712868E18F9650130A71B8B4AE31CAF9897410768BCA772E",
+        "build.json": "20E2199A1AC912A3812FEB852AD65E2DE68F58C02368D6F33304936712FF69C4",
+        "validation.json": "F794B9EE5BB405C93D75C645A96E75E3EEFE35C297B44DAD1E2FEC20A9039ADA"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original mill authored for The Valley G-10",
+        "source": "Original G-21: molino facetado con cuatro aspas de bastidor y paños de paleta común.",
         "license": "Project original"
       }
     },

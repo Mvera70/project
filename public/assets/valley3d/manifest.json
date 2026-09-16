@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T16:56:58.962Z",
+  "generatedAt": "2026-09-16T17:04:34.546Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -79,7 +79,7 @@
     {
       "id": "mill",
       "file": "mill.glb",
-      "sha256": "3E23D151263A67452FE183CDAB5EC2DBA9D278E4D8BC3E36E0F676EE0BAF9E00",
+      "sha256": "2AAD24FD4802A4A1B748430EE1FF01B9B2AE08E9A60C93309285179CAEA157A4",
       "motion": []
     },
     {
