@@ -246,6 +246,36 @@ export function createShell(actions: UiActions): ShellHandle {
   stack.append(message, nav);
   element.append(content, stack);
 
+  /**
+   * UI-V2b · **Lo alto que es la bandeja, publicado como `--ui-stack-height`.**
+   *
+   * El rincón de velocidad (`.valley-hud-right`, `index.html`) se colocaba con
+   * `bottom: 60px`, que era la altura de la barra estrecha de antes del
+   * rediseño. Con la bandeja de UI-V2 —hueco de mensaje más navegación— la
+   * medida dejó de valer y los dos círculos caían **dentro** de la bandeja:
+   * medido en el juego empaquetado a 390 × 844, la bandeja ocupaba de 669 a
+   * 844 y los círculos de 740 a 784, tapados por el papel y encima de la
+   * navegación.
+   *
+   * No se arregla con otro número fijo porque **la bandeja no tiene una altura
+   * fija**: el hueco del mensaje crece con lo que haya que decir —una frase de
+   * actividad de dos líneas, un aviso de la crónica, la pista del inicio
+   * guiado— y se encoge a nada cuando no hay nada. Así que se mide y se
+   * publica, y quien necesite quedarse por encima la lee.
+   *
+   * `ResizeObserver` y no un cálculo al montar: la altura cambia sola, sin que
+   * nadie navegue ni toque nada, cada vez que el texto del hueco cambia.
+   */
+  const publishStackHeight = (height: number): void => {
+    document.documentElement.style.setProperty('--ui-stack-height', `${Math.round(height)}px`);
+  };
+  publishStackHeight(stack.getBoundingClientRect().height);
+  const stackWatcher = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver((entries) => {
+    const entry = entries[0];
+    if (entry !== undefined) publishStackHeight(entry.contentRect.height);
+  });
+  stackWatcher?.observe(stack);
+
   const paintRoute = (route: SheetRoute): void => {
     const active = navTabFor(route);
     for (const [tabName, button] of buttons) button.setAttribute('aria-pressed', String(tabName === active));
@@ -272,7 +302,12 @@ export function createShell(actions: UiActions): ShellHandle {
     setRoute: paintRoute,
     // Los botones no llevan más que `addEventListener`: quitar `element` del
     // árbol basta para que dejen de recibir toques y para que el recolector
-    // se los lleve en cuanto nadie más los referencie.
-    dispose(): void { element.remove(); },
+    // se los lleve en cuanto nadie más los referencie. El observador de la
+    // altura sí hay que soltarlo: vive fuera del árbol, colgado del elemento.
+    dispose(): void {
+      stackWatcher?.disconnect();
+      document.documentElement.style.removeProperty('--ui-stack-height');
+      element.remove();
+    },
   };
 }

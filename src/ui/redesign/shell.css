@@ -93,6 +93,24 @@ html:not([data-screen="valley"]) .ui-shell-message { visibility: hidden; }
    navegación les tapaban la fila de abajo (captura `04-orders-open.png` de
    esta ronda, con «Build first» cortado detrás de la pista). */
 html:has(.valley-panel:not([hidden])) .ui-shell-message { visibility: hidden; }
+/* UI-V2b · **Y con una hoja abierta en la bandeja, el hueco se pliega del
+   todo, no se limita a ocultarse.**
+
+   Es el mismo defecto de arriba, reaparecido por dos motivos: la hoja de
+   órdenes se mudó a `.ui-shell-content` (así que la regla de `.valley-panel`
+   ya no la alcanza) y esta ronda metió la voz de la aldea en el hueco, que
+   pasó de 58 a 107 px de alto. Y el hueco **tapa** la hoja en vez de
+   recortarla: la pila va en z-index 14 y la hoja en 13, así que la hoja sí
+   llega hasta los 68 px del borde —lo dice su `bottom`— pero su parte de
+   abajo queda detrás del pergamino. Medido a 390 × 844: «Build first» otra
+   vez escondido, igual que en la captura `04-orders-open.png` de UI-R2.
+
+   `display: none` y no `visibility: hidden`, que es lo que las dos reglas de
+   arriba usan: ocultar sin plegar deja los 107 px reservados y la hoja sigue
+   sin poder usarlos. Plegado, la pila se queda en la navegación, la hoja se
+   ve entera y `--ui-stack-height` baja sola —lo mide un `ResizeObserver`—,
+   así que el rincón de velocidad se recoloca sin que nadie se lo diga. */
+html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
 
 /* El aviso de `notice.ts`: antes `position: absolute; bottom: calc(118px+…)`,
    fijo e independiente de todo lo demás. Aquí es un hijo de flujo normal del

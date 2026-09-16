@@ -327,7 +327,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   updateSoundToggle();
 
   const hudRight = document.createElement('div');
-  hudRight.className = 'valley-hud-right';
+  // UI-V2b · la segunda clase es la que sube el rincón por encima de la
+  // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
+  // borde, que era la altura de la barra estrecha de antes del rediseño, y
+  // con la bandeja nueva los dos círculos caían dentro de ella.
+  hudRight.className = 'valley-hud-right hud-speed-corner';
   hudRight.append(soundToggle, hud.speedControls, hud.speedBadge);
 
   root.append(canvas, hud.header, hudRight, shell.element);
@@ -361,6 +365,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const noticeBand = messageSlot.querySelector<HTMLElement>('.valley-notice');
   if (noticeBand === null) throw new Error('UI-R1 · notice.ts no montó su banda donde se esperaba');
   messageSlot.append(hint);
+  // UI-V2b · **la voz de la aldea baja a la bandeja.** La frase de actividad y
+  // la línea de órdenes vivían flotando sobre el prado arriba a la izquierda,
+  // con un parche de altura para no pisar la fila de chips; el prototipo 01 las
+  // pone centradas en la bandeja, bajo la hoja de roble. Se colocan aquí, en la
+  // misma ranura y por el mismo motivo que la pista de arriba: `hud.ts` escribe
+  // su propio DOM y no conoce la carcasa, y esta capa es la que sabe de las dos.
+  messageSlot.append(hud.say);
   let hintWantsToShow = false;
   const updateHintVisibility = (): void => {
     hint.hidden = !resolveMessageSlot(!noticeBand.hidden, hintWantsToShow).hintVisible;

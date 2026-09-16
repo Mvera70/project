@@ -287,6 +287,23 @@ export interface HudHandle {
   readonly header: HTMLElement;
   readonly speedControls: HTMLElement;
   readonly speedBadge: HTMLElement;
+  /**
+   * UI-V2b · La voz de la aldea: la frase de actividad y la línea de órdenes,
+   * en un envoltorio, **para que las coloque quien tiene la bandeja**.
+   *
+   * Hasta esta ronda las dos vivían pegadas a la cabecera y flotando sobre el
+   * prado arriba a la izquierda, con un parche de altura para no pisar la fila
+   * de chips. El prototipo 01 las pone en la bandeja de abajo, centradas bajo
+   * la hoja de roble, y ahí es donde tienen sentido: son lo que la aldea dice,
+   * no un instrumento de la cabecera.
+   *
+   * Se exponen y no se colocan aquí a propósito. `hud.ts` es la única mano que
+   * escribe su propio DOM (plan §5) y no conoce la carcasa; `app.ts` es la capa
+   * que ya hace justo esta clase de reubicación —la pista del inicio guiado
+   * entra en la misma ranura con `messageSlot.append(hint)`—, así que la
+   * decisión de *dónde* vive esto es suya y de nadie más.
+   */
+  readonly say: HTMLElement;
   /** Pinta hora, fecha, cifras, tendencias, actividad y resumen de órdenes. */
   paint(state: GameState, fraction: number): void;
   /** La velocidad elegida: marca el botón que toca y recoge la regleta. */
@@ -362,12 +379,12 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   );
 
   const doing = document.createElement('p');
-  // `hud-doing-line` sólo baja la línea lo justo para no pisar la fila de
-  // chips nueva (57–90): el prototipo pone esta frase junto a la bandeja
-  // (§3.1, y 738), que es sitio de UI-V2 (la bandeja), no de esta ronda. Es
-  // un parche de altura, no la piel — se retira en cuanto la frase baje del
-  // todo.
-  doing.className = 'valley-doing hud-doing-line';
+  // UI-V2b · `hud-say-line` deshace el posicionamiento absoluto que U-01 le
+  // puso en `index.html` (arriba a la izquierda, flotando sobre el prado) y la
+  // deja en flujo, centrada, dentro de la bandeja. **Con esto se retira el
+  // parche de altura de UI-V1** (`hud-doing-line`), que sólo existía para que
+  // la frase no pisara la fila de chips nueva mientras seguía arriba.
+  doing.className = 'valley-doing hud-say-line';
 
   /**
    * La línea que resume las órdenes, y la puerta de la hoja (`orders.ts`).
@@ -382,7 +399,7 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
    */
   const ordersNow = document.createElement('button');
   ordersNow.type = 'button';
-  ordersNow.className = 'valley-orders-now hud-orders-line';
+  ordersNow.className = 'valley-orders-now hud-say-line hud-say-orders';
   ordersNow.setAttribute('aria-label', renderUiText('app.orders.open'));
   ordersNow.addEventListener('click', () => {
     // Un único propietario de la ruta (`contracts.ts`): si ya estaban
@@ -417,9 +434,17 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   compactHeader.hidden = true;
   compactHeader.append(compactDatePlate, compactFiguresPlate);
 
+  // UI-V2b · la voz de la aldea sale de la cabecera. Las dos líneas van juntas
+  // en su envoltorio y `app.ts` lo mete en la bandeja; la cabecera se queda
+  // con lo que es instrumento —fecha, arco del sol y cifras—, que es como lo
+  // reparte el prototipo.
+  const say = document.createElement('div');
+  say.className = 'hud-say';
+  say.append(doing, ordersNow);
+
   const header = document.createElement('div');
   header.className = 'ui-hud-header';
-  header.append(datePlate, timeLine, vitals, compactHeader, doing, ordersNow);
+  header.append(datePlate, timeLine, vitals, compactHeader);
 
   // ---------------------------------------------------------------------
   // La velocidad: dos círculos (plan §3.1). Uno pausa/reanuda sin abrir nada
@@ -591,6 +616,7 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   return {
     header,
     speedControls,
+    say,
     speedBadge: speedCluster,
     paint,
     setSpeed(speed: Speed): void {
