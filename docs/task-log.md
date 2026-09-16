@@ -1,0 +1,180 @@
+# Cuaderno de tareas — el rework
+
+**Este fichero es lo primero que hay que leer, y lo último que hay que tocar
+antes de cerrar una ronda.** Existe porque el dueño del diseño dijo, el 16 sep
+2026: «te has perdido… necesitas un documento en el que te vaya guiando
+siempre». Tenía razón: había un informe por ronda (`docs/life-rounds/`,
+`docs/ui-redesign/rounds/`) pero **ningún sitio que dijera dónde estoy**, así
+que cada vez que se retomaba la sesión había que reconstruirlo leyendo commits.
+
+**La regla, y es una sola:** ninguna ronda se cierra sin actualizar aquí el
+tablero (§2), las cifras (§3) y lo abierto (§4). Si sólo se puede hacer una
+cosa, es ésta: un informe de ronda sin esta actualización es un informe que
+nadie va a encontrar.
+
+---
+
+## 1. Dónde estamos ahora mismo
+
+| Qué | Valor |
+|---|---|
+| Rama | `rework/parada-a-media` |
+| HEAD | `7822454` · «Los animales se pasaban el día andando hacia el sitio donde no hacer nada» |
+| `main` | `d2b85b7` — **nada de este rework está en `main` todavía** |
+| Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
+| Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
+| Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
+| **En vuelo ahora** | **IA-6 (historia visible)**, un agente de Sonnet sobre `scenes.ts`, `staging.ts`, `village.ts`, `commitments.ts`, `props.ts`. **No tocar esos ficheros hasta que vuelva.** |
+| Lo que estaba haciendo yo | El nivelado de la vaca (§4, punto 1) en `beasts.ts`, `decide.ts`, `steering.ts` |
+
+## 2. El tablero
+
+Orden fijado por el dueño: auditoría, movimiento, interacciones, hábitos,
+animales, fauna, escenas históricas, **y después interfaz**.
+
+### La IA de la vida (`docs/life-ai-implementation-prompt.md`)
+
+| Fase | Estado | Commit | Informe |
+|---|---|---|---|
+| IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `life-rounds/IA-0.md` |
+| IA-1 · movimiento y destinos | **hecha** | `1509121` | `life-rounds/IA-1.md` |
+| IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
+| IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `life-rounds/IA-3.md` |
+| IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
+| IA-5 · fauna silvestre (cuervos, lobos) | **siguiente** | — | — |
+| IA-6 · historia visible | **en vuelo** | — | — |
+
+### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)
+
+| Ronda | Estado | Commit |
+|---|---|---|
+| UI-R0 · auditoría y cierre de especificación | **hecha** | `f9f2df4` |
+| UI-R1 · carcasa, tokens y navegación | pendiente | — |
+| UI-R2 · cabecera, actividad, órdenes, velocidad | pendiente | — |
+| UI-R3 · crónica · UI-R4 · personas | pendientes (pueden ir en paralelo tras congelar UI-R2) | — |
+| UI-R5 · integración y decisiones · UI-R6 · validación | pendientes | — |
+
+### El rework de fondo (`docs/rework.md`)
+
+| Fase | Estado |
+|---|---|
+| R-1 · los sucesos del valle | **hecha** (v3.75), y el caos de §2.6 aplicado (v3.76) |
+| R-2 · gente distinta | **cubierta en la práctica por IA-3**; la riña con `id` la cubre IA-6 |
+| R-3 · diez rasgos de valle | pendiente. **El cuaderno del dueño ya trae las diez plantas** (`visual-reference` §4) |
+| R-4 · encrucijadas | no es trabajo: se quedan y no se afinan |
+| R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
+
+## 3. Las cifras que mandan
+
+**Movimiento** (`npx tsx tools/life-report.ts 7 23 97 --days 2`, 26 880
+cuerpo-segundos). La primera columna es el estado antes de tocar nada.
+
+| | línea de partida | ahora (`7822454`) |
+|---|---|---|
+| centro en celda cerrada | 0 | **0** |
+| círculo en celda cerrada | 1,31 % | **0,09 %** |
+| giros > π/2 estando parado | 4,75 % | **0,39 %** |
+| parados con impulso ≥ 0,9 | 0,20 % | **0,00 %** |
+
+Los giros subieron de 0,21 % a 0,39 % en `7822454` y es efecto conocido: un
+animal que ahora se queda quieto en su sitio gira ahí. **Vigilar.**
+
+**El día de cada especie** (`npx tsx tools/life-report-species.ts 7 23 --days 2`):
+
+| | andando | quieta sin nada | lo suyo |
+|---|---|---|---|
+| gallina | 51,5 % | 40,7 % | 7,6 % |
+| cerdo | 65 % | — | 34,6 % |
+| **vaca** | **93 %** | — | **5,1 %** ← el problema abierto |
+
+**Interacciones** (IA-2): 1 144 empiezan, 1 122 terminan, **0 colgadas**.
+**Sucesos del valle** (R-1, `tools/fate-report.ts`): 12,3 al año, mediana de 3
+semanas, y **8 de 12 valles se rompen a los 40 años** (el caos que el dueño
+pidió).
+
+## 4. Lo abierto, por orden de lo que más duele
+
+1. **La vaca anda el 93 % del día y pasta el 5 %.** Su pausa ya es mínima; lo
+   que queda son sus parches de pasto, a 1,2–3,2 celdas del ancla, a 0,32 celdas
+   por segundo: hasta diez segundos de ida para un pasto de catorce. El cuaderno
+   dice que «por parches» es **quedarse en un parche** y avanzar poco entre
+   tandas, no hacer viajes entre puntos. **Es lo siguiente que hago yo.**
+2. **Las nueve jornadas rojas de `rework.md` §2.8.** Casi todas son de la capa
+   de vida y sus números cambian con cada fase, así que se tocan **al final de
+   la tanda de IA**, no antes.
+3. **Un trabajador de vitest se cae en la suite rápida en paralelo**
+   («Worker exited unexpectedly»; no es montículo, con 4 GB cae igual), y **la
+   suite ya no cabe en treinta segundos** como promete `CLAUDE.md`. Hay que
+   decidir si las tres pruebas caras del motor (bosque de un siglo 19 s, riñas
+   25 s, crónica anual 12 s) se mudan a las jornadas o si se reescribe la
+   promesa. Bloquea UI-R6, que pide la suite entera.
+4. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
+   se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
+   e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.
+5. **Dos decisiones del dueño, pendientes de él**: `spring_valley` y
+   `wide_ford` se contradicen literalmente como pareja de rasgos, y
+   `spring_valley` con `marsh_valley` hay que acordarla (`visual-reference`
+   §4). Y si el caos actual —ocho de doce valles roto— es el juego que quiere.
+6. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
+   «siempre» (ver §5), pero cuántos saludos al día hay es cosa del ojo.
+7. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
+   `village.ts` y en `Beast` en vez de en `Dweller`. Arreglo escrito allí.
+8. **§3.5 punto 5 de `rework.md`**: la malla contra el radio. Una vaca colisiona
+   con radio 0,4 y su malla mide más de una celda. Es de `render3d/`, no de
+   `life/`.
+9. **El aviso de la crónica y la pista de las órdenes se pintan encima uno del
+   otro** en la franja de abajo. Captura que lo prueba en
+   `life-rounds/evidencia-capturas.md`. Va al rediseño; el cuaderno del dueño da
+   la geometría (`visual-reference` §5).
+
+## 5. Lo que ya se aprendió y no hay que volver a aprender
+
+De método, y cada una costó tiempo:
+
+- **Nada de suites largas.** Orden del dueño: «no podemos estar parando a hacer
+  pruebas de 15, 30, 45, una hora». Typecheck, lint y los ficheros tocados.
+- **Una sola cosa corriendo a la vez, y al matar un run se matan sus
+  trabajadores.** Esta sesión llegó a tener **121 procesos de vitest huérfanos**
+  comiéndose la máquina, y todo parecía lentísimo por eso.
+- **Nunca `git stash` sobre el árbol entero si hay otro agente escribiendo.** La
+  forma segura de comparar antes/después es `git show HEAD:<fichero> > tmp`.
+- **Reparto de ficheros por escrito antes de lanzar dos agentes en paralelo**, y
+  decirle a cada uno qué ficheros son del otro. Funcionó con IA-3 e IA-4.
+- **Medir antes de afirmar.** Dos veces esta sesión tuve una hipótesis
+  convincente y falsa, y lo supe porque la medida no se movió. Y una vez estuve
+  a punto de informar de que el mundo era incoherente por contar sólo las casas
+  de madera: eran de piedra.
+
+De diseño, y son las que más valen:
+
+- **Una cota absoluta calibrada con una persona no vale para un cuerpo que no es
+  una persona.** Tres fallos distintos de la misma familia: el umbral de avance,
+  el margen con las paredes y el radio de la pausa. Lo que se le pide a un
+  cuerpo se mide **con ese cuerpo**.
+- **Una probabilidad que se tira cada paso no es la probabilidad que parece.**
+  `GREET_ODDS = 0.2` se leía como «uno de cada cinco cruces» y era «siempre»,
+  porque la llave llevaba el paso: con p repetida n veces sale 1 − (1 − p)^n.
+- **Un compromiso es una interacción de verdad, no una cercanía.** Reservarlo
+  por proximidad dejaba a los animales esperando en `approach` hasta caducar.
+- **Tapar el síntoma mejora la cifra y empeora el juego.** Hacer que estar
+  parado saciara la sed quitaba a los sedientos de la estadística y les quitaba
+  las ganas de ir al agua. El hueco real era que **sólo se podía beber en un
+  sitio y con dos plazas**.
+- **A 6 píxeles no hay que confiarle el significado a un gesto fino**, dice el
+  cuaderno del dueño: ni un giro de cabeza ni un picotazo. Lo que sobrevive a la
+  reducción es la continuidad de la trayectoria y la alternancia de quietud y
+  marcha. Eso cambia qué merece la pena implementar.
+- **La capa de vida sólo corre en 3D.** Una captura Canvas no acredita nada de
+  estas fases, y la ruta `?debug=1` monta Canvas. Para ver un valle crecido hay
+  que adelantar el reloj: `shot.mjs --advance <semanas>`
+  (`life-rounds/evidencia-capturas.md`).
+
+## 6. Qué hacer cuando se retoma esto
+
+1. Leer §1 y §2 de aquí. Si hay algo «en vuelo», **no tocar sus ficheros**.
+2. Mirar `git status` y `git log --oneline -5`. Conservar lo ajeno; nada de
+   `reset` ni `checkout` destructivo sin documentarlo.
+3. Coger el punto 1 de §4, o la fase «siguiente» de §2 si el 1 está hecho.
+4. Cerrar con: informe de ronda en `docs/life-rounds/` o
+   `docs/ui-redesign/rounds/`, **actualizar este fichero**, y commit con las
+   medidas dentro del mensaje.

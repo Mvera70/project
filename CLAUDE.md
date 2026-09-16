@@ -193,6 +193,12 @@ el parte de bienvenida leído por quien no lo escribió— y dejan de bloquear: 
 se validan y no se sustituyen por pruebas. Siguen descritos en `docs/design.md`
 §9.5 y §15.1 como el criterio con el que se construyó el motor.
 
+**`docs/task-log.md` es el cuaderno de tareas: dónde está el rework, qué está en
+vuelo, qué cifras mandan y qué está abierto.** Se lee antes que nada y se
+actualiza antes de cerrar cualquier ronda — existe porque sin él cada sesión
+reconstruía el estado leyendo commits. `docs/rework.md` dice el plan;
+`task-log.md` dice el punto exacto.
+
 **El rework está en marcha, y `docs/rework.md` es el plan que manda.** El
 dueño lo pidió el 15 sep («mucho más aleatorio y con mucha más vida … cargárselo
 casi entero») y la primera fase está en `main`: **R-1, los sucesos del valle**
@@ -223,6 +229,7 @@ escrita (`rework.md` §2.7).
 
 | Qué necesitas saber | Dónde |
 |---|---|
+| **Dónde está el rework ahora mismo, y qué toca** | **`docs/task-log.md` — se lee primero y se actualiza al cerrar cada ronda** |
 | Las reglas vigentes | `docs/design.md` — §1–4 primero |
 | Cómo se llegó a ellas | `docs/changelog.md` — el motivo de cada revisión |
 | En qué estado exacto está todo, y qué trampas ya costaron tiempo | `docs/handover.md` |
