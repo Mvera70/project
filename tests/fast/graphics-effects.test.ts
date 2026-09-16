@@ -1,3 +1,4 @@
+import { destroyBuilding } from '@engine/world/buildings';
 // G-08 · design.md §10.3, D.3, D.8 — estaciones y consecuencias visibles.
 //
 // El objetivo de la ronda dicho por el brief: **que la belleza conserve el valle
@@ -182,7 +183,7 @@ describe('G-08 · las consecuencias', () => {
         && lived.has(building.id),
     );
     expect(home, 'alguna casa habitada que quemar').toBeDefined();
-    if (home !== undefined) home.lostTick = burnt.tick;
+    if (home !== undefined) destroyBuilding(burnt, home.id);
 
     const after = tellsFor(burnt).filter((tell) => tell.kind === 'smoke').length;
     expect(after).toBeLessThan(before);
@@ -314,7 +315,7 @@ describe('G-08 · las consecuencias', () => {
     const state = village(14);
     const burnt = structuredClone(state);
     const home = burnt.buildings.find((building) => building.lostTick === null && building.kind !== 'field');
-    if (home !== undefined) home.lostTick = burnt.tick;
+    if (home !== undefined) destroyBuilding(burnt, home.id);
     const before = planFor(state).buildings.find((building) => building.id === home?.id);
     const ruin = planFor(burnt).buildings.find((building) => building.id === home?.id);
     expect(ruin?.ruin).toBe(true);

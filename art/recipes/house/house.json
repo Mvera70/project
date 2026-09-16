@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "G-21: casa de paja y entramado de madera. Basamento de piedra, puerta enmarcada, contraventanas abiertas, aleros y capas de paja. Misma parcela, ventanas y orientación del juego."
+    "note": "G-21: casa de paja y entramado de madera. Basamento de piedra, puerta enmarcada, contraventanas abiertas, aleros y capas de paja. Misma parcela, ventanas y orientación del juego. IA-10: hoja y herrajes independientes por material door; fondo oscuro del umbral."
   },
   "materials": [
     {
@@ -39,6 +39,11 @@
       "name": "window",
       "role": "timberDark",
       "roughness": 1
+    },
+    {
+      "name": "door",
+      "role": "timber",
+      "roughness": 0.95
     }
   ],
   "groups": [
@@ -101,7 +106,7 @@
         0.16,
         1.7
       ],
-      "material": "wood",
+      "material": "door",
       "parent": "Root"
     },
     {
@@ -544,7 +549,7 @@
         0.055,
         0.11
       ],
-      "material": "window",
+      "material": "door",
       "parent": "Root",
       "bevel": 0
     },
@@ -989,6 +994,22 @@
       "material": "window",
       "parent": "Root",
       "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "House_DoorRecess",
+      "location": [
+        3,
+        0.38500000000000006,
+        0.85
+      ],
+      "dimensions": [
+        1.025,
+        0.03,
+        1.7149999999999999
+      ],
+      "material": "window",
+      "parent": "Root"
     }
   ],
   "clips": [],

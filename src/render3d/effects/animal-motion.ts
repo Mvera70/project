@@ -56,6 +56,8 @@ export class AnimalMotion {
     this.previous = { x: animal.x, y: animal.y };
   }
 
+  get walkWeight(): number { return this.blend; }
+
   dispose(): void {
     this.mixer.stopAllAction();
     this.mixer.uncacheRoot(this.mixer.getRoot());

@@ -10,6 +10,7 @@
 // función que evaluaba una curva del reloj— ya no existe, y con ella se fue la
 // bandera que permitía volver a ella.
 
+import { indoors } from './home';
 import { occupationOf } from '../world/models';
 import type { VillagerId } from '@engine/state';
 import type { Activity, Actor } from '../contracts';
@@ -94,6 +95,7 @@ export function castOf(
   const width = life.land.width;
   const actors: Actor[] = [];
   for (const dweller of life.dwellers) {
+    if (indoors(dweller)) continue;
     const { body } = dweller;
     const speed = Math.hypot(body.vx, body.vz);
     const moving = speed > 0.25;

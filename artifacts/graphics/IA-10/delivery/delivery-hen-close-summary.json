@@ -1,0 +1,21 @@
+{
+  "sampledPeople": 2,
+  "sampledBeasts": 3,
+  "meshDrift": 0,
+  "peopleMeshDrift": 0,
+  "penetratingCircles": 0,
+  "blockedCentres": 0,
+  "night": [],
+  "transitions": [
+    {
+      "at": 0,
+      "id": 0,
+      "stage": "day"
+    },
+    {
+      "at": 0,
+      "id": 1,
+      "stage": "day"
+    }
+  ]
+}

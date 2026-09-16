@@ -1,3 +1,4 @@
+import { visibleBuildings } from '@derive/visible-buildings';
 // G-10, lote del mundo · El bosque. design.md D.8, D.9.
 //
 // Un valle maduro tiene varios cientos de celdas de bosque. Un árbol por celda
@@ -123,7 +124,7 @@ export function scatterOn(
  */
 export function builtCells(state: { buildings: readonly Building[]; map: ValleyMap }): Set<number> {
   const taken = new Set<number>();
-  for (const building of state.buildings) {
+  for (const building of visibleBuildings(state)) {
     for (let row = 0; row < building.h; row += 1) {
       for (let column = 0; column < building.w; column += 1) {
         taken.add((building.y + row) * state.map.width + building.x + column);

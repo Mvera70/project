@@ -22,7 +22,7 @@
 // Vive aquí y no en cada sitio que lo necesite porque es la clase de detalle
 // que se olvida al copiarlo: una sola máscara, y quien la use la hereda bien.
 
-import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
 import type { Point, Terrain } from './body';
 
 /**
@@ -56,7 +56,7 @@ export const WALLED: ReadonlySet<string> = new Set([
  * Se rehace cuando cambia el valle —una casa nueva cierra un paso— y eso ocurre
  * una vez por jornada escénica, no por fotograma.
  */
-export function terrainOf(state: GameState): Terrain {
+export function terrainOf(state: { readonly map: ValleyMap; readonly buildings: readonly Building[] }): Terrain {
   const { width, height } = state.map;
   const blocked = new Uint8Array(width * height);
 

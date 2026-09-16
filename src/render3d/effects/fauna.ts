@@ -1,14 +1,8 @@
 // G-10 · La fauna del valle, en tres dimensiones. design.md D.6, D.8, §7.7.
 //
-// **No hay ninguna regla nueva aquí.** Cuántos animales hay y dónde están lo
-// deciden `animalPositions` y `wildlifePositions`, que son los mismos que usa el
-// render 2D y salen en coordenadas de mapa porque nunca fueron código de
-// dibujo. Esto sólo decide qué forma tiene cada bicho y hacia dónde mira.
-//
-// §7.7 dice que la cabaña es cosmética: no se guarda, no alimenta a nadie y no
-// mueve ningún número de §12. Y §4.3 dice que el render no consume azar: estas
-// dos funciones no lo consumen, derivan la posición del estado y de la hora, así
-// que el mismo instante da siempre la misma vaca en el mismo sitio.
+// La vida decide dónde están gallinas, cerdos, vacas y el lobo. El render
+// coloca esos mismos cuerpos. Cuervos y peces conservan la derivación ambiental.
+// Ninguna de estas posiciones escribe en el estado ni consume azar del motor.
 //
 // G-23: los recursos con clips tienen un esqueleto propio por animal y comparten
 // geometría/materiales. Los recursos sin clips conservan la vía de instancias.
@@ -18,7 +12,7 @@
 import { Group, InstancedMesh, Matrix4, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState, type ValleyMap } from '@engine/state';
 import {
-  animalPositions, wildlifePositions, type Animal, type AnimalKind,
+  wildlifePositions, type Animal, type AnimalKind,
 } from '@derive/animals';
 import { piecesOf, type Piece } from '../world/forest';
 import type { LoadedAsset } from '../assets';
@@ -163,58 +157,26 @@ export class Fauna {
 
   private ground: (x: number, z: number) => number = () => 0;
 
-  /**
-   * Coloca la fauna que corresponde a este instante.
-   *
-   * `dayPhase` es la hora escénica y no la fracción del tick: los animales se
-   * recogen al anochecer igual que la gente (§10.6), y usar el tick los habría
-   * metido en casa cuatro veces por día escénico a ×1.
-   *
-   * **El estado llega quieto y por eso aquí ya no se congela nada.** La
-   * querencia de cada animal se sortea con la semana (§11.9, v3.06), y el
-   * identificador de cada bicho es su puesto en la fila de la cabaña, así que
-   * los dos se movían solos dentro de una misma jornada —ocho semanas a ×1,
-   * sesenta y cuatro a ×64— y el rebaño se teletransportaba. La cura era
-   * guardar aquí la semana, la cabaña y el pueblo de anoche; hoy la trae hecha
-   * `scenic-state.ts`, para todos y de una vez, y este método vuelve a ser lo
-   * que debía: una función de la hora.
-   *
-   * **Y sigue derivando del estado, que es la deuda que queda aquí — salvo
-   * para el lobo, desde IA-5.** V-08 partió la clase en dos —«de dónde salen
-   * las posiciones» y «cómo se pintan», `paint` abajo— para que la capa de
-   * vida pudiera entrar por la segunda mitad: `life/beasts.ts` ya daba
-   * animales vivos, con cuerpo y sin necesidad de `ashore`, pero ese enganche
-   * no se había hecho para ninguna especie del corral, y sigue sin hacerse
-   * aquí — es trabajo de una ronda que no es ésta, y tocar la gallina, el
-   * cerdo o la vaca ahora habría movido cifras que IA-4 ya midió sin que
-   * nadie lo pidiera.
-   *
-   * El lobo es distinto: antes de esta fase era decorado puro
-   * (`wildlifePositions`, un círculo alrededor de un árbol cada noche de
-   * invierno, pasara o no `wolves_at_the_coop` esa semana) y ahora tiene
-   * cuerpo de verdad en `life/wildlife.ts`, sólo la semana del suceso real.
-   * **Una especie no puede tener dos fuentes de posición en 3D a la vez**
-   * (el brief de la fase lo llama así, literal), así que aquí se descarta su
-   * entrada de la fórmula vieja — Canvas (`render/renderer.ts`) sigue
-   * llamando a `wildlifePositions` directamente y no pasa por esta clase, así
-   * que su lobo decorativo no se toca — y `live` (`Village.wildlife`, nueva)
-   * es la única fuente que llega a pintarse. Ya viene en tierra y con las
-   * coordenadas que le tocan: no pasa por `ashore`, que es cosa de la fórmula
-   * vieja para anclas que no miran el terreno.
-   */
+  /** Una sola fuente para el ganado y el lobo: los cuerpos de la capa de vida.
+   * Cuervo y pez siguen siendo fauna ambiental derivada. */
   update(state: GameState, dayPhase: number, live: readonly Animal[] = [], seconds = dayPhase * 120): void {
+    const ambient = wildlifePositions(state, dayPhase).filter(animal => animal.kind !== 'wolf');
     const animals: Animal[] = [];
-    for (const animal of [...animalPositions(state, dayPhase), ...wildlifePositions(state, dayPhase)]) {
-      if (animal.kind === 'wolf') continue; // IA-5: una sola fuente en 3D — ver arriba.
-      if (animal.kind === 'fish') {
-        animals.push(animal);
-        continue;
-      }
+    for (const animal of ambient) {
+      if (animal.kind === 'fish') { animals.push(animal); continue; }
       const dry = ashore(state.map, animal.x, animal.y);
       if (dry !== null) animals.push({ ...animal, x: dry.x, y: dry.y });
     }
-    for (const animal of live) animals.push(animal);
-    this.paint(animals, seconds);
+    this.paint([...animals, ...live], seconds);
+  }
+
+  /** Coordenadas de las mallas ya colocadas, no de su intención. */
+  snapshot(): { id: number; kind: string; x: number; z: number; walkWeight: number | null }[] {
+    return [
+      ...[...this.animated].map(([id, body]) => ({ id, kind: body.kind,
+        x: body.group.position.x, z: body.group.position.z, walkWeight: body.walkWeight })),
+      ...[...this.last].map(([id, point]) => ({ id, kind: 'static', x: point.x, z: point.y, walkWeight: null })),
+    ];
   }
 
   /**

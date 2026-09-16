@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T22:04:43.167Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T22-04-25-239Z-21428\\candidate\\stone-house.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/candidate/stone-house.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T22-04-25-239Z-21428\\three\\capture-1.png",
+      "sha256": "A004B792B6258EA25AF41820FF066F517113CD00D2D9221BC7A923B143A655F8",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T22-04-25-239Z-21428\\three\\capture-1-gray.png",
+        "sha256": "5131565ABAD0243CA3D8F02C9F787B94E4AED82F298471E76D40FB18179F236C",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 1886,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:52259/artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/candidate/stone-house.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "stone-house_door",
+          "stone-house_roof",
+          "stone-house_stone",
+          "stone-house_window",
+          "stone-house_wood"
+        ],
+        "bounds": {
+          "min": [
+            0,
+            -0.0025,
+            -2
+          ],
+          "max": [
+            2,
+            1.57,
+            0
+          ],
+          "size": [
+            2,
+            1.5725,
+            2
+          ]
+        },
+        "loadDurationMs": 186
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T22-04-25-239Z-21428\\three\\capture-2.png",
+      "sha256": "A004B792B6258EA25AF41820FF066F517113CD00D2D9221BC7A923B143A655F8",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T22-04-25-239Z-21428\\three\\capture-2-gray.png",
+        "sha256": "5131565ABAD0243CA3D8F02C9F787B94E4AED82F298471E76D40FB18179F236C",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 173,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:52259/artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/candidate/stone-house.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "stone-house_door",
+          "stone-house_roof",
+          "stone-house_stone",
+          "stone-house_window",
+          "stone-house_wood"
+        ],
+        "bounds": {
+          "min": [
+            0,
+            -0.0025,
+            -2
+          ],
+          "max": [
+            2,
+            1.57,
+            0
+          ],
+          "size": [
+            2,
+            1.5725,
+            2
+          ]
+        },
+        "loadDurationMs": 45
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:52259/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 223,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T22-04-25-239Z-21428\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

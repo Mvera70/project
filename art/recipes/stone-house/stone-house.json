@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "G-21: casa de mampostería y teja, cumbrera transversal, esquinas trabadas, dinteles gruesos y puerta reforzada. Misma parcela y tres huecos de luz del juego."
+    "note": "G-21: casa de mampostería y teja, cumbrera transversal, esquinas trabadas, dinteles gruesos y puerta reforzada. Misma parcela y tres huecos de luz del juego. IA-10: hoja y herrajes independientes por material door; fondo oscuro del umbral."
   },
   "materials": [
     {
@@ -34,6 +34,11 @@
       "name": "window",
       "role": "timberDark",
       "roughness": 1
+    },
+    {
+      "name": "door",
+      "role": "timber",
+      "roughness": 0.95
     }
   ],
   "groups": [
@@ -96,7 +101,7 @@
         0.16,
         1.8
       ],
-      "material": "wood",
+      "material": "door",
       "parent": "Root"
     },
     {
@@ -607,7 +612,7 @@
         0.04,
         0.095
       ],
-      "material": "window",
+      "material": "door",
       "parent": "Root",
       "bevel": 0
     },
@@ -624,7 +629,7 @@
         0.04,
         0.095
       ],
-      "material": "window",
+      "material": "door",
       "parent": "Root",
       "bevel": 0
     },
@@ -641,7 +646,7 @@
         0.05,
         0.12
       ],
-      "material": "window",
+      "material": "door",
       "parent": "Root",
       "bevel": 0
     },
@@ -1120,6 +1125,22 @@
       "material": "window",
       "parent": "Root",
       "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Stone_DoorRecess",
+      "location": [
+        3,
+        0.35500000000000004,
+        0.9
+      ],
+      "dimensions": [
+        1.075,
+        0.03,
+        1.815
+      ],
+      "material": "window",
+      "parent": "Root"
     }
   ],
   "clips": [],

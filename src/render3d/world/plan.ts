@@ -1,3 +1,4 @@
+import { visibleBuildings } from '@derive/visible-buildings';
 // G-06 · What the scene should contain, as data. design.md D.5, D.6.
 //
 // The plan is a pure description of the valley at one instant: which ground,
@@ -157,11 +158,12 @@ function plannedFrom(building: Building, tick: number): PlannedBuilding {
 }
 
 export function planFor(state: GameState): ScenePlan {
-  const connections = defenceConnections(state.buildings);
+  const visible = visibleBuildings(state);
+  const connections = defenceConnections(visible);
   return {
     game: `${state.seed}:${state.terrainSeed}`,
     ground: groundSignature(state.map, state.tick),
-    buildings: state.buildings.map((building) => ({ ...plannedFrom(building, state.tick),
+    buildings: visible.map((building) => ({ ...plannedFrom(building, state.tick),
       ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
     }))
       .sort((a, b) => a.id - b.id),

@@ -7,7 +7,8 @@ import { foundTwenty } from '../helpers/founding';
 describe('G-21 · ruinas dentro de su parcela', () => {
   it.each([[1,1],[2,2],[3,2],[3,3]])('ajusta %s×%s sin cambiar altura ni geometría compartida', (w,h) => {
     const state=foundTwenty(7), building=state.buildings[0]!;
-    building.lostTick=1;building.w=w;building.h=h;
+    building.lostTick=1;building.w=w;building.h=h;state.buildings=[building];
+    for(let z=building.y;z<building.y+h;z++)for(let x=building.x;x<building.x+w;x++)state.map.ruins[z*state.map.width+x]=1;
     const planned=planFor(state).buildings.find(b=>b.id===building.id)!;
     const source=new Group(),geometry=new BoxGeometry(2.1,.7,2.1);
     const mesh=new Mesh(geometry,new MeshStandardMaterial());

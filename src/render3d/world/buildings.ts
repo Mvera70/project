@@ -50,6 +50,8 @@ export interface BuildingModel {
    * decide la estación, igual que el color del suelo y el del bosque.
    */
   weather(snow: number, colour: string): void;
+  face?(radians: number): void;
+  door?(open: boolean, seconds: number): void;
   dispose(): void;
 }
 
@@ -153,10 +155,32 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
     }
   });
   group.add(model);
+  // La hoja usa material propio; nunca se arranca del material de toda la casa.
+  group.updateMatrixWorld(true);
+  const doorMesh = model.getObjectByName(`${planned.asset}_door`);
+  const hinge = new Group();
+  if (doorMesh !== undefined) {
+    const bounds = new Box3().setFromObject(doorMesh);
+    hinge.name = 'DoorHinge';
+    hinge.position.copy(group.worldToLocal(new Vector3(bounds.min.x, bounds.min.y, bounds.max.z)));
+    group.add(hinge);
+    hinge.attach(doorMesh);
+  }
   const roofs = roofsOf(model);
   const snowy = new Color();
   return {
     object: group,
+    face(radians: number): void {
+      const dx = -planned.w / 2, dz = planned.h / 2;
+      group.rotation.y = radians;
+      group.position.x = planned.x + planned.w / 2 + Math.cos(radians) * dx + Math.sin(radians) * dz;
+      group.position.z = planned.z + planned.h / 2 - Math.sin(radians) * dx + Math.cos(radians) * dz;
+    },
+    door(open: boolean, seconds: number): void {
+      const target = open ? -Math.PI / 2 : 0;
+      const delta = Math.max(0, Math.min(1, seconds * 4));
+      hinge.rotation.y += (target - hinge.rotation.y) * delta;
+    },
     weather(snow: number, colour: string): void {
       for (const roof of roofs) {
         roof.material.color.copy(roof.base).lerp(snowy.set(colour), Math.max(0, Math.min(1, snow)));
@@ -264,6 +288,14 @@ export class Village {
     // estación.
     model.weather(this.snow, this.snowColour);
     this.group.add(model.object);
+  }
+
+  entrances(entries: ReadonlyMap<number, number>): void {
+    for (const [id, facing] of entries) this.models.get(id)?.face?.(facing);
+  }
+
+  doors(open: ReadonlySet<number>, seconds: number): void {
+    for (const [id, model] of this.models) model.door?.(open.has(id), seconds);
   }
 
   remove(id: BuildingId): void {

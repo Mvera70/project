@@ -248,6 +248,11 @@ export class Cast {
     this.players.delete(id);
   }
 
+  /** Posiciones de las mallas colocadas, para contrastarlas con sus cuerpos. */
+  snapshot(): { id: number; x: number; z: number }[] {
+    return [...this.players].map(([id, player]) => ({ id, x: player.object.position.x, z: player.object.position.z }));
+  }
+
   get count(): number {
     return this.players.size;
   }

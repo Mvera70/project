@@ -8,6 +8,7 @@
 // pantalla sale de aquí, y nada de aquí sale del reloj de la pared ni escribe
 // una coma en `GameState`.
 
+import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import type { GameState, Trait, VillagerId } from '@engine/state';
 import { DAY, FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
@@ -15,7 +16,7 @@ import { opinionOf } from '@engine/people/opinions';
 import { ageOf } from '@engine/people/villagers';
 import { hash32 } from '@engine/rng';
 import {
-  blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
+  blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
 } from './body';
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
@@ -66,6 +67,7 @@ const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
+  readonly residence?: HomeRoutine;
   readonly body: Body;
   readonly villager: VillagerId;
   readonly traits: readonly Trait[];
@@ -187,7 +189,7 @@ export interface Village {
    *  el resto de esta capa, no sobreviven a la jornada. */
   readonly props: readonly Prop[];
   /** Un paso de vida para todos. */
-  step(): void;
+  step(phase?: number): void;
   /** Cuántos pasos lleva la jornada. */
   readonly steps: number;
   /** Pases de pelota dados en la jornada, V-09: lo que sale de jugar. */
@@ -275,6 +277,7 @@ export interface Village {
  */
 export interface DayOptions {
   readonly props?: boolean;
+  readonly land?: Terrain;
 }
 
 /**
@@ -380,7 +383,7 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
 
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
-  const land = terrainOf(state);
+  const land = options.land ?? terrainOf(state);
   const seed = seedOfDay(state.seed, day);
   // IA-6 · La riña de la plaza (§7.10, `docs/rework.md` §4 R-2 punto 1): si el
   // motor tiró `quarrel_in_the_square` esta semana, éstos son los dos `id` de
@@ -426,10 +429,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // la que no tiene pueblo.
   let heart = places[0]?.at ?? { x: land.width / 2, z: land.height / 2 };
   let most = -1;
+  const evaluated = new Uint8Array(land.width * land.height);
   for (const place of places) {
-    const near = places.filter(
-      (other) => Math.hypot(other.at.x - place.at.x, other.at.z - place.at.z) < 14,
-    ).length;
+    const cell = Math.floor(place.at.z) * land.width + Math.floor(place.at.x);
+    if (evaluated[cell] === 1 || blockedAt(land, place.at.x, place.at.z)) continue;
+    const region = reachableFrom(land, place.at);
+    for (let i = 0; i < region.length; i += 1) if (region[i] === 1) evaluated[i] = 1;
+    // La proximidad geométrica no basta: dos plazas a un metro pueden estar
+    // separadas por una pared. Se elige la región con más destinos alcanzables.
+    const near = places.filter(other => canReach(land, region, other.at)).length;
     if (near > most) { most = near; heart = place.at; }
   }
   const shore = reachableFrom(land, heart);
@@ -476,7 +484,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const mine = summoned
     ? summons
     : [
-      ...places.filter((place) => canReach(land, shore, place.at)),
+      ...places,
       ...beasts.map((beast) => beast.gift),
     ];
 
@@ -489,7 +497,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
   alive.forEach((villager, n) => {
     // Se le deja junto a un sitio de la aldea, repartidos.
-    const spot = mine[n % Math.max(1, mine.length)]?.at ?? heart;
+    const homeBuilding = villager.homeId === null ? undefined
+      : state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
+    const residence = homeBuilding === undefined ? undefined : homeRoutine(homeBuilding, land);
+    // Cada habitante nace en el lado de su casa, no en un patio elegido para
+    // todo el pueblo. Las decisiones descartan después las rutas imposibles.
+    const spot = residence !== undefined && fitsCircle(land, residence.approach.x, residence.approach.z, 0.32)
+      ? residence.approach : mine[n % Math.max(1, mine.length)]?.at ?? heart;
+    const personalShore = reachableFrom(land, spot);
     // **El sitio de partida, si los cuarenta anillos fallan, ya no es el punto
     // exacto del sitio.** Era `spot` a secas, y eso es un montón: dos personas
     // cuyos anillos fallan los dos nacen en **la misma coordenada exacta**, que
@@ -500,14 +515,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const scatterAngle = (hash32(seed, `spawn:${villager.id}`) / 4_294_967_296) * Math.PI * 2;
     let x = spot.x + Math.cos(scatterAngle) * 0.45;
     let z = spot.z + Math.sin(scatterAngle) * 0.45;
-    if (blockedAt(land, x, z)) { x = spot.x; z = spot.z; }
+    if (!fitsCircle(land, x, z, 0.32)) { x = spot.x; z = spot.z; }
     for (let ring = 0; ring < 40; ring += 1) {
       const angle = ring * 2.39996;
       const reach = 0.6 + ring * 0.35;
       const tryX = spot.x + Math.sin(angle) * reach;
       const tryZ = spot.z + Math.cos(angle) * reach;
       if (tryX <= 1 || tryZ <= 1 || tryX >= land.width - 1 || tryZ >= land.height - 1) continue;
-      if (!canReach(land, shore, { x: tryX, z: tryZ })) continue;
+      if (!canReach(land, personalShore, { x: tryX, z: tryZ }) || !fitsCircle(land, tryX, tryZ, 0.32)) continue;
       // **Y las bestias también ocupan sitio.** Esto miraba sólo a la gente, y
       // la cabaña se crea antes (V-08), así que alguien podía nacer **encima**
       // de una vaca. Dos cuerpos en el mismo punto exacto son el único caso que
@@ -530,8 +545,6 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     // Y la puerta de su casa, si tiene una en pie: falta si nunca se le asignó
     // una o si se perdió (`lostTick`), y entonces el tirón de «cerca de casa»
     // (`decide.ts`, `homePull`) simplemente no pesa nada.
-    const homeBuilding = villager.homeId === null ? undefined
-      : state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
     const home = homeBuilding === undefined ? undefined
       : doorOf(land, homeBuilding.x, homeBuilding.y, homeBuilding.w, homeBuilding.h) ?? undefined;
     dwellers.push({
@@ -551,6 +564,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       failed: new Map(),
       ageGroup,
       home,
+      ...(residence === undefined ? {} : { residence }),
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -700,11 +714,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       return count;
     },
 
-    step(): void {
+    step(phase = 0.45): void {
       const now = steps * LIFE_STEP;
+      const outside = (): Body[] => bodies.filter(body => { const person = byId.get(body.id); return person === undefined || !indoors(person); });
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
-      around.rebuild(bodies);
+      around.rebuild(outside());
 
       // V-09: los trastos sueltos ahora mismo, como opciones más para decidir
       // — se rehace cada paso porque un trasto deja de ofrecer nada en cuanto
@@ -891,6 +906,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         //     Con un tope, eso sí: si el camino se ha hecho eterno —porque el
         //     sitio se llenó, o porque hay medio pueblo por medio— se replantea
         //     igual. Quedarse andando para siempre es el otro modo de fallar.
+        if (stepHome(dweller, phase, steps, land, around, dwellers)) continue;
         const onTheWay = dweller.doing !== null && !dweller.doing.there;
         // **Espera creciente, no `GIVE_UP` fijo** (checklist IA-1, punto 6):
         // `noProgress()` sólo concede el replanteo cuando el viaje lleva de
@@ -1283,7 +1299,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         },
         wolf !== null && wolf.phase !== 'gone' ? { x: wolf.body.x, z: wolf.body.z } : null);
 
-      resolve(bodies, around, land);
+      resolve(outside(), around, land);
 
       // 9 · ¿Quién se ha encontrado con quién? V-07, ampliado en IA-2.
       //
@@ -1302,7 +1318,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       //    brief): así reconstruir el mismo día da las mismas parejas, y dos
       //    propuestas que compitan por el mismo cuerpo en el mismo paso no
       //    dependen de quién se mirara primero.
-      around.rebuild(bodies);
+      around.rebuild(outside());
 
       type Candidate =
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'yield'; readonly data: Yielding }
@@ -1311,7 +1327,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'conflict'; readonly data: Scene }
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
 
-      const freeToPropose = (d: Dweller): boolean => d.scene === null
+      const freeToPropose = (d: Dweller): boolean => !indoors(d) && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
         && steps >= d.sceneCooldownUntil && !commitments.busy(actorOf(d));
 
       // IA-6: si estos dos son, en cualquier orden, los `id` de la riña real
@@ -1349,6 +1365,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           // sigue siendo primero, un cruce físico no espera a que dos se
           // pongan a discutir. `!quarrelStaged` es lo que impide montarla más
           // de una vez al día una vez que ya se ha vivido.
+          if (isNight(phase)) return;
           if (!quarrelStaged && isQuarrelPair(dweller, other)) {
             const scene = proposeQuarrel(dweller, other, seed, steps);
             if (scene !== null) {

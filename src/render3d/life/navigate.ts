@@ -14,7 +14,7 @@
 // tiene encima saca a alguien de un tropiezo, pero no de un rincón cóncavo. Sin
 // ruta, quien va a un sitio detrás de una casa se queda empujando la pared.
 
-import { blockedAt, type Point, type Terrain } from './body';
+import { fitsCircle, blockedAt, type Point, type Terrain } from './body';
 
 /** Un punto por el que pasar. La ruta es una lista de ellos, en orden. */
 export type Waypoint = Point;
@@ -131,11 +131,7 @@ export function clearBetween(land: Terrain, from: Point, to: Point, radius = 0):
     const t = n / steps;
     const x = from.x + (to.x - from.x) * t;
     const z = from.z + (to.z - from.z) * t;
-    if (blockedAt(land, x, z)) return false;
-    if (radius > 0 && (
-      blockedAt(land, x - radius, z) || blockedAt(land, x + radius, z)
-      || blockedAt(land, x, z - radius) || blockedAt(land, x, z + radius)
-    )) return false;
+    if (!fitsCircle(land, x, z, radius)) return false;
   }
   return true;
 }

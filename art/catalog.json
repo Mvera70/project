@@ -470,13 +470,13 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T16-52-13-018Z-35544",
-        "directory": "artifacts/graphics/G-21/approved/5fb010cd3d40d3e4"
+        "runId": "2026-09-16T22-03-39-132Z-37876",
+        "directory": "artifacts/graphics/G-21/approved/3b29d1ed828f257b"
       },
       "bounds": {
         "min": [
           0,
-          0,
+          -0.0025,
           -2
         ],
         "max": [
@@ -486,36 +486,37 @@
         ],
         "size": [
           2,
-          1.580666,
+          1.583166,
           2
         ]
       },
-      "recipeSha256": "C09E2D98348387B08043011A0D913BEBBC2742203391B726206A2769CEE750FA",
+      "recipeSha256": "CFD7FBAD91FBB7436C58E7614134937C87AC294F03CF5A21FBF28C3152D33888",
       "materials": [
         "plaster",
         "roof",
         "wood",
         "stone",
-        "window"
+        "window",
+        "door"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 6,
-        "meshes": 5,
-        "materials": 5,
-        "triangles": 656
+        "objects": 7,
+        "meshes": 6,
+        "materials": 6,
+        "triangles": 668
       },
       "hashes": {
-        "house.blend": "F968D432062B4EB161CCD5FB475BF2AD5B52CF479157CEAB8B369DF0F42A8D43",
-        "house.glb": "5FB010CD3D40D3E4DD07676D1BE9DC9C618D7C82B03F84EFEF77575630F42151",
-        "house-blender.png": "F76D3F487A7BF3CFAAEB0BCB3DEAFB76D74E413C98814D02F653C074222F84BD",
-        "capture-1.png": "73A7F6E3C7FFE74672FB5356289E1995745928771BA306B61F499FBEBA8BC9D9",
-        "capture-1-gray.png": "20665D607B8F9F3929D975EC038E5DD1F7ED90E086693749509920F259E073FD",
-        "capture.json": "24D303E2DA55610FB45E2086C7A4FD3460C394613E4DC537F6A1996879D95118",
-        "build.json": "06A83EE644DCA200F02916DDF59D3614FECE5D9DAC6EE917B3B4716BDE62D5D2",
-        "validation.json": "DC25B4B2603418B16F90C205B098686634DBC0DC0F0312410F4D437A22FEEB59"
+        "house.blend": "EFDA15CFCE944FBB7DC84A30C5CFB8183F00236C8024BA10A7595E02F0D84457",
+        "house.glb": "3B29D1ED828F257B5630A38D142881E1EED4113B51D296817FF132ECBAAB4325",
+        "house-blender.png": "0651C708737C26AEA6359CD755E10945FCA0632A49E5ED82BA909E1745764D8C",
+        "capture-1.png": "9579B8A34AADEF2E37EED01E00516F4B322FAFAFD1DEC69EB173A6BEA7BB2AD2",
+        "capture-1-gray.png": "806378EB8A25F5DA60CCA345B507DC1FD257575E36CB58F6EC079A39E063E1B4",
+        "capture.json": "FDB990F1B2578D6D3C4B035DDABACE0DCB3D3E5E40C84DDF597516C0E146FC9E",
+        "build.json": "5F9ABCCD566CF23125181D2525AECC2461EAFA55F10F625112CC9AC2DB2194C2",
+        "validation.json": "D2077AC41ACA2EC6B268962E5DE253A23B8B0B3F6EEBC3B22A278C02A04AAE5C"
       },
       "provenance": {
         "kind": "original",
@@ -950,13 +951,13 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T16-56-31-507Z-48688",
-        "directory": "artifacts/graphics/G-21/approved/df75fd4689ed1ed6"
+        "runId": "2026-09-16T22-04-25-239Z-21428",
+        "directory": "artifacts/graphics/G-21/approved/110f59506b8e4bcd"
       },
       "bounds": {
         "min": [
           0,
-          0,
+          -0.0025,
           -2
         ],
         "max": [
@@ -966,35 +967,36 @@
         ],
         "size": [
           2,
-          1.57,
+          1.5725,
           2
         ]
       },
-      "recipeSha256": "BAACBB26938BFCA1958F222671245AB181FCF2CD07888FAFCEB0F317061FCA63",
+      "recipeSha256": "D83590050B7B91F55D7581397AAAA02E4166BC1F3275CB4031DD57EEFBC2E765",
       "materials": [
         "stone",
         "roof",
         "wood",
-        "window"
+        "window",
+        "door"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 5,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 752
+        "objects": 6,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 764
       },
       "hashes": {
-        "stone-house.blend": "5E9A886F21C49B385A44A0A993FF06B8D2668B6C5F6BACABA8F4F39E79E68AE9",
-        "stone-house.glb": "DF75FD4689ED1ED6946537256B86C49DA4B1856B2EA61444DAE94F7B46D190FA",
-        "stone-house-blender.png": "869AC74527B721F9210EDA5269C569E0EC7CC8205AE40535CED252D83F2A7B3D",
-        "capture-1.png": "A85617278A2A136E1FA41C1FFC4A132C6AC0CAA5BD2ED78E00ECE1645FED0574",
-        "capture-1-gray.png": "87266C183C06F3DCBC9B20B9B7A6F0D3D0335105D5EB19B4A0AD614DD490D9C8",
-        "capture.json": "C9F960A3506AEAD3167CE6A62CC097C60846D5124F071F0278C0397F48EF73D8",
-        "build.json": "7C390B99ADE6DB76E65035774644004D0E02BF75BD3C5035FB1FED5FA4B9D923",
-        "validation.json": "E38FA3BB46C2646E93811D329EBEB40CF1DFCD59ACBC66AC2EB54894BACEB0AC"
+        "stone-house.blend": "BABA12CF70A3EE42CE0220E3FEDCF242C77D64B335F5BADABC187EFBE1330693",
+        "stone-house.glb": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
+        "stone-house-blender.png": "D0C3E03D40FEBE74224B1BFB22B5725E6111F1DD5451F37B2482DEC283C47CAB",
+        "capture-1.png": "A004B792B6258EA25AF41820FF066F517113CD00D2D9221BC7A923B143A655F8",
+        "capture-1-gray.png": "5131565ABAD0243CA3D8F02C9F787B94E4AED82F298471E76D40FB18179F236C",
+        "capture.json": "B447FCD9CE8AD9C60CFE1840082F8D69B9F6A9B84F81B596792D4ECDC3DEB488",
+        "build.json": "538F67D13360DBEB61898CE26D0921B9069DD6E7151AFA9375BAADC4829E3E87",
+        "validation.json": "03CC127233CA7975596661581B77F953ADAFFD50B7F8694B7C1270B672D08843"
       },
       "provenance": {
         "kind": "original",

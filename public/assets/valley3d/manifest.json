@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T21:27:58.543Z",
+  "generatedAt": "2026-09-16T22:05:43.701Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -67,7 +67,7 @@
     {
       "id": "house",
       "file": "house.glb",
-      "sha256": "5FB010CD3D40D3E4DD07676D1BE9DC9C618D7C82B03F84EFEF77575630F42151",
+      "sha256": "3B29D1ED828F257B5630A38D142881E1EED4113B51D296817FF132ECBAAB4325",
       "motion": []
     },
     {
@@ -115,7 +115,7 @@
     {
       "id": "stone-house",
       "file": "stone-house.glb",
-      "sha256": "DF75FD4689ED1ED6946537256B86C49DA4B1856B2EA61444DAE94F7B46D190FA",
+      "sha256": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
       "motion": []
     },
     {

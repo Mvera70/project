@@ -176,6 +176,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 
 | Fase | Estado | Commit | Informe |
 |---|---|---|---|
+| IA-10 · observatorio, hogares y sólidos | **parcial** — visor sincronizado, puertas y rutina doméstica; 26/32 duermen en semilla 43, quedan atascos | (este commit) | `life-rounds/IA-10.md` |
 | IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `life-rounds/IA-0.md` |
 | IA-1 · movimiento y destinos | **hecha** | `1509121` | `life-rounds/IA-1.md` |
 | IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
@@ -237,6 +238,12 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+IA-10: 156 pruebas pertinentes verdes. Tres tomas del renderer real con estado fijo:
+semillas 7/11/43, durmiendo 2/2, 14/23 y 26/32 con vivienda. Cero penetraciones
+y desajustes cuerpo/modelo muestreados. No equivale a una partida completa.
+Casas con puertas: paja 668 triángulos/6 materiales; piedra 764/5.
+
 
 G-23: vaca de 3476 triángulos, cuatro materiales; clips idle/walk y controlador
 por distancia. 42 pruebas pertinentes verdes. Cuatro llamadas por vaca visible;
@@ -329,6 +336,12 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**IA-10 parcial:** resolver atascos de regreso y salida compartida en aldeas densas;
+validar ciclos con motor vivo. Faltan colisiones finas de troncos/lápidas y revisión
+de encuentros y clips de todas las especies. El observatorio y casos concretos están
+en `docs/life-rounds/IA-10.md`; no dar por cerrada la IA por pasar tests aislados.
+
 
 G-23: seis especies terminadas y comprobadas. No queda modelado pendiente del
 catálogo animal actual. Coste del banco documentado en G-23; no hay medida
