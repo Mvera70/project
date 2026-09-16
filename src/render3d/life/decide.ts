@@ -13,7 +13,7 @@
 
 import type { Trait } from '@engine/state';
 import { hash32 } from '@engine/rng';
-import type { Point, Terrain } from './body';
+import { blockedAt, type Point, type Terrain } from './body';
 import type { Needs } from './needs';
 import { NEED_NAMES } from './needs';
 import type { Offer, Place } from './offers';
@@ -263,7 +263,22 @@ export function decide(
 
     // La plaza que queda libre en ese sitio, y con ella el palmo de suelo donde
     // ponerse: un corro y no un montón.
-    const seat = taken.get(pick.key) ?? 0;
+    //
+    // **Al azar entre las libres, no siempre la primera** (checklist IA-1,
+    // punto 2). Con `seat = ya ocupadas` a secas, una oferta de uso exclusivo
+    // —el `self` de un animal (`beasts.ts`), que nadie más elige nunca—
+    // siempre ve cero ocupadas y siempre cae en el mismo `spots[0]`: la vaca
+    // que «vuelve siempre al mismo sitio exacto» de rework.md §3.5.2, aun
+    // dándole varios puntos entre los que elegir. El desempate sale de
+    // `hash32` por persona, paso y oferta, así que dos máquinas colocan al
+    // mismo animal en el mismo sitio (§4.3), y sigue sin poder pasarse del
+    // aforo: el hueco es sólo entre las plazas que quedan libres.
+    const already = taken.get(pick.key) ?? 0;
+    const free = pick.offer.seats - already;
+    const jitter = free <= 1 ? 0 : Math.floor(
+      (hash32(seed, `seat:${who.id}:${step}:${pick.key}`) / 4_294_967_296) * free,
+    );
+    const seat = already + jitter;
     const spot = seatAt(pick.offer, seat);
     const route = router.to(land, who.at, spot);
     // **Sin camino se prueba la siguiente, no se abandona el día.** Era la otra
@@ -286,7 +301,21 @@ export function decide(
     };
   }
 
-  return who.doing;
+  // Ninguna de las `TRY` mejores tiene ruta. Si ya se había llegado a algo
+  // —`there === true`— se sigue: no hay motivo para soltar una ocupación en
+  // marcha sólo porque nada mejor sea alcanzable ahora mismo, y esto también
+  // cubre `who.doing === null` (no hay nada que conservar).
+  //
+  // **Pero una intención que iba de camino se invalida, no se repite**
+  // (checklist IA-1, punto 4). Esta función sólo se llama con
+  // `doing !== null && !there` cuando el viaje se ha dado por eterno —los dos
+  // llamadores, `village.ts` y `beasts.ts`, sólo invocan `decide()` de camino
+  // cuando `noProgress()` lo pide—, así que conservarla aquí es repetir el
+  // mismo fracaso hasta `GIVE_UP` cada vez: el cuerpo vuelve a intentar la
+  // misma ruta que ya ha demostrado no llevar a ningún sitio. `null` deja que
+  // quien llama ofrezca otra cosa (`pauseHere`, más abajo).
+  if (who.doing !== null && who.doing.there) return who.doing;
+  return null;
 }
 
 /** Lo que una oferta calma, aplicado a quien la está haciendo. */
@@ -299,4 +328,150 @@ export function satisfy(needs: Needs, offer: Offer, seconds: number): void {
     const rate = gives / Math.max(1, offer.seconds[0]);
     needs[name] = Math.max(0, Math.min(1, needs[name] - rate * seconds));
   }
+}
+
+/**
+ * Cada cuántos pasos se comprueba si un viaje avanza.
+ *
+ * TUNE: 90 pasos, tres segundos escénicos (checklist IA-1, punto 6). Ni cada
+ * paso —confundiría el vaivén de un forcejeo de un instante con un atasco de
+ * verdad— ni sólo al `GIVE_UP` entero (600 pasos, veinte segundos): eso es
+ * justo la espera fija que se deja de hacer.
+ */
+export const PROGRESS_CHECK = 90;
+
+/**
+ * Cuánto tiene que haberse acercado al objetivo desde la última comprobación
+ * para contar como avance, en celdas.
+ *
+ * TUNE: 0,3. Más que el vaivén de un forcejeo con un vecino o una pared
+ * (rework.md §3.5.1 y §3.5.3, mismo margen que `TURN_MIN_PROGRESS` en
+ * `body.ts`), menos que cualquier tramo real de camino andado a paso normal
+ * en tres segundos.
+ */
+const PROGRESS_MIN = 0.3;
+
+/**
+ * Lo que hace falta recordar, de una llamada a `noProgress()` a la
+ * siguiente, para saber si una intención avanza.
+ *
+ * Vive fuera de `Dweller`/`Beast` a propósito: `Dweller` lo construyen
+ * también ficheros ajenos a esta fase (pruebas de escenas, por ejemplo), y
+ * añadirle campos obligatorios les rompería el tipo sin que esta fase pueda
+ * tocarlos. `village.ts` guarda uno de éstos por persona en un mapa aparte;
+ * `beasts.ts` lo lleva colgado del propio `Beast`, que sólo construye él.
+ */
+export interface ProgressState {
+  at: number;
+  gap: number;
+  stalls: number;
+}
+
+/** Un `ProgressState` recién nacido: sin comprobación hecha todavía. */
+export function freshProgress(): ProgressState {
+  return { at: 0, gap: Number.POSITIVE_INFINITY, stalls: 0 };
+}
+
+/**
+ * Si el viaje se ha quedado sin avanzar y toca replantearlo.
+ *
+ * **Espera creciente, no un `GIVE_UP` fijo** (checklist IA-1, punto 6): la
+ * primera vez que no hay avance se concede el replanteo a los tres segundos
+ * (`PROGRESS_CHECK`), y si la intención nueva vuelve a atascarse la espera se
+ * dobla cada vez, hasta el tope que marca `giveUp` — así un tropiezo de un
+ * instante no dispara el router de más (`RETHINK` ya evita recalcular cada
+ * paso; esto evita recalcular cada tres segundos para siempre), y quien está
+ * de verdad clavado no espera nunca el tope entero para que se note.
+ *
+ * Muta `state` porque necesita recordar, de una llamada a la siguiente,
+ * cuánto se había acercado la última vez y cuántas veces seguidas no ha
+ * mejorado — la misma clase de estado por cuerpo que `rethinkAt`, no algo que
+ * quepa calcular sin memoria.
+ */
+export function noProgress(
+  doing: Intent | null, state: ProgressState, at: Point, step: number, giveUp: number,
+): boolean {
+  if (doing === null || doing.there) { state.stalls = 0; return false; }
+  if (step < state.at) return false;
+
+  const target = seatAt(doing.offer, doing.seat);
+  const gap = Math.hypot(target.x - at.x, target.z - at.z);
+  const improved = gap < state.gap - PROGRESS_MIN;
+  state.stalls = improved ? 0 : Math.min(state.stalls + 1, 4);
+  state.gap = gap;
+  state.at = step + Math.min(giveUp, PROGRESS_CHECK * 2 ** state.stalls);
+  return !improved;
+}
+
+/**
+ * Una pausa local, siempre alcanzable.
+ *
+ * Checklist IA-1, punto 5: para cuando `decide()` no encuentra nada que
+ * merezca la pena — o lo que había se acaba de invalidar por inalcanzable
+ * (punto 4) — el cuerpo tiene que poder hacer algo donde está, en vez de
+ * quedarse con `doing === null` hasta que la jornada vuelva a intentarlo
+ * entero. Es la medida que sigue sin moverse en rework.md §3.6: parados con
+ * un impulso ≥ 0,9, 0,19 %.
+ *
+ * No es una oferta del catálogo (`offers.ts`, `OFFERS`): nadie más la ve —se
+ * construye aquí mismo, de un uso— y no compite por aforo con nadie. Sólo
+ * tiene que existir un instante y ser alcanzable de verdad, así que sus
+ * `spots` viven a una o dos celdas del punto de partida (el rango que pide
+ * rework.md §3.5.4) y sólo en celda libre; si ninguno de los intentos cae
+ * bien —un rincón de una sola celda, rarísimo pero posible—, el propio punto
+ * de partida entra como último recurso, porque ahí es donde el cuerpo ya
+ * está de pie y por tanto siempre es alcanzable.
+ *
+ * `reach: 1` a propósito: `follow()` considera un tramo andado en cuanto se
+ * está a `REACHED = 0.45` celdas (`navigate.ts`), y la llegada de verdad se
+ * mide a `offer.reach * 0.6` — con `reach` por debajo de 0,75 ese margen cae
+ * por debajo de 0,45 y un cuerpo podría vaciar la ruta sin llegar nunca a
+ * marcarse como llegado, quedándose de pie sin `there === true` para
+ * siempre.
+ */
+const PAUSE_SPOTS = 3;
+
+export function pauseHere(
+  at: Point, land: Terrain, router: Router, seed: number, id: number, step: number,
+): Intent {
+  const spots: Point[] = [];
+  for (let n = 0; n < PAUSE_SPOTS; n += 1) {
+    const angle = (hash32(seed, `pause:${id}:${step}:${n}:a`) / 4_294_967_296) * Math.PI * 2;
+    const dist = 1 + (hash32(seed, `pause:${id}:${step}:${n}:d`) / 4_294_967_296);
+    const spot = { x: at.x + Math.cos(angle) * dist, z: at.z + Math.sin(angle) * dist };
+    if (spot.x <= 0.5 || spot.z <= 0.5 || spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
+    if (blockedAt(land, spot.x, spot.z)) continue;
+    spots.push(spot);
+  }
+  if (spots.length === 0) spots.push({ x: at.x, z: at.z });
+
+  const anchor = spots[0] as Point;
+  const offer: Offer = {
+    id: 'pause', at: anchor, reach: 1, seats: spots.length,
+    // **Una pausa no bebe agua, ni cumple tu deber, ni te da compañía.** La
+    // primera versión de IA-1 calmaba un pellizco de sed, compañía y deber
+    // «para que nadie se quede con sed 1,0 mostrada indefinidamente», y eso es
+    // tapar el síntoma: con la sed calmándose de pie, un cuerpo sediento se
+    // queda parado en vez de ir al agua, y la cifra de §3.6 mejora sin que el
+    // valle mejore. El sediento que no encuentra agua es un hueco de
+    // contenido, no de decisión, y se arregla donde estaba el hueco: había un
+    // solo pozo de dos plazas para toda la aldea, y ahora el vado da de beber
+    // (`places.ts`, `OFFERS.drink`). Aquí sólo lo que de verdad da estar
+    // parado un rato: descansar, dejar de aburrirse y templarse.
+    gives: { rest: 0.2, boredom: 0.2, irritation: 0.15 },
+    seconds: [4, 9],
+    spots,
+  };
+  const place: Place = { id: `pause:${id}`, at: anchor, offers: [offer] };
+  const route = router.to(land, at, anchor) ?? [{ x: anchor.x, z: anchor.z }];
+  const dice = hash32(seed, `pausespan:${id}:${step}`) / 4_294_967_296;
+  return {
+    place,
+    offer,
+    route: [...route],
+    seat: 0,
+    since: step,
+    until: step + Math.round((offer.seconds[0] + dice * (offer.seconds[1] - offer.seconds[0])) * 30),
+    there: false,
+  };
 }

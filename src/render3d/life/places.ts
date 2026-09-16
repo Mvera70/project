@@ -199,7 +199,18 @@ function detectFord(state: GameState, land: Terrain, shore: Uint8Array): Place |
   // El vado ofrece un lugar tranquilo, con hora punta por la mañana.
   const offer = placedOffer(loiterSpec, at, land, [0.0, 0.4]);
   if (offer === null) return null;
-  return { id: 'ford:crossing', at: offer.at, offers: [offer] };
+
+  // **Y da de beber** (IA-1). El vado es una celda de tierra con el río al
+  // lado: hasta ahora la única agua del valle era el pozo, un edificio, y con
+  // dos plazas. Eso dejaba a la aldea entera dependiendo de un brocal —y sin
+  // ninguna si el pozo no estaba levantado todavía—, y se midió gente de pie
+  // con la sed al máximo. Un río del que no se puede beber es el hueco de
+  // contenido que estaba detrás de esa cifra. Sin hora punta: al río se va
+  // cuando se tiene sed, no a una hora.
+  const drinkSpec = OFFERS.drink;
+  const water = drinkSpec === undefined ? null : placedOffer(drinkSpec, at, land);
+  const offers = water === null ? [offer] : [offer, water];
+  return { id: 'ford:crossing', at: offer.at, offers };
 }
 
 /**

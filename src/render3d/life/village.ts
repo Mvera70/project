@@ -25,7 +25,10 @@ import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { commons } from './places';
-import { decide, satisfy, RETHINK, type Intent } from './decide';
+import {
+  decide, freshProgress, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
+  type Intent, type ProgressState,
+} from './decide';
 import { alive as sceneAlive, play, propose, SCENE_COOLDOWN, SCENE_EARSHOT, type Scene } from './scenes';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, type Beast } from './beasts';
@@ -232,7 +235,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // casa o campo) no depende de `mine` pero lo que ofrece a la gente —`pet`,
   // `chase`, `feed`— sí entra en la misma lista que el resto de sitios: para
   // `decide()` un animal cerca no es distinto de un pozo cerca.
-  const beasts = createBeasts(state, land, heart, seed);
+  const beasts = createBeasts(state, land, heart, seed, shore);
   // V-11 · **Y cuando hay reunión, la reunión es lo único que se ofrece.**
   //
   // Medido, porque mi primera versión sólo sustituía los sitios del valle y
@@ -326,6 +329,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // otro exactamente como se apartarían dos personas.
   const bodies = [...dwellers.map((d) => d.body), ...beasts.map((b) => b.dweller.body)];
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
+  // Checklist IA-1, punto 6: lo que `noProgress()` (`decide.ts`) necesita
+  // recordar por persona para medir si un viaje avanza. Fuera de `Dweller` a
+  // propósito — ver el comentario de `ProgressState` en `decide.ts` — así que
+  // vive aquí, un `ProgressState` por cuerpo, poblado una vez por jornada.
+  const progress = new Map<number, ProgressState>(dwellers.map((d) => [d.body.id, freshProgress()]));
   // Las escenas vivas ahora mismo. Un mismo objeto lo referencian los dos
   // `Dweller` que participan (ver `Dweller.scene`); esta lista es sólo para no
   // tener que recorrer a toda la aldea buscando quién está en una.
@@ -340,12 +348,25 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // por sí solo no dice quién se la pasó a quién.
   const passLog: PassRecord[] = [];
 
-  /** Cuánta gente hay en cada oferta ahora mismo. */
+  /**
+   * Cuánta gente y cuánta cabaña hay en cada oferta ahora mismo.
+   *
+   * Checklist IA-1, punto 3: **el aforo se comparte entre personas y
+   * animales**, así que la cuenta también — la misma que `village.ts` ya
+   * hacía sólo para `dwellers` ahora suma también `beasts`, y el mapa que
+   * sale de aquí es el que `stepBeasts()` recibe más abajo, en vez de
+   * construirse el suyo propio siempre vacío.
+   */
   function seats(): Map<string, number> {
     const taken = new Map<string, number>();
     for (const dweller of dwellers) {
       if (dweller.doing === null) continue;
       const key = seatKey(dweller.doing.place, dweller.doing.offer);
+      taken.set(key, (taken.get(key) ?? 0) + 1);
+    }
+    for (const beast of beasts) {
+      if (beast.dweller.doing === null) continue;
+      const key = seatKey(beast.dweller.doing.place, beast.dweller.doing.offer);
       taken.set(key, (taken.get(key) ?? 0) + 1);
     }
     return taken;
@@ -463,7 +484,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         //     sitio se llenó, o porque hay medio pueblo por medio— se replantea
         //     igual. Quedarse andando para siempre es el otro modo de fallar.
         const onTheWay = dweller.doing !== null && !dweller.doing.there;
-        const tooLong = dweller.doing !== null && steps - dweller.doing.since > GIVE_UP;
+        // **Espera creciente, no `GIVE_UP` fijo** (checklist IA-1, punto 6):
+        // `noProgress()` sólo concede el replanteo cuando el viaje lleva de
+        // verdad sin acercarse, con una espera que se dobla cada vez que
+        // vuelve a atascarse — ver `decide.ts`.
+        const prog = progress.get(dweller.body.id) as ProgressState;
+        const tooLong = noProgress(dweller.doing, prog, body, steps, GIVE_UP);
         // V-09 · Con un trasto ya en la mano y a la espera de soltarlo, tampoco
         // se replantea la vida: la jugada dura menos que `RETHINK` (1,5 s) a
         // propósito —«no se come la jornada»—, y sin este freno el rethink de
@@ -488,10 +514,17 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             : !playedOut || propOptions.length === 0
               ? [...mine, ...propOptions]
               : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
+          // **Checklist IA-1, punto 5: si `decide()` no encuentra nada que
+          // merezca la pena —o acaba de invalidar lo que había por
+          // inalcanzable (punto 4)— siempre queda `pauseHere()`**, una pausa
+          // local que sí se puede alcanzar. `dweller.doing` deja de poder
+          // quedarse en `null` de aquí en adelante: es lo que arregla la
+          // medida que rework.md §3.6 dejó sin mover, parados con un impulso
+          // ≥ 0,9.
           dweller.doing = decide(
             { traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before },
             options, taken, land, router, seed, steps,
-          );
+          ) ?? pauseHere(body, land, router, seed, body.id, steps);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
           // paso, así que los veinte que decidían en ese instante veían el mismo
@@ -501,9 +534,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             const old = seatKey(before.place, before.offer);
             taken.set(old, Math.max(0, (taken.get(old) ?? 1) - 1));
           }
-          if (dweller.doing !== null) {
-            const now = seatKey(dweller.doing.place, dweller.doing.offer);
-            taken.set(now, (taken.get(now) ?? 0) + 1);
+          const seatNow = seatKey(dweller.doing.place, dweller.doing.offer);
+          taken.set(seatNow, (taken.get(seatNow) ?? 0) + 1);
+          // Sólo se reinicia el reloj de progreso cuando la intención cambia
+          // de verdad: `decide()` devuelve la misma referencia cuando sigue
+          // con lo mismo (arriba, «se sigue, sin recalcular el camino»), y
+          // reiniciarlo también ahí borraría el atasco que se acaba de medir.
+          if (dweller.doing !== before) {
+            prog.at = steps + PROGRESS_CHECK;
+            prog.gap = Number.POSITIVE_INFINITY;
+            prog.stalls = 0;
           }
         }
 
@@ -562,9 +602,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         const next = dweller.doing === null || dweller.doing.there
           ? null
           : follow(body, dweller.doing.route);
-        if (dweller.doing !== null && !dweller.doing.there && next === null) {
-          dweller.doing.there = true;
-        }
+        // **Llegar es alcanzar la zona válida, no vaciar la ruta** (checklist
+        // IA-1, punto 6). La comprobación de arriba ya cubre el caso normal
+        // —estar a `reach` de la plaza—; si la ruta se vacía sin que eso haya
+        // pasado (`next === null` y `there` sigue en `false`), no se marca
+        // como llegado donde no se está: antes esta rama daba la intención
+        // por cumplida con sólo consumir la ruta, así que un cuerpo podía
+        // quedarse «llegado» —y recibiendo `satisfy()`— a varias celdas de la
+        // oferta. Ahora se queda de pie con la ruta vacía (`want` es cero sin
+        // ruta que seguir) hasta que `noProgress()`, más arriba, note que no
+        // se acerca y lo replantee.
         // V-09 · Primera lección del descarte: al llegar junto a un trasto
         // suelto se coge, no hace falta pisarlo. Sólo en el instante de
         // llegar (`!wasThere`), y sólo si de verdad hay algo que ofrezca
@@ -728,7 +775,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       //    cosa de `dwellers`, sólo personas): lo que un animal ofrece a quien
       //    pase ya está en `mine`, y quien lo elige es la gente decidiendo,
       //    no una escena de dos.
-      stepBeasts(beasts, land, around, router, seed, steps);
+      // El mismo `taken` que acaba de usar la gente (checklist IA-1, punto 3):
+      // `seats()` ya cuenta personas y bestias, y lo que la gente decidió
+      // arriba ya está reflejado aquí, así que la cabaña ve el aforo real y
+      // no un mapa vacío.
+      stepBeasts(beasts, land, around, router, seed, steps, taken);
 
       resolve(bodies, around, land);
 

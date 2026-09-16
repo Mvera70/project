@@ -29,12 +29,16 @@ import {
   type Body, type Point, type Terrain,
 } from './body';
 import { LIFE_STEP } from './clock';
-import { decide, satisfy, RETHINK } from './decide';
+import {
+  decide, freshProgress, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
+  type ProgressState,
+} from './decide';
 import type { Neighbourhood } from './grid';
 import { freshNeeds, type Needs, type NeedName } from './needs';
 import { follow, type Router } from './navigate';
-import { doorOf, OFFERS, seatAt, type Offer, type Place } from './offers';
+import { doorOf, OFFERS, seatAt, seatKey, type Offer, type Place } from './offers';
 import { avoid, drive, seek, separate } from './steering';
+import { canReach, nearestReachable } from './terrain';
 import type { Dweller } from './village';
 
 /** Las tres clases que hoy tienen cuerpo, cabaña y nombre en `state.herd`. */
@@ -96,19 +100,66 @@ const BEAST_RISE: Readonly<Record<BeastKind, number>> = {
 /**
  * Lo que cada clase hace sola, junto a su ancla. `gives`/`seconds` en la
  * misma escala que `OFFERS` (`offers.ts`): no hay otra referencia de la que
- * partir.
+ * partir. `seats` y `spots` (checklist IA-1, punto 2) los pone
+ * `selfPlaceOf()` a partir de aquí — este molde ya no lleva un asiento fijo.
  */
 const SELF_OFFER: Readonly<Record<BeastKind, {
   readonly id: string;
   readonly reach: number;
-  readonly seats: number;
   readonly gives: Partial<Record<NeedName, number>>;
   readonly seconds: readonly [number, number];
 }>> = {
-  hen: { id: 'peck', reach: 1.0, seats: 1, gives: { boredom: 0.6 }, seconds: [4, 10] },
-  pig: { id: 'root', reach: 1.1, seats: 1, gives: { boredom: 0.55 }, seconds: [8, 18] },
-  cow: { id: 'graze', reach: 1.3, seats: 1, gives: { boredom: 0.5 }, seconds: [15, 30] },
+  hen: { id: 'peck', reach: 1.0, gives: { boredom: 0.6 }, seconds: [4, 10] },
+  pig: { id: 'root', reach: 1.1, gives: { boredom: 0.55 }, seconds: [8, 18] },
+  cow: { id: 'graze', reach: 1.3, gives: { boredom: 0.5 }, seconds: [15, 30] },
 };
+
+/**
+ * Cuántos puntos de su propia oferta tiene cada animal para elegir.
+ *
+ * TUNE: tres o cuatro, tal cual pide el checklist IA-1 (punto 2): tres para
+ * la gallina y el cerdo, cuatro para la vaca, que es la que más celda de
+ * pasto necesita para no leerse como clavada en un punto. No es una medida
+ * en pantalla, es el rango literal del brief.
+ */
+const SPOT_COUNT: Readonly<Record<BeastKind, number>> = { hen: 3, pig: 3, cow: 4 };
+
+/**
+ * Los puntos alrededor del ancla donde un animal hace lo suyo, todos en
+ * celda libre y en la misma orilla que el resto de la aldea.
+ *
+ * Checklist IA-1, punto 2: con un solo punto, un animal vuelve siempre al
+ * mismo palmo de corral en cuanto se le da un rato — es lo que el dueño ve
+ * como «dan vueltas» sin moverse de sitio. Con varios y la elección al azar
+ * entre los libres que ya hace `decide()` (`decide.ts`, «al azar entre las
+ * libres»), un cerdo hoza por el corral entero en vez de volver siempre al
+ * mismo palmo.
+ *
+ * TUNE: de 0,8 a 1,5 celdas del ancla, el rango que pide el checklist. Hasta
+ * veinte intentos por punto porque un corral apretado entre dos casas puede
+ * tener pocas celdas libres alrededor; si ninguno cuaja para un punto dado,
+ * el propio ancla —ya libre y conectada por `anchorOf`— entra en su lugar,
+ * para no dejar la oferta con menos plazas de las que promete.
+ */
+function spotsAround(
+  land: Terrain, reach: Uint8Array, anchor: Point, seed: number, id: number, count: number,
+): Point[] {
+  const spots: Point[] = [];
+  for (let n = 0; n < count; n += 1) {
+    let found: Point | null = null;
+    for (let attempt = 0; attempt < 20 && found === null; attempt += 1) {
+      const angle = (hash32(seed, `beast:spot:${id}:${n}:${attempt}:a`) / 4_294_967_296) * Math.PI * 2;
+      const dist = 0.8 + (hash32(seed, `beast:spot:${id}:${n}:${attempt}:d`) / 4_294_967_296) * 0.7;
+      const at = { x: anchor.x + Math.cos(angle) * dist, z: anchor.z + Math.sin(angle) * dist };
+      if (at.x <= 0.5 || at.z <= 0.5 || at.x >= land.width - 0.5 || at.z >= land.height - 0.5) continue;
+      if (blockedAt(land, at.x, at.z)) continue;
+      if (!canReach(land, reach, at)) continue;
+      found = at;
+    }
+    spots.push(found ?? anchor);
+  }
+  return spots;
+}
 
 /** Lo que cada clase ofrece a quien pase, del catálogo central (`offers.ts`). */
 const GIFT_OFFER: Readonly<Record<BeastKind, string>> = {
@@ -154,6 +205,14 @@ export interface Beast {
   readonly gift: Place;
   /** Lo que el bicho hace solo, junto al ancla. */
   readonly self: Place;
+  /**
+   * Lo que `noProgress()` (`decide.ts`) necesita recordar para saber si el
+   * viaje en marcha avanza. Checklist IA-1, punto 6. Vive aquí y no en
+   * `Dweller` porque `Dweller` lo construyen también ficheros ajenos a esta
+   * fase (pruebas de escenas) y añadirle campos obligatorios les rompería el
+   * tipo.
+   */
+  readonly progress: ProgressState;
 }
 
 /** Lo de siempre entre cero y uno, igual que en `needs.ts`. */
@@ -166,9 +225,16 @@ export function driftBeast(needs: Needs, kind: BeastKind, seconds: number): void
   needs.boredom = hold(needs.boredom + BEAST_RISE[kind] * seconds);
 }
 
-function selfPlaceOf(kind: BeastKind, id: number, anchor: Point): Place {
+function selfPlaceOf(
+  kind: BeastKind, id: number, anchor: Point, land: Terrain, reach: Uint8Array, seed: number,
+): Place {
   const spec = SELF_OFFER[kind];
-  return { id: `beast:${id}:self`, at: anchor, offers: [{ ...spec, at: anchor }] };
+  const spots = spotsAround(land, reach, anchor, seed, id, SPOT_COUNT[kind]);
+  return {
+    id: `beast:${id}:self`,
+    at: anchor,
+    offers: [{ ...spec, at: anchor, seats: spots.length, spots }],
+  };
 }
 
 function giftPlaceOf(kind: BeastKind, id: number, body: Point): Place {
@@ -190,7 +256,9 @@ function giftPlaceOf(kind: BeastKind, id: number, body: Point): Place {
  * la cuenta por clase tiene que cuadrar siempre con la cabaña, y un animal sin
  * sitio bueno sigue siendo un animal.
  */
-export function createBeasts(state: GameState, land: Terrain, heart: Point, seed: number): Beast[] {
+export function createBeasts(
+  state: GameState, land: Terrain, heart: Point, seed: number, shore: Uint8Array,
+): Beast[] {
   const houses = state.buildings
     .filter((b) => (b.kind === 'house' || b.kind === 'stone_house') && b.lostTick === null)
     .sort((a, b) => a.id - b.id);
@@ -234,8 +302,9 @@ export function createBeasts(state: GameState, land: Terrain, heart: Point, seed
       dweller,
       kind,
       anchor,
-      self: selfPlaceOf(kind, id, anchor),
+      self: selfPlaceOf(kind, id, anchor, land, shore, seed),
       gift: giftPlaceOf(kind, id, body),
+      progress: freshProgress(),
     });
     n += 1;
   };
@@ -256,8 +325,22 @@ export function createBeasts(state: GameState, land: Terrain, heart: Point, seed
     // por bicho, saca al animal del mismo palmo sin alejarlo de la casa.
     const angle = (hash32(seed, `beast:corner:${id}`) / 4_294_967_296) * Math.PI * 2;
     const nudge = { x: door.x + Math.cos(angle) * 1.4, z: door.z + Math.sin(angle) * 1.4 };
-    if (nudge.x <= 0.5 || nudge.z <= 0.5 || nudge.x >= land.width - 0.5 || nudge.z >= land.height - 0.5) return door;
-    return blockedAt(land, nudge.x, nudge.z) ? door : nudge;
+    const inBounds = nudge.x > 0.5 && nudge.z > 0.5
+      && nudge.x < land.width - 0.5 && nudge.z < land.height - 0.5;
+    const candidate = inBounds && !blockedAt(land, nudge.x, nudge.z) ? nudge : door;
+    // **Checklist IA-1, punto 1: libre y conectada, no sólo libre.** Antes,
+    // caer en celda cerrada volvía a la puerta sin más comprobación — y la
+    // puerta está a 0,82 celdas del muro, así que un cerdo de radio 0,24 se
+    // pasaba el día apretado contra él. Ahora se exige además que la celda
+    // esté en la misma orilla que el corazón de la aldea (`shore`,
+    // `reachableFrom` en `village.ts`): un patio sin salida es tan inútil
+    // como una celda dentro del muro (E.7). Si ni la puerta lo cumple, se
+    // busca la celda libre y conectada más cercana (`nearestReachable`,
+    // `terrain.ts`); si el valle entero estuviera cerrado —no ocurre en la
+    // práctica, el corazón siempre tiene suelo alrededor— el corazón mismo
+    // cierra el reparto.
+    if (canReach(land, shore, candidate)) return candidate;
+    return nearestReachable(land, shore, candidate) ?? heart;
   };
 
   // Gallinas: dos por casa, como en `render/animals.ts` (`HENS_PER_HOUSE`).
@@ -282,10 +365,14 @@ export function createBeasts(state: GameState, land: Terrain, heart: Point, seed
 /**
  * Un paso de vida para toda la cabaña.
  *
- * **Igual que el paso de una persona en `village.ts`, con dos cosas menos**:
- * no entra en escenas (`scenes.ts` sólo mira `dwellers`, las personas) y elige
- * de una lista de una sola oferta —la suya, `beast.self`— así que no hace
- * falta un `taken` compartido: nadie más puede ocupar el sitio de otro animal.
+ * **Igual que el paso de una persona en `village.ts`, con una cosa menos**: no
+ * entra en escenas (`scenes.ts` sólo mira `dwellers`, las personas). Elige de
+ * una lista de una sola oferta —la suya, `beast.self`—, pero desde el
+ * checklist IA-1 (punto 3) esa oferta tiene varios asientos (`spotsAround`) y
+ * el aforo se cuenta de verdad con el mismo `taken` que ya usó la gente este
+ * paso (`village.ts`, `seats()`): así dos animales que compartieran ancla no
+ * elegirían el mismo asiento sin fin, y un bicho que vuelve solo a lo suyo no
+ * ve siempre «cero ocupado» sin que nadie lo cuente.
  *
  * Colisiona con lo que haya —gente, otros animales, paredes— con el mismo
  * `integrate`/`avoid`/`separate` de siempre, y por eso nunca pisa el agua: la
@@ -299,20 +386,36 @@ export function stepBeasts(
   router: Router,
   seed: number,
   step: number,
+  taken: Map<string, number>,
 ): void {
-  const noSeats = new Map<string, number>();
   for (const beast of beasts) {
-    const { dweller, self } = beast;
+    const { dweller, self, progress } = beast;
     const { body } = dweller;
 
     const onTheWay = dweller.doing !== null && !dweller.doing.there;
-    const tooLong = dweller.doing !== null && step - dweller.doing.since > GIVE_UP;
+    // Espera creciente, no `GIVE_UP` fijo (checklist IA-1, punto 6): igual
+    // que en `village.ts`, ver `decide.ts` (`noProgress`).
+    const tooLong = noProgress(dweller.doing, progress, body, step, GIVE_UP);
     if (step >= dweller.rethinkAt && (!onTheWay || tooLong)) {
       dweller.rethinkAt = step + RETHINK;
+      const before = dweller.doing;
+      // Checklist IA-1, punto 5: si no hay nada alcanzable que valga, una
+      // pausa local siempre lo es — igual que en `village.ts`.
       dweller.doing = decide(
-        { traits: [], needs: dweller.needs, at: body, id: body.id, doing: dweller.doing },
-        [self], noSeats, land, router, seed, step,
-      );
+        { traits: [], needs: dweller.needs, at: body, id: body.id, doing: before },
+        [self], taken, land, router, seed, step,
+      ) ?? pauseHere(body, land, router, seed, body.id, step);
+      if (before !== null) {
+        const old = seatKey(before.place, before.offer);
+        taken.set(old, Math.max(0, (taken.get(old) ?? 1) - 1));
+      }
+      const seatNow = seatKey(dweller.doing.place, dweller.doing.offer);
+      taken.set(seatNow, (taken.get(seatNow) ?? 0) + 1);
+      if (dweller.doing !== before) {
+        progress.at = step + PROGRESS_CHECK;
+        progress.gap = Number.POSITIVE_INFINITY;
+        progress.stalls = 0;
+      }
     }
 
     if (dweller.doing !== null && dweller.doing.there && step >= dweller.doing.until) {
@@ -327,8 +430,11 @@ export function stepBeasts(
         dweller.doing.route.length = 0;
       }
     }
+    // **Llegar es alcanzar la zona válida, no vaciar la ruta** (checklist
+    // IA-1, punto 6): la comprobación de arriba ya cubre el caso normal, y si
+    // la ruta se vacía sin haber pasado por ahí el cuerpo se queda de pie con
+    // `there` en `false` hasta que `noProgress()` note que no se acerca.
     const next = dweller.doing === null || dweller.doing.there ? null : follow(body, dweller.doing.route);
-    if (dweller.doing !== null && !dweller.doing.there && next === null) dweller.doing.there = true;
 
     const want = next === null ? { x: 0, z: 0 } : seek(body, next);
     const push = separate(body, around);

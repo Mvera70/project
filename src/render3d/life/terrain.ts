@@ -122,3 +122,46 @@ export function canReach(land: Terrain, reach: Uint8Array, to: Point): boolean {
   if (cx < 0 || cz < 0 || cx >= land.width || cz >= land.height) return false;
   return reach[cz * land.width + cx] === 1;
 }
+
+/**
+ * La celda libre y alcanzable más cercana a un punto, o nada si el valle
+ * entero está cerrado.
+ *
+ * rework.md §3.5.2: un ancla que cae en celda cerrada, o en un patio sin
+ * salida hacia el resto de la aldea, es tan inútil como una dentro del muro
+ * — `avoid` la empuja sin descanso en el primer caso, y en el segundo nadie
+ * llega nunca a hacerle compañía. `reach` es la marca de `reachableFrom`
+ * desde el corazón de la aldea (`village.ts`): sólo cuenta estar libre y en
+ * esa misma orilla, no cualquier celda libre.
+ *
+ * Barrido en anillos cuadrados crecientes alrededor de la celda de partida,
+ * comprobando sólo el perímetro de cada anillo y no todo su interior — el
+ * valle cabe en unos pocos miles de celdas y esto corre una vez por cuerpo al
+ * amanecer, no por paso—, con desempate determinista por fila y luego columna:
+ * dos animales que partan de la misma celda cerrada encuentran la misma
+ * celda de rescate, que es lo que exige §4.3.
+ */
+export function nearestReachable(land: Terrain, reach: Uint8Array, from: Point): Point | null {
+  const startX = Math.max(0, Math.min(land.width - 1, Math.floor(from.x)));
+  const startZ = Math.max(0, Math.min(land.height - 1, Math.floor(from.z)));
+  if (land.blocked[startZ * land.width + startX] === 0 && reach[startZ * land.width + startX] === 1) {
+    return { x: startX + 0.5, z: startZ + 0.5 };
+  }
+
+  const maxRing = Math.max(land.width, land.height);
+  for (let ring = 1; ring <= maxRing; ring += 1) {
+    for (let dz = -ring; dz <= ring; dz += 1) {
+      const z = startZ + dz;
+      if (z < 0 || z >= land.height) continue;
+      const onEdgeRow = dz === -ring || dz === ring;
+      for (let dx = -ring; dx <= ring; dx += 1) {
+        if (!onEdgeRow && dx !== -ring && dx !== ring) continue;
+        const x = startX + dx;
+        if (x < 0 || x >= land.width) continue;
+        const cell = z * land.width + x;
+        if (land.blocked[cell] === 0 && reach[cell] === 1) return { x: x + 0.5, z: z + 0.5 };
+      }
+    }
+  }
+  return null;
+}
