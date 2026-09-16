@@ -24,6 +24,15 @@ const opt = (name, fallback) => {
   return i >= 0 && args[i + 1] !== undefined ? args[i + 1] : fallback;
 };
 const runSeconds = Number(opt('run', '0'));
+// --advance N   adelanta N semanas del motor antes de fotografiar, falseando el
+//               reloj del navegador como hacen las jornadas de Playwright
+//               (`tools/valley.shots.ts`, `advanceWeeks`). Sin esto la única
+//               aldea que se podía fotografiar era la del año 1 —la pareja
+//               fundadora, dos cuerpos— y **ninguna fase de la capa de vida
+//               podía entregar su evidencia**, porque lo que hay que ver es un
+//               valle con gente y animales. La ruta `?debug=1` no sirve para
+//               esto: monta el valle en Canvas, y la capa de vida es de 3D.
+const advanceWeeks = Number(opt('advance', '0'));
 const speed = opt('speed', '1');
 const waitFor = opt('wait', '');
 // **Girar la vista antes de disparar.** Sin esto la única forma de comprobar
@@ -82,6 +91,9 @@ const tab = await browser.newPage({ viewport: { width: 390, height: 844 }, devic
 const errors = [];
 tab.on('pageerror', (e) => errors.push(String(e)));
 tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+// El reloj falso se instala **antes** de navegar, porque la página lo lee al
+// arrancar; después ya no se le puede cambiar por debajo.
+if (advanceWeeks > 0) await tab.clock.install();
 await tab.goto(page);
 // U-10 · el menú de inicio: se funda un valle nuevo, que es lo que hace el
 // dedo la primera vez. `--seed N` escribe ese número antes de fundar.
@@ -92,6 +104,27 @@ if (open !== 'title') await tab.locator('.title-new').click().catch(() => {});
 //   --settle S   segundos que se espera tras fundar antes de hacer nada (8 por defecto;
 //                0.5 para ver el vuelo de entrada de U-11 fotograma a fotograma)
 await tab.waitForTimeout(open === 'title' ? 1500 : Number(opt('settle', '8')) * 1000);
+
+// --advance: el salto. `TIME.REAL_MS_PER_TICK` son 840 000 ms por semana a ×1
+// (§12.1, v3.72), y el motor cobra lo que le deben con `ticksOwed`. Se salta en
+// tramos de una generación —`LETHARGY_CAP_MS`, 960 ticks— porque el letargo de
+// §13.2 recorta cualquier ausencia más larga que eso, así que un solo salto de
+// veinte años se quedaría corto y en silencio.
+if (advanceWeeks > 0) {
+  const MS_PER_WEEK = 840_000;
+  // **Año a año, y con espera de reloj de verdad entre saltos.** El primer
+  // intento saltaba los veinte años de golpe y la aldea llegaba al año 2: el
+  // motor no cobra los ticks que le deben de una vez, los cobra **por lotes de
+  // 64 en fotogramas sucesivos** (`runBatch`, §13.2), así que un salto grande
+  // seguido de 400 ms deja casi todo sin cobrar y en silencio. Cuarenta y ocho
+  // semanas por salto es un año, y basta medio segundo para que se cobre.
+  const CHUNK = 48;
+  for (let left = advanceWeeks; left > 0; left -= CHUNK) {
+    await tab.clock.fastForward(Math.min(left, CHUNK) * MS_PER_WEEK);
+    await tab.waitForTimeout(500);
+  }
+  await tab.waitForTimeout(1500);
+}
 
 // La regleta está recogida detrás del botón de velocidad, como para el dedo.
 if (speed !== '1') {
