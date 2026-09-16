@@ -429,10 +429,24 @@
 /* ----------------------------------------------------------------- iconos */
 
 /**
- * Un icono del sprite. Se usa así, y el `href` es **relativo al documento**
- * (§13.4: el mismo build sirve desde la raíz y desde `/project/`):
+ * Un icono del sprite. Pensado para usarse así, con el `href` **relativo al
+ * documento** (§13.4: el mismo build sirve desde la raíz y desde
+ * `/project/`):
  *
  *   <svg class="skin-icon" aria-hidden="true"><use href="./ui/icons.svg#people"/></svg>
+ *
+ * **UI-V2 · añadido `stroke-width`/`stroke-linecap`/`stroke-linejoin`.**
+ * Medido con el juego empaquetado de verdad (`bundle-game.ts` + `shot.mjs`):
+ * un `<use>` contra `public/ui/icons.svg` no carga bajo `file://` —Chromium
+ * bloquea la referencia entre documentos, «'file:' URLs are treated as
+ * unique security origins», y `fetch()` del mismo fichero falla igual, por
+ * CORS—, así que `shell.ts` (UI-V2) copia los trazos que necesita en línea
+ * en vez de `<use>`. Estas tres propiedades son las que antes ponía el grupo
+ * `skin-icon-defaults` del propio sprite (`public/ui/icons.svg`, 1.5/round/
+ * round) y que un icono en línea necesita que alguien le ponga: quedan aquí,
+ * en la única clase que todo icono —del sprite o en línea— ya usa, para que
+ * el día que `<use>` funcione (el sprite incrustado en el documento, fuera
+ * del alcance de esta ronda) no haga falta tocar ni un icono.
  */
 .skin-icon {
   width: 24px;
@@ -441,6 +455,9 @@
   display: block;
   fill: none;
   stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 /* El árbol del sello va relleno, no de trazo: es una silueta. */
 .skin-seal .skin-icon { fill: currentColor; stroke: none; }

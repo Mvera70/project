@@ -33,10 +33,24 @@ html.crossroad-open .ui-shell-stack, html.epitaph-open .ui-shell-stack { visibil
    crece hacia arriba con el texto; vacío no reserva nada, porque no siempre
    hay algo que decir. `app.ts` monta aquí el aviso de la crónica y la pista
    del inicio guiado — ver los dos overrides de abajo, que sólo cambian su
-   posicionamiento, nunca su piel ni su texto. */
+   posicionamiento, nunca su piel ni su texto.
+
+   UI-V2 (plan-piel.md §3.4) · **es la bandeja del prototipo 01**, no un hueco
+   transparente: pergamino profundo (`--skin-parchment-deep`, el mismo tono
+   que la propia hoja de tokens documenta como «bandeja inferior y chips») con
+   la textura de UI-V0, en columna —borde curvado arriba (`.skin-scroll-edge`,
+   `shell.ts`), el ornamento debajo, y el aviso o la pista de `notice.ts`/
+   `app.ts` en el sitio de siempre—. Se pinta siempre que el valle está en
+   pantalla (la visibilidad la deciden las dos reglas de más abajo, sin
+   tocar), igual que el respaldo del prototipo: la bandeja es parte fija de la
+   pantalla del valle, tenga o no algo que decir en este instante — la única
+   pieza que de verdad aparece y desaparece es el texto del aviso/la pista. */
 .ui-shell-message { box-sizing: border-box; min-height: var(--ui-message-min-height);
-  display: flex; align-items: flex-end; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   padding: 0 var(--ui-margin-mobile) var(--ui-stack-gap);
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px; background-blend-mode: multiply;
   /* UI-R2 · sin aviso ni pista, este hueco sigue habiendo: `notice.ts` monta su
      banda (oculta con `hidden`) y `app.ts` mete aquí la pista del inicio
      guiado (también oculta) desde el primer pintado, así que el contenedor
@@ -53,6 +67,18 @@ html.crossroad-open .ui-shell-stack, html.epitaph-open .ui-shell-stack { visibil
      debajo cuando no hay nada que leer. */
   pointer-events: none; }
 .ui-shell-message > * { pointer-events: auto; }
+/* El borde y el ornamento son decoración de la bandeja, no controles: no
+   deben quitarle el toque a lo que haya debajo (§4.1 de UI-R2, arriba). */
+.ui-shell-message > .skin-scroll-edge,
+.ui-shell-message > .skin-ornament { pointer-events: none; }
+/* El borde vive dentro del hueco (no en la pila, que no tiene margen propio),
+   así que tiene que estirarse a los dos lados: `align-items: center` de la
+   regla de arriba lo dejaría del ancho de su contenido si no fuera por esto. */
+.ui-shell-message > .skin-scroll-edge { align-self: stretch; margin: 0 calc(-1 * var(--ui-margin-mobile)); }
+/* 14px bajo el ornamento, del plan §3.4: «hoja … 14 px por encima de la
+   frase». 8px sobre él, el mismo respiro que el plan da al pergamino bajo el
+   borde curvado cuando el SVG llegue (§3.4, la variante que aún no existe). */
+.ui-shell-message > .skin-ornament { margin-top: 8px; margin-bottom: 14px; }
 .ui-shell-message:empty { min-height: 0; padding: 0; }
 /* El mensaje habla del valle —la crónica que acaba de pasar, la pista de las
    órdenes—, así que sólo tiene sitio con el valle en pantalla. Antes de este
@@ -71,9 +97,22 @@ html:has(.valley-panel:not([hidden])) .ui-shell-message { visibility: hidden; }
 /* El aviso de `notice.ts`: antes `position: absolute; bottom: calc(118px+…)`,
    fijo e independiente de todo lo demás. Aquí es un hijo de flujo normal del
    hueco compartido — mismo fondo, mismo filete, mismo texto, sólo cambia
-   dónde se sitúa. No se toca `notice.ts`: la regla gana por especificidad. */
+   dónde se sitúa. No se toca `notice.ts`: la regla gana por especificidad.
+
+   UI-V2 · y es **la frase de la bandeja** del prototipo 01 («The mill is
+   waiting for oak.», plan §3.1): la única fuente de un texto así que el motor
+   ya produce es este aviso —la aldea contestando cuando no puede obedecer
+   (`answerFor`), o contando lo último que pasó—, así que es el respaldo que
+   el plan pide en vez de inventar un dato nuevo. Tinta sobre el papel de la
+   bandeja en vez de la tarjeta oscura que llevaba sobre el valle desnudo:
+   aquí ya no hace falta un cartón propio, el papel de detrás ya lee. Sigue
+   siendo `notice.ts` quien decide cuándo se ve y qué dice; esto sólo cambia
+   cómo se pinta. */
 .ui-shell-message .valley-notice { position: static; left: auto; transform: none;
-  width: 100%; max-width: 460px; margin: 0 auto; }
+  width: 100%; max-width: 32ch; margin: 0 auto;
+  background: transparent; border: 0; box-shadow: none; border-radius: 0; padding: 0;
+  color: var(--skin-ink); text-align: center; text-wrap: pretty;
+  font: 400 17px/1.45 var(--skin-font-read); letter-spacing: normal; }
 
 /* La pista del inicio guiado: antes vivía en `index.html` con
    `position: absolute; bottom: 82px`, en el mismo tramo de pantalla que el
@@ -82,20 +121,14 @@ html:has(.valley-panel:not([hidden])) .ui-shell-message { visibility: hidden; }
   width: 100%; max-width: 460px; margin: 0 auto; box-sizing: border-box; }
 
 /* La navegación: Valley/Chronicle/People, siempre visible salvo encrucijada o
-   epitafio. Misma piel que llevaba `.valley-tabbar`, con los tokens en vez de
-   valores sueltos. 56px + área segura, como pide el cuaderno del dueño. */
-.ui-shell-nav { display: flex; box-sizing: border-box; min-height: var(--ui-nav-height);
-  padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
-  background: var(--ui-paper-bg); border-top: 1px solid var(--ui-edge);
-  box-shadow: 0 -2px 8px rgba(34, 29, 24, .16); backdrop-filter: blur(2px); }
-.ui-shell-tab { flex: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 2px; min-width: var(--ui-tap-min); min-height: var(--ui-tap-min);
-  padding: 4px 2px; border: 0; border-radius: var(--ui-radius-control); background: transparent;
-  color: var(--ui-paper-ink-soft); font: 650 10px/1.1 var(--ui-font-plain); letter-spacing: .02em;
-  cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.ui-shell-tab:active { background: rgba(34, 29, 24, .08); }
-.ui-shell-tab[aria-pressed="true"] { background: var(--ui-paper-ink); color: var(--ui-paper-bg); }
-.ui-shell-tab:focus-visible { outline: 2px solid var(--ui-accent-on-paper); outline-offset: 2px; }
+   epitafio.
+   UI-V2 · la piel de verdad —papel, filetes, versalitas, la placa o la
+   madera de la pestaña activa— es `.skin-nav`/`.skin-nav-tab` y sus
+   variantes (`skin.css`, UI-V0, plan §3.4); esta clase sólo aporta ya lo que
+   el kit no sabe: el respiro del área segura de un teléfono con muesca. Los
+   44 px de área táctil de §11.7 los sigue dando `--ui-tap-min` a través de
+   `.skin-nav-tab { min-height: var(--ui-tap-min) }` en `skin.css`. */
+.ui-shell-nav { box-sizing: border-box; padding-bottom: env(safe-area-inset-bottom); }
 
 /* La bandeja (`content` de `ShellHandle`). Desde UI-R2 aloja la hoja de
    órdenes de verdad (`orders.ts`); la geometría ya es la de la especificación:
