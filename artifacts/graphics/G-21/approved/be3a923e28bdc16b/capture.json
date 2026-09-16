@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T19:18:15.798Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-18-01-947Z-41444\\candidate\\haystack.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/candidate/haystack.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-18-01-947Z-41444\\three\\capture-1.png",
+      "sha256": "4726C82D03CD2ED843C81906B6A9D7F01FDE673199450F8401A631A35AA480B5",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-18-01-947Z-41444\\three\\capture-1-gray.png",
+        "sha256": "FEFACF0A51EE9A34B6B7EA18850C13B10AD977F4F340C2B232AE8D2BD89D57E1",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 672,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:61769/artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/candidate/haystack.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "haystack_dry-hay",
+          "haystack_hay",
+          "haystack_stake"
+        ],
+        "bounds": {
+          "min": [
+            -0.297575,
+            -0.000333,
+            -0.293333
+          ],
+          "max": [
+            0.297575,
+            0.666667,
+            0.293333
+          ],
+          "size": [
+            0.59515,
+            0.667,
+            0.586667
+          ]
+        },
+        "loadDurationMs": 135
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-18-01-947Z-41444\\three\\capture-2.png",
+      "sha256": "4726C82D03CD2ED843C81906B6A9D7F01FDE673199450F8401A631A35AA480B5",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-18-01-947Z-41444\\three\\capture-2-gray.png",
+        "sha256": "FEFACF0A51EE9A34B6B7EA18850C13B10AD977F4F340C2B232AE8D2BD89D57E1",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 117,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:61769/artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/candidate/haystack.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "haystack_dry-hay",
+          "haystack_hay",
+          "haystack_stake"
+        ],
+        "bounds": {
+          "min": [
+            -0.297575,
+            -0.000333,
+            -0.293333
+          ],
+          "max": [
+            0.297575,
+            0.666667,
+            0.293333
+          ],
+          "size": [
+            0.59515,
+            0.667,
+            0.586667
+          ]
+        },
+        "loadDurationMs": 29
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:61769/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 147,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-18-01-947Z-41444\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

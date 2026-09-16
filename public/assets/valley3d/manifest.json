@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T19:05:16.608Z",
+  "generatedAt": "2026-09-16T19:18:17.912Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -464,7 +464,7 @@
     {
       "id": "haystack",
       "file": "haystack.glb",
-      "sha256": "814AD600DA3C1E14D4E7E075657B234F7FA77D35B2CE181D8D297BE6A7E2EBF9",
+      "sha256": "BE3A923E28BDC16BF70C5F0578D0B0AEB787A0E3F520CD86CD18177F67D43D6D",
       "motion": []
     },
     {

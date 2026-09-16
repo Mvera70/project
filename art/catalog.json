@@ -2866,59 +2866,60 @@
     },
     {
       "id": "haystack",
-      "artifactRound": "G-15",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/haystack/haystack.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-15T00-09-00-882Z-8912",
-        "directory": "artifacts/graphics/G-15/approved/814ad600da3c1e14"
+        "runId": "2026-09-16T19-18-01-947Z-41444",
+        "directory": "artifacts/graphics/G-21/approved/be3a923e28bdc16b"
       },
       "bounds": {
         "min": [
-          -0.295442,
-          0,
-          -0.3
+          -0.297575,
+          -0.000333,
+          -0.293333
         ],
         "max": [
-          0.295442,
+          0.297575,
           0.666667,
-          0.281908
+          0.293333
         ],
         "size": [
-          0.590885,
-          0.666667,
-          0.581908
+          0.59515,
+          0.667,
+          0.586667
         ]
       },
-      "recipeSha256": "DBB8463989C565E6F7B4DDDE5D4E5C402199B3D32E85219A30E5E8A21758C69D",
+      "recipeSha256": "E20187AF942233F4B9CFF9BCA95C10EB73FE2E606D850D99CA3047F481979010",
       "materials": [
         "hay",
-        "stake"
+        "stake",
+        "dry-hay"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 68
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 958
       },
       "hashes": {
-        "haystack.blend": "825A5B0BFF94C10284431D1610DC846B276C8E6DF63FF83C3AF2D57E193AF3CF",
-        "haystack.glb": "814AD600DA3C1E14D4E7E075657B234F7FA77D35B2CE181D8D297BE6A7E2EBF9",
-        "haystack-blender.png": "E3A00B9BEE0FF9E3289EE413A427B01F4F3412D9582485B94FE5D86EF3037BE5",
-        "capture-1.png": "6E9E9CEF8781C63E9D70E5CBAB5CA5F9A20B8ABED33939E3C829C2A58BA13B85",
-        "capture-1-gray.png": "04820A306B9B61D217D57D0173EBCA54AFB721DB1E5970B4FE85594BF3B1180E",
-        "capture.json": "E36A942D486E649EAD3AA20B165325F1F4351A6459391FECED6CD664849155AC",
-        "build.json": "E5B566E1C0576683F119CD057ED635F05319877B12C9A67300118D23B89C2E71",
-        "validation.json": "1B549F6FB7143AE2CC534E2CD2A13272423640F7E1121EC3B34D8416F4128854"
+        "haystack.blend": "10CC8F3D10236C6C195237B9B679A63A208A022D58EC6720258FD32DE9BBF4C6",
+        "haystack.glb": "BE3A923E28BDC16BF70C5F0578D0B0AEB787A0E3F520CD86CD18177F67D43D6D",
+        "haystack-blender.png": "DADA690A28DE3DFEA8AA3F82C803398E69748F22A98FF4751E585AD20F7BDBA3",
+        "capture-1.png": "4726C82D03CD2ED843C81906B6A9D7F01FDE673199450F8401A631A35AA480B5",
+        "capture-1-gray.png": "FEFACF0A51EE9A34B6B7EA18850C13B10AD977F4F340C2B232AE8D2BD89D57E1",
+        "capture.json": "D456D5747DFEF0D9A694751667BA9053642022F6F47C0B733955F04A32BBBBEC",
+        "build.json": "D1FADAD7787AA5D6F0552FAFD0DE63522974CF2F502B5691CC4CE855D40C3BAE",
+        "validation.json": "05C5CB2A98C8B7A07D82DD6E86ECD15A18E7E7F676CEF8FDE9E7489C70C7D226"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original haystack authored for The Valley G-15 (scatter props)",
+        "source": "Original G-21: almiar con faldones de heno, haces y estaca central.",
         "license": "Project original"
       }
     },
