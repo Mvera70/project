@@ -56,6 +56,26 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | UI-R3 · crónica · UI-R4 · personas | pendientes (pueden ir en paralelo tras congelar UI-R2) | — |
 | UI-R5 · integración y decisiones · UI-R6 · validación | pendientes | — |
 
+### Las fases nuevas, salidas de la lista de aldeanos (16 sep 2026)
+
+La lista completa, escrita para quien modela, está en
+`docs/graphics-rounds/aldeanos-por-hacer.md`. De analizarla salen cuatro fases,
+y **el orden importa**: la primera es de arte, la segunda es la que hace que el
+arte sirva sin tocar el motor, y las dos últimas necesitan que el motor tenga un
+dato que hoy no tiene.
+
+| Fase | Qué | Depende de | Estado |
+|---|---|---|---|
+| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, buhonero, forastero, leñador, albañil, pastor, pescador, novios— | De nada. Es la sesión de Blender | **en marcha** (base, herrero, cura, granjero) |
+| **V-15 · el modelo se elige por lo que se hace** | Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea **oficio → malla**, y por eso un niño, un leñador o un albañil no pueden tener figura propia: no son oficios. El render ya sabe la edad y la actividad de cada persona, así que la elección de malla pasa a mirar eso. **Sin tocar `src/engine/`** | De que exista al menos una malla nueva de §3 de la lista | pendiente |
+| **R-5b · quién acude a un funeral y a un incendio** | El motor sabe quién murió y qué edificio se quemó, pero **no sabe quién asiste**, y por eso IA-6 se negó a inventar espectadores. Falta el dato en el estado: un puñado de `id` de acompañantes en el suceso, como la riña ya trae los suyos en `who` | Cambio del motor (§7.10) | pendiente |
+| **R-6 · la vigilancia** | Existen la torre y la empalizada como edificios y una bandera de amenaza, pero **nadie vigila**: no hay ocupación que ponga a una persona ahí. Sin eso, un vigía modelado se quedaría sin usar | Cambio del motor y una oferta nueva en `life/offers.ts` | pendiente |
+
+**Por qué V-15 antes que más mallas:** sin ella, cada tipo nuevo que no sea un
+oficio del motor no tiene forma de entrar en el juego, y el arte se acumula sin
+verse. Es una fase pequeña —cambiar de qué se lee la malla— y desbloquea de una
+vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
+
 ### El rework de fondo (`docs/rework.md`)
 
 | Fase | Estado |
