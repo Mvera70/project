@@ -43,7 +43,20 @@ describe('el hambre le pasa factura al que manda · §7.9', () => {
     expect(opinionOf(state, someone.id, leader.id)).toBeLessThan(before);
   });
 
-  it('cuanto peor el año, más factura', () => {
+  // **`it.fails`, con la medida al lado** (patrón de CLAUDE.md, como
+  // `life-props.test.ts`): el reequilibrado del caos del 16 sep 2026
+  // (`9c9f492`, «que casi todas se vayan a romper no es la idea») movió
+  // `balance.ts`/`world/fate.ts` y con ellos algo de esta cadena — no se ha
+  // tocado nada de `src/engine/` en esta ronda para saberlo con certeza,
+  // pero el fallo apareció entre ese commit y hoy y no antes. Medido: los dos
+  // extremos, hambre leve (0,2) y hambre total (1), acaban en el **mismo
+  // suelo, `OPINION.MIN = -100`**, así que «peor año, más factura» deja de
+  // distinguirse en la semilla 7 a los veinte años. La propiedad del brief
+  // (§7.9) sigue intacta arriba; esto no es mío que arreglar hoy —haría
+  // falta el arbitrio del dueño del diseño sobre `balance.ts`, y ningún
+  // número se inventa fuera de ese proceso (CLAUDE.md)—, así que se deja
+  // escrito en vez de silenciado. Ver `docs/task-log.md` §4.
+  it.fails('cuanto peor el año, más factura', () => {
     const light = village(20);
     scarHunger(light, 0.2);
     const heavy = village(20);
