@@ -114,13 +114,18 @@ const RUIN_ASSETS: Readonly<Record<0 | 1, string>> = {
   1: 'ruin-stone',
 };
 
+// G-22 · Variedades visuales estables por parcela, sin azar ni recursos nuevos.
+export const FIELD_CROPS: readonly string[] = ['field', 'field-cabbage'];
+
 function assetFor(building: Building, tick: number): string | null {
   if (building.lostTick !== null) {
     return building.kind === 'field' ? 'field-cut' : RUIN_ASSETS[building.tier];
   }
   if (building.kind === 'field') {
     const week = weekOf(tick);
-    return week >= SOWN_FROM && week < TIME.HARVEST_WEEK ? 'field' : 'field-cut';
+    return week >= SOWN_FROM && week < TIME.HARVEST_WEEK
+      ? FIELD_CROPS[building.id % 3] ?? 'field'
+      : 'field-cut';
   }
   return BUILDING_ASSETS[building.kind] ?? null;
 }

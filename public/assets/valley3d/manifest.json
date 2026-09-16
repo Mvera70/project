@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T18:25:50.726Z",
+  "generatedAt": "2026-09-16T18:30:35.788Z",
   "invocation": "G-22: publicación selectiva por modelo",
   "assets": [
     {
@@ -726,6 +726,12 @@
           "strideLength": 0.26
         }
       ]
+    },
+    {
+      "id": "field-cabbage",
+      "file": "field-cabbage.glb",
+      "sha256": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5",
+      "motion": []
     }
   ]
 }

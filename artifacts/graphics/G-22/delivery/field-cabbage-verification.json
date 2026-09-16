@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "field-cabbage",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 2292
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -2
+    ],
+    "max": [
+      3,
+      0.198333,
+      0
+    ],
+    "size": [
+      3,
+      0.198333,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T18-29-27-041Z-47124",
+    "directory": "artifacts/graphics/G-22/approved/eeb451ab6596c7f5"
+  },
+  "sha256": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5",
+  "otherPublishedFilesUnchanged": true
+}

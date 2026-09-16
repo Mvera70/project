@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "field-cabbage",
+  "runId": "2026-09-16T18-29-27-041Z-47124",
+  "recipe": "art/recipes/field-cabbage/field-cabbage.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 12409,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/candidate/field-cabbage.blend",
+      "bytes": 123995,
+      "sha256": "5A53BF0B5B974D1D0B9ADBE31AD75754D05BC09785E51DA117572A3383986AFF"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/candidate/field-cabbage.glb",
+      "bytes": 169488,
+      "sha256": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/candidate/field-cabbage-blender.png",
+      "bytes": 441485,
+      "sha256": "672E24FCDDE7B3F23EE6517C52A5C9916B16CC2673A0C0F1B0390BE2AE98F022"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/blender.log",
+      "bytes": 1305,
+      "sha256": "F3553D60049BB742FD226F0DB3E347698104436214862E6B0256BDF2B6D17DF4"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/temporary/resolved-recipe.json",
+      "bytes": 55303,
+      "sha256": "C677E8AA7E3E53915D3415962EF4722D6AFA57D0F12F89B8D495CF8E41F5C971"
+    }
+  }
+}

@@ -1,0 +1,2725 @@
+{
+  "schemaVersion": 1,
+  "id": "field-cabbage",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "field",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "G-22: coles redondeadas con hojas abiertas; variante visual estable por parcela. Misma huella 3x2 y escala que field. No añade recursos ni reglas agrícolas."
+  },
+  "materials": [
+    {
+      "name": "soil",
+      "role": "soil",
+      "roughness": 1
+    },
+    {
+      "name": "leaf",
+      "role": "foliage",
+      "roughness": 0.95
+    },
+    {
+      "name": "heart",
+      "role": "foliageLight",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Soil",
+      "location": [
+        4.5,
+        3,
+        0.04
+      ],
+      "dimensions": [
+        9,
+        6,
+        0.08
+      ],
+      "material": "soil",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_0",
+      "location": [
+        4.5,
+        0.6,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_1",
+      "location": [
+        4.5,
+        1.7999999999999998,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_2",
+      "location": [
+        4.5,
+        3,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_3",
+      "location": [
+        4.5,
+        4.199999999999999,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_4",
+      "location": [
+        4.5,
+        5.3999999999999995,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_0_Heart",
+      "location": [
+        0.8,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_0_Leaf_0",
+      "location": [
+        0.98,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_0_Leaf_1",
+      "location": [
+        0.8,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_0_Leaf_2",
+      "location": [
+        0.6200000000000001,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_0_Leaf_3",
+      "location": [
+        0.8,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_1_Heart",
+      "location": [
+        2.0300000000000002,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_1_Leaf_0",
+      "location": [
+        2.2100000000000004,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_1_Leaf_1",
+      "location": [
+        2.0300000000000002,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_1_Leaf_2",
+      "location": [
+        1.8500000000000003,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_1_Leaf_3",
+      "location": [
+        2.0300000000000002,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_2_Heart",
+      "location": [
+        3.26,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_2_Leaf_0",
+      "location": [
+        3.44,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_2_Leaf_1",
+      "location": [
+        3.26,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_2_Leaf_2",
+      "location": [
+        3.0799999999999996,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_2_Leaf_3",
+      "location": [
+        3.26,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_3_Heart",
+      "location": [
+        4.49,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_3_Leaf_0",
+      "location": [
+        4.67,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_3_Leaf_1",
+      "location": [
+        4.49,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_3_Leaf_2",
+      "location": [
+        4.3100000000000005,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_3_Leaf_3",
+      "location": [
+        4.49,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_4_Heart",
+      "location": [
+        5.72,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_4_Leaf_0",
+      "location": [
+        5.8999999999999995,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_4_Leaf_1",
+      "location": [
+        5.72,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_4_Leaf_2",
+      "location": [
+        5.54,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_4_Leaf_3",
+      "location": [
+        5.72,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_5_Heart",
+      "location": [
+        6.95,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_5_Leaf_0",
+      "location": [
+        7.13,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_5_Leaf_1",
+      "location": [
+        6.95,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_5_Leaf_2",
+      "location": [
+        6.7700000000000005,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_5_Leaf_3",
+      "location": [
+        6.95,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_0_6_Heart",
+      "location": [
+        8.18,
+        0.8,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_6_Leaf_0",
+      "location": [
+        8.36,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_6_Leaf_1",
+      "location": [
+        8.18,
+        0.98,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_6_Leaf_2",
+      "location": [
+        8,
+        0.8,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_0_6_Leaf_3",
+      "location": [
+        8.18,
+        0.6200000000000001,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        270
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_0_Heart",
+      "location": [
+        0.8,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_0_Leaf_0",
+      "location": [
+        0.98,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_0_Leaf_1",
+      "location": [
+        0.8,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_0_Leaf_2",
+      "location": [
+        0.6200000000000001,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_0_Leaf_3",
+      "location": [
+        0.8,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_1_Heart",
+      "location": [
+        2.0300000000000002,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_1_Leaf_0",
+      "location": [
+        2.2100000000000004,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_1_Leaf_1",
+      "location": [
+        2.0300000000000002,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_1_Leaf_2",
+      "location": [
+        1.8500000000000003,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_1_Leaf_3",
+      "location": [
+        2.0300000000000002,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_2_Heart",
+      "location": [
+        3.26,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_2_Leaf_0",
+      "location": [
+        3.44,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_2_Leaf_1",
+      "location": [
+        3.26,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_2_Leaf_2",
+      "location": [
+        3.0799999999999996,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_2_Leaf_3",
+      "location": [
+        3.26,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_3_Heart",
+      "location": [
+        4.49,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_3_Leaf_0",
+      "location": [
+        4.67,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_3_Leaf_1",
+      "location": [
+        4.49,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_3_Leaf_2",
+      "location": [
+        4.3100000000000005,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_3_Leaf_3",
+      "location": [
+        4.49,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_4_Heart",
+      "location": [
+        5.72,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_4_Leaf_0",
+      "location": [
+        5.8999999999999995,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_4_Leaf_1",
+      "location": [
+        5.72,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_4_Leaf_2",
+      "location": [
+        5.54,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_4_Leaf_3",
+      "location": [
+        5.72,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_5_Heart",
+      "location": [
+        6.95,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_5_Leaf_0",
+      "location": [
+        7.13,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_5_Leaf_1",
+      "location": [
+        6.95,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_5_Leaf_2",
+      "location": [
+        6.7700000000000005,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_5_Leaf_3",
+      "location": [
+        6.95,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_1_6_Heart",
+      "location": [
+        8.18,
+        2.26,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_6_Leaf_0",
+      "location": [
+        8.36,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        12
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_6_Leaf_1",
+      "location": [
+        8.18,
+        2.44,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        102
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_6_Leaf_2",
+      "location": [
+        8,
+        2.26,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        192
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_1_6_Leaf_3",
+      "location": [
+        8.18,
+        2.0799999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        282
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_0_Heart",
+      "location": [
+        0.8,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_0_Leaf_0",
+      "location": [
+        0.98,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_0_Leaf_1",
+      "location": [
+        0.8,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_0_Leaf_2",
+      "location": [
+        0.6200000000000001,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_0_Leaf_3",
+      "location": [
+        0.8,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_1_Heart",
+      "location": [
+        2.0300000000000002,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_1_Leaf_0",
+      "location": [
+        2.2100000000000004,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_1_Leaf_1",
+      "location": [
+        2.0300000000000002,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_1_Leaf_2",
+      "location": [
+        1.8500000000000003,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_1_Leaf_3",
+      "location": [
+        2.0300000000000002,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_2_Heart",
+      "location": [
+        3.26,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_2_Leaf_0",
+      "location": [
+        3.44,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_2_Leaf_1",
+      "location": [
+        3.26,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_2_Leaf_2",
+      "location": [
+        3.0799999999999996,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_2_Leaf_3",
+      "location": [
+        3.26,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_3_Heart",
+      "location": [
+        4.49,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_3_Leaf_0",
+      "location": [
+        4.67,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_3_Leaf_1",
+      "location": [
+        4.49,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_3_Leaf_2",
+      "location": [
+        4.3100000000000005,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_3_Leaf_3",
+      "location": [
+        4.49,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_4_Heart",
+      "location": [
+        5.72,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_4_Leaf_0",
+      "location": [
+        5.8999999999999995,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_4_Leaf_1",
+      "location": [
+        5.72,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_4_Leaf_2",
+      "location": [
+        5.54,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_4_Leaf_3",
+      "location": [
+        5.72,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_5_Heart",
+      "location": [
+        6.95,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_5_Leaf_0",
+      "location": [
+        7.13,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_5_Leaf_1",
+      "location": [
+        6.95,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_5_Leaf_2",
+      "location": [
+        6.7700000000000005,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_5_Leaf_3",
+      "location": [
+        6.95,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_2_6_Heart",
+      "location": [
+        8.18,
+        3.7199999999999998,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_6_Leaf_0",
+      "location": [
+        8.36,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        24
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_6_Leaf_1",
+      "location": [
+        8.18,
+        3.9,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        114
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_6_Leaf_2",
+      "location": [
+        8,
+        3.7199999999999998,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        204
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_2_6_Leaf_3",
+      "location": [
+        8.18,
+        3.5399999999999996,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        294
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_0_Heart",
+      "location": [
+        0.8,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_0_Leaf_0",
+      "location": [
+        0.98,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_0_Leaf_1",
+      "location": [
+        0.8,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_0_Leaf_2",
+      "location": [
+        0.6200000000000001,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_0_Leaf_3",
+      "location": [
+        0.8,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_1_Heart",
+      "location": [
+        2.0300000000000002,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_1_Leaf_0",
+      "location": [
+        2.2100000000000004,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_1_Leaf_1",
+      "location": [
+        2.0300000000000002,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_1_Leaf_2",
+      "location": [
+        1.8500000000000003,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_1_Leaf_3",
+      "location": [
+        2.0300000000000002,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_2_Heart",
+      "location": [
+        3.26,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_2_Leaf_0",
+      "location": [
+        3.44,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_2_Leaf_1",
+      "location": [
+        3.26,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_2_Leaf_2",
+      "location": [
+        3.0799999999999996,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_2_Leaf_3",
+      "location": [
+        3.26,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_3_Heart",
+      "location": [
+        4.49,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_3_Leaf_0",
+      "location": [
+        4.67,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_3_Leaf_1",
+      "location": [
+        4.49,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_3_Leaf_2",
+      "location": [
+        4.3100000000000005,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_3_Leaf_3",
+      "location": [
+        4.49,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_4_Heart",
+      "location": [
+        5.72,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_4_Leaf_0",
+      "location": [
+        5.8999999999999995,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_4_Leaf_1",
+      "location": [
+        5.72,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_4_Leaf_2",
+      "location": [
+        5.54,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_4_Leaf_3",
+      "location": [
+        5.72,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_5_Heart",
+      "location": [
+        6.95,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_5_Leaf_0",
+      "location": [
+        7.13,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_5_Leaf_1",
+      "location": [
+        6.95,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_5_Leaf_2",
+      "location": [
+        6.7700000000000005,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_5_Leaf_3",
+      "location": [
+        6.95,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Cabbage_3_6_Heart",
+      "location": [
+        8.18,
+        5.18,
+        0.34
+      ],
+      "radius": 0.255,
+      "segments": 8,
+      "rings": 4,
+      "smooth": false,
+      "material": "heart",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_6_Leaf_0",
+      "location": [
+        8.36,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        36
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_6_Leaf_1",
+      "location": [
+        8.18,
+        5.359999999999999,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        126
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_6_Leaf_2",
+      "location": [
+        8,
+        5.18,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        216
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Cabbage_3_6_Leaf_3",
+      "location": [
+        8.18,
+        5,
+        0.15
+      ],
+      "width": 0.44,
+      "depth": 0.5,
+      "height": 0.12,
+      "rotationDegrees": [
+        0,
+        0,
+        306
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      4.5,
+      -3.8,
+      3.25
+    ],
+    "cameraTarget": [
+      1.5,
+      1,
+      0.12
+    ],
+    "orthoScale": 4.1,
+    "worldRole": "sky"
+  }
+}

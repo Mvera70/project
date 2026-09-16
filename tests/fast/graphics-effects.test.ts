@@ -34,7 +34,7 @@ import { Tells, WINDOWS } from '../../src/render3d/effects/tells';
 import { createScenicState } from '../../src/render3d/scenic-state';
 import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
-import { groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
+import { FIELD_CROPS, groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
@@ -275,11 +275,25 @@ describe('G-08 · las consecuencias', () => {
       const parcel = planFor(moment).buildings.find((building) => building.kind === 'field');
       return parcel?.asset ?? null;
     };
-    expect(fieldAt(TIME.HARVEST_WEEK - 1)).toBe('field');
+    expect(FIELD_CROPS).toContain(fieldAt(TIME.HARVEST_WEEK - 1));
     expect(fieldAt(TIME.HARVEST_WEEK)).toBe('field-cut');
     expect(fieldAt(TIME.HARVEST_WEEK + 6)).toBe('field-cut');
     expect(fieldAt(2)).toBe('field-cut');
-    expect(fieldAt(20)).toBe('field');
+    expect(fieldAt(20)).toBe(fieldAt(TIME.HARVEST_WEEK - 1));
+  });
+
+  it('las variedades de cultivo se mantienen por parcela y comparten la siega', () => {
+    const state = village(14);
+    const field = state.buildings.find((b) => b.kind === 'field');
+    expect(field).toBeDefined();
+    if (field === undefined) throw new Error('La aldea de prueba necesita un campo.');
+    state.buildings = Array.from({ length: 12 }, (_, index) => ({ ...field, id: index + 1000 }));
+    const before = JSON.stringify(state);
+    const crops = (week: number) => planFor(atTick(state, week)).buildings.map((b) => b.asset);
+    expect(new Set(crops(10))).toEqual(new Set(FIELD_CROPS));
+    expect(crops(10)).toEqual(crops(30));
+    expect(crops(TIME.HARVEST_WEEK).every((id) => id === 'field-cut')).toBe(true);
+    expect(JSON.stringify(state)).toBe(before);
   });
 
   it('y ese cambio pide reconstruir el campo, no el pueblo entero', () => {

@@ -3781,6 +3781,65 @@
         "source": "Original G-18: Pescador: camisa azul río, botas altas y cesto lateral; manos libres para la acción.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "field-cabbage",
+      "artifactRound": "G-22",
+      "status": "study",
+      "recipe": "art/recipes/field-cabbage/field-cabbage.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T18-29-27-041Z-47124",
+        "directory": "artifacts/graphics/G-22/approved/eeb451ab6596c7f5"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.198333,
+          0
+        ],
+        "size": [
+          3,
+          0.198333,
+          2
+        ]
+      },
+      "recipeSha256": "7F0AA4BDEBBA0B7CEB77B2E6F20EE4CBA3B4DA95CC5C7C5960086CA4A2D9889D",
+      "materials": [
+        "soil",
+        "leaf",
+        "heart"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 2292
+      },
+      "hashes": {
+        "field-cabbage.blend": "5A53BF0B5B974D1D0B9ADBE31AD75754D05BC09785E51DA117572A3383986AFF",
+        "field-cabbage.glb": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5",
+        "field-cabbage-blender.png": "672E24FCDDE7B3F23EE6517C52A5C9916B16CC2673A0C0F1B0390BE2AE98F022",
+        "capture-1.png": "D8154DFCAA78C5EAF54C51439FCAC2A8EBD264FB590B7FB06251BAF47BCA1620",
+        "capture-1-gray.png": "4FC9785F64E263D7E0B244082E9BCA8C112ED188DD49D668244F95B65EED20B6",
+        "capture.json": "D10E1A1D3C00BFAC18D09CFA309B94078D66FD4390A7D2147044EE0903856BE8",
+        "build.json": "D24BC6416ABE75E438B6C0D4B085AB3D4BCCA118FED3EABD0E035489560994F8",
+        "validation.json": "5F3CF42265150F637E7B1D6BDF14E1171DD2D63A287076EFC28C8B4F09F9F710"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-22: coles con corazón redondeado y hojas verdes abiertas.",
+        "license": "Project original"
+      }
     }
   ]
 }
