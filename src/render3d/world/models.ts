@@ -1,0 +1,145 @@
+// V-15 · Qué malla lleva cada persona. design.md D.6.2, Anexo E.
+//
+// **El problema que esta fase resuelve, dicho corto:** hasta ahora la malla se
+// elegía **por el oficio** (`VILLAGER_BY_ROLE`, que vivía en `renderer.ts`), y
+// en este juego los oficios son siete y la mayoría de la gente **no tiene
+// ninguno**. Así que un niño, un anciano, un leñador, un albañil o un pastor no
+// podían tener figura propia: no son oficios, y no hay hueco donde ponerlos.
+// De hecho no se podían ni pedir al taller de arte, porque llegarían sin poder
+// entrar en el juego.
+//
+// Lo dijo el dueño del diseño el 16 sep 2026, al corregirme cuando yo daba por
+// hecho que el granjero tendría que sustituir al aldeano base: «esto futuro
+// puede implementarse en nuevos aldeanos, no significa que el granjero vaya a
+// ser el aldeano base». O sea que **el repertorio crece**, y el render tiene que
+// admitir tipos que el motor no nombra.
+//
+// **Y no hace falta tocar el motor para eso.** El render ya recibe, por actor,
+// la edad y lo que esa persona está haciendo ahora mismo: son datos que la capa
+// de vida calcula y pasa en `Actor` (`contracts.ts`). Esta fase sólo cambia
+// **de qué se lee** la malla.
+//
+// **Cómo entra el arte, y por qué esto se puede escribir antes que las mallas.**
+// La regla devuelve un **nombre deseado**, y quien lo consume prueba ese nombre
+// y **cae al aldeano base si el recurso no existe**. Así que el día que llegue
+// `villager-child` de la sesión de Blender, los niños del valle cambian de
+// figura sin tocar una línea; y mientras no llegue, se ven exactamente como
+// hoy. No hay un paso de integración: hay mallas que aparecen.
+//
+// El encargo de arte con la lista entera y sus restricciones está en
+// `docs/graphics-rounds/aldeanos-por-hacer.md`.
+
+import { LIFE } from '@engine/balance';
+import type { Role } from '@engine/state';
+import type { Actor } from '../contracts';
+
+/**
+ * Los siete oficios con malla propia, tal como estaban en `renderer.ts`.
+ *
+ * `stranger` no está y es deliberado: no es un oficio, es «sin oficio todavía»,
+ * y por eso usa el aldeano base. Si algún día quiere figura propia —y la lista
+ * de encargo la pide, porque un desconocido entre conocidos se nota— entra por
+ * la regla de abajo y no por aquí.
+ */
+export const VILLAGER_BY_ROLE: Readonly<Record<Exclude<Role, 'stranger'>, string>> = {
+  leader: 'villager-leader',
+  smith: 'villager-smith',
+  midwife: 'villager-midwife',
+  priest: 'villager-priest',
+  woodward: 'villager-woodward',
+  reeve: 'villager-reeve',
+  herbalist: 'villager-herbalist',
+};
+
+/**
+ * La malla del aldeano de siempre. Es el respaldo de todo lo de este fichero:
+ * ninguna regla puede dejar a una persona sin figura.
+ */
+export const BASE_VILLAGER = 'villager';
+
+/**
+ * Hasta qué edad se es un crío y desde cuál se es un mayor, **leídos del motor**
+ * (`LIFE.ADULT`) y no escritos aquí.
+ *
+ * Importa que sean los mismos que usa el resto del juego: la capa de vida ya
+ * hace que los críos busquen más cerca de casa y que los mayores prefieran
+ * pausas próximas con estos mismos umbrales (IA-3). Si la figura se partiera por
+ * una edad distinta, se vería un adulto pequeño comportándose como un niño.
+ */
+export const CHILD_UNDER = LIFE.ADULT[0];
+export const ELDER_OVER = LIFE.ADULT[1];
+
+/**
+ * Lo que una persona está haciendo, en los términos que le importan a la malla.
+ *
+ * Lo calcula la capa de vida (`life/cast.ts`) del sitio y la oferta que esa
+ * persona está consumiendo, y llega en `Actor.occupation`. Es una lista corta a
+ * propósito: **sólo lo que cambiaría la silueta**. No es el catálogo de ofertas
+ * —hay quince— ni el de oficios del motor; es «qué figura pediría a un
+ * ilustrador para esta persona en este instante».
+ */
+export type Occupation =
+  | 'field'      // trabaja la tierra: es lo que hace la mayoría
+  | 'felling'    // en el tajo del bosque, talando
+  | 'building'   // en una obra
+  | 'herding'    // con el rebaño: dando de comer, acariciando, espantando
+  | 'water'      // en el vado o en el pozo
+  | null;        // nada que distinga una silueta
+
+/**
+ * La malla que le corresponde a este actor, en orden de lo que más manda.
+ *
+ * El orden **es** la decisión de diseño, así que va explicado:
+ *
+ * 1. **La edad primero, por encima del oficio.** Un niño es un niño aunque un
+ *    día herede un cargo, y un anciano es un anciano aunque sea el jefe. Es
+ *    además la distinción que más se lee a la distancia de la cámara —silueta
+ *    baja y cabeza grande, o espalda encorvada— y el cuaderno de referencia
+ *    visual del dueño dice que a veinte píxeles lo que se lee es la silueta.
+ * 2. **Después el oficio**, que es lo que había antes de esta fase y sigue
+ *    valiendo: el herrero es herrero esté en la fragua o cruzando la plaza,
+ *    porque el oficio es quién eres y no qué haces ahora.
+ * 3. **Y por último lo que está haciendo**, que es lo que esta fase añade y lo
+ *    que da figura a la mayoría de la aldea, que no tiene oficio: el que labra,
+ *    el que tala, el que levanta un muro, el que anda con el rebaño.
+ *
+ * Quien llame a esto tiene que **caer al aldeano base** si el nombre devuelto
+ * no tiene recurso. Ver la cabecera del fichero.
+ */
+export function modelFor(actor: Actor): string {
+  if (actor.age < CHILD_UNDER) return 'villager-child';
+  if (actor.age > ELDER_OVER) return 'villager-elder';
+
+  if (actor.role !== null && actor.role !== 'stranger') {
+    return VILLAGER_BY_ROLE[actor.role];
+  }
+
+  switch (actor.occupation) {
+    case 'field': return 'villager-farmer';
+    case 'felling': return 'villager-woodcutter';
+    case 'building': return 'villager-mason';
+    case 'herding': return 'villager-shepherd';
+    case 'water': return 'villager-fisher';
+    default: return BASE_VILLAGER;
+  }
+}
+
+/**
+ * De qué sitio y qué oferta sale cada ocupación.
+ *
+ * Vive aquí y no en `life/cast.ts` para que la regla entera —qué figura y de
+ * dónde sale— se lea de un tirón, y para que una prueba pueda comprobarla sin
+ * montar una jornada.
+ *
+ * Los identificadores de sitio los pone `life/offers.ts`: `felling` es el tajo
+ * del bosque, `works:<id>` una obra en marcha, `<clase>:<id>` un edificio, y
+ * `ford:crossing` el vado. Las ofertas son las de `OFFERS`.
+ */
+export function occupationOf(placeId: string, offerId: string): Occupation {
+  if (placeId === 'felling') return 'felling';
+  if (placeId.startsWith('works:')) return 'building';
+  if (placeId.startsWith('field:') && offerId === 'work') return 'field';
+  if (offerId === 'feed' || offerId === 'pet' || offerId === 'chase') return 'herding';
+  if (offerId === 'drink' && placeId.startsWith('ford:')) return 'water';
+  return null;
+}

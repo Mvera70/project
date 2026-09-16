@@ -10,6 +10,7 @@
 // función que evaluaba una curva del reloj— ya no existe, y con ella se fue la
 // bandera que permitía volver a ella.
 
+import { occupationOf } from '../world/models';
 import type { VillagerId } from '@engine/state';
 import type { Activity, Actor } from '../contracts';
 import type { ClipName } from '../clips';
@@ -123,6 +124,12 @@ export function castOf(
       // que marca al 60 % de la gente no señala a nadie (§11.1.1).
       talking: talkingOf(dweller),
       arguing: arguingOf(dweller),
+      // V-15: sólo cuando ha llegado a su sitio. Alguien de camino al tajo
+      // todavía no es un leñador, va andando, y cambiarle la figura a media
+      // calle se vería como un parpadeo.
+      occupation: dweller.doing?.there === true
+        ? occupationOf(dweller.doing.place.id, dweller.doing.offer.id)
+        : null,
       // TUNE: la capa de vida todavía no trae el `Role` de nadie hasta aquí
       // (V-11 añadió los ocho modelos en `world/cast.ts`, no este puente); con
       // `null` todo el mundo se sigue viendo con el aldeano base, que es lo

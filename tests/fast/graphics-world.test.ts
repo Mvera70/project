@@ -593,6 +593,7 @@ describe('G-10 · el reparto no son clones', () => {
       id: id as Actor['id'], x: 1, z: 1, facing: 0, activity: 'resting',
       clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named: false, age, talking: false,
     arguing: false,
+    occupation: null,
       role: null,
     };
   }
@@ -759,6 +760,7 @@ describe('G-10 · cobertura del catálogo', () => {
       id: id as Actor['id'], x: 1, z: 1, facing: 0, activity: 'resting',
       clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named, age: 30, talking: false,
     arguing: false,
+    occupation: null,
       role: null,
     });
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);
@@ -853,6 +855,7 @@ describe('G-10 · lo que pisa el valle sigue su cota', () => {
       id: id as Actor['id'], x, z, facing: 0, activity: 'resting',
       clip: 'idle', clipSeconds: 0, travelled: 0, cell: 0, named: false, age: 30, talking: false,
     arguing: false,
+    occupation: null,
       role: null,
     });
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, model);

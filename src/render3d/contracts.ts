@@ -2,6 +2,7 @@
 
 import type { GameState, Role, VillagerId } from '../engine/state';
 import type { ClipName } from './clips';
+import type { Occupation } from './world/models';
 
 /**
  * Qué está haciendo una figura, de las seis cosas que el render distingue.
@@ -60,6 +61,15 @@ export interface Actor {
    * la historia visible era invisible.
    */
   readonly arguing: boolean;
+  /**
+   * V-15: qué está haciendo esta persona, en los términos que le importan a la
+   * malla (`world/models.ts`, `Occupation`). Existe porque la figura **no puede
+   * elegirse sólo por el oficio**: los oficios del motor son siete y la mayoría
+   * de la gente no tiene ninguno, así que un niño, un leñador o un albañil no
+   * tenían dónde entrar. `activity` no sirve para esto: distingue andar de
+   * trabajar, no labrar de talar.
+   */
+  readonly occupation: Occupation;
   /**
    * Los años que tiene. Sirven para la talla y para nada más.
    *
