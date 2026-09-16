@@ -20,11 +20,11 @@ nadie va a encontrar.
 |---|---|
 | Rama | `rework/parada-a-media` |
 | HEAD | ver `git log -1`; la última ronda mía es el nivelado de las estancias y el plazo vencido |
-| `main` | **`7f0bfc4`, al día** — se empuja al cerrar cada tramo; la rama también está en el remoto |
+| `main` | **`4145cfc`, al día** — se empuja al cerrar cada tramo; la rama también está en el remoto |
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | **UI-R1** (agente Sonnet, `src/ui/redesign/`, `app.ts`, `index.html`; no tocar). **C-1 está completa** salvo el punto 7, aplazado con motivo |
+| **En vuelo ahora** | **UI-R1** (agente Sonnet, `src/ui/redesign/`, `app.ts`, `index.html`; no tocar). Al cierre del 16 sep llevaba más de una hora sin reportar y `app.ts` no compilaba; se le pidió dejar el árbol compilando y reportar. **Nada de UI-R1 está en `main`.** Informe de cierre: `sesiones/2026-09-16-cierre.md`. **C-1 está completa** salvo el punto 7, aplazado con motivo |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | **G-18 entregado y verificado** (`9cc97af`: los doce aldeanos de Blender, sin tocar `src/`; pendiente de aprobación estética del dueño). **IA-8**: el descarte de la plaza que falló, el plazo propio del viaje (`arriveBy`) y el labrador a su puesto (fuera del campo 6,5 %, parados 0,08 %, giros 0,39 %). Antes: **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
@@ -66,6 +66,10 @@ traído aquí.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
+
+**Demo v17 (16 sep, tarde):** los dieciséis aldeanos de Blender (G-17 y
+G-18) en el valle e IA-8, 50 recursos y ninguno pendiente; fotogramas en
+`artifacts/graphics/G-18/demo-doce/` (sin seguimiento). Sobre `4145cfc`.
 
 **Demo v16 (16 sep):** publicada en el artefacto de siempre con los cuatro
 aldeanos de G-17. Empaquetada desde un **worktree limpio en HEAD** (`git
