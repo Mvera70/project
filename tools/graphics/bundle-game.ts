@@ -32,8 +32,24 @@ for (const file of readdirSync(ASSETS)) {
   if (!WANTED.includes(id)) continue;
   embedded[id] = readFileSync(resolve(ASSETS, file)).toString('base64');
 }
+// **Dos cosas distintas que antes eran la misma.** Un id que está en el catálogo
+// y no tiene GLB promovido es un olvido y sigue siendo un error. Pero desde
+// V-15b la lista `WANTED` pide también los modelos que el taller **todavía no
+// ha entregado** —niño, anciano, granjero, leñador…— para que se carguen solos
+// el día que existan, y ésos no están en el catálogo siquiera: no son un
+// olvido, son lo que viene. Se saltan y se dicen en voz alta, no en silencio,
+// para que la lista de lo que falta sea visible en cada empaquetado. El
+// cargador (`assets.ts`) ya los toleraba; el empaquetador no, y rompió el
+// primer intento de demo tras V-15b con «Sin promover: villager-child, …».
+const catalogued = new Set(
+  (JSON.parse(readFileSync(resolve(ROOT, 'art', 'catalog.json'), 'utf8')) as { assets: { id: string }[] })
+    .assets.map((asset) => asset.id),
+);
 const missing = WANTED.filter((id) => embedded[id] === undefined);
-if (missing.length > 0) throw new Error(`Sin promover: ${missing.join(', ')}.`);
+const forgotten = missing.filter((id) => catalogued.has(id));
+const notYet = missing.filter((id) => !catalogued.has(id));
+if (forgotten.length > 0) throw new Error(`Sin promover: ${forgotten.join(', ')}.`);
+if (notYet.length > 0) console.warn(`Aún sin modelo (se cargarán solos cuando existan): ${notYet.join(', ')}.`);
 
 await build({
   root: ROOT,
