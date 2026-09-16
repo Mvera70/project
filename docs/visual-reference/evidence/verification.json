@@ -1,0 +1,102 @@
+{
+  "widths": [
+    {
+      "width": 1280,
+      "document": 1280,
+      "viewport": 1280,
+      "phones": [
+        390,
+        390
+      ],
+      "docks": [
+        390,
+        390,
+        390,
+        390
+      ]
+    },
+    {
+      "width": 390,
+      "document": 390,
+      "viewport": 390,
+      "phones": [
+        390,
+        390
+      ],
+      "docks": [
+        362,
+        362,
+        362,
+        362
+      ]
+    },
+    {
+      "width": 320,
+      "document": 320,
+      "viewport": 320,
+      "phones": [
+        390,
+        390
+      ],
+      "docks": [
+        292,
+        292,
+        292,
+        292
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "scene": "greet",
+      "distinctDrawings": 4
+    },
+    {
+      "scene": "peck",
+      "distinctDrawings": 3
+    },
+    {
+      "scene": "yield",
+      "distinctDrawings": 4
+    }
+  ],
+  "errors": [],
+  "counts": {
+    "frames": 24,
+    "maps": 10,
+    "docks": 4
+  },
+  "images": [
+    {
+      "src": "../ui-redesign/ui-captures/03-valley-developed.png",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "src": "../ui-redesign/ui-captures/03-valley-developed.png",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "src": "evidence/live-01.png",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "src": "evidence/live-02.png",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "src": "evidence/live-03.png",
+      "width": 780,
+      "height": 1688
+    },
+    {
+      "src": "evidence/live-04.png",
+      "width": 780,
+      "height": 1688
+    }
+  ],
+  "status": "passed"
+}
