@@ -24,7 +24,7 @@ import {
   type InstancedMesh, type Object3D,
 } from 'three';
 import { TERRAIN_CODE } from '@engine/state';
-import { animalPositions, wildlifePositions } from '@derive/animals';
+import { animalPositions, wildlifePositions, type Animal } from '@derive/animals';
 import { daylightAt, NIGHT_FLOOR, NOON } from '../../src/render3d/effects/daylight';
 import { Fauna, ashore as ashoreOf } from '../../src/render3d/effects/fauna';
 import { readFileSync } from 'node:fs';
@@ -385,6 +385,50 @@ describe('G-10 · la fauna (§7.7)', () => {
     fauna.dispose();
     expect(fauna.group.children.length).toBe(0);
     expect(fauna.count).toBe(0);
+  });
+});
+
+describe('IA-5 · el lobo tiene una sola fuente en 3D', () => {
+  function model(): Object3D {
+    const group = new Group();
+    group.add(new Mesh(new BoxGeometry(0.2, 0.2, 0.2), new MeshStandardMaterial()));
+    return group;
+  }
+
+  it('la fórmula vieja ya no pone lobos en la escena 3D, aunque siga dándolos para Canvas', () => {
+    // Noche de invierno: la ventana en la que el lobo decorativo
+    // (`wildlifePositions`) sale siempre que haga frío, pase o no
+    // `wolves_at_the_coop` esa semana en concreto — es justo la doble fuente
+    // que esta fase quita del 3D. Canvas (`render/renderer.ts`) sigue
+    // llamando a `wildlifePositions` directamente y no pasa por `Fauna`, así
+    // que su lobo no se toca: se comprueba aquí que la función lo sigue dando.
+    const base = village(20);
+    const winter = TIME.WEEKS_PER_SEASON * 3 + 4;
+    const moment = atTick(
+      base, Math.floor(base.tick / TIME.WEEKS_PER_YEAR) * TIME.WEEKS_PER_YEAR + winter,
+    );
+    const formulaWolves = wildlifePositions(moment, 0.95).filter((a) => a.kind === 'wolf');
+    expect(formulaWolves.length, 'la fórmula sigue dando lobos, para Canvas').toBeGreaterThan(0);
+    // Y de noche el resto de la cabaña está recogida (§10.6), así que si algo
+    // se pinta a esta hora sólo puede ser el lobo de la fórmula — el que no
+    // tiene que colarse.
+    expect(animalPositions(moment, 0.95)).toEqual([]);
+
+    const fauna = new Fauna(() => model());
+    fauna.update(moment, 0.95); // sin `live`: nada de la fórmula debe colarse.
+    expect(fauna.count).toBe(0);
+    fauna.dispose();
+  });
+
+  it('con un lobo vivo, la escena pinta exactamente ése', () => {
+    const state = village(20);
+    const fauna = new Fauna(() => model());
+    const live: Animal[] = [{ id: 20_000, kind: 'wolf', x: 5, y: 5 }];
+    // De noche, para que la cabaña de la fórmula no aporte nada y lo único
+    // que pueda haber en escena sea `live`.
+    fauna.update(state, 0.95, live);
+    expect(fauna.count).toBe(1);
+    fauna.dispose();
   });
 });
 

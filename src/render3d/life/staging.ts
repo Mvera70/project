@@ -122,6 +122,26 @@ export function quarrelToday(state: GameState): readonly [VillagerId, VillagerId
 }
 
 /**
+ * IA-5 · Si el motor ha soltado un lobo sobre el corral esta semana (§7.10,
+ * `wolves_at_the_coop`, `world/fate.ts`). Mismo criterio que `quarrelToday`:
+ * sólo la semana en que ocurrió (`happening.tick === state.tick`), válido
+ * los siete días de esa semana e igual en cualquiera de ellos.
+ *
+ * **Sin `who`, a propósito.** El suceso no nombra una gallina —no hay tal
+ * cosa: `fate.ts` sólo resta una cuenta de `state.herd.hens`— así que aquí no
+ * hay un `id` que leer, sólo el hecho de que pasó. La vida no inventa a quién
+ * le tocó: enseña que hubo visita (`life/wildlife.ts`), no a quién.
+ *
+ * Pura lectura del estado, sin azar y sin tocar el motor (E.3).
+ */
+export function wolfRaidToday(state: GameState): boolean {
+  for (const happening of state.happenings) {
+    if (happening.tick === state.tick && happening.id === 'wolves_at_the_coop') return true;
+  }
+  return false;
+}
+
+/**
  * La hora de la reunión, como fase de la jornada.
  *
  * TUNE: de 0,25 a 0,75. Fija porque el brief lo pide —«una `Place` temporal con

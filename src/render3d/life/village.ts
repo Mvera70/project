@@ -18,7 +18,7 @@ import {
   blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
 } from './body';
-import { meetingPlace, ordersOf, quarrelToday } from './staging';
+import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { avoid, drive, resolve, seek, separate } from './steering';
 import { createRouter, follow, type Router } from './navigate';
@@ -37,7 +37,9 @@ import {
 } from './scenes';
 import { createCommitmentRegistry, type ActorRef } from './commitments';
 import { LIFE_STEP, seedOfDay } from './clock';
-import { createBeasts, stepBeasts, type Beast } from './beasts';
+import { createBeasts, stepBeasts, WOLF_ALARM_RADIUS, type Beast } from './beasts';
+import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
+import type { Animal } from '@derive/animals';
 import {
   carryAt, drop, findMate, fling, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
   REST_AFTER_THROW, scatter, settle, take, THROW, THROW_AHEAD, type Prop,
@@ -218,6 +220,29 @@ export interface Village {
      *  historia hoy, o nada si esta semana no tiene ninguno de los que esta
      *  fase sabe escenificar. Sirve para comprobar que lo que se cuenta sale
      *  de un hecho real y en qué semana pasó. */
+    readonly triggerTick: number | null;
+  };
+  /**
+   * IA-5: el lobo del corral, listo para pintarse — vacío si no hay visita
+   * hoy o ya se ha ido. Misma forma que `@derive/animals`' `Animal`, la que
+   * ya consume `effects/fauna.ts`, para que el render no necesite un segundo
+   * tipo sólo para esto: una fuente en vivo en vez de la fórmula de siempre.
+   */
+  readonly wildlife: readonly Animal[];
+  /**
+   * IA-5: la cuenta de la visita del lobo, del mismo tipo que `stories` —
+   * episodios, no pasos—: cuántas veces ha aparecido (a lo sumo una por
+   * jornada), cuántas ha llegado a notarla de verdad una gallina, cuántas se
+   * ha ido en calma y cuántas ha tenido que cortarse por el tope de pasos en
+   * vez de terminar sola. Esta última tiene que quedarse en cero: los topes
+   * de `wildlife.ts` están medidos con margen para que la visita siempre
+   * quepa dentro de la noche.
+   */
+  readonly threats: {
+    readonly appeared: number;
+    readonly noticed: number;
+    readonly recovered: number;
+    readonly stuck: number;
     readonly triggerTick: number | null;
   };
   /** Qué está haciendo la aldea ahora, para poder contarlo. */
@@ -412,6 +437,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // `chase`, `feed`— sí entra en la misma lista que el resto de sitios: para
   // `decide()` un animal cerca no es distinto de un pozo cerca.
   const beasts = createBeasts(state, land, heart, seed, shore);
+  // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
+  // soltó esta semana (`wolfRaidToday`, `staging.ts`), hay visita esta
+  // jornada, guionizada en `wildlife.ts`. El corral es el ancla de la primera
+  // gallina que haya —determinista, es la primera que crea `createBeasts`—, o
+  // el corazón de la aldea si el suceso se llevó ya a todas: el lobo sigue
+  // teniendo sentido narrativo aunque no quede ninguna a la que asustar.
+  const wolfRaid = wolfRaidToday(state);
+  const henAnchor = beasts.find((beast) => beast.kind === 'hen')?.anchor ?? heart;
   // V-11 · **Y cuando hay reunión, la reunión es lo único que se ofrece.**
   //
   // Medido, porque mi primera versión sólo sustituía los sitios del valle y
@@ -560,6 +593,18 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   let storiesCompleted = 0;
   let storiesInvalidated = 0;
   let storiesStuck = 0;
+  // IA-5: el lobo del corral, si lo hay hoy. Uno solo (`wolfSpawned` evita
+  // que se cree una segunda vez la misma jornada una vez que la primera ya se
+  // ha ido), y sus cuatro cuentas — amenaza, aviso, calma, forzada — son el
+  // mismo tipo de prueba que `stories` de más arriba: episodios por visita,
+  // no pasos.
+  let wolf: Wolf | null = null;
+  let wolfSpawned = false;
+  let wolfNoticedThisVisit = false;
+  let wildlifeThreats = 0;
+  let wildlifeNoticed = 0;
+  let wildlifeRecovered = 0;
+  let wildlifeStuck = 0;
   let steps = 0;
   // V-09: pases de pelota dados en la jornada. Contados igual que en
   // `spike/life.ts` (`world.passes += 1`): cualquier tirada de una pelota a
@@ -619,6 +664,22 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         invalidated: storiesInvalidated,
         stuck: storiesStuck,
         triggerTick: quarrelPair === null ? null : state.tick,
+      };
+    },
+
+    get wildlife(): readonly Animal[] {
+      return wolf !== null && wolf.phase !== 'gone'
+        ? [{ id: wolf.body.id, kind: 'wolf', x: wolf.body.x, y: wolf.body.z }]
+        : [];
+    },
+
+    get threats() {
+      return {
+        appeared: wildlifeThreats,
+        noticed: wildlifeNoticed,
+        recovered: wildlifeRecovered,
+        stuck: wildlifeStuck,
+        triggerTick: wolfRaid ? state.tick : null,
       };
     },
 
@@ -1143,6 +1204,40 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         target.aimAt = findMate(target, dwellers)?.body.id ?? null;
       }
 
+      // 7e · IA-5 · La amenaza del lobo, si el motor la soltó esta semana.
+      //
+      //     Antes de que la cabaña decida nada, para que la gallina que huye
+      //     este mismo paso huya de dónde está el lobo *ahora*, no de dónde
+      //     estaba hace un paso. Guionizado (`wildlife.ts`), no navegado ni
+      //     metido en el registro de compromisos: no es una interacción de
+      //     dos actores por unas plazas, es una amenaza sobre el corral
+      //     entero, y nunca escribe en `GameState` — el motor ya decidió
+      //     cuántas gallinas se llevó (`fate.ts`), esto sólo lo enseña.
+      if (wolfRaid && !wolfSpawned && steps >= WOLF_START_STEP) {
+        wolf = createWolf(state, land, shore, router, henAnchor, steps);
+        wolfSpawned = true;
+        wolfNoticedThisVisit = false;
+        wildlifeThreats += 1;
+      }
+      if (wolf !== null && wolf.phase !== 'gone') {
+        // Ligado a una constante propia y no a `wolf` a secas: `stepWolf`
+        // muta `.phase` por dentro, y TypeScript no lo sabe — sigue creyendo,
+        // tras la llamada, que `wolf.phase` es lo que era antes de ella. Con
+        // `active` la comprobación de más abajo es fresca de verdad.
+        const active = wolf;
+        stepWolf(active, land, router, seed, steps);
+        if (!wolfNoticedThisVisit) {
+          const alarmed = beasts.some((beast) => beast.kind === 'hen'
+            && Math.hypot(beast.dweller.body.x - active.body.x, beast.dweller.body.z - active.body.z)
+              <= WOLF_ALARM_RADIUS);
+          if (alarmed) wolfNoticedThisVisit = true;
+        }
+        if (active.phase === 'gone') {
+          if (wolfNoticedThisVisit) wildlifeNoticed += 1;
+          if (active.forced) wildlifeStuck += 1; else wildlifeRecovered += 1;
+        }
+      }
+
       // 8 · La cabaña vive su propio paso. V-08.
       //
       //    Después de la gente y antes de `resolve()`, para que la corrección
@@ -1157,12 +1252,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // no un mapa vacío.
       // El registro es el de la aldea y la ventana de intención sale de los
       // `Dweller` que ya tenemos aquí: un animal sólo necesita saber si quien
-      // tiene al lado viene a él (consolidación de IA-4).
+      // tiene al lado viene a él (consolidación de IA-4). Y desde IA-5, si hay
+      // lobo vivo, su posición es la amenaza que puede hacer huir a una
+      // gallina (`WOLF_ALARM_RADIUS`, `beasts.ts`).
       stepBeasts(beasts, land, around, router, seed, steps, taken, commitments,
         (bodyId) => {
           const person = byId.get(bodyId);
           return person?.doing?.there === true ? person.doing.offer.id : null;
-        });
+        },
+        wolf !== null && wolf.phase !== 'gone' ? { x: wolf.body.x, z: wolf.body.z } : null);
 
       resolve(bodies, around, land);
 

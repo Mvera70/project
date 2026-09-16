@@ -173,18 +173,33 @@ export class Fauna {
    * `scenic-state.ts`, para todos y de una vez, y este método vuelve a ser lo
    * que debía: una función de la hora.
    *
-   * **Y sigue derivando del estado, que es la deuda que queda aquí.** V-08
-   * partió la clase en dos —«de dónde salen las posiciones» y «cómo se
-   * pintan», `paint` abajo— para que la capa de vida pudiera entrar por la
-   * segunda mitad: `life/beasts.ts` ya da animales vivos, con cuerpo y sin
-   * necesidad de `ashore`. Ese enganche **no se ha hecho**, así que el rebaño
-   * que se ve es todavía una función de la hora mientras la gente a su lado
-   * son cuerpos que andan. Es trabajo de la ronda que integre el renderer, y
-   * no estaba en el alcance de V-08 (E.8) ni en el de V-12.
+   * **Y sigue derivando del estado, que es la deuda que queda aquí — salvo
+   * para el lobo, desde IA-5.** V-08 partió la clase en dos —«de dónde salen
+   * las posiciones» y «cómo se pintan», `paint` abajo— para que la capa de
+   * vida pudiera entrar por la segunda mitad: `life/beasts.ts` ya daba
+   * animales vivos, con cuerpo y sin necesidad de `ashore`, pero ese enganche
+   * no se había hecho para ninguna especie del corral, y sigue sin hacerse
+   * aquí — es trabajo de una ronda que no es ésta, y tocar la gallina, el
+   * cerdo o la vaca ahora habría movido cifras que IA-4 ya midió sin que
+   * nadie lo pidiera.
+   *
+   * El lobo es distinto: antes de esta fase era decorado puro
+   * (`wildlifePositions`, un círculo alrededor de un árbol cada noche de
+   * invierno, pasara o no `wolves_at_the_coop` esa semana) y ahora tiene
+   * cuerpo de verdad en `life/wildlife.ts`, sólo la semana del suceso real.
+   * **Una especie no puede tener dos fuentes de posición en 3D a la vez**
+   * (el brief de la fase lo llama así, literal), así que aquí se descarta su
+   * entrada de la fórmula vieja — Canvas (`render/renderer.ts`) sigue
+   * llamando a `wildlifePositions` directamente y no pasa por esta clase, así
+   * que su lobo decorativo no se toca — y `live` (`Village.wildlife`, nueva)
+   * es la única fuente que llega a pintarse. Ya viene en tierra y con las
+   * coordenadas que le tocan: no pasa por `ashore`, que es cosa de la fórmula
+   * vieja para anclas que no miran el terreno.
    */
-  update(state: GameState, dayPhase: number): void {
+  update(state: GameState, dayPhase: number, live: readonly Animal[] = []): void {
     const animals: Animal[] = [];
     for (const animal of [...animalPositions(state, dayPhase), ...wildlifePositions(state, dayPhase)]) {
+      if (animal.kind === 'wolf') continue; // IA-5: una sola fuente en 3D — ver arriba.
       if (animal.kind === 'fish') {
         animals.push(animal);
         continue;
@@ -192,6 +207,7 @@ export class Fauna {
       const dry = ashore(state.map, animal.x, animal.y);
       if (dry !== null) animals.push({ ...animal, x: dry.x, y: dry.y });
     }
+    for (const animal of live) animals.push(animal);
     this.paint(animals);
   }
 

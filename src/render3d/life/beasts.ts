@@ -278,6 +278,19 @@ const GIVE_UP = 600;
  */
 const NOTICE_RADIUS: Readonly<Record<BeastKind, number>> = { hen: 1.15, pig: 1.15, cow: 1.15 };
 
+/**
+ * IA-5: a qué distancia nota una gallina que el lobo del corral (`wildlife.ts`)
+ * está cerca, en celdas.
+ *
+ * TUNE: 3,5, muy por encima de `NOTICE_RADIUS.hen` (1,15): un lobo se nota de
+ * más lejos que una visita curiosa, y es justo esa distancia la que lo hace
+ * un lobo y no un vecino. Exportada porque `village.ts` necesita el mismo
+ * número para contar cuántas veces la visita ha llegado a notarse de verdad
+ * — dos sitios con la misma cifra por copiarla habrían sido dos cifras en
+ * cuanto una se afinara sin la otra.
+ */
+export const WOLF_ALARM_RADIUS = 3.5;
+
 /** Cuánto más allá del alcance del regalo cuenta como «encima», en celdas. */
 const CLOSE_MARGIN = 0.15;
 
@@ -838,6 +851,10 @@ function updateReaction(
  * soltarse la reacción sólo hace falta invalidarla explícitamente para que
  * «volver a una actividad alcanzable» sea un `decide()` limpio y no un cuerpo
  * que se cree `there` a varias celdas de donde debería estar.
+ *
+ * IA-5: además de la persona más cercana, una gallina también nota al lobo
+ * del corral si lo hay (`threat`, `village.ts`, `wildlife.ts`) y huye de él
+ * con el mismo reflejo — ver el comentario junto a `WOLF_ALARM_RADIUS`.
  */
 export function stepBeasts(
   beasts: readonly Beast[],
@@ -864,6 +881,13 @@ export function stepBeasts(
    * saber si el que tienen al lado viene a ellos o pasaba por ahí.
    */
   intentOf: (bodyId: number) => string | null,
+  /**
+   * IA-5: dónde está el lobo del corral ahora mismo (`wildlife.ts`), o `null`
+   * si no hay visita hoy o ya se ha ido. Opcional y con valor por defecto para
+   * no romper a quien llame sin saber de lobos —las pruebas de esta fase, el
+   * resto del año—: la inmensa mayoría de las jornadas no tienen ninguno.
+   */
+  threat: Point | null = null,
 ): void {
   const encounters = registry;
   encounters.expire(step);
@@ -951,8 +975,18 @@ export function stepBeasts(
     // gallinas impasibles ante quien pasa — que es lo contrario de una gallina.
     // Apartarse no es un compromiso: no reserva a nadie, no tiene final que
     // negociar y no puede fallar.
-    const fleeing = beast.kind === 'hen' && visitor !== null
+    //
+    // **IA-5: el lobo del corral asusta a la gallina por el mismo reflejo**,
+    // sólo que desde más lejos (`WOLF_ALARM_RADIUS`, muy por encima de
+    // `NOTICE_RADIUS.hen`): un lobo no es una visita curiosa. Cuando los dos
+    // están cerca a la vez, gana el lobo — huir de un depredador no compite
+    // con apartarse de quien pasa.
+    const personNear = beast.kind === 'hen' && visitor !== null
       && Math.hypot(visitor.x - body.x, visitor.z - body.z) <= NOTICE_RADIUS.hen;
+    const wolfNear = beast.kind === 'hen' && threat !== null
+      && Math.hypot(threat.x - body.x, threat.z - body.z) <= WOLF_ALARM_RADIUS;
+    const fleeFrom: Point | null = wolfNear ? threat : personNear ? visitor : null;
+    const fleeing = fleeFrom !== null;
     const holdingStill = beast.kind !== 'hen' && reaction.stage === 'act';
     const calming = reaction.stage === 'recover';
     const overridden = fleeing || holdingStill || calming;
@@ -1042,8 +1076,8 @@ export function stepBeasts(
       : follow(body, dweller.doing.route);
 
     let want: Push;
-    if (fleeing && visitor !== null) {
-      want = flee(body, visitor);
+    if (fleeing && fleeFrom !== null) {
+      want = flee(body, fleeFrom);
     } else if (holdingStill || calming) {
       want = { x: 0, z: 0 };
     } else {

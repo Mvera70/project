@@ -24,7 +24,7 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | **Sólo IA-5** (fauna silvestre), sobre `effects/fauna.ts`, `life/wildlife.ts`, `life/beasts.ts`, `life/staging.ts`, `life/village.ts`, `renderer.ts`. **No tocar esos ficheros.** **UI-R1 no está en vuelo**: se dijo que sí el 16 sep y era falso —un mensaje del dueño interrumpió entre las dos llamadas y sólo salió la primera—. Corregido aquí. |
+| **En vuelo ahora** | nada. La tanda de IA está cerrada: IA-0 a IA-6, las siete fases |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
@@ -43,12 +43,13 @@ dependencias, no el de lo que apetece.
 
 | # | Qué | Dueño | Depende de | Hecho cuando |
 |---|---|---|---|---|
-| 1 | **Aterrizar IA-5**, y **no está verde**. Su run de verificación llevaba **una hora y seis minutos colgado** y lo maté yo; medido en su lugar: `life-wildlife.test.ts` pasa pero **tarda 63 s**, que no cabe en la rápida, y `graphics-effects.test.ts` tiene **cuatro rojas de sus cambios**, la peor `expected 0 to be greater than 0` sobre la fauna, o sea que la prueba **no encuentra ni una vaca ni un pez** —justo el riesgo de la doble fuente de posiciones que su brief marcaba en rojo—. Le he mandado las cuatro con su mensaje literal y la regla de dónde vive una prueba cara | yo | de que el agente conteste | commit propio, informe `life-rounds/IA-5.md`, tablero actualizado |
+| 1 | ~~Aterrizar IA-5~~ **HECHO**. Y reclamó bien: las cuatro rojas de `graphics-effects.test.ts` que le mandé **no eran suyas**, lo comprobó revirtiendo sus ficheros y lo verifiqué yo con `git stash`. Pasan a ser el punto 8 | yo | — | **hecho** |
 | 2 | **V-15b · enganchar el renderer.** `renderer.ts` llama a `modelFor(actor)`, cae al aldeano base si el recurso falta, y **borra su propio `VILLAGER_BY_ROLE`**, que ahora está duplicado en `world/models.ts` | yo | 1 (suelta `renderer.ts`) | `life-models` y `graphics-world` verdes, y una captura que demuestre **que no cambia nada visible** hoy, porque las mallas nuevas aún no existen |
 | 3 | **Las nueve jornadas rojas** (`rework.md` §2.8). Ya se pueden tocar: la tanda de IA ha terminado y sus números están quietos | Sonnet | 1 y 2 | `npm run test:journeys` verde, o `it.fails` con la medida escrita y la propiedad intacta. **Sin bajar un solo listón sin motivo escrito** |
 | 4 | ~~El trabajador de vitest que se cae~~ **HECHO, y era bueno**: no se reproduce. Dos pasadas completas de `tests/fast` en paralelo, sin flags, terminaron limpias. Se fue al mover las cuatro partidas largas a las jornadas. **Y de paso destapó la causa probable de las caídas pasadas:** no era ninguna prueba, era **contención por runs huérfanos** —encontró 29 procesos de una hora de antigüedad ocupando los 28 núcleos—. Si vuelve a aparecer, mirar los procesos antes de tocar un solo fichero de prueba | Sonnet | — | **hecho** |
 | 5 | **La demo.** Empaquetar, publicar en el artefacto de siempre, y **una secuencia de capturas** con la aldea crecida | yo | 1 y 2 (árbol limpio) | enlace enviado al dueño con la secuencia; él juzga |
 | 6 | **`main` al día** tras cada uno de los puntos anteriores, no al final | yo | cada punto | `git log -1 main` es el último tramo verde |
+| 8 | **Las cuatro rojas de `graphics-effects.test.ts`, que son mías.** Preexistentes en HEAD y verificadas dos veces. Tres huelen a la misma cosa que las 42 de IA-0 —el valle del fixture ya no tiene el granero, la vaca o el pez que la prueba da por hecho, porque el equilibrado de la densidad cambió las trayectorias— y la cuarta, «una señal dentro de un edificio», parece un fallo de colocación de verdad | yo | — | **lo siguiente** |
 | 7 | **El plazo vencido de las personas**, que está retirado con su medida (`IA-6.md` §4.3): falta poder descartar una plaza que ya falló. Entra si cabe; si no, se queda escrito donde está | yo | 3 | «parados con impulso ≥ 0,9» no empeora del 0,06 % |
 
 **Lo que esta fase deja fuera a propósito**, para que no se cuele: R-3 (los diez
@@ -75,7 +76,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
 | IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `life-rounds/IA-3.md` |
 | IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
-| IA-5 · fauna silvestre (cuervos, lobos) | **la única que queda de la tanda** | — | — |
+| IA-5 · fauna silvestre | **hecha** — el lobo migra y sólo sale la semana del suceso; el cuervo y el pez se quedan, con el motivo escrito | (este commit) | `life-rounds/IA-5.md` |
 | IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | (este commit) | `life-rounds/IA-6.md` |
 
 ### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)

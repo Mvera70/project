@@ -715,7 +715,10 @@ export async function createGraphicsRenderer(
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
       // congelado entre semana y semana sería peor que no tenerlo.
-      fauna.update(shown, phase);
+      // IA-5: y el lobo del corral, si lo hay hoy, viene de la vida
+      // (`life.wildlife`) y no de la fórmula — ver el comentario de `update`
+      // en `effects/fauna.ts` sobre por qué sólo él.
+      fauna.update(shown, phase, life.wildlife);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
       // **U-13 · el cielo.** Se deriva (`derive/weather.ts`): la fila del clima
