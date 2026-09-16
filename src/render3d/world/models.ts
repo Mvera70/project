@@ -107,21 +107,46 @@ export type Occupation =
  * no tiene recurso. Ver la cabecera del fichero.
  */
 export function modelFor(actor: Actor): string {
-  if (actor.age < CHILD_UNDER) return 'villager-child';
-  if (actor.age > ELDER_OVER) return 'villager-elder';
+  return modelChainFor(actor)[0] as string;
+}
+
+/**
+ * Las mallas que le valen a este actor, de la que más le cuadra a la que menos,
+ * **y siempre con el aldeano base al final**.
+ *
+ * Es una cadena y no un solo nombre por una razón que costó verla: con un único
+ * respaldo al base, **un jefe anciano perdía su malla de jefe**. Pedía
+ * `villager-elder`, que todavía no existe, y se caía directo al aldeano de
+ * siempre — o sea que enganchar esta regla habría **empeorado** lo que se ve
+ * hoy, justo lo contrario de lo que pretendía.
+ *
+ * Con la cadena, ese jefe anciano pide anciano, no lo hay, pide jefe, y lo hay.
+ * Y el día que llegue la malla de anciano, la coge sin tocar nada. La regla de
+ * abajo es la misma de siempre: **manda la edad, luego el oficio, luego lo que
+ * se está haciendo**, sólo que ahora expresada como preferencia y no como
+ * decisión única.
+ */
+export function modelChainFor(actor: Actor): readonly string[] {
+  const chain: string[] = [];
+
+  if (actor.age < CHILD_UNDER) chain.push('villager-child');
+  else if (actor.age > ELDER_OVER) chain.push('villager-elder');
 
   if (actor.role !== null && actor.role !== 'stranger') {
-    return VILLAGER_BY_ROLE[actor.role];
+    chain.push(VILLAGER_BY_ROLE[actor.role]);
   }
 
   switch (actor.occupation) {
-    case 'field': return 'villager-farmer';
-    case 'felling': return 'villager-woodcutter';
-    case 'building': return 'villager-mason';
-    case 'herding': return 'villager-shepherd';
-    case 'water': return 'villager-fisher';
-    default: return BASE_VILLAGER;
+    case 'field': chain.push('villager-farmer'); break;
+    case 'felling': chain.push('villager-woodcutter'); break;
+    case 'building': chain.push('villager-mason'); break;
+    case 'herding': chain.push('villager-shepherd'); break;
+    case 'water': chain.push('villager-fisher'); break;
+    default: break;
   }
+
+  chain.push(BASE_VILLAGER);
+  return chain;
 }
 
 /**

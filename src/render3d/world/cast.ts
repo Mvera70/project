@@ -12,7 +12,7 @@
 import {
   AnimationMixer, Color, Group, type AnimationClip, type Material, type Object3D,
 } from 'three';
-import type { Role, VillagerId } from '@engine/state';
+import type { VillagerId } from '@engine/state';
 import type { Actor } from '../contracts';
 import type { LoadedAsset } from '../assets';
 
@@ -111,7 +111,16 @@ export class Cast {
    */
   constructor(
     private readonly asset: LoadedAsset,
-    private readonly instance: (role: Role | null) => Object3D | undefined,
+    /**
+     * V-15b: recibe **el actor entero**, no sólo su oficio.
+     *
+     * Antes era `(role) => ...`, y con eso la malla sólo podía depender del
+     * oficio — que en este juego son siete y **casi nadie tiene uno**. Un niño,
+     * un anciano, un leñador o un albañil no cabían: no son oficios. Ahora la
+     * regla vive en `world/models.ts` (`modelFor`) y mira la edad, el oficio y
+     * lo que la persona está haciendo, en ese orden.
+     */
+    private readonly instance: (actor: Actor) => Object3D | undefined,
     private readonly prop?: (id: string) => Object3D | undefined,
   ) {
     this.group.name = 'Valley_Cast';
@@ -145,7 +154,7 @@ export class Cast {
       present.add(actor.id);
       let player = this.players.get(actor.id);
       if (player === undefined) {
-        const object = this.instance(actor.role);
+        const object = this.instance(actor);
         if (object === undefined) continue;
         object.name = `Villager_${actor.id}`;
         object.traverse((child) => { child.userData.villagerId = actor.id; });

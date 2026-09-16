@@ -11,9 +11,9 @@
 // desaparece. Una peste vencida que siguiera manchando casas sería el mismo
 // fallo que la v2.18 pagó con cinco rondas de balance.
 
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
-import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { clockOf, SEASONS } from '@engine/time';
 import type { GameState } from '@engine/state';
@@ -40,11 +40,27 @@ import { fingerprint } from '../helpers/fingerprint';
 const ROOT = resolve(import.meta.dirname, '..', '..');
 
 const grown = new Map<string, GameState>();
+/**
+ * La aldea de este fichero **se funda con los veinte de §12.2**, no con la
+ * pareja.
+ *
+ * Lo que estas pruebas miden es lo que el valle **enseña sin abrir una ficha**:
+ * el humo de una fragua encendida, la luz de una capilla, el nivel del granero,
+ * las vacas y los peces. O sea que necesitan una aldea que **tenga** esas
+ * cosas, y eso es lo que `foundTwenty` garantiza y una pareja no.
+ *
+ * Con `foundGame` cuatro de ellas fallaban, y es exactamente la misma causa que
+ * movió a dieciocho fixtures en IA-0 (`docs/life-rounds/IA-0.md` §3): el valle
+ * de catorce años de la pareja ya no tiene fragua, ni capilla, ni granero, ni
+ * vaca. La convención está en `CLAUDE.md` desde v3.69 y este fichero no se había
+ * migrado — se descubrió al cerrar IA-5, cuando el agente demostró que esas
+ * cuatro rojas no eran de su fase sino preexistentes.
+ */
 function village(years: number, seed = 7): GameState {
   const key = `${years}:${seed}`;
   let base = grown.get(key);
   if (base === undefined) {
-    base = foundGame(seed);
+    base = foundTwenty(seed);
     run(base, years * 48, 'prudent', CATALOG);
     grown.set(key, base);
   }

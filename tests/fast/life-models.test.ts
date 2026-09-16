@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { LIFE } from '@engine/balance';
 import type { Actor } from '../../src/render3d/contracts';
 import {
-  BASE_VILLAGER, VILLAGER_BY_ROLE, modelFor, occupationOf,
+  BASE_VILLAGER, VILLAGER_BY_ROLE, modelChainFor, modelFor, occupationOf,
 } from '../../src/render3d/world/models';
 
 /** Un actor cualquiera, adulto, sin oficio y sin nada que hacer. */
@@ -100,5 +100,54 @@ describe('V-15 · la malla se elige por quién eres y por lo que haces', () => {
     // no da figura de labrador.
     expect(occupationOf('field:12', 'work')).toBe('field');
     expect(occupationOf('field:12', 'loiter')).toBeNull();
+  });
+});
+
+describe('V-15b · la cadena de respaldo, que es lo que hace segura la mudanza', () => {
+  it('un jefe anciano no pierde su malla de jefe mientras no exista la de anciano', () => {
+    // **El fallo que esta cadena evita, y que estuve a punto de meter.** Con un
+    // solo respaldo al aldeano base, un jefe de sesenta y cinco años pedía
+    // `villager-elder` —que el taller todavía no ha entregado—, no la
+    // encontraba, y se caía directo al aldeano de siempre: o sea que enganchar
+    // la regla nueva habría **empeorado** lo que se ve hoy. Con la cadena pide
+    // anciano, no lo hay, pide jefe, y lo hay.
+    const chain = modelChainFor(actor({ age: 65, role: 'leader' }));
+    expect(chain[0]).toBe('villager-elder');
+    expect(chain).toContain(VILLAGER_BY_ROLE.leader);
+    expect(chain[chain.length - 1]).toBe(BASE_VILLAGER);
+    expect(chain.indexOf('villager-elder')).toBeLessThan(chain.indexOf(VILLAGER_BY_ROLE.leader));
+  });
+
+  it('y con las mallas de hoy, nadie cambia de figura: la mudanza no se ve', () => {
+    // La condición que me puse para enganchar esto: **hoy no puede cambiar
+    // nada**, porque ninguna malla nueva existe todavía. Se comprueba con el
+    // catálogo de verdad: la primera malla de la cadena que exista tiene que ser
+    // la misma que la regla vieja habría dado, que era el oficio o el base.
+    const HAY = new Set([BASE_VILLAGER, ...Object.values(VILLAGER_BY_ROLE)]);
+    const antes = (who: Actor): string =>
+      who.role !== null && who.role !== 'stranger' ? VILLAGER_BY_ROLE[who.role] : BASE_VILLAGER;
+
+    const ages = [3, 10, 15, 30, 59, 60, 72];
+    const roles = [null, 'stranger', ...Object.keys(VILLAGER_BY_ROLE)] as Actor['role'][];
+    const jobs = [null, 'field', 'felling', 'building', 'herding', 'water'] as Actor['occupation'][];
+    for (const age of ages) {
+      for (const role of roles) {
+        for (const occupation of jobs) {
+          const who = actor({ age, role, occupation });
+          const primera = modelChainFor(who).find((name) => HAY.has(name));
+          expect(primera, `${age} años, ${role ?? 'sin oficio'}, ${occupation ?? 'sin tarea'}`)
+            .toBe(antes(who));
+        }
+      }
+    }
+  });
+
+  it('y ninguna cadena se queda sin el aldeano base al final', () => {
+    for (const age of [1, 20, 80]) {
+      for (const occupation of [null, 'field', 'water'] as Actor['occupation'][]) {
+        const chain = modelChainFor(actor({ age, occupation }));
+        expect(chain[chain.length - 1]).toBe(BASE_VILLAGER);
+      }
+    }
   });
 });

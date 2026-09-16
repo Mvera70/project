@@ -19,7 +19,7 @@ import { clockOf } from '@engine/time';
 import { paletteFor } from '@derive/palette';
 import { moodsFor } from '@derive/moods';
 import { createValleyCamera } from './camera';
-import { TERRAIN_CODE, type GameState, type Role, type VillagerId } from '@engine/state';
+import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
   Actor, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
@@ -35,6 +35,7 @@ import {
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { Cast } from './world/cast';
+import { VILLAGER_BY_ROLE, modelChainFor } from './world/models';
 import { dayNumber, dayPhase } from './presentation-clock';
 import { SKY } from '@engine/balance';
 import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../derive/weather';
@@ -56,23 +57,6 @@ const ROCK = 'rock';
 const REED = 'reed';
 const FORD = 'ford-stone';
 
-/**
- * Que recurso clona cada oficio con nombre. design.md D.6.2.
- *
- * Los siete son los que existen de verdad en el estado (§3.4); `stranger` no
- * tiene modelo propio porque es "sin oficio todavia" y no un oficio. Todos
- * comparten huesos y clips con el aldeano base, asi que solo cambia que malla
- * se clona.
- */
-const VILLAGER_BY_ROLE: Readonly<Record<Exclude<Role, 'stranger'>, string>> = {
-  leader: 'villager-leader',
-  smith: 'villager-smith',
-  midwife: 'villager-midwife',
-  priest: 'villager-priest',
-  woodward: 'villager-woodward',
-  reeve: 'villager-reeve',
-  herbalist: 'villager-herbalist',
-};
 
 /**
  * Las clases de §7.7, cada una con su recurso. El nombre del recurso es el de
@@ -271,12 +255,22 @@ export async function createGraphicsRenderer(
   // cuelgan de ello: un almiar toca un campo y la leña toca una casa.
   const steading = new Steading();
   world.add(steading.group);
-  // El oficio elige el recurso; sin oficio, o si el catálogo aún no tiene el
-  // suyo, cae al aldeano base — que es el mismo criterio que ya usaba todo el
-  // mundo antes de que hubiera más de un modelo.
-  const cast = new Cast(villager, (role) => {
-    const wanted = role === null || role === 'stranger' ? undefined : VILLAGER_BY_ROLE[role];
-    return (wanted === undefined ? undefined : library.instance(wanted)) ?? library.instance(VILLAGER);
+  // **V-15b · la malla la decide `modelFor`, y si no existe se cae al aldeano
+  // base.** La regla entera —manda la edad, luego el oficio, luego lo que se
+  // está haciendo— vive en `world/models.ts`; aquí sólo queda pedirla y el
+  // respaldo, que es el mismo criterio que ya había antes de que hubiera más de
+  // un modelo.
+  //
+  // Ese respaldo es lo que permite que el arte entre **una malla a la vez**: el
+  // día que el taller entregue `villager-child`, los críos del valle cambian de
+  // figura sin tocar una línea, y mientras no llegue se ven como hoy. No hay un
+  // paso de integración; hay mallas que aparecen.
+  const cast = new Cast(villager, (actor) => {
+    for (const wanted of modelChainFor(actor)) {
+      const object = library.instance(wanted);
+      if (object !== undefined) return object;
+    }
+    return library.instance(VILLAGER);
   }, (id) => library.instance(id));
   // U-13 · la lluvia, la nieve y el rayo. Tres mallas, creadas una vez.
   const weather = createWeather(scene);
