@@ -115,7 +115,7 @@ const RUIN_ASSETS: Readonly<Record<0 | 1, string>> = {
 };
 
 // G-22 · Variedades visuales estables por parcela, sin azar ni recursos nuevos.
-export const FIELD_CROPS: readonly string[] = ['field', 'field-cabbage'];
+export const FIELD_CROPS: readonly string[] = ['field', 'field-cabbage', 'field-leeks'];
 
 function assetFor(building: Building, tick: number): string | null {
   if (building.lostTick !== null) {

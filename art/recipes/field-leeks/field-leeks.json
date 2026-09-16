@@ -1,0 +1,3777 @@
+{
+  "schemaVersion": 1,
+  "id": "field-leeks",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "field",
+    "footprint": [
+      3,
+      2
+    ],
+    "note": "G-22: puerros de base clara y hojas verdes largas abiertas en abanico. Variante visual estable por parcela; misma escala y huella 3x2; sin recursos ni reglas agrícolas nuevos."
+  },
+  "materials": [
+    {
+      "name": "soil",
+      "role": "soil",
+      "roughness": 1
+    },
+    {
+      "name": "leaf",
+      "role": "foliage",
+      "roughness": 0.95
+    },
+    {
+      "name": "stalk",
+      "role": "plaster",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Soil",
+      "location": [
+        4.5,
+        3,
+        0.04
+      ],
+      "dimensions": [
+        9,
+        6,
+        0.08
+      ],
+      "material": "soil",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_0",
+      "location": [
+        4.5,
+        0.6,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_1",
+      "location": [
+        4.5,
+        1.7999999999999998,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_2",
+      "location": [
+        4.5,
+        3,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_3",
+      "location": [
+        4.5,
+        4.199999999999999,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Furrow_4",
+      "location": [
+        4.5,
+        5.3999999999999995,
+        0.08
+      ],
+      "width": 0.65,
+      "depth": 8.4,
+      "height": 0.08,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_0_Base",
+      "location": [
+        0.7,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_0_Leaf_0",
+      "location": [
+        0.5800126902926389,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_0_Leaf_1",
+      "location": [
+        0.7,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_0_Leaf_2",
+      "location": [
+        0.819987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_1_Base",
+      "location": [
+        1.65,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_1_Leaf_0",
+      "location": [
+        1.5300126902926388,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_1_Leaf_1",
+      "location": [
+        1.65,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_1_Leaf_2",
+      "location": [
+        1.769987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_2_Base",
+      "location": [
+        2.5999999999999996,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_2_Leaf_0",
+      "location": [
+        2.4800126902926385,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_2_Leaf_1",
+      "location": [
+        2.5999999999999996,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_2_Leaf_2",
+      "location": [
+        2.719987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_3_Base",
+      "location": [
+        3.55,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_3_Leaf_0",
+      "location": [
+        3.4300126902926387,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_3_Leaf_1",
+      "location": [
+        3.55,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_3_Leaf_2",
+      "location": [
+        3.669987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_4_Base",
+      "location": [
+        4.5,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_4_Leaf_0",
+      "location": [
+        4.380012690292639,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_4_Leaf_1",
+      "location": [
+        4.5,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_4_Leaf_2",
+      "location": [
+        4.619987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_5_Base",
+      "location": [
+        5.45,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_5_Leaf_0",
+      "location": [
+        5.330012690292639,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_5_Leaf_1",
+      "location": [
+        5.45,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_5_Leaf_2",
+      "location": [
+        5.569987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_6_Base",
+      "location": [
+        6.3999999999999995,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_6_Leaf_0",
+      "location": [
+        6.280012690292638,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_6_Leaf_1",
+      "location": [
+        6.3999999999999995,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_6_Leaf_2",
+      "location": [
+        6.519987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_7_Base",
+      "location": [
+        7.35,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_7_Leaf_0",
+      "location": [
+        7.2300126902926385,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_7_Leaf_1",
+      "location": [
+        7.35,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_7_Leaf_2",
+      "location": [
+        7.469987309707361,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_8_Base",
+      "location": [
+        8.299999999999999,
+        0.6,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_8_Leaf_0",
+      "location": [
+        8.180012690292639,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_8_Leaf_1",
+      "location": [
+        8.299999999999999,
+        0.6,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_0_8_Leaf_2",
+      "location": [
+        8.41998730970736,
+        0.6,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_0_Base",
+      "location": [
+        0.7,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_0_Leaf_0",
+      "location": [
+        0.5800126902926389,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_0_Leaf_1",
+      "location": [
+        0.7,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_0_Leaf_2",
+      "location": [
+        0.819987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_1_Base",
+      "location": [
+        1.65,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_1_Leaf_0",
+      "location": [
+        1.5300126902926388,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_1_Leaf_1",
+      "location": [
+        1.65,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_1_Leaf_2",
+      "location": [
+        1.769987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_2_Base",
+      "location": [
+        2.5999999999999996,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_2_Leaf_0",
+      "location": [
+        2.4800126902926385,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_2_Leaf_1",
+      "location": [
+        2.5999999999999996,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_2_Leaf_2",
+      "location": [
+        2.719987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_3_Base",
+      "location": [
+        3.55,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_3_Leaf_0",
+      "location": [
+        3.4300126902926387,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_3_Leaf_1",
+      "location": [
+        3.55,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_3_Leaf_2",
+      "location": [
+        3.669987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_4_Base",
+      "location": [
+        4.5,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_4_Leaf_0",
+      "location": [
+        4.380012690292639,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_4_Leaf_1",
+      "location": [
+        4.5,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_4_Leaf_2",
+      "location": [
+        4.619987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_5_Base",
+      "location": [
+        5.45,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_5_Leaf_0",
+      "location": [
+        5.330012690292639,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_5_Leaf_1",
+      "location": [
+        5.45,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_5_Leaf_2",
+      "location": [
+        5.569987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_6_Base",
+      "location": [
+        6.3999999999999995,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_6_Leaf_0",
+      "location": [
+        6.280012690292638,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_6_Leaf_1",
+      "location": [
+        6.3999999999999995,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_6_Leaf_2",
+      "location": [
+        6.519987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_7_Base",
+      "location": [
+        7.35,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_7_Leaf_0",
+      "location": [
+        7.2300126902926385,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_7_Leaf_1",
+      "location": [
+        7.35,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_7_Leaf_2",
+      "location": [
+        7.469987309707361,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_8_Base",
+      "location": [
+        8.299999999999999,
+        1.7999999999999998,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_8_Leaf_0",
+      "location": [
+        8.180012690292639,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_8_Leaf_1",
+      "location": [
+        8.299999999999999,
+        1.7999999999999998,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_1_8_Leaf_2",
+      "location": [
+        8.41998730970736,
+        1.7999999999999998,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_0_Base",
+      "location": [
+        0.7,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_0_Leaf_0",
+      "location": [
+        0.5800126902926389,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_0_Leaf_1",
+      "location": [
+        0.7,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_0_Leaf_2",
+      "location": [
+        0.819987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_1_Base",
+      "location": [
+        1.65,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_1_Leaf_0",
+      "location": [
+        1.5300126902926388,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_1_Leaf_1",
+      "location": [
+        1.65,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_1_Leaf_2",
+      "location": [
+        1.769987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_2_Base",
+      "location": [
+        2.5999999999999996,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_2_Leaf_0",
+      "location": [
+        2.4800126902926385,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_2_Leaf_1",
+      "location": [
+        2.5999999999999996,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_2_Leaf_2",
+      "location": [
+        2.719987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_3_Base",
+      "location": [
+        3.55,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_3_Leaf_0",
+      "location": [
+        3.4300126902926387,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_3_Leaf_1",
+      "location": [
+        3.55,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_3_Leaf_2",
+      "location": [
+        3.669987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_4_Base",
+      "location": [
+        4.5,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_4_Leaf_0",
+      "location": [
+        4.380012690292639,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_4_Leaf_1",
+      "location": [
+        4.5,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_4_Leaf_2",
+      "location": [
+        4.619987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_5_Base",
+      "location": [
+        5.45,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_5_Leaf_0",
+      "location": [
+        5.330012690292639,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_5_Leaf_1",
+      "location": [
+        5.45,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_5_Leaf_2",
+      "location": [
+        5.569987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_6_Base",
+      "location": [
+        6.3999999999999995,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_6_Leaf_0",
+      "location": [
+        6.280012690292638,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_6_Leaf_1",
+      "location": [
+        6.3999999999999995,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_6_Leaf_2",
+      "location": [
+        6.519987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_7_Base",
+      "location": [
+        7.35,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_7_Leaf_0",
+      "location": [
+        7.2300126902926385,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_7_Leaf_1",
+      "location": [
+        7.35,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_7_Leaf_2",
+      "location": [
+        7.469987309707361,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_8_Base",
+      "location": [
+        8.299999999999999,
+        3,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_8_Leaf_0",
+      "location": [
+        8.180012690292639,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_8_Leaf_1",
+      "location": [
+        8.299999999999999,
+        3,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_2_8_Leaf_2",
+      "location": [
+        8.41998730970736,
+        3,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_0_Base",
+      "location": [
+        0.7,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_0_Leaf_0",
+      "location": [
+        0.5800126902926389,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_0_Leaf_1",
+      "location": [
+        0.7,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_0_Leaf_2",
+      "location": [
+        0.819987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_1_Base",
+      "location": [
+        1.65,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_1_Leaf_0",
+      "location": [
+        1.5300126902926388,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_1_Leaf_1",
+      "location": [
+        1.65,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_1_Leaf_2",
+      "location": [
+        1.769987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_2_Base",
+      "location": [
+        2.5999999999999996,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_2_Leaf_0",
+      "location": [
+        2.4800126902926385,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_2_Leaf_1",
+      "location": [
+        2.5999999999999996,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_2_Leaf_2",
+      "location": [
+        2.719987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_3_Base",
+      "location": [
+        3.55,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_3_Leaf_0",
+      "location": [
+        3.4300126902926387,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_3_Leaf_1",
+      "location": [
+        3.55,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_3_Leaf_2",
+      "location": [
+        3.669987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_4_Base",
+      "location": [
+        4.5,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_4_Leaf_0",
+      "location": [
+        4.380012690292639,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_4_Leaf_1",
+      "location": [
+        4.5,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_4_Leaf_2",
+      "location": [
+        4.619987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_5_Base",
+      "location": [
+        5.45,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_5_Leaf_0",
+      "location": [
+        5.330012690292639,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_5_Leaf_1",
+      "location": [
+        5.45,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_5_Leaf_2",
+      "location": [
+        5.569987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_6_Base",
+      "location": [
+        6.3999999999999995,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_6_Leaf_0",
+      "location": [
+        6.280012690292638,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_6_Leaf_1",
+      "location": [
+        6.3999999999999995,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_6_Leaf_2",
+      "location": [
+        6.519987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_7_Base",
+      "location": [
+        7.35,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_7_Leaf_0",
+      "location": [
+        7.2300126902926385,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_7_Leaf_1",
+      "location": [
+        7.35,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_7_Leaf_2",
+      "location": [
+        7.469987309707361,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_8_Base",
+      "location": [
+        8.299999999999999,
+        4.199999999999999,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_8_Leaf_0",
+      "location": [
+        8.180012690292639,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_8_Leaf_1",
+      "location": [
+        8.299999999999999,
+        4.199999999999999,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_3_8_Leaf_2",
+      "location": [
+        8.41998730970736,
+        4.199999999999999,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        35
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_0_Base",
+      "location": [
+        0.7,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_0_Leaf_0",
+      "location": [
+        0.5800126902926389,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_0_Leaf_1",
+      "location": [
+        0.7,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_0_Leaf_2",
+      "location": [
+        0.819987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_1_Base",
+      "location": [
+        1.65,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_1_Leaf_0",
+      "location": [
+        1.5300126902926388,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_1_Leaf_1",
+      "location": [
+        1.65,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_1_Leaf_2",
+      "location": [
+        1.769987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_2_Base",
+      "location": [
+        2.5999999999999996,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_2_Leaf_0",
+      "location": [
+        2.4800126902926385,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_2_Leaf_1",
+      "location": [
+        2.5999999999999996,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_2_Leaf_2",
+      "location": [
+        2.719987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_3_Base",
+      "location": [
+        3.55,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_3_Leaf_0",
+      "location": [
+        3.4300126902926387,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_3_Leaf_1",
+      "location": [
+        3.55,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_3_Leaf_2",
+      "location": [
+        3.669987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_4_Base",
+      "location": [
+        4.5,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_4_Leaf_0",
+      "location": [
+        4.380012690292639,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_4_Leaf_1",
+      "location": [
+        4.5,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_4_Leaf_2",
+      "location": [
+        4.619987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_5_Base",
+      "location": [
+        5.45,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_5_Leaf_0",
+      "location": [
+        5.330012690292639,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_5_Leaf_1",
+      "location": [
+        5.45,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_5_Leaf_2",
+      "location": [
+        5.569987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_6_Base",
+      "location": [
+        6.3999999999999995,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_6_Leaf_0",
+      "location": [
+        6.280012690292638,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_6_Leaf_1",
+      "location": [
+        6.3999999999999995,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_6_Leaf_2",
+      "location": [
+        6.519987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_7_Base",
+      "location": [
+        7.35,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_7_Leaf_0",
+      "location": [
+        7.2300126902926385,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_7_Leaf_1",
+      "location": [
+        7.35,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_7_Leaf_2",
+      "location": [
+        7.469987309707361,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_8_Base",
+      "location": [
+        8.299999999999999,
+        5.3999999999999995,
+        0.24
+      ],
+      "radius": 0.063,
+      "depth": 0.32,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stalk",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_8_Leaf_0",
+      "location": [
+        8.180012690292639,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        -24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_8_Leaf_1",
+      "location": [
+        8.299999999999999,
+        5.3999999999999995,
+        0.74
+      ],
+      "radius": 0.045,
+      "depth": 0.72,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Leek_4_8_Leaf_2",
+      "location": [
+        8.41998730970736,
+        5.3999999999999995,
+        0.6494959100045672
+      ],
+      "radius": 0.045,
+      "depth": 0.59,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        24,
+        0
+      ],
+      "material": "leaf",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      4.5,
+      -3.8,
+      3.25
+    ],
+    "cameraTarget": [
+      1.5,
+      1,
+      0.12
+    ],
+    "orthoScale": 4.1,
+    "worldRole": "sky"
+  }
+}

@@ -3840,6 +3840,65 @@
         "source": "Original G-22: coles con corazón redondeado y hojas verdes abiertas.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "field-leeks",
+      "artifactRound": "G-22",
+      "status": "study",
+      "recipe": "art/recipes/field-leeks/field-leeks.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T18-34-25-577Z-45756",
+        "directory": "artifacts/graphics/G-22/approved/1fce25e55b550079"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.366667,
+          0
+        ],
+        "size": [
+          3,
+          0.366667,
+          2
+        ]
+      },
+      "recipeSha256": "2027BC62C3C644FB7A512789F5B2975533BCA78F674F4B6DD347654B45B29966",
+      "materials": [
+        "soil",
+        "leaf",
+        "stalk"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 2212
+      },
+      "hashes": {
+        "field-leeks.blend": "137F6E384EEFA930482661F596A4A9790F2B2AEA8416527BC83A75E79CE3F30A",
+        "field-leeks.glb": "1FCE25E55B5500790E934F5CC08AF1DACE945FE0E8CBA1E7718C0D7FEB6EC123",
+        "field-leeks-blender.png": "DE74EB073D52F9922CD56FE1B69C893785500F8F0FC7C1754C75F6DD5D0E8DBD",
+        "capture-1.png": "96DBB4FFA2CB602020F7161DA20F861A2276A70EAD798120E6FF90F91690A89E",
+        "capture-1-gray.png": "ABEE5A9B12F1D91DF6A2202D7F79B260595C9C83059A7E08AC69954D098F5AF5",
+        "capture.json": "0729C196B08D5E421F57BBCC6DE81FF214A229FCE849F58A0210630C424CA9A6",
+        "build.json": "2CC87B0207327DB4B3A347283904BD65A7CC51AE90BC0402A7D68FBACCE4EEAD",
+        "validation.json": "DDAAB4B8307D511A4B49AA0820425D00737C08CD557321CF7196330C68D2A7A2"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-22: puerros de tallo claro y hojas largas verdes.",
+        "license": "Project original"
+      }
     }
   ]
 }

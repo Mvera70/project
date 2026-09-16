@@ -88,6 +88,9 @@ Trigo rehecho con granos laterales y tallos verdes, validado y revisado en juego
 Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](graphics-rounds/G-22.md).
 Trigo G-22 subido en `1b834c7`. Coles terminadas y selección estable por parcela
 conectada en el render; 88 pruebas verdes y captura real revisada. Siguen puerros.
+Coles subidas en `0edca57`. Puerros terminados y conectados: trigo, coles y
+puerros aparecen en parcelas distintas, con selección estable y cosecha intacta.
+88 pruebas verdes y captura conjunta revisada; pendiente de valoración estética.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -197,6 +200,7 @@ Pozo: 1 108 triángulos, cuatro materiales/mallas y GLB de 78 572 bytes.
 Campo cultivado: 2 056 triángulos, dos materiales/mallas y GLB de 160 704 bytes.
 G-22 sustituye ese campo por trigo de 4 732 triángulos y tres materiales/mallas.
 Coles G-22: 2 292 triángulos y tres materiales/mallas.
+Puerros G-22: 2 212 triángulos y tres materiales/mallas; 52 recursos empaquetados.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -244,8 +248,8 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**G-22:** terminar puerros y completar las variedades visuales solicitadas;
-después retomar el campo segado. Trigo y coles ya rehechos y revisados en juego.
+**G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
+Falta la valoración estética del dueño; siguiente recurso pendiente: campo segado.
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y
 validada técnicamente y revisada de frente en juego. Granero y capilla terminados;
