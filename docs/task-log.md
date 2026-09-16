@@ -20,14 +20,46 @@ nadie va a encontrar.
 |---|---|
 | Rama | `rework/parada-a-media` |
 | HEAD | ver `git log -1`; la última ronda mía es el nivelado de las estancias y el plazo vencido |
-| `main` | **`5e34e5c`, al día** — 16 commits del rework subidos el 16 sep a petición del dueño; la rama también está en el remoto |
+| `main` | **`7f0bfc4`, al día** — se empuja al cerrar cada tramo; la rama también está en el remoto |
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | **IA-5** (fauna silvestre) sobre `derive/animals.ts`, `effects/fauna.ts`, `life/wildlife.ts`, `contracts.ts`, `renderer.ts`; y **UI-R1** (carcasa) sobre `src/ui/` e `index.html`. **No tocar esos ficheros.** |
+| **En vuelo ahora** | **Sólo IA-5** (fauna silvestre), sobre `effects/fauna.ts`, `life/wildlife.ts`, `life/beasts.ts`, `life/staging.ts`, `life/village.ts`, `renderer.ts`. **No tocar esos ficheros.** **UI-R1 no está en vuelo**: se dijo que sí el 16 sep y era falso —un mensaje del dueño interrumpió entre las dos llamadas y sólo salió la primera—. Corregido aquí. |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
+
+## 1b. La fase en curso: C-1 · Cierre de la tanda de IA
+
+**Por qué esta fase y no otra.** El dueño lo dijo el 16 sep: «nos estamos
+dejando cosas atrás». Y era verdad: nueve commits sin empujar a `main`, una
+fase anunciada como en vuelo que nunca se lanzó, una demo prometida dos veces y
+no publicada, nueve jornadas rojas desde hace cuatro fases, y un fallo del
+runner de pruebas sin diagnosticar. **Nada nuevo entra hasta que esto se
+cierre.** Después, y sólo después, empieza el rediseño de interfaz con UI-R1.
+
+Cada punto tiene dueño, puerta y criterio de hecho. El orden es el de las
+dependencias, no el de lo que apetece.
+
+| # | Qué | Dueño | Depende de | Hecho cuando |
+|---|---|---|---|---|
+| 1 | **Aterrizar IA-5.** Revisar su informe, commitear lo verde, descartar lo que no. Borrar sus dos ficheros temporales de `tools/` | yo | de que el agente vuelva | commit propio, informe `life-rounds/IA-5.md`, tablero actualizado |
+| 2 | **V-15b · enganchar el renderer.** `renderer.ts` llama a `modelFor(actor)`, cae al aldeano base si el recurso falta, y **borra su propio `VILLAGER_BY_ROLE`**, que ahora está duplicado en `world/models.ts` | yo | 1 (suelta `renderer.ts`) | `life-models` y `graphics-world` verdes, y una captura que demuestre **que no cambia nada visible** hoy, porque las mallas nuevas aún no existen |
+| 3 | **Las nueve jornadas rojas** (`rework.md` §2.8). Ya se pueden tocar: la tanda de IA ha terminado y sus números están quietos | Sonnet | 1 y 2 | `npm run test:journeys` verde, o `it.fails` con la medida escrita y la propiedad intacta. **Sin bajar un solo listón sin motivo escrito** |
+| 4 | **El trabajador de vitest que se cae** en la suite rápida en paralelo. Una sola ronda acotada: encontrar el fichero que lo tira. Si en una ronda no sale, se documenta y se sigue | Sonnet | nada | o el fichero encontrado y arreglado, o un informe que diga qué se probó y qué no |
+| 5 | **La demo.** Empaquetar, publicar en el artefacto de siempre, y **una secuencia de capturas** con la aldea crecida | yo | 1 y 2 (árbol limpio) | enlace enviado al dueño con la secuencia; él juzga |
+| 6 | **`main` al día** tras cada uno de los puntos anteriores, no al final | yo | cada punto | `git log -1 main` es el último tramo verde |
+| 7 | **El plazo vencido de las personas**, que está retirado con su medida (`IA-6.md` §4.3): falta poder descartar una plaza que ya falló. Entra si cabe; si no, se queda escrito donde está | yo | 3 | «parados con impulso ≥ 0,9» no empeora del 0,06 % |
+
+**Lo que esta fase deja fuera a propósito**, para que no se cuele: R-3 (los diez
+rasgos), R-5b y R-6 (los datos que le faltan al motor), G-18 (Blender, que el
+dueño quiere para lo último), el nivelado fino de duraciones con el cuaderno,
+y **cualquier fase nueva de IA**.
+
+**La regla de esta fase, y es la que faltaba:** un punto no está hecho hasta
+que su fila de arriba dice «hecho», su commit está en `main` y este cuaderno lo
+refleja. Anunciar algo como hecho o en vuelo sin que lo esté es lo que nos ha
+traído aquí.
 
 ## 2. El tablero
 
