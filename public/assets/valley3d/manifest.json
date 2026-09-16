@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T19:22:30.019Z",
+  "generatedAt": "2026-09-16T19:27:24.622Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -470,7 +470,7 @@
     {
       "id": "log-pile",
       "file": "log-pile.glb",
-      "sha256": "3EC2DFBE987F7F2ECD0CBB958461C9669AD5EEFEB301BC4BEE52EC5F9CB3C883",
+      "sha256": "48A29EB876083634E92E297183321BB49D895A3708759E675FDF208E3F7BA468",
       "motion": []
     },
     {

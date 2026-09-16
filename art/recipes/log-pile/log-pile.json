@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "log-pile",
   "scale": 0.3333333333333333,
-  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "scaleNote": "Escala 1/3; geometría reducida un 10 % por petición del dueño.",
   "mergeByMaterial": true,
   "palette": "../palette.json",
   "metadata": {
@@ -12,7 +12,7 @@
       1,
       1
     ],
-    "note": "G-21: cinco troncos en dos hileras, corteza facetada, extremos cortados en ambas caras, duramen y grietas. Conserva origen centrado, eje longitudinal X, escala 1/3 y tamaño de adorno."
+    "note": "G-21: cinco troncos en dos hileras, corteza facetada, extremos cortados en ambas caras, duramen y grietas. Conserva origen centrado, eje longitudinal X, escala 1/3 y tamaño de adorno. Ajuste posterior: tamaño global reducido un 10 % a petición del dueño."
   },
   "materials": [
     {
@@ -47,9 +47,9 @@
         0
       ],
       "dimensions": [
-        0.002,
-        0.002,
-        0.002
+        0.0018000000000000002,
+        0.0018000000000000002,
+        0.0018000000000000002
       ],
       "material": "bark",
       "parent": "Root"
@@ -63,9 +63,9 @@
         0
       ],
       "dimensions": [
-        0.002,
-        0.002,
-        0.002
+        0.0018000000000000002,
+        0.0018000000000000002,
+        0.0018000000000000002
       ],
       "material": "cut",
       "parent": "Root"
@@ -74,12 +74,12 @@
       "type": "cylinder",
       "name": "Log_0",
       "location": [
-        -0.02,
-        -0.34,
-        0.17
+        -0.018000000000000002,
+        -0.30600000000000005,
+        0.15300000000000002
       ],
-      "radius": 0.17,
-      "depth": 1.5,
+      "radius": 0.15300000000000002,
+      "depth": 1.35,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -93,12 +93,12 @@
       "type": "cylinder",
       "name": "Cut_0_L",
       "location": [
-        -0.778,
-        -0.34,
-        0.17
+        -0.7002,
+        -0.30600000000000005,
+        0.15300000000000002
       ],
-      "radius": 0.1462,
-      "depth": 0.018,
+      "radius": 0.13158,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -112,12 +112,12 @@
       "type": "cylinder",
       "name": "Heart_0_L",
       "location": [
-        -0.79,
-        -0.327,
-        0.161
+        -0.7110000000000001,
+        -0.2943,
+        0.1449
       ],
-      "radius": 0.05780000000000001,
-      "depth": 0.009,
+      "radius": 0.05202000000000001,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -131,12 +131,12 @@
       "type": "cylinder",
       "name": "HeartCentre_0_L",
       "location": [
-        -0.796,
-        -0.327,
-        0.161
+        -0.7164,
+        -0.2943,
+        0.1449
       ],
-      "radius": 0.0442,
-      "depth": 0.008,
+      "radius": 0.03978,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -150,14 +150,14 @@
       "type": "cube",
       "name": "Crack_0_L",
       "location": [
-        -0.795,
-        -0.391,
-        0.23970000000000002
+        -0.7155,
+        -0.35190000000000005,
+        0.21573000000000003
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.1037
+        0.007200000000000001,
+        0.009899999999999999,
+        0.09333
       ],
       "material": "bark",
       "parent": "Root"
@@ -166,12 +166,12 @@
       "type": "cylinder",
       "name": "Cut_0_R",
       "location": [
-        0.738,
-        -0.34,
-        0.17
+        0.6642,
+        -0.30600000000000005,
+        0.15300000000000002
       ],
-      "radius": 0.1462,
-      "depth": 0.018,
+      "radius": 0.13158,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -185,12 +185,12 @@
       "type": "cylinder",
       "name": "Heart_0_R",
       "location": [
-        0.75,
-        -0.327,
-        0.161
+        0.675,
+        -0.2943,
+        0.1449
       ],
-      "radius": 0.05780000000000001,
-      "depth": 0.009,
+      "radius": 0.05202000000000001,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -204,12 +204,12 @@
       "type": "cylinder",
       "name": "HeartCentre_0_R",
       "location": [
-        0.756,
-        -0.327,
-        0.161
+        0.6804,
+        -0.2943,
+        0.1449
       ],
-      "radius": 0.0442,
-      "depth": 0.008,
+      "radius": 0.03978,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -223,14 +223,14 @@
       "type": "cube",
       "name": "Crack_0_R",
       "location": [
-        0.755,
-        -0.391,
-        0.23970000000000002
+        0.6795,
+        -0.35190000000000005,
+        0.21573000000000003
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.1037
+        0.007200000000000001,
+        0.009899999999999999,
+        0.09333
       ],
       "material": "bark",
       "parent": "Root"
@@ -240,11 +240,11 @@
       "name": "BarkRidge_0_0",
       "location": [
         0,
-        -0.22460017331035545,
-        0.2853998266896446
+        -0.20214015597931992,
+        0.25685984402068013
       ],
-      "radius": 0.013,
-      "depth": 1.23,
+      "radius": 0.0117,
+      "depth": 1.107,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -259,11 +259,11 @@
       "name": "BarkRidge_0_1",
       "location": [
         0,
-        -0.34,
-        0.33320000000000005
+        -0.30600000000000005,
+        0.29988000000000004
       ],
-      "radius": 0.013,
-      "depth": 1.23,
+      "radius": 0.0117,
+      "depth": 1.107,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -278,11 +278,11 @@
       "name": "BarkRidge_0_2",
       "location": [
         0,
-        -0.45539982668964457,
-        0.2853998266896446
+        -0.4098598440206801,
+        0.25685984402068013
       ],
-      "radius": 0.013,
-      "depth": 1.23,
+      "radius": 0.0117,
+      "depth": 1.107,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -296,12 +296,12 @@
       "type": "cylinder",
       "name": "Log_1",
       "location": [
-        0.03,
+        0.027,
         0,
-        0.17
+        0.15300000000000002
       ],
-      "radius": 0.17,
-      "depth": 1.42,
+      "radius": 0.15300000000000002,
+      "depth": 1.278,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -315,12 +315,12 @@
       "type": "cylinder",
       "name": "Cut_1_L",
       "location": [
-        -0.688,
+        -0.6192,
         0,
-        0.17
+        0.15300000000000002
       ],
-      "radius": 0.1462,
-      "depth": 0.018,
+      "radius": 0.13158,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -334,12 +334,12 @@
       "type": "cylinder",
       "name": "Heart_1_L",
       "location": [
-        -0.7,
-        0.013,
-        0.161
+        -0.63,
+        0.0117,
+        0.1449
       ],
-      "radius": 0.05780000000000001,
-      "depth": 0.009,
+      "radius": 0.05202000000000001,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -353,12 +353,12 @@
       "type": "cylinder",
       "name": "HeartCentre_1_L",
       "location": [
-        -0.706,
-        0.013,
-        0.161
+        -0.6354,
+        0.0117,
+        0.1449
       ],
-      "radius": 0.0442,
-      "depth": 0.008,
+      "radius": 0.03978,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -372,14 +372,14 @@
       "type": "cube",
       "name": "Crack_1_L",
       "location": [
-        -0.705,
-        -0.051000000000000004,
-        0.23970000000000002
+        -0.6345,
+        -0.0459,
+        0.21573000000000003
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.1037
+        0.007200000000000001,
+        0.009899999999999999,
+        0.09333
       ],
       "material": "bark",
       "parent": "Root"
@@ -388,12 +388,12 @@
       "type": "cylinder",
       "name": "Cut_1_R",
       "location": [
-        0.748,
+        0.6732,
         0,
-        0.17
+        0.15300000000000002
       ],
-      "radius": 0.1462,
-      "depth": 0.018,
+      "radius": 0.13158,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -407,12 +407,12 @@
       "type": "cylinder",
       "name": "Heart_1_R",
       "location": [
-        0.76,
-        0.013,
-        0.161
+        0.684,
+        0.0117,
+        0.1449
       ],
-      "radius": 0.05780000000000001,
-      "depth": 0.009,
+      "radius": 0.05202000000000001,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -426,12 +426,12 @@
       "type": "cylinder",
       "name": "HeartCentre_1_R",
       "location": [
-        0.766,
-        0.013,
-        0.161
+        0.6894,
+        0.0117,
+        0.1449
       ],
-      "radius": 0.0442,
-      "depth": 0.008,
+      "radius": 0.03978,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -445,14 +445,14 @@
       "type": "cube",
       "name": "Crack_1_R",
       "location": [
-        0.765,
-        -0.051000000000000004,
-        0.23970000000000002
+        0.6885,
+        -0.0459,
+        0.21573000000000003
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.1037
+        0.007200000000000001,
+        0.009899999999999999,
+        0.09333
       ],
       "material": "bark",
       "parent": "Root"
@@ -461,12 +461,12 @@
       "type": "cylinder",
       "name": "BarkRidge_1_0",
       "location": [
-        0.05,
-        0.11539982668964457,
-        0.2853998266896446
+        0.045000000000000005,
+        0.10385984402068012,
+        0.25685984402068013
       ],
-      "radius": 0.013,
-      "depth": 1.1643999999999999,
+      "radius": 0.0117,
+      "depth": 1.04796,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -480,12 +480,12 @@
       "type": "cylinder",
       "name": "BarkRidge_1_1",
       "location": [
-        0.05,
-        9.993117881042403e-18,
-        0.33320000000000005
+        0.045000000000000005,
+        8.993806092938163e-18,
+        0.29988000000000004
       ],
-      "radius": 0.013,
-      "depth": 1.1643999999999999,
+      "radius": 0.0117,
+      "depth": 1.04796,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -499,12 +499,12 @@
       "type": "cylinder",
       "name": "BarkRidge_1_2",
       "location": [
-        0.05,
-        -0.11539982668964456,
-        0.2853998266896446
+        0.045000000000000005,
+        -0.1038598440206801,
+        0.25685984402068013
       ],
-      "radius": 0.013,
-      "depth": 1.1643999999999999,
+      "radius": 0.0117,
+      "depth": 1.04796,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -518,12 +518,12 @@
       "type": "cylinder",
       "name": "Log_2",
       "location": [
-        -0.04,
-        0.34,
-        0.17
+        -0.036000000000000004,
+        0.30600000000000005,
+        0.15300000000000002
       ],
-      "radius": 0.17,
-      "depth": 1.46,
+      "radius": 0.15300000000000002,
+      "depth": 1.314,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -537,12 +537,12 @@
       "type": "cylinder",
       "name": "Cut_2_L",
       "location": [
-        -0.778,
-        0.34,
-        0.17
+        -0.7002,
+        0.30600000000000005,
+        0.15300000000000002
       ],
-      "radius": 0.1462,
-      "depth": 0.018,
+      "radius": 0.13158,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -556,12 +556,12 @@
       "type": "cylinder",
       "name": "Heart_2_L",
       "location": [
-        -0.79,
-        0.35300000000000004,
-        0.161
+        -0.7110000000000001,
+        0.31770000000000004,
+        0.1449
       ],
-      "radius": 0.05780000000000001,
-      "depth": 0.009,
+      "radius": 0.05202000000000001,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -575,12 +575,12 @@
       "type": "cylinder",
       "name": "HeartCentre_2_L",
       "location": [
-        -0.796,
-        0.35300000000000004,
-        0.161
+        -0.7164,
+        0.31770000000000004,
+        0.1449
       ],
-      "radius": 0.0442,
-      "depth": 0.008,
+      "radius": 0.03978,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -594,14 +594,14 @@
       "type": "cube",
       "name": "Crack_2_L",
       "location": [
-        -0.795,
-        0.28900000000000003,
-        0.23970000000000002
+        -0.7155,
+        0.26010000000000005,
+        0.21573000000000003
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.1037
+        0.007200000000000001,
+        0.009899999999999999,
+        0.09333
       ],
       "material": "bark",
       "parent": "Root"
@@ -610,12 +610,12 @@
       "type": "cylinder",
       "name": "Cut_2_R",
       "location": [
-        0.698,
-        0.34,
-        0.17
+        0.6282,
+        0.30600000000000005,
+        0.15300000000000002
       ],
-      "radius": 0.1462,
-      "depth": 0.018,
+      "radius": 0.13158,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -629,12 +629,12 @@
       "type": "cylinder",
       "name": "Heart_2_R",
       "location": [
-        0.71,
-        0.35300000000000004,
-        0.161
+        0.639,
+        0.31770000000000004,
+        0.1449
       ],
-      "radius": 0.05780000000000001,
-      "depth": 0.009,
+      "radius": 0.05202000000000001,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -648,12 +648,12 @@
       "type": "cylinder",
       "name": "HeartCentre_2_R",
       "location": [
-        0.716,
-        0.35300000000000004,
-        0.161
+        0.6444,
+        0.31770000000000004,
+        0.1449
       ],
-      "radius": 0.0442,
-      "depth": 0.008,
+      "radius": 0.03978,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -667,14 +667,14 @@
       "type": "cube",
       "name": "Crack_2_R",
       "location": [
-        0.715,
-        0.28900000000000003,
-        0.23970000000000002
+        0.6435,
+        0.26010000000000005,
+        0.21573000000000003
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.1037
+        0.007200000000000001,
+        0.009899999999999999,
+        0.09333
       ],
       "material": "bark",
       "parent": "Root"
@@ -683,12 +683,12 @@
       "type": "cylinder",
       "name": "BarkRidge_2_0",
       "location": [
-        -0.02,
-        0.4553998266896446,
-        0.2853998266896446
+        -0.018000000000000002,
+        0.40985984402068015,
+        0.25685984402068013
       ],
-      "radius": 0.013,
-      "depth": 1.1971999999999998,
+      "radius": 0.0117,
+      "depth": 1.0774799999999998,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -702,12 +702,12 @@
       "type": "cylinder",
       "name": "BarkRidge_2_1",
       "location": [
-        -0.02,
-        0.34,
-        0.33320000000000005
+        -0.018000000000000002,
+        0.30600000000000005,
+        0.29988000000000004
       ],
-      "radius": 0.013,
-      "depth": 1.1971999999999998,
+      "radius": 0.0117,
+      "depth": 1.0774799999999998,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -721,12 +721,12 @@
       "type": "cylinder",
       "name": "BarkRidge_2_2",
       "location": [
-        -0.02,
-        0.22460017331035548,
-        0.2853998266896446
+        -0.018000000000000002,
+        0.20214015597931995,
+        0.25685984402068013
       ],
-      "radius": 0.013,
-      "depth": 1.1971999999999998,
+      "radius": 0.0117,
+      "depth": 1.0774799999999998,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -740,12 +740,12 @@
       "type": "cylinder",
       "name": "Log_3",
       "location": [
-        0.04,
-        -0.17,
-        0.455
+        0.036000000000000004,
+        -0.15300000000000002,
+        0.40950000000000003
       ],
-      "radius": 0.16,
-      "depth": 1.4,
+      "radius": 0.14400000000000002,
+      "depth": 1.26,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -759,12 +759,12 @@
       "type": "cylinder",
       "name": "Cut_3_L",
       "location": [
-        -0.6679999999999999,
-        -0.17,
-        0.455
+        -0.6012,
+        -0.15300000000000002,
+        0.40950000000000003
       ],
-      "radius": 0.1376,
-      "depth": 0.018,
+      "radius": 0.12384,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -778,12 +778,12 @@
       "type": "cylinder",
       "name": "Heart_3_L",
       "location": [
-        -0.6799999999999999,
-        -0.157,
-        0.446
+        -0.612,
+        -0.1413,
+        0.40140000000000003
       ],
-      "radius": 0.054400000000000004,
-      "depth": 0.009,
+      "radius": 0.048960000000000004,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -797,12 +797,12 @@
       "type": "cylinder",
       "name": "HeartCentre_3_L",
       "location": [
-        -0.6859999999999999,
-        -0.157,
-        0.446
+        -0.6174,
+        -0.1413,
+        0.40140000000000003
       ],
-      "radius": 0.041600000000000005,
-      "depth": 0.008,
+      "radius": 0.03744000000000001,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -816,14 +816,14 @@
       "type": "cube",
       "name": "Crack_3_L",
       "location": [
-        -0.6849999999999999,
-        -0.21800000000000003,
-        0.5206
+        -0.6164999999999999,
+        -0.19620000000000004,
+        0.46853999999999996
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.0976
+        0.007200000000000001,
+        0.009899999999999999,
+        0.08784
       ],
       "material": "bark",
       "parent": "Root"
@@ -832,12 +832,12 @@
       "type": "cylinder",
       "name": "Cut_3_R",
       "location": [
-        0.748,
-        -0.17,
-        0.455
+        0.6732,
+        -0.15300000000000002,
+        0.40950000000000003
       ],
-      "radius": 0.1376,
-      "depth": 0.018,
+      "radius": 0.12384,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -851,12 +851,12 @@
       "type": "cylinder",
       "name": "Heart_3_R",
       "location": [
-        0.76,
-        -0.157,
-        0.446
+        0.684,
+        -0.1413,
+        0.40140000000000003
       ],
-      "radius": 0.054400000000000004,
-      "depth": 0.009,
+      "radius": 0.048960000000000004,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -870,12 +870,12 @@
       "type": "cylinder",
       "name": "HeartCentre_3_R",
       "location": [
-        0.766,
-        -0.157,
-        0.446
+        0.6894,
+        -0.1413,
+        0.40140000000000003
       ],
-      "radius": 0.041600000000000005,
-      "depth": 0.008,
+      "radius": 0.03744000000000001,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -889,14 +889,14 @@
       "type": "cube",
       "name": "Crack_3_R",
       "location": [
-        0.765,
-        -0.21800000000000003,
-        0.5206
+        0.6885,
+        -0.19620000000000004,
+        0.46853999999999996
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.0976
+        0.007200000000000001,
+        0.009899999999999999,
+        0.08784
       ],
       "material": "bark",
       "parent": "Root"
@@ -905,12 +905,12 @@
       "type": "cylinder",
       "name": "BarkRidge_3_0",
       "location": [
-        0.06,
-        -0.0613883984097463,
-        0.5636116015902537
+        0.054,
+        -0.05524955856877167,
+        0.5072504414312283
       ],
-      "radius": 0.013,
-      "depth": 1.148,
+      "radius": 0.0117,
+      "depth": 1.0332,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -924,12 +924,12 @@
       "type": "cylinder",
       "name": "BarkRidge_3_1",
       "location": [
-        0.06,
-        -0.17,
-        0.6086
+        0.054,
+        -0.15300000000000002,
+        0.54774
       ],
-      "radius": 0.013,
-      "depth": 1.148,
+      "radius": 0.0117,
+      "depth": 1.0332,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -943,12 +943,12 @@
       "type": "cylinder",
       "name": "BarkRidge_3_2",
       "location": [
-        0.06,
-        -0.27861160159025367,
-        0.5636116015902537
+        0.054,
+        -0.2507504414312283,
+        0.5072504414312283
       ],
-      "radius": 0.013,
-      "depth": 1.148,
+      "radius": 0.0117,
+      "depth": 1.0332,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -962,12 +962,12 @@
       "type": "cylinder",
       "name": "Log_4",
       "location": [
-        0.02,
-        0.17,
-        0.455
+        0.018000000000000002,
+        0.15300000000000002,
+        0.40950000000000003
       ],
-      "radius": 0.16,
-      "depth": 1.48,
+      "radius": 0.14400000000000002,
+      "depth": 1.332,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -981,12 +981,12 @@
       "type": "cylinder",
       "name": "Cut_4_L",
       "location": [
-        -0.728,
-        0.17,
-        0.455
+        -0.6552,
+        0.15300000000000002,
+        0.40950000000000003
       ],
-      "radius": 0.1376,
-      "depth": 0.018,
+      "radius": 0.12384,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -1000,12 +1000,12 @@
       "type": "cylinder",
       "name": "Heart_4_L",
       "location": [
-        -0.74,
-        0.18300000000000002,
-        0.446
+        -0.666,
+        0.1647,
+        0.40140000000000003
       ],
-      "radius": 0.054400000000000004,
-      "depth": 0.009,
+      "radius": 0.048960000000000004,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -1019,12 +1019,12 @@
       "type": "cylinder",
       "name": "HeartCentre_4_L",
       "location": [
-        -0.746,
-        0.18300000000000002,
-        0.446
+        -0.6714,
+        0.1647,
+        0.40140000000000003
       ],
-      "radius": 0.041600000000000005,
-      "depth": 0.008,
+      "radius": 0.03744000000000001,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -1038,14 +1038,14 @@
       "type": "cube",
       "name": "Crack_4_L",
       "location": [
-        -0.745,
-        0.12200000000000001,
-        0.5206
+        -0.6705,
+        0.10980000000000001,
+        0.46853999999999996
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.0976
+        0.007200000000000001,
+        0.009899999999999999,
+        0.08784
       ],
       "material": "bark",
       "parent": "Root"
@@ -1054,12 +1054,12 @@
       "type": "cylinder",
       "name": "Cut_4_R",
       "location": [
-        0.768,
-        0.17,
-        0.455
+        0.6912,
+        0.15300000000000002,
+        0.40950000000000003
       ],
-      "radius": 0.1376,
-      "depth": 0.018,
+      "radius": 0.12384,
+      "depth": 0.0162,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -1073,12 +1073,12 @@
       "type": "cylinder",
       "name": "Heart_4_R",
       "location": [
-        0.78,
-        0.18300000000000002,
-        0.446
+        0.7020000000000001,
+        0.1647,
+        0.40140000000000003
       ],
-      "radius": 0.054400000000000004,
-      "depth": 0.009,
+      "radius": 0.048960000000000004,
+      "depth": 0.0081,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -1092,12 +1092,12 @@
       "type": "cylinder",
       "name": "HeartCentre_4_R",
       "location": [
-        0.786,
-        0.18300000000000002,
-        0.446
+        0.7074,
+        0.1647,
+        0.40140000000000003
       ],
-      "radius": 0.041600000000000005,
-      "depth": 0.008,
+      "radius": 0.03744000000000001,
+      "depth": 0.007200000000000001,
       "vertices": 8,
       "material": "cut",
       "rotationDegrees": [
@@ -1111,14 +1111,14 @@
       "type": "cube",
       "name": "Crack_4_R",
       "location": [
-        0.785,
-        0.12200000000000001,
-        0.5206
+        0.7065,
+        0.10980000000000001,
+        0.46853999999999996
       ],
       "dimensions": [
-        0.008,
-        0.011,
-        0.0976
+        0.007200000000000001,
+        0.009899999999999999,
+        0.08784
       ],
       "material": "bark",
       "parent": "Root"
@@ -1127,12 +1127,12 @@
       "type": "cylinder",
       "name": "BarkRidge_4_0",
       "location": [
-        0.04,
-        0.2786116015902537,
-        0.5636116015902537
+        0.036000000000000004,
+        0.2507504414312284,
+        0.5072504414312283
       ],
-      "radius": 0.013,
-      "depth": 1.2136,
+      "radius": 0.0117,
+      "depth": 1.09224,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -1146,12 +1146,12 @@
       "type": "cylinder",
       "name": "BarkRidge_4_1",
       "location": [
-        0.04,
-        0.17,
-        0.6086
+        0.036000000000000004,
+        0.15300000000000002,
+        0.54774
       ],
-      "radius": 0.013,
-      "depth": 1.2136,
+      "radius": 0.0117,
+      "depth": 1.09224,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [
@@ -1165,12 +1165,12 @@
       "type": "cylinder",
       "name": "BarkRidge_4_2",
       "location": [
-        0.04,
-        0.06138839840974633,
-        0.5636116015902537
+        0.036000000000000004,
+        0.0552495585687717,
+        0.5072504414312283
       ],
-      "radius": 0.013,
-      "depth": 1.2136,
+      "radius": 0.0117,
+      "depth": 1.09224,
       "vertices": 8,
       "material": "bark",
       "rotationDegrees": [

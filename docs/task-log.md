@@ -99,7 +99,8 @@ individual subida en `5e6b070`. Almiar G-21 terminado y revisado en juego:
 capas de heno, haces y estaca central; 94 pruebas, typecheck y lint verdes.
 Almiar subido en `f0e933f`. Pila de leña G-21 terminada y revisada en juego;
 94 pruebas, typecheck y lint verdes. Entrega individual validada para commit
-y subida. Sigue el cobertizo (`shed`).
+y subida. Leña subida en `15b7f5b`; ajuste posterior solicitado por el dueño:
+10 % más pequeña, reconstruida y revisada en juego. Sigue el cobertizo (`shed`).
 **Avisar al dueño antes de los muros.**
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
@@ -218,6 +219,7 @@ Almiar G-21: 958 triángulos, tres materiales/mallas; altura 0,666667 celdas
 conservada y 94 pruebas verdes.
 Pila de leña G-21: 1 544 triángulos, dos materiales/mallas, 97 652 bytes;
 94 pruebas verdes y captura real revisada.
+Leña: geometría reducida un 10 %, conservando la escala de exportación 1/3.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
