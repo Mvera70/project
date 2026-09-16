@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-15T00:09:07.608Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts",
+  "generatedAt": "2026-09-16T11:49:16.092Z",
+  "invocation": "G-17: publicación selectiva de cuatro recursos aprobados, verify-publish.ts",
   "assets": [
     {
       "id": "axis-marker",
@@ -24,7 +24,7 @@
     {
       "id": "villager",
       "file": "villager.glb",
-      "sha256": "BD6A178E2335D7F0C863C3A869DF2ED044DAD9CFC8B4BD878ADC982E44A4003C",
+      "sha256": "E40FB6DD9B1D5CA4F0EDFBF953B498C26B20AB387D21EF859441423F1FEE46D4",
       "motion": [
         {
           "name": "idle",
@@ -278,7 +278,7 @@
     {
       "id": "villager-smith",
       "file": "villager-smith.glb",
-      "sha256": "8BF53D92D7145F432166026AD2C96D8423CB41EC84F3BA591877249AE4989E30",
+      "sha256": "011DCF45E9E5FD63B07DD5678A1E8EBE69781E8CCC207FAD636829A0EB371FFC",
       "motion": [
         {
           "name": "idle",
@@ -340,7 +340,7 @@
     {
       "id": "villager-priest",
       "file": "villager-priest.glb",
-      "sha256": "86212FA9F1A79746779C1C6390DABD9C1B9B9400B1EC26E3731272FFA0017586",
+      "sha256": "894CB713BE282E67F6C798598ED55B216FF3E82D5CAD072571511C7F75A7704E",
       "motion": [
         {
           "name": "idle",
@@ -478,6 +478,37 @@
       "file": "handcart.glb",
       "sha256": "BE7CEBEDE684B4600CB90D42D5C2384E333AB0880D9E5A7C9698364315C1B962",
       "motion": []
+    },
+    {
+      "id": "villager-farmer",
+      "file": "villager-farmer.glb",
+      "sha256": "99D21FF52888E01DEA3923C9C6764A9227056C9C8B6A2A3B5C7C665B31D7E69E",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
     }
   ]
 }

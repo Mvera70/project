@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-priest",
+  "runId": "2026-09-16T11-45-44-603Z-38612",
+  "recipe": "art/recipes/villager-priest/villager-priest.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11674,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-45-44-603Z-38612/candidate/villager-priest.blend",
+      "bytes": 124803,
+      "sha256": "3662116671C62E7D3B3A6C4A9EE509B7974536E483D26AF8067298D8C2AF5FAD"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-45-44-603Z-38612/candidate/villager-priest.glb",
+      "bytes": 294640,
+      "sha256": "894CB713BE282E67F6C798598ED55B216FF3E82D5CAD072571511C7F75A7704E"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-45-44-603Z-38612/candidate/villager-priest-blender.png",
+      "bytes": 280535,
+      "sha256": "6ACDA1C538C8DF57B625C5941F6DB483818C1772F7A667866745B6B8B74C9F6A"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-45-44-603Z-38612/blender.log",
+      "bytes": 1701,
+      "sha256": "A00946F0A0E006F3C4FE4F49B250A64370821FA9EC65B97FFF0F6229C5487FAA"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-45-44-603Z-38612/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-45-44-603Z-38612/temporary/resolved-recipe.json",
+      "bytes": 70598,
+      "sha256": "932960FC0442566854CFD165F68B4D903144F5C09FD90F4E88466005829791AC"
+    }
+  }
+}

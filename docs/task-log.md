@@ -64,6 +64,11 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-17 · Blender, entrega terminada (16 sep):** `villager`, `villager-smith`,
+`villager-priest` y `villager-farmer`, recetas canónicas, catálogo y cuatro GLB
+publicados. Informe: [G-17](graphics-rounds/G-17.md); prompt de integración:
+[G-17-handoff](graphics-rounds/G-17-handoff.md). No se ha tocado `src/`.
+
 Orden fijado por el dueño: auditoría, movimiento, interacciones, hábitos,
 animales, fauna, escenas históricas, **y después interfaz**.
 
@@ -122,6 +127,11 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**G-17:** cuatro modelos de 0,65 celdas; 1056 / 1116 / 1012 / 960 triángulos
+(base / herrero / cura / granjero), cuatro materiales y cuatro mallas cada uno.
+Typecheck y lint verdes; 16/16 pruebas del rig; cuatro construcciones y cuatro
+auditorías de animación verdes. Todos reproducen los clips del base.
+
 **Movimiento** (`npx tsx tools/life-report.ts 7 23 97 --days 2`, 26 880
 cuerpo-segundos). La primera columna es el estado antes de tocar nada.
 
@@ -158,6 +168,10 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**G-17 queda cerrado técnicamente:** los cuatro recursos están publicados con
+los ids del encargo. El cura lleva sotana negra. No necesita cambios de selección
+en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
 
 0. **La palanca «apretar el bosque» hace lo contrario de lo que dice, y es el
    verbo del juego.** Lo destapó C-1.3 al medir la jornada `intent.test.ts`,

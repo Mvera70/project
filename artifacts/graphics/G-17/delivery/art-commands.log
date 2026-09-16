@@ -1,0 +1,19 @@
+> npm run art -- all villager
+Built villager in artifacts\graphics\G-17\runs\2026-09-16T11-44-47-164Z-42044
+Validated villager from run 2026-09-16T11-44-47-164Z-42044
+Reported and promoted villager to artifacts\graphics\G-17\approved\e40fb6dd9b1d5ca4
+
+> npm run art -- all villager-smith
+Built villager-smith in artifacts\graphics\G-17\runs\2026-09-16T11-45-12-668Z-27776
+Validated villager-smith from run 2026-09-16T11-45-12-668Z-27776
+Reported and promoted villager-smith to artifacts\graphics\G-17\approved\011dcf45e9e5fd63
+
+> npm run art -- all villager-priest
+Built villager-priest in artifacts\graphics\G-17\runs\2026-09-16T11-45-44-603Z-38612
+Validated villager-priest from run 2026-09-16T11-45-44-603Z-38612
+Reported and promoted villager-priest to artifacts\graphics\G-17\approved\894cb713be282e67
+
+> npm run art -- all villager-farmer
+Built villager-farmer in artifacts\graphics\G-17\runs\2026-09-16T11-46-35-530Z-50704
+Validated villager-farmer from run 2026-09-16T11-46-35-530Z-50704
+Reported and promoted villager-farmer to artifacts\graphics\G-17\approved\99d21ff52888e01d

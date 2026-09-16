@@ -4,7 +4,7 @@
   "scale": 0.3333333333333333,
   "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
   "mergeByMaterial": true,
-  "mergeNote": "G-09: dieciocho mallas y tres materiales. Medido en el banco, los aldeanos eran el 87 % de las llamadas de dibujo. Unir por material los deja en tres y no cambia ni un triángulo ni un peso.",
+  "mergeNote": "G-17: unir por los cuatro materiales después de atar al rig; biseles sólo en cabeza, torso, manos, pies y pelo.",
   "palette": "../palette.json",
   "metadata": {
     "cellUnit": 1,
@@ -13,7 +13,7 @@
       1,
       1
     ],
-    "note": "V-11, aldeano de oficio (priest). Misma malla, mismo esqueleto de 16 huesos y los mismos cuatro clips que villager.json (G-04) — el pipeline de D.4 clona por Role (design.md §3.4) con un modelo por oficio (world/cast.ts elige por Role). Cura: acento oscuro, capucha en punta y una cruz al pecho. Sólo colores y formas de la paleta de P1 (art/recipes/palette.json); nada inventado. Un aldeano sin Role sigue usando 'villager' sin tocar."
+    "note": "G-17: sotana negra larga y facetada, mangas completas, cuello y cruz marfil. Cabeza low-voxel aprobada, sin capucha puntiaguda. Piernas ocultas omitidas; pies y rig originales. Cuatro materiales."
   },
   "materials": [
     {
@@ -23,17 +23,17 @@
     },
     {
       "name": "cloth",
-      "role": "cloth",
+      "role": "clericalBlack",
       "roughness": 0.95
     },
     {
       "name": "cloth-accent",
-      "role": "trunk",
+      "role": "plaster",
       "roughness": 0.95
     },
     {
       "name": "dark",
-      "role": "trunk",
+      "role": "timberDark",
       "roughness": 0.9
     }
   ],
@@ -73,364 +73,462 @@
       "location": [
         0,
         0,
-        1.14
+        1.17
       ],
       "dimensions": [
-        0.5,
-        0.3,
-        0.62
+        0.52,
+        0.34,
+        0.55
       ],
       "material": "cloth",
-      "parent": "Villager_Root"
+      "parent": "Villager_Root",
+      "bevel": 0.025
     },
     {
-      "type": "sphere",
-      "name": "Villager_Head",
+      "type": "cube",
+      "name": "Villager_Neck",
       "location": [
         0,
         0,
-        1.72
+        1.48
       ],
-      "radius": 0.28,
-      "segments": 16,
-      "rings": 10,
-      "smooth": true,
+      "dimensions": [
+        0.18,
+        0.19,
+        0.16
+      ],
       "material": "skin",
-      "parent": "Villager_Root"
+      "parent": "Villager_Root",
+      "bevel": 0
     },
     {
-      "type": "cylinder",
+      "type": "cube",
+      "name": "Villager_Head",
+      "location": [
+        0,
+        -0.015,
+        1.715
+      ],
+      "dimensions": [
+        0.43,
+        0.38,
+        0.4
+      ],
+      "material": "skin",
+      "parent": "Villager_Root",
+      "bevel": 0.035
+    },
+    {
+      "type": "cube",
+      "name": "Villager_HairCap",
+      "location": [
+        0,
+        0.005,
+        1.905
+      ],
+      "dimensions": [
+        0.46,
+        0.41,
+        0.09
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0.012
+    },
+    {
+      "type": "cube",
+      "name": "Villager_HairBack",
+      "location": [
+        0,
+        0.175,
+        1.755
+      ],
+      "dimensions": [
+        0.45,
+        0.08,
+        0.25
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Fringe_L",
+      "location": [
+        -0.12,
+        -0.193,
+        1.86
+      ],
+      "dimensions": [
+        0.2,
+        0.045,
+        0.1
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Fringe_R",
+      "location": [
+        0.075,
+        -0.193,
+        1.89
+      ],
+      "dimensions": [
+        0.18,
+        0.045,
+        0.055
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Nose",
+      "location": [
+        0,
+        -0.225,
+        1.7
+      ],
+      "dimensions": [
+        0.085,
+        0.095,
+        0.095
+      ],
+      "material": "skin",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Ear_L",
+      "location": [
+        -0.232,
+        0,
+        1.71
+      ],
+      "dimensions": [
+        0.065,
+        0.12,
+        0.11
+      ],
+      "material": "skin",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Eye_L",
+      "location": [
+        -0.1,
+        -0.21,
+        1.755
+      ],
+      "dimensions": [
+        0.034,
+        0.012,
+        0.037
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
       "name": "Villager_UpperArm_L",
       "location": [
         -0.34,
         0,
         1.24
       ],
-      "radius": 0.095,
-      "depth": 0.42,
-      "smooth": true,
+      "dimensions": [
+        0.2,
+        0.26,
+        0.38
+      ],
       "material": "cloth",
       "parent": "Villager_Root",
-      "vertices": 12
+      "bevel": 0
     },
     {
-      "type": "cylinder",
+      "type": "cube",
       "name": "Villager_Forearm_L",
       "location": [
         -0.4,
         0,
         0.9
       ],
-      "radius": 0.085,
-      "depth": 0.35,
-      "smooth": true,
-      "material": "skin",
-      "parent": "Villager_Root",
-      "vertices": 12
-    },
-    {
-      "type": "sphere",
-      "name": "Villager_Hand_L",
-      "location": [
-        -0.43,
-        0,
-        0.69
+      "dimensions": [
+        0.19,
+        0.23,
+        0.34
       ],
-      "radius": 0.09,
-      "segments": 10,
-      "rings": 7,
-      "smooth": true,
-      "material": "skin",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Villager_UpperArm_R",
-      "location": [
-        0.34,
-        0,
-        1.24
-      ],
-      "radius": 0.095,
-      "depth": 0.42,
-      "smooth": true,
       "material": "cloth",
       "parent": "Villager_Root",
-      "vertices": 12
+      "bevel": 0
     },
     {
-      "type": "cylinder",
-      "name": "Villager_Forearm_R",
+      "type": "cube",
+      "name": "Villager_Hand_L",
       "location": [
-        0.4,
-        0,
-        0.9
-      ],
-      "radius": 0.085,
-      "depth": 0.35,
-      "smooth": true,
-      "material": "skin",
-      "parent": "Villager_Root",
-      "vertices": 12
-    },
-    {
-      "type": "sphere",
-      "name": "Villager_Hand_R",
-      "location": [
-        0.43,
-        0,
+        -0.435,
+        -0.005,
         0.69
       ],
-      "radius": 0.09,
-      "segments": 10,
-      "rings": 7,
-      "smooth": true,
+      "dimensions": [
+        0.18,
+        0.2,
+        0.17
+      ],
       "material": "skin",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Villager_Thigh_L",
-      "location": [
-        -0.15,
-        0,
-        0.72
-      ],
-      "radius": 0.115,
-      "depth": 0.46,
-      "smooth": true,
-      "material": "cloth-accent",
       "parent": "Villager_Root",
-      "vertices": 12
-    },
-    {
-      "type": "cylinder",
-      "name": "Villager_Shin_L",
-      "location": [
-        -0.15,
-        0,
-        0.32
-      ],
-      "radius": 0.1,
-      "depth": 0.38,
-      "smooth": true,
-      "material": "cloth-accent",
-      "parent": "Villager_Root",
-      "vertices": 12
+      "bevel": 0.017
     },
     {
       "type": "cube",
       "name": "Villager_Foot_L",
       "location": [
         -0.15,
-        -0.06,
-        0.1
+        -0.065,
+        0.075
       ],
       "dimensions": [
-        0.16,
-        0.3,
-        0.14
+        0.23,
+        0.36,
+        0.15
       ],
-      "material": "cloth-accent",
-      "parent": "Villager_Root"
+      "material": "cloth",
+      "parent": "Villager_Root",
+      "bevel": 0.017
     },
     {
-      "type": "cylinder",
-      "name": "Villager_Thigh_R",
+      "type": "cube",
+      "name": "Villager_Ear_R",
       "location": [
-        0.15,
+        0.232,
         0,
-        0.72
+        1.71
       ],
-      "radius": 0.115,
-      "depth": 0.46,
-      "smooth": true,
-      "material": "cloth-accent",
+      "dimensions": [
+        0.065,
+        0.12,
+        0.11
+      ],
+      "material": "skin",
       "parent": "Villager_Root",
-      "vertices": 12
+      "bevel": 0
     },
     {
-      "type": "cylinder",
-      "name": "Villager_Shin_R",
+      "type": "cube",
+      "name": "Villager_Eye_R",
       "location": [
-        0.15,
-        0,
-        0.32
+        0.1,
+        -0.21,
+        1.755
       ],
-      "radius": 0.1,
-      "depth": 0.38,
-      "smooth": true,
-      "material": "cloth-accent",
+      "dimensions": [
+        0.034,
+        0.012,
+        0.037
+      ],
+      "material": "dark",
       "parent": "Villager_Root",
-      "vertices": 12
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_UpperArm_R",
+      "location": [
+        0.34,
+        0,
+        1.24
+      ],
+      "dimensions": [
+        0.2,
+        0.26,
+        0.38
+      ],
+      "material": "cloth",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Forearm_R",
+      "location": [
+        0.4,
+        0,
+        0.9
+      ],
+      "dimensions": [
+        0.19,
+        0.23,
+        0.34
+      ],
+      "material": "cloth",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Hand_R",
+      "location": [
+        0.435,
+        -0.005,
+        0.69
+      ],
+      "dimensions": [
+        0.18,
+        0.2,
+        0.17
+      ],
+      "material": "skin",
+      "parent": "Villager_Root",
+      "bevel": 0.017
     },
     {
       "type": "cube",
       "name": "Villager_Foot_R",
       "location": [
         0.15,
-        -0.06,
+        -0.065,
+        0.075
+      ],
+      "dimensions": [
+        0.23,
+        0.36,
+        0.15
+      ],
+      "material": "cloth",
+      "parent": "Villager_Root",
+      "bevel": 0.017
+    },
+    {
+      "type": "cylinder",
+      "name": "Villager_CassockSkirt",
+      "location": [
+        0,
+        0,
+        0.6
+      ],
+      "radius": 0.365,
+      "depth": 0.82,
+      "vertices": 8,
+      "rotationDegrees": [
+        0,
+        0,
+        22.5
+      ],
+      "material": "cloth",
+      "parent": "Villager_Root",
+      "smooth": false,
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_CassockWaist",
+      "location": [
+        0,
+        0,
+        0.97
+      ],
+      "dimensions": [
+        0.56,
+        0.365,
         0.1
       ],
+      "material": "cloth",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_ClericalCollar",
+      "location": [
+        0,
+        -0.105,
+        1.447
+      ],
       "dimensions": [
-        0.16,
-        0.3,
-        0.14
+        0.19,
+        0.2,
+        0.065
       ],
       "material": "cloth-accent",
-      "parent": "Villager_Root"
+      "parent": "Villager_Root",
+      "bevel": 0
     },
     {
-      "type": "sphere",
-      "name": "Villager_Elbow_L",
+      "type": "cube",
+      "name": "Villager_NeckCord",
       "location": [
-        -0.38,
         0,
-        1.06
+        -0.193,
+        1.325
       ],
-      "radius": 0.102,
-      "segments": 8,
-      "rings": 6,
-      "smooth": true,
-      "material": "cloth",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "sphere",
-      "name": "Villager_Elbow_R",
-      "location": [
-        0.38,
-        0,
-        1.06
+      "dimensions": [
+        0.024,
+        0.025,
+        0.15
       ],
-      "radius": 0.102,
-      "segments": 8,
-      "rings": 6,
-      "smooth": true,
-      "material": "cloth",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "sphere",
-      "name": "Villager_Knee_L",
-      "location": [
-        -0.15,
-        0,
-        0.52
-      ],
-      "radius": 0.118,
-      "segments": 8,
-      "rings": 6,
-      "smooth": true,
       "material": "cloth-accent",
-      "parent": "Villager_Root"
+      "parent": "Villager_Root",
+      "bevel": 0
     },
     {
-      "type": "sphere",
-      "name": "Villager_Knee_R",
+      "type": "cube",
+      "name": "Villager_CrossStem",
       "location": [
+        0,
+        -0.211,
+        1.18
+      ],
+      "dimensions": [
+        0.046,
+        0.033,
+        0.2
+      ],
+      "material": "cloth-accent",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_CrossArms",
+      "location": [
+        0,
+        -0.211,
+        1.225
+      ],
+      "dimensions": [
         0.15,
-        0,
-        0.52
-      ],
-      "radius": 0.118,
-      "segments": 8,
-      "rings": 6,
-      "smooth": true,
-      "material": "cloth-accent",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "cube",
-      "name": "Villager_Apron",
-      "location": [
-        0.0,
-        -0.16,
-        1.02
-      ],
-      "dimensions": [
-        0.42,
-        0.05,
-        0.46
-      ],
-      "material": "cloth-accent",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "sphere",
-      "name": "Villager_Eye_L",
-      "location": [
-        -0.1,
-        -0.24,
-        1.76
-      ],
-      "radius": 0.045,
-      "segments": 6,
-      "rings": 4,
-      "smooth": true,
-      "material": "dark",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "sphere",
-      "name": "Villager_Eye_R",
-      "location": [
-        0.1,
-        -0.24,
-        1.76
-      ],
-      "radius": 0.045,
-      "segments": 6,
-      "rings": 4,
-      "smooth": true,
-      "material": "dark",
-      "parent": "Villager_Root"
-    },
-    {
-      "type": "cone",
-      "name": "Priest_Hood",
-      "location": [
-        0,
-        0,
-        2.05
+        0.033,
+        0.046
       ],
       "material": "cloth-accent",
       "parent": "Villager_Root",
-      "radius": 0.22,
-      "depth": 0.32,
-      "vertices": 10
+      "bevel": 0
     },
     {
       "type": "cube",
-      "name": "Priest_CrossUpright",
+      "name": "Villager_CassockPlacket",
       "location": [
         0,
-        -0.22,
-        1.3
+        -0.176,
+        1.18
       ],
-      "material": "dark",
-      "parent": "Villager_Root",
       "dimensions": [
-        0.03,
+        0.035,
         0.02,
-        0.14
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Priest_CrossBar",
-      "location": [
-        0,
-        -0.22,
-        1.34
+        0.42
       ],
-      "material": "dark",
+      "material": "cloth",
       "parent": "Villager_Root",
-      "dimensions": [
-        0.1,
-        0.02,
-        0.03
-      ]
+      "bevel": 0
     }
   ],
   "rig": {
@@ -664,32 +762,35 @@
       }
     ],
     "bind": {
+      "hand_l": "hand.L",
+      "hand_r": "hand.R",
       "Villager_Torso": "spine",
+      "Villager_Neck": "head",
       "Villager_Head": "head",
+      "Villager_HairCap": "head",
+      "Villager_HairBack": "head",
+      "Villager_Fringe_L": "head",
+      "Villager_Fringe_R": "head",
+      "Villager_Nose": "head",
+      "Villager_Ear_L": "head",
+      "Villager_Eye_L": "head",
       "Villager_UpperArm_L": "upperarm.L",
       "Villager_Forearm_L": "forearm.L",
       "Villager_Hand_L": "hand.L",
+      "Villager_Foot_L": "foot.L",
+      "Villager_Ear_R": "head",
+      "Villager_Eye_R": "head",
       "Villager_UpperArm_R": "upperarm.R",
       "Villager_Forearm_R": "forearm.R",
       "Villager_Hand_R": "hand.R",
-      "Villager_Thigh_L": "thigh.L",
-      "Villager_Shin_L": "shin.L",
-      "Villager_Foot_L": "foot.L",
-      "Villager_Thigh_R": "thigh.R",
-      "Villager_Shin_R": "shin.R",
       "Villager_Foot_R": "foot.R",
-      "hand_r": "hand.R",
-      "hand_l": "hand.L",
-      "Villager_Elbow_L": "upperarm.L",
-      "Villager_Elbow_R": "upperarm.R",
-      "Villager_Knee_L": "thigh.L",
-      "Villager_Knee_R": "thigh.R",
-      "Villager_Apron": "spine",
-      "Villager_Eye_L": "head",
-      "Villager_Eye_R": "head",
-      "Priest_Hood": "head",
-      "Priest_CrossUpright": "spine",
-      "Priest_CrossBar": "spine"
+      "Villager_CassockSkirt": "hips",
+      "Villager_CassockWaist": "hips",
+      "Villager_ClericalCollar": "spine",
+      "Villager_NeckCord": "spine",
+      "Villager_CrossStem": "spine",
+      "Villager_CrossArms": "spine",
+      "Villager_CassockPlacket": "spine"
     },
     "gait": {
       "note": "Lo que la auditoria necesita para juzgar una marcha sin saber que esto es un humano: que huesos son pies, y que tercias forman una bisagra y hacia que lado dobla cada una. Un codo y una rodilla doblan en sentidos opuestos, y cada uno solo hacia el suyo.",
@@ -805,21 +906,21 @@
               "rotation": [
                 -1.4,
                 0,
-                -2.0
+                -2
               ]
             },
             {
               "frame": 48,
               "rotation": [
-                -3.0,
+                -3,
                 0,
-                -2.0
+                -2
               ]
             },
             {
               "frame": 84,
               "rotation": [
-                -1.0,
+                -1,
                 0,
                 1.6
               ]
@@ -1161,7 +1262,7 @@
               "frame": 9,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -1193,7 +1294,7 @@
               "frame": 25,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -1296,7 +1397,7 @@
               "frame": 1,
               "rotation": [
                 0,
-                -2.0,
+                -2,
                 0
               ]
             },
@@ -1312,7 +1413,7 @@
               "frame": 9,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -1328,7 +1429,7 @@
               "frame": 17,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             },
@@ -1344,7 +1445,7 @@
               "frame": 25,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -1360,7 +1461,7 @@
               "frame": 32,
               "rotation": [
                 0,
-                -2.0,
+                -2,
                 0
               ]
             }
@@ -1373,7 +1474,7 @@
               "frame": 1,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             },
@@ -1389,7 +1490,7 @@
               "frame": 9,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -1405,7 +1506,7 @@
               "frame": 17,
               "rotation": [
                 0,
-                -2.0,
+                -2,
                 0
               ]
             },
@@ -1421,7 +1522,7 @@
               "frame": 25,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -1437,7 +1538,7 @@
               "frame": 32,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             }
@@ -1449,7 +1550,7 @@
             {
               "frame": 1,
               "rotation": [
-                -18.0,
+                -18,
                 0,
                 0
               ]
@@ -1457,7 +1558,7 @@
             {
               "frame": 5,
               "rotation": [
-                -10.0,
+                -10,
                 0,
                 0
               ]
@@ -1465,7 +1566,7 @@
             {
               "frame": 9,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -1473,7 +1574,7 @@
             {
               "frame": 13,
               "rotation": [
-                14.0,
+                14,
                 0,
                 0
               ]
@@ -1481,7 +1582,7 @@
             {
               "frame": 17,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1489,7 +1590,7 @@
             {
               "frame": 21,
               "rotation": [
-                -9.0,
+                -9,
                 0,
                 0
               ]
@@ -1497,7 +1598,7 @@
             {
               "frame": 25,
               "rotation": [
-                -19.0,
+                -19,
                 0,
                 0
               ]
@@ -1505,7 +1606,7 @@
             {
               "frame": 29,
               "rotation": [
-                -21.0,
+                -21,
                 0,
                 0
               ]
@@ -1513,7 +1614,7 @@
             {
               "frame": 32,
               "rotation": [
-                -18.0,
+                -18,
                 0,
                 0
               ]
@@ -1526,7 +1627,7 @@
             {
               "frame": 1,
               "rotation": [
-                6.0,
+                6,
                 0,
                 0
               ]
@@ -1534,7 +1635,7 @@
             {
               "frame": 5,
               "rotation": [
-                16.0,
+                16,
                 0,
                 0
               ]
@@ -1542,7 +1643,7 @@
             {
               "frame": 9,
               "rotation": [
-                4.0,
+                4,
                 0,
                 0
               ]
@@ -1550,7 +1651,7 @@
             {
               "frame": 13,
               "rotation": [
-                20.0,
+                20,
                 0,
                 0
               ]
@@ -1558,7 +1659,7 @@
             {
               "frame": 17,
               "rotation": [
-                46.0,
+                46,
                 0,
                 0
               ]
@@ -1566,7 +1667,7 @@
             {
               "frame": 21,
               "rotation": [
-                30.0,
+                30,
                 0,
                 0
               ]
@@ -1574,7 +1675,7 @@
             {
               "frame": 25,
               "rotation": [
-                14.0,
+                14,
                 0,
                 0
               ]
@@ -1582,7 +1683,7 @@
             {
               "frame": 29,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1590,7 +1691,7 @@
             {
               "frame": 32,
               "rotation": [
-                6.0,
+                6,
                 0,
                 0
               ]
@@ -1603,7 +1704,7 @@
             {
               "frame": 1,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1611,7 +1712,7 @@
             {
               "frame": 5,
               "rotation": [
-                3.0,
+                3,
                 0,
                 0
               ]
@@ -1619,7 +1720,7 @@
             {
               "frame": 9,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -1627,7 +1728,7 @@
             {
               "frame": 13,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -1635,7 +1736,7 @@
             {
               "frame": 17,
               "rotation": [
-                -8.0,
+                -8,
                 0,
                 0
               ]
@@ -1643,7 +1744,7 @@
             {
               "frame": 21,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -1651,7 +1752,7 @@
             {
               "frame": 25,
               "rotation": [
-                3.0,
+                3,
                 0,
                 0
               ]
@@ -1659,7 +1760,7 @@
             {
               "frame": 29,
               "rotation": [
-                6.0,
+                6,
                 0,
                 0
               ]
@@ -1667,7 +1768,7 @@
             {
               "frame": 32,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1680,7 +1781,7 @@
             {
               "frame": 1,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1688,7 +1789,7 @@
             {
               "frame": 5,
               "rotation": [
-                -9.0,
+                -9,
                 0,
                 0
               ]
@@ -1696,7 +1797,7 @@
             {
               "frame": 9,
               "rotation": [
-                -19.0,
+                -19,
                 0,
                 0
               ]
@@ -1704,7 +1805,7 @@
             {
               "frame": 13,
               "rotation": [
-                -21.0,
+                -21,
                 0,
                 0
               ]
@@ -1712,7 +1813,7 @@
             {
               "frame": 17,
               "rotation": [
-                -18.0,
+                -18,
                 0,
                 0
               ]
@@ -1720,7 +1821,7 @@
             {
               "frame": 21,
               "rotation": [
-                -10.0,
+                -10,
                 0,
                 0
               ]
@@ -1728,7 +1829,7 @@
             {
               "frame": 25,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -1736,7 +1837,7 @@
             {
               "frame": 29,
               "rotation": [
-                14.0,
+                14,
                 0,
                 0
               ]
@@ -1744,7 +1845,7 @@
             {
               "frame": 32,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1757,7 +1858,7 @@
             {
               "frame": 1,
               "rotation": [
-                46.0,
+                46,
                 0,
                 0
               ]
@@ -1765,7 +1866,7 @@
             {
               "frame": 5,
               "rotation": [
-                30.0,
+                30,
                 0,
                 0
               ]
@@ -1773,7 +1874,7 @@
             {
               "frame": 9,
               "rotation": [
-                14.0,
+                14,
                 0,
                 0
               ]
@@ -1781,7 +1882,7 @@
             {
               "frame": 13,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1789,7 +1890,7 @@
             {
               "frame": 17,
               "rotation": [
-                6.0,
+                6,
                 0,
                 0
               ]
@@ -1797,7 +1898,7 @@
             {
               "frame": 21,
               "rotation": [
-                16.0,
+                16,
                 0,
                 0
               ]
@@ -1805,7 +1906,7 @@
             {
               "frame": 25,
               "rotation": [
-                4.0,
+                4,
                 0,
                 0
               ]
@@ -1813,7 +1914,7 @@
             {
               "frame": 29,
               "rotation": [
-                20.0,
+                20,
                 0,
                 0
               ]
@@ -1821,7 +1922,7 @@
             {
               "frame": 32,
               "rotation": [
-                46.0,
+                46,
                 0,
                 0
               ]
@@ -1834,7 +1935,7 @@
             {
               "frame": 1,
               "rotation": [
-                -8.0,
+                -8,
                 0,
                 0
               ]
@@ -1842,7 +1943,7 @@
             {
               "frame": 5,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -1850,7 +1951,7 @@
             {
               "frame": 9,
               "rotation": [
-                3.0,
+                3,
                 0,
                 0
               ]
@@ -1858,7 +1959,7 @@
             {
               "frame": 13,
               "rotation": [
-                6.0,
+                6,
                 0,
                 0
               ]
@@ -1866,7 +1967,7 @@
             {
               "frame": 17,
               "rotation": [
-                8.0,
+                8,
                 0,
                 0
               ]
@@ -1874,7 +1975,7 @@
             {
               "frame": 21,
               "rotation": [
-                3.0,
+                3,
                 0,
                 0
               ]
@@ -1882,7 +1983,7 @@
             {
               "frame": 25,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -1890,7 +1991,7 @@
             {
               "frame": 29,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -1898,7 +1999,7 @@
             {
               "frame": 32,
               "rotation": [
-                -8.0,
+                -8,
                 0,
                 0
               ]
@@ -1911,7 +2012,7 @@
             {
               "frame": 1,
               "rotation": [
-                18.0,
+                18,
                 0,
                 0
               ]
@@ -1919,7 +2020,7 @@
             {
               "frame": 5,
               "rotation": [
-                14.0,
+                14,
                 0,
                 0
               ]
@@ -1927,7 +2028,7 @@
             {
               "frame": 9,
               "rotation": [
-                -2.0,
+                -2,
                 0,
                 0
               ]
@@ -1935,7 +2036,7 @@
             {
               "frame": 13,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -1943,7 +2044,7 @@
             {
               "frame": 17,
               "rotation": [
-                -22.0,
+                -22,
                 0,
                 0
               ]
@@ -1951,7 +2052,7 @@
             {
               "frame": 21,
               "rotation": [
-                -16.0,
+                -16,
                 0,
                 0
               ]
@@ -1959,7 +2060,7 @@
             {
               "frame": 25,
               "rotation": [
-                -2.0,
+                -2,
                 0,
                 0
               ]
@@ -1967,7 +2068,7 @@
             {
               "frame": 29,
               "rotation": [
-                10.0,
+                10,
                 0,
                 0
               ]
@@ -1975,7 +2076,7 @@
             {
               "frame": 32,
               "rotation": [
-                18.0,
+                18,
                 0,
                 0
               ]
@@ -1988,7 +2089,7 @@
             {
               "frame": 1,
               "rotation": [
-                -10.0,
+                -10,
                 0,
                 0
               ]
@@ -1996,7 +2097,7 @@
             {
               "frame": 5,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -2004,7 +2105,7 @@
             {
               "frame": 9,
               "rotation": [
-                -20.0,
+                -20,
                 0,
                 0
               ]
@@ -2012,7 +2113,7 @@
             {
               "frame": 13,
               "rotation": [
-                -25.0,
+                -25,
                 0,
                 0
               ]
@@ -2020,7 +2121,7 @@
             {
               "frame": 17,
               "rotation": [
-                -28.0,
+                -28,
                 0,
                 0
               ]
@@ -2028,7 +2129,7 @@
             {
               "frame": 21,
               "rotation": [
-                -25.0,
+                -25,
                 0,
                 0
               ]
@@ -2036,7 +2137,7 @@
             {
               "frame": 25,
               "rotation": [
-                -20.0,
+                -20,
                 0,
                 0
               ]
@@ -2044,7 +2145,7 @@
             {
               "frame": 29,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -2052,7 +2153,7 @@
             {
               "frame": 32,
               "rotation": [
-                -10.0,
+                -10,
                 0,
                 0
               ]
@@ -2065,7 +2166,7 @@
             {
               "frame": 1,
               "rotation": [
-                -22.0,
+                -22,
                 0,
                 0
               ]
@@ -2073,7 +2174,7 @@
             {
               "frame": 5,
               "rotation": [
-                -16.0,
+                -16,
                 0,
                 0
               ]
@@ -2081,7 +2182,7 @@
             {
               "frame": 9,
               "rotation": [
-                -2.0,
+                -2,
                 0,
                 0
               ]
@@ -2089,7 +2190,7 @@
             {
               "frame": 13,
               "rotation": [
-                10.0,
+                10,
                 0,
                 0
               ]
@@ -2097,7 +2198,7 @@
             {
               "frame": 17,
               "rotation": [
-                18.0,
+                18,
                 0,
                 0
               ]
@@ -2105,7 +2206,7 @@
             {
               "frame": 21,
               "rotation": [
-                14.0,
+                14,
                 0,
                 0
               ]
@@ -2113,7 +2214,7 @@
             {
               "frame": 25,
               "rotation": [
-                -2.0,
+                -2,
                 0,
                 0
               ]
@@ -2121,7 +2222,7 @@
             {
               "frame": 29,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -2129,7 +2230,7 @@
             {
               "frame": 32,
               "rotation": [
-                -22.0,
+                -22,
                 0,
                 0
               ]
@@ -2142,7 +2243,7 @@
             {
               "frame": 1,
               "rotation": [
-                -28.0,
+                -28,
                 0,
                 0
               ]
@@ -2150,7 +2251,7 @@
             {
               "frame": 5,
               "rotation": [
-                -25.0,
+                -25,
                 0,
                 0
               ]
@@ -2158,7 +2259,7 @@
             {
               "frame": 9,
               "rotation": [
-                -20.0,
+                -20,
                 0,
                 0
               ]
@@ -2166,7 +2267,7 @@
             {
               "frame": 13,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -2174,7 +2275,7 @@
             {
               "frame": 17,
               "rotation": [
-                -10.0,
+                -10,
                 0,
                 0
               ]
@@ -2182,7 +2283,7 @@
             {
               "frame": 21,
               "rotation": [
-                -14.0,
+                -14,
                 0,
                 0
               ]
@@ -2190,7 +2291,7 @@
             {
               "frame": 25,
               "rotation": [
-                -20.0,
+                -20,
                 0,
                 0
               ]
@@ -2198,7 +2299,7 @@
             {
               "frame": 29,
               "rotation": [
-                -25.0,
+                -25,
                 0,
                 0
               ]
@@ -2206,7 +2307,7 @@
             {
               "frame": 32,
               "rotation": [
-                -28.0,
+                -28,
                 0,
                 0
               ]
@@ -2598,7 +2699,7 @@
               "frame": 1,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             },
@@ -2614,7 +2715,7 @@
               "frame": 9,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -2630,7 +2731,7 @@
               "frame": 17,
               "rotation": [
                 0,
-                -2.0,
+                -2,
                 0
               ]
             },
@@ -2646,7 +2747,7 @@
               "frame": 25,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -2662,7 +2763,7 @@
               "frame": 32,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             }
@@ -2826,7 +2927,7 @@
               "frame": 1,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             },
@@ -2842,7 +2943,7 @@
               "frame": 9,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -2858,7 +2959,7 @@
               "frame": 17,
               "rotation": [
                 0,
-                -2.0,
+                -2,
                 0
               ]
             },
@@ -2874,7 +2975,7 @@
               "frame": 25,
               "rotation": [
                 0,
-                0.0,
+                0,
                 0
               ]
             },
@@ -2890,7 +2991,7 @@
               "frame": 32,
               "rotation": [
                 0,
-                2.0,
+                2,
                 0
               ]
             }
@@ -2918,7 +3019,7 @@
             {
               "frame": 9,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -3072,7 +3173,7 @@
             {
               "frame": 9,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -3096,7 +3197,7 @@
             {
               "frame": 21,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -3181,7 +3282,7 @@
             {
               "frame": 25,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -3295,7 +3396,7 @@
             {
               "frame": 5,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -3335,7 +3436,7 @@
             {
               "frame": 25,
               "rotation": [
-                0.0,
+                0,
                 0,
                 0
               ]
@@ -3450,19 +3551,20 @@
     "hand_r"
   ],
   "referenceRender": {
-    "width": 390,
+    "width": 640,
     "height": 640,
     "cameraLocation": [
-      4.2,
-      -5.2,
-      3.4
+      1.2,
+      -1.8,
+      1.1
     ],
     "cameraTarget": [
       0,
       0,
-      1.0
+      0.32
     ],
-    "orthoScale": 3.2,
+    "orthoScale": 0.92,
     "worldRole": "sky"
-  }
+  },
+  "house": "tiled"
 }

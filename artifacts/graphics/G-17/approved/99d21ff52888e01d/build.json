@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-farmer",
+  "runId": "2026-09-16T11-46-35-530Z-50704",
+  "recipe": "art/recipes/villager-farmer/villager-farmer.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11717,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-46-35-530Z-50704/candidate/villager-farmer.blend",
+      "bytes": 125105,
+      "sha256": "F5FB2E654ECEC9121827FF95BAA426B8A14D917288BD775CFF4DF2196D07E605"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-46-35-530Z-50704/candidate/villager-farmer.glb",
+      "bytes": 289324,
+      "sha256": "99D21FF52888E01DEA3923C9C6764A9227056C9C8B6A2A3B5C7C665B31D7E69E"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-46-35-530Z-50704/candidate/villager-farmer-blender.png",
+      "bytes": 291736,
+      "sha256": "EB4DC363A251210302DAF20288F685117ADFE26D6A700FF6ABCA272A8CFC0FB8"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-46-35-530Z-50704/blender.log",
+      "bytes": 1701,
+      "sha256": "FCBA839440B093211BCA01D39AD9BB9495C417004BF235CF98C2EBF74E399043"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-46-35-530Z-50704/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-17/runs/2026-09-16T11-46-35-530Z-50704/temporary/resolved-recipe.json",
+      "bytes": 72642,
+      "sha256": "8DBE5A41C855A54EBF527D89DEEDD42219CD11C2A1BD1359C7EF20B07288692A"
+    }
+  }
+}

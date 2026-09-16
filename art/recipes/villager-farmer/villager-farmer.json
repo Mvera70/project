@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "villager",
+  "id": "villager-farmer",
   "scale": 0.3333333333333333,
   "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
   "mergeByMaterial": true,
@@ -13,7 +13,7 @@
       1,
       1
     ],
-    "note": "G-17: base low-voxel aprobada por Vera. Altura de 1,95 m, frente reconocible, peto terracota y botas. Rig y clips originales."
+    "note": "G-17: granjero de sombrero ancho y peto color paja. Alto total 1,95 m incluyendo sombrero; manos libres para azada y carga. No añade un oficio al motor."
   },
   "materials": [
     {
@@ -28,7 +28,7 @@
     },
     {
       "name": "cloth-accent",
-      "role": "clothAccent",
+      "role": "grain",
       "roughness": 0.95
     },
     {
@@ -124,12 +124,12 @@
       "location": [
         0,
         -0.015,
-        1.715
+        1.675
       ],
       "dimensions": [
         0.43,
         0.38,
-        0.4
+        0.36
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -137,28 +137,11 @@
     },
     {
       "type": "cube",
-      "name": "Villager_HairCap",
-      "location": [
-        0,
-        0.005,
-        1.905
-      ],
-      "dimensions": [
-        0.46,
-        0.41,
-        0.09
-      ],
-      "material": "dark",
-      "parent": "Villager_Root",
-      "bevel": 0.012
-    },
-    {
-      "type": "cube",
       "name": "Villager_HairBack",
       "location": [
         0,
         0.175,
-        1.755
+        1.7149999999999999
       ],
       "dimensions": [
         0.45,
@@ -171,45 +154,11 @@
     },
     {
       "type": "cube",
-      "name": "Villager_Fringe_L",
-      "location": [
-        -0.12,
-        -0.193,
-        1.86
-      ],
-      "dimensions": [
-        0.2,
-        0.045,
-        0.1
-      ],
-      "material": "dark",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_Fringe_R",
-      "location": [
-        0.075,
-        -0.193,
-        1.89
-      ],
-      "dimensions": [
-        0.18,
-        0.045,
-        0.055
-      ],
-      "material": "dark",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
       "name": "Villager_Nose",
       "location": [
         0,
         -0.225,
-        1.7
+        1.66
       ],
       "dimensions": [
         0.085,
@@ -226,7 +175,7 @@
       "location": [
         -0.232,
         0,
-        1.71
+        1.67
       ],
       "dimensions": [
         0.065,
@@ -243,7 +192,7 @@
       "location": [
         -0.1,
         -0.21,
-        1.755
+        1.7149999999999999
       ],
       "dimensions": [
         0.034,
@@ -318,7 +267,7 @@
         0.26,
         0.43
       ],
-      "material": "cloth-accent",
+      "material": "dark",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -335,7 +284,7 @@
         0.23,
         0.38
       ],
-      "material": "cloth-accent",
+      "material": "dark",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -379,7 +328,7 @@
       "location": [
         0.232,
         0,
-        1.71
+        1.67
       ],
       "dimensions": [
         0.065,
@@ -396,7 +345,7 @@
       "location": [
         0.1,
         -0.21,
-        1.755
+        1.7149999999999999
       ],
       "dimensions": [
         0.034,
@@ -471,7 +420,7 @@
         0.26,
         0.43
       ],
-      "material": "cloth-accent",
+      "material": "dark",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -488,7 +437,7 @@
         0.23,
         0.38
       ],
-      "material": "cloth-accent",
+      "material": "dark",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -608,6 +557,57 @@
         0.063
       ],
       "material": "skin",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_StrawBrim",
+      "location": [
+        0,
+        -0.015,
+        1.865
+      ],
+      "dimensions": [
+        0.68,
+        0.57,
+        0.06
+      ],
+      "material": "cloth-accent",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_StrawCrown",
+      "location": [
+        0,
+        0.005,
+        1.915
+      ],
+      "dimensions": [
+        0.39,
+        0.34,
+        0.07
+      ],
+      "material": "cloth-accent",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_HatBand",
+      "location": [
+        0,
+        0.005,
+        1.903
+      ],
+      "dimensions": [
+        0.4,
+        0.35,
+        0.024
+      ],
+      "material": "dark",
       "parent": "Villager_Root",
       "bevel": 0
     }
@@ -849,10 +849,7 @@
       "Villager_TunicHem": "hips",
       "Villager_Neck": "head",
       "Villager_Head": "head",
-      "Villager_HairCap": "head",
       "Villager_HairBack": "head",
-      "Villager_Fringe_L": "head",
-      "Villager_Fringe_R": "head",
       "Villager_Nose": "head",
       "Villager_Ear_L": "head",
       "Villager_Eye_L": "head",
@@ -876,7 +873,10 @@
       "Villager_Collar_L": "spine",
       "Villager_Collar_R": "spine",
       "Villager_Belt": "hips",
-      "Villager_Buckle": "hips"
+      "Villager_Buckle": "hips",
+      "Villager_StrawBrim": "head",
+      "Villager_StrawCrown": "head",
+      "Villager_HatBand": "head"
     },
     "gait": {
       "note": "Lo que la auditoria necesita para juzgar una marcha sin saber que esto es un humano: que huesos son pies, y que tercias forman una bisagra y hacia que lado dobla cada una. Un codo y una rodilla doblan en sentidos opuestos, y cada uno solo hacia el suyo.",

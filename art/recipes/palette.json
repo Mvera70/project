@@ -30,7 +30,8 @@
     "trunk": "#735338",
     "skin": "#C98A63",
     "cloth": "#71885E",
-    "clothAccent": "#A96146"
+    "clothAccent": "#A96146",
+    "clericalBlack": "#08090B"
   },
   "houses": {
     "note": "Lo que varía de una casa a otra. Cada edificio elige uno de forma estable, nunca al azar en cada pintada.",

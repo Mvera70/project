@@ -1,0 +1,10 @@
+
+ RUN  v2.1.9 D:/DESARROLLO/PROYECTOS/VALLEY/project
+
+ ✓ tests/fast/villager-rig.test.ts (16 tests) 23ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  13:52:04
+   Duration  303ms (transform 49ms, setup 0ms, collect 49ms, tests 23ms, environment 0ms, prepare 65ms)
+

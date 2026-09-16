@@ -1,0 +1,232 @@
+{
+  "status": "pass",
+  "sharedRigAndClips": true,
+  "handConnectorsFree": true,
+  "allPublishedHashesMatch": true,
+  "assets": [
+    {
+      "id": "villager",
+      "recipe": "art/recipes/villager/villager.json",
+      "approved": "artifacts/graphics/G-17/approved/e40fb6dd9b1d5ca4",
+      "sha256": "E40FB6DD9B1D5CA4F0EDFBF953B498C26B20AB387D21EF859441423F1FEE46D4",
+      "bytes": 299824,
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.071667
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.1625
+        ]
+      },
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1056
+      },
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-smith",
+      "recipe": "art/recipes/villager-smith/villager-smith.json",
+      "approved": "artifacts/graphics/G-17/approved/011dcf45e9e5fd63",
+      "sha256": "011DCF45E9E5FD63B07DD5678A1E8EBE69781E8CCC207FAD636829A0EB371FFC",
+      "bytes": 306492,
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.071667
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.1625
+        ]
+      },
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1116
+      },
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-priest",
+      "recipe": "art/recipes/villager-priest/villager-priest.json",
+      "approved": "artifacts/graphics/G-17/approved/894cb713be282e67",
+      "sha256": "894CB713BE282E67F6C798598ED55B216FF3E82D5CAD072571511C7F75A7704E",
+      "bytes": 294640,
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.112405
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.112405
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.224811
+        ]
+      },
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1012
+      },
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-farmer",
+      "recipe": "art/recipes/villager-farmer/villager-farmer.json",
+      "approved": "artifacts/graphics/G-17/approved/99d21ff52888e01d",
+      "sha256": "99D21FF52888E01DEA3923C9C6764A9227056C9C8B6A2A3B5C7C665B31D7E69E",
+      "bytes": 289324,
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.1
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.19
+        ]
+      },
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 960
+      },
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    }
+  ]
+}

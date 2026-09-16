@@ -1,0 +1,23 @@
+Info: Saved as "villager-farmer.blend"
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+13:46:37 | INFO: Starting glTF 2.0 export
+13:46:37 | INFO: Extracting primitive: villager-farmer_cloth_Mesh
+13:46:37 | INFO: Primitives created: 1
+13:46:37 | INFO: Extracting primitive: villager-farmer_cloth-accent_Mesh
+13:46:37 | INFO: Primitives created: 1
+13:46:37 | INFO: Extracting primitive: villager-farmer_dark_Mesh
+13:46:37 | INFO: Primitives created: 1
+13:46:37 | INFO: Extracting primitive: villager-farmer_skin_Mesh
+13:46:37 | INFO: Primitives created: 1
+13:46:37 | INFO: Finished glTF 2.0 export in 0.23987197875976562 s
+00:11.375  render           | Saved: 'D:\DESARROLLO\PROYECTOS\VALLEY\project\artifacts\graphics\G-17\runs\2026-09-16T11-46-35-530Z-50704\candidate\villager-farmer-blender.png'
+
+VALLEY_ART_CLIPS:[{"name": "idle", "frames": 96, "loop": true, "curves": 39}, {"name": "walk", "frames": 32, "loop": true, "curves": 42}, {"name": "work_hoe", "frames": 48, "loop": true, "curves": 39}, {"name": "carry_walk", "frames": 32, "loop": true, "curves": 42}]
+VALLEY_ART_BUILD_OK:villager-farmer
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
+
+D:\DESARROLLO\PROYECTOS\VALLEY\project\artifacts\graphics\G-17\runs\2026-09-16T11-46-35-530Z-50704\temporary\build.py:17: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  material.use_nodes = True

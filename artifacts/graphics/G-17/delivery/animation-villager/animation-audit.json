@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T11:49:44.514Z",
+  "invocation": "npx tsx tools/graphics/animation-audit.ts",
+  "asset": "public/assets/valley3d/villager.glb",
+  "recipe": "art/recipes/villager/villager.json",
+  "camera": "iso-ne",
+  "thresholds": {
+    "fps": 24,
+    "rootDrift": 0.0026,
+    "minTravel": 0.01,
+    "loopGap": 0.001,
+    "boundsSlack": 1.6,
+    "kneeFlexion": 30,
+    "strideSlack": 0.2,
+    "hingeSlack": 8
+  },
+  "status": "pass",
+  "problems": [],
+  "clips": [
+    {
+      "clip": "idle",
+      "durationSeconds": 4,
+      "expectedSeconds": 4,
+      "loops": true,
+      "strideLength": null,
+      "rootDrift": 0,
+      "liveliest": {
+        "node": "handL",
+        "travel": 0.0162
+      },
+      "loopGap": 0,
+      "joints": {
+        "knee.L": {
+          "least": 177,
+          "most": 177,
+          "wrongWay": 0
+        },
+        "knee.R": {
+          "least": 178,
+          "most": 178,
+          "wrongWay": 0
+        },
+        "elbow.L": {
+          "least": 170.4,
+          "most": 173.4,
+          "wrongWay": 6.6
+        },
+        "elbow.R": {
+          "least": 171.1,
+          "most": 173.4,
+          "wrongWay": 6.6
+        }
+      },
+      "measuredStride": null,
+      "outOfBounds": [],
+      "contactSheet": "artifacts/graphics/G-17/delivery/animation-villager/idle-contact.png"
+    },
+    {
+      "clip": "walk",
+      "durationSeconds": 1.3333,
+      "expectedSeconds": 1.3333,
+      "loops": true,
+      "strideLength": 0.317,
+      "rootDrift": 0,
+      "liveliest": {
+        "node": "handR",
+        "travel": 0.2626
+      },
+      "loopGap": 0,
+      "joints": {
+        "knee.L": {
+          "least": 134.5,
+          "most": 175.7,
+          "wrongWay": 0
+        },
+        "knee.R": {
+          "least": 134,
+          "most": 175.8,
+          "wrongWay": 0
+        },
+        "elbow.L": {
+          "least": 150.4,
+          "most": 167.2,
+          "wrongWay": 0
+        },
+        "elbow.R": {
+          "least": 150.3,
+          "most": 167.1,
+          "wrongWay": 0
+        }
+      },
+      "measuredStride": 0.316,
+      "outOfBounds": [],
+      "contactSheet": "artifacts/graphics/G-17/delivery/animation-villager/walk-contact.png"
+    },
+    {
+      "clip": "work_hoe",
+      "durationSeconds": 2,
+      "expectedSeconds": 2,
+      "loops": true,
+      "strideLength": null,
+      "rootDrift": 0,
+      "liveliest": {
+        "node": "handL",
+        "travel": 0.2499
+      },
+      "loopGap": 0,
+      "joints": {
+        "knee.L": {
+          "least": 160,
+          "most": 160,
+          "wrongWay": 0
+        },
+        "knee.R": {
+          "least": 164,
+          "most": 164,
+          "wrongWay": 0
+        },
+        "elbow.L": {
+          "least": 138.5,
+          "most": 167.2,
+          "wrongWay": 0
+        },
+        "elbow.R": {
+          "least": 138.5,
+          "most": 167.2,
+          "wrongWay": 0
+        }
+      },
+      "measuredStride": null,
+      "outOfBounds": [],
+      "contactSheet": "artifacts/graphics/G-17/delivery/animation-villager/work_hoe-contact.png"
+    },
+    {
+      "clip": "carry_walk",
+      "durationSeconds": 1.3333,
+      "expectedSeconds": 1.3333,
+      "loops": true,
+      "strideLength": 0.26,
+      "rootDrift": 0,
+      "liveliest": {
+        "node": "footR",
+        "travel": 0.207
+      },
+      "loopGap": 0,
+      "joints": {
+        "knee.L": {
+          "least": 142.7,
+          "most": 176.4,
+          "wrongWay": 0
+        },
+        "knee.R": {
+          "least": 142.3,
+          "most": 176.5,
+          "wrongWay": 0
+        },
+        "elbow.L": {
+          "least": 130.6,
+          "most": 130.6,
+          "wrongWay": 0
+        },
+        "elbow.R": {
+          "least": 130.6,
+          "most": 130.6,
+          "wrongWay": 0
+        }
+      },
+      "measuredStride": 0.261,
+      "outOfBounds": [],
+      "contactSheet": "artifacts/graphics/G-17/delivery/animation-villager/carry_walk-contact.png"
+    }
+  ]
+}
