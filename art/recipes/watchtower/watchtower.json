@@ -9,10 +9,10 @@
     "cellUnit": 1,
     "kind": "watchtower",
     "footprint": [
-      1,
-      1
+      2,
+      2
     ],
-    "note": "G-10, lote de defensa. Seis metros de fuste, una galeria que vuela por encima y un chapitel. Lo mas alto del valle despues del campanario, que es de lo que sirve una atalaya."
+    "note": "G-21: atalaya de piedra con galería abierta. Centrada en la parcela 2x2 real del motor (la receta antigua declaraba 1x1). Altura 2,75 celdas."
   },
   "materials": [
     {
@@ -29,6 +29,11 @@
       "name": "roof",
       "role": "roof",
       "roughness": 0.85
+    },
+    {
+      "name": "dark",
+      "role": "timberDark",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -45,51 +50,2219 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Tower_Shaft",
+      "name": "Shaft",
       "location": [
-        1.5,
-        1.5,
-        3.0
+        3,
+        3,
+        2.72
       ],
       "dimensions": [
-        2.2,
-        2.2,
-        6.0
+        2.08,
+        2.08,
+        5.44
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Tower_Gallery",
+      "name": "Footing",
       "location": [
-        1.5,
-        1.5,
+        3,
+        3,
+        0.15
+      ],
+      "dimensions": [
+        2.3,
+        2.3,
+        0.3
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_0_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        0.4
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_0_1",
+      "location": [
+        1.94,
+        1.94,
+        0.4
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_0_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        0.4
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_0_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        0.4
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_0_0_455",
+      "location": [
+        3,
+        1.955,
+        0.15500000000000003
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_0_2_545",
+      "location": [
+        3,
+        4.045,
+        0.15500000000000003
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_0_0_455",
+      "location": [
+        1.955,
+        3,
+        0.15500000000000003
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_0_2_545",
+      "location": [
+        4.045,
+        3,
+        0.15500000000000003
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_1_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        0.91
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_1_1",
+      "location": [
+        1.94,
+        1.94,
+        0.91
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_1_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        0.91
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_1_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        0.91
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_1_0_455",
+      "location": [
+        3,
+        1.955,
+        0.665
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_1_2_545",
+      "location": [
+        3,
+        4.045,
+        0.665
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_1_0_455",
+      "location": [
+        1.955,
+        3,
+        0.665
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_1_2_545",
+      "location": [
+        4.045,
+        3,
+        0.665
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_2_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        1.42
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_2_1",
+      "location": [
+        1.94,
+        1.94,
+        1.42
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_2_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        1.42
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_2_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        1.42
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_2_0_455",
+      "location": [
+        3,
+        1.955,
+        1.1749999999999998
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_2_2_545",
+      "location": [
+        3,
+        4.045,
+        1.1749999999999998
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_2_0_455",
+      "location": [
+        1.955,
+        3,
+        1.1749999999999998
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_2_2_545",
+      "location": [
+        4.045,
+        3,
+        1.1749999999999998
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_3_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        1.9300000000000002
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_3_1",
+      "location": [
+        1.94,
+        1.94,
+        1.9300000000000002
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_3_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        1.9300000000000002
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_3_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        1.9300000000000002
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_3_0_455",
+      "location": [
+        3,
+        1.955,
+        1.685
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_3_2_545",
+      "location": [
+        3,
+        4.045,
+        1.685
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_3_0_455",
+      "location": [
+        1.955,
+        3,
+        1.685
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_3_2_545",
+      "location": [
+        4.045,
+        3,
+        1.685
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_4_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        2.44
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_4_1",
+      "location": [
+        1.94,
+        1.94,
+        2.44
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_4_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        2.44
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_4_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        2.44
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_4_0_455",
+      "location": [
+        3,
+        1.955,
+        2.195
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_4_2_545",
+      "location": [
+        3,
+        4.045,
+        2.195
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_4_0_455",
+      "location": [
+        1.955,
+        3,
+        2.195
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_4_2_545",
+      "location": [
+        4.045,
+        3,
+        2.195
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_5_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        2.9499999999999997
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_5_1",
+      "location": [
+        1.94,
+        1.94,
+        2.9499999999999997
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_5_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        2.9499999999999997
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_5_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        2.9499999999999997
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_5_0_455",
+      "location": [
+        3,
+        1.955,
+        2.7049999999999996
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_5_2_545",
+      "location": [
+        3,
+        4.045,
+        2.7049999999999996
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_5_0_455",
+      "location": [
+        1.955,
+        3,
+        2.7049999999999996
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_5_2_545",
+      "location": [
+        4.045,
+        3,
+        2.7049999999999996
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_6_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        3.46
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_6_1",
+      "location": [
+        1.94,
+        1.94,
+        3.46
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_6_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        3.46
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_6_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        3.46
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_6_0_455",
+      "location": [
+        3,
+        1.955,
+        3.215
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_6_2_545",
+      "location": [
+        3,
+        4.045,
+        3.215
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_6_0_455",
+      "location": [
+        1.955,
+        3,
+        3.215
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_6_2_545",
+      "location": [
+        4.045,
+        3,
+        3.215
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_7_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        3.97
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_7_1",
+      "location": [
+        1.94,
+        1.94,
+        3.97
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_7_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        3.97
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_7_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        3.97
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_7_0_455",
+      "location": [
+        3,
+        1.955,
+        3.725
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_7_2_545",
+      "location": [
+        3,
+        4.045,
+        3.725
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_7_0_455",
+      "location": [
+        1.955,
+        3,
+        3.725
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_7_2_545",
+      "location": [
+        4.045,
+        3,
+        3.725
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_8_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        4.48
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_8_1",
+      "location": [
+        1.94,
+        1.94,
+        4.48
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_8_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        4.48
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_8_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        4.48
+      ],
+      "dimensions": [
+        0.42,
+        0.24,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_8_0_455",
+      "location": [
+        3,
+        1.955,
+        4.235
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_8_2_545",
+      "location": [
+        3,
+        4.045,
+        4.235
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_8_0_455",
+      "location": [
+        1.955,
+        3,
+        4.235
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_8_2_545",
+      "location": [
+        4.045,
+        3,
+        4.235
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_9_0",
+      "location": [
+        1.94,
+        4.0600000000000005,
+        4.99
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_9_1",
+      "location": [
+        1.94,
+        1.94,
+        4.99
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_9_2",
+      "location": [
+        4.0600000000000005,
+        4.0600000000000005,
+        4.99
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Quoin_9_3",
+      "location": [
+        4.0600000000000005,
+        1.94,
+        4.99
+      ],
+      "dimensions": [
+        0.24,
+        0.42,
+        0.46
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_9_0_455",
+      "location": [
+        3,
+        1.955,
+        4.745
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Course_9_2_545",
+      "location": [
+        3,
+        4.045,
+        4.745
+      ],
+      "dimensions": [
+        1.76,
+        0.018,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_9_0_455",
+      "location": [
+        1.955,
+        3,
+        4.745
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideCourse_9_2_545",
+      "location": [
+        4.045,
+        3,
+        4.745
+      ],
+      "dimensions": [
+        0.018,
+        1.76,
+        0.027
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorShadow",
+      "location": [
+        3,
+        1.947,
+        0.72
+      ],
+      "dimensions": [
+        0.7,
+        0.035,
+        1.44
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorPlank_0",
+      "location": [
+        2.745,
+        1.92,
+        0.68
+      ],
+      "dimensions": [
+        0.152,
+        0.06,
+        1.32
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorPlank_1",
+      "location": [
+        2.915,
+        1.92,
+        0.68
+      ],
+      "dimensions": [
+        0.152,
+        0.06,
+        1.32
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorPlank_2",
+      "location": [
+        3.085,
+        1.92,
+        0.68
+      ],
+      "dimensions": [
+        0.152,
+        0.06,
+        1.32
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorPlank_3",
+      "location": [
+        3.255,
+        1.92,
+        0.68
+      ],
+      "dimensions": [
+        0.152,
+        0.06,
+        1.32
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorStrap_0_3",
+      "location": [
+        3,
+        1.88,
+        0.3
+      ],
+      "dimensions": [
+        0.67,
+        0.035,
+        0.07
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorStrap_1_05",
+      "location": [
+        3,
+        1.88,
+        1.05
+      ],
+      "dimensions": [
+        0.67,
+        0.035,
+        0.07
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "DoorLintel",
+      "location": [
+        3,
+        1.9,
+        1.52
+      ],
+      "dimensions": [
+        1.02,
+        0.24,
+        0.19
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ArrowSlitFront_2_7",
+      "location": [
+        3,
+        1.946,
+        2.7
+      ],
+      "dimensions": [
+        0.14,
+        0.028,
+        0.72
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ArrowSlitSide_2_7",
+      "location": [
+        4.054,
+        3,
+        2.7
+      ],
+      "dimensions": [
+        0.028,
+        0.14,
+        0.72
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ArrowSlitFront_4_2",
+      "location": [
+        3,
+        1.946,
+        4.2
+      ],
+      "dimensions": [
+        0.14,
+        0.028,
+        0.72
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ArrowSlitSide_4_2",
+      "location": [
+        4.054,
+        3,
+        4.2
+      ],
+      "dimensions": [
+        0.028,
+        0.14,
+        0.72
+      ],
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GalleryFloor",
+      "location": [
+        3,
+        3,
+        5.55
+      ],
+      "dimensions": [
+        2.85,
+        2.85,
+        0.24
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GalleryPost_0",
+      "location": [
+        1.72,
+        4.279999999999999,
         6.3
       ],
       "dimensions": [
-        2.9,
-        2.9,
-        0.6
+        0.16,
+        0.16,
+        1.5
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Support_0",
+      "location": [
+        1.912,
+        4.088,
+        5.115
+      ],
+      "radius": 0.09,
+      "depth": 0.8317523669939269,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        40.76123436760702,
+        135.00000000000003
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GalleryPost_1",
+      "location": [
+        1.72,
+        1.72,
+        6.3
+      ],
+      "dimensions": [
+        0.16,
+        0.16,
+        1.5
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Support_1",
+      "location": [
+        1.912,
+        1.912,
+        5.115
+      ],
+      "radius": 0.09,
+      "depth": 0.8317523669939269,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        40.76123436760702,
+        -135
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GalleryPost_2",
+      "location": [
+        4.279999999999999,
+        4.279999999999999,
+        6.3
+      ],
+      "dimensions": [
+        0.16,
+        0.16,
+        1.5
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Support_2",
+      "location": [
+        4.088,
+        4.088,
+        5.115
+      ],
+      "radius": 0.09,
+      "depth": 0.8317523669939266,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        40.76123436760701,
+        45
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GalleryPost_3",
+      "location": [
+        4.279999999999999,
+        1.72,
+        6.3
+      ],
+      "dimensions": [
+        0.16,
+        0.16,
+        1.5
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Support_3",
+      "location": [
+        4.088,
+        1.912,
+        5.115
+      ],
+      "radius": 0.09,
+      "depth": 0.8317523669939269,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        40.76123436760702,
+        -45.00000000000002
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailX_6_02",
+      "location": [
+        3,
+        1.72,
+        5.8
+      ],
+      "dimensions": [
+        2.72,
+        0.1,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailX_8_58",
+      "location": [
+        3,
+        4.279999999999999,
+        5.8
+      ],
+      "dimensions": [
+        2.72,
+        0.1,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailY_6_02",
+      "location": [
+        1.72,
+        3,
+        5.8
+      ],
+      "dimensions": [
+        0.1,
+        2.72,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailY_8_58",
+      "location": [
+        4.279999999999999,
+        3,
+        5.8
+      ],
+      "dimensions": [
+        0.1,
+        2.72,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailX_6_42",
+      "location": [
+        3,
+        1.72,
+        6.2
+      ],
+      "dimensions": [
+        2.72,
+        0.1,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailX_8_98",
+      "location": [
+        3,
+        4.279999999999999,
+        6.2
+      ],
+      "dimensions": [
+        2.72,
+        0.1,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailY_6_42",
+      "location": [
+        1.72,
+        3,
+        6.2
+      ],
+      "dimensions": [
+        0.1,
+        2.72,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RailY_8_98",
+      "location": [
+        4.279999999999999,
+        3,
+        6.2
+      ],
+      "dimensions": [
+        0.1,
+        2.72,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_0_0",
+      "location": [
+        2.07,
+        1.72,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_1_0",
+      "location": [
+        2.07,
+        4.279999999999999,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_2_0",
+      "location": [
+        1.72,
+        2.07,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_3_0",
+      "location": [
+        4.279999999999999,
+        2.07,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_0_1",
+      "location": [
+        2.535,
+        1.72,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_1_1",
+      "location": [
+        2.535,
+        4.279999999999999,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_2_1",
+      "location": [
+        1.72,
+        2.535,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_3_1",
+      "location": [
+        4.279999999999999,
+        2.535,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_0_2",
+      "location": [
+        3,
+        1.72,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_1_2",
+      "location": [
+        3,
+        4.279999999999999,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_2_2",
+      "location": [
+        1.72,
+        3,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_3_2",
+      "location": [
+        4.279999999999999,
+        3,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_0_3",
+      "location": [
+        3.465,
+        1.72,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_1_3",
+      "location": [
+        3.465,
+        4.279999999999999,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_2_3",
+      "location": [
+        1.72,
+        3.465,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_3_3",
+      "location": [
+        4.279999999999999,
+        3.465,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_0_4",
+      "location": [
+        3.93,
+        1.72,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_1_4",
+      "location": [
+        3.93,
+        4.279999999999999,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_2_4",
+      "location": [
+        1.72,
+        3.93,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Baluster_3_4",
+      "location": [
+        4.279999999999999,
+        3.93,
+        5.99
+      ],
+      "dimensions": [
+        0.055,
+        0.055,
+        0.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RoofFrame",
+      "location": [
+        3,
+        3,
+        6.94
+      ],
+      "dimensions": [
+        2.82,
+        2.82,
+        0.12
       ],
       "material": "wood",
       "parent": "Root"
     },
     {
       "type": "cone",
-      "name": "Tower_Cap",
+      "name": "Roof",
       "location": [
-        1.5,
-        1.5,
-        7.4
+        3,
+        3,
+        7.575
       ],
-      "radius": 1.9,
-      "depth": 1.7,
+      "radius": 2.04,
+      "depth": 1.35,
       "vertices": 4,
       "rotationDegrees": [
         0,
         0,
-        0
+        45
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofSeam_0",
+      "location": [
+        3.7212489168102785,
+        3.7212489168102785,
+        7.57
+      ],
+      "radius": 0.025,
+      "depth": 2.4298148077579906,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        122.90524292298792,
+        45
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofSeam_1",
+      "location": [
+        2.2787510831897215,
+        3.7212489168102785,
+        7.57
+      ],
+      "radius": 0.025,
+      "depth": 2.4298148077579906,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        122.90524292298792,
+        135
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofSeam_2",
+      "location": [
+        2.2787510831897215,
+        2.2787510831897215,
+        7.57
+      ],
+      "radius": 0.025,
+      "depth": 2.4298148077579906,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        122.90524292298792,
+        -135
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofSeam_3",
+      "location": [
+        3.7212489168102785,
+        2.2787510831897215,
+        7.57
+      ],
+      "radius": 0.025,
+      "depth": 2.4298148077579906,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        122.90524292298792,
+        -45.00000000000001
       ],
       "material": "roof",
       "parent": "Root"
@@ -98,19 +2271,19 @@
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 800,
+    "height": 1000,
     "cameraLocation": [
-      9.0,
-      -11.25,
-      7.2
+      3.5,
+      -2.5,
+      2.9
     ],
     "cameraTarget": [
-      0,
-      0,
-      4.0
+      1,
+      1,
+      1.35
     ],
-    "orthoScale": 12.6,
+    "orthoScale": 3.5,
     "worldRole": "sky"
   }
 }

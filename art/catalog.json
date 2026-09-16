@@ -1236,60 +1236,61 @@
     },
     {
       "id": "watchtower",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/watchtower/watchtower.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-16-02-541Z-30548",
-        "directory": "artifacts/graphics/G-10/approved/d16c6cda3ae329be"
+        "runId": "2026-09-16T20-34-32-575Z-18856",
+        "directory": "artifacts/graphics/G-21/approved/17b5f14e9e166187"
       },
       "bounds": {
         "min": [
-          -0.133333,
+          0.513275,
           0,
-          -1.133333
+          -1.486725
         ],
         "max": [
-          1.133333,
-          2.75,
-          0.133333
+          1.486725,
+          2.75033,
+          -0.513275
         ],
         "size": [
-          1.266667,
-          2.75,
-          1.266667
+          0.97345,
+          2.75033,
+          0.97345
         ]
       },
-      "recipeSha256": "F24D2652A08C9B9A8B6E5AD2992B07865DE47D6E9130B8C0E1A7F347138F0BA4",
+      "recipeSha256": "6C9BF2CB27463BC72BC2DB58C49D2505273EB1A3B437F93F30770E5434CCF191",
       "materials": [
         "stone",
         "wood",
-        "roof"
+        "roof",
+        "dark"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 30
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1638
       },
       "hashes": {
-        "watchtower.blend": "42B9E2AD73F1619B3AC1BA4E47B89947DF4C15953B815E33AF2B5DDD91F1C400",
-        "watchtower.glb": "D16C6CDA3AE329BE334F090AAA4622D8892ABE2FA119B8318F37ADB05E56E228",
-        "watchtower-blender.png": "EA845C8695FF55A4C1D6AC259BF390A6A3CA62990D144BFD3DB3D9381A7BD8E1",
-        "capture-1.png": "AC6362D1F3898EE0241FBC31CCF6CC0362772009E2736238B8C0161CCBE544B4",
-        "capture-1-gray.png": "377E824B2F51DDE0C92D130CDB315B69D9EE3C67628D0A98669A39C02602F656",
-        "capture.json": "E0D354B1E00111B29214F948D9EAAE36C6E5A655DB1828C0CC016CA171E71288",
-        "build.json": "08CF5FFE4FD13E394AFB88472CA11722C7EFB700A480D4C907D7E309747C56CD",
-        "validation.json": "A267B8406FB1CFD6BBDBE67AE5038F565A2EA58946839BFF09A0A6B4CEEEBC7B"
+        "watchtower.blend": "709DD44812CE565A004D73C5BE50E012076E9F7FF263A48C6E9CCE670E429FC9",
+        "watchtower.glb": "17B5F14E9E166187439C064F6E6E799F505C18959452B2F1727773BC7340CCF8",
+        "watchtower-blender.png": "489DC23C606204FEC5FC1D2DDE69190D7639A259868018F25F45551D83AB9E12",
+        "capture-1.png": "829B5AB31F7274113EC5DD7E8D36F4ACFC9F1531C9C29B1DEFF0ED1FD84C78EA",
+        "capture-1-gray.png": "481252EA3105460035D57B7025008E17D0DA8F5D6DCCD863234F7B022690BB44",
+        "capture.json": "C43C6948CFAF20E7F98E3FEFC2EF799096D0732D568D9BBD83AAB08BB86B3300",
+        "build.json": "EBBD56D3E4EC04ACB65E99C4CD076B4942DD4232A46CB0CF9A892FF805AC5902",
+        "validation.json": "4585FE6CFBAE77C1D38344B6A775496E6CD92884B0994EF7BF06D197E5EDE96B"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original watchtower authored for The Valley G-10",
+        "source": "Original G-21: atalaya de piedra con galería abierta y cubierta a cuatro aguas.",
         "license": "Project original"
       }
     },

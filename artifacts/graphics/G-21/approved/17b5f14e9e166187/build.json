@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "watchtower",
+  "runId": "2026-09-16T20-34-32-575Z-18856",
+  "recipe": "art/recipes/watchtower/watchtower.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 12187,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/candidate/watchtower.blend",
+      "bytes": 104055,
+      "sha256": "709DD44812CE565A004D73C5BE50E012076E9F7FF263A48C6E9CCE670E429FC9"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/candidate/watchtower.glb",
+      "bytes": 119384,
+      "sha256": "17B5F14E9E166187439C064F6E6E799F505C18959452B2F1727773BC7340CCF8"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/candidate/watchtower-blender.png",
+      "bytes": 648406,
+      "sha256": "489DC23C606204FEC5FC1D2DDE69190D7639A259868018F25F45551D83AB9E12"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/blender.log",
+      "bytes": 1389,
+      "sha256": "2BAB4870A85B0A68D327535230CE262B0005824BF824B668F82B1F2BDDE0201B"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/temporary/resolved-recipe.json",
+      "bytes": 52534,
+      "sha256": "77A8719564C7976117FC4FC98E00FFF5AD42130E299152274DB7FF3A06E6F31B"
+    }
+  }
+}
