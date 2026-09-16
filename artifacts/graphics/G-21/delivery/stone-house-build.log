@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all stone-house
+
+Built stone-house in artifacts\graphics\G-21\runs\2026-09-16T16-56-31-507Z-48688
+Validated stone-house from run 2026-09-16T16-56-31-507Z-48688
+Reported and promoted stone-house to artifacts\graphics\G-21\approved\df75fd4689ed1ed6

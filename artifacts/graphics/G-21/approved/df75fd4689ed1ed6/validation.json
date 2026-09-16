@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "assetId": "stone-house",
+  "runId": "2026-09-16T16-56-31-507Z-48688",
+  "status": "pass",
+  "durationMs": 2510,
+  "candidateSha256": "DF75FD4689ED1ED6946537256B86C49DA4B1856B2EA61444DAE94F7B46D190FA",
+  "glb": {
+    "version": 2,
+    "declaredLength": 57236,
+    "nodeNames": [
+      "stone-house_roof",
+      "stone-house_stone",
+      "stone-house_window",
+      "stone-house_wood",
+      "Root"
+    ],
+    "meshNames": [
+      "stone-house_roof_Mesh",
+      "stone-house_stone_Mesh",
+      "stone-house_window_Mesh",
+      "stone-house_wood_Mesh"
+    ],
+    "materialNames": [
+      "roof",
+      "stone",
+      "window",
+      "wood"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 5,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 752
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T16:56:45.374Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-56-31-507Z-48688\\candidate\\stone-house.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T16-56-31-507Z-48688/candidate/stone-house.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-56-31-507Z-48688\\three\\capture-1.png",
+        "sha256": "A85617278A2A136E1FA41C1FFC4A132C6AC0CAA5BD2ED78E00ECE1645FED0574",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-56-31-507Z-48688\\three\\capture-1-gray.png",
+          "sha256": "87266C183C06F3DCBC9B20B9B7A6F0D3D0335105D5EB19B4A0AD614DD490D9C8",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 367,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:58429/artifacts/graphics/G-21/runs/2026-09-16T16-56-31-507Z-48688/candidate/stone-house.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "stone-house_roof",
+            "stone-house_stone",
+            "stone-house_window",
+            "stone-house_wood"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              2,
+              1.57,
+              0
+            ],
+            "size": [
+              2,
+              1.57,
+              2
+            ]
+          },
+          "loadDurationMs": 131
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-56-31-507Z-48688\\three\\capture-2.png",
+        "sha256": "A85617278A2A136E1FA41C1FFC4A132C6AC0CAA5BD2ED78E00ECE1645FED0574",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-56-31-507Z-48688\\three\\capture-2-gray.png",
+          "sha256": "87266C183C06F3DCBC9B20B9B7A6F0D3D0335105D5EB19B4A0AD614DD490D9C8",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 116,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:58429/artifacts/graphics/G-21/runs/2026-09-16T16-56-31-507Z-48688/candidate/stone-house.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "stone-house_roof",
+            "stone-house_stone",
+            "stone-house_window",
+            "stone-house_wood"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              2,
+              1.57,
+              0
+            ],
+            "size": [
+              2,
+              1.57,
+              2
+            ]
+          },
+          "loadDurationMs": 32
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:58429/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 135,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-56-31-507Z-48688\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

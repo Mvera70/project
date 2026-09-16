@@ -937,14 +937,14 @@
     },
     {
       "id": "stone-house",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/stone-house/stone-house.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T01-04-40-656Z-26124",
-        "directory": "artifacts/graphics/G-10/approved/8c71b136695b4859"
+        "runId": "2026-09-16T16-56-31-507Z-48688",
+        "directory": "artifacts/graphics/G-21/approved/df75fd4689ed1ed6"
       },
       "bounds": {
         "min": [
@@ -954,16 +954,16 @@
         ],
         "max": [
           2,
-          1.533333,
+          1.57,
           0
         ],
         "size": [
           2,
-          1.533333,
+          1.57,
           2
         ]
       },
-      "recipeSha256": "0803AC0DF1901440E7647A520EABD786B95A26630F9FB5A11720BB17FE444512",
+      "recipeSha256": "BAACBB26938BFCA1958F222671245AB181FCF2CD07888FAFCEB0F317061FCA63",
       "materials": [
         "stone",
         "roof",
@@ -977,21 +977,21 @@
         "objects": 5,
         "meshes": 4,
         "materials": 4,
-        "triangles": 88
+        "triangles": 752
       },
       "hashes": {
-        "stone-house.blend": "7CC3965FA116B2ADE4619A97E30196793B0F56D2E398DB5C86AB6F89DEC4BB5C",
-        "stone-house.glb": "8C71B136695B48593CF33303C3091F361944B66A338AF90EF9E30036FF62BE22",
-        "stone-house-blender.png": "2D640D1B446D0EE83E6A8CCB41EC883C25379CC01FC6D05E06607A6BC902DDB2",
-        "capture-1.png": "AB2A4E2A3DD12AF4EBD27A106BEDE7726A188C643A35F297B019E6F182526323",
-        "capture-1-gray.png": "28EF0B75F8873D224F8F799A1760DF8EA9218F6B4EA4F8DB7CBB44267E1752E1",
-        "capture.json": "5EA26F58EDA69191A71BEF3ADA8E0DC97421783AC56B386794172C07EFD4BEB1",
-        "build.json": "C88BC94A6322ABCD6B6CCE8490BD35A1FCB6A776259B0B6839F99F99C4833F13",
-        "validation.json": "2C91147597E5F83B22B7FEC6F163949A9996C3522B548C1EA2195B453A9774AE"
+        "stone-house.blend": "5E9A886F21C49B385A44A0A993FF06B8D2668B6C5F6BACABA8F4F39E79E68AE9",
+        "stone-house.glb": "DF75FD4689ED1ED6946537256B86C49DA4B1856B2EA61444DAE94F7B46D190FA",
+        "stone-house-blender.png": "869AC74527B721F9210EDA5269C569E0EC7CC8205AE40535CED252D83F2A7B3D",
+        "capture-1.png": "A85617278A2A136E1FA41C1FFC4A132C6AC0CAA5BD2ED78E00ECE1645FED0574",
+        "capture-1-gray.png": "87266C183C06F3DCBC9B20B9B7A6F0D3D0335105D5EB19B4A0AD614DD490D9C8",
+        "capture.json": "C9F960A3506AEAD3167CE6A62CC097C60846D5124F071F0278C0397F48EF73D8",
+        "build.json": "7C390B99ADE6DB76E65035774644004D0E02BF75BD3C5035FB1FED5FA4B9D923",
+        "validation.json": "E38FA3BB46C2646E93811D329EBEB40CF1DFCD59ACBC66AC2EB54894BACEB0AC"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original stone-house authored for The Valley G-10",
+        "source": "Original G-21: vivienda de piedra y teja, contratos de parcela y ventanas conservados.",
         "license": "Project original"
       }
     },

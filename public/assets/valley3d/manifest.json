@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T16:53:20.351Z",
+  "generatedAt": "2026-09-16T16:56:58.962Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -115,7 +115,7 @@
     {
       "id": "stone-house",
       "file": "stone-house.glb",
-      "sha256": "8C71B136695B48593CF33303C3091F361944B66A338AF90EF9E30036FF62BE22",
+      "sha256": "DF75FD4689ED1ED6946537256B86C49DA4B1856B2EA61444DAE94F7B46D190FA",
       "motion": []
     },
     {
