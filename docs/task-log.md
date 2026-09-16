@@ -121,7 +121,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | UI-R0 · auditoría y cierre de especificación | **hecha** | `f9f2df4` |
 | UI-R1 · carcasa, tokens y navegación | **hecha** — carcasa, tokens, un solo dueño de la navegación, aviso y pista comparten ranura y nunca se pisan (era el defecto visible de la demo v15); las pantallas **no** se dan por migradas, a propósito | (este commit) · `ui-redesign/rounds/UI-R1.md` |
 | UI-R2 · cabecera, actividad, órdenes, velocidad | **hecha** — tres fallos de gestos reales arreglados (toques fantasma al valle, ranura de mensaje tapando el botón de velocidad, `pointer-events` sin recuperar) | `c278e12` |
-| UI-R3 · crónica | **en vuelo** (Sonnet) | — |
+| UI-R3 · crónica | **hecha** — migrada a `shell.content`, no roba el desplazamiento del lector | `ee2279d` |
 | UI-R4 · personas y fichas | **en vuelo** (Sonnet, en paralelo con UI-R3) | — |
 | UI-R5 · integración y decisiones · UI-R6 · validación | pendientes | — |
 
