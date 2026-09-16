@@ -64,6 +64,11 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-23 · animales:** encargo de rehacer las seis especies y sus animaciones.
+Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
+verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
+subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](graphics-rounds/G-23.md).
+
 **Siguiente encargo de Blender · aldea:** alcance preparado para viviendas,
 molino, iglesia/capilla, herrería, pozo, granero, campos, carros y adornos.
 Inventario y tandas en [encargo-blender-aldea](graphics-rounds/encargo-blender-aldea.md).
@@ -219,6 +224,10 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+G-23: vaca de 3476 triángulos, cuatro materiales; clips idle/walk y controlador
+por distancia. 42 pruebas pertinentes verdes. Cuatro llamadas por vaca visible;
+sin nueva medida de FPS móvil.
+
 **Inventario del nuevo encargo de aldea:** 21 ids existentes en cuatro tandas;
 las variantes de vivienda y adornos nuevos se definirán con su integración.
 Casa de paja: 656 triángulos y cinco materiales/mallas; piedra: 752 y cuatro.
@@ -299,6 +308,9 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+G-23: completar cerdo, gallina, lobo, cuervo y pez con entrega individual.
+La articulación requiere esqueletos propios; medir coste conjunto al cerrar.
 
 **G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
 Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado

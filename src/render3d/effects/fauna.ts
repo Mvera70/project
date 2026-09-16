@@ -20,6 +20,8 @@ import {
   animalPositions, wildlifePositions, type Animal, type AnimalKind,
 } from '@derive/animals';
 import { piecesOf, type Piece } from '../world/forest';
+import type { LoadedAsset } from '../assets';
+import { AnimalMotion } from './animal-motion';
 
 /**
  * Cuánto tiene que moverse un animal para que se le cambie la cara.
@@ -129,6 +131,8 @@ interface Herd {
  */
 export class Fauna {
   readonly group = new Group();
+  private readonly animated = new Map<number, AnimalMotion>();
+  private previousSeconds: number | undefined;
   private readonly herds = new Map<AnimalKind, Herd>();
   /** Hacia dónde miraba cada bicho la última vez, para que gire y no salte. */
   private readonly facing = new Map<number, number>();
@@ -146,7 +150,8 @@ export class Fauna {
    * catálogo no la tiene. Una clase sin recurso simplemente no se ve: un valle a
    * medio catalogar sigue siendo un valle.
    */
-  constructor(private readonly source: (kind: AnimalKind) => Object3D | undefined) {
+  constructor(private readonly source: (kind: AnimalKind) => Object3D | undefined,
+    private readonly asset?: (kind: AnimalKind) => LoadedAsset | undefined) {
     this.group.name = 'Valley_Fauna';
   }
 
@@ -196,7 +201,7 @@ export class Fauna {
    * coordenadas que le tocan: no pasa por `ashore`, que es cosa de la fórmula
    * vieja para anclas que no miran el terreno.
    */
-  update(state: GameState, dayPhase: number, live: readonly Animal[] = []): void {
+  update(state: GameState, dayPhase: number, live: readonly Animal[] = [], seconds = dayPhase * 120): void {
     const animals: Animal[] = [];
     for (const animal of [...animalPositions(state, dayPhase), ...wildlifePositions(state, dayPhase)]) {
       if (animal.kind === 'wolf') continue; // IA-5: una sola fuente en 3D — ver arriba.
@@ -208,7 +213,7 @@ export class Fauna {
       if (dry !== null) animals.push({ ...animal, x: dry.x, y: dry.y });
     }
     for (const animal of live) animals.push(animal);
-    this.paint(animals);
+    this.paint(animals, seconds);
   }
 
   /**
@@ -222,9 +227,26 @@ export class Fauna {
    * animal-`Dweller` no llega a pisar el agua— sin que esta clase necesite
    * saber que la vida existe.
    */
-  paint(animals: readonly Animal[]): void {
+  paint(animals: readonly Animal[], seconds = 0): void {
+    const delta = this.previousSeconds === undefined ? 0 : Math.max(0, Math.min(0.25, seconds - this.previousSeconds));
+    this.previousSeconds = seconds;
     const byKind = new Map<AnimalKind, Animal[]>();
     for (const animal of animals) {
+      const asset = this.asset?.(animal.kind);
+      if (asset !== undefined && asset.clips.some(clip => clip.name === 'walk')) {
+        let body = this.animated.get(animal.id);
+        if (body !== undefined && body.kind !== animal.kind) {
+          body.dispose(); this.animated.delete(animal.id); body = undefined;
+        }
+        if (body === undefined) {
+          const object = this.source(animal.kind);
+          if (object === undefined) continue;
+          body = new AnimalMotion(animal.kind, object, asset, animal.id);
+          this.animated.set(animal.id, body); this.group.add(body.group);
+        }
+        body.place(animal, animal.kind === 'fish' ? FISH_LEVEL : this.ground(animal.x, animal.y), seconds, delta);
+        continue;
+      }
       const list = byKind.get(animal.kind);
       if (list === undefined) byKind.set(animal.kind, [animal]);
       else list.push(animal);
@@ -240,6 +262,7 @@ export class Fauna {
       if (herd !== null) this.place(kind, herd, list);
     }
     for (const animal of animals) seen.add(animal.id);
+    for (const [id, body] of this.animated) if (!seen.has(id)) { body.dispose(); this.animated.delete(id); }
     // Un bicho que ya no está se lleva su memoria: si no, el mapa crece con
     // cada lobo que pasó por el valle en sesenta años.
     for (const id of [...this.last.keys()]) if (!seen.has(id)) this.last.delete(id);
@@ -334,10 +357,13 @@ export class Fauna {
 
   /** Cuántas cabezas hay puestas ahora mismo, sumando las clases. */
   get count(): number {
-    return this.last.size;
+    return this.last.size + this.animated.size;
   }
 
   clear(): void {
+    for (const body of this.animated.values()) body.dispose();
+    this.animated.clear();
+    this.previousSeconds = undefined;
     for (const kind of [...this.herds.keys()]) this.drop(kind);
     this.last.clear();
     this.facing.clear();

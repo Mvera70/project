@@ -277,7 +277,7 @@ export async function createGraphicsRenderer(
   // U-13 · la lluvia, la nieve y el rayo. Tres mallas, creadas una vez.
   const weather = createWeather(scene);
   const tells = new Tells();
-  const fauna = new Fauna((kind) => library.instance(kind));
+  const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props();
   world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group);
@@ -788,7 +788,7 @@ export async function createGraphicsRenderer(
       // IA-5: y el lobo del corral, si lo hay hoy, viene de la vida
       // (`life.wildlife`) y no de la fórmula — ver el comentario de `update`
       // en `effects/fauna.ts` sobre por qué sólo él.
-      fauna.update(shown, phase, life.wildlife);
+      fauna.update(shown, phase, life.wildlife, frame.presentationSeconds);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
       // **U-13 · el cielo.** Se deriva (`derive/weather.ts`): la fila del clima
