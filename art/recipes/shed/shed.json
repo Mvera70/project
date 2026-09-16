@@ -12,7 +12,7 @@
       1,
       1
     ],
-    "note": "G-10, lote de vivienda. Un cobertizo de una celda, para lo que no es casa ni taller. Sin uso todavia en el motor; el catalogo lo tiene listo para cuando lo haya."
+    "note": "G-21: cobertizo abierto de tablas y paja, postes, travesaños y estante interior. Conserva parcela 1x1, escala y altura. Recurso de catálogo: el juego todavía no selecciona shed."
   },
   "materials": [
     {
@@ -24,6 +24,11 @@
       "name": "roof",
       "role": "roof",
       "roughness": 0.9
+    },
+    {
+      "name": "frame",
+      "role": "timberDark",
+      "roughness": 0.95
     }
   ],
   "groups": [
@@ -40,18 +45,706 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Shed_Walls",
+      "name": "BackBoard_0",
       "location": [
-        1.5,
-        1.5,
-        0.85
+        0.42,
+        2.66,
+        0.86
       ],
       "dimensions": [
-        2.4,
-        2.4,
+        0.224,
+        0.075,
         1.7
       ],
       "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_0_L",
+      "location": [
+        0.34,
+        0.42,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_0_R",
+      "location": [
+        2.66,
+        0.42,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_1",
+      "location": [
+        0.6599999999999999,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_1_L",
+      "location": [
+        0.34,
+        0.6599999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_1_R",
+      "location": [
+        2.66,
+        0.6599999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_2",
+      "location": [
+        0.8999999999999999,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_2_L",
+      "location": [
+        0.34,
+        0.8999999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_2_R",
+      "location": [
+        2.66,
+        0.8999999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_3",
+      "location": [
+        1.14,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_3_L",
+      "location": [
+        0.34,
+        1.14,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_3_R",
+      "location": [
+        2.66,
+        1.14,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_4",
+      "location": [
+        1.38,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_4_L",
+      "location": [
+        0.34,
+        1.38,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_4_R",
+      "location": [
+        2.66,
+        1.38,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_5",
+      "location": [
+        1.6199999999999999,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_5_L",
+      "location": [
+        0.34,
+        1.6199999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_5_R",
+      "location": [
+        2.66,
+        1.6199999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_6",
+      "location": [
+        1.8599999999999999,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_6_L",
+      "location": [
+        0.34,
+        1.8599999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_6_R",
+      "location": [
+        2.66,
+        1.8599999999999999,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_7",
+      "location": [
+        2.1,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_7_L",
+      "location": [
+        0.34,
+        2.1,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_7_R",
+      "location": [
+        2.66,
+        2.1,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_8",
+      "location": [
+        2.34,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_8_L",
+      "location": [
+        0.34,
+        2.34,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_8_R",
+      "location": [
+        2.66,
+        2.34,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBoard_9",
+      "location": [
+        2.58,
+        2.66,
+        0.86
+      ],
+      "dimensions": [
+        0.224,
+        0.075,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_9_L",
+      "location": [
+        0.34,
+        2.58,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBoard_9_R",
+      "location": [
+        2.66,
+        2.58,
+        0.86
+      ],
+      "dimensions": [
+        0.075,
+        0.224,
+        1.7
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPost_0",
+      "location": [
+        0.34,
+        2.66,
+        0.9
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        1.8
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPost_1",
+      "location": [
+        0.34,
+        0.34,
+        0.9
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        1.8
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPost_2",
+      "location": [
+        2.66,
+        2.66,
+        0.9
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        1.8
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CornerPost_3",
+      "location": [
+        2.66,
+        0.34,
+        0.9
+      ],
+      "dimensions": [
+        0.14,
+        0.14,
+        1.8
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackRail_0_25",
+      "location": [
+        1.5,
+        2.59,
+        0.25
+      ],
+      "dimensions": [
+        2.4,
+        0.09,
+        0.11
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideRail_0_4_0_25",
+      "location": [
+        0.4,
+        1.5,
+        0.25
+      ],
+      "dimensions": [
+        0.09,
+        2.4,
+        0.11
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideRail_2_6_0_25",
+      "location": [
+        2.6,
+        1.5,
+        0.25
+      ],
+      "dimensions": [
+        0.09,
+        2.4,
+        0.11
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackRail_1_45",
+      "location": [
+        1.5,
+        2.59,
+        1.45
+      ],
+      "dimensions": [
+        2.4,
+        0.09,
+        0.11
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideRail_0_4_1_45",
+      "location": [
+        0.4,
+        1.5,
+        1.45
+      ],
+      "dimensions": [
+        0.09,
+        2.4,
+        0.11
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideRail_2_6_1_45",
+      "location": [
+        2.6,
+        1.5,
+        1.45
+      ],
+      "dimensions": [
+        0.09,
+        2.4,
+        0.11
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontLintel",
+      "location": [
+        1.5,
+        0.34,
+        1.66
+      ],
+      "dimensions": [
+        2.46,
+        0.16,
+        0.18
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Shelf",
+      "location": [
+        1.5,
+        2.3,
+        0.8
+      ],
+      "dimensions": [
+        2.12,
+        0.48,
+        0.08
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ShelfLeg_0_6",
+      "location": [
+        0.6,
+        2.3,
+        0.4
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        0.8
+      ],
+      "material": "frame",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "ShelfLeg_2_4",
+      "location": [
+        2.4,
+        2.3,
+        0.4
+      ],
+      "dimensions": [
+        0.08,
+        0.08,
+        0.8
+      ],
+      "material": "frame",
       "parent": "Root"
     },
     {
@@ -64,32 +757,502 @@
       ],
       "width": 2.8,
       "depth": 2.8,
-      "height": 1.0,
+      "height": 1,
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_0_L",
+      "location": [
+        0.8,
+        0.15,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
       "rotationDegrees": [
         0,
-        0,
-        0.0
+        54.46,
+        0
       ],
       "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_0_R",
+      "location": [
+        2.2,
+        0.15,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_1_L",
+      "location": [
+        0.8,
+        0.48750000000000004,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_1_R",
+      "location": [
+        2.2,
+        0.48750000000000004,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_2_L",
+      "location": [
+        0.8,
+        0.8250000000000001,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_2_R",
+      "location": [
+        2.2,
+        0.8250000000000001,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_3_L",
+      "location": [
+        0.8,
+        1.1625,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_3_R",
+      "location": [
+        2.2,
+        1.1625,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_4_L",
+      "location": [
+        0.8,
+        1.5,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_4_R",
+      "location": [
+        2.2,
+        1.5,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_5_L",
+      "location": [
+        0.8,
+        1.8375,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_5_R",
+      "location": [
+        2.2,
+        1.8375,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_6_L",
+      "location": [
+        0.8,
+        2.1750000000000003,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_6_R",
+      "location": [
+        2.2,
+        2.1750000000000003,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_7_L",
+      "location": [
+        0.8,
+        2.5125,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_7_R",
+      "location": [
+        2.2,
+        2.5125,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_8_L",
+      "location": [
+        0.8,
+        2.85,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofBatten_8_R",
+      "location": [
+        2.2,
+        2.85,
+        2.21
+      ],
+      "radius": 0.023,
+      "depth": 1.71,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "roof",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofEdge_0_075_L",
+      "location": [
+        0.8,
+        0.075,
+        2.2
+      ],
+      "radius": 0.047,
+      "depth": 1.72,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "frame",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofEdge_0_075_R",
+      "location": [
+        2.2,
+        0.075,
+        2.2
+      ],
+      "radius": 0.047,
+      "depth": 1.72,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "frame",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofEdge_2_925_L",
+      "location": [
+        0.8,
+        2.925,
+        2.2
+      ],
+      "radius": 0.047,
+      "depth": 1.72,
+      "rotationDegrees": [
+        0,
+        54.46,
+        0
+      ],
+      "material": "frame",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "RoofEdge_2_925_R",
+      "location": [
+        2.2,
+        2.925,
+        2.2
+      ],
+      "radius": 0.047,
+      "depth": 1.72,
+      "rotationDegrees": [
+        0,
+        -54.46,
+        0
+      ],
+      "material": "frame",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ridge",
+      "location": [
+        1.5,
+        1.5,
+        2.67
+      ],
+      "radius": 0.04,
+      "depth": 2.85,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "roof",
+      "vertices": 6,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Brace_L",
+      "location": [
+        0.54,
+        0.33,
+        1.42
+      ],
+      "radius": 0.048,
+      "depth": 0.58,
+      "rotationDegrees": [
+        0,
+        45,
+        0
+      ],
+      "material": "frame",
+      "vertices": 4,
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Brace_R",
+      "location": [
+        2.46,
+        0.33,
+        1.42
+      ],
+      "radius": 0.048,
+      "depth": 0.58,
+      "rotationDegrees": [
+        0,
+        -45,
+        0
+      ],
+      "material": "frame",
+      "vertices": 4,
       "parent": "Root"
     }
   ],
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 800,
+    "height": 800,
     "cameraLocation": [
-      4.0,
-      -5.0,
-      3.2
+      1.9,
+      -1.7,
+      1.45
     ],
     "cameraTarget": [
-      0,
-      0,
-      1.0
+      0.5,
+      0.48,
+      0.4
     ],
-    "orthoScale": 5.6,
+    "orthoScale": 1.6,
     "worldRole": "sky"
   }
 }

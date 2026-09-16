@@ -100,7 +100,10 @@ capas de heno, haces y estaca central; 94 pruebas, typecheck y lint verdes.
 Almiar subido en `f0e933f`. Pila de leña G-21 terminada y revisada en juego;
 94 pruebas, typecheck y lint verdes. Entrega individual validada para commit
 y subida. Leña subida en `15b7f5b`; ajuste posterior solicitado por el dueño:
-10 % más pequeña, reconstruida y revisada en juego. Sigue el cobertizo (`shed`).
+10 % más pequeña, reconstruida y revisada en juego, subida en `5ccfe5b`.
+Cobertizo (`shed`) G-21 terminado y validado en Blender y visor GLB; aún no
+seleccionado por el juego. 94 pruebas y typecheck verdes; lint global falla
+en `compare.mjs:55` ajeno (variable `row` sin uso). Entrega lista para subir.
 **Avisar al dueño antes de los muros.**
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
@@ -220,6 +223,8 @@ conservada y 94 pruebas verdes.
 Pila de leña G-21: 1 544 triángulos, dos materiales/mallas, 97 652 bytes;
 94 pruebas verdes y captura real revisada.
 Leña: geometría reducida un 10 %, conservando la escala de exportación 1/3.
+Cobertizo G-21: 844 triángulos, tres materiales/mallas y 62 564 bytes;
+parcela 1×1, altura máxima 0,912712 celdas.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -271,7 +276,8 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado
 y revisado en juego y subido. Almiar (`haystack`) terminado y revisado;
 almiar subido. Pila de leña (`log-pile`) terminada y revisada en juego;
-sigue el cobertizo (`shed`) tras subir la leña.
+cobertizo (`shed`) terminado como recurso de catálogo; falta selección runtime.
+Tras subirlo empieza la tanda de defensas: avisar antes de modelar los muros.
 **Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y

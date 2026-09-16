@@ -1,0 +1,32 @@
+
+ RUN  v2.1.9 D:/DESARROLLO/PROYECTOS/VALLEY/project
+
+ ✓ tests/fast/graphics-scenic-state.test.ts (5 tests) 2680ms
+   ✓ G-11 · el estado de la jornada > no cambia mientras la jornada está a la vista, por muchas semanas que corran 820ms
+   ✓ G-11 · el estado de la jornada > el motor no puede mover por debajo lo que ya se está pintando 598ms
+   ✓ G-11 · el estado de la jornada > releva al caer la noche, que es cuando no lo ve nadie 534ms
+   ✓ G-11 · el estado de la jornada > una partida nueva no hereda la jornada de la anterior 727ms
+ ✓ tests/fast/graphics-effects.test.ts (40 tests) 2568ms
+   ✓ G-08 · las estaciones > el valle cambia de color cuatro veces al año 591ms
+   ✓ G-08 · las estaciones > mirar el valle no lo cambia, en ninguna estación 456ms
+   ✓ G-08 · las consecuencias > el valle dice sin abrir una ficha qué le pasa a la aldea 562ms
+   ✓ IA-5 · el lobo tiene una sola fuente en 3D > la fórmula vieja ya no pone lobos en la escena 3D, aunque siga dándolos para Canvas 663ms
+ ✓ tests/fast/graphics-world.test.ts (43 tests) 3730ms
+   ✓ G-06 · el plan de escena > planificar no escribe en el estado ni consume una tirada 628ms
+   ✓ G-06 · el plan de escena > construir añade una casa y nada más 626ms
+   ✓ G-06 · el plan de escena > una ruina deja de ser una casa: más baja, más gris y sin tejado 462ms
+   ✓ G-06 · el plan de escena > otra partida se tira entera, no se actualiza 362ms
+   ✓ G-06 · el suelo > tiene un cuadrado por celda y ni uno más 309ms
+   ✓ G-06 · el suelo > un camino muy pisado deja rodada 554ms
+   ✓ G-06 · el pueblo > un edificio lleva su identidad para que se pueda tocar 321ms
+ ✓ tests/fast/graphics-steading.test.ts (6 tests) 5116ms
+   ✓ G-15 · dónde se dejan los trastos del corral > nada sobre el agua, la marisma, la roca, el bosque ni lo construido 2059ms
+   ✓ G-15 · dónde se dejan los trastos del corral > ni dos cosas en la misma celda 761ms
+   ✓ G-15 · dónde se dejan los trastos del corral > ni cuatro almiares en fila, que se leen como un campamento 1618ms
+   ✓ G-15 · dónde se dejan los trastos del corral > el mismo estado da los mismos sitios, pintadas las veces que sea 417ms
+
+ Test Files  4 passed (4)
+      Tests  94 passed (94)
+   Start at  21:33:19
+   Duration  6.02s (transform 881ms, setup 0ms, collect 2.50s, tests 14.09s, environment 1ms, prepare 400ms)
+

@@ -885,59 +885,60 @@
     },
     {
       "id": "shed",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/shed/shed.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-04-47-343Z-53004",
-        "directory": "artifacts/graphics/G-10/approved/b2974decd482d81b"
+        "runId": "2026-09-16T19-32-33-052Z-45552",
+        "directory": "artifacts/graphics/G-21/approved/c5ccd1eab317043b"
       },
       "bounds": {
         "min": [
-          0.033333,
+          0.024297,
           0,
-          -0.966667
+          -0.990667
         ],
         "max": [
-          0.966667,
-          0.9,
-          -0.033333
+          0.975703,
+          0.912712,
+          -0.009333
         ],
         "size": [
-          0.933333,
-          0.9,
-          0.933333
+          0.951407,
+          0.912712,
+          0.981333
         ]
       },
-      "recipeSha256": "3ACDB1770A4BF4847E01536221474BD9AA612D3C2000905DBA542CEEA544769B",
+      "recipeSha256": "60303E37F8729A02A4DFAF22EBE1BD1F5D117FC464CAE9273DBE6857AFB100ED",
       "materials": [
         "wood",
-        "roof"
+        "roof",
+        "frame"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 20
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 844
       },
       "hashes": {
-        "shed.blend": "F3FAA08747CC27EB527CF046AF030D134C75FA01A5E4E488CCFDCF3EA4942771",
-        "shed.glb": "B2974DECD482D81BCD0277898073F007520480C39CE7F5ED111A25FFDA4B9E49",
-        "shed-blender.png": "EFB04FB6462EE3CC3ADDE8770F0427EAE5AC94933EF119398009A8CAA96C3412",
-        "capture-1.png": "720EEF7E6F42B233C41735914043825E3A7C59F87535AB6964A0FD894B151C50",
-        "capture-1-gray.png": "823E89E2EF3576C826F893C0F3654118B9BC42B7BBF2BC30A3E016C6FFC7C9A7",
-        "capture.json": "EFA67E052F0DC24A4709BA53BB49052599DED636EA8F57D14895786E9B1DB6A2",
-        "build.json": "903AC4783AE3AC5D074EFB5B22CCE7080B2326C36931CCA5CDBECDB24158BEA9",
-        "validation.json": "B83EEB654167B47CA1893C03989E66E3DA95655B4BD2C849E46B66A1FBFACC28"
+        "shed.blend": "DF3B45D918DDEFA2E15094A6C8FE6204BE6F9C1773488BF4422E7D60A5F43150",
+        "shed.glb": "C5CCD1EAB317043B1FE2E11C6D342B4FFED796BA4FCDD27D94F010A260307260",
+        "shed-blender.png": "267343C3F7429F2BB27C8077C227F8BE1367F367B7AE332E9E55C71A80CF8CB6",
+        "capture-1.png": "381288DE6B9252CFB2767D4C9413C6D3F8A9F7EB1E60CC962EDE6A9243E6615A",
+        "capture-1-gray.png": "6911D7867F4151A3B2611C95960257F2B7195EEB685285845C8681CF8AE6734F",
+        "capture.json": "A341BBDF6A6DD0B54FD997BE09438F7827F86C4C9DD45969A7152CCDC4EE0BA5",
+        "build.json": "B6C772219A2F17E7A088F6837F6FBDF1EA5B0413584E2A867E9F469360B8E8EB",
+        "validation.json": "72B4ECA2651B39C0BFA2D9A11947C179AB9C75F8D3245E79D5E15EE711BEE33B"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original shed authored for The Valley G-10",
+        "source": "Original G-21: cobertizo abierto de tablas con estructura y tejado de paja.",
         "license": "Project original"
       }
     },

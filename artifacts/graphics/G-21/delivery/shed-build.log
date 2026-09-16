@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all shed
+
+Built shed in artifacts\graphics\G-21\runs\2026-09-16T19-32-33-052Z-45552
+Validated shed from run 2026-09-16T19-32-33-052Z-45552
+Reported and promoted shed to artifacts\graphics\G-21\approved\c5ccd1eab317043b

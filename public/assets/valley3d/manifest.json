@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T19:27:24.622Z",
+  "generatedAt": "2026-09-16T19:33:14.055Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -109,7 +109,7 @@
     {
       "id": "shed",
       "file": "shed.glb",
-      "sha256": "B2974DECD482D81BCD0277898073F007520480C39CE7F5ED111A25FFDA4B9E49",
+      "sha256": "C5CCD1EAB317043B1FE2E11C6D342B4FFED796BA4FCDD27D94F010A260307260",
       "motion": []
     },
     {
