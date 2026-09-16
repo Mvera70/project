@@ -240,7 +240,11 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
       const seats = parcel
         ? parcelSeats(land, building.x, building.y, building.w, building.h, spec.seats, building.id)
         : undefined;
-      const offer = placedOffer(spec, at, land, undefined, seats);
+      // En una parcela se llega **al puesto**, no a su alcance: con el `reach`
+      // de `work` (1,6) se daba por llegado a 0,96 celdas, y el 13,6 % de los
+      // labradores cavaba la linde desde fuera (IA-7). `PARCEL_REACH` deja el
+      // margen por encima de `REACHED` (`navigate.ts`, 0,45 = 0,9 × 0,6 → 0,54).
+      const offer = placedOffer(parcel ? { ...spec, reach: PARCEL_REACH } : spec, at, land, undefined, seats);
       if (offer !== null) offers.push(offer);
     }
     if (offers.length > 0) places.push({ id: `${building.kind}:${building.id}`, at, offers });
@@ -396,6 +400,9 @@ export function offersNear(
  * cuerpo que llega a su puesto está en su campo, y la azada cae en tierra
  * labrada y no en el prado.
  */
+/** Alcance de llegada a un puesto de parcela: dentro del campo, o no se ha llegado. */
+export const PARCEL_REACH = 0.9;
+
 export function parcelSeats(
   land: Terrain, x: number, z: number, w: number, h: number, want: number, id: number,
 ): Point[] {
@@ -405,8 +412,11 @@ export function parcelSeats(
     const cell = n % cells;
     const cx = x + (cell % w) + 0.5;
     const cz = z + Math.floor(cell / w) + 0.5;
-    const jx = (hash32(id, `parcel:${n}:x`) / 4_294_967_296 - 0.5) * 0.5;
-    const jz = (hash32(id, `parcel:${n}:z`) / 4_294_967_296 - 0.5) * 0.5;
+    // ±0,15 y no ±0,25: con un cuerpo de radio 0,32, un puesto a 0,25 del borde
+    // de su celda solapaba la celda vecina si estaba bloqueada (un almiar),
+    // y eso contaba como «círculo en celda cerrada».
+    const jx = (hash32(id, `parcel:${n}:x`) / 4_294_967_296 - 0.5) * 0.3;
+    const jz = (hash32(id, `parcel:${n}:z`) / 4_294_967_296 - 0.5) * 0.3;
     const spot = { x: cx + jx, z: cz + jz };
     if (spot.x <= 0.5 || spot.z <= 0.5) continue;
     if (spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;

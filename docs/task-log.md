@@ -27,7 +27,7 @@ nadie va a encontrar.
 | **En vuelo ahora** | **UI-R1** (agente Sonnet, `src/ui/redesign/`, `app.ts`, `index.html`; no tocar). **C-1 está completa** salvo el punto 7, aplazado con motivo |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
-| Lo que acabo de cerrar | **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
+| Lo que acabo de cerrar | **G-18 entregado y verificado** (`9cc97af`: los doce aldeanos de Blender, sin tocar `src/`; pendiente de aprobación estética del dueño). **IA-8**: el descarte de la plaza que falló, el plazo propio del viaje (`arriveBy`) y el labrador a su puesto (fuera del campo 6,5 %, parados 0,08 %, giros 0,39 %). Antes: **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
 
 ## 1b. La fase en curso: C-1 · Cierre de la tanda de IA
 
@@ -64,6 +64,9 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
+verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
+
 **Demo v16 (16 sep):** publicada en el artefacto de siempre con los cuatro
 aldeanos de G-17. Empaquetada desde un **worktree limpio en HEAD** (`git
 worktree add`, `node_modules` enlazado) porque el agente de UI-R1 tiene
@@ -92,6 +95,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
 | IA-5 · fauna silvestre | **hecha** — el lobo migra y sólo sale la semana del suceso; el cuervo y el pez se quedan, con el motivo escrito | (este commit) | `life-rounds/IA-5.md` |
 | IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | `e20eeb5` y anteriores | `life-rounds/IA-6.md` |
+| IA-8 · la plaza que falló se descarta, el viaje tiene su plazo | **hecha** — cierra el punto 1 de lo abierto y el 0b de IA-7; el devoto queda frágil (§4) | (este commit) | `life-rounds/IA-8.md` |
 | IA-7 · los labradores, dentro de su campo | **hecha** — lo vio el dueño en la demo v15; de rebote, el suelo de V-11 se multiplicaba después y no era un suelo | (este commit) | `life-rounds/IA-7.md` |
 
 ### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)
@@ -114,7 +118,7 @@ dato que hoy no tiene.
 
 | Fase | Qué | Depende de | Estado |
 |---|---|---|---|
-| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, buhonero, forastero, leñador, albañil, pastor, pescador, novios— | De nada. Es la sesión de Blender | **G-17 entregado** (base, herrero, cura, granjero, `9f33582`). El encargo del resto: `graphics-rounds/encargo-blender-aldeanos-2.md` |
+| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, forastero, leñador, albañil, pastor, pescador— | De nada. Es la sesión de Blender | **entregado** (`9cc97af`, doce ids, verificado: huesos y clips del base al byte, 54 huellas, G-17 intacto). Falta la **aprobación estética del dueño** y la demo con los doce. Buhonero, novios, doliente y vigía: fuera hasta R-5b/R-6 |
 | **V-15 · el modelo se elige por lo que se hace** | La regla está escrita y probada en `src/render3d/world/models.ts`: manda la edad, luego el oficio, luego lo que se está haciendo. `Actor` gana `occupation` y la capa de vida la calcula del sitio y la oferta. Nueve pruebas en `tests/fast/life-models.test.ts` | — | **hecha, menos el último enganche** |
 | ~~V-15b~~ **hecha** | `renderer.ts` sigue teniendo su propio `VILLAGER_BY_ROLE` y elige por oficio. Hay que **borrarlo de ahí**, llamar a `modelFor(actor)` y **caer al aldeano base si el recurso no existe**, que es lo que permite que las mallas se enciendan una a una sin tocar código. No se hizo porque IA-5 tenía `renderer.ts` abierto | De que IA-5 suelte `renderer.ts` | **lo siguiente** |
 | **R-5b · quién acude a un funeral y a un incendio** | El motor sabe quién murió y qué edificio se quemó, pero **no sabe quién asiste**, y por eso IA-6 se negó a inventar espectadores. Falta el dato en el estado: un puñado de `id` de acompañantes en el suceso, como la riña ya trae los suyos en `who` | Cambio del motor (§7.10) | pendiente |
@@ -136,6 +140,9 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+**G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
+triángulos. 29 pruebas y doce auditorías verdes; las huellas de G-17 se conservan.
 
 **G-17:** cuatro modelos de 0,65 celdas; 1056 / 1116 / 1012 / 960 triángulos
 (base / herrero / cura / granjero), cuatro materiales y cuatro mallas cada uno.
@@ -179,6 +186,9 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
+**G-18:** recursos entregados para revisión visual; diferencia de zancada
+medida/declarada del niño dentro de tolerancia, documentada en el informe.
+
 **G-17 queda cerrado técnicamente:** los cuatro recursos están publicados con
 los ids del encargo. El cura lleva sotana negra. No necesita cambios de selección
 en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
@@ -200,56 +210,20 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
    no puede depender tanto de la leña. Ronda propia, medida, antes del rediseño
    de interfaz o en paralelo con él, pero **no dentro de C-1**.
 
-0b. **El 13,6 % de labradores que cavan la linde.** Queda de IA-7: la
-   tolerancia de llegada (`reach`, 1,6 × 0,6 celdas) deja a quien tiene puesto
-   en la primera fila a 0,86 celdas fuera del campo. Arreglo pequeño —una
-   tolerancia menor sólo para las plazas de parcela— y se mide con la quinta
-   cifra de `tools/life-report.ts`.
+0b. **~~El 13,6 % de labradores que cavan la linde~~ HECHO en IA-8**: 6,5 %
+   con `PARCEL_REACH` 0,9 y temblor ±0,15.
 
-1. **Falta poder descartar una plaza que ya falló.** Es la pieza que bloquea
-   dos cosas a la vez. El plazo vencido de las personas (`village.ts`) tiene el
-   mismo fallo que tenían los animales, **pero aplicar el arreglo empeora la
-   cifra**: «parados con un impulso al máximo» sube de 0,06 % a 0,20 %, la de
-   partida, porque con las estancias fijas de `SEAT_DWELL` se vuelve a elegir
-   la misma plaza inalcanzable y se reintenta en bucle. Probado, medido y
-   **retirado**, con el número escrito en el propio sitio del código
-   (`village.ts`) y en `life-rounds/IA-6.md` §4.3. Con el descarte, el arreglo
-   entra solo.
-2. **Las duraciones y distancias de las actividades**, con los tiempos del
-   cuaderno (`visual-reference` §2 y §3) como referencia declarada como
-   hipótesis. La vaca sigue andando el 82,5 %: sus cinco parches están a 1,2–3,2
-   celdas y anda a 0,32 celdas por segundo.
-3. **Las nueve jornadas rojas de `rework.md` §2.8.** Casi todas son de la capa
-   de vida y sus números cambian con cada fase, así que se tocan **al final de
-   la tanda de IA**, no antes.
-4. **Un trabajador de vitest se cae en la suite rápida en paralelo**
-   («Worker exited unexpectedly»; no es montículo, con 4 GB cae igual). Sigue
-   abierto y bloquea UI-R6, que pide la suite entera. **Lo que ya está hecho:**
-   las cuatro partidas largas del motor se mudaron a
-   `tests/journeys/engine-long.test.ts` por decisión del dueño («si las pruebas
-   no son posibles hay que cambiar cómo las hacemos»), y con eso esos tres
-   ficheros bajan de **45 s a 9 s**: bosque 15,9 → 1,25 s, riñas 15,5 → 1,09 s,
-   invariantes → 7 s. Las cuatro siguen corriendo, en 42 s, donde tardar es
-   legítimo.
-5. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
-   se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
-   e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.
-6. ~~Rasgos incompatibles~~ **cerrado el 16 sep**: las **dos** parejas
-   —`spring_valley` con `wide_ford` y con `marsh_valley`— se excluyen del
-   sorteo, y no se le inventa un efecto nuevo a la marisma. Escrito en
-   `docs/rework.md` (R-3) con el motivo y con la vía que se descartó, por si
-   alguien la retoma. El nivel de caos también está cerrado: ver §3.
-7. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
-   «siempre» (ver §5), pero cuántos saludos al día hay es cosa del ojo.
-8. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
-   `village.ts` y en `Beast` en vez de en `Dweller`. Arreglo escrito allí.
-9. **§3.5 punto 5 de `rework.md`**: la malla contra el radio. Una vaca colisiona
-   con radio 0,4 y su malla mide más de una celda. Es de `render3d/`, no de
-   `life/`.
-10. **El aviso de la crónica y la pista de las órdenes se pintan encima uno del
-   otro** en la franja de abajo. Captura que lo prueba en
-   `life-rounds/evidencia-capturas.md`. Va al rediseño; el cuaderno del dueño da
-   la geometría (`visual-reference` §5).
+0c. **El devoto se mide con una muestra que no lo ve.** `el devoto reza al
+   menos el doble` (IA-3) pasa por poco con dos semillas y su proporción va
+   de 0,6× a 2,7× sobre seis al apagar cambios que no tocan el rezo
+   (`life-rounds/IA-8.md` §3). Hace falta un sesgo del devoto visible con
+   una muestra barata, o una muestra mayor en las jornadas. Mientras, si se
+   pone roja al tocar otra cosa, no es del devoto.
+
+1. **~~Falta poder descartar una plaza que ya falló~~ HECHO en IA-8**
+   (`Dweller.failed`, `Chooser.shunned`), y con ello el plazo vencido de las
+   personas, con plazo propio del viaje (`Intent.arriveBy`). Parados 0,08 %,
+   giros 0,39 %.
 
 ## 5. Lo que ya se aprendió y no hay que volver a aprender
 

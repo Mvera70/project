@@ -27,7 +27,7 @@ import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { commons } from './places';
 import {
-  decide, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
+  decide, failedSeatKey, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK, SHUN_STEPS,
   type Intent, type ProgressState,
 } from './decide';
 import {
@@ -137,6 +137,12 @@ export interface Dweller {
    * siempre.
    */
   playedUntil: number;
+  /**
+   * Plazas que le fallaron hace poco (`failedSeatKey` → paso hasta el que se
+   * descartan). Es la pieza que faltaba para el plazo vencido: ver
+   * `Chooser.shunned` en `decide.ts` y la cifra que hay al lado.
+   */
+  failed: Map<string, number>;
   /**
    * IA-3: si es un crío o un mayor, del brief («los niños juegan cerca de
    * casa; los mayores prefieren pausas próximas»). Sale de `ageOf` (motor,
@@ -542,6 +548,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       holding: null,
       aimAt: null,
       playedUntil: 0,
+      failed: new Map(),
       ageGroup,
       home,
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
@@ -899,9 +906,23 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // pegada en la mano para el resto del día. Medido: 3 139 pasos con la
         // pelota en la mano y cero pases en la semilla 3, antes de este freno.
         const heldSteady = dweller.holding !== null && dweller.doing?.there === true;
-        if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong)) {
+        // **El plazo vencido, también sin haber llegado.** Es el mismo hueco
+        // que se cerró para los animales en IA-4: `until` sólo contaba una
+        // vez llegado, así que quien no llegaba se quedaba con el viaje
+        // puesto. Ahora entra porque la plaza que falló se descarta abajo:
+        // sin eso, medido, empeoraba (0,06 % → 0,20 % de parados con un
+        // impulso al máximo, `docs/life-rounds/IA-6.md` §4.3).
+        const overdue = onTheWay && dweller.doing?.arriveBy !== undefined && steps >= dweller.doing.arriveBy;
+        if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong || overdue)) {
           dweller.rethinkAt = steps + RETHINK;
           const before = dweller.doing;
+          // La plaza a la que no se llegó se descarta durante una ventana, y
+          // las que ya caducaron se olvidan.
+          if (before !== null && !before.there) {
+            dweller.failed.set(failedSeatKey(before), steps + SHUN_STEPS);
+          }
+          for (const [key, until] of dweller.failed) if (until <= steps) dweller.failed.delete(key);
+          const shunned = dweller.failed.size === 0 ? undefined : new Set(dweller.failed.keys());
           // V-09b · Hasta que se le pasen las ganas (`PLAYED_OUT`), a éste no
           // se le ofrece `play`: se filtra aquí, al montar las opciones de
           // *este* dweller, no dentro de `decide` — una oferta no puede saber
@@ -925,7 +946,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.doing = decide(
             {
               traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before,
-              ageGroup: dweller.ageGroup, home: dweller.home,
+              ageGroup: dweller.ageGroup, home: dweller.home, shunned, pace: body.pace,
             },
             options, taken, land, router, seed, steps,
           ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
@@ -947,20 +968,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         }
 
         // 2 · ¿Se acabó lo que estaba haciendo?
-        // **Pendiente, y medido: el plazo vencido de las personas no se
-        // arregla todavía.** El mismo hueco que se cerró para los animales
-        // —`until` sólo se comprobaba después de haber llegado, así que quien
-        // no llegaba se quedaba con el viaje puesto— está aquí igual. Se probó
-        // el arreglo y **empeora lo que importa**: «parados con un impulso al
-        // máximo» subió de 0,06 % a 0,20 %, que es la cifra de partida, porque
-        // choca con las estancias fijas de `SEAT_DWELL`: al soltar el viaje se
-        // vuelve a elegir **la misma plaza inalcanzable** —la llave del sorteo
-        // es la misma durante treinta segundos— y se reintenta en bucle con la
-        // necesidad a tope.
-        //
-        // Falta la pieza que no existe: que una plaza que ya falló se descarte
-        // para la siguiente elección. Con eso, el arreglo entra solo. Está en
-        // `docs/task-log.md` §4 con este número al lado.
+        // **El plazo vencido de quien no ha llegado se resuelve más arriba**,
+        // con el replanteo (`overdue`), y entró el día que existió la pieza que
+        // faltaba: descartar la plaza que falló (`Dweller.failed`,
+        // `Chooser.shunned`). Sin ella, medido, empeoraba: parados con un
+        // impulso al máximo de 0,06 % a 0,20 % (`life-rounds/IA-6.md` §4.3),
+        // porque se volvía a elegir la misma plaza inalcanzable. Con ella:
+        // parados 0,08 %, y los giros suben de 0,37 % a 0,54 % porque quien
+        // abandona ahora **se da la vuelta y va a otro sitio**, que es lo que
+        // debe pasar — antes se quedaba clavado mirando a la plaza fallida.
+        // Aquí queda sólo el final normal de una ocupación cumplida.
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
           // pelota se tira —encarado a quien tocara, o hacia delante si nadie

@@ -549,6 +549,7 @@ export function createBeasts(
       aimAt: null,
       // V-09b: la cabaña no juega, así que nunca se le pasan las ganas.
       playedUntil: 0,
+      failed: new Map(),
       rethinkAt: Math.floor((hash32(seed, `beast:think:${id}`) / 4_294_967_296) * RETHINK),
     };
     beasts.push({

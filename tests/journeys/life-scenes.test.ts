@@ -53,7 +53,7 @@ function makeDweller(
     sceneCooldownUntil: 0,
     holding: null,
     aimAt: null,
-    playedUntil: 0,
+    playedUntil: 0, failed: new Map(),
   };
 }
 

@@ -141,7 +141,7 @@ describe('IA-4 · feed/pet/chase como interacción, no como oferta pasiva', () =
       sceneCooldownUntil: 0,
       holding: null,
       aimAt: null,
-      playedUntil: 0,
+      playedUntil: 0, failed: new Map(),
       rethinkAt: 0,
     };
     const giftId = kind === 'hen' ? 'chase' : kind === 'pig' ? 'feed' : 'pet';
@@ -311,7 +311,7 @@ describe('IA-4 · la vaca sola busca al rebaño', () => {
           body: { id, x: at.x, z: at.z, vx: 0, vz: 0, facing: 0, radius: 0.4, pace: 0.32 },
           villager: -1 - id, traits: [], needs: freshNeeds(), doing: null, travelled: 0,
           faceAnchor: { x: at.x, z: at.z }, scene: null, sceneCooldownUntil: 0,
-          holding: null, aimAt: null, playedUntil: 0, rethinkAt: 100_000,
+          holding: null, aimAt: null, playedUntil: 0, failed: new Map(), rethinkAt: 100_000,
         },
         kind: 'cow',
         anchor: at,

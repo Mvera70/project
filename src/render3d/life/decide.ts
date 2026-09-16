@@ -36,7 +36,22 @@ export interface Intent {
   there: boolean;
   /** Qué plaza ocupa, para no ponerse todos en el mismo palmo de suelo. */
   readonly seat: number;
+  /**
+   * El paso en el que el viaje se da por fallido si aún no se ha llegado.
+   *
+   * **No es `until`.** `until` es cuándo termina la ocupación y se fija al
+   * decidir, así que contaba el viaje: el devoto, que ve la capilla a tres
+   * veces la distancia, llegaba tarde a su propio plazo y abandonaba antes de
+   * rezar (medido: 1,5 veces el rezo del resto en vez de más del doble). Esto
+   * es el viaje esperado por la ruta, doblado y con holgura. Opcional porque
+   * las intenciones de fórmula (pausa, animales) no lo necesitan.
+   */
+  readonly arriveBy?: number;
 }
+
+/** Holgura del plazo de un viaje: el doble de lo esperado y cinco segundos más. */
+export const JOURNEY_SLACK = 2;
+export const JOURNEY_GRACE_STEPS = 150;
 
 /**
  * Lo lejos que se busca algo que hacer, en celdas.
@@ -369,6 +384,35 @@ export interface Chooser {
    * quien decide es una bestia; entonces no pesa nada.
    */
   readonly home?: Point | undefined;
+  /**
+   * Las plazas que ya le fallaron hace poco, por `failedSeatKey`. **La pieza
+   * que faltaba** (task-log §4, punto 1): sin ella, quien abandonaba un viaje
+   * por no avanzar volvía a elegir **la misma plaza inalcanzable** —la llave
+   * del sorteo es la misma durante `SEAT_DWELL`— y reintentaba en bucle con
+   * la necesidad a tope. Medido al probar el plazo vencido sin esto: parados
+   * con un impulso al máximo de 0,06 % a 0,20 %. Lo rellena `village.ts` con
+   * lo que `noProgress()` y el plazo vencido descartan, durante `SHUN_STEPS`.
+   *
+   * **Se descarta la plaza, no el sitio.** La primera versión descartaba el
+   * sitio entero y le quitaba la capilla al devoto —es quien viaja más lejos
+   * a rezar y a quien más se le vence el viaje—: rezaba 1,97 veces lo que el
+   * resto en vez de más del doble. Con la plaza sola, al volver a mirar el
+   * mismo sitio sale otra plaza libre.
+   */
+  readonly shunned?: ReadonlySet<string> | undefined;
+  /** Celdas por segundo de quien decide, para el plazo del viaje. Sin él no hay plazo. */
+  readonly pace?: number | undefined;
+}
+
+/**
+ * Cuánto dura el descarte de una plaza que falló: una ventana de sorteo
+ * entera, para que al volver a mirar ese sitio salga otra plaza y no la misma.
+ */
+export const SHUN_STEPS = SEAT_DWELL;
+
+/** La llave de una plaza concreta de una oferta en un sitio, para `Chooser.shunned`. */
+export function failedSeatKey(doing: Pick<Intent, 'place' | 'offer' | 'seat'>): string {
+  return `${seatKey(doing.place, doing.offer)}#${doing.seat}`;
 }
 
 /**
@@ -541,7 +585,17 @@ export function decide(
     const secretive = who.traits.includes('secretive');
     const shaped = secretive ? 1 - (1 - rawDice) ** SECRETIVE_EDGE_POWER : rawDice;
     const jitter = free <= 1 ? 0 : Math.floor(shaped * free);
-    const seat = already + jitter;
+    // La plaza que ya falló hace poco se salta: se prueban las demás libres en
+    // orden, y si todas fallaron se pasa al siguiente sitio.
+    let seat = already + jitter;
+    if (who.shunned !== undefined && free > 0) {
+      let tries = 0;
+      while (tries < free && who.shunned.has(`${pick.key}#${seat}`)) {
+        seat = already + (jitter + tries + 1) % free;
+        tries += 1;
+      }
+      if (tries >= free) continue;
+    }
     const spot = seatAt(pick.offer, seat);
     const route = router.to(land, who.at, spot);
     // **Sin camino se prueba la siguiente, no se abandona el día.** Era la otra
@@ -567,6 +621,9 @@ export function decide(
       since: step,
       until: step + Math.round(seconds * 30),
       there: false,
+      ...(who.pace === undefined || who.pace <= 0 ? {} : {
+        arriveBy: step + Math.round((route.length / who.pace) * 30 * JOURNEY_SLACK) + JOURNEY_GRACE_STEPS,
+      }),
     };
   }
 

@@ -168,7 +168,7 @@ function makeDweller(
   return {
     body, villager: id, traits, needs: { ...freshNeeds(), ...needs }, doing: null, rethinkAt: 0,
     travelled: 0, faceAnchor: { x: at.x, z: at.z }, scene: null, sceneCooldownUntil: 0,
-    holding: null, aimAt: null, playedUntil: 0,
+    holding: null, aimAt: null, playedUntil: 0, failed: new Map(),
   };
 }
 

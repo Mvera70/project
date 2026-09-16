@@ -377,6 +377,15 @@ describe('IA-3 · aldeanos con hábitos', () => {
     return sample;
   }
 
+  // **Frágil, y medido** (IA-8, 16 sep 2026): con estas dos semillas el
+  // devoto pasa el doble por poco, y la proporción cambia con cualquier
+  // cambio de la capa que no toque el rezo —apagando uno a uno el descarte de
+  // plaza, el plazo del viaje, el alcance de parcela y el temblor de los
+  // puestos, sobre seis semillas, va de 0,6× a 2,7×—. El rezo es el 1 % del
+  // tiempo y esta muestra apenas lo ve. Si se pone roja al tocar otra cosa,
+  // no es una regresión del devoto: es esto. Lo abierto está en
+  // `docs/task-log.md` §4: un sesgo del devoto que se vea con una muestra
+  // barata, o una muestra mayor fuera de la suite rápida.
   it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
