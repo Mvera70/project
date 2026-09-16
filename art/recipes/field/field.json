@@ -12,13 +12,13 @@
       3,
       2
     ],
-    "note": "G-10, lote de sustento. Cinco surcos de mies a lo largo de la parcela. Los surcos son lo que separa un campo sembrado de un rectangulo de tierra a la escala del valle, donde nadie va a distinguir una espiga."
+    "note": "G-21: cinco surcos con doble hilera de tallos y espigas facetadas; parcela 3x2, escala y dos materiales conservados. Mies de hasta 0,282 celdas, antes 0,167. Alternancia estacional field/field-cut intacta; sin crecimiento ni animación nuevos."
   },
   "materials": [
     {
       "name": "soil",
       "role": "soil",
-      "roughness": 1.0
+      "roughness": 1
     },
     {
       "name": "grain",
@@ -43,93 +43,4212 @@
       "name": "Field_Soil",
       "location": [
         4.5,
-        3.0,
+        3,
         0.04
       ],
       "dimensions": [
-        9.0,
-        6.0,
+        9,
+        6,
         0.08
       ],
       "material": "soil",
       "parent": "Root"
     },
     {
-      "type": "cube",
-      "name": "Field_Row_0",
+      "type": "gable",
+      "name": "Field_Furrow_0",
       "location": [
         4.5,
         0.6,
-        0.25
+        0.08
       ],
-      "dimensions": [
-        8.4,
-        0.55,
-        0.5
+      "width": 0.68,
+      "depth": 8.4,
+      "height": 0.09,
+      "rotationDegrees": [
+        0,
+        0,
+        90
       ],
-      "material": "grain",
+      "material": "soil",
       "parent": "Root"
     },
     {
-      "type": "cube",
-      "name": "Field_Row_1",
+      "type": "gable",
+      "name": "Field_Furrow_1",
       "location": [
         4.5,
         1.7999999999999998,
-        0.25
+        0.08
       ],
-      "dimensions": [
-        8.4,
-        0.55,
-        0.5
+      "width": 0.68,
+      "depth": 8.4,
+      "height": 0.09,
+      "rotationDegrees": [
+        0,
+        0,
+        90
       ],
-      "material": "grain",
+      "material": "soil",
       "parent": "Root"
     },
     {
-      "type": "cube",
-      "name": "Field_Row_2",
+      "type": "gable",
+      "name": "Field_Furrow_2",
       "location": [
         4.5,
-        3.0,
-        0.25
+        3,
+        0.08
       ],
-      "dimensions": [
-        8.4,
-        0.55,
-        0.5
+      "width": 0.68,
+      "depth": 8.4,
+      "height": 0.09,
+      "rotationDegrees": [
+        0,
+        0,
+        90
       ],
-      "material": "grain",
+      "material": "soil",
       "parent": "Root"
     },
     {
-      "type": "cube",
-      "name": "Field_Row_3",
+      "type": "gable",
+      "name": "Field_Furrow_3",
       "location": [
         4.5,
         4.199999999999999,
-        0.25
+        0.08
+      ],
+      "width": 0.68,
+      "depth": 8.4,
+      "height": 0.09,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Field_Furrow_4",
+      "location": [
+        4.5,
+        5.3999999999999995,
+        0.08
+      ],
+      "width": 0.68,
+      "depth": 8.4,
+      "height": 0.09,
+      "rotationDegrees": [
+        0,
+        0,
+        90
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Headland_12",
+      "location": [
+        0.12,
+        3,
+        0.07
       ],
       "dimensions": [
-        8.4,
-        0.55,
-        0.5
+        0.24,
+        5.8,
+        0.1
+      ],
+      "material": "soil",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Headland_888",
+      "location": [
+        8.88,
+        3,
+        0.07
+      ],
+      "dimensions": [
+        0.24,
+        5.8,
+        0.1
+      ],
+      "material": "soil",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_0_0",
+      "location": [
+        0.65,
+        0.395,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_0_1",
+      "location": [
+        0.65,
+        0.655,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_0_0",
+      "location": [
+        0.65,
+        0.395,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_0_1",
+      "location": [
+        0.65,
+        0.655,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
       ],
       "material": "grain",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Field_Row_4",
+      "name": "Field_Stem_0_1_0",
       "location": [
-        4.5,
-        5.3999999999999995,
-        0.25
+        1.42,
+        0.5449999999999999,
+        0.35
       ],
       "dimensions": [
-        8.4,
-        0.55,
-        0.5
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_1_1",
+      "location": [
+        1.42,
+        0.8049999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_1_0",
+      "location": [
+        1.42,
+        0.5449999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_1_1",
+      "location": [
+        1.42,
+        0.8049999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_2_0",
+      "location": [
+        2.19,
+        0.395,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_2_1",
+      "location": [
+        2.19,
+        0.655,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_2_0",
+      "location": [
+        2.19,
+        0.395,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_2_1",
+      "location": [
+        2.19,
+        0.655,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_3_0",
+      "location": [
+        2.96,
+        0.5449999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_3_1",
+      "location": [
+        2.96,
+        0.8049999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_3_0",
+      "location": [
+        2.96,
+        0.5449999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_3_1",
+      "location": [
+        2.96,
+        0.8049999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_4_0",
+      "location": [
+        3.73,
+        0.395,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_4_1",
+      "location": [
+        3.73,
+        0.655,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_4_0",
+      "location": [
+        3.73,
+        0.395,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_4_1",
+      "location": [
+        3.73,
+        0.655,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_5_0",
+      "location": [
+        4.5,
+        0.5449999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_5_1",
+      "location": [
+        4.5,
+        0.8049999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_5_0",
+      "location": [
+        4.5,
+        0.5449999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_5_1",
+      "location": [
+        4.5,
+        0.8049999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_6_0",
+      "location": [
+        5.2700000000000005,
+        0.395,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_6_1",
+      "location": [
+        5.2700000000000005,
+        0.655,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_6_0",
+      "location": [
+        5.2700000000000005,
+        0.395,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_6_1",
+      "location": [
+        5.2700000000000005,
+        0.655,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_7_0",
+      "location": [
+        6.040000000000001,
+        0.5449999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_7_1",
+      "location": [
+        6.040000000000001,
+        0.8049999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_7_0",
+      "location": [
+        6.040000000000001,
+        0.5449999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_7_1",
+      "location": [
+        6.040000000000001,
+        0.8049999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_8_0",
+      "location": [
+        6.8100000000000005,
+        0.395,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_8_1",
+      "location": [
+        6.8100000000000005,
+        0.655,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_8_0",
+      "location": [
+        6.8100000000000005,
+        0.395,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_8_1",
+      "location": [
+        6.8100000000000005,
+        0.655,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_9_0",
+      "location": [
+        7.58,
+        0.5449999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_9_1",
+      "location": [
+        7.58,
+        0.8049999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_9_0",
+      "location": [
+        7.58,
+        0.5449999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_9_1",
+      "location": [
+        7.58,
+        0.8049999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_10_0",
+      "location": [
+        8.35,
+        0.395,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_0_10_1",
+      "location": [
+        8.35,
+        0.655,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_10_0",
+      "location": [
+        8.35,
+        0.395,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_0_10_1",
+      "location": [
+        8.35,
+        0.655,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_0_0",
+      "location": [
+        0.65,
+        1.5949999999999998,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_0_1",
+      "location": [
+        0.65,
+        1.855,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_0_0",
+      "location": [
+        0.65,
+        1.5949999999999998,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_0_1",
+      "location": [
+        0.65,
+        1.855,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_1_0",
+      "location": [
+        1.42,
+        1.7449999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_1_1",
+      "location": [
+        1.42,
+        2.005,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_1_0",
+      "location": [
+        1.42,
+        1.7449999999999997,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_1_1",
+      "location": [
+        1.42,
+        2.005,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_2_0",
+      "location": [
+        2.19,
+        1.5949999999999998,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_2_1",
+      "location": [
+        2.19,
+        1.855,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_2_0",
+      "location": [
+        2.19,
+        1.5949999999999998,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_2_1",
+      "location": [
+        2.19,
+        1.855,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_3_0",
+      "location": [
+        2.96,
+        1.7449999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_3_1",
+      "location": [
+        2.96,
+        2.005,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_3_0",
+      "location": [
+        2.96,
+        1.7449999999999997,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_3_1",
+      "location": [
+        2.96,
+        2.005,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_4_0",
+      "location": [
+        3.73,
+        1.5949999999999998,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_4_1",
+      "location": [
+        3.73,
+        1.855,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_4_0",
+      "location": [
+        3.73,
+        1.5949999999999998,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_4_1",
+      "location": [
+        3.73,
+        1.855,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_5_0",
+      "location": [
+        4.5,
+        1.7449999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_5_1",
+      "location": [
+        4.5,
+        2.005,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_5_0",
+      "location": [
+        4.5,
+        1.7449999999999997,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_5_1",
+      "location": [
+        4.5,
+        2.005,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_6_0",
+      "location": [
+        5.2700000000000005,
+        1.5949999999999998,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_6_1",
+      "location": [
+        5.2700000000000005,
+        1.855,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_6_0",
+      "location": [
+        5.2700000000000005,
+        1.5949999999999998,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_6_1",
+      "location": [
+        5.2700000000000005,
+        1.855,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_7_0",
+      "location": [
+        6.040000000000001,
+        1.7449999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_7_1",
+      "location": [
+        6.040000000000001,
+        2.005,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_7_0",
+      "location": [
+        6.040000000000001,
+        1.7449999999999997,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_7_1",
+      "location": [
+        6.040000000000001,
+        2.005,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_8_0",
+      "location": [
+        6.8100000000000005,
+        1.5949999999999998,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_8_1",
+      "location": [
+        6.8100000000000005,
+        1.855,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_8_0",
+      "location": [
+        6.8100000000000005,
+        1.5949999999999998,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_8_1",
+      "location": [
+        6.8100000000000005,
+        1.855,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_9_0",
+      "location": [
+        7.58,
+        1.7449999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_9_1",
+      "location": [
+        7.58,
+        2.005,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_9_0",
+      "location": [
+        7.58,
+        1.7449999999999997,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_9_1",
+      "location": [
+        7.58,
+        2.005,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_10_0",
+      "location": [
+        8.35,
+        1.5949999999999998,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_1_10_1",
+      "location": [
+        8.35,
+        1.855,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_10_0",
+      "location": [
+        8.35,
+        1.5949999999999998,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_1_10_1",
+      "location": [
+        8.35,
+        1.855,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_0_0",
+      "location": [
+        0.65,
+        2.795,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_0_1",
+      "location": [
+        0.65,
+        3.0549999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_0_0",
+      "location": [
+        0.65,
+        2.795,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_0_1",
+      "location": [
+        0.65,
+        3.0549999999999997,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_1_0",
+      "location": [
+        1.42,
+        2.9450000000000003,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_1_1",
+      "location": [
+        1.42,
+        3.205,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_1_0",
+      "location": [
+        1.42,
+        2.9450000000000003,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_1_1",
+      "location": [
+        1.42,
+        3.205,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_2_0",
+      "location": [
+        2.19,
+        2.795,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_2_1",
+      "location": [
+        2.19,
+        3.0549999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_2_0",
+      "location": [
+        2.19,
+        2.795,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_2_1",
+      "location": [
+        2.19,
+        3.0549999999999997,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_3_0",
+      "location": [
+        2.96,
+        2.9450000000000003,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_3_1",
+      "location": [
+        2.96,
+        3.205,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_3_0",
+      "location": [
+        2.96,
+        2.9450000000000003,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_3_1",
+      "location": [
+        2.96,
+        3.205,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_4_0",
+      "location": [
+        3.73,
+        2.795,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_4_1",
+      "location": [
+        3.73,
+        3.0549999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_4_0",
+      "location": [
+        3.73,
+        2.795,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_4_1",
+      "location": [
+        3.73,
+        3.0549999999999997,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_5_0",
+      "location": [
+        4.5,
+        2.9450000000000003,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_5_1",
+      "location": [
+        4.5,
+        3.205,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_5_0",
+      "location": [
+        4.5,
+        2.9450000000000003,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_5_1",
+      "location": [
+        4.5,
+        3.205,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_6_0",
+      "location": [
+        5.2700000000000005,
+        2.795,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_6_1",
+      "location": [
+        5.2700000000000005,
+        3.0549999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_6_0",
+      "location": [
+        5.2700000000000005,
+        2.795,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_6_1",
+      "location": [
+        5.2700000000000005,
+        3.0549999999999997,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_7_0",
+      "location": [
+        6.040000000000001,
+        2.9450000000000003,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_7_1",
+      "location": [
+        6.040000000000001,
+        3.205,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_7_0",
+      "location": [
+        6.040000000000001,
+        2.9450000000000003,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_7_1",
+      "location": [
+        6.040000000000001,
+        3.205,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_8_0",
+      "location": [
+        6.8100000000000005,
+        2.795,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_8_1",
+      "location": [
+        6.8100000000000005,
+        3.0549999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_8_0",
+      "location": [
+        6.8100000000000005,
+        2.795,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_8_1",
+      "location": [
+        6.8100000000000005,
+        3.0549999999999997,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_9_0",
+      "location": [
+        7.58,
+        2.9450000000000003,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_9_1",
+      "location": [
+        7.58,
+        3.205,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_9_0",
+      "location": [
+        7.58,
+        2.9450000000000003,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_9_1",
+      "location": [
+        7.58,
+        3.205,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_10_0",
+      "location": [
+        8.35,
+        2.795,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_2_10_1",
+      "location": [
+        8.35,
+        3.0549999999999997,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_10_0",
+      "location": [
+        8.35,
+        2.795,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_2_10_1",
+      "location": [
+        8.35,
+        3.0549999999999997,
+        0.6900000000000001
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_0_0",
+      "location": [
+        0.65,
+        3.994999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_0_1",
+      "location": [
+        0.65,
+        4.254999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_0_0",
+      "location": [
+        0.65,
+        3.994999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_0_1",
+      "location": [
+        0.65,
+        4.254999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_1_0",
+      "location": [
+        1.42,
+        4.145,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_1_1",
+      "location": [
+        1.42,
+        4.404999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_1_0",
+      "location": [
+        1.42,
+        4.145,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_1_1",
+      "location": [
+        1.42,
+        4.404999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_2_0",
+      "location": [
+        2.19,
+        3.994999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_2_1",
+      "location": [
+        2.19,
+        4.254999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_2_0",
+      "location": [
+        2.19,
+        3.994999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_2_1",
+      "location": [
+        2.19,
+        4.254999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_3_0",
+      "location": [
+        2.96,
+        4.145,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_3_1",
+      "location": [
+        2.96,
+        4.404999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_3_0",
+      "location": [
+        2.96,
+        4.145,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_3_1",
+      "location": [
+        2.96,
+        4.404999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_4_0",
+      "location": [
+        3.73,
+        3.994999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_4_1",
+      "location": [
+        3.73,
+        4.254999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_4_0",
+      "location": [
+        3.73,
+        3.994999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_4_1",
+      "location": [
+        3.73,
+        4.254999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_5_0",
+      "location": [
+        4.5,
+        4.145,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_5_1",
+      "location": [
+        4.5,
+        4.404999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_5_0",
+      "location": [
+        4.5,
+        4.145,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_5_1",
+      "location": [
+        4.5,
+        4.404999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_6_0",
+      "location": [
+        5.2700000000000005,
+        3.994999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_6_1",
+      "location": [
+        5.2700000000000005,
+        4.254999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_6_0",
+      "location": [
+        5.2700000000000005,
+        3.994999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_6_1",
+      "location": [
+        5.2700000000000005,
+        4.254999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_7_0",
+      "location": [
+        6.040000000000001,
+        4.145,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_7_1",
+      "location": [
+        6.040000000000001,
+        4.404999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_7_0",
+      "location": [
+        6.040000000000001,
+        4.145,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_7_1",
+      "location": [
+        6.040000000000001,
+        4.404999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_8_0",
+      "location": [
+        6.8100000000000005,
+        3.994999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_8_1",
+      "location": [
+        6.8100000000000005,
+        4.254999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_8_0",
+      "location": [
+        6.8100000000000005,
+        3.994999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_8_1",
+      "location": [
+        6.8100000000000005,
+        4.254999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_9_0",
+      "location": [
+        7.58,
+        4.145,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_9_1",
+      "location": [
+        7.58,
+        4.404999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_9_0",
+      "location": [
+        7.58,
+        4.145,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_9_1",
+      "location": [
+        7.58,
+        4.404999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_10_0",
+      "location": [
+        8.35,
+        3.994999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_3_10_1",
+      "location": [
+        8.35,
+        4.254999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_10_0",
+      "location": [
+        8.35,
+        3.994999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_3_10_1",
+      "location": [
+        8.35,
+        4.254999999999999,
+        0.64
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_0_0",
+      "location": [
+        0.65,
+        5.194999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_0_1",
+      "location": [
+        0.65,
+        5.454999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_0_0",
+      "location": [
+        0.65,
+        5.194999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_0_1",
+      "location": [
+        0.65,
+        5.454999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_1_0",
+      "location": [
+        1.42,
+        5.345,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_1_1",
+      "location": [
+        1.42,
+        5.6049999999999995,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_1_0",
+      "location": [
+        1.42,
+        5.345,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_1_1",
+      "location": [
+        1.42,
+        5.6049999999999995,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_2_0",
+      "location": [
+        2.19,
+        5.194999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_2_1",
+      "location": [
+        2.19,
+        5.454999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_2_0",
+      "location": [
+        2.19,
+        5.194999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_2_1",
+      "location": [
+        2.19,
+        5.454999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_3_0",
+      "location": [
+        2.96,
+        5.345,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_3_1",
+      "location": [
+        2.96,
+        5.6049999999999995,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_3_0",
+      "location": [
+        2.96,
+        5.345,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_3_1",
+      "location": [
+        2.96,
+        5.6049999999999995,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_4_0",
+      "location": [
+        3.73,
+        5.194999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_4_1",
+      "location": [
+        3.73,
+        5.454999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_4_0",
+      "location": [
+        3.73,
+        5.194999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_4_1",
+      "location": [
+        3.73,
+        5.454999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_5_0",
+      "location": [
+        4.5,
+        5.345,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_5_1",
+      "location": [
+        4.5,
+        5.6049999999999995,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_5_0",
+      "location": [
+        4.5,
+        5.345,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_5_1",
+      "location": [
+        4.5,
+        5.6049999999999995,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_6_0",
+      "location": [
+        5.2700000000000005,
+        5.194999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_6_1",
+      "location": [
+        5.2700000000000005,
+        5.454999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_6_0",
+      "location": [
+        5.2700000000000005,
+        5.194999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_6_1",
+      "location": [
+        5.2700000000000005,
+        5.454999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_7_0",
+      "location": [
+        6.040000000000001,
+        5.345,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_7_1",
+      "location": [
+        6.040000000000001,
+        5.6049999999999995,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_7_0",
+      "location": [
+        6.040000000000001,
+        5.345,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_7_1",
+      "location": [
+        6.040000000000001,
+        5.6049999999999995,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_8_0",
+      "location": [
+        6.8100000000000005,
+        5.194999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_8_1",
+      "location": [
+        6.8100000000000005,
+        5.454999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_8_0",
+      "location": [
+        6.8100000000000005,
+        5.194999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_8_1",
+      "location": [
+        6.8100000000000005,
+        5.454999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_9_0",
+      "location": [
+        7.58,
+        5.345,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_9_1",
+      "location": [
+        7.58,
+        5.6049999999999995,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_9_0",
+      "location": [
+        7.58,
+        5.345,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_9_1",
+      "location": [
+        7.58,
+        5.6049999999999995,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_10_0",
+      "location": [
+        8.35,
+        5.194999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Field_Stem_4_10_1",
+      "location": [
+        8.35,
+        5.454999999999999,
+        0.35
+      ],
+      "dimensions": [
+        0.075,
+        0.075,
+        0.54
+      ],
+      "material": "grain",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_10_0",
+      "location": [
+        8.35,
+        5.194999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
+      ],
+      "material": "grain",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Field_Ear_4_10_1",
+      "location": [
+        8.35,
+        5.454999999999999,
+        0.665
+      ],
+      "radius": 0.095,
+      "depth": 0.31,
+      "vertices": 4,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        45
       ],
       "material": "grain",
       "parent": "Root"
@@ -138,19 +4257,19 @@
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 800,
+    "height": 800,
     "cameraLocation": [
-      11.0,
-      -13.75,
-      8.8
+      4.6,
+      -3.7,
+      3.5
     ],
     "cameraTarget": [
-      0,
-      0,
-      0.6
+      1.5,
+      1,
+      0.06
     ],
-    "orthoScale": 15.399999999999999,
+    "orthoScale": 4.2,
     "worldRole": "sky"
   }
 }

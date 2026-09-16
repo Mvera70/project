@@ -1003,14 +1003,14 @@
     },
     {
       "id": "field",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/field/field.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-34-296Z-53056",
-        "directory": "artifacts/graphics/G-10/approved/62ed547480f85701"
+        "runId": "2026-09-16T18-20-16-403Z-47820",
+        "directory": "artifacts/graphics/G-21/approved/989feea131186480"
       },
       "bounds": {
         "min": [
@@ -1020,16 +1020,16 @@
         ],
         "max": [
           3,
-          0.166667,
+          0.281667,
           0
         ],
         "size": [
           3,
-          0.166667,
+          0.281667,
           2
         ]
       },
-      "recipeSha256": "CBA2C13FF3B2FA7865242A223B475C2A7198F77E716643EABBD8BC4F74BF3287",
+      "recipeSha256": "D35D1764917BB9DD38374E1F7A473C5D689F7725FDAF9C4D680269A4F25FEEAF",
       "materials": [
         "soil",
         "grain"
@@ -1041,21 +1041,21 @@
         "objects": 3,
         "meshes": 2,
         "materials": 2,
-        "triangles": 72
+        "triangles": 2056
       },
       "hashes": {
-        "field.blend": "00FFA228B83FCD2F1B120D11A0FF5BF3D0C29043DE74BE153CE70E3B5E068C1A",
-        "field.glb": "62ED547480F857018D649435697C0FE9F44EF6BDC146FA4FC9050BE1D0A2BC67",
-        "field-blender.png": "54DEF3181533550B7639A8CC26217163BD37C330563077071602E585929529D1",
-        "capture-1.png": "BA4EDEADD02A36D0FC5139C638ED9161ED2F0C70FBD39FD5E623EF971E2D55A7",
-        "capture-1-gray.png": "0FA620284788B8C5ACD78E4A71B81178547F834CCB327213B168D944D5FA93C5",
-        "capture.json": "9E5D18BD7FF4C1391EDCE0C0EFE2385870175B1F49710560B168F663C793C10E",
-        "build.json": "ECBE41D4EF78A162E1E239EC2DA256DC3663B28CAB5D04C27E2ABD4DBE2DC1A5",
-        "validation.json": "3127AF640A96AF2C27ED8E493E8968F56ADE926A8DCF830A05FD1951CC614CF7"
+        "field.blend": "8C437B30CB1BB3770BB525FF03F6B7EC39F8BC314E63681F4641A48766B7EF6B",
+        "field.glb": "989FEEA131186480AF20F82EFF5BC9E4BC5618498ABDCB5487465E929B89EAC0",
+        "field-blender.png": "87D2DAB240E119CA220A3B97D3E17830F7529D56FFEF1A52C67BED56AEDFE47A",
+        "capture-1.png": "A45D5823CFBA628440CDF3C9873E482592077D83ABA6296664D6DE93BB71704B",
+        "capture-1-gray.png": "201D0D6AF41D84031B1B859BCB32728271F944BC291931EA2730913E6C558B32",
+        "capture.json": "33C3007612C8F0BDBACDEC541CD3C171E4FC0B49394E4DF0D81A12068015FFE1",
+        "build.json": "C1EFB66D1A44EAABDF13F3FC74D0926ECAC11FE48ED6CE7097DB1AC2AC1B2ADE",
+        "validation.json": "0E119D687A6A4F447708D1FE294505CEEAB7C7873E31EF444CC1D88BB02FD8DF"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original field authored for The Valley G-10",
+        "source": "Original G-21: campo con cinco surcos y espigas facetadas, dos materiales.",
         "license": "Project original"
       }
     },
