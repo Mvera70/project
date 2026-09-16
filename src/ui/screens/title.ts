@@ -50,11 +50,11 @@ const STYLE = `
 .title-seed-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
 .title-seed-row label { grid-column: 1 / -1; color: var(--paper-dim, #d9cfbc); font-size: 12px;
   letter-spacing: .08em; text-transform: uppercase; }
-.title-seed { box-sizing: border-box; width: 100%; min-height: 44px; padding: 8px 12px;
+.title-seed, .title-year { box-sizing: border-box; width: 100%; min-height: 44px; padding: 8px 12px;
   border: 1px solid rgba(242,233,216,.35); border-radius: 10px; background: rgba(0,0,0,.25);
   color: var(--parchment, #f2e9d8); font: 600 18px/1.2 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
   font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-.title-seed:focus { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 1px; }
+.title-seed:focus, .title-year:focus { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 1px; }
 .title-reroll { min-height: 44px !important; padding: 8px 14px !important; font-size: 14px !important; }
 .title-hint { grid-column: 1 / -1; margin: 0; color: var(--paper-dim, #d9cfbc); font-size: 13px; text-wrap: pretty; }
 .title-dev-row { display: grid; gap: 8px; }
@@ -248,7 +248,12 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   yearLabel.htmlFor = 'valley-year';
   const year = document.createElement('input');
   year.id = 'valley-year';
-  year.className = 'title-seed';
+  // Clase propia y no `title-seed`, a propósito: `valley.shots.ts` localiza
+  // el número del valle por esa clase exacta —`page.locator('.title-seed')
+  // .fill(...)`— y con dos campos compartiéndola, ese localizador dejó de
+  // ser único ("strict mode violation") el mismo día que se escribió U-10b.
+  // La piel se comparte por selector CSS; el nombre de clase, no.
+  year.className = 'title-year';
   year.inputMode = 'numeric';
   year.autocomplete = 'off';
   year.spellcheck = false;

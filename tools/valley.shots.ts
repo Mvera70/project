@@ -44,6 +44,7 @@
 import { TIME } from '@engine/balance';
 import { hourAt } from '../src/render3d/effects/day-phases';
 import { test, type Page } from '@playwright/test';
+import { passTitle } from './pass-title';
 
 /** La puerta de vuelta, pedida a propósito. Ver la cabecera. */
 const CANVAS = '/?render=canvas';
@@ -94,19 +95,6 @@ async function answerAnyCrossroad(page: Page): Promise<void> {
   if (await options.count() === 0) return;
   await options.first().click();
   await page.locator('.crossroad-scrim').waitFor({ state: 'detached' });
-}
-
-/**
- * U-10 · la ruta real abre con el menú de inicio, y se pasa como lo pasa el
- * dedo: continuar si hay partida, fundar un valle nuevo si no.
- */
-async function passTitle(page: Page): Promise<void> {
-  const title = page.locator('.title-scrim');
-  await title.waitFor();
-  const cont = page.locator('.title-continue');
-  if (await cont.count() > 0) await cont.click();
-  else await page.locator('.title-new').click();
-  await title.waitFor({ state: 'detached' });
 }
 
 test('el juego abre con el menú de inicio: un valle nuevo con su número, y continuar sólo cuando hay partida', async ({ page }) => {

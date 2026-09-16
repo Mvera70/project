@@ -5,6 +5,7 @@
  * the thing being tested and it does not exist in the dev server.
  */
 import { test, type Page } from '@playwright/test';
+import { passTitle } from './pass-title';
 
 /** Wait until a worker controls the page: until then nothing is intercepted. */
 async function controlled(page: Page): Promise<void> {
@@ -12,7 +13,12 @@ async function controlled(page: Page): Promise<void> {
 }
 
 test('el manifest declara una aplicación instalable', async ({ page, request }) => {
+  // U-10 (título antes de fundar) llegó después de que esta prueba se
+  // escribiera y nadie la volvió a pasar entera desde entonces: `test:pwa` no
+  // corre en cada ronda, sólo al cerrar una tanda (regla del dueño). Sin
+  // pasar el menú, `data-app-ready` nunca llega y la prueba agota el minuto.
   await page.goto('/');
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
 
   const response = await request.get('/manifest.webmanifest');
@@ -53,8 +59,11 @@ test('el manifest declara una aplicación instalable', async ({ page, request })
  */
 async function warmed(page: Page, query = ''): Promise<void> {
   await page.goto(`/${query}`);
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
+  // La recarga sí encuentra partida guardada (§13.1) y no vuelve a mostrar el
+  // menú: ahí no hace falta `passTitle` otra vez.
   await page.reload();
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
