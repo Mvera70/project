@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T21:23:22.975Z",
+  "generatedAt": "2026-09-16T21:27:58.543Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -270,8 +270,21 @@
     {
       "id": "fish",
       "file": "fish.glb",
-      "sha256": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
-      "motion": []
+      "sha256": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.13
+        }
+      ]
     },
     {
       "id": "hoe",

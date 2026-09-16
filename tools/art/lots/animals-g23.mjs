@@ -21,6 +21,9 @@ const piece = (name,location,dimensions,material='coat',bind='body',bevel=.025) 
 const cone = (name,location,radius,depth,material,bind,rotationDegrees=[0,0,0]) => {
   r.primitives.push({type:'cone',name,location,radius,depth,vertices:6,rotationDegrees,material,parent:'Root'}); r.rig.bind[name]=bind;
 };
+const fin = (name,location,width,depth,height,bind,rotationDegrees=[0,0,0]) => {
+  r.primitives.push({type:'gable',name,location,width,depth,height,rotationDegrees,material:'accent',parent:'Root'});r.rig.bind[name]=bind;
+};
 bone('body',[0,0,.5]);
 let stride=.18;
 const legs=[];
@@ -105,12 +108,13 @@ if (['cow','pig','wolf'].includes(id)) {
   piece('Body',[0,0,.02],[.32,.12,.17],'coat','body',.05);
   piece('Belly',[-.015,0,-.025],[.27,.1,.075],'light','body',.025);
   bone('head',[-.1,0,.02],'body');piece('Head',[-.16,0,.025],[.12,.115,.13],'coat','head',.035);
+  piece('Mouth',[-.22,0,.008],[.008,.04,.01],'dark','head',0);
   for(const side of [-1,1])piece('Eye_'+(side<0?'L':'R'),[-.18,side*.055,.052],[.035,.015,.03],'dark','head',.008);
   bone('tail',[.11,0,.02],'body');bone('tailTip',[.21,0,.02],'tail');
   piece('TailStem',[.17,0,.02],[.14,.065,.095],'coat','tail',.023);
-  for(const side of [-1,1])cone('TailFin_'+(side<0?'L':'R'),[.27,0,.02+side*.055],.065,.13,'accent','tailTip',[0,side>0?0:180,0]);
-  cone('Dorsal',[0,0,.13],.065,.15,'accent','body');
-  for(const side of [-1,1]){bone('fin'+side,[-.055,side*.045,0],'body');piece('Fin_'+(side<0?'L':'R'),[-.015,side*.085,-.015],[.10,.08,.025],'accent','fin'+side,.008);}
+  for(const side of [-1,1])fin('TailFin_'+(side<0?'L':'R'),[.27,0,.02],.14,.014,.12,'tailTip',[side>0?0:180,0,0]);
+  fin('Dorsal',[0,0,.083],.15,.014,.12,'body');
+  for(const side of [-1,1]){bone('fin'+side,[-.055,side*.045,0],'body');fin('Fin_'+(side<0?'L':'R'),[-.025,side*.05,-.015],.12,.012,.075,'fin'+side,[-side*90,0,0]);}
   r.referenceRender={width:600,height:600,cameraLocation:[-1,-1.3,.9],cameraTarget:[0,0,.03],orthoScale:.8,worldColor:'#bec9c0'};
 }
 // Todos los huesos tienen ejes iguales: Y local es Z de Blender.

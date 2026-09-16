@@ -15,13 +15,16 @@ document.body.style.margin='0';document.body.append(renderer.domElement);
 const scene=new Scene();scene.background=new Color('#b7c3b2');scene.add(new AmbientLight(0xffffff,2));
 const sun=new DirectionalLight(0xffeed5,3);sun.position.set(-3,5,4);scene.add(sun);
 const plane=new Mesh(new PlaneGeometry(20,20),new MeshStandardMaterial({color:'#7f946f',roughness:1}));plane.rotation.x=-Math.PI/2;plane.position.y=-.015;scene.add(plane);
+// En el banco se descubre el cuerpo del pez; en partida conserva su cota bajo el agua.
+if(PREVIEW_ID==='fish'){plane.position.y=-.2;plane.material.color.set('#638c91');}
 const scale=PREVIEW_ID==='cow'?1:PREVIEW_ID==='wolf'?.85:PREVIEW_ID==='pig'?.7:PREVIEW_ID==='fish'?.25:.38;
 const camera=new OrthographicCamera(-scale*.8,scale*.8,scale*.67,-scale*.67,.01,100);
 const fauna=new Fauna(k=>library.instance(k),k=>library.get(k));scene.add(fauna.group);
 let time=0,x=0;
 window.sample=(t,moving)=>{
   while(time<t-1e-8){const dt=Math.min(1/60,t-time);time+=dt;if(moving)x-=.09*dt;fauna.paint([{id:71,kind:PREVIEW_ID,x,y:0}],time);}
-  camera.position.set(x-scale*1.7,scale*1.2,scale*1.9);camera.lookAt(x,scale*.24,0);
+  const floor=PREVIEW_ID==='fish'?-.14:0;
+  camera.position.set(x-scale*1.7,scale*1.2+floor,scale*1.9);camera.lookAt(x,scale*.24+floor,0);
   scene.updateMatrixWorld(true);renderer.render(scene,camera);
   const joints:Record<string,number[]>={};let vertices=0;let finite=true;
   fauna.group.traverse(n=>{
@@ -31,6 +34,17 @@ window.sample=(t,moving)=>{
   return {time,x,joints,vertices,finite,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles};
 };
 fauna.paint([{id:71,kind:PREVIEW_ID,x:0,y:0}],0);window.sample(0,false);window.previewReady=true;
+// El mismo banco se puede abrir como visor local para revisar el ciclo continuo.
+const controls=document.createElement('div');controls.style.cssText='position:fixed;left:12px;top:12px;display:flex;gap:8px';document.body.append(controls);
+let playMode:boolean|null=null,previousFrame=0;
+for(const [label,mode] of [['Walk',true],['Rest',false],['Pause',null]] as const){
+  const button=document.createElement('button');button.textContent=label;button.onclick=()=>{playMode=mode;};controls.append(button);
+}
+function play(now:number):void{
+  if(playMode!==null&&previousFrame>0)window.sample(time+Math.min(.1,(now-previousFrame)/1000),playMode);
+  previousFrame=now;requestAnimationFrame(play);
+}
+requestAnimationFrame(play);
 window.benchmark=(count,animated)=>{
   scene.remove(fauna.group);
   const herd=new Fauna(k=>library.instance(k),animated?k=>library.get(k):undefined);scene.add(herd.group);

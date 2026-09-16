@@ -73,6 +73,10 @@ Gallina subida en `a48bb00`. Lobo terminado y revisado, con marcha sincronizada
 y apoyos comprobados; 50 pruebas, typecheck y lint verdes. Siguen cuervo y pez.
 Lobo subido en `b323c58`. Cuervo terminado y revisado, 52 pruebas, typecheck
 y lint verdes. Queda el pez para cerrar las seis especies existentes.
+Cuervo subido en `3b395c8`. **Las seis especies terminadas y validadas:** vaca,
+cerdo, gallina, lobo, cuervo y pez, con rig y clips conectados al juego. Pez y
+cierre preparados para subida individual. 75 pruebas, typecheck y lint verdes;
+seis bancos visuales, visores con reproducción/pausa y captura del juego.
 Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
 verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
 subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](graphics-rounds/G-23.md).
@@ -240,6 +244,8 @@ Gallina: 874 triángulos, cuatro materiales y 12 huesos; 45 pruebas. Banco de
 40 cerdos: CPU/envío mediana 1,6 ms, p95 3,8 ms; no es una medida de FPS móvil.
 Lobo: 2828 triángulos, cuatro materiales, 18 huesos. 50 pruebas pertinentes.
 Cuervo: 826 triángulos, cuatro materiales, 12 huesos. 52 pruebas pertinentes.
+Pez: 700 triángulos, cuatro materiales, seis huesos. Cierre: 75 pruebas en seis
+archivos; GLB de las seis especies 1 916 800 bytes. Todos los hashes verificados.
 
 **Inventario del nuevo encargo de aldea:** 21 ids existentes en cuatro tandas;
 las variantes de vivienda y adornos nuevos se definirán con su integración.
@@ -322,8 +328,9 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-G-23: completar el pez con entrega individual y comprobar el conjunto.
-La articulación requiere esqueletos propios; medir coste conjunto al cerrar.
+G-23: seis especies terminadas y comprobadas. No queda modelado pendiente del
+catálogo animal actual. Coste del banco documentado en G-23; no hay medida
+nueva de FPS en dispositivo móvil. Nuevas especies o conductas son otro encargo.
 
 **G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
 Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado

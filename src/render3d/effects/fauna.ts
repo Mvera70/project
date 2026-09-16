@@ -10,9 +10,10 @@
 // dos funciones no lo consumen, derivan la posición del estado y de la hora, así
 // que el mismo instante da siempre la misma vaca en el mismo sitio.
 //
-// Van instanciados, como los árboles: una aldea madura tiene cerca de cuarenta
-// cabezas, y cuarenta objetos sueltos serían cuarenta llamadas de dibujo por un
-// puñado de triángulos.
+// G-23: los recursos con clips tienen un esqueleto propio por animal y comparten
+// geometría/materiales. Los recursos sin clips conservan la vía de instancias.
+// El coste de las dos vías se mide en el banco de G-23; aplanar un esqueleto
+// en una instancia estática volvería a dejar inmóviles todas sus articulaciones.
 
 import { Group, InstancedMesh, Matrix4, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState, type ValleyMap } from '@engine/state';
@@ -219,9 +220,9 @@ export class Fauna {
   /**
    * Pinta exactamente los animales que se le dan, y nada más.
    *
-   * **Esto es «pintar instancias»**: no deriva nada del estado, no consulta la
-   * hora, no corrige el agua — sólo reparte la lista en mallas por clase y
-   * escribe una matriz por bicho. `update` es hoy el único que la llama, con
+   * No deriva nada del estado ni corrige el agua: coloca la lista recibida y
+   * usa el tiempo de presentación explícito para sus articulaciones. Los
+   * recursos sin clips se reparten en instancias. `update` la llama con
    * la lista de siempre (§7.7 cosmético); un `life/beasts.ts` en marcha
    * llamaría aquí con su propia lista —viva, sin `ashore`, porque un
    * animal-`Dweller` no llega a pisar el agua— sin que esta clase necesite

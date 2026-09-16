@@ -1912,59 +1912,78 @@
     },
     {
       "id": "fish",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/fish/fish.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-34-253Z-33664",
-        "directory": "artifacts/graphics/G-10/approved/edf544ad22d99bb5"
+        "runId": "2026-09-16T21-27-17-551Z-37688",
+        "directory": "artifacts/graphics/G-23/approved/9e6d26667f104c33"
       },
       "bounds": {
         "min": [
-          -0.056667,
-          0.003333,
-          -0.036667
+          -0.074667,
+          -0.033333,
+          -0.041667
         ],
         "max": [
-          0.11,
-          0.08,
-          0.036667
+          0.113333,
+          0.067667,
+          0.041667
         ],
         "size": [
-          0.166667,
-          0.076667,
-          0.073333
+          0.188,
+          0.101,
+          0.083333
         ]
       },
-      "recipeSha256": "A9864DB4E4AB9ACA26BCFB2FAE32152882FBD72037FE86B6D775B235E621AD38",
+      "recipeSha256": "7B3BA5F821FDAF6F656223DDC085CC957B13E76A1AF027B46FE868FBA7C9F86F",
       "materials": [
-        "fin"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.13
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 86
+        "objects": 12,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 700
       },
       "hashes": {
-        "fish.blend": "F9B7E017041B4DD1C11B87336389CB09AAF5DE15BE8E5909690D247EB5DA484A",
-        "fish.glb": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
-        "fish-blender.png": "B3082493F084B512B6B5E5647CEF4BC892489838F2327CF2413A746749E1E3CE",
-        "capture-1.png": "69643E86845B2D09A1ED50DF5D8CFFD2927EE5BEAB086A659C23F891DE6D6FDF",
-        "capture-1-gray.png": "F3DEB459526772E6D8CF3B55E09BA2BA655F6A4AF660FB321F8CC2D5B0466712",
-        "capture.json": "59AB8A694F6E367A8C53A55383EF84605973AB4E12D5EF7166374BA0A765562F",
-        "build.json": "39C0D5CC77CD1D7D41F1688C3137B9FD3D0391C2B8B41546BD8247B1B0E5A01C",
-        "validation.json": "38A3E25C14976BEE3BF1EEB70A3EA7082992D9B965D9DF0989E9DEDE483E5D47"
+        "fish.blend": "B6814E9F51419FCEF4026031146E174E706FB50ED4463A621C03A7336C1BED9F",
+        "fish.glb": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
+        "fish-blender.png": "7E1E0AB1599E6DF62AE52D78159A395037AC00438E9256B36CB8E920BA8B3F2E",
+        "capture-1.png": "141B293E34E50F2832387644A1803B4D828FB4BA45276F9A18C15043C75CB06D",
+        "capture-1-gray.png": "345EC876DB5AC198E0F19321809CB5B9CEFD02C32A47E8C016FA806C772607DC",
+        "capture.json": "2C45B1C7CBD4F211ADE2B01A26F1C742C800581EBB2EAE1C8BF77EB45FD43C26",
+        "build.json": "33ABC9CA13E95ECDC97DB6FB949626BA129C55512D2C277434B463DBD6407082",
+        "validation.json": "9405AD4D7F2A6E4DD3F48FFBA33BB022A96713893C2B6A0E8F35B5CF0C6C0AA6"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original fish authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {

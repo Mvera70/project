@@ -27,6 +27,11 @@ try{
  }
  for(const t of [3.5,4,6,8])samples.push(await page.evaluate(t=>window.sample(t,false),t));
  writeFileSync(`${dir}/${id}-idle.png`,Buffer.from((await page.evaluate(()=>document.querySelector('canvas').toDataURL('image/png'))).split(',')[1],'base64'));
+ await page.getByRole('button',{name:'Walk',exact:true}).click();
+ await page.waitForTimeout(200);await page.getByRole('button',{name:'Pause',exact:true}).click();
+ const paused=await page.evaluate(()=>window.sample(0,false));await page.waitForTimeout(150);
+ const held=await page.evaluate(()=>window.sample(0,false));
+ if(paused.time<=8||held.time!==paused.time)throw Error('El visor no reproduce o no respeta pausa');
  if(process.argv.includes('--benchmark')){
    const runs=[];for(const count of [40,120])for(const animated of [false,true])runs.push(await page.evaluate(({count,animated})=>window.benchmark(count,animated),{count,animated}));
    writeFileSync(`${dir}/${id}-benchmark.json`,JSON.stringify({context:'Chromium headless, ANGLE SwiftShader, portátil; no FPS móvil',runs},null,2)+'\n');
@@ -35,5 +40,10 @@ try{
  await page.setViewportSize({width:1080,height:640});await page.evaluate(()=>Promise.all([...document.images].map(img=>img.decode())));await page.screenshot({path:`${dir}/${id}-walk-sheet.png`});
  if(errors.length||samples.some(s=>!s.finite))throw Error(JSON.stringify({errors,samples}));
  writeFileSync(`${dir}/${id}-motion.json`,JSON.stringify({id,errors,samples},null,2)+'\n');
+ if(process.argv.includes('--gallery')){
+   const labels={cow:'Vaca',pig:'Cerdo',hen:'Gallina',wolf:'Lobo',crow:'Cuervo',fish:'Pez'};
+   const html='<html lang="es"><meta charset="utf-8"><body style="margin:0;background:#b7c3b2;font:18px sans-serif"><div style="padding:12px">G-23 · Seis animales articulados · Escalas ajustadas para inspección</div>'+Object.entries(labels).map(([key,label])=>`<div style="display:inline-block;width:360px"><a href="${key}-preview.html"><img style="display:block;width:360px" src="data:image/png;base64,${readFileSync(`${dir}/${key}-walk-4.png`).toString('base64')}"><div style="padding:4px 12px">${label} · abrir visor</div></a></div>`).join('')+'</body></html>';
+   writeFileSync(`${dir}/animals-gallery.html`,html);await page.setContent(html);await page.setViewportSize({width:1080,height:710});await page.evaluate(()=>Promise.all([...document.images].map(img=>img.decode())));await page.screenshot({path:`${dir}/animals-overview.png`});
+ }
  console.log(id+': movimiento real de Fauna, 12 poses + reposo, sin errores.');
 }finally{await browser.close();}
