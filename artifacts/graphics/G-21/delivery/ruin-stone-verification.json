@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "ruin-stone",
+  "statistics": {
+    "objects": 5,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 956
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -2
+    ],
+    "max": [
+      2,
+      0.618333,
+      0
+    ],
+    "size": [
+      2,
+      0.618333,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T20-49-25-840Z-32812",
+    "directory": "artifacts/graphics/G-21/approved/3f50a13b45835153"
+  },
+  "sha256": "3F50A13B4583515320921EF13FC2AA62296969990D829563A89C9989A1CA4D66",
+  "otherPublishedFilesUnchanged": true
+}

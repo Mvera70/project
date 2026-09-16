@@ -116,6 +116,9 @@ en partida (semilla 43, año 60), listo para subir; siguen las dos ruinas.
 Cementerio subido en `fc22492`. Ruina de madera terminada y revisada en
 partida y banco. El render ajusta ambas ruinas a la parcela perdida; 90
 pruebas, typecheck y lint verdes. Lista para subir; queda la ruina de piedra.
+Ruina de madera subida en `e61c977`. Ruina de piedra terminada y revisada
+en Blender y renderer real con estado de prueba. Los cuatro encargados
+están terminados; entrega final validada para commit y subida.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
@@ -246,6 +249,9 @@ Cementerio G-21: 936 triángulos, tres materiales, 68 260 bytes; 86 pruebas,
 typecheck y lint verdes, captura natural bajo lluvia y banco de integración.
 Ruina de madera G-21: 792 triángulos, tres materiales, 57 084 bytes;
 90 pruebas, incluidas cuatro huellas de parcela sin deformar la altura.
+Ruina de piedra G-21: 956 triángulos, cuatro materiales, 70 436 bytes.
+Cierre de los cuatro: 90 pruebas, typecheck/lint verdes y huellas de todos
+los artefactos y archivos publicados verificadas.
 87 pruebas verdes para cada entrega; revisadas dentro del juego real.
 
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
@@ -304,6 +310,9 @@ Torre terminada; continuar con cementerio, ruina de madera y ruina de piedra,
 con commit y subida individual de cada modelo.
 Cementerio terminado; tras subirlo quedan las ruinas de madera y piedra.
 Ruina de madera terminada; publicar antes de continuar con la piedra.
+Los cuatro modelos restantes están terminados; entrega final validada para
+commit y subida. Sigue pendiente integrar `shed`; variantes de casas y adornos nuevos
+son ampliaciones aún no realizadas, no parte de estos cuatro.
 **Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
 
 **Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T20:44:20.005Z",
+  "generatedAt": "2026-09-16T20:49:51.903Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -163,7 +163,7 @@
     {
       "id": "ruin-stone",
       "file": "ruin-stone.glb",
-      "sha256": "38A7D566A14FD0BA8C3D3DBFB789F698ED4979EDDB815B05C4652BD30901F098",
+      "sha256": "3F50A13B4583515320921EF13FC2AA62296969990D829563A89C9989A1CA4D66",
       "motion": []
     },
     {

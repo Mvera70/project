@@ -4,7 +4,7 @@
   "scale": 0.3333333333333333,
   "mergeByMaterial": true,
   "palette": "../palette.json",
-  "house": "thatched",
+  "house": "tiled",
   "metadata": {
     "cellUnit": 1,
     "kind": "ruin-stone",
@@ -12,18 +12,28 @@
       2,
       2
     ],
-    "note": "G-10, lote de la ruina. Una casa de piedra caida: tres lienzos de muro de alturas muy distintas y dos monton de cascote. Desiguales a proposito, porque cuatro muros parejos serian un edificio en obras."
+    "note": "G-21: casa de piedra derrumbada, muros de hiladas rotas, hueco de entrada, cascotes, tejas caídas y viga. Huella canónica 2x2 adaptada a la parcela por el render."
   },
   "materials": [
     {
       "name": "stone",
       "role": "stone",
-      "roughness": 1.0
+      "roughness": 1
     },
     {
       "name": "soil",
       "role": "soil",
-      "roughness": 1.0
+      "roughness": 1
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 1
+    },
+    {
+      "name": "wood",
+      "role": "timberDark",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -40,112 +50,1275 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Ruin_Floor",
+      "name": "Floor",
       "location": [
-        3.0,
-        3.0,
-        0.05
+        3,
+        3,
+        0.035
       ],
       "dimensions": [
-        6.2,
-        6.2,
-        0.1
+        6,
+        6,
+        0.07
       ],
       "material": "soil",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Wall_N",
+      "name": "BackStone_0_0",
       "location": [
-        3.0,
-        0.5,
-        0.95
+        0.72,
+        5.28,
+        0.25
       ],
       "dimensions": [
-        6.0,
-        0.6,
-        1.9
+        0.65,
+        0.56,
+        0.33
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Wall_W",
+      "name": "BackStone_0_1",
       "location": [
-        0.5,
-        2.2,
-        0.65
+        0.7999999999999999,
+        5.28,
+        0.61
       ],
       "dimensions": [
-        0.6,
-        3.0,
-        1.3
+        0.65,
+        0.56,
+        0.33
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Wall_E",
+      "name": "BackStone_0_2",
       "location": [
-        5.5,
-        3.8,
-        0.4
+        0.72,
+        5.28,
+        0.97
       ],
       "dimensions": [
-        0.6,
-        2.4,
-        0.8
+        0.65,
+        0.56,
+        0.33
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Stub",
+      "name": "BackStone_0_3",
       "location": [
-        4.6,
-        5.5,
-        0.3
+        0.7999999999999999,
+        5.28,
+        1.33
       ],
       "dimensions": [
-        1.6,
-        0.6,
-        0.6
+        0.65,
+        0.56,
+        0.33
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Rubble_A",
+      "name": "BackStone_0_4",
       "location": [
-        2.4,
-        4.4,
-        0.18
+        0.72,
+        5.28,
+        1.69
       ],
       "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_1_0",
+      "location": [
+        1.41,
+        5.28,
+        0.25
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_1_1",
+      "location": [
+        1.49,
+        5.28,
+        0.61
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_1_2",
+      "location": [
+        1.41,
+        5.28,
+        0.97
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_1_3",
+      "location": [
+        1.49,
+        5.28,
+        1.33
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_1_4",
+      "location": [
+        1.41,
+        5.28,
+        1.69
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_2_0",
+      "location": [
+        2.0999999999999996,
+        5.28,
+        0.25
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_2_1",
+      "location": [
+        2.1799999999999997,
+        5.28,
+        0.61
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_2_2",
+      "location": [
+        2.0999999999999996,
+        5.28,
+        0.97
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_2_3",
+      "location": [
+        2.1799999999999997,
+        5.28,
+        1.33
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_3_0",
+      "location": [
+        2.79,
+        5.28,
+        0.25
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_3_1",
+      "location": [
+        2.87,
+        5.28,
+        0.61
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_3_2",
+      "location": [
+        2.79,
+        5.28,
+        0.97
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_4_0",
+      "location": [
+        3.4799999999999995,
+        5.28,
+        0.25
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_4_1",
+      "location": [
+        3.5599999999999996,
+        5.28,
+        0.61
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_5_0",
+      "location": [
+        4.17,
+        5.28,
+        0.25
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_5_1",
+      "location": [
+        4.25,
+        5.28,
+        0.61
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackStone_6_0",
+      "location": [
+        4.859999999999999,
+        5.28,
+        0.25
+      ],
+      "dimensions": [
+        0.65,
+        0.56,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_0_0",
+      "location": [
+        0.68,
+        0.93,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_1_0",
+      "location": [
+        0.68,
+        1.62,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_1_1",
+      "location": [
+        0.68,
+        1.62,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_2_0",
+      "location": [
+        0.68,
+        2.31,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_2_1",
+      "location": [
+        0.68,
+        2.31,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_3_0",
+      "location": [
+        0.68,
+        3,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_3_1",
+      "location": [
+        0.68,
+        3,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_3_2",
+      "location": [
+        0.68,
+        3,
+        0.97
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_4_0",
+      "location": [
+        0.68,
+        3.69,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_4_1",
+      "location": [
+        0.68,
+        3.69,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_4_2",
+      "location": [
+        0.68,
+        3.69,
+        0.97
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_4_3",
+      "location": [
+        0.68,
+        3.69,
+        1.33
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_5_0",
+      "location": [
+        0.68,
+        4.38,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_5_1",
+      "location": [
+        0.68,
+        4.38,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_5_2",
+      "location": [
+        0.68,
+        4.38,
+        0.97
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftStone_5_3",
+      "location": [
+        0.68,
+        4.38,
+        1.33
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RightStone_0_0",
+      "location": [
+        5.25,
+        3.6,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RightStone_1_0",
+      "location": [
+        5.25,
+        4.29,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RightStone_1_1",
+      "location": [
+        5.25,
+        4.29,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RightStone_2_0",
+      "location": [
+        5.25,
+        4.98,
+        0.25
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "RightStone_2_1",
+      "location": [
+        5.25,
+        4.98,
+        0.61
+      ],
+      "dimensions": [
+        0.56,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontStub_0",
+      "location": [
         1.1,
-        0.9,
-        0.36
+        0.68,
+        0.24
+      ],
+      "dimensions": [
+        0.66,
+        0.56,
+        0.34
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Rubble_B",
+      "name": "FrontStub_1",
       "location": [
-        4.0,
-        2.0,
-        0.14
+        1.8,
+        0.68,
+        0.24
       ],
       "dimensions": [
-        0.8,
-        0.8,
-        0.28
+        0.66,
+        0.56,
+        0.34
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontStub_2",
+      "location": [
+        4.2,
+        0.68,
+        0.24
+      ],
+      "dimensions": [
+        0.66,
+        0.56,
+        0.34
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontStub_3",
+      "location": [
+        4.9,
+        0.68,
+        0.24
+      ],
+      "dimensions": [
+        0.66,
+        0.56,
+        0.34
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Threshold",
+      "location": [
+        3,
+        0.68,
+        0.1
+      ],
+      "dimensions": [
+        1.42,
+        0.62,
+        0.12
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_0",
+      "location": [
+        1.16,
+        1.34,
+        0.16
+      ],
+      "radius": 0.19,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_1",
+      "location": [
+        2.32,
+        1.34,
+        0.16
+      ],
+      "radius": 0.26,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        31
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_2",
+      "location": [
+        3.1799999999999997,
+        1.34,
+        0.16
+      ],
+      "radius": 0.33,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        62
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_3",
+      "location": [
+        4.340000000000001,
+        1.34,
+        0.16
+      ],
+      "radius": 0.19,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        93
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_4",
+      "location": [
+        1.16,
+        2.25,
+        0.16
+      ],
+      "radius": 0.26,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        124
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_5",
+      "location": [
+        2.32,
+        2.25,
+        0.16
+      ],
+      "radius": 0.33,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        155
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_6",
+      "location": [
+        3.1799999999999997,
+        2.25,
+        0.16
+      ],
+      "radius": 0.19,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        186
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_7",
+      "location": [
+        4.340000000000001,
+        2.25,
+        0.16
+      ],
+      "radius": 0.26,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        217
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_8",
+      "location": [
+        1.16,
+        3.16,
+        0.16
+      ],
+      "radius": 0.33,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        248
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_9",
+      "location": [
+        2.32,
+        3.16,
+        0.16
+      ],
+      "radius": 0.19,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        279
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_10",
+      "location": [
+        3.1799999999999997,
+        3.16,
+        0.16
+      ],
+      "radius": 0.26,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        310
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_11",
+      "location": [
+        4.340000000000001,
+        3.16,
+        0.16
+      ],
+      "radius": 0.33,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        341
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_12",
+      "location": [
+        1.16,
+        4.07,
+        0.16
+      ],
+      "radius": 0.19,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        372
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Rubble_13",
+      "location": [
+        2.32,
+        4.07,
+        0.16
+      ],
+      "radius": 0.26,
+      "depth": 0.22,
+      "vertices": 5,
+      "rotationDegrees": [
+        0,
+        0,
+        403
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_0",
+      "location": [
+        1.7,
+        1.75,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_1",
+      "location": [
+        2.37,
+        1.75,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        27
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_2",
+      "location": [
+        3.04,
+        1.75,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        54
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_3",
+      "location": [
+        3.71,
+        1.75,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        81
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_4",
+      "location": [
+        1.7,
+        2.6,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        108
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_5",
+      "location": [
+        2.37,
+        2.6,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        135
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_6",
+      "location": [
+        3.04,
+        2.6,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        162
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_7",
+      "location": [
+        3.71,
+        2.6,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        189
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_8",
+      "location": [
+        1.7,
+        3.45,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        216
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "TileShard_9",
+      "location": [
+        2.37,
+        3.45,
+        0.125
+      ],
+      "radius": 0.26,
+      "depth": 0.05,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        12,
+        243
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FallenRafter",
+      "location": [
+        3.18,
+        3.3,
+        0.32
+      ],
+      "radius": 0.13,
+      "depth": 3.7,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        86,
+        34
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BrokenLintel",
+      "location": [
+        3.7,
+        4.22,
+        0.29
+      ],
+      "dimensions": [
+        1.5,
+        0.36,
+        0.29
       ],
       "material": "stone",
       "parent": "Root"
@@ -154,19 +1327,19 @@
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 900,
+    "height": 800,
     "cameraLocation": [
-      8.0,
-      -10.0,
-      6.4
+      3,
+      -2.7,
+      2.25
     ],
     "cameraTarget": [
-      0,
-      0,
-      0.9
+      1,
+      1,
+      0.23
     ],
-    "orthoScale": 11.2,
+    "orthoScale": 2.85,
     "worldRole": "sky"
   }
 }

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "ruin-stone",
+  "runId": "2026-09-16T20-49-25-840Z-32812",
+  "recipe": "art/recipes/ruin-stone/ruin-stone.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11623,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/candidate/ruin-stone.blend",
+      "bytes": 106701,
+      "sha256": "37D1ABD60F0FDBB84F86E81B884035F694726AD1ED7364858286389A5C5EA568"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/candidate/ruin-stone.glb",
+      "bytes": 70436,
+      "sha256": "3F50A13B4583515320921EF13FC2AA62296969990D829563A89C9989A1CA4D66"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/candidate/ruin-stone-blender.png",
+      "bytes": 564973,
+      "sha256": "0D8B31D92EE57B3ADD4D1F5BC33F9147E080BE6A5F7CFDAEB6449FD15C8D296C"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/blender.log",
+      "bytes": 1389,
+      "sha256": "6B31751D51236E3ABF9C3EBC6CC11D0A02F162C6F5F275475E8E2B0334712A1C"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/temporary/resolved-recipe.json",
+      "bytes": 28597,
+      "sha256": "73B54801BEC774ABB04D1D0715313BCB46DAB300840318D395D146E19794C807"
+    }
+  }
+}

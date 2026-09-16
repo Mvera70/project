@@ -1,0 +1,18 @@
+
+ RUN  v2.1.9 D:/DESARROLLO/PROYECTOS/VALLEY/project
+
+ ✓ tests/fast/graphics-defences.test.ts (3 tests) 64ms
+ ✓ tests/fast/graphics-ruins.test.ts (4 tests) 93ms
+ ✓ tests/fast/graphics-effects.test.ts (40 tests) 1439ms
+   ✓ G-08 · las estaciones > el valle cambia de color cuatro veces al año 363ms
+   ✓ IA-5 · el lobo tiene una sola fuente en 3D > la fórmula vieja ya no pone lobos en la escena 3D, aunque siga dándolos para Canvas 369ms
+ ✓ tests/fast/graphics-world.test.ts (43 tests) 2092ms
+   ✓ G-06 · el plan de escena > planificar no escribe en el estado ni consume una tirada 361ms
+   ✓ G-06 · el plan de escena > construir añade una casa y nada más 333ms
+   ✓ G-06 · el suelo > un camino muy pisado deja rodada 310ms
+
+ Test Files  4 passed (4)
+      Tests  90 passed (90)
+   Start at  22:49:55
+   Duration  2.91s (transform 538ms, setup 0ms, collect 1.75s, tests 3.69s, environment 1ms, prepare 294ms)
+

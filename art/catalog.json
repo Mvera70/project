@@ -1414,59 +1414,61 @@
     },
     {
       "id": "ruin-stone",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/ruin-stone/ruin-stone.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-25-31-230Z-52400",
-        "directory": "artifacts/graphics/G-10/approved/38a7d566a14fd0ba"
+        "runId": "2026-09-16T20-49-25-840Z-32812",
+        "directory": "artifacts/graphics/G-21/approved/3f50a13b45835153"
       },
       "bounds": {
         "min": [
-          -0.033333,
           0,
-          -2.033333
+          0,
+          -2
         ],
         "max": [
-          2.033333,
-          0.633333,
-          0.033333
+          2,
+          0.618333,
+          0
         ],
         "size": [
-          2.066667,
-          0.633333,
-          2.066667
+          2,
+          0.618333,
+          2
         ]
       },
-      "recipeSha256": "887EE871609093412AD1A462A80E742B990CECD1B8495F275AE11FF5D0D0A058",
+      "recipeSha256": "1A7B1094F3927BEA5E121103D3AD7F3C3F710C0B43FE60BB820FC9FC15680838",
       "materials": [
         "stone",
-        "soil"
+        "soil",
+        "roof",
+        "wood"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 84
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 956
       },
       "hashes": {
-        "ruin-stone.blend": "066F1867EB466AB27A9A4061E9E66FC1328DF446178CC63B92F60FBF91851B11",
-        "ruin-stone.glb": "38A7D566A14FD0BA8C3D3DBFB789F698ED4979EDDB815B05C4652BD30901F098",
-        "ruin-stone-blender.png": "EF3BBE2E7DBA96B82DF6AEC31FCA786F3F2D1241ADDB64BCF6EC3509E5C4EF56",
-        "capture-1.png": "A1987813A79676997B33B1E2C0CF293E591C6DC9CD7278A9A5AC19C90E3C83AA",
-        "capture-1-gray.png": "0BD4C2C0BEC166EE515AF0EE34C39268F2E240D67C01A33424F22EDD1E0AAB5D",
-        "capture.json": "A0A262B56FD369634FF5623D4B231E4D6CDD9A2D14162240FEBA8A32860CCB44",
-        "build.json": "7C1BDCDFE69B5D016B93EABC6B5EA9C679000A64138B3AE0A63C9DFF69707BD6",
-        "validation.json": "7A7D71987D0881A24AA984C695A09897355F4C44EA9EBFA28FEBD674E9EA9077"
+        "ruin-stone.blend": "37D1ABD60F0FDBB84F86E81B884035F694726AD1ED7364858286389A5C5EA568",
+        "ruin-stone.glb": "3F50A13B4583515320921EF13FC2AA62296969990D829563A89C9989A1CA4D66",
+        "ruin-stone-blender.png": "0D8B31D92EE57B3ADD4D1F5BC33F9147E080BE6A5F7CFDAEB6449FD15C8D296C",
+        "capture-1.png": "1C26DEB5AC3C168373F26E084E772987849784897FCEB462368FF3999DDDE838",
+        "capture-1-gray.png": "263692D5A7D6B756261B80CB73822F2EBBD3AB1BFFBE946D959296B2A5BE1D6A",
+        "capture.json": "0D74095CB5275491B2D72B5132C8ECE127F43550546693D865F7103256CAF119",
+        "build.json": "FCF698C3285F7FF223A1F5FDC08FB7908A3EFFDC8B5B3F6082DC07B84DD4B19A",
+        "validation.json": "DEF85BC34EB6A054C01A1BD5D55FC538930D3D9FCF315656DE0E8E7FD931AF84"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original ruin-stone authored for The Valley G-10",
+        "source": "Original G-21: ruina de piedra con hiladas rotas, cascote y tejas caídas.",
         "license": "Project original"
       }
     },
