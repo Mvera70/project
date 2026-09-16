@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T17:47:15.841Z",
+  "generatedAt": "2026-09-16T17:54:13.302Z",
   "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
@@ -91,7 +91,7 @@
     {
       "id": "chapel",
       "file": "chapel.glb",
-      "sha256": "BE38606B095C0FF6A1259C42C627DF450D16C99717E1C0D400BA72638DA61059",
+      "sha256": "CE20D06C0E4E32FCC1BC43F3AB95B9EC4E627EA6E10780B9CC386CAFC43B2398",
       "motion": []
     },
     {

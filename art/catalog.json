@@ -705,60 +705,61 @@
     },
     {
       "id": "chapel",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/chapel/chapel.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-04-38-716Z-45296",
-        "directory": "artifacts/graphics/G-10/approved/be38606b095c0ff6"
+        "runId": "2026-09-16T17-53-54-519Z-50956",
+        "directory": "artifacts/graphics/G-21/approved/ce20d06c0e4e32fc"
       },
       "bounds": {
         "min": [
-          0.2,
+          0.183333,
           0,
           -2
         ],
         "max": [
-          1.8,
+          1.816667,
           2.1,
           0
         ],
         "size": [
-          1.6,
+          1.633333,
           2.1,
           2
         ]
       },
-      "recipeSha256": "B0C2421A7416763E1EC185CE6F3CF29CD47742D219C50B3C14F8AB4E8A74E2E2",
+      "recipeSha256": "CCC8D5C116E5FC4A5C17B1225BE3FE1F08B755C7338D77CDDB895FBD7879C8F3",
       "materials": [
         "stone",
         "roof",
-        "wood"
+        "wood",
+        "dark"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 56
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 776
       },
       "hashes": {
-        "chapel.blend": "B7EE8C05EC5B80256551A751153D1DDAEFC6610224BB21BA55E8B21E88D49441",
-        "chapel.glb": "BE38606B095C0FF6A1259C42C627DF450D16C99717E1C0D400BA72638DA61059",
-        "chapel-blender.png": "E94EA8DA02369722EC8CA17823CEF50E245E0FB7025EC400DA90048EC05E031D",
-        "capture-1.png": "E2C21AE08A4E7F93C2FBB9E02431BC63AD669052D33A278092411D476BCD8A86",
-        "capture-1-gray.png": "A74D9A09C47F7692A530B1122A3180712B756BEA6D1CF4CA1F6CBC82C6829DD1",
-        "capture.json": "2CCA037A4C76946E9EDC61C1400792CCD0FD07337ADE5822E5F17269F9A4CA71",
-        "build.json": "2BB3749D875BE7F8D359A56D6401F65661F487FE38E3C149785E68B283085ABC",
-        "validation.json": "B3F10328D9EFA9B8FF9076A2A7DB64CCB030FDE495A406A93578FA2818005099"
+        "chapel.blend": "9AA3C2F942F32BCB22E6515FB74F60E31997B6F5A4CFC33498C1F3E446890ADD",
+        "chapel.glb": "CE20D06C0E4E32FCC1BC43F3AB95B9EC4E627EA6E10780B9CC386CAFC43B2398",
+        "chapel-blender.png": "F8D4A41E6717212F6BA85975F0A3743547204C37AB79151C7954A327066C8004",
+        "capture-1.png": "0D628101C66287D07A6967F9E9F3E759DC6792EAECEE1ECB9F75CE5B2FF20D88",
+        "capture-1-gray.png": "FC7E84D9E02261352E7D16077FCB72F1252164E19F7AF4449413B104BB94637B",
+        "capture.json": "EAAB20E36AB884C1DC6B70210650E117FD1A5394568B51D528F995A3F1B3E429",
+        "build.json": "A70FAC8B5E6482BB7A5C680433521953D109F05611CC70BB70507AD6A6F24535",
+        "validation.json": "4510FA8D2F1FA888083FB501E12A57697A4920A30C4E318690693AC30812EF90"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original chapel authored for The Valley G-10",
+        "source": "Original G-21: capilla con espadaña, campana, contrafuertes y portada de piedra.",
         "license": "Project original"
       }
     },
