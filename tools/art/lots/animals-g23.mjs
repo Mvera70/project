@@ -43,6 +43,10 @@ if (['cow','pig','wolf'].includes(id)) {
   bone('head',[hx+.11,0,hz+.08],'neck');
   piece('Head',[hx,0,hz],[pig?.37:.36,width*.56,pig?.31:.39],cow?'light':'coat','head',.06);
   piece('Muzzle',[hx-.2,0,hz-.09],[pig?.14:.27,width*.53,.19],pig?'accent':cow?'accent':'light','head',.04);
+  if(id==='wolf'){
+    piece('Nose',[hx-.34,0,hz-.065],[.065,.18,.115],'accent','head',.018);
+    piece('Mane',[-.3,0,hip+h*.97],[.42,width*.8,.12],'accent','body',.04);
+  }
   for(const side of [-1,1]) {
     piece('Eye_'+(side<0?'L':'R'),[hx-.075,side*width*.287,hz+.08],[.065,.018,.052],'dark','head',.009);
     piece('Nostril_'+(side<0?'L':'R'),[hx-(pig?.276:.34),side*width*.135,hz-.07],[.012,.043,.035],'dark','head',.006);

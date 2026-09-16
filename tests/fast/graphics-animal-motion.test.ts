@@ -32,6 +32,25 @@ describe('G-23 · animales publicados, articulados en el camino vivo',()=>{
     }
     mixer.stopAllAction();mixer.uncacheRoot(object);lib.dispose();
   });
+  it.each(animated.filter(a=>a.id!=='fish').map(a=>a.id))('%s: cada pata alterna apoyo y elevación sin patinar todo el ciclo',async id=>{
+    const lib=await library(id),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
+    const feet=new Map<string,Vector3[]>();
+    for(let frame=0;frame<=300;frame++){
+      fauna.paint([{id:71,kind:id as AnimalKind,x:-frame*.0015,y:0}],frame/60);
+      fauna.group.updateMatrixWorld(true);
+      if(frame<60)continue;
+      fauna.group.traverse(n=>{if(n instanceof Bone&&n.name.endsWith('Foot')){
+        const samples=feet.get(n.name)??[];samples.push(n.getWorldPosition(new Vector3()));feet.set(n.name,samples);
+      }});
+    }
+    expect(feet.size).toBeGreaterThanOrEqual(2);
+    for(const samples of feet.values()){
+      const heights=samples.map(p=>p.y);expect(Math.max(...heights)-Math.min(...heights)).toBeGreaterThan(.003);
+      let planted=0;for(let i=1;i<samples.length;i++)if(Math.abs(samples[i]!.x-samples[i-1]!.x)<.0015*.3)planted++;
+      expect(planted/samples.length).toBeGreaterThan(.2);
+    }
+    fauna.dispose();lib.dispose();
+  });
   it('la marcha sigue la distancia, respeta la pausa y conserva el cuerpo entre fotogramas',async()=>{
     const lib=await library('cow'),fauna=new Fauna(k=>lib.instance(k),k=>lib.get(k));
     const at=(x:number,y:number,t:number)=>fauna.paint([{id:12,kind:'cow',x,y}],t);

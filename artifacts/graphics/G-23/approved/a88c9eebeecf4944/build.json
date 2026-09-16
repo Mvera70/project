@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "wolf",
+  "runId": "2026-09-16T21-18-22-160Z-50676",
+  "recipe": "art/recipes/wolf/wolf.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 15517,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/candidate/wolf.blend",
+      "bytes": 144031,
+      "sha256": "993222FD14EA12642FDB4E60C5065354B42FCB340725EBC345008D0E9E3F7FA9"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/candidate/wolf.glb",
+      "bytes": 437420,
+      "sha256": "A88C9EEBEECF49441B0E5AC427EABB0A67C6D0D6567A8E59FECC48720682BEF8"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/candidate/wolf-blender.png",
+      "bytes": 193418,
+      "sha256": "450CCAE09EB1B7D188B2109703E74F5F15D5B10D53FBE30F96F7AD416E21CFFC"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/blender.log",
+      "bytes": 1487,
+      "sha256": "776C4ADA47EB2DF34C197D8A35684CFB6F5CBA3B4B6ACEE7AD63C412224AE813"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/temporary/resolved-recipe.json",
+      "bytes": 217062,
+      "sha256": "D1FC8597D0CD036ABD00C443332DD9D5CE84AB675B9853C0B3BC124EA9820A0A"
+    }
+  }
+}

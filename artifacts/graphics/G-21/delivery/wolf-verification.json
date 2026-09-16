@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "wolf",
+  "statistics": {
+    "objects": 24,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 2828
+  },
+  "bounds": {
+    "min": [
+      -0.408833,
+      0,
+      -0.075
+    ],
+    "max": [
+      0.246267,
+      0.429067,
+      0.075
+    ],
+    "size": [
+      0.6551,
+      0.429067,
+      0.15
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T21-18-22-160Z-50676",
+    "directory": "artifacts/graphics/G-23/approved/a88c9eebeecf4944"
+  },
+  "sha256": "A88C9EEBEECF49441B0E5AC427EABB0A67C6D0D6567A8E59FECC48720682BEF8",
+  "otherPublishedFilesUnchanged": true
+}

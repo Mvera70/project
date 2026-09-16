@@ -69,6 +69,8 @@ Vaca subida en `df0ac66`. Cerdo terminado y revisado en movimiento; preparado
 para entrega individual. Siguen gallina, lobo, cuervo y pez.
 Cerdo subido en `aec6c38`. Gallina terminada y revisada; 45 pruebas, typecheck
 y lint verdes, entrega individual preparada. Siguen lobo, cuervo y pez.
+Gallina subida en `a48bb00`. Lobo terminado y revisado, con marcha sincronizada
+y apoyos comprobados; 50 pruebas, typecheck y lint verdes. Siguen cuervo y pez.
 Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
 verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
 subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](graphics-rounds/G-23.md).
@@ -234,6 +236,7 @@ sin nueva medida de FPS móvil.
 Cerdo: 2808 triángulos, cuatro materiales y 18 huesos; 43 pruebas pertinentes.
 Gallina: 874 triángulos, cuatro materiales y 12 huesos; 45 pruebas. Banco de
 40 cerdos: CPU/envío mediana 1,6 ms, p95 3,8 ms; no es una medida de FPS móvil.
+Lobo: 2828 triángulos, cuatro materiales, 18 huesos. 50 pruebas pertinentes.
 
 **Inventario del nuevo encargo de aldea:** 21 ids existentes en cuatro tandas;
 las variantes de vivienda y adornos nuevos se definirán con su integración.
@@ -316,7 +319,7 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-G-23: completar lobo, cuervo y pez con entrega individual.
+G-23: completar cuervo y pez con entrega individual.
 La articulación requiere esqueletos propios; medir coste conjunto al cerrar.
 
 **G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
