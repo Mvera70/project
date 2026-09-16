@@ -1,15 +1,24 @@
 ---
 name: calcar-iconos
-description: Cómo sacar un icono, un glifo o una silueta de un prototipo en PNG y dejarlo como SVG que se parezca de verdad al diseño. Úsala cuando haya que dibujar o corregir un icono de la interfaz, cuando un icono «no se parece» al prototipo, o cuando lleves más de dos intentos peleando con un `d=`. Cubre el calco automático, el dibujo a mano con una pieza repetida, las medidas que hay que tomar antes de dibujar y el bucle de comprobación.
+description: Cómo sacar un icono, un adorno o una viñeta de un prototipo en PNG y dejarlo en la interfaz de modo que se parezca de verdad al diseño. Úsala cuando haya que dibujar o corregir un icono, cuando una pantalla «tenga la estructura pero la estética sea mala», cuando algo «no se parece» al prototipo, o cuando lleves más de dos intentos peleando con un `d=`. Cubre el calco de línea, el recorte de pintura, el dibujo a mano con una pieza repetida, las medidas previas y el bucle de comprobación.
 ---
 
-# Calcar iconos de los prototipos
+# Calcar del prototipo: iconos y adornos
 
 Esta skill sale de una tanda que costó **nueve versiones dibujadas a mano de dos
 iconos** —la espiga del grano y la pila de leña de la cabecera— con el dueño del
 diseño diciendo «siguen sin estar bien» cuatro veces. Las dos que valieron no se
-dibujaron: **se calcaron del prototipo, y con eso salieron a la primera.** El
-orden de abajo importa, porque la regla 1 es la que ahorra las otras.
+dibujaron: **se calcaron del prototipo, y con eso salieron a la primera.**
+
+Y volvió a pasar en la página de la crónica, que es la prueba de que no era
+mala suerte con dos iconos: se entregó la estructura entera con los colores
+correctos y el veredicto fue «la estructura está más o menos conseguida pero la
+estética sigue siendo muy mala». Lo que le faltaba —capitular ilustrado,
+palmeta, rombos, orla de hojas, viñeta a pluma— estaba pintado en el prototipo
+desde el principio. **Un esqueleto con la paleta correcta no se parece al
+diseño; el adorno no es el acabado, es la mitad del dibujo.**
+
+El orden de abajo importa, porque la regla 1 es la que ahorra las otras.
 
 ---
 
@@ -28,6 +37,40 @@ Devuelve un `d=` de 24 × 24 listo para meter en un `<symbol>`. Por dentro:
 umbral de Otsu, seguimiento del borde de píxel, Ramer–Douglas–Peucker para
 quitar la escalera y dos pasadas de Chaikin para redondear. No necesita numpy;
 con Pillow basta.
+
+**Pero antes de calcar, decide qué clase de pieza es. Hay dos herramientas y
+usar la que no toca es el error siguiente:**
+
+| La pieza es… | Herramienta | Por qué |
+|---|---|---|
+| Línea o silueta: un icono, una palmeta, un rombo, una rama de orla | `tools/ui/trace-glyph.py` | Sale un `<path>` que toma el color de quien lo usa y escala sin límite |
+| Pintura con medios tonos: un capitular ilustrado, una viñeta a pluma, un sello | `tools/ui/cut-art.py` | Calcarla da un borrón negro: no hay una silueta que sacar |
+
+Lo aprendí calcando la página de la crónica: la palmeta y el rombo salieron
+perfectos, y el capitular ilustrado —oro y filigrana sobre un cuadrado rojo—
+salió como una mancha con jirones, por mucho que le moviera el corte. Era
+pintura, no línea.
+
+`cut-art.py` tiene dos modos, y el segundo es el que importa:
+
+```bash
+python tools/ui/cut-art.py plain <png> <x0> <y0> <x1> <y1> <salida> [ancho]
+python tools/ui/cut-art.py wash  <png> <x0> <y0> <x1> <y1> <salida> [ancho]
+```
+
+- `plain` recorta y reescala: para una pieza que trae su propio fondo, como el
+  capitular con su cuadrado rojo.
+- `wash` es para **tinta sobre papel**, y hace lo único que funciona: tira el
+  fondo y **guarda el dibujo como alfa**, tiñéndolo de la tinta del juego. El
+  papel del prototipo no es el papel del juego, así que recortar a lo bruto
+  deja un rectángulo de otro tono encima de la página; con el alfa se compone
+  sobre cualquier papel y conserva los medios tonos del aguado.
+
+**Y un adorno calcado que va como fondo de CSS no puede usar `currentColor`:**
+dentro de una `data:` URI no hay color que heredar. Hay que sustituirlo por un
+hex literal —muestreado del prototipo, no elegido a ojo— y codificar el SVG con
+`encodeURIComponent`, porque un `#` sin escapar dentro de una `url()` rompe la
+declaración entera y en silencio.
 
 Tres cosas que hay que saber para que salga bien:
 
@@ -164,7 +207,10 @@ la forma cómoda de hacerlo.
 
 | Qué | Dónde |
 |---|---|
-| El calcador | `tools/ui/trace-glyph.py` |
+| El calcador de línea | `tools/ui/trace-glyph.py` |
+| El recortador de pintura | `tools/ui/cut-art.py` |
+| Los adornos de la crónica | `tools/ui/chronicle-ornaments.py` → `src/ui/redesign/chronicle-ornaments.ts` |
+| Las piezas pintadas | `public/ui/art/` |
 | Los recuadros y los cortes de cada calco | `tools/ui/icons/regenerar-calcos.py` |
 | Las variantes dibujadas a mano, por si hay que volver | `tools/ui/icons/variantes.py` |
 | El que escribe el sprite y su copia de una vez | `tools/ui/icons/aplicar.py` |

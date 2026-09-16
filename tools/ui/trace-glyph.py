@@ -172,7 +172,7 @@ def chaikin(points, rounds=2):
 # ------------------------------------------------------------------- el path
 
 def trace(png, box, upscale=3, viewbox=24.0, margin=1.0, eps=1.6, keep=0.004,
-          bias=0):
+          bias=0, invert=False, aspect=False):
     im = Image.open(png).convert('L').crop(box)
     im = im.resize((im.width * upscale, im.height * upscale), Image.LANCZOS)
     w, h = im.size
@@ -181,7 +181,10 @@ def trace(png, box, upscale=3, viewbox=24.0, margin=1.0, eps=1.6, keep=0.004,
     # juntas claras entre troncos se abren**: con el corte de Otsu a secas la
     # pila calcada salia como un solo bulto con agujeros.
     cut = otsu(im.histogram()) + bias
-    ink = [v < cut for v in px]
+    # `invert`: la pieza es **clara sobre oscuro**, no tinta sobre papel. Hace
+    # falta para el oro del capitular de la cronica, que es lo claro dentro de
+    # un cuadrado rojo; sin esto se calca el rojo y sale un cuadrado.
+    ink = [v > cut for v in px] if invert else [v < cut for v in px]
 
     loops = loops_of(ink, w, h)
     if not loops:
@@ -194,10 +197,19 @@ def trace(png, box, upscale=3, viewbox=24.0, margin=1.0, eps=1.6, keep=0.004,
 
     xs = [p[0] for loop in smoothed for p in loop]
     ys = [p[1] for loop in smoothed for p in loop]
-    span = max(max(xs) - min(xs), max(ys) - min(ys)) or 1.0
+    # `aspect`: en vez de meter la pieza en un cuadrado, se devuelve un
+    # `viewBox` con la proporcion real. Un icono quiere el cuadrado; una rama
+    # de borde o una palmeta, no -- deformarlas es peor que no ponerlas.
+    wide, tall = max(xs) - min(xs), max(ys) - min(ys)
+    span = max(wide, tall) or 1.0
     scale = (viewbox - 2 * margin) / span
-    off_x = margin + (viewbox - 2 * margin - (max(xs) - min(xs)) * scale) / 2
-    off_y = margin + (viewbox - 2 * margin - (max(ys) - min(ys)) * scale) / 2
+    if aspect:
+        off_x = off_y = margin
+        view = (wide * scale + 2 * margin, tall * scale + 2 * margin)
+    else:
+        off_x = margin + (viewbox - 2 * margin - wide * scale) / 2
+        off_y = margin + (viewbox - 2 * margin - tall * scale) / 2
+        view = (viewbox, viewbox)
 
     def place(p):
         return ((p[0] - min(xs)) * scale + off_x, (p[1] - min(ys)) * scale + off_y)
@@ -211,6 +223,8 @@ def trace(png, box, upscale=3, viewbox=24.0, margin=1.0, eps=1.6, keep=0.004,
         head = 'M%.2f %.2f' % pts[0]
         body = ''.join('L%.2f %.2f' % p for p in pts[1:])
         parts.append(head + body + 'Z')
+    if aspect:
+        return ''.join(parts), len(smoothed), view
     return ''.join(parts), len(smoothed)
 
 
