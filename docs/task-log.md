@@ -24,7 +24,7 @@ nadie va a encontrar.
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | nada. **UI-R2 a UI-R5 aterrizadas.** Lo siguiente: UI-R6 (validación, coordinador) | 
+| **En vuelo ahora** | nada. **UI-R0 a UI-R6 completas.** El rediseño de interfaz está cerrado | 
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | **G-18 entregado y verificado** (`9cc97af`: los doce aldeanos de Blender, sin tocar `src/`; pendiente de aprobación estética del dueño). **IA-8**: el descarte de la plaza que falló, el plazo propio del viaje (`arriveBy`) y el labrador a su puesto (fuera del campo 6,5 %, parados 0,08 %, giros 0,39 %). Antes: **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
@@ -136,7 +136,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | UI-R3 · crónica | **hecha** — migrada a `shell.content`, no roba el desplazamiento del lector | `ee2279d` |
 | UI-R4 · personas y fichas | **hecha** — un fallecido/emigrado deja de envejecer en su propia ficha; seguimiento honesto ("marca, no promete centrar") | `00f8ed7` |
 | UI-R5 · integración, decisiones y salida | **hecha** — `contentRouteFor` unificado, enlace crónica→ficha, la encrucijada gana a una bandeja abierta (fallo real encontrado) | `af8d7d0` |
-| UI-R6 · validación | pendiente | — |
+| UI-R6 · validación | **hecha** — 1215/1216 en la suite rápida, 128/130 en jornadas (sin novedad), manifiesto de instalación verde; tres hallazgos documentados sin perseguir más (offline tras redespliegue, picking en aldea de 83 edificios, factura de opinión con el reequilibrado del caos) | `ui-redesign/rounds/UI-R6.md` |
 
 ### Las fases nuevas, salidas de la lista de aldeanos (16 sep 2026)
 
