@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "villager-woodward",
+  "id": "villager-fisher",
   "scale": 0.3333333333333333,
   "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
   "mergeByMaterial": true,
@@ -13,7 +13,7 @@
       1,
       1
     ],
-    "note": "Guardabosques: capucha y capa corta verde oscuro, cinturón de cuero."
+    "note": "Pescador: camisa azul río, botas altas y cesto lateral; manos libres para la acción."
   },
   "materials": [
     {
@@ -23,12 +23,12 @@
     },
     {
       "name": "cloth",
-      "role": "forestGreen",
+      "role": "riverBlue",
       "roughness": 0.95
     },
     {
       "name": "cloth-accent",
-      "role": "timber",
+      "role": "grain",
       "roughness": 0.95
     },
     {
@@ -134,6 +134,74 @@
       "material": "skin",
       "parent": "Villager_Root",
       "bevel": 0.035
+    },
+    {
+      "type": "cube",
+      "name": "Villager_HairCap",
+      "location": [
+        0,
+        0.005,
+        1.905
+      ],
+      "dimensions": [
+        0.46,
+        0.41,
+        0.09
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0.012
+    },
+    {
+      "type": "cube",
+      "name": "Villager_HairBack",
+      "location": [
+        0,
+        0.175,
+        1.755
+      ],
+      "dimensions": [
+        0.45,
+        0.08,
+        0.25
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Fringe_L",
+      "location": [
+        -0.12,
+        -0.193,
+        1.86
+      ],
+      "dimensions": [
+        0.2,
+        0.045,
+        0.1
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Fringe_R",
+      "location": [
+        0.075,
+        -0.193,
+        1.89
+      ],
+      "dimensions": [
+        0.18,
+        0.045,
+        0.055
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
     },
     {
       "type": "cube",
@@ -277,12 +345,12 @@
       "location": [
         -0.15,
         -0.015,
-        0.2
+        0.3
       ],
       "dimensions": [
         0.22,
         0.26,
-        0.22
+        0.42
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -430,12 +498,12 @@
       "location": [
         0.15,
         -0.015,
-        0.2
+        0.3
       ],
       "dimensions": [
         0.22,
         0.26,
-        0.22
+        0.42
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -494,125 +562,35 @@
     },
     {
       "type": "cube",
-      "name": "Villager_HoodTop",
+      "name": "Villager_FishBasket",
       "location": [
-        0,
-        0.035,
-        1.91
+        -0.32,
+        0.05,
+        0.91
       ],
       "dimensions": [
-        0.51,
-        0.47,
-        0.08
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodBack",
-      "location": [
-        0,
-        0.21,
-        1.72
-      ],
-      "dimensions": [
-        0.51,
-        0.09,
-        0.35
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodSide_L",
-      "location": [
-        -0.24,
-        0.04,
-        1.72
-      ],
-      "dimensions": [
-        0.07,
-        0.39,
-        0.35
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodSide1",
-      "location": [
-        0.24,
-        0.04,
-        1.72
-      ],
-      "dimensions": [
-        0.07,
-        0.39,
-        0.35
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_CapeBack",
-      "location": [
-        0,
-        0.21,
-        1.08
-      ],
-      "dimensions": [
-        0.62,
-        0.085,
-        0.64
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0,
-      "rotationDegrees": [
-        -8,
-        0,
-        0
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Villager_CapeShoulders",
-      "location": [
-        0,
-        0.02,
-        1.405
-      ],
-      "dimensions": [
-        0.76,
-        0.43,
-        0.075
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_RangerBelt",
-      "location": [
-        0,
-        -0.01,
-        0.96
-      ],
-      "dimensions": [
-        0.57,
-        0.38,
-        0.09
+        0.26,
+        0.28,
+        0.27
       ],
       "material": "cloth-accent",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_BasketRim",
+      "location": [
+        -0.32,
+        0.05,
+        1.05
+      ],
+      "dimensions": [
+        0.29,
+        0.31,
+        0.045
+      ],
+      "material": "dark",
       "parent": "Villager_Root",
       "bevel": 0
     }
@@ -854,6 +832,10 @@
       "Villager_TunicHem": "hips",
       "Villager_Neck": "head",
       "Villager_Head": "head",
+      "Villager_HairCap": "head",
+      "Villager_HairBack": "head",
+      "Villager_Fringe_L": "head",
+      "Villager_Fringe_R": "head",
       "Villager_Nose": "head",
       "Villager_Ear_L": "head",
       "Villager_Eye_L": "head",
@@ -875,13 +857,8 @@
       "Villager_Foot_R": "foot.R",
       "Villager_Belt": "hips",
       "Villager_Buckle": "hips",
-      "Villager_HoodTop": "head",
-      "Villager_HoodBack": "head",
-      "Villager_HoodSide_L": "head",
-      "Villager_HoodSide1": "head",
-      "Villager_CapeBack": "spine",
-      "Villager_CapeShoulders": "spine",
-      "Villager_RangerBelt": "hips"
+      "Villager_FishBasket": "hips",
+      "Villager_BasketRim": "hips"
     },
     "gait": {
       "note": "Lo que la auditoria necesita para juzgar una marcha sin saber que esto es un humano: que huesos son pies, y que tercias forman una bisagra y hacia que lado dobla cada una. Un codo y una rodilla doblan en sentidos opuestos, y cada uno solo hacia el suyo.",

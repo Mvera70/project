@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "villager-woodward",
+  "id": "villager-stranger",
   "scale": 0.3333333333333333,
   "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
   "mergeByMaterial": true,
@@ -13,7 +13,7 @@
       1,
       1
     ],
-    "note": "Guardabosques: capucha y capa corta verde oscuro, cinturón de cuero."
+    "note": "Forastero: capucha y capa azul pizarra, color exclusivo, sin herramienta."
   },
   "materials": [
     {
@@ -23,12 +23,12 @@
     },
     {
       "name": "cloth",
-      "role": "forestGreen",
+      "role": "strangerSlate",
       "roughness": 0.95
     },
     {
       "name": "cloth-accent",
-      "role": "timber",
+      "role": "stone",
       "roughness": 0.95
     },
     {
@@ -595,23 +595,6 @@
         0.43,
         0.075
       ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_RangerBelt",
-      "location": [
-        0,
-        -0.01,
-        0.96
-      ],
-      "dimensions": [
-        0.57,
-        0.38,
-        0.09
-      ],
       "material": "cloth-accent",
       "parent": "Villager_Root",
       "bevel": 0
@@ -880,8 +863,7 @@
       "Villager_HoodSide_L": "head",
       "Villager_HoodSide1": "head",
       "Villager_CapeBack": "spine",
-      "Villager_CapeShoulders": "spine",
-      "Villager_RangerBelt": "hips"
+      "Villager_CapeShoulders": "spine"
     },
     "gait": {
       "note": "Lo que la auditoria necesita para juzgar una marcha sin saber que esto es un humano: que huesos son pies, y que tercias forman una bisagra y hacia que lado dobla cada una. Un codo y una rodilla doblan en sentidos opuestos, y cada uno solo hacia el suyo.",

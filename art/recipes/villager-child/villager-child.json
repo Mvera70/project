@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "villager-woodward",
+  "id": "villager-child",
   "scale": 0.3333333333333333,
   "scaleNote": "Una celda del mapa son unos tres metros: una casa ocupa dos por dos celdas y una casa mide seis metros de lado. La receta se escribe en metros y esto la lleva a celdas, que es la unidad de escena (D.4). Sin esto el aldeano medía dos celdas, tanto como el ancho de su casa.",
   "mergeByMaterial": true,
@@ -13,7 +13,7 @@
       1,
       1
     ],
-    "note": "Guardabosques: capucha y capa corta verde oscuro, cinturón de cuero."
+    "note": "Niño: cabeza mayor, brazos y piernas proporcionalmente cortos, túnica terracota sin herramientas; 0,65 celdas antes de statureAt."
   },
   "materials": [
     {
@@ -23,12 +23,12 @@
     },
     {
       "name": "cloth",
-      "role": "forestGreen",
+      "role": "clothAccent",
       "roughness": 0.95
     },
     {
       "name": "cloth-accent",
-      "role": "timber",
+      "role": "grain",
       "roughness": 0.95
     },
     {
@@ -50,18 +50,18 @@
     {
       "name": "hand_r",
       "location": [
-        0.44,
+        0.396,
         0,
-        0.66
+        0.6052631578947368
       ],
       "parent": "Villager_Root"
     },
     {
       "name": "hand_l",
       "location": [
-        -0.44,
+        -0.396,
         0,
-        0.66
+        0.6052631578947368
       ],
       "parent": "Villager_Root"
     }
@@ -73,12 +73,12 @@
       "location": [
         0,
         0,
-        1.17
+        1.0719298245614033
       ],
       "dimensions": [
-        0.52,
+        0.468,
         0.34,
-        0.55
+        0.5128070175438596
       ],
       "material": "cloth",
       "parent": "Villager_Root",
@@ -90,12 +90,12 @@
       "location": [
         0,
         0,
-        0.89
+        0.815
       ],
       "dimensions": [
-        0.55,
+        0.49500000000000005,
         0.35,
-        0.17
+        0.15999999999999992
       ],
       "material": "cloth",
       "parent": "Villager_Root",
@@ -107,12 +107,12 @@
       "location": [
         0,
         0,
-        1.48
+        1.3740222897669707
       ],
       "dimensions": [
-        0.18,
+        0.162,
         0.19,
-        0.16
+        0.1728064842958461
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -123,13 +123,13 @@
       "name": "Villager_Head",
       "location": [
         0,
-        -0.015,
-        1.715
+        -0.016800000000000002,
+        1.6550000000000002
       ],
       "dimensions": [
-        0.43,
-        0.38,
-        0.4
+        0.5246,
+        0.42560000000000003,
+        0.5021276595744679
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -137,16 +137,84 @@
     },
     {
       "type": "cube",
+      "name": "Villager_HairCap",
+      "location": [
+        0,
+        0.005600000000000001,
+        1.8935106382978724
+      ],
+      "dimensions": [
+        0.5612,
+        0.4592,
+        0.11297872340425519
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0.012
+    },
+    {
+      "type": "cube",
+      "name": "Villager_HairBack",
+      "location": [
+        0,
+        0.196,
+        1.7052127659574468
+      ],
+      "dimensions": [
+        0.549,
+        0.08960000000000001,
+        0.31382978723404253
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Fringe_L",
+      "location": [
+        -0.1464,
+        -0.21616000000000002,
+        1.837021276595745
+      ],
+      "dimensions": [
+        0.244,
+        0.0504,
+        0.12553191489361715
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Villager_Fringe_R",
+      "location": [
+        0.0915,
+        -0.21616000000000002,
+        1.8746808510638298
+      ],
+      "dimensions": [
+        0.2196,
+        0.0504,
+        0.06904255319148955
+      ],
+      "material": "dark",
+      "parent": "Villager_Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
       "name": "Villager_Nose",
       "location": [
         0,
-        -0.225,
-        1.7
+        -0.25200000000000006,
+        1.6361702127659576
       ],
       "dimensions": [
-        0.085,
-        0.095,
-        0.095
+        0.1037,
+        0.10640000000000001,
+        0.11925531914893628
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -156,14 +224,14 @@
       "type": "cube",
       "name": "Villager_Ear_L",
       "location": [
-        -0.232,
+        -0.28304,
         0,
-        1.71
+        1.6487234042553192
       ],
       "dimensions": [
-        0.065,
-        0.12,
-        0.11
+        0.0793,
+        0.13440000000000002,
+        0.13808510638297866
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -173,14 +241,14 @@
       "type": "cube",
       "name": "Villager_Eye_L",
       "location": [
-        -0.1,
-        -0.21,
-        1.755
+        -0.122,
+        -0.23520000000000002,
+        1.7052127659574468
       ],
       "dimensions": [
-        0.034,
-        0.012,
-        0.037
+        0.04148,
+        0.013440000000000002,
+        0.046446808510638204
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -190,14 +258,14 @@
       "type": "cube",
       "name": "Villager_UpperArm_L",
       "location": [
-        -0.34,
+        -0.30600000000000005,
         0,
-        1.24
+        1.1423809523809525
       ],
       "dimensions": [
-        0.2,
+        0.18000000000000002,
         0.26,
-        0.38
+        0.3447619047619048
       ],
       "material": "cloth",
       "parent": "Villager_Root",
@@ -207,14 +275,14 @@
       "type": "cube",
       "name": "Villager_Forearm_L",
       "location": [
-        -0.4,
+        -0.36000000000000004,
         0,
-        0.9
+        0.8284711779448621
       ],
       "dimensions": [
-        0.16,
+        0.14400000000000002,
         0.2,
-        0.34
+        0.32115288220551386
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -224,14 +292,14 @@
       "type": "cube",
       "name": "Villager_Hand_L",
       "location": [
-        -0.435,
+        -0.3915,
         -0.005,
-        0.69
+        0.6321052631578947
       ],
       "dimensions": [
-        0.18,
+        0.162,
         0.2,
-        0.17
+        0.15210526315789463
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -241,16 +309,16 @@
       "type": "cube",
       "name": "Villager_Thigh_L",
       "location": [
-        -0.15,
+        -0.135,
         0,
-        0.71
+        0.6513157894736841
       ],
       "dimensions": [
-        0.23,
+        0.20700000000000002,
         0.26,
-        0.43
+        0.3873684210526315
       ],
-      "material": "dark",
+      "material": "cloth-accent",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -258,16 +326,16 @@
       "type": "cube",
       "name": "Villager_Shin_L",
       "location": [
-        -0.15,
+        -0.135,
         0,
-        0.33
+        0.31
       ],
       "dimensions": [
-        0.2,
+        0.18000000000000002,
         0.23,
-        0.38
+        0.33999999999999997
       ],
-      "material": "dark",
+      "material": "cloth-accent",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -275,14 +343,14 @@
       "type": "cube",
       "name": "Villager_Boot_L",
       "location": [
-        -0.15,
+        -0.135,
         -0.015,
-        0.2
+        0.1910526315789474
       ],
       "dimensions": [
-        0.22,
+        0.198,
         0.26,
-        0.22
+        0.20210526315789473
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -292,14 +360,14 @@
       "type": "cube",
       "name": "Villager_Foot_L",
       "location": [
-        -0.15,
+        -0.135,
         -0.065,
-        0.075
+        0.07447368421052632
       ],
       "dimensions": [
-        0.23,
+        0.20700000000000002,
         0.36,
-        0.15
+        0.14894736842105263
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -309,14 +377,14 @@
       "type": "cube",
       "name": "Villager_Ear_R",
       "location": [
-        0.232,
+        0.28304,
         0,
-        1.71
+        1.6487234042553192
       ],
       "dimensions": [
-        0.065,
-        0.12,
-        0.11
+        0.0793,
+        0.13440000000000002,
+        0.13808510638297866
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -326,14 +394,14 @@
       "type": "cube",
       "name": "Villager_Eye_R",
       "location": [
-        0.1,
-        -0.21,
-        1.755
+        0.122,
+        -0.23520000000000002,
+        1.7052127659574468
       ],
       "dimensions": [
-        0.034,
-        0.012,
-        0.037
+        0.04148,
+        0.013440000000000002,
+        0.046446808510638204
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -343,14 +411,14 @@
       "type": "cube",
       "name": "Villager_UpperArm_R",
       "location": [
-        0.34,
+        0.30600000000000005,
         0,
-        1.24
+        1.1423809523809525
       ],
       "dimensions": [
-        0.2,
+        0.18000000000000002,
         0.26,
-        0.38
+        0.3447619047619048
       ],
       "material": "cloth",
       "parent": "Villager_Root",
@@ -360,14 +428,14 @@
       "type": "cube",
       "name": "Villager_Forearm_R",
       "location": [
-        0.4,
+        0.36000000000000004,
         0,
-        0.9
+        0.8284711779448621
       ],
       "dimensions": [
-        0.16,
+        0.14400000000000002,
         0.2,
-        0.34
+        0.32115288220551386
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -377,14 +445,14 @@
       "type": "cube",
       "name": "Villager_Hand_R",
       "location": [
-        0.435,
+        0.3915,
         -0.005,
-        0.69
+        0.6321052631578947
       ],
       "dimensions": [
-        0.18,
+        0.162,
         0.2,
-        0.17
+        0.15210526315789463
       ],
       "material": "skin",
       "parent": "Villager_Root",
@@ -394,16 +462,16 @@
       "type": "cube",
       "name": "Villager_Thigh_R",
       "location": [
-        0.15,
+        0.135,
         0,
-        0.71
+        0.6513157894736841
       ],
       "dimensions": [
-        0.23,
+        0.20700000000000002,
         0.26,
-        0.43
+        0.3873684210526315
       ],
-      "material": "dark",
+      "material": "cloth-accent",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -411,16 +479,16 @@
       "type": "cube",
       "name": "Villager_Shin_R",
       "location": [
-        0.15,
+        0.135,
         0,
-        0.33
+        0.31
       ],
       "dimensions": [
-        0.2,
+        0.18000000000000002,
         0.23,
-        0.38
+        0.33999999999999997
       ],
-      "material": "dark",
+      "material": "cloth-accent",
       "parent": "Villager_Root",
       "bevel": 0
     },
@@ -428,14 +496,14 @@
       "type": "cube",
       "name": "Villager_Boot_R",
       "location": [
-        0.15,
+        0.135,
         -0.015,
-        0.2
+        0.1910526315789474
       ],
       "dimensions": [
-        0.22,
+        0.198,
         0.26,
-        0.22
+        0.20210526315789473
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -445,14 +513,14 @@
       "type": "cube",
       "name": "Villager_Foot_R",
       "location": [
-        0.15,
+        0.135,
         -0.065,
-        0.075
+        0.07447368421052632
       ],
       "dimensions": [
-        0.23,
+        0.20700000000000002,
         0.36,
-        0.15
+        0.14894736842105263
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -464,12 +532,12 @@
       "location": [
         0,
         -0.005,
-        0.956
+        0.8759999999999999
       ],
       "dimensions": [
-        0.555,
+        0.49950000000000006,
         0.367,
-        0.066
+        0.06600000000000006
       ],
       "material": "dark",
       "parent": "Villager_Root",
@@ -481,138 +549,14 @@
       "location": [
         0,
         -0.201,
-        0.956
+        0.8759999999999999
       ],
       "dimensions": [
-        0.08,
+        0.07200000000000001,
         0.035,
-        0.063
+        0.06299999999999994
       ],
       "material": "skin",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodTop",
-      "location": [
-        0,
-        0.035,
-        1.91
-      ],
-      "dimensions": [
-        0.51,
-        0.47,
-        0.08
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodBack",
-      "location": [
-        0,
-        0.21,
-        1.72
-      ],
-      "dimensions": [
-        0.51,
-        0.09,
-        0.35
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodSide_L",
-      "location": [
-        -0.24,
-        0.04,
-        1.72
-      ],
-      "dimensions": [
-        0.07,
-        0.39,
-        0.35
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_HoodSide1",
-      "location": [
-        0.24,
-        0.04,
-        1.72
-      ],
-      "dimensions": [
-        0.07,
-        0.39,
-        0.35
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_CapeBack",
-      "location": [
-        0,
-        0.21,
-        1.08
-      ],
-      "dimensions": [
-        0.62,
-        0.085,
-        0.64
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0,
-      "rotationDegrees": [
-        -8,
-        0,
-        0
-      ]
-    },
-    {
-      "type": "cube",
-      "name": "Villager_CapeShoulders",
-      "location": [
-        0,
-        0.02,
-        1.405
-      ],
-      "dimensions": [
-        0.76,
-        0.43,
-        0.075
-      ],
-      "material": "cloth",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
-      "name": "Villager_RangerBelt",
-      "location": [
-        0,
-        -0.01,
-        0.96
-      ],
-      "dimensions": [
-        0.57,
-        0.38,
-        0.09
-      ],
-      "material": "cloth-accent",
       "parent": "Villager_Root",
       "bevel": 0
     }
@@ -632,7 +576,7 @@
         "tail": [
           0,
           0,
-          0.28
+          0.26526315789473687
         ],
         "parent": null
       },
@@ -641,12 +585,12 @@
         "head": [
           0,
           0,
-          0.86
+          0.7842105263157895
         ],
         "tail": [
           0,
           0,
-          1.06
+          0.98
         ],
         "parent": "root"
       },
@@ -655,12 +599,12 @@
         "head": [
           0,
           0,
-          1.06
+          0.98
         ],
         "tail": [
           0,
           0,
-          1.48
+          1.36
         ],
         "parent": "hips"
       },
@@ -669,7 +613,7 @@
         "head": [
           0,
           0,
-          1.48
+          1.36
         ],
         "tail": [
           0,
@@ -681,110 +625,110 @@
       {
         "name": "upperarm.L",
         "head": [
-          -0.28,
+          -0.25200000000000006,
           0,
-          1.42
+          1.3057142857142858
         ],
         "tail": [
-          -0.38,
+          -0.342,
           0,
-          1.06
+          0.98
         ],
         "parent": "spine"
       },
       {
         "name": "forearm.L",
         "head": [
-          -0.38,
+          -0.342,
           0,
-          1.06
+          0.98
         ],
         "tail": [
-          -0.43,
+          -0.387,
           0,
-          0.74
+          0.6768421052631578
         ],
         "parent": "upperarm.L"
       },
       {
         "name": "hand.L",
         "head": [
-          -0.43,
+          -0.387,
           0,
-          0.74
+          0.6768421052631578
         ],
         "tail": [
-          -0.44,
+          -0.396,
           0,
-          0.62
+          0.5694736842105262
         ],
         "parent": "forearm.L"
       },
       {
         "name": "upperarm.R",
         "head": [
-          0.28,
+          0.25200000000000006,
           0,
-          1.42
+          1.3057142857142858
         ],
         "tail": [
-          0.38,
+          0.342,
           0,
-          1.06
+          0.98
         ],
         "parent": "spine"
       },
       {
         "name": "forearm.R",
         "head": [
-          0.38,
+          0.342,
           0,
-          1.06
+          0.98
         ],
         "tail": [
-          0.43,
+          0.387,
           0,
-          0.74
+          0.6768421052631578
         ],
         "parent": "upperarm.R"
       },
       {
         "name": "hand.R",
         "head": [
-          0.43,
+          0.387,
           0,
-          0.74
+          0.6768421052631578
         ],
         "tail": [
-          0.44,
+          0.396,
           0,
-          0.62
+          0.5694736842105262
         ],
         "parent": "forearm.R"
       },
       {
         "name": "thigh.L",
         "head": [
-          -0.15,
+          -0.135,
           0,
-          0.9
+          0.82
         ],
         "tail": [
-          -0.15,
+          -0.135,
           0,
-          0.52
+          0.48
         ],
         "parent": "hips"
       },
       {
         "name": "shin.L",
         "head": [
-          -0.15,
+          -0.135,
           0,
-          0.52
+          0.48
         ],
         "tail": [
-          -0.15,
+          -0.135,
           0,
           0.14
         ],
@@ -793,40 +737,40 @@
       {
         "name": "foot.L",
         "head": [
-          -0.15,
+          -0.135,
           0,
           0.14
         ],
         "tail": [
-          -0.15,
+          -0.135,
           -0.2,
-          0.06
+          0.060000000000000005
         ],
         "parent": "shin.L"
       },
       {
         "name": "thigh.R",
         "head": [
-          0.15,
+          0.135,
           0,
-          0.9
+          0.82
         ],
         "tail": [
-          0.15,
+          0.135,
           0,
-          0.52
+          0.48
         ],
         "parent": "hips"
       },
       {
         "name": "shin.R",
         "head": [
-          0.15,
+          0.135,
           0,
-          0.52
+          0.48
         ],
         "tail": [
-          0.15,
+          0.135,
           0,
           0.14
         ],
@@ -835,14 +779,14 @@
       {
         "name": "foot.R",
         "head": [
-          0.15,
+          0.135,
           0,
           0.14
         ],
         "tail": [
-          0.15,
+          0.135,
           -0.2,
-          0.06
+          0.060000000000000005
         ],
         "parent": "shin.R"
       }
@@ -854,6 +798,10 @@
       "Villager_TunicHem": "hips",
       "Villager_Neck": "head",
       "Villager_Head": "head",
+      "Villager_HairCap": "head",
+      "Villager_HairBack": "head",
+      "Villager_Fringe_L": "head",
+      "Villager_Fringe_R": "head",
       "Villager_Nose": "head",
       "Villager_Ear_L": "head",
       "Villager_Eye_L": "head",
@@ -874,14 +822,7 @@
       "Villager_Boot_R": "shin.R",
       "Villager_Foot_R": "foot.R",
       "Villager_Belt": "hips",
-      "Villager_Buckle": "hips",
-      "Villager_HoodTop": "head",
-      "Villager_HoodBack": "head",
-      "Villager_HoodSide_L": "head",
-      "Villager_HoodSide1": "head",
-      "Villager_CapeBack": "spine",
-      "Villager_CapeShoulders": "spine",
-      "Villager_RangerBelt": "hips"
+      "Villager_Buckle": "hips"
     },
     "gait": {
       "note": "Lo que la auditoria necesita para juzgar una marcha sin saber que esto es un humano: que huesos son pies, y que tercias forman una bisagra y hacia que lado dobla cada una. Un codo y una rodilla doblan en sentidos opuestos, y cada uno solo hacia el suyo.",

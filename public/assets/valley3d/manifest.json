@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T11:49:16.092Z",
-  "invocation": "G-17: publicación selectiva de cuatro recursos aprobados, verify-publish.ts",
+  "generatedAt": "2026-09-16T12:33:18.852Z",
+  "invocation": "G-18: publicación selectiva verificada",
   "assets": [
     {
       "id": "axis-marker",
@@ -247,7 +247,7 @@
     {
       "id": "villager-leader",
       "file": "villager-leader.glb",
-      "sha256": "C18503B111433ED53417EDD551ECEACBF4EC3C3153E6ACC2767C9ACBCCB47173",
+      "sha256": "48526252B42A4AE6557EB9E186B5A4ED1E7990612A5846DC413051F8E83B1C9E",
       "motion": [
         {
           "name": "idle",
@@ -309,7 +309,7 @@
     {
       "id": "villager-midwife",
       "file": "villager-midwife.glb",
-      "sha256": "760EB20249249E9A890E75B7131DBA18ED7F40BBA3A313CC3A736DF61BC795B5",
+      "sha256": "9F24D0BE9586FA1D1AF56E920C96BDB3A87B22942504375EF6BAA8829709A4CE",
       "motion": [
         {
           "name": "idle",
@@ -371,7 +371,7 @@
     {
       "id": "villager-woodward",
       "file": "villager-woodward.glb",
-      "sha256": "1907A330784A352C646D3ECEE842F4DAD50BAA83D4AC504841268E601A2DBA49",
+      "sha256": "FC406C74D7235849FAF87EC36AFFA20E9547B6879F69D5645BF43ECCDD4AAEAE",
       "motion": [
         {
           "name": "idle",
@@ -402,7 +402,7 @@
     {
       "id": "villager-reeve",
       "file": "villager-reeve.glb",
-      "sha256": "7E3934563D2DDEFD2CDBF24EAE66C54ABE689C6036C58EAFCF7849D0805B2D86",
+      "sha256": "43FC649BC07349C007C8165AA2B68DAD20DCA2D6B3ED5B648C8CC526C691E7C5",
       "motion": [
         {
           "name": "idle",
@@ -433,7 +433,7 @@
     {
       "id": "villager-herbalist",
       "file": "villager-herbalist.glb",
-      "sha256": "EDF9F80EF4566E1D79550ED11FF8A4A8B55837C6B932E459D01D44F27F13328F",
+      "sha256": "7FAACA20BABA3B9E28B01E4C72E9F89EAB5A20FB591E069A394C809CB9E56114",
       "motion": [
         {
           "name": "idle",
@@ -483,6 +483,223 @@
       "id": "villager-farmer",
       "file": "villager-farmer.glb",
       "sha256": "99D21FF52888E01DEA3923C9C6764A9227056C9C8B6A2A3B5C7C665B31D7E69E",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-child",
+      "file": "villager-child.glb",
+      "sha256": "3B12B8C1A0B05AF852A3D0B2F5476A9A11E7915D4508CE481B1B3D73BE0B4EE3",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-elder",
+      "file": "villager-elder.glb",
+      "sha256": "09607F6CCEAE6C8F55F765E805075E50A70EE54B56F0E0FA8F8623EA3CA5D033",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-woodcutter",
+      "file": "villager-woodcutter.glb",
+      "sha256": "C81FCADE8E7B0BA54800D70016B96F3FBCD99E4358B78A74769BAC9755BF64B4",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-mason",
+      "file": "villager-mason.glb",
+      "sha256": "F853038BA6F4F88715D8BC1FE666AEED052989020FDD12DFDB51B4FA3AD4B63F",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-shepherd",
+      "file": "villager-shepherd.glb",
+      "sha256": "9E00FD0FB9D51A1F0632DFB8208C8DECD1F7CA1C50F3F17C2E0D3ADF7F8CD69E",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-stranger",
+      "file": "villager-stranger.glb",
+      "sha256": "664EFDBFD40A45B4F3EC88434285F58BD0178AD10B89206E0754E730EB744759",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-fisher",
+      "file": "villager-fisher.glb",
+      "sha256": "543C7849D05DF8DBB350E8E0A24089045868078D302605793CBB1671C69D9AEE",
       "motion": [
         {
           "name": "idle",
