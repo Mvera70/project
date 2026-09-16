@@ -120,7 +120,23 @@ export function avoid(body: Body, land: Terrain): Push {
       const nx = Math.max(cx, Math.min(body.x, cx + 1));
       const nz = Math.max(cz, Math.min(body.z, cz + 1));
       const apart = Math.hypot(body.x - nx, body.z - nz);
-      const clear = body.radius + WALL_CLEAR;
+      // **El margen con la pared es proporcional al cuerpo, no absoluto.**
+      // `WALL_CLEAR` se calibró con una persona (radio 0,32), y aplicado tal
+      // cual dejaba a una gallina de radio 0,14 guardando 0,76 celdas de
+      // distancia —más de cinco veces su propio radio— mientras su sitio de
+      // picoteo está pegado a la casa. Resultado medido: `seek` tirando hacia
+      // el muro y `avoid` empujando hacia fuera, las dos a la vez, y los
+      // animales andando al 30 % de su paso sin llegar nunca (0,17 celdas por
+      // segundo con un paso de 0,50, sin un solo vecino a menos de 0,6). De
+      // ahí salía que las tres especies pasaran del 65 % al 96 % de la jornada
+      // «andando» y que la vaca pastara el 1,5 %.
+      //
+      // Dos radios de holgura, con el tope de siempre: una persona guarda lo
+      // mismo que antes (0,32 × 2 = 0,64, capado a 0,62) y una gallina 0,28,
+      // que es lo que le permite picotear junto a la fachada. Es el mismo
+      // criterio que ya siguen `TURN_MIN_SPEED` y el umbral de avance: lo que
+      // se le pide a un cuerpo se mide con ese cuerpo.
+      const clear = body.radius + Math.min(WALL_CLEAR, body.radius * 2);
       if (apart >= clear) continue;
       // **Justo en el borde compartido, el punto más cercano es el propio
       // cuerpo** (rework.md §3.5.1): con el círculo colisionando de verdad, un

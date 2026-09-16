@@ -922,7 +922,7 @@ export function stepBeasts(
     // ella: sólo mantiene el invariante y dice la verdad si se muestrea a
     // media reacción.
     if (dweller.doing === null) {
-      dweller.doing = pauseHere(body, land, router, seed, body.id, step);
+      dweller.doing = pauseHere(body, land, router, seed, body.id, step, [], body.pace);
       moveSeat(taken, null, dweller.doing);
       progress.at = step + PROGRESS_CHECK;
       progress.gap = Number.POSITIVE_INFINITY;
@@ -948,7 +948,7 @@ export function stepBeasts(
       const onTheWay = dweller.doing !== null && !dweller.doing.there;
       // Espera creciente, no `GIVE_UP` fijo (checklist IA-1, punto 6): igual
       // que en `village.ts`, ver `decide.ts` (`noProgress`).
-      const tooLong = noProgress(dweller.doing, progress, body, step, GIVE_UP);
+      const tooLong = noProgress(dweller.doing, progress, body, step, GIVE_UP, body.pace);
       if (step >= dweller.rethinkAt && (!onTheWay || tooLong)) {
         dweller.rethinkAt = step + RETHINK;
         const before = dweller.doing;
@@ -961,7 +961,7 @@ export function stepBeasts(
         dweller.doing = decide(
           { traits: [], needs: dweller.needs, at: body, id: body.id, doing: before },
           places, taken, land, router, seed, step,
-        ) ?? pauseHere(body, land, router, seed, body.id, step);
+        ) ?? pauseHere(body, land, router, seed, body.id, step, [], body.pace);
         moveSeat(taken, before, dweller.doing);
         if (dweller.doing !== before) {
           progress.at = step + PROGRESS_CHECK;
@@ -977,7 +977,24 @@ export function stepBeasts(
 
       if (dweller.doing !== null && !dweller.doing.there) {
         const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
-        if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
+        const away = Math.hypot(spot.x - body.x, spot.z - body.z);
+        // **Y con la ruta agotada, el alcance entero.** La cota estrecha
+        // —`reach * 0.6`, o sea 0,6 celdas para una oferta de alcance 1— la
+        // puso IA-1 para que nadie se declarase llegado a media legua, y para
+        // una persona está bien. Para un cuerpo pequeño y lento que además se
+        // codea con los suyos alrededor del mismo corral, no: medido con una
+        // gallina paso a paso, se acercaba hasta 0,61 celdas —a un pelo— y
+        // ahí se quedaba, y como nunca llegaba nunca ejecutaba su actividad.
+        // Así, las tres especies pasaban del 65 % al 96 % de la jornada
+        // «andando» con la vaca pastando el 1,5 %.
+        //
+        // La condición laxa sigue acotada, que es lo que la separa del fallo
+        // que IA-1 arregló: hace falta **haber agotado la ruta** —o sea estar
+        // en el último tramo— y estar dentro del alcance de la oferta, no en
+        // cualquier sitio.
+        const arrived = away <= dweller.doing.offer.reach * 0.6
+          || (dweller.doing.route.length === 0 && away <= dweller.doing.offer.reach);
+        if (arrived) {
           dweller.doing.there = true;
           dweller.doing.route.length = 0;
         }

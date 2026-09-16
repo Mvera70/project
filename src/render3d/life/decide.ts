@@ -13,6 +13,7 @@
 
 import type { Trait } from '@engine/state';
 import { hash32 } from '@engine/rng';
+import { LIFE_STEP } from './clock';
 import { blockedAt, type Point, type Terrain } from './body';
 import type { Needs } from './needs';
 import { NEED_NAMES } from './needs';
@@ -535,6 +536,28 @@ export const PROGRESS_CHECK = 90;
 const PROGRESS_MIN = 0.3;
 
 /**
+ * Qué parte de lo que un cuerpo **andaría suelto** en la ventana de comprobación
+ * cuenta como avanzar.
+ *
+ * TUNE: 0,25. `PROGRESS_MIN` es una distancia fija y estaba calibrada con el
+ * paso de una persona (1,05 a 1,65 celdas por segundo, `village.ts`). Una
+ * gallina anda a 0,55 y una vaca a 0,32, así que en los tres segundos de
+ * `PROGRESS_CHECK` una vaca recorre menos de lo que la cota fija exige y
+ * **«no avanzar» le pasaba andando**. Medido con una gallina paso a paso: se
+ * acercaba de 1,66 a 0,61 celdas de su sitio —la llegada está en 0,6— y en ese
+ * momento se la declaraba atascada, elegía otra actividad en dirección
+ * contraria y volvía a empezar. Así, las tres especies pasaban entre el 69 % y
+ * el 92 % de la jornada andando y no llegaban nunca: gallina picoteando el
+ * 8 %, vaca pastando el 5,7 % y rumiando el 0,1 %, y `lie` y `amble` del cerdo
+ * sin salir ni una vez.
+ *
+ * Relativo al paso propio, como ya lo son `TURN_MIN_SPEED` y
+ * `TURN_MIN_PROGRESS` (`body.ts`), un cuerpo lento y uno rápido piden lo
+ * mismo: avanzar un cuarto de lo que andarían sin que nada les retuviera.
+ */
+const PROGRESS_SHARE = 0.25;
+
+/**
  * Lo que hace falta recordar, de una llamada a `noProgress()` a la
  * siguiente, para saber si una intención avanza.
  *
@@ -573,13 +596,22 @@ export function freshProgress(): ProgressState {
  */
 export function noProgress(
   doing: Intent | null, state: ProgressState, at: Point, step: number, giveUp: number,
+  /**
+   * El paso del cuerpo, en celdas por segundo. Sin él se usa la cota fija de
+   * siempre, que es lo que vale para una persona; con él, la cota se mide en
+   * proporción a lo que ese cuerpo andaría suelto (ver `PROGRESS_SHARE`).
+   */
+  pace?: number,
 ): boolean {
   if (doing === null || doing.there) { state.stalls = 0; return false; }
   if (step < state.at) return false;
 
   const target = seatAt(doing.offer, doing.seat);
   const gap = Math.hypot(target.x - at.x, target.z - at.z);
-  const improved = gap < state.gap - PROGRESS_MIN;
+  const least = pace === undefined
+    ? PROGRESS_MIN
+    : Math.min(PROGRESS_MIN, pace * PROGRESS_CHECK * LIFE_STEP * PROGRESS_SHARE);
+  const improved = gap < state.gap - least;
   state.stalls = improved ? 0 : Math.min(state.stalls + 1, 4);
   state.gap = gap;
   state.at = step + Math.min(giveUp, PROGRESS_CHECK * 2 ** state.stalls);
@@ -661,17 +693,38 @@ export function moveSeat(
   taken.set(now, (taken.get(now) ?? 0) + 1);
 }
 
+/**
+ * Cuánto se aleja un cuerpo para hacer nada, en segundos de su propio paso.
+ *
+ * TUNE: 0,6 s. La pausa se plantaba a una o dos celdas **fijas**, y eso convertía
+ * cada rato muerto en un viaje: una gallina picotea tres segundos, se le va el
+ * aburrimiento, tarda veinte en volver a tenerlo (`BEAST_RISE`), y en ese hueco
+ * ninguna actividad vale nada, así que entra la pausa —y se pasa el hueco
+ * **andando hacia ella** a medio paso. Medido: del 65 % al 96 % de la jornada de
+ * los tres animales en «andando», con la vaca pastando el 1,5 %, y la inmensa
+ * mayoría de ese tiempo camino de una pausa.
+ *
+ * Medido en segundos del paso propio, «hacer nada» es quedarse más o menos
+ * donde estás: una persona se mueve poco más de media celda, una gallina un
+ * tercio. Es el mismo criterio que el margen con las paredes y el umbral de
+ * avance: lo que se le pide a un cuerpo se mide con ese cuerpo.
+ */
+const PAUSE_SECONDS = 0.6;
+
 export function pauseHere(
   at: Point, land: Terrain, router: Router, seed: number, id: number, step: number,
   // IA-3: opcional y al final, por defecto sin rasgos — así `beasts.ts`
   // (que llama sin este argumento, «un animal no tiene rasgos») sigue
   // compilando y comportándose exactamente igual que antes de esta ronda.
   traits: readonly Trait[] = [],
+  /** El paso del cuerpo, para que «hacer nada» no sea un viaje (`PAUSE_SECONDS`). */
+  pace = 1,
 ): Intent {
   const spots: Point[] = [];
   for (let n = 0; n < PAUSE_SPOTS; n += 1) {
     const angle = (hash32(seed, `pause:${id}:${step}:${n}:a`) / 4_294_967_296) * Math.PI * 2;
-    const dist = 1 + (hash32(seed, `pause:${id}:${step}:${n}:d`) / 4_294_967_296);
+    const roam = Math.max(0.25, pace * PAUSE_SECONDS);
+    const dist = roam * (0.4 + 0.6 * (hash32(seed, `pause:${id}:${step}:${n}:d`) / 4_294_967_296));
     const spot = { x: at.x + Math.cos(angle) * dist, z: at.z + Math.sin(angle) * dist };
     if (spot.x <= 0.5 || spot.z <= 0.5 || spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
     if (blockedAt(land, spot.x, spot.z)) continue;

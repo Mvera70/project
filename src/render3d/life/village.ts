@@ -764,7 +764,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               ageGroup: dweller.ageGroup, home: dweller.home,
             },
             options, taken, land, router, seed, steps,
-          ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits);
+          ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
           // paso, así que los veinte que decidían en ese instante veían el mismo
