@@ -64,6 +64,12 @@ traído aquí.
 
 ## 2. El tablero
 
+**Siguiente encargo de Blender · aldea:** alcance preparado para viviendas,
+molino, iglesia/capilla, herrería, pozo, granero, campos, carros y adornos.
+Inventario y tandas en [encargo-blender-aldea](graphics-rounds/encargo-blender-aldea.md).
+**G-21: primera casa de paja terminada**, validada y preparada para subir por
+separado. Informe en [G-21](graphics-rounds/G-21.md).
+
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
 verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
 
@@ -160,6 +166,10 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**Inventario del nuevo encargo de aldea:** 21 ids existentes en cuatro tandas;
+las variantes de vivienda y adornos nuevos se definirán con su integración.
+Primera casa: 656 triángulos, cinco materiales/mallas; 87 pruebas verdes.
+
 **G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
 triángulos. 29 pruebas y doce auditorías verdes; las huellas de G-17 se conservan.
 
@@ -204,6 +214,10 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**Rediseño de aldea:** casa de paja terminada; sigue casa de piedra. Las variantes
+adicionales, los adornos nuevos y la aparición de `shed` requieren conexión del
+equipo del juego; reemplazar los ids ya seleccionados encaja directamente.
 
 **G-18:** recursos entregados para revisión visual; diferencia de zancada
 medida/declarada del niño dentro de tolerancia, documentada en el informe.

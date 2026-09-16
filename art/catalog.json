@@ -464,14 +464,14 @@
     },
     {
       "id": "house",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/house/house.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T01-04-35-078Z-53368",
-        "directory": "artifacts/graphics/G-10/approved/8d974884b42d275a"
+        "runId": "2026-09-16T16-52-13-018Z-35544",
+        "directory": "artifacts/graphics/G-21/approved/5fb010cd3d40d3e4"
       },
       "bounds": {
         "min": [
@@ -481,16 +481,16 @@
         ],
         "max": [
           2,
-          1.566667,
+          1.580666,
           0
         ],
         "size": [
           2,
-          1.566667,
+          1.580666,
           2
         ]
       },
-      "recipeSha256": "54DFDF20149661624210E79B779132F15F8DA86E377759C294C056477D0E5588",
+      "recipeSha256": "C09E2D98348387B08043011A0D913BEBBC2742203391B726206A2769CEE750FA",
       "materials": [
         "plaster",
         "roof",
@@ -505,21 +505,21 @@
         "objects": 6,
         "meshes": 5,
         "materials": 5,
-        "triangles": 88
+        "triangles": 656
       },
       "hashes": {
-        "house.blend": "FD688E9748EC0AB5F7E241F98FBD63C273ACAD67B312A288B7C4F150C962748F",
-        "house.glb": "8D974884B42D275ACEAC63D73613E102150BEB0C362A3583CD0BB852BB934528",
-        "house-blender.png": "77BC4B4760993E2049D927DBC1887FD1A90EE19A376026E64E0CF903444FAA22",
-        "capture-1.png": "F92EE65A4A8EA1B00681CA19C51CD575EFF03EC4FB4EF96DD752F34A6BADED4F",
-        "capture-1-gray.png": "3254110FA219E87969A31898B8B51B06935CF8765E24D33C671F92323353AB89",
-        "capture.json": "94148B5E6EA843ED954C2B2D964C0B28AC4CBD590C8BBA1706C500860400C7AD",
-        "build.json": "BA455ECE069130FC814C991B8FD1CABA850C69FAF38845D5F04F5434A64E5E37",
-        "validation.json": "87D30D263808EFC36B1B9BF3C91D7062180F455AD9DB9CF44C2543B8E8D17225"
+        "house.blend": "F968D432062B4EB161CCD5FB475BF2AD5B52CF479157CEAB8B369DF0F42A8D43",
+        "house.glb": "5FB010CD3D40D3E4DD07676D1BE9DC9C618D7C82B03F84EFEF77575630F42151",
+        "house-blender.png": "F76D3F487A7BF3CFAAEB0BCB3DEAFB76D74E413C98814D02F653C074222F84BD",
+        "capture-1.png": "73A7F6E3C7FFE74672FB5356289E1995745928771BA306B61F499FBEBA8BC9D9",
+        "capture-1-gray.png": "20665D607B8F9F3929D975EC038E5DD1F7ED90E086693749509920F259E073FD",
+        "capture.json": "24D303E2DA55610FB45E2086C7A4FD3460C394613E4DC537F6A1996879D95118",
+        "build.json": "06A83EE644DCA200F02916DDF59D3614FECE5D9DAC6EE917B3B4716BDE62D5D2",
+        "validation.json": "DC25B4B2603418B16F90C205B098686634DBC0DC0F0312410F4D437A22FEEB59"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original house authored for The Valley G-10",
+        "source": "Original G-21: casa de paja low-voxel, contrato de parcela y ventanas de G-10 conservado.",
         "license": "Project original"
       }
     },

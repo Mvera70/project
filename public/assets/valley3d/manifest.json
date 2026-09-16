@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T12:33:18.852Z",
-  "invocation": "G-18: publicación selectiva verificada",
+  "generatedAt": "2026-09-16T16:53:20.351Z",
+  "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
       "id": "axis-marker",
@@ -67,7 +67,7 @@
     {
       "id": "house",
       "file": "house.glb",
-      "sha256": "8D974884B42D275ACEAC63D73613E102150BEB0C362A3583CD0BB852BB934528",
+      "sha256": "5FB010CD3D40D3E4DD07676D1BE9DC9C618D7C82B03F84EFEF77575630F42151",
       "motion": []
     },
     {
