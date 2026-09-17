@@ -37,11 +37,18 @@ test('bajo un subdirectorio arranca, el worker se limita a él y abre sin red', 
   for (const path of cached) test.expect(path, path).toMatch(/^\/project\//);
 
   await page.reload();
+  // VZ-4 · el menú de U-10 sale también al recargar; `passTitle` pulsa el botón
+  // que haya («Continue» cuando hay partida, y desde VZ-4 la hay en cuanto se
+  // funda). Esta prueba es de antes del menú.
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
 
   await context.setOffline(true);
   await page.reload();
+  // Sin red el menú sale igual, y «Continue» funciona: la partida vive en
+  // IndexedDB y eso no necesita red.
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
   // **Y abre con el render que se publica.** Aquí se miraba el lienzo 2D, que
   // sólo está visible cuando el relevo a WebGL no ha ocurrido — así que la

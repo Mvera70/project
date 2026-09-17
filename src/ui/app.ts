@@ -264,6 +264,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   }
   /** Lo que cualquier `UiPanel` necesita para pintarse (`contracts.ts`). */
   const snapshot = (): UiSnapshot => ({ state, archive, speed });
+  /**
+   * A quién sigue la cámara, o `null`. Se declara **antes** de `actions`, que
+   * es quien la escribe: una `let` leída desde una función definida más arriba
+   * y llamada en el arranque cae en la zona muerta temporal, y eso ya costó una
+   * ronda («Cannot access before initialization», VZ-02).
+   */
+  let trackedId: number | null = null;
+
   const actions: UiActions = {
     navigate,
     setSpeed(value): void { app.setSpeed(value); },
@@ -284,7 +292,25 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // después la aldea tiene que seguir haciendo lo que se le dijo.
       persist();
     },
-    track(id): void { renderer.track(id); },
+    /**
+     * VZ-4 · **seguir es seguir, no centrar una vez.**
+     *
+     * `renderer.track` mira a quien se le dice y vuelve; llamándolo una sola
+     * vez al pulsar «Follow», la cámara centraba a la persona y ésta se iba
+     * andando del encuadre. El dueño del diseño lo pidió claro: «lo de la
+     * silueta del aldeano que se resalte y que lo siga, lo quiero». Lo que
+     * falta —el resalte de la silueta— vive en `renderer.ts`, que la otra
+     * sesión tiene abierto ahora mismo; queda anotado en el cuaderno.
+     *
+     * Aquí se guarda a quién sigue y `paint` lo repite en cada fotograma, que
+     * es lo que hace que la cámara vaya detrás. Se guarda en esta capa y no en
+     * la ficha a propósito: la ficha se desmonta al cambiar de ruta y el
+     * seguimiento no tiene por qué morir con ella.
+     */
+    track(id): void {
+      trackedId = id;
+      renderer.track(id);
+    },
   };
   // UI-R2/UI-R4 · `hud.ts` cría la hora, la fecha, la tira, la frase de estado
   // y el resumen/acceso a las órdenes; `orders.ts` la hoja de las tres
@@ -643,6 +669,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // hoja de roble en oro) y lo que el manejador del toque mira para saber si
     // lo que se está leyendo es la pista. Nadie toca una clase desde aquí.
     shell.voice.dataset.role = now?.role ?? '';
+    // VZ-4 · la cámara va detrás de quien se sigue, fotograma a fotograma.
+    if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
@@ -1117,6 +1145,27 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   } else {
     beginLoop();
   }
+
+  /**
+   * VZ-4 · **un valle recién fundado se guarda ya, y no al primer tick.**
+   *
+   * El guardado corriente va cada `TIME.SAVE_EVERY_TICKS` ticks, y desde v3.72
+   * un tick a ×1 son **catorce minutos de reloj de pared**. Así que entre
+   * fundar un valle y el primer autoguardado había un cuarto de hora en el que
+   * la partida no existía en el disco: quien fundaba y cerraba la pestaña la
+   * perdía, y al volver el menú ofrecía «fundar» en vez de «continuar».
+   *
+   * Y es la causa de las **cinco pruebas de PWA** que llevaban rotas: las cinco
+   * abren, pasan el menú y recargan, y en la recarga el juego volvía al menú
+   * porque no había nada que continuar. El guardado del `pagehide` no las
+   * salvaba: `persist` encola una escritura en IndexedDB y la página se
+   * desmonta antes de que termine —el recorrido del menú lo tapaba esperando
+   * 600 ms después de un `pagehide` sintético—.
+   *
+   * Va aquí abajo y no junto a la fundación porque `persist` se declara después:
+   * leerla antes la pilla en la zona muerta temporal.
+   */
+  if (fresh) persist();
 
   return app;
 }

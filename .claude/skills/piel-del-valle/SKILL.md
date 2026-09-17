@@ -242,9 +242,31 @@ difícil, tienes que revisar el trabajo con una simple captura». Así que:
 
 Se escribe aquí para que no se pierda, no porque esté bien:
 
-- **`BACK TO THE LIST` en la ficha de una persona.** Las otras dos formas de
-  cerrar se unificaron en la cruz de §7; ésta se queda porque no cierra, vuelve
-  a la lista, y nadie ha decidido si eso merece una pieza propia.
-- **El ornamento de la hoja de roble** sólo está en la bandeja del valle, donde
-  el prototipo 01 lo puso. En la crónica y en la gente el sitio lo ocupa su
-  propio encabezado. Parece correcto, pero es una asimetría sin decidir.
+Las dos que había aquí quedaron **decididas** el 17 sep 2026, y se escriben
+resueltas para que nadie las vuelva a abrir:
+
+- **`BACK TO THE LIST` no es una tercera forma de cerrar.** Se monta sólo
+  cuando la ficha se abrió desde la lista (`from === 'people'`), y lo que hace
+  es volver a la lista, no cerrar: cerrar lo hace la misma cruz de §7, que la
+  ficha ya lleva por vivir en la hoja de la carcasa. Dos verbos distintos, cada
+  uno donde significa algo.
+- **El ornamento de la hoja de roble se queda sólo en el valle**, donde el
+  prototipo 01 lo puso. En la crónica y en la gente ese sitio lo ocupa su propio
+  encabezado —la capitular del año, el título de la sección—, que es lo que
+  distingue una sección de otra. Va en el estándar que el dueño del diseño
+  aprobó en el lienzo de VZ-2.
+
+Y lo que sí queda abierto, con su motivo:
+
+- **El resalte de la silueta del aldeano seguido.** La cámara ya va detrás de
+  él (VZ-4, en `app.ts`), pero el cuerpo no se distingue del resto: eso se
+  dibuja en `src/render3d/renderer.ts`, que la otra sesión tiene con cambios
+  sin comprometer. Se hace en cuanto ese fichero esté libre.
+- **La línea «Today» de la ficha.** Necesita la capa de vida —derivarla del
+  motor podría contradecir al cuerpo que se ve en pantalla— y esa capa es justo
+  la que la otra sesión está reescribiendo.
+- **El nombre del caché del service worker se sube a mano.** Los modelos 3D no
+  llevan huella en el nombre, así que una copia guardada puede ser la
+  equivocada: el 17 sep los animales rediseñados no llegaron a los
+  dispositivos que ya habían visitado hasta que alguien subió el caché a
+  `valley-v3`. Derivarlo del hash del manifiesto lo cierra para siempre.

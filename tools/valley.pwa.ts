@@ -5,6 +5,7 @@
  * the thing being tested and it does not exist in the dev server.
  */
 import { test, type Page } from '@playwright/test';
+import { TIME } from '@engine/balance';
 import { passTitle } from './pass-title';
 
 /** Wait until a worker controls the page: until then nothing is intercepted. */
@@ -62,9 +63,21 @@ async function warmed(page: Page, query = ''): Promise<void> {
   await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
-  // La recarga sí encuentra partida guardada (§13.1) y no vuelve a mostrar el
-  // menú: ahí no hace falta `passTitle` otra vez.
+  // **VZ-4 · la recarga también pasa por el menú, y ahí estaba el fallo.**
+  //
+  // El comentario que había aquí decía que con partida guardada la recarga no
+  // vuelve a mostrar el menú. Eso era verdad antes de U-10, que puso el menú de
+  // inicio delante de todo: desde entonces la recarga lo enseña siempre y sólo
+  // cambia el botón que ofrece —«Continue» cuando hay partida—, así que la
+  // espera de `data-app-ready` no se cumplía nunca y con ella caían cinco
+  // pruebas. `passTitle` ya sabe pulsar el que haya.
+  //
+  // Y el otro lado del mismo fallo estaba en el juego: un valle recién fundado
+  // no se guardaba hasta el primer tick, que a ×1 son catorce minutos, así que
+  // al recargar no había nada que continuar y el menú ofrecía fundar otro. Se
+  // arregla en `app.ts` (VZ-4): fundar guarda.
   await page.reload();
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor();
   await controlled(page);
 }
@@ -86,7 +99,9 @@ test('a partir de la segunda apertura, el valle abre en modo avión', async ({ p
 
   await context.setOffline(true);
   await page.reload();
-
+  // VZ-4 · el menú de U-10 sale también al recargar, y ofrece «Continue»
+  // porque la partida vive en IndexedDB, que no necesita red.
+  await passTitle(page);
   // Esto es §13.4 entero: sin red, la aldea sigue abriendo.
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
   // Y abre **con el render que se publica**, que desde G-12 es el 3D.
@@ -126,9 +141,23 @@ function savedTick(page: Page): Promise<number> {
 test('la partida guardada sobrevive a quedarse sin red', async ({ page, context }) => {
   await page.clock.install({ time: Date.now() });
   await warmed(page, NO_PAINT);
+  // VZ-4 · las cuatro velocidades viven recogidas detrás del botón desde
+  // UI-V2b, así que hay que desplegarlas antes de pedir una. Es el mismo paso
+  // que dan los recorridos de `valley.shots.ts`.
+  await page.locator('.valley-speed-badge').click();
   await page.getByRole('button', { name: '16×', exact: true }).click();
   // Más de 20 ticks: cruza el autoguardado de §13.1.
-  await page.clock.runFor((25 * 15_000) / 16 + 500);
+  // VZ-4 · la duración sale de `balance.ts`: aquí había 25 ticks a los quince
+  // segundos por tick de antes de v3.72, y desde entonces una semana son
+  // catorce minutos, así que el salto valía una cincuentava parte de lo que
+  // dice y el autoguardado no se cruzaba nunca.
+  // Y se **salta** el reloj en vez de correrlo, que es lo que los recorridos
+  // aprendieron en su día: correr un millón de milisegundos fotograma a
+  // fotograma son decenas de miles de pintados y la página se queda sin
+  // tiempo. `fastForward` salta y los 200 ms de después dejan que el bucle
+  // pinte una vez con el reloj ya adelantado.
+  await page.clock.fastForward((25 * TIME.REAL_MS_PER_TICK) / 16 + 500);
+  await page.clock.runFor(200);
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
   await test.expect.poll(() => savedTick(page)).toBeGreaterThan(0);
   const before = await savedTick(page);
@@ -137,6 +166,9 @@ test('la partida guardada sobrevive a quedarse sin red', async ({ page, context 
   // IndexedDB y el guardado es de §13.1, no suyo.
   await context.setOffline(true);
   await page.reload();
+  // VZ-4 · el menú de U-10 sale también al recargar, y ofrece «Continue»
+  // porque la partida vive en IndexedDB, que no necesita red.
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
   test.expect(await savedTick(page)).toBeGreaterThanOrEqual(before);
 

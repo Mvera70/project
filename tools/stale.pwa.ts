@@ -34,6 +34,10 @@ test('un despliegue nuevo alcanza a un cliente que ya visitó, con las cabeceras
   // Y sigue abriendo sin red después de la actualización.
   await page.context().setOffline(true);
   await page.reload();
+  // VZ-4 · y aquí también: el menú de U-10 sale al recargar, con red o sin
+  // ella. Esta prueba ya llevaba la nota puesta arriba para la primera
+  // apertura; le faltaba la recarga.
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
   await page.context().setOffline(false);
 });
