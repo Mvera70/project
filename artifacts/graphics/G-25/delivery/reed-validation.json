@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "assetId": "reed",
+  "runId": "2026-09-17T10-14-55-794Z-46520",
+  "status": "pass",
+  "durationMs": 4565,
+  "candidateSha256": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
+  "glb": {
+    "version": 2,
+    "declaredLength": 21572,
+    "nodeNames": [
+      "reed_reed",
+      "reed_reed-light",
+      "reed_seed-head",
+      "Root"
+    ],
+    "meshNames": [
+      "reed_reed_Mesh",
+      "reed_reed-light_Mesh",
+      "reed_seed-head_Mesh"
+    ],
+    "materialNames": [
+      "reed",
+      "reed-light",
+      "seed-head"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 3,
+    "statistics": {
+      "objects": 4,
+      "meshes": 3,
+      "materials": 3,
+      "triangles": 228
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T10:15:36.366Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-14-55-794Z-46520\\candidate\\reed.glb",
+      "assetUrl": "/artifacts/graphics/G-25/runs/2026-09-17T10-14-55-794Z-46520/candidate/reed.glb",
+      "viewport": {
+        "width": 640,
+        "height": 780,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-14-55-794Z-46520\\three\\capture-1.png",
+        "sha256": "47221FB180B6DF434F1F236F15E136E54A581E4936BB70AB577CF89345A1B6EB",
+        "dimensions": {
+          "width": 640,
+          "height": 780
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-14-55-794Z-46520\\three\\capture-1-gray.png",
+          "sha256": "9B6D611D3BCF6208ED97DB49C640A52D0B4F9E5A6D3887B25B5DC868177B21B3",
+          "dimensions": {
+            "width": 640,
+            "height": 780
+          }
+        },
+        "durationMs": 1142,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:51771/artifacts/graphics/G-25/runs/2026-09-17T10-14-55-794Z-46520/candidate/reed.glb",
+          "viewport": {
+            "width": 640,
+            "height": 780,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "reed_reed",
+            "reed_reed-light",
+            "reed_seed-head"
+          ],
+          "bounds": {
+            "min": [
+              -0.168115,
+              0,
+              -0.186606
+            ],
+            "max": [
+              0.163982,
+              0.571667,
+              0.158215
+            ],
+            "size": [
+              0.332097,
+              0.571667,
+              0.344821
+            ]
+          },
+          "loadDurationMs": 175
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-14-55-794Z-46520\\three\\capture-2.png",
+        "sha256": "47221FB180B6DF434F1F236F15E136E54A581E4936BB70AB577CF89345A1B6EB",
+        "dimensions": {
+          "width": 640,
+          "height": 780
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-14-55-794Z-46520\\three\\capture-2-gray.png",
+          "sha256": "9B6D611D3BCF6208ED97DB49C640A52D0B4F9E5A6D3887B25B5DC868177B21B3",
+          "dimensions": {
+            "width": 640,
+            "height": 780
+          }
+        },
+        "durationMs": 106,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:51771/artifacts/graphics/G-25/runs/2026-09-17T10-14-55-794Z-46520/candidate/reed.glb",
+          "viewport": {
+            "width": 640,
+            "height": 780,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "reed_reed",
+            "reed_reed-light",
+            "reed_seed-head"
+          ],
+          "bounds": {
+            "min": [
+              -0.168115,
+              0,
+              -0.186606
+            ],
+            "max": [
+              0.163982,
+              0.571667,
+              0.158215
+            ],
+            "size": [
+              0.332097,
+              0.571667,
+              0.344821
+            ]
+          },
+          "loadDurationMs": 32
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:51771/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=780&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 173,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-14-55-794Z-46520\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

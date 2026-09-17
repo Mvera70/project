@@ -10,8 +10,8 @@ import { loadRecipe } from '../../tools/art/recipe';
 import { parseRecipe } from '../../tools/art/schema';
 
 describe('G-25 · piedras confinadas y formas achatadas', () => {
-  it('conserva todo el GLB dentro de su celda aunque cambien giro, escala y desplazamiento', async () => {
-    const bytes = readFileSync(resolve('public/assets/valley3d/rock.glb'));
+  it.each(['rock', 'reed'])('conserva todo %s dentro de su celda aunque cambien giro, escala y desplazamiento', async (asset) => {
+    const bytes = readFileSync(resolve(`public/assets/valley3d/${asset}.glb`));
     const { scene } = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     const state = foundTwenty(7);
     const map = structuredClone(state.map);

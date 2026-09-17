@@ -554,7 +554,7 @@ export async function createGraphicsRenderer(
     if (reed !== undefined) {
       // La orilla se replanta con el suelo por el mismo motivo que el bosque: el
       // rio no se mueve, pero un camino nuevo pegado al agua si le quita sitio.
-      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map, taken), palette);
+      reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map, taken), palette, true);
       reeds.group.name = 'Valley_Reeds';
       world.add(reeds.group);
     }

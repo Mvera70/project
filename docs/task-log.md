@@ -64,6 +64,10 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-25 · ribera entregada:** hojas abiertas y tres espigas por mata, tinte
+estacional y contención en la celda. 51 pruebas, typecheck y lint verdes;
+captura real sin errores. Pendientes monte bajo y más siluetas arbóreas.
+
 **G-25 · roca entregada:** afloramiento facetado y colocación completa dentro de
 su celda, sin ocupar caminos ni solares. 50 pruebas, typecheck y lint verdes.
 Captura real revisada; pendiente continuar vegetación. [Informe](graphics-rounds/G-25.md).
@@ -304,6 +308,9 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**G-25 reed:** 72→228 triángulos; 3 materiales/mallas, 21 572 bytes, altura
+0,572 celdas. Verificación de todos los vértices tras giro/escala por instancia.
+
 **G-25 rock:** 72→186 triángulos, dos materiales/mallas, 17 496 bytes.
 Contención comprobada sobre vértices del GLB en todas las instancias del mapa de prueba.
 
@@ -452,7 +459,7 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**G-25 paisaje:** rocas entregadas; siguen pendientes vegetación baja/ribera y otras siluetas
+**G-25 paisaje:** rocas y ribera entregadas; siguen pendientes monte bajo y otras siluetas
 de árboles; requieren respetar accesos y campos. El vado desplazado sigue abierto.
 La batería OBS-02 se aplaza por decisión del usuario; se retoma modelado 3D.
 

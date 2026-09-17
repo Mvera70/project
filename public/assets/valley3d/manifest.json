@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T10:10:12.946463+00:00",
+  "generatedAt": "2026-09-17T10:16:03.892609+00:00",
   "invocation": "G-25: publicación selectiva por modelo",
   "assets": [
     {
@@ -169,7 +169,7 @@
     {
       "id": "reed",
       "file": "reed.glb",
-      "sha256": "31B2B1B0A7F7933FB95A1FE9161C01AA7DB35357783FBE35902F656602CA9027",
+      "sha256": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
       "motion": []
     },
     {

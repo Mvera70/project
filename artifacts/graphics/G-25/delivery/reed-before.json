@@ -1,0 +1,58 @@
+{
+  "id": "reed",
+  "artifactRound": "G-10",
+  "status": "study",
+  "recipe": "art/recipes/reed/reed.json",
+  "generator": "tools/art/blender-build.py",
+  "blenderVersion": "5.2.1 LTS",
+  "approved": {
+    "runId": "2026-09-10T23-29-09-422Z-32756",
+    "directory": "artifacts/graphics/G-10/approved/31b2b1b0a7f7933f"
+  },
+  "bounds": {
+    "min": [
+      -0.109647,
+      -0.000331,
+      -0.086567
+    ],
+    "max": [
+      0.128845,
+      0.433359,
+      0.102284
+    ],
+    "size": [
+      0.238492,
+      0.43369,
+      0.188851
+    ]
+  },
+  "recipeSha256": "1C2698CF4D6B2D3CD220082598A385DAD3332BFDF7736BAF0CE86C034BC2359D",
+  "materials": [
+    "reed",
+    "reed-light"
+  ],
+  "clips": [],
+  "motion": [],
+  "connectors": [],
+  "statistics": {
+    "objects": 3,
+    "meshes": 2,
+    "materials": 2,
+    "triangles": 72
+  },
+  "hashes": {
+    "reed.blend": "76A9E7192E7BFF990ABEBF651BC20A6FE153FECBC13E2A8D6B5BF58A4C2A9D28",
+    "reed.glb": "31B2B1B0A7F7933FB95A1FE9161C01AA7DB35357783FBE35902F656602CA9027",
+    "reed-blender.png": "0AD2C30EE61B60903C11C06F58BA6B4D0D410DAAD3F62BD4CE8D07CFB363662D",
+    "capture-1.png": "ED17DCCC17921ED2D5A323CBF6D4325FB13BD99046916D13175109247451C59C",
+    "capture-1-gray.png": "BFF25BEA5C18D3526248C24389BDE2F90551A7FBC1CD42E210F5D6C43D08A0EF",
+    "capture.json": "3428DB67F54F2147022B79B084248F342A5E73E5CD97249B16F9861B593C7AB9",
+    "build.json": "4E23F7C6C7A257AB67200DBC163955BF8ACAE6B1B8A9EC205B760DC29E44A812",
+    "validation.json": "4DA9BFBE25BDCD498EC9880A241694B2E6F038B603158229D8BEA1367A0E3276"
+  },
+  "provenance": {
+    "kind": "original",
+    "source": "Original reed authored for The Valley G-10",
+    "license": "Project original"
+  }
+}

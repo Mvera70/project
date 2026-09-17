@@ -1476,55 +1476,56 @@
     },
     {
       "id": "reed",
-      "artifactRound": "G-10",
+      "artifactRound": "G-25",
       "status": "study",
       "recipe": "art/recipes/reed/reed.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-29-09-422Z-32756",
-        "directory": "artifacts/graphics/G-10/approved/31b2b1b0a7f7933f"
+        "runId": "2026-09-17T10-14-55-794Z-46520",
+        "directory": "artifacts/graphics/G-25/approved/3ae010539e86395b"
       },
       "bounds": {
         "min": [
-          -0.109647,
-          -0.000331,
-          -0.086567
+          -0.168115,
+          0,
+          -0.186606
         ],
         "max": [
-          0.128845,
-          0.433359,
-          0.102284
+          0.163982,
+          0.571667,
+          0.158215
         ],
         "size": [
-          0.238492,
-          0.43369,
-          0.188851
+          0.332097,
+          0.571667,
+          0.344821
         ]
       },
-      "recipeSha256": "1C2698CF4D6B2D3CD220082598A385DAD3332BFDF7736BAF0CE86C034BC2359D",
+      "recipeSha256": "8B3847F5CF68ED178A13AE617FA81FAEB0D45395DB1207A960DEBC46B56744C7",
       "materials": [
         "reed",
-        "reed-light"
+        "reed-light",
+        "seed-head"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 72
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 228
       },
       "hashes": {
-        "reed.blend": "76A9E7192E7BFF990ABEBF651BC20A6FE153FECBC13E2A8D6B5BF58A4C2A9D28",
-        "reed.glb": "31B2B1B0A7F7933FB95A1FE9161C01AA7DB35357783FBE35902F656602CA9027",
-        "reed-blender.png": "0AD2C30EE61B60903C11C06F58BA6B4D0D410DAAD3F62BD4CE8D07CFB363662D",
-        "capture-1.png": "ED17DCCC17921ED2D5A323CBF6D4325FB13BD99046916D13175109247451C59C",
-        "capture-1-gray.png": "BFF25BEA5C18D3526248C24389BDE2F90551A7FBC1CD42E210F5D6C43D08A0EF",
-        "capture.json": "3428DB67F54F2147022B79B084248F342A5E73E5CD97249B16F9861B593C7AB9",
-        "build.json": "4E23F7C6C7A257AB67200DBC163955BF8ACAE6B1B8A9EC205B760DC29E44A812",
-        "validation.json": "4DA9BFBE25BDCD498EC9880A241694B2E6F038B603158229D8BEA1367A0E3276"
+        "reed.blend": "A949C55FCA246DF56A3DF31C29C097382D06B152EFE6487AD0FE9D293B6F4FB4",
+        "reed.glb": "3AE010539E86395BBFB41C13EC468FF48C75BE298E737255AB2DE17DEA87960D",
+        "reed-blender.png": "EE02C27E6930D10627F87E230CD017526336614C2226A979A864023DDBE749DE",
+        "capture-1.png": "47221FB180B6DF434F1F236F15E136E54A581E4936BB70AB577CF89345A1B6EB",
+        "capture-1-gray.png": "9B6D611D3BCF6208ED97DB49C640A52D0B4F9E5A6D3887B25B5DC868177B21B3",
+        "capture.json": "10453B2625CAFE33D05FDA6990470B3DFB6B226F89CB61606348A6429663EB9F",
+        "build.json": "CC6F8F1B1EA3C4F49DEDFB343981E2DA81675CBDC33F615EDA27F9ABE41B2689",
+        "validation.json": "283F437B23F0057E3D95FCEC26458E0FEC2FBC70E839D4E52A930A540071B1DA"
       },
       "provenance": {
         "kind": "original",

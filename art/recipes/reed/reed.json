@@ -12,7 +12,7 @@
       1,
       1
     ],
-    "note": "G-10, lote de la orilla. Un manojo de seis tallos inclinados en dos verdes. Se planta donde el prado toca el agua: sin nada en el borde, el rio parece pegado encima del valle en vez de correr por el."
+    "note": "G-25: mata de ribera de hojas lanceoladas abiertas y tres espigas pardas a distintas alturas. Dos verdes estacionales y espigas de color fijo."
   },
   "materials": [
     {
@@ -24,6 +24,11 @@
       "name": "reed-light",
       "role": "foliageLight",
       "roughness": 1.0
+    },
+    {
+      "name": "seed-head",
+      "role": "timberDark",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -40,141 +45,336 @@
   "primitives": [
     {
       "type": "cylinder",
-      "name": "Reed_0",
+      "name": "Reed_Stem_0",
       "location": [
-        0.0,
-        0.0,
-        0.65
+        -0.18,
+        0.03,
+        0.8
       ],
-      "radius": 0.05,
-      "depth": 1.3,
+      "radius": 0.027,
+      "depth": 1.6,
       "vertices": 4,
-      "smooth": true,
-      "rotationDegrees": [
-        6,
-        -4,
-        0
-      ],
+      "smooth": false,
       "material": "reed",
       "parent": "Root"
     },
     {
       "type": "cylinder",
-      "name": "Reed_1",
+      "name": "Reed_Seed_0",
       "location": [
-        0.22,
-        0.1,
+        -0.18,
+        0.03,
+        1.58
+      ],
+      "radius": 0.074,
+      "depth": 0.27,
+      "vertices": 5,
+      "smooth": false,
+      "material": "seed-head",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Reed_Stem_1",
+      "location": [
+        0.16,
+        0.15,
+        0.655
+      ],
+      "radius": 0.027,
+      "depth": 1.31,
+      "vertices": 4,
+      "smooth": false,
+      "material": "reed",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Reed_Seed_1",
+      "location": [
+        0.16,
+        0.15,
+        1.29
+      ],
+      "radius": 0.074,
+      "depth": 0.27,
+      "vertices": 5,
+      "smooth": false,
+      "material": "seed-head",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Reed_Stem_2",
+      "location": [
+        0.28,
+        -0.17,
         0.525
       ],
-      "radius": 0.05,
+      "radius": 0.027,
       "depth": 1.05,
       "vertices": 4,
-      "smooth": true,
-      "rotationDegrees": [
-        -9,
-        5,
-        0
-      ],
-      "material": "reed-light",
-      "parent": "Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Reed_2",
-      "location": [
-        -0.2,
-        0.14,
-        0.575
-      ],
-      "radius": 0.05,
-      "depth": 1.15,
-      "vertices": 4,
-      "smooth": true,
-      "rotationDegrees": [
-        7,
-        8,
-        0
-      ],
+      "smooth": false,
       "material": "reed",
       "parent": "Root"
     },
     {
       "type": "cylinder",
-      "name": "Reed_3",
+      "name": "Reed_Seed_2",
       "location": [
-        0.08,
-        -0.22,
-        0.425
+        0.28,
+        -0.17,
+        1.03
       ],
-      "radius": 0.05,
-      "depth": 0.85,
-      "vertices": 4,
-      "smooth": true,
-      "rotationDegrees": [
-        -5,
-        -9,
-        0
-      ],
-      "material": "reed-light",
+      "radius": 0.074,
+      "depth": 0.27,
+      "vertices": 5,
+      "smooth": false,
+      "material": "seed-head",
       "parent": "Root"
     },
     {
-      "type": "cylinder",
-      "name": "Reed_4",
+      "type": "sphere",
+      "name": "Reed_Blade_0",
       "location": [
-        -0.14,
-        -0.16,
-        0.5
+        0.2646179760171352,
+        0.05364071931466653,
+        0.375
       ],
-      "radius": 0.05,
-      "depth": 1.0,
-      "vertices": 4,
-      "smooth": true,
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        0.7877182237323191
+      ],
       "rotationDegrees": [
-        11,
-        3,
-        0
+        0,
+        28.842660135412075,
+        11.459155902616466
       ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
       "material": "reed",
       "parent": "Root"
     },
     {
-      "type": "cylinder",
-      "name": "Reed_5",
+      "type": "sphere",
+      "name": "Reed_Blade_1",
       "location": [
-        0.3,
-        -0.06,
-        0.36
+        0.18380634961672973,
+        0.23073843598449853,
+        0.455
       ],
-      "radius": 0.05,
-      "depth": 0.72,
-      "vertices": 4,
-      "smooth": true,
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        0.9525754563287887
+      ],
       "rotationDegrees": [
-        -12,
-        -6,
-        0
+        0,
+        26.83404347077447,
+        51.459155902616466
       ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
       "material": "reed-light",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_2",
+      "location": [
+        -0.008148583045864587,
+        0.31989623410466195,
+        0.535
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        1.1182575731914361
+      ],
+      "rotationDegrees": [
+        0,
+        25.41928833890289,
+        91.45915590261646
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_3",
+      "location": [
+        -0.17876321361233943,
+        0.20234552987152718,
+        0.375
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        0.7877182237323191
+      ],
+      "rotationDegrees": [
+        0,
+        28.842660135412075,
+        131.45915590261646
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_4",
+      "location": [
+        -0.29172852200043004,
+        0.04381175015272281,
+        0.455
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        0.9525754563287886
+      ],
+      "rotationDegrees": [
+        0,
+        26.834043470774457,
+        171.45915590261646
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed-light",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_5",
+      "location": [
+        -0.2729639737866788,
+        -0.1670049969748969,
+        0.535
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        1.1182575731914361
+      ],
+      "rotationDegrees": [
+        0,
+        25.41928833890289,
+        211.4591559026165
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_6",
+      "location": [
+        -0.08585476240479589,
+        -0.25598624918619367,
+        0.375
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        0.7877182237323191
+      ],
+      "rotationDegrees": [
+        0,
+        28.842660135412075,
+        251.45915590261646
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_7",
+      "location": [
+        0.10792217238370025,
+        -0.2745501861372214,
+        0.455
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        0.9525754563287887
+      ],
+      "rotationDegrees": [
+        0,
+        26.83404347077447,
+        291.4591559026165
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed-light",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Reed_Blade_8",
+      "location": [
+        0.28111255683254344,
+        -0.15289123712976505,
+        0.535
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.055,
+        0.21,
+        1.1182575731914361
+      ],
+      "rotationDegrees": [
+        0,
+        25.41928833890289,
+        331.4591559026165
+      ],
+      "segments": 4,
+      "rings": 3,
+      "smooth": false,
+      "material": "reed",
       "parent": "Root"
     }
   ],
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 640,
+    "height": 780,
     "cameraLocation": [
-      2.2,
-      -2.75,
-      1.7600000000000002
+      1.8,
+      -2.3,
+      1.4
     ],
     "cameraTarget": [
       0,
       0,
-      0.7
+      0.26
     ],
-    "orthoScale": 3.08,
+    "orthoScale": 0.95,
     "worldRole": "sky"
   }
 }
