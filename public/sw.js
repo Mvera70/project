@@ -15,7 +15,7 @@
 // The cache NAME is the only invalidation this has. Bump it and every older
 // cache is dropped on activate.
 
-const CACHE = 'valley-v2';
+const CACHE = 'valley-v3';
 
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 

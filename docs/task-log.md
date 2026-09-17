@@ -76,6 +76,15 @@ aptos muestran un plantón creciente hasta la regeneración. Semilla 67 filmada
 con motor vivo y semilla 1 con rebrote real; 97 pruebas dirigidas, typecheck y
 lint verdes. [Informe](life-rounds/IA-16.md).
 
+**Icono PWA renovado (17 sep):** el mosaico plano de M-27 se sustituye por el
+emblema aprobado por el dueño —casa de paja, escudo y cinta sobre fondo cuero
+naranja— en 192, 512 y 512 `maskable`. La fuente maestra queda en
+`tools/icon-source.png` y `npm run icons` reproduce las tres salidas. Revisado a
+48 px y bajo máscara circular; typecheck, lint del generador y la prueba del
+manifiesto instalable, verdes. La caché del trabajador sube a `valley-v3`: los
+iconos conservan sus nombres públicos y, sin invalidarla, una instalación
+existente seguiría sirviendo los PNG anteriores después del despliegue.
+
 **IA-15 · primera cadena visible de recursos:** reparto semanal estable, pareja
 fundadora dedicada a subsistencia y ciclo `árbol → tala → carga → descarga → vuelta`.
 El tajo coincide con la celda que tala el motor; almiares y pilas responden a reservas
