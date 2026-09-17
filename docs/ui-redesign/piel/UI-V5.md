@@ -103,3 +103,87 @@ el orden del motor, la cabecera sigue aclarando que la cifra global es mayor, y
 la identidad sigue viajando por `id` y nunca por el nombre (AC-9: dos aldeanos
 pueden compartir nombre). 52 pruebas de la lista y el recorrido de U-14, en
 verde.
+
+---
+
+# UI-V5c · La encrucijada, y la fuga de la cabecera
+
+Las dos cosas que salieron de la captura del año 37 al ir a verificar el
+documento sellado de la crónica.
+
+## La placa de fecha vacía sobre la decisión
+
+No era el velo comiéndose una tinta floja. `crossroad.ts` oculta la cabecera
+mientras se decide —bien, la pantalla entera es de la decisión, §11.2— pero su
+lista nombraba **los elementos de U-01**: `.valley-date`, `.valley-time`,
+`.valley-vitals`. Y UI-V1 metió cada uno **dentro de una placa nueva**. Se
+ocultaba el texto y la placa se quedaba: en la captura salía la placa de fecha
+vacía, con su arco del sol, flotando encima de la decisión. Los dos círculos de
+velocidad, igual: la lista tenía `.valley-speed-badge` —el de la derecha— pero
+no el grupo, así que el de pausa asomaba detrás de las tarjetas.
+
+Ahora se ocultan los contenedores de la piel (`.hud-plate-date`,
+`.hud-speed-cluster`, `.hud-compact-header`) y no sólo sus textos.
+
+**La lección, que vale para cualquier ronda que envuelva algo:** una lista de
+«qué esconder» escrita con nombres de elementos caduca en cuanto alguien mete
+esos elementos dentro de otra cosa, y caduca **en silencio**. Nada falla; sólo
+aparece una placa vacía que nadie mira hasta que sale en una captura.
+
+## La decisión, como documento sellado
+
+`plan-piel.md` §3.5, que no tiene prototipo propio y se viste con el lenguaje
+del documento sellado del prototipo 02:
+
+- **El velo oscuro se va.** Estaba por una razón medida y buena —el suelo del
+  valle es claro y el precio perdía contraste contra el prado— pero era la
+  solución del juego de antes del rediseño. Con una página de pergamino debajo,
+  el problema desaparece de raíz, y el valle se queda a la vista con un velo del
+  18 %: atenuado y no tapado, que es lo que §11.2 pide.
+- La página sube desde abajo con una franja de fusión de 64 px, **hermana de la
+  página y no un fondo suyo**. El primer intento puso el degradado y el color
+  opaco en el mismo elemento: el color rellena la caja entera, el degradado deja
+  de tener nada que fundir, y salió una banda de pergamino vacía de 300 px
+  encima del título. Es el mismo reparto que la crónica ya tenía, por un motivo
+  hermano.
+- Sello de lacre a la izquierda del título, título en `--skin-red-ink`, cuerpo
+  en EB Garamond 17, y cada opción una tarjeta de pergamino con el canto rasgado
+  —los cuatro recortes alternados— con el verbo en Cinzel y el precio en cursiva
+  al lado.
+- La píldora de la decisión aplazada pasa a chip de pergamino con el sello, y
+  **baja debajo de la fila de cifras**: con el sello mide 199 px y arriba a la
+  derecha choca con la placa de fecha, que ocupa de x 27 a x 361.
+
+### Una salvedad del plan, medida
+
+§3.5 pide el precio «al lado» del verbo. Hay precios de cuarenta caracteres
+—«the wood does not come back in a lifetime»— y a 390 px no caben en la misma
+línea. La fila envuelve: el corto se queda al lado y el largo baja solo. Lo que
+UI-R5 exige —mismo bloque, mismo toque, siempre visible— se cumple en los dos
+casos.
+
+## Medido
+
+Semilla 11, año 37, con bundle propio en `artifacts/graphics/UI-V3c/game` para
+no pisar el de la otra sesión:
+
+| Qué | Medida |
+|---|---|
+| Precios en pantalla | 3 de 3, en y 633, 717 y 793 de 844 |
+| ¿Hace falta desplazar? | No: `scrollHeight` 413 = `clientHeight` 413 |
+| Piezas de cabecera ocultas | placa de fecha, círculos, regleta y cifras |
+| Solape de la píldora | ninguno, ni con la fecha ni con las cifras |
+
+**Lo que no cubre ninguna prueba automática:** la jornada de la encrucijada de
+`valley.shots.ts` es un fallo declarado desde antes de esta ronda —«ya no se
+planta a los 58 s de reloj virtual en esa semilla»— así que no valida esta
+maquetación. Ahora hay con qué arreglarla, y queda anotado: `openAtYear` es
+`foundGame` más `run(…, 'prudent')`, y con eso se predice fuera del navegador en
+qué año queda una pendiente, en vez de fijar un número de segundos a ojo.
+Semilla 11 año 37, semilla 7 año 25 y semilla 43 años 13, 39 y 45 sirven.
+
+## Y el epitafio sigue pendiente
+
+§3.5 lo cubre en la misma frase —la misma página, con la capitular en
+`--skin-wood-plaque` en vez de rojo— y no se ha tocado: no ha salido en ninguna
+captura, y esta ronda era para lo que sí.

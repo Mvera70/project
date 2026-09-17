@@ -17,72 +17,134 @@ import { recogniseGesture, type Point } from '../gestures';
 
 const STYLE_ID = 'valley-crossroad-style';
 const STYLE = `
-/* §11.2 pide el valle atenuado y no tapado, pero **el valle no es un fondo
-   uniforme**: su suelo es claro y las opciones caen justo encima. Visto en
-   captura, el coste de cada opción perdía contraste contra el prado. Se deja
-   ver arriba, donde no hay letra, y se cierra hacia abajo, donde sí. */
-.crossroad-scrim { position: fixed; inset: 0; z-index: 10; display: flex; align-items: flex-end;
-  background: linear-gradient(to bottom, rgba(26,21,17,.72) 0%, rgba(26,21,17,.93) 38%, rgba(26,21,17,.97) 100%);
-  color: var(--parchment, #f2e9d8); font: 14px/1.35 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
-.crossroad { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
-  padding: max(22px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); }
-/* U-01 · La encrucijada es el momento en que el jugador decide, y tiene que
-   pesar como tal: un filete de latón encima del título, como el encabezamiento
-   de un capítulo, y el cuerpo en la misma voz con que está escrita la crónica. */
-.crossroad h1 { margin: 0 0 12px; padding-top: 14px; text-wrap: balance;
-  border-top: 2px solid var(--gild-lit, #c9ab6b); color: var(--parchment, #f2e9d8);
-  font: 600 23px/1.18 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-.crossroad p.crossroad-body { margin: 0 0 20px; color: var(--paper-dim, #d9cfbc);
-  font: 15px/1.5 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif);
-  text-wrap: pretty; }
-.crossroad-options { display: flex; flex-direction: column; gap: 9px; }
-/* Cada opción es una carta que se levanta: un canto claro a la izquierda la
-   marca como elegible, y al pulsarla se hunde en vez de cambiar de color. */
-.crossroad-options button { display: block; width: 100%; box-sizing: border-box; text-align: left;
-  padding: 13px 15px 13px 14px; border: 1px solid rgba(217,207,188,.28);
-  border-left: 3px solid var(--gild-lit, #c9ab6b); border-radius: 4px;
-  background: rgba(217,207,188,.07); color: inherit; font: inherit; min-height: 44px;
-  cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.crossroad-options button:active { background: rgba(217,207,188,.16); transform: translateY(1px); }
-.crossroad-options button:focus-visible { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 2px; }
-.crossroad-label { display: block; color: var(--parchment, #f2e9d8);
-  font: 600 16px/1.25 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-/* El precio no es una nota al pie: es la mitad de la decisión.
-   **Y no va en mayúsculas**, que era como estaba y se vio en una captura: «A
+/* UI-V5c · **La decisión, como documento sellado.** \`plan-piel.md\` §3.5: se
+   viste con el mismo lenguaje que el documento sellado del prototipo 02, que
+   es lo que ese prototipo enseña de una decisión — no tiene pantalla propia.
+
+   **Y el velo oscuro se va.** Estaba ahí por una razón medida y buena: el suelo
+   del valle es claro, las opciones caen encima y el precio perdía contraste
+   contra el prado. Pero la solución era del juego de antes del rediseño; con
+   una página de pergamino debajo, el problema desaparece de raíz y no hace
+   falta apagar el valle para leer. El valle se sigue viendo arriba, que es lo
+   que §11.2 pide («atenuado y no tapado»), y la página sube desde y 300 como
+   la de la crónica. */
+.crossroad-scrim { position: fixed; inset: 0; z-index: 10; display: flex;
+  flex-direction: column; justify-content: flex-end;
+  /* §11.2 pide el valle **atenuado y no tapado**, y sin esto quedaba a plena
+     luz: un velo suave, que sólo se ve donde se ve el valle porque la franja
+     de fusión y la página pintan encima de él. Un 18 % basta para que la
+     atención caiga en el documento sin apagar la aldea, que es lo que el velo
+     opaco de antes hacía. */
+  background: rgba(27, 22, 19, .18);
+  color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
+/* La franja con la que la página se funde con el valle, **hermana de la página
+   y no un fondo suyo**. Es el mismo reparto que en la crónica y por el mismo
+   motivo aprendido allí: el degradado y el color opaco en el mismo elemento se
+   pisan —el color rellena la caja entera y el degradado deja de tener nada que
+   fundir—, y lo que salió en la primera captura fue una banda de pergamino
+   vacía de 300 px encima del título. Y la altura la pone el contenido: la
+   página ocupa lo que necesita y esta franja le añade la fusión, en vez de un
+   número fijo que a veces sobra. */
+.crossroad-fade { flex: 0 0 64px;
+  background: linear-gradient(to bottom, transparent 0, var(--skin-page) 100%); }
+/* La página. */
+.crossroad { box-sizing: border-box; width: 100%; overflow: auto;
+  padding: 0 20px max(20px, env(safe-area-inset-bottom));
+  background-color: var(--skin-page);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px;
+  background-blend-mode: multiply; }
+/* La cabecera: el sello a la izquierda del título, como el documento sellado
+   de la crónica (§3.2), y el título en la tinta roja de una decisión. */
+.crossroad-head { display: flex; align-items: flex-start; gap: 14px; padding-top: 4px; }
+.crossroad-head .skin-seal { margin-top: 2px; }
+.crossroad h1 { margin: 0; padding-top: 0; border-top: 0; flex: 1 1 auto;
+  color: var(--skin-red-ink); text-wrap: balance;
+  font: 600 20px/1.2 var(--skin-font-voice);
+  letter-spacing: var(--skin-track-inscription); text-transform: uppercase; }
+.crossroad p.crossroad-body { margin: 14px 0 20px; color: var(--skin-ink);
+  font: 17px/1.5 var(--skin-font-read); text-wrap: pretty; }
+.crossroad-options { display: flex; flex-direction: column; gap: 10px; }
+/* Cada opción, una tarjeta de pergamino con el canto rasgado, y los cuatro
+   recortes alternados para que tres seguidas no se lean como tres copias. */
+.crossroad-options button { display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: 4px 10px; width: 100%; box-sizing: border-box; min-height: 52px; text-align: left;
+  padding: 12px 15px; border: 0; border-radius: 0; cursor: pointer;
+  color: var(--skin-ink); font: inherit;
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip);
+  -webkit-tap-highlight-color: transparent; }
+.crossroad-options button:nth-child(2) { clip-path: var(--skin-deckle-chip-b); }
+.crossroad-options button:nth-child(3) { clip-path: var(--skin-deckle-chip-c); }
+.crossroad-options button:nth-child(4) { clip-path: var(--skin-deckle-chip-d); }
+.crossroad-options button:active { background-color: var(--skin-parchment-aged);
+  transform: translateY(1px); }
+.crossroad-options button:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+.crossroad-label { color: var(--skin-ink);
+  font: 600 15px/1.25 var(--skin-font-voice); letter-spacing: .02em; }
+/* El precio, **al lado del verbo y no debajo**, que es lo que §3.5 pide. Con
+   una salvedad medida: hay precios de cuarenta caracteres («the wood does not
+   come back in a lifetime») y a 390 px de ancho no caben en la misma línea que
+   el verbo. Así que la fila envuelve: el precio corto se queda al lado, el
+   largo baja solo. Lo que UI-R5 exige —mismo bloque, mismo toque, siempre
+   visible— se cumple en los dos casos.
+
+   Y no va en mayúsculas, que era como estaba y se vio en una captura: «A
    HUNDRED AND TWENTY OF GRAIN, AND SHE IS THIN» grita, y el precio de una
    decisión no grita, se dice. El banco lo escribe en minúscula con su
-   mayúscula inicial (§9.3) y la hoja de estilo lo estaba reescribiendo. En
-   cursiva y en la misma serif de la crónica: es la voz de quien te vende la
-   vaca, no una etiqueta de sistema. */
-.crossroad-cost { display: block; margin-top: 5px; color: var(--gild-lit, #c9ab6b);
-  font: italic 13.5px/1.35 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif);
-  letter-spacing: .005em; }
+   mayúscula inicial (§9.3). */
+.crossroad-cost { color: var(--skin-ink-faded);
+  font: italic 14px/1.35 var(--skin-font-read); letter-spacing: .005em; }
 /* U-07 · la marca discreta de §11.2 pasaba por un punto rojo de 14 px que
-   nadie lee como "lo mas importante que el juego tiene que pedirte". Misma
-   piel que la regleta de velocidad y la barra de abajo (index.html,
-   .valley-speeds, .valley-tabbar): pergamino (--plate) con un filete de
-   latón, porque es el mismo tipo de mando de estado, no un aviso de sistema. */
-.crossroad-marker { position: fixed; z-index: 9; top: max(9px, env(safe-area-inset-top));
-  right: max(12px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 6px;
-  min-height: 44px; padding: 0 14px; border: 1.5px solid var(--gild, #7d5c2e); border-radius: 22px;
-  background: var(--plate, rgba(242,233,216,.90)); color: var(--ink, #221d18);
-  font: 650 12px/1 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
-  letter-spacing: .02em; cursor: pointer; -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 2px 6px rgba(34,29,24,.20); backdrop-filter: blur(2px); }
-.crossroad-marker:active { background: rgba(217,207,188,.55); transform: translateY(1px); }
-.crossroad-marker:focus-visible { outline: 2px solid var(--gild, #7d5c2e); outline-offset: 2px; }
+   nadie lee como «lo más importante que el juego tiene que pedirte». Desde
+   esta ronda es un chip de pergamino con su canto rasgado, como el resto de lo
+   que este juego pone sobre el valle, y lleva el sello para que se lea como el
+   documento que espera. */
+/* **Debajo de la fila de chips, no arriba a la derecha.** Ahí es donde vivía, y
+   con el sello la píldora pasó de 150 a 199 px de ancho: medido, choca con la
+   placa de fecha, que ocupa de x 27 a x 361. La tira de cifras acaba en y 90,
+   así que 92 la deja justo debajo, sobre el valle y sin tapar nada. */
+.crossroad-marker { position: fixed; z-index: 9;
+  top: calc(max(9px, env(safe-area-inset-top)) + 92px);
+  right: max(12px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 14px; border: 0; border-radius: 0; cursor: pointer;
+  background-color: var(--skin-parchment);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip-b);
+  color: var(--skin-red-ink); font: 600 12px/1 var(--skin-font-voice);
+  letter-spacing: var(--skin-track-label); text-transform: uppercase;
+  box-shadow: var(--skin-shadow); -webkit-tap-highlight-color: transparent; }
+.crossroad-marker .skin-seal { width: 26px; height: 26px; flex: 0 0 26px; }
+.crossroad-marker .skin-seal .skin-icon { width: 15px; height: 15px; }
+.crossroad-marker:active { background-color: var(--skin-parchment-deep); transform: translateY(1px); }
+.crossroad-marker:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 /* **La pantalla entera es de la decisión** (§11.2), y eso incluye la cabecera.
    Se vio en una captura: la tira, las tres palancas y la línea de estado se
-   leían a través de la encrucijada —las tarjetas son translúcidas—, y ahí
-   arriba no hay nada que hacer mientras se contesta: las órdenes permanentes
-   valen para la semana que viene, no para esto. El aviso de §11.6 ya se
-   ocultaba por la misma razón (index.html). */
+   leían a través de la encrucijada, y ahí arriba no hay nada que hacer mientras
+   se contesta: las órdenes permanentes valen para la semana que viene, no para
+   esto.
+
+   **UI-V5c · y hay que ocultar las piezas, no sólo sus textos.** Esta lista
+   nombraba los elementos de U-01 —\`.valley-date\`, \`.valley-time\`,
+   \`.valley-vitals\`— y UI-V1 metió cada uno **dentro de una placa nueva**. El
+   texto se ocultaba y la placa se quedaba: en la captura del año 37 salía la
+   placa de fecha vacía, con su arco del sol, encima de la decisión. Y los dos
+   círculos de velocidad igual: la lista tenía \`.valley-speed-badge\` —el de la
+   derecha— pero no el grupo, así que el de pausa asomaba detrás de las
+   tarjetas. Se ocultan los contenedores de la piel. */
+.crossroad-open .hud-plate-date,
+.crossroad-open .hud-speed-cluster,
+.crossroad-open .hud-compact-header,
 .crossroad-open .valley-speeds,
 .crossroad-open .valley-speed-badge,
 .crossroad-open .valley-orders-now,
 .crossroad-open .valley-orders,
 .crossroad-open .valley-vitals,
-.crossroad-open .valley-orders,
 .crossroad-open .valley-doing,
 .crossroad-open .valley-time,
 .crossroad-open .valley-date { visibility: hidden; }
@@ -156,9 +218,15 @@ function mountMarker(app: App, p: PendingCrossroad): void {
   // is the summons ("a crossroad is waiting") that already had its wording
   // and was not to change.
   marker.setAttribute('aria-label', renderUiText('crossroad.waiting'));
+  // UI-V5c · la píldora lleva el sello, para que se lea como el documento que
+  // espera y no como un aviso de sistema.
+  const markerSeal = document.createElement('div');
+  markerSeal.className = 'skin-seal';
+  markerSeal.setAttribute('aria-hidden', 'true');
+  markerSeal.innerHTML = '<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#seal-tree"/></svg>';
   const text = document.createElement('span');
   text.textContent = renderUiText('crossroad.pending_pill');
-  marker.append(text);
+  marker.append(markerSeal, text);
   marker.addEventListener('click', () => {
     marker.remove();
     mountOverlay(app, p);
@@ -176,10 +244,23 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
 
   const scrim = document.createElement('div');
   scrim.className = 'crossroad-scrim';
+  // La franja de fusión, hermana de la página: ver su comentario en `STYLE`.
+  const fade = document.createElement('div');
+  fade.className = 'crossroad-fade';
   const card = document.createElement('section');
   card.className = 'crossroad';
+  // UI-V5c · el sello de lacre a la izquierda del título, como el documento
+  // sellado del prototipo 02 (§3.5). El árbol sale del sprite incrustado en
+  // `index.html`: un `<use>` a un fichero externo no carga bajo `file://`.
+  const head = document.createElement('div');
+  head.className = 'crossroad-head';
+  const seal = document.createElement('div');
+  seal.className = 'skin-seal';
+  seal.setAttribute('aria-hidden', 'true');
+  seal.innerHTML = '<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#seal-tree"/></svg>';
   const h1 = document.createElement('h1');
   h1.textContent = textOf(state, p, template.title);
+  head.append(seal, h1);
   const body = document.createElement('p');
   body.className = 'crossroad-body';
   body.textContent = textOf(state, p, template.body);
@@ -224,8 +305,8 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
     options.append(button);
   }
 
-  card.append(h1, body, options);
-  scrim.append(card);
+  card.append(head, body, options);
+  scrim.append(fade, card);
 
   // §11.2: no close button. A swipe down returns to the valley; the crossroad
   // stays pending and a discreet mark takes its place.
