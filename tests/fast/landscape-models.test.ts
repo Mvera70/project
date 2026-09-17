@@ -5,12 +5,12 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { type InstancedMesh, Matrix4, Vector3 } from 'three';
 import { foundTwenty } from '../helpers/founding';
 import { TERRAIN_CODE } from '../../src/engine/state';
-import { scatterOn } from '../../src/render3d/world/forest';
+import { scatterOn, scrubCells } from '../../src/render3d/world/forest';
 import { loadRecipe } from '../../tools/art/recipe';
 import { parseRecipe } from '../../tools/art/schema';
 
 describe('G-25 · piedras confinadas y formas achatadas', () => {
-  it.each(['rock', 'reed'])('conserva todo %s dentro de su celda aunque cambien giro, escala y desplazamiento', async (asset) => {
+  it.each(['rock', 'reed', 'scrub'])('conserva todo %s dentro de su celda aunque cambien giro, escala y desplazamiento', async (asset) => {
     const bytes = readFileSync(resolve(`public/assets/valley3d/${asset}.glb`));
     const { scene } = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     const state = foundTwenty(7);
@@ -40,6 +40,41 @@ describe('G-25 · piedras confinadas y formas achatadas', () => {
     // Matrices de instancia Float32: tolerancia numérica, no margen de invasión.
     expect(maxOutside).toBeLessThan(0.00002);
     forest.dispose();
+  });
+
+  it('coloca monte bajo estable solo en bordes y deja espacio junto a construcciones, agua y caminos', () => {
+    const map = structuredClone(foundTwenty(7).map);
+    map.path.fill(0);
+    map.terrain.fill(TERRAIN_CODE.meadow);
+    for (let z = 0; z < map.height; z++) {
+      for (let x = 0; x < map.width; x++) {
+        if (x % 8 === 0) map.terrain[z * map.width + x] = TERRAIN_CODE.forest;
+      }
+    }
+    const taken = new Set<number>();
+    for (let x = 0; x < map.width; x++) {
+      map.path[5 * map.width + x] = 1;
+      taken.add(12 * map.width + x);
+      map.terrain[20 * map.width + x] = TERRAIN_CODE.water;
+    }
+    const before = structuredClone(map);
+    const cells = scrubCells(map, taken);
+    expect(cells.length).toBeGreaterThan(0);
+    expect(scrubCells(map, taken)).toEqual(cells);
+    expect(map).toEqual(before);
+    const selected = new Set(cells);
+    for (const cell of cells) {
+      expect(map.terrain[cell]).toBe(TERRAIN_CODE.meadow);
+      expect([cell - 1, cell + 1, cell - map.width, cell + map.width]
+        .some(n => map.terrain[n] === TERRAIN_CODE.forest || map.terrain[n] === TERRAIN_CODE.rock)).toBe(true);
+      for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) {
+        const n = cell + dz * map.width + dx;
+        expect(taken.has(n) || map.path[n]! > 0 || map.terrain[n] === TERRAIN_CODE.water).toBe(false);
+        if (n !== cell) expect(selected.has(n)).toBe(false);
+      }
+    }
+    map.terrain.fill(TERRAIN_CODE.meadow);
+    expect(scrubCells(map, new Set())).toEqual([]);
   });
 
   it('admite dimensiones positivas de elipsoide y rechaza escalas degeneradas', async () => {

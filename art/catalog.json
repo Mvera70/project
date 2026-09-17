@@ -4022,6 +4022,64 @@
         "source": "Original G-22: puerros de tallo claro y hojas largas verdes.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "scrub",
+      "artifactRound": "G-25",
+      "status": "study",
+      "recipe": "art/recipes/scrub/scrub.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T10-23-15-091Z-5364",
+        "directory": "artifacts/graphics/G-25/approved/b425079a418a7b93"
+      },
+      "bounds": {
+        "min": [
+          -0.300691,
+          -0.011667,
+          -0.325706
+        ],
+        "max": [
+          0.324571,
+          0.291931,
+          0.279147
+        ],
+        "size": [
+          0.625262,
+          0.303598,
+          0.604853
+        ]
+      },
+      "recipeSha256": "4676D6A64B9D2A3C5A1C9E7268F01716C43B48DB0FE2EA437931DF9F5C34156E",
+      "materials": [
+        "leaf",
+        "leaf-light"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 244
+      },
+      "hashes": {
+        "scrub.blend": "6301CDE3A435DDFEB6C8E81C59DD73981050B38ADE8FA3D9B5A553EB01BFC978",
+        "scrub.glb": "B425079A418A7B93A35AFA990702AF851F506FCE346BFD375813015B9770E136",
+        "scrub-blender.png": "2D6B28FA798A83FEF0165EDCDB2ABD5039088D55A6966E75D1306ABD9C157B32",
+        "capture-1.png": "D6C912CACA9FE1B5D656E8666A3433344EB4C9EDE3A79CD53E5CC6F980A2248F",
+        "capture-1-gray.png": "5F008130B8A8E18D1BB1DB6DAA276DDA27623A66A1510F4185FB4E9D53EEA6A5",
+        "capture.json": "ED87B8DA6E176432023F71FD0E8F13F60B49E9651FFF5C2BDC5FA57515ACC4DA",
+        "build.json": "C72B5F24B265EDD4C79738F94434599E0586C3D20121B3835C81F22AE7EA7A99",
+        "validation.json": "7352FFE068A3D36FCF25C82BFDB5358404FF5147D7D5E95DDC3B09AA10E811A3"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-25: monte bajo facetado para The Valley.",
+        "license": "Project original"
+      }
     }
   ]
 }

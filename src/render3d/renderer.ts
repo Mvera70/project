@@ -31,7 +31,7 @@ import { buildGround, elevationAt, type Ground } from './world/ground';
 import { buildRidge } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
 import {
-  buildForest, builtCells, scatterCells, scatterOn, shoreCells, type Forest,
+  buildForest, builtCells, scatterCells, scatterOn, scrubCells, shoreCells, type Forest,
 } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
@@ -60,6 +60,7 @@ const VILLAGER = 'villager';
 const TREE = 'tree';
 const ROCK = 'rock';
 const REED = 'reed';
+const SCRUB = 'scrub';
 const FORD = 'ford-stone';
 
 
@@ -82,7 +83,7 @@ export const WANTED = [
   // G-15 · los trastos del corral, que es lo que dice que aquí vive alguien.
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
-  ...VILLAGER_MODELS, TREE, ROCK, REED, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  ...VILLAGER_MODELS, TREE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
@@ -291,6 +292,7 @@ export async function createGraphicsRenderer(
   let forest: Forest | null = null;
   let stones: Forest | null = null;
   let reeds: Forest | null = null;
+  let scrub: Forest | null = null;
   let crossing: Ford | null = null;
   let plan: ScenePlan | null = null;
   /** La sierra de V-14. Vive con el valle y se rehace sólo si cambia el mapa. */
@@ -517,7 +519,7 @@ export async function createGraphicsRenderer(
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
-    for (const scattered of [forest, stones, reeds, crossing]) {
+    for (const scattered of [forest, stones, reeds, scrub, crossing]) {
       if (scattered === null) continue;
       world.remove(scattered.group);
       scattered.dispose();
@@ -525,6 +527,7 @@ export async function createGraphicsRenderer(
     forest = null;
     stones = null;
     reeds = null;
+    scrub = null;
     crossing = null;
 
     // Lo construido no lleva vegetacion encima.
@@ -557,6 +560,15 @@ export async function createGraphicsRenderer(
       reeds = scatterCells(state.map, reed.original as Object3D, shoreCells(state.map, taken), palette, true);
       reeds.group.name = 'Valley_Reeds';
       world.add(reeds.group);
+    }
+    const undergrowth = library.get(SCRUB);
+    if (undergrowth !== undefined) {
+      const scrubTaken = new Set(taken);
+      // La leña y los carros viven fuera de la huella del edificio.
+      for (const prop of steadingOf(state, state.terrainSeed)) scrubTaken.add(prop.cell);
+      scrub = scatterCells(state.map, undergrowth.original as Object3D, scrubCells(state.map, scrubTaken), palette, true);
+      scrub.group.name = 'Valley_Scrub';
+      world.add(scrub.group);
     }
     // El vado. Donde esta lo dice el motor, que es quien lo define: calcularlo
     // aqui seria tener dos vados, y ya hay uno de mas en el render 2D.
@@ -1085,7 +1097,7 @@ export async function createGraphicsRenderer(
         ground.dispose();
         ground = null;
       }
-      for (const scattered of [forest, stones, reeds, crossing]) {
+      for (const scattered of [forest, stones, reeds, scrub, crossing]) {
         if (scattered === null) continue;
         world.remove(scattered.group);
         scattered.dispose();
@@ -1093,6 +1105,7 @@ export async function createGraphicsRenderer(
       forest = null;
       stones = null;
       reeds = null;
+      scrub = null;
       crossing = null;
       if (!borrowed) library.dispose();
       lastActors = [];

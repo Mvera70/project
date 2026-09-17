@@ -172,6 +172,32 @@ export function shoreCells(map: ValleyMap, taken?: ReadonlySet<number>): number[
   return cells;
 }
 
+/** Monte bajo decorativo en bordes, con un cinturón libre junto a accesos.
+ * TUNE visual: se conserva aproximadamente un tercio de candidatos, sin azar
+ * del motor ni obstáculos nuevos. El interior de los prados sigue despejado. */
+export function scrubCells(map: ValleyMap, taken: ReadonlySet<number>): number[] {
+  const cells: number[] = [];
+  const selected = new Set<number>();
+  for (let cell = 0; cell < map.terrain.length; cell++) {
+    if (map.terrain[cell] !== TERRAIN_CODE.meadow || stable(cell, 83) >= 0.33) continue;
+    const x = cell % map.width, z = Math.floor(cell / map.width);
+    const adjacent = [cell - 1, cell + 1, cell - map.width, cell + map.width];
+    if (!adjacent.some(n => map.terrain[n] === TERRAIN_CODE.forest || map.terrain[n] === TERRAIN_CODE.rock)) continue;
+    let clear = true;
+    for (let dz = -1; dz <= 1 && clear; dz++) for (let dx = -1; dx <= 1; dx++) {
+      const nx = x + dx, nz = z + dz, neighbour = nz * map.width + nx;
+      if (nx < 0 || nx >= map.width || nz < 0 || nz >= map.height
+        || taken.has(neighbour) || selected.has(neighbour) || (map.path[neighbour] ?? 0) > 0
+        || map.terrain[neighbour] === TERRAIN_CODE.water || map.terrain[neighbour] === TERRAIN_CODE.ford) {
+        clear = false;
+        break;
+      }
+    }
+    if (clear) { cells.push(cell); selected.add(cell); }
+  }
+  return cells;
+}
+
 /** Lo mismo sobre una lista de celdas ya elegida. */
 export function scatterCells(
   map: ValleyMap, source: Object3D, cells: readonly number[], palette?: Palette,

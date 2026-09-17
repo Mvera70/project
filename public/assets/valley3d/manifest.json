@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T10:16:03.892609+00:00",
+  "generatedAt": "2026-09-17T10:24:19.420816+00:00",
   "invocation": "G-25: publicación selectiva por modelo",
   "assets": [
     {
@@ -815,6 +815,12 @@
       "id": "field-leeks",
       "file": "field-leeks.glb",
       "sha256": "1FCE25E55B5500790E934F5CC08AF1DACE945FE0E8CBA1E7718C0D7FEB6EC123",
+      "motion": []
+    },
+    {
+      "id": "scrub",
+      "file": "scrub.glb",
+      "sha256": "B425079A418A7B93A35AFA990702AF851F506FCE346BFD375813015B9770E136",
       "motion": []
     }
   ]

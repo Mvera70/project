@@ -64,6 +64,10 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-25 · monte bajo entregado:** recurso nuevo scrub, repartido de forma estable
+en bordes de bosque/roca con margen de accesos, cultivos, agua y objetos del corral.
+53 pruebas, typecheck y lint verdes; dos capturas finales reales revisadas.
+
 **G-25 · ribera entregada:** hojas abiertas y tres espigas por mata, tinte
 estacional y contención en la celda. 51 pruebas, typecheck y lint verdes;
 captura real sin errores. Pendientes monte bajo y más siluetas arbóreas.
@@ -308,6 +312,9 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**G-25 scrub:** 244 triángulos, 2 materiales/mallas, 22 524 bytes y altura
+0,304 celdas. 53 recursos empaquetados; sin medición nueva de rendimiento móvil.
+
 **G-25 reed:** 72→228 triángulos; 3 materiales/mallas, 21 572 bytes, altura
 0,572 celdas. Verificación de todos los vértices tras giro/escala por instancia.
 
@@ -459,7 +466,7 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**G-25 paisaje:** rocas y ribera entregadas; siguen pendientes monte bajo y otras siluetas
+**G-25 paisaje:** rocas, ribera y monte bajo entregados; siguen pendientes otras siluetas
 de árboles; requieren respetar accesos y campos. El vado desplazado sigue abierto.
 La batería OBS-02 se aplaza por decisión del usuario; se retoma modelado 3D.
 
