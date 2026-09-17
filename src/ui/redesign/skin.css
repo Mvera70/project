@@ -403,10 +403,47 @@
  * redondeadas. La clase es la misma, así que el día que llegue el SVG basta
  * darle `mask-image` aquí y ninguna ronda tiene que cambiar de marcado.
  */
+/** UI-V8 · **El listón de madera del canto de la bandeja.**
+
+    Aquí había una franja plana de 6 px, y el dueño del diseño la señaló en su
+    tablet: «no se parece al prototipo». No se parecía. En el prototipo 01 el
+    canto es un **listón redondo de madera**, con su brillo a lo largo del
+    filo de arriba y su sombra debajo, y el pergamino se le mete por debajo.
+    Una franja plana del mismo color no es lo mismo: es una línea, y lo que hay
+    que leer ahí es un palo del que cuelga el papel.
+
+    Once de alto y no seis —el del prototipo mide 24 px del PNG, o sea 11 en
+    CSS—, con el redondeo completo para que sea cilindro y no caja, un brillo
+    de latón de un píxel en el filo y la sombra que lo separa del papel. */
 .skin-scroll-edge {
-  height: 6px;
-  background: var(--skin-wood);
-  border-radius: 18px 18px 0 0;
+  /* **UI-V8 · el canto es un listón de madera clara sobre el papel, y su
+     curva tiene meseta.** Medido en el prototipo 01: la madera baja a y 1507
+     en la esquina y sube a 1452 en el centro —25 px de flecha en medida de
+     pantalla— y entre medias **no es un arco**, sino una meseta central con
+     dos hombros en S. Un `border-radius` sólo sabe hacer elipses, así que
+     esto lo dibuja una tapa: el papel de la bandeja por debajo de la curva,
+     el listón encima de la junta y transparente por arriba, donde se ve el
+     valle. Estirada con `100% 100%`, así que en una tablet la meseta se
+     ensancha y los hombros se tienden, que es lo que hace un palo largo.
+     La flecha son los 31 px medidos y el hombro se resuelve en los primeros
+     80. Se dibuja con una cúbica de tangente horizontal en la esquina: con un
+     tramo recto y luego la curva salía una rodilla, y el canto parecía una
+     escuadra en vez de un palo doblado.
+
+     Los tres pardos son `--skin-batten-lit`, `--skin-batten` y
+     `--skin-batten-deep`, literales aquí porque `var()` no entra dentro de
+     `url()`. El relleno **no** es `--skin-parchment-deep` sino el color con el
+     que la bandeja se pinta de verdad, medido en la captura: el token es
+     #D9C2A5 y con la textura encima sale #CBB59A, y con el token plano se veía
+     el escalón. El listón tapa la junta, así que no hay costura que enseñar. */
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  bottom: 100%;
+  height: 46px;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 46' preserveAspectRatio='none'><path d='M0 40 C34 40 40 11 80 10.2 C150 8.6 240 8.6 310 10.2 C350 11 356 40 390 40L390 46L0 46Z' fill='%23CBB59A'/><path d='M0 42.6 C34 42.6 40 13.6 80 12.8 C150 11.2 240 11.2 310 12.8 C350 13.6 356 42.6 390 42.6' fill='none' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M0 40 C34 40 40 11 80 10.2 C150 8.6 240 8.6 310 10.2 C350 11 356 40 390 40' fill='none' stroke='%23785A3C' stroke-width='5.4'/><path d='M0 38.3 C34 38.3 40 9.3 80 8.5 C150 6.9 240 6.9 310 8.5 C350 9.3 356 38.3 390 38.3' fill='none' stroke='%23A9855D' stroke-width='1.4'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 /** El ornamento de la bandeja: la hoja entre dos filetes cortos. */
@@ -417,14 +454,35 @@
   gap: var(--ui-space-2);
   color: var(--skin-gold);
 }
+/** El filete de cada lado **muere en un punto**, que es lo que el prototipo
+    dibuja y lo que le da el aire de guarda de libro: una línea que se corta a
+    pelo parece un recorte. Se hace con el propio pseudoelemento —un degradado
+    que es hairline casi todo el recorrido y un disco de 3 px al final— en vez
+    de añadir dos nodos más al DOM por dos puntos.
+
+    Y 87 px de largo, no 40: medido en el prototipo, cada tramo va de x 80 a
+    x 167 en CSS, así que el conjunto con la hoja ocupa unos 230 de los 390 de
+    la columna. Con 40 el ornamento quedaba como un guion perdido en medio del
+    papel. */
 .skin-ornament::before,
 .skin-ornament::after {
   content: '';
-  width: 40px;
-  height: 1px;
-  background: var(--skin-rule-gold);
+  width: 87px;
+  max-width: 24vw;
+  height: 5px;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(var(--skin-rule-gold), var(--skin-rule-gold)),
+    radial-gradient(circle 2px at center, var(--skin-gold) 98%, transparent 100%);
+  background-size: 100% 1px, 4px 4px;
 }
-.skin-ornament .skin-icon { width: 22px; height: 22px; }
+.skin-ornament::before {
+  background-position: left center, right center;
+}
+.skin-ornament::after {
+  background-position: right center, left center;
+}
+.skin-ornament .skin-icon { width: 26px; height: 26px; }
 
 /* ----------------------------------------------------------------- iconos */
 
@@ -1159,13 +1217,35 @@
 /* El borde curvado de la bandeja es la única excepción: es el canto del papel,
    así que cruza con ella y no se acota. */
 .ui-shell-message > .skin-scroll-edge { max-width: none; }
+/** **La directriz, y esta ronda la corrige.** La primera versión acotó las
+    hojas a 390 y dejó que las barras cruzaran, o sea **dos reglas distintas
+    para la misma cosa**, y el resultado lo dijo el dueño del diseño mirando la
+    tablet: «el de la crónica ha quedado muy mal, eso de que se despliegue para
+    arriba una tira y a los laterales se siga viendo así; en el resto de
+    secciones no lo hace igual; deberíamos tener un estándar y que se viesen los
+    tres iguales».
+
+    Tenía razón, y la regla correcta es la que la bandeja y la navegación ya
+    seguían: **la superficie cruza la pantalla y su contenido va en columna.**
+    Una sola directriz para las tres secciones —la crónica, la gente y la
+    ficha— y para las dos pantallas que las acompañan —la decisión y la
+    portada—. Lo que las distingue es **cuánto alto ocupan**, que es lo que
+    tiene que distinguirlas: la crónica casi todo, la gente y la ficha lo que
+    pidan. Ninguna vuelve a ser una tira con valle a los lados. */
 .ui-shell-content,
 .chronicle-fade,
 .chronicle-body,
 .crossroad-fade,
 .crossroad,
 .title-sheet {
+  max-width: none;
+}
+.ui-shell-content-body,
+.chronicle-body > *,
+.crossroad > *,
+.title-sheet > * {
   box-sizing: border-box;
+  width: 100%;
   max-width: 390px;
   margin-inline: auto;
 }
@@ -1178,3 +1258,31 @@
    portada seguían dando a la hoja todo el ancho. */
 .crossroad-scrim { align-items: center; }
 .title-scrim { justify-content: center; }
+
+/** La tapa del listón se cuelga por encima del hueco (`bottom: 100%`), así
+    que el hueco le presta el sistema de coordenadas. El canto de arriba se
+    queda recto: la curva y el papel que va bajo ella los pinta la tapa, y así
+    lo que queda por fuera del arco deja ver el valle en vez de una esquina de
+    pergamino. */
+.ui-shell-message { position: relative; }
+
+/** UI-V8 · **La cabecera compacta de la crónica, sin recortar.**
+
+    `.hud-compact-header` tenía `width: 334px` y repartía 143 para la fecha y
+    183 para las cuatro cifras, medido con la aldea de dos personas del año 1.
+    En el año 50 las cifras son de tres dígitos y no caben: el dueño del diseño
+    lo vio en su tablet —«si te fijas en el título, se están cortando los
+    recursos»— con el 120 partido por la mitad y el ánimo directamente fuera.
+
+    Las medidas del prototipo se quedan como mínimos y dejan de ser topes: cada
+    placa crece con lo que tiene que decir, y el conjunto no pasa de la columna
+    de lectura. Una cifra cortada es un dato que el juego no está dando. */
+.hud-compact-header {
+  width: auto;
+  max-width: min(334px, calc(100% - 54px));
+  height: auto;
+  min-height: 50px;
+}
+.hud-compact-date { flex: 0 0 auto; }
+.hud-compact-figures-plate { flex: 0 1 auto; }
+.hud-compact-figures { flex-wrap: nowrap; }

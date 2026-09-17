@@ -55,6 +55,24 @@ def reflow(markup, indent):
     return '\n'.join(indent + ln if ln else '' for ln in lines)
 
 
+OAK_LEAF_NOTE = """<!-- El ornamento de la bandeja: la hoja de roble del prototipo 01, **calcada**.
+
+       La de UI-V0 estaba dibujada a mano —un contorno de nueve lobulos hecho a
+       base de curvas— y a los 26 px del ornamento se leia como una piruleta:
+       un circulo con un palo. El dueno del diseno la senalo en su tablet, «no
+       se parece al prototipo», y no se parecia.
+
+       Receta en `tools/ui/icons/regenerar-calcos.py`: recuadro
+       (400, 1490, 454, 1560) del prototipo 01 y umbral de Otsu sin correr. El
+       recuadro se midio a maquina y no a ojo —buscando las columnas con mas de
+       18 px de tinta, que son las de la hoja y no las del filete que le pasa
+       por el medio—, porque el ornamento tiene el filete a la misma altura y a
+       ojo entraba dentro.
+
+       Va rellena y con `fill-rule="evenodd"`, asi que el dibujo del prototipo
+       —contorno y nervio, con el papel viendose por dentro— se conserva tal
+       cual en vez de convertirse en una mancha. -->"""
+
 WHEAT_NOTE_D = """<!-- El grano: la espiga del prototipo 01, **calcada**.
 
        Cuatro versiones dibujadas a mano no valieron —una pluma, un romero, una
@@ -184,12 +202,14 @@ def main():
     # Cada variante lleva su propio comentario: un icono con la nota de otra
     # version es peor que sin nota.
     notes = {('wheat', 'B'): WHEAT_NOTE_B, ('wheat', 'D'): WHEAT_NOTE_D,
-             ('logs', 'D'): LOGS_NOTE_D}
+             ('logs', 'D'): LOGS_NOTE_D, ('oak-leaf', 'D'): OAK_LEAF_NOTE}
     blocks = {
         'wheat': build('wheat', V.WHEAT[wheat_key],
                        notes.get(('wheat', wheat_key), WHEAT_NOTE)),
         'logs': build('logs', V.LOGS[logs_key],
                       notes.get(('logs', logs_key), LOGS_NOTE)),
+        # La hoja de roble no tiene variantes: o la calcada, o la de UI-V0.
+        'oak-leaf': build('oak-leaf', V.OAK_LEAF_D, OAK_LEAF_NOTE),
     }
     for rel, indent in (('public/ui/icons.svg', '  '), ('index.html', '    ')):
         path = ROOT / rel

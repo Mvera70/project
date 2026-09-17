@@ -74,7 +74,11 @@ html.crossroad-open .ui-shell-stack, html.epitaph-open .ui-shell-stack { visibil
 /* El borde vive dentro del hueco (no en la pila, que no tiene margen propio),
    así que tiene que estirarse a los dos lados: `align-items: center` de la
    regla de arriba lo dejaría del ancho de su contenido si no fuera por esto. */
-.ui-shell-message > .skin-scroll-edge { align-self: stretch; margin: 0 calc(-1 * var(--ui-margin-mobile)); }
+/* UI-V8 · el listón cruza la bandeja y **se sale un poco por los dos lados**,
+   como en el prototipo: sus puntas quedan fuera de la pantalla, que es lo que
+   hace que parezca un palo y no una pieza encajada. Y va pegado al canto de
+   arriba, sin el hueco que dejaba antes. */
+.ui-shell-message > .skin-scroll-edge { max-width: none; }
 /* 14px bajo el ornamento, del plan §3.4: «hoja … 14 px por encima de la
    frase». 8px sobre él, el mismo respiro que el plan da al pergamino bajo el
    borde curvado cuando el SVG llegue (§3.4, la variante que aún no existe). */

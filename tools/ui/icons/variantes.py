@@ -149,3 +149,8 @@ WHEAT_WHY['D'] = ('Calcada del prototipo',
 LOGS_WHY['D'] = ('Calcada del prototipo',
                  'Igual que la espiga D: la silueta del propio prototipo. Las '
                  'testas son agujeros, no parches del color del chip.')
+# --------------------------------------------------- la hoja de roble, calcada
+# La de UI-V0 estaba dibujada a mano y se leia como una piruleta: un circulo
+# con un palo. Esta es la del prototipo 01 (`calcar-iconos`: si el dibujo ya
+# existe, no se deduce, se calca), con sus lobulos y su nervio.
+OAK_LEAF_D = _TRACED % _C.OAK_LEAF

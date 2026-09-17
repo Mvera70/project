@@ -166,7 +166,12 @@ const STYLE = `
    necesita una URL, así que \`chronicle.ts\` la compone en \`data:\` una sola
    vez al montar. */
 .chronicle-body { position: relative; }
-.chronicle-body::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 20px;
+/* UI-V8 · la orla va pegada al **canto de la columna**, no al de la pantalla.
+   Con la página cruzando la tablet y el texto centrado, \`left: 0\` la dejaba
+   huérfana a medio metro de lo que adorna. 195 es la mitad de la columna de
+   390; el \`max\` la deja en cero en cuanto la pantalla es la columna. */
+.chronicle-body::before { content: ''; position: absolute; left: max(0px, calc(50% - 195px));
+  top: 0; bottom: 0; width: 20px;
   background-image: var(--chronicle-vine); background-repeat: repeat-y;
   background-size: 20px auto; background-position: left top;
   opacity: .42; pointer-events: none; }
@@ -857,9 +862,18 @@ export const chroniclePanel: PanelFactory = (actions) => {
     if (recogniseGesture({ points: trace }) === 'swipe_down') actions.navigate({ kind: 'valley' });
   });
 
-  let sourceLabel: HTMLLabelElement | null = null;
   let archiveCount = -1;
-  let selectedArchive: number | null = null;
+  /**
+   * Qué partida se está leyendo: `null` la de ahora, o el índice de una
+   * archivada.
+   *
+   * `const` desde UI-V8, y no es una simplificación: es la huella de que **el
+   * mando se retiró y el dato no**. Lo que lo movía era el `<select>` de
+   * `rebuildSourcePicker`, y mientras §2.4 no tenga una puerta nueva nadie lo
+   * cambia. `sourceFor` y `archivedSource` lo siguen leyendo enteros, así que
+   * el día que haya puerta, esto vuelve a `let` y nada más se toca.
+   */
+  const selectedArchive: number | null = null;
   let renderedIdentity: string | null = null;
   let renderedYear: number | null = null;
   let renderedTick: number | null = null;
@@ -926,40 +940,25 @@ export const chroniclePanel: PanelFactory = (actions) => {
     if (!atTop) element.scrollTop = beforeScroll + (element.scrollHeight - beforeHeight);
   };
 
-  const rebuildSourcePicker = (snapshot: UiSnapshot): void => {
-    sourceLabel?.remove();
-    sourceLabel = null;
-    const state = snapshot.state;
-    const previous = selectableArchive(snapshot.archive, state.seed, state.ended?.tick);
-    if (previous.length === 0) return;
-    const label = document.createElement('label');
-    label.className = 'chronicle-source';
-    label.textContent = renderUiText('chronicle.source');
-    const select = document.createElement('select');
-    select.setAttribute('aria-label', renderUiText('chronicle.source'));
-    const currentOption = document.createElement('option');
-    currentOption.value = 'current';
-    currentOption.textContent = renderUiText('chronicle.current');
-    select.append(currentOption);
-    // `previous` ya viene del más reciente al más antiguo (`selectableArchive`).
-    for (const { game, index } of previous) {
-      const option = document.createElement('option');
-      option.value = `archive:${index}`;
-      option.textContent = renderUiText('chronicle.archived', {
-        number: index + 1, years: yearOf(game.endedTick), peak: game.peakPeople,
-      });
-      select.append(option);
-    }
-    select.value = selectedArchive === null ? 'current' : `archive:${selectedArchive}`;
-    select.addEventListener('change', () => {
-      selectedArchive = select.value === 'current' ? null : Number(select.value.split(':')[1]);
-      element.scrollTop = 0;
-      // La identidad cambió: el próximo `update` reconstruye entero.
-      renderedIdentity = null;
-    });
-    label.append(select);
-    sourceLabel = label;
-    element.insertBefore(label, close);
+  /**
+   * UI-V8 · **El selector de valles anteriores sale de la página.**
+   *
+   * Lo pidió el dueño del diseño probando la demo: «el selector ese de
+   * diferentes historias de varios pueblos no me gusta nada, hay que
+   * quitarlo de ahí; esa barra ahí en medio es horrorosa». Y era literal:
+   * un `<select>` de sistema, con su flecha y su marco, cruzando la página
+   * entre el valle y el primer año — la única pieza de toda la piel que no
+   * era ni pergamino ni tinta.
+   *
+   * **Lo que se retira es el mando, no el dato.** `selectedArchive`,
+   * `sourceFor` y `archivedSource` siguen enteros y probados: la crónica
+   * sabe pintar una partida archivada en cuanto alguien le diga cuál. Lo
+   * que no tiene es puerta, y ponerle una nueva sin saber dónde la quiere
+   * sería inventarme el sitio otra vez. §2.4 del plan de rediseño queda
+   * **abierta**, anotada en `docs/task-log.md`.
+   */
+  const rebuildSourcePicker = (): void => {
+    /* Sin mando: ver el comentario de arriba. */
   };
 
   return {
@@ -969,7 +968,7 @@ export const chroniclePanel: PanelFactory = (actions) => {
       // partida nueva archivada — no en cada fotograma.
       if (snapshot.archive.length !== archiveCount) {
         archiveCount = snapshot.archive.length;
-        rebuildSourcePicker(snapshot);
+        rebuildSourcePicker();
       }
       const identity = chronicleIdentity(selectedArchive, snapshot.state.seed);
       const source = sourceFor(snapshot);

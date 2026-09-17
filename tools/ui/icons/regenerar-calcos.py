@@ -31,6 +31,12 @@ HERE = pathlib.Path(__file__).resolve().parent
 GLYPHS = {
     'WHEAT': ((283, 136, 337, 186), -10, 0.002),
     'LOGS': ((462, 139, 517, 180), -40, 0.0015),
+    # UI-V8 · la hoja de roble del ornamento de la bandeja. La de UI-V0 estaba
+    # dibujada a mano y se leia como una piruleta: un circulo con un palo. El
+    # dueno del diseno la senalo en su tablet, «no se parece al prototipo», y no
+    # se parecia. Esta es la del prototipo 01, con sus lobulos y su nervio, y
+    # aguanta a los 26 px del ornamento.
+    'OAK_LEAF': ((400, 1490, 454, 1560), 0, 0.004),
 }
 
 

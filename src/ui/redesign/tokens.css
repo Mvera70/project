@@ -54,6 +54,13 @@
   --skin-wood: #2B1F17;             /* 03, barra de navegación */
   --skin-wood-soft: #453023;        /* 03, botón FOLLOW */
   --skin-wood-plaque: #3A2E24;      /* 02, placa de la pestaña activa */
+  /* **El listón de la bandeja es madera clara, y no la de la navegación.**
+     Muestreado del prototipo 01 en la banda del canto (y 1493..1505 sobre
+     x 120): la cara al sol, el cuerpo y la sombra de debajo. Con
+     `--skin-wood` el palo salía casi negro y parecía un marco metálico. */
+  --skin-batten-lit: #A9855D;       /* 01, la cara alta del listón */
+  --skin-batten: #785A3C;           /* 01, el cuerpo del listón */
+  --skin-batten-deep: #453624;      /* 01, su sombra sobre el papel */
 
   /* ----------------------------------------------------------- rojo, lacre */
   --skin-red: #6A2521;              /* 02, fondo de la capitular */
