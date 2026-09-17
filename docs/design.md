@@ -1414,6 +1414,54 @@ las cuatro están verificadas por mutación — la del flujo hacía falta porque
 perturbar un flujo que nadie usa no cambia nada, y hay que mirar el contador de
 frente.
 
+### 7.12 Los medios: lo que el jugador mete en el valle (M-2, 17 sep 2026)
+
+**El verbo del juego.** Lo dijo el dueño del diseño con una imagen y es el
+diseño entero: *«es como si cogieras a un grupo de personas y le dieses una
+pala, o un martillo, o un no sé qué. Depende de lo que le des van a hacer
+diferentes cosas. Tú realmente no le estás diciendo qué tienen que hacer, sino
+que ciertas cosas dan lugar a otras. Y eso crea situaciones random, que es lo
+que deseamos.»*
+
+Así que **el jugador no fija ningún número y no da ninguna orden: mete cosas en
+el valle**, y lo que la aldea haga con ellas lo deciden sus propios sistemas —el
+reparto de manos de §5.2, la tabla de sucesos de §7.10, las opiniones de §6.4—.
+
+**Qué es un medio.** Una cosa que se da, que **cuesta lo del valle** y que abre
+algo bueno **y** algo malo. Ninguna de las dos mitades es opcional: la mala es
+la que convierte darlo en una decisión en vez de una compra.
+
+| Medio | Qué cambia | Lo bueno | Lo malo |
+|---|---|---|---|
+| **Un arado** | Un campo se trabaja con `MEANS.PLOUGH_CREW` de las manos que pedía | Sobran brazos, y la aldea los manda donde ella quiera: bosque, obra, cantera | El granero se llena, y un granero lleno trae ratas, ladrones y al señor (§7.10, M-1) |
+| **Dos cerdos** | Dos cabezas en el corral | Carne en invierno y matanza en la fiesta de la cosecha | Los lobos van a donde hay ganado, y el corral apretado cría peste (§7.7) |
+| **Un barril** | Una fiesta esta misma semana | Ánimo de golpe, y bodas las semanas siguientes | Riñas las mismas semanas, y la fe lo mira mal |
+
+**Y no se coloca nada.** «En este juego no se coloca nada; todo se decide y el
+mapa interactúa solo» (dueño del diseño): el arado va al campo que se trabaje,
+los cerdos al corral que haya y el barril a la plaza. Quien sabe dónde está cada
+cosa es §7.4, no el jugador.
+
+**Un medio con rasgo es un rasgo de valle que pone el jugador.** El arado entra
+en `state.traits` como los cuatro de la fundación (§7.11): cambia un número de
+la economía para siempre y se cuenta en la crónica. Por eso no se da dos veces.
+
+**El precio está medido, no elegido.** La leña no es escasa en este juego y el
+grano sobrante es corriente; lo que de verdad limita es **la plata**, que no se
+produce dentro y entra a cuentagotas por el camino (§7.8). Con los primeros
+precios —doce, ocho y cuatro— un valle compraba **cincuenta y un barriles en
+sesenta años**, o sea fiesta permanente. Con veinte, catorce y diez, y sin poder
+encadenar barriles, toda la plata de una partida da para una docena de medios:
+un medio pasa a ser una decisión de década.
+
+**Lo que esto entrega, medido** (`tools/agency-report.ts`, 24 semillas × 60
+años): con arado, población mediana **60** y la primera piedra en 23 valles de
+24; sin dar nada, **38** y 7 de 24. Y con la misma plata, un jugador que compra
+barriles en cuanto puede se queda en 45 y **nunca junta para el arado** — que
+es exactamente lo que hace que elegir importe.
+
+---
+
 ### 7.8 Los comerciantes del camino
 
 **No hay pueblos vecinos en el mapa y no los va a haber.** Lo que la aldea sabe
@@ -2549,8 +2597,20 @@ cosas y una carcasa de navegación no se puede construir sobre una lista así.
 
 - **Rutas**, lo que la bandeja enseña y entre lo que se navega: **el valle**, la
   **crónica**, la **gente** (U-08, que esta lista no contaba y existe desde
-  entonces), la **ficha** y las **órdenes** (v2.0, tres palancas permanentes).
-  Son las cinco de `SheetRoute` en `src/ui/redesign/contracts.ts`.
+  entonces), la **ficha** y **el carro** (M-2, 17 sep 2026). Son las cinco de
+  `SheetRoute` en `src/ui/redesign/contracts.ts`.
+
+  > **El carro sustituye a las órdenes.** Hasta M-2 la quinta ruta era la hoja
+  > de las **tres palancas permanentes** de la versión 2.0 —cuánto se siembra,
+  > dónde van las manos que sobran, qué se levanta antes—, y se retiran por
+  > decisión del dueño del diseño («no me gustan para nada», 17 sep 2026) con la
+  > medida detrás: sólo vivía la postura de fábrica, y a dos muescas del reposo
+  > se moría media aldea, tarde y sin aviso (`docs/plan-medios.md` §1). Lo que
+  > ocupa su sitio es **lo que el jugador puede dar al valle** (§7.12): tres
+  > cosas, lo que cuesta cada una en fichas de recurso, y el motivo escrito
+  > cuando no se puede dar. Se abre desde la línea de la bandeja donde vivía el
+  > resumen de las órdenes, y la pestaña encendida sigue siendo el valle: es una
+  > hoja del valle, no un destino.
 - **Superposiciones**, que no son rutas porque no se navega a ellas ni se sale
   de ellas al valle por la barra: la **encrucijada**, que ocupa la pantalla
   entera y manda sobre cualquier ruta (punto 3 de abajo), y el **epitafio**, que

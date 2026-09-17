@@ -50,6 +50,8 @@ import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { scarFire } from './people/scars';
 import { destroyBuilding } from './world/buildings';
 import { rollFate } from './world/fate';
+import { giveMeans } from './world/means';
+import type { MeansOutcome } from './world/means';
 import { collectTithe, expireOffer, settleOffer } from './world/road';
 import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
@@ -198,6 +200,8 @@ export interface TickReport {
   happening: HappeningId | null;
   /** M-0 · lo que pasó con la oferta del camino por lo que hizo el jugador. */
   offer: OfferOutcome | null;
+  /** M-2 · lo que el jugador metió en el valle esta semana, si metió algo. */
+  means: MeansOutcome | null;
   /** M-0 · el diezmo, la semana que se cobra. */
   tithe: Tithe | null;
   posed: string | null;
@@ -632,12 +636,22 @@ export function tick(
   // desplazar la partida (`world/road.ts`). Y queda en `state.acts`, que es lo
   // que mantiene el guardado reproducible.
   let offer: OfferOutcome | null = null;
+  let means: MeansOutcome | null = null;
   for (const act of acts) {
     if (act.kind === 'offer') {
       const outcome = settleOffer(state, act.accept, seasonOf(state.tick), yearOf(state.tick));
       state.acts.push({ tick: state.tick, act, done: outcome !== null && !outcome.refused });
       if (outcome === null) continue;
       offer = outcome;
+      if (outcome.entry !== null) say(outcome.entry);
+    } else {
+      // M-2 · dar un medio. Se paga aquí y lo que abra lo abren los sistemas de
+      // la aldea por su cuenta: el arado libera brazos en el reparto de §5.2,
+      // los cerdos llaman a los lobos de §7.10, y el barril se celebra en el
+      // paso 2b de esta misma semana.
+      const outcome = giveMeans(state, act.means, seasonOf(state.tick), yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome.given });
+      means = outcome;
       if (outcome.entry !== null) say(outcome.entry);
     }
   }
@@ -1208,6 +1222,7 @@ export function tick(
       }))],
     happening: fated?.record.id ?? null,
     offer,
+    means,
     tithe,
     posed,
     entries: buffer,

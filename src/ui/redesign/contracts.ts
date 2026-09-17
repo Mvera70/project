@@ -9,7 +9,7 @@
 // Nadie más define estos tipos: un consumidor que necesite otra ruta reabre
 // §11.2 con el coordinador en vez de añadirla en silencio (UI-R0 §8).
 
-import type { ArchivedGame, GameState, Intent } from '@engine/state';
+import type { ArchivedGame, GameState, Intent, MeansId } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
 import type { ActorDoing } from '../../render3d/contracts';
@@ -26,7 +26,12 @@ export type SheetRoute =
   | { kind: 'chronicle' }
   | { kind: 'people' }
   | { kind: 'inspect'; target: InspectTarget; from: 'valley' | 'people' }
-  | { kind: 'orders' };
+  // M-2 · **el carro sustituye a la hoja de órdenes.** Las tres palancas se
+  // retiran de la interfaz (decisión del dueño del diseño, 17 sep 2026: «no me
+  // gustan para nada»), y lo que ocupa su sitio es lo que el jugador puede
+  // **dar** al valle. Sigue siendo una ruta y no una superposición: se abre
+  // desde el valle y se sale por la barra, como las órdenes.
+  | { kind: 'cart' };
 
 /**
  * Lo único que un panel puede pedirle a la aplicación.
@@ -53,6 +58,13 @@ export interface UiActions {
    * efímero y no se guarda (Anexo E)—.
    */
   doing(id: number): ActorDoing | null;
+  /**
+   * M-2 · **Dar un medio al valle.** No dice qué hacer con él: lo que la aldea
+   * haga lo deciden sus sistemas (`engine/world/means.ts`). El panel no
+   * comprueba si se puede —eso lo decide el motor y lo repite para pintarse—,
+   * sólo lo pide.
+   */
+  give(means: MeansId): void;
 }
 
 /**

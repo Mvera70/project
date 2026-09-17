@@ -38,6 +38,11 @@ const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
   factor_visit: 'pedlar.svg',
   drover_visit: 'pedlar.svg',
   salt_visit: 'pedlar.svg',
+  // M-2 · lo que los medios abren. La fiesta del barril es una fiesta y la
+  // matanza también se celebra; las ratas son una pérdida del granero.
+  ale_feast: 'harvest.svg',
+  pig_slaughter: 'harvest.svg',
+  rats_in_the_granary: 'lost.svg',
 };
 
 /**

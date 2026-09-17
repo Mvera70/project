@@ -909,6 +909,14 @@
   justify-content: center;
   gap: 10px;
 }
+/** **Y con su propio `[hidden]`, que si no no se esconde.** Es la trampa que
+    `shell.css` ya tenía escrita y que ha vuelto a morder: el navegador respeta
+    `hidden` con una regla del agente de usuario **sin especificidad**, así que
+    en cuanto una hoja de autor pone `display: flex` en el mismo elemento, esa
+    regla gana y el atributo deja de ocultar nada. Visto en captura (M-2): los
+    dos toques de una oferta seguían en pantalla mientras la voz contaba la
+    fiesta del barril, apretando la frase a la mitad del ancho. */
+.valley-voice-actions[hidden] { display: none; }
 .valley-voice-answer {
   min-height: var(--ui-tap-min);
   padding: 0 16px;

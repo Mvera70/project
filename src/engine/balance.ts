@@ -322,6 +322,11 @@ export const FATE = {
     factor_visit: 2,
     drover_visit: 1.5,
     salt_visit: 1,
+    // M-2 · lo que los medios abren. `ale_feast` no se sortea —la paga el
+    // jugador— y las otras dos piden el corral o el granero lleno.
+    ale_feast: 0,
+    pig_slaughter: 1.5,
+    rats_in_the_granary: 2,
   },
   // La fiesta de la cosecha no es suerte: si hay grano y hay gente, la semana
   // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
@@ -409,6 +414,24 @@ export const FATE = {
   GRACE_PEOPLE: 6,
   GRACE_YEARS: 5,
   GRACE_FACTOR: 0.25,
+  // ---------------------------------------------------------------------------
+  // M-2 · Las dos caras de cada medio, en pesos.
+  // ---------------------------------------------------------------------------
+  /** Cerdos mínimos para que la fiesta de la cosecha tenga matanza. */
+  SLAUGHTER_MIN_PIGS: 3,
+  /** Lo que la matanza deja: comida y ánimo. */
+  SLAUGHTER_GRAIN: [20, 40],
+  SLAUGHTER_MORALE: 3,
+  /** Las ratas: piden el granero por encima de esta parte de su capacidad. */
+  RATS_FULL: 0.8,
+  RATS_GRAIN_LOSS: 0.1,
+  RATS_MORALE: -2,
+  /** La fiesta del barril: lo que sube de golpe, y lo que la fe piensa de ello. */
+  ALE_MORALE: 8,
+  ALE_FAITH: -1,
+  /** Y lo que el barril hace probable durante su ventana: bodas… y riñas. */
+  ALE_WEDDING: 3,
+  ALE_QUARREL: 3,
   // TUNE (M-0): lo que deja un forastero que duerme en la aldea. Es la plata
   // de antes de la primera venta: sin ella un valle joven no ve ni una moneda
   // hasta que tiene excedente que vender.
@@ -490,6 +513,38 @@ export const MOOD_FACE = {
   LOW: 20,
   GRIM: 40,
   GLAD: 70,
+} as const;
+
+// ---------------------------------------------------------------------------
+// M-2 · Los medios: lo que el jugador mete en el valle. `plan-medios.md` §3
+// ---------------------------------------------------------------------------
+
+/**
+ * **Los precios, y de dónde sale su escala.** Todos TUNE.
+ *
+ * Lo que el dueño del diseño decidió el 17 sep: un medio **cuesta lo del
+ * valle** —«no quiero que sea gratis»— y no hay contador de espera, así que el
+ * límite es el granero y la leñera. Y la escala sale de lo medido: la leña no
+ * es escasa (de 507 a 43 000 en cien años) y el grano sobrante es corriente
+ * (2 600 de mediana a los sesenta años), así que **lo que de verdad limita es
+ * la plata**, que no se produce dentro del valle y entra a cuentagotas por el
+ * camino (M-0: unas dos docenas por década).
+ *
+ * De ahí que los tres cuesten plata: con doce por el arado y ocho por los
+ * cerdos, un valle que comercia puede dar dos o tres medios por década, y uno
+ * que no comercia, casi ninguno. Eso es una decisión de verdad y no una compra.
+ */
+export const MEANS = {
+  /** Semanas que la fiesta del barril sigue tiñendo lo que pasa. */
+  ALE_WEEKS: 4,
+  /**
+   * El arado: un campo se trabaja con esta parte de las manos que pedía.
+   *
+   * TUNE. No sube la cosecha: **libera brazos**, que es la diferencia entre un
+   * medio y un número mejor. Lo que la aldea haga con los brazos que sobran lo
+   * decide `allocateLabour` por necesidades, y ahí el jugador no manda.
+   */
+  PLOUGH_CREW: 0.6,
 } as const;
 
 /** El señor cobra cada otoño. Decisión del dueño del diseño, 17 sep 2026. */

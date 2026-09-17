@@ -539,6 +539,65 @@ test('alguien sube por el camino y el trato se cierra con un toque (M-0)', async
   await page.screenshot({ path: 'artifacts/m0-offer-taken.png', fullPage: true });
 });
 
+test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', async ({ page }) => {
+  // **El verbo del juego, de punta a punta.** Las tres palancas de órdenes se
+  // retiran aquí (decisión del dueño del diseño: «no me gustan para nada», y
+  // medido sólo hacían daño) y lo que ocupa su sitio es el carro: lo que el
+  // jugador puede **dar**. Esto guarda las cuatro cosas que eso significa: que
+  // se llega desde el valle, que cada cosa dice lo que cuesta con los iconos de
+  // la cabecera, que lo que no se puede dar **dice por qué**, y que darlo se ve
+  // en la misma semana.
+  await page.clock.install();
+  await page.goto('/?debug=1&live=1&seed=7&year=40&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
+  // Se espera al relevo del 3D antes de fotografiar: la captura es lo que
+  // juzga esta pantalla (VZ-02).
+  await test.expect.poll(
+    async () => (await page.locator('canvas:visible').first().boundingBox())?.width ?? 0,
+    { timeout: 20_000 },
+  ).toBeGreaterThan(300);
+
+  // La puerta es la línea de la bandeja, donde vivía el resumen de las órdenes.
+  const door = page.locator('.valley-orders-now');
+  await test.expect(door).toBeVisible();
+  await door.click();
+  // **La pestaña encendida sigue siendo el valle**, y es a propósito: el carro
+  // se abre desde el valle y no es un destino de la barra, igual que la hoja de
+  // órdenes a la que sustituye (`navTabFor` en `redesign/shell.ts`).
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
+  const rows = page.locator('.cart-row');
+  await test.expect(rows).toHaveCount(3);
+  // Cada cosa lleva su precio en fichas de recurso, no en una frase con cifras.
+  await test.expect(page.locator('.cart-row').first().locator('.cart-coin').first()).toBeVisible();
+  await page.screenshot({ path: 'artifacts/m2-cart.png', fullPage: true });
+
+  // Lo que no alcanza se queda apagado **con su motivo**: es la única cosa que
+  // se conserva de las órdenes (E4, «te he entendido y no puedo»).
+  // Se mira **la fila que está apagada**, no la primera: el motivo es de quien
+  // no se puede dar, y en un valle con plata la primera suele poderse.
+  for (const row of await rows.all()) {
+    if (await row.locator('.cart-give').isDisabled()) {
+      await test.expect(row.locator('.cart-why')).not.toBeEmpty();
+      await test.expect(row.locator('.cart-why')).toBeVisible();
+    }
+  }
+
+  // Y dar algo se ve esa semana: el barril es una fiesta, no una promesa.
+  const ale = rows.nth(2).locator('.cart-give');
+  if (await ale.isEnabled()) {
+    await ale.click();
+    // La crónica lo cuenta y la voz lo dice; basta con que el valle hable de
+    // ello, que es lo que §11.6 promete.
+    await page.getByRole('button', { name: 'Valley' }).click();
+    await test.expect(page.locator('.valley-voice-line')).not.toBeEmpty();
+    // Y **sin los dos toques de una oferta encima**: la voz está contando la
+    // fiesta, no preguntando nada. Lo cazó una captura de esta misma prueba.
+    await test.expect(page.locator('.valley-voice-actions')).toBeHidden();
+    await page.screenshot({ path: 'artifacts/m2-ale.png', fullPage: true });
+  }
+});
+
 test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ page }) => {
   // U-13 · el último de los cinco pasos del dueño del diseño. La ruta de
   // depuración adelanta el valle hasta una jornada de tormenta (`runToSky`),
@@ -904,6 +963,16 @@ test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)
   // Y se retira sola: es un aviso, no un panel que haya que cerrar. Su vida es
   // tiempo real (`TIME.NOTICE_MS`, §11.4) y no semanas, así que aquí sí van
   // segundos.
+  //
+  // **Con el mundo en pausa**, y desde M-2 hace falta: el valle tiene más cosas
+  // que contar —los medios abren tres sucesos más— así que a 64× llegaba otro
+  // aviso dentro de los seis segundos de la espera y el hueco no se vaciaba
+  // nunca. Lo que esta prueba guarda es que **un aviso se retira solo**, no que
+  // el valle se quede callado; parando el reloj del juego se mide lo primero.
+  await page.locator('.valley-speed-badge').click();
+  await page.getByRole('button', { name: 'Pause', exact: false }).first().click().catch(async () => {
+    await page.getByRole('button', { name: '0×', exact: true }).click();
+  });
   await page.clock.runFor(TIME.NOTICE_MS + 1_000);
   await test.expect(notice).toBeHidden();
 });

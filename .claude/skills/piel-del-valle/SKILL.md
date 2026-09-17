@@ -279,6 +279,19 @@ Y lo que sí queda abierto, con su motivo:
   rediseñados del 17 sep sin llegar a los dispositivos que ya habían visitado—
   no puede repetirse. Lo que sigue a mano es el casco y el documento.
 
+**Y la trampa que ha mordido dos veces, que es la que vale más de esta lista:**
+
+- **Un elemento que se oculta con `hidden` necesita su propia regla `[hidden]`
+  si la piel le pone `display`.** El navegador respeta `hidden` con una regla
+  del agente de usuario **sin especificidad**, así que en cuanto una hoja de
+  autor escribe `display: flex` en ese elemento, esa regla gana y el atributo
+  deja de ocultar nada. `shell.css` lo tenía escrito desde UI-R2 —el hueco del
+  mensaje se tragaba los toques del valle— y volvió a pasar en M-2: los dos
+  toques de una oferta del camino seguían en pantalla mientras la voz contaba
+  otra cosa, apretando la frase a media columna. **Las dos veces lo cazó una
+  captura y ninguna prueba.** Cada bloque que ponga `display` lleva su
+  `&[hidden] { display: none; }` al lado.
+
 Y una trampa nueva de VZ-6, que vale para cualquier adorno de la bandeja:
 
 - **Un adorno que pasa a ser botón tiene que recuperar el toque.** La hoja de

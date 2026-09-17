@@ -60,9 +60,27 @@ describe('el hambre le pasa factura al que manda · §7.9', () => {
   // vuelve a caer, lo que hay que mirar es si la aldea llega al suelo, no si la
   // regla de §7.9 se ha roto.
   it('cuanto peor el año, más factura', () => {
+    // **Y se parte de una aldea que no está ya en el suelo.** Esta prueba ha
+    // caído y se ha levantado tres veces sin que la regla de §7.9 cambiase, y
+    // siempre por lo mismo: mide la **biografía** de la semilla 7 a los veinte
+    // años, y a un suelo (`OPINION.MIN`) no se le puede bajar más, así que
+    // cuando esa aldea llega al año 20 con las opiniones en el fondo —lo que
+    // pasa según qué sucesos le hayan tocado— los dos extremos del hambre dan
+    // el mismo número. Se declaró como fallo en septiembre, volvió al verde
+    // sola con M-0 y volvió a caer con M-2, las tres veces por la trayectoria.
+    //
+    // Así que la opinión se pone a la mitad antes de medir: lo que se guarda es
+    // que **un año peor cuesta más**, que es la regla, y no dónde estaba esa
+    // aldea concreta el día de la medida.
+    const middle = (s: GameState): void => {
+      const leader = leaderOf(s);
+      for (const person of othersOf(s)) person.opinions[leader.id] = 0;
+    };
     const light = village(20);
+    middle(light);
     scarHunger(light, 0.2);
     const heavy = village(20);
+    middle(heavy);
     scarHunger(heavy, 1);
 
     const drop = (s: GameState): number =>

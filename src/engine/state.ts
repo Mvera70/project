@@ -442,6 +442,12 @@ export const HAPPENINGS = [
   'bear_in_the_wood',
   'child_lost',
   'stranger_passes',
+  // M-2 · lo que los medios abren. `ale_feast` la paga el jugador y no se
+  // sortea; las otras dos son las dos caras de haber prosperado: la matanza de
+  // la fiesta con el corral lleno, y las ratas con el granero lleno.
+  'ale_feast',
+  'pig_slaughter',
+  'rats_in_the_granary',
   // M-0 · las visitas del camino. No cambian el estado al salir: dejan una
   // oferta (`state.offer`) que el jugador acepta o deja pasar. El buhonero de
   // arriba también es ya una de ellas.
@@ -510,7 +516,9 @@ export interface Offer {
  * que no es suyo.
  */
 export type PlayerAct =
-  | { kind: 'offer'; accept: boolean };
+  | { kind: 'offer'; accept: boolean }
+  // M-2 · dar un medio al valle. No dice qué hacer con él.
+  | { kind: 'means'; means: MeansId };
 
 export interface ActRecord {
   tick: number;
@@ -589,7 +597,10 @@ export type ChronicleKind =
   // con lo que le pasó. Contarlo como suceso descuadraba la cuenta de R-1 (una
   // prueba compara las dos listas) y le pedía tres frases a una línea de
   // contabilidad.
-  | 'road';
+  | 'road'
+  // M-2 · lo que el jugador metió en el valle. No es un suceso: es un acto, y
+  // la crónica lo cuenta como lo que es.
+  | 'means';
 
 /**
  * The chronicle stores keys and parameters, never prose. The text is composed
@@ -857,7 +868,17 @@ export function restingIntent(): Intent {
  * uno sin piedra la aldea nunca pasa de la madera, así que la fe y los oficios
  * llegan antes que las murallas. Es la misma palanca dando otra partida.
  */
-export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills';
+export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills'
+  // M-2 · **un medio con rasgo es un rasgo de valle que pone el jugador.** Los
+  // cuatro de arriba se sortean al fundar y dicen lo que el valle era antes de
+  // que llegara nadie (E5); éste lo mete el jugador a mitad de partida y lo
+  // paga. El mecanismo es el mismo a propósito: cambia un número de la economía
+  // para siempre y se cuenta en la crónica.
+  | 'plough';
+
+/** M-2 · Lo que el jugador puede meter en el valle. `world/means.ts`. */
+export const MEANS_IDS = ['plough', 'pigs', 'ale'] as const;
+export type MeansId = (typeof MEANS_IDS)[number];
 
 /** Los cuatro, en orden estable: el sorteo de la fundación recorre esta lista. */
 export const VALLEY_TRAITS: readonly ValleyTrait[] = [

@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HAPPENINGS, HERD_KINDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
+import { HAPPENINGS, HERD_KINDS, MEANS_IDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -115,7 +115,11 @@ function offerValue(value: unknown): boolean {
 function actRecord(value: unknown): boolean {
   if (!record(value) || !tickValue(value['tick']) || typeof value['done'] !== 'boolean') return false;
   const act = value['act'];
-  return record(act) && act['kind'] === 'offer' && typeof act['accept'] === 'boolean';
+  if (!record(act)) return false;
+  if (act['kind'] === 'offer') return typeof act['accept'] === 'boolean';
+  // M-2 · y dar un medio, con su identificador del dominio cerrado: una partida
+  // guardada que nombre un medio que este build no conoce no se puede jugar.
+  return act['kind'] === 'means' && (MEANS_IDS as readonly string[]).includes(act['means'] as string);
 }
 
 function catalogueOption(templateId: unknown, optionId: unknown) {

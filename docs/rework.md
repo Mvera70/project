@@ -964,7 +964,54 @@ corral lleno por `state.herd` y el bosque talado por `fellForest`, sin
 empalizada— **entre 6 y 10 muertas de 16, ninguna antes del año 10**. Si con
 la peor no muere ninguna, no hay riesgo y está igual de mal.
 
-### M-2 · Tres medios, de punta a punta — **la fase que decide**
+### M-2 · Tres medios, de punta a punta — **hecha, y el patrón vale** (17 sep 2026)
+
+> **La medida que decidía, cumplida.** El criterio era: tres combinaciones de
+> medios en las mismas semillas tienen que dar aldeas que un tercero distinga, y
+> **≥ 20 puntos de población mediana entre la mejor y la peor**. Medido con
+> `tools/agency-report.ts`, 24 semillas × 60 años:
+>
+> | Cómo se juega | Población mediana | Primera piedra |
+> |---|---|---|
+> | Sin dar nada | 38 | 7 valles de 24 |
+> | Sólo el arado | **61** | **24 de 24** |
+> | Sólo cerdos | 40 | 14 de 24 |
+> | Sólo barriles | 45 | 15 de 24 |
+> | Ahorrando para el arado, y después lo que salga | **60** | 23 de 24 |
+> | Comprando barriles en cuanto se puede | 45 | 15 de 24 |
+>
+> **23 puntos entre la mejor y la peor**, y la diferencia se lee sin números: un
+> valle con arado tiene piedra y el que no, no la ve. Y las dos últimas filas
+> son el hallazgo: **con la misma plata, quien compra barriles en cuanto puede
+> nunca junta para el arado** —diez contra veinte de plata— así que elegir no es
+> una preferencia, es la partida. Eso no estaba diseñado: salió al medir, y es
+> exactamente lo que el dueño del diseño pidió con la pala y el martillo.
+>
+> **Lo que costó medir, y es la tercera vez que el mismo error aparece:** con
+> los primeros precios (12, 8 y 4 de plata) un valle compraba **cincuenta y un
+> barriles en sesenta años** —fiesta permanente— porque la plata del camino daba
+> para eso. Con 20, 14 y 10, y sin poder encadenar barriles, toda la plata de
+> una partida da para una docena de medios. Un medio es una decisión de década.
+>
+> **Dos trampas de interfaz, las dos cazadas por una captura y ninguna por una
+> prueba:**
+>
+> 1. El carro llevaba la clase `.valley-panel`, que es `position: absolute;
+>    bottom: 0` desde U-06: dentro de la bandeja se sale del flujo y la deja con
+>    altura cero. En la captura sólo asomaba «A PLOUGH» por debajo de la barra.
+> 2. **Los dos toques de una oferta seguían en pantalla mientras la voz contaba
+>    otra cosa**, apretando la frase a media columna. Es la trampa del `hidden`
+>    contra una regla de autor que `shell.css` ya tenía escrita desde UI-R2 y que
+>    ha vuelto a morder; está ahora en la skill `piel-del-valle` como regla.
+>
+> Y un `TS1005` por acentos graves dentro de una plantilla de CSS, que también
+> está en la skill y también ha vuelto a pasar.
+>
+> **Las tres palancas de órdenes quedan fuera de la interfaz**, como el dueño
+> pidió: la ruta `orders` pasa a ser `cart`, y la línea de la bandeja que decía
+> cómo estaban puestas dice ahora si hay algo que dar. `redesign/orders.ts` y
+> `state.intent` siguen en el código y se borran en M-4.
+
 
 **Qué.** El arado, la pareja de cerdos y el barril: uno de economía, uno de
 animales, uno de gente. Cada uno: un rasgo de valle que el jugador añade con

@@ -19,7 +19,7 @@
 // Determinista por el flujo `fate` y nada más: ningún suceso toca otro flujo,
 // y hay prueba. El cielo lo pregunta a `world/sky.ts`, que no consume tiradas.
 
-import { DISASTER, FATE, LIFE, OFFER, TIME } from '../balance';
+import { DISASTER, FATE, LIFE, MEANS, OFFER, TIME } from '../balance';
 import { flagSet, ratioOf } from '../crossroads/conditions';
 import type { VisualEffect } from '../crossroads/schema';
 import { isHere, population } from '../people/demography';
@@ -33,6 +33,8 @@ import { count, has, standing } from '../subsistence/building-counts';
 import { seasonOf, weekOf } from '../time';
 import { destroyBuilding } from './buildings';
 import { herdCapacity, herdDensity } from '../subsistence/herd';
+import { storageCapacity } from '../subsistence/harvest';
+import { aleWindow } from './means';
 import { factorWants, postOffer } from './road';
 import { weekWeather } from './sky';
 
@@ -147,7 +149,10 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
           * (walled(state) ? FATE.WOLVES_WALLED : 1)
         : 0;
     case 'wedding':
-      return adults(state).length >= FATE.WEDDING_MIN_ADULTS ? w : 0;
+      // M-2 · **y después de un barril, mucho más.** Una fiesta es donde se
+      // conoce la gente, y es la cara buena del medio más barato.
+      return adults(state).length >= FATE.WEDDING_MIN_ADULTS
+        ? w * (aleWindow(state) ? FATE.ALE_WEDDING : 1) : 0;
     case 'pedlar':
       // M-0 · una visita no sube mientras hay otra esperando en el camino.
       return visitable(state, 'pedlar') && ctx.season === 'summer' && state.village.wood >= OFFER.PEDLAR_WOOD * 2 ? w : 0;
@@ -177,10 +182,12 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
       // Sólo entra en el sorteo si no es un rito; como rito lo trata `rollFate`.
       return !FATE.FEAST_IS_A_RITE && feastDue(state, ctx) ? w : 0;
     case 'quarrel_in_the_square':
+      // M-2 · **y la otra cara del barril.** El mismo medio que trae bodas trae
+      // riñas: es lo que hace que darlo sea una decisión y no una compra.
       return state.people.namedIds.filter((id) => {
         const v = state.people.villagers.find((x) => x.id === id);
         return v !== undefined && isHere(v);
-      }).length >= 2 ? w : 0;
+      }).length >= 2 ? w * (aleWindow(state) ? FATE.ALE_QUARREL : 1) : 0;
     case 'bear_in_the_wood':
       // En verano y otoño, que es cuando el oso baja a comer; en un valle de
       // bosque viejo, el doble.
@@ -194,6 +201,20 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
       return children(state).length > 0 ? w : 0;
     case 'stranger_passes':
       return flagSet(state, 'hostile') ? 0 : w;
+    // ----------------------------------------------------------------- M-2
+    case 'ale_feast':
+      // No se sortea nunca: la fiesta del barril la paga el jugador y la sirve
+      // `rollFate` como rito, igual que la de la cosecha.
+      return 0;
+    case 'pig_slaughter':
+      // La cara buena de tener cerdos, y sólo en la semana de la fiesta: una
+      // matanza es parte de la fiesta, no un suceso suelto.
+      return feastDue(state, ctx) && state.herd.pigs >= FATE.SLAUGHTER_MIN_PIGS ? w : 0;
+    case 'rats_in_the_granary':
+      // Y la cara mala de tener el granero lleno, que es a donde lleva el
+      // arado. En invierno, que es cuando el grano lleva meses quieto.
+      return ctx.season === 'winter' && has(state, 'granary')
+        && state.village.grain > FATE.RATS_FULL * storageCapacity(state) ? w : 0;
     default:
       return 0;
   }
@@ -427,6 +448,31 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       visible.push({ k: 'gather', where: 'ford', days: 1 });
       break;
     }
+    case 'ale_feast': {
+      // M-2 · **el barril, y es el medio que le da al ánimo el reloj del
+      // jugador**: sube de golpe esta semana, no dentro de un año.
+      moraleBy(state, FATE.ALE_MORALE);
+      faithBy(state, FATE.ALE_FAITH);
+      visible.push({ k: 'gather', where: 'square', days: 2 });
+      break;
+    }
+    case 'pig_slaughter': {
+      const grain = int(state.rng, 'fate', FATE.SLAUGHTER_GRAIN[0], FATE.SLAUGHTER_GRAIN[1]);
+      state.village.grain += grain;
+      state.herd.pigs = Math.max(0, state.herd.pigs - 1);
+      moraleBy(state, FATE.SLAUGHTER_MORALE);
+      params['grain'] = grain;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      break;
+    }
+    case 'rats_in_the_granary': {
+      const lost = Math.round(state.village.grain * FATE.RATS_GRAIN_LOSS);
+      state.village.grain = Math.max(0, state.village.grain - lost);
+      moraleBy(state, FATE.RATS_MORALE);
+      params['grain'] = lost;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      break;
+    }
     case 'stranger_passes': {
       moraleBy(state, FATE.STRANGER_MORALE);
       // M-0 · y paga la cama: la primera plata de un valle joven.
@@ -483,6 +529,10 @@ export function rollFate(state: GameState): FateOutcome | null {
   // Va antes del hueco mínimo porque una fiesta pegada a otro suceso no se
   // apila: es la semana de la siega y punto.
   if (FATE.FEAST_IS_A_RITE && feastDue(state, ctx)) return happen(state, 'harvest_feast', ctx);
+  // M-2 · **y el barril es un rito pagado.** El jugador lo ha comprado esta
+  // semana, así que la fiesta se celebra: no se sortea, no espera hueco y no
+  // compite con nada. Es la única forma de que un medio se vea el mismo día.
+  if (state.flags['ale'] === state.tick + MEANS.ALE_WEEKS) return happen(state, 'ale_feast', ctx);
 
   const last = state.happenings[state.happenings.length - 1];
   if (last !== undefined && state.tick - last.tick < FATE.MIN_GAP_WEEKS) return null;

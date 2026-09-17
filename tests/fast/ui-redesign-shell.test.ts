@@ -19,7 +19,7 @@ describe('navTabFor · docs/design.md §11.2, cinco rutas', () => {
   });
 
   it('las órdenes se abren desde el valle: no tienen pestaña propia (§11.2 punto 1)', () => {
-    expect(navTabFor({ kind: 'orders' })).toBe('valley');
+    expect(navTabFor({ kind: 'cart' })).toBe('valley');
   });
 
   it('la ficha enciende la pestaña de donde vino, no una cuarta (regla de S-05)', () => {
@@ -34,7 +34,7 @@ describe('navTabFor · docs/design.md §11.2, cinco rutas', () => {
       { kind: 'valley' },
       { kind: 'chronicle' },
       { kind: 'people' },
-      { kind: 'orders' },
+      { kind: 'cart' },
       { kind: 'inspect', target, from: 'valley' },
     ];
     for (const route of routes) expect(['valley', 'chronicle', 'people']).toContain(navTabFor(route));
@@ -44,7 +44,7 @@ describe('navTabFor · docs/design.md §11.2, cinco rutas', () => {
 describe('contentRouteFor · qué monta la bandeja de la carcasa (UI-R5)', () => {
   it('órdenes, ficha, crónica y gente piden un panel dentro de `content`', () => {
     const target = { kind: 'terrain', x: 0, y: 0 } as const;
-    expect(contentRouteFor({ kind: 'orders' })).toBe('orders');
+    expect(contentRouteFor({ kind: 'cart' })).toBe('cart');
     expect(contentRouteFor({ kind: 'inspect', target, from: 'valley' })).toBe('inspect');
     expect(contentRouteFor({ kind: 'chronicle' })).toBe('chronicle');
     expect(contentRouteFor({ kind: 'people' })).toBe('people');

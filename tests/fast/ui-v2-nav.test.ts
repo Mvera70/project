@@ -17,7 +17,7 @@ describe('navSkinFor · plan-piel.md §3.4, la navegación cambia de piel con la
   });
 
   it('las órdenes se abren desde el valle y comparten su piel (§11.2 punto 1)', () => {
-    expect(navSkinFor({ kind: 'orders' })).toBe('default');
+    expect(navSkinFor({ kind: 'cart' })).toBe('default');
   });
 
   it('la crónica lleva la placa de madera del prototipo 02', () => {
@@ -40,7 +40,7 @@ describe('navSkinFor · plan-piel.md §3.4, la navegación cambia de piel con la
       { kind: 'valley' },
       { kind: 'chronicle' },
       { kind: 'people' },
-      { kind: 'orders' },
+      { kind: 'cart' },
       { kind: 'inspect', target, from: 'valley' },
     ];
     for (const route of routes) expect(['default', 'plaque', 'wood']).toContain(navSkinFor(route));

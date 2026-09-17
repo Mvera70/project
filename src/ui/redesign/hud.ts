@@ -53,12 +53,14 @@
 import { TIME } from '@engine/balance';
 import { renderUiText } from '@engine/chronicle/render';
 import type { GameState, Season } from '@engine/state';
-import { stopOf } from '@engine/state';
+import {  } from '@engine/state';
 import { seasonOf } from '@engine/time';
 import { valleyClock } from '@derive/clock';
 import { hourAt } from '../../render3d/effects/day-phases';
 import { speedLabel, type Speed } from '../speed';
 import { TREND_WEEKS, moodFace, trendsOf, vitalsOf, type Vitals } from '../vitals';
+import { MEANS_IDS } from '@engine/state';
+import { refusalFor } from '@engine/world/means';
 import type { SheetRoute, UiActions } from './contracts';
 
 /** U-06 · una clave del banco por estación: `seasonOf` decide, nunca un literal. */
@@ -409,11 +411,11 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   const ordersNow = document.createElement('button');
   ordersNow.type = 'button';
   ordersNow.className = 'valley-orders-now hud-say-line hud-say-orders';
-  ordersNow.setAttribute('aria-label', renderUiText('app.orders.open'));
+  ordersNow.setAttribute('aria-label', renderUiText('cart.open'));
   ordersNow.addEventListener('click', () => {
-    // Un único propietario de la ruta (`contracts.ts`): si ya estaban
-    // abiertas, tocar otra vez vuelve al valle; si no, las abre.
-    actions.navigate(getRoute().kind === 'orders' ? { kind: 'valley' } : { kind: 'orders' });
+    // Un único propietario de la ruta (`contracts.ts`): si el carro ya estaba
+    // abierto, tocar otra vez vuelve al valle.
+    actions.navigate(getRoute().kind === 'cart' ? { kind: 'valley' } : { kind: 'cart' });
   });
 
   // UI-V2b · la voz de la aldea sale de la cabecera. Las dos líneas van juntas
@@ -567,14 +569,17 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
       renderUiText('app.vitals.silver', { count: now.silver }), false);
     lastVitals = now;
 
-    // Y el resumen de las tres órdenes, con `stopOf` — nunca redondeando el
-    // valor a mano: es la misma función que usa `orders.ts` para pintar los
-    // botones, así que las dos lecturas no pueden divergir.
-    ordersNow.textContent = renderUiText('app.orders.now', {
-      sowing: lower(`app.sowing.${stopOf('fields', state.intent.fields)}`),
-      hands: lower(`app.hands.${stopOf('timber', state.intent.timber)}`),
-      build: lower(`app.build.${state.intent.priority}`),
-    });
+    // **M-2 · la línea de las órdenes pasa a ser la puerta del carro.**
+    //
+    // Decía cómo estaban puestas las tres palancas —«sowing enough · hands to
+    // both · building as needed»—, y las palancas se retiran: medido, sólo
+    // hacían daño (`plan-medios.md` §1). Lo que dice ahora es si hay algo que
+    // el valle pueda dar, que es lo único que hace falta saber sin abrirlo: si
+    // no alcanza para nada, no merece la pena el toque.
+    const canGiveSomething = MEANS_IDS.some((id) => refusalFor(state, id) === null);
+    const cartLine = renderUiText(canGiveSomething ? 'cart.some' : 'cart.nothing');
+    if (ordersNow.textContent !== cartLine) ordersNow.textContent = cartLine;
+    ordersNow.dataset.cart = canGiveSomething ? 'ready' : 'empty';
 
   };
 

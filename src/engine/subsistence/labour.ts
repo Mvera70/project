@@ -27,9 +27,9 @@
 // y el forrajeo, que son emergencias y se sirven antes que cualquier postura.
 // Un jugador puede equivocarse; no puede saltarse la aritmética del hambre.
 
-import { FOOD, FORAGE, LABOUR, TIME } from '../balance';
+import { FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
 import { population, workforce } from '../people/demography';
-import { INTENT_RANGE } from '../state';
+import { hasTrait, INTENT_RANGE } from '../state';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
 import { foragingUrgency, hasRiver } from './forage';
@@ -94,7 +94,12 @@ export function allocateLabour(state: GameState): Allocation {
     Math.floor(farmLabour / FOOD.MIN_FIELD_CREW),
   );
   const workedFields = Math.min(count(state, 'field'), neededFields, crewable);
-  const farmDemand = workedFields * FOOD.FIELD_CREW;
+  // M-2 · **el arado.** Un campo se trabaja con menos manos, así que sobran
+  // brazos y el reparto de abajo los manda donde haga falta —al bosque, a la
+  // obra, a la cantera—. No sube la cosecha: eso sería un número mejor y no un
+  // medio; lo que cambia es **quién queda libre**, y eso lo decide la aldea.
+  const crew = FOOD.FIELD_CREW * (hasTrait(state, 'plough') ? MEANS.PLOUGH_CREW : 1);
+  const farmDemand = workedFields * crew;
 
   let farmers = Math.min(w, farmDemand);
   let spare = w - farmers;

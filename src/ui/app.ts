@@ -24,7 +24,7 @@ import { tick, type TickReport } from '@engine/sim';
 import type { ArchivedGame, Decision, GameState, Intent, PlayerAct, SaveFile } from '@engine/state';
 import { createHud } from './redesign/hud';
 import { createInspectPanel } from './redesign/inspect-panel';
-import { ordersPanel } from './redesign/orders';
+import { cartPanel } from './redesign/cart';
 import { peoplePanel } from './redesign/people-panel';
 import { createShell } from './redesign/shell';
 import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
@@ -268,10 +268,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       mountedInspect = inspect;
       shell.content.append(inspect.element);
       inspect.update(snapshot());
-    } else if (route.kind === 'orders') {
-      // `shell.content` ya ha quedado vacía arriba: es seguro montar aquí.
-      shell.content.append(orders.element);
-      orders.update(snapshot());
+    } else if (route.kind === 'cart') {
+      // M-2 · `shell.content` ya ha quedado vacía arriba: es seguro montar aquí.
+      shell.content.append(cart.element);
+      cart.update(snapshot());
     }
   }
   /** Lo que cualquier `UiPanel` necesita para pintarse (`contracts.ts`). */
@@ -290,6 +290,17 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // hace ese cuerpo **en el fotograma que se está viendo**, preguntado a la
     // capa de vida y no adivinado del motor.
     doing(id: number) { return backend.live.doing(id); },
+    /**
+     * M-2 · **dar un medio.** Va por el mismo canal que contestar una oferta y
+     * por el mismo motivo: lo que el jugador hace entra por `tick` y queda en
+     * el registro del estado, así que la partida se puede reproducir. Y se
+     * aplica ahora, no en catorce minutos: dar algo y no ver nada es lo que
+     * hacía que las palancas no se entendieran.
+     */
+    give(means): void {
+      pendingActs.push({ kind: 'means', means });
+      if (speed !== 0) { runTick(); paint(lastFraction); }
+    },
     setSpeed(value): void { app.setSpeed(value); },
     // UI-R2 · la única escritura que un panel puede hacer sobre las órdenes
     // (`contracts.ts`), y desde esta ronda el único sitio donde se aplica la
@@ -337,7 +348,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // ficha (`inspect-panel.ts`) es la excepción: se crea de nuevo por cada
   // navegación porque lleva un `target` distinto cada vez (ver `navigate`).
   const hud = createHud(actions, () => currentRoute);
-  const orders = ordersPanel(actions);
+  const cart = cartPanel(actions);
   // UI-R3/UI-R4 · la crónica y la lista de la gente, migradas a
   // `shell.content` (ver el comentario de `navigate`, arriba). Igual que
   // `orders`: se crean una vez y su `element` se monta/desmonta de la
@@ -639,7 +650,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // práctica de hoy esto nunca discrepa de lo que ya pintó `navigate` al
     // entrar — pero un panel no debe fiarse de que nadie más vaya a tocar el
     // estado mientras está montado.
-    if (currentRoute.kind === 'orders') orders.update(snapshot());
+    if (currentRoute.kind === 'cart') cart.update(snapshot());
     // UI-R3 · la crónica lee entradas nuevas mientras está abierta —a
     // diferencia de la vieja `openChronicle`, que pintaba una vez y no volvía
     // a mirar el estado—; `chroniclePanel.update` decide sola cuándo de

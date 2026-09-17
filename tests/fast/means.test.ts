@@ -1,0 +1,181 @@
+// M-2 · Los medios: lo que el jugador mete en el valle.
+// `docs/plan-medios.md` §3, brief en `docs/rework.md` §4b.
+//
+// **Lo que se guarda no es que un medio sea bueno.** Es que dar algo cueste lo
+// del valle, que no se pueda dar lo que no se puede pagar, que dar no mueva una
+// sola tirada del mundo, y que cada medio abra algo **y** cierre algo. Si un día
+// alguien hace que los medios sólo traigan cosas buenas, esto se rompe, y eso
+// es lo que tiene que pasar: la mitad mala es la mitad que hace que elegir sea
+// una decisión (`plan-medios.md` §3.2).
+
+import { describe, expect, it } from 'vitest';
+import { FATE, MEANS, TIME } from '@engine/balance';
+import { CATALOG } from '@engine/crossroads/catalog';
+import { foundGame } from '@engine/found';
+import { run, tick } from '@engine/sim';
+import { MEANS_IDS, type GameState, type MeansId, type PlayerAct } from '@engine/state';
+import { weightNow } from '@engine/world/fate';
+import { MEANS_SPEC, canGive, giveMeans, refusalFor } from '@engine/world/means';
+import { foundTwenty } from '../helpers/founding';
+
+const give = (means: MeansId): PlayerAct[] => [{ kind: 'means', means }];
+
+/** Una aldea hecha con de todo en la despensa, para que el precio no estorbe. */
+function rich(seed = 7): GameState {
+  const state = foundTwenty(seed);
+  run(state, TIME.WEEKS_PER_YEAR * 4, 'prudent', CATALOG);
+  state.village.grain = 5000;
+  state.village.wood = 5000;
+  state.village.silver = 500;
+  return state;
+}
+
+describe('dar un medio', () => {
+  it('cuesta exactamente lo que dice, y nada más', () => {
+    for (const id of MEANS_IDS) {
+      const state = rich();
+      const before = { ...state.village };
+      const outcome = giveMeans(state, id, 'spring', 4);
+      expect(outcome.given, id).toBe(true);
+      for (const stat of ['grain', 'wood', 'stone', 'silver'] as const) {
+        const cost = MEANS_SPEC[id].cost[stat] ?? 0;
+        expect(state.village[stat], `${id}: ${stat}`).toBe(before[stat] - cost);
+      }
+    }
+  });
+
+  it('no se puede dar lo que no se puede pagar, y no se cobra a medias', () => {
+    const state = rich();
+    state.village.silver = 0;
+    for (const id of MEANS_IDS) {
+      const before = { ...state.village };
+      expect(refusalFor(state, id), id).toBe('cost');
+      const outcome = giveMeans(state, id, 'spring', 4);
+      expect(outcome.given, id).toBe(false);
+      expect(state.village, id).toEqual(before);
+    }
+  });
+
+  it('el arado no se da dos veces: es un rasgo del valle', () => {
+    const state = rich();
+    expect(canGive(state, 'plough')).toBe(true);
+    giveMeans(state, 'plough', 'spring', 4);
+    expect(state.traits).toContain('plough');
+    expect(refusalFor(state, 'plough')).toBe('already');
+  });
+
+  it('un barril no se encadena con el anterior', () => {
+    // Medido: sin esto, un valle compraba cincuenta y un barriles en sesenta
+    // años —fiesta permanente— porque la plata del camino daba para eso.
+    const state = rich();
+    giveMeans(state, 'ale', 'spring', 4);
+    expect(refusalFor(state, 'ale')).toBe('feasting');
+    state.tick += MEANS.ALE_WEEKS;
+    expect(refusalFor(state, 'ale')).toBeNull();
+  });
+
+  it('no mueve una sola tirada del mundo', () => {
+    // §4.3, la misma propiedad que las ofertas del camino: lo que el jugador
+    // hace no puede desplazar la partida.
+    const a = rich(11);
+    const b = rich(11);
+    tick(a, CATALOG, undefined, give('pigs'));
+    tick(b, CATALOG);
+    expect(a.rng).toEqual(b.rng);
+  });
+
+  it('queda en el registro, con lo que se hizo y lo que no', () => {
+    const state = rich();
+    tick(state, CATALOG, undefined, give('plough'));
+    expect(state.acts.at(-1)).toMatchObject({ act: { kind: 'means', means: 'plough' }, done: true });
+    state.village.silver = 0;
+    tick(state, CATALOG, undefined, give('pigs'));
+    expect(state.acts.at(-1)).toMatchObject({ act: { kind: 'means', means: 'pigs' }, done: false });
+  });
+});
+
+describe('cada medio abre algo, y cierra algo', () => {
+  it('el arado libera brazos, y no sube la cosecha', () => {
+    // Es la diferencia entre un medio y un número mejor: lo que cambia es
+    // **quién queda libre**, y a dónde van esos brazos lo decide la aldea.
+    const plain = rich();
+    const ploughed = rich();
+    giveMeans(ploughed, 'plough', 'spring', 4);
+    // Mismo estado salvo el rasgo y lo que costó: se igualan las existencias
+    // para que lo único que se mida sea el reparto.
+    ploughed.village = { ...plain.village };
+    const before = tick(plain, CATALOG);
+    const after = tick(ploughed, CATALOG);
+    expect(after.harvested).toBe(before.harvested);
+    // Menos manos en el campo, y la aldea las usa: la leña y la obra suben.
+    expect(after.wood + after.buildPoints).toBeGreaterThan(before.wood + before.buildPoints);
+  });
+
+  it('los cerdos llaman a los lobos', () => {
+    const quiet = rich();
+    quiet.herd.hens = 6;
+    quiet.herd.pigs = 0;
+    quiet.tick = TIME.WEEKS_PER_YEAR * 5 + 38; // invierno
+    const fed = structuredClone(quiet);
+    giveMeans(fed, 'pigs', 'winter', 5);
+    expect(weightNow(fed, 'wolves_at_the_coop')).toBeGreaterThan(weightNow(quiet, 'wolves_at_the_coop'));
+  });
+
+  it('el barril trae bodas y riñas, las dos', () => {
+    const sober = rich();
+    const merry = structuredClone(sober);
+    giveMeans(merry, 'ale', 'spring', 4);
+    expect(weightNow(merry, 'wedding')).toBeGreaterThan(weightNow(sober, 'wedding'));
+    expect(weightNow(merry, 'quarrel_in_the_square'))
+      .toBeGreaterThan(weightNow(sober, 'quarrel_in_the_square'));
+  });
+
+  it('la fiesta del barril se celebra esa misma semana', () => {
+    // Es lo que le da al ánimo el reloj del jugador: dar algo y no ver nada es
+    // lo que hacía que las palancas no se entendieran.
+    const state = rich();
+    const before = state.village.morale;
+    const report = tick(state, CATALOG, undefined, give('ale'));
+    expect(report.happening).toBe('ale_feast');
+    expect(state.village.morale).toBeGreaterThan(before);
+  });
+
+  it('y el granero lleno trae ratas, que es a donde lleva el arado', () => {
+    const state = rich();
+    state.tick = TIME.WEEKS_PER_YEAR * 6 + 40; // invierno
+    state.village.grain = 0;
+    const empty = weightNow(state, 'rats_in_the_granary');
+    state.village.grain = 100_000;
+    const full = weightNow(state, 'rats_in_the_granary');
+    expect(empty).toBe(0);
+    // Sólo con granero en pie: sin granero no hay dónde entrar.
+    if (state.buildings.some((b) => b.kind === 'granary' && b.lostTick === null)) {
+      expect(full).toBeGreaterThan(0);
+    }
+  });
+
+  it('y el corral lleno, matanza en la fiesta', () => {
+    const state = rich();
+    state.tick = TIME.WEEKS_PER_YEAR * 6 + TIME.HARVEST_WEEK + 1; // la semana de la fiesta
+    state.herd.pigs = 0;
+    expect(weightNow(state, 'pig_slaughter')).toBe(0);
+    state.herd.pigs = FATE.SLAUGHTER_MIN_PIGS;
+    expect(weightNow(state, 'pig_slaughter')).toBeGreaterThan(0);
+  });
+});
+
+describe('el valle recién fundado', () => {
+  it('no puede pagar nada, y se le dice por qué', () => {
+    // La pareja no tiene plata: el carro está lleno de cosas que no puede dar,
+    // y eso **se dice** en vez de dejar tres botones apagados sin motivo.
+    const pair = foundGame(7);
+    for (const id of MEANS_IDS) {
+      const refusal = refusalFor(pair, id);
+      expect(refusal, id).not.toBeNull();
+      // Y el motivo que se da es el más cierto de los que hay: a la pareja no
+      // le falta sólo la plata, es que tampoco tiene corral. Cada motivo tiene
+      // su frase en el banco (`cart.no.*`), que es lo que el carro enseña.
+      expect(['cost', 'room', 'already', 'feasting'], id).toContain(refusal);
+    }
+  });
+});

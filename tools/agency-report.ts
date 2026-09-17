@@ -22,9 +22,10 @@ import { CATALOG } from '../src/engine/crossroads/catalog/index';
 import { foundGame } from '../src/engine/found';
 import { population } from '../src/engine/people/demography';
 import { run, type Policy } from '../src/engine/sim';
-import type { GameState, PlayerAct } from '../src/engine/state';
+import type { GameState, MeansId, PlayerAct } from '../src/engine/state';
 import { herdCapacity } from '../src/engine/subsistence/herd';
 import { fellForest } from '../src/engine/world/forest';
+import { canGive } from '../src/engine/world/means';
 import { canAccept } from '../src/engine/world/road';
 
 export interface Variant {
@@ -62,10 +63,47 @@ const loadTheValley = (state: GameState): void => {
   fellForest(state, 3000);
 };
 
+/**
+ * M-2 · **Dar un medio en cuanto el valle pueda pagarlo.** Es la manera de
+ * jugar más simple que existe con los medios —ni esperar ni elegir el momento—
+ * y por eso sirve de patrón: si con esto tres combinaciones no dan tres aldeas
+ * distintas, los medios son decorado (criterio del brief M-2).
+ */
+const giveWhatYouCan = (...wanted: readonly MeansId[]) => (state: GameState): PlayerAct[] => {
+  // Uno por semana como mucho: el carro no es una tienda.
+  for (const means of wanted) {
+    if (canGive(state, means)) return [{ kind: 'means', means }];
+  }
+  return [];
+};
+
+/**
+ * M-2 · El jugador que **ahorra**: mientras no tenga arado no gasta plata en
+ * nada más, y después compra lo que pueda. Es la otra manera de jugar, y la
+ * distancia entre las dos es lo que mide si elegir importa.
+ */
+const saveForThePlough = (state: GameState): PlayerAct[] => {
+  if (!(state.traits as readonly string[]).includes('plough')) {
+    return canGive(state, 'plough') ? [{ kind: 'means', means: 'plough' }] : [];
+  }
+  return giveWhatYouCan('pigs', 'ale')(state);
+};
+
 export const VARIANTS: readonly Variant[] = [
   { name: 'nada', policy: 'prudent', acts: () => [] },
   { name: 'acepta ofertas', policy: 'prudent', acts: acceptWhatYouCan },
   { name: 'cargado', policy: 'prudent', acts: () => [], prelude: loadTheValley },
+  // M-2 · las tres combinaciones que deciden si el patrón vale.
+  { name: 'arado', policy: 'prudent', acts: giveWhatYouCan('plough') },
+  { name: 'cerdos', policy: 'prudent', acts: giveWhatYouCan('pigs') },
+  { name: 'barril', policy: 'prudent', acts: giveWhatYouCan('ale') },
+  // **Y el jugador que ahorra.** `todo` compraba lo primero que podía pagar, y
+  // medido eso significa que **el arado nunca llega**: el barril cuesta diez y
+  // el arado veinte, así que quien compra cerveza en cuanto puede no junta
+  // nunca para el arado. Es un hallazgo del diseño y no un defecto de la
+  // medida —elegir importa— así que se miden las dos maneras.
+  { name: 'barril primero', policy: 'prudent', acts: giveWhatYouCan('ale', 'pigs', 'plough') },
+  { name: 'arado primero', policy: 'prudent', acts: saveForThePlough },
   { name: 'peor encrucijada', policy: 'worst', acts: () => [] },
 ];
 
@@ -83,6 +121,10 @@ interface Row {
   tradingDecades: number;
   offers: number;
   accepted: number;
+  /** M-2 · medios dados, y si el arado llegó. */
+  means: number;
+  plough: boolean;
+  pigs: number;
 }
 
 function play(seed: number, years: number, variant: Variant): Row {
@@ -124,6 +166,9 @@ function play(seed: number, years: number, variant: Variant): Row {
     tradingDecades: trading,
     offers,
     accepted,
+    means: state.acts.filter((a) => a.act.kind === 'means' && a.done).length,
+    plough: (state.traits as readonly string[]).includes('plough'),
+    pigs: state.herd.pigs,
   };
 }
 
@@ -145,7 +190,7 @@ function main(): void {
   const variants = only === undefined ? VARIANTS : VARIANTS.filter((v) => only.includes(v.name));
 
   console.log(`${seeds} semillas, ${years} años\n`);
-  console.log('variante           | pop med | min..max | muertas (año más temprano) | 1ª piedra med (min..max) | piedra fin | plata fin | entra / sale | décadas con trato | ofertas / aceptadas');
+  console.log('variante           | pop med | min..max | muertas (año más temprano) | 1ª piedra med (min..max) | piedra fin | plata fin | entra / sale | décadas con trato | ofertas / aceptadas | medios');
   for (const variant of variants) {
     const rows: Row[] = [];
     for (let seed = 1; seed <= seeds; seed += 1) rows.push(play(seed, years, variant));
@@ -169,6 +214,7 @@ function main(): void {
       `${fmt(median(rows.map((r) => r.silverIn)))} / ${fmt(median(rows.map((r) => r.silverOut)))}`.padStart(12),
       `${trading}/${live}`.padStart(17),
       `${rows.reduce((n, r) => n + r.offers, 0)} / ${rows.reduce((n, r) => n + r.accepted, 0)}`.padStart(19),
+      `${rows.reduce((n, r) => n + r.means, 0)}`.padStart(6),
     ].join(' | '));
   }
 }

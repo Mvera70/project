@@ -57,7 +57,7 @@ export function navTabFor(route: SheetRoute): NavTab {
     case 'chronicle': return 'chronicle';
     case 'people': return 'people';
     case 'inspect': return route.from;
-    case 'orders':
+    case 'cart':
     case 'valley':
     default: return 'valley';
   }
@@ -79,7 +79,7 @@ export function navTabFor(route: SheetRoute): NavTab {
  * la carcasa por su cuenta para decidir su propia visibilidad. `valley` es
  * la única ruta que no monta nada: es el valle mismo, sin bandeja encima.
  */
-export function contentRouteFor(route: SheetRoute): 'orders' | 'inspect' | 'chronicle' | 'people' | null {
+export function contentRouteFor(route: SheetRoute): 'cart' | 'inspect' | 'chronicle' | 'people' | null {
   return route.kind === 'valley' ? null : route.kind;
 }
 

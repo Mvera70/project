@@ -531,6 +531,39 @@ export const BANK: Record<string, string[]> = {
     'A hard winter in year {year}. Wolves in the pen, {count} hens gone and a pig with them.',
     'They counted the herd in the {season} snow and were a pig and {count} hens short.',
   ],
+  // M-2 · lo que los medios abren, contado como lo que es.
+  'fate.ale_feast': [
+    'They broached the barrel in {season} and the square did not empty till dark.',
+    'A barrel came into the valley in year {year}. Nobody worked the next morning.',
+    'There was ale that {season}, and singing, and two arguments nobody remembers starting.',
+  ],
+  'fate.pig_slaughter': [
+    'They killed a pig for the harvest feast: {grain} bushels worth of meat, salted and hung.',
+    'A pig went for the feast in year {year}, and the valley ate like it never does.',
+    'The feast of {season} had meat on the table: {grain} bushels worth.',
+  ],
+  'fate.rats_in_the_granary': [
+    'Rats had been in the granary all winter: {grain} bushels gone before anyone counted.',
+    'They opened the granary in the {season} of year {year} and found {grain} bushels eaten.',
+    'A full granary feeds more than the village: {grain} bushels to the rats that winter.',
+  ],
+  // M-2 · y lo que el jugador metió. Peso 2: es un hecho de la partida y se lee
+  // sobre el valle, pero no es un hito.
+  'means.plough.given': [
+    'A plough came into the valley in the {season} of year {year}. One field, half the hands.',
+    'They put a plough to the fields that {season}, and the ox-less furrows came out straighter than anyone expected.',
+    'A plough in year {year}: the first tool the valley owned that did a person\'s work.',
+  ],
+  'means.pigs.given': [
+    'Two pigs came over the ridge in {season} and went straight into the pen.',
+    'The valley got two pigs in year {year}. The children named them within the hour.',
+    'Two pigs that {season}: winter meat, if the wolves keep their distance.',
+  ],
+  'means.ale.given': [
+    'A barrel of ale came up the road in the {season} of year {year}.',
+    'They bought ale in year {year}, and everyone knew before the cart had stopped.',
+    'A barrel that {season}, and not a soul asked what it cost.',
+  ],
   'fate.river_flood': [
     'The river came over its banks in the {season} of year {year}, and {grain} bushels were spoiled.',
     'After a week of rain the ford went under and the low fields with it: {grain} bushels lost.',
@@ -1981,6 +2014,22 @@ export const UI_BANK: Record<string, string> = {
   'offer.take': 'Take it',
   'offer.leave': 'Let him go',
   'offer.cannot': 'The valley cannot pay for that.',
+  // M-2 · el carro: lo que el jugador puede meter en el valle. Ninguna de estas
+  // frases dice qué hará la aldea con ello, porque no se le ordena nada.
+  'cart': 'The cart',
+  'cart.open': 'What you can give the valley',
+  'cart.nothing': 'Nothing to give yet',
+  'cart.some': 'Something to give',
+  'cart.give': 'Give',
+  'cart.plough': 'A plough',
+  'cart.plough.what': 'One field worked by half the hands. The rest go where the valley needs them.',
+  'cart.pigs': 'Two pigs',
+  'cart.pigs.what': 'Meat for the winter, and a feast when the pen is full.',
+  'cart.ale': 'A barrel of ale',
+  'cart.ale.what': 'A feast this week. Weddings follow a barrel, and so do quarrels.',
+  'cart.no.cost': 'Not enough for that yet.',
+  'cart.no.already': 'The valley already has one.',
+  'cart.no.room': 'No room in the pen.',
   // La línea de estado de la tira (`src/ui/doing.ts`). **Interfaz y no crónica**:
   // una sola forma por clave, sin variantes, porque una etiqueta que cambia de
   // palabras cada vez que se mira no es una etiqueta. Presente, corta, y dicha
