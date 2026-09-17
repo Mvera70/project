@@ -20,8 +20,12 @@
 // `FATE` y los aplica `world/fate.ts`. Aquí sólo está qué cuesta, qué deja y qué
 // se cuenta.
 
-import { MEANS } from '../balance';
-import type { ChronicleEntry, GameState, MeansId, VillageStats } from '../state';
+import { MEANS, PEOPLE, TIME } from '../balance';
+import { housingCapacity, population } from '../people/demography';
+import { MALE_NAMES, FEMALE_NAMES } from '../people/names';
+import { ALL_TRAITS } from '../people/traits';
+import { hash32 } from '../rng';
+import type { ChronicleEntry, GameState, MeansId, VillageStats, Villager } from '../state';
 import { herdCapacity } from '../subsistence/herd';
 
 /** Lo que un medio cuesta y lo que deja al darlo. */
@@ -34,11 +38,15 @@ export interface MeansSpec {
    * de fundación (§7.11) — un medio es uno de esos, puesto a mitad de partida y
    * pagado.
    */
-  readonly trait?: 'plough' | 'sty';
+  readonly trait?: 'plough' | 'sty' | 'axe' | 'relic';
   /** Si mete animales en el corral, cuántos y de qué. */
   readonly herd?: { readonly kind: 'pigs' | 'cows'; readonly count: number };
   /** Si lo que deja es una fiesta esta semana. */
   readonly feast?: boolean;
+  /** M-4 · si lo que llega es una persona que se queda. */
+  readonly hand?: boolean;
+  /** M-4 · banderas que el medio deja puestas, con sus años. */
+  readonly flags?: readonly { readonly flag: string; readonly years: number }[];
 }
 
 export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
@@ -61,6 +69,23 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
   // riñas, que es lo que una fiesta también trae. Es el medio que le da al ánimo
   // el reloj del jugador (`plan-medios.md` §6.2).
   ale: { cost: { grain: 25, silver: 10 }, feast: true },
+  // **Un hacha buena.** Cada leñador trae más leña, así que la obra y la piedra
+  // llegan antes; y el bosque del corazón retrocede, que es de donde la riada
+  // saca su peso (M-1). Leña ahora a cambio de agua después.
+  axe: { cost: { grain: 20, silver: 18 }, trait: 'axe' },
+  // **Una reliquia.** La fe deriva alto, y con fe hay capilla y cura (§7.3).
+  // Y el camino se entera: un valle con reliquia es un valle del que se habla,
+  // y de eso vive el señor.
+  relic: {
+    cost: { silver: 30 },
+    trait: 'relic',
+    flags: [{ flag: 'watched', years: MEANS.RELIC_WATCHED_YEARS }],
+  },
+  // **Un par de manos.** El forastero que pasaba y se queda: lo más caro que
+  // hay en este valle, porque todo lo demás sale de las manos que haya. No trae
+  // oficio puesto —eso lo decide la aldea cuando haya un puesto vacante
+  // (§6.2)— y no se coloca: duerme donde haya sitio, como cualquiera.
+  hand: { cost: { grain: 60, silver: 24 }, hand: true },
 };
 
 /**
@@ -71,6 +96,52 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
  * encadenar barriles, salen unos pocos medios por partida: un medio pasa a ser
  * una decisión de década y no una compra de semana. Ver `docs/task-log.md`.
  */
+
+/**
+ * M-4 · **El forastero que se queda.**
+ *
+ * Entra como un adulto de `MEANS.HAND_AGE` inviernos, con nombre y sin oficio:
+ * lo que la aldea haga con él lo decide §6.2 cuando haya un puesto vacante, que
+ * es el principio del carro aplicado a una persona.
+ *
+ * **Y su nombre sale de un hash y no del flujo de nombres**, que es lo que
+ * mantiene la invariante de todos los actos del jugador: dar algo no mueve una
+ * sola tirada del mundo (§4.3). `hash32` es puro; `makeName` habría consumido
+ * del flujo `names` y con eso un forastero habría desplazado la partida entera.
+ */
+function settle(state: GameState): void {
+  const female = hash32(state.tick, 'means-hand') % 2 === 0;
+  const bank = female ? FEMALE_NAMES : MALE_NAMES;
+  const used = new Set(state.people.villagers.map((person) => person.name));
+  const free = bank.filter((name) => !used.has(name));
+  const pool = free.length > 0 ? free : bank;
+  const name = pool[hash32(state.tick, 'means-hand-name') % pool.length] ?? 'Stranger';
+  const id = state.people.nextId;
+  state.people.nextId += 1;
+  state.people.villagers.push({
+    id,
+    name,
+    named: true,
+    role: null,
+    female,
+    bornTick: state.tick - MEANS.HAND_AGE * TIME.WEEKS_PER_YEAR,
+    diedTick: null,
+    causeOfDeath: null,
+    leftTick: null,
+    // Los rasgos salen del mismo hash: un forastero tiene carácter, y el mismo
+    // en la misma partida, pero no cuesta una tirada.
+    traits: [
+      ALL_TRAITS[hash32(state.tick, 'means-hand-a') % ALL_TRAITS.length],
+      ALL_TRAITS[hash32(state.tick, 'means-hand-b') % ALL_TRAITS.length],
+    ].filter((trait, index, all): trait is Villager['traits'][number] =>
+      trait !== undefined && all.indexOf(trait) === index),
+    homeId: null,
+    parentIds: [null, null],
+    memories: [],
+    opinions: {},
+  });
+  if (state.people.namedIds.length < PEOPLE.MAX_NAMED) state.people.namedIds.push(id);
+}
 
 /** Por qué no se puede dar algo, o `null` si se puede. */
 export type MeansRefusal = 'cost' | 'already' | 'room' | 'feasting';
@@ -91,6 +162,9 @@ export function refusalFor(state: GameState, id: MeansId): MeansRefusal | null {
   // el primero, y sin esto la fiesta se podía encadenar semana a semana: medido,
   // cincuenta y un barriles en una partida de sesenta años.
   if (spec.feast === true && aleWindow(state)) return 'feasting';
+  // Y un forastero necesita dónde dormir: sin cama libre no se queda, que es la
+  // misma regla que §5.7 aplica a quien llega por su cuenta.
+  if (spec.hand === true && housingCapacity(state) <= population(state)) return 'room';
   for (const [stat, amount] of Object.entries(spec.cost)) {
     if (state.village[stat as keyof VillageStats] < (amount ?? 0)) return 'cost';
   }
@@ -138,6 +212,10 @@ export function giveMeans(state: GameState, id: MeansId, season: string, year: n
   // `world/fate.ts` la semana que la bandera está puesta, que es donde viven
   // los sucesos y sus efectos visibles.
   if (spec.feast === true) state.flags['ale'] = state.tick + MEANS.ALE_WEEKS;
+  for (const flag of spec.flags ?? []) {
+    state.flags[flag.flag] = state.tick + flag.years * TIME.WEEKS_PER_YEAR;
+  }
+  if (spec.hand === true) settle(state);
   return {
     id,
     given: true,

@@ -104,6 +104,11 @@ export const VARIANTS: readonly Variant[] = [
   // medida —elegir importa— así que se miden las dos maneras.
   { name: 'barril primero', policy: 'prudent', acts: giveWhatYouCan('ale', 'pigs', 'plough') },
   { name: 'arado primero', policy: 'prudent', acts: saveForThePlough },
+  // M-4 · los tres que cierran el carro, cada uno solo, y el carro entero.
+  { name: 'hacha', policy: 'prudent', acts: giveWhatYouCan('axe') },
+  { name: 'reliquia', policy: 'prudent', acts: giveWhatYouCan('relic') },
+  { name: 'manos', policy: 'prudent', acts: giveWhatYouCan('hand') },
+  { name: 'el carro entero', policy: 'prudent', acts: giveWhatYouCan('plough', 'axe', 'pigs', 'relic', 'hand', 'ale') },
   { name: 'peor encrucijada', policy: 'worst', acts: () => [] },
 ];
 

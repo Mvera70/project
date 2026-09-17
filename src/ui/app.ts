@@ -14,14 +14,13 @@ import './redesign/shell.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
-import { answerFor } from './answer';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { offerLine } from './offer-line';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
-import type { ArchivedGame, Decision, GameState, Intent, PlayerAct, SaveFile } from '@engine/state';
+import type { ArchivedGame, Decision, GameState, PlayerAct, SaveFile } from '@engine/state';
 import { createHud } from './redesign/hud';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { cartPanel } from './redesign/cart';
@@ -308,17 +307,19 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // cada palanca (`orderRow`, que vivía en este fichero); ahora está una vez,
     // en el punto que de verdad decide qué pasa cuando cambia una orden —
     // `orders.ts` sólo emite la intención nueva.
-    setIntent(intent: Intent): void {
-      state.intent = intent;
-      // E4 · **y la aldea contesta.** Si la orden no se puede cumplir, se dice
-      // ahora y una sola vez: un roce repetido cada semana deja de ser una
-      // respuesta y se convierte en una regañina.
-      const said = answerFor(state);
-      if (said !== null) say('event', renderUiText(said.key, said.params));
-      // Y se guarda, porque es una decisión del jugador: al volver dos días
-      // después la aldea tiene que seguir haciendo lo que se le dijo.
-      persist();
-    },
+    /**
+     * M-4 · **Las órdenes permanentes se retiran.**
+     *
+     * Aquí vivía `setIntent`, la única escritura que un panel podía hacer sobre
+     * las tres palancas de la v2.0. Se van con la hoja que las pintaba: medido,
+     * sólo hacían daño —a dos muescas del reposo moría media aldea, tarde y sin
+     * aviso (`docs/plan-medios.md` §1)— y el dueño del diseño las retiró por
+     * eso. Lo que el jugador hace ahora es **dar** (`give`, arriba).
+     *
+     * `state.intent` se queda en reposo dentro del motor y se borra cuando el
+     * esquema del guardado vuelva a subir: quitarlo hoy sería una migración
+     * entera por limpieza, y la limpieza va después (decisión 5 del dueño).
+     */
     /**
      * VZ-4 · **seguir es seguir, no centrar una vez.**
      *

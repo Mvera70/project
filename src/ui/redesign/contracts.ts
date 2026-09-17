@@ -9,7 +9,7 @@
 // Nadie más define estos tipos: un consumidor que necesite otra ruta reabre
 // §11.2 con el coordinador en vez de añadirla en silencio (UI-R0 §8).
 
-import type { ArchivedGame, GameState, Intent, MeansId } from '@engine/state';
+import type { ArchivedGame, GameState, MeansId } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
 import type { ActorDoing } from '../../render3d/contracts';
@@ -45,7 +45,9 @@ export type SheetRoute =
 export interface UiActions {
   navigate(route: SheetRoute): void;
   setSpeed(speed: Speed): void;
-  setIntent(intent: Intent): void;
+  // M-4 · `setIntent` se retira con las órdenes permanentes: un panel ya no
+  // escribe sobre las palancas porque no hay palancas. Lo que un panel puede
+  // pedir es **dar** (`give`).
   track(id: number | null): void;
   /**
    * VZ-6 · **Qué está haciendo esa persona ahora mismo**, para la línea «Today»

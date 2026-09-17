@@ -4,7 +4,7 @@
 // to somebody else; what lives here is the sequence, and the sequence is
 // normative — changing it changes the balance and breaks saved games.
 
-import { CROWS, FORAGE, LABOUR, MIGRATION, PEOPLE, TIME } from './balance';
+import { CROWS, FORAGE, LABOUR, MIGRATION, PEOPLE, TIME, MEANS } from './balance';
 import {
   isHere,
   population,
@@ -35,7 +35,7 @@ import type {
   Villager,
   VillagerId,
 } from './state';
-import { TERRAIN_CODE } from './state';
+import { TERRAIN_CODE, hasTrait } from './state';
 import { seasonOf, weekOf, yearOf } from './time';
 import { count } from './subsistence/building-counts';
 import { allocateLabour, produce } from './subsistence/labour';
@@ -830,7 +830,11 @@ export function tick(
   // says how much it actually got, which is §5.2's `woodCap`: a valley that has
   // been cut flat stops producing timber instead of producing it out of air.
   const allocation = allocateLabour(state);
-  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER);
+  // M-4 · **el hacha buena** del carro (§7.12): cada leñador trae más leña, y
+  // el bosque del corazón retrocede más rápido. Lo segundo no hay que
+  // escribirlo aquí: la riada ya pesa con el bosque que ya no está (M-1).
+  const axe = hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1;
+  const felled = fellForest(state, allocation.cutters * LABOUR.WOOD_PER_CUTTER * axe);
   const produced = produce(state, allocation, felled);
   // §7.7, v2.92: the hands the allocation sent out come back with food. The
   // forest fraction is read here and passed in because `subsistence/` may not

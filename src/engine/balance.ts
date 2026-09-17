@@ -545,6 +545,26 @@ export const MEANS = {
    * decide `allocateLabour` por necesidades, y ahí el jugador no manda.
    */
   PLOUGH_CREW: 0.6,
+  /**
+   * El hacha buena: cada leñador trae esta proporción de leña.
+   *
+   * TUNE. Y su cara mala no hay que inventarla: el bosque del corazón retrocede
+   * más rápido, y la riada pesa con el bosque que ya no está (M-1). Un hacha es
+   * leña ahora a cambio de agua después.
+   */
+  AXE_WOOD: 1.4,
+  /**
+   * La reliquia: a dónde deriva la fe con ella en la capilla.
+   *
+   * TUNE. La fe abre la capilla (§7.3 pide 45) y con ella el cura y el ánimo
+   * que sostiene; la reliquia es la forma de llegar ahí sin esperar una
+   * generación. Su precio no es sólo la plata: un valle con reliquia es un valle
+   * del que se habla, y de eso vive el señor (`watched`).
+   */
+  RELIC_FAITH: 62,
+  RELIC_WATCHED_YEARS: 12,
+  /** El forastero que se queda: los inviernos que ya tiene al llegar. */
+  HAND_AGE: 24,
 } as const;
 
 /** El señor cobra cada otoño. Decisión del dueño del diseño, 17 sep 2026. */

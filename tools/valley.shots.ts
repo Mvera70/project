@@ -42,6 +42,7 @@
  * ---------------------------------------------------------------------------
  */
 import { TIME } from '@engine/balance';
+import { MEANS_IDS } from '@engine/state';
 import { hourAt } from '../src/render3d/effects/day-phases';
 import { test, type Page } from '@playwright/test';
 import { passTitle } from './pass-title';
@@ -567,7 +568,9 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
   // órdenes a la que sustituye (`navTabFor` en `redesign/shell.ts`).
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
   const rows = page.locator('.cart-row');
-  await test.expect(rows).toHaveCount(3);
+  // Tantas filas como medios haya, sin congelar el número: M-4 pasó de tres a
+  // seis y esta prueba no es la que decide cuántos hay (`MEANS_IDS`).
+  await test.expect(rows).toHaveCount(MEANS_IDS.length);
   // Cada cosa lleva su precio en fichas de recurso, no en una frase con cifras.
   await test.expect(page.locator('.cart-row').first().locator('.cart-coin').first()).toBeVisible();
   await page.screenshot({ path: 'artifacts/m2-cart.png', fullPage: true });
@@ -584,7 +587,7 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
   }
 
   // Y dar algo se ve esa semana: el barril es una fiesta, no una promesa.
-  const ale = rows.nth(2).locator('.cart-give');
+  const ale = rows.nth(MEANS_IDS.indexOf('ale')).locator('.cart-give');
   if (await ale.isEnabled()) {
     await ale.click();
     // La crónica lo cuenta y la voz lo dice; basta con que el valle hable de

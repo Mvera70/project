@@ -24,19 +24,30 @@ const CABE_EN_DOS_LINEAS = 104;
 /**
  * Las claves que hablan por el hueco de la voz, por familias.
  *
- * `doing.*` el fondo (qué está haciendo la aldea), `answer.*` la respuesta a una
- * orden imposible, `intro.*` la pista del inicio guiado, `founding.*` y
- * `valley.*` lo que se dice al fundar. Lo que sale de la crónica —los sucesos y
+ * `doing.*` el fondo (qué está haciendo la aldea), `offer.*.say` lo que ofrece
+ * quien espera en el camino (M-0), `intro.*` la pista del inicio guiado,
+ * `founding.*` y `valley.*` lo que se dice al fundar. **`answer.*` se retiró en
+ * M-4** con las órdenes permanentes: ya no hay orden que no se pueda cumplir. Lo que sale de la crónica —los sucesos y
  * los hitos— no se mide aquí: sus plantillas se comprueban enteras en
  * `chronicle.test.ts`, y lo que llega al hueco es una línea de crónica, que ya
  * está acotada por §9.1.
  */
-const FAMILIAS = ['doing.', 'answer.', 'intro.', 'founding.settled', 'valley.'] as const;
+const FAMILIAS = ['doing.', 'intro.', 'founding.settled', 'valley.'] as const;
+
+/**
+ * Y de las ofertas del camino, **sólo lo que se dice en la voz**: `offer.*.say`
+ * es la frase del hueco y `offer.*.taken`/`.gone` son líneas de crónica, que
+ * viven acotadas por §9.1 y llegan al hueco ya cortadas como cualquier entrada.
+ */
+function hablaPorLaVoz(key: string): boolean {
+  if (key.startsWith('offer.')) return key.endsWith('.say');
+  return FAMILIAS.some((familia) => key.startsWith(familia));
+}
 
 function laLargaDe(fuente: Record<string, unknown>): { key: string; text: string }[] {
   const frases: { key: string; text: string }[] = [];
   for (const [key, valor] of Object.entries(fuente)) {
-    if (!FAMILIAS.some((familia) => key.startsWith(familia))) continue;
+    if (!hablaPorLaVoz(key)) continue;
     // El banco guarda o una frase o varias variantes de la misma; se miden todas.
     const textos = typeof valor === 'string' ? [valor] : Array.isArray(valor) ? valor : [];
     for (const texto of textos) {

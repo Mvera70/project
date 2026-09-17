@@ -9,8 +9,9 @@
 // endures disasters that would sink a faithless one — which is exactly why the
 // priest is dangerous.
 
-import { MOOD, TIME } from '../balance';
+import { MOOD, TIME, MEANS } from '../balance';
 import { housingCapacity, isHere, population } from '../people/demography';
+import { hasTrait } from '../state';
 import type { DeathCause, GameState, TickContext } from '../state';
 import { weekOf } from '../time';
 import { has } from './building-counts';
@@ -46,6 +47,19 @@ const clamp = (x: number): number => Math.max(0, Math.min(100, x));
  * village is held up by its faith no matter what happened this week — and so
  * that the floor is computed from the faith of this tick, not the last one.
  */
+/**
+ * M-4 · A dónde deriva la fe. `MOOD.FAITH_DRIFT_TO` de siempre, y más alto con
+ * **la reliquia** del carro (§7.12).
+ *
+ * Es lo que hace de la reliquia un medio y no un adorno: la capilla pide 45 de
+ * fe (§7.3), así que con reliquia un valle llega a tener capilla y cura sin
+ * esperar una generación — y de paso se hace visible para el señor, que es su
+ * cara mala y la pone el propio medio con la bandera `watched`.
+ */
+function faithTarget(state: GameState): number {
+  return hasTrait(state, 'relic') ? MEANS.RELIC_FAITH : MOOD.FAITH_DRIFT_TO;
+}
+
 export function updateMood(state: GameState, ctx: TickContext): void {
   const people = population(state);
   const chapel = has(state, 'chapel');
@@ -73,7 +87,7 @@ export function updateMood(state: GameState, ctx: TickContext): void {
   const priest = state.people.villagers.find((v) => isHere(v) && v.role === 'priest');
 
   let faith = state.village.faith;
-  faith += (MOOD.FAITH_DRIFT_TO - faith) * MOOD.FAITH_DRIFT;
+  faith += (faithTarget(state) - faith) * MOOD.FAITH_DRIFT;
   if (chapel) faith += MOOD.FAITH_CHAPEL;
   if (church) faith += MOOD.FAITH_CHURCH;
   if (priest !== undefined) {

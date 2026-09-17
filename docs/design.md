@@ -1434,8 +1434,21 @@ la que convierte darlo en una decisión en vez de una compra.
 | Medio | Qué cambia | Lo bueno | Lo malo |
 |---|---|---|---|
 | **Un arado** | Un campo se trabaja con `MEANS.PLOUGH_CREW` de las manos que pedía | Sobran brazos, y la aldea los manda donde ella quiera: bosque, obra, cantera | El granero se llena, y un granero lleno trae ratas, ladrones y al señor (§7.10, M-1) |
-| **Dos cerdos** | Dos cabezas en el corral | Carne en invierno y matanza en la fiesta de la cosecha | Los lobos van a donde hay ganado, y el corral apretado cría peste (§7.7) |
+| **Una pocilga y dos cerdos** | Sube el techo del corral (`ANIMALS.STY_PIGS`) y mete dos | Carne en invierno y matanza en la fiesta de la cosecha | Los lobos van a donde hay ganado, y el corral apretado cría peste (§7.7) |
 | **Un barril** | Una fiesta esta misma semana | Ánimo de golpe, y bodas las semanas siguientes | Riñas las mismas semanas, y la fe lo mira mal |
+| **Un hacha buena** | Cada leñador trae `MEANS.AXE_WOOD` de leña | Leña, y con ella obra y piedra | El bosque del corazón retrocede, y la riada pesa con el bosque que ya no está |
+| **Una reliquia** | La fe deriva a `MEANS.RELIC_FAITH` | Capilla y cura sin esperar una generación (§7.3 pide 45 de fe) | El camino se entera: `watched`, y de eso vive el señor |
+| **Un par de manos** | Un forastero adulto se queda | Manos, que es de donde sale todo lo demás | Una boca más, y sin cama libre no se queda |
+
+**Y por qué la pocilga y no dos cerdos sueltos** (M-3): el corral se llena solo
+—`tendHerd` cría hasta la capacidad que dan las casas— así que dar animales a
+una aldea hecha era una negativa por falta de sitio casi siempre. Lo que un
+medio da es **lo que la aldea no puede darse a sí misma**.
+
+**Y el forastero no cuesta una tirada.** Su nombre y sus rasgos salen de un
+`hash32` del tick, no del flujo `names`: la invariante de todos los actos del
+jugador es que dar algo **no mueve una sola tirada del mundo** (§4.3), y un
+forastero con nombre sorteado habría desplazado la partida entera.
 
 **Y no se coloca nada.** «En este juego no se coloca nada; todo se decide y el
 mapa interactúa solo» (dueño del diseño): el arado va al campo que se trabaje,
@@ -1455,10 +1468,32 @@ encadenar barriles, toda la plata de una partida da para una docena de medios:
 un medio pasa a ser una decisión de década.
 
 **Lo que esto entrega, medido** (`tools/agency-report.ts`, 24 semillas × 60
-años): con arado, población mediana **60** y la primera piedra en 23 valles de
-24; sin dar nada, **38** y 7 de 24. Y con la misma plata, un jugador que compra
-barriles en cuanto puede se queda en 45 y **nunca junta para el arado** — que
-es exactamente lo que hace que elegir importe.
+años, dando cada medio en cuanto el valle puede pagarlo):
+
+| Se da | Población mediana | Primera piedra |
+|---|---|---|
+| nada | 38 | año 44, en 7 valles de 24 |
+| el arado | **61** | año 43, en **24 de 24** |
+| la reliquia | 47 | **año 34**, en 21 de 24 |
+| las manos | 49 | año 46, en 17 de 24 |
+| el barril | 45 | año 43, en 15 de 24 |
+| la pocilga | 40 | año 46, en 12 de 24 |
+| el hacha | 39 | año 48, en 8 de 24 |
+| el carro entero | 45 | año 43, en 15 de 24 |
+
+**Veintitrés puntos entre la mejor y la peor manera de jugar**, y la diferencia
+se lee sin números: un valle con arado tiene piedra y el que no, no la ve; uno
+con reliquia la tiene diez años antes. Y con la misma plata, **el carro entero
+sale peor que sólo el arado** (45 contra 61), porque comprar de todo deja sin
+plata para lo que de verdad cambia la partida. Elegir no es una preferencia.
+
+**Y una medida que dice algo del juego y no de los medios: el hacha no cambia
+casi nada** (39 contra 38). No es un defecto del medio: es que **la leña no es
+un cuello de botella en este valle** —de 507 a 43 000 unidades en cien años,
+medido desde v2.9 y anotado en `crossroads/catalog/trade.ts`—, así que dar más
+leña es dar más de lo que ya sobra. Lo que el hacha sí cobra es su precio: el
+bosque retrocede y la riada pesa con él. Queda escrito para quien decida algún
+día si la leña debe escasear; **es balance y no es de esta fase**.
 
 ---
 

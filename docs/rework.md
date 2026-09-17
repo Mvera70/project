@@ -1132,7 +1132,45 @@ propiedad medible, como en R-5: «en la semana del suceso X, al menos N
 cuerpos están en la escena X durante M segundos», con N y M medidos en tres
 semillas.
 
-### M-4 · El resto del carro
+### M-4 · El resto del carro — **hecha** (17 sep 2026)
+
+> **El carro queda con seis medios** y las órdenes permanentes salen del código,
+> no sólo de la pantalla. Los tres que faltaban:
+>
+> - **Un hacha buena**: más leña por leñador, y el bosque lo paga.
+> - **Una reliquia**: la fe deriva alto, así que hay capilla y cura sin esperar
+>   una generación — y el camino se entera (`watched`).
+> - **Un par de manos**: el forastero que se queda. **Y no cuesta una tirada**:
+>   su nombre y sus rasgos salen de un `hash32` del tick, porque la invariante
+>   de todos los actos del jugador es que dar algo no mueve el azar del mundo.
+>   Con `makeName` habría consumido del flujo `names` y un forastero habría
+>   desplazado la partida entera.
+>
+> **Retirado:** `redesign/orders.ts`, `ui/answer.ts`, `UiActions.setIntent`, la
+> prueba de las palancas y **veintitrés claves del banco** (`app.orders.*`,
+> `app.sowing.*`, `app.hands.*`, `app.build.*`, `answer.*`; dieciocho más en el
+> banco español). `state.intent` se queda en reposo dentro del motor: quitarlo
+> es una migración de esquema entera por limpieza, y la limpieza va después
+> (decisión 5 del dueño del diseño).
+>
+> **Medido** (24 semillas × 60 años, tabla completa en `design.md` §7.12): de 38
+> de población sin dar nada a **61 con el arado**, con la reliquia adelantando
+> la primera piedra **diez años** (año 34 contra 44). Y dos cosas que la medida
+> dice y el diseño no había previsto:
+>
+> 1. **El carro entero sale peor que sólo el arado** (45 contra 61): comprar de
+>    todo deja sin plata para lo que cambia la partida.
+> 2. **El hacha casi no cambia nada** (39 contra 38), y no por el medio: **la
+>    leña no es un cuello de botella** en este juego (de 507 a 43 000 en cien
+>    años, medido desde v2.9). Dar más leña es dar más de lo que sobra. Queda
+>    escrito para quien decida si la leña debe escasear; eso es balance, y el
+>    balance va después.
+>
+> **Y el banco de balance, remedido** —lo que este brief pedía—: 37 asertos de
+> §12.9 sobre sesenta semillas. Sus números están en el informe de la ronda y
+> **no se han tocado**: el nivelado es la decisión 5 del dueño y va después de
+> que esto se juegue.
+
 
 **Qué.** Los medios que quedan de `plan-medios.md` §3.3 —el hacha, el forastero
 con oficio, la reliquia— y los que salgan de ver jugar M-2, cada uno con el

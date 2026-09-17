@@ -559,6 +559,21 @@ export const BANK: Record<string, string[]> = {
     'A sty and two pigs in year {year}. The children had named them within the hour.',
     'A sty went up that {season}, and two pigs moved into it before the straw was down.',
   ],
+  'means.axe.given': [
+    'A good axe came into the valley in the {season} of year {year}. The woodpile grew that week.',
+    'They bought an axe in year {year}, and the wood came in faster than the carts could take it.',
+    'An axe with a true edge that {season}. The forest would notice.',
+  ],
+  'means.relic.given': [
+    'A relic came to the valley in the {season} of year {year}, wrapped in cloth and carried by two.',
+    'They bought a relic in year {year}. Whether it was what the pedlar said it was, nobody asked.',
+    'A relic that {season}, and the whole valley came to look at it.',
+  ],
+  'means.hand.given': [
+    'A stranger stayed in the {season} of year {year} and was given a bed.',
+    'Somebody came up the road in year {year} and did not leave: another pair of hands.',
+    'A traveller put down their pack that {season} and stayed.',
+  ],
   'means.ale.given': [
     'A barrel of ale came up the road in the {season} of year {year}.',
     'They bought ale in year {year}, and everyone knew before the cart had stopped.',
@@ -1754,31 +1769,6 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   // dice que no hay campos», porque una orden se la da a alguien y quien
   // contesta es ese alguien. Es la misma diferencia que hay entre un mensaje de
   // error y una persona.
-  'answer.no_more_fields': [
-    'The reeve says there are {count} fields and no hands idle to break another.',
-    'There are {count} fields, and sowing heavier means breaking new ground first.',
-    'The reeve counted {count} fields and shrugged. Ground has to be broken before it is sown.',
-  ],
-  'answer.no_more_hands': [
-    'The reeve says a field cannot be worked by fewer than two, and there are no more pairs.',
-    'These hands can crew {count} fields, and no order changes that.',
-    'The reeve will not split the crews thinner. A half-worked field yields nothing.',
-  ],
-  'answer.all_the_land': [
-    'That is every acre the valley has, and there is no more ground to break.',
-    'The valley holds {count} fields and has no room for another.',
-    'The reeve says the ground has run out before the will did.',
-  ],
-  'answer.someone_must_build': [
-    'Someone has to keep building, or the valley stops being one.',
-    'The reeve keeps a few back from the wood. Roofs do not mend themselves.',
-    'Not everyone goes to the trees. Something always needs raising.',
-  ],
-  'answer.no_wood_to_build': [
-    'Nothing can be raised without timber, whatever it is meant to be.',
-    'The works wait on the wood.',
-    'The carpenters are standing about. There is no timber to give them.',
-  ],
 
   // --- milestones (§11.6) ---
   //
@@ -1933,31 +1923,13 @@ export const UI_BANK: Record<string, string> = {
   // y se nombran **con palabras y no con cifras** (§11.1): «sembrar de más» es
   // una orden que un alguacil entendería, «1,5×» no. Tres posiciones cada una,
   // porque tres es una decisión y cinco es un dial.
-  'app.orders': 'Standing orders',
   // La línea que resume las tres órdenes con la hoja cerrada (`app.ts`). Las
   // posiciones entran en minúscula porque van en mitad de una frase.
-  'app.orders.now': 'Sowing {sowing} · hands to {hands} · building {build}',
-  'app.orders.open': 'Change the standing orders',
   // El botón de velocidad enseña la velocidad de ahora; esto es lo que anuncia.
   'app.speed.open': 'Change the speed',
-  'app.sowing': 'Sowing',
-  'app.sowing.lean': 'Lean',
-  'app.sowing.enough': 'Enough',
-  'app.sowing.heavy': 'Heavy',
-  'app.hands': 'Spare hands',
-  'app.hands.works': 'Build',
-  'app.hands.both': 'Both',
-  'app.hands.wood': 'Wood',
   // E3 · La tercera orden: qué se levanta antes. Seis posiciones y no tres,
   // porque aquí cada una no es «más o menos» de lo mismo, es otra cosa — quien
   // quiere una capilla no quiere «algo más de capilla».
-  'app.build': 'Build first',
-  'app.build.none': 'As needed',
-  'app.build.food': 'Food',
-  'app.build.shelter': 'Roofs',
-  'app.build.craft': 'Trades',
-  'app.build.faith': 'Faith',
-  'app.build.defence': 'Walls',
   'app.year': 'ANNO {year}',
   // U-12 · el reloj de la cabecera (v3.72). Reemplaza al título «ANNO I», que
   // se queda donde sigue teniendo sentido: las cabeceras de año de la crónica.
@@ -1991,6 +1963,11 @@ export const UI_BANK: Record<string, string> = {
   // UI-V1 · el círculo ▶/⏸ de la piel (plan-piel.md §3.1) necesita las dos
   // etiquetas: qué va a pasar si se toca, no lo que está pasando ahora.
   'app.speed.resume': 'Resume',
+  // M-4 · **las claves de las órdenes permanentes se retiraron con ellas**:
+  // `app.orders.*`, `app.sowing.*`, `app.hands.*`, `app.build.*` y `answer.*`
+  // —la respuesta de la aldea a una orden que no podía cumplir—. Eran
+  // veintitrés y nadie las leía desde M-2. Lo que el jugador hace ahora se dice
+  // en `cart.*`.
   'app.vitals': 'The village at a glance',
   'app.vitals.people': '{count} villagers',
   'app.vitals.food': 'Food for {weeks} weeks',
@@ -2025,6 +2002,12 @@ export const UI_BANK: Record<string, string> = {
   'cart.plough.what': 'One field worked by half the hands. The rest go where the valley needs them.',
   'cart.pigs': 'A sty and two pigs',
   'cart.pigs.what': 'Room in the pen for more, and two to start. Meat for the winter — and wolves know a full pen.',
+  'cart.axe': 'A good axe',
+  'cart.axe.what': 'More timber from every woodcutter. The forest pays for it, and so does the river.',
+  'cart.relic': 'A relic',
+  'cart.relic.what': 'Faith enough for a chapel and a priest. And a valley the road talks about.',
+  'cart.hand': 'A pair of hands',
+  'cart.hand.what': 'A stranger who stays. The valley finds them a trade when one falls vacant.',
   'cart.ale': 'A barrel of ale',
   'cart.ale.what': 'A feast this week. Weddings follow a barrel, and so do quarrels.',
   'cart.no.cost': 'Not enough for that yet.',

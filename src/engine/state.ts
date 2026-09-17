@@ -881,10 +881,15 @@ export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills
   // cuatro aldeas que se midieron). Un medio que no se puede dar no es un
   // medio. Lo que se da es **sitio**: la pocilga sube el techo del corral, y los
   // cerdos que entran con ella se ven desde el primer día.
-  | 'sty';
+  | 'sty'
+  // M-4 · los tres que cierran el carro. Un hacha buena, una reliquia, y —el
+  // único que no es una cosa— el forastero que se queda: lo que trae es un par
+  // de manos, que es lo más caro que hay en este valle.
+  | 'axe'
+  | 'relic';
 
 /** M-2 · Lo que el jugador puede meter en el valle. `world/means.ts`. */
-export const MEANS_IDS = ['plough', 'pigs', 'ale'] as const;
+export const MEANS_IDS = ['plough', 'pigs', 'ale', 'axe', 'relic', 'hand'] as const;
 export type MeansId = (typeof MEANS_IDS)[number];
 
 /** Los cuatro, en orden estable: el sorteo de la fundación recorre esta lista. */
