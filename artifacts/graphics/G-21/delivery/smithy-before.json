@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "id": "smithy",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "smithy",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de sustento. Baja y ancha, con la fragua asomando por detras y la boca abierta al camino: una herreria trabaja con la puerta abierta."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.85
+    },
+    {
+      "name": "dark",
+      "role": "soil",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Smithy_Walls",
+      "location": [
+        3,
+        3,
+        1.05
+      ],
+      "dimensions": [
+        5.4,
+        5,
+        2.1
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Smithy_Roof",
+      "location": [
+        3,
+        3,
+        2.1
+      ],
+      "width": 6,
+      "depth": 5.6,
+      "height": 1.5,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Smithy_Forge",
+      "location": [
+        4.6,
+        4.5,
+        2.6
+      ],
+      "radius": 0.42,
+      "depth": 3.2,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Smithy_Mouth",
+      "location": [
+        3,
+        0.32,
+        1
+      ],
+      "dimensions": [
+        2.4,
+        0.2,
+        2
+      ],
+      "material": "dark",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      9,
+      -11.25,
+      7.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      2
+    ],
+    "orthoScale": 12.6,
+    "worldRole": "sky"
+  }
+}

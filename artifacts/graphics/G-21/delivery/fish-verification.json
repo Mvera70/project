@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "fish",
+  "statistics": {
+    "objects": 12,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 700
+  },
+  "bounds": {
+    "min": [
+      -0.074667,
+      -0.033333,
+      -0.041667
+    ],
+    "max": [
+      0.113333,
+      0.067667,
+      0.041667
+    ],
+    "size": [
+      0.188,
+      0.101,
+      0.083333
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T21-27-17-551Z-37688",
+    "directory": "artifacts/graphics/G-23/approved/9e6d26667f104c33"
+  },
+  "sha256": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
+  "otherPublishedFilesUnchanged": true
+}

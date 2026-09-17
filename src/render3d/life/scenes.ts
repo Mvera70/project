@@ -22,7 +22,7 @@
 import type { Trait } from '@engine/state';
 import { hash32 } from '@engine/rng';
 import { drive } from './steering';
-import { blockedAt, turnTo, type Body, type Point, type Terrain } from './body';
+import { turnTo, type Body, type Point, type Terrain } from './body';
 import { clearBetween } from './navigate';
 import { LIFE_STEP } from './clock';
 import type { Dweller } from './village';
@@ -365,7 +365,7 @@ export function play(scene: Scene, a: Dweller, b: Dweller, step: number): void {
     position(b.body, a.body, CHAT_GAP, CHAT_URGE);
     face(a.body, b.body);
     face(b.body, a.body);
-    scene.beat = 1;
+    scene.beat = Math.hypot(a.body.x - b.body.x, a.body.z - b.body.z) <= CHAT_GAP + 0.25 ? 1 : 0;
     return;
   }
 
@@ -583,7 +583,10 @@ export function proposeYield(
 
   const towardB = ((b.body.x - a.body.x) * a.body.vx + (b.body.z - a.body.z) * a.body.vz) / apart;
   const towardA = ((a.body.x - b.body.x) * b.body.vx + (a.body.z - b.body.z) * b.body.vz) / apart;
-  if (towardB < 0.15 || towardA < 0.15) return null;
+  const aWaiting = Math.hypot(a.body.vx, a.body.vz) < 0.1;
+  const bWaiting = Math.hypot(b.body.vx, b.body.vz) < 0.1;
+  if (!(towardB >= 0.15 && towardA >= 0.15)
+    && !(aWaiting && towardA >= 0.15) && !(bWaiting && towardB >= 0.15)) return null;
 
   // Ancho de sobra para uno, no para dos: si por el doble ya se pasa sin
   // rozar, esto no es un hueco estrecho y no hace falta que nadie ceda.
@@ -595,7 +598,7 @@ export function proposeYield(
   const lowId = Math.min(a.body.id, b.body.id);
   const highId = Math.max(a.body.id, b.body.id);
   const key = `yield:${lowId}:${highId}:${step}`;
-  const yielderIsA = roll(seed, key) < 0.5;
+  const yielderIsA = aWaiting ? true : bWaiting ? false : roll(seed, key) < 0.5;
   const yielder = yielderIsA ? a : b;
   const passer = yielderIsA ? b : a;
 
@@ -613,21 +616,31 @@ export function proposeYield(
       z: yielder.body.z + sideZ * YIELD_ASIDE * sign,
     };
     if (at.x <= 0.5 || at.z <= 0.5 || at.x >= land.width - 0.5 || at.z >= land.height - 0.5) continue;
-    if (blockedAt(land, at.x, at.z)) continue;
+    if (!clearBetween(land, yielder.body, at, yielder.body.radius)) continue;
     aside = at;
     break;
+  }
+
+  // Si no cabe al lado, retrocede por suelo transitable para liberar el paso.
+  if (aside === null) {
+    const back = { x: yielder.body.x - dx / along * 1.2, z: yielder.body.z - dz / along * 1.2 };
+    if (clearBetween(land, yielder.body, back, yielder.body.radius)) aside = back;
   }
 
   const actSpan = stepsOf(YIELD_ACT_SPAN[0]
     + roll(seed, `${key}:act`) * (YIELD_ACT_SPAN[1] - YIELD_ACT_SPAN[0]));
   const recoverSpan = stepsOf(YIELD_RECOVER_SPAN[0]
     + roll(seed, `${key}:rec`) * (YIELD_RECOVER_SPAN[1] - YIELD_RECOVER_SPAN[0]));
+  const moveSpan = aside === null ? 0 : stepsOf(
+    Math.hypot(aside.x - yielder.body.x, aside.z - yielder.body.z) / (yielder.body.pace * 0.6) + 0.15,
+  );
+  const actualActSpan = Math.max(actSpan, moveSpan);
   return {
     yielder: yielder.body.id,
     passer: passer.body.id,
     since: step,
-    actUntil: step + actSpan,
-    until: step + actSpan + recoverSpan,
+    actUntil: step + actualActSpan,
+    until: step + actualActSpan + recoverSpan,
     aside,
   };
 }

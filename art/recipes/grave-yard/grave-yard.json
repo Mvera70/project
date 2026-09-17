@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "G-10. Cinco lapidas a alturas y sitios distintos, y una cruz al fondo. Alineadas y todas iguales pareceria un almacen de bloques; torcidas y desiguales se lee lo que es."
+    "note": "G-21: cementerio de cinco sepulturas con lápidas redondeadas y cruces de madera, cruz central y linde baja interrumpida en la entrada. Parcela 2x2, sin cerrar el acceso."
   },
   "materials": [
     {
@@ -23,7 +23,12 @@
     {
       "name": "soil",
       "role": "soil",
-      "roughness": 1.0
+      "roughness": 1
+    },
+    {
+      "name": "wood",
+      "role": "trunk",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -40,128 +45,1193 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Yard_Ground",
+      "name": "Ground",
       "location": [
-        3.0,
-        3.0,
-        0.05
+        3,
+        3,
+        0.025
       ],
       "dimensions": [
         5.8,
         5.8,
-        0.1
+        0.05
       ],
       "material": "soil",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Yard_Stone_A",
+      "name": "BackBorder_0",
       "location": [
-        1.7,
-        1.9,
-        0.45
+        0.45,
+        5.68,
+        0.12
       ],
       "dimensions": [
-        0.5,
-        0.16,
-        0.9
+        0.64,
+        0.22,
+        0.24
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Yard_Stone_B",
+      "name": "SideBorder_0_L",
       "location": [
-        3.1,
-        1.6,
+        0.3,
+        0.45,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_0_R",
+      "location": [
+        5.7,
+        0.45,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontBorder_0",
+      "location": [
+        0.45,
+        0.3,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_1",
+      "location": [
+        1.17,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_1_L",
+      "location": [
+        0.3,
+        1.17,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_1_R",
+      "location": [
+        5.7,
+        1.17,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontBorder_1",
+      "location": [
+        1.17,
+        0.3,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_2",
+      "location": [
+        1.89,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_2_L",
+      "location": [
+        0.3,
+        1.89,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_2_R",
+      "location": [
+        5.7,
+        1.89,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontBorder_2",
+      "location": [
+        1.89,
+        0.3,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_3",
+      "location": [
+        2.6100000000000003,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_3_L",
+      "location": [
+        0.3,
+        2.6100000000000003,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_3_R",
+      "location": [
+        5.7,
+        2.6100000000000003,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_4",
+      "location": [
+        3.33,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_4_L",
+      "location": [
+        0.3,
+        3.33,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_4_R",
+      "location": [
+        5.7,
+        3.33,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_5",
+      "location": [
+        4.05,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_5_L",
+      "location": [
+        0.3,
+        4.05,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_5_R",
+      "location": [
+        5.7,
+        4.05,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontBorder_5",
+      "location": [
+        4.05,
+        0.3,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_6",
+      "location": [
+        4.7700000000000005,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_6_L",
+      "location": [
+        0.3,
+        4.7700000000000005,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_6_R",
+      "location": [
+        5.7,
+        4.7700000000000005,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontBorder_6",
+      "location": [
+        4.7700000000000005,
+        0.3,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackBorder_7",
+      "location": [
+        5.49,
+        5.68,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_7_L",
+      "location": [
+        0.3,
+        5.49,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SideBorder_7_R",
+      "location": [
+        5.7,
+        5.49,
+        0.12
+      ],
+      "dimensions": [
+        0.22,
+        0.64,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "FrontBorder_7",
+      "location": [
+        5.49,
+        0.3,
+        0.12
+      ],
+      "dimensions": [
+        0.64,
+        0.22,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveBed_0",
+      "location": [
+        1.35,
+        1.46,
+        0.075
+      ],
+      "dimensions": [
+        0.75,
+        1.15,
+        0.12
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_0_L",
+      "location": [
+        0.9300000000000002,
+        1.46,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_0_R",
+      "location": [
+        1.77,
+        1.46,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveFoot_0",
+      "location": [
+        1.35,
+        0.8799999999999999,
+        0.115
+      ],
+      "dimensions": [
+        0.84,
+        0.1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Headstone_0",
+      "location": [
+        1.35,
+        1.9,
+        0.42
+      ],
+      "dimensions": [
+        0.59,
+        0.18,
+        0.84
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "HeadstoneCrown_0",
+      "location": [
+        1.35,
+        1.9,
+        0.84
+      ],
+      "radius": 0.295,
+      "depth": 0.18,
+      "material": "stone",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "vertices": 8,
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InscriptionV_0",
+      "location": [
+        1.35,
+        1.805,
+        0.5795999999999999
+      ],
+      "dimensions": [
+        0.033,
+        0.014,
+        0.22
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InscriptionH_0",
+      "location": [
+        1.35,
+        1.8039999999999998,
+        0.6132
+      ],
+      "dimensions": [
+        0.15,
+        0.014,
+        0.032
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveBed_1",
+      "location": [
+        4.65,
+        1.36,
+        0.075
+      ],
+      "dimensions": [
+        0.75,
+        1.15,
+        0.12
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_1_L",
+      "location": [
+        4.23,
+        1.36,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_1_R",
+      "location": [
+        5.07,
+        1.36,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveFoot_1",
+      "location": [
+        4.65,
+        0.78,
+        0.115
+      ],
+      "dimensions": [
+        0.84,
+        0.1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WoodCrossV_1",
+      "location": [
+        4.65,
+        1.8,
+        0.46
+      ],
+      "dimensions": [
+        0.12,
+        0.13,
+        0.92
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WoodCrossH_1",
+      "location": [
+        4.65,
+        1.8,
+        0.6716
+      ],
+      "dimensions": [
+        0.54,
+        0.13,
+        0.12
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveBed_2",
+      "location": [
+        1.4,
+        3.56,
+        0.075
+      ],
+      "dimensions": [
+        0.75,
+        1.15,
+        0.12
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_2_L",
+      "location": [
+        0.98,
+        3.56,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_2_R",
+      "location": [
+        1.8199999999999998,
+        3.56,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveFoot_2",
+      "location": [
+        1.4,
+        2.98,
+        0.115
+      ],
+      "dimensions": [
+        0.84,
+        0.1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Headstone_2",
+      "location": [
+        1.4,
+        4,
+        0.39
+      ],
+      "dimensions": [
+        0.59,
+        0.18,
+        0.78
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "HeadstoneCrown_2",
+      "location": [
+        1.4,
+        4,
+        0.78
+      ],
+      "radius": 0.295,
+      "depth": 0.18,
+      "material": "stone",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "vertices": 8,
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InscriptionV_2",
+      "location": [
+        1.4,
+        3.905,
+        0.5382
+      ],
+      "dimensions": [
+        0.033,
+        0.014,
+        0.22
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InscriptionH_2",
+      "location": [
+        1.4,
+        3.904,
+        0.5694
+      ],
+      "dimensions": [
+        0.15,
+        0.014,
+        0.032
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveBed_3",
+      "location": [
+        4.6,
+        3.6599999999999997,
+        0.075
+      ],
+      "dimensions": [
+        0.75,
+        1.15,
+        0.12
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_3_L",
+      "location": [
+        4.18,
+        3.6599999999999997,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_3_R",
+      "location": [
+        5.02,
+        3.6599999999999997,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveFoot_3",
+      "location": [
+        4.6,
+        3.0799999999999996,
+        0.115
+      ],
+      "dimensions": [
+        0.84,
+        0.1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WoodCrossV_3",
+      "location": [
+        4.6,
+        4.1,
+        0.44
+      ],
+      "dimensions": [
+        0.12,
+        0.13,
+        0.88
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "WoodCrossH_3",
+      "location": [
+        4.6,
+        4.1,
+        0.6424
+      ],
+      "dimensions": [
+        0.54,
+        0.13,
+        0.12
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveBed_4",
+      "location": [
+        3,
+        3.7600000000000002,
+        0.075
+      ],
+      "dimensions": [
+        0.75,
+        1.15,
+        0.12
+      ],
+      "material": "soil",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_4_L",
+      "location": [
+        2.58,
+        3.7600000000000002,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveEdge_4_R",
+      "location": [
+        3.42,
+        3.7600000000000002,
+        0.115
+      ],
+      "dimensions": [
+        0.1,
+        1.22,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "GraveFoot_4",
+      "location": [
+        3,
+        3.18,
+        0.115
+      ],
+      "dimensions": [
+        0.84,
+        0.1,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Headstone_4",
+      "location": [
+        3,
+        4.2,
         0.4
       ],
       "dimensions": [
-        0.5,
-        0.16,
+        0.59,
+        0.18,
         0.8
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
-      "type": "cube",
-      "name": "Yard_Stone_C",
+      "type": "cylinder",
+      "name": "HeadstoneCrown_4",
       "location": [
-        4.4,
-        2.1,
-        0.5
-      ],
-      "dimensions": [
-        0.5,
-        0.16,
-        1.0
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Yard_Stone_D",
-      "location": [
-        2.2,
-        3.9,
-        0.42
-      ],
-      "dimensions": [
-        0.5,
-        0.16,
-        0.85
-      ],
-      "material": "stone",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Yard_Stone_E",
-      "location": [
-        3.8,
+        3,
         4.2,
-        0.46
+        0.8
+      ],
+      "radius": 0.295,
+      "depth": 0.18,
+      "material": "stone",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "vertices": 8,
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InscriptionV_4",
+      "location": [
+        3,
+        4.105,
+        0.5519999999999999
       ],
       "dimensions": [
-        0.5,
-        0.16,
-        0.92
+        0.033,
+        0.014,
+        0.22
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "InscriptionH_4",
+      "location": [
+        3,
+        4.104,
+        0.584
+      ],
+      "dimensions": [
+        0.15,
+        0.014,
+        0.032
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CrossPlinth",
+      "location": [
+        3,
+        5.3,
+        0.15
+      ],
+      "dimensions": [
+        0.72,
+        0.6,
+        0.3
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Yard_Cross_V",
+      "name": "CrossStem",
       "location": [
-        3.0,
-        5.1,
-        0.75
+        3,
+        5.3,
+        0.91
       ],
       "dimensions": [
-        0.18,
-        0.18,
-        1.5
+        0.2,
+        0.2,
+        1.3
       ],
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Yard_Cross_H",
+      "name": "CrossArm",
       "location": [
-        3.0,
-        5.1,
-        1.2
+        3,
+        5.3,
+        1.26
       ],
       "dimensions": [
-        0.85,
-        0.18,
-        0.18
+        0.92,
+        0.2,
+        0.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EntryStone_0",
+      "location": [
+        3,
+        0.48,
+        0.065
+      ],
+      "dimensions": [
+        0.64,
+        0.43,
+        0.07
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EntryStone_1",
+      "location": [
+        3,
+        1.03,
+        0.065
+      ],
+      "dimensions": [
+        0.64,
+        0.43,
+        0.07
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EntryStone_2",
+      "location": [
+        3,
+        1.58,
+        0.065
+      ],
+      "dimensions": [
+        0.64,
+        0.43,
+        0.07
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "EntryStone_3",
+      "location": [
+        3,
+        2.13,
+        0.065
+      ],
+      "dimensions": [
+        0.64,
+        0.43,
+        0.07
       ],
       "material": "stone",
       "parent": "Root"
@@ -170,19 +1240,19 @@
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 900,
+    "height": 800,
     "cameraLocation": [
-      8.0,
-      -10.0,
-      6.4
+      3,
+      -2.7,
+      2.4
     ],
     "cameraTarget": [
-      0,
-      0,
-      0.8
+      1,
+      1,
+      0.16
     ],
-    "orthoScale": 11.2,
+    "orthoScale": 2.85,
     "worldRole": "sky"
   }
 }

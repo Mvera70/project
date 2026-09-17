@@ -8,6 +8,7 @@
 // pantalla sale de aquí, y nada de aquí sale del reloj de la pared ni escribe
 // una coma en `GameState`.
 
+import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import type { GameState, Trait, VillagerId } from '@engine/state';
 import { DAY, FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
@@ -15,19 +16,20 @@ import { opinionOf } from '@engine/people/opinions';
 import { ageOf } from '@engine/people/villagers';
 import { hash32 } from '@engine/rng';
 import {
-  blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
+  blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
 } from './body';
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
-import { avoid, drive, resolve, seek, separate } from './steering';
-import { createRouter, follow, type Router } from './navigate';
+import { drive, resolve, seek, separate } from './steering';
+import { clearBetween, createRouter, routeAroundBodies, type Router } from './navigate';
+import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { commons } from './places';
 import {
-  decide, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK,
+  decide, failedSeatKey, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK, SHUN_STEPS,
   type Intent, type ProgressState,
 } from './decide';
 import {
@@ -66,6 +68,7 @@ const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
+  readonly residence?: HomeRoutine;
   readonly body: Body;
   readonly villager: VillagerId;
   readonly traits: readonly Trait[];
@@ -138,6 +141,12 @@ export interface Dweller {
    */
   playedUntil: number;
   /**
+   * Plazas que le fallaron hace poco (`failedSeatKey` → paso hasta el que se
+   * descartan). Es la pieza que faltaba para el plazo vencido: ver
+   * `Chooser.shunned` en `decide.ts` y la cifra que hay al lado.
+   */
+  failed: Map<string, number>;
+  /**
    * IA-3: si es un crío o un mayor, del brief («los niños juegan cerca de
    * casa; los mayores prefieren pausas próximas»). Sale de `ageOf` (motor,
    * sólo lectura) contra los mismos umbrales que ya usaba el camino viejo
@@ -149,6 +158,8 @@ export interface Dweller {
    * `undefined` es un adulto, y también lo que sigue siendo cualquier bestia.
    */
   readonly ageGroup?: 'child' | 'elder' | undefined;
+  readonly dayPlan?: DayPlan;
+  readonly leisure?: readonly Place[];
   /**
    * IA-3: la puerta de su propia casa, si tiene una en pie. Sólo se usa para
    * el tirón de «cerca de casa» de un crío (`decide.ts`, `homePull`).
@@ -181,7 +192,7 @@ export interface Village {
    *  el resto de esta capa, no sobreviven a la jornada. */
   readonly props: readonly Prop[];
   /** Un paso de vida para todos. */
-  step(): void;
+  step(phase?: number): void;
   /** Cuántos pasos lleva la jornada. */
   readonly steps: number;
   /** Pases de pelota dados en la jornada, V-09: lo que sale de jugar. */
@@ -269,6 +280,7 @@ export interface Village {
  */
 export interface DayOptions {
   readonly props?: boolean;
+  readonly land?: Terrain;
 }
 
 /**
@@ -309,7 +321,7 @@ function settleHeldBody(dweller: Dweller, land: Terrain, around: Neighbourhood, 
   const { body } = dweller;
   integrate(body, land, LIFE_STEP);
   const speed = Math.hypot(body.vx, body.vz);
-  dweller.travelled = speed > 0.05 ? dweller.travelled + speed * LIFE_STEP : 0;
+  if (speed > 0.05) dweller.travelled += speed * LIFE_STEP;
   dweller.faceAnchor = { x: body.x, z: body.z };
   let company = false;
   around.near(body, (other) => {
@@ -374,7 +386,7 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
 
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
-  const land = terrainOf(state);
+  const land = options.land ?? terrainOf(state);
   const seed = seedOfDay(state.seed, day);
   // IA-6 · La riña de la plaza (§7.10, `docs/rework.md` §4 R-2 punto 1): si el
   // motor tiró `quarrel_in_the_square` esta semana, éstos son los dos `id` de
@@ -420,10 +432,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // la que no tiene pueblo.
   let heart = places[0]?.at ?? { x: land.width / 2, z: land.height / 2 };
   let most = -1;
+  const evaluated = new Uint8Array(land.width * land.height);
   for (const place of places) {
-    const near = places.filter(
-      (other) => Math.hypot(other.at.x - place.at.x, other.at.z - place.at.z) < 14,
-    ).length;
+    const cell = Math.floor(place.at.z) * land.width + Math.floor(place.at.x);
+    if (evaluated[cell] === 1 || blockedAt(land, place.at.x, place.at.z)) continue;
+    const region = reachableFrom(land, place.at);
+    for (let i = 0; i < region.length; i += 1) if (region[i] === 1) evaluated[i] = 1;
+    // La proximidad geométrica no basta: dos plazas a un metro pueden estar
+    // separadas por una pared. Se elige la región con más destinos alcanzables.
+    const near = places.filter(other => canReach(land, region, other.at)).length;
     if (near > most) { most = near; heart = place.at; }
   }
   const shore = reachableFrom(land, heart);
@@ -470,7 +487,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const mine = summoned
     ? summons
     : [
-      ...places.filter((place) => canReach(land, shore, place.at)),
+      ...places,
       ...beasts.map((beast) => beast.gift),
     ];
 
@@ -483,7 +500,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
   alive.forEach((villager, n) => {
     // Se le deja junto a un sitio de la aldea, repartidos.
-    const spot = mine[n % Math.max(1, mine.length)]?.at ?? heart;
+    const homeBuilding = villager.homeId === null ? undefined
+      : state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
+    const residence = homeBuilding === undefined ? undefined : homeRoutine(homeBuilding, land);
+    // Cada habitante nace en el lado de su casa, no en un patio elegido para
+    // todo el pueblo. Las decisiones descartan después las rutas imposibles.
+    const spot = residence !== undefined && fitsCircle(land, residence.approach.x, residence.approach.z, 0.32)
+      ? residence.approach : mine[n % Math.max(1, mine.length)]?.at ?? heart;
+    const personalShore = reachableFrom(land, spot);
     // **El sitio de partida, si los cuarenta anillos fallan, ya no es el punto
     // exacto del sitio.** Era `spot` a secas, y eso es un montón: dos personas
     // cuyos anillos fallan los dos nacen en **la misma coordenada exacta**, que
@@ -494,14 +518,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const scatterAngle = (hash32(seed, `spawn:${villager.id}`) / 4_294_967_296) * Math.PI * 2;
     let x = spot.x + Math.cos(scatterAngle) * 0.45;
     let z = spot.z + Math.sin(scatterAngle) * 0.45;
-    if (blockedAt(land, x, z)) { x = spot.x; z = spot.z; }
+    if (!fitsCircle(land, x, z, 0.32)) { x = spot.x; z = spot.z; }
     for (let ring = 0; ring < 40; ring += 1) {
       const angle = ring * 2.39996;
       const reach = 0.6 + ring * 0.35;
       const tryX = spot.x + Math.sin(angle) * reach;
       const tryZ = spot.z + Math.cos(angle) * reach;
       if (tryX <= 1 || tryZ <= 1 || tryX >= land.width - 1 || tryZ >= land.height - 1) continue;
-      if (!canReach(land, shore, { x: tryX, z: tryZ })) continue;
+      if (!canReach(land, personalShore, { x: tryX, z: tryZ }) || !fitsCircle(land, tryX, tryZ, 0.32)) continue;
       // **Y las bestias también ocupan sitio.** Esto miraba sólo a la gente, y
       // la cabaña se crea antes (V-08), así que alguien podía nacer **encima**
       // de una vaca. Dos cuerpos en el mismo punto exacto son el único caso que
@@ -524,8 +548,6 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     // Y la puerta de su casa, si tiene una en pie: falta si nunca se le asignó
     // una o si se perdió (`lostTick`), y entonces el tirón de «cerca de casa»
     // (`decide.ts`, `homePull`) simplemente no pesa nada.
-    const homeBuilding = villager.homeId === null ? undefined
-      : state.buildings.find((b) => b.id === villager.homeId && b.lostTick === null);
     const home = homeBuilding === undefined ? undefined
       : doorOf(land, homeBuilding.x, homeBuilding.y, homeBuilding.w, homeBuilding.h) ?? undefined;
     dwellers.push({
@@ -542,8 +564,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       holding: null,
       aimAt: null,
       playedUntil: 0,
+      failed: new Map(),
       ageGroup,
+      leisure: leisurePlaces(land, residence?.approach ?? spot, ageGroup === 'child', villager.id, ageGroup === 'elder'),
       home,
+      ...(residence === undefined ? {} : { residence }),
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
       // entera cambia de idea a la vez y se ve el mecanismo.
       rethinkAt: Math.floor((hash32(seed, `think:${villager.id}`) / 4_294_967_296) * RETHINK),
@@ -554,7 +579,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // y la misma `resolve()`, así que un niño y una gallina se apartan el uno del
   // otro exactamente como se apartarían dos personas.
   const bodies = [...dwellers.map((d) => d.body), ...beasts.map((b) => b.dweller.body)];
+  const plans = dayPlans(state, mine, land, new Map(dwellers.map(d => [d.villager, d.body])));
+  dwellers.forEach((dweller, index) => { dwellers[index] = { ...dweller, dayPlan: plans.get(dweller.villager)! }; });
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
+
   // Checklist IA-1, punto 6: lo que `noProgress()` (`decide.ts`) necesita
   // recordar por persona para medir si un viaje avanza. Fuera de `Dweller` a
   // propósito — ver el comentario de `ProgressState` en `decide.ts` — así que
@@ -693,11 +721,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       return count;
     },
 
-    step(): void {
+    step(phase = 0.45): void {
       const now = steps * LIFE_STEP;
+      const outside = (): Body[] => bodies.filter(body => { const person = byId.get(body.id); return person === undefined || !indoors(person); });
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
-      around.rebuild(bodies);
+      around.rebuild(outside());
 
       // V-09: los trastos sueltos ahora mismo, como opciones más para decidir
       // — se rehace cada paso porque un trasto deja de ofrecer nada en cuanto
@@ -884,13 +913,22 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         //     Con un tope, eso sí: si el camino se ha hecho eterno —porque el
         //     sitio se llenó, o porque hay medio pueblo por medio— se replantea
         //     igual. Quedarse andando para siempre es el otro modo de fallar.
+        if (stepHome(dweller, phase, steps, land, around, dwellers)) continue;
         const onTheWay = dweller.doing !== null && !dweller.doing.there;
         // **Espera creciente, no `GIVE_UP` fijo** (checklist IA-1, punto 6):
         // `noProgress()` sólo concede el replanteo cuando el viaje lleva de
         // verdad sin acercarse, con una espera que se dobla cada vez que
         // vuelve a atascarse — ver `decide.ts`.
         const prog = progress.get(dweller.body.id) as ProgressState;
-        const tooLong = noProgress(dweller.doing, prog, body, steps, GIVE_UP);
+        let tooLong = noProgress(dweller.doing, prog, body, steps, GIVE_UP);
+        if (tooLong && dweller.doing !== null && !dweller.doing.there && !dweller.doing.detoured) {
+          dweller.doing.detoured = true;
+          const alternative = routeAroundBodies(land, body, seatAt(dweller.doing.offer, dweller.doing.seat), outside());
+          if (alternative !== null) {
+            dweller.doing.route.splice(0, dweller.doing.route.length, ...alternative);
+            prog.at = steps + PROGRESS_CHECK; prog.gap = Number.POSITIVE_INFINITY; tooLong = false;
+          }
+        }
         // V-09 · Con un trasto ya en la mano y a la espera de soltarlo, tampoco
         // se replantea la vida: la jugada dura menos que `RETHINK` (1,5 s) a
         // propósito —«no se come la jornada»—, y sin este freno el rethink de
@@ -898,10 +936,25 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // aburrimiento que hacía atractivo jugar, dejando a la pelota
         // pegada en la mano para el resto del día. Medido: 3 139 pasos con la
         // pelota en la mano y cero pases en la semilla 3, antes de este freno.
-        const heldSteady = dweller.holding !== null && dweller.doing?.there === true;
-        if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong)) {
+        const heldSteady = dweller.doing?.there === true && (dweller.holding !== null
+          || (steps < dweller.doing.until && dweller.needs.thirst < 0.9 && dweller.needs.rest < 0.9));
+        // **El plazo vencido, también sin haber llegado.** Es el mismo hueco
+        // que se cerró para los animales en IA-4: `until` sólo contaba una
+        // vez llegado, así que quien no llegaba se quedaba con el viaje
+        // puesto. Ahora entra porque la plaza que falló se descarta abajo:
+        // sin eso, medido, empeoraba (0,06 % → 0,20 % de parados con un
+        // impulso al máximo, `docs/life-rounds/IA-6.md` §4.3).
+        const overdue = onTheWay && dweller.doing?.arriveBy !== undefined && steps >= dweller.doing.arriveBy;
+        if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong || overdue)) {
           dweller.rethinkAt = steps + RETHINK;
           const before = dweller.doing;
+          // La plaza a la que no se llegó se descarta durante una ventana, y
+          // las que ya caducaron se olvidan.
+          if (before !== null && !before.there) {
+            dweller.failed.set(failedSeatKey(before), steps + SHUN_STEPS);
+          }
+          for (const [key, until] of dweller.failed) if (until <= steps) dweller.failed.delete(key);
+          const shunned = dweller.failed.size === 0 ? undefined : new Set(dweller.failed.keys());
           // V-09b · Hasta que se le pasen las ganas (`PLAYED_OUT`), a éste no
           // se le ofrece `play`: se filtra aquí, al montar las opciones de
           // *este* dweller, no dentro de `decide` — una oferta no puede saber
@@ -915,6 +968,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             : !playedOut || propOptions.length === 0
               ? [...mine, ...propOptions]
               : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
+          // Los protagonistas de un hecho del motor se reúnen en plazas
+          // contiguas; el azar del corro no debe impedir escenificarlo.
+          const enactment = !quarrelStaged && quarrelPair?.includes(dweller.villager)
+            ? mine.find(place => place.id.startsWith('gather:')) : undefined;
+          const eventOffer = enactment?.offers[0];
+          const closeSeat = eventOffer?.spots?.map((point, seat) => ({ seat, distance: gap(point, eventOffer.spots![0]!) }))
+            .filter(item => item.seat > 0).sort((a, b) => a.distance - b.distance)[0]?.seat ?? 1;
+          const eventOptions = enactment === undefined ? options : options.map(place => place !== enactment ? place
+            : { ...place, offers: place.offers.map(offer => ({ ...offer, reach: 0.75 })) });
           // **Checklist IA-1, punto 5: si `decide()` no encuentra nada que
           // merezca la pena —o acaba de invalidar lo que había por
           // inalcanzable (punto 4)— siempre queda `pauseHere()`**, una pausa
@@ -925,9 +987,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.doing = decide(
             {
               traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before,
-              ageGroup: dweller.ageGroup, home: dweller.home,
+              ageGroup: dweller.ageGroup, home: dweller.home, shunned, pace: body.pace,
+              job: enactment === undefined ? dweller.dayPlan?.job : {
+                place: enactment.id, offer: enactment.offers[0]!.id, seat: quarrelPair!.indexOf(dweller.villager) === 0 ? 0 : closeSeat,
+              }, phase,
+              // IA-9 · si el viaje no avanza o se le pasó el plazo, que no se
+              // conserve: es justo el caso en que conservarlo deja a alguien de
+              // pie para siempre.
+              restart: tooLong || overdue,
             },
-            options, taken, land, router, seed, steps,
+            summoned ? eventOptions : [...eventOptions, ...(dweller.leisure ?? [])], taken, land, router, seed, steps,
           ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
@@ -947,20 +1016,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         }
 
         // 2 · ¿Se acabó lo que estaba haciendo?
-        // **Pendiente, y medido: el plazo vencido de las personas no se
-        // arregla todavía.** El mismo hueco que se cerró para los animales
-        // —`until` sólo se comprobaba después de haber llegado, así que quien
-        // no llegaba se quedaba con el viaje puesto— está aquí igual. Se probó
-        // el arreglo y **empeora lo que importa**: «parados con un impulso al
-        // máximo» subió de 0,06 % a 0,20 %, que es la cifra de partida, porque
-        // choca con las estancias fijas de `SEAT_DWELL`: al soltar el viaje se
-        // vuelve a elegir **la misma plaza inalcanzable** —la llave del sorteo
-        // es la misma durante treinta segundos— y se reintenta en bucle con la
-        // necesidad a tope.
-        //
-        // Falta la pieza que no existe: que una plaza que ya falló se descarte
-        // para la siguiente elección. Con eso, el arreglo entra solo. Está en
-        // `docs/task-log.md` §4 con este número al lado.
+        // **El plazo vencido de quien no ha llegado se resuelve más arriba**,
+        // con el replanteo (`overdue`), y entró el día que existió la pieza que
+        // faltaba: descartar la plaza que falló (`Dweller.failed`,
+        // `Chooser.shunned`). Sin ella, medido, empeoraba: parados con un
+        // impulso al máximo de 0,06 % a 0,20 % (`life-rounds/IA-6.md` §4.3),
+        // porque se volvía a elegir la misma plaza inalcanzable. Con ella:
+        // parados 0,08 %, y los giros suben de 0,37 % a 0,54 % porque quien
+        // abandona ahora **se da la vuelta y va a otro sitio**, que es lo que
+        // debe pasar — antes se quedaba clavado mirando a la plaza fallida.
+        // Aquí queda sólo el final normal de una ocupación cumplida.
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
           // pelota se tira —encarado a quien tocara, o hacia delante si nadie
@@ -1009,12 +1074,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
           if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
             dweller.doing.there = true;
+            dweller.doing.until = steps + (dweller.doing.durationSteps ?? Math.round(dweller.doing.offer.seconds[0] * 30));
             dweller.doing.route.length = 0;
           }
         }
-        const next = dweller.doing === null || dweller.doing.there
-          ? null
-          : follow(body, dweller.doing.route);
+        const route = dweller.doing?.route;
+        // Se gira cuando el siguiente tramo es seguro desde la posición real,
+        // sin exigir acertar un punto microscópico ni recortar una esquina.
+        while (route !== undefined && route.length > 1 && gap(body, route[0]!) < 0.4
+          && clearBetween(land, body, route[1]!, body.radius)) route.shift();
+        const next = dweller.doing === null || dweller.doing.there ? null : route?.[0] ?? null;
         // **Llegar es alcanzar la zona válida, no vaciar la ruta** (checklist
         // IA-1, punto 6). La comprobación de arriba ya cubre el caso normal
         // —estar a `reach` de la plaza—; si la ruta se vacía sin que eso haya
@@ -1042,8 +1111,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         }
 
         const want = next === null ? { x: 0, z: 0 } : seek(body, next);
+        if (next !== null) {
+          const distance = Math.hypot(next.x - body.x, next.z - body.z);
+          const pace = Math.min(body.pace, distance / LIFE_STEP);
+          if (distance > 0) { want.x = (next.x - body.x) / distance * pace; want.z = (next.z - body.z) / distance * pace; }
+        }
         const push = separate(body, around);
-        const wall = avoid(body, land);
+        const norm = Math.hypot(want.x, want.z);
+        const along = norm > 0 ? (push.x * want.x + push.z * want.z) / (norm * norm) : 0;
         // **La intención cumplida frena de verdad** (rework.md §3.5.3):
         // `doing.there === true`, no «no hay ruta que seguir» —`next` también
         // es nulo sin intención todavía, recién llegado el día o entre una
@@ -1054,15 +1129,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // empujado por `separate`/`avoid` con la velocidad vieja de fondo, y
         // el forcejeo con un vecino apretado le hacía oscilar de velocidad
         // cada paso: eso es la vuelta sobre sí mismo, no el andar.
-        if (dweller.doing?.there === true) { body.vx = 0; body.vz = 0; }
-        drive(body, { x: want.x + push.x + wall.x, z: want.z + push.z + wall.z });
+        if (next === null) { body.vx = 0; body.vz = 0; }
+        const before = { x: body.x, z: body.z };
+        drive(body, next === null ? { x: 0, z: 0 }
+          : { x: want.x + (push.x - want.x * along) * 0.25, z: want.z + (push.z - want.z * along) * 0.25 });
+        // La inercia y la separación no pueden sacar al cuerpo del tramo seguro.
+        if (next !== null && !clearBetween(land, body,
+          { x: body.x + body.vx * LIFE_STEP, z: body.z + body.vz * LIFE_STEP }, body.radius)) {
+          body.vx = want.x; body.vz = want.z;
+        }
         integrate(body, land, LIFE_STEP);
 
         const speed = Math.hypot(body.vx, body.vz);
         if (speed > 0.05) {
-          dweller.travelled += speed * LIFE_STEP;
-        } else {
-          dweller.travelled = 0;
+          dweller.travelled += Math.hypot(body.x - before.x, body.z - before.z);
         }
 
         // **La cara sólo sigue al cuerpo cuando el cuerpo anda de verdad**
@@ -1262,7 +1342,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         },
         wolf !== null && wolf.phase !== 'gone' ? { x: wolf.body.x, z: wolf.body.z } : null);
 
-      resolve(bodies, around, land);
+      resolve(outside(), around, land);
 
       // 9 · ¿Quién se ha encontrado con quién? V-07, ampliado en IA-2.
       //
@@ -1281,7 +1361,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       //    brief): así reconstruir el mismo día da las mismas parejas, y dos
       //    propuestas que compitan por el mismo cuerpo en el mismo paso no
       //    dependen de quién se mirara primero.
-      around.rebuild(bodies);
+      around.rebuild(outside());
 
       type Candidate =
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'yield'; readonly data: Yielding }
@@ -1290,8 +1370,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'conflict'; readonly data: Scene }
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
 
-      const freeToPropose = (d: Dweller): boolean => d.scene === null
-        && steps >= d.sceneCooldownUntil && !commitments.busy(actorOf(d));
+      const freeToPropose = (d: Dweller): boolean => !indoors(d) && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
+        && (steps >= d.sceneCooldownUntil || isNight(phase) || (!quarrelStaged && quarrelPair?.includes(d.villager) === true))
+        && !commitments.busy(actorOf(d));
 
       // IA-6: si estos dos son, en cualquier orden, los `id` de la riña real
       // de esta semana. `quarrelPair` sale de `state.happenings[].who`
@@ -1328,6 +1409,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           // sigue siendo primero, un cruce físico no espera a que dos se
           // pongan a discutir. `!quarrelStaged` es lo que impide montarla más
           // de una vez al día una vez que ya se ha vivido.
+          if (isNight(phase)) return;
           if (!quarrelStaged && isQuarrelPair(dweller, other)) {
             const scene = proposeQuarrel(dweller, other, seed, steps);
             if (scene !== null) {
@@ -1337,7 +1419,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           }
 
           const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
-          if (apart <= SCENE_EARSHOT) {
+          const onDuty = (d: Dweller): boolean => phase >= 0.16 && phase < 0.65
+            && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
+            && ['work', 'pray'].includes(d.dayPlan.job.offer)
+            && (d.doing === null || d.doing.place.id === d.dayPlan.job.place);
+          if (apart <= SCENE_EARSHOT && !onDuty(dweller) && !onDuty(other)) {
             // Sólo lectura del motor, y de los dos sentidos: ninguna escena
             // conoce a nadie por nombre, pero el trato entre estos dos sí
             // puede pesar en si se paran o no.

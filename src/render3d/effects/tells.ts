@@ -352,9 +352,9 @@ export class Tells {
   }
 
   /** Pone las señales al día. Sin cambios, no toca nada. */
-  update(state: GameState): void {
+  update(state: GameState, facing: ReadonlyMap<number, number> = new Map()): void {
     const tells = tellsFor(state);
-    const signature = signatureOf(tells);
+    const signature = signatureOf(tells) + JSON.stringify([...facing]);
     if (signature === this.signature) return;
     // El orden importa: `clear` borra la firma, así que guardarla antes la
     // perdía y todo se reconstruía en cada fotograma. Lo cazó la prueba
@@ -371,6 +371,15 @@ export class Tells {
     );
     for (const tell of tells) {
       for (const piece of bodyOf(tell, at)) {
+        const home = at(tell.x, tell.y);
+        const angle = home === undefined ? 0 : facing.get(home.id) ?? 0;
+        if (home !== undefined && angle !== 0) {
+          const cx = home.x + home.w / 2, cz = home.y + home.h / 2;
+          const dx = piece.object.position.x - cx, dz = piece.object.position.z - cz;
+          piece.object.position.x = cx + Math.cos(angle) * dx + Math.sin(angle) * dz;
+          piece.object.position.z = cz - Math.sin(angle) * dx + Math.cos(angle) * dz;
+          piece.object.rotation.y += angle;
+        }
         this.group.add(piece.object);
         this.owned.push(piece);
         const plume = piece.object.userData.plume as Omit<Plume, 'mesh'> | undefined;

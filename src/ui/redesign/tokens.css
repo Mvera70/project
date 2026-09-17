@@ -1,0 +1,183 @@
+/* UI-V0 · Los tokens de la interfaz. `docs/ui-redesign/piel/plan-piel.md` §2.
+
+   **Lo que esta ronda corrige, y el motivo escrito porque costó cinco
+   rondas:** la primera versión de este fichero (UI-R1) sembró la paleta
+   copiando lo que ya vestía el juego —«las mismas dos pilas que ya vestían el
+   juego (U-01)», decía— y con esa semilla, cinco rondas fieles a los tokens
+   sólo podían reproducir el juego anterior. La estructura de los prototipos se
+   entregó entera; su aspecto, no. El diagnóstico completo está en
+   `plan-piel.md` §1.
+
+   Ahora los colores **salen de los prototipos**, muestreados de los PNG de
+   `docs/ui-redesign/ui-prototypes/` (mediana de un recuadro sin texto; la
+   tinta, la media del 5 % más oscuro; el oro sobre madera, del 5 % más claro).
+   No se redondean a ojo: el hex de cada uno es el que dio la muestra, y al
+   lado va de qué pieza de qué prototipo sale, para que cualquiera pueda
+   repetir la medida.
+
+   Los `--ui-*` de UI-R1 **se quedan**, apuntando a los nuevos: cinco rondas
+   de interfaz los usan y romperlos sería rehacer trabajo que funciona. */
+
+:root {
+  /* ---------------------------------------------------------------- papel */
+  /* Pergamino, tres profundidades. El claro es la placa de cabecera, el
+     medio los chips y la bandeja, y el envejecido los bordes y las tarjetas
+     que el prototipo dibuja más curtidas. */
+  --skin-parchment: #E5D3BB;        /* 01, placa de cabecera */
+  --skin-parchment-deep: #D9C2A5;   /* 01, bandeja inferior y chips */
+  --skin-page: #EADBC2;             /* 02, la página de la crónica */
+  --skin-parchment-aged: #BCA87D;   /* 03, tarjeta superior de la ficha */
+
+  /* ---------------------------------------------------------------- tinta */
+  --skin-ink: #1B1613;              /* 02, texto de las entradas */
+  --skin-ink-soft: #3A2E1F;         /* 01, etiquetas de navegación */
+  /* **Éste es el único color que no es el del prototipo, y va con su
+     motivo.** La muestra daba `#816D52`, y con él las versalitas de la fecha
+     quedan en 3,39:1 sobre la placa y en 2,88:1 sobre la bandeja: por debajo
+     del 4,5:1 que el plan exige para texto de lectura (§6), y este juego se
+     mira a pleno sol en un móvil. Se oscurece **manteniendo el tono** hasta
+     el mínimo que pasa (5,49:1 y 4,66:1), que es lo que dice la regla de
+     `tools/ui/contrast.py`: se oscurece la tinta, nunca se aclara el papel,
+     porque el papel es lo que hace que se parezca al prototipo. */
+  --skin-ink-faded: #5D4E3B;        /* 01 oscurecido de #816D52 por contraste */
+
+  /* ------------------------------------------------------------ oro y ocre */
+  --skin-gold: #7C5C1F;             /* 02, puntos de la línea de tiempo */
+  --skin-gold-lit: #F1DEAE;         /* 03, etiqueta activa sobre madera */
+  --skin-ochre: #765833;            /* 01, subrayado de la pestaña activa */
+  /* El sol y su arco de la placa de fecha, muestreados aparte porque no son
+     papel ni tinta: el disco del sol y el trazo del arco del prototipo 01. */
+  --skin-sun: #C39A3F;              /* 01, el disco del sol */
+  --skin-arc: #9F845D;              /* 01, el trazo del arco, lejos del sol */
+
+  /* --------------------------------------------------------------- madera */
+  --skin-wood: #2B1F17;             /* 03, barra de navegación */
+  --skin-wood-soft: #453023;        /* 03, botón FOLLOW */
+  --skin-wood-plaque: #3A2E24;      /* 02, placa de la pestaña activa */
+
+  /* ----------------------------------------------------------- rojo, lacre */
+  --skin-red: #6A2521;              /* 02, fondo de la capitular */
+  --skin-red-deep: #5B1A1B;         /* 02, el sello de lacre */
+  --skin-red-ink: #4E0504;          /* 02, título de la decisión */
+
+  /* El aviso de la comida se conserva: es de §11.1.1, no del prototipo. */
+  --ui-alarm: #9E4A34;
+
+  /* Filetes. Sobre papel, tinta al 20 %; sobre madera, oro al 30 %. */
+  --skin-rule-on-paper: rgba(27, 22, 19, .2);
+  --skin-rule-on-wood: rgba(124, 92, 31, .3);
+  --skin-rule-gold: rgba(124, 92, 31, .45);
+
+  /* Sombra de las placas, del plan §2. Dos capas: el papel se levanta poco
+     del valle y proyecta lejos, como en el prototipo. */
+  --skin-shadow: 0 2px 4px rgba(27, 22, 19, .25), 0 8px 18px rgba(27, 22, 19, .18);
+  --skin-shadow-sheet: 0 -6px 20px rgba(27, 22, 19, .3);
+
+  /* ----------------------------------------------------------- tipografía */
+  /* Dos familias empaquetadas, OFL, en `redesign/fonts/` — declaradas con
+     `@font-face` en `skin.css`, que explica por qué van por Vite y no por
+     `public/` (§13.4, el subdirectorio de Pages). Son **variables**: un
+     fichero cubre todos los pesos, 93 KB los tres.
+
+     `--skin-font-voice` es la inscripción: fechas, cifras, ANNO, nombres,
+     etiquetas. `--skin-font-read` es lo que se lee seguido: la crónica, la
+     frase de la bandeja. Las pilas de respaldo son las de U-01, así que si
+     una fuente no cargara, el juego se ve como ayer y no descolocado. */
+  --skin-font-voice: 'Cinzel', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --skin-font-read: 'EB Garamond', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  /* Versalitas: el prototipo las usa en todas las etiquetas. Cinzel es una
+     capital romana, así que va en mayúsculas con un poco de aire entre letras
+     — sin `letter-spacing` se lee apretada. */
+  --skin-track-label: .12em;
+  --skin-track-inscription: .08em;
+
+  /* --------------------------------------------------- textura y rasgados */
+  /* La textura pasa por Vite (vive junto a este fichero) para que su ruta
+     resuelva igual desde la raíz y desde el subdirectorio de Pages — §13.4.
+     Se usa con `background-blend-mode: multiply` sobre el color del token:
+     el grano lo da la textura, el tono lo sigue mandando la paleta. */
+  --skin-parchment-texture: url('./parchment.png');
+
+  /* Bordes rasgados, de `tools/ui/deckle.py` (semilla fija). Escritos, no
+     calculados: un borde que cambia entre fotogramas tiembla, y la
+     comparativa contra el prototipo tiene que dar siempre la misma imagen. */
+  --skin-deckle-plate: polygon(0% 1%, 8.33% 0.57%, 16.67% 0.6%, 25% 1.03%, 33.33% 0.6%, 41.67% 0.32%, 50% 1.09%, 58.33% 0.85%, 66.67% 0.96%, 75% 0.47%, 83.33% 1.03%, 91.67% 0.97%, 99.25% 0%, 99.1% 8.33%, 98.94% 16.67%, 98.83% 25%, 99.31% 33.33%, 99.2% 41.67%, 99.6% 50%, 99.7% 58.33%, 99.95% 66.67%, 99.06% 75%, 99.83% 83.33%, 98.99% 91.67%, 100% 99.81%, 91.67% 99.03%, 83.33% 99%, 75% 99.74%, 66.67% 99.34%, 58.33% 99.19%, 50% 98.92%, 41.67% 99.82%, 33.33% 99.43%, 25% 99.53%, 16.67% 99.02%, 8.33% 99.25%, 0.88% 100%, 0.25% 91.67%, 0.18% 83.33%, 0.93% 75%, 0.4% 66.67%, 0.22% 58.33%, 0.68% 50%, 0.43% 41.67%, 0.18% 33.33%, 0.06% 25%, 1.07% 16.67%, 0.69% 8.33%);
+  --skin-deckle-chip: polygon(0% 1.64%, 16.67% 1.18%, 33.33% 1.42%, 50% 3.65%, 66.67% 1.61%, 83.33% 1.45%, 96.64% 0%, 97.87% 16.67%, 97.84% 33.33%, 99.68% 50%, 99.95% 66.67%, 98.56% 83.33%, 100% 96.48%, 83.33% 97.47%, 66.67% 99.2%, 50% 97.88%, 33.33% 98.07%, 16.67% 99.9%, 1.55% 100%, 0.6% 83.33%, 0.26% 66.67%, 1.9% 50%, 3.32% 33.33%, 0.95% 16.67%);
+  --skin-deckle-chip-b: polygon(0% 0.13%, 16.67% 0.06%, 33.33% 0.71%, 50% 0.9%, 66.67% 2.32%, 83.33% 2.13%, 99.71% 0%, 99.1% 16.67%, 96.18% 33.33%, 98.54% 50%, 97.62% 66.67%, 99.07% 83.33%, 100% 98.47%, 83.33% 99.68%, 66.67% 97.2%, 50% 98.99%, 33.33% 99.29%, 16.67% 97.68%, 3.79% 100%, 2.9% 83.33%, 1.44% 66.67%, 0.5% 50%, 2.56% 33.33%, 3% 16.67%);
+  --skin-deckle-chip-c: polygon(0% 1.33%, 16.67% 0.69%, 33.33% 2.25%, 50% 2.8%, 66.67% 3.72%, 83.33% 2.76%, 97.02% 0%, 96.65% 16.67%, 98.77% 33.33%, 97.75% 50%, 99.83% 66.67%, 99.34% 83.33%, 100% 98.36%, 83.33% 97.47%, 66.67% 97.94%, 50% 98.69%, 33.33% 96.3%, 16.67% 97.46%, 0.13% 100%, 2.69% 83.33%, 3.79% 66.67%, 3.48% 50%, 0% 33.33%, 3.69% 16.67%);
+  --skin-deckle-chip-d: polygon(0% 1.4%, 16.67% 2.72%, 33.33% 2.71%, 50% 1.83%, 66.67% 1.49%, 83.33% 2.54%, 99.59% 0%, 99.57% 16.67%, 98.93% 33.33%, 97.22% 50%, 97.86% 66.67%, 98.58% 83.33%, 100% 99.32%, 83.33% 97.63%, 66.67% 98.26%, 50% 99.3%, 33.33% 96.79%, 16.67% 97.15%, 3.74% 100%, 0.2% 83.33%, 0.08% 66.67%, 0.05% 50%, 0.12% 33.33%, 3.92% 16.67%);
+  /* UI-V5 · **El contorno de una gota de lacre**, para el sello.
+     `.skin-seal` usaba el recorte rasgado de un chip y salia un cuadrado rojo
+     con las esquinas mordidas; el sello del prototipo 02 es cera derramada, o
+     sea un circulo con el radio ondulado. Generado por radio, como los deckle
+     de `tools/ui/deckle.py`: 28 puntos, radio 46 con dos ondas encima (6 a
+     cinco lobulos y 3 a ocho), que es lo que le da el borde irregular sin que
+     deje de leerse como redondo. */
+  --skin-seal-blob: polygon(102.5% 50.0%, 98.5% 61.1%, 91.0% 69.7%, 84.4% 77.4%, 75.6% 82.1%, 68.7% 88.9%, 61.7% 101.1%, 50.0% 103.2%, 40.6% 91.4%, 33.3% 84.6%, 21.8% 85.3%, 11.6% 80.7%, 5.8% 71.3%, 1.9% 61.0%, 5.3% 50.0%, 12.8% 41.5%, 11.1% 31.3%, 8.1% 16.6%, 17.7% 9.5%, 31.4% 11.4%, 40.8% 9.6%, 50.0% 6.0%, 60.1% 5.7%, 71.8% 4.8%, 82.7% 9.0%, 84.2% 22.8%, 83.3% 33.9%, 93.3% 40.1%);
+  --skin-deckle-card: polygon(0% 0.86%, 7.14% 0.15%, 14.29% 0.62%, 21.43% 0.34%, 28.57% 0.6%, 35.71% 0.77%, 42.86% 0.93%, 50% 0.82%, 57.14% 0.67%, 64.29% 0.56%, 71.43% 0.46%, 78.57% 0.13%, 85.71% 0.76%, 92.86% 0.62%, 99.5% 0%, 99.26% 7.14%, 99.36% 14.29%, 99.71% 21.43%, 99.65% 28.57%, 99.95% 35.71%, 99.38% 42.86%, 99.99% 50%, 99.24% 57.14%, 99.63% 64.29%, 99.68% 71.43%, 99.45% 78.57%, 99.31% 85.71%, 99.72% 92.86%, 100% 99.05%, 92.86% 99.34%, 85.71% 99.53%, 78.57% 99.99%, 71.43% 99.09%, 64.29% 99.88%, 57.14% 99.81%, 50% 99%, 42.86% 99.44%, 35.71% 99.11%, 28.57% 99.87%, 21.43% 99.62%, 14.29% 99.94%, 7.14% 99.09%, 0.68% 100%, 0.05% 92.86%, 0.29% 85.71%, 0.15% 78.57%, 0.42% 71.43%, 0.82% 64.29%, 0.82% 57.14%, 0.35% 50%, 0.83% 42.86%, 0.34% 35.71%, 0.34% 28.57%, 0.41% 21.43%, 0.41% 14.29%, 0% 7.14%);
+  --skin-deckle-sheet: polygon(0% 0.35%, 6.25% 0.32%, 12.5% 0.34%, 18.75% 0.05%, 25% 0.53%, 31.25% 0.04%, 37.5% 0.58%, 43.75% 0.23%, 50% 0.58%, 56.25% 0.5%, 62.5% 0.4%, 68.75% 0.32%, 75% 0.1%, 81.25% 0.16%, 87.5% 0.42%, 93.75% 0.39%, 99.68% 0%, 99.47% 6.25%, 99.71% 12.5%, 99.6% 18.75%, 99.44% 25%, 99.41% 31.25%, 99.92% 37.5%, 100% 43.75%, 99.99% 50%, 99.49% 56.25%, 99.54% 62.5%, 99.89% 68.75%, 99.63% 75%, 99.74% 81.25%, 99.54% 87.5%, 99.57% 93.75%, 100% 99.42%, 93.75% 99.75%, 87.5% 99.41%, 81.25% 99.69%, 75% 99.5%, 68.75% 99.98%, 62.5% 99.67%, 56.25% 99.72%, 50% 99.62%, 43.75% 99.5%, 37.5% 99.89%, 31.25% 99.41%, 25% 99.8%, 18.75% 99.51%, 12.5% 99.49%, 6.25% 99.49%, 0.48% 100%, 0.23% 93.75%, 0.15% 87.5%, 0.59% 81.25%, 0.36% 75%, 0.44% 68.75%, 0.34% 62.5%, 0% 56.25%, 0.6% 50%, 0.18% 43.75%, 0.35% 37.5%, 0.22% 31.25%, 0.13% 25%, 0.2% 18.75%, 0.06% 12.5%, 0.25% 6.25%);
+
+  /* Inclinaciones de las placas sueltas, fijas por índice: el prototipo las
+     tiene ligeramente giradas, y al azar en cada pintado sería un tic. */
+  --skin-tilt-a: -0.6deg;
+  --skin-tilt-b: 0.4deg;
+  --skin-tilt-c: -0.3deg;
+  --skin-tilt-d: 0.5deg;
+  --skin-tilt-card: -0.4deg;
+  --skin-tilt-sealed: -1.5deg;
+
+  /* ------------------------------------------- los `--ui-*` de UI-R1, vivos */
+  /* Cinco rondas los usan. Se conservan y **apuntan a los de arriba**, así
+     que la piel nueva entra sin tocar `hud.ts`, `orders.ts`, `shell.css` ni
+     las pantallas: lo que cambie aquí se ve allí. */
+  --ui-paper-bg: var(--skin-parchment);
+  --ui-paper-ink: var(--skin-ink);
+  --ui-paper-ink-soft: var(--skin-ink-soft);
+  --ui-accent-on-paper: var(--skin-gold);
+
+  --ui-dark-surface: var(--skin-wood);
+  --ui-dark-surface-soft: var(--skin-wood-plaque);
+  --ui-dark-ink: var(--skin-page);
+  --ui-dark-ink-dim: var(--skin-parchment-deep);
+  --ui-accent-on-dark: var(--skin-gold-lit);
+
+  --ui-edge: var(--skin-rule-on-paper);
+  --ui-edge-dark: var(--skin-rule-on-wood);
+
+  --ui-font-voice: var(--skin-font-voice);
+  --ui-font-plain: var(--skin-font-read);
+
+  /* Tamaños del plan §3, medidos en los prototipos y convertidos a 390 px. */
+  --ui-text-reading-size: 17px;
+  --ui-text-reading-line: 1.45;
+  --ui-text-control-size: 15px;
+  --ui-text-control-line: 1.4;
+  --ui-sheet-title-size: 20px;
+  --ui-sheet-title-line: 1.2;
+
+  --skin-text-inscription: 13px;   /* la fecha de la cabecera */
+  --skin-text-figure: 16px;        /* las cuatro cifras */
+  --skin-text-label: 11px;         /* etiquetas de navegación y chips */
+  --skin-text-anno: 24px;          /* «ANNO XXI» */
+  --skin-text-name: 20px;          /* «HEREWARD · 21 WINTERS» */
+
+  /* Escala 4/8/12/16/24, sin cambios. */
+  --ui-space-1: 4px;
+  --ui-space-2: 8px;
+  --ui-space-3: 12px;
+  --ui-space-4: 16px;
+  --ui-space-5: 24px;
+
+  --ui-tap-min: 44px;
+  --ui-margin-mobile: 12px;
+  --ui-radius-sheet: 16px;
+  --ui-radius-control: 8px;
+
+  /* La franja inferior, con las alturas del plan §3.4: la navegación sube de
+     56 a 68 px porque el prototipo pone etiqueta bajo el icono. */
+  --ui-nav-height: 68px;
+  --ui-controls-min-height: 52px;
+  --ui-message-min-height: 56px;
+  --ui-stack-gap: var(--ui-space-2);
+}

@@ -377,6 +377,8 @@ describe('IA-3 · aldeanos con hábitos', () => {
     return sample;
   }
 
+  // IA-12: pasa al evitar la charla previa al primer destino laboral.
+  // Se conserva el umbral 2× y la condición de necesidades urgentes.
   it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);

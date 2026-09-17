@@ -1,3 +1,4 @@
+import { visibleBuildings } from '@derive/visible-buildings';
 // G-10, lote del mundo · El bosque. design.md D.8, D.9.
 //
 // Un valle maduro tiene varios cientos de celdas de bosque. Un árbol por celda
@@ -35,6 +36,17 @@ const JITTER = 0.34;
 function stable(cell: number, salt: number): number {
   const mixed = Math.imul(cell * 73_856_093 + salt * 19_349_663, 2_654_435_761) >>> 0;
   return (mixed % 100_003) / 100_003;
+}
+
+/** Contrato común del tronco visible y su obstáculo físico. */
+export function scatterTransform(width: number, cell: number, extra = 0): { x: number; z: number; scale: number; facing: number } {
+  const salt = extra * 977;
+  return {
+    x: cell % width + 0.5 + (stable(cell, salt + 1) - 0.5) * 2 * JITTER,
+    z: Math.floor(cell / width) + 0.5 + (stable(cell, salt + 2) - 0.5) * 2 * JITTER,
+    scale: 1 + (stable(cell, salt + 3) - 0.5) * 2 * SIZE_SPREAD,
+    facing: stable(cell, salt + 4) * Math.PI * 2,
+  };
 }
 
 export interface Piece {
@@ -123,7 +135,7 @@ export function scatterOn(
  */
 export function builtCells(state: { buildings: readonly Building[]; map: ValleyMap }): Set<number> {
   const taken = new Set<number>();
-  for (const building of state.buildings) {
+  for (const building of visibleBuildings(state)) {
     for (let row = 0; row < building.h; row += 1) {
       for (let column = 0; column < building.w; column += 1) {
         taken.add((building.y + row) * state.map.width + building.x + column);
@@ -189,14 +201,11 @@ export function scatterCells(
       let slot = 0;
       for (const cell of cells) {
         for (let extra = 0; extra < PER_CELL; extra += 1) {
-          const salt = extra * 977;
-          const x = (cell % map.width) + 0.5 + (stable(cell, salt + 1) - 0.5) * 2 * JITTER;
-          const z = Math.floor(cell / map.width) + 0.5 + (stable(cell, salt + 2) - 0.5) * 2 * JITTER;
-          const scale = 1 + (stable(cell, salt + 3) - 0.5) * 2 * SIZE_SPREAD;
+          const { x, z, scale, facing } = scatterTransform(map.width, cell, extra);
           position.set(x, 0, z);
           // Girar cada uno lo suyo: una copa asimétrica repetida sin girar deja
           // un patrón que se ve desde arriba como un papel pintado.
-          turn.setFromAxisAngle(up, stable(cell, salt + 4) * Math.PI * 2);
+          turn.setFromAxisAngle(up, facing);
           size.set(scale, scale, scale);
           matrix.compose(position, turn, size);
           instanced.setMatrixAt(slot, matrix);

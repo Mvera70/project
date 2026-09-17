@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all mill
+
+Built mill in artifacts\graphics\G-21\runs\2026-09-16T17-04-10-583Z-48892
+Validated mill from run 2026-09-16T17-04-10-583Z-48892
+Reported and promoted mill to artifacts\graphics\G-21\approved\2aad24fd4802a4a1

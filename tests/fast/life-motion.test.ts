@@ -28,7 +28,7 @@ import { TIME } from '@engine/balance';
 import { run } from '@engine/sim';
 import { foundTwenty } from '../helpers/founding';
 import {
-  blockedAt, integrate, type Body, type Terrain,
+  blockedAt, integrate, penetration, type Body, type Terrain,
 } from '../../src/render3d/life/body';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 import { terrainOf } from '../../src/render3d/life/terrain';
@@ -45,9 +45,9 @@ const SAMPLE_EVERY = 30;
  *  mismos cinco puntos que `tools/life-report.ts`. */
 function circleBlocked(land: Terrain, body: Body): boolean {
   const { x, z, radius } = body;
-  return blockedAt(land, x, z)
-    || blockedAt(land, x - radius, z) || blockedAt(land, x + radius, z)
-    || blockedAt(land, x, z - radius) || blockedAt(land, x, z + radius);
+  // IA-12: círculo completo, también en esquinas; tolerancia de redondeo
+  // (un contacto a 1e-9 no es una penetración física).
+  return blockedAt(land, x, z) || penetration(land, x, z, radius) > 1e-7;
 }
 
 interface Totals {
@@ -113,14 +113,8 @@ describe('V-02/V-03/V-08 · cuerpos y bestias en marcha', () => {
       .toBeLessThan(0.01);
   });
 
-  // El brief (rework.md §3.5.1) pide 0 cuerpo-pasos con el círculo en un
-  // muro, no «casi nunca». Medido tras el arreglo: ~0,11 % en esta muestra
-  // (~0,10 % con las seis semillas y cuatro jornadas del informe) — sobre
-  // todo cuerpos en movimiento rápido rozando una esquina un único paso, no
-  // atrapados (ver `docs/rework.md` §3.6). Bajar de ahí a cero pediría tocar
-  // la resolución de colisiones más de lo que esta ronda alcanza a probar en
-  // pantalla; se deja escrito en vez de bajar el listón (`CLAUDE.md`).
-  it.fails('el círculo nunca cae en una pared, ni una vez', () => {
+  // IA-10: el caso antes marcado como fallo esperado pasa con el disco exacto.
+  it('el círculo nunca cae en una pared, ni una vez', () => {
     expect(totals.circleInWall).toBe(0);
   });
 

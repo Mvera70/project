@@ -1,3 +1,4 @@
+import { visibleBuildings } from '@derive/visible-buildings';
 // G-06 · The renderer. design.md D.5, D.6.
 //
 // The whole contract, implemented. D.5 forbids publishing an empty method to
@@ -34,6 +35,9 @@ import {
 } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
+import { isNight, type HomeRoutine } from './life/home';
+import { fitsCircle, penetration } from './life/body';
+import { solidTerrain } from './world/obstacles';
 import { Cast } from './world/cast';
 import { VILLAGER_MODELS, modelChainFor } from './world/models';
 import { dayNumber, dayPhase } from './presentation-clock';
@@ -42,6 +46,7 @@ import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../deriv
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
+import type { DayPlan } from './life/day';
 import { castOf, propsOf } from './life/cast';
 import { Props } from './world/props';
 import { LIFE_STEP } from './life/clock';
@@ -49,7 +54,7 @@ import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
-import { isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
+import { FIELD_CROPS, isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 
 const VILLAGER = 'villager';
 const TREE = 'tree';
@@ -73,6 +78,7 @@ const FAUNA = ['cow', 'pig', 'hen', 'wolf', 'crow', 'fish'] as const;
  * fuera sin que nadie lo notara: una orilla pelada no parece un fallo.
  */
 export const WANTED = [
+  ...FIELD_CROPS,
   // G-15 · los trastos del corral, que es lo que dice que aquí vive alguien.
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
@@ -276,7 +282,7 @@ export async function createGraphicsRenderer(
   // U-13 · la lluvia, la nieve y el rayo. Tres mallas, creadas una vez.
   const weather = createWeather(scene);
   const tells = new Tells();
-  const fauna = new Fauna((kind) => library.instance(kind));
+  const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props();
   world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group);
@@ -362,11 +368,18 @@ export async function createGraphicsRenderer(
    */
   let life: LifeVillage | null = null;
   let lifeDay = -1;
+  let lifeState: GameState | null = null;
+  let observedState: Readonly<GameState> | null = null;
+  let observedFrame: GraphicsFrame | null = null;
+  let sampling = false;
+  let observing = false;
   let lifeCarry = 0;
   let mapWidth = 0;
   let mapHeight = 0;
   // U-12 · la fase de la última jornada pintada, para poder mirarla desde fuera.
   let paintedPhase = 0;
+  let steppedPhase = 0.28;
+  const nightOutcomes: { tick: number; residents: number; sleeping: number; pending: number[] }[] = [];
   // U-13 · el cielo de la jornada que se está pintando, y los rayos que han
   // caído. `bolts` sólo sube: `app.ts` mira cuánto ha subido para tronar.
   let paintedSky: SkyKind = 'clear';
@@ -562,7 +575,139 @@ export async function createGraphicsRenderer(
     frameCamera();
   }
 
-  return {
+  // **El enganche de taller: poder mirar el juego como si fuera un vídeo.**
+  //
+  // Lo pidió el dueño del diseño el 16 sep 2026, y el problema que resuelve es
+  // real: quien revisa este juego no puede ver la pantalla en movimiento, sólo
+  // capturas, y «la IA se ve torpe» es imposible de arreglar mirando fotos
+  // sueltas. Con esto, `tools/graphics/film.mjs` toma decenas de fotogramas
+  // seguidos y, en cada uno, **pregunta al juego dónde está cada cuerpo y qué
+  // está haciendo**. Los píxeles dicen si algo se ve mal; esto dice qué es.
+  //
+  // **No puede desplazar la simulación, y eso es lo que lo hace admisible**
+  // (§4.3, y el innegociable de `CLAUDE.md`): sólo lee valores que el
+  // fotograma acaba de calcular, no tira ningún dado, no toca el estado y no
+  // existe para el juego —nadie de `src/` lo llama—. Si se borrara, no
+  // cambiaría un solo píxel.
+  //
+  // Va sin puerta, como `window.__valleySound`, por el mismo motivo: una
+  // bandera que hay que encender es una bandera que un día no está encendida
+  // cuando hace falta, y lo que se quiere mirar casi nunca se repite a la
+  // segunda.
+  window.__valleyLife = () => {
+    if (life === null) return null;
+    const round = (value: number): number => Math.round(value * 1000) / 1000;
+    const screen = (x: number, z: number): { x: number; y: number } => {
+      const point = new Vector3(x, groundFloor(x, z) + 0.1, z).project(camera);
+      return { x: round((point.x + 1) * viewport.widthCss / 2), y: round((1 - point.y) * viewport.heightCss / 2) };
+    };
+    return {
+      renderedPeople: cast.snapshot(),
+      bubbles: bubbles.snapshot(),
+      buildings: (lifeState === null ? [] : visibleBuildings(lifeState)).map(building => ({ id: building.id, kind: building.kind,
+        x: building.x, z: building.y, w: building.w, h: building.h, ruin: building.lostTick !== null })),
+      viewport: { width: viewport.widthCss, height: viewport.heightCss },
+      map: { width: life.land.width, height: life.land.height, blocked: Array.from(life.land.blocked) },
+      renderedAnimals: fauna.snapshot().map(animal => ({ ...animal, screen: screen(animal.x, animal.z) })),
+      day: lifeDay,
+      steps: life.steps,
+      phase: round(paintedPhase),
+      interactions: { ...life.interactions },
+      nightOutcomes: nightOutcomes.map(night => ({ ...night, pending: [...night.pending] })),
+      people: life.dwellers.map((dweller) => ({
+        id: dweller.villager,
+        bodyId: dweller.body.id,
+        dayPlan: dweller.dayPlan ?? null,
+        ageGroup: dweller.ageGroup ?? 'adult',
+        penetration: round(penetration(life!.land, dweller.body.x, dweller.body.z, dweller.body.radius)),
+        screen: screen(dweller.body.x, dweller.body.z),
+        home: dweller.home ?? null,
+        residence: dweller.residence ?? null,
+        routePoints: (dweller.residence?.stage !== 'day' && dweller.residence !== undefined ? dweller.residence.route : dweller.doing?.route ?? []).map(point => ({ ...point, screen: screen(point.x, point.z) })),
+        partners: dweller.scene === null ? [] : [dweller.scene.a, dweller.scene.b],
+        x: round(dweller.body.x),
+        z: round(dweller.body.z),
+        vx: round(dweller.body.vx),
+        vz: round(dweller.body.vz),
+        facing: round(dweller.body.facing),
+        pace: round(dweller.body.pace),
+        needs: Object.fromEntries(
+          Object.entries(dweller.needs).map(([name, value]) => [name, round(value as number)]),
+        ) as Record<string, number>,
+        // Lo que está haciendo, con el sitio y la oferta por su nombre: es lo
+        // que convierte «no se mueve» en «lleva ciento veinte pasos yendo a
+        // la plaza 3 del campo 7 y no llega».
+        doing: dweller.doing === null ? null : {
+          place: dweller.doing.place.id,
+          offer: dweller.doing.offer.id,
+          seat: dweller.doing.seat,
+          there: dweller.doing.there,
+          until: dweller.doing.until,
+          route: dweller.doing.route.length,
+        },
+        scene: dweller.scene === null ? null : dweller.scene.kind,
+        quarrel: dweller.quarrel !== null,
+        holding: dweller.holding,
+      })),
+      beasts: life.beasts.map((beast) => ({
+        id: beast.dweller.body.id,
+        penetration: round(penetration(life!.land, beast.dweller.body.x, beast.dweller.body.z, beast.dweller.body.radius)),
+        screen: screen(beast.dweller.body.x, beast.dweller.body.z),
+        routePoints: (beast.dweller.doing?.route ?? []).map(point => ({ ...point, screen: screen(point.x, point.z) })),
+        kind: beast.kind,
+        reaction: { stage: beast.reaction.stage, commitment: beast.reaction.commitmentId },
+        x: round(beast.dweller.body.x),
+        z: round(beast.dweller.body.z),
+        doing: beast.dweller.doing === null ? null : beast.dweller.doing.offer.id,
+      })),
+      // Del reparto sólo lo que la capa de vida no sabe: qué clip se está
+      // pintando y qué burbuja lleva. Es la única forma de cazar un cuerpo que
+      // se mueve con el clip de estarse quieto, o al revés.
+      actors: lastActors.map((actor) => ({
+        id: actor.id,
+        clip: actor.clip,
+        activity: actor.activity,
+        talking: actor.talking,
+        arguing: actor.arguing,
+        occupation: actor.occupation,
+      })),
+    };
+  };
+
+  // Captura síncrona: se vuelve a pintar sin dar pasos y se leen píxeles y
+  // estado en la misma tarea JavaScript. Ningún RAF puede colarse entre ambos.
+  window.__valleyCapture = (follow?: number, zoom = 1) => {
+    if (follow !== undefined && follow >= 0 || zoom !== 1) { flight = null; disturbed = true; }
+    const person = life?.dwellers.find(dweller => dweller.villager === follow);
+    const target = person?.body ?? life?.beasts.find(beast => beast.dweller.body.id === follow)?.dweller.body;
+    if (target !== undefined) view.look(target.x, target.z);
+    if (zoom !== 1) view.zoom(zoom, viewport.widthCss / 2, viewport.heightCss / 2);
+    renderer.render(scene, camera);
+    return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
+  };
+  let observingLive = false;
+  window.__valleyObserveLive = () => { observingLive = true; };
+
+  window.__valleyAdvance = (steps: number, reset = false) => {
+    if (!Number.isInteger(steps) || steps < 0 || steps > 3600) throw new Error('Invalid observation steps');
+    sampling = true;
+    try {
+      if (reset && observedState !== null && observedFrame !== null) {
+        observing = true;
+        observedState = structuredClone(observedState);
+        fauna.clear(); cast.clear();
+        graphics.paint(observedState, { ...observedFrame, presentationSeconds: 0, deltaSeconds: 0,
+          realDeltaSeconds: 0, discontinuity: true });
+      }
+      for (let n = 0; n < steps; n += 1) {
+        if (observedState === null || observedFrame === null) break;
+        graphics.paint(observedState, { ...observedFrame, deltaSeconds: LIFE_STEP, realDeltaSeconds: LIFE_STEP,
+          presentationSeconds: observedFrame.presentationSeconds + LIFE_STEP, discontinuity: false });
+      }
+    } finally { sampling = false; }
+  };
+
+  const graphics: GraphicsRenderer = {
     resize(next: GraphicsViewport): void {
       if (disposed) return;
       viewport = next;
@@ -574,6 +719,8 @@ export async function createGraphicsRenderer(
     },
 
     paint(state: Readonly<GameState>, frame: GraphicsFrame): void {
+      if (observing && !sampling) return;
+      observedState = state; observedFrame = frame;
       if (disposed) return;
       // La hora escenica primero, porque de ella cuelga todo lo demas: es la
       // que dice que jornada se esta pintando y, con ella, que estado.
@@ -635,15 +782,53 @@ export async function createGraphicsRenderer(
       //
       // La aldea vive por su cuenta: una jornada es una vida, y al amanecer se
       // estrena otra con la gente que el motor diga.
-      if (life === null || lifeDay !== today || frame.discontinuity) {
-        life = createVillage(shown, today);
+      if (life === null || lifeState !== shown || frame.discontinuity) {
+        const previous = life;
+        life = createVillage(shown, today, { land: solidTerrain(shown, id => library.instance(id)) });
+        // El relevo del estado no recoloca a los supervivientes. Sólo una
+        // discontinuidad explícita permite reconstruir toda la presentación.
+        if (previous !== null && !frame.discontinuity) {
+          for (const person of life.dwellers) {
+            const old = previous.dwellers.find(other => other.villager === person.villager);
+            if (old === undefined || !fitsCircle(life.land, old.body.x, old.body.z, person.body.radius)) continue;
+            Object.assign(person.body, { x: old.body.x, z: old.body.z, facing: old.body.facing, vx: old.body.vx, vz: old.body.vz });
+            person.travelled = old.travelled;
+            if (person.residence !== undefined && old.residence?.building === person.residence.building) {
+              // El relevo escénico puede ocurrir durante el regreso: conservar
+              // el desvío y el turno, traduciendo sus relojes al nuevo paso cero.
+              Object.assign(person.residence, old.residence, {
+                route: old.residence.route.map(point => ({ ...point })),
+                until: old.residence.until - previous.steps,
+                retryAt: old.residence.retryAt - previous.steps,
+                progressAt: (old.residence.progressAt ?? previous.steps) - previous.steps,
+                returnCheck: 0,
+              });
+            }
+          }
+          for (const beast of life.beasts) {
+            const old = previous.beasts.find(other => other.dweller.body.id === beast.dweller.body.id && other.kind === beast.kind);
+            if (old !== undefined && fitsCircle(life.land, old.dweller.body.x, old.dweller.body.z, beast.dweller.body.radius)) {
+              Object.assign(beast.dweller.body, { x: old.dweller.body.x, z: old.dweller.body.z, facing: old.dweller.body.facing });
+            }
+          }
+        }
         lifeDay = today;
+        lifeState = shown;
         lifeCarry = 0;
       }
       lifeCarry += frame.deltaSeconds;
+      if (frame.discontinuity) { steppedPhase = phase; nightOutcomes.length = 0; }
       let given = 0;
       while (lifeCarry >= LIFE_STEP && given < 240) {
-        life.step();
+        const stepPhase = (phase - (lifeCarry - LIFE_STEP) / 120 + 1) % 1;
+        if (isNight(steppedPhase) && !isNight(stepPhase)) {
+          const residents = life.dwellers.filter(person => person.residence !== undefined);
+          const pending = residents.filter(person => person.residence!.stage !== 'sleeping').map(person => person.villager);
+          nightOutcomes.push({ tick: state.tick, residents: residents.length, sleeping: residents.length - pending.length, pending });
+          if (nightOutcomes.length > 64) nightOutcomes.shift();
+        }
+        steppedPhase = stepPhase;
+        life.step(stepPhase);
         lifeCarry -= LIFE_STEP;
         given += 1;
       }
@@ -653,6 +838,12 @@ export async function createGraphicsRenderer(
         ages.set(villager.id, clockOf(shown.tick).year - clockOf(villager.bornTick).year);
         if (villager.named) named.add(villager.id);
       }
+      const entrances = new Map(life.dwellers.filter(person => person.residence !== undefined)
+        .map(person => [person.residence!.building, person.residence!.facing]));
+      village.entrances(entrances);
+      village.doors(new Set(life.dwellers.filter(person => person.residence !== undefined
+        && ['opening', 'entering', 'leaving'].includes(person.residence.stage))
+        .map(person => person.residence!.building)), frame.deltaSeconds);
       lastActors = castOf(life, frame.presentationSeconds, ages, named);
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
@@ -670,7 +861,7 @@ export async function createGraphicsRenderer(
         // un estado de fondo y una charla es lo corriente.
         const bubble: Bubble | undefined = actor.arguing
           ? 'quarrel'
-          : mood ?? (actor.talking ? 'chat' : undefined);
+          : actor.talking ? 'chat' : (actor.clip === 'idle' && Math.floor(frame.presentationSeconds + actor.id * 1.7) % 12 < 3 ? mood : undefined);
         if (bubble === undefined) continue;
         carried.set(actor.id, bubble);
         heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });
@@ -685,8 +876,8 @@ export async function createGraphicsRenderer(
         const centre = view.view.centre;
         const kept = [...carried.entries()]
           .sort(([idA, a], [idB, b]) => {
-            const stateA = a === 'chat' ? 1 : 0;
-            const stateB = b === 'chat' ? 1 : 0;
+            const stateA = a === 'quarrel' ? 0 : a === 'chat' ? 1 : 2;
+            const stateB = b === 'quarrel' ? 0 : b === 'chat' ? 1 : 2;
             if (stateA !== stateB) return stateA - stateB;
             const headA = heads.get(idA);
             const headB = heads.get(idB);
@@ -702,7 +893,7 @@ export async function createGraphicsRenderer(
       bubbles.update(heads, carried);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
-      tells.update(shown);
+      tells.update(shown, entrances);
       // El humo y las luces si son de cada fotograma: uno sube y las otras se
       // encienden cuando cae el dia.
       tells.drift(frame.presentationSeconds, phase, frame.speed);
@@ -713,7 +904,9 @@ export async function createGraphicsRenderer(
       // IA-5: y el lobo del corral, si lo hay hoy, viene de la vida
       // (`life.wildlife`) y no de la fórmula — ver el comentario de `update`
       // en `effects/fauna.ts` sobre por qué sólo él.
-      fauna.update(shown, phase, life.wildlife);
+      fauna.update(shown, phase, [...life.wildlife, ...life.beasts.map(beast => ({
+        id: beast.dweller.body.id, kind: beast.kind, x: beast.dweller.body.x, y: beast.dweller.body.z,
+      }))], frame.presentationSeconds);
       // Y la luz que hace a esa hora. Va despues de todo lo que se coloca porque
       // no depende de nada de ello: solo de la hora.
       // **U-13 · el cielo.** Se deriva (`derive/weather.ts`): la fila del clima
@@ -767,7 +960,7 @@ export async function createGraphicsRenderer(
       // acercarse metia el pueblo dentro de la bruma.
       if (mapWidth > 0) fogAround(new Vector3(mapWidth / 2, 0, mapHeight / 2));
 
-      renderer.render(scene, camera);
+      if (!sampling && !observingLive) renderer.render(scene, camera);
     },
 
     pick(localXCss: number, localYCss: number): GraphicsTarget | null {
@@ -890,6 +1083,7 @@ export async function createGraphicsRenderer(
       renderer.forceContextLoss();
     },
   };
+  return graphics;
 }
 
 /** Walks up from a hit to whichever ancestor carries the id we are after. */
@@ -901,4 +1095,69 @@ function idOf(object: Object3D, key: 'villagerId' | 'buildingId'): number | unde
     node = node.parent;
   }
   return undefined;
+}
+
+declare global {
+  interface Window {
+    /**
+     * El enganche de taller de arriba. Opcional porque el juego no lo necesita
+     * y porque una prueba que corra sin renderer no lo tiene.
+     */
+    __valleyLife?: () => LifeSnapshot | null;
+    __valleyAdvance?: (steps: number, reset?: boolean) => void;
+    __valleyCapture?: (follow?: number, zoom?: number) => { image: string; life: LifeSnapshot | null };
+    __valleyObserveLive?: () => void;
+  }
+}
+
+/** Lo que el enganche devuelve. Nada de esto se usa dentro del juego. */
+interface ScreenPoint { readonly x: number; readonly y: number }
+interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
+export interface LifeSnapshot {
+  readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
+  readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number }[];
+  readonly bubbles: readonly { readonly id: number; readonly kind: Bubble }[];
+  readonly buildings: readonly { readonly id: number; readonly kind: string; readonly x: number;
+    readonly z: number; readonly w: number; readonly h: number; readonly ruin: boolean }[];
+  readonly viewport: { readonly width: number; readonly height: number };
+  readonly map: { readonly width: number; readonly height: number; readonly blocked: readonly number[] };
+  readonly renderedAnimals: readonly { readonly id: number; readonly kind: string; readonly x: number;
+    readonly z: number; readonly walkWeight: number | null; readonly screen: ScreenPoint }[];
+  readonly day: number;
+  readonly steps: number;
+  readonly phase: number;
+  readonly interactions: Readonly<Record<string, number>>;
+  readonly people: readonly {
+    readonly id: number;
+    readonly residence: HomeRoutine | null;
+    readonly penetration: number;
+    readonly bodyId: number; readonly screen: ScreenPoint;
+    readonly dayPlan: DayPlan | null;
+    readonly ageGroup: string;
+    readonly home: { readonly x: number; readonly z: number } | null;
+    readonly routePoints: readonly ObservedPoint[]; readonly partners: readonly number[];
+    readonly x: number; readonly z: number;
+    readonly vx: number; readonly vz: number;
+    readonly facing: number; readonly pace: number;
+    readonly needs: Readonly<Record<string, number>>;
+    readonly doing: {
+      readonly place: string; readonly offer: string; readonly seat: number;
+      readonly there: boolean; readonly until: number; readonly route: number;
+    } | null;
+    readonly scene: string | null;
+    readonly quarrel: boolean;
+    readonly holding: number | null;
+  }[];
+  readonly beasts: readonly {
+    readonly id: number; readonly kind: string;
+    readonly penetration: number;
+    readonly reaction: { readonly stage: string | null; readonly commitment: string | null };
+    readonly screen: ScreenPoint; readonly routePoints: readonly ObservedPoint[];
+    readonly x: number; readonly z: number; readonly doing: string | null;
+  }[];
+  readonly actors: readonly {
+    readonly id: number; readonly clip: string; readonly activity: string;
+    readonly talking: boolean; readonly arguing: boolean;
+    readonly occupation: string | null;
+  }[];
 }

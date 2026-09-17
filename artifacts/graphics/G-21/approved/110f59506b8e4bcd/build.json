@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "stone-house",
+  "runId": "2026-09-16T22-04-25-239Z-21428",
+  "recipe": "art/recipes/stone-house/stone-house.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 14118,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/candidate/stone-house.blend",
+      "bytes": 103731,
+      "sha256": "BABA12CF70A3EE42CE0220E3FEDCF242C77D64B335F5BADABC187EFBE1330693"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/candidate/stone-house.glb",
+      "bytes": 59184,
+      "sha256": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/candidate/stone-house-blender.png",
+      "bytes": 496979,
+      "sha256": "D0C3E03D40FEBE74224B1BFB22B5725E6111F1DD5451F37B2482DEC283C47CAB"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/blender.log",
+      "bytes": 1501,
+      "sha256": "EB313C814E429222AE7B89F7D509CDFF726F595A6C754C9528AAB21969A57573"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T22-04-25-239Z-21428/temporary/resolved-recipe.json",
+      "bytes": 25000,
+      "sha256": "EFF3A238F2FF48F88C6DC6F9286303B26B04D0F0CA7ED37FEE0E2A650B90A1D5"
+    }
+  }
+}

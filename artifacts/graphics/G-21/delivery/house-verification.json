@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "house",
+  "statistics": {
+    "objects": 7,
+    "meshes": 6,
+    "materials": 6,
+    "triangles": 668
+  },
+  "bounds": {
+    "min": [
+      0,
+      -0.0025,
+      -2
+    ],
+    "max": [
+      2,
+      1.580666,
+      0
+    ],
+    "size": [
+      2,
+      1.583166,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T22-03-39-132Z-37876",
+    "directory": "artifacts/graphics/G-21/approved/3b29d1ed828f257b"
+  },
+  "sha256": "3B29D1ED828F257B5630A38D142881E1EED4113B51D296817FF132ECBAAB4325",
+  "otherPublishedFilesUnchanged": true
+}

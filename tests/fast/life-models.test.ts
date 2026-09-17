@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { LIFE } from '@engine/balance';
 import type { Actor } from '../../src/render3d/contracts';
 import {
-  BASE_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, modelChainFor, modelFor, occupationOf,
+  BASE_VILLAGER, STRANGER_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, modelChainFor, modelFor, occupationOf,
 } from '../../src/render3d/world/models';
 import { WANTED } from '../../src/render3d/renderer';
 
@@ -52,11 +52,14 @@ describe('V-15 · la malla se elige por quién eres y por lo que haces', () => {
       .toBe(VILLAGER_BY_ROLE.smith);
   });
 
-  it('los siete oficios tienen figura, y el forastero no: no es un oficio', () => {
+  it('los siete oficios tienen figura, y el forastero la suya, que no es de oficio', () => {
     for (const role of Object.keys(VILLAGER_BY_ROLE) as (keyof typeof VILLAGER_BY_ROLE)[]) {
       expect(modelFor(actor({ role }))).toBe(VILLAGER_BY_ROLE[role]);
     }
-    expect(modelFor(actor({ role: 'stranger' }))).toBe(BASE_VILLAGER);
+    // El forastero no está en `VILLAGER_BY_ROLE` a propósito: no es un oficio.
+    // Pide su figura y, mientras no exista, cae al base como todos.
+    expect(modelFor(actor({ role: 'stranger' }))).toBe(STRANGER_VILLAGER);
+    expect(modelChainFor(actor({ role: 'stranger' }))).toEqual([STRANGER_VILLAGER, BASE_VILLAGER]);
   });
 
   it('y quien no tiene oficio recibe figura por lo que hace, que es la mayoría', () => {

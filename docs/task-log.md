@@ -20,14 +20,14 @@ nadie va a encontrar.
 |---|---|
 | Rama | `rework/parada-a-media` |
 | HEAD | ver `git log -1`; la última ronda mía es el nivelado de las estancias y el plazo vencido |
-| `main` | **`7f0bfc4`, al día** — se empuja al cerrar cada tramo; la rama también está en el remoto |
+| `main` | **al día** — se empuja al cerrar cada tramo — se empuja al cerrar cada tramo; la rama también está en el remoto |
 | Fusionado aquí | `docs/visual-reference` (`f842a8d`), el cuaderno de referencia visual del dueño |
 | Sin seguimiento, a propósito | `docs/life-ai-implementation-prompt.md` es del dueño; se deja para que lo commitee él |
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
-| **En vuelo ahora** | nada. **C-1 está completa** salvo el punto 7, aplazado con motivo. Lo siguiente es UI-R1 |
+| **En vuelo ahora** | **la tanda de piel** (`ui-redesign/piel/plan-piel.md`). **UI-V0 hecha** (`4da029c`: el kit — 17 colores muestreados, Cinzel y EB Garamond empaquetadas, 25 primitivas, muestrario, comparador y medidor de contraste). En vuelo, tres agentes Sonnet en worktrees: **UI-V1** (`hud.ts`), **UI-V2** (`shell.ts`/`shell.css`), **UI-V3** (`screens/chronicle.ts` + `chronicle-art.ts`). Después UI-V4 (ficha), UI-V5 (encrucijada) y UI-V6 (validación). **El dueño trabaja en paralelo en los modelos 3D: ningún agente mío entra en `src/render3d/` ni en `art/`** |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
 | Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
-| Lo que acabo de cerrar | IA-6, más la burbuja que hace visible la riña y el suelo de la convocatoria |
+| Lo que acabo de cerrar | **G-18 entregado y verificado** (`9cc97af`: los doce aldeanos de Blender, sin tocar `src/`; pendiente de aprobación estética del dueño). **IA-8**: el descarte de la plaza que falló, el plazo propio del viaje (`arriveBy`) y el labrador a su puesto (fuera del campo 6,5 %, parados 0,08 %, giros 0,39 %). Antes: **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
 
 ## 1b. La fase en curso: C-1 · Cierre de la tanda de IA
 
@@ -64,6 +64,106 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-23 · animales:** encargo de rehacer las seis especies y sus animaciones.
+Vaca subida en `df0ac66`. Cerdo terminado y revisado en movimiento; preparado
+para entrega individual. Siguen gallina, lobo, cuervo y pez.
+Cerdo subido en `aec6c38`. Gallina terminada y revisada; 45 pruebas, typecheck
+y lint verdes, entrega individual preparada. Siguen lobo, cuervo y pez.
+Gallina subida en `a48bb00`. Lobo terminado y revisado, con marcha sincronizada
+y apoyos comprobados; 50 pruebas, typecheck y lint verdes. Siguen cuervo y pez.
+Lobo subido en `b323c58`. Cuervo terminado y revisado, 52 pruebas, typecheck
+y lint verdes. Queda el pez para cerrar las seis especies existentes.
+Cuervo subido en `3b395c8`. **Las seis especies terminadas y validadas:** vaca,
+cerdo, gallina, lobo, cuervo y pez, con rig y clips conectados al juego. Pez y
+cierre preparados para subida individual. 75 pruebas, typecheck y lint verdes;
+seis bancos visuales, visores con reproducción/pausa y captura del juego.
+Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
+verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
+subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](graphics-rounds/G-23.md).
+
+**Siguiente encargo de Blender · aldea:** alcance preparado para viviendas,
+molino, iglesia/capilla, herrería, pozo, granero, campos, carros y adornos.
+Inventario y tandas en [encargo-blender-aldea](graphics-rounds/encargo-blender-aldea.md).
+**G-21: casas de paja, piedra y molino terminados**, con entrega individual por modelo.
+Paja subida en `dcb4cf1` y piedra en `4d2893e`; molino validado con 87 pruebas,
+typecheck, lint y captura del juego. Informe en [G-21](graphics-rounds/G-21.md).
+Molino subido en `1889d40`. Herrería subida en `8d03f5c`;
+validación técnica verde. Su revisión frontal en juego se cierra con la captura
+de la capilla (semilla 2, año 60); detalles y evidencias en el informe G-21.
+Granero terminado y revisado dentro del juego; conserva el montón variable de
+reservas. Typecheck, lint y 87 pruebas verdes; entrega individual G-21.
+Granero subido en `a90c54e`. Capilla terminada, validada y revisada dentro del
+juego; conserva las velas dinámicas. Entrega individual G-21.
+Capilla subida en `0561f34`. Iglesia terminada y revisada en el juego, con
+campanario abierto y puerta visible; validación técnica verde. Sigue el pozo.
+Iglesia subida en `1dd19df`. Pozo terminado, validado y revisado en juego;
+conserva su celda y añade brocal hueco, torno y cubo. Sigue el campo cultivado.
+Pozo subido en `6f8876f`. Campo cultivado terminado, validado y revisado en
+verano dentro del juego; conserva la alternancia estacional. Sigue `field-cut`.
+**G-22 · cultivos:** el dueño rechaza las espigas de G-21 por parecer flechas.
+Trigo rehecho con granos laterales y tallos verdes, validado y revisado en juego.
+Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](graphics-rounds/G-22.md).
+Trigo G-22 subido en `1b834c7`. Coles terminadas y selección estable por parcela
+conectada en el render; 88 pruebas verdes y captura real revisada. Siguen puerros.
+Coles subidas en `0edca57`. Puerros terminados y conectados: trigo, coles y
+puerros aparecen en parcelas distintas, con selección estable y cosecha intacta.
+88 pruebas verdes y captura conjunta revisada; pendiente de valoración estética.
+Puerros subidos en `d096f83`. Campo segado terminado y revisado después de la
+cosecha; 88 pruebas verdes. Campo segado subido en `4aa61c5`.
+Carro G-21 terminado: caja de tablas, ruedas abiertas con radios y varales;
+94 pruebas verdes, typecheck y lint. Capturas reales revisadas, entrega
+individual subida en `5e6b070`. Almiar G-21 terminado y revisado en juego:
+capas de heno, haces y estaca central; 94 pruebas, typecheck y lint verdes.
+Almiar subido en `f0e933f`. Pila de leña G-21 terminada y revisada en juego;
+94 pruebas, typecheck y lint verdes. Entrega individual validada para commit
+y subida. Leña subida en `15b7f5b`; ajuste posterior solicitado por el dueño:
+10 % más pequeña, reconstruida y revisada en juego, subida en `5ccfe5b`.
+Cobertizo (`shed`) G-21 terminado y validado en Blender y visor GLB; aún no
+seleccionado por el juego. 94 pruebas y typecheck verdes; lint global falla
+en `compare.mjs:55` ajeno (variable `row` sin uso). Entrega lista para subir.
+Cobertizo subido en `f23ffa5`. Avisado el dueño antes de los muros;
+autoriza resolver también las uniones en código. Defensas G-21 terminadas:
+empalizada y piedra, conexiones cardinales, esquinas, T y cruces mixtos.
+86 pruebas, typecheck y lint verdes; captura del juego y banco de uniones
+revisados. Defensas subidas en `8a1011e`, `a2e9c8b` y `24b94b1`.
+Encargo de completar los cuatro restantes sin parar: torre terminada y
+validada, lista para subida individual; siguen cementerio y ambas ruinas.
+Torre subida en `128f357`. Cementerio terminado, revisado en el renderer y
+en partida (semilla 43, año 60), listo para subir; siguen las dos ruinas.
+Cementerio subido en `fc22492`. Ruina de madera terminada y revisada en
+partida y banco. El render ajusta ambas ruinas a la parcela perdida; 90
+pruebas, typecheck y lint verdes. Lista para subir; queda la ruina de piedra.
+Ruina de madera subida en `e61c977`. Ruina de piedra terminada y revisada
+en Blender y renderer real con estado de prueba. Los cuatro encargados
+están terminados; entrega final validada para commit y subida.
+
+**G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
+verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
+
+**U-10b · el menú abre el valle en el año que se le pida (16 sep, `21b11e9`).**
+Lo pidió el dueño porque probar le costaba demasiado: «no tengo manera de
+elegir el año o solamente la semilla». Botón «Dev» discreto en el menú —la
+preferencia se recuerda— y campo «Open at year»; el valle se juega con la
+política de referencia (`openAtYear`, `debug.ts`), no con un bucle de `tick`.
+El año es el que lee la cabecera: el 1 es fundar. Medido: 20 años 296 ms, 60
+años 1,3 s; la semilla 11 da 27 personas al año 20 y 45 al 40. **Y el
+capturador lo usa** (`shot.mjs --year N`): 19 años pasan de 20 s de reloj
+falso a 300 ms, y por la trayectoria de referencia, así que las capturas de
+aquí en adelante son comparables con las cifras del proyecto. **Demo v18.**
+
+**Demo v17 (16 sep, tarde):** los dieciséis aldeanos de Blender (G-17 y
+G-18) en el valle e IA-8, 50 recursos y ninguno pendiente; fotogramas en
+`artifacts/graphics/G-18/demo-doce/` (sin seguimiento). Sobre `4145cfc`.
+
+**Demo v16 (16 sep):** publicada en el artefacto de siempre con los cuatro
+aldeanos de G-17. Empaquetada desde un **worktree limpio en HEAD** (`git
+worktree add`, `node_modules` enlazado) porque el agente de UI-R1 tiene
+`app.ts` a medias y no compila. `shot.mjs` gana `--answer N`: la primera
+encrucijada planteada se queda abierta para siempre y tapaba el valle en toda
+captura con `--advance`; ahora la contesta como el dedo. Ojo: el empaquetado
+completo **vacía** el directorio y borra la forma partida; `--split` va al
+final.
+
 **G-17 · Blender, entrega terminada (16 sep):** `villager`, `villager-smith`,
 `villager-priest` y `villager-farmer`, recetas canónicas, catálogo y cuatro GLB
 publicados. Informe: [G-17](graphics-rounds/G-17.md); prompt de integración:
@@ -76,23 +176,42 @@ animales, fauna, escenas históricas, **y después interfaz**.
 
 | Fase | Estado | Commit | Informe |
 |---|---|---|---|
+| IA-12 · jornada, oficios y gestos | Rutina básica: 15/15 y 21/21 puestos alcanzados; ocho acciones, ocio por edad y burbujas ligadas a encuentros | (este commit) | `life-rounds/IA-12.md` |
+| IA-11 · circulación, portones y motor vivo | **hecha en los casos verificados** — 66/66 noches completas en tres aldeas; desvíos, pasillos y colisión fina | (este commit) | `life-rounds/IA-11.md` |
+| IA-10 · observatorio, hogares y sólidos | **seguida por IA-11** — visor sincronizado, puertas y rutina doméstica; cifras iniciales conservadas en el informe | `a472eca` | `life-rounds/IA-10.md` |
 | IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `life-rounds/IA-0.md` |
 | IA-1 · movimiento y destinos | **hecha** | `1509121` | `life-rounds/IA-1.md` |
 | IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
 | IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `life-rounds/IA-3.md` |
 | IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
 | IA-5 · fauna silvestre | **hecha** — el lobo migra y sólo sale la semana del suceso; el cuervo y el pez se quedan, con el motivo escrito | (este commit) | `life-rounds/IA-5.md` |
-| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | (este commit) | `life-rounds/IA-6.md` |
+| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | `e20eeb5` y anteriores | `life-rounds/IA-6.md` |
+| IA-9 · rodar el valle, y el que va a un sitio sin ruta | **hecha** — la herramienta de película (`film.mjs` + el enganche `__valleyLife` + `film-sheet.py`) y el arreglo que destapó: `decide()` devolvía la intención muerta tal cual. Clavados 3 → 0; queda el 15 % de gente con ruta que no anda, que es dirección y va como **IA-10** | (este commit) | `life-rounds/IA-9.md` |
+| IA-8 · la plaza que falló se descarta, el viaje tiene su plazo | **hecha** — cierra el punto 1 de lo abierto y el 0b de IA-7; el devoto queda frágil (§4) | (este commit) | `life-rounds/IA-8.md` |
+| IA-7 · los labradores, dentro de su campo | **hecha** — lo vio el dueño en la demo v15; de rebote, el suelo de V-11 se multiplicaba después y no era un suelo | (este commit) | `life-rounds/IA-7.md` |
 
 ### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)
 
 | Ronda | Estado | Commit |
 |---|---|---|
 | UI-R0 · auditoría y cierre de especificación | **hecha** | `f9f2df4` |
-| UI-R1 · carcasa, tokens y navegación | pendiente | — |
-| UI-R2 · cabecera, actividad, órdenes, velocidad | pendiente | — |
-| UI-R3 · crónica · UI-R4 · personas | pendientes (pueden ir en paralelo tras congelar UI-R2) | — |
-| UI-R5 · integración y decisiones · UI-R6 · validación | pendientes | — |
+| UI-R1 · carcasa, tokens y navegación | **hecha** — carcasa, tokens, un solo dueño de la navegación, aviso y pista comparten ranura y nunca se pisan (era el defecto visible de la demo v15); las pantallas **no** se dan por migradas, a propósito | (este commit) · `ui-redesign/rounds/UI-R1.md` |
+| UI-R2 · cabecera, actividad, órdenes, velocidad | **hecha** — tres fallos de gestos reales arreglados (toques fantasma al valle, ranura de mensaje tapando el botón de velocidad, `pointer-events` sin recuperar) | `c278e12` |
+| UI-R3 · crónica | **hecha** — migrada a `shell.content`, no roba el desplazamiento del lector | `ee2279d` |
+| UI-R4 · personas y fichas | **hecha** — un fallecido/emigrado deja de envejecer en su propia ficha; seguimiento honesto ("marca, no promete centrar") | `00f8ed7` |
+| UI-R5 · integración, decisiones y salida | **hecha** — `contentRouteFor` unificado, enlace crónica→ficha, la encrucijada gana a una bandeja abierta (fallo real encontrado) | `af8d7d0` |
+| **UI-V0 · el kit de la piel** | **hecha** — `4da029c`, informe en `ui-redesign/piel/UI-V0.md`. El muestrario cazó dos fallos antes de costar seis rondas (la textura oscurecía a la mitad; el rasgado se comía el texto) | `4da029c` |
+| **UI-V1 a UI-V6 · las pantallas** | **V1, V1b, V2 y V3 en `main`; quedan V4, V5 y V6** — el diagnóstico y el plan están en `ui-redesign/piel/plan-piel.md` §1 (por qué salió la estructura y no el aspecto: el prompt prohibía copiar, los tokens se sembraron del juego viejo, no había criterio visual de hecho ni activos ni fuentes empaquetadas) | `197b143`, `e38c053`, `c1ddc72` |
+| **UI-V2b · los iconos del chip** | **hecha** — la espiga y la pila **calcadas del prototipo** con `tools/ui/trace-glyph.py`, y la caja del icono del chip de 16 a 21 px (medido: el glifo del prototipo ocupa 18,3 px de 31,5; el nuestro se quedaba en 12,5). Nueve versiones dibujadas a mano no valieron; calcadas salieron a la primera. **El método está en la skill `calcar-iconos`** |  |
+| **UI-V3 · la crónica** | **hecha**, en dos pasadas e informe en `ui-redesign/piel/UI-V3.md`. El agente entregó la estructura; el veredicto del dueño fue «la estética sigue siendo muy mala», y la segunda pasada la cerró **calcando los seis adornos del prototipo** (capitular ilustrado, viñeta a pluma, palmeta, rombo, orla de hojas; la cuenta anillada a mano). Medido en el juego: 21 años, 228 entradas, 216 viñetas y ninguna rota. **El documento sellado no se ha visto en captura** y el motivo está medido: no había encrucijada pendiente — queda para UI-V5 |  |
+| **ABIERTO · una decisión pendiente bloquea la navegación** | **Fallo encontrado, sin arreglar** (17 sep 2026), y es de los que cancelan dos funciones a la vez. `app.ts:624`, dentro de `paint` y por tanto **en cada fotograma**: `if (state.crossroad !== null …) if (currentRoute.kind !== 'valley') navigate({kind:'valley'})`. Mientras hay decisión pendiente —incluso **aplazada**, con la píldora puesta y el velo retirado— la crónica y la lista de la gente **no se pueden abrir**: la pestaña se pulsa, la ruta cambia y el fotograma siguiente la devuelve al valle. Medido: semilla 11, año 37 (`forest_cut` queda pendiente al abrir), aplazada deslizando; `data-screen` se queda en `valley`, 0 bloques de crónica y 0 filas de gente. **Y de ahí sale que el documento sellado de UI-V3 sea inalcanzable por construcción**: sólo existe cuando hay una decisión pendiente, que es justo el estado en el que la crónica no abre. La intención original es de UI-R5 y es buena —una bandeja abierta tapaba las opciones—, pero la condición tiene que ser «el velo de la encrucijada está en pantalla», no «hay decisión pendiente»: aplazar existe precisamente para poder ir a mirar otra cosa. Evidencia en `artifacts/graphics/UI-V3c/` |  |
+| **ABIERTO · seguir a un aldeano no le marca** | **Revisado, sin tocar** (17 sep 2026, a petición del dueño para no pisar la sesión 3D). Enfocar **sí** funciona: `renderer.track` llama a `view.look` y la cámara se recentra (medido con el reloj en pausa: cambia el 44 % de los píxeles del valle). **Iluminar la silueta no existe en el 3D**: `src/render3d/renderer.ts:995` no guarda a quién sigue, así que no hay nada que pintar — el aro sí existe, pero en el renderer 2D (`src/render/renderer.ts:78`), o sea en el camino muerto. Además apunta una vez y no sigue, `track(null)` sale en la primera línea, y el texto `inspect.track.note` promete «marks {name} on the map», que en el 3D es falso. Faltan también el aro de luz y el contorno de oro de su casa del prototipo 03. El arreglo cabe entero en `src/render3d/renderer.ts` |  |
+| **UI-V5b · la lista de la gente** | **hecha**. El último trozo sin vestir, y el segundo sin prototipo (el 03 dibuja una ficha, no una lista): fila de pergamino rasgado con los cuatro cantos alternados, el medallón de la ficha en talla pequeña, y el nombre con la edad detrás como en la placa. **Los rasgos se quedan en texto y no como chips**: ochenta y un recuadros convierten una lista que se recorre con el pulgar en un muro |  |
+| **UI-V5 · el menú de inicio** | **hecho**, informe en `ui-redesign/piel/UI-V5.md`. **La única pantalla sin prototipo**, así que se diseña en vez de calcarse: **la cubierta de la crónica** — madera de fondo, una hoja de pergamino con el canto deshilachado encima, el título con el filete y la palmeta de la crónica, y el sello de lacre en el centro como «documento por abrir». Ni un texto cambia. De paso, `--skin-seal-blob`: el sello usaba el recorte de un chip y era un cuadrado rojo, ahora es una gota de cera — arregla también el documento sellado de la crónica |  |
+| **UI-V4 · la ficha de la persona** | **hecha**, informe en `ui-redesign/piel/UI-V4.md`. La ficha del prototipo 03: medallón con **monograma** (no hay retratos y no se inventan), nombre con edad, oficio, chips de rasgo, helecho calcado, tira de parentesco y los dos botones de madera y pergamino. **El parentesco sale sólo de lo que el motor guarda** —`parentIds` y `opinions`—: la «wife» del prototipo no existe porque la boda de R-1 es un suceso y no un vínculo. Falta la línea «Today», que necesita la capa de vida que el dueño está reescribiendo: derivarla del motor podría contradecir al cuerpo que se ve. 14 pruebas del modelo puro |  |
+| **UI-V3b · los tres remates** | **hecha**. Salieron de la vuelta completa de capturas, ninguno visto antes: la **regleta de velocidad** seguía con la píldora de U-01 y **se salía de la pantalla** (sus cinco botones piden 220 px y el rincón ya gasta 150, en 390 no caben en fila) — ahora va vestida y **apilada encima** del rincón; el **botón de cerrar de la crónica** era `fixed` y al leer hacia abajo se comía el final de dos líneas — ahora es `absolute` dentro del velo, así que vive sobre el valle y se va con la página, y volver lo da la barra de abajo, que desde UI-V2 está siempre a la vista; y la **hoja de órdenes** («no parece que cumpla la estética del resto», dueño del diseño) pasa a chips de pergamino rasgado con la elegida en placa de tinta y letra de oro, igual que la pestaña activa y el multiplicador |  |
+| **UI-V2b · la bandeja y el rincón** | **hecha**. La frase de actividad y la línea de órdenes bajan a la bandeja, centradas bajo la hoja de roble como el prototipo 01, y con ellas se retira el parche de altura de UI-V1. Y el rincón de velocidad deja de caer dentro de la bandeja: `shell.ts` mide la bandeja con un `ResizeObserver` y publica `--ui-stack-height`, porque su alto **no es fijo** — medido: la bandeja ocupaba 669–844 y los círculos 740–784, y ahora 615–659. De paso, con una hoja abierta el hueco del mensaje se **pliega** en vez de sólo ocultarse: la pila va en z-index 14 y la hoja en 13, así que el papel le tapaba los últimos 107 px y «Build first» volvía a quedar escondido |  |
+| UI-R6 · validación | **hecha** — 1215/1216 en la suite rápida, 128/130 en jornadas (sin novedad), manifiesto de instalación verde; tres hallazgos documentados sin perseguir más (offline tras redespliegue, picking en aldea de 83 edificios, factura de opinión con el reequilibrado del caos) | `ui-redesign/rounds/UI-R6.md` |
 
 ### Las fases nuevas, salidas de la lista de aldeanos (16 sep 2026)
 
@@ -104,7 +223,9 @@ dato que hoy no tiene.
 
 | Fase | Qué | Depende de | Estado |
 |---|---|---|---|
-| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, buhonero, forastero, leñador, albañil, pastor, pescador, novios— | De nada. Es la sesión de Blender | **en marcha** (base, herrero, cura, granjero) |
+| **G-19 · la hoja de contactos** | Las dieciséis figuras a tamaño natural, a 20 px y a 6 px, con quién las lleva y qué las distingue, para que la aprobación estética cueste un minuto | De G-17 y G-18 | **hecha** (`artifacts/graphics/G-19/aldeanos.html`, `graphics-rounds/G-19.md`). **Su veredicto quedó en duda el mismo día, y con razón:** decía que ocho de dieciséis son la misma mancha marrón, pero lo midió sobre un render de **estudio, fondo beige, sin movimiento y a píxeles de CSS**. El dueño lo miró en el juego y dijo que los modelos le gustan y que «no se ve tan mal»; el recorte del juego real a 1:1 (`artifacts/graphics/G-19/real-1a1.png`) le da la razón. Lo que sí sobrevive del análisis: las parejas que compiten por familia de color (dos azules, dos sombreros, tres verdes) son difíciles de distinguir **entre sí**. Aviso escrito en el propio informe |
+| **G-20 · la medida sobre el juego, no sobre el taller** | Redirigida el mismo día: en vez de un plan de repintado, **medir la legibilidad en el juego empaquetado** —cuántos píxeles reales mide una persona a la distancia de apertura y acercada, recortes a 1:1 sobre prado— y corregir o confirmar el veredicto de G-19. Sólo si alguna figura falla **ahí**, se propone su arreglo mínimo | De G-19 | **en vuelo** (Sonnet) |
+| **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, forastero, leñador, albañil, pastor, pescador— | De nada. Es la sesión de Blender | **entregado** (`9cc97af`, doce ids, verificado: huesos y clips del base al byte, 54 huellas, G-17 intacto). Falta la **aprobación estética del dueño** y la demo con los doce. Buhonero, novios, doliente y vigía: fuera hasta R-5b/R-6 |
 | **V-15 · el modelo se elige por lo que se hace** | La regla está escrita y probada en `src/render3d/world/models.ts`: manda la edad, luego el oficio, luego lo que se está haciendo. `Actor` gana `occupation` y la capa de vida la calcula del sitio y la oferta. Nueve pruebas en `tests/fast/life-models.test.ts` | — | **hecha, menos el último enganche** |
 | ~~V-15b~~ **hecha** | `renderer.ts` sigue teniendo su propio `VILLAGER_BY_ROLE` y elige por oficio. Hay que **borrarlo de ahí**, llamar a `modelFor(actor)` y **caer al aldeano base si el recurso no existe**, que es lo que permite que las mallas se enciendan una a una sin tocar código. No se hizo porque IA-5 tenía `renderer.ts` abierto | De que IA-5 suelte `renderer.ts` | **lo siguiente** |
 | **R-5b · quién acude a un funeral y a un incendio** | El motor sabe quién murió y qué edificio se quemó, pero **no sabe quién asiste**, y por eso IA-6 se negó a inventar espectadores. Falta el dato en el estado: un puñado de `id` de acompañantes en el suceso, como la riña ya trae los suyos en `who` | Cambio del motor (§7.10) | pendiente |
@@ -126,6 +247,74 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+IA-12: dos tomas diurnas reales (semillas 11/43, años 20/60, 45 s a 2 fps),
+15/15 y 21/21 trabajadores/religiosos asignados llegan a ejercer. Cero discrepancias
+de burbuja de charla o clip aplicado. Mayor natural (7/37): descanso y conversación
+observados; ocho clips nuevos comprobados sobre esqueletos publicados. Detalles,
+regresión nocturna y límites en `life-rounds/IA-12.md`.
+
+IA-11: 62 pruebas pertinentes en 11 archivos; typecheck, lint y bundle verdes.
+Tres partidas vivas a ×64, 42 s y 2 fps: 22/22 noches completas cada una, 66/66
+en total. Semillas 7/11/43: 2, 23→22 y 32 residentes con casa. Ticks 0→3,
+912→915 y 2832→2835. Cero penetraciones de personas/animales, centros en sólidos,
+desajustes cuerpo/modelo y errores JS muestreados. Evidencia en IA-11/delivery.
+
+IA-10: 156 pruebas pertinentes verdes. Tres tomas del renderer real con estado fijo:
+semillas 7/11/43, durmiendo 2/2, 14/23 y 26/32 con vivienda. Cero penetraciones
+y desajustes cuerpo/modelo muestreados. No equivale a una partida completa.
+Casas con puertas: paja 668 triángulos/6 materiales; piedra 764/5.
+
+
+G-23: vaca de 3476 triángulos, cuatro materiales; clips idle/walk y controlador
+por distancia. 42 pruebas pertinentes verdes. Cuatro llamadas por vaca visible;
+sin nueva medida de FPS móvil.
+Cerdo: 2808 triángulos, cuatro materiales y 18 huesos; 43 pruebas pertinentes.
+Gallina: 874 triángulos, cuatro materiales y 12 huesos; 45 pruebas. Banco de
+40 cerdos: CPU/envío mediana 1,6 ms, p95 3,8 ms; no es una medida de FPS móvil.
+Lobo: 2828 triángulos, cuatro materiales, 18 huesos. 50 pruebas pertinentes.
+Cuervo: 826 triángulos, cuatro materiales, 12 huesos. 52 pruebas pertinentes.
+Pez: 700 triángulos, cuatro materiales, seis huesos. Cierre: 75 pruebas en seis
+archivos; GLB de las seis especies 1 916 800 bytes. Todos los hashes verificados.
+
+**Inventario del nuevo encargo de aldea:** 21 ids existentes en cuatro tandas;
+las variantes de vivienda y adornos nuevos se definirán con su integración.
+Casa de paja: 656 triángulos y cinco materiales/mallas; piedra: 752 y cuatro.
+Molino: 966 triángulos y cuatro materiales/mallas; herrería: 894 y cuatro.
+Granero: 1 220 triángulos, cuatro materiales/mallas y GLB de 89 972 bytes.
+Capilla: 776 triángulos, cuatro materiales/mallas y GLB de 57 672 bytes.
+Iglesia: 1 230 triángulos, cuatro materiales/mallas y GLB de 89 412 bytes.
+Pozo: 1 108 triángulos, cuatro materiales/mallas y GLB de 78 572 bytes.
+Campo cultivado: 2 056 triángulos, dos materiales/mallas y GLB de 160 704 bytes.
+G-22 sustituye ese campo por trigo de 4 732 triángulos y tres materiales/mallas.
+Coles G-22: 2 292 triángulos y tres materiales/mallas.
+Puerros G-22: 2 212 triángulos y tres materiales/mallas; 52 recursos empaquetados.
+Campo segado G-22: 232 triángulos, un material/malla y GLB de 17 856 bytes.
+Carro G-21: 888 triángulos, tres materiales/mallas y GLB de 64 556 bytes;
+94 pruebas verdes, incluidas las seis de colocación de adornos.
+Almiar G-21: 958 triángulos, tres materiales/mallas; altura 0,666667 celdas
+conservada y 94 pruebas verdes.
+Pila de leña G-21: 1 544 triángulos, dos materiales/mallas, 97 652 bytes;
+94 pruebas verdes y captura real revisada.
+Leña: geometría reducida un 10 %, conservando la escala de exportación 1/3.
+Cobertizo G-21: 844 triángulos, tres materiales/mallas y 62 564 bytes;
+parcela 1×1, altura máxima 0,912712 celdas.
+Defensas G-21: empalizada 318 triángulos / 23 808 bytes; piedra 276 /
+21 636 bytes; dos materiales cada recurso. 16 máscaras cardinales cubiertas
+por pruebas. Las esquinas añaden geometría recortada propia del render.
+Torre G-21: 1 638 triángulos, cuatro materiales, 119 384 bytes; 86 pruebas,
+typecheck y lint verdes. Banco con renderer real y estado de prueba revisado.
+Cementerio G-21: 936 triángulos, tres materiales, 68 260 bytes; 86 pruebas,
+typecheck y lint verdes, captura natural bajo lluvia y banco de integración.
+Ruina de madera G-21: 792 triángulos, tres materiales, 57 084 bytes;
+90 pruebas, incluidas cuatro huellas de parcela sin deformar la altura.
+Ruina de piedra G-21: 956 triángulos, cuatro materiales, 70 436 bytes.
+Cierre de los cuatro: 90 pruebas, typecheck/lint verdes y huellas de todos
+los artefactos y archivos publicados verificadas.
+87 pruebas verdes para cada entrega; revisadas dentro del juego real.
+
+**G-18:** doce modelos, 0,65 celdas, cuatro materiales/mallas, 948–1092
+triángulos. 29 pruebas y doce auditorías verdes; las huellas de G-17 se conservan.
 
 **G-17:** cuatro modelos de 0,65 celdas; 1056 / 1116 / 1012 / 960 triángulos
 (base / herrero / cura / granjero), cuatro materiales y cuatro mallas cada uno.
@@ -169,6 +358,50 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
+**IA-12:** regreso nocturno pendiente del residente 155, semilla 43/año 60,
+tick 2834 (31/32 durmiendo; 21/22 noches completas). La semilla 11 completa 22/22.
+Queda revisar encuentros y acciones propias de cada especie; anclajes de
+uso del yunque/bancos y tareas específicas de partera, herbolario, caza y pesca.
+El ocio, cultivo, tala, construcción, herrería, granero y rezo básicos están
+conectados. Sentarse es en el suelo; un especialista sin edificio usa ocio.
+
+**IA-11:** regreso/salida, desvíos, pasillos, portones y colisión fina de troncos/lápidas
+verificados con 66 noches del motor vivo. Queda revisar encuentros completos y clips
+de todas las especies, y ampliar la muestra a otros recintos y aldeas; los portones
+permanecen abiertos. No hay interiores ni clip de acostarse, ni se asignan viviendas
+ficticias a los residentes sin casa. Véase `docs/life-rounds/IA-11.md`; no dar por
+cerrada toda la IA por esta muestra.
+
+
+G-23: seis especies terminadas y comprobadas. No queda modelado pendiente del
+catálogo animal actual. Coste del banco documentado en G-23; no hay medida
+nueva de FPS en dispositivo móvil. Nuevas especies o conductas son otro encargo.
+
+**G-22:** trigo, coles y puerros terminados, conectados y revisados en juego.
+Campo segado también terminado y revisado tras la cosecha. Carro G-21 terminado
+y revisado en juego y subido. Almiar (`haystack`) terminado y revisado;
+almiar subido. Pila de leña (`log-pile`) terminada y revisada en juego;
+cobertizo (`shed`) terminado como recurso de catálogo; falta selección runtime.
+Defensas modeladas y conectadas por petición del dueño; subir la entrega
+antes de seguir con la torre de vigilancia. El aviso previo ya se cumplió.
+Torre terminada; continuar con cementerio, ruina de madera y ruina de piedra,
+con commit y subida individual de cada modelo.
+Cementerio terminado; tras subirlo quedan las ruinas de madera y piedra.
+Ruina de madera terminada; publicar antes de continuar con la piedra.
+Los cuatro modelos restantes están terminados; entrega final validada para
+commit y subida. Sigue pendiente integrar `shed`; variantes de casas y adornos nuevos
+son ampliaciones aún no realizadas, no parte de estos cuatro.
+**Avisar al dueño al llegar a los muros, antes de empezar esa parte.**
+
+**Rediseño de aldea:** paja, piedra y molino terminados; herrería modelada y
+validada técnicamente y revisada de frente en juego. Granero y capilla terminados;
+iglesia, pozo y campo cultivado terminados y revisados en juego; sigue el campo segado. Las variantes
+adicionales, los adornos nuevos y la aparición de `shed` requieren conexión del
+equipo del juego; reemplazar los ids ya seleccionados encaja directamente.
+
+**G-18:** recursos entregados para revisión visual; diferencia de zancada
+medida/declarada del niño dentro de tolerancia, documentada en el informe.
+
 **G-17 queda cerrado técnicamente:** los cuatro recursos están publicados con
 los ids del encargo. El cura lleva sotana negra. No necesita cambios de selección
 en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
@@ -190,50 +423,36 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
    no puede depender tanto de la leña. Ronda propia, medida, antes del rediseño
    de interfaz o en paralelo con él, pero **no dentro de C-1**.
 
-1. **Falta poder descartar una plaza que ya falló.** Es la pieza que bloquea
-   dos cosas a la vez. El plazo vencido de las personas (`village.ts`) tiene el
-   mismo fallo que tenían los animales, **pero aplicar el arreglo empeora la
-   cifra**: «parados con un impulso al máximo» sube de 0,06 % a 0,20 %, la de
-   partida, porque con las estancias fijas de `SEAT_DWELL` se vuelve a elegir
-   la misma plaza inalcanzable y se reintenta en bucle. Probado, medido y
-   **retirado**, con el número escrito en el propio sitio del código
-   (`village.ts`) y en `life-rounds/IA-6.md` §4.3. Con el descarte, el arreglo
-   entra solo.
-2. **Las duraciones y distancias de las actividades**, con los tiempos del
-   cuaderno (`visual-reference` §2 y §3) como referencia declarada como
-   hipótesis. La vaca sigue andando el 82,5 %: sus cinco parches están a 1,2–3,2
-   celdas y anda a 0,32 celdas por segundo.
-3. **Las nueve jornadas rojas de `rework.md` §2.8.** Casi todas son de la capa
-   de vida y sus números cambian con cada fase, así que se tocan **al final de
-   la tanda de IA**, no antes.
-4. **Un trabajador de vitest se cae en la suite rápida en paralelo**
-   («Worker exited unexpectedly»; no es montículo, con 4 GB cae igual). Sigue
-   abierto y bloquea UI-R6, que pide la suite entera. **Lo que ya está hecho:**
-   las cuatro partidas largas del motor se mudaron a
-   `tests/journeys/engine-long.test.ts` por decisión del dueño («si las pruebas
-   no son posibles hay que cambiar cómo las hacemos»), y con eso esos tres
-   ficheros bajan de **45 s a 9 s**: bosque 15,9 → 1,25 s, riñas 15,5 → 1,09 s,
-   invariantes → 7 s. Las cuatro siguen corriendo, en 42 s, donde tardar es
-   legítimo.
-5. **El zoom de las capturas topa por encima de unas dos muescas**, así que no
-   se puede acercar la cámara a un animal en una aldea grande. Lo midieron IA-3
-   e IA-4 por separado. Es lo primero que hace falta para juzgar de cerca.
-6. ~~Rasgos incompatibles~~ **cerrado el 16 sep**: las **dos** parejas
-   —`spring_valley` con `wide_ford` y con `marsh_valley`— se excluyen del
-   sorteo, y no se le inventa un efecto nuevo a la marisma. Escrito en
-   `docs/rework.md` (R-3) con el motivo y con la vía que se descartó, por si
-   alguien la retoma. El nivel de caos también está cerrado: ver §3.
-7. **`GREET_ODDS` sigue sin medir en la jornada**, sólo acotado. Ya no es
-   «siempre» (ver §5), pero cuántos saludos al día hay es cosa del ojo.
-8. **Deuda de `IA-1.md` §4.2**: `ProgressState` vive en un `Map` de
-   `village.ts` y en `Beast` en vez de en `Dweller`. Arreglo escrito allí.
-9. **§3.5 punto 5 de `rework.md`**: la malla contra el radio. Una vaca colisiona
-   con radio 0,4 y su malla mide más de una celda. Es de `render3d/`, no de
-   `life/`.
-10. **El aviso de la crónica y la pista de las órdenes se pintan encima uno del
-   otro** en la franja de abajo. Captura que lo prueba en
-   `life-rounds/evidencia-capturas.md`. Va al rediseño; el cuaderno del dueño da
-   la geometría (`visual-reference` §5).
+0a. **El 15 % de la aldea está de pie con una ruta que no anda** (IA-9, y es
+   lo que el dueño ve como «la IA sigue siendo torpe»). Medido **en el
+   navegador** con `tools/graphics/film.mjs`: en la semilla 42, año 50, siete
+   personas clavadas media película con rutas de 12 a 21 tramos, pegadas a un
+   borde de celda junto a un edificio, y con el replanteo entrando (el `until`
+   se renueva). No es la decisión: es `seek()` contra `avoid()`. **Es IA-10** y
+   la película es cómo se comprueba. La primera mitad del problema —la
+   intención muerta que se conservaba para siempre— ya está arreglada en IA-9:
+   clavados 3 → 0 en la semilla 11.
+
+0b. **~~El 13,6 % de labradores que cavan la linde~~ HECHO en IA-8**: 6,5 %
+   con `PARCEL_REACH` 0,9 y temblor ±0,15.
+
+0d. **`ui-milestones` está roja y no es de nadie de hoy**: «una partida de
+   sesenta años da entre unos pocos y unas docenas de hitos», semilla 999 da
+   18 contra 20. Falla igual en HEAD limpio (`4145cfc`). Es deriva de la
+   trayectoria nueva, como las de `rework.md` §2.8, y va con la decisión del
+   peso de los avisos (punto 10).
+
+0c. **El devoto se mide con una muestra que no lo ve.** `el devoto reza al
+   menos el doble` (IA-3) pasa por poco con dos semillas y su proporción va
+   de 0,6× a 2,7× sobre seis al apagar cambios que no tocan el rezo
+   (`life-rounds/IA-8.md` §3). Hace falta un sesgo del devoto visible con
+   una muestra barata, o una muestra mayor en las jornadas. Mientras, si se
+   pone roja al tocar otra cosa, no es del devoto.
+
+1. **~~Falta poder descartar una plaza que ya falló~~ HECHO en IA-8**
+   (`Dweller.failed`, `Chooser.shunned`), y con ello el plazo vencido de las
+   personas, con plazo propio del viaje (`Intent.arriveBy`). Parados 0,08 %,
+   giros 0,39 %.
 
 ## 5. Lo que ya se aprendió y no hay que volver a aprender
 

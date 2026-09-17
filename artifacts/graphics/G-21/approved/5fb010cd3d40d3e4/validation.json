@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "assetId": "house",
+  "runId": "2026-09-16T16-51-21-724Z-49012",
+  "status": "pass",
+  "durationMs": 3107,
+  "candidateSha256": "5FB010CD3D40D3E4DD07676D1BE9DC9C618D7C82B03F84EFEF77575630F42151",
+  "glb": {
+    "version": 2,
+    "declaredLength": 51500,
+    "nodeNames": [
+      "house_plaster",
+      "house_roof",
+      "house_stone",
+      "house_window",
+      "house_wood",
+      "Root"
+    ],
+    "meshNames": [
+      "house_plaster_Mesh",
+      "house_roof_Mesh",
+      "house_stone_Mesh",
+      "house_window_Mesh",
+      "house_wood_Mesh"
+    ],
+    "materialNames": [
+      "plaster",
+      "roof",
+      "stone",
+      "window",
+      "wood"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 5,
+    "statistics": {
+      "objects": 6,
+      "meshes": 5,
+      "materials": 5,
+      "triangles": 656
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T16:51:36.070Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-51-21-724Z-49012\\candidate\\house.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T16-51-21-724Z-49012/candidate/house.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-51-21-724Z-49012\\three\\capture-1.png",
+        "sha256": "73A7F6E3C7FFE74672FB5356289E1995745928771BA306B61F499FBEBA8BC9D9",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-51-21-724Z-49012\\three\\capture-1-gray.png",
+          "sha256": "20665D607B8F9F3929D975EC038E5DD1F7ED90E086693749509920F259E073FD",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 1030,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:59363/artifacts/graphics/G-21/runs/2026-09-16T16-51-21-724Z-49012/candidate/house.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "house_plaster",
+            "house_roof",
+            "house_stone",
+            "house_window",
+            "house_wood"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              2,
+              1.580666,
+              0
+            ],
+            "size": [
+              2,
+              1.580666,
+              2
+            ]
+          },
+          "loadDurationMs": 170
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-51-21-724Z-49012\\three\\capture-2.png",
+        "sha256": "73A7F6E3C7FFE74672FB5356289E1995745928771BA306B61F499FBEBA8BC9D9",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-51-21-724Z-49012\\three\\capture-2-gray.png",
+          "sha256": "20665D607B8F9F3929D975EC038E5DD1F7ED90E086693749509920F259E073FD",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 169,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:59363/artifacts/graphics/G-21/runs/2026-09-16T16-51-21-724Z-49012/candidate/house.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "house_plaster",
+            "house_roof",
+            "house_stone",
+            "house_window",
+            "house_wood"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              2,
+              1.580666,
+              0
+            ],
+            "size": [
+              2,
+              1.580666,
+              2
+            ]
+          },
+          "loadDurationMs": 39
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:59363/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 203,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T16-51-21-724Z-49012\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

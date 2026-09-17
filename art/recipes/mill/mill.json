@@ -12,7 +12,7 @@
       2,
       2
     ],
-    "note": "G-10, lote de sustento. Torre de piedra, capucha de paja y aspas en cruz. Las aspas no giran todavia: girarlas es un clip y va con la ronda que anime el mundo, no con la que lo modela."
+    "note": "G-21: molino de torre octogonal, zócalo y cornisas de piedra, cubierta de paja facetada y cuatro aspas de bastidor con paños. Parcela 2x2 y eje a la altura original. Recurso estático: el juego aún no reproduce giro de aspas."
   },
   "materials": [
     {
@@ -27,8 +27,13 @@
     },
     {
       "name": "wood",
-      "role": "timber",
+      "role": "timberDark",
       "roughness": 0.95
+    },
+    {
+      "name": "sail",
+      "role": "plaster",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -51,10 +56,10 @@
         3,
         2.4
       ],
-      "radius": 2.3,
+      "radius": 2.2,
       "depth": 4.8,
-      "vertices": 10,
-      "smooth": true,
+      "vertices": 8,
+      "smooth": false,
       "rotationDegrees": [
         0,
         0,
@@ -73,46 +78,15 @@
       ],
       "radius": 2.5,
       "depth": 1.8,
-      "vertices": 10,
+      "vertices": 8,
       "rotationDegrees": [
         0,
         0,
         0
       ],
       "material": "roof",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Mill_Sail_A",
-      "location": [
-        3,
-        0.35,
-        5.2
-      ],
-      "dimensions": [
-        5.6,
-        0.2,
-        0.55
-      ],
-      "material": "wood",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Mill_Sail_B",
-      "location": [
-        3,
-        0.35,
-        5.2
-      ],
-      "dimensions": [
-        0.55,
-        0.2,
-        5.6
-      ],
-      "material": "wood",
-      "parent": "Root"
+      "parent": "Root",
+      "smooth": false
     },
     {
       "type": "cube",
@@ -123,30 +97,1145 @@
         0.95
       ],
       "dimensions": [
-        1.0,
+        1,
         0.2,
         1.9
       ],
       "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Foundation",
+      "location": [
+        3,
+        3,
+        0.14
+      ],
+      "radius": 2.4,
+      "depth": 0.28,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Cornice_0",
+      "location": [
+        3,
+        3,
+        1.25
+      ],
+      "radius": 2.25,
+      "depth": 0.13,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Cornice_1",
+      "location": [
+        3,
+        3,
+        3.1
+      ],
+      "radius": 2.25,
+      "depth": 0.13,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Cornice_2",
+      "location": [
+        3,
+        3,
+        4.73
+      ],
+      "radius": 2.25,
+      "depth": 0.13,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Eaves",
+      "location": [
+        3,
+        3,
+        4.73
+      ],
+      "radius": 2.5,
+      "depth": 0.15,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_RoofFinial",
+      "location": [
+        3,
+        3,
+        6.49
+      ],
+      "radius": 0.15,
+      "depth": 0.23,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Mill_DoorJamb_L",
+      "location": [
+        2.41,
+        0.7,
+        1.03
+      ],
+      "dimensions": [
+        0.17,
+        0.22,
+        2.06
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_DoorJamb_R",
+      "location": [
+        3.59,
+        0.7,
+        1.03
+      ],
+      "dimensions": [
+        0.17,
+        0.22,
+        2.06
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_DoorLintel",
+      "location": [
+        3,
+        0.7,
+        2.06
+      ],
+      "dimensions": [
+        1.36,
+        0.23,
+        0.22
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_DoorStep",
+      "location": [
+        3,
+        0.6,
+        0.09
+      ],
+      "dimensions": [
+        1.42,
+        0.52,
+        0.18
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_DoorBrace_0",
+      "location": [
+        3,
+        0.635,
+        0.48
+      ],
+      "dimensions": [
+        0.91,
+        0.06,
+        0.11
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_DoorBrace_1",
+      "location": [
+        3,
+        0.635,
+        1.48
+      ],
+      "dimensions": [
+        0.91,
+        0.06,
+        0.11
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_UpperOpening",
+      "location": [
+        3,
+        0.79,
+        3.7
+      ],
+      "dimensions": [
+        0.62,
+        0.2,
+        0.83
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_UpperSill",
+      "location": [
+        3,
+        0.72,
+        3.24
+      ],
+      "dimensions": [
+        0.85,
+        0.28,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_UpperLintel",
+      "location": [
+        3,
+        0.76,
+        4.17
+      ],
+      "dimensions": [
+        0.86,
+        0.28,
+        0.16
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_SideOpening",
+      "location": [
+        0.79,
+        3,
+        3.6
+      ],
+      "dimensions": [
+        0.2,
+        0.65,
+        0.82
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_SideSill",
+      "location": [
+        0.72,
+        3,
+        3.14
+      ],
+      "dimensions": [
+        0.28,
+        0.87,
+        0.13
+      ],
+      "material": "stone",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Axle",
+      "location": [
+        3,
+        0.63,
+        5.2
+      ],
+      "radius": 0.18,
+      "depth": 1.02,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Arm_0",
+      "location": [
+        3,
+        0.26,
+        6.67
+      ],
+      "dimensions": [
+        0.13,
+        0.16,
+        2.6
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_OuterRail_0",
+      "location": [
+        3.59,
+        0.26,
+        7.07
+      ],
+      "dimensions": [
+        0.1,
+        0.15,
+        1.79
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_0_0",
+      "location": [
+        3.295,
+        0.21,
+        6.24
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_0_1",
+      "location": [
+        3.295,
+        0.21,
+        6.640000000000001
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_0_2",
+      "location": [
+        3.295,
+        0.21,
+        7.04
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_0_3",
+      "location": [
+        3.295,
+        0.21,
+        7.44
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_0_4",
+      "location": [
+        3.295,
+        0.21,
+        7.84
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_0_0",
+      "location": [
+        3.3,
+        0.28,
+        6.44
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_0_1",
+      "location": [
+        3.3,
+        0.28,
+        6.84
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_0_2",
+      "location": [
+        3.3,
+        0.28,
+        7.24
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_0_3",
+      "location": [
+        3.3,
+        0.28,
+        7.640000000000001
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Arm_1",
+      "location": [
+        4.47,
+        0.26,
+        5.2
+      ],
+      "dimensions": [
+        2.6,
+        0.16,
+        0.13
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_OuterRail_1",
+      "location": [
+        4.87,
+        0.26,
+        4.61
+      ],
+      "dimensions": [
+        1.79,
+        0.15,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_1_0",
+      "location": [
+        4.04,
+        0.21,
+        4.905
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_1_1",
+      "location": [
+        4.4399999999999995,
+        0.21,
+        4.905
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_1_2",
+      "location": [
+        4.84,
+        0.21,
+        4.905
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_1_3",
+      "location": [
+        5.24,
+        0.21,
+        4.905
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_1_4",
+      "location": [
+        5.640000000000001,
+        0.21,
+        4.905
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_1_0",
+      "location": [
+        4.24,
+        0.28,
+        4.9
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_1_1",
+      "location": [
+        4.640000000000001,
+        0.28,
+        4.9
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_1_2",
+      "location": [
+        5.04,
+        0.28,
+        4.9
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_1_3",
+      "location": [
+        5.44,
+        0.28,
+        4.9
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Arm_2",
+      "location": [
+        3,
+        0.26,
+        3.7300000000000004
+      ],
+      "dimensions": [
+        0.13,
+        0.16,
+        2.6
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_OuterRail_2",
+      "location": [
+        2.41,
+        0.26,
+        3.33
+      ],
+      "dimensions": [
+        0.1,
+        0.15,
+        1.79
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_2_0",
+      "location": [
+        2.705,
+        0.21,
+        4.16
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_2_1",
+      "location": [
+        2.705,
+        0.21,
+        3.7600000000000002
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_2_2",
+      "location": [
+        2.705,
+        0.21,
+        3.3600000000000003
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_2_3",
+      "location": [
+        2.705,
+        0.21,
+        2.96
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_2_4",
+      "location": [
+        2.705,
+        0.21,
+        2.56
+      ],
+      "dimensions": [
+        0.76,
+        0.11,
+        0.075
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_2_0",
+      "location": [
+        2.7,
+        0.28,
+        3.96
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_2_1",
+      "location": [
+        2.7,
+        0.28,
+        3.56
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_2_2",
+      "location": [
+        2.7,
+        0.28,
+        3.16
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_2_3",
+      "location": [
+        2.7,
+        0.28,
+        2.76
+      ],
+      "dimensions": [
+        0.47,
+        0.055,
+        0.325
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Arm_3",
+      "location": [
+        1.53,
+        0.26,
+        5.2
+      ],
+      "dimensions": [
+        2.6,
+        0.16,
+        0.13
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_OuterRail_3",
+      "location": [
+        1.13,
+        0.26,
+        5.79
+      ],
+      "dimensions": [
+        1.79,
+        0.15,
+        0.1
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_3_0",
+      "location": [
+        1.96,
+        0.21,
+        5.495
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_3_1",
+      "location": [
+        1.56,
+        0.21,
+        5.495
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_3_2",
+      "location": [
+        1.16,
+        0.21,
+        5.495
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_3_3",
+      "location": [
+        0.7599999999999998,
+        0.21,
+        5.495
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Rib_3_4",
+      "location": [
+        0.3599999999999999,
+        0.21,
+        5.495
+      ],
+      "dimensions": [
+        0.075,
+        0.11,
+        0.76
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_3_0",
+      "location": [
+        1.76,
+        0.28,
+        5.5
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_3_1",
+      "location": [
+        1.3599999999999999,
+        0.28,
+        5.5
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_3_2",
+      "location": [
+        0.96,
+        0.28,
+        5.5
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Mill_Canvas_3_3",
+      "location": [
+        0.5599999999999996,
+        0.28,
+        5.5
+      ],
+      "dimensions": [
+        0.325,
+        0.055,
+        0.47
+      ],
+      "material": "sail",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_Hub",
+      "location": [
+        3,
+        0.16,
+        5.2
+      ],
+      "radius": 0.32,
+      "depth": 0.25,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Mill_HubCap",
+      "location": [
+        3,
+        0.036,
+        5.2
+      ],
+      "radius": 0.14,
+      "depth": 0.065,
+      "vertices": 8,
+      "smooth": false,
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "material": "stone",
       "parent": "Root"
     }
   ],
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 800,
+    "height": 800,
     "cameraLocation": [
-      11.0,
-      -13.75,
-      8.8
+      3.8,
+      -4,
+      3.4
     ],
     "cameraTarget": [
-      0,
-      0,
-      3.5
+      1,
+      0.8,
+      1.3
     ],
-    "orthoScale": 15.399999999999999,
+    "orthoScale": 4.1,
     "worldRole": "sky"
   }
 }

@@ -10,15 +10,19 @@
 // shared by every villager in the valley. Disposing a clone must not touch them.
 
 import {
-  AnimationMixer, Color, Group, type AnimationClip, type Material, type Object3D,
+  AnimationMixer, Color, Group, Mesh, type AnimationClip, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
 import type { Actor } from '../contracts';
 import type { LoadedAsset } from '../assets';
+import { actionClips } from '../action-clips';
+import { handTool } from '../hand-tools';
+import { modelFor } from './models';
 
 type Action = NonNullable<ReturnType<AnimationMixer['clipAction']>>;
 
 interface Player {
+  readonly model: string;
   readonly object: Object3D;
   readonly mixer: AnimationMixer;
   readonly actions: Map<string, Action>;
@@ -27,6 +31,8 @@ interface Player {
   /** Lo que lleva en la mano, por clip. Vacio si el catalogo no lo tiene. */
   readonly held: Map<string, Object3D>;
   playing: string | null;
+  previous: Action | null;
+  changedAt: number;
 }
 
 /**
@@ -40,6 +46,9 @@ interface Player {
 const HELD: Readonly<Record<string, { asset: string; hand: string }>> = {
   work_hoe: { asset: 'hoe', hand: 'hand_r' },
   carry_walk: { asset: 'bundle', hand: 'hand_l' },
+  hammer: { asset: 'hammer', hand: 'hand_r' },
+  chop: { asset: 'axe', hand: 'hand_r' },
+  drink: { asset: 'cup', hand: 'hand_r' },
 };
 
 /**
@@ -96,6 +105,7 @@ const CLOTH_LIGHT = 0.2;
 export class Cast {
   readonly group = new Group();
   private readonly players = new Map<VillagerId, Player>();
+  private readonly extraClips: AnimationClip[];
 
   /**
    * `prop` da una copia de una herramienta del catalogo, o `undefined` si no la
@@ -124,6 +134,8 @@ export class Cast {
     private readonly prop?: (id: string) => Object3D | undefined,
   ) {
     this.group.name = 'Valley_Cast';
+    const idle = asset.clips.find(clip => clip.name === 'idle');
+    this.extraClips = idle === undefined ? [] : actionClips(idle);
   }
 
   /**
@@ -153,6 +165,7 @@ export class Cast {
     for (const actor of actors) {
       present.add(actor.id);
       let player = this.players.get(actor.id);
+      if (player !== undefined && player.model !== modelFor(actor)) { this.retire(actor.id); player = undefined; }
       if (player === undefined) {
         const object = this.instance(actor);
         if (object === undefined) continue;
@@ -160,8 +173,9 @@ export class Cast {
         object.traverse((child) => { child.userData.villagerId = actor.id; });
         const mixer = new AnimationMixer(object);
         player = {
+          model: modelFor(actor),
           object, mixer, actions: new Map(), owned: dress(object, actor.id),
-          held: new Map(), playing: null,
+          held: new Map(), playing: null, previous: null, changedAt: 0,
         };
         this.players.set(actor.id, player);
         this.group.add(object);
@@ -172,7 +186,7 @@ export class Cast {
       // La talla se pone en cada pasada y no al crear: un nino cumple anos sin
       // dejar de ser el mismo actor, y tiene que ir creciendo.
       player.object.scale.setScalar(statureAt(actor.age) * (actor.named ? NAMED_TALLER : 1));
-      this.pose(player, actor.clip, actor.clipSeconds);
+      this.pose(player, actor.clip, actor.clipSeconds, actor.poseSeconds ?? actor.clipSeconds);
       this.equip(player, actor.clip);
     }
 
@@ -189,10 +203,10 @@ export class Cast {
    * same instant give the same pose, however many frames happened in between,
    * and a suspended tab that wakes up does not have to replay anything.
    */
-  private pose(player: Player, clip: string, seconds: number): void {
+  private pose(player: Player, clip: string, seconds: number, now: number): void {
     let action = player.actions.get(clip);
     if (action === undefined) {
-      const found = this.asset.clips.find((candidate: AnimationClip) => candidate.name === clip);
+      const found = [...this.asset.clips, ...this.extraClips].find((candidate: AnimationClip) => candidate.name === clip);
       if (found === undefined) return;
       const made = player.mixer.clipAction(found);
       if (made === null) return;
@@ -200,12 +214,20 @@ export class Cast {
       player.actions.set(clip, action);
     }
     if (player.playing !== clip) {
-      for (const [name, other] of player.actions) if (name !== clip) other.stop();
+      player.previous?.stop();
+      player.previous = player.playing === null ? null : player.actions.get(player.playing) ?? null;
+      player.changedAt = now;
       action.reset().play();
       player.playing = clip;
     }
+    const weight = Math.min(1, Math.max(0, (now - player.changedAt) / 0.22));
+    action.setEffectiveWeight(player.previous === null ? 1 : weight);
+    if (player.previous !== null) {
+      player.previous.setEffectiveWeight(1 - weight);
+      if (weight >= 1) { player.previous.stop(); player.previous = null; }
+    }
     action.time = seconds;
-    player.mixer.setTime(seconds);
+    player.mixer.update(0);
   }
 
   /**
@@ -218,8 +240,8 @@ export class Cast {
    */
   private equip(player: Player, clip: string): void {
     const wanted = HELD[clip];
-    if (wanted !== undefined && !player.held.has(clip) && this.prop !== undefined) {
-      const tool = this.prop(wanted.asset);
+    if (wanted !== undefined && !player.held.has(clip)) {
+      const tool = this.prop?.(wanted.asset) ?? handTool(clip);
       const hand = player.object.getObjectByName(wanted.hand);
       if (tool !== undefined && hand !== undefined) {
         tool.name = `Held_${clip}`;
@@ -242,10 +264,22 @@ export class Cast {
     // La ropa si era suya: se clono para el y se suelta con el. Lo que no se
     // toca es la geometria, que es de la biblioteca.
     for (const material of player.owned) material.dispose();
+    for (const tool of player.held.values()) if (tool.userData.ownedTool === true) tool.traverse(child => {
+      if (child instanceof Mesh) {
+        child.geometry.dispose();
+        for (const material of Array.isArray(child.material) ? child.material : [child.material]) material.dispose();
+      }
+    });
     // The clone's own nodes go; the geometry and the materials do not, because
     // they were never this actor's to free. Freeing them here would take the
     // rest of the village with the first villager who died.
     this.players.delete(id);
+  }
+
+  /** Posiciones de las mallas colocadas, para contrastarlas con sus cuerpos. */
+  snapshot(): { id: number; x: number; z: number; clip: string | null; weight: number }[] {
+    return [...this.players].map(([id, player]) => ({ id, x: player.object.position.x, z: player.object.position.z,
+      clip: player.playing, weight: player.playing === null ? 0 : player.actions.get(player.playing)?.getEffectiveWeight() ?? 0 }));
   }
 
   get count(): number {

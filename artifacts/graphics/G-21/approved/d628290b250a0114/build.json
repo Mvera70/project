@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "grave-yard",
+  "runId": "2026-09-16T20-39-10-308Z-40616",
+  "recipe": "art/recipes/grave-yard/grave-yard.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11548,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/candidate/grave-yard.blend",
+      "bytes": 103173,
+      "sha256": "01D3E41CCBAD2473FA75A9CDC774851D38B44104E6080DF32F6D1BF90C9B2B3E"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/candidate/grave-yard.glb",
+      "bytes": 68260,
+      "sha256": "D628290B250A0114938AEA22106C750C01E98BF054E6391B94F10A4C25B1FDE2"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/candidate/grave-yard-blender.png",
+      "bytes": 539219,
+      "sha256": "062DB1275F04C2719595EB89675A51D1985400EE1E7D222F6F803E9E82201143"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/blender.log",
+      "bytes": 1288,
+      "sha256": "B499F1CF21A64DE00CEC4561FCF338453D0524FFF3CDCAF6C2821A25A8999B8E"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T20-39-10-308Z-40616/temporary/resolved-recipe.json",
+      "bytes": 28295,
+      "sha256": "AC12AB8DEA95FC8F72B6EF4E237A5CFD4B85DF980CB3D6413892F0A58E23B5A3"
+    }
+  }
+}

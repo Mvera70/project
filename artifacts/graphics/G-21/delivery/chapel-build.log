@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all chapel
+
+Built chapel in artifacts\graphics\G-21\runs\2026-09-16T17-53-54-519Z-50956
+Validated chapel from run 2026-09-16T17-53-54-519Z-50956
+Reported and promoted chapel to artifacts\graphics\G-21\approved\ce20d06c0e4e32fc

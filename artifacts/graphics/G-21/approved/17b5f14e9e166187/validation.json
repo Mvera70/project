@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "assetId": "watchtower",
+  "runId": "2026-09-16T20-34-32-575Z-18856",
+  "status": "pass",
+  "durationMs": 2727,
+  "candidateSha256": "17B5F14E9E166187439C064F6E6E799F505C18959452B2F1727773BC7340CCF8",
+  "glb": {
+    "version": 2,
+    "declaredLength": 119384,
+    "nodeNames": [
+      "watchtower_dark",
+      "watchtower_roof",
+      "watchtower_stone",
+      "watchtower_wood",
+      "Root"
+    ],
+    "meshNames": [
+      "watchtower_dark_Mesh",
+      "watchtower_roof_Mesh",
+      "watchtower_stone_Mesh",
+      "watchtower_wood_Mesh"
+    ],
+    "materialNames": [
+      "dark",
+      "roof",
+      "stone",
+      "wood"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 5,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 1638
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T20:34:47.139Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-34-32-575Z-18856\\candidate\\watchtower.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/candidate/watchtower.glb",
+      "viewport": {
+        "width": 800,
+        "height": 1000,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-34-32-575Z-18856\\three\\capture-1.png",
+        "sha256": "829B5AB31F7274113EC5DD7E8D36F4ACFC9F1531C9C29B1DEFF0ED1FD84C78EA",
+        "dimensions": {
+          "width": 800,
+          "height": 1000
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-34-32-575Z-18856\\three\\capture-1-gray.png",
+          "sha256": "481252EA3105460035D57B7025008E17D0DA8F5D6DCCD863234F7B022690BB44",
+          "dimensions": {
+            "width": 800,
+            "height": 1000
+          }
+        },
+        "durationMs": 710,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:52833/artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/candidate/watchtower.glb",
+          "viewport": {
+            "width": 800,
+            "height": 1000,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "watchtower_dark",
+            "watchtower_roof",
+            "watchtower_stone",
+            "watchtower_wood"
+          ],
+          "bounds": {
+            "min": [
+              0.513275,
+              0,
+              -1.486725
+            ],
+            "max": [
+              1.486725,
+              2.75033,
+              -0.513275
+            ],
+            "size": [
+              0.97345,
+              2.75033,
+              0.97345
+            ]
+          },
+          "loadDurationMs": 134
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-34-32-575Z-18856\\three\\capture-2.png",
+        "sha256": "829B5AB31F7274113EC5DD7E8D36F4ACFC9F1531C9C29B1DEFF0ED1FD84C78EA",
+        "dimensions": {
+          "width": 800,
+          "height": 1000
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-34-32-575Z-18856\\three\\capture-2-gray.png",
+          "sha256": "481252EA3105460035D57B7025008E17D0DA8F5D6DCCD863234F7B022690BB44",
+          "dimensions": {
+            "width": 800,
+            "height": 1000
+          }
+        },
+        "durationMs": 119,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:52833/artifacts/graphics/G-21/runs/2026-09-16T20-34-32-575Z-18856/candidate/watchtower.glb",
+          "viewport": {
+            "width": 800,
+            "height": 1000,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "watchtower_dark",
+            "watchtower_roof",
+            "watchtower_stone",
+            "watchtower_wood"
+          ],
+          "bounds": {
+            "min": [
+              0.513275,
+              0,
+              -1.486725
+            ],
+            "max": [
+              1.486725,
+              2.75033,
+              -0.513275
+            ],
+            "size": [
+              0.97345,
+              2.75033,
+              0.97345
+            ]
+          },
+          "loadDurationMs": 34
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:52833/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=1000&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 147,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-34-32-575Z-18856\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "assetId": "field-leeks",
+  "runId": "2026-09-16T18-34-25-577Z-45756",
+  "status": "pass",
+  "durationMs": 4003,
+  "candidateSha256": "1FCE25E55B5500790E934F5CC08AF1DACE945FE0E8CBA1E7718C0D7FEB6EC123",
+  "glb": {
+    "version": 2,
+    "declaredLength": 158664,
+    "nodeNames": [
+      "field-leeks_leaf",
+      "field-leeks_soil",
+      "field-leeks_stalk",
+      "Root"
+    ],
+    "meshNames": [
+      "field-leeks_leaf_Mesh",
+      "field-leeks_soil_Mesh",
+      "field-leeks_stalk_Mesh"
+    ],
+    "materialNames": [
+      "leaf",
+      "soil",
+      "stalk"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 3,
+    "statistics": {
+      "objects": 4,
+      "meshes": 3,
+      "materials": 3,
+      "triangles": 2212
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T18:34:44.977Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-34-25-577Z-45756\\candidate\\field-leeks.glb",
+      "assetUrl": "/artifacts/graphics/G-22/runs/2026-09-16T18-34-25-577Z-45756/candidate/field-leeks.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-34-25-577Z-45756\\three\\capture-1.png",
+        "sha256": "96DBB4FFA2CB602020F7161DA20F861A2276A70EAD798120E6FF90F91690A89E",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-34-25-577Z-45756\\three\\capture-1-gray.png",
+          "sha256": "ABEE5A9B12F1D91DF6A2202D7F79B260595C9C83059A7E08AC69954D098F5AF5",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 1033,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:61911/artifacts/graphics/G-22/runs/2026-09-16T18-34-25-577Z-45756/candidate/field-leeks.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "field-leeks_leaf",
+            "field-leeks_soil",
+            "field-leeks_stalk"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              3,
+              0.366667,
+              0
+            ],
+            "size": [
+              3,
+              0.366667,
+              2
+            ]
+          },
+          "loadDurationMs": 135
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-34-25-577Z-45756\\three\\capture-2.png",
+        "sha256": "96DBB4FFA2CB602020F7161DA20F861A2276A70EAD798120E6FF90F91690A89E",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-34-25-577Z-45756\\three\\capture-2-gray.png",
+          "sha256": "ABEE5A9B12F1D91DF6A2202D7F79B260595C9C83059A7E08AC69954D098F5AF5",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 129,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:61911/artifacts/graphics/G-22/runs/2026-09-16T18-34-25-577Z-45756/candidate/field-leeks.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "field-leeks_leaf",
+            "field-leeks_soil",
+            "field-leeks_stalk"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              3,
+              0.366667,
+              0
+            ],
+            "size": [
+              3,
+              0.366667,
+              2
+            ]
+          },
+          "loadDurationMs": 32
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:61911/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 158,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-34-25-577Z-45756\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

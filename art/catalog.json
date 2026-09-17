@@ -464,511 +464,100 @@
     },
     {
       "id": "house",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/house/house.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T01-04-35-078Z-53368",
-        "directory": "artifacts/graphics/G-10/approved/8d974884b42d275a"
+        "runId": "2026-09-16T22-03-39-132Z-37876",
+        "directory": "artifacts/graphics/G-21/approved/3b29d1ed828f257b"
       },
       "bounds": {
         "min": [
           0,
-          0,
+          -0.0025,
           -2
         ],
         "max": [
           2,
-          1.566667,
+          1.580666,
           0
         ],
         "size": [
           2,
-          1.566667,
+          1.583166,
           2
         ]
       },
-      "recipeSha256": "54DFDF20149661624210E79B779132F15F8DA86E377759C294C056477D0E5588",
+      "recipeSha256": "CFD7FBAD91FBB7436C58E7614134937C87AC294F03CF5A21FBF28C3152D33888",
       "materials": [
         "plaster",
         "roof",
         "wood",
         "stone",
-        "window"
+        "window",
+        "door"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 6,
-        "meshes": 5,
-        "materials": 5,
-        "triangles": 88
+        "objects": 7,
+        "meshes": 6,
+        "materials": 6,
+        "triangles": 668
       },
       "hashes": {
-        "house.blend": "FD688E9748EC0AB5F7E241F98FBD63C273ACAD67B312A288B7C4F150C962748F",
-        "house.glb": "8D974884B42D275ACEAC63D73613E102150BEB0C362A3583CD0BB852BB934528",
-        "house-blender.png": "77BC4B4760993E2049D927DBC1887FD1A90EE19A376026E64E0CF903444FAA22",
-        "capture-1.png": "F92EE65A4A8EA1B00681CA19C51CD575EFF03EC4FB4EF96DD752F34A6BADED4F",
-        "capture-1-gray.png": "3254110FA219E87969A31898B8B51B06935CF8765E24D33C671F92323353AB89",
-        "capture.json": "94148B5E6EA843ED954C2B2D964C0B28AC4CBD590C8BBA1706C500860400C7AD",
-        "build.json": "BA455ECE069130FC814C991B8FD1CABA850C69FAF38845D5F04F5434A64E5E37",
-        "validation.json": "87D30D263808EFC36B1B9BF3C91D7062180F455AD9DB9CF44C2543B8E8D17225"
+        "house.blend": "EFDA15CFCE944FBB7DC84A30C5CFB8183F00236C8024BA10A7595E02F0D84457",
+        "house.glb": "3B29D1ED828F257B5630A38D142881E1EED4113B51D296817FF132ECBAAB4325",
+        "house-blender.png": "0651C708737C26AEA6359CD755E10945FCA0632A49E5ED82BA909E1745764D8C",
+        "capture-1.png": "9579B8A34AADEF2E37EED01E00516F4B322FAFAFD1DEC69EB173A6BEA7BB2AD2",
+        "capture-1-gray.png": "806378EB8A25F5DA60CCA345B507DC1FD257575E36CB58F6EC079A39E063E1B4",
+        "capture.json": "FDB990F1B2578D6D3C4B035DDABACE0DCB3D3E5E40C84DDF597516C0E146FC9E",
+        "build.json": "5F9ABCCD566CF23125181D2525AECC2461EAFA55F10F625112CC9AC2DB2194C2",
+        "validation.json": "D2077AC41ACA2EC6B268962E5DE253A23B8B0B3F6EEBC3B22A278C02A04AAE5C"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original house authored for The Valley G-10",
+        "source": "Original G-21: casa de paja low-voxel, contrato de parcela y ventanas de G-10 conservado.",
         "license": "Project original"
       }
     },
     {
       "id": "granary",
-      "artifactRound": "G-10",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/granary/granary.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-04-24-036Z-40080",
-        "directory": "artifacts/graphics/G-10/approved/4ca8f8ef337ef8eb"
+        "runId": "2026-09-16T17-46-45-051Z-43184",
+        "directory": "artifacts/graphics/G-21/approved/0d35c7e1b2a0801a"
       },
       "bounds": {
         "min": [
-          0.033333,
+          0.015,
           0,
-          -1.966667
+          -1.983333
         ],
         "max": [
-          1.966667,
-          1.733333,
-          -0.033333
-        ],
-        "size": [
-          1.933333,
-          1.733333,
-          1.933333
-        ]
-      },
-      "recipeSha256": "9EAB19A7E96E0A3C94E84C424ECEC629959AA75C39A2C65324C867938196D0F0",
-      "materials": [
-        "wood",
-        "roof",
-        "grain"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 112
-      },
-      "hashes": {
-        "granary.blend": "11CBA6A6B308189A46342257857CDDAB03D67A63B85717B6D609BEC729544BF9",
-        "granary.glb": "4CA8F8EF337EF8EB7BF88A05DF2C778CE1328AAAEBF53200BDD0A9A9966BD8AD",
-        "granary-blender.png": "1412EDDF549B342ADAECDC24EEA76936B37CA4A4C0C2CE990001D22DC6472968",
-        "capture-1.png": "C4AC4857919EE73157D58BF4FA9071F56286DFAE91650997F97E2972AA095814",
-        "capture-1-gray.png": "9FD6B621CC0BB5CBC78AA8912DC548511A8C1648485DE5571577FB0E5D0DBD58",
-        "capture.json": "CF2C3A54C79314371E6CAED46C7EF5D6D286DAA315C32AB3DFF216619750A0C3",
-        "build.json": "BCB027711A58B996E0EC3D3D163C927D0FA11E53DA6381B2D44CE304D3A0E12F",
-        "validation.json": "43DE4265076C85B4A28B75F833FCC7C9AC64740B7ED52BE1BA8C357CCE04578E"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original granary authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "mill",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/mill/mill.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-05-14-326Z-50220",
-        "directory": "artifacts/graphics/G-10/approved/3e23d151263a6745"
-      },
-      "bounds": {
-        "min": [
-          0.066667,
-          0,
-          -1.833333
-        ],
-        "max": [
-          1.933333,
-          2.666667,
-          -0.083333
-        ],
-        "size": [
-          1.866667,
-          2.666667,
-          1.75
-        ]
-      },
-      "recipeSha256": "870FAE8E1D760B9FB503B3112441EDC8D285B1A0C5C0F75F20A1F11911979A8A",
-      "materials": [
-        "stone",
-        "roof",
-        "wood"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 90
-      },
-      "hashes": {
-        "mill.blend": "7858A114EA5AE7216A2C8F5D9EDBCE04F09881D83EC7F2DB34A5D842F984CD3A",
-        "mill.glb": "3E23D151263A67452FE183CDAB5EC2DBA9D278E4D8BC3E36E0F676EE0BAF9E00",
-        "mill-blender.png": "6F4B5538C2DFB573ACD2DFF556B18E93E70EC0B1A2B749620C4A7BEB2E91A695",
-        "capture-1.png": "0093D182C6F9556C3C098979A7F83BE728927AAD517457709F0E0114530368E6",
-        "capture-1-gray.png": "2EEB0A677FECD99BEC63094569BD05225ADC7258B87E688D2FC8C7E603F63E4C",
-        "capture.json": "9E5F5A8B2985CBF339732CB1B770355753A73A1512BDAA9E4EFE9EBA38BB7276",
-        "build.json": "7890F4F560264345DD9CFD8631A638FD8864D5D615F80D25FCCD4D38BBAB614E",
-        "validation.json": "E1A5CFFCD3AF04520ACA5C98109BD9CC2BD87050DB20DCA85E3245B920460718"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original mill authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "smithy",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/smithy/smithy.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-04-31-790Z-40148",
-        "directory": "artifacts/graphics/G-10/approved/88982d4e2d28e6a9"
-      },
-      "bounds": {
-        "min": [
-          0,
-          0,
-          -1.933333
-        ],
-        "max": [
-          2,
-          1.4,
-          -0.066667
-        ],
-        "size": [
-          2,
-          1.4,
-          1.866667
-        ]
-      },
-      "recipeSha256": "9C7662749EF1253089E8A1F29857625BC9C6CE4EA71C867B04D697687623682B",
-      "materials": [
-        "stone",
-        "roof",
-        "dark"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 52
-      },
-      "hashes": {
-        "smithy.blend": "80F230391ADAF3AB2ED2769525AB3C7C79702D6D90CA1722DEA5300F3ED75D20",
-        "smithy.glb": "88982D4E2D28E6A92E90E85C201AD731FDFBDF0801466495FCCD18B62489C63B",
-        "smithy-blender.png": "5BA46F86C4FA33004550DE81F765294E7FCAC590C6A97CB8CA9B518CE20EA43A",
-        "capture-1.png": "C5DE75616443216FFF3D52A5A7D65F6DCA5D582FF5D5404D9D937D15BB28B938",
-        "capture-1-gray.png": "1B9CDBDE40761EA3E360E3A3020599331650CEB4610FF4FA07BFD02CBD12BAC4",
-        "capture.json": "BA62CAF51C3F0DD91CEAF5BF53B50189E685501B6D9620CBC8F15FB1035F7376",
-        "build.json": "220833866DD84563D718F741243710D326547C50F478D5E855264BA477052544",
-        "validation.json": "DC6C8040A3C0442BE27D44A1F7D04B7AB83D378637F03F6052C846AE2ABCC4EF"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original smithy authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "chapel",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/chapel/chapel.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-04-38-716Z-45296",
-        "directory": "artifacts/graphics/G-10/approved/be38606b095c0ff6"
-      },
-      "bounds": {
-        "min": [
-          0.2,
-          0,
-          -2
-        ],
-        "max": [
-          1.8,
-          2.1,
+          1.985,
+          1.765,
           0
         ],
         "size": [
-          1.6,
-          2.1,
-          2
+          1.97,
+          1.765,
+          1.983333
         ]
       },
-      "recipeSha256": "B0C2421A7416763E1EC185CE6F3CF29CD47742D219C50B3C14F8AB4E8A74E2E2",
-      "materials": [
-        "stone",
-        "roof",
-        "wood"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 56
-      },
-      "hashes": {
-        "chapel.blend": "B7EE8C05EC5B80256551A751153D1DDAEFC6610224BB21BA55E8B21E88D49441",
-        "chapel.glb": "BE38606B095C0FF6A1259C42C627DF450D16C99717E1C0D400BA72638DA61059",
-        "chapel-blender.png": "E94EA8DA02369722EC8CA17823CEF50E245E0FB7025EC400DA90048EC05E031D",
-        "capture-1.png": "E2C21AE08A4E7F93C2FBB9E02431BC63AD669052D33A278092411D476BCD8A86",
-        "capture-1-gray.png": "A74D9A09C47F7692A530B1122A3180712B756BEA6D1CF4CA1F6CBC82C6829DD1",
-        "capture.json": "2CCA037A4C76946E9EDC61C1400792CCD0FD07337ADE5822E5F17269F9A4CA71",
-        "build.json": "2BB3749D875BE7F8D359A56D6401F65661F487FE38E3C149785E68B283085ABC",
-        "validation.json": "B3F10328D9EFA9B8FF9076A2A7DB64CCB030FDE495A406A93578FA2818005099"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original chapel authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "church",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/church/church.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-05-21-257Z-33532",
-        "directory": "artifacts/graphics/G-10/approved/4c1e58b6db255985"
-      },
-      "bounds": {
-        "min": [
-          0.1,
-          0,
-          -2.266667
-        ],
-        "max": [
-          1.9,
-          3.716667,
-          0.3
-        ],
-        "size": [
-          1.8,
-          3.716667,
-          2.566667
-        ]
-      },
-      "recipeSha256": "B40E627EAD9FFE5935FACD62D14E3D6A28B1A1B07C90492FAF7264ABE0148F81",
-      "materials": [
-        "stone",
-        "roof",
-        "wood"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 74
-      },
-      "hashes": {
-        "church.blend": "B6DE3DA7D528DA8744A79E423A05D14A5540F114FFF877F38EEE00ABBEDC2B97",
-        "church.glb": "4C1E58B6DB2559854C445EAE32590CD7BD0B27CD12C261A027712395941AFB9C",
-        "church-blender.png": "F63F726FD51175E9C14F74AD6467A55B0D752BC534E9B33287F51C4ED8F9AD4B",
-        "capture-1.png": "27311384718FE592AE83E0599A11FCD4E64197903DE178205F2209DAC3229E83",
-        "capture-1-gray.png": "6ADABF7250B34A5AEE6E874371B32EE92352FFDC6EE7689431AEFBF9F2D9B48E",
-        "capture.json": "8475E8812CC8253B225F56848BED954B2B306B0D56FA7A51A1EC1D72113C368B",
-        "build.json": "518C87EE84CDED6929755E3527366BD86245F1DED1857284A65D0F410F35328E",
-        "validation.json": "37D06AC18B965D247511B9FD1615B281664E5702AB0F334F0938896FFB6C36D6"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original church authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "well",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/well/well.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-05-28-268Z-28368",
-        "directory": "artifacts/graphics/G-10/approved/c6cb07df6b06c9d8"
-      },
-      "bounds": {
-        "min": [
-          0.230534,
-          0,
-          -0.833333
-        ],
-        "max": [
-          0.769466,
-          1.033333,
-          -0.166667
-        ],
-        "size": [
-          0.538932,
-          1.033333,
-          0.666667
-        ]
-      },
-      "recipeSha256": "70ABAB496FA7DFC6A6A256B4A306290D56DCC2E3D304A5372FEBBB0D578C1661",
-      "materials": [
-        "stone",
-        "wood",
-        "roof"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 84
-      },
-      "hashes": {
-        "well.blend": "DC3E3C3081201D6AC4F793A12F2BA65D813D267A4ACE3589E09C3E9D890DF08D",
-        "well.glb": "C6CB07DF6B06C9D879F7F689C88DF73ABE275B96D764EEB4F75E1F6E6754C7D1",
-        "well-blender.png": "80861C39ABB47C934EB987CA9537C051BE0BD5246A8E5F2AAE8C5AACF37A305D",
-        "capture-1.png": "6530C30F1D9602D94EBABA5AD9DC23B03A990075E3BFA59EE25EAC1F78A0D233",
-        "capture-1-gray.png": "DDB5CD6F1DA388CF18DD5ECA4D1921326BE3841D966A5E1BCB01A9A1443FAA3F",
-        "capture.json": "A82E12EBDA4071C0D8DD632D9AD612B81293BA3A2A94A2DAF42AEBDE93B90C80",
-        "build.json": "6E743CCF1B77EDC769EABBBA3113BCFBF934FF57225DE07E0339E7FE9AE88ED3",
-        "validation.json": "8B640BB4B62012ED38E125116BBACFF22C3B28F8F5512CAB143E0AF16B4A104E"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original well authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "shed",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/shed/shed.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-04-47-343Z-53004",
-        "directory": "artifacts/graphics/G-10/approved/b2974decd482d81b"
-      },
-      "bounds": {
-        "min": [
-          0.033333,
-          0,
-          -0.966667
-        ],
-        "max": [
-          0.966667,
-          0.9,
-          -0.033333
-        ],
-        "size": [
-          0.933333,
-          0.9,
-          0.933333
-        ]
-      },
-      "recipeSha256": "3ACDB1770A4BF4847E01536221474BD9AA612D3C2000905DBA542CEEA544769B",
+      "recipeSha256": "AF6C5A087B3CBB4BE00C032A901460FE692E311A908BCF08E50B12E12A75CA5B",
       "materials": [
         "wood",
-        "roof"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 20
-      },
-      "hashes": {
-        "shed.blend": "F3FAA08747CC27EB527CF046AF030D134C75FA01A5E4E488CCFDCF3EA4942771",
-        "shed.glb": "B2974DECD482D81BCD0277898073F007520480C39CE7F5ED111A25FFDA4B9E49",
-        "shed-blender.png": "EFB04FB6462EE3CC3ADDE8770F0427EAE5AC94933EF119398009A8CAA96C3412",
-        "capture-1.png": "720EEF7E6F42B233C41735914043825E3A7C59F87535AB6964A0FD894B151C50",
-        "capture-1-gray.png": "823E89E2EF3576C826F893C0F3654118B9BC42B7BBF2BC30A3E016C6FFC7C9A7",
-        "capture.json": "EFA67E052F0DC24A4709BA53BB49052599DED636EA8F57D14895786E9B1DB6A2",
-        "build.json": "903AC4783AE3AC5D074EFB5B22CCE7080B2326C36931CCA5CDBECDB24158BEA9",
-        "validation.json": "B83EEB654167B47CA1893C03989E66E3DA95655B4BD2C849E46B66A1FBFACC28"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original shed authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "stone-house",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/stone-house/stone-house.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-11T01-04-40-656Z-26124",
-        "directory": "artifacts/graphics/G-10/approved/8c71b136695b4859"
-      },
-      "bounds": {
-        "min": [
-          0,
-          0,
-          -2
-        ],
-        "max": [
-          2,
-          1.533333,
-          0
-        ],
-        "size": [
-          2,
-          1.533333,
-          2
-        ]
-      },
-      "recipeSha256": "0803AC0DF1901440E7647A520EABD786B95A26630F9FB5A11720BB17FE444512",
-      "materials": [
-        "stone",
         "roof",
-        "wood",
-        "window"
+        "frame",
+        "stone"
       ],
       "clips": [],
       "motion": [],
@@ -977,286 +566,357 @@
         "objects": 5,
         "meshes": 4,
         "materials": 4,
-        "triangles": 88
+        "triangles": 1220
       },
       "hashes": {
-        "stone-house.blend": "7CC3965FA116B2ADE4619A97E30196793B0F56D2E398DB5C86AB6F89DEC4BB5C",
-        "stone-house.glb": "8C71B136695B48593CF33303C3091F361944B66A338AF90EF9E30036FF62BE22",
-        "stone-house-blender.png": "2D640D1B446D0EE83E6A8CCB41EC883C25379CC01FC6D05E06607A6BC902DDB2",
-        "capture-1.png": "AB2A4E2A3DD12AF4EBD27A106BEDE7726A188C643A35F297B019E6F182526323",
-        "capture-1-gray.png": "28EF0B75F8873D224F8F799A1760DF8EA9218F6B4EA4F8DB7CBB44267E1752E1",
-        "capture.json": "5EA26F58EDA69191A71BEF3ADA8E0DC97421783AC56B386794172C07EFD4BEB1",
-        "build.json": "C88BC94A6322ABCD6B6CCE8490BD35A1FCB6A776259B0B6839F99F99C4833F13",
-        "validation.json": "2C91147597E5F83B22B7FEC6F163949A9996C3522B548C1EA2195B453A9774AE"
+        "granary.blend": "52B86C9DDE72B3FBFB362968B9B8D0458E523F924AE679A7FD9A4DBDF99952B6",
+        "granary.glb": "0D35C7E1B2A0801A963F15CEB634D76A020B53506422BC80725B26FE0162283A",
+        "granary-blender.png": "B8D367660A040E0CE67AD0366DD0CBDDFC1CBBED138865EBFB854435A5853ADC",
+        "capture-1.png": "7C0EC72E8E13552F1E48566E973687211FDFD50065A259A3D83CA783BFEBEB87",
+        "capture-1-gray.png": "794B7146B1D1778B925590519348F64BAF1171C4EFB128A698E66508C9171381",
+        "capture.json": "EC1CE626BA4067E7EBC4CC8AA33F33CBF4AF1DE8C94BE0BD14C9104B0D1C533E",
+        "build.json": "FE176C2104122966E184CA70FF5EF011BAF84E090819394CCBF49A4279BEB674",
+        "validation.json": "63D5A498950BCABD8F0B82F2852812C3DD17348A3F89B2102D193E3BAB098CD6"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original stone-house authored for The Valley G-10",
+        "source": "Original G-21: granero elevado de madera, portón doble y cubierta de paja.",
         "license": "Project original"
       }
     },
     {
-      "id": "field",
-      "artifactRound": "G-10",
+      "id": "mill",
+      "artifactRound": "G-21",
       "status": "study",
-      "recipe": "art/recipes/field/field.json",
+      "recipe": "art/recipes/mill/mill.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-34-296Z-53056",
-        "directory": "artifacts/graphics/G-10/approved/62ed547480f85701"
+        "runId": "2026-09-16T17-04-10-583Z-48892",
+        "directory": "artifacts/graphics/G-21/approved/2aad24fd4802a4a1"
       },
       "bounds": {
         "min": [
+          0.076667,
           0,
-          0,
-          -2
+          -1.833333
         ],
         "max": [
-          3,
-          0.166667,
-          0
+          1.923333,
+          2.656667,
+          -0.001167
         ],
         "size": [
-          3,
-          0.166667,
-          2
+          1.846667,
+          2.656667,
+          1.832167
         ]
       },
-      "recipeSha256": "CBA2C13FF3B2FA7865242A223B475C2A7198F77E716643EABBD8BC4F74BF3287",
+      "recipeSha256": "796A56B9CB8A14133CC9F2E3950A858030868AC6B9248DC11B49B7152E527A43",
       "materials": [
-        "soil",
-        "grain"
+        "stone",
+        "roof",
+        "wood",
+        "sail"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 72
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 966
       },
       "hashes": {
-        "field.blend": "00FFA228B83FCD2F1B120D11A0FF5BF3D0C29043DE74BE153CE70E3B5E068C1A",
-        "field.glb": "62ED547480F857018D649435697C0FE9F44EF6BDC146FA4FC9050BE1D0A2BC67",
-        "field-blender.png": "54DEF3181533550B7639A8CC26217163BD37C330563077071602E585929529D1",
-        "capture-1.png": "BA4EDEADD02A36D0FC5139C638ED9161ED2F0C70FBD39FD5E623EF971E2D55A7",
-        "capture-1-gray.png": "0FA620284788B8C5ACD78E4A71B81178547F834CCB327213B168D944D5FA93C5",
-        "capture.json": "9E5D18BD7FF4C1391EDCE0C0EFE2385870175B1F49710560B168F663C793C10E",
-        "build.json": "ECBE41D4EF78A162E1E239EC2DA256DC3663B28CAB5D04C27E2ABD4DBE2DC1A5",
-        "validation.json": "3127AF640A96AF2C27ED8E493E8968F56ADE926A8DCF830A05FD1951CC614CF7"
+        "mill.blend": "2F8984BD8EF63382F3DE2C12134DDE5FE6F31FFB2CC8087159F324EBAC6B70B1",
+        "mill.glb": "2AAD24FD4802A4A1B748430EE1FF01B9B2AE08E9A60C93309285179CAEA157A4",
+        "mill-blender.png": "28F5ADAD57A68BF19F7B0D74455CED8BFC1C74EF393FD429624789E2E207C231",
+        "capture-1.png": "5ED45324F7DAF7B9E780CF432C0CB39F39305E492ECADA9B0A088A75EB60465A",
+        "capture-1-gray.png": "85777AE878AEA945598FAEB1288D7E7D673D02E8388E3662618AF654645E561E",
+        "capture.json": "50B80759A32BEEED712868E18F9650130A71B8B4AE31CAF9897410768BCA772E",
+        "build.json": "20E2199A1AC912A3812FEB852AD65E2DE68F58C02368D6F33304936712FF69C4",
+        "validation.json": "F794B9EE5BB405C93D75C645A96E75E3EEFE35C297B44DAD1E2FEC20A9039ADA"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original field authored for The Valley G-10",
+        "source": "Original G-21: molino facetado con cuatro aspas de bastidor y paños de paleta común.",
         "license": "Project original"
       }
     },
     {
-      "id": "field-cut",
-      "artifactRound": "G-10",
+      "id": "smithy",
+      "artifactRound": "G-21",
       "status": "study",
-      "recipe": "art/recipes/field-cut/field-cut.json",
+      "recipe": "art/recipes/smithy/smithy.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-41-310Z-52588",
-        "directory": "artifacts/graphics/G-10/approved/29100c79fbf74ca6"
+        "runId": "2026-09-16T17-22-18-021Z-40400",
+        "directory": "artifacts/graphics/G-21/approved/bb1cb2fc6312c38c"
       },
       "bounds": {
         "min": [
+          0.001667,
           0,
-          0,
-          -2
+          -1.958333
         ],
         "max": [
-          3,
-          0.073333,
-          0
+          1.998333,
+          1.404167,
+          -0.06
         ],
         "size": [
-          3,
-          0.073333,
-          2
+          1.996667,
+          1.404167,
+          1.898333
         ]
       },
-      "recipeSha256": "45AE24294D7225661EAC81616CD26451D3535CE336DDC898401A1C326280428B",
+      "recipeSha256": "620AF34B8E2ABCD5E9D04E46E13DC757AC7EEEC8D4DEFF8EEEB175C62947FC3A",
       "materials": [
-        "soil"
-      ],
-      "clips": [],
-      "motion": [],
-      "connectors": [],
-      "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 72
-      },
-      "hashes": {
-        "field-cut.blend": "22630904FF705ABA71490B1A863DBEC886ADB454716575C9602E731DF04C17F0",
-        "field-cut.glb": "29100C79FBF74CA646909A650113EDCBC1B079FBDD61D7ECC4BEEB35013FFE58",
-        "field-cut-blender.png": "85C3E6386AAD51922753CD6347AA2A70EB7BED41D4F965CDFE3A0BF783B0A786",
-        "capture-1.png": "3F820BD9930DA65EA2058070B520426CC3A9F78C1FCEFCDBECDDA18B01FE6D62",
-        "capture-1-gray.png": "76D9467533E495A24AA9DEEC6F4BF08A51530F61143BC7585C4D175FA841BB38",
-        "capture.json": "E1AD564180392EB64ADF6F62A0DA3DE2A050BB99E024B4B901E4ADCDB8A5D2E9",
-        "build.json": "0EE703B904634DA323A800E771888C3FCCCDB0ADB118E209AD6E9F1AC9D7DB76",
-        "validation.json": "E8448CDB2F56FBC9150D79BE871B662FE046194F976D9D4E4111560D155CEDEE"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original field-cut authored for The Valley G-10",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "palisade",
-      "artifactRound": "G-10",
-      "status": "study",
-      "recipe": "art/recipes/palisade/palisade.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-10T23-15-48-379Z-52660",
-        "directory": "artifacts/graphics/G-10/approved/49c65821cca0ad0a"
-      },
-      "bounds": {
-        "min": [
-          0,
-          0,
-          -0.573333
-        ],
-        "max": [
-          1,
-          0.8,
-          -0.426667
-        ],
-        "size": [
-          1,
-          0.8,
-          0.146667
-        ]
-      },
-      "recipeSha256": "7903871E3ADD9D34894790888691383045F82A7E65C7A3B25D6868ACE5130A08",
-      "materials": [
+        "stone",
+        "roof",
+        "dark",
         "wood"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 72
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 894
       },
       "hashes": {
-        "palisade.blend": "B4694522FC2DA174D4EBF48A0B486D7BBCDE7C4DA940E72C953AFDFAC015BA5B",
-        "palisade.glb": "49C65821CCA0AD0A505854DD56B0EF420A89F6F4141970A7B3486B3E20F9B133",
-        "palisade-blender.png": "9CC42BBFCFC04DEDE8497CA920EA9233280FCB4CA2A44A64B53F5698962C45AB",
-        "capture-1.png": "6A934E6EFAC23F8DE686C519F66B3B9C58A44061A206266BB5F247F4C1AE5448",
-        "capture-1-gray.png": "3798E736AE81C28AFE4F807CAC415B3A08B0F4F9A9B976AE5AF119B6D57ED3C5",
-        "capture.json": "987BD10A33E62B1F8E42674D00E12BDBB473DAA52135134830010B538DE770A7",
-        "build.json": "F91A70D1F126867B398F1ADD8F48FBB2E7B2D1FE5043C8B30AFDEEA5D689860B",
-        "validation.json": "27DB15B48778881ABF6C0E12EA00EDB2278BC2663AB99A082174C9903FDAE5EA"
+        "smithy.blend": "902D988C72F74B7D080B344D5ABFC48070842D35EAB8EAE87FFA006798D95731",
+        "smithy.glb": "BB1CB2FC6312C38C3F5B61F9B0E6F7BA81797B5A446816AED00F8D77773DBC5F",
+        "smithy-blender.png": "0FF6BB7AF2D3456BFD87D4D2B825E241641A5238797B3663AED820C98B4714B5",
+        "capture-1.png": "E32082CCECA4DE57A33CF4E3223A55D239D3251B0C631F0AA586953D120971FB",
+        "capture-1-gray.png": "87414E95AD0F7B7443A1D610175975EED5DD414EC82F163DDDC03451E5D62BC3",
+        "capture.json": "0017CF8DDF873E860C162E27B6D263596536EFA2BED1DDFAB92B0078370DE4BD",
+        "build.json": "329EAB4266DC3A05343FE68DA3CAB30A3A923D6A03570C5EDA9949EB2B32D00D",
+        "validation.json": "1D9382105C4153F1B5D5E048588B6C03996C97BD46CACF9C796EF4962B807CEF"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original palisade authored for The Valley G-10",
+        "source": "Original G-21: herrería abierta, tejado de teja, fragua y yunque de formas facetadas.",
         "license": "Project original"
       }
     },
     {
-      "id": "wall",
-      "artifactRound": "G-10",
+      "id": "chapel",
+      "artifactRound": "G-21",
       "status": "study",
-      "recipe": "art/recipes/wall/wall.json",
+      "recipe": "art/recipes/chapel/chapel.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-15-55-432Z-29576",
-        "directory": "artifacts/graphics/G-10/approved/93067586949fabcd"
+        "runId": "2026-09-16T17-53-54-519Z-50956",
+        "directory": "artifacts/graphics/G-21/approved/ce20d06c0e4e32fc"
       },
       "bounds": {
         "min": [
+          0.183333,
           0,
-          0,
-          -0.683333
+          -2
         ],
         "max": [
-          1,
-          0.875,
-          -0.316667
+          1.816667,
+          2.1,
+          0
         ],
         "size": [
-          1,
-          0.875,
-          0.366667
+          1.633333,
+          2.1,
+          2
         ]
       },
-      "recipeSha256": "8C694D80C19639F15173B29FF3BDE2C5A29F1CFDCBB4C563909DB6CE117E8054",
+      "recipeSha256": "CCC8D5C116E5FC4A5C17B1225BE3FE1F08B755C7338D77CDDB895FBD7879C8F3",
       "materials": [
-        "stone"
+        "stone",
+        "roof",
+        "wood",
+        "dark"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 36
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 776
       },
       "hashes": {
-        "wall.blend": "9B4E00D3DA788D262432A286FEF9E76FA27C7E8C694A3C6EF8B6C422D79F955C",
-        "wall.glb": "93067586949FABCDC849983A14175FF2D81818480D226ABA5290018816B431BF",
-        "wall-blender.png": "4D61B55C7F24E64ED76B1FB7B50EDB1DDFA6E39CD9D51C05C02C93D1CFF64B58",
-        "capture-1.png": "83E90F28112AE9972C5171AAB31A1B80FE4228DD8F1327B9B2B4BFE3C1FC5FBB",
-        "capture-1-gray.png": "F39761ACF36A6ABB510CA7687798DE037189C4123096EB4D6B5B468D7A9FC423",
-        "capture.json": "1A807BAF0F8C4A943E99B8E53FF63D8B8AC8112CEBC86FD439ED8A6F863FF550",
-        "build.json": "559A7E52CCB8A84823411CC43367BEE4232CED71EA4DFCB5A3C0177135D64E23",
-        "validation.json": "42BF23E7B4ED428ED94ECA28054D2E608B35BB97F3802DED966816AFC3A195E3"
+        "chapel.blend": "9AA3C2F942F32BCB22E6515FB74F60E31997B6F5A4CFC33498C1F3E446890ADD",
+        "chapel.glb": "CE20D06C0E4E32FCC1BC43F3AB95B9EC4E627EA6E10780B9CC386CAFC43B2398",
+        "chapel-blender.png": "F8D4A41E6717212F6BA85975F0A3743547204C37AB79151C7954A327066C8004",
+        "capture-1.png": "0D628101C66287D07A6967F9E9F3E759DC6792EAECEE1ECB9F75CE5B2FF20D88",
+        "capture-1-gray.png": "FC7E84D9E02261352E7D16077FCB72F1252164E19F7AF4449413B104BB94637B",
+        "capture.json": "EAAB20E36AB884C1DC6B70210650E117FD1A5394568B51D528F995A3F1B3E429",
+        "build.json": "A70FAC8B5E6482BB7A5C680433521953D109F05611CC70BB70507AD6A6F24535",
+        "validation.json": "4510FA8D2F1FA888083FB501E12A57697A4920A30C4E318690693AC30812EF90"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original wall authored for The Valley G-10",
+        "source": "Original G-21: capilla con espadaña, campana, contrafuertes y portada de piedra.",
         "license": "Project original"
       }
     },
     {
-      "id": "watchtower",
-      "artifactRound": "G-10",
+      "id": "church",
+      "artifactRound": "G-21",
       "status": "study",
-      "recipe": "art/recipes/watchtower/watchtower.json",
+      "recipe": "art/recipes/church/church.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-16-02-541Z-30548",
-        "directory": "artifacts/graphics/G-10/approved/d16c6cda3ae329be"
+        "runId": "2026-09-16T18-02-14-568Z-40260",
+        "directory": "artifacts/graphics/G-21/approved/92b8dbffc1221461"
       },
       "bounds": {
         "min": [
-          -0.133333,
+          0.078333,
           0,
-          -1.133333
+          -2
         ],
         "max": [
-          1.133333,
-          2.75,
-          0.133333
+          1.921667,
+          3.716667,
+          0
         ],
         "size": [
-          1.266667,
-          2.75,
-          1.266667
+          1.843333,
+          3.716667,
+          2
         ]
       },
-      "recipeSha256": "F24D2652A08C9B9A8B6E5AD2992B07865DE47D6E9130B8C0E1A7F347138F0BA4",
+      "recipeSha256": "62BCF27C10E9536E629454D23A1FF0EF6683F84BFF2D6D41E21EB677A332704C",
+      "materials": [
+        "stone",
+        "roof",
+        "wood",
+        "dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1230
+      },
+      "hashes": {
+        "church.blend": "9F21AB980BC5CFEF4A8420FECC8655C9053E77ACF14B1D5D7E4839F6D4CD3855",
+        "church.glb": "92B8DBFFC122146175E12944630D8170678078D3DBC661DDC46761E5560A6AB1",
+        "church-blender.png": "675D4C118048C40C8C9B8B7EA4B66B98C6AB34C4564630CEC9B84219B1220AC0",
+        "capture-1.png": "541A4D860AD17974908A6B5864EEAD70F69AD290EF3DD2D1387111DFF4F6547F",
+        "capture-1-gray.png": "C92B8E9C29E18136ED382DD3F232EA3A5E3EF51336929D0704F69111D0059410",
+        "capture.json": "D1410BB9F4C4CB99B90220074621E8C810A83B2CF080B12B27CD44A69D4864E7",
+        "build.json": "D500F20FA0792B48F8B310F526488829FE256258C99625B8733C75A6C427A02B",
+        "validation.json": "8EF3BF607A6B9FC56D4E1246BAAF9CA9D20A455F58E100BDC27E43732E5F4705"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: iglesia de piedra con campanario abierto y chapitel cuadrado.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "well",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/well/well.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T18-09-35-894Z-28336",
+        "directory": "artifacts/graphics/G-21/approved/a07afdc2d123322b"
+      },
+      "bounds": {
+        "min": [
+          0.128333,
+          0,
+          -0.9
+        ],
+        "max": [
+          0.952667,
+          1.033333,
+          -0.1
+        ],
+        "size": [
+          0.824333,
+          1.033333,
+          0.8
+        ]
+      },
+      "recipeSha256": "815DF7052F7338B286EF8D6274BE8CC4559302F2ED80A6271AD96DA48A9AB73C",
       "materials": [
         "stone",
         "wood",
-        "roof"
+        "roof",
+        "dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1108
+      },
+      "hashes": {
+        "well.blend": "894835732C2FFAD80F1AEBB691D84E21F4AE721C996787F8C74D63E6CA4F7AC0",
+        "well.glb": "A07AFDC2D123322B8792706051A5FC0F7EA29C09177A50F14CA436116C417FE2",
+        "well-blender.png": "1D8CC0D10B40D13DD29A159E31589B8A120F180A6D61C08E08C910F78F48E690",
+        "capture-1.png": "F6CBF291EB51182690E5CBCF3127D4FCCF2A2B5C23E9616024D1FC241AE43688",
+        "capture-1-gray.png": "961D0C5A4D1E8C9FABB2033491D55F06E02BFD19B3C08BE5A697C312AC8A1AF2",
+        "capture.json": "6A6D1EA4947A918E4F0EEA8C0ACA7C8B5164D9010B5795EBA434C0760E9BE9C3",
+        "build.json": "9ACEDBF97A29D190DA08E18F8CF0B01DAA93415082438450262C4E705E13EA56",
+        "validation.json": "9E1E7075E359F6D33BCC9BC603E064B4245A102F0F44B1F4CBB056C68A06E698"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: pozo de brocal hueco, torno, cuerda y cubo bajo cubierta de paja.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "shed",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/shed/shed.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T19-32-33-052Z-45552",
+        "directory": "artifacts/graphics/G-21/approved/c5ccd1eab317043b"
+      },
+      "bounds": {
+        "min": [
+          0.024297,
+          0,
+          -0.990667
+        ],
+        "max": [
+          0.975703,
+          0.912712,
+          -0.009333
+        ],
+        "size": [
+          0.951407,
+          0.912712,
+          0.981333
+        ]
+      },
+      "recipeSha256": "60303E37F8729A02A4DFAF22EBE1BD1F5D117FC464CAE9273DBE6857AFB100ED",
+      "materials": [
+        "wood",
+        "roof",
+        "frame"
       ],
       "clips": [],
       "motion": [],
@@ -1265,113 +925,175 @@
         "objects": 4,
         "meshes": 3,
         "materials": 3,
-        "triangles": 30
+        "triangles": 844
       },
       "hashes": {
-        "watchtower.blend": "42B9E2AD73F1619B3AC1BA4E47B89947DF4C15953B815E33AF2B5DDD91F1C400",
-        "watchtower.glb": "D16C6CDA3AE329BE334F090AAA4622D8892ABE2FA119B8318F37ADB05E56E228",
-        "watchtower-blender.png": "EA845C8695FF55A4C1D6AC259BF390A6A3CA62990D144BFD3DB3D9381A7BD8E1",
-        "capture-1.png": "AC6362D1F3898EE0241FBC31CCF6CC0362772009E2736238B8C0161CCBE544B4",
-        "capture-1-gray.png": "377E824B2F51DDE0C92D130CDB315B69D9EE3C67628D0A98669A39C02602F656",
-        "capture.json": "E0D354B1E00111B29214F948D9EAAE36C6E5A655DB1828C0CC016CA171E71288",
-        "build.json": "08CF5FFE4FD13E394AFB88472CA11722C7EFB700A480D4C907D7E309747C56CD",
-        "validation.json": "A267B8406FB1CFD6BBDBE67AE5038F565A2EA58946839BFF09A0A6B4CEEEBC7B"
+        "shed.blend": "DF3B45D918DDEFA2E15094A6C8FE6204BE6F9C1773488BF4422E7D60A5F43150",
+        "shed.glb": "C5CCD1EAB317043B1FE2E11C6D342B4FFED796BA4FCDD27D94F010A260307260",
+        "shed-blender.png": "267343C3F7429F2BB27C8077C227F8BE1367F367B7AE332E9E55C71A80CF8CB6",
+        "capture-1.png": "381288DE6B9252CFB2767D4C9413C6D3F8A9F7EB1E60CC962EDE6A9243E6615A",
+        "capture-1-gray.png": "6911D7867F4151A3B2611C95960257F2B7195EEB685285845C8681CF8AE6734F",
+        "capture.json": "A341BBDF6A6DD0B54FD997BE09438F7827F86C4C9DD45969A7152CCDC4EE0BA5",
+        "build.json": "B6C772219A2F17E7A088F6837F6FBDF1EA5B0413584E2A867E9F469360B8E8EB",
+        "validation.json": "72B4ECA2651B39C0BFA2D9A11947C179AB9C75F8D3245E79D5E15EE711BEE33B"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original watchtower authored for The Valley G-10",
+        "source": "Original G-21: cobertizo abierto de tablas con estructura y tejado de paja.",
         "license": "Project original"
       }
     },
     {
-      "id": "grave-yard",
-      "artifactRound": "G-10",
+      "id": "stone-house",
+      "artifactRound": "G-21",
       "status": "study",
-      "recipe": "art/recipes/grave-yard/grave-yard.json",
+      "recipe": "art/recipes/stone-house/stone-house.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-16-09-563Z-52492",
-        "directory": "artifacts/graphics/G-10/approved/3975478f357c908e"
+        "runId": "2026-09-16T22-04-25-239Z-21428",
+        "directory": "artifacts/graphics/G-21/approved/110f59506b8e4bcd"
       },
       "bounds": {
         "min": [
-          0.033333,
-          -0.001667,
-          -1.966667
+          0,
+          -0.0025,
+          -2
         ],
         "max": [
-          1.966667,
-          0.5,
-          -0.033333
+          2,
+          1.57,
+          0
         ],
         "size": [
-          1.933333,
-          0.501667,
-          1.933333
+          2,
+          1.5725,
+          2
         ]
       },
-      "recipeSha256": "9C9B42F1BB2A5C9D6C0D268A1B8FEFA87A6FF0DAC7E71FF6FA2269665BDF20A8",
+      "recipeSha256": "D83590050B7B91F55D7581397AAAA02E4166BC1F3275CB4031DD57EEFBC2E765",
       "materials": [
         "stone",
-        "soil"
+        "roof",
+        "wood",
+        "window",
+        "door"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 96
+        "objects": 6,
+        "meshes": 5,
+        "materials": 5,
+        "triangles": 764
       },
       "hashes": {
-        "grave-yard.blend": "A176F1700BC983D48C452340B457B59F1885DEEAC3D1BE45AC67653A2452E6D8",
-        "grave-yard.glb": "3975478F357C908E5F9A8E3920454737FD7E053C9F0B72B9C9CDDF37ACE20567",
-        "grave-yard-blender.png": "5D2F12B2DBE0DD97BAD3686359E6612CA0C4433AE89F87CAF91FD06D0F4407DC",
-        "capture-1.png": "D6B7FF49A81390966F1EE02B9F5151B99BD3B5A5192AF32EB600FE93071DA030",
-        "capture-1-gray.png": "6050328E737E7D2999758BD8E1157DB382E958E70CE52EFC24BC784F532A2DA6",
-        "capture.json": "7AAB577CF56E3AB087331D4274285180239DDBB75E27460097AE649722827D3C",
-        "build.json": "217BF5548F6AEFE1ECBB01D465ADFF64ACF5AF350482F9D16E98E68E6A31BA60",
-        "validation.json": "41280514F096A547EC520525844A315036EE8A6BB189EC63D5F6959CA6480127"
+        "stone-house.blend": "BABA12CF70A3EE42CE0220E3FEDCF242C77D64B335F5BADABC187EFBE1330693",
+        "stone-house.glb": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
+        "stone-house-blender.png": "D0C3E03D40FEBE74224B1BFB22B5725E6111F1DD5451F37B2482DEC283C47CAB",
+        "capture-1.png": "A004B792B6258EA25AF41820FF066F517113CD00D2D9221BC7A923B143A655F8",
+        "capture-1-gray.png": "5131565ABAD0243CA3D8F02C9F787B94E4AED82F298471E76D40FB18179F236C",
+        "capture.json": "B447FCD9CE8AD9C60CFE1840082F8D69B9F6A9B84F81B596792D4ECDC3DEB488",
+        "build.json": "538F67D13360DBEB61898CE26D0921B9069DD6E7151AFA9375BAADC4829E3E87",
+        "validation.json": "03CC127233CA7975596661581B77F953ADAFFD50B7F8694B7C1270B672D08843"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original grave-yard authored for The Valley G-10",
+        "source": "Original G-21: vivienda de piedra y teja, contratos de parcela y ventanas conservados.",
         "license": "Project original"
       }
     },
     {
-      "id": "ruin-wood",
-      "artifactRound": "G-10",
+      "id": "field",
+      "artifactRound": "G-22",
       "status": "study",
-      "recipe": "art/recipes/ruin-wood/ruin-wood.json",
+      "recipe": "art/recipes/field/field.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-26-12-358Z-17080",
-        "directory": "artifacts/graphics/G-10/approved/8efa0ff692be6d91"
+        "runId": "2026-09-16T18-25-17-403Z-37028",
+        "directory": "artifacts/graphics/G-22/approved/e717b101d051aae6"
       },
       "bounds": {
         "min": [
-          -0.033333,
           0,
-          -2.033333
+          0,
+          -2
         ],
         "max": [
-          2.033333,
-          0.666667,
-          0.033333
+          3,
+          0.356667,
+          0
         ],
         "size": [
-          2.066667,
-          0.666667,
-          2.066667
+          3,
+          0.356667,
+          2
         ]
       },
-      "recipeSha256": "66037ACA3EECC07CE3A949E1B1B94691E4BC13083660EB8655D00173DD8901BD",
+      "recipeSha256": "8C6D802DB936107E0F6364F46A133F8459071B587065CF7BA9E84F13FB03FBE2",
       "materials": [
-        "char"
+        "soil",
+        "leaf",
+        "crop"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 4732
+      },
+      "hashes": {
+        "field.blend": "937CA0C145FD02AD0DD60437177DE693431E970BA58DE13D6E0216283F361A19",
+        "field.glb": "E717B101D051AAE69D265BDC736EAF5DF72470F0CEE2C13FDF5105869D60F629",
+        "field-blender.png": "18B4F72EAF3A54E1BCB8965294602ADEDA7976E3A1EE01526C52857030ADDE42",
+        "capture-1.png": "E7F3180D968DAEA542ABE5583952DC3CBDEA0E541A63C5C6878C520815536315",
+        "capture-1-gray.png": "AE0D891F767AAF4803DCC7459EF569E8B40A65C58E5DA19ABB3143CD955AE648",
+        "capture.json": "50E81E27FEF4EE5EFAB66BC2B1BDA72E22039EBC3BA33FFEFA194E2F099F48BC",
+        "build.json": "248C4FDAE5BF29A3A9AF4718A58866F3367C647ADBC9E8B5A7759C6BCC949738",
+        "validation.json": "F2A2CF810D040DC27283E5A8A606D10ABE9F1629B0E6D137B669C270F73C8174"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-22: cultivo de trigo con espigas de granos laterales.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "field-cut",
+      "artifactRound": "G-22",
+      "status": "study",
+      "recipe": "art/recipes/field-cut/field-cut.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T18-53-19-368Z-49192",
+        "directory": "artifacts/graphics/G-22/approved/ad935893a9ad52cf"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.073333,
+          0
+        ],
+        "size": [
+          3,
+          0.073333,
+          2
+        ]
+      },
+      "recipeSha256": "29C31A9BD67956B6810B2C352BD71CB65CF8AA255975391E510E6CE00F3E2654",
+      "materials": [
+        "soil"
       ],
       "clips": [],
       "motion": [],
@@ -1380,56 +1102,56 @@
         "objects": 2,
         "meshes": 1,
         "materials": 1,
-        "triangles": 128
+        "triangles": 232
       },
       "hashes": {
-        "ruin-wood.blend": "5C98FE29BCAF6C00FAA9D740B06291EF5C0C33872379387874AF1E330DFB9A35",
-        "ruin-wood.glb": "8EFA0FF692BE6D91A0B1998135EE242E120517B0E762F4DABF86ED986B49D653",
-        "ruin-wood-blender.png": "C102F9215A56B0E55970334BABAF14031C25ADF2BE2D8481BCCE89254955A49D",
-        "capture-1.png": "8A3B8F627BC56D3C17E677B3D1D7B02F613C7EC595799EDA0DE49A1394865401",
-        "capture-1-gray.png": "41D42E6809C1FCC28C96BA1CD60A6DE9C75375257FE8DE0A170A49EAF688388E",
-        "capture.json": "739DEA4A0DF11F8FB46A234DF7650222475013188E65F2AB43E0619C997A4728",
-        "build.json": "32F83B672DD0791B46703D19971EB211F5069EDF2328D7B7275D4EF7873811A1",
-        "validation.json": "5F025DA415C4AF6D0E6AD99941C55AC6BB936CD63A69D977CC6C2CACC5ED0445"
+        "field-cut.blend": "4B1DEAECB5BFA5AEADC1711DB1CAE4FA20D8BD536CDE4D6E53BC8C0678DC232A",
+        "field-cut.glb": "AD935893A9AD52CF4DBBC0EAB4977CD134718139E4EA6BD1BE983A0BD08708BD",
+        "field-cut-blender.png": "063104F2AD768614AF6BE92629C3685336C3A089810B0E84C50F0C3825A4BC5C",
+        "capture-1.png": "29E2FBDECAF0A2B86650B22D9FE39822FA6741352087CE0E5D0FC9177B4F99DC",
+        "capture-1-gray.png": "4769C20D0323B0CEF46AB9A95BB09BC275EDEA6439C488F1977213B3BC34BD8E",
+        "capture.json": "17F5C4026E9EF3AA3C6D621AFBFCE90AB32668C7233FCFA9BBB4D1FA423DB39B",
+        "build.json": "349339C2C59AA658F1FF02B6F479181886C759BAB1AC0DCE460C0E9E600E2B33",
+        "validation.json": "0BD6884A0772603DE0177B6E8A972DD12AFA52D78D74C67CD86078FC857C25EB"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original ruin-wood authored for The Valley G-10",
+        "source": "Original G-22: terreno cosechado, surcos continuos y terrones bajos.",
         "license": "Project original"
       }
     },
     {
-      "id": "ruin-stone",
-      "artifactRound": "G-10",
+      "id": "palisade",
+      "artifactRound": "G-21",
       "status": "study",
-      "recipe": "art/recipes/ruin-stone/ruin-stone.json",
+      "recipe": "art/recipes/palisade/palisade.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T23-25-31-230Z-52400",
-        "directory": "artifacts/graphics/G-10/approved/38a7d566a14fd0ba"
+        "runId": "2026-09-16T19-43-03-412Z-39728",
+        "directory": "artifacts/graphics/G-21/approved/e69ebd0e9c12bad7"
       },
       "bounds": {
         "min": [
-          -0.033333,
           0,
-          -2.033333
+          0,
+          -0.596667
         ],
         "max": [
-          2.033333,
-          0.633333,
-          0.033333
+          1,
+          0.866667,
+          -0.43
         ],
         "size": [
-          2.066667,
-          0.633333,
-          2.066667
+          1,
+          0.866667,
+          0.166667
         ]
       },
-      "recipeSha256": "887EE871609093412AD1A462A80E742B990CECD1B8495F275AE11FF5D0D0A058",
+      "recipeSha256": "1F0F5639EA64DD55DB2B1EA028BD316F8FFDC61660CD64F6121651D8E84B5FD7",
       "materials": [
-        "stone",
-        "soil"
+        "wood",
+        "frame"
       ],
       "clips": [],
       "motion": [],
@@ -1438,21 +1160,317 @@
         "objects": 3,
         "meshes": 2,
         "materials": 2,
-        "triangles": 84
+        "triangles": 318
       },
       "hashes": {
-        "ruin-stone.blend": "066F1867EB466AB27A9A4061E9E66FC1328DF446178CC63B92F60FBF91851B11",
-        "ruin-stone.glb": "38A7D566A14FD0BA8C3D3DBFB789F698ED4979EDDB815B05C4652BD30901F098",
-        "ruin-stone-blender.png": "EF3BBE2E7DBA96B82DF6AEC31FCA786F3F2D1241ADDB64BCF6EC3509E5C4EF56",
-        "capture-1.png": "A1987813A79676997B33B1E2C0CF293E591C6DC9CD7278A9A5AC19C90E3C83AA",
-        "capture-1-gray.png": "0BD4C2C0BEC166EE515AF0EE34C39268F2E240D67C01A33424F22EDD1E0AAB5D",
-        "capture.json": "A0A262B56FD369634FF5623D4B231E4D6CDD9A2D14162240FEBA8A32860CCB44",
-        "build.json": "7C1BDCDFE69B5D016B93EABC6B5EA9C679000A64138B3AE0A63C9DFF69707BD6",
-        "validation.json": "7A7D71987D0881A24AA984C695A09897355F4C44EA9EBFA28FEBD674E9EA9077"
+        "palisade.blend": "0ED31B4E13B93BFE4B8FD85ABBF772316DF2057A6B93CE2EF9BDA34627590A4D",
+        "palisade.glb": "E69EBD0E9C12BAD7BC453CAECECE0EEEDB12B280B284F67D267972BCDFF822A4",
+        "palisade-blender.png": "970C5EDDBFAECAB51518B7752D7E11D31F7F1FDA1B7D3ACE4DE7473578B477E7",
+        "capture-1.png": "89DC4912F8CC9DCE408B57CD7D62D097B7C8018142EFA6066ABB823DE24D6A91",
+        "capture-1-gray.png": "0B56A8146FA4CDE0C1FFF89075E106DB0ABDE83E79BAF2E2EC2940F5E2EE2A13",
+        "capture.json": "74BC75DB9F84C9F191CB5B151AD8915F2C77AAC21A290E6E2BA6F4915EEF2DEE",
+        "build.json": "572667176CDC70E41DA93E04709BA65F3DDE3823E90E22AE865276EFBAEF0071",
+        "validation.json": "6C0246FCE8F0248F41E5C0B3FFA43CF9AEC158A9A8F5238767B7C5474E4E82CC"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original ruin-stone authored for The Valley G-10",
+        "source": "Original G-21: palisade modular con conexiones cardinales en el render.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "wall",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/wall/wall.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T19-43-18-182Z-19612",
+        "directory": "artifacts/graphics/G-21/approved/e4dc13b81b51a5e4"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -0.68
+        ],
+        "max": [
+          1,
+          0.885,
+          -0.32
+        ],
+        "size": [
+          1,
+          0.885,
+          0.36
+        ]
+      },
+      "recipeSha256": "F193BC47769962967D7663EC23444909AB7BF8E33F95488B3479A992AA82BAA0",
+      "materials": [
+        "stone",
+        "mortar"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 276
+      },
+      "hashes": {
+        "wall.blend": "EA973EE7143B4548E6C8149B0035AA29661DBF8D7514CE0A82C21EEA63BD32F4",
+        "wall.glb": "E4DC13B81B51A5E4CEBF8E41EFB6EE96A6651BE41CF06BC95649BA30601581A7",
+        "wall-blender.png": "DB46F69010B6D687E054BCFCEF037D778273F899A3391C181A9DD7A843085457",
+        "capture-1.png": "E381D31211662B91407F3FB164B247845918FA7D1FC12360884A875E6925F7AE",
+        "capture-1-gray.png": "EE9031FF2FE59E317F92033CD53D75ED523274623B2DA3CABB314469938AAE6F",
+        "capture.json": "F859BEEB59F85D5B740E90207751C58BEABBFDF6D13B47D164CA9DB89C1E9342",
+        "build.json": "7C439B58BCA40AEF807492EE66CE8097126DD8731C3578A30C3B41D5308E5FED",
+        "validation.json": "BCD94E0BE3F1045B712DA879440E72AD92F361E44F5CD8258404F995F45A697F"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: wall modular con conexiones cardinales en el render.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "watchtower",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/watchtower/watchtower.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T20-34-32-575Z-18856",
+        "directory": "artifacts/graphics/G-21/approved/17b5f14e9e166187"
+      },
+      "bounds": {
+        "min": [
+          0.513275,
+          0,
+          -1.486725
+        ],
+        "max": [
+          1.486725,
+          2.75033,
+          -0.513275
+        ],
+        "size": [
+          0.97345,
+          2.75033,
+          0.97345
+        ]
+      },
+      "recipeSha256": "6C9BF2CB27463BC72BC2DB58C49D2505273EB1A3B437F93F30770E5434CCF191",
+      "materials": [
+        "stone",
+        "wood",
+        "roof",
+        "dark"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1638
+      },
+      "hashes": {
+        "watchtower.blend": "709DD44812CE565A004D73C5BE50E012076E9F7FF263A48C6E9CCE670E429FC9",
+        "watchtower.glb": "17B5F14E9E166187439C064F6E6E799F505C18959452B2F1727773BC7340CCF8",
+        "watchtower-blender.png": "489DC23C606204FEC5FC1D2DDE69190D7639A259868018F25F45551D83AB9E12",
+        "capture-1.png": "829B5AB31F7274113EC5DD7E8D36F4ACFC9F1531C9C29B1DEFF0ED1FD84C78EA",
+        "capture-1-gray.png": "481252EA3105460035D57B7025008E17D0DA8F5D6DCCD863234F7B022690BB44",
+        "capture.json": "C43C6948CFAF20E7F98E3FEFC2EF799096D0732D568D9BBD83AAB08BB86B3300",
+        "build.json": "EBBD56D3E4EC04ACB65E99C4CD076B4942DD4232A46CB0CF9A892FF805AC5902",
+        "validation.json": "4585FE6CFBAE77C1D38344B6A775496E6CD92884B0994EF7BF06D197E5EDE96B"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: atalaya de piedra con galería abierta y cubierta a cuatro aguas.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "grave-yard",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/grave-yard/grave-yard.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T20-39-10-308Z-40616",
+        "directory": "artifacts/graphics/G-21/approved/d628290b250a0114"
+      },
+      "bounds": {
+        "min": [
+          0.033333,
+          0,
+          -1.966667
+        ],
+        "max": [
+          1.966667,
+          0.52,
+          -0.033333
+        ],
+        "size": [
+          1.933333,
+          0.52,
+          1.933333
+        ]
+      },
+      "recipeSha256": "55FFE7D03B2826A110BF89F8A72A5F865700310CE0E5F099221C80897C46348B",
+      "materials": [
+        "stone",
+        "soil",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 936
+      },
+      "hashes": {
+        "grave-yard.blend": "01D3E41CCBAD2473FA75A9CDC774851D38B44104E6080DF32F6D1BF90C9B2B3E",
+        "grave-yard.glb": "D628290B250A0114938AEA22106C750C01E98BF054E6391B94F10A4C25B1FDE2",
+        "grave-yard-blender.png": "062DB1275F04C2719595EB89675A51D1985400EE1E7D222F6F803E9E82201143",
+        "capture-1.png": "9550269888046571C2D60362F35148CB98B5A6C6A6E7698C8EDA5C7F18AE6E44",
+        "capture-1-gray.png": "AA9D4481A230C13F9752BE4426E2468072616DD1B51EF19F3AF5919044F51859",
+        "capture.json": "9C435D192827C2B2BBFAC8C936D07E450BC89D2DD5D4716BA40AC48504924655",
+        "build.json": "2330A9F4F796E6AFF7DBD91D6EC7A9CFE5CA7DA0D9331E1EDBCD0050A72C1B03",
+        "validation.json": "A168C67CF2C0BDD2CF5C21C701D44DD233334B99CADF93EEF075F8075F730FCD"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: cementerio con lápidas, cruces de madera y sepulturas bajas.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "ruin-wood",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/ruin-wood/ruin-wood.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T20-43-57-190Z-5400",
+        "directory": "artifacts/graphics/G-21/approved/0e3deb6554dbc55c"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          2,
+          0.643333,
+          0
+        ],
+        "size": [
+          2,
+          0.643333,
+          2
+        ]
+      },
+      "recipeSha256": "34DD61585577AA190038D5AF06FD5E64EBD1E4AAC8449EC9DCF990A6C7B418A3",
+      "materials": [
+        "char",
+        "ash",
+        "stone"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 792
+      },
+      "hashes": {
+        "ruin-wood.blend": "67DB33298482DF329BD86893ACBF5BF30F9CE269F8FFFBD924265C8E3E16C516",
+        "ruin-wood.glb": "0E3DEB6554DBC55C802561AB4A56920F6CC0B6C74CFA75B94C6A2C4167678063",
+        "ruin-wood-blender.png": "F37B46D41DDDA536502EE92EC1C39E2DA7EA3B9D8133D9CEE98EA86BB42F05CE",
+        "capture-1.png": "8AE8C59F08D9DB2F8105E848AA916D84FEB1B3ED4FD60C72CB12D751D28A9D3C",
+        "capture-1-gray.png": "80E0CA7E18FA0E06BE9D30534F0CEBF87E5A05D9761AF29251E1EA8361D1379D",
+        "capture.json": "3E80B38B4258C8906FF95EBFE7B85844F59F80DCEBA1473793C01B6CF8D1C473",
+        "build.json": "C5EAC78FE1D9E6DA1F6C1E4B43EF0F3FF5729FE9106FC6E01BD0753F3892FBC8",
+        "validation.json": "AF686E08AD16C598EDD42CA53213C874216B75245C9A2CD38531CF15EBA0F95B"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: ruina de madera con vigas quemadas, ceniza y hogar.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "ruin-stone",
+      "artifactRound": "G-21",
+      "status": "study",
+      "recipe": "art/recipes/ruin-stone/ruin-stone.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T20-49-25-840Z-32812",
+        "directory": "artifacts/graphics/G-21/approved/3f50a13b45835153"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          2,
+          0.618333,
+          0
+        ],
+        "size": [
+          2,
+          0.618333,
+          2
+        ]
+      },
+      "recipeSha256": "1A7B1094F3927BEA5E121103D3AD7F3C3F710C0B43FE60BB820FC9FC15680838",
+      "materials": [
+        "stone",
+        "soil",
+        "roof",
+        "wood"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 5,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 956
+      },
+      "hashes": {
+        "ruin-stone.blend": "37D1ABD60F0FDBB84F86E81B884035F694726AD1ED7364858286389A5C5EA568",
+        "ruin-stone.glb": "3F50A13B4583515320921EF13FC2AA62296969990D829563A89C9989A1CA4D66",
+        "ruin-stone-blender.png": "0D8B31D92EE57B3ADD4D1F5BC33F9147E080BE6A5F7CFDAEB6449FD15C8D296C",
+        "capture-1.png": "1C26DEB5AC3C168373F26E084E772987849784897FCEB462368FF3999DDDE838",
+        "capture-1-gray.png": "263692D5A7D6B756261B80CB73822F2EBBD3AB1BFFBE946D959296B2A5BE1D6A",
+        "capture.json": "0D74095CB5275491B2D72B5132C8ECE127F43550546693D865F7103256CAF119",
+        "build.json": "FCF698C3285F7FF223A1F5FDC08FB7908A3EFFDC8B5B3F6082DC07B84DD4B19A",
+        "validation.json": "DEF85BC34EB6A054C01A1BD5D55FC538930D3D9FCF315656DE0E8E7FD931AF84"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-21: ruina de piedra con hiladas rotas, cascote y tejas caídas.",
         "license": "Project original"
       }
     },
@@ -1516,349 +1534,458 @@
     },
     {
       "id": "cow",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/cow/cow.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-06-984Z-52520",
-        "directory": "artifacts/graphics/G-10/approved/8f931cf3e1e34c55"
+        "runId": "2026-09-16T21-02-28-147Z-25912",
+        "directory": "artifacts/graphics/G-23/approved/6a922a86c1dbf645"
       },
       "bounds": {
         "min": [
-          -0.413333,
+          -0.460667,
           0,
-          -0.111667
+          -0.129067
         ],
         "max": [
-          0.282518,
-          0.426667,
-          0.111667
+          0.288067,
+          0.519722,
+          0.129067
         ],
         "size": [
-          0.695851,
-          0.426667,
-          0.223333
+          0.748733,
+          0.519722,
+          0.258133
         ]
       },
-      "recipeSha256": "6A9EA2BD0CFB0A1AB8EDA6342FEC20845ED72BB2EF0E8A5D4D0600777B8B686F",
+      "recipeSha256": "3144E6F52763092CFD406CB7F5D255E0A4CC8A6563EF7D6442024682B824BB81",
       "materials": [
-        "hide",
-        "pale",
-        "hide-dark"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.21
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 4,
-        "meshes": 3,
-        "materials": 3,
-        "triangles": 112
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 3476
       },
       "hashes": {
-        "cow.blend": "B52218C0470A227C88A5FB1459B4A02FA61C82CEAE020EC0683385B1EF166CB7",
-        "cow.glb": "8F931CF3E1E34C55EE3CB51EDB345DDB8137A45E82646F76866CC72CEB64465F",
-        "cow-blender.png": "6C7D844DF26E230A55584354972E1F43DA4A68073244B58DBA2FABD32732CA38",
-        "capture-1.png": "A70C6A45A28C81998F2016FA0A2EECB9C12D05419570BAF64BB7745FDC685803",
-        "capture-1-gray.png": "F745E4A794BD3063ECC852E69DD080DDE2D3FC3B8DCE68B2FAA19B63A71A6390",
-        "capture.json": "8A0070E3F803C64C4BC2D187375A4475CA41D259C907A7416F5FFED59B87FA8E",
-        "build.json": "79F33B3B651891470DA27BD129C12ED67B585FCEF5CF325495E8551E888426A7",
-        "validation.json": "FB4137C36196FD5126D469FAD2A6F356C6379B27BF682CD5C30A1AA3F4A25D7B"
+        "cow.blend": "9995A2CDECB142399A6332F43E8134B084583B84484F35F62DD1FCF8985D1839",
+        "cow.glb": "6A922A86C1DBF645EEA0E200403147099D5B3D6EE578DA145F1ABC2DC90FC713",
+        "cow-blender.png": "3CA10D9FA7942D009AD3DD3AB83CAE625556FD81F31258D3376928DC582A6244",
+        "capture-1.png": "1FC63169397452A46EC534D8DDE6F7790A7B340433B2A84D5997C2985EB1FDDE",
+        "capture-1-gray.png": "043E4F2E7A9C5543D0F9D0296266E7233AC7F1EB30C0F7193476939B796A0F7D",
+        "capture.json": "FEB516E3A134FC3A522EDAAB524D0F82233251A72DCFDA179175BF373EDD7BE0",
+        "build.json": "5AAE8A583993FCA041B74BC8C5EBC6EAB39A69C81BB94957DDF35BA2FC16255D",
+        "validation.json": "37290CB884D7F207540642F667019301EC5A2C76B1E9D1029F232B28669EF03E"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original cow authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {
       "id": "pig",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/pig/pig.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-12-503Z-53488",
-        "directory": "artifacts/graphics/G-10/approved/348c0670102f2435"
+        "runId": "2026-09-16T21-10-44-636Z-16096",
+        "directory": "artifacts/graphics/G-23/approved/3d0ed448cf7f75a1"
       },
       "bounds": {
         "min": [
-          -0.196635,
+          -0.332,
           0,
-          -0.106667
+          -0.117867
         ],
         "max": [
-          0.151667,
-          0.253333,
-          0.106667
+          0.219133,
+          0.2931,
+          0.117867
         ],
         "size": [
-          0.348301,
-          0.253333,
-          0.213333
+          0.551133,
+          0.2931,
+          0.235733
         ]
       },
-      "recipeSha256": "D262F5713DCD3F06441290F5A2710671876E69E1ADD64584BF77A73CA50CC7FE",
+      "recipeSha256": "E6846AC9BFC9DFBAEB9B69C80612CFC9A92BB539CBBE0CF08D63B8D75210ED0E",
       "materials": [
-        "pale",
-        "hide-dark"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.115
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 162
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 2808
       },
       "hashes": {
-        "pig.blend": "723B9E6306869D03FD26DCDFE1C5EA2D77C6466404848099EF6AF66AFA1CF981",
-        "pig.glb": "348C0670102F2435177463FC5F9EB62CA9AF49CC255B982AFC11FE0D9B1DF161",
-        "pig-blender.png": "0A89B79EC042793DBA243B75B724FDF3044629E860CA658DDC8C87930C14BA78",
-        "capture-1.png": "4645DE57DC4D0B02DD1AEA8471DF0B9908DEB908CDC42B28B1D3C7BEF3717CF1",
-        "capture-1-gray.png": "F369CDFF3B024E068FC464E48450F6DFD6E52E172960A47134E425C28ECD790A",
-        "capture.json": "AC65E6FDF78A3713F5A267E57F43265622BC0AB1A6E32A42EA618F0D464F6753",
-        "build.json": "CC31D202B4BCD85BB92A9EB6C0084F92AFA3E8D9B7681094BCE3AD7A37700675",
-        "validation.json": "4D89DEBE735226990427D5DCB64E9B3FA40E755BB1C1C2A97F889A9774DEE1CC"
+        "pig.blend": "244CE9AA2048655936F86EE78BB04C382F25B66ED41F93A6CCD54058AEEC8909",
+        "pig.glb": "3D0ED448CF7F75A18783CAC8047666381E6F9C90DA1BFC44F9736DDFA40D3524",
+        "pig-blender.png": "49EA1DB82679BCDBDCC34DAC195FBB0CDBEA06A1357C9B52C0AE2D7133229A5B",
+        "capture-1.png": "332F6DC6BBB42FD851E6DF3300B77AB915E862D019DDEFFBCEE0E66705663AE0",
+        "capture-1-gray.png": "DEACA16C58CEC873E3371102A217E420FA8822D8619E9FF6AE813517403CBBAF",
+        "capture.json": "EAE3475D16529A68EFC46F139F9A8A8861A5882DDB876D76FF1B294DCCFD9552",
+        "build.json": "FAD7AAAA2AED508508E728D9DCEBF3B32A0F1E174FF42911C4678C43EB29F21C",
+        "validation.json": "8A9780B3A7DDAEC88293A865952DFA152212FD8BE2B0614598C02CE5681E2360"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original pig authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {
       "id": "hen",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/hen/hen.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-17-942Z-48528",
-        "directory": "artifacts/graphics/G-10/approved/1fd725e724f15787"
+        "runId": "2026-09-16T21-14-49-709Z-6100",
+        "directory": "artifacts/graphics/G-23/approved/e08f6d310277de6d"
       },
       "bounds": {
         "min": [
-          -0.091667,
-          0,
-          -0.047553
+          -0.126667,
+          0.000333,
+          -0.054167
         ],
         "max": [
-          0.085198,
-          0.156667,
-          0.042844
+          0.13,
+          0.220833,
+          0.054167
         ],
         "size": [
-          0.176865,
-          0.156667,
-          0.090396
+          0.256667,
+          0.2205,
+          0.108333
         ]
       },
-      "recipeSha256": "1905B4F526F523AF567655D15F974BE95EFA4010062867AB2955D258FA5B135C",
+      "recipeSha256": "B04DB6AA872A4213BE4691400F64A0705154309912BFBD10A326AD17F33422E0",
       "materials": [
-        "pale",
-        "comb"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.075
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 142
+        "objects": 18,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 874
       },
       "hashes": {
-        "hen.blend": "FFF2A5D939CBD6E7BCB47CA06D0AC5089F71AA4580F5B7141407BB6D0F5C82C6",
-        "hen.glb": "1FD725E724F157877310608663022149E343B515A29DF5B4A4525FDF39DF2F9E",
-        "hen-blender.png": "07B9F6B2EAEA453A4216EA7AAA3CE19ABB0E36BCFFBFDD6ACACC83B0BCFB358E",
-        "capture-1.png": "BD103E5AA9FC0BC4D06BC16D5D7FF92C1C370666B573F4362D1C4222255B22DE",
-        "capture-1-gray.png": "F44AB973AA6A4234E714C78323134A95DC41BC8928A95B22431A26371FB22D28",
-        "capture.json": "13DF539F90BFD4A3E74693206DF46BCAD83EFAFF01F26ABE0DF433EEADF5E0D9",
-        "build.json": "7F48340F2F6E39208A80BE466B2A241925D29BD10534EB3650F77B6A52222ED5",
-        "validation.json": "8E812901BFB9B6A264F46A1DAFCC79F97DCDCB33CCDF6D7669E6D4B10DFDA6D5"
+        "hen.blend": "8EE12596BAAFE9C062609273E7997F0494D34F3FAF33A90517FAB358EE73E6FA",
+        "hen.glb": "E08F6D310277DE6D4749F33CAD8EE56CBB4877A7973F0E8ED727CA393BB251F1",
+        "hen-blender.png": "4BAC2A10DB0A645FCFF2BAEA7CD9F99193A63AB2DCB18BB3B337FE26F9CFEC0B",
+        "capture-1.png": "BB30B086C86C0C6F595DBFB8E22C847143410F910B5771A9720CF09214D7C0A8",
+        "capture-1-gray.png": "B331EFE24ADD6FBF1FD5A35B0087D3AC945EC5F1322BDC09CFDF8894C6E43895",
+        "capture.json": "33495836B46F4513F361F975533A59116AEED4EA4A949AB22AF7C47E196A72EA",
+        "build.json": "6489426A61B1FD693053584DF581EAE892605166ABE1E62EE06F6D714E5012C8",
+        "validation.json": "987B857F5C073DAD45E75A4E3ACABA6AF7468E3D58D52492B9BF175E6F116B8E"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original hen authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {
       "id": "wolf",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/wolf/wolf.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-23-356Z-50588",
-        "directory": "artifacts/graphics/G-10/approved/98ed20bc75e1339d"
+        "runId": "2026-09-16T21-18-22-160Z-50676",
+        "directory": "artifacts/graphics/G-23/approved/a88c9eebeecf4944"
       },
       "bounds": {
         "min": [
-          -0.311702,
+          -0.408833,
           0,
-          -0.065
+          -0.075
         ],
         "max": [
-          0.276799,
-          0.296667,
-          0.065
+          0.246267,
+          0.429067,
+          0.075
         ],
         "size": [
-          0.588501,
-          0.296667,
-          0.13
+          0.6551,
+          0.429067,
+          0.15
         ]
       },
-      "recipeSha256": "778CF05FE9D8E99ECC4162253753797753DE1AA1577FB399E7141E668F910562",
+      "recipeSha256": "462B45D3287375CA67562F234BBA633256614A1E26861BD624322E931A1F77DB",
       "materials": [
-        "hide-dark",
-        "pale"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.2
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 108
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 2828
       },
       "hashes": {
-        "wolf.blend": "02402E69E8B29C8B37D7D50EA0F63157DBEB79D369E8C1896E922BAA8D269103",
-        "wolf.glb": "98ED20BC75E1339DF7F90AB2F7B069936E04AA6B288D0A8A321C903393F45AC8",
-        "wolf-blender.png": "5310294BDFB359638E93EC2E634F96583959A53EFB691C4EF98D4EE4B7160CF7",
-        "capture-1.png": "F4C15BFCAEE36731C859DCA6079F916BF6425F2043C3EF3D1A75DC0DF90C533C",
-        "capture-1-gray.png": "26E2CF89422A2EB2DAEC116F4FEB70EC58C3F01F4CB793D94F9D4A92D76BEA0A",
-        "capture.json": "46192751BA0DE98834C6982F3BA5B9398BE1CB6D2A688076565E175FC323C9EE",
-        "build.json": "7186B4907A9371BE83FDFAC667B8FAA6BFF645C38AC90CDF6B43DA5FF3FF2F21",
-        "validation.json": "7C7CB328CF5D40491C1AF96E36270F88483318564393FBB01392FA4FA26E6BB5"
+        "wolf.blend": "993222FD14EA12642FDB4E60C5065354B42FCB340725EBC345008D0E9E3F7FA9",
+        "wolf.glb": "A88C9EEBEECF49441B0E5AC427EABB0A67C6D0D6567A8E59FECC48720682BEF8",
+        "wolf-blender.png": "450CCAE09EB1B7D188B2109703E74F5F15D5B10D53FBE30F96F7AD416E21CFFC",
+        "capture-1.png": "FCFEAEA8F09E74E01A0512C7053157B115D101ED58982D5BB2B45DA585057DE6",
+        "capture-1-gray.png": "EFBEEBB776D799F0299A8F58E99EA1795BDD56DC444EB4E58A28FB1AE8EC5964",
+        "capture.json": "B0269CDF0E3AFEFA7A88FD57671496E8ABC5707E34EAE3A66235BBA87AD06689",
+        "build.json": "F5305B5EE248D3ACAE3697C49B60B40336A6F6275D7715743EE534AA07FAB106",
+        "validation.json": "8ED7DD814500ABFC50021170316D4C6612E91FD366B84C35B432B598887559C0"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original wolf authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {
       "id": "crow",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/crow/crow.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-28-809Z-42176",
-        "directory": "artifacts/graphics/G-10/approved/1524b0e09484040a"
+        "runId": "2026-09-16T21-22-40-671Z-47264",
+        "directory": "artifacts/graphics/G-23/approved/f9a171936f7695af"
       },
       "bounds": {
         "min": [
-          -0.08,
-          0,
-          -0.034872
+          -0.136667,
+          0.000333,
+          -0.054167
         ],
         "max": [
-          0.076667,
-          0.11,
-          0.034872
+          0.173333,
+          0.203333,
+          0.054167
         ],
         "size": [
-          0.156667,
-          0.11,
-          0.069744
+          0.31,
+          0.203,
+          0.108333
         ]
       },
-      "recipeSha256": "4D510C8E209B55DB67E8622908564EB61DB06E61CFD9C96B1FC6DE2816363129",
+      "recipeSha256": "51C58D0DF6C60BBA00B027D36AA8BF3A602DB29EF61CA91F42837AA221CDC9B8",
       "materials": [
-        "hide-dark"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.08
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 120
+        "objects": 18,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 826
       },
       "hashes": {
-        "crow.blend": "32E70E5AA3194B3FBFEAA2AC7013F78F2F43541FFAB099BBE78BB23A111AC454",
-        "crow.glb": "1524B0E09484040A3F90A2607C251CE1B5F4C1085860264161A2D8B9C4E7C32C",
-        "crow-blender.png": "68D87EDDAA46321D9727B2DEFF515F1B44A6DA442F5E1B85811C6EB6A05F0A1C",
-        "capture-1.png": "AF3341D8C76EE57319BFA80E9D5DD04FB8A3269EC7BBEADA944ABBC14041BEE9",
-        "capture-1-gray.png": "36D31868709F88C24FD2D9AF7DFE7967330434FA4F64D293F36DBE181C21BB50",
-        "capture.json": "5FBE58D0192C0FBDBFA1CDE604F3CEA75D12C42FEACD548F737F4DA4FB127CE4",
-        "build.json": "5C2D9F73C025CFD04831210E08C03FEED7C5714C738D3CC946F1A0D6CA032B40",
-        "validation.json": "3F81E7B5AA88BD50E96F484ADA0C7FE3E3A5563315E1A5062795DEA6E5F15AB9"
+        "crow.blend": "30164B0ABEDB741CA03C3FDDFB23F4AAC3E88ADEDF00C5E6A35383FD8E768AEE",
+        "crow.glb": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
+        "crow-blender.png": "A6A54B718E222A9F76A72290B32F8255F7920A53F99BEB064DB94899986E4F56",
+        "capture-1.png": "3335470C66B72853CD6BBA1D5A4C06B7C374B15FCAEC2DCC424E15D75753A299",
+        "capture-1-gray.png": "393B7E5F2E3374292A4D829950A91D1263700D969DDC88E6ADACBFD8815285D5",
+        "capture.json": "78600F8E6C0CA2B5268A144328D2D38449EF4EFC96FBCF631A479FFF3BA88967",
+        "build.json": "639E9261AAA8B54A74E617A2270FA18DDED91FEF180459DAFC4F7BBC4BE2D6AD",
+        "validation.json": "90D27A7EC07B60825B3B416C7DBDA96A37E754F86E4F65769D7F91770F213DD4"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original crow authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {
       "id": "fish",
-      "artifactRound": "G-10",
+      "artifactRound": "G-23",
       "status": "study",
       "recipe": "art/recipes/fish/fish.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-11T00-23-34-253Z-33664",
-        "directory": "artifacts/graphics/G-10/approved/edf544ad22d99bb5"
+        "runId": "2026-09-16T21-27-17-551Z-37688",
+        "directory": "artifacts/graphics/G-23/approved/9e6d26667f104c33"
       },
       "bounds": {
         "min": [
-          -0.056667,
-          0.003333,
-          -0.036667
+          -0.074667,
+          -0.033333,
+          -0.041667
         ],
         "max": [
-          0.11,
-          0.08,
-          0.036667
+          0.113333,
+          0.067667,
+          0.041667
         ],
         "size": [
-          0.166667,
-          0.076667,
-          0.073333
+          0.188,
+          0.101,
+          0.083333
         ]
       },
-      "recipeSha256": "A9864DB4E4AB9ACA26BCFB2FAE32152882FBD72037FE86B6D775B235E621AD38",
+      "recipeSha256": "7B3BA5F821FDAF6F656223DDC085CC957B13E76A1AF027B46FE868FBA7C9F86F",
       "materials": [
-        "fin"
+        "coat",
+        "light",
+        "dark",
+        "accent"
       ],
-      "clips": [],
-      "motion": [],
+      "clips": [
+        "idle",
+        "walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.13
+        }
+      ],
       "connectors": [],
       "statistics": {
-        "objects": 2,
-        "meshes": 1,
-        "materials": 1,
-        "triangles": 86
+        "objects": 12,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 700
       },
       "hashes": {
-        "fish.blend": "F9B7E017041B4DD1C11B87336389CB09AAF5DE15BE8E5909690D247EB5DA484A",
-        "fish.glb": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
-        "fish-blender.png": "B3082493F084B512B6B5E5647CEF4BC892489838F2327CF2413A746749E1E3CE",
-        "capture-1.png": "69643E86845B2D09A1ED50DF5D8CFFD2927EE5BEAB086A659C23F891DE6D6FDF",
-        "capture-1-gray.png": "F3DEB459526772E6D8CF3B55E09BA2BA655F6A4AF660FB321F8CC2D5B0466712",
-        "capture.json": "59AB8A694F6E367A8C53A55383EF84605973AB4E12D5EF7166374BA0A765562F",
-        "build.json": "39C0D5CC77CD1D7D41F1688C3137B9FD3D0391C2B8B41546BD8247B1B0E5A01C",
-        "validation.json": "38A3E25C14976BEE3BF1EEB70A3EA7082992D9B965D9DF0989E9DEDE483E5D47"
+        "fish.blend": "B6814E9F51419FCEF4026031146E174E706FB50ED4463A621C03A7336C1BED9F",
+        "fish.glb": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
+        "fish-blender.png": "7E1E0AB1599E6DF62AE52D78159A395037AC00438E9256B36CB8E920BA8B3F2E",
+        "capture-1.png": "141B293E34E50F2832387644A1803B4D828FB4BA45276F9A18C15043C75CB06D",
+        "capture-1-gray.png": "345EC876DB5AC198E0F19321809CB5B9CEFD02C32A47E8C016FA806C772607DC",
+        "capture.json": "2C45B1C7CBD4F211ADE2B01A26F1C742C800581EBB2EAE1C8BF77EB45FD43C26",
+        "build.json": "33ABC9CA13E95ECDC97DB6FB949626BA129C55512D2C277434B463DBD6407082",
+        "validation.json": "9405AD4D7F2A6E4DD3F48FFBA33BB022A96713893C2B6A0E8F35B5CF0C6C0AA6"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original fish authored for The Valley G-10",
-        "license": "Project original"
+        "source": "Receta original G-23; anatomía estilizada, rig por especie y marcha articulada.",
+        "license": "project-original"
       }
     },
     {
@@ -2208,33 +2335,33 @@
     },
     {
       "id": "villager-leader",
-      "artifactRound": "G-10",
+      "artifactRound": "G-18",
       "status": "study",
       "recipe": "art/recipes/villager-leader/villager-leader.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-14T19-08-39-325Z-30668",
-        "directory": "artifacts/graphics/G-10/approved/c18503b111433ed5"
+        "runId": "2026-09-16T12-29-28-020Z-44512",
+        "directory": "artifacts/graphics/G-18/approved/48526252b42a4ae6"
       },
       "bounds": {
         "min": [
-          -0.17115,
-          0.01,
-          -0.093333
+          -0.175,
+          0,
+          -0.105
         ],
         "max": [
-          0.17115,
-          0.666667,
-          0.095
+          0.175,
+          0.65,
+          0.090833
         ],
         "size": [
-          0.342299,
-          0.656667,
-          0.188333
+          0.35,
+          0.65,
+          0.195833
         ]
       },
-      "recipeSha256": "49C4A02656E7A9F42EC60B3FF3FA799D2F161453CD02EBC0150EA1D8030368B5",
+      "recipeSha256": "A5747783A6237BF161BB956B5916F33B2899565023AB2D1E899A9CA34BAE3695",
       "materials": [
         "skin",
         "cloth",
@@ -2281,21 +2408,21 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1320
+        "triangles": 948
       },
       "hashes": {
-        "villager-leader.blend": "FE789B594463A4F4F73FA9EB94C2910D59A3ED0761AB464D69B773ED3505960F",
-        "villager-leader.glb": "C18503B111433ED53417EDD551ECEACBF4EC3C3153E6ACC2767C9ACBCCB47173",
-        "villager-leader-blender.png": "E1DEE38C31081D5F7D3CBFD6E0804FB7650E9339CA109D2AC44AB82894EB6E31",
-        "capture-1.png": "3AED7E5AD7D976A12E47F50737ECC8C11E4CCE9D9155B451FC0FB88C4E4BA6BC",
-        "capture-1-gray.png": "4A97499D1BEF989694426B7A7511BE33F97BF38E74052B0058D439FE78E15126",
-        "capture.json": "7DE00ED391B0F39DFF30B037FC7A5068186C0F97156D39F2A288D5C8022FFB62",
-        "build.json": "824E56C2134EC33FCB3C4657539E0B2E78F65037FA4B029D76EE6C3ED404CB30",
-        "validation.json": "1DB531E48C3AD710A0096F927C94813FF1EC8DFF1C9337362D61A4DE9CBD6452"
+        "villager-leader.blend": "B3537B9AE7CFDA4B271E0576CA6B7F80975BA11D2093685081F308983946FA78",
+        "villager-leader.glb": "48526252B42A4AE6557EB9E186B5A4ED1E7990612A5846DC413051F8E83B1C9E",
+        "villager-leader-blender.png": "109FA93E1D95831BE3EE0ABCE365F886C3F9D5DEDEFE5B612D41DA354A968795",
+        "capture-1.png": "B5AEC5A0336CDFCCB8D80C7761DD8256987998F5588A90D1E578339901E5D6C7",
+        "capture-1-gray.png": "82B88467119C284A29303ADC5025E5E61DFA7761FB2D886768C2639CA578BAEB",
+        "capture.json": "CD544B2DD347CC363653D28445FF80F6968C0792D233CCDFDEBB418DE31B6F17",
+        "build.json": "803A75AE3982CA516AF63769B861D3B65B7612CED6E01B1AC62EE45590DCC8F9",
+        "validation.json": "1BA4A17991699982AF56BE7789E9740170E295AAF2648DE226B9DA8DB268065D"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-leader authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "source": "Original G-18: Jefe: gorro alto aparente, manto dorado sobre los hombros y túnica burdeos.",
         "license": "Project original"
       }
     },
@@ -2394,33 +2521,33 @@
     },
     {
       "id": "villager-midwife",
-      "artifactRound": "G-10",
+      "artifactRound": "G-18",
       "status": "study",
       "recipe": "art/recipes/villager-midwife/villager-midwife.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-14T19-08-55-326Z-29864",
-        "directory": "artifacts/graphics/G-10/approved/760eb20249249e9a"
+        "runId": "2026-09-16T12-32-05-776Z-37764",
+        "directory": "artifacts/graphics/G-18/approved/9f24d0be9586fa1d"
       },
       "bounds": {
         "min": [
-          -0.17115,
-          0.01,
-          -0.093333
+          -0.175,
+          0,
+          -0.09
         ],
         "max": [
-          0.17115,
-          0.666667,
-          0.095
+          0.175,
+          0.65,
+          0.090833
         ],
         "size": [
-          0.342299,
-          0.656667,
-          0.188333
+          0.35,
+          0.65,
+          0.180833
         ]
       },
-      "recipeSha256": "61F22CC61299667D9839E1EFE2D5489693E587C2104C083A00C1C7C93A64FD73",
+      "recipeSha256": "0A898F423AB63982CBB61D9B9987AE48B25CC1D2938DC28B70E1C06250540AD9",
       "materials": [
         "skin",
         "cloth",
@@ -2467,21 +2594,21 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1320
+        "triangles": 972
       },
       "hashes": {
-        "villager-midwife.blend": "535BF2D23D61599CBAA86A76A841193827B354E9B6BC40ABFA2F26B48AC400F0",
-        "villager-midwife.glb": "760EB20249249E9A890E75B7131DBA18ED7F40BBA3A313CC3A736DF61BC795B5",
-        "villager-midwife-blender.png": "D3DCA9D2598E7750B4723EA10C551FAEEE1F57176BA22AD0D3A63B6CB9442FC2",
-        "capture-1.png": "981C5466F3AA0355E8D5033E1A4AF3DB0A9D76A9114118468C030C6540BC6C51",
-        "capture-1-gray.png": "C07DA08580BF193A770CD94AEEB9360F8B55B0671920534BED3DE0843ECE7D77",
-        "capture.json": "CD4AFB08F47E9FFE41A0A51A6D7E41DF3863CC1463F100D83C4E81F92CFF1C03",
-        "build.json": "609D0039B808593FC13B46ADCD109D968A12810DBA2B43B879969AE0D91450EA",
-        "validation.json": "575716756BA3E9E7F5E93B291E013C67D45B0B10869F3037B6B782E11F7D299A"
+        "villager-midwife.blend": "CFCAF0BCC9F5C910AF78B960036C8C5A3C0BDF4B7705C1171021A8A3B1191BB9",
+        "villager-midwife.glb": "9F24D0BE9586FA1D1AF56E920C96BDB3A87B22942504375EF6BAA8829709A4CE",
+        "villager-midwife-blender.png": "9EFCF3E56AF9014DD386672B2D1CD827675D7BDB1D5E6678A1AE252050DEAA34",
+        "capture-1.png": "FC3B54D36E7BDE101D4DBC33E5B60779FBA78D0799616E6E31B6AC694C622B68",
+        "capture-1-gray.png": "C2267819814EF9C667F1144C4D193A08D0426634D5AB92389B75FF6377B478DD",
+        "capture.json": "F27EDDA0C200AD9C1427FFC4E3647FFDCBD1B31AF4E8DA238D2EDBE27638301C",
+        "build.json": "EF4F233F0087BC325D87CEA2CFE7B9CB88F398CAAA7171E6CF7D51F661249A17",
+        "validation.json": "F603E6879838FF19BB68BBA14861624547074E10C0DDAE9EDB0BA8057F340CD7"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-midwife authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "source": "Original G-18: Comadrona: toca marfil envolvente y delantal claro largo sobre vestido terracota.",
         "license": "Project original"
       }
     },
@@ -2580,33 +2707,33 @@
     },
     {
       "id": "villager-woodward",
-      "artifactRound": "G-10",
+      "artifactRound": "G-18",
       "status": "study",
       "recipe": "art/recipes/villager-woodward/villager-woodward.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-14T19-09-07-193Z-6884",
-        "directory": "artifacts/graphics/G-10/approved/1907a330784a352c"
+        "runId": "2026-09-16T12-32-20-763Z-45612",
+        "directory": "artifacts/graphics/G-18/approved/fc406c74d7235849"
       },
       "bounds": {
         "min": [
-          -0.17115,
-          0.01,
-          -0.093333
+          -0.175,
+          0,
+          -0.09
         ],
         "max": [
-          0.17115,
-          0.666667,
-          0.095
+          0.175,
+          0.65,
+          0.090833
         ],
         "size": [
-          0.342299,
-          0.656667,
-          0.188333
+          0.35,
+          0.65,
+          0.180833
         ]
       },
-      "recipeSha256": "E2DB2978CD1867314E90FCF51D2C8BA596DAC049A0178A8FE9AC222144309D06",
+      "recipeSha256": "6C2E018DF0F084D10A4298F5B04B39B06F41FC25FBBA6036F477FF83981740DD",
       "materials": [
         "skin",
         "cloth",
@@ -2653,53 +2780,53 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1320
+        "triangles": 960
       },
       "hashes": {
-        "villager-woodward.blend": "C5DDF5A1CF909F148113DEB5EDB8A9893F53A9F7A4E94D91E31D5E0E5FC28F64",
-        "villager-woodward.glb": "1907A330784A352C646D3ECEE842F4DAD50BAA83D4AC504841268E601A2DBA49",
-        "villager-woodward-blender.png": "EE6F6E5B808EE9395421706149CD62E54296CDE7CA0217A92057A4C08EAA6B81",
-        "capture-1.png": "4D92032B8747590F2362091F231C865CB7F76CC8E82EEE207AFB204501F9C61C",
-        "capture-1-gray.png": "CF662C47F521455EE70BBF6A70800D248EE79F63E0DC4369C8E222E7F1BC9CA9",
-        "capture.json": "5234596761C8721F4AB8C77BB582306415E80A36EB37FF664390420C95897F08",
-        "build.json": "59F1ED267AB1DA3EE8C627C8B5DD026617A39D23BC05AB9C1567F017EC1545FD",
-        "validation.json": "FE44CAE0EDF4AFAEBEDEF660B1C69EEF6628A8DF32329BA3F3EFAD67C53EFDDA"
+        "villager-woodward.blend": "0C029FF7CB89462EBD4597848345A1AEC90B4A239DA1748AC7B90F06B67B20BA",
+        "villager-woodward.glb": "FC406C74D7235849FAF87EC36AFFA20E9547B6879F69D5645BF43ECCDD4AAEAE",
+        "villager-woodward-blender.png": "A4F670A521FB6EB6CA66D277EEDE33F82C96600F0FA764701E4B4C8BA42E2918",
+        "capture-1.png": "C1A37CF332C2BB3BB5F38BDEFF13FE4122C36EA9074A029DD38BB1F23C45B6B1",
+        "capture-1-gray.png": "23E4757772FF14CCD584A4803C902E2C35CD9B9EC2E1BB49B7B35E94BED079DA",
+        "capture.json": "43954970C12C437169CE51EED66A7E2822AEEEA356C7A18D3F3EC40AE01068BB",
+        "build.json": "D90F83A64048469B3D2A31C041830095581E4D94FB83248D3305EF8FA826965A",
+        "validation.json": "A29E113ADE5878C65620A1E212E50B1D054E71AC4E1C964E7DC3A546FF8813D9"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-woodward authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "source": "Original G-18: Guardabosques: capucha y capa corta verde oscuro, cinturón de cuero.",
         "license": "Project original"
       }
     },
     {
       "id": "villager-reeve",
-      "artifactRound": "G-10",
+      "artifactRound": "G-18",
       "status": "study",
       "recipe": "art/recipes/villager-reeve/villager-reeve.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-14T19-09-13-357Z-6156",
-        "directory": "artifacts/graphics/G-10/approved/7e3934563d2ddefd"
+        "runId": "2026-09-16T12-29-42-841Z-44572",
+        "directory": "artifacts/graphics/G-18/approved/43fc649bc07349c0"
       },
       "bounds": {
         "min": [
-          -0.17115,
-          0.01,
-          -0.093333
+          -0.175,
+          0,
+          -0.071667
         ],
         "max": [
-          0.17115,
-          0.666667,
-          0.095
+          0.175,
+          0.65,
+          0.090833
         ],
         "size": [
-          0.342299,
-          0.656667,
-          0.188333
+          0.35,
+          0.65,
+          0.1625
         ]
       },
-      "recipeSha256": "C21C7B444A9F7788135C8319DD5DE4AAB3B987302759FE160F602ADA8DD26520",
+      "recipeSha256": "18A545FEECDDD47420323F997928E67FBA62814AB525945FDCE7891BE976A7F5",
       "materials": [
         "skin",
         "cloth",
@@ -2746,53 +2873,53 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1320
+        "triangles": 1044
       },
       "hashes": {
-        "villager-reeve.blend": "FE5CAF3C9E5E4319D6ECA380D4D5A1ED6DC5085B7EE85CA479A855A490A3574A",
-        "villager-reeve.glb": "7E3934563D2DDEFD2CDBF24EAE66C54ABE689C6036C58EAFCF7849D0805B2D86",
-        "villager-reeve-blender.png": "AB925AEDFE4B753A805E55596682382CD6CE42077DE945A41475E745712A4EFD",
-        "capture-1.png": "D8D8DE8C2E8DB0215807AAA72E1ECE19C2AD9600F528A7D084F4A3F07176833D",
-        "capture-1-gray.png": "17A5DC6C7CE6CC7E86D24EB8D3559508D93D3E3B0770E3E9EFDF4476962284F4",
-        "capture.json": "C6260C745E8C0AEA84F6E7B9E5B2B1B3F6AF90452FE83243001C2872204EAE64",
-        "build.json": "0BF9C8DBDB5FB1F8ECF7C8FB251EFD15A409E0E421BFE003EE3F7412B1303474",
-        "validation.json": "60A6D59DB5FC17002AC97CDCFB9FF075976DDDD5EAF35FF41A6906C887051514"
+        "villager-reeve.blend": "1491EF81C22944654E113C823C4BD5AB27FA26E25BD79F55428633E726EBFA99",
+        "villager-reeve.glb": "43FC649BC07349C007C8165AA2B68DAD20DCA2D6B3ED5B648C8CC526C691E7C5",
+        "villager-reeve-blender.png": "3052E81F20CFEE694755AF26082C64F1ED5C8A425A8BB5CEC5A779B0A02C3FF8",
+        "capture-1.png": "54BBEB38403B721491596E6CAE3EB7FA73614FC04EA47D74B5CF82A28876B71C",
+        "capture-1-gray.png": "EA47C6AD38B5F4595620E92FDBCD94829C3788BB0B165A3B9205AAD03EF406A6",
+        "capture.json": "9FE5F6B6E89AF38907EE7FA087DFFE0D2F0C445675A0AB88569553DDE03BCAEA",
+        "build.json": "E1AE35302BAFC547101836A7BD7550F31483B0ADACB8DE37F9A971325E30107E",
+        "validation.json": "1C9889747078440F5A26264989553C49B4B20A49289F66EAECBAE877BCA99544"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-reeve authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "source": "Original G-18: Alguacil: túnica ocre corta, cinturón ancho y cuaderno al cinto; manos libres.",
         "license": "Project original"
       }
     },
     {
       "id": "villager-herbalist",
-      "artifactRound": "G-10",
+      "artifactRound": "G-18",
       "status": "study",
       "recipe": "art/recipes/villager-herbalist/villager-herbalist.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-14T19-09-19-518Z-29376",
-        "directory": "artifacts/graphics/G-10/approved/edf9f80ef4566e1d"
+        "runId": "2026-09-16T12-32-36-257Z-35680",
+        "directory": "artifacts/graphics/G-18/approved/7faaca20baba3b9e"
       },
       "bounds": {
         "min": [
-          -0.17115,
-          0.01,
-          -0.093333
+          -0.175,
+          0,
+          -0.071667
         ],
         "max": [
-          0.17115,
-          0.666667,
-          0.095
+          0.175,
+          0.65,
+          0.090833
         ],
         "size": [
-          0.342299,
-          0.656667,
-          0.188333
+          0.35,
+          0.65,
+          0.1625
         ]
       },
-      "recipeSha256": "8B6CEFFD9DD35645D004A94A821778149BBB32BC1100C67B69278A49E003BB3A",
+      "recipeSha256": "741D628E18A639743CA17BF60420EEECB235AF079763077E98000895B96E78EE",
       "materials": [
         "skin",
         "cloth",
@@ -2839,111 +2966,112 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1320
+        "triangles": 1080
       },
       "hashes": {
-        "villager-herbalist.blend": "565759E81FB99D97DB33F6BA5D4C6A808058A606D2CD7F76C6B44BFAD2CDCA1C",
-        "villager-herbalist.glb": "EDF9F80EF4566E1D79550ED11FF8A4A8B55837C6B932E459D01D44F27F13328F",
-        "villager-herbalist-blender.png": "E937155448DC26396742A20B32E1B86F4F80446833E78584EDF0EC713EAB84FF",
-        "capture-1.png": "AD1954ACFA5D9CE7682D37FC1232FE5C94785F029141D912C7007CAB08D76BF4",
-        "capture-1-gray.png": "504C9D1584DE14E718BE77A421892E80C013FE4FFEB14E927ABCCF7E81E12A7F",
-        "capture.json": "CDEEC271450C102FDDE08A263594A05B00F25BCC98B83A227BCF7D57F48D2A9D",
-        "build.json": "1558A3224A93B223AC29B5BC49D0B7E749E7770E932C430AF534980E38E33787",
-        "validation.json": "28E9D52562E30024AA938EFDB51A9B7250C2CAF57E94CBC29A6233281886EEE8"
+        "villager-herbalist.blend": "04B292DA21F9B4D5D1BB879012821977311EEA7D5E17B555CB282C9C7078E101",
+        "villager-herbalist.glb": "7FAACA20BABA3B9E28B01E4C72E9F89EAB5A20FB591E069A394C809CB9E56114",
+        "villager-herbalist-blender.png": "3B2DF3374382BA7EEA4D8251F2BB4DEE950E44C0287C117FBF414F70F097DC3C",
+        "capture-1.png": "8207318487982016221866ADD234BC9E080EE4DE8DC63F1B2FE88E8B93D0BA01",
+        "capture-1-gray.png": "E2EABD400A04E2AE5C340E31A043666321BA2852CD00153993945EEA2D9529DB",
+        "capture.json": "85E1D0F58ABCA7365FBA3F8A98FFA59EA597DE98BDEF492E87F59BDC63632A9A",
+        "build.json": "060C4E1C87E839F6CE9186D92C1BA04271E24B2AE96E10EBC21D4094697F6B8C",
+        "validation.json": "AB559F3BCEEE6B502FBA731C7F9E9EB752F417AE575F73C6239046E58ECE6F5B"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original villager-herbalist authored for The Valley G-10/V-11, variant of villager (G-04) recolored by Role",
+        "source": "Original G-18: Herbolario: túnica verde hierba y zurrón ocre con un haz de plantas.",
         "license": "Project original"
       }
     },
     {
       "id": "haystack",
-      "artifactRound": "G-15",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/haystack/haystack.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-15T00-09-00-882Z-8912",
-        "directory": "artifacts/graphics/G-15/approved/814ad600da3c1e14"
+        "runId": "2026-09-16T19-18-01-947Z-41444",
+        "directory": "artifacts/graphics/G-21/approved/be3a923e28bdc16b"
       },
       "bounds": {
         "min": [
-          -0.295442,
-          0,
-          -0.3
+          -0.297575,
+          -0.000333,
+          -0.293333
         ],
         "max": [
-          0.295442,
+          0.297575,
           0.666667,
-          0.281908
+          0.293333
         ],
         "size": [
-          0.590885,
-          0.666667,
-          0.581908
+          0.59515,
+          0.667,
+          0.586667
         ]
       },
-      "recipeSha256": "DBB8463989C565E6F7B4DDDE5D4E5C402199B3D32E85219A30E5E8A21758C69D",
+      "recipeSha256": "E20187AF942233F4B9CFF9BCA95C10EB73FE2E606D850D99CA3047F481979010",
       "materials": [
         "hay",
-        "stake"
+        "stake",
+        "dry-hay"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 68
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 958
       },
       "hashes": {
-        "haystack.blend": "825A5B0BFF94C10284431D1610DC846B276C8E6DF63FF83C3AF2D57E193AF3CF",
-        "haystack.glb": "814AD600DA3C1E14D4E7E075657B234F7FA77D35B2CE181D8D297BE6A7E2EBF9",
-        "haystack-blender.png": "E3A00B9BEE0FF9E3289EE413A427B01F4F3412D9582485B94FE5D86EF3037BE5",
-        "capture-1.png": "6E9E9CEF8781C63E9D70E5CBAB5CA5F9A20B8ABED33939E3C829C2A58BA13B85",
-        "capture-1-gray.png": "04820A306B9B61D217D57D0173EBCA54AFB721DB1E5970B4FE85594BF3B1180E",
-        "capture.json": "E36A942D486E649EAD3AA20B165325F1F4351A6459391FECED6CD664849155AC",
-        "build.json": "E5B566E1C0576683F119CD057ED635F05319877B12C9A67300118D23B89C2E71",
-        "validation.json": "1B549F6FB7143AE2CC534E2CD2A13272423640F7E1121EC3B34D8416F4128854"
+        "haystack.blend": "10CC8F3D10236C6C195237B9B679A63A208A022D58EC6720258FD32DE9BBF4C6",
+        "haystack.glb": "BE3A923E28BDC16BF70C5F0578D0B0AEB787A0E3F520CD86CD18177F67D43D6D",
+        "haystack-blender.png": "DADA690A28DE3DFEA8AA3F82C803398E69748F22A98FF4751E585AD20F7BDBA3",
+        "capture-1.png": "4726C82D03CD2ED843C81906B6A9D7F01FDE673199450F8401A631A35AA480B5",
+        "capture-1-gray.png": "FEFACF0A51EE9A34B6B7EA18850C13B10AD977F4F340C2B232AE8D2BD89D57E1",
+        "capture.json": "D456D5747DFEF0D9A694751667BA9053642022F6F47C0B733955F04A32BBBBEC",
+        "build.json": "D1FADAD7787AA5D6F0552FAFD0DE63522974CF2F502B5691CC4CE855D40C3BAE",
+        "validation.json": "05C5CB2A98C8B7A07D82DD6E86ECD15A18E7E7F676CEF8FDE9E7489C70C7D226"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original haystack authored for The Valley G-15 (scatter props)",
+        "source": "Original G-21: almiar con faldones de heno, haces y estaca central.",
         "license": "Project original"
       }
     },
     {
       "id": "log-pile",
-      "artifactRound": "G-15",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/log-pile/log-pile.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-15T00-03-50-190Z-16312",
-        "directory": "artifacts/graphics/G-15/approved/719d3301e2db0fae"
+        "runId": "2026-09-16T19-27-01-730Z-51040",
+        "directory": "artifacts/graphics/G-21/approved/48a29eb876083634"
       },
       "bounds": {
         "min": [
-          -0.25,
-          0,
-          -0.17
+          -0.24,
+          -0.0003,
+          -0.153
         ],
         "max": [
-          0.26,
-          0.213333,
-          0.17
+          0.237,
+          0.18648,
+          0.153
         ],
         "size": [
-          0.51,
-          0.213333,
-          0.34
+          0.477,
+          0.18678,
+          0.306
         ]
       },
-      "recipeSha256": "D50EB9694235195DF51B6E9FD372B63E1C83276A3B967B6836305BADE756AABC",
+      "recipeSha256": "01941334D110B8FB0EED9C194914F19A0931FFF41EA88FA32821D70DC132158A",
       "materials": [
         "bark",
         "cut"
@@ -2955,79 +3083,80 @@
         "objects": 3,
         "meshes": 2,
         "materials": 2,
-        "triangles": 196
+        "triangles": 1544
       },
       "hashes": {
-        "log-pile.blend": "51FD78673080A808E7C33E127D88ED323CFE9A0B102FC81164A0DBF928FE4FFB",
-        "log-pile.glb": "719D3301E2DB0FAE6FC040934A77861B429897E00C7CB4EEA265253B55127247",
-        "log-pile-blender.png": "70EB50F409BE27BF32D10AF9E6F122935D5E0DBBE867E155B2EDFDCCBB7CFB60",
-        "capture-1.png": "DBBE26A05A02A084DB3FBD0F5278366B0454D52A328D12E2972478671C5BD32E",
-        "capture-1-gray.png": "08EBF614BE62C3F86707AAF16573C397DD65A4B1AE4CE44BDDF4DA3ADB82036F",
-        "capture.json": "A6155B6E64F4D89DD6DA04E90EA6BAA9623B3D8B629C9C8581DE7D9E3A1159FB",
-        "build.json": "DDD03F61C3C401AAD17DFCF5852C8D9BEA0E625D17798DA39E6DE18200246485",
-        "validation.json": "5AD9A8DD6461A9662274822D0B21A58769A967E2023D7A58182631A8E0CB9B72"
+        "log-pile.blend": "2B724D884792D6D752E42516F0C723B9572EA787DA0B2BDC356D8B03B1B98CB7",
+        "log-pile.glb": "48A29EB876083634E92E297183321BB49D895A3708759E675FDF208E3F7BA468",
+        "log-pile-blender.png": "D8E2F12EC0F6A153861BA449B37430E0F161992B1BFF6C324C1720FFB47192E2",
+        "capture-1.png": "CDADCB41BE8C75A04FC7F4B4759CFAC10DAECD32FA06ABBF99E64F743515C9AC",
+        "capture-1-gray.png": "F23FEF98B365162F8179B3C9D54837898678C22E9A068EAA3428CDAC1B34E4C9",
+        "capture.json": "8249A205E2E1554291E9747AA47B61C397A067CEC21F8A24026F9B2ED0A036D8",
+        "build.json": "362B4485DF26D9C6BD7850D3974271A7A8057D6835B7EBF867BEFFF136B214E0",
+        "validation.json": "7E2CC4C0E05E13C4B2A267266C9277AEE7D1A06366B107E48E8023DF73BF1E8D"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original log pile authored for The Valley G-15 (scatter props)",
+        "source": "Original G-21: leña apilada con corteza, cortes, duramen y grietas.",
         "license": "Project original"
       }
     },
     {
       "id": "handcart",
-      "artifactRound": "G-15",
+      "artifactRound": "G-21",
       "status": "study",
       "recipe": "art/recipes/handcart/handcart.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-15T00-04-43-459Z-18348",
-        "directory": "artifacts/graphics/G-15/approved/be7cebede684b460"
+        "runId": "2026-09-16T19-04-41-693Z-39676",
+        "directory": "artifacts/graphics/G-21/approved/3ad96d3b5da5c2ef"
       },
       "bounds": {
         "min": [
           -0.50498,
-          0,
-          -0.153333
+          0.000107,
+          -0.175333
         ],
         "max": [
-          0.183333,
-          0.27,
-          0.153333
+          0.191667,
+          0.3,
+          0.175333
         ],
         "size": [
-          0.688313,
-          0.27,
-          0.306667
+          0.696646,
+          0.299893,
+          0.350667
         ]
       },
-      "recipeSha256": "C4EBBE98BFE375CFBEEC6BAAB74AC99C3FCD07506AF578D279986A170430EDB0",
+      "recipeSha256": "F3F55A0B744CB4EB499EE900B30C91D9A337829E633A0B0FDDBE2A7DD3F9D13D",
       "materials": [
         "wood",
-        "plank"
+        "plank",
+        "iron"
       ],
       "clips": [],
       "motion": [],
       "connectors": [],
       "statistics": {
-        "objects": 3,
-        "meshes": 2,
-        "materials": 2,
-        "triangles": 580
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 888
       },
       "hashes": {
-        "handcart.blend": "305B108A6DAECD2B30AB2158278AD5FFCAEC2458DCBE80BFAE2946173FA5B3E4",
-        "handcart.glb": "BE7CEBEDE684B4600CB90D42D5C2384E333AB0880D9E5A7C9698364315C1B962",
-        "handcart-blender.png": "6253AADD3BE7A843CCAAB529078CB6AC5BCCF025FA429240CE57D30A8DCD6CE9",
-        "capture-1.png": "A2142143C7AF876660AF0254D9866FE33B8783B814FE3E2FF77C01C0A4415FC2",
-        "capture-1-gray.png": "188275D132848F62DFEE569C049323670FC074F5BDE9452AD8692F3030878015",
-        "capture.json": "5D8099B6DFF0C7EA506AFD88D131FE868AF31D4A9E287271F8175C791C234B3B",
-        "build.json": "DA55280905EC0684EDA8023C7ED2F7D116C14061993CF21B180F9351728E6170",
-        "validation.json": "EBD7CB11355948D7017008EF92BD781F8CDB9134C61EBCA84F53E53BBC821510"
+        "handcart.blend": "63D2D0804F6082F75ADD35B1EFC4E3011F2BFC1B1FAC237E0CA387A9D5E99FF9",
+        "handcart.glb": "3AD96D3B5DA5C2EFCC08D326B8272B41BABB60D8674D093F661F4D5AB23FC1DD",
+        "handcart-blender.png": "441E02D4694D8E4E535ECDBE746131BF6FCD6CA603AD4482C6759DCB07A4BE4C",
+        "capture-1.png": "50A69813BFADA83D3CDF9F822E044CE1D68F4DA438C20E5F6EBD844A0CE21001",
+        "capture-1-gray.png": "806D174F9325B5A925C7BEDB19620FD7546FB818370D0DAEB12708280174C7F3",
+        "capture.json": "EF3A80C50DBCC1F18ED2E56693D484FEA418BEE1C5DD5269740D2FCA4466DBDD",
+        "build.json": "AB11BE3B88C4458104A8EE4AA6BB1377AC4918FEE4DCF027CF961DB17E4D5635",
+        "validation.json": "56D854E0530A2175DF0AAB57454E072AB870B8F2DB3C3446AFA5DE1B764CA327"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original handcart authored for The Valley G-15 (scatter props)",
+        "source": "Original G-21: carro de tablas con ruedas abiertas, radios y aros de hierro.",
         "license": "Project original"
       }
     },
@@ -3121,6 +3250,775 @@
       "provenance": {
         "kind": "original",
         "source": "Original villager-farmer: sombrero de paja y ropa de campo G-17; rig compartido G-04.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-child",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-child/villager-child.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-27-50-345Z-47160",
+        "directory": "artifacts/graphics/G-18/approved/3b12b8c1a0b05af8"
+      },
+      "bounds": {
+        "min": [
+          -0.1575,
+          0,
+          -0.080267
+        ],
+        "max": [
+          0.1575,
+          0.65,
+          0.101733
+        ],
+        "size": [
+          0.315,
+          0.65,
+          0.182
+        ]
+      },
+      "recipeSha256": "9986F5F53241A717428B0C521B169E8086DFEC860C2E21C22C69F64A8756FF1F",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1020
+      },
+      "hashes": {
+        "villager-child.blend": "5393D3A3A9C0B149D569FB2226B5311B24D44899755C811F5960384C150829B0",
+        "villager-child.glb": "3B12B8C1A0B05AF852A3D0B2F5476A9A11E7915D4508CE481B1B3D73BE0B4EE3",
+        "villager-child-blender.png": "76B4937AE1072C7D30830FCACFCDFDB123CC29D7C2CC469630903E896B0EE784",
+        "capture-1.png": "69BC0F73041E019C3B26035789594DE1914BFFD7C5E0BB752029EDBC833D1775",
+        "capture-1-gray.png": "929E36E04C3002B92A44C694F6A74C1DDC3B6FDE4F9FA65244A7F0711BF1A08A",
+        "capture.json": "0A374EAF483575DC8127A518E3D52818C709EC8F239CE0E349B3D8F56E254C05",
+        "build.json": "9F818F3922265B373A07A9A8706507EA169E4C898021CC16BACF7A7830F81D9C",
+        "validation.json": "EEC0A0DDBDB843826B862935B4351F932A64B872E7C7628A44CABD5B363DD562"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Niño: cabeza mayor, brazos y piernas proporcionalmente cortos, túnica terracota sin herramientas; 0,65 celdas antes de statureAt.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-elder",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-elder/villager-elder.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-29-12-924Z-42284",
+        "directory": "artifacts/graphics/G-18/approved/09607f6cceae6c8f"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.146731
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.236731
+        ]
+      },
+      "recipeSha256": "BDFBFD6701AD0CD807A786811FB0DCCEBD492A29C2CA66D2B6A54A777B07D645",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1032
+      },
+      "hashes": {
+        "villager-elder.blend": "86BA64B00753DA472F62904AFD0CB852B6DC1D36967BA443947D48A5C46537EA",
+        "villager-elder.glb": "09607F6CCEAE6C8F55F765E805075E50A70EE54B56F0E0FA8F8623EA3CA5D033",
+        "villager-elder-blender.png": "877860FC165B329EF4B370A22B40F8263EA9B7EFAFD5DFDF4284A94398D9C0D0",
+        "capture-1.png": "CF3C93211E5B4C4150E2EF11227C21061395A5F5BC14E71B06DA10550197E430",
+        "capture-1-gray.png": "E7B454F8458F2D289469F6C3004707D859D31AFF237004AEFA709E8C3719DEE6",
+        "capture.json": "FB87B832F4DD2D7C711B5861E931DF48D62EC87E8DC8FA5E9B71D445A83AD9A9",
+        "build.json": "76A61A34F23BF33B5B2CB96758892795A005251FAF12E8ED4A79B380FC72B3DC",
+        "validation.json": "ADD020C5A24A22447869382E11E53D178AC957AA429E1073389D8D848A9501B1"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Anciano: espalda inclinada en la geometría, pelo claro y chal apagado. Sin bastón fijo: ambas manos permanecen disponibles para los accesorios del juego.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-stranger",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-stranger/villager-stranger.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-31-36-056Z-46000",
+        "directory": "artifacts/graphics/G-18/approved/664efdbfd40a45b4"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.180833
+        ]
+      },
+      "recipeSha256": "ADDB30C1181CD1363017B2937A172147BD7ACFF71BBF01CCFDA18356C645C72D",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 948
+      },
+      "hashes": {
+        "villager-stranger.blend": "238D2842A1C6AEEFB621FB8AB4C583FD7B7B37CFBDF7418619A19468C380D2DD",
+        "villager-stranger.glb": "664EFDBFD40A45B4F3EC88434285F58BD0178AD10B89206E0754E730EB744759",
+        "villager-stranger-blender.png": "9A4EB5B303CFFDA0BEC61BA6293AC1B0BDAA060F258595E2CDA449F0FCA83E0C",
+        "capture-1.png": "9F8CB9D5F78CED5D7A5242FEBA8E89CC47D9B37144C3E19DF1B8B53472D66B82",
+        "capture-1-gray.png": "EB17ECFCEA9390DB47573CC0D23041CB18D4EFE4D3821BA5FDF0756D8595C830",
+        "capture.json": "A00941027FD07B8049E3A084024325EA756069CB7D0214F37909FA957E9355D0",
+        "build.json": "603261A685D2AFE87468FD11B6BBB2E00D92120DD0CE9CF2EB9E4EC947969B36",
+        "validation.json": "5685A412AEE62C840446164D7278C6CF2C776B91563E33E1347FD306E75D7C7E"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Forastero: capucha y capa azul pizarra, color exclusivo, sin herramienta.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-woodcutter",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-woodcutter/villager-woodcutter.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-30-36-976Z-44196",
+        "directory": "artifacts/graphics/G-18/approved/c81fcade8e7b0ba5"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.071667
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.1625
+        ]
+      },
+      "recipeSha256": "E4D2D18B6CA384985D02242BDDE38B955B174B662518CA98639D49A12B6BE953",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1092
+      },
+      "hashes": {
+        "villager-woodcutter.blend": "94C50A6A885B61D28F21C8BE930B547C9585176CF0F3931986CAAE921F3E1AFB",
+        "villager-woodcutter.glb": "C81FCADE8E7B0BA54800D70016B96F3FBCD99E4358B78A74769BAC9755BF64B4",
+        "villager-woodcutter-blender.png": "35F36BD14FAD13807EB9ECE2B24E02125D227BA073AD7020E4BCF8CC3744D5EC",
+        "capture-1.png": "83C7C5647F817CB2E75072BC414C6674130D36548F0028E6D89876398591FE02",
+        "capture-1-gray.png": "29C0E170C9C03D3CB7C5BE913767DB7D97185BC93E471101AB3443D79EB63995",
+        "capture.json": "90AC0358C014D184B04926E619504A2D7B0EFF465AB4805E8FC967D4BDA8F22E",
+        "build.json": "CFE4D20089FAE55585D6BB11721E803A22B2B9209899BC2D3918C90599D1C2EA",
+        "validation.json": "83C723E06251CE07FED27CEBD1607200EF72174A318C12EA62FBC075526DF280"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Leñador: chaleco abierto oscuro, mangas arremangadas y hacha guardada al cinto.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-mason",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-mason/villager-mason.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-30-52-424Z-49328",
+        "directory": "artifacts/graphics/G-18/approved/f853038ba6f4f887"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.075
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.165833
+        ]
+      },
+      "recipeSha256": "7B6484DF92F4591E6E035FA0E68009FF3051B5E0EAB25FADB19E20E2DCD8C40E",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 972
+      },
+      "hashes": {
+        "villager-mason.blend": "AC7BA6F10611DA66CE7DD42905A4AF10067A92D77378229BA202F441E4354E8A",
+        "villager-mason.glb": "F853038BA6F4F88715D8BC1FE666AEED052989020FDD12DFDB51B4FA3AD4B63F",
+        "villager-mason-blender.png": "EA618587527144088FE181BEAED5559D6A1F0F5CFD2E82D73FFBC72AEB3A7DC9",
+        "capture-1.png": "644AC5958F6EA181F457461303C3E9AC1AD673E8511A795589046B24598ABF24",
+        "capture-1-gray.png": "91776E05185D263A87E5C418A9981C8B31DDF2FA89D55B408625B82CC8DBC485",
+        "capture.json": "BB68FC750138B7C009DAD2BFEE731296820A89CC23088E15EC0BCC9F2E06B3E7",
+        "build.json": "F73A1FCE6F6496918A6DDE98DBFC36F986120F303943DA35DDAF4A10B8906C6E",
+        "validation.json": "8A5F8858C96D43E95CCE80BD92018D6E38115DB6EDC65916A4A8B94A7BCF15A4"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Albañil: gorra, delantal marfil y pequeño bloque sobre un protector de hombro.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-shepherd",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-shepherd/villager-shepherd.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-31-07-018Z-49532",
+        "directory": "artifacts/graphics/G-18/approved/9e00fd0fb9d51a1f"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.075
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.165833
+        ]
+      },
+      "recipeSha256": "05E0462F514C615D92FE3BD0919AD27F6713D4613F104747AE0BE431B7EFAEFF",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 960
+      },
+      "hashes": {
+        "villager-shepherd.blend": "A8AFE1010C1A85C9AA329FAEFD0F6A3EBCCB0E526DF6DFA1BAB454475241C8DB",
+        "villager-shepherd.glb": "9E00FD0FB9D51A1F0632DFB8208C8DECD1F7CA1C50F3F17C2E0D3ADF7F8CD69E",
+        "villager-shepherd-blender.png": "FC445B37C2F919CB56612A4D7CA08D40604B405541F8A192B00622A78853C4EF",
+        "capture-1.png": "C8637AFA721897CD1A195CA22D3722B777E9A1F459F3F4A47B6BCAD02036BC57",
+        "capture-1-gray.png": "054E8E87C835069529B3C20EDE3C74716AF4A273F6A5DA6C86B9085CB50C0C84",
+        "capture.json": "A4CCF4291CD00C20AC6BD6E23A266E2DFA43B3C16564938C7279E6C5F5A30236",
+        "build.json": "AAFDCD81313909F9100F8980442E60B303B3B11675D01FBBFEE3A0AF5CCD7CF3",
+        "validation.json": "96D3BCBEF8E267F5A568B7B5803C9019DB32AA4AF606BCE7908CE958A1E6A0CC"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Pastor: sombrero pequeño, ropa clara, zurrón y vara lateral guardada; conectores libres.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-fisher",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-fisher/villager-fisher.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T12-31-50-638Z-11516",
+        "directory": "artifacts/graphics/G-18/approved/543c7849d05df8db"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.071667
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.090833
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.1625
+        ]
+      },
+      "recipeSha256": "9FF467BFC22E06986409ED0BB89B22C190B3FB81389469BA1670DA217B57FD0D",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1044
+      },
+      "hashes": {
+        "villager-fisher.blend": "B1DAD5F541F78BC7EEFE274C3E9A031392559A9D27088F0DC841282587EB0762",
+        "villager-fisher.glb": "543C7849D05DF8DBB350E8E0A24089045868078D302605793CBB1671C69D9AEE",
+        "villager-fisher-blender.png": "E63A54D8DE64EDE419EFBA425B8FF02E1AFFC3A65101FA21594CB9FFD3CD46CC",
+        "capture-1.png": "8C3801EDA900223F3254D146BF5DF8E25C85AB61F3BE6ED5902C397AD63B0145",
+        "capture-1-gray.png": "1E628EF48BD8CB95ED586483E3D0AAF7191A9AD385CB4725B7AB4CB237A3043E",
+        "capture.json": "6BC3CEB443EEF95724BAD5A4129BB07F6ABA3BACD1453E2D2CF5F3DB2E8E1948",
+        "build.json": "9ED8165ECED965E8545FF0DF769CF552B09D231B45AFE85AB979B904E6368AA7",
+        "validation.json": "52433421A221A58CF9173A605F14514518ABB1E5CE1667A92B26A110A6E06224"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Pescador: camisa azul río, botas altas y cesto lateral; manos libres para la acción.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "field-cabbage",
+      "artifactRound": "G-22",
+      "status": "study",
+      "recipe": "art/recipes/field-cabbage/field-cabbage.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T18-29-27-041Z-47124",
+        "directory": "artifacts/graphics/G-22/approved/eeb451ab6596c7f5"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.198333,
+          0
+        ],
+        "size": [
+          3,
+          0.198333,
+          2
+        ]
+      },
+      "recipeSha256": "7F0AA4BDEBBA0B7CEB77B2E6F20EE4CBA3B4DA95CC5C7C5960086CA4A2D9889D",
+      "materials": [
+        "soil",
+        "leaf",
+        "heart"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 2292
+      },
+      "hashes": {
+        "field-cabbage.blend": "5A53BF0B5B974D1D0B9ADBE31AD75754D05BC09785E51DA117572A3383986AFF",
+        "field-cabbage.glb": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5",
+        "field-cabbage-blender.png": "672E24FCDDE7B3F23EE6517C52A5C9916B16CC2673A0C0F1B0390BE2AE98F022",
+        "capture-1.png": "D8154DFCAA78C5EAF54C51439FCAC2A8EBD264FB590B7FB06251BAF47BCA1620",
+        "capture-1-gray.png": "4FC9785F64E263D7E0B244082E9BCA8C112ED188DD49D668244F95B65EED20B6",
+        "capture.json": "D10E1A1D3C00BFAC18D09CFA309B94078D66FD4390A7D2147044EE0903856BE8",
+        "build.json": "D24BC6416ABE75E438B6C0D4B085AB3D4BCCA118FED3EABD0E035489560994F8",
+        "validation.json": "5F3CF42265150F637E7B1D6BDF14E1171DD2D63A287076EFC28C8B4F09F9F710"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-22: coles con corazón redondeado y hojas verdes abiertas.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "field-leeks",
+      "artifactRound": "G-22",
+      "status": "study",
+      "recipe": "art/recipes/field-leeks/field-leeks.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-16T18-34-25-577Z-45756",
+        "directory": "artifacts/graphics/G-22/approved/1fce25e55b550079"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -2
+        ],
+        "max": [
+          3,
+          0.366667,
+          0
+        ],
+        "size": [
+          3,
+          0.366667,
+          2
+        ]
+      },
+      "recipeSha256": "2027BC62C3C644FB7A512789F5B2975533BCA78F674F4B6DD347654B45B29966",
+      "materials": [
+        "soil",
+        "leaf",
+        "stalk"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 2212
+      },
+      "hashes": {
+        "field-leeks.blend": "137F6E384EEFA930482661F596A4A9790F2B2AEA8416527BC83A75E79CE3F30A",
+        "field-leeks.glb": "1FCE25E55B5500790E934F5CC08AF1DACE945FE0E8CBA1E7718C0D7FEB6EC123",
+        "field-leeks-blender.png": "DE74EB073D52F9922CD56FE1B69C893785500F8F0FC7C1754C75F6DD5D0E8DBD",
+        "capture-1.png": "96DBB4FFA2CB602020F7161DA20F861A2276A70EAD798120E6FF90F91690A89E",
+        "capture-1-gray.png": "ABEE5A9B12F1D91DF6A2202D7F79B260595C9C83059A7E08AC69954D098F5AF5",
+        "capture.json": "0729C196B08D5E421F57BBCC6DE81FF214A229FCE849F58A0210630C424CA9A6",
+        "build.json": "2CC87B0207327DB4B3A347283904BD65A7CC51AE90BC0402A7D68FBACCE4EEAD",
+        "validation.json": "DDAAB4B8307D511A4B49AA0820425D00737C08CD557321CF7196330C68D2A7A2"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-22: puerros de tallo claro y hojas largas verdes.",
         "license": "Project original"
       }
     }

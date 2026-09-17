@@ -1,3 +1,4 @@
+import { fitsCircle } from './body';
 // V-02 · Lo que empuja a un cuerpo. design.md Anexo E.
 //
 // Tres fuerzas y una corrección, y entre las cuatro sustituyen a quince
@@ -190,11 +191,6 @@ const FIX_CAP = 0.06;
  * posiciones con el círculo ya dentro — 13 % de los cuerpo-segundos contra el
  * 1,3 % de antes de tocar nada.
  */
-function fitsCircle(land: Terrain, x: number, z: number, radius: number): boolean {
-  return !blockedAt(land, x, z)
-    && !blockedAt(land, x - radius, z) && !blockedAt(land, x + radius, z)
-    && !blockedAt(land, x, z - radius) && !blockedAt(land, x, z + radius);
-}
 
 /**
  * Separa a los que hayan quedado encima, después de mover a todos.

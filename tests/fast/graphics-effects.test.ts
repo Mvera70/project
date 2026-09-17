@@ -1,3 +1,4 @@
+import { destroyBuilding } from '@engine/world/buildings';
 // G-08 · design.md §10.3, D.3, D.8 — estaciones y consecuencias visibles.
 //
 // El objetivo de la ronda dicho por el brief: **que la belleza conserve el valle
@@ -34,7 +35,7 @@ import { Tells, WINDOWS } from '../../src/render3d/effects/tells';
 import { createScenicState } from '../../src/render3d/scenic-state';
 import { cellColour } from '../../src/render3d/world/ground';
 import { TIME } from '@engine/balance';
-import { groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
+import { FIELD_CROPS, groundSignature, planChange, planFor } from '../../src/render3d/world/plan';
 import { fingerprint } from '../helpers/fingerprint';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
@@ -182,7 +183,7 @@ describe('G-08 · las consecuencias', () => {
         && lived.has(building.id),
     );
     expect(home, 'alguna casa habitada que quemar').toBeDefined();
-    if (home !== undefined) home.lostTick = burnt.tick;
+    if (home !== undefined) destroyBuilding(burnt, home.id);
 
     const after = tellsFor(burnt).filter((tell) => tell.kind === 'smoke').length;
     expect(after).toBeLessThan(before);
@@ -275,11 +276,25 @@ describe('G-08 · las consecuencias', () => {
       const parcel = planFor(moment).buildings.find((building) => building.kind === 'field');
       return parcel?.asset ?? null;
     };
-    expect(fieldAt(TIME.HARVEST_WEEK - 1)).toBe('field');
+    expect(FIELD_CROPS).toContain(fieldAt(TIME.HARVEST_WEEK - 1));
     expect(fieldAt(TIME.HARVEST_WEEK)).toBe('field-cut');
     expect(fieldAt(TIME.HARVEST_WEEK + 6)).toBe('field-cut');
     expect(fieldAt(2)).toBe('field-cut');
-    expect(fieldAt(20)).toBe('field');
+    expect(fieldAt(20)).toBe(fieldAt(TIME.HARVEST_WEEK - 1));
+  });
+
+  it('las variedades de cultivo se mantienen por parcela y comparten la siega', () => {
+    const state = village(14);
+    const field = state.buildings.find((b) => b.kind === 'field');
+    expect(field).toBeDefined();
+    if (field === undefined) throw new Error('La aldea de prueba necesita un campo.');
+    state.buildings = Array.from({ length: 12 }, (_, index) => ({ ...field, id: index + 1000 }));
+    const before = JSON.stringify(state);
+    const crops = (week: number) => planFor(atTick(state, week)).buildings.map((b) => b.asset);
+    expect(new Set(crops(10))).toEqual(new Set(FIELD_CROPS));
+    expect(crops(10)).toEqual(crops(30));
+    expect(crops(TIME.HARVEST_WEEK).every((id) => id === 'field-cut')).toBe(true);
+    expect(JSON.stringify(state)).toBe(before);
   });
 
   it('y ese cambio pide reconstruir el campo, no el pueblo entero', () => {
@@ -300,7 +315,7 @@ describe('G-08 · las consecuencias', () => {
     const state = village(14);
     const burnt = structuredClone(state);
     const home = burnt.buildings.find((building) => building.lostTick === null && building.kind !== 'field');
-    if (home !== undefined) home.lostTick = burnt.tick;
+    if (home !== undefined) destroyBuilding(burnt, home.id);
     const before = planFor(state).buildings.find((building) => building.id === home?.id);
     const ruin = planFor(burnt).buildings.find((building) => building.id === home?.id);
     expect(ruin?.ruin).toBe(true);

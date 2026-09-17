@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "assetId": "chapel",
+  "runId": "2026-09-16T17-53-54-519Z-50956",
+  "status": "pass",
+  "durationMs": 2485,
+  "candidateSha256": "CE20D06C0E4E32FCC1BC43F3AB95B9EC4E627EA6E10780B9CC386CAFC43B2398",
+  "glb": {
+    "version": 2,
+    "declaredLength": 57672,
+    "nodeNames": [
+      "chapel_dark",
+      "chapel_roof",
+      "chapel_stone",
+      "chapel_wood",
+      "Root"
+    ],
+    "meshNames": [
+      "chapel_dark_Mesh",
+      "chapel_roof_Mesh",
+      "chapel_stone_Mesh",
+      "chapel_wood_Mesh"
+    ],
+    "materialNames": [
+      "dark",
+      "roof",
+      "stone",
+      "wood"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 5,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 776
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T17:54:08.079Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-53-54-519Z-50956\\candidate\\chapel.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T17-53-54-519Z-50956/candidate/chapel.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-53-54-519Z-50956\\three\\capture-1.png",
+        "sha256": "0D628101C66287D07A6967F9E9F3E759DC6792EAECEE1ECB9F75CE5B2FF20D88",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-53-54-519Z-50956\\three\\capture-1-gray.png",
+          "sha256": "FC7E84D9E02261352E7D16077FCB72F1252164E19F7AF4449413B104BB94637B",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 611,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:65321/artifacts/graphics/G-21/runs/2026-09-16T17-53-54-519Z-50956/candidate/chapel.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "chapel_dark",
+            "chapel_roof",
+            "chapel_stone",
+            "chapel_wood"
+          ],
+          "bounds": {
+            "min": [
+              0.183333,
+              0,
+              -2
+            ],
+            "max": [
+              1.816667,
+              2.1,
+              0
+            ],
+            "size": [
+              1.633333,
+              2.1,
+              2
+            ]
+          },
+          "loadDurationMs": 133
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-53-54-519Z-50956\\three\\capture-2.png",
+        "sha256": "0D628101C66287D07A6967F9E9F3E759DC6792EAECEE1ECB9F75CE5B2FF20D88",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-53-54-519Z-50956\\three\\capture-2-gray.png",
+          "sha256": "FC7E84D9E02261352E7D16077FCB72F1252164E19F7AF4449413B104BB94637B",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 129,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:65321/artifacts/graphics/G-21/runs/2026-09-16T17-53-54-519Z-50956/candidate/chapel.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "chapel_dark",
+            "chapel_roof",
+            "chapel_stone",
+            "chapel_wood"
+          ],
+          "bounds": {
+            "min": [
+              0.183333,
+              0,
+              -2
+            ],
+            "max": [
+              1.816667,
+              2.1,
+              0
+            ],
+            "size": [
+              1.633333,
+              2.1,
+              2
+            ]
+          },
+          "loadDurationMs": 32
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:65321/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 140,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-53-54-519Z-50956\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "church",
+  "statistics": {
+    "objects": 5,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 1230
+  },
+  "bounds": {
+    "min": [
+      0.078333,
+      0,
+      -2
+    ],
+    "max": [
+      1.921667,
+      3.716667,
+      0
+    ],
+    "size": [
+      1.843333,
+      3.716667,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T18-02-14-568Z-40260",
+    "directory": "artifacts/graphics/G-21/approved/92b8dbffc1221461"
+  },
+  "sha256": "92B8DBFFC122146175E12944630D8170678078D3DBC661DDC46761E5560A6AB1",
+  "otherPublishedFilesUnchanged": true
+}

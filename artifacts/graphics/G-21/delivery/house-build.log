@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all house
+
+Built house in artifacts\graphics\G-21\runs\2026-09-16T16-52-13-018Z-35544
+Validated house from run 2026-09-16T16-52-13-018Z-35544
+Reported and promoted house to artifacts\graphics\G-21\approved\5fb010cd3d40d3e4

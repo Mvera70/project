@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "pig",
+  "statistics": {
+    "objects": 24,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 2808
+  },
+  "bounds": {
+    "min": [
+      -0.332,
+      0,
+      -0.117867
+    ],
+    "max": [
+      0.219133,
+      0.2931,
+      0.117867
+    ],
+    "size": [
+      0.551133,
+      0.2931,
+      0.235733
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T21-10-44-636Z-16096",
+    "directory": "artifacts/graphics/G-23/approved/3d0ed448cf7f75a1"
+  },
+  "sha256": "3D0ED448CF7F75A18783CAC8047666381E6F9C90DA1BFC44F9736DDFA40D3524",
+  "otherPublishedFilesUnchanged": true
+}

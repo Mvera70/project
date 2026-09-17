@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-16T11:49:16.092Z",
-  "invocation": "G-17: publicación selectiva de cuatro recursos aprobados, verify-publish.ts",
+  "generatedAt": "2026-09-16T22:05:43.701Z",
+  "invocation": "G-21: publicación selectiva por modelo",
   "assets": [
     {
       "id": "axis-marker",
@@ -67,103 +67,103 @@
     {
       "id": "house",
       "file": "house.glb",
-      "sha256": "8D974884B42D275ACEAC63D73613E102150BEB0C362A3583CD0BB852BB934528",
+      "sha256": "3B29D1ED828F257B5630A38D142881E1EED4113B51D296817FF132ECBAAB4325",
       "motion": []
     },
     {
       "id": "granary",
       "file": "granary.glb",
-      "sha256": "4CA8F8EF337EF8EB7BF88A05DF2C778CE1328AAAEBF53200BDD0A9A9966BD8AD",
+      "sha256": "0D35C7E1B2A0801A963F15CEB634D76A020B53506422BC80725B26FE0162283A",
       "motion": []
     },
     {
       "id": "mill",
       "file": "mill.glb",
-      "sha256": "3E23D151263A67452FE183CDAB5EC2DBA9D278E4D8BC3E36E0F676EE0BAF9E00",
+      "sha256": "2AAD24FD4802A4A1B748430EE1FF01B9B2AE08E9A60C93309285179CAEA157A4",
       "motion": []
     },
     {
       "id": "smithy",
       "file": "smithy.glb",
-      "sha256": "88982D4E2D28E6A92E90E85C201AD731FDFBDF0801466495FCCD18B62489C63B",
+      "sha256": "BB1CB2FC6312C38C3F5B61F9B0E6F7BA81797B5A446816AED00F8D77773DBC5F",
       "motion": []
     },
     {
       "id": "chapel",
       "file": "chapel.glb",
-      "sha256": "BE38606B095C0FF6A1259C42C627DF450D16C99717E1C0D400BA72638DA61059",
+      "sha256": "CE20D06C0E4E32FCC1BC43F3AB95B9EC4E627EA6E10780B9CC386CAFC43B2398",
       "motion": []
     },
     {
       "id": "church",
       "file": "church.glb",
-      "sha256": "4C1E58B6DB2559854C445EAE32590CD7BD0B27CD12C261A027712395941AFB9C",
+      "sha256": "92B8DBFFC122146175E12944630D8170678078D3DBC661DDC46761E5560A6AB1",
       "motion": []
     },
     {
       "id": "well",
       "file": "well.glb",
-      "sha256": "C6CB07DF6B06C9D879F7F689C88DF73ABE275B96D764EEB4F75E1F6E6754C7D1",
+      "sha256": "A07AFDC2D123322B8792706051A5FC0F7EA29C09177A50F14CA436116C417FE2",
       "motion": []
     },
     {
       "id": "shed",
       "file": "shed.glb",
-      "sha256": "B2974DECD482D81BCD0277898073F007520480C39CE7F5ED111A25FFDA4B9E49",
+      "sha256": "C5CCD1EAB317043B1FE2E11C6D342B4FFED796BA4FCDD27D94F010A260307260",
       "motion": []
     },
     {
       "id": "stone-house",
       "file": "stone-house.glb",
-      "sha256": "8C71B136695B48593CF33303C3091F361944B66A338AF90EF9E30036FF62BE22",
+      "sha256": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
       "motion": []
     },
     {
       "id": "field",
       "file": "field.glb",
-      "sha256": "62ED547480F857018D649435697C0FE9F44EF6BDC146FA4FC9050BE1D0A2BC67",
+      "sha256": "E717B101D051AAE69D265BDC736EAF5DF72470F0CEE2C13FDF5105869D60F629",
       "motion": []
     },
     {
       "id": "field-cut",
       "file": "field-cut.glb",
-      "sha256": "29100C79FBF74CA646909A650113EDCBC1B079FBDD61D7ECC4BEEB35013FFE58",
+      "sha256": "AD935893A9AD52CF4DBBC0EAB4977CD134718139E4EA6BD1BE983A0BD08708BD",
       "motion": []
     },
     {
       "id": "palisade",
       "file": "palisade.glb",
-      "sha256": "49C65821CCA0AD0A505854DD56B0EF420A89F6F4141970A7B3486B3E20F9B133",
+      "sha256": "E69EBD0E9C12BAD7BC453CAECECE0EEEDB12B280B284F67D267972BCDFF822A4",
       "motion": []
     },
     {
       "id": "wall",
       "file": "wall.glb",
-      "sha256": "93067586949FABCDC849983A14175FF2D81818480D226ABA5290018816B431BF",
+      "sha256": "E4DC13B81B51A5E4CEBF8E41EFB6EE96A6651BE41CF06BC95649BA30601581A7",
       "motion": []
     },
     {
       "id": "watchtower",
       "file": "watchtower.glb",
-      "sha256": "D16C6CDA3AE329BE334F090AAA4622D8892ABE2FA119B8318F37ADB05E56E228",
+      "sha256": "17B5F14E9E166187439C064F6E6E799F505C18959452B2F1727773BC7340CCF8",
       "motion": []
     },
     {
       "id": "grave-yard",
       "file": "grave-yard.glb",
-      "sha256": "3975478F357C908E5F9A8E3920454737FD7E053C9F0B72B9C9CDDF37ACE20567",
+      "sha256": "D628290B250A0114938AEA22106C750C01E98BF054E6391B94F10A4C25B1FDE2",
       "motion": []
     },
     {
       "id": "ruin-wood",
       "file": "ruin-wood.glb",
-      "sha256": "8EFA0FF692BE6D91A0B1998135EE242E120517B0E762F4DABF86ED986B49D653",
+      "sha256": "0E3DEB6554DBC55C802561AB4A56920F6CC0B6C74CFA75B94C6A2C4167678063",
       "motion": []
     },
     {
       "id": "ruin-stone",
       "file": "ruin-stone.glb",
-      "sha256": "38A7D566A14FD0BA8C3D3DBFB789F698ED4979EDDB815B05C4652BD30901F098",
+      "sha256": "3F50A13B4583515320921EF13FC2AA62296969990D829563A89C9989A1CA4D66",
       "motion": []
     },
     {
@@ -175,38 +175,116 @@
     {
       "id": "cow",
       "file": "cow.glb",
-      "sha256": "8F931CF3E1E34C55EE3CB51EDB345DDB8137A45E82646F76866CC72CEB64465F",
-      "motion": []
+      "sha256": "6A922A86C1DBF645EEA0E200403147099D5B3D6EE578DA145F1ABC2DC90FC713",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.21
+        }
+      ]
     },
     {
       "id": "pig",
       "file": "pig.glb",
-      "sha256": "348C0670102F2435177463FC5F9EB62CA9AF49CC255B982AFC11FE0D9B1DF161",
-      "motion": []
+      "sha256": "3D0ED448CF7F75A18783CAC8047666381E6F9C90DA1BFC44F9736DDFA40D3524",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.115
+        }
+      ]
     },
     {
       "id": "hen",
       "file": "hen.glb",
-      "sha256": "1FD725E724F157877310608663022149E343B515A29DF5B4A4525FDF39DF2F9E",
-      "motion": []
+      "sha256": "E08F6D310277DE6D4749F33CAD8EE56CBB4877A7973F0E8ED727CA393BB251F1",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.075
+        }
+      ]
     },
     {
       "id": "wolf",
       "file": "wolf.glb",
-      "sha256": "98ED20BC75E1339DF7F90AB2F7B069936E04AA6B288D0A8A321C903393F45AC8",
-      "motion": []
+      "sha256": "A88C9EEBEECF49441B0E5AC427EABB0A67C6D0D6567A8E59FECC48720682BEF8",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.2
+        }
+      ]
     },
     {
       "id": "crow",
       "file": "crow.glb",
-      "sha256": "1524B0E09484040A3F90A2607C251CE1B5F4C1085860264161A2D8B9C4E7C32C",
-      "motion": []
+      "sha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.08
+        }
+      ]
     },
     {
       "id": "fish",
       "file": "fish.glb",
-      "sha256": "EDF544AD22D99BB5AA6B9424486365755AB0440E7C0B8088049ABC756A0A06DC",
-      "motion": []
+      "sha256": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 8.041666666666666,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 2.7083333333333335,
+          "loop": true,
+          "strideLength": 0.13
+        }
+      ]
     },
     {
       "id": "hoe",
@@ -247,7 +325,7 @@
     {
       "id": "villager-leader",
       "file": "villager-leader.glb",
-      "sha256": "C18503B111433ED53417EDD551ECEACBF4EC3C3153E6ACC2767C9ACBCCB47173",
+      "sha256": "48526252B42A4AE6557EB9E186B5A4ED1E7990612A5846DC413051F8E83B1C9E",
       "motion": [
         {
           "name": "idle",
@@ -309,7 +387,7 @@
     {
       "id": "villager-midwife",
       "file": "villager-midwife.glb",
-      "sha256": "760EB20249249E9A890E75B7131DBA18ED7F40BBA3A313CC3A736DF61BC795B5",
+      "sha256": "9F24D0BE9586FA1D1AF56E920C96BDB3A87B22942504375EF6BAA8829709A4CE",
       "motion": [
         {
           "name": "idle",
@@ -371,7 +449,7 @@
     {
       "id": "villager-woodward",
       "file": "villager-woodward.glb",
-      "sha256": "1907A330784A352C646D3ECEE842F4DAD50BAA83D4AC504841268E601A2DBA49",
+      "sha256": "FC406C74D7235849FAF87EC36AFFA20E9547B6879F69D5645BF43ECCDD4AAEAE",
       "motion": [
         {
           "name": "idle",
@@ -402,7 +480,7 @@
     {
       "id": "villager-reeve",
       "file": "villager-reeve.glb",
-      "sha256": "7E3934563D2DDEFD2CDBF24EAE66C54ABE689C6036C58EAFCF7849D0805B2D86",
+      "sha256": "43FC649BC07349C007C8165AA2B68DAD20DCA2D6B3ED5B648C8CC526C691E7C5",
       "motion": [
         {
           "name": "idle",
@@ -433,7 +511,7 @@
     {
       "id": "villager-herbalist",
       "file": "villager-herbalist.glb",
-      "sha256": "EDF9F80EF4566E1D79550ED11FF8A4A8B55837C6B932E459D01D44F27F13328F",
+      "sha256": "7FAACA20BABA3B9E28B01E4C72E9F89EAB5A20FB591E069A394C809CB9E56114",
       "motion": [
         {
           "name": "idle",
@@ -464,19 +542,19 @@
     {
       "id": "haystack",
       "file": "haystack.glb",
-      "sha256": "814AD600DA3C1E14D4E7E075657B234F7FA77D35B2CE181D8D297BE6A7E2EBF9",
+      "sha256": "BE3A923E28BDC16BF70C5F0578D0B0AEB787A0E3F520CD86CD18177F67D43D6D",
       "motion": []
     },
     {
       "id": "log-pile",
       "file": "log-pile.glb",
-      "sha256": "719D3301E2DB0FAE6FC040934A77861B429897E00C7CB4EEA265253B55127247",
+      "sha256": "48A29EB876083634E92E297183321BB49D895A3708759E675FDF208E3F7BA468",
       "motion": []
     },
     {
       "id": "handcart",
       "file": "handcart.glb",
-      "sha256": "BE7CEBEDE684B4600CB90D42D5C2384E333AB0880D9E5A7C9698364315C1B962",
+      "sha256": "3AD96D3B5DA5C2EFCC08D326B8272B41BABB60D8674D093F661F4D5AB23FC1DD",
       "motion": []
     },
     {
@@ -509,6 +587,235 @@
           "strideLength": 0.26
         }
       ]
+    },
+    {
+      "id": "villager-child",
+      "file": "villager-child.glb",
+      "sha256": "3B12B8C1A0B05AF852A3D0B2F5476A9A11E7915D4508CE481B1B3D73BE0B4EE3",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-elder",
+      "file": "villager-elder.glb",
+      "sha256": "09607F6CCEAE6C8F55F765E805075E50A70EE54B56F0E0FA8F8623EA3CA5D033",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-woodcutter",
+      "file": "villager-woodcutter.glb",
+      "sha256": "C81FCADE8E7B0BA54800D70016B96F3FBCD99E4358B78A74769BAC9755BF64B4",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-mason",
+      "file": "villager-mason.glb",
+      "sha256": "F853038BA6F4F88715D8BC1FE666AEED052989020FDD12DFDB51B4FA3AD4B63F",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-shepherd",
+      "file": "villager-shepherd.glb",
+      "sha256": "9E00FD0FB9D51A1F0632DFB8208C8DECD1F7CA1C50F3F17C2E0D3ADF7F8CD69E",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-stranger",
+      "file": "villager-stranger.glb",
+      "sha256": "664EFDBFD40A45B4F3EC88434285F58BD0178AD10B89206E0754E730EB744759",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "villager-fisher",
+      "file": "villager-fisher.glb",
+      "sha256": "543C7849D05DF8DBB350E8E0A24089045868078D302605793CBB1671C69D9AEE",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ]
+    },
+    {
+      "id": "field-cabbage",
+      "file": "field-cabbage.glb",
+      "sha256": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5",
+      "motion": []
+    },
+    {
+      "id": "field-leeks",
+      "file": "field-leeks.glb",
+      "sha256": "1FCE25E55B5500790E934F5CC08AF1DACE945FE0E8CBA1E7718C0D7FEB6EC123",
+      "motion": []
     }
   ]
 }

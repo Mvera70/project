@@ -1,0 +1,10 @@
+
+> the-valley@0.0.0 lint
+> eslint .
+
+
+D:\DESARROLLO\PROYECTOS\VALLEY\project\compare.mjs
+  55:7  error  'row' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (1 error, 0 warnings)
+

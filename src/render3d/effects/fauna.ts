@@ -1,25 +1,22 @@
 // G-10 · La fauna del valle, en tres dimensiones. design.md D.6, D.8, §7.7.
 //
-// **No hay ninguna regla nueva aquí.** Cuántos animales hay y dónde están lo
-// deciden `animalPositions` y `wildlifePositions`, que son los mismos que usa el
-// render 2D y salen en coordenadas de mapa porque nunca fueron código de
-// dibujo. Esto sólo decide qué forma tiene cada bicho y hacia dónde mira.
+// La vida decide dónde están gallinas, cerdos, vacas y el lobo. El render
+// coloca esos mismos cuerpos. Cuervos y peces conservan la derivación ambiental.
+// Ninguna de estas posiciones escribe en el estado ni consume azar del motor.
 //
-// §7.7 dice que la cabaña es cosmética: no se guarda, no alimenta a nadie y no
-// mueve ningún número de §12. Y §4.3 dice que el render no consume azar: estas
-// dos funciones no lo consumen, derivan la posición del estado y de la hora, así
-// que el mismo instante da siempre la misma vaca en el mismo sitio.
-//
-// Van instanciados, como los árboles: una aldea madura tiene cerca de cuarenta
-// cabezas, y cuarenta objetos sueltos serían cuarenta llamadas de dibujo por un
-// puñado de triángulos.
+// G-23: los recursos con clips tienen un esqueleto propio por animal y comparten
+// geometría/materiales. Los recursos sin clips conservan la vía de instancias.
+// El coste de las dos vías se mide en el banco de G-23; aplanar un esqueleto
+// en una instancia estática volvería a dejar inmóviles todas sus articulaciones.
 
 import { Group, InstancedMesh, Matrix4, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState, type ValleyMap } from '@engine/state';
 import {
-  animalPositions, wildlifePositions, type Animal, type AnimalKind,
+  wildlifePositions, type Animal, type AnimalKind,
 } from '@derive/animals';
 import { piecesOf, type Piece } from '../world/forest';
+import type { LoadedAsset } from '../assets';
+import { AnimalMotion } from './animal-motion';
 
 /**
  * Cuánto tiene que moverse un animal para que se le cambie la cara.
@@ -129,6 +126,8 @@ interface Herd {
  */
 export class Fauna {
   readonly group = new Group();
+  private readonly animated = new Map<number, AnimalMotion>();
+  private previousSeconds: number | undefined;
   private readonly herds = new Map<AnimalKind, Herd>();
   /** Hacia dónde miraba cada bicho la última vez, para que gire y no salte. */
   private readonly facing = new Map<number, number>();
@@ -146,7 +145,8 @@ export class Fauna {
    * catálogo no la tiene. Una clase sin recurso simplemente no se ve: un valle a
    * medio catalogar sigue siendo un valle.
    */
-  constructor(private readonly source: (kind: AnimalKind) => Object3D | undefined) {
+  constructor(private readonly source: (kind: AnimalKind) => Object3D | undefined,
+    private readonly asset?: (kind: AnimalKind) => LoadedAsset | undefined) {
     this.group.name = 'Valley_Fauna';
   }
 
@@ -157,74 +157,59 @@ export class Fauna {
 
   private ground: (x: number, z: number) => number = () => 0;
 
-  /**
-   * Coloca la fauna que corresponde a este instante.
-   *
-   * `dayPhase` es la hora escénica y no la fracción del tick: los animales se
-   * recogen al anochecer igual que la gente (§10.6), y usar el tick los habría
-   * metido en casa cuatro veces por día escénico a ×1.
-   *
-   * **El estado llega quieto y por eso aquí ya no se congela nada.** La
-   * querencia de cada animal se sortea con la semana (§11.9, v3.06), y el
-   * identificador de cada bicho es su puesto en la fila de la cabaña, así que
-   * los dos se movían solos dentro de una misma jornada —ocho semanas a ×1,
-   * sesenta y cuatro a ×64— y el rebaño se teletransportaba. La cura era
-   * guardar aquí la semana, la cabaña y el pueblo de anoche; hoy la trae hecha
-   * `scenic-state.ts`, para todos y de una vez, y este método vuelve a ser lo
-   * que debía: una función de la hora.
-   *
-   * **Y sigue derivando del estado, que es la deuda que queda aquí — salvo
-   * para el lobo, desde IA-5.** V-08 partió la clase en dos —«de dónde salen
-   * las posiciones» y «cómo se pintan», `paint` abajo— para que la capa de
-   * vida pudiera entrar por la segunda mitad: `life/beasts.ts` ya daba
-   * animales vivos, con cuerpo y sin necesidad de `ashore`, pero ese enganche
-   * no se había hecho para ninguna especie del corral, y sigue sin hacerse
-   * aquí — es trabajo de una ronda que no es ésta, y tocar la gallina, el
-   * cerdo o la vaca ahora habría movido cifras que IA-4 ya midió sin que
-   * nadie lo pidiera.
-   *
-   * El lobo es distinto: antes de esta fase era decorado puro
-   * (`wildlifePositions`, un círculo alrededor de un árbol cada noche de
-   * invierno, pasara o no `wolves_at_the_coop` esa semana) y ahora tiene
-   * cuerpo de verdad en `life/wildlife.ts`, sólo la semana del suceso real.
-   * **Una especie no puede tener dos fuentes de posición en 3D a la vez**
-   * (el brief de la fase lo llama así, literal), así que aquí se descarta su
-   * entrada de la fórmula vieja — Canvas (`render/renderer.ts`) sigue
-   * llamando a `wildlifePositions` directamente y no pasa por esta clase, así
-   * que su lobo decorativo no se toca — y `live` (`Village.wildlife`, nueva)
-   * es la única fuente que llega a pintarse. Ya viene en tierra y con las
-   * coordenadas que le tocan: no pasa por `ashore`, que es cosa de la fórmula
-   * vieja para anclas que no miran el terreno.
-   */
-  update(state: GameState, dayPhase: number, live: readonly Animal[] = []): void {
+  /** Una sola fuente para el ganado y el lobo: los cuerpos de la capa de vida.
+   * Cuervo y pez siguen siendo fauna ambiental derivada. */
+  update(state: GameState, dayPhase: number, live: readonly Animal[] = [], seconds = dayPhase * 120): void {
+    const ambient = wildlifePositions(state, dayPhase).filter(animal => animal.kind !== 'wolf');
     const animals: Animal[] = [];
-    for (const animal of [...animalPositions(state, dayPhase), ...wildlifePositions(state, dayPhase)]) {
-      if (animal.kind === 'wolf') continue; // IA-5: una sola fuente en 3D — ver arriba.
-      if (animal.kind === 'fish') {
-        animals.push(animal);
-        continue;
-      }
+    for (const animal of ambient) {
+      if (animal.kind === 'fish') { animals.push(animal); continue; }
       const dry = ashore(state.map, animal.x, animal.y);
       if (dry !== null) animals.push({ ...animal, x: dry.x, y: dry.y });
     }
-    for (const animal of live) animals.push(animal);
-    this.paint(animals);
+    this.paint([...animals, ...live], seconds);
+  }
+
+  /** Coordenadas de las mallas ya colocadas, no de su intención. */
+  snapshot(): { id: number; kind: string; x: number; z: number; walkWeight: number | null }[] {
+    return [
+      ...[...this.animated].map(([id, body]) => ({ id, kind: body.kind,
+        x: body.group.position.x, z: body.group.position.z, walkWeight: body.walkWeight })),
+      ...[...this.last].map(([id, point]) => ({ id, kind: 'static', x: point.x, z: point.y, walkWeight: null })),
+    ];
   }
 
   /**
    * Pinta exactamente los animales que se le dan, y nada más.
    *
-   * **Esto es «pintar instancias»**: no deriva nada del estado, no consulta la
-   * hora, no corrige el agua — sólo reparte la lista en mallas por clase y
-   * escribe una matriz por bicho. `update` es hoy el único que la llama, con
+   * No deriva nada del estado ni corrige el agua: coloca la lista recibida y
+   * usa el tiempo de presentación explícito para sus articulaciones. Los
+   * recursos sin clips se reparten en instancias. `update` la llama con
    * la lista de siempre (§7.7 cosmético); un `life/beasts.ts` en marcha
    * llamaría aquí con su propia lista —viva, sin `ashore`, porque un
    * animal-`Dweller` no llega a pisar el agua— sin que esta clase necesite
    * saber que la vida existe.
    */
-  paint(animals: readonly Animal[]): void {
+  paint(animals: readonly Animal[], seconds = 0): void {
+    const delta = this.previousSeconds === undefined ? 0 : Math.max(0, Math.min(0.25, seconds - this.previousSeconds));
+    this.previousSeconds = seconds;
     const byKind = new Map<AnimalKind, Animal[]>();
     for (const animal of animals) {
+      const asset = this.asset?.(animal.kind);
+      if (asset !== undefined && asset.clips.some(clip => clip.name === 'walk')) {
+        let body = this.animated.get(animal.id);
+        if (body !== undefined && body.kind !== animal.kind) {
+          body.dispose(); this.animated.delete(animal.id); body = undefined;
+        }
+        if (body === undefined) {
+          const object = this.source(animal.kind);
+          if (object === undefined) continue;
+          body = new AnimalMotion(animal.kind, object, asset, animal.id);
+          this.animated.set(animal.id, body); this.group.add(body.group);
+        }
+        body.place(animal, animal.kind === 'fish' ? FISH_LEVEL : this.ground(animal.x, animal.y), seconds, delta);
+        continue;
+      }
       const list = byKind.get(animal.kind);
       if (list === undefined) byKind.set(animal.kind, [animal]);
       else list.push(animal);
@@ -240,6 +225,7 @@ export class Fauna {
       if (herd !== null) this.place(kind, herd, list);
     }
     for (const animal of animals) seen.add(animal.id);
+    for (const [id, body] of this.animated) if (!seen.has(id)) { body.dispose(); this.animated.delete(id); }
     // Un bicho que ya no está se lleva su memoria: si no, el mapa crece con
     // cada lobo que pasó por el valle en sesenta años.
     for (const id of [...this.last.keys()]) if (!seen.has(id)) this.last.delete(id);
@@ -334,10 +320,13 @@ export class Fauna {
 
   /** Cuántas cabezas hay puestas ahora mismo, sumando las clases. */
   get count(): number {
-    return this.last.size;
+    return this.last.size + this.animated.size;
   }
 
   clear(): void {
+    for (const body of this.animated.values()) body.dispose();
+    this.animated.clear();
+    this.previousSeconds = undefined;
     for (const kind of [...this.herds.keys()]) this.drop(kind);
     this.last.clear();
     this.facing.clear();

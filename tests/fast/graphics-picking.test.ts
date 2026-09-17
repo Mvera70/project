@@ -381,15 +381,32 @@ describe('Los gestos del valle · el veredicto del 15 sep 2026', () => {
   });
 
   it('tocar el suelo cierra la ficha en vez de abrir otra', () => {
-    expect(app, 'un objetivo de terreno o ninguno cierra')
-      .toMatch(/target === null \|\| target\.kind === 'terrain'\)\s*closePanel\(\)/u);
+    // UI-R4/UI-R5 (16 sep 2026): la ficha dejó de ser un `<section>` que
+    // `closePanel()` cerraba a mano; ahora es una ruta más de `SheetRoute` y
+    // cerrar es navegar a `valley`, como cualquier otra. El comportamiento —
+    // tocar terreno cierra en vez de abrir otra cosa— es el mismo; sólo
+    // cambió el nombre de la llamada. Mudado al camino vivo, no al muerto
+    // (CLAUDE.md: «una prueba que llama a una función directamente no sabe si
+    // el juego la llama», y lo mismo vale al revés para un texto congelado).
+    expect(app, 'un objetivo de terreno o ninguno cierra a Valley')
+      .toMatch(/target === null \|\| target\.kind === 'terrain'\)\s*actions\.navigate\(\{\s*kind:\s*'valley'\s*\}\)/u);
   });
 
   it('la ficha lleva su propia salida', () => {
-    expect(app).toContain("className = 'valley-panel-close'");
-    expect(app).toContain(`close.addEventListener('click', closePanel)`);
-    const html = readFileSync(resolve(ROOT, 'index.html'), 'utf8');
-    expect(html, 'con área táctil de §11.7').toMatch(/\.valley-panel-close \{[^}]*44px/u);
+    // UI-R4 §5.3 (`docs/ui-redesign/rounds/UI-R4.md`): la ficha ya no duplica
+    // un «×» propio — usa el compartido de la carcasa
+    // (`.ui-shell-content-close`, `redesign/shell.ts`), con el mismo área
+    // táctil mínima que antes tenía `.valley-panel-close` a mano, ahora por
+    // el token `--ui-tap-min` (`redesign/tokens.css`). `orders.ts` sí sigue
+    // duplicando su propio «×» con esa clase exacta, porque `shot.mjs` lo
+    // clica por ella — eso no cambió y no es lo que esta prueba mira.
+    const shell = readFileSync(resolve(ROOT, 'src', 'ui', 'redesign', 'shell.ts'), 'utf8');
+    expect(shell).toContain("contentClose.className = 'ui-shell-content-close'");
+    expect(shell).toContain("contentClose.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });");
+    const css = readFileSync(resolve(ROOT, 'src', 'ui', 'redesign', 'shell.css'), 'utf8');
+    expect(css, 'con área táctil de §11.7').toMatch(/\.ui-shell-content-close \{[^}]*--ui-tap-min[^}]*--ui-tap-min/su);
+    const tokens = readFileSync(resolve(ROOT, 'src', 'ui', 'redesign', 'tokens.css'), 'utf8');
+    expect(tokens).toMatch(/--ui-tap-min:\s*44px/u);
   });
 
   it('dos toques seguidos devuelven la vista de partida', () => {

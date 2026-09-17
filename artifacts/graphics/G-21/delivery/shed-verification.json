@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "shed",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 844
+  },
+  "bounds": {
+    "min": [
+      0.024297,
+      0,
+      -0.990667
+    ],
+    "max": [
+      0.975703,
+      0.912712,
+      -0.009333
+    ],
+    "size": [
+      0.951407,
+      0.912712,
+      0.981333
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T19-32-33-052Z-45552",
+    "directory": "artifacts/graphics/G-21/approved/c5ccd1eab317043b"
+  },
+  "sha256": "C5CCD1EAB317043B1FE2E11C6D342B4FFED796BA4FCDD27D94F010A260307260",
+  "otherPublishedFilesUnchanged": true
+}

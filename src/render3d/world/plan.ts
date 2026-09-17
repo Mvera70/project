@@ -1,3 +1,5 @@
+import { visibleBuildings } from '@derive/visible-buildings';
+import { defenceGates } from '@derive/defence-gates';
 // G-06 · What the scene should contain, as data. design.md D.5, D.6.
 //
 // The plan is a pure description of the valley at one instant: which ground,
@@ -17,6 +19,7 @@ import { TIME } from '@engine/balance';
 import { SEASONS, clockOf, weekOf } from '@engine/time';
 import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
+import { defenceConnections } from './defences';
 
 export interface PlannedBuilding {
   readonly id: BuildingId;
@@ -41,6 +44,9 @@ export interface PlannedBuilding {
    * y sólo ese la semana de la siega.
    */
   readonly asset: string | null;
+  /** Vecinos cardinales de una defensa viva; ausente en los demás edificios. */
+  readonly connections?: number;
+  readonly gate?: 'x' | 'z';
 }
 
 export interface ScenePlan {
@@ -114,13 +120,18 @@ const RUIN_ASSETS: Readonly<Record<0 | 1, string>> = {
   1: 'ruin-stone',
 };
 
+// G-22 · Variedades visuales estables por parcela, sin azar ni recursos nuevos.
+export const FIELD_CROPS: readonly string[] = ['field', 'field-cabbage', 'field-leeks'];
+
 function assetFor(building: Building, tick: number): string | null {
   if (building.lostTick !== null) {
     return building.kind === 'field' ? 'field-cut' : RUIN_ASSETS[building.tier];
   }
   if (building.kind === 'field') {
     const week = weekOf(tick);
-    return week >= SOWN_FROM && week < TIME.HARVEST_WEEK ? 'field' : 'field-cut';
+    return week >= SOWN_FROM && week < TIME.HARVEST_WEEK
+      ? FIELD_CROPS[building.id % 3] ?? 'field'
+      : 'field-cut';
   }
   return BUILDING_ASSETS[building.kind] ?? null;
 }
@@ -149,10 +160,16 @@ function plannedFrom(building: Building, tick: number): PlannedBuilding {
 }
 
 export function planFor(state: GameState): ScenePlan {
+  const visible = visibleBuildings(state);
+  const connections = defenceConnections(visible);
+  const gates = defenceGates(state);
   return {
     game: `${state.seed}:${state.terrainSeed}`,
     ground: groundSignature(state.map, state.tick),
-    buildings: state.buildings.map((building) => plannedFrom(building, state.tick))
+    buildings: visible.map((building) => ({ ...plannedFrom(building, state.tick),
+      ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
+      ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
+    }))
       .sort((a, b) => a.id - b.id),
   };
 }
@@ -161,7 +178,7 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
   return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
     && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
-    && a.asset === b.asset;
+    && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate;
 }
 
 /**

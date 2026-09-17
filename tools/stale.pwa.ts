@@ -3,6 +3,7 @@
  * design.md §13.4, and served with the headers GitHub Pages really sends.
  */
 import { test, type Page } from '@playwright/test';
+import { passTitle } from './pass-title';
 
 const BASE = 'http://127.0.0.1:4181/';
 
@@ -12,6 +13,9 @@ async function controlled(page: Page): Promise<void> {
 
 test('un despliegue nuevo alcanza a un cliente que ya visitó, con las cabeceras de Pages', async ({ page, request }) => {
   await page.goto(BASE);
+  // U-10 puso un menú delante de fundar; esta prueba es de antes y nunca se
+  // había vuelto a ejecutar entera para notarlo.
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
   await controlled(page);
   await page.reload();

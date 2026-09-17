@@ -71,10 +71,13 @@ interface Totals {
   circleStepsInWall: number;
   spins: number;
   stuckHungry: number;
+  /** Labradores en su puesto: dentro de su campo, y fuera. */
+  fieldIn: number;
+  fieldOut: number;
 }
 
 function zero(): Totals {
-  return { bodySeconds: 0, centreInWall: 0, circleStepsInWall: 0, spins: 0, stuckHungry: 0 };
+  return { bodySeconds: 0, centreInWall: 0, circleStepsInWall: 0, spins: 0, stuckHungry: 0, fieldIn: 0, fieldOut: 0 };
 }
 
 function add(a: Totals, b: Totals): void {
@@ -83,6 +86,8 @@ function add(a: Totals, b: Totals): void {
   a.circleStepsInWall += b.circleStepsInWall;
   a.spins += b.spins;
   a.stuckHungry += b.stuckHungry;
+  a.fieldIn += b.fieldIn;
+  a.fieldOut += b.fieldOut;
 }
 
 const grand = zero();
@@ -96,6 +101,11 @@ for (const seed of SEEDS) {
 
   for (let day = 0; day < DAYS; day += 1) {
     const life = createVillage(state, day);
+    // Labradores fuera de su campo: lo vio el dueño el 16 sep 2026 y medido era
+    // el 96 %. Se cuenta para que no vuelva a crecer.
+    const fields = new Map(state.buildings
+      .filter((b) => b.kind === 'field' && b.lostTick === null)
+      .map((b) => [`field:${b.id}`, b]));
     // Todo cuerpo con vida hoy, persona o bestia, con el mismo trato: el
     // brief pide medir las dos, no dos informes separados.
     const bodies: Dweller[] = [...life.dwellers, ...life.beasts.map((b) => b.dweller)];
@@ -125,6 +135,14 @@ for (const seed of SEEDS) {
 
         const hungriest = Math.max(...Object.values(d.needs));
         if (d.doing === null && hungriest >= 0.9) seedTotals.stuckHungry += 1;
+        const at = d.doing;
+        if (at !== null && at.there && at.place.id.startsWith('field:')) {
+          const f = fields.get(at.place.id);
+          if (f !== undefined) {
+            const inside = body.x >= f.x && body.x < f.x + f.w && body.z >= f.y && body.z < f.y + f.h;
+            if (inside) seedTotals.fieldIn += 1; else seedTotals.fieldOut += 1;
+          }
+        }
       }
     }
   }
@@ -137,7 +155,8 @@ for (const seed of SEEDS) {
     + ` · centro en muro ${seedTotals.centreInWall}`
     + ` · círculo en muro ${pct(seedTotals.circleStepsInWall, seedTotals.bodySeconds)}`
     + ` · giros/seg ${pct(seedTotals.spins, seedTotals.bodySeconds)}`
-    + ` · parados con hambre ${pct(seedTotals.stuckHungry, seedTotals.bodySeconds)}\n`,
+    + ` · parados con hambre ${pct(seedTotals.stuckHungry, seedTotals.bodySeconds)}`
+    + ` · labradores fuera ${pct(seedTotals.fieldOut, seedTotals.fieldIn + seedTotals.fieldOut)}\n`,
   );
 }
 
@@ -146,5 +165,6 @@ process.stdout.write(
   + `  centro en celda cerrada:        ${grand.centreInWall} (tiene que ser 0)\n`
   + `  círculo en celda cerrada:       ${grand.circleStepsInWall} (${(100 * grand.circleStepsInWall / grand.bodySeconds).toFixed(2)}%)\n`
   + `  giros > π/2 en un segundo:      ${grand.spins} (${(100 * grand.spins / grand.bodySeconds).toFixed(2)}%)\n`
-  + `  parados con impulso ≥ 0,9:      ${grand.stuckHungry} (${(100 * grand.stuckHungry / grand.bodySeconds).toFixed(2)}%)\n`,
+  + `  parados con impulso ≥ 0,9:      ${grand.stuckHungry} (${(100 * grand.stuckHungry / grand.bodySeconds).toFixed(2)}%)\n`
+  + `  labradores fuera de su campo:   ${grand.fieldOut} de ${grand.fieldIn + grand.fieldOut} (${(100 * grand.fieldOut / Math.max(1, grand.fieldIn + grand.fieldOut)).toFixed(1)}%)\n`,
 );

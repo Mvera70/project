@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all wall
+
+Built wall in artifacts\graphics\G-21\runs\2026-09-16T19-43-18-182Z-19612
+Validated wall from run 2026-09-16T19-43-18-182Z-19612
+Reported and promoted wall to artifacts\graphics\G-21\approved\e4dc13b81b51a5e4

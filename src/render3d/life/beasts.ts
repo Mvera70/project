@@ -37,7 +37,7 @@ import { ANIMALS } from '@engine/balance';
 import { hash32 } from '@engine/rng';
 import type { GameState } from '@engine/state';
 import {
-  blockedAt, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
+  blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
 } from './body';
 import { LIFE_STEP } from './clock';
@@ -50,7 +50,7 @@ import {
 } from './decide';
 import type { Neighbourhood } from './grid';
 import { freshNeeds, type Needs, type NeedName } from './needs';
-import { follow, type Router } from './navigate';
+import { follow, routeAroundBodies, type Router } from './navigate';
 import { doorOf, OFFERS, seatAt, type Offer, type OfferSpec, type Place } from './offers';
 import { commons } from './places';
 import { avoid, drive, seek, separate, type Push } from './steering';
@@ -523,6 +523,12 @@ export function createBeasts(
   let n = 0;
 
   const spawn = (kind: BeastKind, anchor: Point): void => {
+    // El centro libre no basta: el cuerpo entero debe caber al nacer.
+    if (!fitsCircle(land, anchor.x, anchor.z, RADIUS[kind])) {
+      const free = nearestReachable(land, shore, anchor, RADIUS[kind]);
+      if (free === null) return;
+      anchor = free;
+    }
     const id = BEAST_ID_BASE + n;
     const paceDice = hash32(seed, `beast:pace:${id}`) / 4_294_967_296;
     const body: Body = {
@@ -549,6 +555,7 @@ export function createBeasts(
       aimAt: null,
       // V-09b: la cabaña no juega, así que nunca se le pasan las ganas.
       playedUntil: 0,
+      failed: new Map(),
       rethinkAt: Math.floor((hash32(seed, `beast:think:${id}`) / 4_294_967_296) * RETHINK),
     };
     beasts.push({
@@ -995,7 +1002,16 @@ export function stepBeasts(
       const onTheWay = dweller.doing !== null && !dweller.doing.there;
       // Espera creciente, no `GIVE_UP` fijo (checklist IA-1, punto 6): igual
       // que en `village.ts`, ver `decide.ts` (`noProgress`).
-      const tooLong = noProgress(dweller.doing, progress, body, step, GIVE_UP, body.pace);
+      let tooLong = noProgress(dweller.doing, progress, body, step, GIVE_UP, body.pace);
+      if (tooLong && dweller.doing !== null && !dweller.doing.there && !dweller.doing.detoured) {
+        dweller.doing.detoured = true;
+        const nearby: Body[] = []; around.near(body, other => nearby.push(other));
+        const alternative = routeAroundBodies(land, body, seatAt(dweller.doing.offer, dweller.doing.seat), nearby);
+        if (alternative !== null) {
+          dweller.doing.route.splice(0, dweller.doing.route.length, ...alternative);
+          progress.at = step + PROGRESS_CHECK; progress.gap = Number.POSITIVE_INFINITY; tooLong = false;
+        }
+      }
       if (step >= dweller.rethinkAt && (!onTheWay || tooLong)) {
         dweller.rethinkAt = step + RETHINK;
         const before = dweller.doing;

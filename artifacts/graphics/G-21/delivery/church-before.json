@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "id": "church",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "tiled",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "church",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de comunidad. La torre es lo que se ve desde el otro lado del valle, y por eso el campanario sube por delante de la nave en vez de quedarse dentro de la huella comun."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.85
+    },
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Church_Nave",
+      "location": [
+        3,
+        3.4,
+        2
+      ],
+      "dimensions": [
+        4.8,
+        6.4,
+        4
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Church_Roof",
+      "location": [
+        3,
+        3.4,
+        4
+      ],
+      "width": 5.4,
+      "depth": 6.8,
+      "height": 2.2,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_Tower",
+      "location": [
+        3,
+        0.9,
+        3.6
+      ],
+      "dimensions": [
+        2.4,
+        2.4,
+        7.2
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Church_Spire",
+      "location": [
+        3,
+        0.9,
+        8.4
+      ],
+      "radius": 1.8,
+      "depth": 2.6,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_Door",
+      "location": [
+        3,
+        0.1,
+        1.2
+      ],
+      "dimensions": [
+        1.3,
+        0.2,
+        2.4
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_Cross_V",
+      "location": [
+        3,
+        0.9,
+        10.4
+      ],
+      "dimensions": [
+        0.2,
+        0.2,
+        1.5
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Church_Cross_H",
+      "location": [
+        3,
+        0.9,
+        10.6
+      ],
+      "dimensions": [
+        1,
+        0.2,
+        0.2
+      ],
+      "material": "wood",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      14,
+      -17.5,
+      11.200000000000001
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      5
+    ],
+    "orthoScale": 19.599999999999998,
+    "worldRole": "sky"
+  }
+}

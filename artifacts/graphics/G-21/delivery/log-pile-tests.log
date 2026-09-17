@@ -1,0 +1,24 @@
+
+ RUN  v2.1.9 D:/DESARROLLO/PROYECTOS/VALLEY/project
+
+ ✓ tests/fast/graphics-scenic-state.test.ts (5 tests) 1589ms
+   ✓ G-11 · el estado de la jornada > no cambia mientras la jornada está a la vista, por muchas semanas que corran 533ms
+   ✓ G-11 · el estado de la jornada > el motor no puede mover por debajo lo que ya se está pintando 384ms
+   ✓ G-11 · el estado de la jornada > una partida nueva no hereda la jornada de la anterior 386ms
+ ✓ tests/fast/graphics-effects.test.ts (40 tests) 1609ms
+   ✓ G-08 · las estaciones > el valle cambia de color cuatro veces al año 442ms
+   ✓ IA-5 · el lobo tiene una sola fuente en 3D > la fórmula vieja ya no pone lobos en la escena 3D, aunque siga dándolos para Canvas 377ms
+ ✓ tests/fast/graphics-world.test.ts (43 tests) 2374ms
+   ✓ G-06 · el plan de escena > planificar no escribe en el estado ni consume una tirada 474ms
+   ✓ G-06 · el plan de escena > construir añade una casa y nada más 359ms
+   ✓ G-06 · el suelo > un camino muy pisado deja rodada 333ms
+ ✓ tests/fast/graphics-steading.test.ts (6 tests) 3057ms
+   ✓ G-15 · dónde se dejan los trastos del corral > nada sobre el agua, la marisma, la roca, el bosque ni lo construido 1282ms
+   ✓ G-15 · dónde se dejan los trastos del corral > ni dos cosas en la misma celda 444ms
+   ✓ G-15 · dónde se dejan los trastos del corral > ni cuatro almiares en fila, que se leen como un campamento 886ms
+
+ Test Files  4 passed (4)
+      Tests  94 passed (94)
+   Start at  21:22:33
+   Duration  3.67s (transform 543ms, setup 0ms, collect 1.70s, tests 8.63s, environment 1ms, prepare 303ms)
+

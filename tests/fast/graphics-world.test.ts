@@ -114,7 +114,7 @@ describe('G-06 · el plan de escena', () => {
     expect(JSON.stringify(planFor(state))).toBe(JSON.stringify(once));
   });
 
-  it('construir añade una casa y nada más', () => {
+  it('el crecimiento añade edificios y retira los solares perdidos ya reutilizados', () => {
     const state = village(10);
     const before = planFor(state);
     const grownUp = village(16);
@@ -123,7 +123,11 @@ describe('G-06 · el plan de escena', () => {
     // faltan en vez de rehacer el pueblo entero.
     expect(change.cleared).toBe(false);
     expect(change.added.length).toBeGreaterThan(0);
-    expect(change.removed.length).toBe(0);
+    for (const id of change.removed) {
+      const historical = grownUp.buildings.find(building => building.id === id);
+      expect(historical).toBeDefined();
+      expect(historical?.lostTick).not.toBeNull();
+    }
   });
 
   it('una ruina deja de ser una casa: más baja, más gris y sin tejado', () => {
@@ -136,7 +140,12 @@ describe('G-06 · el plan de escena', () => {
 
     const burnt = structuredClone(state);
     const target = burnt.buildings.find((building) => building.id === standing?.id);
-    if (target !== undefined) target.lostTick = burnt.tick;
+    if (target !== undefined) {
+      target.lostTick = burnt.tick;
+      for (let z = target.y; z < target.y + target.h; z += 1) {
+        for (let x = target.x; x < target.x + target.w; x += 1) burnt.map.ruins[z * burnt.map.width + x] = 1;
+      }
+    }
 
     const change = planChange(before, planFor(burnt));
     expect(change.added.length).toBe(0);

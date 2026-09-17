@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T20:49:39.885Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-49-25-840Z-32812\\candidate\\ruin-stone.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/candidate/ruin-stone.glb",
+    "viewport": {
+      "width": 900,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-49-25-840Z-32812\\three\\capture-1.png",
+      "sha256": "1C26DEB5AC3C168373F26E084E772987849784897FCEB462368FF3999DDDE838",
+      "dimensions": {
+        "width": 900,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-49-25-840Z-32812\\three\\capture-1-gray.png",
+        "sha256": "263692D5A7D6B756261B80CB73822F2EBBD3AB1BFFBE946D959296B2A5BE1D6A",
+        "dimensions": {
+          "width": 900,
+          "height": 800
+        }
+      },
+      "durationMs": 707,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:63170/artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/candidate/ruin-stone.glb",
+        "viewport": {
+          "width": 900,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "ruin-stone_roof",
+          "ruin-stone_soil",
+          "ruin-stone_stone",
+          "ruin-stone_wood"
+        ],
+        "bounds": {
+          "min": [
+            0,
+            0,
+            -2
+          ],
+          "max": [
+            2,
+            0.618333,
+            0
+          ],
+          "size": [
+            2,
+            0.618333,
+            2
+          ]
+        },
+        "loadDurationMs": 133
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-49-25-840Z-32812\\three\\capture-2.png",
+      "sha256": "1C26DEB5AC3C168373F26E084E772987849784897FCEB462368FF3999DDDE838",
+      "dimensions": {
+        "width": 900,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-49-25-840Z-32812\\three\\capture-2-gray.png",
+        "sha256": "263692D5A7D6B756261B80CB73822F2EBBD3AB1BFFBE946D959296B2A5BE1D6A",
+        "dimensions": {
+          "width": 900,
+          "height": 800
+        }
+      },
+      "durationMs": 120,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:63170/artifacts/graphics/G-21/runs/2026-09-16T20-49-25-840Z-32812/candidate/ruin-stone.glb",
+        "viewport": {
+          "width": 900,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "ruin-stone_roof",
+          "ruin-stone_soil",
+          "ruin-stone_stone",
+          "ruin-stone_wood"
+        ],
+        "bounds": {
+          "min": [
+            0,
+            0,
+            -2
+          ],
+          "max": [
+            2,
+            0.618333,
+            0
+          ],
+          "size": [
+            2,
+            0.618333,
+            2
+          ]
+        },
+        "loadDurationMs": 32
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:63170/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=900&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 168,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-49-25-840Z-32812\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

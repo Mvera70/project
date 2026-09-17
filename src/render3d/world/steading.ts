@@ -1,3 +1,5 @@
+import { piecesOf } from './forest';
+import { visibleBuildings } from '@derive/visible-buildings';
 // G-15 · Los trastos del corral: lo que dice que aquí vive alguien.
 //
 // Lo pidió el dueño del diseño al probar la demo: *«los modelos son muy
@@ -18,10 +20,12 @@
 // cuenta al motor.
 
 import {
-  InstancedMesh, Matrix4, Mesh, Quaternion, Vector3, Group,
-  type Material, type BufferGeometry, type Object3D,
+  InstancedMesh, Matrix4, Quaternion, Vector3, Group,
+  type Object3D,
 } from 'three';
 import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
+import { terrainOf } from '../life/terrain';
+import { homeRoutine } from '../life/home';
 import { hash32 } from '@engine/rng';
 
 /** Qué se deja por el valle, y contra qué se apoya. */
@@ -66,8 +70,8 @@ interface Field { readonly x: number; readonly y: number; readonly w: number; re
 
 function ringOf(map: ValleyMap, box: Field): number[] {
   const out: number[] = [];
-  for (let y = box.y - 1; y <= box.y + box.h; y += 1) {
-    for (let x = box.x - 1; x <= box.x + box.w; x += 1) {
+  for (let y = box.y - 2; y <= box.y + box.h + 1; y += 1) {
+    for (let x = box.x - 2; x <= box.x + box.w + 1; x += 1) {
       const inside = x >= box.x && x < box.x + box.w && y >= box.y && y < box.y + box.h;
       if (inside || x < 0 || y < 0 || x >= map.width || y >= map.height) continue;
       out.push(y * map.width + x);
@@ -93,8 +97,7 @@ export function steadingOf(
 ): Steaded[] {
   const { map } = state;
   const taken = new Set<number>();
-  for (const building of state.buildings) {
-    if (building.lostTick !== null) continue;
+  for (const building of visibleBuildings(state)) {
     for (let row = 0; row < building.h; row += 1) {
       for (let column = 0; column < building.w; column += 1) {
         taken.add((building.y + row) * map.width + building.x + column);
@@ -102,7 +105,22 @@ export function steadingOf(
     }
   }
 
+  // Los adornos no pueden cerrar la puerta de una vivienda. El mismo acceso
+  // se usa para orientar la fachada y para la rutina de volver a casa.
+  const land = terrainOf(state);
+  const entrances = state.buildings.filter(building => building.lostTick === null
+    && (building.kind === 'house' || building.kind === 'stone_house'))
+    .map(building => homeRoutine(building, land).approach);
   const free = (cell: number): boolean => {
+    const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
+    if ((map.path[cell] ?? 0) > 0) return false;
+    // Una calle de una celda no admite carros ni leña: se reserva el anillo
+    // completo, incluso a los lados sin puerta y junto a las defensas.
+    if (state.buildings.some(b => b.lostTick === null && b.kind !== 'field' && b.kind !== 'grave_yard'
+      && x > b.x - 1 && x < b.x + b.w + 1 && z > b.y - 1 && z < b.y + b.h + 1)) return false;
+    // TUNE: reserva de 1.5 celdas a cada lado del umbral para la anchura del
+    // mayor adorno y el cuerpo que entra. Los candidatos se amplían un anillo.
+    if (entrances.some(entry => Math.abs(entry.x - x) < 1.5 && Math.abs(entry.z - z) < 1.5)) return false;
     if (taken.has(cell)) return false;
     const kind = map.terrain[cell];
     // Prado o rastrojo. Nada sobre el agua, la marisma, la roca ni el bosque:
@@ -145,30 +163,21 @@ export function steadingOf(
   );
   place('log-pile', homes.flatMap((one) => ringOf(map, one)));
 
-  // Y la carreta, en el camino más pisado. Si no hay camino todavía —los
+  // Y la carreta, al lado del camino más pisado. Si no hay camino todavía —los
   // primeros años no hay— junto al granero, que es donde acaba el grano.
   const road = [...map.path.entries()]
-    .filter(([cell, wear]) => wear >= 2 && free(cell))
+    .filter(([, wear]) => wear >= 2)
     .sort((a, z) => z[1] - a[1] || a[0] - z[0])
-    .map(([cell]) => cell);
+    .flatMap(([cell]) => [-map.width, -1, 1, map.width]
+      .filter(offset => (offset !== -1 || cell % map.width > 0) && (offset !== 1 || cell % map.width < map.width - 1))
+      .map(offset => cell + offset))
+    .filter(cell => cell >= 0 && cell < map.terrain.length && free(cell));
   const stores = state.buildings.filter(
     (one) => (one.kind === 'granary' || one.kind === 'mill') && one.lostTick === null,
   );
   place('handcart', [...road, ...stores.flatMap((one) => ringOf(map, one))]);
 
   return out;
-}
-
-interface Piece { readonly geometry: BufferGeometry; readonly material: Material }
-
-function piecesOf(source: Object3D): Piece[] {
-  const pieces: Piece[] = [];
-  source.traverse((child) => {
-    if (child instanceof Mesh) {
-      pieces.push({ geometry: child.geometry as BufferGeometry, material: child.material as Material });
-    }
-  });
-  return pieces;
 }
 
 /**
@@ -237,6 +246,7 @@ export class Steading {
     for (const instanced of this.owned) {
       this.group.remove(instanced);
       instanced.dispose();
+      instanced.geometry.dispose();
     }
     this.owned.length = 0;
     this.placed = 0;

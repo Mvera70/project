@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "assetId": "field-cabbage",
+  "runId": "2026-09-16T18-29-27-041Z-47124",
+  "status": "pass",
+  "durationMs": 3182,
+  "candidateSha256": "EEB451AB6596C7F5407762941B9AC8E0C1D75D112D6337DDFB28594EE1CC2BE5",
+  "glb": {
+    "version": 2,
+    "declaredLength": 169488,
+    "nodeNames": [
+      "field-cabbage_heart",
+      "field-cabbage_leaf",
+      "field-cabbage_soil",
+      "Root"
+    ],
+    "meshNames": [
+      "field-cabbage_heart_Mesh",
+      "field-cabbage_leaf_Mesh",
+      "field-cabbage_soil_Mesh"
+    ],
+    "materialNames": [
+      "heart",
+      "leaf",
+      "soil"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 3,
+    "statistics": {
+      "objects": 4,
+      "meshes": 3,
+      "materials": 3,
+      "triangles": 2292
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T18:29:42.221Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-29-27-041Z-47124\\candidate\\field-cabbage.glb",
+      "assetUrl": "/artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/candidate/field-cabbage.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-29-27-041Z-47124\\three\\capture-1.png",
+        "sha256": "D8154DFCAA78C5EAF54C51439FCAC2A8EBD264FB590B7FB06251BAF47BCA1620",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-29-27-041Z-47124\\three\\capture-1-gray.png",
+          "sha256": "4FC9785F64E263D7E0B244082E9BCA8C112ED188DD49D668244F95B65EED20B6",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 857,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:53366/artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/candidate/field-cabbage.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "field-cabbage_heart",
+            "field-cabbage_leaf",
+            "field-cabbage_soil"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              3,
+              0.198333,
+              0
+            ],
+            "size": [
+              3,
+              0.198333,
+              2
+            ]
+          },
+          "loadDurationMs": 229
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-29-27-041Z-47124\\three\\capture-2.png",
+        "sha256": "D8154DFCAA78C5EAF54C51439FCAC2A8EBD264FB590B7FB06251BAF47BCA1620",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-29-27-041Z-47124\\three\\capture-2-gray.png",
+          "sha256": "4FC9785F64E263D7E0B244082E9BCA8C112ED188DD49D668244F95B65EED20B6",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 169,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:53366/artifacts/graphics/G-22/runs/2026-09-16T18-29-27-041Z-47124/candidate/field-cabbage.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "field-cabbage_heart",
+            "field-cabbage_leaf",
+            "field-cabbage_soil"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              3,
+              0.198333,
+              0
+            ],
+            "size": [
+              3,
+              0.198333,
+              2
+            ]
+          },
+          "loadDurationMs": 50
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:53366/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 195,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-22\\runs\\2026-09-16T18-29-27-041Z-47124\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

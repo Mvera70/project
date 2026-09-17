@@ -7,6 +7,7 @@
  * that failure turned into a test.
  */
 import { test, type Page } from '@playwright/test';
+import { passTitle } from './pass-title';
 
 const BASE = 'http://127.0.0.1:4180/project/';
 
@@ -16,6 +17,8 @@ async function controlled(page: Page): Promise<void> {
 
 test('bajo un subdirectorio arranca, el worker se limita a él y abre sin red', async ({ page, context }) => {
   await page.goto(BASE);
+  // U-10: el menú de inicio va antes de fundar.
+  await passTitle(page);
   await page.locator('html[data-app-ready="true"]').waitFor({ timeout: 30_000 });
   await controlled(page);
 

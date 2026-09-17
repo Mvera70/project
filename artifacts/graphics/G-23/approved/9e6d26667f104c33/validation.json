@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "assetId": "fish",
+  "runId": "2026-09-16T21-27-17-551Z-37688",
+  "status": "pass",
+  "durationMs": 3679,
+  "candidateSha256": "9E6D26667F104C3375FB7F7E0575281D1E6ABF468C082B705BB8471917A81C60",
+  "glb": {
+    "version": 2,
+    "declaredLength": 146060,
+    "nodeNames": [
+      "fin1",
+      "fin-1",
+      "head",
+      "tailTip",
+      "tail",
+      "body",
+      "fish_accent",
+      "fish_coat",
+      "fish_dark",
+      "fish_light",
+      "fish_Rig",
+      "Root"
+    ],
+    "meshNames": [
+      "fish_accent_Mesh",
+      "fish_coat_Mesh",
+      "fish_dark_Mesh",
+      "fish_light_Mesh"
+    ],
+    "materialNames": [
+      "accent",
+      "coat",
+      "dark",
+      "light"
+    ],
+    "animationNames": [
+      "idle",
+      "walk"
+    ],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 12,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 700
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T21:27:32.564Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-27-17-551Z-37688\\candidate\\fish.glb",
+      "assetUrl": "/artifacts/graphics/G-23/runs/2026-09-16T21-27-17-551Z-37688/candidate/fish.glb",
+      "viewport": {
+        "width": 600,
+        "height": 600,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-27-17-551Z-37688\\three\\capture-1.png",
+        "sha256": "141B293E34E50F2832387644A1803B4D828FB4BA45276F9A18C15043C75CB06D",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-27-17-551Z-37688\\three\\capture-1-gray.png",
+          "sha256": "345EC876DB5AC198E0F19321809CB5B9CEFD02C32A47E8C016FA806C772607DC",
+          "dimensions": {
+            "width": 600,
+            "height": 600
+          }
+        },
+        "durationMs": 1942,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:62327/artifacts/graphics/G-23/runs/2026-09-16T21-27-17-551Z-37688/candidate/fish.glb",
+          "viewport": {
+            "width": 600,
+            "height": 600,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "idle",
+            "duration": 8.041666984558105
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "body",
+            "fin-1",
+            "fin1",
+            "fish_Rig",
+            "fish_accent",
+            "fish_coat",
+            "fish_dark",
+            "fish_light",
+            "head",
+            "tail",
+            "tailTip"
+          ],
+          "bounds": {
+            "min": [
+              -0.074667,
+              -0.033333,
+              -0.041667
+            ],
+            "max": [
+              0.113333,
+              0.067667,
+              0.041667
+            ],
+            "size": [
+              0.188,
+              0.101,
+              0.083333
+            ]
+          },
+          "loadDurationMs": 305
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-27-17-551Z-37688\\three\\capture-2.png",
+        "sha256": "141B293E34E50F2832387644A1803B4D828FB4BA45276F9A18C15043C75CB06D",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-27-17-551Z-37688\\three\\capture-2-gray.png",
+          "sha256": "345EC876DB5AC198E0F19321809CB5B9CEFD02C32A47E8C016FA806C772607DC",
+          "dimensions": {
+            "width": 600,
+            "height": 600
+          }
+        },
+        "durationMs": 132,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:62327/artifacts/graphics/G-23/runs/2026-09-16T21-27-17-551Z-37688/candidate/fish.glb",
+          "viewport": {
+            "width": 600,
+            "height": 600,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "idle",
+            "duration": 8.041666984558105
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "body",
+            "fin-1",
+            "fin1",
+            "fish_Rig",
+            "fish_accent",
+            "fish_coat",
+            "fish_dark",
+            "fish_light",
+            "head",
+            "tail",
+            "tailTip"
+          ],
+          "bounds": {
+            "min": [
+              -0.074667,
+              -0.033333,
+              -0.041667
+            ],
+            "max": [
+              0.113333,
+              0.067667,
+              0.041667
+            ],
+            "size": [
+              0.188,
+              0.101,
+              0.083333
+            ]
+          },
+          "loadDurationMs": 55
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:62327/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=600&height=600&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 182,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-27-17-551Z-37688\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

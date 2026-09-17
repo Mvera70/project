@@ -22,8 +22,9 @@
 // Vive aquí y no en cada sitio que lo necesite porque es la clase de detalle
 // que se olvida al copiarlo: una sola máscara, y quien la use la hereda bien.
 
-import { TERRAIN_CODE, type GameState } from '@engine/state';
-import type { Point, Terrain } from './body';
+import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
+import { defenceGates } from '@derive/defence-gates';
+import { fitsCircle, type Point, type Terrain } from './body';
 
 /**
  * Lo que tiene paredes y por tanto corta el paso.
@@ -56,9 +57,10 @@ export const WALLED: ReadonlySet<string> = new Set([
  * Se rehace cuando cambia el valle —una casa nueva cierra un paso— y eso ocurre
  * una vez por jornada escénica, no por fotograma.
  */
-export function terrainOf(state: GameState): Terrain {
+export function terrainOf(state: { readonly map: ValleyMap; readonly buildings: readonly Building[] }): Terrain {
   const { width, height } = state.map;
   const blocked = new Uint8Array(width * height);
+  const gates = defenceGates(state);
 
   for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
     const kind = state.map.terrain[cell];
@@ -70,7 +72,7 @@ export function terrainOf(state: GameState): Terrain {
   }
 
   for (const building of state.buildings) {
-    if (building.lostTick !== null || !WALLED.has(building.kind)) continue;
+    if (building.lostTick !== null || !WALLED.has(building.kind) || gates.has(building.id)) continue;
     for (let z = building.y; z < building.y + building.h; z += 1) {
       for (let x = building.x; x < building.x + building.w; x += 1) {
         if (x >= 0 && z >= 0 && x < width && z < height) blocked[z * width + x] = 1;
@@ -141,10 +143,10 @@ export function canReach(land: Terrain, reach: Uint8Array, to: Point): boolean {
  * dos animales que partan de la misma celda cerrada encuentran la misma
  * celda de rescate, que es lo que exige §4.3.
  */
-export function nearestReachable(land: Terrain, reach: Uint8Array, from: Point): Point | null {
+export function nearestReachable(land: Terrain, reach: Uint8Array, from: Point, radius = 0): Point | null {
   const startX = Math.max(0, Math.min(land.width - 1, Math.floor(from.x)));
   const startZ = Math.max(0, Math.min(land.height - 1, Math.floor(from.z)));
-  if (land.blocked[startZ * land.width + startX] === 0 && reach[startZ * land.width + startX] === 1) {
+  if (fitsCircle(land, startX + 0.5, startZ + 0.5, radius) && reach[startZ * land.width + startX] === 1) {
     return { x: startX + 0.5, z: startZ + 0.5 };
   }
 
@@ -159,7 +161,7 @@ export function nearestReachable(land: Terrain, reach: Uint8Array, from: Point):
         const x = startX + dx;
         if (x < 0 || x >= land.width) continue;
         const cell = z * land.width + x;
-        if (land.blocked[cell] === 0 && reach[cell] === 1) return { x: x + 0.5, z: z + 0.5 };
+        if (reach[cell] === 1 && fitsCircle(land, x + 0.5, z + 0.5, radius)) return { x: x + 0.5, z: z + 0.5 };
       }
     }
   }

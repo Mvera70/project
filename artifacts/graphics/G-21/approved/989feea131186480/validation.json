@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "assetId": "field",
+  "runId": "2026-09-16T18-20-16-403Z-47820",
+  "status": "pass",
+  "durationMs": 2434,
+  "candidateSha256": "989FEEA131186480AF20F82EFF5BC9E4BC5618498ABDCB5487465E929B89EAC0",
+  "glb": {
+    "version": 2,
+    "declaredLength": 160704,
+    "nodeNames": [
+      "field_grain",
+      "field_soil",
+      "Root"
+    ],
+    "meshNames": [
+      "field_grain_Mesh",
+      "field_soil_Mesh"
+    ],
+    "materialNames": [
+      "grain",
+      "soil"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 2,
+    "statistics": {
+      "objects": 3,
+      "meshes": 2,
+      "materials": 2,
+      "triangles": 2056
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T18:20:31.316Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-20-16-403Z-47820\\candidate\\field.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T18-20-16-403Z-47820/candidate/field.glb",
+      "viewport": {
+        "width": 800,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-20-16-403Z-47820\\three\\capture-1.png",
+        "sha256": "A45D5823CFBA628440CDF3C9873E482592077D83ABA6296664D6DE93BB71704B",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-20-16-403Z-47820\\three\\capture-1-gray.png",
+          "sha256": "201D0D6AF41D84031B1B859BCB32728271F944BC291931EA2730913E6C558B32",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 363,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:54215/artifacts/graphics/G-21/runs/2026-09-16T18-20-16-403Z-47820/candidate/field.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "field_grain",
+            "field_soil"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              3,
+              0.281667,
+              0
+            ],
+            "size": [
+              3,
+              0.281667,
+              2
+            ]
+          },
+          "loadDurationMs": 143
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-20-16-403Z-47820\\three\\capture-2.png",
+        "sha256": "A45D5823CFBA628440CDF3C9873E482592077D83ABA6296664D6DE93BB71704B",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-20-16-403Z-47820\\three\\capture-2-gray.png",
+          "sha256": "201D0D6AF41D84031B1B859BCB32728271F944BC291931EA2730913E6C558B32",
+          "dimensions": {
+            "width": 800,
+            "height": 800
+          }
+        },
+        "durationMs": 119,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:54215/artifacts/graphics/G-21/runs/2026-09-16T18-20-16-403Z-47820/candidate/field.glb",
+          "viewport": {
+            "width": 800,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "field_grain",
+            "field_soil"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              3,
+              0.281667,
+              0
+            ],
+            "size": [
+              3,
+              0.281667,
+              2
+            ]
+          },
+          "loadDurationMs": 32
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:54215/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 125,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-20-16-403Z-47820\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

@@ -15,10 +15,11 @@
 // da comportamiento a los ochenta a la vez**, sin tocar a nadie. Añadir «lavar
 // en el río» es una entrada en una tabla, no una rama en un árbol de decisión.
 
+import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
 import type { Point, Terrain } from './body';
-import { blockedAt, WALL_CLEAR } from './body';
+import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
 
 /** Algo que se puede hacer, y dónde. */
@@ -221,14 +222,29 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
     if (building.lostTick !== null) continue;
     const menu = BY_BUILDING[building.kind];
     if (menu === undefined) continue;
-    const at = doorOf(land, building.x, building.y, building.w, building.h);
+    // **Un campo es una parcela, no un edificio con puerta.** Su sitio es el
+    // centro del rectángulo y sus puestos van dentro (`parcelSeats`); lo demás
+    // sigue naciendo en la puerta. Es la corrección del 16 sep 2026: el 96 % de
+    // los labradores trabajaban fuera de su campo.
+    const parcel = building.kind === 'field';
+    const centre = { x: building.x + building.w / 2, z: building.y + building.h / 2 };
+    const at = parcel && !blockedAt(land, centre.x, centre.z)
+      ? centre
+      : doorOf(land, building.x, building.y, building.w, building.h);
     if (at === null) continue;
 
     const offers: Offer[] = [];
     for (const name of menu) {
       const spec = OFFERS[name];
       if (spec === undefined) continue;
-      const offer = placedOffer(spec, at, land);
+      const seats = parcel
+        ? parcelSeats(land, building.x, building.y, building.w, building.h, spec.seats, building.id)
+        : undefined;
+      // En una parcela se llega **al puesto**, no a su alcance: con el `reach`
+      // de `work` (1,6) se daba por llegado a 0,96 celdas, y el 13,6 % de los
+      // labradores cavaba la linde desde fuera (IA-7). `PARCEL_REACH` deja el
+      // margen por encima de `REACHED` (`navigate.ts`, 0,45 = 0,9 × 0,6 → 0,54).
+      const offer = placedOffer(parcel ? { ...spec, reach: PARCEL_REACH } : spec, at, land, undefined, seats);
       if (offer !== null) offers.push(offer);
     }
     if (offers.length > 0) places.push({ id: `${building.kind}:${building.id}`, at, offers });
@@ -362,9 +378,57 @@ export function offersNear(
  * **subió**. Una aldea con menos sitios donde estar es una aldea más apretada,
  * y eso pesa más que la holgura de cada plaza.
  */
+/**
+ * Los puestos de trabajo de una **parcela**: dentro de su rectángulo, no en
+ * anillos alrededor de un punto de fuera.
+ *
+ * **El fallo que esto arregla lo vio el dueño del diseño en pantalla el 16 sep
+ * 2026**: «los trabajadores ni siquiera interpretan el campo de trabajo y se
+ * salen fuera de él para labrar el suelo». Medido antes de tocar nada, tres
+ * semillas y dos jornadas: **el 96 % de los labradores trabajaban fuera de su
+ * campo**, hasta tres celdas del borde, y sólo el 4 % dentro. La causa era una
+ * línea: el sitio de **todo** edificio nacía en `doorOf()`, un punto de pie
+ * junto a la fachada, y `seatsOn()` repartía los puestos en anillos alrededor
+ * de ese punto exterior. Para una casa es correcto —se está en la puerta—; para
+ * un campo es tratar una parcela como si fuera un edificio con puerta, y nadie
+ * sabía dónde estaba el campo.
+ *
+ * Aquí un puesto por celda del contorno, en el centro de la celda con un
+ * temblor pequeño y **determinista** (`hash32` del edificio y del puesto: azar
+ * de presentación, nunca del motor), y si hacen falta más puestos que celdas se
+ * vuelve a empezar con otro temblor. Todo dentro del rectángulo, así que un
+ * cuerpo que llega a su puesto está en su campo, y la azada cae en tierra
+ * labrada y no en el prado.
+ */
+/** Alcance de llegada a un puesto de parcela: dentro del campo, o no se ha llegado. */
+export const PARCEL_REACH = 0.9;
+
+export function parcelSeats(
+  land: Terrain, x: number, z: number, w: number, h: number, want: number, id: number,
+): Point[] {
+  const found: Point[] = [];
+  const cells = Math.max(1, w * h);
+  for (let n = 0; found.length < want && n < cells * 3; n += 1) {
+    const cell = n % cells;
+    const cx = x + (cell % w) + 0.5;
+    const cz = z + Math.floor(cell / w) + 0.5;
+    // ±0,15 y no ±0,25: con un cuerpo de radio 0,32, un puesto a 0,25 del borde
+    // de su celda solapaba la celda vecina si estaba bloqueada (un almiar),
+    // y eso contaba como «círculo en celda cerrada».
+    const jx = (hash32(id, `parcel:${n}:x`) / 4_294_967_296 - 0.5) * 0.3;
+    const jz = (hash32(id, `parcel:${n}:z`) / 4_294_967_296 - 0.5) * 0.3;
+    const spot = { x: cx + jx, z: cz + jz };
+    if (spot.x <= 0.5 || spot.z <= 0.5) continue;
+    if (spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
+    if (!fitsCircle(land, spot.x, spot.z, 0.32)) continue;
+    found.push(spot);
+  }
+  return found;
+}
+
 export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
   const found: Point[] = [];
-  if (!blockedAt(land, at.x, at.z)) found.push(at);
+  if (fitsCircle(land, at.x, at.z, 0.32)) found.push(at);
   // Cuarenta intentos para llenar como mucho seis plazas: de sobra para rodear
   // un pozo encajonado, y un tope para no barrer el valle entero buscando.
   for (let ring = 1; found.length < want && ring < 40; ring += 1) {
@@ -373,7 +437,7 @@ export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
     const spot = { x: at.x + Math.sin(angle) * reach, z: at.z + Math.cos(angle) * reach };
     if (spot.x <= 0.5 || spot.z <= 0.5) continue;
     if (spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
-    if (blockedAt(land, spot.x, spot.z)) continue;
+    if (!fitsCircle(land, spot.x, spot.z, 0.32)) continue;
     found.push(spot);
   }
   return found;
@@ -387,8 +451,14 @@ export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
  */
 export function placedOffer(
   spec: OfferSpec, at: Point, land: Terrain, hours?: readonly [number, number],
+  /**
+   * Puestos ya calculados, para los sitios que **no** son un punto con anillos
+   * alrededor: una parcela se trabaja dentro (`parcelSeats`). Si no se dan,
+   * se reparten en anillos alrededor de `at`, que es lo de siempre.
+   */
+  given?: readonly Point[],
 ): Offer | null {
-  const spots = seatsOn(land, at, spec.seats);
+  const spots = given !== undefined && given.length > 0 ? [...given] : seatsOn(land, at, spec.seats);
   const first = spots[0];
   if (first === undefined) return null;
   return {

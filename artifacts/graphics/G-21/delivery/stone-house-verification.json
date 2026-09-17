@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "stone-house",
+  "statistics": {
+    "objects": 6,
+    "meshes": 5,
+    "materials": 5,
+    "triangles": 764
+  },
+  "bounds": {
+    "min": [
+      0,
+      -0.0025,
+      -2
+    ],
+    "max": [
+      2,
+      1.57,
+      0
+    ],
+    "size": [
+      2,
+      1.5725,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T22-04-25-239Z-21428",
+    "directory": "artifacts/graphics/G-21/approved/110f59506b8e4bcd"
+  },
+  "sha256": "110F59506B8E4BCD05666168A66CC04A72B5CB19634829C579E794F9FF12A10B",
+  "otherPublishedFilesUnchanged": true
+}

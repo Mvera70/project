@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "id": "handcart",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Misma convención que el aldeano (villager.json): la receta se escribe en metros y esto la lleva a celdas.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "handcart",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "Una carreta de mano de dos ruedas, con las varas apoyadas en el suelo. Parada junto al granero o en el camino, es lo que dice que las cosas del valle se mueven: el grano va a algún sitio y alguien lo lleva. Las varas en el suelo y no en el aire porque una carreta en reposo se apoya, y además así la silueta tiene una diagonal, que es lo que la distingue de una caja a veinte píxeles. Las ruedas van facetadas y no suaves: un disco de doce lados con sombreado suave se lee como un huevo, visto en la hoja de contactos antes de publicarlo."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "trunk",
+      "roughness": 0.9
+    },
+    {
+      "name": "plank",
+      "role": "soil",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Cart_Bed",
+      "location": [
+        0,
+        0,
+        0.52
+      ],
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0.02,
+      "smooth": false,
+      "dimensions": [
+        1.1,
+        0.7,
+        0.12
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Cart_Side_L",
+      "location": [
+        0,
+        -0.33,
+        0.66
+      ],
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0.01,
+      "smooth": false,
+      "dimensions": [
+        1.1,
+        0.06,
+        0.3
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Cart_Side_R",
+      "location": [
+        0,
+        0.33,
+        0.66
+      ],
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0.01,
+      "smooth": false,
+      "dimensions": [
+        1.1,
+        0.06,
+        0.3
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Cart_Head",
+      "location": [
+        -0.52,
+        0,
+        0.66
+      ],
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "bevel": 0.01,
+      "smooth": false,
+      "dimensions": [
+        0.06,
+        0.7,
+        0.3
+      ]
+    },
+    {
+      "type": "cylinder",
+      "name": "Cart_Wheel_L",
+      "location": [
+        0.12,
+        -0.42,
+        0.3
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.3,
+      "depth": 0.08,
+      "vertices": 12
+    },
+    {
+      "type": "cylinder",
+      "name": "Cart_Wheel_R",
+      "location": [
+        0.12,
+        0.42,
+        0.3
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.3,
+      "depth": 0.08,
+      "vertices": 12
+    },
+    {
+      "type": "cylinder",
+      "name": "Cart_Axle",
+      "location": [
+        0.12,
+        0,
+        0.3
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.05,
+      "depth": 0.84,
+      "vertices": 6
+    },
+    {
+      "type": "cylinder",
+      "name": "Cart_Shaft_L",
+      "location": [
+        -1,
+        -0.3,
+        0.28
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        65,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.045,
+      "depth": 1.1,
+      "vertices": 6
+    },
+    {
+      "type": "cylinder",
+      "name": "Cart_Shaft_R",
+      "location": [
+        -1,
+        0.3,
+        0.28
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        65,
+        0
+      ],
+      "bevel": 0,
+      "smooth": false,
+      "radius": 0.045,
+      "depth": 1.1,
+      "vertices": 6
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      2.6,
+      -3,
+      1.8
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.4
+    ],
+    "orthoScale": 3,
+    "worldRole": "sky"
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "id": "granary",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "granary",
+    "footprint": [
+      2,
+      2
+    ],
+    "note": "G-10, lote de sustento. Levantado sobre postes, que es como se guarda el grano lejos de la humedad y de los ratones, y una gavilla apoyada fuera para que se lea que ahi dentro hay grano."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.95
+    },
+    {
+      "name": "roof",
+      "role": "roof",
+      "roughness": 0.9
+    },
+    {
+      "name": "grain",
+      "role": "grain",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Granary_Post_A",
+      "location": [
+        1.4,
+        1.4,
+        0.45
+      ],
+      "radius": 0.22,
+      "depth": 0.9,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Granary_Post_B",
+      "location": [
+        4.6,
+        1.4,
+        0.45
+      ],
+      "radius": 0.22,
+      "depth": 0.9,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Granary_Post_C",
+      "location": [
+        1.4,
+        4.6,
+        0.45
+      ],
+      "radius": 0.22,
+      "depth": 0.9,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Granary_Post_D",
+      "location": [
+        4.6,
+        4.6,
+        0.45
+      ],
+      "radius": 0.22,
+      "depth": 0.9,
+      "vertices": 6,
+      "smooth": true,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Granary_Body",
+      "location": [
+        3,
+        3,
+        2.05
+      ],
+      "dimensions": [
+        5,
+        5,
+        2.3
+      ],
+      "material": "wood",
+      "parent": "Root"
+    },
+    {
+      "type": "gable",
+      "name": "Granary_Roof",
+      "location": [
+        3,
+        3,
+        3.2
+      ],
+      "width": 5.8,
+      "depth": 5.8,
+      "height": 2,
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "material": "roof",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Granary_Sheaf",
+      "location": [
+        3,
+        0.6,
+        0.35
+      ],
+      "dimensions": [
+        2.2,
+        0.9,
+        0.7
+      ],
+      "material": "grain",
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 390,
+    "height": 640,
+    "cameraLocation": [
+      9,
+      -11.25,
+      7.2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      2
+    ],
+    "orthoScale": 12.6,
+    "worldRole": "sky"
+  }
+}

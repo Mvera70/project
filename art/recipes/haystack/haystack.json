@@ -12,7 +12,7 @@
       1,
       1
     ],
-    "note": "Un almiar: el heno del año, apilado alrededor de una estaca. Es el objeto que más dice «aquí se siega» desde arriba, porque el amarillo del grano es lo único cálido en un prado verde. Dos metros y medio de alto, que es lo que un hombre puede echar con la horca. La estaca asoma por encima porque sin ella se lee como una piedra redonda. Bajado de 2,6 m a 1,8 tras verlo en el valle: a la altura anterior competia con el tejado de una casa, y un almiar mas alto que una puerta no es un almiar."
+    "note": "G-21: almiar tradicional alrededor de una estaca, faldones de heno superpuestos y haces visibles. Origen centrado, escala 1/3 y altura de la estaca conservados. Adorno estático."
   },
   "materials": [
     {
@@ -24,6 +24,11 @@
       "name": "stake",
       "role": "trunk",
       "roughness": 0.9
+    },
+    {
+      "name": "dry-hay",
+      "role": "path",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -39,46 +44,113 @@
   ],
   "primitives": [
     {
-      "type": "cylinder",
-      "name": "Hay_Base",
+      "type": "cube",
+      "name": "Origin_hay",
       "location": [
         0,
         0,
-        0.25
+        0
+      ],
+      "dimensions": [
+        0.002,
+        0.002,
+        0.002
       ],
       "material": "hay",
-      "parent": "Root",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Origin_stake",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "dimensions": [
+        0.002,
+        0.002,
+        0.002
+      ],
+      "material": "stake",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Origin_dry_hay",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "dimensions": [
+        0.002,
+        0.002,
+        0.002
+      ],
+      "material": "dry-hay",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Lower",
+      "location": [
+        0,
+        0,
+        0.08
+      ],
+      "radius": 0.81,
+      "depth": 0.16,
+      "vertices": 12,
+      "material": "hay",
       "rotationDegrees": [
         0,
         0,
         0
       ],
-      "bevel": 0,
-      "smooth": true,
-      "radius": 0.85,
-      "depth": 0.5,
-      "vertices": 9
+      "parent": "Root"
     },
     {
       "type": "cone",
-      "name": "Hay_Top",
+      "name": "Hay_LowerSkirt",
       "location": [
         0,
         0,
-        1.17
+        0.91
       ],
+      "radius": 0.88,
+      "depth": 1.64,
+      "vertices": 12,
       "material": "hay",
-      "parent": "Root",
-      "rotationDegrees": [
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Hay_MiddleSkirt",
+      "location": [
         0,
         0,
-        0
+        1.1
       ],
-      "bevel": 0,
-      "smooth": true,
-      "depth": 1.35,
-      "vertices": 9,
-      "radius": 0.9
+      "radius": 0.67,
+      "depth": 1.02,
+      "vertices": 12,
+      "material": "hay",
+      "parent": "Root"
+    },
+    {
+      "type": "cone",
+      "name": "Hay_Crown",
+      "location": [
+        0,
+        0,
+        1.4
+      ],
+      "radius": 0.43,
+      "depth": 0.72,
+      "vertices": 12,
+      "material": "hay",
+      "parent": "Root"
     },
     {
       "type": "cylinder",
@@ -86,38 +158,1290 @@
       "location": [
         0,
         0,
-        1.0
+        1
       ],
+      "radius": 0.048,
+      "depth": 2,
+      "vertices": 6,
       "material": "stake",
-      "parent": "Root",
       "rotationDegrees": [
         0,
         0,
         0
       ],
-      "bevel": 0,
-      "smooth": false,
-      "radius": 0.05,
-      "depth": 2.0,
-      "vertices": 6
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_0",
+      "location": [
+        0.7224999999999999,
+        0,
+        0.4
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        0
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_1",
+      "location": [
+        0.6789279185178188,
+        0.24710955355279562,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        20
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_2",
+      "location": [
+        0.5534671101534615,
+        0.46441404799852454,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        40
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_3",
+      "location": [
+        0.36125,
+        0.6257033542342568,
+        0.4
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        59.99999999999999
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_4",
+      "location": [
+        0.12546080836435722,
+        0.7115236015513202,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        80
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_5",
+      "location": [
+        -0.12546080836435713,
+        0.7115236015513202,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        100
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_6",
+      "location": [
+        -0.3612499999999998,
+        0.6257033542342569,
+        0.4
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        119.99999999999999
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_7",
+      "location": [
+        -0.5534671101534615,
+        0.4644140479985247,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        140
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_8",
+      "location": [
+        -0.6789279185178186,
+        0.24710955355279574,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        160
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_9",
+      "location": [
+        -0.7224999999999999,
+        8.848073123839626e-17,
+        0.4
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        180
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_10",
+      "location": [
+        -0.6789279185178188,
+        -0.24710955355279557,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        200
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_11",
+      "location": [
+        -0.5534671101534618,
+        -0.4644140479985243,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        219.99999999999997
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_12",
+      "location": [
+        -0.3612500000000003,
+        -0.6257033542342567,
+        0.4
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        239.99999999999997
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_13",
+      "location": [
+        -0.12546080836435716,
+        -0.7115236015513202,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        260
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_14",
+      "location": [
+        0.12546080836435688,
+        -0.7115236015513203,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        280
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_15",
+      "location": [
+        0.36124999999999946,
+        -0.6257033542342572,
+        0.4
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        299.99999999999994
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_16",
+      "location": [
+        0.5534671101534614,
+        -0.4644140479985248,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        320
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_0_17",
+      "location": [
+        0.6789279185178188,
+        -0.24710955355279554,
+        0.4
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231272,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.43255724645935,
+        340
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_0",
+      "location": [
+        0.5108491752088266,
+        0.04110194871854019,
+        0.8500000000000001
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        4.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_1",
+      "location": [
+        0.4659835058866226,
+        0.21334390603345557,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        24.599999999999998
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_2",
+      "location": [
+        0.36491334857038565,
+        0.3598534396600207,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        44.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_3",
+      "location": [
+        0.21982925586911223,
+        0.4629593375924416,
+        0.8500000000000001
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        64.60000000000001
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_4",
+      "location": [
+        0.048230510575738565,
+        0.5102255068590784,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        84.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_5",
+      "location": [
+        -0.12918554609959576,
+        0.4959509498720102,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        104.60000000000001
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_6",
+      "location": [
+        -0.2910199193397144,
+        0.4218573888739014,
+        0.8500000000000001
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        124.60000000000001
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_7",
+      "location": [
+        -0.41775299531088406,
+        0.2968816008256228,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        144.60000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_8",
+      "location": [
+        -0.49409889466998147,
+        0.1360975102119894,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        164.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_9",
+      "location": [
+        -0.5108491752088266,
+        -0.041101948718540296,
+        0.8500000000000001
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        184.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_10",
+      "location": [
+        -0.46598350588662263,
+        -0.2133439060334555,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        204.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_11",
+      "location": [
+        -0.36491334857038554,
+        -0.3598534396600208,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        224.60000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_12",
+      "location": [
+        -0.2198292558691123,
+        -0.46295933759244157,
+        0.8500000000000001
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        244.60000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_13",
+      "location": [
+        -0.048230510575738406,
+        -0.5102255068590784,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        264.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_14",
+      "location": [
+        0.1291855460995957,
+        -0.4959509498720102,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        284.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_15",
+      "location": [
+        0.29101991933971455,
+        -0.4218573888739013,
+        0.8500000000000001
+      ],
+      "radius": 0.021,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        304.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_16",
+      "location": [
+        0.417752995310884,
+        -0.29688160082562287,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        324.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_1_17",
+      "location": [
+        0.49409889466998147,
+        -0.13609751021198924,
+        0.8500000000000001
+      ],
+      "radius": 0.014,
+      "depth": 0.5687046685231274,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -32.432557246459346,
+        344.6
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_0",
+      "location": [
+        0.282814539943411,
+        0.045805960273710686,
+        1.29
+      ],
+      "radius": 0.021,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        9.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_1",
+      "location": [
+        0.25009217513780047,
+        0.13977179234324688,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        29.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_2",
+      "location": [
+        0.1872050030431652,
+        0.21687908344422818,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        49.199999999999996
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_3",
+      "location": [
+        0.10173814472993123,
+        0.26782755628745814,
+        1.29
+      ],
+      "radius": 0.021,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        69.20000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_4",
+      "location": [
+        0.004000164667165143,
+        0.2864720731286656,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        89.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_5",
+      "location": [
+        -0.09422029429060402,
+        0.2705638300730383,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        109.19999999999999
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_6",
+      "location": [
+        -0.18107639521347976,
+        0.22202159601374746,
+        1.29
+      ],
+      "radius": 0.021,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        129.20000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_7",
+      "location": [
+        -0.24609201047063528,
+        0.14670028078541886,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        149.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_8",
+      "location": [
+        -0.2814252973337693,
+        0.053684746628810086,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        169.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_9",
+      "location": [
+        -0.282814539943411,
+        -0.045805960273710714,
+        1.29
+      ],
+      "radius": 0.021,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        189.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_10",
+      "location": [
+        -0.25009217513780047,
+        -0.13977179234324694,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        209.20000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_11",
+      "location": [
+        -0.18720500304316504,
+        -0.21687908344422832,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        229.20000000000005
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_12",
+      "location": [
+        -0.10173814472993122,
+        -0.26782755628745814,
+        1.29
+      ],
+      "radius": 0.021,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        249.20000000000002
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_13",
+      "location": [
+        -0.004000164667164924,
+        -0.2864720731286656,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        269.20000000000005
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_14",
+      "location": [
+        0.09422029429060416,
+        -0.2705638300730383,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        289.20000000000005
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_15",
+      "location": [
+        0.18107639521347993,
+        -0.2220215960137473,
+        1.29
+      ],
+      "radius": 0.021,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "dry-hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        309.20000000000005
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_16",
+      "location": [
+        0.24609201047063536,
+        -0.14670028078541866,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        329.2
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_Fibre_2_17",
+      "location": [
+        0.2814252973337693,
+        -0.05368474662880987,
+        1.29
+      ],
+      "radius": 0.014,
+      "depth": 0.5349102728495687,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        -30.68820986105866,
+        349.2000000000001
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_0",
+      "location": [
+        0.79,
+        0,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        0
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_1",
+      "location": [
+        0.6841600689897066,
+        0.39499999999999996,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        29.999999999999996
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_2",
+      "location": [
+        0.39500000000000013,
+        0.6841600689897065,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        59.99999999999999
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_3",
+      "location": [
+        4.8373548566320456e-17,
+        0.79,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        90
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_4",
+      "location": [
+        -0.39499999999999985,
+        0.6841600689897066,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        119.99999999999999
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_5",
+      "location": [
+        -0.6841600689897066,
+        0.39499999999999996,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        150.00000000000003
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_6",
+      "location": [
+        -0.79,
+        9.674709713264091e-17,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        180
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_7",
+      "location": [
+        -0.6841600689897067,
+        -0.3949999999999998,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        209.99999999999997
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_8",
+      "location": [
+        -0.39500000000000035,
+        -0.6841600689897064,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        239.99999999999997
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_9",
+      "location": [
+        -1.4512064569896134e-16,
+        -0.79,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        270
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_10",
+      "location": [
+        0.39500000000000013,
+        -0.6841600689897065,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        300.00000000000006
+      ],
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Hay_BaseTuft_11",
+      "location": [
+        0.6841600689897064,
+        -0.39500000000000035,
+        0.13
+      ],
+      "radius": 0.035,
+      "depth": 0.24,
+      "vertices": 4,
+      "material": "hay",
+      "rotationDegrees": [
+        0,
+        18,
+        329.99999999999994
+      ],
+      "parent": "Root"
     }
   ],
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 800,
+    "height": 800,
     "cameraLocation": [
-      3.2,
-      -3.8,
-      2.2
+      1.4,
+      -1.65,
+      1.15
     ],
     "cameraTarget": [
       0,
       0,
-      1.1
+      0.3
     ],
-    "orthoScale": 3.4,
+    "orthoScale": 1.1,
     "worldRole": "sky"
   }
 }

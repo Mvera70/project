@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T21:18:42.948Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-18-22-160Z-50676\\candidate\\wolf.glb",
+    "assetUrl": "/artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/candidate/wolf.glb",
+    "viewport": {
+      "width": 600,
+      "height": 600,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-18-22-160Z-50676\\three\\capture-1.png",
+      "sha256": "FCFEAEA8F09E74E01A0512C7053157B115D101ED58982D5BB2B45DA585057DE6",
+      "dimensions": {
+        "width": 600,
+        "height": 600
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-18-22-160Z-50676\\three\\capture-1-gray.png",
+        "sha256": "EFBEEBB776D799F0299A8F58E99EA1795BDD56DC444EB4E58A28FB1AE8EC5964",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      "durationMs": 3076,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:60549/artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/candidate/wolf.glb",
+        "viewport": {
+          "width": 600,
+          "height": 600,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "idle",
+          "duration": 8.041666984558105
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "body",
+          "ear-1",
+          "ear1",
+          "foreL",
+          "foreLFoot",
+          "foreLLower",
+          "foreR",
+          "foreRFoot",
+          "foreRLower",
+          "head",
+          "hindL",
+          "hindLFoot",
+          "hindLLower",
+          "hindR",
+          "hindRFoot",
+          "hindRLower",
+          "neck",
+          "tail",
+          "wolf_Rig",
+          "wolf_accent",
+          "wolf_coat",
+          "wolf_dark",
+          "wolf_light"
+        ],
+        "bounds": {
+          "min": [
+            -0.408833,
+            0,
+            -0.075
+          ],
+          "max": [
+            0.246267,
+            0.429067,
+            0.075
+          ],
+          "size": [
+            0.6551,
+            0.429067,
+            0.15
+          ]
+        },
+        "loadDurationMs": 511
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-18-22-160Z-50676\\three\\capture-2.png",
+      "sha256": "FCFEAEA8F09E74E01A0512C7053157B115D101ED58982D5BB2B45DA585057DE6",
+      "dimensions": {
+        "width": 600,
+        "height": 600
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-18-22-160Z-50676\\three\\capture-2-gray.png",
+        "sha256": "EFBEEBB776D799F0299A8F58E99EA1795BDD56DC444EB4E58A28FB1AE8EC5964",
+        "dimensions": {
+          "width": 600,
+          "height": 600
+        }
+      },
+      "durationMs": 209,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:60549/artifacts/graphics/G-23/runs/2026-09-16T21-18-22-160Z-50676/candidate/wolf.glb",
+        "viewport": {
+          "width": 600,
+          "height": 600,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "idle",
+          "duration": 8.041666984558105
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "body",
+          "ear-1",
+          "ear1",
+          "foreL",
+          "foreLFoot",
+          "foreLLower",
+          "foreR",
+          "foreRFoot",
+          "foreRLower",
+          "head",
+          "hindL",
+          "hindLFoot",
+          "hindLLower",
+          "hindR",
+          "hindRFoot",
+          "hindRLower",
+          "neck",
+          "tail",
+          "wolf_Rig",
+          "wolf_accent",
+          "wolf_coat",
+          "wolf_dark",
+          "wolf_light"
+        ],
+        "bounds": {
+          "min": [
+            -0.408833,
+            0,
+            -0.075
+          ],
+          "max": [
+            0.246267,
+            0.429067,
+            0.075
+          ],
+          "size": [
+            0.6551,
+            0.429067,
+            0.15
+          ]
+        },
+        "loadDurationMs": 84
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:60549/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=600&height=600&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 276,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-23\\runs\\2026-09-16T21-18-22-160Z-50676\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

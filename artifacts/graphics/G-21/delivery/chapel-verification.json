@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "chapel",
+  "statistics": {
+    "objects": 5,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 776
+  },
+  "bounds": {
+    "min": [
+      0.183333,
+      0,
+      -2
+    ],
+    "max": [
+      1.816667,
+      2.1,
+      0
+    ],
+    "size": [
+      1.633333,
+      2.1,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T17-53-54-519Z-50956",
+    "directory": "artifacts/graphics/G-21/approved/ce20d06c0e4e32fc"
+  },
+  "sha256": "CE20D06C0E4E32FCC1BC43F3AB95B9EC4E627EA6E10780B9CC386CAFC43B2398",
+  "otherPublishedFilesUnchanged": true
+}

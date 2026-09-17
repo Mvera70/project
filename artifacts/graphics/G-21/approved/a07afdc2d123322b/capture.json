@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T18:09:49.531Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-09-35-894Z-28336\\candidate\\well.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T18-09-35-894Z-28336/candidate/well.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-09-35-894Z-28336\\three\\capture-1.png",
+      "sha256": "F6CBF291EB51182690E5CBCF3127D4FCCF2A2B5C23E9616024D1FC241AE43688",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-09-35-894Z-28336\\three\\capture-1-gray.png",
+        "sha256": "961D0C5A4D1E8C9FABB2033491D55F06E02BFD19B3C08BE5A697C312AC8A1AF2",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 360,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:56277/artifacts/graphics/G-21/runs/2026-09-16T18-09-35-894Z-28336/candidate/well.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "well_dark",
+          "well_roof",
+          "well_stone",
+          "well_wood"
+        ],
+        "bounds": {
+          "min": [
+            0.128333,
+            0,
+            -0.9
+          ],
+          "max": [
+            0.952667,
+            1.033333,
+            -0.1
+          ],
+          "size": [
+            0.824333,
+            1.033333,
+            0.8
+          ]
+        },
+        "loadDurationMs": 136
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-09-35-894Z-28336\\three\\capture-2.png",
+      "sha256": "F6CBF291EB51182690E5CBCF3127D4FCCF2A2B5C23E9616024D1FC241AE43688",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-09-35-894Z-28336\\three\\capture-2-gray.png",
+        "sha256": "961D0C5A4D1E8C9FABB2033491D55F06E02BFD19B3C08BE5A697C312AC8A1AF2",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 109,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:56277/artifacts/graphics/G-21/runs/2026-09-16T18-09-35-894Z-28336/candidate/well.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "well_dark",
+          "well_roof",
+          "well_stone",
+          "well_wood"
+        ],
+        "bounds": {
+          "min": [
+            0.128333,
+            0,
+            -0.9
+          ],
+          "max": [
+            0.952667,
+            1.033333,
+            -0.1
+          ],
+          "size": [
+            0.824333,
+            1.033333,
+            0.8
+          ]
+        },
+        "loadDurationMs": 33
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:56277/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 137,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T18-09-35-894Z-28336\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

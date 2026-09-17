@@ -1,0 +1,25 @@
+
+ RUN  v2.1.9 D:/DESARROLLO/PROYECTOS/VALLEY/project
+
+ ✓ tests/fast/graphics-scenic-state.test.ts (5 tests) 1811ms
+   ✓ G-11 · el estado de la jornada > no cambia mientras la jornada está a la vista, por muchas semanas que corran 621ms
+   ✓ G-11 · el estado de la jornada > el motor no puede mover por debajo lo que ya se está pintando 382ms
+   ✓ G-11 · el estado de la jornada > releva al caer la noche, que es cuando no lo ve nadie 327ms
+   ✓ G-11 · el estado de la jornada > una partida nueva no hereda la jornada de la anterior 480ms
+ ✓ tests/fast/graphics-effects.test.ts (39 tests) 1802ms
+   ✓ G-08 · las estaciones > el valle cambia de color cuatro veces al año 516ms
+   ✓ G-08 · las estaciones > mirar el valle no lo cambia, en ninguna estación 313ms
+   ✓ G-08 · las consecuencias > el valle dice sin abrir una ficha qué le pasa a la aldea 330ms
+   ✓ IA-5 · el lobo tiene una sola fuente en 3D > la fórmula vieja ya no pone lobos en la escena 3D, aunque siga dándolos para Canvas 434ms
+ ✓ tests/fast/graphics-world.test.ts (43 tests) 2789ms
+   ✓ G-06 · el plan de escena > planificar no escribe en el estado ni consume una tirada 473ms
+   ✓ G-06 · el plan de escena > construir añade una casa y nada más 373ms
+   ✓ G-06 · el plan de escena > una ruina deja de ser una casa: más baja, más gris y sin tejado 301ms
+   ✓ G-06 · el suelo > un camino muy pisado deja rodada 473ms
+   ✓ G-06 · el pueblo > un edificio lleva su identidad para que se pueda tocar 324ms
+
+ Test Files  3 passed (3)
+      Tests  87 passed (87)
+   Start at  20:25:55
+   Duration  3.74s (transform 592ms, setup 0ms, collect 1.63s, tests 6.40s, environment 0ms, prepare 224ms)
+

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T17:46:59.015Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-46-45-051Z-43184\\candidate\\granary.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/candidate/granary.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-46-45-051Z-43184\\three\\capture-1.png",
+      "sha256": "7C0EC72E8E13552F1E48566E973687211FDFD50065A259A3D83CA783BFEBEB87",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-46-45-051Z-43184\\three\\capture-1-gray.png",
+        "sha256": "794B7146B1D1778B925590519348F64BAF1171C4EFB128A698E66508C9171381",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 373,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:56820/artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/candidate/granary.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "granary_frame",
+          "granary_roof",
+          "granary_stone",
+          "granary_wood"
+        ],
+        "bounds": {
+          "min": [
+            0.015,
+            0,
+            -1.983333
+          ],
+          "max": [
+            1.985,
+            1.765,
+            0
+          ],
+          "size": [
+            1.97,
+            1.765,
+            1.983333
+          ]
+        },
+        "loadDurationMs": 132
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-46-45-051Z-43184\\three\\capture-2.png",
+      "sha256": "7C0EC72E8E13552F1E48566E973687211FDFD50065A259A3D83CA783BFEBEB87",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-46-45-051Z-43184\\three\\capture-2-gray.png",
+        "sha256": "794B7146B1D1778B925590519348F64BAF1171C4EFB128A698E66508C9171381",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 126,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:56820/artifacts/graphics/G-21/runs/2026-09-16T17-46-45-051Z-43184/candidate/granary.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "granary_frame",
+          "granary_roof",
+          "granary_stone",
+          "granary_wood"
+        ],
+        "bounds": {
+          "min": [
+            0.015,
+            0,
+            -1.983333
+          ],
+          "max": [
+            1.985,
+            1.765,
+            0
+          ],
+          "size": [
+            1.97,
+            1.765,
+            1.983333
+          ]
+        },
+        "loadDurationMs": 29
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:56820/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 143,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T17-46-45-051Z-43184\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

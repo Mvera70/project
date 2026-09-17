@@ -12,11 +12,12 @@
 // need the final art to be judged wrong.
 
 import {
-  BoxGeometry, BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshStandardMaterial,
+  Box3, BoxGeometry, BufferAttribute, BufferGeometry, Color, Group, Mesh, MeshStandardMaterial, Vector3,
   type Material, type Object3D,
 } from 'three';
 import type { BuildingId, BuildingKind } from '@engine/state';
 import type { PlannedBuilding } from './plan';
+import { buildDefence } from './defences';
 
 /**
  * A four-sided pyramid over a `w × h` footprint, `rise` tall.
@@ -49,6 +50,8 @@ export interface BuildingModel {
    * decide la estación, igual que el color del suelo y el del bosque.
    */
   weather(snow: number, colour: string): void;
+  face?(radians: number): void;
+  door?(open: boolean, seconds: number): void;
   dispose(): void;
 }
 
@@ -109,6 +112,7 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
  * lo que tiene que leerse es que ya no es una casa.
  */
 export function buildFromAsset(planned: PlannedBuilding, source: Object3D): BuildingModel {
+  if (!planned.ruin && planned.connections !== undefined) return buildDefence(planned, source);
   const group = new Group();
   group.name = `Building_${planned.id}`;
   // **El fondo de la huella se suma a la Z, y esto es un arreglo, no un ajuste.**
@@ -126,7 +130,22 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   // donde no habia ventana, y la gente cruzando paredes.
   group.position.set(planned.x, 0, planned.z + planned.h);
   group.userData.buildingId = planned.id;
-  const model = source;
+  let model = source;
+  if (planned.ruin && planned.asset?.startsWith('ruin-')) {
+    // La misma ruina sustituye parcelas de 1×1, 2×2, 3×2 o 3×3. Ajustar solo
+    // su huella evita invadir al vecino; la altura del cascote se conserva.
+    const bounds = new Box3().setFromObject(source);
+    const size = bounds.getSize(new Vector3());
+    if (size.x > 0 && size.z > 0) {
+      const origin = new Group();
+      origin.position.set(-bounds.min.x, -bounds.min.y, -bounds.max.z);
+      origin.add(source);
+      const fitted = new Group();
+      fitted.scale.set(planned.w / size.x, 1, planned.h / size.z);
+      fitted.add(origin);
+      model = fitted;
+    }
+  }
   model.traverse((object) => {
     object.userData.buildingId = planned.id;
     const mesh = object as Object3D & { isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean };
@@ -136,10 +155,32 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
     }
   });
   group.add(model);
+  // La hoja usa material propio; nunca se arranca del material de toda la casa.
+  group.updateMatrixWorld(true);
+  const doorMesh = model.getObjectByName(`${planned.asset}_door`);
+  const hinge = new Group();
+  if (doorMesh !== undefined) {
+    const bounds = new Box3().setFromObject(doorMesh);
+    hinge.name = 'DoorHinge';
+    hinge.position.copy(group.worldToLocal(new Vector3(bounds.min.x, bounds.min.y, bounds.max.z)));
+    group.add(hinge);
+    hinge.attach(doorMesh);
+  }
   const roofs = roofsOf(model);
   const snowy = new Color();
   return {
     object: group,
+    face(radians: number): void {
+      const dx = -planned.w / 2, dz = planned.h / 2;
+      group.rotation.y = radians;
+      group.position.x = planned.x + planned.w / 2 + Math.cos(radians) * dx + Math.sin(radians) * dz;
+      group.position.z = planned.z + planned.h / 2 - Math.sin(radians) * dx + Math.cos(radians) * dz;
+    },
+    door(open: boolean, seconds: number): void {
+      const target = open ? -Math.PI / 2 : 0;
+      const delta = Math.max(0, Math.min(1, seconds * 4));
+      hinge.rotation.y += (target - hinge.rotation.y) * delta;
+    },
     weather(snow: number, colour: string): void {
       for (const roof of roofs) {
         roof.material.color.copy(roof.base).lerp(snowy.set(colour), Math.max(0, Math.min(1, snow)));
@@ -247,6 +288,14 @@ export class Village {
     // estación.
     model.weather(this.snow, this.snowColour);
     this.group.add(model.object);
+  }
+
+  entrances(entries: ReadonlyMap<number, number>): void {
+    for (const [id, facing] of entries) this.models.get(id)?.face?.(facing);
+  }
+
+  doors(open: ReadonlySet<number>, seconds: number): void {
+    for (const [id, model] of this.models) model.door?.(open.has(id), seconds);
   }
 
   remove(id: BuildingId): void {

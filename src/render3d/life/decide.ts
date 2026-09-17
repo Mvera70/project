@@ -21,9 +21,13 @@ import type { Offer, Place } from './offers';
 import { seatAt, seatKey } from './offers';
 import type { Router, Waypoint } from './navigate';
 import { STEPS_PER_DAY } from './clock';
+import type { DayJob } from './day';
 
 /** Lo que alguien está haciendo o yendo a hacer. */
 export interface Intent {
+  readonly durationSteps?: number;
+  /** Un desvío por tráfico antes de abandonar esta intención. */
+  detoured?: boolean;
   readonly place: Place;
   readonly offer: Offer;
   /** El camino hasta allí. Se va gastando al andarlo. */
@@ -36,7 +40,22 @@ export interface Intent {
   there: boolean;
   /** Qué plaza ocupa, para no ponerse todos en el mismo palmo de suelo. */
   readonly seat: number;
+  /**
+   * El paso en el que el viaje se da por fallido si aún no se ha llegado.
+   *
+   * **No es `until`.** `until` es cuándo termina la ocupación y se fija al
+   * decidir, así que contaba el viaje: el devoto, que ve la capilla a tres
+   * veces la distancia, llegaba tarde a su propio plazo y abandonaba antes de
+   * rezar (medido: 1,5 veces el rezo del resto en vez de más del doble). Esto
+   * es el viaje esperado por la ruta, doblado y con holgura. Opcional porque
+   * las intenciones de fórmula (pausa, animales) no lo necesitan.
+   */
+  readonly arriveBy?: number;
 }
+
+/** Holgura del plazo de un viaje: el doble de lo esperado y cinco segundos más. */
+export const JOURNEY_SLACK = 2;
+export const JOURNEY_GRACE_STEPS = 150;
 
 /**
  * Lo lejos que se busca algo que hacer, en celdas.
@@ -123,11 +142,7 @@ function leanOf(traits: readonly Trait[], offer: string): number {
  * que importar los umbrales de `@engine/balance` (`DAY.CHILD_UNDER`,
  * `DAY.ELDER_OVER`) sólo para esto.
  *
- * Un crío inclinado a `work` en 0,35 y no en 0 **a propósito**: si la única
- * oferta a mano es el tajo y el deber aprieta, un niño real también acaba
- * ahí un rato — lo que no hace es preferirlo, y con 0,35 nunca gana a `play`
- * si `play` está a mano y da algo parecido (regla del brief: no ignorar una
- * necesidad urgente por una etiqueta de edad).
+ * IA-12: niños y mayores quedan excluidos del trabajo antes de puntuar.
  */
 const AGE_LEANING: Readonly<Record<'child' | 'elder', Partial<Record<string, number>>>> = {
   child: { play: 1.8, chase: 1.6, pet: 1.2, gossip: 0.6, pray: 0.5, work: 0.35 },
@@ -348,6 +363,8 @@ const TRY = 4;
 
 /** Lo que decide alguien, con todo lo suyo delante. */
 export interface Chooser {
+  readonly job?: DayJob | null | undefined;
+  readonly phase?: number;
   readonly traits: readonly Trait[];
   readonly needs: Needs;
   readonly at: Point;
@@ -369,6 +386,42 @@ export interface Chooser {
    * quien decide es una bestia; entonces no pesa nada.
    */
   readonly home?: Point | undefined;
+  /**
+   * Las plazas que ya le fallaron hace poco, por `failedSeatKey`. **La pieza
+   * que faltaba** (task-log §4, punto 1): sin ella, quien abandonaba un viaje
+   * por no avanzar volvía a elegir **la misma plaza inalcanzable** —la llave
+   * del sorteo es la misma durante `SEAT_DWELL`— y reintentaba en bucle con
+   * la necesidad a tope. Medido al probar el plazo vencido sin esto: parados
+   * con un impulso al máximo de 0,06 % a 0,20 %. Lo rellena `village.ts` con
+   * lo que `noProgress()` y el plazo vencido descartan, durante `SHUN_STEPS`.
+   *
+   * **Se descarta la plaza, no el sitio.** La primera versión descartaba el
+   * sitio entero y le quitaba la capilla al devoto —es quien viaja más lejos
+   * a rezar y a quien más se le vence el viaje—: rezaba 1,97 veces lo que el
+   * resto en vez de más del doble. Con la plaza sola, al volver a mirar el
+   * mismo sitio sale otra plaza libre.
+   */
+  readonly shunned?: ReadonlySet<string> | undefined;
+  /** Celdas por segundo de quien decide, para el plazo del viaje. Sin él no hay plazo. */
+  readonly pace?: number | undefined;
+  /**
+   * **La intención de ahora ha fallado: no la conserves.** Lo pone `village.ts`
+   * cuando el viaje no avanza (`noProgress`) o se le ha pasado el plazo
+   * (`arriveBy`), y sin esto el replanteo no servía de nada en el único caso
+   * en que hace falta — ver la viabilidad de abajo.
+   */
+  readonly restart?: boolean | undefined;
+}
+
+/**
+ * Cuánto dura el descarte de una plaza que falló: una ventana de sorteo
+ * entera, para que al volver a mirar ese sitio salga otra plaza y no la misma.
+ */
+export const SHUN_STEPS = SEAT_DWELL;
+
+/** La llave de una plaza concreta de una oferta en un sitio, para `Chooser.shunned`. */
+export function failedSeatKey(doing: Pick<Intent, 'place' | 'offer' | 'seat'>): string {
+  return `${seatKey(doing.place, doing.offer)}#${doing.seat}`;
 }
 
 /**
@@ -391,7 +444,7 @@ export function decide(
   seed: number,
   step: number,
 ): Intent | null {
-  const dayPhase = (step % STEPS_PER_DAY) / STEPS_PER_DAY;
+  const dayPhase = who.phase ?? (step % STEPS_PER_DAY) / STEPS_PER_DAY;
   const options: { place: Place; offer: Offer; score: number; key: string }[] = [];
 
   // IA-3: un crío o un mayor busca más corto, a igualdad de necesidad — ver
@@ -429,8 +482,10 @@ export function decide(
     // propiedad que V-11 existe para vigilar es justamente que la orden del
     // motor llegue a toda la aldea.
     const searchReach = hasHour ? LOOK * reachMult : personalReach * reachMult;
-    if (away > searchReach) continue;
+    if (away > searchReach && who.job?.place !== place.id) continue;
     for (const offer of place.offers) {
+      const assigned = who.job?.place === place.id && who.job.offer === offer.id;
+      if (offer.id === 'work' && (who.ageGroup !== undefined || (who.job !== undefined && !assigned))) continue;
       const key = seatKey(place, offer);
       // El aforo, salvo para quien ya está dentro: no se echa a nadie de su
       // propio sitio por estar lleno.
@@ -438,6 +493,12 @@ export function decide(
       if (!inside && (taken.get(key) ?? 0) >= offer.seats) continue;
 
       let score = worth(offer, who.needs, who.traits, who.at, personalReach);
+      // El turno laboral admite descanso y agua urgentes, no un cambio continuo de oficio.
+      if (assigned && dayPhase >= 0.16 && dayPhase < 0.65 && who.needs.thirst < 0.9 && who.needs.rest < 0.9) score = Math.max(score, 1.2);
+      if (place.id.startsWith('leisure:')) {
+        if (inside) score *= 0.15;
+        else score = Math.max(score, who.ageGroup === 'child' ? 0.55 : 0.25);
+      }
       // **La convocatoria se obedece, no se sopesa** (§11.8, V-11). La reunión
       // que el motor ordena da compañía y quita aburrimiento, así que a quien
       // no le falte ninguna de las dos **no le ofrece nada** y `worth` le da
@@ -453,10 +514,10 @@ export function decide(
       // tiene una necesidad al límite, que es lo que el brief de IA-3 prohíbe
       // pisar («no ignores necesidades urgentes para forzar una escena»).
       const summoned = place.id.startsWith('gather:');
-      if (summoned) {
-        const urgent = Math.max(...NEED_NAMES.map((need) => who.needs[need]));
-        if (urgent < GATHER_URGENT) score = Math.max(score, GATHER_FLOOR);
-      }
+      // El suelo se aplica **al final**, después de la hora, la edad, la casa,
+      // lo pegajoso y el dado — ver abajo. Aquí sólo se evita descartar la
+      // reunión por valer cero.
+      if (summoned && score <= 0) score = Number.EPSILON;
       if (score <= 0) continue;
       score *= hourFactor(offer, dayPhase);
       score *= ageLeanOf(who.ageGroup, offer.id);
@@ -469,6 +530,18 @@ export function decide(
       // pozo no se muevan como un solo cuerpo.
       const dice = hash32(seed, `pick:${who.id}:${step}:${place.id}:${offer.id}`) / 4_294_967_296;
       score *= 0.85 + dice * 0.3;
+      // **Un suelo que se multiplica después no es un suelo.** La primera
+      // versión ponía `GATHER_FLOOR` antes de los factores de hora, edad y
+      // casa y de lo pegajoso de la intención actual, así que 0,8 acababa en
+      // 0,3 y la pausa —ya elegida, y por tanto ×1,35— ganaba. V-11 volvió a
+      // caer con otra muestra (capilla, semilla 7: 14 de 26, los doce que no
+      // iban en pausa a cuatro o seis celdas) en cuanto el arreglo de los
+      // campos movió a la gente de sitio. La orden del motor se aplica sobre
+      // el resultado final, con la única excepción de una necesidad al límite.
+      if (summoned) {
+        const urgent = Math.max(...NEED_NAMES.map((need) => who.needs[need]));
+        if (urgent < GATHER_URGENT) score = Math.max(score, GATHER_FLOOR);
+      }
 
       options.push({ place, offer, score, key: seatKey(place, offer) });
     }
@@ -480,12 +553,33 @@ export function decide(
   options.sort((a, b) => (b.score - a.score) || (a.key < b.key ? -1 : 1));
 
   for (const pick of options.slice(0, TRY)) {
-    if (who.doing !== null
+    const same = who.doing !== null
       && who.doing.place.id === pick.place.id
-      && who.doing.offer.id === pick.offer.id) {
-      // Lo mismo que ya hacía: se sigue, sin recalcular el camino.
-      return who.doing;
-    }
+      && who.doing.offer.id === pick.offer.id;
+    // **Se sigue con lo mismo sólo si lo mismo todavía sirve**, y esto es el
+    // arreglo de IA-9. Antes se devolvía la intención tal cual —«se sigue, sin
+    // recalcular el camino»—, que es lo correcto para un viaje que avanza y
+    // ruinoso para uno que no: con la ruta gastada sin haber llegado, `want`
+    // vale cero y el cuerpo **se queda de pie para siempre**, porque cada
+    // replanteo vuelve a elegir el mismo sitio y vuelve a devolver la misma
+    // intención muerta. El descarte de plaza de IA-8 y el plazo del viaje
+    // tampoco podían entrar: este atajo estaba antes que ellos.
+    //
+    // Medido en el navegador con `tools/graphics/film.mjs` (semilla 11, año 50,
+    // 30 s de aldea, 44 personas): **una de cada cinco muestras era un cuerpo
+    // con intención, sin llegar y a velocidad cero**, sin estar en ninguna
+    // escena. El 91 pasó los 907 pasos de la película clavado en el mismo
+    // punto persiguiendo una gallina, con la ruta a cero y la sed subiendo de
+    // 0,22 a 0,58. Nada de eso se veía en el informe de fuera del navegador,
+    // que sólo contaba a quien no tenía intención ninguna.
+    //
+    // Dos motivos para soltarla, y los dos vienen de fuera o de ella misma:
+    // que la ruta esté gastada sin haber llegado, y que quien pregunta diga
+    // que este viaje ya ha fallado (`restart`).
+    const usable = who.doing !== null
+      && who.restart !== true
+      && (who.doing.there || who.doing.route.length > 0);
+    if (same && usable) return who.doing;
 
     // La plaza que queda libre en ese sitio, y con ella el palmo de suelo donde
     // ponerse: un corro y no un montón.
@@ -529,9 +623,20 @@ export function decide(
     const secretive = who.traits.includes('secretive');
     const shaped = secretive ? 1 - (1 - rawDice) ** SECRETIVE_EDGE_POWER : rawDice;
     const jitter = free <= 1 ? 0 : Math.floor(shaped * free);
-    const seat = already + jitter;
+    // La plaza que ya falló hace poco se salta: se prueban las demás libres en
+    // orden, y si todas fallaron se pasa al siguiente sitio.
+    let seat = already + jitter;
+    if (who.shunned !== undefined && free > 0) {
+      let tries = 0;
+      while (tries < free && who.shunned.has(`${pick.key}#${seat}`)) {
+        seat = already + (jitter + tries + 1) % free;
+        tries += 1;
+      }
+      if (tries >= free) continue;
+    }
+    if (who.job?.place === pick.place.id && who.job.offer === pick.offer.id && who.job.seat !== undefined) seat = who.job.seat;
     const spot = seatAt(pick.offer, seat);
-    const route = router.to(land, who.at, spot);
+    const route = router.to(land, who.at, spot, who.job === undefined ? undefined : 0.32);
     // **Sin camino se prueba la siguiente, no se abandona el día.** Era la otra
     // mitad del fallo de las plazas en pared: bastaba con que la mejor oferta
     // fuera inalcanzable para que la persona se quedara sin hacer nada, y como
@@ -554,7 +659,12 @@ export function decide(
       seat,
       since: step,
       until: step + Math.round(seconds * 30),
+      durationSteps: Math.round(seconds * 30),
       there: false,
+      ...(who.pace === undefined || who.pace <= 0 ? {} : {
+        arriveBy: step + Math.round((route.reduce((sum, point, i) => sum + Math.hypot(point.x - (route[i - 1] ?? who.at).x,
+          point.z - (route[i - 1] ?? who.at).z), 0) / who.pace) * 30 * JOURNEY_SLACK) + JOURNEY_GRACE_STEPS,
+      }),
     };
   }
 

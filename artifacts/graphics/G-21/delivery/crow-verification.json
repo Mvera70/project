@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "crow",
+  "statistics": {
+    "objects": 18,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 826
+  },
+  "bounds": {
+    "min": [
+      -0.136667,
+      0.000333,
+      -0.054167
+    ],
+    "max": [
+      0.173333,
+      0.203333,
+      0.054167
+    ],
+    "size": [
+      0.31,
+      0.203,
+      0.108333
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T21-22-40-671Z-47264",
+    "directory": "artifacts/graphics/G-23/approved/f9a171936f7695af"
+  },
+  "sha256": "F9A171936F7695AFCAF975524C52E0569FB025D46F5B966FAEBE9C20ED51E16E",
+  "otherPublishedFilesUnchanged": true
+}

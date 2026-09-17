@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "assetId": "ruin-wood",
+  "runId": "2026-09-16T20-43-57-190Z-5400",
+  "status": "pass",
+  "durationMs": 2779,
+  "candidateSha256": "0E3DEB6554DBC55C802561AB4A56920F6CC0B6C74CFA75B94C6A2C4167678063",
+  "glb": {
+    "version": 2,
+    "declaredLength": 57084,
+    "nodeNames": [
+      "ruin-wood_ash",
+      "ruin-wood_char",
+      "ruin-wood_stone",
+      "Root"
+    ],
+    "meshNames": [
+      "ruin-wood_ash_Mesh",
+      "ruin-wood_char_Mesh",
+      "ruin-wood_stone_Mesh"
+    ],
+    "materialNames": [
+      "ash",
+      "char",
+      "stone"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 3,
+    "statistics": {
+      "objects": 4,
+      "meshes": 3,
+      "materials": 3,
+      "triangles": 792
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-16T20:44:11.039Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-43-57-190Z-5400\\candidate\\ruin-wood.glb",
+      "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/candidate/ruin-wood.glb",
+      "viewport": {
+        "width": 900,
+        "height": 800,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-43-57-190Z-5400\\three\\capture-1.png",
+        "sha256": "8AE8C59F08D9DB2F8105E848AA916D84FEB1B3ED4FD60C72CB12D751D28A9D3C",
+        "dimensions": {
+          "width": 900,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-43-57-190Z-5400\\three\\capture-1-gray.png",
+          "sha256": "80E0CA7E18FA0E06BE9D30534F0CEBF87E5A05D9761AF29251E1EA8361D1379D",
+          "dimensions": {
+            "width": 900,
+            "height": 800
+          }
+        },
+        "durationMs": 699,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:57949/artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/candidate/ruin-wood.glb",
+          "viewport": {
+            "width": 900,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "ruin-wood_ash",
+            "ruin-wood_char",
+            "ruin-wood_stone"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              2,
+              0.643333,
+              0
+            ],
+            "size": [
+              2,
+              0.643333,
+              2
+            ]
+          },
+          "loadDurationMs": 137
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-43-57-190Z-5400\\three\\capture-2.png",
+        "sha256": "8AE8C59F08D9DB2F8105E848AA916D84FEB1B3ED4FD60C72CB12D751D28A9D3C",
+        "dimensions": {
+          "width": 900,
+          "height": 800
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-43-57-190Z-5400\\three\\capture-2-gray.png",
+          "sha256": "80E0CA7E18FA0E06BE9D30534F0CEBF87E5A05D9761AF29251E1EA8361D1379D",
+          "dimensions": {
+            "width": 900,
+            "height": 800
+          }
+        },
+        "durationMs": 119,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:57949/artifacts/graphics/G-21/runs/2026-09-16T20-43-57-190Z-5400/candidate/ruin-wood.glb",
+          "viewport": {
+            "width": 900,
+            "height": 800,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "ruin-wood_ash",
+            "ruin-wood_char",
+            "ruin-wood_stone"
+          ],
+          "bounds": {
+            "min": [
+              0,
+              0,
+              -2
+            ],
+            "max": [
+              2,
+              0.643333,
+              0
+            ],
+            "size": [
+              2,
+              0.643333,
+              2
+            ]
+          },
+          "loadDurationMs": 25
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:57949/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=900&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 156,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T20-43-57-190Z-5400\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

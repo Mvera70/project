@@ -12,13 +12,23 @@
       2,
       2
     ],
-    "note": "G-10, lote de la ruina. Una casa de madera despues del fuego: la tierra quemada, cuatro postes rotos a alturas distintas y dos vigas caidas. §7.4 deja la ruina en el mapa, asi que tiene que leerse que ahi hubo una casa y que ya no la hay."
+    "note": "G-21: casa de madera quemada, soleras, postes truncados, tablas desiguales, vigas caídas, ceniza y hogar de piedra. Huella canónica 2x2 adaptada por el render a la parcela perdida."
   },
   "materials": [
     {
       "name": "char",
       "role": "timberDark",
-      "roughness": 1.0
+      "roughness": 1
+    },
+    {
+      "name": "ash",
+      "role": "elderGrey",
+      "roughness": 1
+    },
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 1
     }
   ],
   "groups": [
@@ -35,144 +45,903 @@
   "primitives": [
     {
       "type": "cube",
-      "name": "Ruin_Scorch",
+      "name": "Scorch",
       "location": [
-        3.0,
-        3.0,
-        0.03
+        3,
+        3,
+        0.025
       ],
       "dimensions": [
-        6.2,
-        6.2,
-        0.06
-      ],
-      "material": "char",
-      "parent": "Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Ruin_Post_A",
-      "location": [
-        0.8,
-        0.8,
-        0.85
-      ],
-      "radius": 0.2,
-      "depth": 1.7,
-      "vertices": 6,
-      "smooth": true,
-      "rotationDegrees": [
-        0,
-        0,
-        0
-      ],
-      "material": "char",
-      "parent": "Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Ruin_Post_B",
-      "location": [
-        5.2,
-        0.9,
-        0.55
-      ],
-      "radius": 0.2,
-      "depth": 1.1,
-      "vertices": 6,
-      "smooth": true,
-      "rotationDegrees": [
-        0,
-        0,
-        0
-      ],
-      "material": "char",
-      "parent": "Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Ruin_Post_C",
-      "location": [
-        0.9,
-        5.1,
-        0.4
-      ],
-      "radius": 0.2,
-      "depth": 0.8,
-      "vertices": 6,
-      "smooth": true,
-      "rotationDegrees": [
-        0,
-        0,
-        0
-      ],
-      "material": "char",
-      "parent": "Root"
-    },
-    {
-      "type": "cylinder",
-      "name": "Ruin_Post_D",
-      "location": [
-        5.1,
-        5.2,
-        1.0
-      ],
-      "radius": 0.2,
-      "depth": 2.0,
-      "vertices": 6,
-      "smooth": true,
-      "rotationDegrees": [
-        0,
-        0,
-        0
+        6,
+        6,
+        0.05
       ],
       "material": "char",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Beam_A",
+      "name": "SillX_F",
       "location": [
-        3.0,
-        2.2,
-        0.28
+        3,
+        0.62,
+        0.13
       ],
       "dimensions": [
-        4.6,
-        0.28,
-        0.28
-      ],
-      "material": "char",
-      "parent": "Root"
-    },
-    {
-      "type": "cube",
-      "name": "Ruin_Beam_B",
-      "location": [
-        2.4,
-        3.6,
+        4.98,
+        0.19,
         0.2
       ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SillX_B",
+      "location": [
+        3,
+        5.38,
+        0.13
+      ],
       "dimensions": [
-        0.26,
-        3.4,
-        0.26
+        4.98,
+        0.19,
+        0.2
       ],
       "material": "char",
       "parent": "Root"
     },
     {
       "type": "cube",
-      "name": "Ruin_Sill",
+      "name": "SillY_L",
       "location": [
-        3.0,
-        0.85,
+        0.62,
+        3,
+        0.13
+      ],
+      "dimensions": [
+        0.19,
+        4.98,
+        0.2
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "SillY_R",
+      "location": [
+        5.38,
+        3,
+        0.13
+      ],
+      "dimensions": [
+        0.19,
+        4.98,
+        0.2
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BrokenPost_0",
+      "location": [
+        0.65,
+        0.65,
+        0.9
+      ],
+      "dimensions": [
+        0.24,
+        0.24,
+        1.8
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Split_0",
+      "location": [
+        0.71,
+        0.6900000000000001,
+        1.865
+      ],
+      "dimensions": [
+        0.07,
+        0.1,
+        0.13
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BrokenPost_1",
+      "location": [
+        5.35,
+        0.65,
+        0.35
+      ],
+      "dimensions": [
+        0.24,
+        0.24,
+        0.7
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Split_1",
+      "location": [
+        5.409999999999999,
+        0.6900000000000001,
+        0.7649999999999999
+      ],
+      "dimensions": [
+        0.07,
+        0.1,
+        0.13
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BrokenPost_2",
+      "location": [
+        0.65,
+        5.35,
+        0.61
+      ],
+      "dimensions": [
+        0.24,
+        0.24,
+        1.22
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Split_2",
+      "location": [
+        0.71,
+        5.39,
+        1.285
+      ],
+      "dimensions": [
+        0.07,
+        0.1,
+        0.13
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BrokenPost_3",
+      "location": [
+        5.35,
+        5.35,
+        0.25
+      ],
+      "dimensions": [
+        0.24,
+        0.24,
+        0.5
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Split_3",
+      "location": [
+        5.409999999999999,
+        5.39,
+        0.565
+      ],
+      "dimensions": [
+        0.07,
+        0.1,
+        0.13
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_0",
+      "location": [
+        1.02,
+        5.35,
+        0.28
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.32
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_1",
+      "location": [
+        1.4100000000000001,
+        5.35,
+        0.395
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.55
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_2",
+      "location": [
+        1.8,
+        5.35,
+        0.49
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.74
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_3",
+      "location": [
+        2.19,
+        5.35,
+        0.435
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.63
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_4",
+      "location": [
+        2.58,
+        5.35,
+        0.585
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.93
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_5",
+      "location": [
+        2.97,
+        5.35,
+        0.65
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        1.06
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_6",
+      "location": [
+        3.36,
+        5.35,
+        0.455
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.67
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_7",
+      "location": [
+        3.75,
+        5.35,
+        0.345
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.45
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "BackPlank_8",
+      "location": [
+        4.140000000000001,
+        5.35,
+        0.22999999999999998
+      ],
+      "dimensions": [
+        0.34,
+        0.095,
+        0.22
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftPlank_0",
+      "location": [
+        0.65,
+        1.15,
+        0.3
+      ],
+      "dimensions": [
+        0.09,
+        0.35,
+        0.45
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftPlank_1",
+      "location": [
+        0.65,
+        1.5499999999999998,
+        0.39
+      ],
+      "dimensions": [
+        0.09,
+        0.35,
+        0.6
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftPlank_2",
+      "location": [
+        0.65,
+        1.95,
+        0.48
+      ],
+      "dimensions": [
+        0.09,
+        0.35,
+        0.75
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "LeftPlank_3",
+      "location": [
+        0.65,
+        2.35,
+        0.5700000000000001
+      ],
+      "dimensions": [
+        0.09,
+        0.35,
+        0.8999999999999999
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FallenRafter",
+      "location": [
+        2.86,
+        2.3,
+        0.25
+      ],
+      "radius": 0.16,
+      "depth": 4.563375943312144,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        88.74434263482189,
+        31.739140795815157
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "FallenCrossbeam",
+      "location": [
+        3,
+        3.425,
+        0.26
+      ],
+      "radius": 0.13,
+      "depth": 4.374071330008235,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        88.68999000008971,
+        -38.96674699379929
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "LeaningPost",
+      "location": [
+        1.575,
+        1.375,
+        0.965
+      ],
+      "radius": 0.11,
+      "depth": 2.8266411162367255,
+      "vertices": 4,
+      "rotationDegrees": [
+        0,
+        123.74030613684846,
+        38.08877288097532
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_0",
+      "location": [
+        1.15,
+        1.55,
+        0.06
+      ],
+      "radius": 0.25,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_0",
+      "location": [
+        1.3199999999999998,
+        1.6800000000000002,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_1",
+      "location": [
+        2.4299999999999997,
+        1.55,
+        0.06
+      ],
+      "radius": 0.35,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_1",
+      "location": [
+        2.5999999999999996,
+        1.6800000000000002,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_2",
+      "location": [
+        3.71,
+        1.55,
+        0.06
+      ],
+      "radius": 0.45,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_2",
+      "location": [
+        3.88,
+        1.6800000000000002,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_3",
+      "location": [
+        1.15,
+        2.7,
+        0.06
+      ],
+      "radius": 0.25,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_3",
+      "location": [
+        1.3199999999999998,
+        2.83,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_4",
+      "location": [
+        2.4299999999999997,
+        2.7,
+        0.06
+      ],
+      "radius": 0.35,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_4",
+      "location": [
+        2.5999999999999996,
+        2.83,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_5",
+      "location": [
+        3.71,
+        2.7,
+        0.06
+      ],
+      "radius": 0.45,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_5",
+      "location": [
+        3.88,
+        2.83,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_6",
+      "location": [
+        1.15,
+        3.8499999999999996,
+        0.06
+      ],
+      "radius": 0.25,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_6",
+      "location": [
+        1.3199999999999998,
+        3.9799999999999995,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_7",
+      "location": [
+        2.4299999999999997,
+        3.8499999999999996,
+        0.06
+      ],
+      "radius": 0.35,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_7",
+      "location": [
+        2.5999999999999996,
+        3.9799999999999995,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Ash_8",
+      "location": [
+        3.71,
+        3.8499999999999996,
+        0.06
+      ],
+      "radius": 0.45,
+      "depth": 0.025,
+      "vertices": 7,
+      "material": "ash",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "CharredBoard_8",
+      "location": [
+        3.88,
+        3.9799999999999995,
+        0.13
+      ],
+      "dimensions": [
+        0.68,
+        0.15,
+        0.08
+      ],
+      "material": "char",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_0_0",
+      "location": [
+        4.25,
+        4.75,
         0.22
       ],
       "dimensions": [
-        4.2,
-        0.3,
-        0.35
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_0_1",
+      "location": [
+        4.7,
+        4.75,
+        0.22
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_1_0",
+      "location": [
+        4.25,
+        4.75,
+        0.58
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_1_1",
+      "location": [
+        4.7,
+        4.75,
+        0.58
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_2_0",
+      "location": [
+        4.25,
+        4.75,
+        0.94
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_2_1",
+      "location": [
+        4.7,
+        4.75,
+        0.94
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_3_0",
+      "location": [
+        4.25,
+        4.75,
+        1.3
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "Hearth_3_1",
+      "location": [
+        4.7,
+        4.75,
+        1.3
+      ],
+      "dimensions": [
+        0.42,
+        0.65,
+        0.33
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "HearthBrokenTop",
+      "location": [
+        4.28,
+        4.75,
+        1.56
+      ],
+      "dimensions": [
+        0.4,
+        0.59,
+        0.24
+      ],
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "cube",
+      "name": "HearthOpening",
+      "location": [
+        4.46,
+        4.411,
+        0.44
+      ],
+      "dimensions": [
+        0.53,
+        0.025,
+        0.51
       ],
       "material": "char",
       "parent": "Root"
@@ -181,19 +950,19 @@
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
-    "height": 640,
+    "width": 900,
+    "height": 800,
     "cameraLocation": [
-      8.0,
-      -10.0,
-      6.4
+      3,
+      -2.7,
+      2.1
     ],
     "cameraTarget": [
-      0,
-      0,
-      0.8
+      1,
+      1,
+      0.2
     ],
-    "orthoScale": 11.2,
+    "orthoScale": 2.85,
     "worldRole": "sky"
   }
 }

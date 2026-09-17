@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "field-leeks",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 2212
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -2
+    ],
+    "max": [
+      3,
+      0.366667,
+      0
+    ],
+    "size": [
+      3,
+      0.366667,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T18-34-25-577Z-45756",
+    "directory": "artifacts/graphics/G-22/approved/1fce25e55b550079"
+  },
+  "sha256": "1FCE25E55B5500790E934F5CC08AF1DACE945FE0E8CBA1E7718C0D7FEB6EC123",
+  "otherPublishedFilesUnchanged": true
+}

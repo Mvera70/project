@@ -37,6 +37,24 @@ export interface Terrain {
   readonly height: number;
   /** 1 donde no se pisa. Un índice por celda, `z * width + x`. */
   readonly blocked: Uint8Array;
+  /** Obstáculos menores que una celda, indexados por las celdas que tocan. */
+  readonly solids?: ReadonlyMap<number, readonly Solid[]>;
+  /** Coste temporal de tráfico; no convierte un vecino en una pared. */
+  readonly traffic?: Uint8Array;
+  /** Cuerpos cercanos para desvíos que requieren salir de la propia celda. */
+  readonly trafficBodies?: readonly Body[];
+}
+
+export interface Solid { readonly minX: number; readonly minZ: number; readonly maxX: number; readonly maxZ: number }
+
+export function indexSolids(width: number, height: number, solids: readonly Solid[]): ReadonlyMap<number, readonly Solid[]> {
+  const index = new Map<number, Solid[]>();
+  for (const solid of solids) for (let z = Math.max(0, Math.floor(solid.minZ)); z <= Math.min(height - 1, Math.floor(solid.maxZ)); z++) {
+    for (let x = Math.max(0, Math.floor(solid.minX)); x <= Math.min(width - 1, Math.floor(solid.maxX)); x++) {
+      const cell = z * width + x, list = index.get(cell) ?? []; list.push(solid); index.set(cell, list);
+    }
+  }
+  return index;
 }
 
 /** Si este punto cae donde no se puede estar, contando el borde del mapa. */
@@ -44,7 +62,38 @@ export function blockedAt(land: Terrain, x: number, z: number): boolean {
   const cx = Math.floor(x);
   const cz = Math.floor(z);
   if (cx < 0 || cz < 0 || cx >= land.width || cz >= land.height) return true;
-  return land.blocked[cz * land.width + cx] === 1;
+  return land.blocked[cz * land.width + cx] === 1 || (land.solids?.get(cz * land.width + cx)
+    ?.some(s => x > s.minX && x < s.maxX && z > s.minZ && z < s.maxZ) ?? false);
+}
+
+/** Penetración de un disco contra las cajas de la rejilla; incluye esquinas. */
+export function penetration(land: Terrain, x: number, z: number, radius: number): number {
+  let total = 0;
+  const seen = new Set<Solid>();
+  for (let cz = Math.floor(z - radius); cz <= Math.floor(z + radius); cz += 1) {
+    for (let cx = Math.floor(x - radius); cx <= Math.floor(x + radius); cx += 1) {
+      for (const s of land.solids?.get(cz * land.width + cx) ?? []) {
+        if (seen.has(s)) continue;
+        seen.add(s);
+        const dx = x - Math.max(s.minX, Math.min(x, s.maxX));
+        const dz = z - Math.max(s.minZ, Math.min(z, s.maxZ));
+        const distance = Math.hypot(dx, dz);
+        total += distance === 0 ? radius + Math.min(x - s.minX, s.maxX - x, z - s.minZ, s.maxZ - z)
+          : Math.max(0, radius - distance);
+      }
+      if (cx >= 0 && cz >= 0 && cx < land.width && cz < land.height && land.blocked[cz * land.width + cx] !== 1) continue;
+      const dx = x - Math.max(cx, Math.min(x, cx + 1));
+      const dz = z - Math.max(cz, Math.min(z, cz + 1));
+      const distance = Math.hypot(dx, dz);
+      total += distance === 0 ? radius + Math.min(x - cx, cx + 1 - x, z - cz, cz + 1 - z)
+        : Math.max(0, radius - distance);
+    }
+  }
+  return total;
+}
+
+export function fitsCircle(land: Terrain, x: number, z: number, radius: number): boolean {
+  return !blockedAt(land, x, z) && penetration(land, x, z, radius) <= 1e-9;
 }
 
 /**
@@ -57,55 +106,21 @@ export function blockedAt(land: Terrain, x: number, z: number): boolean {
  */
 export const WALL_CLEAR = 0.62;
 
-/**
- * Adelanta el cuerpo el tiempo que se le diga, chocando con lo que haya.
- *
- * **Los dos ejes se prueban por separado**, que es lo que permite deslizarse a
- * lo largo de una pared en vez de clavarse contra ella: quien va en diagonal
- * hacia una fachada sigue avanzando por el lado que sí tiene hueco. Clavarse se
- * lee como que el juego se ha colgado; deslizar se lee como rodear.
- *
- * **El círculo colisiona, no el punto** (rework.md §3.5.1, medido en
- * `tools/life-report.ts`). Comprobar sólo el centro dejaba pasar medio cuerpo
- * dentro del muro —radio 0,32 de una persona, 0,4 de una vaca— porque el
- * centro puede estar en celda libre con el borde ya metido en la pared. Ahora
- * se comprueba el borde: el punto del círculo que va por delante en el
- * sentido en que se mueve ese eje, no los dos. **Sólo el de delante, y no
- * también el de detrás**: comprobar los dos bloqueaba el escape de quien ya
- * tenía el círculo metido en la pared —por `resolve()`, por nacer pegado a
- * ella— porque el borde de atrás seguía tocando el muro que se está dejando,
- * y eso frenaba en seco el mismo movimiento que lo habría sacado. Medido:
- * 13 % de los cuerpo-segundos con el círculo en un muro comprobando los dos
- * bordes, contra menos del 1 % comprobando sólo el de delante — el primer
- * intento de esta ronda se quedó en el peor de los dos números y está en
- * `docs/rework.md` §3.6 para que no se repita.
- *
- * **Y quien nace atrapado del todo tiene que poder salir.** El ancla de un
- * animal pegada a una pared, el punto de reunión que cae dentro de una
- * capilla (Anexo E.7, «trampas ya pagadas»): con el **centro** metido en la
- * celda cerrada, ni el borde de delante ni el punto de destino sirven de
- * comprobación —los dos siguen dentro de la misma celda cerrada mientras el
- * paso no basta para cruzarla entera, así que un punto bloqueado no distingue
- * acercarse al borde de hundirse más— y por eso aquí no se comprueba nada: se
- * deja pasar el movimiento sin más, confiando en que quien lo pide
- * (`avoid()`, que empuja hacia la celda abierta más cercana) reduzca la
- * penetración paso a paso, como bastaba antes de esta ronda. En cuanto el
- * centro sale de la celda cerrada, la colisión del círculo entra en vigor y
- * no se vuelve a relajar.
- */
+/** Avanza el disco contra la rejilla sólida. Resuelve cada eje por separado
+ * para deslizar por las fachadas; si nace solapado sólo permite reducir o
+ * mantener la penetración mientras busca la salida. */
 export function integrate(body: Body, land: Terrain, seconds: number): void {
-  const nextX = body.x + body.vx * seconds;
-  const nextZ = body.z + body.vz * seconds;
-
-  const escaping = blockedAt(land, body.x, body.z);
-
-  const leadX = nextX >= body.x ? nextX + body.radius : nextX - body.radius;
-  const xBlocked = !escaping && blockedAt(land, leadX, body.z);
-  if (!xBlocked) body.x = nextX; else body.vx = 0;
-
-  const leadZ = nextZ >= body.z ? nextZ + body.radius : nextZ - body.radius;
-  const zBlocked = !escaping && blockedAt(land, body.x, leadZ);
-  if (!zBlocked) body.z = nextZ; else body.vz = 0;
+  // Barrido en subpasos: ni una velocidad alta ni una esquina diagonal
+  // pueden saltarse una celda sólida. Un cuerpo solapado sólo puede salir.
+  const count = Math.max(1, Math.ceil(Math.hypot(body.vx, body.vz) * seconds / 0.1));
+  for (let n = 0; n < count; n += 1) {
+    const before = penetration(land, body.x, body.z, body.radius);
+    const x = body.x + body.vx * seconds / count;
+    if (penetration(land, x, body.z, body.radius) <= before) body.x = x; else body.vx = 0;
+    const afterX = penetration(land, body.x, body.z, body.radius);
+    const z = body.z + body.vz * seconds / count;
+    if (penetration(land, body.x, z, body.radius) <= afterX) body.z = z; else body.vz = 0;
+  }
 
   // Y dentro del mapa, siempre. Medio paso de margen: justo en el borde de la
   // última celda, el redondeo del suelo puede dejar a alguien fuera.

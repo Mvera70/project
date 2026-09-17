@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "haystack",
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 958
+  },
+  "bounds": {
+    "min": [
+      -0.297575,
+      -0.000333,
+      -0.293333
+    ],
+    "max": [
+      0.297575,
+      0.666667,
+      0.293333
+    ],
+    "size": [
+      0.59515,
+      0.667,
+      0.586667
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T19-18-01-947Z-41444",
+    "directory": "artifacts/graphics/G-21/approved/be3a923e28bdc16b"
+  },
+  "sha256": "BE3A923E28BDC16BF70C5F0578D0B0AEB787A0E3F520CD86CD18177F67D43D6D",
+  "otherPublishedFilesUnchanged": true
+}

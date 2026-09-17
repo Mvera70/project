@@ -85,6 +85,17 @@ npm run test:all     # las dos de arriba
 npm run test:balance # siglos en sesenta semillas — minutos, se lanza aparte
 npm run lint
 npm run shot         # empaqueta el juego y lo fotografía, sin red
+node tools/graphics/shot.mjs --seed 11 --year 50   # **abre el valle en ese año**: el menú
+                     # lo hace desde U-10b, así que ya no hay que falsear el reloj
+node tools/graphics/film.mjs --seed 11 --year 50 --seconds 10 --fps 6 --out artifacts/graphics/film/x
+python tools/graphics/film-sheet.py artifacts/graphics/film/x
+                     # **rodar el valle y leerlo**: fotogramas seguidos + la traza de
+                     # cada cuerpo en cada uno (`window.__valleyLife`), y de ahí una
+                     # tira de contactos y un informe de anomalías. Es la única forma
+                     # de medir la capa de vida **como la ejecuta el navegador**: el
+                     # informe de fuera (`tools/life-report.ts`) no vio nunca que una
+                     # de cada cinco muestras era alguien de pie creyendo que iba a
+                     # algún sitio (IA-9)
 npm run test:shots   # recorridos de interfaz en Canvas (Playwright)
 npm run test:pwa     # instalable y sin conexión, sobre el build real
 npm run chronicle -- --seed 7 --years 60   # runner del hito 0

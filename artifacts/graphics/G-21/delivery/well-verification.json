@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "well",
+  "statistics": {
+    "objects": 5,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 1108
+  },
+  "bounds": {
+    "min": [
+      0.128333,
+      0,
+      -0.9
+    ],
+    "max": [
+      0.952667,
+      1.033333,
+      -0.1
+    ],
+    "size": [
+      0.824333,
+      1.033333,
+      0.8
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T18-09-35-894Z-28336",
+    "directory": "artifacts/graphics/G-21/approved/a07afdc2d123322b"
+  },
+  "sha256": "A07AFDC2D123322B8792706051A5FC0F7EA29C09177A50F14CA436116C417FE2",
+  "otherPublishedFilesUnchanged": true
+}

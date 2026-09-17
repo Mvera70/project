@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all granary
+
+Built granary in artifacts\graphics\G-21\runs\2026-09-16T17-46-45-051Z-43184
+Validated granary from run 2026-09-16T17-46-45-051Z-43184
+Reported and promoted granary to artifacts\graphics\G-21\approved\0d35c7e1b2a0801a

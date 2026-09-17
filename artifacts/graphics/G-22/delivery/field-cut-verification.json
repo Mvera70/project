@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "field-cut",
+  "statistics": {
+    "objects": 2,
+    "meshes": 1,
+    "materials": 1,
+    "triangles": 232
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -2
+    ],
+    "max": [
+      3,
+      0.073333,
+      0
+    ],
+    "size": [
+      3,
+      0.073333,
+      2
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T18-53-19-368Z-49192",
+    "directory": "artifacts/graphics/G-22/approved/ad935893a9ad52cf"
+  },
+  "sha256": "AD935893A9AD52CF4DBBC0EAB4977CD134718139E4EA6BD1BE983A0BD08708BD",
+  "otherPublishedFilesUnchanged": true
+}

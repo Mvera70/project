@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "cow",
+  "statistics": {
+    "objects": 24,
+    "meshes": 4,
+    "materials": 4,
+    "triangles": 3476
+  },
+  "bounds": {
+    "min": [
+      -0.460667,
+      0,
+      -0.129067
+    ],
+    "max": [
+      0.288067,
+      0.519722,
+      0.129067
+    ],
+    "size": [
+      0.748733,
+      0.519722,
+      0.258133
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T21-02-28-147Z-25912",
+    "directory": "artifacts/graphics/G-23/approved/6a922a86c1dbf645"
+  },
+  "sha256": "6A922A86C1DBF645EEA0E200403147099D5B3D6EE578DA145F1ABC2DC90FC713",
+  "otherPublishedFilesUnchanged": true
+}

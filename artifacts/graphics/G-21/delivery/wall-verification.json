@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "id": "wall",
+  "statistics": {
+    "objects": 3,
+    "meshes": 2,
+    "materials": 2,
+    "triangles": 276
+  },
+  "bounds": {
+    "min": [
+      0,
+      0,
+      -0.68
+    ],
+    "max": [
+      1,
+      0.885,
+      -0.32
+    ],
+    "size": [
+      1,
+      0.885,
+      0.36
+    ]
+  },
+  "approved": {
+    "runId": "2026-09-16T19-43-18-182Z-19612",
+    "directory": "artifacts/graphics/G-21/approved/e4dc13b81b51a5e4"
+  },
+  "sha256": "E4DC13B81B51A5E4CEBF8E41EFB6EE96A6651BE41CF06BC95649BA30601581A7",
+  "otherPublishedFilesUnchanged": true
+}

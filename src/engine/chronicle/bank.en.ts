@@ -1864,6 +1864,12 @@ export const UI_BANK: Record<string, string> = {
   'nav.valley': 'Valley',
   'nav.chronicle': 'Chronicle',
   'nav.people': 'People',
+  // UI-R1 · la bandeja de la carcasa (`src/ui/redesign/shell.ts`): una región
+  // etiquetada, no un diálogo, así que necesita su propio nombre accesible.
+  'app.sheet': 'Details',
+  // UI-V1 · el círculo ▶/⏸ de la piel (plan-piel.md §3.1) necesita las dos
+  // etiquetas: qué va a pasar si se toca, no lo que está pasando ahora.
+  'app.speed.resume': 'Resume',
   'app.vitals': 'The village at a glance',
   'app.vitals.people': '{count} villagers',
   'app.vitals.food': 'Food for {weeks} weeks',
@@ -1910,6 +1916,10 @@ export const UI_BANK: Record<string, string> = {
   'title.seed': 'Valley number',
   'title.seed.hint': 'The same number gives anyone the same valley to start with. Nobody leads it the same way.',
   'title.reroll': 'Another',
+  'title.new.working': 'Founding…',
+  'title.dev': 'Dev',
+  'title.dev.year': 'Open at year',
+  'title.dev.hint': 'The valley is played forward with the reference policy before it opens, so what you see is a real game and not a mock-up. Ten years take about a second. A valley that dies on the way opens as what it became.',
   // U-11 · el inicio guiado: dos pistas, una vez, después del vuelo de entrada.
   // Se tocan para pasar. No son un tutorial: dicen dónde están los dos mandos.
   'intro.orders': 'The line above is the standing orders: how much to sow, where spare hands go, what to raise first. Tap it when you want a change.',
@@ -1942,15 +1952,56 @@ export const UI_BANK: Record<string, string> = {
   'inspect.opinion.resents': 'Resents {name}: {value}.',
   'inspect.memory': '{memory} — ANNO {year}.',
   'inspect.age': '{age} winters old.',
+  // UI-V4 · la misma edad, pero para ir detrás del nombre en la placa de la
+  // ficha («HEREWARD · 21 WINTERS», prototipo 03): ahí no cabe una frase con
+  // punto, y el nombre ya es el sujeto.
+  'inspect.age.short': '{age} winters',
   'inspect.traits.none': 'No named traits.',
+
+  // UI-V4 · Las palabras de la tira de parentesco de la ficha (prototipo 03).
+  // Sólo hay seis porque sólo hay seis vínculos que el motor guarde de verdad:
+  // padre y madre (`parentIds`), de ahí hijo e hija, y el amigo y el rival que
+  // salen de `opinions`. El prototipo dibuja «wife» y no está aquí a propósito:
+  // el motor no guarda matrimonios —la boda de R-1 es un suceso, no un
+  // vínculo— y una palabra sin dato detrás es una frase inventada.
+  'kin.mother': 'mother',
+  'kin.father': 'father',
+  'kin.son': 'son',
+  'kin.daughter': 'daughter',
+  'kin.friend': 'friend',
+  'kin.rival': 'rival',
+  // Los dos botones del pie de la ficha, prototipo 03.
+  'inspect.story': 'Life story',
+  'inspect.story.close': 'Close the story',
   'inspect.gone': 'Gone',
   'inspect.terrain.people': '{people} people live in the valley.',
-  // U-08 · la pantalla People (`src/ui/screens/people.ts`): la lista en sí no
-  // lleva frase propia (usa `nav.people`, ya en el banco), sólo lo que le
-  // falta a la ficha reusada: el vacío de una aldea sin nadie con nombre
-  // todavía, y volver de una ficha a la lista.
+  // UI-R4 · quien ya no está no se enseña como si siguiera aquí (§2.5 del
+  // plan de rediseño): la edad de un fallecido se cuenta hasta su muerte, no
+  // hasta hoy, y un emigrado no lleva ni edad ni rasgos porque ninguno de los
+  // dos describe ya a nadie presente.
+  'inspect.died': 'Died in ANNO {year}, {age} winters old.',
+  'inspect.left': 'Left the valley in ANNO {year}.',
+  // UI-R4 · el control de seguimiento de la ficha. `track` marca un cuerpo,
+  // no mueve la cámara de forma continua (`src/render3d/renderer.ts` apunta
+  // una vez y no vuelve a tocarla sola; el 2D sólo dibuja un aro) — el texto
+  // lo dice para no prometer un centrado que ningún backend cumple.
+  'inspect.follow': 'Follow',
+  'inspect.unfollow': 'Stop following',
+  'inspect.track.note': 'Marks {name} on the map. It does not promise to keep the view on them.',
+  // U-08 · la pantalla People (`src/ui/redesign/people-panel.ts` desde
+  // UI-R4): la lista en sí no lleva frase propia (usa `nav.people`, ya en el
+  // banco), sólo lo que le falta a la ficha reusada: el vacío de una aldea
+  // sin nadie con nombre todavía, y volver de una ficha a la lista. UI-R4
+  // añade `people.scope`: la lista sólo enseña nombrados y presentes, y la
+  // población total puede ser mayor (los anónimos no salen nunca).
   'people.empty': 'Nobody in the valley has a name yet.',
   'people.back': 'Back to the list',
+  'people.scope': '{named} named, of {population} in the valley.',
+  // UI-R5 · el nombre de alguien dentro de una línea de crónica, cuando el
+  // suceso que la escribió deja un id real detrás (`world/fate.ts`,
+  // `state.happenings[n].who`): la etiqueta accesible del enlace en línea
+  // (`src/ui/screens/chronicle.ts`, `linkNamesInParagraph`).
+  'chronicle.person.link': "Open {name}'s page.",
   'role.leader': 'leader',
   'role.smith': 'smith',
   'role.midwife': 'midwife',

@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all smithy
+
+Built smithy in artifacts\graphics\G-21\runs\2026-09-16T17-22-18-021Z-40400
+Validated smithy from run 2026-09-16T17-22-18-021Z-40400
+Reported and promoted smithy to artifacts\graphics\G-21\approved\bb1cb2fc6312c38c

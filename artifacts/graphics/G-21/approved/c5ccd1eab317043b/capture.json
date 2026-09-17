@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T19:32:48.840Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-32-33-052Z-45552\\candidate\\shed.glb",
+    "assetUrl": "/artifacts/graphics/G-21/runs/2026-09-16T19-32-33-052Z-45552/candidate/shed.glb",
+    "viewport": {
+      "width": 800,
+      "height": 800,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-32-33-052Z-45552\\three\\capture-1.png",
+      "sha256": "381288DE6B9252CFB2767D4C9413C6D3F8A9F7EB1E60CC962EDE6A9243E6615A",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-32-33-052Z-45552\\three\\capture-1-gray.png",
+        "sha256": "6911D7867F4151A3B2611C95960257F2B7195EEB685285845C8681CF8AE6734F",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 686,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:56641/artifacts/graphics/G-21/runs/2026-09-16T19-32-33-052Z-45552/candidate/shed.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "shed_frame",
+          "shed_roof",
+          "shed_wood"
+        ],
+        "bounds": {
+          "min": [
+            0.024297,
+            0,
+            -0.990667
+          ],
+          "max": [
+            0.975703,
+            0.912712,
+            -0.009333
+          ],
+          "size": [
+            0.951407,
+            0.912712,
+            0.981333
+          ]
+        },
+        "loadDurationMs": 133
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-32-33-052Z-45552\\three\\capture-2.png",
+      "sha256": "381288DE6B9252CFB2767D4C9413C6D3F8A9F7EB1E60CC962EDE6A9243E6615A",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-32-33-052Z-45552\\three\\capture-2-gray.png",
+        "sha256": "6911D7867F4151A3B2611C95960257F2B7195EEB685285845C8681CF8AE6734F",
+        "dimensions": {
+          "width": 800,
+          "height": 800
+        }
+      },
+      "durationMs": 122,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:56641/artifacts/graphics/G-21/runs/2026-09-16T19-32-33-052Z-45552/candidate/shed.glb",
+        "viewport": {
+          "width": 800,
+          "height": 800,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": null,
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Root",
+          "Scene",
+          "shed_frame",
+          "shed_roof",
+          "shed_wood"
+        ],
+        "bounds": {
+          "min": [
+            0.024297,
+            0,
+            -0.990667
+          ],
+          "max": [
+            0.975703,
+            0.912712,
+            -0.009333
+          ],
+          "size": [
+            0.951407,
+            0.912712,
+            0.981333
+          ]
+        },
+        "loadDurationMs": 31
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:56641/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=800&height=800&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 132,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-21\\runs\\2026-09-16T19-32-33-052Z-45552\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

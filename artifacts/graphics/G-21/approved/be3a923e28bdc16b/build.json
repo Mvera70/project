@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "haystack",
+  "runId": "2026-09-16T19-18-01-947Z-41444",
+  "recipe": "art/recipes/haystack/haystack.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11580,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/candidate/haystack.blend",
+      "bytes": 107528,
+      "sha256": "10CC8F3D10236C6C195237B9B679A63A208A022D58EC6720258FD32DE9BBF4C6"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/candidate/haystack.glb",
+      "bytes": 70164,
+      "sha256": "BE3A923E28BDC16BF70C5F0578D0B0AEB787A0E3F520CD86CD18177F67D43D6D"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/candidate/haystack-blender.png",
+      "bytes": 456964,
+      "sha256": "DADA690A28DE3DFEA8AA3F82C803398E69748F22A98FF4751E585AD20F7BDBA3"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/blender.log",
+      "bytes": 1277,
+      "sha256": "316E60C754142879443DEA6D68944E63C434F62058A85FF10D1FB040FE47AA2A"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/temporary/build.py",
+      "bytes": 10291,
+      "sha256": "F9835846AB25640F8E1B39E7AF1CCE83A590CBF38D80091AF4A043BEDDAA5B28"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-21/runs/2026-09-16T19-18-01-947Z-41444/temporary/resolved-recipe.json",
+      "bytes": 32258,
+      "sha256": "CEA221E81B29AB5694D06BFD20209D16E78986EF4C8947CCC779175D076A1E1C"
+    }
+  }
+}

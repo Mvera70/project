@@ -1,0 +1,4 @@
+{
+  "note": "UI-V0. Los dibujos de la cronica, segun docs/ui-redesign/piel/encargo-arte-piel.md. La interfaz solo usa lo que esta listado aqui; lo que falta cae al respaldo (la hoja de roble). Anadir una linea por dibujo entregado: {\"name\": \"wolf\", \"file\": \"wolf.svg\"}.",
+  "art": []
+}

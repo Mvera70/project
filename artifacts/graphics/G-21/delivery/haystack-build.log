@@ -1,0 +1,7 @@
+
+> the-valley@0.0.0 art
+> tsx tools/art/index.ts all haystack
+
+Built haystack in artifacts\graphics\G-21\runs\2026-09-16T19-18-01-947Z-41444
+Validated haystack from run 2026-09-16T19-18-01-947Z-41444
+Reported and promoted haystack to artifacts\graphics\G-21\approved\be3a923e28bdc16b
