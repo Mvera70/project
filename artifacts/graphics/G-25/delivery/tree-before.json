@@ -1,0 +1,59 @@
+{
+  "id": "tree",
+  "artifactRound": "G-10",
+  "status": "study",
+  "recipe": "art/recipes/tree/tree.json",
+  "generator": "tools/art/blender-build.py",
+  "blenderVersion": "5.2.1 LTS",
+  "approved": {
+    "runId": "2026-09-10T22-53-55-348Z-47644",
+    "directory": "artifacts/graphics/G-10/approved/76c3e850d8876f02"
+  },
+  "bounds": {
+    "min": [
+      -0.769354,
+      0,
+      -0.734853
+    ],
+    "max": [
+      0.65754,
+      2.816667,
+      0.566509
+    ],
+    "size": [
+      1.426894,
+      2.816667,
+      1.301362
+    ]
+  },
+  "recipeSha256": "85C699311D50020BDED3014E4D43595EFCE7CE4D79BDFF41D2F4B8A0145BE34C",
+  "materials": [
+    "bark",
+    "leaf",
+    "leaf-light"
+  ],
+  "clips": [],
+  "motion": [],
+  "connectors": [],
+  "statistics": {
+    "objects": 4,
+    "meshes": 3,
+    "materials": 3,
+    "triangles": 188
+  },
+  "hashes": {
+    "tree.blend": "B7013BD3AFA71162CD31BFB52722B61840E18809778B50D3C4F8631E1B44B3F9",
+    "tree.glb": "76C3E850D8876F022116B87309332250E2833D34AF10C7CD37EA6BFCD7838C01",
+    "tree-blender.png": "BC4A84794452859236CE748D6B5CE4B387A50BC85F23C922E64F4E8ED99E97D0",
+    "capture-1.png": "85B8EFBCD57A92967E9DF2CC6189B31F47B5B1EABBE12C676CFAB3BCA6A9867D",
+    "capture-1-gray.png": "F4F2EEE1105F7ECAB65EAEF8D7443D727A95AF39C4543DD4578E9C96784B512E",
+    "capture.json": "85FDFAE48F52545523F0BFD2F9530BFA36E462A9202DDE804E4BFC4BBE35395D",
+    "build.json": "79E36B96C19A8B5A1A7B7337DFB4AA3075CB79083464AA1FD9190F4C021750EB",
+    "validation.json": "1C095F86032DF94D99FDF34C73476A08A554B4979F164F4EB6C3DC854B628338"
+  },
+  "provenance": {
+    "kind": "original",
+    "source": "Original tree authored for The Valley G-10, world batch",
+    "license": "Project original"
+  }
+}

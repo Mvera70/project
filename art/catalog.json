@@ -347,33 +347,33 @@
     },
     {
       "id": "tree",
-      "artifactRound": "G-10",
+      "artifactRound": "G-25",
       "status": "study",
       "recipe": "art/recipes/tree/tree.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-10T22-53-55-348Z-47644",
-        "directory": "artifacts/graphics/G-10/approved/76c3e850d8876f02"
+        "runId": "2026-09-17T09-52-41-711Z-20376",
+        "directory": "artifacts/graphics/G-25/approved/bdc81b55e67f8aa6"
       },
       "bounds": {
         "min": [
-          -0.769354,
+          -0.82414,
           0,
-          -0.734853
+          -0.816667
         ],
         "max": [
-          0.65754,
-          2.816667,
-          0.566509
+          0.872887,
+          2.666666,
+          0.752135
         ],
         "size": [
-          1.426894,
-          2.816667,
-          1.301362
+          1.697027,
+          2.666666,
+          1.568802
         ]
       },
-      "recipeSha256": "85C699311D50020BDED3014E4D43595EFCE7CE4D79BDFF41D2F4B8A0145BE34C",
+      "recipeSha256": "896BE22D2C194371805F2EAD82C76D5A0491D42E38ED3C0F4EEC005CDFDD2E9B",
       "materials": [
         "bark",
         "leaf",
@@ -386,17 +386,17 @@
         "objects": 4,
         "meshes": 3,
         "materials": 3,
-        "triangles": 188
+        "triangles": 352
       },
       "hashes": {
-        "tree.blend": "B7013BD3AFA71162CD31BFB52722B61840E18809778B50D3C4F8631E1B44B3F9",
-        "tree.glb": "76C3E850D8876F022116B87309332250E2833D34AF10C7CD37EA6BFCD7838C01",
-        "tree-blender.png": "BC4A84794452859236CE748D6B5CE4B387A50BC85F23C922E64F4E8ED99E97D0",
-        "capture-1.png": "85B8EFBCD57A92967E9DF2CC6189B31F47B5B1EABBE12C676CFAB3BCA6A9867D",
-        "capture-1-gray.png": "F4F2EEE1105F7ECAB65EAEF8D7443D727A95AF39C4543DD4578E9C96784B512E",
-        "capture.json": "85FDFAE48F52545523F0BFD2F9530BFA36E462A9202DDE804E4BFC4BBE35395D",
-        "build.json": "79E36B96C19A8B5A1A7B7337DFB4AA3075CB79083464AA1FD9190F4C021750EB",
-        "validation.json": "1C095F86032DF94D99FDF34C73476A08A554B4979F164F4EB6C3DC854B628338"
+        "tree.blend": "169FD51CDD9336E92C641A42CCBDDB8F81DA874A747264E48100F612B892CE58",
+        "tree.glb": "BDC81B55E67F8AA6CAFBBC161CA1CB69F388D064DCD7FD35857FDFBCAA4BAB09",
+        "tree-blender.png": "EF1455EB0B6307AAD799A364A859B6A4D415DD4E964B87CD8A7110AA8F5EC0F8",
+        "capture-1.png": "17EE3CB0C6DFCAE100E01AD9D00B14EE06316644D64047CCB73D4849CAE27C73",
+        "capture-1-gray.png": "49BFD943E10C7D1FE993E3732F3A4F723FEF0C8F69B418034EB77077DAC8D32B",
+        "capture.json": "792C950D33A689592E817E37C042E9FCE1ACC105670CDE0A4F6922C2393AC228",
+        "build.json": "F7FF89F83DFE90E3BD0624DBF7A1347CAE68DE5BB97AD1BF8F1FBEAB44731C06",
+        "validation.json": "37018169C4B51829ED0D2F7CA29EEF807DBD9A691350490B8385AA6074785E8A"
       },
       "provenance": {
         "kind": "original",

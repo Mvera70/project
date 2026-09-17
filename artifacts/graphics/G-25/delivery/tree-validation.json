@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "assetId": "tree",
+  "runId": "2026-09-17T09-52-41-711Z-20376",
+  "status": "pass",
+  "durationMs": 4677,
+  "candidateSha256": "BDC81B55E67F8AA6CAFBBC161CA1CB69F388D064DCD7FD35857FDFBCAA4BAB09",
+  "glb": {
+    "version": 2,
+    "declaredLength": 30428,
+    "nodeNames": [
+      "tree_bark",
+      "tree_leaf",
+      "tree_leaf-light",
+      "Tree_Root"
+    ],
+    "meshNames": [
+      "tree_bark_Mesh",
+      "tree_leaf_Mesh",
+      "tree_leaf-light_Mesh"
+    ],
+    "materialNames": [
+      "bark",
+      "leaf",
+      "leaf-light"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 3,
+    "statistics": {
+      "objects": 4,
+      "meshes": 3,
+      "materials": 3,
+      "triangles": 352
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T09:53:19.552Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T09-52-41-711Z-20376\\candidate\\tree.glb",
+      "assetUrl": "/artifacts/graphics/G-25/runs/2026-09-17T09-52-41-711Z-20376/candidate/tree.glb",
+      "viewport": {
+        "width": 780,
+        "height": 900,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T09-52-41-711Z-20376\\three\\capture-1.png",
+        "sha256": "17EE3CB0C6DFCAE100E01AD9D00B14EE06316644D64047CCB73D4849CAE27C73",
+        "dimensions": {
+          "width": 780,
+          "height": 900
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T09-52-41-711Z-20376\\three\\capture-1-gray.png",
+          "sha256": "49BFD943E10C7D1FE993E3732F3A4F723FEF0C8F69B418034EB77077DAC8D32B",
+          "dimensions": {
+            "width": 780,
+            "height": 900
+          }
+        },
+        "durationMs": 1011,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:54532/artifacts/graphics/G-25/runs/2026-09-17T09-52-41-711Z-20376/candidate/tree.glb",
+          "viewport": {
+            "width": 780,
+            "height": 900,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Tree_Root",
+            "tree_bark",
+            "tree_leaf",
+            "tree_leaf-light"
+          ],
+          "bounds": {
+            "min": [
+              -0.82414,
+              0,
+              -0.816667
+            ],
+            "max": [
+              0.872887,
+              2.666666,
+              0.752135
+            ],
+            "size": [
+              1.697027,
+              2.666666,
+              1.568802
+            ]
+          },
+          "loadDurationMs": 164
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T09-52-41-711Z-20376\\three\\capture-2.png",
+        "sha256": "17EE3CB0C6DFCAE100E01AD9D00B14EE06316644D64047CCB73D4849CAE27C73",
+        "dimensions": {
+          "width": 780,
+          "height": 900
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T09-52-41-711Z-20376\\three\\capture-2-gray.png",
+          "sha256": "49BFD943E10C7D1FE993E3732F3A4F723FEF0C8F69B418034EB77077DAC8D32B",
+          "dimensions": {
+            "width": 780,
+            "height": 900
+          }
+        },
+        "durationMs": 129,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:54532/artifacts/graphics/G-25/runs/2026-09-17T09-52-41-711Z-20376/candidate/tree.glb",
+          "viewport": {
+            "width": 780,
+            "height": 900,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Tree_Root",
+            "tree_bark",
+            "tree_leaf",
+            "tree_leaf-light"
+          ],
+          "bounds": {
+            "min": [
+              -0.82414,
+              0,
+              -0.816667
+            ],
+            "max": [
+              0.872887,
+              2.666666,
+              0.752135
+            ],
+            "size": [
+              1.697027,
+              2.666666,
+              1.568802
+            ]
+          },
+          "loadDurationMs": 35
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:54532/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=780&height=900&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 221,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T09-52-41-711Z-20376\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

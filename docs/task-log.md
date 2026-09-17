@@ -64,6 +64,10 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-25 · paisaje, primer modelo entregado:** árbol tree rehecho con horquillas
+y copa facetada asimétrica. GLB publicado selectivamente, captura real revisada,
+48 pruebas, typecheck y lint verdes. [Informe](graphics-rounds/G-25.md).
+
 **OBS-02 · piloto y comparación cerrados:** tres Luna, un Terra y un Sol revisaron
 los casos archivados; ninguno localizó concretamente marcha lateral ni vado desplazado.
 El método no supera calibración. Propuesta posterior: Luna recopila evidencia y el
@@ -296,6 +300,9 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**G-25 tree:** 188→352 triángulos; 3 materiales/mallas; 9 868→30 428 bytes.
+Huella física del tronco idéntica al GLB anterior. Sin medición móvil nueva.
+
 **OBS-02 piloto + comparación:** 5 revisores (3 Luna, Terra y Sol), 3 casos,
 139 PNG archivados y 10 informes originales. 0/5 detecciones visuales concretas de
 marcha lateral y vado; contacto no aislado suficientemente. 24 encargos sin ejecutar.
@@ -437,6 +444,10 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**G-25 paisaje:** siguen pendientes rocas, vegetación baja/ribera y otras siluetas
+de árboles; requieren respetar accesos y campos. El vado desplazado sigue abierto.
+La batería OBS-02 se aplaza por decisión del usuario; se retoma modelado 3D.
 
 **OBS-02 detenido tras el piloto por petición del usuario:** decidir después cómo
 mejorar encuadre y revisión temporal antes de repetir calibración. No lanzar la
