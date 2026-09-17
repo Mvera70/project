@@ -248,17 +248,14 @@ interface VitalCell {
 }
 
 /**
- * Cada cifra vive **dos veces en el DOM**: un chip para la cabecera del valle
- * (plan §3.1) y una cifra plana para la cabecera compacta de la crónica (plan
- * §3.2). No es la misma pieza reubicada porque las dos cabeceras conviven —una
- * oculta, la otra visible— y reparentar un nodo cada vez que cambia la ruta es
- * más frágil que escribir el mismo número dos veces, que es barato y puro
- * (`paintVital`, más abajo).
+ * **UI-V9 · cada cifra vive una sola vez.** Hasta esta ronda vivía dos veces
+ * —un chip para la cabecera del valle y una cifra plana para una cabecera
+ * compacta que sólo salía en la crónica—, y el dueño del diseño lo cortó de
+ * raíz mirando la tablet: «no usamos el mismo que tenemos en la otra pantalla
+ * funcionando». Tenía razón: eran dos piezas para el mismo trabajo, la segunda
+ * topada a 334 px, y por eso la crónica enseñaba tres cifras de cuatro
+ * mientras el valle enseñaba las cuatro.
  */
-interface VitalDual {
-  readonly chip: VitalCell;
-  readonly figure: VitalCell;
-}
 
 function makeVitalCell(iconId: string, extraClass: string): VitalCell {
   const cell = document.createElement('span');
@@ -341,42 +338,23 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   datePlate.append(dateLine, sunArc.svg);
 
   // ---------------------------------------------------------------------
-  // Las cuatro cifras. Dos cabeceras las leen (§3.1 y la primera fila de
-  // §3.2): un chip por cabeza en la del valle, una cifra entre filetes en la
-  // compacta de la crónica.
+  // Las cuatro cifras, un chip cada una (§3.1). **La misma fila en las cuatro
+  // pantallas**, que es la directriz de UI-V9.
   // ---------------------------------------------------------------------
   const vitals = document.createElement('div');
   vitals.className = 'valley-vitals hud-chips-row';
   vitals.setAttribute('aria-label', renderUiText('app.vitals'));
 
-  const figures = document.createElement('div');
-  figures.className = 'hud-compact-figures';
-  figures.setAttribute('aria-label', renderUiText('app.vitals'));
-
-  const rule = (): HTMLElement => {
-    const bar = document.createElement('span');
-    bar.className = 'skin-rule-v';
-    bar.setAttribute('aria-hidden', 'true');
-    return bar;
-  };
-
-  const dual = (iconId: string): VitalDual => {
+  const vital = (iconId: string): VitalCell => {
     const chip = makeVitalCell(iconId, 'skin-plate skin-plate--chip');
-    const figure = makeVitalCell(iconId, 'hud-figure');
     vitals.append(chip.cell);
-    return { chip, figure };
+    return chip;
   };
 
-  const people = dual('people');
-  const food = dual('wheat');
-  const wood = dual('logs');
-  const spirits = dual('face');
-  figures.append(
-    people.figure.cell, rule(),
-    food.figure.cell, rule(),
-    wood.figure.cell, rule(),
-    spirits.figure.cell,
-  );
+  const people = vital('people');
+  const food = vital('wheat');
+  const wood = vital('logs');
+  const spirits = vital('face');
 
   const doing = document.createElement('p');
   // UI-V2b · `hud-say-line` deshace el posicionamiento absoluto que U-01 le
@@ -407,33 +385,6 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     actions.navigate(getRoute().kind === 'orders' ? { kind: 'valley' } : { kind: 'orders' });
   });
 
-  // ---------------------------------------------------------------------
-  // La cabecera compacta de la crónica (plan §3.2, primera fila): dos
-  // placas, fecha a dos líneas con el sol a la izquierda y las cuatro
-  // cifras entre filetes. Vive apagada (`hidden`) hasta que la ruta lo pide.
-  // ---------------------------------------------------------------------
-  const compactDateLine1 = document.createElement('div');
-  compactDateLine1.className = 'skin-inscription';
-  const compactDateLine2 = document.createElement('div');
-  compactDateLine2.className = 'skin-inscription';
-  const compactDateText = document.createElement('div');
-  compactDateText.className = 'hud-compact-date-text';
-  compactDateText.append(compactDateLine1, compactDateLine2);
-
-  const compactDatePlate = document.createElement('div');
-  compactDatePlate.className = 'skin-plate hud-compact-date';
-  compactDatePlate.innerHTML = spriteIcon('sun');
-  compactDatePlate.append(compactDateText);
-
-  const compactFiguresPlate = document.createElement('div');
-  compactFiguresPlate.className = 'skin-plate hud-compact-figures-plate';
-  compactFiguresPlate.append(figures);
-
-  const compactHeader = document.createElement('div');
-  compactHeader.className = 'hud-compact-header';
-  compactHeader.hidden = true;
-  compactHeader.append(compactDatePlate, compactFiguresPlate);
-
   // UI-V2b · la voz de la aldea sale de la cabecera. Las dos líneas van juntas
   // en su envoltorio y `app.ts` lo mete en la bandeja; la cabecera se queda
   // con lo que es instrumento —fecha, arco del sol y cifras—, que es como lo
@@ -444,7 +395,7 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
 
   const header = document.createElement('div');
   header.className = 'ui-hud-header';
-  header.append(datePlate, timeLine, vitals, compactHeader);
+  header.append(datePlate, timeLine, vitals);
 
   // ---------------------------------------------------------------------
   // La velocidad: dos círculos (plan §3.1). Uno pausa/reanuda sin abrir nada
@@ -508,30 +459,27 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   };
   let paintedTime = '';
   let paintedDate = '';
-  let paintedCompact: boolean | null = null;
 
   const lower = (key: string): string => renderUiText(key).toLowerCase();
 
-  /** Escribe una cifra en sus dos casas (chip y figura), sin duplicar lógica. */
+  /** Escribe una cifra en su chip. */
   const paintVital = (
-    dualCell: VitalDual,
+    instance: VitalCell,
     text: string,
     changed: boolean,
     way: 'up' | 'down' | 'steady',
     title: string,
     alarm: boolean,
   ): void => {
-    for (const instance of [dualCell.chip, dualCell.figure]) {
-      bump(instance.cell, changed);
-      instance.value.textContent = text;
-      instance.arrow.innerHTML = way === 'steady' ? '' : TREND_MARK[way];
-      instance.arrow.dataset.way = way;
-      instance.cell.title = title;
-      // La comida es la única que avisa: §5.3 mata de hambre, y una aldea con
-      // menos de un mes de reserva está a un mal invierno de eso. Se conserva
-      // en `--ui-alarm` como antes de esta ronda: no es del prototipo.
-      instance.cell.classList.toggle('thin', alarm);
-    }
+    bump(instance.cell, changed);
+    instance.value.textContent = text;
+    instance.arrow.innerHTML = way === 'steady' ? '' : TREND_MARK[way];
+    instance.arrow.dataset.way = way;
+    instance.cell.title = title;
+    // La comida es la única que avisa: §5.3 mata de hambre, y una aldea con
+    // menos de un mes de reserva está a un mal invierno de eso. Se conserva
+    // en `--ui-alarm` como antes de esta ronda: no es del prototipo.
+    instance.cell.classList.toggle('thin', alarm);
   };
 
   const paint = (state: GameState, fraction: number): void => {
@@ -547,13 +495,6 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     });
     if (date !== paintedDate) {
       dateLine.textContent = date;
-      // La cabecera compacta parte la misma frase del banco por su separador
-      // («Year 21 · Summer, day 83»): son las dos líneas del prototipo 02
-      // sin escribir un carácter nuevo, sólo partiendo el texto que ya viene
-      // del banco (CLAUDE.md: nada de texto que no salga de `bank.en.ts`).
-      const cut = date.indexOf(' · ');
-      compactDateLine1.textContent = cut === -1 ? date : date.slice(0, cut);
-      compactDateLine2.textContent = cut === -1 ? '' : date.slice(cut + 3);
       paintedDate = date;
     }
 
@@ -603,16 +544,6 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
       build: lower(`app.build.${state.intent.priority}`),
     });
 
-    // La cabecera compacta de la crónica (plan §3.2): sólo esa ruta la
-    // enseña, y la del valle se apaga entera mientras tanto — «cada opción
-    // cambia algo en pantalla» aplicado a la propia cabecera.
-    const compact = getRoute().kind === 'chronicle';
-    if (compact !== paintedCompact) {
-      datePlate.hidden = compact;
-      vitals.hidden = compact;
-      compactHeader.hidden = !compact;
-      paintedCompact = compact;
-    }
   };
 
   return {
@@ -643,7 +574,6 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
       monthAgo = null;
       paintedTime = '';
       paintedDate = '';
-      paintedCompact = null;
     },
     dispose(): void {
       header.remove();

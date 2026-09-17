@@ -169,7 +169,13 @@ export function createShell(actions: UiActions): ShellHandle {
   element.className = 'ui-shell';
 
   const content = document.createElement('section');
-  content.className = 'ui-shell-content';
+  // UI-V9 · **el mismo papel que la crónica, y por ser la misma clase y no una
+  // copia de sus valores.** Hasta esta ronda esta hoja se pintaba con
+  // `--ui-paper-bg`, un token de U-01 anterior al rediseño y sin textura, así
+  // que la gente y la ficha salían en un papel y la crónica en otro. Lo dijo
+  // el dueño del diseño: «los fondos que hay detrás de los textos, usa siempre
+  // el mismo; el de la crónica es el bueno». `skin-paper--page` es ese papel.
+  content.className = 'ui-shell-content skin-paper skin-paper--page';
   content.hidden = true;
   content.tabIndex = -1;
   // Región etiquetada, no un modal (plan §3): no atrapa el foco, y quien

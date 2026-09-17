@@ -139,7 +139,6 @@ const STYLE = `
    tarjetas. Se ocultan los contenedores de la piel. */
 .crossroad-open .hud-plate-date,
 .crossroad-open .hud-speed-cluster,
-.crossroad-open .hud-compact-header,
 .crossroad-open .valley-speeds,
 .crossroad-open .valley-speed-badge,
 .crossroad-open .valley-orders-now,

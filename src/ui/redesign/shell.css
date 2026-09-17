@@ -176,7 +176,7 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
   bottom: calc(var(--ui-nav-height) + env(safe-area-inset-bottom));
   box-sizing: border-box; max-height: 60vh; overflow: auto; pointer-events: auto;
   padding: var(--ui-space-4) var(--ui-margin-mobile);
-  background: var(--ui-paper-bg); border-top: 1px solid var(--ui-edge);
+  border-top: 1px solid var(--ui-edge);
   border-radius: var(--ui-radius-sheet) var(--ui-radius-sheet) 0 0;
   box-shadow: 0 -6px 18px rgba(34, 29, 24, .22); color: var(--ui-paper-ink); }
 .ui-shell-content[hidden] { display: none; }

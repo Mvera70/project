@@ -398,52 +398,44 @@
 /**
  * El borde curvado superior de la bandeja (prototipo 01).
  *
- * Respaldo mientras `public/ui/art/scroll-edge.svg` no exista
- * (`encargo-arte-piel.md` §3): una franja de madera de 6 px con las esquinas
- * redondeadas. La clase es la misma, así que el día que llegue el SVG basta
- * darle `mask-image` aquí y ninguna ronda tiene que cambiar de marcado.
+ * Ya no hace falta el encargo de `public/ui/art/scroll-edge.svg`
+ * (`encargo-arte-piel.md` §3): el canto se dibuja aquí, calcado del
+ * prototipo 01. La clase sigue siendo la misma, así que si algún día llega un
+ * SVG pintado a mano basta cambiar estas tres piezas.
  */
-/** UI-V8 · **El listón de madera del canto de la bandeja.**
-
-    Aquí había una franja plana de 6 px, y el dueño del diseño la señaló en su
-    tablet: «no se parece al prototipo». No se parecía. En el prototipo 01 el
-    canto es un **listón redondo de madera**, con su brillo a lo largo del
-    filo de arriba y su sombra debajo, y el pergamino se le mete por debajo.
-    Una franja plana del mismo color no es lo mismo: es una línea, y lo que hay
-    que leer ahí es un palo del que cuelga el papel.
-
-    Once de alto y no seis —el del prototipo mide 24 px del PNG, o sea 11 en
-    CSS—, con el redondeo completo para que sea cilindro y no caja, un brillo
-    de latón de un píxel en el filo y la sombra que lo separa del papel. */
 .skin-scroll-edge {
-  /* **UI-V8 · el canto es un listón de madera clara sobre el papel, y su
-     curva tiene meseta.** Medido en el prototipo 01: la madera baja a y 1507
-     en la esquina y sube a 1452 en el centro —25 px de flecha en medida de
-     pantalla— y entre medias **no es un arco**, sino una meseta central con
-     dos hombros en S. Un `border-radius` sólo sabe hacer elipses, así que
-     esto lo dibuja una tapa: el papel de la bandeja por debajo de la curva,
-     el listón encima de la junta y transparente por arriba, donde se ve el
-     valle. Estirada con `100% 100%`, así que en una tablet la meseta se
-     ensancha y los hombros se tienden, que es lo que hace un palo largo.
-     La flecha son los 31 px medidos y el hombro se resuelve en los primeros
-     80. Se dibuja con una cúbica de tangente horizontal en la esquina: con un
-     tramo recto y luego la curva salía una rodilla, y el canto parecía una
-     escuadra en vez de un palo doblado.
+  /* **UI-V8b · el canto se corta en tres, y el hombro no se estira.**
+     La primera versión estiraba una sola tapa con `background-size: 100% 100%`
+     y en una tablet quedaba en evidencia: los 31 px de flecha repartidos en
+     750 px de ancho son **una recta con dos ganchos en las puntas**, no el palo
+     doblado del prototipo. La proporción del prototipo es 31 px de flecha en
+     390 de ancho, y un canto que cambia de forma con la pantalla es
+     exactamente lo que la directriz de esta ronda prohíbe.
+
+     Así que se corta en tres, como un borde de nueve piezas: **el hombro mide
+     80 px en cualquier pantalla** —los mismos 80 en los que el prototipo
+     resuelve la subida: a 27 px de la esquina la madera ha subido 6 y a 55 ya
+     está arriba— y lo único que se estira es la franja llana del medio, que es
+     horizontal y estirarla no la deforma. El resultado: la curva es idéntica
+     a 390 y a 1240, y lo que crece es la meseta, que es lo que le pasa a un
+     palo más largo.
 
      Los tres pardos son `--skin-batten-lit`, `--skin-batten` y
      `--skin-batten-deep`, literales aquí porque `var()` no entra dentro de
      `url()`. El relleno **no** es `--skin-parchment-deep` sino el color con el
-     que la bandeja se pinta de verdad, medido en la captura: el token es
-     #D9C2A5 y con la textura encima sale #CBB59A, y con el token plano se veía
-     el escalón. El listón tapa la junta, así que no hay costura que enseñar. */
+     que la bandeja se pinta de verdad (`#CBB59A`): el token es `#D9C2A5` y con
+     la textura encima sale más oscuro, y con el token plano se veía el escalón
+     donde acaba la tapa. La franja del medio se solapa 2 px con cada hombro
+     para que el redondeo no deje una costura de un píxel. */
   position: absolute;
-  left: -10px;
-  right: -10px;
+  left: 0;
+  right: 0;
   bottom: 100%;
   height: 46px;
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 46' preserveAspectRatio='none'><path d='M0 40 C34 40 40 11 80 10.2 C150 8.6 240 8.6 310 10.2 C350 11 356 40 390 40L390 46L0 46Z' fill='%23CBB59A'/><path d='M0 42.6 C34 42.6 40 13.6 80 12.8 C150 11.2 240 11.2 310 12.8 C350 13.6 356 42.6 390 42.6' fill='none' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M0 40 C34 40 40 11 80 10.2 C150 8.6 240 8.6 310 10.2 C350 11 356 40 390 40' fill='none' stroke='%23785A3C' stroke-width='5.4'/><path d='M0 38.3 C34 38.3 40 9.3 80 8.5 C150 6.9 240 6.9 310 8.5 C350 9.3 356 38.3 390 38.3' fill='none' stroke='%23A9855D' stroke-width='1.4'/></svg>");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 46'><path d='M0 40.0 C30 40.0 36 9 80 8.6L80 46L0 46Z' fill='%23CBB59A'/><path d='M0 42.6 C30 42.6 36 11.6 80 11.2' fill='none' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M0 40.0 C30 40.0 36 9 80 8.6' fill='none' stroke='%23785A3C' stroke-width='5.4'/><path d='M0 38.3 C30 38.3 36 7.3 80 6.9' fill='none' stroke='%23A9855D' stroke-width='1.4'/></svg>"), url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 46'><path d='M80 40.0 C50 40.0 44 9 0 8.6L0 46L80 46Z' fill='%23CBB59A'/><path d='M80 42.6 C50 42.6 44 11.6 0 11.2' fill='none' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M80 40.0 C50 40.0 44 9 0 8.6' fill='none' stroke='%23785A3C' stroke-width='5.4'/><path d='M80 38.3 C50 38.3 44 7.3 0 6.9' fill='none' stroke='%23A9855D' stroke-width='1.4'/></svg>"), url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 46' preserveAspectRatio='none'><path d='M0 8.6 L4 8.6 L4 46L0 46Z' fill='%23CBB59A'/><path d='M0 11.2 L4 11.2' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M0 8.6 L4 8.6' stroke='%23785A3C' stroke-width='5.4'/><path d='M0 6.8999999999999995 L4 6.8999999999999995' stroke='%23A9855D' stroke-width='1.4'/></svg>");
+  background-position: left top, right top, center top;
+  background-size: 80px 46px, 80px 46px, calc(100% - 156px) 46px;
+  background-repeat: no-repeat, no-repeat, no-repeat;
 }
 
 /** El ornamento de la bandeja: la hoja entre dos filetes cortos. */
@@ -534,7 +526,7 @@
    `.valley-vital` y `.valley-speed-badge` con su piel de antes de esta ronda
    —no se toca en UI-V1—, así que cada uno de esos elementos lleva una
    **segunda clase propia** (`.hud-date-text`, `.hud-clock-sr`,
-   `.hud-chips-row`, `.skin-plate--chip`/`.hud-figure`, `.hud-round-btn`) y las
+   `.hud-chips-row`, `.skin-plate--chip`, `.hud-round-btn`) y las
    reglas de abajo la combinan con la de siempre: dos clases en el selector
    pesan más que una sin importar en qué orden cargue cada hoja, así que la
    piel nueva gana siempre, venga `index.html` antes o después en el documento
@@ -547,11 +539,11 @@
    la ruta). El navegador sólo respeta ese atributo con `display: none` desde
    una regla del UA sin especificidad; en cuanto una hoja de autor pone
    `display: flex` sin condición en el mismo elemento —lo que hacen
-   `.hud-plate-date`, `.valley-vitals.hud-chips-row` y `.hud-compact-header`,
-   las tres de abajo—, esa regla gana y `hidden` deja de ocultar nada: las dos
-   cabeceras se pintaban una encima de otra, fecha a dos líneas incluida.
-   Cada bloque lleva su propio `&[hidden] { display: none; }` para que el
-   atributo siga mandando. */
+   `.hud-plate-date` y `.valley-vitals.hud-chips-row`—, esa regla gana y
+   `hidden` deja de ocultar nada. Cada bloque lleva su propio
+   `&[hidden] { display: none; }` para que el atributo siga mandando. **Y
+   desde UI-V9 hay una sola cabecera**, así que ya no hay dos pintándose una
+   encima de otra: el defecto que esto cazaba no puede volver. */
 
 /** La hora sigue existiendo —U-12, la sigue leyendo `tools/valley.pwa.ts` y
     `tools/valley.shots.ts`— pero el prototipo no dibuja un reloj digital,
@@ -573,6 +565,17 @@
 }
 
 /** La placa de fecha (plan §3.1): x 27–361, y 16–50, alto 34. */
+/** UI-V9 · **la misma placa en las cuatro pantallas, y con sitio para
+    cerrar.** Con una hoja abierta arriba a la derecha hay un botón de cerrar
+    de 71 px, y los 334 de la placa llegaban a x 361 de 390: se tocaban. Así
+    que con hoja abierta la placa cede lo que el botón necesita —y sólo
+    entonces—, en vez de ser otra placa distinta. */
+html:not([data-screen="valley"]) .hud-plate-date {
+  /* 118 = los 27 del margen izquierdo + los 71 del botón + sus 8 de aire +
+     12 de margen derecho. A 390 px la placa queda en 272 y a partir de 452
+     vuelve a sus 334: es la misma placa cediendo, no otra. */
+  width: min(334px, calc(100% - 118px));
+}
 .hud-plate-date {
   position: absolute;
   z-index: 2;
@@ -595,6 +598,7 @@
   top: auto;
   left: auto;
   margin: 0;
+  flex: 0 0 auto;
   color: var(--skin-ink-faded);
   font-size: var(--skin-text-inscription);
   text-shadow: none;
@@ -614,10 +618,15 @@
    · **las cuentas**, que jalonan las horas sin escribirlas;
    · **el sol**, un disco ámbar con doce rayos — antes era un punto marrón del
      color del arco y no se leía como un sol. */
+/** El arco es la pieza que cede cuando la placa se estrecha (con una hoja
+    abierta, arriba): tiene `viewBox`, así que reescala limpio, mientras la
+    fecha es información y no se toca. 56 px es el suelo en el que el arco
+    sigue leyéndose como un arco con su sol. */
 .hud-sun-arc {
   width: 90px;
   height: 29px;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 56px;
   display: block;
   overflow: visible;
 }
@@ -688,82 +697,6 @@
 .valley-vital.skin-plate--chip .skin-icon { width: 21px; height: 21px; }
 .valley-vital.skin-plate--chip b { font-weight: 600; }
 
-/** La misma cifra, sin chip, para la cabecera compacta de la crónica. */
-.valley-vital.hud-figure {
-  position: static;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0 4px;
-  border-left: 0 !important;
-  color: var(--skin-ink-soft);
-  font-family: var(--skin-font-voice);
-  font-weight: 600;
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
-.valley-vital.hud-figure.thin { color: var(--ui-alarm); }
-.valley-vital.hud-figure .skin-icon { width: 18px; height: 18px; }
-
-/** La cabecera compacta de la crónica (plan §3.2, primera fila): dos placas,
-    x 27–170 la fecha (con el sol a la izquierda) y x 178–361 las cifras. */
-.hud-compact-header {
-  position: absolute;
-  z-index: 2;
-  left: 27px;
-  top: 16px;
-  width: 334px;
-  height: 50px;
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-}
-.hud-compact-header[hidden] { display: none; }
-.hud-compact-date {
-  flex: 0 0 143px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  box-sizing: border-box;
-}
-.hud-compact-date .skin-icon {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 auto;
-  color: var(--skin-gold);
-}
-.hud-compact-date-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  min-width: 0;
-  color: var(--skin-ink-faded);
-}
-.hud-compact-date-text > * {
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.hud-compact-figures-plate {
-  flex: 1 1 183px;
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  box-sizing: border-box;
-  min-width: 0;
-}
-.hud-compact-figures {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  width: 100%;
-  min-width: 0;
-}
-.hud-compact-figures .skin-rule-v { height: 16px; flex: 0 0 auto; }
 
 /** Los dos círculos de velocidad (plan §3.1): ⌀ 40 dibujados, en un blanco
     táctil de 44 (`--ui-tap-min`, §11.7/§6.4 del plan): el relleno de la
@@ -870,7 +803,13 @@
     en `--ui-stack-height`. Aquí sólo se lee, con un respiro de 10 px y un
     respaldo de 60 por si alguien monta el rincón sin carcasa. */
 .valley-hud-right.hud-speed-corner {
-  bottom: calc(var(--ui-stack-height, 60px) + 10px);
+  /* UI-V8b · **por encima del listón, no cortado por él.** Con 10 px el
+     grupo quedaba mordido por la madera: el canto sube 37 px sobre el papel en
+     la meseta y el grupo mide 148 px de ancho pegado al borde, así que cae
+     justo encima. Los 50 son esos 37 más los 13 de hierba que el prototipo
+     deja entre los círculos y la madera (medido en el prototipo 01: de 12 a 19
+     px según el círculo). */
+  bottom: calc(var(--ui-stack-height, 60px) + 50px);
 }
 
 /* ------------------------------------------------- la regleta de velocidad */
@@ -1266,23 +1205,3 @@
     pergamino. */
 .ui-shell-message { position: relative; }
 
-/** UI-V8 · **La cabecera compacta de la crónica, sin recortar.**
-
-    `.hud-compact-header` tenía `width: 334px` y repartía 143 para la fecha y
-    183 para las cuatro cifras, medido con la aldea de dos personas del año 1.
-    En el año 50 las cifras son de tres dígitos y no caben: el dueño del diseño
-    lo vio en su tablet —«si te fijas en el título, se están cortando los
-    recursos»— con el 120 partido por la mitad y el ánimo directamente fuera.
-
-    Las medidas del prototipo se quedan como mínimos y dejan de ser topes: cada
-    placa crece con lo que tiene que decir, y el conjunto no pasa de la columna
-    de lectura. Una cifra cortada es un dato que el juego no está dando. */
-.hud-compact-header {
-  width: auto;
-  max-width: min(334px, calc(100% - 54px));
-  height: auto;
-  min-height: 50px;
-}
-.hud-compact-date { flex: 0 0 auto; }
-.hud-compact-figures-plate { flex: 0 1 auto; }
-.hud-compact-figures { flex-wrap: nowrap; }
