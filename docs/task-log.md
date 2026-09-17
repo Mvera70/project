@@ -64,6 +64,14 @@ traído aquí.
 
 ## 2. El tablero
 
+**OBS-01 · batería de observación con tres agentes Luna: ejecutada y auditada.**
+Informes separados de día, noche y fauna, más revisión de geometría por el
+coordinador. El bundle inicial coincidió con una edición incompleta de UI y
+falló al arrancar; las tomas usan el control G-24 identificado por hash.
+Nueve tomas, 627 PNG capturados, selección visual revisada y trazas contrastadas.
+No se ha modificado el juego. Conclusiones y protocolo repetible en
+[OBS-01](observations/OBS-01/conclusions.md).
+
 **G-24 · vado 3D: hecho.** La hilera blanca junto al río no eran afloramientos
 de roca: el renderer ignoraba `TERRAIN_CODE.ford` y volvía a adivinar el cruce
 desde la orilla con una búsqueda de hasta catorce celdas. Ahora dibuja únicamente
@@ -275,6 +283,13 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+OBS-01: día 15/15 y 21/21 puestos alcanzados (11/20 y 43/60); noches vivas
+22/22 y 21/22 completas (7/1 y 43/60), ticks 0→3 y 2832→2835. Residente 155
+pendiente al amanecer del tick 2834. Nueve tomas sin errores ni penetraciones
+muestreadas. Gallina y peces observados; cuatro especies y ancianos sin evaluar.
+WLD-01 confirma mediante GLB transformado que una losa de G-24 sigue fuera de
+su celda, aunque su raíz esté bien colocada: la conclusión visual previa era excesiva.
+
 G-24: semilla 7/año 1, dos celdas de vado `(38,52)` y `(39,52)` frente al campo
 en `x=34…36`; 17 fotogramas revisados, 2 personas y 3 animales. Cero errores,
 penetraciones, centros bloqueados o deriva. 60/60 pruebas dirigidas, typecheck
@@ -400,6 +415,12 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**OBS-01:** corregir el pivote del vado y comprobar continuidad del agua; G-24
+arregló la selección de celdas pero no toda la geometría. El regreso del 155
+se reproduce (21/22 noches completas); no queda resuelto porque otra noche del
+mismo tick sí termine. Completar cobertura de ancianos, vaca, cerdo, lobo,
+cuervo, encuentros y gestos cercanos. Ver prioridades en OBS-01.
 
 **IA-12:** regreso nocturno pendiente del residente 155, semilla 43/año 60,
 tick 2834 (31/32 durmiendo; 21/22 noches completas). La semilla 11 completa 22/22.
