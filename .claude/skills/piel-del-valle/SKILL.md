@@ -116,6 +116,12 @@ Dos medidas que hay que respetar y que se descubrieron pintándolo:
 
 ## 7. Lo que flota sobre la bandeja lee su altura
 
+> **Provisional.** Esta sección describe el parche de UI-V10, que el dueño del
+> diseño juzgó «una chapuza». El plan que lo sustituye está en
+> `docs/ui-redesign/piel/plan-voz.md`: **nada flota**, la bandeja enseña una
+> frase de altura fija elegida por una cola, y esta sección se reescribe cuando
+> VZ-02 llegue a `main`. Hasta entonces, no añadir ninguna pieza flotante nueva.
+
 Nada que aparezca encima de la bandeja lleva un `bottom` fijo. La bandeja mide
 **lo que mida su texto** —crece a dos líneas cuando la aldea tiene dos cosas que
 decir— más el canto de madera, así que cualquier número fijo la tapa justo
