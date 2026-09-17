@@ -11,7 +11,7 @@ import { visibleBuildings } from '@derive/visible-buildings';
 // peor que uno alineado: aquí el mismo valle da siempre el mismo bosque.
 
 import {
-  InstancedMesh, Group, Matrix4, Quaternion, Vector3,
+  Box3, InstancedMesh, Group, Matrix4, Quaternion, Vector3,
   type BufferGeometry, type Color, type Material, type Object3D,
 } from 'three';
 import type { Building, ValleyMap } from '@engine/state';
@@ -122,9 +122,10 @@ export function scatterOn(
     // Un arbol dentro de una casa es un arbol dentro de una casa. El motor deja
     // levantar sobre bosque talado sin cambiar el terreno de la celda, asi que
     // esto hay que mirarlo aqui.
-    if (map.terrain[cell] === terrain && taken?.has(cell) !== true) cells.push(cell);
+    if (map.terrain[cell] === terrain && taken?.has(cell) !== true
+      && (terrain !== TERRAIN_CODE.rock || (map.path[cell] ?? 0) === 0)) cells.push(cell);
   }
-  return scatterCells(map, source, cells, palette);
+  return scatterCells(map, source, cells, palette, terrain === TERRAIN_CODE.rock);
 }
 
 /**
@@ -174,11 +175,19 @@ export function shoreCells(map: ValleyMap, taken?: ReadonlySet<number>): number[
 /** Lo mismo sobre una lista de celdas ya elegida. */
 export function scatterCells(
   map: ValleyMap, source: Object3D, cells: readonly number[], palette?: Palette,
+  containInCell = false,
 ): Forest {
   const tree = source;
   const group = new Group();
   group.name = 'Valley_Forest';
   const pieces = piecesOf(tree);
+  // Una roca bloquea su celda, no la vecina. Su caja girada y escalada debe
+  // caber entera; comprobar solo el origen dejaba piedras dentro de caminos.
+  const bounds = new Box3();
+  if (containInCell) for (const piece of pieces) {
+    piece.geometry.computeBoundingBox();
+    if (piece.geometry.boundingBox !== null) bounds.union(piece.geometry.boundingBox);
+  }
   const owned: InstancedMesh[] = [];
   const tinted: Material[] = [];
   const total = cells.length * PER_CELL;
@@ -201,7 +210,17 @@ export function scatterCells(
       let slot = 0;
       for (const cell of cells) {
         for (let extra = 0; extra < PER_CELL; extra += 1) {
-          const { x, z, scale, facing } = scatterTransform(map.width, cell, extra);
+          const scattered = scatterTransform(map.width, cell, extra);
+          const { facing } = scattered;
+          let { x, z, scale } = scattered;
+          if (containInCell && !bounds.isEmpty()) {
+            const rotated = bounds.clone().applyMatrix4(new Matrix4().makeRotationY(facing));
+            const span = rotated.getSize(new Vector3());
+            scale = Math.min(scale, 1 / Math.max(span.x, span.z));
+            const left = cell % map.width, top = Math.floor(cell / map.width);
+            x = Math.max(left - rotated.min.x * scale, Math.min(x, left + 1 - rotated.max.x * scale));
+            z = Math.max(top - rotated.min.z * scale, Math.min(z, top + 1 - rotated.max.z * scale));
+          }
           position.set(x, 0, z);
           // Girar cada uno lo suyo: una copa asimétrica repetida sin girar deja
           // un patrón que se ve desde arriba como un papel pintado.

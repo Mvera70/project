@@ -46,6 +46,8 @@ interface GablePrimitive extends PrimitiveBase {
 interface SpherePrimitive extends PrimitiveBase {
   type: 'sphere';
   radius: number;
+  /** Tamaño local opcional antes del giro; las recetas antiguas conservan su esfera. */
+  dimensions?: Vec3;
   segments: number;
   rings: number;
 }
@@ -522,6 +524,7 @@ export function parseRecipe(value: unknown): ArtRecipe {
     };
     if (type === 'sphere') return {
       ...base, type, radius: numberValue(item.radius, `recipe.primitives[${index}].radius`, true),
+      ...(item.dimensions === undefined ? {} : { dimensions: vec3(item.dimensions, `recipe.primitives[${index}].dimensions`, true) }),
       segments: integer(item.segments, `recipe.primitives[${index}].segments`, 3),
       rings: integer(item.rings, `recipe.primitives[${index}].rings`, 2),
     };

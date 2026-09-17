@@ -64,6 +64,10 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-25 · roca entregada:** afloramiento facetado y colocación completa dentro de
+su celda, sin ocupar caminos ni solares. 50 pruebas, typecheck y lint verdes.
+Captura real revisada; pendiente continuar vegetación. [Informe](graphics-rounds/G-25.md).
+
 **G-25 · paisaje, primer modelo entregado:** árbol tree rehecho con horquillas
 y copa facetada asimétrica. GLB publicado selectivamente, captura real revisada,
 48 pruebas, typecheck y lint verdes. [Informe](graphics-rounds/G-25.md).
@@ -300,6 +304,9 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**G-25 rock:** 72→186 triángulos, dos materiales/mallas, 17 496 bytes.
+Contención comprobada sobre vértices del GLB en todas las instancias del mapa de prueba.
+
 **G-25 tree:** 188→352 triángulos; 3 materiales/mallas; 9 868→30 428 bytes.
 Huella física del tronco idéntica al GLB anterior. Sin medición móvil nueva.
 
@@ -445,7 +452,7 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**G-25 paisaje:** siguen pendientes rocas, vegetación baja/ribera y otras siluetas
+**G-25 paisaje:** rocas entregadas; siguen pendientes vegetación baja/ribera y otras siluetas
 de árboles; requieren respetar accesos y campos. El vado desplazado sigue abierto.
 La batería OBS-02 se aplaza por decisión del usuario; se retoma modelado 3D.
 

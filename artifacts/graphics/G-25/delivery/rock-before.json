@@ -1,0 +1,58 @@
+{
+  "id": "rock",
+  "artifactRound": "G-10",
+  "status": "study",
+  "recipe": "art/recipes/rock/rock.json",
+  "generator": "tools/art/blender-build.py",
+  "blenderVersion": "5.2.1 LTS",
+  "approved": {
+    "runId": "2026-09-10T23-04-03-254Z-53604",
+    "directory": "artifacts/graphics/G-10/approved/aea5e25acbfaaee0"
+  },
+  "bounds": {
+    "min": [
+      -0.303109,
+      -0.166667,
+      -0.373333
+    ],
+    "max": [
+      0.528979,
+      0.533333,
+      0.35
+    ],
+    "size": [
+      0.832088,
+      0.7,
+      0.723333
+    ]
+  },
+  "recipeSha256": "E94AD4466491C38D1F0943905E6685C7C5F719DA465DDA00DA2DD99886EBE277",
+  "materials": [
+    "stone",
+    "dark"
+  ],
+  "clips": [],
+  "motion": [],
+  "connectors": [],
+  "statistics": {
+    "objects": 3,
+    "meshes": 2,
+    "materials": 2,
+    "triangles": 72
+  },
+  "hashes": {
+    "rock.blend": "B6723AF745D3AF37C9794617D5B2F64BEAA6CF25AED17E457991DF97D3990F3D",
+    "rock.glb": "AEA5E25ACBFAAEE0EE7C909BC5BCDAE055AE0F97C4579B2DD9A26843B9591426",
+    "rock-blender.png": "FE1B35994C1234CDFE329B432B8AD836D293892C4EC9C6FC132479BD70AE91F9",
+    "capture-1.png": "49EA0A66861366ADD60D7529E1833D48F29E261B280AB738EDFC34C7163BA416",
+    "capture-1-gray.png": "CB441B7F7C55AB4BB0304CD99A8DE361DF49C809E8172D0E2556B0524C4C94F1",
+    "capture.json": "F16EE259BEB6F9FD8509CFDA6C0E8A22430EC0775B75613A9C0BCBDCFF2F18E2",
+    "build.json": "BE61A4664AC2FCDFD135F5DF88538BB694D8149F3B2A6170617285D40657A5E6",
+    "validation.json": "86A9E4A49E8C0FE07FE127A76073599D4F36EBD80A1554618928FFB2341D9C81"
+  },
+  "provenance": {
+    "kind": "original",
+    "source": "Original rock authored for The Valley G-10",
+    "license": "Project original"
+  }
+}

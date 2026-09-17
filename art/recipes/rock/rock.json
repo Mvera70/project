@@ -12,7 +12,7 @@
       1,
       1
     ],
-    "note": "G-10, lote del mundo. Dos masas de piedra, sin simetria, para que un afloramiento no parezca una pelota. Se instancia sobre el terreno rocoso."
+    "note": "G-25: afloramiento de tres masas facetadas achatadas y dos fragmentos, con caras planas y alturas asimétricas. Reparto confinado al terreno rocoso."
   },
   "materials": [
     {
@@ -22,7 +22,7 @@
     },
     {
       "name": "dark",
-      "role": "soil",
+      "role": "timberDark",
       "roughness": 0.9
     }
   ],
@@ -40,31 +40,126 @@
   "primitives": [
     {
       "type": "sphere",
-      "name": "Rock_Big",
+      "name": "Rock_Fragment_0",
       "location": [
-        0,
-        0,
-        0.55
+        -0.22,
+        0.02,
+        0.6
       ],
-      "radius": 1.05,
-      "segments": 6,
+      "radius": 1,
+      "dimensions": [
+        1.55,
+        1.45,
+        1.55
+      ],
+      "rotationDegrees": [
+        4,
+        -12,
+        18
+      ],
+      "segments": 7,
       "rings": 4,
-      "smooth": true,
+      "smooth": false,
       "material": "stone",
       "parent": "Root"
     },
     {
       "type": "sphere",
-      "name": "Rock_Small",
+      "name": "Rock_Fragment_1",
       "location": [
-        1.05,
-        0.5,
-        0.35
+        0.63,
+        0.13,
+        0.28
       ],
-      "radius": 0.62,
+      "radius": 1,
+      "dimensions": [
+        1.24,
+        0.92,
+        0.8
+      ],
+      "rotationDegrees": [
+        8,
+        14,
+        -24
+      ],
       "segments": 6,
       "rings": 4,
-      "smooth": true,
+      "smooth": false,
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Rock_Fragment_2",
+      "location": [
+        -0.37,
+        0.76,
+        0.24
+      ],
+      "radius": 1,
+      "dimensions": [
+        1.1,
+        0.73,
+        0.66
+      ],
+      "rotationDegrees": [
+        -6,
+        7,
+        31
+      ],
+      "segments": 6,
+      "rings": 4,
+      "smooth": false,
+      "material": "dark",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Rock_Fragment_3",
+      "location": [
+        -0.87,
+        -0.55,
+        0.12
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.53,
+        0.42,
+        0.39
+      ],
+      "rotationDegrees": [
+        9,
+        5,
+        16
+      ],
+      "segments": 6,
+      "rings": 4,
+      "smooth": false,
+      "material": "stone",
+      "parent": "Root"
+    },
+    {
+      "type": "sphere",
+      "name": "Rock_Fragment_4",
+      "location": [
+        0.64,
+        -0.62,
+        0.1
+      ],
+      "radius": 1,
+      "dimensions": [
+        0.46,
+        0.33,
+        0.29
+      ],
+      "rotationDegrees": [
+        4,
+        -6,
+        -8
+      ],
+      "segments": 6,
+      "rings": 4,
+      "smooth": false,
       "material": "dark",
       "parent": "Root"
     }
@@ -72,19 +167,19 @@
   "clips": [],
   "connectors": [],
   "referenceRender": {
-    "width": 390,
+    "width": 780,
     "height": 640,
     "cameraLocation": [
-      4.0,
-      -5.0,
-      3.2
+      2,
+      -2.5,
+      1.7
     ],
     "cameraTarget": [
       0,
       0,
-      0.6
+      0.2
     ],
-    "orthoScale": 5.6,
+    "orthoScale": 1.4,
     "worldRole": "sky"
   }
 }

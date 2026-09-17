@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "assetId": "rock",
+  "runId": "2026-09-17T10-07-11-158Z-18616",
+  "status": "pass",
+  "durationMs": 17622,
+  "candidateSha256": "77CAD1068ECF96A6398D2ADA23B95A8FC89D8D92F92CD0261BDF3D23F3AA250E",
+  "glb": {
+    "version": 2,
+    "declaredLength": 17496,
+    "nodeNames": [
+      "rock_dark",
+      "rock_stone",
+      "Root"
+    ],
+    "meshNames": [
+      "rock_dark_Mesh",
+      "rock_stone_Mesh"
+    ],
+    "materialNames": [
+      "dark",
+      "stone"
+    ],
+    "animationNames": [],
+    "finitePositionAccessors": 2,
+    "statistics": {
+      "objects": 3,
+      "meshes": 2,
+      "materials": 2,
+      "triangles": 186
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T10:09:51.796Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-07-11-158Z-18616\\candidate\\rock.glb",
+      "assetUrl": "/artifacts/graphics/G-25/runs/2026-09-17T10-07-11-158Z-18616/candidate/rock.glb",
+      "viewport": {
+        "width": 780,
+        "height": 640,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-07-11-158Z-18616\\three\\capture-1.png",
+        "sha256": "FC89697B2EA6CD0D21617CA6C5A1DBB9B49C2A58546C2750E4A2AEB685D45796",
+        "dimensions": {
+          "width": 780,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-07-11-158Z-18616\\three\\capture-1-gray.png",
+          "sha256": "155660D5D581FBB7ED310C0017B5B5651D614C56FDF414964C48E8EAE187CC1D",
+          "dimensions": {
+            "width": 780,
+            "height": 640
+          }
+        },
+        "durationMs": 14549,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:53711/artifacts/graphics/G-25/runs/2026-09-17T10-07-11-158Z-18616/candidate/rock.glb",
+          "viewport": {
+            "width": 780,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "rock_dark",
+            "rock_stone"
+          ],
+          "bounds": {
+            "min": [
+              -0.383658,
+              -0.052073,
+              -0.398513
+            ],
+            "max": [
+              0.426429,
+              0.452073,
+              0.261055
+            ],
+            "size": [
+              0.810087,
+              0.504145,
+              0.659567
+            ]
+          },
+          "loadDurationMs": 175
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-07-11-158Z-18616\\three\\capture-2.png",
+        "sha256": "FC89697B2EA6CD0D21617CA6C5A1DBB9B49C2A58546C2750E4A2AEB685D45796",
+        "dimensions": {
+          "width": 780,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-07-11-158Z-18616\\three\\capture-2-gray.png",
+          "sha256": "155660D5D581FBB7ED310C0017B5B5651D614C56FDF414964C48E8EAE187CC1D",
+          "dimensions": {
+            "width": 780,
+            "height": 640
+          }
+        },
+        "durationMs": 150,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:53711/artifacts/graphics/G-25/runs/2026-09-17T10-07-11-158Z-18616/candidate/rock.glb",
+          "viewport": {
+            "width": 780,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": null,
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Root",
+            "Scene",
+            "rock_dark",
+            "rock_stone"
+          ],
+          "bounds": {
+            "min": [
+              -0.383658,
+              -0.052073,
+              -0.398513
+            ],
+            "max": [
+              0.426429,
+              0.452073,
+              0.261055
+            ],
+            "size": [
+              0.810087,
+              0.504145,
+              0.659567
+            ]
+          },
+          "loadDurationMs": 34
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:53711/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=780&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 282,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-25\\runs\\2026-09-17T10-07-11-158Z-18616\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

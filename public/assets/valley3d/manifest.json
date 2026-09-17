@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T09:56:47.354777+00:00",
-  "invocation": "G-25: publicación selectiva de tree; conserva otros recursos",
+  "generatedAt": "2026-09-17T10:10:12.946463+00:00",
+  "invocation": "G-25: publicación selectiva por modelo",
   "assets": [
     {
       "id": "axis-marker",
@@ -61,7 +61,7 @@
     {
       "id": "rock",
       "file": "rock.glb",
-      "sha256": "AEA5E25ACBFAAEE0EE7C909BC5BCDAE055AE0F97C4579B2DD9A26843B9591426",
+      "sha256": "77CAD1068ECF96A6398D2ADA23B95A8FC89D8D92F92CD0261BDF3D23F3AA250E",
       "motion": []
     },
     {

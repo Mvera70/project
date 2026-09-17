@@ -37,6 +37,12 @@ def create_primitive(spec, materials):
             segments=spec['segments'], ring_count=spec['rings'],
             radius=spec['radius'], location=location,
         )
+        # Elipsoides para piedras y matas. Sin dimensions se conserva la
+        # construcción histórica, incluida su orientación, byte a byte geométrico.
+        if 'dimensions' in spec:
+            shaped = bpy.context.view_layer.objects.active
+            shaped.dimensions = tuple(spec['dimensions'])
+            shaped.rotation_euler = tuple(math.radians(value) for value in spec['rotationDegrees'])
     elif spec['type'] == 'cylinder':
         bpy.ops.mesh.primitive_cylinder_add(
             vertices=spec['vertices'], radius=spec['radius'], depth=spec['depth'],
