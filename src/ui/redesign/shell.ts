@@ -168,7 +168,7 @@ export function createShell(actions: UiActions): ShellHandle {
   // que la gente y la ficha salían en un papel y la crónica en otro. Lo dijo
   // el dueño del diseño: «los fondos que hay detrás de los textos, usa siempre
   // el mismo; el de la crónica es el bueno». `skin-paper--page` es ese papel.
-  content.className = 'ui-shell-content skin-paper skin-paper--page';
+  content.className = 'ui-shell-content skin-paper skin-paper--page skin-torn-top';
   content.hidden = true;
   content.tabIndex = -1;
   // Región etiquetada, no un modal (plan §3): no atrapa el foco, y quien
@@ -200,7 +200,9 @@ export function createShell(actions: UiActions): ShellHandle {
   // usando `root.append(...)`/`messageSlot.append(hint)`, que añaden al
   // final, así que el orden de pintado queda: borde, hoja, aviso o pista.
   const message = document.createElement('div');
-  message.className = 'ui-shell-message';
+  // VZ-2 · el canto rasgado, igual que la hoja de gente y la página de la
+  // crónica: una sola clase para las tres superficies (`skin.css`).
+  message.className = 'ui-shell-message skin-torn-top';
 
   const trayEdge = document.createElement('div');
   trayEdge.className = 'skin-scroll-edge';

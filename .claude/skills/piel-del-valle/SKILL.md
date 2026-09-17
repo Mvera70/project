@@ -56,10 +56,13 @@ Los cuatro llevan la textura multiplicada (`--skin-parchment-texture`), y el ton
 lo manda el token: la textura sólo aporta grano. Si una superficie lleva color
 propio en un `background`, está mal; lleva una clase.
 
-**La única excepción viva, y va con su motivo:** la bandeja del valle es
-`--skin-parchment-deep` y no `--skin-page`, porque el prototipo 01 la pinta más
-oscura que la página de la crónica y es mobiliario de la pantalla del valle, no
-una superficie de lectura. Cualquier excepción nueva se escribe aquí o no existe.
+**Y no queda ninguna excepción.** La bandeja del valle era
+`--skin-parchment-deep` —más oscura que la página, como la pinta el prototipo
+01— y el dueño del diseño lo cortó viendo las tres pestañas seguidas: «que cada
+sección tenga un borde diferente y además el fondo no sea de la misma tonalidad
+ni textura, no me gusta nada; queda fatal cuando cambias entre pestañas». Es una
+desviación deliberada del prototipo y la única: un solo papel pesa más que la
+fidelidad de un tono. Cualquier excepción nueva se escribe aquí o no existe.
 
 ## 3. La cabecera: una, la del valle
 
@@ -93,28 +96,63 @@ para cuatro cifras.
 
 Las cifras que se alinean llevan `font-variant-numeric: tabular-nums`.
 
-## 6. El canto de la bandeja, y la lección que dejó
+## 6. El canto: el papel se desgarra, y es el mismo en todas
 
-El canto es un **listón de madera clara** (`--skin-batten-lit` / `--skin-batten` /
-`--skin-batten-deep`, muestreados del prototipo 01), no la madera casi negra de
-la barra de navegación.
+**Toda superficie de papel que sube desde el borde de abajo lleva el mismo
+canto rasgado** (`.skin-torn-top`): la bandeja del valle, la hoja de gente, la
+página de la crónica, la decisión, el epitafio y el parte de bienvenida. Seis
+superficies, una clase.
 
-Y se dibuja **en tres piezas**: hombro izquierdo de 80 px, hombro derecho de
-80 px y una franja llana estirada en el medio. La razón es la directriz: con una
-sola tapa estirada al 100 % el arco se aplana con la pantalla, y a 750 px era una
-recta con dos ganchos en las puntas. **Una pieza cuya forma cambia con el ancho
-no es un estándar.** Cuando algo dibujado tenga que cruzar la pantalla, piensa en
-nueve piezas: las esquinas en medida fija, el medio estirado.
+Antes había tres cantos para lo mismo —un listón de madera curvo en la bandeja,
+un corte recto con franja de fusión de 64 px en la crónica, y una esquina
+redondeada de 16 px con sombra en la hoja de gente— y el dueño del diseño
+eligió éste de entre tres alternativas que se le enseñaron en un lienzo: «me
+gusta más el borde como de hoja rota».
 
-Dos medidas que hay que respetar y que se descubrieron pintándolo:
+Lo que se retira con él: la franja de fusión, la esquina redondeada, la sombra
+de la hoja, el filete recto de su canto y el segundo tono de papel. Cinco reglas
+menos.
 
-- El relleno de la tapa lleva el color con el que la bandeja se pinta **de
-  verdad** (`#CBB59A`), no el del token (`#D9C2A5`): la textura lo oscurece, y
-  con el token plano se veía el escalón donde acaba la tapa.
-- Los círculos de velocidad dejan de 12 a 19 px de hierba sobre la madera en el
-  prototipo. Si se apoyan en el listón, el papel los muerde.
+**Cómo está hecho, y las tres trampas que costó:**
 
-## 7. El valle habla desde un sitio, y nada flota
+- **Es un azulejo que se repite, no una pieza que se estira.** 130 × 14 px con
+  `repeat-x`, de `tools/ui/torn-edge.py` con semilla fija —escrito, no
+  calculado, como los `deckle`—. Un desgarro repetido tiene la misma forma a
+  390 y a 1240; el listón de madera se estiraba con
+  `background-size: 100% 100%` y a 750 px era «una recta con dos ganchos».
+- **Es una máscara sobre la hoja, no una tira dibujada encima.** Una tira en
+  `::after` colocada por encima del canto **la recorta `overflow: auto`**, y
+  tres de las seis superficies lo llevan: medido, el epitafio y la hoja de
+  gente salían con el canto recto mientras la bandeja y la crónica salían
+  rasgadas. La máscara no la recorta el desplazamiento. Y recortando la propia
+  hoja hay **una sola superficie**: el papel y su grano llegan hasta el canto y
+  no hay ningún tono que igualar a mano, que es lo que el listón obligaba
+  (`#CBB59A` contra el token `#D9C2A5`).
+- **Pero una máscara recorta a sus descendientes**, y la crónica vive anidada
+  dentro de la hoja de la carcasa con un velo `position: fixed` desde UI-R3:
+  con la máscara puesta, su página quedaba recortada a los 33 px que esa hoja
+  mide cuando su contenido está fuera de flujo. De ahí la única excepción, con
+  `:has(.chronicle-scrim)`, escrita y medida en `skin.css`.
+
+## 7. Cerrar: una cruz pequeña, o deslizar
+
+Una sección se cierra con **una cruz de 19 px dentro de un toque de 44**, sobre
+el papel y no flotando encima del valle, o **deslizando hacia abajo**. Las dos
+cosas, en las dos secciones. Lo pidió así el dueño del diseño: «el botón de
+close no lo puedes poner arriba a la derecha; tiene que ir como una cruz
+pequeñita o si no la opción de poder deslizar hacia abajo».
+
+Con esto desaparece la placa con la palabra `CLOSE` que la crónica tenía arriba
+a la derecha, y las tres formas de cerrar que §11 listaba como pendientes se
+quedan en una. La salida de U-14 no depende de la cruz: la da la pestaña del
+valle, que está siempre a la vista.
+
+Y un detalle que costó una captura: la página de la crónica se vacía con
+`replaceChildren()` en cada repintado, así que la cruz se monta con
+`replaceChildren(close)` y no con un `append` previo — montada antes, el primer
+repintado se la llevaba por delante.
+
+## 8. El valle habla desde un sitio, y nada flota
 
 **Nada transitorio flota sobre el valle.** La bandeja enseña **una** frase bajo
 la hoja de roble, con un hueco de **altura fija de dos líneas**, y quién habla lo
@@ -154,7 +192,7 @@ Y un detalle que costó una captura: en una caja `flex` un pseudo-elemento es
 **otro ítem**, no texto en línea. El `›` de la pista puesto en el párrafo salía
 flotando a la derecha, a media altura; va dentro del `span` de la frase.
 
-## 8. El primer fotograma no es de otro juego
+## 9. El primer fotograma no es de otro juego
 
 El 2D (`?render=canvas`) es la puerta de vuelta desde G-12, no el primer
 fotograma. Mientras Three se descarga, el lienzo 2D va oculto y el hueco espera
@@ -169,7 +207,7 @@ tocando esas coordenadas en el 3D. Con el 2D oculto, el primero visible es el 3D
 antes de que `size()` lo estire— y el «centro» pasó a ser la esquina de arriba.
 Cuando una prueba mida un lienzo, **espera a que esté dimensionado**.
 
-## 9. Qué no se inventa
+## 10. Qué no se inventa
 
 - **Ni un color ni una medida sin muestrear el prototipo.** Los prototipos están
   en `docs/ui-redesign/ui-prototypes/`. Muestrear es abrir el PNG y leer el
@@ -179,7 +217,7 @@ Cuando una prueba mida un lienzo, **espera a que esté dimensionado**.
 - **Ni un dibujo a mano si está dibujado en el prototipo.** Se calca; cómo, en
   la skill `calcar-iconos`.
 
-## 10. El bucle de comprobación, y el error que más caro sale
+## 11. El bucle de comprobación, y el error que más caro sale
 
 **Una medida no es una captura.** En UI-V8 verifiqué la maquetación midiendo
 cajas en el navegador —todas correctas— y subí un canto que en la tablet era una
@@ -200,12 +238,13 @@ difícil, tienes que revisar el trabajo con una simple captura». Así que:
    pegan una encima de otra.
 5. Cerrar con `npm run lint` y las pruebas rápidas de interfaz.
 
-## 11. Lo que aún no está estandarizado
+## 12. Lo que aún no está estandarizado
 
 Se escribe aquí para que no se pierda, no porque esté bien:
 
-- **Tres formas de cerrar**: un botón `CLOSE` con texto en la crónica, una `×` en
-  la hoja de gente, y `BACK TO THE LIST` en la ficha. Son tres piezas para el
-  mismo verbo y hay que quedarse con una.
-- **La bandeja no tiene canto en las hojas** de gente y ficha, y sí en el valle.
-  Puede estar bien —son superficies distintas— pero nadie lo ha decidido.
+- **`BACK TO THE LIST` en la ficha de una persona.** Las otras dos formas de
+  cerrar se unificaron en la cruz de §7; ésta se queda porque no cierra, vuelve
+  a la lista, y nadie ha decidido si eso merece una pieza propia.
+- **El ornamento de la hoja de roble** sólo está en la bandeja del valle, donde
+  el prototipo 01 lo puso. En la crónica y en la gente el sitio lo ocupa su
+  propio encabezado. Parece correcto, pero es una asimetría sin decidir.

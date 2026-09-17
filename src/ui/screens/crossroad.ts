@@ -45,8 +45,11 @@ const STYLE = `
    vacía de 300 px encima del título. Y la altura la pone el contenido: la
    página ocupa lo que necesita y esta franja le añade la fusión, en vez de un
    número fijo que a veces sobra. */
-.crossroad-fade { flex: 0 0 64px;
-  background: linear-gradient(to bottom, transparent 0, var(--skin-page) 100%); }
+/* VZ-2 · el hueco por el que se ve el valle. Era una franja de fusión con
+   degradado; ahora la transición la hace el canto rasgado de la hoja
+   (\`.skin-torn-top\`, \`skin.css\`), el mismo de las tres secciones, y esto
+   sólo reserva el sitio. */
+.crossroad-fade { flex: 0 0 64px; }
 /* La página. */
 .crossroad { box-sizing: border-box; width: 100%; overflow: auto;
   padding: 0 20px max(20px, env(safe-area-inset-bottom));
@@ -227,7 +230,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
   const fade = document.createElement('div');
   fade.className = 'crossroad-fade';
   const card = document.createElement('section');
-  card.className = 'crossroad';
+  card.className = 'crossroad skin-torn-top';
   // UI-V5c · el sello de lacre a la izquierda del título, como el documento
   // sellado del prototipo 02 (§3.5). El árbol sale del sprite incrustado en
   // `index.html`: un `<use>` a un fichero externo no carga bajo `file://`.

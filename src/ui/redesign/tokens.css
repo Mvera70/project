@@ -115,6 +115,20 @@
      el grano lo da la textura, el tono lo sigue mandando la paleta. */
   --skin-parchment-texture: url('./parchment.png');
 
+  /* VZ-2 · **El canto rasgado de la hoja**, de `tools/ui/torn-edge.py` (semilla
+     fija, como los `deckle`). El dueño del diseño eligió este de las tres
+     alternativas que se le enseñaron: «me gusta más el borde como de hoja
+     rota». Es un azulejo de 130 × 14 que se **repite**, no una pieza que se
+     estira: ahí está la lección del listón de madera, que con
+     `background-size: 100% 100%` a 750 px era una recta con dos ganchos.
+
+     El primero es la **máscara**: recorta la hoja por el desgarro, así que el
+     papel y su grano llegan hasta el canto y no hay dos superficies cuyo tono
+     haya que igualar a mano. El segundo es la **tinta**, 0,7 px por dentro del
+     canto para que la máscara no se la coma. */
+--skin-torn-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='14' viewBox='0 0 130 14'><path d='M0 5.0 L9 5.58 L18 3.3 L27 4.61 L36 5.98 L45 5.31 L54 3.8 L63 6.87 L72 4.42 L81 5.55 L90 5.37 L99 4.8 L108 4.1 L117 3.28 L130 5.0 L130 14 L0 14 Z' fill='%23000'/></svg>");
+  --skin-torn-ink: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='14' viewBox='0 0 130 14'><path d='M0 5.7 L9 6.28 L18 4.0 L27 5.31 L36 6.68 L45 6.01 L54 4.5 L63 7.57 L72 5.12 L81 6.25 L90 6.07 L99 5.5 L108 4.8 L117 3.98 L130 5.7' fill='none' stroke='%231B1613' stroke-opacity='.3' stroke-width='1.1'/></svg>");
+
   /* Bordes rasgados, de `tools/ui/deckle.py` (semilla fija). Escritos, no
      calculados: un borde que cambia entre fotogramas tiembla, y la
      comparativa contra el prototipo tiene que dar siempre la misma imagen. */

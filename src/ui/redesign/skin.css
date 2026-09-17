@@ -396,47 +396,75 @@
 /* ------------------------------------------------- borde de la bandeja */
 
 /**
- * El borde curvado superior de la bandeja (prototipo 01).
+ * VZ-2 · **El canto de la hoja: el papel se desgarra.**
  *
- * Ya no hace falta el encargo de `public/ui/art/scroll-edge.svg`
- * (`encargo-arte-piel.md` §3): el canto se dibuja aquí, calcado del
- * prototipo 01. La clase sigue siendo la misma, así que si algún día llega un
- * SVG pintado a mano basta cambiar estas tres piezas.
+ * Las tres secciones tenían tres cantos —el listón de madera curvo en la
+ * bandeja, un corte recto con franja de fusión en la crónica, y una esquina
+ * redondeada con sombra en la hoja de gente— y dos tonos de papel. El dueño
+ * del diseño lo cortó mirando la tablet: «que cada sección tenga un borde
+ * diferente y además el fondo no sea de la misma tonalidad ni textura, no me
+ * gusta nada; queda fatal cuando cambias entre pestañas». De las tres
+ * alternativas que se le enseñaron eligió ésta.
+ *
+ * **Es una máscara sobre el propio papel, no una tapa encima.** El listón de
+ * madera llevaba su propio relleno de pergamino y había que igualarlo a mano
+ * al color con el que la bandeja se pinta de verdad (`#CBB59A` contra el token
+ * `#D9C2A5`). Recortando la hoja con el desgarro hay **una sola superficie**:
+ * el papel y su grano llegan hasta el canto y no hay ningún tono que igualar.
+ *
+ * **Y el azulejo se repite en vez de estirarse**, que es la lección de las dos
+ * rondas anteriores: el listón estirado con `background-size: 100% 100%` tenía
+ * una forma distinta en cada pantalla, y eso no es un estándar. 130 px de
+ * desgarro repetidos con `repeat-x` son el mismo desgarro a 390 y a 1240.
+ *
+ * `.skin-torn-top` es la clase: la lleva la bandeja, la hoja de gente, la
+ * página de la crónica y las tres superposiciones. Una sola pieza para todas.
  */
-.skin-scroll-edge {
-  /* **UI-V8b · el canto se corta en tres, y el hombro no se estira.**
-     La primera versión estiraba una sola tapa con `background-size: 100% 100%`
-     y en una tablet quedaba en evidencia: los 31 px de flecha repartidos en
-     750 px de ancho son **una recta con dos ganchos en las puntas**, no el palo
-     doblado del prototipo. La proporción del prototipo es 31 px de flecha en
-     390 de ancho, y un canto que cambia de forma con la pantalla es
-     exactamente lo que la directriz de esta ronda prohíbe.
+.skin-torn-top {
+  position: relative;
+  /* El desgarro recorta la hoja por su canto. Dos capas: el azulejo, repetido
+     en horizontal, talla los dientes en los 14 px de arriba; la segunda mide
+     la caja entera y arranca 13 px más abajo, así que tapa desde el desgarro
+     hasta el suelo y lo que sobra se recorta.
 
-     Así que se corta en tres, como un borde de nueve piezas: **el hombro mide
-     80 px en cualquier pantalla** —los mismos 80 en los que el prototipo
-     resuelve la subida: a 27 px de la esquina la madera ha subido 6 y a 55 ya
-     está arriba— y lo único que se estira es la franja llana del medio, que es
-     horizontal y estirarla no la deforma. El resultado: la curva es idéntica
-     a 390 y a 1240, y lo que crece es la meseta, que es lo que le pasa a un
-     palo más largo.
+     **Y es una máscara y no una tira dibujada encima**, que fue el primer
+     intento: una tira en `::after` colocada por encima del canto la recorta
+     `overflow: auto`, y tres de estas seis superficies lo llevan. Medido: el
+     epitafio y la hoja de gente salían con el canto recto mientras la bandeja
+     y la crónica salían rasgadas. La máscara no la recorta el desplazamiento.
 
-     Los tres pardos son `--skin-batten-lit`, `--skin-batten` y
-     `--skin-batten-deep`, literales aquí porque `var()` no entra dentro de
-     `url()`. El relleno **no** es `--skin-parchment-deep` sino el color con el
-     que la bandeja se pinta de verdad (`#CBB59A`): el token es `#D9C2A5` y con
-     la textura encima sale más oscuro, y con el token plano se veía el escalón
-     donde acaba la tapa. La franja del medio se solapa 2 px con cada hombro
-     para que el redondeo no deje una costura de un píxel. */
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: var(--ui-batten-height);
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 46'><path d='M0 40.0 C30 40.0 36 9 80 8.6L80 46L0 46Z' fill='%23CBB59A'/><path d='M0 42.6 C30 42.6 36 11.6 80 11.2' fill='none' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M0 40.0 C30 40.0 36 9 80 8.6' fill='none' stroke='%23785A3C' stroke-width='5.4'/><path d='M0 38.3 C30 38.3 36 7.3 80 6.9' fill='none' stroke='%23A9855D' stroke-width='1.4'/></svg>"), url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 46'><path d='M80 40.0 C50 40.0 44 9 0 8.6L0 46L80 46Z' fill='%23CBB59A'/><path d='M80 42.6 C50 42.6 44 11.6 0 11.2' fill='none' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M80 40.0 C50 40.0 44 9 0 8.6' fill='none' stroke='%23785A3C' stroke-width='5.4'/><path d='M80 38.3 C50 38.3 44 7.3 0 6.9' fill='none' stroke='%23A9855D' stroke-width='1.4'/></svg>"), url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 46' preserveAspectRatio='none'><path d='M0 8.6 L4 8.6 L4 46L0 46Z' fill='%23CBB59A'/><path d='M0 11.2 L4 11.2' stroke='%23453624' stroke-width='3.2' stroke-opacity='.45'/><path d='M0 8.6 L4 8.6' stroke='%23785A3C' stroke-width='5.4'/><path d='M0 6.8999999999999995 L4 6.8999999999999995' stroke='%23A9855D' stroke-width='1.4'/></svg>");
-  background-position: left top, right top, center top;
-  background-size: 80px 46px, 80px 46px, calc(100% - 156px) 46px;
-  background-repeat: no-repeat, no-repeat, no-repeat;
+     Lo que sí recorta una máscara es a sus descendientes, y de ahí la
+     excepción de más abajo. */
+  -webkit-mask-image: var(--skin-torn-mask), linear-gradient(#000 0, #000 100%);
+  mask-image: var(--skin-torn-mask), linear-gradient(#000 0, #000 100%);
+  -webkit-mask-size: 130px 14px, 100% 100%;
+  mask-size: 130px 14px, 100% 100%;
+  -webkit-mask-position: left top, left 13px;
+  mask-position: left top, left 13px;
+  -webkit-mask-repeat: repeat-x, no-repeat;
+  mask-repeat: repeat-x, no-repeat;
+  /* Los dientes llegan hasta y 7: sin este respiro, el primer renglón de la
+     sección se queda sin la punta. */
+  padding-top: 10px;
 }
+/**
+ * **La excepción, y va con su medida.** Desde UI-R3 la crónica vive anidada
+ * dentro de la hoja de la carcasa con un velo `position: fixed`, y una máscara
+ * recorta a todos sus descendientes: con la máscara puesta, la página de la
+ * crónica quedaba recortada a los 33 px de alto que esa hoja mide cuando su
+ * contenido está fuera de flujo —el papel sólo pintaba de y 750 a 844 y el
+ * resto era valle—. Cuando la hoja hospeda la crónica no se enmascara: la
+ * página de dentro lleva su propio desgarro y es la que se ve.
+ */
+.ui-shell-content:has(.chronicle-scrim) {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+/* El canto ya no es un elemento: era la tapa de madera, y ahora es el recorte
+   de la propia hoja. Se conserva la clase, vacía y sin caja, porque `shell.ts`
+   la monta y un recorrido la nombra; el día que se retire del DOM, esto se va
+   con ella. */
+.skin-scroll-edge { display: none; }
 
 /** El ornamento de la bandeja: la hoja entre dos filetes cortos. */
 .skin-ornament {

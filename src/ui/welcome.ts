@@ -32,8 +32,11 @@ const STYLE = `
   flex-direction: column; justify-content: flex-end;
   background: rgba(27, 22, 19, .18);
   color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
-.welcome-fade { flex: 0 0 64px;
-  background: linear-gradient(to bottom, transparent 0, var(--skin-page) 100%); }
+/* VZ-2 · el hueco por el que se ve el valle. Era una franja de fusión con
+   degradado; ahora la transición la hace el canto rasgado de la hoja
+   (\`.skin-torn-top\`, \`skin.css\`), el mismo de las tres secciones, y esto
+   sólo reserva el sitio. */
+.welcome-fade { flex: 0 0 64px; }
 .welcome { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
   padding: 0 20px max(24px, env(safe-area-inset-bottom));
   background-color: var(--skin-page);
@@ -118,7 +121,7 @@ export function openWelcome(app: App, digest: Digest): void {
   fade.className = 'welcome-fade';
   fade.setAttribute('aria-hidden', 'true');
   const card = document.createElement('section');
-  card.className = 'welcome skin-paper skin-paper--page';
+  card.className = 'welcome skin-paper skin-paper--page skin-torn-top';
   const h1 = document.createElement('h1');
   h1.textContent = renderUiText('welcome.title');
 

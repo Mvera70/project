@@ -45,8 +45,12 @@ const STYLE = `
    contenido, esta franja sube con el resto y desaparece en cuanto se lee más
    allá — que es lo que promete el plan («la página sube desde el valle»),
    no una mirilla que reaparece a mitad de año. */
-.chronicle-fade { height: 439px; margin-bottom: -1px;
-  background: linear-gradient(to bottom, transparent 0, transparent 379px, var(--skin-page) 439px); }
+/* VZ-2 · **la franja de fusión se queda sin degradado.** Era lo que fundía la
+   página con el valle; ahora eso lo hace el canto rasgado de la hoja
+   (\`.skin-torn-top\`, \`skin.css\`), que es el mismo en las tres secciones. El
+   elemento se conserva porque sigue haciendo el otro trabajo que hacía: dejar
+   ver el valle por encima de la página y subir con ella al desplazar. */
+.chronicle-fade { height: 439px; }
 /* La página en sí: \`--skin-page\` **con su textura** (§3.2), no un color
    plano — \`.skin-paper\`/\`.skin-paper--page\` son del kit (\`skin.css\`, UI-V0)
    y se componen tal cual él las deja, sin redefinir nada aquí. */
@@ -76,11 +80,20 @@ const STYLE = `
    siempre a la vista desde UI-V2 y su pestaña del valle es la misma puerta —
    que es justo lo que U-14 pedía y entonces no existía. Y el deslizamiento
    hacia abajo se queda, como siempre. */
-.chronicle-close { position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px; z-index: 2;
-  min-height: 40px; padding: 6px 14px; border: 1px solid var(--skin-parchment-aged); border-radius: 8px;
-  background: var(--skin-parchment); color: var(--skin-ink); font: 600 13px/1 var(--skin-font-voice);
-  box-shadow: var(--skin-shadow); cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.chronicle-close:active { background: var(--skin-parchment-deep); }
+/* VZ-2 · **una cruz pequeña sobre el papel, y no una placa flotando arriba a
+   la derecha.** Lo dijo el dueño del diseño: «el botón de close no lo puedes
+   poner arriba a la derecha; tiene que ir como una cruz pequeñita o si no la
+   opción de poder deslizar hacia abajo». Las dos cosas: esta cruz es la misma
+   que la hoja de gente ya tenía —cuarenta y cuatro píxeles de toque con la
+   aspa dibujada pequeña— y el deslizamiento hacia abajo sigue donde estaba.
+   Va dentro de la página y sube con ella: la salida de U-14 no depende de
+   esto, la da la pestaña del valle, que está siempre a la vista. */
+.chronicle-close { position: absolute; top: 4px; right: 6px; z-index: 2;
+  width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
+  padding: 0; border: 0; background: transparent; color: var(--skin-ink-faded);
+  font: 400 19px/1 var(--skin-font-voice); cursor: pointer;
+  -webkit-tap-highlight-color: transparent; }
+.chronicle-close:active { color: var(--skin-ink); }
 /* UI-R3 · desde esta ronda la crónica puede vivir anidada dentro de la
    bandeja de la carcasa (\`shell.content\`, que UI-R2 ya deja con
    \`pointer-events: auto\`). Se declara aquí también, explícito, para que la
@@ -691,11 +704,22 @@ export function openChronicle(app: App, sinceTick?: number, onClose?: () => void
   fade.className = 'chronicle-fade';
 
   const body = document.createElement('div');
-  body.className = 'chronicle-body skin-paper skin-paper--page';
+  body.className = 'chronicle-body skin-paper skin-paper--page skin-torn-top';
   paintVine(body);
+  // VZ-2 · **la cruz vive dentro de la página, y sobrevive a cada pintado.**
+  // Se crea antes de `renderSource` y se repone con `replaceChildren(close)`:
+  // ese método vacía la página en cada cambio de fuente, y montada después se
+  // la llevaba por delante en el primer repintado.
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'chronicle-close';
+  // La etiqueta se queda para quien no ve el aspa (lector de pantalla).
+  close.setAttribute('aria-label', renderUiText('app.close'));
+  close.textContent = '×';
+  close.addEventListener('click', closeChronicle);
   const current: ChronicleSource = { chronicle: state.chronicle, rng: state.rng, lastTick: state.tick };
   const renderSource = (source: ChronicleSource, scrollSince?: number): HTMLElement | null => {
-    body.replaceChildren();
+    body.replaceChildren(close);
     let scrollTarget: HTMLElement | null = null;
     for (let year = yearOf(source.lastTick); year >= 0; year -= 1) {
       const block = yearBlock(source, year);
@@ -735,12 +759,7 @@ export function openChronicle(app: App, sinceTick?: number, onClose?: () => void
     label.append(select);
     scrim.append(label);
   }
-  const close = document.createElement('button');
-  close.type = 'button';
-  close.className = 'chronicle-close';
-  close.textContent = renderUiText('app.close');
-  close.addEventListener('click', closeChronicle);
-  scrim.append(fade, close, body);
+  scrim.append(fade, body);
   const scrollTarget = renderSource(current, sinceTick);
 
   const trace: Point[] = [];
@@ -837,16 +856,19 @@ export const chroniclePanel: PanelFactory = (actions) => {
   fade.className = 'chronicle-fade';
 
   const body = document.createElement('div');
-  body.className = 'chronicle-body skin-paper skin-paper--page';
+  body.className = 'chronicle-body skin-paper skin-paper--page skin-torn-top';
   paintVine(body);
 
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'chronicle-close';
-  close.textContent = renderUiText('app.close');
+  // La etiqueta se queda para quien no ve el aspa (lector de pantalla).
+  close.setAttribute('aria-label', renderUiText('app.close'));
+  close.textContent = '×';
   close.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
 
-  element.append(fade, close, body);
+  body.append(close);
+  element.append(fade, body);
 
   // El mismo gesto que el resto del valle (S-05, U-14): deslizar hacia abajo
   // cierra, y siempre por `actions.navigate` — nunca un callback propio, que
@@ -896,7 +918,8 @@ export const chroniclePanel: PanelFactory = (actions) => {
   };
 
   const fullRender = (source: ChronicleSource): void => {
-    body.replaceChildren();
+    // VZ-2 · la cruz se repone en cada pintado, igual que en `openChronicle`.
+    body.replaceChildren(close);
     for (let year = yearOf(source.lastTick); year >= 0; year -= 1) {
       const block = yearBlock(source, year, actions);
       if (block !== null) { linkChronicleNames(block, source, year, actions); body.append(block); }

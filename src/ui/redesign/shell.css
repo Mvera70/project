@@ -56,9 +56,12 @@ html.welcome-open .ui-shell-stack { visibility: hidden; }
 .ui-shell-message { box-sizing: border-box; min-height: var(--ui-message-min-height);
   display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   padding: 0 var(--ui-margin-mobile) var(--ui-stack-gap);
-  background-color: var(--skin-parchment-deep);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px; background-blend-mode: multiply;
+  /* VZ-2 · **el mismo papel que las otras dos secciones.** La bandeja era
+     `--skin-parchment-deep`, más oscura que la página de la crónica, porque el
+     prototipo 01 la pinta así. El dueño del diseño lo cambió mirando las tres
+     pestañas seguidas: «el fondo no es de la misma tonalidad ni textura, no me
+     gusta nada». Un solo papel pesa más que la fidelidad de un tono. */
+  background-color: var(--skin-page);
   /* UI-R2 · sin aviso ni pista, este hueco sigue habiendo: `notice.ts` monta su
      banda (oculta con `hidden`) y `app.ts` mete aquí la pista del inicio
      guiado (también oculta) desde el primer pintado, así que el contenedor
@@ -163,14 +166,20 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
   bottom: calc(var(--ui-nav-height) + env(safe-area-inset-bottom));
   box-sizing: border-box; max-height: 60vh; overflow: auto; pointer-events: auto;
   padding: var(--ui-space-4) var(--ui-margin-mobile);
-  border-top: 1px solid var(--ui-edge);
-  border-radius: var(--ui-radius-sheet) var(--ui-radius-sheet) 0 0;
-  box-shadow: 0 -6px 18px rgba(34, 29, 24, .22); color: var(--ui-paper-ink); }
+  /* VZ-2 · sin filete recto: el canto de esta hoja es el desgarro. */
+  /* VZ-2 · la esquina redondeada y la sombra se retiran: el canto rasgado es
+     el mismo en las tres secciones, y una hoja de papel roto no tiene la
+     esquina torneada ni se levanta del valle. */
+  color: var(--ui-paper-ink); }
 .ui-shell-content[hidden] { display: none; }
 .ui-shell-content-close { position: absolute; top: 6px; right: 8px;
   width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
   padding: 0; border: 0; background: transparent; color: var(--ui-paper-ink-soft);
-  font: 400 26px/1 var(--ui-font-voice); cursor: pointer; }
+  /* VZ-2 · **una cruz pequeñita**, que es lo que pidió el dueño del diseño
+     para cerrar: 19 px de aspa dentro de los 44 de toque. La crónica lleva la
+     misma (`screens/chronicle.ts`), así que las dos secciones se cierran con
+     el mismo gesto y el mismo dibujo. */
+  font: 400 19px/1 var(--ui-font-voice); cursor: pointer; }
 .ui-shell-content-close:hover { color: var(--ui-paper-ink); }
 .ui-shell-content-close:focus-visible { outline: 2px solid var(--ui-accent-on-paper); outline-offset: 2px; }
 .ui-shell-content-body p { margin: 3px 0; color: var(--ui-paper-ink-soft);

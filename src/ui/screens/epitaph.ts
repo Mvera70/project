@@ -25,8 +25,11 @@ const STYLE = `
   flex-direction: column; justify-content: flex-end;
   background: rgba(27, 22, 19, .18);
   color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
-.epitaph-fade { flex: 0 0 64px;
-  background: linear-gradient(to bottom, transparent 0, var(--skin-page) 100%); }
+/* VZ-2 · el hueco por el que se ve el valle. Era una franja de fusión con
+   degradado; ahora la transición la hace el canto rasgado de la hoja
+   (\`.skin-torn-top\`, \`skin.css\`), el mismo de las tres secciones, y esto
+   sólo reserva el sitio. */
+.epitaph-fade { flex: 0 0 64px; }
 .epitaph { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
   padding: 0 20px max(28px, env(safe-area-inset-bottom));
   background-color: var(--skin-page);
@@ -66,7 +69,7 @@ export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void
   fade.className = 'epitaph-fade';
   fade.setAttribute('aria-hidden', 'true');
   const card = document.createElement('section');
-  card.className = 'epitaph skin-paper skin-paper--page';
+  card.className = 'epitaph skin-paper skin-paper--page skin-torn-top';
   // El sello a la izquierda del título, como en la decisión: es el otro
   // documento que ocupa la pantalla entera.
   const head = document.createElement('div');

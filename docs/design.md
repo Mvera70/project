@@ -2478,6 +2478,16 @@ cosas y una carcasa de navegación no se puede construir sobre una lista así.
 diseño: «no hay forma de volver atrás»). No es una anécdota de una ronda: es la
 regla, y cualquier panel nuevo la cumple o está roto.
 
+**Y las tres rutas que se ven son la misma hoja de papel** (VZ-2, 17 sep 2026,
+pedido por el dueño del diseño: «queda fatal cuando cambias entre pestañas;
+quiero llegar a algo más genérico»). El valle, la crónica y la gente comparten
+**un canto, un papel y una textura**: el canto es el desgarro de
+`.skin-torn-top`, el papel es `--skin-page` con su grano, y lo único que
+distingue a una sección de otra es **cuánto alto ocupa**. Las tres
+superposiciones —la decisión, el epitafio y el parte de §9.2— son la misma hoja,
+sólo más alta. Y se cierran con una cruz pequeña sobre el papel o deslizando
+hacia abajo, nunca con una placa flotando sobre el valle.
+
 **0. El menú de inicio** (U-10, v3.70). Lo pidió el dueño del diseño el 15 sep
 2026 con la premisa del juego: la gracia es **comparar valles**, así que lo
 único que se configura es **el número del valle**, un entero de 32 bits que

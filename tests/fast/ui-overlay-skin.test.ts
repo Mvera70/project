@@ -70,14 +70,20 @@ describe('VZ-04 · el parte y el epitafio llevan la piel, no los tokens de U-01'
       expect(css).not.toContain('.84');
     });
 
-    it(`${nombre} funde con el valle en una franja hermana, no en su propio fondo`, () => {
-      // La trampa que costó una captura en UI-V5c: el degradado y el color
-      // opaco en el mismo elemento se pisan —el color rellena la caja y el
-      // degradado deja de tener nada que fundir— y sale una banda de pergamino
-      // vacía encima del título.
+    it(`${nombre} lleva el canto rasgado, el mismo de las tres secciones`, () => {
+      // VZ-2 · **la franja de fusión se queda sin degradado.** Antes la
+      // transición entre el valle y la página era un degradado de 64 px, y
+      // cada superficie tenía el suyo; ahora la hace el desgarro del papel
+      // (`.skin-torn-top`), que es el mismo en las tres secciones y en las
+      // tres superposiciones. Lo eligió el dueño del diseño de entre tres
+      // alternativas: «me gusta más el borde como de hoja rota».
+      const fuente = readFileSync(fichero, 'utf8');
+      expect(fuente).toContain('skin-torn-top');
+      // La franja se queda, sin degradado: sigue reservando el hueco por el
+      // que se ve el valle por encima de la página.
       const css = hoja(fichero);
-      expect(css).toContain('-fade');
-      expect(css).toContain('linear-gradient(to bottom, transparent 0, var(--skin-page) 100%)');
+      expect(css).toContain('-fade { flex: 0 0 64px; }');
+      expect(css).not.toContain('linear-gradient(to bottom, transparent');
     });
   }
 
