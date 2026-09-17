@@ -31,6 +31,7 @@ describe('G-21 · conexiones de defensas', () => {
     const joined=planFor(state);
     expect(planChange(before,joined).changed.map(b=>b.id)).toEqual([1,2]);
     state.buildings[2]!.lostTick=1;
+    state.map.ruins[10 * state.map.width + 11] = 1;
     const broken=planFor(state);
     expect(broken.buildings[0]?.connections).toBe(0);
     expect(broken.buildings[2]?.connections).toBeUndefined();

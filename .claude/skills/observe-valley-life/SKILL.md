@@ -36,6 +36,7 @@ Ejemplos:
 node tools/graphics/observe-life.mjs --seed 7 --year 1 --lead 55 --seconds 45 --fps 2 --follow 0 --zoom 0.5 --out artifacts/graphics/IA-10/check-night-7
 node tools/graphics/observe-life.mjs --seed 43 --year 60 --lead 55 --seconds 45 --fps 2 --out artifacts/graphics/IA-10/check-night-43
 node tools/graphics/observe-life.mjs --seed 7 --year 1 --lead 94 --seconds 6 --fps 15 --follow 10002 --zoom 0.18 --out artifacts/graphics/IA-10/check-hen-walk
+node tools/graphics/observe-life.mjs --live --speed 64 --seed 43 --year 60 --seconds 42 --fps 2 --out artifacts/graphics/IA-11/check-live-43
 ```
 
 Si Chromium no puede iniciarse dentro del sandbox, solicita autorización para ejecutar
@@ -52,6 +53,8 @@ Lee también `summary.json` y, para investigar un id concreto, `trace.json`. Com
 - `errors` vacío;
 - `meshDrift` y `peopleMeshDrift` en cero;
 - `penetratingCircles` y `blockedCentres` en cero;
+- `penetratingBeasts` en cero, incluida la primera muestra (aparición del animal);
+- con `--live`, `lastTick > firstTick` y `nightOutcomes`: residentes, durmiendo e ids pendientes en cada amanecer;
 - transiciones esperadas y ausencia de estados que se prolongan sin progreso;
 - concordancia entre lo que dice la traza y lo que se ve en los PNG.
 
@@ -73,7 +76,9 @@ Informa siempre:
 - qué se inspeccionó visualmente;
 - límites de la evidencia y trabajo aún abierto.
 
-No declares que “la IA funciona” porque una toma controlada pase. El modo actual mantiene
-fijo el estado persistente mientras avanza la vida/render a 30 Hz: prueba presentación,
-rutas y animación, pero no varios ciclos del motor ni sus encrucijadas.
+No declares que “la IA funciona” porque una toma controlada pase. Sin `--live` el estado
+persistente permanece fijo. Con `--live` avanzan el bucle de la aplicación y el motor:
+comprueba varias noches y ticks, y distingue el total de residentes en cada amanecer
+porque puede haber bajas o cambios de vivienda. A ×64 y 2 fps se miden ciclos, no la
+calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
 

@@ -22,7 +22,7 @@ import {
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { avoid, drive, resolve, seek, separate } from './steering';
-import { createRouter, follow, type Router } from './navigate';
+import { createRouter, follow, routeAroundBodies, type Router } from './navigate';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
@@ -913,7 +913,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // verdad sin acercarse, con una espera que se dobla cada vez que
         // vuelve a atascarse — ver `decide.ts`.
         const prog = progress.get(dweller.body.id) as ProgressState;
-        const tooLong = noProgress(dweller.doing, prog, body, steps, GIVE_UP);
+        let tooLong = noProgress(dweller.doing, prog, body, steps, GIVE_UP);
+        if (tooLong && dweller.doing !== null && !dweller.doing.there && !dweller.doing.detoured) {
+          dweller.doing.detoured = true;
+          const alternative = routeAroundBodies(land, body, seatAt(dweller.doing.offer, dweller.doing.seat), outside());
+          if (alternative !== null) {
+            dweller.doing.route.splice(0, dweller.doing.route.length, ...alternative);
+            prog.at = steps + PROGRESS_CHECK; prog.gap = Number.POSITIVE_INFINITY; tooLong = false;
+          }
+        }
         // V-09 · Con un trasto ya en la mano y a la espera de soltarlo, tampoco
         // se replantea la vida: la jugada dura menos que `RETHINK` (1,5 s) a
         // propósito —«no se come la jornada»—, y sin este freno el rethink de

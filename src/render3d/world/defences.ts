@@ -66,7 +66,25 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
     group.add(turn);
   }
 
-  if (mask === 0 || mask === 10 || mask === 5) {
+  if (planned.gate !== undefined) {
+    // Paso libre de 0.84 celdas: permite el disco de la vaca (radio 0.4).
+    // Los postes y hojas abiertas se dibujan fuera de ese gálibo.
+    const portal = new Group(); portal.name = 'OpenGate';
+    portal.position.set(0.5, 0, 0.5);
+    portal.rotation.y = planned.gate === 'x' ? Math.PI / 2 : 0;
+    let material: Material | Material[] | undefined;
+    source.traverse(node => { if (node instanceof Mesh && material === undefined) material = node.material; });
+    const box = (w: number, h: number, d: number, x: number, y: number, z: number): void => {
+      const geometry = new BoxGeometry(w, h, d); owned.push(geometry);
+      const mesh = new Mesh(geometry, material); mesh.position.set(x, y, z); portal.add(mesh);
+    };
+    for (const side of [-1, 1]) {
+      box(0.08, size.y * 1.18, thickness, side * 0.46, size.y * 0.59, 0);
+      box(0.06, size.y * 0.7, 0.38, side * 0.46, size.y * 0.35, 0.19);
+    }
+    box(1, 0.12, thickness, 0, size.y * 1.18, 0);
+    group.add(portal);
+  } else if (mask === 0 || mask === 10 || mask === 5) {
     segment(1, 0.5, 0.5, mask === 5 ? Math.PI / 2 : 0);
   } else {
     // Un núcleo cuadrado común evita huecos y superficies superpuestas en L/T/+.

@@ -35,7 +35,7 @@ import {
 } from './world/forest';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
-import type { HomeRoutine } from './life/home';
+import { isNight, type HomeRoutine } from './life/home';
 import { fitsCircle, penetration } from './life/body';
 import { solidTerrain } from './world/obstacles';
 import { Cast } from './world/cast';
@@ -377,6 +377,8 @@ export async function createGraphicsRenderer(
   let mapHeight = 0;
   // U-12 · la fase de la última jornada pintada, para poder mirarla desde fuera.
   let paintedPhase = 0;
+  let steppedPhase = 0.28;
+  const nightOutcomes: { tick: number; residents: number; sleeping: number; pending: number[] }[] = [];
   // U-13 · el cielo de la jornada que se está pintando, y los rayos que han
   // caído. `bolts` sólo sube: `app.ts` mira cuánto ha subido para tronar.
   let paintedSky: SkyKind = 'clear';
@@ -609,6 +611,7 @@ export async function createGraphicsRenderer(
       steps: life.steps,
       phase: round(paintedPhase),
       interactions: { ...life.interactions },
+      nightOutcomes: nightOutcomes.map(night => ({ ...night, pending: [...night.pending] })),
       people: life.dwellers.map((dweller) => ({
         id: dweller.villager,
         bodyId: dweller.body.id,
@@ -644,6 +647,7 @@ export async function createGraphicsRenderer(
       })),
       beasts: life.beasts.map((beast) => ({
         id: beast.dweller.body.id,
+        penetration: round(penetration(life!.land, beast.dweller.body.x, beast.dweller.body.z, beast.dweller.body.radius)),
         screen: screen(beast.dweller.body.x, beast.dweller.body.z),
         routePoints: (beast.dweller.doing?.route ?? []).map(point => ({ ...point, screen: screen(point.x, point.z) })),
         kind: beast.kind,
@@ -677,6 +681,8 @@ export async function createGraphicsRenderer(
     renderer.render(scene, camera);
     return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
   };
+  let observingLive = false;
+  window.__valleyObserveLive = () => { observingLive = true; };
 
   window.__valleyAdvance = (steps: number, reset = false) => {
     if (!Number.isInteger(steps) || steps < 0 || steps > 3600) throw new Error('Invalid observation steps');
@@ -798,9 +804,18 @@ export async function createGraphicsRenderer(
         lifeCarry = 0;
       }
       lifeCarry += frame.deltaSeconds;
+      if (frame.discontinuity) { steppedPhase = phase; nightOutcomes.length = 0; }
       let given = 0;
       while (lifeCarry >= LIFE_STEP && given < 240) {
-        life.step((phase - (lifeCarry - LIFE_STEP) / 120 + 1) % 1);
+        const stepPhase = (phase - (lifeCarry - LIFE_STEP) / 120 + 1) % 1;
+        if (isNight(steppedPhase) && !isNight(stepPhase)) {
+          const residents = life.dwellers.filter(person => person.residence !== undefined);
+          const pending = residents.filter(person => person.residence!.stage !== 'sleeping').map(person => person.villager);
+          nightOutcomes.push({ tick: state.tick, residents: residents.length, sleeping: residents.length - pending.length, pending });
+          if (nightOutcomes.length > 64) nightOutcomes.shift();
+        }
+        steppedPhase = stepPhase;
+        life.step(stepPhase);
         lifeCarry -= LIFE_STEP;
         given += 1;
       }
@@ -932,7 +947,7 @@ export async function createGraphicsRenderer(
       // acercarse metia el pueblo dentro de la bruma.
       if (mapWidth > 0) fogAround(new Vector3(mapWidth / 2, 0, mapHeight / 2));
 
-      if (!sampling) renderer.render(scene, camera);
+      if (!sampling && !observingLive) renderer.render(scene, camera);
     },
 
     pick(localXCss: number, localYCss: number): GraphicsTarget | null {
@@ -1078,6 +1093,7 @@ declare global {
     __valleyLife?: () => LifeSnapshot | null;
     __valleyAdvance?: (steps: number, reset?: boolean) => void;
     __valleyCapture?: (follow?: number, zoom?: number) => { image: string; life: LifeSnapshot | null };
+    __valleyObserveLive?: () => void;
   }
 }
 
@@ -1085,6 +1101,7 @@ declare global {
 interface ScreenPoint { readonly x: number; readonly y: number }
 interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
 export interface LifeSnapshot {
+  readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
   readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number }[];
   readonly buildings: readonly { readonly id: number; readonly kind: string; readonly x: number;
     readonly z: number; readonly w: number; readonly h: number; readonly ruin: boolean }[];
@@ -1117,6 +1134,7 @@ export interface LifeSnapshot {
   }[];
   readonly beasts: readonly {
     readonly id: number; readonly kind: string;
+    readonly penetration: number;
     readonly reaction: { readonly stage: string | null; readonly commitment: string | null };
     readonly screen: ScreenPoint; readonly routePoints: readonly ObservedPoint[];
     readonly x: number; readonly z: number; readonly doing: string | null;

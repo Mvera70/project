@@ -11,6 +11,8 @@ const seed = Number(opt('seed', '43')), year = Number(opt('year', '60'));
 const lead = Number(opt('lead', '0'));
 const follow = Number(opt('follow', '-1')), zoom = Number(opt('zoom', '1'));
 const seconds = Number(opt('seconds', '120')), fps = Number(opt('fps', '2'));
+const live = args.includes('--live');
+const speed = Number(opt('speed', '16'));
 if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || fps <= 0 || lead < 0 || lead > 120) throw new Error('Usa fps divisor de 30 y lead entre 0 y 120.');
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
 if (existsSync(join(out, 'trace.json'))) throw new Error('La toma ya existe; usa otra carpeta --out.');
@@ -22,6 +24,10 @@ const browser = await chromium.launch({ executablePath,
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   const tab = await browser.newPage({ viewport: { width: 1100, height: 850 } });
+  if (live) {
+    await tab.clock.install({ time: new Date('2026-09-17T12:00:00Z') });
+    await tab.clock.pauseAt(new Date('2026-09-17T12:00:00Z'));
+  }
   const errors = [];
   tab.on('pageerror', e => errors.push(String(e)));
   await tab.goto(pathToFileURL(resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html'))).href);
@@ -29,32 +35,50 @@ try {
   if (await tab.locator('.title-dev').getAttribute('aria-pressed') === 'false') await tab.locator('.title-dev').click();
   await tab.locator('#valley-year').fill(String(year));
   await tab.locator('.title-new').click();
+  if (live) for (let attempt = 0; attempt < 200; attempt++) {
+    if (await tab.evaluate(() => (window.__valleyLife?.()?.people.length ?? 0) > 0)) break;
+    await tab.clock.runFor(100);
+  }
   await tab.waitForFunction(() => window.__valleyLife?.()?.people.length > 0);
   // Congela todo el navegador entre muestras, incluido RAF: una captura lenta
   // no hace avanzar la simulación mientras se escribe el PNG.
-  const start = new Date();
-  await tab.clock.install({ time: start });
-  await tab.clock.pauseAt(new Date(start.getTime() + 100));
-  await tab.evaluate(() => window.__valleyAdvance(0, true));
-  if (lead > 0) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30));
+  if (live) {
+    await tab.evaluate(() => window.__valleyObserveLive());
+    await tab.locator('.valley-speed-badge').click();
+    await tab.getByRole('button', { name: `${speed}×`, exact: true }).evaluate(button => button.click());
+    if (lead > 0) await tab.clock.runFor(lead * 1000);
+  } else {
+    const start = new Date();
+    await tab.clock.install({ time: start });
+    await tab.clock.pauseAt(new Date(start.getTime() + 100));
+    await tab.evaluate(() => window.__valleyAdvance(0, true));
+    if (lead > 0) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30));
+  }
   const frames = [];
   for (let n = 0; n <= seconds * fps; n += 1) {
-    if (n) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(30 / fps));
+    if (live) {
+      const decision = tab.locator('.crossroad-options button').first();
+      if (await decision.isVisible()) await decision.click();
+      if (n) await tab.clock.runFor(1000 / fps);
+    } else if (n) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(30 / fps));
     const shot = await tab.evaluate(({ follow, zoom }) => window.__valleyCapture(follow, zoom), { follow, zoom: n === 0 ? zoom : 1 });
     if (shot.life === null) throw new Error('Fotograma sin vida.');
     const expectedPhase = (0.28 + (lead + n / fps) / 120) % 1;
     const phaseError = Math.abs(shot.life.phase - expectedPhase);
-    if (Math.min(phaseError, 1 - phaseError) > 0.002) throw new Error('El reloj externo ha interferido en la toma.');
+    if (!live && Math.min(phaseError, 1 - phaseError) > 0.002) throw new Error('El reloj externo ha interferido en la toma.');
     const file = `frames/${String(n).padStart(4, '0')}.png`;
     writeFileSync(join(out, file), Buffer.from(shot.image.split(',')[1], 'base64'));
-    frames.push({ seconds: n / fps, file, life: shot.life });
+    frames.push({ seconds: n / fps, file, life: shot.life, engineTick: Number(await tab.locator('html').getAttribute('data-tick')) });
     if (n % (10 * fps) === 0) process.stdout.write(`${n / fps}s, fase ${shot.life.phase}, ${shot.life.people.length} personas\n`);
   }
-  const summary = { sampledPeople: frames[0]?.life.people.length ?? 0, sampledBeasts: frames[0]?.life.beasts.length ?? 0, meshDrift: 0, peopleMeshDrift: 0, penetratingCircles: 0, blockedCentres: 0, night: [], transitions: [] };
+  const summary = { sampledPeople: frames[0]?.life.people.length ?? 0, sampledBeasts: frames[0]?.life.beasts.length ?? 0,
+    firstTick: frames[0]?.engineTick, lastTick: frames.at(-1)?.engineTick, nightOutcomes: frames.at(-1)?.life.nightOutcomes,
+    meshDrift: 0, peopleMeshDrift: 0, penetratingCircles: 0, penetratingBeasts: 0, blockedCentres: 0, night: [], transitions: [] };
   const last = new Map();
   for (const frame of frames) {
     const life = frame.life;
     for (const beast of life.beasts) {
+      if (beast.penetration > 0.001) summary.penetratingBeasts += 1;
       const mesh = life.renderedAnimals.find(item => item.id === beast.id);
       if (mesh === undefined || Math.hypot(mesh.x - beast.x, mesh.z - beast.z) > 0.002) summary.meshDrift += 1;
     }
@@ -72,12 +96,13 @@ try {
     if (life.phase >= 0.78 || life.phase < 0.06) summary.night.push({ at: frame.seconds, phase: life.phase, counts });
   }
   writeFileSync(join(out, 'summary.json'), JSON.stringify(summary, null, 2));
-  const report = { seed, year, fps, lead, mode: 'production-renderer-fixed-state-30hz', errors, summary, frames };
+  const report = { seed, year, fps, lead, speed: live ? speed : null,
+    mode: live ? 'live-engine-browser-clock' : 'production-renderer-fixed-state-30hz', errors, summary, frames };
   writeFileSync(join(out, 'trace.json'), JSON.stringify(report));
   const data = JSON.stringify(report).replaceAll('<', '\\u003c');
   writeFileSync(join(out, 'index.html'), `<!doctype html><meta charset="utf-8"><title>Observatorio · Valle ${seed}</title>
 <style>body{margin:20px;background:#17201e;color:#ede7d6;font:16px system-ui}button,select,input{font:inherit}main{display:flex;gap:20px;align-items:flex-start}figure{margin:0;position:relative;height:calc(100vh - 180px);aspect-ratio:390/844;flex-shrink:0}img,svg{width:100%;height:100%}svg{position:absolute;inset:0;height:100%;pointer-events:none}aside{flex:1;max-height:calc(100vh - 180px);overflow:auto;white-space:pre-wrap;font:13px monospace}input{width:50%}circle{cursor:pointer;pointer-events:all}</style>
-<h1>Observatorio · Valle ${seed}, año ${year}</h1><p>Render y vida reales a 30 Hz, con el estado de la partida fijo durante la toma. Selecciona un cuerpo para ver su ruta, intención y animación. El ganado dibujado se marca en naranja.</p>
+<h1>Observatorio · Valle ${seed}, año ${year}</h1><p>${live ? `Partida viva a ×${speed}, motor y reloj del navegador avanzando.` : 'Render y vida reales a 30 Hz, con el estado de la partida fijo durante la toma.'} Selecciona un cuerpo para ver su ruta, intención y animación. El ganado dibujado se marca en naranja.</p>
 <button id="play">▶ / pausa</button> <input id="time" type="range" min="0" max="${frames.length - 1}" value="0"> <span id="stamp"></span>
 <main><figure><img id="frame"><svg id="overlay" viewBox="0 0 1100 850"></svg></figure><aside><select id="who"><option value="">Todos</option></select><pre id="info"></pre></aside></main>
 <script>const data=${data};let selected='',timer=null;const $=id=>document.getElementById(id);const choices=new Set();for(const f of data.frames){for(const p of f.life.people)choices.add('p:'+p.id);for(const b of f.life.beasts)choices.add('b:'+b.id)}for(const id of choices){const o=document.createElement('option');o.value=id;o.textContent=id;$('who').append(o)}

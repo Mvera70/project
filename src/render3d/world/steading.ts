@@ -113,6 +113,11 @@ export function steadingOf(
     .map(building => homeRoutine(building, land).approach);
   const free = (cell: number): boolean => {
     const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
+    if ((map.path[cell] ?? 0) > 0) return false;
+    // Una calle de una celda no admite carros ni leña: se reserva el anillo
+    // completo, incluso a los lados sin puerta y junto a las defensas.
+    if (state.buildings.some(b => b.lostTick === null && b.kind !== 'field' && b.kind !== 'grave_yard'
+      && x > b.x - 1 && x < b.x + b.w + 1 && z > b.y - 1 && z < b.y + b.h + 1)) return false;
     // TUNE: reserva de 1.5 celdas a cada lado del umbral para la anchura del
     // mayor adorno y el cuerpo que entra. Los candidatos se amplían un anillo.
     if (entrances.some(entry => Math.abs(entry.x - x) < 1.5 && Math.abs(entry.z - z) < 1.5)) return false;
@@ -158,12 +163,15 @@ export function steadingOf(
   );
   place('log-pile', homes.flatMap((one) => ringOf(map, one)));
 
-  // Y la carreta, en el camino más pisado. Si no hay camino todavía —los
+  // Y la carreta, al lado del camino más pisado. Si no hay camino todavía —los
   // primeros años no hay— junto al granero, que es donde acaba el grano.
   const road = [...map.path.entries()]
-    .filter(([cell, wear]) => wear >= 2 && free(cell))
+    .filter(([, wear]) => wear >= 2)
     .sort((a, z) => z[1] - a[1] || a[0] - z[0])
-    .map(([cell]) => cell);
+    .flatMap(([cell]) => [-map.width, -1, 1, map.width]
+      .filter(offset => (offset !== -1 || cell % map.width > 0) && (offset !== 1 || cell % map.width < map.width - 1))
+      .map(offset => cell + offset))
+    .filter(cell => cell >= 0 && cell < map.terrain.length && free(cell));
   const stores = state.buildings.filter(
     (one) => (one.kind === 'granary' || one.kind === 'mill') && one.lostTick === null,
   );

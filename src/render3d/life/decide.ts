@@ -24,6 +24,8 @@ import { STEPS_PER_DAY } from './clock';
 
 /** Lo que alguien está haciendo o yendo a hacer. */
 export interface Intent {
+  /** Un desvío por tráfico antes de abandonar esta intención. */
+  detoured?: boolean;
   readonly place: Place;
   readonly offer: Offer;
   /** El camino hasta allí. Se va gastando al andarlo. */

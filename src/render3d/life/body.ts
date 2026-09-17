@@ -37,6 +37,24 @@ export interface Terrain {
   readonly height: number;
   /** 1 donde no se pisa. Un índice por celda, `z * width + x`. */
   readonly blocked: Uint8Array;
+  /** Obstáculos menores que una celda, indexados por las celdas que tocan. */
+  readonly solids?: ReadonlyMap<number, readonly Solid[]>;
+  /** Coste temporal de tráfico; no convierte un vecino en una pared. */
+  readonly traffic?: Uint8Array;
+  /** Cuerpos cercanos para desvíos que requieren salir de la propia celda. */
+  readonly trafficBodies?: readonly Body[];
+}
+
+export interface Solid { readonly minX: number; readonly minZ: number; readonly maxX: number; readonly maxZ: number }
+
+export function indexSolids(width: number, height: number, solids: readonly Solid[]): ReadonlyMap<number, readonly Solid[]> {
+  const index = new Map<number, Solid[]>();
+  for (const solid of solids) for (let z = Math.max(0, Math.floor(solid.minZ)); z <= Math.min(height - 1, Math.floor(solid.maxZ)); z++) {
+    for (let x = Math.max(0, Math.floor(solid.minX)); x <= Math.min(width - 1, Math.floor(solid.maxX)); x++) {
+      const cell = z * width + x, list = index.get(cell) ?? []; list.push(solid); index.set(cell, list);
+    }
+  }
+  return index;
 }
 
 /** Si este punto cae donde no se puede estar, contando el borde del mapa. */
@@ -44,15 +62,26 @@ export function blockedAt(land: Terrain, x: number, z: number): boolean {
   const cx = Math.floor(x);
   const cz = Math.floor(z);
   if (cx < 0 || cz < 0 || cx >= land.width || cz >= land.height) return true;
-  return land.blocked[cz * land.width + cx] === 1;
+  return land.blocked[cz * land.width + cx] === 1 || (land.solids?.get(cz * land.width + cx)
+    ?.some(s => x > s.minX && x < s.maxX && z > s.minZ && z < s.maxZ) ?? false);
 }
 
 /** Penetración de un disco contra las cajas de la rejilla; incluye esquinas. */
 export function penetration(land: Terrain, x: number, z: number, radius: number): number {
   let total = 0;
+  const seen = new Set<Solid>();
   for (let cz = Math.floor(z - radius); cz <= Math.floor(z + radius); cz += 1) {
     for (let cx = Math.floor(x - radius); cx <= Math.floor(x + radius); cx += 1) {
-      if (!blockedAt(land, cx + 0.5, cz + 0.5)) continue;
+      for (const s of land.solids?.get(cz * land.width + cx) ?? []) {
+        if (seen.has(s)) continue;
+        seen.add(s);
+        const dx = x - Math.max(s.minX, Math.min(x, s.maxX));
+        const dz = z - Math.max(s.minZ, Math.min(z, s.maxZ));
+        const distance = Math.hypot(dx, dz);
+        total += distance === 0 ? radius + Math.min(x - s.minX, s.maxX - x, z - s.minZ, s.maxZ - z)
+          : Math.max(0, radius - distance);
+      }
+      if (cx >= 0 && cz >= 0 && cx < land.width && cz < land.height && land.blocked[cz * land.width + cx] !== 1) continue;
       const dx = x - Math.max(cx, Math.min(x, cx + 1));
       const dz = z - Math.max(cz, Math.min(z, cz + 1));
       const distance = Math.hypot(dx, dz);

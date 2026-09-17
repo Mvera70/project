@@ -176,7 +176,8 @@ animales, fauna, escenas históricas, **y después interfaz**.
 
 | Fase | Estado | Commit | Informe |
 |---|---|---|---|
-| IA-10 · observatorio, hogares y sólidos | **parcial** — visor sincronizado, puertas y rutina doméstica; 26/32 duermen en semilla 43, quedan atascos | (este commit) | `life-rounds/IA-10.md` |
+| IA-11 · circulación, portones y motor vivo | **hecha en los casos verificados** — 66/66 noches completas en tres aldeas; desvíos, pasillos y colisión fina | (este commit) | `life-rounds/IA-11.md` |
+| IA-10 · observatorio, hogares y sólidos | **seguida por IA-11** — visor sincronizado, puertas y rutina doméstica; cifras iniciales conservadas en el informe | `a472eca` | `life-rounds/IA-10.md` |
 | IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `life-rounds/IA-0.md` |
 | IA-1 · movimiento y destinos | **hecha** | `1509121` | `life-rounds/IA-1.md` |
 | IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
@@ -239,6 +240,12 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+IA-11: 62 pruebas pertinentes en 11 archivos; typecheck, lint y bundle verdes.
+Tres partidas vivas a ×64, 42 s y 2 fps: 22/22 noches completas cada una, 66/66
+en total. Semillas 7/11/43: 2, 23→22 y 32 residentes con casa. Ticks 0→3,
+912→915 y 2832→2835. Cero penetraciones de personas/animales, centros en sólidos,
+desajustes cuerpo/modelo y errores JS muestreados. Evidencia en IA-11/delivery.
 
 IA-10: 156 pruebas pertinentes verdes. Tres tomas del renderer real con estado fijo:
 semillas 7/11/43, durmiendo 2/2, 14/23 y 26/32 con vivienda. Cero penetraciones
@@ -338,10 +345,12 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**IA-10 parcial:** resolver atascos de regreso y salida compartida en aldeas densas;
-validar ciclos con motor vivo. Faltan colisiones finas de troncos/lápidas y revisión
-de encuentros y clips de todas las especies. El observatorio y casos concretos están
-en `docs/life-rounds/IA-10.md`; no dar por cerrada la IA por pasar tests aislados.
+**IA-11:** regreso/salida, desvíos, pasillos, portones y colisión fina de troncos/lápidas
+verificados con 66 noches del motor vivo. Queda revisar encuentros completos y clips
+de todas las especies, y ampliar la muestra a otros recintos y aldeas; los portones
+permanecen abiertos. No hay interiores ni clip de acostarse, ni se asignan viviendas
+ficticias a los residentes sin casa. Véase `docs/life-rounds/IA-11.md`; no dar por
+cerrada toda la IA por esta muestra.
 
 
 G-23: seis especies terminadas y comprobadas. No queda modelado pendiente del

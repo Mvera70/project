@@ -7,10 +7,18 @@ menú real e instala el reloj controlado de Playwright. `window.__valleyAdvance`
 mismo renderer y la misma capa de vida que usa el juego, a pasos de 1/30 s. La captura de
 píxel y `window.__valleyLife` ocurre de forma síncrona para que pertenezcan al mismo paso.
 
-El estado del motor se clona al comenzar y permanece fijo. Esto hace reproducibles las
+Sin `--live`, el estado del motor se clona al comenzar y permanece fijo. Esto hace reproducibles las
 rutas y animaciones, pero no prueba nacimientos, obras, encrucijadas, cambios de jornada
 ni la renovación escénica provocada por el motor. Para eso hace falta un recorrido del
-juego vivo además de esta herramienta.
+juego vivo con `--live`.
+
+Con `--live` se instala el reloj **antes de abrir el juego**, se avanza RAF para arrancar,
+y se elige la velocidad mediante el control real. `clock.runFor` ejecuta el bucle de la
+aplicación, sin llamar a `tick` ni a `__valleyAdvance`. Se responde la primera opción de
+una encrucijada cuando aparece. La llamada programática al botón de velocidad evita el
+aviso de bienvenida que lo puede tapar: no certifica la accesibilidad táctil del control.
+`__valleyObserveLive` ahorra dibujo GPU entre muestras; vida, animaciones y escena siguen
+avanzando y `__valleyCapture` dibuja el fotograma sincronizado. No sirve para medir FPS.
 
 ## Opciones
 
@@ -25,8 +33,12 @@ juego vivo además de esta herramienta.
 | `--zoom` | Factor aplicado al primer fotograma. Valores menores acercan la cámara. |
 | `--out` | Carpeta nueva de salida. Nunca reutilices una que ya tenga `trace.json`. |
 | `--page` | HTML alternativo; normalmente usa el bundle predeterminado. |
+| `--live` | Avanza la partida mediante el bucle real de la aplicación. |
+| `--speed` | Velocidad elegida en la UI en modo vivo; predeterminado 16, ejemplo 64. |
 
-La fase esperada es `(0.28 + (lead + segundos) / 120) % 1`. El script aborta si un RAF
+En modo fijo, `lead` y `seconds` son segundos escénicos. En modo vivo son segundos del
+reloj del navegador antes de aplicar velocidad: 42 s a ×64 cubren unas 22 jornadas.
+La fase esperada del modo fijo es `(0.28 + (lead + segundos) / 120) % 1`. El script aborta si un RAF
 externo altera esa fase, porque entonces la imagen y el experimento dejan de ser fiables.
 
 ## Archivos de salida
@@ -46,6 +58,11 @@ externo altera esa fase, porque entonces la imagen y el experimento dejan de ser
 - `actors`: actividad o clip visual del aldeano.
 - `beasts[].reaction`: fase y compromiso de conducta animal.
 - `interactions` y `partners`: escena o participantes activos.
+- `firstTick`, `lastTick`: prueban que la partida avanza en modo vivo.
+- `nightOutcomes`: medida en el paso fijo justo antes de salir de la noche; `pending`
+  son los residentes que aún no duermen. Guarda hasta 64 noches, no sólo los PNG nocturnos.
+  No cuenta como fallo a quienes carecen de vivienda. Informa noches completas/total y
+  residentes por noche, sin promediar y esconder una noche fallida.
 
 ## Trampas que ya dieron conclusiones falsas
 
