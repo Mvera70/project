@@ -9,7 +9,8 @@
 
 import { describe, expect, it } from 'vitest';
 import type { GameState, Villager } from '@engine/state';
-import { personCard } from '@ui/person-card';
+import type { Activity } from '../../src/render3d/contracts';
+import { doingLine, personCard } from '@ui/person-card';
 import { foundTwenty } from '../helpers/founding';
 
 /** Los dos primeros con nombre de una aldea de veinte, que siempre hay. */
@@ -159,6 +160,33 @@ describe('personCard · la ficha enseña lo que el motor guarda, y nada más', (
     person.opinions = { [other.id]: 80 };
     other.diedTick = state.tick;
     expect(personCard(state, person.id)?.kin).toEqual([]);
+  });
+
+  // VZ-6 · la línea «Today». Tres propiedades y ninguna congela una frase: lo
+  // que se guarda es que se calla cuando no hay cuerpo, que la carga manda
+  // sobre el tramo, y que las seis actividades del contrato tienen palabra.
+  it('sin cuerpo que mirar, la ficha no dice qué hace nadie', () => {
+    expect(doingLine(null)).toBeNull();
+  });
+
+  it('quien va cargado está acarreando, ande o vuelva', () => {
+    const andando = doingLine({ activity: 'walking', load: 'bundle' });
+    const volviendo = doingLine({ activity: 'returning', load: 'bundle' });
+    expect(andando).toBe(volviendo);
+    expect(andando).toContain('timber');
+    // Y sin carga, el tramo sí decide: si no, la línea diría lo mismo siempre.
+    expect(doingLine({ activity: 'walking', load: null })).not.toBe(andando);
+  });
+
+  it('las seis actividades del contrato tienen palabra, y ninguna sale sin componer', () => {
+    const todas: readonly Activity[] = ['home', 'leaving', 'walking', 'working', 'returning', 'resting'];
+    const frases = todas.map((activity) => doingLine({ activity, load: null }));
+    for (const frase of frases) {
+      expect(frase).not.toBeNull();
+      // Una clave sin plantilla sale como la clave o con el hueco puesto.
+      expect(frase).not.toMatch(/\{\w+\}|inspect\./u);
+    }
+    expect(new Set(frases).size).toBe(todas.length);
   });
 
   it('quien sigue aquí trae su edad y su oficio en palabras', () => {

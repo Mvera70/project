@@ -1144,6 +1144,17 @@
 .person-kin-name em { color: var(--skin-ink-soft); }
 .person-heart { flex: 0 0 auto; width: 17px; height: 15px; color: var(--skin-red); }
 
+/** VZ-6 · «Today: …», la línea del prototipo 03. En cursiva y en tinta suave
+    porque es **lo único de la ficha que no es un hecho de la partida**: es lo
+    que esa persona está haciendo en este instante, y cambia mientras se mira.
+    El mismo tratamiento que la pista de la voz, por el mismo motivo. */
+.person-today {
+  margin: 0;
+  color: var(--skin-ink-faded);
+  font: italic 15px/1.35 var(--skin-font-read);
+  text-align: center;
+}
+
 .person-gone { margin: 0; color: var(--skin-ink-soft); }
 /** La vida, detrás del botón: los recuerdos que el motor guarda, en la voz de
     lectura y separados del resto por un filete, para que no se lean como parte

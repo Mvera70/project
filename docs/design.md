@@ -2552,11 +2552,42 @@ que dice la cabecera.
 se levantó, quién lo usa, la cifra relevante. Para un nombrado: nombre, edad,
 rasgos, dos líneas de memoria y sus opiniones fuertes.
 
+> **VZ-6 — y qué está haciendo ahora mismo.** «Today: carrying timber» va bajo
+> la placa del nombre, y **su dato no sale del motor**: sale del actor que la
+> capa de vida está pintando en ese fotograma (`ActorDoing` en
+> `render3d/contracts.ts`, por `backend.live.doing`). UI-V4 la dejó fuera por
+> eso mismo y con razón — derivarla del oficio, la estación y las órdenes daba
+> una frase que podía decir que alguien acarrea madera mientras se le ve parado
+> en la plaza. Nueve palabras, ninguna inventa un destino (la vida sabe qué
+> lleva y en qué tramo va, no a qué edificio), la carga manda sobre el tramo, y
+> **quien ya no está no tiene línea**: una ficha no le inventa un presente a un
+> muerto. Con el lienzo 2D no hay línea, porque no simula cuerpos.
+
 **3. Encrucijada.** Ocupa la pantalla entera, se abre con el valle atenuado
 detrás. Título, tres o cuatro frases de contexto, y las opciones como bloques
 grandes con **el verbo y el precio**, siempre visible el precio. Sin botón de
 cerrar: se decide o se vuelve al valle con gesto, y la encrucijada sigue
 pendiente con una marca discreta.
+
+> **VZ-6, 17 sep 2026 — y aplazada deja ir a mirar otra cosa.** §8.6 dice que
+> una decisión aplazada **espera, no caduca**, y eso sólo sirve si se puede ir a
+> ver la crónica antes de contestar. No se podía: el pintado devolvía la ruta al
+> valle en cada fotograma mientras hubiera decisión pendiente, aplazada
+> incluida. VZ-03 lo cerró al separar la decisión aplazada de la planteada, y de
+> ahí se desbloquea además **el documento sellado** de la crónica, que sólo
+> existe habiendo decisión pendiente y por tanto era inalcanzable por
+> construcción — se ha visto en captura por primera vez hoy
+> (`artifacts/vz6-sealed.png`).
+>
+> La marca discreta es **el sello de lacre en el ornamento de la bandeja**
+> (VZ-03) y hay tres puertas de vuelta: el sello, el documento sellado de la
+> crónica —que lleva al valle, donde el sello espera— y el paso del tiempo, que
+> no la quita. Con una trampa que costó una prueba: el ornamento llevaba
+> `pointer-events: none` de cuando era sólo una hoja de roble decorativa, así
+> que **el sello no se podía pulsar** y el lienzo 3D se comía el toque. La
+> excepción va atada a `:disabled`: decoración no recibe toques, control sí.
+> `?crossroad=1` en las rutas de depuración abre un valle con una decisión sin
+> contestar, que es lo que hace fotografiable todo esto.
 
 > **U-14, v3.73 — y hay forma de volver atrás.** Lo dijo el dueño del diseño
 > mirando el juego: «cuando entras a ver a los aldeanos o el historial, no hay
@@ -2653,6 +2684,22 @@ visible. Con `who` —una letra del reparto— se resuelve al edificio de esa
 persona. Si no se puede resolver y hay varias instancias, conserva el respaldo
 del núcleo; escoger la primera por orden convertiría una falta de identidad en
 una identidad falsa.
+
+**Y enfocar es mover la cámara, no escalar un lienzo** (VZ-6, 17 sep 2026).
+Contestar una encrucijada mira a la celda del primer efecto visible del tick:
+`screens/crossroad.ts` lo pide por `app.look`, que baja por `backend.live.look`
+hasta `view.look` del renderer. Antes escalaba `#valley` con un `transform` y un
+`transform-origin` en tanto por ciento, que funcionaba porque el lienzo 2D
+dibuja el mapa entero — y **dejó de hacer nada el día que el 3D relevó**
+(UI-V10 lo esconde en cuanto el piloto carga), sin que nada lo dijera: el
+recorrido que lo vigilaba leía ese mismo `transform`, así que se quedó verde
+midiendo un lienzo oculto y luego declarado como fallo. Es el caso de libro de
+la regla de `CLAUDE.md`: una prueba que llama al camino muerto no sabe si el
+juego llama al vivo.
+
+Mueve el **centro** y no la altura —acercarse es del jugador (§11.2)— y cuenta
+como mover la cámara: apaga el vuelo de entrada y pone `disturbed`, o el
+encuadre automático del pintado siguiente se comería el enfoque.
 
 ### 11.6 Los sucesos se ven, no solo los estados
 

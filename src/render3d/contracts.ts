@@ -131,6 +131,27 @@ export interface GraphicsRenderer {
   paint(state: Readonly<GameState>, frame: GraphicsFrame): void;
   pick(localXCss: number, localYCss: number): GraphicsTarget | null;
   track(id: number | null): void;
+
+  /**
+   * VZ-6 · Qué está haciendo esa persona ahora mismo, o `null` si no tiene
+   * cuerpo en la escena —no está, o la vida todavía no ha dado su primer paso.
+   */
+  doing(id: number): ActorDoing | null;
+
+  /**
+   * VZ-6 · **Mirar a un punto del mapa**, en celdas.
+   *
+   * Existe porque §11.5 promete que contestar una decisión enfoca lo que esa
+   * decisión cambia, y eso **no estaba pasando en el juego que se publica**:
+   * `screens/crossroad.ts` lo hacía escalando el lienzo 2D con un `transform`,
+   * y ese lienzo va oculto desde UI-V10 en cuanto el 3D releva. O sea que el
+   * enfoque no hacía nada desde entonces, y el recorrido que lo vigilaba no
+   * tenía nada que leer: por eso llevaba declarado como fallo.
+   *
+   * Mueve el centro y no la altura, igual que `track`: acercarse o no es del
+   * jugador (§11.2).
+   */
+  look(x: number, z: number): void;
   dispose(): void;
 
   /**
@@ -175,6 +196,25 @@ export interface GraphicsRenderer {
   stats(): GraphicsStats;
 }
 
+/**
+ * VZ-6 · Lo que un cuerpo está haciendo **ahora mismo**, para quien lo mire.
+ *
+ * Es el dato que la línea «Today» de la ficha (prototipo 03) necesitaba y que
+ * UI-V4 dejó fuera con razón: derivarla del motor —oficio, estación, órdenes—
+ * daba una frase que **podía contradecir al cuerpo** que se ve en el valle. La
+ * cura no es adivinar mejor: es preguntar a quien lo sabe. Esto sale de la capa
+ * de vida, del mismo actor que se está pintando, así que la ficha no puede
+ * decir que acarrea madera mientras el aldeano está parado en la plaza.
+ *
+ * Dos campos y no el `Actor` entero a propósito: la interfaz no tiene nada que
+ * hacer con una posición, un clip ni un ángulo, y un contrato estrecho no se
+ * rompe cuando la vida se reescriba.
+ */
+export interface ActorDoing {
+  readonly activity: Activity;
+  readonly load: 'bundle' | 'stone' | 'grain' | null;
+}
+
 export interface GraphicsStats {
   readonly drawCalls: number;
   readonly triangles: number;
@@ -186,6 +226,16 @@ export interface GraphicsStats {
   readonly buildings: number;
   /** U-11 · a qué altura está la vista, en celdas: es lo que deja medir el vuelo de entrada desde fuera. */
   readonly viewHeight: number;
+  /**
+   * VZ-6 · **y dónde mira**, en celdas del mapa.
+   *
+   * Hermano de `viewHeight` y por el mismo motivo escrito allí: es lo que deja
+   * medir la cámara desde fuera sin abrir el renderer. La altura sola no
+   * bastaba: enfocar una decisión (§11.5) **mueve el centro y no la altura**,
+   * así que el recorrido que lo comprobaba miraba el `transform` del lienzo 2D
+   * —oculto desde UI-V10— y se quedó sin nada que leer.
+   */
+  readonly viewCentre: { readonly x: number; readonly z: number };
   /**
    * U-12 · qué fase de la jornada se acaba de pintar, de 0 a 1.
    *

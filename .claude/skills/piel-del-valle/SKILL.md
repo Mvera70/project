@@ -264,11 +264,28 @@ Y lo que sí queda abierto, con su motivo:
   encendida sola no se distingue a la distancia a la que se juega. Lo que queda
   es **juzgar la fuerza en el dispositivo**: el arnés no la aísla, porque el oro
   del anillo se confunde con la paja del valle si se busca por píxel.
-- **La línea «Today» de la ficha.** Necesita la capa de vida —derivarla del
-  motor podría contradecir al cuerpo que se ve en pantalla— y esa capa es justo
-  la que la otra sesión está reescribiendo.
-- **El nombre del caché del service worker se sube a mano.** Los modelos 3D no
-  llevan huella en el nombre, así que una copia guardada puede ser la
-  equivocada: el 17 sep los animales rediseñados no llegaron a los
-  dispositivos que ya habían visitado hasta que alguien subió el caché a
-  `valley-v3`. Derivarlo del hash del manifiesto lo cierra para siempre.
+- **La línea «Today» de la ficha está hecha** (VZ-6), y la cura no fue adivinar
+  mejor: fue **preguntar a quien lo sabe**. El dato sale del actor que la capa
+  de vida está pintando en ese fotograma (`ActorDoing`, por
+  `backend.live.doing`), no del motor, así que la ficha no puede decir que
+  alguien acarrea madera mientras se le ve parado en la plaza. **La regla que
+  deja:** cuando una frase de la interfaz describa algo que se está viendo, su
+  dato sale de lo que lo pinta. Nueve palabras y ninguna inventa un destino —la
+  vida sabe qué se lleva y en qué tramo va, no a qué edificio—, y quien ya no
+  está no tiene línea.
+- **El nombre del caché del service worker se sube a mano.** Los modelos 3D ya
+  llevan huella (VZ-6: `assets.ts` les cuelga el `sha256` y `sw.js` precachea
+  esas mismas direcciones), así que el caso que costó una tarde —los animales
+  rediseñados del 17 sep sin llegar a los dispositivos que ya habían visitado—
+  no puede repetirse. Lo que sigue a mano es el casco y el documento.
+
+Y una trampa nueva de VZ-6, que vale para cualquier adorno de la bandeja:
+
+- **Un adorno que pasa a ser botón tiene que recuperar el toque.** La hoja de
+  roble del ornamento lleva `pointer-events: none` desde UI-R2 por un motivo
+  medido: decoración que se traga los toques del valle. VZ-03 convirtió ese
+  mismo hueco en el **sello** de una decisión aplazada —el único camino de
+  vuelta a esa decisión— y la regla no se revisó: tocarlo no hacía nada y el
+  lienzo 3D se comía el toque. La excepción va atada a `:disabled`, que es lo
+  que `shell.ts` pone con la hoja. Y **sólo lo caza un click de verdad**: el
+  botón sale visible, habilitado y en su sitio en cualquier medida.

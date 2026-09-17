@@ -37,7 +37,7 @@ import { renderUiText } from '@engine/chronicle/render';
 import { isHere } from '@engine/people/demography';
 import type { GameState } from '@engine/state';
 import { panelFor, type InspectTarget } from '../inspect';
-import { personCard, type CardKin } from '../person-card';
+import { doingLine, personCard, type CardKin } from '../person-card';
 import type { UiActions, UiPanel, UiSnapshot } from './contracts';
 import { HEAD_SPRIG, ORNAMENT_VIEWBOX } from './person-ornaments';
 
@@ -165,11 +165,18 @@ export function createInspectPanel(
   kinStrip.className = 'person-kin';
   kinStrip.hidden = true;
 
+  // VZ-6 · la línea «Today» del prototipo 03, debajo de la placa y antes de
+  // los allegados: es lo único de la ficha que cambia mientras se mira, así
+  // que va donde el ojo cae al abrirla y no al final.
+  const todayLine = document.createElement('p');
+  todayLine.className = 'skin-read person-today';
+  todayLine.hidden = true;
+
   const goneLine = document.createElement('p');
   goneLine.className = 'skin-read person-gone';
   goneLine.hidden = true;
 
-  card.append(headPlate, kinStrip, goneLine);
+  card.append(headPlate, todayLine, kinStrip, goneLine);
   element.append(card, body);
 
   const follow = document.createElement('div');
@@ -260,7 +267,8 @@ export function createInspectPanel(
     // terreno siguen por el camino plano de `panelFor`, que esta ronda no
     // toca — son otra clase de cosa y no tienen ni cara ni parientes.
     // ------------------------------------------------------------------
-    const person = target.kind === 'villager' ? personCard(latest, target.id) : null;
+    const villagerId = target.kind === 'villager' ? target.id : null;
+    const person = villagerId === null ? null : personCard(latest, villagerId);
     card.hidden = person === null;
     heading.hidden = person !== null;
 
@@ -284,6 +292,18 @@ export function createInspectPanel(
 
       goneLine.textContent = person.gone ?? '';
       goneLine.hidden = person.gone === null;
+
+      // VZ-6 · «Today: …», y **sólo de quien sigue aquí**: un fallecido o un
+      // emigrado no tiene cuerpo en el valle, así que preguntar por él
+      // devolvería `null` de todas formas — pero la guarda va explícita por la
+      // misma razón que UI-R4 le quitó la edad de hoy, que una ficha no puede
+      // inventarle un presente a quien no lo tiene.
+      //
+      // Se lee en cada pintado a propósito: es la única línea de la ficha que
+      // cambia con el valle, y `textContent` sólo se toca si de verdad cambió.
+      const doing = person.gone === null && villagerId !== null ? doingLine(actions.doing(villagerId)) : null;
+      if (todayLine.textContent !== (doing ?? '')) todayLine.textContent = doing ?? '';
+      todayLine.hidden = doing === null;
 
       // La tira de parentesco sólo aparece cuando hay a quién poner en ella:
       // una tira vacía con dos aros sin inicial diría que alguien no tiene a

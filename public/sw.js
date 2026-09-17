@@ -10,7 +10,10 @@
 // The document has to come from the network when there is one, or a new
 // deployment could never reach a device that already installed the old one.
 // Everything else carries a content hash in its name, so a cached copy can
-// never be the wrong copy.
+// never be the wrong copy. **Y desde VZ-6 eso vale también para los modelos**:
+// no lo valía —`cow.glb` se llama igual siempre— y por eso los animales
+// rediseñados del 16 sep no llegaron a los dispositivos que ya habían
+// visitado; ahora `render3d/assets.ts` les cuelga su `sha256` a la dirección.
 //
 // The cache NAME is the only invalidation this has. Bump it and every older
 // cache is dropped on activate.
@@ -86,8 +89,19 @@ async function modelAssets(cache) {
     if (response === undefined) return [];
     const manifest = await response.json();
     const assets = Array.isArray(manifest.assets) ? manifest.assets : [];
+    // VZ-6 · **con la misma huella que pide el juego.** `render3d/assets.ts`
+    // cuelga los ocho primeros caracteres del `sha256` de cada recurso a su
+    // dirección, para que la suposición de la cabecera de este fichero —«cada
+    // recurso lleva una huella en el nombre, así que una copia guardada no
+    // puede ser la equivocada»— sea cierta también para los modelos, que se
+    // llaman igual toda la vida. Si aquí se precacharan sin ella, se guardarían
+    // claves que nadie va a pedir y el modo avión se quedaría sin modelos.
     return assets
-      .map((asset) => (typeof asset.file === 'string' ? `./assets/valley3d/${asset.file}` : null))
+      .map((asset) => {
+        if (typeof asset.file !== 'string') return null;
+        const stamp = typeof asset.sha256 === 'string' ? asset.sha256.slice(0, 8).toLowerCase() : '';
+        return `./assets/valley3d/${asset.file}${stamp === '' ? '' : `?v=${stamp}`}`;
+      })
       .filter((url) => url !== null);
   } catch {
     // Sin manifiesto no hay modelos que precachear, y el casco sigue entero.

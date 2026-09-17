@@ -1958,6 +1958,27 @@ export const UI_BANK: Record<string, string> = {
   'inspect.age.short': '{age} winters',
   'inspect.traits.none': 'No named traits.',
 
+  // VZ-6 · **la línea «Today» del prototipo 03**, que UI-V4 dejó fuera por una
+  // razón buena: la frase tenía que salir de la capa de vida y no del motor, o
+  // la ficha diría que alguien acarrea madera mientras se le ve parado en la
+  // plaza. Ahora sale del mismo actor que se está pintando (`ActorDoing`), así
+  // que dice lo que se ve.
+  //
+  // Nueve palabras y ninguna inventa un destino: el prototipo pone «carrying
+  // timber to the mill» y el molino no se puede afirmar —la vida sabe qué lleva
+  // y en qué tramo va, no a qué edificio—. Lo que sí es cierto es la carga, y
+  // manda sobre el tramo: quien va cargado está acarreando, ande o vuelva.
+  'inspect.today': 'Today: {doing}',
+  'inspect.doing.bundle': 'carrying timber',
+  'inspect.doing.stone': 'carrying stone',
+  'inspect.doing.grain': 'carrying grain',
+  'inspect.doing.home': 'indoors at home',
+  'inspect.doing.leaving': 'setting out',
+  'inspect.doing.walking': 'out on the paths',
+  'inspect.doing.working': 'at work',
+  'inspect.doing.returning': 'on the way home',
+  'inspect.doing.resting': 'resting',
+
   // UI-V4 · Las palabras de la tira de parentesco de la ficha (prototipo 03).
   // Sólo hay seis porque sólo hay seis vínculos que el motor guarde de verdad:
   // padre y madre (`parentIds`), de ahí hijo e hija, y el amigo y el rival que
@@ -1981,10 +2002,11 @@ export const UI_BANK: Record<string, string> = {
   // dos describe ya a nadie presente.
   'inspect.died': 'Died in ANNO {year}, {age} winters old.',
   'inspect.left': 'Left the valley in ANNO {year}.',
-  // UI-R4 · el control de seguimiento de la ficha. `track` marca un cuerpo,
-  // no mueve la cámara de forma continua (`src/render3d/renderer.ts` apunta
-  // una vez y no vuelve a tocarla sola; el 2D sólo dibuja un aro) — el texto
-  // lo dice para no prometer un centrado que ningún backend cumple.
+  // UI-R4 · el control de seguimiento de la ficha, y **el texto dice lo que
+  // desde VZ-4 y VZ-5 es verdad**: `app.ts` repite `track` en cada pintado, así
+  // que la vista se queda en quien anda, y `world/cast.ts` le enciende la ropa
+  // y le pone un anillo de oro en el suelo. Hasta entonces prometía sólo una
+  // marca porque el 3D apuntaba una vez y no volvía.
   'inspect.follow': 'Follow',
   'inspect.unfollow': 'Stop following',
   'inspect.track.note': 'Rings {name} on the map and keeps the view on them.',

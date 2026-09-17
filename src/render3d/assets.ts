@@ -115,6 +115,32 @@ export interface AssetOptions {
   readonly manifest?: unknown;
 }
 
+
+/**
+ * VZ-6 · **La dirección de un modelo lleva su huella.**
+ *
+ * El trabajador de `public/sw.js` responde a todo lo que no sea el documento
+ * con «caché primero», y su propio comentario dice por qué eso es seguro:
+ * «everything else carries a content hash in its name, so a cached copy can
+ * never be the wrong copy». Para los modelos **no era verdad**: `cow.glb` se
+ * llama igual siempre, así que un dispositivo que ya había visitado seguía
+ * sirviendo el modelo viejo de su propia caché.
+ *
+ * Pasó de verdad y lo notó el dueño del diseño: los seis animales se
+ * rediseñaron el 16 sep y en su tablet seguían saliendo los antiguos. Se tapó
+ * subiendo a mano el nombre de la caché, que es la única invalidación que ese
+ * fichero tiene; esto quita la necesidad de acordarse.
+ *
+ * El manifiesto ya trae el `sha256` de cada recurso, así que la huella no hay
+ * que calcularla: se le cuelga a la dirección y con eso la suposición del
+ * trabajador pasa a ser cierta. Ocho caracteres bastan —son 32 bits de
+ * colisión sobre 57 ficheros— y dejan la dirección legible en la pestaña de
+ * red, que es donde se depura esto.
+ */
+function urlOf(base: string, asset: AssetEntry): string {
+  return `${base}${asset.file}?v=${asset.sha256.slice(0, 8).toLowerCase()}`;
+}
+
 export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
   const base = options.baseUrl.endsWith('/') ? options.baseUrl : `${options.baseUrl}/`;
   const get = options.fetcher ?? fetch;
@@ -138,7 +164,7 @@ export async function loadAssets(options: AssetOptions): Promise<AssetLibrary> {
     // budget rather than to grab.
     const held = options.bytes?.[asset.id];
     const gltf = held === undefined
-      ? await loader.loadAsync(`${base}${asset.file}`).catch((error: unknown) => {
+      ? await loader.loadAsync(urlOf(base, asset)).catch((error: unknown) => {
         const cause = error instanceof Error ? error.message : String(error);
         throw new Error(`Could not load '${asset.id}' from ${base}${asset.file}: ${cause}`);
       })

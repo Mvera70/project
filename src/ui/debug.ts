@@ -98,6 +98,34 @@ export function runToSky(
  *
  * Medido en el portátil: 5 años 59 ms, 20 años 296 ms, 60 años 1,3 s.
  */
+/**
+ * VZ-6 · Sigue jugando hasta que haya **una decisión planteada y sin contestar**,
+ * y devuelve cuántas semanas hizo falta.
+ *
+ * Es lo que le da su estado a `?crossroad=1`, y hace falta porque `stateAt` y
+ * `openAtYear` juegan con la política prudente —que es lo correcto: sin
+ * contestar, la primera planteada se queda pendiente para siempre y con ella se
+ * van sus consecuencias (`CLAUDE.md`)—, así que al abrir **nunca** hay ninguna
+ * en pantalla. Y sin una en pantalla hay dos cosas que no se pueden mirar: el
+ * documento sellado de UI-V3, que sólo existe habiendo decisión pendiente, y
+ * que aplazar deje ir a ver otra cosa (§8.6).
+ *
+ * No es un bucle de `tick`: es `run` semana a semana con la política de
+ * referencia. `run` contesta la pendiente **al empezar** el tick siguiente, así
+ * que una recién planteada sigue ahí cuando la semana termina — que es
+ * exactamente el instante que se busca, y una partida de verdad hasta él.
+ *
+ * Puede acabarse el valle por el camino (§13.3): entonces se abre lo que quedó,
+ * igual que `openAtYear`.
+ */
+export function runToCrossroad(state: GameState, limitWeeks = 400): number {
+  for (let weeks = 0; weeks < limitWeeks; weeks += 1) {
+    if (state.crossroad !== null || state.ended !== null) return weeks;
+    run(state, 1, 'prudent', CATALOG);
+  }
+  return limitWeeks;
+}
+
 export function openAtYear(state: GameState, year: number): void {
   const weeks = Math.max(0, Math.floor(year) - 1) * TIME.WEEKS_PER_YEAR;
   if (weeks > 0) run(state, weeks, 'prudent', CATALOG);

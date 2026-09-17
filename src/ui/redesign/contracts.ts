@@ -12,6 +12,7 @@
 import type { ArchivedGame, GameState, Intent } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
+import type { ActorDoing } from '../../render3d/contracts';
 
 /**
  * A dónde puede navegar el jugador. Cinco rutas, ninguna superposición.
@@ -41,6 +42,17 @@ export interface UiActions {
   setSpeed(speed: Speed): void;
   setIntent(intent: Intent): void;
   track(id: number | null): void;
+  /**
+   * VZ-6 · **Qué está haciendo esa persona ahora mismo**, para la línea «Today»
+   * de la ficha. `null` cuando no hay a quién preguntar: el lienzo 2D no simula
+   * cuerpos, y en 3D alguien puede no tener actor todavía.
+   *
+   * Es una **lectura**, no una acción, y va aquí porque es el único conducto
+   * que un panel tiene hacia el mundo: `UiSnapshot` sólo lleva estado del
+   * motor, y esto no está en el estado a propósito —lo que se ve andando es
+   * efímero y no se guarda (Anexo E)—.
+   */
+  doing(id: number): ActorDoing | null;
 }
 
 /**

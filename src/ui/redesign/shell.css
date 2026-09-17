@@ -79,9 +79,20 @@ html.welcome-open .ui-shell-stack { visibility: hidden; }
   pointer-events: none; }
 .ui-shell-message > * { pointer-events: auto; }
 /* El borde y el ornamento son decoración de la bandeja, no controles: no
-   deben quitarle el toque a lo que haya debajo (§4.1 de UI-R2, arriba). */
+   deben quitarle el toque a lo que haya debajo (§4.1 de UI-R2, arriba).
+
+   **VZ-6 · pero el ornamento dejó de ser siempre decoración.** Con la hoja de
+   roble lo es —y esta regla tiene que seguir, o la hoja se traga los toques del
+   valle—, pero desde VZ-03 sostiene el sello de lacre de una decisión aplazada,
+   y el sello **es el único camino de vuelta a esa decisión**. Con esta regla
+   sobre los dos casos, tocarlo no hacía nada: el lienzo 3D se comía el toque.
+   Medido con un click real de Playwright, que es lo único que lo caza — «canvas
+   #valley3d intercepts pointer events» sobre un botón visible y habilitado.
+   Así que la excepción se ata a `:disabled`, que es exactamente lo que `shell.
+   ts` pone cuando el ornamento lleva la hoja: decoración no recibe toques,
+   control sí. */
 .ui-shell-message > .skin-scroll-edge,
-.ui-shell-message > .skin-ornament { pointer-events: none; }
+.ui-shell-message > .skin-ornament:disabled { pointer-events: none; }
 /* El borde vive dentro del hueco (no en la pila, que no tiene margen propio),
    así que tiene que estirarse a los dos lados: `align-items: center` de la
    regla de arriba lo dejaría del ancho de su contenido si no fuera por esto. */

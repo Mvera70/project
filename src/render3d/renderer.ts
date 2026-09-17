@@ -23,7 +23,7 @@ import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
-  Actor, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
+  Actor, ActorDoing, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
   GraphicsViewport,
 } from './contracts';
 import { VALLEY_COLOURS } from './visual-config';
@@ -1058,6 +1058,30 @@ export async function createGraphicsRenderer(
       };
     },
 
+    doing(id: number): ActorDoing | null {
+      // VZ-6 · del mismo `lastActors` con el que se pintó el último fotograma:
+      // lo que la ficha dice es literalmente lo que se está viendo.
+      const found = lastActors.find((actor) => actor.id === id);
+      if (found === undefined) return null;
+      return { activity: found.activity, load: found.load ?? null };
+    },
+
+    look(x: number, z: number): void {
+      if (disposed) return;
+      // VZ-6 · lo que §11.5 pide al contestar una decisión: mirar a lo que esa
+      // decisión ha cambiado. Sin tocar la altura, como `track`: acercarse es
+      // del jugador.
+      //
+      // Cuenta como mover la cámara —`flight` fuera, `disturbed` puesto— y no
+      // por gusto: contestar cambia el estado, y el encuadre automático de
+      // `paint` (`if (!isQuiet(change) && !disturbed) frameCamera()`) se comía
+      // el enfoque en el fotograma siguiente. Es la misma razón por la que
+      // `pan` y `zoom` lo hacen.
+      flight = null;
+      disturbed = true;
+      view.look(x, z);
+    },
+
     track(id: number | null): void {
       // VZ-5 · **y se le enciende la ropa**, que es lo que hace que sepas a
       // quién sigues: en un valle con ochenta personas del tamaño de un dedal,
@@ -1119,6 +1143,7 @@ export async function createGraphicsRenderer(
         actors: cast.count,
         buildings: village.count,
         viewHeight: view.view.height,
+        viewCentre: { x: view.view.centre.x, z: view.view.centre.z },
         sunPhase: paintedPhase,
         sky: paintedSky,
         bolts,

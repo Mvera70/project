@@ -27,6 +27,7 @@ import { isHere } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import type { GameState, Villager, VillagerId } from '@engine/state';
 import { yearOf } from '@engine/time';
+import type { ActorDoing } from '../render3d/contracts';
 
 /** Lo mínimo para dibujar a alguien en un medallón y nombrarlo. */
 interface CardFace {
@@ -72,6 +73,25 @@ export interface PersonCard extends CardFace {
    * opiniones que le tienen hoy sería inventarle un presente.
    */
   readonly gone: string | null;
+}
+
+/**
+ * VZ-6 · La línea «Today» de la ficha: qué está haciendo esa persona.
+ *
+ * Puro y aparte de `personCard` porque **su dato no está en el estado**: lo que
+ * se ve andando es efímero y lo produce la capa de vida en cada paso (Anexo E),
+ * así que no hay `GameState` del que sacarlo. Recibe lo que el renderer dice
+ * del cuerpo que está pintando y devuelve la frase, o `null` cuando no hay
+ * cuerpo —el lienzo 2D no simula ninguno, y en 3D alguien puede no tenerlo
+ * todavía—. `null` es «no se dice nada», nunca una frase de relleno.
+ *
+ * La carga manda sobre el tramo: quien lleva un fardo está acarreando, y da
+ * igual si en ese instante va o vuelve.
+ */
+export function doingLine(doing: ActorDoing | null): string | null {
+  if (doing === null) return null;
+  const what = doing.load !== null ? doing.load : doing.activity;
+  return renderUiText('inspect.today', { doing: renderUiText(`inspect.doing.${what}`) });
 }
 
 /** El umbral con el que una opinión deja de ser ruido. El mismo que `inspect.ts`. */

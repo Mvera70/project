@@ -12,7 +12,7 @@
 
 import { WORLD } from '@engine/balance';
 import type { GameState } from '@engine/state';
-import type { GraphicsStats } from '../render3d/contracts';
+import type { ActorDoing, GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
 import { inspectAt } from './inspect';
 import { createRenderer, type ValleyRenderer } from '@render/renderer';
@@ -42,6 +42,10 @@ interface ValleyBackend {
   /** What is under a point, in CSS pixels local to the viewport element. */
   pick(state: GameState, xCss: number, yCss: number, tickFraction: number): InspectTarget | null;
   track(id: number | null): void;
+  /** VZ-6 · mirar a un punto del mapa, en celdas. El 2D no tiene cámara. */
+  look(x: number, z: number): void;
+  /** VZ-6 · qué hace ese cuerpo ahora mismo. El 2D no simula cuerpos. */
+  doing(id: number): ActorDoing | null;
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
   /** Gira la vista, en radianes. Canvas no puede: no tiene desde dónde mirar. */
@@ -126,6 +130,10 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
       );
     },
     track(id) { renderer.track(id); },
+    look() { /* El 2D dibuja el mapa entero: no hay a dónde mirar. */ },
+    // El 2D pinta puntos desde el estado, no simula cuerpos: no hay a quién
+    // preguntar qué está haciendo, y una frase inventada es peor que ninguna.
+    doing() { return null; },
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
     pan() { /* idem */ },
     // El 2D es una proyección fija del mapa entero dibujada a mano: no hay ángulo
@@ -308,6 +316,8 @@ export function attachBackend(
         kind: 'pilot3d',
         movesCamera: true,
         surface: webgl,
+        look(x, z) { renderer.look(x, z); },
+        doing(id) { return renderer.doing(id); },
         paint(state, tickFraction, speed) {
           // El reloj de presentacion es dueno unico del tiempo escenico y no
           // toca el acumulador del juego: quien avanza los ticks sigue siendo

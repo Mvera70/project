@@ -2,7 +2,7 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { SCHEMA_VERSION, type SaveFile } from '@engine/state';
-import { mountDebug, openAtYear, parseDebugRequest, runToSky, stateAt } from './ui/debug';
+import { mountDebug, openAtYear, parseDebugRequest, runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -62,6 +62,11 @@ if (root) {
     // dos, o nubes). En invierno hay que pedir `snow`: no truena.
     const sky = query.get('weather');
     if (sky === 'storm' || sky === 'snow' || sky === 'wet') runToSky(state, sky);
+    // VZ-6 · `&crossroad=1` sigue jugando hasta que haya una decisión sin
+    // contestar. Sin esto no se puede fotografiar ni el documento sellado ni
+    // el sello del ornamento: el valle que estas rutas abren viene ya jugado
+    // con la política prudente, o sea con todas contestadas.
+    if (query.get('crossroad') === '1') runToCrossroad(state);
     if (query.get('hunger') === '1') state.village.grain = 0;
     if (query.get('ended') === '1') {
       state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };

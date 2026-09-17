@@ -153,27 +153,26 @@ function textOf(state: GameState, p: PendingCrossroad, key: string): string {
 }
 
 /**
- * §11.2's two seconds: zoom on the map cell a decision changed. `transform-
- * origin` as a percentage of the canvas box does the centring for free — the
- * canvas always draws the whole map (§11.3: "no hay desplazamiento de cámara
- * a 1×"), so a fraction of its box is exactly a fraction of the map.
+ * §11.2 · contestar enfoca lo que la decisión cambia: la cámara mira a la
+ * celda del primer efecto visible del tick.
+ *
+ * **VZ-6 lo reescribió entero, y la causa merece quedar escrita**: esto
+ * escalaba `#valley` con un `transform` y un `transform-origin` en tanto por
+ * ciento, que funcionaba porque el lienzo 2D dibuja el mapa completo. Desde
+ * UI-V10 ese lienzo está oculto en cuanto el 3D releva, así que enfocar no
+ * hacía **nada** en el juego que se publica —y el recorrido que lo vigilaba no
+ * tenía nada que leer, por lo que llevaba declarado como fallo—. Ahora se pide
+ * por `app.look`, que baja a la cámara del renderer.
+ *
+ * Mueve el centro y no la altura: acercarse o no es del jugador (§11.2), y un
+ * salto de zoom sobre un valle en marcha marea más de lo que señala. Sin
+ * transición y sin volver: la cámara se queda donde la decisión la dejó, que
+ * es lo mismo que pasa cuando el jugador la arrastra con el dedo.
  */
-function focus(state: GameState, report: TickReport): void {
+function focus(app: App, report: TickReport): void {
   const point = report.visualEffects[0];
   if (point === undefined) return;
-  const canvas = document.querySelector<HTMLCanvasElement>('#valley');
-  if (canvas === null) return;
-  // No CSS transition: an eased zoom is a real-clock animation riding on top
-  // of a simulation the tick's own clock drives, and the two have no reason
-  // to agree — the animation can still be mid-flight when a later tick (or a
-  // test's fake clock) has already moved the two seconds on. A hard cut reads
-  // as emphasis and stays exactly two seconds, not "about" two seconds.
-  canvas.style.transformOrigin = `${(point.x / state.map.width) * 100}% ${(point.y / state.map.height) * 100}%`;
-  canvas.style.transform = 'scale(2.5)';
-  setTimeout(() => {
-    canvas.style.transform = 'scale(1)';
-    canvas.style.transformOrigin = '50% 50%';
-  }, 2_000);
+  app.look(point.x, point.y);
 }
 
 interface Shown { key: string; overlay: HTMLElement | null; marker: HTMLElement | null }
@@ -273,7 +272,7 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
       // — and dispatches the event — synchronously inside that call, so a
       // listener added after it returns would already have missed it.
       const onDecided = ((event: CustomEvent<TickReport>) => {
-        focus(app.state(), event.detail);
+        focus(app, event.detail);
       }) as EventListener;
       document.addEventListener('valley:decided', onDecided, { once: true });
       const accepted = app.decide(optionId);

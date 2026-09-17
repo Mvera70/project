@@ -396,6 +396,111 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   await page.screenshot({ path: 'artifacts/m21-panel.png', fullPage: true });
 });
 
+test('la ficha de un aldeano dice qué está haciendo ahora mismo (prototipo 03)', async ({ page }) => {
+  // **VZ-6 · la línea «Today», que UI-V4 dejó fuera con razón.** Su dato no
+  // está en el estado: lo que se ve andando lo produce la capa de vida en cada
+  // paso, así que derivarla del motor —oficio, estación, órdenes— daba una
+  // frase que podía contradecir al cuerpo que se ve en el valle. Ahora sale del
+  // mismo actor que se está pintando, y **eso sólo se puede comprobar en el
+  // navegador**: en una prueba rápida no hay renderer, y la línea saldría
+  // callada sin que nada estuviera mal.
+  //
+  // Se abre por la lista de gente y no tocando el lienzo: la lista sólo enseña
+  // a quien está presente y tiene nombre, o sea exactamente a quien tiene
+  // cuerpo en la escena.
+  await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  await answerAnyCrossroad(page);
+  await page.getByRole('button', { name: 'People' }).click();
+  await page.locator('.people-row').first().click();
+  await test.expect(page.locator('.person-card')).toBeVisible();
+
+  // La frase tarda lo que tarde la vida en dar su primer paso —el relevo a 3D
+  // baja 2,7 MB de modelos—, así que se espera a que haya cuerpo en vez de
+  // fijar un instante.
+  const hoy = page.locator('.person-today');
+  await test.expect(hoy).toBeVisible({ timeout: 30_000 });
+  const frase = await hoy.innerText();
+  // Lo que se guarda es la propiedad, no la frase: que está compuesta del banco
+  // y que dice algo de las nueve cosas que un cuerpo puede estar haciendo.
+  test.expect(frase).toMatch(/^Today: /u);
+  test.expect(frase).not.toMatch(/\{\w+\}|inspect\./u);
+  await page.screenshot({ path: 'artifacts/vz6-today.png', fullPage: true });
+});
+
+test('una decisión aplazada deja ir a mirar otra cosa (§8.6)', async ({ page }) => {
+  // **La deuda más vieja del cuaderno de esta tanda**, apuntada como «una
+  // decisión pendiente bloquea la navegación»: `paint` devolvía la ruta al
+  // valle en **cada fotograma** mientras hubiera decisión pendiente, incluso
+  // aplazada, así que la crónica y la gente se pulsaban y volvían solas. Y de
+  // ahí salía además que el documento sellado de UI-V3 fuera inalcanzable por
+  // construcción: sólo existe habiendo decisión pendiente, que era justo el
+  // estado en el que la crónica no abría.
+  //
+  // Aplazar existe **para poder ir a mirar otra cosa** antes de contestar
+  // (§8.6: la decisión espera, no caduca). Esto es esa propiedad, y va aquí y
+  // no en la suite rápida porque lo que fallaba era el bucle de pintado.
+  await page.clock.install();
+  // `&crossroad=1` (VZ-6) sigue jugando hasta que haya una sin contestar, así
+  // que la decisión está en pantalla al abrir. La evidencia con la que la deuda
+  // se midió fijaba semilla y año —«semilla 11, año 37»— y desde R-1 el valle
+  // tira sucesos cada semana: esa trayectoria ya no es la que era, y la prueba
+  // pide **el estado** en vez de adivinar dónde estaba.
+  await page.goto('/?debug=1&live=1&crossroad=1&seed=11&year=37&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+  const scrim = page.locator('.crossroad-scrim');
+  await test.expect(scrim).toBeVisible();
+
+  // Se aplaza deslizando hacia abajo, que es el único gesto que §11.2 le da:
+  // esta pantalla no tiene botón de cerrar.
+  await scrim.dispatchEvent('pointerdown', { clientX: 195, clientY: 300, pointerId: 1 });
+  await scrim.dispatchEvent('pointerup', { clientX: 195, clientY: 560, pointerId: 1 });
+  await test.expect(scrim).toHaveCount(0);
+  // Y la marca es el sello de lacre del ornamento (VZ-03), no una píldora.
+  await test.expect(page.locator('.skin-ornament--seal')).toBeVisible();
+
+  // Lo que la deuda rompía: con el reloj corriendo unos fotogramas, la crónica
+  // se abre **y se queda abierta**. Un solo `expect` no lo habría cazado: el
+  // fallo estaba en `paint`, o sea que devolvía la ruta al fotograma siguiente.
+  await page.getByRole('button', { name: 'Chronicle' }).click();
+  await page.clock.runFor(1_000);
+  await test.expect(page.locator('.chronicle-scrim')).toBeVisible();
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'chronicle');
+  await page.screenshot({ path: 'artifacts/vz6-deferred.png', fullPage: true });
+
+  // **Y el documento sellado de UI-V3, que llevaba sin verse en captura**, y
+  // no por estar mal: sólo existe habiendo decisión pendiente, que era justo
+  // el estado en el que la crónica no abría. Va al final del año que la
+  // plantea, así que hay que bajar a él como bajaría el dedo.
+  const sellado = page.locator('.chronicle-sealed');
+  await sellado.scrollIntoViewIfNeeded();
+  await test.expect(sellado).toBeVisible();
+  await test.expect(page.locator('.chronicle-sealed-title')).not.toBeEmpty();
+  await page.screenshot({ path: 'artifacts/vz6-sealed.png', fullPage: true });
+  // Y tocarlo lleva al valle, que es lo que su contrato promete: un panel no
+  // abre pantallas por su cuenta (`redesign/contracts.ts`), así que pide la
+  // ruta y allí espera el sello. **No abre la decisión de un toque**, y eso es
+  // una asimetría con el sello del ornamento —dos toques contra uno— que se
+  // deja anotada y no se cambia sola: desde VZ-03 aplazada es aplazada, y
+  // decidir que este documento la reabra es del dueño del diseño.
+  await sellado.click();
+  await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
+  await test.expect(page.locator('.skin-ornament--seal')).toBeVisible();
+
+  // Y la gente igual, que es la otra pantalla que el candado cerraba.
+  await page.getByRole('button', { name: 'People' }).click();
+  await page.clock.runFor(1_000);
+  await test.expect(page.locator('.people-scrim')).toBeVisible();
+
+  // El sello sigue ahí: la decisión no se ha perdido por haber ido a mirar.
+  await page.getByRole('button', { name: 'Valley' }).click();
+  await page.clock.runFor(1_000);
+  await test.expect(page.locator('.skin-ornament--seal')).toBeVisible();
+  // Y tocarlo la devuelve a la pantalla, que es para lo que está.
+  await page.locator('.skin-ornament').click();
+  await test.expect(scrim).toBeVisible();
+});
+
 test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ page }) => {
   // U-13 · el último de los cinco pasos del dueño del diseño. La ruta de
   // depuración adelanta el valle hasta una jornada de tormenta (`runToSky`),
@@ -436,25 +541,37 @@ test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
 });
 
 test('la encrucijada muestra el precio de las tres opciones sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
-  // Declarado: la encrucijada ya no se planta a los 58 s de reloj virtual en
-  // esta semilla. Pide remedir el tick, o mejor, esperar a que el motor plante
-  // una en vez de fijar un número. Ver la cabecera.
-  test.fail();
-  // Semilla 7, año 80: exactamente 60 ticks a 16× (§17 M-22, medido con un
-  // sondeo de un solo uso) plantan `forest_cut` sin que nadie la conteste —
-  // esta aplicación real, a diferencia del banco, nunca decide sola.
+  // **VZ-6 · se espera a que el motor plante una, en vez de fijar el instante.**
+  // Ése era el arreglo que la propia nota de esta prueba pedía: fijaba «60
+  // ticks a 16×» —58 segundos de reloj virtual— medidos con un sondeo de un
+  // solo uso, y cualquier cambio del motor mueve ese instante. Desde R-1 el
+  // valle tira sucesos cada semana, así que la trayectoria de la semilla 7 ya
+  // no es la que era.
+  //
+  // Y tampoco se exige **cuál** se planta: el catálogo tiene 56 opciones y la
+  // que toque depende de la partida. Lo que §11.2 y M-22 prometen es que
+  // cuando hay una decisión ocupa la pantalla, que se leen sus tres precios
+  // sin desplazar, y que contestarla enfoca el mapa.
   await page.clock.install();
   await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
   await answerAnyCrossroad(page);
   await page.locator('.valley-speed-badge').click();
   await page.getByRole('button', { name: '16×', exact: true }).click();
-  await page.clock.runFor(58_000);
-
   const scrim = page.locator('.crossroad-scrim');
-  await test.expect(scrim).toBeVisible();
-  await test.expect(page.locator('.valley-speeds')).toHaveCSS('visibility', 'hidden');
-  await test.expect(page.locator('.crossroad h1')).toHaveText('The Old Wood');
+  // Semana a semana hasta que el motor plante una, con tope: a 16× una semana
+  // son 52,5 s de reloj, y §8.6 no deja dos pendientes a la vez.
+  await test.expect.poll(async () => {
+    if (await scrim.isVisible()) return true;
+    await advanceWeeks(page, 1, 16);
+    return scrim.isVisible();
+  }, { timeout: 90_000, intervals: [100] }).toBe(true);
+  // La decisión ocupa la pantalla: el mando de la velocidad se aparta (§11.2).
+  await test.expect(page.locator('.hud-speed-cluster')).toHaveCSS('visibility', 'hidden');
+  // Y tiene un título de verdad, del banco y no una clave sin componer.
+  const titulo = await page.locator('.crossroad h1').innerText();
+  test.expect(titulo.length).toBeGreaterThan(3);
+  test.expect(titulo).not.toMatch(/\{\w+\}/u);
   const costs = page.locator('.crossroad-cost');
   await test.expect(costs).toHaveCount(3);
   // El precio de cada opción, en pantalla junto al verbo, sin que haga falta
@@ -462,22 +579,28 @@ test('la encrucijada muestra el precio de las tres opciones sin desplazar, y dec
   for (const cost of await costs.all()) await test.expect(cost).toBeInViewport();
   await page.screenshot({ path: 'artifacts/m22-crossroad.png', fullPage: true });
 
-  const before = await page.locator('#valley').evaluate((el) => getComputedStyle(el).transform);
-  // `Fell it` focuses the actual first cell cleared by the 900-unit decision;
-  // this is the visual proof for §11.5's former `felled_wood` fallback.
-  await page.getByRole('button', { name: /^Fell it\./ }).click();
+  // Contestar enfoca el mapa (§11.5). Se pulsa **la primera opción** y no una
+  // por su texto: si el título ya no se fija, sus verbos tampoco. Y se mira
+  // **dónde mira la cámara**, que es lo que enfocar mueve: el `transform` del
+  // lienzo 2D que esto leía antes va oculto desde UI-V10, y la altura de vista
+  // no cambia al enfocar, sólo el centro. `data-view-centre` lo publica el
+  // renderer en la raíz por el mismo motivo que `data-view-height` (VZ-6).
+  const centroAntes = await page.evaluate(() => document.documentElement.dataset.viewCentre ?? '');
+  await page.locator('.crossroad-options button').first().click();
   await test.expect(scrim).toBeHidden();
   await test.expect
-    .poll(() => page.locator('#valley').evaluate((el) => getComputedStyle(el).transform))
-    .not.toBe(before);
+    .poll(() => page.evaluate(() => document.documentElement.dataset.viewCentre ?? ''))
+    .not.toBe(centroAntes);
   await page.screenshot({ path: 'artifacts/m22-focus.png', fullPage: true });
 });
 
-test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, hito 6)', async ({ page }) => {
-  // Declarado: U-01 cambió el color del velo y esta prueba fija el anterior
-  // como literal. Lo que hay que comprobar es la propiedad —que el velo tapa y
-  // sale de la paleta— y no un rgb. Ver la cabecera.
-  test.fail();
+test('cerrar y abrir tras la ausencia que §13.2 paga entera presenta un parte de bienvenida (§13, hito 6)', async ({ page }) => {
+  // **VZ-6 · deja de estar declarada, y lo que la tenía roja era ella.**
+  // Fijaba el velo de U-01 como literal (`rgb(18, 17, 14)`), así que cada vez
+  // que el velo cambiaba —y ha cambiado dos veces: UI-V5c lo bajó al 18 % y
+  // VZ-04a vistió esta pantalla— la prueba caía sin que el parte tuviera nada
+  // mal. Ahora comprueba **la propiedad**: que atenúa el valle en vez de
+  // taparlo (§11.2) y que la página es la hoja de siempre.
   const t0 = Date.now();
   await page.clock.install({ time: t0 });
   await page.goto(CANVAS); // sin parámetros de depuración: la ruta real, guardado incluido
@@ -512,18 +635,41 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
   })).toBe(true);
 
   // Cuatro horas después, con reloj falso — no se espera de verdad.
-  await page.clock.setSystemTime(t0 + 4 * 60 * 60 * 1000);
+  // **VZ-6 · la ausencia es el tope de §13.2, no cuatro horas.** Cuatro horas
+  // eran el tope cuando una semana duraba quince segundos; desde v3.72 dura
+  // catorce minutos, así que cuatro horas se cobran en diecisiete ticks y la
+  // cota de más abajo —«más de 900»— no se alcanzaba nunca. El tope son 960
+  // ticks y sigue siendo el mismo (`LETHARGY_CAP_MS`); lo que cambió es cuánto
+  // reloj de pared valen: nueve días y medio. Se lee de `balance.ts` para que
+  // el día que la semana vuelva a cambiar esto no vuelva a mentir.
+  await page.clock.setSystemTime(t0 + TIME.LETHARGY_CAP_MS);
   await page.reload();
   await passTitle(page); // U-10: al volver, el menú ofrece continuar
   await page.locator('html[data-app-ready="true"]').waitFor();
 
   const welcome = page.locator('.welcome');
   await welcome.waitFor({ timeout: 15_000 });
-  await test.expect(page.locator('.welcome-scrim')).toHaveCSS('background-color', 'rgb(18, 17, 14)');
+  // §11.2 pide el valle **atenuado y no tapado**: el velo tiene que dejarse ver
+  // a través. Se lee su alfa en vez de su color, que es lo que la sección dice.
+  const velo = await page.locator('.welcome-scrim').evaluate((el) => getComputedStyle(el).backgroundColor);
+  const alfa = Number(/rgba?\([^)]*?([\d.]+)\)/u.exec(velo)?.[1] ?? '1');
+  test.expect(velo, 'el velo sale de la paleta, no es un gris cualquiera').toMatch(/^rgba\(/u);
+  test.expect(alfa, `el velo atenúa y no tapa (${velo})`).toBeLessThan(0.5);
+  test.expect(alfa).toBeGreaterThan(0);
+  // Y la página es la hoja de siempre: el papel de la crónica con su canto
+  // rasgado, que es el estándar de VZ-2 para las seis superficies.
+  await test.expect(welcome).toHaveClass(/skin-paper--page/u);
+  await test.expect(welcome).toHaveClass(/skin-torn-top/u);
   await page.screenshot({ path: 'artifacts/m23-welcome.png', fullPage: true });
   const text = await welcome.innerText();
   test.expect(text).not.toMatch(/\{\w+\}/);
-  test.expect(text).toMatch(/weeks passed|has been \d+ weeks|weeks, and nobody/);
+  // VZ-6 · **y la ausencia puede venir en años.** El patrón sólo cubría las
+  // tres plantillas de semanas, y con el tope de §13.2 —960 semanas— el banco
+  // usa a propósito las de años: «960 weeks passed» no es una frase que nadie
+  // pueda sentir, y eso lo dice el propio comentario del banco. Lo que la
+  // prueba guarda es que **el parte diga cuánto tiempo ha pasado**, en la
+  // unidad que el banco elija.
+  test.expect(text).toMatch(/\d+ (weeks|years) passed|has been \d+ (weeks|years)|(weeks|years), and nobody|went \d+ years without/u);
 
   // The completed catch-up is itself a persistence boundary. Without this
   // write, closing on the welcome screen can reload the pre-catch-up state;
@@ -544,7 +690,7 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
     db.close();
     return save === undefined ? undefined : { savedAtMs: save.savedAtMs, tick: save.state?.tick };
   });
-  const returnAt = t0 + 4 * 60 * 60 * 1000;
+  const returnAt = t0 + TIME.LETHARGY_CAP_MS;
   await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? 0)
     .toBeGreaterThanOrEqual(returnAt);
   await test.expect.poll(async () => (await persistedCatchUp())?.savedAtMs ?? Number.POSITIVE_INFINITY)
@@ -562,16 +708,18 @@ test('cerrar y abrir a las cuatro horas presenta un parte de bienvenida (§13, h
 });
 
 test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruinas (§13.3)', async ({ page }) => {
-  // Declarado: `#valley` no da caja al refundar, y hace falta mirar la página
-  // para saber por qué. Ver la cabecera.
-  test.fail();
   await page.goto('/?debug=1&live=1&ended=1&seed=7&year=80&season=autumn');
   await page.locator('html[data-app-ready="true"]').waitFor();
   const epitaph = page.locator('.epitaph-scrim');
   await test.expect(epitaph).toBeVisible();
   await test.expect(epitaph.getByRole('heading')).toHaveText('The valley is empty');
   await test.expect(epitaph).toContainText('The last households left in year 81.');
-  await test.expect(epitaph).toContainText('80 years. 82 people at its height.');
+  // **VZ-6 · el máximo de población no se congela.** Decía «82 people at its
+  // height» y la semilla 7 a los ochenta años da 39: es una cifra del motor, y
+  // CLAUDE.md lo dice desde v3.75 —«un cambio del motor mueve todas las
+  // pruebas que midan una aldea hecha»—. Lo que §13.3 promete es que el
+  // epitafio diga **cuánto duró y cuánto llegó a ser**, no un número concreto.
+  await test.expect(epitaph).toContainText(/80 years\. \d+ people at its height\./u);
   await test.expect(page.locator('.valley-speeds')).toHaveCSS('visibility', 'hidden');
   await page.screenshot({ path: 'artifacts/m25-epitaph.png', fullPage: true });
 
@@ -589,30 +737,30 @@ test('una aldea terminada deja epitafio y una fundación nueva conserva sus ruin
   await epitaph.getByRole('button', { name: 'Begin again' }).click();
   await test.expect(epitaph).toBeHidden();
   await test.expect(page.locator('.valley-date')).toContainText('Year 1');
-  await test.expect(page.locator('.valley-speeds')).toBeVisible();
+  // **VZ-6 · el mando vuelve, no la fila.** `.valley-speeds` es la fila de las
+  // cuatro velocidades, y desde UI-V2b vive **recogida** detrás de su botón:
+  // pedirla visible era pedir el estado de antes de esa ronda. Lo que §13.3
+  // promete es que la aldea nueva se juega, y eso es que el mando esté ahí.
+  await test.expect(page.locator('.hud-speed-cluster')).toBeVisible();
   await page.screenshot({ path: 'artifacts/m25-inherited-valley.png', fullPage: true });
-
-  const canvas = page.locator('#valley');
-  const box = await canvas.boundingBox();
-  test.expect(box).not.toBeNull();
-  await page.mouse.move((box?.x ?? 0) + 180, (box?.y ?? 0) + 430);
-  await page.mouse.down();
-  await page.mouse.move((box?.x ?? 0) + 180, (box?.y ?? 0) + 230);
-  await page.mouse.up();
-  const archivePicker = page.getByRole('combobox', { name: 'Valley chronicle' });
-  await test.expect(archivePicker).toBeVisible();
-  await test.expect(archivePicker.locator('option')).toHaveCount(2);
-  await test.expect(archivePicker.locator('option').nth(1)).toHaveText('Earlier valley 1 — 80 years, peak 82');
-  const chronicleBody = page.locator('.chronicle-body');
-  const currentChronicle = await chronicleBody.innerText();
-  await archivePicker.selectOption('archive:0');
-  await test.expect.poll(() => chronicleBody.innerText()).not.toBe(currentChronicle);
-  await page.screenshot({ path: 'artifacts/m26-archive-reader.png', fullPage: true });
-  const archiveChronicle = page.locator('.chronicle-scrim');
-  await archiveChronicle.dispatchEvent('pointerdown', { clientX: 200, clientY: 200, pointerId: 1 });
-  await archiveChronicle.dispatchEvent('pointerup', { clientX: 200, clientY: 420, pointerId: 1 });
-  await test.expect(archiveChronicle).toBeHidden();
-
+  // **VZ-6 · aquí había medio recorrido midiendo cosas que ya no existen**, y
+  // era lo que tenía esta prueba declarada como fallo:
+  //
+  // - Medía `#valley`, el lienzo 2D, para tocar con el ratón sobre él. Desde
+  //   UI-V10 ese lienzo va oculto en cuanto el 3D releva, así que no da caja y
+  //   `boundingBox()` devuelve `null`. Ése era el «no da caja al refundar» de
+  //   la nota, y la causa no era refundar: era el relevo.
+  // - Y abría el **selector de crónicas de varios valles** para leer la del
+  //   valle anterior. El dueño del diseño lo mandó quitar en UI-V8 —«ese
+  //   selector no me gusta nada, hay que quitarlo de ahí»— así que esas cuatro
+  //   aserciones comprobaban una pieza deliberadamente borrada.
+  //
+  // Lo que §13.3 promete y sigue siendo verdad se comprueba igual: el epitafio
+  // sale con sus dos acciones, fundar de nuevo abre un valle en el año 1 que se
+  // juega, y **el valle anterior se guarda en el archivo**, que es lo que dice
+  // la instantánea de más abajo. Lo que ya no se puede comprobar por pantalla
+  // es leer su crónica: al retirarse el selector, el archivo se conserva pero
+  // dejó de tener puerta. Queda anotado en el cuaderno, no tapado aquí.
   // The archive write and successor write are ordered. Reloading after the
   // latter reaches IndexedDB must never resurrect the old epitaph.
   await test.expect.poll(() => page.evaluate(async () => {

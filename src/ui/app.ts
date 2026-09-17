@@ -57,6 +57,17 @@ export interface App {
   state(): Readonly<GameState>;
   archive(): readonly ArchivedGame[];
   decide(optionId: string): boolean;
+  /**
+   * VZ-6 · **Mirar a una celda del mapa**, que es lo que §11.2 promete cuando
+   * se contesta una encrucijada: dos segundos sobre lo que esa decisión ha
+   * cambiado.
+   *
+   * Existe porque la pantalla no puede llegar a la cámara de otra forma, y lo
+   * que había en su lugar —escalar `#valley` con un `transform`— dejó de hacer
+   * nada el día que el 3D relevó al lienzo 2D (UI-V10 lo esconde). El único
+   * que sabe mover la cámara es el backend, y el único que lo tiene es `boot`.
+   */
+  look(x: number, y: number): void;
 }
 
 export interface DecisionAttempt {
@@ -274,6 +285,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
 
   const actions: UiActions = {
     navigate,
+    // VZ-6 · la lectura que la línea «Today» de la ficha necesitaba: lo que
+    // hace ese cuerpo **en el fotograma que se está viendo**, preguntado a la
+    // capa de vida y no adivinado del motor.
+    doing(id: number) { return backend.live.doing(id); },
     setSpeed(value): void { app.setSpeed(value); },
     // UI-R2 · la única escritura que un panel puede hacer sobre las órdenes
     // (`contracts.ts`), y desde esta ronda el único sitio donde se aplica la
@@ -588,6 +603,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     const stats = backend.live.stats();
     if (stats !== null) {
       document.documentElement.dataset.viewHeight = stats.viewHeight.toFixed(1);
+      // VZ-6 · y dónde mira, que es lo que cambia al enfocar una decisión: la
+      // altura no se mueve, el centro sí.
+      document.documentElement.dataset.viewCentre =
+        `${stats.viewCentre.x.toFixed(1)},${stats.viewCentre.z.toFixed(1)}`;
       // U-12 · y en qué punto de la jornada va el sol, para poder comprobar
       // desde fuera que la hora de abajo es la que se ve por la ventana.
       document.documentElement.dataset.sunPhase = stats.sunPhase.toFixed(4);
@@ -1121,6 +1140,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       pendingDecision = { templateId: state.crossroad.templateId, optionId };
       if (attempt.forceTick) { runTick(); paint(lastFraction); }
       return true;
+    },
+    look(x: number, y: number): void {
+      // El eje `y` del mapa es el `z` del mundo: una celda es una unidad, y el
+      // propio `pick` del renderer lee las celdas de `point.x`/`point.z`.
+      // En 2D es un no-op del backend: ese lienzo dibuja el mapa entero.
+      backend.live.look(x, y);
     },
   };
   app.setSpeed(speed);
