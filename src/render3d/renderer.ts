@@ -1115,7 +1115,7 @@ declare global {
 /** Lo que el enganche devuelve. Nada de esto se usa dentro del juego. */
 interface ScreenPoint { readonly x: number; readonly y: number }
 interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
-export interface LifeSnapshot {
+interface LifeSnapshot {
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
   readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number;
     readonly scale: number }[];

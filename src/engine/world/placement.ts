@@ -5,7 +5,7 @@ import type { Building, BuildingKind, GameState } from '../state';
 
 interface Rect { x: number; y: number; w: number; h: number }
 interface Point { x: number; y: number }
-export const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
 /** Existing works reserve their entire future footprint, including church growth. */
 /**

@@ -197,7 +197,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   };
 }
 
-export function buildBuilding(planned: PlannedBuilding): BuildingModel {
+function buildBuilding(planned: PlannedBuilding): BuildingModel {
   const group = new Group();
   group.name = `Building_${planned.id}`;
   // The engine's corner is the building's corner (D.4), so the group sits there

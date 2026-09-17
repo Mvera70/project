@@ -16,7 +16,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { Mesh, type Material, type Texture } from 'three';
 
-export interface AssetMotion {
+interface AssetMotion {
   readonly name: string;
   readonly seconds: number;
   readonly loop: boolean;
@@ -24,7 +24,7 @@ export interface AssetMotion {
   readonly strideLength: number | null;
 }
 
-export interface AssetEntry {
+interface AssetEntry {
   readonly id: string;
   /** File name, relative to the manifest. */
   readonly file: string;

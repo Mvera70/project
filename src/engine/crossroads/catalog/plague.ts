@@ -6,7 +6,7 @@
 import type { CrossroadTemplate } from '../schema';
 
 /** A.5 · Where the dead go. Nine in eleven days and the ground is hard. */
-export const PLAGUE_PIT: CrossroadTemplate = {
+const PLAGUE_PIT: CrossroadTemplate = {
   id: 'plague_pit',
   category: 'plague',
   weight: 14,

@@ -961,7 +961,7 @@ export const DEATH = {
 // something of themselves or came running from something.
 // ---------------------------------------------------------------------------
 
-export const TRAIT_WEIGHT_ROLE = 3;
+const TRAIT_WEIGHT_ROLE = 3;
 export const TRAIT_WEIGHT_BASE = 1;
 
 export const TRAIT_WEIGHTS = {

@@ -215,18 +215,18 @@ export function parseYear(text: string, fallback = 1): number {
 }
 
 /** Si el interruptor de taller está puesto. Se recuerda, como el sonido. */
-export function devPreference(): boolean {
+function devPreference(): boolean {
   try { return localStorage.getItem(DEV_KEY) === 'on'; } catch { return false; }
 }
 
-export function setDevPreference(on: boolean): void {
+function setDevPreference(on: boolean): void {
   try { localStorage.setItem(DEV_KEY, on ? 'on' : 'off'); } catch { /* modo privado: nada que hacer */ }
 }
 
 const DEV_KEY = 'valley.dev';
 
 /** Un número de valle al azar que no repita ninguno de los ya jugados. */
-export function rollSeed(excluded: ReadonlySet<number>): number {
+function rollSeed(excluded: ReadonlySet<number>): number {
   const value = new Uint32Array(1);
   crypto.getRandomValues(value);
   return nextUnusedSeed(value[0] as number, excluded);

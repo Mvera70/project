@@ -95,8 +95,8 @@ export const VILLAGER_MODELS: readonly string[] = [
  * pausas próximas con estos mismos umbrales (IA-3). Si la figura se partiera por
  * una edad distinta, se vería un adulto pequeño comportándose como un niño.
  */
-export const CHILD_UNDER = LIFE.ADULT[0];
-export const ELDER_OVER = LIFE.ADULT[1];
+const CHILD_UNDER = LIFE.ADULT[0];
+const ELDER_OVER = LIFE.ADULT[1];
 
 /**
  * Talla escénica contra un adulto. La malla infantil ya tiene proporciones de

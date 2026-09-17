@@ -13,7 +13,7 @@ import type { CrossroadTemplate } from '../schema';
  * Its only condition is a full granary, which is the one state in which "what
  * shall we do with all this" is a real question.
  */
-export const QUIET_YEARS: CrossroadTemplate = {
+const QUIET_YEARS: CrossroadTemplate = {
   id: 'quiet_years',
   category: 'stranger',
   weight: 1,

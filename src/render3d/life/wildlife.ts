@@ -55,7 +55,7 @@ import { LIFE_STEP, stepOfPhase } from './clock';
  * comparte identificador con nadie más de esta capa. A lo sumo hay un lobo a
  * la vez (una visita por jornada), así que basta un único valor fijo.
  */
-export const WOLF_ID = 20_000;
+const WOLF_ID = 20_000;
 
 /**
  * El paso de la jornada en el que puede aparecer el lobo.
@@ -175,7 +175,7 @@ const PROGRESS_MIN_GAIN = 0.15;
 const PROGRESS_MAX_STALLS = 4;
 
 /** En qué compás va la visita: acercarse, rondar, volver, o ya se ha ido. */
-export type WolfPhase = 'approach' | 'linger' | 'retreat' | 'gone';
+type WolfPhase = 'approach' | 'linger' | 'retreat' | 'gone';
 
 /** El lobo de una visita, entero. */
 export interface Wolf {

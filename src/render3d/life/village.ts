@@ -175,7 +175,7 @@ export interface Dweller {
  * quién jugar (`THROW_AHEAD`): eso cuenta como pase pero no puede ser parte
  * de una cadena, porque no hay un segundo cuerpo al que seguirle la pista.
  */
-export interface PassRecord {
+interface PassRecord {
   readonly from: number;
   readonly to: number | null;
   readonly step: number;
@@ -290,7 +290,7 @@ export interface DayOptions {
  * `villager: -1 - id`), así que esto no inventa nada, sólo lo traduce a
  * `ActorRef`.
  */
-export function actorOf(dweller: Dweller): ActorRef {
+function actorOf(dweller: Dweller): ActorRef {
   return { kind: dweller.villager < 0 ? 'beast' : 'villager', id: dweller.body.id };
 }
 

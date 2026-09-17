@@ -1,6 +1,6 @@
 export type Vec3 = [number, number, number];
 
-export interface ArtMaterial {
+interface ArtMaterial {
   name: string;
   color: string;
   roughness: number;
@@ -16,12 +16,12 @@ interface PrimitiveBase {
   smooth: boolean;
 }
 
-export interface CubePrimitive extends PrimitiveBase {
+interface CubePrimitive extends PrimitiveBase {
   type: 'cube';
   dimensions: Vec3;
 }
 
-export interface ConePrimitive extends PrimitiveBase {
+interface ConePrimitive extends PrimitiveBase {
   type: 'cone';
   radius: number;
   depth: number;
@@ -29,30 +29,30 @@ export interface ConePrimitive extends PrimitiveBase {
   rotationDegrees: Vec3;
 }
 
-export interface CylinderPrimitive extends PrimitiveBase {
+interface CylinderPrimitive extends PrimitiveBase {
   type: 'cylinder';
   radius: number;
   depth: number;
   vertices: number;
 }
 
-export interface GablePrimitive extends PrimitiveBase {
+interface GablePrimitive extends PrimitiveBase {
   type: 'gable';
   width: number;
   depth: number;
   height: number;
 }
 
-export interface SpherePrimitive extends PrimitiveBase {
+interface SpherePrimitive extends PrimitiveBase {
   type: 'sphere';
   radius: number;
   segments: number;
   rings: number;
 }
 
-export type ArtPrimitive = CubePrimitive | ConePrimitive | CylinderPrimitive | GablePrimitive | SpherePrimitive;
+type ArtPrimitive = CubePrimitive | ConePrimitive | CylinderPrimitive | GablePrimitive | SpherePrimitive;
 
-export interface ArtGroup { name: string; location: Vec3; parent: string | null }
+interface ArtGroup { name: string; location: Vec3; parent: string | null }
 
 export interface ArtRecipe {
   schemaVersion: 1;
@@ -379,9 +379,9 @@ function gaitOf(value: unknown, bones: Set<string>): RecipeGait | null {
   return { feet, hinges };
 }
 
-export interface RecipeClipKey { frame: number; rotation: [number, number, number] }
-export interface RecipeClipMove { frame: number; offset: [number, number, number] }
-export interface RecipeClipTrack {
+interface RecipeClipKey { frame: number; rotation: [number, number, number] }
+interface RecipeClipMove { frame: number; offset: [number, number, number] }
+interface RecipeClipTrack {
   bone: string;
   keys: RecipeClipKey[];
   /** Desplazamientos del hueso, en su propio eje. Vacío salvo que el clip los pida. */
@@ -395,7 +395,7 @@ export interface RecipeClip {
   strideLength: number | null;
   tracks: RecipeClipTrack[];
 }
-export interface RecipeBone {
+interface RecipeBone {
   name: string;
   head: [number, number, number];
   tail: [number, number, number];
@@ -410,13 +410,13 @@ export interface RecipeBone {
  * pasaron por aquí. `walking` marca las que un clip con zancada tiene que
  * plegar de verdad.
  */
-export interface RecipeHinge {
+interface RecipeHinge {
   bones: [string, string, string];
   bends: 'front' | 'back';
   walking: boolean;
 }
-export interface RecipeGait { feet: string[]; hinges: Record<string, RecipeHinge> }
-export interface RecipeRig {
+interface RecipeGait { feet: string[]; hinges: Record<string, RecipeHinge> }
+interface RecipeRig {
   bones: RecipeBone[];
   bind: Record<string, string>;
   gait: RecipeGait | null;

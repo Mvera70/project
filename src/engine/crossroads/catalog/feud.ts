@@ -119,7 +119,7 @@ export const SMITH_FEUD: CrossroadTemplate = {
  * A.8 · What the father left. The one template that reaches back a generation
  * on its own, which is why it cannot fire before year 25.
  */
-export const FEUD_INHERITED: CrossroadTemplate = {
+const FEUD_INHERITED: CrossroadTemplate = {
   id: 'feud_inherited',
   category: 'feud',
   weight: 5,

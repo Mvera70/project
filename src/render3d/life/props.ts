@@ -108,7 +108,7 @@ function roll(seed: number, key: string): number {
  * Misma vecindad de nueve casillas que mira `avoid`, que basta: cualquier
  * casilla fuera de ella está a más de una celda.
  */
-export function standable(land: Terrain, x: number, z: number): boolean {
+function standable(land: Terrain, x: number, z: number): boolean {
   if (x <= 0.5 || z <= 0.5 || x >= land.width - 0.5 || z >= land.height - 0.5) return false;
   if (blockedAt(land, x, z)) return false;
   const clear = 0.32 + WALL_CLEAR;
@@ -134,7 +134,7 @@ export function standable(land: Terrain, x: number, z: number): boolean {
  * una oferta difícil que ninguna, y `decide` ya prueba la siguiente si no hay
  * ruta.
  */
-export function standableNear(land: Terrain, at: Point): Point {
+function standableNear(land: Terrain, at: Point): Point {
   if (standable(land, at.x, at.z)) return at;
   for (let ring = 1; ring < 40; ring += 1) {
     const angle = ring * 2.39996;
@@ -282,10 +282,10 @@ export function scatter(state: GameState, land: Terrain, seed: number): Prop[] {
 // ---------------------------------------------------------------------------
 
 /** Lo que cae un trasto por segundo al cuadrado. Ported de spike (`GRAVITY`). */
-export const GRAVITY = 14;
+const GRAVITY = 14;
 /** Lo que frena una pelota rodando por la hierba, por segundo. Ported de spike
  *  (`ROLL_DRAG`). */
-export const ROLL_DRAG = 1.6;
+const ROLL_DRAG = 1.6;
 /** Lo que bota una pelota al tocar el suelo. Ported de spike (`-prop.vy * 0.32`). */
 const BOUNCE = 0.32;
 /** Por debajo de esto, deja de botar. Ported de spike (`< 0.6`). */

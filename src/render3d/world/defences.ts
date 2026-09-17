@@ -9,7 +9,7 @@ export const DEFENCE_DIRECTIONS = [
   { bit: 4, x: 0, z: 1 }, { bit: 8, x: -1, z: 0 },
 ] as const;
 
-export function isDefence(building: Pick<Building, 'kind' | 'lostTick'>): boolean {
+function isDefence(building: Pick<Building, 'kind' | 'lostTick'>): boolean {
   return building.lostTick === null && (building.kind === 'wall' || building.kind === 'palisade');
 }
 

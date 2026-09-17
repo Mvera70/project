@@ -53,7 +53,7 @@ export function actorKey(actor: ActorRef): string {
 }
 
 /** Si dos referencias señalan al mismo cuerpo. */
-export function sameActor(a: ActorRef, b: ActorRef): boolean {
+function sameActor(a: ActorRef, b: ActorRef): boolean {
   return a.kind === b.kind && a.id === b.id;
 }
 
@@ -78,7 +78,7 @@ export type CommitmentStage = 'approach' | 'act' | 'recover';
  * del catálogo nuevo; `reserveRaw` es la puerta de atrás para lo que ya
  * existía y no encaja en ese enum sin inventárselo.
  */
-export interface Commitment {
+interface Commitment {
   readonly id: string;
   readonly kind: string;
   readonly participants: readonly [ActorRef, ActorRef];

@@ -54,8 +54,8 @@ export interface Intent {
 }
 
 /** Holgura del plazo de un viaje: el doble de lo esperado y cinco segundos más. */
-export const JOURNEY_SLACK = 2;
-export const JOURNEY_GRACE_STEPS = 150;
+const JOURNEY_SLACK = 2;
+const JOURNEY_GRACE_STEPS = 150;
 
 /**
  * Lo lejos que se busca algo que hacer, en celdas.
@@ -290,7 +290,7 @@ export const RETHINK = 45;
  * varias veces en el mismo palmo y una larga cabe entera, que es lo que hace
  * que «estar en un parche» se vea como estar y no como pasar.
  */
-export const SEAT_DWELL = 900;
+const SEAT_DWELL = 900;
 
 /**
  * Cuánto se prefiere lo que ya se está haciendo.

@@ -12,7 +12,7 @@
 import type { CrossroadTemplate } from '../schema';
 
 /** A.1 · The flagship template, the one `valle.md` §3 opens with. */
-export const WINTER_GRAIN_DEBT: CrossroadTemplate = {
+const WINTER_GRAIN_DEBT: CrossroadTemplate = {
   id: 'winter_grain_debt',
   category: 'lord',
   weight: 10,
@@ -112,7 +112,7 @@ export const WINTER_GRAIN_DEBT: CrossroadTemplate = {
 };
 
 /** A.2 · Once the valley is a vassal, the ledger comes every autumn. */
-export const TITHE_DEMAND: CrossroadTemplate = {
+const TITHE_DEMAND: CrossroadTemplate = {
   id: 'tithe_demand',
   category: 'lord',
   weight: 6,

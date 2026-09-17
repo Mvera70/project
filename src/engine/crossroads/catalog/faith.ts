@@ -3,7 +3,7 @@
 import type { CrossroadTemplate } from '../schema';
 
 /** A.9 · Timber enough for one. Two men have been drawing in the dirt. */
-export const CHAPEL_OR_GRANARY: CrossroadTemplate = {
+const CHAPEL_OR_GRANARY: CrossroadTemplate = {
   id: 'chapel_or_granary',
   category: 'faith',
   weight: 8,
@@ -72,7 +72,7 @@ export const CHAPEL_OR_GRANARY: CrossroadTemplate = {
 };
 
 /** A.10 · A bone in a box, and a story that came with it. */
-export const RELIC_PEDLAR: CrossroadTemplate = {
+const RELIC_PEDLAR: CrossroadTemplate = {
   id: 'relic_pedlar',
   category: 'faith',
   weight: 6,

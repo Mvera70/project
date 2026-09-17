@@ -29,7 +29,7 @@ import type { GameState, Villager, VillagerId } from '@engine/state';
 import { yearOf } from '@engine/time';
 
 /** Lo mínimo para dibujar a alguien en un medallón y nombrarlo. */
-export interface CardFace {
+interface CardFace {
   readonly id: VillagerId;
   readonly name: string;
   /**

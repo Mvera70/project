@@ -21,7 +21,7 @@ import { all, flagSet, holderOf, outbreakRunning, weeksToHarvest } from './condi
 import type { Catalogue, CrossroadCategory, CrossroadTemplate, ScoredTemplate } from './schema';
 
 /** The reserve template of §8.6, used when the guarantee fires and nothing fits. */
-export const FALLBACK_ID = 'quiet_years';
+const FALLBACK_ID = 'quiet_years';
 
 /**
  * What kind of trouble the village is in, or null if none. §8.6.
@@ -49,7 +49,7 @@ export function crisisOf(state: GameState): CrossroadCategory | null {
  * ceiling on the strength of a standing vacancy would fire every other tick
  * until somebody took the job.
  */
-export function leaderVacantSince(state: GameState): number | null {
+function leaderVacantSince(state: GameState): number | null {
   if (holderOf(state, 'leader') !== null) return null;
   let latest = 0;
   for (const v of state.people.villagers) {
@@ -84,7 +84,7 @@ export function lastCrossroadTick(state: GameState): number {
 const TRADE_IDS = new Set(TRADE_TEMPLATES.map((t) => t.id));
 
 /** True for the templates that come up the road to sell (§7.8). */
-export function isTrade(templateId: string): boolean {
+function isTrade(templateId: string): boolean {
   return TRADE_IDS.has(templateId);
 }
 

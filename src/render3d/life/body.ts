@@ -135,7 +135,7 @@ export function integrate(body: Body, land: Terrain, seconds: number): void {
  * muñeco al que le han dado la vuelta; uno que tarda medio segundo en girarse
  * del todo parece que mira hacia donde va.
  */
-export const TURN_RATE = 6;
+const TURN_RATE = 6;
 
 /**
  * Umbral de velocidad, relativo al paso propio, por debajo del cual la cara no

@@ -21,8 +21,7 @@
 // **UI-V2 · la piel de la bandeja y la navegación** (`docs/ui-redesign/piel/
 // plan-piel.md` §3.4). Los tres iconos de la barra ya no son los trazos de
 // `../icons` (`NAV_ICONS`, U-05): son los mismos cuatro dibujos del sprite
-// grabado de UI-V0 (`public/ui/icons.svg`) — `icons.ts` se queda sin tocar,
-// con `NAV_ICONS` vivo pero sin más consumidores que éste. Y la navegación
+// grabado de UI-V0 (`public/ui/icons.svg`). Y la navegación
 // cambia de piel según la ruta —papel con subrayado en el valle, placa de
 // madera en la crónica, madera entera en la gente/la ficha—, que es lo que
 // los tres prototipos hacen y `navSkinFor` es esa regla, pura y probada sin

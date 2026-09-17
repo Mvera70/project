@@ -19,7 +19,7 @@ import { createRenderer, type ValleyRenderer } from '@render/renderer';
 
 export type BackendKind = 'canvas' | 'pilot3d';
 
-export interface ValleyBackend {
+interface ValleyBackend {
   readonly kind: BackendKind;
   /** Whether this backend moves its own camera. Canvas does not. */
   readonly movesCamera: boolean;

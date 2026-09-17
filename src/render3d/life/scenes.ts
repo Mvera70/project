@@ -27,7 +27,7 @@ import { clearBetween } from './navigate';
 import { LIFE_STEP } from './clock';
 import type { Dweller } from './village';
 
-export type SceneKind = 'chat' | 'shove' | 'brawl';
+type SceneKind = 'chat' | 'shove' | 'brawl';
 
 /** Dos personas, algo entre ellas, y un papel distinto para cada una. */
 export interface Scene {
@@ -505,10 +505,6 @@ export function playGreet(a: Dweller, b: Dweller): void {
 
 /** A qué distancia se saludan dos que se cruzan de largo. */
 export const GREET_REACH = GREET_RANGE;
-/** Lo que se tarda en volver a tener ganas de saludar a quien se acaba de
- *  cruzar. */
-export const GREET_COOLDOWN_SPAN = GREET_COOLDOWN;
-
 // ---------------------------------------------------------------------------
 // IA-2 · Cesión de paso. docs/life-ai-proposal.md §7: «Uno espera, otro pasa,
 // primero continúa.» Es de las cosas que más se notan en pantalla, porque hoy

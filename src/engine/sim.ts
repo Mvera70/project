@@ -163,7 +163,7 @@ export function fillVacancies(state: GameState): void {
  * into a place, so the interface can point a camera at it (§2.60, §17 M-22):
  * the engine says what changed and where, never where to look.
  */
-export interface PositionedVisualEffect {
+interface PositionedVisualEffect {
   effect: VisualEffect;
   x: number;
   y: number;

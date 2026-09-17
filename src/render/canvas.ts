@@ -17,7 +17,7 @@ export function sizeCanvas(canvas: HTMLCanvasElement, cell: number, pixelRatio: 
   canvas.style.height = `${WORLD.HEIGHT * cell}px`;
 }
 
-export function makeBackground(map: ValleyMap, palette: Palette, cell: number): OffscreenCanvas {
+function makeBackground(map: ValleyMap, palette: Palette, cell: number): OffscreenCanvas {
   const canvas = new OffscreenCanvas(map.width * cell, map.height * cell);
   const ctx = canvas.getContext('2d');
   if (ctx === null) throw new Error('Canvas 2D is unavailable.');

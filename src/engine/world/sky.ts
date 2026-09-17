@@ -65,7 +65,7 @@ export function skyOfDay(seed: number, weatherIndex: number, day: number): Sky {
 }
 
 /** Las siete jornadas de la semana `tick`, en orden. */
-export function skiesOfWeek(seed: number, weatherIndex: number, tick: number): readonly Sky[] {
+function skiesOfWeek(seed: number, weatherIndex: number, tick: number): readonly Sky[] {
   const first = tick * TIME.DAYS_PER_WEEK;
   const out: Sky[] = [];
   for (let day = first; day < first + TIME.DAYS_PER_WEEK; day += 1) {

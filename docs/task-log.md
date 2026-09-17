@@ -64,6 +64,13 @@ traído aquí.
 
 ## 2. El tablero
 
+**Limpieza de código muerto (17 sep): hecha.** Auditoría contrastada con Knip,
+búsqueda global, puntos de entrada y configuración. Eliminados `src/ui/icons.ts`,
+`GREET_COOLDOWN_SPAN` y el tipo huérfano `BeastSighting`; 78 exportaciones de
+valor y 34 de tipo pasan a ser internas. Se conservan los comandos manuales,
+hooks, service worker y el generador reproducible de animales. Informe completo
+en `docs/dead-code-audit-2026-09-17.md`.
+
 **G-23 · animales:** encargo de rehacer las seis especies y sus animaciones.
 Vaca subida en `df0ac66`. Cerdo terminado y revisado en movimiento; preparado
 para entrega individual. Siguen gallina, lobo, cuervo y pez.
@@ -249,6 +256,12 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+Limpieza estática: 1 módulo, 1 alias ejecutable y 1 tipo huérfano eliminados;
+112 exportaciones públicas innecesarias cerradas. Typecheck, lint, build y
+comprobación de inalcanzables verdes. Knip final sólo deja puntos de entrada
+manuales/configurados y tres falsos positivos con consumidores comprobados.
+Suite: 1.327/1.330; las tres rojas no pasan por los símbolos retirados.
 
 IA-12: dos tomas diurnas reales (semillas 11/43, años 20/60, 45 s a 2 fps),
 15/15 y 21/21 trabajadores/religiosos asignados llegan a ejercer. Cero discrepancias
@@ -443,6 +456,13 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
    18 contra 20. Falla igual en HEAD limpio (`4145cfc`). Es deriva de la
    trayectoria nueva, como las de `rework.md` §2.8, y va con la decisión del
    peso de los avisos (punto 10).
+
+0e. **La limpieza no deja verde la suite completa por dos rojas ajenas más.**
+   `graphics-clock` espera cuatro clips en el manifiesto del aldeano y encuentra
+   doce; `life-staging` reúne 20 de 39 aldeanos en la capilla (51,3 % frente al
+   60 % exigido). Ninguna depende de los símbolos retirados: la primera mide el
+   catálogo de arte y la segunda la trayectoria de V-11 ya documentada en
+   `rework.md` §2.8. Se dejan abiertas para sus rondas funcionales.
 
 0c. **El devoto se mide con una muestra que no lo ve.** `el devoto reza al
    menos el doble` (IA-3) pasa por poco con dos semillas y su proporción va

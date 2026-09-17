@@ -164,4 +164,4 @@ export function silentIn(seen: Map<string, number>): string[] {
   return CATALOG.filter((t) => (seen.get(t.id) ?? 0) === 0).map((t) => t.id);
 }
 
-export { founded, tick, build, YEAR };
+export { founded, tick, YEAR };

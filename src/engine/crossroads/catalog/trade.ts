@@ -19,7 +19,7 @@ import type { CrossroadTemplate } from '../schema';
  * He asks for bread, so a village that has none does not get the offer: an
  * option nobody can take is not a decision.
  */
-export const CATTLE_DROVER: CrossroadTemplate = {
+const CATTLE_DROVER: CrossroadTemplate = {
   id: 'cattle_drover',
   category: 'trade',
   weight: 8,
@@ -85,7 +85,7 @@ export const CATTLE_DROVER: CrossroadTemplate = {
  * The `salted` flag is read by M-29's slaughter: a village with salt gets more
  * out of every head it kills, for as long as the salt lasts.
  */
-export const SALT_CARRIER: CrossroadTemplate = {
+const SALT_CARRIER: CrossroadTemplate = {
   id: 'salt_carrier',
   category: 'trade',
   weight: 7,
@@ -158,7 +158,7 @@ export const SALT_CARRIER: CrossroadTemplate = {
  * never fell below 507 and reached 43,000. Timber is not scarce in this game.
  * A surplus of grain is, however, entirely ordinary.
  */
-export const GRAIN_FACTOR: CrossroadTemplate = {
+const GRAIN_FACTOR: CrossroadTemplate = {
   id: 'grain_factor',
   category: 'trade',
   weight: 8,

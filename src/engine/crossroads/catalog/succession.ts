@@ -10,7 +10,7 @@ import type { CrossroadTemplate } from '../schema';
  * one who is not chosen remembers it, and that memory is what A.7 casts twenty
  * years later.
  */
-export const SUCCESSION: CrossroadTemplate = {
+const SUCCESSION: CrossroadTemplate = {
   id: 'succession',
   category: 'succession',
   weight: 100,
@@ -116,7 +116,7 @@ export const SUCCESSION: CrossroadTemplate = {
  * cannot ask. A full valley is what that means in numbers: the population is at
  * the roll of §12.4 and the smithy that makes stone possible is standing.
  */
-export const FIRST_STONE: CrossroadTemplate = {
+const FIRST_STONE: CrossroadTemplate = {
   id: 'first_stone',
   category: 'succession',
   // **Medido y dejado como estaba, 15 sep 2026.** Estuve a punto de relajar

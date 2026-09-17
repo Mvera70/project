@@ -449,7 +449,7 @@ function hold(value: number): number {
 
 /** Un paso de vida para los impulsos propios de un animal: aburrimiento, y
  *  sed sólo para quien la tiene (IA-4, `BEAST_THIRST`). */
-export function driftBeast(needs: Needs, kind: BeastKind, seconds: number): void {
+function driftBeast(needs: Needs, kind: BeastKind, seconds: number): void {
   needs.boredom = hold(needs.boredom + BEAST_RISE[kind] * seconds);
   const thirstRate = BEAST_THIRST[kind];
   if (thirstRate > 0) needs.thirst = hold(needs.thirst + thirstRate * seconds);
@@ -1148,19 +1148,4 @@ export function stepBeasts(
     driftBeast(dweller.needs, beast.kind, LIFE_STEP);
     if (!overridden && dweller.doing?.there === true) satisfy(dweller.needs, dweller.doing.offer, LIFE_STEP);
   }
-}
-
-/**
- * Dónde está cada animal ahora, para quien tenga que pintarlo.
- *
- * Forma propia y no `Animal` de `@render/animals`: la capa de vida no conoce
- * el render (E.2), y esto es sólo `{id, kind, x, y}` — lo bastante parecido
- * para que quien lo consuma lo adapte sin ceremonia, y lo bastante propio para
- * no importar de fuera de `life/`.
- */
-export interface BeastSighting {
-  readonly id: number;
-  readonly kind: BeastKind;
-  readonly x: number;
-  readonly y: number;
 }

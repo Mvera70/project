@@ -53,7 +53,7 @@ export interface CrossroadTemplate {
  * fails if any option changes nothing on screen — principle 1 of the game
  * turned into an assertion (design.md §8.1).
  */
-export interface CrossroadOption {
+interface CrossroadOption {
   id: string;
   label: string; // key: the verb, 1-3 words
   cost: string; // key: the price, visible before choosing
@@ -137,7 +137,7 @@ import type { VisualEffect } from '../state';
 // planted it, with the year.
 // ---------------------------------------------------------------------------
 
-export interface SeedSpec {
+interface SeedSpec {
   id: string;
   delayYears: [number, number]; // drawn within the range
   condition?: Condition; // if it fails when due, the seed withers

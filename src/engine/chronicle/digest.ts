@@ -33,7 +33,7 @@ function diverseRecent(entries: readonly ChronicleEntry[]): ChronicleEntry[] {
   return entries.filter((_entry, index) => chosen.has(index));
 }
 
-export interface DigestSummary {
+interface DigestSummary {
   weeks: number; // how long they were away
   people: number; // how many are left
   born: number;

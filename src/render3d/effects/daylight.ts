@@ -281,5 +281,4 @@ export function daylightAt(
   };
 }
 
-export { DAWN, DUSK, LIGHT_STEADY, NIGHT_FLOOR, NOON, STEADY_PHASE };
-export { hourAt } from './day-phases';
+export { NIGHT_FLOOR, NOON };

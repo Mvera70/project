@@ -129,7 +129,7 @@ function scenicRate(speed: 0 | 1 | 4 | 16 | 64): number {
  */
 const REAL_MS_PER_TICK = TIME.REAL_MS_PER_TICK;
 
-export interface ClockInput {
+interface ClockInput {
   /** Monotonic real milliseconds. `performance.now()` in the app, a number in tests. */
   readonly realMs: number;
   /** The engine's current tick. Read, never written. */

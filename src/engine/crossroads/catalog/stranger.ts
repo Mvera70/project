@@ -3,7 +3,7 @@
 import type { CrossroadTemplate } from '../schema';
 
 /** A.13 · Nine at the ford, with a cart and no oxen. */
-export const STRANGERS_AT_THE_FORD: CrossroadTemplate = {
+const STRANGERS_AT_THE_FORD: CrossroadTemplate = {
   id: 'strangers_at_the_ford',
   category: 'stranger',
   weight: 10,
@@ -93,7 +93,7 @@ export const STRANGERS_AT_THE_FORD: CrossroadTemplate = {
 };
 
 /** A.14 · Six men and a horse, out of the north wood at noon so as to be seen. */
-export const BANDITS: CrossroadTemplate = {
+const BANDITS: CrossroadTemplate = {
   id: 'bandits',
   category: 'stranger',
   weight: 8,

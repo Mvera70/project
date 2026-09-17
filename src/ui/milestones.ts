@@ -17,7 +17,7 @@ import { FOUNDING, MILESTONES, TIME } from '@engine/balance';
 import { seasonOf, yearOf } from '@engine/time';
 import type { Building, BuildingId, BuildingKind, GameState } from '@engine/state';
 
-export type MilestoneKind = 'first_of_kind' | 'peak_people' | 'turn_of_decade' | 'work_done';
+type MilestoneKind = 'first_of_kind' | 'peak_people' | 'turn_of_decade' | 'work_done';
 
 export interface Milestone {
   readonly kind: MilestoneKind;

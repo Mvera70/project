@@ -37,7 +37,7 @@ function polygon(ctx: DrawingContext, points: readonly [number, number][], fill:
   ctx.stroke();
 }
 
-export const house: Sprite = (ctx, x, y, cell, palette, tier) => {
+const house: Sprite = (ctx, x, y, cell, palette, tier) => {
   const body = tier === 1 ? palette.rock : palette.wood;
   polygon(ctx, [[x + 0.2, y + 0.85], [x + 1.8, y + 0.85], [x + 1.7, y + 1.95], [x + 0.3, y + 1.95]], body, cell);
   polygon(ctx, [[x + 0.08, y + 0.9], [x + 1, y + 0.07], [x + 1.92, y + 0.9]], palette.roof, cell);
@@ -46,9 +46,9 @@ export const house: Sprite = (ctx, x, y, cell, palette, tier) => {
   if (tier === 1) rect(ctx, x + 1.45, y + 0.18, 0.25, 0.55, palette.rock, cell);
 };
 
-export const stoneHouse: Sprite = (ctx, x, y, cell, palette) => house(ctx, x, y, cell, palette, 1);
+const stoneHouse: Sprite = (ctx, x, y, cell, palette) => house(ctx, x, y, cell, palette, 1);
 
-export const field: Sprite = (ctx, x, y, cell, palette) => {
+const field: Sprite = (ctx, x, y, cell, palette) => {
   ctx.fillStyle = palette.field;
   ctx.fillRect(x * cell, y * cell, 3 * cell, 2 * cell);
   ctx.strokeStyle = outline(palette.field);
@@ -59,7 +59,7 @@ export const field: Sprite = (ctx, x, y, cell, palette) => {
   }
 };
 
-export const granary: Sprite = (ctx, x, y, cell, palette) => {
+const granary: Sprite = (ctx, x, y, cell, palette) => {
   rect(ctx, x + 0.35, y + 0.35, 1.3, 1.15, palette.wood, cell);
   polygon(ctx, [[x + 0.2, y + 0.4], [x + 1, y + 0.05], [x + 1.8, y + 0.4]], palette.roof, cell);
   ctx.strokeStyle = outline(palette.wood); ctx.lineWidth = Math.max(1, cell * 0.12);
@@ -68,7 +68,7 @@ export const granary: Sprite = (ctx, x, y, cell, palette) => {
   }
 };
 
-export const chapel: Sprite = (ctx, x, y, cell, palette) => {
+const chapel: Sprite = (ctx, x, y, cell, palette) => {
   rect(ctx, x + 0.15, y + 0.8, 1.7, 1.1, palette.accent, cell);
   polygon(ctx, [[x + 0.08, y + 0.85], [x + 1, y + 0.42], [x + 1.92, y + 0.85]], palette.roof, cell);
   rect(ctx, x + 0.75, y + 0.05, 0.5, 1.2, palette.wood, cell);
@@ -76,14 +76,14 @@ export const chapel: Sprite = (ctx, x, y, cell, palette) => {
   ctx.beginPath(); ctx.moveTo((x + 1) * cell, (y + 0.1) * cell); ctx.lineTo((x + 1) * cell, (y + 0.42) * cell); ctx.moveTo((x + 0.82) * cell, (y + 0.2) * cell); ctx.lineTo((x + 1.18) * cell, (y + 0.2) * cell); ctx.stroke();
 };
 
-export const church: Sprite = (ctx, x, y, cell, palette) => {
+const church: Sprite = (ctx, x, y, cell, palette) => {
   rect(ctx, x + 0.1, y + 1.1, 2.8, 1.8, palette.rock, cell);
   polygon(ctx, [[x + 0.08, y + 1.18], [x + 1.55, y + 0.62], [x + 2.92, y + 1.18]], palette.roof, cell);
   rect(ctx, x + 0.3, y + 0.15, 1, 2.3, palette.rock, cell);
   polygon(ctx, [[x + 0.2, y + 0.25], [x + 0.8, y + 0.07], [x + 1.4, y + 0.25]], palette.roof, cell);
 };
 
-export const smithy: Sprite = (ctx, x, y, cell, palette) => {
+const smithy: Sprite = (ctx, x, y, cell, palette) => {
   polygon(ctx, [[x + 0.08, y + 0.55], [x + 1, y + 0.12], [x + 1.92, y + 0.55]], palette.roof, cell);
   ctx.strokeStyle = outline(palette.wood); ctx.lineWidth = Math.max(1, cell * 0.16);
   for (const px of [0.25, 1.75]) { ctx.beginPath(); ctx.moveTo((x + px) * cell, (y + 0.5) * cell); ctx.lineTo((x + px) * cell, (y + 1.95) * cell); ctx.stroke(); }
@@ -91,36 +91,36 @@ export const smithy: Sprite = (ctx, x, y, cell, palette) => {
   polygon(ctx, [[x + 0.55, y + 1.35], [x + 1.3, y + 1.35], [x + 1.15, y + 1.6], [x + 0.65, y + 1.6]], outline(palette.rock), cell);
 };
 
-export const mill: Sprite = (ctx, x, y, cell, palette) => {
+const mill: Sprite = (ctx, x, y, cell, palette) => {
   polygon(ctx, [[x + 0.55, y + 0.55], [x + 1.45, y + 0.55], [x + 1.65, y + 1.95], [x + 0.35, y + 1.95]], palette.wood, cell);
   polygon(ctx, [[x + 0.45, y + 0.6], [x + 1, y + 0.18], [x + 1.55, y + 0.6]], palette.roof, cell);
   ctx.strokeStyle = outline(palette.accent); ctx.lineWidth = Math.max(1, cell * 0.1);
   for (let i = 0; i < 4; i += 1) { const a = Math.PI / 4 + i * Math.PI / 2; ctx.beginPath(); ctx.moveTo((x + 1) * cell, (y + 1.05) * cell); ctx.lineTo((x + 1 + Math.cos(a) * 0.85) * cell, (y + 1.05 + Math.sin(a) * 0.85) * cell); ctx.stroke(); }
 };
 
-export const well: Sprite = (ctx, x, y, cell, palette) => {
+const well: Sprite = (ctx, x, y, cell, palette) => {
   ctx.fillStyle = palette.rock; ctx.strokeStyle = outline(palette.rock); ctx.lineWidth = Math.max(1, cell * 0.1);
   ctx.beginPath(); ctx.ellipse((x + 0.5) * cell, (y + 0.67) * cell, 0.42 * cell, 0.22 * cell, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.moveTo((x + 0.18) * cell, (y + 0.65) * cell); ctx.lineTo((x + 0.18) * cell, (y + 0.15) * cell); ctx.lineTo((x + 0.82) * cell, (y + 0.15) * cell); ctx.lineTo((x + 0.82) * cell, (y + 0.65) * cell); ctx.stroke();
 };
 
-export const palisade: Sprite = (ctx, x, y, cell, palette, tier) => {
+const palisade: Sprite = (ctx, x, y, cell, palette, tier) => {
   const fill = tier === 1 ? palette.rock : palette.wood;
   ctx.strokeStyle = outline(fill); ctx.fillStyle = fill; ctx.lineWidth = Math.max(1, cell * 0.1);
   for (let i = 0; i < 4; i += 1) polygon(ctx, [[x + 0.07 + i * 0.2, y + 0.9], [x + 0.07 + i * 0.2 + 0.11, y + 0.11], [x + 0.07 + i * 0.2 + 0.22, y + 0.9]], fill, cell);
 };
 
-export const wall: Sprite = (ctx, x, y, cell, palette) => {
+const wall: Sprite = (ctx, x, y, cell, palette) => {
   rect(ctx, x + 0.07, y + 0.28, 0.86, 0.65, palette.rock, cell);
   for (let i = 0; i < 3; i += 1) ctx.fillRect((x + 0.04 + i * 0.34) * cell, y * cell, 0.2 * cell, 0.35 * cell);
 };
 
-export const watchtower: Sprite = (ctx, x, y, cell, palette) => {
+const watchtower: Sprite = (ctx, x, y, cell, palette) => {
   rect(ctx, x + 0.35, y + 0.45, 1.3, 1.5, palette.rock, cell);
   for (let i = 0; i < 4; i += 1) ctx.fillRect((x + 0.28 + i * 0.4) * cell, (y + 0.18) * cell, 0.22 * cell, 0.35 * cell);
 };
 
-export const graveYard: Sprite = (ctx, x, y, cell, palette) => {
+const graveYard: Sprite = (ctx, x, y, cell, palette) => {
   ctx.strokeStyle = outline(palette.rock); ctx.lineWidth = Math.max(1, cell * 0.1);
   for (const [px, py] of [[0.5, 0.5], [1.4, 1.15], [2.35, 0.55]] as const) {
     ctx.beginPath(); ctx.moveTo((x + px) * cell, (y + py) * cell); ctx.lineTo((x + px) * cell, (y + py + 0.65) * cell); ctx.moveTo((x + px - 0.2) * cell, (y + py + 0.2) * cell); ctx.lineTo((x + px + 0.2) * cell, (y + py + 0.2) * cell); ctx.stroke();

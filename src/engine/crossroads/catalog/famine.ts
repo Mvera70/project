@@ -9,7 +9,7 @@ import type { CrossroadTemplate } from '../schema';
  * Harvest promises use §8.4's harvest effect and are spent by the next reaping.
  * `forced_hunger` remains a short flag because it changes eight weekly meals.
  */
-export const HUNGRY_SPRING: CrossroadTemplate = {
+const HUNGRY_SPRING: CrossroadTemplate = {
   id: 'hungry_spring',
   category: 'famine',
   weight: 12,
@@ -74,7 +74,7 @@ export const HUNGRY_SPRING: CrossroadTemplate = {
 };
 
 /** A.4 · The broken latch. Nobody saw anything, and everybody is sure. */
-export const GRANARY_THEFT: CrossroadTemplate = {
+const GRANARY_THEFT: CrossroadTemplate = {
   id: 'granary_theft',
   category: 'famine',
   weight: 7,

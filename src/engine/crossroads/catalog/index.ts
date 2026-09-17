@@ -51,13 +51,4 @@ export const CATALOG: Catalogue = [
   ...RESERVE_TEMPLATES,
 ];
 
-export { FAITH_TEMPLATES } from './faith';
-export { FAMINE_TEMPLATES } from './famine';
-export { FEUD_TEMPLATES } from './feud';
-export { FOREST_TEMPLATES } from './forest';
-export { LORD_TEMPLATES } from './lord';
-export { PLAGUE_TEMPLATES } from './plague';
-export { RESERVE_TEMPLATES } from './reserve';
-export { STRANGER_TEMPLATES } from './stranger';
-export { SUCCESSION_TEMPLATES } from './succession';
 export { TRADE_TEMPLATES } from './trade';

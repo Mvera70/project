@@ -401,9 +401,9 @@ export function offersNear(
  * labrada y no en el prado.
  */
 /** Alcance de llegada a un puesto de parcela: dentro del campo, o no se ha llegado. */
-export const PARCEL_REACH = 0.9;
+const PARCEL_REACH = 0.9;
 
-export function parcelSeats(
+function parcelSeats(
   land: Terrain, x: number, z: number, w: number, h: number, want: number, id: number,
 ): Point[] {
   const found: Point[] = [];
@@ -426,7 +426,7 @@ export function parcelSeats(
   return found;
 }
 
-export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
+function seatsOn(land: Terrain, at: Point, want: number): Point[] {
   const found: Point[] = [];
   if (fitsCircle(land, at.x, at.z, 0.32)) found.push(at);
   // Cuarenta intentos para llenar como mucho seis plazas: de sobra para rodear

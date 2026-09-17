@@ -21,7 +21,7 @@
 import { OrthographicCamera, Vector3 } from 'three';
 
 /** The direction the camera looks from. Matches every study capture since G-01. */
-export const VIEW = new Vector3(1, 0.9, 1.15);
+const VIEW = new Vector3(1, 0.9, 1.15);
 
 /**
  * `VIEW` en los dos ángulos que el jugador puede mover.
@@ -46,7 +46,7 @@ const PITCH_LOW = (12 * Math.PI) / 180;
 const PITCH_HIGH = (78 * Math.PI) / 180;
 
 /** El rumbo y la inclinación, en radianes. `yaw` da la vuelta completa. */
-export interface Angles {
+interface Angles {
   readonly yaw: number;
   readonly pitch: number;
 }
@@ -81,14 +81,14 @@ export const CLOSEST_HEIGHT = 8;
  */
 export const RESTING_HEIGHT_MAX = 26;
 
-export interface Bounds {
+interface Bounds {
   readonly minX: number;
   readonly minZ: number;
   readonly maxX: number;
   readonly maxZ: number;
 }
 
-export interface Viewport {
+interface Viewport {
   readonly width: number;
   readonly height: number;
 }
@@ -100,7 +100,7 @@ export interface Viewport {
  * says how much valley fits on the screen, and it is what the limits are written
  * in. A zoom factor would say nothing without knowing the screen.
  */
-export interface View {
+interface View {
   readonly centre: { x: number; z: number };
   readonly height: number;
 }

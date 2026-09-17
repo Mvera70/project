@@ -11,7 +11,7 @@ import type { CrossroadTemplate } from '../schema';
  * plus a full-ish granary is the closest the DSL gets, and it fires in the same
  * situations: a village big enough to be short of ground.
  */
-export const FOREST_CUT: CrossroadTemplate = {
+const FOREST_CUT: CrossroadTemplate = {
   id: 'forest_cut',
   category: 'forest',
   weight: 9,
@@ -104,7 +104,7 @@ export const FOREST_CUT: CrossroadTemplate = {
  * template's episodic driver, which is `season = winter` plus `people > 15`.
  * Lowered to 0.15, comfortably under every measured floor in that window.
  */
-export const WOLF_WINTER: CrossroadTemplate = {
+const WOLF_WINTER: CrossroadTemplate = {
   id: 'wolf_winter',
   category: 'forest',
   weight: 7,

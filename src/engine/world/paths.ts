@@ -103,7 +103,7 @@ function activeTraffic(state: GameState): Set<number> {
  * up or came down. Every route is recomputed after this; a changed destination
  * does not need it, because the destination is part of the key.
  */
-export function invalidateRoutes(state: GameState): void {
+function invalidateRoutes(state: GameState): void {
   GROUND.set(state, (GROUND.get(state) ?? 0) + 1);
 }
 

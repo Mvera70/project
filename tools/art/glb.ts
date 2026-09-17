@@ -44,7 +44,7 @@ function vectorIsFinite(value: unknown): boolean {
   return Array.isArray(value) && value.length === 3 && value.every((item) => typeof item === 'number' && Number.isFinite(item));
 }
 
-export function inspectGlb(buffer: Buffer): GlbInspection {
+function inspectGlb(buffer: Buffer): GlbInspection {
   if (buffer.length < 20) throw new Error(`GLB is truncated: ${buffer.length} bytes.`);
   if (buffer.subarray(0, 4).toString('ascii') !== 'glTF') throw new Error('GLB magic must be glTF.');
   const version = buffer.readUInt32LE(4);
