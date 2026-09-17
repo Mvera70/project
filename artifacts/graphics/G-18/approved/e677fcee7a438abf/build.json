@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-midwife",
+  "runId": "2026-09-17T17-49-11-607Z-49752",
+  "recipe": "art/recipes/villager-midwife/villager-midwife.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 12021,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-11-607Z-49752/candidate/villager-midwife.blend",
+      "bytes": 125253,
+      "sha256": "2528E0F3D063A10D5691DB63C502AE2264F2F5B7BCD7A198E22F0F7DB9FA267A"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-11-607Z-49752/candidate/villager-midwife.glb",
+      "bytes": 289340,
+      "sha256": "E677FCEE7A438ABFA4AD0B993A6D0813C182D9C1C25E403CCEE7190C9F9816A2"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-11-607Z-49752/candidate/villager-midwife-blender.png",
+      "bytes": 287704,
+      "sha256": "11DBFAAE35F0F1802A00500D6CBE7E3EE9561257E82BAC1A946F12D9AC61326D"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-11-607Z-49752/blender.log",
+      "bytes": 1708,
+      "sha256": "2734F23257DE396101E1B71F59E79BEA5A19905317A6E9B6E41890AC12D5BA58"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-11-607Z-49752/temporary/build.py",
+      "bytes": 10701,
+      "sha256": "48EF9F67BD54D82E823077BE9538000A6866F28CEA8DCCA97042A80E8D9AEED2"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-11-607Z-49752/temporary/resolved-recipe.json",
+      "bytes": 72625,
+      "sha256": "334B5D7A00AAC47867F3A68C503FBAA619D5C1EEDC12CAA4BA43C90FC9906A7B"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-woodcutter",
+  "runId": "2026-09-17T17-56-25-042Z-7708",
+  "recipe": "art/recipes/villager-woodcutter/villager-woodcutter.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 3012,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/candidate/villager-woodcutter.blend",
+      "bytes": 126172,
+      "sha256": "978B886012027175CBB0625E63BC9C3C12E6986E8E9ABC5D51BD23ACDF3D3F3C"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/candidate/villager-woodcutter.glb",
+      "bytes": 302572,
+      "sha256": "450A895DC69642CD1423FB133CB9F4CCC609EEDC4EB7A80886F34DB9751700E7"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/candidate/villager-woodcutter-blender.png",
+      "bytes": 290649,
+      "sha256": "9DBFE59991E2E0199B2D734F3C2958BE99C679BD42D50A4A9C5CD981ED2CFB25"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/blender.log",
+      "bytes": 1727,
+      "sha256": "FB34484A0CBC2EE40511F13E9E150B84E5549F167A6EE1063444FBE79F093645"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/temporary/build.py",
+      "bytes": 10701,
+      "sha256": "48EF9F67BD54D82E823077BE9538000A6866F28CEA8DCCA97042A80E8D9AEED2"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/temporary/resolved-recipe.json",
+      "bytes": 73460,
+      "sha256": "080DD80B25D7EA727AF50FAA292D3F550CB3269D18AC02D065EFC3D9470C88D0"
+    }
+  }
+}

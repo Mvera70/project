@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-17T17:49:52.082Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-59-091Z-5472\\candidate\\villager-mason.glb",
+    "assetUrl": "/artifacts/graphics/G-18/runs/2026-09-17T17-48-59-091Z-5472/candidate/villager-mason.glb",
+    "viewport": {
+      "width": 640,
+      "height": 640,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-59-091Z-5472\\three\\capture-1.png",
+      "sha256": "A43DFA9E5CB295227D263E858ECADDDE398CB9297CD9CA8372347FC7AFFD840B",
+      "dimensions": {
+        "width": 640,
+        "height": 640
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-59-091Z-5472\\three\\capture-1-gray.png",
+        "sha256": "78B2382ACC59E484BC73E296DDCFD73D941611145C55AF936CB095E841AFE16B",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        }
+      },
+      "durationMs": 3603,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:50959/artifacts/graphics/G-18/runs/2026-09-17T17-48-59-091Z-5472/candidate/villager-mason.glb",
+        "viewport": {
+          "width": 640,
+          "height": 640,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "carry_walk",
+          "duration": 1.3333333730697632
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Scene",
+          "Villager_Root",
+          "footL",
+          "footR",
+          "forearmL",
+          "forearmR",
+          "handL",
+          "handR",
+          "hand_l",
+          "hand_r",
+          "head",
+          "hips",
+          "root",
+          "shinL",
+          "shinR",
+          "spine",
+          "thighL",
+          "thighR",
+          "upperarmL",
+          "upperarmR",
+          "villager-mason_Rig",
+          "villager-mason_cloth",
+          "villager-mason_cloth-accent",
+          "villager-mason_dark",
+          "villager-mason_skin"
+        ],
+        "bounds": {
+          "min": [
+            -0.175,
+            0,
+            -0.075
+          ],
+          "max": [
+            0.175,
+            0.65,
+            0.088333
+          ],
+          "size": [
+            0.35,
+            0.65,
+            0.163333
+          ]
+        },
+        "loadDurationMs": 331
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-59-091Z-5472\\three\\capture-2.png",
+      "sha256": "A43DFA9E5CB295227D263E858ECADDDE398CB9297CD9CA8372347FC7AFFD840B",
+      "dimensions": {
+        "width": 640,
+        "height": 640
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-59-091Z-5472\\three\\capture-2-gray.png",
+        "sha256": "78B2382ACC59E484BC73E296DDCFD73D941611145C55AF936CB095E841AFE16B",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        }
+      },
+      "durationMs": 148,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:50959/artifacts/graphics/G-18/runs/2026-09-17T17-48-59-091Z-5472/candidate/villager-mason.glb",
+        "viewport": {
+          "width": 640,
+          "height": 640,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "carry_walk",
+          "duration": 1.3333333730697632
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Scene",
+          "Villager_Root",
+          "footL",
+          "footR",
+          "forearmL",
+          "forearmR",
+          "handL",
+          "handR",
+          "hand_l",
+          "hand_r",
+          "head",
+          "hips",
+          "root",
+          "shinL",
+          "shinR",
+          "spine",
+          "thighL",
+          "thighR",
+          "upperarmL",
+          "upperarmR",
+          "villager-mason_Rig",
+          "villager-mason_cloth",
+          "villager-mason_cloth-accent",
+          "villager-mason_dark",
+          "villager-mason_skin"
+        ],
+        "bounds": {
+          "min": [
+            -0.175,
+            0,
+            -0.075
+          ],
+          "max": [
+            0.175,
+            0.65,
+            0.088333
+          ],
+          "size": [
+            0.35,
+            0.65,
+            0.163333
+          ]
+        },
+        "loadDurationMs": 56
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:50959/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 208,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-59-091Z-5472\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

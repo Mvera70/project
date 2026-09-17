@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-priest",
+  "runId": "2026-09-17T17-49-24-169Z-57124",
+  "status": "pass",
+  "durationMs": 5672,
+  "candidateSha256": "97BEB63DE1137367CE2B61FAA63C330F1CC49E6736D3F27B3AA2E583DC322CF2",
+  "glb": {
+    "version": 2,
+    "declaredLength": 293320,
+    "nodeNames": [
+      "head",
+      "hand_l",
+      "hand.L",
+      "forearm.L",
+      "upperarm.L",
+      "hand_r",
+      "hand.R",
+      "forearm.R",
+      "upperarm.R",
+      "spine",
+      "foot.L",
+      "shin.L",
+      "thigh.L",
+      "foot.R",
+      "shin.R",
+      "thigh.R",
+      "hips",
+      "root",
+      "villager-priest_cloth",
+      "villager-priest_cloth-accent",
+      "villager-priest_dark",
+      "villager-priest_skin",
+      "villager-priest_Rig",
+      "Villager_Root"
+    ],
+    "meshNames": [
+      "villager-priest_cloth_Mesh",
+      "villager-priest_cloth-accent_Mesh",
+      "villager-priest_dark_Mesh",
+      "villager-priest_skin_Mesh"
+    ],
+    "materialNames": [
+      "cloth",
+      "cloth-accent",
+      "dark",
+      "skin"
+    ],
+    "animationNames": [
+      "carry_walk",
+      "idle",
+      "walk",
+      "work_hoe"
+    ],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 24,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 1000
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T17:50:04.666Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-49-24-169Z-57124\\candidate\\villager-priest.glb",
+      "assetUrl": "/artifacts/graphics/G-17/runs/2026-09-17T17-49-24-169Z-57124/candidate/villager-priest.glb",
+      "viewport": {
+        "width": 640,
+        "height": 640,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-49-24-169Z-57124\\three\\capture-1.png",
+        "sha256": "C11C42A3CCA40802CEF4E22AE8DE89F2A3BA9920FF64713DFD2FFBEA116FB4A4",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-49-24-169Z-57124\\three\\capture-1-gray.png",
+          "sha256": "E304D8714815309564789F2281C61BF7F9D5197AC34CCF5250729420150EC3D9",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 3575,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:57508/artifacts/graphics/G-17/runs/2026-09-17T17-49-24-169Z-57124/candidate/villager-priest.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager-priest_Rig",
+            "villager-priest_cloth",
+            "villager-priest_cloth-accent",
+            "villager-priest_dark",
+            "villager-priest_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.112405
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.112405
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.224811
+            ]
+          },
+          "loadDurationMs": 305
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-49-24-169Z-57124\\three\\capture-2.png",
+        "sha256": "C11C42A3CCA40802CEF4E22AE8DE89F2A3BA9920FF64713DFD2FFBEA116FB4A4",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-49-24-169Z-57124\\three\\capture-2-gray.png",
+          "sha256": "E304D8714815309564789F2281C61BF7F9D5197AC34CCF5250729420150EC3D9",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 159,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:57508/artifacts/graphics/G-17/runs/2026-09-17T17-49-24-169Z-57124/candidate/villager-priest.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager-priest_Rig",
+            "villager-priest_cloth",
+            "villager-priest_cloth-accent",
+            "villager-priest_dark",
+            "villager-priest_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.112405
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.112405
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.224811
+            ]
+          },
+          "loadDurationMs": 58
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:57508/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 211,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-49-24-169Z-57124\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-shepherd",
+  "runId": "2026-09-17T17-49-49-432Z-44144",
+  "status": "pass",
+  "durationMs": 5790,
+  "candidateSha256": "EC93822AE214ADF822DEBD1E0AE6BF4C82BB8F019E135CBB0C6C1B60E1E31B55",
+  "glb": {
+    "version": 2,
+    "declaredLength": 288032,
+    "nodeNames": [
+      "head",
+      "hand_l",
+      "hand.L",
+      "forearm.L",
+      "upperarm.L",
+      "hand_r",
+      "hand.R",
+      "forearm.R",
+      "upperarm.R",
+      "spine",
+      "foot.L",
+      "shin.L",
+      "thigh.L",
+      "foot.R",
+      "shin.R",
+      "thigh.R",
+      "hips",
+      "root",
+      "villager-shepherd_cloth",
+      "villager-shepherd_cloth-accent",
+      "villager-shepherd_dark",
+      "villager-shepherd_skin",
+      "villager-shepherd_Rig",
+      "Villager_Root"
+    ],
+    "meshNames": [
+      "villager-shepherd_cloth_Mesh",
+      "villager-shepherd_cloth-accent_Mesh",
+      "villager-shepherd_dark_Mesh",
+      "villager-shepherd_skin_Mesh"
+    ],
+    "materialNames": [
+      "cloth",
+      "cloth-accent",
+      "dark",
+      "skin"
+    ],
+    "animationNames": [
+      "carry_walk",
+      "idle",
+      "walk",
+      "work_hoe"
+    ],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 24,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 948
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T17:50:17.668Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-49-49-432Z-44144\\candidate\\villager-shepherd.glb",
+      "assetUrl": "/artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/candidate/villager-shepherd.glb",
+      "viewport": {
+        "width": 640,
+        "height": 640,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-49-49-432Z-44144\\three\\capture-1.png",
+        "sha256": "24D24CC25BF4F388ABFEEB80FAEDABE9C32CF92E956AB9376B5B65407582D443",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-49-49-432Z-44144\\three\\capture-1-gray.png",
+          "sha256": "EA7AA047A38D05FA5A413A32444851E00B1D1EB0D8BBFA156333C86A8E3BB975",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 3662,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:54437/artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/candidate/villager-shepherd.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager-shepherd_Rig",
+            "villager-shepherd_cloth",
+            "villager-shepherd_cloth-accent",
+            "villager-shepherd_dark",
+            "villager-shepherd_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.075
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.088333
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.163333
+            ]
+          },
+          "loadDurationMs": 346
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-49-49-432Z-44144\\three\\capture-2.png",
+        "sha256": "24D24CC25BF4F388ABFEEB80FAEDABE9C32CF92E956AB9376B5B65407582D443",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-49-49-432Z-44144\\three\\capture-2-gray.png",
+          "sha256": "EA7AA047A38D05FA5A413A32444851E00B1D1EB0D8BBFA156333C86A8E3BB975",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 177,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:54437/artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/candidate/villager-shepherd.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager-shepherd_Rig",
+            "villager-shepherd_cloth",
+            "villager-shepherd_cloth-accent",
+            "villager-shepherd_dark",
+            "villager-shepherd_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.075
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.088333
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.163333
+            ]
+          },
+          "loadDurationMs": 64
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:54437/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 179,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-49-49-432Z-44144\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

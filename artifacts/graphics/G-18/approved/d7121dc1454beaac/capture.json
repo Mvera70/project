@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-17T17:49:32.830Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-21-714Z-43712\\candidate\\villager-fisher.glb",
+    "assetUrl": "/artifacts/graphics/G-18/runs/2026-09-17T17-48-21-714Z-43712/candidate/villager-fisher.glb",
+    "viewport": {
+      "width": 640,
+      "height": 640,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-21-714Z-43712\\three\\capture-1.png",
+      "sha256": "00D0E4E6F163BAEE4A8329A40A485E6B6A88C111DA27579E0E4A9E5065DA091C",
+      "dimensions": {
+        "width": 640,
+        "height": 640
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-21-714Z-43712\\three\\capture-1-gray.png",
+        "sha256": "CF4BB6D8FD3B282D5C62BF8B6294BA77D8E8A5DA4FE27193F98CA7074EA6A368",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        }
+      },
+      "durationMs": 3944,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:53767/artifacts/graphics/G-18/runs/2026-09-17T17-48-21-714Z-43712/candidate/villager-fisher.glb",
+        "viewport": {
+          "width": 640,
+          "height": 640,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "carry_walk",
+          "duration": 1.3333333730697632
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Scene",
+          "Villager_Root",
+          "footL",
+          "footR",
+          "forearmL",
+          "forearmR",
+          "handL",
+          "handR",
+          "hand_l",
+          "hand_r",
+          "head",
+          "hips",
+          "root",
+          "shinL",
+          "shinR",
+          "spine",
+          "thighL",
+          "thighR",
+          "upperarmL",
+          "upperarmR",
+          "villager-fisher_Rig",
+          "villager-fisher_cloth",
+          "villager-fisher_cloth-accent",
+          "villager-fisher_dark",
+          "villager-fisher_skin"
+        ],
+        "bounds": {
+          "min": [
+            -0.175,
+            0,
+            -0.071667
+          ],
+          "max": [
+            0.175,
+            0.65,
+            0.081667
+          ],
+          "size": [
+            0.35,
+            0.65,
+            0.153333
+          ]
+        },
+        "loadDurationMs": 407
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-21-714Z-43712\\three\\capture-2.png",
+      "sha256": "00D0E4E6F163BAEE4A8329A40A485E6B6A88C111DA27579E0E4A9E5065DA091C",
+      "dimensions": {
+        "width": 640,
+        "height": 640
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-21-714Z-43712\\three\\capture-2-gray.png",
+        "sha256": "CF4BB6D8FD3B282D5C62BF8B6294BA77D8E8A5DA4FE27193F98CA7074EA6A368",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        }
+      },
+      "durationMs": 193,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:53767/artifacts/graphics/G-18/runs/2026-09-17T17-48-21-714Z-43712/candidate/villager-fisher.glb",
+        "viewport": {
+          "width": 640,
+          "height": 640,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "carry_walk",
+          "duration": 1.3333333730697632
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Scene",
+          "Villager_Root",
+          "footL",
+          "footR",
+          "forearmL",
+          "forearmR",
+          "handL",
+          "handR",
+          "hand_l",
+          "hand_r",
+          "head",
+          "hips",
+          "root",
+          "shinL",
+          "shinR",
+          "spine",
+          "thighL",
+          "thighR",
+          "upperarmL",
+          "upperarmR",
+          "villager-fisher_Rig",
+          "villager-fisher_cloth",
+          "villager-fisher_cloth-accent",
+          "villager-fisher_dark",
+          "villager-fisher_skin"
+        ],
+        "bounds": {
+          "min": [
+            -0.175,
+            0,
+            -0.071667
+          ],
+          "max": [
+            0.175,
+            0.65,
+            0.081667
+          ],
+          "size": [
+            0.35,
+            0.65,
+            0.153333
+          ]
+        },
+        "loadDurationMs": 70
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:53767/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 204,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-21-714Z-43712\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

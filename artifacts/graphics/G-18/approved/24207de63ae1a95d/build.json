@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-woodward",
+  "runId": "2026-09-17T17-56-33-913Z-5364",
+  "recipe": "art/recipes/villager-woodward/villager-woodward.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 3012,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-33-913Z-5364/candidate/villager-woodward.blend",
+      "bytes": 124252,
+      "sha256": "92A3BC3DE3E44417C3C4D63B1C47AE52C2D7B8BE723692EF32123CD1590CC578"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-33-913Z-5364/candidate/villager-woodward.glb",
+      "bytes": 288020,
+      "sha256": "24207DE63AE1A95D28529807D26B2498794AFF4ABFF835361D14E97050688084"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-33-913Z-5364/candidate/villager-woodward-blender.png",
+      "bytes": 289352,
+      "sha256": "ADDDC06D74D22BFFB97F91D12BE32D7A3D18402D587E93CD32BE239FE9668FEA"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-33-913Z-5364/blender.log",
+      "bytes": 1713,
+      "sha256": "6060FDDF446208641821C26C5539090AF931F981985012A73292FEE9BECC4A0D"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-33-913Z-5364/temporary/build.py",
+      "bytes": 10701,
+      "sha256": "48EF9F67BD54D82E823077BE9538000A6866F28CEA8DCCA97042A80E8D9AEED2"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-56-33-913Z-5364/temporary/resolved-recipe.json",
+      "bytes": 72174,
+      "sha256": "0BF181F95956CCE674EACF3D8DACA24711C3382F5ED999C00CCE61EBFDA51DAA"
+    }
+  }
+}

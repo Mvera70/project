@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-reeve",
+  "runId": "2026-09-17T17-49-36-698Z-54380",
+  "recipe": "art/recipes/villager-reeve/villager-reeve.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 12191,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-36-698Z-54380/candidate/villager-reeve.blend",
+      "bytes": 126114,
+      "sha256": "633C6AC06D4889B11BD732A07A295B70EBE53751788542C13579969968C58E8E"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-36-698Z-54380/candidate/villager-reeve.glb",
+      "bytes": 297232,
+      "sha256": "CB41B332EF41CF704973AA57D06DE088839771A35F8416D917730C9E972189D5"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-36-698Z-54380/candidate/villager-reeve-blender.png",
+      "bytes": 285628,
+      "sha256": "4649C40BB394876908752F5CD7DAC71B75F87A8BB8A84B665CADC08D34B4C81A"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-36-698Z-54380/blender.log",
+      "bytes": 1694,
+      "sha256": "33C48C432B51070B3214542A5163EE55650EEC9928B31F0A0CBD11BF2C3468EF"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-36-698Z-54380/temporary/build.py",
+      "bytes": 10701,
+      "sha256": "48EF9F67BD54D82E823077BE9538000A6866F28CEA8DCCA97042A80E8D9AEED2"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-36-698Z-54380/temporary/resolved-recipe.json",
+      "bytes": 71749,
+      "sha256": "F4DB31575773DD4B672D31729CEAF4835665FC7AC07023EAD4640E8CA184AF8A"
+    }
+  }
+}

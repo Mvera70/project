@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-17T17:56:33.058Z",
+  "invocation": "npx tsx tools/graphics/capture.ts",
+  "input": {
+    "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-56-25-042Z-7708\\candidate\\villager-woodcutter.glb",
+    "assetUrl": "/artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/candidate/villager-woodcutter.glb",
+    "viewport": {
+      "width": 640,
+      "height": 640,
+      "pixelRatio": 1
+    },
+    "camera": "iso-ne",
+    "zoom": 1,
+    "clip": null,
+    "presentationSeconds": 0,
+    "grayscale": true
+  },
+  "environment": {
+    "node": "v24.15.0",
+    "browser": "153.0.8010.48",
+    "three": "0.185.0"
+  },
+  "captures": [
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-56-25-042Z-7708\\three\\capture-1.png",
+      "sha256": "063A22C9BFC232E431F69B07324F43D98BB953005F0E33A6026A1296BB0875BE",
+      "dimensions": {
+        "width": 640,
+        "height": 640
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-56-25-042Z-7708\\three\\capture-1-gray.png",
+        "sha256": "A89AA10F5C8EF75D40386EA68DF6EBE259130E01C91AAAE09F635D720CE2A18A",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        }
+      },
+      "durationMs": 3544,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:59989/artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/candidate/villager-woodcutter.glb",
+        "viewport": {
+          "width": 640,
+          "height": 640,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "carry_walk",
+          "duration": 1.3333333730697632
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Scene",
+          "Villager_Root",
+          "footL",
+          "footR",
+          "forearmL",
+          "forearmR",
+          "handL",
+          "handR",
+          "hand_l",
+          "hand_r",
+          "head",
+          "hips",
+          "root",
+          "shinL",
+          "shinR",
+          "spine",
+          "thighL",
+          "thighR",
+          "upperarmL",
+          "upperarmR",
+          "villager-woodcutter_Rig",
+          "villager-woodcutter_cloth",
+          "villager-woodcutter_cloth-accent",
+          "villager-woodcutter_dark",
+          "villager-woodcutter_skin"
+        ],
+        "bounds": {
+          "min": [
+            -0.175,
+            0,
+            -0.071667
+          ],
+          "max": [
+            0.175,
+            0.65,
+            0.081667
+          ],
+          "size": [
+            0.35,
+            0.65,
+            0.153333
+          ]
+        },
+        "loadDurationMs": 269
+      }
+    },
+    {
+      "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-56-25-042Z-7708\\three\\capture-2.png",
+      "sha256": "063A22C9BFC232E431F69B07324F43D98BB953005F0E33A6026A1296BB0875BE",
+      "dimensions": {
+        "width": 640,
+        "height": 640
+      },
+      "grayscale": {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-56-25-042Z-7708\\three\\capture-2-gray.png",
+        "sha256": "A89AA10F5C8EF75D40386EA68DF6EBE259130E01C91AAAE09F635D720CE2A18A",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        }
+      },
+      "durationMs": 135,
+      "viewer": {
+        "resourceUrl": "http://127.0.0.1:59989/artifacts/graphics/G-18/runs/2026-09-17T17-56-25-042Z-7708/candidate/villager-woodcutter.glb",
+        "viewport": {
+          "width": 640,
+          "height": 640,
+          "pixelRatio": 1
+        },
+        "zoom": 1,
+        "clip": {
+          "name": "carry_walk",
+          "duration": 1.3333333730697632
+        },
+        "camera": "iso-ne",
+        "presentationSeconds": 0,
+        "threeRevision": "185",
+        "objectNames": [
+          "Scene",
+          "Villager_Root",
+          "footL",
+          "footR",
+          "forearmL",
+          "forearmR",
+          "handL",
+          "handR",
+          "hand_l",
+          "hand_r",
+          "head",
+          "hips",
+          "root",
+          "shinL",
+          "shinR",
+          "spine",
+          "thighL",
+          "thighR",
+          "upperarmL",
+          "upperarmR",
+          "villager-woodcutter_Rig",
+          "villager-woodcutter_cloth",
+          "villager-woodcutter_cloth-accent",
+          "villager-woodcutter_dark",
+          "villager-woodcutter_skin"
+        ],
+        "bounds": {
+          "min": [
+            -0.175,
+            0,
+            -0.071667
+          ],
+          "max": [
+            0.175,
+            0.65,
+            0.081667
+          ],
+          "size": [
+            0.35,
+            0.65,
+            0.153333
+          ]
+        },
+        "loadDurationMs": 31
+      }
+    }
+  ],
+  "deterministicOnThisHost": true,
+  "missingResource": {
+    "url": "http://127.0.0.1:59989/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+    "state": "error",
+    "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+    "durationMs": 163,
+    "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-56-25-042Z-7708\\three\\missing-resource.png"
+  },
+  "browserErrors": []
+}

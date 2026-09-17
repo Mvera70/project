@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-herbalist",
+  "runId": "2026-09-17T17-48-34-090Z-43612",
+  "recipe": "art/recipes/villager-herbalist/villager-herbalist.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11908,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/candidate/villager-herbalist.blend",
+      "bytes": 126229,
+      "sha256": "F7C8F8CC192A1C9EB02D2FB7BA72D33312945C304CE58248B577342D4405661A"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/candidate/villager-herbalist.glb",
+      "bytes": 301236,
+      "sha256": "1BEBC15685A55026905295FFC008754CC387A04B11A9404D1518A7F205A08067"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/candidate/villager-herbalist-blender.png",
+      "bytes": 286132,
+      "sha256": "8F24D517168855EAD2462C2AF9388F863130627073F536D92004326A571176F3"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/blender.log",
+      "bytes": 1722,
+      "sha256": "9439E0C1942206CBE5EC5FB3E145807427FEC427555E3B698FE93749D13A828C"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/temporary/build.py",
+      "bytes": 10701,
+      "sha256": "48EF9F67BD54D82E823077BE9538000A6866F28CEA8DCCA97042A80E8D9AEED2"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/temporary/resolved-recipe.json",
+      "bytes": 73027,
+      "sha256": "89712FB7BEFAC30FD5A1C866CF64FDF4232B6E1D5B3A6F92BE6D23813F53F9C1"
+    }
+  }
+}

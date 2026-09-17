@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager",
+  "runId": "2026-09-17T17-47-23-892Z-55152",
+  "status": "pass",
+  "durationMs": 6014,
+  "candidateSha256": "3E77C2FA1E6349696B828DAA2AB2FE01848531274FA0B2D31435B0D09BA02D33",
+  "glb": {
+    "version": 2,
+    "declaredLength": 298504,
+    "nodeNames": [
+      "head",
+      "hand_l",
+      "hand.L",
+      "forearm.L",
+      "upperarm.L",
+      "hand_r",
+      "hand.R",
+      "forearm.R",
+      "upperarm.R",
+      "spine",
+      "foot.L",
+      "shin.L",
+      "thigh.L",
+      "foot.R",
+      "shin.R",
+      "thigh.R",
+      "hips",
+      "root",
+      "villager_cloth",
+      "villager_cloth-accent",
+      "villager_dark",
+      "villager_skin",
+      "villager_Rig",
+      "Villager_Root"
+    ],
+    "meshNames": [
+      "villager_cloth_Mesh",
+      "villager_cloth-accent_Mesh",
+      "villager_dark_Mesh",
+      "villager_skin_Mesh"
+    ],
+    "materialNames": [
+      "cloth",
+      "cloth-accent",
+      "dark",
+      "skin"
+    ],
+    "animationNames": [
+      "carry_walk",
+      "idle",
+      "walk",
+      "work_hoe"
+    ],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 24,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 1044
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T17:49:07.055Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-47-23-892Z-55152\\candidate\\villager.glb",
+      "assetUrl": "/artifacts/graphics/G-17/runs/2026-09-17T17-47-23-892Z-55152/candidate/villager.glb",
+      "viewport": {
+        "width": 640,
+        "height": 640,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-47-23-892Z-55152\\three\\capture-1.png",
+        "sha256": "15DE9D6C2536E1E1DA8BECAF6ACCCF47D003136F8800A5D42802245DF8758D4F",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-47-23-892Z-55152\\three\\capture-1-gray.png",
+          "sha256": "ABA47B81E2ED800470B510B5278A6C293399EDD671529E2E12D5F9DCE8BE0D76",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 1362,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:56882/artifacts/graphics/G-17/runs/2026-09-17T17-47-23-892Z-55152/candidate/villager.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager_Rig",
+            "villager_cloth",
+            "villager_cloth-accent",
+            "villager_dark",
+            "villager_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.071667
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.081667
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.153333
+            ]
+          },
+          "loadDurationMs": 360
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-47-23-892Z-55152\\three\\capture-2.png",
+        "sha256": "15DE9D6C2536E1E1DA8BECAF6ACCCF47D003136F8800A5D42802245DF8758D4F",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-47-23-892Z-55152\\three\\capture-2-gray.png",
+          "sha256": "ABA47B81E2ED800470B510B5278A6C293399EDD671529E2E12D5F9DCE8BE0D76",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 181,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:56882/artifacts/graphics/G-17/runs/2026-09-17T17-47-23-892Z-55152/candidate/villager.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager_Rig",
+            "villager_cloth",
+            "villager_cloth-accent",
+            "villager_dark",
+            "villager_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.071667
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.081667
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.153333
+            ]
+          },
+          "loadDurationMs": 79
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:56882/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 215,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-17\\runs\\2026-09-17T17-47-23-892Z-55152\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

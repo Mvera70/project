@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-herbalist",
+  "runId": "2026-09-17T17-48-34-090Z-43612",
+  "status": "pass",
+  "durationMs": 5711,
+  "candidateSha256": "1BEBC15685A55026905295FFC008754CC387A04B11A9404D1518A7F205A08067",
+  "glb": {
+    "version": 2,
+    "declaredLength": 301236,
+    "nodeNames": [
+      "head",
+      "hand_l",
+      "hand.L",
+      "forearm.L",
+      "upperarm.L",
+      "hand_r",
+      "hand.R",
+      "forearm.R",
+      "upperarm.R",
+      "spine",
+      "foot.L",
+      "shin.L",
+      "thigh.L",
+      "foot.R",
+      "shin.R",
+      "thigh.R",
+      "hips",
+      "root",
+      "villager-herbalist_cloth",
+      "villager-herbalist_cloth-accent",
+      "villager-herbalist_dark",
+      "villager-herbalist_skin",
+      "villager-herbalist_Rig",
+      "Villager_Root"
+    ],
+    "meshNames": [
+      "villager-herbalist_cloth_Mesh",
+      "villager-herbalist_cloth-accent_Mesh",
+      "villager-herbalist_dark_Mesh",
+      "villager-herbalist_skin_Mesh"
+    ],
+    "materialNames": [
+      "cloth",
+      "cloth-accent",
+      "dark",
+      "skin"
+    ],
+    "animationNames": [
+      "carry_walk",
+      "idle",
+      "walk",
+      "work_hoe"
+    ],
+    "finitePositionAccessors": 4,
+    "statistics": {
+      "objects": 24,
+      "meshes": 4,
+      "materials": 4,
+      "triangles": 1068
+    }
+  },
+  "capture": {
+    "schemaVersion": 1,
+    "generatedAt": "2026-09-17T17:49:39.085Z",
+    "invocation": "npx tsx tools/graphics/capture.ts",
+    "input": {
+      "assetPath": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-34-090Z-43612\\candidate\\villager-herbalist.glb",
+      "assetUrl": "/artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/candidate/villager-herbalist.glb",
+      "viewport": {
+        "width": 640,
+        "height": 640,
+        "pixelRatio": 1
+      },
+      "camera": "iso-ne",
+      "zoom": 1,
+      "clip": null,
+      "presentationSeconds": 0,
+      "grayscale": true
+    },
+    "environment": {
+      "node": "v24.15.0",
+      "browser": "153.0.8010.48",
+      "three": "0.185.0"
+    },
+    "captures": [
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-34-090Z-43612\\three\\capture-1.png",
+        "sha256": "6C660FF36F0702F9E926A726F151F1A03F032BB9C6E9DAD1CB16790054F10F61",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-34-090Z-43612\\three\\capture-1-gray.png",
+          "sha256": "8BA83AA06E3493F71B890E8BDFBC33C31005DDFE04B89D137A325C8A6DDE13F6",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 3606,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:56679/artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/candidate/villager-herbalist.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager-herbalist_Rig",
+            "villager-herbalist_cloth",
+            "villager-herbalist_cloth-accent",
+            "villager-herbalist_dark",
+            "villager-herbalist_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.071667
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.081667
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.153333
+            ]
+          },
+          "loadDurationMs": 343
+        }
+      },
+      {
+        "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-34-090Z-43612\\three\\capture-2.png",
+        "sha256": "6C660FF36F0702F9E926A726F151F1A03F032BB9C6E9DAD1CB16790054F10F61",
+        "dimensions": {
+          "width": 640,
+          "height": 640
+        },
+        "grayscale": {
+          "file": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-34-090Z-43612\\three\\capture-2-gray.png",
+          "sha256": "8BA83AA06E3493F71B890E8BDFBC33C31005DDFE04B89D137A325C8A6DDE13F6",
+          "dimensions": {
+            "width": 640,
+            "height": 640
+          }
+        },
+        "durationMs": 159,
+        "viewer": {
+          "resourceUrl": "http://127.0.0.1:56679/artifacts/graphics/G-18/runs/2026-09-17T17-48-34-090Z-43612/candidate/villager-herbalist.glb",
+          "viewport": {
+            "width": 640,
+            "height": 640,
+            "pixelRatio": 1
+          },
+          "zoom": 1,
+          "clip": {
+            "name": "carry_walk",
+            "duration": 1.3333333730697632
+          },
+          "camera": "iso-ne",
+          "presentationSeconds": 0,
+          "threeRevision": "185",
+          "objectNames": [
+            "Scene",
+            "Villager_Root",
+            "footL",
+            "footR",
+            "forearmL",
+            "forearmR",
+            "handL",
+            "handR",
+            "hand_l",
+            "hand_r",
+            "head",
+            "hips",
+            "root",
+            "shinL",
+            "shinR",
+            "spine",
+            "thighL",
+            "thighR",
+            "upperarmL",
+            "upperarmR",
+            "villager-herbalist_Rig",
+            "villager-herbalist_cloth",
+            "villager-herbalist_cloth-accent",
+            "villager-herbalist_dark",
+            "villager-herbalist_skin"
+          ],
+          "bounds": {
+            "min": [
+              -0.175,
+              0,
+              -0.071667
+            ],
+            "max": [
+              0.175,
+              0.65,
+              0.081667
+            ],
+            "size": [
+              0.35,
+              0.65,
+              0.153333
+            ]
+          },
+          "loadDurationMs": 61
+        }
+      }
+    ],
+    "deterministicOnThisHost": true,
+    "missingResource": {
+      "url": "http://127.0.0.1:56679/tools/graphics/viewer.html?asset=%2Fartifacts%2Fgraphics%2FG-00%2Fintentionally-missing.glb&width=640&height=640&pixelRatio=1&camera=iso-ne&zoom=1&time=0",
+      "state": "error",
+      "message": "Could not load GLB '/artifacts/graphics/G-00/intentionally-missing.glb': Unexpected token '<', \"<!doctype \"... is not valid JSON",
+      "durationMs": 191,
+      "screenshot": "D:\\DESARROLLO\\PROYECTOS\\VALLEY\\project\\artifacts\\graphics\\G-18\\runs\\2026-09-17T17-48-34-090Z-43612\\three\\missing-resource.png"
+    },
+    "browserErrors": []
+  },
+  "checks": [
+    "GLB 2 container and JSON chunk",
+    "finite three-axis POSITION bounds",
+    "unique expected object and material names",
+    "declared connectors and clips",
+    "real Three.js load",
+    "repeatable same-host capture",
+    "finite positive world bounds"
+  ]
+}

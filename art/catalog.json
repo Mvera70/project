@@ -260,8 +260,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T11-44-47-164Z-42044",
-        "directory": "artifacts/graphics/G-17/approved/e40fb6dd9b1d5ca4"
+        "runId": "2026-09-17T17-47-23-892Z-55152",
+        "directory": "artifacts/graphics/G-17/approved/3e77c2fa1e634969"
       },
       "bounds": {
         "min": [
@@ -272,15 +272,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.081667
         ],
         "size": [
           0.35,
           0.65,
-          0.1625
+          0.153333
         ]
       },
-      "recipeSha256": "C2181AC4806B44DBC4977DEB4DF63C0933BD0C1277E0579983A0EA9FDC574CB1",
+      "recipeSha256": "08045680EC2EF4FE2B63B326AB80B0BCC1FAF0D8DF167753F53A4783489E7608",
       "materials": [
         "skin",
         "cloth",
@@ -327,17 +327,17 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1056
+        "triangles": 1044
       },
       "hashes": {
-        "villager.blend": "6CB345DAF48184A7967246D53F5A0ED5875127E6034CA97C71CD1E5451EA577A",
-        "villager.glb": "E40FB6DD9B1D5CA4F0EDFBF953B498C26B20AB387D21EF859441423F1FEE46D4",
-        "villager-blender.png": "7847DC1A1E7F1EBCD61B1355DCAC023469BFAD530A48B0F68C4780A587F35723",
-        "capture-1.png": "D36BB72B022D7E6A430D460A273F777B105C8BC30EDE272659DD40B3038F308F",
-        "capture-1-gray.png": "10F45FB2F0DA9BB391B8B9117934B3D379BB9E2498377BE75744E598F405A229",
-        "capture.json": "5BD71A7C6C7184149FA5CD15C3E4537C8A627FD73B202664E3DA1DFE9F1697CA",
-        "build.json": "4850DBE00F81612FF8089C1DB8578ED811632AE7EA05F32286BAE9F48C7F3610",
-        "validation.json": "B70BB90642FB41531EA1B16C9139C9FC8B5FD7FEF1D3A438F67DFF3AFBB00EFE"
+        "villager.blend": "7982EB8D909A735F9A085CDCB0C2B164187C6A060119F1EBDBA9D09554B84EB9",
+        "villager.glb": "3E77C2FA1E6349696B828DAA2AB2FE01848531274FA0B2D31435B0D09BA02D33",
+        "villager-blender.png": "1D6F43FE1343ED4A171DB12C42BE873A1EE90E04891FC05DAF113FD9CC9D68C6",
+        "capture-1.png": "15DE9D6C2536E1E1DA8BECAF6ACCCF47D003136F8800A5D42802245DF8758D4F",
+        "capture-1-gray.png": "ABA47B81E2ED800470B510B5278A6C293399EDD671529E2E12D5F9DCE8BE0D76",
+        "capture.json": "5F5FAC2DD48BA1B632D657BC92D94C8A3B3B1A250A05EE9820A11346D6974C63",
+        "build.json": "8688642F73163F47E236E123C5A612A8B0976A7DF1D1EC227792310BCE7FEE7F",
+        "validation.json": "6B5897F8D03861C93174B4A720D234266168B403DB92CD2C0C211EC72C4E031A"
       },
       "provenance": {
         "kind": "original",
@@ -2342,8 +2342,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-29-28-020Z-44512",
-        "directory": "artifacts/graphics/G-18/approved/48526252b42a4ae6"
+        "runId": "2026-09-17T17-48-46-537Z-51992",
+        "directory": "artifacts/graphics/G-18/approved/e756751692393543"
       },
       "bounds": {
         "min": [
@@ -2354,15 +2354,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.088333
         ],
         "size": [
           0.35,
           0.65,
-          0.195833
+          0.193333
         ]
       },
-      "recipeSha256": "A5747783A6237BF161BB956B5916F33B2899565023AB2D1E899A9CA34BAE3695",
+      "recipeSha256": "88A9E48EAE12852E6FEE61D28168553A5AFD5713E1A8325C781470038FDE5DD7",
       "materials": [
         "skin",
         "cloth",
@@ -2409,17 +2409,17 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 948
+        "triangles": 936
       },
       "hashes": {
-        "villager-leader.blend": "B3537B9AE7CFDA4B271E0576CA6B7F80975BA11D2093685081F308983946FA78",
-        "villager-leader.glb": "48526252B42A4AE6557EB9E186B5A4ED1E7990612A5846DC413051F8E83B1C9E",
-        "villager-leader-blender.png": "109FA93E1D95831BE3EE0ABCE365F886C3F9D5DEDEFE5B612D41DA354A968795",
-        "capture-1.png": "B5AEC5A0336CDFCCB8D80C7761DD8256987998F5588A90D1E578339901E5D6C7",
-        "capture-1-gray.png": "82B88467119C284A29303ADC5025E5E61DFA7761FB2D886768C2639CA578BAEB",
-        "capture.json": "CD544B2DD347CC363653D28445FF80F6968C0792D233CCDFDEBB418DE31B6F17",
-        "build.json": "803A75AE3982CA516AF63769B861D3B65B7612CED6E01B1AC62EE45590DCC8F9",
-        "validation.json": "1BA4A17991699982AF56BE7789E9740170E295AAF2648DE226B9DA8DB268065D"
+        "villager-leader.blend": "859FD8791FC1E191603F582391788C25F5A06C89B04F569DD5D21900178086A6",
+        "villager-leader.glb": "E7567516923935435B382AF8528C03FAD64E3D5E376C769BD028926AD1561FD5",
+        "villager-leader-blender.png": "96302ED0F08139630727DACF0EA30602A00C8EF197D65C2F901BD5451DE52F8F",
+        "capture-1.png": "741C0A425FA9A24885C07C1E8DB72D71AA61B448400AEB8CA39A07FA10159547",
+        "capture-1-gray.png": "B2131E9860A93002E963D9BB195EC108100CA71CA23153E6D2A4FAC6C2692097",
+        "capture.json": "95120ACBF58E7362B9E68B6FD0790F778607CB4CFA47C86C7BF1369312268133",
+        "build.json": "F38A5F18BC240DC7BF40FEDA9A054B0C07D24CD34E03153ABB1FC210FF5464A5",
+        "validation.json": "8340164CD641A5F752D0DC276E1F33FE0220A6236D4004CBDDCEEB6EAD76D942"
       },
       "provenance": {
         "kind": "original",
@@ -2435,8 +2435,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T11-45-12-668Z-27776",
-        "directory": "artifacts/graphics/G-17/approved/011dcf45e9e5fd63"
+        "runId": "2026-09-17T17-50-01-952Z-52704",
+        "directory": "artifacts/graphics/G-17/approved/268df1c141d8d6bf"
       },
       "bounds": {
         "min": [
@@ -2447,15 +2447,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.088333
         ],
         "size": [
           0.35,
           0.65,
-          0.1625
+          0.16
         ]
       },
-      "recipeSha256": "EAAF0B5E7FC46EECC76D5731B2B4DC14AD4F1A8E2C762945EE7F7488EBDE07D5",
+      "recipeSha256": "B51DD83CA9CF4A40851690F08A89BC8966F9A9FA145E3FE1A6F3B0122B7A1715",
       "materials": [
         "skin",
         "cloth",
@@ -2502,17 +2502,17 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1116
+        "triangles": 1104
       },
       "hashes": {
-        "villager-smith.blend": "973EDAD5AC031018E2ED62B9379711FC942157AA817EE5BD0CC5AC3F4623C6A2",
-        "villager-smith.glb": "011DCF45E9E5FD63B07DD5678A1E8EBE69781E8CCC207FAD636829A0EB371FFC",
-        "villager-smith-blender.png": "7773771F8A4DDD796BD1D6D9487D2531C9164829860CE9A2FD55F26A1E5CDC3A",
-        "capture-1.png": "BCA15ADD1ECE2EA70329731200B6DC6C0229D2DEDF174B42607CF33E0E4A6270",
-        "capture-1-gray.png": "E3B32B74921A09A50ABE7D88E1C66EEFD0BA31AD28E92C41B13DC9042E0C37A8",
-        "capture.json": "4F1639849104F1490BC807175B8534A720C87C43CC1DCE92C399CB9DE69E440A",
-        "build.json": "FC9832831DBB798A801ABCC86A84B6F0974EED0268E6964B1F9E8965F6EEDE23",
-        "validation.json": "51529ACE71097580C6B80A477BDAC2A98EA2145836F68D130C6C6EEDBED9DC2D"
+        "villager-smith.blend": "8D20F66715DD8C26D6E175DA7F4E965ACC7697855B7ACF4E7F6E46CEFC5F468F",
+        "villager-smith.glb": "268DF1C141D8D6BFDF7490B51E5C0F9348F4F48563111788CAD6733DFB472F66",
+        "villager-smith-blender.png": "14D37A8D01614218A990E2E59A540D57F5366F1ED6A70306F54E5154EFE5A8E2",
+        "capture-1.png": "2F17F3581EB280263F08CD749FBA0E9367CCB5DDDE6478186763DC957A791437",
+        "capture-1-gray.png": "B2ABA9CF04C086A47B808E24D90015AE648BF9F0D82814B849FB6FAC355C7FF6",
+        "capture.json": "9AA8AAE4C2740F777E7B48782B7BE03603EBB79D297A96B0DF0524E900DFFA53",
+        "build.json": "08892E14282259A30C848BB99063531032DD7036F8A380AA71D6D24A0D7C59D9",
+        "validation.json": "35512FF02D948C408D81B571CBDAFB11457237187F629493ADC9268E81B35CE8"
       },
       "provenance": {
         "kind": "original",
@@ -2528,8 +2528,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-32-05-776Z-37764",
-        "directory": "artifacts/graphics/G-18/approved/9f24d0be9586fa1d"
+        "runId": "2026-09-17T17-49-11-607Z-49752",
+        "directory": "artifacts/graphics/G-18/approved/e677fcee7a438abf"
       },
       "bounds": {
         "min": [
@@ -2540,201 +2540,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.081667
         ],
         "size": [
           0.35,
           0.65,
-          0.180833
+          0.171667
         ]
       },
-      "recipeSha256": "0A898F423AB63982CBB61D9B9987AE48B25CC1D2938DC28B70E1C06250540AD9",
-      "materials": [
-        "skin",
-        "cloth",
-        "cloth-accent",
-        "dark"
-      ],
-      "clips": [
-        "idle",
-        "walk",
-        "work_hoe",
-        "carry_walk"
-      ],
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ],
-      "connectors": [
-        "hand_l",
-        "hand_r"
-      ],
-      "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 972
-      },
-      "hashes": {
-        "villager-midwife.blend": "CFCAF0BCC9F5C910AF78B960036C8C5A3C0BDF4B7705C1171021A8A3B1191BB9",
-        "villager-midwife.glb": "9F24D0BE9586FA1D1AF56E920C96BDB3A87B22942504375EF6BAA8829709A4CE",
-        "villager-midwife-blender.png": "9EFCF3E56AF9014DD386672B2D1CD827675D7BDB1D5E6678A1AE252050DEAA34",
-        "capture-1.png": "FC3B54D36E7BDE101D4DBC33E5B60779FBA78D0799616E6E31B6AC694C622B68",
-        "capture-1-gray.png": "C2267819814EF9C667F1144C4D193A08D0426634D5AB92389B75FF6377B478DD",
-        "capture.json": "F27EDDA0C200AD9C1427FFC4E3647FFDCBD1B31AF4E8DA238D2EDBE27638301C",
-        "build.json": "EF4F233F0087BC325D87CEA2CFE7B9CB88F398CAAA7171E6CF7D51F661249A17",
-        "validation.json": "F603E6879838FF19BB68BBA14861624547074E10C0DDAE9EDB0BA8057F340CD7"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original G-18: Comadrona: toca marfil envolvente y delantal claro largo sobre vestido terracota.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "villager-priest",
-      "artifactRound": "G-17",
-      "status": "study",
-      "recipe": "art/recipes/villager-priest/villager-priest.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-16T11-45-44-603Z-38612",
-        "directory": "artifacts/graphics/G-17/approved/894cb713be282e67"
-      },
-      "bounds": {
-        "min": [
-          -0.175,
-          0,
-          -0.112405
-        ],
-        "max": [
-          0.175,
-          0.65,
-          0.112405
-        ],
-        "size": [
-          0.35,
-          0.65,
-          0.224811
-        ]
-      },
-      "recipeSha256": "B76E06764052D03C0DE65C39011A1E7BFA893A3921C7272952ABBDB025222C9C",
-      "materials": [
-        "skin",
-        "cloth",
-        "cloth-accent",
-        "dark"
-      ],
-      "clips": [
-        "idle",
-        "walk",
-        "work_hoe",
-        "carry_walk"
-      ],
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ],
-      "connectors": [
-        "hand_l",
-        "hand_r"
-      ],
-      "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 1012
-      },
-      "hashes": {
-        "villager-priest.blend": "3662116671C62E7D3B3A6C4A9EE509B7974536E483D26AF8067298D8C2AF5FAD",
-        "villager-priest.glb": "894CB713BE282E67F6C798598ED55B216FF3E82D5CAD072571511C7F75A7704E",
-        "villager-priest-blender.png": "6ACDA1C538C8DF57B625C5941F6DB483818C1772F7A667866745B6B8B74C9F6A",
-        "capture-1.png": "C14A6BD07BC2D5EED23949F718D34D7B7E87A9EE7B899D8AF694D0CFC4FA9691",
-        "capture-1-gray.png": "AB5E0B24E59D061D2EDC8493F27AF8A85A3BC43AF1C0678C027A181587731843",
-        "capture.json": "8891B50E8A771B3F484B377B58B06C8C5F1E1093E9FB8668B930BFF3250610F9",
-        "build.json": "823DD783B2D50C313FEB50BBD4A56FE090270B90BDA80EB0D0265D61DA2CE1FA",
-        "validation.json": "D933FF646C66B420BEEEB1B1929790AADFF784C1F23C339BE564CA562B62F9ED"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original villager-priest: rediseño low-voxel G-17, rig compartido G-04; ver docs/graphics-rounds/G-17.md.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "villager-woodward",
-      "artifactRound": "G-18",
-      "status": "study",
-      "recipe": "art/recipes/villager-woodward/villager-woodward.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-16T12-32-20-763Z-45612",
-        "directory": "artifacts/graphics/G-18/approved/fc406c74d7235849"
-      },
-      "bounds": {
-        "min": [
-          -0.175,
-          0,
-          -0.09
-        ],
-        "max": [
-          0.175,
-          0.65,
-          0.090833
-        ],
-        "size": [
-          0.35,
-          0.65,
-          0.180833
-        ]
-      },
-      "recipeSha256": "6C2E018DF0F084D10A4298F5B04B39B06F41FC25FBBA6036F477FF83981740DD",
+      "recipeSha256": "1399D9101AAD433B1B4727286DDA8F3E0E7DEAEB791FB6E74B90ACC84EDAA9D9",
       "materials": [
         "skin",
         "cloth",
@@ -2784,14 +2598,200 @@
         "triangles": 960
       },
       "hashes": {
-        "villager-woodward.blend": "0C029FF7CB89462EBD4597848345A1AEC90B4A239DA1748AC7B90F06B67B20BA",
-        "villager-woodward.glb": "FC406C74D7235849FAF87EC36AFFA20E9547B6879F69D5645BF43ECCDD4AAEAE",
-        "villager-woodward-blender.png": "A4F670A521FB6EB6CA66D277EEDE33F82C96600F0FA764701E4B4C8BA42E2918",
-        "capture-1.png": "C1A37CF332C2BB3BB5F38BDEFF13FE4122C36EA9074A029DD38BB1F23C45B6B1",
-        "capture-1-gray.png": "23E4757772FF14CCD584A4803C902E2C35CD9B9EC2E1BB49B7B35E94BED079DA",
-        "capture.json": "43954970C12C437169CE51EED66A7E2822AEEEA356C7A18D3F3EC40AE01068BB",
-        "build.json": "D90F83A64048469B3D2A31C041830095581E4D94FB83248D3305EF8FA826965A",
-        "validation.json": "A29E113ADE5878C65620A1E212E50B1D054E71AC4E1C964E7DC3A546FF8813D9"
+        "villager-midwife.blend": "2528E0F3D063A10D5691DB63C502AE2264F2F5B7BCD7A198E22F0F7DB9FA267A",
+        "villager-midwife.glb": "E677FCEE7A438ABFA4AD0B993A6D0813C182D9C1C25E403CCEE7190C9F9816A2",
+        "villager-midwife-blender.png": "11DBFAAE35F0F1802A00500D6CBE7E3EE9561257E82BAC1A946F12D9AC61326D",
+        "capture-1.png": "3D779348FB553F6612D268F78C03DFF0B92269011254A65E185BDDF2834148C5",
+        "capture-1-gray.png": "C58C39913CEE913D9EDE5370591B674899E245D458B8E5F81EEC7ADDEFCF0C33",
+        "capture.json": "6A65F7337E7560D49C91F0CF14294DF3EE16CFCFAB605A6C94B6B799FE0BA309",
+        "build.json": "D95D54E62542C3D7FBEBB7196C32C2C5D192FA593D0EDA82E8E0EFB8CB052B63",
+        "validation.json": "17FD2383C21EB78B73E5F3A02E28B6278C5F4D39B7BC85289380A812BF8DD00A"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Comadrona: toca marfil envolvente y delantal claro largo sobre vestido terracota.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-priest",
+      "artifactRound": "G-17",
+      "status": "study",
+      "recipe": "art/recipes/villager-priest/villager-priest.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T17-49-24-169Z-57124",
+        "directory": "artifacts/graphics/G-17/approved/97beb63de1137367"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.112405
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.112405
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.224811
+        ]
+      },
+      "recipeSha256": "F454385513858ACBE0C8ABFFDB03254CC65D03FADAD9E3B47F829A335B732F03",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1000
+      },
+      "hashes": {
+        "villager-priest.blend": "B9EE2C721DF54CB28A19483FCD62C7C044B9E1D98367BB8CFA657F27B26689A3",
+        "villager-priest.glb": "97BEB63DE1137367CE2B61FAA63C330F1CC49E6736D3F27B3AA2E583DC322CF2",
+        "villager-priest-blender.png": "538AFFC4AB64A3AFB26CB6A75EEB2F424468D6DED049F366BD911F57973EDB1B",
+        "capture-1.png": "C11C42A3CCA40802CEF4E22AE8DE89F2A3BA9920FF64713DFD2FFBEA116FB4A4",
+        "capture-1-gray.png": "E304D8714815309564789F2281C61BF7F9D5197AC34CCF5250729420150EC3D9",
+        "capture.json": "71D65BCD3A13DDD7BE7096AF2CDC8FB3A9C7F79AE559B742733A80244C91D120",
+        "build.json": "D3715F3703C7ACC1D24640DBE1F64C8CBAEEA5F60CADAB736B61248E5C3D03BA",
+        "validation.json": "3D0FAB5E827A79AF8C3D1890116AAF86329C8126AD52314343D1199706411EA1"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-priest: rediseño low-voxel G-17, rig compartido G-04; ver docs/graphics-rounds/G-17.md.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-woodward",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-woodward/villager-woodward.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T17-56-33-913Z-5364",
+        "directory": "artifacts/graphics/G-18/approved/24207de63ae1a95d"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.081667
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.171667
+        ]
+      },
+      "recipeSha256": "0EA0D80511A8A0C712710DCACD3E26348C03E0C17A4E5815D49C22404B385FB7",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 948
+      },
+      "hashes": {
+        "villager-woodward.blend": "92A3BC3DE3E44417C3C4D63B1C47AE52C2D7B8BE723692EF32123CD1590CC578",
+        "villager-woodward.glb": "24207DE63AE1A95D28529807D26B2498794AFF4ABFF835361D14E97050688084",
+        "villager-woodward-blender.png": "ADDDC06D74D22BFFB97F91D12BE32D7A3D18402D587E93CD32BE239FE9668FEA",
+        "capture-1.png": "A9B4D123AB821D522B26A771A8AACFBE38EFD136EFDF47C670353A1CB65ACE6D",
+        "capture-1-gray.png": "6FBFFE3118A116974067014B23FAA1B75387CA62BA3F929B7EEA388B1182023A",
+        "capture.json": "0F21809A6EC061900A10648EEE56CA9EC96DB43A6F6D87CB1B05DD0CEFCB3955",
+        "build.json": "7EC864CBDFB97A8C53D60618E71CAE62380B6891C84E97E6E2716CCC65E0EBAF",
+        "validation.json": "21763801B1393278D8C4DF8FC2DB473043355F29CC7549D1BD81F7AC53BD75FB"
       },
       "provenance": {
         "kind": "original",
@@ -2807,8 +2807,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-29-42-841Z-44572",
-        "directory": "artifacts/graphics/G-18/approved/43fc649bc07349c0"
+        "runId": "2026-09-17T17-49-36-698Z-54380",
+        "directory": "artifacts/graphics/G-18/approved/cb41b332ef41cf70"
       },
       "bounds": {
         "min": [
@@ -2819,15 +2819,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.081667
         ],
         "size": [
           0.35,
           0.65,
-          0.1625
+          0.153333
         ]
       },
-      "recipeSha256": "18A545FEECDDD47420323F997928E67FBA62814AB525945FDCE7891BE976A7F5",
+      "recipeSha256": "4A3A54F76147D2FD56A116E16AE93DF9C826614491164F4520AEF45CDE51A127",
       "materials": [
         "skin",
         "cloth",
@@ -2874,17 +2874,17 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1044
+        "triangles": 1032
       },
       "hashes": {
-        "villager-reeve.blend": "1491EF81C22944654E113C823C4BD5AB27FA26E25BD79F55428633E726EBFA99",
-        "villager-reeve.glb": "43FC649BC07349C007C8165AA2B68DAD20DCA2D6B3ED5B648C8CC526C691E7C5",
-        "villager-reeve-blender.png": "3052E81F20CFEE694755AF26082C64F1ED5C8A425A8BB5CEC5A779B0A02C3FF8",
-        "capture-1.png": "54BBEB38403B721491596E6CAE3EB7FA73614FC04EA47D74B5CF82A28876B71C",
-        "capture-1-gray.png": "EA47C6AD38B5F4595620E92FDBCD94829C3788BB0B165A3B9205AAD03EF406A6",
-        "capture.json": "9FE5F6B6E89AF38907EE7FA087DFFE0D2F0C445675A0AB88569553DDE03BCAEA",
-        "build.json": "E1AE35302BAFC547101836A7BD7550F31483B0ADACB8DE37F9A971325E30107E",
-        "validation.json": "1C9889747078440F5A26264989553C49B4B20A49289F66EAECBAE877BCA99544"
+        "villager-reeve.blend": "633C6AC06D4889B11BD732A07A295B70EBE53751788542C13579969968C58E8E",
+        "villager-reeve.glb": "CB41B332EF41CF704973AA57D06DE088839771A35F8416D917730C9E972189D5",
+        "villager-reeve-blender.png": "4649C40BB394876908752F5CD7DAC71B75F87A8BB8A84B665CADC08D34B4C81A",
+        "capture-1.png": "87E2ECDB70D1303452634814871DFB166404406AA6DCD725E89E32E21FC97987",
+        "capture-1-gray.png": "33C813AD1E591E91F3A6982577FEFBD57EC42C1B099FE335E60DC9BE29B6DA1A",
+        "capture.json": "F03542F524530AEF2898FB85597F1303DB9618B3918A05746AFD1E9B52E4987D",
+        "build.json": "1C2CF2F964BBE68449EE53C373E75B8764BFE630D84BC27B837C27AF939E4DB8",
+        "validation.json": "2D17179F1C14CA2FA7542278E6511262D21D45587215E3CC99253837C46FC0C9"
       },
       "provenance": {
         "kind": "original",
@@ -2900,8 +2900,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-32-36-257Z-35680",
-        "directory": "artifacts/graphics/G-18/approved/7faaca20baba3b9e"
+        "runId": "2026-09-17T17-48-34-090Z-43612",
+        "directory": "artifacts/graphics/G-18/approved/1bebc15685a55026"
       },
       "bounds": {
         "min": [
@@ -2912,15 +2912,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.081667
         ],
         "size": [
           0.35,
           0.65,
-          0.1625
+          0.153333
         ]
       },
-      "recipeSha256": "741D628E18A639743CA17BF60420EEECB235AF079763077E98000895B96E78EE",
+      "recipeSha256": "8DA3D1011F88C45F2F2582CDD70844CA91EE7AF4DECB440E1C82B4849D6F9279",
       "materials": [
         "skin",
         "cloth",
@@ -2967,17 +2967,17 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1080
+        "triangles": 1068
       },
       "hashes": {
-        "villager-herbalist.blend": "04B292DA21F9B4D5D1BB879012821977311EEA7D5E17B555CB282C9C7078E101",
-        "villager-herbalist.glb": "7FAACA20BABA3B9E28B01E4C72E9F89EAB5A20FB591E069A394C809CB9E56114",
-        "villager-herbalist-blender.png": "3B2DF3374382BA7EEA4D8251F2BB4DEE950E44C0287C117FBF414F70F097DC3C",
-        "capture-1.png": "8207318487982016221866ADD234BC9E080EE4DE8DC63F1B2FE88E8B93D0BA01",
-        "capture-1-gray.png": "E2EABD400A04E2AE5C340E31A043666321BA2852CD00153993945EEA2D9529DB",
-        "capture.json": "85E1D0F58ABCA7365FBA3F8A98FFA59EA597DE98BDEF492E87F59BDC63632A9A",
-        "build.json": "060C4E1C87E839F6CE9186D92C1BA04271E24B2AE96E10EBC21D4094697F6B8C",
-        "validation.json": "AB559F3BCEEE6B502FBA731C7F9E9EB752F417AE575F73C6239046E58ECE6F5B"
+        "villager-herbalist.blend": "F7C8F8CC192A1C9EB02D2FB7BA72D33312945C304CE58248B577342D4405661A",
+        "villager-herbalist.glb": "1BEBC15685A55026905295FFC008754CC387A04B11A9404D1518A7F205A08067",
+        "villager-herbalist-blender.png": "8F24D517168855EAD2462C2AF9388F863130627073F536D92004326A571176F3",
+        "capture-1.png": "6C660FF36F0702F9E926A726F151F1A03F032BB9C6E9DAD1CB16790054F10F61",
+        "capture-1-gray.png": "8BA83AA06E3493F71B890E8BDFBC33C31005DDFE04B89D137A325C8A6DDE13F6",
+        "capture.json": "E8E49128AB3A2C17534F50F424467FF80D1C023DDC9F7C4B7A6DA239C3562467",
+        "build.json": "11F56C9115673D3007C429FB6E5799C359777F497A3096B93450D99AB2BAFD23",
+        "validation.json": "C1F9BD499CD20F9C92D723CDFF581926C3534D1468AF00E7D351916548886E20"
       },
       "provenance": {
         "kind": "original",
@@ -3169,8 +3169,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T11-46-35-530Z-50704",
-        "directory": "artifacts/graphics/G-17/approved/99d21ff52888e01d"
+        "runId": "2026-09-17T17-48-09-334Z-53704",
+        "directory": "artifacts/graphics/G-17/approved/21f0e44c16425796"
       },
       "bounds": {
         "min": [
@@ -3189,286 +3189,7 @@
           0.19
         ]
       },
-      "recipeSha256": "5C3EF80C0F08F1AAEB4E889F3070C70FFD34D17FEDD174B0F58621CED8DC891D",
-      "materials": [
-        "skin",
-        "cloth",
-        "cloth-accent",
-        "dark"
-      ],
-      "clips": [
-        "idle",
-        "walk",
-        "work_hoe",
-        "carry_walk"
-      ],
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ],
-      "connectors": [
-        "hand_l",
-        "hand_r"
-      ],
-      "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 960
-      },
-      "hashes": {
-        "villager-farmer.blend": "F5FB2E654ECEC9121827FF95BAA426B8A14D917288BD775CFF4DF2196D07E605",
-        "villager-farmer.glb": "99D21FF52888E01DEA3923C9C6764A9227056C9C8B6A2A3B5C7C665B31D7E69E",
-        "villager-farmer-blender.png": "EB4DC363A251210302DAF20288F685117ADFE26D6A700FF6ABCA272A8CFC0FB8",
-        "capture-1.png": "E65C3EB4EEBFB59E97CE5FC872BC0EC16A68E6FB6BC3163B63B69A5ED55A1959",
-        "capture-1-gray.png": "9CE35E589F6432FE90D8336B1CC06F28B8D3CDA5C00BCCC6806DFAFE56F9189F",
-        "capture.json": "882F6251B8C4A3ABC79FBFA81C409BC1BBA647E10B5C85DBDB28B3275474180B",
-        "build.json": "8E5CECCBC754F946BFDB2B660E5D292FDA09C9ADA1E7CAE6B9DEC9C781A92746",
-        "validation.json": "3E30E593B26C2A70D04AE46AF71121EB24A1237DCB421A476A8B6D09F2604213"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original villager-farmer: sombrero de paja y ropa de campo G-17; rig compartido G-04.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "villager-child",
-      "artifactRound": "G-18",
-      "status": "study",
-      "recipe": "art/recipes/villager-child/villager-child.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-16T12-27-50-345Z-47160",
-        "directory": "artifacts/graphics/G-18/approved/3b12b8c1a0b05af8"
-      },
-      "bounds": {
-        "min": [
-          -0.1575,
-          0,
-          -0.080267
-        ],
-        "max": [
-          0.1575,
-          0.65,
-          0.101733
-        ],
-        "size": [
-          0.315,
-          0.65,
-          0.182
-        ]
-      },
-      "recipeSha256": "9986F5F53241A717428B0C521B169E8086DFEC860C2E21C22C69F64A8756FF1F",
-      "materials": [
-        "skin",
-        "cloth",
-        "cloth-accent",
-        "dark"
-      ],
-      "clips": [
-        "idle",
-        "walk",
-        "work_hoe",
-        "carry_walk"
-      ],
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ],
-      "connectors": [
-        "hand_l",
-        "hand_r"
-      ],
-      "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 1020
-      },
-      "hashes": {
-        "villager-child.blend": "5393D3A3A9C0B149D569FB2226B5311B24D44899755C811F5960384C150829B0",
-        "villager-child.glb": "3B12B8C1A0B05AF852A3D0B2F5476A9A11E7915D4508CE481B1B3D73BE0B4EE3",
-        "villager-child-blender.png": "76B4937AE1072C7D30830FCACFCDFDB123CC29D7C2CC469630903E896B0EE784",
-        "capture-1.png": "69BC0F73041E019C3B26035789594DE1914BFFD7C5E0BB752029EDBC833D1775",
-        "capture-1-gray.png": "929E36E04C3002B92A44C694F6A74C1DDC3B6FDE4F9FA65244A7F0711BF1A08A",
-        "capture.json": "0A374EAF483575DC8127A518E3D52818C709EC8F239CE0E349B3D8F56E254C05",
-        "build.json": "9F818F3922265B373A07A9A8706507EA169E4C898021CC16BACF7A7830F81D9C",
-        "validation.json": "EEC0A0DDBDB843826B862935B4351F932A64B872E7C7628A44CABD5B363DD562"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original G-18: Niño: cabeza mayor, brazos y piernas proporcionalmente cortos, túnica terracota sin herramientas; 0,65 celdas antes de statureAt.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "villager-elder",
-      "artifactRound": "G-18",
-      "status": "study",
-      "recipe": "art/recipes/villager-elder/villager-elder.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-16T12-29-12-924Z-42284",
-        "directory": "artifacts/graphics/G-18/approved/09607f6cceae6c8f"
-      },
-      "bounds": {
-        "min": [
-          -0.175,
-          0,
-          -0.09
-        ],
-        "max": [
-          0.175,
-          0.65,
-          0.146731
-        ],
-        "size": [
-          0.35,
-          0.65,
-          0.236731
-        ]
-      },
-      "recipeSha256": "BDFBFD6701AD0CD807A786811FB0DCCEBD492A29C2CA66D2B6A54A777B07D645",
-      "materials": [
-        "skin",
-        "cloth",
-        "cloth-accent",
-        "dark"
-      ],
-      "clips": [
-        "idle",
-        "walk",
-        "work_hoe",
-        "carry_walk"
-      ],
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ],
-      "connectors": [
-        "hand_l",
-        "hand_r"
-      ],
-      "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 1032
-      },
-      "hashes": {
-        "villager-elder.blend": "86BA64B00753DA472F62904AFD0CB852B6DC1D36967BA443947D48A5C46537EA",
-        "villager-elder.glb": "09607F6CCEAE6C8F55F765E805075E50A70EE54B56F0E0FA8F8623EA3CA5D033",
-        "villager-elder-blender.png": "877860FC165B329EF4B370A22B40F8263EA9B7EFAFD5DFDF4284A94398D9C0D0",
-        "capture-1.png": "CF3C93211E5B4C4150E2EF11227C21061395A5F5BC14E71B06DA10550197E430",
-        "capture-1-gray.png": "E7B454F8458F2D289469F6C3004707D859D31AFF237004AEFA709E8C3719DEE6",
-        "capture.json": "FB87B832F4DD2D7C711B5861E931DF48D62EC87E8DC8FA5E9B71D445A83AD9A9",
-        "build.json": "76A61A34F23BF33B5B2CB96758892795A005251FAF12E8ED4A79B380FC72B3DC",
-        "validation.json": "ADD020C5A24A22447869382E11E53D178AC957AA429E1073389D8D848A9501B1"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original G-18: Anciano: espalda inclinada en la geometría, pelo claro y chal apagado. Sin bastón fijo: ambas manos permanecen disponibles para los accesorios del juego.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "villager-stranger",
-      "artifactRound": "G-18",
-      "status": "study",
-      "recipe": "art/recipes/villager-stranger/villager-stranger.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-16T12-31-36-056Z-46000",
-        "directory": "artifacts/graphics/G-18/approved/664efdbfd40a45b4"
-      },
-      "bounds": {
-        "min": [
-          -0.175,
-          0,
-          -0.09
-        ],
-        "max": [
-          0.175,
-          0.65,
-          0.090833
-        ],
-        "size": [
-          0.35,
-          0.65,
-          0.180833
-        ]
-      },
-      "recipeSha256": "ADDB30C1181CD1363017B2937A172147BD7ACFF71BBF01CCFDA18356C645C72D",
+      "recipeSha256": "3C600EC99E40529E94901E3B070D316B82895E77552AFF279EEAAE5667CFE50C",
       "materials": [
         "skin",
         "cloth",
@@ -3518,14 +3239,293 @@
         "triangles": 948
       },
       "hashes": {
-        "villager-stranger.blend": "238D2842A1C6AEEFB621FB8AB4C583FD7B7B37CFBDF7418619A19468C380D2DD",
-        "villager-stranger.glb": "664EFDBFD40A45B4F3EC88434285F58BD0178AD10B89206E0754E730EB744759",
-        "villager-stranger-blender.png": "9A4EB5B303CFFDA0BEC61BA6293AC1B0BDAA060F258595E2CDA449F0FCA83E0C",
-        "capture-1.png": "9F8CB9D5F78CED5D7A5242FEBA8E89CC47D9B37144C3E19DF1B8B53472D66B82",
-        "capture-1-gray.png": "EB17ECFCEA9390DB47573CC0D23041CB18D4EFE4D3821BA5FDF0756D8595C830",
-        "capture.json": "A00941027FD07B8049E3A084024325EA756069CB7D0214F37909FA957E9355D0",
-        "build.json": "603261A685D2AFE87468FD11B6BBB2E00D92120DD0CE9CF2EB9E4EC947969B36",
-        "validation.json": "5685A412AEE62C840446164D7278C6CF2C776B91563E33E1347FD306E75D7C7E"
+        "villager-farmer.blend": "629FAD7F74CB02D2CD56D1FA880940DFF32BC750D9F6D2459BA298DA122B2016",
+        "villager-farmer.glb": "21F0E44C16425796EB88CC44A44B4FCD28D7EFFAC33E592522B8F8DC81631F8C",
+        "villager-farmer-blender.png": "142D6D10125AE4CD22FEC12651368DBC980E031BC3E0C0A20D728C8A6CC91094",
+        "capture-1.png": "4E425B70CFE73750F19CE1906454A9241B2F328F03AD761B44A6F3976C4D0FA7",
+        "capture-1-gray.png": "7BAB9E1FE9F25FDE782BE00C6C8096D4ECAF62CC5F0BA5587226D048D8624F71",
+        "capture.json": "0BB420D89B6FD75F3F699CE86BC6CEFDBAAF6A97FA8BAEA3C50CEEE304C60946",
+        "build.json": "603A27FC94C663953C32B238757B15345DC4ABF221497D7D2E575FAFC8E011F7",
+        "validation.json": "7E4E22BFE132EDFAD53CF1778F59FD244307A0896ADEFD90A25282A7A88B41A2"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original villager-farmer: sombrero de paja y ropa de campo G-17; rig compartido G-04.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-child",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-child/villager-child.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T17-47-44-501Z-58000",
+        "directory": "artifacts/graphics/G-18/approved/f229770e18b5bf38"
+      },
+      "bounds": {
+        "min": [
+          -0.1575,
+          0,
+          -0.080267
+        ],
+        "max": [
+          0.1575,
+          0.65,
+          0.081667
+        ],
+        "size": [
+          0.315,
+          0.65,
+          0.161933
+        ]
+      },
+      "recipeSha256": "EC33C06B35C2C6A16E4AAB42B7D9AE81F3C912629C76EEEEC402222471A5815A",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1008
+      },
+      "hashes": {
+        "villager-child.blend": "3DDCA124BA3106FA05A097A71ED06397F3FC17A3442F756DB97DF9CF9DE6E686",
+        "villager-child.glb": "F229770E18B5BF38A13F534A873104DD2E35B338B9121CB91F18B840811C0169",
+        "villager-child-blender.png": "BA7447D51DA7DC8BDBFA03A94D1C918576723E8F5F671B5397ED6111C7C169AA",
+        "capture-1.png": "FF18817DFA7E472BC16836C0D9FDB3FFB93DD15B96E79F1829D1637D376EDCF2",
+        "capture-1-gray.png": "6E01764CE139F064F4D69D6F8AE063507173BBCE47FDCA8CA22CBF810CCEEE6B",
+        "capture.json": "A8183ED6F06067A4668F3B9223413B55E0DC81676BAFBCEDE70204A3F54F1DC2",
+        "build.json": "31D8C6ECF611C183A22BB5F791FB639F3E0B374900D3A3E3068C8FAC1E8716AD",
+        "validation.json": "34D138DDEC755F4F01B117683D80D858B5578FFDA2E4497DAD9AE4B29576E0E5"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Niño: cabeza mayor, brazos y piernas proporcionalmente cortos, túnica terracota sin herramientas; 0,65 celdas antes de statureAt.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-elder",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-elder/villager-elder.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T17-47-56-901Z-55548",
+        "directory": "artifacts/graphics/G-18/approved/2060c4c0e92058b1"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.145601
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.235601
+        ]
+      },
+      "recipeSha256": "F0A016567555629260F5C17FC84399F8F646A916FB97E1A6A4F9CEAC55B7AB30",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1020
+      },
+      "hashes": {
+        "villager-elder.blend": "C4990307816824F6E0EB370D72AA8B6F4EB10123737CF85FE5240B600B03E943",
+        "villager-elder.glb": "2060C4C0E92058B16C67C48AEE229673B1470A701778DBB4AEF371019BED7523",
+        "villager-elder-blender.png": "18F6A8BFA800A2A2374A5E32FC43AABFFA649B2D8CE6A9C410860A2D6B356E22",
+        "capture-1.png": "14E0403CE839DAE6495A87BFC0F6D225F50500941CC6698EF936DD13981D23E7",
+        "capture-1-gray.png": "00D9CBD19569514BA35AD5D582D442CF51AA490A700E4B06592ED054C2C2CB8B",
+        "capture.json": "A7609A92442A4EAE6C298ED145B101584AF9F18F1874D953C7F88743B8B3C493",
+        "build.json": "47ABA350B5451C4760D6C861A33BFAE9BEF1172319B2E73552AF1F7BD80CDB0A",
+        "validation.json": "E067A5AD59DBD8EC465D02209BED523CD9F32BF73B1FFD8D4E975B3375E752AA"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Anciano: espalda inclinada en la geometría, pelo claro y chal apagado. Sin bastón fijo: ambas manos permanecen disponibles para los accesorios del juego.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-stranger",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-stranger/villager-stranger.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T17-56-16-181Z-54848",
+        "directory": "artifacts/graphics/G-18/approved/5677a975e92740f5"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.09
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.081667
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.171667
+        ]
+      },
+      "recipeSha256": "D25EC879DC53700BC3229E04E218DB3D709AE5A963AC44DF8C4F742F02B8A79E",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 936
+      },
+      "hashes": {
+        "villager-stranger.blend": "EF25D6954AA7835C2EEFD33FAFAB7034246D1618FE102FF93C30FEC12662A89A",
+        "villager-stranger.glb": "5677A975E92740F54B13FC2F01B74AAC5306E07C1ECFB1E28EF0500AF62D38A2",
+        "villager-stranger-blender.png": "AB67AF79B98CAFB13C5A4D70C32B213B204B5483D5DA333FF308A089463FA3BE",
+        "capture-1.png": "64343FE4791F8364A3982AE9903CE34DC8801222B20AF09D2EB623587F243DE8",
+        "capture-1-gray.png": "46958B99CFEB4D5BB10B5818307A5B0A68231921162A0C7D4052BBF31579D69F",
+        "capture.json": "CC7D9F251B4C6EB2E342B160245ACF539473FB317807359A88AF2512B6B21012",
+        "build.json": "D38B2B6F27BA897AA1B8F2405B62B3CF0F06FD731F41A7745C50AEDB8EFD91A4",
+        "validation.json": "345F7BA9ABADB9786F34C83C10F574FA7D00A9A6C77775242776CC06BFE9198D"
       },
       "provenance": {
         "kind": "original",
@@ -3541,8 +3541,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-30-36-976Z-44196",
-        "directory": "artifacts/graphics/G-18/approved/c81fcade8e7b0ba5"
+        "runId": "2026-09-17T17-56-25-042Z-7708",
+        "directory": "artifacts/graphics/G-18/approved/450a895dc69642cd"
       },
       "bounds": {
         "min": [
@@ -3553,15 +3553,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.081667
         ],
         "size": [
           0.35,
           0.65,
-          0.1625
+          0.153333
         ]
       },
-      "recipeSha256": "E4D2D18B6CA384985D02242BDDE38B955B174B662518CA98639D49A12B6BE953",
+      "recipeSha256": "3747D709FC79D6970969A41D89B6591CF4BC507B4DFB4732DB5C6BCA64AC012B",
       "materials": [
         "skin",
         "cloth",
@@ -3608,17 +3608,17 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1092
+        "triangles": 1080
       },
       "hashes": {
-        "villager-woodcutter.blend": "94C50A6A885B61D28F21C8BE930B547C9585176CF0F3931986CAAE921F3E1AFB",
-        "villager-woodcutter.glb": "C81FCADE8E7B0BA54800D70016B96F3FBCD99E4358B78A74769BAC9755BF64B4",
-        "villager-woodcutter-blender.png": "35F36BD14FAD13807EB9ECE2B24E02125D227BA073AD7020E4BCF8CC3744D5EC",
-        "capture-1.png": "83C7C5647F817CB2E75072BC414C6674130D36548F0028E6D89876398591FE02",
-        "capture-1-gray.png": "29C0E170C9C03D3CB7C5BE913767DB7D97185BC93E471101AB3443D79EB63995",
-        "capture.json": "90AC0358C014D184B04926E619504A2D7B0EFF465AB4805E8FC967D4BDA8F22E",
-        "build.json": "CFE4D20089FAE55585D6BB11721E803A22B2B9209899BC2D3918C90599D1C2EA",
-        "validation.json": "83C723E06251CE07FED27CEBD1607200EF72174A318C12EA62FBC075526DF280"
+        "villager-woodcutter.blend": "978B886012027175CBB0625E63BC9C3C12E6986E8E9ABC5D51BD23ACDF3D3F3C",
+        "villager-woodcutter.glb": "450A895DC69642CD1423FB133CB9F4CCC609EEDC4EB7A80886F34DB9751700E7",
+        "villager-woodcutter-blender.png": "9DBFE59991E2E0199B2D734F3C2958BE99C679BD42D50A4A9C5CD981ED2CFB25",
+        "capture-1.png": "063A22C9BFC232E431F69B07324F43D98BB953005F0E33A6026A1296BB0875BE",
+        "capture-1-gray.png": "A89AA10F5C8EF75D40386EA68DF6EBE259130E01C91AAAE09F635D720CE2A18A",
+        "capture.json": "1F2E6D758CEAF974348CDD825EBEDF48317A4D8AB5487C1B16963A607D78A2F5",
+        "build.json": "87F256A21A1BDE9DC363B4E31CCA1B80CEEF53F4B28A7BDC29B2433C7156DB21",
+        "validation.json": "D80489143E29A8CBC0B62D877DA21EC7DD18188FC521FDD57FC68C41FBC53DE5"
       },
       "provenance": {
         "kind": "original",
@@ -3634,8 +3634,8 @@
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-30-52-424Z-49328",
-        "directory": "artifacts/graphics/G-18/approved/f853038ba6f4f887"
+        "runId": "2026-09-17T17-48-59-091Z-5472",
+        "directory": "artifacts/graphics/G-18/approved/1bd2cf762fc705cc"
       },
       "bounds": {
         "min": [
@@ -3646,108 +3646,15 @@
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.088333
         ],
         "size": [
           0.35,
           0.65,
-          0.165833
+          0.163333
         ]
       },
-      "recipeSha256": "7B6484DF92F4591E6E035FA0E68009FF3051B5E0EAB25FADB19E20E2DCD8C40E",
-      "materials": [
-        "skin",
-        "cloth",
-        "cloth-accent",
-        "dark"
-      ],
-      "clips": [
-        "idle",
-        "walk",
-        "work_hoe",
-        "carry_walk"
-      ],
-      "motion": [
-        {
-          "name": "idle",
-          "seconds": 4,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.317
-        },
-        {
-          "name": "work_hoe",
-          "seconds": 2,
-          "loop": true,
-          "strideLength": null
-        },
-        {
-          "name": "carry_walk",
-          "seconds": 1.3333333333333333,
-          "loop": true,
-          "strideLength": 0.26
-        }
-      ],
-      "connectors": [
-        "hand_l",
-        "hand_r"
-      ],
-      "statistics": {
-        "objects": 24,
-        "meshes": 4,
-        "materials": 4,
-        "triangles": 972
-      },
-      "hashes": {
-        "villager-mason.blend": "AC7BA6F10611DA66CE7DD42905A4AF10067A92D77378229BA202F441E4354E8A",
-        "villager-mason.glb": "F853038BA6F4F88715D8BC1FE666AEED052989020FDD12DFDB51B4FA3AD4B63F",
-        "villager-mason-blender.png": "EA618587527144088FE181BEAED5559D6A1F0F5CFD2E82D73FFBC72AEB3A7DC9",
-        "capture-1.png": "644AC5958F6EA181F457461303C3E9AC1AD673E8511A795589046B24598ABF24",
-        "capture-1-gray.png": "91776E05185D263A87E5C418A9981C8B31DDF2FA89D55B408625B82CC8DBC485",
-        "capture.json": "BB68FC750138B7C009DAD2BFEE731296820A89CC23088E15EC0BCC9F2E06B3E7",
-        "build.json": "F73A1FCE6F6496918A6DDE98DBFC36F986120F303943DA35DDAF4A10B8906C6E",
-        "validation.json": "8A5F8858C96D43E95CCE80BD92018D6E38115DB6EDC65916A4A8B94A7BCF15A4"
-      },
-      "provenance": {
-        "kind": "original",
-        "source": "Original G-18: Albañil: gorra, delantal marfil y pequeño bloque sobre un protector de hombro.",
-        "license": "Project original"
-      }
-    },
-    {
-      "id": "villager-shepherd",
-      "artifactRound": "G-18",
-      "status": "study",
-      "recipe": "art/recipes/villager-shepherd/villager-shepherd.json",
-      "generator": "tools/art/blender-build.py",
-      "blenderVersion": "5.2.1 LTS",
-      "approved": {
-        "runId": "2026-09-16T12-31-07-018Z-49532",
-        "directory": "artifacts/graphics/G-18/approved/9e00fd0fb9d51a1f"
-      },
-      "bounds": {
-        "min": [
-          -0.175,
-          0,
-          -0.075
-        ],
-        "max": [
-          0.175,
-          0.65,
-          0.090833
-        ],
-        "size": [
-          0.35,
-          0.65,
-          0.165833
-        ]
-      },
-      "recipeSha256": "05E0462F514C615D92FE3BD0919AD27F6713D4613F104747AE0BE431B7EFAEFF",
+      "recipeSha256": "35E356D45F54A0748F1F4758DEB5789DB56F62E1282C66630B77FD3145F7A83C",
       "materials": [
         "skin",
         "cloth",
@@ -3797,50 +3704,50 @@
         "triangles": 960
       },
       "hashes": {
-        "villager-shepherd.blend": "A8AFE1010C1A85C9AA329FAEFD0F6A3EBCCB0E526DF6DFA1BAB454475241C8DB",
-        "villager-shepherd.glb": "9E00FD0FB9D51A1F0632DFB8208C8DECD1F7CA1C50F3F17C2E0D3ADF7F8CD69E",
-        "villager-shepherd-blender.png": "FC445B37C2F919CB56612A4D7CA08D40604B405541F8A192B00622A78853C4EF",
-        "capture-1.png": "C8637AFA721897CD1A195CA22D3722B777E9A1F459F3F4A47B6BCAD02036BC57",
-        "capture-1-gray.png": "054E8E87C835069529B3C20EDE3C74716AF4A273F6A5DA6C86B9085CB50C0C84",
-        "capture.json": "A4CCF4291CD00C20AC6BD6E23A266E2DFA43B3C16564938C7279E6C5F5A30236",
-        "build.json": "AAFDCD81313909F9100F8980442E60B303B3B11675D01FBBFEE3A0AF5CCD7CF3",
-        "validation.json": "96D3BCBEF8E267F5A568B7B5803C9019DB32AA4AF606BCE7908CE958A1E6A0CC"
+        "villager-mason.blend": "C83E93D7FF6D63F896AE817455D8EEF0666E646B2B7B9A60266B0DAA957CC05C",
+        "villager-mason.glb": "1BD2CF762FC705CC9D6DF89315CE62814E30386C8896773547A1BF0C848DFF34",
+        "villager-mason-blender.png": "C1EFDC7F7E7FB2247D2B14CF7A8DCD90A9E3489DB72486AB3EBD0DE4CE733A15",
+        "capture-1.png": "A43DFA9E5CB295227D263E858ECADDDE398CB9297CD9CA8372347FC7AFFD840B",
+        "capture-1-gray.png": "78B2382ACC59E484BC73E296DDCFD73D941611145C55AF936CB095E841AFE16B",
+        "capture.json": "EF72CB5BDC7F867C4F92A9B6458BA68854397DC063C4261D9E53643E9DB7FEE0",
+        "build.json": "AE31A77D717323CE5CFA951437F72A0FDF27D89A647A5698AFDFDA87F7E37695",
+        "validation.json": "143AD8FC8632A6265B19B929AA385CA75D2BC33E2E2DAE72DF6D234CCD4E1F02"
       },
       "provenance": {
         "kind": "original",
-        "source": "Original G-18: Pastor: sombrero pequeño, ropa clara, zurrón y vara lateral guardada; conectores libres.",
+        "source": "Original G-18: Albañil: gorra, delantal marfil y pequeño bloque sobre un protector de hombro.",
         "license": "Project original"
       }
     },
     {
-      "id": "villager-fisher",
+      "id": "villager-shepherd",
       "artifactRound": "G-18",
       "status": "study",
-      "recipe": "art/recipes/villager-fisher/villager-fisher.json",
+      "recipe": "art/recipes/villager-shepherd/villager-shepherd.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
       "approved": {
-        "runId": "2026-09-16T12-31-50-638Z-11516",
-        "directory": "artifacts/graphics/G-18/approved/543c7849d05df8db"
+        "runId": "2026-09-17T17-49-49-432Z-44144",
+        "directory": "artifacts/graphics/G-18/approved/ec93822ae214adf8"
       },
       "bounds": {
         "min": [
           -0.175,
           0,
-          -0.071667
+          -0.075
         ],
         "max": [
           0.175,
           0.65,
-          0.090833
+          0.088333
         ],
         "size": [
           0.35,
           0.65,
-          0.1625
+          0.163333
         ]
       },
-      "recipeSha256": "9FF467BFC22E06986409ED0BB89B22C190B3FB81389469BA1670DA217B57FD0D",
+      "recipeSha256": "0116B899F3AD2F6DF42143BF274915169CCB9DFCF35DA763120BEADCD3112200",
       "materials": [
         "skin",
         "cloth",
@@ -3887,17 +3794,110 @@
         "objects": 24,
         "meshes": 4,
         "materials": 4,
-        "triangles": 1044
+        "triangles": 948
       },
       "hashes": {
-        "villager-fisher.blend": "B1DAD5F541F78BC7EEFE274C3E9A031392559A9D27088F0DC841282587EB0762",
-        "villager-fisher.glb": "543C7849D05DF8DBB350E8E0A24089045868078D302605793CBB1671C69D9AEE",
-        "villager-fisher-blender.png": "E63A54D8DE64EDE419EFBA425B8FF02E1AFFC3A65101FA21594CB9FFD3CD46CC",
-        "capture-1.png": "8C3801EDA900223F3254D146BF5DF8E25C85AB61F3BE6ED5902C397AD63B0145",
-        "capture-1-gray.png": "1E628EF48BD8CB95ED586483E3D0AAF7191A9AD385CB4725B7AB4CB237A3043E",
-        "capture.json": "6BC3CEB443EEF95724BAD5A4129BB07F6ABA3BACD1453E2D2CF5F3DB2E8E1948",
-        "build.json": "9ED8165ECED965E8545FF0DF769CF552B09D231B45AFE85AB979B904E6368AA7",
-        "validation.json": "52433421A221A58CF9173A605F14514518ABB1E5CE1667A92B26A110A6E06224"
+        "villager-shepherd.blend": "629F0938AEC3D80300EFD104F4D2E006EA397536F1E5C4D270BD640C537E744D",
+        "villager-shepherd.glb": "EC93822AE214ADF822DEBD1E0AE6BF4C82BB8F019E135CBB0C6C1B60E1E31B55",
+        "villager-shepherd-blender.png": "CEEFC4FB74FFBC84D4CC14771094C07B7E03BAC5F3D990B1396CF6624996EF07",
+        "capture-1.png": "24D24CC25BF4F388ABFEEB80FAEDABE9C32CF92E956AB9376B5B65407582D443",
+        "capture-1-gray.png": "EA7AA047A38D05FA5A413A32444851E00B1D1EB0D8BBFA156333C86A8E3BB975",
+        "capture.json": "63AD1C77726F34E376BB4C0D3E6E6E29C4AFBCB35001B6251C7F2DF9643688F6",
+        "build.json": "3B02CE6D81E08D46FA2E895408D3EB150A1DFCAF4C7F7801D26D36EEEFB9E540",
+        "validation.json": "76BC199BF031AFD3AFCED29B129FD4B95B0E70EEF4605B8FD28CE2490DE91BEA"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original G-18: Pastor: sombrero pequeño, ropa clara, zurrón y vara lateral guardada; conectores libres.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-fisher",
+      "artifactRound": "G-18",
+      "status": "study",
+      "recipe": "art/recipes/villager-fisher/villager-fisher.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T17-48-21-714Z-43712",
+        "directory": "artifacts/graphics/G-18/approved/d7121dc1454beaac"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.071667
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.081667
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.153333
+        ]
+      },
+      "recipeSha256": "E9365938B9F2DB0D41FDAA841D8F000949A6BADBDD6A954042DDDC6555655BC0",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1032
+      },
+      "hashes": {
+        "villager-fisher.blend": "DF774E569B5C1F631A7C585DB8BBFCD561ECD0875B2BB8326011A773D9EFE0ED",
+        "villager-fisher.glb": "D7121DC1454BEAAC5A7425C5E5E18FB903515B4860D9C3F5D3AE8A2E0FDF3079",
+        "villager-fisher-blender.png": "EF38E7484E17AA6D9E79998ECC0501A4498E14455529969EBD55B5CFE0F17B0B",
+        "capture-1.png": "00D0E4E6F163BAEE4A8329A40A485E6B6A88C111DA27579E0E4A9E5065DA091C",
+        "capture-1-gray.png": "CF4BB6D8FD3B282D5C62BF8B6294BA77D8E8A5DA4FE27193F98CA7074EA6A368",
+        "capture.json": "DA4F1F0A98297A775F5AD3725755D5081285B97F5776E7A6FE3FA3550962B76B",
+        "build.json": "BCF6D4133100DE2479E5581F2DDDE399E7015685E4DF16BA59B53BD5B990F43B",
+        "validation.json": "A87DE22842C9EC0D2685C0EB3735D907CDBAA6C2774CF0BADB5B157C85801749"
       },
       "provenance": {
         "kind": "original",

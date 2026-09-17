@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "assetId": "villager-shepherd",
+  "runId": "2026-09-17T17-49-49-432Z-44144",
+  "recipe": "art/recipes/villager-shepherd/villager-shepherd.json",
+  "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
+  "blenderVersion": "Blender 5.2.1 LTS",
+  "durationMs": 11979,
+  "completionMarker": true,
+  "files": {
+    "blend": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/candidate/villager-shepherd.blend",
+      "bytes": 124926,
+      "sha256": "629F0938AEC3D80300EFD104F4D2E006EA397536F1E5C4D270BD640C537E744D"
+    },
+    "glb": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/candidate/villager-shepherd.glb",
+      "bytes": 288032,
+      "sha256": "EC93822AE214ADF822DEBD1E0AE6BF4C82BB8F019E135CBB0C6C1B60E1E31B55"
+    },
+    "blenderRender": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/candidate/villager-shepherd-blender.png",
+      "bytes": 289155,
+      "sha256": "CEEFC4FB74FFBC84D4CC14771094C07B7E03BAC5F3D990B1396CF6624996EF07"
+    },
+    "log": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/blender.log",
+      "bytes": 1714,
+      "sha256": "706262E042579C5BC493B12A55B9BFEC3C90E8577B6DE32457878331E4E6DDED"
+    },
+    "generatedScript": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/temporary/build.py",
+      "bytes": 10701,
+      "sha256": "48EF9F67BD54D82E823077BE9538000A6866F28CEA8DCCA97042A80E8D9AEED2"
+    },
+    "resolvedRecipe": {
+      "path": "artifacts/graphics/G-18/runs/2026-09-17T17-49-49-432Z-44144/temporary/resolved-recipe.json",
+      "bytes": 72281,
+      "sha256": "3900E2D8B1DD550ED5CA6801C0AC2D36C267F2B6C8DE5E6660BCE3AA309EF695"
+    }
+  }
+}
