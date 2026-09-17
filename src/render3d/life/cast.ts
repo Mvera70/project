@@ -35,7 +35,7 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     const action = dweller.doing.offer.id, place = dweller.doing.place.id;
     if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
       : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
-    if (action === 'deliver') return 'sort';
+    if (action === 'deliver' || action === 'deliver-stone') return 'sort';
     if (action === 'sit') return 'sit';
     if (action === 'pray') return 'pray';
     if (action === 'drink') return 'drink';
@@ -119,6 +119,8 @@ export function castOf(
       facing: body.facing,
       activity: activityOf(dweller, moving),
       clip,
+      load: dweller.holding !== null && dweller.holding <= -1_000_000 ? 'stone'
+        : dweller.holding !== null && dweller.holding < 0 ? 'bundle' : null,
       poseSeconds: seconds,
       // El clip de andar lo mueve el suelo recorrido (G-04); los de estarse
       // quieto, el reloj, con un desfase por persona para que ochenta vecinos

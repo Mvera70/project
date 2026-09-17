@@ -636,6 +636,7 @@ export async function createGraphicsRenderer(
       day: lifeDay,
       steps: life.steps,
       timberDeliveries: life.timberDeliveries,
+      stoneDeliveries: life.stoneDeliveries,
       forest: {
         standing: forest?.count ?? 0,
         stumps: forest?.stumpCount ?? 0,
@@ -700,6 +701,7 @@ export async function createGraphicsRenderer(
         age: actor.age,
         named: actor.named,
         clip: actor.clip,
+        load: actor.load ?? null,
         activity: actor.activity,
         talking: actor.talking,
         arguing: actor.arguing,
@@ -1186,6 +1188,7 @@ interface LifeSnapshot {
   readonly day: number;
   readonly steps: number;
   readonly timberDeliveries: number;
+  readonly stoneDeliveries: number;
   readonly forest: {
     readonly standing: number;
     readonly stumps: number;
@@ -1225,7 +1228,7 @@ interface LifeSnapshot {
   }[];
   readonly actors: readonly {
     readonly id: number; readonly age: number; readonly named: boolean;
-    readonly clip: string; readonly activity: string;
+    readonly clip: string; readonly load: 'bundle' | 'stone' | null; readonly activity: string;
     readonly talking: boolean; readonly arguing: boolean;
     readonly occupation: string | null;
   }[];

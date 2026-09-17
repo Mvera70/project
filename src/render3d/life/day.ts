@@ -11,7 +11,7 @@ import { OFFERS, placedOffer, type Place } from './offers';
 export interface DayJob { readonly place: string; readonly offer: string; readonly seat?: number }
 export interface DayPlan { readonly role: Role | null; readonly job: DayJob | null }
 
-type LabourKind = 'field:' | 'felling' | 'works:';
+type LabourKind = 'field:' | 'felling' | 'works:' | 'quarry:';
 
 const WEEK_DAYS = 7;
 
@@ -119,13 +119,17 @@ export function dayPlans(
   // El guardabosques que conserva su puesto ya representa una jornada de tala
   // cada día; se descuenta antes de repartir el resto para no duplicarla.
   const fixedCutters = [...plans.values()].filter(plan => plan.job?.place.startsWith('felling')).length;
+  const hasQuarry = places.some(place => place.id.startsWith('quarry:'));
+  const buildingDays = hands.builders * WEEK_DAYS;
   const roster = weeklyRoster([
     { kind: 'field:', days: hands.farmers * WEEK_DAYS },
     { kind: 'felling', days: Math.max(0, hands.cutters - fixedCutters) * WEEK_DAYS },
-    { kind: 'works:', days: hands.builders * WEEK_DAYS },
+    { kind: 'quarry:', days: hasQuarry ? buildingDays / 2 : 0 },
+    { kind: 'works:', days: hasQuarry ? buildingDays / 2 : buildingDays },
   ], idle.size, day);
   const quotas = ([
     { prefix: 'felling' as const },
+    { prefix: 'quarry:' as const },
     { prefix: 'works:' as const },
     { prefix: 'field:' as const },
   ]).map(quota => ({ ...quota, count: roster.get(quota.prefix) ?? 0 }));

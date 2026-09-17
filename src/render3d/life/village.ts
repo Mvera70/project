@@ -202,6 +202,8 @@ export interface Village {
   readonly passes: number;
   /** Haces llevados del árbol a la leñera durante esta jornada. */
   readonly timberDeliveries: number;
+  /** Cargas llevadas del pedregal a una obra de piedra durante esta jornada. */
+  readonly stoneDeliveries: number;
   /** Cada pase, en orden, con quién lo dio y a quién iba. V-09b: lo que hace
    *  falta para medir una cadena — `passes` sólo da el total. */
   readonly passLog: readonly PassRecord[];
@@ -651,6 +653,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // delante por gusto (`finishHolding`, más abajo).
   let passes = 0;
   let timberDeliveries = 0;
+  let stoneDeliveries = 0;
   // V-09b: el registro de cada pase, para poder medir una cadena — `passes`
   // por sí solo no dice quién se la pasó a quién.
   const passLog: PassRecord[] = [];
@@ -688,6 +691,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get steps(): number { return steps; },
     get passes(): number { return passes; },
     get timberDeliveries(): number { return timberDeliveries; },
+    get stoneDeliveries(): number { return stoneDeliveries; },
     get passLog(): readonly PassRecord[] { return passLog; },
     get interactions() {
       return {
@@ -1064,7 +1068,34 @@ export function createVillage(state: GameState, day: number, options: DayOptions
                 place: store, offer, seat, route: [...route], since: steps,
                 until: steps + durationSteps, durationSteps, there: false,
               };
-              dweller.rethinkAt = steps + RETHINK;
+              // El viaje y la descarga son una sola tarea. Replantearla a los
+              // tres segundos cortaba portes largos justo al llegar.
+              dweller.rethinkAt = steps + GIVE_UP;
+              continue;
+            }
+          }
+          // El coste de piedra ya forma parte de `bpCost`: esta ida representa
+          // esa fracción de trabajo, sin crear un sexto recurso ni escribir en
+          // el motor. La carga sólo existe durante la jornada visible.
+          const quarrying = dweller.doing.place.id.startsWith('quarry:')
+            && dweller.dayPlan?.job?.place.startsWith('quarry:') === true;
+          if (quarrying) {
+            const works = mine.find(place => place.id.startsWith('works:'));
+            const offer = works?.offers.find(item => item.id === 'deliver-stone');
+            const seat = offer === undefined ? 0
+              : (dweller.dayPlan?.job?.seat ?? 0) % Math.max(1, offer.seats);
+            const spot = offer === undefined ? null : seatAt(offer, seat);
+            const route = spot === null ? null : pathTo(land, body, spot, body.radius);
+            if (works !== undefined && offer !== undefined && route !== null) {
+              // La cantera queda lejos y el regreso empieza en fase 0,5. Una
+              // descarga breve cabe antes de volver a casa sin cortar la carga.
+              const durationSteps = Math.round(1.5 / LIFE_STEP);
+              dweller.holding = -1_000_000 - body.id;
+              dweller.doing = {
+                place: works, offer, seat, route: [...route], since: steps,
+                until: steps + durationSteps, durationSteps, there: false,
+              };
+              dweller.rethinkAt = steps + GIVE_UP;
               continue;
             }
           }
@@ -1083,6 +1114,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               };
               props.push(bundle);
               propsById.set(bundle.id, bundle);
+            }
+          }
+          if (dweller.doing.offer.id === 'deliver-stone'
+            && dweller.holding !== null && dweller.holding <= -1_000_000) {
+            stoneDeliveries += 1;
+            if (stoneDeliveries <= 3) {
+              const stone: Prop = {
+                id: -20_000_000 - stoneDeliveries,
+                kind: 'stone', x: body.x, z: body.z, y: 0,
+                vx: 0, vz: 0, vy: 0, held: null,
+                restUntil: Number.POSITIVE_INFINITY, for: null,
+              };
+              props.push(stone);
+              propsById.set(stone.id, stone);
             }
           }
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
@@ -1434,7 +1479,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         && (steps >= d.sceneCooldownUntil || isNight(phase) || (!quarrelStaged && quarrelPair?.includes(d.villager) === true))
         && !commitments.busy(actorOf(d));
       const onDuty = (d: Dweller): boolean => d.holding !== null && d.holding < 0
-        || d.doing?.offer.id === 'deliver'
+        || d.doing?.offer.id === 'deliver' || d.doing?.offer.id === 'deliver-stone'
         || (phase >= 0.16 && phase < 0.65
           && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
           && ['work', 'pray'].includes(d.dayPlan.job.offer)

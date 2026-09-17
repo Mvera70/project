@@ -34,6 +34,8 @@ export interface Actor {
   readonly facing: number;
   readonly activity: Activity;
   readonly clip: ClipName;
+  /** Carga profesional visible durante `carry_walk`; no forma parte del guardado. */
+  readonly load?: 'bundle' | 'stone' | null;
   /** En qué segundo de su propio clip hay que ponerlo. */
   readonly clipSeconds: number;
   readonly poseSeconds?: number;

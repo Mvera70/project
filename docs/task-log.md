@@ -64,6 +64,12 @@ traído aquí.
 
 ## 2. El tablero
 
+**IA-17 · cantera visible:** una obra cuyo coste real incluye piedra reparte
+jornadas entre parcela y roca alcanzable; se ve pico, carga, camino, descarga
+y vuelta, sin inventario paralelo. Semilla 11/año44 completa la entrega antes
+del regreso; 68 pruebas dirigidas, typecheck y lint verdes.
+[Informe](life-rounds/IA-17.md).
+
 **IA-16 · bosque visible:** las copas acusan cuatro tramos de existencias; el
 último árbol cae sólo con la transición real a claro, deja tocón y los claros
 aptos muestran un plantón creciente hasta la regeneración. Semilla 67 filmada
@@ -329,6 +335,11 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+IA-17: semilla 11/año44, tick2064, 62 personas, obra `stone_house` 166,29/170
+y cantera en celda4056. Id15: pico a 17,33 s, carga a 23,33 s, descarga a
+24,17 s y entrega a 25,67 s. Cero errores, deriva, penetraciones o centros
+bloqueados. 68 pruebas dirigidas, typecheck y lint verdes.
+
 IA-16: semilla 67/año19, toma viva a ×64 y 6 fps: tick 864→865, celda 2986,
 bosque 472→471; caída 1,17→2,67 s, tocón visible desde 2,17 s y tronco retirado
 a 8,17 s. Semilla 1: 0 rebrotes en tick432 y 1 en tick480. Cero errores, deriva,
@@ -497,9 +508,10 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**Recursos visibles:** IA-15 e IA-16 cierran la primera cadena de madera, incluida
-la evolución del bosque con el motor vivo. Sigue conectar la extracción de piedra
-y después los estados de cultivo, cosecha y almacenamiento.
+**Recursos visibles:** IA-15 e IA-16 cierran la madera e IA-17 hace visible la
+cantera ligada al sobrecoste real de una obra, sin convertir piedra en inventario.
+Sigue conectar estados de cultivo, cosecha, porte y almacenamiento. El agotamiento
+de roca exigiría cambiar el contrato persistente del motor y no se ha fingido.
 
 **G-25:** corregida la uniformidad de las rocas señalada por el dueño. Sigue pendiente ampliar siluetas de árboles.
 

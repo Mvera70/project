@@ -44,7 +44,7 @@ interface Player {
  * Los conectores `hand_l` y `hand_r` los dejo G-04 en el aldeano justo para
  * esto, y hasta ahora no colgaba nada de ellos.
  */
-const HELD: Readonly<Record<string, { asset: string; hand: string }>> = {
+const HELD: Readonly<Record<string, { asset: string; hand: string; scale?: number }>> = {
   work_hoe: { asset: 'hoe', hand: 'hand_r' },
   carry_walk: { asset: 'bundle', hand: 'hand_l' },
   hammer: { asset: 'hammer', hand: 'hand_r' },
@@ -166,7 +166,7 @@ export class Cast {
       const seconds = actor.clip === 'walk' || actor.clip === 'carry_walk'
         ? clipTime(actor.clip, actor.travelled / scale, 0, 0) : actor.clipSeconds;
       this.pose(player, actor.clip, seconds, actor.poseSeconds ?? actor.clipSeconds);
-      this.equip(player, actor.clip);
+      this.equip(player, actor);
     }
 
     for (const id of [...this.players.keys()]) {
@@ -217,21 +217,25 @@ export class Cast {
    * objetos por fotograma, que es lo que D.6 prohibe. Y cuelga del hueso, asi
    * que la anima el mismo esqueleto sin que nadie la mueva a mano.
    */
-  private equip(player: Player, clip: string): void {
-    const wanted = HELD[clip];
-    if (wanted !== undefined && !player.held.has(clip)) {
-      const tool = this.prop?.(wanted.asset) ?? handTool(clip);
+  private equip(player: Player, actor: Actor): void {
+    const key = actor.clip === 'carry_walk' && actor.load === 'stone' ? 'carry_stone' : actor.clip;
+    const wanted = key === 'carry_stone'
+      ? { asset: 'rock', hand: 'hand_l', scale: 0.18 }
+      : HELD[actor.clip];
+    if (wanted !== undefined && !player.held.has(key)) {
+      const tool = this.prop?.(wanted.asset) ?? handTool(actor.clip);
       const hand = player.object.getObjectByName(wanted.hand);
       if (tool !== undefined && hand !== undefined) {
-        tool.name = `Held_${clip}`;
+        tool.name = `Held_${key}`;
+        if (wanted.scale !== undefined) tool.scale.multiplyScalar(wanted.scale);
         // La herramienta no se selecciona: quien la lleva si. Sin esto, tocar la
         // azada no devolvia a nadie.
         tool.traverse((child) => { child.userData.villagerId = player.object.userData.villagerId; });
         hand.add(tool);
-        player.held.set(clip, tool);
+        player.held.set(key, tool);
       }
     }
-    for (const [name, tool] of player.held) tool.visible = name === clip;
+    for (const [name, tool] of player.held) tool.visible = name === key;
   }
 
   private retire(id: VillagerId): void {

@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { foundGame } from '../../src/engine/found';
+import { bpCostOf } from '../../src/engine/world/works';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 
-describe('IA-15 · recursos visibles', () => {
+describe('IA-15/17 · recursos visibles', () => {
   it('el talador corta, vuelve cargado, descarga y retoma el tajo sin escribir en el motor', () => {
     const state = foundGame(7);
     const before = JSON.stringify(state);
@@ -49,5 +50,39 @@ describe('IA-15 · recursos visibles', () => {
       place: dweller.doing?.place.id ?? null,
     }));
     expect(snapshot(1)).toEqual(snapshot(0));
+  });
+
+  it('una obra de piedra manda al albañil a roca real, carga, descarga y vuelve sin inventario', () => {
+    const state = foundGame(7);
+    const house = state.buildings.find(building => building.kind === 'house')!;
+    state.works = [{
+      id: 77, kind: 'stone_house', x: house.x, y: house.y, w: house.w, h: house.h,
+      bpCost: bpCostOf('stone_house'), bpDone: 0, materialsPaid: true,
+      startedTick: state.tick, upgradeOf: house.id,
+    }];
+    const before = JSON.stringify(state);
+    const life = Array.from({ length: 14 }, (_, day) => createVillage(state, day))
+      .find(candidate => candidate.dwellers.some(dweller =>
+        dweller.dayPlan?.job?.place.startsWith('quarry:') === true));
+    expect(life, 'alguna jornada representa la fracción de cantera de la obra').toBeDefined();
+    if (life === undefined) return;
+
+    const mason = life.dwellers.find(dweller => dweller.dayPlan?.job?.place.startsWith('quarry:'))!;
+    let quarrying = false, hauling = false, unloading = false, interrupted = false;
+    for (let step = 0; step < 7_200 && life.stoneDeliveries === 0; step += 1) {
+      life.step(0.45);
+      interrupted ||= mason.holding !== null && mason.holding <= -1_000_000 && mason.scene !== null;
+      const actor = castOf(life, step / 30, new Map(), new Set()).find(item => item.id === mason.villager);
+      quarrying ||= actor?.clip === 'hammer' && mason.doing?.place.id.startsWith('quarry:') === true;
+      hauling ||= actor?.clip === 'carry_walk' && actor.load === 'stone';
+      unloading ||= actor?.clip === 'sort' && mason.doing?.offer.id === 'deliver-stone';
+    }
+    expect(quarrying).toBe(true);
+    expect(hauling).toBe(true);
+    expect(unloading).toBe(true);
+    expect(interrupted).toBe(false);
+    expect(life.stoneDeliveries).toBeGreaterThan(0);
+    expect(life.props.some(prop => prop.kind === 'stone' && prop.held === null)).toBe(true);
+    expect(JSON.stringify(state)).toBe(before);
   });
 });

@@ -1,9 +1,35 @@
 import { visibleBuildings } from '@derive/visible-buildings';
-import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
+import { BUILDINGS } from '@engine/balance';
+import { TERRAIN_CODE, type Building, type ConstructionWork, type GameState, type ValleyMap } from '@engine/state';
 import { homeRoutine } from './home';
 import { terrainOf } from './terrain';
 
 type ResourceState = { readonly buildings: readonly Building[]; readonly map: ValleyMap };
+
+/** Una obra cuyo coste incluye cantera, no una concesión gratuita de encrucijada. */
+export function stoneWork(state: Pick<GameState, 'works'>): ConstructionWork | null {
+  const work = state.works[0];
+  if (work === undefined) return null;
+  const spec = BUILDINGS[work.kind];
+  return spec.stone > 0 && work.bpCost > spec.bp ? work : null;
+}
+
+/** Pedregales ordenados por cercanía a la obra real; la alcanzabilidad se comprueba al poner la oferta. */
+export function quarryCells(state: Pick<GameState, 'map' | 'works'>): number[] {
+  const work = stoneWork(state);
+  if (work === null) return [];
+  const centreX = work.x + work.w / 2;
+  const centreZ = work.y + work.h / 2;
+  const cells: number[] = [];
+  for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+    if (state.map.terrain[cell] === TERRAIN_CODE.rock) cells.push(cell);
+  }
+  return cells.sort((a, b) => {
+    const ax = a % state.map.width + 0.5, az = Math.floor(a / state.map.width) + 0.5;
+    const bx = b % state.map.width + 0.5, bz = Math.floor(b / state.map.width) + 0.5;
+    return Math.hypot(ax - centreX, az - centreZ) - Math.hypot(bx - centreX, bz - centreZ) || a - b;
+  });
+}
 
 function ringOf(map: ValleyMap, building: Building): number[] {
   const cells: number[] = [];

@@ -59,7 +59,7 @@ import type { Dweller } from './village';
  */
 export interface Prop {
   readonly id: number;
-  readonly kind: 'ball' | 'stick' | 'bucket' | 'bundle';
+  readonly kind: 'ball' | 'stick' | 'bucket' | 'bundle' | 'stone';
   x: number;
   z: number;
   /** Altura sobre el suelo. Cero es el suelo; por encima, va por el aire. */
@@ -540,7 +540,7 @@ export function findMate(from: Dweller, dwellers: readonly Dweller[]): Dweller |
  *  carga — el `stick` incluido: aquí no es un arma (eso es `scenes.ts`), es un
  *  palo que se lleva de un sitio a otro, igual que el cubo o el haz de leña. */
 const OFFER_OF: Readonly<Record<Prop['kind'], string>> = {
-  ball: 'play', stick: 'carry', bucket: 'carry', bundle: 'carry',
+  ball: 'play', stick: 'carry', bucket: 'carry', bundle: 'carry', stone: 'carry',
 };
 
 /** El prefijo del id de la `Place` de un trasto, para poder volver del uno al

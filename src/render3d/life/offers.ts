@@ -22,7 +22,8 @@ import { fellingTarget } from '@engine/world/forest';
 import type { Point, Terrain } from './body';
 import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
-import { woodStoreCells } from './resource-sites';
+import { quarryCells, stoneWork, woodStoreCells } from './resource-sites';
+import { pathTo } from './navigate';
 
 /** Algo que se puede hacer, y dónde. */
 export interface Offer {
@@ -115,6 +116,8 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
   /** Descargar la madera en la leñera. Sólo la rutina del talador la asigna. */
   deliver: { id: 'deliver', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4] },
+  /** Asentar una carga de piedra en la obra que la consume. */
+  'deliver-stone': { id: 'deliver-stone', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4] },
 
   // V-11 · La reunión que el motor convoca (§11.8). No es una oferta que nadie
   // elija por gusto: es la orden de una decisión del jugador puesta en el sitio
@@ -159,6 +162,8 @@ const WORK = OFFERS['work'] as OfferSpec;
  * dura 20–45 s, pero ese plazo ocupa casi toda la mañana y nunca deja tiempo
  * para volver a la leñera antes del regreso nocturno. */
 const FELL = { ...WORK, seconds: [6, 10] as const };
+/** Una tanda breve de pico antes de llevar la carga a la obra. */
+const QUARRY = { ...WORK, seconds: [6, 10] as const };
 
 /** Un sitio del valle, con lo que da. */
 export interface Place {
@@ -293,8 +298,24 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
   if (building > 0 && work !== undefined) {
     const at = doorOf(land, work.x, work.y, work.w, work.h);
     if (at !== null) {
+      const offers: Offer[] = [];
       const offer = placedOffer({ ...WORK, seats: Math.min(building, MOST_SEATS) }, at, land);
-      if (offer !== null) places.push({ id: `works:${work.id}`, at, offers: [offer] });
+      if (offer !== null) offers.push(offer);
+      if (stoneWork(state) !== null) {
+        const delivery = placedOffer({ ...OFFERS['deliver-stone']!, seats: Math.min(building, 2) }, at, land);
+        if (delivery !== null) offers.push(delivery);
+      }
+      if (offers.length > 0) places.push({ id: `works:${work.id}`, at, offers });
+    }
+    if (stoneWork(state) !== null) {
+      const workAt = doorOf(land, work.x, work.y, work.w, work.h);
+      for (const cell of quarryCells(state)) {
+        const at = { x: cell % state.map.width + 0.5, z: Math.floor(cell / state.map.width) + 0.5 };
+        const offer = placedOffer({ ...QUARRY, seats: Math.min(building, MOST_SEATS) }, at, land);
+        if (offer === null || workAt === null || pathTo(land, workAt, offer.at, 0.32) === null) continue;
+        places.push({ id: `quarry:${cell}`, at, offers: [offer] });
+        break;
+      }
     }
   }
 
