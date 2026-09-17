@@ -226,13 +226,23 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   const alto = box?.height ?? 844;
   const cx = ancho / 2;
   const cy = alto / 2;
+  // **VZ-3 · aquí el barrido es fino, y no ancho.** Este recorrido funda un
+  // valle nuevo: al año 1 hay **una casa** en un mapa de 72 × 112, y el 2D
+  // dibuja el mapa entero en 360 × 560, así que la aldea ocupa unos pocos
+  // píxeles en el centro. Un barrido de treinta en treinta la salta —medido:
+  // 220 toques sin abrir nada, tres veces seguidas—. De cinco en cinco
+  // alrededor del centro, que es donde se funda (§7.1) y de donde no se mueve.
   const around: [number, number][] = [];
-  for (let dx = -Math.round(ancho * 0.4); dx <= ancho * 0.4; dx += 30) {
-    for (let dy = -Math.round(alto * 0.35); dy <= alto * 0.35; dy += 30) around.push([dx, dy]);
-  }
+  for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
   for (const [dx, dy] of around) {
+    // VZ-3 · un fotograma de espera entre el toque y la comprobación, y la
+    // encrucijada contestada si asoma. Sin las dos cosas el barrido era
+    // intermitente: el panel monta en el fotograma siguiente al toque, y una
+    // decisión abierta se queda los toques que caen sobre sus tarjetas.
+    await answerAnyCrossroad(page);
     await canvas.click({ position: { x: cx + dx, y: cy + dy }, force: true });
+    await page.waitForTimeout(80);
     if (await panel.isVisible()) break;
   }
   await test.expect(panel).toBeVisible();

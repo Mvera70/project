@@ -629,17 +629,17 @@
 }
 
 /** La placa de fecha (plan §3.1): x 27–361, y 16–50, alto 34. */
-/** UI-V9 · **la misma placa en las cuatro pantallas, y con sitio para
-    cerrar.** Con una hoja abierta arriba a la derecha hay un botón de cerrar
-    de 71 px, y los 334 de la placa llegaban a x 361 de 390: se tocaban. Así
-    que con hoja abierta la placa cede lo que el botón necesita —y sólo
-    entonces—, en vez de ser otra placa distinta. */
-html:not([data-screen="valley"]) .hud-plate-date {
-  /* 118 = los 27 del margen izquierdo + los 71 del botón + sus 8 de aire +
-     12 de margen derecho. A 390 px la placa queda en 272 y a partir de 452
-     vuelve a sus 334: es la misma placa cediendo, no otra. */
-  width: min(334px, calc(100% - 118px));
-}
+/** VZ-3 · **la misma placa en las tres pantallas, y ahora de verdad.**
+
+    UI-V9 la estrechaba a 272 px con una hoja abierta para dejar sitio al botón
+    de cerrar, que era una placa de 71 px arriba a la derecha y se tocaba con
+    los 334 de la fecha. VZ-2 retiró ese botón —ahora es una cruz de 19 px
+    sobre el papel— así que la excepción se quedó sin motivo y sólo dejaba el
+    defecto: el dueño del diseño lo vio poniendo las tres capturas en fila, «la
+    parte de la UI de arriba no está alineada; que sea exactamente igual en las
+    tres pantallas». Medido antes de quitarla: placa 334 en el valle y 272 en
+    las otras dos, arco del sol 90 contra 62. La fila de chips ya era idéntica
+    en las tres (x 43, ancho 318). */
 .hud-plate-date {
   position: absolute;
   z-index: 2;
@@ -682,15 +682,13 @@ html:not([data-screen="valley"]) .hud-plate-date {
    · **las cuentas**, que jalonan las horas sin escribirlas;
    · **el sol**, un disco ámbar con doce rayos — antes era un punto marrón del
      color del arco y no se leía como un sol. */
-/** El arco es la pieza que cede cuando la placa se estrecha (con una hoja
-    abierta, arriba): tiene `viewBox`, así que reescala limpio, mientras la
-    fecha es información y no se toca. 56 px es el suelo en el que el arco
-    sigue leyéndose como un arco con su sol. */
+/** VZ-3 · el arco vuelve a sus 90 px fijos en las tres pantallas. Cedía
+    —tiene `viewBox` y reescala limpio— cuando la placa se estrechaba para el
+    botón de cerrar de UI-V9; sin ese botón no hay nada que le pida sitio. */
 .hud-sun-arc {
   width: 90px;
   height: 29px;
-  flex: 0 1 auto;
-  min-width: 56px;
+  flex: 0 0 auto;
   display: block;
   overflow: visible;
 }
