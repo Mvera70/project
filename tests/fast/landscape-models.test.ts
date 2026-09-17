@@ -24,11 +24,13 @@ describe('G-25 · piedras confinadas y formas achatadas', () => {
     expect(forest.count).toBe(cells.length);
     const matrix = new Matrix4(), point = new Vector3();
     let maxOutside = 0;
+    const heights: number[] = [];
     for (const node of forest.group.children) {
       const mesh = node as InstancedMesh;
       const positions = mesh.geometry.getAttribute('position');
       for (let instance = 0; instance < mesh.count; instance++) {
         mesh.getMatrixAt(instance, matrix);
+        if (node === forest.group.children[0]) heights.push(new Vector3().setFromMatrixScale(matrix).y);
         const cell = cells[instance]!;
         const left = cell % map.width, top = Math.floor(cell / map.width);
         for (let vertex = 0; vertex < positions.count; vertex++) {
@@ -39,6 +41,11 @@ describe('G-25 · piedras confinadas y formas achatadas', () => {
     }
     // Matrices de instancia Float32: tolerancia numérica, no margen de invasión.
     expect(maxOutside).toBeLessThan(0.00002);
+    if (asset === 'rock') {
+      // Diferencia perceptible entre guijarros y bloques, no ruido de escala.
+      expect(Math.max(...heights) / Math.min(...heights)).toBeGreaterThan(4);
+      expect(heights.filter(h => h > 1.4).length).toBeGreaterThan(cells.length * 0.1);
+    }
     forest.dispose();
   });
 

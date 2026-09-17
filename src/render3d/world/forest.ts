@@ -125,7 +125,7 @@ export function scatterOn(
     if (map.terrain[cell] === terrain && taken?.has(cell) !== true
       && (terrain !== TERRAIN_CODE.rock || (map.path[cell] ?? 0) === 0)) cells.push(cell);
   }
-  return scatterCells(map, source, cells, palette, terrain === TERRAIN_CODE.rock);
+  return scatterCells(map, source, cells, palette, terrain === TERRAIN_CODE.rock, terrain === TERRAIN_CODE.rock);
 }
 
 /**
@@ -201,7 +201,7 @@ export function scrubCells(map: ValleyMap, taken: ReadonlySet<number>): number[]
 /** Lo mismo sobre una lista de celdas ya elegida. */
 export function scatterCells(
   map: ValleyMap, source: Object3D, cells: readonly number[], palette?: Palette,
-  containInCell = false,
+  containInCell = false, varyRockSize = false,
 ): Forest {
   const tree = source;
   const group = new Group();
@@ -239,10 +239,25 @@ export function scatterCells(
           const scattered = scatterTransform(map.width, cell, extra);
           const { facing } = scattered;
           let { x, z, scale } = scattered;
+          let heightScale = scale;
           if (containInCell && !bounds.isEmpty()) {
             const rotated = bounds.clone().applyMatrix4(new Matrix4().makeRotationY(facing));
             const span = rotated.getSize(new Vector3());
-            scale = Math.min(scale, 1 / Math.max(span.x, span.z));
+            const fit = 1 / Math.max(span.x, span.z);
+            if (varyRockSize) {
+              // TUNE visual: guijarros, piedras medianas y bloques dominantes.
+              // Antes el límite recortaba todas las escalas grandes al mismo
+              // tamaño. Elegimos la ocupación DESPUÉS de calcular ese límite.
+              const rank = stable(cell, 117);
+              const occupancy = rank < 0.3 ? 0.28 + rank * 0.6
+                : rank < 0.7 ? 0.58 + (rank - 0.3) * 0.65
+                  : 0.9 + (rank - 0.7) * 0.3;
+              scale = fit * occupancy;
+              heightScale = scale * (1.05 + stable(cell, 151) * 0.85);
+            } else {
+              scale = Math.min(scale, fit);
+              heightScale = scale;
+            }
             const left = cell % map.width, top = Math.floor(cell / map.width);
             x = Math.max(left - rotated.min.x * scale, Math.min(x, left + 1 - rotated.max.x * scale));
             z = Math.max(top - rotated.min.z * scale, Math.min(z, top + 1 - rotated.max.z * scale));
@@ -251,7 +266,7 @@ export function scatterCells(
           // Girar cada uno lo suyo: una copa asimétrica repetida sin girar deja
           // un patrón que se ve desde arriba como un papel pintado.
           turn.setFromAxisAngle(up, facing);
-          size.set(scale, scale, scale);
+          size.set(scale, heightScale, scale);
           matrix.compose(position, turn, size);
           instanced.setMatrixAt(slot, matrix);
           slot += 1;

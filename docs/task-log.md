@@ -64,6 +64,9 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-25 · tamaños de roca corregidos (17 sep):** guijarros, piedras medianas y bloques grandes; el límite de celda ya no uniformiza las escalas. Ver G-25.
+
+
 **G-25 · monte bajo entregado:** recurso nuevo scrub, repartido de forma estable
 en bordes de bosque/roca con margen de accesos, cultivos, agua y objetos del corral.
 53 pruebas, typecheck y lint verdes; dos capturas finales reales revisadas.
@@ -312,6 +315,9 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+**G-25 · tamaños:** ocupación horizontal 28–99 % de celda, variación vertical superior a 4×; 49 pruebas, typecheck y lint correctos.
+
+
 **G-25 scrub:** 244 triángulos, 2 materiales/mallas, 22 524 bytes y altura
 0,304 celdas. 53 recursos empaquetados; sin medición nueva de rendimiento móvil.
 
@@ -465,6 +471,9 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**G-25:** corregida la uniformidad de las rocas señalada por el dueño. Sigue pendiente ampliar siluetas de árboles.
+
 
 **G-25 paisaje:** rocas, ribera y monte bajo entregados; siguen pendientes otras siluetas
 de árboles; requieren respetar accesos y campos. El vado desplazado sigue abierto.
