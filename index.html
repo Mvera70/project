@@ -2,7 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- UI-V7 · `user-scalable=no`: el juego tiene su propio zoom (pellizco sobre
+         el valle) y sin esto el navegador se quedaba el gesto y ampliaba la
+         página entera, cifras y bandeja incluidas. Lo encontró el dueño del
+         diseño probando en la tablet: «no se puede hacer zoom del juego, sino
+         hacer zoom a todo». -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#8fae5b" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icon-192.png" />
@@ -40,9 +45,39 @@
       }
       html, body { margin: 0; height: 100%; background: var(--ink); overscroll-behavior: none; }
       body { display: grid; place-items: center; font: 14px/1.45 var(--plain); color: var(--ink); }
+      /* UI-V7 · **La aplicación ocupa la pantalla entera, sin tope.**
+
+         Aquí había `width: min(100vw, 390px); height: min(100dvh, 844px)`, y en
+         un móvil eso es la pantalla y no se nota. En una tablet no: medido a
+         1240 x 1900, el juego se pintaba en una columna de 390 px centrada en
+         x 425, con el fondo de la página alrededor, y de ese tope salían los
+         tres defectos que el dueño del diseño encontró probándolo:
+
+           1. «La pantalla se mueve y no se queda fija»: el documento era más
+              grande que el juego, así que se podía arrastrar entero.
+           2. «No se puede hacer zoom del juego, sino zoom a todo»: el pellizco
+              caía en el documento y no en el valle.
+           3. «Tampoco se puede girar el ángulo de visión»: lo mismo, el gesto
+              no llegaba nunca al lienzo.
+
+         Y además la carcasa iba por su cuenta: la bandeja, la navegación y la
+         crónica se posicionan con `fixed`, que se mide contra la **pantalla** y
+         no contra esta caja, así que ocupaban los 1240 px mientras el valle
+         ocupaba 390. Con la caja a pantalla completa las dos cosas vuelven a
+         coincidir, y el renderer se adapta solo: se mide contra este elemento
+         (`backend.ts`, `size()`) y `view.resize` reencuadra, así que una
+         pantalla más ancha **enseña más valle**, que es lo que se pidió. */
       .valley-app { --valley-void: var(--void); position: relative; display: grid; place-items: start center;
-        width: min(100vw, 390px); height: min(100dvh, 844px); overflow: hidden; background: var(--valley-void); }
+        width: 100vw; height: 100dvh; overflow: hidden; background: var(--valley-void); }
       #valley { display: block; margin-top: max(22px, env(safe-area-inset-top)); border: 2px solid transparent; touch-action: none; }
+      /* **Y el lienzo 3D también, que es el que se toca de verdad.** `#valley`
+         —el 2D— lo tenía desde U-01 y el 3D nació sin él: el navegador se
+         quedaba el pellizco y el arrastre antes de que los llevara a
+         `backend.live.zoom`/`orbit`, que están cableados y funcionando desde
+         siempre en `app.ts`. Va en el lienzo y no en `.valley-app` a propósito:
+         así el gesto que empieza sobre el valle es del juego, y el que empieza
+         sobre la crónica o la bandeja sigue desplazando el papel. */
+      #valley3d { touch-action: none; }
 
       /* U-12 · la hora, donde estaba el año. Es la identidad del juego y el
          instrumento que dice a qué hora vive la aldea, así que va en la voz del

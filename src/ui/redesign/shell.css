@@ -192,10 +192,15 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
   color: var(--ui-paper-ink); font: 600 21px/1.15 var(--ui-font-voice);
   letter-spacing: .01em; text-wrap: balance; }
 
-@media (min-width: 900px) {
-  .ui-shell-content { left: auto; right: 0; top: 0; width: 360px; max-height: none;
-    border-radius: var(--ui-radius-sheet) 0 0 0; }
-}
+/* UI-V7 · **Aquí había un raíl lateral de 360 px para pantallas de 900 o más**,
+   y con la aplicación topada a 390 nunca se activaba: era código que no se
+   había visto nunca. Al quitar el tope (`index.html`) se encendió, y lo que
+   salió en la tablet fue una banda de pergamino en el canto derecho a la vez
+   que la página de la crónica ocupaba los 1240 px: dos superficies pintadas
+   encima del valle. Se retira. Lo que esta tanda hace en pantalla grande es lo
+   de abajo: el valle a sangre y **cada superficie de lectura en su columna**,
+   que es la misma regla para todos los tamaños y no una maqueta aparte que
+   nadie mantiene. */
 
 /* design.md §11.4: la interfaz no anima sobre el reloj del navegador. Nada de
    lo de arriba depende de una transición, y esta regla lo deja explícito para

@@ -224,6 +224,14 @@ export function createShell(actions: UiActions): ShellHandle {
   // en el kit de UI-V0, sólo hacía falta usarlo aquí, entre cada dos botones
   // (dos filetes para tres pestañas, ninguno en los bordes exteriores).
   const rules: HTMLDivElement[] = [];
+  // UI-V7 · **Las tres celdas viven en un envoltorio, y la barra sigue siendo
+  // la barra.** En una tablet la barra cruza 1240 px y sus tres pestañas se
+  // separaban medio palmo; acotar la barra entera la habría convertido en una
+  // isla flotante y el prototipo la tiene cruzando la pantalla. Así que el
+  // papel y los filetes siguen siendo de la barra y lo que se acota y se centra
+  // es esto de dentro (`skin.css`, la sección de la columna de lectura).
+  const cells = document.createElement('div');
+  cells.className = 'skin-nav-cells';
   const labels: Record<NavTab, string> = {
     valley: renderUiText('nav.valley'),
     chronicle: renderUiText('nav.chronicle'),
@@ -233,16 +241,17 @@ export function createShell(actions: UiActions): ShellHandle {
     if (index > 0) {
       const rule = document.createElement('div');
       rule.className = 'skin-rule-v';
-      nav.append(rule);
+      cells.append(rule);
       rules.push(rule);
     }
     const button = tapButton(labels[tabName], NAV_TAB_ICON[tabName], 'skin-nav-tab');
     button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => { actions.navigate({ kind: tabName }); });
-    nav.append(button);
+    cells.append(button);
     buttons.set(tabName, button);
   });
 
+  nav.append(cells);
   stack.append(message, nav);
   element.append(content, stack);
 

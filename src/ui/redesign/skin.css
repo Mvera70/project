@@ -1116,3 +1116,65 @@
   color: var(--skin-ink-faded);
   font: italic 12.5px/1.35 var(--skin-font-read);
 }
+
+/* ------------------------------------ la columna de lectura, en pantalla grande */
+
+/** UI-V7 · **El valle a sangre; lo que se lee, en una columna.**
+
+    `index.html` topaba la aplicación entera a 390 x 844, así que en una tablet
+    el juego era una tira centrada con el fondo de la página alrededor y el
+    pellizco se lo quedaba el navegador. Quitar el tope arregla eso —el valle
+    ocupa la pantalla y enseña más mapa, medido a 1240 x 1900— pero mueve el
+    problema de sitio: **toda esta piel está medida a 390 px**, y estirada a
+    1240 la crónica queda con un renglón de texto perdido en una llanura de
+    pergamino.
+
+    Así que la regla es la que cualquier diseño hecho para el dedo aplica en una
+    pantalla grande: la imagen a sangre y el texto en su columna. Y la columna
+    son **exactamente los 390 px con los que se midió cada pieza** —no 480 ni
+    520— porque así ni un valor de esta hoja deja de ser verdad: el chip mide lo
+    que medía, el capitular ocupa lo que ocupaba y la placa de fecha sigue de
+    x 27 a x 361.
+
+    Se acota la **superficie**, nunca la barra: la bandeja y la navegación siguen
+    cruzando la pantalla como en el prototipo, y lo que se centra es lo que hay
+    dentro de ellas. */
+.ui-shell-message > * {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 390px;
+  margin-inline: auto;
+}
+/* La barra de abajo **cruza la pantalla**, como en el prototipo: es el marco de
+   la pantalla, no una isla. Lo que se centra son sus tres celdas, para que no
+   se separen medio metro en una tablet. */
+.skin-nav-cells {
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 390px;
+  margin-inline: auto;
+}
+/* El borde curvado de la bandeja es la única excepción: es el canto del papel,
+   así que cruza con ella y no se acota. */
+.ui-shell-message > .skin-scroll-edge { max-width: none; }
+.ui-shell-content,
+.chronicle-fade,
+.chronicle-body,
+.crossroad-fade,
+.crossroad,
+.title-sheet {
+  box-sizing: border-box;
+  max-width: 390px;
+  margin-inline: auto;
+}
+/* Y la página de la crónica llega al suelo. Sin esto, en una pantalla alta se
+   quedaba flotando a media altura como una tarjeta —tres entradas y aire
+   debajo— cuando lo que es, y lo que el prototipo enseña, es una página. */
+.chronicle-body { min-height: 100%; }
+/* Y los velos que las envuelven dejan de estirar su contenido a lo ancho: sin
+   esto, `align-items: flex-end` de la encrucijada y el `display: flex` de la
+   portada seguían dando a la hoja todo el ancho. */
+.crossroad-scrim { align-items: center; }
+.title-scrim { justify-content: center; }
