@@ -250,8 +250,9 @@ export class Cast {
   }
 
   /** Posiciones de las mallas colocadas, para contrastarlas con sus cuerpos. */
-  snapshot(): { id: number; x: number; z: number; clip: string | null; weight: number }[] {
+  snapshot(): { id: number; x: number; z: number; scale: number; clip: string | null; weight: number }[] {
     return [...this.players].map(([id, player]) => ({ id, x: player.object.position.x, z: player.object.position.z,
+      scale: player.object.scale.x,
       clip: player.playing, weight: player.playing === null ? 0 : player.actions.get(player.playing)?.getEffectiveWeight() ?? 0 }));
   }
 

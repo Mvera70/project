@@ -27,10 +27,10 @@ function actor(over: Partial<Actor> = {}): Actor {
 
 describe('V-15 · la malla se elige por quién eres y por lo que haces', () => {
   it('los niños conservan una silueta claramente menor hasta la edad adulta', () => {
-    expect(statureAt(4)).toBeLessThan(0.75);
-    expect(statureAt(8)).toBeLessThan(0.83);
-    expect(statureAt(12)).toBeLessThan(0.9);
-    expect(statureAt(14)).toBeLessThan(0.94);
+    expect(statureAt(4)).toBeCloseTo(0.546, 3);
+    expect(statureAt(8)).toBeCloseTo(0.671, 3);
+    expect(statureAt(12)).toBeCloseTo(0.797, 3);
+    expect(statureAt(14)).toBeCloseTo(0.86, 3);
     expect(statureAt(4)).toBeLessThan(statureAt(8));
     expect(statureAt(8)).toBeLessThan(statureAt(12));
     expect(statureAt(12)).toBeLessThan(statureAt(14));
@@ -41,6 +41,8 @@ describe('V-15 · la malla se elige por quién eres y por lo que haces', () => {
       .toBe(displayScaleFor(actor({ age: 12, named: false })));
     expect(displayScaleFor(actor({ age: 12, named: true })))
       .toBeLessThan(displayScaleFor(actor({ age: 30, named: false })));
+    expect(displayScaleFor(actor({ age: 15, named: true }))).toBeCloseTo(0.9);
+    expect(displayScaleFor(actor({ age: 17, named: true }))).toBeLessThan(1);
     expect(displayScaleFor(actor({ age: 30, named: true })))
       .toBeGreaterThan(displayScaleFor(actor({ age: 30, named: false })));
   });

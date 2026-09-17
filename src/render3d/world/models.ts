@@ -101,18 +101,20 @@ export const ELDER_OVER = LIFE.ADULT[1];
 /**
  * Talla escénica contra un adulto. La malla infantil ya tiene proporciones de
  * niño, pero comparte los 1,95 m de altura base del rig adulto; por eso necesita
- * una reducción adicional. A los doce años queda en 0,90 y a los catorce en
- * 0,93: sigue creciendo, pero no se confunde con un adulto desde la cámara.
+ * una reducción adicional. Las referencias visuales son 0,55 a los cuatro,
+ * 0,67 a los ocho, 0,80 a los doce y 0,86 a los catorce. Entre quince y
+ * dieciocho se completa el crecimiento sin un salto brusco al cambiar de malla.
  */
 export function statureAt(age: number): number {
   if (age >= 60) return 0.97 - Math.min(0.05, (age - 60) * 0.003);
-  if (age >= CHILD_UNDER) return 1;
-  return 0.52 + 0.42 * Math.sqrt(Math.max(0, age) / CHILD_UNDER);
+  if (age >= 18) return 1;
+  if (age >= CHILD_UNDER) return 0.9 + (age - CHILD_UNDER) / (18 - CHILD_UNDER) * 0.1;
+  return 0.42 + Math.max(0, age) / (CHILD_UNDER - 1) * 0.44;
 }
 
 /** La distinción de altura de los personajes nombrados empieza al ser adulto. */
 export function displayScaleFor(actor: Pick<Actor, 'age' | 'named'>): number {
-  const namedAdult = actor.named && actor.age >= CHILD_UNDER ? 1.08 : 1;
+  const namedAdult = actor.named && actor.age >= 18 ? 1.08 : 1;
   return statureAt(actor.age) * namedAdult;
 }
 

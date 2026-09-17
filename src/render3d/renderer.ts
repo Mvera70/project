@@ -665,6 +665,8 @@ export async function createGraphicsRenderer(
       // se mueve con el clip de estarse quieto, o al revés.
       actors: lastActors.map((actor) => ({
         id: actor.id,
+        age: actor.age,
+        named: actor.named,
         clip: actor.clip,
         activity: actor.activity,
         talking: actor.talking,
@@ -1115,7 +1117,8 @@ interface ScreenPoint { readonly x: number; readonly y: number }
 interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
 export interface LifeSnapshot {
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
-  readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number }[];
+  readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number;
+    readonly scale: number }[];
   readonly bubbles: readonly { readonly id: number; readonly kind: Bubble }[];
   readonly buildings: readonly { readonly id: number; readonly kind: string; readonly x: number;
     readonly z: number; readonly w: number; readonly h: number; readonly ruin: boolean }[];
@@ -1156,7 +1159,8 @@ export interface LifeSnapshot {
     readonly x: number; readonly z: number; readonly doing: string | null;
   }[];
   readonly actors: readonly {
-    readonly id: number; readonly clip: string; readonly activity: string;
+    readonly id: number; readonly age: number; readonly named: boolean;
+    readonly clip: string; readonly activity: string;
     readonly talking: boolean; readonly arguing: boolean;
     readonly occupation: string | null;
   }[];

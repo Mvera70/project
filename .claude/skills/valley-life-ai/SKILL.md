@@ -48,6 +48,11 @@ El plan debe conservar `place`, `offer` y, cuando exista, `seat`.
 Los niños no trabajan: elige puntos de juego cercanos y transitables. Los
 mayores pasean, conversan y alternan puntos de descanso; un descanso puede ser
 sentado aunque todavía no haya banco. Los desempleados usan ocio y conversación.
+La malla infantil comparte la altura base de 1,95 m del rig adulto: no juzgues
+su talla por la receta sin aplicar `displayScaleFor`. Usa como referencias
+visuales aproximadas 0,55 a los 4 años, 0,67 a los 8, 0,80 a los 12 y 0,86 a
+los 14; completa el crecimiento entre 15 y 18. El realce de talla de personajes
+nombrados sólo corresponde a adultos de 18 o más.
 El viaje no consume el plazo de actividad: al llegar, conserva `until` y ejerce
 la acción hasta que una necesidad urgente o el cambio de fase la interrumpa.
 Durante el horario de trabajo evita que una charla ambiental robe el puesto a
