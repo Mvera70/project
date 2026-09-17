@@ -36,15 +36,57 @@ import type { PanelFactory, UiSnapshot } from './contracts';
 
 const STYLE_ID = 'valley-people-panel-style';
 const STYLE = `
-.people-scrim { color: var(--ui-paper-ink); font: var(--ui-text-control-size)/var(--ui-text-control-line) var(--ui-font-plain); }
-.people-scope { margin: 0 0 10px; color: var(--ui-paper-ink-soft); font-size: 12px; line-height: 1.4; }
-.people-row { display: block; box-sizing: border-box; width: 100%; min-height: 44px; margin: 0 0 8px; padding: 9px 12px;
-  border: 1px solid var(--ui-edge); border-radius: var(--ui-radius-control); background: transparent;
-  color: var(--ui-paper-ink); font: inherit; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.people-row:active { background: rgba(34, 29, 24, .08); }
-.people-row b { display: block; font: 600 15px/1.2 var(--ui-font-voice); }
-.people-row span { display: block; margin-top: 2px; color: var(--ui-paper-ink-soft); font-size: 12px; line-height: 1.4; }
-.people-empty { margin: 0; color: var(--ui-paper-ink-soft); }
+/* UI-V5b · La piel de la lista. \`plan-piel.md\` no tiene sección para ella y el
+   prototipo 03 dibuja **una ficha**, no una lista, así que —como el menú de
+   inicio— esto se diseña en vez de calcarse, con el vocabulario que la ficha ya
+   dejó puesto: medallón con la inicial, nombre en la voz de Cinzel y la fila
+   como una tira de pergamino con el canto rasgado.
+
+   **Lo que se decidió NO traer de la ficha, y por qué.** Los rasgos se quedan
+   en texto y no como chips. En la ficha hay tres chips y son medio dibujo; aquí
+   puede haber veintisiete filas con tres chips cada una, y ochenta y un
+   recuadros convierten una lista que se recorre con el pulgar en un muro. Una
+   lista tiene que seguir siendo una lista. */
+.people-scrim { color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
+.people-scrim > h2 { margin: 0 0 4px; color: var(--skin-ink);
+  font: 600 21px/1.15 var(--skin-font-voice); letter-spacing: var(--skin-track-inscription);
+  text-transform: uppercase; }
+.people-scope { margin: 0 0 14px; color: var(--skin-ink-faded);
+  font: italic 13px/1.4 var(--skin-font-read); }
+
+/* La fila: papel con su canto, el medallón a la izquierda y dos líneas a la
+   derecha. \`display: flex\` y no \`block\`, que es lo que la hacía un bloque de
+   texto con un borde. */
+.people-row { display: flex; align-items: center; gap: 12px; box-sizing: border-box;
+  width: 100%; min-height: 56px; margin: 0 0 8px; padding: 8px 12px;
+  border: 0; border-radius: 0; text-align: left; cursor: pointer;
+  color: var(--skin-ink); font: inherit;
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip);
+  -webkit-tap-highlight-color: transparent; }
+/* Cuatro cantos alternados, el mismo truco que los chips de la cabecera: con
+   uno solo, veintisiete filas se leen como veintisiete copias del mismo
+   recorte y el borde deja de parecer papel. */
+.people-row:nth-child(4n + 2) { clip-path: var(--skin-deckle-chip-b); }
+.people-row:nth-child(4n + 3) { clip-path: var(--skin-deckle-chip-c); }
+.people-row:nth-child(4n + 4) { clip-path: var(--skin-deckle-chip-d); }
+.people-row:active { background-color: var(--skin-parchment-aged); }
+.people-row:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+/* El medallón es el mismo de la ficha, en su talla pequeña: tocar una fila
+   abre esa ficha, y la inicial es lo que hace que sea la misma persona y no
+   otra pantalla. */
+.people-row .skin-medallion { flex: 0 0 42px; width: 42px; height: 42px; font-size: 19px; }
+.people-row-text { flex: 1 1 auto; min-width: 0; }
+.people-row b { display: block; color: var(--skin-ink);
+  font: 600 16px/1.2 var(--skin-font-voice); letter-spacing: .01em; }
+.people-row span { display: block; margin-top: 2px; color: var(--skin-ink-soft);
+  font: italic 13px/1.35 var(--skin-font-read); }
+.people-row span + span { color: var(--skin-ink-faded); font-style: normal; font-size: 12.5px; }
+.people-empty { margin: 0; color: var(--skin-ink-faded);
+  font: italic 14px/1.4 var(--skin-font-read); }
 `;
 
 function ensureStyle(): void {
@@ -121,16 +163,27 @@ export const peoplePanel: PanelFactory = (actions) => {
       const row = document.createElement('button');
       row.type = 'button';
       row.className = 'people-row';
+      // El medallón con la inicial, el mismo que la ficha (UI-V4): tocar la
+      // fila abre esa ficha, y es lo que dice que es la misma persona.
+      const face = document.createElement('div');
+      face.className = 'skin-medallion';
+      face.setAttribute('aria-hidden', 'true');
+      face.textContent = v.name === '' ? '?' : v.name.charAt(0).toUpperCase();
+      const text = document.createElement('div');
+      text.className = 'people-row-text';
       const name = document.createElement('b');
-      name.textContent = v.name;
+      // La edad va detrás del nombre y en la misma línea, como en la placa de
+      // la ficha: son la misma persona vista dos veces, y leerla igual en las
+      // dos ahorra el trabajo de volver a situarse.
+      name.textContent = `${v.name} · ${renderUiText('inspect.age.short', { age: ageOf(v, state.tick) })}`;
       const trade = tradeLine(v);
       const stats = document.createElement('span');
-      stats.textContent = trade === null
-        ? renderUiText('inspect.age', { age: ageOf(v, state.tick) })
-        : `${renderUiText('inspect.age', { age: ageOf(v, state.tick) })} — ${trade}`;
+      stats.textContent = trade ?? '';
+      stats.hidden = trade === null;
       const traits = document.createElement('span');
       traits.textContent = traitsLine(v);
-      row.append(name, stats, traits);
+      text.append(name, stats, traits);
+      row.append(face, text);
       // La identidad viaja por `id`, nunca por el nombre que se lee en la
       // fila: dos aldeanos pueden compartir nombre (AC-9, `docs/ui-redesign/
       // acceptance-scenarios.md`), y el motor sólo distingue por `id`.

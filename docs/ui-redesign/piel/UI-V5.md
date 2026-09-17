@@ -71,3 +71,35 @@ Semilla 11, `bundle-game` + `shot.mjs --open title`, sin errores de página. Las
 8 pruebas de `ui-title.test.ts` en verde —el número del valle, el techo del año,
 el interruptor recordado— y el recorrido del menú y el de las cuatro velocidades
 también.
+
+---
+
+# UI-V5b · La lista de la gente
+
+El último trozo sin vestir, y el segundo sin prototipo: el 03 dibuja **una
+ficha**, no una lista. Así que, como el menú, se diseña — con el vocabulario que
+la ficha acababa de dejar puesto:
+
+- la fila es una **tira de pergamino con el canto rasgado**, con los cuatro
+  recortes alternados (el mismo truco que los chips de la cabecera: con uno
+  solo, veintisiete filas se leen como veintisiete copias y el borde deja de
+  parecer papel);
+- a la izquierda, **el medallón con la inicial**, el mismo de la ficha en su
+  talla pequeña — tocar la fila abre esa ficha, y la inicial es lo que dice que
+  es la misma persona;
+- el nombre con la edad detrás en la misma línea, exactamente como la placa de
+  la ficha: son la misma persona vista dos veces, y leerla igual en las dos
+  ahorra volver a situarse;
+- el oficio en cursiva y los rasgos debajo.
+
+**Lo que se decidió no traer de la ficha, y es la única decisión de la ronda:**
+los rasgos se quedan en **texto** y no como chips. En la ficha hay tres chips y
+son medio dibujo; aquí puede haber veintisiete filas con tres chips cada una, y
+ochenta y un recuadros convierten una lista que se recorre con el pulgar en un
+muro. Una lista tiene que seguir siendo una lista.
+
+Nada del comportamiento cambia: el filtro sigue siendo nombrados y presentes en
+el orden del motor, la cabecera sigue aclarando que la cifra global es mayor, y
+la identidad sigue viajando por `id` y nunca por el nombre (AC-9: dos aldeanos
+pueden compartir nombre). 52 pruebas de la lista y el recorrido de U-14, en
+verde.
