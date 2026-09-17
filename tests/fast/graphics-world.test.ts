@@ -449,7 +449,7 @@ describe('G-06 · el suelo', () => {
     tree.add(new Mesh(new BoxGeometry(1, 1, 1), leaf), new Mesh(new BoxGeometry(1, 1, 1), bark));
 
     const paintedIn = (palette: typeof PALETTES.summer): Record<string, string> => {
-      const forest = buildForest(state.map, tree, palette);
+      const forest = buildForest(state, tree, palette);
       const seen: Record<string, string> = {};
       for (const piece of forest.group.children) {
         const mesh = piece as Mesh;

@@ -64,6 +64,12 @@ traído aquí.
 
 ## 2. El tablero
 
+**IA-16 · bosque visible:** las copas acusan cuatro tramos de existencias; el
+último árbol cae sólo con la transición real a claro, deja tocón y los claros
+aptos muestran un plantón creciente hasta la regeneración. Semilla 67 filmada
+con motor vivo y semilla 1 con rebrote real; 97 pruebas dirigidas, typecheck y
+lint verdes. [Informe](life-rounds/IA-16.md).
+
 **IA-15 · primera cadena visible de recursos:** reparto semanal estable, pareja
 fundadora dedicada a subsistencia y ciclo `árbol → tala → carga → descarga → vuelta`.
 El tajo coincide con la celda que tala el motor; almiares y pilas responden a reservas
@@ -323,6 +329,11 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+IA-16: semilla 67/año19, toma viva a ×64 y 6 fps: tick 864→865, celda 2986,
+bosque 472→471; caída 1,17→2,67 s, tocón visible desde 2,17 s y tronco retirado
+a 8,17 s. Semilla 1: 0 rebrotes en tick432 y 1 en tick480. Cero errores, deriva,
+penetraciones y centros bloqueados. 97 pruebas dirigidas, typecheck y lint verdes.
+
 IA-15: semilla 7/año20, 286 fotogramas a 15 fps siguiendo al id2: tala, carga,
 transporte, descarga a 17,93 s y vuelta, 1 entrega, 0 charlas con carga. Semilla
 11/año20: 27 personas, 17/17 puestos alcanzados, cinco ids en tala/transporte/
@@ -486,9 +497,9 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**IA-15 recursos:** falta que el árbol muestre caída, tocón, agotamiento y
-regeneración al avanzar el motor; después conectar piedra y estados de cultivo.
-La toma fija valida la coreografía de madera, no varios ticks de producción.
+**Recursos visibles:** IA-15 e IA-16 cierran la primera cadena de madera, incluida
+la evolución del bosque con el motor vivo. Sigue conectar la extracción de piedra
+y después los estados de cultivo, cosecha y almacenamiento.
 
 **G-25:** corregida la uniformidad de las rocas señalada por el dueño. Sigue pendiente ampliar siluetas de árboles.
 

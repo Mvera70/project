@@ -20,6 +20,7 @@ import { SEASONS, clockOf, weekOf } from '@engine/time';
 import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 import { defenceConnections } from './defences';
+import { forestSignature } from './forest-state';
 
 export interface PlannedBuilding {
   readonly id: BuildingId;
@@ -57,11 +58,14 @@ export interface ScenePlan {
   readonly game: string;
   /** Changes whenever the ground's look changes: terrain, paths, cleared land. */
   readonly ground: number;
+  /** Cambia al adelgazar una copa o avanzar una etapa de rebrote. */
+  readonly forest: number;
   readonly buildings: readonly PlannedBuilding[];
 }
 
 export interface PlanChange {
   readonly ground: boolean;
+  readonly forest: boolean;
   readonly cleared: boolean;
   readonly added: readonly PlannedBuilding[];
   readonly changed: readonly PlannedBuilding[];
@@ -166,6 +170,7 @@ export function planFor(state: GameState): ScenePlan {
   return {
     game: `${state.seed}:${state.terrainSeed}`,
     ground: groundSignature(state.map, state.tick),
+    forest: forestSignature(state),
     buildings: visible.map((building) => ({ ...plannedFrom(building, state.tick),
       ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
       ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
@@ -191,7 +196,7 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
 export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanChange {
   if (previous === null || previous.game !== next.game) {
     return {
-      ground: true, cleared: true, added: next.buildings, changed: [], removed: [],
+      ground: true, forest: true, cleared: true, added: next.buildings, changed: [], removed: [],
     };
   }
 
@@ -207,6 +212,7 @@ export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanCha
 
   return {
     ground: previous.ground !== next.ground,
+    forest: previous.forest !== next.forest,
     cleared: false,
     added,
     changed,
@@ -216,6 +222,6 @@ export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanCha
 
 /** Whether a change asks for any work at all. Most frames ask for none. */
 export function isQuiet(change: PlanChange): boolean {
-  return !change.ground && !change.cleared
+  return !change.ground && !change.forest && !change.cleared
     && change.added.length === 0 && change.changed.length === 0 && change.removed.length === 0;
 }

@@ -54,6 +54,7 @@ import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
+import { TreeFalls, type TreeFallSighting } from './effects/tree-falls';
 import { FIELD_CROPS, isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 
 const VILLAGER = 'villager';
@@ -286,7 +287,8 @@ export async function createGraphicsRenderer(
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
-  world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group);
+  const treeFalls = new TreeFalls(() => library.instance(TREE));
+  world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group, treeFalls.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -490,6 +492,18 @@ export async function createGraphicsRenderer(
    */
   let painted = '';
 
+  function rebuildForest(state: GameState, palette: ReturnType<typeof paletteFor>): void {
+    if (forest !== null) {
+      world.remove(forest.group);
+      forest.dispose();
+      forest = null;
+    }
+    const sapling = library.get(TREE);
+    if (sapling === undefined) return;
+    forest = buildForest(state, sapling.original as Object3D, palette, treeFalls.suppressed);
+    world.add(forest.group);
+  }
+
   function rebuildGround(state: GameState, clock: ReturnType<typeof clockOf>): void {
     if (ground !== null) {
       world.remove(ground.mesh);
@@ -497,6 +511,7 @@ export async function createGraphicsRenderer(
     }
     // §10.3 · la paleta de la estación, la misma que usa el render 2D.
     const palette = paletteFor(clock.season, clock.seasonWeek);
+    treeFalls.season(palette);
     ground = buildGround(state.map, palette);
     // La nieve en los tejados sale de la misma paleta que la del suelo: cuando
     // §10.3 pone el prado blanco es que ha nevado, y la nieve no elige donde
@@ -532,11 +547,7 @@ export async function createGraphicsRenderer(
 
     // Lo construido no lleva vegetacion encima.
     const taken = builtCells(state);
-    const sapling = library.get(TREE);
-    if (sapling !== undefined) {
-      forest = buildForest(state.map, sapling.original as Object3D, palette, taken);
-      world.add(forest.group);
-    }
+    rebuildForest(state, palette);
     // G-15 · y los trastos del corral, que cuelgan de lo construido: el almiar
     // toca un campo, la leña toca una casa, la carreta está en el camino. Se
     // montan aquí porque se rehacen exactamente cuando eso cambia.
@@ -582,9 +593,10 @@ export async function createGraphicsRenderer(
     groundFloor = floor;
     cast.standOn(floor);
     fauna.standOn(floor);
+    treeFalls.standOn(floor);
     mapWidth = state.map.width;
     mapHeight = state.map.height;
-    frameCamera();
+    if (!disturbed) frameCamera();
   }
 
   // **El enganche de taller: poder mirar el juego como si fuera un vídeo.**
@@ -624,6 +636,13 @@ export async function createGraphicsRenderer(
       day: lifeDay,
       steps: life.steps,
       timberDeliveries: life.timberDeliveries,
+      forest: {
+        standing: forest?.count ?? 0,
+        stumps: forest?.stumpCount ?? 0,
+        regrowth: forest?.regrowthCount ?? 0,
+        suppressed: treeFalls.suppressed.size,
+        falls: treeFalls.snapshot(),
+      },
       phase: round(paintedPhase),
       interactions: { ...life.interactions },
       nightOutcomes: nightOutcomes.map(night => ({ ...night, pending: [...night.pending] })),
@@ -753,6 +772,7 @@ export async function createGraphicsRenderer(
 
       const next = planFor(shown);
       const change = planChange(plan, next);
+      let fallingChanged = treeFalls.observe(state.map, frame.discontinuity);
 
       if (change.cleared) {
         // A different valley. Everything built for the last one goes, rather
@@ -765,8 +785,12 @@ export async function createGraphicsRenderer(
         bubbles.clear();
         props.clear();
         weather.clear();
+        treeFalls.reset(state.map);
+        fallingChanged = false;
+        disturbed = false;
         paintedSky = 'clear';
       }
+      const acceptedForest = treeFalls.acceptShown(shown.map);
       // El suelo se rehace cuando cambia el terreno **o cuando cambia la
       // estación del reloj vivo**, que es lo que le da el color. La clave lleva
       // la semana dentro de la estación porque §10.3 deshiela mezclando durante
@@ -776,7 +800,10 @@ export async function createGraphicsRenderer(
       if (change.ground || change.cleared || colour !== painted) {
         rebuildGround(shown, live);
         painted = colour;
+      } else if (change.forest || fallingChanged || acceptedForest) {
+        rebuildForest(shown, paletteFor(live.season, live.seasonWeek));
       }
+      treeFalls.step(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
       plan = next;
@@ -1090,6 +1117,7 @@ export async function createGraphicsRenderer(
       fauna.dispose();
       bubbles.dispose();
       props.dispose();
+      treeFalls.dispose();
       cast.dispose();
       village.dispose();
       steading.dispose();
@@ -1157,6 +1185,14 @@ interface LifeSnapshot {
     readonly z: number; readonly walkWeight: number | null; readonly screen: ScreenPoint }[];
   readonly day: number;
   readonly steps: number;
+  readonly timberDeliveries: number;
+  readonly forest: {
+    readonly standing: number;
+    readonly stumps: number;
+    readonly regrowth: number;
+    readonly suppressed: number;
+    readonly falls: readonly TreeFallSighting[];
+  };
   readonly phase: number;
   readonly interactions: Readonly<Record<string, number>>;
   readonly people: readonly {

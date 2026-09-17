@@ -19,6 +19,7 @@ import { createWeather } from '../../src/render3d/effects/weather';
 import { TERRAIN_CODE } from '@engine/state';
 import { PALETTES } from '@derive/palette';
 import { buildForest } from '../../src/render3d/world/forest';
+import { forestLooks } from '../../src/render3d/world/forest-state';
 import { planFor } from '../../src/render3d/world/plan';
 
 const grown = new Map<string, GameState>();
@@ -76,7 +77,7 @@ describe('G-10 · el bosque', () => {
     // D.9 nombra este caso: instanciar árboles. Un objeto suelto por celda de
     // bosque serían varios cientos de llamadas de dibujo en un valle maduro.
     const state = village(16);
-    const forest = buildForest(state.map, sapling());
+    const forest = buildForest(state, sapling());
     expect(forest.count).toBeGreaterThan(200);
     expect(forest.group.children.length).toBe(3);
     for (const child of forest.group.children) {
@@ -86,11 +87,10 @@ describe('G-10 · el bosque', () => {
     expect(forest.group.children.length).toBe(0);
   });
 
-  it('hay un árbol por celda de bosque y ni uno fuera', () => {
+  it('hay un árbol por celda de bosque libre y ni uno debajo de lo construido', () => {
     const state = village(16);
-    let woods = 0;
-    for (const code of state.map.terrain) if (code === TERRAIN_CODE.forest) woods += 1;
-    const forest = buildForest(state.map, sapling());
+    const woods = forestLooks(state).filter(look => look.stage === 'standing').length;
+    const forest = buildForest(state, sapling());
     expect(forest.count).toBe(woods);
     forest.dispose();
   });
@@ -99,8 +99,8 @@ describe('G-10 · el bosque', () => {
     // §4.3 · el render no consume azar. Un bosque que se resembrara en cada
     // pintada sería peor que uno alineado.
     const state = village(16);
-    const first = buildForest(state.map, sapling());
-    const second = buildForest(state.map, sapling());
+    const first = buildForest(state, sapling());
+    const second = buildForest(state, sapling());
     const matrixOf = (forest: ReturnType<typeof buildForest>, at: number): number[] => {
       const mesh = forest.group.children[0] as unknown as { instanceMatrix: { array: ArrayLike<number> } };
       return [...Array.from({ length: 16 }, (_, index) => mesh.instanceMatrix.array[at * 16 + index] ?? 0)];
@@ -112,7 +112,7 @@ describe('G-10 · el bosque', () => {
 
   it('talar quita árboles', () => {
     const state = village(16);
-    const before = buildForest(state.map, sapling()).count;
+    const before = buildForest(state, sapling()).count;
     const felled = structuredClone(state);
     let cut = 0;
     for (let cell = 0; cell < felled.map.terrain.length && cut < 30; cell += 1) {
@@ -121,7 +121,7 @@ describe('G-10 · el bosque', () => {
         cut += 1;
       }
     }
-    const after = buildForest(felled.map, sapling());
+    const after = buildForest(felled, sapling());
     expect(after.count).toBe(before - cut);
     after.dispose();
   });
@@ -129,7 +129,7 @@ describe('G-10 · el bosque', () => {
   it('plantar y talar cien veces no deja nada', () => {
     const state = village(16);
     for (let round = 0; round < 100; round += 1) {
-      const forest = buildForest(state.map, sapling());
+      const forest = buildForest(state, sapling());
       forest.dispose();
       forest.dispose();
     }

@@ -11,12 +11,13 @@ import { visibleBuildings } from '@derive/visible-buildings';
 // peor que uno alineado: aquí el mismo valle da siempre el mismo bosque.
 
 import {
-  Box3, InstancedMesh, Group, Matrix4, Quaternion, Vector3,
+  Box3, CylinderGeometry, InstancedMesh, Group, Matrix4, MeshStandardMaterial, Quaternion, Vector3,
   type BufferGeometry, type Color, type Material, type Object3D,
 } from 'three';
 import type { Building, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@derive/palette';
+import { forestLooks, type ForestState } from './forest-state';
 
 /**
  * Cuántos árboles caben en una celda de bosque.
@@ -72,8 +73,12 @@ export function piecesOf(source: Object3D): Piece[] {
 
 export interface Forest {
   readonly group: Group;
-  /** Cuántos árboles hay plantados. */
+  /** Cuántos árboles adultos hay plantados. */
   readonly count: number;
+  /** Cuántos plantones transitables representan un rebrote en curso. */
+  readonly regrowthCount: number;
+  /** Cuántos claros recién talados conservan el tocón. */
+  readonly stumpCount: number;
   dispose(): void;
 }
 
@@ -84,9 +89,67 @@ export interface Forest {
  * al año, no sesenta veces por segundo.
  */
 export function buildForest(
-  map: ValleyMap, tree: Object3D, palette?: Palette, taken?: ReadonlySet<number>,
+  state: ForestState,
+  tree: Object3D,
+  palette?: Palette,
+  suppressed: ReadonlySet<number> = new Set(),
 ): Forest {
-  return scatterOn(map, tree, TERRAIN_CODE.forest, palette, taken);
+  const looks = forestLooks(state, suppressed);
+  const byCell = new Map(looks.map(look => [look.cell, look]));
+  const growing = looks.filter(look => look.stage !== 'stump');
+  const scattered = scatterCells(
+    state.map,
+    tree,
+    growing.map(look => look.cell),
+    palette,
+    false,
+    false,
+    (cell, material) => {
+      const look = byCell.get(cell)!;
+      if (look.stage === 'regrowth') return look.size;
+      return material.includes('leaf') ? look.crown : 1;
+    },
+  );
+  const stumpCells = looks.filter(look => look.stage === 'stump').map(look => look.cell);
+  const stumpGeometry = new CylinderGeometry(0.16, 0.2, 0.22, 8);
+  stumpGeometry.translate(0, 0.11, 0);
+  const stumpMaterial = new MeshStandardMaterial({ color: palette?.wood ?? '#735338', roughness: 1 });
+  stumpMaterial.name = 'stump';
+  const stumps = new InstancedMesh(stumpGeometry, stumpMaterial, stumpCells.length);
+  stumps.name = 'Forest_Stumps';
+  stumps.castShadow = true;
+  stumps.receiveShadow = true;
+  const matrix = new Matrix4();
+  const position = new Vector3();
+  const turn = new Quaternion();
+  const size = new Vector3();
+  const up = new Vector3(0, 1, 0);
+  for (let slot = 0; slot < stumpCells.length; slot += 1) {
+    const at = scatterTransform(state.map.width, stumpCells[slot]!);
+    position.set(at.x, 0, at.z);
+    turn.setFromAxisAngle(up, at.facing);
+    size.setScalar(at.scale);
+    matrix.compose(position, turn, size);
+    stumps.setMatrixAt(slot, matrix);
+  }
+  if (stumpCells.length > 0) {
+    stumps.instanceMatrix.needsUpdate = true;
+    stumps.computeBoundingSphere();
+    scattered.group.add(stumps);
+  }
+  return {
+    ...scattered,
+    count: looks.filter(look => look.stage === 'standing').length,
+    regrowthCount: looks.filter(look => look.stage === 'regrowth').length,
+    stumpCount: stumpCells.length,
+    dispose(): void {
+      scattered.dispose();
+      if (stumpCells.length > 0) scattered.group.remove(stumps);
+      stumps.dispose();
+      stumpGeometry.dispose();
+      stumpMaterial.dispose();
+    },
+  };
 }
 
 /**
@@ -107,6 +170,23 @@ function tintFoliage(material: Material, palette: Palette): void {
   } else if (painted.name.includes('leaf') || painted.name.includes('reed')) {
     painted.color.set(palette.forestDark);
   }
+}
+
+/** Copia y tiñe los materiales de un árbol suelto sin tocar la biblioteca. */
+export function seasonTree(source: Object3D, palette: Palette): Material[] {
+  const owned: Material[] = [];
+  source.traverse((object) => {
+    const mesh = object as Object3D & { isMesh?: boolean; material?: Material | Material[] };
+    if (mesh.isMesh !== true || mesh.material === undefined) return;
+    const materials = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map(material => {
+      const copy = material.clone();
+      tintFoliage(copy, palette);
+      owned.push(copy);
+      return copy;
+    });
+    mesh.material = Array.isArray(mesh.material) ? materials : materials[0]!;
+  });
+  return owned;
 }
 
 /**
@@ -202,6 +282,7 @@ export function scrubCells(map: ValleyMap, taken: ReadonlySet<number>): number[]
 export function scatterCells(
   map: ValleyMap, source: Object3D, cells: readonly number[], palette?: Palette,
   containInCell = false, varyRockSize = false,
+  scaleFor?: (cell: number, material: string) => number,
 ): Forest {
   const tree = source;
   const group = new Group();
@@ -240,6 +321,9 @@ export function scatterCells(
           const { facing } = scattered;
           let { x, z, scale } = scattered;
           let heightScale = scale;
+          const visualScale = scaleFor?.(cell, piece.material.name) ?? 1;
+          scale *= visualScale;
+          heightScale *= visualScale;
           if (containInCell && !bounds.isEmpty()) {
             const rotated = bounds.clone().applyMatrix4(new Matrix4().makeRotationY(facing));
             const span = rotated.getSize(new Vector3());
@@ -283,6 +367,8 @@ export function scatterCells(
   return {
     group,
     count: total,
+    regrowthCount: 0,
+    stumpCount: 0,
     dispose(): void {
       for (const instanced of owned) {
         group.remove(instanced);
