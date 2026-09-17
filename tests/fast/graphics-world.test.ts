@@ -160,9 +160,17 @@ describe('G-06 · el plan de escena', () => {
   });
 
   it('demoler retira, y sólo a ése', () => {
+    // **Y se demuele algo que esté solo**, no un tramo de valla. Lo enseñó M-1:
+    // esta prueba cogía «el edificio de en medio» y, con la trayectoria nueva,
+    // ése pasó a ser un tramo de empalizada — cuyo vecino **sí** cambia de
+    // forma al quedarse sin él, porque una valla sabe con quién enlaza
+    // (`connections`). Eso no es un defecto del plan: es lo que el plan tiene
+    // que hacer, y va en la prueba de abajo. Aquí se mide lo que el título
+    // dice, sobre una pieza que no se da la mano con nadie.
     const state = village(12);
     const before = planFor(state);
-    const doomed = before.buildings[Math.floor(before.buildings.length / 2)];
+    const doomed = before.buildings.find(
+      (building) => building.kind !== 'palisade' && building.kind !== 'wall');
     expect(doomed).toBeDefined();
 
     const gone = structuredClone(state);
@@ -172,6 +180,25 @@ describe('G-06 · el plan de escena', () => {
     expect(change.removed).toEqual([doomed?.id]);
     expect(change.added.length).toBe(0);
     expect(change.changed.length).toBe(0);
+  });
+
+  it('pero quitar un tramo de valla cambia la forma de sus vecinos', () => {
+    // La otra mitad, y es una propiedad del plan que no estaba escrita: los
+    // tramos de empalizada se dibujan según con cuántos lados enlazan, así que
+    // abrir un hueco en la cerca **tiene** que cambiar a los de al lado. Si
+    // algún día deja de hacerlo, la valla saldrá con una esquina suelta.
+    const state = village(12);
+    const before = planFor(state);
+    const fence = before.buildings.filter((building) => building.kind === 'palisade');
+    if (fence.length < 2) return; // este valle no levantó cerca; no hay nada que medir
+    const doomed = fence[Math.floor(fence.length / 2)];
+    const gone = structuredClone(state);
+    gone.buildings = gone.buildings.filter((building) => building.id !== doomed?.id);
+
+    const change = planChange(before, planFor(gone));
+    expect(change.removed).toEqual([doomed?.id]);
+    expect(change.changed.length).toBeGreaterThan(0);
+    for (const changed of change.changed) expect(changed.kind).toBe('palisade');
   });
 
   it('talar cambia el suelo y nada más', () => {

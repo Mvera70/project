@@ -32,7 +32,7 @@ import { HAPPENINGS } from '../state';
 import { count, has, standing } from '../subsistence/building-counts';
 import { seasonOf, weekOf } from '../time';
 import { destroyBuilding } from './buildings';
-import { herdCapacity } from '../subsistence/herd';
+import { herdCapacity, herdDensity } from '../subsistence/herd';
 import { factorWants, postOffer } from './road';
 import { weekWeather } from './sky';
 
@@ -71,6 +71,34 @@ function wooden(state: GameState): Building[] {
     && (DISASTER.FIRE_KINDS as readonly string[]).includes(b.kind));
 }
 
+/**
+ * M-1 · **Los sucesos que destruyen, contra una aldea que todavía no ha
+ * decidido nada.** Devuelve el factor con el que pesan.
+ *
+ * La decisión 4 del dueño del diseño: el mundo no mata sin motivo y de primeras
+ * no mata. Una aldea de cuatro personas en su tercer año no ha tomado ninguna
+ * decisión que la pueda tumbar, así que romperla no cuenta una historia. No es
+ * una puerta —el rayo sigue pudiendo caer sobre la única casa, que es §2.6— es
+ * un peso.
+ */
+function grace(state: GameState, people: number): number {
+  // **Joven Y pequeña, no una de las dos.** Medido, y es el error que casi se
+  // queda dentro: con «pequeña» a secas, las muertas de treinta y dos partidas
+  // bajaban de nueve a **una**, porque un valle que se está apagando pasa por
+  // debajo de seis personas y a partir de ahí era casi inmune a lo que
+  // destruye. Eso no es la decisión del dueño —«de primeras la aldea no tiene
+  // por qué morirse»— es un escudo permanente para el que va perdiendo, y borra
+  // el caos que él mismo pidió («que haya partidas que se rompan es la idea»).
+  // La gracia es de los primeros años, no del tamaño.
+  const young = state.tick < FATE.GRACE_YEARS * TIME.WEEKS_PER_YEAR;
+  return young && people < FATE.GRACE_PEOPLE ? FATE.GRACE_FACTOR : 1;
+}
+
+/** Si hay algo que un lobo tenga que saltar para llegar al corral. */
+function walled(state: GameState): boolean {
+  return count(state, 'palisade') > 0 || count(state, 'wall') > 0 || count(state, 'watchtower') > 0;
+}
+
 /** Cuánto pesa un rasgo del valle en un suceso: 1 si no lo tiene. */
 function trait(state: GameState, name: string, factor: number): number {
   return (state.traits as readonly string[]).includes(name) ? factor : 1;
@@ -96,14 +124,28 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
       // Sin puertas: el dueño del diseño pidió que el caos sea el juego y que
       // una partida pueda romperse (`docs/rework.md` §2.6). El rayo pide sólo
       // lo que la física pide, tormenta y algo de madera en pie, aunque eso
-      // sea la única casa de la pareja fundadora.
-      return ctx.sky.storms > 0 && wooden(state).length > 0 ? w * ctx.sky.storms : 0;
+      // sea la única casa de la pareja fundadora — lo que M-1 le quita es
+      // poder dejar a la aldea **sin ninguna** (ver `happen`).
+      return ctx.sky.storms > 0 && wooden(state).length > 0
+        ? w * ctx.sky.storms * grace(state, ctx.people) : 0;
     case 'river_flood':
+      // M-1 · **y con el bosque talado, más.** El agua que el bosque no para
+      // baja al río: es la consecuencia de haber talado, que es una decisión
+      // del jugador y no del cielo.
       return ctx.season === 'spring' && ctx.sky.wet >= FATE.FLOOD_WET_DAYS
-        ? w * trait(state, 'bare_hills', 0.5) : 0;
+        ? w * trait(state, 'bare_hills', 0.5) * grace(state, ctx.people)
+          * (1 + FATE.FLOOD_PER_FELLED * (1 - ratioOf(state, 'forestLeft')))
+        : 0;
     case 'wolves_at_the_coop':
+      // M-1 · **los lobos van a donde hay ganado.** Cada cerdo y cada vaca los
+      // llaman; una empalizada o una atalaya los aparta. Las gallinas siguen
+      // siendo la condición porque son lo que primero se llevan.
       return ctx.season === 'winter' && state.herd.hens > 0
-        ? w * trait(state, 'old_forest', 1.6) * trait(state, 'bare_hills', 0.5) : 0;
+        ? w * trait(state, 'old_forest', 1.6) * trait(state, 'bare_hills', 0.5)
+          * grace(state, ctx.people)
+          * (1 + FATE.WOLVES_PER_HEAD * (state.herd.pigs + state.herd.cows))
+          * (walled(state) ? FATE.WOLVES_WALLED : 1)
+        : 0;
     case 'wedding':
       return adults(state).length >= FATE.WEDDING_MIN_ADULTS ? w : 0;
     case 'pedlar':
@@ -235,7 +277,22 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
 
   switch (id) {
     case 'lightning_fire': {
-      const target = weighted(state.rng, 'fate', wooden(state), (b) =>
+      // M-1 · **un rayo destruye una casa, nunca la última.** Decisión 4 del
+      // dueño del diseño, con sus palabras: «que caiga un rayo en una casa y
+      // eso ya se muera no tiene gracia». Con un solo techo en pie, el rayo cae
+      // en otra cosa —el granero, un campo, la empalizada— y si no hay otra
+      // cosa, cae y no se lleva nada: se ve, se cuenta y no acaba la partida.
+      const roofs = standing(state, 'house').length + standing(state, 'stone_house').length;
+      const burnable = roofs > 1
+        ? wooden(state)
+        : wooden(state).filter((b) => b.kind !== 'house');
+      if (burnable.length === 0) {
+        moraleBy(state, FATE.LIGHTNING_MORALE);
+        key = 'fate.lightning_fire.spared';
+        weight = 2;
+        break;
+      }
+      const target = weighted(state.rng, 'fate', burnable, (b) =>
         b.kind === 'house' ? FATE.LIGHTNING_HOUSE_WEIGHT : 1);
       // Como el incendio de §5.9: la marca antes de la ruina, porque después
       // nadie tiene `homeId` apuntando a ella.
@@ -260,6 +317,14 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       state.herd.hens -= taken;
       moraleBy(state, FATE.WOLVES_MORALE);
       params['count'] = taken;
+      // M-1 · **y con el corral lleno se llevan un cerdo.** Es la otra cara de
+      // tener ganado: lo que alimenta a la aldea en invierno también alimenta
+      // a los lobos, y un corral apretado es una despensa a la vista.
+      if (state.herd.pigs > 0 && herdDensity(state) >= FATE.WOLVES_PIG_DENSITY) {
+        state.herd.pigs -= 1;
+        key = 'fate.wolves_at_the_coop.pig';
+        weight = 2;
+      }
       break;
     }
     case 'wedding': {
@@ -389,6 +454,24 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
  * Devuelve `null` casi siempre. Cuando no, el estado ya está cambiado y el
  * tick sólo tiene que contar y enseñar.
  */
+/**
+ * M-1 · Cuánto pesa un suceso **ahora mismo**, con el estado delante.
+ *
+ * Lo mismo que `rollFate` usa para sortear, expuesto para poder medirlo: lo que
+ * M-1 promete es que el peso de lo que destruye **va con lo que la aldea ha
+ * acumulado** (más ganado, más lobos; más bosque talado, más riada), y eso se
+ * comprueba comparando dos estados, no jugando cien partidas y mirando el
+ * resultado. `tools/fate-report.ts` puede usarlo igual.
+ */
+export function weightNow(state: GameState, id: HappeningId): number {
+  return weightOf(state, id, {
+    season: seasonOf(state.tick),
+    week: weekOf(state.tick),
+    sky: weekWeather(state.seed, state.weather.index, state.tick),
+    people: population(state),
+  });
+}
+
 export function rollFate(state: GameState): FateOutcome | null {
   const ctx: Context = {
     season: seasonOf(state.tick),

@@ -54,7 +54,7 @@ const OPS = new Set(['<', '<=', '>', '>=', '==']);
 // either is not old content, it is content the engine cannot read: the
 // comparison would run against `undefined` and the condition would answer
 // something no template ever meant (v2.81).
-const STATS = new Set(['people', 'grain', 'wood', 'morale', 'faith']);
+const STATS = new Set(['people', 'grain', 'wood', 'morale', 'faith', 'stone', 'silver']); // M-0: la mesa nueva
 const RATIOS = new Set(['grainYears', 'grainToHarvest', 'housingFree', 'forestLeft']);
 
 function record(value: unknown): value is Record<string, unknown> {

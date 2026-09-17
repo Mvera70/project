@@ -9,6 +9,7 @@
 // the mechanics stay with the module that owns them. Each one says who must
 // read it.
 
+import { FATE } from '../../balance';
 import type { CrossroadTemplate } from '../schema';
 
 /** A.1 · The flagship template, the one `valle.md` §3 opens with. */
@@ -125,8 +126,17 @@ const TITHE_DEMAND: CrossroadTemplate = {
   // v2.9. Elegible el 12 % de los ticks: `vassal` es permanente y el otoño es
   // un cuarto del año. El disparador es la cuenta misma — el hombre del señor
   // cuenta las gavillas cuando hay gavillas que contar, no en cualquier otoño.
+  // **M-1 · o vasallo, o conocido por rico.** El señor visitaba sólo a quien ya
+  // le debía algo (`vassal`); desde el juego de los medios hay otra forma de
+  // llamar su atención, y es la que el propio factor de grano siempre cobró:
+  // vender el excedente en el camino deja la bandera `watched`, y una caja con
+  // plata dentro se sabe. Es la consecuencia de haber prosperado a la vista.
   requires: [
-    { k: 'flag', flag: 'vassal', set: true },
+    { k: 'any', cs: [
+      { k: 'flag', flag: 'vassal', set: true },
+      { k: 'flag', flag: 'watched', set: true },
+      { k: 'stat', stat: 'silver', op: '>', v: FATE.RICH_SILVER },
+    ] },
     { k: 'season', season: 'autumn', minWeek: 11 },
     { k: 'year', op: '>', v: 5 },
   ],

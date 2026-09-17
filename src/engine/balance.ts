@@ -372,6 +372,43 @@ export const FATE = {
   // TUNE: un niño perdido y encontrado, y un forastero que pasa.
   CHILD_MORALE: -3,
   STRANGER_MORALE: 1,
+  // ---------------------------------------------------------------------------
+  // M-1 · **El mundo contesta a lo que hay.** `docs/rework.md` §4b.
+  //
+  // No es «el mundo mata solo»: la decisión 4 del dueño del diseño dice que una
+  // aldea no se muere sin motivo y que de primeras no se muere —«que caiga un
+  // rayo en una casa y eso ya se muera no tiene gracia; se puede morir, pero
+  // más adelante, porque ya hemos tomado varias decisiones que hacen que se
+  // tumbe»—. Así que lo que el mundo puede romper **escala con lo que el
+  // jugador ha metido**: más ganado, más lobos; más bosque talado, más riada;
+  // más grano y más plata, más ladrones y más señor.
+  //
+  // Todos TUNE, medidos con `tools/agency-report.ts`: un valle intocado tiene
+  // que morir lo mismo que antes de M-1, y un valle cargado de animales y con
+  // el bosque talado, bastante más.
+  // ---------------------------------------------------------------------------
+  /** Por cabeza de cerdo o vaca en el corral, cuánto más pesan los lobos. */
+  WOLVES_PER_HEAD: 0.15,
+  /** Y cuánto menos si hay empalizada o atalaya en pie: algo que saltar. */
+  WOLVES_WALLED: 0.4,
+  /** Con el corral lleno, los lobos se llevan un cerdo y no sólo gallinas. */
+  WOLVES_PIG_DENSITY: 0.6,
+  /** Por cada parte del bosque del corazón que ya no está, cuánto sube la riada. */
+  FLOOD_PER_FELLED: 2,
+  /** La plata a partir de la cual un valle es «rico» para el ladrón y el señor. */
+  RICH_SILVER: 40,
+  /**
+   * **La gracia de la pareja.** Mientras la aldea sea más pequeña que esto o
+   * más joven que `GRACE_YEARS`, lo que destruye pesa una cuarta parte.
+   *
+   * No es una puerta —el rayo puede caer igual, que es §2.6— y no protege para
+   * siempre: es que una aldea de cuatro personas en su tercer año no ha tomado
+   * todavía ninguna decisión que la pueda tumbar, así que romperla no cuenta
+   * una historia, sólo corta una.
+   */
+  GRACE_PEOPLE: 6,
+  GRACE_YEARS: 5,
+  GRACE_FACTOR: 0.25,
   // TUNE (M-0): lo que deja un forastero que duerme en la aldea. Es la plata
   // de antes de la primera venta: sin ella un valle joven no ve ni una moneda
   // hasta que tiene excedente que vender.

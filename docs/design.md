@@ -86,15 +86,41 @@ Las de `valle.md` siguen todas en pie. Estas son las que se cierran aquí.
 | Persistencia | IndexedDB, snapshot + registro de decisiones | Determinismo verificable |
 | Escala del mapa | **72 × 112**, con corazón productivo de 36 × 56 | v3.68: el valle es el centro de algo más amplio, y la economía sólo mide el corazón (§7) |
 | Catálogo inicial | 16 plantillas de encrucijada | Suficiente para validar el hito 0 |
-| Fuente de letalidad | Las encrucijadas, no el mundo | Principio 2: el jugador es el cuello de botella |
+| Fuente de letalidad | **La acumulación de lo que el jugador metió** (M-1, 17 sep 2026); antes: «las encrucijadas, no el mundo» | El jugador sigue siendo el cuello de botella, y ahora también por lo que **tiene**: más ganado, más lobos; más bosque talado, más riada; más grano y más plata, más ladrones y más señor |
 
-**La última merece explicación.** La simulación base, jugada sin decisiones, es
-poco mortal: 3 % de extinción en 200 años. Es deliberado. Si el mundo matara
-solo, el jugador sería un espectador y el principio 2 se rompería. Lo que puede
-destruir la aldea son las consecuencias de lo que el jugador elige: matanzas,
-graneros perdidos antes del invierno, la reputación que corta la llegada de
-forasteros. La sección 12.9 fija los objetivos de mortalidad que la suite de
-balance verifica.
+**La última merece explicación, y cambió el 17 sep 2026.**
+
+Decía «las encrucijadas, no el mundo», y el razonamiento era correcto: si el
+mundo matara solo, el jugador sería un espectador. La simulación base, jugada
+sin decisiones, era poco mortal a propósito —3 % de extinción en 200 años—, y lo
+que podía destruir la aldea eran las consecuencias de lo que el jugador elegía:
+matanzas, graneros perdidos antes del invierno, la reputación que corta la
+llegada de forasteros.
+
+**Lo que M-1 cambia es de dónde sale esa consecuencia, no que tenga que
+haberla.** Con el juego de los medios el jugador mete cosas en el valle
+(`docs/plan-medios.md`), y lo que mete **es** lo que el mundo puede romper:
+lobos contra el corral que compró, riada contra el bosque que taló, ladrones y
+señor contra el grano y la plata que juntó. El mundo sigue sin matar por su
+cuenta —una aldea intocada muere lo que moría, medido— y el jugador sigue siendo
+el cuello de botella; lo que se acaba es que prosperar fuera gratis.
+
+**Y dos cosas que no se negocian**, las dos por decisión del dueño del diseño
+del 17 sep 2026 («que caiga un rayo en una casa y eso ya se muera no tiene
+gracia; se puede morir, pero más adelante, porque ya hemos tomado varias
+decisiones que hacen que se tumbe»):
+
+- **Un rayo destruye una casa, nunca la última.** Con un solo techo en pie cae
+  en otra cosa, y si no hay otra cosa cae y no se lleva nada: se ve, se cuenta y
+  no acaba la partida.
+- **La gracia de la pareja.** Mientras la aldea tenga menos de `FATE.GRACE_PEOPLE`
+  o menos de `FATE.GRACE_YEARS` años, lo que destruye pesa una cuarta parte. No
+  es una puerta —el rayo puede caer, que es lo que §2.6 del rework decidió— es
+  que una aldea que no ha tomado ninguna decisión todavía no tiene nada que se
+  le pueda volver en contra.
+
+La sección 12.9 fija los objetivos de mortalidad que la suite de balance
+verifica, y está **por remedir** desde R-1 (`docs/rework.md` §5).
 
 ---
 

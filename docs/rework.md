@@ -883,7 +883,47 @@ en todas las semillas vivas; las mismas 2 muertas de 16. Secuencia de capturas
 al dueño: la cabecera nueva, una oferta en la voz, la cara del ánimo en dos
 estados.
 
-### M-1 · El mundo contesta a lo que hay
+### M-1 · El mundo contesta a lo que hay — **hecha** (17 sep 2026)
+
+> **Entregada, y la medida corrigió el brief.** Lo que pedía: «sin medios, las
+> mismas 2 muertas de 16; con una combinación deliberadamente mala, entre 6 y
+> 10». Lo que salió, y por qué el número de arriba estaba mal:
+>
+> **La regla del último techo se llevó por delante la mayoría de las muertes, y
+> eso es exactamente lo que el dueño del diseño pidió.** Un valle intocado pasa
+> de **9 muertas de 32 a 1**, y la causa está medida aislando las dos piezas de
+> M-1: no es la gracia de la pareja (sin ella, 2 de 32) sino que **antes, la
+> mayoría de los finales eran «un rayo quemó la única casa»** — la frase suya
+> era «que caiga un rayo en una casa y eso ya se muera no tiene gracia». Así que
+> el 9 de la base no era caos: era ese accidente repetido. El único final
+> temprano que queda (año 8, semilla 22) es un **abandono**: la pareja no creció
+> y se fue, que es §5.7 y es un final con motivo.
+>
+> **Y la letalidad por acumulación existe, pero tarda.** A sesenta años, un
+> valle cargado —corral lleno y bosque talado cada año— muere lo mismo que uno
+> intocado (2 de 32) pero **con la mitad de gente** (mediana 23 contra 42). A
+> ciento veinte años se ve del todo: **9 muertas de 24 contra 1**, con la
+> población a la mitad. Es literalmente lo que él pidió: «se puede morir, pero
+> más adelante, porque ya hemos tomado varias decisiones que hacen que se
+> tumbe».
+>
+> **El error que casi se queda dentro, y vale como regla:** la gracia estaba
+> atada a «pequeña **o** joven», y con eso un valle que se apaga pasa por debajo
+> de seis personas y se vuelve casi inmune a lo que destruye —las muertas de
+> treinta y dos partidas bajaban a una por ese camino, no por el rayo—. Un
+> escudo para el que va perdiendo no es proteger el principio: es borrar el
+> final. Ahora es «joven **y** pequeña», y hay prueba con ese nombre.
+>
+> **Y el rayo no era el único que se llevaba la última casa:** el incendio anual
+> de §5.9 hacía lo mismo dos semanas después, y lo cazó una prueba que forzaba
+> un solo techo. La regla vale para los dos.
+>
+> Lo hecho: lobos × cada cabeza del corral y ÷ empalizada (y con el corral
+> apretado se llevan un cerdo); riada × el bosque que ya no está; el ladrón del
+> granero y el diezmo del señor miran también la plata, no sólo el hambre; el
+> rayo y el fuego nunca dejan la aldea sin techo; la gracia de los primeros
+> años; y §1 de `design.md` reescrita con la fila de letalidad nueva.
+
 
 **Qué.** Tres sucesos de R-1 escalan con lo que la aldea tiene, se quitan las
 dos puertas del rayo de §2.6 sin que un rayo pueda acabar con una aldea, y la

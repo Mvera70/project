@@ -68,9 +68,26 @@ export function rollFire(state: GameState): FireResult | null {
     (b) => b.lostTick === null && b.tier === 0 &&
       (DISASTER.FIRE_KINDS as readonly string[]).includes(b.kind),
   );
-  if (wooden.length === 0) return null;
+  // **M-1 · el fuego no se lleva el último techo.** La decisión del dueño del
+  // diseño del 17 sep 2026 se dijo del rayo —«que caiga un rayo en una casa y
+  // eso ya se muera no tiene gracia»— y vale igual para el incendio de §5.9,
+  // que es el mismo hecho con otro nombre: sin esto, el rayo de `world/fate.ts`
+  // respetaba la última casa y el fuego de aquí la quemaba dos semanas después.
+  // Lo cazó una prueba que forzaba un solo techo (`tests/fast/pressure.test.ts`).
+  // La tirada de `FIRE_CHANCE` ya se ha gastado arriba, así que esto no decide
+  // **si** hay fuego, sólo a qué se lleva. Lo que sí cambia, y se dice porque
+  // es verdad: cuando lo único de madera en pie es esa última casa, el sorteo
+  // ponderado no llega a tirarse, y eso mueve el flujo `world` respecto a un
+  // build anterior a M-1. La partida sigue siendo reproducible —misma semilla,
+  // misma partida— y M-1 mueve esa secuencia de todas formas al cambiar los
+  // pesos de §7.10.
+  const roofs = state.buildings.filter(
+    (b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'),
+  ).length;
+  const burnable = roofs > 1 ? wooden : wooden.filter((b) => b.kind !== 'house');
+  if (burnable.length === 0) return null;
 
-  const target = weighted(state.rng, 'world', wooden, (b) =>
+  const target = weighted(state.rng, 'world', burnable, (b) =>
     b.kind === 'house' ? DISASTER.FIRE_HOUSE_WEIGHT : 1,
   );
 

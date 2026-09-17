@@ -1,5 +1,6 @@
 // M-08 · Hunger. design.md Annex A.3, A.4.
 
+import { FATE } from '../../balance';
 import type { CrossroadTemplate } from '../schema';
 
 /**
@@ -87,9 +88,17 @@ const GRANARY_THEFT: CrossroadTemplate = {
   // ninguna otra estación, porque la cosecha es la semana 35. Invierno y
   // granero vacío están ANTICORRELACIONADOS. `grainToHarvest` sí baja según se
   // aleja la próxima cosecha, que es la magnitud que el ladrón mira.
+  // **M-1 · o un granero lleno, o una aldea con plata.** Hasta aquí el ladrón
+  // sólo salía en un invierno de hambre, y eso deja fuera el caso que el juego
+  // de los medios abre: una aldea que ha prosperado —grano de sobra, plata en
+  // la caja— es exactamente una aldea a la que le merece la pena forzar el
+  // granero de noche. Sigue hacienda falta el rencor: quien entra es de casa.
   requires: [
     { k: 'season', season: 'winter', minWeek: 4 },
-    { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 1.1 },
+    { k: 'any', cs: [
+      { k: 'ratio', ratio: 'grainToHarvest', op: '<', v: 1.1 },
+      { k: 'stat', stat: 'silver', op: '>', v: FATE.RICH_SILVER },
+    ] },
     { k: 'has', building: 'granary' },
     { k: 'grudge', min: 40 },
   ],

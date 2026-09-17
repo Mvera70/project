@@ -23,6 +23,8 @@ import { foundGame } from '../src/engine/found';
 import { population } from '../src/engine/people/demography';
 import { run, type Policy } from '../src/engine/sim';
 import type { GameState, PlayerAct } from '../src/engine/state';
+import { herdCapacity } from '../src/engine/subsistence/herd';
+import { fellForest } from '../src/engine/world/forest';
 import { canAccept } from '../src/engine/world/road';
 
 export interface Variant {
@@ -30,15 +32,40 @@ export interface Variant {
   readonly policy: Policy;
   /** Lo que el jugador hace esta semana, leído del estado antes del tick. */
   readonly acts: (state: GameState) => readonly PlayerAct[];
+  /**
+   * M-1 · Lo que se le pone al valle antes de la semana, para medir un estado
+   * que el jugador todavía no puede producir. **No es una manera de jugar**: es
+   * un banco de pruebas, y va marcado como tal en lo que se publique.
+   */
+  readonly prelude?: (state: GameState) => void;
 }
 
 /** Acepta toda oferta que el valle pueda pagar. Es lo que haría un jugador que mira. */
 const acceptWhatYouCan = (state: GameState): PlayerAct[] =>
   state.offer !== null && canAccept(state, state.offer) ? [{ kind: 'offer', accept: true }] : [];
 
+/**
+ * M-1 · **Un valle cargado de lo que el mundo puede romper**, para medir la
+ * otra mitad de la decisión 4 del dueño del diseño: una aldea intocada muere lo
+ * que moría, y una que ha llenado el corral y talado el bosque, bastante más.
+ *
+ * No es lo que hará el jugador —los medios llegan en M-2— es la carga puesta a
+ * mano: cada año se llena el corral hasta donde llegue y se tala un pedazo de
+ * bosque. Va en `prelude` y no en `acts` porque no es un acto del jugador
+ * todavía; es el estado que M-2 va a poder producir.
+ */
+const loadTheValley = (state: GameState): void => {
+  if (state.tick % TIME.WEEKS_PER_YEAR !== 0) return;
+  const room = herdCapacity(state);
+  state.herd.pigs = Math.max(state.herd.pigs, room.pigs);
+  state.herd.cows = Math.max(state.herd.cows, room.cows);
+  fellForest(state, 3000);
+};
+
 export const VARIANTS: readonly Variant[] = [
   { name: 'nada', policy: 'prudent', acts: () => [] },
   { name: 'acepta ofertas', policy: 'prudent', acts: acceptWhatYouCan },
+  { name: 'cargado', policy: 'prudent', acts: () => [], prelude: loadTheValley },
   { name: 'peor encrucijada', policy: 'worst', acts: () => [] },
 ];
 
@@ -68,6 +95,7 @@ function play(seed: number, years: number, variant: Variant): Row {
   let offers = 0;
   let accepted = 0;
   for (let week = 0; week < years * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
+    variant.prelude?.(state);
     const before = state.village.silver;
     const [report] = run(state, 1, variant.policy, CATALOG, variant.acts);
     const delta = state.village.silver - before;
@@ -117,7 +145,7 @@ function main(): void {
   const variants = only === undefined ? VARIANTS : VARIANTS.filter((v) => only.includes(v.name));
 
   console.log(`${seeds} semillas, ${years} años\n`);
-  console.log('variante           | pop med | min..max | muertas | 1ª piedra med (min..max) | piedra fin | plata fin | entra / sale | décadas con trato | ofertas / aceptadas');
+  console.log('variante           | pop med | min..max | muertas (año más temprano) | 1ª piedra med (min..max) | piedra fin | plata fin | entra / sale | décadas con trato | ofertas / aceptadas');
   for (const variant of variants) {
     const rows: Row[] = [];
     for (let seed = 1; seed <= seeds; seed += 1) rows.push(play(seed, years, variant));
@@ -129,7 +157,12 @@ function main(): void {
       variant.name.padEnd(18),
       fmt(median(pops)).padStart(7),
       `${Math.min(...pops)}..${Math.max(...pops)}`.padStart(8),
-      String(rows.filter((r) => r.dead).length).padStart(7),
+      (() => {
+        const ends = rows.map((r) => r.endYear).filter((x): x is number => x !== null);
+        // El año más temprano importa por sí solo: la decisión 4 del dueño del
+        // diseño dice que de primeras la aldea no se muere.
+        return `${ends.length} (${ends.length === 0 ? '-' : Math.min(...ends)})`.padStart(26);
+      })(),
       `${fmt(median(stones))} (${stones.length === 0 ? '-' : `${Math.min(...stones)}..${Math.max(...stones)}`}, ${stones.length}/${rows.length})`.padStart(24),
       fmt(median(rows.map((r) => r.stone))).padStart(10),
       fmt(median(rows.map((r) => r.silver))).padStart(9),

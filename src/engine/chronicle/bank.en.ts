@@ -518,6 +518,19 @@ export const BANK: Record<string, string[]> = {
     'A storm in {season} brought the lightning down on the {building}. Nothing of it was saved.',
     'The {building} burned in the storm of {season}, year {year}, struck from the sky.',
   ],
+  // M-1 · el rayo que cae y no se lleva el último techo. Se cuenta igual: lo
+  // que el valle recuerda es el susto, y §11.5 lo enseña.
+  'fate.lightning_fire.spared': [
+    'Lightning came down beside the last house in {season} and took nothing but the quiet.',
+    'A bolt split the air over the valley in year {year}. Nothing burned, and nobody slept.',
+    'The storm of {season} struck close enough to smell. The roof held.',
+  ],
+  // M-1 · y los lobos que ya no se contentan con las gallinas.
+  'fate.wolves_at_the_coop.pig': [
+    'Wolves took {count} hens and a pig that winter: the pen was full and they knew it.',
+    'A hard winter in year {year}. Wolves in the pen, {count} hens gone and a pig with them.',
+    'They counted the herd in the {season} snow and were a pig and {count} hens short.',
+  ],
   'fate.river_flood': [
     'The river came over its banks in the {season} of year {year}, and {grain} bushels were spoiled.',
     'After a week of rain the ford went under and the low fields with it: {grain} bushels lost.',
