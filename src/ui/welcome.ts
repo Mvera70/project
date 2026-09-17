@@ -13,24 +13,46 @@ import { recogniseGesture, type Point } from './gestures';
 
 const STYLE_ID = 'valley-welcome-style';
 const STYLE = `
-/* U-01 · la misma piel que el resto: el parte del letargo es una página de la
-   crónica puesta al día, no un cuadro de diálogo. */
-.welcome-scrim { position: fixed; inset: 0; z-index: 11; display: flex; align-items: flex-end;
-  background: var(--night, #1a1511); color: var(--parchment, #f2e9d8);
-  font: 14px/1.45 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
+/* VZ-04a · **El parte se viste como lo que su propio comentario dice que es:
+   una página de la crónica puesta al día.**
+
+   Hasta esta ronda era un velo de noche a pantalla entera con las tipografías
+   de U-01 —la noche, la voz, la llana— y ni una clase de la piel. Lo dijo
+   el dueño del diseño mirando la crónica: «los fondos que hay detrás de los
+   textos, usa siempre el mismo; el de la crónica es el bueno». Esta pantalla y
+   el epitafio eran las dos que seguían sin vestir.
+
+   El reparto es el del documento sellado de la encrucijada (UI-V5c), y por el
+   mismo motivo: el valle **atenuado y no tapado** (§11.2), la página subiendo
+   desde abajo con una franja de fusión **hermana y no un fondo suyo** —el
+   degradado y el color opaco en el mismo elemento se pisan y dejan una banda
+   de pergamino vacía—, y el contenido en la columna de 390 px de la directriz
+   (\`piel-del-valle\` §1). */
+.welcome-scrim { position: fixed; inset: 0; z-index: 11; display: flex;
+  flex-direction: column; justify-content: flex-end;
+  background: rgba(27, 22, 19, .18);
+  color: var(--skin-ink); font-family: var(--skin-font-read); font-size: 15px; }
+.welcome-fade { flex: 0 0 64px;
+  background: linear-gradient(to bottom, transparent 0, var(--skin-page) 100%); }
 .welcome { box-sizing: border-box; width: 100%; max-height: 100%; overflow: auto;
-  padding: max(20px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom)); }
-.welcome h1 { margin: 0 0 14px; padding-top: 13px; text-wrap: balance;
-  border-top: 2px solid var(--gild-lit, #c9ab6b); color: var(--parchment, #f2e9d8);
-  font: 600 21px/1.18 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-.welcome p { margin: 7px 0; color: var(--paper-dim, #d9cfbc); text-wrap: pretty;
-  font: 15px/1.5 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-.welcome p.welcome-headline { color: var(--parchment, #f2e9d8); font-weight: 600; }
-/* Las cifras no son crónica: van en la letra llana y separadas por un filete. */
-.welcome p.welcome-count { margin-top: 16px; padding-top: 12px;
-  border-top: 1px solid rgba(201,171,107,.3); color: var(--gild-lit, #c9ab6b);
-  font: 13px/1.45 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
-  font-variant-numeric: tabular-nums; }
+  padding: 0 20px max(24px, env(safe-area-inset-bottom));
+  background-color: var(--skin-page);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px;
+  background-blend-mode: multiply; }
+/* La directriz: la superficie cruza la pantalla, el contenido va en columna. */
+.welcome > * { box-sizing: border-box; width: 100%; max-width: 390px; margin-inline: auto; }
+.welcome h1 { margin: 0 0 16px; padding-top: 4px; text-wrap: balance;
+  color: var(--skin-ink); font: 600 20px/1.2 var(--skin-font-voice);
+  letter-spacing: var(--skin-track-inscription); text-transform: uppercase; }
+.welcome p { margin: 10px auto; color: var(--skin-ink-soft); text-wrap: pretty;
+  font: 17px/1.5 var(--skin-font-read); }
+.welcome p.welcome-headline { color: var(--skin-ink); }
+/* Las cifras no son crónica: van en la letra de las cifras y tras un filete,
+   igual que en la ficha de la persona. */
+.welcome p.welcome-count { margin-top: 18px; padding-top: 12px;
+  border-top: 1px solid var(--skin-rule-gold); color: var(--skin-ink-faded);
+  font: 13px/1.45 var(--skin-font-voice); font-variant-numeric: tabular-nums; }
 .welcome p.welcome-count ~ p.welcome-count { margin-top: 2px; padding-top: 0; border-top: 0; }
 `;
 
@@ -91,8 +113,12 @@ export function openWelcome(app: App, digest: Digest): void {
 
   const scrim = document.createElement('div');
   scrim.className = 'welcome-scrim';
+  // Hermana de la página y no un fondo suyo: ver el comentario de la hoja.
+  const fade = document.createElement('div');
+  fade.className = 'welcome-fade';
+  fade.setAttribute('aria-hidden', 'true');
   const card = document.createElement('section');
-  card.className = 'welcome';
+  card.className = 'welcome skin-paper skin-paper--page';
   const h1 = document.createElement('h1');
   h1.textContent = renderUiText('welcome.title');
 
@@ -107,9 +133,16 @@ export function openWelcome(app: App, digest: Digest): void {
   });
 
   card.append(h1, ...paragraphs);
-  scrim.append(card);
+  scrim.append(fade, card);
 
-  const close = (): void => { scrim.remove(); shown = null; };
+  // Como las otras tres superposiciones: la raíz lleva la marca mientras el
+  // parte está abierto, y con ella la bandeja se aparta (`shell.css`).
+  document.documentElement.classList.add('welcome-open');
+  const close = (): void => {
+    scrim.remove();
+    document.documentElement.classList.remove('welcome-open');
+    shown = null;
+  };
   const trace: Point[] = [];
   scrim.addEventListener('pointerdown', (event) => {
     trace.length = 0;

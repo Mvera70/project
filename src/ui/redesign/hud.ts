@@ -29,7 +29,7 @@
 // carcasa, los tokens y la navegación ya existían, pero la cabecera seguía
 // siendo DOM suelto dentro de `boot()`, sin nombre propio ni frontera. Aquí
 // vive **sobre datos reales** — nunca un literal reconstruido — y sólo lee:
-// `vitalsOf`/`trendsOf` (`../vitals.ts`), `doingNow` (`../doing.ts`),
+// `vitalsOf`/`trendsOf` (`../vitals.ts`),
 // `stopOf`/`INTENT_STOPS` (`@engine/state`, para la frase-resumen de las
 // órdenes) y `TIME.SPEEDS`/`speedLabel` (`../speed.ts`) para la velocidad.
 // Ninguno de esos módulos se toca: siguen puros y ajenos al DOM.
@@ -57,7 +57,6 @@ import { stopOf } from '@engine/state';
 import { seasonOf } from '@engine/time';
 import { valleyClock } from '@derive/clock';
 import { hourAt } from '../../render3d/effects/day-phases';
-import { doingNow } from '../doing';
 import { speedLabel, type Speed } from '../speed';
 import { TREND_WEEKS, trendsOf, vitalsOf, type Vitals } from '../vitals';
 import type { SheetRoute, UiActions } from './contracts';
@@ -356,13 +355,12 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   const wood = vital('logs');
   const spirits = vital('face');
 
-  const doing = document.createElement('p');
-  // UI-V2b · `hud-say-line` deshace el posicionamiento absoluto que U-01 le
-  // puso en `index.html` (arriba a la izquierda, flotando sobre el prado) y la
-  // deja en flujo, centrada, dentro de la bandeja. **Con esto se retira el
-  // parche de altura de UI-V1** (`hud-doing-line`), que sólo existía para que
-  // la frase no pisara la fila de chips nueva mientras seguía arriba.
-  doing.className = 'valley-doing hud-say-line';
+  // VZ-02 · **la frase de actividad ya no vive aquí.** Era una de las cuatro
+  // voces del valle y ahora las cuatro se leen en un solo hueco, el de la
+  // bandeja (`shell.ts`, `voice.ts`): `app.ts` ofrece `doingNow` a la cola con
+  // papel `state` y la cola decide si se lee. La cabecera se queda con lo que
+  // es instrumento —fecha, arco del sol, cifras— y con la línea de órdenes,
+  // que no es una voz sino el verbo del juego.
 
   /**
    * La línea que resume las órdenes, y la puerta de la hoja (`orders.ts`).
@@ -391,7 +389,7 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   // reparte el prototipo.
   const say = document.createElement('div');
   say.className = 'hud-say';
-  say.append(doing, ordersNow);
+  say.append(ordersNow);
 
   const header = document.createElement('div');
   header.className = 'ui-hud-header';
@@ -527,13 +525,6 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     paintVital(spirits, String(now.morale), changed('morale'), trends.morale,
       renderUiText('app.vitals.morale', { value: now.morale }), false);
     lastVitals = now;
-
-    // La línea de estado. Se recalcula en cada pintado porque `doingNow` es
-    // pura y barata —lee el estado y no consume nada— y porque la obra en
-    // marcha cambia a mitad de semana cuando se termina algo.
-    const said = doingNow(state);
-    doing.textContent = said === null ? '' : renderUiText(said.key, said.params);
-    doing.hidden = said === null;
 
     // Y el resumen de las tres órdenes, con `stopOf` — nunca redondeando el
     // valor a mano: es la misma función que usa `orders.ts` para pintar los

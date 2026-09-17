@@ -25,7 +25,7 @@ import { createHud } from './redesign/hud';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { ordersPanel } from './redesign/orders';
 import { peoplePanel } from './redesign/people-panel';
-import { createShell, resolveMessageSlot } from './redesign/shell';
+import { createShell } from './redesign/shell';
 import type { SheetRoute, UiActions, UiPanel, UiSnapshot } from './redesign/contracts';
 import { seasonOf, yearOf } from '@engine/time';
 import { attachBackend, backendFrom, type BackendHandle } from './backend';
@@ -34,14 +34,23 @@ import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
 import { milestonesAt } from './milestones';
-import { mountMoments } from './moment';
-import { mountNotices } from './notice';
+import { doingNow } from './doing';
+import { noticeText } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
-import { closeCrossroad, openCrossroad } from './screens/crossroad';
+import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
 import { accentFor, ambientFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
+import {
+  SILENT,
+  dismissHint,
+  expire,
+  offerUnlessMuted,
+  speaking,
+  type Utterance,
+  type VoiceRole,
+} from './voice';
 
 export interface App {
   setSpeed(speed: Speed): void;
@@ -166,12 +175,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   canvas.id = 'valley';
   canvas.setAttribute('aria-label', renderUiText('app.valley'));
 
-  // U-11 · la pista del inicio guiado, bajo la línea de órdenes. Oculta salvo
-  // la primera vez, y se toca para pasar.
-  const hint = document.createElement('button');
-  hint.type = 'button';
-  hint.className = 'valley-hint';
-  hint.hidden = true;
+  // VZ-02 · la pista del inicio guiado (U-11) ya no tiene elemento propio: es
+  // una voz más, con papel `hint`, y se lee en el hueco de la bandeja como las
+  // otras tres. `advanceHint` lo rellena el bloque del inicio guiado, más
+  // abajo, y es lo que el toque sobre el hueco llama cuando la pista es lo que
+  // se está leyendo.
+  let advanceHint: (() => void) | null = null;
 
   /**
    * **UI-R1 · la carcasa, y el único propietario del estado de navegación.**
@@ -270,12 +279,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // ahora y una sola vez: un roce repetido cada semana deja de ser una
       // respuesta y se convierte en una regañina.
       const said = answerFor(state);
-      if (said !== null) {
-        notices.show(state, [{
-          tick: state.tick, kind: 'season', templateKey: said.key,
-          params: said.params, weight: 2,
-        }]);
-      }
+      if (said !== null) say('event', renderUiText(said.key, said.params));
       // Y se guarda, porque es una decisión del jugador: al volver dos días
       // después la aldea tiene que seguir haciendo lo que se le dijo.
       persist();
@@ -360,56 +364,62 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // UI-R5 · el rodeo que UI-R4 necesitaba aquí (leer `.ui-shell-content` a
   // mano para destapar la bandeja de 'people') se retiró: `contentRouteFor`
   // ya sabe de esa ruta (ver `navigate`, arriba, y `redesign/shell.ts`).
-  // §11.6: the band that says what just happened, over the valley itself.
-  const notices = mountNotices(messageSlot);
-  const noticeBand = messageSlot.querySelector<HTMLElement>('.valley-notice');
-  if (noticeBand === null) throw new Error('UI-R1 · notice.ts no montó su banda donde se esperaba');
-  // UI-V2b · **la voz de la aldea baja a la bandeja.** La frase de actividad y
-  // la línea de órdenes vivían flotando sobre el prado arriba a la izquierda,
-  // con un parche de altura para no pisar la fila de chips; el prototipo 01 las
-  // pone centradas en la bandeja, bajo la hoja de roble. Se colocan aquí, en la
-  // misma ranura y por el mismo motivo que la pista de arriba: `hud.ts` escribe
-  // su propio DOM y no conoce la carcasa, y esta capa es la que sabe de las dos.
+  //
+  // UI-V2b · la línea de órdenes va en la bandeja, bajo la voz: `hud.ts`
+  // escribe su propio DOM y no conoce la carcasa, y esta capa sabe de las dos.
   messageSlot.append(hud.say);
-  // UI-V10 · **la pista va detrás de la línea de órdenes, porque dice «the
-  // line above».** Se montaba antes que la voz de la aldea, de cuando flotaba
-  // suelta sobre el prado y el orden del DOM no era el orden de la pantalla.
-  // En la bandeja sí lo es, así que la frase del banco señalaba al ornamento
-  // en vez de a las órdenes. No se toca el texto —sale de `bank.en.ts`—: se
-  // coloca donde el texto ya dice que está.
-  messageSlot.append(hint);
-  let hintWantsToShow = false;
-  const updateHintVisibility = (): void => {
-    hint.hidden = !resolveMessageSlot(!noticeBand.hidden, hintWantsToShow).hintVisible;
+
+  /**
+   * VZ-02 · **el valle habla por un solo sitio, y la cola decide qué dice.**
+   *
+   * Lo que había aquí hasta esta ronda: el aviso de `notice.ts` con su banda y
+   * su temporizador, la pista del inicio guiado con el suyo,
+   * `resolveMessageSlot` arbitrando entre esos dos, un `MutationObserver`
+   * espiando el atributo `hidden` del aviso para saber cuándo la pista podía
+   * volver, y la cartela de hito flotando aparte con un tercer temporizador.
+   * Cuatro emisores, tres relojes y dos arbitrajes que no se conocían entre sí.
+   *
+   * Ahora hay un estado (`voice.ts`, puro) y dos funciones: `say` ofrece,
+   * `paint` lee. La prioridad —hito, suceso, pista, estado— y las caducidades
+   * están en un módulo que una prueba recorre sin DOM, y el observador de
+   * mutaciones sobra: nadie tiene que espiar a nadie porque ya no hay dos
+   * dueños del mismo hueco.
+   */
+  let voice = SILENT;
+  /**
+   * Si estamos recuperando una ausencia (§13.2). Vive aquí arriba y no junto al
+   * letargo porque `say` la lee, y `say` se llama ya en el arranque —la frase de
+   * la fundación es un hito— así que declararla más abajo la dejaba en la zona
+   * muerta temporal: el juego arrancaba con «Cannot access before
+   * initialization» y el hueco de la voz se quedaba vacío. Lo cazó la primera
+   * captura de esta ronda, que es para lo que están.
+   */
+  let catchingUp = false;
+  const say = (role: VoiceRole, text: string | null): void => {
+    if (text === null || text === '') return;
+    const utterance: Utterance = { role, text, saidAtMs: Date.now() };
+    // Durante un letargo el valle no cuenta lo que pasa (§11.6): esa ausencia
+    // la cuenta el parte de bienvenida de §9.2.
+    voice = offerUnlessMuted(voice, utterance, catchingUp);
   };
-  // **Se observa sólo la banda del aviso, nunca `messageSlot` entero con
-  // `subtree: true`.** La primera versión de esta ronda sí lo hacía, y era un
-  // fallo real y no una hipótesis: `updateHintVisibility` escribe
-  // `hint.hidden`, y como `hint` es descendiente del contenedor observado,
-  // esa misma escritura vuelve a encolar una mutación —`setAttribute` encola
-  // un registro aunque el valor no cambie— y el observador se vuelve a
-  // llamar a sí mismo. En microtareas, no en la misma pila, así que no lanza
-  // ni un error: solo mantiene el hilo principal ocupado para siempre. Se
-  // reprodujo con el juego de verdad (`tools/graphics/shot.mjs`, tres veces
-  // seguidas): el clic de «Found a new valley» no volvía nunca y la pestaña
-  // acababa cayéndose («Target crashed») unos noventa segundos después.
-  // Observando sólo `noticeBand` —que `hint` no toca— el bucle es imposible.
-  new MutationObserver(updateHintVisibility)
-    .observe(noticeBand, { attributes: true, attributeFilter: ['hidden'] });
-  // U-02 · y la cartela de lo que pasa una vez, que es otra cosa.
+
+  /**
+   * La pista del inicio guiado se toca en el propio hueco de la voz.
+   *
+   * Era un `<button>` propio; ahora el hueco es un párrafo y el toque sólo
+   * cuenta cuando lo que se está leyendo **es** la pista, que es lo que
+   * `data-role` dice. Así el mismo elemento sirve para las cuatro voces sin
+   * que ninguna herede la afordancia de otra.
+   */
+  shell.voice.addEventListener('click', () => {
+    if (shell.voice.dataset.role !== 'hint') return;
+    voice = dismissHint(voice);
+    advanceHint?.();
+  });
+
   // Desde qué tick se buscan hitos. Arranca donde arranca la partida, así que
   // una partida cargada no vuelve a celebrar lo que ya celebró.
   let lastMilestoneTick = state.tick;
-  /**
-   * La cartela, y **sólo para el arranque**.
-   *
-   * U-02 la puso para los hitos y U-04 la reusó para la frase de la fundación.
-   * El dueño del diseño juzgó los hitos al probar la demo —«esto no aporta
-   * nada, mejorar o quitar»— y la cartela no era el problema: usarla cada vez
-   * que la aldea levanta su primera cualquier-cosa, sí. Una frase de apertura
-   * que se dice una vez por partida es otra cosa que una interrupción semanal.
-   */
-  const moments = mountMoments(root);
 
   // U-04 · Lo primero que ve quien empieza, y lo único que el juego dice sin
   // que se lo pidan. **No es un tutorial**: es la misma cartela de los hitos
@@ -425,20 +435,22 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // (U-11) lo lee más abajo.
   const fresh = state.tick === 0 && state.history.length === 0;
   if (fresh) {
-    moments.show(
-      renderUiText('founding.label'),
-      renderEntry(
-        {
-          tick: 0,
-          kind: 'season',
-          templateKey: 'founding.settled',
-          params: { people: vitalsOf(state).people, year: yearOf(state.tick), season: seasonOf(state.tick) },
-          weight: 3,
-        },
-        state.rng,
-      ),
-      true,
-    );
+    // VZ-02 · la frase de apertura es un **hito**: se dice una vez por partida
+    // y la hoja de roble se pone en oro mientras se lee. Antes era una cartela
+    // de pergamino flotando sobre el valle con sus motas de latón, que es la
+    // pieza que el dueño del diseño juzgó «una chapuza» al verla en la tablet.
+    // La etiqueta `founding.label` se retira: el papel de la voz ya dice que
+    // esto es un hito, y un rótulo encima era decir dos veces lo mismo.
+    say('milestone', renderEntry(
+      {
+        tick: 0,
+        kind: 'season',
+        templateKey: 'founding.settled',
+        params: { people: vitalsOf(state).people, year: yearOf(state.tick), season: seasonOf(state.tick) },
+        weight: 3,
+      },
+      state.rng,
+    ));
     // E5 · y qué valle es éste, que es lo que hace que un rasgo sea una historia
     // y no un modificador oculto: el jugador tiene que saber dónde está para que
     // su postura sea una decisión y no una apuesta. Va en el aviso y no en la
@@ -448,9 +460,10 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // seguidos sólo enseñaría el segundo: el aviso no tiene cola.
     const [first] = state.traits;
     if (first !== undefined) {
-      notices.show(state, [{
-        tick: 0, kind: 'founding', templateKey: `valley.${first}`, params: {}, weight: 2,
-      }]);
+      say('event', renderEntry(
+        { tick: 0, kind: 'founding', templateKey: `valley.${first}`, params: {}, weight: 2 },
+        state.rng,
+      ));
     }
   }
 
@@ -516,22 +529,20 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     let at = 0;
     const showStep = (): void => {
       if (at >= steps.length) {
-        hintWantsToShow = false;
-        updateHintVisibility();
         document.documentElement.dataset.intro = 'done';
         try { localStorage.setItem(GUIDED_KEY, 'done'); } catch { /* idem */ }
         return;
       }
-      hint.textContent = renderUiText(steps[at] as string);
-      // UI-R1 · `hintWantsToShow` es lo que el paso pide; `updateHintVisibility`
-      // decide si de verdad se ve, cediendo el hueco al aviso si éste lo ocupa
-      // (`resolveMessageSlot`). El paso no se marca visto por ceder: sigue en
-      // `at` hasta que el jugador lo toque.
-      hintWantsToShow = true;
-      updateHintVisibility();
+      // VZ-02 · la pista es una voz con papel `hint`: pegajosa hasta que se
+      // toca, y si un suceso o un hito coinciden con ella, la cola los lee
+      // primero y la pista **vuelve sola sin marcarse vista** (esa era la regla
+      // de UI-R1 y sigue siendo la misma, ahora dentro de `voice.ts`).
+      say('hint', renderUiText(steps[at] as string));
       document.documentElement.dataset.intro = 'hints';
     };
-    hint.addEventListener('click', () => { at += 1; showStep(); });
+    // Tocar el hueco mientras se lee la pista avanza al paso siguiente: el
+    // manejador del hueco llama a esto (ver `shell.voice` arriba).
+    advanceHint = (): void => { at += 1; showStep(); };
     scheduleHint = (afterMs: number): void => {
       if (hintTimer !== null) window.clearTimeout(hintTimer);
       hintTimer = window.setTimeout(showStep, afterMs);
@@ -541,6 +552,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const renderer = { paint: (s2: GameState, f: number): void => backend.live.paint(s2, f, speed),
     track: (id: number | null): void => { backend.live.track(id); } };
   let lastBolts = 0;
+  // Lo último que se ofreció como fondo, para no ofrecer lo mismo cada fotograma.
+  let spokenState: string | null = null;
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
@@ -606,6 +619,30 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // único sitio (`actions.navigate`): antes de esta ronda había que releer
     // el DOM de la crónica en cada fotograma porque ese adaptador no avisaba
     // a la barra por su cuenta (`screens/chronicle.ts` no se toca).
+    /**
+     * VZ-02 · **la voz se lee aquí, y esto sustituye a tres temporizadores.**
+     *
+     * `expire` retira lo transitorio comparando contra `saidAtMs`, así que un
+     * salto del reloj del juego —o una pestaña que vuelve de estar oculta— no
+     * deja nada a medias: la frase está o no está, que es lo que §11.4 pide.
+     * Un `setTimeout` sí se queda a medias, y había tres.
+     *
+     * El fondo (`doing.ts`) se ofrece sólo cuando cambia de texto, y el DOM se
+     * escribe sólo cuando cambia lo que se lee: esto corre a 60 fps.
+     */
+    const doing = doingNow(state);
+    const doingText = doing === null ? null : renderUiText(doing.key, doing.params);
+    if (doingText !== null && doingText !== spokenState) say('state', doingText);
+    spokenState = doingText;
+    const nowMs = Date.now();
+    voice = expire(voice, nowMs);
+    const now = speaking(voice, nowMs);
+    const text = now?.text ?? '';
+    if (text !== shell.voiceLine.textContent) shell.voiceLine.textContent = text;
+    // `data-role` es lo que la hoja de estilo lee para el acento del hito (la
+    // hoja de roble en oro) y lo que el manejador del toque mira para saber si
+    // lo que se está leyendo es la pista. Nadie toca una clase desde aquí.
+    shell.voice.dataset.role = now?.role ?? '';
     renderer.paint(state, fraction);
     // §11.2's third screen opens itself the moment there is something to
     // answer — including the very first paint, for a save or a debug
@@ -628,8 +665,20 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // Volver al valle es lo mismo que ya hace deslizar hacia abajo para
     // aplazarla (S-05, U-14): la decisión se queda pendiente, no se pierde.
     if (state.crossroad !== null && state.ended === null) {
-      if (currentRoute.kind !== 'valley') navigate({ kind: 'valley' });
-      openCrossroad(app, state.crossroad);
+      const pending = state.crossroad;
+      // VZ-03 · si el jugador la aplazó, **la marca es el sello del ornamento**
+      // y no se le vuelve a plantear hasta que lo toque (§8.6: espera, no
+      // caduca). Antes esto era una píldora `position: fixed`, la tercera pieza
+      // que flotaba sobre el valle.
+      if (isDeferred(pending)) {
+        shell.setOrnament('seal', () => { openDeferred(app, pending); });
+      } else {
+        shell.setOrnament('leaf');
+        if (currentRoute.kind !== 'valley') navigate({ kind: 'valley' });
+        openCrossroad(app, pending);
+      }
+    } else {
+      shell.setOrnament('leaf');
     }
   };
 
@@ -879,7 +928,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // valley simply froze — the promise "sigue sin ti" was false for the most
   // ordinary thing a player does. Hiding notes the hour; coming back owes it.
   let hiddenAtMs: number | null = null;
-  let catchingUp = false;
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { hiddenAtMs = Date.now(); persist(); return; }
     const since = hiddenAtMs;
@@ -904,8 +952,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const finish = (): void => {
     if (state.ended === null) return;
     loop?.stop();
-    notices.clear();
-    moments.clear();
+    // VZ-02 · el valle calla: aquí habla el epitafio (§13.3).
+    voice = SILENT;
     closeCrossroad();
     let game = archive.find((item) =>
       item.seed === state.seed && item.endedTick === state.ended?.tick);
@@ -942,7 +990,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // §11.6: what the chronicle would print in bold, where the player is
     // already looking. Not during a catch-up — nine hundred ticks of notices
     // is a backlog, and the welcome report of §9.2 is what tells that story.
-    if (!catchingUp) notices.show(state, report.entries);
+    say('event', noticeText(state, report.entries));
     // U-02 · Y lo que pasa una vez. **Después del aviso a propósito**: si en el
     // mismo tick la aldea levanta su primera capilla y además se quema un
     // cobertizo, lo que se queda en pantalla es la capilla, que es lo raro.
@@ -984,11 +1032,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
         // Y un hito de peso 1 ya no interrumpe: `noticeworthy` filtra por
         // debajo de 2, así que lo tranquilo se queda sólo en la crónica. Eso es
         // ganancia, no pérdida.
-        notices.show(state, [{
-          tick: best.tick, kind: 'season', templateKey: best.key,
-          params: best.params, weight: best.weight,
-        }]);
-        moments.clear();
+        say('milestone', renderEntry(
+          {
+            tick: best.tick, kind: 'season', templateKey: best.key,
+            params: best.params, weight: best.weight,
+          },
+          state.rng,
+        ));
       }
     }
     if (state.tick % TIME.SAVE_EVERY_TICKS === 0) persist();

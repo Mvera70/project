@@ -2695,6 +2695,36 @@ Reglas:
 - **Cede la pantalla.** La encrucijada y el epitafio la ocupan entera y el aviso
   se retira.
 
+**El valle habla desde un sitio** (VZ, 17 sep 2026, pedido por el dueño del
+diseño: «estos mensajes que salen por encima no cuadran con la interfaz; haz un
+plan para reestructurarlo»). Lo que acaba de pasar, lo que la aldea está
+haciendo, la pista del inicio y el hito se leen en **la bandeja**, bajo la hoja
+de roble, **una frase cada vez y por prioridad**: hito, suceso, pista, estado.
+Nada transitorio flota sobre el valle; sólo las superposiciones de §11.2 —la
+encrucijada y el epitafio— y el parte de §9.2 lo cubren, y las tres apartan la
+bandeja mientras están abiertas.
+
+Tres consecuencias que son norma y no implementación:
+
+- **El hueco de la voz mide siempre lo mismo** —dos líneas—, así que la bandeja
+  no cambia de alto y nada de lo que hay encima se recoloca nunca. Antes de esto
+  la bandeja crecía cuando la aldea tenía dos cosas que decir, y cada ronda de
+  interfaz volvía a ajustar a mano lo que se le montaba arriba: la cartela del
+  hito, la píldora de la decisión y los círculos de velocidad, tres piezas con
+  tres geometrías.
+- **No hay cola.** Un suceso nuevo sustituye al anterior y el anterior queda en
+  la crónica. Es la regla de `docs/visual-reference/README.md` §5 —«más de un
+  aviso: uno según prioridad, sin una cola interminable de cartelas»— y la que
+  hace imposible el teletipo que esta sección midió.
+- **La caducidad se mide contra el reloj de pared en cada pintado**, no con
+  temporizadores. Cumple §11.4 mejor que un `setTimeout`, que un salto del reloj
+  del juego deja a medias: una resta tiene estado definido en cada instante.
+
+Y un hito se distingue de un suceso corriente porque **la hoja de roble del
+ornamento se pone en oro** mientras habla, no porque interrumpa con una cartela
+propia. Una decisión aplazada se coge por el **sello de lacre**, que ocupa el
+sitio de la hoja mientras espera (§8.6: no caduca).
+
 Esto es lo mínimo honesto y **no es el vocabulario visual definitivo**: qué
 dibujo merece una muerte, una cosecha perdida o un asalto pertenece al trabajo
 de arte, y llegará con él. Lo que esta sección fija es que el valle tiene que

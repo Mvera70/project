@@ -79,6 +79,26 @@ export type PanelFactory = (actions: UiActions) => UiPanel;
 export interface ShellHandle {
   element: HTMLElement;
   content: HTMLElement;
+  /**
+   * VZ-02 · **el único sitio desde el que habla el valle.** Un párrafo bajo el
+   * ornamento de la bandeja, de altura fija: lo que acaba de pasar, lo que la
+   * aldea está haciendo, la pista del inicio y el hito se leen aquí, una frase
+   * cada vez y por prioridad (`voice.ts`). Antes había cuatro emisores con tres
+   * geometrías, y tres de ellos flotaban sobre el valle.
+   */
+  voice: HTMLElement;
+  /**
+   * Donde se escribe la frase. `voice` es la caja que centra y lleva el
+   * `data-role`; ésta es el texto, y el `›` de la pista sale de ella para que
+   * quede tras la última palabra y no flotando al lado.
+   */
+  voiceLine: HTMLElement;
+  /**
+   * VZ-03 · qué hay en el ornamento: la hoja de roble de siempre, o el sello de
+   * lacre cuando hay una decisión aplazada. `onTap` sólo se usa con el sello, y
+   * es lo que abre el documento; con la hoja el ornamento no se toca.
+   */
+  setOrnament(kind: 'leaf' | 'seal', onTap?: () => void): void;
   setRoute(route: SheetRoute): void;
   dispose(): void;
 }

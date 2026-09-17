@@ -8,7 +8,7 @@
 
 import { CATALOG } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
-import { renderEntry, renderUiText } from '@engine/chronicle/render';
+import { renderEntry } from '@engine/chronicle/render';
 import type { GameState, PendingCrossroad } from '@engine/state';
 import type { TickReport } from '@engine/sim';
 import { yearOf } from '@engine/time';
@@ -107,22 +107,6 @@ const STYLE = `
    con el sello la píldora pasó de 150 a 199 px de ancho: medido, choca con la
    placa de fecha, que ocupa de x 27 a x 361. La tira de cifras acaba en y 90,
    así que 92 la deja justo debajo, sobre el valle y sin tapar nada. */
-.crossroad-marker { position: fixed; z-index: 9;
-  top: calc(max(9px, env(safe-area-inset-top)) + 92px);
-  right: max(12px, env(safe-area-inset-right)); display: flex; align-items: center; gap: 8px;
-  min-height: 44px; padding: 0 14px; border: 0; border-radius: 0; cursor: pointer;
-  background-color: var(--skin-parchment);
-  background-image: var(--skin-parchment-texture);
-  background-repeat: repeat; background-size: 256px 256px;
-  background-blend-mode: multiply;
-  clip-path: var(--skin-deckle-chip-b);
-  color: var(--skin-red-ink); font: 600 12px/1 var(--skin-font-voice);
-  letter-spacing: var(--skin-track-label); text-transform: uppercase;
-  box-shadow: var(--skin-shadow); -webkit-tap-highlight-color: transparent; }
-.crossroad-marker .skin-seal { width: 26px; height: 26px; flex: 0 0 26px; }
-.crossroad-marker .skin-seal .skin-icon { width: 15px; height: 15px; }
-.crossroad-marker:active { background-color: var(--skin-parchment-deep); transform: translateY(1px); }
-.crossroad-marker:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 /* **La pantalla entera es de la decisión** (§11.2), y eso incluye la cabecera.
    Se vio en una captura: la tira, las tres palancas y la línea de estado se
    leían a través de la encrucijada, y ahí arriba no hay nada que hacer mientras
@@ -144,7 +128,7 @@ const STYLE = `
 .crossroad-open .valley-orders-now,
 .crossroad-open .valley-orders,
 .crossroad-open .valley-vitals,
-.crossroad-open .valley-doing,
+.crossroad-open .valley-voice,
 .crossroad-open .valley-time,
 .crossroad-open .valley-date { visibility: hidden; }
 `;
@@ -191,6 +175,27 @@ function focus(state: GameState, report: TickReport): void {
 
 interface Shown { key: string; overlay: HTMLElement | null; marker: HTMLElement | null }
 let shown: Shown | null = null;
+/**
+ * VZ-03 · qué decisión ha aplazado el jugador deslizando hacia abajo.
+ *
+ * Existe porque la marca de una decisión aplazada dejó de ser una píldora de
+ * este módulo y pasó a ser el sello del ornamento de la bandeja, que es de la
+ * carcasa. `app.ts` pregunta en cada pintado y pone el sello o la hoja; aquí
+ * sólo se recuerda, que es lo único que este módulo sabe.
+ */
+let deferred: string | null = null;
+
+/** Si la decisión que hay planteada está aplazada (§8.6: no caduca, espera). */
+export function isDeferred(p: PendingCrossroad): boolean {
+  return deferred === key(p);
+}
+
+/** Abrir la decisión aplazada: es lo que hace el sello del ornamento. */
+export function openDeferred(app: App, p: PendingCrossroad): void {
+  deferred = null;
+  removeShown();
+  mountOverlay(app, p);
+}
 
 function key(p: PendingCrossroad): string {
   return `${p.templateId}:${p.posedTick}`;
@@ -206,32 +211,7 @@ function removeShown(): void {
 export function closeCrossroad(): void {
   removeShown();
   shown = null;
-}
-
-function mountMarker(app: App, p: PendingCrossroad): void {
-  const marker = document.createElement('button');
-  marker.type = 'button';
-  marker.className = 'crossroad-marker';
-  // The visible label and the screen-reader label answer different questions
-  // — the pill's own text is the affordance ("what is this"), the aria-label
-  // is the summons ("a crossroad is waiting") that already had its wording
-  // and was not to change.
-  marker.setAttribute('aria-label', renderUiText('crossroad.waiting'));
-  // UI-V5c · la píldora lleva el sello, para que se lea como el documento que
-  // espera y no como un aviso de sistema.
-  const markerSeal = document.createElement('div');
-  markerSeal.className = 'skin-seal';
-  markerSeal.setAttribute('aria-hidden', 'true');
-  markerSeal.innerHTML = '<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#seal-tree"/></svg>';
-  const text = document.createElement('span');
-  text.textContent = renderUiText('crossroad.pending_pill');
-  marker.append(markerSeal, text);
-  marker.addEventListener('click', () => {
-    marker.remove();
-    mountOverlay(app, p);
-  });
-  document.body.append(marker);
-  shown = { key: key(p), overlay: null, marker };
+  deferred = null;
 }
 
 function mountOverlay(app: App, p: PendingCrossroad): void {
@@ -319,7 +299,12 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
     if (recogniseGesture({ points: trace }) === 'swipe_down') {
       scrim.remove();
       document.documentElement.classList.remove('crossroad-open');
-      mountMarker(app, p);
+      // VZ-03 · la decisión queda pendiente y **la marca es el sello de lacre
+      // en el ornamento de la bandeja**, no una píldora flotante a 92 px del
+      // techo. Quien sabe del ornamento es `app.ts` (tiene la carcasa), así que
+      // aquí sólo se anota que esta decisión está aplazada y `paint` lo lee.
+      deferred = key(p);
+      shown = { key: key(p), overlay: null, marker: null };
     }
   });
 
@@ -335,6 +320,9 @@ function mountOverlay(app: App, p: PendingCrossroad): void {
  */
 export function openCrossroad(app: App, p: PendingCrossroad): void {
   if (shown !== null && shown.key === key(p)) return;
+  // Aplazada es aplazada: §8.6 dice que espera, y reabrirla cada tick sería
+  // quitarle al jugador el gesto que acaba de hacer.
+  if (deferred === key(p)) return;
   removeShown();
   mountOverlay(app, p);
 }

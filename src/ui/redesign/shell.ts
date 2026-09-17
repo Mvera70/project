@@ -9,14 +9,12 @@
 // cambia la ruta activa, y es pura respecto al DOM que no le pertenece — no
 // toca el lienzo, no toca el estado del motor, no consume azar.
 //
-// **La pila del mensaje**, y es el fallo concreto que esta ronda tiene que
-// dejar imposible (`docs/life-rounds/evidencia-capturas.md` §3): el aviso de
-// la crónica (`notice.ts`) y la pista del inicio guiado competían por la
-// misma franja con dos offsets fijos y distintos, y en cuanto la pista crecía
-// a dos líneas se pisaban. `docs/visual-reference/README.md` §5 da la
-// geometría —una sola pila de abajo arriba, y cuando dos mensajes coinciden
-// uno cede el sitio y vuelve— y `resolveMessageSlot` es esa regla hecha
-// función pura, para el único caso que hoy tiene dos emisores reales.
+// **La pila del mensaje**, y desde VZ-02 con un solo dueño: el hueco de la voz
+// (`voice` en el handle) es lo único que habla, y qué dice lo decide la cola de
+// `../voice.ts`. Antes de eso había cuatro emisores con dos arbitrajes que no
+// se conocían, y el fallo que UI-R1 arregló —el aviso y la pista pisándose con
+// dos offsets fijos, `docs/life-rounds/evidencia-capturas.md` §3— podía volver
+// por cualquiera de los otros dos caminos.
 //
 // **UI-V2 · la piel de la bandeja y la navegación** (`docs/ui-redesign/piel/
 // plan-piel.md` §3.4). Los tres iconos de la barra ya no son los trazos de
@@ -104,21 +102,15 @@ export function navSkinFor(route: SheetRoute): NavSkin {
 }
 
 /**
- * La pila del mensaje (visual-reference §5, tabla de coincidencias, primera
- * fila): el aviso de la crónica **cuenta algo que acaba de pasar** y tiene
- * prioridad; la pista del inicio guiado espera **sin marcarse como vista** —
- * quien la mira no ha avanzado su paso, sólo se le ha tapado un instante— y
- * vuelve sola en cuanto el aviso se retira. Pura a propósito: es la regla que
- * hace imposible el pisado de `evidencia-capturas.md` §3, y una prueba puede
- * comprobarla sin montar ni un elemento.
+ * VZ-02 · **`resolveMessageSlot` se retira, y con ella el arbitraje a dos.**
+ *
+ * Era la regla de visual-reference §5 hecha función pura, y valía: el aviso
+ * gana, la pista cede sin marcarse vista y vuelve sola. Lo que no valía era su
+ * alcance —sólo sabía de dos voces de las cuatro que había— ni el rodeo que
+ * `app.ts` necesitaba para usarla: un `MutationObserver` espiando el atributo
+ * `hidden` del aviso. Las cuatro voces, sus prioridades y sus caducidades viven
+ * ahora en `../voice.ts`, con la misma pureza y sin nadie espiando a nadie.
  */
-export interface MessageSlotState {
-  readonly noticeVisible: boolean;
-  readonly hintVisible: boolean;
-}
-export function resolveMessageSlot(noticeWantsToShow: boolean, hintWantsToShow: boolean): MessageSlotState {
-  return { noticeVisible: noticeWantsToShow, hintVisible: hintWantsToShow && !noticeWantsToShow };
-}
 
 /** Qué símbolo del sprite lleva cada pestaña. Los ids son los de `icons.svg`. */
 const NAV_TAB_ICON: Record<NavTab, string> = {
@@ -127,6 +119,7 @@ const NAV_TAB_ICON: Record<NavTab, string> = {
   people: 'people',
 };
 const OAK_LEAF = 'oak-leaf';
+const SEAL_TREE = 'seal-tree';
 
 /**
  * Un icono del sprite del documento. `id`, no trazos: ver la cabecera.
@@ -211,11 +204,65 @@ export function createShell(actions: UiActions): ShellHandle {
 
   const trayEdge = document.createElement('div');
   trayEdge.className = 'skin-scroll-edge';
-  const ornament = document.createElement('div');
+
+  /**
+   * VZ-03 · el ornamento tiene dos caras.
+   *
+   * La hoja de roble del prototipo 01 es lo normal, y no se toca: es decoración
+   * (`aria-hidden`). Con una decisión aplazada, el sello de lacre de UI-V5c
+   * ocupa su sitio y **el ornamento se vuelve el acceso a la decisión**. Antes
+   * eso era una píldora `position: fixed` a 92 px del techo, ajustada a mano en
+   * dos rondas; aquí no tiene geometría propia y está donde el jugador ya mira.
+   *
+   * Es un `<button>` siempre, con `disabled` cuando lleva la hoja: así el DOM no
+   * cambia de forma entre los dos estados y no hay dos árboles que mantener.
+   */
+  const ornament = document.createElement('button');
+  ornament.type = 'button';
   ornament.className = 'skin-ornament';
-  ornament.setAttribute('aria-hidden', 'true');
-  ornament.innerHTML = inlineIcon(OAK_LEAF);
-  message.append(trayEdge, ornament);
+  let ornamentTap: (() => void) | null = null;
+  ornament.addEventListener('click', () => { ornamentTap?.(); });
+  const setOrnament = (kind: 'leaf' | 'seal', onTap?: () => void): void => {
+    ornamentTap = kind === 'seal' ? onTap ?? null : null;
+    ornament.classList.toggle('skin-ornament--seal', kind === 'seal');
+    ornament.disabled = kind === 'leaf';
+    if (kind === 'seal') {
+      ornament.removeAttribute('aria-hidden');
+      ornament.setAttribute('aria-label', renderUiText('crossroad.waiting'));
+      ornament.innerHTML = `<span class="skin-seal" aria-hidden="true">${inlineIcon(SEAL_TREE)}</span>`;
+    } else {
+      ornament.setAttribute('aria-hidden', 'true');
+      ornament.removeAttribute('aria-label');
+      ornament.innerHTML = inlineIcon(OAK_LEAF);
+    }
+  };
+  setOrnament('leaf');
+
+  /**
+   * VZ-02 · el hueco de la voz: **un párrafo, y siempre el mismo alto.**
+   *
+   * `aria-live="polite"` porque es lo que era el aviso: algo que aparece sin
+   * que nadie lo haya pedido y que un lector de pantalla tiene que anunciar sin
+   * interrumpir. `data-role` dice qué voz habla, y con eso la hoja de estilo
+   * pone el acento del hito (la hoja de roble en oro) sin que nadie toque una
+   * clase desde JavaScript.
+   */
+  const voice = document.createElement('p');
+  voice.className = 'valley-voice';
+  voice.setAttribute('aria-live', 'polite');
+  /**
+   * La frase va en un hijo, y no es capricho: el párrafo **centra** (es una caja
+   * flex, para que una frase de una línea quede a media altura del hueco de dos)
+   * y en una caja flex un pseudo-elemento es **otro ítem**, no texto en línea.
+   * Con el `›` de la pista puesto en el párrafo salía flotando a la derecha, a
+   * media altura y separado de la última palabra. Dentro de esta línea, el `›`
+   * es lo que tiene que ser: el final de la frase.
+   */
+  const voiceLine = document.createElement('span');
+  voiceLine.className = 'valley-voice-line';
+  voice.append(voiceLine);
+
+  message.append(trayEdge, ornament, voice);
 
   const nav = document.createElement('nav');
   // `ui-shell-nav` sólo aporta ya el respiro del área segura (`shell.css`);
@@ -313,6 +360,9 @@ export function createShell(actions: UiActions): ShellHandle {
   return {
     element,
     content: contentBody,
+    voice,
+    voiceLine,
+    setOrnament,
     setRoute: paintRoute,
     // Los botones no llevan más que `addEventListener`: quitar `element` del
     // árbol basta para que dejen de recibir toques y para que el recolector

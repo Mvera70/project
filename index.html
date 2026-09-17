@@ -123,18 +123,10 @@
         opacity: .72; }
       .valley-trend:empty { display: none; }
 
-      /* **La línea de estado de la aldea** (`ui/doing.ts`): qué está haciendo,
-         bajo la tira. Sin placa y sin filete a propósito: no es un instrumento
-         que se toque, es una frase, así que va como va la línea de la estación
-         —tinta sobre el valle, con el relieve de pergamino detrás para que se
-         lea sobre el prado—. La serif de la crónica, porque es la voz de la
-         aldea y no una etiqueta de interfaz. */
-      .valley-doing { position: absolute; z-index: 2; left: 14px; margin: 0;
-        top: calc(max(7px, env(safe-area-inset-top)) + 62px);
-        max-width: min(72vw, 300px); color: var(--ink); text-wrap: pretty;
-        font: 13px/1.25 var(--voice); letter-spacing: .005em;
-        text-shadow: 0 1px 0 rgba(242,233,216,.65), 0 0 3px rgba(242,233,216,.5); }
-      .valley-doing:empty, .valley-doing[hidden] { display: none; }
+      /* VZ-02 · la piel de la frase de actividad se retira de aquí. Vivía
+         flotando arriba a la izquierda sobre el prado, con halo de pergamino
+         para leerse encima de la hierba; desde VZ-02 es una voz más y se lee
+         en el hueco de la bandeja (`.valley-voice`, `skin.css`). */
 
       /* E1 · **El mando**, y desde el 15 sep 2026 una hoja y no tres filas a la
          vista. Las tres filas de doce botones se comían el tercio de arriba de
@@ -232,18 +224,11 @@
          escondida por la encrucijada y el epitafio). Se retira de aquí y no se
          duplica: es justo lo que el plan pide («retirar del HTML sólo los
          estilos ya reemplazados»). */
-      /* U-11 · la pista del inicio guiado: latón sobre tinta, la voz del
-         juego, y se toca para pasar. **Su posición la fija UI-R1** en
-         `.ui-shell-message .valley-hint` (`shell.css`): antes vivía suelta en
-         `bottom: 82px` y se pisaba con el aviso de la crónica en cuanto
-         crecía a dos líneas (`docs/life-rounds/evidencia-capturas.md` §3).
-         Lo que queda aquí es sólo su piel — colores, tipografía, sombra —,
-         no su sitio en la pantalla. */
-      .valley-hint { padding: 10px 14px 10px 12px; border: 0; border-left: 3px solid var(--gild-lit);
-        border-radius: 0 10px 10px 0; background: var(--night); color: var(--parchment); text-align: left;
-        font: italic 15px/1.4 var(--voice); text-wrap: pretty; box-shadow: 0 6px 18px rgba(26,21,17,.35); }
-      .valley-hint::after { content: ' ›'; color: var(--gild-lit); font-style: normal; }
-      html.crossroad-open .valley-hint { visibility: hidden; }
+      /* VZ-02 · la piel de la pista del inicio guiado se retira de aquí.
+         Era un cartón de tinta de noche con filete de latón, de cuando la pista
+         flotaba sobre el prado desnudo (U-11); desde VZ-02 la pista es una voz
+         más y se lee en el hueco de la bandeja, en tinta sobre su papel
+         (`.valley-voice[data-role="hint"]`, `skin.css`). */
 
       /* §11.2 · la ficha. Sube del borde de abajo como una hoja, con un filete
          y no con el trazo de dos píxeles que tenía. */

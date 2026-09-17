@@ -181,6 +181,16 @@ de prueba, no la medida de todos los iPhone.
 | Más de un aviso | Uno según prioridad existente | Agrupar novedad en crónica, sin una cola interminable de cartelas |
 | Encrucijada/epitafio abiertos | La superposición completa | Ocultar y retirar de foco controles cubiertos; restaurar navegación al salir cuando proceda |
 
+**Cumplido en VZ (17 sep 2026), y esta tabla es la que lo describía.** La pila
+única existe: la bandeja enseña **una** frase de altura fija y quién habla lo
+decide una cola pura (`src/ui/voice.ts`) con la prioridad hito > suceso > pista
+> estado. Las cuatro filas de arriba se resuelven ahí, y la frase que esta
+sección escribió antes de que nadie la construyera —«no conservar una quinta
+cartela flotante sobre esta pila»— se cumplió retirando la cartela de hito
+entera (`src/ui/moment.ts`, borrado) y la píldora de la decisión aplazada, que
+pasa a ser el sello de lacre del ornamento. El informe está en
+`../ui-redesign/piel/VZ.md`.
+
 La velocidad actual y el acceso a las órdenes persisten en la fila de control;
 la pista no es el acceso. Una decisión pendiente conserva acceso también en la
 bandeja expandida. Un hito de `moment.ts` es otro emisor que debe someterse al

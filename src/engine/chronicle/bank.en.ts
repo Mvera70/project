@@ -1922,11 +1922,11 @@ export const UI_BANK: Record<string, string> = {
   'title.dev.hint': 'The valley is played forward with the reference policy before it opens, so what you see is a real game and not a mock-up. Ten years take about a second. A valley that dies on the way opens as what it became.',
   // U-11 · el inicio guiado: dos pistas, una vez, después del vuelo de entrada.
   // Se tocan para pasar. No son un tutorial: dicen dónde están los dos mandos.
-  'intro.orders': 'The line above is the standing orders: how much to sow, where spare hands go, what to raise first. Tap it when you want a change.',
+  'intro.orders': 'The line below is the standing orders: what to sow, where hands go, what to raise. Tap to change.',
   'intro.time': 'The button at the right sets the pace. The valley goes on by itself; come back whenever you like.',
   'crossroad.waiting': 'A crossroad is waiting',
   // U-07 · el texto visible de la píldora que reemplaza al punto rojo
-  // (`screens/crossroad.ts`, `.crossroad-marker`). Distinto del aria-label de
+  // (el sello del ornamento de la bandeja, VZ-03). Distinto del aria-label de
   // arriba a propósito: éste es lo que se lee en pantalla, aquél lo que
   // anuncia un lector de pantalla, y no tenían por qué decir lo mismo.
   'crossroad.pending_pill': 'A decision waits',

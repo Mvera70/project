@@ -8,7 +8,7 @@
 // real (un solo canvas, foco, `data-screen`) se acredita con capturas, no aquí.
 
 import { describe, expect, it } from 'vitest';
-import { contentRouteFor, navTabFor, resolveMessageSlot } from '@ui/redesign/shell';
+import { contentRouteFor, navTabFor } from '@ui/redesign/shell';
 import type { SheetRoute } from '@ui/redesign/contracts';
 
 describe('navTabFor · docs/design.md §11.2, cinco rutas', () => {
@@ -55,29 +55,11 @@ describe('contentRouteFor · qué monta la bandeja de la carcasa (UI-R5)', () =>
   });
 });
 
-describe('resolveMessageSlot · visual-reference §5, tabla de coincidencias', () => {
-  it('sin nadie pidiendo el hueco, no se ve nada', () => {
-    expect(resolveMessageSlot(false, false)).toEqual({ noticeVisible: false, hintVisible: false });
-  });
-
-  it('el aviso solo, se ve', () => {
-    expect(resolveMessageSlot(true, false)).toEqual({ noticeVisible: true, hintVisible: false });
-  });
-
-  it('la pista sola, se ve', () => {
-    expect(resolveMessageSlot(false, true)).toEqual({ noticeVisible: false, hintVisible: true });
-  });
-
-  it(
-    'el fallo fotografiado en evidencia-capturas.md §3: los dos a la vez, y el aviso gana',
-    () => {
-      // «Pista de órdenes + aviso de crónica → Ocupa el mensaje: Aviso de
-      // crónica; Pista pendiente, sin marcar como vista» — primera fila de la
-      // tabla de coincidencias del cuaderno del dueño. La propiedad que hace
-      // imposible el pisado: nunca `noticeVisible && hintVisible` a la vez.
-      const resolved = resolveMessageSlot(true, true);
-      expect(resolved).toEqual({ noticeVisible: true, hintVisible: false });
-      expect(resolved.noticeVisible && resolved.hintVisible).toBe(false);
-    },
-  );
-});
+// VZ-02 · **las pruebas de `resolveMessageSlot` se mudan, no se pierden.**
+//
+// Guardaban la primera fila de la tabla de coincidencias de visual-reference
+// §5 —«pista de órdenes + aviso de crónica → ocupa el mensaje el aviso; pista
+// pendiente, sin marcar como vista»— y esa propiedad sigue exigida, ahora en
+// `tests/fast/ui-voice.test.ts`, que la comprueba para las **cuatro** voces y
+// no sólo para dos: «la pista no se marca vista por ceder». La función que
+// arbitraba a dos se retiró con la cola.

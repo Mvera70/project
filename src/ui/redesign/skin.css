@@ -445,7 +445,43 @@
   justify-content: center;
   gap: var(--ui-space-2);
   color: var(--skin-gold);
+  /* VZ-03 · es un `<button>` desde esta ronda, así que hay que deshacer lo que
+     el navegador le pone: no es un control cuando lleva la hoja (va
+     `disabled`), y cuando lleva el sello es el acceso a la decisión aplazada.
+     Sin fondo, sin borde y sin la letra del sistema. */
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
+/* Con la hoja no se toca: `disabled` lo dice al navegador y al lector de
+   pantalla, y el cursor no miente. */
+.skin-ornament:disabled { cursor: default; }
+.skin-ornament:not(:disabled) { cursor: pointer; }
+/** VZ-03 · **la decisión aplazada vive aquí, no en una píldora flotante.**
+
+    Era un `position: fixed` a 92 px del techo y a la derecha, ajustado a mano
+    en UI-V5c y en UI-V8, y era la tercera pieza que flotaba sobre el valle.
+    El sello de lacre de UI-V5c mide lo que la hoja de roble y ocupa su sitio
+    mientras hay algo que decidir, así que el acceso está donde el jugador ya
+    mira y no tiene geometría propia que volver a ajustar. Decisión del dueño
+    del diseño, 17 sep 2026. */
+.skin-ornament--seal .skin-seal {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+}
+.skin-ornament--seal .skin-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--skin-parchment);
+}
+.skin-ornament--seal::before,
+.skin-ornament--seal::after { opacity: .55; }
 /** El filete de cada lado **muere en un punto**, que es lo que el prototipo
     dibuja y lo que le da el aire de guarda de libro: una línea que se corta a
     pelo parece un recorte. Se hace con el propio pseudoelemento —un degradado
@@ -751,10 +787,9 @@ html:not([data-screen="valley"]) .hud-plate-date {
     Lo que hace falta deshacer es el `position: absolute` con `left`/`top` que
     `index.html` (U-01) les puso: dentro de la bandeja van **en flujo**, que es
     quien reparte el alto de la ranura. Dos clases en el propio nodo
-    (`.valley-doing.hud-say-line`) ganan a la regla de una sola clase de
+    (`.valley-orders-now.hud-say-line`) ganan a la regla de una sola clase de
     `index.html` sin depender del orden de carga de las hojas — el mismo
     criterio que el resto de esta hoja. */
-.valley-doing.hud-say-line,
 .valley-orders-now.hud-say-line {
   position: static;
   left: auto;
@@ -765,17 +800,67 @@ html:not([data-screen="valley"]) .hud-plate-date {
      existía para que la frase se leyera encima del prado, y aquí sobra. */
   text-shadow: none;
 }
-.valley-doing.hud-say-line {
-  font: 16px/1.3 var(--skin-font-read);
-  color: var(--skin-ink);
-}
 .valley-orders-now.hud-say-line {
   width: 100%;
   font: italic 12.5px/1.3 var(--skin-font-read);
   color: var(--skin-ink-faded);
 }
-/** El envoltorio de las dos. Va después del ornamento en el DOM, así que la
-    hoja de roble y su filete quedan encima, como en el prototipo. */
+/** VZ-02 · **El hueco de la voz: un sitio, una frase y siempre el mismo alto.**
+
+    El valle hablaba por cuatro bocas —el aviso de lo que acaba de pasar, la
+    cartela de hito, la pista del inicio y la frase de actividad— con tres
+    geometrías y tres temporizadores, y tres de ellas flotaban encima del
+    valle. El dueño del diseño lo cortó mirando la secuencia del inicio en la
+    tablet: «estos mensajes que salen por encima no cuadran con la interfaz».
+    Ahora las cuatro se leen aquí, y cuál se lee lo decide `voice.ts`.
+
+    **El alto es fijo, y eso es la mitad del arreglo.** Dos líneas de EB
+    Garamond 17/1,45 son 49,3 px: con `min-height` de 50 la bandeja mide lo
+    mismo diga lo que diga, así que nada de lo que hay encima —los círculos de
+    velocidad— vuelve a moverse nunca. Antes la bandeja crecía a dos líneas
+    cuando la aldea tenía dos cosas que decir, y cada ronda de interfaz volvía
+    a ajustar a mano lo que se le montaba encima. Una frase de una línea deja
+    aire; ninguna hace crecer la caja. */
+.valley-voice {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  margin: 0;
+  padding: 0 22px;
+  text-align: center;
+  text-wrap: pretty;
+  font: 17px/1.45 var(--skin-font-read);
+  color: var(--skin-ink);
+}
+/** La pista del inicio guiado se toca, y se dice con la cursiva de la voz del
+    juego y su `›` de latón: es lo único que la distingue de las demás, porque
+    es la única que pide un gesto. */
+.valley-voice[data-role="hint"] {
+  cursor: pointer;
+  font-style: italic;
+  font-size: 15px;
+  color: var(--skin-ink-soft);
+}
+.valley-voice[data-role="hint"] .valley-voice-line::after {
+  content: ' ›';
+  color: var(--skin-gold);
+  font-style: normal;
+}
+/** El acento del hito (decisión del dueño del diseño, 17 sep 2026): **la hoja
+    de roble pasa a oro** mientras se lee algo que pasa una vez, y vuelve a
+    tinta al caducar. Es un acento en una pieza que ya existe, no una pieza
+    nueva; lo que sustituye es la cartela de pergamino con motas de latón que
+    U-02 puso y que el dueño juzgó «esto no aporta nada, mejorar o quitar».
+    Y va en CSS y no en JavaScript a propósito: `data-role` ya lo dice todo. */
+.ui-shell-message:has(.valley-voice[data-role="milestone"]) .skin-ornament .skin-icon {
+  color: var(--skin-gold);
+}
+
+/** El envoltorio de la línea de órdenes. Va después de la voz en el DOM, así
+    que la frase queda encima y la línea de órdenes debajo — que es lo que la
+    pista dice con sus palabras: «the line below is the standing orders». */
 .hud-say {
   display: flex;
   flex-direction: column;
@@ -783,9 +868,6 @@ html:not([data-screen="valley"]) .hud-plate-date {
   gap: 2px;
   padding: 2px 22px 4px;
 }
-/* Sin frase que decir, el envoltorio no deja un hueco: la bandeja se cierra
-   sobre la navegación y no queda una banda de papel vacía. */
-.hud-say:has(.valley-doing[hidden]:only-child) { display: none; }
 
 /* ------------------------------------------- el rincón de la velocidad */
 

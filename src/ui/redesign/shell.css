@@ -9,7 +9,7 @@
    §3: el aviso de la crónica y la pista del inicio guiado competían por la
    misma franja con dos offsets fijos, y en cuanto la pista crecía a dos
    líneas se pisaban. Ahora comparten un hijo de flujo normal del mismo hueco,
-   y `shell.ts` (`resolveMessageSlot`) decide cuál de los dos se ve. */
+   y desde VZ-02 lo que se ve lo decide la cola de `../voice.ts`. */
 
 /* Sin `z-index` propio a propósito: con uno, este contenedor abre su propio
    contexto de apilamiento y atrapa dentro a `.ui-shell-stack` (z-index 14) y
@@ -27,7 +27,15 @@
 .ui-shell-stack { position: fixed; left: 0; right: 0; bottom: 0; z-index: 14;
   display: flex; flex-direction: column; pointer-events: none; }
 .ui-shell-stack > * { pointer-events: auto; }
-html.crossroad-open .ui-shell-stack, html.epitaph-open .ui-shell-stack { visibility: hidden; }
+/* VZ-04a · **y el parte de bienvenida, que faltaba.** La pila va en z-index 14
+   —por encima de las cuatro superposiciones a propósito, ver arriba— así que
+   cada una la oculta por su nombre. El parte (§9.2) no estaba en la lista desde
+   que la pila existe, y se vio en la primera captura de esta ronda: el título
+   «While you were gone» cortado por el listón de la bandeja y el resto del
+   parte detrás del pergamino. No lo causó el vestido de VZ-04a; lo enseñó. */
+html.crossroad-open .ui-shell-stack,
+html.epitaph-open .ui-shell-stack,
+html.welcome-open .ui-shell-stack { visibility: hidden; }
 
 /* El hueco del mensaje. Min-height 56px del prototipo (visual-reference §5) y
    crece hacia arriba con el texto; vacío no reserva nada, porque no siempre
@@ -116,44 +124,10 @@ html:has(.valley-panel:not([hidden])) .ui-shell-message { visibility: hidden; }
    así que el rincón de velocidad se recoloca sin que nadie se lo diga. */
 html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
 
-/* El aviso de `notice.ts`: antes `position: absolute; bottom: calc(118px+…)`,
-   fijo e independiente de todo lo demás. Aquí es un hijo de flujo normal del
-   hueco compartido — mismo fondo, mismo filete, mismo texto, sólo cambia
-   dónde se sitúa. No se toca `notice.ts`: la regla gana por especificidad.
-
-   UI-V2 · y es **la frase de la bandeja** del prototipo 01 («The mill is
-   waiting for oak.», plan §3.1): la única fuente de un texto así que el motor
-   ya produce es este aviso —la aldea contestando cuando no puede obedecer
-   (`answerFor`), o contando lo último que pasó—, así que es el respaldo que
-   el plan pide en vez de inventar un dato nuevo. Tinta sobre el papel de la
-   bandeja en vez de la tarjeta oscura que llevaba sobre el valle desnudo:
-   aquí ya no hace falta un cartón propio, el papel de detrás ya lee. Sigue
-   siendo `notice.ts` quien decide cuándo se ve y qué dice; esto sólo cambia
-   cómo se pinta. */
-.ui-shell-message .valley-notice { position: static; left: auto; transform: none;
-  width: 100%; max-width: 32ch; margin: 0 auto;
-  background: transparent; border: 0; box-shadow: none; border-radius: 0; padding: 0;
-  color: var(--skin-ink); text-align: center; text-wrap: pretty;
-  font: 400 17px/1.45 var(--skin-font-read); letter-spacing: normal; }
 
 /* La pista del inicio guiado: antes vivía en `index.html` con
    `position: absolute; bottom: 82px`, en el mismo tramo de pantalla que el
    aviso. Reubicada en el mismo hueco compartido y sin tocar su piel. */
-/* UI-V10 · **y con la piel de la bandeja, no con su cartón oscuro.** La pista
-   seguía siendo la tarjeta de tinta de noche con la que nació en U-11, cuando
-   flotaba sobre el prado desnudo: encima del pergamino se veía como un parche
-   negro tapando el ornamento y la frase de la aldea. Es el mismo arreglo que
-   el aviso recibió en UI-V2 y por el mismo motivo —aquí el papel de detrás ya
-   lee, no hace falta un cartón propio—, y lo que se conserva es lo que la
-   distingue: la cursiva de la voz del juego y el `›` de latón que dice que se
-   toca. Sigue siendo `app.ts` quien decide cuándo aparece. */
-.ui-shell-message .valley-hint { position: static; left: auto; right: auto; bottom: auto;
-  width: 100%; max-width: 40ch; margin: 0 auto; box-sizing: border-box;
-  background: transparent; border: 0; border-left: 0; border-radius: 0;
-  box-shadow: none; padding: 0;
-  color: var(--skin-ink-soft); text-align: center; text-wrap: pretty;
-  font: italic 400 15px/1.45 var(--skin-font-read); }
-.ui-shell-message .valley-hint::after { color: var(--skin-gold); }
 
 /* La navegación: Valley/Chronicle/People, siempre visible salvo encrucijada o
    epitafio.

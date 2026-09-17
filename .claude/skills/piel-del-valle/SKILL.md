@@ -114,35 +114,45 @@ Dos medidas que hay que respetar y que se descubrieron pintándolo:
 - Los círculos de velocidad dejan de 12 a 19 px de hierba sobre la madera en el
   prototipo. Si se apoyan en el listón, el papel los muerde.
 
-## 7. Lo que flota sobre la bandeja lee su altura
+## 7. El valle habla desde un sitio, y nada flota
 
-> **Provisional.** Esta sección describe el parche de UI-V10, que el dueño del
-> diseño juzgó «una chapuza». El plan que lo sustituye está en
-> `docs/ui-redesign/piel/plan-voz.md`: **nada flota**, la bandeja enseña una
-> frase de altura fija elegida por una cola, y esta sección se reescribe cuando
-> VZ-02 llegue a `main`. Hasta entonces, no añadir ninguna pieza flotante nueva.
+**Nada transitorio flota sobre el valle.** La bandeja enseña **una** frase bajo
+la hoja de roble, con un hueco de **altura fija de dos líneas**, y quién habla lo
+decide una cola pura (`src/ui/voice.ts`): hito, suceso, pista, estado, en ese
+orden. Lo único que cubre el valle son las tres superposiciones —la encrucijada,
+el epitafio y el parte de bienvenida—, y las tres apartan la bandeja con su
+clase en la raíz (`html.crossroad-open`, `.epitaph-open`, `.welcome-open`).
 
-Nada que aparezca encima de la bandeja lleva un `bottom` fijo. La bandeja mide
-**lo que mida su texto** —crece a dos líneas cuando la aldea tiene dos cosas que
-decir— más el canto de madera, así que cualquier número fijo la tapa justo
-cuando hay más que leer, que es el peor momento.
+Con la altura fija, **nada de lo que hay encima se recoloca nunca**. Eso es lo
+que se compró: antes la bandeja crecía cuando la aldea tenía dos cosas que decir,
+y cada ronda volvía a ajustar a mano la cartela del hito, la píldora de la
+decisión y los círculos de velocidad. La versión anterior de esta sección decía
+«lo que flota lee la altura de la bandeja»; el dueño del diseño la llamó una
+chapuza y tenía razón: la respuesta no era anclar mejor, era no flotar.
 
-La carcasa publica `--ui-stack-height` con un `ResizeObserver`, y el canto vale
-`--ui-batten-height`. Todo lo de arriba se ancla a esos dos:
+Reglas que salen de ahí:
 
-```css
-bottom: calc(var(--ui-stack-height, 173px) + var(--ui-batten-height, 46px) + 14px);
-```
+- **Una frase que no quepa en dos líneas rompe la promesa.** El tope medido es
+  ~104 caracteres a 390 px (97 caben, 129 se van a una tercera línea), y lo
+  vigila `tests/fast/ui-voice-fits.test.ts` desde el banco. Si hay que enseñar
+  más, se parte en dos pasos, no se estira la bandeja.
+- **No hay cola.** Un suceso nuevo sustituye al anterior; el anterior queda en la
+  crónica. Guardar una lista es el teletipo que §11.6 prohíbe con dos cotas
+  medidas.
+- **Ni un `setTimeout` para retirar una frase.** La caducidad se mide contra el
+  reloj de pared en cada pintado: tiene estado definido en cada instante, que es
+  lo que §11.4 pide y lo que un temporizador no da.
+- **Lo que pide un gesto se distingue por la tinta, no por un cartón.** La pista
+  va en cursiva con su `›` de latón; el hito pone la hoja de roble en oro; la
+  decisión aplazada cambia la hoja por el sello de lacre. Tres acentos sobre
+  piezas que ya existen, ninguna pieza nueva.
+- **El orden dentro de la bandeja es el orden en la pantalla**, así que una frase
+  que dice «the line below» va encima de esa línea. Se coloca la pieza donde el
+  texto ya dice que está; el texto sale del banco y no se retuerce.
 
-Lo llevan la cartela de hito y el rincón de velocidad. Y la regla hermana: **lo
-que tenga sitio dentro de la bandeja va dentro**, en flujo, con tinta sobre su
-papel y sin cartón propio —el papel de detrás ya lee—. Así están el aviso de
-`notice.ts` y la pista del inicio guiado, que hasta UI-V10 era una tarjeta de
-tinta de noche puesta encima del pergamino.
-
-Y el orden dentro de la bandeja **es** el orden en la pantalla, así que una
-frase que dice «the line above» tiene que ir después de esa línea. Se coloca la
-pieza donde el texto ya dice que está; el texto no se toca, sale del banco.
+Y un detalle que costó una captura: en una caja `flex` un pseudo-elemento es
+**otro ítem**, no texto en línea. El `›` de la pista puesto en el párrafo salía
+flotando a la derecha, a media altura; va dentro del `span` de la frase.
 
 ## 8. El primer fotograma no es de otro juego
 
@@ -151,6 +161,13 @@ fotograma. Mientras Three se descarga, el lienzo 2D va oculto y el hueco espera
 en `--ui-ground`; vuelve a la vista sólo si el 3D no llega. Sin eso el jugador ve
 un instante el mapa plano de casillas —el dueño del diseño lo cazó en una
 secuencia del inicio— y eso no es una transición, es otro juego asomando.
+
+**Y lo que ese cambio destapó, que es la lección útil:** un recorrido que medía
+`canvas:visible` estaba midiendo el lienzo 2D ya dimensionado (360 × 560) y
+tocando esas coordenadas en el 3D. Con el 2D oculto, el primero visible es el 3D
+**recién montado**, que mide `300 × 150` —el tamaño por defecto de un `<canvas>`
+antes de que `size()` lo estire— y el «centro» pasó a ser la esquina de arriba.
+Cuando una prueba mida un lienzo, **espera a que esté dimensionado**.
 
 ## 9. Qué no se inventa
 

@@ -127,15 +127,21 @@ test('el juego abre con el menú de inicio: un valle nuevo con su número, y con
 
   // U-11 · la primera vez, dos pistas —órdenes y tiempo— que se tocan para
   // pasar. En Canvas no hay vuelo de entrada, así que llegan enseguida.
-  const hint = page.locator('.valley-hint');
+  // VZ-02 · la pista ya no tiene elemento propio: es una voz más, y se lee en
+  // el hueco de la bandeja con `data-role="hint"`. El recorrido es el mismo —se
+  // toca para pasar, dos pasos y a dormir— y lo que cambia es dónde se mira.
+  const voice = page.locator('.valley-voice');
+  const hint = page.locator('.valley-voice[data-role="hint"]');
   await test.expect(hint).toBeVisible({ timeout: 15_000 });
-  const first = await hint.innerText();
+  const first = await voice.innerText();
   test.expect(first).not.toMatch(/\[intro\./u);
-  await hint.click();
+  await voice.click();
   await test.expect(hint).toBeVisible();
-  test.expect(await hint.innerText()).not.toBe(first);
-  await hint.click();
-  await test.expect(hint).toBeHidden();
+  test.expect(await voice.innerText()).not.toBe(first);
+  await voice.click();
+  // Retirada la pista, el hueco no se queda vacío: lo ocupa el fondo, que es lo
+  // que la aldea está haciendo. Lo que desaparece es el papel de pista.
+  await test.expect(hint).toHaveCount(0);
   await test.expect(page.locator('html')).toHaveAttribute('data-intro', 'done');
   // Guardada la partida, el menú ofrece continuarla.
   await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide')));
@@ -185,12 +191,45 @@ test('la crónica y la gente se abren y se cierran: hay forma de volver (U-14)',
   // un campo, no ochenta edificios— y «Valley» tiene que cerrarla igual que
   // cierra las otras dos.
   const canvas = page.locator('canvas:visible').first();
+  // **Y se espera a que el lienzo esté medido.** Aquí estaba el fallo que
+  // UI-V10 destapó: `#valley` iba visible mientras el 3D cargaba, así que
+  // `canvas:visible` devolvía el 2D, ya dimensionado a 360 × 560. Desde UI-V10
+  // el 2D va oculto de entrada —el dueño del diseño veía asomar el mapa plano
+  // un instante al fundar— y el primero visible es el 3D, que recién montado
+  // mide **300 × 150**: el tamaño por defecto de un `<canvas>` antes de que
+  // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
+  // esquina de arriba, y ningún toque abría nada.
+  await test.expect.poll(
+    async () => (await canvas.boundingBox())?.width ?? 0,
+    { timeout: 20_000 },
+  ).toBeGreaterThan(300);
   const box = await canvas.boundingBox();
+  // **VZ-02 · y se barre la pantalla, no cuarenta píxeles alrededor del centro.**
+  //
+  // Esta prueba pasaba por un accidente que UI-V10 destapó: medía la caja del
+  // lienzo **2D** —360 × 560, porque el 3D aún no había cargado cuando
+  // `boundingBox()` corría— y tocaba esas coordenadas en el lienzo **3D**, que
+  // mide 390 × 844. O sea que apuntaba a (180, 280): la parte alta del
+  // encuadre, que es donde la aldea cae. Desde UI-V10 el 2D va oculto mientras
+  // el 3D carga —el dueño del diseño veía asomar el mapa plano un instante— así
+  // que la caja medida es ya la del 3D y el «centro» pasó a ser (195, 422):
+  // hierba, y ochenta y un toques sin abrir nada.
+  //
+  // Lo que la prueba guarda es que **tocar la aldea abre su ficha**, no que la
+  // aldea esté en un píxel concreto: a los ochenta y un años, y con la cámara
+  // siguiendo a alguien después de contestar la encrucijada, no hay píxel fijo
+  // que valga. Así que se barre el encuadre de veinte en veinte píxeles desde
+  // el centro hacia fuera y se para en el primer toque que abre algo, que es
+  // exactamente lo que hace un dedo que busca una casa.
   const panel = page.locator('.valley-panel:not(.valley-orders)');
-  const cx = (box?.width ?? 360) / 2;
-  const cy = (box?.height ?? 560) / 2;
+  const ancho = box?.width ?? 390;
+  const alto = box?.height ?? 844;
+  const cx = ancho / 2;
+  const cy = alto / 2;
   const around: [number, number][] = [];
-  for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
+  for (let dx = -Math.round(ancho * 0.4); dx <= ancho * 0.4; dx += 30) {
+    for (let dy = -Math.round(alto * 0.35); dy <= alto * 0.35; dy += 30) around.push([dx, dy]);
+  }
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
   for (const [dx, dy] of around) {
     await canvas.click({ position: { x: cx + dx, y: cy + dy }, force: true });
@@ -281,6 +320,18 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // `#valley3d`, y un localizador clavado al 2D fallaba con «no visible» en
   // mitad del barrido de abajo. Es lo que hace el dedo: toca lo que hay.
   const canvas = page.locator('canvas:visible').first();
+  // **Y se espera a que el lienzo esté medido.** Aquí estaba el fallo que
+  // UI-V10 destapó: `#valley` iba visible mientras el 3D cargaba, así que
+  // `canvas:visible` devolvía el 2D, ya dimensionado a 360 × 560. Desde UI-V10
+  // el 2D va oculto de entrada —el dueño del diseño veía asomar el mapa plano
+  // un instante al fundar— y el primero visible es el 3D, que recién montado
+  // mide **300 × 150**: el tamaño por defecto de un `<canvas>` antes de que
+  // `size()` lo estire. Medido así, el «centro» caía en (150, 75), o sea la
+  // esquina de arriba, y ningún toque abría nada.
+  await test.expect.poll(
+    async () => (await canvas.boundingBox())?.width ?? 0,
+    { timeout: 20_000 },
+  ).toBeGreaterThan(300);
   const box = await canvas.boundingBox();
   // `force`, y con razón: contestar la encrucijada de arriba hace que el mapa
   // enfoque y **siga** a alguien de su reparto, y en Canvas eso es cambiar la
@@ -295,18 +346,39 @@ test('la ruta viva abre un valle maduro determinista para revisar la multitud', 
   // dos casas de piedra: el toque abría nada. Una rejilla de cinco píxeles
   // —una celda— hasta cuatro celdas alrededor, del centro hacia fuera, y se
   // para en el primer toque que abre algo.
+  // **VZ-02 · y se barre la pantalla, no cuarenta píxeles alrededor del centro.**
+  //
+  // Esta prueba pasaba por un accidente que UI-V10 destapó: medía la caja del
+  // lienzo **2D** —360 × 560, porque el 3D aún no había cargado cuando
+  // `boundingBox()` corría— y tocaba esas coordenadas en el lienzo **3D**, que
+  // mide 390 × 844. O sea que apuntaba a (180, 280): la parte alta del
+  // encuadre, que es donde la aldea cae. Desde UI-V10 el 2D va oculto mientras
+  // el 3D carga —el dueño del diseño veía asomar el mapa plano un instante— así
+  // que la caja medida es ya la del 3D y el «centro» pasó a ser (195, 422):
+  // hierba, y ochenta y un toques sin abrir nada.
+  //
+  // Lo que la prueba guarda es que **tocar la aldea abre su ficha**, no que la
+  // aldea esté en un píxel concreto: a los ochenta y un años, y con la cámara
+  // siguiendo a alguien después de contestar la encrucijada, no hay píxel fijo
+  // que valga. Así que se barre el encuadre de veinte en veinte píxeles desde
+  // el centro hacia fuera y se para en el primer toque que abre algo, que es
+  // exactamente lo que hace un dedo que busca una casa.
   const panel = page.locator('.valley-panel:not(.valley-orders)');
-  const cx = (box?.width ?? 360) / 2;
-  const cy = (box?.height ?? 560) / 2;
+  const ancho = box?.width ?? 390;
+  const alto = box?.height ?? 844;
+  const cx = ancho / 2;
+  const cy = alto / 2;
   const around: [number, number][] = [];
-  for (let dx = -20; dx <= 20; dx += 5) for (let dy = -20; dy <= 20; dy += 5) around.push([dx, dy]);
+  for (let dx = -Math.round(ancho * 0.4); dx <= ancho * 0.4; dx += 30) {
+    for (let dy = -Math.round(alto * 0.35); dy <= alto * 0.35; dy += 30) around.push([dx, dy]);
+  }
   around.sort((a, b) => Math.hypot(a[0], a[1]) - Math.hypot(b[0], b[1]));
   for (const [dx, dy] of around) {
     // A ×1 y con ochenta personas, una encrucijada puede abrirse entre dos
     // toques y esconder el lienzo; se contesta y se sigue.
     await answerAnyCrossroad(page);
     await canvas.click({ position: { x: cx + dx, y: cy + dy }, force: true });
-    await page.waitForTimeout(120);
+    await page.waitForTimeout(80);
     if (await panel.isVisible()) break;
   }
   await test.expect(panel).toBeVisible();
@@ -619,7 +691,9 @@ test('cuando pasa algo, el valle lo dice donde el jugador está mirando (§11.6)
   await page.locator('.valley-speed-badge').click();
   await page.getByRole('button', { name: '64×', exact: true }).click();
 
-  const notice = page.locator('.valley-notice');
+  // VZ-02 · el aviso se lee en el hueco de la voz con `data-role="event"`: un
+  // solo sitio para las cuatro voces del valle, y ya no hay banda propia.
+  const notice = page.locator('.valley-voice[data-role="event"]');
   await test.expect(notice).toBeHidden(); // nada que decir todavía
 
   // Semana a semana, saltando el reloj: el aviso vive cinco segundos reales

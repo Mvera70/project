@@ -14,7 +14,6 @@
 // separately — and no numbers, which §11.1 forbids. The chronicle's voice,
 // where the player is already looking.
 
-import { TIME } from '@engine/balance';
 import { renderEntry } from '@engine/chronicle/render';
 import type { ChronicleEntry, GameState } from '@engine/state';
 
@@ -30,95 +29,26 @@ export function noticeworthy(entries: readonly ChronicleEntry[]): ChronicleEntry
   return entries.filter((entry) => entry.weight >= 2);
 }
 
-const STYLE_ID = 'valley-notice-style';
-const STYLE = `
-/* Sits clear of the speed controls of §11.2 rather than over them, which since
-   U-05 sit clear of the tab bar in turn: bar, then speeds, then this. */
-/* U-01 · la voz de la crónica, vestida como tal: tinta con un filete de latón
-   arriba, y la misma serif con la que está escrito el resto del pasado de la
-   aldea. Sigue siendo corte seco y nada que cerrar (§11.6). */
-/* **Una nota al margen, no una pancarta.**
-   Esto era una banda a sangre de borde a borde, casi opaca, y con el filete de
-   latón de la encrucijada encima. Tres cosas mal a la vez: tapaba un tercio del
-   valle —que es el HUD, §11.1—, pesaba lo mismo que la pantalla de una decisión
-   aunque sea un comentario de paso, y al ser tan ancha el ojo la leía antes que
-   el valle. Se vio en una captura de G-15 y el dueño del diseño ya lo había
-   dicho: «los mensajes que aparecen ahí son horrorosos».
-   Ahora es una tarjeta estrecha y centrada, del ancho de la cartela de hito
-   (moment.ts) para que las dos voces se reconozcan como parientes, con un
-   filete de latón **a la izquierda** en vez de arriba: el que va arriba es el
-   del capítulo, y un aviso no abre capítulo. */
-.valley-notice { position: absolute; z-index: 4; left: 50%; transform: translateX(-50%);
-  bottom: calc(118px + env(safe-area-inset-bottom));
-  box-sizing: border-box; width: min(86%, 340px); padding: 10px 14px 11px;
-  background: rgba(28,23,19,.86); border-radius: 3px;
-  border-left: 2px solid rgba(125,92,46,.85);
-  box-shadow: 0 4px 14px rgba(20,16,13,.26);
-  color: #f2e9d8; text-wrap: pretty; letter-spacing: .005em;
-  font: 14px/1.4 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; }
-.valley-notice[hidden] { display: none !important; }
-/* §11.2 · la encrucijada ocupa la pantalla entera, y eso incluye no tener una
-   banda de crónica asomando entre las opciones. Se vio en una captura: el
-   aviso se leía a través de las tarjetas, que son translúcidas. */
-html.crossroad-open .valley-notice { display: none !important; }
-`;
-
-function ensureStyle(): void {
-  if (document.getElementById(STYLE_ID) !== null) return;
-  const style = document.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = STYLE;
-  document.head.append(style);
-}
-
-export interface Notices {
-  /** Show the last noticeworthy entry of this tick, if there is one. */
-  show(state: GameState, entries: readonly ChronicleEntry[]): void;
-  /** Hide at once — the crossroad and the epitaph own the whole screen. */
-  clear(): void;
-}
-
 /**
- * Mounts the band and returns the handle the loop drives.
+ * VZ-02 · **la frase de este tick, o nada.** Ya no monta nada ni mide tiempo:
+ * quien la lee es el hueco de la voz de la bandeja (`voice.ts`, `shell.ts`),
+ * que es el único sitio desde el que el valle habla. Antes este módulo tenía su
+ * propia banda `position: absolute`, su `setTimeout` y su piel —un cartón
+ * oscuro sobre el prado— y las tres cosas sobraban desde UI-V2, cuando la
+ * bandeja pasó a poner la frase en tinta sobre su papel.
  *
- * The line is composed by `renderEntry` with the entry's own position in the
- * chronicle as the discriminant, the same one `renderYear` uses, so the
- * sentence read here and the sentence read later in the chronicle are the same
- * sentence (§9.1: scrolling the chronicle must not reword the village's past).
+ * La línea la compone `renderEntry` con la posición de la entrada en la crónica
+ * como discriminante, la misma que usa `renderYear`, para que la frase que se
+ * lee aquí y la que se lee luego en la crónica sean **la misma frase** (§9.1:
+ * desplazar la crónica no puede reescribir el pasado de la aldea).
  */
-export function mountNotices(root: HTMLElement): Notices {
-  ensureStyle();
-  const band = document.createElement('aside');
-  band.className = 'valley-notice';
-  band.hidden = true;
-  band.setAttribute('aria-live', 'polite');
-  root.append(band);
-
-  let timer = 0;
-  const clear = (): void => {
-    if (timer !== 0) { clearTimeout(timer); timer = 0; }
-    band.hidden = true;
-    band.textContent = '';
-  };
-
-  return {
-    clear,
-    show(state: GameState, entries: readonly ChronicleEntry[]): void {
-      const worthy = noticeworthy(entries);
-      const entry = worthy.at(-1);
-      if (entry === undefined) return;
-      // Bounded search: the tick's entries were just pushed, so the index is
-      // near the end. `indexOf` on reference equality finds the same position
-      // `renderYear` will use.
-      const from = Math.max(0, state.chronicle.length - entries.length - 2);
-      const at = state.chronicle.indexOf(entry, from);
-      band.textContent = renderEntry(entry, state.rng, at < 0 ? 0 : at);
-      band.hidden = false;
-      if (timer !== 0) clearTimeout(timer);
-      // Real time, and cut hard rather than faded: §11.4 allows an affordance
-      // to use the wall clock only if it has a defined state at every instant
-      // and survives a jump of the game's own clock. Hidden or shown does.
-      timer = window.setTimeout(clear, TIME.NOTICE_MS);
-    },
-  };
+export function noticeText(state: GameState, entries: readonly ChronicleEntry[]): string | null {
+  const entry = noticeworthy(entries).at(-1);
+  if (entry === undefined) return null;
+  // Búsqueda acotada: las entradas de este tick se acaban de empujar, así que
+  // el índice está cerca del final. `indexOf` por identidad encuentra la misma
+  // posición que `renderYear` va a usar.
+  const from = Math.max(0, state.chronicle.length - entries.length - 2);
+  const at = state.chronicle.indexOf(entry, from);
+  return renderEntry(entry, state.rng, at < 0 ? 0 : at);
 }
