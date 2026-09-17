@@ -61,6 +61,15 @@
   --skin-batten-lit: #A9855D;       /* 01, la cara alta del listón */
   --skin-batten: #785A3C;           /* 01, el cuerpo del listón */
   --skin-batten-deep: #453624;      /* 01, su sombra sobre el papel */
+  /* El alto del canto de la bandeja, en un solo sitio: lo leen la propia tapa
+     y todo lo que tenga que quedar **por encima** de ella (la cartela de
+     hito). Con el número suelto en dos ficheros, uno de los dos se queda
+     atrás y algo acaba tapado. */
+  --ui-batten-height: 46px;
+  /* El prado, muestreado del valle ya pintado (#8CA14B es el tono dominante
+     de la banda media): es el fondo con el que se espera a que el 3D cargue,
+     para que ese instante sea campo y no una página en blanco. */
+  --ui-ground: #8CA14B;
 
   /* ----------------------------------------------------------- rojo, lacre */
   --skin-red: #6A2521;              /* 02, fondo de la capitular */

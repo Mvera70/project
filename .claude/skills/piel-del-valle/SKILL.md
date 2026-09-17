@@ -114,7 +114,39 @@ Dos medidas que hay que respetar y que se descubrieron pintándolo:
 - Los círculos de velocidad dejan de 12 a 19 px de hierba sobre la madera en el
   prototipo. Si se apoyan en el listón, el papel los muerde.
 
-## 7. Qué no se inventa
+## 7. Lo que flota sobre la bandeja lee su altura
+
+Nada que aparezca encima de la bandeja lleva un `bottom` fijo. La bandeja mide
+**lo que mida su texto** —crece a dos líneas cuando la aldea tiene dos cosas que
+decir— más el canto de madera, así que cualquier número fijo la tapa justo
+cuando hay más que leer, que es el peor momento.
+
+La carcasa publica `--ui-stack-height` con un `ResizeObserver`, y el canto vale
+`--ui-batten-height`. Todo lo de arriba se ancla a esos dos:
+
+```css
+bottom: calc(var(--ui-stack-height, 173px) + var(--ui-batten-height, 46px) + 14px);
+```
+
+Lo llevan la cartela de hito y el rincón de velocidad. Y la regla hermana: **lo
+que tenga sitio dentro de la bandeja va dentro**, en flujo, con tinta sobre su
+papel y sin cartón propio —el papel de detrás ya lee—. Así están el aviso de
+`notice.ts` y la pista del inicio guiado, que hasta UI-V10 era una tarjeta de
+tinta de noche puesta encima del pergamino.
+
+Y el orden dentro de la bandeja **es** el orden en la pantalla, así que una
+frase que dice «the line above» tiene que ir después de esa línea. Se coloca la
+pieza donde el texto ya dice que está; el texto no se toca, sale del banco.
+
+## 8. El primer fotograma no es de otro juego
+
+El 2D (`?render=canvas`) es la puerta de vuelta desde G-12, no el primer
+fotograma. Mientras Three se descarga, el lienzo 2D va oculto y el hueco espera
+en `--ui-ground`; vuelve a la vista sólo si el 3D no llega. Sin eso el jugador ve
+un instante el mapa plano de casillas —el dueño del diseño lo cazó en una
+secuencia del inicio— y eso no es una transición, es otro juego asomando.
+
+## 9. Qué no se inventa
 
 - **Ni un color ni una medida sin muestrear el prototipo.** Los prototipos están
   en `docs/ui-redesign/ui-prototypes/`. Muestrear es abrir el PNG y leer el
@@ -124,7 +156,7 @@ Dos medidas que hay que respetar y que se descubrieron pintándolo:
 - **Ni un dibujo a mano si está dibujado en el prototipo.** Se calca; cómo, en
   la skill `calcar-iconos`.
 
-## 8. El bucle de comprobación, y el error que más caro sale
+## 10. El bucle de comprobación, y el error que más caro sale
 
 **Una medida no es una captura.** En UI-V8 verifiqué la maquetación midiendo
 cajas en el navegador —todas correctas— y subí un canto que en la tablet era una
@@ -145,7 +177,7 @@ difícil, tienes que revisar el trabajo con una simple captura». Así que:
    pegan una encima de otra.
 5. Cerrar con `npm run lint` y las pruebas rápidas de interfaz.
 
-## 9. Lo que aún no está estandarizado
+## 11. Lo que aún no está estandarizado
 
 Se escribe aquí para que no se pierda, no porque esté bien:
 

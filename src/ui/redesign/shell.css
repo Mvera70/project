@@ -139,8 +139,21 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
 /* La pista del inicio guiado: antes vivía en `index.html` con
    `position: absolute; bottom: 82px`, en el mismo tramo de pantalla que el
    aviso. Reubicada en el mismo hueco compartido y sin tocar su piel. */
+/* UI-V10 · **y con la piel de la bandeja, no con su cartón oscuro.** La pista
+   seguía siendo la tarjeta de tinta de noche con la que nació en U-11, cuando
+   flotaba sobre el prado desnudo: encima del pergamino se veía como un parche
+   negro tapando el ornamento y la frase de la aldea. Es el mismo arreglo que
+   el aviso recibió en UI-V2 y por el mismo motivo —aquí el papel de detrás ya
+   lee, no hace falta un cartón propio—, y lo que se conserva es lo que la
+   distingue: la cursiva de la voz del juego y el `›` de latón que dice que se
+   toca. Sigue siendo `app.ts` quien decide cuándo aparece. */
 .ui-shell-message .valley-hint { position: static; left: auto; right: auto; bottom: auto;
-  width: 100%; max-width: 460px; margin: 0 auto; box-sizing: border-box; }
+  width: 100%; max-width: 40ch; margin: 0 auto; box-sizing: border-box;
+  background: transparent; border: 0; border-left: 0; border-radius: 0;
+  box-shadow: none; padding: 0;
+  color: var(--skin-ink-soft); text-align: center; text-wrap: pretty;
+  font: italic 400 15px/1.45 var(--skin-font-read); }
+.ui-shell-message .valley-hint::after { color: var(--skin-gold); }
 
 /* La navegación: Valley/Chronicle/People, siempre visible salvo encrucijada o
    epitafio.

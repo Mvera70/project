@@ -364,7 +364,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const notices = mountNotices(messageSlot);
   const noticeBand = messageSlot.querySelector<HTMLElement>('.valley-notice');
   if (noticeBand === null) throw new Error('UI-R1 · notice.ts no montó su banda donde se esperaba');
-  messageSlot.append(hint);
   // UI-V2b · **la voz de la aldea baja a la bandeja.** La frase de actividad y
   // la línea de órdenes vivían flotando sobre el prado arriba a la izquierda,
   // con un parche de altura para no pisar la fila de chips; el prototipo 01 las
@@ -372,6 +371,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // misma ranura y por el mismo motivo que la pista de arriba: `hud.ts` escribe
   // su propio DOM y no conoce la carcasa, y esta capa es la que sabe de las dos.
   messageSlot.append(hud.say);
+  // UI-V10 · **la pista va detrás de la línea de órdenes, porque dice «the
+  // line above».** Se montaba antes que la voz de la aldea, de cuando flotaba
+  // suelta sobre el prado y el orden del DOM no era el orden de la pantalla.
+  // En la bandeja sí lo es, así que la frase del banco señalaba al ornamento
+  // en vez de a las órdenes. No se toca el texto —sale de `bank.en.ts`—: se
+  // coloca donde el texto ya dice que está.
+  messageSlot.append(hint);
   let hintWantsToShow = false;
   const updateHintVisibility = (): void => {
     hint.hidden = !resolveMessageSlot(!noticeBand.hidden, hintWantsToShow).hintVisible;

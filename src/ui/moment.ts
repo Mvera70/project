@@ -24,7 +24,16 @@ import { TIME } from '@engine/balance';
 const STYLE_ID = 'valley-moment-style';
 const STYLE = `
 .valley-moment { position: absolute; z-index: 5; left: 50%; transform: translateX(-50%);
-  bottom: calc(200px + env(safe-area-inset-bottom));
+  /* UI-V10 · **por encima de la bandeja, y no a 200 px del suelo.** Los 200
+     eran de antes de la piel: la bandeja mide ahora lo que mida su texto
+     —crece a dos líneas cuando la aldea tiene dos cosas que decir— más el
+     canto de madera, así que un número fijo la tapaba justo cuando había más
+     que leer. El dueño del diseño lo vio en la secuencia del inicio: «el
+     marco tapa el mensaje que sale por encima». La altura de la pila la
+     publica la carcasa con un ResizeObserver, así que la cartela se recoloca
+     sola. */
+  bottom: calc(var(--ui-stack-height, 173px) + var(--ui-batten-height, 46px)
+    + 14px + env(safe-area-inset-bottom));
   box-sizing: border-box; width: min(84%, 320px); padding: 14px 18px 15px;
   background: var(--parchment, #f2e9d8); color: var(--ink, #221d18);
   border: 1px solid rgba(125,92,46,.55); border-radius: 3px;

@@ -186,6 +186,23 @@ export function attachBackend(
 
   if (options.kind !== 'pilot3d') return handle;
 
+  // **El 2D no asoma mientras el 3D carga.**
+  //
+  // Hasta aquí el relevo era: el 2D pinta, se descarga Three, y cuando el
+  // renderer está listo se apaga el lienzo viejo. Eso deja un instante en el
+  // que el jugador ve **otro juego**: el mapa plano de casillas con el prado a
+  // trozos. El dueño del diseño lo cazó en una secuencia del inicio en su
+  // tablet: «no sé por qué se ve un momento la aldea en 2D».
+  //
+  // Se apaga de entrada y se enciende sólo si el 3D no llega (el `catch` de
+  // abajo), que es lo que el 2D es desde G-12: la puerta de vuelta, no el
+  // primer fotograma. Se usa `visibility` y no `display` para no mover la
+  // maquetación del lienzo mientras el 2D sigue siendo quien pinta.
+  canvas.style.visibility = 'hidden';
+  // Y el hueco espera en verde prado en vez de en el fondo de la página: el
+  // instante de carga es campo, no una pantalla en blanco.
+  viewport.style.backgroundColor = 'var(--ui-ground, #8CA14B)';
+
   void (async (): Promise<void> => {
     try {
       // Imported here and not at the top: nobody who plays in 2D should pay for
@@ -320,6 +337,9 @@ export function attachBackend(
       options.onSwap?.(handle);
     } catch (error: unknown) {
       failure = error instanceof Error ? error.message : String(error);
+      // El 3D no llegó: el 2D vuelve a la vista, que es para lo que está.
+      canvas.style.visibility = 'visible';
+      viewport.style.backgroundColor = '';
       options.onSwap?.(handle);
     }
   })();
