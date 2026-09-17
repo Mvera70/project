@@ -928,3 +928,186 @@
 }
 .skin-order-bar button:active { background-color: var(--skin-parchment-aged); }
 .skin-order-bar button[aria-pressed="true"]:active { background-color: var(--skin-ink); }
+
+/* ------------------------------------------------- la ficha de una persona */
+
+/** UI-V4 · La ficha del prototipo 03. `plan-piel.md` §3.3.
+
+    Tres piezas, y las tres estaban ya en el kit de UI-V0 esperando a esta
+    ronda: el **medallón** (que ahí se dejó con monograma y no con retrato, a
+    propósito), el **chip de rasgo** y los **dos botones** —madera y
+    pergamino—, que se llamaron así precisamente porque salen de este
+    prototipo. Lo único que esta ronda añade de dibujo es el helecho del canto
+    derecho, calcado (`person-ornaments.ts`).
+
+    Medido sobre el prototipo (853 px de ancho = 390 CSS, factor 0,457): la
+    placa de cabecera mide 110 px de alto, el medallón 95 de diámetro y
+    sobresale de la placa por arriba y por abajo, el nombre va a 20 px y el
+    oficio en cursiva a 15. */
+.person-card { display: flex; flex-direction: column; gap: 14px; }
+/** **Y el `hidden` de vuelta, que es un fallo que este fichero se buscó solo.**
+    Un `display: flex` en el propio elemento le gana al `[hidden]
+    { display: none }` que trae el navegador, así que los tres bloques que esta
+    ficha enciende y apaga por atributo —la ficha entera, la tira de parentesco
+    y la fila de chips— se quedaban visibles con `hidden` puesto. Se vio en una
+    captura: la tira de parentesco de alguien que no tiene ningún lazo salía
+    como una banda de papel vacía de 12 px, diciendo que no tiene a nadie
+    cuando lo que pasa es que nadie le tiene todavía una opinión fuerte. */
+.person-card[hidden],
+.person-kin[hidden],
+.person-chips[hidden] { display: none; }
+
+/* La placa de cabecera. El medallón se sale por arriba y por abajo, así que la
+   placa lleva el hueco por dentro y el `overflow` no puede recortar. */
+.person-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px 12px 10px;
+  transform: rotate(var(--skin-tilt-card));
+}
+.person-face { width: 66px; height: 66px; flex: 0 0 66px; font-size: 30px; }
+.person-head-text { flex: 1 1 auto; min-width: 0; display: flex;
+  flex-direction: column; gap: 5px; }
+/* **17 px y sin tracking, y está medido.** A 20 px con el espaciado de
+   `.skin-inscription` el nombre más largo del banco de nombres
+   («MEREWENNA · 53 WINTERS», 22 caracteres) se partía en dos líneas y la placa
+   crecía por debajo del medallón. El prototipo lo tiene en una sola línea y es
+   media lectura de la ficha: se sabe de quién es de un vistazo. Con la caja del
+   medallón en 66 quedan 252 px para el nombre, que es lo que 22 caracteres de
+   Cinzel a 17 ocupan. */
+.person-name {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: .01em;
+  color: var(--skin-ink);
+  text-wrap: balance;
+}
+/* El oficio en cursiva de lectura, que es como lo pone el prototipo: no es una
+   etiqueta de interfaz, es una aposición del nombre. */
+.person-role {
+  margin: 0;
+  font: italic 15px/1.2 var(--skin-font-read);
+  color: var(--skin-ink-soft);
+}
+/* Los tres chips en una fila, como el prototipo: con el relleno del kit
+   (10 px) y tres rasgos largos se iban a dos líneas. Siguen pudiendo envolver
+   —hay gente con cuatro rasgos— pero el caso de tres, que es el normal, cabe. */
+.person-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.person-chips .skin-chip { min-height: 25px; padding: 0 7px; font-size: 10px; }
+/* El helecho: marca de agua, no tinta. A tinta plena tapaba el nombre cuando
+   éste es largo, y en el prototipo apenas se distingue del papel. */
+.person-sprig {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 26px;
+  height: auto;
+  max-height: 94px;
+  color: var(--skin-ink-soft);
+  opacity: .22;
+  pointer-events: none;
+}
+
+/* La tira de parentesco: un medallón pequeño en cada punta y los dos nombres
+   dentro, con el corazón en medio (prototipo 03, y 1 220–1 330). */
+.person-kin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip-c);
+}
+.person-kin-name {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  color: var(--skin-ink);
+  font: 15px/1.25 var(--skin-font-read);
+  text-align: center;
+}
+.person-kin-name strong { font-weight: 600; }
+.person-kin-name em { color: var(--skin-ink-soft); }
+.person-heart { flex: 0 0 auto; width: 17px; height: 15px; color: var(--skin-red); }
+
+.person-gone { margin: 0; color: var(--skin-ink-soft); }
+/** La vida, detrás del botón: los recuerdos que el motor guarda, en la voz de
+    lectura y separados del resto por un filete, para que no se lean como parte
+    de la placa. Van hasta doce, que es el tope del motor, y la hoja de la
+    bandeja ya se desplaza. */
+.person-story {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--skin-rule-on-paper);
+}
+.person-story[hidden] { display: none; }
+.person-memory { margin: 0 0 6px; color: var(--skin-ink); }
+
+/* El pie: los dos botones del prototipo, a la misma altura y repartidos. El
+   `border-top` y la piel de sistema que `index.html` le puso a
+   `.valley-panel-follow` se retiran: aquí manda la placa. */
+.valley-panel-follow.person-actions {
+  margin-top: 2px;
+  padding-top: 0;
+  border-top: 0;
+}
+.person-action-row { display: flex; gap: 10px; }
+/** **Con el selector largo a propósito.** `index.html` (U-01) viste
+    `.valley-panel-follow button` —una clase y un elemento— y eso le gana a
+    `.skin-button--wood`, que es una clase sola, sin que importe el orden de
+    carga: el botón de seguir salía de pergamino claro en vez de madera, o sea
+    los dos botones iguales, y en el prototipo el contraste entre los dos es lo
+    que dice cuál es la acción principal. Tres clases zanjan el empate. */
+.valley-panel-follow.person-actions .person-action {
+  flex: 1 1 0;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+.valley-panel-follow.person-actions .skin-button--wood {
+  border: 0;
+  background: var(--skin-wood-soft);
+  color: var(--skin-gold-lit);
+}
+.valley-panel-follow.person-actions .skin-button--wood[aria-pressed="true"] {
+  background: var(--skin-wood);
+}
+.valley-panel-follow.person-actions .skin-button--parchment {
+  border: 1px solid var(--skin-parchment-aged);
+  background-color: var(--skin-parchment);
+  color: var(--skin-ink);
+}
+.person-action .skin-icon { width: 20px; height: 20px; }
+.person-action[hidden] { display: none; }
+
+/** El botón de volver a la lista, que se había quedado con la piel de sistema:
+    un chip de pergamino como los demás, y el mismo empate de especificidad que
+    los de arriba, así que va con dos clases. */
+.valley-panel .valley-panel-back {
+  min-height: 40px;
+  margin: 0 0 12px;
+  padding: 0 14px;
+  border: 1px solid var(--skin-parchment-aged);
+  border-radius: 0;
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip-d);
+  color: var(--skin-ink-soft);
+  font: 600 12px/1 var(--skin-font-voice);
+  letter-spacing: var(--skin-track-label);
+  text-transform: uppercase;
+}
+.valley-panel-follow.person-actions p {
+  margin: 8px 2px 0;
+  color: var(--skin-ink-faded);
+  font: italic 12.5px/1.35 var(--skin-font-read);
+}

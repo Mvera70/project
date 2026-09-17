@@ -1952,7 +1952,27 @@ export const UI_BANK: Record<string, string> = {
   'inspect.opinion.resents': 'Resents {name}: {value}.',
   'inspect.memory': '{memory} — ANNO {year}.',
   'inspect.age': '{age} winters old.',
+  // UI-V4 · la misma edad, pero para ir detrás del nombre en la placa de la
+  // ficha («HEREWARD · 21 WINTERS», prototipo 03): ahí no cabe una frase con
+  // punto, y el nombre ya es el sujeto.
+  'inspect.age.short': '{age} winters',
   'inspect.traits.none': 'No named traits.',
+
+  // UI-V4 · Las palabras de la tira de parentesco de la ficha (prototipo 03).
+  // Sólo hay seis porque sólo hay seis vínculos que el motor guarde de verdad:
+  // padre y madre (`parentIds`), de ahí hijo e hija, y el amigo y el rival que
+  // salen de `opinions`. El prototipo dibuja «wife» y no está aquí a propósito:
+  // el motor no guarda matrimonios —la boda de R-1 es un suceso, no un
+  // vínculo— y una palabra sin dato detrás es una frase inventada.
+  'kin.mother': 'mother',
+  'kin.father': 'father',
+  'kin.son': 'son',
+  'kin.daughter': 'daughter',
+  'kin.friend': 'friend',
+  'kin.rival': 'rival',
+  // Los dos botones del pie de la ficha, prototipo 03.
+  'inspect.story': 'Life story',
+  'inspect.story.close': 'Close the story',
   'inspect.gone': 'Gone',
   'inspect.terrain.people': '{people} people live in the valley.',
   // UI-R4 · quien ya no está no se enseña como si siguiera aquí (§2.5 del
