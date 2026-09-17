@@ -258,10 +258,12 @@ resueltas para que nadie las vuelva a abrir:
 
 Y lo que sí queda abierto, con su motivo:
 
-- **El resalte de la silueta del aldeano seguido.** La cámara ya va detrás de
-  él (VZ-4, en `app.ts`), pero el cuerpo no se distingue del resto: eso se
-  dibuja en `src/render3d/renderer.ts`, que la otra sesión tiene con cambios
-  sin comprometer. Se hace en cuanto ese fichero esté libre.
+- **El resalte del aldeano seguido está hecho** (VZ-5): se le enciende su
+  propia ropa —`dress` clona los materiales por aldeano, así que encender a uno
+  no toca a nadie— y lleva un anillo de oro en el suelo, porque la ropa
+  encendida sola no se distingue a la distancia a la que se juega. Lo que queda
+  es **juzgar la fuerza en el dispositivo**: el arnés no la aísla, porque el oro
+  del anillo se confunde con la paja del valle si se busca por píxel.
 - **La línea «Today» de la ficha.** Necesita la capa de vida —derivarla del
   motor podría contradecir al cuerpo que se ve en pantalla— y esa capa es justo
   la que la otra sesión está reescribiendo.

@@ -288,7 +288,7 @@ export async function createGraphicsRenderer(
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group, treeFalls.group);
+  world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, treeFalls.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -1059,6 +1059,13 @@ export async function createGraphicsRenderer(
     },
 
     track(id: number | null): void {
+      // VZ-5 · **y se le enciende la ropa**, que es lo que hace que sepas a
+      // quién sigues: en un valle con ochenta personas del tamaño de un dedal,
+      // centrar la cámara no basta. Lo dibuja `cast.highlight` subiendo la
+      // emisión de los materiales propios de ese aldeano —`dress` se los clona
+      // a cada uno— así que no toca a nadie más. Idempotente: `app.ts` llama a
+      // esto en cada fotograma desde VZ-4 para que la cámara vaya detrás.
+      cast.highlight(id);
       if (id === null) return;
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
       // el jugador y no se le quita de las manos.

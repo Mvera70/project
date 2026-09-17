@@ -10,7 +10,8 @@
 // shared by every villager in the valley. Disposing a clone must not touch them.
 
 import {
-  AnimationMixer, Color, Group, Mesh, type AnimationClip, type Material, type Object3D,
+  AnimationMixer, Color, DoubleSide, Group, Mesh, MeshBasicMaterial, RingGeometry,
+  type AnimationClip, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
 import type { Actor } from '../contracts';
@@ -21,6 +22,29 @@ import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
 
 type Action = NonNullable<ReturnType<AnimationMixer['clipAction']>>;
+
+/**
+ * VZ-5 · el color con el que se enciende a quien se sigue, y cuánto.
+ *
+ * Es el oro de la piel (`--skin-sun`, #C39A3F, muestreado del disco del sol del
+ * prototipo 01): el juego ya usa ese oro para decir «mira aquí» —la hoja de
+ * roble del hito, los puntos de la crónica— así que seguir a alguien habla el
+ * mismo idioma. La fuerza es baja a propósito: se busca que el cuerpo destaque
+ * sobre el prado, no que parezca una farola.
+ */
+const HIGHLIGHT = 0xC39A3F;
+/**
+ * El anillo que se le pone en el suelo, en celdas de radio.
+ *
+ * Encender la ropa sola no bastaba: medido en el juego, a la distancia a la que
+ * se juega el cuerpo mide unos pocos píxeles y la diferencia se confundía con
+ * el color de su propia tela. El anillo se ve de un vistazo y es además lo que
+ * la ficha promete —«marks them on the map»—. Va pegado al suelo, sin escribir
+ * profundidad, para no pelearse con el prado.
+ */
+const RING_INNER = 0.34;
+const RING_OUTER = 0.46;
+const HIGHLIGHT_STRENGTH = 1;
 
 interface Player {
   readonly model: string;
@@ -108,6 +132,22 @@ export class Cast {
     private readonly prop?: (id: string) => Object3D | undefined,
   ) {
     this.group.name = 'Valley_Cast';
+    this.ring = new Mesh(
+      new RingGeometry(RING_INNER, RING_OUTER, 28),
+      new MeshBasicMaterial({
+        color: HIGHLIGHT, transparent: true, opacity: 0.85,
+        depthWrite: false, side: DoubleSide,
+      }),
+    );
+    this.ring.name = 'Valley_Cast_Ring';
+    this.ring.rotation.x = -Math.PI / 2;
+    this.ring.renderOrder = 3;
+    this.ring.visible = false;
+    // **En su propio grupo, no en el del reparto.** `cast.group.children` son
+    // los cuerpos y varias pruebas los leen por índice: metiendo el anillo ahí,
+    // el primer hijo dejaba de ser el primer aldeano y caían siete.
+    this.mark.name = 'Valley_Cast_Mark';
+    this.mark.add(this.ring);
     const idle = asset.clips.find(clip => clip.name === 'idle');
     this.extraClips = idle === undefined ? [] : actionClips(idle);
   }
@@ -123,7 +163,72 @@ export class Cast {
     this.ground = ground;
   }
 
+  /**
+   * Enciende a uno y apaga al anterior. `null` apaga y no enciende a nadie.
+   *
+   * Idempotente a propósito: `renderer.track` la llama en cada fotograma desde
+   * VZ-4, y volver a pintar los mismos dos colores sesenta veces por segundo
+   * sería trabajo por nada.
+   */
+  highlight(id: VillagerId | null): void {
+    if (id === this.lit) return;
+    this.dim();
+    this.lit = id;
+    if (id === null) return;
+    const player = this.players.get(id);
+    if (player === undefined) return;
+    for (const material of player.owned) {
+      const lightable = material as Material & { emissive?: Color; emissiveIntensity?: number };
+      if (lightable.emissive === undefined) continue;
+      this.wasLit.set(material, {
+        color: lightable.emissive.clone(),
+        intensity: lightable.emissiveIntensity ?? 1,
+      });
+      lightable.emissive.setHex(HIGHLIGHT);
+      lightable.emissiveIntensity = HIGHLIGHT_STRENGTH;
+    }
+  }
+
+  /** Devuelve a quien estuviera encendido el color que traía. */
+  private dim(): void {
+    for (const [material, before] of this.wasLit) {
+      const lightable = material as Material & { emissive?: Color; emissiveIntensity?: number };
+      if (lightable.emissive === undefined) continue;
+      lightable.emissive.copy(before.color);
+      lightable.emissiveIntensity = before.intensity;
+    }
+    this.wasLit.clear();
+  }
+
   private ground: (x: number, z: number) => number = () => 0;
+
+  /**
+   * VZ-5 · **A quién sigue el jugador, encendido.**
+   *
+   * Seguir a alguien centraba la cámara en él y nada más: en un valle con
+   * ochenta personas del tamaño de un dedal, saber a cuál sigues era imposible.
+   * Lo pidió el dueño del diseño: «lo de la silueta del aldeano que se resalte
+   * y que lo siga, lo quiero». La cámara ya va detrás desde VZ-4; esto es el
+   * resalte.
+   *
+   * **Se enciende su propia ropa, no una pieza nueva encima.** `dress` clona
+   * el material de cada malla para cada aldeano —es lo que les da su color de
+   * tela— así que subirle la emisión a uno no toca a nadie más. Un contorno
+   * postizo habría que clonarlo y posarlo cada fotograma sobre un cuerpo con
+   * esqueleto; esto son dos colores.
+   *
+   * Y se guarda lo que había para devolverlo: un aldeano que deja de seguirse
+   * tiene que volver a ser uno cualquiera.
+   */
+  private lit: VillagerId | null = null;
+
+  private wasLit = new Map<Material, { color: Color; intensity: number }>();
+
+  /** El anillo del suelo. Uno, reutilizado: sólo se sigue a una persona. */
+  private readonly ring: Mesh;
+
+  /** Donde vive el anillo, para que lo cuelgue quien monta la escena. */
+  readonly mark = new Group();
 
   /**
    * Put the stage in the state these actors describe.
@@ -171,6 +276,18 @@ export class Cast {
 
     for (const id of [...this.players.keys()]) {
       if (!present.has(id)) this.retire(id);
+    }
+
+    // El anillo va donde esté quien se sigue, y se apaga si no se sigue a
+    // nadie o si esa persona ya no está en pantalla.
+    const lit = this.lit === null ? undefined : this.players.get(this.lit);
+    this.ring.visible = lit !== undefined;
+    if (lit !== undefined) {
+      this.ring.position.set(
+        lit.object.position.x,
+        lit.object.position.y + 0.02,
+        lit.object.position.z,
+      );
     }
   }
 
@@ -243,6 +360,9 @@ export class Cast {
   private retire(id: VillagerId): void {
     const player = this.players.get(id);
     if (player === undefined) return;
+    // Si era el que se seguía, se apaga antes de soltar sus materiales: si no,
+    // `dim` intentaría devolver el color a un material ya liberado.
+    if (id === this.lit) { this.dim(); this.lit = null; }
     player.mixer.stopAllAction();
     player.mixer.uncacheRoot(player.object);
     this.group.remove(player.object);
@@ -277,6 +397,8 @@ export class Cast {
   }
 
   dispose(): void {
+    this.ring.geometry.dispose();
+    (this.ring.material as Material).dispose();
     this.clear();
   }
 }

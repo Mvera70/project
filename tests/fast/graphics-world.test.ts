@@ -618,6 +618,76 @@ describe('G-10 · el reparto no son clones', () => {
     cast.dispose();
   });
 
+  it('VZ-5 · a quien se sigue se le enciende la ropa, y sólo a él', () => {
+    // Seguir a alguien centraba la cámara y nada más: en un valle con ochenta
+    // personas del tamaño de un dedal, saber a cuál sigues era imposible. Lo
+    // pidió el dueño del diseño: «que se resalte y que lo siga».
+    //
+    // Se enciende su **propia** ropa: `dress` clona el material de cada malla
+    // para cada aldeano, así que subirle la emisión a uno no puede tocar a
+    // nadie más. Esta prueba guarda exactamente eso.
+    const emissiveOf = (object: Object3D | undefined): number => {
+      let hex = -1;
+      object?.traverse((child) => {
+        if (child instanceof Mesh && !Array.isArray(child.material)) {
+          const material = child.material as MeshStandardMaterial;
+          if (material.emissive !== undefined) hex = material.emissive.getHex();
+        }
+      });
+      return hex;
+    };
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    cast.show([actorAt(1, 30), actorAt(2, 30)]);
+    const [uno, otro] = cast.group.children;
+    const apagado = emissiveOf(uno);
+    expect(emissiveOf(otro)).toBe(apagado);
+
+    cast.highlight(1 as Actor['id']);
+    expect(emissiveOf(uno), 'el seguido se enciende').not.toBe(apagado);
+    expect(emissiveOf(otro), 'y nadie más').toBe(apagado);
+
+    // Cambiar de persona apaga a la anterior: si no, el valle se iría llenando
+    // de gente encendida a medida que el jugador va mirando fichas.
+    cast.highlight(2 as Actor['id']);
+    expect(emissiveOf(uno), 'la anterior vuelve a su color').toBe(apagado);
+    expect(emissiveOf(otro)).not.toBe(apagado);
+
+    // Y dejar de seguir apaga del todo.
+    cast.highlight(null);
+    expect(emissiveOf(uno)).toBe(apagado);
+    expect(emissiveOf(otro)).toBe(apagado);
+    cast.dispose();
+  });
+
+  it('VZ-5 · y lleva un anillo en el suelo, que es lo que se ve de un vistazo', () => {
+    // Encender la ropa sola no basta: a la distancia a la que se juega, el
+    // cuerpo mide unos pocos píxeles y el tono se confunde con su propia tela.
+    // El anillo se ve de un vistazo y es lo que la ficha promete —«marks them
+    // on the map»—. Vive en `cast.mark` y no en `cast.group`: ahí dentro están
+    // los cuerpos y varias pruebas los leen por índice.
+    const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
+    cast.show([actorAt(1, 30), actorAt(2, 30)]);
+    const anillo = cast.mark.children[0];
+    expect(anillo, 'el anillo existe y está aparte de los cuerpos').toBeDefined();
+    expect(cast.group.children).toHaveLength(2);
+    expect(anillo?.visible, 'apagado mientras no se sigue a nadie').toBe(false);
+
+    cast.highlight(2 as Actor['id']);
+    cast.show([actorAt(1, 30), actorAt(2, 30)]);
+    expect(anillo?.visible, 'encendido al seguir').toBe(true);
+    // Y va donde está el cuerpo, no donde estaba: es lo que hace que siga al
+    // que anda en vez de quedarse en el sitio donde se le pulsó.
+    const cuerpo = cast.group.children[1];
+    expect(anillo?.position.x).toBeCloseTo(cuerpo?.position.x ?? -1, 5);
+    expect(anillo?.position.z).toBeCloseTo(cuerpo?.position.z ?? -1, 5);
+
+    // Si esa persona se va del valle, el anillo se apaga: no se queda un aro
+    // de oro marcando un sitio vacío.
+    cast.show([actorAt(1, 30)]);
+    expect(anillo?.visible).toBe(false);
+    cast.dispose();
+  });
+
   it('crece: la talla se pone en cada pasada, no al nacer', () => {
     const cast = new Cast({ clips: [] } as unknown as LoadedAsset, () => villagerModel());
     cast.show([actorAt(1, 4)]);

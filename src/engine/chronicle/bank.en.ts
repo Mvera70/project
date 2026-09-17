@@ -1987,7 +1987,7 @@ export const UI_BANK: Record<string, string> = {
   // lo dice para no prometer un centrado que ningún backend cumple.
   'inspect.follow': 'Follow',
   'inspect.unfollow': 'Stop following',
-  'inspect.track.note': 'Marks {name} on the map. It does not promise to keep the view on them.',
+  'inspect.track.note': 'Rings {name} on the map and keeps the view on them.',
   // U-08 · la pantalla People (`src/ui/redesign/people-panel.ts` desde
   // UI-R4): la lista en sí no lleva frase propia (usa `nav.people`, ya en el
   // banco), sólo lo que le falta a la ficha reusada: el vacío de una aldea
