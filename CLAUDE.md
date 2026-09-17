@@ -236,6 +236,21 @@ y personas** («atraviesan paredes, dan vueltas sobre sí mismos»: `rework.md`
 distinta, escenas) y R-3 (diez rasgos de valle). Las encrucijadas se quedan y
 **no se afinan**.
 
+**Y desde el 17 sep 2026, la parada de las mecánicas: el juego de los
+medios.** El dueño lo dijo sin rodeos —«ahora mismo no es nada divertido; lo
+único bonito es mirar cómo avanza el pueblo»— y `docs/plan-medios.md` lo mide:
+las tres palancas de órdenes de v2.0 **son una trampa** (sólo vive la postura
+de fábrica; `timber` a 0,2 mata 11 aldeas de 16), las encrucijadas pesan (42
+personas contra 6) pero no se sienten, y la aldea prospera sola porque §1 lo
+manda. Lo que sustituye a todo eso, con sus palabras: «le das una pala o un
+martillo y hacen cosas distintas; tú no les dices qué hacer». **El jugador
+mete cosas en el valle —un arado, unos cerdos, un barril— pagándolas con lo
+del valle, y la aldea decide qué hace con ellas.** Piedra y plata entran como
+existencias, el ánimo se enseña como cara, las palancas se retiran, nada se
+coloca con el dedo, y el mundo sólo rompe lo que el jugador cargó. **Los
+briefs están en `docs/rework.md` §4b (M-0 a M-4) y van antes que R-2, R-5 y
+R-3.** La medida que decide si el patrón vale es la de M-2.
+
 Tres cosas del dueño que mandan sobre cualquier otra regla de este fichero:
 **el caos es el juego** («que haya partidas que se rompan es la idea»: las dos
 puertas del rayo que R-1 puso hay que quitarlas, `rework.md` §2.6); **los planes

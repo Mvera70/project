@@ -46,6 +46,15 @@ la de arriba.
 7. **Lo que ya no cuenta:** los hitos humanos 0 y 6 están descartados; el juego
    ya se abrió en su iPad y su iPhone y funciona; el ritmo de decisión no
    importa.
+8. **La parada del 17 sep: el juego de los medios.** «Ahora mismo no es nada
+   divertido; lo único bonito es mirar cómo avanza el pueblo.» Medido en
+   `docs/plan-medios.md`: las palancas de órdenes son una trampa, las
+   encrucijadas pesan pero no se sienten, la aldea prospera sola por diseño.
+   Lo que manda desde entonces: **el jugador mete cosas en el valle y la aldea
+   decide qué hace con ellas** (§4b), con piedra y plata en la mesa, las
+   palancas fuera, nada colocado con el dedo, y un mundo que sólo rompe lo que
+   el jugador cargó. **Las fases M-0 a M-4 de §4b van antes que R-2, R-5 y
+   R-3**, y §3 (la IA) sigue en la otra sesión en paralelo.
 
 ---
 
@@ -695,6 +704,307 @@ que su efecto de suceso pesa (una tabla, no seis pruebas).
 Se quedan, no se afinan (decisión del dueño). Con R-1 y R-2 el drama ya no
 depende de ellas. Las diez plantillas que no salen nunca son una lista que
 podar cuando toque, no un problema que resolver.
+
+---
+
+## 4b. El juego de los medios — M-0 a M-4, con brief (17 sep 2026)
+
+**De dónde sale.** De la parada del 17 sep: `docs/plan-medios.md` es el
+diagnóstico con sus medidas y **se lee entero antes que esto**. En una frase: las
+tres palancas de órdenes de v2.0 son una trampa (sólo vive la postura de
+fábrica; a dos muescas muere media aldea), las encrucijadas pesan (42 personas
+contra 6) pero no se sienten, y la aldea prospera sola porque §1 lo manda. El
+dueño: «ahora mismo no es nada divertido; lo único bonito es mirar cómo avanza
+el pueblo».
+
+**El principio que manda en las cinco fases**, con sus palabras: *«es como si
+cogieras a un grupo de personas y le dieses una pala, o un martillo. Depende de
+lo que le des van a hacer diferentes cosas. Tú no le estás diciendo qué tienen
+que hacer, sino que ciertas cosas dan lugar a otras.»* **El jugador nunca fija
+un número ni da una orden: mete cosas en el valle**, y la aldea decide qué hace
+con ellas por sus propios sistemas.
+
+**Sus decisiones, que ordenan el trabajo** (todas del 17 sep):
+
+1. Un medio **cuesta lo del valle** (grano, leña, piedra, plata). Nada gratis y
+   nada de esperar: «cada semana, cada mes, cada tres meses que pasen cosas».
+2. **Nada se coloca con el dedo.** Todo se da; la aldea decide dónde va.
+3. **Las tres palancas de órdenes se retiran.** «No me gustan para nada.»
+4. **El mundo no mata sin motivo.** «Que caiga un rayo en una casa y eso ya se
+   muera no tiene gracia. Se puede morir, pero más adelante, porque hemos
+   tomado varias decisiones que hacen que se tumbe.» La letalidad **escala con
+   lo que el jugador metió**; una aldea intocada muere como hoy; la pareja
+   fundadora no se queda a cero por el mundo.
+5. **Piedra y plata** entran como existencias. **El ánimo se enseña como cara**,
+   no como cifra. **Las visitas de comercio son ofertas** que se aceptan o se
+   dejan pasar desde la voz de la bandeja, sin pantalla entera. **El señor cobra
+   diezmo regular en plata** cada otoño.
+6. El **rey** —elegir qué aldeano manda y que la aldea tire por donde él tire—
+   va después de M-4 y no se detalla aquí; nada de lo de abajo debe impedirlo.
+
+**Orden:** M-0 → M-1 → M-2 → M-3 → M-4. Cada una se juega y se juzga sola; la
+medida de M-2 es la que decide si el patrón vale. Como en §4: rama desde
+`main`, la puerta del módulo, commit en español con las medidas, `main`
+empujado, rebundle y publicación (`https://mvera70.github.io/project/`), y
+**una secuencia de capturas para el dueño**. Verificación durante la ronda:
+typecheck, lint y los ficheros tocados; la suite entera al cerrar.
+
+**Tres reglas de motor que valen para las cinco fases:**
+
+- **Toda entrada del jugador pasa por `tick`** y queda en `state.history`. Hoy
+  `Decision` es `{templateId, optionId}` y `DecisionRecord` lo guarda con `cast`.
+  Las ofertas y los medios son **entradas nuevas del mismo canal**: `Decision`
+  pasa a ser una unión discriminada (`kind: 'crossroad' | 'offer' | 'means'`),
+  `DecisionRecord` gana `kind`, y `sim.ts:352` (que filtra repeticiones por
+  `templateId`) filtra por `kind === 'crossroad'`. Así el guardado sigue siendo
+  «instantánea + registro de decisiones» (§13.1) y la partida se puede
+  reproducir byte a byte.
+- **Ninguna tirada nueva fuera de un flujo con nombre.** Las visitas y los
+  medios consumen `fate`; nada más. `tests/fast/fate.test.ts` ya guarda que
+  `rollFate` sólo consume `fate`: se extiende, no se duplica.
+- **Ningún número fuera de `balance.ts`**, con `// TUNE:` y su motivo. Los de
+  abajo son propuestas para arrancar, no cifras medidas: la medida es lo que
+  cierra cada fase.
+
+### M-0 · La mesa: piedra y plata
+
+**Qué.** Dos existencias nuevas en `VillageStats`, las visitas de comercio como
+ofertas, el diezmo, y la cabecera con cinco cosas y una cara.
+
+**Dónde y cómo.**
+
+1. **`state.ts`.** `VillageStats` gana `stone: number` y `silver: number`;
+   `StatName` los incluye (el DSL de efectos de encrucijada, `k: 'stat'`, los
+   admite gratis). `SCHEMA_VERSION` a 7 y la migración en `save.ts` (busca
+   `candidate.schema`): una partida vieja entra con `stone: 0, silver: 0`.
+   `tests/fast/save.test.ts` tiene el patrón.
+2. **La piedra se cantea y se gasta.** Hoy `works.ts` la cobra como trabajo
+   (`bpCostOf`: `bp + stone / WORLD.STONE_PER_BP`) si `canQuarry` (fragua y
+   roca). Cambia a: `bpCostOf` devuelve sólo `bp`; **una parte de los
+   constructores cantea** cuando hay proyecto de piedra en cola y
+   `state.village.stone < lo que pide` (en `allocateLabour`, `labour.ts`: un
+   reparto `quarriers` sacado de `builders`, con `LABOUR.QUARRY_SHARE` — TUNE,
+   arranca en 0,5, que es lo que la vida ya hace: `life/day.ts` da a la
+   cantera `buildingDays / 2`); cada cantero produce `WORLD.STONE_PER_WEEK`
+   (TUNE: 2, calibrar para que la primera piedra siga cayendo en los años 42 a
+   45, `handover.md` §2.1); el proyecto de piedra **no arranca** hasta tener su
+   `stone` en el montón, y al arrancar lo descuenta (donde hoy descuenta la
+   madera: búscalo por `woodCostOf`). `canQuarry` se queda. `TRAITS` de
+   `bare_hills` sigue actuando por el mapa, sin tocar.
+3. **La plata entra y sale.** Tres sitios:
+   - **Las visitas.** Las tres encrucijadas de comercio (`catalog/trade.ts`:
+     `cattle_drover`, `salt_carrier`, `grain_factor`) y el suceso `pedlar` de
+     R-1 pasan a ser **ofertas**: sucesos de `fate.ts` (`HAPPENINGS` gana
+     `drover_visit`, `salt_visit`, `factor_visit`; `pedlar` cambia de efecto
+     inmediato a oferta) que **no cambian el estado al salir**: dejan en
+     `state.offer: Offer | null` un cambio concreto —`{ id, gives: {stat,
+     amount}, takes: {stat, amount}, expiresTick }`— con cantidades sacadas de
+     `balance.ts` (`TRADE.*`, TUNE) y del estado (el factor ofrece por el
+     excedente sobre `FOOD_WEEKS`; el tratante vende un cerdo si hay corral).
+     La oferta caduca en `TRADE.OFFER_WEEKS` (TUNE: 2). Aceptarla es una
+     `Decision` de `kind: 'offer'` que `tick` aplica al empezar (mismo sitio
+     que la de encrucijada). Las tres plantillas de `trade.ts` **se quitan del
+     catálogo** (no se borran: se sacan de `CATALOG` y sus pruebas cambian a
+     las ofertas), y `grain_factor.sell_the_surplus` conserva su precio de
+     verdad: la bandera `watched` a 15 años, que leen las plantillas del señor.
+   - **El diezmo.** Cada otoño (`TIME.HARVEST_WEEK + TITHE_WEEKS`, TUNE: 4)
+     el señor cobra `LORD.TITHE_SHARE` (TUNE: 0,1) de la plata; si no hay plata
+     cobra grano al cambio (`TRADE.SILVER_PER_GRAIN`, TUNE: 0,1); si no hay
+     ninguna de las dos, pone `flags.lord_owed` y la plantilla
+     `winter_grain_debt` gana peso (ya existe en el catálogo). Es un paso del
+     tick nuevo, **después** de la cosecha y antes de la crónica; entrada de
+     crónica `tithe.paid` / `tithe.owed` en `bank.en.ts`.
+   - **El forastero.** `stranger_passes` deja `+TRADE.STRANGER_SILVER` (TUNE: 2)
+     cuando hay plaza y ánimo, para que la plata exista antes de la primera
+     venta.
+4. **La interfaz.** `hud.ts`: cinco vitales —gente, grano, leña, piedra,
+   plata—, con los iconos calcados por el método de la skill `calcar-iconos`
+   (no dibujados a mano: la ronda UI-V2b enseñó que nueve versiones a mano no
+   valieron). **El ánimo deja de ser cifra**: el chip enseña una cara con
+   cuatro estados (`MOOD_FACE` en `balance.ts`, TUNE: < 20 hundida, < 40
+   seria, < 70 tranquila, ≥ 70 contenta) y la cifra sólo al tocarlo (ficha de
+   la aldea, `inspect.terrain.*`). La oferta se dice **por la voz** (`voice.ts`
+   gana el rol `'offer'`, prioridad entre `event` e `hint`, TTL el de la
+   oferta) con dos toques dentro de la línea —«Take it» / «Let him go»— que
+   emiten `app.decide({kind:'offer', accept})`; `contracts.ts` de la piel:
+   sigue siendo la misma hoja de papel y la misma voz (`piel-del-valle` §8).
+   Las tres palancas de órdenes **no se tocan aún** (se retiran en M-2).
+
+**Pruebas.** `tests/fast/works.test.ts` (o donde viva `bpCostOf`): la primera
+piedra sigue cayendo en la ventana de hoy en cuatro semillas; `fate.test.ts`:
+una oferta no cambia el estado hasta aceptarse y caduca sola; `save.test.ts`:
+la migración 6 → 7; `sim` : el diezmo cobra en otoño y no dos veces;
+`ui-voice.test.ts`: el rol `offer` no pisa un hito ni es pisado por un aviso.
+Recorrido nuevo en `valley.shots.ts`: una oferta se lee en la voz, se acepta
+con un toque y la plata sube en la cabecera.
+
+**Medida y terminado.** Con reposo, sesenta años, dieciséis semillas (el
+script de `plan-medios.md` §1, que hay que meter en `tools/` como
+`agency-report.ts` porque las cinco fases lo usan): la piedra llega en los
+años 42 a 45 como hoy; la plata **entra y sale al menos una vez por década**
+en todas las semillas vivas; las mismas 2 muertas de 16. Secuencia de capturas
+al dueño: la cabecera nueva, una oferta en la voz, la cara del ánimo en dos
+estados.
+
+### M-1 · El mundo contesta a lo que hay
+
+**Qué.** Tres sucesos de R-1 escalan con lo que la aldea tiene, se quitan las
+dos puertas del rayo de §2.6 sin que un rayo pueda acabar con una aldea, y la
+regla de §1 se reescribe. **No es «el mundo mata solo».**
+
+**Dónde y cómo.** Todo en `fate.ts` (`weightOf`, `happen`) y `balance.ts`
+(`FATE`):
+
+1. `wolves_at_the_coop`: peso × `(1 + FATE.WOLVES_PER_HEAD · (cerdos + vacas))`
+   (TUNE: 0,15) y, con `herdDensity` alta, se lleva un cerdo y no sólo
+   gallinas. Empalizada o atalaya en pie: ×0,4 (`FATE.WOLVES_WALLED`).
+2. `river_flood`: peso × `(1 + FATE.FLOOD_PER_FELLED · fracción de bosque
+   talado)` (TUNE: 2); el bosque talado ya se mide (`forestLeft`).
+3. `granary_theft` (plantilla del catálogo) y `tithe_demand`: sus condiciones
+   (`crossroads/conditions.ts`) pasan a mirar `grain > GRANARY_FULL · capacidad`
+   **o** `silver > FATE.RICH_SILVER` (TUNE: 40), y `watched` sigue contando.
+4. `lightning_fire`: fuera `LIGHTNING_MIN_HOUSES` y `LIGHTNING_MIN_PEOPLE`
+   (§2.6), **y** un rayo destruye **una** casa y nunca la última: si
+   `count(house) + count(stone_house) === 1`, quema el granero o un campo, o
+   nada. Lo mismo para cualquier `destroyBuilding` que salga de `fate.ts`.
+5. **La gracia de la pareja:** mientras `population < FATE.GRACE_PEOPLE`
+   (TUNE: 6) o `tick < FATE.GRACE_YEARS · 48` (TUNE: 5), los sucesos con
+   `happen` destructivo (rayo, riada, lobos) pesan ×0,25. No es una puerta que
+   impida: es que de primeras «la aldea no tiene por qué morirse».
+6. `design.md` §1: la fila «Fuente de letalidad: las encrucijadas, no el
+   mundo» pasa a «**la acumulación de lo que el jugador metió**», con el
+   párrafo de abajo reescrito y la fecha. `docs/changelog.md` lo cuenta.
+
+**Pruebas.** `fate.test.ts`: cada escalado tiene una fila en una tabla (una
+prueba, no seis): con N cerdos el peso de los lobos es ≥ k veces el de sin
+cerdos; el rayo nunca deja una aldea sin casa (cuatro semillas, sesenta años,
+con `lightning_fire` forzado cada tormenta); en gracia los tres pesan ×0,25.
+
+**Medida y terminado.** `agency-report.ts`: con reposo y sin medios, **las
+mismas 2 muertas de 16** (no más: si suben, el mundo mata solo y está mal).
+Con una combinación deliberadamente mala fijada a mano en el informe —el
+corral lleno por `state.herd` y el bosque talado por `fellForest`, sin
+empalizada— **entre 6 y 10 muertas de 16, ninguna antes del año 10**. Si con
+la peor no muere ninguna, no hay riesgo y está igual de mal.
+
+### M-2 · Tres medios, de punta a punta — **la fase que decide**
+
+**Qué.** El arado, la pareja de cerdos y el barril: uno de economía, uno de
+animales, uno de gente. Cada uno: un rasgo de valle que el jugador añade con
+coste, un objeto en la escena, dos filas nuevas en la tabla de sucesos (una
+buena, una mala), una plantilla del catálogo que pasa a salir, y una entrada
+de crónica. Con ellos entra **el carro** (la pantalla de los medios) y salen
+las tres palancas.
+
+**Dónde y cómo.**
+
+1. **Un medio es un rasgo de valle que se añade a mitad de partida.** `state.ts`:
+   `ValleyTrait` gana `'plough' | 'pigs' | 'ale'` (los de fundación siguen
+   siendo dos de cuatro; `valleyTraits` no los sortea). `balance.ts` gana
+   `MEANS`: por medio, `cost: Partial<VillageStats>` (TUNE: arado 40 leña y
+   12 plata; cerdos 30 grano y 8 plata; barril 25 grano y 4 plata) y sus
+   multiplicadores. Darlo es una `Decision` de `kind: 'means'` que `tick`
+   aplica al empezar: descuenta el coste (si no alcanza, se rechaza y la voz
+   lo dice: `means.cannot` en el banco), añade el rasgo o el ganado, y deja la
+   crónica (`means.plough.given`…). Un medio con rasgo **no se da dos veces**;
+   los cerdos y el barril sí (son ganado y una fiesta).
+2. **Lo que cada uno hace en el motor**, y sus dos sucesos:
+   - **El arado.** `FOOD.FIELD_CREW` × `MEANS.PLOUGH_CREW` (TUNE: 0,6) con el
+     rasgo: el mismo campo con menos manos → sobran manos y `allocateLabour`
+     las reparte como siempre. Bueno: `good_harvest` no existe como suceso,
+     así que el suceso bueno es que **`harvest_feast` pesa más** y el granero
+     se llena; malo: `granary_theft` y `tithe_demand` salen (M-1 §3) y una
+     fila nueva `rats_in_the_granary` (−10 % grano, invierno, sólo con
+     granero > 80 %).
+   - **Los cerdos.** `state.herd.pigs += 2` (el corral ya existe:
+     `herd.ts`, `herdCapacity`). Bueno: `pig_slaughter` en la fiesta de la
+     cosecha (+grano, ánimo +3, sólo con cerdos ≥ 3); malo: lobos escalados
+     (M-1 §1) y `murrainChance` ya existe (v2.94).
+   - **El barril.** Una fiesta **esa semana**: `happen('ale_feast')` directo
+     (ánimo +8, fe −1, `gather square` 2 días); bueno: `wedding` pesa ×3 las
+     cuatro semanas siguientes; malo: `quarrel_in_the_square` pesa ×3 las
+     mismas cuatro, y la riña de R-2 (si está) se ve en la plaza. Es el medio
+     que da al ánimo el reloj del jugador (`plan-medios.md` §6.2).
+3. **El carro.** Una ruta nueva en `SheetRoute` (`kind: 'cart'`), en la barra
+   de abajo en el sitio de las órdenes; misma hoja de papel, mismo canto, misma
+   cruz (`piel-del-valle` §2, §6, §7). Lista de medios con su coste en los
+   iconos de la cabecera y un botón «Give» por fila; gris si no alcanza, con
+   la razón en una línea. **Sin números sueltos**: el coste se enseña como
+   fichas de recurso. Las tres palancas y `redesign/orders.ts` **se retiran de
+   la interfaz** (el fichero se queda hasta M-4 por si el dueño quiere volver a
+   verlas; `state.intent` se queda en reposo y `answerFor` deja de llamarse).
+   `data-screen="cart"` para las pruebas.
+4. **Se ve.** Cada medio tiene un objeto que `render3d/world` posa sin tocar
+   `life/` (que es de la otra sesión): el arado junto al campo más viejo, el
+   barril en la plaza los dos días de fiesta, los cerdos ya los pinta el
+   corral. Un GLB por objeto por el pipeline de `tools/art` (o un primitivo
+   con los materiales de `visual-config.ts` si el arte no llega: se anota).
+
+**Pruebas.** `tests/fast/means.test.ts`: dar sin fondos no cambia nada y no
+consume azar; dar descuenta exactamente el coste; el arado no se da dos veces;
+el barril sube el ánimo esa misma semana; cada medio hace elegible su
+plantilla (una tabla). `ui-v2-nav.test.ts`: cinco rutas siguen siendo cinco
+(el carro sustituye a las órdenes, no se suma). Recorrido en `valley.shots.ts`:
+abrir el carro, dar el barril, ver la fiesta en la voz y el ánimo cambiar de
+cara.
+
+**Medida y terminado — y es la que decide si el patrón vale.**
+`agency-report.ts` con **tres combinaciones fijas** (sólo arado en el año 3;
+cerdos y barril cada vez que alcanza; nada) en dieciséis semillas y sesenta
+años: las tres tienen que dar aldeas que un tercero distinga en población,
+obras y crónica, y **la distancia entre la mejor y la peor ≥ 20 puntos de
+población mediana** (el umbral de §12.9 que hoy está en 5). Si las tres dan la
+misma aldea, los medios son decorado y **se para aquí** y se vuelve a
+`plan-medios.md`. Secuencia de capturas: el carro, el barril dado, la fiesta,
+la riña o la boda que sigue.
+
+### M-3 · Se ve lo que provoca
+
+**Qué.** Que «lo que metí» y «lo que pasó» se liguen por los ojos y no por la
+crónica. Es la fase de la capa de vida y el render, y **se coordina con la
+sesión de `life/`** (`docs/dos-sesiones.md`): aquí sólo se escribe qué tiene
+que verse, y quien tenga `life/` lo hace.
+
+1. Los lobos que vienen a por los cerdos **se ven venir**: `beasts.ts` ya tiene
+   lobos de invierno; con `wolves_at_the_coop` esa semana, van al corral y no
+   al bosque.
+2. La fiesta del barril es la escena de `harvest_feast` de R-5 con el barril
+   de `props.ts` en medio.
+3. El arado se acarrea al campo el día que se da (`deliver-*` de `offers.ts`,
+   como la piedra).
+4. Las ratas del granero: humo no, pero sí el granero abierto y dos personas
+   dentro (`gather granary` en `visible`, y una oferta `sweep`).
+
+**Criterio.** Una secuencia de capturas por medio en tres momentos —se da, se
+ve la cosa, se ve lo que provoca— enviada al dueño, que dice si se lee. La
+propiedad medible, como en R-5: «en la semana del suceso X, al menos N
+cuerpos están en la escena X durante M segundos», con N y M medidos en tres
+semillas.
+
+### M-4 · El resto del carro
+
+**Qué.** Los medios que quedan de `plan-medios.md` §3.3 —el hacha, el forastero
+con oficio, la reliquia— y los que salgan de ver jugar M-2, cada uno con el
+mismo contrato (coste, rasgo u objeto, dos sucesos, una plantilla que sale,
+crónica, objeto en escena). `redesign/orders.ts` y `answerFor` se borran.
+`docs/design.md` §11.2 describe el carro y retira las órdenes; §12 recibe los
+números de `MEANS`, `TRADE`, `LORD` y `FATE` con su medida; **se remide la
+suite de balance** (§5 lo tenía para después: aquí ya toca, porque el motor ha
+cambiado tres veces desde R-1) y se reescriben §12.9 y `handover.md` §5.5.
+
+**Criterio.** Seis medios en el carro, cada uno con su fila en
+`agency-report.ts`; el informe entero en `docs/` con la tabla de distancias
+entre combinaciones; el dueño juega una tarde con la demo y dice si es
+divertido, que es la única medida que no cabe en un script.
+
+### Lo que va después y **no** está en estas fases
+
+- **El rey** (decisión del dueño, «más adelante»): elegir qué aldeano manda;
+  su oficio y sus rasgos deciden la familia de obra que se adelanta, los pesos
+  de los sucesos y a quién se vende. Sus piezas quedan puestas: la tesorería
+  (plata), los rasgos de valle que un medio añade, y el `who` de los sucesos.
+- Podar las plantillas que sigan sin salir después de M-2 (R-4).
+- Afinar los pesos con el informe (§5).
 
 ---
 
