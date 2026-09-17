@@ -285,7 +285,7 @@ export async function createGraphicsRenderer(
   const tells = new Tells();
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
-  const props = new Props();
+  const props = new Props((id) => library.instance(id));
   world.add(village.group, cast.group, tells.group, fauna.group, bubbles.group, props.group);
 
   let ground: Ground | null = null;
@@ -623,6 +623,7 @@ export async function createGraphicsRenderer(
       renderedAnimals: fauna.snapshot().map(animal => ({ ...animal, screen: screen(animal.x, animal.z) })),
       day: lifeDay,
       steps: life.steps,
+      timberDeliveries: life.timberDeliveries,
       phase: round(paintedPhase),
       interactions: { ...life.interactions },
       nightOutcomes: nightOutcomes.map(night => ({ ...night, pending: [...night.pending] })),

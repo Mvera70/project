@@ -2,12 +2,84 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { AnimationMixer, Bone, SkinnedMesh, Vector3 } from 'three';
 import { foundTwenty } from '../helpers/founding';
+import { foundGame } from '../../src/engine/found';
+import type { Role } from '../../src/engine/state';
+import type { Terrain } from '../../src/render3d/life/body';
+import { dayPlans } from '../../src/render3d/life/day';
+import { OFFERS, placesOf, type Offer, type Place } from '../../src/render3d/life/offers';
+import { terrainOf } from '../../src/render3d/life/terrain';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 import { loadAssets, type AssetManifest } from '../../src/render3d/assets';
 import { actionClips } from '../../src/render3d/action-clips';
 
 describe('IA-12 · jornada y acciones', () => {
+  it('la pareja convierte sus fracciones semanales en doce jornadas de campo, una de tala y una de obra', () => {
+    const state = foundGame(7), before = JSON.stringify(state), land = terrainOf(state);
+    const places = placesOf(state, land), field = places.find(place => place.id.startsWith('field:'))!;
+    const work = field.offers.find(offer => offer.id === 'work')!;
+    // La fundación aún no tiene obra real. Se añade un tajo alcanzable sólo
+    // para comprobar que la fracción de albañil no se pierde cuando sí lo hay.
+    const works: Place = {
+      id: 'works:test', at: field.at,
+      offers: [{ ...work, seats: 1, spots: [field.at] }],
+    };
+    const days = Array.from({ length: 7 }, (_, day) => dayPlans(state, [...places, works], land, undefined, day));
+    const jobs = days.flatMap((plans, day) => [...plans].flatMap(([id, plan]) => plan.job === null
+      ? [] : [{ day, id, place: plan.job.place }]));
+
+    expect(jobs.filter(job => job.place.startsWith('field:'))).toHaveLength(12);
+    expect(jobs.filter(job => job.place.startsWith('felling:'))).toHaveLength(1);
+    expect(jobs.filter(job => job.place.startsWith('works:'))).toHaveLength(1);
+    expect(new Set(jobs.map(job => `${job.day}:${job.id}`)).size).toBe(jobs.length);
+    expect(new Set(jobs.map(job => job.id))).toEqual(new Set([0, 1]));
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('conserva los puestos de especialista y usa otra plaza si la primera no tiene ruta', () => {
+    const state = foundTwenty(7);
+    for (const villager of state.people.villagers) villager.homeId = null;
+    const before = JSON.stringify(state);
+    const land: Terrain = { width: 12, height: 8, blocked: new Uint8Array(12 * 8) };
+    // El muro deja `felling:0` más cerca del guardabosques, pero al otro lado.
+    for (let z = 0; z < land.height; z += 1) land.blocked[z * land.width + 4] = 1;
+    const at = (x: number, z: number): { x: number; z: number } => ({ x, z });
+    const offer = (id: keyof typeof OFFERS, spot: { x: number; z: number }, seats = 1): Offer => ({
+      ...OFFERS[id]!, at: spot, seats,
+      spots: Array.from({ length: seats }, (_, seat) => ({ x: spot.x + seat * 0.05, z: spot.z })),
+    });
+    const places: Place[] = [
+      { id: 'smithy:0', at: at(1.5, 1.5), offers: [offer('work', at(1.5, 1.5))] },
+      { id: 'church:0', at: at(1.5, 2.5), offers: [offer('pray', at(1.5, 2.5))] },
+      { id: 'granary:0', at: at(1.5, 3.5), offers: [offer('work', at(1.5, 3.5))] },
+      { id: 'square', at: at(1.5, 4.5), offers: [offer('gossip', at(1.5, 4.5))] },
+      { id: 'felling:0', at: at(5.5, 2.5), offers: [offer('work', at(5.5, 2.5))] },
+      { id: 'felling:1', at: at(2.5, 5.5), offers: [offer('work', at(2.5, 5.5), 4)] },
+      { id: 'field:0', at: at(2.5, 6.5), offers: [offer('work', at(2.5, 6.5), 8)] },
+      { id: 'works:0', at: at(3.5, 6.5), offers: [offer('work', at(3.5, 6.5), 4)] },
+    ];
+    const starts = new Map(state.people.villagers.map(villager => [villager.id, at(3.5, 2.5)]));
+    const byRole = new Map(state.people.villagers.flatMap(villager => villager.role === null
+      ? [] : [[villager.role, villager.id] as const]));
+    const expected: Partial<Record<Role, readonly [string, string]>> = {
+      leader: ['square', 'gossip'], smith: ['smithy:', 'work'], priest: ['church:', 'pray'],
+      woodward: ['felling:1', 'work'], reeve: ['granary:', 'work'],
+    };
+    let midwifeWorked = false;
+    for (let day = 0; day < 7; day += 1) {
+      const plans = dayPlans(state, places, land, starts, day);
+      for (const [role, [prefix, action]] of Object.entries(expected) as [Role, readonly [string, string]][]) {
+        const job = plans.get(byRole.get(role)!)?.job;
+        expect(job?.place.startsWith(prefix), `${role}, día ${day}`).toBe(true);
+        expect(job?.offer, `${role}, día ${day}`).toBe(action);
+      }
+      const midwife = plans.get(byRole.get('midwife')!)?.job;
+      if (midwife?.place.startsWith('field:') || midwife?.place.startsWith('works:')) midwifeWorked = true;
+    }
+    expect(midwifeWorked).toBe(true);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
   it.each([7, 23])('semilla %s: puestos distintos, menores y mayores libres, sin escribir en el motor', seed => {
     const state = foundTwenty(seed), before = JSON.stringify(state), life = createVillage(state, 0);
     const jobs = life.dwellers.flatMap(d => d.dayPlan?.job ? [d.dayPlan.job] : []);

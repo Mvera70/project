@@ -95,11 +95,30 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
     expect(first.length, 'y hay algo que comparar').toBeGreaterThan(0);
   });
 
-  it('una aldea recién fundada ya tiene algo dejado por ahí', () => {
-    // El primer minuto del juego también cuenta: una aldea con cuatro casas y
-    // un campo tiene leña apilada, porque para levantar esas casas alguien taló.
+  it('la pareja recién fundada no finge una cosecha ni una leñera asentada', () => {
     const state = foundGame(7);
     const places = steadingOf(state, state.terrainSeed);
-    expect(places.length, 'algo hay desde el primer día').toBeGreaterThan(0);
+    expect(places.filter(place => place.asset === 'haystack')).toEqual([]);
+    expect(places.filter(place => place.asset === 'log-pile')).toEqual([]);
+  });
+
+  it('la leña y los almiares responden a las reservas, no a contar casas y campos', () => {
+    const state = foundGame(7);
+    state.tick = 1;
+    state.village.wood = 0;
+    state.village.grain = 0;
+    expect(steadingOf(state, state.terrainSeed)
+      .filter(place => place.asset === 'log-pile' || place.asset === 'haystack')).toEqual([]);
+
+    state.village.wood = 60;
+    state.village.grain = 200;
+    const scant = steadingOf(state, state.terrainSeed);
+    state.village.wood = 180;
+    state.village.grain = 600;
+    const stocked = steadingOf(state, state.terrainSeed);
+    expect(stocked.filter(place => place.asset === 'log-pile').length)
+      .toBeGreaterThan(scant.filter(place => place.asset === 'log-pile').length);
+    expect(stocked.filter(place => place.asset === 'haystack').length)
+      .toBeGreaterThan(scant.filter(place => place.asset === 'haystack').length);
   });
 });

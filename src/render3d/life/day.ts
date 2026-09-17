@@ -11,7 +11,72 @@ import { OFFERS, placedOffer, type Place } from './offers';
 export interface DayJob { readonly place: string; readonly offer: string; readonly seat?: number }
 export interface DayPlan { readonly role: Role | null; readonly job: DayJob | null }
 
-export function dayPlans(state: GameState, places: readonly Place[], land: Terrain, starts?: ReadonlyMap<number, Point>): ReadonlyMap<number, DayPlan> {
+type LabourKind = 'field:' | 'felling' | 'works:';
+
+const WEEK_DAYS = 7;
+
+/**
+ * Convierte manos semanales fraccionarias en una parrilla de jornadas enteras.
+ *
+ * El redondeo se hace sobre la semana completa y entre todos los trabajos: si
+ * cada fracción se redondea por separado cada día, algunas jornadas piden más
+ * personas de las que existen y la última cuota desaparece. El reparto por
+ * restos mayores conserva la mezcla de `allocateLabour`; el segundo paso la
+ * esparce por las plazas de la semana para no concentrar la tala en dos días.
+ */
+function weeklyRoster(
+  shares: readonly { readonly kind: LabourKind; readonly days: number }[],
+  peoplePerDay: number,
+  day: number,
+): ReadonlyMap<LabourKind, number> {
+  const capacity = peoplePerDay * WEEK_DAYS;
+  if (capacity <= 0) return new Map();
+
+  const wanted = shares.map(share => ({ ...share, days: Math.max(0, share.days) }));
+  const wantedTotal = wanted.reduce((sum, share) => sum + share.days, 0);
+  const assignedTotal = Math.min(capacity, Math.round(wantedTotal));
+  const scale = wantedTotal > capacity ? capacity / wantedTotal : 1;
+  const counts = wanted.map(share => {
+    const exact = share.days * scale;
+    return { kind: share.kind, exact, count: Math.floor(exact) };
+  });
+  let remaining = assignedTotal - counts.reduce((sum, share) => sum + share.count, 0);
+  for (const share of [...counts].sort((a, b) => (b.exact - b.count) - (a.exact - a.count)
+    || a.kind.localeCompare(b.kind))) {
+    if (remaining <= 0) break;
+    share.count += 1;
+    remaining -= 1;
+  }
+
+  const idle = capacity - counts.reduce((sum, share) => sum + share.count, 0);
+  const lanes: { readonly kind: LabourKind | null; readonly count: number; done: number }[] = [
+    ...counts.map(share => ({ kind: share.kind, count: share.count, done: 0 })),
+    { kind: null, count: idle, done: 0 },
+  ];
+  const slots: (LabourKind | null)[] = [];
+  for (let slot = 0; slot < capacity; slot += 1) {
+    const lane = [...lanes].sort((a, b) =>
+      ((slot + 1) * b.count / capacity - b.done) - ((slot + 1) * a.count / capacity - a.done)
+      || (a.kind ?? 'zz').localeCompare(b.kind ?? 'zz'))[0]!;
+    slots.push(lane.kind);
+    lane.done += 1;
+  }
+
+  const weekDay = ((day % WEEK_DAYS) + WEEK_DAYS) % WEEK_DAYS;
+  const today = new Map<LabourKind, number>();
+  for (const kind of slots.slice(weekDay * peoplePerDay, (weekDay + 1) * peoplePerDay)) {
+    if (kind !== null) today.set(kind, (today.get(kind) ?? 0) + 1);
+  }
+  return today;
+}
+
+export function dayPlans(
+  state: GameState,
+  places: readonly Place[],
+  land: Terrain,
+  starts?: ReadonlyMap<number, Point>,
+  day = 0,
+): ReadonlyMap<number, DayPlan> {
   const plans = new Map<number, DayPlan>(), used = new Map<string, number>(), reserved = new Set<string>();
   const alive = state.people.villagers.filter(v => v.diedTick === null && v.leftTick === null).sort((a, b) => a.id - b.id);
   const available = (p: Place, offer: string): boolean => (used.get(p.id) ?? 0) < (p.offers.find(o => o.id === offer)?.seats ?? 0);
@@ -26,11 +91,10 @@ export function dayPlans(state: GameState, places: readonly Place[], land: Terra
     return null;
   };
   const hands = allocateLabour(state);
-  const quotas = [
-    { prefix: 'felling', count: Math.round(hands.cutters) },
-    { prefix: 'works:', count: Math.round(hands.builders) },
-    { prefix: 'field:', count: Math.round(hands.farmers) },
-  ];
+  const adults = alive.filter(v => {
+    const age = ageOf(v, state.tick);
+    return age >= LIFE.ADULT[0] && age <= LIFE.ADULT[1];
+  });
   const idle = new Map<number, Point>();
   for (const v of alive) {
     const home = state.buildings.find(b => b.id === v.homeId && b.lostTick === null);
@@ -40,12 +104,31 @@ export function dayPlans(state: GameState, places: readonly Place[], land: Terra
       const role = v.role;
       const target = role === 'smith' ? ['smithy:', 'work'] : role === 'priest' ? ['church:|chapel:', 'pray']
         : role === 'woodward' ? ['felling', 'work'] : role === 'reeve' ? ['granary:', 'work']
-          : role === 'leader' ? ['square', 'gossip'] : null;
+          // En una aldea ya formada el líder conserva la plaza. Cuando sólo
+          // quedan dos adultos, sus catorce jornadas hacen falta para comer,
+          // talar y construir: dirigir no puede apartar a media población.
+          : role === 'leader' && adults.length > 2 ? ['square', 'gossip'] : null;
       if (target !== null) job = choose(from, places.filter(p => target[0]!.split('|').some(prefix => p.id.startsWith(prefix))), target[1]!);
-      else if (role === null || role === 'stranger') idle.set(v.id, from);
+      // Un cargo sin edificio o al otro lado del río no deja a la persona
+      // parada: vuelve al reparto común de subsistencia.
+      if (job === null) idle.set(v.id, from);
     }
     plans.set(v.id, { role: v.role, job });
   }
+
+  // El guardabosques que conserva su puesto ya representa una jornada de tala
+  // cada día; se descuenta antes de repartir el resto para no duplicarla.
+  const fixedCutters = [...plans.values()].filter(plan => plan.job?.place.startsWith('felling')).length;
+  const roster = weeklyRoster([
+    { kind: 'field:', days: hands.farmers * WEEK_DAYS },
+    { kind: 'felling', days: Math.max(0, hands.cutters - fixedCutters) * WEEK_DAYS },
+    { kind: 'works:', days: hands.builders * WEEK_DAYS },
+  ], idle.size, day);
+  const quotas = ([
+    { prefix: 'felling' as const },
+    { prefix: 'works:' as const },
+    { prefix: 'field:' as const },
+  ]).map(quota => ({ ...quota, count: roster.get(quota.prefix) ?? 0 }));
   // Primero los tajos escasos, por proximidad, y luego los campos repartidos.
   // El orden de ids no debe enviar al recién llegado al bosque del otro extremo.
   for (const quota of quotas) {

@@ -64,6 +64,12 @@ traído aquí.
 
 ## 2. El tablero
 
+**IA-15 · primera cadena visible de recursos:** reparto semanal estable, pareja
+fundadora dedicada a subsistencia y ciclo `árbol → tala → carga → descarga → vuelta`.
+El tajo coincide con la celda que tala el motor; almiares y pilas responden a reservas
+reales y desaparecen de la fundación. Dos aldeas observadas sin errores, deriva ni
+penetraciones; 72 pruebas, typecheck y lint verdes. [Informe](life-rounds/IA-15.md).
+
 **G-25 · tamaños de roca corregidos (17 sep):** guijarros, piedras medianas y bloques grandes; el límite de celda ya no uniformiza las escalas. Ver G-25.
 
 
@@ -315,6 +321,12 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+IA-15: semilla 7/año20, 286 fotogramas a 15 fps siguiendo al id2: tala, carga,
+transporte, descarga a 17,93 s y vuelta, 1 entrega, 0 charlas con carga. Semilla
+11/año20: 27 personas, 17/17 puestos alcanzados, cinco ids en tala/transporte/
+descarga. Dos tomas con 0 errores, deriva, penetraciones o centros bloqueados;
+tick fijo 912→912. 72 pruebas dirigidas, typecheck y lint verdes.
+
 **G-25 · tamaños:** ocupación horizontal 28–99 % de celda, variación vertical superior a 4×; 49 pruebas, typecheck y lint correctos.
 
 
@@ -471,6 +483,10 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**IA-15 recursos:** falta que el árbol muestre caída, tocón, agotamiento y
+regeneración al avanzar el motor; después conectar piedra y estados de cultivo.
+La toma fija valida la coreografía de madera, no varios ticks de producción.
 
 **G-25:** corregida la uniformidad de las rocas señalada por el dueño. Sigue pendiente ampliar siluetas de árboles.
 

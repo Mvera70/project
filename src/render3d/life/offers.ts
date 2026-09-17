@@ -16,11 +16,13 @@
 // en el río» es una entrada en una tabla, no una rama en un árbol de decisión.
 
 import { hash32 } from '@engine/rng';
-import { TERRAIN_CODE, type GameState } from '@engine/state';
+import type { GameState } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
+import { fellingTarget } from '@engine/world/forest';
 import type { Point, Terrain } from './body';
 import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
+import { woodStoreCells } from './resource-sites';
 
 /** Algo que se puede hacer, y dónde. */
 export interface Offer {
@@ -111,6 +113,8 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   play: { id: 'play', reach: 0.75, seats: 1, gives: { boredom: 0.4, company: 0.2 }, seconds: [1, 2.2] },
   /** Cargar con el palo, el cubo o el haz de leña un rato, y soltarlo. */
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
+  /** Descargar la madera en la leñera. Sólo la rutina del talador la asigna. */
+  deliver: { id: 'deliver', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4] },
 
   // V-11 · La reunión que el motor convoca (§11.8). No es una oferta que nadie
   // elija por gusto: es la orden de una decisión del jugador puesta en el sitio
@@ -151,6 +155,10 @@ const BY_BUILDING: Readonly<Record<string, readonly string[]>> = {
 
 /** La oferta de trabajo, de la que salen los tajos de E2 con otro aforo. */
 const WORK = OFFERS['work'] as OfferSpec;
+/** TUNE escénico: una tanda de hachazos produce un haz transportable. La obra
+ * dura 20–45 s, pero ese plazo ocupa casi toda la mañana y nunca deja tiempo
+ * para volver a la leñera antes del regreso nocturno. */
+const FELL = { ...WORK, seconds: [6, 10] as const };
 
 /** Un sitio del valle, con lo que da. */
 export interface Place {
@@ -263,10 +271,17 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
   // legible: si hay 0,60 de semana-persona en el bosque, alguien va al bosque.
   const felling = Math.ceil(hands.cutters);
   if (felling > 0) {
-    const at = nearestOf(state, land, places, TERRAIN_CODE.forest);
-    if (at !== null) {
-      const offer = placedOffer({ ...WORK, seats: Math.min(felling, MOST_SEATS) }, at, land);
-      if (offer !== null) places.push({ id: 'felling', at, offers: [offer] });
+    const cell = fellingTarget(state);
+    if (cell !== null) {
+      const at = { x: cell % state.map.width + 0.5, z: Math.floor(cell / state.map.width) + 0.5 };
+      const offer = placedOffer({ ...FELL, seats: Math.min(felling, MOST_SEATS) }, at, land);
+      if (offer !== null) places.push({ id: `felling:${cell}`, at, offers: [offer] });
+    }
+    const store = woodStoreCells(state)[0];
+    if (store !== undefined) {
+      const at = { x: store % state.map.width + 0.5, z: Math.floor(store / state.map.width) + 0.5 };
+      const offer = placedOffer({ ...OFFERS.deliver!, seats: Math.min(felling, 2) }, at, land);
+      if (offer !== null) places.push({ id: `wood-store:${store}`, at, offers: [offer] });
     }
   }
 
@@ -304,30 +319,6 @@ const MOST_SEATS = 8;
  * una celda lo sabe `state.map`, y preguntárselo es leer del motor, que es lo
  * que E.3 permite.
  */
-function nearestOf(
-  state: GameState, land: Terrain, places: readonly Place[], kind: number,
-): Point | null {
-  if (places.length === 0) return null;
-  let cx = 0;
-  let cz = 0;
-  for (const place of places) { cx += place.at.x; cz += place.at.z; }
-  cx /= places.length;
-  cz /= places.length;
-
-  let best: Point | null = null;
-  let closest = Number.POSITIVE_INFINITY;
-  for (let z = 0; z < land.height; z += 1) {
-    for (let x = 0; x < land.width; x += 1) {
-      if (state.map.terrain[z * state.map.width + x] !== kind) continue;
-      // Y que se pueda estar ahí: un tajo dentro de una pared no es un tajo.
-      if (blockedAt(land, x + 0.5, z + 0.5)) continue;
-      const away = (x + 0.5 - cx) ** 2 + (z + 0.5 - cz) ** 2;
-      if (away < closest) { closest = away; best = { x: x + 0.5, z: z + 0.5 }; }
-    }
-  }
-  return best;
-}
-
 /**
  * Las ofertas que se pueden alcanzar desde un punto, con su aforo libre.
  *

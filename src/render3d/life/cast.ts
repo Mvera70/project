@@ -33,8 +33,9 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
   if (dweller.scene === null && dweller.doing?.there === true
     && (dweller.residence === undefined || dweller.residence.stage === 'day')) {
     const action = dweller.doing.offer.id, place = dweller.doing.place.id;
-    if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place === 'felling' ? 'chop'
+    if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
       : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
+    if (action === 'deliver') return 'sort';
     if (action === 'sit') return 'sit';
     if (action === 'pray') return 'pray';
     if (action === 'drink') return 'drink';
@@ -47,7 +48,7 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
 function activityOf(dweller: Dweller, moving: boolean): Activity {
   if (moving) return 'walking';
   if (dweller.scene !== null || dweller.doing === null) return 'resting';
-  return dweller.doing.there && dweller.doing.offer.id === 'work' ? 'working' : 'resting';
+  return dweller.doing.there && ['work', 'deliver'].includes(dweller.doing.offer.id) ? 'working' : 'resting';
 }
 
 /**
@@ -156,9 +157,8 @@ export function castOf(
  * `VillagerId` que el render sabe pintar es justo el trabajo de este fichero,
  * el mismo que ya hace `castOf` con `dweller.villager`.
  *
- * **Sin modelo todavía** (alcance recortado de esta ronda, ver el informe):
- * el render de hoy no dibuja nada con esto. Es el enganche para cuando haya
- * un GLB de pelota/palo/cubo/haz de leña que pintar.
+ * `Props` dibuja los que están en el suelo. Los que van en la mano se traducen
+ * también aquí para que `Cast` equipe el recurso sobre el hueso correspondiente.
  */
 export interface PropSighting {
   readonly id: number;

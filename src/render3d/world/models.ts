@@ -204,12 +204,12 @@ export function modelChainFor(actor: Actor): readonly string[] {
  * dónde sale— se lea de un tirón, y para que una prueba pueda comprobarla sin
  * montar una jornada.
  *
- * Los identificadores de sitio los pone `life/offers.ts`: `felling` es el tajo
+ * Los identificadores de sitio los pone `life/offers.ts`: `felling:<cell>` es el tajo
  * del bosque, `works:<id>` una obra en marcha, `<clase>:<id>` un edificio, y
  * `ford:crossing` el vado. Las ofertas son las de `OFFERS`.
  */
 export function occupationOf(placeId: string, offerId: string): Occupation {
-  if (placeId === 'felling') return 'felling';
+  if (placeId === 'felling' || placeId.startsWith('felling:')) return 'felling';
   if (placeId.startsWith('works:')) return 'building';
   if (placeId.startsWith('field:') && offerId === 'work') return 'field';
   if (offerId === 'feed' || offerId === 'pet' || offerId === 'chase') return 'herding';

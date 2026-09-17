@@ -1,0 +1,53 @@
+import { describe, expect, it } from 'vitest';
+import { foundGame } from '../../src/engine/found';
+import { createVillage } from '../../src/render3d/life/village';
+import { castOf } from '../../src/render3d/life/cast';
+
+describe('IA-15 · recursos visibles', () => {
+  it('el talador corta, vuelve cargado, descarga y retoma el tajo sin escribir en el motor', () => {
+    const state = foundGame(7);
+    const before = JSON.stringify(state);
+    const life = Array.from({ length: 14 }, (_, day) => createVillage(state, day))
+      .find(candidate => candidate.dwellers.some(dweller =>
+        dweller.dayPlan?.job?.place.startsWith('felling:') === true));
+    expect(life, 'alguna jornada representa la fracción semanal de tala').toBeDefined();
+    if (life === undefined) return;
+
+    let chopping = false;
+    let hauling = false;
+    let unloading = false;
+    let haulingInterrupted = false;
+    for (let step = 0; step < 7_200 && life.timberDeliveries === 0; step += 1) {
+      life.step(0.45);
+      haulingInterrupted ||= life.dwellers.some(dweller => dweller.holding !== null
+        && dweller.holding < 0 && dweller.scene !== null);
+      const actors = castOf(life, step / 30, new Map(), new Set());
+      chopping ||= actors.some(actor => actor.clip === 'chop');
+      hauling ||= actors.some(actor => actor.clip === 'carry_walk');
+      unloading ||= actors.some(actor => actor.clip === 'sort'
+        && life.dwellers.some(dweller => dweller.villager === actor.id
+          && dweller.doing?.offer.id === 'deliver'));
+    }
+    expect(chopping).toBe(true);
+    expect(hauling).toBe(true);
+    expect(unloading).toBe(true);
+    expect(haulingInterrupted, 'el porteador no deja la carga para charlar').toBe(false);
+    expect(life.timberDeliveries).toBeGreaterThan(0);
+    expect(life.props.some(prop => prop.kind === 'bundle' && prop.held === null)).toBe(true);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('la misma jornada produce la misma secuencia logística', () => {
+    const state = foundGame(11);
+    const lives = [createVillage(state, 4), createVillage(state, 4)];
+    for (let step = 0; step < 900; step += 1) for (const life of lives) life.step(0.45);
+    const snapshot = (index: number) => lives[index]!.dwellers.map(dweller => ({
+      id: dweller.villager,
+      x: dweller.body.x,
+      z: dweller.body.z,
+      holding: dweller.holding,
+      place: dweller.doing?.place.id ?? null,
+    }));
+    expect(snapshot(1)).toEqual(snapshot(0));
+  });
+});

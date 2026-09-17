@@ -19,6 +19,7 @@ import type { GameState, Intent } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
 import { placesOf } from '../../src/render3d/life/offers';
 import { terrainOf } from '../../src/render3d/life/terrain';
+import { fellingTarget, fellForestWithLocation } from '../../src/engine/world/forest';
 
 function village(years: number, seed = 7, intent?: Intent): GameState {
   const state = foundTwenty(seed);
@@ -36,6 +37,15 @@ function seatsAt(state: GameState, prefix: string): number {
 }
 
 describe('E2 · la orden del jugador tiene sitio donde verse', () => {
+  it('el tajo visible es el mismo árbol del que el motor obtiene la madera', () => {
+    const state = village(12, 7, { fields: 1, timber: 0.85, priority: 'none' });
+    const target = fellingTarget(state);
+    expect(target).not.toBeNull();
+    expect(placesOf(state, terrainOf(state)).some(place => place.id === `felling:${target}`)).toBe(true);
+    const clone = structuredClone(state);
+    expect(fellForestWithLocation(clone, 1).firstCell).toBe(target);
+  });
+
   it('mandar las manos al bosque abre un tajo en el bosque', () => {
     // Y mandarlas a la obra lo cierra. Es la respuesta visual más directa que
     // tiene el juego: la misma aldea, la misma semana, y gente en otro sitio.

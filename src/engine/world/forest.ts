@@ -33,6 +33,32 @@ function core(state: GameState): { x: number; y: number } {
   };
 }
 
+/**
+ * El árbol que el motor talaría ahora mismo, sin tocar el estado.
+ *
+ * La vida visible usa esta consulta para mandar al leñador al mismo árbol que
+ * perderá existencias al resolver la semana. Antes cada capa elegía su propio
+ * bosque con un centro distinto y se podía animar una tala a veinte celdas del
+ * claro que realmente avanzaba.
+ */
+export function fellingTarget(state: GameState): number | null {
+  const centre = core(state);
+  let cell = -1;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < state.map.terrain.length; i += 1) {
+    if (state.map.terrain[i] !== TERRAIN_CODE.forest
+      || (state.map.forestStock[i] as number) <= 0) continue;
+    const dx = (i % state.map.width) + 0.5 - centre.x;
+    const dy = Math.floor(i / state.map.width) + 0.5 - centre.y;
+    const d = dx * dx + dy * dy;
+    if (d < bestD || (d === bestD && i < cell)) {
+      cell = i;
+      bestD = d;
+    }
+  }
+  return cell < 0 ? null : cell;
+}
+
 /** How much wood is still standing in the valley. */
 export function woodStanding(state: GameState): number {
   let total = 0;
@@ -107,20 +133,8 @@ export function fellForestWithLocation(
     if (target === undefined || target.coreX !== centre.x || target.coreY !== centre.y ||
       state.map.terrain[target.cell] !== TERRAIN_CODE.forest ||
       (state.map.forestStock[target.cell] as number) <= 0) {
-      let cell = -1;
-      let bestD = Number.POSITIVE_INFINITY;
-      for (let i = 0; i < state.map.terrain.length; i += 1) {
-        if (state.map.terrain[i] !== TERRAIN_CODE.forest ||
-          (state.map.forestStock[i] as number) <= 0) continue;
-        const dx = (i % state.map.width) + 0.5 - centre.x;
-        const dy = Math.floor(i / state.map.width) + 0.5 - centre.y;
-        const d = dx * dx + dy * dy;
-        if (d < bestD || (d === bestD && i < cell)) {
-          cell = i;
-          bestD = d;
-        }
-      }
-      if (cell < 0) break;
+      const cell = fellingTarget(state);
+      if (cell === null) break;
       target = { cell, coreX: centre.x, coreY: centre.y };
       FELL_TARGET.set(state, target);
     }

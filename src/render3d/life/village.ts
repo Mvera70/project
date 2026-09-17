@@ -23,7 +23,7 @@ import {
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
 import { drive, resolve, seek, separate } from './steering';
-import { clearBetween, createRouter, routeAroundBodies, type Router } from './navigate';
+import { clearBetween, createRouter, pathTo, routeAroundBodies, type Router } from './navigate';
 import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
@@ -200,6 +200,8 @@ export interface Village {
   readonly steps: number;
   /** Pases de pelota dados en la jornada, V-09: lo que sale de jugar. */
   readonly passes: number;
+  /** Haces llevados del árbol a la leñera durante esta jornada. */
+  readonly timberDeliveries: number;
   /** Cada pase, en orden, con quién lo dio y a quién iba. V-09b: lo que hace
    *  falta para medir una cadena — `passes` sólo da el total. */
   readonly passLog: readonly PassRecord[];
@@ -508,8 +510,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const residence = homeBuilding === undefined ? undefined : homeRoutine(homeBuilding, land);
     // Cada habitante nace en el lado de su casa, no en un patio elegido para
     // todo el pueblo. Las decisiones descartan después las rutas imposibles.
+    const offered = Array.from({ length: mine.length }, (_, offset) =>
+      mine[(n + offset) % Math.max(1, mine.length)]?.at)
+      .find((at): at is Point => at !== undefined && fitsCircle(land, at.x, at.z, 0.32));
     const spot = residence !== undefined && fitsCircle(land, residence.approach.x, residence.approach.z, 0.32)
-      ? residence.approach : mine[n % Math.max(1, mine.length)]?.at ?? heart;
+      ? residence.approach : offered ?? heart;
     const personalShore = reachableFrom(land, spot);
     // **El sitio de partida, si los cuarenta anillos fallan, ya no es el punto
     // exacto del sitio.** Era `spot` a secas, y eso es un montón: dos personas
@@ -585,7 +590,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // y la misma `resolve()`, así que un niño y una gallina se apartan el uno del
   // otro exactamente como se apartarían dos personas.
   const bodies = [...dwellers.map((d) => d.body), ...beasts.map((b) => b.dweller.body)];
-  const plans = dayPlans(state, mine, land, new Map(dwellers.map(d => [d.villager, d.body])));
+  const plans = dayPlans(state, mine, land, new Map(dwellers.map(d => [d.villager, d.body])), day);
   dwellers.forEach((dweller, index) => { dwellers[index] = { ...dweller, dayPlan: plans.get(dweller.villager)! }; });
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
 
@@ -645,6 +650,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // alguien cuenta, aunque no haya nadie a quien apuntar y se tire hacia
   // delante por gusto (`finishHolding`, más abajo).
   let passes = 0;
+  let timberDeliveries = 0;
   // V-09b: el registro de cada pase, para poder medir una cadena — `passes`
   // por sí solo no dice quién se la pasó a quién.
   const passLog: PassRecord[] = [];
@@ -681,6 +687,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     props,
     get steps(): number { return steps; },
     get passes(): number { return passes; },
+    get timberDeliveries(): number { return timberDeliveries; },
     get passLog(): readonly PassRecord[] { return passLog; },
     get interactions() {
       return {
@@ -920,7 +927,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         //     Con un tope, eso sí: si el camino se ha hecho eterno —porque el
         //     sitio se llenó, o porque hay medio pueblo por medio— se replantea
         //     igual. Quedarse andando para siempre es el otro modo de fallar.
-        if (stepHome(dweller, phase, steps, land, around, dwellers)) continue;
+        if (stepHome(dweller, phase, steps, land, around, dwellers)) {
+          // Un haz es parte de la jornada, no de la persona: al volver a casa
+          // se considera descargado y no entra con él por la puerta.
+          if (dweller.holding !== null && dweller.holding < 0) dweller.holding = null;
+          continue;
+        }
         const onTheWay = dweller.doing !== null && !dweller.doing.there;
         // **Espera creciente, no `GIVE_UP` fijo** (checklist IA-1, punto 6):
         // `noProgress()` sólo concede el replanteo cuando el viaje lleva de
@@ -1034,6 +1046,45 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // debe pasar — antes se quedaba clavado mirando a la plaza fallida.
         // Aquí queda sólo el final normal de una ocupación cumplida.
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
+          // Una tanda de hachazos termina con un viaje visible a la leñera.
+          // Es coreografía derivada: no añade madera ni condiciona el tick.
+          const felling = dweller.doing.place.id.startsWith('felling:')
+            && dweller.dayPlan?.job?.place.startsWith('felling:') === true;
+          if (felling) {
+            const store = mine.find(place => place.id.startsWith('wood-store:'));
+            const offer = store?.offers.find(item => item.id === 'deliver');
+            const seat = offer === undefined ? 0
+              : (dweller.dayPlan?.job?.seat ?? 0) % Math.max(1, offer.seats);
+            const spot = offer === undefined ? null : seatAt(offer, seat);
+            const route = spot === null ? null : pathTo(land, body, spot, body.radius);
+            if (store !== undefined && offer !== undefined && route !== null) {
+              const durationSteps = Math.round(3 / LIFE_STEP);
+              dweller.holding = -1 - body.id;
+              dweller.doing = {
+                place: store, offer, seat, route: [...route], since: steps,
+                until: steps + durationSteps, durationSteps, there: false,
+              };
+              dweller.rethinkAt = steps + RETHINK;
+              continue;
+            }
+          }
+          if (dweller.doing.offer.id === 'deliver' && dweller.holding !== null && dweller.holding < 0) {
+            timberDeliveries += 1;
+            // Hasta tres haces quedan junto a la descarga durante la jornada.
+            // No son inventario y no se pueden volver a coger: hacen visible
+            // el resultado inmediato antes de que el siguiente tick reconstruya
+            // la pila estable a partir de `village.wood`.
+            if (timberDeliveries <= 3) {
+              const bundle: Prop = {
+                id: -10_000_000 - timberDeliveries,
+                kind: 'bundle', x: body.x, z: body.z, y: 0,
+                vx: 0, vz: 0, vy: 0, held: null,
+                restUntil: Number.POSITIVE_INFINITY, for: null,
+              };
+              props.push(bundle);
+              propsById.set(bundle.id, bundle);
+            }
+          }
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
           // pelota se tira —encarado a quien tocara, o hacia delante si nadie
           // quiso jugar— y cualquier otra cosa se suelta donde se está.
@@ -1382,6 +1433,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       const freeToPropose = (d: Dweller): boolean => !indoors(d) && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
         && (steps >= d.sceneCooldownUntil || isNight(phase) || (!quarrelStaged && quarrelPair?.includes(d.villager) === true))
         && !commitments.busy(actorOf(d));
+      const onDuty = (d: Dweller): boolean => d.holding !== null && d.holding < 0
+        || d.doing?.offer.id === 'deliver'
+        || (phase >= 0.16 && phase < 0.65
+          && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
+          && ['work', 'pray'].includes(d.dayPlan.job.offer)
+          && (d.doing === null || d.doing.place.id === d.dayPlan.job.place));
 
       // IA-6: si estos dos son, en cualquier orden, los `id` de la riña real
       // de esta semana. `quarrelPair` sale de `state.happenings[].who`
@@ -1428,10 +1485,6 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           }
 
           const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
-          const onDuty = (d: Dweller): boolean => phase >= 0.16 && phase < 0.65
-            && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
-            && ['work', 'pray'].includes(d.dayPlan.job.offer)
-            && (d.doing === null || d.doing.place.id === d.dayPlan.job.place);
           if (apart <= SCENE_EARSHOT && !onDuty(dweller) && !onDuty(other)) {
             // Sólo lectura del motor, y de los dos sentidos: ninguna escena
             // conoce a nadie por nombre, pero el trato entre estos dos sí
@@ -1447,7 +1500,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             }
           }
 
-          const greeting = proposeGreet(dweller, other, seed, steps);
+          const greeting = onDuty(dweller) || onDuty(other) ? null : proposeGreet(dweller, other, seed, steps);
           if (greeting !== null) candidates.push({ a: dweller, b: other, tag: 'greet', data: greeting });
         });
       }

@@ -1,10 +1,8 @@
 // V-09b · Los trastos, pintados. design.md Anexo E.
 //
-// **Sin modelo todavía** (V-09 lo dejó dicho: no hay Blender en este entorno).
-// Hasta que haya pelota/palo/cubo/haz por la vía de D.4, esto pinta primitivas
-// de Three.js — una esfera pequeña para la pelota, un cilindro corto para lo
-// demás — y nada más: ni GLB, ni textura, ni sombra propia que no dé ya el sol
-// de la escena.
+// Pelota, palo y cubo conservan las primitivas pequeñas de V-09. El haz ya tiene
+// recurso publicado: cuando queda en el suelo se usa su GLB; mientras alguien
+// lo lleva lo pinta `Cast`, unido al hueso de la mano.
 //
 // El mismo patrón que `Bubbles` (`effects/bubbles.ts`): un grupo, un trasto
 // por id, se crea al aparecer y se retira cuando `propsOf` deja de listarlo —
@@ -13,7 +11,7 @@
 
 import {
   CylinderGeometry, Group, Mesh, MeshStandardMaterial, SphereGeometry,
-  type BufferGeometry, type Material,
+  type BufferGeometry, type Material, type Object3D,
 } from 'three';
 import type { PropSighting } from '../life/cast';
 
@@ -40,7 +38,7 @@ const COLOUR: Readonly<Record<Kind, number>> = {
 };
 
 interface Shown {
-  readonly mesh: Mesh;
+  readonly object: Object3D;
   readonly kind: Kind;
 }
 
@@ -50,7 +48,7 @@ export class Props {
   private readonly geometry: Readonly<Record<Kind, BufferGeometry>>;
   private readonly materials = new Map<Kind, Material>();
 
-  constructor() {
+  constructor(private readonly instance?: (id: string) => Object3D | undefined) {
     this.group.name = 'Valley_Props';
     const ball = new SphereGeometry(BALL_RADIUS, 10, 8);
     const other = new CylinderGeometry(OTHER_RADIUS, OTHER_RADIUS, OTHER_HEIGHT, 8);
@@ -78,18 +76,32 @@ export class Props {
   update(sightings: readonly PropSighting[], ground: (x: number, z: number) => number): void {
     const present = new Set<number>();
     for (const sighting of sightings) {
+      // `Cast` ya cuelga el GLB del haz de la mano durante `carry_walk`.
+      // Pintarlo también en sus coordenadas físicas produciría dos cargas.
+      if (sighting.kind === 'bundle' && sighting.heldBy !== null) continue;
       present.add(sighting.id);
       let held = this.shown.get(sighting.id);
       if (held === undefined || held.kind !== sighting.kind) {
         if (held !== undefined) this.retire(sighting.id);
-        const mesh = new Mesh(this.geometry[sighting.kind], this.materialFor(sighting.kind));
-        mesh.name = `Prop_${sighting.id}`;
-        mesh.castShadow = true;
-        this.group.add(mesh);
-        held = { mesh, kind: sighting.kind };
+        const model = sighting.kind === 'bundle' ? this.instance?.('bundle') : undefined;
+        const object = model ?? new Mesh(this.geometry[sighting.kind], this.materialFor(sighting.kind));
+        object.name = `Prop_${sighting.id}`;
+        object.traverse(child => { child.castShadow = true; });
+        if (model !== undefined) {
+          // El recurso cuelga hacia abajo cuando va en la mano. En tierra se
+          // tumba, se hace menor que una carga completa y se levanta medio
+          // grosor para no enterrarlo.
+          object.rotation.x = Math.PI / 2;
+          object.scale.setScalar(0.65);
+          object.userData.groundLift = 0.11;
+        }
+        this.group.add(object);
+        held = { object, kind: sighting.kind };
         this.shown.set(sighting.id, held);
       }
-      held.mesh.position.set(sighting.x, ground(sighting.x, sighting.z) + sighting.y, sighting.z);
+      const lift = typeof held.object.userData.groundLift === 'number'
+        ? held.object.userData.groundLift : 0;
+      held.object.position.set(sighting.x, ground(sighting.x, sighting.z) + sighting.y + lift, sighting.z);
     }
 
     for (const id of [...this.shown.keys()]) {
@@ -100,7 +112,7 @@ export class Props {
   private retire(id: number): void {
     const held = this.shown.get(id);
     if (held === undefined) return;
-    this.group.remove(held.mesh);
+    this.group.remove(held.object);
     this.shown.delete(id);
   }
 

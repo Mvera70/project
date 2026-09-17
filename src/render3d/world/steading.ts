@@ -23,10 +23,11 @@ import {
   InstancedMesh, Matrix4, Quaternion, Vector3, Group,
   type Object3D,
 } from 'three';
-import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
+import { TERRAIN_CODE, type Building, type ValleyMap, type VillageStats } from '@engine/state';
 import { terrainOf } from '../life/terrain';
 import { homeRoutine } from '../life/home';
 import { hash32 } from '@engine/rng';
+import { woodStoreCells } from '../life/resource-sites';
 
 /** Qué se deja por el valle, y contra qué se apoya. */
 export const STEADING_ASSETS = ['haystack', 'log-pile', 'handcart'] as const;
@@ -93,7 +94,13 @@ function ringOf(map: ValleyMap, box: Field): number[] {
  * de una tirada, así que dos pintadas seguidas no mueven nada.
  */
 export function steadingOf(
-  state: { buildings: readonly Building[]; map: ValleyMap }, seed: number,
+  state: {
+    buildings: readonly Building[];
+    map: ValleyMap;
+    village: Pick<VillageStats, 'grain' | 'wood'>;
+    tick: number;
+  },
+  seed: number,
 ): Steaded[] {
   const { map } = state;
   const taken = new Set<number>();
@@ -139,9 +146,9 @@ export function steadingOf(
         || Math.abs(Math.floor(one.cell / map.width) - z) >= APART;
     });
   };
-  const place = (asset: SteadingAsset, candidates: readonly number[]): void => {
+  const place = (asset: SteadingAsset, candidates: readonly number[], limit = MOST_STEADED[asset]): void => {
     for (const cell of candidates) {
-      if (out.filter((one) => one.asset === asset).length >= MOST_STEADED[asset]) return;
+      if (out.filter((one) => one.asset === asset).length >= limit) return;
       if (used.has(cell) || !free(cell) || !far(asset, cell)) continue;
       used.add(cell);
       // El rumbo sale de la celda, en ocho direcciones: un almiar y su vecino
@@ -151,17 +158,29 @@ export function steadingOf(
     }
   };
 
-  // El almiar toca un campo, y los campos primero: es lo que hace que se lea
-  // como la cosecha de ése y no como un bulto amarillo.
-  const fields = state.buildings.filter((one) => one.kind === 'field' && one.lostTick === null);
-  place('haystack', fields.flatMap((one) => ringOf(map, one)));
-
-  // La leña, contra una casa. Contra las de piedra también: lo que pide leña es
-  // el invierno (§5.4) y el invierno entra igual por una pared de piedra.
+  // La leña, contra una casa, sólo aparece después de que el valle haya vivido:
+  // la reserva inicial viaja con los fundadores y no cuenta una tala inexistente.
+  // Cada sesenta unidades visibles sostienen una pila. La rutina de transporte
+  // comparte su emplazamiento y la colocamos primero para que un almiar próximo
+  // no robe justo la celda donde se descarga.
   const homes = state.buildings.filter(
     (one) => (one.kind === 'house' || one.kind === 'stone_house') && one.lostTick === null,
   );
-  place('log-pile', homes.flatMap((one) => ringOf(map, one)));
+  const logPiles = state.tick === 0
+    ? 0
+    : Math.min(MOST_STEADED['log-pile'], Math.floor(state.village.wood / 60));
+  place('log-pile', [
+    ...woodStoreCells(state),
+    ...homes.flatMap((one) => ringOf(map, one)),
+  ], logPiles);
+
+  // El almiar toca un campo y representa grano que existe. Antes aparecía por
+  // el mero hecho de haber una parcela: la pareja fundadora empezaba junto a
+  // un almiar sin haber cosechado una sola vez. Doscientas unidades por almiar
+  // dan cambios grandes y legibles sin pretender que cada brizna sea inventario.
+  const fields = state.buildings.filter((one) => one.kind === 'field' && one.lostTick === null);
+  const haystacks = Math.min(MOST_STEADED.haystack, Math.floor(state.village.grain / 200));
+  place('haystack', fields.flatMap((one) => ringOf(map, one)), haystacks);
 
   // Y la carreta, al lado del camino más pisado. Si no hay camino todavía —los
   // primeros años no hay— junto al granero, que es donde acaba el grano.
