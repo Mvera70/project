@@ -28,9 +28,18 @@ import type { Dweller, Village } from './village';
  * charla seguiría cavando con la azada.
  */
 function clipOf(dweller: Dweller, moving: boolean): ClipName {
-  if (moving) return 'walk';
+  if (moving) return dweller.holding !== null ? 'carry_walk' : 'walk';
+  if (talkingOf(dweller)) return 'talk';
   if (dweller.scene === null && dweller.doing?.there === true
-    && dweller.doing.offer.id === 'work') return 'work_hoe';
+    && (dweller.residence === undefined || dweller.residence.stage === 'day')) {
+    const action = dweller.doing.offer.id, place = dweller.doing.place.id;
+    if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place === 'felling' ? 'chop'
+      : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
+    if (action === 'sit') return 'sit';
+    if (action === 'pray') return 'pray';
+    if (action === 'drink') return 'drink';
+    if (action === 'play') return 'play';
+  }
   return 'idle';
 }
 
@@ -38,7 +47,7 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
 function activityOf(dweller: Dweller, moving: boolean): Activity {
   if (moving) return 'walking';
   if (dweller.scene !== null || dweller.doing === null) return 'resting';
-  return dweller.doing.offer.id === 'work' ? 'working' : 'resting';
+  return dweller.doing.there && dweller.doing.offer.id === 'work' ? 'working' : 'resting';
 }
 
 /**
@@ -62,7 +71,7 @@ function roleOf(dweller: Dweller): 'gives' | 'takes' | 'peer' | null {
  * eso no lleva nube de diálogo encima porque no ha habido diálogo.
  */
 function talkingOf(dweller: Dweller): boolean {
-  return dweller.scene !== null && dweller.scene.kind === 'chat' && roleOf(dweller) === 'peer';
+  return dweller.scene !== null && dweller.scene.kind === 'chat' && roleOf(dweller) === 'peer' && dweller.scene.beat > 0;
 }
 
 /**
@@ -109,6 +118,7 @@ export function castOf(
       facing: body.facing,
       activity: activityOf(dweller, moving),
       clip,
+      poseSeconds: seconds,
       // El clip de andar lo mueve el suelo recorrido (G-04); los de estarse
       // quieto, el reloj, con un desfase por persona para que ochenta vecinos
       // no respiren a la vez.
@@ -124,19 +134,15 @@ export function castOf(
       // nube de diálogo a la vez**, porque el corro de cotilleo tiene plazas
       // para media aldea y estar sentado en una no es estar hablando. Una señal
       // que marca al 60 % de la gente no señala a nadie (§11.1.1).
-      talking: talkingOf(dweller),
+      talking: talkingOf(dweller) && !moving && dweller.scene !== null
+        && Math.floor((life.steps - dweller.scene.since) / 54) % 2 === (body.id === dweller.scene.a ? 0 : 1),
       arguing: arguingOf(dweller),
-      // V-15: sólo cuando ha llegado a su sitio. Alguien de camino al tajo
-      // todavía no es un leñador, va andando, y cambiarle la figura a media
-      // calle se vería como un parpadeo.
-      occupation: dweller.doing?.there === true
-        ? occupationOf(dweller.doing.place.id, dweller.doing.offer.id)
-        : null,
-      // TUNE: la capa de vida todavía no trae el `Role` de nadie hasta aquí
-      // (V-11 añadió los ocho modelos en `world/cast.ts`, no este puente); con
-      // `null` todo el mundo se sigue viendo con el aldeano base, que es lo
-      // mismo que hacía antes de que hubiera más de un modelo.
-      role: null,
+      // La figura del oficio permanece durante el trayecto y los descansos.
+      occupation: dweller.dayPlan?.job !== null && dweller.dayPlan?.job !== undefined
+        ? occupationOf(dweller.dayPlan.job.place, dweller.dayPlan.job.offer)
+        : dweller.dayPlan === undefined && dweller.doing?.there === true ? occupationOf(dweller.doing.place.id, dweller.doing.offer.id) : null,
+      // El cargo real llega al selector de modelo.
+      role: dweller.dayPlan?.role ?? null,
     });
   }
   return actors;

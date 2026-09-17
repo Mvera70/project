@@ -21,6 +21,8 @@ export interface HomeRoutine {
   progressPoint?: Point;
   reroutes?: number;
   exit?: Point;
+  returnAt?: number;
+  returnCheck?: number;
 }
 
 /** Casas actuales: fachada hacia +Z, puerta centrada en X (recetas G-21). */
@@ -50,9 +52,16 @@ export function stepHome(dweller: Dweller, phase: number, step: number, land: Te
   if (home === undefined) return false;
   const { body } = dweller;
   // Se emprende el regreso antes del ocaso según la distancia al hogar.
-  // TUNE: hasta 12 s de anticipo y 3 s para la cola de la puerta. Quien ya
-  // vuelve conserva esa decisión aunque al acercarse disminuya la distancia.
-  const lead = Math.min(0.1, (gap(body, home.approach) / body.pace + 3) / 120);
+  // Quien ya vuelve conserva la decisión aunque se acerque a su puerta.
+  if (home.stage === 'day' && phase >= 0.5 && step >= (home.returnCheck ?? 0)) {
+    const route = pathTo(land, body, home.approach, body.radius);
+    const distance = route?.reduce((sum, point, i) => sum + gap(point, route[i - 1] ?? body), 0) ?? gap(body, home.approach);
+    // TUNE: margen 2 y 8 s de puerta; hasta 36 s de anticipo. La muralla
+    // puede convertir cinco celdas en línea recta en treinta de recorrido.
+    home.returnAt = DUSK - Math.min(0.3, (distance / body.pace * 2 + 8) / 120);
+    home.returnCheck = step + 90;
+  }
+  const lead = home.returnAt === undefined ? Math.min(0.1, (gap(body, home.approach) / body.pace + 3) / 120) : DUSK - home.returnAt;
   const night = isNight(phase) || (phase >= DUSK - lead && phase < DUSK)
     || (phase > 0.5 && home.stage !== 'day');
   if (!night && home.stage === 'day') return false;
@@ -94,6 +103,21 @@ export function stepHome(dweller: Dweller, phase: number, step: number, land: Te
       home.progressPoint = { x: body.x, z: body.z }; home.progressAt = step;
     }
     const stuck = step - (home.progressAt ?? step) > 60;
+    if (!stuck && step >= home.retryAt && home.route.length > 0 && (home.reroutes ?? 0) > 0) {
+      home.retryAt = step + 90;
+      const shorter = pathTo(land, body, home.approach, body.radius);
+      const length = (route: readonly Point[]): number => route.reduce((sum, point, i) => sum + gap(point, route[i - 1] ?? body), 0);
+      // Un rodeo por un vecino no debe durar cuando el vecino ya se ha ido.
+      // Sólo se recupera el camino corto si todos sus segmentos están libres.
+      if (shorter !== null && length(shorter) < length(home.route) * 0.7 && shorter.every((end, i) => {
+        const start = shorter[i - 1] ?? body, dx = end.x - start.x, dz = end.z - start.z, squared = dx * dx + dz * dz;
+        return people.every(other => {
+          if (other === dweller || indoors(other)) return true;
+          const t = squared === 0 ? 0 : Math.max(0, Math.min(1, ((other.body.x - start.x) * dx + (other.body.z - start.z) * dz) / squared));
+          return Math.hypot(other.body.x - start.x - t * dx, other.body.z - start.z - t * dz) >= body.radius + other.body.radius - 0.02;
+        });
+      })) home.route = shorter;
+    }
     // Conserva el desvío mientras progresa: sustituirlo cada tres segundos
     // por el camino corto devolvía al residente al mismo atasco.
     if (step >= home.retryAt && (stuck || home.route.length === 0 || home.stage === 'unreachable')) {
@@ -106,23 +130,26 @@ export function stepHome(dweller: Dweller, phase: number, step: number, land: Te
     if (home.stage === 'unreachable') { body.vx = 0; body.vz = 0; return true; }
     // No se recorta una esquina por estar cerca: el disco debe alcanzar
     // el punto seguro antes de empezar el siguiente tramo de la ruta.
-    while (home.route.length > 1 && gap(body, home.route[0]!) < 0.1) home.route.shift();
+    while (home.route.length > 1 && gap(body, home.route[0]!) < 0.4
+      && clearBetween(land, body, home.route[1]!, body.radius)) home.route.shift();
     target = home.route[0] ?? home.approach;
-    const owner = people.find(other => other !== dweller && other.residence?.building === home.building
-      && ['opening', 'entering', 'leaving'].includes(other.residence.stage));
+    const queue = people.filter(other => other.residence?.building === home.building
+      && ['returning', 'opening', 'entering', 'leaving'].includes(other.residence.stage));
+    const owner = queue.find(other => ['opening', 'entering', 'leaving'].includes(other.residence!.stage))
+      ?? [...queue].sort((a, b) => gap(a.body, home.approach) - gap(b.body, home.approach) || a.body.id - b.body.id)[0];
     // Esperar pegado a quien entra impide que alcance el umbral.
-    if (owner !== undefined && gap(body, home.approach) < 1.2) {
+    if (owner !== undefined && owner !== dweller && gap(body, home.approach) < 2.2) {
       const dx = Math.round(Math.sin(home.facing)), dz = Math.round(Math.cos(home.facing));
-      target = [
-        { x: home.approach.x + dx, z: home.approach.z + dz },
-        { x: home.approach.x + dz, z: home.approach.z - dx },
-        { x: home.approach.x - dz, z: home.approach.z + dx },
-      ].filter(point => fitsCircle(land, point.x, point.z, body.radius)
+      const place = queue.filter(other => other !== owner).sort((a, b) => a.body.id - b.body.id).indexOf(dweller);
+      target = Array.from({ length: 9 }, (_, i) => {
+        const slot = (place + i) % 9, ahead = 1.4 + Math.floor(slot / 3) * 0.8, side = (slot % 3 - 1) * 0.9;
+        return { x: home.approach.x + dx * ahead + dz * side, z: home.approach.z + dz * ahead - dx * side };
+      }).filter(point => fitsCircle(land, point.x, point.z, body.radius)
         && clearBetween(land, body, point, body.radius))
-        .sort((a, b) => gap(body, a) - gap(body, b))[0] ?? null;
+        [0] ?? null;
     }
     if (gap(body, home.approach) < 0.45) {
-      if (owner === undefined) { home.stage = 'opening'; home.until = step + 15; target = null; }
+      if (owner === undefined || owner === dweller) { home.stage = 'opening'; home.until = step + 15; target = null; }
     }
   } else if (home.stage === 'entering') {
     target = home.threshold;
@@ -130,7 +157,8 @@ export function stepHome(dweller: Dweller, phase: number, step: number, land: Te
       home.stage = 'sleeping'; body.vx = 0; body.vz = 0; return true;
     }
   } else if (home.stage === 'leaving') {
-    while (home.route.length > 1 && gap(body, home.route[0]!) < 0.1) home.route.shift();
+    while (home.route.length > 1 && gap(body, home.route[0]!) < 0.4
+      && clearBetween(land, body, home.route[1]!, body.radius)) home.route.shift();
     target = step < home.until ? null : home.route[0] ?? home.exit ?? home.approach;
     if (step >= home.until && gap(body, home.exit ?? home.approach) < 0.1) { home.stage = 'day'; dweller.rethinkAt = step; }
   }
@@ -160,9 +188,13 @@ export function stepHome(dweller: Dweller, phase: number, step: number, land: Te
   const norm = Math.hypot(want.x, want.z);
   const along = norm > 0 ? (push.x * want.x + push.z * want.z) / (norm * norm) : 0;
   drive(body, { x: want.x + (push.x - want.x * along) * 0.25, z: want.z + (push.z - want.z * along) * 0.25 });
+  if (target !== null && !clearBetween(land, body,
+    { x: body.x + body.vx * LIFE_STEP, z: body.z + body.vz * LIFE_STEP }, body.radius)) {
+    body.vx = want.x; body.vz = want.z;
+  }
   integrate(body, land, LIFE_STEP);
   const moved = gap(body, before);
-  dweller.travelled = moved > 0.00001 ? dweller.travelled + moved : 0;
+  if (moved > 0.00001) dweller.travelled += moved;
   if (moved > 0.00001) turnTo(body, Math.atan2(body.x - before.x, body.z - before.z), LIFE_STEP);
   return true;
 }

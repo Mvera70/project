@@ -46,6 +46,7 @@ import { boltPlace, boltsInDay, overcastOf, skyAt, type SkyKind } from '../deriv
 import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
+import type { DayPlan } from './life/day';
 import { castOf, propsOf } from './life/cast';
 import { Props } from './world/props';
 import { LIFE_STEP } from './life/clock';
@@ -602,6 +603,7 @@ export async function createGraphicsRenderer(
     };
     return {
       renderedPeople: cast.snapshot(),
+      bubbles: bubbles.snapshot(),
       buildings: (lifeState === null ? [] : visibleBuildings(lifeState)).map(building => ({ id: building.id, kind: building.kind,
         x: building.x, z: building.y, w: building.w, h: building.h, ruin: building.lostTick !== null })),
       viewport: { width: viewport.widthCss, height: viewport.heightCss },
@@ -615,6 +617,8 @@ export async function createGraphicsRenderer(
       people: life.dwellers.map((dweller) => ({
         id: dweller.villager,
         bodyId: dweller.body.id,
+        dayPlan: dweller.dayPlan ?? null,
+        ageGroup: dweller.ageGroup ?? 'adult',
         penetration: round(penetration(life!.land, dweller.body.x, dweller.body.z, dweller.body.radius)),
         screen: screen(dweller.body.x, dweller.body.z),
         home: dweller.home ?? null,
@@ -787,9 +791,18 @@ export async function createGraphicsRenderer(
           for (const person of life.dwellers) {
             const old = previous.dwellers.find(other => other.villager === person.villager);
             if (old === undefined || !fitsCircle(life.land, old.body.x, old.body.z, person.body.radius)) continue;
-            Object.assign(person.body, { x: old.body.x, z: old.body.z, facing: old.body.facing });
+            Object.assign(person.body, { x: old.body.x, z: old.body.z, facing: old.body.facing, vx: old.body.vx, vz: old.body.vz });
+            person.travelled = old.travelled;
             if (person.residence !== undefined && old.residence?.building === person.residence.building) {
-              person.residence.stage = old.residence.stage === 'sleeping' ? 'sleeping' : 'day';
+              // El relevo escénico puede ocurrir durante el regreso: conservar
+              // el desvío y el turno, traduciendo sus relojes al nuevo paso cero.
+              Object.assign(person.residence, old.residence, {
+                route: old.residence.route.map(point => ({ ...point })),
+                until: old.residence.until - previous.steps,
+                retryAt: old.residence.retryAt - previous.steps,
+                progressAt: (old.residence.progressAt ?? previous.steps) - previous.steps,
+                returnCheck: 0,
+              });
             }
           }
           for (const beast of life.beasts) {
@@ -848,7 +861,7 @@ export async function createGraphicsRenderer(
         // un estado de fondo y una charla es lo corriente.
         const bubble: Bubble | undefined = actor.arguing
           ? 'quarrel'
-          : mood ?? (actor.talking ? 'chat' : undefined);
+          : actor.talking ? 'chat' : (actor.clip === 'idle' && Math.floor(frame.presentationSeconds + actor.id * 1.7) % 12 < 3 ? mood : undefined);
         if (bubble === undefined) continue;
         carried.set(actor.id, bubble);
         heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });
@@ -863,8 +876,8 @@ export async function createGraphicsRenderer(
         const centre = view.view.centre;
         const kept = [...carried.entries()]
           .sort(([idA, a], [idB, b]) => {
-            const stateA = a === 'chat' ? 1 : 0;
-            const stateB = b === 'chat' ? 1 : 0;
+            const stateA = a === 'quarrel' ? 0 : a === 'chat' ? 1 : 2;
+            const stateB = b === 'quarrel' ? 0 : b === 'chat' ? 1 : 2;
             if (stateA !== stateB) return stateA - stateB;
             const headA = heads.get(idA);
             const headB = heads.get(idB);
@@ -1103,6 +1116,7 @@ interface ObservedPoint { readonly x: number; readonly z: number; readonly scree
 export interface LifeSnapshot {
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
   readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number }[];
+  readonly bubbles: readonly { readonly id: number; readonly kind: Bubble }[];
   readonly buildings: readonly { readonly id: number; readonly kind: string; readonly x: number;
     readonly z: number; readonly w: number; readonly h: number; readonly ruin: boolean }[];
   readonly viewport: { readonly width: number; readonly height: number };
@@ -1118,6 +1132,8 @@ export interface LifeSnapshot {
     readonly residence: HomeRoutine | null;
     readonly penetration: number;
     readonly bodyId: number; readonly screen: ScreenPoint;
+    readonly dayPlan: DayPlan | null;
+    readonly ageGroup: string;
     readonly home: { readonly x: number; readonly z: number } | null;
     readonly routePoints: readonly ObservedPoint[]; readonly partners: readonly number[];
     readonly x: number; readonly z: number;

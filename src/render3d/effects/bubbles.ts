@@ -189,7 +189,7 @@ export class Bubbles {
     }
 
     for (const id of [...this.held.keys()]) {
-      if (!what.has(id)) this.retire(id);
+      if (!what.has(id) || !where.has(id)) this.retire(id);
     }
   }
 
@@ -200,6 +200,10 @@ export class Bubbles {
     // El material es suyo y se suelta; la textura es compartida y no.
     held.material.dispose();
     this.held.delete(id);
+  }
+
+  snapshot(): { id: number; kind: Bubble }[] {
+    return [...this.held].map(([id, held]) => ({ id, kind: held.bubble }));
   }
 
   get count(): number {

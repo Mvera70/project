@@ -24,6 +24,11 @@ Empaqueta el juego después de cada cambio relevante:
 npm run bundle
 ```
 
+Si hay otros agentes empaquetando, usa una salida propia y pásala al observatorio:
+`npm run bundle -- --out artifacts/graphics/MI-RONDA/game`, y después
+`--page artifacts/graphics/MI-RONDA/game/valley.html`. No pruebes sobre una página
+que otro agente esté reconstruyendo.
+
 Escoge una toma que responda a la hipótesis:
 
 - Rutas, puertas, sueño o colisiones: 2 fps y 30–45 segundos.
@@ -57,6 +62,12 @@ Lee también `summary.json` y, para investigar un id concreto, `trace.json`. Com
 - con `--live`, `lastTick > firstTick` y `nightOutcomes`: residentes, durmiendo e ids pendientes en cada amanecer;
 - transiciones esperadas y ausencia de estados que se prolongan sin progreso;
 - concordancia entre lo que dice la traza y lo que se ve en los PNG.
+
+Para rutinas diurnas, ejecuta `node tools/graphics/day-report.mjs RUTA/trace.json`.
+Resume puestos asignados/alcanzados, actividades por persona y discrepancias entre
+burbujas, actores y clips del mixer. Un clip con el nombre correcto no prueba que
+mueva los huesos: inspecciona secuencias cercanas y comprueba los nombres importados
+por GLTFLoader (por ejemplo, `forearm.R` pasa a `forearmR`).
 
 Los contadores localizan casos; no sustituyen la inspección de imagen. Si una persona
 queda `returning`, `entering` o `unreachable`, sigue ese id en otra toma cercana y revisa

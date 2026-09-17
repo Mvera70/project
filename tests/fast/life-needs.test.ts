@@ -377,27 +377,9 @@ describe('IA-3 · aldeanos con hábitos', () => {
     return sample;
   }
 
-  // **Frágil, y medido** (IA-8, 16 sep 2026): con estas dos semillas el
-  // devoto pasa el doble por poco, y la proporción cambia con cualquier
-  // cambio de la capa que no toque el rezo —apagando uno a uno el descarte de
-  // plaza, el plazo del viaje, el alcance de parcela y el temblor de los
-  // puestos, sobre seis semillas, va de 0,6× a 2,7×—. El rezo es el 1 % del
-  // tiempo y esta muestra apenas lo ve. Si se pone roja al tocar otra cosa,
-  // no es una regresión del devoto: es esto. Lo abierto está en
-  // `docs/task-log.md` §4: un sesgo del devoto que se vea con una muestra
-  // barata, o una muestra mayor fuera de la suite rápida.
-  // **`it.fails` con la propiedad intacta y la medida escrita**, que es el
-  // patrón de `CLAUDE.md` para lo que no llega. Segunda vez que esta prueba
-  // cae por un cambio que no toca el rezo (IA-8 y IA-9), y ya está medido por
-  // qué: el rezo es el 1 % del tiempo de la aldea y esta muestra —dos
-  // semillas, tres segundos— no lo ve. Sobre seis semillas la proporción va de
-  // **0,6× a 2,7×** según cambios ajenos (`life-rounds/IA-8.md` §3); con IA-9
-  // queda en **1,0×** (0,7 % contra 0,7 %). El listón del brief de IA-3 —el
-  // doble— se queda como está y la prueba dice la verdad: hoy no se cumple.
-  // Lo que hace falta para cerrarla está en `docs/task-log.md` §4, punto 0c:
-  // un sesgo del devoto que se vea con una muestra barata, o una muestra
-  // grande en las jornadas.
-  it.fails('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
+  // IA-12: pasa al evitar la charla previa al primer destino laboral.
+  // Se conserva el umbral 2× y la condición de necesidades urgentes.
+  it('el devoto reza al menos el doble que el resto, sin apagar una necesidad urgente', () => {
     const { byTrait, anyThirstIgnored } = habitSample();
     expect(anyThirstIgnored, 'una necesidad urgente no se apaga con otra cosa').toBe(false);
 

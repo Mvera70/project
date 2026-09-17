@@ -191,6 +191,16 @@ function meadow(): Terrain {
 }
 
 describe('IA-2 · cesión de paso', () => {
+  it('un vecino quieto retrocede cuando no cabe al lado del que intenta pasar', () => {
+    const a = makeDweller(1, { x: 4, z: 3.5 }, { vx: 1, vz: 0 });
+    const b = makeDweller(2, { x: 4.8, z: 3.5 });
+    const yielding = proposeYield(corridor(), a, b, 7, 100);
+    expect(yielding?.yielder).toBe(2);
+    expect(yielding?.aside?.x).toBeGreaterThan(b.body.x);
+    expect(yielding?.aside?.z).toBe(b.body.z);
+    expect(yielding!.actUntil - yielding!.since).toBeGreaterThan(30);
+  });
+
   it('dos que van de frente por un pasillo estrecho generan una cesión', () => {
     const land = corridor();
     const a = makeDweller(1, { x: 4, z: 3.5 }, { vx: 1, vz: 0 });

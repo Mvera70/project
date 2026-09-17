@@ -23,7 +23,9 @@ const SIDECAR = 'valley-assets.json';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const ASSETS = resolve(ROOT, 'public', 'assets', 'valley3d');
-const OUT = resolve(ROOT, 'artifacts', 'graphics', 'G-10', 'game');
+const outIndex = process.argv.indexOf('--out');
+const OUT = outIndex >= 0 ? resolve(ROOT, process.argv[outIndex + 1]!) : resolve(ROOT, 'artifacts', 'graphics', 'G-10', 'game');
+if (!OUT.startsWith(`${ROOT}\\artifacts\\`) && !OUT.startsWith(`${ROOT}/artifacts/`)) throw new Error('--out debe estar dentro de artifacts del proyecto.');
 
 const embedded: Record<string, string> = {};
 for (const file of readdirSync(ASSETS)) {

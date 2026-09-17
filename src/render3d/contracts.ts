@@ -36,6 +36,7 @@ export interface Actor {
   readonly clip: ClipName;
   /** En qué segundo de su propio clip hay que ponerlo. */
   readonly clipSeconds: number;
+  readonly poseSeconds?: number;
   /**
    * Suelo recorrido desde que empezó este tramo, en celdas.
    *

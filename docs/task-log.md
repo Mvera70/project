@@ -358,7 +358,9 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**IA-12:** queda revisar encuentros y acciones propias de cada especie; anclajes de
+**IA-12:** regreso nocturno pendiente del residente 155, semilla 43/año 60,
+tick 2834 (31/32 durmiendo; 21/22 noches completas). La semilla 11 completa 22/22.
+Queda revisar encuentros y acciones propias de cada especie; anclajes de
 uso del yunque/bancos y tareas específicas de partera, herbolario, caza y pesca.
 El ocio, cultivo, tala, construcción, herrería, granero y rezo básicos están
 conectados. Sentarse es en el suelo; un especialista sin edificio usa ocio.

@@ -1,0 +1,516 @@
+{
+  "seed": 43,
+  "year": 60,
+  "mode": "production-renderer-fixed-state-30hz",
+  "fps": 2,
+  "assigned": 21,
+  "reachedJob": 21,
+  "pendingWorkers": [],
+  "misleadingChat": 0,
+  "wrongClip": 0,
+  "people": [
+    {
+      "id": 42,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:5",
+        "offer": "work",
+        "seat": 1
+      },
+      "samples": 89,
+      "atJob": 78,
+      "actions": {
+        "travelling": 11,
+        "work": 78
+      }
+    },
+    {
+      "id": 45,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:5",
+        "offer": "work",
+        "seat": 2
+      },
+      "samples": 89,
+      "atJob": 81,
+      "actions": {
+        "travelling": 8,
+        "work": 81
+      }
+    },
+    {
+      "id": 51,
+      "ageGroup": "adult",
+      "job": {
+        "place": "square:common",
+        "offer": "gossip",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 20,
+      "actions": {
+        "travelling": 69,
+        "gossip": 20
+      }
+    },
+    {
+      "id": 53,
+      "ageGroup": "adult",
+      "job": {
+        "place": "smithy:140",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 25,
+      "actions": {
+        "travelling": 64,
+        "work": 25
+      }
+    },
+    {
+      "id": 55,
+      "ageGroup": "adult",
+      "job": {
+        "place": "church:41",
+        "offer": "pray",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 55,
+      "actions": {
+        "travelling": 34,
+        "pray": 55
+      }
+    },
+    {
+      "id": 60,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:5",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 81,
+      "actions": {
+        "travelling": 8,
+        "work": 81
+      }
+    },
+    {
+      "id": 61,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:138",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 73,
+      "actions": {
+        "travelling": 16,
+        "work": 73
+      }
+    },
+    {
+      "id": 63,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:21",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 74,
+      "actions": {
+        "travelling": 15,
+        "work": 74
+      }
+    },
+    {
+      "id": 64,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:138",
+        "offer": "work",
+        "seat": 1
+      },
+      "samples": 89,
+      "atJob": 79,
+      "actions": {
+        "travelling": 10,
+        "work": 79
+      }
+    },
+    {
+      "id": 68,
+      "ageGroup": "adult",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 72,
+        "sit": 16,
+        "chat": 1
+      }
+    },
+    {
+      "id": 71,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:138",
+        "offer": "work",
+        "seat": 2
+      },
+      "samples": 89,
+      "atJob": 79,
+      "actions": {
+        "travelling": 10,
+        "work": 79
+      }
+    },
+    {
+      "id": 79,
+      "ageGroup": "adult",
+      "job": {
+        "place": "felling",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 41,
+      "actions": {
+        "travelling": 48,
+        "work": 41
+      }
+    },
+    {
+      "id": 85,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:12",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 79,
+      "actions": {
+        "travelling": 10,
+        "work": 79
+      }
+    },
+    {
+      "id": 87,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:21",
+        "offer": "work",
+        "seat": 1
+      },
+      "samples": 89,
+      "atJob": 25,
+      "actions": {
+        "travelling": 64,
+        "work": 25
+      }
+    },
+    {
+      "id": 97,
+      "ageGroup": "adult",
+      "job": {
+        "place": "granary:142",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 16,
+      "actions": {
+        "travelling": 73,
+        "work": 16
+      }
+    },
+    {
+      "id": 100,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:21",
+        "offer": "work",
+        "seat": 2
+      },
+      "samples": 89,
+      "atJob": 45,
+      "actions": {
+        "travelling": 44,
+        "work": 45
+      }
+    },
+    {
+      "id": 106,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:21",
+        "offer": "work",
+        "seat": 4
+      },
+      "samples": 89,
+      "atJob": 36,
+      "actions": {
+        "travelling": 53,
+        "work": 36
+      }
+    },
+    {
+      "id": 110,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:5",
+        "offer": "work",
+        "seat": 3
+      },
+      "samples": 89,
+      "atJob": 55,
+      "actions": {
+        "travelling": 34,
+        "work": 55
+      }
+    },
+    {
+      "id": 111,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:21",
+        "offer": "work",
+        "seat": 5
+      },
+      "samples": 89,
+      "atJob": 44,
+      "actions": {
+        "travelling": 45,
+        "work": 44
+      }
+    },
+    {
+      "id": 113,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:21",
+        "offer": "work",
+        "seat": 3
+      },
+      "samples": 89,
+      "atJob": 37,
+      "actions": {
+        "travelling": 52,
+        "work": 37
+      }
+    },
+    {
+      "id": 115,
+      "ageGroup": "adult",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 45,
+        "wander": 21,
+        "chat": 23
+      }
+    },
+    {
+      "id": 116,
+      "ageGroup": "adult",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 23,
+        "wander": 19,
+        "drink": 12,
+        "chat": 3,
+        "sit": 32
+      }
+    },
+    {
+      "id": 122,
+      "ageGroup": "adult",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 38,
+        "drink": 18,
+        "loiter": 19,
+        "sit": 14
+      }
+    },
+    {
+      "id": 130,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 47,
+        "sit": 35,
+        "play": 7
+      }
+    },
+    {
+      "id": 132,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 33,
+        "drink": 25,
+        "chat": 1,
+        "gossip": 30
+      }
+    },
+    {
+      "id": 136,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 52,
+        "sit": 28,
+        "chat": 9
+      }
+    },
+    {
+      "id": 137,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 36,
+        "play": 53
+      }
+    },
+    {
+      "id": 147,
+      "ageGroup": "adult",
+      "job": {
+        "place": "felling",
+        "offer": "work",
+        "seat": 1
+      },
+      "samples": 89,
+      "atJob": 83,
+      "actions": {
+        "travelling": 6,
+        "work": 83
+      }
+    },
+    {
+      "id": 148,
+      "ageGroup": "adult",
+      "job": {
+        "place": "field:1",
+        "offer": "work",
+        "seat": 0
+      },
+      "samples": 89,
+      "atJob": 87,
+      "actions": {
+        "travelling": 2,
+        "work": 87
+      }
+    },
+    {
+      "id": 149,
+      "ageGroup": "adult",
+      "job": {
+        "place": "felling",
+        "offer": "work",
+        "seat": 2
+      },
+      "samples": 89,
+      "atJob": 82,
+      "actions": {
+        "travelling": 7,
+        "work": 82
+      }
+    },
+    {
+      "id": 150,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 28,
+        "drink": 25,
+        "sit": 25,
+        "chat": 11
+      }
+    },
+    {
+      "id": 155,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 79,
+        "chat": 1,
+        "drink": 9
+      }
+    },
+    {
+      "id": 156,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 39,
+        "drink": 11,
+        "chat": 1,
+        "sit": 38
+      }
+    },
+    {
+      "id": 157,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 21,
+        "play": 67,
+        "chat": 1
+      }
+    },
+    {
+      "id": 158,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 48,
+        "sit": 26,
+        "chat": 15
+      }
+    },
+    {
+      "id": 159,
+      "ageGroup": "child",
+      "job": null,
+      "samples": 89,
+      "atJob": 0,
+      "actions": {
+        "travelling": 53,
+        "sit": 26,
+        "chat": 10
+      }
+    }
+  ]
+}

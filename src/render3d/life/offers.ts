@@ -19,7 +19,7 @@ import { hash32 } from '@engine/rng';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
 import type { Point, Terrain } from './body';
-import { blockedAt, WALL_CLEAR } from './body';
+import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
 import type { NeedName } from './needs';
 
 /** Algo que se puede hacer, y dónde. */
@@ -420,7 +420,7 @@ export function parcelSeats(
     const spot = { x: cx + jx, z: cz + jz };
     if (spot.x <= 0.5 || spot.z <= 0.5) continue;
     if (spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
-    if (blockedAt(land, spot.x, spot.z)) continue;
+    if (!fitsCircle(land, spot.x, spot.z, 0.32)) continue;
     found.push(spot);
   }
   return found;
@@ -428,7 +428,7 @@ export function parcelSeats(
 
 export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
   const found: Point[] = [];
-  if (!blockedAt(land, at.x, at.z)) found.push(at);
+  if (fitsCircle(land, at.x, at.z, 0.32)) found.push(at);
   // Cuarenta intentos para llenar como mucho seis plazas: de sobra para rodear
   // un pozo encajonado, y un tope para no barrer el valle entero buscando.
   for (let ring = 1; found.length < want && ring < 40; ring += 1) {
@@ -437,7 +437,7 @@ export function seatsOn(land: Terrain, at: Point, want: number): Point[] {
     const spot = { x: at.x + Math.sin(angle) * reach, z: at.z + Math.cos(angle) * reach };
     if (spot.x <= 0.5 || spot.z <= 0.5) continue;
     if (spot.x >= land.width - 0.5 || spot.z >= land.height - 0.5) continue;
-    if (blockedAt(land, spot.x, spot.z)) continue;
+    if (!fitsCircle(land, spot.x, spot.z, 0.32)) continue;
     found.push(spot);
   }
   return found;

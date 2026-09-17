@@ -112,11 +112,12 @@ describe('IA-11 · accesos, desvíos y obstáculos finos', () => {
     }
   });
 
-  it('una familia entra por turnos y deja libre la salida para el siguiente', () => {
+  it.each([4, 8])('una familia de %s entra por turnos y deja libre la salida para el siguiente', count => {
     const state = foundTwenty(7), building = { ...state.buildings[0]!, x: 5, y: 5, w: 2, h: 2 };
     state.buildings = [building]; state.map.terrain.fill(TERRAIN_CODE.meadow);
     const land = terrainOf(state), template = createVillage(state, 0).dwellers[0]!;
-    const people = [0, 1, 2, 3].map(id => ({ ...template, villager: id, body: body(id, 5 + id * 0.7, 9), residence: homeRoutine(building, land) }));
+    const people = Array.from({ length: count }, (_, id) => ({ ...template, villager: id,
+      body: body(id, 5.3 + id % 3 * 0.7, 7.65 + Math.floor(id / 3) * 0.75), residence: homeRoutine(building, land) }));
     const around = createNeighbourhood(land.width, land.height);
     for (let step = 0; step < 1500; step++) {
       around.rebuild(people.filter(p => !indoors(p)).map(p => p.body));

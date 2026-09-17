@@ -21,8 +21,9 @@ import {
 } from './body';
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
 import { createNeighbourhood, type Neighbourhood } from './grid';
-import { avoid, drive, resolve, seek, separate } from './steering';
-import { createRouter, follow, routeAroundBodies, type Router } from './navigate';
+import { drive, resolve, seek, separate } from './steering';
+import { clearBetween, createRouter, routeAroundBodies, type Router } from './navigate';
+import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
@@ -157,6 +158,8 @@ export interface Dweller {
    * `undefined` es un adulto, y también lo que sigue siendo cualquier bestia.
    */
   readonly ageGroup?: 'child' | 'elder' | undefined;
+  readonly dayPlan?: DayPlan;
+  readonly leisure?: readonly Place[];
   /**
    * IA-3: la puerta de su propia casa, si tiene una en pie. Sólo se usa para
    * el tirón de «cerca de casa» de un crío (`decide.ts`, `homePull`).
@@ -318,7 +321,7 @@ function settleHeldBody(dweller: Dweller, land: Terrain, around: Neighbourhood, 
   const { body } = dweller;
   integrate(body, land, LIFE_STEP);
   const speed = Math.hypot(body.vx, body.vz);
-  dweller.travelled = speed > 0.05 ? dweller.travelled + speed * LIFE_STEP : 0;
+  if (speed > 0.05) dweller.travelled += speed * LIFE_STEP;
   dweller.faceAnchor = { x: body.x, z: body.z };
   let company = false;
   around.near(body, (other) => {
@@ -563,6 +566,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       playedUntil: 0,
       failed: new Map(),
       ageGroup,
+      leisure: leisurePlaces(land, residence?.approach ?? spot, ageGroup === 'child', villager.id, ageGroup === 'elder'),
       home,
       ...(residence === undefined ? {} : { residence }),
       // Escalonados: si todos se replantean la vida en el mismo paso, la aldea
@@ -575,7 +579,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // y la misma `resolve()`, así que un niño y una gallina se apartan el uno del
   // otro exactamente como se apartarían dos personas.
   const bodies = [...dwellers.map((d) => d.body), ...beasts.map((b) => b.dweller.body)];
+  const plans = dayPlans(state, mine, land, new Map(dwellers.map(d => [d.villager, d.body])));
+  dwellers.forEach((dweller, index) => { dwellers[index] = { ...dweller, dayPlan: plans.get(dweller.villager)! }; });
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
+
   // Checklist IA-1, punto 6: lo que `noProgress()` (`decide.ts`) necesita
   // recordar por persona para medir si un viaje avanza. Fuera de `Dweller` a
   // propósito — ver el comentario de `ProgressState` en `decide.ts` — así que
@@ -929,7 +936,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // aburrimiento que hacía atractivo jugar, dejando a la pelota
         // pegada en la mano para el resto del día. Medido: 3 139 pasos con la
         // pelota en la mano y cero pases en la semilla 3, antes de este freno.
-        const heldSteady = dweller.holding !== null && dweller.doing?.there === true;
+        const heldSteady = dweller.doing?.there === true && (dweller.holding !== null
+          || (steps < dweller.doing.until && dweller.needs.thirst < 0.9 && dweller.needs.rest < 0.9));
         // **El plazo vencido, también sin haber llegado.** Es el mismo hueco
         // que se cerró para los animales en IA-4: `until` sólo contaba una
         // vez llegado, así que quien no llegaba se quedaba con el viaje
@@ -960,6 +968,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             : !playedOut || propOptions.length === 0
               ? [...mine, ...propOptions]
               : [...mine, ...propOptions.filter((place) => place.offers[0]?.id !== 'play')];
+          // Los protagonistas de un hecho del motor se reúnen en plazas
+          // contiguas; el azar del corro no debe impedir escenificarlo.
+          const enactment = !quarrelStaged && quarrelPair?.includes(dweller.villager)
+            ? mine.find(place => place.id.startsWith('gather:')) : undefined;
+          const eventOffer = enactment?.offers[0];
+          const closeSeat = eventOffer?.spots?.map((point, seat) => ({ seat, distance: gap(point, eventOffer.spots![0]!) }))
+            .filter(item => item.seat > 0).sort((a, b) => a.distance - b.distance)[0]?.seat ?? 1;
+          const eventOptions = enactment === undefined ? options : options.map(place => place !== enactment ? place
+            : { ...place, offers: place.offers.map(offer => ({ ...offer, reach: 0.75 })) });
           // **Checklist IA-1, punto 5: si `decide()` no encuentra nada que
           // merezca la pena —o acaba de invalidar lo que había por
           // inalcanzable (punto 4)— siempre queda `pauseHere()`**, una pausa
@@ -971,12 +988,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             {
               traits: dweller.traits, needs: dweller.needs, at: body, id: body.id, doing: before,
               ageGroup: dweller.ageGroup, home: dweller.home, shunned, pace: body.pace,
+              job: enactment === undefined ? dweller.dayPlan?.job : {
+                place: enactment.id, offer: enactment.offers[0]!.id, seat: quarrelPair!.indexOf(dweller.villager) === 0 ? 0 : closeSeat,
+              }, phase,
               // IA-9 · si el viaje no avanza o se le pasó el plazo, que no se
               // conserve: es justo el caso en que conservarlo deja a alguien de
               // pie para siempre.
               restart: tooLong || overdue,
             },
-            options, taken, land, router, seed, steps,
+            summoned ? eventOptions : [...eventOptions, ...(dweller.leisure ?? [])], taken, land, router, seed, steps,
           ) ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
           // **La plaza se reserva al decidir, no al llegar**, y ése era el imán
           // que se veía en pantalla: el aforo se contaba una vez al empezar el
@@ -1054,12 +1074,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
           if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
             dweller.doing.there = true;
+            dweller.doing.until = steps + (dweller.doing.durationSteps ?? Math.round(dweller.doing.offer.seconds[0] * 30));
             dweller.doing.route.length = 0;
           }
         }
-        const next = dweller.doing === null || dweller.doing.there
-          ? null
-          : follow(body, dweller.doing.route);
+        const route = dweller.doing?.route;
+        // Se gira cuando el siguiente tramo es seguro desde la posición real,
+        // sin exigir acertar un punto microscópico ni recortar una esquina.
+        while (route !== undefined && route.length > 1 && gap(body, route[0]!) < 0.4
+          && clearBetween(land, body, route[1]!, body.radius)) route.shift();
+        const next = dweller.doing === null || dweller.doing.there ? null : route?.[0] ?? null;
         // **Llegar es alcanzar la zona válida, no vaciar la ruta** (checklist
         // IA-1, punto 6). La comprobación de arriba ya cubre el caso normal
         // —estar a `reach` de la plaza—; si la ruta se vacía sin que eso haya
@@ -1087,8 +1111,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         }
 
         const want = next === null ? { x: 0, z: 0 } : seek(body, next);
+        if (next !== null) {
+          const distance = Math.hypot(next.x - body.x, next.z - body.z);
+          const pace = Math.min(body.pace, distance / LIFE_STEP);
+          if (distance > 0) { want.x = (next.x - body.x) / distance * pace; want.z = (next.z - body.z) / distance * pace; }
+        }
         const push = separate(body, around);
-        const wall = avoid(body, land);
+        const norm = Math.hypot(want.x, want.z);
+        const along = norm > 0 ? (push.x * want.x + push.z * want.z) / (norm * norm) : 0;
         // **La intención cumplida frena de verdad** (rework.md §3.5.3):
         // `doing.there === true`, no «no hay ruta que seguir» —`next` también
         // es nulo sin intención todavía, recién llegado el día o entre una
@@ -1099,15 +1129,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // empujado por `separate`/`avoid` con la velocidad vieja de fondo, y
         // el forcejeo con un vecino apretado le hacía oscilar de velocidad
         // cada paso: eso es la vuelta sobre sí mismo, no el andar.
-        if (dweller.doing?.there === true) { body.vx = 0; body.vz = 0; }
-        drive(body, { x: want.x + push.x + wall.x, z: want.z + push.z + wall.z });
+        if (next === null) { body.vx = 0; body.vz = 0; }
+        const before = { x: body.x, z: body.z };
+        drive(body, next === null ? { x: 0, z: 0 }
+          : { x: want.x + (push.x - want.x * along) * 0.25, z: want.z + (push.z - want.z * along) * 0.25 });
+        // La inercia y la separación no pueden sacar al cuerpo del tramo seguro.
+        if (next !== null && !clearBetween(land, body,
+          { x: body.x + body.vx * LIFE_STEP, z: body.z + body.vz * LIFE_STEP }, body.radius)) {
+          body.vx = want.x; body.vz = want.z;
+        }
         integrate(body, land, LIFE_STEP);
 
         const speed = Math.hypot(body.vx, body.vz);
         if (speed > 0.05) {
-          dweller.travelled += speed * LIFE_STEP;
-        } else {
-          dweller.travelled = 0;
+          dweller.travelled += Math.hypot(body.x - before.x, body.z - before.z);
         }
 
         // **La cara sólo sigue al cuerpo cuando el cuerpo anda de verdad**
@@ -1336,7 +1371,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
 
       const freeToPropose = (d: Dweller): boolean => !indoors(d) && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
-        && steps >= d.sceneCooldownUntil && !commitments.busy(actorOf(d));
+        && (steps >= d.sceneCooldownUntil || isNight(phase) || (!quarrelStaged && quarrelPair?.includes(d.villager) === true))
+        && !commitments.busy(actorOf(d));
 
       // IA-6: si estos dos son, en cualquier orden, los `id` de la riña real
       // de esta semana. `quarrelPair` sale de `state.happenings[].who`
@@ -1383,7 +1419,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           }
 
           const apart = Math.hypot(otherBody.x - dweller.body.x, otherBody.z - dweller.body.z);
-          if (apart <= SCENE_EARSHOT) {
+          const onDuty = (d: Dweller): boolean => phase >= 0.16 && phase < 0.65
+            && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
+            && ['work', 'pray'].includes(d.dayPlan.job.offer)
+            && (d.doing === null || d.doing.place.id === d.dayPlan.job.place);
+          if (apart <= SCENE_EARSHOT && !onDuty(dweller) && !onDuty(other)) {
             // Sólo lectura del motor, y de los dos sentidos: ninguna escena
             // conoce a nadie por nombre, pero el trato entre estos dos sí
             // puede pesar en si se paran o no.

@@ -29,9 +29,17 @@ export interface ClipMotion {
   readonly strideLength: number | null;
 }
 
-export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk';
+export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'play' | 'drink' | 'sort';
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
+  sort: { seconds: 3, loop: true, strideLength: null },
+  sit: { seconds: 5, loop: true, strideLength: null },
+  talk: { seconds: 3.6, loop: true, strideLength: null },
+  pray: { seconds: 5, loop: true, strideLength: null },
+  hammer: { seconds: 1.6, loop: true, strideLength: null },
+  chop: { seconds: 2.2, loop: true, strideLength: null },
+  play: { seconds: 2.4, loop: true, strideLength: null },
+  drink: { seconds: 3, loop: true, strideLength: null },
   idle: { seconds: 4, loop: true, strideLength: null },
   walk: { seconds: 4 / 3, loop: true, strideLength: 0.317 },
   work_hoe: { seconds: 2, loop: true, strideLength: null },

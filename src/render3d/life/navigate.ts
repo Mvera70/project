@@ -145,7 +145,9 @@ function routeClear(land: Terrain, from: Point, to: Point, radius: number): bool
 }
 
 function bodyTraffic(land: Terrain, point: Point, radius: number): number {
-  return land.trafficBodies?.some(other => Math.hypot(other.x - point.x, other.z - point.z) < radius + other.radius + 0.08) ? 120 : 0;
+  // TUNE: 1000. El desvío se pide después de un atasco real; atravesar
+  // otra vez al vecino no debe resultar más barato que rodear una manzana.
+  return land.trafficBodies?.some(other => Math.hypot(other.x - point.x, other.z - point.z) < radius + other.radius + 0.08) ? 1000 : 0;
 }
 
 /**
@@ -305,7 +307,7 @@ export function routeAroundBodies(land: Terrain, body: Body, to: Point, bodies: 
  * cierra un paso— y eso pasa una vez al día escénico, no por fotograma.
  */
 export interface Router {
-  to(land: Terrain, from: Point, to: Point): Waypoint[] | null;
+  to(land: Terrain, from: Point, to: Point, radius?: number): Waypoint[] | null;
   /** Olvida lo aprendido. El valle ha cambiado de forma. */
   clear(): void;
   readonly asked: number;
@@ -323,19 +325,19 @@ export function createRouter(limit = 512): Router {
 
     clear(): void { known.clear(); },
 
-    to(land: Terrain, from: Point, to: Point): Waypoint[] | null {
+    to(land: Terrain, from: Point, to: Point, radius = ROUTE_CLEARANCE): Waypoint[] | null {
       asked += 1;
-      const key = `${cellOf(land, from)}:${cellOf(land, to)}`;
+      const key = `${cellOf(land, from)}:${cellOf(land, to)}:${radius}`;
       const seen = known.get(key);
       if (seen !== undefined && (land.solids === undefined || (seen !== null && seen.length > 0
-        && clearBetween(land, from, seen[0]!, ROUTE_CLEARANCE)
-        && clearBetween(land, seen.length > 1 ? seen[seen.length - 2]! : from, to, ROUTE_CLEARANCE)))) {
+        && clearBetween(land, from, seen[0]!, radius)
+        && clearBetween(land, seen.length > 1 ? seen[seen.length - 2]! : from, to, radius)))) {
         // La ruta guardada va de centro a centro de celda; el último tramo se
         // rehace hacia el punto pedido, que rara vez es el centro justo.
         return seen === null ? null : [...seen.slice(0, -1), { x: to.x, z: to.z }];
       }
       solved += 1;
-      const found = pathTo(land, from, to);
+      const found = pathTo(land, from, to, radius);
       if (known.size >= limit) known.clear();
       known.set(key, found);
       return found;
@@ -352,10 +354,10 @@ const REACHED = 0.45;
  * Va quitando los que ya se han alcanzado. Devuelve nada cuando se acabó la
  * ruta, que es como el que anda sabe que ha llegado.
  */
-export function follow(body: Point, route: Waypoint[]): Waypoint | null {
+export function follow(body: Point, route: Waypoint[], reached = REACHED): Waypoint | null {
   while (route.length > 0) {
     const next = route[0] as Waypoint;
-    if (Math.hypot(next.x - body.x, next.z - body.z) > REACHED) return next;
+    if (Math.hypot(next.x - body.x, next.z - body.z) > reached) return next;
     route.shift();
   }
   return null;

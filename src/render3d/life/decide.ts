@@ -21,9 +21,11 @@ import type { Offer, Place } from './offers';
 import { seatAt, seatKey } from './offers';
 import type { Router, Waypoint } from './navigate';
 import { STEPS_PER_DAY } from './clock';
+import type { DayJob } from './day';
 
 /** Lo que alguien está haciendo o yendo a hacer. */
 export interface Intent {
+  readonly durationSteps?: number;
   /** Un desvío por tráfico antes de abandonar esta intención. */
   detoured?: boolean;
   readonly place: Place;
@@ -140,11 +142,7 @@ function leanOf(traits: readonly Trait[], offer: string): number {
  * que importar los umbrales de `@engine/balance` (`DAY.CHILD_UNDER`,
  * `DAY.ELDER_OVER`) sólo para esto.
  *
- * Un crío inclinado a `work` en 0,35 y no en 0 **a propósito**: si la única
- * oferta a mano es el tajo y el deber aprieta, un niño real también acaba
- * ahí un rato — lo que no hace es preferirlo, y con 0,35 nunca gana a `play`
- * si `play` está a mano y da algo parecido (regla del brief: no ignorar una
- * necesidad urgente por una etiqueta de edad).
+ * IA-12: niños y mayores quedan excluidos del trabajo antes de puntuar.
  */
 const AGE_LEANING: Readonly<Record<'child' | 'elder', Partial<Record<string, number>>>> = {
   child: { play: 1.8, chase: 1.6, pet: 1.2, gossip: 0.6, pray: 0.5, work: 0.35 },
@@ -365,6 +363,8 @@ const TRY = 4;
 
 /** Lo que decide alguien, con todo lo suyo delante. */
 export interface Chooser {
+  readonly job?: DayJob | null | undefined;
+  readonly phase?: number;
   readonly traits: readonly Trait[];
   readonly needs: Needs;
   readonly at: Point;
@@ -444,7 +444,7 @@ export function decide(
   seed: number,
   step: number,
 ): Intent | null {
-  const dayPhase = (step % STEPS_PER_DAY) / STEPS_PER_DAY;
+  const dayPhase = who.phase ?? (step % STEPS_PER_DAY) / STEPS_PER_DAY;
   const options: { place: Place; offer: Offer; score: number; key: string }[] = [];
 
   // IA-3: un crío o un mayor busca más corto, a igualdad de necesidad — ver
@@ -482,8 +482,10 @@ export function decide(
     // propiedad que V-11 existe para vigilar es justamente que la orden del
     // motor llegue a toda la aldea.
     const searchReach = hasHour ? LOOK * reachMult : personalReach * reachMult;
-    if (away > searchReach) continue;
+    if (away > searchReach && who.job?.place !== place.id) continue;
     for (const offer of place.offers) {
+      const assigned = who.job?.place === place.id && who.job.offer === offer.id;
+      if (offer.id === 'work' && (who.ageGroup !== undefined || (who.job !== undefined && !assigned))) continue;
       const key = seatKey(place, offer);
       // El aforo, salvo para quien ya está dentro: no se echa a nadie de su
       // propio sitio por estar lleno.
@@ -491,6 +493,12 @@ export function decide(
       if (!inside && (taken.get(key) ?? 0) >= offer.seats) continue;
 
       let score = worth(offer, who.needs, who.traits, who.at, personalReach);
+      // El turno laboral admite descanso y agua urgentes, no un cambio continuo de oficio.
+      if (assigned && dayPhase >= 0.16 && dayPhase < 0.65 && who.needs.thirst < 0.9 && who.needs.rest < 0.9) score = Math.max(score, 1.2);
+      if (place.id.startsWith('leisure:')) {
+        if (inside) score *= 0.15;
+        else score = Math.max(score, who.ageGroup === 'child' ? 0.55 : 0.25);
+      }
       // **La convocatoria se obedece, no se sopesa** (§11.8, V-11). La reunión
       // que el motor ordena da compañía y quita aburrimiento, así que a quien
       // no le falte ninguna de las dos **no le ofrece nada** y `worth` le da
@@ -626,8 +634,9 @@ export function decide(
       }
       if (tries >= free) continue;
     }
+    if (who.job?.place === pick.place.id && who.job.offer === pick.offer.id && who.job.seat !== undefined) seat = who.job.seat;
     const spot = seatAt(pick.offer, seat);
-    const route = router.to(land, who.at, spot);
+    const route = router.to(land, who.at, spot, who.job === undefined ? undefined : 0.32);
     // **Sin camino se prueba la siguiente, no se abandona el día.** Era la otra
     // mitad del fallo de las plazas en pared: bastaba con que la mejor oferta
     // fuera inalcanzable para que la persona se quedara sin hacer nada, y como
@@ -650,9 +659,11 @@ export function decide(
       seat,
       since: step,
       until: step + Math.round(seconds * 30),
+      durationSteps: Math.round(seconds * 30),
       there: false,
       ...(who.pace === undefined || who.pace <= 0 ? {} : {
-        arriveBy: step + Math.round((route.length / who.pace) * 30 * JOURNEY_SLACK) + JOURNEY_GRACE_STEPS,
+        arriveBy: step + Math.round((route.reduce((sum, point, i) => sum + Math.hypot(point.x - (route[i - 1] ?? who.at).x,
+          point.z - (route[i - 1] ?? who.at).z), 0) / who.pace) * 30 * JOURNEY_SLACK) + JOURNEY_GRACE_STEPS,
       }),
     };
   }

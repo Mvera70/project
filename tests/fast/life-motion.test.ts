@@ -28,7 +28,7 @@ import { TIME } from '@engine/balance';
 import { run } from '@engine/sim';
 import { foundTwenty } from '../helpers/founding';
 import {
-  blockedAt, integrate, type Body, type Terrain,
+  blockedAt, integrate, penetration, type Body, type Terrain,
 } from '../../src/render3d/life/body';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 import { terrainOf } from '../../src/render3d/life/terrain';
@@ -45,9 +45,9 @@ const SAMPLE_EVERY = 30;
  *  mismos cinco puntos que `tools/life-report.ts`. */
 function circleBlocked(land: Terrain, body: Body): boolean {
   const { x, z, radius } = body;
-  return blockedAt(land, x, z)
-    || blockedAt(land, x - radius, z) || blockedAt(land, x + radius, z)
-    || blockedAt(land, x, z - radius) || blockedAt(land, x, z + radius);
+  // IA-12: círculo completo, también en esquinas; tolerancia de redondeo
+  // (un contacto a 1e-9 no es una penetración física).
+  return blockedAt(land, x, z) || penetration(land, x, z, radius) > 1e-7;
 }
 
 interface Totals {
