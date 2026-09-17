@@ -814,3 +814,117 @@
 .valley-hud-right.hud-speed-corner {
   bottom: calc(var(--ui-stack-height, 60px) + 10px);
 }
+
+/* ------------------------------------------------- la regleta de velocidad */
+
+/** UI-V3b · **La regleta, vestida y encima del rincón en vez de a su lado.**
+
+    Dos defectos, los dos vistos en la primera captura que la abrió de verdad
+    (`tour/4-velocidad.png`): seguía con la píldora blanca de U-01 —UI-V1 vistió
+    los dos círculos pero no la tira que sale de ellos— y **se salía de la
+    pantalla por la izquierda**, con «Pause» cortado. La cuenta es simple: sus
+    cinco botones piden 44 px cada uno, 220 más el aire, y el rincón que los
+    ancla ya gasta unos 150 con el sonido, el círculo y el multiplicador. En
+    390 px no caben en una fila, y ninguna cantidad de piel arregla eso.
+
+    Así que no se pone al lado: se **apila encima**. `position: absolute` con
+    `bottom: 100%` la levanta sobre el rincón, anclada a su derecha, donde sí
+    cabe. Y de paso es donde un desplegable espera estar, encima de lo que lo
+    abre. */
+.valley-speeds.hud-speeds {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  margin-bottom: 8px;
+  padding: 3px;
+  gap: 2px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: var(--skin-shadow);
+  backdrop-filter: none;
+  background-color: var(--skin-parchment);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip-b);
+}
+/* El rincón pasa a ser el ancla de la regleta: sin esto `bottom: 100%` se
+   mediría contra el lienzo y la tira se iría a lo alto de la pantalla. */
+.valley-hud-right.hud-speed-corner { position: absolute; }
+.valley-speeds.hud-speeds button {
+  min-width: 42px;
+  border-radius: 0;
+  color: var(--skin-ink-soft);
+  font: 600 13px/1 var(--skin-font-voice);
+  letter-spacing: .04em;
+}
+.valley-speeds.hud-speeds button[aria-pressed="true"] {
+  background: var(--skin-ink-soft);
+  color: var(--skin-gold-lit);
+}
+.valley-speeds.hud-speeds button:active { background: rgba(27, 22, 19, .12); }
+.valley-speeds.hud-speeds button[aria-pressed="true"]:active { background: var(--skin-ink); }
+
+/* ---------------------------------------- la hoja de las órdenes permanentes */
+
+/** UI-V3b · **Las tres palancas, con la piel del resto.**
+
+    Lo dijo el dueño del diseño al ver la vuelta completa: «la sección de
+    standing orders no parece que cumpla la estética del resto de secciones», y
+    era exacto. La hoja se migró a la bandeja en UI-R2 y se quedó con los
+    controles de antes del rediseño: etiquetas en sans, grupos de píldoras
+    grises y esquinas redondeadas de sistema, dentro de una pantalla que ya era
+    toda pergamino y Cinzel.
+
+    No hay prototipo de esta hoja —las tres palancas son nuestras, de la v2.0—
+    así que la piel sale de lo que los prototipos **sí** dicen y el kit ya
+    tiene: la etiqueta es la versalita de `.skin-label`, cada posición es un
+    chip de pergamino con el canto rasgado, y **la elegida es una placa de
+    tinta con letra de oro**, que es exactamente como la barra de abajo marca
+    su pestaña activa y como la regleta de velocidad marca su multiplicador.
+    Así las tres cosas que en este juego dicen «esto está puesto» se marcan
+    igual, y no de tres maneras distintas. */
+.skin-orders h2 {
+  margin: 0 0 4px;
+  color: var(--skin-ink);
+  font-size: var(--skin-text-name);
+  text-transform: none;
+}
+.skin-order { gap: 7px; margin: 16px 0 2px; }
+.skin-order > .skin-label { color: var(--skin-ink-faded); }
+/* La barra deja de ser un surco: las posiciones se apoyan en el papel, con
+   aire entre ellas, como los chips de la cabecera. */
+.skin-order-bar {
+  padding: 0;
+  gap: 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.skin-order-bar button {
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 0;
+  color: var(--skin-ink-soft);
+  font: 600 13px/1 var(--skin-font-voice);
+  letter-spacing: .05em;
+  background-color: var(--skin-parchment-deep);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-chip);
+}
+/* Cuatro cantos rasgados distintos por fila, para que seis chips seguidos no
+   se lean como seis copias del mismo recorte. Es lo que `skin.css` ya hace con
+   los cuatro chips de la cabecera. */
+.skin-order-bar button:nth-child(4n + 2) { clip-path: var(--skin-deckle-chip-b); }
+.skin-order-bar button:nth-child(4n + 3) { clip-path: var(--skin-deckle-chip-c); }
+.skin-order-bar button:nth-child(4n + 4) { clip-path: var(--skin-deckle-chip-d); }
+.skin-order-bar button[aria-pressed="true"] {
+  background-color: var(--skin-ink-soft);
+  color: var(--skin-gold-lit);
+}
+.skin-order-bar button:active { background-color: var(--skin-parchment-aged); }
+.skin-order-bar button[aria-pressed="true"]:active { background-color: var(--skin-ink); }

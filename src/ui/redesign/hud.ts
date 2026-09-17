@@ -454,7 +454,9 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   // ahí, y `tools/valley.shots.ts` sigue contando cinco botones.
   // ---------------------------------------------------------------------
   const speedControls = document.createElement('div');
-  speedControls.className = 'valley-speeds';
+  // UI-V3b · la segunda clase la viste y la coloca (`skin.css`). `valley-speeds`
+  // se queda porque `tools/valley.shots.ts` cuenta sus cinco botones por ahí.
+  speedControls.className = 'valley-speeds hud-speeds';
   speedControls.setAttribute('aria-label', renderUiText('app.speed.controls'));
   const speedButtons = TIME.SPEEDS.map((value) => {
     const button = document.createElement('button');

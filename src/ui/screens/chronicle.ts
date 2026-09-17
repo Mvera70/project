@@ -65,10 +65,18 @@ const STYLE = `
    sep 2026: «no hay forma de volver atrás». Ahora hay un botón y la barra de
    abajo sigue a la vista, que es lo que un dedo espera de una barra de
    pestañas. El deslizamiento se queda: era correcto, sólo estaba solo.
-   Fijo (no \`sticky\`) porque ya no hay un padding superior del que colgar: el
-   botón flota sobre el valle, igual que la píldora de \`screens/crossroad.ts\`
-   (\`.crossroad-marker\`) con la que convive arriba a la derecha. */
-.chronicle-close { position: fixed; top: max(10px, env(safe-area-inset-top)); right: 12px; z-index: 2;
+   **UI-V3b · y absoluto, no fijo, que es lo que costó una captura.** Fijo se
+   quedaba clavado en la esquina de la pantalla, y al leer hacia abajo la
+   página le pasaba por debajo: se comía el final de las dos primeras líneas
+   de la entrada de arriba (visto en \`tour/6-cronica-abajo.png\`). Absoluto
+   dentro del velo —que es el contenedor que se desplaza— lo deja donde tiene
+   sentido: **sobre el valle transparente de arriba**, que es lo que el
+   prototipo enseña ahí, y se va con la página en cuanto se lee más allá.
+   Volver sigue estando a mano en todo momento sin él: la barra de abajo está
+   siempre a la vista desde UI-V2 y su pestaña del valle es la misma puerta —
+   que es justo lo que U-14 pedía y entonces no existía. Y el deslizamiento
+   hacia abajo se queda, como siempre. */
+.chronicle-close { position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px; z-index: 2;
   min-height: 40px; padding: 6px 14px; border: 1px solid var(--skin-parchment-aged); border-radius: 8px;
   background: var(--skin-parchment); color: var(--skin-ink); font: 600 13px/1 var(--skin-font-voice);
   box-shadow: var(--skin-shadow); cursor: pointer; -webkit-tap-highlight-color: transparent; }

@@ -68,7 +68,10 @@ export function nextIntentForPriority(intent: Intent, key: string): Intent {
  */
 export const ordersPanel: PanelFactory = (actions) => {
   const element = document.createElement('section');
-  element.className = 'valley-orders';
+  // UI-V3b · la piel entra por una segunda clase en cada nodo, como en el
+  // resto de esta tanda: los nombres `valley-*` se quedan porque
+  // `shot.mjs` y `valley.shots.ts` los buscan, y `skin-*` es lo que viste.
+  element.className = 'valley-orders skin-orders';
   element.setAttribute('aria-label', renderUiText('app.orders'));
 
   const close = document.createElement('button');
@@ -79,6 +82,7 @@ export const ordersPanel: PanelFactory = (actions) => {
   close.addEventListener('click', () => { actions.navigate({ kind: 'valley' }); });
 
   const heading = document.createElement('h2');
+  heading.className = 'skin-inscription';
   heading.textContent = renderUiText('app.orders');
   element.append(close, heading);
 
@@ -92,12 +96,12 @@ export const ordersPanel: PanelFactory = (actions) => {
     current: (state: GameState) => string,
   ): void => {
     const row = document.createElement('div');
-    row.className = 'valley-order';
+    row.className = 'valley-order skin-order';
     const label = document.createElement('span');
-    label.className = 'valley-order-name';
+    label.className = 'valley-order-name skin-label';
     label.textContent = name;
     const bar = document.createElement('div');
-    bar.className = 'valley-order-bar';
+    bar.className = 'valley-order-bar skin-order-bar';
     const buttons = stops.map((stop) => {
       const button = document.createElement('button');
       button.type = 'button';
