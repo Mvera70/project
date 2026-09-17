@@ -24,53 +24,128 @@ import { population } from '@engine/people/demography';
 import type { SaveFile } from '@engine/state';
 import { yearOf } from '@engine/time';
 import { nextUnusedSeed } from '../app';
+import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
 import { setSoundPreference, soundPreference } from '../sound';
 
 const STYLE_ID = 'valley-title-style';
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const STYLE = `
-/* U-01 · la misma piel que el parte del letargo: noche, pergamino y latón. */
-.title-scrim { position: fixed; inset: 0; z-index: 13; display: flex; flex-direction: column;
-  justify-content: space-between; box-sizing: border-box;
-  padding: max(28px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
-  background: var(--night, #1a1511); color: var(--parchment, #f2e9d8);
-  font: 14px/1.45 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
-.title-head { padding-top: 14px; border-top: 2px solid var(--gild-lit, #c9ab6b); }
-.title-head h1 { margin: 0; letter-spacing: .12em; text-transform: uppercase; text-wrap: balance;
-  color: var(--gild-lit, #c9ab6b);
-  font: 600 30px/1.1 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-.title-head p { margin: 12px 0 0; max-width: 34ch; color: var(--paper-dim, #d9cfbc); text-wrap: pretty;
-  font: 16px/1.5 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-.title-actions { display: grid; gap: 12px; }
-.title-actions button { min-height: 50px; padding: 12px 16px; border: 1px solid rgba(242,233,216,.35);
-  border-radius: 10px; background: rgba(242,233,216,.08); color: inherit; text-align: left;
-  font: 600 16px/1.2 var(--voice, 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif); }
-.title-actions button small { display: block; margin-top: 4px; color: var(--paper-dim, #d9cfbc);
-  font: 13px/1.3 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif); }
-.title-new { background: #d8c574 !important; color: #242016 !important; border-color: #d8c574 !important; }
-.title-seed-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
-.title-seed-row label { grid-column: 1 / -1; color: var(--paper-dim, #d9cfbc); font-size: 12px;
-  letter-spacing: .08em; text-transform: uppercase; }
-.title-seed, .title-year { box-sizing: border-box; width: 100%; min-height: 44px; padding: 8px 12px;
-  border: 1px solid rgba(242,233,216,.35); border-radius: 10px; background: rgba(0,0,0,.25);
-  color: var(--parchment, #f2e9d8); font: 600 18px/1.2 var(--plain, ui-sans-serif,-apple-system,'Segoe UI',Roboto,sans-serif);
-  font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-.title-seed:focus, .title-year:focus { outline: 2px solid var(--gild-lit, #c9ab6b); outline-offset: 1px; }
-.title-reroll { min-height: 44px !important; padding: 8px 14px !important; font-size: 14px !important; }
-.title-hint { grid-column: 1 / -1; margin: 0; color: var(--paper-dim, #d9cfbc); font-size: 13px; text-wrap: pretty; }
-.title-dev-row { display: grid; gap: 8px; }
-.title-dev-row label { color: var(--paper-dim, #d9cfbc); font-size: 12px;
-  letter-spacing: .08em; text-transform: uppercase; }
+/* UI-V5 · **La cubierta de la crónica.**
+   \`docs/ui-redesign/piel/plan-piel.md\` no tiene sección para esta pantalla y
+   los tres prototipos tampoco la dibujan: el menú de inicio quedó fuera de la
+   tanda de piel porque no hay nada que copiar. El dueño del diseño lo pidió
+   igualmente («aunque no tenemos diseño, pero habrá que hacerlo»), así que esto
+   **no se calca: se diseña**, y lo único que no es mío es el vocabulario, que
+   sale entero del kit de UI-V0 y de los tres prototipos.
+
+   **La idea, y por qué ésta.** Este juego es la crónica de un valle —la pantalla
+   que más peso tiene es una página de pergamino con su capitular— y esta
+   pantalla viene *antes* de que el valle exista. Así que es lo que hay antes de
+   la primera página: **la cubierta cerrada, sobre la mesa**. De ahí las tres
+   decisiones:
+
+   1. El fondo es la **madera** de la barra de navegación (\`--skin-wood\`), no la
+      noche de U-01. La madera ya significa «el mueble donde esto vive» en los
+      prototipos 02 y 03; la noche no significaba nada.
+   2. Encima, **una hoja de pergamino con su canto deshilachado**
+      (\`--skin-deckle-sheet\`), la misma textura que la página de la crónica y
+      la misma inclinación mínima que las tarjetas. Una hoja, no un cuadro de
+      diálogo.
+   3. En el centro, **el sello de lacre con el roble** (\`.skin-seal\`, del kit).
+      Es la primitiva que el plan reservó para «documento por abrir» y aquí es
+      literal: lo que se abre es la crónica. Es el único adorno, y hace de ancla
+      del hueco que esta pantalla tiene en medio.
+
+   Lo que **no** cambia: ni un texto, ni el orden de los controles, ni qué
+   configura esta pantalla (el número del valle, §11.10). Sólo la piel. */
+.title-scrim { position: fixed; inset: 0; z-index: 13; box-sizing: border-box;
+  display: flex; padding: 14px;
+  background-color: var(--skin-wood); color: var(--skin-ink);
+  font-family: var(--skin-font-read); font-size: 15px; line-height: 1.45; }
+
+/* La hoja. Lleva el desplazamiento por dentro: en una pantalla corta con el
+   interruptor de taller abierto hay más de 844 px de controles, y una cubierta
+   que recorta el botón de empezar no es una cubierta. */
+.title-sheet { flex: 1 1 auto; box-sizing: border-box; overflow: auto;
+  display: flex; flex-direction: column; gap: 18px;
+  padding: max(26px, env(safe-area-inset-top)) 22px max(22px, env(safe-area-inset-bottom));
+  background-color: var(--skin-page);
+  background-image: var(--skin-parchment-texture);
+  background-repeat: repeat; background-size: 256px 256px;
+  background-blend-mode: multiply;
+  clip-path: var(--skin-deckle-sheet);
+  transform: rotate(var(--skin-tilt-c)); }
+
+/* -------------------------------------------------------------- la portada */
+.title-head { display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding-top: 6px; text-align: center; }
+.title-head h1 { margin: 0; color: var(--skin-ink);
+  font: 600 31px/1.1 var(--skin-font-voice);
+  letter-spacing: .14em; text-transform: uppercase; text-wrap: balance; }
+/* El filete y la palmeta con la que muere, los mismos que cierran la cabecera
+   de un año en la crónica: es el remate de la casa, no uno nuevo. */
+.title-flourish { display: flex; align-items: center; gap: 6px; width: 100%; max-width: 280px; }
+.title-flourish hr { flex: 1 1 auto; margin: 0; height: 1px; border: 0;
+  background: var(--skin-rule-gold); }
+.title-flourish svg { flex: 0 0 auto; display: block; height: 14px; width: auto;
+  color: var(--skin-gold); }
+.title-flourish svg:first-child { transform: scaleX(-1); }
+.title-head p { margin: 0; max-width: 30ch; color: var(--skin-ink-soft);
+  font: italic 16px/1.45 var(--skin-font-read); text-wrap: pretty; }
+
+/* El sello, en el hueco del medio. \`margin: auto\` es lo que hace que la
+   portada quede arriba, los controles abajo y el sello centrado en lo que
+   sobre, sin números fijos que se rompan en una pantalla más corta. */
+/* 88 y no los 48 del kit: aquí el sello no acompaña a un título, **es** el
+   centro de la portada, y en el hueco que esta pantalla tiene en medio uno de
+   48 se leía como una mancha. */
+.title-seal { width: 88px; height: 88px; flex: 0 0 88px; margin: auto; }
+.title-seal .skin-icon { width: 46px; height: 46px; }
+
+/* ------------------------------------------------------------ los controles */
+.title-actions { display: flex; flex-direction: column; gap: 12px; }
+.title-seed-row { display: flex; align-items: flex-end; gap: 10px; }
+.title-seed-field { flex: 1 1 auto; display: flex; flex-direction: column; gap: 5px; }
+.title-seed-row label, .title-dev-row label { color: var(--skin-ink-faded);
+  font: 400 11px/1.1 var(--skin-font-voice); letter-spacing: var(--skin-track-label);
+  text-transform: uppercase; }
+/* El campo: papel con un filete de tinta debajo, no una caja de sistema. Un
+   número escrito a mano en un registro. */
+.title-seed, .title-year { box-sizing: border-box; width: 100%; min-height: 46px;
+  padding: 0 12px; border: 0; border-bottom: 2px solid var(--skin-ink-soft);
+  border-radius: 0; background: rgba(255, 253, 245, .38); color: var(--skin-ink);
+  font: 600 20px/1 var(--skin-font-voice); font-variant-numeric: tabular-nums;
+  letter-spacing: .04em; }
+.title-seed:focus-visible, .title-year:focus-visible {
+  outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+.title-hint { margin: 0; color: var(--skin-ink-faded);
+  font: italic 13px/1.4 var(--skin-font-read); }
+.title-dev-row { display: flex; flex-direction: column; gap: 8px; }
 .title-dev-row[hidden] { display: none; }
-.title-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.title-sound { justify-self: start; min-height: 40px !important; padding: 8px 12px !important;
-  border-color: transparent !important; background: transparent !important; font-size: 14px !important;
-  color: var(--paper-dim, #d9cfbc) !important; }
-.title-sound[aria-pressed="true"] { color: var(--gild-lit, #c9ab6b) !important; }
-.title-dev { min-height: 40px !important; padding: 8px 12px !important;
-  border-color: transparent !important; background: transparent !important; font-size: 13px !important;
-  letter-spacing: .1em; text-transform: uppercase;
-  color: rgba(217,207,188,.55) !important; }
-.title-dev[aria-pressed="true"] { color: var(--gild-lit, #c9ab6b) !important; }
+.title-dev-field { flex: 1 1 auto; display: flex; flex-direction: column; gap: 5px; }
+
+/* Los botones son los dos del prototipo 03, y el reparto dice cuál manda:
+   **madera el de fundar**, que es lo que esta pantalla existe para hacer, y
+   pergamino el de continuar y el de otro número. */
+.title-new, .title-continue { width: 100%; }
+.title-reroll { flex: 0 0 auto; min-height: 46px; padding: 0 14px; font-size: 12px; }
+.title-continue-row { display: flex; flex-direction: column; gap: 4px; }
+.title-continue-row small { color: var(--skin-ink-faded);
+  font: italic 12.5px/1.35 var(--skin-font-read); }
+.title-new[disabled] { opacity: .65; cursor: default; }
+
+/* El pie: dos interruptores pequeños, y el de taller a la derecha porque no es
+   para quien juega. */
+.title-bottom { display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-top: 4px; }
+.title-sound, .title-dev { min-height: 38px; padding: 0 10px; border: 0;
+  background: transparent; color: var(--skin-ink-faded); cursor: pointer;
+  font: 400 11px/1 var(--skin-font-voice); letter-spacing: var(--skin-track-label);
+  text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+.title-sound[aria-pressed="true"], .title-dev[aria-pressed="true"] { color: var(--skin-ochre); }
+.title-sound:focus-visible, .title-dev:focus-visible {
+  outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+
 @media (prefers-reduced-motion: no-preference) {
   .title-scrim { animation: title-in .6s ease-out both; }
   @keyframes title-in { from { opacity: 0; } to { opacity: 1; } }
@@ -188,7 +263,34 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   name.textContent = renderUiText('title.name');
   const tagline = document.createElement('p');
   tagline.textContent = renderUiText('title.tagline');
-  head.append(name, tagline);
+  // UI-V5 · el filete con su palmeta, el mismo que remata la cabecera de un
+  // año en la crónica (`chronicle-ornaments.ts`, calcada del prototipo 02).
+  // Uno de la casa y no uno nuevo: esta pantalla no tiene prototipo, así que
+  // todo lo que se dibuja en ella sale de lo que las otras ya dibujan.
+  const flourish = document.createElement('div');
+  flourish.className = 'title-flourish';
+  flourish.setAttribute('aria-hidden', 'true');
+  for (let side = 0; side < 2; side += 1) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', ORNAMENT_VIEWBOX.YEAR_FLOURISH);
+    svg.setAttribute('focusable', 'false');
+    svg.innerHTML = YEAR_FLOURISH;
+    flourish.append(svg);
+    if (side === 0) {
+      const rule = document.createElement('hr');
+      flourish.append(rule);
+    }
+  }
+  head.append(name, flourish, tagline);
+
+  // El sello de lacre con el roble, del kit. `.skin-seal` es la primitiva que
+  // el plan reservó para «documento por abrir» (§3.2) y aquí es literal: lo
+  // que se abre es la crónica de un valle que todavía no existe. Va en el
+  // hueco del medio, que esta pantalla tiene de sobra.
+  const seal = document.createElement('div');
+  seal.className = 'skin-seal title-seal';
+  seal.setAttribute('aria-hidden', 'true');
+  seal.innerHTML = '<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#seal-tree"/></svg>';
 
   const actions = document.createElement('div');
   actions.className = 'title-actions';
@@ -205,16 +307,20 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   if (save !== null && save.state.ended === null) {
     const cont = document.createElement('button');
     cont.type = 'button';
-    cont.className = 'title-continue';
+    cont.className = 'title-continue skin-button--parchment';
     cont.textContent = renderUiText('title.continue');
     const detail = document.createElement('small');
     detail.textContent = renderUiText('title.continue.detail', {
       year: yearOf(save.state.tick) + 1,
       count: population(save.state),
     });
-    cont.append(detail);
     cont.addEventListener('click', () => finish({ kind: 'continue' }));
-    actions.append(cont);
+    // El detalle sale del botón y va debajo: dentro heredaba las versalitas y
+    // el oro del botón de madera y se leía como parte de la etiqueta.
+    const contRow = document.createElement('div');
+    contRow.className = 'title-continue-row';
+    contRow.append(cont, detail);
+    actions.append(contRow);
   }
 
   const seedRow = document.createElement('div');
@@ -231,13 +337,16 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   seed.value = String(rollSeed(played));
   const reroll = document.createElement('button');
   reroll.type = 'button';
-  reroll.className = 'title-reroll';
+  reroll.className = 'title-reroll skin-button--parchment';
   reroll.textContent = renderUiText('title.reroll');
   reroll.addEventListener('click', () => { seed.value = String(rollSeed(played)); });
   const hint = document.createElement('p');
   hint.className = 'title-hint';
   hint.textContent = renderUiText('title.seed.hint');
-  seedRow.append(seedLabel, seed, reroll, hint);
+  const seedField = document.createElement('div');
+  seedField.className = 'title-seed-field';
+  seedField.append(seedLabel, seed);
+  seedRow.append(seedField, reroll);
 
   // U-10b · la fila de taller: en qué año se abre el valle. Oculta salvo que
   // el interruptor de abajo esté puesto.
@@ -269,12 +378,18 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const devHint = document.createElement('p');
   devHint.className = 'title-hint';
   devHint.textContent = renderUiText('title.dev.hint');
-  devRow.append(yearLabel, year, devHint);
+  const yearField = document.createElement('div');
+  yearField.className = 'title-dev-field';
+  yearField.append(yearLabel, year);
+  // **La pista va dentro de la fila, no al lado.** Colgada de `actions` se
+  // quedaba visible con la fila de taller oculta: la primera captura salía
+  // explicando el interruptor de taller a quien no lo ha abierto.
+  devRow.append(yearField, devHint);
   devRow.hidden = !devPreference();
 
   const begin = document.createElement('button');
   begin.type = 'button';
-  begin.className = 'title-new';
+  begin.className = 'title-new skin-button--wood';
   begin.textContent = renderUiText('title.new');
   begin.addEventListener('click', () => {
     const choice: TitleChoice = {
@@ -326,7 +441,10 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   bottom.className = 'title-bottom';
   bottom.append(sound, dev);
 
-  actions.append(seedRow, devRow, begin, bottom);
-  scrim.append(head, actions);
+  actions.append(seedRow, hint, devRow, begin, bottom);
+  const sheet = document.createElement('div');
+  sheet.className = 'title-sheet';
+  sheet.append(head, seal, actions);
+  scrim.append(sheet);
   document.body.append(scrim);
 }

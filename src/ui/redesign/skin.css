@@ -226,7 +226,7 @@
   display: grid;
   place-items: center;
   background: var(--skin-red-deep);
-  clip-path: var(--skin-deckle-chip);
+  clip-path: var(--skin-seal-blob);
   color: var(--skin-gold-lit);
   filter: drop-shadow(0 1px 2px rgba(27, 22, 19, .45));
 }
@@ -853,7 +853,12 @@
    mediría contra el lienzo y la tira se iría a lo alto de la pantalla. */
 .valley-hud-right.hud-speed-corner { position: absolute; }
 .valley-speeds.hud-speeds button {
-  min-width: 42px;
+  /* **44 y no menos.** Bajarlo a 42 para ganar dos píxeles de ancho rompió el
+     mínimo táctil de `design.md` §11.3, y lo cazó el recorrido de las cuatro
+     velocidades (`valley.shots.ts`, que mide la caja de cada botón). Apilada
+     encima del rincón la tira cabe de sobra: cinco de 44 más los huecos son
+     236 de los 390 que hay. */
+  min-width: 44px;
   border-radius: 0;
   color: var(--skin-ink-soft);
   font: 600 13px/1 var(--skin-font-voice);
