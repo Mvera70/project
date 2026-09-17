@@ -425,6 +425,83 @@ cosas que lo muevan cada semana, y una cara en vez de un número.
 
 ---
 
+## 8. Lo entregado · las cinco fases, 17 sep 2026
+
+**Las cinco están en `main`.** Cada una con su medida, y cada una cerrada con
+una captura. Los commits, en orden: `aaebc0f`/`ac5196e` (M-0), `168c946` (M-1),
+`c8f7888` (M-2), `df8004f` (M-3), `e4dd23d` (M-4).
+
+| Fase | Qué entregó | La medida que la cierra |
+|---|---|---|
+| **M-0 · la mesa** | Piedra y plata como existencias; los tres comerciantes pasan a ser **ofertas** en la voz de la bandeja; diezmo cada otoño; cabecera de cinco cifras y el ánimo como **cara** | La primera piedra sigue en el año 48 (base 48); la plata entra y sale en 123 de 161 décadas; las mismas muertas que la base |
+| **M-1 · el mundo contesta** | Lobos × el ganado, riada × el bosque talado, ladrón y señor × la riqueza; el rayo y el fuego **nunca** dejan la aldea sin techo; gracia de los primeros años | Un valle intocado pasa de 9 muertas de 32 a **1**; uno cargado, **9 de 24 a los 120 años** con la mitad de gente |
+| **M-2 · los medios** | El arado, la pocilga y el barril; **el carro** en el sitio de las órdenes; las palancas fuera | **38 de población sin dar nada contra 61 con el arado**, y la primera piedra en 24 valles de 24 contra 7 |
+| **M-3 · se ve** | La pocilga da **sitio** —el corral se llenaba solo— y los cerdos dejan de apilarse en el mismo punto; `?means=` para poder mirarlo | Los cerdos dados **están en el valle**, contados con `window.__valleyLife` |
+| **M-4 · el resto** | El hacha, la reliquia y un par de manos; las órdenes fuera del código y 41 claves del banco retiradas | La reliquia adelanta la primera piedra **diez años**; el carro entero sale **peor** que sólo el arado (45 contra 61) |
+
+### 8.1 · Lo que la medida dijo y el plan no había previsto
+
+1. **La mayoría de los finales de antes no eran caos: eran un rayo sobre la
+   única casa.** Con esa regla quitada —la que el dueño del diseño pidió
+   expresamente— un valle intocado casi no muere. El caos que queda viene de lo
+   que el jugador acumula, que es lo que él pidió.
+2. **Elegir es la partida.** Con la misma plata, quien compra barriles en cuanto
+   puede **nunca junta para el arado** (45 contra 61 de población), y el carro
+   entero sale peor que un solo medio bien elegido. Eso no se diseñó: salió al
+   medir.
+3. **La leña no es un cuello de botella.** El hacha casi no cambia nada (39
+   contra 38) porque la leña va de 507 a 43 000 unidades en cien años. Si algún
+   día se quiere que un medio de leña importe, lo que hay que decidir es que la
+   leña escasee — y eso es balance.
+4. **Un medio que la aldea puede darse a sí misma no es un medio.** «Dos cerdos»
+   era una negativa por falta de sitio casi siempre, porque el corral se llena
+   solo. Lo que un medio da es lo que la aldea **no** puede conseguir sola.
+5. **Un escudo para el que va perdiendo borra el final.** La gracia de la pareja
+   atada al tamaño —y no a los primeros años— dejaba casi inmune a cualquier
+   valle que se estuviera apagando: las muertas de 32 partidas bajaban a una por
+   ese camino.
+
+### 8.2 · Las trampas que volvieron a morder, y las tres las cazó una captura
+
+Ninguna de las cuatro la habría visto una prueba, y todas estaban escritas:
+
+- **`.valley-panel` es `position: absolute`** desde U-06: dentro de la bandeja
+  deja la hoja con altura cero. El carro salía como una rendija.
+- **El atributo `hidden` no oculta nada si la piel pone `display`** en el mismo
+  elemento (`shell.css` lo tenía escrito desde UI-R2): los dos toques de una
+  oferta seguían en pantalla mientras la voz contaba otra cosa. **Ahora está en
+  la skill `piel-del-valle` como regla.**
+- **Acentos graves dentro de una plantilla de CSS** en un `.ts`: `TS1005` que no
+  menciona la causa. También estaba escrito.
+- **Un `+` dentro de un ternario**: `hasGranary ? … : 0 + sty` no suma nada
+  cuando hay granero. Ni el typecheck ni una prueba de tipos lo ven; lo cazó
+  medir el techo del corral antes y después.
+
+### 8.3 · Lo que queda, y de quién es
+
+- **La mitad de M-3 que vive en `src/render3d/life/`**: el barril en la plaza, el
+  arado acarreado al campo, los lobos yendo al corral. **Encargado por escrito**
+  en `docs/dos-sesiones.md`, con todo lo que el motor ya les da. Y hace falta
+  arte: no hay malla de barril ni de arado.
+- **El rey** (decisión del dueño, «más adelante»): elegir qué aldeano manda. Sus
+  piezas quedan puestas —la tesorería en plata, los rasgos que un medio añade,
+  el `who` de los sucesos— y nada de M-0 a M-4 lo impide.
+- **El nivelado** (decisión 5 del dueño): que la leña escasee, afinar los pesos,
+  remedir §12.9. El banco de balance se lanzó al cerrar M-4 —sesenta semillas por
+  doscientos años, las cuatro políticas— y **no se ha tocado ningún número**.
+  Lo primero que dice, y queda anotado para quien lo retome: **`quiet_years`
+  deja de salir nunca**. Es la plantilla de reserva —la que existe para que el
+  jugador no se quede sin pregunta— y deja de hacer falta justamente por M-1: al
+  abrir el ladrón del granero y el diezmo del señor a la riqueza, la aldea tiene
+  más preguntas propias. La reserva se queda donde está por si algún día vuelve
+  a hacer falta; que salga o no es balance.
+- **`state.intent`** sigue en el motor en reposo: sacarlo es una migración de
+  esquema por limpieza.
+- **Cuatro pruebas rápidas rojas de la otra sesión** (`graphics-clock`,
+  `life-needs`, `life-staging` ×2), comprobadas como ajenas a estas fases.
+
+---
+
 ## 7. Las decisiones del dueño (17 sep 2026, por la tarde)
 
 Las cuatro preguntas que había aquí, contestadas con sus palabras, y lo que
