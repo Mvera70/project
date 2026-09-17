@@ -240,28 +240,6 @@
     },
     {
       "type": "cube",
-      "name": "Villager_Nose",
-      "location": [
-        0,
-        -0.39269178930900117,
-        1.6481689002987097
-      ],
-      "dimensions": [
-        0.085,
-        0.095,
-        0.09387319649864045
-      ],
-      "material": "skin",
-      "parent": "Villager_Root",
-      "bevel": 0,
-      "rotationDegrees": [
-        16,
-        0,
-        0
-      ]
-    },
-    {
-      "type": "cube",
       "name": "Villager_Ear_L",
       "location": [
         -0.232,
@@ -884,7 +862,6 @@
       "Villager_HairBack": "head",
       "Villager_Fringe_L": "head",
       "Villager_Fringe_R": "head",
-      "Villager_Nose": "head",
       "Villager_Ear_L": "head",
       "Villager_Eye_L": "head",
       "Villager_UpperArm_L": "upperarm.L",

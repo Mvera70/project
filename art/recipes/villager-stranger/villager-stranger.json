@@ -137,23 +137,6 @@
     },
     {
       "type": "cube",
-      "name": "Villager_Nose",
-      "location": [
-        0,
-        -0.225,
-        1.7
-      ],
-      "dimensions": [
-        0.085,
-        0.095,
-        0.095
-      ],
-      "material": "skin",
-      "parent": "Villager_Root",
-      "bevel": 0
-    },
-    {
-      "type": "cube",
       "name": "Villager_Ear_L",
       "location": [
         -0.232,
@@ -837,7 +820,6 @@
       "Villager_TunicHem": "hips",
       "Villager_Neck": "head",
       "Villager_Head": "head",
-      "Villager_Nose": "head",
       "Villager_Ear_L": "head",
       "Villager_Eye_L": "head",
       "Villager_UpperArm_L": "upperarm.L",
