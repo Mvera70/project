@@ -1,7 +1,7 @@
 import { visibleBuildings } from '../../src/derive/visible-buildings';
 import { readFileSync } from 'node:fs';
 import { loadAssets } from '../../src/render3d/assets';
-import { buildFromAsset } from '../../src/render3d/world/buildings';
+import { buildFromAsset, Village } from '../../src/render3d/world/buildings';
 import { planFor } from '../../src/render3d/world/plan';
 import { describe, expect, it } from 'vitest';
 import { Box3, Vector3, Group, Mesh, BoxGeometry, MeshBasicMaterial } from 'three';
@@ -60,6 +60,30 @@ describe('IA-10 · cuerpo, malla y casa', () => {
     model.door!(false, 1);
     expect(hinge.rotation.y).toBe(0);
     model.dispose(); library.dispose();
+  });
+
+  it('la puerta conserva el paso el tiempo suficiente para verse a cualquier velocidad', async () => {
+    const manifest = JSON.parse(readFileSync('public/assets/valley3d/manifest.json', 'utf8'));
+    const bytes = Uint8Array.from(readFileSync('public/assets/valley3d/house.glb')).buffer;
+    const library = await loadAssets({ baseUrl: '/', manifest: { ...manifest,
+      assets: manifest.assets.filter((asset: { id: string }) => asset.id === 'house') }, bytes: { house: bytes } });
+    const state = foundTwenty(7);
+    const planned = { ...planFor(state).buildings[0]!, asset: 'house', ruin: false };
+    const village = new Village(id => library.instance(id));
+    village.add(planned);
+    const hinge = village.group.getObjectByName('DoorHinge')!;
+
+    village.doors(new Set([planned.id]), 0.1);
+    const first = hinge.rotation.y;
+    expect(first).toBeLessThan(0);
+    // Aunque la IA ya haya terminado de entrar, el pulso no se pierde en el
+    // siguiente fotograma y la hoja completa su apertura.
+    village.doors(new Set(), 0.1);
+    expect(hinge.rotation.y).toBeLessThan(first);
+    for (let frame = 0; frame < 20; frame += 1) village.doors(new Set(), 0.1);
+    expect(Math.abs(hinge.rotation.y)).toBeLessThan(0.005);
+
+    village.dispose(); library.dispose();
   });
 
   it('el ganado dibujado coincide con la vida, sin duplicados derivados', () => {

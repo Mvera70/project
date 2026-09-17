@@ -250,6 +250,14 @@ function buildBuilding(planned: PlannedBuilding): BuildingModel {
 export class Village {
   readonly group = new Group();
   private readonly models = new Map<BuildingId, BuildingModel>();
+  /**
+   * Tiempo real mínimo que una puerta sigue visible después de un paso.
+   *
+   * A ×64 la rutina doméstica puede recorrer `opening` y `entering` entre dos
+   * fotogramas. Guardar el pulso aquí permite enseñar la acción sin ralentizar
+   * la IA ni atarla a la velocidad del calendario.
+   */
+  private readonly doorHolds = new Map<BuildingId, number>();
 
   /**
    * `instance` da una copia del recurso que se le pida, o `undefined` si el
@@ -295,7 +303,15 @@ export class Village {
   }
 
   doors(open: ReadonlySet<number>, seconds: number): void {
-    for (const [id, model] of this.models) model.door?.(open.has(id), seconds);
+    for (const id of open) this.doorHolds.set(id, 0.8);
+    for (const [id, model] of this.models) {
+      const remaining = this.doorHolds.get(id) ?? 0;
+      model.door?.(open.has(id) || remaining > 0, seconds);
+      if (open.has(id) || seconds <= 0) continue;
+      const next = Math.max(0, remaining - seconds);
+      if (next > 0) this.doorHolds.set(id, next);
+      else this.doorHolds.delete(id);
+    }
   }
 
   remove(id: BuildingId): void {
@@ -304,6 +320,7 @@ export class Village {
     this.group.remove(model.object);
     model.dispose();
     this.models.delete(id);
+    this.doorHolds.delete(id);
   }
 
   clear(): void {

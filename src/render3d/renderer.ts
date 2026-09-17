@@ -820,6 +820,18 @@ export async function createGraphicsRenderer(
       }
       lifeCarry += frame.deltaSeconds;
       if (frame.discontinuity) { steppedPhase = phase; nightOutcomes.length = 0; }
+      // Una entrada puede empezar y terminar dentro del mismo fotograma a
+      // velocidades altas. Se acumulan los pulsos de todos los pasos de vida,
+      // no sólo el estado final que queda al terminar el bucle.
+      const activeDoors = new Set<number>();
+      const rememberDoors = (): void => {
+        for (const person of life!.dwellers) {
+          const home = person.residence;
+          if (home !== undefined && (home.stage === 'opening' || home.stage === 'entering' || home.stage === 'leaving')) {
+            activeDoors.add(home.building);
+          }
+        }
+      };
       let given = 0;
       while (lifeCarry >= LIFE_STEP && given < 240) {
         const stepPhase = (phase - (lifeCarry - LIFE_STEP) / 120 + 1) % 1;
@@ -831,9 +843,11 @@ export async function createGraphicsRenderer(
         }
         steppedPhase = stepPhase;
         life.step(stepPhase);
+        rememberDoors();
         lifeCarry -= LIFE_STEP;
         given += 1;
       }
+      rememberDoors();
       const ages = new Map<VillagerId, number>();
       const named = new Set<VillagerId>();
       for (const villager of shown.people.villagers) {
@@ -843,9 +857,10 @@ export async function createGraphicsRenderer(
       const entrances = new Map(life.dwellers.filter(person => person.residence !== undefined)
         .map(person => [person.residence!.building, person.residence!.facing]));
       village.entrances(entrances);
-      village.doors(new Set(life.dwellers.filter(person => person.residence !== undefined
-        && ['opening', 'entering', 'leaving'].includes(person.residence.stage))
-        .map(person => person.residence!.building)), frame.deltaSeconds);
+      // La hoja es una animación legible para el jugador: usa tiempo real y se
+      // congela en pausa. La jornada y los cuerpos siguen usando tiempo
+      // escénico, como antes.
+      village.doors(activeDoors, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       lastActors = castOf(life, frame.presentationSeconds, ages, named);
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);

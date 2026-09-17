@@ -64,6 +64,14 @@ traído aquí.
 
 ## 2. El tablero
 
+**IA-13 · puertas domésticas: hecha.** La IA sí entraba, pero a ×64 podía
+recorrer `opening → entering → sleeping` dentro de un solo fotograma y el
+renderer sólo miraba la etapa final. Ahora acumula el pulso de todos los pasos
+internos y la hoja permanece visible 0,8 s reales, también al salir; se congela
+en pausa. Validado con GLB publicado, 20/20 pruebas y toma viva a ×64 en
+`life-rounds/IA-13.md`. La evidencia posterior se empaquetó desde una copia
+aislada para no tocar la UI-V8 concurrente.
+
 **Limpieza de código muerto (17 sep): hecha.** Auditoría contrastada con Knip,
 búsqueda global, puntos de entrada y configuración. Eliminados `src/ui/icons.ts`,
 `GREET_COOLDOWN_SPAN` y el tipo huérfano `BeastSighting`; 78 exportaciones de
@@ -256,6 +264,11 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+IA-13: semilla 7/año 1, toma viva a ×64, 6 s y 15 fps; dos residentes, tres
+animales y tres noches completas. Apertura, paso y cierre visibles en los
+fotogramas 10–20 aunque el residente ya conste `sleeping`; cero errores,
+penetraciones, centros bloqueados o deriva. 20/20 pruebas dirigidas verdes.
 
 Limpieza estática: 1 módulo, 1 alias ejecutable y 1 tipo huérfano eliminados;
 112 exportaciones públicas innecesarias cerradas. Typecheck, lint, build y
