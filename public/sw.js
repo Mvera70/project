@@ -18,7 +18,14 @@
 // The cache NAME is the only invalidation this has. Bump it and every older
 // cache is dropped on activate.
 
-const CACHE = 'valley-v3';
+// VZ-6 · subido a v4 **una vez más a mano, y por última vez por este motivo**:
+// los GLB que los dispositivos ya tienen guardados están bajo su nombre pelado
+// (`cow.glb`), y a partir de esta versión nadie los pide — se piden con su
+// huella. Sin subir el nombre esas copias se quedarían ahí para siempre,
+// ocupando sitio y sin servir a nadie. Cuesta volver a bajar 2,7 MB una vez, y
+// es lo que hace que los animales rediseñados lleguen al iPad del dueño del
+// diseño, que es donde se vio el problema.
+const CACHE = 'valley-v4';
 
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 
