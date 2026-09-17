@@ -58,7 +58,7 @@ import { seasonOf } from '@engine/time';
 import { valleyClock } from '@derive/clock';
 import { hourAt } from '../../render3d/effects/day-phases';
 import { speedLabel, type Speed } from '../speed';
-import { TREND_WEEKS, trendsOf, vitalsOf, type Vitals } from '../vitals';
+import { TREND_WEEKS, moodFace, trendsOf, vitalsOf, type Vitals } from '../vitals';
 import type { SheetRoute, UiActions } from './contracts';
 
 /** U-06 · una clave del banco por estación: `seasonOf` decide, nunca un literal. */
@@ -244,6 +244,23 @@ interface VitalCell {
   readonly cell: HTMLElement;
   readonly value: HTMLElement;
   readonly arrow: HTMLElement;
+  /** M-0 · cambiar el dibujo sin rehacer el chip: lo pide la cara del ánimo. */
+  setIcon(iconId: string): void;
+}
+
+/**
+ * M-0 · Cifras grandes en un chip estrecho: 2 610 se lee «2,6k».
+ *
+ * Hacen falta desde que la fila tiene cinco cifras y no cuatro: la leña llega a
+ * decenas de miles en una partida larga (medido: de 507 a 43 000 en cien años,
+ * `catalog/trade.ts`) y cinco dígitos en un chip de 62 px empujan al vecino
+ * fuera de la pantalla. Hasta mil se dice entero, que es el rango en el que un
+ * grano de diferencia importa.
+ */
+function compact(value: number): string {
+  if (value < 1000) return String(value);
+  const thousands = value / 1000;
+  return `${thousands < 10 ? thousands.toFixed(1).replace(/\.0$/u, '') : Math.round(thousands)}k`;
 }
 
 /**
@@ -269,7 +286,15 @@ function makeVitalCell(iconId: string, extraClass: string): VitalCell {
   const arrow = document.createElement('i');
   arrow.className = 'valley-trend';
   cell.append(value, arrow);
-  return { cell, value, arrow };
+  return {
+    cell,
+    value,
+    arrow,
+    setIcon(next: string): void {
+      const icon = cell.querySelector('use');
+      if (icon !== null) icon.setAttribute('href', `#${next}`);
+    },
+  };
 }
 
 /** El mando de la carcasa. `header` va donde iba la tira de siempre; `speedControls`
@@ -350,10 +375,18 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     return chip;
   };
 
-  const people = vital('people');
+  // M-0 · **cinco cifras, y el ánimo dentro de la primera.** La fila tenía
+  // cuatro chips y ahora la mesa del juego tiene cinco cosas (gente, grano,
+  // leña, piedra, plata); el ánimo dejó de ser cifra por decisión del dueño del
+  // diseño, así que en vez de un sexto chip **la cara es el icono del chip de
+  // la gente**: una sola pieza dice cuántos son y cómo están, que es lo que ese
+  // chip quiere decir de verdad. Un sexto chip no cabía a 390 px sin romper el
+  // mínimo de toque.
+  const people = vital('face-calm');
   const food = vital('wheat');
   const wood = vital('logs');
-  const spirits = vital('face');
+  const stone = vital('stone');
+  const silver = vital('silver');
 
   // VZ-02 · **la frase de actividad ya no vive aquí.** Era una de las cuatro
   // voces del valle y ahora las cuatro se leen en un solo hueco, el de la
@@ -516,14 +549,22 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     if (monthAgo === null || state.tick - monthAgo.at >= TREND_WEEKS) monthAgo = { at: state.tick, vitals: now };
     const trends = trendsOf(now, monthAgo.vitals);
     const changed = (key: keyof Vitals): boolean => lastVitals !== null && now[key] !== lastVitals[key];
+    // M-0 · la gente lleva la cara de la aldea, y la flecha sigue siendo la de
+    // la gente: son dos cosas y sólo una es una cifra. La cara se cambia sólo
+    // cuando cambia de humor, no en cada fotograma.
+    const face = moodFace(now.morale);
+    if (lastVitals === null || moodFace(lastVitals.morale) !== face) people.setIcon(`face-${face}`);
     paintVital(people, String(now.people), changed('people'), trends.people,
-      renderUiText('app.vitals.people', { count: now.people }), false);
+      `${renderUiText('app.vitals.spirits', { mood: lower(`mood.${face}`) })} · ${renderUiText('app.vitals.people', { count: now.people })}`,
+      false);
     paintVital(food, String(now.weeks), changed('weeks'), trends.weeks,
       renderUiText('app.vitals.food', { weeks: now.weeks }), now.weeks < 4);
-    paintVital(wood, String(now.wood), changed('wood'), trends.wood,
+    paintVital(wood, compact(now.wood), changed('wood'), trends.wood,
       renderUiText('app.vitals.wood', { count: now.wood }), false);
-    paintVital(spirits, String(now.morale), changed('morale'), trends.morale,
-      renderUiText('app.vitals.morale', { value: now.morale }), false);
+    paintVital(stone, compact(now.stone), changed('stone'), trends.stone,
+      renderUiText('app.vitals.stone', { count: now.stone }), false);
+    paintVital(silver, compact(now.silver), changed('silver'), trends.silver,
+      renderUiText('app.vitals.silver', { count: now.silver }), false);
     lastVitals = now;
 
     // Y el resumen de las tres órdenes, con `stopOf` — nunca redondeando el

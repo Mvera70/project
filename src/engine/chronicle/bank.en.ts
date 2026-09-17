@@ -533,10 +533,85 @@ export const BANK: Record<string, string[]> = {
     'Two were married that {season}, and the village ate and danced till dark.',
     'A wedding in year {year}, in the {season}: the first music heard in weeks.',
   ],
+  // M-0 · el buhonero ya no se lleva la leña sin preguntar: sube, pide, y
+  // espera. Lo que dice la crónica es que llegó y qué quería.
   'fate.pedlar': [
-    'A pedlar came through in {season} and took {wood} wood for {grain} bushels of grain.',
-    'The pedlar of year {year} traded {grain} bushels for {wood} wood and went on his way.',
-    'A cart came over the ridge that {season}: {wood} wood went out, {grain} bushels came in.',
+    'A pedlar came up the road in {season} wanting timber: {wood} wood for {silver} silver.',
+    'The pedlar of year {year} stood in the square and asked for {wood} wood, for {silver} silver.',
+    'A cart came over the ridge that {season}. The pedlar wanted {wood} wood and had {silver} silver for it.',
+  ],
+  'fate.factor_visit': [
+    'A grain factor rode in that {season} and offered {silver} silver for {grain} bushels.',
+    'The factor of year {year} had heard the granary was full. {silver} silver for {grain} bushels, he said.',
+    'A man with a ledger came up the road in {season}: {grain} bushels, and {silver} silver for them.',
+  ],
+  'fate.drover_visit': [
+    'A drover came down the road in {season} with a cow to sell, for {silver} silver.',
+    'The drover of year {year} had one beast more than he could winter. {silver} silver, he asked.',
+    'A thin cow and a thinner drover at the ford that {season}: {silver} silver and she was theirs.',
+  ],
+  'fate.salt_visit': [
+    'A salt carrier came through in {season}: {silver} silver for salt to last {years} years.',
+    'The salter of year {year} opened his sacks in the square. {silver} silver, and the meat would keep.',
+    'Salt came up the road that {season}, {silver} silver a load.',
+  ],
+  // M-0 · lo que queda escrito cuando el trato se cierra, y cuando no.
+  'offer.pedlar.taken': [
+    '{wood} wood went down the road with the pedlar, and {silver} silver stayed in the valley.',
+    'The pedlar loaded {wood} wood in the {season} of year {year} and paid {silver} silver.',
+    'They sold the pedlar {wood} wood that {season}. {silver} silver, counted twice.',
+  ],
+  'offer.pedlar.gone': [
+    'The pedlar waited, and went on without the timber.',
+    'Nobody sold the pedlar his wood that {season}. He went over the ridge empty.',
+    'The cart left the square empty in year {year}. The woodpile stayed where it was.',
+  ],
+  'offer.factor_visit.taken': [
+    '{grain} bushels went to the factor for {silver} silver. The road would hear of it.',
+    'The factor carted off {grain} bushels in year {year} and left {silver} silver, and the valley\'s name with him.',
+    'They sold {grain} bushels that {season} for {silver} silver: richer by supper, and known on the road by winter.',
+  ],
+  'offer.factor_visit.gone': [
+    'The factor rode on. The grain stayed in the granary.',
+    'Nobody sold to the factor that {season}.',
+    'The factor of year {year} wrote nothing in his ledger and went back down the road.',
+  ],
+  'offer.drover_visit.taken': [
+    'A cow came into the valley in {season} for {silver} silver.',
+    'They bought the drover\'s cow in year {year}, {silver} silver, and she was thinner than she looked.',
+    '{silver} silver for a cow that {season}, and half the village came out to look at her.',
+  ],
+  'offer.drover_visit.gone': [
+    'The drover took his cow on down the road.',
+    'Nobody bought the drover\'s cow that {season}.',
+    'The drover of year {year} went on with one beast more than he wanted.',
+  ],
+  'offer.salt_visit.taken': [
+    'The valley bought salt in {season} for {silver} silver. The meat would keep.',
+    'Salt for {silver} silver in year {year}: a winter\'s worth of pork that would not rot.',
+    'They paid the salter {silver} silver that {season} and salted everything they had.',
+  ],
+  'offer.salt_visit.gone': [
+    'The salter went on. The valley would eat its meat fresh or not at all.',
+    'Nobody bought salt that {season}.',
+    'The salter of year {year} sold nothing here and said so at the next valley.',
+  ],
+  // M-0 · el diezmo del señor, cada otoño. Peso 1: es la crónica, no la
+  // pantalla, salvo el año que se lleva el grano.
+  'tithe.silver': [
+    'The lord\'s man came for the tithe in {season}: {silver} silver.',
+    'Tithe day, year {year}. {silver} silver went up the road to Wealdmere.',
+    'They counted out {silver} silver for the lord that {season} and said little while they did it.',
+  ],
+  'tithe.grain': [
+    'There was no silver for the tithe in year {year}. The lord\'s man took {grain} bushels instead.',
+    'The tithe was paid in grain that {season}: {grain} bushels, and nobody was glad of it.',
+    'No coin in the valley in year {year}, so {grain} bushels went up the road in its place.',
+  ],
+  'tithe.nothing': [
+    'The lord\'s man came for the tithe in year {year} and went away with nothing: there was nothing to take.',
+    'The lord\'s man looked at the granary that {season}, said nothing, and rode back empty.',
+    'Nothing for the lord in year {year}. He would remember the year, they said.',
   ],
   'fate.good_catch': [
     'The river ran thick with fish that {season}: {grain} bushels worth, salted and stored.',
@@ -574,9 +649,9 @@ export const BANK: Record<string, string[]> = {
     '{A} was lost and found in year {year}, and the whole village out along the river looking.',
   ],
   'fate.stranger_passes': [
-    'A stranger came through the valley in {season} and stayed one night.',
-    'Someone passed along the road in the {season} of year {year}, stopped at the square, and went on.',
-    'A traveller in year {year}, gone by morning. They talked of it for a week.',
+    'A stranger came through the valley in {season}, stayed one night, and left {silver} silver for the bed.',
+    'Someone passed along the road in the {season} of year {year}, stopped at the square, paid {silver} silver, and went on.',
+    'A traveller in year {year}, gone by morning, and {silver} silver on the table. They talked of it for a week.',
   ],
 
   // -------------------------------------------------------------------------
@@ -1875,6 +1950,24 @@ export const UI_BANK: Record<string, string> = {
   'app.vitals.food': 'Food for {weeks} weeks',
   'app.vitals.wood': '{count} wood',
   'app.vitals.morale': 'Spirits {value} of 100',
+  // M-0 · las dos existencias nuevas, y el ánimo como cara: la cifra deja de
+  // estar en la cabecera y sólo la dice el título del chip.
+  'app.vitals.stone': '{count} stone',
+  'app.vitals.silver': '{count} silver',
+  'app.vitals.spirits': 'The village is {mood}',
+  'mood.low': 'in despair',
+  'mood.grim': 'grim',
+  'mood.calm': 'at ease',
+  'mood.glad': 'glad',
+  // M-0 · la oferta del camino, dicha por la voz de la bandeja. Dos botones y
+  // una razón cuando no se puede pagar.
+  'offer.pedlar.say': 'A pedlar wants {wood} wood for {silver} silver.',
+  'offer.factor_visit.say': 'A grain factor offers {silver} silver for {grain} bushels.',
+  'offer.drover_visit.say': 'A drover sells a cow for {silver} silver.',
+  'offer.salt_visit.say': 'A salter sells salt for {silver} silver.',
+  'offer.take': 'Take it',
+  'offer.leave': 'Let him go',
+  'offer.cannot': 'The valley cannot pay for that.',
   // La línea de estado de la tira (`src/ui/doing.ts`). **Interfaz y no crónica**:
   // una sola forma por clave, sin variantes, porque una etiqueta que cambia de
   // palabras cada vez que se mira no es una etiqueta. Presente, corta, y dicha

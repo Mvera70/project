@@ -46,9 +46,19 @@ export const CATALOG: Catalogue = [
   ...FAITH_TEMPLATES,
   ...FOREST_TEMPLATES,
   ...STRANGER_TEMPLATES,
-  ...TRADE_TEMPLATES,
+  // M-0 · los tres comerciantes ya no son encrucijadas: son ofertas del camino
+  // (`world/road.ts`, los sucesos de visita de `world/fate.ts`). Se quedan en
+  // `RETIRED_TEMPLATES` para que una partida guardada que ya los contestó siga
+  // cargando, y para que su crónica siga teniendo título.
   ...SUCCESSION_TEMPLATES,
   ...RESERVE_TEMPLATES,
 ];
 
 export { TRADE_TEMPLATES } from './trade';
+
+/**
+ * M-0 · Plantillas que ya no se plantean pero que una partida guardada puede
+ * nombrar en su registro o tener pendiente. Sólo las leen el guardado y quien
+ * busque el título de una decisión pasada.
+ */
+export const RETIRED_TEMPLATES: Catalogue = [...TRADE_TEMPLATES];

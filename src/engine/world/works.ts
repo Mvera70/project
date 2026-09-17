@@ -105,19 +105,58 @@ function noProjectStillApplies(state: GameState): boolean {
 }
 
 /**
- * The build points a project costs. §7.2, with the stone rule of v2.12.
+ * The build points a project costs, once it is open. §7.2.
  *
- *   bpCost = bp + stone / STONE_PER_BP
+ * **M-0 · la piedra ya no va aquí.** Hasta el esquema 6 era `bp + stone /
+ * STONE_PER_BP`: la piedra «no era un sexto recurso, canteala es trabajo, así
+ * que se cobra como trabajo». Sigue siendo trabajo, y **al mismo cambio**: la
+ * obra la cantea con sus propios puntos antes de abrir el proyecto
+ * (`quarryFor`, más abajo) y la gasta del montón al abrirlo. El trabajo total
+ * de una casa de piedra no se mueve; lo que cambia es que la piedra está en
+ * algún sitio entre medias —el montón de `village.stone`—, que es lo que la
+ * capa de vida ya enseñaba y el motor no contaba.
  *
- * Stone is not a sixth resource and never was: quarrying it is work, so it is
- * charged as work. `free` is §8.4's exemption — a crossroad that gives the
- * village a watchtower gives it the stone too, so only the raising is left.
- * The wood of the table is exempt for the same reason, and for the same
- * reason the base `bp` is not: `free` waives materials, never labour.
+ * Y **se queda sin el parámetro `free`**: lo tenía para eximir la piedra de un
+ * regalo de §8.4, y `bp` nunca fue material, así que hoy no distinguiría nada.
+ * Lo que `free` exime —madera y piedra— lo exime `open`.
  */
-export function bpCostOf(kind: BuildingKind, free = false): number {
-  const spec = BUILDINGS[kind];
-  return free ? spec.bp : spec.bp + spec.stone / WORLD.STONE_PER_BP;
+export function bpCostOf(kind: BuildingKind): number {
+  return BUILDINGS[kind].bp;
+}
+
+/** Cuánta piedra pide levantar algo. La tabla de §7.2, sin rasgo que la mueva. */
+export function stoneCostOf(kind: BuildingKind): number {
+  return BUILDINGS[kind].stone;
+}
+
+/**
+ * M-0 · **La obra en la cantera**: pica piedra al montón del valle y de ahí a la
+ * obra, y devuelve los puntos de la semana que sobran.
+ *
+ * Es exactamente el trabajo que `bpCostOf` cobraba antes dentro del proyecto
+ * —al mismo cambio, `WORLD.STONE_PER_BP`—, sólo que ahora se ve: el montón sube
+ * mientras se cantea y baja cuando la obra se lo lleva, y la obra está **abierta**
+ * todo ese tiempo, que es de donde la capa de vida saca a quién mandar a la roca
+ * (`life/resource-sites.ts`).
+ *
+ * Si en el montón ya hay piedra —porque la aldea canteó con la obra parada, o
+ * porque el jugador la compró— la obra la usa y no pica de más.
+ */
+function quarryFor(state: GameState, work: ConstructionWork, points: number): number {
+  const missing = stoneCostOf(work.kind) - work.stoneDone;
+  if (missing <= 0) return points;
+  let left = points;
+  const shortfall = missing - state.village.stone;
+  if (shortfall > 0 && left > 0) {
+    const spent = Math.min(left, shortfall / WORLD.STONE_PER_BP);
+    state.village.stone += spent * WORLD.STONE_PER_BP;
+    left -= spent;
+  }
+  if (state.village.stone + 1e-9 >= missing) {
+    state.village.stone -= missing;
+    work.stoneDone = stoneCostOf(work.kind);
+  }
+  return left;
 }
 
 /** Whether the valley can quarry at all: §7.2 wants a smithy and rock. */
@@ -248,8 +287,10 @@ function open(state: GameState, project: Project, free = false): ConstructionWor
     y,
     w: spec.w,
     h: spec.h,
-    bpCost: bpCostOf(kind, free),
+    bpCost: bpCostOf(kind),
     bpDone: 0,
+    // M-0 · un regalo de §8.4 llega con su piedra; el resto hay que picarla.
+    stoneDone: free ? spec.stone : 0,
     materialsPaid: true,
     startedTick: state.tick,
     upgradeOf,
@@ -324,6 +365,7 @@ function complete(state: GameState, work: ConstructionWork): BuiltEvent {
  * around for a tick after deciding.
  */
 export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[] {
+  let left = Math.max(0, buildPoints);
   if (state.works.length === 0 && !noProjectStillApplies(state)) {
     const project = nextProject(state);
     if (project === null) NO_PROJECT.set(state, projectSnapshot(state));
@@ -333,9 +375,13 @@ export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[
     }
   }
 
-  let left = Math.max(0, buildPoints);
   const built: BuiltEvent[] = [];
   for (const work of [...state.works].sort((a, b) => a.startedTick - b.startedTick || a.id - b.id)) {
+    if (left <= 0) break;
+    // M-0 · primero la piedra, si la pide: una obra no se levanta con lo que no
+    // tiene. Mientras esté en la cantera, la semana se va ahí.
+    left = quarryFor(state, work, left);
+    if (work.stoneDone < stoneCostOf(work.kind)) continue;
     if (left <= 0) break;
     const needed = work.bpCost - work.bpDone;
     const spent = Math.min(left, needed);
@@ -345,5 +391,16 @@ export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[
   }
 
   state.works = state.works.filter((w) => w.bpDone < w.bpCost);
+
+  // M-0 · **y con la obra parada, se cantea.** Una aldea con fragua y roca que
+  // no tiene nada que levantar esta semana manda sus manos a la cantera en vez
+  // de perder los puntos, hasta `STONE_IDLE_CAP`. Es lo que hace que la piedra
+  // exista antes de que haga falta, y la última década de una partida —que
+  // `plan-juego.md` §3.1 midió vacía: el 100 % de las semanas sin nada que
+  // querer construir— deja un montón en vez de nada.
+  if (state.works.length === 0 && left > 0 && canQuarry(state)) {
+    const room = Math.max(0, WORLD.STONE_IDLE_CAP - state.village.stone);
+    state.village.stone += Math.min(room, left * WORLD.STONE_PER_BP);
+  }
   return built;
 }

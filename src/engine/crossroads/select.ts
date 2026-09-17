@@ -11,9 +11,9 @@
 // never reaches for a global, which is also what lets the tests drive this with
 // a handful of fake templates.
 
-import { CROSSROADS, TIME, TRADE } from '../balance';
+import { CROSSROADS, TIME } from '../balance';
 import { population } from '../people/demography';
-import { next, weighted } from '../rng';
+import { weighted } from '../rng';
 import type { GameState, PendingCrossroad, VillagerId } from '../state';
 import { fillCast } from './cast';
 import { TRADE_TEMPLATES } from './catalog/trade';
@@ -252,57 +252,19 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
  * quiet ticks the village gets its best question, not a random one.
  */
 /**
- * §7.8, v2.97 · Who is at the door, on the traders' own clock.
+ * §7.8 · **El canal de los comerciantes, retirado en M-0.**
  *
- * Deliberately much simpler than `selectCrossroad`: no crisis exemption, no
- * guarantee, no novelty weighting. A trader is an offer, not a dilemma the
- * village is owed, so if the conditions do not line up nobody comes and that
- * is a fine outcome.
+ * Aquí vivía `selectTrader`: un segundo canal con su propio reloj y su propio
+ * flujo de azar, por el que el tratante, el salinero y el factor subían a
+ * plantear una encrucijada. Desde M-0 los tres suben como **ofertas** —una
+ * frase en la voz de la bandeja y dos toques (`world/road.ts`)— y quién sube
+ * lo sortea la tabla de sucesos de R-1, así que no hay dos canales que ordenar
+ * ni un reloj aparte que llevar. Lo que aquel canal protegía —que un buhonero
+ * no le quite el turno a una hambruna— se cumple ahora por construcción.
  *
- * Two rules make this a channel and not a second catalogue:
- *
- *   · It never fires while a crossroad is pending. A village in the middle of
- *     deciding something is a village the pedlar walks past.
- *   · It never fires during a crisis. There is a famine on; nobody is buying
- *     salt.
+ * `isTrade` y `lastTradeTick` se quedan justo abajo: una partida guardada
+ * puede tener esas decisiones en su registro y siguen siendo suyas.
  */
-export function selectTrader(state: GameState, catalogue: Catalogue): PendingCrossroad | null {
-  if (state.crossroad !== null) return null;
-  if (crisisOf(state) !== null) return null;
-
-  const last = lastTradeTick(state);
-  if (last >= 0 && state.tick - last < TRADE.MIN_YEARS_BETWEEN * TIME.WEEKS_PER_YEAR) return null;
-
-  const candidates: ScoredTemplate[] = [];
-  for (const t of catalogue) {
-    if (!isTrade(t.id)) continue;
-    if (t.minYear !== undefined && Math.floor(state.tick / TIME.WEEKS_PER_YEAR) < t.minYear) continue;
-    if (t.maxPerGame !== undefined && timesSeen(state, t.id) >= t.maxPerGame) continue;
-    if (yearsSince(state, t.id) < t.cooldownYears) continue;
-    if (!all(t.requires, state)) continue;
-    const cast = fillCast(t, state);
-    if (cast === null) continue;
-    // El desglose va a 1 porque en este canal no hay crisis, ni reputacion, ni
-    // rasgo, ni novedad: solo el peso de la plantilla. Se rellena igual para
-    // que un comerciante se pueda inspeccionar como cualquier otra candidata.
-    candidates.push({
-      template: t, cast, score: t.weight,
-      weight: t.weight, crisis: 1, story: 1, trait: 1, novelty: 1,
-    });
-  }
-  if (candidates.length === 0) return null;
-
-  // El dado se tira DESPUÉS de saber que hay alguien que podría venir, no
-  // antes. Tirándolo antes se gastaba la oportunidad en las tres estaciones en
-  // que nadie podía llegar, y los tres comerciantes salían mudos en cien años.
-  if (next(state.rng, 'traders') >= TRADE.ARRIVE_CHANCE) return null;
-
-  // Del flujo `traders`, nunca del de `crossroads`: quien viene a vender no
-  // puede desplazar la siguiente crisis ni un solo tick (§4.3).
-  const chosen = weighted(state.rng, 'traders', candidates, (c) => c.score);
-  return pose(state, chosen.template, chosen.cast);
-}
-
 export function selectCrossroad(state: GameState, catalogue: Catalogue): PendingCrossroad | null {
   if (state.crossroad !== null) return null;
 

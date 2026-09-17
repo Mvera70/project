@@ -19,7 +19,7 @@
 // Determinista por el flujo `fate` y nada más: ningún suceso toca otro flujo,
 // y hay prueba. El cielo lo pregunta a `world/sky.ts`, que no consume tiradas.
 
-import { DISASTER, FATE, LIFE, TIME } from '../balance';
+import { DISASTER, FATE, LIFE, OFFER, TIME } from '../balance';
 import { flagSet, ratioOf } from '../crossroads/conditions';
 import type { VisualEffect } from '../crossroads/schema';
 import { isHere, population } from '../people/demography';
@@ -32,6 +32,8 @@ import { HAPPENINGS } from '../state';
 import { count, has, standing } from '../subsistence/building-counts';
 import { seasonOf, weekOf } from '../time';
 import { destroyBuilding } from './buildings';
+import { herdCapacity } from '../subsistence/herd';
+import { factorWants, postOffer } from './road';
 import { weekWeather } from './sky';
 
 /** Lo que `rollFate` devuelve al tick: el registro y la línea de crónica. */
@@ -105,7 +107,25 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
     case 'wedding':
       return adults(state).length >= FATE.WEDDING_MIN_ADULTS ? w : 0;
     case 'pedlar':
-      return ctx.season === 'summer' && state.village.wood >= FATE.PEDLAR_WOOD * 2 ? w : 0;
+      // M-0 · una visita no sube mientras hay otra esperando en el camino.
+      return visitable(state, 'pedlar') && ctx.season === 'summer' && state.village.wood >= OFFER.PEDLAR_WOOD * 2 ? w : 0;
+    case 'factor_visit':
+      // Cuando sobra grano, y el doble en los tres meses después de la siega,
+      // que es cuando sobra de verdad.
+      return visitable(state, 'factor_visit') && factorWants(state) > 0
+        ? w * (afterHarvest(ctx) ? 2 : 1) : 0;
+    case 'drover_visit':
+      // En primavera, con corral para otra vaca y plata para pagarla.
+      return visitable(state, 'drover_visit') && ctx.season === 'spring'
+        && state.herd.cows < herdCapacity(state).cows
+        && state.village.silver >= OFFER.DROVER_SILVER ? w : 0;
+    case 'salt_visit':
+      // Antes del invierno, a quien tiene carne que guardar y plata; no a quien
+      // ya tiene sal.
+      return visitable(state, 'salt_visit') && (ctx.season === 'autumn' || ctx.season === 'winter')
+        && state.herd.pigs + state.herd.cows > 0
+        && !flagSet(state, 'salted')
+        && state.village.silver >= OFFER.SALT_SILVER ? w : 0;
     case 'good_catch':
       return (ctx.season === 'spring' || ctx.season === 'summer') && ctx.sky.wet <= 3 ? w : 0;
     case 'roof_under_snow':
@@ -135,6 +155,34 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
     default:
       return 0;
   }
+}
+
+/**
+ * M-0 · Si alguien puede subir por el camino esta semana: nadie mientras otro
+ * espera respuesta, y nadie a un valle hostil.
+ */
+function visitable(state: GameState, id: keyof typeof OFFER.AGAIN_WEEKS): boolean {
+  if (state.offer !== null || flagSet(state, 'hostile')) return false;
+  // Y no mientras hay una decisión sin contestar: esa ocupa la pantalla entera
+  // (§11.2), así que la oferta se leería debajo del velo y caducaría sin que
+  // nadie la hubiera visto. Era la regla del canal viejo y se queda.
+  if (state.crossroad !== null) return false;
+  if (population(state) < OFFER.MIN_PEOPLE) return false;
+  // La última visita de esta clase, buscada desde el final: las visitas son
+  // raras y la lista de sucesos crece hacia atrás en el tiempo.
+  for (let i = state.happenings.length - 1; i >= 0; i -= 1) {
+    const past = state.happenings[i];
+    if (past === undefined) continue;
+    if (state.tick - past.tick >= OFFER.AGAIN_WEEKS[id]) break;
+    if (past.id === id) return false;
+  }
+  return true;
+}
+
+/** Las doce semanas siguientes a la siega, que es cuando sobra grano. */
+function afterHarvest(ctx: Context): boolean {
+  const since = (ctx.week - TIME.HARVEST_WEEK + TIME.WEEKS_PER_YEAR) % TIME.WEEKS_PER_YEAR;
+  return since >= 1 && since <= TIME.WEEKS_PER_SEASON;
 }
 
 /** La semana de la fiesta: la siguiente a la siega, con grano en el granero y gente. */
@@ -221,10 +269,46 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       break;
     }
     case 'pedlar': {
-      state.village.wood = Math.max(0, state.village.wood - FATE.PEDLAR_WOOD);
-      state.village.grain += FATE.PEDLAR_GRAIN;
-      params['wood'] = FATE.PEDLAR_WOOD;
-      params['grain'] = FATE.PEDLAR_GRAIN;
+      // M-0 · el buhonero ya no se lleva la leña: la **pide**, y el jugador dice.
+      postOffer(state, id,
+        [{ k: 'stat', stat: 'silver', amount: OFFER.PEDLAR_SILVER }],
+        [{ k: 'stat', stat: 'wood', amount: OFFER.PEDLAR_WOOD }]);
+      params['wood'] = OFFER.PEDLAR_WOOD;
+      params['silver'] = OFFER.PEDLAR_SILVER;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      break;
+    }
+    case 'factor_visit': {
+      const grain = factorWants(state);
+      const silver = Math.max(1, Math.round(grain * OFFER.SILVER_PER_GRAIN));
+      postOffer(state, id,
+        [
+          { k: 'stat', stat: 'silver', amount: silver },
+          // El precio de verdad, el mismo que tenía la encrucijada del factor:
+          // quien vende su grano en el camino es un valle del que se habla, y
+          // las plantillas del señor leen `watched`.
+          { k: 'flag', flag: 'watched', years: OFFER.FACTOR_WATCHED_YEARS },
+        ],
+        [{ k: 'stat', stat: 'grain', amount: grain }]);
+      params['grain'] = grain;
+      params['silver'] = silver;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      break;
+    }
+    case 'drover_visit': {
+      postOffer(state, id,
+        [{ k: 'herd', kind: 'cows', amount: 1 }],
+        [{ k: 'stat', stat: 'silver', amount: OFFER.DROVER_SILVER }]);
+      params['silver'] = OFFER.DROVER_SILVER;
+      visible.push({ k: 'gather', where: 'square', days: 1 });
+      break;
+    }
+    case 'salt_visit': {
+      postOffer(state, id,
+        [{ k: 'flag', flag: 'salted', years: OFFER.SALT_YEARS }],
+        [{ k: 'stat', stat: 'silver', amount: OFFER.SALT_SILVER }]);
+      params['silver'] = OFFER.SALT_SILVER;
+      params['years'] = OFFER.SALT_YEARS;
       visible.push({ k: 'gather', where: 'square', days: 1 });
       break;
     }
@@ -280,6 +364,9 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
     }
     case 'stranger_passes': {
       moraleBy(state, FATE.STRANGER_MORALE);
+      // M-0 · y paga la cama: la primera plata de un valle joven.
+      state.village.silver += FATE.STRANGER_SILVER;
+      params['silver'] = FATE.STRANGER_SILVER;
       visible.push({ k: 'gather', where: 'square', days: 1 });
       weight = 1;
       break;

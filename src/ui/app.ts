@@ -17,10 +17,11 @@ import { renderEntry, renderUiText } from '@engine/chronicle/render';
 import { answerFor } from './answer';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
+import { offerLine } from './offer-line';
 import { foundGame } from '@engine/found';
 import { archiveGame, foundSuccessor, serialize, ticksOwed } from '@engine/save';
 import { tick, type TickReport } from '@engine/sim';
-import type { ArchivedGame, Decision, GameState, Intent, SaveFile } from '@engine/state';
+import type { ArchivedGame, Decision, GameState, Intent, PlayerAct, SaveFile } from '@engine/state';
 import { createHud } from './redesign/hud';
 import { createInspectPanel } from './redesign/inspect-panel';
 import { ordersPanel } from './redesign/orders';
@@ -44,7 +45,7 @@ import { accentFor, ambientFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
 import {
   SILENT,
-  dismissHint,
+  clearOffer, dismissHint,
   expire,
   offerUnlessMuted,
   speaking,
@@ -595,6 +596,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   let lastBolts = 0;
   // Lo último que se ofreció como fondo, para no ofrecer lo mismo cada fotograma.
   let spokenState: string | null = null;
+  /** M-0 · el `postedTick` de la oferta que ya está dicha, para no repetirla. */
+  let spokenOffer: number | null = null;
   const paint = (fraction: number): void => {
     lastFraction = fraction;
     // U-11 · la altura de la vista, en la raíz, como `data-tick`: es lo único
@@ -679,6 +682,18 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     const doingText = doing === null ? null : renderUiText(doing.key, doing.params);
     if (doingText !== null && doingText !== spokenState) say('state', doingText);
     spokenState = doingText;
+    // M-0 · **quien espera en el camino habla por la misma boca.** La oferta no
+    // caduca con el reloj de pared —vive las dos semanas del valle que el motor
+    // le da—, así que se ofrece mientras esté en el estado y se retira cuando el
+    // motor la quita: aceptada, dejada pasar o ida. Un suceso la tapa sus cinco
+    // segundos y vuelve sola (`voice.ts`).
+    const waiting = state.offer;
+    if (waiting === null) {
+      if (spokenOffer !== null) { voice = clearOffer(voice); spokenOffer = null; }
+    } else if (spokenOffer !== waiting.postedTick) {
+      say('offer', offerLine(waiting));
+      spokenOffer = waiting.postedTick;
+    }
     const nowMs = Date.now();
     voice = expire(voice, nowMs);
     const now = speaking(voice, nowMs);
@@ -688,6 +703,15 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // hoja de roble en oro) y lo que el manejador del toque mira para saber si
     // lo que se está leyendo es la pista. Nadie toca una clase desde aquí.
     shell.voice.dataset.role = now?.role ?? '';
+    // Los dos toques sólo cuando lo que se lee **es** la oferta: si un suceso la
+    // está tapando, contestar a ciegas sería contestar a otra cosa.
+    shell.setOffer(now?.role === 'offer', (accept) => {
+      pendingActs.push({ kind: 'offer', accept });
+      // Como una decisión (§2.60, regla 2): se contesta ahora, no en catorce
+      // minutos. En pausa se queda en la cola, que es lo que §8.7 hace con una
+      // decisión tomada con el reloj parado.
+      if (speed !== 0) { runTick(); paint(lastFraction); }
+    });
     // VZ-4 · la cámara va detrás de quien se sigue, fotograma a fotograma.
     if (trackedId !== null) renderer.track(trackedId);
     renderer.paint(state, fraction);
@@ -996,6 +1020,16 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // paused game just never calls `runTick`, so a decision queued while paused
   // sits untouched until the player unpauses and a real tick runs.
   let pendingDecision: Decision | undefined;
+  /**
+   * M-0 · **Lo que el jugador ha contestado a quien espera en el camino**, en
+   * cola hasta el tick siguiente.
+   *
+   * Es el mismo patrón que `pendingDecision` y por el mismo motivo: lo que el
+   * jugador hace entra por `tick` y queda en el registro del estado, así que la
+   * partida se puede reproducir. Y es una lista porque una semana admite más de
+   * un acto, aunque hoy sólo haya una clase de acto.
+   */
+  let pendingActs: PlayerAct[] = [];
   const finish = (): void => {
     if (state.ended === null) return;
     loop?.stop();
@@ -1026,7 +1060,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     if (state.ended !== null) return;
     const decision = pendingDecision;
     pendingDecision = undefined;
-    const report = tick(state, CATALOG, decision);
+    const acts = pendingActs;
+    pendingActs = [];
+    const report = tick(state, CATALOG, decision, acts);
+    // M-0 · si la oferta no se pudo pagar, se dice y se deja en pie: es la
+    // única respuesta de la aldea que el jugador no puede deducir mirando.
+    if (report.offer?.refused === true) say('event', renderUiText('offer.cannot'));
     // Rule 4 (§2.60): the engine hands back what changed and where; `document`
     // and not `root` because the crossroad screen mounts on `document.body`
     // (§11.2's "ocupa la pantalla entera"), outside the app's own root.

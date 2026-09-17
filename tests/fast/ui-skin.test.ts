@@ -147,10 +147,12 @@ describe('UI-V0 · las primitivas que las seis rondas van a usar', () => {
 });
 
 describe('UI-V0 · los activos que el plan promete', () => {
-  it('el sprite trae los diez iconos, y ninguno lleva color propio', () => {
+  it('el sprite trae los iconos que la interfaz nombra, y ninguno lleva color propio', () => {
     const sprite = readFileSync(resolve(ROOT, 'public/ui/icons.svg'), 'utf8');
     for (const id of ['people', 'wheat', 'logs', 'face', 'mountains', 'book',
-      'footprints', 'oak-leaf', 'sun', 'seal-tree']) {
+      'footprints', 'oak-leaf', 'sun', 'seal-tree',
+      // M-0 · las dos existencias nuevas y las cuatro caras del ánimo.
+      'stone', 'silver', 'face-low', 'face-grim', 'face-calm', 'face-glad']) {
       expect(sprite, id).toContain(`id="${id}"`);
     }
     // El color lo pone quien los usa (`currentColor`), nunca el icono: si un

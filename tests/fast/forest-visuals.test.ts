@@ -54,7 +54,7 @@ describe('IA-16 · bosque visible', () => {
     state.map.terrain[neighbours[2]!] = TERRAIN_CODE.forest;
     state.works.push({
       id: 999, kind: 'house', x: 5, y: 5, w: 1, h: 1,
-      bpCost: 10, bpDone: 0, materialsPaid: true, startedTick: 0, upgradeOf: null,
+      bpCost: 10, bpDone: 0, stoneDone: 0, materialsPaid: true, startedTick: 0, upgradeOf: null,
     });
     expect(forestLooks(state).some(look => look.cell === cell)).toBe(false);
     state.works.length = 0;

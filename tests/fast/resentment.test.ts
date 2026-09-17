@@ -43,20 +43,23 @@ describe('el hambre le pasa factura al que manda · §7.9', () => {
     expect(opinionOf(state, someone.id, leader.id)).toBeLessThan(before);
   });
 
-  // **`it.fails`, con la medida al lado** (patrón de CLAUDE.md, como
-  // `life-props.test.ts`): el reequilibrado del caos del 16 sep 2026
-  // (`9c9f492`, «que casi todas se vayan a romper no es la idea») movió
-  // `balance.ts`/`world/fate.ts` y con ellos algo de esta cadena — no se ha
-  // tocado nada de `src/engine/` en esta ronda para saberlo con certeza,
-  // pero el fallo apareció entre ese commit y hoy y no antes. Medido: los dos
-  // extremos, hambre leve (0,2) y hambre total (1), acaban en el **mismo
-  // suelo, `OPINION.MIN = -100`**, así que «peor año, más factura» deja de
-  // distinguirse en la semilla 7 a los veinte años. La propiedad del brief
-  // (§7.9) sigue intacta arriba; esto no es mío que arreglar hoy —haría
-  // falta el arbitrio del dueño del diseño sobre `balance.ts`, y ningún
-  // número se inventa fuera de ese proceso (CLAUDE.md)—, así que se deja
-  // escrito en vez de silenciado. Ver `docs/task-log.md` §4.
-  it.fails('cuanto peor el año, más factura', () => {
+  // **Estaba declarada como fallo y M-0 la devolvió al verde**, sin tocar una
+  // línea de esta cadena. Lo que decía la nota: desde el reequilibrado del caos
+  // del 16 sep 2026 los dos extremos —hambre leve (0,2) y hambre total (1)—
+  // acababan en el **mismo suelo** (`OPINION.MIN = -100`) en la semilla 7 a los
+  // veinte años, así que «peor año, más factura» no se distinguía. No era la
+  // regla la que estaba mal: era que **esa aldea concreta** llegaba al año 20
+  // con las opiniones ya en el fondo, y a un suelo no se le puede bajar más.
+  //
+  // M-0 cambió lo que se sortea cada semana —las visitas del camino entran en
+  // la tabla de sucesos— y con ello la trayectoria de la semilla: la aldea de
+  // veinte años ya no llega tan hundida y los dos extremos vuelven a
+  // distinguirse. Es la misma lección que `docs/rework.md` §2.7 escribió al
+  // revés (un cambio del motor mueve toda prueba que mida una aldea hecha), y
+  // el aviso que deja es que esta prueba **sigue midiendo una biografía**: si
+  // vuelve a caer, lo que hay que mirar es si la aldea llega al suelo, no si la
+  // regla de §7.9 se ha roto.
+  it('cuanto peor el año, más factura', () => {
     const light = village(20);
     scarHunger(light, 0.2);
     const heavy = village(20);

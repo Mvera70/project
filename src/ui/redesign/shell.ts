@@ -224,6 +224,12 @@ export function createShell(actions: UiActions): ShellHandle {
   ornament.className = 'skin-ornament';
   let ornamentTap: (() => void) | null = null;
   ornament.addEventListener('click', () => { ornamentTap?.(); });
+  /** M-0 · quién contesta a la oferta, y si sus dos toques se ven. */
+  const setOffer = (open: boolean, onAnswer?: (accept: boolean) => void): void => {
+    offerTap = open ? onAnswer ?? null : null;
+    voiceActions.hidden = !open;
+  };
+
   const setOrnament = (kind: 'leaf' | 'seal', onTap?: () => void): void => {
     ornamentTap = kind === 'seal' ? onTap ?? null : null;
     ornament.classList.toggle('skin-ornament--seal', kind === 'seal');
@@ -262,7 +268,37 @@ export function createShell(actions: UiActions): ShellHandle {
    */
   const voiceLine = document.createElement('span');
   voiceLine.className = 'valley-voice-line';
-  voice.append(voiceLine);
+
+  /**
+   * M-0 · **Los dos toques de una oferta del camino**, dentro de la voz.
+   *
+   * Aquí y no en una pantalla propia porque es lo que el dueño del diseño
+   * eligió el 17 sep 2026: «una oferta que se acepta o se deja pasar», sin
+   * pantalla entera. Se montan una vez y se enseñan sólo cuando lo que la voz
+   * está diciendo es una oferta, que lo decide `app.ts` con `data-role`.
+   */
+  const voiceActions = document.createElement('div');
+  voiceActions.className = 'valley-voice-actions';
+  voiceActions.hidden = true;
+  let offerTap: ((accept: boolean) => void) | null = null;
+  const answer = (label: string, accept: boolean, className: string): HTMLButtonElement => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `${className} valley-voice-answer`;
+    button.textContent = renderUiText(label);
+    button.addEventListener('click', (event) => {
+      // La voz entera es el botón de la pista (`app.ts`): un toque en los
+      // botones de la oferta no puede leerse además como «pista vista».
+      event.stopPropagation();
+      offerTap?.(accept);
+    });
+    voiceActions.append(button);
+    return button;
+  };
+  answer('offer.take', true, 'skin-button--wood');
+  answer('offer.leave', false, 'skin-button--parchment');
+
+  voice.append(voiceLine, voiceActions);
 
   message.append(trayEdge, ornament, voice);
 
@@ -365,6 +401,7 @@ export function createShell(actions: UiActions): ShellHandle {
     voice,
     voiceLine,
     setOrnament,
+    setOffer,
     setRoute: paintRoute,
     // Los botones no llevan más que `addEventListener`: quitar `element` del
     // árbol basta para que dejen de recibir toques y para que el recolector

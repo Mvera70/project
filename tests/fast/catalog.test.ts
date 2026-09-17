@@ -6,7 +6,7 @@
 // plantilla que nunca sale es contenido muerto, y con dieciséis escritas a mano
 // es fácil que pase.
 import { beforeAll, describe, expect, it } from 'vitest';
-import { CATALOG } from '@engine/crossroads/catalog';
+import { CATALOG, RETIRED_TEMPLATES } from '@engine/crossroads/catalog';
 import type { CrossroadCategory } from '@engine/crossroads/schema';
 import type { GameState } from '@engine/state';
 import { population } from '@engine/people/demography';
@@ -15,10 +15,18 @@ import { founded, silentIn, sweep, tick, YEAR } from '../helpers/catalogue-bench
 
 
 describe('el catálogo · forma', () => {
-  it('son las dieciséis del Anexo A, la reserva y los tres comerciantes', () => {
-    // v2.95: §7.8 añade la categoría `trade`. El número sube a propósito, y
-    // esta prueba existe justo para que subir sea una decisión y no un descuido.
-    expect(CATALOG).toHaveLength(20);
+  it('son las dieciséis del Anexo A y la reserva; los tres comerciantes ya no están', () => {
+    // v2.95 añadió la categoría `trade` y el número subió a 20; **M-0 retira
+    // esas tres plantillas** —el tratante, el salinero y el factor son ofertas
+    // del camino desde entonces (§7.8, `world/road.ts`)— y el número baja a 17.
+    // Esta prueba existe justo para que subir o bajar sea una decisión y no un
+    // descuido, así que las retiradas se cuentan aparte: siguen existiendo
+    // porque una partida guardada las nombra.
+    expect(CATALOG).toHaveLength(17);
+    expect(RETIRED_TEMPLATES).toHaveLength(3);
+    for (const retired of RETIRED_TEMPLATES) {
+      expect(CATALOG.some((t) => t.id === retired.id), retired.id).toBe(false);
+    }
     expect(CATALOG.some((t) => t.id === 'quiet_years')).toBe(true);
   });
 
@@ -36,10 +44,10 @@ describe('el catálogo · forma', () => {
     ] as CrossroadCategory[]) {
       expect(byCategory.get(c), c).toBe(2);
     }
+    // Y `trade` ya no está en esa lista: sus tres plantillas están retiradas.
+    expect(byCategory.get('trade')).toBeUndefined();
     // stranger lleva tres: las dos suyas y quiet_years, que es la reserva.
     expect(byCategory.get('stranger')).toBe(3);
-    // trade lleva tres, una por comerciante (§7.8).
-    expect(byCategory.get('trade')).toBe(3);
     // Y ninguna categoría puede quedarse con una sola: con una, salir dos
     // veces seguidas es repetirse, y §12.9 lo prohibe.
     for (const [category, n] of byCategory) expect(n, category).toBeGreaterThanOrEqual(2);

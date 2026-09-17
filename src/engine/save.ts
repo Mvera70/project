@@ -1,7 +1,7 @@
 // M-23 · Save format and the catch-up that follows loading one. design.md §13.
 
 import { ANIMALS, BUILDINGS, TIME, WORLD } from './balance';
-import { CATALOG } from './crossroads/catalog';
+import { CATALOG, RETIRED_TEMPLATES } from './crossroads/catalog';
 import { foundGame } from './found';
 import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
@@ -85,7 +85,37 @@ function chronicleEntry(value: unknown): boolean {
 }
 
 function catalogueTemplate(id: unknown) {
-  return typeof id === 'string' ? CATALOG.find((template) => template.id === id) : undefined;
+  // M-0 · con las retiradas: una partida que contestó al tratante antes de que
+  // fuera una oferta tiene esa decisión en su registro, y sigue siendo suya.
+  return typeof id === 'string'
+    ? [...CATALOG, ...RETIRED_TEMPLATES].find((template) => template.id === id)
+    : undefined;
+}
+
+/** M-0 · Un bien de oferta con la forma que `world/road.ts` sabe aplicar. */
+function offerGood(value: unknown): boolean {
+  if (!record(value)) return false;
+  if (value['k'] === 'stat') {
+    return ['grain', 'wood', 'morale', 'faith', 'stone', 'silver'].includes(value['stat'] as string)
+      && finite(value['amount']);
+  }
+  if (value['k'] === 'herd') {
+    return (HERD_KINDS as readonly string[]).includes(value['kind'] as string) && finite(value['amount']);
+  }
+  return value['k'] === 'flag' && typeof value['flag'] === 'string' && finite(value['years']);
+}
+
+function offerValue(value: unknown): boolean {
+  return record(value) && (HAPPENINGS as readonly string[]).includes(value['id'] as string)
+    && Array.isArray(value['gives']) && value['gives'].every(offerGood)
+    && Array.isArray(value['takes']) && value['takes'].every(offerGood)
+    && tickValue(value['postedTick']) && tickValue(value['expiresTick']);
+}
+
+function actRecord(value: unknown): boolean {
+  if (!record(value) || !tickValue(value['tick']) || typeof value['done'] !== 'boolean') return false;
+  const act = value['act'];
+  return record(act) && act['kind'] === 'offer' && typeof act['accept'] === 'boolean';
 }
 
 function catalogueOption(templateId: unknown, optionId: unknown) {
@@ -128,7 +158,7 @@ function building(value: unknown): boolean {
 function work(value: unknown): boolean {
   return record(value) && tickValue(value['id']) && typeof value['kind'] === 'string'
     && value['kind'] in BUILDINGS
-    && ['x', 'y', 'w', 'h', 'bpCost', 'bpDone', 'startedTick'].every((key) => finite(value[key]))
+    && ['x', 'y', 'w', 'h', 'bpCost', 'bpDone', 'stoneDone', 'startedTick'].every((key) => finite(value[key]))
     && typeof value['materialsPaid'] === 'boolean'
     && (value['upgradeOf'] === null || tickValue(value['upgradeOf']));
 }
@@ -255,7 +285,7 @@ function isPlausibleState(value: unknown): value is GameState {
     && tickValue(s['tick']) && tickValue(s['peakPeople'])
     && record(rng) && RNG_STREAMS.every((stream) => uint32(rng[stream]))
     && byteMap(s['map'])
-    && record(village) && ['grain', 'wood', 'morale', 'faith'].every((key) => finite(village[key]))
+    && record(village) && ['grain', 'wood', 'morale', 'faith', 'stone', 'silver'].every((key) => finite(village[key]))
     && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
     // La postura. Se comprueba que sea finita y no que esté en rango:
     // `allocateLabour` ya la recorta, y rechazar una partida entera por una
@@ -276,6 +306,8 @@ function isPlausibleState(value: unknown): value is GameState {
     && Array.isArray(s['chronicle']) && s['chronicle'].every(chronicleEntry)
     && Array.isArray(s['history']) && s['history'].every(decisionRecord)
     && Array.isArray(s['happenings']) && s['happenings'].every(happeningRecord)
+    && (s['offer'] === null || offerValue(s['offer']))
+    && Array.isArray(s['acts']) && s['acts'].every(actRecord)
     && record(weather) && tickValue(weather['year']) && tickValue(weather['index']) && finite(weather['factor'])
     && (outbreak === null || (record(outbreak) && tickValue(outbreak['startedTick'])
       && tickValue(outbreak['endsTick']) && tickValue(outbreak['deaths'])))
@@ -329,7 +361,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && candidate.schema !== 2 && candidate.schema !== 3) {
+  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6].includes(candidate.schema)) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -389,6 +421,36 @@ export function deserialize(raw: unknown): SaveFile {
   // misma razón por la que el sorteo es una función pura de la semilla.
   if ((state as Partial<GameState>).traits === undefined) {
     state = { ...state, traits: valleyTraits(state.terrainSeed) };
+  }
+  // 6 -> 7 (M-0): piedra, plata, la oferta del camino y los actos del jugador.
+  //
+  // Todo entra a cero, y es recordar y no cambiar: antes del esquema 7 la
+  // piedra no estaba en ningún montón —se cobraba dentro de la obra— y la plata
+  // no existía. Una obra de piedra ya abierta sigue su curso con los puntos que
+  // se le calcularon al abrirla. Y una encrucijada de comercio pendiente se
+  // retira: esas plantillas ya no se plantean, y una pregunta que la pantalla
+  // no sabe abrir se quedaría esperando para siempre, que es lo que §8.6
+  // prohíbe (sólo una a la vez).
+  if ((state as Partial<GameState>).acts === undefined) {
+    const village = state.village as Partial<GameState['village']>;
+    const retired = state.crossroad !== null
+      && RETIRED_TEMPLATES.some((template) => template.id === state.crossroad?.templateId);
+    state = {
+      ...state,
+      version: SCHEMA_VERSION,
+      village: { ...state.village, stone: village.stone ?? 0, silver: village.silver ?? 0 },
+      offer: null,
+      acts: [],
+      crossroad: retired ? null : state.crossroad,
+      // Una obra en vuelo **ya pagó su piedra**: hasta el esquema 6 iba dentro
+      // de su `bpCost` (`bp + piedra / STONE_PER_BP`) y su `bpDone` lleva la
+      // cuenta. Entra con la piedra puesta, así que le queda exactamente el
+      // trabajo que le quedaba; si entrara a cero, la aldea pagaría dos veces.
+      works: state.works.map((work) => ({
+        ...work,
+        stoneDone: work.stoneDone ?? BUILDINGS[work.kind].stone,
+      })),
+    } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

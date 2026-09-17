@@ -766,7 +766,44 @@ typecheck, lint y los ficheros tocados; la suite entera al cerrar.
   abajo son propuestas para arrancar, no cifras medidas: la medida es lo que
   cierra cada fase.
 
-### M-0 · La mesa: piedra y plata
+### M-0 · La mesa: piedra y plata — **hecha** (17 sep 2026)
+
+> **Entregada**, con tres desviaciones del brief y sus motivos, y **una trampa
+> que casi se cuela en silencio**. Informe corto en `docs/task-log.md`.
+>
+> 1. **La piedra la cantea la obra, no un reparto de manos.** El brief pedía un
+>    `LABOUR.QUARRY_SHARE` en `allocateLabour`; lo que se hizo es que la obra de
+>    piedra pique con sus propios puntos hasta tener la que pide, al mismo
+>    cambio de siempre (`WORLD.STONE_PER_BP`). Así el trabajo total de una casa
+>    de piedra **no se mueve** —hay prueba de equivalencia, y la primera piedra
+>    sigue cayendo donde caía— en vez de tener que recalibrar el balance entero.
+> 2. **Los actos del jugador van por un canal propio** (`state.acts`,
+>    `PlayerAct`) y no por una unión con `Decision`: una semana admite una
+>    respuesta a la encrucijada **y** una oferta aceptada, y `history` —que las
+>    encrucijadas leen para no repetirse— no tiene por qué aprender a saltarse
+>    lo que no es suyo.
+> 3. **Lo que se cierra en el camino no es un `happening`**: tiene su propia
+>    clase de entrada de crónica (`kind: 'road'`). Contarlo como suceso
+>    descuadraba la cuenta de R-1 y le pedía tres frases a una línea de
+>    contabilidad.
+>
+> **La trampa:** la capa de vida detectaba «esta obra pide piedra» por el coste
+> viejo (`bpCost > bp`), así que al sacar la piedra de `bpCost` **la cantera
+> desaparecía del valle sin que nada fallara salvo una prueba de `life/`** — y
+> ver la piedra es justo lo que el dueño del diseño pedía. Por eso la obra se
+> abre **antes** de picar y lleva su propio `stoneDone`: mientras le falte,
+> está en la cantera, se le ve, y el montón sube y baja.
+>
+> **Medido** (`tools/agency-report.ts`, 32 semillas × 60 años): la primera
+> piedra en el año 48 de mediana, igual que antes (48, base medida con el motor
+> de `a0e2706`); las mismas muertas que la base (9 contra 10, y el «4 contra 2»
+> de dieciséis semillas era ruido); la plata entra y sale en 123 de 161 décadas
+> vividas. Y dos cifras que el camino obligó a poner con su medida al lado:
+> `OFFER.MIN_PEOPLE` 8 y `FACTOR_KEEP_YEARS` 2, porque sin ellas **aceptar
+> ofertas mataba aldeas** —la población mediana bajaba de 47 a 15 y la semilla 9
+> se extinguía en el año 2 vendiendo el grano que la separaba del hambre—, que
+> es exactamente la trampa de las palancas otra vez.
+
 
 **Qué.** Dos existencias nuevas en `VillageStats`, las visitas de comercio como
 ofertas, el diezmo, y la cabecera con cinco cosas y una cara.

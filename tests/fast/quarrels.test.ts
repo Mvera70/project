@@ -27,8 +27,24 @@ function village(years: number, seed = 7): GameState {
 const namedOf = (s: GameState): Villager[] =>
   s.people.villagers.filter((v) => v.named && v.diedTick === null);
 
-/** Dos que se detestan de verdad, con su rencor ya cocido. */
+/**
+ * Dos que se detestan de verdad, con su rencor ya cocido, **y los únicos del
+ * valle**.
+ *
+ * Lo segundo lo aprendió esta prueba dos veces, y la segunda con M-0: la aldea
+ * de veinte años llega con rencores propios —la riña de la plaza de R-1 los
+ * empuja— y cualquier cambio del motor cambia **quiénes** son, así que una
+ * prueba que dé por hecho que los dos primeros nombrados son los que peor se
+ * llevan mide la biografía de una semilla y no la regla de §7.9. Apagando los
+ * demás, lo que se vigila es lo que el título dice.
+ */
 function feuding(state: GameState): [Villager, Villager] {
+  for (const grudge of state.people.grudges) grudge.healedTick = state.tick;
+  for (const person of state.people.villagers) {
+    for (const id of Object.keys(person.opinions)) {
+      if (person.opinions[Number(id)]! < 0) person.opinions[Number(id)] = 0;
+    }
+  }
   const [a, b] = namedOf(state);
   a!.opinions[b!.id] = -80;
   b!.opinions[a!.id] = -80;

@@ -1029,6 +1029,18 @@ borde a borde, entre el 18 % y el 30 % de bosque, y un sitio de fundación váli
 | `church` | 3×3 | 0 + 120 piedra | 200 | Mejora de `chapel` | 1 |
 | `watchtower` | 2×2 | 0 + 60 piedra | 90 | Solo por encrucijada | 2 |
 
+**La piedra es una existencia desde M-0** (17 sep 2026). Hasta entonces «no se
+almacenaba nunca»: canteala era trabajo, así que el coste de obra de una pieza
+de piedra era `bp + piedra / STONE_PER_BP` y la piedra no estaba en ningún
+sitio —mientras la capa de vida ya animaba la cantera y el acarreo—. Ahora la
+obra **cantea con sus propios puntos** hasta tener la piedra que su proyecto
+pide, al mismo cambio, y la gasta al abrirlo; con la obra parada y fragua en
+pie, cantea hasta `WORLD.STONE_IDLE_CAP` en vez de perder la semana. El trabajo
+total de una casa de piedra **no se mueve** —hay prueba de equivalencia en
+`tests/journeys/works.test.ts`— y por eso la primera piedra sigue llegando
+cuando llegaba. La columna «Madera» de la tabla dice «0 + 50 piedra» por lo
+mismo que antes: son dos materiales, y ahora los dos salen de un montón.
+
 **Una celda de calle entre lo que tiene paredes (v3.57).** Dos edificios con
 dentro —casa, casa de piedra, granero, capilla, iglesia, fragua, molino,
 atalaya— no pueden compartir borde: queda entre ellos una celda libre,
@@ -1382,6 +1394,33 @@ frente.
 del mundo exterior es quién entra en ella, y eso no es una limitación sino la
 idea: un comerciante es una persona con un camino a la espalda y una historia
 que cuenta sobre él. Los sitios de donde vienen existen sólo en lo que dicen.
+
+> **M-0 (17 sep 2026) · dejan de ser encrucijadas y pasan a ser ofertas.** Lo
+> de abajo describe cómo estaban montados hasta entonces —plantillas del
+> catálogo con categoría `trade`, y un canal propio (`selectTrader`) con su
+> reloj y su flujo de azar— y **las tres plantillas están retiradas**
+> (`RETIRED_TEMPLATES`: una partida guardada que ya las contestó sigue
+> cargando). Quién sube por el camino lo sortea ahora la tabla de sucesos de
+> §7.10, y lo que deja es una **oferta**: una frase en la voz de la bandeja y
+> dos toques, «aceptar» o «dejarlo ir» (`world/road.ts`, §11.2). El dueño del
+> diseño eligió ese formato: una decisión corta y frecuente, sin pantalla
+> entera, que es lo que da el ritmo que pidió («cada semana, cada mes, cada
+> tres meses que pasen cosas»).
+>
+> **Y lo que se compra y se vende se paga en plata**, que es la existencia que
+> M-0 añade y lo único que viene de fuera del valle. Cuatro visitas: el
+> buhonero compra leña, el factor compra el grano que sobra —dejando siempre
+> dos años de comida, medido: con uno, un valle joven vendía lo que lo
+> separaba del hambre y se extinguía—, el tratante vende una vaca y el salinero
+> sal. Ninguna sube a un caserío de menos de `OFFER.MIN_PEOPLE`, ninguna repite
+> antes de su plazo (`OFFER.AGAIN_WEEKS`; sin él el factor subía más de una vez
+> al año y tapaba al resto de los sucesos) y ninguna sube mientras hay una
+> decisión sin contestar o otra oferta esperando. **Una oferta no cambia nada
+> hasta que el jugador contesta**, aceptar sin poder pagar no la gasta, y
+> dejarla pasar no escribe en la crónica: quien no compra no hace historia.
+>
+> **El señor cobra diezmo cada otoño** (`TITHE`), en plata, o en grano del que
+> sobra si no hay plata, y nunca a un caserío: el mundo no mata sin motivo.
 
 Se apoyan enteros en §8, sin subsistema nuevo: son plantillas del catálogo con
 categoría propia `trade`. El catálogo ya sabía plantear una decisión con
@@ -2415,23 +2454,40 @@ cruzan en el campo y no se nota nada.
 
 Se añaden dos elementos, y **sólo dos**:
 
-**1. La tira de la aldea.** Cuatro cifras, arriba, pequeñas y siempre visibles:
-**gente**, **comida** en semanas, **leña** y **ánimo**. Son las cuatro que
-deciden si la aldea vive: la gente es el juego, la comida es la muerte por
-hambre de §5.3, la leña es el invierno de §5.5 y las obras de §7.3, y el ánimo
-mueve la migración de §5.7 y el peso de las encrucijadas de §8.
+**1. La tira de la aldea.** **Cinco cifras desde M-0** (17 sep 2026), arriba,
+pequeñas y siempre visibles: **gente**, **comida** en semanas, **leña**,
+**piedra** y **plata**. Son las que deciden si la aldea vive y lo que el
+jugador puede gastar: la gente es el juego, la comida es la muerte por hambre
+de §5.3, la leña es el invierno de §5.5 y las obras de §7.3, y la piedra y la
+plata son la mesa sobre la que se juega (§7.2, §7.8).
+
+**Y el ánimo dejó de ser una cifra: es la cara del chip de la gente.** Lo pidió
+el dueño del diseño —«la felicidad creo que no varía nada, siempre está en 55,
+50, 60»— y medido tenía media razón: el número **sí** se mueve (de 6 a 79 en
+sesenta años, y el 17 % de las semanas por debajo de 10) pero **vive a escala de
+años** —lo mueve la cosecha, una vez— y se mira a escala de semanas, así que en
+una sesión no se mueve y se lee como un número muerto. Una cara con cuatro
+gestos (`MOOD_FACE`) dice lo mismo sin prometer una precisión que no tiene, y el
+número exacto sigue a un toque, como todo lo demás en esta sección. La fe
+tampoco entra: sigue siendo las velas de la capilla.
 
 El grano se enseña **en semanas de comida y no en unidades**, porque la unidad
 es «una persona una semana» y lo que el jugador decide con ella es cuántas
 semanas aguanta: la división ya la hace el juego en vez de pedírsela a él.
 
-**Lo que no entra, y por qué.** *Oro* y *piedra* no existen en la simulación. La
-economía de este valle es grano, leña y brazos; el comercio de §8 es trueque, y
-la piedra de §7.2 no se almacena nunca —se convierte en puntos de obra al
-levantar el muro—. Un contador de monedas sería un número inventado, que §12 y
-`CLAUDE.md` prohíben con esas palabras. Si algún día hay moneda, se decide en el
-motor y llega aquí después. La **fe** tampoco entra en la tira: sigue siendo las
-velas de la capilla, que es donde se lee bien.
+> **Lo que decía esta sección hasta M-0, y por qué cambió.** Decía: *«Oro y
+> piedra no existen en la simulación … un contador de monedas sería un número
+> inventado … si algún día hay moneda, **se decide en el motor y llega aquí
+> después**»*. Era correcto y esa última frase es exactamente lo que ha pasado:
+> el dueño del diseño pidió las dos el 17 sep 2026 —«no tenemos la piedra … y
+> sería clave alguna moneda»— porque desde el juego de los medios
+> (`docs/plan-medios.md`) el jugador **paga con lo del valle**, y una economía
+> con la que se paga tiene que estar en pantalla.
+>
+> Las dos se decidieron en el motor primero: la piedra era ya trabajo (§7.2) y
+> pasa a ser existencia con el mismo coste, y la plata entra por §7.8 y sale por
+> el diezmo. Ninguna es un número inventado: las dos tienen de dónde vienen y a
+> dónde van.
 
 **2. La burbuja de estado.** Una nube pequeña sobre la cabeza de quien está
 viviendo algo, con un icono. **Sólo sale de estado con fecha**, nunca de una
@@ -3709,6 +3765,14 @@ política prudente), y hay que pasarlo antes y después de mover cualquiera.
 | `MIN_GAP_WEEKS` | 2 | un suceso pegado a otro no se lee |
 | `FEAST_IS_A_RITE` | true | sorteada, la fiesta salía una vez cada veinte años |
 | `WEIGHT` | rayo 3 · riada 3 · lobos 3 · boda 0,6 · buhonero 2 · pesca 2 · tejado 3 · fiesta 1 (no se sortea) · riña 1 · oso 0,6 · niño 0,5 · forastero 1 | tercera vuelta; las dos anteriores en `docs/rework.md` §2.5 |
+| `WEIGHT` de las visitas | buhonero 2 · factor 2 · tratante 1,5 · salinero 1 | M-0: el listón es el del buhonero, que ya pesaba 2 — una visita es una cosa que pasa, no una rareza |
+| `OFFER.WEEKS` | 2 | lo que espera quien ha subido antes de seguir camino |
+| `OFFER.MIN_PEOPLE` | 8 | **medido**: sin suelo, aceptar ofertas bajaba la población mediana de 47 a 15 y mataba seis aldeas de dieciséis, casi todas parejas que vendían lo que las mantenía vivas |
+| `OFFER.FACTOR_KEEP_YEARS` | 2 | **medido**: con uno, la semilla 9 se extinguía en el año 2 |
+| `OFFER.AGAIN_WEEKS` | buhonero 24 · factor 48 · tratante 48 · salinero 96 | **medido**: sin plazo, el factor subía 1 181 veces en dieciséis partidas de sesenta años y tapaba al resto |
+| `TITHE.SILVER_SHARE`, `GRAIN_OF_SURPLUS`, `MIN_PEOPLE` | 0,1 · 0,1 · 10 | el diezmo se lleva una parte de la plata, o del grano que **sobra**, y no visita un caserío |
+| `WORLD.STONE_IDLE_CAP` | 210 | lo que cuesta una iglesia, una muralla y una casa: no es un almacén, es tener piedra a mano |
+| `MOOD_FACE` | 20 · 40 · 70 | los tres cortes de la cara del ánimo (§11.1.1) |
 | `LIGHTNING_HOUSE_WEIGHT`, `LIGHTNING_MORALE` | 3, −4 | como el incendio de §5.9. **Sin puertas desde v3.76** (decisión del dueño, §7.10): `LIGHTNING_MIN_HOUSES`/`LIGHTNING_MIN_PEOPLE` existieron y se quitaron; el rayo sólo pide tormenta y madera en pie |
 | `FLOOD_WET_DAYS`, `FLOOD_GRAIN_LOSS`, `FLOOD_MORALE` | 3, 0,08, −3 | tres jornadas cerradas de siete; el 8 % del granero |
 | `WOLVES_HENS`, `WOLVES_MORALE` | [1, 2], −1 | |

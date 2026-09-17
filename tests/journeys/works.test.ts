@@ -247,14 +247,42 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
     expect(spot!.y + 3).toBeGreaterThanOrEqual(chapel.y + 2);
   });
 
-  it('la piedra se paga en puntos de obra, no en un sexto recurso', () => {
-    // §7.2, v2.12: bpCost = bp + stone / STONE_PER_BP.
-    expect(bpCostOf('stone_house')).toBe(
-      BUILDINGS.stone_house.bp + BUILDINGS.stone_house.stone / WORLD.STONE_PER_BP,
-    );
-    // `free` de §8.4 exime materiales, nunca el trabajo de levantarlo.
-    expect(bpCostOf('watchtower', true)).toBe(BUILDINGS.watchtower.bp);
-    expect(bpCostOf('house', true)).toBe(BUILDINGS.house.bp);
+  it('la piedra se cantea y se gasta, y cuesta el mismo trabajo que cuando no existía', () => {
+    // **M-0 · la propiedad que hay que guardar, y es de equivalencia.** Hasta
+    // el esquema 6 la piedra era trabajo escondido dentro del proyecto
+    // (`bpCost = bp + stone / STONE_PER_BP`, §7.2 v2.12). Ahora es una
+    // existencia: la obra la cantea con sus propios puntos y la gasta al abrir.
+    // Lo que **no** puede cambiar es lo que cuesta una casa de piedra de punta
+    // a punta, porque de eso depende cuándo llega la primera (años 42 a 45,
+    // `handover.md` §2.1) y por tanto el balance entero.
+    const spec = BUILDINGS.stone_house;
+    const antes = spec.bp + spec.stone / WORLD.STONE_PER_BP;
+    expect(bpCostOf('stone_house')).toBe(spec.bp);
+
+    const s = raise(foundTwenty(7), 'smithy', 1);
+    fillTheValley(s);
+    s.flags['stone_house_unlocked'] = 0;
+    s.village.stone = 0;
+    // Diez puntos por semana, que es lo que pone una aldea pequeña, para que la
+    // cuenta sea de semanas y no de un solo golpe.
+    let weeks = 0;
+    while (!live(s).some((b) => b.kind === 'stone_house') && weeks < 200) {
+      advanceWorks(s, 10);
+      weeks += 1;
+    }
+    expect(live(s).some((b) => b.kind === 'stone_house')).toBe(true);
+    // El mismo trabajo, con el redondeo de la última semana: ni una semana más.
+    expect(weeks).toBe(Math.ceil(antes / 10));
+    // Y la piedra se gastó: el montón no se queda con la casa dentro.
+    expect(s.village.stone).toBeLessThan(spec.stone);
+
+    // `free` de §8.4 exime materiales —también la piedra— y nunca el trabajo,
+    // y por eso `bpCostOf` ya no lo pregunta: levantar cuesta lo que cuesta.
+    expect(bpCostOf('watchtower')).toBe(BUILDINGS.watchtower.bp);
+    expect(bpCostOf('house')).toBe(BUILDINGS.house.bp);
+    const gift = raise(foundTwenty(7), 'smithy', 1);
+    gift.village.stone = 0;
+    expect(requestBuild(gift, 'watchtower')).not.toBeNull();
   });
 
   it('una mejora sustituye a su origen sin dejar ruina ni gente en la calle', () => {
@@ -264,6 +292,8 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
     const source = live(s).find((b) => b.kind === 'house')!;
     const tenants = s.people.villagers.filter((v) => v.homeId === source.id).map((v) => v.id);
     expect(tenants.length).toBeGreaterThan(0);
+    // M-0 · primero se cantea la piedra, luego se abre y se levanta.
+    s.village.stone = BUILDINGS.stone_house.stone;
     advanceWorks(s, 0); // abre la obra
     advanceWorks(s, bpCostOf('stone_house'));
     const raised = live(s).find((b) => b.kind === 'stone_house');
@@ -324,7 +354,7 @@ describe('topes de §7.2', () => {
   it('requestBuild respeta el tope y devuelve null cuando está lleno', () => {
     const s = foundTwenty(7);
     expect(requestBuild(s, 'grave_yard')).not.toBeNull();
-    advanceWorks(s, bpCostOf('grave_yard', true));
+    advanceWorks(s, bpCostOf('grave_yard'));
     expect(live(s).some((b) => b.kind === 'grave_yard')).toBe(true);
     expect(requestBuild(s, 'grave_yard')).toBeNull();
   });

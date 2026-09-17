@@ -14,7 +14,7 @@
 // de §8 es trueque y la piedra de §7.2 se convierte en puntos de obra sin
 // almacenarse nunca. Un contador de monedas sería un número inventado.
 
-import { FOOD } from '@engine/balance';
+import { FOOD, MOOD_FACE } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import type { GameState } from '@engine/state';
 
@@ -51,6 +51,8 @@ export function trendsOf(now: Vitals, then: Vitals): Record<keyof Vitals, Trend>
     weeks: of(now.weeks, then.weeks),
     wood: of(now.wood, then.wood),
     morale: of(now.morale, then.morale),
+    stone: of(now.stone, then.stone),
+    silver: of(now.silver, then.silver),
   };
 }
 
@@ -61,6 +63,24 @@ export interface Vitals {
   wood: number;
   /** 0..100. */
   morale: number;
+  /** M-0 · las dos existencias nuevas. */
+  stone: number;
+  silver: number;
+}
+
+/** M-0 · Los cuatro humores que la cara del chip sabe poner. */
+export type MoodFace = 'low' | 'grim' | 'calm' | 'glad';
+
+/**
+ * M-0 · Qué cara pone la aldea. Pura, y con los cortes en `balance.ts`: la
+ * cifra deja de estar en la cabecera (`MOOD_FACE`, y el motivo largo está
+ * allí).
+ */
+export function moodFace(morale: number): MoodFace {
+  if (morale < MOOD_FACE.LOW) return 'low';
+  if (morale < MOOD_FACE.GRIM) return 'grim';
+  if (morale < MOOD_FACE.GLAD) return 'calm';
+  return 'glad';
 }
 
 /**
@@ -78,5 +98,7 @@ export function vitalsOf(state: GameState): Vitals {
     weeks: eaten <= 0 ? 0 : Math.floor(state.village.grain / eaten),
     wood: Math.floor(state.village.wood),
     morale: Math.round(state.village.morale),
+    stone: Math.floor(state.village.stone),
+    silver: Math.floor(state.village.silver),
   };
 }

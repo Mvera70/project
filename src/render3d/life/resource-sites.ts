@@ -11,7 +11,14 @@ export function stoneWork(state: Pick<GameState, 'works'>): ConstructionWork | n
   const work = state.works[0];
   if (work === undefined) return null;
   const spec = BUILDINGS[work.kind];
-  return spec.stone > 0 && work.bpCost > spec.bp ? work : null;
+  // **M-0 · se pregunta por la piedra que falta, no por el coste de obra.**
+  // Hasta el esquema 6 la piedra iba escondida dentro de `bpCost` (`bp + piedra
+  // / STONE_PER_BP`), así que «pide piedra» se leía como «su coste es mayor que
+  // su base». Ahora la piedra es una existencia y la obra lleva la que ya tiene
+  // (`stoneDone`): mientras le falte, está en la cantera. Sin este cambio la
+  // cantera desaparecía del valle en silencio —nadie iba a la roca— y eso es
+  // justo lo que el dueño del diseño quería **ver**.
+  return spec.stone > 0 && work.stoneDone < spec.stone ? work : null;
 }
 
 /** Pedregales ordenados por cercanía a la obra real; la alcanzabilidad se comprueba al poner la oferta. */

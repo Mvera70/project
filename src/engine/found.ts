@@ -64,6 +64,10 @@ export function foundGame(
       wood: profile.WOOD,
       morale: profile.MORALE,
       faith: profile.FAITH,
+      // M-0 · una aldea nace sin piedra y sin plata: la primera la cantea
+      // cuando tiene fragua, la segunda le llega del camino.
+      stone: 0,
+      silver: 0,
     },
     people: foundPeople(rng, 0, profile),
     buildings: [],
@@ -84,6 +88,8 @@ export function foundGame(
     ],
     history: [],
     happenings: [],
+    offer: null,
+    acts: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null, crowBite: 0,

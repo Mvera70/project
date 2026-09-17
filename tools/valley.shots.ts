@@ -501,6 +501,44 @@ test('una decisión aplazada deja ir a mirar otra cosa (§8.6)', async ({ page }
   await test.expect(scrim).toBeVisible();
 });
 
+test('alguien sube por el camino y el trato se cierra con un toque (M-0)', async ({ page }) => {
+  // **La mesa del juego, de punta a punta.** El dueño del diseño eligió el
+  // formato el 17 sep 2026: «una oferta que se acepta o se deja pasar», sin
+  // pantalla entera. Esto guarda las tres cosas que eso significa: que se lee
+  // en la voz de la bandeja, que dos toques la contestan, y que la cabecera
+  // enseña lo que el trato deja. `&offer=1` la pone (`ui/debug.ts`), porque
+  // quién sube a vender lo sortea la tabla de sucesos y esperar no es una
+  // forma de probarlo.
+  await page.clock.install();
+  await page.goto('/?debug=1&live=1&offer=1&seed=7&year=20&season=summer');
+  await page.locator('html[data-app-ready="true"]').waitFor();
+
+  const voice = page.locator('.valley-voice[data-role="offer"]');
+  await test.expect(voice).toBeVisible();
+  // Y se espera al relevo del 3D antes de fotografiar: la captura es lo que
+  // juzga esta pantalla, y un valle sin cargar no enseña nada (VZ-02).
+  await test.expect.poll(
+    async () => (await page.locator('canvas:visible').first().boundingBox())?.width ?? 0,
+    { timeout: 20_000 },
+  ).toBeGreaterThan(300);
+  const dicho = await page.locator('.valley-voice-line').innerText();
+  // Una frase del banco con sus cifras puestas, no una clave.
+  test.expect(dicho).not.toMatch(/\{\w+\}|offer\./u);
+  test.expect(dicho.length).toBeGreaterThan(10);
+  await page.screenshot({ path: 'artifacts/m0-offer.png', fullPage: true });
+
+  // La plata es el quinto chip de la fila, y antes del trato no hay ninguna
+  // —o la que hubiera—: lo que se mide es que **sube**.
+  const plata = page.locator('.valley-vitals .valley-vital').nth(4).locator('b');
+  const antes = Number((await plata.innerText()).replace(/[^\d]/gu, ''));
+  await page.getByRole('button', { name: 'Take it' }).click();
+  // Y la oferta se va de la voz: ya no hay nadie esperando.
+  await test.expect(voice).toHaveCount(0);
+  await test.expect.poll(async () => Number((await plata.innerText()).replace(/[^\d]/gu, '')))
+    .toBeGreaterThan(antes);
+  await page.screenshot({ path: 'artifacts/m0-offer-taken.png', fullPage: true });
+});
+
 test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ page }) => {
   // U-13 · el último de los cinco pasos del dueño del diseño. La ruta de
   // depuración adelanta el valle hasta una jornada de tormenta (`runToSky`),
@@ -541,31 +579,27 @@ test('el hambre se ve en el valle sin abrir una ficha', async ({ page }) => {
 });
 
 test('la encrucijada muestra el precio de las tres opciones sin desplazar, y decidir enfoca el mapa', async ({ page }) => {
-  // **VZ-6 · se espera a que el motor plante una, en vez de fijar el instante.**
-  // Ése era el arreglo que la propia nota de esta prueba pedía: fijaba «60
-  // ticks a 16×» —58 segundos de reloj virtual— medidos con un sondeo de un
-  // solo uso, y cualquier cambio del motor mueve ese instante. Desde R-1 el
-  // valle tira sucesos cada semana, así que la trayectoria de la semilla 7 ya
-  // no es la que era.
+  // **M-0 · se pide el estado, en vez de esperarlo.**
   //
-  // Y tampoco se exige **cuál** se planta: el catálogo tiene 56 opciones y la
-  // que toque depende de la partida. Lo que §11.2 y M-22 prometen es que
-  // cuando hay una decisión ocupa la pantalla, que se leen sus tres precios
-  // sin desplazar, y que contestarla enfoca el mapa.
+  // VZ-6 quitó el instante fijo que tenía («60 ticks a 16×») y puso un sondeo
+  // semana a semana hasta que el motor plantara una, con noventa segundos de
+  // tope. Duraba minuto y medio, o sea justo al borde, y **M-0 lo pasó**: al
+  // entrar las visitas del camino en la tabla de sucesos la trayectoria de la
+  // semilla 7 cambió y esos noventa segundos dejaron de alcanzar. Cambiar el
+  // número habría sido perseguir la trayectoria otra vez.
+  //
+  // `&crossroad=1` (`ui/debug.ts`, añadido en VZ-6 para esto exactamente)
+  // sigue jugando con la política prudente hasta que hay una decisión sin
+  // contestar, así que la pantalla está en pantalla al abrir. Y no se exige
+  // **cuál**: el catálogo tiene 56 opciones y la que toque depende de la
+  // partida. Lo que §11.2 y M-22 prometen es que cuando hay una decisión ocupa
+  // la pantalla, que se leen sus tres precios sin desplazar, y que contestarla
+  // enfoca el mapa.
   await page.clock.install();
-  await page.goto('/?debug=1&live=1&seed=7&year=80&season=summer');
+  await page.goto('/?debug=1&live=1&crossroad=1&seed=7&year=80&season=summer');
   await page.locator('html[data-app-ready="true"]').waitFor();
-  await answerAnyCrossroad(page);
-  await page.locator('.valley-speed-badge').click();
-  await page.getByRole('button', { name: '16×', exact: true }).click();
   const scrim = page.locator('.crossroad-scrim');
-  // Semana a semana hasta que el motor plante una, con tope: a 16× una semana
-  // son 52,5 s de reloj, y §8.6 no deja dos pendientes a la vez.
-  await test.expect.poll(async () => {
-    if (await scrim.isVisible()) return true;
-    await advanceWeeks(page, 1, 16);
-    return scrim.isVisible();
-  }, { timeout: 90_000, intervals: [100] }).toBe(true);
+  await test.expect(scrim).toBeVisible();
   // La decisión ocupa la pantalla: el mando de la velocidad se aparta (§11.2).
   await test.expect(page.locator('.hud-speed-cluster')).toHaveCSS('visibility', 'hidden');
   // Y tiene un título de verdad, del banco y no una clave sin componer.

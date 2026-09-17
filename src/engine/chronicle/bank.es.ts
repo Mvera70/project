@@ -5,6 +5,21 @@
 
 export const UI_BANK_ES: Record<string, string> = {
   'app.valley': 'El valle',
+  // M-0 · las existencias nuevas, la cara del ánimo y la oferta del camino.
+  'app.vitals.stone': '{count} de piedra',
+  'app.vitals.silver': '{count} de plata',
+  'app.vitals.spirits': 'La aldea está {mood}',
+  'mood.low': 'hundida',
+  'mood.grim': 'seria',
+  'mood.calm': 'tranquila',
+  'mood.glad': 'contenta',
+  'offer.pedlar.say': 'Un buhonero quiere {wood} de leña por {silver} de plata.',
+  'offer.factor_visit.say': 'Un tratante de grano ofrece {silver} de plata por {grain} fanegas.',
+  'offer.drover_visit.say': 'Un ganadero vende una vaca por {silver} de plata.',
+  'offer.salt_visit.say': 'Un salinero vende sal por {silver} de plata.',
+  'offer.take': 'Aceptar',
+  'offer.leave': 'Dejarlo ir',
+  'offer.cannot': 'La aldea no puede pagarlo.',
   'app.close': 'Cerrar',
   'app.orders': 'Órdenes permanentes',
   'app.orders.now': 'Siembra {sowing} · manos a {hands} · construir {build}',

@@ -83,6 +83,8 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
       wood: TWENTY.WOOD,
       morale: TWENTY.MORALE,
       faith: TWENTY.FAITH,
+      stone: 0,
+      silver: 0,
     },
     people,
     buildings: [
@@ -95,7 +97,7 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     seeds: [],
     flags: {},
     chronicle: [],
-    history: [], happenings: [],
+    history: [], happenings: [], offer: null, acts: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,

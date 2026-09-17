@@ -56,7 +56,7 @@ function village(seed: number): GameState {
     crowBite: 0,
     intent: restingIntent(),
     traits: [],
-    village: { grain: 800, wood: 200, morale: 55, faith: 50 },
+    village: { grain: 800, wood: 200, morale: 55, faith: 50, stone: 0, silver: 0 },
     people: foundPeopleTwenty(rng, 0),
     buildings: [],
     works: [],
@@ -65,7 +65,7 @@ function village(seed: number): GameState {
     flags: {},
     chronicle: [],
     history: [],
-    happenings: [],
+    happenings: [], offer: null, acts: [],
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
@@ -309,6 +309,8 @@ describe('render', () => {
       grain: 1224,
       people: 31,
       building: 'mill',
+      // M-0 · la plata, que las visitas del camino y el diezmo nombran.
+      silver: 6,
       sinceYear: 5,
       years: 12,
       // Las letras del reparto: es lo que produce namesOf (§8.3).

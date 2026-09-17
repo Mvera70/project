@@ -315,6 +315,13 @@ export const FATE = {
     bear_in_the_wood: 0.6,
     child_lost: 0.5,
     stranger_passes: 1,
+    // M-0 · las visitas del camino. El buhonero ya pesaba 2 y ése es el
+    // listón: una visita tiene que ser una cosa que pasa, no una rareza.
+    // TUNE: medido con `tools/agency-report.ts` contra «la plata entra y sale
+    // al menos una vez por década» (brief M-0).
+    factor_visit: 2,
+    drover_visit: 1.5,
+    salt_visit: 1,
   },
   // La fiesta de la cosecha no es suerte: si hay grano y hay gente, la semana
   // después de la siega se celebra. Medido sin esto: una vez cada veinte años,
@@ -335,10 +342,10 @@ export const FATE = {
   WEDDING_MIN_ADULTS: 6,
   WEDDING_MORALE: 5,
   WEDDING_FAITH: 2,
-  // TUNE: el buhonero cambia leña por grano a este precio, en verano y sólo si
-  // hay leña de sobra (el doble de lo que se lleva).
+  // TUNE: el buhonero, en verano y sólo si hay leña de sobra (el doble de lo
+  // que se lleva). Desde M-0 **compra** la leña con plata en vez de cambiarla
+  // por grano, y sólo si el jugador acepta: ver `OFFER`.
   PEDLAR_WOOD: 15,
-  PEDLAR_GRAIN: 30,
   // TUNE: una buena pesca, en primavera o verano con el cielo abierto.
   CATCH_GRAIN: [15, 35],
   CATCH_MORALE: 2,
@@ -365,6 +372,101 @@ export const FATE = {
   // TUNE: un niño perdido y encontrado, y un forastero que pasa.
   CHILD_MORALE: -3,
   STRANGER_MORALE: 1,
+  // TUNE (M-0): lo que deja un forastero que duerme en la aldea. Es la plata
+  // de antes de la primera venta: sin ella un valle joven no ve ni una moneda
+  // hasta que tiene excedente que vender.
+  STRANGER_SILVER: 2,
+} as const;
+
+// ---------------------------------------------------------------------------
+// M-0 · Las ofertas del camino y el diezmo. `docs/plan-medios.md` §6
+// ---------------------------------------------------------------------------
+
+/**
+ * **Los precios de quien sube por el camino.** Todos TUNE, y la escala sale de
+ * lo medido y no de un gusto: la leña **no es escasa** en este juego —el
+ * comentario del factor de grano en `catalog/trade.ts` midió existencias de
+ * 507 a 43 000 en cien años— y el grano sobrante es corriente (2 600 de
+ * mediana a los sesenta años, `plan-medios.md` §1). Así que lo que vale es la
+ * **plata**, que no se produce dentro, y los tratos se miden en ella.
+ */
+export const OFFER = {
+  // TUNE: cuántas semanas espera quien ha subido antes de seguir camino.
+  WEEKS: 2,
+  // El buhonero compra leña.
+  PEDLAR_WOOD: 80,
+  PEDLAR_SILVER: 6,
+  // El factor compra el grano que sobra por encima de `FACTOR_KEEP_YEARS` años
+  // de comida, redondeado a diez y con tope. Llega en otoño, después de la
+  // siega, que es cuando sobra. Vender es dejarse ver: pone `watched`, que es
+  // el precio de verdad que la encrucijada del factor ya tenía.
+  // TUNE, medido: con un año, la pareja fundadora que aceptaba vendía el grano
+  // que la separaba del hambre y **la semilla 9 se extinguía en el año 2**. Dos
+  // años de comida en el granero no los compra nadie.
+  FACTOR_KEEP_YEARS: 2,
+  FACTOR_MIN_GRAIN: 60,
+  FACTOR_MAX_GRAIN: 400,
+  SILVER_PER_GRAIN: 0.05,
+  FACTOR_WATCHED_YEARS: 15,
+  // El tratante vende una vaca en primavera si hay corral para ella.
+  DROVER_SILVER: 12,
+  // El salinero vende sal: la carne se guarda más (`salted`, `herd.ts`).
+  SALT_SILVER: 5,
+  SALT_YEARS: 12,
+  // La visita del tratante y del salinero no llega a una aldea que no puede
+  // pagarla: una oferta que nadie puede aceptar no es una oferta.
+  //
+  // TUNE, medido: un caserío no recibe comerciantes. Sin este suelo, aceptar
+  // ofertas bajaba la población mediana a los sesenta años de 47 a 15 y mataba
+  // seis aldeas de dieciséis, casi todas parejas que vendían lo que las
+  // mantenía vivas. Las encrucijadas de comercio pedían diez personas; ocho
+  // deja entrar al camino una década antes.
+  MIN_PEOPLE: 8,
+  // TUNE, medido: semanas mínimas entre dos visitas **de la misma clase**. Sin
+  // ellas el factor subía 1 181 veces en dieciséis partidas de sesenta años
+  // —más de una al año— y tapaba al resto de sucesos. El ritmo que el dueño
+  // pide («cada semana, cada mes, cada tres meses que pasen cosas») es de
+  // cosas distintas, no del mismo hombre con el mismo carro.
+  AGAIN_WEEKS: {
+    pedlar: 24,
+    factor_visit: 48,
+    drover_visit: 48,
+    salt_visit: 96,
+  },
+} as const;
+
+/**
+ * M-0 · **El ánimo se enseña como cara, no como cifra** (decisión del dueño del
+ * diseño, 17 sep 2026: «creo que no varía nada, siempre está en 55, 50, 60»).
+ *
+ * Y medido, la cifra engañaba: en sesenta años el ánimo va de 6 a 79 y pasa el
+ * 17 % de las semanas por debajo de 10 (`docs/plan-medios.md` §6.2). Lo que
+ * pasa es que vive a escala de años —lo mueve la cosecha, una vez— y se mira a
+ * escala de semanas, así que un número que no se mueve en una sesión se lee
+ * como un número muerto. Una cara dice lo mismo sin prometer precisión.
+ *
+ * TUNE: los tres cortes. Por debajo de `LOW` la aldea está hundida —y medido,
+ * ahí pasa una semana de cada seis—, y por encima de `GLAD` está contenta,
+ * que es el año bueno.
+ */
+export const MOOD_FACE = {
+  LOW: 20,
+  GRIM: 40,
+  GLAD: 70,
+} as const;
+
+/** El señor cobra cada otoño. Decisión del dueño del diseño, 17 sep 2026. */
+export const TITHE = {
+  // TUNE: semanas después de la siega. Cuatro: el grano ya está en el granero.
+  WEEKS_AFTER_HARVEST: 4,
+  // TUNE: la parte de la plata que se lleva.
+  SILVER_SHARE: 0.1,
+  // TUNE: sin plata, se cobra en grano **sólo de lo que sobra** por encima de un
+  // año de comida, al cambio de `OFFER.SILVER_PER_GRAIN`: el diezmo no puede
+  // matar de hambre a nadie (decisión 4 del dueño: el mundo no mata sin motivo).
+  GRAIN_OF_SURPLUS: 0.1,
+  // TUNE: un caserío no le interesa al señor.
+  MIN_PEOPLE: 10,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -814,6 +916,13 @@ export const WORLD = {
   PATH_T3: 6000,
   TRAFFIC_DECAY: 0.005, // per tick
   STONE_PER_BP: 0.5, // build points converted to stone, with a smithy
+  // M-0 · TUNE: hasta dónde cantea la aldea cuando no tiene nada que levantar.
+  // Con la fragua en pie y la obra parada, los puntos de la semana se van a la
+  // cantera en vez de perderse, y el montón queda para lo que venga —una obra
+  // de piedra o lo que el jugador compre con ella—. El tope es lo que cuesta la
+  // iglesia (120) más una muralla (40) y una casa (50): no es un almacén, es
+  // tener algo a mano.
+  STONE_IDLE_CAP: 210,
   // §9, v2.16: the mark `forestAge` carries on a cell of the wood that was
   // standing at the founding. Cleared cells count years there instead, and a
   // cell that has been felled once can never carry it again.

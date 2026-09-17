@@ -58,7 +58,7 @@ describe('IA-15/17/18 · recursos visibles', () => {
     const house = state.buildings.find(building => building.kind === 'house')!;
     state.works = [{
       id: 77, kind: 'stone_house', x: house.x, y: house.y, w: house.w, h: house.h,
-      bpCost: bpCostOf('stone_house'), bpDone: 0, materialsPaid: true,
+      bpCost: bpCostOf('stone_house'), bpDone: 0, stoneDone: 0, materialsPaid: true,
       startedTick: state.tick, upgradeOf: house.id,
     }];
     const before = JSON.stringify(state);

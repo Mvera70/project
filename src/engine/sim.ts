@@ -25,6 +25,7 @@ import type {
   BuildingKind,
   ChronicleEntry,
   Decision,
+  PlayerAct,
   DecisionRecord,
   DeathEvent,
   GameState,
@@ -49,13 +50,15 @@ import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { scarFire } from './people/scars';
 import { destroyBuilding } from './world/buildings';
 import { rollFate } from './world/fate';
+import { collectTithe, expireOffer, settleOffer } from './world/road';
+import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
 import { holderOf, ratioOf } from './crossroads/conditions';
-import { selectCrossroad, selectTrader } from './crossroads/select';
+import { selectCrossroad } from './crossroads/select';
 import { applyOption } from './crossroads/resolve';
 import { fireSeeds } from './crossroads/seeds';
 import type {
@@ -193,6 +196,10 @@ export interface TickReport {
   visualEffects: PositionedVisualEffect[];
   /** R-1 · el suceso del valle de este tick, si lo hubo (§7.10). */
   happening: HappeningId | null;
+  /** M-0 · lo que pasó con la oferta del camino por lo que hizo el jugador. */
+  offer: OfferOutcome | null;
+  /** M-0 · el diezmo, la semana que se cobra. */
+  tithe: Tithe | null;
   posed: string | null;
   entries: ChronicleEntry[];
   ended: boolean;
@@ -582,6 +589,7 @@ export function tick(
   state: GameState,
   catalogue: Catalogue,
   decision?: Decision,
+  acts: readonly PlayerAct[] = [],
 ): TickReport {
   // The buffer of step 16. Nothing below writes to the chronicle directly:
   // every step pushes here and step 16 pours it out (§4.2).
@@ -615,6 +623,27 @@ export function tick(
 
   // ---- 1 · ADVANCE ---------------------------------------------------------
   state.tick += 1;
+
+  // ---- 1b · ACTS (M-0) ------------------------------------------------------
+  // Lo que el jugador hizo esta semana sin que nadie le preguntara: contestar a
+  // quien espera en el camino. **Antes que nada del mundo**, porque contestó al
+  // valle tal como lo vio, y antes de que un suceso de esta semana pudiera
+  // poner otra oferta en su sitio. No consume ninguna tirada: un acto no puede
+  // desplazar la partida (`world/road.ts`). Y queda en `state.acts`, que es lo
+  // que mantiene el guardado reproducible.
+  let offer: OfferOutcome | null = null;
+  for (const act of acts) {
+    if (act.kind === 'offer') {
+      const outcome = settleOffer(state, act.accept, seasonOf(state.tick), yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome !== null && !outcome.refused });
+      if (outcome === null) continue;
+      offer = outcome;
+      if (outcome.entry !== null) say(outcome.entry);
+    }
+  }
+  // Y quien esperaba y no tuvo respuesta, sigue camino.
+  const gone = expireOffer(state, seasonOf(state.tick), yearOf(state.tick));
+  if (gone !== null) say(gone);
 
   // ---- 2 · ANNUAL ----------------------------------------------------------
   // Week 0 and week 0 only: the weather of the year, the plague, the fire, the
@@ -929,6 +958,19 @@ export function tick(
     });
   }
 
+  // ---- 9b · TITHE (M-0) ----------------------------------------------------
+  // El señor cobra en otoño, con el grano ya en el granero. Antes del
+  // almacenaje a propósito: lo que se lleva no se pudre.
+  const tithe = collectTithe(state);
+  if (tithe !== null) {
+    say({
+      kind: 'road',
+      templateKey: tithe.silver > 0 ? 'tithe.silver' : tithe.grain > 0 ? 'tithe.grain' : 'tithe.nothing',
+      params: { year: year(), season: season(), silver: tithe.silver, grain: tithe.grain },
+      weight: 1,
+    });
+  }
+
   // ---- 10 · STORAGE --------------------------------------------------------
   const spoiled = applySpoilage(state);
 
@@ -1055,14 +1097,17 @@ export function tick(
   }
 
   // ---- 15 · CROSSROAD ------------------------------------------------------
-  // §7.8, v2.97: two channels, and the order matters. The catalogue asks first
-  // because its questions are the village's own — a famine, a succession, a
-  // feud — and a trader must never take that turn. Only if nothing was asked
-  // does anyone come up the road to sell, on the traders' own clock, which
-  // `lastCrossroadTick` does not see.
+  // §7.8 tenía **dos canales**: el catálogo primero, y si no preguntaba nada,
+  // alguien subía por el camino a vender en su propio reloj. **M-0 retira el
+  // segundo**: quien sube a vender ya no plantea una pantalla entera con tres
+  // opciones, deja una oferta en la voz de la bandeja (`world/road.ts`), y eso
+  // lo sortea la tabla de sucesos del paso 2b como cualquier otra cosa que
+  // pase. Lo que la regla de aquel canal protegía sigue protegido, y ahora por
+  // construcción: un buhonero no puede quitarle el turno a una hambruna porque
+  // ya no compite por este hueco.
   let posed: string | null = null;
   if (state.crossroad === null && state.ended === null) {
-    const next = selectCrossroad(state, catalogue) ?? selectTrader(state, catalogue);
+    const next = selectCrossroad(state, catalogue);
     if (next !== null) {
       state.crossroad = next;
       posed = next.templateId;
@@ -1162,6 +1207,8 @@ export function tick(
         effect, ...locate(state, effect, undefined, null),
       }))],
     happening: fated?.record.id ?? null,
+    offer,
+    tithe,
     posed,
     entries: buffer,
     ended: state.ended !== null,
@@ -1258,6 +1305,10 @@ export function run(
   ticks: number,
   policy: Policy,
   catalogue: Catalogue,
+  // M-0 · lo que el jugador hace por su cuenta cada semana, leído del estado
+  // antes del tick. Por defecto nada: sin esto, una partida jugada con `run`
+  // deja pasar todas las ofertas, que es lo que un valle sin jugador hace.
+  actsFor: (state: GameState) => readonly PlayerAct[] = () => [],
 ): TickReport[] {
   const reports: TickReport[] = [];
   for (let i = 0; i < ticks && state.ended === null; i += 1) {
@@ -1267,7 +1318,7 @@ export function run(
       pending === null || optionId === null
         ? undefined
         : { templateId: pending.templateId, optionId };
-    reports.push(tick(state, catalogue, decision));
+    reports.push(tick(state, catalogue, decision, actsFor(state)));
   }
   return reports;
 }

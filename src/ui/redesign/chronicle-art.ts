@@ -19,7 +19,7 @@
 import type { ChronicleEntry, HappeningId, HappeningRecord } from '@engine/state';
 import { seasonOf } from '@engine/time';
 
-/** Los doce sucesos de R-1 (`state.HAPPENINGS`), cada uno con su dibujo. */
+/** Los sucesos de R-1 y las visitas de M-0 (`state.HAPPENINGS`), cada uno con su dibujo. */
 const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
   lightning_fire: 'fire.svg',
   river_flood: 'flood.svg',
@@ -33,6 +33,11 @@ const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
   bear_in_the_wood: 'bear.svg',
   child_lost: 'child.svg',
   stranger_passes: 'road.svg',
+  // M-0 · las visitas del camino: quien sube a vender es un carro en el camino,
+  // el mismo dibujo del buhonero, que es lo que siempre fueron.
+  factor_visit: 'pedlar.svg',
+  drover_visit: 'pedlar.svg',
+  salt_visit: 'pedlar.svg',
 };
 
 /**
@@ -73,6 +78,10 @@ export function illustrationFor(
       const record = happenings.find((h) => h.tick === entry.tick);
       return record === undefined ? null : HAPPENING_ART[record.id];
     }
+    // M-0 · lo del camino lleva el carro del buhonero, que es lo que se ve
+    // cuando alguien sube a vender o el hombre del señor viene a cobrar.
+    case 'road':
+      return 'pedlar.svg';
     default:
       return null;
   }

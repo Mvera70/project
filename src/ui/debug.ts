@@ -1,10 +1,11 @@
 // M-19 · Deterministic debug route for automated screenshots.
 
 import { skyAt } from '../derive/weather';
-import { TIME } from '@engine/balance';
+import { OFFER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
+import { postOffer } from '@engine/world/road';
 import type { GameState, Season } from '@engine/state';
 import { SEASONS } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
@@ -118,6 +119,22 @@ export function runToSky(
  * Puede acabarse el valle por el camino (§13.3): entonces se abre lo que quedó,
  * igual que `openAtYear`.
  */
+/**
+ * M-0 · Pone una oferta del camino en el estado, para poder mirarla.
+ *
+ * Es lo que le da su estado a `?offer=1`, y hace falta por lo mismo que
+ * `?crossroad=1`: quién sube a vender lo sortea la tabla de sucesos, así que
+ * esperar a que suba no es una forma de fotografiar la oferta ni de probarla.
+ * El trato es el del buhonero, que es el que cualquier valle con leña puede
+ * pagar.
+ */
+export function offerNow(state: GameState): void {
+  state.village.wood = Math.max(state.village.wood, OFFER.PEDLAR_WOOD * 2);
+  postOffer(state, 'pedlar',
+    [{ k: 'stat', stat: 'silver', amount: OFFER.PEDLAR_SILVER }],
+    [{ k: 'stat', stat: 'wood', amount: OFFER.PEDLAR_WOOD }]);
+}
+
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {
   for (let weeks = 0; weeks < limitWeeks; weeks += 1) {
     if (state.crossroad !== null || state.ended !== null) return weeks;

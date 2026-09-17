@@ -37,10 +37,29 @@ export interface VillageStats {
   wood: number; // units
   morale: number; // 0..100
   faith: number; // 0..100
+  /**
+   * M-0 · **La piedra es una existencia**, no trabajo escondido.
+   *
+   * Hasta el esquema 6 se cobraba como puntos de obra (`bp + stone /
+   * STONE_PER_BP`) y nunca estaba en ningún sitio: la capa de vida enseñaba la
+   * cantera y el acarreo, y el motor era el único que no la contaba. Se cantea
+   * con los mismos puntos y al mismo cambio (`world/works.ts`), así que el
+   * trabajo total de una obra de piedra no se mueve; lo que cambia es que el
+   * montón existe, se ve y se puede gastar en otra cosa.
+   */
+  stone: number;
+  /**
+   * M-0 · **La plata: lo único que viene de fuera del valle.**
+   *
+   * Entra vendiendo a quien pasa por el camino y sale comprándole lo que el
+   * valle no sabe hacer, y con el diezmo del señor. No se produce dentro: por
+   * eso es la que hace que el camino importe (`docs/plan-medios.md` §6.3).
+   */
+  silver: number;
 }
 
-/** The four statistics an effect can move. design.md §8.4. */
-export type StatName = 'grain' | 'wood' | 'morale' | 'faith';
+/** The statistics an effect can move. design.md §8.4; stone and silver since M-0. */
+export type StatName = 'grain' | 'wood' | 'morale' | 'faith' | 'stone' | 'silver';
 
 /**
  * The village's animals, as counts. design.md §7.7.
@@ -340,6 +359,16 @@ export interface ConstructionWork {
   h: number;
   bpCost: number; // build points, from BUILDINGS
   bpDone: number;
+  /**
+   * M-0 · La piedra que esta obra ya tiene, de la que pide (`BUILDINGS`).
+   *
+   * Mientras es menor que su coste, la obra **está en la cantera**: los puntos
+   * de la semana se van a picar piedra al montón del valle y de ahí a la obra.
+   * Es lo que hace que canteala se vea —la capa de vida lee esto para mandar
+   * gente a la roca— y lo que mantiene el trabajo total igual que cuando la
+   * piedra iba escondida dentro de `bpCost`.
+   */
+  stoneDone: number;
   materialsPaid: boolean; // wood, and stone for tier 1, are paid up front
   startedTick: number;
   upgradeOf: BuildingId | null; // §7.3 point 9: the stone upgrades
@@ -413,6 +442,12 @@ export const HAPPENINGS = [
   'bear_in_the_wood',
   'child_lost',
   'stranger_passes',
+  // M-0 · las visitas del camino. No cambian el estado al salir: dejan una
+  // oferta (`state.offer`) que el jugador acepta o deja pasar. El buhonero de
+  // arriba también es ya una de ellas.
+  'factor_visit',
+  'drover_visit',
+  'salt_visit',
 ] as const;
 
 export type HappeningId = (typeof HAPPENINGS)[number];
@@ -431,6 +466,57 @@ export interface HappeningRecord {
 export interface Decision {
   templateId: string;
   optionId: string;
+}
+
+// ---------------------------------------------------------------------------
+// M-0 · Lo que el jugador hace sin que nadie le pregunte
+// ---------------------------------------------------------------------------
+
+/** Una cosa que una oferta da o pide. */
+export type OfferGood =
+  | { k: 'stat'; stat: StatName; amount: number }
+  | { k: 'herd'; kind: HerdKind; amount: number }
+  | { k: 'flag'; flag: string; years: number };
+
+/**
+ * M-0 · **Alguien ha subido por el camino con un trato.**
+ *
+ * Es lo que las tres encrucijadas de comercio y el buhonero eran, pasado de
+ * pregunta a pantalla entera a **oferta que se acepta o se deja pasar** desde
+ * la voz de la bandeja (decisión del dueño del diseño, 17 sep 2026). La deja un
+ * suceso de `world/fate.ts`, caduca sola, y aceptarla es un acto del jugador
+ * que `tick` aplica al empezar la semana.
+ */
+export interface Offer {
+  id: HappeningId;
+  /** Lo que el valle recibe si acepta. */
+  gives: OfferGood[];
+  /** Lo que el valle entrega. Se comprueba al aceptar, no al ofrecer. */
+  takes: OfferGood[];
+  postedTick: number;
+  /** El último tick en que se puede aceptar. */
+  expiresTick: number;
+}
+
+/**
+ * M-0 · Un acto del jugador fuera de las encrucijadas. Va por `tick`, igual que
+ * una decisión, y queda en `state.acts`: el guardado sigue siendo instantánea
+ * más registro, y la partida se puede reproducir byte a byte.
+ *
+ * Es un canal aparte de `Decision` y no una unión con ella, a propósito (y es
+ * una desviación del brief de `rework.md` §4b): una semana puede traer una
+ * respuesta a la encrucijada **y** una oferta aceptada, y `history` —que las
+ * encrucijadas leen para no repetirse— no tiene por qué aprender a saltarse lo
+ * que no es suyo.
+ */
+export type PlayerAct =
+  | { kind: 'offer'; accept: boolean };
+
+export interface ActRecord {
+  tick: number;
+  act: PlayerAct;
+  /** Si el motor lo llevó a cabo: una oferta que ya no se puede pagar, no. */
+  done: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -496,7 +582,14 @@ export type ChronicleKind =
   | 'consequence'
   | 'extinction'
   | 'abandonment'
-  | 'happening'; // R-1: un suceso del valle (§7.10), sin decisión detrás
+  | 'happening' // R-1: un suceso del valle (§7.10), sin decisión detrás
+  // M-0 · lo que se cierra en el camino: un trato hecho, uno que se fue, el
+  // diezmo. **No es un `happening`** y la diferencia importa: un suceso le pasa
+  // al valle y queda en `state.happenings`, y esto es lo que el valle **hizo**
+  // con lo que le pasó. Contarlo como suceso descuadraba la cuenta de R-1 (una
+  // prueba compara las dos listas) y le pedía tres frases a una línea de
+  // contabilidad.
+  | 'road';
 
 /**
  * The chronicle stores keys and parameters, never prose. The text is composed
@@ -657,7 +750,7 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 6; // R-1: `happenings` y el flujo `fate`
+export const SCHEMA_VERSION = 7; // M-0: piedra, plata, ofertas y actos (6 era R-1: `happenings` y `fate`)
 
 /**
  * La postura de la aldea: lo único que el jugador manda de forma continua.
@@ -872,6 +965,8 @@ export interface GameState {
   history: DecisionRecord[]; // record of the player's decisions
   /** R-1 · lo que le ha pasado al valle por su cuenta (§7.10). Schema 6. */
   happenings: HappeningRecord[];
+  offer: Offer | null; // M-0, schema 7
+  acts: ActRecord[]; // M-0, schema 7: what the player did outside the crossroads
   weather: YearWeather;
   outbreak: Outbreak | null;
   /**

@@ -111,6 +111,13 @@ export interface ShellHandle {
    * es lo que abre el documento; con la hoja el ornamento no se toca.
    */
   setOrnament(kind: 'leaf' | 'seal', onTap?: () => void): void;
+  /**
+   * M-0 · **Los dos toques de una oferta del camino**, dentro de la voz: se
+   * enseñan cuando hay alguien esperando respuesta y `onAnswer` recibe `true`
+   * por aceptar y `false` por dejarle ir. Sin pantalla propia, que es lo que el
+   * dueño del diseño eligió el 17 sep 2026.
+   */
+  setOffer(open: boolean, onAnswer?: (accept: boolean) => void): void;
   setRoute(route: SheetRoute): void;
   dispose(): void;
 }

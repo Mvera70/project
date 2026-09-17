@@ -35,7 +35,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import type { AppliedEffects } from '@engine/crossroads/schema';
 import { fillVacancies } from '@engine/sim';
 import { advanceWorks } from '@engine/world/works';
-import { selectCrossroad, selectTrader } from '@engine/crossroads/select';
+import { selectCrossroad } from '@engine/crossroads/select';
 import { applyOption } from '@engine/crossroads/resolve';
 import { fireSeeds } from '@engine/crossroads/seeds';
 import { fellForest } from '@engine/world/forest';
@@ -69,7 +69,7 @@ function founded(seed: number): GameState {
     crowBite: 0,
     intent: restingIntent(),
     traits: [],
-    village: { grain: TWENTY.GRAIN, wood: 900, morale: TWENTY.MORALE, faith: TWENTY.FAITH },
+    village: { grain: TWENTY.GRAIN, wood: 900, morale: TWENTY.MORALE, faith: TWENTY.FAITH, stone: 0, silver: 0 },
     people: foundPeopleTwenty(rng, 0),
     buildings: [
       ...Array.from({ length: 14 }, () => build('house')),
@@ -77,7 +77,7 @@ function founded(seed: number): GameState {
       build('granary'),
       build('smithy'),
     ],
-    works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [], happenings: [],
+    works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [], happenings: [], offer: null, acts: [],
     weather: { year: 0, index: 2, factor: 1 }, outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null, ended: null,
   };
@@ -140,10 +140,10 @@ function tick(s: GameState): void {
   resolveBirths(s, ctx);
   driftOpinions(s);
   if (s.crossroad === null) {
-    // Los dos canales de §7.8, en el mismo orden que el paso 15 de sim.ts:
-    // primero las preguntas de la aldea, y solo si no hay ninguna, quien
-    // venga por el camino a vender.
-    const posed = selectCrossroad(s, CATALOG) ?? selectTrader(s, CATALOG);
+    // El paso 15 de `sim.ts`: las preguntas de la aldea. **El segundo canal
+    // de §7.8 —quien subía a vender— se retiró en M-0**: los comerciantes son
+    // ofertas del camino y los sortea la tabla de sucesos.
+    const posed = selectCrossroad(s, CATALOG);
     if (posed) s.crossroad = posed;
   }
 }

@@ -72,9 +72,22 @@ describe('el año de taller · U-10b', () => {
         // El año que se pide es el que la cabecera lee: el 21 es el tick 960.
         expect(state.tick, `semilla ${seed}`).toBe((YEAR - 1) * TIME.WEEKS_PER_YEAR);
         expect(yearOf(state.tick) + 1).toBe(YEAR);
-        // El que aguanta tiene que haber crecido y haber construido.
+        // El que aguanta tiene que haber crecido y haber construido, **y lo
+        // que ha construido va con la gente que tiene**. Esto último lo enseñó
+        // M-0: la semilla 23 se acababa en el año 18 y con la trayectoria nueva
+        // llega al 21 **con tres personas**, un campo y una casa. No está
+        // muerta, no se está apagando —el mínimo viable de §5.7 son dos— y no
+        // hay más que levantar: pedirle cuatro edificios era pedirle una aldea
+        // que no es. Lo que ningún valle vivo puede no tener es de qué comer y
+        // dónde dormir.
+        const live = state.buildings.filter((b) => b.lostTick === null);
         expect(population(state), `semilla ${seed}: gente`).toBeGreaterThan(before);
-        expect(state.buildings.filter((b) => b.lostTick === null).length).toBeGreaterThan(3);
+        expect(live.some((b) => b.kind === 'field'), `semilla ${seed}: campo`).toBe(true);
+        expect(live.some((b) => b.kind === 'house' || b.kind === 'stone_house'),
+          `semilla ${seed}: techo`).toBe(true);
+        if (population(state) >= 8) {
+          expect(live.length, `semilla ${seed}: una aldea hecha construye`).toBeGreaterThan(3);
+        }
         // **Las encrucijadas se contestaron**, que es la diferencia entre esto
         // y un bucle de `tick`: sin contestar, la primera planteada se queda
         // pendiente para siempre y con ella se van sus consecuencias, sus

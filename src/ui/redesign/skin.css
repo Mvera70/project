@@ -108,6 +108,9 @@
 .skin-plate--chip:nth-of-type(3) { clip-path: var(--skin-deckle-chip-c); transform: rotate(var(--skin-tilt-c)); }
 .skin-plate--chip:nth-of-type(4) { clip-path: var(--skin-deckle-chip-d); transform: rotate(var(--skin-tilt-d)); }
 .skin-plate--chip:nth-of-type(1) { transform: rotate(var(--skin-tilt-a)); }
+/* M-0 · el quinto chip (la plata). Canto y ladeo cruzados a propósito: con el
+   par del segundo parecería que la fila se repite cada cuatro. */
+.skin-plate--chip:nth-of-type(5) { clip-path: var(--skin-deckle-chip-b); transform: rotate(var(--skin-tilt-c)); }
 
 .skin-plate--card {
   clip-path: var(--skin-deckle-card);
@@ -713,16 +716,25 @@
 }
 
 /** Las cuatro cifras, en su fila de chips (plan §3.1): y 57–90, desde x 43. */
+/** **M-0 · cinco cifras y no cuatro**, así que la fila se ensancha y se
+    aprieta. El prototipo 01 dibuja cuatro chips de 70 px en 318, centrados con
+    43 px de margen; la mesa del juego tiene ahora cinco cosas (gente con la
+    cara de la aldea, grano, leña, piedra, plata) y con el hueco de antes «2,5k»
+    salía cortado por el chip vecino —visto en captura, que es la única forma de
+    cazarlo—. La fila ocupa la columna entera menos el canto (16 px a cada
+    lado), el hueco baja de 12 a 5 y el relleno de cada chip de 6 a 4: cinco
+    chips de 67 px, que es lo que pide un icono de 18 y cuatro cifras. */
 .valley-vitals.hud-chips-row {
   position: absolute;
   z-index: 2;
-  left: 43px;
+  left: 16px;
   top: 57px;
-  width: 318px;
+  width: calc(100% - 32px);
+  max-width: 358px;
   height: 33px;
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: 5px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -738,8 +750,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 0 6px;
+  gap: 4px;
+  padding: 0 4px;
   box-sizing: border-box;
   /* `.valley-vital + .valley-vital` (index.html) empata en especificidad:
      sin esto, el filete viejo entre chips sobrevive a la piel nueva. */
@@ -756,7 +768,7 @@
    se quedaba en 12,5 y los iconos se leían como adornos diminutos al lado de
    la cifra. Con la caja a 21 y el dibujo llenándola de verdad, el glifo sale
    en 18,4. */
-.valley-vital.skin-plate--chip .skin-icon { width: 21px; height: 21px; }
+.valley-vital.skin-plate--chip .skin-icon { width: 18px; height: 18px; }
 .valley-vital.skin-plate--chip b { font-weight: 600; }
 
 
@@ -874,6 +886,36 @@
   color: var(--skin-gold);
   font-style: normal;
 }
+/** **M-0 · la oferta del camino: una frase y dos toques, en la misma boca.**
+
+    El hueco de la voz es una caja flex centrada para que una frase de una línea
+    quede a media altura (VZ-02), y con los dos botones dentro eso los ponía **al
+    lado** del texto, montados uno sobre otro y el texto apretado a la izquierda
+    —visto en captura, que es lo que lo cazó—. Con la oferta en pantalla la caja
+    se vuelve columna: la frase arriba, los dos toques debajo y centrados.
+
+    Y el hueco crece de 50 a lo que pidan los botones, que es correcto: mientras
+    alguien espera respuesta, la bandeja tiene más que decir. Los dos botones son
+    las primitivas de siempre —madera el que acepta, pergamino el que despide—,
+    las mismas que los dos del pie de la ficha (`piel-del-valle` §2). */
+.valley-voice:has(.valley-voice-actions:not([hidden])) {
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 22px 4px;
+}
+.valley-voice-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.valley-voice-answer {
+  min-height: var(--ui-tap-min);
+  padding: 0 16px;
+  font-size: 14px;
+  letter-spacing: .06em;
+}
+
 /** El acento del hito (decisión del dueño del diseño, 17 sep 2026): **la hoja
     de roble pasa a oro** mientras se lee algo que pasa una vez, y vuelve a
     tinta al caducar. Es un acento en una pieza que ya existe, no una pieza

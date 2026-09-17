@@ -36,8 +36,14 @@ import { TIME } from '@engine/balance';
  *   al fundarlo.
  * - `milestone`: lo que pasa **una vez** (U-02) — la primera capilla, la
  *   fundación. Gana a un suceso del mismo instante y vive algo más.
+ * - `offer`: M-0, **alguien espera respuesta en el camino**. No caduca con el
+ *   reloj de pared como un suceso: vive mientras el motor tenga la oferta en
+ *   pie (dos semanas del valle), así que tiene casilla propia y se retira
+ *   cuando el motor dice que se fue. Un suceso o un hito la tapan sus cinco
+ *   segundos y la oferta vuelve sola, que es lo que hace que no se pierda por
+ *   haber pasado algo mientras el jugador miraba.
  */
-export type VoiceRole = 'state' | 'hint' | 'event' | 'milestone';
+export type VoiceRole = 'state' | 'hint' | 'event' | 'milestone' | 'offer';
 
 /** Una frase ya compuesta por quien la produce, con el instante en que se dijo. */
 export interface Utterance {
@@ -59,10 +65,12 @@ export interface VoiceState {
   readonly state: Utterance | null;
   readonly hint: Utterance | null;
   readonly transient: Utterance | null;
+  /** M-0 · la oferta que espera respuesta, si hay alguna. */
+  readonly offer: Utterance | null;
 }
 
 /** El único estado inicial: el valle callado. */
-export const SILENT: VoiceState = { state: null, hint: null, transient: null };
+export const SILENT: VoiceState = { state: null, hint: null, transient: null, offer: null };
 
 /**
  * Cuánto vive lo transitorio, en milisegundos de reloj de pared.
@@ -106,6 +114,8 @@ export function offer(v: VoiceState, u: Utterance): VoiceState {
       return { ...v, transient: u };
     case 'milestone':
       return { ...v, transient: u };
+    case 'offer':
+      return { ...v, offer: u };
   }
 }
 
@@ -136,6 +146,12 @@ export function expire(v: VoiceState, nowMs: number): VoiceState {
  * La pista se ha tocado y se retira. No la retira nunca ceder el hueco: quien
  * la mira no ha avanzado su paso, sólo se le ha tapado un instante (UI-R1).
  */
+/** M-0 · La oferta se fue: la aceptaron, la dejaron pasar o caducó. */
+export function clearOffer(v: VoiceState): VoiceState {
+  if (v.offer === null) return v;
+  return { ...v, offer: null };
+}
+
 export function dismissHint(v: VoiceState): VoiceState {
   if (v.hint === null) return v;
   return { ...v, hint: null };
@@ -148,6 +164,9 @@ export function dismissHint(v: VoiceState): VoiceState {
  */
 export function speaking(v: VoiceState, nowMs: number): Utterance | null {
   if (alive(v.transient, nowMs)) return v.transient;
+  // M-0 · y por encima de la pista y del estado: hay alguien esperando, y lo
+  // que la aldea esté haciendo puede esperar dos semanas.
+  if (v.offer !== null) return v.offer;
   if (v.hint !== null) return v.hint;
   return v.state;
 }
