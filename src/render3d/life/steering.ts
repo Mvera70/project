@@ -53,7 +53,8 @@ export function separate(body: Body, around: Neighbourhood): Push {
   let z = 0;
   around.near(body, (other) => {
     const apart = Math.hypot(other.x - body.x, other.z - body.z);
-    const touching = body.radius + other.radius + ELBOW;
+    const touching = (body.contactRadius ?? body.radius) + (other.contactRadius ?? other.radius)
+      + (body.contactRadius === undefined ? ELBOW : 0.05);
     if (apart >= touching || apart < 1e-6) return;
     const push = (touching - apart) / touching;
     const awayX = (body.x - other.x) / apart;
@@ -228,7 +229,7 @@ export function resolve(
         // Cada pareja se toca una vez por pasada, no dos.
         if (other.id < body.id) return;
         const apart = Math.hypot(other.x - body.x, other.z - body.z);
-        const room = body.radius + other.radius;
+        const room = (body.contactRadius ?? body.radius) + (other.contactRadius ?? other.radius);
         if (apart >= room) return;
 
         // **Dos cuerpos en el mismo punto exacto se separaban por una dirección

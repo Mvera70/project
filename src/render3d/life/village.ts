@@ -9,6 +9,7 @@
 // una coma en `GameState`.
 
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
+import { statureAt } from '../world/models';
 import type { GameState, Trait, VillagerId } from '@engine/state';
 import { DAY, FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
@@ -16,7 +17,7 @@ import { opinionOf } from '@engine/people/opinions';
 import { ageOf } from '@engine/people/villagers';
 import { hash32 } from '@engine/rng';
 import {
-  blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_PROGRESS, TURN_MIN_SPEED,
+  blockedAt, fitsCircle, gap, integrate, turnTo, TURN_MIN_SPEED,
   type Body, type Point, type Terrain,
 } from './body';
 import { meetingPlace, ordersOf, quarrelToday, wolfRaidToday } from './staging';
@@ -84,6 +85,8 @@ export interface Dweller {
    * al pararse, que es cuando empieza otra caminata.
    */
   travelled: number;
+  /** Velocidad realmente recorrida, después de resolver contactos. Sólo presentación. */
+  motionSpeed?: number;
   /**
    * Desde dónde se cuenta el recorrido para decidir si la cara sigue al
    * cuerpo. rework.md §3.5.3.
@@ -551,7 +554,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const home = homeBuilding === undefined ? undefined
       : doorOf(land, homeBuilding.x, homeBuilding.y, homeBuilding.w, homeBuilding.h) ?? undefined;
     dwellers.push({
-      body: { id: n, x, z, vx: 0, vz: 0, facing: 0, radius: 0.32, pace },
+      // TUNE: el GLB adulto mide 0,35 celdas de ancho; 0,19 incluye brazos
+      // y un margen pequeño. Los 0,32 siguen protegiendo la ruta de fachadas.
+      body: { id: n, x, z, vx: 0, vz: 0, facing: 0, radius: 0.32,
+        contactRadius: 0.19 * statureAt(age), pace },
       villager: villager.id,
       traits: villager.traits,
       needs: freshNeeds(),
@@ -723,6 +729,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
     step(phase = 0.45): void {
       const now = steps * LIFE_STEP;
+      const starts = dwellers.map(d => ({ x: d.body.x, z: d.body.z, travelled: d.travelled }));
       const outside = (): Body[] => bodies.filter(body => { const person = byId.get(body.id); return person === undefined || !indoors(person); });
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
@@ -1145,21 +1152,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.travelled += Math.hypot(body.x - before.x, body.z - before.z);
         }
 
-        // **La cara sólo sigue al cuerpo cuando el cuerpo anda de verdad**
-        // (rework.md §3.5.3). `speed > 0.05` bastaba para creer que alguien
-        // camina, pero un cuerpo apretado contra un muro o contra sus vecinos
-        // oscila por encima de eso sin cambiar de sitio, y el `facing` giraba
-        // detrás a los seis radianes por segundo de `TURN_RATE` cada vez que
-        // la velocidad cambiaba de signo — la vuelta sobre sí mismo que
-        // describe el dueño del diseño. Ahora hace falta velocidad relativa
-        // al paso propio (`TURN_MIN_SPEED`, para que una vaca lenta no pida lo
-        // mismo que una gallina) **y** recorrido neto desde la última vez que
-        // se giró la cara (`TURN_MIN_PROGRESS`, `dweller.faceAnchor`): quien
-        // tiembla en el sitio nunca se aleja lo bastante de su ancla.
+        // El umbral de velocidad evita seguir pequeñas oscilaciones; durante
+        // la marcha el giro se actualiza continuamente, con el límite angular
+        // de turnTo. El ancla se conserva para las escenas que la consultan.
         if (speed <= TURN_MIN_SPEED * body.pace) {
           dweller.faceAnchor = { x: body.x, z: body.z };
-        } else if (gap(dweller.faceAnchor, body) > TURN_MIN_PROGRESS) {
-          turnTo(body, Math.atan2(body.x - dweller.faceAnchor.x, body.z - dweller.faceAnchor.z), LIFE_STEP);
+        } else {
+          // Girar cada paso de marcha: esperar 0,3 celdas y girar sólo un
+          // paso dejaba la cara retrasada durante metros de avance lateral.
+          turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
           dweller.faceAnchor = { x: body.x, z: body.z };
         }
 
@@ -1343,6 +1344,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         wolf !== null && wolf.phase !== 'gone' ? { x: wolf.body.x, z: wolf.body.z } : null);
 
       resolve(outside(), around, land);
+      // El contacto puede cancelar parte del avance o apartar el cuerpo. La
+      // zancada sigue la posición final, no el trayecto anterior a la corrección.
+      dwellers.forEach((d, i) => {
+        const start = starts[i]!;
+        const distance = gap(start, d.body);
+        d.travelled = start.travelled + distance;
+        d.motionSpeed = distance / LIFE_STEP;
+      });
 
       // 9 · ¿Quién se ha encontrado con quién? V-07, ampliado en IA-2.
       //

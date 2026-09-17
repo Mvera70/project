@@ -19,6 +19,8 @@ export interface Body extends Point {
   /** Hacia dónde mira, en radianes. `atan2(vx, vz)` cuando anda. */
   facing: number;
   readonly radius: number;
+  /** Huella de contacto con otros cuerpos; el radio de navegación conserva margen frente a muros. */
+  readonly contactRadius?: number;
   /** Lo que anda cuando nada le retiene, en celdas por segundo. */
   readonly pace: number;
 }

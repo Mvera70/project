@@ -64,6 +64,11 @@ traído aquí.
 
 ## 2. El tablero
 
+**IA-14 · contacto y marcha:** corregidos radio de contacto humano, giro continuo,
+recorrido posterior a colisiones y zancada proporcional a talla. Comparación
+cercana a 15 fps: desalineación rumbo/avance >60° baja del 45,6 % al 4,0 %.
+68 pruebas, typecheck y lint verdes. Informe [IA-14](life-rounds/IA-14.md).
+
 **OBS-01 · batería de observación con tres agentes Luna: ejecutada y auditada.**
 Informes separados de día, noche y fauna, más revisión de geometría por el
 coordinador. El bundle inicial coincidió con una edición incompleta de UI y
@@ -284,6 +289,10 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+IA-14: 27 personas en comparación seed11/año20, 61 frames por toma a15fps.
+485/1063→44/1089 muestras con desalineación >60°. Noche seed43/año60:
+21/22 completas, pendiente132 en tick2834, cero penetraciones/deriva.
+
 OBS-01: día 15/15 y 21/21 puestos alcanzados (11/20 y 43/60); noches vivas
 22/22 y 21/22 completas (7/1 y 43/60), ticks 0→3 y 2832→2835. Residente 155
 pendiente al amanecer del tick 2834. Nueve tomas sin errores ni penetraciones
@@ -416,6 +425,10 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**IA-14:** el contacto y la orientación mejoran; no equivale a apoyo perfecto
+de pies. Regresión nocturna conserva 21/22 noches completas, ahora pendiente132.
+El fallo de regreso y la geometría del vado siguen como tareas separadas.
 
 **OBS-01:** corregir el pivote del vado y comprobar continuidad del agua; G-24
 arregló la selección de celdas pero no toda la geometría. El regreso del 155

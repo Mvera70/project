@@ -16,6 +16,7 @@ import type { VillagerId } from '@engine/state';
 import type { Actor } from '../contracts';
 import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
+import { clipTime } from '../clips';
 import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
 
@@ -158,8 +159,13 @@ export class Cast {
       player.object.rotation.set(0, actor.facing, 0);
       // La talla se pone en cada pasada y no al crear: un nino cumple anos sin
       // dejar de ser el mismo actor, y tiene que ir creciendo.
-      player.object.scale.setScalar(displayScaleFor(actor));
-      this.pose(player, actor.clip, actor.clipSeconds, actor.poseSeconds ?? actor.clipSeconds);
+      const scale = displayScaleFor(actor);
+      player.object.scale.setScalar(scale);
+      // La zancada del recurso también se escala: un niño necesita más pasos
+      // para recorrer la misma distancia, un adulto realzado necesita menos.
+      const seconds = actor.clip === 'walk' || actor.clip === 'carry_walk'
+        ? clipTime(actor.clip, actor.travelled / scale, 0, 0) : actor.clipSeconds;
+      this.pose(player, actor.clip, seconds, actor.poseSeconds ?? actor.clipSeconds);
       this.equip(player, actor.clip);
     }
 

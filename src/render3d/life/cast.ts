@@ -106,8 +106,8 @@ export function castOf(
   for (const dweller of life.dwellers) {
     if (indoors(dweller)) continue;
     const { body } = dweller;
-    const speed = Math.hypot(body.vx, body.vz);
-    const moving = speed > 0.25;
+    const speed = dweller.motionSpeed ?? Math.hypot(body.vx, body.vz);
+    const moving = speed > 0.05;
     const clip = clipOf(dweller, moving);
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
