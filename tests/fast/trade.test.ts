@@ -11,11 +11,8 @@ import { FOOD, ANIMALS, TIME } from '@engine/balance';
 import { BANK, CROSSROAD_BANK } from '@engine/chronicle/bank.en';
 import { CATALOG, TRADE_TEMPLATES } from '@engine/crossroads/catalog';
 import { applyEffect } from '@engine/crossroads/resolve';
-import {
-  crisisOf, eligible, lastCrossroadTick, lastTradeTick, selectTrader,
-} from '@engine/crossroads/select';
-import { all } from '@engine/crossroads/conditions';
-import { fillCast } from '@engine/crossroads/cast';
+import { OFFER } from '@engine/balance';
+import { postOffer } from '@engine/world/road';
 import { run } from '@engine/sim';
 import { herdCapacity } from '@engine/subsistence/herd';
 import { consume } from '@engine/subsistence/consumption';
@@ -233,65 +230,35 @@ function driverWelcome(): GameState {
   return state;
 }
 
-/**
- * ¿Llega alguien en 500 intentos? El canal tira un dado del 3,5 % cada semana,
- * así que una sola llamada devuelve `null` casi siempre y no prueba nada.
- */
-function arrives(state: GameState): boolean {
-  for (let n = 0; n < 500; n += 1) {
-    if (selectTrader(state, CATALOG) !== null) return true;
-  }
-  return false;
-}
+describe('las visitas del camino · M-0', () => {
+  // **El canal propio de §7.8 se retiró en M-0** y sus pruebas viven aquí, en
+  // la forma que las visitas tienen ahora: sucesos que dejan una oferta. Lo
+  // que aquellas pruebas protegían sigue protegido, y dos cosas se cumplen ya
+  // por construcción: un comerciante no cuenta para el reposo de §8.6 (no es
+  // una encrucijada) y no entra en el sorteo del catálogo (no está en él).
+  const VISITS = ['pedlar', 'factor_visit', 'drover_visit', 'salt_visit'] as const;
 
-describe('el canal propio · §7.8, v2.97', () => {
-  it('el estado de partida de estas pruebas deja pasar de verdad al tratante', () => {
-    // Sin esto, las dos pruebas siguientes no valen nada: comprobarían que no
-    // llega nadie en un estado donde no podía llegar nadie de todos modos.
-    const state = driverWelcome();
-    expect(crisisOf(state)).toBeNull();
-    const drover = TRADE_TEMPLATES.find((t) => t.id === 'cattle_drover')!;
-    expect(all(drover.requires, state)).toBe(true);
-    // Y su reparto se puede cubrir: si no, quedaría fuera del sorteo por una
-    // razón que no es la que estas pruebas quieren medir.
-    expect(fillCast(drover, state)).not.toBeNull();
-    // Y de hecho llega, si se le da la oportunidad suficientes veces. Sin
-    // esto, todas las pruebas de «no llega» de aquí abajo pasarían solas: el
-    // dado del canal dice que no el 96 % de las semanas.
-    expect(arrives(driverWelcome())).toBe(true);
-  });
-
-  it('un comerciante no cuenta como encrucijada para el reposo de §8.6', () => {
-    // Lo esencial de todo el canal: que un buhonero no retrase la siguiente
-    // pregunta de la aldea ni un solo tick.
-    const state = village(20);
-    const before = lastCrossroadTick(state);
-    state.history.push({
-      tick: state.tick, templateId: 'cattle_drover', optionId: 'buy_the_cow',
-      cast: {},
-    });
-    expect(lastCrossroadTick(state)).toBe(before);
-    // Pero sí cuenta para el reloj de los comerciantes.
-    expect(lastTradeTick(state)).toBe(state.tick);
-  });
-
-  it('una encrucijada normal sí mueve el reposo', () => {
-    // El contraste, para que la prueba anterior signifique algo.
-    const state = village(20);
-    state.history.push({
-      tick: state.tick, templateId: 'strangers_at_the_ford', optionId: 'take_them_in',
-      cast: {},
-    });
-    expect(lastCrossroadTick(state)).toBe(state.tick);
-    expect(lastTradeTick(state)).toBeLessThan(state.tick);
-  });
-
-  it('los comerciantes no entran en el sorteo del catálogo', () => {
-    // Con sus condiciones cumplidas y todo: si entraran ahí, volverían a
-    // quitarle el turno a una hambruna, que es justo lo que v2.96 midió.
-    const state = driverWelcome();
-    const ids = new Set(eligible(state, CATALOG).map((c) => c.template.id));
+  it('los tres comerciantes ya no plantean encrucijadas', () => {
+    const ids = new Set(CATALOG.map((t) => t.id));
     for (const t of TRADE_TEMPLATES) expect(ids.has(t.id), t.id).toBe(false);
+  });
+
+  it('nadie sube a vender a una aldea hostil, ni con otra oferta esperando', () => {
+    const state = driverWelcome();
+    state.flags['hostile'] = 0;
+    // Desde aquí: el valle de estas pruebas viene de veinte años jugados y ya
+    // tiene visitas en su historia. Lo que se mide es lo que pasa **después**.
+    const before = state.happenings.length;
+    run(state, TIME.WEEKS_PER_YEAR * 5, 'prudent', CATALOG);
+    expect(state.happenings.slice(before)
+      .some((h) => (VISITS as readonly string[]).includes(h.id))).toBe(false);
+    // Y con una oferta en pie no sube otro: `state.offer` es una sola casilla,
+    // así que una segunda visita borraría la primera sin que nadie la viera.
+    const busy = driverWelcome();
+    postOffer(busy, 'pedlar', [], []);
+    const posted = busy.offer;
+    run(busy, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+    if (busy.offer !== null) expect(busy.offer.postedTick).toBe(posted?.postedTick);
   });
 
   it('nadie sube a vender con una encrucijada sin responder', () => {
@@ -299,38 +266,35 @@ describe('el canal propio · §7.8, v2.97', () => {
     state.crossroad = {
       templateId: 'strangers_at_the_ford', posedTick: state.tick, cast: {}, optionIds: [],
     };
-    expect(arrives(state)).toBe(false);
+    const before = state.happenings.length;
+    run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
+    const visits = state.happenings.slice(before)
+      .filter((h) => (VISITS as readonly string[]).includes(h.id));
+    expect(visits).toEqual([]);
   });
 
-  it('nadie sube a vender en plena crisis', () => {
-    // Partiendo de un estado donde el tratante SÍ podría llegar, y añadiendo
-    // sólo la crisis: así lo que se mide es la crisis y no otra cosa. Con
-    // hambre de verdad no valdría, porque entonces tampoco se cumplirían las
-    // condiciones del propio tratante.
+  it('una visita no repite hasta que pasa su plazo', () => {
+    // Medido: sin plazo, el factor subía 1 181 veces en dieciséis partidas de
+    // sesenta años y tapaba al resto de los sucesos.
     const state = driverWelcome();
-    state.flags['threatened'] = 0;
-    expect(crisisOf(state)).not.toBeNull();
-    expect(arrives(state)).toBe(false);
-  });
-
-  it('dos comerciantes no se pisan: hay un reposo entre ellos', () => {
-    const state = driverWelcome();
-    state.history.push({
-      tick: state.tick, templateId: 'salt_carrier', optionId: 'buy_the_salt',
-      cast: {},
-    });
-    expect(arrives(state)).toBe(false);
-  });
-
-  it('el canal tira sólo de su propio flujo de azar', () => {
-    // §4.3: que venga o no venga un comerciante no puede desplazar una muerte.
-    const state = village(20);
-    const before = { ...state.rng };
-    for (let n = 0; n < 50; n += 1) selectTrader(state, CATALOG);
-    for (const stream of Object.keys(before) as (keyof typeof before)[]) {
-      if (stream === 'traders' || stream === 'cast') continue;
-      expect(state.rng[stream], stream).toBe(before[stream]);
+    run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
+    for (const id of VISITS) {
+      const ticks = state.happenings.filter((h) => h.id === id).map((h) => h.tick);
+      for (let i = 1; i < ticks.length; i += 1) {
+        expect((ticks[i] ?? 0) - (ticks[i - 1] ?? 0), id).toBeGreaterThanOrEqual(OFFER.AGAIN_WEEKS[id]);
+      }
     }
+  });
+
+  it('una visita tira sólo del flujo de los sucesos', () => {
+    // §4.3, la misma propiedad que guardaba el canal viejo: que venga o no
+    // venga alguien a vender no puede desplazar una muerte.
+    const state = driverWelcome();
+    const before = { ...state.rng };
+    run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+    // Lo comprueba `fate.test.ts` para todos los sucesos; aquí basta con que
+    // el flujo de los comerciantes ya no se toque: no hay canal que lo tire.
+    expect(state.rng.traders).toBe(before.traders);
   });
 });
 
