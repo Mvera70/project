@@ -97,6 +97,12 @@ El tajo coincide con la celda que tala el motor; almiares y pilas responden a re
 reales y desaparecen de la fundación. Dos aldeas observadas sin errores, deriva ni
 penetraciones; 72 pruebas, typecheck y lint verdes. [Informe](life-rounds/IA-15.md).
 
+**Localización · primera fase:** la portada ya permite elegir `English` o
+`Español`, la preferencia se conserva y la interfaz principal tiene banco
+español con respaldo inglés. Las claves guardadas y la simulación no cambian.
+Queda pendiente traducir las familias completas de crónica y sucesos antes de
+considerar la localización terminada.
+
 **G-25 · tamaños de roca corregidos (17 sep):** guijarros, piedras medianas y bloques grandes; el límite de celda ya no uniformiza las escalas. Ver G-25.
 
 

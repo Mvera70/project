@@ -6,6 +6,20 @@ import type { ChronicleEntry, GameState } from '../state';
 import { yearOf } from '../time';
 import { tallyOf, yearKey } from './events';
 import { BANK, CROSSROAD_BANK, UI_BANK } from './bank.en';
+import { UI_BANK_ES } from './bank.es';
+
+export type Locale = 'en' | 'es';
+
+let activeLocale: Locale = 'en';
+
+/** Idioma de presentación. No participa en la simulación ni en el guardado. */
+export function setLocale(locale: Locale): void {
+  activeLocale = locale;
+}
+
+export function locale(): Locale {
+  return activeLocale;
+}
 
 /**
  * Small counts read as words, because a chronicle says "three children" and a
@@ -101,7 +115,7 @@ export function renderUiText(
   key: string,
   params: Record<string, string | number> = {},
 ): string {
-  const template = UI_BANK[key];
+  const template = activeLocale === 'es' ? (UI_BANK_ES[key] ?? UI_BANK[key]) : UI_BANK[key];
   return template === undefined ? `[${key}]` : fill(template, params);
 }
 

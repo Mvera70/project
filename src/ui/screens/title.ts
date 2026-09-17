@@ -26,6 +26,8 @@ import { yearOf } from '@engine/time';
 import { nextUnusedSeed } from '../app';
 import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
 import { setSoundPreference, soundPreference } from '../sound';
+import { currentLocale, loadLocale, setSavedLocale } from '../locale';
+import type { Locale } from '@engine/chronicle/render';
 
 const STYLE_ID = 'valley-title-style';
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -150,6 +152,11 @@ const STYLE = `
   .title-scrim { animation: title-in .6s ease-out both; }
   @keyframes title-in { from { opacity: 0; } to { opacity: 1; } }
 }
+.title-language { min-height: 38px; padding: 0 7px; border: 1px solid var(--skin-rule);
+  background: transparent; color: var(--skin-ink-faded); cursor: pointer;
+  font: 400 11px/1 var(--skin-font-voice); letter-spacing: var(--skin-track-label);
+  text-transform: uppercase; }
+.title-language:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 `;
 
 /** Lo que el jugador eligió en el menú. */
@@ -248,6 +255,7 @@ function ensureStyle(): void {
  * echar un número nuevo.
  */
 export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) => void): void {
+  loadLocale();
   ensureStyle();
   document.documentElement.classList.add('title-open');
 
@@ -437,9 +445,29 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   });
   paintDev();
 
+  const language = document.createElement('select');
+  language.className = 'title-language';
+  language.setAttribute('aria-label', renderUiText('language.label'));
+  for (const option of [
+    ['en', renderUiText('language.english')],
+    ['es', renderUiText('language.spanish')],
+  ] as const) {
+    const item = document.createElement('option');
+    item.value = option[0];
+    item.textContent = option[1];
+    language.append(item);
+  }
+  language.value = currentLocale();
+  language.addEventListener('change', () => {
+    setSavedLocale(language.value as Locale);
+    scrim.remove();
+    document.documentElement.classList.remove('title-open');
+    openTitle(save, choose);
+  });
+
   const bottom = document.createElement('div');
   bottom.className = 'title-bottom';
-  bottom.append(sound, dev);
+  bottom.append(language, sound, dev);
 
   actions.append(seedRow, hint, devRow, begin, bottom);
   const sheet = document.createElement('div');
