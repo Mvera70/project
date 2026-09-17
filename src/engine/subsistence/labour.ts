@@ -135,12 +135,30 @@ export function allocateLabour(state: GameState): Allocation {
   const hunters = river ? foragers * 0.5 : foragers;
   const fishers = river ? foragers - hunters : 0;
 
-  // **El reparto del jugador, y aquí sí manda entero.** Cero es todo a
-  // construir, uno es todo a leña. La obra no se queda sin nadie porque la
-  // reserva de arriba ya le ha apartado su suelo antes de llegar hasta aquí:
-  // eso es lo que impide que una postura extrema deje el valle sin cambiar
-  // nunca, que es el pecado capital de este juego y no una preferencia.
-  const cutters = spare * intent.timber;
+  // **La aldea corta la leña que necesita, no una cuota.**
+  //
+  // Aquí vivía `spare * intent.timber`: una parte fija de lo que sobra iba al
+  // bosque, viniera de una palanca del jugador (v2.0) o de `RESTING_TIMBER`. El
+  // balanceo del 17 sep 2026 lo cambió porque medido hacía dos cosas mal a la
+  // vez —un valle sin ayuda se congelaba ochenta y dos semanas y otro acumulaba
+  // veinte mil de leña sin usar—; el motivo largo está en `balance.ts`, junto a
+  // las constantes.
+  //
+  // La necesidad es el invierno que viene más el fondo de obra, menos lo que ya
+  // hay en la leñera; se cubre en `WOOD_CATCH_UP_WEEKS` semanas y con un suelo
+  // de leñadores para que el bosque no se quede vacío de gente. **Y aquí es
+  // donde el hacha se convierte en manos libres**: si cada leñador trae más, la
+  // misma necesidad pide menos leñadores.
+  const perCutter = LABOUR.WOOD_PER_CUTTER * (hasTrait(state, 'axe') ? MEANS.AXE_WOOD : 1);
+  const want = people * LABOUR.WINTER_WOOD * LABOUR.WOOD_TARGET_WEEKS + LABOUR.WOOD_WORKS_STOCK;
+  const missing = Math.max(0, want - state.village.wood);
+  const wanted = perCutter > 0 ? missing / (perCutter * LABOUR.WOOD_CATCH_UP_WEEKS) : 0;
+  // Entre el suelo y el techo: ni el bosque se queda sin nadie, ni una leñera
+  // vacía se lleva todas las manos y deja el valle sin construir.
+  const cutters = Math.min(
+    spare * LABOUR.CUTTER_CAP_SHARE,
+    Math.max(spare * LABOUR.CUTTER_FLOOR_SHARE, wanted),
+  );
   const builders = spare - cutters;
 
   return {
@@ -188,8 +206,13 @@ export function produce(
   if (active('works_slowed_80')) worksFactor = Math.min(worksFactor, 0.8);
   if (active('works_slowed_40')) worksFactor = Math.min(worksFactor, 0.4);
 
+  // M-4 · **el hacha buena también levanta la obra** (`MEANS.AXE_WORKS`): es la
+  // herramienta con la que se escuadran las vigas, y es lo que hace que la
+  // decisión de darla complemente al arado en vez de repetir su punto flaco. El
+  // motivo medido está en `balance.ts`, junto a la constante.
   const buildPoints = a.builders * LABOUR.BP_PER_BUILDER *
-    (smithyWorking(state) ? LABOUR.SMITHY_BONUS : 1) * worksFactor;
+    (smithyWorking(state) ? LABOUR.SMITHY_BONUS : 1)
+    * (hasTrait(state, 'axe') ? MEANS.AXE_WORKS : 1) * worksFactor;
 
   return { wood, buildPoints };
 }

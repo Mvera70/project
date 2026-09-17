@@ -22,6 +22,7 @@ import { CATALOG } from '../src/engine/crossroads/catalog/index';
 import { foundGame } from '../src/engine/found';
 import { population } from '../src/engine/people/demography';
 import { run, type Policy } from '../src/engine/sim';
+import { allocateLabour } from '../src/engine/subsistence/labour';
 import type { GameState, MeansId, PlayerAct } from '../src/engine/state';
 import { herdCapacity } from '../src/engine/subsistence/herd';
 import { fellForest } from '../src/engine/world/forest';
@@ -126,6 +127,26 @@ interface Row {
   tradingDecades: number;
   offers: number;
   accepted: number;
+  /** El balanceo del 17 sep: las dos existencias básicas al final. */
+  wood: number;
+  grain: number;
+  /** Y la semana más apretada de leña y de comida que el valle pasó. */
+  leanWood: number;
+  leanWeeks: number;
+  /** Semanas con la leñera vacía en invierno (el frío de §5.4). */
+  coldWeeks: number;
+  /**
+   * **Dónde están las manos**, en promedio y en tanto por ciento de la gente
+   * que trabaja: al campo, al bosque y a la obra. Es la medida que dice si una
+   * decisión libera manos, que es lo que el dueño del diseño pidió que las
+   * decisiones hicieran —y lo que una mediana de población no distingue del
+   * ruido con veinticuatro semillas.
+   */
+  atFields: number;
+  atWood: number;
+  atWorks: number;
+  /** Edificios en pie al final: la medida directa de un bono de obra. */
+  builds: number;
   /** M-2 · medios dados, y si el arado llegó. */
   means: number;
   plough: boolean;
@@ -141,6 +162,13 @@ function play(seed: number, years: number, variant: Variant): Row {
   const decadeOut = new Set<number>();
   let offers = 0;
   let accepted = 0;
+  let leanWood = Number.POSITIVE_INFINITY;
+  let leanWeeks = Number.POSITIVE_INFINITY;
+  let coldWeeks = 0;
+  let hands = 0;
+  let farmers = 0;
+  let cutters = 0;
+  let builders = 0;
   for (let week = 0; week < years * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
     variant.prelude?.(state);
     const before = state.village.silver;
@@ -153,6 +181,20 @@ function play(seed: number, years: number, variant: Variant): Row {
     if (report?.offer?.accepted === true) accepted += 1;
     if (firstStone === null && state.buildings.some((b) => b.tier === 1 && b.lostTick === null)) {
       firstStone = Math.floor(state.tick / TIME.WEEKS_PER_YEAR);
+    }
+    // Lo apretado se mide **después del año 10**: los primeros años de una
+    // pareja son estrechos por definición y no dicen nada del balance de una
+    // aldea.
+    if (state.tick > TIME.WEEKS_PER_YEAR * 10) {
+      const share = allocateLabour(state);
+      hands += share.workforce;
+      farmers += share.farmers;
+      cutters += share.cutters;
+      builders += share.builders;
+      const people = Math.max(1, population(state));
+      leanWood = Math.min(leanWood, state.village.wood);
+      leanWeeks = Math.min(leanWeeks, Math.floor(state.village.grain / people));
+      if (report?.cold === true) coldWeeks += 1;
     }
   }
   const lived = Math.max(1, Math.ceil((state.ended?.tick ?? state.tick) / TIME.WEEKS_PER_YEAR / 10));
@@ -171,6 +213,15 @@ function play(seed: number, years: number, variant: Variant): Row {
     tradingDecades: trading,
     offers,
     accepted,
+    wood: Math.round(state.village.wood),
+    grain: Math.round(state.village.grain),
+    leanWood: Number.isFinite(leanWood) ? Math.round(leanWood) : 0,
+    leanWeeks: Number.isFinite(leanWeeks) ? leanWeeks : 0,
+    coldWeeks,
+    builds: state.buildings.filter((b) => b.lostTick === null).length,
+    atFields: hands > 0 ? Math.round((farmers / hands) * 100) : 0,
+    atWood: hands > 0 ? Math.round((cutters / hands) * 100) : 0,
+    atWorks: hands > 0 ? Math.round((builders / hands) * 100) : 0,
     means: state.acts.filter((a) => a.act.kind === 'means' && a.done).length,
     plough: (state.traits as readonly string[]).includes('plough'),
     pigs: state.herd.pigs,
@@ -195,7 +246,7 @@ function main(): void {
   const variants = only === undefined ? VARIANTS : VARIANTS.filter((v) => only.includes(v.name));
 
   console.log(`${seeds} semillas, ${years} años\n`);
-  console.log('variante           | pop med | min..max | muertas (año más temprano) | 1ª piedra med (min..max) | piedra fin | plata fin | entra / sale | décadas con trato | ofertas / aceptadas | medios');
+  console.log('variante           | pop med | min..max | muertas (año más temprano) | 1ª piedra med (min..max) | piedra fin | plata fin | entra / sale | décadas con trato | ofertas / aceptadas | medios | leña fin | leña min | grano fin | comida min | frío | campo/bosque/obra % | obras');
   for (const variant of variants) {
     const rows: Row[] = [];
     for (let seed = 1; seed <= seeds; seed += 1) rows.push(play(seed, years, variant));
@@ -220,6 +271,13 @@ function main(): void {
       `${trading}/${live}`.padStart(17),
       `${rows.reduce((n, r) => n + r.offers, 0)} / ${rows.reduce((n, r) => n + r.accepted, 0)}`.padStart(19),
       `${rows.reduce((n, r) => n + r.means, 0)}`.padStart(6),
+      fmt(median(rows.map((r) => r.wood))).padStart(9),
+      fmt(median(rows.map((r) => r.leanWood))).padStart(10),
+      fmt(median(rows.map((r) => r.grain))).padStart(9),
+      fmt(median(rows.map((r) => r.leanWeeks))).padStart(10),
+      `${rows.reduce((n, r) => n + r.coldWeeks, 0)}`.padStart(5),
+      `${fmt(median(rows.map((r) => r.atFields)))}/${fmt(median(rows.map((r) => r.atWood)))}/${fmt(median(rows.map((r) => r.atWorks)))}`.padStart(14),
+      fmt(median(rows.map((r) => r.builds))).padStart(6),
     ].join(' | '));
   }
 }

@@ -129,6 +129,22 @@ describe('milestonesAt · ni una aldea sin historia ni un teletipo', () => {
     // enterarse. Una cota floja aquí deja pasar exactamente lo que esta prueba
     // dice vigilar.
     //
+    // **Y el juego de los medios (M-0 a M-4) más el balanceo de la leña movieron
+    // esa cota, así que se vuelve a medir.** Diez semillas con `foundTwenty`,
+    // política 'prudent', sesenta años, barrido año a año (17 sep 2026):
+    //
+    //   semilla  7 → 12   42 → 39   108 → 24   999 → 36   2024 → 18
+    //   semilla 11 → 35   23 → 25    33 → 14    51 → 42    101 → 15
+    //
+    // El rango es **12 a 42** y lo que baja es una sola clase: `work_done`
+    // pasa de las 12–16 de antes a 0 en dos semillas y 1–4 en otras tres. No
+    // es que se construya menos —la 33 acaba con 94 edificios— sino que la
+    // aldea ya no apila veinte mil de leña con la que reformar casas a piedra
+    // sin parar (§7.13), y `turn_of_decade`, `peak_people` y `first_of_kind`
+    // se quedan donde estaban. Así que la cota baja a **diez**, por debajo de
+    // la mínima medida y todavía muy por encima de cero: lo que la prueba
+    // vigila es que ninguna partida entera se quede sin historia.
+    //
     // **Y desde R-1 §2.6 no todas las partidas llegan a los sesenta años.** El
     // dueño del diseño lo pidió así: «que haya caos y que haya partidas que se
     // rompan y no se pueda seguir jugando es la idea del juego». Una partida
@@ -142,7 +158,7 @@ describe('milestonesAt · ni una aldea sin historia ni un teletipo', () => {
     expect(full.length, 'alguna de las cinco semillas debe llegar a los sesenta años').toBeGreaterThan(0);
     for (const { seed, milestones } of full) {
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos`)
-        .toBeGreaterThanOrEqual(20);
+        .toBeGreaterThanOrEqual(10);
       expect(milestones.length, `seed ${seed}: ${milestones.length} hitos`)
         .toBeLessThanOrEqual(60);
     }

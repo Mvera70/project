@@ -1414,6 +1414,44 @@ las cuatro están verificadas por mutación — la del flujo hacía falta porque
 perturbar un flujo que nadie usa no cambia nada, y hay que mirar el contador de
 frente.
 
+### 7.13 La leña se corta por necesidad (balanceo del 17 sep 2026)
+
+**La aldea manda al bosque las manos que hacen falta, no una cuota.** Lo pidió el
+dueño del diseño al cerrar el juego de los medios —«lo primero es balancearlo un
+poco … sobre todo de los recursos básicos, las decisiones deben
+complementarse»— y lo que había era una cuota fija (`LABOUR.CUTTER_SHARE`, y
+antes la palanca `timber` de la v2.0): una parte de lo que sobraba tras el campo
+iba al bosque, hubiera leña o no.
+
+**Medido, eso hacía dos cosas mal a la vez** (24 semillas × 60 años,
+`tools/agency-report.ts`):
+
+| | Cuota fija | Por necesidad |
+|---|---|---|
+| Semanas de invierno con la leñera vacía (§5.4) | **1 982** en 24 partidas | **0** |
+| Leña en el almacén al final, valle con arado | 20 415 | 447 |
+| Leña en el peor momento tras el año 10 | 0 | 168 a 186 |
+| Población mediana sin ayuda del jugador | 38 | **44** |
+| Valles que llegan a la piedra sin ayuda | 7 de 24 | **12 de 24** |
+
+Un valle que no recibía nada del jugador **se congelaba ochenta y dos semanas
+por partida** mientras otro apilaba veinte mil unidades de leña que nadie iba a
+gastar, y las dos cosas salían de la misma regla. La necesidad es el invierno que
+viene (`WOOD_TARGET_WEEKS` semanas de quema) más el fondo de obra
+(`WOOD_WORKS_STOCK`), menos lo que hay en la leñera; se cubre en
+`WOOD_CATCH_UP_WEEKS` semanas y con un suelo de leñadores
+(`CUTTER_FLOOR_SHARE`) para que el bosque nunca se quede sin nadie —que es §11.1:
+el valle es el HUD y un bosque vacío de gente dice algo falso—.
+
+**Y con esto las decisiones se complementan**, que es lo que se pedía: el arado
+libera manos del campo, el hacha hace que las manos rindan más —en la obra
+(`MEANS.AXE_WORKS`) y en el bosque—, y la reliquia abre la capilla que ninguna
+de las dos abre. Antes de esto el hacha no cambiaba nada: la leña ocupa la
+décima parte de las manos, así que multiplicarla sólo podía liberar un 3 % de la
+aldea.
+
+---
+
 ### 7.12 Los medios: lo que el jugador mete en el valle (M-2, 17 sep 2026)
 
 **El verbo del juego.** Lo dijo el dueño del diseño con una imagen y es el

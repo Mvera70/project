@@ -159,9 +159,21 @@ describe('quien prospera a la vista se hace interesante · M-1', () => {
     state.village.silver = 0;
     const template = CATALOG.find((t) => t.id === 'granary_theft');
     if (template === undefined) throw new Error('falta granary_theft');
-    // Con rencor y granero en pie, lo único que falta es el motivo.
+    // Con rencor y granero en pie, lo único que falta es el motivo. **Y el
+    // rencor que la condición mide es la opinión, no el registro** (§8.2 v2.8:
+    // leer el registro dejaba las cuatro plantillas de feudo como contenido
+    // muerto), así que hay que agriar la opinión de verdad: apoyarse en la que
+    // la aldea traiga puesta es medir su biografía, y la trayectoria cambia con
+    // cada ronda del motor.
+    const [one, two] = state.people.namedIds;
+    const first = state.people.villagers.find((person) => person.id === one);
+    const second = state.people.villagers.find((person) => person.id === two);
+    if (first !== undefined && second !== undefined) {
+      first.opinions[second.id] = -70;
+      second.opinions[first.id] = -70;
+    }
     state.people.grudges.push({
-      fromId: state.people.namedIds[0] ?? 0, toId: state.people.namedIds[1] ?? 1,
+      fromId: one ?? 0, toId: two ?? 1,
       cause: 'was_blamed', causeTick: 0, formedTick: state.tick - 100, healedTick: null,
     });
     state.buildings.push({

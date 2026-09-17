@@ -176,12 +176,34 @@ describe('mano de obra · §5.2', () => {
     expect(a.workforce).toBe(workforce(s));
   });
 
-  it('el sobrante se reparte entre leñadores y constructores según §5.2', () => {
+  it('el sobrante va al bosque según la leña que falte, entre un suelo y un techo (§7.13)', () => {
+    // **La cuota fija se retiró al balancear** (17 sep 2026, §7.13): era
+    // `spare * CUTTER_SHARE` y hacía dos cosas mal con la misma regla —un valle
+    // sin ayuda pasaba mil novecientas ochenta y dos semanas de invierno con la
+    // leñera vacía y otro apilaba veinte mil de leña—. Lo que se guarda ahora es
+    // la regla nueva, y en sus tres tramos.
     const s = founded(7);
-    const a = allocateLabour(s);
-    const spare = a.cutters + a.builders;
-    expect(a.cutters).toBeCloseTo(spare * LABOUR.CUTTER_SHARE, 9);
-    expect(a.builders).toBeCloseTo(spare - spare * LABOUR.CUTTER_SHARE, 9);
+
+    // Con la leñera a rebosar, sólo queda el suelo: alguien en el bosque para
+    // que el valle no se lea vacío, y el resto a la obra.
+    s.village.wood = 100_000;
+    const full = allocateLabour(s);
+    const spareFull = full.cutters + full.builders;
+    expect(full.cutters).toBeCloseTo(spareFull * LABOUR.CUTTER_FLOOR_SHARE, 9);
+
+    // Con la leñera vacía, el techo: el bosque se lleva lo suyo **y la obra
+    // conserva su parte**, que es lo que impide que el valle deje de cambiar.
+    s.village.wood = 0;
+    const empty = allocateLabour(s);
+    const spareEmpty = empty.cutters + empty.builders;
+    expect(empty.cutters).toBeCloseTo(spareEmpty * LABOUR.CUTTER_CAP_SHARE, 9);
+    expect(empty.builders).toBeGreaterThan(0);
+
+    // Y en medio, lo que falte: más leñadores con menos leña en la leñera.
+    s.village.wood = 200;
+    const some = allocateLabour(s);
+    expect(some.cutters).toBeGreaterThan(full.cutters);
+    expect(some.cutters).toBeLessThanOrEqual(empty.cutters);
   });
 
   it('labourFactor va de 0 a 1', () => {

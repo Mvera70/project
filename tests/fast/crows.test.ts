@@ -120,7 +120,10 @@ describe('vigilar cuesta · §5.2', () => {
     const state = atWeek(village(20), TIME.HARVEST_WEEK - 2);
     const a = allocateLabour(state);
     expect(a.wardens).toBeGreaterThan(0);
-    expect(a.wardens).toBeLessThanOrEqual(a.workforce - a.farmers);
+    // Con holgura de coma flotante: los dos lados salen de la misma resta de
+    // fracciones y al balancear la leña (§7.13) empezaron a diferir en 3e-16,
+    // que no es un guarda de más sino el último bit de un `double`.
+    expect(a.wardens).toBeLessThanOrEqual(a.workforce - a.farmers + 1e-9);
   });
 
   it('en temporada de cuervos quedan menos brazos para el bosque y la obra', () => {

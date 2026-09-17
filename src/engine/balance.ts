@@ -173,6 +173,74 @@ export const LABOUR = {
   BP_PER_BUILDER: 2.0, // build points per week
   WORKS_RESERVE: 0.15, // minimum fraction of W given to works
   CUTTER_SHARE: 0.4, // of what is left after the fields
+  // ---------------------------------------------------------------------------
+  // **El balanceo del 17 sep 2026: la aldea corta la leña que necesita.**
+  //
+  // Pedido por el dueño del diseño al cerrar las cinco fases: «lo primero es
+  // balancearlo un poco … sobre todo de los recursos básicos, las decisiones
+  // deben complementarse». Y lo que la medida enseñó es que la cuota fija de
+  // `CUTTER_SHARE` hacía las dos cosas mal a la vez (24 semillas × 60 años):
+  //
+  //   · un valle que no recibe nada del jugador pasa **82 semanas de invierno
+  //     con la leñera vacía** —el frío de §5.4— porque manda al bosque una
+  //     parte de lo que sobra y no lo que hace falta;
+  //   · y uno con arado acaba con **20 415 de leña** en el almacén, que es leña
+  //     cortada para nada mientras la obra y la cantera esperan manos.
+  //
+  // Con la necesidad delante, las dos se arreglan con la misma regla y **las
+  // decisiones se complementan**: el hacha (M-4) deja de ser leña que se apila
+  // y pasa a ser **manos libres**, porque la misma necesidad se cubre con menos
+  // leñadores; y el arado sigue siendo lo que libera brazos del campo.
+  // ---------------------------------------------------------------------------
+  /**
+   * Cuántas semanas de invierno se quiere tener en la leñera.
+   *
+   * TUNE: doce, que es un invierno entero (§3.2). Con menos, un año de nieve
+   * larga deja a la aldea al raso; con mucho más, vuelve el almacén de veinte
+   * mil.
+   */
+  WOOD_TARGET_WEEKS: 12,
+  /**
+   * Y el fondo de obra: madera en la leñera por encima del invierno, para que
+   * §7.3 pueda abrir el proyecto siguiente sin esperar a que alguien vaya al
+   * bosque.
+   *
+   * TUNE: 250, que es un granero (120) y una casa (60) con margen.
+   */
+  WOOD_WORKS_STOCK: 250,
+  /**
+   * El suelo de leñadores, como parte de lo que sobra tras el campo.
+   *
+   * TUNE: 0,1. Existe por dos razones y ninguna es el balance: con la leñera
+   * llena, cero leñadores dejaría el bosque sin nadie y el valle se lee vacío
+   * (§11.1, el valle es el HUD); y un suelo evita que una semana de abundancia
+   * apague la tala y la siguiente la encienda a tope, que en pantalla es gente
+   * andando de un lado a otro sin motivo.
+   */
+  CUTTER_FLOOR_SHARE: 0.1,
+  /**
+   * Y el **techo** de leñadores, como parte de lo que sobra tras el campo.
+   *
+   * No es un número de gusto: es el suelo de la obra visto del otro lado. Sin
+   * él, una leñera vacía se lleva **todas** las manos libres al bosque y la
+   * aldea deja de construir, que es «el pecado capital de este juego» escrito
+   * en §5.2 desde la v2.0 —y lo que cazó `forage.test.ts` al balancear: «la
+   * aldea hambrienta sigue construyendo: la reserva de obras sobrevive»—.
+   *
+   * TUNE: 0,6, que es lo que la cuota fija dejaba en su posición más extrema
+   * hacia el bosque (`RESTING_TIMBER` era 0,4 y la palanca llegaba a 1, pero la
+   * reserva de obra de §5.2 ya apartaba su parte antes). Con esto, la obra
+   * conserva cuatro de cada diez manos libres en el peor invierno.
+   */
+  CUTTER_CAP_SHARE: 0.6,
+  /**
+   * En cuántas semanas se quiere cubrir lo que falta.
+   *
+   * TUNE: 8. No es un número de balance sino de suavidad: cubrir el hueco en
+   * una sola semana manda a todo el mundo al bosque de golpe y lo vacía la
+   * semana siguiente.
+   */
+  WOOD_CATCH_UP_WEEKS: 8,
   /**
    * La postura con la que arranca una aldea, y es la del juego de antes.
    *
@@ -553,6 +621,23 @@ export const MEANS = {
    * leña ahora a cambio de agua después.
    */
   AXE_WOOD: 1.4,
+  /**
+   * Y lo que el hacha hace en la obra, que es **lo que la vuelve una decisión**.
+   *
+   * TUNE, y con su motivo medido: con sólo `AXE_WOOD`, el hacha no cambiaba
+   * nada —39 de población contra 38, y el mismo reparto de manos (76/10/12
+   * contra 77/10/12)—. La causa no era el número sino la aritmética: **la leña
+   * ocupa la décima parte de las manos**, así que multiplicarla sólo podía
+   * liberar un 3 % de la aldea. Una herramienta que sólo mejora una tarea
+   * pequeña no es una decisión.
+   *
+   * Un hacha buena no es sólo para talar: es la herramienta con la que se
+   * escuadran las vigas. Así que también levanta la obra, y con eso **las tres
+   * decisiones se complementan** en vez de repetirse: el arado libera manos del
+   * campo, el hacha hace que esas manos rindan más en la obra, y la reliquia
+   * abre la capilla que ninguna de las dos abre.
+   */
+  AXE_WORKS: 1.15,
   /**
    * La reliquia: a dónde deriva la fe con ella en la capilla.
    *
