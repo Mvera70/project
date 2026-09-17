@@ -176,6 +176,7 @@ animales, fauna, escenas históricas, **y después interfaz**.
 
 | Fase | Estado | Commit | Informe |
 |---|---|---|---|
+| IA-12 · jornada, oficios y gestos | Rutina básica: 15/15 y 21/21 puestos alcanzados; ocho acciones, ocio por edad y burbujas ligadas a encuentros | (este commit) | `life-rounds/IA-12.md` |
 | IA-11 · circulación, portones y motor vivo | **hecha en los casos verificados** — 66/66 noches completas en tres aldeas; desvíos, pasillos y colisión fina | (este commit) | `life-rounds/IA-11.md` |
 | IA-10 · observatorio, hogares y sólidos | **seguida por IA-11** — visor sincronizado, puertas y rutina doméstica; cifras iniciales conservadas en el informe | `a472eca` | `life-rounds/IA-10.md` |
 | IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `life-rounds/IA-0.md` |
@@ -203,6 +204,8 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | **UI-V1 a UI-V6 · las pantallas** | **V1, V1b, V2 y V3 en `main`; quedan V4, V5 y V6** — el diagnóstico y el plan están en `ui-redesign/piel/plan-piel.md` §1 (por qué salió la estructura y no el aspecto: el prompt prohibía copiar, los tokens se sembraron del juego viejo, no había criterio visual de hecho ni activos ni fuentes empaquetadas) | `197b143`, `e38c053`, `c1ddc72` |
 | **UI-V2b · los iconos del chip** | **hecha** — la espiga y la pila **calcadas del prototipo** con `tools/ui/trace-glyph.py`, y la caja del icono del chip de 16 a 21 px (medido: el glifo del prototipo ocupa 18,3 px de 31,5; el nuestro se quedaba en 12,5). Nueve versiones dibujadas a mano no valieron; calcadas salieron a la primera. **El método está en la skill `calcar-iconos`** |  |
 | **UI-V3 · la crónica** | **hecha**, en dos pasadas e informe en `ui-redesign/piel/UI-V3.md`. El agente entregó la estructura; el veredicto del dueño fue «la estética sigue siendo muy mala», y la segunda pasada la cerró **calcando los seis adornos del prototipo** (capitular ilustrado, viñeta a pluma, palmeta, rombo, orla de hojas; la cuenta anillada a mano). Medido en el juego: 21 años, 228 entradas, 216 viñetas y ninguna rota. **El documento sellado no se ha visto en captura** y el motivo está medido: no había encrucijada pendiente — queda para UI-V5 |  |
+| **ABIERTO · una decisión pendiente bloquea la navegación** | **Fallo encontrado, sin arreglar** (17 sep 2026), y es de los que cancelan dos funciones a la vez. `app.ts:624`, dentro de `paint` y por tanto **en cada fotograma**: `if (state.crossroad !== null …) if (currentRoute.kind !== 'valley') navigate({kind:'valley'})`. Mientras hay decisión pendiente —incluso **aplazada**, con la píldora puesta y el velo retirado— la crónica y la lista de la gente **no se pueden abrir**: la pestaña se pulsa, la ruta cambia y el fotograma siguiente la devuelve al valle. Medido: semilla 11, año 37 (`forest_cut` queda pendiente al abrir), aplazada deslizando; `data-screen` se queda en `valley`, 0 bloques de crónica y 0 filas de gente. **Y de ahí sale que el documento sellado de UI-V3 sea inalcanzable por construcción**: sólo existe cuando hay una decisión pendiente, que es justo el estado en el que la crónica no abre. La intención original es de UI-R5 y es buena —una bandeja abierta tapaba las opciones—, pero la condición tiene que ser «el velo de la encrucijada está en pantalla», no «hay decisión pendiente»: aplazar existe precisamente para poder ir a mirar otra cosa. Evidencia en `artifacts/graphics/UI-V3c/` |  |
+| **ABIERTO · seguir a un aldeano no le marca** | **Revisado, sin tocar** (17 sep 2026, a petición del dueño para no pisar la sesión 3D). Enfocar **sí** funciona: `renderer.track` llama a `view.look` y la cámara se recentra (medido con el reloj en pausa: cambia el 44 % de los píxeles del valle). **Iluminar la silueta no existe en el 3D**: `src/render3d/renderer.ts:995` no guarda a quién sigue, así que no hay nada que pintar — el aro sí existe, pero en el renderer 2D (`src/render/renderer.ts:78`), o sea en el camino muerto. Además apunta una vez y no sigue, `track(null)` sale en la primera línea, y el texto `inspect.track.note` promete «marks {name} on the map», que en el 3D es falso. Faltan también el aro de luz y el contorno de oro de su casa del prototipo 03. El arreglo cabe entero en `src/render3d/renderer.ts` |  |
 | **UI-V5b · la lista de la gente** | **hecha**. El último trozo sin vestir, y el segundo sin prototipo (el 03 dibuja una ficha, no una lista): fila de pergamino rasgado con los cuatro cantos alternados, el medallón de la ficha en talla pequeña, y el nombre con la edad detrás como en la placa. **Los rasgos se quedan en texto y no como chips**: ochenta y un recuadros convierten una lista que se recorre con el pulgar en un muro |  |
 | **UI-V5 · el menú de inicio** | **hecho**, informe en `ui-redesign/piel/UI-V5.md`. **La única pantalla sin prototipo**, así que se diseña en vez de calcarse: **la cubierta de la crónica** — madera de fondo, una hoja de pergamino con el canto deshilachado encima, el título con el filete y la palmeta de la crónica, y el sello de lacre en el centro como «documento por abrir». Ni un texto cambia. De paso, `--skin-seal-blob`: el sello usaba el recorte de un chip y era un cuadrado rojo, ahora es una gota de cera — arregla también el documento sellado de la crónica |  |
 | **UI-V4 · la ficha de la persona** | **hecha**, informe en `ui-redesign/piel/UI-V4.md`. La ficha del prototipo 03: medallón con **monograma** (no hay retratos y no se inventan), nombre con edad, oficio, chips de rasgo, helecho calcado, tira de parentesco y los dos botones de madera y pergamino. **El parentesco sale sólo de lo que el motor guarda** —`parentIds` y `opinions`—: la «wife» del prototipo no existe porque la boda de R-1 es un suceso y no un vínculo. Falta la línea «Today», que necesita la capa de vida que el dueño está reescribiendo: derivarla del motor podría contradecir al cuerpo que se ve. 14 pruebas del modelo puro |  |
@@ -244,6 +247,12 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+IA-12: dos tomas diurnas reales (semillas 11/43, años 20/60, 45 s a 2 fps),
+15/15 y 21/21 trabajadores/religiosos asignados llegan a ejercer. Cero discrepancias
+de burbuja de charla o clip aplicado. Mayor natural (7/37): descanso y conversación
+observados; ocho clips nuevos comprobados sobre esqueletos publicados. Detalles,
+regresión nocturna y límites en `life-rounds/IA-12.md`.
 
 IA-11: 62 pruebas pertinentes en 11 archivos; typecheck, lint y bundle verdes.
 Tres partidas vivas a ×64, 42 s y 2 fps: 22/22 noches completas cada una, 66/66
@@ -348,6 +357,11 @@ rompen a los cuarenta años** —antes eran 8— y los nueve que aguantan llegan
 entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
+
+**IA-12:** queda revisar encuentros y acciones propias de cada especie; anclajes de
+uso del yunque/bancos y tareas específicas de partera, herbolario, caza y pesca.
+El ocio, cultivo, tala, construcción, herrería, granero y rezo básicos están
+conectados. Sentarse es en el suelo; un especialista sin edificio usa ocio.
 
 **IA-11:** regreso/salida, desvíos, pasillos, portones y colisión fina de troncos/lápidas
 verificados con 66 noches del motor vivo. Queda revisar encuentros completos y clips
