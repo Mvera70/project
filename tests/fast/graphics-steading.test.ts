@@ -100,9 +100,10 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
     const places = steadingOf(state, state.terrainSeed);
     expect(places.filter(place => place.asset === 'haystack')).toEqual([]);
     expect(places.filter(place => place.asset === 'log-pile')).toEqual([]);
+    expect(places.filter(place => place.asset === 'shed')).toEqual([]);
   });
 
-  it('la leña y los almiares responden a las reservas, no a contar casas y campos', () => {
+  it('la leña, los cobertizos y los almiares responden a las reservas, no a contar casas y campos', () => {
     const state = foundGame(7);
     state.tick = 1;
     state.village.wood = 0;
@@ -120,5 +121,7 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
       .toBeGreaterThan(scant.filter(place => place.asset === 'log-pile').length);
     expect(stocked.filter(place => place.asset === 'haystack').length)
       .toBeGreaterThan(scant.filter(place => place.asset === 'haystack').length);
+    expect(stocked.filter(place => place.asset === 'shed').length)
+      .toBeGreaterThan(scant.filter(place => place.asset === 'shed').length);
   });
 });

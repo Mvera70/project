@@ -30,7 +30,7 @@ import { hash32 } from '@engine/rng';
 import { woodStoreCells } from '../life/resource-sites';
 
 /** Qué se deja por el valle, y contra qué se apoya. */
-export const STEADING_ASSETS = ['haystack', 'log-pile', 'handcart'] as const;
+export const STEADING_ASSETS = ['haystack', 'log-pile', 'handcart', 'shed'] as const;
 export type SteadingAsset = (typeof STEADING_ASSETS)[number];
 
 /**
@@ -46,6 +46,7 @@ export const MOST_STEADED: Readonly<Record<SteadingAsset, number>> = {
   haystack: 4,
   'log-pile': 6,
   handcart: 2,
+  shed: 2,
 };
 
 /**
@@ -173,6 +174,20 @@ export function steadingOf(
     ...woodStoreCells(state),
     ...homes.flatMap((one) => ringOf(map, one)),
   ], logPiles);
+
+  // El cobertizo aparece cuando ya hay madera suficiente para haber dejado de
+  // ser la reserva con la que llegaron los fundadores. Comparte la franja de
+  // descarga de la leña, pero se coloca después de las pilas: la madera sigue
+  // leyendo como material al aire libre y el cobertizo como almacén de la
+  // aldea asentada. Es un adorno derivado, no un edificio ni una nueva regla
+  // del motor.
+  const sheds = state.tick === 0
+    ? 0
+    : Math.min(MOST_STEADED.shed, Math.floor(state.village.wood / 180));
+  place('shed', [
+    ...woodStoreCells(state),
+    ...homes.flatMap((one) => ringOf(map, one)),
+  ], sheds);
 
   // El almiar toca un campo y representa grano que existe. Antes aparecía por
   // el mero hecho de haber una parcela: la pareja fundadora empezaba junto a
