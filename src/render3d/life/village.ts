@@ -204,6 +204,8 @@ export interface Village {
   readonly timberDeliveries: number;
   /** Cargas llevadas del pedregal a una obra de piedra durante esta jornada. */
   readonly stoneDeliveries: number;
+  /** Cargas llevadas del campo al almacén durante la semana real de cosecha. */
+  readonly harvestDeliveries: number;
   /** Cada pase, en orden, con quién lo dio y a quién iba. V-09b: lo que hace
    *  falta para medir una cadena — `passes` sólo da el total. */
   readonly passLog: readonly PassRecord[];
@@ -654,6 +656,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   let passes = 0;
   let timberDeliveries = 0;
   let stoneDeliveries = 0;
+  let harvestDeliveries = 0;
   // V-09b: el registro de cada pase, para poder medir una cadena — `passes`
   // por sí solo no dice quién se la pasó a quién.
   const passLog: PassRecord[] = [];
@@ -692,6 +695,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get passes(): number { return passes; },
     get timberDeliveries(): number { return timberDeliveries; },
     get stoneDeliveries(): number { return stoneDeliveries; },
+    get harvestDeliveries(): number { return harvestDeliveries; },
     get passLog(): readonly PassRecord[] { return passLog; },
     get interactions() {
       return {
@@ -952,6 +956,23 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             prog.at = steps + PROGRESS_CHECK; prog.gap = Number.POSITIVE_INFINITY; tooLong = false;
           }
         }
+        // Una carga profesional no vuelve al campo porque un corro haya
+        // cerrado temporalmente el último tramo. Tras probar el rodeo móvil,
+        // recalcula el camino estático y conserva la entrega; en la semilla 7
+        // la ruta larga de cosecha progresaba durante treinta segundos y el
+        // replanteo la mandaba de vuelta aún con el saco en la mano.
+        const delivering = dweller.holding !== null && dweller.holding < 0
+          && dweller.doing?.offer.id.startsWith('deliver') === true;
+        if (tooLong && delivering && dweller.doing !== null) {
+          const target = seatAt(dweller.doing.offer, dweller.doing.seat);
+          const retry = pathTo(land, body, target, body.radius);
+          if (retry !== null) {
+            dweller.doing.route.splice(0, dweller.doing.route.length, ...retry);
+            dweller.doing.detoured = false;
+            prog.at = steps + PROGRESS_CHECK; prog.gap = Number.POSITIVE_INFINITY;
+            dweller.rethinkAt = steps + GIVE_UP; tooLong = false;
+          }
+        }
         // V-09 · Con un trasto ya en la mano y a la espera de soltarlo, tampoco
         // se replantea la vida: la jugada dura menos que `RETHINK` (1,5 s) a
         // propósito —«no se come la jornada»—, y sin este freno el rethink de
@@ -1050,6 +1071,34 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // debe pasar — antes se quedaba clavado mirando a la plaza fallida.
         // Aquí queda sólo el final normal de una ocupación cumplida.
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
+          // La cosecha entra en el motor de golpe en la semana 35. Esta ruta
+          // hace visible esa jornada sin volver a sumar grano ni adjudicar una
+          // producción a una parcela que el estado no conoce.
+          const harvesting = dweller.doing.place.id.startsWith('field:')
+            && dweller.doing.offer.id === 'harvest'
+            && dweller.dayPlan?.job?.offer === 'harvest';
+          if (harvesting) {
+            const stores = mine.filter(place => place.id.startsWith('grain-store:'))
+              .sort((a, b) => Math.hypot(body.x - a.at.x, body.z - a.at.z)
+                - Math.hypot(body.x - b.at.x, body.z - b.at.z));
+            for (const store of stores) {
+              const offer = store.offers.find(item => item.id === 'deliver-grain');
+              const seat = offer === undefined ? 0
+                : (dweller.dayPlan?.job?.seat ?? 0) % Math.max(1, offer.seats);
+              const spot = offer === undefined ? null : seatAt(offer, seat);
+              const route = spot === null ? null : pathTo(land, body, spot, body.radius);
+              if (offer === undefined || route === null) continue;
+              const durationSteps = Math.round(2 / LIFE_STEP);
+              dweller.holding = -2_000_000 - body.id;
+              dweller.doing = {
+                place: store, offer, seat, route: [...route], since: steps,
+                until: steps + durationSteps, durationSteps, there: false,
+              };
+              dweller.rethinkAt = steps + GIVE_UP;
+              break;
+            }
+            if (dweller.holding !== null) continue;
+          }
           // Una tanda de hachazos termina con un viaje visible a la leñera.
           // Es coreografía derivada: no añade madera ni condiciona el tick.
           const felling = dweller.doing.place.id.startsWith('felling:')
@@ -1128,6 +1177,20 @@ export function createVillage(state: GameState, day: number, options: DayOptions
               };
               props.push(stone);
               propsById.set(stone.id, stone);
+            }
+          }
+          if (dweller.doing.offer.id === 'deliver-grain'
+            && dweller.holding !== null && dweller.holding <= -2_000_000) {
+            harvestDeliveries += 1;
+            if (harvestDeliveries <= 3) {
+              const grain: Prop = {
+                id: -30_000_000 - harvestDeliveries,
+                kind: 'grain', x: body.x, z: body.z, y: 0,
+                vx: 0, vz: 0, vy: 0, held: null,
+                restUntil: Number.POSITIVE_INFINITY, for: null,
+              };
+              props.push(grain);
+              propsById.set(grain.id, grain);
             }
           }
           // V-09: si se acaba con un trasto en la mano, se resuelve. Una
@@ -1480,6 +1543,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         && !commitments.busy(actorOf(d));
       const onDuty = (d: Dweller): boolean => d.holding !== null && d.holding < 0
         || d.doing?.offer.id === 'deliver' || d.doing?.offer.id === 'deliver-stone'
+        || d.doing?.offer.id === 'deliver-grain'
         || (phase >= 0.16 && phase < 0.65
           && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
           && ['work', 'pray'].includes(d.dayPlan.job.offer)

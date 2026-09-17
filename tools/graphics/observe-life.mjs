@@ -9,11 +9,13 @@ const args = process.argv.slice(2);
 const opt = (key, fallback) => args.includes(`--${key}`) ? args[args.indexOf(`--${key}`) + 1] : fallback;
 const seed = Number(opt('seed', '43')), year = Number(opt('year', '60'));
 const lead = Number(opt('lead', '0'));
+const advanceWeeks = Number(opt('advance', '0'));
 const follow = Number(opt('follow', '-1')), zoom = Number(opt('zoom', '1'));
 const seconds = Number(opt('seconds', '120')), fps = Number(opt('fps', '2'));
 const live = args.includes('--live');
 const speed = Number(opt('speed', '16'));
-if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || fps <= 0 || lead < 0 || lead > 120) throw new Error('Usa fps divisor de 30 y lead entre 0 y 120.');
+if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || fps <= 0 || lead < 0 || lead > 120
+  || !Number.isInteger(advanceWeeks) || advanceWeeks < 0) throw new Error('Usa fps divisor de 30, lead entre 0 y 120 y advance entero positivo.');
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
 if (existsSync(join(out, 'trace.json'))) throw new Error('La toma ya existe; usa otra carpeta --out.');
 mkdirSync(join(out, 'frames'), { recursive: true });
@@ -24,9 +26,9 @@ const browser = await chromium.launch({ executablePath,
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   const tab = await browser.newPage({ viewport: { width: 1100, height: 850 } });
-  if (live) {
+  if (live || advanceWeeks > 0) {
     await tab.clock.install({ time: new Date('2026-09-17T12:00:00Z') });
-    await tab.clock.pauseAt(new Date('2026-09-17T12:00:00Z'));
+    if (live) await tab.clock.pauseAt(new Date('2026-09-17T12:00:00Z'));
   }
   const errors = [];
   tab.on('pageerror', e => errors.push(String(e)));
@@ -40,6 +42,20 @@ try {
     await tab.clock.runFor(100);
   }
   await tab.waitForFunction(() => window.__valleyLife?.()?.people.length > 0);
+  if (advanceWeeks > 0) {
+    const MS_PER_WEEK = 840_000, CHUNK = 48;
+    for (let left = advanceWeeks; left > 0; left -= CHUNK) {
+      await tab.clock.fastForward(Math.min(left, CHUNK) * MS_PER_WEEK);
+      await tab.clock.runFor(1000);
+      const decision = tab.locator('.crossroad-options button').first();
+      if (await decision.isVisible()) await decision.click();
+    }
+    await tab.clock.runFor(1000);
+    if (!live) {
+      const now = await tab.evaluate(() => Date.now());
+      await tab.clock.pauseAt(new Date(now));
+    }
+  }
   // Congela todo el navegador entre muestras, incluido RAF: una captura lenta
   // no hace avanzar la simulación mientras se escribe el PNG.
   if (live) {
@@ -48,13 +64,16 @@ try {
     await tab.getByRole('button', { name: `${speed}×`, exact: true }).evaluate(button => button.click());
     if (lead > 0) await tab.clock.runFor(lead * 1000);
   } else {
-    const start = new Date();
-    await tab.clock.install({ time: start });
-    await tab.clock.pauseAt(new Date(start.getTime() + 100));
+    if (advanceWeeks === 0) {
+      const start = new Date();
+      await tab.clock.install({ time: start });
+      await tab.clock.pauseAt(new Date(start.getTime() + 100));
+    }
     await tab.evaluate(() => window.__valleyAdvance(0, true));
     if (lead > 0) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30));
   }
   const frames = [];
+  let basePhase = null;
   for (let n = 0; n <= seconds * fps; n += 1) {
     if (live) {
       const decision = tab.locator('.crossroad-options button').first();
@@ -63,7 +82,8 @@ try {
     } else if (n) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(30 / fps));
     const shot = await tab.evaluate(({ follow, zoom }) => window.__valleyCapture(follow, zoom), { follow, zoom: n === 0 ? zoom : 1 });
     if (shot.life === null) throw new Error('Fotograma sin vida.');
-    const expectedPhase = (0.28 + (lead + n / fps) / 120) % 1;
+    if (basePhase === null) basePhase = (shot.life.phase - n / fps / 120 + 1) % 1;
+    const expectedPhase = (basePhase + n / fps / 120) % 1;
     const phaseError = Math.abs(shot.life.phase - expectedPhase);
     if (!live && Math.min(phaseError, 1 - phaseError) > 0.002) throw new Error('El reloj externo ha interferido en la toma.');
     const file = `frames/${String(n).padStart(4, '0')}.png`;
@@ -96,7 +116,7 @@ try {
     if (life.phase >= 0.78 || life.phase < 0.06) summary.night.push({ at: frame.seconds, phase: life.phase, counts });
   }
   writeFileSync(join(out, 'summary.json'), JSON.stringify(summary, null, 2));
-  const report = { seed, year, fps, lead, speed: live ? speed : null,
+  const report = { seed, year, advanceWeeks, fps, lead, speed: live ? speed : null,
     mode: live ? 'live-engine-browser-clock' : 'production-renderer-fixed-state-30hz', errors, summary, frames };
   writeFileSync(join(out, 'trace.json'), JSON.stringify(report));
   const data = JSON.stringify(report).replaceAll('<', '\\u003c');

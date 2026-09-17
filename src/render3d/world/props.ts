@@ -36,6 +36,7 @@ const COLOUR: Readonly<Record<Kind, number>> = {
   bucket: 0x4a4a46,
   bundle: 0x8a6a3c,
   stone: 0x8f8a84,
+  grain: 0xc89a48,
 };
 
 interface Shown {
@@ -53,7 +54,7 @@ export class Props {
     this.group.name = 'Valley_Props';
     const ball = new SphereGeometry(BALL_RADIUS, 10, 8);
     const other = new CylinderGeometry(OTHER_RADIUS, OTHER_RADIUS, OTHER_HEIGHT, 8);
-    this.geometry = { ball, stick: other, bucket: other, bundle: other, stone: other };
+    this.geometry = { ball, stick: other, bucket: other, bundle: other, stone: other, grain: other };
   }
 
   private materialFor(kind: Kind): Material {
@@ -79,12 +80,13 @@ export class Props {
     for (const sighting of sightings) {
       // `Cast` ya cuelga el GLB del haz de la mano durante `carry_walk`.
       // Pintarlo también en sus coordenadas físicas produciría dos cargas.
-      if ((sighting.kind === 'bundle' || sighting.kind === 'stone') && sighting.heldBy !== null) continue;
+      if ((sighting.kind === 'bundle' || sighting.kind === 'stone' || sighting.kind === 'grain')
+        && sighting.heldBy !== null) continue;
       present.add(sighting.id);
       let held = this.shown.get(sighting.id);
       if (held === undefined || held.kind !== sighting.kind) {
         if (held !== undefined) this.retire(sighting.id);
-        const model = sighting.kind === 'bundle' ? this.instance?.('bundle')
+        const model = sighting.kind === 'bundle' || sighting.kind === 'grain' ? this.instance?.('bundle')
           : sighting.kind === 'stone' ? this.instance?.('rock') : undefined;
         const object = model ?? new Mesh(this.geometry[sighting.kind], this.materialFor(sighting.kind));
         object.name = `Prop_${sighting.id}`;
@@ -93,8 +95,8 @@ export class Props {
           // El recurso cuelga hacia abajo cuando va en la mano. En tierra se
           // tumba, se hace menor que una carga completa y se levanta medio
           // grosor para no enterrarlo.
-          if (sighting.kind === 'bundle') object.rotation.x = Math.PI / 2;
-          object.scale.setScalar(sighting.kind === 'stone' ? 0.24 : 0.65);
+          if (sighting.kind === 'bundle' || sighting.kind === 'grain') object.rotation.x = Math.PI / 2;
+          object.scale.setScalar(sighting.kind === 'stone' ? 0.24 : sighting.kind === 'grain' ? 0.5 : 0.65);
           object.userData.groundLift = sighting.kind === 'stone' ? 0.08 : 0.11;
         }
         this.group.add(object);

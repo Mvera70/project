@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { TIME } from '../../src/engine/balance';
 import { foundGame } from '../../src/engine/found';
 import { bpCostOf } from '../../src/engine/world/works';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 
-describe('IA-15/17 · recursos visibles', () => {
+describe('IA-15/17/18 · recursos visibles', () => {
   it('el talador corta, vuelve cargado, descarga y retoma el tajo sin escribir en el motor', () => {
     const state = foundGame(7);
     const before = JSON.stringify(state);
@@ -84,5 +85,51 @@ describe('IA-15/17 · recursos visibles', () => {
     expect(life.stoneDeliveries).toBeGreaterThan(0);
     expect(life.props.some(prop => prop.kind === 'stone' && prop.held === null)).toBe(true);
     expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('la semana real de cosecha recoge, porta y guarda grano sin volver a producirlo', () => {
+    const state = foundGame(11);
+    state.tick = TIME.HARVEST_WEEK;
+    const before = JSON.stringify(state);
+    const life = Array.from({ length: 14 }, (_, day) => createVillage(state, day))
+      .find(candidate => candidate.dwellers.some(dweller => dweller.dayPlan?.job?.offer === 'harvest'));
+    expect(life, 'alguna jornada representa las manos agrícolas de la semana 35').toBeDefined();
+    if (life === undefined) return;
+
+    const farmer = life.dwellers.find(dweller => dweller.dayPlan?.job?.offer === 'harvest')!;
+    let gathering = false, hauling = false, unloading = false, emptyDelivery = false, interrupted = false;
+    for (let step = 0; step < 7_200 && life.harvestDeliveries === 0; step += 1) {
+      life.step(0.45);
+      const actor = castOf(life, step / 30, new Map(), new Set()).find(item => item.id === farmer.villager);
+      gathering ||= actor?.clip === 'sort' && farmer.doing?.offer.id === 'harvest';
+      hauling ||= actor?.clip === 'carry_walk' && actor.load === 'grain';
+      unloading ||= actor?.clip === 'sort' && farmer.doing?.offer.id === 'deliver-grain';
+      interrupted ||= farmer.holding !== null && farmer.holding <= -2_000_000 && farmer.scene !== null;
+      emptyDelivery ||= life.dwellers.some(dweller => dweller.doing?.offer.id.startsWith('deliver') === true
+        && dweller.holding === null);
+    }
+    expect(gathering).toBe(true);
+    expect(hauling).toBe(true);
+    expect(unloading).toBe(true);
+    expect(interrupted).toBe(false);
+    expect(emptyDelivery, 'nadie elige una descarga profesional con las manos vacías').toBe(false);
+    expect(life.harvestDeliveries).toBeGreaterThan(0);
+    expect(life.props.some(prop => prop.kind === 'grain' && prop.held === null)).toBe(true);
+    expect(JSON.stringify(state)).toBe(before);
+  });
+
+  it('fuera de la siega no inventa portes y en invierno nadie ara', () => {
+    for (const week of [TIME.HARVEST_WEEK - 1, TIME.HARVEST_WEEK + 1]) {
+      const state = foundGame(11);
+      state.tick = week;
+      for (let day = 0; day < 7; day += 1) {
+        const life = createVillage(state, day);
+        expect(life.dwellers.some(dweller => dweller.dayPlan?.job?.offer === 'harvest')).toBe(false);
+        if (week > TIME.HARVEST_WEEK) {
+          expect(life.dwellers.some(dweller => dweller.dayPlan?.job?.place.startsWith('field:') === true),
+            `semana ${week}: no se ara en invierno`).toBe(false);
+        }
+      }
+    }
   });
 });

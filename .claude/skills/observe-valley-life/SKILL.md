@@ -44,6 +44,12 @@ node tools/graphics/observe-life.mjs --seed 7 --year 1 --lead 94 --seconds 6 --f
 node tools/graphics/observe-life.mjs --live --speed 64 --seed 43 --year 60 --seconds 42 --fps 2 --out artifacts/graphics/IA-11/check-live-43
 ```
 
+Para una semana concreta del motor usa `--advance N` antes de congelar la
+toma. Por ejemplo, la cosecha de una trayectoria que abre en la semana 1 puede
+alcanzarse con `--advance 34`. Comprueba siempre `engineTick` en la traza: el
+selector de año juega la trayectoria completa y dos semillas pueden abrir con
+un tick de diferencia.
+
 Si Chromium no puede iniciarse dentro del sandbox, solicita autorización para ejecutar
 ese mismo comando. No cambies los flags WebGL del observatorio: usa ANGLE con SwiftShader.
 
@@ -92,4 +98,3 @@ persistente permanece fijo. Con `--live` avanzan el bucle de la aplicación y el
 comprueba varias noches y ticks, y distingue el total de residentes en cada amanecer
 porque puede haber bajas o cambios de vivienda. A ×64 y 2 fps se miden ciclos, no la
 calidad de las zancadas: para eso conserva las tomas lentas de 15 fps.
-

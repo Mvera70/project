@@ -18,6 +18,8 @@
 import { hash32 } from '@engine/rng';
 import type { GameState } from '@engine/state';
 import { allocateLabour } from '@engine/subsistence/labour';
+import { TIME } from '@engine/balance';
+import { seasonOf, weekOf } from '@engine/time';
 import { fellingTarget } from '@engine/world/forest';
 import type { Point, Terrain } from './body';
 import { blockedAt, fitsCircle, WALL_CLEAR } from './body';
@@ -41,6 +43,8 @@ export interface Offer {
   readonly seconds: readonly [number, number];
   /** Hora punta, como fase de la jornada [0, 1]. Fuera vale menos, nunca cero. */
   readonly hours?: readonly [number, number];
+  /** Sólo una rutina profesional puede iniciarla; no entra en la elección ambiental. */
+  readonly routineOnly?: boolean;
   /**
    * Dónde se pone cada uno de los que caben, ya comprobado que es suelo
    * pisable. Una por plaza, y `seats` es su cuenta.
@@ -59,6 +63,7 @@ export interface OfferSpec {
   readonly gives: Partial<Record<NeedName, number>>;
   readonly seconds: readonly [number, number];
   readonly hours?: readonly [number, number];
+  readonly routineOnly?: boolean;
 }
 
 /**
@@ -82,6 +87,8 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   watch: { id: 'watch', reach: 1.4, seats: 3, gives: { boredom: 0.7, company: 0.3 }, seconds: [6, 16] },
   pray: { id: 'pray', reach: 1.1, seats: 5, gives: { irritation: 0.8, boredom: 0.2 }, seconds: [10, 24] },
   work: { id: 'work', reach: 1.6, seats: 6, gives: { duty: 0.9, boredom: -0.2 }, seconds: [20, 45] },
+  /** Recoger la cosecha ya resuelta por el motor en su única semana de siega. */
+  harvest: { id: 'harvest', reach: 1.6, seats: 6, gives: { duty: 0.9 }, seconds: [6, 10], routineOnly: true },
   gossip: { id: 'gossip', reach: 1.3, seats: 4, gives: { company: 0.9, boredom: 0.4 }, seconds: [6, 18] },
   /** Mirar correr el agua. No calma nada del cuerpo y despeja la cabeza. */
   loiter: { id: 'loiter', reach: 1.5, seats: 3, gives: { boredom: 0.5, irritation: 0.3 }, seconds: [8, 18] },
@@ -115,9 +122,11 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   /** Cargar con el palo, el cubo o el haz de leña un rato, y soltarlo. */
   carry: { id: 'carry', reach: 0.75, seats: 1, gives: { duty: 0.2, boredom: 0.15 }, seconds: [5, 12] },
   /** Descargar la madera en la leñera. Sólo la rutina del talador la asigna. */
-  deliver: { id: 'deliver', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4] },
+  deliver: { id: 'deliver', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4], routineOnly: true },
   /** Asentar una carga de piedra en la obra que la consume. */
-  'deliver-stone': { id: 'deliver-stone', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4] },
+  'deliver-stone': { id: 'deliver-stone', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4], routineOnly: true },
+  /** Guardar una carga de la cosecha; sólo la asigna la rutina de la semana 35. */
+  'deliver-grain': { id: 'deliver-grain', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4], routineOnly: true },
 
   // V-11 · La reunión que el motor convoca (§11.8). No es una oferta que nadie
   // elija por gusto: es la orden de una decisión del jugador puesta en el sitio
@@ -228,12 +237,26 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
    * hace con ella es traducir manos en **plazas**, que es la moneda de esta
    * capa: más manos al bosque, más plazas en el tajo del bosque, más gente que
    * la elige y se va allí andando. La orden se ve sin leer una cifra.
-   */
+  */
   const hands = allocateLabour(state);
+  const week = weekOf(state.tick);
+  const winter = seasonOf(state.tick) === 'winter';
+  const harvesting = week === TIME.HARVEST_WEEK;
+  const workedFields = new Set(state.buildings
+    .filter(building => building.kind === 'field' && building.lostTick === null)
+    .sort((a, b) => a.id - b.id)
+    .slice(0, hands.workedFields)
+    .map(building => building.id));
 
   for (const building of state.buildings) {
     if (building.lostTick !== null) continue;
-    const menu = BY_BUILDING[building.kind];
+    // El motor sólo trabaja `workedFields` parcelas y en invierno deriva esas
+    // manos al bosque o a la obra. No se ara rastrojo nevado ni un campo que
+    // esta semana no produce.
+    if (building.kind === 'field' && (winter || (harvesting && !workedFields.has(building.id)))) continue;
+    const menu = building.kind === 'field'
+      ? [harvesting ? 'harvest' : 'work']
+      : BY_BUILDING[building.kind];
     if (menu === undefined) continue;
     // **Un campo es una parcela, no un edificio con puerta.** Su sitio es el
     // centro del rectángulo y sus puestos van dentro (`parcelSeats`); lo demás
@@ -263,6 +286,23 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
     if (offers.length > 0) places.push({ id: `${building.kind}:${building.id}`, at, offers });
   }
 
+  // El juego guarda una capacidad base aunque no haya granero. La descarga
+  // acaba primero en granero o molino y, mientras no exista ninguno, en una
+  // vivienda real. Es coreografía de la cosecha atómica, no otro inventario.
+  if (harvesting && workedFields.size > 0) {
+    const live = state.buildings.filter(building => building.lostTick === null);
+    const stores = live.filter(building => building.kind === 'granary' || building.kind === 'mill');
+    const targets = stores.length > 0 ? stores : live
+      .filter(building => building.kind === 'house' || building.kind === 'stone_house')
+      .sort((a, b) => a.id - b.id);
+    for (const building of targets) {
+      const at = doorOf(land, building.x, building.y, building.w, building.h);
+      if (at === null) continue;
+      const offer = placedOffer(OFFERS['deliver-grain']!, at, land);
+      if (offer !== null) places.push({ id: `grain-store:${building.id}`, at, offers: [offer] });
+    }
+  }
+
   // **El tajo del bosque.** Donde el pueblo tala: la celda de bosque más cercana
   // al centro de lo construido, que es donde §7.6 dice que se tala —cerca, no en
   // el confín del valle—. Las plazas son las manos que el jugador manda allí, así
@@ -274,13 +314,14 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
   // redondear las aplasta a la misma plaza: el tajo se veía idéntico con las dos
   // órdenes. Con techo son una plaza y dos. Y es lo honesto además de lo
   // legible: si hay 0,60 de semana-persona en el bosque, alguien va al bosque.
-  const felling = Math.ceil(hands.cutters);
+  const tree = fellingTarget(state);
+  const felling = Math.ceil(hands.cutters + (winter && tree !== null ? hands.farmers : 0));
   if (felling > 0) {
-    const cell = fellingTarget(state);
+    const cell = tree;
     if (cell !== null) {
       const at = { x: cell % state.map.width + 0.5, z: Math.floor(cell / state.map.width) + 0.5 };
       const offer = placedOffer({ ...FELL, seats: Math.min(felling, MOST_SEATS) }, at, land);
-      if (offer !== null) places.push({ id: `felling:${cell}`, at, offers: [offer] });
+      if (offer !== null) places.push({ id: `felling:${cell}`, at: offer.at, offers: [offer] });
     }
     const store = woodStoreCells(state)[0];
     if (store !== undefined) {
@@ -293,7 +334,7 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
   // **La obra.** Donde se está levantando algo, si hay algo. Las plazas son los
   // albañiles: una aldea que no construye no tiene andamio con gente encima, y
   // eso también es la orden vista sin leer nada.
-  const building = Math.ceil(hands.builders);
+  const building = Math.ceil(hands.builders + (winter && tree === null ? hands.farmers : 0));
   const work = state.works[0];
   if (building > 0 && work !== undefined) {
     const at = doorOf(land, work.x, work.y, work.w, work.h);

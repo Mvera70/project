@@ -106,7 +106,10 @@ function falloff(away: number, reach: number = LOOK): number {
  * tabla de §6.3 leída para esto.
  */
 const LEANING: Partial<Record<Trait, Partial<Record<string, number>>>> = {
-  devout: { pray: 2.2 },
+  // IA-18: al sacar las descargas profesionales de la elección ambiental
+  // desaparece ruido que antes sostenía por accidente la proporción medida.
+  // 2,8 conserva la preferencia observable de dos a uno sin forzar el rezo.
+  devout: { pray: 2.8 },
   kind: { gossip: 1.5 },
   generous: { gossip: 1.6 },
   secretive: { gossip: 0.3, pray: 0.7 },
@@ -485,6 +488,10 @@ export function decide(
     if (away > searchReach && who.job?.place !== place.id) continue;
     for (const offer of place.offers) {
       const assigned = who.job?.place === place.id && who.job.offer === offer.id;
+      // Las descargas y la recolección nacen de una rutina que ya lleva su
+      // carga o su puesto. Sin este corte cualquier vecino podía «descargar»
+      // piedra o grano con las manos vacías por calmar el deber.
+      if (offer.routineOnly === true && !assigned) continue;
       if (offer.id === 'work' && (who.ageGroup !== undefined || (who.job !== undefined && !assigned))) continue;
       const key = seatKey(place, offer);
       // El aforo, salvo para quien ya está dentro: no se echa a nadie de su

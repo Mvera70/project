@@ -33,9 +33,10 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
   if (dweller.scene === null && dweller.doing?.there === true
     && (dweller.residence === undefined || dweller.residence.stage === 'day')) {
     const action = dweller.doing.offer.id, place = dweller.doing.place.id;
+    if (action === 'harvest') return 'sort';
     if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
       : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
-    if (action === 'deliver' || action === 'deliver-stone') return 'sort';
+    if (action.startsWith('deliver')) return 'sort';
     if (action === 'sit') return 'sit';
     if (action === 'pray') return 'pray';
     if (action === 'drink') return 'drink';
@@ -48,7 +49,9 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
 function activityOf(dweller: Dweller, moving: boolean): Activity {
   if (moving) return 'walking';
   if (dweller.scene !== null || dweller.doing === null) return 'resting';
-  return dweller.doing.there && ['work', 'deliver'].includes(dweller.doing.offer.id) ? 'working' : 'resting';
+  return dweller.doing.there
+    && (dweller.doing.offer.id === 'work' || dweller.doing.offer.id === 'harvest'
+      || dweller.doing.offer.id.startsWith('deliver')) ? 'working' : 'resting';
 }
 
 /**
@@ -119,7 +122,8 @@ export function castOf(
       facing: body.facing,
       activity: activityOf(dweller, moving),
       clip,
-      load: dweller.holding !== null && dweller.holding <= -1_000_000 ? 'stone'
+      load: dweller.holding !== null && dweller.holding <= -2_000_000 ? 'grain'
+        : dweller.holding !== null && dweller.holding <= -1_000_000 ? 'stone'
         : dweller.holding !== null && dweller.holding < 0 ? 'bundle' : null,
       poseSeconds: seconds,
       // El clip de andar lo mueve el suelo recorrido (G-04); los de estarse

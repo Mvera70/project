@@ -1,8 +1,9 @@
 // IA-12 · El trabajo pertenece a una persona durante la jornada, no al azar de cada pausa.
-import { LIFE } from '@engine/balance';
+import { LIFE, TIME } from '@engine/balance';
 import { ageOf } from '@engine/people/villagers';
 import { allocateLabour } from '@engine/subsistence/labour';
 import type { GameState, Role } from '@engine/state';
+import { seasonOf, weekOf } from '@engine/time';
 import { gap, fitsCircle, type Terrain, type Point } from './body';
 import { pathTo } from './navigate';
 import { homeRoutine } from './home';
@@ -120,30 +121,37 @@ export function dayPlans(
   // cada día; se descuenta antes de repartir el resto para no duplicarla.
   const fixedCutters = [...plans.values()].filter(plan => plan.job?.place.startsWith('felling')).length;
   const hasQuarry = places.some(place => place.id.startsWith('quarry:'));
+  const hasFelling = places.some(place => place.id.startsWith('felling:'));
+  const hasWorks = places.some(place => place.id.startsWith('works:'));
+  const winter = seasonOf(state.tick) === 'winter';
+  const farmerDays = hands.farmers * WEEK_DAYS;
   const buildingDays = hands.builders * WEEK_DAYS;
   const roster = weeklyRoster([
-    { kind: 'field:', days: hands.farmers * WEEK_DAYS },
-    { kind: 'felling', days: Math.max(0, hands.cutters - fixedCutters) * WEEK_DAYS },
+    { kind: 'field:', days: winter ? 0 : farmerDays },
+    { kind: 'felling', days: Math.max(0, hands.cutters - fixedCutters) * WEEK_DAYS
+      + (winter && hasFelling ? farmerDays : 0) },
     { kind: 'quarry:', days: hasQuarry ? buildingDays / 2 : 0 },
-    { kind: 'works:', days: hasQuarry ? buildingDays / 2 : buildingDays },
+    { kind: 'works:', days: (hasQuarry ? buildingDays / 2 : buildingDays)
+      + (winter && !hasFelling && hasWorks ? farmerDays : 0) },
   ], idle.size, day);
+  const fieldOffer = weekOf(state.tick) === TIME.HARVEST_WEEK ? 'harvest' : 'work';
   const quotas = ([
-    { prefix: 'felling' as const },
-    { prefix: 'quarry:' as const },
-    { prefix: 'works:' as const },
-    { prefix: 'field:' as const },
+    { prefix: 'felling' as const, offer: 'work' },
+    { prefix: 'quarry:' as const, offer: 'work' },
+    { prefix: 'works:' as const, offer: 'work' },
+    { prefix: 'field:' as const, offer: fieldOffer },
   ]).map(quota => ({ ...quota, count: roster.get(quota.prefix) ?? 0 }));
   // Primero los tajos escasos, por proximidad, y luego los campos repartidos.
   // El orden de ids no debe enviar al recién llegado al bosque del otro extremo.
   for (const quota of quotas) {
     const candidates = places.filter(p => p.id.startsWith(quota.prefix));
     while (quota.count > 0 && idle.size > 0) {
-      const pairs = [...idle].flatMap(([id, from]) => candidates.filter(p => available(p, 'work'))
+      const pairs = [...idle].flatMap(([id, from]) => candidates.filter(p => available(p, quota.offer))
         .map(place => ({ id, from, place, distance: gap(from, place.at) })))
         .sort((a, b) => a.distance - b.distance || a.id - b.id);
       let assigned = false;
       for (const pair of pairs) {
-        const job = choose(pair.from, [pair.place], 'work');
+        const job = choose(pair.from, [pair.place], quota.offer);
         if (job === null) continue;
         plans.set(pair.id, { ...plans.get(pair.id)!, job }); idle.delete(pair.id); quota.count--; assigned = true; break;
       }

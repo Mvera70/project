@@ -218,9 +218,11 @@ export class Cast {
    * que la anima el mismo esqueleto sin que nadie la mueva a mano.
    */
   private equip(player: Player, actor: Actor): void {
-    const key = actor.clip === 'carry_walk' && actor.load === 'stone' ? 'carry_stone' : actor.clip;
+    const key = actor.clip === 'carry_walk' && actor.load === 'stone' ? 'carry_stone'
+      : actor.clip === 'carry_walk' && actor.load === 'grain' ? 'carry_grain' : actor.clip;
     const wanted = key === 'carry_stone'
       ? { asset: 'rock', hand: 'hand_l', scale: 0.18 }
+      : key === 'carry_grain' ? { asset: 'bundle', hand: 'hand_l', scale: 0.8 }
       : HELD[actor.clip];
     if (wanted !== undefined && !player.held.has(key)) {
       const tool = this.prop?.(wanted.asset) ?? handTool(actor.clip);

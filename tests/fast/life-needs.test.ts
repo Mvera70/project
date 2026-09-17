@@ -222,7 +222,7 @@ describe('V-05 · lo que el mundo ofrece', () => {
     // comprueba sobre la forma del catálogo: una oferta es qué, dónde, cuánto
     // cabe y qué calma. Si alguna gana un campo que nombre a una persona, un
     // oficio o una decisión, aquí salta.
-    const allowed = new Set(['id', 'reach', 'seats', 'gives', 'seconds']);
+    const allowed = new Set(['id', 'reach', 'seats', 'gives', 'seconds', 'routineOnly']);
     for (const [name, spec] of Object.entries(OFFERS)) {
       for (const field of Object.keys(spec)) {
         expect(allowed.has(field), `la oferta ${name} habla de '${field}'`).toBe(true);

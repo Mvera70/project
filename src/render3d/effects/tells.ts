@@ -293,23 +293,28 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
         tell.x, HEIGHT.banner, tell.y,
       )];
     case 'granary': {
-      // El grano se ve por cuánto llena, no por su color: un montón que sube.
-      //
-      // Y sube **delante** del granero, no en su centro: en el centro quedaba
-      // debajo del granero, que va sobre postes, y desde arriba no se veía
-      // crecer nada. Delante es donde se apila el grano de todas formas.
+      // El stock se lee como sacos apilados delante del granero. El bloque
+      // amarillo anterior tenía la huella de una habitación y parecía una
+      // pieza de depuración, justo al lado de la cosecha que debía explicar.
       const barn = at === undefined ? undefined : at(tell.x + 1, tell.y + 1);
-      const tall = Math.max(0.04, tell.fraction * 0.5);
       const spot = barn === undefined
         ? { x: tell.x + 1, z: tell.y + 1, free: true }
         : outsideOf(barn, at as (x: number, y: number) => Building | undefined);
-      // El montón no se va al tejado cuando no hay cara libre: se queda pegado
-      // al granero, que va sobre postes y por debajo se ve algo. Un montón de
-      // grano flotando sobre el caballete no sería una señal, sería un error.
-      return [mark(
-        new BoxGeometry(1.15, tall, 0.6), TONE.grain, false,
-        spot.x, HEIGHT.grain + tall / 2, spot.z,
-      )];
+      const count = Math.ceil(tell.fraction * 6);
+      return Array.from({ length: count }, (_, index) => {
+        const upper = index >= 4;
+        const slot = upper ? index - 4 : index;
+        const x = spot.x + (slot - (upper ? 0.5 : 1.5)) * 0.27;
+        const y = HEIGHT.grain + 0.13 + (upper ? 0.21 : 0);
+        const z = spot.z + (upper ? 0 : (index % 2) * 0.08);
+        const sack = mark(
+          new SphereGeometry(0.16, 8, 5), TONE.grain, false,
+          x, y, z,
+        );
+        sack.object.scale.set(1.35, 0.8, 0.95);
+        const tie = mark(new BoxGeometry(0.055, 0.055, 0.055), '#725438', false, x, y + 0.13, z);
+        return [sack, tie];
+      }).flat();
     }
     default:
       return [];

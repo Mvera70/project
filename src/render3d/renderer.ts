@@ -491,6 +491,7 @@ export async function createGraphicsRenderer(
    * menudo sí: se midió, y el rebaño saltaba 5,096 celdas (ver `scenic-state.ts`).
    */
   let painted = '';
+  let paintedSteading = '';
 
   function rebuildForest(state: GameState, palette: ReturnType<typeof paletteFor>): void {
     if (forest !== null) {
@@ -637,6 +638,8 @@ export async function createGraphicsRenderer(
       steps: life.steps,
       timberDeliveries: life.timberDeliveries,
       stoneDeliveries: life.stoneDeliveries,
+      harvestDeliveries: life.harvestDeliveries,
+      props: propsOf(life).map(prop => ({ id: prop.id, kind: prop.kind, heldBy: prop.heldBy })),
       forest: {
         standing: forest?.count ?? 0,
         stumps: forest?.stumpCount ?? 0,
@@ -799,9 +802,13 @@ export async function createGraphicsRenderer(
       // las dos primeras.
       const live = clockOf(state.tick);
       const colour = `${live.season}:${Math.min(2, live.seasonWeek)}`;
-      if (change.ground || change.cleared || colour !== painted) {
+      // Los almiares y leñeras se cuantizan a partir de reservas reales. Su
+      // recuento puede cambiar en un tick sin que cambie terreno ni estación.
+      const steadingKey = `${shown.tick === 0 ? 0 : Math.floor(shown.village.wood / 60)}:${Math.floor(shown.village.grain / 200)}`;
+      if (change.ground || change.cleared || colour !== painted || steadingKey !== paintedSteading) {
         rebuildGround(shown, live);
         painted = colour;
+        paintedSteading = steadingKey;
       } else if (change.forest || fallingChanged || acceptedForest) {
         rebuildForest(shown, paletteFor(live.season, live.seasonWeek));
       }
@@ -1189,6 +1196,8 @@ interface LifeSnapshot {
   readonly steps: number;
   readonly timberDeliveries: number;
   readonly stoneDeliveries: number;
+  readonly harvestDeliveries: number;
+  readonly props: readonly { readonly id: number; readonly kind: string; readonly heldBy: number | null }[];
   readonly forest: {
     readonly standing: number;
     readonly stumps: number;
@@ -1228,7 +1237,7 @@ interface LifeSnapshot {
   }[];
   readonly actors: readonly {
     readonly id: number; readonly age: number; readonly named: boolean;
-    readonly clip: string; readonly load: 'bundle' | 'stone' | null; readonly activity: string;
+    readonly clip: string; readonly load: 'bundle' | 'stone' | 'grain' | null; readonly activity: string;
     readonly talking: boolean; readonly arguing: boolean;
     readonly occupation: string | null;
   }[];

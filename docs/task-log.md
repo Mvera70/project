@@ -64,6 +64,12 @@ traído aquí.
 
 ## 2. El tablero
 
+**IA-18 · cosecha visible:** la semana 35 recoge en parcelas realmente
+trabajadas, carga sacos, recorre el camino, descarga en almacenamiento real y
+vuelve sin producir grano dos veces. Ya no se ara en invierno ni se eligen
+descargas vacías. Dos semillas observadas; 89 pruebas dirigidas, typecheck y
+lint verdes. [Informe](life-rounds/IA-18.md).
+
 **IA-17 · cantera visible:** una obra cuyo coste real incluye piedra reparte
 jornadas entre parcela y roca alcanzable; se ve pico, carga, camino, descarga
 y vuelta, sin inventario paralelo. Semilla 11/año44 completa la entrega antes
@@ -344,6 +350,12 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
 ## 3. Las cifras que mandan
 
+IA-18: tick947/semana35. Semilla 11, 26 personas: id37 recoge, carga a 1,13 s,
+camina a 1,20 s, descarga a 1,87 s y entrega a 3,87 s; dos entregas y dos sacos
+al final. Semilla 7, 21 personas: cuatro porteadores, ruta del id3 de 19 a 6
+tramos en 45 s, aún sin descarga. Cero descargas vacías, errores, deriva,
+penetraciones o centros bloqueados. 89 pruebas dirigidas, typecheck y lint.
+
 IA-17: semilla 11/año44, tick2064, 62 personas, obra `stone_house` 166,29/170
 y cantera en celda4056. Id15: pico a 17,33 s, carga a 23,33 s, descarga a
 24,17 s y entrega a 25,67 s. Cero errores, deriva, penetraciones o centros
@@ -517,10 +529,10 @@ entre 20 y 57 habitantes, antes 22, 9, 4 y 1.
 
 ## 4. Lo abierto, por orden de lo que más duele
 
-**Recursos visibles:** IA-15 e IA-16 cierran la madera e IA-17 hace visible la
-cantera ligada al sobrecoste real de una obra, sin convertir piedra en inventario.
-Sigue conectar estados de cultivo, cosecha, porte y almacenamiento. El agotamiento
-de roca exigiría cambiar el contrato persistente del motor y no se ha fingido.
+**Recursos visibles:** IA-15 e IA-16 cierran la madera, IA-17 hace visible la
+cantera e IA-18 conecta cosecha, porte y almacenamiento con el tick real. Queda
+arte específico de siega y decidir si el motor debe guardar crecimiento por
+parcela. El agotamiento de roca también exige un contrato persistente nuevo.
 
 **G-25:** corregida la uniformidad de las rocas señalada por el dueño. Sigue pendiente ampliar siluetas de árboles.
 

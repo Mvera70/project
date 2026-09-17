@@ -211,7 +211,7 @@ export function modelChainFor(actor: Actor): readonly string[] {
 export function occupationOf(placeId: string, offerId: string): Occupation {
   if (placeId === 'felling' || placeId.startsWith('felling:')) return 'felling';
   if (placeId.startsWith('works:') || placeId.startsWith('quarry:')) return 'building';
-  if (placeId.startsWith('field:') && offerId === 'work') return 'field';
+  if (placeId.startsWith('field:') && (offerId === 'work' || offerId === 'harvest')) return 'field';
   if (offerId === 'feed' || offerId === 'pet' || offerId === 'chase') return 'herding';
   if (offerId === 'drink' && placeId.startsWith('ford:')) return 'water';
   return null;
