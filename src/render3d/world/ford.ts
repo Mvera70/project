@@ -1,17 +1,16 @@
 // G-10 · El vado. design.md D.6, D.8, §7.6.
 //
-// El motor sabe dónde está el vado desde M-10: es la orilla firme más cercana
-// al centro de la aldea, y es donde llegan los forasteros, de donde sale la
-// cacería del lobo y donde se despide a quien se va. En la escena no había nada
-// ahí: el río se cruzaba por el aire.
+// El motor sabe dónde está el vado desde M-10. Desde el mapa grande sabe además
+// qué celdas concretas lo forman (`TERRAIN_CODE.ford`): son agua somera que se
+// puede pisar, no una conjetura que el render tenga que repetir.
 //
 // **El sitio no se calcula aquí.** Se le pregunta al motor, que es quien lo
 // define, por el mismo motivo por el que las señales salen de `tellsFor`:
 // calcularlo dos veces es tener dos vados. `render/gatherings.ts` tiene su
 // propia conjetura y apunta a otro sitio; ése es el fallo que esto no repite.
 //
-// Lo que sí se decide aquí es por dónde cruza: desde la orilla, derecho al otro
-// lado, celda de agua a celda de agua. Un vado torcido no es un vado.
+// La búsqueda desde la orilla se conserva sólo para partidas antiguas, cuyos
+// mapas se guardaron antes de que existiera ese código de terreno.
 
 import { Group, type Object3D } from 'three';
 import type { ValleyMap } from '@engine/state';
@@ -28,6 +27,16 @@ const MAX_SPAN = 14;
  * vado que uno que no lleva al otro lado.
  */
 export function fordCells(map: ValleyMap, x: number, y: number): number[] {
+  const marked: number[] = [];
+  for (let cell = 0; cell < map.terrain.length; cell += 1) {
+    if (map.terrain[cell] === TERRAIN_CODE.ford) marked.push(cell);
+  }
+  if (marked.length > 0) return marked;
+
+  // Compatibilidad con partidas anteriores al mapa grande: allí el vado no
+  // estaba marcado y sólo se guardaba agua. No usar esta conjetura en mapas
+  // nuevos: fue la causa de la hilera de losas de hasta catorce celdas que
+  // podía continuar lejos del paso real y pisar visualmente los campos.
   const from = Math.floor(y) * map.width + Math.floor(x);
   const cx = from % map.width;
   const cy = Math.floor(from / map.width);
@@ -60,7 +69,7 @@ export interface Ford {
 }
 
 /**
- * Pone una losa en cada celda de agua del paso.
+ * Pone una losa en cada celda marcada como paso (o en el paso legado).
  *
  * Sin instanciar: son dos o tres piedras, y una malla instanciada para tres
  * cosas cuesta más código del que ahorra.

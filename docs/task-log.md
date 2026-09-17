@@ -64,6 +64,14 @@ traído aquí.
 
 ## 2. El tablero
 
+**G-24 · vado 3D: hecho.** La hilera blanca junto al río no eran afloramientos
+de roca: el renderer ignoraba `TERRAIN_CODE.ford` y volvía a adivinar el cruce
+desde la orilla con una búsqueda de hasta catorce celdas. Ahora dibuja únicamente
+las celdas de paso que guarda el mapa y conserva la conjetura sólo para partidas
+anteriores a ese terreno. En semilla 7/año 1 quedan dos losas contiguas dentro
+del cauce, separadas del campo. 60 pruebas, typecheck, lint y captura reales
+verdes. Informe [G-24](graphics-rounds/G-24.md).
+
 **IA-13 · puertas domésticas: hecha.** La IA sí entraba, pero a ×64 podía
 recorrer `opening → entering → sleeping` dentro de un solo fotograma y el
 renderer sólo miraba la etapa final. Ahora acumula el pulso de todos los pasos
@@ -265,6 +273,11 @@ vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 | R-5 · más vida en pantalla | se cubre con IA-6 y con el nivelado de §4 |
 
 ## 3. Las cifras que mandan
+
+G-24: semilla 7/año 1, dos celdas de vado `(38,52)` y `(39,52)` frente al campo
+en `x=34…36`; 17 fotogramas revisados, 2 personas y 3 animales. Cero errores,
+penetraciones, centros bloqueados o deriva. 60/60 pruebas dirigidas, typecheck
+y lint verdes. La toma mantiene `engineTick=0`: valida colocación, no evolución.
 
 IA-13: semilla 7/año 1, toma viva a ×64, 6 s y 15 fps; dos residentes, tres
 animales y tres noches completas. Apertura, paso y cierre visibles en los

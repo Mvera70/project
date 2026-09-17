@@ -884,18 +884,29 @@ describe('G-10 · lo que pisa el valle sigue su cota', () => {
 });
 
 describe('G-10 · el vado', () => {
-  it('cruza el agua y llega a tierra firme', () => {
-    // El motor sabe dónde está el vado desde M-10 y en la escena no había nada
-    // ahí: el río se cruzaba por el aire.
+  it('usa exactamente el paso que está marcado en el mapa', () => {
+    // El mapa grande guarda el agua somera como terreno propio. Volver a buscar
+    // agua desde una orilla inventaba una segunda geometría y podía dibujar una
+    // hilera de hasta catorce losas fuera del paso real.
     const state = village(14);
     const at = ford(state);
     const cells = fordCells(state.map, at.x, at.y);
+    const marked = [...state.map.terrain.keys()]
+      .filter((cell) => state.map.terrain[cell] === TERRAIN_CODE.ford);
+    expect(cells).toEqual(marked);
+    expect(cells.length).toBeGreaterThan(0);
+    expect(cells.length).toBeLessThanOrEqual(6);
+  });
+
+  it('reconstruye el paso de las partidas anteriores al terreno de vado', () => {
+    const state = village(14);
+    const at = ford(state);
+    for (let cell = 0; cell < state.map.terrain.length; cell += 1) {
+      if (state.map.terrain[cell] === TERRAIN_CODE.ford) state.map.terrain[cell] = TERRAIN_CODE.water;
+    }
+    const cells = fordCells(state.map, at.x, at.y);
     expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) expect(state.map.terrain[cell]).toBe(TERRAIN_CODE.water);
-
-    // En línea recta, sin saltos: un vado torcido no es un vado.
-    const steps = new Set(cells.slice(1).map((cell, index) => cell - (cells[index] ?? 0)));
-    expect(steps.size).toBeLessThanOrEqual(1);
   });
 
   it('donde no se cruza a ninguna parte no pone piedras', () => {
@@ -919,7 +930,7 @@ describe('G-10 · el vado', () => {
     expect(built.count).toBeGreaterThan(0);
     for (const slab of built.group.children) {
       expect(state.map.terrain[Math.round(slab.position.z) * state.map.width + Math.round(slab.position.x)])
-        .toBe(TERRAIN_CODE.water);
+        .toBe(TERRAIN_CODE.ford);
     }
     built.dispose();
   });
