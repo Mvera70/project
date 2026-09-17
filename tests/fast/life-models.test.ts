@@ -11,7 +11,8 @@ import { describe, expect, it } from 'vitest';
 import { LIFE } from '@engine/balance';
 import type { Actor } from '../../src/render3d/contracts';
 import {
-  BASE_VILLAGER, STRANGER_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, modelChainFor, modelFor, occupationOf,
+  BASE_VILLAGER, STRANGER_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, displayScaleFor,
+  modelChainFor, modelFor, occupationOf, statureAt,
 } from '../../src/render3d/world/models';
 import { WANTED } from '../../src/render3d/renderer';
 
@@ -25,6 +26,25 @@ function actor(over: Partial<Actor> = {}): Actor {
 }
 
 describe('V-15 · la malla se elige por quién eres y por lo que haces', () => {
+  it('los niños conservan una silueta claramente menor hasta la edad adulta', () => {
+    expect(statureAt(4)).toBeLessThan(0.75);
+    expect(statureAt(8)).toBeLessThan(0.83);
+    expect(statureAt(12)).toBeLessThan(0.9);
+    expect(statureAt(14)).toBeLessThan(0.94);
+    expect(statureAt(4)).toBeLessThan(statureAt(8));
+    expect(statureAt(8)).toBeLessThan(statureAt(12));
+    expect(statureAt(12)).toBeLessThan(statureAt(14));
+  });
+
+  it('tener nombre no convierte a un niño en alguien tan alto como un adulto', () => {
+    expect(displayScaleFor(actor({ age: 12, named: true })))
+      .toBe(displayScaleFor(actor({ age: 12, named: false })));
+    expect(displayScaleFor(actor({ age: 12, named: true })))
+      .toBeLessThan(displayScaleFor(actor({ age: 30, named: false })));
+    expect(displayScaleFor(actor({ age: 30, named: true })))
+      .toBeGreaterThan(displayScaleFor(actor({ age: 30, named: false })));
+  });
+
   it('sin nada que la distinga, todo el mundo es el aldeano de siempre', () => {
     expect(modelFor(actor())).toBe(BASE_VILLAGER);
   });
