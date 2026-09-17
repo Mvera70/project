@@ -5,9 +5,10 @@ import { OFFER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
+import { MEANS_SPEC, giveMeans } from '@engine/world/means';
 import { postOffer } from '@engine/world/road';
-import type { GameState, Season } from '@engine/state';
-import { SEASONS } from '@engine/time';
+import type { GameState, MeansId, Season } from '@engine/state';
+import { SEASONS, seasonOf, yearOf } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
 import { paletteFor } from '@derive/palette';
 import { auditSprites } from '@render/sprites/audit';
@@ -133,6 +134,22 @@ export function offerNow(state: GameState): void {
   postOffer(state, 'pedlar',
     [{ k: 'stat', stat: 'silver', amount: OFFER.PEDLAR_SILVER }],
     [{ k: 'stat', stat: 'wood', amount: OFFER.PEDLAR_WOOD }]);
+}
+
+/**
+ * M-3 · Da un medio al abrir, para poder **verlo**.
+ *
+ * Es lo que le da su estado a `?means=pigs`. Hace falta por lo mismo que
+ * `?offer=1`: un medio se paga con lo que el valle tenga, así que en una
+ * captura no se puede esperar a que la aldea junte la plata. Se le pone lo que
+ * cuesta y se le da, que es lo que un jugador haría.
+ */
+export function giveNow(state: GameState, id: MeansId): void {
+  for (const [stat, amount] of Object.entries(MEANS_SPEC[id].cost)) {
+    const key = stat as keyof typeof state.village;
+    state.village[key] = Math.max(state.village[key], (amount ?? 0) * 2);
+  }
+  giveMeans(state, id, seasonOf(state.tick), yearOf(state.tick));
 }
 
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {

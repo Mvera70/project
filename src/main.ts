@@ -1,8 +1,8 @@
 // Punto de entrada. M-20 lo sustituye por el armazón real (design.md §17, M-20).
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
-import { SCHEMA_VERSION, type SaveFile } from '@engine/state';
-import { mountDebug, offerNow, openAtYear, parseDebugRequest, runToCrossroad, runToSky, stateAt } from './ui/debug';
+import { MEANS_IDS, SCHEMA_VERSION, type MeansId, type SaveFile } from '@engine/state';
+import { giveNow, mountDebug, offerNow, openAtYear, parseDebugRequest, runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -69,6 +69,11 @@ if (root) {
     if (query.get('crossroad') === '1') runToCrossroad(state);
     // M-0 · y `&offer=1` deja a alguien esperando en el camino.
     if (query.get('offer') === '1') offerNow(state);
+    // M-3 · y `&means=pigs|plough|ale` da un medio al abrir, para verlo.
+    const means = query.get('means');
+    if (means !== null && (MEANS_IDS as readonly string[]).includes(means)) {
+      giveNow(state, means as MeansId);
+    }
     if (query.get('hunger') === '1') state.village.grain = 0;
     if (query.get('ended') === '1') {
       state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };

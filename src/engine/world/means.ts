@@ -34,7 +34,7 @@ export interface MeansSpec {
    * de fundación (§7.11) — un medio es uno de esos, puesto a mitad de partida y
    * pagado.
    */
-  readonly trait?: 'plough';
+  readonly trait?: 'plough' | 'sty';
   /** Si mete animales en el corral, cuántos y de qué. */
   readonly herd?: { readonly kind: 'pigs' | 'cows'; readonly count: number };
   /** Si lo que deja es una fiesta esta semana. */
@@ -47,9 +47,16 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
   // solo: el granero se llena, y un granero lleno atrae al ladrón y al señor
   // (M-1) y a las ratas.
   plough: { cost: { wood: 40, silver: 20 }, trait: 'plough' },
-  // **Dos cerdos.** Comida en invierno y la matanza de la fiesta; y lobos, que
-  // van a donde hay ganado (M-1), y la peste del corral apretado (§7.7).
-  pigs: { cost: { grain: 30, silver: 14 }, herd: { kind: 'pigs', count: 2 } },
+  // **Una pocilga y dos cerdos.** Comida en invierno y la matanza de la fiesta;
+  // y lobos, que van a donde hay ganado (M-1), y la peste del corral apretado
+  // (§7.7).
+  //
+  // **Da sitio y no sólo animales**, y eso lo obligó la medida: el corral se
+  // llena solo (`tendHerd` cría hasta la capacidad de las casas), así que dar
+  // dos cerdos a una aldea hecha era una negativa por `room` casi siempre — un
+  // medio que no se puede dar no es un medio. Con la pocilga, el techo sube y
+  // los dos que entran se quedan.
+  pigs: { cost: { grain: 30, silver: 14 }, trait: 'sty', herd: { kind: 'pigs', count: 2 } },
   // **Un barril.** Una fiesta esta semana: ánimo de golpe, bodas después… y
   // riñas, que es lo que una fiesta también trae. Es el medio que le da al ánimo
   // el reloj del jugador (`plan-medios.md` §6.2).
@@ -73,7 +80,10 @@ export function refusalFor(state: GameState, id: MeansId): MeansRefusal | null {
   if (spec.trait !== undefined && (state.traits as readonly string[]).includes(spec.trait)) {
     return 'already';
   }
-  if (spec.herd !== undefined
+  // El sitio se mide **después** de lo que el propio medio trae: una pocilga
+  // sube el techo, así que preguntarle si cabe en el corral de antes sería
+  // preguntarle por un corral que ya no va a existir.
+  if (spec.herd !== undefined && spec.trait === undefined
     && state.herd[spec.herd.kind] + spec.herd.count > herdCapacity(state)[spec.herd.kind]) {
     return 'room';
   }
@@ -115,8 +125,15 @@ export function giveMeans(state: GameState, id: MeansId, season: string, year: n
     const key = stat as keyof VillageStats;
     state.village[key] = Math.max(0, state.village[key] - (amount ?? 0));
   }
+  // El rasgo primero: si sube el techo del corral, los animales que vengan
+  // detrás tienen dónde entrar.
   if (spec.trait !== undefined) state.traits.push(spec.trait);
-  if (spec.herd !== undefined) state.herd[spec.herd.kind] += spec.herd.count;
+  if (spec.herd !== undefined) {
+    state.herd[spec.herd.kind] = Math.min(
+      state.herd[spec.herd.kind] + spec.herd.count,
+      herdCapacity(state)[spec.herd.kind],
+    );
+  }
   // La fiesta del barril no se sortea: se paga y se celebra. La sirve
   // `world/fate.ts` la semana que la bandera está puesta, que es donde viven
   // los sucesos y sus efectos visibles.

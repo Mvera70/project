@@ -9,18 +9,22 @@
 import { ANIMALS, FOOD, MURRAIN, TIME } from '../balance';
 import { population } from '../people/demography';
 import { next } from '../rng';
-import { HERD_KINDS, type GameState, type HerdKind } from '../state';
+import { HERD_KINDS, hasTrait, type GameState, type HerdKind } from '../state';
 import { count } from './building-counts';
 import { seasonOf } from '../time';
 
 /** What the village's buildings can feed and shelter (§7.7's ceiling). */
 export function herdCapacity(state: GameState): Record<HerdKind, number> {
+  // M-3 · la pocilga del carro (§7.12): sitio para más cerdos, y por eso se
+  // ven. Va aquí y no en el medio porque la capacidad es de §7.7 y quien la
+  // calcula es esta función; el medio sólo pone el rasgo.
+  const sty = hasTrait(state, 'sty') ? ANIMALS.STY_PIGS : 0;
   const houses = count(state, 'house') + count(state, 'stone_house');
   const fields = count(state, 'field');
   const hasGranary = count(state, 'granary') > 0;
   return {
     hens: Math.min(houses, ANIMALS.MAX_PER_KIND) * ANIMALS.HENS_PER_HOUSE,
-    pigs: hasGranary ? Math.min(Math.floor(houses / ANIMALS.HOUSES_PER_PIG), ANIMALS.MAX_PER_KIND) : 0,
+    pigs: (hasGranary ? Math.min(Math.floor(houses / ANIMALS.HOUSES_PER_PIG), ANIMALS.MAX_PER_KIND) : 0) + sty,
     cows: Math.min(Math.floor(fields / ANIMALS.FIELDS_PER_COW), ANIMALS.MAX_PER_KIND),
   };
 }

@@ -1082,7 +1082,34 @@ misma aldea, los medios son decorado y **se para aquí** y se vuelve a
 `plan-medios.md`. Secuencia de capturas: el carro, el barril dado, la fiesta,
 la riña o la boda que sigue.
 
-### M-3 · Se ve lo que provoca
+### M-3 · Se ve lo que provoca — **la mitad que no es de `life/`, hecha** (17 sep 2026)
+
+> **Hecho, y sin tocar un fichero de la otra sesión:** dar la pocilga se **ve**.
+> Y la medida obligó a rehacer un medio de M-2: «dos cerdos» era un medio que
+> **casi nunca se podía dar** —el corral se llena solo, porque `tendHerd` cría
+> hasta la capacidad que dan las casas, y la negativa era `room` en las cuatro
+> aldeas medidas—. Ahora lo que se da es **sitio**: una pocilga que sube el
+> techo del corral (`ANIMALS.STY_PIGS`), con dos cerdos dentro. Un medio que no
+> se puede dar no es un medio.
+>
+> Y un segundo defecto que sólo se ve mirando: los cerdos de más **se apilaban
+> en la misma coordenada** (`derive/animals.ts` colocaba uno por cada dos casas
+> y los que repetían casa caían en el mismo punto), así que dar dos cerdos no
+> cambiaba nada en pantalla —dos cuerpos antes y dos después, medido con
+> `window.__valleyLife`—. Se reparten por vueltas. Recorrido nuevo: «lo que se
+> da al valle se ve en el valle», con captura en `artifacts/m3-pigs.png`.
+>
+> **Y un error de paréntesis que habría pasado por bueno:** el sitio de la
+> pocilga entró como `hasGranary ? … : 0 + sty`, que el lenguaje lee como
+> `hasGranary ? … : (0 + sty)` — o sea que con granero no sumaba nada. Lo cazó
+> medir el techo del corral antes y después, no el typecheck.
+>
+> **Lo que falta es de la sesión de vida y arte, y está encargado por escrito**
+> en `docs/dos-sesiones.md`: el barril y el arado como modelos (no existe malla
+> para ninguno de los dos), el barril en la plaza durante la fiesta, el arado
+> acarreado al campo, y los lobos yendo al corral en vez de al bosque. Con el
+> motor ya dándoles todo lo que necesitan para eso.
+
 
 **Qué.** Que «lo que metí» y «lo que pasó» se liguen por los ojos y no por la
 crónica. Es la fase de la capa de vida y el render, y **se coordina con la

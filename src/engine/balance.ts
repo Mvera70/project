@@ -797,6 +797,10 @@ export const ANIMALS = {
   // food bill: about twenty hens, eight pigs and four cows come to 3.0 a week,
   // roughly a fourteenth of what forty people eat.
   UPKEEP: { hens: 0.02, pigs: 0.15, cows: 0.35 },
+  // M-3 · TUNE: cuántos cerdos más caben con la pocilga del carro (§7.12). Tres
+  // es lo que hace que el corral se **vea** distinto: con las casas de una aldea
+  // hecha el techo es de dos a cuatro, así que la pocilga lo casi duplica.
+  STY_PIGS: 3,
   // What a slaughtered head is worth, in the same units: person-weeks of food.
   // A cow is a week and a half for forty people; the whole herd is a buffer of
   // the order of half a granary, and it walks.

@@ -598,6 +598,38 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
   }
 });
 
+test('lo que se da al valle se ve en el valle (M-3)', async ({ page }) => {
+  // **La mitad que M-3 pide y que no depende de la capa de vida.** El principio
+  // del juego de los medios es «ciertas cosas dan lugar a otras», y eso sólo se
+  // sostiene si lo que se mete **se ve**: dar dos cerdos y no ver cerdos sería
+  // la misma promesa vacía que las palancas.
+  //
+  // Se cuentan los cuerpos que la escena tiene puestos (`window.__valleyLife`,
+  // que es cómo se mide esta capa desde fuera, `CLAUDE.md`), con y sin el medio
+  // dado, sobre la misma semilla y el mismo año.
+  const pigsOnScreen = async (route: string): Promise<number> => {
+    await page.goto(route);
+    await page.locator('html[data-app-ready="true"]').waitFor();
+    await test.expect.poll(
+      async () => (await page.locator('canvas:visible').first().boundingBox())?.width ?? 0,
+      { timeout: 20_000 },
+    ).toBeGreaterThan(300);
+    // La vida puebla la escena en sus primeros pasos: se espera a que haya
+    // algún animal antes de contar, en vez de fijar un instante.
+    await test.expect.poll(async () => page.evaluate(
+      () => (window as unknown as { __valleyLife?: () => { beasts: { kind: string }[] } })
+        .__valleyLife?.().beasts.length ?? 0,
+    ), { timeout: 20_000 }).toBeGreaterThan(0);
+    return page.evaluate(() => (window as unknown as { __valleyLife?: () => { beasts: { kind: string }[] } })
+      .__valleyLife?.().beasts.filter((beast) => beast.kind === 'pig').length ?? 0);
+  };
+
+  const before = await pigsOnScreen('/?debug=1&live=1&seed=11&year=30&season=summer');
+  const after = await pigsOnScreen('/?debug=1&live=1&means=pigs&seed=11&year=30&season=summer');
+  await page.screenshot({ path: 'artifacts/m3-pigs.png', fullPage: true });
+  test.expect(after, 'los dos cerdos que se dieron están en el valle').toBeGreaterThan(before);
+});
+
 test('la tormenta se ve: llueve, la luz baja y cae un rayo (§10.7)', async ({ page }) => {
   // U-13 · el último de los cinco pasos del dueño del diseño. La ruta de
   // depuración adelanta el valle hasta una jornada de tormenta (`runToSky`),

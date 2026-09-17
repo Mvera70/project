@@ -20,6 +20,43 @@ borres sin preguntarle.
 | **Interfaz** | Sesión vida/UI | `src/ui/**`, `index.html`, `UI_BANK` de `bank.en.ts` |
 | **Documentos** | Ambas, con cuidado | `docs/**` — cada una en sus propios ficheros |
 
+## Encargo abierto para la sesión de vida y arte · M-3 (17 sep 2026)
+
+**Contexto en una frase:** el juego de los medios (`docs/plan-medios.md`,
+`rework.md` §4b) hace que el jugador **dé cosas al valle** en vez de darle
+órdenes, y el principio es «ciertas cosas dan lugar a otras». Eso sólo se
+sostiene si **lo que se mete se ve**.
+
+**Lo que ya se ve, hecho en M-3 sin tocar `life/`:** los cerdos. Dar la pocilga
+sube el techo del corral y los animales entran; `derive/animals.ts` los reparte
+alrededor de su casa en vez de apilarlos en el mismo punto —antes, los cerdos de
+más caían todos en la misma coordenada y dar dos no cambiaba nada en pantalla—.
+Hay recorrido que lo guarda (`lo que se da al valle se ve en el valle`) y una
+captura en `artifacts/m3-pigs.png`.
+
+**Lo que falta, y es vuestro porque vive en `life/` y en el arte:**
+
+| Qué | Dónde | Cómo se sabe que hace falta |
+|---|---|---|
+| **Un barril** y **un arado** como modelos | `art/recipes/**`, y el manifiesto | El carro los ofrece y el valle no los enseña: no hay malla para ninguno de los dos (`manifest.json` tiene 57 y ni barril ni arado) |
+| El barril **en la plaza** los dos días de la fiesta | `life/props.ts`, `life/scenes.ts` | El suceso `ale_feast` ya reúne a la aldea en la plaza (`gather square`, dos días); lo que falta es la cosa en medio |
+| El arado **acarreado al campo** el día que se da | `life/offers.ts`, como `deliver-stone` | El rasgo `plough` está en el estado desde ese tick; el acarreo es la escena que lo cuenta |
+| Los lobos **al corral** y no al bosque | `life/beasts.ts` | Con `wolves_at_the_coop` esa semana, los lobos de invierno ya existen; ir a por los cerdos es lo que liga «tengo ganado» con «vienen lobos» (M-1) |
+| Las ratas: el granero abierto y dos dentro | `life/staging.ts` | `rats_in_the_granary` reúne en la plaza porque el efecto visible de §11.5 sólo admite plaza, capilla o vado — si queréis el granero, hace falta un destino nuevo en `VisualEffect` y eso es del motor: pedidlo |
+
+**Lo que el motor ya os da, y no hace falta pedir:** `state.traits` con `plough`
+y `sty`, `state.herd` con los animales que entraron, `state.acts` con lo que el
+jugador dio y cuándo, `report.means` en el tick en que lo dio, y los sucesos
+`ale_feast`, `pig_slaughter` y `rats_in_the_granary` con sus efectos visibles.
+
+**Criterio de terminado** (el del brief M-3): una secuencia de capturas por
+medio, en tres momentos —se da, se ve la cosa, se ve lo que provoca— enviada al
+dueño del diseño, que dice si se lee. Y la propiedad medible, como en R-5: «en
+la semana del suceso X, al menos N cuerpos están en la escena X durante M
+segundos», con N y M medidos en tres semillas.
+
+---
+
 ## Las tres fronteras donde sí se puede chocar
 
 **1. `src/render3d/renderer.ts` — la más probable.** Ahí viven dos cosas de

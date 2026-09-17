@@ -9,13 +9,15 @@
 // una decisión (`plan-medios.md` §3.2).
 
 import { describe, expect, it } from 'vitest';
-import { FATE, MEANS, TIME } from '@engine/balance';
+import { ANIMALS, FATE, MEANS, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { MEANS_IDS, type GameState, type MeansId, type PlayerAct } from '@engine/state';
 import { weightNow } from '@engine/world/fate';
 import { MEANS_SPEC, canGive, giveMeans, refusalFor } from '@engine/world/means';
+import { herdCapacity } from '@engine/subsistence/herd';
+import { animalPositions } from '@derive/animals';
 import { foundTwenty } from '../helpers/founding';
 
 const give = (means: MeansId): PlayerAct[] => [{ kind: 'means', means }];
@@ -161,6 +163,41 @@ describe('cada medio abre algo, y cierra algo', () => {
     expect(weightNow(state, 'pig_slaughter')).toBe(0);
     state.herd.pigs = FATE.SLAUGHTER_MIN_PIGS;
     expect(weightNow(state, 'pig_slaughter')).toBeGreaterThan(0);
+  });
+});
+
+describe('la pocilga: dar sitio, no sólo animales · M-3', () => {
+  it('se puede dar aunque el corral esté lleno, porque lo que da es sitio', () => {
+    // **La medida que obligó a rehacer este medio.** El corral se llena solo
+    // —`tendHerd` cría hasta la capacidad de las casas— así que «dos cerdos»
+    // era una negativa por `room` en las cuatro aldeas que se midieron. Un
+    // medio que no se puede dar no es un medio.
+    const state = rich();
+    state.herd.pigs = herdCapacity(state).pigs;
+    expect(refusalFor(state, 'pigs')).toBeNull();
+    const ceiling = herdCapacity(state).pigs;
+    giveMeans(state, 'pigs', 'summer', 4);
+    expect(herdCapacity(state).pigs).toBe(ceiling + ANIMALS.STY_PIGS);
+    expect(state.herd.pigs).toBeGreaterThan(ceiling);
+  });
+
+  it('y los cerdos que entran se ven: no se apilan en el mismo punto', () => {
+    // El segundo defecto de M-3, y sólo se ve mirando: `derive/animals.ts`
+    // colocaba un cerdo por cada dos casas y los que repetían casa caían en la
+    // **misma coordenada**, así que dar dos cerdos no cambiaba nada en pantalla
+    // —dos cuerpos antes y dos después, medido con `window.__valleyLife`—.
+    const state = rich();
+    const pigsOnScreen = (): number =>
+      animalPositions(state, 0).filter((animal) => animal.kind === 'pig').length;
+    state.herd.pigs = herdCapacity(state).pigs;
+    const before = pigsOnScreen();
+    giveMeans(state, 'pigs', 'summer', 4);
+    expect(pigsOnScreen()).toBeGreaterThan(before);
+    // Y cada uno en su sitio: dos cerdos en la misma coordenada son un cerdo.
+    const spots = new Set(animalPositions(state, 0)
+      .filter((animal) => animal.kind === 'pig')
+      .map((animal) => `${animal.x.toFixed(2)},${animal.y.toFixed(2)}`));
+    expect(spots.size).toBe(pigsOnScreen());
   });
 });
 

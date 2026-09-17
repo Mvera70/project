@@ -874,7 +874,14 @@ export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills
   // que llegara nadie (E5); éste lo mete el jugador a mitad de partida y lo
   // paga. El mecanismo es el mismo a propósito: cambia un número de la economía
   // para siempre y se cuenta en la crónica.
-  | 'plough';
+  | 'plough'
+  // M-3 · **la pocilga**, y la medida que la obligó: el corral se llena solo
+  // —`tendHerd` cría hasta la capacidad que dan las casas— así que «dos cerdos»
+  // era un medio que casi nunca se podía dar (la negativa era `room` en las
+  // cuatro aldeas que se midieron). Un medio que no se puede dar no es un
+  // medio. Lo que se da es **sitio**: la pocilga sube el techo del corral, y los
+  // cerdos que entran con ella se ven desde el primer día.
+  | 'sty';
 
 /** M-2 · Lo que el jugador puede meter en el valle. `world/means.ts`. */
 export const MEANS_IDS = ['plough', 'pigs', 'ale'] as const;

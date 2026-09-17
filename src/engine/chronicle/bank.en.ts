@@ -555,9 +555,9 @@ export const BANK: Record<string, string[]> = {
     'A plough in year {year}: the first tool the valley owned that did a person\'s work.',
   ],
   'means.pigs.given': [
-    'Two pigs came over the ridge in {season} and went straight into the pen.',
-    'The valley got two pigs in year {year}. The children named them within the hour.',
-    'Two pigs that {season}: winter meat, if the wolves keep their distance.',
+    'They put up a sty in {season} and two pigs went into it the same afternoon.',
+    'A sty and two pigs in year {year}. The children had named them within the hour.',
+    'A sty went up that {season}, and two pigs moved into it before the straw was down.',
   ],
   'means.ale.given': [
     'A barrel of ale came up the road in the {season} of year {year}.',
@@ -2023,8 +2023,8 @@ export const UI_BANK: Record<string, string> = {
   'cart.give': 'Give',
   'cart.plough': 'A plough',
   'cart.plough.what': 'One field worked by half the hands. The rest go where the valley needs them.',
-  'cart.pigs': 'Two pigs',
-  'cart.pigs.what': 'Meat for the winter, and a feast when the pen is full.',
+  'cart.pigs': 'A sty and two pigs',
+  'cart.pigs.what': 'Room in the pen for more, and two to start. Meat for the winter — and wolves know a full pen.',
   'cart.ale': 'A barrel of ale',
   'cart.ale.what': 'A feast this week. Weddings follow a barrel, and so do quarrels.',
   'cart.no.cost': 'Not enough for that yet.',

@@ -112,11 +112,20 @@ export function animalPositions(state: GameState, tickFraction: number): Animal[
     place('hen', house.x + house.w * 0.5 + ((n % ANIMALS.HENS_PER_HOUSE) - 0.5) * 0.6, house.y + house.h + 0.15);
   }
 
-  // Pigs: one to every other house.
+  // Pigs: one to every other house, **y los que repiten casa no se apilan.**
+  //
+  // M-3 · con la pocilga del carro (§7.12) un corral puede tener más cerdos que
+  // casas, y hasta aquí todos los que le tocaban la misma casa caían en el mismo
+  // punto: dar dos cerdos no cambiaba nada en pantalla —medido con
+  // `window.__valleyLife`: dos cuerpos antes y dos después— y «lo que se da se
+  // ve» es justo lo que M-3 promete. Se corren de medio metro por vuelta, que
+  // es lo que hace que un corral lleno **parezca** un corral lleno.
+  const pens = Math.max(1, Math.ceil(houses.length / ANIMALS.HOUSES_PER_PIG));
   for (let n = 0; n < state.herd.pigs; n += 1) {
     const house = houses[(n * ANIMALS.HOUSES_PER_PIG) % Math.max(1, houses.length)];
     if (house === undefined) break;
-    place('pig', house.x - 0.35, house.y + house.h * 0.65);
+    const lap = Math.floor(n / pens);
+    place('pig', house.x - 0.35 + lap * 0.5, house.y + house.h * 0.65 - lap * 0.35);
   }
 
   // Cows: pasture, so they follow the fields onto the meadow beside them.
