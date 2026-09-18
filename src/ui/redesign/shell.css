@@ -44,7 +44,18 @@
      11 % mas oscuro que ocho pixeles mas abajo (luminancia 185 contra 207,
      muestreada en veinte columnas), que es la cuenta de una hoja apenas
      despegada y no de una tarjeta flotando. */
-  filter: drop-shadow(0 -3px 5px rgba(27, 22, 19, .45));
+  /* **Dos sombras y no una, porque en el prototipo el canto es un listón.**
+     Mirando el prototipo 01 ampliado, lo que da la altura no es un difuminado
+     suave: es un filo —una barra de madera con su lado de arriba iluminado— y
+     debajo una sombra dura sobre la hierba. La primera versión de esta ronda
+     puso sólo el difuminado y el dueño del diseño lo cortó en una línea: «no
+     se ve nada la elevación; fíjate bien en la captura». Tenía razón, y en mi
+     propio antes/después tampoco se distinguía.
+     Así que: una de **cero difuminado y un píxel**, que traza el contorno
+     diente a diente y es el filo; y otra de seis, que es la altura. */
+  filter:
+    drop-shadow(0 -2px 0 rgba(74, 52, 36, .85))
+    drop-shadow(0 -8px 9px rgba(27, 22, 19, .55));
 }
 .ui-shell-stack > * { pointer-events: auto; }
 /* VZ-04a · **y el parte de bienvenida, que faltaba.** La pila va en z-index 14
@@ -160,6 +171,31 @@ html.bare .ui-shell-stack { visibility: hidden; }
    la clase de las seis superficies del canto; aquí sólo se apaga cuando el
    hueco está vacío y la bandeja se pliega a cero. */
 .ui-shell-message:empty { min-height: 0; padding: 0; box-shadow: none; }
+/** **Y el filo iluminado, que es la otra mitad del listón del prototipo.**
+
+    Ahí el borde de arriba de la madera está más claro que el papel y que la
+    hierba (luminancia 127-152 contra 62 de hierba y 190 de papel, muestreado):
+    es lo que hace que el canto se lea como un bulto y no como un corte.
+
+    Va **dentro** y no fuera, y eso es lo que lo hace posible: la máscara del
+    desgarro recorta a sus descendientes (§6 del estándar), así que esta tira
+    sale recortada **a la forma de los dientes** — un filo que sigue el rasgado
+    en vez de una recta que lo cruza. Lo de fuera no se puede hacer así, y por
+    eso la sombra proyectada vive en el padre.
+
+    Sólo en la bandeja: las otras cinco superficies del canto se desplazan
+    (`overflow: auto`) y una tira absoluta ahí se iría con el contenido, que es
+    exactamente la trampa que §6 tiene escrita. */
+.ui-shell-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  pointer-events: none;
+  background: linear-gradient(rgba(255, 250, 238, 1), rgba(255, 250, 238, 0));
+}
 /* El mensaje habla del valle —la crónica que acaba de pasar, la pista de las
    órdenes—, así que sólo tiene sitio con el valle en pantalla. Antes de este
    fondo la pista quedaba tapada por el velo opaco de la crónica o la gente

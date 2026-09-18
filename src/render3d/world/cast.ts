@@ -34,6 +34,17 @@ type Action = NonNullable<ReturnType<AnimationMixer['clipAction']>>;
  */
 const HIGHLIGHT = 0xC39A3F;
 /**
+ * Y **cuánto**, que es lo que esta ronda baja.
+ *
+ * Estaba en 1 —emisión de oro a tope en toda la ropa del seguido— y el dueño
+ * del diseño lo cortó al verlo: «lo de iluminarse es un poco exagerado; quizás
+ * debería hacerse mucho más sutil». Tenía razón: lo que identifica a quien se
+ * sigue es el anillo del suelo (es lo que la ficha promete, «rings them on the
+ * map»), y la ropa encendida sólo tiene que **confirmar** que es ése, no
+ * convertirlo en una farola. A 0,22 la tela se calienta lo justo para que se
+ * distinga del vecino sin dejar de parecer tela.
+ */
+/**
  * El anillo que se le pone en el suelo, en celdas de radio.
  *
  * Encender la ropa sola no bastaba: medido en el juego, a la distancia a la que
@@ -44,7 +55,7 @@ const HIGHLIGHT = 0xC39A3F;
  */
 const RING_INNER = 0.34;
 const RING_OUTER = 0.46;
-const HIGHLIGHT_STRENGTH = 1;
+const HIGHLIGHT_STRENGTH = 0.22;
 
 interface Player {
   readonly model: string;
@@ -135,7 +146,10 @@ export class Cast {
     this.ring = new Mesh(
       new RingGeometry(RING_INNER, RING_OUTER, 28),
       new MeshBasicMaterial({
-        color: HIGHLIGHT, transparent: true, opacity: 0.85,
+        // Y el anillo, más callado: 0,55 en vez de 0,85, por lo mismo que la
+        // ropa. Sigue siendo lo que se ve de un vistazo —es su trabajo— pero
+        // deja de ser el objeto más brillante de la pantalla.
+        color: HIGHLIGHT, transparent: true, opacity: 0.55,
         depthWrite: false, side: DoubleSide,
       }),
     );

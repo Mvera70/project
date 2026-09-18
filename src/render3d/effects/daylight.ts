@@ -44,13 +44,24 @@ const NIGHT_FLOOR = 0.38;
 /**
  * Lo que sube el cielo nocturno para cubrir lo que el sol deja de poner.
  *
- * TUNE: 1,9. El sol nocturno aportaba 0,99 de intensidad direccional y ahora
+ * TUNE: 2,35. El sol nocturno aportaba 0,99 de intensidad direccional y ahora
  * aporta cero, así que el hemisférico tiene que recoger esa luz o la noche se
  * vuelve un pozo. No es la misma cantidad porque no es la misma clase de luz:
  * la direccional alumbraba una cara y dejaba la otra negra, y el hemisférico
  * llega a todas, así que con menos se ve más.
+ *
+ * **De 1,9 a 2,35 el 18 sep 2026**, y es del dueño del diseño mirando el
+ * juego: «no se ven bien las cosas de noche, tiene que ser un poquito más
+ * clara la noche». El factor del hemisférico a noche cerrada pasa de 0,72 a
+ * 0,89 —o sea de 1,08 de intensidad a 1,34, un 24 % más— y con él sube el
+ * rebote del suelo (`BOUNCE_NIGHT`), que es lo que de verdad enseña los
+ * bultos: una luz de cielo sola deja las caras de abajo negras.
+ *
+ * **Lo que no se toca es el color del cielo** (`SKY_NIGHT`): lo que hay que
+ * ver son las cosas, y aclarar el fondo haría la noche más gris en vez de más
+ * legible. Sigue siendo de noche; lo que cambia es que se distinga el valle.
  */
-const NIGHT_SKY_GAIN = 1.9;
+const NIGHT_SKY_GAIN = 2.35;
 
 /** Lo alto que llega el sol al mediodía, en grados sobre el horizonte. */
 const NOON_ELEVATION = 62;
@@ -87,7 +98,10 @@ const SKY_NIGHT = new Color('#5A6780');
 /** U-13 · el gris al que se va el cielo con nubes. Plomo, no negro: llueve, no anochece. */
 const STORM_GREY = '#5F646B';
 const BOUNCE_DAY = new Color('#776F62');
-const BOUNCE_NIGHT = new Color('#2E3644');
+/** El rebote del suelo de noche. **De #2E3644 a #3D4859 el 18 sep 2026**: es la
+    mitad de «que se vea de noche» —el cielo alumbra desde arriba y esto desde
+    abajo—, y sin subirlo los tejados quedaban legibles y las paredes no. */
+const BOUNCE_NIGHT = new Color('#3D4859');
 
 function ease(value: number): number {
   const clamped = Math.max(0, Math.min(1, value));

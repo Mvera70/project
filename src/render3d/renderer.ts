@@ -319,6 +319,8 @@ export async function createGraphicsRenderer(
   /** La sierra de V-14. Vive con el valle y se rehace sólo si cambia el mapa. */
   let ridge: Mesh | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
+  /** Cuanto se sube en pantalla a quien se sigue. Ver `track`. TUNE: 0,14. */
+  const TRACK_LIFT = 0.14;
   // La cota del suelo, que la burbuja necesita para flotar sobre la cabeza y no
   // sobre el nivel del mar.
   let groundFloor: (x: number, z: number) => number = () => 0;
@@ -1197,7 +1199,29 @@ export async function createGraphicsRenderer(
       // Seguir a alguien es mirarle, no acercarse a el: la distancia la elige
       // el jugador y no se le quita de las manos.
       const followed = lastActors.find((actor) => actor.id === id);
-      if (followed !== undefined) view.look(followed.x, followed.z);
+      if (followed === undefined) return;
+      view.look(followed.x, followed.z);
+      // UI-V10b · **y se le sube por encima del centro.**
+      //
+      // La camara ya iba detras desde VZ-4 —esto se llama en cada fotograma—
+      // pero centrar en la pantalla dejaba al seguido justo en el canto de la
+      // hoja: desde UI-V10 la ficha ocupa el 40 % de abajo mientras se sigue a
+      // alguien, asi que el centro de la pantalla es el borde del papel. Medido
+      // en la toma de esa ronda: Hakon a y 430 de 844, o sea centrado y a la
+      // vez medio tapado. El dueno del diseno lo pidio en una linea: «me
+      // gustaria que la camara fuese moviendose siguiendo al personaje».
+      //
+      // Asi que se mira a la mitad de lo que se ve, no a la mitad de la
+      // pantalla. El 14 % es la cuenta del tercio visible con la ficha abierta
+      // —queda a y 0,36 de la pantalla, bien por encima del canto— y sin ficha
+      // es una brizna por encima del centro, que es donde uno quiere a quien
+      // camina: con sitio por delante para ver a donde va.
+      //
+      // `view.pan` y no un `look` desplazado porque el desplazamiento es de
+      // **pantalla**, no de mundo: el valle se ve en perspectiva y girado, asi
+      // que «sube dos celdas» no es «sube en pantalla». Y no acumula: cada
+      // fotograma vuelve a mirar y a correr lo mismo.
+      view.pan(0, -viewport.heightCss * TRACK_LIFT);
     },
 
     zoom(factor: number, atXCss: number, atYCss: number): void {

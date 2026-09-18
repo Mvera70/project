@@ -494,6 +494,7 @@
   box-shadow: none;
 }
 .ui-shell-content:has(.chronicle-scrim) > .ui-shell-content-close { display: none; }
+
 /* El canto ya no es un elemento: era la tapa de madera, y ahora es el recorte
    de la propia hoja. Se conserva la clase, vacía y sin caja, porque `shell.ts`
    la monta y un recorrido la nombra; el día que se retire del DOM, esto se va
@@ -857,10 +858,22 @@
     pantalla con el respiro del área segura. */
 html.bare .hud-plate-date,
 html.bare .valley-vitals,
-html.bare .hud-speed-cluster,
 html.bare .valley-speeds { visibility: hidden; }
+/* **Y los dos que quedan se van a las esquinas**, que es como el dueño del
+   diseño los pidió al verlos juntos: «el de silencio debe ir a la derecha del
+   todo … y el otro debe ir a la izquierda del todo». Con la pantalla despejada
+   el rincón deja de ser un rincón: cruza el canto de abajo y reparte.
+
+   La pareja de velocidad se va con `display` y no con `visibility` **sólo
+   aquí**: escondida seguiría ocupando su hueco en la fila, y con el reparto a
+   los extremos ese hueco fantasma empujaría el sonido a media pantalla en vez
+   de al canto. Lo que no puede plegarse es la bandeja (ver arriba); esto son
+   dos círculos dentro de una fila. */
+html.bare .hud-speed-cluster { display: none; }
 html.bare .valley-hud-right.hud-speed-corner {
   bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  left: max(10px, env(safe-area-inset-left));
+  justify-content: space-between;
 }
 /* El del sonido, en tenue: sigue ahí para quien quiera callar el valle sin
    volver a sacar la interfaz. El del valle se queda entero — es el camino de
