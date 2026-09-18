@@ -2540,6 +2540,12 @@ export const UI_BANK: Record<string, string> = {
   'building.mill': 'mill',
   'building.hall': 'king’s hall',
   'building.palisade': 'palisade',
+  // A2 · **el portón, que faltaba.** Es el título de su ficha, y sin la clave
+  // tocarlo en el valle enseñaba `[building.gate]` entre corchetes. Lo cazó el
+  // repaso de claves del 19 sep 2026, cruzando cada familia de claves armadas
+  // con datos contra su dominio del motor — el mismo hueco que `cart.no.feasting`
+  // y `language.english`, y el tercero de la misma clase.
+  'building.gate': 'gate',
   'building.wall': 'wall',
   'building.church': 'church',
   'building.stone_house': 'stone house',
