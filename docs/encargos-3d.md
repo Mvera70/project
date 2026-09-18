@@ -1,60 +1,71 @@
-# Encargos de 3D y Blender — el registro
+# Lo que el juego no enseña todavía — el registro
 
-**Todo lo que el juego necesita de Blender se apunta aquí en cuanto hace
-falta**, aunque el código ya funcione sin ello. Lo pidió el dueño del diseño el
-18 sep 2026: «el tema de la malla, todo lo que se vaya haciendo falta en Blender
-y en 3D se va anotando y se va apuntando».
+**Todo lo que se diseñe sin representación real se apunta aquí en la misma
+ronda en que se diseña**, aunque el código funcione sin ello. Lo pidió el dueño
+del diseño el 18 sep 2026, dos veces y cada vez más ancho:
 
-Los encargos grandes tienen su propio documento con medidas y presupuesto de
-triángulos (`encargo-arado.md`, `encargo-fuente.md`); esta es **la lista de
-todo**, para que nada viva sólo en un comentario del código.
+> «El tema de la malla, todo lo que se vaya haciendo falta en Blender y en 3D se
+> va anotando y se va apuntando.»
+>
+> «Todas estas cosas que estemos diseñando que no tengan una representación
+> real… al igual que todas las animaciones, eventos y tal que no estén
+> directamente reflejados, todo eso hay que ir anotándolo como pendiente.»
 
-| Qué | Para qué | Estado hoy en el juego | Dónde está el detalle |
+Así que esto **no es sólo una lista de mallas**: es todo lo que el motor sabe y
+la pantalla no cuenta. Una mecánica que no se ve no existe para quien juega.
+
+---
+
+## 1 · Lo que pasa y no se ve (lo más grave)
+
+Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
+
+| Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
 |---|---|---|---|
-| **El portón** (`gate`) | A2 · la puerta del anillo | Usa la malla de la empalizada; las jambas las dibuja `obstacles.ts` | Abajo, «El portón» |
-| El arado | M-3 · el medio que libera brazos | Sin malla; el barril lo tiene el dueño casi hecho | `encargo-arado.md` |
-| La fuente | P-3 · el centro de la plaza | Tres primitivas | `encargo-fuente.md` |
-| La sala del rey (`hall`) | K-4 · la casa del que manda | Más alta que una casa, con tejado burdeos | `plan-rey.md` §8 |
-| **Clips de combate** | E1 · la fase 4 entera | **No existe ninguno** | Abajo, «Combate» |
-| **El clan vecino** | E2 · quien ataca (§1b) | No existe | Abajo, «Combate» |
-| Muralla de piedra y torre | A4 · la villa de piedra | La muralla de piedra usa su propio material; la torre existe | — |
-| Fuego, humo y gore | E4 · cuando el valle cae | No existe; **el gore es decisión del dueño** | — |
+| **El asalto** (B1) | Una partida de 5 a 60 hombres baja del valle vecino, se lleva plata, grano y una cabeza | **Nada.** Una línea de crónica | Es la fase 4 entera: cuerpos que llegan por el camino, la escena, y lo que arde. Ver §3 |
+| **El aviso** (B2) | Ocho o catorce semanas antes, alguien los ve venir | La encrucijada, y la aldea reuniéndose (`gather`) | Un jinete que baja del pasto alto, o humo en la loma de enfrente. Es un efecto visual nuevo, no una malla |
+| **Prepararse** (B2, `braced`) | El ganado entra, el grano se esconde, se atranca | Nada | El corral vacío y la gente metiendo cosas: se puede hacer con la capa de vida, sin Blender |
+| **Pagar al clan** (B2, `bought_off`) | Treinta de plata suben la ladera y la partida se da la vuelta | Nada | Dos o tres cuerpos saliendo por el portón con una carga |
+| **La semana de después** (B2, `just_sacked`) | La aldea acaba de perder grano y ganado | Nada | Que se note el saqueo: sacos volcados, un corral abierto |
+| **Las armas** (C1) | La aldea se lleva un cuarto menos de golpe | Nada | Lanzas apoyadas en la herrería, o gente que las lleva. **Ninguna malla de arma existe** |
+| **Los arcos** (C1) | El valle tienta menos | Nada | Arcos en la cerca, o alguien practicando en el vado |
+| **Guardia en la atalaya** (C1) | — | La atalaya está, **vacía** | Alguien arriba mirando el camino. Es capa de vida (C2), no Blender |
+
+## 2 · Mallas que faltan
+
+| Malla | Para qué | Qué se ve hoy en su lugar |
+|---|---|---|
+| **El portón** (`gate`, A2) | La puerta del anillo | La malla de la empalizada, con dos jambas dibujadas por `obstacles.ts`. **Y necesita una hoja llamada `gate_door`** para que el gozne la abra: es el mismo mecanismo que las puertas de las casas, idea del dueño |
+| **El arado** (M-3) | El medio que libera brazos | Nada. Encargo completo en `encargo-arado.md` |
+| **La fuente** (P-3) | El centro de la plaza | Tres primitivas. Encargo en `encargo-fuente.md` |
+| **La sala del rey** (`hall`, K-4) | La casa del que manda | Una casa más alta con tejado burdeos. Encargo en `plan-rey.md` §8 |
+| **Armas y arcos** (C1) | Lo de arriba | Nada existe: ni lanza, ni arco, ni flecha, ni escudo |
+| **El clan vecino** (E2) | Quien ataca | Nada. Son **aldeanos armados de otro valle** —no soldados de cota ni bandidos andrajosos— y reaprovechan el aparejo del aldeano |
+
+**Y las que sí están, para no volver a dudarlo:** `watchtower.glb` y `wall.glb`
+existen y se usan; la atalaya de C1 se levanta y se ve. Lo que no hay es nadie
+dentro.
+
+## 3 · Animación y efecto
+
+| Qué | Estado |
+|---|---|
+| **Clips de combate** (E1) | **No existe ni uno.** Tensar el arco, soltar, golpe de espada, recibir el impacto, caer y quedar. Es el camino largo del proyecto: sin ellos la batalla de §1b no se puede ver por bien que funcione |
+| **La hoja del portón** | El gozne está escrito y funciona; falta la hoja que girar |
+| **Fuego, humo y gore** (E4) | Nada. Cómo se ve arder una casa en un asalto y cómo se ve morir. **El gore es decisión del dueño** |
+| **Escombros y ragdoll** | Llegan con Rapier (D1) y no antes |
+
+## 4 · De otras rondas, aún abierto
+
+- **El arado acarreado** el día que se da: una escena de dos con la carreta, no
+  una colocación (`task-log.md`).
+- **La reunión de §11.8 no cabe en una aldea grande**: se junta el 54 %, y la
+  fracción baja con el tamaño. Tres pruebas declaradas con su medida.
 
 ---
 
-## El portón (A2, 18 sep 2026)
-
-**Lo que hay.** El portón es un edificio de 1×1 que ocupa una celda del anillo
-de muralla. Hoy se dibuja con la malla de la empalizada (`BUILDING_ASSETS.gate`
-apunta a `palisade`) y `world/obstacles.ts` le pone dos jambas en su celda.
-
-**Lo que hace falta.** Una malla propia, del tamaño de una celda, en la línea de
-la muralla de madera que ya existe, **con una hoja separada llamada
-`gate_door`**. Ese nombre no es decorativo: `world/buildings.ts` busca un hijo
-llamado `<recurso>_door`, lo cuelga de un gozne y lo gira noventa grados. Es el
-mismo mecanismo con el que se abren las puertas de las casas, y es idea del
-dueño del diseño («para la animación de la puerta, algo similar a lo que se hace
-con las casas»). Con la hoja bien nombrada, **el portón se abre de día y se
-cierra de noche sin tocar una línea de código**.
-
-Dos cosas más que el modelo tiene que admitir, porque la fase 4 las va a pedir:
-una **versión rota** (o que la hoja pueda desprenderse), y que se lea a la
-distancia de la cámara ortográfica, que es desde donde se mira todo.
-
-## Combate (E1 y E2, por empezar)
-
-**Clips (E1), y es el camino largo del proyecto:** tensar el arco, soltar,
-golpe de espada, recibir un impacto, caer y quedar. Hoy no existe **ni uno**, y
-sin ellos la batalla física de §1b no se puede ver por muy bien que funcione.
-
-**Modelos (E2):** el clan vecino. Por decisión del dueño (§1b) quien ataca es
-**otro valle**, así que son aldeanos armados —no soldados de cota ni bandidos
-andrajosos—, con arco, flecha, espada y escudo. Reaprovechan el aparejo del
-aldeano que ya existe.
-
----
-
-**Cómo se mantiene esto.** Cuando una ronda necesite algo de 3D que no existe,
-se añade aquí **en la misma ronda**, con una línea de qué es, para qué, y qué
-hace el juego mientras tanto. Un encargo que sólo vive en un comentario del
-código es un encargo que nadie hará.
+**Cómo se mantiene esto.** Cuando una ronda diseñe algo que la pantalla no
+cuenta, se añade aquí **en la misma ronda**, con qué hace el motor, qué se ve
+hoy y qué haría falta. Un encargo que sólo vive en un comentario del código es
+un encargo que nadie hará — y una mecánica que no se ve no existe para quien
+juega.

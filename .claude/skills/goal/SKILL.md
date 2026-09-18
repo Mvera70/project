@@ -59,6 +59,17 @@ Una fase no está cerrada sin las cuatro cosas:
    entrada en `docs/changelog.md` con el porqué, y `docs/task-log.md` al día.
    Commit por rutas explícitas —nunca `git add -A`— y el motivo en el mensaje.
 
+## 4b · Y lo que la pantalla no cuenta
+
+**Toda mecánica que se diseñe sin representación real se apunta en
+`docs/encargos-3d.md`, en la misma ronda.** No sólo las mallas que falten:
+también las animaciones, los sucesos y los efectos que el motor sabe y la
+pantalla no enseña. Es del dueño del diseño, dos veces: «todas estas cosas que
+estemos diseñando que no tengan una representación real… todo eso hay que ir
+anotándolo como pendiente». Una mecánica que no se ve no existe para quien
+juega, y un encargo que sólo vive en un comentario del código es un encargo que
+nadie hará.
+
 ## 5 · Lo que no decides tú
 
 Qué es «caer» en detalle, cómo se ve el gore, cuánto hay que nivelar, y qué se
