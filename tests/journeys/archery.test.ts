@@ -44,7 +44,17 @@ function assaulted(seed: number, years: number, bows: boolean): GameState {
   return state;
 }
 
-const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [41, 40]];
+/**
+ * Los valles que **tienen cerco y siguen en pie** a esa altura.
+ *
+ * Las dos mitades importan desde B3 (18 sep 2026). La semilla 41 estaba aquí y
+ * se cayó de la lista por las dos razones a la vez: **no levanta muralla** —su
+ * anillo sigue sin fijarse al año treinta— y por eso mismo **acaba tomada** en
+ * el año treinta y cinco. Medir la guarnición de un valle sin cerco no es medir
+ * nada: eso es la propiedad «sin cerco no hay guarnición», y la guarda
+ * `tests/fast/garrison.test.ts`.
+ */
+const VALLEYS: readonly (readonly [number, number])[] = [[7, 25], [11, 25], [23, 25], [36, 30]];
 
 describe('D2 · la muralla contesta', () => {
   it('se dispara, y alguna acierta, en los cuatro valles', async () => {

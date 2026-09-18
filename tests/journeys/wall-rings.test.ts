@@ -312,14 +312,23 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
   // celdas.
   const TEN = [3, 7, 11, 14, 23, 25, 36, 41, 47, 58];
 
-  /** El valle a los sesenta, con el jugador pagando su segunda puerta. */
+  /**
+   * El valle a los sesenta, con el jugador pagando su segunda puerta.
+   *
+   * **Y se para si la partida acaba**, que desde B3 (18 sep 2026) puede pasar:
+   * un valle al que se le lleva el clan vecino pierde su portón en el asalto
+   * (`THREAT.BREACH` lo convierte en ruina), y eso no es un defecto del cerco —
+   * es lo que le pasó. Medido: la semilla 11 acaba tomada antes del año sesenta
+   * y se quedaba con cero portones, con lo que esta prueba leía un fallo de
+   * colocación donde lo que había era una derrota.
+   */
   function valley(seed: number): GameState {
     const state = foundGame(seed);
-    for (let year = 0; year < 60; year += 1) {
+    for (let year = 0; year < 60 && state.ended === null; year += 1) {
       run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
       if (canGive(state, 'gate')) giveMeans(state, 'gate', 'spring', year);
     }
-    run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
+    if (state.ended === null) run(state, TIME.WEEKS_PER_YEAR * 3, 'prudent', CATALOG);
     return state;
   }
 
@@ -328,6 +337,9 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
     // exactamente lo que una puerta de una celda no puede atravesar.
     for (const seed of TEN) {
       const state = valley(seed);
+      // Un valle tomado no se mide aquí: su cerco tiene un boquete **puesto a
+      // propósito** por el asalto (B3), que es lo contrario de un defecto.
+      if (state.ended !== null) continue;
       const wall = new Set(state.buildings
         .filter((b) => b.lostTick === null
           && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'gate'))
@@ -342,8 +354,11 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
     // Funcional quiere decir las dos cosas a la vez: desde la puerta se llega a
     // donde vive la gente **y** a campo abierto de fuera del cerco. Una puerta
     // que da del campo al campo, o de una bolsa a otra bolsa, no es una puerta.
+    let measured = 0;
     for (const seed of TEN) {
       const state = valley(seed);
+      if (state.ended !== null) continue;
+      measured += 1;
       const gates = state.buildings.filter((b) => b.lostTick === null && b.kind === 'gate');
       expect(gates.length, `semilla ${seed}: ${gates.length} portones`).toBe(2);
       const land = terrainOf(state);
@@ -375,5 +390,9 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
       expect(Math.hypot(a.x - b.x, a.y - b.y), `semilla ${seed}: puertas juntas`)
         .toBeGreaterThanOrEqual((state.ring ?? 0) * BUILDING_RULES.GATE_APART);
     }
+    // Y la prueba no se puede quedar vacía por la puerta de atrás: si un día
+    // cayeran todos los valles, esto lo diría en vez de pasar sin medir nada.
+    expect(measured, `valles en pie que se pudieron medir: ${measured} de ${TEN.length}`)
+      .toBeGreaterThanOrEqual(TEN.length / 2);
   });
 });

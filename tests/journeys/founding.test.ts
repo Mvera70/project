@@ -99,7 +99,12 @@ describe('una pareja se hace aldea · v3.69', () => {
     expect(finished.length, summary).toBeLessThanOrEqual(11);
     for (const o of survivors) expect(o.atEnd, `semilla ${o.seed}`).toBeGreaterThan(0);
     for (const o of finished) {
-      expect(['abandoned', 'extinction', 'dispersed'], `semilla ${o.seed}`).toContain(o.state.ended?.cause);
+      // B3 · **y `stormed` desde el 18 sep 2026**: un valle puede acabar tomado
+      // por el clan vecino, que es el primer final que causa alguien de fuera
+      // (§1b). Los otros tres son una aldea que se agota; éste es una aldea
+      // perdida, y por eso está en la lista aunque no se parezca a los demás.
+      expect(['abandoned', 'extinction', 'dispersed', 'stormed'], `semilla ${o.seed}`)
+        .toContain(o.state.ended?.cause);
     }
   });
 

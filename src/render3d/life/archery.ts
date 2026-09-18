@@ -122,11 +122,23 @@ const BODY_TOP = 0.7;
 /**
  * La altura a la que se suelta y a la que se apunta, en celdas.
  *
- * Se suelta desde 2 —lo alto de la empalizada (`physics.ts`, `WALL_HEIGHT`),
- * porque quien dispara está en el cerco— y se apunta al pecho, a 0,4, que son
- * un metro veinte: a los pies no se tira, y a la cabeza tampoco.
+ * Se apunta al pecho, a 0,4, que son un metro veinte: a los pies no se tira, y
+ * a la cabeza tampoco.
+ *
+ * Y se suelta desde **2,3 y no desde 2**, que es lo alto de la empalizada
+ * (`physics.ts`, `WALL_HEIGHT`). Los treinta centímetros de más son **el parapeto
+ * asomado**, y hacen falta: medido en la semilla 36, los arqueros soltaban
+ * **136 flechas y no acertaban ni una**, porque saliendo justo a la altura de la
+ * estaca la flecha se la comía su propia muralla en cuanto el blanco se pegaba
+ * al pie de ella. Es verdad física —por eso las murallas de verdad tienen
+ * matacanes— y es un agujero de diseño: un cerco no puede tener una zona ciega
+ * pegada a su propia puerta, que es justo donde se apretuja un asalto.
+ *
+ * Quien dispara está **en** la muralla (§1b: «las torres son aldeanos en la
+ * muralla disparando»); que por ahora se pinte detrás de la estaca y no encima
+ * es una carencia de arte —falta el adarve, E3— y no una decisión de balística.
  */
-const LOOSE_HEIGHT = 2;
+const LOOSE_HEIGHT = 2.3;
 const CHEST = 0.4;
 
 /** Los arqueros de hoy, de los puestos que tienen arco. */
