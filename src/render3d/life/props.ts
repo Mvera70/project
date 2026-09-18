@@ -48,7 +48,7 @@ import { population } from '@engine/people/demography';
 import { hasTrait } from '@engine/state';
 import type { GameState } from '@engine/state';
 import { aleWindow } from '@engine/world/means';
-import { valleyCore } from '@derive/anchors';
+import { plazaCentre } from '@engine/world/plaza';
 import { blockedAt, fitsCircle, WALL_CLEAR, type Point, type Terrain } from './body';
 import { doorOf, OFFERS, placedOffer, type Offer, type OfferSpec, type Place } from './offers';
 import type { Dweller } from './village';
@@ -380,8 +380,11 @@ export function given(state: GameState, land: Terrain, from = 0): Prop[] {
     // 6,6 celdas del punto de reunión en once de doce semillas, o sea a las
     // afueras. La plaza de este juego cae muchas veces entre campos y eso no es
     // un defecto de la plaza.
-    const square = valleyCore(state);
-    const at = { x: square.x, z: square.y };
+    // P-1 · y desde el esquema 8 la plaza **existe**: es un punto guardado con
+    // su círculo reservado, no la media de los edificios. El barril va ahí, que
+    // es donde está el empedrado.
+    const middle = plazaCentre(state.plaza);
+    const at = { x: middle.x, z: middle.y };
     const meeting = placedOffer(OFFERS['gather'] as OfferSpec, at, land);
     // **Y en la plaza más despejada de las suyas, no en la primera.** La
     // reunión reparte de once a veintiocho plazas alrededor del punto —medido
@@ -401,7 +404,12 @@ export function given(state: GameState, land: Terrain, from = 0): Prop[] {
     // lado (a 0,33 de celda en cuatro semillas, metido en su cara y tapado por
     // el tejado). Así que el aire se pide como mínimo y, cumplido, manda la
     // cercanía: la plaza **más cercana al corro de las que tienen aire**.
-    const seats = [...(meeting?.spots ?? []), base];
+    // Y **sin subirse a la fuente**, que ocupa el centro desde P-2: sin esto el
+    // barril salía justo encima del pilón —la plaza está vacía y empedrada, así
+    // que la primera plaza del corro es la del medio— y se veían las dos cosas
+    // metidas una en otra.
+    const seats = [...(meeting?.spots ?? []), base]
+      .filter((p) => Math.hypot(p.x - middle.x, p.z - middle.y) > FOUNTAIN_CLEAR);
     const roomy = seats.filter((p) => openness(roofs, p) >= ROOM_AROUND && !inField(buildings, p));
     const pick = (list: readonly Point[]): Point | undefined => [...list]
       .sort((a, b) => Math.hypot(a.x - base.x, a.z - base.z) - Math.hypot(b.x - base.x, b.z - base.z))[0];
@@ -478,6 +486,15 @@ export function given(state: GameState, land: Terrain, from = 0): Prop[] {
  * come desde esta cámara: medido en las semillas 23, 41, 33, 2024 y 999.
  */
 const ROOM_AROUND = 0.8;
+
+/**
+ * Lo que hay que dejarle a la fuente del centro de la plaza, en celdas.
+ *
+ * TUNE: una celda. El pilón mide 0,8 de ancho (`render3d/world/plaza.ts`) y su
+ * celda está cerrada al paso, así que a menos de una celda del centro no hay
+ * sitio para nada; y nadie podría acercarse a beber del barril por ese lado.
+ */
+const FOUNTAIN_CLEAR = 1;
 
 /**
  * Si una cosa que **no se coge** puede estar aquí.

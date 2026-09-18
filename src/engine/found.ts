@@ -10,6 +10,7 @@ import { SCHEMA_VERSION, restingIntent, valleyTraits } from './state';
 import type { BuildingKind, FoundingProfile, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
+import { choosePlaza } from './world/plaza';
 
 /** Place completed founding buildings without charging the opening stores. */
 function foundingBuildings(state: GameState, profile: FoundingProfile): void {
@@ -58,6 +59,16 @@ export function foundGame(
     peakPeople: profile.POPULATION,
     rng,
     map: generateMap(mapRng, terrainSeed),
+    // P-1 · se elige más abajo, en cuanto la pareja ha levantado su casa: la
+    // plaza se busca **al lado** de ella, así que no puede decidirse antes de
+    // que exista.
+    //
+    // **Y hasta entonces está fuera del mapa, no en el centro.** Con el centro
+    // del corazón como valor de partida, la reserva ya estaba puesta cuando la
+    // pareja buscaba solar, y la casa fundadora se corría tres celdas: medido,
+    // de (34,55) a (31,55) en la semilla 7. Una plaza que aún no se ha elegido
+    // no puede estorbar a la casa que la va a elegir.
+    plaza: { x: -1_000, y: -1_000 },
     herd: { ...profile.HERD },
     village: {
       grain: profile.GRAIN,
@@ -102,6 +113,10 @@ export function foundGame(
     ended: null,
   };
   foundingBuildings(state, profile);
+  // P-1 · **y aquí se elige la plaza, una vez y para siempre.** Después de la
+  // casa y el campo, porque se pone a su lado; antes del primer tick, porque
+  // desde el primero ya nadie puede construir dentro (`world/placement.ts`).
+  state.plaza = choosePlaza(state);
   if (inherited !== undefined) {
     if (inherited.ruins.length !== state.map.ruins.length) {
       throw new Error('Inherited ruin mask does not fit the valley.');

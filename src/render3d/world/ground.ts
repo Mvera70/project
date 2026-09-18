@@ -141,6 +141,7 @@ const OWN_CELL = 0.46;
  */
 function cornerColour(
   map: ValleyMap, own: number, x: number, z: number, palette: Palette, into: Color,
+  plaza?: Plaza,
 ): void {
   const rest = (1 - OWN_CELL) / 3;
   const ownX = own % map.width;
@@ -156,7 +157,7 @@ function cornerColour(
     // Fuera del mapa no hay terreno que mezclar: esa parte de la mezcla la pone
     // la propia celda, y asi los pesos siguen sumando uno.
     const inside = cx >= 0 && cz >= 0 && cx < map.width && cz < map.height;
-    sample.set(cellColour(map, inside ? cz * map.width + cx : own, palette));
+    sample.set(cellColour(map, inside ? cz * map.width + cx : own, palette, plaza));
     const weight = mine ? OWN_CELL : rest;
     r += sample.r * weight;
     g += sample.g * weight;
@@ -173,7 +174,24 @@ function cornerColour(
  * separaran en cuanto alguien retocara un verde, y G-08 pide expresamente
  * reutilizar el significado existente en vez de repetir las reglas.
  */
-export function cellColour(map: ValleyMap, cell: number, palette: Palette): string {
+export function cellColour(
+  map: ValleyMap, cell: number, palette: Palette, plaza?: Plaza,
+): string {
+  // P-2 · **el empedrado de la plaza.** Va antes que el camino y antes que el
+  // terreno porque es lo que manda: dentro del círculo el suelo es empedrado, y
+  // el motor ya garantiza que ahí no hay nada construido (P-1,
+  // `engine/world/plaza.ts`). El borde se dibuja un tono más oscuro, que es lo
+  // que hace que se lea como un espacio y no como una mancha.
+  if (plaza !== undefined) {
+    const x = cell % map.width;
+    const z = Math.floor(cell / map.width);
+    const gap = Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y);
+    if (gap <= plaza.radius) {
+      return gap > plaza.radius - PLAZA_RIM
+        ? mixed(palette.stone, palette.path)
+        : mixed(palette.path, palette.stone);
+    }
+  }
   const wear = map.path[cell] ?? 0;
   if (wear > 0) {
     // Un camino más pisado es más claro: de la senda al camino real.
@@ -463,7 +481,18 @@ export interface Ground {
   dispose(): void;
 }
 
-export function buildGround(map: ValleyMap, palette: Palette): Ground {
+/**
+ * La plaza, como el suelo la necesita: dónde está y cuánto mide.
+ *
+ * Llega de fuera —del estado, `GameState.plaza`, y de `PLAZA.RADIUS`— porque
+ * esta capa no puede importar del motor (`CLAUDE.md`, las cuatro capas).
+ */
+export interface Plaza { readonly x: number; readonly y: number; readonly radius: number }
+
+/** Cuánto del borde de la plaza se dibuja más oscuro, en celdas. */
+const PLAZA_RIM = 1;
+
+export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza): Ground {
   const cells = map.width * map.height;
   const positions = new Float32Array(cells * 4 * 3);
   const colours = new Float32Array(cells * 4 * 3);
@@ -493,7 +522,7 @@ export function buildGround(map: ValleyMap, palette: Palette): Ground {
       normals[at] = 0;
       normals[at + 1] = 1;
       normals[at + 2] = 0;
-      cornerColour(map, cell, px, pz, palette, tint);
+      cornerColour(map, cell, px, pz, palette, tint, plaza);
       const shade = 1 + mottleAt(px, pz) + patchAt(px, pz);
       colours[at] = tint.r * shade;
       colours[at + 1] = tint.g * shade;

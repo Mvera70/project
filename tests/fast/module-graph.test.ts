@@ -154,7 +154,11 @@ describe('grafo de módulos del motor', () => {
     // corazón del valle (`HEART`), que es la misma geometría que el generador
     // usa y que por eso vive en la hoja topológica. Tres módulos con su propia
     // copia del rectángulo son tres rectángulos en cuanto alguien lo cambie.
-    expect(importsOf('world/placement.ts')).toEqual(['balance', 'state', 'tiles']);
+    // Y `plaza` desde P-1: la reserva de la plaza es una condición de la
+    // colocación, así que quien coloca tiene que preguntarla. La hoja sigue
+    // siendo `tiles`; `plaza` sólo mira a `balance`, `state` y `tiles`.
+    expect(importsOf('world/placement.ts')).toEqual(['balance', 'plaza', 'state', 'tiles']);
+    expect(importsOf('world/plaza.ts')).toEqual(['balance', 'state', 'tiles']);
     expect(importsOf('world/buildings.ts')).toEqual([
       'balance',
       'people/demography',

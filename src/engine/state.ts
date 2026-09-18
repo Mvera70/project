@@ -761,7 +761,7 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 7; // M-0: piedra, plata, ofertas y actos (6 era R-1: `happenings` y `fate`)
+export const SCHEMA_VERSION = 8; // P-1: la plaza (7 era M-0: piedra, plata, ofertas y actos)
 
 /**
  * La postura de la aldea: lo único que el jugador manda de forma continua.
@@ -986,6 +986,20 @@ export interface GameState {
   peakPeople: number; // greatest population observed at a completed tick
   rng: RngBundle; // state of the random streams
   map: ValleyMap;
+  /**
+   * P-1 · **La plaza de este valle**, en celdas, elegida el día de la fundación
+   * y fija para siempre (esquema 8).
+   *
+   * Está guardada y no se deriva, y eso es la decisión: hasta el esquema 7 la
+   * plaza era `valleyCore` —la media de los centros de los edificios— que se
+   * recalcula cada vez que se pregunta y **se movía sola** mientras la aldea
+   * crecía: medido, de 4,2 a 10,8 celdas entre la fundación y el año 60 en ocho
+   * semillas. Un empedrado y una fuente no pueden ir en un punto que se muda.
+   *
+   * La elige `world/plaza.ts` sin consumir azar, y `world/placement.ts` no deja
+   * levantar nada dentro de su radio (`PLAZA.RADIUS`).
+   */
+  plaza: { x: number; y: number };
   village: VillageStats;
   herd: Herd; // §7.7, schema 3
   people: PeopleState;

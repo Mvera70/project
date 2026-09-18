@@ -15,7 +15,7 @@
 import type { Catalogue } from '@engine/crossroads/schema';
 import type { GameState } from '@engine/state';
 import { ford } from '@engine/sim';
-import { standing, valleyCore } from './anchors';
+import { standing } from './anchors';
 
 export interface Gathering {
   x: number;
@@ -46,7 +46,15 @@ function placeOf(state: GameState, where: 'square' | 'chapel' | 'ford'): { x: nu
       return { x: chapel.x + chapel.w * 0.5, y: chapel.y + chapel.h * 0.5 };
     }
   }
-  return where === 'ford' ? ford(state) : valleyCore(state);
+  // P-1 · **«in the square» es la plaza, y desde el esquema 8 la plaza existe**:
+  // un punto elegido el día de la fundación, fijo, con su círculo reservado
+  // (`engine/world/plaza.ts`). Antes era `valleyCore` —la media de los centros
+  // de los edificios— que se movía de 4,2 a 10,8 celdas entre la fundación y el
+  // año 60, así que la aldea se reunía cada década en un sitio distinto sin que
+  // nada hubiera cambiado. `valleyCore` se queda para el vado y para lo que
+  // quiera decir «el centro de lo construido», que es otra cosa.
+  if (where === 'ford') return ford(state);
+  return { x: state.plaza.x, y: state.plaza.y };
 }
 
 /**

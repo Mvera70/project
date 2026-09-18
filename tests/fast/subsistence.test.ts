@@ -64,6 +64,10 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     tick: 0,
     peakPeople: 20,
     rng,
+    // P-1 · la plaza del esquema 8. Aquí el centro del corazón a secas: estos
+    // estados se montan a mano y no fundan nada, así que no hay casa junto a la
+    // que elegirla.
+    plaza: { x: 36, y: 56 },
     map: {
       width: WORLD.WIDTH,
       height: WORLD.HEIGHT,

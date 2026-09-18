@@ -1,5 +1,6 @@
 import { BUILDINGS, BUILDING_RULES } from '../balance';
 import { HEART } from './tiles';
+import { inPlaza, plazaCentre } from './plaza';
 import { TERRAIN_CODE } from '../state';
 import type { Building, BuildingKind, GameState } from '../state';
 
@@ -33,6 +34,12 @@ export function canPlace(state: GameState, kind: BuildingKind, x: number, y: num
     if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
   }
   if (state.buildings.some((b) => b.id !== upgradeOf && standsInTheWay(b, state.tick) && overlaps(rect, b))) return false;
+  // P-1 · **la plaza es suelo de nadie.** Ni casa, ni campo, ni empalizada: es
+  // lo único que la convierte en un sitio y no en una anotación (§7.4b). La
+  // mejora de una casa a casa de piedra está exenta —`upgradeOf`—: una casa que
+  // ya estaba ahí antes de que existiera la regla no se demuele por decreto, y
+  // en una partida migrada eso pasa.
+  if (upgradeOf === null && inPlaza(state, x, y, w, h)) return false;
   return !state.works.some((work) => overlaps(rect, work));
 }
 
@@ -142,6 +149,9 @@ function fitsEmptyGround(
   // Only a building with walls has to keep its distance. A field may lie
   // against a house; you walk over a field.
   const keepsAway = WALLED.has(kind);
+  // P-1 · lo mismo que en `canPlace`, y aquí es donde de verdad muerde: este es
+  // el filtro con el que `placeBuilding` recorre el corazón buscando solar.
+  if (inPlaza(state, x, y, w, h)) return false;
   for (let row = y; row < y + h; row += 1) {
     for (let col = x; col < x + w; col += 1) {
       const cell = row * state.map.width + col;
@@ -178,8 +188,24 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       for (let x = field.x; x < field.x + field.w; x += 1) fieldCells[y * state.map.width + x] = 1;
     }
   }
-  const centre = houses.length === 0 ? { x: state.map.width / 2, y: state.map.height / 2 }
-    : { x: houses.reduce((n, b) => n + center(b).x, 0) / houses.length, y: houses.reduce((n, b) => n + center(b).y, 0) / houses.length };
+  // **El pueblo crece alrededor de la plaza**, y eso es P-1 llevado hasta el
+  // final: lo pidió el dueño del diseño con estas palabras —«las cosas se
+  // deberían mover para que esa plaza parezca una plaza de verdad»— y sin esto
+  // no pasaba. §7.4 mide todo contra un centro, y ese centro era **la media de
+  // las casas**: la aldea crecía alrededor de sí misma y se alejaba de su
+  // plaza. Medido en la semilla 41 al año 60: la plaza acababa en el borde del
+  // caserío, con las casas apiñadas al otro lado.
+  //
+  // Con la plaza como centro, el borde del núcleo se mide desde ella y las
+  // casas se reparten a su alrededor, que es la forma que tiene un pueblo con
+  // plaza. La reserva del círculo (`inPlaza`) impide que alguien la ocupe, así
+  // que lo que queda es exactamente un anillo.
+  const plaza = plazaCentre(state.plaza);
+  const inside = plaza.x >= 0 && plaza.y >= 0
+    && plaza.x < state.map.width && plaza.y < state.map.height;
+  const centre = inside ? plaza
+    : houses.length === 0 ? { x: state.map.width / 2, y: state.map.height / 2 }
+      : { x: houses.reduce((n, b) => n + center(b).x, 0) / houses.length, y: houses.reduce((n, b) => n + center(b).y, 0) / houses.length };
   const hull = convexHull(houses.flatMap((b) => [{ x: b.x, y: b.y }, { x: b.x + b.w, y: b.y },
     { x: b.x + b.w, y: b.y + b.h }, { x: b.x, y: b.y + b.h }]));
   // How far a point sits from the edge of the built core, in cells. Zero is on

@@ -8,6 +8,7 @@ import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
 import { HAPPENINGS, HERD_KINDS, MEANS_IDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
+import { choosePlaza } from './world/plaza';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
 
@@ -289,6 +290,11 @@ function isPlausibleState(value: unknown): value is GameState {
     && tickValue(s['tick']) && tickValue(s['peakPeople'])
     && record(rng) && RNG_STREAMS.every((stream) => uint32(rng[stream]))
     && byteMap(s['map'])
+    // P-1 · la plaza. Se comprueba aquí y no en la migración porque la
+    // migración ya ha corrido: a este punto llega con plaza o no llega.
+    && record(s['plaza'])
+    && finite((s['plaza'] as Record<string, unknown>)['x'])
+    && finite((s['plaza'] as Record<string, unknown>)['y'])
     && record(village) && ['grain', 'wood', 'morale', 'faith', 'stone', 'silver'].every((key) => finite(village[key]))
     && record(s['herd']) && HERD_KINDS.every((kind) => tickValue((s['herd'] as Record<string, unknown>)[kind]))
     // La postura. Se comprueba que sea finita y no que esté en rango:
@@ -365,7 +371,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6].includes(candidate.schema)) {
+  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7].includes(candidate.schema)) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -455,6 +461,20 @@ export function deserialize(raw: unknown): SaveFile {
         stoneDone: work.stoneDone ?? BUILDINGS[work.kind].stone,
       })),
     } as GameState;
+  }
+  // 7 -> 8 (P-1): la plaza.
+  //
+  // **Se deriva, y eso es recordar y no cambiar.** `choosePlaza` la busca al
+  // lado de la casa fundadora —la primera que se levantó, que sigue en la lista
+  // aunque se haya quemado—, así que una partida guardada recibe la plaza que
+  // habría tenido si la regla hubiera existido el día que se fundó.
+  //
+  // Lo que **no** hace la migración es tirar nada: en un valle ya construido
+  // puede haber casas dentro del círculo, y se quedan. La reserva sólo prohíbe
+  // levantar de nuevo (`world/placement.ts`), que es lo que §13.1 permite:
+  // cargar una partida no puede demoler la aldea del jugador.
+  if ((state as Partial<GameState>).plaza === undefined) {
+    state = { ...state, version: SCHEMA_VERSION, plaza: choosePlaza(state) } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

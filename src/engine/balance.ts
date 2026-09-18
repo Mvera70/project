@@ -1068,6 +1068,37 @@ export const TRAITS = {
   BARE_HILLS_ROCK: 0.5,
 } as const;
 
+// ---------------------------------------------------------------------------
+// §7.4b · La plaza (P-1, 18 sep 2026)
+// ---------------------------------------------------------------------------
+
+export const PLAZA = {
+  /**
+   * El radio del círculo de la plaza, en celdas.
+   *
+   * TUNE: tres celdas, que son nueve metros de radio y dieciocho de lado a lado
+   * (D.6.2: una celda son tres metros). Es la medida de una plaza de pueblo de
+   * verdad y cabe la aldea entera de pie: el corro de una reunión de §11.8
+   * reparte de once a veintiocho plazas, y con este radio caben todas dentro
+   * sin pisarse. Con dos celdas la fuente del centro se comería el sitio; con
+   * cuatro, el círculo se traga la mitad del casco —los topes de §12 son
+   * absolutos: dieciséis casas y ocho campos— y la aldea se desparrama.
+   *
+   * El dueño del diseño la pidió «un círculo grande, con separación».
+   */
+  RADIUS: 3,
+  /**
+   * Cuánta calle se deja entre el borde de la plaza y la casa fundadora al
+   * elegirla.
+   *
+   * TUNE: uno, el mismo `BUILDING_RULES.STREET_GAP` que se deja entre dos
+   * edificios con paredes. La plaza se elige pegada a esa casa y sin esto su
+   * borde quedaría contra su muro, que es justo lo contrario de la separación
+   * que se pidió.
+   */
+  STREET: 1,
+} as const;
+
 export const WORLD = {
   /**
    * El valle jugable, en celdas. Una celda son tres metros (D.6.2).

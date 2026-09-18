@@ -1454,6 +1454,50 @@ no lo comprobaba—. La fiesta se iba andando detrás de él.
 
 ---
 
+### 7.4b La plaza (P-1 y P-2, 18 sep 2026)
+
+**El valle tiene una plaza, y es un sitio, no un punto.** La pidió el dueño del
+diseño: «me gustaría que la plaza fuese un espacio que tuviese un círculo
+grande, con separación. Creo que las cosas se deberían mover para que esa plaza
+parezca una plaza de verdad. Y en el centro quizás puedo poner una fuente».
+
+**Qué había antes y por qué no servía.** La plaza era `valleyCore` —la media de
+los centros de los edificios en pie (`derive/anchors.ts`)— y se recalculaba cada
+vez que alguien preguntaba. Medido en ocho semillas, de la fundación al año 60:
+**se desplazaba de 4,2 a 10,8 celdas**. Empedrar eso es empedrar un sitio que se
+muda, y una fuente en un sitio que se muda es una fuente que persigue a la aldea.
+
+Cuatro reglas, y las cuatro son del motor:
+
+1. **Se elige el día de la fundación y se guarda** (`state.plaza`, esquema 8).
+   `choosePlaza` la busca **al lado de la casa fundadora** —de las ocho
+   direcciones, la que menos pisa lo ya construido y más suelo abierto tiene—, y
+   no consume azar: el mismo valle da la misma plaza (§4.3).
+2. **Nadie construye dentro.** `inPlaza` la reserva con radio `PLAZA.RADIUS` = 3
+   celdas, o sea **dieciocho metros de lado a lado**, y la prohibición incluye
+   los campos: un trigal en medio de la plaza es lo contrario de una plaza.
+3. **El pueblo crece a su alrededor.** §7.4 mide todo contra un centro, y ese
+   centro era la media de las casas: la aldea crecía alrededor de sí misma y
+   dejaba la plaza en el borde. Ahora el centro **es la plaza**.
+4. **Y la reunión de §11.8 se convoca ahí.** «In the square» era `valleyCore`, o
+   sea un sitio distinto cada década; ahora es la plaza.
+
+**Lo que cuesta, medido en ocho partidas de sesenta años:** reservar el círculo
+no cuesta nada (352 personas contra 354, 446 edificios contra 454). Centrar el
+trazado en la plaza cuesta **un 6 % de población** —354 a 334, y casi todo en
+una semilla: la 11 pasa de 46 a 28— porque un anillo reparte las casas más lejos
+unas de otras. Se acepta a cambio de lo que se pidió: un pueblo con plaza.
+
+**Lo que se ve** (P-2, `src/render3d/`): el empedrado es el suelo de las celdas
+del círculo, con el borde un tono más oscuro (`world/ground.ts`, `cellColour`), y
+en el centro hay una fuente. La malla de la fuente está encargada
+(`docs/encargo-fuente.md`); mientras no exista, `PlazaFountain` dibuja un pilón,
+el agua y una columna con tres primitivas, por la misma razón que el barril y el
+arado (§7.14). **Su celda está cerrada al paso**: la gente rodea la fuente, no la
+atraviesa.
+
+---
+
 ### 7.13 La leña se corta por necesidad (balanceo del 17 sep 2026)
 
 **La aldea manda al bosque las manos que hacen falta, no una cuota.** Lo pidió el

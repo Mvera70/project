@@ -57,7 +57,12 @@ export const WALLED: ReadonlySet<string> = new Set([
  * Se rehace cuando cambia el valle —una casa nueva cierra un paso— y eso ocurre
  * una vez por jornada escénica, no por fotograma.
  */
-export function terrainOf(state: { readonly map: ValleyMap; readonly buildings: readonly Building[] }): Terrain {
+export function terrainOf(state: {
+  readonly map: ValleyMap;
+  readonly buildings: readonly Building[];
+  /** P-2 · la celda de la fuente, si este valle ya tiene plaza (esquema 8). */
+  readonly plaza?: { readonly x: number; readonly y: number };
+}): Terrain {
   const { width, height } = state.map;
   const blocked = new Uint8Array(width * height);
   const gates = defenceGates(state);
@@ -78,6 +83,16 @@ export function terrainOf(state: { readonly map: ValleyMap; readonly buildings: 
         if (x >= 0 && z >= 0 && x < width && z < height) blocked[z * width + x] = 1;
       }
     }
+  }
+
+  // P-2 · **la fuente de la plaza se rodea, no se atraviesa.** Es una celda y
+  // sólo una: la plaza mide siete de lado a lado, así que cerrar su centro no
+  // encierra a nadie, y sin cerrarlo la gente cruzaría el pilón por dentro —que
+  // es el defecto que el dueño del diseño lleva señalando desde el principio,
+  // «atraviesan paredes»—.
+  const plaza = state.plaza;
+  if (plaza !== undefined && plaza.x >= 0 && plaza.y >= 0 && plaza.x < width && plaza.y < height) {
+    blocked[plaza.y * width + plaza.x] = 1;
   }
 
   return { width, height, blocked };

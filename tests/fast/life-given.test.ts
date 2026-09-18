@@ -17,7 +17,7 @@ import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
-import { valleyCore } from '@derive/anchors';
+import { plazaCentre } from '@engine/world/plaza';
 import { given } from '../../src/render3d/life/props';
 import { OFFERS, placedOffer, type OfferSpec } from '../../src/render3d/life/offers';
 import { terrainOf } from '../../src/render3d/life/terrain';
@@ -154,13 +154,20 @@ describe('M-3 · y está bien puesto, no sólo puesto', () => {
         && barrel.z >= b.y && barrel.z <= b.y + b.h);
       expect(inWheat, `semilla ${seed}: no entre el trigo`).toBe(false);
 
-      // Y en el corro: una de las plazas que la reunión de la plaza reparte.
-      const core = valleyCore(state);
-      const meeting = placedOffer(OFFERS['gather'] as OfferSpec, { x: core.x, z: core.y }, land);
+      // Y en el corro: una de las plazas que la reunión reparte **en la plaza
+      // de verdad**, que desde el esquema 8 es un punto guardado y fijo
+      // (`state.plaza`, P-1) y no la media de los edificios.
+      const middle = plazaCentre(state.plaza);
+      const meeting = placedOffer(
+        OFFERS['gather'] as OfferSpec, { x: middle.x, z: middle.y }, land,
+      );
       expect(meeting, `semilla ${seed}: la plaza admite reunión`).not.toBeNull();
       const seats = [...(meeting?.spots ?? []), ...(meeting === null ? [] : [meeting.at])];
       const onASeat = seats.some((seat) => Math.hypot(seat.x - barrel.x, seat.z - barrel.z) < 0.01);
       expect(onASeat, `semilla ${seed}: en una plaza del corro`).toBe(true);
+      // Y no encima de la fuente, que ocupa el centro (P-2).
+      expect(Math.hypot(barrel.x - middle.x, barrel.z - middle.y),
+        `semilla ${seed}: le deja su sitio a la fuente`).toBeGreaterThan(1);
     }
   });
 });

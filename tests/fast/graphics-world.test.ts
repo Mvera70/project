@@ -150,9 +150,17 @@ describe('G-06 · el plan de escena', () => {
     const change = planChange(before, planFor(burnt));
     expect(change.added.length).toBe(0);
     expect(change.removed.length).toBe(0);
-    expect(change.changed.length).toBe(1);
-    const ruin = change.changed[0];
-    expect(ruin?.id).toBe(standing?.id);
+    // **La que se arruina cambia, y con ella la valla que se le apoyaba.**
+    // Medido el 18 sep 2026, tras P-1: al arruinar el granero de la semilla 7
+    // en (29,56) cambian dos —el granero y la empalizada de (31,56)— porque una
+    // valla se dibuja según sus vecinas (`world/plan.ts`), y con la plaza
+    // reservada el trazado dejó a las dos pegadas. Pedir exactamente una era
+    // pedir que el granero no tuviera vecinos, que es la biografía de un
+    // trazado y no la propiedad: lo que esta prueba guarda es **cómo se lee una
+    // ruina**, así que se busca la ruina entre lo que cambió.
+    expect(change.changed.length).toBeGreaterThanOrEqual(1);
+    const ruin = change.changed.find((entry) => entry.id === standing?.id);
+    expect(ruin, 'la que se arruina está entre las que cambian').toBeDefined();
     expect(ruin?.ruin).toBe(true);
     expect(ruin?.roofed).toBe(false);
     expect(ruin?.walls).toBeLessThan(standing?.walls ?? 0);

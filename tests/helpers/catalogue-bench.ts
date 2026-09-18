@@ -58,6 +58,7 @@ function founded(seed: number): GameState {
   const rng = makeBundle(seed);
   return {
     version: 2, seed, terrainSeed: seed, tick: 0, peakPeople: 20, rng,
+    plaza: { x: 36, y: 56 }, // P-1 · esquema 8, y este estado no funda nada
     map: {
       width: WORLD.WIDTH, height: WORLD.HEIGHT,
       terrain: new Uint8Array(CELLS).fill(1, 0, Math.floor(CELLS * 0.45)),

@@ -1,4 +1,6 @@
 import { visibleBuildings } from '@derive/visible-buildings';
+import { plazaOf } from '@derive/plaza';
+import { PlazaFountain } from './world/plaza';
 // G-06 · The renderer. design.md D.5, D.6.
 //
 // The whole contract, implemented. D.5 forbids publishing an empty method to
@@ -26,7 +28,7 @@ import type {
   Actor, ActorDoing, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
   GraphicsViewport,
 } from './contracts';
-import { VALLEY_COLOURS } from './visual-config';
+import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, type Ground } from './world/ground';
 import { buildRidge } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
@@ -85,6 +87,8 @@ export const WANTED = [
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
   ...VILLAGER_MODELS, TREE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  // P-2 · la fuente de la plaza, cuando exista (`docs/encargo-fuente.md`).
+  'fountain',
   // M-3 · lo que el jugador mete en el valle. Ninguno de los dos está
   // publicado todavía —el encargo es `docs/encargo-arado.md`— y por eso se
   // piden aquí: `WANTED` es lo que el renderer puede pedir, exista ya o no,
@@ -185,7 +189,9 @@ export async function createGraphicsRenderer(
 
   const sun = new DirectionalLight('#FFF4D8', 2.6);
   sun.castShadow = options.quality !== 'low';
-  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.mapSize.set(SUN_SHADOW.mapSize, SUN_SHADOW.mapSize);
+  sun.shadow.bias = SUN_SHADOW.bias;
+  sun.shadow.normalBias = SUN_SHADOW.normalBias;
   const ambient = new HemisphereLight('#FFF6DF', '#776F62', 1.5);
   scene.add(ambient, sun, sun.target);
 
@@ -292,8 +298,10 @@ export async function createGraphicsRenderer(
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
+  // P-2 · la fuente del centro de la plaza. El empedrado lo pinta el suelo.
+  const plaza = new PlazaFountain((id) => library.instance(id));
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, treeFalls.group);
+  world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, plaza.group, treeFalls.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -472,13 +480,13 @@ export async function createGraphicsRenderer(
     const radius = Math.hypot(mapWidth, mapHeight) / 2 + 1;
     sun.target.position.copy(centre);
     fogAround(centre);
-    const reach = radius * 1.2;
+    const reach = radius * SUN_SHADOW.reachMargin;
     sun.shadow.camera.left = -reach;
     sun.shadow.camera.right = reach;
     sun.shadow.camera.top = reach;
     sun.shadow.camera.bottom = -reach;
     sun.shadow.camera.near = 0.5;
-    sun.shadow.camera.far = radius * 8;
+    sun.shadow.camera.far = radius * SUN_SHADOW.farMultiplier;
     sun.shadow.camera.updateProjectionMatrix();
   }
 
@@ -518,7 +526,9 @@ export async function createGraphicsRenderer(
     // §10.3 · la paleta de la estación, la misma que usa el render 2D.
     const palette = paletteFor(clock.season, clock.seasonWeek);
     treeFalls.season(palette);
-    ground = buildGround(state.map, palette);
+    // P-2 · con su plaza empedrada. El radio viene de `derive/plaza.ts`, que es
+    // quien traduce la constante del motor a esta capa.
+    ground = buildGround(state.map, palette, plazaOf(state));
     // La nieve en los tejados sale de la misma paleta que la del suelo: cuando
     // §10.3 pone el prado blanco es que ha nevado, y la nieve no elige donde
     // cuajar. TUNE: 0,72 y no 1, que un tejado del color exacto del prado
@@ -924,6 +934,7 @@ export async function createGraphicsRenderer(
       lastActors = castOf(life, frame.presentationSeconds, ages, named);
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
+      plaza.show(plazaOf(shown), groundFloor);
       cast.show(lastActors);
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
@@ -1169,6 +1180,7 @@ export async function createGraphicsRenderer(
       fauna.dispose();
       bubbles.dispose();
       props.dispose();
+      plaza.dispose();
       treeFalls.dispose();
       cast.dispose();
       village.dispose();
