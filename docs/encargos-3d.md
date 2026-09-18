@@ -53,7 +53,7 @@ dentro.
 | **Clips de combate** (E1) | **No existe ni uno.** Tensar el arco, soltar, golpe de espada, recibir el impacto, caer y quedar. Es el camino largo del proyecto: sin ellos la batalla de §1b no se puede ver por bien que funcione |
 | **La hoja del portón** | El gozne está escrito y funciona; falta la hoja que girar |
 | **Fuego, humo y gore** (E4) | Nada. Cómo se ve arder una casa en un asalto y cómo se ve morir. **El gore es decisión del dueño** |
-| **Escombros y ragdoll** | Llegan con Rapier (D1) y no antes |
+| **Escombros y ragdoll** | Rapier ya está (D1, 18 sep): el mundo existe y `launch()` vuela. Lo que falta es **qué lanzar y quién lo lanza** (D2) y los clips para que un cuerpo caiga como un cuerpo (E1) |
 
 ## 4 · De otras rondas, aún abierto
 

@@ -85,8 +85,8 @@ es divertido, y el resultado es el que sale.
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| D1 · Rapier, integrado | **Decidido el 18 sep: Rapier (WASM) desde el principio.** Casarlo con el paso fijo de la capa de vida, el presupuesto de ~1 MB en móvil y una medida de fotogramas en dispositivo | **P1** | Alta | Astra | — |
-| D2 · Flechas y aldeanos-torre | Flechas como cuerpos de Rapier con gravedad e impacto; el aldeano en la muralla o la atalaya que dispara a lo que entra en alcance | P2 | Media | Sol | **D1** (sin Rapier no hay flecha), C2 |
+| ~~D1 · Rapier, integrado~~ · **hecho el 18 sep 2026**: `life/physics.ts`, un paso de física por paso de vida, y **carga tardía** — el bundle principal no crece y Rapier queda en su trozo de 1,05 MB comprimido que sólo se pide cuando hay algo que simular. Medido: 200 cuerpos en el aire cuestan **403 µs**, el 1,2 % del presupuesto. **Falta la medida en un dispositivo real** | Hecho (salvo la medida en móvil) | Alta | — | — |
+| D2 · Flechas y aldeanos-torre | Flechas como cuerpos de Rapier con gravedad e impacto; el aldeano en la muralla o la atalaya que dispara a lo que entra en alcance. **`launch()` ya existe y vuela**: falta quien dispare y a qué | **P1** | Media | Sol | D1 hecha, C2 |
 | D3 · El bando hostil | Cuerpos enemigos que llegan por el camino con su IA: acercarse, romper el portón, entrar, buscar a la gente y lo que arde | P2 | Alta | Astra | D1, B1 |
 | D4 · Cuerpo a cuerpo | Golpe con alcance, empujón, caída; muertes que salen de la física | P3 | Alta | Astra | D3 |
 | D5 · Lo que se rompe | El portón que cede, la muralla que se abre, las casas que arden durante el asalto | P3 | Media-alta | Sol → Astra | A2, D3 |
