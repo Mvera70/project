@@ -23,6 +23,7 @@
 // que nadie ha medido.
 
 import { renderUiText } from '@engine/chronicle/render';
+import { roleKeyFor } from '@derive/crown';
 import { isHere } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import type { GameState, Villager, VillagerId } from '@engine/state';
@@ -176,7 +177,11 @@ export function personCard(state: GameState, id: VillagerId): PersonCard | null 
 
   const base = {
     ...faceOf(person),
-    role: person.role === null ? null : renderUiText(`role.${person.role}`),
+    // K-5 · «king» si lleva la corona; el motor sigue diciendo `leader`.
+    role: (() => {
+      const key = roleKeyFor(state, person);
+      return key === null ? null : renderUiText(key);
+    })(),
     traits: person.traits.map((trait) => renderUiText(`trait.${trait}`)),
     memories: [...person.memories]
       .sort((a, b) => b.weight - a.weight || b.tick - a.tick)

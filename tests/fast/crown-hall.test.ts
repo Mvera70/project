@@ -87,7 +87,7 @@ describe('K-4 · y es la casa del rey', () => {
     const state = crowned(village());
     const before = housingCapacity(state);
     const hall = { id: 9800, kind: 'hall' as const, x: 30, y: 30, w: 3, h: 3,
-      builtTick: state.tick, lostTick: null, tier: 0, lit: true, blockedUntil: null };
+      builtTick: state.tick, lostTick: null, tier: 0 as const, lit: true, blockedUntil: null };
     state.buildings.push(hall);
     expect(housingCapacity(state)).toBe(before + CROWN.HALL_BEDS);
     expect(CROWN.HALL_BEDS).toBe(LIFE.HOUSE_CAPACITY);

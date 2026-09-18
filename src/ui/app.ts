@@ -300,6 +300,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       pendingActs.push({ kind: 'means', means });
       if (speed !== 0) { runTick(); paint(lastFraction); }
     },
+    // K-5 · la corona. Va por el mismo conducto que un medio —la cola de actos
+    // que el paso 1b consume— porque es el mismo verbo: el jugador da algo y la
+    // aldea decide qué hacer con ello. Aquí lo que da es **a alguien**.
+    crown(who): void {
+      pendingActs.push({ kind: 'crown', who });
+      if (speed !== 0) { runTick(); paint(lastFraction); }
+    },
     setSpeed(value): void { app.setSpeed(value); },
     // UI-R2 · la única escritura que un panel puede hacer sobre las órdenes
     // (`contracts.ts`), y desde esta ronda el único sitio donde se aplica la

@@ -29,6 +29,7 @@
 // `.ui-shell-content`, que ya pone su propio fondo, borde, sombra y cierre
 // (`shell.css`, `shell.ts`).
 import { renderUiText } from '@engine/chronicle/render';
+import { roleKeyFor } from '@derive/crown';
 import { isHere, population } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import type { GameState, Villager } from '@engine/state';
@@ -112,9 +113,17 @@ export function peopleScope(state: GameState): { named: number; population: numb
   return { named: namedPresent(state).length, population: population(state) };
 }
 
-/** A trade word if the villager has one, in the same voice as a trait: lowercase, no sentence. */
-function tradeLine(v: Villager): string | null {
-  return v.role === null ? null : renderUiText(`role.${v.role}`);
+/**
+ * A trade word if the villager has one, in the same voice as a trait: lowercase,
+ * no sentence.
+ *
+ * K-5 · **y «king» si lleva la corona.** El motor llama `leader` a ese asiento y
+ * lo seguirá llamando así —se guarda en las partidas—, así que la palabra la
+ * pone `derive/crown.ts` y esta línea sólo la pide.
+ */
+function tradeLine(state: GameState, v: Villager): string | null {
+  const key = roleKeyFor(state, v);
+  return key === null ? null : renderUiText(key);
 }
 
 function traitsLine(v: Villager): string {
@@ -176,7 +185,7 @@ export const peoplePanel: PanelFactory = (actions) => {
       // la ficha: son la misma persona vista dos veces, y leerla igual en las
       // dos ahorra el trabajo de volver a situarse.
       name.textContent = `${v.name} · ${renderUiText('inspect.age.short', { age: ageOf(v, state.tick) })}`;
-      const trade = tradeLine(v);
+      const trade = tradeLine(state, v);
       const stats = document.createElement('span');
       stats.textContent = trade ?? '';
       stats.hidden = trade === null;

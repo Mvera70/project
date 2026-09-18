@@ -16,7 +16,8 @@ import { population } from '@engine/people/demography';
 import { crownCandidates, crownRefusal, kingOf, RESTING_WILL, styleOf, will } from '@engine/people/crown';
 import { crownKing } from '@engine/world/crown';
 import { applyEffect } from '@engine/crossroads/resolve';
-import { CROSSROAD_BANK } from '@engine/chronicle/bank.en';
+import { CROSSROAD_BANK, UI_BANK } from '@engine/chronicle/bank.en';
+import { crownRow, roleKeyFor } from '@derive/crown';
 import type { GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 
@@ -287,5 +288,54 @@ describe('K-3 · la corona pasa por la sucesión', () => {
     expect(typeof body).toBe('string');
     expect(String(body).toLowerCase()).not.toContain('leader');
     expect(String(body).toLowerCase()).not.toContain('king');
+  });
+});
+
+describe('K-5 · lo que la pantalla lee de la corona', () => {
+  it('sin rey, la fila trae candidatos con lo que hace falta para elegir', () => {
+    const state = rich();
+    const row = crownRow(state, TIME.WEEKS_PER_YEAR);
+    expect(row.style).toBeNull();
+    expect(row.candidates.length).toBeGreaterThan(0);
+    for (const who of row.candidates) {
+      expect(who.name.length).toBeGreaterThan(0);
+      expect(who.age).toBeGreaterThanOrEqual(CROWN.CANDIDATE_AGES[0]);
+      // **Hacia dónde tiraría el valle con él**, que es la información nueva y
+      // la que hace legible la elección.
+      expect(who.styleKey.startsWith('crown.style.')).toBe(true);
+      expect(UI_BANK[who.styleKey], who.styleKey).toBeDefined();
+      for (const key of who.traitKeys) expect(UI_BANK[key], key).toBeDefined();
+      if (who.roleKey !== null) expect(UI_BANK[who.roleKey], who.roleKey).toBeDefined();
+    }
+  });
+
+  it('con rey, la fila no ofrece nada y dice desde cuándo reina', () => {
+    // La corona no se quita ni se cambia de cabeza: cuando el rey muera la
+    // pasará la sucesión (§6.6), que es lo que cobra el interregno.
+    const state = rich();
+    const who = crownCandidates(state)[0];
+    if (who === undefined) return;
+    crownKing(state, who.id, 'spring', 3);
+    const row = crownRow(state, TIME.WEEKS_PER_YEAR);
+    expect(row.candidates).toHaveLength(0);
+    expect(row.style).not.toBeNull();
+    expect(row.kingName).toBe(who.name);
+    expect(row.sinceYear).toBeGreaterThan(0);
+  });
+
+  it('y el asiento se lee «king» sólo cuando hay corona', () => {
+    // El identificador del motor sigue siendo `leader` para siempre —siete
+    // plantillas lo reparten y se guarda en las partidas—, así que la palabra la
+    // pone esta capa y nada más.
+    const state = rich();
+    const leader = state.people.villagers.find(
+      (v) => v.role === 'leader' && v.diedTick === null && v.leftTick === null,
+    );
+    expect(leader).toBeDefined();
+    if (leader === undefined) return;
+    expect(roleKeyFor(state, leader)).toBe('role.leader');
+    crownKing(state, leader.id, 'spring', 3);
+    expect(roleKeyFor(state, leader)).toBe('role.king');
+    expect(UI_BANK['role.king']).toBeDefined();
   });
 });

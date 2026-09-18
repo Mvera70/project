@@ -24,6 +24,9 @@ const means = opt('means', '');
 // semana, por la misma razón: la visita del lobo sale pocas veces en sesenta
 // años y esperarla mirando no es grabarla.
 const happening = opt('happening', '');
+// K-5 · `--crown ready` deja la fila de la corona encendida y `--crown <oficio>`
+// corona ya a alguien de ese oficio, para ver la sala y el estilo del valle.
+const crown = opt('crown', '');
 if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || fps <= 0 || lead < 0 || lead > 120
   || !Number.isInteger(advanceWeeks) || advanceWeeks < 0) throw new Error('Usa fps divisor de 30, lead entre 0 y 120 y advance entero positivo.');
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
@@ -43,9 +46,11 @@ try {
   const errors = [];
   tab.on('pageerror', e => errors.push(String(e)));
   const pageUrl = pathToFileURL(resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html')));
-  const debugRoute = means !== '' || happening !== '';
+  const debugRoute = means !== '' || happening !== '' || crown !== '';
   if (debugRoute) {
-    const extra = (means === '' ? '' : `&means=${means}`) + (happening === '' ? '' : `&happening=${happening}`);
+    const extra = (means === '' ? '' : `&means=${means}`)
+      + (happening === '' ? '' : `&happening=${happening}`)
+      + (crown === '' ? '' : `&crown=${crown}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
   await tab.goto(pageUrl.href);

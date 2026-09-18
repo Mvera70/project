@@ -1,13 +1,15 @@
 // M-19 · Deterministic debug route for automated screenshots.
 
 import { skyAt } from '../derive/weather';
-import { OFFER, TIME } from '@engine/balance';
+import { CROWN, OFFER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { MEANS_SPEC, giveMeans } from '@engine/world/means';
+import { crownCandidates } from '@engine/people/crown';
+import { crownKing } from '@engine/world/crown';
 import { postOffer } from '@engine/world/road';
-import type { GameState, HappeningId, MeansId, Season } from '@engine/state';
+import type { GameState, HappeningId, MeansId, Role, Season } from '@engine/state';
 import { SEASONS, seasonOf, yearOf } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
 import { paletteFor } from '@derive/palette';
@@ -164,6 +166,32 @@ export function giveNow(state: GameState, id: MeansId): void {
  */
 export function happenNow(state: GameState, id: HappeningId): void {
   state.happenings.push({ tick: state.tick, id, visible: [], who: [] });
+}
+
+/**
+ * K-5 · Deja el valle **listo para coronar**, para poder fotografiar la fila.
+ *
+ * Es lo que le da su estado a `?crown=ready`. Hace falta por lo mismo que
+ * `?means=`: la corona pide treinta personas y treinta de plata, y una captura
+ * no puede esperar a que la aldea junte las dos cosas. No corona a nadie: deja
+ * la fila encendida y la decisión al jugador, que es de lo que va la pantalla.
+ */
+export function crownReady(state: GameState): void {
+  state.village.silver = Math.max(state.village.silver, CROWN.SILVER * 2);
+}
+
+/**
+ * Y corona al primer candidato, para fotografiar lo que viene después.
+ *
+ * `?crown=<oficio>`: el oficio se le pone a mano —lo que se quiere ver es un rey
+ * de ese estilo, no si la semilla tenía herrero— igual que `crown-will.test.ts`.
+ */
+export function crownNow(state: GameState, trade: string): void {
+  crownReady(state);
+  const who = crownCandidates(state)[0];
+  if (who === undefined) return;
+  if (trade !== 'any') who.role = trade as Role;
+  crownKing(state, who.id, seasonOf(state.tick), yearOf(state.tick));
 }
 
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {

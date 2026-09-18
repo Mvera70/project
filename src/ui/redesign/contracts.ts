@@ -9,7 +9,7 @@
 // Nadie más define estos tipos: un consumidor que necesite otra ruta reabre
 // §11.2 con el coordinador en vez de añadirla en silencio (UI-R0 §8).
 
-import type { ArchivedGame, GameState, MeansId } from '@engine/state';
+import type { ArchivedGame, GameState, MeansId, VillagerId } from '@engine/state';
 import type { InspectTarget } from '../inspect';
 import type { Speed } from '../speed';
 import type { ActorDoing } from '../../render3d/contracts';
@@ -67,6 +67,14 @@ export interface UiActions {
    * sólo lo pide.
    */
   give(means: MeansId): void;
+  /**
+   * K-5 · **Darle la corona a alguien.** Es el mismo verbo que `give` —se paga
+   * con lo del valle y lo que la aldea haga con ello lo deciden sus sistemas—
+   * sólo que lo que se da es a una persona, así que lleva su `id`. El panel no
+   * comprueba si se puede: eso lo decide el motor (`crownRefusal`) y el panel lo
+   * repite para pintarse.
+   */
+  crown(who: VillagerId): void;
 }
 
 /**

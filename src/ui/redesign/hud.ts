@@ -52,6 +52,7 @@
 // toque el texto y el control a la vez, documentado en el informe de ronda.
 import { TIME } from '@engine/balance';
 import { renderUiText } from '@engine/chronicle/render';
+import { crownRefusal } from '@engine/people/crown';
 import type { GameState, Season } from '@engine/state';
 import {  } from '@engine/state';
 import { seasonOf } from '@engine/time';
@@ -576,7 +577,11 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     // hacían daño (`plan-medios.md` §1). Lo que dice ahora es si hay algo que
     // el valle pueda dar, que es lo único que hace falta saber sin abrirlo: si
     // no alcanza para nada, no merece la pena el toque.
-    const canGiveSomething = MEANS_IDS.some((id) => refusalFor(state, id) === null);
+    // K-5 · **y la corona cuenta como algo que dar.** Es lo más grande del
+    // carro, así que un valle que puede coronar y no puede pagar nada más tiene
+    // que decir que hay algo, o la puerta mentiría.
+    const canGiveSomething = MEANS_IDS.some((id) => refusalFor(state, id) === null)
+      || crownRefusal(state) === null;
     const cartLine = renderUiText(canGiveSomething ? 'cart.some' : 'cart.nothing');
     if (ordersNow.textContent !== cartLine) ordersNow.textContent = cartLine;
     ordersNow.dataset.cart = canGiveSomething ? 'ready' : 'empty';

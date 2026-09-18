@@ -15,6 +15,9 @@
 
 import { renderUiText } from '@engine/chronicle/render';
 import { MEANS_IDS, type MeansId, type VillageStats } from '@engine/state';
+import { CROWN, TIME } from '@engine/balance';
+import { crownRefusal } from '@engine/people/crown';
+import { crownRow } from '@derive/crown';
 import { MEANS_SPEC, refusalFor } from '@engine/world/means';
 import type { UiActions, UiPanel, UiSnapshot } from './contracts';
 
@@ -62,6 +65,17 @@ const CSS = `
    diferencia entre un botón gris y una respuesta. */
 .cart-give[disabled] { opacity: .45; }
 .cart-why { margin: 0; color: var(--skin-ink-faded); font: italic 14px/1.3 var(--skin-font-read); }
+/* K-5 · la corona. Una fila por candidato dentro de la fila de la corona: la
+   misma tira de pergamino de la lista de la gente, con su medalla, sus
+   inviernos, su oficio y hacia dónde tiraría el valle con él. */
+.cart-who { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cart-who-row { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 12px; border-top: 1px solid var(--skin-rule); }
+.cart-who-of { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cart-who-name { font-family: var(--skin-font-voice); font-weight: 600; }
+.cart-who-lean { color: var(--skin-ink-faded); font: italic 14px/1.3 var(--skin-font-read); }
+.cart-who-traits { color: var(--skin-ink-soft); font: 400 13px/1.3 var(--skin-font-read); }
+.cart-reigns { margin: 0; font-family: var(--skin-font-voice); }
 `;
 
 function ensureStyle(): void {
@@ -154,9 +168,90 @@ export function cartPanel(actions: UiActions): UiPanel {
     rows.set(id, { element: row, give, why });
   }
 
+  // K-5 · **la fila de la corona**, detrás de las seis cosas. Va última porque
+  // es la decisión más grande del carro: se paga una vez por generación y no se
+  // deshace.
+  const crownBox = document.createElement('div');
+  crownBox.className = 'skin-plate skin-plate--card cart-row';
+  const crownHead = document.createElement('div');
+  crownHead.className = 'cart-row-head';
+  const crownName = document.createElement('h3');
+  crownName.className = 'skin-inscription cart-name';
+  crownName.textContent = renderUiText('cart.crown');
+  crownHead.append(crownName);
+  const crownWhat = document.createElement('p');
+  crownWhat.className = 'cart-what';
+  crownWhat.textContent = renderUiText('cart.crown.what');
+  const crownCost = document.createElement('div');
+  crownCost.className = 'cart-cost';
+  crownCost.append(coin('silver', CROWN.SILVER));
+  const crownWho = document.createElement('ul');
+  crownWho.className = 'cart-who';
+  const crownReigns = document.createElement('p');
+  crownReigns.className = 'cart-reigns';
+  crownReigns.hidden = true;
+  const crownWhy = document.createElement('p');
+  crownWhy.className = 'cart-why';
+  crownWhy.hidden = true;
+  crownBox.append(crownHead, crownWhat, crownCost, crownReigns, crownWho, crownWhy);
+  element.append(crownBox);
+
   return {
     element,
     update(snapshot: UiSnapshot): void {
+      // K-5 · la corona: o dice quién reina, o pone a los candidatos con lo que
+      // hace falta para elegir, o dice por qué todavía no.
+      const row = crownRow(snapshot.state, TIME.WEEKS_PER_YEAR);
+      const refusal = crownRefusal(snapshot.state);
+      crownReigns.hidden = row.style === null;
+      if (row.style !== null) {
+        crownReigns.textContent = row.kingName === null
+          ? renderUiText('cart.crown.empty')
+          : renderUiText('cart.crown.reigns', { name: row.kingName, year: row.sinceYear ?? 0 });
+      }
+      crownCost.hidden = row.style !== null;
+      const wanted = row.candidates.map((who) => who.id).join(',');
+      if (crownWho.dataset.who !== wanted) {
+        crownWho.dataset.who = wanted;
+        crownWho.replaceChildren();
+        for (const who of row.candidates) {
+          const item = document.createElement('li');
+          item.className = 'cart-who-row';
+          const of = document.createElement('div');
+          of.className = 'cart-who-of';
+          const name = document.createElement('span');
+          name.className = 'cart-who-name';
+          name.textContent = renderUiText('cart.crown.winters', { name: who.name, age: who.age });
+          const lean = document.createElement('span');
+          lean.className = 'cart-who-lean';
+          lean.textContent = renderUiText(who.styleKey);
+          of.append(name, lean);
+          if (who.roleKey !== null || who.traitKeys.length > 0) {
+            const traits = document.createElement('span');
+            traits.className = 'cart-who-traits';
+            traits.textContent = [
+              ...(who.roleKey === null ? [] : [renderUiText(who.roleKey)]),
+              ...who.traitKeys.map((key) => renderUiText(key)),
+            ].join(' · ');
+            of.append(traits);
+          }
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'skin-button--wood cart-give';
+          button.textContent = renderUiText('cart.crown.give');
+          button.addEventListener('click', () => { actions.crown(who.id); });
+          item.append(of, button);
+          crownWho.append(item);
+        }
+      }
+      for (const button of crownWho.querySelectorAll('button')) {
+        button.disabled = refusal !== null;
+      }
+      const crownNo = refusal === null || refusal === 'already' || refusal === 'who'
+        ? '' : renderUiText(`cart.no.${refusal}`);
+      if (crownWhy.textContent !== crownNo) crownWhy.textContent = crownNo;
+      crownWhy.hidden = crownNo === '';
+
       for (const id of MEANS_IDS) {
         const row = rows.get(id);
         if (row === undefined) continue;
