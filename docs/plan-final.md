@@ -47,7 +47,9 @@ hojas de todas las partidas, una al lado de otra).
   - Al acabar, `archiveGame` (`engine/save.ts`) guarda en `save.archive` cada
     partida pasada: semilla, tick del final, causa, pico de población, la
     crónica entera y las ruinas. **Comparar partidas es leer esa lista**, y ya
-    está en el guardado del jugador, en su dispositivo.
+    está en el guardado del jugador, en su dispositivo. Pesa **387 a 400 kB por
+    partida**, medido en tres semillas de ochenta años, y de ahí sale la
+    decisión 3 de §5.
 
 Lo que **no** hay: ninguna animación del final (la hoja sube y ya), ninguna
 estadística más allá de la línea de resumen, y ninguna pantalla que ponga dos
@@ -71,7 +73,7 @@ el valle. Lo que sube no es una hoja: primero es **la inscripción**.
    inscripción (`--skin-track-inscription`), en tinta roja, que se escribe
    **letra a letra** como se graba: «THE VALLEY WAS TAKEN» · «ANNO 43». Es lo
    más cerca de «game over» que este juego puede decir sin salirse de su
-   registro, y **qué dice exactamente es decisión del dueño** (ver §5).
+   registro, y es lo que dice: la decisión 1 de §5 está cerrada.
 4. Un segundo de silencio, y **entonces** sube la hoja de pergamino de siempre
    (`epitaph.ts`), con la inscripción bajando hasta convertirse en su título.
    Lo que ya está hecho no cambia de sitio: cambia lo que pasa antes.
@@ -107,7 +109,10 @@ dibuja `chronicle-ornaments.ts` a cada lado del título.
 |---|---|
 | **Los años** que duró el valle | `yearOf(endedTick)` |
 | **La gente en su mejor momento** | `peakPeople` |
-| **Cómo acabó** | `cause`, con su palabra: *taken · empty · left · scattered* |
+| **Los asaltos que aguantó** | los partes con `held`, o `threat.raids` menos el que lo tumbó |
+
+La causa **no** está entre las tres, y es deliberado: ya es el título de la
+lápida y una etiqueta no se compara (decisión 2 de §5).
 
 **La cuenta larga** (dos columnas, ocho a doce filas; las marcadas con ★ salen
 de la crónica con `welcomeDigest` sobre la partida entera, las marcadas con ◆
@@ -162,11 +167,11 @@ una memoria.
 guarde ya; lo único es que las partidas archivadas antes de este plan tendrán
 sólo las cifras de crónica (§2).
 
-**Cuántas se guardan.** Hoy el archivo crece sin tope: cada partida lleva su
-crónica entera (miles de entradas) y el guardado vive en `localStorage`. Con
-diez partidas de sesenta años son varios megas. **Hay que decidir un tope** (ver
-§5) y a partir de él guardar sólo el `ledger` y las cien últimas líneas de las
-más antiguas.
+**Cuántas se guardan.** Hoy el archivo crece sin tope y eso no aguanta: medido,
+una partida archivada pesa **387 a 400 kB** y el guardado vive en
+`localStorage`. La decisión 3 de §5 lo cierra en tres tamaños —hoja de cuentas
+de todas, crónica entera de las tres últimas, titulares de las demás— y la poda
+va en esta fase.
 
 **Dificultad: media (Sol)** — una pantalla nueva con la piel, y la poda del
 archivo.
@@ -181,6 +186,7 @@ F3b · la hoja de cuentas sobre epitaph.ts                     (Luna)           
 F3c · la lápida: capitular, inscripción letra a letra, retardo (Sol)             ← nada
 F3d · el cronicón, desde la hoja y desde el menú              (Sol)             ← F3a
 F3e · captura de las cuatro causas y una toma de la animación (Luna/Terra)      ← F3b, F3c
+F3f · la hoja como imagen para compartir                      (Sol)             ← F3b · sin prioridad
 ```
 
 F3a y F3c no dependen una de otra y pueden ir a la vez. Lo que más se ve por
@@ -190,24 +196,62 @@ tres o cuatro no se nota.
 
 ---
 
-## 5 · Lo que decide el dueño
+## 5 · Las cuatro decisiones, cerradas
 
-1. **Qué dice la inscripción.** «GAME OVER» no está en el registro de este
-   juego —nada de lo que lee el jugador rompe la ficción— y lo que hay hoy es
-   *The valley is empty* / *was taken*. Propuesta: la inscripción es **la causa
-   en versales y el año** («THE VALLEY WAS TAKEN · ANNO 43»), y la capitular es
-   su letra. Si quieres un «Game Over» literal, cabe como segunda línea pequeña
-   bajo la inscripción, pero es una decisión de registro y es tuya.
-2. **Las tres cifras grandes.** Propuestas: años, gente en su mejor momento,
-   causa. Alternativa igual de defendible: años, gente, **asaltos aguantados**,
-   que es la de la fase 4. Depende de qué quieres que un jugador presuma.
-3. **El tope del archivo**: cuántas partidas pasadas se guardan enteras.
-   Propuesta: las diez últimas enteras y sólo la hoja de cuentas de las demás.
-4. **Compartir.** «Fácil de comparar» puede querer decir también *enseñarla a
-   otro*: la hoja de cuentas como imagen (un PNG de la página, con el
-   ornamento) para mandarla. Es una ronda aparte y pequeña, si la quieres.
+El dueño del diseño dio el plan por bueno y pidió cerrarlo sin preguntar más
+(18 sep 2026: «si necesitas hacerme alguna pregunta para cerrar el plan,
+simplemente cierra el plan»). Quedan cerradas así, cada una con su motivo, y
+cualquiera de las cuatro se puede revocar con una frase suya.
 
----
+**1 · La inscripción no dice «GAME OVER». Dice la causa y el año.**
+
+«THE VALLEY WAS TAKEN · ANNO 43», en versales de Cinzel y tinta roja, con la
+capitular de su letra. El motivo es una regla del proyecto y no un gusto: nada
+de lo que lee el jugador se sale de la ficción —la crónica, la interfaz y los
+nombres están todos dentro de ella— y «game over» es la única frase de todo el
+juego que hablaría del juego y no del valle. La lápida **es** el game over: la
+pantalla se para, el valle se atenúa y una inscripción se graba encima. Si algún
+día se quiere el letrero literal, cabe en pequeño bajo la inscripción sin tocar
+nada de lo demás.
+
+**2 · Las tres cifras grandes son años, gente en su mejor momento y asaltos
+aguantados.**
+
+La causa **no** ocupa una de las tres, y es por lo que se pidió: «muy fácil de
+comparar». La causa es una etiqueta y no se compara —ya es el título de la
+lápida, tres centímetros más arriba— así que gastar un tercio de la fila en
+repetirla sería gastarlo en nada. Con tres números se comparan dos partidas de
+un vistazo, y el tercero es el de la fase 4: **cuántas veces aguantó el cerco**
+es de lo que un jugador presume.
+
+**3 · El archivo guarda la hoja de cuentas de todas las partidas, la crónica
+entera de las tres últimas, y sólo los titulares de las demás.**
+
+Medido en tres semillas de ochenta años: una partida archivada pesa **387 a
+400 kB**, de los que la crónica son 317 a 330 (2 500 a 2 700 entradas). El
+guardado vive en `localStorage`, que da unos cinco megas para todo **y tiene que
+caber además la partida viva**, que pesa lo mismo. Diez partidas enteras son
+cuatro megas y se estrella contra la pared.
+
+Así que tres tamaños y no dos:
+
+| Qué se guarda | Pesa | De cuántas partidas |
+|---|---|---|
+| La hoja de cuentas (`ledger`) | menos de 1 kB | **de todas**, sin tope |
+| La crónica entera | 320 kB | de las **tres últimas** |
+| Sólo los titulares (peso 3) | **47 a 64 kB** (338 a 459 entradas) | de las demás |
+
+Los titulares son exactamente lo que §9.2 reserva para «el momento del siglo»
+—la fundación, la peste, la sucesión, el cerco cerrado, el asalto, el final— o
+sea que una partida vieja conserva **su historia** y pierde el día a día. Con
+veinte partidas eso es un mega largo y no se toca el tope del navegador.
+
+**4 · La hoja como imagen para compartir: sí, y va última.**
+
+Entra como **F3f**, después de todo lo demás y sin prioridad: la página tiene
+que existir antes de poder fotografiarla, y el juego ya sabe hacerlo
+(`npm run shot` fotografía el juego empaquetado, así que el mecanismo está).
+No se diseña ahora.
 
 ## 6 · Lo que no es de este plan
 
