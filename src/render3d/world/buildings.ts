@@ -101,6 +101,11 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   chapel: 'chapel',
   church: 'church',
   well: 'well',
+  // K-4 · la sala del rey. **Todavía sin malla**: el encargo de arte está en
+  // `docs/plan-rey.md` §8, y hasta que exista el render la dibuja con su propio
+  // aspecto —más alta que una casa y con el tejado burdeos del jefe— por el
+  // mismo camino que el barril y el arado.
+  hall: 'hall',
 };
 
 /**

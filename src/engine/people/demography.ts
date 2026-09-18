@@ -21,6 +21,7 @@ import type {
   Villager,
   VillagerId,
 } from '../state';
+import { will } from './crown';
 import { weekOf } from '../time';
 import { ageOf, makeVillager } from './villagers';
 import { rollCharacter } from './traits';
@@ -320,7 +321,13 @@ export function resolveMigration(state: GameState): MigrationEvent[] {
   if (gatesOpen) {
     // Una aldea pequeña atrae más: es lo que hace que una pareja sea aldea en
     // la primera década. Ver `MIGRATION.ARRIVE_SMALL_BELOW`.
-    const chance = small ? MIGRATION.ARRIVE_CHANCE_SMALL : MIGRATION.ARRIVE_CHANCE;
+    // K-2 · **y la puerta la abre o la cierra quien manda.** Un rey miedoso
+    // recibe menos: `will().gate` es 0,7 con el rasgo `craven` y 1 sin él, así
+    // que la tirada es la misma de siempre —una por año— contra un número
+    // distinto. Es la misma dimensión que `CHARACTER.CRAVEN_LEAVES` vista desde
+    // el trono: el cobarde que se iba del valle, mandando, no deja entrar.
+    const chance = (small ? MIGRATION.ARRIVE_CHANCE_SMALL : MIGRATION.ARRIVE_CHANCE)
+      * will(state).gate;
     if (next(state.rng, 'births') >= chance) return [];
     return [arrive(state)];
   }

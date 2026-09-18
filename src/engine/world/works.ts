@@ -13,6 +13,7 @@ import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, TRAITS, WORLD } from '../balance
 import { hasTrait, PRIORITY_FAMILIES } from '../state';
 import { count, has, smithyWorking, standing } from '../subsistence/building-counts';
 import { housingCapacity, population } from '../people/demography';
+import { will } from '../people/crown';
 import { storageCapacity } from '../subsistence/harvest';
 import { TERRAIN_CODE } from '../state';
 import type { BuildingKind, ConstructionWork, GameState } from '../state';
@@ -35,6 +36,16 @@ interface NoProjectSnapshot {
   stoneHouseUnlocked: boolean;
   buildings: string;
   terrain: Uint8Array;
+  /**
+   * K-2 · el estilo del rey.
+   *
+   * **Sin esto, coronar no se nota hasta que cambie otra cosa.** `NO_PROJECT` es
+   * una caché de «aquí no hay nada que construir» que sólo se invalida si su
+   * instantánea cambia, y la voluntad del rey mueve el orden y abre la muralla:
+   * una aldea que había llegado a «nada que hacer» seguiría diciéndolo con un
+   * rey herrero recién coronado.
+   */
+  style: string;
 }
 
 const NO_PROJECT = new WeakMap<GameState, NoProjectSnapshot>();
@@ -74,6 +85,7 @@ function projectSnapshot(state: GameState): NoProjectSnapshot {
     stoneHouseUnlocked: flagNow(state, 'stone_house_unlocked'),
     buildings: buildingSignature(state),
     terrain: Uint8Array.from(state.map.terrain),
+    style: will(state).style ?? 'none',
   };
 }
 
@@ -222,7 +234,11 @@ export function nextProject(state: GameState): Project | null {
   // 7 · the mill
   if (!has(state, 'mill') && people >= BUILDING_RULES.MILL_PEOPLE) wanted.push('mill');
   // 8 · the palisade
-  if (has(state, 'smithy') && threatened) wanted.push('palisade');
+  // K-2 · con un rey herrero, la muralla no espera a que haya amenaza: es lo que
+  // «si eliges al herrero, pues haces más armas» significa en un juego que no
+  // tiene armas como montón (§7.12: las armas son la muralla y el señor que la
+  // cuenta).
+  if (has(state, 'smithy') && (threatened || will(state).arms)) wanted.push('palisade');
 
   // **E3 · lo que el jugador quiere antes va antes.**
   //
@@ -235,9 +251,15 @@ export function nextProject(state: GameState): Project | null {
   // Es la palanca que da el lado bueno del triángulo: E1 midió que con las dos
   // primeras el jugador podía hacerlo peor que la aldea sola pero casi nunca
   // mejor, porque el **qué** construir no era suyo.
-  const family = state.intent.priority === 'none'
-    ? null
-    : PRIORITY_FAMILIES[state.intent.priority];
+  //
+  // **Y desde K-2 la palanca es el rey.** `state.intent` se quedó sin quien lo
+  // escriba cuando M-2 retiró las órdenes (la hoja de la interfaz está
+  // borrada), así que lo que adelanta una familia es ahora la voluntad de quien
+  // lleva la corona: el herrero pide muralla, el del campo comida, el cura
+  // capilla y el noble su sala. Sin rey, `will()` devuelve `'none'` y §7.3
+  // queda exactamente como estaba.
+  const crownPriority = will(state).priority;
+  const family = crownPriority === 'none' ? null : PRIORITY_FAMILIES[crownPriority];
   const ordered = family === null
     ? wanted
     : [...wanted].sort((a, b) => Number(family.includes(b)) - Number(family.includes(a)));

@@ -49,6 +49,8 @@ import { fitsCircle, type Point, type Terrain } from './body';
 export const WALLED: ReadonlySet<string> = new Set([
   'house', 'stone_house', 'granary', 'chapel', 'church',
   'smithy', 'mill', 'watchtower', 'palisade', 'wall',
+  // K-4 · la sala del rey es una casa: se rodea, no se atraviesa.
+  'hall',
 ]);
 
 /**

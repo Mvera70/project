@@ -130,6 +130,11 @@ const graveYard: Sprite = (ctx, x, y, cell, palette) => {
 export const BUILDING_SPRITES: Readonly<Record<BuildingKind, Sprite>> = {
   house, stone_house: stoneHouse, field, granary, chapel, church, smithy, mill,
   well, palisade, wall, watchtower, grave_yard: graveYard,
+  // K-4 · la sala del rey en el render plano, que es el camino de reserva
+  // (`?render=canvas`): la casa de piedra, que es la silueta más grande que
+  // este render tiene. El 3D la dibuja con su propio aspecto y su tejado
+  // burdeos; aquí basta con que no falte.
+  hall: stoneHouse,
 };
 
 export const NAMED_TONES = ['#a34f3f', '#3f6fa3', '#7b5aa6', '#b27636', '#3e8063', '#9a4770', '#65733b', '#776154'] as const;

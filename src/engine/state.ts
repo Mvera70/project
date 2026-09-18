@@ -338,7 +338,10 @@ export type BuildingKind =
   | 'church'
   | 'stone_house'
   | 'watchtower'
-  | 'grave_yard';
+  | 'grave_yard'
+  // K-4 · la sala del rey: la casa que se diferencia, y la única construcción
+  // que sólo existe si alguien lleva la corona.
+  | 'hall';
 
 export interface Building {
   id: BuildingId;

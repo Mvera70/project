@@ -11,8 +11,9 @@
 // never reaches for a global, which is also what lets the tests drive this with
 // a handful of fake templates.
 
-import { CROSSROADS, TIME } from '../balance';
+import { CROWN, CROSSROADS, TIME } from '../balance';
 import { population } from '../people/demography';
+import { will } from '../people/crown';
 import { weighted } from '../rng';
 import type { GameState, PendingCrossroad, VillagerId } from '../state';
 import { fillCast } from './cast';
@@ -207,6 +208,17 @@ export function eligible(state: GameState, catalogue: Catalogue): ScoredTemplate
     }
     if (t.category === 'lord' && flagSet(state, 'a_name_in_the_valley')) {
       storyCandidates.push(CROSSROADS.VALLEY_NAME_LORD_MULTIPLIER);
+    }
+    // K-2 · **el señor cuenta las armas.** Un valle cuyo rey es el herrero
+    // levanta muralla sin esperar a que haya amenaza (§7.3, punto 8), y eso se
+    // ve desde fuera: es el precio de «si eliges al herrero, pues haces más
+    // armas» en un juego donde las armas son la muralla y quien la mira.
+    //
+    // Entra como candidato y no como producto, así que si el valle está además
+    // detrás de un muro (0,4) gana el muro, que es lo correcto: un rey armado
+    // **detrás de una muralla** molesta menos que uno sin ella.
+    if (t.category === 'lord' && will(state).style === 'forge') {
+      storyCandidates.push(CROWN.FORGE_LORD);
     }
     let storyMult = 1;
     for (const candidate of storyCandidates) {

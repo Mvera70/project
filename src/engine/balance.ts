@@ -1118,6 +1118,18 @@ export const CROWN = {
    */
   PLOUGH_FIELDS: 1.3,
   /**
+   * Cuántos campos más de los ocho de §12 rotura un rey del campo.
+   *
+   * TUNE: 2, o sea diez en vez de ocho. **Y este número existe porque el otro no
+   * bastaba**: medido al escribir la prueba de K-2, `PLOUGH_FIELDS` solo no
+   * cambia nada en una aldea hecha —§5.2 trabaja `min(campos, necesarios,
+   * dotables)` y con cuarenta personas los ocho campos ya están todos
+   * trabajados—, así que el rey del campo era un rey sin efecto. Dos campos más
+   * son 1 200 de cosecha llena al año, que es comida para once personas: se ve
+   * en el granero y se ve en el mapa.
+   */
+  PLOUGH_MORE_FIELDS: 2,
+  /**
    * Lo que el rey herrero le añade al interés del señor.
    *
    * TUNE: 1,5, como candidato `story` de la categoría `lord` (§8.6). Un valle
@@ -1344,6 +1356,12 @@ export const BUILDINGS = {
   smithy: { w: 2, h: 2, wood: 140, stone: 0, bp: 100, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // LABOUR.SMITHY_BONUS; enables stone
   mill: { w: 2, h: 2, wood: 180, stone: 0, bp: 140, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // FOOD.MILL_BONUS
   palisade: { w: 1, h: 1, wood: 30, stone: 0, bp: 20, cap: null, tier: 0, upgradeOf: null, byCrossroad: false }, // one segment
+  // K-4 · **la sala del rey**, la casa que se diferencia. Tres por tres como la
+  // iglesia, y la construcción de madera más cara del valle: más obra que el
+  // molino (180/140) y la misma madera que la iglesia, porque es lo más grande
+  // que la aldea levanta en madera. Tope uno, y sólo se pide con rey (§7.3,
+  // punto 2b). Arde como cualquier casa de madera: el caos es el juego.
+  hall: { w: 3, h: 3, wood: 200, stone: 0, bp: 160, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // CROWN.HALL_BEDS
   grave_yard: { w: 3, h: 2, wood: 0, stone: 0, bp: 25, cap: 1, tier: 0, upgradeOf: null, byCrossroad: true }, // MOOD.MORALE_GRAVEYARD
   wall: { w: 1, h: 1, wood: 0, stone: 40, bp: 60, cap: null, tier: 1, upgradeOf: 'palisade', byCrossroad: false },
   stone_house: { w: 2, h: 2, wood: 0, stone: 50, bp: 70, cap: null, tier: 1, upgradeOf: 'house', byCrossroad: false }, // does not burn

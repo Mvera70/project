@@ -35,6 +35,7 @@ import { destroyBuilding } from './buildings';
 import { herdCapacity, herdDensity } from '../subsistence/herd';
 import { storageCapacity } from '../subsistence/harvest';
 import { aleWindow } from './means';
+import { will } from '../people/crown';
 import { factorWants, postOffer } from './road';
 import { weekWeather } from './sky';
 
@@ -187,7 +188,10 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
       return state.people.namedIds.filter((id) => {
         const v = state.people.villagers.find((x) => x.id === id);
         return v !== undefined && isHere(v);
-      }).length >= 2 ? w * (aleWindow(state) ? FATE.ALE_QUARREL : 1) : 0;
+      // K-2 · y un rey de mal genio la hace más probable: es el empujón a las
+      // opiniones que R-1 dio con la riña, ahora con un motivo con nombre.
+      }).length >= 2
+        ? w * (aleWindow(state) ? FATE.ALE_QUARREL : 1) * will(state).quarrel : 0;
     case 'bear_in_the_wood':
       // En verano y otoño, que es cuando el oso baja a comer; en un valle de
       // bosque viejo, el doble.
@@ -416,7 +420,9 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       break;
     }
     case 'harvest_feast': {
-      moraleBy(state, FATE.FEAST_MORALE);
+      // K-2 · un rey cura mira mal la bebida, así que la fiesta vale la mitad de
+      // ánimo. La fe no se toca: lo que le molesta es la juerga, no la cosecha.
+      moraleBy(state, FATE.FEAST_MORALE * will(state).feast);
       faithBy(state, FATE.FEAST_FAITH);
       visible.push({ k: 'gather', where: has(state, 'chapel') || has(state, 'church') ? 'chapel' : 'square', days: 2 });
       break;
@@ -451,7 +457,10 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
     case 'ale_feast': {
       // M-2 · **el barril, y es el medio que le da al ánimo el reloj del
       // jugador**: sube de golpe esta semana, no dentro de un año.
-      moraleBy(state, FATE.ALE_MORALE);
+      // K-2 · y con un rey cura, el barril vale la mitad: es lo que hace que ese
+      // medio y ese rey no se lleven bien, y una decisión del jugador que se
+      // nota.
+      moraleBy(state, FATE.ALE_MORALE * will(state).feast);
       faithBy(state, FATE.ALE_FAITH);
       visible.push({ k: 'gather', where: 'square', days: 2 });
       break;

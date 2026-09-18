@@ -64,8 +64,13 @@ describe('grafo de módulos del motor', () => {
       'time',
       'traits',
     ]);
+    // Y `crown` desde K-2: la puerta de los que llegan la abre o la cierra
+    // quien lleva la corona (§5.7). `people/crown.ts` es una hoja a propósito
+    // —no importa `demography`, y copia `isHere` en local— justamente para que
+    // esta flecha no se invierta.
     expect(importsOf('people/demography.ts')).toEqual([
       'balance',
+      'crown',
       'rng',
       'state',
       'time',
@@ -100,11 +105,14 @@ describe('grafo de módulos del motor', () => {
     // sistemas de §5 la usan y ninguno cuenta edificios por su cuenta.
     expect(importsOf('subsistence/building-counts.ts')).toEqual(['state']);
     expect(importsOf('subsistence/seasons.ts')).toEqual(['balance', 'rng', 'state', 'time']);
+    // K-2 · `people/crown`: los campos que se siembran y los puntos de obra
+    // salen de la voluntad del rey, donde antes salían de la postura retirada.
     expect(importsOf('subsistence/labour.ts')).toEqual([
       'balance',
       'building-counts',
       'crows',
       'forage',
+      'people/crown',
       'people/demography',
       'state',
     ]);
@@ -124,9 +132,12 @@ describe('grafo de módulos del motor', () => {
       'state',
       'time',
     ]);
+    // K-2 · `people/crown`: la fe del rey cura, el hambre del generoso y el
+    // ánimo de la corte.
     expect(importsOf('subsistence/mood.ts')).toEqual([
       'balance',
       'building-counts',
+      'people/crown',
       'people/demography',
       'state',
       'time',
@@ -159,8 +170,11 @@ describe('grafo de módulos del motor', () => {
     // siendo `tiles`; `plaza` sólo mira a `balance`, `state` y `tiles`.
     expect(importsOf('world/placement.ts')).toEqual(['balance', 'plaza', 'state', 'tiles']);
     expect(importsOf('world/plaza.ts')).toEqual(['balance', 'state', 'tiles']);
+    // K-2 · `people/crown`: el tope de campos lo levanta el rey del campo, que
+    // es lo único que la corona cambia de §12.
     expect(importsOf('world/buildings.ts')).toEqual([
       'balance',
+      'people/crown',
       'people/demography',
       'state',
       'subsistence/harvest',
@@ -181,9 +195,13 @@ describe('grafo de módulos del motor', () => {
       'time',
     ]);
     expect(importsOf('world/paths.ts')).not.toContain('forest');
+    // K-2 · `people/crown`: qué familia va delante en la cola de §7.3 y si la
+    // muralla espera a que haya amenaza lo dice ahora la voluntad del rey, no
+    // `state.intent` —que M-2 dejó sin quien lo escriba—.
     expect(importsOf('world/works.ts')).toEqual([
       'balance',
       'buildings',
+      'people/crown',
       'people/demography',
       'placement',
       'state',

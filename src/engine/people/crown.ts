@@ -40,6 +40,17 @@ export interface Will {
   readonly priority: PriorityName;
   /** Cuánto se esfuerza la aldea en sembrar (§5.2). 1 sin rey. */
   readonly fields: number;
+  /**
+   * Cuántos campos más de los que §12 permite puede roturar la aldea. 0 sin rey.
+   *
+   * **Y es lo que de verdad hace al rey del campo**, medido: `will.fields` solo
+   * casi nunca muerde, porque §5.2 trabaja `min(campos, necesarios, dotables)` y
+   * en una aldea hecha el tope de ocho campos es lo que manda —cuarenta personas
+   * ya trabajan los ocho, así que multiplicar «lo necesario» no añade nada—.
+   * Levantar el tope sí: el valle rotura tierra nueva, se ve en el mapa, y no es
+   * el efecto del arado (que libera manos) sino otro.
+   */
+  readonly moreFields: number;
   /** Si la muralla se levanta sin esperar a que haya amenaza (§7.3, punto 8). */
   readonly arms: boolean;
   /** Hacia qué fe deriva el valle, o nada si el rey no la toca (§5.6). */
@@ -64,7 +75,7 @@ export interface Will {
  * que ser byte a byte la de antes de esta fase, y la prueba de K-1 lo mide.
  */
 export const RESTING_WILL: Will = {
-  style: null, priority: 'none', fields: 1, arms: false, faithTo: null,
+  style: null, priority: 'none', fields: 1, moreFields: 0, arms: false, faithTo: null,
   feast: 1, gate: 1, quarrel: 1, works: 1, hunger: 1,
 };
 
@@ -114,6 +125,7 @@ export function will(state: GameState): Will {
       : style === 'plough' ? 'food'
         : style === 'chapel' ? 'faith' : 'court',
     fields: style === 'plough' ? CROWN.PLOUGH_FIELDS : 1,
+    moreFields: style === 'plough' ? CROWN.PLOUGH_MORE_FIELDS : 0,
     arms: style === 'forge',
     faithTo: style === 'chapel' ? CROWN.CHAPEL_FAITH_TO : null,
     feast: style === 'chapel' ? CROWN.CHAPEL_FEAST : 1,

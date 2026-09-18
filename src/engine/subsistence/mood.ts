@@ -9,8 +9,9 @@
 // endures disasters that would sink a faithless one — which is exactly why the
 // priest is dangerous.
 
-import { MOOD, TIME, MEANS } from '../balance';
+import { CROWN, MOOD, TIME, MEANS } from '../balance';
 import { housingCapacity, isHere, population } from '../people/demography';
+import { will } from '../people/crown';
 import { hasTrait } from '../state';
 import type { DeathCause, GameState, TickContext } from '../state';
 import { weekOf } from '../time';
@@ -57,7 +58,14 @@ const clamp = (x: number): number => Math.max(0, Math.min(100, x));
  * cara mala y la pone el propio medio con la bandera `watched`.
  */
 function faithTarget(state: GameState): number {
-  return hasTrait(state, 'relic') ? MEANS.RELIC_FAITH : MOOD.FAITH_DRIFT_TO;
+  // K-2 · **y el rey cura, si es el que más tira.** Dos fuentes de fe no se
+  // suman: gana la más alta, igual que los candidatos `story` de §8.6. Un valle
+  // con reliquia (62) y rey cura (50) deriva a 62, y con rey cura y sin reliquia,
+  // a 50 — que es por encima de lo que la capilla pide (45), así que la capilla
+  // llega sola.
+  const crown = will(state).faithTo ?? 0;
+  const relic = hasTrait(state, 'relic') ? MEANS.RELIC_FAITH : MOOD.FAITH_DRIFT_TO;
+  return Math.max(relic, crown);
 }
 
 export function updateMood(state: GameState, ctx: TickContext): void {
@@ -71,10 +79,18 @@ export function updateMood(state: GameState, ctx: TickContext): void {
   // --- §5.5 · morale ------------------------------------------------------
   let morale = state.village.morale;
   morale += (MOOD.MORALE_DRIFT_TO - morale) * MOOD.MORALE_DRIFT;
-  morale += MOOD.MORALE_HUNGER * ctx.severity;
+  // K-2 · el rey generoso reparte, así que el hambre cuesta menos ánimo: es la
+  // otra fila de §6.3 que estaba escrita y sin implementar («−3 · severidad en
+  // vez de −4», o sea tres cuartos).
+  morale += MOOD.MORALE_HUNGER * ctx.severity * will(state).hunger;
   morale += MOOD.MORALE_PER_DEATH * ctx.deaths;
   morale += MOOD.MORALE_CROWDING * Math.max(0, people - housingCapacity(state));
   if (chapel) morale += MOOD.MORALE_CHAPEL;
+  // K-2 · **la corte, cuando tiene dónde**: un rey noble con su sala en pie da
+  // ánimo por semana, menos que la capilla (0,1 contra 0,15) porque una corte no
+  // puede valer más que la iglesia. Sin sala no da nada: es la sala lo que se
+  // ve, no el título.
+  if (will(state).style === 'court' && has(state, 'hall')) morale += CROWN.COURT_MORALE;
   if (church) morale += MOOD.MORALE_CHURCH;
   if (mill) morale += MOOD.MORALE_MILL;
   if (outbreak) morale += MOOD.MORALE_OUTBREAK;

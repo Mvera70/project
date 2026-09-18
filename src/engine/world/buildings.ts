@@ -2,6 +2,7 @@ import { BUILDINGS, LIFE, TIME } from '../balance';
 import { housingCapacity, isHere } from '../people/demography';
 import { storageCapacity } from '../subsistence/harvest';
 import type { BuildingId, BuildingKind, GameState } from '../state';
+import { will } from '../people/crown';
 
 export interface BuiltEvent { id: BuildingId; kind: BuildingKind; upgradeOf: BuildingId | null }
 
@@ -16,8 +17,13 @@ export function familyOf(kind: BuildingKind): BuildingKind {
 
 export function withinCap(state: GameState, kind: BuildingKind): boolean {
   const family = familyOf(kind);
-  const cap = BUILDINGS[family].cap;
-  if (cap === null) return true;
+  const base = BUILDINGS[family].cap;
+  if (base === null) return true;
+  // K-2 · **el rey del campo rotura tierra nueva.** Es el único sitio donde la
+  // corona levanta un tope de §12, y tiene su motivo medido: multiplicar «lo que
+  // hace falta sembrar» no cambia nada en una aldea hecha, porque los ocho
+  // campos ya están todos trabajados (ver `CROWN.PLOUGH_MORE_FIELDS`).
+  const cap = family === 'field' ? base + will(state).moreFields : base;
   const standing = state.buildings.filter((b) => b.lostTick === null && familyOf(b.kind) === family).length;
   const reserved = state.works.filter((w) => w.upgradeOf === null && familyOf(w.kind) === family).length;
   return standing + reserved < cap;

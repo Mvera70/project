@@ -30,6 +30,7 @@
 import { FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
 import { population, workforce } from '../people/demography';
 import { hasTrait, INTENT_RANGE } from '../state';
+import { will } from '../people/crown';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
 import { foragingUrgency, hasRiver } from './forage';
@@ -56,12 +57,17 @@ export function allocateLabour(state: GameState): Allocation {
   const w = workforce(state);
   const people = population(state);
 
-  // La postura, recortada a su rango: un estado cargado de un fichero puede
-  // traer cualquier cosa, y `intent` es lo primero de este juego que viene de
-  // fuera del motor.
+  // **Lo que el rey quiere, recortado a su rango.** Hasta K-2 esto era
+  // `state.intent`, la postura que el jugador movía con las palancas de v2.0; M-2
+  // las retiró y desde K-2 quien empuja los campos es **quien lleva la corona**:
+  // un rey del campo siembra más ancho, y sin rey esto vale 1, que es
+  // exactamente la fórmula cerrada de §5.2 de siempre.
+  //
+  // El recorte se queda: `will()` es del motor y no puede traer un número
+  // absurdo, pero el rango sigue siendo la garantía de que una cifra nueva en
+  // `CROWN` no puede dejar a la aldea sin sembrar.
   const intent = {
-    fields: clamp(state.intent.fields, INTENT_RANGE.fields.min, INTENT_RANGE.fields.max),
-    timber: clamp(state.intent.timber, INTENT_RANGE.timber.min, INTENT_RANGE.timber.max),
+    fields: clamp(will(state).fields, INTENT_RANGE.fields.min, INTENT_RANGE.fields.max),
   };
 
   // **Lo que hace falta, por lo que el jugador quiera esforzarse.** Con la
@@ -210,9 +216,11 @@ export function produce(
   // herramienta con la que se escuadran las vigas, y es lo que hace que la
   // decisión de darla complemente al arado en vez de repetir su punto flaco. El
   // motivo medido está en `balance.ts`, junto a la constante.
+  // K-2 · **y el rey ambicioso levanta un 5 % más**, que es lo que §6.3 prometía
+  // desde el primer día y nadie había escrito (`CROWN.AMBITIOUS_WORKS`).
   const buildPoints = a.builders * LABOUR.BP_PER_BUILDER *
     (smithyWorking(state) ? LABOUR.SMITHY_BONUS : 1)
-    * (hasTrait(state, 'axe') ? MEANS.AXE_WORKS : 1) * worksFactor;
+    * (hasTrait(state, 'axe') ? MEANS.AXE_WORKS : 1) * will(state).works * worksFactor;
 
   return { wood, buildPoints };
 }

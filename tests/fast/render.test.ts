@@ -99,8 +99,12 @@ describe('M-16 · geometría y regiones', () => {
 
 describe('M-17 · catálogo visual', () => {
   it('tiene un sprite para cada clase de edificio', () => {
+    // `hall` desde K-4: la sala del rey. En este render, que es el camino de
+    // reserva (`?render=canvas`), reutiliza la silueta de la casa de piedra —la
+    // más grande que hay aquí— porque lo que el dueño del diseño pidió que se
+    // diferenciara es el valle en 3D, y allí sí tiene su propio aspecto.
     expect(Object.keys(BUILDING_SPRITES).sort()).toEqual([
-      'chapel', 'church', 'field', 'granary', 'grave_yard', 'house', 'mill',
+      'chapel', 'church', 'field', 'granary', 'grave_yard', 'hall', 'house', 'mill',
       'palisade', 'smithy', 'stone_house', 'wall', 'watchtower', 'well',
     ]);
   });
