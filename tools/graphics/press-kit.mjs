@@ -237,8 +237,18 @@ function writeSheet() {
     if (Array.isArray(old.shots)) before = old.shots;
   } catch { /* la primera pasada no tiene manifiesto */ }
   const mine = new Set(shots.map((one) => one.id));
-  const all = [...before.filter((one) => !mine.has(one.id)), ...shots]
-    .sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }));
+  const all = [...before.filter((one) => !mine.has(one.id)), ...shots];
+  // **Y lo que hay en disco sin ficha, también se lista.** La primera tanda se
+  // cayó antes de escribir manifiesto, así que treinta y siete PNG existían sin
+  // que nada dijera qué eran: el nombre del fichero ya lo dice, y una ficha
+  // pobre es mejor que una captura huérfana.
+  const known = new Set(all.map((one) => one.id));
+  for (const file of readdirSync(outDir).filter((f) => /^[0-9]{2,}-.*\.png$/.test(f))) {
+    const id = file.replace(/\.png$/, '');
+    if (known.has(id)) continue;
+    all.push({ id, name: id.replace(/^[0-9]+-/, ''), note: id.replace(/^[0-9]+-/, '').replace(/-/g, ' ') });
+  }
+  all.sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true }));
   writeFileSync(
     join(outDir, 'manifest.json'),
     JSON.stringify({ width, height, scale, seed, year, shots: all }, null, 2) + NL,
