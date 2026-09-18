@@ -21,28 +21,74 @@ import { seasonOf } from '@engine/time';
 
 /** Los sucesos de R-1 y las visitas de M-0 (`state.HAPPENINGS`), cada uno con su dibujo. */
 const HAPPENING_ART: Readonly<Record<HappeningId, string>> = {
-  lightning_fire: 'fire.svg',
-  river_flood: 'flood.svg',
-  wolves_at_the_coop: 'wolf.svg',
-  wedding: 'wedding.svg',
-  pedlar: 'pedlar.svg',
-  good_catch: 'fish.svg',
-  roof_under_snow: 'season-winter.svg',
-  harvest_feast: 'harvest.svg',
-  quarrel_in_the_square: 'grudge.svg',
-  bear_in_the_wood: 'bear.svg',
-  child_lost: 'child.svg',
-  stranger_passes: 'road.svg',
+  lightning_fire: 'fire.png',
+  river_flood: 'flood.png',
+  wolves_at_the_coop: 'wolf.png',
+  wedding: 'wedding.png',
+  pedlar: 'pedlar.png',
+  good_catch: 'fish.png',
+  roof_under_snow: 'season-winter.png',
+  harvest_feast: 'harvest.png',
+  quarrel_in_the_square: 'grudge.png',
+  bear_in_the_wood: 'bear.png',
+  child_lost: 'child.png',
+  stranger_passes: 'road.png',
   // M-0 · las visitas del camino: quien sube a vender es un carro en el camino,
   // el mismo dibujo del buhonero, que es lo que siempre fueron.
-  factor_visit: 'pedlar.svg',
-  drover_visit: 'pedlar.svg',
-  salt_visit: 'pedlar.svg',
+  factor_visit: 'pedlar.png',
+  drover_visit: 'pedlar.png',
+  salt_visit: 'pedlar.png',
   // M-2 · lo que los medios abren. La fiesta del barril es una fiesta y la
   // matanza también se celebra; las ratas son una pérdida del granero.
-  ale_feast: 'harvest.svg',
-  pig_slaughter: 'harvest.svg',
-  rats_in_the_granary: 'lost.svg',
+  ale_feast: 'harvest.png',
+  pig_slaughter: 'harvest.png',
+  rats_in_the_granary: 'lost.png',
+};
+
+/** Los medios estables de M-2: una ilustración por cosa entregada al valle. */
+const MEANS_ART: Readonly<Record<string, string>> = {
+  'means.plough.given': 'means-plough.png',
+  'means.pigs.given': 'means-pigs.png',
+  'means.axe.given': 'means-axe.png',
+  'means.relic.given': 'means-relic.png',
+  'means.arms.given': 'means-arms.png',
+  'means.bows.given': 'means-bows.png',
+  'means.tower.given': 'means-tower.png',
+  'means.gate.given': 'means-gate.png',
+  'means.hand.given': 'means-hand.png',
+  'means.ale.given': 'means-ale.png',
+};
+
+/**
+ * B1–B4 · **Las líneas del asedio, cada una con su dibujo.**
+ *
+ * Van por clave y no por `kind` —como las de M-0— porque las seis son cuadros
+ * distintos: un jinete bajando del pasto alto no se parece a una avalancha
+ * golpeando un portón, y ninguna de las dos se parece a un valle tomado. Con la
+ * tabla por `kind` las seis caían al respaldo de la hoja de roble, que es lo que
+ * pasaba desde B1: **las entradas de más peso de la crónica —peso 3, las que la
+ * partida cuenta— eran las únicas sin imagen.**
+ *
+ * Los ficheros todavía no existen y eso está bien: `screens/chronicle.ts` lee
+ * `public/ui/art/index.json` y lo que no figura ahí cae al respaldo, así que
+ * esta tabla se puede escribir antes que el arte. El encargo, con lo que cada
+ * una tiene que enseñar, está en `docs/plan-arte-pendiente.md`.
+ */
+const RAID_ART: Readonly<Record<string, string>> = {
+  // El aviso: humo en la loma de enfrente, o el jinete que baja a decirlo.
+  'raid.coming': 'raid-coming.png',
+  // La plata subiendo la ladera y la partida dándose la vuelta.
+  'raid.turned_back': 'raid-paid.png',
+  // El saqueo, con la aldea abierta y con la aldea cerrada.
+  'raid.open': 'raid-sack.png',
+  'raid.walled': 'raid-walled.png',
+  // El asalto: la avalancha contra el portón.
+  'raid.assault': 'raid-assault.png',
+  // Y las dos maneras de acabar.
+  'raid.held': 'raid-held.png',
+  'raid.stormed': 'raid-stormed.png',
+  // La cabeza de ganado que se llevan de paso comparte el dibujo del saqueo.
+  'raid.beast': 'raid-sack.png',
 };
 
 /**
@@ -56,23 +102,23 @@ export function illustrationFor(
   happenings: readonly HappeningRecord[],
 ): string | null {
   switch (entry.kind) {
-    case 'founding': return 'founding.svg';
-    case 'season': return `season-${seasonOf(entry.tick)}.svg`;
-    case 'birth': return 'birth.svg';
+    case 'founding': return 'founding.png';
+    case 'season': return `season-${seasonOf(entry.tick)}.png`;
+    case 'birth': return 'birth.png';
     case 'death':
-    case 'extinction': return 'death.svg';
+    case 'extinction': return 'death.png';
     case 'harvest':
-    case 'forage': return 'harvest.svg';
-    case 'famine': return 'famine.svg';
-    case 'plague': return 'plague.svg';
-    case 'fire': return 'fire.svg';
-    case 'built': return 'built.svg';
+    case 'forage': return 'harvest.png';
+    case 'famine': return 'famine.png';
+    case 'plague': return 'plague.png';
+    case 'fire': return 'fire.png';
+    case 'built': return 'built.png';
     case 'lost':
-    case 'abandonment': return 'lost.svg';
+    case 'abandonment': return 'lost.png';
     case 'arrival':
-    case 'departure': return 'road.svg';
-    case 'grudge': return 'grudge.svg';
-    case 'succession': return 'succession.svg';
+    case 'departure': return 'road.png';
+    case 'grudge': return 'grudge.png';
+    case 'succession': return 'succession.png';
     // §3.6: la decisión —planteada, tomada o su consecuencia— no lleva
     // ilustración: lleva el documento sellado o la tarjeta plana de §3.2.
     case 'crossroad_posed':
@@ -86,7 +132,12 @@ export function illustrationFor(
     // M-0 · lo del camino lleva el carro del buhonero, que es lo que se ve
     // cuando alguien sube a vender o el hombre del señor viene a cobrar.
     case 'road':
-      return 'pedlar.svg';
+      return 'pedlar.png';
+    case 'means':
+      return MEANS_ART[entry.templateKey] ?? null;
+    // B1–B4 · el asedio, por clave: ver `RAID_ART`.
+    case 'raid':
+      return RAID_ART[entry.templateKey] ?? null;
     default:
       return null;
   }

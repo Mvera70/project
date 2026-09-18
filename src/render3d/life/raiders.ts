@@ -7,13 +7,22 @@
 // `docs/encargos-3d.md` —«lo que pasa y no se ve»— y es lo que esta ronda
 // arregla: la semana que llegan, se ven llegar.
 //
-// **Esta es la primera mitad de D3, y conviene saber qué no hace.** Llegan por
-// el camino, se plantan ante el portón y se van. **No pelean, no rompen nada y
-// no matan a nadie**: lo que se llevan ya lo decidió el motor antes de que
-// empiece la jornada, y esto sólo lo enseña. Es el mismo trato que IA-5 le dio
-// al lobo del corral —«no conviertas una conducta visual en consecuencia
-// mecánica» (E.8)— y la razón por la que esta ronda no toca una sola cifra.
-// La pelea es D4, y necesita los clips que todavía no existen.
+// **Y desde D3b/D5 hay dos visitas distintas, porque el motor las distingue.**
+// Un **saqueo** es lo de la primera mitad: llegan, se plantan ante el portón, se
+// llevan lo que el motor ya decidió y se van. Un **asalto** —el que el motor
+// marca cuando la partida cuadruplica lo que el valle pone contra ella (B3)— va
+// a por la puerta: la rompen a golpes y entran. Y eso **sí** tiene consecuencia,
+// porque B4 abrió la puerta para ella: si el portón cede, el parte de la batalla
+// dice `breached` y la partida se acaba.
+//
+// No es una excepción a E.8 («no conviertas una conducta visual en consecuencia
+// mecánica»): la conducta no escribe en el motor. Cuenta lo que pasó y el motor
+// lo lee como dato por donde entra lo que hace el jugador (§1b). La diferencia
+// es que ahora hay una carrera de verdad —los golpes contra las flechas— y lo
+// que salga de ella es lo que pasa.
+//
+// Lo que sigue sin hacer: pelear cuerpo a cuerpo con quien defiende (D4, que
+// necesita los clips de E1) y quemar lo que hay dentro (E4, decisión del dueño).
 //
 // **Navegado, no guionizado**, por la lección que costó una tarde en IA-5: la
 // primera versión del lobo iba en línea recta con `seek`/`avoid` y se atascaba
@@ -37,8 +46,13 @@ import type { Waypoint } from './navigate';
  * alguien en vez de decidirlo el motor: a quien le entra una flecha se le acaba
  * la visita ahí. Es un estado terminal como `gone`, pero **se sigue dibujando**:
  * un cuerpo en el suelo es la marca de que la muralla sirvió de algo.
+ *
+ * **`breaking` e `inside` los trae D3b/D5**, y sólo salen en un asalto: golpear
+ * el portón hasta que cede, y pasar por el boquete. `inside` es terminal en la
+ * jornada —lo que hacen dentro es D4 y D6— y lo que importa de él es que
+ * existió: es lo que el parte de B4 llama `breached`.
  */
-export type RaiderPhase = 'coming' | 'standing' | 'leaving' | 'gone' | 'down';
+export type RaiderPhase = 'coming' | 'standing' | 'breaking' | 'inside' | 'leaving' | 'gone' | 'down';
 
 export interface Raider {
   readonly body: Body;
@@ -46,6 +60,14 @@ export interface Raider {
   readonly road: Point;
   /** El sitio ante el portón que le toca a éste. */
   readonly post: Point;
+  /**
+   * D3b · Y adónde va si el portón cede: el corazón del pueblo.
+   *
+   * Se calcula al montar la partida y no al entrar, por la misma razón que el
+   * puesto: lo que hay que comprobar es que **se puede llegar**, y eso se hace
+   * una vez (`pathTo` pide anchura y la inundación no).
+   */
+  readonly inside: Point;
   phase: RaiderPhase;
   route: Waypoint[];
   /** Paso a partir del cual el tramo se da por hecho aunque no haya llegado. */
@@ -62,6 +84,15 @@ export interface Raider {
    * `PlayerAct`, y hasta entonces vive aquí, que es donde pasó.
    */
   hits: number;
+  /**
+   * D3b · Si éste **pasó por el portón**.
+   *
+   * Y es lo que el parte de B4 mira, no que la puerta haya caído: medido en la
+   * semilla 7, el portón cedía a los veinte segundos con **los doce ya en el
+   * suelo**, o sea que el valle se perdía sin que entrara nadie. Una puerta
+   * rota no es un valle tomado; un hombre dentro, sí.
+   */
+  entered: boolean;
 }
 
 /**
@@ -77,8 +108,17 @@ export interface Raider {
  */
 export const BAND_SHOWN = 12;
 
-/** A qué distancia del portón se plantan, en celdas. */
+/**
+ * A qué distancia del portón se paran, en celdas.
+ *
+ * Dos y media si vienen a mirar el cerco y llevarse lo de fuera (un saqueo,
+ * D3), y **una y poco si vienen a tirar la puerta** (un asalto, D3b): a esa
+ * distancia el brazo llega (`BLOW_REACH`), y los que no quepan en la primera
+ * fila esperan detrás, que es lo que pasa cuando doce hombres quieren golpear
+ * la misma hoja.
+ */
 const STAND_OFF = 2.5;
+const ASSAULT_OFF = 1.1;
 
 /** Cuánto se quedan plantados, en pasos de vida (de 6 a 10 segundos). */
 const STAND_STEPS: readonly [number, number] = [180, 300];
@@ -96,6 +136,18 @@ const DEADLINE_SLACK = 240;
 export function raidToday(state: GameState): number {
   if (state.threat.arrivedTick !== state.tick) return 0;
   return Math.min(BAND_SHOWN, Math.max(1, state.threat.lastBand));
+}
+
+/**
+ * D3b · **Si lo de hoy es un asalto y no un saqueo.**
+ *
+ * Lo dice el motor y no esta capa: `flags['assault']` es la marca que
+ * `advanceThreat` pone la semana en que llegan cuando la partida da para tomar
+ * el valle (B3), y que resuelve la semana siguiente con el parte de la pelea
+ * (B4). Leerla es leer el hecho, que es lo que esta capa hace con todo.
+ */
+export function assaultToday(state: GameState): boolean {
+  return raidToday(state) > 0 && state.flags['assault'] !== undefined;
 }
 
 /** El portón en pie, o el corazón de la aldea si todavía no hay ninguno. */
@@ -198,6 +250,8 @@ const MAX_ENTRY = 26;
 export function createRaiders(
   state: GameState, land: Terrain, heart: Point,
   seed: number, step: number, howMany: number,
+  /** D3b · si vienen a tirar la puerta, se paran al alcance del brazo. */
+  assault = false,
 ): Raider[] {
   const gate = gateOf(state, heart);
   const reach = outsideOf(land, gate, heart);
@@ -217,7 +271,8 @@ export function createRaiders(
     // Se reparten en abanico ante la puerta, no en fila: lo que se mira es un
     // grupo plantado, y un grupo en fila india parece una cola.
     const angle = (hash32(seed, `raider:${n}:angle`) / 0xffffffff) * Math.PI * 2;
-    const spread = STAND_OFF + (hash32(seed, `raider:${n}:far`) / 0xffffffff) * 1.5;
+    const spread = (assault ? ASSAULT_OFF : STAND_OFF)
+      + (hash32(seed, `raider:${n}:far`) / 0xffffffff) * (assault ? 0.6 : 1.5);
     const start = {
       x: road.x + (hash32(seed, `raider:${n}:x`) / 0xffffffff - 0.5) * 3,
       z: road.z + (hash32(seed, `raider:${n}:z`) / 0xffffffff - 0.5) * 3,
@@ -236,11 +291,17 @@ export function createRaiders(
     };
     let post = gate;
     let route: Waypoint[] = [];
+    // **El sitio se busca desde la puerta hacia fuera, anillo a anillo**, y con
+    // una búsqueda de una celda y no de tres. Con tres, y viniendo a un asalto
+    // —donde el punto pedido cae **dentro** del cerco—, `nearestReachable`
+    // devolvía a los doce **la misma celda**, a 5,8 celdas de la puerta: ni se
+    // repartían ni llegaban a golpear. Medido en cuatro semillas: cero golpes.
     for (let far = 0; far < POST_TRIES; far += 1) {
+      const radius = spread + far * (assault ? 0.7 : 1);
       const spot = nearestReachable(land, reach, {
-        x: gate.x + Math.cos(angle) * (spread + far),
-        z: gate.z + Math.sin(angle) * (spread + far),
-      }, 3);
+        x: gate.x + Math.cos(angle) * radius,
+        z: gate.z + Math.sin(angle) * radius,
+      }, assault ? 1 : 3);
       if (spot === null) continue;
       const found = pathTo(land, from, spot);
       if (found === null) continue;
@@ -252,12 +313,14 @@ export function createRaiders(
       body,
       road,
       post,
+      inside: heart,
       phase: 'coming',
       route,
       deadline: deadlineFor(from, post, step),
       standingUntil: 0,
       forced: false,
       hits: 0,
+      entered: false,
     });
   }
   return raiders;
@@ -281,11 +344,17 @@ function deadlineFor(from: Point, to: Point, step: number): number {
 }
 
 /**
- * Un paso de la partida. Tres tramos y siempre acaba: llegar, plantarse,
- * volverse. Nunca es una intención que se repite para siempre (E.7).
+ * Un paso de la partida. Siempre acaba: nunca es una intención que se repite
+ * para siempre (E.7).
+ *
+ * Cuatro caminos, y el motor decide cuál: un **saqueo** llega, se planta y se
+ * vuelve; un **asalto** llega, golpea el portón y entra por él. Los dos pueden
+ * acabar en el suelo si a uno le entra una flecha (D2).
+ *
+ * `gate` sólo se pasa en un asalto, y es lo que convierte plantarse en golpear.
  */
 export function stepRaider(
-  raider: Raider, land: Terrain, seed: number, step: number,
+  raider: Raider, land: Terrain, seed: number, step: number, gate?: Gate,
 ): void {
   if (raider.phase === 'gone') return;
   // D2 · el que ha caído no anda. Se queda donde le dio la flecha.
@@ -295,6 +364,51 @@ export function stepRaider(
     return;
   }
   const { body } = raider;
+
+  // D3b · **golpeando el portón.** Se queda donde está y pega; cada golpe es
+  // uno de los sesenta que la puerta aguanta, así que cuantos menos queden en
+  // pie, más tarda en caer. Es la carrera contra las flechas de D2.
+  if (raider.phase === 'breaking') {
+    if (gate === undefined) { raider.phase = 'standing'; return; }
+    if (gate.brokeAt === null) {
+      const gap = Math.hypot(gate.at.x - body.x, gate.at.z - body.z);
+      // **Se empuja contra la puerta, no se golpea desde el puesto**, y esto lo
+      // enseñó una toma del navegador: los cinco que llegaban se plantaban
+      // donde su puesto dijera y la puerta recibía **cero golpes** en cuarenta
+      // segundos, porque el suelo pisable de la cara de fuera queda a más de un
+      // brazo de la hoja. El terreno del juego no es el de la prueba —el
+      // renderer cierra las celdas con las mallas de verdad—, así que un número
+      // de alcance nunca va a valer para las dos: lo que vale es andar hacia
+      // ella. `integrate` los para contra la puerta, que está cerrada para un
+      // cuerpo, y lo que se ve es un grupo apretándose contra la hoja.
+      if (gap > BLOW_REACH * 0.6) {
+        const step2 = gap || 1;
+        body.vx = ((gate.at.x - body.x) / step2) * RAIDER_PACE;
+        body.vz = ((gate.at.z - body.z) / step2) * RAIDER_PACE;
+        turnTo(body, Math.atan2(body.vx, body.vz), LIFE_STEP);
+      } else {
+        body.vx = 0;
+        body.vz = 0;
+      }
+      integrate(body, land, LIFE_STEP);
+      if (step % BLOW_STEPS === 0
+        && Math.hypot(gate.at.x - body.x, gate.at.z - body.z) <= BLOW_REACH) {
+        gate.hits += 1;
+        if (gate.hits >= GATE_BLOWS) gate.brokeAt = step;
+      }
+      return;
+    }
+    body.vx = 0;
+    body.vz = 0;
+    integrate(body, land, LIFE_STEP);
+    // Ha cedido: se entra por él. El destino es el corazón del pueblo, que es
+    // adonde va quien entra a un sitio a llevarse lo que hay.
+    raider.phase = 'inside';
+    raider.entered = true;
+    raider.route = pathTo(land, { x: body.x, z: body.z }, raider.inside) ?? [];
+    raider.deadline = deadlineFor({ x: body.x, z: body.z }, raider.inside, step);
+    return;
+  }
 
   if (raider.phase === 'standing') {
     body.vx = 0;
@@ -307,17 +421,28 @@ export function stepRaider(
     return;
   }
 
-  const goal = raider.phase === 'coming' ? raider.post : raider.road;
+  const goal = raider.phase === 'coming' ? raider.post
+    : raider.phase === 'inside' ? raider.inside : raider.road;
   const gap = Math.hypot(goal.x - body.x, goal.z - body.z);
   const arrived = gap < 0.6;
   const late = step > raider.deadline;
   if (arrived || late) {
     if (late) raider.forced = true;
     if (raider.phase === 'coming') {
-      raider.phase = 'standing';
-      const span = STAND_STEPS[1] - STAND_STEPS[0];
-      raider.standingUntil = step + STAND_STEPS[0]
-        + Math.round((hash32(seed, `raider:${body.id}:stand`) / 0xffffffff) * span);
+      // D3b · **el que viene a un asalto no se planta: golpea.** Y el que viene
+      // a un saqueo se queda mirando el cerco, que es lo de D3.
+      if (gate !== undefined) {
+        raider.phase = 'breaking';
+      } else {
+        raider.phase = 'standing';
+        const span = STAND_STEPS[1] - STAND_STEPS[0];
+        raider.standingUntil = step + STAND_STEPS[0]
+          + Math.round((hash32(seed, `raider:${body.id}:stand`) / 0xffffffff) * span);
+      }
+    } else if (raider.phase === 'inside') {
+      // Dentro. Lo que hacen aquí es D4 y D6; lo que importa de esta jornada es
+      // que entraron, y eso ya está dicho.
+      raider.phase = 'gone';
     } else {
       raider.phase = 'gone';
     }
@@ -363,9 +488,74 @@ const RAIDER_PACE = 1.4;
  */
 const RAIDER_RADIUS = 0.32;
 
+/**
+ * D5 · **El portón, como cosa que se rompe.** design.md §1b, fase 4.
+ *
+ * Vive en la jornada y no en el motor a propósito: lo que aguanta una puerta
+ * mientras doce hombres la golpean es la clase de cosa que §1b manda resolver
+ * en físico. Si cede, lo dice el parte (B4) y entonces sí lo sabe el motor.
+ */
+export interface Gate {
+  /** Dónde está, para que los golpes y las jambas caigan en el mismo sitio. */
+  readonly at: Point;
+  /** Los golpes que lleva encima. */
+  hits: number;
+  /** Si ya ha cedido, y en qué paso: la escena lo usa para abrir el boquete. */
+  brokeAt: number | null;
+}
+
+/**
+ * Lo que aguanta el portón, en golpes, y lo que tarda un hombre en dar uno.
+ *
+ * TUNE: sesenta golpes, uno por hombre y por segundo. Esos dos números son **la
+ * carrera** de la fase 4, y por eso están elegidos con la arquería de D2 medida
+ * en la mano: cinco arqueros sueltan una flecha cada 2,1 s y aciertan más de la
+ * mitad, o sea que tumban del orden de **uno y medio por segundo**. Con sesenta
+ * golpes, doce hombres tiran la puerta en cinco segundos y tres tardan veinte:
+ * así el asalto grande entra y el que llega mermado se queda fuera, que es
+ * exactamente lo que se quiere que decida la pelea y no una tabla.
+ *
+ * Y son golpes y no segundos porque lo que rompe una puerta son las manos que
+ * la golpean: matar a la mitad de la partida dobla lo que tarda en caer.
+ */
+const GATE_BLOWS = 60;
+const BLOW_STEPS = 30;
+
+/**
+ * A qué distancia del portón cuenta un golpe, en celdas.
+ *
+ * TUNE: 2,6, o sea ocho metros, y **no es el alcance de un brazo**: es el del
+ * grupo que se apretuja contra una puerta. Medido con el primer número (1,6,
+ * un brazo y su arma): la cara de fuera de un portón son una o dos celdas
+ * pisables, así que sólo los dos de delante llegaban y sesenta golpes tardaban
+ * medio minuto en caer — con las flechas de D2 volando, la puerta no cedía
+ * nunca en ninguna semilla. Con 2,6 empujan los seis de delante, que es lo que
+ * se ve en cualquier asalto pintado de la historia.
+ */
+const BLOW_REACH = 2.6;
+
 /** Cuántas plazas se prueban alrededor de la puerta antes de rendirse. */
 const POST_TRIES = 6;
 const RAIDER_ID_BASE = 9000;
+
+/**
+ * D3b · Si alguien de la partida pasó por el portón **y sigue en pie**.
+ *
+ * Las dos mitades hacen falta, y la segunda la enseñó una medida: en la semilla
+ * 7 el portón cedía a los veinte segundos y cuatro hombres entraban, **y los
+ * doce acababan en el suelo** con las flechas de los siete puestos. Un valle en
+ * el que no queda un solo enemigo vivo no es un valle tomado, por muy roto que
+ * esté el portón: contar sólo «entró alguien» perdía partidas que la muralla
+ * había ganado.
+ */
+export function anyEntered(raiders: readonly Raider[]): boolean {
+  return raiders.some((raider) => raider.entered && raider.phase !== 'down');
+}
+
+/** D5 · El portón de hoy, sin un golpe todavía. */
+export function gateNow(state: GameState, heart: Point): Gate {
+  return { at: gateOf(state, heart), hits: 0, brokeAt: null };
+}
 
 /**
  * Si queda alguien de la partida **en pie** en el valle.

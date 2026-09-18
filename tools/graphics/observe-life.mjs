@@ -51,13 +51,16 @@ try {
   const raid = opt('raid', '');
   // C2 · la vispera: la guarnicion arriba y nadie en el camino todavia.
   const braced = opt('braced', '');
-  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== '' || braced !== '';
+  // D3b · `--assault` hace que la partida venga a tirar el porton.
+  const assault = args.includes('--assault') ? '1' : '';
+  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== '' || braced !== '' || assault !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
       + (crown === '' ? '' : `&crown=${crown}`)
       + (raid === '' ? '' : `&raid=${raid}`)
-      + (braced === '' ? '' : `&braced=${braced}`);
+      + (braced === '' ? '' : `&braced=${braced}`)
+      + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
   await tab.goto(pageUrl.href);

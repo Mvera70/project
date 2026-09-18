@@ -202,9 +202,14 @@ export function crownNow(state: GameState, trade: string): void {
  * la partida (`world/threat.ts`), ni más ni menos, así que lo que se ve es lo
  * que se vería jugando.
  */
-export function raidNow(state: GameState, band: number): void {
+export function raidNow(state: GameState, band: number, assault = false): void {
   state.threat.arrivedTick = state.tick;
   state.threat.lastBand = Math.max(1, band);
+  // D3b · **y si es un asalto, la marca del motor.** Es la que hace que la
+  // partida vaya a por el portón en vez de plantarse a mirarlo (B3/B4), y sin
+  // poder ponerla a mano la única forma de grabar un asalto era acertar la
+  // semana exacta en la que el clan junta hombres para tanto.
+  if (assault) state.flags['assault'] = state.tick + 1;
 }
 
 /**

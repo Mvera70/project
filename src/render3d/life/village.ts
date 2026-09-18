@@ -44,7 +44,10 @@ import {
 import { createCommitmentRegistry, type ActorRef } from './commitments';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, WOLF_ALARM_RADIUS, type Beast } from './beasts';
-import { createRaiders, raidToday, raidersHere, stepRaider, type Raider } from './raiders';
+import {
+  anyEntered, assaultToday, createRaiders, gateNow, raidToday, raidersHere, stepRaider,
+  type Gate, type Raider,
+} from './raiders';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import type { Animal } from '@derive/animals';
 import {
@@ -293,6 +296,18 @@ export interface Village {
     readonly loosed: number;
     readonly hits: number;
     readonly fallen: number;
+    /**
+     * D5 · Los golpes que lleva el portón y si ha cedido, cuando hay asalto.
+     *
+     * `broken` es lo que el parte de B4 llama `breached`, y es la única cosa de
+     * esta capa que puede acabar una partida. Que pase aquí y no en el motor es
+     * §1b: «la pelea decide».
+     */
+    readonly gate: {
+      readonly hits: number;
+      readonly broken: boolean;
+      readonly entered: boolean;
+    } | null;
   };
   /**
    * IA-5: la cuenta de la visita del lobo, del mismo tipo que `stories` —
@@ -738,9 +753,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // D3 · la partida, si el motor dice que llegó esta semana. Se monta una vez
   // al abrir la jornada, como los animales: no se sortea cada paso.
   const bandSize = raidToday(state);
+  // D3b · y si lo de hoy es un **asalto** —el motor lo marca cuando la partida
+  // da para tomar el valle (B3)— vienen a por la puerta y no a mirarla.
+  const assault = assaultToday(state);
   const raiders: Raider[] = bandSize === 0
     ? []
-    : createRaiders(state, land, heart, seed, 0, bandSize);
+    : createRaiders(state, land, heart, seed, 0, bandSize, assault);
+  // D5 · el portón, como cosa que se rompe. Sólo existe en un asalto: en un
+  // saqueo nadie lo toca.
+  const gate: Gate | null = assault ? gateNow(state, heart) : null;
   // D2 · los arqueros de los puestos de C2, sus flechas, y el mundo físico en el
   // que vuelan. La lista de arqueros se saca una vez: los puestos son de la
   // jornada y no cambian a media jornada.
@@ -834,6 +855,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         loosed: archers.reduce((sum, archer) => sum + archer.loosed, 0),
         hits: raiders.reduce((sum, raider) => sum + raider.hits, 0),
         fallen: raiders.filter((raider) => raider.phase === 'down').length,
+        gate: gate === null ? null : {
+          hits: gate.hits,
+          broken: gate.brokeAt !== null,
+          // **Y si alguien pasó por él**, que es otra cosa: una puerta rota con
+          // los doce en el suelo no es un valle tomado.
+          entered: anyEntered(raiders),
+        },
       };
     },
 
@@ -1593,7 +1621,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // D3 · y la partida anda lo suyo. Guionizada como el lobo y por la misma
       // razón (E.8): lo que se llevan ya lo decidió el motor antes de que
       // empiece el día, y esto sólo lo enseña. No pelea, no rompe y no mata.
-      for (const raider of raiders) stepRaider(raider, land, seed, steps);
+      for (const raider of raiders) stepRaider(raider, land, seed, steps, gate ?? undefined);
 
       // D2 · **y la muralla contesta.** Un paso de física por paso de vida, que
       // es el matrimonio que D1 dejó montado; las flechas salen de los puestos

@@ -94,7 +94,8 @@ if (root) {
     // después (la sala, la palabra «king», el estilo del valle).
     // D3 · `&raid=20` planta la partida del valle vecino llegando hoy.
     const raid = query.get('raid');
-    if (raid !== null) raidNow(state, Number(raid) || 12);
+    // D3b · `&assault=1` hace que la partida venga a por la puerta.
+    if (raid !== null) raidNow(state, Number(raid) || 12, query.get('assault') === '1');
     // C2 · `&braced=2` deja el valle a dos semanas del asalto: la guarnición
     // sube y todavía no hay nadie en el camino.
     const braced = query.get('braced');
