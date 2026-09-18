@@ -1,5 +1,11 @@
 # The Valley — propuesta de IA para aldeanos y fauna
 
+> **SUPERADO · 18 sep 2026.** Era una propuesta documentada y sin
+> implementar. Lo que de verdad se hizo son las rondas IA-1 a IA-18
+> (`life-rounds/`), medidas con el observatorio y en `main`. Se conserva
+> porque el código la cita y porque su diagnóstico —qué le faltaba a la vida
+> del valle— sigue siendo la explicación de por qué esas rondas existieron.
+
 **v1.0 · 16 de septiembre de 2026 · Europe/Madrid.**
 **Estado: propuesta documentada; no implementada ni calibrada.**
 

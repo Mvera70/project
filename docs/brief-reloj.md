@@ -1,5 +1,12 @@
 # El reloj: qué cuesta afinar el tick, y qué no arregla
 
+> **CERRADO · entregado el 15 sep 2026 (v3.72).** El reloj con horas y la
+> jornada de sol de 120 s. **Y su advertencia se cumplió**: al multiplicar la
+> semana por 56 nadie remidió el §12, y tres días después B-1 encontró cuatro
+> constantes que decían una cosa y significaban otra. Esa lección vive ahora
+> en `CLAUDE.md` y en §12.1: un umbral que decide *cuándo* pasa algo se mira
+> en horas de reloj, con `tools/pace-report.ts`.
+
 **Medido:** 14 sep 2026, sobre `main` con el estado escénico (v3.59) ya puesto.
 **Qué es esto:** el brief del cambio que el dueño del diseño pidió —«me gustaría
 muchísimas más iteraciones»— con el coste medido, no estimado. No es una

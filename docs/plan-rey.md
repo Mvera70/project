@@ -1,5 +1,12 @@
 # Plan de fase · El rey (K-0 a K-7)
 
+> **CERRADO · entregado el 18 sep 2026 (v3.89 a v3.92).** K-1 a K-8: la
+> corona se da, ocho pasos del tick leen su voluntad, pasa por la sucesión,
+> tiene su sala y **se ve en la lista**. Lo medido está en `rey-medida.md`;
+> lo que no llegó —la firma del rey del campo y la malla de la sala— está
+> anotado allí y en `encargos-3d.md`. **Lo que hay que hacer ahora está en
+> `plan-meta.md`.**
+
 **Para quien lo ejecute.** 18 sep 2026. Brief de fase con la forma de `docs/rework.md` §4b (M-0 a M-4): qué toca cada paso, el contrato literal, las pruebas como propiedades y el criterio de terminado. Se lee después de `CLAUDE.md`, `docs/design.md` §1–4, §6, §7.2–7.3, §7.12, §8, §12, §13 y `docs/task-log.md` §4.0.
 
 **Diseñado por Claude Fable 5.1** el 18 sep 2026, a petición del dueño del diseño («el plan diséñalo con Fable 5.1, luego sigue aquí con Opus»). El documento se guarda tal cual lo entregó.

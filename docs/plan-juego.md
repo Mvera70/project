@@ -1,5 +1,13 @@
 # El plan: convertir esto en un juego
 
+> **CERRADO · entregado el 15 sep 2026 (v2.0).** Dio el verbo del juego, el
+> mapa grande y el vado que se cruza. Las tres palancas de órdenes que
+> propone **se retiraron** en M-2 por decisión del dueño («no me gustan para
+> nada»): lo que las sustituye es el juego de los medios (`plan-medios.md`).
+> Se conserva porque el código lo cita y porque explica por qué el juego
+> tiene el verbo que tiene. **Lo que hay que hacer ahora está en
+> `plan-meta.md`.**
+
 **15 de septiembre de 2026.** Escrito después de que el dueño del diseño jugara
 la demo, dijera que la desestimaba —*«no tiene ningún sentido jugar, los
 recursos que mostramos no sirven para nada, no hay ninguna manera lógica de

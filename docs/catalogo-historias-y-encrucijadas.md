@@ -1,5 +1,13 @@
 # Catálogo de historias y encrucijadas
 
+> **FOTO DEL 17 SEP 2026, y no se mantiene a mano.** Decía que había que
+> actualizarlo cada vez que cambiara una historia, y desde entonces han
+> entrado el rey (K-5, K-8), el cierre de la muralla, el portón y el clan
+> vecino sin que nadie lo tocara — que es lo que le pasa siempre a un
+> documento que copia lo que el código ya sabe. **La respuesta viva es
+> `npm run eligibility`**, que mide el catálogo real y dice además cuáles no
+> salen nunca. Esto se queda como lo que es: la foto de un día.
+
 **Creado:** 17 de septiembre de 2026
 
 **Última actualización:** 17 de septiembre de 2026

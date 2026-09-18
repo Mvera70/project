@@ -1,5 +1,12 @@
 # Parada del 17 sep 2026 · Por qué no es divertido, y el juego de los medios
 
+> **CERRADO · entregado el 17 sep 2026 (v3.79 a v3.82).** M-0 a M-4: la
+> piedra y la plata como existencias, el mundo que responde a lo acumulado,
+> y el carro con seis medios. El patrón que propone —**el jugador da y la
+> aldea decide**— sigue vigente y manda sobre todo lo que se añada: la
+> defensa de la fase 4 se construye igual. **Lo que hay que hacer ahora está
+> en `plan-meta.md`.**
+
 Escrito para el dueño del diseño y para los agentes que hagan el trabajo. Es
 una parada, no una ronda: aquí no se cambia código. Se mide, se diagnostica y se
 propone. Lo que se decida va a `docs/rework.md` como fase nueva.

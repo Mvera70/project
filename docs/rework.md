@@ -1,5 +1,12 @@
 # El rework: más azar y más vida — y el plan para quien siga
 
+> **CERRADO · R-1 entregado el 15 sep 2026 (v3.75).** Los sucesos del valle
+> están en `main` y su §4b (M-0 a M-4, el juego de los medios) también. Lo
+> que quedó abierto —R-2, R-3, R-5, y las nueve jornadas rojas de §2.8— lo
+> recoge **`plan-meta.md`**, que es el plan vivo. Este documento es el más
+> citado del proyecto (136 ficheros lo nombran): se conserva entero y con su
+> ruta intacta porque esas citas explican por qué el código es como es.
+
 **15 sep 2026 · lo pidió el dueño del diseño, con estas palabras:** «esto tiene
 que ser mucho más aleatorio y con mucha más vida … el ritmo de decisiones
 tampoco es algo que afecte mucho, no tiene mucha gracia … probablemente hay que

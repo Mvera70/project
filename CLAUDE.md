@@ -291,6 +291,7 @@ escrita (`rework.md` §2.7).
 
 | Qué necesitas saber | Dónde |
 |---|---|
+| **Qué es cada documento y si sigue vivo** | **`docs/README.md` — el mapa de la documentación** |
 | **Dónde está el rework ahora mismo, y qué toca** | **`docs/task-log.md` — se lee primero y se actualiza al cerrar cada ronda** |
 | Las reglas vigentes | `docs/design.md` — §1–4 primero |
 | Cómo se llegó a ellas | `docs/changelog.md` — el motivo de cada revisión |

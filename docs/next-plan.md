@@ -1,5 +1,11 @@
 # El plan siguiente: qué falta, en qué orden, y quién lo hace
 
+> **CERRADO · entregado el 15 sep 2026.** Sus briefs (U-10 a U-14: el menú de
+> inicio, el vuelo de entrada, el reloj con horas, las tormentas) están en
+> `main`. Se conserva por los briefs en sí, que son el modelo de cómo se le
+> escribe una fase a un agente. **Lo que hay que hacer ahora está en
+> `plan-meta.md`.**
+
 **15 sep 2026, al cerrar la auditoría del proyecto.** Este documento es para
 **delegar**: cada ronda lleva su brief listo para pegar en un agente, con el
 carril del router (`docs/agents.md`) y el criterio de terminado.
