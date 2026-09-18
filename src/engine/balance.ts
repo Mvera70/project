@@ -1773,7 +1773,11 @@ export const BUILDINGS = {
   wall: { w: 1, h: 1, wood: 0, stone: 40, bp: 60, cap: null, tier: 1, upgradeOf: 'palisade', byCrossroad: false },
   stone_house: { w: 2, h: 2, wood: 0, stone: 50, bp: 70, cap: null, tier: 1, upgradeOf: 'house', byCrossroad: false }, // does not burn
   church: { w: 3, h: 3, wood: 0, stone: 120, bp: 200, cap: 1, tier: 1, upgradeOf: 'chapel', byCrossroad: false }, // MOOD.*_CHURCH
-  watchtower: { w: 2, h: 2, wood: 0, stone: 60, bp: 90, cap: 2, tier: 1, upgradeOf: null, byCrossroad: true },
+  // C3 · **`byCrossroad` pasa a `false`**, y ya era mentira antes de esta ronda:
+  // C1 le puso un segundo camino (el carro, `MEANS_SPEC.tower`). Desde C3 la
+  // aldea se la levanta sola cuando la han saqueado (`WATCHTOWER_AFTER_RAIDS`),
+  // así que los tres caminos existen y este campo dice la verdad.
+  watchtower: { w: 2, h: 2, wood: 0, stone: 60, bp: 90, cap: 2, tier: 1, upgradeOf: null, byCrossroad: false },
 } as const;
 
 /**
@@ -1869,6 +1873,23 @@ export const BUILDING_RULES = {
    * «en otro lado del cerco», y eso es proporcional al cerco.
    */
   GATE_APART: 1,
+  /**
+   * C3 · **Cuántos asaltos hacen falta para que la aldea se levante su propia
+   * atalaya.**
+   *
+   * TUNE: uno. Hasta aquí la atalaya sólo llegaba de dos maneras y las dos eran
+   * del jugador —una encrucijada que la concede (§8.4) o el carro (C1)— así que
+   * un valle al que nadie le daba nada no la tenía nunca, por muchas veces que
+   * le robaran. Y es la obra que más sentido tiene que salga de la aldea: no
+   * quita ni un golpe, **avisa** —catorce semanas en vez de ocho— y eso es
+   * exactamente lo que un pueblo aprende a querer **después** del primer saqueo.
+   *
+   * Uno y no dos porque la lección de un saqueo no se olvida, y porque con dos
+   * la atalaya llegaba después de la segunda visita, que es cuando ya no hace
+   * falta aprender nada. Es reactiva a propósito: el jugador la puede tener
+   * **antes** pagándola, y esa diferencia —prever o aprender— es la decisión.
+   */
+  WATCHTOWER_AFTER_RAIDS: 1,
   PALISADE_DILATION: 2, // §7.4: "envolvente convexa del núcleo, dilatada 2 celdas"
   // TUNE: **cuántas casas espera la muralla** (B-1, 18 sep 2026). Lo pidió el
   // dueño del diseño mirando el problema: «para hacerlo más sencillo, la

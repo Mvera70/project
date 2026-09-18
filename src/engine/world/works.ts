@@ -51,6 +51,8 @@ interface NoProjectSnapshot {
 const NO_PROJECT = new WeakMap<GameState, NoProjectSnapshot>();
 const AUTOMATIC_KINDS = [
   'field', 'house', 'granary', 'well', 'chapel', 'smithy', 'mill', 'palisade',
+  // C3 · la atalaya, que desde el primer saqueo la levanta la aldea sola.
+  'watchtower',
   // K-4 · la sala. Entra en la máscara de «qué se puede pagar» porque si no, la
   // caché de «nada que hacer» no se enteraría de que la aldea ya tiene madera
   // para levantarla.
@@ -304,6 +306,36 @@ export function nextProject(state: GameState): Project | null {
     && standing(state, 'house').length + standing(state, 'stone_house').length
       >= BUILDING_RULES.PALISADE_HOUSES) {
     wanted.push('palisade');
+  }
+
+  // 8b · la atalaya (C3)
+  //
+  // **La aldea que ya ha sido saqueada quiere ver venir al siguiente.** Hasta
+  // C3 la atalaya sólo llegaba por decisión del jugador —una encrucijada o el
+  // carro (C1)— así que un valle al que nadie le daba nada no la tenía nunca,
+  // por muchas veces que le robaran. Y es la obra que más sentido tiene que
+  // salga de la aldea: no quita ni un golpe, **avisa**, y eso es lo que un
+  // pueblo aprende a querer después del primer saqueo (§1b, C1).
+  //
+  // Va detrás de la muralla y del portón porque el cerco es lo que de verdad
+  // recorta el botín (`THREAT.WALLED_SACK`) y esto sólo da tiempo. Y pide
+  // cantera —es piedra, 60— porque sin poder picarla la obra se quedaría
+  // abierta para siempre: `canQuarry` es la misma puerta que `nextUpgrade` usa
+  // para las mejoras a piedra.
+  //
+  // **Y espera a que el anillo esté decidido, que lo enseñó la medida.** Ir
+  // detrás en esta lista no basta: la muralla pide once casas y la atalaya no,
+  // así que en un valle saqueado joven la torre se pedía **antes** de que la
+  // muralla fuera posible y se comía la piedra y los puntos de obra que el cerco
+  // iba a necesitar. Medido en veinticuatro semillas: el portón pasaba de 159 a
+  // **189 h** de reloj y la villa cerrada de 249 a **320 h** — setenta horas de
+  // retraso en el peldaño de la fase 3 (§1b) a cambio de catorce semanas de
+  // aviso. Con `state.ring !== null` la aldea hace lo que haría un pueblo:
+  // primero el cerco, y la torre cuando el cerco ya está en marcha.
+  if (state.threat.raids >= BUILDING_RULES.WATCHTOWER_AFTER_RAIDS
+    && state.ring !== null
+    && withinCap(state, 'watchtower') && canQuarry(state)) {
+    wanted.push('watchtower');
   }
 
   // **E3 · lo que el jugador quiere antes va antes.**

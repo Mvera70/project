@@ -63,6 +63,10 @@ const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] = [
   // B1 · el primer asalto del clan vecino (§1b): la primera vez que el valle
   // paga por lo que ha juntado.
   ['primer asalto', (s) => s.threat.raids > 0],
+  // C3 · la atalaya que la aldea se levanta sola después del primer saqueo. El
+  // peldaño dice **cuánto tarda en aprender la lección**, que es lo que la
+  // puerta de `WATCHTOWER_AFTER_RAIDS` decide.
+  ['atalaya', (s) => alive(s, 'watchtower') >= 1],
   ['VILLA CERRADA', (s) => ringClosed(s)],
 ];
 
