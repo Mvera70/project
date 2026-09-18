@@ -766,7 +766,10 @@ export const DISASTER = {
   // `grave_yard` are tier 0 by accident of §7.2's table, not because fire
   // should take them: losing a field costs 600 of harvest for ever and reads
   // wrong in the chronicle.
-  FIRE_KINDS: ['house', 'granary', 'chapel', 'smithy', 'mill'],
+  // K-4 · y la sala del rey: es de madera y paja, así que arde como lo demás. El
+  // caos es el juego, y una casa de madera que no arde es una excepción que
+  // habría que explicar.
+  FIRE_KINDS: ['house', 'granary', 'chapel', 'smithy', 'mill', 'hall'],
 } as const;
 
 // ---------------------------------------------------------------------------

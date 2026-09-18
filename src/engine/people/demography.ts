@@ -9,7 +9,7 @@
 // Every step photographs its list before it starts (§4.2): a newborn cannot
 // die in the tick it is born, and somebody who dies this tick fathers nobody.
 
-import { CHARACTER, BIRTH, DEATH, DISASTER, FOUNDING, LABOUR, LIFE, MIGRATION, MOOD, TIME } from '../balance';
+import { CHARACTER, BIRTH, CROWN, DEATH, DISASTER, FOUNDING, LABOUR, LIFE, MIGRATION, MOOD, TIME } from '../balance';
 import { int, next, pick, weighted } from '../rng';
 import type {
   BirthEvent,
@@ -45,7 +45,12 @@ export function housingCapacity(state: GameState): number {
   const houses = state.buildings.filter(
     (b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'),
   ).length;
-  return houses * LIFE.HOUSE_CAPACITY;
+  // K-4 · **la sala del rey es una casa**, con sus camas: es lo que el dueño del
+  // diseño pidió («una casa que se diferencie») y no una sede vacía. Cuenta lo
+  // mismo que una casa (`CROWN.HALL_BEDS` = `LIFE.HOUSE_CAPACITY`), así que
+  // levantarla también resuelve un techo.
+  const halls = state.buildings.filter((b) => b.lostTick === null && b.kind === 'hall').length;
+  return houses * LIFE.HOUSE_CAPACITY + halls * CROWN.HALL_BEDS;
 }
 
 /** Spare beds. Negative when the village is sleeping on floors. */

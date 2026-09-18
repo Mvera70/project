@@ -60,7 +60,9 @@ export function harvestKey(weatherFactor: number): string {
 
 /** The granary burning is worth its own line; so is a house. §5.9. */
 export function fireKey(kind: BuildingKind): string {
-  if (kind === 'house' || kind === 'granary') return `fire.${kind}`;
+  // K-4 · y la sala del rey: que se queme la casa del que manda no es «otro
+  // edificio», es una noticia.
+  if (kind === 'house' || kind === 'granary' || kind === 'hall') return `fire.${kind}`;
   return 'fire.other';
 }
 
@@ -101,6 +103,9 @@ const SINGULAR_BUILDINGS: readonly BuildingKind[] = [
   'smithy',
   'mill',
   'well',
+  // K-4 · la sala del rey se levanta una vez en la vida de un valle: es de las
+  // que merecen su línea.
+  'hall',
 ];
 
 /** §9.2: a finished building. `standing` counts it, itself included. */

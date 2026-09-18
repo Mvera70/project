@@ -15,6 +15,8 @@ import { run, tick } from '@engine/sim';
 import { population } from '@engine/people/demography';
 import { crownCandidates, crownRefusal, kingOf, RESTING_WILL, styleOf, will } from '@engine/people/crown';
 import { crownKing } from '@engine/world/crown';
+import { applyEffect } from '@engine/crossroads/resolve';
+import { CROSSROAD_BANK } from '@engine/chronicle/bank.en';
 import type { GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
 
@@ -239,5 +241,51 @@ describe('K-1 · el acto entra por el tick y queda apuntado', () => {
     expect(report.crown?.crowned).toBe(false);
     expect(state.acts.at(-1)?.done).toBe(false);
     expect(state.crown).toBeNull();
+  });
+});
+
+describe('K-3 · la corona pasa por la sucesión', () => {
+  it('el sucesor la toma con el estilo de su oficio', () => {
+    // A.15 pregunta a quién le toca mandar cuando el que mandaba muere, y desde
+    // la corona esa pregunta decide también **qué clase de rey** viene: un rey
+    // del arado muere, le sucede el herrero, y la aldea empieza a mirar a las
+    // murallas. Sin plantilla nueva: la pregunta ya existía.
+    const state = rich();
+    const first = crownCandidates(state)[0];
+    expect(first).toBeDefined();
+    if (first === undefined) return;
+    first.role = 'reeve';
+    crownKing(state, first.id, 'spring', 3);
+    expect(will(state).style).toBe('plough');
+
+    // El rey muere y otro toma el asiento por el camino de siempre: el efecto
+    // `role: 'leader'` de la decisión.
+    const heir = state.people.villagers.find(
+      (v) => v.id !== first.id && v.named && v.diedTick === null && v.leftTick === null,
+    );
+    expect(heir).toBeDefined();
+    if (heir === undefined) return;
+    heir.role = 'smith';
+    first.diedTick = state.tick;
+    // Con el trono vacante, la aldea vuelve a hacer lo que hacía sola.
+    expect(will(state)).toEqual(RESTING_WILL);
+
+    applyEffect(state, { A: heir.id, B: heir.id }, { k: 'role', who: 'A', role: 'leader' }, {
+      templateId: 'succession', optionId: 'choose_a', killed: [], left: [], arrived: [],
+      seedsPlanted: [], build: [], destroy: [], fell: [], visible: [],
+    });
+    expect(state.crown?.id).toBe(heir.id);
+    expect(state.crown?.trade).toBe('smith');
+    expect(will(state).style).toBe('forge');
+  });
+
+  it('y la pregunta de la sucesión no dice «jefe» ni «rey»', () => {
+    // La propiedad del texto: el mismo cartel vale para un valle con jefe y para
+    // uno con rey, porque es la misma pregunta. Si alguien vuelve a escribir «the
+    // leader is buried», un valle con rey recién enterrado leería algo falso.
+    const body = CROSSROAD_BANK['crossroad.succession.body'];
+    expect(typeof body).toBe('string');
+    expect(String(body).toLowerCase()).not.toContain('leader');
+    expect(String(body).toLowerCase()).not.toContain('king');
   });
 });

@@ -48,7 +48,12 @@ export function destroyBuilding(state: GameState, id: BuildingId, blockYears = 0
 
 /** Give available beds to present villagers without moving existing tenants. */
 export function houseHomeless(state: GameState): void {
-  const houses = state.buildings.filter((b) => b.lostTick === null && familyOf(b.kind) === 'house');
+  // K-4 · **la sala del rey también es techo.** Si no entrara aquí, el rey se
+  // mudaría a ella y `houseHomeless` lo devolvería a una casa al tick siguiente,
+  // porque no la contaría entre las que valen.
+  const houses = state.buildings.filter(
+    (b) => b.lostTick === null && (familyOf(b.kind) === 'house' || b.kind === 'hall'),
+  );
   for (const person of state.people.villagers.filter(isHere)) {
     if (person.homeId !== null && houses.some((h) => h.id === person.homeId)) continue;
     person.homeId = null;

@@ -9,11 +9,11 @@
 // crossroad's `build` joins the same queue rather than jumping it (§8.4), so
 // the only place that decides what gets built is this file.
 
-import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, TRAITS, WORLD } from '../balance';
+import { BUILDING_RULES, BUILDINGS, CROWN, FOOD, LIFE, TRAITS, WORLD } from '../balance';
 import { hasTrait, PRIORITY_FAMILIES } from '../state';
 import { count, has, smithyWorking, standing } from '../subsistence/building-counts';
 import { housingCapacity, population } from '../people/demography';
-import { will } from '../people/crown';
+import { kingOf, will } from '../people/crown';
 import { storageCapacity } from '../subsistence/harvest';
 import { TERRAIN_CODE } from '../state';
 import type { BuildingKind, ConstructionWork, GameState } from '../state';
@@ -51,6 +51,10 @@ interface NoProjectSnapshot {
 const NO_PROJECT = new WeakMap<GameState, NoProjectSnapshot>();
 const AUTOMATIC_KINDS = [
   'field', 'house', 'granary', 'well', 'chapel', 'smithy', 'mill', 'palisade',
+  // K-4 · la sala. Entra en la máscara de «qué se puede pagar» porque si no, la
+  // caché de «nada que hacer» no se enteraría de que la aldea ya tiene madera
+  // para levantarla.
+  'hall',
 ] as const;
 
 function threatenedNow(state: GameState): boolean {
@@ -216,6 +220,13 @@ export function nextProject(state: GameState): Project | null {
     standing(state, 'house').length + standing(state, 'stone_house').length < LIFE.MAX_HOUSES) {
     wanted.push('house');
   }
+  // 2b · K-4 · **la sala del rey**, en cuanto hay rey y gente para sostenerla.
+  // Va aquí —después de las casas y antes del granero— porque es la casa del que
+  // manda: un techo, no un lujo. Sin rey no se pide nunca, y con el rey de corte
+  // además va delante de todo (familia `court`).
+  if (kingOf(state) !== null && !has(state, 'hall') && people >= CROWN.HALL_PEOPLE) {
+    wanted.push('hall');
+  }
   // 3 · granaries
   if (count(state, 'granary') < FOOD.MAX_GRANARIES &&
     state.village.grain > BUILDING_RULES.GRANARY_FULL * storageCapacity(state)) {
@@ -373,6 +384,14 @@ function complete(state: GameState, work: ConstructionWork): BuiltEvent {
     }
   }
   if (familyOf(work.kind) === 'house') houseHomeless(state);
+  // K-4 · **y el rey se muda a su sala el día que se termina.** Es lo que el
+  // dueño del diseño pidió —«debe tener una casa que se diferencie»—: la sala no
+  // es una sede, es su casa, y por eso cuenta camas.
+  if (work.kind === 'hall') {
+    const king = kingOf(state);
+    if (king !== null) king.homeId = id;
+    houseHomeless(state);
+  }
 
   return { id, kind: work.kind, upgradeOf: work.upgradeOf };
 }

@@ -13,7 +13,8 @@ import { rollCharacter } from '../people/traits';
 import { int, next, pick } from '../rng';
 import { herdCapacity } from '../subsistence/herd';
 import type { GameState, Villager, VillagerId } from '../state';
-import { yearOf } from '../time';
+import { styleOf } from '../people/crown';
+import { seasonOf, yearOf } from '../time';
 import { standing } from '../subsistence/building-counts';
 import type { AppliedEffects, Catalogue, Effect } from './schema';
 
@@ -194,7 +195,22 @@ export function applyEffect(
     }
     case 'role': {
       const v = villagerOf(state, cast, e.who);
-      if (v !== undefined) v.role = e.role;
+      if (v !== undefined) {
+        // K-3 · **y si el valle está coronado, la corona pasa con el asiento.**
+        // A.15 pregunta a quién le toca mandar cuando el que mandaba se muere, y
+        // desde la corona esa pregunta es también «quién es rey»: el elegido
+        // toma el asiento y con él su estilo, así que un rey del arado muere y
+        // le sucede el herrero, y la aldea empieza a mirar a las murallas. No
+        // hay plantilla nueva —la pregunta ya existía— y el texto de §9 se
+        // escribió neutro para que valga para un jefe y para un rey.
+        //
+        // El oficio que guarda `crown.trade` es el que el sucesor **tenía**, no
+        // `'leader'`: es lo que decide hacia dónde tira.
+        if (e.role === 'leader' && state.crown !== null && state.crown.id !== v.id) {
+          state.crown = { id: v.id, since: state.tick, trade: v.role };
+        }
+        v.role = e.role;
+      }
       break;
     }
     case 'lit':
@@ -246,6 +262,9 @@ export function applyOption(
     visible: [...option.visible],
   };
 
+  // K-3 · quién llevaba la corona antes de aplicar nada, para saber si pasó.
+  const wore = state.crown?.id ?? null;
+
   for (const e of option.effects) applyEffect(state, pending.cast, e, out);
 
   // §8.5. The delay is drawn once, now, so that the year it lands in is part of
@@ -282,6 +301,24 @@ export function applyOption(
     params: { year: yearOf(state.tick), ...namesOf(state, pending.cast) },
     weight: 3,
   });
+
+  // K-3 · y si la corona cambió de cabeza con esta decisión, se cuenta detrás:
+  // la línea de peso 3 la escribe ya la propia decisión, así que ésta va con
+  // peso 2 y dice **hacia dónde** va a tirar el valle desde ahora.
+  if (state.crown !== null && state.crown.id !== wore) {
+    const king = state.people.villagers.find((v) => v.id === state.crown?.id);
+    if (king !== undefined) {
+      state.chronicle.push({
+        tick: state.tick,
+        kind: 'succession',
+        templateKey: `crown.passed.${styleOf(state.crown.trade)}`,
+        params: {
+          name: king.name, season: seasonOf(state.tick), year: yearOf(state.tick),
+        },
+        weight: 2,
+      });
+    }
+  }
 
   state.crossroad = null;
   return out;

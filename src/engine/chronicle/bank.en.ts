@@ -505,6 +505,12 @@ export const BANK: Record<string, string[]> = {
     'Fire took the granary that {season}, and {grain} bushels with it.',
     'They lost the granary and {grain} bushels in year {year}.',
   ],
+  // K-4 · y la casa del que manda, que no es «otro edificio».
+  'fire.hall': [
+    'The hall burned in the {season} of year {year}, and the crown slept under someone else’s roof.',
+    'Fire took the king’s hall that {season}. Nobody said what it meant.',
+    'They lost the hall to fire in year {year}, and the burgundy roof with it.',
+  ],
   'fire.other': [
     'Fire took the {building} in the {season} of year {year}.',
     'The {building} burned that {season}.',
@@ -803,6 +809,13 @@ export const BANK: Record<string, string[]> = {
     'The mill turned for the first time in the {season} of year {year}.',
     'They finished the mill that {season}.',
     'A mill went up in year {year}.',
+  ],
+  // K-4 · la sala del rey, levantada. Peso 2 como los edificios singulares: se
+  // hace una vez en la vida de un valle.
+  'built.hall': [
+    'The king’s hall was finished in the {season} of year {year}, and the roof was burgundy before the week was out.',
+    'They raised a hall for the crown that {season}: three bays, a porch, and a door that takes two hands.',
+    'The hall went up in year {year}, the largest thing the valley had ever built in timber.',
   ],
   'built.palisade': [
     'They put up another length of palisade in the {season} of year {year}.',
@@ -1118,8 +1131,12 @@ export const CROSSROAD_BANK: Record<string, string> = {
 
   // --- A.15 succession ---
   'crossroad.succession.title': 'Who Speaks Now',
+  // K-3 · **neutro a propósito**: desde la corona esta misma pregunta decide
+  // quién es rey, y «the leader is buried» sonaba a otra cosa con un rey recién
+  // enterrado. «The seat is empty» vale para un jefe y para un rey, y el banco
+  // se puede reescribir sin invalidar partidas guardadas (§3.7).
   'crossroad.succession.body':
-    'The leader is buried. Two people in this valley expect to be asked, and only one of them is going to be.',
+    'The seat is empty. Two people in this valley expect to be asked, and only one of them is going to be.',
   'crossroad.succession.choose_a.label': '{A}',
   'crossroad.succession.choose_a.cost': '{B} will remember it',
   'crossroad.succession.choose_b.label': '{B}',
@@ -2235,6 +2252,7 @@ export const UI_BANK: Record<string, string> = {
   'building.smithy': 'smithy',
   'building.well': 'well',
   'building.mill': 'mill',
+  'building.hall': 'king’s hall',
   'building.palisade': 'palisade',
   'building.wall': 'wall',
   'building.church': 'church',
