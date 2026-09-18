@@ -60,6 +60,20 @@ function enough(state: GameState): number {
   return Math.ceil(resistance(state) * THREAT.STORM_ODDS) + 1;
 }
 
+/**
+ * Deja pasar el asalto entero: la semana en que llegan y la que lo resuelve.
+ *
+ * **Dos semanas desde B4** (18 sep 2026), y es lo que deja que la batalla
+ * física tenga la última palabra: el motor anuncia el asalto al llegar y lo
+ * resuelve la semana siguiente, con el parte de la pelea si alguien la peleó.
+ * Sin parte —que es el caso de estas pruebas, que miden la cuenta de B3— la
+ * segunda semana entra igual.
+ */
+function assault(state: GameState): void {
+  tick(state, CATALOG);
+  tick(state, CATALOG);
+}
+
 /** Los que quedan en pie. */
 function alive(state: GameState): number {
   return state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null).length;
@@ -70,7 +84,7 @@ describe('B3 · el valle tomado', () => {
     const state = besieged();
     const band = enough(state);
     state.threat.comingBand = band;
-    tick(state, CATALOG);
+    assault(state);
     expect(state.ended?.cause, `partida de ${band}`).toBe('stormed');
     expect(state.ended?.tick, 'y la semana queda apuntada').toBe(state.tick);
   });
@@ -108,8 +122,8 @@ describe('B3 · el valle tomado', () => {
       .toBeLessThan(resistance(armed) * THREAT.STORM_ODDS);
     bare.threat.comingBand = band;
     armed.threat.comingBand = band;
-    tick(bare, CATALOG);
-    tick(armed, CATALOG);
+    assault(bare);
+    assault(armed);
     expect(bare.ended?.cause, 'la desnuda cae').toBe('stormed');
     expect(armed.ended, 'la armada aguanta').toBeNull();
   });
@@ -118,7 +132,7 @@ describe('B3 · el valle tomado', () => {
     const state = besieged();
     const before = alive(state);
     state.threat.comingBand = enough(state);
-    tick(state, CATALOG);
+    assault(state);
     expect(state.ended?.cause).toBe('stormed');
     // El portón, roto.
     expect(state.buildings.some((b) => b.kind === 'gate' && b.lostTick === null),
@@ -143,7 +157,7 @@ describe('B3 · el valle tomado', () => {
   it('se cuenta con peso de titular, y no como una extinción', () => {
     const state = besieged();
     state.threat.comingBand = enough(state);
-    tick(state, CATALOG);
+    assault(state);
     const said = state.chronicle.filter((e) => e.templateKey === 'raid.stormed');
     expect(said.length, 'una línea, una vez').toBe(1);
     expect(said[0]?.weight, 'peso 3: el momento del siglo').toBe(3);

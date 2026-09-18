@@ -39,19 +39,34 @@ export interface ThreatEvent {
    * `coming` el aviso, `turned_back` los que cobraron y se fueron, `sacked` el
    * asalto que se aguanta, y **`stormed` el que no**: B3, la mitad grande de
    * «caer» (§1b). Un valle tomado no vuelve: `state.ended` queda puesto.
+   *
+   * B4 mete dos más, y son las dos mitades de una misma semana: `assault` es
+   * «están en el portón y esto no aguanta», que se cuenta **la semana que
+   * llegan**, y `held`/`stormed` es cómo acabó, que se resuelve **la siguiente**
+   * —con el parte de la batalla física si alguien la peleó, y con la cuenta de
+   * B3 si nadie miró—. Esa semana de espera es lo que deja que la pelea tenga
+   * la última palabra sin que el motor tenga que deshacer nada.
    */
-  kind: 'coming' | 'sacked' | 'turned_back' | 'stormed';
+  kind: 'coming' | 'sacked' | 'turned_back' | 'assault' | 'held' | 'stormed';
   /** Con cuántos vienen o vinieron. */
   band: number;
   /** El saqueo, cuando `kind` es `sacked` o `stormed`. */
   sack: Sack | null;
   /**
-   * B3 · Cuántos cayeron defendiendo, sólo cuando entran.
+   * B3 · Cuántos cayeron defendiendo, sólo cuando hay pelea.
    *
    * Es la primera vez que este sistema mata a alguien, y es deliberado: lo que
    * acaba una partida tiene que costar gente o no es un final, es un número.
    */
   fallen: number;
+  /**
+   * B4 · Y cuántos del clan quedaron en el valle, si alguien peleó la batalla.
+   *
+   * Cero cuando nadie la peleó, y eso es exacto: sin parte no se sabe qué les
+   * costó, así que no se inventa. Lo que sí baja igual es su fuerza, porque los
+   * que se dejaron aquí no vuelven (`settle`).
+   */
+  slain: number;
 }
 
 /** Lo que un asalto se lleva, para que la crónica pueda contarlo. */
@@ -116,8 +131,20 @@ function walled(state: GameState): boolean {
  * apetece. Que la partida tarde en llegar (`WARNING_WEEKS`) es lo que deja
  * sitio para el aviso de B2.
  */
-export function advanceThreat(state: GameState): ThreatEvent | null {
+export function advanceThreat(state: GameState, battle?: Battle): ThreatEvent | null {
   const year = yearOf(state.tick);
+
+  // B4 · **0 · ¿Hay un asalto de la semana pasada por resolver?**
+  //
+  // Va primero porque es de la semana anterior, y porque un valle tomado no
+  // tiene nada más que resolver este año. La marca la puso `arrive` y dura una
+  // semana: si nadie peleó la batalla, la cuenta de B3 decide (fue ella la que
+  // marcó), y si alguien la peleó, **manda el parte** (§1b).
+  const pending = state.flags['assault'];
+  if (pending !== undefined) {
+    delete state.flags['assault'];
+    return settle(state, battle);
+  }
 
   // 1 · El vecino crece, pase lo que pase aquí.
   if (state.tick % TIME.WEEKS_PER_YEAR === 0 && state.tick > 0) {
@@ -151,7 +178,7 @@ export function advanceThreat(state: GameState): ThreatEvent | null {
       // `WARNING_WEEKS` sirvan de algo: alguien los vio en el camino, y a
       // partir de aquí `crisisOf` deja pasar la pregunta de §8.6 por encima
       // del techo hasta que lleguen.
-      return { kind: 'coming', band: state.threat.comingBand, sack: null, fallen: 0 };
+      return { kind: 'coming', band: state.threat.comingBand, sack: null, fallen: 0, slain: 0 };
     }
   }
 
@@ -166,7 +193,7 @@ export function advanceThreat(state: GameState): ThreatEvent | null {
     const band = state.threat.comingBand;
     state.threat.comingTick = null;
     state.threat.comingBand = 0;
-    return { kind: 'turned_back', band, sack: null, fallen: 0 };
+    return { kind: 'turned_back', band, sack: null, fallen: 0, slain: 0 };
   }
   // B3 · **¿Entran, o sólo saquean?** La mitad grande de «caer» (§1b), y la
   // decisión del dueño del diseño del 18 sep: «un asalto pequeño se aguanta o se
@@ -179,11 +206,98 @@ export function advanceThreat(state: GameState): ThreatEvent | null {
   // mitades de la cuenta las escribió el jugador. La partida crece con lo que la
   // aldea acumuló y tienta (§1); la resistencia es lo que se le dio.
   const band = state.threat.comingBand;
-  if (band >= resistance(state) * THREAT.STORM_ODDS) {
-    const taken = storm(state);
-    return { kind: 'stormed', band, sack: taken.sack, fallen: taken.fallen };
+  // **La cuenta de B3 decide si esto es un asalto o un saqueo**, pero ya no lo
+  // resuelve aquí: lo marca. El saqueo se cobra igual —están en el portón y se
+  // llevan lo que alcanzan— y lo que queda en el aire es si entran, que es lo
+  // que la batalla física va a contestar (B4).
+  const assault = band >= resistance(state) * THREAT.STORM_ODDS;
+  const sack = arrive(state);
+  if (!assault) return { kind: 'sacked', band, sack, fallen: 0, slain: 0 };
+  state.flags['assault'] = state.tick + 1;
+  return { kind: 'assault', band, sack, fallen: 0, slain: 0 };
+}
+
+/**
+ * B4 · **El parte de la batalla física**, tal como llega del mundo (§1b).
+ *
+ * No es un tipo del motor porque no es una decisión del motor: es lo que la
+ * capa de vida vio pasar. Llega por `PlayerAct` (`kind: 'battle'`).
+ */
+export interface Battle {
+  slain: number;
+  lost: number;
+  breached: boolean;
+}
+
+/**
+ * B4 · Cómo acabó el asalto de la semana pasada.
+ *
+ * **Con parte, manda el parte; sin parte, manda la cuenta.** Las dos ramas
+ * hacen lo mismo con lo que la pelea costó —el clan pierde los hombres que
+ * perdió, la aldea los suyos— y se diferencian en una sola cosa: si entraron.
+ *
+ * Y lo que el clan pierde **se queda perdido**: `threat.strength` baja, así que
+ * una defensa que mata a veinte hombres compra años de paz. Ésa es la
+ * consecuencia que hace que valga la pena mirar la batalla en vez de dejar que
+ * el motor la resuelva solo, y es la primera vez que lo que pasa en pantalla
+ * cambia el mundo.
+ */
+function settle(state: GameState, battle?: Battle): ThreatEvent {
+  const band = state.threat.lastBand;
+  const slain = Math.max(0, Math.min(band, battle?.slain ?? 0));
+  const lost = battle?.lost ?? 0;
+
+  // **Y el parte no salva por existir: salva si adelgazó la partida.** La
+  // primera versión se creía el `breached` del parte tal cual, y con la escena
+  // de hoy —donde nadie puede romper el portón todavía (D5)— eso hacía que
+  // mirar la pantalla volviera al valle inmortal. Lo que de verdad decide es lo
+  // que queda en pie: si a los que siguen enteros les sigue sobrando para tomar
+  // el sitio, entran igual, y si la muralla los ha dejado por debajo de la
+  // cuenta de B3, el asalto se rompe contra ella. Así lo que salva al valle es
+  // **lo que la defensa hizo**, no que alguien estuviera mirando.
+  //
+  // El `breached` del parte manda en la otra dirección, y ahí sí es absoluto:
+  // si la escena vio entrar a alguien, entraron, dijera lo que dijera la cuenta.
+  // Eso es lo que hará que D5 —el portón que cede— pueda perder una partida que
+  // los números daban por salvada, que es §1b: la pelea decide.
+  const left = band - slain;
+  const breached = battle === undefined
+    || battle.breached
+    || left >= resistance(state) * THREAT.STORM_ODDS;
+
+  // Los hombres que el clan dejó en el valle no vuelven a bajar.
+  if (slain > 0) {
+    state.threat.strength = Math.max(0, state.threat.strength - slain);
   }
-  return { kind: 'sacked', band, sack: arrive(state), fallen: 0 };
+  // Y los nuestros, si el parte dice que cayeron. Sin parte los cuenta `storm`.
+  const ours = breached ? 0 : Math.min(lost, defenders(state));
+  const buried = fall(state, ours);
+
+  if (!breached) {
+    return { kind: 'held', band, sack: null, fallen: buried, slain };
+  }
+  const taken = storm(state);
+  return { kind: 'stormed', band, sack: taken.sack, fallen: taken.fallen + buried, slain };
+}
+
+/**
+ * Entierra a `howMany` de los que defendían, los mayores primero.
+ *
+ * Los mayores por la razón más simple: el que sube a la muralla de un pueblo no
+ * es el niño. Devuelve cuántos de verdad cayeron, que puede ser menos de los
+ * que se piden si la aldea no tiene tanta gente.
+ */
+function fall(state: GameState, howMany: number): number {
+  if (howMany <= 0) return 0;
+  const fighters = state.people.villagers
+    .filter((v) => v.diedTick === null && v.leftTick === null)
+    .sort((a, b) => a.bornTick - b.bornTick)
+    .slice(0, howMany);
+  for (const fighter of fighters) {
+    fighter.diedTick = state.tick;
+    fighter.causeOfDeath = 'violence';
+  }
+  return fighters.length;
 }
 
 /**
@@ -231,17 +345,8 @@ function storm(state: GameState): { sack: Sack; fallen: number } {
     }
   }
 
-  // Los que defendían. `defenders` dice cuántos subieron, y mueren los mayores
-  // primero por la razón más simple: el que sube a la muralla de un pueblo no es
-  // el niño, y `LIFE.ADULT` ya dice quién es adulto.
-  const fighters = state.people.villagers
-    .filter((v) => v.diedTick === null && v.leftTick === null)
-    .sort((a, b) => a.bornTick - b.bornTick)
-    .slice(0, defenders(state));
-  for (const fighter of fighters) {
-    fighter.diedTick = state.tick;
-    fighter.causeOfDeath = 'violence';
-  }
+  // Los que defendían: los sube `defenders` y los entierra `fall`.
+  const buried = fall(state, defenders(state));
 
   state.threat.comingTick = null;
   state.threat.comingBand = 0;
@@ -251,12 +356,14 @@ function storm(state: GameState): { sack: Sack; fallen: number } {
   state.ended = {
     tick: state.tick,
     cause: 'stormed',
-    lastId: fighters.at(-1)?.id ?? null,
+    lastId: state.people.villagers
+      .filter((v) => v.diedTick === state.tick && v.causeOfDeath === 'violence')
+      .at(-1)?.id ?? null,
   };
   // **Sin campo nuevo en el esquema**: cuántos cayeron sólo hace falta esta
   // semana, para la línea de crónica, así que vuelve por aquí en vez de
   // guardarse. Un número más que migrar por un titular no vale la pena.
-  return { sack: { band, silver, grain, beast, walled: walled(state) }, fallen: fighters.length };
+  return { sack: { band, silver, grain, beast, walled: walled(state) }, fallen: buried };
 }
 
 /**

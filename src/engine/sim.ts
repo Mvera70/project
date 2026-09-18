@@ -58,7 +58,7 @@ import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { ringClosed } from './world/placement';
-import { advanceThreat } from './world/threat';
+import { advanceThreat, type Battle } from './world/threat';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
@@ -643,6 +643,7 @@ export function tick(
   let offer: OfferOutcome | null = null;
   let means: MeansOutcome | null = null;
   let crown: CrownOutcome | null = null;
+  let battle: Battle | undefined;
   for (const act of acts) {
     if (act.kind === 'offer') {
       const outcome = settleOffer(state, act.accept, seasonOf(state.tick), yearOf(state.tick));
@@ -659,7 +660,7 @@ export function tick(
       state.acts.push({ tick: state.tick, act, done: outcome.given });
       means = outcome;
       if (outcome.entry !== null) say(outcome.entry);
-    } else {
+    } else if (act.kind === 'crown') {
       // K-1 · dar la corona. Es el mismo verbo que un medio —se paga con lo del
       // valle y la aldea decide qué hace con ello— sólo que lo que se da es a
       // **alguien**: desde esta semana, lo que ese alguien quiere lo leen el
@@ -668,6 +669,17 @@ export function tick(
       state.acts.push({ tick: state.tick, act, done: outcome.crowned });
       crown = outcome;
       for (const entry of outcome.entries) say(entry);
+    } else {
+      // B4 · **lo que el mundo hizo.** El único acto que no hace el jugador: el
+      // parte de la batalla física de la semana pasada (§1b). No se aplica
+      // aquí —lo aplica `advanceThreat`, que es quien sabe si había un asalto
+      // por resolver— y se apunta como cualquier otro acto, que es lo que hace
+      // que una partida guardada siga contando la misma historia.
+      //
+      // `done` dice si de verdad había batalla que contar: un parte sin asalto
+      // pendiente no hace nada, igual que una oferta que ya no se puede pagar.
+      battle = act;
+      state.acts.push({ tick: state.tick, act, done: state.flags['assault'] !== undefined });
     }
   }
   // Y quien esperaba y no tuvo respuesta, sigue camino.
@@ -763,7 +775,7 @@ export function tick(
   // mundo hace y la aldea encaja. Y va **antes** de los sucesos para que un
   // asalto y un rayo no se pisen en la misma semana: lo que se cuenta primero
   // es lo que trae gente armada.
-  const raid = advanceThreat(state);
+  const raid = advanceThreat(state, battle);
   if (raid !== null) {
     // B2 · el aviso, la vuelta y el saqueo: tres cosas que contar, y sólo una
     // por semana. El aviso es lo que da sentido a las ocho semanas de margen —
@@ -781,6 +793,21 @@ export function tick(
         kind: 'raid',
         templateKey: 'raid.turned_back',
         params: { year: year(), season: season(), count: raid.band },
+        weight: 3,
+      });
+    } else if (raid.kind === 'held') {
+      // B4 · **el cerco aguantó**, y esta línea sólo existe porque alguien
+      // peleó la batalla: sin parte, un asalto siempre entra.
+      say({
+        kind: 'raid',
+        templateKey: 'raid.held',
+        params: {
+          year: year(),
+          season: season(),
+          count: raid.band,
+          slain: raid.slain,
+          fallen: raid.fallen,
+        },
         weight: 3,
       });
     } else if (raid.kind === 'stormed') {
@@ -802,7 +829,11 @@ export function tick(
       const sack = raid.sack;
       say({
         kind: 'raid',
-        templateKey: sack.walled ? 'raid.walled' : 'raid.open',
+        // B4 · y si esto es el asalto grande, se dice al llegar: el jugador
+        // tiene una semana para verlo venir, que es la semana en la que la
+        // batalla física se pelea.
+        templateKey: raid.kind === 'assault' ? 'raid.assault'
+          : sack.walled ? 'raid.walled' : 'raid.open',
         params: {
           year: year(),
           season: season(),

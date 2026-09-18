@@ -25,8 +25,8 @@ import { createValleyCamera } from './camera';
 import { TERRAIN_CODE, type GameState, type VillagerId } from '@engine/state';
 import { loadAssets, type AssetLibrary } from './assets';
 import type {
-  Actor, ActorDoing, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats, GraphicsTarget,
-  GraphicsViewport,
+  Actor, ActorDoing, BattleReport, GraphicsFrame, GraphicsRenderer, GraphicsRendererOptions, GraphicsStats,
+  GraphicsTarget, GraphicsViewport,
 } from './contracts';
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, type Ground } from './world/ground';
@@ -1143,6 +1143,24 @@ export async function createGraphicsRenderer(
       const found = lastActors.find((actor) => actor.id === id);
       if (found === undefined) return null;
       return { activity: found.activity, load: found.load ?? null };
+    },
+
+    // B4 · **lo que la batalla de esta jornada dejó**, para que el motor lo
+    // apunte (§1b). Sale de la capa de vida tal cual: aquí no se interpreta.
+    battle(): BattleReport | null {
+      if (life === null || life.manned.length === 0) return null;
+      const { loosed, fallen } = life.defence;
+      if (loosed === 0 && fallen === 0) return null;
+      return {
+        shown: life.raiders.length,
+        slain: fallen,
+        // Los nuestros: hoy ninguno, porque el clan todavía no pelea (D4). Lo
+        // que no ha pasado no se cuenta: un número inventado aquí sería una
+        // muerte inventada en el motor.
+        lost: 0,
+        // Y nadie entra todavía: romper el portón es D5.
+        breached: false,
+      };
     },
 
     look(x: number, z: number): void {

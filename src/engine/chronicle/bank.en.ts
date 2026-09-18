@@ -910,6 +910,20 @@ export const BANK: Record<string, string[]> = {
     'Raiders from the next valley circled a closed wall in year {year}, {count} of them.',
     'The wall held that {season}. The {count} who came went home with little.',
   ],
+  // B4 · **Las dos líneas de la semana en que se decide.** `raid.assault` es la
+  // semana en que llegan y el cerco no da para tanto —se cuenta al llegar, y
+  // deja al jugador una semana sabiendo lo que viene—; `raid.held` es la otra
+  // salida, la que sólo existe porque alguien peleó la batalla.
+  'raid.assault': [
+    'A band of {count} came down that {season} and set about the gate itself.',
+    'In year {year} the next valley came in force, {count} of them, and did not stop at the wall.',
+    'That {season} the {count} came for the village and not for its granary.',
+  ],
+  'raid.held': [
+    'The gate held that {season}, and {slain} of them were left in front of it.',
+    'They did not get in. Year {year}: {slain} dead on the field, {fallen} of ours on the wall.',
+    'The wall held in year {year}. The {slain} who fell there were not ours.',
+  ],
   // B3 · **La línea que cierra una partida.** design.md §1b: «cuando la aldea
   // muera tiene que ser que el ejército rival consiga entrar y rompa todo». Es
   // la única línea de este banco que habla de una aldea que ya no está porque

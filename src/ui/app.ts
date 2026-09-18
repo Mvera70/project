@@ -1081,6 +1081,31 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     pendingDecision = undefined;
     const acts = pendingActs;
     pendingActs = [];
+    // B4 · **Lo que el mundo hizo** (§1b). La semana en que hay un asalto por
+    // resolver —la marca la puso el motor al llegar la partida—, se le pregunta
+    // a la escena qué pasó en la muralla y entra como un acto más. Si la escena
+    // no tiene nada que contar (Canvas, o una jornada que el jugador no vio),
+    // no se inventa: el motor resuelve el asalto con su propia cuenta (B3).
+    //
+    // Va aquí y no en el renderer porque **el motor sólo recibe datos por esta
+    // puerta**: es la misma por la que entra una oferta aceptada o una corona.
+    if (state.flags['assault'] !== undefined) {
+      const fought = backend.live.battle();
+      if (fought !== null) {
+        acts.push({
+          kind: 'battle',
+          slain: fought.shown > 0
+            // La escena enseña doce de una partida que puede ser de sesenta, así
+            // que lo que se vio es una **muestra** y se escala con la partida de
+            // verdad. Sin esto, matar a los doce de la pantalla le quitaría doce
+            // hombres a un clan de sesenta y el resto entraría igual.
+            ? Math.round(state.threat.lastBand * fought.slain / fought.shown)
+            : fought.slain,
+          lost: fought.lost,
+          breached: fought.breached,
+        });
+      }
+    }
     const report = tick(state, CATALOG, decision, acts);
     // M-0 · si la oferta no se pudo pagar, se dice y se deja en pie: es la
     // única respuesta de la aldea que el jugador no puede deducir mirando.

@@ -12,7 +12,7 @@
 
 import { WORLD } from '@engine/balance';
 import type { GameState } from '@engine/state';
-import type { ActorDoing, GraphicsStats } from '../render3d/contracts';
+import type { ActorDoing, BattleReport, GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
 import { inspectAt } from './inspect';
 import { createRenderer, type ValleyRenderer } from '@render/renderer';
@@ -46,6 +46,15 @@ interface ValleyBackend {
   look(x: number, z: number): void;
   /** VZ-6 · qué hace ese cuerpo ahora mismo. El 2D no simula cuerpos. */
   doing(id: number): ActorDoing | null;
+  /**
+   * B4 · El parte de la batalla que la escena vio, o `null` si no hubo (§1b).
+   *
+   * En Canvas es siempre `null`, y no es una carencia disimulada: el 2D no
+   * simula cuerpos, así que no hay batalla que contar y el motor resuelve el
+   * asalto con su propia cuenta (B3). Un valle jugado en el camino de vuelta se
+   * defiende peor, y eso es verdad.
+   */
+  battle(): BattleReport | null;
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
   /** Gira la vista, en radianes. Canvas no puede: no tiene desde dónde mirar. */
@@ -134,6 +143,8 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     // El 2D pinta puntos desde el estado, no simula cuerpos: no hay a quién
     // preguntar qué está haciendo, y una frase inventada es peor que ninguna.
     doing() { return null; },
+    // El 2D no tiene batalla: el motor resuelve el asalto con su cuenta (B3).
+    battle() { return null; },
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
     pan() { /* idem */ },
     // El 2D es una proyección fija del mapa entero dibujada a mano: no hay ángulo
@@ -318,6 +329,7 @@ export function attachBackend(
         surface: webgl,
         look(x, z) { renderer.look(x, z); },
         doing(id) { return renderer.doing(id); },
+        battle() { return renderer.battle(); },
         paint(state, tickFraction, speed) {
           // El reloj de presentacion es dueno unico del tiempo escenico y no
           // toca el acumulador del juego: quien avanza los ticks sigue siendo

@@ -126,6 +126,27 @@ export interface GraphicsViewport {
   readonly pixelRatio: number;
 }
 
+/**
+ * B4 · **Lo que pasó en la batalla**, para que el motor pueda apuntarlo (§1b).
+ *
+ * Es el único dato que sube de la capa de vida al motor, y sube por la puerta de
+ * `PlayerAct` como «lo que el mundo hizo». Por eso lleva `shown`: la escena
+ * enseña doce cuerpos de una partida que puede ser de sesenta
+ * (`life/raiders.ts`, `BAND_SHOWN`), así que lo que se informa es **una muestra**
+ * y quien la lee tiene que poder escalarla. Mentir aquí sería decirle al motor
+ * que el clan perdió doce hombres cuando lo que se vio fueron doce de sesenta.
+ */
+export interface BattleReport {
+  /** Cuántos cuerpos de la partida se enseñaron. */
+  readonly shown: number;
+  /** Cuántos de ellos quedaron en el suelo. */
+  readonly slain: number;
+  /** Cuántos de los nuestros cayeron. Estos no son muestra: son todos. */
+  readonly lost: number;
+  /** Si la escena vio entrar a alguien. Hoy nunca: romper el portón es D5. */
+  readonly breached: boolean;
+}
+
 export interface GraphicsRenderer {
   resize(viewport: GraphicsViewport): void;
   paint(state: Readonly<GameState>, frame: GraphicsFrame): void;
@@ -152,6 +173,14 @@ export interface GraphicsRenderer {
    * jugador (§11.2).
    */
   look(x: number, z: number): void;
+  /**
+   * B4 · El parte de la batalla que la escena ha visto, o `null` si no hubo.
+   *
+   * Lo pregunta el bucle de la aplicación la semana en que hay un asalto por
+   * resolver, y lo que contesta entra en el motor como un acto. No se acumula
+   * entre jornadas: es lo de **esta** jornada, que es la que el jugador vio.
+   */
+  battle(): BattleReport | null;
   dispose(): void;
 
   /**

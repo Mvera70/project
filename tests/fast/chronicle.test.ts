@@ -318,8 +318,10 @@ describe('render', () => {
       // M-0 · la plata, que las visitas del camino y el diezmo nombran.
       silver: 6,
       // B3 · los que murieron defendiendo el portón, que es lo que cuenta la
-      // línea del valle tomado (§1b).
+      // línea del valle tomado (§1b). Y B4 · los que se dejó el clan, que es lo
+      // que cuenta la del cerco que aguantó.
       fallen: 4,
+      slain: 17,
       sinceYear: 5,
       years: 12,
       // Las letras del reparto: es lo que produce namesOf (§8.3).

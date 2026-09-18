@@ -548,7 +548,30 @@ export type PlayerAct =
   // M-2 · dar un medio al valle. No dice qué hacer con él.
   | { kind: 'means'; means: MeansId }
   // K-1 · dar la corona a alguien. Tampoco dice qué hacer: dice **quién**.
-  | { kind: 'crown'; who: VillagerId };
+  | { kind: 'crown'; who: VillagerId }
+  /**
+   * B4 · **Lo que el mundo hizo**: el parte de una batalla física (§1b).
+   *
+   * Es el único acto que no hace el jugador, y entra por aquí a propósito.
+   * §1b abre una frontera —«el asalto se resuelve en físico y no es
+   * determinista»— y ésta es la puerta: la capa de vida pelea la batalla con
+   * Rapier, y lo que salió de ella llega al motor **como datos**, igual que
+   * llega una oferta aceptada. Así el motor sigue siendo determinista *dadas
+   * sus entradas*, las partidas guardadas siguen cargando byte a byte, y lo que
+   * pasó en la muralla no se recalcula: se cuenta.
+   *
+   * Lo dijo el dueño del diseño: «el resultado entra en el motor por la misma
+   * puerta por la que entra lo que hace el jugador cada semana».
+   */
+  | {
+    kind: 'battle';
+    /** Cuántos del clan quedaron en el suelo. */
+    slain: number;
+    /** Cuántos de los nuestros. */
+    lost: number;
+    /** Si llegaron a entrar. Lo único que decide si la partida acaba. */
+    breached: boolean;
+  };
 
 export interface ActRecord {
   tick: number;
