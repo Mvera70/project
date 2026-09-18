@@ -13,9 +13,10 @@ ajeno a esta ronda.
 `means.*.given` (arado, cerdos, hacha, reliquia, armas, arcos, atalaya, portón,
 jornalero y cerveza) están generadas, normalizadas e integradas. Catálogo total:
 33 PNG de crónica. Las 52 pruebas dirigidas y el lint de los ficheros tocados
-pasan. La familia `raid` está en desarrollo activo en el árbol de trabajo y
-queda expresamente fuera: anotada, sin generar ni integrar hasta que su
-contrato cierre.
+pasan. B1–B4 ya están cerradas. La familia `raid` tenía la tabla de arte
+preparada por clave y sus siete ilustraciones se han generado, revisado,
+normalizado a 640 × 512 e integrado. El catálogo pasa a 40 PNG. `raid.beast`
+reutiliza `raid-sack.png`.
 
 **Crónicas · nacimiento en revisión (18 sep):** se lanzó una única imagen
 individual con la fundación aprobada como referencia, en formato 5:4. Job de

@@ -107,10 +107,8 @@ cerveza. Se generaron con la boda natural como referencia, se normalizaron a
 640 × 512, se añadieron al índice y `chronicle-art.ts` las selecciona por
 `templateKey`. Una clave futura desconocida conserva el respaldo.
 
-La familia `raid` **no entra en esa tanda**. Está siendo desarrollada ahora
-mismo en cambios sin cerrar de `state.ts`, `sim.ts`, `world/threat.ts`, el
-banco de crónica y el render 3D (`raid.assault`, `raid.held`, `raid.stormed` y
-variantes). Se deja anotada y sin arte hasta que su contrato sea estable.
+La familia `raid` ya tiene el contrato cerrado en B1–B4. Sus siete escenas se
+documentan e integran en la sección específica de este documento.
 
 ## Piezas decorativas de la interfaz
 
@@ -181,11 +179,9 @@ se mueve.
 | `raid-held.png` | `raid.held` | **El cerco aguantó.** Muertos delante de la puerta y la puerta en pie. Los muertos **no son del valle** |
 | `raid-stormed.png` | `raid.stormed` | **El valle tomado**, y es el final de una partida: el portón en pedazos y el boquete a los lados. No es un pueblo vacío —queda gente— es un pueblo perdido |
 
-**Si hay que hacer menos de siete**, el orden es: `raid-assault`,
-`raid-stormed`, `raid-coming`, `raid-sack`. Las tres primeras son las que salen
-en una partida que llega al asedio; `raid-walled` y `raid-held` pueden apoyarse
-en `raid-sack` y `raid-assault` mientras no existan, porque el respaldo por
-clave lo permite sin tocar código.
+**Integración cerrada · 18 sep 2026:** las siete escenas se generaron con la
+referencia natural aprobada, se revisaron visualmente, se normalizaron a 640 ×
+512 y se añadieron al índice de arte. `raid.beast` reutiliza `raid-sack.png`.
 
 ## Orden recomendado
 

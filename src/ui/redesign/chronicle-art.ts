@@ -69,10 +69,9 @@ const MEANS_ART: Readonly<Record<string, string>> = {
  * pasaba desde B1: **las entradas de más peso de la crónica —peso 3, las que la
  * partida cuenta— eran las únicas sin imagen.**
  *
- * Los ficheros todavía no existen y eso está bien: `screens/chronicle.ts` lee
- * `public/ui/art/index.json` y lo que no figura ahí cae al respaldo, así que
- * esta tabla se puede escribir antes que el arte. El encargo, con lo que cada
- * una tiene que enseñar, está en `docs/plan-arte-pendiente.md`.
+ * Los ficheros están normalizados e indexados en `public/ui/art/index.json`.
+ * El encargo visual y la correspondencia completa están en
+ * `docs/plan-arte-pendiente.md`.
  */
 const RAID_ART: Readonly<Record<string, string>> = {
   // El aviso: humo en la loma de enfrente, o el jinete que baja a decirlo.

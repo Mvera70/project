@@ -245,6 +245,10 @@ function ensureArtIndex(): void {
     .then((response) => (response.ok ? response.json() : { art: [] }))
     .then((data: { art?: readonly { file?: string }[] }) => {
       artIndex = new Set((data.art ?? []).map((a) => a.file).filter((f): f is string => typeof f === 'string'));
+      document.querySelectorAll<HTMLImageElement>('img[data-chronicle-art]').forEach((img) => {
+        const file = img.dataset.chronicleArt;
+        if (file !== undefined && artIndex?.has(file) === true) img.src = `./ui/art/${file}`;
+      });
     })
     .catch(() => { /* sin red o sin fichero: el respaldo se queda puesto */ });
 }
@@ -368,6 +372,7 @@ function timelineRow(text: string, art: string | null): HTMLElement {
   const hole = document.createElement('div');
   hole.className = 'chronicle-entry-art';
   const img = document.createElement('img');
+  if (art !== null) img.dataset.chronicleArt = art;
   img.src = hasArt(art) ? `./ui/art/${art}` : ENTRY_VIGNETTE;
   img.alt = '';
   img.loading = 'lazy';

@@ -26,63 +26,63 @@ const AUTUMN = 24;
 const WINTER = 36;
 
 describe('illustrationFor · plan-piel.md §3.6, una prueba por fila', () => {
-  it('founding → founding.svg', () => {
-    expect(illustrationFor(entry('founding'), [])).toBe('founding.svg');
+  it('founding → founding.png', () => {
+    expect(illustrationFor(entry('founding'), [])).toBe('founding.png');
   });
 
-  it('season → season-<estación>.svg, las cuatro', () => {
-    expect(illustrationFor(entry('season', SPRING), [])).toBe('season-spring.svg');
-    expect(illustrationFor(entry('season', SUMMER), [])).toBe('season-summer.svg');
-    expect(illustrationFor(entry('season', AUTUMN), [])).toBe('season-autumn.svg');
-    expect(illustrationFor(entry('season', WINTER), [])).toBe('season-winter.svg');
+  it('season → season-<estación>.png, las cuatro', () => {
+    expect(illustrationFor(entry('season', SPRING), [])).toBe('season-spring.png');
+    expect(illustrationFor(entry('season', SUMMER), [])).toBe('season-summer.png');
+    expect(illustrationFor(entry('season', AUTUMN), [])).toBe('season-autumn.png');
+    expect(illustrationFor(entry('season', WINTER), [])).toBe('season-winter.png');
   });
 
-  it('birth → birth.svg', () => {
-    expect(illustrationFor(entry('birth'), [])).toBe('birth.svg');
+  it('birth → birth.png', () => {
+    expect(illustrationFor(entry('birth'), [])).toBe('birth.png');
   });
 
-  it('death, extinction → death.svg', () => {
-    expect(illustrationFor(entry('death'), [])).toBe('death.svg');
-    expect(illustrationFor(entry('extinction'), [])).toBe('death.svg');
+  it('death, extinction → death.png', () => {
+    expect(illustrationFor(entry('death'), [])).toBe('death.png');
+    expect(illustrationFor(entry('extinction'), [])).toBe('death.png');
   });
 
-  it('harvest, forage → harvest.svg', () => {
-    expect(illustrationFor(entry('harvest'), [])).toBe('harvest.svg');
-    expect(illustrationFor(entry('forage'), [])).toBe('harvest.svg');
+  it('harvest, forage → harvest.png', () => {
+    expect(illustrationFor(entry('harvest'), [])).toBe('harvest.png');
+    expect(illustrationFor(entry('forage'), [])).toBe('harvest.png');
   });
 
-  it('famine → famine.svg', () => {
-    expect(illustrationFor(entry('famine'), [])).toBe('famine.svg');
+  it('famine → famine.png', () => {
+    expect(illustrationFor(entry('famine'), [])).toBe('famine.png');
   });
 
-  it('plague → plague.svg', () => {
-    expect(illustrationFor(entry('plague'), [])).toBe('plague.svg');
+  it('plague → plague.png', () => {
+    expect(illustrationFor(entry('plague'), [])).toBe('plague.png');
   });
 
-  it('fire → fire.svg', () => {
-    expect(illustrationFor(entry('fire'), [])).toBe('fire.svg');
+  it('fire → fire.png', () => {
+    expect(illustrationFor(entry('fire'), [])).toBe('fire.png');
   });
 
-  it('built → built.svg', () => {
-    expect(illustrationFor(entry('built'), [])).toBe('built.svg');
+  it('built → built.png', () => {
+    expect(illustrationFor(entry('built'), [])).toBe('built.png');
   });
 
-  it('lost, abandonment → lost.svg', () => {
-    expect(illustrationFor(entry('lost'), [])).toBe('lost.svg');
-    expect(illustrationFor(entry('abandonment'), [])).toBe('lost.svg');
+  it('lost, abandonment → lost.png', () => {
+    expect(illustrationFor(entry('lost'), [])).toBe('lost.png');
+    expect(illustrationFor(entry('abandonment'), [])).toBe('lost.png');
   });
 
-  it('arrival, departure → road.svg', () => {
-    expect(illustrationFor(entry('arrival'), [])).toBe('road.svg');
-    expect(illustrationFor(entry('departure'), [])).toBe('road.svg');
+  it('arrival, departure → road.png', () => {
+    expect(illustrationFor(entry('arrival'), [])).toBe('road.png');
+    expect(illustrationFor(entry('departure'), [])).toBe('road.png');
   });
 
-  it('grudge → grudge.svg', () => {
-    expect(illustrationFor(entry('grudge'), [])).toBe('grudge.svg');
+  it('grudge → grudge.png', () => {
+    expect(illustrationFor(entry('grudge'), [])).toBe('grudge.png');
   });
 
-  it('succession → succession.svg', () => {
-    expect(illustrationFor(entry('succession'), [])).toBe('succession.svg');
+  it('succession → succession.png', () => {
+    expect(illustrationFor(entry('succession'), [])).toBe('succession.png');
   });
 
   it('crossroad_posed, crossroad_taken, consequence → sin dibujo (documento sellado)', () => {
@@ -91,55 +91,78 @@ describe('illustrationFor · plan-piel.md §3.6, una prueba por fila', () => {
     expect(illustrationFor(entry('consequence'), [])).toBeNull();
   });
 
-  it('happening → lightning_fire → fire.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('lightning_fire', 5)])).toBe('fire.svg');
+  it('happening → lightning_fire → fire.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('lightning_fire', 5)])).toBe('fire.png');
   });
 
-  it('happening → river_flood → flood.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('river_flood', 5)])).toBe('flood.svg');
+  it('happening → river_flood → flood.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('river_flood', 5)])).toBe('flood.png');
   });
 
-  it('happening → wolves_at_the_coop → wolf.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('wolves_at_the_coop', 5)])).toBe('wolf.svg');
+  it('happening → wolves_at_the_coop → wolf.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('wolves_at_the_coop', 5)])).toBe('wolf.png');
   });
 
-  it('happening → wedding → wedding.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('wedding', 5)])).toBe('wedding.svg');
+  it('happening → wedding → wedding.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('wedding', 5)])).toBe('wedding.png');
   });
 
-  it('happening → pedlar → pedlar.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('pedlar', 5)])).toBe('pedlar.svg');
+  it('happening → pedlar → pedlar.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('pedlar', 5)])).toBe('pedlar.png');
   });
 
-  it('happening → good_catch → fish.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('good_catch', 5)])).toBe('fish.svg');
+  it('happening → good_catch → fish.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('good_catch', 5)])).toBe('fish.png');
   });
 
-  it('happening → roof_under_snow → season-winter.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('roof_under_snow', 5)])).toBe('season-winter.svg');
+  it('happening → roof_under_snow → season-winter.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('roof_under_snow', 5)])).toBe('season-winter.png');
   });
 
-  it('happening → harvest_feast → harvest.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('harvest_feast', 5)])).toBe('harvest.svg');
+  it('happening → harvest_feast → harvest.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('harvest_feast', 5)])).toBe('harvest.png');
   });
 
-  it('happening → quarrel_in_the_square → grudge.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('quarrel_in_the_square', 5)])).toBe('grudge.svg');
+  it('happening → quarrel_in_the_square → grudge.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('quarrel_in_the_square', 5)])).toBe('grudge.png');
   });
 
-  it('happening → bear_in_the_wood → bear.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('bear_in_the_wood', 5)])).toBe('bear.svg');
+  it('happening → bear_in_the_wood → bear.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('bear_in_the_wood', 5)])).toBe('bear.png');
   });
 
-  it('happening → child_lost → child.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('child_lost', 5)])).toBe('child.svg');
+  it('happening → child_lost → child.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('child_lost', 5)])).toBe('child.png');
   });
 
-  it('happening → stranger_passes → road.svg', () => {
-    expect(illustrationFor(entry('happening', 5), [happening('stranger_passes', 5)])).toBe('road.svg');
+  it('happening → stranger_passes → road.png', () => {
+    expect(illustrationFor(entry('happening', 5), [happening('stranger_passes', 5)])).toBe('road.png');
   });
 
   it('happening sin registro del mismo tick (no debería darse) no inventa dibujo', () => {
     expect(illustrationFor(entry('happening', 5), [happening('bear_in_the_wood', 9)])).toBeNull();
+  });
+
+  it.each([
+    ['means.plough.given', 'means-plough.png'],
+    ['means.pigs.given', 'means-pigs.png'],
+    ['means.axe.given', 'means-axe.png'],
+    ['means.relic.given', 'means-relic.png'],
+    ['means.arms.given', 'means-arms.png'],
+    ['means.bows.given', 'means-bows.png'],
+    ['means.tower.given', 'means-tower.png'],
+    ['means.gate.given', 'means-gate.png'],
+    ['means.hand.given', 'means-hand.png'],
+    ['means.ale.given', 'means-ale.png'],
+  ])('means estable %s → %s', (templateKey, expected) => {
+    expect(illustrationFor({ ...entry('means'), templateKey }, [])).toBe(expected);
+  });
+
+  it('un medio futuro sin arte cae al respaldo', () => {
+    expect(illustrationFor({ ...entry('means'), templateKey: 'means.future.given' }, [])).toBeNull();
+  });
+
+  it('raid sigue sin arte mientras su contrato está en desarrollo', () => {
+    expect(illustrationFor(entry('raid'), [])).toBeNull();
   });
 });
