@@ -112,7 +112,7 @@ de pelea.
 |---|---|---|---|---|---|
 | F1 · Textos del banco | Todo lo nuevo en `bank.en.ts`: el aviso, el asalto, el portón, las bajas, el cierre | P2 | Baja | Luna, Terra | cada fase que los pida |
 | F2 · La alerta y el HUD del asedio | Qué viene y cuándo; durante el asalto, lo que aguanta el portón y las bajas | P3 | Media | Sol | B2, D3 |
-| F3 · La pantalla del final | Cayó o aguantó, con la crónica de esa partida | P3 | Media | Sol | B3 |
+| F3 · La pantalla del final · **plan detallado en `plan-final.md`** (18 sep): la lápida —capitular e inscripción en Cinzel que se graba letra a letra sobre el valle atenuado— la hoja de cuentas de esa partida (años, gente, causa, y la relación larga: nacieron, murieron, obras, asaltos, caídos) y el cronicón para comparar partidas. Cinco fases, F3a–F3e; sólo F3a toca el motor (`ArchivedGame.ledger`, esquema +1) | **P2** | Baja (datos, hoja) · Media (lápida, cronicón) | Luna/Terra → Sol | B3 hecha |
 | F4 · La captura de cada fase | Ninguna ronda de interfaz se cierra sin captura (`npm run shot`) | — | Baja | Luna, Terra | — |
 
 ### G · Ritmo, balance y letalidad (transversal, y va después)

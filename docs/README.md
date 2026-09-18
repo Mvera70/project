@@ -32,6 +32,7 @@ ordena es **qué es cada cosa y si sigue viva**, no dónde vive.
 | `changelog.md` | **El porqué de cada revisión.** Antes de deshacer una decisión, se busca aquí |
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
+| `plan-final.md` | **El final de una partida**: la lápida, la hoja de cuentas y el cronicón (F3), con fases por agente y las decisiones que son del dueño |
 | `encargos-3d.md` | **Todo lo que hace falta de Blender**, apuntado en la misma ronda en que se descubre |
 | `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio |
 | `handover.md` | El estado exacto de cada pieza y las trampas que ya costaron tiempo |
