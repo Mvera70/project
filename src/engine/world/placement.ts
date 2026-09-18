@@ -117,23 +117,32 @@ function onRingRect(rect: Rect, centre: Point, radius: number): boolean {
 }
 
 /**
- * El radio del anillo que toca levantar: el de la muralla que ya hay, y si en
- * ése no cabe nada más, el siguiente que tenga sitio.
+ * El radio del anillo que toca levantar, o nada si ya no hay muralla que hacer.
  *
- * El tope de la búsqueda es el corazón del valle: si no cabe un anillo más, no
- * se levanta muralla, que es mejor que levantarla en la montaña.
+ * **Una aldea tiene una muralla, y una sola.** Es lo que el dueño del diseño
+ * pidió, con sus palabras: «si la aldea crece a un cierto punto, se construye la
+ * muralla alrededor y **después la siguiente sección de construcción va fuera de
+ * la muralla**». Lo nuevo va fuera; no dijo que se levantara otra muralla
+ * alrededor de lo nuevo, y medido se ve por qué no conviene: cuando la aldea ya
+ * no quiere más casas —§7.3 sólo pide casa si falta sitio para dormir— la
+ * empalizada es lo único que queda en la lista de obras, así que el valle se
+ * pasaba el siglo poniendo anillo tras anillo. **1 824 tramos de muralla contra
+ * 131 casas en doce semillas a 120 años**, y la semilla 51 con anillos en 8, 11,
+ * 14 y 17 y 336 tramos para catorce casas. Eso no es una aldea amurallada.
+ *
+ * Con un anillo por valle, cuando se cierra no hay más muralla que pedir y la
+ * obra pasa a lo siguiente de §7.3 —las mejoras a piedra—, que es exactamente
+ * lo que esa lista dice hacer cuando ya está todo levantado.
  */
 function ringToBuild(state: GameState, centre: Point, coreRadius: number,
   ground: { occupied: Uint8Array; reserved: Uint8Array }): number | null {
-  // El que ya se decidió, si lo hay; y si no, uno alrededor de lo construido.
+  // El que ya se decidió, y si no hay ninguno, uno alrededor de lo construido.
   const base = state.ring ?? Math.round(coreRadius + BUILDING_RULES.PALISADE_DILATION);
-  // **De tres en tres, no de una en una.** Con el paso de una celda, un anillo
-  // que se queda sin sitio arranca el siguiente **pegado** al viejo, y lo que
-  // se ve entonces no es una muralla sino un bulto de estacas de tres o cuatro
-  // de grosor: rodado y mirado en la semilla 41 al año 60. Con tres celdas de
-  // paso quedan dos de calle entre anillo y anillo, que es donde cabe lo que se
-  // construya después —y es lo que el dueño del diseño pidió: «la siguiente
-  // sección de construcción va fuera de la muralla»—.
+  // Si el anillo elegido no tiene sitio, se busca uno más afuera **sólo
+  // mientras la aldea no tenga muralla**: el primer anillo tiene que caber en
+  // alguna parte, y para eso se prueba de tres en tres celdas (así dos anillos
+  // nunca se pegan y entre ellos cabe una calle).
+  if (state.ring !== null) return ringHasRoom(state, centre, base, ground) ? base : null;
   for (let radius = base; radius <= base + RING_SEARCH; radius += RING_STEP) {
     if (ringHasRoom(state, centre, radius, ground)) return radius;
   }

@@ -1525,8 +1525,23 @@ Las reglas:
 3. **La línea del anillo es de la muralla**: ningún otro edificio puede pisarla.
    Es lo que hace que «la siguiente sección de construcción vaya fuera» sin que
    nadie lo mande: cuando dentro no cabe nada, lo nuevo sale.
-4. **Cuando el anillo se llena, el siguiente va tres celdas más afuera**, que
-   deja dos de calle entre anillo y anillo.
+4. **Un anillo por valle, y uno solo.** Cuando se cierra no hay más muralla que
+   pedir, y la obra pasa a lo siguiente de §7.3 —las mejoras a piedra—. El
+   primer anillo se busca de tres en tres celdas hacia fuera hasta encontrar
+   sitio, así que en un valle estrecho la muralla se separa lo que haga falta,
+   pero **no se levanta un segundo anillo alrededor del primero**.
+
+   Esto último se midió y es la corrección del 18 sep 2026. Lo que el dueño del
+   diseño pidió es «se construye la muralla alrededor y después la siguiente
+   sección de construcción **va fuera** de la muralla»: lo nuevo va fuera, no
+   otra muralla. Y permitir el segundo anillo tenía un coste que no se veía
+   venir: **§7.3 sólo pide casa cuando falta sitio para dormir**, así que en
+   cuanto la aldea tiene camas de sobra la empalizada es lo único que queda en
+   la lista de obras y el valle se pasa el siglo levantando anillos. Medido a
+   120 años en doce semillas: **1 824 tramos de muralla contra 131 casas**, con
+   la semilla 51 en anillos de 8, 11, 14 y 17 y **336 tramos para catorce
+   casas**. Con un anillo por valle son de 37 a 59 tramos, uno por aldea, y las
+   casas y los campos no se mueven: 131 y 89, los mismos.
 
 **Lo medido, en cuatro semillas:** al año 20 hay de cero a cuatro piezas y un
 solo tramo; **al año 40, un solo tramo en las cuatro** (8, 28, 4 y 8 piezas); al
