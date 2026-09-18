@@ -27,9 +27,9 @@
 // y el forrajeo, que son emergencias y se sirven antes que cualquier postura.
 // Un jugador puede equivocarse; no puede saltarse la aritmética del hambre.
 
-import { FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
+import { CROWN, FOOD, FORAGE, LABOUR, TIME, MEANS } from '../balance';
 import { population, workforce } from '../people/demography';
-import { hasTrait, INTENT_RANGE } from '../state';
+import { hasTrait } from '../state';
 import { will } from '../people/crown';
 import type { Allocation, GameState } from '../state';
 import { count, smithyWorking } from './building-counts';
@@ -67,7 +67,7 @@ export function allocateLabour(state: GameState): Allocation {
   // absurdo, pero el rango sigue siendo la garantía de que una cifra nueva en
   // `CROWN` no puede dejar a la aldea sin sembrar.
   const intent = {
-    fields: clamp(will(state).fields, INTENT_RANGE.fields.min, INTENT_RANGE.fields.max),
+    fields: clamp(will(state).fields, CROWN.FIELDS_RANGE[0], CROWN.FIELDS_RANGE[1]),
   };
 
   // **Lo que hace falta, por lo que el jugador quiera esforzarse.** Con la

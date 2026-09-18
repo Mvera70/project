@@ -6,7 +6,7 @@
 import { BUILDINGS, FOUNDING, LIFE } from './balance';
 import { foundPeople } from './people/villagers';
 import { makeBundle } from './rng';
-import { SCHEMA_VERSION, restingIntent, valleyTraits } from './state';
+import { SCHEMA_VERSION, valleyTraits } from './state';
 import type { BuildingKind, FoundingProfile, GameState } from './state';
 import { generateMap } from './world/mapgen';
 import { placeBuilding } from './world/placement';
@@ -109,8 +109,6 @@ export function foundGame(
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null, crowBite: 0,
-    // La aldea arranca haciendo lo que hacía sola (§5.2, y D-6 del plan).
-    intent: restingIntent(),
     // E5 · Lo que este valle tiene y otro no. Con la semilla del **terreno**, así
     // que una aldea que hereda el valle hereda sus rasgos: el valle no cambia
     // porque haya muerto la gente (§13.3).

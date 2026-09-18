@@ -14,7 +14,6 @@ import type {
   TickContext,
   Villager,
 } from '@engine/state';
-import { restingIntent } from '@engine/state';
 import { isHere, population, workforce } from '@engine/people/demography';
 import { makeVillager } from '@engine/people/villagers';
 import { count, has, smithyWorking, standing } from '@engine/subsistence/building-counts';
@@ -82,7 +81,6 @@ function founded(seed: number, extra: BuildingKind[] = []): GameState {
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
-    intent: restingIntent(),
     traits: [],
     village: {
       grain: TWENTY.GRAIN,

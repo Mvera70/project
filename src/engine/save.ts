@@ -7,7 +7,7 @@ import { population } from './people/demography';
 import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
-import { HAPPENINGS, HERD_KINDS, MEANS_IDS, SCHEMA_VERSION, TERRAIN_CODE, restingIntent, valleyTraits } from './state';
+import { HAPPENINGS, HERD_KINDS, MEANS_IDS, SCHEMA_VERSION, TERRAIN_CODE, valleyTraits } from './state';
 import { choosePlaza } from './world/plaza';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
@@ -308,9 +308,7 @@ function isPlausibleState(value: unknown): value is GameState {
     // La postura. Se comprueba que sea finita y no que esté en rango:
     // `allocateLabour` ya la recorta, y rechazar una partida entera por una
     // palanca fuera de sitio sería perder la aldea por un número.
-    && record(s['intent'])
-    && ['fields', 'timber'].every((key) => finite((s['intent'] as Record<string, unknown>)[key]))
-    && typeof (s['intent'] as Record<string, unknown>)['priority'] === 'string'
+
     && Array.isArray(s['traits']) && s['traits'].every((one) => typeof one === 'string')
     && finite(s['crowBite']) && (s['crowBite'] as number) >= 0
     && record(people) && Array.isArray(people['villagers']) && people['villagers'].every(villager)
@@ -416,23 +414,14 @@ export function deserialize(raw: unknown): SaveFile {
   if ((state as Partial<GameState>).crowBite === undefined) {
     state = { ...state, crowBite: 0 } as GameState;
   }
-  // 3 -> 4 (E1 del plan): la postura del jugador.
+  // 3 -> 4 y su parche **se retiran en K-7**: `state.intent` ya no existe.
   //
-  // Entra en **reposo**, y no es una elección conservadora: es literalmente lo
-  // que esa aldea estaba haciendo. Antes del esquema 4 `allocateLabour` era una
-  // fórmula cerrada equivalente a `fields: 1, timber: CUTTER_SHARE`, así que una
-  // partida migrada sigue exactamente su curso y el jugador la encuentra donde
-  // la dejó. Si entrara con cualquier otra postura, cargar una partida vieja la
-  // cambiaría por debajo, que es la clase de cosa que §13.1 prohíbe.
-  if ((state as Partial<GameState>).intent === undefined) {
-    state = { ...state, version: SCHEMA_VERSION, intent: restingIntent() } as GameState;
-  }
-  // Y una partida guardada entre E1 y E3 trae la postura sin la tercera palanca.
-  // Entra en `none`, que es el orden de §7.3 de siempre: por la misma razón que
-  // arriba, cargar no puede cambiar lo que la aldea estaba haciendo.
-  if (state.intent.priority === undefined) {
-    state = { ...state, intent: { ...state.intent, priority: 'none' } };
-  }
+  // Y con ello **la única excepción a §13.1 de toda la fase del rey**: una
+  // partida de la v2.0 con una palanca puesta (`priority` distinto de `none`, o
+  // `fields` distinto de 1) cambia de postura al cargarla, porque la palanca no
+  // existe. Desde M-4 la interfaz no puede escribirla —la hoja de órdenes está
+  // borrada— así que sólo afecta a guardados de antes de M-2.
+
   // Y los rasgos del valle (E5). Se **derivan** de la semilla del terreno en vez
   // de entrar vacíos: el valle de una partida guardada siempre tuvo esos rasgos,
   // se hubieran guardado o no, así que ponerlos es recordar y no cambiar. Es la

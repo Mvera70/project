@@ -9,7 +9,6 @@ import { describe, expect, it } from 'vitest';
 import { FOUNDING, LIFE, PEOPLE, TIME, TRAIT_WEIGHTS, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Role, Trait, Villager } from '@engine/state';
-import { restingIntent } from '@engine/state';
 import { FEMALE_NAMES, MALE_NAMES, makeName } from '@engine/people/names';
 import { ALL_TRAITS, rollTraits, suitsRole } from '@engine/people/traits';
 import {
@@ -53,7 +52,6 @@ function stateOf(seed: number): GameState {
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
     traits: [],
-    intent: restingIntent(),
     village: {
       grain: TWENTY.GRAIN,
       wood: TWENTY.WOOD,

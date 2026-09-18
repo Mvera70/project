@@ -1119,6 +1119,15 @@ export const CROWN = {
    * (`enough` 1 y `heavy` 1,5): la de arriba dejaba a la aldea sin manos para la
    * obra, y 1 no se distinguiría de no tener rey.
    */
+  /**
+   * Entre qué dos números se recorta lo que el rey quiere sembrar.
+   *
+   * K-7: era `INTENT_RANGE.fields` en `state.ts`, el rango de la palanca de
+   * v2.0, y se muda aquí con la palanca retirada. Sigue siendo una garantía y no
+   * un ajuste: lo que impide que una cifra nueva de esta tabla deje a la aldea
+   * sin sembrar o sembrando el doble de lo que puede.
+   */
+  FIELDS_RANGE: [0.5, 2] as readonly [number, number],
   PLOUGH_FIELDS: 1.3,
   /**
    * Cuántos campos más de los ocho de §12 rotura un rey del campo.

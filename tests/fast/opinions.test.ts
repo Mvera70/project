@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest';
 import { MEMORY, OPINION, TIME, WORLD } from '@engine/balance';
 import { makeBundle } from '@engine/rng';
 import type { GameState, Memory, Trait, Villager, VillagerId } from '@engine/state';
-import { restingIntent } from '@engine/state';
 import {
   adjustOpinion,
   driftOpinions,
@@ -47,7 +46,6 @@ function village(seed: number): GameState {
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
-    intent: restingIntent(),
     traits: [],
     village: { grain: 800, wood: 200, morale: 55, faith: 50, stone: 0, silver: 0 },
     people: foundPeopleTwenty(rng, 0),

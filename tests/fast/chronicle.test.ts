@@ -11,7 +11,6 @@ import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { yearOf } from '@engine/time';
 import type { ChronicleEntry, ChronicleKind, DeathCause, GameState, Villager } from '@engine/state';
-import { restingIntent } from '@engine/state';
 import { BANK } from '@engine/chronicle/bank.en';
 import {
   arrivalKey,
@@ -60,7 +59,6 @@ function village(seed: number): GameState {
     },
     herd: { hens: 0, pigs: 0, cows: 0 },
     crowBite: 0,
-    intent: restingIntent(),
     traits: [],
     village: { grain: 800, wood: 200, morale: 55, faith: 50, stone: 0, silver: 0 },
     people: foundPeopleTwenty(rng, 0),
