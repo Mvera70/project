@@ -61,6 +61,7 @@ import { FIELD_CROPS, isQuiet, planChange, planFor, type ScenePlan } from './wor
 
 const VILLAGER = 'villager';
 const TREE = 'tree';
+const TREE_PINE = 'tree-pine';
 const ROCK = 'rock';
 const REED = 'reed';
 const SCRUB = 'scrub';
@@ -86,7 +87,7 @@ export const WANTED = [
   // G-15 · los trastos del corral, que es lo que dice que aquí vive alguien.
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
-  ...VILLAGER_MODELS, TREE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  ...VILLAGER_MODELS, TREE, TREE_PINE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   // P-2 · la fuente de la plaza, cuando exista (`docs/encargo-fuente.md`).
   'fountain',
   // M-3 · lo que el jugador mete en el valle. Ninguno de los dos está
@@ -300,6 +301,8 @@ export async function createGraphicsRenderer(
   const props = new Props((id) => library.instance(id));
   // P-2 · la fuente del centro de la plaza. El empedrado lo pinta el suelo.
   const plaza = new PlazaFountain((id) => library.instance(id));
+  // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
+  // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
   world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, plaza.group, treeFalls.group);
 
@@ -514,7 +517,8 @@ export async function createGraphicsRenderer(
     }
     const sapling = library.get(TREE);
     if (sapling === undefined) return;
-    forest = buildForest(state, sapling.original as Object3D, palette, treeFalls.suppressed);
+    forest = buildForest(state, sapling.original as Object3D, palette, treeFalls.suppressed,
+      library.get(TREE_PINE)?.original as Object3D | undefined);
     world.add(forest.group);
   }
 

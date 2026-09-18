@@ -59,6 +59,12 @@
       "motion": []
     },
     {
+      "id": "tree-pine",
+      "file": "tree-pine.glb",
+      "sha256": "20A5D8033E247108EC37CC066A0DE40D22AB40B69B30E0E96FB7256E8BB99106",
+      "motion": []
+    },
+    {
       "id": "rock",
       "file": "rock.glb",
       "sha256": "77CAD1068ECF96A6398D2ADA23B95A8FC89D8D92F92CD0261BDF3D23F3AA250E",

@@ -18,6 +18,7 @@ import type { Building, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { forestLooks, type ForestState } from './forest-state';
+import { elevationAt } from './ground';
 
 /**
  * Cuántos árboles caben en una celda de bosque.
@@ -82,6 +83,104 @@ export interface Forest {
   dispose(): void;
 }
 
+// ---------------------------------------------------------------------------
+// Los pinos, en la loma de la montaña.
+//
+// **Corrección del 18 sep 2026, del dueño del diseño**: «los pinos deben salir
+// en la loma de la montaña, están mal puestos». La primera versión los ponía en
+// el **bosque** próximo a la falda —sustituían un árbol de hoja por una conífera
+// en las celdas de bosque a menos de siete celdas de la montaña— y eso es otra
+// cosa: un pinar dentro del robledal. Lo que pidió es lo que se ve en un valle
+// de verdad: coníferas **subiendo la ladera**, donde ya no crece el bosque.
+//
+// Y con sus palabras, las tres condiciones: «en grupos de 3, 2 y 1, de
+// diferentes tamaños», «por los alrededores del mapa más pegado a la montaña».
+//
+// Medido para elegir la banda (tres semillas): la montaña ocupa media hoja
+// —3 980 celdas de 8 064— y sube de cota 0,15 a 6,00. Por cotas: de 0,15 a 0,5
+// hay unas 500 celdas, de 0,5 a 1 unas 460, de 1 a 1,5 unas 280, y por encima
+// de 2,5 más de dos mil. La loma es la banda baja: por debajo es el pie llano
+// del prado, donde el bosque ya planta lo suyo, y por encima es roca pelada
+// donde un pino no se agarra.
+// ---------------------------------------------------------------------------
+
+/** La cota entre la que un pino agarra en la ladera. */
+const LOMA_LOW = 0.2;
+const LOMA_HIGH = 1.6;
+
+/**
+ * Cuántas de las anclas posibles se quedan.
+ *
+ * TUNE: 0,18. La banda tiene de 1 250 a 1 350 celdas por valle, y una ancla por
+ * celda daría más de cien corros: una ladera tapizada de pinos, que no es lo que
+ * se pidió. Con esta parte salen de 17 a 26 corros y de 30 a 50 pinos, que es la
+ * densidad de la primera versión —la que se vio bien, sólo que en el sitio
+ * equivocado—.
+ */
+const ANCHOR_SHARE = 0.18;
+
+/** Si esa celda es ladera de montaña donde un pino agarra. */
+function onHillside(map: ValleyMap, cell: number): boolean {
+  if (map.terrain[cell] !== TERRAIN_CODE.mountain) return false;
+  const x = cell % map.width, z = Math.floor(cell / map.width);
+  const height = elevationAt(map, x + 0.5, z + 0.5);
+  return height >= LOMA_LOW && height <= LOMA_HIGH;
+}
+
+/**
+ * Los pinos del valle: corros de uno a tres, separados entre sí, en la ladera.
+ *
+ * Determinista y sin azar del motor: el sitio sale de la celda, como todo lo
+ * que este módulo planta (§4.3). El mismo valle da los mismos pinos.
+ */
+export function pineCells(map: ValleyMap): ReadonlySet<number> {
+  const candidates = new Set<number>();
+  for (let cell = 0; cell < map.terrain.length; cell += 1) {
+    if (onHillside(map, cell)) candidates.add(cell);
+  }
+  const neighbours = (cell: number): number[] => {
+    const x = cell % map.width, z = Math.floor(cell / map.width), around: number[] = [];
+    for (let dz = -1; dz <= 1; dz += 1) for (let dx = -1; dx <= 1; dx += 1) {
+      if (dx === 0 && dz === 0) continue;
+      const nx = x + dx, nz = z + dz;
+      if (nx >= 0 && nz >= 0 && nx < map.width && nz < map.height) around.push(nz * map.width + nx);
+    }
+    return around;
+  };
+  // Un ancla es la celda de menor rango de su vecindad —así no hay dos anclas
+  // pegadas— y sólo una parte de ellas se queda, para que la ladera respire.
+  const anchors = [...candidates].filter(cell => {
+    if (stable(cell, 823) >= ANCHOR_SHARE) return false;
+    const rank = stable(cell, 211);
+    return neighbours(cell).every(near => !candidates.has(near) || stable(near, 211) >= rank);
+  }).sort((a, b) => stable(a, 313) - stable(b, 313) || a - b);
+  const selected = new Set<number>(), reserved = new Set<number>();
+  for (const anchor of anchors) {
+    if (reserved.has(anchor)) continue;
+    const companions = neighbours(anchor).filter(cell => candidates.has(cell) && !reserved.has(cell))
+      .sort((a, b) => stable(a, anchor + 419) - stable(b, anchor + 419) || a - b);
+    // Uno, dos o tres. La cuenta sale del ancla, así que un corro de tres es
+    // siempre el mismo corro de tres.
+    const group = [anchor, ...companions].slice(0, 1 + Math.floor(stable(anchor, 421) * 3));
+    for (const cell of group) {
+      selected.add(cell); reserved.add(cell);
+      for (const near of neighbours(cell)) reserved.add(near);
+    }
+  }
+  return selected;
+}
+
+/**
+ * Lo que mide cada pino: tres tamaños, «de diferentes tamaños».
+ *
+ * TUNE: 0,78, 1 y 1,2, repartidos a tercios por la celda. Un pinar de clones se
+ * lee como un patrón; con tres alturas la ladera parece crecida.
+ */
+export function pineScaleAt(cell: number): number {
+  const rank = stable(cell, 577);
+  return rank < 0.34 ? 0.78 : rank < 0.68 ? 1 : 1.2;
+}
+
 /**
  * Planta un árbol en cada celda de bosque del mapa.
  *
@@ -93,10 +192,19 @@ export function buildForest(
   tree: Object3D,
   palette?: Palette,
   suppressed: ReadonlySet<number> = new Set(),
+  pine?: Object3D,
 ): Forest {
   const looks = forestLooks(state, suppressed);
   const byCell = new Map(looks.map(look => [look.cell, look]));
   const growing = looks.filter(look => look.stage !== 'stump');
+  const scaleFor = (cell: number, material: string): number => {
+    const look = byCell.get(cell);
+    if (look === undefined) return 1;
+    if (look.stage === 'regrowth') return look.size;
+    return material.includes('leaf') ? look.crown : 1;
+  };
+  // El bosque es de hoja, entero: los pinos **no salen del bosque** desde la
+  // corrección del 18 sep 2026, salen de la ladera (ver `pineCells`).
   const scattered = scatterCells(
     state.map,
     tree,
@@ -104,12 +212,15 @@ export function buildForest(
     palette,
     false,
     false,
-    (cell, material) => {
-      const look = byCell.get(cell)!;
-      if (look.stage === 'regrowth') return look.size;
-      return material.includes('leaf') ? look.crown : 1;
-    },
+    scaleFor,
   );
+  // Y los pinos, en la loma, con su tamaño propio. No dependen de `forestLooks`
+  // —no son bosque que se tale— así que su escala es sólo la del pino.
+  const conifers = pine === undefined ? null : scatterCells(state.map, pine,
+    [...pineCells(state.map)], palette, false, false,
+    (cell) => pineScaleAt(cell));
+  const group = conifers === null ? scattered.group : new Group();
+  if (conifers !== null) { group.name = 'Valley_Forest'; group.add(scattered.group, conifers.group); }
   const stumpCells = looks.filter(look => look.stage === 'stump').map(look => look.cell);
   const stumpGeometry = new CylinderGeometry(0.16, 0.2, 0.22, 8);
   stumpGeometry.translate(0, 0.11, 0);
@@ -135,16 +246,19 @@ export function buildForest(
   if (stumpCells.length > 0) {
     stumps.instanceMatrix.needsUpdate = true;
     stumps.computeBoundingSphere();
-    scattered.group.add(stumps);
+    group.add(stumps);
   }
   return {
     ...scattered,
+    group,
     count: looks.filter(look => look.stage === 'standing').length,
     regrowthCount: looks.filter(look => look.stage === 'regrowth').length,
     stumpCount: stumpCells.length,
     dispose(): void {
       scattered.dispose();
-      if (stumpCells.length > 0) scattered.group.remove(stumps);
+      conifers?.dispose();
+      if (conifers !== null) group.remove(scattered.group, conifers.group);
+      if (stumpCells.length > 0) group.remove(stumps);
       stumps.dispose();
       stumpGeometry.dispose();
       stumpMaterial.dispose();

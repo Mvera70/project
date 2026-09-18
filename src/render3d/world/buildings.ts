@@ -150,8 +150,13 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
     object.userData.buildingId = planned.id;
     const mesh = object as Object3D & { isMesh?: boolean; castShadow?: boolean; receiveShadow?: boolean };
     if (mesh.isMesh === true) {
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
+      // El campo ya lleva hileras facetadas como parte del recurso. Si esas
+      // caras proyectan y reciben sombra a la vez, el shadow map dibuja una
+      // sombra por cada diente y el sembrado parpadea al moverse el sol. Es
+      // suelo trabajado, no un volumen que tenga que oscurecer a la aldea:
+      // dejamos la luz directa y quitamos la auto-sombra de la parcela.
+      mesh.castShadow = planned.kind !== 'field';
+      mesh.receiveShadow = planned.kind !== 'field';
     }
   });
   group.add(model);

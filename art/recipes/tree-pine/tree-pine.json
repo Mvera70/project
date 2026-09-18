@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "tree-pine",
+  "scale": 0.3333333333333333,
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "tree",
+    "footprint": [1, 1],
+    "note": "G-25. Conífera baja de cuatro verticilos facetados; comparte el tronco físico, origen, escala y materiales estacionales del caducifolio para convivir con navegación y tala."
+  },
+  "materials": [
+    { "name": "bark", "role": "trunk", "roughness": 0.95 },
+    { "name": "leaf", "role": "foliage", "roughness": 0.9 },
+    { "name": "leaf-light", "role": "foliageLight", "roughness": 0.9 }
+  ],
+  "groups": [
+    { "name": "Pine_Root", "location": [0, 0, 0], "parent": null }
+  ],
+  "primitives": [
+    { "type": "cylinder", "name": "Pine_Trunk", "location": [0, 0, 1.7], "radius": 0.34, "depth": 3.4, "vertices": 6, "smooth": false, "material": "bark", "parent": "Pine_Root" },
+    { "type": "cone", "name": "Pine_Whorl_Low", "location": [0, 0, 3.42], "radius": 1.28, "depth": 2.64, "vertices": 7, "smooth": false, "material": "leaf", "parent": "Pine_Root" },
+    { "type": "cone", "name": "Pine_Whorl_Mid", "location": [0.06, -0.04, 4.76], "radius": 1.02, "depth": 2.46, "vertices": 7, "smooth": false, "material": "leaf", "parent": "Pine_Root" },
+    { "type": "cone", "name": "Pine_Whorl_High", "location": [-0.04, 0.04, 5.98], "radius": 0.74, "depth": 2.18, "vertices": 7, "smooth": false, "material": "leaf-light", "parent": "Pine_Root" },
+    { "type": "cone", "name": "Pine_Crown", "location": [0, 0, 7.02], "radius": 0.42, "depth": 1.76, "vertices": 7, "smooth": false, "material": "leaf-light", "parent": "Pine_Root" }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 780,
+    "height": 900,
+    "cameraLocation": [4, -5, 3.33],
+    "cameraTarget": [0, 0, 1.33],
+    "orthoScale": 3.8,
+    "worldRole": "sky"
+  }
+}

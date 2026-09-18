@@ -6688,6 +6688,47 @@ sombra sobre medio pueblo, y lo que hay que ver es el pueblo.
 roca rodando por una ladera sigue sin tener donde ocurrir. Eso pide una capa de
 altura en `ValleyMap` y es trabajo del generador de mapas.
 
+### D.8b Los pinos de la ladera, y la sombra que parpadeaba (18 sep 2026)
+
+**Dos cosas del render que el dueño del diseño revisó mirando el valle rodado.**
+
+**Los pinos van en la loma, no en el bosque.** La primera versión los ponía
+dentro del bosque cercano a la falda —una conífera en lugar de un árbol de hoja,
+en las celdas de bosque a menos de siete de la montaña— y su veredicto fue
+directo: «los pinos deben salir en la loma de la montaña, están mal puestos».
+Ahora salen de la **ladera**: celdas de montaña con la cota entre 0,2 y 1,6, que
+es la banda baja medida —la montaña ocupa media hoja y sube de 0,15 a 6,00; por
+debajo está el pie llano del prado, donde ya planta el bosque, y por encima la
+roca pelada—.
+
+Las otras dos condiciones son suyas y están medidas en las cuatro semillas:
+
+| | Qué se pidió | Qué sale |
+|---|---|---|
+| Corros | «en grupos de 3, 2 y 1» | los tres tamaños en las cuatro semillas, con el dos como el más común; nunca cuatro |
+| Alturas | «de diferentes tamaños» | tres escalas (0,78, 1 y 1,2), las tres presentes en cada valle |
+| Sitio | «por los alrededores del mapa más pegado a la montaña» | de 96 a 122 pinos en 45 a 59 corros, todos en la ladera |
+
+Un corro se elige por la celda y no por una tirada (§4.3): el mismo valle da los
+mismos pinos. Y los pinos **no son bosque**: no se talan, no salen en
+`forestLooks` y un árbol que cae es siempre de hoja.
+
+**La sombra que parpadeaba era el campo.** El recurso del sembrado lleva hileras
+facetadas, y con esas caras proyectando y recibiendo sombra a la vez el shadow
+map dibujaba una sombra por cada diente: al moverse el sol, el campo entero
+parpadeaba. Un campo es **suelo trabajado**, no un volumen que tenga que
+oscurecer la aldea, así que se queda con la luz directa y sin auto-sombra
+(`world/buildings.ts`). Medido después, en una toma de seis segundos a ×64 con
+quince fotogramas por segundo: el salto medio entre fotogramas es de 1,9 sobre
+255 y el único pico —19,9— es el cambio de medianoche, cuando la fase pasa de
+0,997 a 0,031.
+
+Y la otra mitad de la sombra, que entró antes: la cámara del sol se ajusta al
+**mapa** y no a lo que se ve (`SUN_SHADOW`, `visual-config.ts`), así que acercar
+la cámara ya no mueve las sombras.
+
+---
+
 ### D.9 Rendimiento: presupuesto antes de ampliar
 
 §10.7 contiene objetivos del Canvas, no mediciones ni garantías trasladables

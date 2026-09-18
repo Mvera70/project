@@ -405,6 +405,25 @@
       }
     },
     {
+      "id": "tree-pine",
+      "artifactRound": "G-25",
+      "status": "study",
+      "recipe": "art/recipes/tree-pine/tree-pine.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-17T18-50-54-254Z-28980",
+        "directory": "artifacts/graphics/G-25/approved/20a5d8033e247108"
+      },
+      "bounds": {"min": [-0.415969, 0, -0.426667], "max": [0.415969, 2.633334, 0.384413], "size": [0.831938, 2.633333, 0.81108]},
+      "recipeSha256": "647399763ED73B4C24EC3982A4207E736676F207BE286B2F1F4BBC0AC1C3520E",
+      "materials": ["bark", "leaf", "leaf-light"],
+      "clips": [], "motion": [], "connectors": [],
+      "statistics": {"objects": 4, "meshes": 3, "materials": 3, "triangles": 68},
+      "hashes": {"tree-pine.glb": "20A5D8033E247108EC37CC066A0DE40D22AB40B69B30E0E96FB7256E8BB99106"},
+      "provenance": {"kind": "original", "source": "Original conifer authored for The Valley G-25, forest variation batch", "license": "Project original"}
+    },
+    {
       "id": "rock",
       "artifactRound": "G-25",
       "status": "study",
