@@ -509,6 +509,53 @@ quién lo escribe y para qué prueba existe. Sácalos con
 
 ---
 
+#### S-09 · La crónica enseña `{B}` en vez de un nombre
+
+**Por qué.** En la semilla 7 al año 50 se lee, en una entrada de **peso 3**:
+
+> The smithy passed to **{B}** in year 49.
+
+Con la llave y la letra en pantalla. Lo cazó una captura del paquete de prensa
+el 18 sep 2026, y la causa está localizada — no hay que investigarla:
+
+- `namesOf` (`src/engine/crossroads/resolve.ts`, al final) traduce el reparto de
+  la encrucijada a nombres, y **se salta a quien tiene el nombre vacío**.
+- Un aldeano sólo tiene nombre cuando **ocupa un oficio vacante**:
+  `promoteToNamed` (`src/engine/people/villagers.ts`), llamado desde el paso del
+  tick en `sim.ts:156`. Hay un tope de **ocho nombrados a la vez**
+  (`PEOPLE.MAX_NAMED`), así que un valle de cuarenta y dos personas tiene seis
+  con nombre.
+- La encrucijada del rencor heredado (`catalog/feud.ts:135`) reparte
+  `A: anyNamed` y **`B: childOf A`**. Un hijo no tiene oficio, así que no tiene
+  nombre, y la plantilla se escribe con el hueco sin rellenar.
+- No es cosa de los muertos: `state.people.villagers` «includes the dead; nobody
+  is ever removed», así que a un fallecido sí se le encuentra el nombre.
+
+**La decisión es del dueño del diseño** (por la regla de arriba: aquí hay una
+elección de contenido, no una de implementación). Son dos caminos:
+
+1. **La frase lleva el parentesco en vez del nombre.** Sólo toca
+   `bank.en.ts`: las tres variantes de
+   `crossroad.feud_inherited.give_b_the_smithy` —y las de `send_b_away`, que
+   tienen el mismo reparto— se reescriben para no depender de `{B}`. No toca el
+   motor, no mueve el azar, no mueve ninguna partida guardada. Es el arreglo de
+   media hora.
+2. **Ser elegido para una encrucijada nombra a esa persona.** Es lo coherente
+   con el juego —se nombra a quien se vuelve notable— y convierte el drama en
+   una fábrica de personajes, que es lo que el rework pide. Pero **gasta una de
+   las ocho sillas**, consume azar del flujo de nombres y por tanto **mueve los
+   nombres de toda partida guardada**: hay que contarlo en el changelog y
+   revisar las pruebas que fijan nombres.
+
+**Qué hacer, cualquiera de los dos.** Una prueba rápida que recorra **todas**
+las plantillas del catálogo y falle si una entrada renderizada deja un `{...}`
+sin resolver, con el reparto que el catálogo declara. Hoy no existe y es lo que
+habría cazado esto sin una captura: es la gemela de la prueba de `cart.no.*`
+(cada medio × cada negativa) que C4 escribió por la misma razón.
+
+**Hecho cuando** ninguna plantilla del catálogo puede llegar a la pantalla con
+un hueco sin rellenar, y la prueba lo vigila.
+
 ---
 
 ### 4. Operativa que cuesta tiempo si no se sabe
