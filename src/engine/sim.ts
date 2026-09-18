@@ -57,6 +57,7 @@ import { collectTithe, expireOffer, settleOffer } from './world/road';
 import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
+import { ringClosed } from './world/placement';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
@@ -946,6 +947,37 @@ export function tick(
         building: raised.kind,
       },
       weight: builtWeight(raised.kind, count(state, raised.kind)),
+    });
+  }
+
+  // A1 · **El día que la villa queda cerrada** (§1b, fase 3 de la meta).
+  //
+  // Se pregunta sólo cuando se acaba de levantar una pieza de muralla, porque
+  // es lo único que puede cerrar un anillo y `ringClosed` recorre las rejillas
+  // de ocupación: preguntarlo cada semana sería pagarlo cada semana para que
+  // la respuesta sea «no» durante sesenta años.
+  //
+  // La bandera es permanente y hace dos cosas: que la línea suene **una vez**
+  // —si mañana arde una estaca y se repone, el anillo se vuelve a cerrar y eso
+  // no es una noticia— y que el resto del juego pueda preguntar en qué fase
+  // está el valle sin recorrer nada (§1b: es la puerta de la fase 4, y lo que
+  // un asedio necesita para tener contra qué llegar).
+  //
+  // **Peso 3**, y §9.2 se amplía con esta línea: una aldea se cierra una vez
+  // en su vida y desde §1b eso es cambiar de fase, no terminar un edificio.
+  if (built.some((raised) => raised.kind === 'palisade' || raised.kind === 'wall')
+    && state.flags['wall_closed'] === undefined
+    && ringClosed(state)) {
+    state.flags['wall_closed'] = 0;
+    say({
+      kind: 'built',
+      templateKey: 'wall.closed',
+      params: {
+        year: year(),
+        season: season(),
+        pieces: count(state, 'palisade') + count(state, 'wall'),
+      },
+      weight: 3,
     });
   }
 

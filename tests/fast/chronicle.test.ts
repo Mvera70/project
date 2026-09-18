@@ -329,6 +329,9 @@ describe('render', () => {
       built: 2,
       lost: 1,
       wood: 15, // R-1: el buhonero y el tejado hablan de leña
+      // A1 · los tramos de muralla que tiene el anillo al cerrarse
+      // (medido: de 58 a 103 en doce semillas).
+      pieces: 84,
     };
     const keys = bankKeys();
     let rendered = 0;

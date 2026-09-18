@@ -153,6 +153,32 @@ function ringToBuild(state: GameState, centre: Point, coreRadius: number,
   return null;
 }
 
+/**
+ * A1 · **Si el anillo de muralla está cerrado**: hay anillo y ya no cabe ni una
+ * pieza más en él.
+ *
+ * Vive aquí y no en `derive/` porque la respuesta sale de las mismas rejillas
+ * de ocupación que usa `placeBuilding` —lo construido, lo reservado, la línea
+ * de la propia muralla— y duplicarlas fuera sería tener dos ideas distintas de
+ * dónde cabe una pieza. Es pura: no escribe nada, ni siquiera el anillo.
+ *
+ * **Cerrado no quiere decir un círculo perfecto.** Quiere decir que la aldea
+ * ya no tiene dónde seguir amurallando ese anillo: el agua, la roca y el borde
+ * del mapa cierran el resto. Es exactamente la condición con la que §7.4c deja
+ * de pedir muralla y la obra pasa a lo siguiente (`nextProject`), así que lo
+ * que esto responde es «la aldea ha terminado su muralla», que es la fase 3 de
+ * la meta (§1b).
+ */
+export function ringClosed(state: GameState): boolean {
+  const ring = state.ring;
+  if (ring === null) return false;
+  const plaza = plazaCentre(state.plaza);
+  const inside = plaza.x >= 0 && plaza.y >= 0
+    && plaza.x < state.map.width && plaza.y < state.map.height;
+  if (!inside) return false;
+  return !ringHasRoom(state, plaza, ring, occupiedCells(state));
+}
+
 /** Si en ese anillo queda alguna celda donde se pueda plantar una pieza. */
 function ringHasRoom(state: GameState, centre: Point, radius: number,
   ground: { occupied: Uint8Array; reserved: Uint8Array }): boolean {

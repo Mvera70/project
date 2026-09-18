@@ -24,6 +24,7 @@ import { run } from '../src/engine/sim';
 import { foundGame } from '../src/engine/found';
 import { population } from '../src/engine/people/demography';
 import { crownRefusal } from '../src/engine/people/crown';
+import { ringClosed } from '../src/engine/world/placement';
 import type { GameState } from '../src/engine/state';
 
 const arg = (name: string, fallback: number): number => {
@@ -56,6 +57,9 @@ const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] = [
   ['molino', (s) => alive(s, 'mill') >= 1],
   ['corona posible', (s) => crownRefusal(s) !== 'small'],
   ['30 personas', (s) => population(s) >= 30],
+  // A1 · el peldaño de la fase 3 (§1b): la villa cerrada, que es lo que un
+  // asedio necesita para tener contra qué llegar.
+  ['VILLA CERRADA', (s) => ringClosed(s)],
 ];
 
 const hits = new Map(LADDER.map(([name]) => [name, [] as number[]]));

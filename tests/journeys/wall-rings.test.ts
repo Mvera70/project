@@ -25,6 +25,7 @@
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
+import { ringClosed } from '@engine/world/placement';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import type { Building, GameState } from '@engine/state';
@@ -138,5 +139,60 @@ describe('P-4 · la muralla es una muralla', () => {
     });
     expect(onRing.length / Math.max(1, walls.length),
       `en el anillo ${onRing.length} de ${walls.length}`).toBeGreaterThanOrEqual(0.8);
+  });
+});
+
+describe('A1 · la villa se cierra, y se cuenta una vez', () => {
+  // §1b · La fase 3 de la meta. Lo que se guarda no es cuándo se cierra —eso
+  // es balance y se nivela al final— sino que **el juego se entera**: que la
+  // aldea que ya no puede seguir amurallando lo diga, con peso de titular, y
+  // que no lo repita.
+  //
+  // Medido al cerrar A1, doce semillas × ochenta años: cierran **once de
+  // doce**, la mediana en el año 38 —425 h de reloj a ×1— con 58 a 103 piezas
+  // de muralla, y **ninguna lo dijo dos veces**. La que no cierra (la 91) se
+  // queda en 67 piezas: su anillo cruza agua y sigue teniendo hueco donde no
+  // se puede construir, que es el caso que `ringClosed` tiene que saber leer
+  // sin colgarse esperando un círculo perfecto.
+  const YEARS = 80;
+
+  it('el valle que cierra su anillo lo cuenta, con peso de titular y una sola vez', () => {
+    let closed = 0;
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      const said: number[] = [];
+      for (let week = 0; week < TIME.WEEKS_PER_YEAR * YEARS && state.ended === null; week += 1) {
+        for (const report of run(state, 1, 'prudent', CATALOG)) {
+          for (const entry of report.entries) {
+            if (entry.templateKey === 'wall.closed') said.push(entry.weight);
+          }
+        }
+      }
+      // La propiedad, en las dos direcciones: lo dice si y sólo si se cerró.
+      expect(said.length, `semilla ${seed}: lo dijo ${said.length} veces`)
+        .toBe(ringClosed(state) ? 1 : 0);
+      for (const weight of said) {
+        expect(weight, `semilla ${seed}: peso`).toBe(3);
+      }
+      if (said.length === 1) closed += 1;
+    }
+    // Y no es una propiedad vacía: la mayoría de los valles llegan a cerrar.
+    expect(closed, `cerraron ${closed} de ${SEEDS.length}`)
+      .toBeGreaterThanOrEqual(Math.ceil(SEEDS.length / 2));
+  });
+
+  it('la marca se queda puesta, que es lo que la fase 4 va a preguntar', () => {
+    const state = foundGame(69);
+    run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
+    expect(ringClosed(state), 'la semilla 69 cierra en el año 29').toBe(true);
+    expect(state.flags['wall_closed'], 'y la marca es permanente').toBe(0);
+  });
+
+  it('un valle sin anillo no está cerrado', () => {
+    // `ringClosed` no puede decir que sí por no haber muralla: sin anillo no
+    // hay nada cerrado, y es la mitad de la propiedad que un asedio necesita.
+    const state = foundGame(7);
+    expect(state.ring).toBeNull();
+    expect(ringClosed(state)).toBe(false);
   });
 });

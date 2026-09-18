@@ -183,8 +183,38 @@ a cuerpo (golpe, empujón, caída) y el ejército que entra (un bando hostil con
 IA, un portón que se rompe) son del tamaño de una tanda como la de la IA de la
 vida; y el gore, los cuerpos que quedan y las casas que arden de verdad
 dependen de la sesión de arte, porque **hoy no existe un solo clip de pelea**.
-Cómo se hace el gore y cómo se hacen las físicas está por decidir; que sea así
-no.
+Cómo se hace el gore está por decidir; que sea así, no.
+
+#### Las cuatro decisiones del 18 sep 2026
+
+Tomadas por el dueño del diseño al abrirse el plan (`docs/plan-meta.md`), y
+son las que dejan de estar abiertas:
+
+**1 · Caer tiene dos tamaños.** Un asalto pequeño se aguanta o se sufre: entran,
+matan a algunos, roban grano y plata, queman lo que pillan, y la aldea sigue con
+lo que queda. Uno grande que rompa el portón y entre entero **acaba la
+partida**. Así hay asedios que se cuentan en la crónica y uno que la cierra, y
+la presión sube con lo que se acumuló. El motor gana un final que no tenía —una
+derrota militar— junto a la extinción, el abandono y la dispersión.
+
+**2 · Quien ataca es otro valle.** Un clan vecino que crece por su cuenta, no
+bandidos ni el señor de Wealdmere. Dos consecuencias: **la amenaza corre con los
+años y no con la riqueza** —es un valle que se desarrolla en paralelo— mientras
+que **lo acumulado decide el premio y la dureza del golpe**, que es §1 intacto;
+y abre la puerta a que algún día ese otro valle se pueda ver. El señor y los
+bandidos siguen donde están (el diezmo, el ladrón del granero): no son el
+ejército.
+
+**3 · Las físicas son Rapier desde el principio.** Motor de cuerpos rígidos
+(Rust/WASM) en vez de ampliar lo que la capa de vida ya tiene. Se elige sabiendo
+lo que cuesta, que estaba escrito al elegirlo: **cerca de un megabyte más en el
+móvil**, casarlo con el paso fijo de la capa de vida es una tanda entera, y la
+primera flecha vuela más tarde que por el otro camino. A cambio, ragdolls,
+escombros y un portón que se astilla salen del mismo sitio y no hay que
+rehacerlo después.
+
+**4 · Lo primero es que cerrar la muralla se note** (A1 del plan): sin el cierre
+no hay contra qué llegue un asedio.
 
 ---
 
@@ -2543,9 +2573,19 @@ un registro de obra, no una crónica.
 
 | Peso | Qué |
 |---|---|
-| **3** | Fundación, extinción, muerte de un nombrado, sucesión, encrucijada y su consecuencia diferida, brote de peste, hambruna con muertos |
+| **3** | Fundación, extinción, muerte de un nombrado, sucesión, encrucijada y su consecuencia diferida, brote de peste, hambruna con muertos, **el cierre de la muralla** |
 | **2** | Cosecha excepcional (ruinosa o abundante), llegada o marcha de gente, incendio, edificio **singular** terminado (capilla, iglesia, fragua, molino, pozo, primer granero), rencor formado |
 | **1** | Todo lo demás: casas, campos, graneros posteriores, **cada tramo de empalizada o muro**, cosecha normal, nacimientos y muertes corrientes, cambio de estación |
+
+**El cierre de la muralla entró en la fila de arriba con A1 (18 sep 2026)** y
+es la única línea de obra que llega a peso 3. El motivo es §1b: desde que el
+juego tiene meta, cerrar el anillo no es terminar un edificio, es **cambiar de
+fase** —el valle deja de ser un pueblo abierto y pasa a ser lo que un asedio
+puede sitiar—, y eso pasa una vez en la vida de una aldea. Cada tramo suelto
+sigue siendo peso 1, que es lo que impide que un año de obra sepulte el año.
+La marca `state.flags['wall_closed']` es lo que hace que suene una sola vez:
+si mañana arde una estaca y se repone, el anillo se vuelve a cerrar y eso ya no
+es una noticia.
 
 **Y se agregan por año.** Varias entradas de la misma clave en el mismo año se
 componen en una sola línea con su recuento: veintiún tramos de empalizada son

@@ -817,6 +817,14 @@ export const BANK: Record<string, string[]> = {
     'They raised a hall for the crown that {season}: three bays, a porch, and a door that takes two hands.',
     'The hall went up in year {year}, the largest thing the valley had ever built in timber.',
   ],
+  // A1 · El cierre del anillo (§1b, fase 3): la aldea deja de ser un pueblo
+  // abierto. Es la línea más alta que puede decir una obra, y por eso no es un
+  // `built.*` más: lo que se cuenta no es la última estaca, es la villa.
+  'wall.closed': [
+    'The last stake went in at {season}, and the village stood enclosed.',
+    'By {season} the ring was whole: {pieces} lengths of it, and no way in but the gate.',
+    'They closed the wall in {season} of year {year}, and slept inside it.',
+  ],
   'built.palisade': [
     'They put up another length of palisade in the {season} of year {year}.',
     'The palisade grew by a stretch that {season}.',
