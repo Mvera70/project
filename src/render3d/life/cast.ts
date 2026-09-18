@@ -152,6 +152,50 @@ export function castOf(
       role: dweller.dayPlan?.role ?? null,
     });
   }
+
+  // D3 · **Y la partida del valle vecino, si hoy hay una** (§1b, fase 4).
+  //
+  // Entran por aquí y no por `dwellers` porque no son vecinos: no tienen
+  // `VillagerId`, ni casa, ni necesidades, ni oficio. Lo único que comparten
+  // con la gente del valle es que son cuerpos que andan, y eso es exactamente
+  // lo que un `Actor` describe.
+  //
+  // Se pintan con la figura del forastero (`role: 'stranger'` →
+  // `STRANGER_VILLAGER`), que es la más honesta que hay hoy: un desconocido
+  // entre conocidos. Cuando el taller entregue el clan armado (E2 del plan),
+  // esta línea es lo único que cambia.
+  for (const raider of life.raiders) {
+    if (raider.phase === 'gone') continue;
+    const { body } = raider;
+    const speed = Math.hypot(body.vx, body.vz);
+    const moving = speed > 0.05;
+    const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
+    const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
+    actors.push({
+      id: body.id,
+      x: body.x,
+      z: body.z,
+      facing: body.facing,
+      // Andando o plantado. `walking`/`resting` son las dos únicas actividades
+      // que un forastero puede tener: no trabaja, no vuelve a casa y no tiene
+      // casa a la que volver.
+      activity: moving ? 'walking' : 'resting',
+      clip: moving ? 'walk' : 'idle',
+      load: null,
+      poseSeconds: seconds,
+      clipSeconds: seconds,
+      // Sin `travelled`: la zancada de un saqueador la mueve el reloj y no el
+      // suelo, porque nadie le sigue la pista paso a paso como a un vecino.
+      travelled: 0,
+      cell: cellZ * width + cellX,
+      named: false,
+      age: 30,
+      talking: false,
+      arguing: false,
+      occupation: null,
+      role: 'stranger',
+    });
+  }
   return actors;
 }
 

@@ -2,7 +2,7 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
-import { crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear, parseDebugRequest, runToCrossroad, runToSky, stateAt } from './ui/debug';
+import { crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear, parseDebugRequest, raidNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -84,6 +84,9 @@ if (root) {
     // K-5 · `&crown=ready` deja la fila de la corona encendida, y
     // `&crown=<oficio>` corona ya a alguien de ese oficio para ver lo que viene
     // después (la sala, la palabra «king», el estilo del valle).
+    // D3 · `&raid=20` planta la partida del valle vecino llegando hoy.
+    const raid = query.get('raid');
+    if (raid !== null) raidNow(state, Number(raid) || 12);
     const crown = query.get('crown');
     if (crown === 'ready') crownReady(state);
     else if (crown !== null) crownNow(state, crown);

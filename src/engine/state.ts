@@ -1049,6 +1049,17 @@ export interface Threat {
   comingBand: number;
   /** Cuántas han llegado ya, para que la crónica y §8.6 sepan que no es la primera. */
   raids: number;
+  /**
+   * D3 · El tick en que llegó la última partida, o `null` si no ha llegado
+   * ninguna. **Lo que la capa de vida necesita para enseñarla**: un asalto pasa
+   * en una semana y el motor lo resuelve y lo olvida, así que sin esto la
+   * jornada no tiene forma de saber que hoy hay gente en el camino. Es el mismo
+   * trato que `state.happenings` le da al lobo del corral (IA-5): el hecho se
+   * apunta, y quien dibuja lo lee.
+   */
+  arrivedTick: number | null;
+  /** Y de cuántos era, por la misma razón. */
+  lastBand: number;
 }
 
 // ---------------------------------------------------------------------------

@@ -114,7 +114,7 @@ export function foundGame(
     // porque haya muerto la gente (§13.3).
     traits: valleyTraits(terrainSeed),
     // B1 · el clan vecino empieza donde empieza todo: sin nada y sin bajar.
-    threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 },
+    threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0, arrivedTick: null, lastBand: 0 },
     ended: null,
   };
   foundingBuildings(state, profile);

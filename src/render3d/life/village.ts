@@ -41,6 +41,7 @@ import {
 import { createCommitmentRegistry, type ActorRef } from './commitments';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, WOLF_ALARM_RADIUS, type Beast } from './beasts';
+import { createRaiders, raidToday, stepRaider, type Raider } from './raiders';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import type { Animal } from '@derive/animals';
 import {
@@ -249,6 +250,15 @@ export interface Village {
    * tipo sólo para esto: una fuente en vivo en vez de la fórmula de siempre.
    */
   readonly wildlife: readonly Animal[];
+  /**
+   * D3 · La partida del valle vecino, si hoy hay una (§1b, fase 4).
+   *
+   * Vacía casi siempre: sólo la semana que el motor dice que llegaron
+   * (`threat.arrivedTick`). No son vecinos —no tienen `VillagerId`, ni casa, ni
+   * necesidades— así que van por su lista y no por `dwellers`: quien los dibuja
+   * los pinta como forasteros, que es lo que son.
+   */
+  readonly raiders: readonly Raider[];
   /**
    * IA-5: la cuenta de la visita del lobo, del mismo tipo que `stories` —
    * episodios, no pasos—: cuántas veces ha aparecido (a lo sumo una por
@@ -652,6 +662,12 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // ha ido), y sus cuatro cuentas — amenaza, aviso, calma, forzada — son el
   // mismo tipo de prueba que `stories` de más arriba: episodios por visita,
   // no pasos.
+  // D3 · la partida, si el motor dice que llegó esta semana. Se monta una vez
+  // al abrir la jornada, como los animales: no se sortea cada paso.
+  const bandSize = raidToday(state);
+  const raiders: Raider[] = bandSize === 0
+    ? []
+    : createRaiders(state, land, heart, seed, 0, bandSize);
   let wolf: Wolf | null = null;
   let wolfSpawned = false;
   let wolfNoticedThisVisit = false;
@@ -726,6 +742,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         triggerTick: quarrelPair === null ? null : state.tick,
       };
     },
+
+    get raiders(): readonly Raider[] { return raiders; },
 
     get wildlife(): readonly Animal[] {
       return wolf !== null && wolf.phase !== 'gone'
@@ -1480,6 +1498,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         wolfNoticedThisVisit = false;
         wildlifeThreats += 1;
       }
+      // D3 · y la partida anda lo suyo. Guionizada como el lobo y por la misma
+      // razón (E.8): lo que se llevan ya lo decidió el motor antes de que
+      // empiece el día, y esto sólo lo enseña. No pelea, no rompe y no mata.
+      for (const raider of raiders) stepRaider(raider, land, seed, steps);
+
       if (wolf !== null && wolf.phase !== 'gone') {
         // Ligado a una constante propia y no a `wolf` a secas: `stepWolf`
         // muta `.phase` por dentro, y TypeScript no lo sabe — sigue creyendo,

@@ -194,6 +194,19 @@ export function crownNow(state: GameState, trade: string): void {
   crownKing(state, who.id, seasonOf(state.tick), yearOf(state.tick));
 }
 
+/**
+ * D3 · `?raid=<cuántos>` planta una partida del valle vecino llegando **hoy**.
+ *
+ * Hace falta por lo mismo que `?crown=`: un asalto llega hacia la hora 114 de
+ * reloj y una captura no puede esperar. Pone lo que el motor pondría al llegar
+ * la partida (`world/threat.ts`), ni más ni menos, así que lo que se ve es lo
+ * que se vería jugando.
+ */
+export function raidNow(state: GameState, band: number): void {
+  state.threat.arrivedTick = state.tick;
+  state.threat.lastBand = Math.max(1, band);
+}
+
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {
   for (let weeks = 0; weeks < limitWeeks; weeks += 1) {
     if (state.crossroad !== null || state.ended !== null) return weeks;

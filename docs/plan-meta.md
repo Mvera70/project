@@ -87,7 +87,7 @@ es divertido, y el resultado es el que sale.
 |---|---|---|---|---|---|
 | ~~D1 · Rapier, integrado~~ · **hecho el 18 sep 2026**: `life/physics.ts`, un paso de física por paso de vida, y **carga tardía** — el bundle principal no crece y Rapier queda en su trozo de 1,05 MB comprimido que sólo se pide cuando hay algo que simular. Medido: 200 cuerpos en el aire cuestan **403 µs**, el 1,2 % del presupuesto. **Falta la medida en un dispositivo real** | Hecho (salvo la medida en móvil) | Alta | — | — |
 | D2 · Flechas y aldeanos-torre | Flechas como cuerpos de Rapier con gravedad e impacto; el aldeano en la muralla o la atalaya que dispara a lo que entra en alcance. **`launch()` ya existe y vuela**: falta quien dispare y a qué | **P1** | Media | Sol | D1 hecha, C2 |
-| D3 · El bando hostil | Cuerpos enemigos que llegan por el camino con su IA: acercarse, romper el portón, entrar, buscar a la gente y lo que arde | P2 | Alta | Astra | D1, B1 |
+| D3 · El bando hostil · **primera mitad hecha el 18 sep 2026**: llegan por el camino, se plantan ante el portón y se van (`life/raiders.ts`). Medido en 10 valles: 120 cuerpos, **cero colgados**, todos llegan andando. **Falta la segunda**: romper el portón, entrar y buscar lo que arde — y eso necesita los clips de E1 | **P1** (segunda mitad) | Alta | Astra | D1 y B1 hechas |
 | D4 · Cuerpo a cuerpo | Golpe con alcance, empujón, caída; muertes que salen de la física | P3 | Alta | Astra | D3 |
 | D5 · Lo que se rompe | El portón que cede, la muralla que se abre, las casas que arden durante el asalto | P3 | Media-alta | Sol → Astra | A2, D3 |
 | D6 · El saqueo | La escena de cuando cae: la entrada, la gente, el final que se ve | P3 | Alta | Astra | D4, D5, B3 |

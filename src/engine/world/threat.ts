@@ -196,6 +196,9 @@ function arrive(state: GameState): Sack {
   state.threat.comingTick = null;
   state.threat.comingBand = 0;
   state.threat.raids += 1;
+  // D3 · y queda apuntado que llegaron, para que la jornada pueda enseñarlos.
+  state.threat.arrivedTick = state.tick;
+  state.threat.lastBand = band;
   // B2 · la semana de después: `after_the_raid` pregunta qué se hace con lo que
   // queda mientras esta marca dure. Un año, que es lo que una aldea tarda en
   // dejar de hablar de ello.

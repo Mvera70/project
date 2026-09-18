@@ -22,7 +22,7 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
 |---|---|---|---|
-| **El asalto** (B1) | Una partida de 5 a 60 hombres baja del valle vecino, se lleva plata, grano y una cabeza | **Nada.** Una línea de crónica | Es la fase 4 entera: cuerpos que llegan por el camino, la escena, y lo que arde. Ver §3 |
+| **El asalto** (B1, D3) | Una partida de 5 a 60 hombres baja del valle vecino, se lleva plata, grano y una cabeza | **Se les ve llegar** desde D3 (18 sep): doce cuerpos entran por el campo, se plantan ante el portón y se van. Se pintan con **la figura del forastero**, que es lo más honesto que hay hoy | El clan armado (E2) —una línea de `cast.ts` cuando exista— y la segunda mitad de D3: romper, entrar, y lo que arde |
 | **El aviso** (B2) | Ocho o catorce semanas antes, alguien los ve venir | La encrucijada, y la aldea reuniéndose (`gather`) | Un jinete que baja del pasto alto, o humo en la loma de enfrente. Es un efecto visual nuevo, no una malla |
 | **Prepararse** (B2, `braced`) | El ganado entra, el grano se esconde, se atranca | Nada | El corral vacío y la gente metiendo cosas: se puede hacer con la capa de vida, sin Blender |
 | **Pagar al clan** (B2, `bought_off`) | Treinta de plata suben la ladera y la partida se da la vuelta | Nada | Dos o tres cuerpos saliendo por el portón con una carga |

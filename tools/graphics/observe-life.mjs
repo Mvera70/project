@@ -46,11 +46,15 @@ try {
   const errors = [];
   tab.on('pageerror', e => errors.push(String(e)));
   const pageUrl = pathToFileURL(resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html')));
-  const debugRoute = means !== '' || happening !== '' || crown !== '';
+  // D3 · `--raid 20` planta la partida del valle vecino llegando hoy, que es
+  // la única forma de grabarla: un asalto llega hacia la hora 114 de reloj.
+  const raid = opt('raid', '');
+  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
-      + (crown === '' ? '' : `&crown=${crown}`);
+      + (crown === '' ? '' : `&crown=${crown}`)
+      + (raid === '' ? '' : `&raid=${raid}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
   await tab.goto(pageUrl.href);

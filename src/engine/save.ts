@@ -438,7 +438,7 @@ export function deserialize(raw: unknown): SaveFile {
     state = {
       ...state,
       rng: { ...state.rng, raid: state.rng.raid ?? hash32(state.seed, 'raid') },
-      threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 },
+      threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0, arrivedTick: null, lastBand: 0 },
     } as GameState;
   }
   if ((state as Partial<GameState>).traits === undefined) {

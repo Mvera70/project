@@ -121,7 +121,33 @@ ninguna pieza como terminada.
 Mirelo Text to Audio, 8 s de bosque inglés tranquilo con pájaros, hojas y brisa,
 sin música ni voces (`d249cedb-0628-47d8-8d59-3e7fc89e57d2`). Coste comprobado
 antes de enviar: 2 créditos; saldo 89 → 87. La generación terminó, pero la
-descarga local se interrumpió y no se integra ningún fichero en el juego.
+descarga local se interrumpió y no se integra ningún fichero en el juego. El
+dueño la descartó por cargada. Se hizo **una sola segunda prueba**: capa aislada
+de dos o tres pájaros lejanos, llamadas suaves y silencios largos, 8 s y 2
+créditos (`dccda69f-3a48-4185-8bfc-37a1155f735f`). También queda sólo como
+referencia: no se integra hasta escucharla y aprobarla.
+
+**Inventario de audio (18 sep):** `plan-audio.md` separa lo que ya sintetiza
+`ui/sound.ts` de lo que falta y vincula cada pieza a un disparador real. La
+producción se divide en ambiente limpio, interfaz, economía, medios, vida,
+sucesos, hitos/fases y asedio. Primera tanda, siempre de una en una: pájaros
+aprobados → apertura de panel → plata recibida → acción aceptada → hito mayor
+→ concepto de villa de piedra. El dueño pidió moderación: la interfaz no debe
+parecer una máquina de premios; abrir/cerrar serán una sola familia muy discreta
+y cambiar de pestaña puede quedar en silencio. El cambio de fase queda
+documentado pero no se integra antes de A4/A5; no existe un «nivel» separado
+del hito.
+
+**Prueba de interfaz sonora (18 sep):** se generó una única toma de
+`ui_panel_open` en Mirelo, 2 s técnicos para una cola útil de aproximadamente
+medio segundo, con pergamino seco y toque leve de madera. Coste preflight y
+real: **0,5 créditos** (`702c3d80-ff92-47a4-9c6d-a85a32eabac6`). Está pendiente
+de escucha y no se integra todavía; la moderación de interfaz queda como
+criterio de aceptación. Después se rehízo el criterio de prompts: la interfaz
+combina un gesto orgánico mínimo con un cuerpo tonal cálido y redondeado; el
+tanteo queda registrado, pero no es el patrón. `plan-audio.md` §8 contiene los
+**120 prompts canónicos** —todos los IDs del inventario— con duración, cabecera,
+núcleo exacto y exclusiones. No se generó nada en esa revisión.
 
 **IA-15 · primera cadena visible de recursos:** reparto semanal estable, pareja
 fundadora dedicada a subsistencia y ciclo `árbol → tala → carga → descarga → vuelta`.
@@ -618,6 +644,7 @@ es**.
 | ~~**Los lobos van al corral**~~ · **esta línea estaba mal anotada**: ya lo hacía IA-5 (`life/wildlife.ts`), y el 18 sep 2026 se rodó para comprobarlo | — | Toma de 90 s en la semilla 11, año 30, con el suceso provocado (`--happening wolves_at_the_coop`): el lobo sale del bosque, se acerca a **1,8 celdas de una gallina y 1,0 del corral**, ronda y se vuelve. Cero errores y cero penetraciones. Lo que faltaba no era el lobo: era poder **provocar** el suceso para verlo |
 | **LA META: la villa cerrada y el asedio** (`design.md` §1b, 18 sep 2026) · **A1, A2, B1, B2, C1 y D1 hechas** (el mundo físico ya existe y cuesta el 1,2 % del presupuesto; falta medirlo en un móvil de verdad) (el clan vecino baja a las 103 h y saquea; la mitad grande de «caer» espera a la batalla física): el cierre se cuenta con peso 3 y deja marca (`flags['wall_closed']`), y el portón es un edificio que va en el anillo (200 h de reloj); medido, la villa se cierra a las **425 h** de reloj contra las 61 h de la edad de piedra, y ese hueco es lo primero que pedirá el nivelado · **el plan está en `docs/plan-meta.md`**: ocho puntos (A-H), sus fases, prioridad, dificultad y agente (Luna/Terra baja, Sol media, Astra alta), y el orden en seis pasos | Dueño + quien retome | La fase 3 (villa cerrada) está a medias: el anillo existe y se cierra, el cierre no se celebra ni se ve distinto. La fase 4 (asedio) está por hacer entera y tiene tres piezas con coste conocido: flechas y aldeanos-torre (barato), cuerpo a cuerpo y ejército hostil (una tanda como la IA de la vida), gore y destrucción visible (sesión de arte: hoy no hay un solo clip de pelea). Antes de escribir el brief hay que decidir con el dueño qué es «caer» —el motor tiene tres finales y ninguno es una derrota militar— y con qué motor de físicas (balística propia basta para las flechas; el cuerpo a cuerpo con caídas pide más) |
 | ~~**LA LETALIDAD: el valle ya no se rompe**~~ · **respondido por el dueño el 18 sep**: «no pasa nada, todo eso se irá nivelando y haciendo el juego más difícil; si la vas cagando, el valle puede morir. Esa es la clave». La letalidad vendrá por las decisiones y por el asedio (§1b), no por remedir el rayo. `fate-chaos` sigue roja y medida hasta entonces | Decisión tomada | B-1 arregló el ritmo y con ello se llevó el caos: `tests/journeys/fate-chaos.test.ts` mide el principio —«que haya partidas que se rompan es la idea»— y da **0 de 12 valles acabados donde pide 3 o más**; a sesenta años, 1 de 24. La causa está medida y es la misma que arregló el ritmo: con casas a tiempo hay camas, con camas llega gente, y el ánimo pasa de estar por debajo de 25 el 26 % de las semanas al 4 %. La prueba se queda **roja y sin tocar el listón**: bajar la cota sería borrar el principio. Lo que hay que decidir es **por dónde muerde el mundo** — el hambre (el grano toca cero y no mata a nadie, la línea de abajo), los desastres acumulados de M-1, o la gracia de la pareja, que hoy cubre `GRACE_PEOPLE` 6 y `GRACE_YEARS` 5 |
+| **DOS DEFECTOS DE LA MURALLA, medidos al hacer D3** | Sol (motor) | Los encontró la partida del valle vecino al buscar por dónde entrar, y son de la muralla, no de ella. **Uno:** en la semilla 41 al año 20 el interior transitable de la aldea son **232 celdas de 8 064** y el portón da a una bolsa que no conecta con donde vive la gente — o sea que los vecinos no pueden salir a sus campos por la puerta. **Dos:** en la semilla 7 al año 25 el portón tiene **tres lados tapiados y una bolsa de ocho celdas**: una puerta que no lleva a ninguna parte. Es la misma enfermedad que B-1 destapó con el corro de §11.8 —la aldea densa parte el suelo transitable en bolsas— y ahora tiene dos casos medidos más. `life/raiders.ts` lo rodea (los saqueadores navegan por su lado y se conforman con campo abierto), pero **la muralla sigue rota** |
 | **La reunión de §11.8 no cabe en una aldea grande** | Sesión de vida (Anexo E) | Medido en B-1: se junta el **54 %** de la aldea (244 de 450 en doce combinaciones), y la fracción baja con el tamaño —la semilla 23 (19 personas) junta 10, la 41 (70) junta 28—. El corro son anillos alrededor de un punto y setenta personas no caben; subir el aforo pedido **no cambia nada** (medido con 40, 80 y 140 plazas). Tres pruebas declaradas con lo medido en `life-staging.test.ts`. Lo que B-1 **sí** arregló: el corro caía en una bolsa de suelo cerrada y la reunión se descartaba entera (cero de veinticinco) |
 | **Rehacer el banco de balance** (`npm run test:balance`, 45 min) | Quien retome el nivelado | Las **19 rojas de 37** medidas al cerrar M-4 son de **antes** del balanceo de la leña, así que no valen para decidir nada. Y el banco tarda más que su propio presupuesto: su aserto de duración (45 min) es una de las rojas |
 | **El hacha es el medio más flojo** | Decisión del dueño | 18 de plata para +2 obras de 60 y la primera piedra hasta veinte años antes en algún valle, pero sin mover la población (39 contra 40 en sesenta semillas). O baja de precio o necesita otro efecto; inventar el número sería inventarlo |
