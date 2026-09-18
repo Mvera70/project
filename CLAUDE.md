@@ -228,11 +228,37 @@ sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **La meta del proyecto está en `docs/design.md` §1b (18 sep 2026): una villa
 cerrada que cae o aguanta.** Cuatro fases —caserío, aldea, villa cerrada,
-asedio—, las dos primeras hechas y medidas en horas de reloj (B-1), la tercera a
-medias y la cuarta por hacer. Se cae por las decisiones, no por un rayo; la
-defensa se construye *dando* (armas, portón, atalaya) y el «tower defense» es
-literal —aldeanos en la muralla disparando— pero nada se coloca con el dedo.
-Toda ronda nueva se ordena contra esa tabla.
+asedio—, y **el 18 sep 2026 las cuatro tienen cuerpo**. Se cae por las
+decisiones, no por un rayo; la defensa se construye *dando* (armas, portón,
+atalaya) y el «tower defense» es literal —aldeanos en la muralla disparando—
+pero nada se coloca con el dedo. Toda ronda nueva se ordena contra
+`docs/plan-meta.md`.
+
+**El asedio funciona de punta a punta, y conviene saber por dónde pasa.** Un
+clan vecino crece con los años y baja cuando el valle tienta (B1); la crónica
+avisa (B2); la aldea sube de una a siete manos al cerco la víspera, con lo que
+se le haya dado (C2); los que tienen arco disparan flechas de Rapier con su
+parábola y su impacto (D2); un **asalto** —el que cuadruplica lo que el valle
+pone contra él— va a por la puerta, se apretuja contra ella y la golpea sesenta
+veces (D3b/D5); quien llega al alcance de un brazo pelea, y **defender cuesta
+vidas** (D4); y lo que salga de esa pelea **entra al motor como dato** por la
+puerta de `PlayerAct` (B4, `kind: 'battle'`), que es la frontera que §1b abrió:
+el motor sigue siendo determinista *dadas sus entradas* y la batalla no lo es.
+Si nadie mira la pelea, decide la cuenta de B3. Si el portón cede y alguien
+entra y sigue en pie, `ended.cause = 'stormed'` y la partida se acaba.
+
+**Tres reglas de esa maquinaria que cuesta tiempo olvidar:** una flecha basta y
+un golpe de mano no (tres); un portón roto con la partida entera en el suelo
+**no** es un valle tomado; y el parte de la batalla **no salva por existir**,
+salva si adelgazó la partida —si no, mirar la pantalla volvería al valle
+inmortal. Medido: sin dar defensa caen 3 de 12 valles en ochenta años; con la
+muralla tumbando al 30 % de la partida, ninguno.
+
+**Lo que le falta a la fase 4 es arte, no mecánica.** No existe un solo clip de
+pelea: el arquero se pinta con `idle`, el que cae se queda de pie, y el golpe
+contra la puerta no se ve. El encargo está en `docs/encargo-combate.md` y el
+inventario completo en `docs/encargos-3d.md`. **Y el gore, el fuego y la escena
+del saqueo (D6, E4) son decisión del dueño del diseño y están sin tomar.**
 
 **Los hitos humanos 0 y 6 se descartan** (dueño del diseño, 15 sep 2026). Eran
 la deuda más antigua del proyecto —una lectura de tres crónicas por un tercero y
