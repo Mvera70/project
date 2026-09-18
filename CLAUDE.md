@@ -113,6 +113,13 @@ python tools/graphics/film-sheet.py artifacts/graphics/film/x
                      # informe de fuera (`tools/life-report.ts`) no vio nunca que una
                      # de cada cinco muestras era alguien de pie creyendo que iba a
                      # algún sitio (IA-9)
+node tools/graphics/press-kit.mjs  # **el paquete de prensa**: todas las pantallas y
+                     # todos sus estados en una pasada, con hoja de contactos
+                     # (`artifacts/graphics/press/index.html`). Y el metraje del
+                     # tráiler aparte —el valle creciendo por años, las cuatro
+                     # estaciones, las diez escenas de R-1, el cerco, el asedio—
+                     # **sin interfaz**, con la pantalla despejada de UI-V10.
+                     # `--only <grupos>`, `--offset N` para continuar una tanda.
 npm run test:shots   # recorridos de interfaz en Canvas (Playwright)
 npm run test:pwa     # instalable y sin conexión, sobre el build real
 npm run chronicle -- --seed 7 --years 60   # runner del hito 0

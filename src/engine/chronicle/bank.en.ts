@@ -2352,6 +2352,15 @@ export const UI_BANK: Record<string, string> = {
   'title.seed.hint': 'The same number gives anyone the same valley to start with. Nobody leads it the same way.',
   'title.reroll': 'Another',
   'title.new.working': 'Founding…',
+  // El selector de idioma del menú (`screens/title.ts`). **Las tres claves
+  // faltaban**, así que el menú enseñaba `[language.english]` entre corchetes
+  // abajo a la izquierda: lo cazó la primera captura del paquete de prensa, y
+  // es la pantalla con la que empieza toda partida. Los nombres van **cada uno
+  // en su idioma**, que es como se nombra un idioma en un selector: quien busca
+  // español no busca «Spanish».
+  'language.label': 'Language',
+  'language.english': 'English',
+  'language.spanish': 'Español',
   'title.dev': 'Dev',
   'title.dev.year': 'Open at year',
   'title.dev.hint': 'The valley is played forward with the reference policy before it opens, so what you see is a real game and not a mock-up. Ten years take about a second. A valley that dies on the way opens as what it became.',
