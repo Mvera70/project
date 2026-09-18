@@ -94,6 +94,27 @@ export type Role =
   | 'herbalist'
   | 'stranger';
 
+/**
+ * K-1 · **La corona del valle**: quién la lleva, desde cuándo, y qué era antes.
+ *
+ * `trade` es el oficio que tenía el día que la recibió, y es lo que decide su
+ * estilo (`people/crown.ts`): el herrero tira a la muralla, el cura a la
+ * capilla. Se guarda en lugar de leerse de `villager.role` porque al coronar el
+ * oficio se pierde —el rey ocupa el asiento de `leader`— y sin esto un rey
+ * herrero dejaría de ser herrero en el momento de coronarlo.
+ *
+ * `id` puede ser de alguien muerto: entonces el trono está vacante y la corona
+ * espera a la sucesión de A.15 (§6.6).
+ */
+export interface Crown {
+  id: VillagerId;
+  since: number;
+  trade: Role | null;
+}
+
+/** Hacia dónde tira la aldea con ese rey. Sale del oficio, no del rasgo. */
+export type CrownStyle = 'forge' | 'plough' | 'chapel' | 'court';
+
 export type Trait =
   | 'ambitious'
   | 'devout'
@@ -518,7 +539,9 @@ export interface Offer {
 export type PlayerAct =
   | { kind: 'offer'; accept: boolean }
   // M-2 · dar un medio al valle. No dice qué hacer con él.
-  | { kind: 'means'; means: MeansId };
+  | { kind: 'means'; means: MeansId }
+  // K-1 · dar la corona a alguien. Tampoco dice qué hacer: dice **quién**.
+  | { kind: 'crown'; who: VillagerId };
 
 export interface ActRecord {
   tick: number;
@@ -761,7 +784,7 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 9; // P-4: el anillo de muralla (8 era P-1: la plaza)
+export const SCHEMA_VERSION = 10; // K-1: la corona (9 era P-4: el anillo de muralla)
 
 /**
  * La postura de la aldea: lo único que el jugador manda de forma continua.
@@ -821,7 +844,7 @@ export interface Intent {
 }
 
 /** Las familias de §7.3 que el jugador puede adelantar. */
-export type PriorityName = 'none' | 'food' | 'shelter' | 'faith' | 'craft' | 'defence';
+export type PriorityName = 'none' | 'food' | 'shelter' | 'faith' | 'craft' | 'defence' | 'court';
 
 /**
  * Qué entra en cada familia.
@@ -837,6 +860,9 @@ export const PRIORITY_FAMILIES: Readonly<Record<Exclude<PriorityName, 'none'>, r
   faith: ['chapel', 'church'],
   craft: ['smithy', 'mill', 'well'],
   defence: ['palisade', 'wall', 'watchtower'],
+  // K-4 · la sala del rey. Una familia de una sola cosa, porque es una sola
+  // cosa: la casa del que manda, y la quiere quien la quiere por eso.
+  court: ['hall'],
 };
 
 /**
@@ -1000,6 +1026,16 @@ export interface GameState {
    * levantar nada dentro de su radio (`PLAZA.RADIUS`).
    */
   plaza: { x: number; y: number };
+  /**
+   * K-1 · **La corona de este valle**, o nada si nadie la lleva todavía
+   * (esquema 10).
+   *
+   * Entra a `null` y una partida sin coronar es **byte a byte** la de antes de
+   * la fase del rey: `will(state)` devuelve entonces la voluntad de reposo, que
+   * es literalmente lo que el reparto de manos y la cola de obras leían de la
+   * postura retirada de v2.0.
+   */
+  crown: Crown | null;
   /**
    * P-4 · **El anillo de muralla que se está levantando**, como radio en celdas
    * desde la plaza, o nada si la aldea todavía no ha empezado ninguno

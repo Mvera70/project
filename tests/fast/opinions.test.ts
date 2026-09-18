@@ -34,6 +34,7 @@ function village(seed: number): GameState {
     // que elegirla.
     plaza: { x: 36, y: 56 },
     ring: null, // P-4 · sin muralla empezada (esquema 9)
+    crown: null, // K-1 · sin rey (esquema 10)
     map: {
       width: WORLD.WIDTH,
       height: WORLD.HEIGHT,

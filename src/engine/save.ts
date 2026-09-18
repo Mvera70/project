@@ -120,6 +120,8 @@ function actRecord(value: unknown): boolean {
   if (act['kind'] === 'offer') return typeof act['accept'] === 'boolean';
   // M-2 · y dar un medio, con su identificador del dominio cerrado: una partida
   // guardada que nombre un medio que este build no conoce no se puede jugar.
+  // K-1 · y la corona, que se da a alguien: el `who` es un id de aldeano.
+  if (act['kind'] === 'crown') return tickValue(act['who']);
   return act['kind'] === 'means' && (MEANS_IDS as readonly string[]).includes(act['means'] as string);
 }
 
@@ -290,6 +292,12 @@ function isPlausibleState(value: unknown): value is GameState {
     && tickValue(s['tick']) && tickValue(s['peakPeople'])
     && record(rng) && RNG_STREAMS.every((stream) => uint32(rng[stream]))
     && byteMap(s['map'])
+    // K-1 · la corona: o no hay, o tiene quién, desde cuándo y qué era.
+    && (s['crown'] === null || (record(s['crown'])
+      && tickValue((s['crown'] as Record<string, unknown>)['id'])
+      && tickValue((s['crown'] as Record<string, unknown>)['since'])
+      && ((s['crown'] as Record<string, unknown>)['trade'] === null
+        || ROLES.has(String((s['crown'] as Record<string, unknown>)['trade'])))))
     // P-1 · la plaza. Se comprueba aquí y no en la migración porque la
     // migración ya ha corrido: a este punto llega con plaza o no llega.
     && record(s['plaza'])
@@ -371,7 +379,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8].includes(candidate.schema)) {
+  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8, 9].includes(candidate.schema)) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -485,6 +493,17 @@ export function deserialize(raw: unknown): SaveFile {
   // primer anillo alrededor de la plaza.
   if ((state as Partial<GameState>).ring === undefined) {
     state = { ...state, version: SCHEMA_VERSION, ring: null } as GameState;
+  }
+  // 9 -> 10 (K-1): la corona.
+  //
+  // Entra **vacía**, y es recordar y no cambiar: una partida guardada tenía un
+  // jefe que no ejercía ninguna voluntad, que es exactamente lo que
+  // `will(state)` devuelve con `crown === null` —la voluntad de reposo, o sea
+  // las mismas constantes que el reparto de manos y la cola de obras leían—. La
+  // aldea sigue haciendo lo mismo el tick siguiente a cargarla (§13.1), y el
+  // jugador puede coronar a quien quiera cuando quiera.
+  if ((state as Partial<GameState>).crown === undefined) {
+    state = { ...state, version: SCHEMA_VERSION, crown: null } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

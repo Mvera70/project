@@ -1069,6 +1069,123 @@ export const TRAITS = {
 } as const;
 
 // ---------------------------------------------------------------------------
+// §6.7 · El rey (K-1, 18 sep 2026)
+//
+// El plan entero está en `docs/plan-rey.md`. Aquí sólo las cifras, y cada una
+// con de dónde sale: ninguna se inventa, todas se apoyan en un número que el
+// juego ya tenía medido.
+// ---------------------------------------------------------------------------
+
+export const CROWN = {
+  /**
+   * Cuánta gente hace falta para que haya a quién coronar.
+   *
+   * TUNE: 30, que es `BUILDING_RULES.CHAPEL_PEOPLE`. Una aldea que puede tener
+   * capilla puede tener corte; y un rey de seis personas es una broma.
+   */
+  MIN_PEOPLE: 30,
+  /**
+   * Lo que cuesta la corona, en plata.
+   *
+   * TUNE: 30, el precio de la reliquia (`MEANS_SPEC.relic`), que es el medio más
+   * caro. §7.12 midió que con esos precios «un medio pasa a ser una decisión de
+   * década»; la corona tiene que ser la decisión de una generación.
+   */
+  SILVER: 30,
+  /** La banda de edad de la que sale un rey: la misma de la sucesión (A.15). */
+  CANDIDATE_AGES: [20, 60] as readonly [number, number],
+  /** Lo que el desplazado piensa del coronado. El de A.15, sin tocar. */
+  SET_ASIDE_OPINION: -45,
+  /** El peso del recuerdo de haber sido pasado por alto. El de A.15. */
+  SET_ASIDE_MEMORY: 4,
+  /**
+   * Qué estilo da cada oficio.
+   *
+   * Es un **dato y no código**: mover a la comadrona de sitio no toca una línea.
+   * Los tres que el dueño del diseño nombró —herrero, granjero, noble— y el cura
+   * como cuarto, porque la fe ya es una cifra del valle y tenía dueño.
+   */
+  STYLE_OF_TRADE: {
+    smith: 'forge', reeve: 'plough', woodward: 'plough', midwife: 'plough',
+    herbalist: 'plough', priest: 'chapel', leader: 'court', stranger: 'court',
+  } as const,
+  /**
+   * Cuánto más se siembra con un rey del campo.
+   *
+   * TUNE: 1,3. Entre las dos paradas que E1 midió para la palanca retirada
+   * (`enough` 1 y `heavy` 1,5): la de arriba dejaba a la aldea sin manos para la
+   * obra, y 1 no se distinguiría de no tener rey.
+   */
+  PLOUGH_FIELDS: 1.3,
+  /**
+   * Lo que el rey herrero le añade al interés del señor.
+   *
+   * TUNE: 1,5, como candidato `story` de la categoría `lord` (§8.6). Un valle
+   * que hace armas se mira desde fuera; es el precio de la muralla.
+   */
+  FORGE_LORD: 1.5,
+  /**
+   * Hacia qué fe deriva el valle con un rey cura.
+   *
+   * TUNE: 50. La deriva base es 40 y la reliquia la sube a 62; la capilla pide
+   * 45, así que con este rey la capilla llega sola.
+   */
+  CHAPEL_FAITH_TO: 50,
+  /**
+   * Lo que valen las fiestas con un rey cura.
+   *
+   * TUNE: 0,5. El barril vale la mitad: es lo que un rey así le quita al valle,
+   * y hace que el medio del barril y este rey no se lleven bien.
+   */
+  CHAPEL_FEAST: 0.5,
+  /**
+   * El ánimo por semana que da tener corte, con la sala en pie.
+   *
+   * TUNE: 0,1. La capilla da 0,15, y una corte no puede valer más que la iglesia.
+   */
+  COURT_MORALE: 0.1,
+  /**
+   * Cuántos años lleva el valle «vigilado» tras coronar a un noble.
+   *
+   * TUNE: 20. El factor pone 15 y la reliquia 12; un rey de corte es lo que más
+   * llama la atención del señor, así que dura más.
+   */
+  COURT_WATCHED_YEARS: 20,
+  /** Cuánta gente hace falta para que la aldea levante la sala. = MIN_PEOPLE. */
+  HALL_PEOPLE: 30,
+  /** Camas de la sala del rey. = `LIFE.HOUSE_CAPACITY`: es una casa. */
+  HALL_BEDS: 5,
+  /**
+   * La obra del rey ambicioso.
+   *
+   * TUNE: 1,05, y **no es un número nuevo**: §6.3 prometía «el líder ambicioso
+   * levanta un 5 % más de obra» desde el primer día y nadie lo había escrito.
+   */
+  AMBITIOUS_WORKS: 1.05,
+  /**
+   * Lo que el hambre cuesta de ánimo con un rey generoso.
+   *
+   * TUNE: 0,75, y tampoco es nuevo: §6.3 decía «−3 · severidad en vez de −4»,
+   * que es exactamente tres cuartos.
+   */
+  GENEROUS_HUNGER: 0.75,
+  /**
+   * La puerta de los que llegan, con un rey miedoso.
+   *
+   * TUNE: 0,7. Nuevo. Es la misma dimensión que `CHARACTER.CRAVEN_LEAVES` visto
+   * desde el trono: el cobarde que se iba del valle, mandando, cierra la puerta.
+   */
+  CRAVEN_GATE: 0.7,
+  /**
+   * El peso de la riña de la plaza con un rey de mal genio.
+   *
+   * TUNE: 1,5. Nuevo, y es el empujón a las opiniones que R-1 dio con la riña,
+   * ahora con un motivo con nombre.
+   */
+  TEMPER_QUARREL: 1.5,
+} as const;
+
+// ---------------------------------------------------------------------------
 // §7.4b · La plaza (P-1, 18 sep 2026)
 // ---------------------------------------------------------------------------
 

@@ -547,6 +547,57 @@ export const BANK: Record<string, string[]> = {
     'They opened the granary in the {season} of year {year} and found {grain} bushels eaten.',
     'A full granary feeds more than the village: {grain} bushels to the rats that winter.',
   ],
+  // K-1 · la corona. Peso 3: es un titular de generación (§9.2), y el único
+  // hecho de una partida que cambia **quién** decide qué hace la aldea. Cuatro
+  // claves, una por estilo, porque lo que se lee después no es lo mismo: la
+  // frase tiene que dejar dicho hacia dónde va a tirar el valle.
+  'crown.given.forge': [
+    '{name} was given the crown in the {season} of year {year}, with a hammer still on the bench.',
+    'They crowned {name} the smith in year {year}. The talk that evening was of walls.',
+    'A smith took the crown that {season}. What the valley made after, it made in iron.',
+  ],
+  'crown.given.plough': [
+    '{name} was given the crown in the {season} of year {year}, and went back to the fields the same week.',
+    'They crowned {name} in year {year}. The furrows came first after that.',
+    'A crown to {name} that {season}, and the sowing went wider than it ever had.',
+  ],
+  'crown.given.chapel': [
+    '{name} was given the crown in the {season} of year {year}, and said the first words over it.',
+    'They crowned {name} the priest in year {year}. The chapel was never short of hands after.',
+    'A priest took the crown that {season}, and the feasts grew quieter.',
+  ],
+  'crown.given.court': [
+    '{name} was given the crown in the {season} of year {year}, and the road heard of it before the year was out.',
+    'They crowned {name} in year {year}. A hall was spoken of the same month.',
+    'A crown to {name} that {season}, and from then on the valley had a door to knock at.',
+  ],
+  'crown.set_aside': [
+    '{name} had held the seat until then. {other} wore the crown, and {name} said nothing about it.',
+    'The seat had belonged to {name} until then. After {other} was crowned, {name} kept to their own work.',
+    '{name} stepped aside for {other} in year {year}, and was not asked twice.',
+  ],
+  // K-3 · la corona que pasa por la sucesión de A.15. Peso 2: la línea de peso
+  // 3 la escribe ya la decisión.
+  'crown.passed.forge': [
+    'The crown went to {name} that {season}, and the walls were spoken of again.',
+    '{name} took the crown in year {year}. A smith, and the valley knew what that meant.',
+    'A smith wore the crown from that {season} on, and the forge never went cold.',
+  ],
+  'crown.passed.plough': [
+    'The crown went to {name} that {season}, and the fields came first again.',
+    '{name} took the crown in year {year}, and was in the furrows by the week after.',
+    'From that {season} the crown was {name}’s, and the sowing set the year.',
+  ],
+  'crown.passed.chapel': [
+    'The crown went to {name} that {season}, and the chapel had its hands back.',
+    '{name} took the crown in year {year}. The feasts stayed short.',
+    'A priest wore the crown from that {season}, and the bell was rung more often.',
+  ],
+  'crown.passed.court': [
+    'The crown went to {name} that {season}, and the hall had someone in it again.',
+    '{name} took the crown in year {year}, and the road was told.',
+    'From that {season} the crown was {name}’s, and the hall had a master again.',
+  ],
   // M-2 · y lo que el jugador metió. Peso 2: es un hecho de la partida y se lee
   // sobre el valle, pero no es un hito.
   'means.plough.given': [

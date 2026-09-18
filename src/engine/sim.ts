@@ -51,6 +51,7 @@ import { scarFire } from './people/scars';
 import { destroyBuilding } from './world/buildings';
 import { rollFate } from './world/fate';
 import { giveMeans } from './world/means';
+import { crownKing, type CrownOutcome } from './world/crown';
 import type { MeansOutcome } from './world/means';
 import { collectTithe, expireOffer, settleOffer } from './world/road';
 import type { OfferOutcome, Tithe } from './world/road';
@@ -202,6 +203,8 @@ export interface TickReport {
   offer: OfferOutcome | null;
   /** M-2 · lo que el jugador metió en el valle esta semana, si metió algo. */
   means: MeansOutcome | null;
+  /** K-1 · la coronación de esta semana, si la hubo. */
+  crown: CrownOutcome | null;
   /** M-0 · el diezmo, la semana que se cobra. */
   tithe: Tithe | null;
   posed: string | null;
@@ -637,6 +640,7 @@ export function tick(
   // que mantiene el guardado reproducible.
   let offer: OfferOutcome | null = null;
   let means: MeansOutcome | null = null;
+  let crown: CrownOutcome | null = null;
   for (const act of acts) {
     if (act.kind === 'offer') {
       const outcome = settleOffer(state, act.accept, seasonOf(state.tick), yearOf(state.tick));
@@ -644,7 +648,7 @@ export function tick(
       if (outcome === null) continue;
       offer = outcome;
       if (outcome.entry !== null) say(outcome.entry);
-    } else {
+    } else if (act.kind === 'means') {
       // M-2 · dar un medio. Se paga aquí y lo que abra lo abren los sistemas de
       // la aldea por su cuenta: el arado libera brazos en el reparto de §5.2,
       // los cerdos llaman a los lobos de §7.10, y el barril se celebra en el
@@ -653,6 +657,15 @@ export function tick(
       state.acts.push({ tick: state.tick, act, done: outcome.given });
       means = outcome;
       if (outcome.entry !== null) say(outcome.entry);
+    } else {
+      // K-1 · dar la corona. Es el mismo verbo que un medio —se paga con lo del
+      // valle y la aldea decide qué hace con ello— sólo que lo que se da es a
+      // **alguien**: desde esta semana, lo que ese alguien quiere lo leen el
+      // reparto de manos, la cola de obras, el ánimo y los sucesos.
+      const outcome = crownKing(state, act.who, seasonOf(state.tick), yearOf(state.tick));
+      state.acts.push({ tick: state.tick, act, done: outcome.crowned });
+      crown = outcome;
+      for (const entry of outcome.entries) say(entry);
     }
   }
   // Y quien esperaba y no tuvo respuesta, sigue camino.
@@ -1227,6 +1240,7 @@ export function tick(
     happening: fated?.record.id ?? null,
     offer,
     means,
+    crown,
     tithe,
     posed,
     entries: buffer,

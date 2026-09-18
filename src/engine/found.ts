@@ -71,6 +71,9 @@ export function foundGame(
     plaza: { x: -1_000, y: -1_000 },
     // P-4 · sin muralla empezada: el primer tramo fija el anillo.
     ring: null,
+    // K-1 · sin rey: el jefe de la fundación manda, pero no ejerce ninguna
+    // voluntad hasta que alguien le da la corona (aunque sea a él).
+    crown: null,
     herd: { ...profile.HERD },
     village: {
       grain: profile.GRAIN,
