@@ -207,6 +207,19 @@ export function raidNow(state: GameState, band: number): void {
   state.threat.lastBand = Math.max(1, band);
 }
 
+/**
+ * C2/D2 · **Pone el valle en pie de guerra a `weeks` semanas del asalto**, para
+ * poder ver la guarnición subir sin esperar a que baje nadie.
+ *
+ * Es el compañero de `raidNow`: uno enseña el asalto y esto la víspera. Sin él,
+ * la única manera de grabar a los arqueros en sus puestos era acertar la semana
+ * exacta en la que el motor avisa, que pasa dos veces en sesenta años.
+ */
+export function bracedNow(state: GameState, weeks = 1): void {
+  state.threat.comingTick = state.tick + Math.max(0, weeks);
+  state.threat.comingBand = Math.max(state.threat.comingBand, 20);
+}
+
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {
   for (let weeks = 0; weeks < limitWeeks; weeks += 1) {
     if (state.crossroad !== null || state.ended !== null) return weeks;

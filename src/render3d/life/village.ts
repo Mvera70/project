@@ -29,6 +29,8 @@ import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { garrisonPlaces, type Manned } from './garrison';
+import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
+import { createPhysics, type Physics } from './physics';
 import { commons } from './places';
 import {
   decide, failedSeatKey, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK, SHUN_STEPS,
@@ -42,7 +44,7 @@ import {
 import { createCommitmentRegistry, type ActorRef } from './commitments';
 import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, WOLF_ALARM_RADIUS, type Beast } from './beasts';
-import { createRaiders, raidToday, stepRaider, type Raider } from './raiders';
+import { createRaiders, raidToday, raidersHere, stepRaider, type Raider } from './raiders';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import type { Animal } from '@derive/animals';
 import {
@@ -271,6 +273,28 @@ export interface Village {
    */
   readonly manned: readonly Manned[];
   /**
+   * D2 · Las flechas de la jornada, las que vuelan y las clavadas (§1b).
+   *
+   * Vacía siempre menos el día de un asalto con arqueros en el cerco. Quien
+   * dibuja lee `body.at` y `body.velocity`: la posición es la del mundo físico y
+   * la velocidad es hacia dónde apunta el astil.
+   */
+  readonly arrows: readonly Arrow[];
+  /**
+   * D2 · Lo que la defensa hizo hoy: cuántas se soltaron, cuántas dieron y
+   * cuántos del clan quedaron en el suelo.
+   *
+   * **No es una cifra del motor y no lo será hasta B4**, que es la fase que mete
+   * el resultado del asalto en la partida como datos. Está aquí porque es aquí
+   * donde pasó, y porque sin contarlo no hay manera de medir si la muralla
+   * sirve de algo.
+   */
+  readonly defence: {
+    readonly loosed: number;
+    readonly hits: number;
+    readonly fallen: number;
+  };
+  /**
    * IA-5: la cuenta de la visita del lobo, del mismo tipo que `stories` —
    * episodios, no pasos—: cuántas veces ha aparecido (a lo sumo una por
    * jornada), cuántas ha llegado a notarla de verdad una gallina, cuántas se
@@ -311,6 +335,20 @@ export interface Village {
 export interface DayOptions {
   readonly props?: boolean;
   readonly land?: Terrain;
+  /**
+   * D2 · **El mundo físico, si quien llama ya lo tiene.**
+   *
+   * Rapier se carga con `import()` dinámico y eso es una promesa; `createVillage`
+   * es síncrona porque la llama el bucle de fotogramas (`renderer.ts`). Así que
+   * la jornada **se lo pide a sí misma** el primer paso en que hay algo que
+   * simular —una partida en el valle y alguien con un arco— y lo enchufa cuando
+   * llega, unos fotogramas después: la banda tarda segundos en ponerse a tiro,
+   * así que no se pierde ni una flecha. Quien quiera medir sin esperar lo pasa
+   * hecho por aquí, que es lo que hacen las pruebas.
+   *
+   * Un valle en paz nunca lo pide, que es la promesa de D1: **cero bytes**.
+   */
+  readonly physics?: Physics | null;
 }
 
 /**
@@ -414,6 +452,16 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
  *  A lo sumo una por jornada (`quarrelStaged`), así que basta con un valor
  *  nulable y no una lista. */
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
+
+/**
+ * D2 · A qué distancia de su puesto se considera que alguien **está** en él.
+ *
+ * TUNE escénico: 1,2 celdas. El alcance de la propia oferta es 0,8 (`offers.ts`)
+ * y un cuerpo mide 0,64 de ancho: con el umbral justo, un arquero que se
+ * remueve en su sitio dejaría de disparar a mitad de una salva. Un tercio de
+ * celda de margen es lo que hace que «estar de guardia» no parpadee.
+ */
+const POST_REACH = 1.2;
 
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = options.land ?? terrainOf(state);
@@ -693,6 +741,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const raiders: Raider[] = bandSize === 0
     ? []
     : createRaiders(state, land, heart, seed, 0, bandSize);
+  // D2 · los arqueros de los puestos de C2, sus flechas, y el mundo físico en el
+  // que vuelan. La lista de arqueros se saca una vez: los puestos son de la
+  // jornada y no cambian a media jornada.
+  const archers: Archer[] = archersOf(manned);
+  const arrows: Arrow[] = [];
+  let physics: Physics | null = options.physics ?? null;
+  let physicsAsked = physics !== null;
   let wolf: Wolf | null = null;
   let wolfSpawned = false;
   let wolfNoticedThisVisit = false;
@@ -771,6 +826,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get raiders(): readonly Raider[] { return raiders; },
 
     get manned(): readonly Manned[] { return manned; },
+
+    get arrows(): readonly Arrow[] { return arrows; },
+
+    get defence() {
+      return {
+        loosed: archers.reduce((sum, archer) => sum + archer.loosed, 0),
+        hits: raiders.reduce((sum, raider) => sum + raider.hits, 0),
+        fallen: raiders.filter((raider) => raider.phase === 'down').length,
+      };
+    },
 
     get wildlife(): readonly Animal[] {
       return wolf !== null && wolf.phase !== 'gone'
@@ -1529,6 +1594,29 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // razón (E.8): lo que se llevan ya lo decidió el motor antes de que
       // empiece el día, y esto sólo lo enseña. No pelea, no rompe y no mata.
       for (const raider of raiders) stepRaider(raider, land, seed, steps);
+
+      // D2 · **y la muralla contesta.** Un paso de física por paso de vida, que
+      // es el matrimonio que D1 dejó montado; las flechas salen de los puestos
+      // de C2 y lo que le pasa a quien la recibe lo decide el vuelo (§1b).
+      if (physics === null && !physicsAsked && archers.length > 0 && raidersHere(raiders)) {
+        physicsAsked = true;
+        void createPhysics(land).then((world) => { physics = world; });
+      }
+      if (physics !== null && (arrows.length > 0 || raidersHere(raiders))) {
+        physics.step();
+        // **Y sólo dispara el puesto que tiene a alguien dentro.** Se recalcula
+        // cada paso porque el arquero llega, se va a beber y vuelve: lo que
+        // decide si la muralla contesta es quién está en ella **ahora**.
+        const held = new Set<string>();
+        for (const post of manned) {
+          const there = dwellers.some((dweller) =>
+            dweller.dayPlan?.job?.place === post.place.id
+            && Math.hypot(dweller.body.x - post.place.at.x,
+              dweller.body.z - post.place.at.z) < POST_REACH);
+          if (there) held.add(post.place.id);
+        }
+        stepArchery(archers, raiders, arrows, physics, steps, held);
+      }
 
       if (wolf !== null && wolf.phase !== 'gone') {
         // Ligado a una constante propia y no a `wolf` a secas: `stepWolf`

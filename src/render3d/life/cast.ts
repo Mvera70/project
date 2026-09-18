@@ -12,6 +12,7 @@
 
 import { indoors } from './home';
 import { occupationOf } from '../world/models';
+import type { ArrowSighting } from '../world/arrows';
 import type { VillagerId } from '@engine/state';
 import type { Activity, Actor } from '../contracts';
 import type { ClipName } from '../clips';
@@ -222,6 +223,29 @@ export interface PropSighting {
 
 /** Los trastos de esta jornada, tal como el render los necesitaría. Puro,
  *  igual que `castOf`: no toca la vida ni el estado, sólo los traduce. */
+/**
+ * D2b · Las flechas de la jornada, para quien las dibuja.
+ *
+ * Sale de aquí y no del renderer por lo mismo que `propsOf`: el renderer no
+ * conoce la capa de vida por dentro. Se listan **todas las que están en el
+ * mundo**, volando y clavadas: una flecha clavada en el suelo junto al portón es
+ * la marca de que ahí hubo una pelea, y se retira cuando la arquería la retira
+ * (`ARROW_LIFE`).
+ */
+export function arrowsOf(life: Village): ArrowSighting[] {
+  return life.arrows.map((arrow, index) => {
+    const at = arrow.body.at;
+    const velocity = arrow.body.velocity;
+    return {
+      // El identificador es el orden en que se soltaron: estable dentro de la
+      // jornada, que es todo lo que un objeto de esta capa necesita (E.2).
+      id: index,
+      x: at.x, y: at.y, z: at.z,
+      vx: velocity.x, vy: velocity.y, vz: velocity.z,
+    };
+  });
+}
+
 export function propsOf(life: Village): PropSighting[] {
   const byBody = new Map(life.dwellers.map((dweller) => [dweller.body.id, dweller.villager]));
   return life.props.map((prop) => ({

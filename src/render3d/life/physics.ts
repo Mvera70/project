@@ -144,21 +144,40 @@ export async function createPhysics(land: Terrain): Promise<Physics | null> {
       world.createCollider(RAPIER.ColliderDesc.ball(ARROW_RADIUS), body);
       const handle = { body };
       live.add(handle);
+      // **Un cuerpo retirado tiene que seguir contestando dónde estaba**, y esto
+      // lo encontró una toma del observatorio con la primera versión de D2: el
+      // renderer guarda la lista de flechas de un fotograma y la lee en el
+      // siguiente, y preguntarle la posición a un cuerpo ya liberado **revienta
+      // el WASM** («RuntimeError: unreachable», que no es una excepción de
+      // JavaScript y se lleva la página entera por delante). Se guarda lo último
+      // que se supo de él y se contesta eso: un cuerpo muerto está quieto donde
+      // se murió, que además es la verdad.
+      let last = { x: at.x, y: at.y, z: at.z };
+      let lastVelocity = { x: velocity.x, y: velocity.y, z: velocity.z };
+      let dead = false;
       return {
         get at() {
+          if (dead) return last;
           const t = body.translation();
           return { x: t.x, y: t.y, z: t.z };
         },
         get velocity() {
+          if (dead) return lastVelocity;
           const v = body.linvel();
           return { x: v.x, y: v.y, z: v.z };
         },
         get resting(): boolean {
+          if (dead) return true;
           const v = body.linvel();
           return v.x * v.x + v.y * v.y + v.z * v.z < RESTING_SPEED * RESTING_SPEED;
         },
         remove(): void {
-          if (!live.has(handle)) return;
+          if (dead) return;
+          const t = body.translation();
+          const v = body.linvel();
+          last = { x: t.x, y: t.y, z: t.z };
+          lastVelocity = { x: v.x, y: v.y, z: v.z };
+          dead = true;
           live.delete(handle);
           world.removeRigidBody(body);
         },

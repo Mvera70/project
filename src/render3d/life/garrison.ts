@@ -46,23 +46,50 @@ const BODY = 0.32;
  */
 export function postSpot(
   land: Terrain, post: Post, heart: Point, reach?: Uint8Array,
+  /**
+   * Las celdas que ya ocupa otro puesto, para no poner a dos en la misma.
+   *
+   * **Hacía falta, y lo encontró una toma del observatorio.** Tres puestos
+   * seguidos del anillo —`20,53`, `20,51` y `19,53`— daban **el mismo punto**
+   * en pantalla: la celda de dentro más cercana al corazón es la misma para
+   * varias estacas vecinas, así que los tres arqueros se plantaban en el mismo
+   * palmo de suelo empujándose, que es exactamente el defecto que `seatsOn`
+   * arregló para los corros en IA-1. Se pasa el conjunto de lo ya cogido y cada
+   * puesto se queda con la mejor celda **libre**.
+   */
+  taken?: ReadonlySet<number>,
 ): Point | null {
-  let best: Point | null = null;
-  let bestGap = Number.POSITIVE_INFINITY;
-  for (let dz = -1; dz <= 1; dz += 1) {
-    for (let dx = -1; dx <= 1; dx += 1) {
-      if (dx === 0 && dz === 0) continue;
-      const at = { x: post.x + 0.5 + dx, z: post.y + 0.5 + dz };
-      if (!fitsCircle(land, at.x, at.z, BODY)) continue;
-      if (reach !== undefined && !canReach(land, reach, at)) continue;
-      const gap = Math.hypot(at.x - heart.x, at.z - heart.z);
-      if (gap >= bestGap) continue;
-      bestGap = gap;
-      best = at;
+  // **Dos anillos, y el segundo hizo falta**: con los puestos vecinos del
+  // círculo compartiendo su única celda de dentro, exigir celda distinta dejaba
+  // la guarnición en **uno de tres** (medido en la toma de la semilla 7). Un
+  // defensor una celda más atrás sigue guardando su tramo; dos ya no, y por eso
+  // no se busca más lejos: se prefiere perder el puesto a poner a alguien en
+  // medio del pueblo diciendo que está en la muralla.
+  for (let ring = 1; ring <= POST_RINGS; ring += 1) {
+    let best: Point | null = null;
+    let bestGap = Number.POSITIVE_INFINITY;
+    for (let dz = -ring; dz <= ring; dz += 1) {
+      for (let dx = -ring; dx <= ring; dx += 1) {
+        if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
+        const col = post.x + dx;
+        const row = post.y + dz;
+        if (taken?.has(row * land.width + col) === true) continue;
+        const at = { x: col + 0.5, z: row + 0.5 };
+        if (!fitsCircle(land, at.x, at.z, BODY)) continue;
+        if (reach !== undefined && !canReach(land, reach, at)) continue;
+        const gap = Math.hypot(at.x - heart.x, at.z - heart.z);
+        if (gap >= bestGap) continue;
+        bestGap = gap;
+        best = at;
+      }
     }
+    if (best !== null) return best;
   }
-  return best;
+  return null;
 }
+
+/** Cuántas celdas hacia dentro se busca sitio para un puesto. Ver arriba. */
+const POST_RINGS = 2;
 
 /** Qué oferta corresponde a un arma. */
 function offerFor(arm: Arm): OfferSpec {
@@ -83,9 +110,11 @@ export function garrisonPlaces(
   const garrison = garrisonOf(state);
   if (!garrison.manned) return [];
   const manned: Manned[] = [];
+  const taken = new Set<number>();
   for (const post of garrison.posts) {
-    const at = postSpot(land, post, heart, reach);
+    const at = postSpot(land, post, heart, reach, taken);
     if (at === null) continue;
+    taken.add(Math.floor(at.z) * land.width + Math.floor(at.x));
     // Una plaza y su sitio dado: un puesto es de uno, y no se reparte en corro
     // alrededor de la estaca —que es campo abierto por el otro lado—.
     const offer = placedOffer(offerFor(post.arm), at, land, undefined, [at]);

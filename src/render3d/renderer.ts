@@ -49,8 +49,9 @@ import { createWeather } from './effects/weather';
 import { createScenicState } from './scenic-state';
 import { createVillage, type Village as LifeVillage } from './life/village';
 import type { DayPlan } from './life/day';
-import { castOf, propsOf } from './life/cast';
+import { arrowsOf, castOf, propsOf } from './life/cast';
 import { Props } from './world/props';
+import { Arrows } from './world/arrows';
 import { LIFE_STEP } from './life/clock';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
@@ -299,12 +300,14 @@ export async function createGraphicsRenderer(
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
+  // D2b · las flechas del asedio. Un grupo vacío el 99 % de la partida.
+  const arrows = new Arrows();
   // P-2 · la fuente del centro de la plaza. El empedrado lo pinta el suelo.
   const plaza = new PlazaFountain((id) => library.instance(id));
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, plaza.group, treeFalls.group);
+  world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -665,6 +668,29 @@ export async function createGraphicsRenderer(
         id: prop.id, kind: prop.kind, heldBy: prop.heldBy,
         x: round(prop.x), z: round(prop.z), y: round(prop.y), screen: screen(prop.x, prop.z),
       })),
+      // C2/D2 · **la batalla, en la traza.** Sin esto el observatorio —que es la
+      // única forma de medir esta capa como la ejecuta el navegador— no podía
+      // ver un asalto: ni quién está en la muralla, ni dónde está la partida,
+      // ni una flecha. Se mide lo que la fase 4 necesita comprobar de una toma:
+      // que los puestos estén ocupados, que la partida llegue, y que las
+      // flechas salgan de un puesto y acaben en alguien.
+      garrison: life.manned.map(post => ({
+        id: post.place.id, arm: post.post.arm, on: post.post.on,
+        x: round(post.place.at.x), z: round(post.place.at.z),
+        screen: screen(post.place.at.x, post.place.at.z),
+      })),
+      raiders: life.raiders.map(raider => ({
+        id: raider.body.id, phase: raider.phase, hits: raider.hits,
+        x: round(raider.body.x), z: round(raider.body.z),
+        screen: screen(raider.body.x, raider.body.z),
+      })),
+      arrows: arrowsOf(life).map(arrow => ({
+        id: arrow.id,
+        x: round(arrow.x), y: round(arrow.y), z: round(arrow.z),
+        speed: round(Math.hypot(arrow.vx, arrow.vy, arrow.vz)),
+        screen: screen(arrow.x, arrow.z),
+      })),
+      defence: life.defence,
       forest: {
         standing: forest?.count ?? 0,
         stumps: forest?.stumpCount ?? 0,
@@ -740,10 +766,21 @@ export async function createGraphicsRenderer(
 
   // Captura síncrona: se vuelve a pintar sin dar pasos y se leen píxeles y
   // estado en la misma tarea JavaScript. Ningún RAF puede colarse entre ambos.
+  /** El «no sigas a nadie» del enganche de observación. Ver abajo. */
+  const NOBODY = -1;
   window.__valleyCapture = (follow?: number, zoom = 1) => {
-    if (follow !== undefined && follow >= 0 || zoom !== 1) { flight = null; disturbed = true; }
+    // D2 · **y se puede seguir a un saqueador.** Hasta aquí el enganche sólo
+    // encontraba vecinos y bichos, así que la única manera de grabar un asalto
+    // era acertar con la cámara puesta en la plaza: la batalla pasa en el
+    // portón, que a esta distancia de cámara se queda fuera del encuadre. Los
+    // cuerpos de la partida llevan identificador **negativo** a propósito
+    // (`raiders.ts`), así que el centinela de «sin seguir a nadie» pasa a ser
+    // `-1` exacto y cualquier otro número se busca, del signo que sea.
+    if (follow !== undefined && follow !== NOBODY || zoom !== 1) { flight = null; disturbed = true; }
     const person = life?.dwellers.find(dweller => dweller.villager === follow);
-    const target = person?.body ?? life?.beasts.find(beast => beast.dweller.body.id === follow)?.dweller.body;
+    const target = person?.body
+      ?? life?.beasts.find(beast => beast.dweller.body.id === follow)?.dweller.body
+      ?? life?.raiders.find(raider => raider.body.id === follow)?.body;
     if (target !== undefined) view.look(target.x, target.z);
     if (zoom !== 1) view.zoom(zoom, viewport.widthCss / 2, viewport.heightCss / 2);
     renderer.render(scene, camera);
@@ -814,6 +851,7 @@ export async function createGraphicsRenderer(
         fauna.clear();
         bubbles.clear();
         props.clear();
+        arrows.clear();
         weather.clear();
         treeFalls.reset(state.map);
         fallingChanged = false;
@@ -951,6 +989,8 @@ export async function createGraphicsRenderer(
       lastActors = castOf(life, frame.presentationSeconds, ages, named);
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
+      // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
+      arrows.update(arrowsOf(life));
       plaza.show(plazaOf(shown), groundFloor);
       cast.show(lastActors);
 
@@ -1197,6 +1237,7 @@ export async function createGraphicsRenderer(
       fauna.dispose();
       bubbles.dispose();
       props.dispose();
+      arrows.dispose();
       plaza.dispose();
       treeFalls.dispose();
       cast.dispose();

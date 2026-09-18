@@ -49,12 +49,15 @@ try {
   // D3 · `--raid 20` planta la partida del valle vecino llegando hoy, que es
   // la única forma de grabarla: un asalto llega hacia la hora 114 de reloj.
   const raid = opt('raid', '');
-  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== '';
+  // C2 · la vispera: la guarnicion arriba y nadie en el camino todavia.
+  const braced = opt('braced', '');
+  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== '' || braced !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
       + (crown === '' ? '' : `&crown=${crown}`)
-      + (raid === '' ? '' : `&raid=${raid}`);
+      + (raid === '' ? '' : `&raid=${raid}`)
+      + (braced === '' ? '' : `&braced=${braced}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
   await tab.goto(pageUrl.href);

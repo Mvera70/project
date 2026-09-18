@@ -30,8 +30,15 @@ import { LIFE_STEP } from './clock';
 import { pathTo } from './navigate';
 import type { Waypoint } from './navigate';
 
-/** En qué anda la partida ahora mismo. */
-export type RaiderPhase = 'coming' | 'standing' | 'leaving' | 'gone';
+/**
+ * En qué anda la partida ahora mismo.
+ *
+ * **`down` lo trae D2**, y es la primera vez que algo de esta capa le pasa a
+ * alguien en vez de decidirlo el motor: a quien le entra una flecha se le acaba
+ * la visita ahí. Es un estado terminal como `gone`, pero **se sigue dibujando**:
+ * un cuerpo en el suelo es la marca de que la muralla sirvió de algo.
+ */
+export type RaiderPhase = 'coming' | 'standing' | 'leaving' | 'gone' | 'down';
 
 export interface Raider {
   readonly body: Body;
@@ -47,6 +54,14 @@ export interface Raider {
   standingUntil: number;
   /** Si algún tope tuvo que cortarle el viaje en vez de terminarlo andando. */
   forced: boolean;
+  /**
+   * D2 · Cuántas flechas le han entrado.
+   *
+   * Se cuenta y no se usa para nada más que para pararle: **lo que un asalto le
+   * costó al clan es un dato que B4 va a meter en el motor** por la puerta de
+   * `PlayerAct`, y hasta entonces vive aquí, que es donde pasó.
+   */
+  hits: number;
 }
 
 /**
@@ -242,6 +257,7 @@ export function createRaiders(
       deadline: deadlineFor(from, post, step),
       standingUntil: 0,
       forced: false,
+      hits: 0,
     });
   }
   return raiders;
@@ -272,6 +288,12 @@ export function stepRaider(
   raider: Raider, land: Terrain, seed: number, step: number,
 ): void {
   if (raider.phase === 'gone') return;
+  // D2 · el que ha caído no anda. Se queda donde le dio la flecha.
+  if (raider.phase === 'down') {
+    raider.body.vx = 0;
+    raider.body.vz = 0;
+    return;
+  }
   const { body } = raider;
 
   if (raider.phase === 'standing') {
@@ -345,9 +367,14 @@ const RAIDER_RADIUS = 0.32;
 const POST_TRIES = 6;
 const RAIDER_ID_BASE = 9000;
 
-/** Si queda alguien de la partida en el valle. */
+/**
+ * Si queda alguien de la partida **en pie** en el valle.
+ *
+ * Los caídos (D2) no cuentan: siguen en pantalla pero la visita, para ellos, ya
+ * acabó. Lo que esta pregunta contesta es si hay todavía algo que defender.
+ */
 export function raidersHere(raiders: readonly Raider[]): boolean {
-  return raiders.some((r) => r.phase !== 'gone');
+  return raiders.some((r) => r.phase !== 'gone' && r.phase !== 'down');
 }
 
 /** Para que quien dibuje sepa dónde están, sin conocer este módulo por dentro. */

@@ -2,7 +2,8 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
-import { crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear, parseDebugRequest, raidNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
+import { crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear, parseDebugRequest, raidNow,
+  bracedNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -70,9 +71,16 @@ if (root) {
     // M-0 · y `&offer=1` deja a alguien esperando en el camino.
     if (query.get('offer') === '1') offerNow(state);
     // M-3 · y `&means=pigs|plough|ale` da un medio al abrir, para verlo.
+    // C2/D2 · `&means=bows,arms` da varias cosas de golpe, que es lo que hace
+    // falta para grabar una defensa: sin arcos no hay arqueros, y con un solo
+    // medio por toma no se podía ver la muralla contestando.
     const means = query.get('means');
     if (means !== null && (MEANS_IDS as readonly string[]).includes(means)) {
       giveNow(state, means as MeansId);
+    } else if (means !== null) {
+      for (const one of means.split(',')) {
+        if ((MEANS_IDS as readonly string[]).includes(one)) giveNow(state, one as MeansId);
+      }
     }
     // IA-5 · y `&happening=wolves_at_the_coop` provoca un suceso del valle esta
     // semana, que es la única forma de grabar una visita que sale pocas veces
@@ -87,6 +95,10 @@ if (root) {
     // D3 · `&raid=20` planta la partida del valle vecino llegando hoy.
     const raid = query.get('raid');
     if (raid !== null) raidNow(state, Number(raid) || 12);
+    // C2 · `&braced=2` deja el valle a dos semanas del asalto: la guarnición
+    // sube y todavía no hay nadie en el camino.
+    const braced = query.get('braced');
+    if (braced !== null) bracedNow(state, Number(braced) || 1);
     const crown = query.get('crown');
     if (crown === 'ready') crownReady(state);
     else if (crown !== null) crownNow(state, crown);
