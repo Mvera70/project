@@ -41,6 +41,48 @@ Lo que **nunca** se hace: acotar la superficie a 390 y dejar la barra cruzando,
 que es dos reglas para la misma cosa y se ve como una tira de papel flotando con
 valle a los lados.
 
+## 1b. Y en vertical: una hoja cubre, la bandeja no
+
+**La crónica y la gente cubren la pantalla. El valle es la única pestaña con
+hoja baja.** Decisión del dueño del diseño, 18 sep 2026: «la parte de People y
+Crónica debería cubrir toda la pantalla, que no se ve la aldea … en principio
+el valle es la única que va a tener la pestaña baja».
+
+Antes de eso toda hoja se topaba a `max-height: 60vh` y las tres secciones se
+leían con medio valle asomando por encima: el valle moviéndose detrás de un
+texto que se está leyendo. Ahora:
+
+| Superficie | De dónde a dónde |
+|---|---|
+| La crónica, la gente, el carro | De debajo de la cabecera a la barra de navegación |
+| La bandeja del valle | Del canto rasgado a la barra, y sólo en el valle |
+| La ficha **mientras se sigue a alguien** | Baja, 40 vh — es la única excepción, y la pidió él: «cuando pinche una persona y le das al follow, que se baje hasta abajo y se quede a una altura bajita» |
+
+**La cabecera se queda en las cuatro**, que es §3 y es suyo también. Lo que una
+hoja tapa es el valle, no los instrumentos.
+
+**Y el alto de la cabecera no se escribe a mano**: `hud.ts` lo publica en
+`--ui-hud-height` con un `ResizeObserver`, igual que la bandeja publica
+`--ui-stack-height` desde UI-V2b. Son dos placas con el área segura por encima,
+así que en un móvil con muesca miden una cosa y en el portátil otra, y el día
+que el grano llegue a cuatro dígitos la fila de chips crecerá sola.
+
+### La pantalla despejada
+
+Hay un cuarto estado, y es del dedo: **el botón del rincón de mandos que quita
+todo y deja sólo el valle** («que se quite todo, que solamente se vea el valle.
+Y solamente se vea ese icono y a lo mejor el del sonido en tenue»). Se marca
+con `html.bare`, y tres reglas:
+
+- **Se apaga con `visibility`, nunca con `display`.** La bandeja publica su
+  alto y media interfaz se coloca contra él: plegarla a cero recolocaría lo que
+  queda en pantalla, que es justo lo que §8 existe para impedir.
+- **El camino de vuelta se queda a la vista.** Por eso el botón no se atenúa y
+  por eso abrir cualquier hoja sale del modo: una hoja sobre un valle sin
+  cabecera ni barra es una hoja sin salida.
+- **El rincón de mandos baja al canto**, porque sin bandeja debajo no tiene
+  contra qué quedarse alto.
+
 ## 2. Los papeles: cuatro tonos, un trabajo cada uno
 
 Un token por papel, y el papel se pide por su clase:

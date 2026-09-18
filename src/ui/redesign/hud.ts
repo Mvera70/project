@@ -431,6 +431,38 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   header.className = 'ui-hud-header';
   header.append(datePlate, timeLine, vitals);
 
+  /**
+   * UI-V10 · **Lo alto que es la cabecera, publicado como `--ui-hud-height`.**
+   *
+   * Es el mismo patrón —y por el mismo motivo— con el que `shell.ts` publica
+   * `--ui-stack-height` desde UI-V2b: la hoja de la crónica y la de la gente
+   * pasan a cubrir la pantalla **hasta debajo de la cabecera**, y esa cabecera
+   * no tiene una altura fija que nadie pueda escribir a mano — son dos placas
+   * con su respiro y el área segura del móvil por encima, así que en un iPhone
+   * con muesca mide una cosa y en el portátil otra.
+   *
+   * `ResizeObserver` y no una cuenta al montar, otra vez por la misma razón:
+   * el hueco de las cifras crece el día que el grano llega a cuatro dígitos.
+   */
+  const publishHeaderHeight = (): void => {
+    document.documentElement.style.setProperty(
+      '--ui-hud-height',
+      `${Math.round(vitals.getBoundingClientRect().bottom)}px`,
+    );
+  };
+  const headerWatcher = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => {
+    publishHeaderHeight();
+  });
+  // **Se mide la fila de chips, no el envoltorio**, y eso costó una captura: la
+  // placa de fecha y la fila de cifras van `position: absolute` (piel de U-01,
+  // `index.html`), así que `.ui-hud-header` es una caja de **altura cero** y la
+  // primera versión publicaba `0px`. Con eso la crónica arrancaba a 8 px del
+  // techo y se tragaba la cabecera entera: se vio en la primera toma de la
+  // ronda. Lo que la hoja necesita saber es **dónde acaba lo último de la
+  // cabecera**, que es el canto de abajo de los chips en coordenadas de
+  // ventana — y la hoja es `position: fixed`, o sea las mismas coordenadas.
+  headerWatcher?.observe(vitals);
+
   // ---------------------------------------------------------------------
   // La velocidad: dos círculos (plan §3.1). Uno pausa/reanuda sin abrir nada
   // —el ▶/⏸ del prototipo—, el otro enseña el multiplicador elegido y
@@ -618,6 +650,9 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
       paintedDate = '';
     },
     dispose(): void {
+      // El observador vive fuera del árbol, colgado del elemento: quitar el
+      // nodo no lo suelta. Mismo trato que `stackWatcher` en `shell.ts`.
+      headerWatcher?.disconnect();
       header.remove();
       speedControls.remove();
       speedCluster.remove();

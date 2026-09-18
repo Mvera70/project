@@ -482,7 +482,18 @@
 .ui-shell-content:has(.chronicle-scrim) {
   -webkit-mask-image: none;
   mask-image: none;
+  /* UI-V10 · **y tampoco pinta papel ni cruz.** Mientras la hoja se topaba a
+     60 vh esto no se veía —la crónica la tapaba entera—, pero cubriendo la
+     pantalla salían **dos papeles y dos cruces**: el de la carcasa asomando
+     por encima de la página, con su aspa arriba a la derecha y la de la
+     crónica un poco más abajo. Se vio en la primera toma de la ronda. Quien
+     hospeda no se viste: la página de dentro trae su papel, su canto y su
+     cruz. */
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
 }
+.ui-shell-content:has(.chronicle-scrim) > .ui-shell-content-close { display: none; }
 /* El canto ya no es un elemento: era la tapa de madera, y ahora es el recorte
    de la propia hoja. Se conserva la clase, vacía y sin caja, porque `shell.ts`
    la monta y un recorrido la nombra; el día que se retire del DOM, esto se va
@@ -828,6 +839,36 @@
 }
 .hud-round-btn:active { transform: translateY(1px); }
 .hud-round-btn:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
+
+/** UI-V10 · **La pantalla despejada: sólo el valle.**
+
+    Decisión del dueño del diseño, 18 sep 2026: «un botón que sea rollo de
+    despejar la pantalla, que se quite todo, que solamente se vea el valle. Y
+    solamente se vea ese icono y a lo mejor el del sonido en tenue».
+
+    Se apaga con `visibility` y no con `display` a propósito, que es la lección
+    que §8 del estándar dejó escrita: la bandeja publica su alto
+    (`--ui-stack-height`) y media interfaz se coloca contra él, así que
+    plegarla a cero movería lo que quede en pantalla. Escondida conserva su
+    caja, nada se recoloca, y volver es exacto.
+
+    Lo único que se mueve es el rincón de mandos, y a propósito: sin bandeja
+    debajo no tiene contra qué quedarse alto, así que baja al canto de la
+    pantalla con el respiro del área segura. */
+html.bare .hud-plate-date,
+html.bare .valley-vitals,
+html.bare .hud-speed-cluster,
+html.bare .valley-speeds { visibility: hidden; }
+html.bare .valley-hud-right.hud-speed-corner {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+}
+/* El del sonido, en tenue: sigue ahí para quien quiera callar el valle sin
+   volver a sacar la interfaz. El del valle se queda entero — es el camino de
+   vuelta, y un camino de vuelta a medio gas no se ve. */
+html.bare .valley-sound { opacity: .4; }
+/* Y con la pantalla despejada el botón dice que lo está: el mismo trato que
+   `aria-pressed` le da al resto de los redondos. */
+.valley-bare[aria-pressed="true"] { color: var(--skin-ink); }
 
 /* ---------------------------------------------------- la voz, en la bandeja */
 

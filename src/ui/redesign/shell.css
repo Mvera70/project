@@ -56,6 +56,10 @@
 html.crossroad-open .ui-shell-stack,
 html.epitaph-open .ui-shell-stack,
 html.welcome-open .ui-shell-stack { visibility: hidden; }
+/* UI-V10 · y la pantalla despejada, que es lo mismo pero pedido por el dedo:
+   la bandeja y la barra se van y sólo queda el valle. Ver el bloque de
+   `html.bare` en `skin.css`, donde está el motivo de que sea `visibility`. */
+html.bare .ui-shell-stack { visibility: hidden; }
 
 /* El hueco del mensaje. Min-height 56px del prototipo (visual-reference §5) y
    crece hacia arriba con el texto; vacío no reserva nada, porque no siempre
@@ -223,9 +227,30 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
    ahí (§3.1 de `docs/ui-redesign/rounds/UI-R1.md`) y las capturas de esta
    misma ronda sólo habían comprobado que la hoja se **veía**, no que
    respondiera al dedo. */
+/** UI-V10 · **La crónica y la gente cubren la pantalla; sólo el valle tiene
+    hoja baja.** Decisión del dueño del diseño, 18 sep 2026: «la parte de
+    People y Crónica debería cubrir toda la pantalla, que no se ve la aldea …
+    en principio el valle es la única que va a tener la pestaña baja».
+
+    Hasta aquí toda hoja se topaba a `max-height: 60vh`, así que en las tres
+    secciones se leía un documento con medio valle asomando por encima —el
+    valle moviéndose detrás de un texto que se está leyendo—. Ahora la hoja
+    arranca **justo debajo de la cabecera** y llega a la navegación.
+
+    **La cabecera se queda**, y es a propósito: §3 del estándar dice «una sola
+    cabecera en las cuatro pantallas» y eso lo pidió el propio dueño del diseño
+    («no usamos el mismo que tenemos en la otra pantalla funcionando»). Lo que
+    tapa la hoja es el valle, que es lo que molestaba.
+
+    El alto de la cabecera no se escribe a mano: lo publica `hud.ts` en
+    `--ui-hud-height` con un `ResizeObserver`, igual que la bandeja publica el
+    suyo desde UI-V2b — son dos placas con área segura por encima, así que en
+    un móvil con muesca mide una cosa y en el portátil otra. Los 8 px de
+    respiro son el aire que el prototipo 02 deja entre los chips y el papel. */
 .ui-shell-content { position: fixed; left: 0; right: 0; z-index: 13;
   bottom: calc(var(--ui-nav-height) + env(safe-area-inset-bottom));
-  box-sizing: border-box; max-height: 60vh; overflow: auto; pointer-events: auto;
+  top: calc(var(--ui-hud-height, 96px) + 8px);
+  box-sizing: border-box; overflow: auto; pointer-events: auto;
   padding: var(--ui-space-4) var(--ui-margin-mobile);
   /* VZ-2 · sin filete recto: el canto de esta hoja es el desgarro. */
   /* VZ-2 · la esquina redondeada y la sombra se retiran: el canto rasgado es
@@ -233,6 +258,23 @@ html:has(.ui-shell-content:not([hidden])) .ui-shell-message { display: none; }
      esquina torneada ni se levanta del valle. */
   color: var(--ui-paper-ink); }
 .ui-shell-content[hidden] { display: none; }
+/** UI-V10 · **La excepción, y es la que el dueño del diseño pidió con nombre:
+    seguir a alguien baja la ficha.** Sus palabras: «solamente en People tener
+    la posibilidad de, cuando pinche una persona y le das al follow, que se
+    baje hasta abajo y se quede a una altura bajita».
+
+    Y tiene que ser así, porque seguir a alguien **es mirar el valle**: la
+    ficha a pantalla completa tapaba justo al aldeano que se acaba de pedir
+    ver. El 40 % es el tope de antes de esta ronda menos un tercio: con 60 vh
+    la cabeza del seguido caía detrás del papel a 390 × 844.
+
+    La marca la pone `inspect-panel.ts` en la raíz, y la pone donde ya estaba
+    el único punto de escritura de esa ficha sobre el mundo (`setTracking`), no
+    en un segundo sitio que pueda desincronizarse. */
+html.following .ui-shell-content {
+  top: auto;
+  max-height: 40vh;
+}
 .ui-shell-content-close { position: absolute; top: 6px; right: 8px;
   width: var(--ui-tap-min); height: var(--ui-tap-min); display: grid; place-items: center;
   padding: 0; border: 0; background: transparent; color: var(--ui-paper-ink-soft);

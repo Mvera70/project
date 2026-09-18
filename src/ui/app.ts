@@ -221,8 +221,20 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // `dispose()` cancele el seguimiento que ella misma pudiera haber empezado
   // (§2.5: «cerrar la ficha termina el seguimiento iniciado desde ella»).
   let mountedInspect: UiPanel | null = null;
+  /**
+   * UI-V10 · Salir de la pantalla despejada. Se asigna de verdad más abajo,
+   * cuando el botón existe; hasta entonces no hay nada que despejar. La
+   * indirección es para que `navigate` —que se declara antes que el rincón de
+   * mandos— pueda llamarlo sin depender del orden en que se monta la interfaz.
+   */
+  let dropBareView: () => void = () => {};
+
   function navigate(route: SheetRoute): void {
     currentRoute = route;
+    // UI-V10 · **con la pantalla despejada no se abre una hoja.** Sin esto, la
+    // crónica se montaría sobre un valle sin cabecera y sin barra de abajo, o
+    // sea sin salida a la vista.
+    if (route.kind !== 'valley') dropBareView();
     // S-05, U-14 · crónica, gente, ficha y órdenes no coexisten: la ruta que
     // llega cierra a las demás antes de abrirse, y siempre a través de este
     // único punto — nunca dentro de un manejador suelto.
@@ -392,13 +404,61 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   soundToggle.addEventListener('click', () => { sound.setEnabled(!sound.enabled); updateSoundToggle(); });
   updateSoundToggle();
 
+  /**
+   * UI-V10 · **Despejar la pantalla: sólo el valle.**
+   *
+   * Lo pidió el dueño del diseño el 18 sep 2026, y es el gesto que esta
+   * interfaz no tenía: «justo a la izquierda del todo de los tres botones que
+   * tenemos ahora de acción, poner un botón que sea rollo de despejar la
+   * pantalla, que se quite todo, que solamente se vea el valle. Y solamente se
+   * vea ese icono y a lo mejor el del sonido en tenue».
+   *
+   * Encaja con la premisa del juego —un idle bonito de mirar de fondo— y es lo
+   * primero que alguien quiere cuando el valle ya le gusta: quitarle la
+   * cabecera, la bandeja y la barra de encima.
+   *
+   * **El icono es el del valle** (`mountains`, el mismo de su pestaña), y es
+   * deliberado: dice a qué se va, no qué se esconde. No se dibuja uno nuevo
+   * porque el sprite es de la tanda de arte que el dueño tiene en marcha
+   * —`public/ui/icons.svg` e `index.html` están tocados por él ahora mismo— y
+   * un icono propio para esto queda apuntado en `plan-arte-pendiente.md`.
+   *
+   * **Y el camino de vuelta es este mismo botón**, que se queda a la vista
+   * cuando todo lo demás se va: por eso no hay nada que pueda quedarse
+   * inalcanzable, ni el sello de una decisión aplazada.
+   */
+  const bareToggle = document.createElement('button');
+  bareToggle.type = 'button';
+  bareToggle.className = 'valley-bare hud-round-btn skin-plate skin-plate--round';
+  bareToggle.innerHTML = '<svg class="skin-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'
+    + '<use href="#mountains"/></svg>';
+  let bare = false;
+  const paintBare = (): void => {
+    document.documentElement.classList.toggle('bare', bare);
+    bareToggle.setAttribute('aria-pressed', String(bare));
+    bareToggle.setAttribute('aria-label', renderUiText(bare ? 'app.bare.off' : 'app.bare'));
+  };
+  bareToggle.addEventListener('click', () => { bare = !bare; paintBare(); });
+  paintBare();
+  /**
+   * Y se cae sola en cuanto hay algo que leer: abrir la crónica, la gente, el
+   * carro o una ficha con la pantalla despejada dejaría una hoja sobre un valle
+   * sin cabecera ni barra, o sea sin salida a la vista. Se llama desde
+   * `navigate`, que es el único dueño de la ruta (`contracts.ts`).
+   */
+  dropBareView = (): void => {
+    if (!bare) return;
+    bare = false;
+    paintBare();
+  };
+
   const hudRight = document.createElement('div');
   // UI-V2b · la segunda clase es la que sube el rincón por encima de la
   // bandeja (`skin.css`): la regla de `index.html` lo dejaba a 60 px del
   // borde, que era la altura de la barra estrecha de antes del rediseño, y
   // con la bandeja nueva los dos círculos caían dentro de ella.
   hudRight.className = 'valley-hud-right hud-speed-corner';
-  hudRight.append(soundToggle, hud.speedControls, hud.speedBadge);
+  hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge);
 
   root.append(canvas, hud.header, hudRight, shell.element);
 

@@ -217,6 +217,18 @@ export function createInspectPanel(
     if (next === tracking) return;
     tracking = next;
     actions.track(next);
+    // UI-V10 · **y la ficha se baja mientras se le sigue.** Lo pidió el dueño
+    // del diseño el 18 sep 2026: la crónica y la gente cubren la pantalla, y
+    // la única excepción es ésta — «cuando pinche una persona y le das al
+    // follow, que se baje hasta abajo y se quede a una altura bajita». Es
+    // obvio en cuanto se ve: seguir a alguien es mirar el valle, y una ficha a
+    // pantalla completa tapa justo al aldeano que se acaba de pedir ver.
+    //
+    // La marca va en la raíz porque quien tiene que reaccionar es la carcasa
+    // (`shell.css`), y se pone **aquí**, en el único punto de escritura que
+    // esta ficha ya tenía sobre el mundo: un segundo sitio que también supiera
+    // si se está siguiendo a alguien es un sitio que puede desincronizarse.
+    document.documentElement.classList.toggle('following', next !== null);
   };
 
   /**

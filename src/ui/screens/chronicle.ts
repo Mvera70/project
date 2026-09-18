@@ -51,7 +51,15 @@ const STYLE = `
    (\`.skin-torn-top\`, \`skin.css\`), que es el mismo en las tres secciones. El
    elemento se conserva porque sigue haciendo el otro trabajo que hacía: dejar
    ver el valle por encima de la página y subir con ella al desplazar. */
-.chronicle-fade { height: 439px; }
+/* UI-V10 · **y su alto es el de la cabecera, no 439 px.** La crónica pasa a
+   cubrir la pantalla (decision del dueno del diseno, 18 sep 2026: «la parte de
+   People y Cronica deberia cubrir toda la pantalla, que no se ve la aldea»), y
+   este hueco era lo que la empujaba 439 px hacia abajo para dejar valle
+   asomando. Ahora deja exactamente la cabecera, que es lo unico que se queda a
+   la vista, y lo lee de \`--ui-hud-height\` —que publica \`hud.ts\` con un
+   \`ResizeObserver\`— en vez de escribirlo a mano. Sigue siendo parte del
+   contenido que se desplaza, asi que la pagina sigue subiendo al leer. */
+.chronicle-fade { height: calc(var(--ui-hud-height, 96px) + 8px); }
 /* La página en sí: \`--skin-page\` **con su textura** (§3.2), no un color
    plano — \`.skin-paper\`/\`.skin-paper--page\` son del kit (\`skin.css\`, UI-V0)
    y se componen tal cual él las deja, sin redefinir nada aquí. */

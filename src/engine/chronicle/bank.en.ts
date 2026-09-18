@@ -2175,6 +2175,10 @@ export const UI_BANK: Record<string, string> = {
   'era.hamlet': 'Hamlet',
   'era.village': 'Village',
   'era.town': 'Walled town',
+  // UI-V10 · el botón que despeja la pantalla (`app.ts`). Dice a dónde se va y
+  // no qué se esconde, que es lo mismo que hace su icono —el del valle—.
+  'app.bare': 'Just the valley',
+  'app.bare.off': 'Show the panels again',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',
   'app.speed.multiplier': '{speed}×',

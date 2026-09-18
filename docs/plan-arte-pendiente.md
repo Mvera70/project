@@ -224,6 +224,12 @@ color—, así que lo que hoy va en oro o en rojo es de la versión anterior.
 Ninguna de las cinco se integra sin pasar por la skill `piel-del-valle` (§10) y
 sin retirar, en la misma ronda, el color que sustituye.
 
+## Iconos que faltan en el sprite (UI-V10, 18 sep 2026)
+
+| Icono | Para qué | Qué se usa hoy en su lugar |
+|---|---|---|
+| **Despejar la pantalla** | El botón nuevo del rincón de mandos: quita cabecera, bandeja y barra, y deja sólo el valle (decisión del dueño del diseño, 18 sep) | **El icono del valle** (`mountains`, el de su pestaña). Dice a dónde se va, así que no miente, pero es el mismo dibujo en dos sitios con dos significados. Lo que pide es un icono propio en la temática de tinta parda: un marco vacío, un ojo, o las dos flechas que abren. No se dibujó en la ronda porque el sprite (`public/ui/icons.svg`) y el documento que lo incrusta (`index.html`) están tocados por el dueño ahora mismo |
+
 ## Orden recomendado
 
 1. ~~Resolver el recuento de ilustraciones y cerrar el catálogo nominal.~~
