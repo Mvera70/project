@@ -73,8 +73,8 @@ El patrón de M-2: el jugador **da** y la aldea decide.
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| C1 · Los medios de defensa | Armas a la herrería, arcos, portón, atalaya en el carro, cada uno con su cara mala (el señor cuenta las armas, la madera que no va a casas) | P2 | Media | Sol | B1 |
-| C2 · La guarnición | Quién sube a la muralla: oferta `guard`/`archer` en la jornada, el herrero, el rey herrero que pone a más | P2 | Media | Sol | C1 |
+| ~~C1 · Los medios de defensa~~ · **hecho el 18 sep 2026**: tres medios y tres ejes — **armas** (se llevan un cuarto menos, y el señor las cuenta), **arcos** (tientan menos, pero cuando bajan bajan más) y **atalaya** (catorce semanas de aviso en vez de ocho, y se levanta de verdad). Medido en 8 semillas × 80 años | Hecho | Media | — | — |
+| C2 · La guarnición | Quién sube a la muralla: oferta `guard`/`archer` en la jornada, el herrero, el rey herrero que pone a más. **Con C1 hecha, los arcos ya existen como cosa dada**: falta quien los use | **P1** | Media | Sol | C1 hecha |
 | C3 · Atalaya y torres como obra normal | Hoy la atalaya sólo llega por encrucijada; pasa a §7.3 con su puerta medida | P3 | Baja | Luna, Terra | A4 |
 | C4 · La fila del carro | La interfaz de dar defensa, con el precio en fichas y el motivo cuando no se puede | P2 | Baja | Luna, Terra | C1 |
 

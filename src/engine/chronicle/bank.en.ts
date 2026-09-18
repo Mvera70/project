@@ -626,6 +626,23 @@ export const BANK: Record<string, string[]> = {
     'They bought a relic in year {year}. Whether it was what the pedlar said it was, nobody asked.',
     'A relic that {season}, and the whole valley came to look at it.',
   ],
+  // C1 · Los tres de la defensa (§1b). Cada uno dice lo que hace y lo que
+  // cuesta, que es lo que un medio tiene que decir.
+  'means.arms.given': [
+    'The smith spent that {season} on spear heads, and the valley had iron in its hands.',
+    'Weapons were bought in year {year}. Wealdmere heard about it before the winter.',
+    'They armed themselves that {season}, and slept no easier for it.',
+  ],
+  'means.bows.given': [
+    'Bows came to the valley in year {year}, and the word went up the ridge with them.',
+    'They bought bows that {season}. A village that shoots back is a village people go around.',
+    'Yew and gut in year {year}, and the young ones practising at the ford.',
+  ],
+  'means.tower.given': [
+    'The timber for a watchtower came that {season}, and the village raised it.',
+    'A watchtower was paid for in year {year}, to see the road before the road sees you.',
+    'They put up a tower that {season}, and someone has been up there since.',
+  ],
   'means.hand.given': [
     'A stranger stayed in the {season} of year {year} and was given a bed.',
     'Somebody came up the road in year {year} and did not leave: another pair of hands.',
@@ -2182,6 +2199,13 @@ export const UI_BANK: Record<string, string> = {
   'cart.axe.what': 'More timber from every woodcutter. The forest pays for it, and so does the river.',
   'cart.relic': 'A relic',
   'cart.relic.what': 'Faith enough for a chapel and a priest. And a valley the road talks about.',
+  // C1 · Las tres filas de la defensa. Dicen las dos caras, como todas.
+  'cart.arms': 'Arms for the smithy',
+  'cart.arms.what': 'The village fights back and loses less to a raid. And the lord counts the weapons.',
+  'cart.bows': 'Bows',
+  'cart.bows.what': 'A valley that shoots back tempts nobody. But when they do come, they come in force.',
+  'cart.tower': 'A watchtower',
+  'cart.tower.what': 'Raiders are seen from far off: fourteen weeks of warning instead of eight.',
   'cart.hand': 'A pair of hands',
   'cart.hand.what': 'A stranger who stays. The valley finds them a trade when one falls vacant.',
   'cart.ale': 'A barrel of ale',

@@ -26,7 +26,7 @@
 import { THREAT, TIME } from '../balance';
 import { flagSet } from '../crossroads/conditions';
 import { next } from '../rng';
-import type { GameState, HerdKind } from '../state';
+import { hasTrait, type GameState, type HerdKind } from '../state';
 import { yearOf } from '../time';
 
 /**
@@ -68,9 +68,17 @@ export function worthOf(state: GameState): number {
     + state.herd.cows * THREAT.WORTH_PER_COW;
 }
 
-/** Cuánto tienta, de cero a uno. */
+/**
+ * Cuánto tienta, de cero a uno.
+ *
+ * C1 · **Y los arcos descuentan**: un valle del que se sabe que dispara desde
+ * la cerca tienta menos. Se aplica aquí y no en el tamaño de la partida porque
+ * la disuasión es sobre la decisión de venir, no sobre cuántos vienen — lo
+ * segundo lo empeora, que es la cara mala del que se arma.
+ */
 function temptation(state: GameState): number {
-  return Math.max(0, Math.min(1, worthOf(state) / THREAT.WORTH_FULL));
+  const worth = worthOf(state) * (hasTrait(state, 'bows') ? THREAT.BOWS_TEMPTATION : 1);
+  return Math.max(0, Math.min(1, worth / THREAT.WORTH_FULL));
 }
 
 /**
@@ -115,9 +123,17 @@ export function advanceThreat(state: GameState): ThreatEvent | null {
     if (next(state.rng, 'raid') < chance) {
       const share = THREAT.BAND_LEAST_SHARE
         + (1 - THREAT.BAND_LEAST_SHARE) * temptation(state);
-      state.threat.comingTick = state.tick + THREAT.WARNING_WEEKS;
-      state.threat.comingBand = Math.max(THREAT.BAND_MIN,
-        Math.round(state.threat.strength * share));
+      // C1 · la atalaya los ve venir antes: el aviso pasa de ocho semanas a
+      // catorce, que es tiempo para hacer algo con él (B2).
+      const warning = hasTrait(state, 'watch')
+        ? THREAT.WATCH_WARNING_WEEKS
+        : THREAT.WARNING_WEEKS;
+      state.threat.comingTick = state.tick + warning;
+      // Y los arcos, su cara mala: quien se arma deja de ser un sitio al que se
+      // va a robar y pasa a ser un sitio al que hay que ir en serio.
+      const band = state.threat.strength * share
+        * (hasTrait(state, 'bows') ? THREAT.BOWS_BAND : 1);
+      state.threat.comingBand = Math.max(THREAT.BAND_MIN, Math.round(band));
       // B2 · **y el valle se entera.** Lo que hace que las ocho semanas de
       // `WARNING_WEEKS` sirvan de algo: alguien los vio en el camino, y a
       // partir de aquí `crisisOf` deja pasar la pregunta de §8.6 por encima
@@ -155,9 +171,13 @@ function arrive(state: GameState): Sack {
   const behindWall = walled(state);
   // B2 · la aldea que se preparó esconde la mitad de lo que se llevarían.
   const braced = flagSet(state, 'braced');
+  // C1 · y las armas: la aldea que las tiene se lleva menos golpe. Unas lanzas
+  // en la herrería no son una guarnición —eso es la fase 4— pero un valle con
+  // hierro en las manos no es un valle que se deja saquear.
   const share = THREAT.SACK_SHARE
     * (behindWall ? THREAT.WALLED_SACK : 1)
-    * (braced ? THREAT.BRACED_SACK : 1);
+    * (braced ? THREAT.BRACED_SACK : 1)
+    * (hasTrait(state, 'arms') ? THREAT.ARMS_SACK : 1);
 
   const silver = Math.round(state.village.silver * share);
   const grain = Math.round(state.village.grain * share);

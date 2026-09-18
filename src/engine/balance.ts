@@ -689,6 +689,10 @@ export const MEANS = {
    */
   RELIC_FAITH: 62,
   RELIC_WATCHED_YEARS: 12,
+  // C1 · **el señor cuenta las armas** (§7.12). Doce años, los mismos que la
+  // reliquia: las dos cosas hacen que se hable del valle, y de eso vive
+  // Wealdmere. No es un castigo aparte, es `watched` de siempre.
+  ARMS_WATCHED_YEARS: 12,
   /** El forastero que se queda: los inviernos que ya tiene al llegar. */
   HAND_AGE: 24,
 } as const;
@@ -807,6 +811,31 @@ export const THREAT = {
   BAND_LEAST_SHARE: 0.25,
   /** Y nunca menos de esto, o no es una partida, es un paseo. */
   BAND_MIN: 4,
+  /**
+   * C1 · **Las armas**: lo que la aldea armada se lleva de menos. Dos tercios
+   * de lo que se llevarían, y **no más**: unas lanzas en la herrería no son una
+   * guarnición. Lo que de verdad cambia un asalto es la gente en la muralla, y
+   * eso es la fase 4.
+   */
+  ARMS_SACK: 0.66,
+  /**
+   * C1 · **Los arcos**: lo que deja de tentar un valle del que se sabe que
+   * dispara. Se aplica al valor que el clan ve (`worthOf`), así que baja a la
+   * vez la probabilidad de que bajen y el tamaño de la partida.
+   */
+  BOWS_TEMPTATION: 0.7,
+  /**
+   * Y su cara mala: cuando por fin bajan, bajan con más gente. Quien se arma
+   * deja de ser un sitio al que se va a robar y pasa a ser un sitio al que hay
+   * que ir en serio.
+   */
+  BOWS_BAND: 1.3,
+  /**
+   * C1 · **La atalaya**: las semanas de aviso pasan de ocho a esto. Catorce, o
+   * sea un trimestre largo: tiempo para meter el ganado, esconder el grano o
+   * mandar la plata, que son exactamente las tres salidas que B2 ofrece.
+   */
+  WATCH_WARNING_WEEKS: 14,
   /**
    * B2 · Lo que cuesta que se den la vuelta. Treinta de plata: lo mismo que
    * cuesta una corona (`CROWN.SILVER`), y es a propósito — pagar a quien viene

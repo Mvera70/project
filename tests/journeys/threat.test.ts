@@ -15,6 +15,7 @@ import { THREAT, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
+import { giveMeans } from '@engine/world/means';
 import { worthOf } from '@engine/world/threat';
 import type { GameState } from '@engine/state';
 
@@ -239,5 +240,104 @@ describe('B2 · el aviso, y lo que se puede hacer con él', () => {
     run(known, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
     expect(known.threat.raids, 'al que paga vuelven más veces')
       .toBeGreaterThanOrEqual(plain.threat.raids);
+  });
+});
+
+describe('C1 · lo que se da para aguantar', () => {
+  // §1b, fase 4, y el patrón de M-2 de punta a punta: el jugador **da** y la
+  // aldea decide. Tres medios y **tres ejes distintos** — aguantar el golpe,
+  // verlos venir, que no vengan — porque tres medios que hicieran lo mismo con
+  // números distintos serían un solo medio con tres precios
+  // (`plan-medios.md` §3.2).
+  //
+  // Medido al cerrar C1 en ocho semillas × 80 años, contra el mismo valle sin
+  // nada: las armas bajan el botín de 5 817 a **4 386** (un cuarto menos), los
+  // arcos bajan los asaltos de 18 a **13**, y la atalaya sube el aviso de ocho
+  // semanas a **catorce**. Lo que se guarda aquí es que cada uno mueve **su**
+  // eje, no la cifra.
+
+  /** El mismo valle en el mismo instante, con y sin lo que se le dé. */
+  function pair(seed: number, id: 'arms' | 'bows' | 'tower'): [GameState, GameState] {
+    const base = foundGame(seed);
+    run(base, TIME.WEEKS_PER_YEAR * 8, 'prudent', CATALOG);
+    base.village.silver += 80;
+    base.village.wood += 150;
+    const without = structuredClone(base);
+    const with_ = structuredClone(base);
+    const outcome = giveMeans(with_, id, 'spring', 8);
+    expect(outcome.given, `${id} en la semilla ${seed}: ${outcome.refusal ?? ''}`).toBe(true);
+    return [without, with_];
+  }
+
+  it('las armas hacen que se lleven menos', () => {
+    const [without, armed] = pair(25, 'arms');
+    for (const state of [without, armed]) {
+      state.village.silver = 200;
+      state.village.grain = 2000;
+      state.threat.comingTick = state.tick + 1;
+      state.threat.comingBand = 20;
+      // Sin muralla: lo que se mide es el hierro, no el cerco.
+      state.buildings = state.buildings.filter(
+        (b) => b.kind !== 'gate' && b.kind !== 'palisade' && b.kind !== 'wall',
+      );
+      run(state, 2, 'prudent', CATALOG);
+    }
+    expect(armed.village.silver, 'la aldea armada conserva más plata')
+      .toBeGreaterThan(without.village.silver);
+  });
+
+  it('la atalaya los ve venir con semanas de sobra', () => {
+    const [without, watching] = pair(36, 'tower');
+    // La partida que ya estuviera en camino se programó con el aviso viejo: lo
+    // que se mide es la **siguiente**, que es la que la atalaya ve.
+    for (const state of [without, watching]) state.threat.comingTick = null;
+    const margin = (state: GameState): number => {
+      for (let week = 0; week < 60 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
+        run(state, 1, 'prudent', CATALOG);
+        if (state.threat.comingTick !== null) return state.threat.comingTick - state.tick;
+      }
+      return 0;
+    };
+    expect(margin(watching), 'con atalaya, más aviso').toBeGreaterThan(margin(without));
+  });
+
+  it('los arcos hacen que tienten menos, y que cuando bajen bajen más', () => {
+    // Las dos caras del mismo medio, medidas sobre el mismo valle: el clan mira
+    // un premio más pequeño (`temptation`) pero arma una partida mayor.
+    const [without, armed] = pair(47, 'bows');
+    for (const state of [without, armed]) {
+      state.threat.comingTick = null;
+      state.threat.strength = 40;
+      state.village.silver = 60;
+    }
+    const bandOf = (state: GameState): number => {
+      for (let week = 0; week < 60 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
+        run(state, 1, 'prudent', CATALOG);
+        if (state.threat.comingTick !== null) return state.threat.comingBand;
+      }
+      return 0;
+    };
+    const plain = bandOf(without);
+    const withBows = bandOf(armed);
+    expect(plain, 'el valle sin arcos recibe partida').toBeGreaterThan(0);
+    expect(withBows, 'con arcos vienen en más').toBeGreaterThanOrEqual(plain);
+  });
+
+  it('y una atalaya que no cabe no se cobra', () => {
+    // La promesa de M-2: no se cobra a medias. Si el valle ya tiene sus
+    // atalayas, dar otra es una negativa y la madera se queda donde estaba.
+    const state = foundGame(58);
+    run(state, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+    state.village.wood = 500;
+    state.village.silver = 100;
+    let given = 0;
+    for (let n = 0; n < 6; n += 1) {
+      if (giveMeans(state, 'tower', 'spring', 20).given) given += 1;
+    }
+    const wood = state.village.wood;
+    const refused = giveMeans(state, 'tower', 'spring', 20);
+    expect(given, 'alguna se levantó').toBeGreaterThan(0);
+    expect(refused.given, 'la siguiente ya no cabe').toBe(false);
+    expect(state.village.wood, 'y no se cobró').toBe(wood);
   });
 });

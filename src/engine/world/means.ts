@@ -25,7 +25,10 @@ import { housingCapacity, population } from '../people/demography';
 import { MALE_NAMES, FEMALE_NAMES } from '../people/names';
 import { ALL_TRAITS } from '../people/traits';
 import { hash32 } from '../rng';
-import type { ChronicleEntry, GameState, MeansId, VillageStats, Villager } from '../state';
+import { withinCap } from './buildings';
+import { placeBuilding } from './placement';
+import { requestBuild } from './works';
+import type { BuildingKind, ChronicleEntry, GameState, MeansId, VillageStats, Villager } from '../state';
 import { herdCapacity } from '../subsistence/herd';
 
 /** Lo que un medio cuesta y lo que deja al darlo. */
@@ -38,7 +41,7 @@ export interface MeansSpec {
    * de fundación (§7.11) — un medio es uno de esos, puesto a mitad de partida y
    * pagado.
    */
-  readonly trait?: 'plough' | 'sty' | 'axe' | 'relic';
+  readonly trait?: 'plough' | 'sty' | 'axe' | 'relic' | 'arms' | 'bows' | 'watch';
   /** Si mete animales en el corral, cuántos y de qué. */
   readonly herd?: { readonly kind: 'pigs' | 'cows'; readonly count: number };
   /** Si lo que deja es una fiesta esta semana. */
@@ -47,6 +50,16 @@ export interface MeansSpec {
   readonly hand?: boolean;
   /** M-4 · banderas que el medio deja puestas, con sus años. */
   readonly flags?: readonly { readonly flag: string; readonly years: number }[];
+  /**
+   * C1 · Si lo que se da es un edificio, y se levanta puesto.
+   *
+   * **Puesto y no en la cola de obras**, que es la diferencia entre dar y
+   * mandar: el jugador paga la madera y la atalaya está ahí, en vez de entrar
+   * en §7.3 a esperar turno detrás de tres casas. Usa la misma puerta que una
+   * encrucijada que concede un edificio (`requestBuild` con `free`), así que no
+   * hay maquinaria nueva.
+   */
+  readonly build?: BuildingKind;
 }
 
 export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
@@ -86,6 +99,38 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
   // oficio puesto —eso lo decide la aldea cuando haya un puesto vacante
   // (§6.2)— y no se coloca: duerme donde haya sitio, como cualquiera.
   hand: { cost: { grain: 60, silver: 24 }, hand: true },
+
+  // -------------------------------------------------------------------------
+  // C1 · Lo que se da para aguantar un asalto (§1b, fase 4).
+  //
+  // **Tres medios y tres ejes distintos, y eso es lo que los hace una
+  // elección**: uno aguanta el golpe, otro lo ve venir y el tercero hace que no
+  // venga. Si los tres hicieran lo mismo con números distintos serían un solo
+  // medio con tres precios, que es exactamente lo que `plan-medios.md` §3.2
+  // prohíbe. Y cada uno tiene su cara mala, como todos los demás desde M-2.
+  // -------------------------------------------------------------------------
+
+  // **Armas para la herrería.** La aldea se defiende y se lleva menos golpe:
+  // un valle con hierro en las manos no es un valle que se deja saquear. Lo
+  // malo es viejo y está escrito en §7.12 —«las armas son la muralla y el señor
+  // que la cuenta»—: un valle armado es un valle del que se habla, y de eso
+  // vive Wealdmere.
+  arms: {
+    cost: { wood: 40, silver: 22 },
+    trait: 'arms',
+    flags: [{ flag: 'watched', years: MEANS.ARMS_WATCHED_YEARS }],
+  },
+  // **Arcos.** No pelean: disuaden. Un valle del que se sabe que dispara desde
+  // la cerca tienta menos, y el clan de al lado prefiere otro sitio. Y la cara
+  // mala es la del que se arma: **cuando por fin bajan, bajan con más gente**,
+  // porque saben a qué vienen.
+  bows: { cost: { wood: 30, silver: 16 }, trait: 'bows' },
+  // **Una atalaya.** No quita ni un golpe: lo ve venir antes. Las semanas de
+  // aviso de §1b pasan de ocho a catorce, y eso es tiempo para meter el ganado,
+  // esconder el grano o mandar la plata. Se levanta de verdad —es el edificio
+  // `watchtower`, que hasta hoy sólo llegaba por encrucijada— y por eso cuesta
+  // madera de obra y no sólo plata.
+  tower: { cost: { wood: 90, silver: 12 }, trait: 'watch', build: 'watchtower' },
 };
 
 /**
@@ -162,6 +207,13 @@ export function refusalFor(state: GameState, id: MeansId): MeansRefusal | null {
   // el primero, y sin esto la fiesta se podía encadenar semana a semana: medido,
   // cincuenta y un barriles en una partida de sesenta años.
   if (spec.feast === true && aleWindow(state)) return 'feasting';
+  // C1 · Y una atalaya necesita dónde levantarse: si el valle ya tiene las suyas
+  // (§7.2 le pone tope) o no queda solar, no se puede dar. Se comprueba **antes**
+  // de cobrar, que es la promesa de M-2: no se cobra a medias.
+  if (spec.build !== undefined
+    && (!withinCap(state, spec.build) || placeBuilding(state, spec.build) === null)) {
+    return 'room';
+  }
   // Y un forastero necesita dónde dormir: sin cama libre no se queda, que es la
   // misma regla que §5.7 aplica a quien llega por su cuenta.
   if (spec.hand === true && housingCapacity(state) <= population(state)) return 'room';
@@ -215,6 +267,13 @@ export function giveMeans(state: GameState, id: MeansId, season: string, year: n
   for (const flag of spec.flags ?? []) {
     state.flags[flag.flag] = state.tick + flag.years * TIME.WEEKS_PER_YEAR;
   }
+  // C1 · **La atalaya se abre como obra pagada.** El jugador pone la madera y
+  // la aldea la levanta, que es el trato de M-2 de punta a punta: se da, no se
+  // coloca. Usa la misma puerta que una encrucijada que concede un edificio
+  // (A.16), así que no hay maquinaria nueva. Si no cabe —ya hay dos atalayas, o
+  // no hay solar— la madera igualmente se pagó: dar algo que no cabe es una
+  // negativa, y por eso `refusalFor` lo comprueba antes.
+  if (spec.build !== undefined) requestBuild(state, spec.build);
   if (spec.hand === true) settle(state);
   return {
     id,

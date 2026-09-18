@@ -862,10 +862,25 @@ export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills
   // único que no es una cosa— el forastero que se queda: lo que trae es un par
   // de manos, que es lo más caro que hay en este valle.
   | 'axe'
-  | 'relic';
+  | 'relic'
+  // C1 · Los tres de la defensa (§1b, fase 4), y el mecanismo vuelve a ser el
+  // mismo: un medio con rasgo es un rasgo de valle que pone el jugador y paga.
+  // `arms` hace que la aldea se lleve menos golpe, `bows` que tienten menos —y
+  // que cuando bajen, bajen con más— y `watch` que se les vea venir antes.
+  // **No entran en `VALLEY_TRAITS`**: esos cuatro son lo que el valle era antes
+  // de que llegara nadie, y unas armas no le salen a un valle de la tierra.
+  | 'arms'
+  | 'bows'
+  | 'watch';
 
 /** M-2 · Lo que el jugador puede meter en el valle. `world/means.ts`. */
-export const MEANS_IDS = ['plough', 'pigs', 'ale', 'axe', 'relic', 'hand'] as const;
+// C1 · Los tres medios de defensa (§1b, fase 4). Van al final porque el orden
+// de esta lista es el orden del carro, y lo que se da para defenderse llega
+// después de lo que se da para vivir: primero se come, luego se aguanta.
+export const MEANS_IDS = [
+  'plough', 'pigs', 'ale', 'axe', 'relic', 'hand',
+  'arms', 'bows', 'tower',
+] as const;
 export type MeansId = (typeof MEANS_IDS)[number];
 
 /** Los cuatro, en orden estable: el sorteo de la fundación recorre esta lista. */
