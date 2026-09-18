@@ -86,3 +86,20 @@ export const RUIN = {
 
 /** How far above the ground the whole valley's geometry sits, to avoid z-fighting. */
 export const GROUND_BIAS = 0.002;
+
+/**
+ * Parámetros de la sombra solar. El mapa cubre el valle jugable, no la sierra
+ * decorativa: cuanto más volumen vacío dejamos, menos texels tiene cada tejado
+ * y más saltan los bordes al girar el sol. Los sesgos evitan que una superficie
+ * se auto-sombree por la precisión del depth buffer.
+ *
+ * TUNE: valores medidos en la escena de 72 × 112 celdas con PCF suave y mapa
+ * de 1024; subir el mapa es más caro en móvil y se deja como segunda palanca.
+ */
+export const SUN_SHADOW = {
+  mapSize: 1024,
+  reachMargin: 1.08,
+  farMultiplier: 4,
+  bias: -0.0002,
+  normalBias: 0.02,
+} as const;
