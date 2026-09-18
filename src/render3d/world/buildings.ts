@@ -91,6 +91,12 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   house: 'house',
   field: 'field',
   palisade: 'palisade',
+  // A2 · el portón. **Todavía sin malla propia** (E3 del plan de la meta):
+  // usa la de la empalizada, que es la pieza de muralla que ocupa, y las
+  // jambas las dibuja `obstacles.ts` en su celda. El día que la malla exista
+  // con una hoja llamada `gate_door`, el gozne de `door()` la abre sin tocar
+  // una línea de aquí.
+  gate: 'palisade',
   wall: 'wall',
   watchtower: 'watchtower',
   grave_yard: 'grave-yard',

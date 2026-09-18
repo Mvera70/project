@@ -21,7 +21,12 @@ import { WALLED } from '../../src/render3d/life/terrain';
  * que **todo** tipo de edificio caiga en uno de los dos lados, nunca en
  * ninguno y nunca en los dos.
  */
-const GROUND: ReadonlySet<BuildingKind> = new Set(['field', 'well', 'grave_yard']);
+// A2 · **el portón es suelo**, y es literalmente para lo que está: es la única
+// celda de la línea de muralla por la que se pasa. Si algún día un portón
+// cerrado tiene que cortar el paso de verdad —un asedio con la puerta echada—
+// eso no se decide aquí: aquí se decide qué es la cosa, y una puerta es un
+// hueco con hoja.
+const GROUND: ReadonlySet<BuildingKind> = new Set(['field', 'well', 'grave_yard', 'gate']);
 
 describe('V-03 · qué corta el paso', () => {
   it('todo tipo de edificio es suelo o corta el paso, y nada se queda sin decidir', () => {

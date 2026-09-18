@@ -207,7 +207,12 @@ const RING_STEP = 3;
 /** Si esa celda tiene una pieza de muralla pegada, en cruz. */
 function touchesWall(state: GameState, x: number, y: number): boolean {
   return state.buildings.some((b) => b.lostTick === null
-    && (b.kind === 'wall' || b.kind === 'palisade')
+    // A2 · **el portón cuenta como muralla para pegarse a él**, y hace falta:
+    // sin esto, las dos celdas que flanquean la puerta puntuaban como «no toca
+    // muralla», la estacada crecía por otro lado y el anillo se cerraba con un
+    // hueco a cada lado del portón. Medido en la semilla 11 al año 40: el
+    // anillo partido en dos arcos de 37 y 32 piezas en vez de uno de 69.
+    && (b.kind === 'wall' || b.kind === 'palisade' || b.kind === 'gate')
     && Math.abs(b.x - x) + Math.abs(b.y - y) === 1);
 }
 
@@ -339,7 +344,22 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   const spec = BUILDINGS[kind];
   // §7.4c · el anillo que toca, sólo cuando se va a levantar muralla: es un
   // barrido de círculos y no hay que pagarlo por cada casa.
+  // §7.4c · el anillo que toca, sólo cuando se va a levantar muralla: es un
+  // barrido de círculos y no hay que pagarlo por cada casa.
   const ring = kind === 'palisade' ? ringToBuild(state, centre, coreRadius, occupied) : null;
+  // A2 · **el portón va en el anillo escrito, y en ninguno provisional.**
+  //
+  // Esto costó una depuración y es la trampa de B-1 vista desde la puerta:
+  // mientras el valle no tiene once casas, `ringToBuild` devuelve un radio
+  // **tanteado** que no se apunta (ver arriba), y con él el portón se colgaba
+  // de una sección temprana a radio 7 mientras la muralla de verdad se cerraba
+  // luego a radio 11. Medido en la semilla 23: puerta a 7,07 del centro, anillo
+  // en 11, y **el valle amurallado sin una sola salida** — `ringClosed` decía
+  // que sí y la gente no tenía por dónde pasar.
+  //
+  // Una puerta pertenece a una muralla, y a la de verdad: sin anillo escrito no
+  // hay portón, que es lo mismo que §7.3 dice al no pedirlo.
+  const gateRing = kind === 'gate' ? state.ring : null;
   // **Y se escribe, pero sólo cuando hay pueblo que amurallar.** Un anillo es
   // una decisión de la aldea —«hasta aquí llega el pueblo»— y una decisión se
   // apunta: si se volviera a calcular cada vez, volvería a moverse medio paso
@@ -365,7 +385,7 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // pieza. Reservarla es además lo que el dueño del diseño pidió con sus
   // palabras —«después la siguiente sección de construcción va fuera de la
   // muralla»—: cuando dentro ya no cabe nada, lo nuevo sale fuera solo.
-  const wallLine = kind === 'palisade' || kind === 'wall' ? null : state.ring;
+  const wallLine = kind === 'palisade' || kind === 'wall' || kind === 'gate' ? null : state.ring;
   // **Sólo el corazón del valle**, y por dos razones que apuntan al mismo sitio.
   //
   // La de diseño: fuera del corazón no hay terreno productivo —es montaña, lago
@@ -385,6 +405,11 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
     const p = center(rect);
     // §7.4c · la muralla va en el anillo, no en la envolvente del día.
     if (kind === 'palisade' && (ring === null || !onRing(p, centre, ring))) continue;
+    if (kind === 'gate' && (gateRing === null || !onRing(p, centre, gateRing))) continue;
+    // A2 · **un portón se cuelga de una muralla**, nunca en un hueco suelto del
+    // anillo: sin esto, la primera puerta del valle podía acabar en la parte
+    // del círculo que todavía no tiene una sola estaca.
+    if (kind === 'gate' && !touchesWall(state, x, y)) continue;
     if (wallLine !== null && onRingRect(rect, centre, wallLine)) continue;
     let river = false;
     let touchesForest = false;
@@ -436,6 +461,16 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
         Number(!touchesWall(state, x, y)),
         Math.round((Math.atan2(p.y - centre.y, p.x - centre.x) + Math.PI) * 100),
         Number(!path),
+      ]; break;
+      // A2 · **el portón, donde ya se pasa.** Lo pisado manda —un camino
+      // gastado es por donde la aldea entra y sale, y ahí es donde una puerta
+      // tiene sentido— y entre dos sitios igual de pisados gana el que está más
+      // cerca de la plaza, que es de donde se sale. Es el mismo criterio con el
+      // que `defence-gates.ts` elegía el paso cuando un portón no se construía;
+      // lo que cambia es que ahora la elección se levanta y se queda.
+      case 'gate': score = [
+        -(state.map.path[y * state.map.width + x] ?? 0),
+        distance(p, centre),
       ]; break;
       default: score = [distance(p, centre)];
     }

@@ -99,6 +99,9 @@ export function lostKey(kind: BuildingKind): string {
  */
 const SINGULAR_BUILDINGS: readonly BuildingKind[] = [
   'chapel',
+  // A2 · el portón. Un valle cuelga una puerta una vez, y a partir de ese día
+  // tiene un dentro y un fuera: es de las que merecen su línea.
+  'gate',
   'church',
   'smithy',
   'mill',

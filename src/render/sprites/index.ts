@@ -130,6 +130,10 @@ const graveYard: Sprite = (ctx, x, y, cell, palette) => {
 export const BUILDING_SPRITES: Readonly<Record<BuildingKind, Sprite>> = {
   house, stone_house: stoneHouse, field, granary, chapel, church, smithy, mill,
   well, palisade, wall, watchtower, grave_yard: graveYard,
+  // A2 · el portón se dibuja como el tramo que ocupa: en el lienzo 2D —que es
+  // la puerta de vuelta de §1, no el juego— una celda de muralla es una celda
+  // de muralla. Quien lo enseña como portón es el 3D (`defences.ts`).
+  gate: palisade,
   // K-4 · la sala del rey en el render plano, que es el camino de reserva
   // (`?render=canvas`): la casa de piedra, que es la silueta más grande que
   // este render tiene. El 3D la dibuja con su propio aspecto y su tejado

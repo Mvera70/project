@@ -68,6 +68,9 @@ export const BUILDING_LOOKS: Readonly<Record<BuildingKind, BuildingLook>> = {
   watchtower: { walls: 1.6, roof: 0.5, wallColour: STONE, roofColour: TILE, roofed: true },
   well: { walls: 0.3, roof: 0.22, wallColour: STONE, roofColour: THATCH, roofed: true },
   palisade: { walls: 0.75, roof: 0, wallColour: VALLEY_COLOURS.trunk, roofColour: TILE, roofed: false },
+  // A2 · el portón: la misma madera y algo más alto que la estacada, porque
+  // una puerta con jambas se ve por encima de la empalizada.
+  gate: { walls: 0.95, roof: 0, wallColour: VALLEY_COLOURS.trunk, roofColour: TILE, roofed: false },
   wall: { walls: 0.8, roof: 0, wallColour: STONE, roofColour: TILE, roofed: false },
   field: { walls: 0.04, roof: 0, wallColour: VALLEY_COLOURS.soil, roofColour: TILE, roofed: false },
   grave_yard: { walls: 0.1, roof: 0, wallColour: '#8E9576', roofColour: TILE, roofed: false },

@@ -335,6 +335,10 @@ export type BuildingKind =
   | 'mill'
   | 'palisade'
   | 'wall'
+  // A2 · **el portón**: la puerta del anillo. Es un edificio y no un cálculo
+  // sobre una estaca (§1b, fase 3), porque lo que viene detrás tiene que poder
+  // romperlo, y lo que se rompe en este motor es un edificio.
+  | 'gate'
   | 'church'
   | 'stone_house'
   | 'watchtower'

@@ -23,17 +23,28 @@
 //   año 60 · [12] · [41,15,4,1,1] · [25] · [57,19,19,14,11,2,2,1,1,1,1]
 
 import { describe, expect, it } from 'vitest';
-import { TIME } from '@engine/balance';
+import { BUILDING_RULES, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { ringClosed } from '@engine/world/placement';
+import { defenceGates } from '@derive/defence-gates';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
+import { destroyBuilding } from '@engine/world/buildings';
 import type { Building, GameState } from '@engine/state';
 
-/** Los tramos de muralla conectados, de mayor a menor. */
+/**
+ * Los tramos de muralla conectados, de mayor a menor.
+ *
+ * **Y el portón cuenta como muralla** (A2): una puerta es parte del cerco, no
+ * un agujero en él. Sin esto la cuenta partía el anillo en dos a los dos lados
+ * de la puerta —medido en la semilla 7: [39, 28, …] en vez de un tramo de 67—
+ * y la prueba habría dicho que la muralla se rompió cuando lo que pasó es que
+ * la aldea colgó su puerta.
+ */
 function runs(state: GameState): number[] {
   const walls = state.buildings.filter(
-    (b) => b.lostTick === null && (b.kind === 'wall' || b.kind === 'palisade'),
+    (b) => b.lostTick === null
+      && (b.kind === 'wall' || b.kind === 'palisade' || b.kind === 'gate'),
   );
   const byCell = new Map(walls.map((b) => [b.y * state.map.width + b.x, b]));
   const seen = new Set<number>();
@@ -194,5 +205,66 @@ describe('A1 · la villa se cierra, y se cuenta una vez', () => {
     const state = foundGame(7);
     expect(state.ring).toBeNull();
     expect(ringClosed(state)).toBe(false);
+  });
+});
+
+describe('A2 · el portón es una cosa, no un cálculo', () => {
+  // §1b, fase 3. Lo que esto guarda es que **la puerta existe, es una sola, y
+  // es por donde se pasa** — que es lo que la fase 4 necesita para poder
+  // romperla. Antes de A2 el paso era una estaca elegida por `defenceGates`, y
+  // esa elección se movía cada vez que la muralla crecía: la misma enfermedad
+  // que tenía el anillo antes de v3.88.
+  //
+  // Medido al cerrar A2, cuatro semillas × cuarenta años: un portón por valle,
+  // levantado entre el año 2,3 y el 6,6 (26 a 74 h de reloj a ×1), siempre en
+  // el anillo y pegado a la muralla, y **ni una estaca abierta por error**.
+
+  it('la aldea cuelga un portón, y sólo uno', () => {
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
+      const gates = state.buildings.filter((b) => b.kind === 'gate' && b.lostTick === null);
+      const walls = state.buildings.filter((b) => b.lostTick === null
+        && (b.kind === 'palisade' || b.kind === 'wall'));
+      // Sin muralla no hay puerta: una puerta suelta en el prado era el defecto
+      // que el dueño del diseño vio en una captura el 18 sep.
+      if (walls.length < BUILDING_RULES.GATE_MIN_RUN) {
+        expect(gates.length, `semilla ${seed}: sin muralla`).toBe(0);
+        continue;
+      }
+      expect(gates.length, `semilla ${seed}: ${gates.length} portones`).toBe(1);
+      const gate = gates[0]!;
+      // Cuelga de la muralla: tiene una pieza pegada en cruz.
+      const touching = walls.some((w) => Math.abs(w.x - gate.x) + Math.abs(w.y - gate.y) === 1);
+      expect(touching, `semilla ${seed}: el portón toca muralla`).toBe(true);
+    }
+  });
+
+  it('y el paso de la muralla es el portón, no un agujero en una estaca', () => {
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
+      const gateIds = new Set(state.buildings
+        .filter((b) => b.kind === 'gate' && b.lostTick === null).map((b) => b.id));
+      if (gateIds.size === 0) continue;
+      const passages = defenceGates(state);
+      expect([...passages.keys()], `semilla ${seed}`).toEqual([...gateIds]);
+    }
+  });
+
+  it('si el portón se pierde, la aldea vuelve a colgar uno', () => {
+    // La otra mitad, y es la que la fase 4 va a usar: un portón roto es un
+    // edificio perdido, con el hueco que deja. La aldea lo repone porque §7.3
+    // vuelve a pedirlo, sin ninguna regla nueva.
+    const state = foundGame(23);
+    run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
+    const gate = state.buildings.find((b) => b.kind === 'gate' && b.lostTick === null);
+    expect(gate, 'la semilla 23 cuelga su portón en el año 2,3').toBeDefined();
+    if (gate === undefined) return;
+    destroyBuilding(state, gate.id);
+    expect(state.buildings.some((b) => b.kind === 'gate' && b.lostTick === null)).toBe(false);
+    run(state, TIME.WEEKS_PER_YEAR * 10, 'prudent', CATALOG);
+    expect(state.buildings.some((b) => b.kind === 'gate' && b.lostTick === null),
+      'diez años después hay puerta otra vez').toBe(true);
   });
 });

@@ -1,27 +1,23 @@
+import { BUILDING_RULES } from '@engine/balance';
 import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
 
-/**
- * Cuántas piezas de muralla tiene que tener un tramo para merecer un portón.
- *
- * TUNE: tres, o sea nueve metros de muralla (D.6.2). **Y el número sale de un
- * defecto que el dueño del diseño vio en una captura**, el 18 sep 2026: «veo
- * que hay puertas que se colocan solas sin muralla al lado, no debería pasar».
- * Tenía razón, y la causa era esta función: daba un portón **por cada tramo
- * conectado**, y la aldea levanta la empalizada pieza a pieza a lo largo de la
- * envolvente (§7.4), así que un trozo suelto de una sola pieza también contaba
- * como recinto.
- *
- * Medido en cuatro semillas al año 60: **de 6 a 17 portones por valle, y de 5 a
- * 11 de ellos en tramos de una sola pieza** —una puerta de pie en la hierba, sin
- * nada a los lados—. Con el mínimo en tres, la semilla 41 pasa de 17 portones a
- * 5, y los que quedan están todos en un tramo por el que de verdad hay que
- * pasar. Una puerta pertenece a una muralla: por un tramo de una o dos piezas se
- * da la vuelta andando.
- */
-const GATE_MIN_RUN = 3;
 
-/** Un portón por recinto conectado. Se conserva el edificio y su defensa;
- * sólo se deriva el paso físico. Prioridad a caminos existentes y tramos rectos. */
+/**
+ * Por dónde se atraviesa la muralla: el edificio que hace de paso y en qué eje.
+ *
+ * **A2 · Desde que el portón se construye, el paso es el portón.** Hasta aquí
+ * esto elegía una estaca de cada tramo y la declaraba puerta, y esa elección
+ * **se movía**: la aldea levanta muralla pieza a pieza, así que el tramo cambia
+ * de forma cada pocas semanas y con él la estaca elegida. Es la misma
+ * enfermedad que tenía el anillo antes de v3.88 —una defensa recalculada cada
+ * vez se pasea— y la misma cura: la aldea lo construye y se queda donde está.
+ *
+ * Lo derivado que queda es sólo **el eje**, que no es una decisión sino una
+ * lectura del terreno: por un portón se pasa por donde hay suelo a los dos
+ * lados. Y se conserva la derivación antigua **para el valle que todavía no ha
+ * levantado su puerta**: mientras haya muralla y no haya portón, la aldea sigue
+ * entrando por donde puede, que es lo que hacía antes de A2.
+ */
 export function defenceGates(state: { buildings: readonly Building[]; map: ValleyMap }): ReadonlyMap<number, 'x' | 'z'> {
   const walls = state.buildings.filter(b => b.lostTick === null && (b.kind === 'wall' || b.kind === 'palisade'));
   const cells = new Map(walls.map(b => [b.y * state.map.width + b.x, b]));
@@ -39,6 +35,23 @@ export function defenceGates(state: { buildings: readonly Building[]; map: Valle
     return tile !== TERRAIN_CODE.water && tile !== TERRAIN_CODE.rock
       && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake;
   };
+  // Los portones de verdad, si los hay. El eje es por donde se pasa: el que
+  // tiene suelo pisable a los dos lados. Si los dos ejes valen —una puerta en
+  // una esquina— gana `x`, y da igual cuál sea: lo que el render necesita saber
+  // es hacia dónde miran las jambas.
+  const built = state.buildings.filter((b) => b.lostTick === null && b.kind === 'gate');
+  if (built.length > 0) {
+    for (const gate of built) {
+      const open = (['x', 'z'] as const).find((axis) => {
+        const dx = axis === 'x' ? 1 : 0;
+        const dz = axis === 'z' ? 1 : 0;
+        return free(gate.x - dx, gate.y - dz) && free(gate.x + dx, gate.y + dz);
+      });
+      gates.set(gate.id, open ?? 'x');
+    }
+    return gates;
+  }
+
   for (const wall of walls) {
     if (visited.has(wall.id)) continue;
     const component = [wall]; visited.add(wall.id);
@@ -52,7 +65,7 @@ export function defenceGates(state: { buildings: readonly Building[]; map: Valle
     }
     // Un tramo corto no lleva portón: no hay recinto que abrir y lo que se veía
     // era una puerta suelta en medio del prado (ver `GATE_MIN_RUN`).
-    if (component.length < GATE_MIN_RUN) continue;
+    if (component.length < BUILDING_RULES.GATE_MIN_RUN) continue;
     const options = component.flatMap(b => (['x', 'z'] as const).flatMap(axis => {
       const dx = axis === 'x' ? 1 : 0, dz = axis === 'z' ? 1 : 0;
       if (!free(b.x - dx, b.y - dz) || !free(b.x + dx, b.y + dz)) return [];

@@ -104,7 +104,9 @@ describe('M-17 · catálogo visual', () => {
     // más grande que hay aquí— porque lo que el dueño del diseño pidió que se
     // diferenciara es el valle en 3D, y allí sí tiene su propio aspecto.
     expect(Object.keys(BUILDING_SPRITES).sort()).toEqual([
-      'chapel', 'church', 'field', 'granary', 'grave_yard', 'hall', 'house', 'mill',
+      // A2 · `gate` reutiliza la silueta de la empalizada por lo mismo: aquí es
+      // una celda de muralla, y quien lo enseña como portón es el 3D.
+      'chapel', 'church', 'field', 'gate', 'granary', 'grave_yard', 'hall', 'house', 'mill',
       'palisade', 'smithy', 'stone_house', 'wall', 'watchtower', 'well',
     ]);
   });

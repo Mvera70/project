@@ -157,8 +157,8 @@ describe('balance · topes duplicados', () => {
   it('la tabla de edificios cubre todos los BuildingKind', () => {
     // Comprobación de tipos: si §3.5 añade un edificio y §7.2 no, no compila.
     const covered: Record<BuildingKind, unknown> = BUILDINGS;
-    // Catorce desde K-4: la sala del rey (`hall`).
-    expect(Object.keys(covered).length).toBe(14);
+    // Quince desde A2: el portón (`gate`). Catorce eran desde K-4 (`hall`).
+    expect(Object.keys(covered).length).toBe(15);
   });
 
   it('cada edificio ocupa celdas y cuesta obra', () => {

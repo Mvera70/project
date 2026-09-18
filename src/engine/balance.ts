@@ -1466,6 +1466,11 @@ export const BUILDINGS = {
   smithy: { w: 2, h: 2, wood: 140, stone: 0, bp: 100, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // LABOUR.SMITHY_BONUS; enables stone
   mill: { w: 2, h: 2, wood: 180, stone: 0, bp: 140, cap: 1, tier: 0, upgradeOf: null, byCrossroad: false }, // FOOD.MILL_BONUS
   palisade: { w: 1, h: 1, wood: 30, stone: 0, bp: 20, cap: null, tier: 0, upgradeOf: null, byCrossroad: false }, // one segment
+  // A2 · **el portón** (§1b, fase 3). Ocupa una celda de la línea de muralla,
+  // como un tramo, y cuesta el doble que él: una hoja de roble con sus goznes
+  // es carpintería, no estacas clavadas. Sin tope: cada recinto quiere el suyo,
+  // y quién lo pide lo decide §7.3, no un número aquí.
+  gate: { w: 1, h: 1, wood: 60, stone: 0, bp: 40, cap: null, tier: 0, upgradeOf: null, byCrossroad: false },
   // K-4 · **la sala del rey**, la casa que se diferencia. Tres por tres como la
   // iglesia, y la construcción de madera más cara del valle: más obra que el
   // molino (180/140) y la misma madera que la iglesia, porque es lo más grande
@@ -1510,6 +1515,18 @@ export const BUILDING_RULES = {
   MILL_PEOPLE: 18, // §7.3 point 7
   GRANARY_FULL: 0.8, // §7.3 point 3: grain above 80 % of capacity
   GRANARY_HOUSE_DISTANCE: 6, // §7.4: "a menos de 6 celdas de una casa"
+  // TUNE: **cuántas piezas de muralla tiene que tener un tramo para merecer un
+  // portón.** Tres, o sea nueve metros (D.6.2), y el número sale de un defecto
+  // que el dueño del diseño vio en una captura el 18 sep 2026 —«veo que hay
+  // puertas que se colocan solas sin muralla al lado, no debería pasar»—:
+  // medido en cuatro semillas al año 60, de 6 a 17 portones por valle y de 5 a
+  // 11 de ellos en tramos de una sola pieza, una puerta de pie en la hierba.
+  // Por un tramo de una o dos piezas se da la vuelta andando.
+  //
+  // Vivía en `derive/defence-gates.ts`, que es donde se calculaba el paso
+  // cuando un portón no era nada. Desde A2 el portón se construye, así que el
+  // número es de balance y vive aquí.
+  GATE_MIN_RUN: 3,
   PALISADE_DILATION: 2, // §7.4: "envolvente convexa del núcleo, dilatada 2 celdas"
   // TUNE: **cuántas casas espera la muralla** (B-1, 18 sep 2026). Lo pidió el
   // dueño del diseño mirando el problema: «para hacerlo más sencillo, la

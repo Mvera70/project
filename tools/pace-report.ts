@@ -59,6 +59,7 @@ const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] = [
   ['30 personas', (s) => population(s) >= 30],
   // A1 · el peldaño de la fase 3 (§1b): la villa cerrada, que es lo que un
   // asedio necesita para tener contra qué llegar.
+  ['portón', (s) => s.buildings.some((b) => b.kind === 'gate' && b.lostTick === null)],
   ['VILLA CERRADA', (s) => ringClosed(s)],
 ];
 

@@ -50,7 +50,7 @@ y nadie se entera.
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
 | ~~A1 · El cierre se ve y se celebra~~ · **hecho el 18 sep 2026**: `ringClosed` en `placement.ts`, línea de crónica `wall.closed` con **peso 3** (§9.2 ampliada), marca permanente `flags['wall_closed']` y el peldaño en `pace-report`. Medido: cierran 11 de 12 valles, mediana **año 38 = 425 h de reloj**, ninguno lo dice dos veces | Hecho | Baja-media | — | — |
-| A2 · El portón | La puerta del anillo pasa de ser un cálculo (`defenceGates`) a un edificio con estado: abierto, cerrado, roto | **P1** | Media | Sol | A1 hecha |
+| ~~A2 · El portón~~ · **hecho el 18 sep 2026**: `gate` es un edificio (60 de madera, 40 de obra) que va en el anillo escrito y por delante de la estacada; el paso de la muralla es él; abierto de día y cerrado de noche con el gozne de las casas; roto es la ruina de siempre, y §7.3 lo repone. Medido: un portón por valle a las **200 h** de reloj, y ni una estaca abierta por error | Hecho | Media | — | — |
 | A3 · El segundo anillo | Cuándo la aldea desborda el primero y pide el siguiente tres celdas afuera (v3.88 lo dejó en uno); lo de dentro queda «intramuros» | P2 | Media | Sol | A1 |
 | A4 · La villa de piedra | La muralla de piedra (`wall`) y las torres como mejora del anillo; la **era** en el estado (`hamlet · village · town`) | P2 | Media | Sol | A1 |
 | A5 · La fase en la interfaz | La cabecera y la crónica dicen en qué fase está el valle | P3 | Baja | Luna, Terra | A4 |

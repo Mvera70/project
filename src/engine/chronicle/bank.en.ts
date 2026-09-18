@@ -825,6 +825,13 @@ export const BANK: Record<string, string[]> = {
     'By {season} the ring was whole: {pieces} lengths of it, and no way in but the gate.',
     'They closed the wall in {season} of year {year}, and slept inside it.',
   ],
+  // A2 · El portón: se cuelga una vez y es por donde entra todo lo que entra,
+  // incluido lo que algún día venga a tirarlo.
+  'built.gate': [
+    'They hung a gate in the {season} of year {year}, oak and iron, two men to swing it.',
+    'The village got its gate that {season}: shut at dusk, open at first light.',
+    'A gate went into the wall in year {year}, and the road ran through it.',
+  ],
   'built.palisade': [
     'They put up another length of palisade in the {season} of year {year}.',
     'The palisade grew by a stretch that {season}.',
@@ -1864,6 +1871,12 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
   // tiene sus propias `built.*` en pasado, donde el pasado es lo correcto), así
   // que aquí el presente no choca con nada. La fecha se quita entera: el año lo
   // dice la cabecera y la estación también.
+  // A2 · el primer portón del valle: el día que hubo un dentro y un fuera.
+  'milestone.first_of_kind.gate': [
+    'The valley has a gate, and a way of shutting it.',
+    'There is a door in the wall now.',
+    'The first gate hangs, and it swings both ways.',
+  ],
   'milestone.first_of_kind.house': [
     'There is a house in the valley, the first anyone here has raised.',
     'The first roof is up.',

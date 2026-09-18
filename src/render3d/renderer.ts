@@ -898,6 +898,19 @@ export async function createGraphicsRenderer(
       // velocidades altas. Se acumulan los pulsos de todos los pasos de vida,
       // no sólo el estado final que queda al terminar el bucle.
       const activeDoors = new Set<number>();
+      // A2 · **El portón se abre de día y se cierra de noche**, con el mismo
+      // gozne que la puerta de una casa: el modelo trae una hoja llamada
+      // `<recurso>_door` y `village.doors()` la gira. Lo pidió el dueño del
+      // diseño —«para la animación de la puerta, algo similar a lo que se hace
+      // con las casas»— y es la forma barata de que «abierto» y «cerrado» sean
+      // algo que se ve y no un campo del estado: la aldea recoge el ganado y
+      // cierra, y al alba la vuelve a abrir. Cuando el portón tenga malla (E3)
+      // esto ya funciona; hasta entonces gira lo que haya.
+      if (!isNight(phase)) {
+        for (const building of state.buildings) {
+          if (building.kind === 'gate' && building.lostTick === null) activeDoors.add(building.id);
+        }
+      }
       const rememberDoors = (): void => {
         for (const person of life!.dwellers) {
           const home = person.residence;

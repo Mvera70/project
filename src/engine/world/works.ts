@@ -256,6 +256,28 @@ export function nextProject(state: GameState): Project | null {
   if (!has(state, 'smithy') && people >= BUILDING_RULES.SMITHY_PEOPLE) wanted.push('smithy');
   // 7 · the mill
   if (!has(state, 'mill') && people >= BUILDING_RULES.MILL_PEOPLE) wanted.push('mill');
+  // 8b · A2 · **el portón, y va delante de la muralla.**
+  //
+  // Delante porque el anillo se llena: §7.4c planta estacas mientras quede una
+  // celda libre en la línea, así que un portón pedido después no tendría dónde
+  // ponerse —la aldea se habría amurallado sin puerta—. Pedirlo antes es además
+  // lo que hace un pueblo: se deja el hueco de la puerta y se amuralla alrededor.
+  //
+  // La condición es la de §7.4c llevada a su puerta: hace falta un tramo de
+  // muralla de verdad (`GATE_MIN_RUN`, tres piezas) y no tener ya un portón en
+  // pie. Uno por valle mientras haya un solo anillo; cuando A3 traiga el
+  // segundo, esta cuenta será por recinto.
+  // **Y sólo cuando el anillo está escrito**: hasta que la aldea decide por
+  // dónde va su muralla (once casas, B-1), lo que hay son secciones sueltas, y
+  // una puerta colgada de una sección se queda dentro cuando el anillo de
+  // verdad se cierra más afuera — medido en la semilla 23: portón a 7,07 del
+  // centro, anillo en 11, y el valle amurallado sin salida.
+  if (state.ring !== null && standing(state, 'gate').length === 0 && wallRuns(state).some(
+    (run) => run >= BUILDING_RULES.GATE_MIN_RUN,
+  )) {
+    wanted.push('gate');
+  }
+
   // 8 · the palisade
   // K-2 · con un rey herrero, la muralla no espera a que haya amenaza: es lo que
   // «si eliges al herrero, pues haces más armas» significa en un juego que no
@@ -466,4 +488,34 @@ export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[
     state.village.stone += Math.min(room, left * WORLD.STONE_PER_BP);
   }
   return built;
+}
+
+/**
+ * A2 · Los tramos de muralla conectados, de mayor a menor.
+ *
+ * Lo necesita §7.3 para saber si hay recinto que merezca una puerta, y cuenta
+ * el portón como muralla: una puerta es parte del cerco, no un agujero en él.
+ * Vecindad en cruz, que es como se pega una estaca a la siguiente.
+ */
+export function wallRuns(state: GameState): number[] {
+  const walls = state.buildings.filter((b) => b.lostTick === null
+    && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'gate'));
+  const byCell = new Map(walls.map((b) => [b.y * state.map.width + b.x, b]));
+  const seen = new Set<number>();
+  const sizes: number[] = [];
+  for (const wall of walls) {
+    if (seen.has(wall.id)) continue;
+    const run = [wall];
+    seen.add(wall.id);
+    for (let n = 0; n < run.length; n += 1) {
+      const b = run[n];
+      if (b === undefined) continue;
+      for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]] as const) {
+        const next = byCell.get((b.y + dz) * state.map.width + b.x + dx);
+        if (next !== undefined && !seen.has(next.id)) { seen.add(next.id); run.push(next); }
+      }
+    }
+    sizes.push(run.length);
+  }
+  return sizes.sort((a, b) => b - a);
 }
