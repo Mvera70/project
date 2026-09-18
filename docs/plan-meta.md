@@ -99,7 +99,7 @@ de pelea.
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| E1 · Clips de combate | Arco (tensar, soltar), espada (golpe), recibir un impacto, caer y quedar | **P1** (empezar ya) | Alta | Astra · sesión de arte | — |
+| E1 · Clips de combate | Arco (tensar, soltar), lanza, recibir un impacto, caer y huir. **Encargo escrito: `encargo-combate.md`** (18 sep), sobre el aparejo del aldeano que ya existe | **P1** (empezar ya) | Alta | Sesión de arte | — |
 | E0 · **Lo que pasa y no se ve** | Ocho mecánicas ya en `main` que sólo salen como línea de crónica: el asalto, el aviso, prepararse, pagar, la semana de después, armas, arcos y la atalaya vacía. El inventario está en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Astra (diseño) · Sol (capa de vida) | — |
 | E2 · Modelos del asedio | **El clan vecino**: aldeanos armados de otro valle —no soldados de cota ni bandidos andrajosos—, arco, flecha, espada, escudo | P2 | Alta | Astra · sesión de arte | — |
 | E3 · Portón, muralla de piedra, torre | Las mallas de la fase 3; el portón con dos estados y roto | P2 | Media | Sesión de arte | A2, A4 |

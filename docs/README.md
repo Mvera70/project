@@ -33,6 +33,7 @@ ordena es **qué es cada cosa y si sigue viva**, no dónde vive.
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
 | `encargos-3d.md` | **Todo lo que hace falta de Blender**, apuntado en la misma ronda en que se descubre |
+| `plan-audio.md` | **Inventario maestro de audio**: ambiente, interfaz, economía, hitos, fases y asedio |
 | `handover.md` | El estado exacto de cada pieza y las trampas que ya costaron tiempo |
 | `roadmap.md` | Qué falta en total, y qué no puede hacer ningún agente |
 | `agents.md` | Cómo se delega y se audita |
@@ -56,9 +57,11 @@ documento con medidas y presupuesto de triángulos.
 
 | Documento | Qué pide |
 |---|---|
+| `encargo-combate.md` | **Los seis clips de combate (E1)**, el camino largo de la fase 4 |
 | `encargo-arado.md` | La malla del arado (M-3) |
 | `encargo-fuente.md` | La fuente de la plaza (P-3) |
 | `plan-arte-pendiente.md` | Lo que el arte tiene en cola |
+| `plan-audio.md` | Biblioteca sonora pendiente, prioridades y primera tanda de producción |
 | `respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |
 
 ## Cerrados: se conservan por el porqué, no se actualizan

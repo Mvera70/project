@@ -50,7 +50,7 @@ dentro.
 
 | Qué | Estado |
 |---|---|
-| **Clips de combate** (E1) | **No existe ni uno.** Tensar el arco, soltar, golpe de espada, recibir el impacto, caer y quedar. Es el camino largo del proyecto: sin ellos la batalla de §1b no se puede ver por bien que funcione |
+| **Clips de combate** (E1) | **No existe ni uno**, y es el camino largo del proyecto. **Encargo escrito el 18 sep: `encargo-combate.md`** — seis clips sobre el aparejo del aldeano que ya existe, con sus nombres, duraciones y el orden en que hacen falta. Con los tres primeros (tensar, soltar, caer) ya se puede hacer una defensa que se mire |
 | **La hoja del portón** | El gozne está escrito y funciona; falta la hoja que girar |
 | **Fuego, humo y gore** (E4) | Nada. Cómo se ve arder una casa en un asalto y cómo se ve morir. **El gore es decisión del dueño** |
 | **Escombros y ragdoll** | Rapier ya está (D1, 18 sep): el mundo existe y `launch()` vuela. Lo que falta es **qué lanzar y quién lo lanza** (D2) y los clips para que un cuerpo caiga como un cuerpo (E1) |
