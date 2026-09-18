@@ -297,6 +297,7 @@ escrita (`rework.md` §2.7).
 | En qué estado exacto está todo, y qué trampas ya costaron tiempo | `docs/handover.md` |
 | Qué se hace ahora, con briefs listos para agentes | `docs/next-plan.md` |
 | El plan que sacó al proyecto del atasco, y qué entregó | `docs/plan-juego.md` |
+| **El plan hacia la meta: puntos, fases, prioridad, dificultad y a qué agente** | **`docs/plan-meta.md`** |
 | Qué falta en total, y qué no puede hacer ningún agente | `docs/roadmap.md` |
 | Cómo se delega y se audita | `docs/agents.md` |
 | Por qué el catálogo no sale | `docs/findings-drama.md` |
