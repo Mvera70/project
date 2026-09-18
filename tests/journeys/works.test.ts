@@ -38,6 +38,13 @@ function populate(state: GameState, target: number): GameState {
 
 /** Levanta n edificios de un tipo, ya terminados, donde §7.4 los pondría. */
 function raise(state: GameState, kind: BuildingKind, n: number): GameState {
+  // A2c · **una estaca vive en el anillo, así que el valle tiene que haber
+  // decidido el suyo.** La aldea lo decide cuando tiene once casas (§7.4c), y
+  // antes de eso no se levanta muralla: una pieza sin anillo se buscaba su
+  // propio radio y de ahí salían los dos arcos pegados. Aquí se dice a mano,
+  // que es lo mismo que hacer grande la aldea de la prueba y no cambia nada de
+  // lo que estas pruebas miden, que es el **orden** de las mejoras.
+  if ((kind === 'palisade' || kind === 'wall') && state.ring === null) state.ring = 8;
   for (let i = 0; i < n; i += 1) {
     const spot = placeBuilding(state, kind);
     if (spot === null) throw new Error(`sin sitio para ${kind}`);

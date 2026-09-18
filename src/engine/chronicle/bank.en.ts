@@ -643,6 +643,11 @@ export const BANK: Record<string, string[]> = {
     'A watchtower was paid for in year {year}, to see the road before the road sees you.',
     'They put up a tower that {season}, and someone has been up there since.',
   ],
+  'means.gate.given': [
+    'A second gate was cut into the wall that {season}, and the village breathed easier.',
+    'They opened another way through the palisade in year {year}.',
+    'The wall got a second door that {season}. Two ways in, and two to watch.',
+  ],
   'means.hand.given': [
     'A stranger stayed in the {season} of year {year} and was given a bed.',
     'Somebody came up the road in year {year} and did not leave: another pair of hands.',
@@ -2082,6 +2087,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'A second watchtower stands.',
     'There is one more tower over the road.',
   ],
+  'milestone.work_done.gate': [
+    'A second gate opens on the far side of the wall.',
+    'The wall has another way through it now.',
+    'A new gate stands where the wall meets the other road.',
+  ],
   'milestone.work_done.grave_yard': [
     'The burying ground is wider now.',
     'More ground has been walled off for the dead.',
@@ -2206,6 +2216,8 @@ export const UI_BANK: Record<string, string> = {
   'cart.bows.what': 'A valley that shoots back tempts nobody. But when they do come, they come in force.',
   'cart.tower': 'A watchtower',
   'cart.tower.what': 'Raiders are seen from far off: fourteen weeks of warning instead of eight.',
+  'cart.gate': 'A second gate',
+  'cart.gate.what': 'Another way through the wall. Easier to come and go, and one more door to hold.',
   'cart.hand': 'A pair of hands',
   'cart.hand.what': 'A stranger who stays. The valley finds them a trade when one falls vacant.',
   'cart.ale': 'A barrel of ale',

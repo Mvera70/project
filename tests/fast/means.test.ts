@@ -47,10 +47,44 @@ function rich(seed = 7): GameState {
   return state;
 }
 
+/**
+ * A2c · **Y una aldea con muralla y puerta, para el portón.**
+ *
+ * El portón es el único medio que necesita algo que no está en la despensa: un
+ * cerco que atravesar. La aldea de cuatro años de `rich()` no lo tiene, así que
+ * la negativa que salía era `room` y estas dos pruebas —que miden el
+ * **precio**— no llegaban a mirarlo. Es el mismo remedio que las dos casas de
+ * más: se le da al valle lo que el medio necesita y el precio deja de quedar
+ * tapado.
+ *
+ * Treinta y dos años en la semilla 47 es lo primero que hay, medido en diez
+ * semillas: antes de eso la aldea ni siquiera ha cerrado un tramo de muralla
+ * donde quepa una segunda puerta. Se guarda hecha y se clona, que es lo que
+ * hace `crown-will.test.ts` por lo mismo.
+ */
+let walledBase: GameState | undefined;
+function walled(): GameState {
+  if (walledBase === undefined) {
+    walledBase = foundTwenty(47);
+    run(walledBase, TIME.WEEKS_PER_YEAR * 32, 'prudent', CATALOG);
+  }
+  const state = structuredClone(walledBase);
+  state.village.grain = 5000;
+  state.village.wood = 5000;
+  state.village.silver = 500;
+  state.village.stone = 5000;
+  return state;
+}
+
+/** La aldea que cada medio necesita para que lo único que estorbe sea el precio. */
+function payer(id: MeansId): GameState {
+  return id === 'gate' ? walled() : rich();
+}
+
 describe('dar un medio', () => {
   it('cuesta exactamente lo que dice, y nada más', () => {
     for (const id of MEANS_IDS) {
-      const state = rich();
+      const state = payer(id);
       const before = { ...state.village };
       const outcome = giveMeans(state, id, 'spring', 4);
       expect(outcome.given, id).toBe(true);
@@ -62,9 +96,9 @@ describe('dar un medio', () => {
   });
 
   it('no se puede dar lo que no se puede pagar, y no se cobra a medias', () => {
-    const state = rich();
-    state.village.silver = 0;
     for (const id of MEANS_IDS) {
+      const state = payer(id);
+      state.village.silver = 0;
       const before = { ...state.village };
       expect(refusalFor(state, id), id).toBe('cost');
       const outcome = giveMeans(state, id, 'spring', 4);

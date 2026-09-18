@@ -81,16 +81,18 @@ describe('el catálogo · alcanzabilidad de las condiciones', () => {
   // real y hay que investigarlo, no ampliar la lista.
   const NARROW_NOT_IMPOSSIBLE = ['tithe_demand', 'chapel_or_granary', 'relic_pedlar'];
 
-  // **Roja a propósito, con lo medido escrito** (15 sep 2026). Esta prueba
-  // llegó con la rama del 14 sep y su lista se midió contra el mapa de 36 × 56;
-  // el mapa grande de v3.68 redefinió `forestLeft` contra el corazón y movió
-  // las trayectorias. Hoy mide: **`plague_blame` y `bandits` no cumplen
-  // condiciones nunca** en seis semillas × sesenta años, además de
-  // `wolf_winter`, cuyo umbral se queda en 0.25 hasta el rework (ver
-  // `catalog/forest.ts`). Se deja entera y roja en vez de meter las dos en la
-  // lista de excepciones, que es lo que el método de `CLAUDE.md` pide: bajar el
-  // listón esconde el hallazgo.
-  it.fails(`ninguna plantilla corriente tiene una condición inalcanzable — ${SEEDS.length} semillas × ${YEARS} años`, () => {
+  // **Estuvo roja a propósito durante tres días, y ya no lo está** (18 sep
+  // 2026). Llegó con la rama del 14 sep y su lista se midió contra el mapa de
+  // 36 × 56; el mapa grande de v3.68 redefinió `forestLeft` contra el corazón y
+  // movió las trayectorias, y desde entonces medía **`plague_blame` y `bandits`
+  // sin cumplir condiciones nunca** en seis semillas × sesenta años. Se dejó
+  // entera y roja en vez de meter las dos en la lista de excepciones, que es lo
+  // que el método de `CLAUDE.md` pide: bajar el listón esconde el hallazgo.
+  //
+  // Lo que la ha puesto verde es la fase 4: **B1 dio al valle un vecino que
+  // baja a saquear**, así que ahora hay partidas armadas en el valle y las dos
+  // plantillas encuentran su sitio. No se tocó ni una condición del catálogo.
+  it(`ninguna plantilla corriente tiene una condición inalcanzable — ${SEEDS.length} semillas × ${YEARS} años`, () => {
     const never = CATALOG
       .filter((t) => !NARROW_NOT_IMPOSSIBLE.includes(t.id))
       .filter((t) => (passes.get(t.id) ?? 0) === 0)

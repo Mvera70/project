@@ -1609,9 +1609,10 @@ export const BUILDINGS = {
   palisade: { w: 1, h: 1, wood: 30, stone: 0, bp: 20, cap: null, tier: 0, upgradeOf: null, byCrossroad: false }, // one segment
   // A2 · **el portón** (§1b, fase 3). Ocupa una celda de la línea de muralla,
   // como un tramo, y cuesta el doble que él: una hoja de roble con sus goznes
-  // es carpintería, no estacas clavadas. Sin tope: cada recinto quiere el suyo,
-  // y quién lo pide lo decide §7.3, no un número aquí.
-  gate: { w: 1, h: 1, wood: 60, stone: 0, bp: 40, cap: null, tier: 0, upgradeOf: null, byCrossroad: false },
+  // es carpintería, no estacas clavadas. **Tope dos** (`MAX_GATES`), y es del
+  // valle y no de la obra: la aldea abre una sola —§7.3 se para en la primera—
+  // y la segunda la paga el jugador por el carro (M-2).
+  gate: { w: 1, h: 1, wood: 60, stone: 0, bp: 40, cap: 2, tier: 0, upgradeOf: null, byCrossroad: false },
   // K-4 · **la sala del rey**, la casa que se diferencia. Tres por tres como la
   // iglesia, y la construcción de madera más cara del valle: más obra que el
   // molino (180/140) y la misma madera que la iglesia, porque es lo más grande
@@ -1668,6 +1669,56 @@ export const BUILDING_RULES = {
   // cuando un portón no era nada. Desde A2 el portón se construye, así que el
   // número es de balance y vive aquí.
   GATE_MIN_RUN: 3,
+  /**
+   * A2b · **El paso del portón, reservado como se reserva la plaza.**
+   *
+   * Lo pidió el dueño del diseño señalando el mecanismo que ya existe: «al
+   * igual que la aldea reserva una serie de espacios —el centro de la aldea, la
+   * plaza—, justamente el portón». Y hacía falta, con dos casos medidos al
+   * hacer D3: en la semilla 41 al año 20 el interior transitable de la aldea
+   * eran **232 celdas de 8 064** con el portón dando a una bolsa que no
+   * conectaba con las casas, y en la semilla 7 el portón tenía **tres lados
+   * tapiados y una bolsa de ocho celdas**. Una puerta que no lleva a ninguna
+   * parte no es una puerta, y la gente no podía salir a sus campos por ella.
+   *
+   * TUNE: dos celdas y media de radio, o sea siete metros y medio alrededor de
+   * la puerta. Es lo que hace falta para que quepa el paso por los dos lados
+   * —dos celdas dentro y dos fuera— con el margen de una casa que se apoye en
+   * el borde. Menos no garantiza el paso; más se come el solar de un pueblo que
+   * ya crece apretado dentro de su anillo.
+   *
+   * **La muralla es la excepción**, y tiene que serlo: la línea del anillo pasa
+   * por la puerta y las piezas que la flanquean son lo que la convierte en una
+   * puerta y no en un hueco.
+   */
+  GATE_CLEAR: 2.5,
+  /**
+   * A2b · **Cuántas puertas puede tener un valle. Dos**, y la segunda se paga.
+   *
+   * Del dueño del diseño: «debería haber una, y después que haya posibilidad de
+   * construirse otra más, dos en total de momento, con un momento en el que
+   * tengas que pagar». La primera la levanta la aldea sola cuando hay muralla
+   * que atravesar (§7.3); la segunda es del jugador y entra por el carro, que
+   * es donde vive todo lo que se da (M-2).
+   */
+  MAX_GATES: 2,
+  /**
+   * A2c · **Lo lejos que tiene que estar la segunda puerta de la primera**, en
+   * radios del anillo.
+   *
+   * Con el anillo de una sola capa ya salían dos puertas funcionales en las
+   * diez semillas medidas, pero **en nueve de las diez caían pegadas**: dos
+   * celdas seguidas del mismo tramo, que no son dos puertas sino un portillo
+   * ancho. Dos puertas son dos por dónde entrar, y eso importa cuando lo que
+   * entre sea una partida armada: una segunda puerta al lado de la primera no
+   * cambia nada de la defensa.
+   *
+   * TUNE: un radio de separación, que en un anillo de once son once celdas y
+   * unos sesenta grados de arco. Se mide en radios y no en celdas para que un
+   * valle de anillo pequeño no se quede sin segunda puerta: lo que se pide es
+   * «en otro lado del cerco», y eso es proporcional al cerco.
+   */
+  GATE_APART: 1,
   PALISADE_DILATION: 2, // §7.4: "envolvente convexa del núcleo, dilatada 2 celdas"
   // TUNE: **cuántas casas espera la muralla** (B-1, 18 sep 2026). Lo pidió el
   // dueño del diseño mirando el problema: «para hacerlo más sencillo, la

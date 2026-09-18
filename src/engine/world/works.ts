@@ -19,7 +19,7 @@ import { TERRAIN_CODE } from '../state';
 import type { BuildingKind, ConstructionWork, GameState } from '../state';
 import { familyOf, houseHomeless, withinCap } from './buildings';
 import type { BuiltEvent } from './buildings';
-import { placeBuilding } from './placement';
+import { placeBuilding, wallAt } from './placement';
 import { nextUpgrade, upgradeSpot } from './upgrade';
 import type { Upgrade } from './upgrade';
 
@@ -272,9 +272,20 @@ export function nextProject(state: GameState): Project | null {
   // una puerta colgada de una sección se queda dentro cuando el anillo de
   // verdad se cierra más afuera — medido en la semilla 23: portón a 7,07 del
   // centro, anillo en 11, y el valle amurallado sin salida.
-  if (state.ring !== null && standing(state, 'gate').length === 0 && wallRuns(state).some(
-    (run) => run >= BUILDING_RULES.GATE_MIN_RUN,
-  )) {
+  // **Y se sigue pidiendo mientras falte alguna de las dos**, no sólo la
+  // primera: «las dos puertas tienen que ser funcionales» (dueño del diseño, 18
+  // sep). Si no hay sitio donde una puerta separe de verdad, `placeBuilding`
+  // devuelve nada y la cola pasa a lo siguiente — que es lo que hace que un
+  // valle sin cerco todavía no tenga puerta, en vez de tener una que no sirve.
+  // A2c · **la aldea levanta una puerta, no dos.** El tope de dos
+  // (`MAX_GATES`) es el del valle, no el de la obra: la primera la abre la
+  // aldea sola porque un cerco sin salida no es un cerco, y **la segunda la
+  // paga el jugador** por el carro (M-2). Es lo que pidió el dueño del diseño:
+  // «debería haber una, y después que haya posibilidad de construirse otra
+  // más, dos en total de momento, con un momento en el que tengas que pagar».
+  if (state.ring !== null
+    && standing(state, 'gate').length === 0
+    && wallRuns(state).some((run) => run >= BUILDING_RULES.GATE_MIN_RUN)) {
     wanted.push('gate');
   }
 
@@ -342,6 +353,11 @@ function open(state: GameState, project: Project, free = false): ConstructionWor
     const spot = placeBuilding(state, kind);
     if (spot === null) return null;
     ({ x, y } = spot);
+    // A2c · **una puerta abierta en la muralla hecha sustituye a su tramo**, y
+    // se apunta como lo que es: una mejora. `complete` ya sabe dar de baja lo
+    // que una mejora reemplaza, así que la estaca cae el día que la puerta se
+    // termina y no antes —el cerco no se queda abierto mientras se trabaja—.
+    if (kind === 'gate') upgradeOf = wallAt(state, x, y)?.id ?? null;
   } else {
     const source = state.buildings.find((b) => b.id === project.buildingId);
     if (source === undefined || source.lostTick !== null) return null;
@@ -495,8 +511,19 @@ export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[
  *
  * Lo necesita §7.3 para saber si hay recinto que merezca una puerta, y cuenta
  * el portón como muralla: una puerta es parte del cerco, no un agujero en él.
- * Vecindad en cruz, que es como se pega una estaca a la siguiente.
+ * **Vecindad en ocho direcciones, y desde A2c tiene que serlo**: el anillo es
+ * un círculo rasterizado, así que dos estacas seguidas de la misma muralla caen
+ * en diagonal cada pocos pasos. Contando en cruz, el cerco entero de la semilla
+ * 7 se leía como once trozos de 13, 13, 13, 7, 7, 2 y cinco sueltos, y la
+ * primera puerta no salía nunca porque ningún «tramo» llegaba al mínimo. Y es
+ * además la vecindad correcta para lo que la pregunta significa: una muralla
+ * conectada en ocho direcciones es la que **no se puede cruzar**, que es lo que
+ * un cerco es.
  */
+const EIGHT = [
+  [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1],
+] as const;
+
 export function wallRuns(state: GameState): number[] {
   const walls = state.buildings.filter((b) => b.lostTick === null
     && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'gate'));
@@ -510,7 +537,7 @@ export function wallRuns(state: GameState): number[] {
     for (let n = 0; n < run.length; n += 1) {
       const b = run[n];
       if (b === undefined) continue;
-      for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]] as const) {
+      for (const [dx, dz] of EIGHT) {
         const next = byCell.get((b.y + dz) * state.map.width + b.x + dx);
         if (next !== undefined && !seen.has(next.id)) { seen.add(next.id); run.push(next); }
       }

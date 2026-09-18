@@ -879,7 +879,7 @@ export type ValleyTrait = 'good_clay' | 'thin_soil' | 'old_forest' | 'bare_hills
 // después de lo que se da para vivir: primero se come, luego se aguanta.
 export const MEANS_IDS = [
   'plough', 'pigs', 'ale', 'axe', 'relic', 'hand',
-  'arms', 'bows', 'tower',
+  'arms', 'bows', 'tower', 'gate',
 ] as const;
 export type MeansId = (typeof MEANS_IDS)[number];
 

@@ -27,6 +27,7 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 | **Prepararse** (B2, `braced`) | El ganado entra, el grano se esconde, se atranca | Nada | El corral vacío y la gente metiendo cosas: se puede hacer con la capa de vida, sin Blender |
 | **Pagar al clan** (B2, `bought_off`) | Treinta de plata suben la ladera y la partida se da la vuelta | Nada | Dos o tres cuerpos saliendo por el portón con una carga |
 | **La semana de después** (B2, `just_sacked`) | La aldea acaba de perder grano y ganado | Nada | Que se note el saqueo: sacos volcados, un corral abierto |
+| **La segunda puerta, abierta en la muralla hecha** (A2c) | El jugador paga una puerta y la aldea **tira un tramo del cerco** para colgarla: la estaca se da de baja el día que la puerta se termina | La estaca desaparece y la puerta aparece en su sitio, sin transición | El derribo: el tramo cayendo, o al menos el hueco marcado mientras la obra dura. Y una puerta en obra hoy se ve como cualquier otra obra |
 | **Las armas** (C1) | La aldea se lleva un cuarto menos de golpe | Nada | Lanzas apoyadas en la herrería, o gente que las lleva. **Ninguna malla de arma existe** |
 | **Los arcos** (C1) | El valle tienta menos | Nada | Arcos en la cerca, o alguien practicando en el vado |
 | **Guardia en la atalaya** (C1) | — | La atalaya está, **vacía** | Alguien arriba mirando el camino. Es capa de vida (C2), no Blender |

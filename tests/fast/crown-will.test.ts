@@ -70,8 +70,13 @@ describe('K-2 · el rey herrero mira a la muralla', () => {
     // §7.3 punto 8 pide fragua **y** amenaza; con este rey basta la fragua. Es
     // lo que «si eliges al herrero, pues haces más armas» significa en un juego
     // que no tiene armas como montón: la muralla, y el señor que la cuenta.
-    const plain = village();
-    const forge = crowned(village(), 'smith');
+    // **Dieciocho años y no quince**, desde que la muralla espera a que haya
+    // pueblo que amurallar: §7.3 pide once casas (`PALISADE_HOUSES`) para que
+    // el anillo no se fije con el valle aún sin forma, y la 41 no las tiene al
+    // año quince. Lo que se mide sigue siendo lo mismo —el mismo valle con y
+    // sin rey—, sólo que cuando la muralla ya es una obra posible para los dos.
+    const plain = village(41, 18);
+    const forge = crowned(village(41, 18), 'smith');
     for (const state of [plain, forge]) {
       delete state.flags['threatened'];
       state.village.wood = 4_000;

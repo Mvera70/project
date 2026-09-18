@@ -88,25 +88,65 @@ function center(rect: Rect): Point { return { x: rect.x + rect.w / 2, y: rect.y 
 
 
 /**
- * Si esa celda está en la banda del anillo.
+ * A2c · **El anillo es un círculo rasterizado de una celda de grosor.**
  *
- * **Medio paso no basta, y esto costó tres medidas.** Un círculo dibujado con
- * celdas enteras no pasa por el centro de las celdas: al ir de una a la de al
- * lado en diagonal, el centro se separa del radio hasta 0,7. Con la banda en
- * 0,5 se rechazaban celdas que están en el anillo, el anillo parecía lleno
- * cuando no lo estaba, y la muralla salía a buscarse otro radio cada pocas
- * piezas: **de 25 a 47 tramos por valle al año 60**, con doce y dieciséis
- * piezas huérfanas. Con 0,75 la banda contiene un círculo de celdas conectado
- * en ocho direcciones, que es lo que una muralla necesita para ser una muralla.
+ * Antes era una *banda*: `|distancia - radio| <= 0,75`. Y la banda tenia que
+ * ser de ese ancho -con 0,5 se rechazaban celdas que estan en el circulo y la
+ * muralla se buscaba otro radio cada pocas piezas: **de 25 a 47 tramos por
+ * valle al ano 60**-, pero 0,75 es celda y media, asi que **en muchos angulos
+ * entran dos celdas** y la muralla salia de dos capas de grosor. De ahi salia
+ * todo lo demas: un porton es una celda, perforaba una capa y la otra seguia
+ * sellando el pueblo. Medido en la semilla 41, las quince casas encerradas en
+ * una bolsa de 220 celdas de 8 064 con los dos lados de la puerta dando al
+ * campo.
+ *
+ * Lo que hay ahora es el circulo **dibujado**, no una distancia: se recorre por
+ * angulos y se queda la celda que contiene cada punto. Dos puntos seguidos caen
+ * en la misma celda o en una pegada, asi que el resultado esta conectado en
+ * ocho direcciones -lo que una muralla necesita para ser una muralla- y **no
+ * hay dos celdas del anillo en la misma perpendicular**, que es lo que hace que
+ * una sola puerta lo atraviese de verdad.
+ *
+ * Se guarda porque se pregunta miles de veces por tick y solo hay un punado de
+ * anillos distintos por partida. Es memoria de una funcion pura: mismo centro y
+ * mismo radio, mismas celdas, y nada de esto toca el azar del motor.
  */
-function onRing(point: Point, centre: Point, radius: number): boolean {
-  return Math.abs(Math.sqrt(distance(point, centre)) - radius) <= RING_BAND;
+function ringCells(centre: Point, radius: number): Set<number> {
+  const key = `${centre.x}|${centre.y}|${radius}`;
+  const had = RING_CACHE.get(key);
+  if (had !== undefined) return had;
+  const cells = new Set<number>();
+  // Un paso de angulo por cada media celda de arco: sobra para que dos puntos
+  // seguidos nunca se salten una celda.
+  const steps = Math.max(64, Math.ceil(radius * 16));
+  for (let n = 0; n < steps; n += 1) {
+    const angle = (n / steps) * Math.PI * 2;
+    const col = Math.floor(centre.x + Math.cos(angle) * radius);
+    const row = Math.floor(centre.y + Math.sin(angle) * radius);
+    if (col < 0 || row < 0 || col >= RING_STRIDE) continue;
+    cells.add(row * RING_STRIDE + col);
+  }
+  if (RING_CACHE.size >= RING_CACHE_MAX) RING_CACHE.clear();
+  RING_CACHE.set(key, cells);
+  return cells;
 }
 
-/** Lo ancho que es el anillo, en celdas. Ver `onRing`. */
-const RING_BAND = 0.75;
+/** Los anillos ya dibujados. Memoria de una funcion pura; ver `ringCells`. */
+const RING_CACHE = new Map<string, Set<number>>();
+/** Cuantos anillos se recuerdan antes de tirarlos todos. */
+const RING_CACHE_MAX = 64;
+/** El ancho con el que se numera una celda del anillo. Mayor que cualquier mapa. */
+const RING_STRIDE = 1024;
 
-/** Si un solar entero pisa la banda del anillo, celda a celda. */
+/** Si esa celda es una de las del anillo. */
+function onRing(point: Point, centre: Point, radius: number): boolean {
+  const col = Math.floor(point.x);
+  const row = Math.floor(point.y);
+  if (col < 0 || row < 0 || col >= RING_STRIDE) return false;
+  return ringCells(centre, radius).has(row * RING_STRIDE + col);
+}
+
+/** Si un solar entero pisa el anillo, celda a celda. */
 function onRingRect(rect: Rect, centre: Point, radius: number): boolean {
   for (let y = rect.y; y < rect.y + rect.h; y += 1) {
     for (let x = rect.x; x < rect.x + rect.w; x += 1) {
@@ -179,20 +219,154 @@ export function ringClosed(state: GameState): boolean {
   return !ringHasRoom(state, plaza, ring, occupiedCells(state));
 }
 
+
+
+
+/**
+ * A2b · Las celdas a las que se llega andando **desde donde vive la gente**.
+ *
+ * Una inundación en cruz sobre el suelo libre, sembrada en la puerta de una
+ * casa. Sirve para una sola pregunta, y es la que convierte un hueco en una
+ * puerta: **¿esta celda separa el pueblo del campo?** Sin ella, un portón puede
+ * acabar en un trozo de muralla que no encierra nada —medido en la semilla 41:
+ * sus dos lados daban a la misma bolsa de 1 457 celdas mientras las quince
+ * casas se quedaban en otra de 220, sin salida—.
+ *
+ * Se calcula **una vez** antes de recorrer los solares, no por candidato: es un
+ * barrido del corazón del valle y sólo se paga cuando se va a plantar una
+ * puerta, que pasa una o dos veces por partida.
+ */
+function villageSide(state: GameState, ground: { occupied: Uint8Array }): Uint8Array | null {
+  const seen = new Uint8Array(state.map.terrain.length);
+  const house = state.buildings.find(
+    (b) => (b.kind === 'house' || b.kind === 'stone_house') && b.lostTick === null,
+  );
+  if (house === undefined) return null;
+  const free = (col: number, row: number): boolean => {
+    if (col < 0 || row < 0 || col >= state.map.width || row >= state.map.height) return false;
+    const cell = row * state.map.width + col;
+    return ground.occupied[cell] === 0 && buildable(state.map.terrain[cell]);
+  };
+  const start: Point[] = [];
+  for (let row = house.y - 1; row <= house.y + house.h; row += 1) {
+    for (let col = house.x - 1; col <= house.x + house.w; col += 1) {
+      if (free(col, row)) start.push({ x: col, y: row });
+    }
+  }
+  const queue = [...start];
+  for (const at of start) seen[at.y * state.map.width + at.x] = 1;
+  while (queue.length > 0) {
+    const at = queue.pop();
+    if (at === undefined) continue;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const col = at.x + dx;
+      const row = at.y + dy;
+      if (!free(col, row) || seen[row * state.map.width + col] === 1) continue;
+      seen[row * state.map.width + col] = 1;
+      queue.push({ x: col, y: row });
+    }
+  }
+  return seen;
+}
+
+/**
+ * A2b · Si por esa celda se puede cruzar la muralla: hay suelo libre a los dos
+ * lados en alguno de los dos ejes.
+ *
+ * Es la misma pregunta que `derive/defence-gates.ts` se hace para saber por
+ * dónde se pasa, hecha **antes** de plantar la puerta en vez de después.
+ */
+function crossable(
+  state: GameState, x: number, y: number,
+  ground: { occupied: Uint8Array; reserved: Uint8Array },
+  village: Uint8Array | null,
+  ring: number,
+): boolean {
+  const centre = plazaCentre(state.plaza);
+  const open = (col: number, row: number): boolean => {
+    if (col < 0 || row < 0 || col >= state.map.width || row >= state.map.height) return false;
+    const cell = row * state.map.width + col;
+    return ground.occupied[cell] === 0 && buildable(state.map.terrain[cell]);
+  };
+  const far = (col: number, row: number): number =>
+    Math.hypot(col + 0.5 - centre.x, row + 0.5 - centre.y);
+  const atHome = (col: number, row: number): boolean =>
+    village === null || village[row * state.map.width + col] === 1;
+
+  for (const [dx, dy] of [[1, 0], [0, 1]] as const) {
+    const a = { x: x - dx, y: y - dy };
+    const b = { x: x + dx, y: y + dy };
+    if (!open(a.x, a.y) || !open(b.x, b.y)) continue;
+    // Uno de los dos lados tiene que caer dentro del anillo y el otro fuera:
+    // eso es cruzar la muralla y no correr paralelo a ella.
+    const inA = far(a.x, a.y) < ring;
+    const inB = far(b.x, b.y) < ring;
+    if (inA === inB) continue;
+    // **Y el lado de dentro tiene que dar a las casas.** Es lo que hace que una
+    // puerta sea funcional —la regla del dueño del diseño: «las dos puertas
+    // tienen que ser funcionales»— y lo que faltaba: en la semilla 41 el portón
+    // tenía sus dos lados libres y cruzaba el anillo, pero por dentro daba al
+    // hueco **entre las dos capas** de una muralla que en algunos tramos es
+    // gruesa, así que las quince casas quedaban en una bolsa de 220 celdas sin
+    // salida mientras la puerta comunicaba campo con campo.
+    const inner = inA ? a : b;
+    if (atHome(inner.x, inner.y)) return true;
+  }
+  return false;
+}
+
+/**
+ * A2b · **El paso de un portón**, reservado igual que la plaza (`inPlaza`).
+ *
+ * Un disco alrededor de cada puerta en pie. Lo que garantiza es lo único que
+ * una puerta tiene que garantizar: que se pueda entrar y salir por ella — que
+ * es justo lo que dos valles medidos no podían (ver `BUILDING_RULES.GATE_CLEAR`).
+ */
+export function inGateway(state: GameState, x: number, y: number, w = 1, h = 1): boolean {
+  const centre = plazaCentre(state.plaza);
+  for (const gate of state.buildings) {
+    if (gate.kind !== 'gate' || gate.lostTick !== null) continue;
+    const at = { x: gate.x + 0.5, y: gate.y + 0.5 };
+    // El eje del paso: hacia fuera desde la plaza, que es por donde se cruza un
+    // anillo. La muralla corre perpendicular a él.
+    const ray = { x: at.x - centre.x, y: at.y - centre.y };
+    const span = Math.hypot(ray.x, ray.y) || 1;
+    const unit = { x: ray.x / span, y: ray.y / span };
+    for (let row = y; row < y + h; row += 1) {
+      for (let col = x; col < x + w; col += 1) {
+        const dx = col + 0.5 - at.x;
+        const dy = row + 0.5 - at.y;
+        if (Math.hypot(dx, dy) > BUILDING_RULES.GATE_CLEAR) continue;
+        // **Y el túnel es lo que de verdad se reserva.** Un disco entero
+        // tendría que dejar pasar la muralla —su línea cruza la puerta— y
+        // entonces no reserva nada: medido en la semilla 41, el anillo es de
+        // **dos capas** en algunos tramos y la puerta perforaba sólo una, así
+        // que las quince casas quedaban en una bolsa de 220 celdas sin salida
+        // mientras los dos lados de la puerta daban al campo. Lo que se guarda
+        // libre es la franja **a lo largo del paso**, ancha de una celda a cada
+        // lado; la muralla puede cruzarla por su propia línea, que es
+        // perpendicular, y de hecho lo hace: la puerta es esa cruz.
+        const along = dx * unit.x + dy * unit.y;
+        const aside = Math.abs(dx * unit.y - dy * unit.x);
+        if (aside <= GATE_TUNNEL_HALF && Math.abs(along) > 0.5) return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Medio ancho del túnel del portón, en celdas. Una a cada lado del paso. */
+const GATE_TUNNEL_HALF = 1;
+
 /** Si en ese anillo queda alguna celda donde se pueda plantar una pieza. */
 function ringHasRoom(state: GameState, centre: Point, radius: number,
   ground: { occupied: Uint8Array; reserved: Uint8Array }): boolean {
-  // Se recorre el círculo por ángulos y no el mapa entero: un anillo de radio
+  // Se recorren las celdas del anillo y no el mapa entero: un anillo de radio
   // veinte son ciento treinta celdas, y el mapa cuatro mil.
-  const steps = Math.max(16, Math.round(radius * 8));
-  for (let n = 0; n < steps; n += 1) {
-    const angle = (n / steps) * Math.PI * 2;
-    // La celda cuyo centro cae sobre el círculo, no la que contiene el punto:
-    // así lo que se comprueba aquí es exactamente lo que `onRing` acepta abajo.
-    const x = Math.round(centre.x + Math.cos(angle) * radius - 0.5);
-    const y = Math.round(centre.y + Math.sin(angle) * radius - 0.5);
+  for (const cell of ringCells(centre, radius)) {
+    const x = cell % RING_STRIDE;
+    const y = (cell - x) / RING_STRIDE;
     if (x < HEART.x0 || y < HEART.y0 || x >= HEART.x1 || y >= HEART.y1) continue;
-    if (!onRing({ x: x + 0.5, y: y + 0.5 }, centre, radius)) continue;
     if (!fitsEmptyGround(state, 'palisade', x, y, ground)) continue;
     return true;
   }
@@ -204,7 +378,30 @@ const RING_SEARCH = 15;
 /** Lo que se separa un anillo del siguiente, en celdas. */
 const RING_STEP = 3;
 
-/** Si esa celda tiene una pieza de muralla pegada, en cruz. */
+/**
+ * A2c · **La pieza de muralla que hay en esa celda**, si la hay y sigue en pie.
+ *
+ * Existe para una sola cosa: **la segunda puerta se abre en la muralla ya
+ * hecha, no en un hueco del anillo.** Hasta aquí una puerta necesitaba una
+ * celda vacía del círculo, y eso sólo se cumple mientras el cerco está a
+ * medias: medido en cuatro semillas con la aldea levantando una sola puerta,
+ * **la segunda no cabía en ningún año de los cuarenta** salvo en la semilla 11,
+ * porque al cerrarse el anillo no queda ni una celda libre en él. Una aldea que
+ * quiere otra salida no espera a que le sobre muralla: tira un tramo y cuelga
+ * ahí la puerta.
+ */
+export function wallAt(state: GameState, x: number, y: number): Building | null {
+  return state.buildings.find((b) => b.lostTick === null && b.x === x && b.y === y
+    && (b.kind === 'palisade' || b.kind === 'wall')) ?? null;
+}
+
+/**
+ * Si esa celda tiene una pieza de muralla pegada.
+ *
+ * **En ocho direcciones desde A2c**: el anillo es un círculo rasterizado y dos
+ * estacas seguidas caen en diagonal cada pocos pasos, así que en cruz la celda
+ * donde de verdad toca abrir la puerta parecía no tocar muralla.
+ */
 function touchesWall(state: GameState, x: number, y: number): boolean {
   return state.buildings.some((b) => b.lostTick === null
     // A2 · **el portón cuenta como muralla para pegarse a él**, y hace falta:
@@ -213,7 +410,7 @@ function touchesWall(state: GameState, x: number, y: number): boolean {
     // hueco a cada lado del portón. Medido en la semilla 11 al año 40: el
     // anillo partido en dos arcos de 37 y 32 piezas en vez de uno de 69.
     && (b.kind === 'wall' || b.kind === 'palisade' || b.kind === 'gate')
-    && Math.abs(b.x - x) + Math.abs(b.y - y) === 1);
+    && Math.max(Math.abs(b.x - x), Math.abs(b.y - y)) === 1);
 }
 
 /**
@@ -278,6 +475,10 @@ function fitsEmptyGround(
   // P-1 · lo mismo que en `canPlace`, y aquí es donde de verdad muerde: este es
   // el filtro con el que `placeBuilding` recorre el corazón buscando solar.
   if (inPlaza(state, x, y, w, h)) return false;
+  // A2b · y el paso del portón, por la misma razón y con el mismo mecanismo: lo
+  // que la aldea reserva no se le da a nadie. La muralla es la excepción —su
+  // línea pasa por la puerta— y por eso se pregunta por la clase.
+  if (kind !== 'gate' && inGateway(state, x, y, w, h)) return false;
   for (let row = y; row < y + h; row += 1) {
     for (let col = x; col < x + w; col += 1) {
       const cell = row * state.map.width + col;
@@ -376,8 +577,22 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // empalizada donde la aldea podía ponerlo —lo que el dueño del diseño llama
   // una sección— y el anillo de verdad se fija cuando el pueblo ya tiene su
   // forma (once casas, el 91 % del radio que va a ocupar).
+  // A2b · el suelo del pueblo, para saber si una puerta separa de verdad. Se
+  // calcula una vez y sólo cuando se va a plantar una: es un barrido del valle.
+  const villageBag = kind === 'gate' ? villageSide(state, occupied) : null;
   const grown = houses.length >= BUILDING_RULES.PALISADE_HOUSES;
   if (ring !== null && ring !== state.ring && grown) state.ring = ring;
+  // A2c · **y no hay estaca antes de que el anillo esté decidido.** El tope de
+  // once casas existe para que el anillo no se elija el año dos, con el pueblo
+  // aún sin forma; pero una encrucijada puede conceder una empalizada antes de
+  // eso, y esa pieza no tenía anillo al que agarrarse: cada una se buscaba su
+  // propio radio y la muralla salía en dos arcos pegados. Medido en diez
+  // semillas: de 3 a 13 piezas fuera del anillo y **cinco valles con bloques de
+  // dos por dos**, que es justo el grosor doble que una puerta de una celda no
+  // atraviesa. Dejar que esa pieza fije el anillo es peor —el anillo se cerraba
+  // en radio 7 y la aldea crecía fuera de su propia muralla—, así que lo que se
+  // hace es esperar: la concesión se rechaza como se rechaza cualquier obra que
+  // hoy no cabe, y la muralla empieza cuando la aldea tiene su forma.
   // **Y la línea de la muralla empezada es de la muralla.** Sin esto, la aldea
   // levantaba casas encima del anillo en curso, el anillo se quedaba sin sitio
   // y el siguiente arrancaba más afuera dejando la pieza vieja suelta: medido
@@ -385,6 +600,7 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // pieza. Reservarla es además lo que el dueño del diseño pidió con sus
   // palabras —«después la siguiente sección de construcción va fuera de la
   // muralla»—: cuando dentro ya no cabe nada, lo nuevo sale fuera solo.
+  if ((kind === 'palisade' || kind === 'wall') && state.ring === null) return null;
   const wallLine = kind === 'palisade' || kind === 'wall' || kind === 'gate' ? null : state.ring;
   // **Sólo el corazón del valle**, y por dos razones que apuntan al mismo sitio.
   //
@@ -400,7 +616,9 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // cincuenta. Acotar al corazón devuelve el coste que tenía.
   for (let y = HEART.y0; y <= Math.min(HEART.y1, state.map.height) - spec.h; y += 1) {
     for (let x = HEART.x0; x <= Math.min(HEART.x1, state.map.width) - spec.w; x += 1) {
-    if (!fitsEmptyGround(state, kind, x, y, occupied)) continue;
+    // A2c · un portón vale sobre una estaca en pie: se derriba y se cuelga ahí.
+    const onWall = kind === 'gate' && wallAt(state, x, y) !== null;
+    if (!onWall && !fitsEmptyGround(state, kind, x, y, occupied)) continue;
     const rect = { x, y, w: spec.w, h: spec.h };
     const p = center(rect);
     // §7.4c · la muralla va en el anillo, no en la envolvente del día.
@@ -410,6 +628,26 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
     // anillo: sin esto, la primera puerta del valle podía acabar en la parte
     // del círculo que todavía no tiene una sola estaca.
     if (kind === 'gate' && !touchesWall(state, x, y)) continue;
+    // A2c · **y la segunda puerta va en otro lado del cerco.** Ver `GATE_APART`.
+    // Cuenta también la que está en obra: las dos puertas se pueden pedir la
+    // misma temporada —una la aldea y otra el jugador— y mirando sólo las que
+    // están en pie salían a cuatro celdas una de otra (semilla 36), que es un
+    // portillo ancho y no dos puertas.
+    if (kind === 'gate' && gateRing !== null) {
+      const apart = gateRing * BUILDING_RULES.GATE_APART;
+      const near = state.buildings.some((b) => b.lostTick === null && b.kind === 'gate'
+        && Math.hypot(b.x - x, b.y - y) < apart)
+        || state.works.some((w) => w.kind === 'gate' && Math.hypot(w.x - x, w.y - y) < apart);
+      if (near) continue;
+    }
+    // A2b · **y donde de verdad se pueda pasar.** Reservar el paso (`inGateway`)
+    // llega tarde si la puerta se planta donde ya hay casas a los dos lados: la
+    // reserva impide lo que venga después, no deshace lo de antes. Medido en
+    // diez valles, eso dejaba a uno encerrado en su propio cerco —la semilla 41
+    // con 220 celdas de 8 064 a su alcance—. Una puerta se abre donde hay por
+    // dónde entrar y por dónde salir.
+    if (kind === 'gate'
+      && (gateRing === null || !crossable(state, x, y, occupied, villageBag, gateRing))) continue;
     if (wallLine !== null && onRingRect(rect, centre, wallLine)) continue;
     let river = false;
     let touchesForest = false;
@@ -468,6 +706,10 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       // cerca de la plaza, que es de donde se sale. Es el mismo criterio con el
       // que `defence-gates.ts` elegía el paso cuando un portón no se construía;
       // lo que cambia es que ahora la elección se levanta y se queda.
+      // A2b · **y la que de verdad separa el pueblo del campo va primero.** Si
+      // no hay ninguna —la primera puerta se pide cuando la muralla tiene cinco
+      // piezas y todavía no encierra nada— vale la que se pueda cruzar, que es
+      // lo que impide que un valle se quede sin puerta.
       case 'gate': score = [
         -(state.map.path[y * state.map.width + x] ?? 0),
         distance(p, centre),

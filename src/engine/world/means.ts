@@ -131,6 +131,17 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
   // `watchtower`, que hasta hoy sólo llegaba por encrucijada— y por eso cuesta
   // madera de obra y no sólo plata.
   tower: { cost: { wood: 90, silver: 12 }, trait: 'watch', build: 'watchtower' },
+  // **Una segunda puerta.** Lo pidió el dueño del diseño: «debería haber una, y
+  // después que haya posibilidad de construirse otra más, dos en total de
+  // momento, con un momento en el que tengas que pagar». La primera la levanta
+  // la aldea sola cuando hay muralla que atravesar (§7.3); la segunda es una
+  // decisión del jugador y cuesta lo que cuesta abrir un cerco.
+  //
+  // **No lleva rasgo a propósito**, y por eso puede darse aunque ya haya un
+  // portón: lo que limita es el tope de §7.2 (`MAX_GATES`, dos). Y sirve para
+  // algo más que comodidad — una aldea que se ha amurallado a sí misma sin
+  // salida usable tiene aquí su remedio.
+  gate: { cost: { wood: 70, silver: 10 }, build: 'gate' },
 };
 
 /**
