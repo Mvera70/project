@@ -23,7 +23,9 @@ export function withinCap(state: GameState, kind: BuildingKind): boolean {
   // corona levanta un tope de §12, y tiene su motivo medido: multiplicar «lo que
   // hace falta sembrar» no cambia nada en una aldea hecha, porque los ocho
   // campos ya están todos trabajados (ver `CROWN.PLOUGH_MORE_FIELDS`).
-  const cap = family === 'field' ? base + will(state).moreFields : base;
+  const crown = will(state);
+  const cap = family === 'field' ? base + crown.moreFields
+    : family === 'granary' ? base + crown.moreGranaries : base;
   const standing = state.buildings.filter((b) => b.lostTick === null && familyOf(b.kind) === family).length;
   const reserved = state.works.filter((w) => w.upgradeOf === null && familyOf(w.kind) === family).length;
   return standing + reserved < cap;

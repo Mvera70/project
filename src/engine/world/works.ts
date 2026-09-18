@@ -224,11 +224,23 @@ export function nextProject(state: GameState): Project | null {
   // Va aquí —después de las casas y antes del granero— porque es la casa del que
   // manda: un techo, no un lujo. Sin rey no se pide nunca, y con el rey de corte
   // además va delante de todo (familia `court`).
-  if (kingOf(state) !== null && !has(state, 'hall') && people >= CROWN.HALL_PEOPLE) {
+  //
+  // **Y sólo la pide el rey de corte**, que es lo medido: la sala cuesta
+  // doscientos de madera y ciento sesenta de obra, y con cualquier rey eso se
+  // come dos o tres casas —diez casas sin rey, siete u ocho con él en 24
+  // partidas de sesenta años—. Como las casas son el techo de la población, la
+  // corona salía cara para todos por igual y eso no es una elección, es un
+  // impuesto. Ahora la sala es la marca del noble: su estilo la pide, la
+  // adelanta (familia `court`) y paga por ella.
+  if (will(state).style === 'court' && !has(state, 'hall') && people >= CROWN.HALL_PEOPLE) {
     wanted.push('hall');
   }
   // 3 · granaries
-  if (count(state, 'granary') < FOOD.MAX_GRANARIES &&
+  // **Y el tope del granero lo levanta el rey del campo.** Esta cuenta va aparte
+  // de `withinCap`, así que subir el tope allí no llegaba hasta aquí: medido,
+  // tres graneros y 2 750 de bodega en las cinco maneras de jugar, la del rey
+  // del campo incluida. Con el tope bien leído, su valle guarda mil fanegas más.
+  if (count(state, 'granary') < FOOD.MAX_GRANARIES + will(state).moreGranaries &&
     state.village.grain > BUILDING_RULES.GRANARY_FULL * storageCapacity(state)) {
     wanted.push('granary');
   }

@@ -51,6 +51,16 @@ export interface Will {
    * el efecto del arado (que libera manos) sino otro.
    */
   readonly moreFields: number;
+  /**
+   * Cuántos graneros más de los que §12 permite. 0 sin rey.
+   *
+   * **Y es la mitad que faltaba del rey del campo**, medido: con sólo los campos
+   * no se veía nada —siete campos y cinco trabajados con rey y sin él, y 2 189
+   * de grano contra 2 272—, porque lo que limita no es la tierra sino **dónde
+   * guardar lo que da**. Un granero más son otras mil fanegas de sitio, y eso es
+   * lo que hace que un valle del campo aguante el invierno que hunde a otro.
+   */
+  readonly moreGranaries: number;
   /** Si la muralla se levanta sin esperar a que haya amenaza (§7.3, punto 8). */
   readonly arms: boolean;
   /** Hacia qué fe deriva el valle, o nada si el rey no la toca (§5.6). */
@@ -75,7 +85,7 @@ export interface Will {
  * que ser byte a byte la de antes de esta fase, y la prueba de K-1 lo mide.
  */
 export const RESTING_WILL: Will = {
-  style: null, priority: 'none', fields: 1, moreFields: 0, arms: false, faithTo: null,
+  style: null, priority: 'none', fields: 1, moreFields: 0, moreGranaries: 0, arms: false, faithTo: null,
   feast: 1, gate: 1, quarrel: 1, works: 1, hunger: 1,
 };
 
@@ -126,12 +136,19 @@ export function will(state: GameState): Will {
         : style === 'chapel' ? 'faith' : 'court',
     fields: style === 'plough' ? CROWN.PLOUGH_FIELDS : 1,
     moreFields: style === 'plough' ? CROWN.PLOUGH_MORE_FIELDS : 0,
+    moreGranaries: style === 'plough' ? CROWN.PLOUGH_MORE_GRANARIES : 0,
     arms: style === 'forge',
     faithTo: style === 'chapel' ? CROWN.CHAPEL_FAITH_TO : null,
     feast: style === 'chapel' ? CROWN.CHAPEL_FEAST : 1,
     gate: has(king, 'craven') ? CROWN.CRAVEN_GATE : 1,
     quarrel: has(king, 'hot_tempered') ? CROWN.TEMPER_QUARREL : 1,
-    works: has(king, 'ambitious') ? CROWN.AMBITIOUS_WORKS : 1,
+    // **Y la obra del rey cura va más despacio**, que es su precio: medido, sin
+    // él era una mejora limpia —fe 82 contra 34, población 49 contra 42 y más
+    // grano— y un rey que sólo da no es una elección. Las manos que están en la
+    // capilla no están en el andamio. Si además es ambicioso, las dos cosas se
+    // multiplican: un rey puede ser cura y ambicioso.
+    works: (has(king, 'ambitious') ? CROWN.AMBITIOUS_WORKS : 1)
+      * (style === 'chapel' ? CROWN.CHAPEL_WORKS : 1),
     hunger: has(king, 'generous') ? CROWN.GENEROUS_HUNGER : 1,
   };
 }

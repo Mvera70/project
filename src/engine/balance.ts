@@ -1133,6 +1133,16 @@ export const CROWN = {
    */
   PLOUGH_MORE_FIELDS: 2,
   /**
+   * Y cuántos graneros más de los tres de §12.
+   *
+   * TUNE: 1. **Es la mitad que faltaba**, y también salió de medir: con la
+   * tierra sola el rey del campo no se veía —siete campos, cinco trabajados y
+   * 2 189 de grano contra 2 272 sin rey, en 24 partidas de sesenta años—, porque
+   * lo que limita el grano guardado no es la tierra sino el sitio donde
+   * guardarlo. Un granero son mil fanegas más de bodega.
+   */
+  PLOUGH_MORE_GRANARIES: 1,
+  /**
    * Lo que el rey herrero le añade al interés del señor.
    *
    * TUNE: 1,5, como candidato `story` de la categoría `lord` (§8.6). Un valle
@@ -1153,6 +1163,17 @@ export const CROWN = {
    * y hace que el medio del barril y este rey no se lleven bien.
    */
   CHAPEL_FEAST: 0.5,
+  /**
+   * Lo que la obra rinde con un rey cura.
+   *
+   * TUNE: 0,9. **Es su precio, y hacía falta uno**: medido en 24 partidas de
+   * sesenta años, el rey cura salía siendo una mejora limpia —fe 82 contra 34,
+   * población 49 contra 42, más grano y más campos— y la mitad de ánimo de las
+   * fiestas no lo compensaba porque las fiestas son pocas. Las manos que están
+   * en la capilla no están en el andamio: un diez por ciento menos de obra es lo
+   * que cuesta tener un valle devoto.
+   */
+  CHAPEL_WORKS: 0.9,
   /**
    * El ánimo por semana que da tener corte, con la sala en pie.
    *

@@ -1454,6 +1454,61 @@ no lo comprobaba—. La fiesta se iba andando detrás de él.
 
 ---
 
+### 6.7 El rey (K-1 a K-5, 18 sep 2026)
+
+**El jugador no manda; dice quién manda.** Es el principio de los medios (§7.12)
+aplicado a una persona: la corona es una cosa que se da, se paga con lo del valle
+y lo que la aldea haga con ella lo deciden los sistemas que ya existen. El plan
+completo está en `docs/plan-rey.md`; la medida, en `docs/rey-medida.md`.
+
+**Qué es.** `state.crown` (esquema 10) guarda quién la lleva, desde cuándo y **qué
+oficio tenía el día que la recibió** —eso último es lo que decide su estilo, y al
+coronar se pierde porque el rey ocupa el asiento de `leader`—. Se da con un acto
+del jugador (`{kind:'crown', who}`) en el paso 1b, cuesta 30 de plata y pide 30
+personas, y **no consume azar**.
+
+**El asiento no se renombra.** El rey ocupa el mismo puesto que el jefe de la
+fundación: siete plantillas de encrucijada reparten `{as:'A', role:'leader'}` y la
+puerta de la migración depende de que exista. Lo que cambia es quién lo ocupa —el
+jugador, una vez— y qué hace el que lo ocupa. La palabra «king» la pone
+`derive/crown.ts`; el identificador se queda para siempre (§2.2).
+
+**Los cuatro estilos**, por el oficio de antes:
+
+| Estilo | Oficio | Lo que abre | Lo que cierra |
+|---|---|---|---|
+| `forge` | herrero | La defensa va delante y la muralla no espera amenaza | El señor cuenta las armas (×1,5 en sus plantillas), y la muralla cuesta manos |
+| `plough` | campo, o sin oficio | La comida va delante; dos campos y un granero más de los que §12 permite | Más manos en el campo son menos en la obra |
+| `chapel` | cura | La fe deriva a 50, con lo que la capilla llega sola | La obra rinde un 10 % menos, y el barril vale la mitad |
+| `court` | jefe o forastero | Su sala, y ánimo mientras está en pie | El valle queda vigilado veinte años, y la sala cuesta dos casas |
+
+**Y cuatro rasgos con número**, de los que **dos eran deuda de §6.3 que nadie
+había escrito**: el ambicioso levanta un 5 % más de obra y el generoso hace que el
+hambre cueste tres cuartos de ánimo. Los nuevos: el miedoso cierra la puerta a los
+de fuera (×0,7) y el de mal genio hace la riña de la plaza ×1,5.
+
+**Sin corona, nada de esto pasa.** `will()` devuelve la voluntad de reposo, que es
+literalmente lo que el reparto de manos y la cola de obras leían de la postura
+retirada de v2.0, así que **una partida sin coronar es byte a byte la de antes**.
+La migración 9 → 10 entra a `null` por eso.
+
+**Cuando el rey muere, la corona pasa por la sucesión de siempre** (A.15, §6.6):
+el elegido toma el asiento y con él su estilo, así que un rey del arado muere, le
+sucede el herrero y la aldea empieza a mirar a las murallas. Si el trono queda
+vacío, la voluntad vuelve al reposo y el interregno cuesta lo que costaba. El
+cartel de esa pregunta se reescribió **neutro** —«the seat is empty»— porque ahora
+vale para un jefe y para un rey.
+
+**La sala del rey** (`hall`, 3×3, 200 de madera, 160 de obra, tope 1) la levanta
+**sólo el estilo de corte**, y eso se midió: con cualquier rey costaba dos o tres
+casas, y como las casas son el techo de la población, coronar bajaba la población
+de 42 a 31–39 en las cuatro variantes. Un impuesto por coronar no es una elección.
+Es la casa del rey —se muda a ella y cuenta cinco camas— y arde como cualquier
+casa de madera. Su malla está encargada (`docs/plan-rey.md` §8); hasta que llegue,
+el render la dibuja más alta que una casa y con el tejado burdeos del jefe.
+
+---
+
 ### 7.4b La plaza (P-1 y P-2, 18 sep 2026)
 
 **El valle tiene una plaza, y es un sitio, no un punto.** La pidió el dueño del
