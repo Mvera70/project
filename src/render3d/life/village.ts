@@ -30,6 +30,7 @@ import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { garrisonPlaces, type Manned } from './garrison';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
+import { fallenDefenders, stepMelee, type Defender } from './melee';
 import { createPhysics, type Physics } from './physics';
 import { commons } from './places';
 import {
@@ -296,6 +297,8 @@ export interface Village {
     readonly loosed: number;
     readonly hits: number;
     readonly fallen: number;
+    /** D4 · Los de la aldea que han caído defendiendo su puesto. */
+    readonly lost: number;
     /**
      * D5 · Los golpes que lleva el portón y si ha cedido, cuando hay asalto.
      *
@@ -767,6 +770,18 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // jornada y no cambian a media jornada.
   const archers: Archer[] = archersOf(manned);
   const arrows: Arrow[] = [];
+  // D4 · los que defienden cada puesto, para que el cuerpo a cuerpo tenga a
+  // quién golpear. Se llena al empezar la jornada con quien el reparto haya
+  // puesto en cada puesto, y se queda vacío los días de paz.
+  const defenders: Defender[] = [];
+  /**
+   * Los golpes que lleva cada defensor, por persona y para toda la jornada.
+   *
+   * Hace falta porque la lista de arriba se rehace cada paso —quien se aparta
+   * de su puesto deja de pelear— y los golpes no se curan al moverse: sin esto,
+   * bastaba con dar un paso atrás para volver a estar entero.
+   */
+  const wounded = new Map<VillagerId, Defender>();
   let physics: Physics | null = options.physics ?? null;
   let physicsAsked = physics !== null;
   let wolf: Wolf | null = null;
@@ -855,6 +870,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         loosed: archers.reduce((sum, archer) => sum + archer.loosed, 0),
         hits: raiders.reduce((sum, raider) => sum + raider.hits, 0),
         fallen: raiders.filter((raider) => raider.phase === 'down').length,
+        // D4 · los nuestros que han caído defendiendo. Es el `lost` del parte
+        // de B4, y es la primera vez que este número no es cero.
+        lost: fallenDefenders([...wounded.values()]),
         gate: gate === null ? null : {
           hits: gate.hits,
           broken: gate.brokeAt !== null,
@@ -1030,6 +1048,18 @@ export function createVillage(state: GameState, day: number, options: DayOptions
 
       for (const dweller of dwellers) {
         const { body } = dweller;
+
+        // D4 · **al que cayó defendiendo se le acabó la jornada.** Sin esto un
+        // muerto seguía su día —iba a beber, volvía a casa— y el motor lo
+        // enterraba la semana siguiente: una mentira de las que se ven. Se
+        // queda donde cayó; que **se vea** caído es otra cosa y falta el clip
+        // (E1, `fall`), anotado en `encargos-3d.md`.
+        if (wounded.get(dweller.villager)?.down === true) {
+          body.vx = 0;
+          body.vz = 0;
+          dweller.doing = null;
+          continue;
+        }
 
         // Quien está en una escena ya ha recibido su velocidad de `play`: sólo
         // falta integrarla —**nunca se escribe `x`/`z` a mano**, es el mismo
@@ -1644,6 +1674,25 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           if (there) held.add(post.place.id);
         }
         stepArchery(archers, raiders, arrows, physics, steps, held);
+
+        // D4 · **y el cuerpo a cuerpo**, que es lo que hace que defender
+        // cueste. La lista de defensores se rehace con quien esté de verdad en
+        // su puesto: el que va de camino no pelea, y el que ha caído tampoco.
+        defenders.length = 0;
+        for (const post of manned) {
+          const there = dwellers.find((dweller) =>
+            dweller.dayPlan?.job?.place === post.place.id
+            && Math.hypot(dweller.body.x - post.place.at.x,
+              dweller.body.z - post.place.at.z) < POST_REACH);
+          if (there === undefined) continue;
+          const already = wounded.get(there.villager);
+          const defender: Defender = already ?? {
+            at: there.body, post, hits: 0, down: false,
+          };
+          wounded.set(there.villager, defender);
+          defenders.push(defender);
+        }
+        stepMelee(raiders, defenders, steps);
       }
 
       if (wolf !== null && wolf.phase !== 'gone') {

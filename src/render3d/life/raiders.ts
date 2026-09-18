@@ -77,11 +77,16 @@ export interface Raider {
   /** Si algún tope tuvo que cortarle el viaje en vez de terminarlo andando. */
   forced: boolean;
   /**
-   * D2 · Cuántas flechas le han entrado.
+   * D2/D4 · Los golpes que lleva encima, de flecha o de mano.
    *
-   * Se cuenta y no se usa para nada más que para pararle: **lo que un asalto le
-   * costó al clan es un dato que B4 va a meter en el motor** por la puerta de
-   * `PlayerAct`, y hasta entonces vive aquí, que es donde pasó.
+   * **Una flecha basta y un golpe de mano no**, y las dos cosas usan este mismo
+   * contador: la arquería lo sube y le acaba la visita en el acto (una flecha en
+   * el pecho), y el cuerpo a cuerpo necesita tres. No es una incoherencia, es la
+   * diferencia entre las dos armas dicha con un solo número.
+   *
+   * Se cuenta y no se usa para nada más: **lo que un asalto le costó al clan es
+   * un dato que B4 mete en el motor** por la puerta de `PlayerAct`, y hasta
+   * entonces vive aquí, que es donde pasó.
    */
   hits: number;
   /**

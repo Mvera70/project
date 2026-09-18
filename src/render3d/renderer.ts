@@ -1149,17 +1149,18 @@ export async function createGraphicsRenderer(
     // apunte (§1b). Sale de la capa de vida tal cual: aquí no se interpreta.
     battle(): BattleReport | null {
       if (life === null) return null;
-      const { loosed, fallen, gate } = life.defence;
+      const { loosed, fallen, lost, gate } = life.defence;
       // Hay algo que contar si alguien disparó, si alguien cayó, o si la puerta
       // ha recibido un golpe: las tres son cosas que pasaron en la muralla.
       if (loosed === 0 && fallen === 0 && (gate === null || gate.hits === 0)) return null;
       return {
         shown: life.raiders.length,
         slain: fallen,
-        // Los nuestros: hoy ninguno, porque el clan todavía no pelea con quien
-        // defiende (D4). Lo que no ha pasado no se cuenta: un número inventado
-        // aquí sería una muerte inventada en el motor.
-        lost: 0,
+        // D4 · **y los nuestros.** Desde el cuerpo a cuerpo esto ya no es cero:
+        // a quien defiende su puesto le llegan encima, y el motor lo entierra
+        // cuando lee el parte (B4). Es la única manera en que una muerte de la
+        // batalla llega a la partida.
+        lost,
         // D5 · **y entraron si alguien pasó por el portón**, no si el portón
         // cayó: con la puerta abajo y la partida entera en el suelo, el valle
         // aguantó. Esto es lo que hace que la pelea pueda perder una partida que

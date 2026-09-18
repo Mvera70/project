@@ -57,6 +57,7 @@ function raided(seed: number, years: number, opts: {
 async function fight(state: GameState): Promise<{
   posts: number; loosed: number; fallen: number;
   gateHits: number; broken: boolean; entered: boolean;
+  lost: number;
   brokeAt: number | null;
 }> {
   const physics = await createPhysics(terrainOf(state));
@@ -67,11 +68,11 @@ async function fight(state: GameState): Promise<{
     life.step();
     if (brokeAt === null && life.defence.gate?.broken === true) brokeAt = n;
   }
-  const { loosed, fallen, gate } = life.defence;
+  const { loosed, fallen, lost, gate } = life.defence;
   physics.dispose();
   return {
     posts: life.manned.length,
-    loosed, fallen,
+    loosed, fallen, lost,
     gateHits: gate?.hits ?? 0,
     broken: gate?.broken ?? false,
     entered: gate?.entered ?? false,
@@ -150,5 +151,38 @@ describe('D3b/D5 · el portón que cede', () => {
     expect(storm.entered, 'entraron').toBe(true);
     expect(JSON.stringify(state), 'y el motor no se enteró por su cuenta').toBe(before);
     expect(state.ended, 'la partida sigue abierta hasta que el motor lo lea').toBeNull();
+  });
+});
+
+describe('D4 · y defender cuesta', () => {
+  it('un asalto se cobra a alguno de los nuestros', async () => {
+    // **La mitad que faltaba del asedio.** Hasta D4 el parte de B4 informaba
+    // `lost: 0` siempre: las flechas salían y nadie tocaba a los que
+    // defendían. Medido al cerrar D4 en los cuatro valles con arcos y sin
+    // arcos: caen de **cero a tres** de los nuestros por asalto, y el reparto
+    // es dispar a propósito —depende de a quién alcancen los doce en la puerta—.
+    //
+    // La propiedad, que es la que se puede escribir de algo que no es
+    // determinista: **en algún valle cuesta gente**. Que costara siempre sería
+    // un número, no una batalla.
+    let bled = 0;
+    for (const [seed, years] of WALLED) {
+      for (const bows of [true, false]) {
+        const fight2 = await fight(raided(seed, years, { bows, assault: true }));
+        if (fight2.lost > 0) bled += 1;
+      }
+    }
+    expect(bled, `hubo bajas propias en ${bled} de ${WALLED.length * 2} asaltos`)
+      .toBeGreaterThan(0);
+  });
+
+  it('y un saqueo no se cobra a nadie: no hay a quién pegar', async () => {
+    // Nadie se acerca a la muralla en un saqueo (D3), así que el cuerpo a
+    // cuerpo no ocurre. Es la otra mitad de la propiedad de arriba: lo que
+    // cuesta gente es el asalto.
+    for (const [seed, years] of WALLED) {
+      const sack = await fight(raided(seed, years, { bows: true, assault: false }));
+      expect(sack.lost, `semilla ${seed}: ni una baja propia en un saqueo`).toBe(0);
+    }
   });
 });
