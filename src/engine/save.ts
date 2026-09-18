@@ -38,7 +38,7 @@ export function serialize(
   };
 }
 
-const ENDS = new Set(['extinction', 'abandoned', 'dispersed']);
+const ENDS = new Set(['extinction', 'abandoned', 'dispersed', 'stormed']);
 const ROLES = new Set(['leader', 'smith', 'midwife', 'priest', 'woodward', 'reeve', 'herbalist', 'stranger']);
 const TRAITS = new Set([
   'ambitious', 'devout', 'spiteful', 'craven', 'generous', 'stubborn', 'cunning', 'kind',

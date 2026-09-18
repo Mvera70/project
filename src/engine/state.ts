@@ -686,13 +686,20 @@ export interface EndState {
    * `abandoned` — §5.7: too few for too long, and the rest walked out.
    * `dispersed` — Annex A.15, v2.22: refused a leader three times running,
    *   with nobody appointed in between, and gave up on the valley.
+   * `stormed` — §1b, B3 (18 sep 2026): the neighbouring clan got in and broke
+   *   it. **The only end that somebody else causes**, and the reason the goal
+   *   of the project is "a walled village that falls or holds": the first three
+   *   are a valley running out, this one is a valley taken. The owner's own
+   *   words: "cuando la aldea muera tiene que ser que el ejército rival
+   *   consiga entrar y rompa todo".
    *
-   * All three leave the valley at zero, which is the only way §1 allows a game
-   * to be lost. They are told apart because the chronicle has to say which: a
-   * failed settlement is not a village that starved, and a valley that talked
-   * itself out of having anyone in charge is not one that simply dwindled.
+   * The first three leave the valley at zero, which was the only way §1 allowed
+   * a game to be lost until the siege existed. They are told apart because the
+   * chronicle has to say which: a failed settlement is not a village that
+   * starved, a valley that talked itself out of having anyone in charge is not
+   * one that simply dwindled, and none of them is a valley that was stormed.
    */
-  cause: 'extinction' | 'abandoned' | 'dispersed';
+  cause: 'extinction' | 'abandoned' | 'dispersed' | 'stormed';
   lastId: VillagerId | null; // the last to die, quoted by the chronicle
 }
 

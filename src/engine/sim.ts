@@ -783,6 +783,21 @@ export function tick(
         params: { year: year(), season: season(), count: raid.band },
         weight: 3,
       });
+    } else if (raid.kind === 'stormed') {
+      // B3 · **el final que no es la aldea acabándose sola.** `advanceThreat` ya
+      // ha puesto `state.ended`: aquí sólo se cuenta, y con peso 3, que es lo
+      // que §9.2 reserva para el momento del siglo.
+      say({
+        kind: 'raid',
+        templateKey: 'raid.stormed',
+        params: {
+          year: year(),
+          season: season(),
+          count: raid.band,
+          fallen: raid.fallen,
+        },
+        weight: 3,
+      });
     } else if (raid.sack !== null) {
       const sack = raid.sack;
       say({

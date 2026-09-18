@@ -79,7 +79,11 @@ export function openEpitaph(app: App, game: ArchivedGame, beginAgain: () => void
   seal.setAttribute('aria-hidden', 'true');
   seal.innerHTML = '<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#seal-tree"/></svg>';
   const heading = document.createElement('h1');
-  heading.textContent = renderUiText('epitaph.title');
+  // B3 · **un valle tomado no está vacío**, y el título no puede decir que lo
+  // está: quedan los que no subieron a la muralla. Los otros tres finales sí son
+  // un valle que se queda sin nadie (§1b).
+  heading.textContent = renderUiText(game.cause === 'stormed'
+    ? 'epitaph.title_stormed' : 'epitaph.title');
   head.append(seal, heading);
   const cause = document.createElement('p');
   cause.textContent = renderUiText(`epitaph.${game.cause}`, { year: yearOf(game.endedTick) });

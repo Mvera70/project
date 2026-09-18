@@ -55,8 +55,15 @@ describe('el caos es el juego · R-1 §2.6', () => {
     for (const state of states) {
       // La partida que acaba lo cuenta: causa y crónica, no un final mudo.
       if (state.ended !== null) {
-        const kind = state.ended.cause === 'extinction' ? 'extinction' : 'abandonment';
-        expect(state.chronicle.some((e) => e.kind === kind)).toBe(true);
+        // B3 · **y desde el 18 sep hay una tercera manera de acabar**: el valle
+        // tomado por el clan vecino, que no se cuenta como una extinción ni como
+        // un abandono sino como lo que es, un asalto (`raid.stormed`). Es la
+        // letalidad que el dueño del diseño dijo que vendría «por las decisiones
+        // y por el asedio» en vez de por remedir el rayo.
+        const kind = state.ended.cause === 'extinction' ? 'extinction'
+          : state.ended.cause === 'stormed' ? 'raid' : 'abandonment';
+        expect(state.chronicle.some((e) => e.kind === kind),
+          `${state.ended.cause} se cuenta`).toBe(true);
       }
       // Lo que sigue sin negociarse es la integridad, no la supervivencia:
       // el grano nunca es negativo, el ánimo se queda entre 0 y 100 y las

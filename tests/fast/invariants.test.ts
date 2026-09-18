@@ -54,8 +54,14 @@ describe('M-11 · integrated invariants', () => {
     for (let i = 0; i < 1000; i += 1) next(noisy.rng, 'chronicle');
     run(baseline, 1000, 'first', CATALOG);
     run(noisy, 1000, 'first', CATALOG);
-    expect(baseline.tick).toBe(2000);
-    expect(noisy.tick).toBe(2000);
+    // **Lo que esta prueba mide es el aislamiento del flujo, no cuántos ticks
+    // caben.** Pedía 2 000 y desde B3 (18 sep 2026) el valle de la semilla 6 no
+    // llega: el clan vecino lo toma en el tick 1 304 y `run` se para ahí, que es
+    // lo que hace un final. Que las dos partidas paren **en el mismo tick** es
+    // además la mitad de la propiedad: si mil tiradas de crónica movieran la
+    // simulación, una de las dos caería en otra semana.
+    expect(baseline.tick, 'la partida avanzó más allá del primer tramo').toBeGreaterThan(1000);
+    expect(noisy.tick, 'y las dos acaban en el mismo tick').toBe(baseline.tick);
     expect(noisy.rng.chronicle).not.toBe(baseline.rng.chronicle);
     // Exclude only the deliberately advanced stream; compare everything else.
     const normalized = structuredClone(noisy);

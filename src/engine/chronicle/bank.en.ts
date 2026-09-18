@@ -910,6 +910,16 @@ export const BANK: Record<string, string[]> = {
     'Raiders from the next valley circled a closed wall in year {year}, {count} of them.',
     'The wall held that {season}. The {count} who came went home with little.',
   ],
+  // B3 · **La línea que cierra una partida.** design.md §1b: «cuando la aldea
+  // muera tiene que ser que el ejército rival consiga entrar y rompa todo». Es
+  // la única línea de este banco que habla de una aldea que ya no está porque
+  // alguien se la llevó, y por eso no se parece a las otras tres del final: no
+  // dice que se fueron ni que se apagaron, dice que entraron.
+  'raid.stormed': [
+    'They broke the gate in year {year}, came through it {count} strong, and left {fallen} dead on it.',
+    'The wall did not hold that {season}: {count} of them came over it, and the valley was theirs by dark.',
+    'In year {year} the next valley came for good — {count} men, the gate in pieces, {fallen} dead on it.',
+  ],
   'raid.beast': [
     'They drove off a {animal} as they went.',
     'A {animal} went up the valley with them.',
@@ -2299,9 +2309,14 @@ export const UI_BANK: Record<string, string> = {
   'crossroad.pending_pill': 'A decision waits',
   'welcome.title': 'While you were gone',
   'epitaph.title': 'The valley is empty',
+  // B3 · el otro título, para el único final que deja gente viva.
+  'epitaph.title_stormed': 'The valley was taken',
   'epitaph.extinction': 'The last of them died in year {year}.',
   'epitaph.abandoned': 'The last households left in year {year}.',
   'epitaph.dispersed': 'The village broke apart in year {year}.',
+  // B3 · el epitafio de un valle **tomado**, que es el final que la fase 4 trae
+  // y el único que no es la aldea acabándose sola.
+  'epitaph.stormed': 'The valley was taken in year {year}.',
   'epitaph.summary': '{years} years. {peak} people at its height.',
   'epitaph.chronicle': 'Read the chronicle',
   'epitaph.begin': 'Begin again',

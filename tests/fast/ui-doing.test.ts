@@ -23,6 +23,12 @@ describe('doingNow · la aldea dice qué está haciendo', () => {
       const state = foundTwenty(seed);
       for (let year = 0; year < 40 && state.ended === null; year += 1) {
         run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+        // **«Mientras la aldea viva» incluye el año en que deja de vivir.** El
+        // año se juega entero antes de preguntar, y desde B3 (18 sep 2026) un
+        // valle puede acabar **tomado** a media semana: la semilla 7 cae en el
+        // año 21. A un valle acabado `doingNow` no le pregunta nadie —la
+        // pantalla enseña el epitafio— así que aquí se sale.
+        if (state.ended !== null) break;
         const said = doingNow(state);
         expect(said, `semilla ${seed}, año ${year}`).not.toBeNull();
         if (said === null) continue;

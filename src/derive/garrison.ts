@@ -17,11 +17,15 @@
 // puestos por orden de importancia; el reparto de la jornada (`life/day.ts`)
 // elige a las personas por cercanía, igual que reparte los oficios. Así la
 // aldea decide, que es el patrón de M-2 llevado a la defensa.
+//
+// **Y tampoco decide cuántas manos** desde B3 (18 sep 2026): eso es una regla
+// del juego con sus constantes en §12 —el motor la necesita para saber si una
+// partida armada se lleva el valle por delante— y vive en
+// `engine/world/garrison.ts`. Aquí se lee. Tener la cuenta en dos sitios era
+// tener dos ideas de cuánta defensa tiene una aldea.
 
-import { GARRISON, LIFE, THREAT } from '@engine/balance';
-import { ageOf } from '@engine/people/villagers';
-import { will } from '@engine/people/crown';
-import { count } from '@engine/subsistence/building-counts';
+import { THREAT } from '@engine/balance';
+import { alertOf, defenders } from '@engine/world/garrison';
 import type { Building, GameState } from '@engine/state';
 
 /** Con qué se ocupa un puesto. */
@@ -56,48 +60,6 @@ export interface Garrison {
 }
 
 const NOBODY: Garrison = { manned: false, why: null, hands: 0, posts: [] };
-
-/**
- * Si la aldea está en vísperas o en ello.
- *
- * Dos ventanas, y la segunda es de una semana: `arrivedTick` es la semana en la
- * que el motor resolvió el asalto (B1), y es la misma que `life/raiders.ts` usa
- * para sacar los cuerpos al camino. Que las dos lean el mismo campo es lo que
- * hace que la guarnición esté arriba **el día que llegan** y no el siguiente.
- */
-function alertOf(state: GameState): 'coming' | 'arrived' | null {
-  if (state.threat.arrivedTick === state.tick) return 'arrived';
-  const coming = state.threat.comingTick;
-  if (coming === null) return null;
-  const away = coming - state.tick;
-  if (away < 0 || away > GARRISON.ALERT_WEEKS) return null;
-  return 'coming';
-}
-
-/**
- * Cuántas manos sube la aldea, antes de recortar por puestos.
- *
- * Todo lo que suma es **algo que se dio o se decidió** (C1, K-2), que es §1b:
- * la defensa se construye dando. Lo único que no se da es la primera mano, la
- * del portón, porque un pueblo que sabe que bajan pone a alguien en la puerta
- * aunque no tenga con qué.
- */
-function handsOf(state: GameState): number {
-  const traits = state.traits as readonly string[];
-  let hands = GARRISON.BASE_HANDS;
-  if (traits.includes('arms')) hands += GARRISON.ARMS_HANDS;
-  if (traits.includes('bows')) hands += GARRISON.BOWS_HANDS;
-  if (count(state, 'smithy') > 0) hands += GARRISON.SMITH_HANDS;
-  if (will(state).arms) hands += GARRISON.KING_HANDS;
-  // **Y el techo es la aldea, no la tabla.** Un caserío de cuatro adultos no
-  // sube seis: `MOST_SHARE` deja al valle sembrando y talando mientras vigila.
-  const adults = state.people.villagers.filter((v) => {
-    if (v.diedTick !== null || v.leftTick !== null) return false;
-    const age = ageOf(v, state.tick);
-    return age >= LIFE.ADULT[0] && age <= LIFE.ADULT[1];
-  }).length;
-  return Math.max(0, Math.min(hands, Math.floor(adults * GARRISON.MOST_SHARE)));
-}
 
 /**
  * Los puestos del cerco, por orden de lo que importan.
@@ -140,7 +102,7 @@ export function postsOf(state: GameState): Post[] {
 export function garrisonOf(state: GameState): Garrison {
   const why = alertOf(state);
   if (why === null) return NOBODY;
-  const hands = handsOf(state);
+  const hands = defenders(state);
   if (hands === 0) return NOBODY;
   const posts = postsOf(state).slice(0, hands);
   if (posts.length === 0) return NOBODY;

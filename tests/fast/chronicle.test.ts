@@ -317,6 +317,9 @@ describe('render', () => {
       building: 'mill',
       // M-0 · la plata, que las visitas del camino y el diezmo nombran.
       silver: 6,
+      // B3 · los que murieron defendiendo el portón, que es lo que cuenta la
+      // línea del valle tomado (§1b).
+      fallen: 4,
       sinceYear: 5,
       years: 12,
       // Las letras del reparto: es lo que produce namesOf (§8.3).

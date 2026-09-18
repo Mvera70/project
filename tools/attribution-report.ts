@@ -24,7 +24,7 @@ const DECIDED_AT = 40; // the year §12.9 asks about
 
 interface Trial {
   seed: number;
-  ended: null | 'extinction' | 'abandoned' | 'dispersed';
+  ended: null | 'extinction' | 'abandoned' | 'dispersed' | 'stormed';
   endYear: number;
   atYear40: number | null;
   hostileTicks: number;
@@ -86,12 +86,14 @@ for (let seed = 0; seed < SEEDS; seed += 1) trials.push(play(seed));
 const dead = trials.filter((t) => t.ended !== null);
 const alive = trials.filter((t) => t.ended === null);
 const extinct = trials.filter((t) => t.ended === 'extinction');
+// B3 · el final que trae la fase 4: un valle tomado por el clan vecino.
+const stormed = trials.filter((t) => t.ended === 'stormed');
 const abandoned = trials.filter((t) => t.ended === 'abandoned');
 const dispersed = trials.filter((t) => t.ended === 'dispersed');
 
 console.info(`\nprudent · ${SEEDS} seeds x ${YEARS} years\n`);
 console.info(`ended: ${dead.length}/${SEEDS} (${share(dead.length, SEEDS)})` +
-  `  — extinction ${extinct.length}, abandoned ${abandoned.length}, dispersed ${dispersed.length}`);
+  `  — extinction ${extinct.length}, abandoned ${abandoned.length}, dispersed ${dispersed.length}, stormed ${stormed.length}`);
 console.info(`survived to year ${YEARS}: ${alive.length}\n`);
 
 // ---------------------------------------------------------------- (a) options

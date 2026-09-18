@@ -870,6 +870,86 @@ export const THREAT = {
    * abierto y uno cerrado.
    */
   WALLED_SACK: 0.25,
+  /**
+   * B3 · **Lo que vale el cerco cuando hay que contarlo como defensa.**
+   *
+   * El anillo cerrado vale cuatro manos y su puerta dos más
+   * (`world/garrison.ts`, `resistance`). No son un número de gusto: son lo que
+   * hace que **la muralla decida** en la cuenta de si una partida entra o sólo
+   * saquea. Con el valle hecho —siete manos con todo dado— un cerco cerrado con
+   * puerta lleva la resistencia de 7 a 13, o sea que dobla lo que hace falta
+   * para tomar el valle. Medido en doce semillas: sin esto, **cayeron 12 de 12**
+   * antes del año sesenta; con esto, cae lo que se cuenta en el registro de B3.
+   *
+   * Y es la traducción de §1b a números: «uno grande que rompa el portón y entre
+   * entero acaba la partida» — el portón es lo primero que hay que romper, así
+   * que tiene precio.
+   */
+  WALL_WORTH: 4,
+  GATE_WORTH: 2,
+  /**
+   * B3 · **Cuántas veces la resistencia tiene que ser la partida para entrar.**
+   *
+   * TUNE: **cuatro**, y está medido en doce semillas × ochenta años con las dos
+   * maneras de jugar que importan:
+   *
+   *   tres  → tomados **12 de 12** sin dar nada, 2 de 12 dándola. El juego se
+   *           acaba siempre, y la escalera del ritmo lo dijo sin rodeos: 23 de
+   *           24 partidas acabadas, 22 de ellas tomadas.
+   *   cuatro → tomados **3 de 12** sin dar nada (a las 304–819 h de reloj) y
+   *           **0 de 12** dándola. Hay caos y la defensa sirve.
+   *   cinco → **0 de 12** en las dos. La mecánica no se dispara nunca.
+   *
+   * Cuatro es además la regla de asedio de siempre con el margen que el cerco
+   * merece —hacen falta tres o cuatro contra uno para tomar una posición
+   * fortificada— y deja el juego donde el dueño del diseño lo quiere: «que haya
+   * partidas que se rompan es la idea», tres de doce, y «si la vas cagando, el
+   * valle puede morir». El nivelado fino es suyo y va al final (G4).
+   *
+   * **Y esto es sólo la mitad determinista.** Desde B4, el resultado de la
+   * batalla física puede entrar por la puerta de `PlayerAct` y decir otra cosa:
+   * esta cuenta es lo que pasa cuando nadie ha mirado la pelea.
+   */
+  STORM_ODDS: 4,
+  /**
+   * B3 · **Lo que vale cada adulto de la aldea defendiendo su casa.**
+   *
+   * TUNE: ver la medida en el registro de B3. No son soldados —los soldados son
+   * la guarnición de C2, que sale de lo que se dio— pero tampoco son cero:
+   * quien entra a robar en un pueblo de treinta se pelea con treinta.
+   *
+   * Hizo falta porque sin esto la resistencia de un caserío eran dos manos y
+   * **cualquier** partida la triplicaba: cayeron 12 de 12 valles, el primero a
+   * las 58 h de reloj, con seis hombres. Eso no es «caer» (§1b), es un juego que
+   * no se puede jugar.
+   */
+  HOMESTEAD_SHARE: 0.5,
+  /**
+   * B3 · **Y el techo de eso, que es lo que hace que la defensa importe.**
+   *
+   * Sin techo, la resistencia de una aldea grande la pone su censo y no sus
+   * decisiones: medido, la semilla 7 llegaba a **28,5 de resistencia con dos
+   * manos**, o sea que hacían falta 86 hombres para tomarla cuando el clan tiene
+   * un techo de 60 — inmortal por ser numerosa, y eso es justo lo contrario de
+   * «se cae por las decisiones» (§1b).
+   *
+   * TUNE: **diez**, medido junto a `STORM_ODDS` (ver arriba). Es lo que valen
+   * las manos sin entrenar de un pueblo entero, del orden de la guarnición de
+   * siete que sale de haber dado lanzas, arcos y fragua: así lo que decide es
+   * **lo que se dio**, y el censo sólo evita que a un caserío se lo lleven seis
+   * hombres.
+   */
+  HOMESTEAD_CAP: 10,
+  /**
+   * B3 · Hasta dónde se lleva por delante el cerco la partida que entra, en
+   * celdas alrededor del portón.
+   *
+   * Dos: la puerta y las dos estacas de cada lado, que es el boquete por el que
+   * cabe un grupo. No es el anillo entero —una aldea tomada sigue teniendo su
+   * muralla, con un agujero— y eso importa para lo que se ve: un cerco con el
+   * portón arrancado cuenta lo que pasó mejor que un solar vacío.
+   */
+  BREACH: 2,
 } as const;
 
 /**

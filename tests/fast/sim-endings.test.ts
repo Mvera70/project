@@ -265,10 +265,17 @@ describe('el abandono · §5.7, v2.16', () => {
   });
 
   it('una aldea viable no se abandona nunca', () => {
+    // **Lo que esta prueba guarda es el abandono, no el final.** Pedía
+    // `ended === null` y desde B3 (18 sep 2026) eso es otra cosa: un valle
+    // puede acabar **tomado** por el clan vecino, que es la mitad grande de
+    // «caer» (§1b) y no tiene nada que ver con §5.7. Medido: la semilla 108
+    // llegaba al año 40 viva y ahora la toman en el año 21. La propiedad es la
+    // misma de siempre —una aldea con gente no se queda sin gente sola— y se
+    // dice como lo que es.
     const s = foundTwenty(108);
     run(s, 40 * YEAR, 'prudent', CATALOG);
     if (population(s) >= MIGRATION.VIABLE_POPULATION) {
-      expect(s.ended).toBeNull();
+      expect(s.ended?.cause ?? null, 'no se abandona').not.toBe('abandoned');
       expect(s.dwindlingSince).toBeNull();
     }
   });

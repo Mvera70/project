@@ -24,6 +24,7 @@
 // van**, y la aldea sigue con lo que queda.
 
 import { THREAT, TIME } from '../balance';
+import { defenders, resistance } from './garrison';
 import { flagSet } from '../crossroads/conditions';
 import { next } from '../rng';
 import { hasTrait, type GameState, type HerdKind } from '../state';
@@ -34,11 +35,23 @@ import { yearOf } from '../time';
  * que se llevaron al llegar. Nunca las dos cosas a la vez.
  */
 export interface ThreatEvent {
-  kind: 'coming' | 'sacked' | 'turned_back';
+  /**
+   * `coming` el aviso, `turned_back` los que cobraron y se fueron, `sacked` el
+   * asalto que se aguanta, y **`stormed` el que no**: B3, la mitad grande de
+   * «caer» (§1b). Un valle tomado no vuelve: `state.ended` queda puesto.
+   */
+  kind: 'coming' | 'sacked' | 'turned_back' | 'stormed';
   /** Con cuántos vienen o vinieron. */
   band: number;
-  /** El saqueo, sólo cuando `kind` es `sacked`. */
+  /** El saqueo, cuando `kind` es `sacked` o `stormed`. */
   sack: Sack | null;
+  /**
+   * B3 · Cuántos cayeron defendiendo, sólo cuando entran.
+   *
+   * Es la primera vez que este sistema mata a alguien, y es deliberado: lo que
+   * acaba una partida tiene que costar gente o no es un final, es un número.
+   */
+  fallen: number;
 }
 
 /** Lo que un asalto se lleva, para que la crónica pueda contarlo. */
@@ -138,7 +151,7 @@ export function advanceThreat(state: GameState): ThreatEvent | null {
       // `WARNING_WEEKS` sirvan de algo: alguien los vio en el camino, y a
       // partir de aquí `crisisOf` deja pasar la pregunta de §8.6 por encima
       // del techo hasta que lleguen.
-      return { kind: 'coming', band: state.threat.comingBand, sack: null };
+      return { kind: 'coming', band: state.threat.comingBand, sack: null, fallen: 0 };
     }
   }
 
@@ -153,9 +166,97 @@ export function advanceThreat(state: GameState): ThreatEvent | null {
     const band = state.threat.comingBand;
     state.threat.comingTick = null;
     state.threat.comingBand = 0;
-    return { kind: 'turned_back', band, sack: null };
+    return { kind: 'turned_back', band, sack: null, fallen: 0 };
   }
-  return { kind: 'sacked', band: state.threat.comingBand, sack: arrive(state) };
+  // B3 · **¿Entran, o sólo saquean?** La mitad grande de «caer» (§1b), y la
+  // decisión del dueño del diseño del 18 sep: «un asalto pequeño se aguanta o se
+  // sufre; uno grande que rompa el portón y entre entero acaba la partida».
+  //
+  // Se compara la partida con lo que el valle pone contra ella —las manos del
+  // cerco más lo que vale el cerco (`world/garrison.ts`)— y hace falta triplicar
+  // esa cuenta para tomar el sitio, que es la regla de asedio de siempre. Lo que
+  // hace que esto sea letalidad **por las decisiones** y no por un dado: las dos
+  // mitades de la cuenta las escribió el jugador. La partida crece con lo que la
+  // aldea acumuló y tienta (§1); la resistencia es lo que se le dio.
+  const band = state.threat.comingBand;
+  if (band >= resistance(state) * THREAT.STORM_ODDS) {
+    const taken = storm(state);
+    return { kind: 'stormed', band, sack: taken.sack, fallen: taken.fallen };
+  }
+  return { kind: 'sacked', band, sack: arrive(state), fallen: 0 };
+}
+
+/**
+ * B3 · **Entran, y se acaba.**
+ *
+ * Lo que §1b describe con las palabras del dueño: «que el ejército rival consiga
+ * entrar y rompa todo». Así que se llevan **todo** lo que se ve —la plata, el
+ * grano, el corral entero—, el portón y la estacada que rodearon quedan
+ * perdidos como ruinas, **los que defendían mueren**, y la partida termina con
+ * una causa que no existía: `stormed`.
+ *
+ * **Y no mata a todo el mundo**, a propósito. Los otros tres finales dejan el
+ * valle a cero porque son un valle que se acaba; éste es un valle **tomado**, y
+ * quien no estaba en la muralla sigue vivo cuando la crónica se cierra. Eso es
+ * lo que hace que la última línea pueda tener un nombre y una viuda, que es lo
+ * que §9.2 pide de un titular de peso 3.
+ *
+ * Lo que aquí **no** se decide: cómo se ve (D6), qué se rompe exactamente en
+ * pantalla (D5), ni si la batalla física podría haberlo evitado (B4). Esto es
+ * lo que pasa cuando nadie ha mirado la pelea.
+ */
+function storm(state: GameState): { sack: Sack; fallen: number } {
+  const band = state.threat.comingBand;
+  const silver = state.village.silver;
+  const grain = state.village.grain;
+  state.village.silver = 0;
+  state.village.grain = 0;
+  let beast: HerdKind | null = null;
+  for (const kind of ['cows', 'pigs', 'hens'] as const) {
+    if (state.herd[kind] > 0 && beast === null) beast = kind;
+    state.herd[kind] = 0;
+  }
+
+  // El cerco roto: el portón primero, que es por donde entraron, y con él las
+  // estacas de al lado. Son ruinas como cualquier otra pérdida (§7.4), así que
+  // la pantalla ya sabe enseñarlas sin que nadie escriba nada.
+  const gate = state.buildings.find((b) => b.kind === 'gate' && b.lostTick === null);
+  if (gate !== undefined) {
+    gate.lostTick = state.tick;
+    for (const wall of state.buildings) {
+      if (wall.lostTick !== null) continue;
+      if (wall.kind !== 'palisade' && wall.kind !== 'wall') continue;
+      if (Math.max(Math.abs(wall.x - gate.x), Math.abs(wall.y - gate.y)) > THREAT.BREACH) continue;
+      wall.lostTick = state.tick;
+    }
+  }
+
+  // Los que defendían. `defenders` dice cuántos subieron, y mueren los mayores
+  // primero por la razón más simple: el que sube a la muralla de un pueblo no es
+  // el niño, y `LIFE.ADULT` ya dice quién es adulto.
+  const fighters = state.people.villagers
+    .filter((v) => v.diedTick === null && v.leftTick === null)
+    .sort((a, b) => a.bornTick - b.bornTick)
+    .slice(0, defenders(state));
+  for (const fighter of fighters) {
+    fighter.diedTick = state.tick;
+    fighter.causeOfDeath = 'violence';
+  }
+
+  state.threat.comingTick = null;
+  state.threat.comingBand = 0;
+  state.threat.raids += 1;
+  state.threat.arrivedTick = state.tick;
+  state.threat.lastBand = band;
+  state.ended = {
+    tick: state.tick,
+    cause: 'stormed',
+    lastId: fighters.at(-1)?.id ?? null,
+  };
+  // **Sin campo nuevo en el esquema**: cuántos cayeron sólo hace falta esta
+  // semana, para la línea de crónica, así que vuelve por aquí en vez de
+  // guardarse. Un número más que migrar por un titular no vale la pena.
+  return { sack: { band, silver, grain, beast, walled: walled(state) }, fallen: fighters.length };
 }
 
 /**

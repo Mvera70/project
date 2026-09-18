@@ -321,7 +321,14 @@ describe('IA-3 · aldeanos con hábitos', () => {
   let sample: HabitSample | null = null;
   function habitSample(): HabitSample {
     if (sample !== null) return sample;
-    const seeds = [7, 23];
+    // **Cuatro valles y no dos** (B3, 18 sep 2026). Es la segunda vez que esta
+    // muestra se queda corta: B2 la movió unas décimas y B3 —el valle que puede
+    // acabar **tomado**— la movió otra vez, esta vez al otro lado (43,4 % contra
+    // 45,8 %, o sea la propiedad del revés por dos puntos). El número no baila
+    // porque la propiedad sea falsa: baila porque doce muestras de una capa con
+    // semilla por jornada son pocas. Cuatro semillas × tres jornadas son
+    // veinticuatro, y eso es lo que pide `CLAUDE.md` para un umbral de aquí.
+    const seeds = [7, 23, 41, 11];
     const fiery: Trait[] = ['hot_tempered', 'spiteful'];
     const calm: Trait[] = ['kind', 'generous'];
     const byTrait = new Map<Trait, { pray: number; total: number }>();
