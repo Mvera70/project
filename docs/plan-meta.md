@@ -112,7 +112,7 @@ de pelea.
 |---|---|---|---|---|---|
 | F1 · Textos del banco | Todo lo nuevo en `bank.en.ts`: el aviso, el asalto, el portón, las bajas, el cierre | P2 | Baja | Luna, Terra | cada fase que los pida |
 | F2 · La alerta y el HUD del asedio | Qué viene y cuándo; durante el asalto, lo que aguanta el portón y las bajas | P3 | Media | Sol | B2, D3 |
-| F3 · La pantalla del final · **plan detallado en `plan-final.md`** (18 sep): la lápida —capitular e inscripción en Cinzel que se graba letra a letra sobre el valle atenuado— la hoja de cuentas de esa partida (años, gente, causa, y la relación larga: nacieron, murieron, obras, asaltos, caídos) y el cronicón para comparar partidas. Cinco fases, F3a–F3e; sólo F3a toca el motor (`ArchivedGame.ledger`, esquema +1) | **P2** | Baja (datos, hoja) · Media (lápida, cronicón) | Luna/Terra → Sol | B3 hecha |
+| ~~F3 · La pantalla del final~~ · **F3a, F3b, F3c y F3e hechas el 18 sep 2026** (plan y medidas en `plan-final.md`): el libro de cuentas (`engine/chronicle/ledger.ts`, y **sin subir el esquema** porque casi todo se recuenta de la crónica), la hoja de cuentas con tres cifras grandes y quince filas sobre el documento que ya existía, y la lápida —capitular de la palabra que nombra el final e inscripción en Cinzel que se graba sobre el valle atenuado, con el HUD escondido—. Fotografiadas las cuatro causas. **Falta F3d** (el cronicón, comparar partidas) y F3f (la hoja como imagen, sin prioridad) | P3 (lo que queda) | Media | Sol | B3 hecha |
 | F4 · La captura de cada fase | Ninguna ronda de interfaz se cierra sin captura (`npm run shot`) | — | Baja | Luna, Terra | — |
 
 ### G · Ritmo, balance y letalidad (transversal, y va después)

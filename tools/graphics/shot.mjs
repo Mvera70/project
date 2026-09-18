@@ -83,12 +83,23 @@ const page = /^https?:\/\//u.test(pageArg)
 
 function browserExe() {
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
-  if (!existsSync(root)) return undefined;
-  const dirs = readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort();
-  for (const dir of dirs.reverse()) {
-    const exe = join(root, dir, 'chrome-win64', 'chrome.exe');
-    if (existsSync(exe)) return exe;
+  if (existsSync(root)) {
+    try {
+      const dirs = readdirSync(root).filter((d) => /^chromium-\d+$/.test(d)).sort();
+      for (const dir of dirs.reverse()) {
+        const exe = join(root, dir, 'chrome-win64', 'chrome.exe');
+        if (existsSync(exe)) return exe;
+      }
+    } catch {
+      // Continúa con el navegador instalado fuera de la carpeta protegida.
+    }
   }
+  // En este equipo la carpeta de Playwright existe pero no es legible para el
+  // runner. Chrome instalado sirve igual para la captura WebGL.
+  for (const exe of [
+    'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+  ]) if (existsSync(exe)) return exe;
   return undefined;
 }
 
@@ -238,6 +249,20 @@ if (waitFor) {
     const open = await tab.evaluate(() => document.documentElement.classList.contains('crossroad-open'));
     if (open) await swipeDown();
   }
+}
+
+// F3 · `--ended <causa>` acaba la partida ahí mismo y espera a que suba la
+// lapida y su hoja de cuentas, que es la unica manera de fotografiar las cuatro
+// maneras de acabar sin esperar a que un valle se muera de cada una. La causa
+// se aplica sobre el estado del juego ya abierto (`__valleyEnd`), asi que la
+// foto sale con **el valle de verdad detras**, que es la mitad de lo que esta
+// pantalla tiene que enseñar.
+const endedCause = opt('ended', '');
+if (endedCause !== '') {
+  await tab.evaluate((cause) => window.__valleyEnd?.(cause), endedCause);
+  // La lapida dura 2,2 s y despues sube la hoja: se espera lo uno o lo otro
+  // segun lo que se quiera fotografiar (`--open stone` para la lapida).
+  await tab.waitForTimeout(open === 'stone' ? 1200 : 3600);
 }
 
 if (open === 'orders') await tab.locator('.valley-orders-now').click().catch(() => {});

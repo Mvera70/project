@@ -104,8 +104,15 @@ if (root) {
     if (crown === 'ready') crownReady(state);
     else if (crown !== null) crownNow(state, crown);
     if (query.get('hunger') === '1') state.village.grain = 0;
-    if (query.get('ended') === '1') {
-      state.ended = { tick: state.tick, cause: 'abandoned', lastId: null };
+    // F3 · `&ended=1` acaba la partida, y `&ended=<causa>` acaba de esa manera
+    // concreta: `extinction`, `abandoned`, `dispersed` o `stormed`. Hacía falta
+    // para poder fotografiar las cuatro lápidas —cada una tiene su capitular y
+    // su inscripción— sin esperar a que un valle se muera de la manera que toca.
+    const ended = query.get('ended');
+    if (ended !== null) {
+      const cause = (['extinction', 'abandoned', 'dispersed', 'stormed'] as const)
+        .find((one) => one === ended) ?? 'abandoned';
+      state.ended = { tick: state.tick, cause, lastId: null };
     }
     boot(root, {
       schema: state.version,

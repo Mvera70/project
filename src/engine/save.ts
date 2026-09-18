@@ -8,6 +8,7 @@ import { hash32, RNG_STREAMS } from './rng';
 import { tick } from './sim';
 import { herdCapacity } from './subsistence/herd';
 import { HAPPENINGS, HERD_KINDS, MEANS_IDS, SCHEMA_VERSION, TERRAIN_CODE, valleyTraits } from './state';
+import { ledgerOf } from './chronicle/ledger';
 import { choosePlaza } from './world/plaza';
 import type { ArchivedGame, DecisionRecord, GameState, Herd, SaveFile } from './state';
 import { SEASONS } from './time';
@@ -270,8 +271,29 @@ function byteMap(value: unknown): boolean {
     && value['ruins'].every((cell) => cell <= 1);
 }
 
+/**
+ * F3a · Si el libro de cuentas de una partida archivada es plausible.
+ *
+ * **Opcional a propósito**: una partida guardada antes de F3a no lo lleva y se
+ * recuenta de su crónica al enseñarla. Lo que no se admite es uno a medias, que
+ * es lo que distingue «este dato no existe» de «este guardado está corrupto».
+ */
+function ledgerValue(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!record(value)) return false;
+  const counts = ['years', 'peak', 'raidsHeld', 'born', 'died', 'arrived', 'left',
+    'built', 'lostWorks', 'decisions', 'given', 'kings', 'raids', 'slain', 'fallen'];
+  if (!counts.every((key) => tickValue(value[key]))) return false;
+  // Tres que pueden faltar de verdad: el año de la piedra si nunca llegó, y lo
+  // que quedó en pie si la partida se archivó sin ese dato.
+  return (value['stoneYear'] === null || tickValue(value['stoneYear']))
+    && (value['houses'] === null || tickValue(value['houses']))
+    && (value['wall'] === null || tickValue(value['wall']));
+}
+
 function archivedGame(value: unknown): boolean {
-  return record(value) && uint32(value['seed']) && uint32(value['terrainSeed'])
+  return record(value) && ledgerValue(value['ledger'])
+    && uint32(value['seed']) && uint32(value['terrainSeed'])
     && tickValue(value['endedTick']) && ENDS.has(value['cause'] as string)
     && tickValue(value['peakPeople']) && Array.isArray(value['chronicle'])
     && value['chronicle'].every(chronicleEntry) && value['ruins'] instanceof Uint8Array
@@ -549,6 +571,10 @@ export function archiveGame(state: GameState): ArchivedGame {
     peakPeople: state.peakPeople,
     chronicle: state.chronicle.map((entry) => ({ ...entry, params: { ...entry.params } })),
     ruins: ruinMask(state),
+    // F3a · **las cuentas, aquí y no al enseñarlas.** Es el último momento en
+    // que se puede saber qué quedó en pie, y además lo que sobrevive a la poda
+    // de la crónica de las partidas viejas (`plan-final.md` §5, decisión 3).
+    ledger: ledgerOf(state),
   };
 }
 

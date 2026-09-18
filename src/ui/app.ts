@@ -1075,6 +1075,22 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       beginLoop();
     });
   };
+  /**
+   * F3 · **Acabar la partida desde fuera, para poder fotografiar el final.**
+   *
+   * El mismo tipo de gancho de observación que `__valleySound` (U-09) y que
+   * `data-app-ready`: no lo usa el juego y no cambia nada de él. Existe porque
+   * las cuatro maneras de acabar tienen cada una su lápida, y esperar a que un
+   * valle se muera de cada una para fotografiarlas es esperar horas de reloj.
+   */
+  window.__valleyEnd = (cause: string): void => {
+    if (state.ended !== null) return;
+    const known = (['extinction', 'abandoned', 'dispersed', 'stormed'] as const)
+      .find((one) => one === cause) ?? 'abandoned';
+    state.ended = { tick: state.tick, cause: known, lastId: null };
+    finish();
+  };
+
   const runTick = (): void => {
     if (state.ended !== null) return;
     const decision = pendingDecision;
@@ -1276,4 +1292,18 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   if (fresh) persist();
 
   return app;
+}
+
+/**
+ * F3 · El gancho para fotografiar el final, y sólo para eso.
+ *
+ * Se declara aquí y no en `sound.ts` porque es de esta capa, y lleva el mismo
+ * trato que `__valleySound`: existe para que una herramienta de fuera
+ * (`tools/graphics/shot.mjs --ended <causa>`) pueda ver una pantalla que de
+ * otro modo tardaría horas de reloj en salir. El juego no lo llama nunca.
+ */
+declare global {
+  interface Window {
+    __valleyEnd?: (cause: string) => void;
+  }
 }

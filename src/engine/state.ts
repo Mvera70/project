@@ -831,6 +831,8 @@ export type MigrationEvent =
  * no sería aceptable.
  */
 export const SCHEMA_VERSION = 11; // B1: el clan vecino (10 era K-1: la corona)
+// F3a no sube el esquema: `ArchivedGame.ledger` es opcional y lo que falta se
+// recuenta de la crónica, así que una partida vieja carga sin migración.
 
 
 /** Las familias de §7.3 que el jugador puede adelantar. */
@@ -1101,6 +1103,56 @@ export interface Threat {
  * the next game, which seeds them into map.ruins (design.md §13.3). The ruins
  * have no mechanical effect: they are there to be seen.
  */
+/**
+ * F3a · Las cuentas de una partida, tal como se enseñan al acabar.
+ *
+ * La forma está aquí porque es parte de lo que se guarda (`ArchivedGame`);
+ * **cómo se cuenta** está en `chronicle/ledger.ts`, que es lo que puede cambiar.
+ *
+ * Números y nada más: sin texto, sin claves de banco y sin nada que dependa
+ * del idioma. Quien lo pinta decide cómo se llama cada fila (`F3b`), que es la
+ * misma división que tiene la crónica entre lo que pasó y cómo se cuenta.
+ */
+export interface Ledger {
+  // ---- las tres grandes (plan-final.md §5, decisión 2) --------------------
+  /** Los años que duró el valle. */
+  years: number;
+  /** La gente que tuvo en su mejor momento. */
+  peak: number;
+  /** Los asaltos que el cerco aguantó. La cifra de la que se presume. */
+  raidsHeld: number;
+
+  // ---- la cuenta larga ---------------------------------------------------
+  born: number;
+  died: number;
+  arrived: number;
+  left: number;
+  /** Obras terminadas y obras perdidas, de todas las clases. */
+  built: number;
+  lostWorks: number;
+  /** Decisiones contestadas, medios dados y coronas puestas. */
+  decisions: number;
+  given: number;
+  kings: number;
+  /** Asaltos que bajaron al valle, contando el que lo tumbó. */
+  raids: number;
+  /** Lo que costó la defensa: del clan y de los nuestros. */
+  slain: number;
+  fallen: number;
+  /** El año de la primera obra de piedra, o nada si nunca llegó. */
+  stoneYear: number | null;
+
+  // ---- lo que sólo sabe el estado del último día -------------------------
+  /**
+   * Casas y tramos de cerco **en pie al acabar**, o `null` en una partida
+   * archivada antes de F3a: la crónica dice lo que se levantó y lo que se
+   * perdió, pero no lo que quedó, y un cero ahí sería mentira y no un dato que
+   * falta.
+   */
+  houses: number | null;
+  wall: number | null;
+}
+
 export interface ArchivedGame {
   seed: number;
   terrainSeed: number;
@@ -1109,6 +1161,20 @@ export interface ArchivedGame {
   peakPeople: number;
   chronicle: ChronicleEntry[];
   ruins: Uint8Array; // building mask, WIDTH*HEIGHT
+  /**
+   * F3a · **Las cuentas de esa partida** (`docs/plan-final.md`).
+   *
+   * Casi todas se pueden recontar de `chronicle`, y de hecho una partida
+   * archivada antes de F3a se recuenta así al enseñarla. Se guardan de todos
+   * modos por dos razones: **qué quedó en pie** el último día no está en la
+   * crónica y sólo se sabe al cerrar el estado, y la decisión 3 del plan poda
+   * la crónica de las partidas viejas —de todas menos las tres últimas se
+   * guardan sólo los titulares— con lo que recontar dejaría de ser posible.
+   *
+   * Opcional a propósito: una partida guardada antes de F3a no lo tiene y no
+   * hay nada que migrar. Quien la enseñe lo recuenta (`ledgerFromChronicle`).
+   */
+  ledger?: Ledger;
 }
 
 /**

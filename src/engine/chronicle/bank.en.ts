@@ -2332,6 +2332,49 @@ export const UI_BANK: Record<string, string> = {
   // y el único que no es la aldea acabándose sola.
   'epitaph.stormed': 'The valley was taken in year {year}.',
   'epitaph.summary': '{years} years. {peak} people at its height.',
+
+  // ---------------------------------------------------------------------------
+  // F3 · La lápida y la hoja de cuentas. docs/plan-final.md
+  //
+  // **La inscripción no dice «game over»** (decisión 1 del plan): dice la causa
+  // y el año, en versales, porque es la única frase de todo el juego que
+  // hablaría del juego y no del valle. La capitular es su letra inicial.
+  // ---------------------------------------------------------------------------
+  'epitaph.initial.extinction': 'E',
+  'epitaph.initial.abandoned': 'L',
+  'epitaph.initial.dispersed': 'B',
+  'epitaph.initial.stormed': 'T',
+  'epitaph.inscription.extinction': 'THE VALLEY IS EMPTY',
+  'epitaph.inscription.abandoned': 'THE LAST LEFT',
+  'epitaph.inscription.dispersed': 'THE VILLAGE BROKE APART',
+  'epitaph.inscription.stormed': 'THE VALLEY WAS TAKEN',
+  'epitaph.inscription.anno': 'ANNO {year}',
+
+  // Las tres cifras grandes (decisión 2): años, gente en su mejor momento y
+  // asaltos aguantados. La causa no está entre ellas porque ya es el título.
+  'epitaph.ledger.title': 'The reckoning',
+  'epitaph.ledger.years': 'Years',
+  'epitaph.ledger.peak': 'People at its height',
+  'epitaph.ledger.held': 'Assaults held',
+
+  // Y la cuenta larga. Cada una es una fila, y las que no se saben no se
+  // enseñan: un cero diría que no quedó nada.
+  'epitaph.ledger.born': 'Born',
+  'epitaph.ledger.died': 'Died',
+  'epitaph.ledger.arrived': 'Came up the road',
+  'epitaph.ledger.left': 'Walked out',
+  'epitaph.ledger.built': 'Works raised',
+  'epitaph.ledger.lostWorks': 'Works lost',
+  'epitaph.ledger.houses': 'Houses still standing',
+  'epitaph.ledger.wall': 'Wall still standing',
+  'epitaph.ledger.decisions': 'Decisions answered',
+  'epitaph.ledger.given': 'Things given',
+  'epitaph.ledger.kings': 'Crowned',
+  'epitaph.ledger.raids': 'Raids suffered',
+  'epitaph.ledger.slain': 'Raiders felled',
+  'epitaph.ledger.fallen': 'Died on the wall',
+  'epitaph.ledger.stoneYear': 'First stone, year',
+  'epitaph.ledger.none': '—',
   'epitaph.chronicle': 'Read the chronicle',
   'epitaph.begin': 'Begin again',
   'chronicle.source': 'Valley chronicle',

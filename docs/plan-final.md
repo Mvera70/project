@@ -181,13 +181,37 @@ archivo.
 ## 4 · El orden, y qué depende de qué
 
 ```
-F3a · derive/ledger.ts + ArchivedGame.ledger + migración     (Luna/Terra → Sol revisa)
-F3b · la hoja de cuentas sobre epitaph.ts                     (Luna)            ← F3a
-F3c · la lápida: capitular, inscripción letra a letra, retardo (Sol)             ← nada
-F3d · el cronicón, desde la hoja y desde el menú              (Sol)             ← F3a
-F3e · captura de las cuatro causas y una toma de la animación (Luna/Terra)      ← F3b, F3c
-F3f · la hoja como imagen para compartir                      (Sol)             ← F3b · sin prioridad
+F3a · el libro de cuentas + ArchivedGame.ledger    HECHO 18 sep 2026
+F3b · la hoja de cuentas sobre epitaph.ts          HECHO 18 sep 2026
+F3c · la lápida: capitular e inscripción grabada   HECHO 18 sep 2026
+F3e · captura de las cuatro causas                 HECHO 18 sep 2026
+F3d · el cronicón, desde la hoja y desde el menú   (Sol)            ← F3a
+F3f · la hoja como imagen para compartir           (Sol)            ← F3b · sin prioridad
 ```
+
+**Lo hecho el 18 sep 2026, y lo que costó.** F3a no subió el esquema: el
+`ledger` es opcional y lo que falta se recuenta de la crónica, así que una
+partida guardada antes carga sin migración. Y **casi todo sale de la crónica**
+—sólo «qué quedó en pie» necesita el estado del último día—, que es lo que hizo
+este plan barato.
+
+Tres cosas las encontró una captura, y ninguna prueba las habría visto:
+
+- **La inscripción no se leía.** Tinta roja sobre tejados claros con el velo al
+  34 %: ilegible. Se arregla con el material que ya está —una banda de
+  pergamino, que es lo que este juego hace con el texto que va sobre el valle,
+  igual que la cinta de la fecha— y el velo al 52 %.
+- **El HUD seguía puesto.** Un final con la cinta de la fecha y la fila de
+  cifras encima no es un final: es una pantalla más. Se esconde mientras dura
+  la lápida.
+- **La línea de resumen repetía la hoja.** Decía «39 years. 71 people at its
+  height» justo encima de una hoja cuyas dos primeras cifras grandes son 39 y
+  71. Se quita del documento y la clave se queda en el banco.
+
+Y una que encontró la prueba: **la capitular no puede ser la inicial de la
+inscripción**, porque las cuatro empiezan por «THE» y las cuatro capitulares
+serían una T. Es la letra de la palabra que nombra el final —**T**AKEN,
+**E**MPTY, **L**AST, **B**ROKE—, que es lo que hace un manuscrito iluminado.
 
 F3a y F3c no dependen una de otra y pueden ir a la vez. Lo que más se ve por
 menos es **F3c + F3b**: el momento y los números de esa partida. El cronicón va
