@@ -23,7 +23,7 @@
 // que nadie ha medido.
 
 import { renderUiText } from '@engine/chronicle/render';
-import { roleKeyFor } from '@derive/crown';
+import { crownStyleKey, isKing, roleKeyFor } from '@derive/crown';
 import { isHere } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import type { GameState, Villager, VillagerId } from '@engine/state';
@@ -59,6 +59,17 @@ export interface PersonCard extends CardFace {
   readonly age: number | null;
   /** El oficio, ya en la palabra del banco, o `null` si no tiene ninguno. */
   readonly role: string | null;
+  /**
+   * K-8 · Si lleva la corona, y con ella a qué atiende el valle.
+   *
+   * **La palabra no basta y está medido a ojo del dueño del diseño**: «no se ve
+   * rey en chiquitito, parece uno más». `role` ya decía «king» desde K-5, pero
+   * en la misma cursiva que dice «midwife»; esto es lo que deja que la ficha
+   * pinte la corona en vez de cambiar una palabra por otra.
+   */
+  readonly crowned: boolean;
+  /** Hacia dónde tira el valle con ese rey, o `null` si no lo es. */
+  readonly lean: string | null;
   /** Los rasgos, ya en palabras. Vacío si no tiene nombre. */
   readonly traits: readonly string[];
   /**
@@ -180,6 +191,12 @@ export function personCard(state: GameState, id: VillagerId): PersonCard | null 
     // K-5 · «king» si lleva la corona; el motor sigue diciendo `leader`.
     role: (() => {
       const key = roleKeyFor(state, person);
+      return key === null ? null : renderUiText(key);
+    })(),
+    crowned: isKing(state, person),
+    lean: (() => {
+      if (!isKing(state, person)) return null;
+      const key = crownStyleKey(state);
       return key === null ? null : renderUiText(key);
     })(),
     traits: person.traits.map((trait) => renderUiText(`trait.${trait}`)),

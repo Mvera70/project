@@ -1150,6 +1150,45 @@
   font: italic 15px/1.2 var(--skin-font-read);
   color: var(--skin-ink-soft);
 }
+/* K-8 · **La corona en la ficha**, con la misma chapa de lacre que la fila de
+   la lista (`people-panel.ts`): se llega aquí tocando esa fila, y que la marca
+   cambiara de forma al abrirla haría dudar de que sea el mismo hombre. El
+   oficio del rey deja de ser una aposición en cursiva y pasa a ser un sello:
+   eso es lo que faltaba —«no se ve rey en chiquitito, parece uno más»—. */
+/* **Y va con la placa delante en el selector, que no es adorno**: la bandeja de
+   la carcasa viste sus párrafos con `.ui-shell-content-body p` —dos piezas en
+   el selector contra una— y con `.person-role--king` a secas el oro salía tinta
+   parda sobre el lacre, ilegible. Medido en la captura, no deducido. */
+.person-head-text .person-role--king {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  background: var(--skin-red-deep);
+  box-shadow: inset 0 0 0 1px var(--skin-rule-gold);
+  color: var(--skin-gold-lit);
+  font: 600 12.5px/1.6 var(--skin-font-voice);
+  letter-spacing: var(--skin-track-label);
+  text-transform: uppercase;
+}
+.person-head-text .person-role--king .skin-icon { width: 15px; height: 15px; flex: 0 0 15px; }
+.person-head-text .person-role--king i { font-style: normal; }
+/* A qué atiende el valle con ese rey (`crown.style.*`): información, y la que
+   de verdad cambia según a quién se corone. */
+.person-head-text .person-lean {
+  margin: 0;
+  font: italic 13.5px/1.3 var(--skin-font-read);
+  color: var(--skin-ink-soft);
+}
+/* El medallón del rey, en lacre: el mismo tono que su chapa, y el aro en oro. */
+.person-face--king {
+  background-color: var(--skin-red-deep);
+  background-image: none;
+  color: var(--skin-gold-lit);
+  box-shadow: inset 0 0 0 2px var(--skin-gold), var(--skin-shadow);
+}
+
 /* Los tres chips en una fila, como el prototipo: con el relleno del kit
    (10 px) y tres rasgos largos se iban a dos líneas. Siguen pudiendo envolver
    —hay gente con cuatro rasgos— pero el caso de tres, que es el normal, cabe. */

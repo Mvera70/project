@@ -152,7 +152,9 @@ describe('UI-V0 · los activos que el plan promete', () => {
     for (const id of ['people', 'wheat', 'logs', 'face', 'mountains', 'book',
       'footprints', 'oak-leaf', 'sun', 'seal-tree',
       // M-0 · las dos existencias nuevas y las cuatro caras del ánimo.
-      'stone', 'silver', 'face-low', 'face-grim', 'face-calm', 'face-glad']) {
+      'stone', 'silver', 'face-low', 'face-grim', 'face-calm', 'face-glad',
+      // K-8 · la corona del rey, que la lista de la gente y la ficha pintan.
+      'crown']) {
       expect(sprite, id).toContain(`id="${id}"`);
     }
     // El color lo pone quien los usa (`currentColor`), nunca el icono: si un

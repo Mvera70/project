@@ -148,9 +148,12 @@ export function createInspectPanel(
   cardName.className = 'skin-inscription person-name';
   const cardRole = document.createElement('p');
   cardRole.className = 'person-role';
+  const cardLean = document.createElement('p');
+  cardLean.className = 'person-lean';
+  cardLean.hidden = true;
   const cardChips = document.createElement('div');
   cardChips.className = 'person-chips';
-  headText.append(cardName, cardRole, cardChips);
+  headText.append(cardName, cardRole, cardLean, cardChips);
   // El helecho del canto derecho de la placa: marca de agua, calcada del
   // prototipo (`person-ornaments.ts`), no un dibujo a mano.
   const sprig = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -280,8 +283,29 @@ export function createInspectPanel(
       cardName.textContent = person.age === null
         ? person.name
         : `${person.name} · ${renderUiText('inspect.age.short', { age: person.age })}`;
-      cardRole.textContent = person.role ?? '';
+      // K-8 · **El rey no lleva una palabra más, lleva su corona.** La misma
+      // chapa de lacre que la fila de la lista, para que la persona que se abre
+      // desde ahí se lea igual que en la lista de la que se viene, y debajo a
+      // qué atiende el valle con él.
+      medallion.classList.toggle('person-face--king', person.crowned);
+      cardRole.classList.toggle('person-role--king', person.crowned);
+      if (person.crowned) {
+        const crown = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        crown.setAttribute('class', 'skin-icon');
+        crown.setAttribute('aria-hidden', 'true');
+        crown.setAttribute('focusable', 'false');
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', '#crown');
+        crown.append(use);
+        const word = document.createElement('i');
+        word.textContent = person.role ?? '';
+        cardRole.replaceChildren(crown, word);
+      } else {
+        cardRole.textContent = person.role ?? '';
+      }
       cardRole.hidden = person.role === null;
+      cardLean.textContent = person.lean ?? '';
+      cardLean.hidden = person.lean === null;
       cardChips.replaceChildren(...person.traits.map((trait) => {
         const chip = document.createElement('span');
         chip.className = 'skin-chip';

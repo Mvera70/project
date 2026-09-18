@@ -20,10 +20,32 @@ import type { CrownStyle, GameState, Villager } from '@engine/state';
  */
 export function roleKeyFor(state: GameState, v: Villager): string | null {
   if (v.role === null) return null;
-  if (v.role === 'leader' && state.crown !== null && kingOf(state)?.id === v.id) {
-    return 'role.king';
-  }
+  if (isKing(state, v)) return 'role.king';
   return `role.${v.role}`;
+}
+
+/**
+ * K-8 · Si ése es el rey coronado de este valle.
+ *
+ * La misma condición que `roleKeyFor` usa para decir «king», con nombre propio
+ * porque **la lista de la gente necesita el hecho, no la palabra**: la fila del
+ * rey se pinta distinta (medallón de lacre, la corona, el primer sitio) y
+ * comparar el texto devuelto contra `'role.king'` habría hecho de una cadena de
+ * contenido una condición de pintado.
+ */
+export function isKing(state: GameState, v: Villager): boolean {
+  return v.role === 'leader' && state.crown !== null && kingOf(state)?.id === v.id;
+}
+
+/**
+ * K-8 · Hacia dónde tira el valle con el rey que tiene, o nada si no hay rey.
+ *
+ * **Sale de `state.crown.trade` y no del oficio de hoy**, que es la misma
+ * fuente que usa `will()`: el asiento guarda con qué oficio se coronó, y es eso
+ * lo que manda en el tick aunque el hombre cambie de puesto después.
+ */
+export function crownStyleKey(state: GameState): string | null {
+  return state.crown === null ? null : `crown.style.${styleOf(state.crown.trade)}`;
 }
 
 /** Hacia dónde tiraría la aldea con ese candidato, por su oficio de hoy. */

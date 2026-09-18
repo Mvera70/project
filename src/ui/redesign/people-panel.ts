@@ -29,7 +29,7 @@
 // `.ui-shell-content`, que ya pone su propio fondo, borde, sombra y cierre
 // (`shell.css`, `shell.ts`).
 import { renderUiText } from '@engine/chronicle/render';
-import { roleKeyFor } from '@derive/crown';
+import { crownStyleKey, isKing, roleKeyFor } from '@derive/crown';
 import { isHere, population } from '@engine/people/demography';
 import { ageOf } from '@engine/people/villagers';
 import type { GameState, Villager } from '@engine/state';
@@ -88,6 +88,50 @@ const STYLE = `
 .people-row span + span { color: var(--skin-ink-faded); font-style: normal; font-size: 12.5px; }
 .people-empty { margin: 0; color: var(--skin-ink-faded);
   font: italic 14px/1.4 var(--skin-font-read); }
+
+/* K-8 · **La fila del rey.** Del dueño del diseño, 18 sep 2026: «cuando
+   selecciones un rey, tiene que destacar después en la lista. No se ve rey en
+   chiquitito, parece uno más». Y tenía razón: la palabra salía por la misma
+   línea que el oficio de cualquiera —cursiva de trece píxeles, tinta suave—,
+   así que coronar a alguien cambiaba una palabra donde antes decía «leader» y
+   nada más.
+
+   Lo que la separa son tres cosas, ninguna inventada: el **lacre** del medallón
+   (\`--skin-red-deep\`, el de la gota de cera del prototipo 02, el único rojo de
+   la paleta que no es papel), la **corona** del sprite con la palabra en
+   versalitas de oro sobre ese lacre —una chapa, no una cursiva— y **el primer
+   sitio de la lista**. Y una cuarta que es información y no adorno: debajo, a
+   qué atiende ese rey (\`crown.style.*\`), que es lo que de verdad cambia en la
+   aldea según a quién se corone. */
+.people-row--king { min-height: 72px; background-color: var(--skin-parchment);
+  box-shadow: inset 5px 0 0 var(--skin-red-deep), inset 0 0 0 1px var(--skin-rule-gold);
+  /* **El canto de una placa y no el de un chip**, y se vio en la captura: con
+     el recorte rasgado de las demás filas, el filete de lacre del canto
+     izquierdo se partía en dos cuñas —el chip muerde un 3 % justo a media
+     altura— y parecía un desperfecto. El rasgado de placa apenas se sale del
+     1 %, así que el filete sale recto y la fila del rey se lee como lo que es:
+     una placa entre tiras. */
+  clip-path: var(--skin-deckle-plate); }
+.people-row--king b { font-size: 17.5px; }
+.people-row--king .skin-medallion { background-color: var(--skin-red-deep);
+  background-image: none; color: var(--skin-gold-lit);
+  box-shadow: inset 0 0 0 2px var(--skin-gold); }
+/* La chapa: \`inline-flex\` con dos clases para ganarle al \`display: block\` de
+   \`.people-row span\`, que es lo que hace de cada línea un renglón. */
+.people-row .people-crown { display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 4px; padding: 2px 9px 2px 7px;
+  background: var(--skin-red-deep); color: var(--skin-gold-lit);
+  box-shadow: inset 0 0 0 1px var(--skin-rule-gold);
+  font: 600 12px/1.6 var(--skin-font-voice);
+  letter-spacing: var(--skin-track-label); text-transform: uppercase;
+  font-style: normal; }
+.people-row .people-crown .skin-icon { width: 14px; height: 14px; flex: 0 0 14px; }
+/* La palabra va en un \`<i>\` —es una voz distinta dentro de la fila, no énfasis—
+   y hay que devolverle la vertical: el navegador la inclina por su cuenta y una
+   versalita de Cinzel inclinada parece un error de la fuente. */
+.people-row .people-crown i { font-style: normal; }
+.people-row .people-king-lean { margin-top: 3px; color: var(--skin-ink-soft);
+  font: italic 13px/1.35 var(--skin-font-read); }
 `;
 
 function ensureStyle(): void {
@@ -106,6 +150,21 @@ function ensureStyle(): void {
  */
 export function namedPresent(state: GameState): readonly Villager[] {
   return state.people.villagers.filter((v) => v.named && isHere(v));
+}
+
+/**
+ * K-8 · El rey delante, y los demás en el orden que trae el motor.
+ *
+ * **Es la única clasificación que esta lista hace, y la pidió el dueño del
+ * diseño**: «cuando selecciones un rey, tiene que destacar después en la
+ * lista». Buscarlo entre veintisiete tiras iguales no es destacar. El resto de
+ * la lista sigue como estaba —orden del motor, ninguna ordenación inventada—,
+ * así que sin corona esto devuelve exactamente lo que recibe.
+ */
+export function kingFirst(state: GameState, people: readonly Villager[]): readonly Villager[] {
+  const crowned = people.find((v) => isKing(state, v));
+  if (crowned === undefined) return people;
+  return [crowned, ...people.filter((v) => v.id !== crowned.id)];
 }
 
 /** Cuántos nombrados enseña la lista, de cuántos habitantes tiene el valle en total. */
@@ -155,10 +214,14 @@ export const peoplePanel: PanelFactory = (actions) => {
   // años); si no cambió, las filas ya montadas se quedan donde están.
   let lastKey = '';
   const render = (state: GameState): void => {
-    const villagers = namedPresent(state);
+    const villagers = kingFirst(state, namedPresent(state));
     const counted = peopleScope(state);
     scope.textContent = renderUiText('people.scope', { named: counted.named, population: counted.population });
-    const key = villagers.map((v) => `${v.id}:${v.name}:${v.role}:${v.traits.join('|')}:${ageOf(v, state.tick)}`).join(',');
+    // K-8 · La corona entra en la llave: coronar no cambia el oficio del que la
+    // recibe —sigue siendo `leader`—, así que sin esto la lista se quedaba con
+    // las filas de antes y el rey no aparecía hasta que alguien cumpliera años.
+    const key = `${state.crown?.id ?? 0}/`
+      + villagers.map((v) => `${v.id}:${v.name}:${v.role}:${v.traits.join('|')}:${ageOf(v, state.tick)}`).join(',');
     if (key === lastKey) return;
     lastKey = key;
     if (villagers.length === 0) {
@@ -185,13 +248,37 @@ export const peoplePanel: PanelFactory = (actions) => {
       // la ficha: son la misma persona vista dos veces, y leerla igual en las
       // dos ahorra el trabajo de volver a situarse.
       name.textContent = `${v.name} · ${renderUiText('inspect.age.short', { age: ageOf(v, state.tick) })}`;
-      const trade = tradeLine(state, v);
-      const stats = document.createElement('span');
-      stats.textContent = trade ?? '';
-      stats.hidden = trade === null;
       const traits = document.createElement('span');
       traits.textContent = traitsLine(v);
-      text.append(name, stats, traits);
+      if (isKing(state, v)) {
+        // La chapa de lacre con la corona, y debajo a qué atiende: las dos cosas
+        // que hacen que un rey se lea como rey y no como un oficio más.
+        row.classList.add('people-row--king');
+        const mark = document.createElement('span');
+        mark.className = 'people-crown';
+        const crown = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        crown.setAttribute('class', 'skin-icon');
+        crown.setAttribute('aria-hidden', 'true');
+        crown.setAttribute('focusable', 'false');
+        const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', '#crown');
+        crown.append(use);
+        const word = document.createElement('i');
+        word.textContent = renderUiText('role.king');
+        mark.append(crown, word);
+        const lean = document.createElement('span');
+        lean.className = 'people-king-lean';
+        const styleKey = crownStyleKey(state);
+        lean.textContent = styleKey === null ? '' : renderUiText(styleKey);
+        lean.hidden = styleKey === null;
+        text.append(name, mark, lean, traits);
+      } else {
+        const trade = tradeLine(state, v);
+        const stats = document.createElement('span');
+        stats.textContent = trade ?? '';
+        stats.hidden = trade === null;
+        text.append(name, stats, traits);
+      }
       row.append(face, text);
       // La identidad viaja por `id`, nunca por el nombre que se lee en la
       // fila: dos aldeanos pueden compartir nombre (AC-9, `docs/ui-redesign/

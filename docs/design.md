@@ -1507,6 +1507,20 @@ Es la casa del rey —se muda a ella y cuenta cinco camas— y arde como cualqui
 casa de madera. Su malla está encargada (`docs/plan-rey.md` §8); hasta que llegue,
 el render la dibuja más alta que una casa y con el tejado burdeos del jefe.
 
+**Y el rey se ve** (K-8). Lo dijo el dueño del diseño al probarlo: «cuando
+selecciones un rey, tiene que destacar después en la lista. No se ve rey en
+chiquitito, parece uno más». Tenía razón: K-5 cambió la palabra —`role.leader`
+pasaba a `role.king`— y la palabra salía en la misma cursiva de trece píxeles con
+la que la fila dice «midwife», así que coronar a alguien no se veía. Lo que lo
+separa ahora, en la lista de la gente y en su ficha, son cuatro cosas y ninguna es
+un color nuevo: el **medallón en lacre** con el aro de oro, la **corona** del
+sprite con la palabra en versalitas sobre esa cera —una chapa, no una cursiva—, el
+**primer sitio de la lista** (la única ordenación que esa pantalla hace) y, debajo,
+**a qué atiende el valle con él** (`crown.style.*`), que es información y no
+adorno: es lo que de verdad cambia según a quién se corone. La condición la da
+`isKing` en `derive/crown.ts`, para que una cadena de contenido no acabe siendo la
+condición de un pintado.
+
 ---
 
 ### 7.4b La plaza (P-1 y P-2, 18 sep 2026)
