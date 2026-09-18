@@ -25,7 +25,27 @@
    (velo a 13) para que siempre haya una salida a la vista (U-14). La
    encrucijada y el epitafio la esconden igual que hacían con la barra vieja. */
 .ui-shell-stack { position: fixed; left: 0; right: 0; bottom: 0; z-index: 14;
-  display: flex; flex-direction: column; pointer-events: none; }
+  display: flex; flex-direction: column; pointer-events: none;
+  /* UI-V10 · **la hoja se levanta un poco del prado**, que es lo que el dueno
+     del diseno echo en falta: «la hoja que esta pegada al corte esta muy muy
+     pegada; podria tener una pequena elevacion en esa zona, como estaba hecho
+     en el prototipo».
+
+     Va **aqui y no en la bandeja** por el orden de pintado: el canto rasgado es
+     una mascara (§6 del estandar) y una mascara se aplica **despues** del
+     filtro, asi que un `drop-shadow` puesto en la propia hoja se lo recorta su
+     propia mascara y no se ve nada fuera de su caja. Puesto en el padre, el
+     filtro ve a la hoja **ya recortada** y la sombra sigue el desgarro diente a
+     diente, que es justo lo que una tira recta no puede hacer.
+
+     Y es `drop-shadow` y no `box-shadow` por lo mismo: una caja proyecta un
+     rectangulo, y el canto de esta hoja no es recto. Dos pixeles hacia arriba
+     con tres de difuminado: en el prototipo 01 el papel bajo el corte esta un
+     11 % mas oscuro que ocho pixeles mas abajo (luminancia 185 contra 207,
+     muestreada en veinte columnas), que es la cuenta de una hoja apenas
+     despegada y no de una tarjeta flotando. */
+  filter: drop-shadow(0 -3px 5px rgba(27, 22, 19, .45));
+}
 .ui-shell-stack > * { pointer-events: auto; }
 /* VZ-04a · **y el parte de bienvenida, que faltaba.** La pila va en z-index 14
    —por encima de las cuatro superposiciones a propósito, ver arriba— así que
@@ -132,7 +152,10 @@ html.welcome-open .ui-shell-stack { visibility: hidden; }
 /* La trampa de §12 del estandar: una hoja de autor que pone `display` le gana
    al `hidden` del navegador, que no tiene especificidad. */
 .valley-era[hidden] { display: none; }
-.ui-shell-message:empty { min-height: 0; padding: 0; }
+/* El filo sombreado de la bandeja lo pone `.skin-torn-top` (skin.css), que es
+   la clase de las seis superficies del canto; aquí sólo se apaga cuando el
+   hueco está vacío y la bandeja se pliega a cero. */
+.ui-shell-message:empty { min-height: 0; padding: 0; box-shadow: none; }
 /* El mensaje habla del valle —la crónica que acaba de pasar, la pista de las
    órdenes—, así que sólo tiene sitio con el valle en pantalla. Antes de este
    fondo la pista quedaba tapada por el velo opaco de la crónica o la gente

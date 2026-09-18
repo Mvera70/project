@@ -449,6 +449,26 @@
   /* Los dientes llegan hasta y 7: sin este respiro, el primer renglón de la
      sección se queda sin la punta. */
   padding-top: 10px;
+  /** UI-V10 · **y el filo va sombreado, porque una hoja no está pintada sobre
+      el prado.** Lo pidió el dueño del diseño mirando la primera pestaña: «la
+      hoja que está pegada al corte está muy muy pegada; podría tener una
+      pequeña elevación en esa zona, como estaba hecho en el prototipo».
+
+      Y es lo que el prototipo 01 tiene, muestreado en veinte columnas: bajo su
+      canto el papel está un 11 % más oscuro que ocho píxeles más abajo
+      (luminancia 185 contra 207) y vuelve a papel limpio enseguida. Aquí sale
+      182 → 221 en once píxeles, que es esa misma cuenta.
+
+      **Va en la clase y no en la bandeja** para que las seis superficies del
+      canto corten igual, que es de lo que va este estándar. Y **aquí la
+      máscara ayuda**: recorta la sombra al perfil del desgarro, así que el
+      sombreado entra por los dientes en vez de trazar una recta sobre ellos.
+
+      La medida que costó una pasada: **entra a 16 px y no a 7**. El azulejo
+      del desgarro mide 14 y la máscara se come justo esos, o sea exactamente
+      donde vivía una sombra interior de 7 px: el papel pasaba de 221 a 217 de
+      luminancia —un 2 %, invisible— porque se gastaba dentro de lo recortado. */
+  box-shadow: inset 0 16px 9px -10px rgba(27, 22, 19, .4);
 }
 /**
  * **La excepción, y va con su medida.** Desde UI-R3 la crónica vive anidada
@@ -966,8 +986,18 @@
      la meseta y el grupo mide 148 px de ancho pegado al borde, así que cae
      justo encima. Los 50 son esos 37 más los 13 de hierba que el prototipo
      deja entre los círculos y la madera (medido en el prototipo 01: de 12 a 19
-     px según el círculo). */
-  bottom: calc(var(--ui-stack-height, 60px) + 50px);
+     px según el círculo).
+
+     **UI-V10 · y de 50 a 14, porque 37 de esos 50 eran de un listón que ya no
+     existe.** VZ-2 cambió el canto de la bandeja por el desgarro
+     (`.skin-torn-top`), que es una máscara y **no sube nada sobre el papel**:
+     medido en el navegador, `.skin-scroll-edge` mide 0 × 0 y el hueco entre los
+     círculos y la hoja era de 50 px a 390 y a 750. El dueño del diseño lo dijo
+     mirándolo: «tiene que tener un pequeño margen pero tiene demasiado». Los 14
+     son los 12-19 que el prototipo deja de hierba, y coinciden con el alto del
+     azulejo del desgarro, así que los círculos quedan justo por encima del
+     diente más profundo. */
+  bottom: calc(var(--ui-stack-height, 60px) + 14px);
 }
 
 /* ------------------------------------------------- la regleta de velocidad */
