@@ -689,6 +689,48 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       // in a corner of the map — where a 3×3 church can no longer replace it.
       case 'chapel': case 'church': score = [Math.round(rimOffset(p, BUILDING_RULES.CHAPEL_SET_BACK)), Number(!rock), distance(p, centre)]; break;
       case 'smithy': score = [rimOffset(p, 0), -houseDistance]; break;
+      // A4 · **la torre va contra el cerco, por dentro.** Es la tercera parte
+      // de la fila A4 («las torres como mejora del anillo») y el defecto que
+      // arregla se ve desde C2: `watchtower` no tenía caso propio, así que
+      // caía en el `default` —lo más cerca posible de la plaza— y `postsOf`
+      // colgaba de ella un arquero tierra adentro, mirando los tejados.
+      // Medido en doce semillas a ochenta años, veinte torres: **de 10 de 20
+      // pegadas al cerco a 20 de 20**, y la distancia media al muro de 2,2 a
+      // 1,4 celdas —1,4 es el mínimo de una pieza de 2×2 cuyo centro cae media
+      // celda dentro, o sea tocándolo—.
+      //
+      // **No sustituye una pieza de muralla**, y eso es deliberado: la torre
+      // es 2×2 y el anillo tiene una celda de grosor, así que colgarla del
+      // anillo como se cuelga el portón (A2c, `upgradeOf`) taparía dos o tres
+      // tramos y sólo se daría de baja uno — un boquete en el cerco, con
+      // `ringClosed` diciendo que está cerrado. Lo que hace es **pegarse**: el
+      // `onRingRect` de abajo sigue prohibiéndole la línea, y este marcador la
+      // trae a la celda de al lado. Por dentro, porque entre dos sitios igual
+      // de pegados gana el más cercano a la plaza.
+      //
+      // **Y dentro pesa más que pegada**, porque una torre fuera es un arquero
+      // fuera: al primer asalto es una baja de C2 regalada. Aun así **cuatro
+      // de las veinte salen fuera** —semillas 61 y 73— y no por el marcador:
+      // en un valle ya cerrado no queda un solo solar de 2×2 que respete la
+      // calle de §7.4, así que fuera es lo único que hay. Dejarlo así es
+      // deliberado: una torre en la línea del anillo taparía dos o tres
+      // tramos y sólo daría de baja uno (ver arriba), y **un bastión de verdad
+      // —una pieza de cerco que además es torre— es trabajo de A3**, con su
+      // `ringClosed` y su `wallRuns` de la mano. Apuntado en `plan-meta.md`.
+      //
+      // Sin anillo decidido no hay a qué pegarse y vale lo de antes: la torre
+      // llega también por carro (C1) y por encrucijada (§8.4), y esas no
+      // esperan a que el valle tenga cerco.
+      case 'watchtower': {
+        if (wallLine === null) { score = [distance(p, centre)]; break; }
+        const radius = Math.sqrt(distance(p, centre));
+        score = [
+          radius > wallLine ? 1 : 0,
+          Math.round(Math.abs(radius - wallLine)),
+          distance(p, centre),
+        ];
+        break;
+      }
       // §7.4c · **la muralla crece pegada a la muralla.** Primero, que la pieza
       // toque una que ya esté puesta: eso es lo que convierte piezas sueltas en
       // secciones. Después, el ángulo alrededor del centro, que es lo que hace

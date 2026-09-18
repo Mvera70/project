@@ -24,6 +24,7 @@ import { run } from '../src/engine/sim';
 import { foundGame } from '../src/engine/found';
 import { population } from '../src/engine/people/demography';
 import { crownRefusal } from '../src/engine/people/crown';
+import { eraOf } from '../src/derive/era';
 import { ringClosed } from '../src/engine/world/placement';
 import type { GameState } from '../src/engine/state';
 
@@ -68,6 +69,13 @@ const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] = [
   // puerta de `WATCHTOWER_AFTER_RAIDS` decide.
   ['atalaya', (s) => alive(s, 'watchtower') >= 1],
   ['VILLA CERRADA', (s) => ringClosed(s)],
+  // A4 · las dos eras que el valle **es** (§1b, `derive/era.ts`). La tercera es
+  // la villa cerrada de arriba, que es la misma marca.
+  ['ERA: aldea', (s) => eraOf(s) !== 'hamlet'],
+  ['ERA: villa', (s) => eraOf(s) === 'town'],
+  // A4 · y la piedra del cerco, que hasta hoy no llegaba nunca: la encrucijada
+  // de la primera piedra obliga a elegir y la política elige las casas.
+  ['muralla de piedra', (s) => alive(s, 'wall') >= 1],
 ];
 
 const hits = new Map(LADDER.map(([name]) => [name, [] as number[]]));

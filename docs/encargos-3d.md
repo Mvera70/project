@@ -35,6 +35,8 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 | **La avalancha en el portón** (D3b/D5) | La partida se apretuja contra la hoja y la golpea: sesenta golpes y cede | Se ve el grupo empujando contra la puerta y a los que van cayendo, **pero no hay un solo golpe animado**: se pintan con `idle`, quietos contra la madera | **El clip que falta y es el que más se va a mirar de la fase 4**: golpear la puerta con lo que se lleve en las manos. No está en el encargo E1 —que es de arco, lanza y caída— y hace falta. Y la puerta: hoy no se astilla ni se mueve, y cuando cae desaparece de golpe |
 | **El valle tomado** (B3) | El clan entra, se lo lleva todo, rompe el portón y **acaba la partida**: hay un final nuevo (`stormed`) | La crónica lo cuenta y el epitafio dice «The valley was taken». En el valle se ve **el boquete**: el portón y cuatro estacas pasan a ruina, que la pantalla ya sabe pintar | **La escena entera está por hacer y es D6**: la entrada por el boquete, la gente huyendo, lo que arde. Y los muertos: hoy los que defendían desaparecen de la lista de vivos sin que se vea caer a ninguno |
 | **El saqueador que cae** (D2) | Una flecha le acaba la visita: se queda donde le dio (`phase: 'down'`) | **De pie y quieto.** No hay clip de caer, así que un hombre alcanzado en el pecho se lee como un hombre parado | El clip `fall` de E1 —«la última pose tiene que quedarse quieta y creíble»— y después el ragdoll, que sale de Rapier y es D4. Cómo se ve morir, y si hay sangre, es decisión del dueño (E4) |
+| **La muralla de piedra** (A4) | El cerco cerrado abre la piedra y la aldea **dobla su estacada**: 10 de 12 valles, 65 tramos en la semilla 91, desde las 249 h de reloj | `wall.glb` existe y se usa, así que la pieza de piedra **se ve** — y es la primera vez, porque hasta A4 ningún valle levantaba una: la malla llevaba en el juego desde G-10 sin dibujarse en una sola partida | Dos cosas, y ninguna es una malla: **la obra** —una pieza de piedra en construcción se ve igual que cualquier otra obra, y aquí lo que pasa es que se derriba una estaca y se levanta un muro en su sitio— y **el cambio**: la estaca desaparece y el muro aparece de golpe, sin astillas ni transición, que es el mismo hueco que la segunda puerta de A2c. Y el cerco mezclado —madera y piedra en el mismo anillo mientras la obra avanza— **no se ha mirado nunca en una captura** |
+| **La era del valle** (A4, A5) | El valle es caserío, aldea o villa cerrada, y eso ya se puede preguntar (`derive/era.ts`) | La cabecera lo dice desde A5 | **Nada en el valle cambia de aspecto al cambiar de fase.** No es una malla: es que una villa cerrada se vea como una villa —el camino más pisado, la plaza con más cosas, humo en más tejados— y eso es material de una ronda de ambiente, no de Blender |
 | ~~**Guardia en la atalaya**~~ (C1, C2) | La aldea sube de una a siete manos al cerco la víspera de un asalto | **Sube gente desde C2** (18 sep): ocupan el portón, la atalaya y la muralla junto a la puerta | Lo que falta es de arte, y son tres cosas: **el clip `bow_draw`** (E1) —hoy un arquero se pinta con `idle`, de pie y sin arco—, **la lanza y el arco en la mano** (E2: no existe ninguna malla de arma) y **el adarve**: hoy se está **detrás** de la estaca, no encima, porque la celda de la muralla está cerrada para un cuerpo. Una muralla con paso de ronda (E3) es lo que deja subirse de verdad |
 
 ## 2 · Mallas que faltan
@@ -50,7 +52,9 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 
 **Y las que sí están, para no volver a dudarlo:** `watchtower.glb` y `wall.glb`
 existen y se usan; la atalaya de C1 se levanta y se ve. Lo que no hay es nadie
-dentro.
+dentro. **Y `wall.glb` dejó de ser malla muerta el 18 sep** (A4): hasta ese día
+ningún valle levantaba una sola pieza de piedra, así que la malla estaba en el
+juego desde G-10 sin aparecer en una partida.
 
 ## 3 · Animación y efecto
 

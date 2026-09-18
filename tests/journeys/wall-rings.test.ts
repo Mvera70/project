@@ -27,6 +27,7 @@ import { BUILDING_RULES, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { ringClosed } from '@engine/world/placement';
 import { defenceGates } from '@derive/defence-gates';
+import { eraOf, type Era } from '@derive/era';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { destroyBuilding } from '@engine/world/buildings';
@@ -394,5 +395,60 @@ describe('A2c · el cerco tiene una capa y dos puertas que sirven', () => {
     // cayeran todos los valles, esto lo diría en vez de pasar sin medir nada.
     expect(measured, `valles en pie que se pudieron medir: ${measured} de ${TEN.length}`)
       .toBeGreaterThanOrEqual(TEN.length / 2);
+  });
+});
+
+describe('A4 · la era y la muralla de piedra', () => {
+  // **La era jugada.** Vive aquí y no en la suite rápida porque son seis
+  // partidas de ochenta años; la versión de estado —qué marca cada era, que no
+  // vuelve atrás cuando el valle pierde lo que la marcaba— está en
+  // `tests/fast/era.test.ts` y es instantánea.
+  const ORDER: readonly Era[] = ['hamlet', 'village', 'town'];
+  const A4_SEEDS = [7, 23, 36, 41, 79, 91];
+
+  it('la era nunca da un paso atrás en ochenta años', () => {
+    // La propiedad de `derive/era.ts` contra el juego y no contra un estado a
+    // mano: con rayos, riadas y asaltos por medio, una aldea que perdió su
+    // fragua sigue siendo una aldea. Con `run` porque un bucle de `tick` no
+    // contesta encrucijadas (la trampa escrita en CLAUDE.md).
+    for (const seed of A4_SEEDS) {
+      const state = foundGame(seed);
+      let seen = 0;
+      for (let year = 0; year < 80; year += 1) {
+        run(state, TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+        const now = ORDER.indexOf(eraOf(state));
+        expect(now, `semilla ${seed}, año ${year}: la era retrocedió`)
+          .toBeGreaterThanOrEqual(seen);
+        seen = now;
+        if (state.ended !== null) break;
+      }
+    }
+  });
+
+  it('y las tres eras son las tres fases: el valle que cierra su cerco las recorre', () => {
+    // **La medida que A4 existe para mover.** Antes de A4 la muralla de piedra
+    // no la tenía **ningún** valle de los doce medidos: la única puerta era la
+    // encrucijada de la primera piedra, que obliga a elegir entre la muralla y
+    // las casas, y las diez veces que se desbloqueó se eligieron las casas.
+    // Con el cerco cerrado como segunda puerta: **10 de 12 valles con muralla
+    // de piedra**, 65 tramos en la semilla 91, y la escalera del ritmo la pone
+    // a las 249 h de reloj — la misma hora que la villa cerrada, que es lo que
+    // el contrato dice (`stoneWallOpen`).
+    let towns = 0;
+    let withStone = 0;
+    for (const seed of A4_SEEDS) {
+      const state = foundGame(seed);
+      run(state, TIME.WEEKS_PER_YEAR * 80, 'prudent', CATALOG);
+      if (eraOf(state) !== 'town') continue;
+      towns += 1;
+      // Una villa cerrada ha pasado por aldea: la fragua es lo que abre la
+      // piedra, así que no se puede cerrar un cerco sin haber sido aldea.
+      expect(state.buildings.some((b) => b.kind === 'smithy'),
+        `semilla ${seed}: villa sin haber sido aldea`).toBe(true);
+      if (state.buildings.some((b) => b.kind === 'wall')) withStone += 1;
+    }
+    expect(towns, 'valles que cerraron su cerco').toBeGreaterThanOrEqual(2);
+    expect(withStone / towns, `muralla de piedra en ${withStone} de ${towns} villas`)
+      .toBeGreaterThanOrEqual(0.5);
   });
 });

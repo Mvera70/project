@@ -19,6 +19,8 @@ import { describe, expect, it } from 'vitest';
 import { BUILDING_RULES, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
+import { placeBuilding } from '@engine/world/placement';
+import { plazaCentre } from '@engine/world/plaza';
 import { nextProject } from '@engine/world/works';
 import type { GameState } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
@@ -84,6 +86,25 @@ describe('C3 · la atalaya que la aldea se levanta sola', () => {
       });
     }
     expect(wantsTower(state), 'con las dos en pie, no pide otra').toBe(false);
+  });
+
+  it('A4 · y va contra el cerco, no en medio del pueblo', () => {
+    // **La tercera parte de la fila A4** («las torres como mejora del anillo»),
+    // y el defecto se ve desde C2: `postsOf` cuelga un arquero de cada torre,
+    // así que una torre tierra adentro es un arquero mirando tejados. Medido en
+    // doce semillas a ochenta años, veinte torres: de 10 de 20 pegadas al cerco
+    // a 20 de 20, y la media al muro de 2,2 a 1,4 celdas.
+    //
+    // El listón es «pegada», no un radio: 1,4 es el mínimo de una pieza de 2×2
+    // cuyo centro cae media celda dentro del muro, o sea tocándolo, y fijar más
+    // sería fijar el rasterizado del anillo.
+    const state = quarrying();
+    const spot = placeBuilding(state, 'watchtower');
+    expect(spot, 'hay sitio para una torre').not.toBe(null);
+    const centre = plazaCentre(state.plaza);
+    const radius = Math.hypot(spot!.x + 1 - centre.x, spot!.y + 1 - centre.y);
+    expect(Math.abs(radius - state.ring!), `radio ${radius.toFixed(1)} contra anillo ${state.ring}`)
+      .toBeLessThanOrEqual(2);
   });
 
   it('y sigue llegando por donde llegaba: el carro y la encrucijada', () => {

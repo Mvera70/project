@@ -35,11 +35,37 @@ export function upgradeSpot(
   return null;
 }
 
+/**
+ * A4 · **El cerco cerrado abre la muralla de piedra.** §1b, fase 3.
+ *
+ * Hasta A4 la piedra sólo se abría por la encrucijada de la primera piedra
+ * (A.16, `catalog/succession.ts`), y esa encrucijada **obliga a elegir**: la
+ * muralla o las casas, una de las dos y para siempre. Medido en doce semillas a
+ * ochenta años: se desbloquea en diez, y **las diez eligen las casas** —dan doce
+ * de ánimo contra seis y sin bandera mala— así que **cero valles llegaban a
+ * tener un solo muro de piedra**. La `wall` de §7.2 era contenido muerto: tenía
+ * tabla, mejora, dibujo de crónica y ni un solo uso.
+ *
+ * Eso se escribió cuando la muralla era un adorno. Desde §1b es **la fase 3 de
+ * la meta** y lo que decide si el valle cae, así que dejarla detrás de un cara o
+ * cruz contra un +12 de ánimo hacía inalcanzable el objetivo del proyecto por la
+ * vía de tomar la decisión razonable.
+ *
+ * Ahora hay dos caminos y no uno: la encrucijada sigue abriéndola **antes**
+ * —eso es lo que se compra con la bandera de las casas frías— y **un cerco
+ * cerrado la abre por sí solo**, que es lo que haría un pueblo que ya tiene su
+ * anillo y le sobra piedra. La marca es la de A1 (`wall_closed`, permanente), o
+ * sea que no hay campo nuevo ni migración.
+ */
+function stoneWallOpen(state: GameState): boolean {
+  return flagActive(state, 'wall_unlocked') || state.flags['wall_closed'] !== undefined;
+}
+
 /** The order is normative: houses, palisades, chapel. Source ids break ties. */
 export function nextUpgrade(state: GameState): Upgrade | null {
   for (const kind of ['stone_house', 'wall', 'church'] as const) {
     if (kind === 'stone_house' && !flagActive(state, 'stone_house_unlocked')) continue;
-    if (kind === 'wall' && !flagActive(state, 'wall_unlocked')) continue;
+    if (kind === 'wall' && !stoneWallOpen(state)) continue;
     for (const source of [...state.buildings].sort((a, b) => a.id - b.id)) {
       if (source.lostTick !== null || source.kind !== BUILDINGS[kind].upgradeOf) continue;
       if (state.works.some((work) => work.upgradeOf === source.id)) continue;
