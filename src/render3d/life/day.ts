@@ -8,6 +8,7 @@ import { gap, fitsCircle, type Terrain, type Point } from './body';
 import { pathTo } from './navigate';
 import { homeRoutine } from './home';
 import { OFFERS, placedOffer, type Place } from './offers';
+import { isPost } from './garrison';
 
 export interface DayJob { readonly place: string; readonly offer: string; readonly seat?: number }
 export interface DayPlan { readonly role: Role | null; readonly job: DayJob | null }
@@ -96,10 +97,43 @@ export function dayPlans(
     const age = ageOf(v, state.tick);
     return age >= LIFE.ADULT[0] && age <= LIFE.ADULT[1];
   });
+  /** De dónde sale cada uno al empezar la jornada: su puerta, o donde nació. */
+  const fromOf = (v: typeof alive[number]): Point | undefined => {
+    const home = state.buildings.find(b => b.id === v.homeId && b.lostTick === null);
+    return home === undefined ? starts?.get(v.id) ?? places[0]?.at : homeRoutine(home, land).approach;
+  };
+
+  // C2 · **El cerco va antes que el oficio**, y es la única cosa de esta función
+  // que se salta el reparto de §7.3. La víspera de un asalto el herrero deja la
+  // fragua: `garrisonOf` ya ha decidido cuántas manos sube la aldea —como mucho
+  // un tercio de los adultos— y en qué orden importan los puestos, así que lo
+  // que queda aquí es **quién**, y se decide por cercanía, igual que se decide
+  // quién va a qué tajo. Nadie se coloca con el dedo (§1b).
+  //
+  // En una aldea en paz esta lista está vacía: `life/garrison.ts` no crea
+  // ningún puesto si no hay alerta, así que esto no cuesta nada los otros días.
+  const posted = new Map<number, DayJob>();
+  for (const place of places.filter(p => isPost(p.id))) {
+    const offer = place.offers[0];
+    if (offer === undefined) continue;
+    const nearest = adults
+      .filter(v => !posted.has(v.id))
+      .map(v => ({ v, from: fromOf(v) }))
+      .filter((c): c is { v: typeof adults[number]; from: Point } => c.from !== undefined)
+      .sort((a, b) => gap(a.from, place.at) - gap(b.from, place.at) || a.v.id - b.v.id);
+    for (const candidate of nearest) {
+      const job = choose(candidate.from, [place], offer.id);
+      if (job === null) continue;
+      posted.set(candidate.v.id, job);
+      break;
+    }
+  }
+
   const idle = new Map<number, Point>();
   for (const v of alive) {
-    const home = state.buildings.find(b => b.id === v.homeId && b.lostTick === null);
-    const from = home === undefined ? starts?.get(v.id) ?? places[0]?.at : homeRoutine(home, land).approach;
+    const guarding = posted.get(v.id);
+    if (guarding !== undefined) { plans.set(v.id, { role: v.role, job: guarding }); continue; }
+    const from = fromOf(v);
     const age = ageOf(v, state.tick); let job: DayJob | null = null;
     if (from !== undefined && age >= LIFE.ADULT[0] && age <= LIFE.ADULT[1]) {
       const role = v.role;

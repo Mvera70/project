@@ -872,6 +872,76 @@ export const THREAT = {
   WALLED_SACK: 0.25,
 } as const;
 
+/**
+ * C2 · **La guarnición: quién sube a la muralla cuando bajan.**
+ *
+ * §1b lo dice literal —«el tower defense es literal: las torres son aldeanos
+ * en la muralla disparando»— y con la regla que manda sobre todo lo demás:
+ * **nada se coloca con el dedo**. Aquí no hay una orden del jugador; hay una
+ * cuenta de cuántas manos deja la aldea de hacer lo suyo para ir al cerco, y de
+ * con qué suben, que sale de lo que se le dio (C1: `arms`, `bows`, `tower`).
+ *
+ * Quien va lo elige la aldea —el reparto de la jornada, por cercanía al puesto,
+ * como reparte los oficios (`life/day.ts`)— y no esta tabla.
+ */
+export const GARRISON = {
+  /**
+   * Cuántas semanas antes de que lleguen se sube al cerco.
+   *
+   * TUNE: dos. El aviso de B2 llega **ocho** semanas antes (catorce con
+   * atalaya), y ocho semanas de gente plantada en la muralla son casi dos horas
+   * de reloj a ×1 en las que la aldea no siembra ni tala: eso no es una
+   * guarnición, es una aldea paralizada. Dos semanas son veintiocho minutos de
+   * reloj, que es lo que dura una víspera.
+   *
+   * Y el aviso sigue haciendo lo suyo durante las otras seis: es la encrucijada
+   * de B2 —esconder, pagar, esperar— la que ocupa esa espera.
+   *
+   * Medido en diez semillas jugadas sesenta años dando la defensa en cuanto se
+   * puede: **la primera guardia sube a las 59–126 h de reloj**, y sube **una
+   * sola mano** —la del portón— porque a esa altura el valle todavía no ha
+   * podido pagar ni lanzas ni arcos. La guarnición de siete llega después, con
+   * lo dado.
+   */
+  ALERT_WEEKS: 2,
+  /**
+   * Las manos que sube una aldea sin nada dado: **una**, la del portón.
+   *
+   * No es cero a propósito. Un pueblo que sabe que bajan pone a alguien en la
+   * puerta aunque no tenga con qué; lo que no tiene es con qué pelear, y eso lo
+   * deciden los medios de C1. Que la defensa se construya **dando** significa
+   * que sin dar nada hay un vecino mirando el camino, no que no haya nadie.
+   */
+  BASE_HANDS: 1,
+  /** Lo que suman las lanzas de la herrería (`arms`, C1). */
+  ARMS_HANDS: 2,
+  /** Lo que suman los arcos (`bows`, C1): los que de verdad disparan (D2). */
+  BOWS_HANDS: 3,
+  /** Y el herrero, que las hizo, sube también. */
+  SMITH_HANDS: 1,
+  /**
+   * Lo que pone de más un rey herrero.
+   *
+   * K-2 ya hace que ese rey levante muralla sin esperar amenaza; esto es la
+   * otra mitad de la misma frase del dueño («si eliges al herrero, pues haces
+   * más armas») en un juego donde las armas son la muralla y quien la ocupa.
+   */
+  KING_HANDS: 2,
+  /**
+   * Y el techo de verdad: **que la aldea no deje de vivir por estar de guardia.**
+   *
+   * TUNE: un tercio de los adultos, y lo medido dice que en un valle hecho **no
+   * llega a morder**: con todo dado (lanzas, arcos, fragua) suben **siete** en
+   * las diez semillas, que es del 13 % al 30 % de sus adultos. Donde manda es
+   * en el caserío, que es para lo que está: una aldea de nueve adultos sube
+   * tres y no siete, y sigue sembrando.
+   *
+   * Se mide en adultos y no en población porque los niños y los viejos no
+   * suben (`LIFE.ADULT`).
+   */
+  MOST_SHARE: 1 / 3,
+} as const;
+
 export const MIGRATION = {
   ARRIVE_CHANCE: 0.3,
   // TUNE: **cada cuántas semanas se pregunta si llega alguien** (B-1, 18 sep

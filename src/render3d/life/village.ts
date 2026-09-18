@@ -28,6 +28,7 @@ import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
+import { garrisonPlaces, type Manned } from './garrison';
 import { commons } from './places';
 import {
   decide, failedSeatKey, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK, SHUN_STEPS,
@@ -260,6 +261,16 @@ export interface Village {
    */
   readonly raiders: readonly Raider[];
   /**
+   * C2 · Los puestos del cerco ocupados hoy, con su arma y su puesto (§1b).
+   *
+   * Vacía casi siempre, por lo mismo que `raiders`: sólo la víspera de un
+   * asalto y el día que llegan. Va aquí y no dentro de `dwellers` porque un
+   * puesto no es una persona: es un sitio con un arma, y quién está en él lo
+   * dice el reparto de la jornada. **Lo que D2 necesita** para saber desde
+   * dónde y con qué se dispara sale de esta lista.
+   */
+  readonly manned: readonly Manned[];
+  /**
    * IA-5: la cuenta de la visita del lobo, del mismo tipo que `stories` —
    * episodios, no pasos—: cuántas veces ha aparecido (a lo sumo una por
    * jornada), cuántas ha llegado a notarla de verdad una gallina, cuántas se
@@ -460,6 +471,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     if (near > most) { most = near; heart = place.at; }
   }
   const shore = reachableFrom(land, heart);
+  // C2 · **Los puestos del cerco, si hoy hay alerta.** Entran en la lista de
+  // sitios como uno más —eso es todo lo que hace falta para que el reparto de la
+  // jornada los ocupe (`day.ts`)— y sólo existen la víspera de un asalto y el
+  // día que llegan, porque `garrisonOf` sólo los da entonces. Van después del
+  // corazón a propósito: el corazón se calcula con los sitios de la aldea, y una
+  // guardia en la muralla no es un sitio donde viva nadie.
+  const manned = garrisonPlaces(state, land, heart, shore);
+  places.push(...manned.map((post) => post.place));
   // **Y sólo cuentan los sitios de esta orilla.** El río no se cruza, así que un
   // sitio del otro lado no es un sitio para esta gente: dejar a alguien allí era
   // condenarle a andar sin llegar nunca, y se veía — medido, hasta el 83 % de la
@@ -510,8 +529,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     .filter((place): place is Place => place !== null);
   /** Si el motor ha convocado a la aldea hoy y hay dónde reunirse. */
   const summoned = summons.length > 0;
+  // C2 · **y el cerco va en las dos ramas.** Una reunión sustituye los sitios de
+  // la aldea a propósito (arriba), pero una guardia no es un sitio al que se va
+  // por gusto: si el motor convocó a la aldea la misma semana que baja el clan,
+  // la reunión es de los que no están en la muralla. Sin esto, los puestos se
+  // caían de la lista que reparte la jornada y **nadie subía** — medido en la
+  // semilla 11: siete puestos con sitio y cero asignados.
   const mine = summoned
-    ? summons
+    ? [...summons, ...manned.map((post) => post.place)]
     : [
       ...places,
       ...beasts.map((beast) => beast.gift),
@@ -744,6 +769,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     },
 
     get raiders(): readonly Raider[] { return raiders; },
+
+    get manned(): readonly Manned[] { return manned; },
 
     get wildlife(): readonly Animal[] {
       return wolf !== null && wolf.phase !== 'gone'

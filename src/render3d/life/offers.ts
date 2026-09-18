@@ -128,6 +128,31 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   /** Guardar una carga de la cosecha; sólo la asigna la rutina de la semana 35. */
   'deliver-grain': { id: 'deliver-grain', reach: 0.9, seats: 2, gives: { duty: 0.35 }, seconds: [2, 4], routineOnly: true },
 
+  // C2 · Los dos puestos del cerco. design.md §1b: «las torres son aldeanos en
+  // la muralla disparando». Quién sube lo dice `derive/garrison.ts` y dónde se
+  // pone `life/garrison.ts`; esto es sólo lo que se hace ahí.
+  //
+  // Tres cosas los distinguen de todo lo demás de esta tabla:
+  //
+  //  · **`routineOnly`**, y es lo que impide que la aldea se vacíe. Sin él, un
+  //    puesto es una oferta de deber alto que cualquiera con la jornada sin
+  //    cumplir puede elegir, y lo que se vería es media aldea subida al cerco
+  //    un martes cualquiera. Sube quien el reparto manda (`day.ts`).
+  //  · **Aforo uno.** Un puesto es de uno: el sitio se lo da `garrison.ts`
+  //    (`placedOffer` con la plaza puesta a mano) y no un corro alrededor de la
+  //    estaca, que por el otro lado es campo abierto.
+  //  · **Lo que dan es deber y nada más**, como el tajo. Estar de guardia no
+  //    entretiene, no da compañía y no descansa: es un turno.
+  //
+  // `seconds` es el más largo de la tabla después de la reunión —de uno a dos
+  // minutos escénicos— porque una guardia no se hace en tandas de diez
+  // segundos: quien sube se queda, y `RETHINK` (45 pasos) le dejaría bajarse
+  // a beber en cuanto le picara la sed.
+  /** Sujetar el portón con una lanza. */
+  guard: { id: 'guard', reach: 0.8, seats: 1, gives: { duty: 1 }, seconds: [60, 120], routineOnly: true },
+  /** Vigilar el camino con un arco tensado. El que dispara en D2. */
+  archer: { id: 'archer', reach: 0.8, seats: 1, gives: { duty: 1 }, seconds: [60, 120], routineOnly: true },
+
   // V-11 · La reunión que el motor convoca (§11.8). No es una oferta que nadie
   // elija por gusto: es la orden de una decisión del jugador puesta en el sitio
   // que el motor dice, y `life/staging.ts` es quien la monta.

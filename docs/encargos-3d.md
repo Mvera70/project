@@ -30,7 +30,7 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 | **La segunda puerta, abierta en la muralla hecha** (A2c) | El jugador paga una puerta y la aldea **tira un tramo del cerco** para colgarla: la estaca se da de baja el día que la puerta se termina | La estaca desaparece y la puerta aparece en su sitio, sin transición | El derribo: el tramo cayendo, o al menos el hueco marcado mientras la obra dura. Y una puerta en obra hoy se ve como cualquier otra obra |
 | **Las armas** (C1) | La aldea se lleva un cuarto menos de golpe | Nada | Lanzas apoyadas en la herrería, o gente que las lleva. **Ninguna malla de arma existe** |
 | **Los arcos** (C1) | El valle tienta menos | Nada | Arcos en la cerca, o alguien practicando en el vado |
-| **Guardia en la atalaya** (C1) | — | La atalaya está, **vacía** | Alguien arriba mirando el camino. Es capa de vida (C2), no Blender |
+| ~~**Guardia en la atalaya**~~ (C1, C2) | La aldea sube de una a siete manos al cerco la víspera de un asalto | **Sube gente desde C2** (18 sep): ocupan el portón, la atalaya y la muralla junto a la puerta | Lo que falta es de arte, y son tres cosas: **el clip `bow_draw`** (E1) —hoy un arquero se pinta con `idle`, de pie y sin arco—, **la lanza y el arco en la mano** (E2: no existe ninguna malla de arma) y **el adarve**: hoy se está **detrás** de la estaca, no encima, porque la celda de la muralla está cerrada para un cuerpo. Una muralla con paso de ronda (E3) es lo que deja subirse de verdad |
 
 ## 2 · Mallas que faltan
 
