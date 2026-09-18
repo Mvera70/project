@@ -2266,6 +2266,35 @@ export const UI_BANK: Record<string, string> = {
   'cart.no.who': 'Not that one.',
   'cart.no.already': 'The valley already has one.',
   'cart.no.room': 'No room in the pen.',
+
+  // ---------------------------------------------------------------------------
+  // C4 · **El motivo, dicho para la cosa que se pide.**
+  //
+  // El carro busca primero `cart.no.<motivo>.<cosa>` y cae a `cart.no.<motivo>`
+  // si no está, así que aquí sólo se escribe lo que la frase general dice mal.
+  // Y decía mal dos cosas, las dos nacidas de que los medios de defensa de C1
+  // reutilizan motivos escritos para los cerdos:
+  //
+  //  · **`room` era «no room in the pen»** — escrito para la pocilga— y desde
+  //    C1/A2b lo devuelven también la atalaya (no cabe o ya hay tope), el
+  //    portón (no hay dónde abrirlo que sirva) y el par de manos (no hay cama).
+  //    A quien pide una segunda puerta se le contestaba que el corral está
+  //    lleno.
+  //  · **`feasting` no existía**, así que pedir un segundo barril mientras dura
+  //    la fiesta pintaba `[cart.no.feasting]` en pantalla: un corchete con una
+  //    clave dentro, que es el único fallo de este módulo que el jugador ve.
+  //
+  // `already` se deja general a propósito: «the valley already has one» vale
+  // para el arado, el hacha y la reliquia. Para los tres de defensa no —no se
+  // tiene «uno» de armas— así que llevan la suya.
+  // ---------------------------------------------------------------------------
+  'cart.no.feasting': 'They are still drinking the last one.',
+  'cart.no.room.tower': 'Nowhere left to raise one.',
+  'cart.no.room.gate': 'Nowhere in the wall a gate would help.',
+  'cart.no.room.hand': 'Nowhere for them to sleep.',
+  'cart.no.already.arms': 'The smithy has made them already.',
+  'cart.no.already.bows': 'The valley shoots back already.',
+  'cart.no.already.tower': 'One already watches the road.',
   // La línea de estado de la tira (`src/ui/doing.ts`). **Interfaz y no crónica**:
   // una sola forma por clave, sin variantes, porque una etiqueta que cambia de
   // palabras cada vez que se mira no es una etiqueta. Presente, corta, y dicha

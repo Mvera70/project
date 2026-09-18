@@ -107,6 +107,18 @@ interface Row {
  * El carro. `actions.give` es lo único que escribe: el panel no toca el estado
  * ni sabe qué pasa después (`contracts.ts`).
  */
+/**
+ * C4 · El motivo de una negativa, con la frase de esa cosa si la tiene.
+ *
+ * `renderUiText` devuelve la clave entre corchetes cuando falta, y eso es
+ * exactamente lo que hay que detectar para caer a la frase general: es la misma
+ * señal que `ui-milestones` y `ui-epitaph` usan para vigilar el banco.
+ */
+function reasonFor(id: MeansId, refusal: string): string {
+  const mine = renderUiText(`cart.no.${refusal}.${id}`);
+  return mine.startsWith('[') ? renderUiText(`cart.no.${refusal}`) : mine;
+}
+
 export function cartPanel(actions: UiActions): UiPanel {
   ensureStyle();
   const element = document.createElement('section');
@@ -172,7 +184,12 @@ export function cartPanel(actions: UiActions): UiPanel {
   // es la decisión más grande del carro: se paga una vez por generación y no se
   // deshace.
   const crownBox = document.createElement('div');
-  crownBox.className = 'skin-plate skin-plate--card cart-row';
+  // C4 · **y con su propia clase**, que hacía falta: la corona llevaba
+  // `cart-row` a secas, así que contar las filas del carro contaba once cuando
+  // los medios son diez, y el recorrido que vigila esta pantalla se quedó rojo
+  // el día que A2b añadió la segunda puerta. Una fila que no es una cosa que se
+  // da tiene que poder distinguirse de las que sí.
+  crownBox.className = 'skin-plate skin-plate--card cart-row cart-row--crown';
   const crownHead = document.createElement('div');
   crownHead.className = 'cart-row-head';
   const crownName = document.createElement('h3');
@@ -260,7 +277,11 @@ export function cartPanel(actions: UiActions): UiPanel {
         // **El motivo, escrito.** Un botón apagado sin razón es un juego que no
         // contesta; es la misma regla que E4 puso en las órdenes («te he
         // entendido y no puedo») y lo único que se conserva de ellas.
-        const why = refusal === null ? '' : renderUiText(`cart.no.${refusal}`);
+        // C4 · **y dicho para la cosa que se pide.** Primero la frase de esa
+        // cosa y, si no la tiene, la general: los medios de defensa de C1
+        // reutilizan los motivos de los cerdos, así que a quien pedía una
+        // segunda puerta se le contestaba «no room in the pen».
+        const why = refusal === null ? '' : reasonFor(id, refusal);
         if (row.why.textContent !== why) row.why.textContent = why;
         row.why.hidden = refusal === null;
       }

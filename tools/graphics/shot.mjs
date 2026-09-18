@@ -265,7 +265,14 @@ if (endedCause !== '') {
   await tab.waitForTimeout(open === 'stone' ? 1200 : 3600);
 }
 
-if (open === 'orders') await tab.locator('.valley-orders-now').click().catch(() => {});
+// C4 · `--open cart` abre el carro y **espera a que esté puesto**. Con `--open
+// orders` la captura salia con el valle: se pulsaba y se fotografiaba 300 ms
+// despues, sin comprobar que la seccion hubiera montado. Esperar al elemento es
+// lo que hace que la foto sea una prueba y no una casualidad.
+if (open === 'orders' || open === 'cart') {
+  await tab.locator('.valley-orders-now').click().catch(() => {});
+  await tab.locator('.valley-cart').waitFor({ timeout: 4000 }).catch(() => {});
+}
 if (open === 'speed') await tab.locator('.valley-speed-badge').click().catch(() => {});
 if (open) await tab.waitForTimeout(300);
 

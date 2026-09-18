@@ -567,13 +567,25 @@ test('el carro: se da algo al valle y el valle lo celebra esa semana (M-2)', asy
   // se abre desde el valle y no es un destino de la barra, igual que la hoja de
   // órdenes a la que sustituye (`navTabFor` en `redesign/shell.ts`).
   await test.expect(page.locator('html')).toHaveAttribute('data-screen', 'valley');
-  const rows = page.locator('.cart-row');
+  // C4 · **las filas de cosas que se dan, sin la de la corona.** La corona
+  // lleva su propia clase desde C4 precisamente para esto: hasta entonces era
+  // una `.cart-row` más, así que la cuenta daba once para diez medios y el
+  // bucle de abajo le pedía a la fila de la corona un solo botón de dar cuando
+  // tiene uno por candidato. Esta prueba se quedó roja el día que A2b añadió la
+  // segunda puerta, y así ya no depende de cuántas filas ajenas haya.
+  const rows = page.locator('.cart-row:not(.cart-row--crown)');
   // Tantas filas como medios haya, sin congelar el número: M-4 pasó de tres a
   // seis y esta prueba no es la que decide cuántos hay (`MEANS_IDS`).
   await test.expect(rows).toHaveCount(MEANS_IDS.length);
   // Cada cosa lleva su precio en fichas de recurso, no en una frase con cifras.
-  await test.expect(page.locator('.cart-row').first().locator('.cart-coin').first()).toBeVisible();
+  await test.expect(rows.first().locator('.cart-coin').first()).toBeVisible();
   await page.screenshot({ path: 'artifacts/m2-cart.png', fullPage: true });
+  // C4 · **y una foto de las filas de defensa**, que son las que deciden si el
+  // valle cae (C1, A2b) y las que nadie había mirado: se baja hasta la última
+  // —la segunda puerta— y se fotografía ahí. Es la prueba de que su precio y su
+  // motivo se ven, y no sólo de que existen en la tabla.
+  await rows.nth(MEANS_IDS.indexOf('gate')).scrollIntoViewIfNeeded();
+  await page.screenshot({ path: 'artifacts/c4-cart-defence.png', fullPage: false });
 
   // Lo que no alcanza se queda apagado **con su motivo**: es la única cosa que
   // se conserva de las órdenes (E4, «te he entendido y no puedo»).
