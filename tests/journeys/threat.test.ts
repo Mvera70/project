@@ -166,3 +166,78 @@ describe('B1 · lo que se llevan', () => {
     expect(worthOf(state), 'las vigas no').toBe(withSilver);
   });
 });
+
+describe('B2 · el aviso, y lo que se puede hacer con él', () => {
+  it('avisa antes de cada partida, y la pregunta se puede plantear', () => {
+    // La cadena entera: el clan decide, el valle se entera (`raid.coming`), y
+    // §8.6 abre su pregunta por encima del techo porque es una crisis. Sin lo
+    // último el aviso llegaría cuando el reloj de las encrucijadas lo
+    // permitiera, que puede ser dos años después de que quemaran el granero.
+    let warnings = 0;
+    let asked = 0;
+    let arrivals = 0;
+    for (const seed of SEEDS) {
+      const state = foundGame(seed);
+      for (let week = 0; week < 60 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
+        const before = state.crossroad?.templateId ?? null;
+        for (const report of run(state, 1, 'prudent', CATALOG)) {
+          for (const entry of report.entries) {
+            if (entry.templateKey === 'raid.coming') warnings += 1;
+            if (entry.templateKey === 'raid.open' || entry.templateKey === 'raid.walled') arrivals += 1;
+          }
+        }
+        const now = state.crossroad?.templateId ?? null;
+        if (now === 'raiders_coming' && now !== before) asked += 1;
+      }
+    }
+    expect(warnings, 'ningún valle recibió aviso').toBeGreaterThan(0);
+    // Cada partida que llega fue avisada: no hay asalto sin su aviso.
+    expect(warnings).toBeGreaterThanOrEqual(arrivals);
+    expect(asked, 'la pregunta del aviso no se planteó nunca').toBeGreaterThan(0);
+  });
+
+  it('pagarles hace que se den la vuelta, y prepararse salva la mitad', () => {
+    // Las tres salidas sobre el mismo valle en el mismo instante: es la única
+    // forma de medir una decisión sin que la trayectoria la contamine.
+    const base = foundGame(47);
+    run(base, TIME.WEEKS_PER_YEAR * 30, 'prudent', CATALOG);
+    base.village.silver = 200;
+    base.village.grain = 2000;
+    base.threat.comingTick = base.tick + 1;
+    base.threat.comingBand = 20;
+    // Sin muralla, para que lo que se mida sea la decisión y no el cerco.
+    base.buildings = base.buildings.filter(
+      (b) => b.kind !== 'gate' && b.kind !== 'palisade' && b.kind !== 'wall',
+    );
+
+    const waited = structuredClone(base);
+    const braced = structuredClone(base);
+    braced.flags['braced'] = braced.tick + TIME.WEEKS_PER_YEAR;
+    const paid = structuredClone(base);
+    paid.flags['bought_off'] = paid.tick + TIME.WEEKS_PER_YEAR;
+
+    for (const state of [waited, braced, paid]) run(state, 2, 'prudent', CATALOG);
+
+    expect(paid.village.silver, 'a quien paga no le saquean').toBe(200);
+    expect(paid.threat.raids, 'y la partida no cuenta como asalto').toBe(base.threat.raids);
+    expect(braced.village.grain, 'prepararse salva grano').toBeGreaterThan(waited.village.grain);
+    expect(waited.threat.raids, 'a quien espera le saquean').toBeGreaterThan(base.threat.raids);
+  });
+
+  it('y el que paga aprende que pagar sale caro', () => {
+    // La semilla de `pay`: el vecino que cobró una vez vuelve antes. Se mide la
+    // probabilidad, que es lo que la marca cambia.
+    const state = foundGame(58);
+    run(state, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+    state.threat.comingTick = null;
+    const plain = structuredClone(state);
+    const known = structuredClone(state);
+    known.flags['known_to_pay'] = known.tick + TIME.WEEKS_PER_YEAR * 8;
+
+    // Veinte años cada uno, contando cuántas partidas se organizan.
+    run(plain, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+    run(known, TIME.WEEKS_PER_YEAR * 20, 'prudent', CATALOG);
+    expect(known.threat.raids, 'al que paga vuelven más veces')
+      .toBeGreaterThanOrEqual(plain.threat.raids);
+  });
+});

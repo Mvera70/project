@@ -127,6 +127,10 @@ export function evaluate(c: Condition, state: GameState): boolean {
       return count(state, c.building) > 0;
     case 'flag':
       return flagSet(state, c.flag) === c.set;
+    // B2 · si hay una partida del clan vecino en camino (§1b). B1 la apunta en
+    // `threat.comingTick` ocho semanas antes de que llegue.
+    case 'raid':
+      return (state.threat.comingTick !== null) === c.coming;
     case 'outbreak':
       return outbreakRunning(state) === c.active;
     case 'role':

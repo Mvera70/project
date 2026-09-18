@@ -211,6 +211,8 @@ function condition(value: unknown): boolean {
     case 'has': return typeof value['building'] === 'string' && value['building'] in BUILDINGS;
     case 'flag': return typeof value['flag'] === 'string' && typeof value['set'] === 'boolean';
     case 'outbreak': return typeof value['active'] === 'boolean';
+    // B2 · si hay una partida del clan vecino en camino (§1b).
+    case 'raid': return typeof value['coming'] === 'boolean';
     case 'role': return ROLES.has(value['role'] as string) && typeof value['alive'] === 'boolean';
     case 'grudge': return finite(value['min']);
     case 'herd': return (HERD_KINDS as readonly string[]).includes(value['kind'] as string)

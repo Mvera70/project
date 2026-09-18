@@ -22,7 +22,9 @@ describe('el catálogo · forma', () => {
     // Esta prueba existe justo para que subir o bajar sea una decisión y no un
     // descuido, así que las retiradas se cuentan aparte: siguen existiendo
     // porque una partida guardada las nombra.
-    expect(CATALOG).toHaveLength(17);
+    // Diecinueve desde B2: las dos del clan del valle vecino (§1b), una
+    // categoría que el Anexo A no tenía porque el asedio es de la meta.
+    expect(CATALOG).toHaveLength(19);
     expect(RETIRED_TEMPLATES).toHaveLength(3);
     for (const retired of RETIRED_TEMPLATES) {
       expect(CATALOG.some((t) => t.id === retired.id), retired.id).toBe(false);
@@ -106,6 +108,11 @@ describe('el catálogo · forma', () => {
       // §7.8, v2.95: la sal del salinero. Su lector está en la matanza de
       // M-29, que saca más de cada cabeza mientras la sal dure.
       'salted',
+      // §1b, B2: las tres del clan vecino. Las lee `world/threat.ts`, que es
+      // quien posee la mecánica: `braced` esconde la mitad de lo saqueable,
+      // `bought_off` hace que la partida se dé la vuelta, y `known_to_pay` —la
+      // consecuencia de haber pagado— hace que vuelvan antes.
+      'braced', 'bought_off', 'known_to_pay',
     ]);
     const written = CATALOG.flatMap((template) => template.options).flatMap((option) => [
       ...option.effects,

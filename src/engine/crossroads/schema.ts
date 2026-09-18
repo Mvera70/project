@@ -32,6 +32,9 @@ export type CrossroadCategory =
   | 'forest'
   | 'stranger'
   | 'trade'
+  // B2 · el clan del valle vecino (§1b). Es una categoría propia y no `lord`
+  // porque no es el señor: es gente que baja de la ladera de al lado.
+  | 'raid'
   | 'succession';
 
 export interface CrossroadTemplate {

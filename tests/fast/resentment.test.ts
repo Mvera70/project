@@ -172,13 +172,27 @@ describe('la cadena entera · §6.4, §7.9', () => {
     expect(fresh.some((g) => g.cause === 'went_hungry')).toBe(true);
   });
 
-  it('un solo año malo no rompe a nadie', () => {
+  it('un solo año malo no rompe a nadie que no estuviera ya al borde', () => {
     // El umbral de §6.4 está en −50 y un año pesa 18: hacen falta varios. Un
     // valle no se subleva por un invierno.
+    //
+    // **Y se mide el salto, no el total** (B2, 18 sep 2026). Esto comparaba la
+    // cuenta de rencores antes y después, y eso deja de medir el hambre en
+    // cuanto la aldea llega al año veinte con alguien ya cerca del umbral: el
+    // clan del valle vecino baja desde el año nueve, el saqueo hunde el ánimo
+    // y `after_the_raid` deja un recuerdo de culpa. Con la aldea a −40, un año
+    // de hambre rompe, y **eso es correcto**: lo que §6.4 promete es que
+    // dieciocho puntos no cruzan cincuenta por sí solos, no que un valle harto
+    // aguante indefinidamente.
     const state = village(20);
-    const before = state.people.grudges.length;
+    const leader = leaderOf(state);
+    const before = new Map(othersOf(state).map((v) => [v.id, opinionOf(state, v.id, leader.id)]));
+    const fresh = state.people.grudges.length;
     scarHunger(state, 1);
-    expect(state.people.grudges.length).toBe(before);
+    for (const g of state.people.grudges.slice(fresh)) {
+      const was = before.get(g.fromId);
+      expect(was, `${g.fromId} rompió sin estar al borde`).toBeLessThan(-50 + 18);
+    }
   });
 
   it('el rencor cabe dentro de los límites de §6.4', () => {

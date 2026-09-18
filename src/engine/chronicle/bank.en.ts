@@ -830,6 +830,54 @@ export const BANK: Record<string, string[]> = {
   // B1 · El clan del valle vecino baja (§1b). Tres frases por caso, como todo
   // lo demás; lo que cambia entre ellas es si la aldea lo recibió tras su
   // muralla o a campo abierto.
+  // B2 · El aviso, ocho semanas antes. Es lo que abre la pregunta de §8.6.
+  // B2 · Lo que la crónica cuenta de cada salida del aviso, y de la semana de
+  // después. Son entradas de crónica —tres variantes— y no textos de pantalla.
+  'crossroad.raiders_coming.brace': [
+    'The herd came in, the grain went under the floor, and the village waited.',
+    '{A} had everything brought inside, and then they waited.',
+    'They barred what could be barred and put the animals behind the houses.',
+  ],
+  'crossroad.raiders_coming.pay': [
+    '{A} sent silver over the ridge rather than see the village burn.',
+    'The valley bought its peace in year {year}, and counted the cost later.',
+    'Silver went up the valley, and the men did not come down.',
+  ],
+  'crossroad.raiders_coming.wait': [
+    '{A} said the village would meet them as it was.',
+    'Nothing was moved and nothing was hidden. They would come as they came.',
+    'The valley did not stir at all. It only waited.',
+  ],
+  'crossroad.after_the_raid.chase': [
+    'They followed the tracks past the ford and brought back what they could.',
+    '{B} led them out after the raiders. Not everyone came home.',
+    'The village went after its grain in year {year}, and paid for it.',
+  ],
+  'crossroad.after_the_raid.build_up': [
+    'The timber meant for houses went into the wall instead.',
+    '{A} set the whole valley to raising the wall in year {year}.',
+    'They answered the raid with stakes and a deeper ditch.',
+  ],
+  'crossroad.after_the_raid.bear_it': [
+    'They buried what needed burying and said nothing about the rest.',
+    'The village bore it. {B} did not forget who decided that.',
+    'Nothing was done in year {year}, and everyone remembered.',
+  ],
+  'consequence.they_come_again': [
+    'Word got about that this valley pays. They were back in {years} years.',
+    'A village that buys peace buys it again: {years} years, and the same men.',
+    'The silver of year {sinceYear} was remembered over the ridge, and not kindly.',
+  ],
+  'raid.coming': [
+    'A rider from the high pasture brought word that {season}: {count} men are arming over the ridge.',
+    'Word came in year {year} that the next valley is gathering, {count} of them.',
+    'Smoke on the far ridge that {season}, and a count of {count} before dark.',
+  ],
+  'raid.turned_back': [
+    'The silver went up the valley that {season}, and the {count} turned back.',
+    'They were paid in year {year} and went home, {count} men, without a blow struck.',
+    'The {count} took the payment that {season} and left the village standing.',
+  ],
   'raid.open': [
     'A band of {count} came down that {season} and took {silver} silver and {grain} grain.',
     'Men from over the ridge walked in that {season}, {count} of them, and nobody stopped them.',
@@ -981,6 +1029,27 @@ export const BANK: Record<string, string[]> = {
 
 export const CROSSROAD_BANK: Record<string, string> = {
   // --- A.1 winter_grain_debt ---
+  // B2 · El aviso del clan vecino (§1b). El cuerpo dice lo que se sabe y lo que
+  // no: cuántos vienen, y que llegarán antes de que cambie la luna.
+  'crossroad.raiders_coming.title': 'Men Over the Ridge',
+  'crossroad.raiders_coming.body':
+    'Year {year}. The herdsmen came down early and {A} has their count: {count} men, armed, gathering in the next valley. They will be here before the moon turns. The village has weeks, not months.',
+  'crossroad.raiders_coming.brace.label': 'Bring everything inside',
+  'crossroad.raiders_coming.brace.cost': 'A week of every pair of hands, and timber to bar what can be barred',
+  'crossroad.raiders_coming.pay.label': 'Send them silver',
+  'crossroad.raiders_coming.pay.cost': 'Thirty of silver, and they will remember the road',
+  'crossroad.raiders_coming.wait.label': 'Let them come',
+  'crossroad.raiders_coming.wait.cost': 'Nothing today',
+  // B2 · La semana de después, que es la que dice qué clase de valle es este.
+  'crossroad.after_the_raid.title': 'What They Left',
+  'crossroad.after_the_raid.body':
+    'Year {year}. The raiders are a day gone and the tracks are still fresh in the mud by the ford. {B} wants to go after them. {A} has to say.',
+  'crossroad.after_the_raid.chase.label': 'Go after them',
+  'crossroad.after_the_raid.chase.cost': 'Some of what was taken comes back, and somebody does not',
+  'crossroad.after_the_raid.build_up.label': 'Raise the wall higher',
+  'crossroad.after_the_raid.build_up.cost': 'Timber that was going to be houses',
+  'crossroad.after_the_raid.bear_it.label': 'Bear it',
+  'crossroad.after_the_raid.bear_it.cost': 'Nothing, and everyone will remember that',
   'crossroad.winter_grain_debt.title': 'The Lord of Wealdmere Sends Carts',
   'crossroad.winter_grain_debt.body':
     'Year {year}. The granary is bare and the frost has not broken. Riders from Wealdmere wait at the ford with three carts of rye. Their captain will not unload them until {A} kneels.',

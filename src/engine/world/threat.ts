@@ -24,9 +24,22 @@
 // van**, y la aldea sigue con lo que queda.
 
 import { THREAT, TIME } from '../balance';
+import { flagSet } from '../crossroads/conditions';
 import { next } from '../rng';
 import type { GameState, HerdKind } from '../state';
 import { yearOf } from '../time';
+
+/**
+ * B2 · Lo que el paso del clan deja esta semana: o el aviso de que vienen, o lo
+ * que se llevaron al llegar. Nunca las dos cosas a la vez.
+ */
+export interface ThreatEvent {
+  kind: 'coming' | 'sacked' | 'turned_back';
+  /** Con cuántos vienen o vinieron. */
+  band: number;
+  /** El saqueo, sólo cuando `kind` es `sacked`. */
+  sack: Sack | null;
+}
 
 /** Lo que un asalto se lleva, para que la crónica pueda contarlo. */
 export interface Sack {
@@ -82,7 +95,7 @@ function walled(state: GameState): boolean {
  * apetece. Que la partida tarde en llegar (`WARNING_WEEKS`) es lo que deja
  * sitio para el aviso de B2.
  */
-export function advanceThreat(state: GameState): Sack | null {
+export function advanceThreat(state: GameState): ThreatEvent | null {
   const year = yearOf(state.tick);
 
   // 1 · El vecino crece, pase lo que pase aquí.
@@ -96,19 +109,37 @@ export function advanceThreat(state: GameState): Sack | null {
   if (state.tick % TIME.WEEKS_PER_YEAR === 0
     && state.threat.comingTick === null
     && year >= THREAT.MIN_YEAR) {
-    const chance = THREAT.YEARLY_CHANCE * temptation(state);
+    // B2 · y el que cobró una vez vuelve antes: es lo que cuesta pagar.
+    const chance = THREAT.YEARLY_CHANCE * temptation(state)
+      * (flagSet(state, 'known_to_pay') ? THREAT.KNOWN_TO_PAY_CHANCE : 1);
     if (next(state.rng, 'raid') < chance) {
       const share = THREAT.BAND_LEAST_SHARE
         + (1 - THREAT.BAND_LEAST_SHARE) * temptation(state);
       state.threat.comingTick = state.tick + THREAT.WARNING_WEEKS;
       state.threat.comingBand = Math.max(THREAT.BAND_MIN,
         Math.round(state.threat.strength * share));
+      // B2 · **y el valle se entera.** Lo que hace que las ocho semanas de
+      // `WARNING_WEEKS` sirvan de algo: alguien los vio en el camino, y a
+      // partir de aquí `crisisOf` deja pasar la pregunta de §8.6 por encima
+      // del techo hasta que lleguen.
+      return { kind: 'coming', band: state.threat.comingBand, sack: null };
     }
   }
 
   // 3 · ¿Llegan esta semana?
   if (state.threat.comingTick === null || state.tick < state.threat.comingTick) return null;
-  return arrive(state);
+
+  // B2 · **si se les pagó, se dan la vuelta.** La plata la cobró la opción de
+  // la encrucijada al contestarla; lo que hace la marca es que no lleguen. Es
+  // el trato de A.1 para lo que el DSL de §8.4 no sabe decir: la decisión se
+  // apunta como bandera y la mecánica se queda con quien la posee.
+  if (flagSet(state, 'bought_off')) {
+    const band = state.threat.comingBand;
+    state.threat.comingTick = null;
+    state.threat.comingBand = 0;
+    return { kind: 'turned_back', band, sack: null };
+  }
+  return { kind: 'sacked', band: state.threat.comingBand, sack: arrive(state) };
 }
 
 /**
@@ -122,7 +153,11 @@ export function advanceThreat(state: GameState): Sack | null {
 function arrive(state: GameState): Sack {
   const band = state.threat.comingBand;
   const behindWall = walled(state);
-  const share = THREAT.SACK_SHARE * (behindWall ? THREAT.WALLED_SACK : 1);
+  // B2 · la aldea que se preparó esconde la mitad de lo que se llevarían.
+  const braced = flagSet(state, 'braced');
+  const share = THREAT.SACK_SHARE
+    * (behindWall ? THREAT.WALLED_SACK : 1)
+    * (braced ? THREAT.BRACED_SACK : 1);
 
   const silver = Math.round(state.village.silver * share);
   const grain = Math.round(state.village.grain * share);
@@ -132,7 +167,7 @@ function arrive(state: GameState): Sack {
   // Una cabeza, la mayor que haya: un saqueador se lleva la vaca antes que la
   // gallina. A campo abierto; tras la muralla el ganado está dentro.
   let beast: HerdKind | null = null;
-  if (!behindWall) {
+  if (!behindWall && !braced) {
     for (const kind of ['cows', 'pigs', 'hens'] as const) {
       if (state.herd[kind] > 0) { state.herd[kind] -= 1; beast = kind; break; }
     }
@@ -141,5 +176,9 @@ function arrive(state: GameState): Sack {
   state.threat.comingTick = null;
   state.threat.comingBand = 0;
   state.threat.raids += 1;
+  // B2 · la semana de después: `after_the_raid` pregunta qué se hace con lo que
+  // queda mientras esta marca dure. Un año, que es lo que una aldea tarda en
+  // dejar de hablar de ello.
+  state.flags['just_sacked'] = state.tick + TIME.WEEKS_PER_YEAR;
   return { band, silver, grain, beast, walled: behindWall };
 }

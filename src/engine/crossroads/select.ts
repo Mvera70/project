@@ -35,6 +35,11 @@ const FALLBACK_ID = 'quiet_years';
 export function crisisOf(state: GameState): CrossroadCategory | null {
   const people = population(state);
   if (people > 0 && state.village.grain < people * weeksToHarvest(state.tick)) return 'famine';
+  // B2 · **una partida en camino es una crisis**, y por eso pasa por encima del
+  // techo de §8.6: el aviso no sirve de nada si llega dos años tarde porque
+  // hubo otra pregunta hace poco. Va detrás del hambre y no delante a
+  // propósito: el hambre ya está matando esta semana y el clan tarda ocho.
+  if (state.threat.comingTick !== null) return 'raid';
   if (outbreakRunning(state)) return 'plague';
   if (flagSet(state, 'threatened')) return 'lord';
   if (holderOf(state, 'leader') === null) return 'succession';

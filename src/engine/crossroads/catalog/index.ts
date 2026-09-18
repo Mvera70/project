@@ -17,6 +17,9 @@
 //   behind_the_wall        M-07 select():   lord and stranger weigh ×0.4 (A.16)
 //   a_name_in_the_valley   M-07 select():   lord templates weigh ×0.5 (A.14)
 //   salted                 M-29 feedAndSlaughter(): meat goes further (§7.8)
+//   braced                 B1 world/threat.ts: el saqueo se lleva la mitad (§1b)
+//   bought_off             B1 world/threat.ts: la partida se da la vuelta (§1b)
+//   known_to_pay           B1 world/threat.ts: el vecino vuelve antes (§1b)
 //
 // The flags Annex A already named — vassal, proud, watched, threatened,
 // hostile — are read by the templates themselves and need nobody else.
@@ -28,6 +31,7 @@ import { FEUD_TEMPLATES } from './feud';
 import { FOREST_TEMPLATES } from './forest';
 import { LORD_TEMPLATES } from './lord';
 import { PLAGUE_TEMPLATES } from './plague';
+import { RAID_TEMPLATES } from './raid';
 import { RESERVE_TEMPLATES } from './reserve';
 import { STRANGER_TEMPLATES } from './stranger';
 import { TRADE_TEMPLATES } from './trade';
@@ -50,6 +54,9 @@ export const CATALOG: Catalogue = [
   // (`world/road.ts`, los sucesos de visita de `world/fate.ts`). Se quedan en
   // `RETIRED_TEMPLATES` para que una partida guardada que ya los contestó siga
   // cargando, y para que su crónica siga teniendo título.
+  // B2 · el aviso del clan vecino (§1b). Va junto a la sucesión porque comparte
+  // su privilegio: es una crisis y su pregunta pasa por encima del techo.
+  ...RAID_TEMPLATES,
   ...SUCCESSION_TEMPLATES,
   ...RESERVE_TEMPLATES,
 ];

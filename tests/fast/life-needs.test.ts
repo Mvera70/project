@@ -331,9 +331,18 @@ describe('IA-3 · aldeanos con hábitos', () => {
     let calmConflictDays = 0;
     let calmPersonDays = 0;
 
+    // **Tres jornadas por semilla, y no una** (18 sep 2026). Cada jornada tiene
+    // su propia semilla (`seedOfDay`), así que el día 0 de dos valles son dos
+    // muestras y no dos aldeas — es la regla que `CLAUDE.md` deja escrita para
+    // esta capa, y esta función la incumplía. Se vio cuando B2 metió al clan
+    // vecino: la trayectoria se movió unas décimas y la tasa de encontronazos
+    // cayó del 6,67 % al 6,52 %, con lo que una propiedad verdadera —los de
+    // mal genio se enzarzan más— salía roja por un cuarto de punto. Con seis
+    // muestras el número deja de bailar por un asalto.
     for (const seed of seeds) {
+    for (const day of [0, 1, 2]) {
       const state = village(seed);
-      const life = createVillage(state, 0);
+      const life = createVillage(state, day);
       const hadConflict = new Set<number>();
       for (let n = 0; n < STEPS_PER_DAY; n += 1) {
         life.step();
@@ -369,6 +378,7 @@ describe('IA-3 · aldeanos con hábitos', () => {
           if (hadConflict.has(d.body.id)) calmConflictDays += 1;
         }
       }
+    }
     }
 
     sample = {

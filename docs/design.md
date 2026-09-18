@@ -2498,8 +2498,18 @@ fuerza la de mayor puntuación aunque no sea crisis. Si no hay ninguna elegible
 —cosa rara— se usa la plantilla de reserva `quiet_years`, que ofrece al jugador
 qué hacer con un excedente.
 
-**Techo:** una cada 120 ticks (30 minutos reales a ×1). Las encrucijadas tienen
-que seguir siendo raras o dejan de pesar.
+**Techo:** una cada 48 ticks —un año de aldea— desde B-1, que remidió el número
+contra el reloj de v3.72 (§12.1). Las encrucijadas tienen que seguir siendo
+raras o dejan de pesar.
+
+**Y dos exenciones, no una** (B2, 18 sep 2026). La sucesión siempre fue la
+excepción de §6.6: la muerte de un jefe pregunta en el acto. La segunda es el
+**asalto**: mientras `state.threat.comingTick` no sea nulo, `crisisOf` devuelve
+la categoría `raid` y su propia pregunta pasa por encima del techo. El motivo es
+el mismo que el de la sucesión: un aviso que avisa tarde no es un aviso, y el
+clan del valle vecino da **ocho semanas** (§1b). Va **detrás del hambre** en el
+orden de crisis y no delante, y eso también es una decisión: el hambre ya está
+matando esta semana y la partida tarda dos meses en llegar.
 
 **Cómo se comprueba que el ritmo es sano.** No basta con contar encrucijadas por
 partida: hay que mirar **qué fracción de los intervalos queda pegada al techo**.

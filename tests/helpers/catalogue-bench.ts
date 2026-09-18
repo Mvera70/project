@@ -28,6 +28,7 @@ import { allocateLabour, produce } from '@engine/subsistence/labour';
 import { consume, overwinter } from '@engine/subsistence/consumption';
 import { applySpoilage, harvest } from '@engine/subsistence/harvest';
 import { isUnexplained, updateMood } from '@engine/subsistence/mood';
+import { advanceThreat } from '@engine/world/threat';
 import { rollWeather } from '@engine/subsistence/seasons';
 import { rollPlague } from '@engine/subsistence/disasters';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -107,6 +108,11 @@ function carryOut(s: GameState, applied: AppliedEffects): void {
 /** El tick de §4.2, con los pasos que existen. Política neutra. */
 function tick(s: GameState): void {
   s.tick += 1;
+  // B2 · el clan del valle vecino crece y baja también aquí. Sin esto, las
+  // dos plantillas de `raid` no podían salir nunca en el barrido —su
+  // condición mira `threat.comingTick`— y la cobertura las daba por mudas
+  // cuando en una partida de verdad salen desde el año nueve.
+  advanceThreat(s);
   if (s.tick % YEAR === 0) {
     s.weather = rollWeather(s);
     const o = rollPlague(s);

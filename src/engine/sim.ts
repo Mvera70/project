@@ -763,29 +763,50 @@ export function tick(
   // mundo hace y la aldea encaja. Y va **antes** de los sucesos para que un
   // asalto y un rayo no se pisen en la misma semana: lo que se cuenta primero
   // es lo que trae gente armada.
-  const sack = advanceThreat(state);
-  if (sack !== null) {
-    say({
-      kind: 'raid',
-      templateKey: sack.walled ? 'raid.walled' : 'raid.open',
-      params: {
-        year: year(),
-        season: season(),
-        count: sack.band,
-        silver: sack.silver,
-        grain: sack.grain,
-      },
-      // §9.2, peso 3: una partida armada bajando al valle es de lo que se
-      // cuenta en la crónica de una aldea, como la peste o la sucesión.
-      weight: 3,
-    });
-    if (sack.beast !== null) {
+  const raid = advanceThreat(state);
+  if (raid !== null) {
+    // B2 · el aviso, la vuelta y el saqueo: tres cosas que contar, y sólo una
+    // por semana. El aviso es lo que da sentido a las ocho semanas de margen —
+    // el valle se entera y `crisisOf` abre la pregunta de §8.6— y la vuelta es
+    // lo que se ve cuando se les pagó.
+    if (raid.kind === 'coming') {
       say({
         kind: 'raid',
-        templateKey: 'raid.beast',
-        params: { year: year(), season: season(), animal: sack.beast },
-        weight: 2,
+        templateKey: 'raid.coming',
+        params: { year: year(), season: season(), count: raid.band },
+        weight: 3,
       });
+    } else if (raid.kind === 'turned_back') {
+      say({
+        kind: 'raid',
+        templateKey: 'raid.turned_back',
+        params: { year: year(), season: season(), count: raid.band },
+        weight: 3,
+      });
+    } else if (raid.sack !== null) {
+      const sack = raid.sack;
+      say({
+        kind: 'raid',
+        templateKey: sack.walled ? 'raid.walled' : 'raid.open',
+        params: {
+          year: year(),
+          season: season(),
+          count: raid.band,
+          silver: sack.silver,
+          grain: sack.grain,
+        },
+        // §9.2, peso 3: una partida armada bajando al valle es de lo que se
+        // cuenta en la crónica de una aldea, como la peste o la sucesión.
+        weight: 3,
+      });
+      if (sack.beast !== null) {
+        say({
+          kind: 'raid',
+          templateKey: 'raid.beast',
+          params: { year: year(), season: season(), animal: sack.beast },
+          weight: 2,
+        });
+      }
     }
   }
 

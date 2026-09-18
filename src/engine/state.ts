@@ -592,6 +592,10 @@ export type Condition =
   // v3.69 · cuántas cabezas hay en el corral. Nació de una captura: el tratante
   // de §7.8 le ofrecía «vender dos cerdos» a una pareja que tenía tres gallinas.
   | { k: 'herd'; kind: HerdKind; op: Op; v: number }
+  // B2 · **Si hay una partida del clan vecino en camino** (§1b). La respuesta
+  // la da `state.threat.comingTick`, que B1 pone ocho semanas antes de que
+  // lleguen: ese hueco existe justamente para que se pueda preguntar aquí.
+  | { k: 'raid'; coming: boolean }
   | { k: 'not'; c: Condition }
   | { k: 'any'; cs: Condition[] };
 

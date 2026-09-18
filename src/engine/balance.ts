@@ -808,6 +808,24 @@ export const THREAT = {
   /** Y nunca menos de esto, o no es una partida, es un paseo. */
   BAND_MIN: 4,
   /**
+   * B2 · Lo que cuesta que se den la vuelta. Treinta de plata: lo mismo que
+   * cuesta una corona (`CROWN.SILVER`), y es a propósito — pagar a quien viene
+   * a robarte cuesta lo que coronar a un hombre, y las dos son decisiones de
+   * las que se toman una vez cada muchos años.
+   */
+  PAY_OFF_SILVER: 30,
+  /**
+   * B2 · Lo que se salva la aldea que se prepara (`braced`): esconde el ganado,
+   * mete el grano y atranca. Se llevan la mitad.
+   */
+  BRACED_SACK: 0.5,
+  /**
+   * B2 · Y lo que cuesta pagar, a la larga: el vecino que cobró una vez vuelve
+   * **antes**. La marca `known_to_pay` multiplica la probabilidad anual de que
+   * bajen mientras dura.
+   */
+  KNOWN_TO_PAY_CHANCE: 1.8,
+  /**
    * Lo que se llevan cuando saquean: esta parte de la plata y del grano.
    *
    * **Es la mitad pequeña de «caer»** (§1b): entran, se llevan lo que pueden y
