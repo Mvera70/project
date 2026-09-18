@@ -25,7 +25,7 @@
 // ocupando sitio y sin servir a nadie. Cuesta volver a bajar 2,7 MB una vez, y
 // es lo que hace que los animales rediseñados lleguen al iPad del dueño del
 // diseño, que es donde se vio el problema.
-const CACHE = 'valley-v4';
+const CACHE = 'valley-v5';
 
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 
