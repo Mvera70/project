@@ -12,6 +12,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { BUILDING_RULES, BUILDINGS, FOOD, LIFE, WORLD } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog/index';
 import { foundTwenty } from '../helpers/founding';
+import { foundGame } from '@engine/found';
 import { makeVillager } from '@engine/people/villagers';
 import { run, tick } from '@engine/sim';
 import { TERRAIN_CODE } from '@engine/state';
@@ -109,9 +110,14 @@ describe('prioridad de construcción · §7.3', () => {
     expect(nextProject(s)).toBe('granary');
   });
 
-  it('4 · el pozo a los 25, y no a los 24', () => {
+  it('4 · el pozo en su cifra, y no uno menos', () => {
+    // **Y la aldea de partida es la pareja, no la de veinte.** B-1 bajó esta
+    // puerta de 25 a 10 personas —un valle mediano llega a 23, así que a 25 el
+    // pozo no llegaba— y con eso `foundTwenty` ya la pasa de sobra: la mitad
+    // «todavía no» de esta propiedad no se puede medir en una aldea que nace
+    // con veinte. `populate` sólo añade gente, nunca quita.
     const base = (): GameState => {
-      const s = raise(raise(foundTwenty(7), 'field', 4), 'house', 4);
+      const s = raise(raise(foundGame(7), 'field', 4), 'house', 4);
       s.village.grain = 10;
       return s;
     };

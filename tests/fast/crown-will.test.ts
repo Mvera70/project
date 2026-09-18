@@ -129,6 +129,15 @@ describe('K-2 · el rey cura sube la fe y apaga la fiesta', () => {
   it('la fe deriva hacia su número en vez de hacia el de siempre', () => {
     const plain = village();
     const chapel = crowned(village(), 'priest');
+    // B-1 · **y al valle de control hay que quitarle el cura**, que es lo que
+    // esta prueba aprendió cuando el ritmo cambió: coronar al cura le quita el
+    // cura a la aldea —ese hombre pasa a ocupar el asiento de `leader`— y
+    // `MOOD.FAITH_NO_PRIEST` pesa más que derivar hacia 50. Mientras ninguna
+    // aldea llegaba a tener capilla eso no se veía; con la capilla a las 47
+    // horas de reloj (B-1) el control tenía cura y el rey no, así que la prueba
+    // medía la diferencia de tener cura y no la voluntad del rey. Sin cura en
+    // los dos, la única diferencia es la corona, que es lo que se quiere medir.
+    for (const v of plain.people.villagers) if (v.role === 'priest') v.role = null;
     for (const state of [plain, chapel]) state.village.faith = MOOD.FAITH_DRIFT_TO - 5;
     for (let n = 0; n < 24; n += 1) {
       updateMood(plain, ctx());

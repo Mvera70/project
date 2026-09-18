@@ -52,6 +52,13 @@ describe('los lobos van a donde hay ganado · M-1', () => {
     const state = village('winter');
     state.herd.hens = 6;
     state.herd.pigs = 6;
+    // B-1 · **y el valle abierto hay que dejarlo abierto.** Con el ritmo nuevo
+    // esta aldea de dos años ya tiene empalizada —la herrería llega a las 43
+    // horas de reloj y la muralla a las 47—, así que el peso «sin muralla» se
+    // medía con muralla y añadir otra pieza no cambiaba nada: 1,968 contra
+    // 1,968. Lo que la prueba dice es que la muralla aparta a los lobos, y para
+    // medirlo hay que partir de un valle sin ella.
+    state.buildings = state.buildings.filter((b) => b.kind !== 'palisade');
     const open = weightNow(state, 'wolves_at_the_coop');
     state.buildings.push({
       id: 9001, kind: 'palisade', x: 2, y: 2, w: 1, h: 1,

@@ -323,15 +323,28 @@ describe('se habla en corro, no sólo de dos en dos · §11.9', () => {
     // Cuatro puntos cercanos pero distintos: así dos parejas nunca comparten
     // punto medio por casualidad.
     const spots = named.map((v, i) => ({ id: v.id, x: 10 + i * 0.7, y: 10 + i * 0.3 }));
-    const talks = encountersAmong(state, spots);
 
-    const bySpot = new Map<string, number>();
-    for (const talk of talks.values()) {
-      const key = `${talk.x.toFixed(3)},${talk.y.toFixed(3)}`;
-      bySpot.set(key, (bySpot.get(key) ?? 0) + 1);
+    // **Y se mira una estación entera, no una semana.** Pararse a hablar es una
+    // moneda determinista por pareja (`noise(tick, a, b)` en `encounters.ts`),
+    // así que una sola semana puede salir cruz para las seis parejas —es lo que
+    // pasó cuando B-1 cambió el ritmo y con él el tick y los identificadores de
+    // los cuatro primeros nombrados: seis cruces seguidas—. Lo que §11.9 promete
+    // no es que se hable **esta** semana, es que se habla en corro; doce semanas
+    // son la muestra que lo dice sin depender de un lanzamiento.
+    let most = 0;
+    let weeksWithTalk = 0;
+    for (let week = 0; week < TIME.WEEKS_PER_SEASON; week += 1) {
+      const talks = encountersAmong({ ...state, tick: state.tick + week }, spots);
+      if (talks.size > 0) weeksWithTalk += 1;
+      const bySpot = new Map<string, number>();
+      for (const talk of talks.values()) {
+        const key = `${talk.x.toFixed(3)},${talk.y.toFixed(3)}`;
+        bySpot.set(key, (bySpot.get(key) ?? 0) + 1);
+      }
+      most = Math.max(most, ...bySpot.values());
     }
-    expect(talks.size, 'tienen que hablar').toBeGreaterThan(0);
-    expect(Math.max(...bySpot.values()), 'y algún corro pasa de dos').toBeGreaterThan(2);
+    expect(weeksWithTalk, 'tienen que hablar').toBeGreaterThan(0);
+    expect(most, 'y algún corro pasa de dos').toBeGreaterThan(2);
   });
 
   it('pero no se junta la aldea entera en un punto', () => {

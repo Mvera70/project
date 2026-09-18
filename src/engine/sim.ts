@@ -721,29 +721,38 @@ export function tick(
       });
     }
 
-    for (const move of resolveMigration(state)) {
-      const n = move.ids.length;
-      if (move.kind === 'arrival') {
-        arrived += n;
-        say({
-          kind: 'arrival',
-          templateKey: arrivalKey(n),
-          params: { year: year(), season: season(), count: n, people: population(state) },
-          weight: 2,
-        });
-      } else {
-        left += n;
-        say({
-          kind: 'departure',
-          templateKey: departureKey(n),
-          params: { year: year(), season: season(), count: n, people: population(state) },
-          weight: 2,
-        });
-      }
-    }
-
     decayMemories(state);
     fillVacancies(state);
+  }
+
+  // ---- 2a · QUIEN LLEGA Y QUIEN SE VA (§5.7) --------------------------------
+  // **Sigue siendo el paso 2 y en el mismo sitio de la secuencia**; lo que
+  // cambia desde B-1 es que ya no se pregunta sólo en la semana 0 del año. El
+  // compás lo pone `MIGRATION.ARRIVE_EVERY_WEEKS`/`_SMALL` y `resolveMigration`
+  // lo respeta por su cuenta: una aldea hecha recibe una vez al año, la joven
+  // una vez por estación. El motivo, en horas reales, está escrito en
+  // `balance.ts`: a catorce minutos por semana, una tirada al año era una
+  // tirada cada once horas de juego, y las veinte personas costaban ciento
+  // treinta y ocho.
+  for (const move of resolveMigration(state)) {
+    const n = move.ids.length;
+    if (move.kind === 'arrival') {
+      arrived += n;
+      say({
+        kind: 'arrival',
+        templateKey: arrivalKey(n),
+        params: { year: year(), season: season(), count: n, people: population(state) },
+        weight: 2,
+      });
+    } else {
+      left += n;
+      say({
+        kind: 'departure',
+        templateKey: departureKey(n),
+        params: { year: year(), season: season(), count: n, people: population(state) },
+        weight: 2,
+      });
+    }
   }
 
   // ---- 2b · LOS SUCESOS DEL VALLE (R-1, §7.10) ------------------------------

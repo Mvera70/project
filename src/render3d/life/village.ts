@@ -419,9 +419,6 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // no deja de estar ahí porque haya reunión. Y si el sitio de la reunión no
   // admite a nadie —agua, roca— no se sustituye nada: mejor la jornada de
   // siempre que una aldea sin ningún sitio adonde ir.
-  const meetings = ordersOf(state)
-    .map((order, index) => meetingPlace(order, land, index))
-    .filter((place): place is Place => place !== null);
   const places = [...placesOf(state, land), ...commons(state, land)];
   const around: Neighbourhood = createNeighbourhood(land.width, land.height);
   const router: Router = createRouter();
@@ -490,7 +487,17 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // cumplir, y dejar la lista vacía por obedecerla fue mi segundo error —
   // medido: veintitrés personas con `doing: null` toda la jornada, plantadas
   // donde nacieron—. Si no se puede llegar, la jornada es la de siempre.
-  const summons = meetings.filter((place) => canReach(land, shore, place.at));
+  // B-1 · **y el corro se busca con la orilla en la mano**, no después. Esto
+  // filtraba reuniones ya colocadas, y colocarlas sin saber qué suelo es
+  // alcanzable las ponía en bolsas cerradas: con la aldea densa que trae el
+  // ritmo nuevo, la reunión de la capilla caía en un patio al que llegaban dos
+  // casas de seis y se descartaba entera (semilla 7, cero de veinticinco).
+  // Dándole la orilla, `meetingPlace` mueve el punto a la celda alcanzable más
+  // cercana y descarta las plazas de otra bolsa; si de verdad no hay ninguna,
+  // sigue devolviendo nada y la jornada es la de siempre.
+  const summons = ordersOf(state)
+    .map((order, index) => meetingPlace(order, land, index, shore))
+    .filter((place): place is Place => place !== null);
   /** Si el motor ha convocado a la aldea hoy y hay dónde reunirse. */
   const summoned = summons.length > 0;
   const mine = summoned

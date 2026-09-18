@@ -170,8 +170,32 @@ export const FOOD = {
 
 export const LABOUR = {
   WOOD_PER_CUTTER: 3.0, // per week
-  BP_PER_BUILDER: 2.0, // build points per week
-  WORKS_RESERVE: 0.15, // minimum fraction of W given to works
+  // TUNE: **cuánto levanta un albañil en una semana, y cuántas manos tiene
+  // garantizada la obra** (B-1, 18 sep 2026). Los dos números de esta pareja
+  // eran 2,0 y 0,15 desde M-02, y los dos se fijaron cuando la aldea se fundaba
+  // con veinte personas: con la fundación en pareja de v3.69, un caserío de
+  // cinco pone **0,45 albañiles a 0,9 puntos por semana** y una casa de 40
+  // puntos cuesta **cuarenta y cuatro semanas** — casi un año de aldea entera
+  // para cinco camas. Ese era el techo de todo lo demás: sin camas no llega
+  // gente, sin gente no se abren las puertas de §7.3, y sin obras no hay piedra.
+  //
+  // Medido en 16 semillas × 30 años, en horas de reloj de pared a ×1 (que es la
+  // unidad que el dueño del diseño puso: «la edad de piedra en 60/70 horas»):
+  //
+  //   | bp · reserva | 15 pers | granero | capilla | herrería | piedra | obra de piedra |
+  //   |---|---|---|---|---|---|---|
+  //   | 2 · 0,15 (antes) | 70 h | 61 h | 102 h | 153 h | 153 h | 177 h |
+  //   | 3 · 0,30 | 42 h | 45 h | 54 h | 60 h | 60 h | 94 h |
+  //   | **4 · 0,30** | **34 h** | 56 h | 44 h | 55 h | 55 h | **72 h** |
+  //   | 5 · 0,30 | 31 h | 42 h | 51 h | 49 h | 49 h | 70 h |
+  //
+  // 4 y 0,3 es el codo: con 5 la escalera ya no se mueve (70 h contra 72) y una
+  // casa bajaría de diez a ocho semanas-persona, que deja de parecer una casa.
+  // Y no es sólo velocidad: las semanas con el ánimo por debajo de 25 caen del
+  // 27 % al 7 % y ningún valle de dieciséis se acaba, porque lo que hundía el
+  // ánimo era dormir en el suelo.
+  BP_PER_BUILDER: 4.0, // build points per week
+  WORKS_RESERVE: 0.3, // minimum fraction of W given to works
   CUTTER_SHARE: 0.4, // of what is left after the fields
   // ---------------------------------------------------------------------------
   // **El balanceo del 17 sep 2026: la aldea corta la leña que necesita.**
@@ -361,8 +385,25 @@ export const FATE = {
   // semanas y en una aldea de cuarenta cada dos, que además es más variedad
   // entre valles y no menos: el caserío tiene una vida callada y la aldea un
   // noticiario, y eso se compara.
+  //
+  // **B-1 (18 sep 2026): el suelo sube de 0,25 a 0,5**, y es una corrección de
+  // fecha, no de gusto. Ese 0,25 se midió en v3.78 **antes** de que M-1 pusiera
+  // la gracia de la pareja (`GRACE_PEOPLE`/`GRACE_YEARS`/`GRACE_FACTOR`, 17
+  // sep): lo que rompía ocho valles de doce no era la cantidad de sucesos, era
+  // que los destructivos pesaban igual en una aldea de tres que en una de
+  // cuarenta, y eso ya lo amortigua la gracia. Con la gracia puesta, el suelo
+  // en 0,5 sale **gratis**, medido en 24 semillas × 20 años: los sucesos del
+  // primer año pasan de 3 a 7, y las muertas (0 de 24), el ánimo (26 % de
+  // semanas por debajo de 25) y la población del año 20 (22 contra 23) no se
+  // mueven. Con 1 —o sea con la tirada plana de v3.75— vuelve el destrozo: la
+  // población del año 20 cae a 12.
+  //
+  // Y el motivo de subirlo es del dueño del diseño, con el juego delante: «en
+  // los primeros meses deben pasar eventos ya, dinamismo por favor». A catorce
+  // minutos por semana, 3 sucesos al año es uno cada cuatro horas de reloj de
+  // pared; 7 es uno cada hora y media.
   FATED_FULL_PEOPLE: 20,
-  FATED_LEAST_SHARE: 0.25,
+  FATED_LEAST_SHARE: 0.5,
   // TUNE: el peso de cada suceso entre los posibles. La fiesta pesa mucho
   // porque sólo puede pasar una semana al año; el rayo se multiplica por las
   // jornadas de tormenta de la semana.
@@ -692,6 +733,30 @@ export const LIFE = {
 
 export const MIGRATION = {
   ARRIVE_CHANCE: 0.3,
+  // TUNE: **cada cuántas semanas se pregunta si llega alguien** (B-1, 18 sep
+  // 2026). Estaba escrito en el código —`weekOf(tick) !== 0`, o sea una tirada
+  // al año— y era el techo del crecimiento: con 0,7 de probabilidad y de dos a
+  // cuatro personas por llegada, una aldea joven crece **dos o tres personas al
+  // año** y las veinte personas cuestan doce años, que a ×1 son ciento treinta
+  // y ocho horas. El dueño del diseño puso el objetivo en horas reales («la
+  // edad de piedra en 60/70 horas, en los primeros meses deben pasar eventos
+  // ya»), y a catorce minutos por semana una hora real es un mes de juego: una
+  // tirada al año es una tirada cada once horas de juego.
+  //
+  // Una aldea hecha sigue recibiendo una vez al año —es la llamada del valle,
+  // no una feria—; **la joven, una vez por estación**, que es lo que mide el
+  // número de abajo. No es una puerta y no regala nadie: la tirada es la misma
+  // contra las mismas condiciones (ánimo, grano, hostilidad, que haya quien
+  // mande), sólo se pregunta más veces mientras el valle tiene sitio.
+  // Medido (24 semillas × 20 años, con lo demás de B-1 puesto): con la tirada
+  // anual las veinte personas llegan a las 130 h de reloj, por estación a las
+  // 90 y **al mes a las 38**; las quince, de 70 h a 23. Ni una muerta más en
+  // ningún caso y el ánimo mejora, porque lo que hundía el ánimo era el
+  // apretón y ahora hay casas. Mensual mientras el valle es pequeño: la voz
+  // corre, y las puertas de siempre (ánimo, grano, hostilidad, que haya quien
+  // mande) siguen decidiendo quién entra.
+  ARRIVE_EVERY_WEEKS: 48,
+  ARRIVE_EVERY_WEEKS_SMALL: 4,
   // Dos desde la fundación en pareja: si hicieran falta ocho para que llegara
   // alguien, nadie llegaría nunca.
   ARRIVE_MIN_PEOPLE: 2,
@@ -1350,7 +1415,19 @@ export const PATHING = {
 // ---------------------------------------------------------------------------
 
 export const CROSSROADS = {
-  MIN_TICKS_BETWEEN: 120, // 30 real minutes at ×1
+  // TUNE: el hueco mínimo entre dos encrucijadas. **Eran 120 ticks, y el número
+  // se eligió cuando eso era media hora de reloj** —la especificación lo dice
+  // con esas palabras, «30 minutos reales a ×1»—: v3.72 puso la semana en
+  // catorce minutos y los mismos 120 ticks pasaron a ser **veintiocho horas**
+  // sin que nadie tocara la constante. Medido con el catálogo real (16 semillas
+  // × 30 años), el techo mandaba el **68 % de los intervalos**, y §8.6 dice que
+  // por encima del 40 % «manda el reloj, no el contenido».
+  //
+  // Con 48 —un año de juego, once horas de reloj— baja al 34 % y el intervalo
+  // mediano lo pone el contenido: 76 semanas. Bajarlo más no cambia el número
+  // de decisiones (13 contra 14 en treinta años) porque lo que las limita es
+  // qué hay elegible, así que se queda en el menor cambio que arregla la señal.
+  MIN_TICKS_BETWEEN: 48,
   GUARANTEE_TICKS: 960, // at least one per generation
   CRISIS_MULTIPLIER: 4.0,
   FEUD_RIPE_MULTIPLIER: 4.0,
@@ -1411,14 +1488,55 @@ export const BUILDINGS = {
  * 2 celdas") and one of them is a number, the other is not.
  */
 export const BUILDING_RULES = {
-  WELL_PEOPLE: 25, // §7.3 point 4
-  CHAPEL_PEOPLE: 30, // §7.3 point 5
-  CHAPEL_FAITH: 45, // §7.3 point 5
-  SMITHY_PEOPLE: 35, // §7.3 point 6
-  MILL_PEOPLE: 45, // §7.3 point 7
+  // TUNE: **las cinco puertas de §7.3, remedidas contra la aldea que existe**
+  // (B-1, 18 sep 2026). Eran 25, 30 (con fe 45), 35 y 45 personas, y están
+  // escritas para la aldea de veinte de antes de v3.69: un valle mediano llega
+  // a **23 personas en veinte años**, así que el molino pedía más gente de la
+  // que el juego tiene nunca y la capilla pedía además una fe de 45 que —medido
+  // con `npm run eligibility`— **falla en el 99 % de los ticks**. El resultado
+  // era una escalera con los cuatro peldaños de arriba pintados: molino en 12
+  // valles de 16 al año 44, capilla en **1 de 16 en ochenta años**, y ninguna
+  // obra de piedra nunca.
+  //
+  // Ahora piden lo que pide una aldea que se está haciendo, y la escalera se
+  // sube entera (16 semillas × 30 años): pozo a las 26 h de reloj, capilla a
+  // las 44, herrería a las 55, molino a las 77 y la primera obra de piedra a
+  // las 72. La fe baja a 30 porque es donde vive de verdad (mediana 34): pedir
+  // 45 era pedir una devoción que sólo da una reliquia.
+  WELL_PEOPLE: 10, // §7.3 point 4
+  CHAPEL_PEOPLE: 12, // §7.3 point 5
+  CHAPEL_FAITH: 30, // §7.3 point 5
+  SMITHY_PEOPLE: 14, // §7.3 point 6
+  MILL_PEOPLE: 18, // §7.3 point 7
   GRANARY_FULL: 0.8, // §7.3 point 3: grain above 80 % of capacity
   GRANARY_HOUSE_DISTANCE: 6, // §7.4: "a menos de 6 celdas de una casa"
   PALISADE_DILATION: 2, // §7.4: "envolvente convexa del núcleo, dilatada 2 celdas"
+  // TUNE: **cuántas casas espera la muralla** (B-1, 18 sep 2026). Lo pidió el
+  // dueño del diseño mirando el problema: «para hacerlo más sencillo, la
+  // muralla se podría hacer a partir de X número de casas», y es la regla
+  // buena, porque **el anillo se fija una sola vez** (v3.88, y es lo que hace
+  // que la muralla sea una y no confeti) y hasta aquí se fijaba alrededor de
+  // una aldea que todavía no existía: medido en doce semillas con el ritmo
+  // nuevo, la herrería llega a las 43 horas de reloj y la muralla detrás, así
+  // que el anillo quedaba en radio 6 a 10 **en el año 2 a 7**, mientras las
+  // casas de ese mismo valle acaban llegando al radio 9,6 (mediana; hasta
+  // 10,5). El resultado era una rosca de 49 piezas en un círculo de 44 celdas
+  // con media aldea construida fuera de su propia muralla.
+  //
+  // Once, y sale de medir cuándo el pueblo deja de extenderse:
+  //
+  //   | casas | radio de las casas | % de lo que llegará a ocupar |
+  //   |---|---|---|
+  //   | 5 | 4,7 | 49 % |
+  //   | 8 | 7,4 | 77 % |
+  //   | **11** | **8,7** | **91 %** |
+  //   | 13 | 9,5 | 99 % |
+  //
+  // Antes de la novena casa el valle se está extendiendo todavía, y con once ya
+  // sabe la forma que va a tener: el anillo se fija donde va a hacer falta. No
+  // es un tope de defensa —la amenaza sigue mandando— es esperar a tener pueblo
+  // que amurallar.
+  PALISADE_HOUSES: 11,
   CHAPEL_SET_BACK: 2, // TUNE: §7.4 wants the chapel "algo apartada"; cells past the core rim.
   // TUNE: cells of street left between two buildings that have walls. One is
   // enough for a lane: at three metres a cell (design.md D.6.2) that is a cart

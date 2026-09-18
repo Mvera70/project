@@ -3761,6 +3761,68 @@ export const TIME = {
 > esprinta) y `DAYS_PER_WEEK` (7 → 3 deja de parecerse a una semana). Cualquiera
 > de los dos arrastra `REAL_MS_PER_TICK` con él, o la identidad se rompe.
 
+> **Revisión B-1, 18 sep 2026 — el ritmo se mide en horas de reloj, y el reloj
+> no se toca.** El dueño del diseño lo planteó jugando: «el ritmo del juego
+> ahora mismo es muy lento … esperar simplemente un año es muchísimo; si el
+> ritmo está mal hecho, que la edad de piedra llegue a los 40 años…». Y al
+> elegir entre acelerar el reloj o acelerar el contenido, eligió: **«me gusta el
+> reloj realista, está ligado a muchos sistemas; el ritmo se arregla con el
+> contenido y la velocidad de omisión. Deberíamos llegar a la edad de piedra en
+> 60/70 horas, el año es lo de menos»**, y «en los primeros meses deben pasar
+> eventos ya, dinamismo por favor».
+>
+> Así que esta tabla **no cambia** y lo que cambia es todo lo que decide cuándo
+> pasan las cosas. La unidad de diseño pasa a ser la hora de reloj a ×1, que es
+> la velocidad por omisión: **una hora real es un mes de juego**, un año son
+> once horas.
+>
+> **Por qué hacía falta, y es una lección que vale más que los números.** v3.72
+> multiplicó la semana por 56 —de 15 s a 14 min— y **ningún umbral del §12 se
+> volvió a medir**, así que el juego llevaba desde entonces calibrado contra un
+> reloj que no existe. Se encontraron cuatro calibraciones caducadas, y las
+> cuatro con la misma firma:
+>
+> | Lo que decía | Lo que significaba al escribirse | Lo que significaba el 18 sep |
+> |---|---|---|
+> | `CROSSROADS.MIN_TICKS_BETWEEN` 120, «30 minutos reales a ×1» | media hora entre decisiones | **28 horas**, y el techo mandaba el 68 % de los intervalos |
+> | `MIGRATION` tirando en la semana 0 (`weekOf(tick) !== 0`) | una tirada al año, con el año en 12 min | una tirada **cada once horas**: 20 personas costaban 138 h |
+> | `LABOUR.BP_PER_BUILDER` 2 y `WORKS_RESERVE` 0,15 | la aldea de **veinte** de antes de v3.69 levantaba una casa en semanas | un caserío de cinco pone 0,45 albañiles: **44 semanas por casa** |
+> | Las puertas de §7.3 (pozo 25, capilla 30 y fe 45, herrería 35, molino 45) | la aldea de veinte llegaba a 40-50 personas | un valle mediano llega a 23: molino en 12 valles de 16 al año 44 y **capilla en 1 de 16 en ochenta años** |
+>
+> Y una quinta que no es del reloj sino del mismo descuido: `FATE`
+> `FATED_LEAST_SHARE` 0,25 se midió en v3.78 **antes** de que M-1 pusiera la
+> gracia de la pareja, o sea contra un mundo donde un caserío se rompía por
+> tener sucesos.
+>
+> **La escalera resultante, en horas de reloj a ×1** (`npx tsx
+> tools/pace-report.ts`, 24 semillas × 60 años, política `prudent`; entre
+> paréntesis, lo que costaba antes de B-1):
+>
+> | Peldaño | Horas a ×1 | Antes |
+> |---|---:|---:|
+> | Primer suceso del valle | 1,2 h | 1,6 h |
+> | Cinco personas | 56 min | 11 h |
+> | Segunda casa | 6,3 h | 33 h |
+> | **Primera decisión del jugador** | **14 h** | 100 h |
+> | Diez personas | 11 h | 55 h |
+> | Granero | 27 h | 60 h |
+> | Capilla | 47 h | nunca (1 valle de 16) |
+> | Veinte personas | 32 h | 138 h |
+> | **Edad de piedra (primera obra)** | **61 h** | 661 h |
+> | Molino | 70 h | 490 h (12 valles de 16) |
+> | Corona posible | 99 h | 271 h |
+>
+> **Y el caos no se toca**: una partida acabada de 24 a sesenta años, la misma
+> que antes, y la población final va de 0 a 80 según el valle. Lo que sí mejora
+> sin haberlo pedido es el ánimo —las semanas por debajo de 25 caen del 26 % al
+> 4 %— porque lo que lo hundía era dormir en el suelo mientras la casa tardaba
+> un año.
+>
+> **La herramienta es parte de la decisión.** `tools/pace-report.ts` imprime esa
+> escalera en horas, y hay que volver a pasarla cada vez que se toque
+> `REAL_MS_PER_TICK` o cualquier número que decida cuándo pasa algo. Medir el
+> ritmo en años de juego es lo que dejó pasar esto durante tres días.
+
 ### 12.2 Fundación
 
 > **Revisión v3.69, 15 sep 2026 — la pareja.** Lo decidió el dueño del diseño:

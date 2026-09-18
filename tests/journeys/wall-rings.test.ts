@@ -57,15 +57,37 @@ function runs(state: GameState): number[] {
 const SEEDS = [7, 11, 23, 41];
 
 describe('P-4 · la muralla es una muralla', () => {
-  it('a los cuarenta años, lo levantado es un solo tramo', () => {
-    // La propiedad más fuerte que el anillo concede, y la que cierra el defecto
-    // que se vio: mientras la aldea cabe en su primer anillo, su muralla es una
-    // sola. Medido: 8, 28, 4 y 8 piezas, un tramo cada valle.
+  it('a los cuarenta años hay una muralla, y lo demás son secciones', () => {
+    // **Esto pedía «un solo tramo», y B-1 enseñó por qué no podía seguir
+    // pidiéndolo.** El anillo se fija una vez (§7.4c) y §7.3 no es el único que
+    // levanta muralla: una encrucijada contestada también la concede. Con el
+    // ritmo nuevo la primera decisión llega a las 14 horas de reloj en vez de a
+    // las cien, así que había piezas de empalizada en el año dos y el anillo se
+    // fijaba **alrededor de una aldea de cinco casas, en radio 7** — medido en
+    // doce semillas — para no moverse nunca: 49 piezas en un círculo de 44
+    // celdas y el pueblo creciendo fuera de su propia muralla.
+    //
+    // La regla que lo arregla es del dueño del diseño —«la muralla se podría
+    // hacer a partir de X número de casas»— con la X medida en once
+    // (`BUILDING_RULES.PALISADE_HOUSES`: con once casas el pueblo ocupa ya el
+    // 91 % del radio que va a ocupar). Con ella, el anillo se fija en el año 13
+    // a 34 con radio 10 a 12, que es el del valle hecho.
+    //
+    // Lo que queda, y es lo que esta prueba guarda ahora: **una muralla de
+    // verdad y, como mucho, secciones sueltas de lo que se levantó antes de
+    // tener pueblo** —que es la palabra del dueño para eso—. Medido a los
+    // cuarenta años: el tramo mayor tiene 68, 71, 56 y 63 piezas, o sea del
+    // 62 % al 92 % de la muralla del valle, y lo que sobra son de uno a cuatro
+    // trozos de 1 a 31 piezas.
     for (const seed of SEEDS) {
       const state = foundGame(seed);
       run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
       const sizes = runs(state);
-      expect(sizes.length, `semilla ${seed}: ${JSON.stringify(sizes)}`).toBeLessThanOrEqual(1);
+      const total = sizes.reduce((sum, n) => sum + n, 0);
+      if (total === 0) continue;
+      expect((sizes[0] ?? 0) / total, `semilla ${seed}: ${JSON.stringify(sizes)}`)
+        .toBeGreaterThanOrEqual(0.6);
+      expect(sizes.length, `semilla ${seed}: ${JSON.stringify(sizes)}`).toBeLessThanOrEqual(6);
     }
   });
 
@@ -90,20 +112,31 @@ describe('P-4 · la muralla es una muralla', () => {
     }
   });
 
-  it('el anillo se escribe una vez y se respeta', () => {
-    // `GameState.ring` es el radio en curso. Mientras quepa una pieza más, no
-    // cambia; y cada pieza nueva cae en él.
+  it('el anillo se escribe una vez, y la muralla vive en él', () => {
+    // `GameState.ring` es el radio en curso: mientras quepa una pieza más no
+    // cambia, y cada pieza que se levanta **desde que se escribió** cae en él.
+    //
+    // **Lo que no puede exigir esta prueba, y B-1 lo midió:** que *todas* las
+    // piezas estén en el anillo. El anillo se escribe cuando el pueblo tiene
+    // once casas (`PALISADE_HOUSES`), y hasta entonces una encrucijada
+    // contestada puede conceder empalizada —con el ritmo nuevo, desde las 14
+    // horas de reloj—. Esas piezas de antes son las **secciones** de las que
+    // habló el dueño del diseño, y están donde la aldea pudo ponerlas. Medido
+    // en la semilla 41: de 69 piezas, 63 en el anillo y 6 en dos secciones
+    // previas.
     const state = foundGame(41);
     run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
     const ring = state.ring;
     expect(ring, 'a los cuarenta años ya hay anillo').not.toBeNull();
     if (ring === null) return;
     const centre = { x: state.plaza.x + 0.5, y: state.plaza.y + 0.5 };
-    for (const b of state.buildings) {
-      if (b.lostTick !== null || (b.kind !== 'wall' && b.kind !== 'palisade')) continue;
+    const walls = state.buildings.filter((b) => b.lostTick === null
+      && (b.kind === 'wall' || b.kind === 'palisade'));
+    const onRing = walls.filter((b) => {
       const gap = Math.hypot(b.x + 0.5 - centre.x, b.y + 0.5 - centre.y);
-      expect(Math.abs(gap - ring), `pieza en ${b.x},${b.y} fuera del anillo ${ring}`)
-        .toBeLessThanOrEqual(0.75);
-    }
+      return Math.abs(gap - ring) <= 0.75;
+    });
+    expect(onRing.length / Math.max(1, walls.length),
+      `en el anillo ${onRing.length} de ${walls.length}`).toBeGreaterThanOrEqual(0.8);
   });
 });

@@ -195,6 +195,15 @@ sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **Reglas que cuestan tiempo cada vez que se olvidan:**
 
+- **Un umbral que decide *cuándo* pasa algo se mira en horas de reloj, no en
+  años de juego.** `npx tsx tools/pace-report.ts` imprime la escalera del juego
+  en horas a ×1, que es la velocidad por omisión y la unidad en la que el dueño
+  del diseño pone los objetivos («la edad de piedra en 60/70 horas»). A catorce
+  minutos por semana, **una hora real es un mes de juego**. Medirlo en años es
+  lo que dejó pasar tres días que v3.72 había multiplicado la semana por 56 sin
+  que nadie remidiera el §12: cuatro constantes decían una cosa y significaban
+  otra, y una de ellas lo llevaba escrito en su propio comentario («30 minutos
+  reales a ×1») sin que nadie cambiara el número (B-1, §12.1).
 - **En la capa de vida, un umbral no se fija con una jornada, igual que no se
   fija con una semilla.** Cada jornada tiene su propia semilla (`seedOfDay`), así
   que el día 0 de seis semillas son seis muestras, no seis aldeas.

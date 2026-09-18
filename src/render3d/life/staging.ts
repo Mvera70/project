@@ -21,6 +21,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import type { GameState, VillagerId } from '@engine/state';
 import { gatheringsAt } from '@derive/gatherings';
 import type { Point, Terrain } from './body';
+import { canReach, nearestReachable } from './terrain';
 import { OFFERS, placedOffer, type OfferSpec, type Place } from './offers';
 
 /**
@@ -77,10 +78,42 @@ export function ordersOf(state: GameState, since: number = state.tick): Order[] 
  * fija al mediodía, y lo que da es compañía y no deber. Una reunión no es un
  * turno de trabajo.
  */
-export function meetingPlace(order: Order, land: Terrain, index: number): Place | null {
+export function meetingPlace(
+  order: Order, land: Terrain, index: number,
+  /**
+   * B-1 · **El suelo que la aldea pisa de verdad**, si quien llama lo tiene.
+   *
+   * Sin esto, el corro se planta en el primer suelo pisable que haya alrededor
+   * del punto del motor, y «pisable» no es «alcanzable»: una aldea densa deja
+   * bolsas de prado cerradas entre edificios. Medido cuando B-1 hizo que las
+   * capillas existieran de verdad (semilla 7, año 12): el corro caía en una
+   * bolsa de 1 707 celdas a la que sólo llegaban **2 de las 6 casas**, así que
+   * `village.ts` descartaba la reunión entera por inalcanzable y la aldea se
+   * iba a sus campos — cero de veinticinco, con la decisión del jugador
+   * quedándose sin nada en pantalla, que es el principio 1 del juego. En la
+   * semilla 41, con el mismo código, se reunían once de setenta.
+   *
+   * Con la orilla a mano, el punto se mueve a la celda alcanzable más cercana
+   * (`nearestReachable`, la misma que usa la cabaña) y las plazas que queden en
+   * otra bolsa se descartan.
+   */
+  reach?: Uint8Array,
+): Place | null {
   if (order.kind !== 'gather') return null;
-  const offer = placedOffer(OFFERS['gather'] as OfferSpec, order.at, land, MEETING_HOURS);
+  const at = reach === undefined ? order.at : nearestReachable(land, reach, order.at, MEETING_SEARCH);
+  if (at === null) return null;
+  const offer = placedOffer(OFFERS['gather'] as OfferSpec, at, land, MEETING_HOURS);
   if (offer === null) return null;
+  if (reach !== undefined) {
+    const spots = (offer.spots ?? []).filter((spot) => canReach(land, reach, spot));
+    const first = spots[0];
+    if (first === undefined) return null;
+    return {
+      id: `gather:${index}`,
+      at: first,
+      offers: [{ ...offer, at: first, spots, seats: spots.length }],
+    };
+  }
   // **El sitio es donde se puede estar, no donde el motor apunta**, y esto
   // costó una tarde de depuración. §11.8 convoca «en la capilla», «en la plaza»
   // o «en el vado», y `placeOf` devuelve el punto de esa cosa: el de la capilla
@@ -152,3 +185,12 @@ export function wolfRaidToday(state: GameState): boolean {
  * rezagado sigue acercándose al anochecer.
  */
 const MEETING_HOURS: readonly [number, number] = [0.25, 0.75];
+
+/**
+ * Cuántas celdas se busca alrededor del punto del motor una celda alcanzable.
+ *
+ * Seis: el edificio más grande que convoca es la iglesia (3×3), así que desde
+ * su centro hay que poder salir de su huella y de la fila de alrededor. Con
+ * menos, una capilla pegada a otro edificio no encuentra la salida buena.
+ */
+const MEETING_SEARCH = 6;

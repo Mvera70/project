@@ -261,7 +261,17 @@ export function nextProject(state: GameState): Project | null {
   // «si eliges al herrero, pues haces más armas» significa en un juego que no
   // tiene armas como montón (§7.12: las armas son la muralla y el señor que la
   // cuenta).
-  if (has(state, 'smithy') && (threatened || will(state).arms)) wanted.push('palisade');
+  // **Y la muralla espera a que haya pueblo que amurallar.** Once casas
+  // (`BUILDING_RULES.PALISADE_HOUSES`), que es la regla que pidió el dueño del
+  // diseño —«la muralla se podría hacer a partir de X número de casas»— y el
+  // número está medido: con once, las casas ocupan ya el 91 % del radio que van
+  // a ocupar. Importa porque el anillo de §7.4c **se fija una sola vez**: con la
+  // muralla pedida en el año dos, el valle acababa creciendo fuera de ella.
+  if (has(state, 'smithy') && (threatened || will(state).arms)
+    && standing(state, 'house').length + standing(state, 'stone_house').length
+      >= BUILDING_RULES.PALISADE_HOUSES) {
+    wanted.push('palisade');
+  }
 
   // **E3 · lo que el jugador quiere antes va antes.**
   //

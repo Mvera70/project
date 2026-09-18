@@ -231,14 +231,20 @@ describe('balance · encrucijadas', () => {
     expect(CROSSROADS.GUARANTEE_TICKS).toBe(TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR);
   });
 
-  it('el techo son dos años y medio de aldea', () => {
-    // Estuvo escrito como «30 minutos reales a ×1», y era verdad mientras la
-    // semana durase quince segundos. Desde v3.72 dura catorce minutos, así que
-    // la misma decisión —ciento veinte semanas entre dos encrucijadas— se lee
-    // en la pared de otra manera según el botón: veintiséis minutos a ×64,
-    // veintiocho horas a ×1. Lo que el diseño fija son las semanas, y eso es lo
-    // que esta prueba guarda.
-    expect(CROSSROADS.MIN_TICKS_BETWEEN).toBe(2.5 * TIME.WEEKS_PER_YEAR);
+  it('el techo es un año de aldea, y no lo pone el reloj', () => {
+    // **Eran dos años y medio, y el número venía de una lectura caducada.**
+    // Estuvo escrito como «30 minutos reales a ×1» y era verdad mientras la
+    // semana durase quince segundos; desde v3.72 dura catorce minutos, así que
+    // los mismos 120 ticks pasaron a ser veintiocho horas de reloj sin que
+    // nadie tocara la constante. Medido en B-1 con el catálogo real (16
+    // semillas × 30 años), el techo mandaba el **68 %** de los intervalos, y
+    // §8.6 dice que por encima del 40 % «manda el reloj, no el contenido».
+    //
+    // Con un año baja al 34 % y el intervalo lo pone otra vez lo que hay
+    // elegible (mediana 76 semanas). Lo que esta prueba guarda es la propiedad,
+    // no el número: **el hueco mínimo es un año de aldea**, que es lo que hace
+    // que dos decisiones no se pisen sin que el reloj sea quien decide.
+    expect(CROSSROADS.MIN_TICKS_BETWEEN).toBe(TIME.WEEKS_PER_YEAR);
   });
 
   it('el techo es mucho más estrecho que la garantía', () => {

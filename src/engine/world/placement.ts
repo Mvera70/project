@@ -137,6 +137,10 @@ function onRingRect(rect: Rect, centre: Point, radius: number): boolean {
 function ringToBuild(state: GameState, centre: Point, coreRadius: number,
   ground: { occupied: Uint8Array; reserved: Uint8Array }): number | null {
   // El que ya se decidió, y si no hay ninguno, uno alrededor de lo construido.
+  // **Que eso sea el tamaño bueno depende de cuándo se pregunte**, y de eso se
+  // encarga §7.3: la muralla no se pide hasta que hay once casas
+  // (`PALISADE_HOUSES`), que es cuando el pueblo tiene ya el 91 % de la
+  // extensión que va a tener. El anillo se fija una vez y no se mueve.
   const base = state.ring ?? Math.round(coreRadius + BUILDING_RULES.PALISADE_DILATION);
   // Si el anillo elegido no tiene sitio, se busca uno más afuera **sólo
   // mientras la aldea no tenga muralla**: el primer anillo tiene que caber en
@@ -310,12 +314,24 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // §7.4c · el anillo que toca, sólo cuando se va a levantar muralla: es un
   // barrido de círculos y no hay que pagarlo por cada casa.
   const ring = kind === 'palisade' ? ringToBuild(state, centre, coreRadius, occupied) : null;
-  // **Y se escribe.** Es la única cosa que esta función cambia del estado, y es
-  // a propósito: un anillo es una decisión de la aldea —«hasta aquí llega el
-  // pueblo»— y una decisión se apunta. Si se volviera a calcular cada vez,
-  // volvería a moverse medio paso por pieza, que es lo que llenaba el valle de
-  // tramos sueltos (ver `GameState.ring`).
-  if (ring !== null && ring !== state.ring) state.ring = ring;
+  // **Y se escribe, pero sólo cuando hay pueblo que amurallar.** Un anillo es
+  // una decisión de la aldea —«hasta aquí llega el pueblo»— y una decisión se
+  // apunta: si se volviera a calcular cada vez, volvería a moverse medio paso
+  // por pieza, que es lo que llenaba el valle de tramos sueltos (ver
+  // `GameState.ring`).
+  //
+  // **B-1 le pone la condición de las once casas**, y hace falta porque §7.3 no
+  // es el único que levanta muralla: una encrucijada contestada también la
+  // concede, y con el ritmo nuevo la primera decisión llega a las 14 horas de
+  // reloj en vez de a las cien. Medido, eso fijaba el anillo **en el año 1,8 a
+  // 6,3 con cuatro o cinco casas y radio 7**, y como no se mueve nunca, el
+  // valle acababa creciendo fuera de su propia muralla: 49 piezas en un círculo
+  // de 44 celdas. Con la condición, esas piezas tempranas son un trozo de
+  // empalizada donde la aldea podía ponerlo —lo que el dueño del diseño llama
+  // una sección— y el anillo de verdad se fija cuando el pueblo ya tiene su
+  // forma (once casas, el 91 % del radio que va a ocupar).
+  const grown = houses.length >= BUILDING_RULES.PALISADE_HOUSES;
+  if (ring !== null && ring !== state.ring && grown) state.ring = ring;
   // **Y la línea de la muralla empezada es de la muralla.** Sin esto, la aldea
   // levantaba casas encima del anillo en curso, el anillo se quedaba sin sitio
   // y el siguiente arrancaba más afuera dejando la pieza vieja suelta: medido

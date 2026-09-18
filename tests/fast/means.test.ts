@@ -22,13 +22,28 @@ import { foundTwenty } from '../helpers/founding';
 
 const give = (means: MeansId): PlayerAct[] => [{ kind: 'means', means }];
 
-/** Una aldea hecha con de todo en la despensa, para que el precio no estorbe. */
+/**
+ * Una aldea hecha con de todo en la despensa, para que el precio no estorbe.
+ *
+ * **Y con camas de sobra desde B-1**, por la misma razón: el par de manos pide
+ * un sitio donde dormir, y con el ritmo nuevo esta aldea de cuatro años llega
+ * con las camas llenas —la gente llega todos los meses mientras el valle es
+ * pequeño—, así que la negativa que salía era `room` y esta prueba, que mide el
+ * **precio**, no llegaba a mirarlo. Dos casas más y el sitio deja de estorbar,
+ * igual que la despensa.
+ */
 function rich(seed = 7): GameState {
   const state = foundTwenty(seed);
   run(state, TIME.WEEKS_PER_YEAR * 4, 'prudent', CATALOG);
   state.village.grain = 5000;
   state.village.wood = 5000;
   state.village.silver = 500;
+  for (let n = 0; n < 2; n += 1) {
+    state.buildings.push({
+      id: 9500 + n, kind: 'house', x: 10 + n * 3, y: 10, w: 2, h: 2,
+      builtTick: state.tick, lostTick: null, tier: 0, lit: true, blockedUntil: null,
+    });
+  }
   return state;
 }
 

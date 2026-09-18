@@ -68,12 +68,14 @@ describe('grafo de módulos del motor', () => {
     // quien lleva la corona (§5.7). `people/crown.ts` es una hoja a propósito
     // —no importa `demography`, y copia `isHere` en local— justamente para que
     // esta flecha no se invierta.
+    // B-1 · y ya no importa `time`: la migración preguntaba `weekOf(tick) !== 0`
+    // —una tirada al año— y ese compás pasó a `MIGRATION.ARRIVE_EVERY_WEEKS`,
+    // que se compara con el tick a pelo.
     expect(importsOf('people/demography.ts')).toEqual([
       'balance',
       'crown',
       'rng',
       'state',
-      'time',
       'traits',
       'villagers',
     ]);

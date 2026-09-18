@@ -22,7 +22,6 @@ import type {
   VillagerId,
 } from '../state';
 import { will } from './crown';
-import { weekOf } from '../time';
 import { ageOf, makeVillager } from './villagers';
 import { rollCharacter } from './traits';
 
@@ -301,9 +300,16 @@ function leaderPresent(state: GameState): boolean {
  * village its main engine of growth and lose people twice as fast.
  */
 export function resolveMigration(state: GameState): MigrationEvent[] {
-  if (weekOf(state.tick) !== 0) return [];
-
   const people = population(state);
+  // B-1 · **El compás de la llegada.** Antes estaba aquí en el código, y era
+  // una tirada al año —`weekOf(state.tick) !== 0`—: el techo del crecimiento
+  // temprano. Una aldea hecha sigue recibiendo una vez al año; la joven, una
+  // vez por estación. El motivo, con las medidas, en `MIGRATION`.
+  const beat = people < MIGRATION.ARRIVE_SMALL_BELOW
+    ? MIGRATION.ARRIVE_EVERY_WEEKS_SMALL
+    : MIGRATION.ARRIVE_EVERY_WEEKS;
+  if (state.tick % beat !== 0) return [];
+
   const grainYears = people > 0
     ? state.village.grain / (people * TIME.WEEKS_PER_YEAR * 1)
     : Number.POSITIVE_INFINITY;

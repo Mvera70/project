@@ -12,9 +12,10 @@ import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 import { loadAssets, type AssetManifest } from '../../src/render3d/assets';
 import { actionClips } from '../../src/render3d/action-clips';
+import { allocateLabour } from '../../src/engine/subsistence/labour';
 
 describe('IA-12 · jornada y acciones', () => {
-  it('la pareja convierte sus fracciones semanales en doce jornadas de campo, una de tala y una de obra', () => {
+  it('la pareja convierte sus fracciones semanales en jornadas enteras sin perder ninguna', () => {
     const state = foundGame(7), before = JSON.stringify(state), land = terrainOf(state);
     const places = placesOf(state, land), field = places.find(place => place.id.startsWith('field:'))!;
     const work = field.offers.find(offer => offer.id === 'work')!;
@@ -28,9 +29,28 @@ describe('IA-12 · jornada y acciones', () => {
     const jobs = days.flatMap((plans, day) => [...plans].flatMap(([id, plan]) => plan.job === null
       ? [] : [{ day, id, place: plan.job.place }]));
 
-    expect(jobs.filter(job => job.place.startsWith('field:'))).toHaveLength(12);
-    expect(jobs.filter(job => job.place.startsWith('felling:'))).toHaveLength(1);
-    expect(jobs.filter(job => job.place.startsWith('works:'))).toHaveLength(1);
+    // **La propiedad, y no el reparto de un día concreto.** Esto decía «doce de
+    // campo, una de tala y una de obra», y esos tres números son el reparto de
+    // manos de §5.2, que B-1 movió: la obra pasó de tener garantizado el 15 %
+    // de las manos al 30 %, así que la pareja de la fundación reparte hoy 10 de
+    // campo, 2 de tala y 2 de obra. Congelar el reparto era congelar el balance
+    // en una prueba de la capa de vida, que no es de quien es.
+    //
+    // Lo que esta prueba guarda —y es lo que IA-12 tenía que demostrar— es que
+    // **las fracciones semanales del motor se convierten en jornadas enteras y
+    // no se pierde ninguna**: dos personas por siete días son catorce jornadas,
+    // cada oficio se lleva las suyas con un día de margen de redondeo, y el
+    // campo sigue siendo lo que más manos come.
+    const share = allocateLabour(state);
+    const inDays = (fraction: number): number => fraction * 7;
+    const fieldDays = jobs.filter(job => job.place.startsWith('field:')).length;
+    const fellingDays = jobs.filter(job => job.place.startsWith('felling:')).length;
+    const worksDays = jobs.filter(job => job.place.startsWith('works:')).length;
+    expect(fieldDays + fellingDays + worksDays).toBe(share.workforce * 7);
+    expect(Math.abs(fieldDays - inDays(share.farmers)), 'campo').toBeLessThanOrEqual(1);
+    expect(Math.abs(fellingDays - inDays(share.cutters)), 'tala').toBeLessThanOrEqual(1);
+    expect(Math.abs(worksDays - inDays(share.builders)), 'obra').toBeLessThanOrEqual(1);
+    expect(fieldDays).toBeGreaterThan(fellingDays + worksDays);
     expect(new Set(jobs.map(job => `${job.day}:${job.id}`)).size).toBe(jobs.length);
     expect(new Set(jobs.map(job => job.id))).toEqual(new Set([0, 1]));
     expect(JSON.stringify(state)).toBe(before);
