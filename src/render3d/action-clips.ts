@@ -2,9 +2,22 @@
 import { type AnimationClip, Quaternion, QuaternionKeyframeTrack, Vector3, VectorKeyframeTrack } from 'three';
 import { VILLAGER_CLIPS, type ClipName } from './clips';
 
+/**
+ * Los clips que este módulo **fabrica**, y que por tanto no están en el GLB ni
+ * en `art/catalog.json`.
+ *
+ * Está exportada porque `VILLAGER_CLIPS` es un superconjunto del catálogo desde
+ * IA-12 y alguien tiene que poder comprobar por qué: un nombre en la tabla que
+ * ni venga del GLB ni se fabrique aquí es un clip que nadie puede reproducir, y
+ * eso en pantalla es un aldeano en pose de descanso haciendo como que trabaja.
+ * Lo vigila `tests/fast/graphics-clock.test.ts`.
+ */
+export const ACTION_CLIPS: readonly ClipName[] = [
+  'sit', 'talk', 'pray', 'hammer', 'chop', 'play', 'drink', 'sort',
+];
+
 export function actionClips(idle: AnimationClip): AnimationClip[] {
-  const actions: ClipName[] = ['sit', 'talk', 'pray', 'hammer', 'chop', 'play', 'drink', 'sort'];
-  return actions.map(name => {
+  return ACTION_CLIPS.map(name => {
     const duration = VILLAGER_CLIPS[name].seconds;
     const clip = idle.clone(); clip.name = name; clip.duration = duration;
     for (const track of clip.tracks) track.times = Float32Array.from(track.times, t => t * duration / idle.duration);

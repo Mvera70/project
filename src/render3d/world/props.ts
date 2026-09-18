@@ -10,7 +10,7 @@
 // trasto no sobrevive a la jornada (E.2).
 
 import {
-  CylinderGeometry, Group, Mesh, MeshStandardMaterial, SphereGeometry,
+  BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, SphereGeometry,
   type BufferGeometry, type Material, type Object3D,
 } from 'three';
 import type { PropSighting } from '../life/cast';
@@ -28,6 +28,24 @@ const BALL_RADIUS = 0.14;
 const OTHER_RADIUS = 0.11;
 const OTHER_HEIGHT = 0.28;
 
+/**
+ * **El barril y el arado son de otra escala, y a propósito.** M-3: son lo que
+ * el jugador metió en el valle, no algo que alguien se echa al hombro, así que
+ * se leen desde lejos. Una celda de este valle son unos tres metros (D.6.2), de
+ * donde salen las dos medidas del encargo de arte (`docs/encargo-arado.md`):
+ * el barril mide 0,9 m de alto —0,3 celdas— y el arado 2,4 × 0,9 × 1,0 m, que
+ * son 0,8 × 0,3 × 0,33.
+ *
+ * Son primitivas mientras no haya malla, igual que la pelota y el cubo llevan
+ * siendo una esfera y un cilindro desde V-09: en cuanto `barrel.glb` y
+ * `plough.glb` estén publicados, `instance` los devuelve y esto no se usa.
+ */
+const BARREL_RADIUS = 0.13;
+const BARREL_HEIGHT = 0.3;
+const PLOUGH_LENGTH = 0.8;
+const PLOUGH_WIDTH = 0.3;
+const PLOUGH_HEIGHT = 0.33;
+
 /** El color de cada clase, de la paleta de P1: tinta y latón, sin colores que
  *  no estén ya en la aldea. */
 const COLOUR: Readonly<Record<Kind, number>> = {
@@ -37,7 +55,14 @@ const COLOUR: Readonly<Record<Kind, number>> = {
   bundle: 0x8a6a3c,
   stone: 0x8f8a84,
   grain: 0xc89a48,
+  // Roble y hierro: las dos maderas ya están en la aldea y el hierro es el de
+  // la herrería.
+  barrel: 0x7a5630,
+  plough: 0x6b4a2b,
 };
+
+/** El hierro de la vertedera del arado, para que no sea un bulto de madera. */
+const IRON = 0x53565a;
 
 interface Shown {
   readonly object: Object3D;
@@ -49,12 +74,22 @@ export class Props {
   private readonly shown = new Map<number, Shown>();
   private readonly geometry: Readonly<Record<Kind, BufferGeometry>>;
   private readonly materials = new Map<Kind, Material>();
+  /** El hierro del arado de apaño: no es de ninguna clase de trasto, así que no
+   *  cabe en el mapa de arriba. Se crea la primera vez que hace falta. */
+  private iron: Material | null = null;
+  /** Lo que el arado de apaño crea por su cuenta, para poder liberarlo. */
+  private readonly extra: BufferGeometry[] = [];
 
   constructor(private readonly instance?: (id: string) => Object3D | undefined) {
     this.group.name = 'Valley_Props';
     const ball = new SphereGeometry(BALL_RADIUS, 10, 8);
     const other = new CylinderGeometry(OTHER_RADIUS, OTHER_RADIUS, OTHER_HEIGHT, 8);
-    this.geometry = { ball, stick: other, bucket: other, bundle: other, stone: other, grain: other };
+    const barrel = new CylinderGeometry(BARREL_RADIUS, BARREL_RADIUS * 0.88, BARREL_HEIGHT, 10);
+    const plough = new BoxGeometry(PLOUGH_LENGTH, PLOUGH_HEIGHT * 0.34, PLOUGH_WIDTH);
+    this.geometry = {
+      ball, stick: other, bucket: other, bundle: other, stone: other, grain: other,
+      barrel, plough,
+    };
   }
 
   private materialFor(kind: Kind): Material {
@@ -87,11 +122,28 @@ export class Props {
       if (held === undefined || held.kind !== sighting.kind) {
         if (held !== undefined) this.retire(sighting.id);
         const model = sighting.kind === 'bundle' || sighting.kind === 'grain' ? this.instance?.('bundle')
-          : sighting.kind === 'stone' ? this.instance?.('rock') : undefined;
-        const object = model ?? new Mesh(this.geometry[sighting.kind], this.materialFor(sighting.kind));
+          : sighting.kind === 'stone' ? this.instance?.('rock')
+            // M-3 · lo que el jugador dio. Los dos piden su propia malla y, hasta
+            // que exista, se apañan con primitivas: `instance` devuelve nada
+            // cuando el recurso no está publicado, que es hoy el caso de los dos.
+            : sighting.kind === 'barrel' ? this.instance?.('barrel')
+              : sighting.kind === 'plough' ? this.instance?.('plough') : undefined;
+        const object = model
+          ?? (sighting.kind === 'plough' ? this.ploughStandIn()
+            : new Mesh(this.geometry[sighting.kind], this.materialFor(sighting.kind)));
         object.name = `Prop_${sighting.id}`;
         object.traverse(child => { child.castShadow = true; });
-        if (model !== undefined) {
+        // Un barril de pie se apoya en el suelo, no se entierra hasta la mitad:
+        // el cilindro tiene el origen en su centro.
+        if (model === undefined && sighting.kind === 'barrel') {
+          object.userData.groundLift = BARREL_HEIGHT / 2;
+        }
+        if (model !== undefined && (sighting.kind === 'barrel' || sighting.kind === 'plough')) {
+          // Las mallas del encargo vienen ya en unidades de celda, con el origen
+          // centrado y en el suelo (`docs/encargo-arado.md`): ni escala ni
+          // levante, o se dibujarían del tamaño de una casa.
+          object.userData.groundLift = 0;
+        } else if (model !== undefined) {
           // El recurso cuelga hacia abajo cuando va en la mano. En tierra se
           // tumba, se hace menor que una carga completa y se levanta medio
           // grosor para no enterrarlo.
@@ -111,6 +163,44 @@ export class Props {
     for (const id of [...this.shown.keys()]) {
       if (!present.has(id)) this.retire(id);
     }
+  }
+
+  /**
+   * Un arado de apaño, mientras no haya malla: el cuerpo tumbado, la vertedera
+   * de hierro y la mancera levantada. Tres primitivas y ninguna es un adorno —
+   * son las tres piezas por las que se reconoce un arado de vertedera de lejos,
+   * que es la distancia a la que se mira este juego.
+   *
+   * Las medidas son las del encargo (`docs/encargo-arado.md`) pasadas a celdas,
+   * así que el día que llegue el GLB no cambia de tamaño en pantalla.
+   */
+  private ploughStandIn(): Object3D {
+    const group = new Group();
+    const wood = this.materialFor('plough');
+    const body = new Mesh(this.geometry.plough, wood);
+    body.position.y = PLOUGH_HEIGHT * 0.17;
+    group.add(body);
+
+    this.iron ??= new MeshStandardMaterial({ color: IRON, roughness: 0.5, metalness: 0.35 });
+    const iron: Material = this.iron;
+    const shareShape = new BoxGeometry(
+      PLOUGH_LENGTH * 0.3, PLOUGH_HEIGHT * 0.2, PLOUGH_WIDTH * 0.8,
+    );
+    this.extra.push(shareShape);
+    const share = new Mesh(shareShape, iron);
+    share.position.set(-PLOUGH_LENGTH * 0.42, PLOUGH_HEIGHT * 0.1, 0);
+    share.rotation.z = 0.26;
+    group.add(share);
+
+    const handleShape = new CylinderGeometry(
+      PLOUGH_WIDTH * 0.07, PLOUGH_WIDTH * 0.07, PLOUGH_HEIGHT, 6,
+    );
+    this.extra.push(handleShape);
+    const handle = new Mesh(handleShape, wood);
+    handle.position.set(PLOUGH_LENGTH * 0.34, PLOUGH_HEIGHT * 0.5, 0);
+    handle.rotation.z = -0.3;
+    group.add(handle);
+    return group;
   }
 
   private retire(id: number): void {
@@ -133,6 +223,10 @@ export class Props {
     // `stick`/`bucket`/`bundle` comparten una geometría: se libera una vez,
     // no tres.
     for (const geometry of new Set(Object.values(this.geometry))) geometry.dispose();
+    for (const geometry of this.extra) geometry.dispose();
+    this.extra.length = 0;
     for (const material of this.materials.values()) material.dispose();
+    this.iron?.dispose();
+    this.iron = null;
   }
 }

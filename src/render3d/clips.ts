@@ -6,9 +6,22 @@
 // manifest exists would block this round on the next one.
 //
 // A copy that nobody checks is a copy that drifts, so
-// `tests/fast/graphics-actors.test.ts` reads the catalogue and asserts these
+// `tests/fast/graphics-clock.test.ts` reads the catalogue and asserts these
 // match. When G-06 lands the manifest, this table becomes its default and the
 // test keeps pointing at the same truth.
+//
+// **Y desde IA-12 esta tabla es más grande que el catálogo, a propósito.** El
+// GLB del aldeano trae cuatro animaciones —`idle`, `walk`, `work_hoe` y
+// `carry_walk`, las que G-04 midió— y los ocho clips de acción (`sit`, `talk`,
+// `pray`, `hammer`, `chop`, `play`, `drink`, `sort`) los **fabrica**
+// `action-clips.ts` doblando huesos sobre el `idle`, sin tocar el GLB. Sus
+// segundos viven aquí porque son una decisión de ritmo y no una medida del
+// exportado. Lo que la prueba comprueba, entonces, no es que las dos listas
+// tengan el mismo tamaño —eso dejó de ser verdad el día de IA-12 y rompió la
+// prueba sin que nada se hubiera desviado— sino tres cosas: que lo del catálogo
+// esté aquí con los mismos números, que lo que sobra sea exactamente lo que
+// `ACTION_CLIPS` fabrica, y que **ningún clip fabricado ande**: un clip clonado
+// del `idle` no tiene paso que medir, y darle zancada es el aldeano patinando.
 
 export interface ClipMotion {
   readonly seconds: number;

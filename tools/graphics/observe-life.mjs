@@ -14,6 +14,16 @@ const follow = Number(opt('follow', '-1')), zoom = Number(opt('zoom', '1'));
 const seconds = Number(opt('seconds', '120')), fps = Number(opt('fps', '2'));
 const live = args.includes('--live');
 const speed = Number(opt('speed', '16'));
+// M-3 · `--means plough|ale|pigs|axe|relic|hand` abre un valle **con ese medio ya
+// dado**, que es la única forma de observar lo que el jugador metió: un medio se
+// paga con lo del valle, así que esperar a que la aldea junte la plata no es una
+// forma de grabarlo. Entra por la ruta de depuración (`?debug=1&live=1&means=`,
+// `src/main.ts`) en vez de por el menú, y por eso se salta sus clics.
+const means = opt('means', '');
+// IA-5 · `--happening wolves_at_the_coop` provoca ese suceso del valle esta
+// semana, por la misma razón: la visita del lobo sale pocas veces en sesenta
+// años y esperarla mirando no es grabarla.
+const happening = opt('happening', '');
 if (!Number.isFinite(seconds) || seconds < 0 || !Number.isInteger(30 / fps) || fps <= 0 || lead < 0 || lead > 120
   || !Number.isInteger(advanceWeeks) || advanceWeeks < 0) throw new Error('Usa fps divisor de 30, lead entre 0 y 120 y advance entero positivo.');
 const out = resolve(opt('out', `artifacts/graphics/IA-10/seed-${seed}`));
@@ -32,11 +42,19 @@ try {
   }
   const errors = [];
   tab.on('pageerror', e => errors.push(String(e)));
-  await tab.goto(pathToFileURL(resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html'))).href);
-  await tab.locator('#valley-seed').fill(String(seed));
-  if (await tab.locator('.title-dev').getAttribute('aria-pressed') === 'false') await tab.locator('.title-dev').click();
-  await tab.locator('#valley-year').fill(String(year));
-  await tab.locator('.title-new').click();
+  const pageUrl = pathToFileURL(resolve(opt('page', 'artifacts/graphics/G-10/game/valley.html')));
+  const debugRoute = means !== '' || happening !== '';
+  if (debugRoute) {
+    const extra = (means === '' ? '' : `&means=${means}`) + (happening === '' ? '' : `&happening=${happening}`);
+    pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
+  }
+  await tab.goto(pageUrl.href);
+  if (!debugRoute) {
+    await tab.locator('#valley-seed').fill(String(seed));
+    if (await tab.locator('.title-dev').getAttribute('aria-pressed') === 'false') await tab.locator('.title-dev').click();
+    await tab.locator('#valley-year').fill(String(year));
+    await tab.locator('.title-new').click();
+  }
   if (live) for (let attempt = 0; attempt < 200; attempt++) {
     if (await tab.evaluate(() => (window.__valleyLife?.()?.people.length ?? 0) > 0)) break;
     await tab.clock.runFor(100);

@@ -7,7 +7,7 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { MEANS_SPEC, giveMeans } from '@engine/world/means';
 import { postOffer } from '@engine/world/road';
-import type { GameState, MeansId, Season } from '@engine/state';
+import type { GameState, HappeningId, MeansId, Season } from '@engine/state';
 import { SEASONS, seasonOf, yearOf } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
 import { paletteFor } from '@derive/palette';
@@ -150,6 +150,20 @@ export function giveNow(state: GameState, id: MeansId): void {
     state.village[key] = Math.max(state.village[key], (amount ?? 0) * 2);
   }
   giveMeans(state, id, seasonOf(state.tick), yearOf(state.tick));
+}
+
+/**
+ * IA-5 · Provoca un suceso del valle esta misma semana, para poder **verlo**.
+ *
+ * Es lo que le da su estado a `?happening=wolves_at_the_coop`. Hace falta por
+ * lo mismo que `?weather=storm`: el lobo del corral sale en un puñado de
+ * semanas de una partida de sesenta años, así que esperarlo mirando no es una
+ * forma de grabarlo. **No toca el motor**: escribe en el registro lo que el
+ * paso 2b habría escrito, que es lo único que la capa de vida lee para
+ * guionizar la visita (`wolfRaidToday`, `life/staging.ts`).
+ */
+export function happenNow(state: GameState, id: HappeningId): void {
+  state.happenings.push({ tick: state.tick, id, visible: [], who: [] });
 }
 
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {

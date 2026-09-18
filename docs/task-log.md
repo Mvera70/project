@@ -553,16 +553,17 @@ es**.
 
 | Qué queda | De quién | Por qué no está hecho |
 |---|---|---|
-| **El barril y el arado en la escena**: el barril en la plaza durante la fiesta, el arado apoyado en el campo, el arado acarreado el día que se da | Sesión de vida (`life/props.ts`, `life/offers.ts`) | Vive en `src/render3d/life/`, que es de la otra sesión. Encargo escrito en `docs/dos-sesiones.md`; el motor ya les da todo (`state.traits`, `state.acts`, `report.means`) |
+| ~~**El barril y el arado en la escena**~~ · **hecho el 18 sep 2026** (§7.14): el barril en el corro de la plaza mientras dura la fiesta, y se bebe de él; el arado apoyado dentro de su campo. **Queda una de las tres**: el arado **acarreado** el día que se da, que es una escena de dos con la carreta y no una colocación | Sesión de vida (`life/props.ts`) | El sitio se midió tres veces tras el aviso del dueño («el posicionamiento no estaba bien hecho»): entre el trigo, luego a las afueras, y al final en una plaza del corro con 0,8 de aire |
 | **La malla del arado** | Sesión de Blender | No existe ninguna: `manifest.json` tiene 57 recursos y ni barril ni arado. **Encargo completo en `docs/encargo-arado.md`** (medidas, piezas, materiales, presupuesto de 400 triángulos y los tres pasos para meterlo). El barril lo tiene el dueño casi hecho |
-| **Los lobos van al corral y no al bosque** con `wolves_at_the_coop` | Sesión de vida (`life/beasts.ts`) | Ídem. Es lo que ligaría «tengo ganado» con «vienen lobos» por los ojos y no por la crónica |
+| ~~**Los lobos van al corral**~~ · **esta línea estaba mal anotada**: ya lo hacía IA-5 (`life/wildlife.ts`), y el 18 sep 2026 se rodó para comprobarlo | — | Toma de 90 s en la semilla 11, año 30, con el suceso provocado (`--happening wolves_at_the_coop`): el lobo sale del bosque, se acerca a **1,8 celdas de una gallina y 1,0 del corral**, ronda y se vuelve. Cero errores y cero penetraciones. Lo que faltaba no era el lobo: era poder **provocar** el suceso para verlo |
 | **Rehacer el banco de balance** (`npm run test:balance`, 45 min) | Quien retome el nivelado | Las **19 rojas de 37** medidas al cerrar M-4 son de **antes** del balanceo de la leña, así que no valen para decidir nada. Y el banco tarda más que su propio presupuesto: su aserto de duración (45 min) es una de las rojas |
 | **El hacha es el medio más flojo** | Decisión del dueño | 18 de plata para +2 obras de 60 y la primera piedra hasta veinte años antes en algún valle, pero sin mover la población (39 contra 40 en sesenta semillas). O baja de precio o necesita otro efecto; inventar el número sería inventarlo |
 | **El grano toca cero después del año 10** en todas las maneras de jugar medidas | Decisión del dueño (balance) | La comida baja a menos de una semana por persona en el peor momento de casi toda partida, y **no mata a nadie** en sesenta años. O el hambre debe morder más, o el granero debe llenarse menos: es la otra mitad de «balancear los recursos básicos» y no se tocó para no excederse |
 | **`quiet_years` deja de salir nunca** | Decisión del dueño (balance) | Es la plantilla de reserva y deja de hacer falta por M-1: al abrir el ladrón y el diezmo a la riqueza, la aldea tiene más preguntas propias. Se queda donde está |
 | **`state.intent` sigue en el motor** en reposo, con `INTENT_RANGE`, `INTENT_STOPS`, `PRIORITY_FAMILIES` y su lectura en `works.ts` | Quien suba el esquema del guardado | Sacarlo es una migración entera por limpieza y la limpieza va después (decisión 5). La interfaz ya no lo escribe: `setIntent` y la hoja de órdenes están borradas |
+| **LA PLAZA, QUE AHORA NO EXISTE** | Pedido por el dueño el 18 sep 2026, brief abajo | Hoy la plaza es **un punto calculado y nada más**: `valleyCore` (`derive/anchors.ts`) es la media de los centros de los edificios en pie, se recalcula cada vez que se pregunta —así que **se mueve sola** mientras la aldea crece—, no se dibuja nada en ella y puede caer dentro de una casa o entre sembrados. El dueño la quiere «un espacio con un círculo grande, con separación, y en el centro quizás una fuente». Eso son tres trabajos y uno es del motor: ver §4.0b |
 | **El rey** | Siguiente fase, decidida por el dueño | «Más adelante». Sus piezas están puestas: tesorería en plata, rasgos que un medio añade, `who` en los sucesos. Nada de M-0 a M-4 lo impide |
-| **Cuatro pruebas rápidas rojas** (`graphics-clock`, `life-needs`, `life-staging` ×2) | Sesión de vida | Comprobadas como ajenas a estas fases. Una de ellas es una declarada que cambia de estado según la trayectoria |
+| **Tres pruebas rápidas rojas** (`life-needs`, `life-staging` ×2) | Sesión de vida | `graphics-clock` **arreglada el 18 sep 2026**: comparaba doce clips contra los cuatro del GLB desde IA-12, que añadió ocho fabricados en código. Las otras tres siguen siendo ajenas; una es una declarada que cambia de estado según la trayectoria |
 | **Leer la crónica de un valle anterior** | Interfaz, sin dueño asignado | Sin puerta de entrada desde que UI-V8 retiró el selector de archivo. El dato sigue guardado |
 | **La fuerza del resalte del aldeano, sin juzgar en dispositivo** | Dueño del diseño | El arnés no la aísla: el oro del anillo se confunde con la paja del valle al buscarlo por píxel |
 
@@ -695,6 +696,43 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
    (`Dweller.failed`, `Chooser.shunned`), y con ello el plazo vencido de las
    personas, con plazo propio del viaje (`Intent.arriveBy`). Parados 0,08 %,
    giros 0,39 %.
+
+### 4.0b · La plaza de verdad (pedida el 18 sep 2026)
+
+**Lo que el dueño pidió, con sus palabras:** «me gustaría que la plaza fuese un
+espacio que tuviese un círculo grande, con separación. Creo que las cosas se
+deberían mover para que esa plaza parezca una plaza de verdad. Y en el centro
+quizás puedo poner una fuente, que eso habrá que hacerlo con 3D».
+
+**De dónde se parte, medido el 18 sep 2026:** la plaza no tiene cuerpo. Es
+`valleyCore`, la media de los centros de los edificios en pie, y la usan cuatro
+sitios sin que ninguno la enseñe —las reuniones de §11.8, las marcas del mapa,
+hacia dónde miran los animales y las reacciones del render 2D—. El motor tiene
+**su propia copia** de la función (`sim.ts`), que es la misma trampa que la
+tabla de clips. En doce semillas, el punto de reunión que se saca de ella queda
+de 0,0 a 1,5 celdas de la media, y el barril de la fiesta tiene que buscarse un
+hueco con aire entre los tejados: de 0,80 a 2,24 celdas de la casa más cercana.
+
+Son tres trabajos, y el primero es del motor y manda sobre los otros dos:
+
+| Paso | Qué es | Quién |
+|---|---|---|
+| **P-1 · la plaza existe y no se mueve** | Un punto guardado en el estado (no una media que cambia cada semana) y un **radio reservado**: la colocación de obras (`world/works.ts`) no puede levantar nada dentro de él. Sin esto no hay plaza que empedrar: lo que hoy hay es un punto que se desplaza y al que las casas se le echan encima | Motor. **Sube el esquema del guardado** y **mueve el trazado de todos los valles**, así que toca medir población, obras y el frío antes y después con `tools/agency-report.ts` |
+| **P-2 · la plaza se ve** | El empedrado: un círculo de suelo distinto donde cae el punto, con su borde. Y las reuniones, el barril y el corro pasan a usarlo | Render (`src/render3d/`) |
+| **P-3 · la fuente** | La malla del centro, por el mismo camino que el arado: receta en `art/recipes/`, `npm run art`, `npm run assets:publish` | Blender. **Encargo por escribir**, como `docs/encargo-arado.md` |
+
+**Lo que hay que decidir antes de empezar P-1, y es del dueño:** si la plaza se
+fija **en la fundación** —la pareja llega, elige un claro y ahí se queda para
+siempre, aunque la aldea crezca hacia otro lado— o si la aldea puede
+**trasladarla** al crecer. Lo primero es una línea de código y una plaza que a
+veces queda descentrada; lo segundo es un empedrado que se mueve, y eso no
+existe en ningún pueblo.
+
+**Lo que no puedo hacer yo:** conducir el Blender que tienes abierto. El puente
+`blender-mcp` está corriendo en la máquina pero sus herramientas no están
+expuestas en esta sesión, así que la fuente sale o por la receta del pipeline
+(que sí puedo escribir y ejecutar con `npm run art`) o por la sesión de arte.
+
 
 ## 5. Lo que ya se aprendió y no hay que volver a aprender
 

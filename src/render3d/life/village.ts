@@ -44,7 +44,7 @@ import { createBeasts, stepBeasts, WOLF_ALARM_RADIUS, type Beast } from './beast
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import type { Animal } from '@derive/animals';
 import {
-  carryAt, drop, findMate, fling, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
+  carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
   REST_AFTER_THROW, scatter, settle, take, THROW, THROW_AHEAD, type Prop,
 } from './props';
 
@@ -503,7 +503,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // V-09: los trastos de la jornada, anclados a puertas de verdad y por tanto
   // ya en la orilla que se usa (`scatter`, `props.ts`). `propsById` es cómo
   // `village.ts` vuelve de «qué trasto lleva éste» (un id) al trasto mismo.
-  const props: Prop[] = options.props === true ? scatter(state, land, seed) : [];
+  // Los trastos de V-09 siguen apagados (`DayOptions.props`), y lo que el
+  // jugador dio va siempre: es una cosa con sitio y no una pelota en el prado
+  // (M-3, ver `given` en `props.ts`).
+  const loose: Prop[] = options.props === true ? scatter(state, land, seed) : [];
+  const props: Prop[] = [...loose, ...given(state, land, loose.length)];
   const propsById = new Map(props.map((prop) => [prop.id, prop]));
 
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
@@ -1265,11 +1269,21 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // llegar (`!wasThere`), y sólo si de verdad hay algo que ofrezca
         // `play`/`carry` ahí: el aforo ya reservó la plaza al decidir, así
         // que en condiciones normales sigue libre.
+        //
+        // **Y sólo lo que se coge con la mano.** El comentario de arriba decía
+        // «sólo si de verdad hay algo que ofrezca `play`/`carry`» y el código no
+        // lo comprobaba: cogía cualquier trasto a cuya plaza se hubiera llegado.
+        // Con el barril de la fiesta (M-3) eso se volvió visible — el primero en
+        // llegar a beber se llevaba el barril en la mano y la fiesta se iba
+        // andando detrás de él— así que ahora la condición está escrita: un
+        // trasto marcado `fixed` está donde está, y la oferta tiene que ser de
+        // las de coger.
         if (dweller.doing !== null && dweller.doing.there && !wasThere
           && dweller.holding === null
-          && dweller.doing.place.id.startsWith(PROP_PLACE_PREFIX)) {
+          && dweller.doing.place.id.startsWith(PROP_PLACE_PREFIX)
+          && (dweller.doing.offer.id === 'play' || dweller.doing.offer.id === 'carry')) {
           const prop = propsById.get(Number(dweller.doing.place.id.slice(PROP_PLACE_PREFIX.length)));
-          if (prop !== undefined && take(prop, dweller)) {
+          if (prop !== undefined && prop.fixed !== true && take(prop, dweller)) {
             dweller.aimAt = dweller.doing.offer.id === 'play'
               ? (findMate(dweller, dwellers)?.body.id ?? null)
               : null;

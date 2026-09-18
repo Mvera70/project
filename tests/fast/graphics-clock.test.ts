@@ -19,6 +19,7 @@ import {
   createPresentationClock, dayPhase, SCENIC_DAY_SECONDS,
 } from '../../src/render3d/presentation-clock';
 import { VILLAGER_CLIPS } from '../../src/render3d/clips';
+import { ACTION_CLIPS } from '../../src/render3d/action-clips';
 
 describe('G-05 · el reloj de presentación', () => {
   it('en pausa no avanza ni un segundo escénico', () => {
@@ -189,12 +190,23 @@ describe('G-04 · los clips del aldeano', () => {
     // G-04 midió estos números sobre el GLB exportado. Aquí hay una copia
     // porque el manifiesto de recursos es de G-06; una copia que nadie
     // comprueba es una copia que se separa en silencio.
+    //
+    // **Y lo que esta prueba pedía dejó de ser cierto el día de IA-12**, que
+    // añadió ocho clips de acción fabricados en código a partir del `idle`
+    // —`sit`, `talk`, `pray`, `hammer`, `chop`, `play`, `drink`, `sort`— sin
+    // tocar el GLB. Así que `VILLAGER_CLIPS` tiene doce entradas y el catálogo
+    // cuatro, y el aserto de igualdad de tamaños se puso rojo sin que nada se
+    // hubiera desviado: es la trampa de congelar una lista que crece
+    // (`CLAUDE.md`). Lo que sí hay que vigilar son tres propiedades, y son las
+    // de abajo.
     const catalog = JSON.parse(readFileSync(
       resolve(import.meta.dirname, '..', '..', 'art', 'catalog.json'), 'utf8',
     )) as { assets: Array<{ id: string; motion: Array<{ name: string; seconds: number; loop: boolean; strideLength: number | null }> }> };
     const villager = catalog.assets.find((asset) => asset.id === 'villager');
     expect(villager).toBeDefined();
 
+    // Una: lo que el catálogo mide está aquí, con los mismos números. Es la
+    // garantía original y no cambia.
     for (const motion of villager?.motion ?? []) {
       const mine = VILLAGER_CLIPS[motion.name as keyof typeof VILLAGER_CLIPS];
       expect(mine, `falta el clip '${motion.name}'`).toBeDefined();
@@ -202,6 +214,20 @@ describe('G-04 · los clips del aldeano', () => {
       expect(mine.loop).toBe(motion.loop);
       expect(mine.strideLength).toBe(motion.strideLength);
     }
-    expect(Object.keys(VILLAGER_CLIPS).length).toBe(villager?.motion.length);
+
+    // Dos: lo que sobra en la tabla es **exactamente** lo que se fabrica. Ni un
+    // clip fabricado sin su ritmo aquí, ni un nombre aquí que nadie sepa
+    // reproducir.
+    const measured = new Set((villager?.motion ?? []).map((motion) => motion.name));
+    const extra = Object.keys(VILLAGER_CLIPS).filter((name) => !measured.has(name)).sort();
+    expect(extra, 'lo que no viene del GLB lo fabrica action-clips.ts')
+      .toEqual([...ACTION_CLIPS].sort());
+
+    // Tres: ningún clip fabricado anda. Un clip clonado del `idle` no tiene
+    // paso que medir, así que darle zancada haría que se reprodujese a ritmo de
+    // distancia recorrida —`clipTime`— y eso es el aldeano patinando de D.6.
+    for (const name of ACTION_CLIPS) {
+      expect(VILLAGER_CLIPS[name].strideLength, `${name} no puede tener zancada`).toBeNull();
+    }
   });
 });

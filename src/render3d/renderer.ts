@@ -85,6 +85,11 @@ export const WANTED = [
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
   ...VILLAGER_MODELS, TREE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  // M-3 · lo que el jugador mete en el valle. Ninguno de los dos está
+  // publicado todavía —el encargo es `docs/encargo-arado.md`— y por eso se
+  // piden aquí: `WANTED` es lo que el renderer puede pedir, exista ya o no,
+  // y mientras no exista `world/props.ts` los dibuja con primitivas.
+  'barrel', 'plough',
   ...FAUNA,
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
@@ -639,7 +644,13 @@ export async function createGraphicsRenderer(
       timberDeliveries: life.timberDeliveries,
       stoneDeliveries: life.stoneDeliveries,
       harvestDeliveries: life.harvestDeliveries,
-      props: propsOf(life).map(prop => ({ id: prop.id, kind: prop.kind, heldBy: prop.heldBy })),
+      // Con dónde está y dónde se ve: sin eso, un trasto en la traza sólo dice
+      // que existe, y para mirar si el barril está en la plaza hay que poder
+      // ir a su píxel (M-3).
+      props: propsOf(life).map(prop => ({
+        id: prop.id, kind: prop.kind, heldBy: prop.heldBy,
+        x: round(prop.x), z: round(prop.z), y: round(prop.y), screen: screen(prop.x, prop.z),
+      })),
       forest: {
         standing: forest?.count ?? 0,
         stumps: forest?.stumpCount ?? 0,
@@ -1229,7 +1240,11 @@ interface LifeSnapshot {
   readonly timberDeliveries: number;
   readonly stoneDeliveries: number;
   readonly harvestDeliveries: number;
-  readonly props: readonly { readonly id: number; readonly kind: string; readonly heldBy: number | null }[];
+  readonly props: readonly {
+    readonly id: number; readonly kind: string; readonly heldBy: number | null;
+    readonly x: number; readonly z: number; readonly y: number;
+    readonly screen: { readonly x: number; readonly y: number };
+  }[];
   readonly forest: {
     readonly standing: number;
     readonly stumps: number;

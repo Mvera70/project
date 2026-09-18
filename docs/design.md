@@ -1414,6 +1414,46 @@ las cuatro están verificadas por mutación — la del flujo hacía falta porque
 perturbar un flujo que nadie usa no cambia nada, y hay que mirar el contador de
 frente.
 
+### 7.14 Lo que el jugador da se ve en el valle (M-3, 18 sep 2026)
+
+**Dos de los seis medios tienen cuerpo en la aldea**, y los cuatro restantes no
+lo tienen a propósito:
+
+| Medio | Qué se ve | Dónde, y desde cuándo |
+|---|---|---|
+| El barril de cerveza | Un barril en la plaza, del que se bebe | En el corro de la reunión (§11.8), **sólo mientras dura la fiesta** que se pagó (`aleWindow`) |
+| El arado | Un arado apoyado en un campo | Dentro de su campo, en el rincón más despejado, **desde el día que se dio y para siempre** (el rasgo no caduca) |
+| La pocilga | Cerdos | Ya los pinta `life/beasts.ts`: el medio sube el techo del corral (§7.12) |
+| El hacha, la reliquia, unas manos | Nada propio | Cambian lo que la aldea consigue o cuánta gente hay. Ponerles un trasto «para que se notara» sería decorado |
+
+**Van por `given()` y no por `scatter()`**, y esa separación es una decisión del
+dueño del diseño del 15 sep 2026 cumplida al pie de la letra: los trastos
+repartidos por el prado están **apagados** en el juego —«esas pelotas eran de
+prueba, ahora mismo no tiene ningún sentido que haya pelotas por ahí»— y lo que
+quedó dicho es que la maquinaria se guardaba «por si algún día un trasto tiene
+sentido **en su sitio**: un cubo junto al pozo, un haz junto a la leñera.
+Repartidos por el prado, no». El barril y el arado son cosas con sitio.
+
+**El sitio costó tres intentos y cada uno se midió**, porque el dueño avisó de
+que «eso de los trastos y las pelotas no estaba bien hecho, el posicionamiento»:
+
+1. Anclado a la puerta del corazón de la aldea: el corazón es casi siempre un
+   campo, así que el barril salía **entre los sembrados**.
+2. Buscando en anillos el punto más despejado: penalizar el sembrado lo echaba
+   de la plaza, **de 4 a 6,6 celdas del punto de reunión en once de doce
+   semillas**, o sea a las afueras.
+3. El que quedó: **una de las plazas que la propia reunión reparte**, la más
+   cercana al corro entre las que tienen 0,8 celdas de aire al tejado más
+   próximo. Medido en doce semillas: nunca bloqueado, nunca en un sembrado, de
+   0,80 a 2,24 celdas de aire.
+
+Y **no se cogen** (`Prop.fixed`): el barril daba de beber a seis, y quien llegaba
+primero se lo llevaba en la mano porque `village.ts` cogía cualquier trasto a
+cuya plaza hubiera llegado —el comentario decía «sólo `play`/`carry`» y el código
+no lo comprobaba—. La fiesta se iba andando detrás de él.
+
+---
+
 ### 7.13 La leña se corta por necesidad (balanceo del 17 sep 2026)
 
 **La aldea manda al bosque las manos que hacen falta, no una cuota.** Lo pidió el

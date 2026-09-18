@@ -45,9 +45,12 @@
 
 import { hash32 } from '@engine/rng';
 import { population } from '@engine/people/demography';
+import { hasTrait } from '@engine/state';
 import type { GameState } from '@engine/state';
-import { blockedAt, WALL_CLEAR, type Point, type Terrain } from './body';
-import { doorOf, OFFERS, type Offer, type Place } from './offers';
+import { aleWindow } from '@engine/world/means';
+import { valleyCore } from '@derive/anchors';
+import { blockedAt, fitsCircle, WALL_CLEAR, type Point, type Terrain } from './body';
+import { doorOf, OFFERS, placedOffer, type Offer, type OfferSpec, type Place } from './offers';
 import type { Dweller } from './village';
 
 /**
@@ -59,7 +62,7 @@ import type { Dweller } from './village';
  */
 export interface Prop {
   readonly id: number;
-  readonly kind: 'ball' | 'stick' | 'bucket' | 'bundle' | 'stone' | 'grain';
+  readonly kind: 'ball' | 'stick' | 'bucket' | 'bundle' | 'stone' | 'grain' | 'barrel' | 'plough';
   x: number;
   z: number;
   /** Altura sobre el suelo. Cero es el suelo; por encima, va por el aire. */
@@ -82,6 +85,19 @@ export interface Prop {
    * interacción entre dos que no pasa por `decide`.
    */
   for: number | null;
+  /**
+   * **Lo que el jugador metió en el valle, y por eso no se coge ni se tira.**
+   *
+   * El barril de la fiesta y el arado del campo son trastos por cómo se pintan
+   * y se sitúan, no por cómo se usan: pesan, están donde están, y lo que la
+   * aldea hace con ellos es rodearlos. Sin esta marca, la primera persona que
+   * llegara al barril se lo llevaría en la mano —`village.ts` coge lo que
+   * encuentra al llegar a la plaza de un trasto— y la fiesta se iría andando.
+   *
+   * Es la mitad visible de «lo que se da al valle se ve en el valle» (M-3): el
+   * medio se paga con lo del valle, y desde ese día está ahí.
+   */
+  readonly fixed?: boolean;
 }
 
 function roll(seed: number, key: string): number {
@@ -215,14 +231,11 @@ const ANCHOR_CANDIDATES = 20;
  * recibe el corazón del pueblo del contrato, así que lo calcula con el mismo
  * criterio que `village.ts`: el edificio con más vecinos a mano.
  */
-export function scatter(state: GameState, land: Terrain, seed: number): Prop[] {
-  const buildings = state.buildings.filter((b) => b.lostTick === null);
-  const count = Math.max(
-    MIN_PROPS,
-    Math.min(MAX_PROPS, Math.round(population(state) / PER_PEOPLE)),
-  );
+type Building = GameState['buildings'][number];
 
-  // El corazón: el edificio con más vecinos a mano, igual que `village.ts`.
+/** El corazón de la aldea: el edificio con más vecinos a mano, el mismo
+ *  criterio que usa `village.ts` para plantar a la gente. */
+function heartOf(buildings: readonly Building[]): Building | undefined {
   let heart = buildings[0];
   let most = -1;
   for (const candidate of buildings) {
@@ -235,16 +248,30 @@ export function scatter(state: GameState, land: Terrain, seed: number): Prop[] {
     }).length;
     if (near > most) { most = near; heart = candidate; }
   }
-  // Y sólo los más próximos a él: los caminos entre vecinos son cortos.
-  let pool = buildings;
-  if (heart !== undefined) {
-    const h = heart;
-    pool = [...buildings].sort((a, b) => {
-      const da = Math.hypot(a.x - h.x, a.y - h.y);
-      const db = Math.hypot(b.x - h.x, b.y - h.y);
-      return da - db;
-    }).slice(0, ANCHOR_CANDIDATES);
-  }
+  return heart;
+}
+
+/** Los edificios más próximos al corazón: los caminos entre vecinos son
+ *  cortos, y un trasto anclado lejos no se juega nunca (ver `ANCHOR_CANDIDATES`). */
+function anchorPool(buildings: readonly Building[], heart: Building | undefined): Building[] {
+  if (heart === undefined) return [...buildings];
+  const h = heart;
+  return [...buildings].sort((a, b) => {
+    const da = Math.hypot(a.x - h.x, a.y - h.y);
+    const db = Math.hypot(b.x - h.x, b.y - h.y);
+    return da - db;
+  }).slice(0, ANCHOR_CANDIDATES);
+}
+
+export function scatter(state: GameState, land: Terrain, seed: number): Prop[] {
+  const buildings = state.buildings.filter((b) => b.lostTick === null);
+  const count = Math.max(
+    MIN_PROPS,
+    Math.min(MAX_PROPS, Math.round(population(state) / PER_PEOPLE)),
+  );
+
+  const heart = heartOf(buildings);
+  const pool = anchorPool(buildings, heart);
 
   const props: Prop[] = [];
   for (let i = 0; i < count; i += 1) {
@@ -274,7 +301,263 @@ export function scatter(state: GameState, land: Terrain, seed: number): Prop[] {
     }
     props.push({ id: i, kind, x, z, y: 0, vx: 0, vz: 0, vy: 0, held: null, restUntil: 0, for: null });
   }
+
   return props;
+}
+
+/**
+ * **Lo que el jugador dio, plantado donde se ve.** M-3, la mitad de vida de
+ * «lo que se da al valle se ve en el valle».
+ *
+ * **Va aparte de `scatter` y siempre encendido**, y esa separación es la
+ * decisión del dueño del diseño del 15 sep 2026 cumplida al pie de la letra:
+ * los trastos repartidos por el prado están apagados —«esas pelotas eran de
+ * prueba, ahora mismo no tiene ningún sentido que haya pelotas por ahí»— y lo
+ * que se dejó dicho es que la maquinaria se quedaba «por si algún día un trasto
+ * tiene sentido **en su sitio**: un cubo junto al pozo, un haz junto a la
+ * leñera. Repartidos por el prado, no». El barril de la fiesta y el arado del
+ * campo son exactamente eso: cosas con sitio, pagadas por el jugador.
+ *
+ * Dos cosas y no seis, porque son las dos que tienen sitio propio en la aldea:
+ *
+ *   · **el barril**, en la plaza y **sólo mientras dura la fiesta** que se pagó
+ *     (`aleWindow`), ofreciendo de beber a seis a la vez: eso es la fiesta vista
+ *     desde fuera, gente rodeando un barril y no una línea en la crónica;
+ *   · **el arado**, apoyado en un campo **desde el día que se dio y para
+ *     siempre** (el rasgo `plough` no caduca), sin ofrecer nada: es un apero
+ *     apoyado, y quien trabaja el campo ya tiene su plaza de `work` en el campo.
+ *
+ * Los otros cuatro medios no ponen nada aquí y es deliberado: la pocilga son
+ * cerdos —`state.herd`, que `beasts.ts` ya pinta—, el hacha y la reliquia
+ * cambian lo que la aldea consigue, y un par de manos es una persona más en el
+ * censo. Meterles un trasto para que «se notara» sería decorado.
+ *
+ * No consume azar del motor: el sitio sale de la semilla de la jornada, igual
+ * que el resto de `scatter`.
+ */
+export function given(state: GameState, land: Terrain, from = 0): Prop[] {
+  const buildings = state.buildings.filter((b) => b.lostTick === null);
+  const heart = heartOf(buildings);
+  const pool = anchorPool(buildings, heart);
+  const made: Prop[] = [];
+  // **Mejor nada que mal puesto.** Si no hay un sitio donde de verdad se pueda
+  // estar, esto no coloca la cosa: un barril dentro de un muro no es una fiesta
+  // a la que no se llega, es una fiesta que el jugador ve mal hecha.
+  const put = (kind: Prop['kind'], at: Point | null): void => {
+    if (at === null) return;
+    made.push({
+      id: from + made.length, kind, x: at.x, z: at.z, y: 0,
+      vx: 0, vz: 0, vy: 0, held: null, restUntil: 0, for: null, fixed: true,
+    });
+  };
+
+  if (aleWindow(state)) {
+    // **En la plaza, y la plaza no es un invento de este módulo**: es
+    // `valleyCore`, el mismo punto al que §11.8 convoca a la aldea cuando la
+    // crónica dice «in the square» (`derive/gatherings.ts`, `placeOf`). La
+    // frase del banco es literal —«they broached the barrel in {season} and the
+    // square did not empty till dark»— así que el barril va donde esa frase
+    // dice, y no donde le venga bien a un reparto de trastos.
+    //
+    // Antes estuvo anclado a la puerta del corazón de la aldea y **estaba mal
+    // puesto**: el corazón de casi cualquier valle de este juego es un campo,
+    // así que el barril de la fiesta acababa entre los sembrados y detrás de un
+    // caballete. Rodado y mirado en la semilla 11, año 30.
+    // **Donde se junta la aldea, y no donde este módulo crea que se junta.**
+    //
+    // `valleyCore` es el punto de la plaza y `placedOffer` es lo que §11.8 usa
+    // para bajarlo a suelo donde de verdad cabe gente: su primera plaza es la
+    // puerta de la reunión (`staging.ts`, `meetingPlace`). El barril se pone
+    // **ahí**, así que por construcción está donde la aldea se reuniría, con
+    // sitio alrededor —de once a veintiocho plazas en las doce semillas
+    // medidas—.
+    //
+    // Costó dos intentos, y los dos estaban mal puestos de la misma manera: por
+    // buscarle sitio yo. El primero lo anclaba a la puerta del corazón de la
+    // aldea, que casi siempre es un campo, y el barril salía entre los
+    // sembrados; el segundo buscaba en anillos el punto más despejado, y como
+    // penalizaba estar en un sembrado, **se iba de la plaza**: medido, de 4,1 a
+    // 6,6 celdas del punto de reunión en once de doce semillas, o sea a las
+    // afueras. La plaza de este juego cae muchas veces entre campos y eso no es
+    // un defecto de la plaza.
+    const square = valleyCore(state);
+    const at = { x: square.x, z: square.y };
+    const meeting = placedOffer(OFFERS['gather'] as OfferSpec, at, land);
+    // **Y en la plaza más despejada de las suyas, no en la primera.** La
+    // reunión reparte de once a veintiocho plazas alrededor del punto —medido
+    // en doce semillas— y la primera cae donde caiga: con ella, el barril
+    // quedaba a **dos centésimas de celda de una pared** en dos semillas y a
+    // menos de media en seis, o sea metido en la cara de una casa y tapado por
+    // su tejado. Eligiendo entre las plazas de la propia reunión no se sale de
+    // la plaza y se sale del muro: el sitio sigue siendo el que §11.8 concede,
+    // sólo que el del corro que está a la vista.
+    const roofs = buildings.filter((b) => b.kind !== 'field');
+    const base = meeting?.at ?? at;
+    // **El aire es una condición, no un gusto**, y esto costó tres intentos con
+    // su medida cada uno. Sumar despejo y cercanía en una sola cuenta da las dos
+    // versiones malas según cómo se pesen: premiando el despejo, el barril se va
+    // a la plaza de fuera del corro (de 4,0 a 5,0 celdas del punto en ocho de
+    // doce semillas); premiando la cercanía, se pega a la pared de la casa de al
+    // lado (a 0,33 de celda en cuatro semillas, metido en su cara y tapado por
+    // el tejado). Así que el aire se pide como mínimo y, cumplido, manda la
+    // cercanía: la plaza **más cercana al corro de las que tienen aire**.
+    const seats = [...(meeting?.spots ?? []), base];
+    const roomy = seats.filter((p) => openness(roofs, p) >= ROOM_AROUND && !inField(buildings, p));
+    const pick = (list: readonly Point[]): Point | undefined => [...list]
+      .sort((a, b) => Math.hypot(a.x - base.x, a.z - base.z) - Math.hypot(b.x - base.x, b.z - base.z))[0];
+    // Y si en toda la plaza no hay una con aire —una aldea que se ha cerrado
+    // sobre sí misma—, la que más tenga: sigue siendo la plaza.
+    const chosen = pick(roomy)
+      ?? [...seats].sort((a, b) => openness(roofs, b) - openness(roofs, a))[0]
+      ?? base;
+    put('barrel', placeable(land, chosen.x, chosen.z) ? chosen : null);
+  }
+
+  if (hasTrait(state, 'plough')) {
+    // Apoyado en un campo, y en el mismo campo mientras ese campo exista: el
+    // sitio sale del identificador del campo y no del día, así que el arado no
+    // amanece cada mañana en una punta distinta del valle.
+    const fields = pool.filter((b) => b.kind === 'field');
+    const field = fields.length === 0
+      ? state.buildings.find((b) => b.lostTick === null && b.kind === 'field')
+      : fields[Math.floor(roll(1, 'plough:field') * fields.length)];
+    if (field !== undefined) {
+      // **Dentro del campo, y en su rincón más despejado.**
+      //
+      // Primero se probó alrededor del campo, y medido no vale: en la semilla
+      // 11, año 30, **ninguno de los dieciséis puntos del borde era suelo donde
+      // plantarse** —un pueblo apretado deja los bordes del campo a menos de
+      // 0,94 de una pared, que es lo que `standable` exige— así que todos caían
+      // en la reserva y el arado acababa en el centro del campo, detrás del
+      // caballete de una casa. Un campo se anda (no está bloqueado: son
+      // sembrados), así que el sitio de un arado es el propio campo, y de sus
+      // rincones se elige el que más lejos está de un tejado.
+      const others = buildings.filter((b) => b.id !== field.id && b.kind !== 'field');
+      put('plough', inside(land, field, (spot) => openness(others, spot)));
+    }
+  }
+
+  return made;
+}
+
+/**
+ * Un sitio pisable a esa distancia de un punto, probando ángulos.
+ *
+ * **Un solo ángulo no vale, y esto lo aprendió el barril.** El corazón de la
+ * aldea suele ser un campo, y un campo mide seis por seis: un ángulo elegido a
+ * ciegas manda el barril **dentro** del campo, y desde el centro de un bloqueo
+ * de seis celdas la espiral de `standableNear` —que llega a tres y media— no
+ * sale. Medido: en la semilla 41 no había barril en la plaza durante la fiesta,
+ * y en las otras tres sí, que es la peor clase de fallo porque parece una
+ * semilla rara y es una colocación mal hecha.
+ *
+ * El ángulo sale de `key` y no del día, así que lo que se coloca con esto
+ * amanece siempre en el mismo rincón. Si ninguno de los dieciséis vale, cae en
+ * `standableNear`, que es lo que hace el resto de este módulo.
+ */
+/**
+ * El mejor sitio para plantar algo junto a un punto: se prueban varios anillos
+ * alrededor y se queda el que más le gusta a `prefer`, siempre entre los
+ * pisables.
+ *
+ * **Es lo que distingue estar puesto de estar tirado.** Un solo anillo a una
+ * distancia fija hereda el defecto de los trastos de V-09 —el sitio lo decide
+ * el azar y el suelo, no si la cosa se ve— y con la plaza de este valle eso es
+ * peor que con una pelota: la plaza es la media de los edificios, así que
+ * muchas veces cae **dentro** de uno. Probando del anillo de media celda al de
+ * cuatro y quedándose con el punto más despejado, la cosa sale del tejado y se
+ * queda en el claro de al lado.
+ */
+/**
+ * El aire que se le exige a lo que se planta en la plaza: 0,8 celdas al tejado
+ * más cercano.
+ *
+ * TUNE: un cuerpo ocupa 0,32 de radio y el barril 0,13, así que con 0,45 ya
+ * «cabe»; 0,8 es lo que hace falta para que **se vea**, que es otra cosa. Por
+ * debajo de media celda el barril queda en la cara de la casa y el tejado se lo
+ * come desde esta cámara: medido en las semillas 23, 41, 33, 2024 y 999.
+ */
+const ROOM_AROUND = 0.8;
+
+/**
+ * Si una cosa que **no se coge** puede estar aquí.
+ *
+ * **Y no es `standable`, que es el criterio de lo que sí se coge.** `standable`
+ * exige 0,94 celdas de aire —el radio del cuerpo más `WALL_CLEAR`— porque quien
+ * va a recoger una pelota tiene que poder plantarse encima de ella, y `avoid`
+ * no le deja acercarse más a un muro. Un barril no se recoge: la gente bebe
+ * **alrededor**, en las plazas que `seatsOn` reparte con el criterio laxo de
+ * §11.8 (`fitsCircle` con 0,32, el mismo con el que se convoca una reunión en
+ * la plaza). Pedirle a un barril el aire de una pelota es lo que lo mandaba a
+ * las afueras: medido, cuatro celdas y media de la plaza en nueve de doce
+ * semillas, porque en el casco no había un solo punto con 0,94 de aire.
+ *
+ * Así que lo que se pide es lo que de verdad hace falta: que la cosa quepa
+ * donde se pone, y que quepa un cuerpo pegado a ella.
+ */
+function placeable(land: Terrain, x: number, z: number): boolean {
+  if (x <= 0.5 || z <= 0.5 || x >= land.width - 0.5 || z >= land.height - 0.5) return false;
+  if (!fitsCircle(land, x, z, 0.32)) return false;
+  // Un cuerpo a su lado, en alguno de los cuatro rumbos: sin eso, un barril en
+  // un callejón de una celda es un barril del que nadie puede beber.
+  for (const [dx, dz] of [[0.8, 0], [-0.8, 0], [0, 0.8], [0, -0.8]] as const) {
+    if (fitsCircle(land, x + dx, z + dz, 0.32)) return true;
+  }
+  return false;
+}
+
+
+/** Si el punto cae dentro de un sembrado. Un barril de fiesta entre el trigo
+ *  está mal puesto aunque se pueda estar de pie ahí. */
+function inField(buildings: readonly Building[], spot: Point): boolean {
+  return buildings.some((b) => b.kind === 'field'
+    && spot.x >= b.x && spot.x <= b.x + b.w && spot.z >= b.y && spot.z <= b.y + b.h);
+}
+
+/**
+ * El punto del propio campo más a gusto de `prefer`: sus cuatro rincones, los
+ * cuatro medios de sus lados y el centro, metidos hacia dentro para no quedar
+ * justo en la linde. Si ninguno es suelo donde plantarse, el centro, que en un
+ * campo lo es siempre —un sembrado no bloquea— y es donde estaría un arado si
+ * lo hubieran dejado a media faena.
+ */
+function inside(land: Terrain, field: Building, prefer: (spot: Point) => number): Point | null {
+  const inset = 0.45;
+  const middle = { x: field.x + field.w / 2, z: field.y + field.h / 2 };
+  const xs = [field.x + inset, middle.x, field.x + field.w - inset];
+  const zs = [field.y + inset, middle.z, field.y + field.h - inset];
+  let best: Point | null = null;
+  let score = -Infinity;
+  for (const x of xs) {
+    for (const z of zs) {
+      if (!placeable(land, x, z)) continue;
+      const value = prefer({ x, z });
+      if (value > score) { score = value; best = { x, z }; }
+    }
+  }
+  // Y si en el campo entero no hay un punto donde plantarse —un sembrado
+  // encajonado entre casas—, mejor ningún arado que un arado en un muro.
+  return best ?? (placeable(land, middle.x, middle.z) ? middle : null);
+}
+
+/**
+ * Lo despejado que está un punto: la distancia al edificio más cercano.
+ *
+ * **Para que se vea.** El arado cabía en veinte sitios pisables alrededor de su
+ * campo y el primero que salía podía ser el de detrás de un tejado: rodado y
+ * mirado, en la semilla 11 asomaba media vertedera por encima del caballete de
+ * una casa. Pisable no es visible, igual que pisable no era alcanzable
+ * (`standable`). Con esto, de los dieciséis candidatos se queda el más
+ * despejado, que en un pueblo apretado es el borde del campo que da al prado.
+ */
+function openness(buildings: readonly Building[], spot: Point): number {
+  let gap = Infinity;
+  for (const b of buildings) {
+    const nx = Math.max(b.x, Math.min(spot.x, b.x + b.w));
+    const nz = Math.max(b.y, Math.min(spot.z, b.y + b.h));
+    gap = Math.min(gap, Math.hypot(spot.x - nx, spot.z - nz));
+  }
+  return gap;
 }
 
 // ---------------------------------------------------------------------------
@@ -307,6 +590,9 @@ const BOUNCE_FLOOR = 0.6;
 export function settle(props: Prop[], land: Terrain, seconds: number): void {
   for (const prop of props) {
     if (prop.held !== null) continue;
+    // Lo que el jugador dio pesa: no cae, no rueda y no rebota. Ya nace en el
+    // suelo y sin velocidad, así que esto es una garantía y no un cálculo.
+    if (prop.fixed === true) continue;
 
     if (prop.y > 0 || prop.vy > 0) {
       prop.vy -= GRAVITY * seconds;
@@ -539,8 +825,13 @@ export function findMate(from: Dweller, dwellers: readonly Dweller[]): Dweller |
 /** Qué ofrece cada clase de trasto suelto: la pelota se juega, lo demás se
  *  carga — el `stick` incluido: aquí no es un arma (eso es `scenes.ts`), es un
  *  palo que se lleva de un sitio a otro, igual que el cubo o el haz de leña. */
-const OFFER_OF: Readonly<Record<Prop['kind'], string>> = {
+const OFFER_OF: Readonly<Partial<Record<Prop['kind'], string>>> = {
   ball: 'play', stick: 'carry', bucket: 'carry', bundle: 'carry', stone: 'carry', grain: 'carry',
+  // El barril de la fiesta da de beber a seis a la vez (`OFFERS.drink`): es la
+  // fiesta pagada, vista desde fuera. El arado no ofrece nada — es un apero
+  // apoyado— y por eso no está en esta tabla: `propPlaces` salta lo que no
+  // encuentra aquí.
+  barrel: 'drink',
 };
 
 /** El prefijo del id de la `Place` de un trasto, para poder volver del uno al
@@ -570,7 +861,9 @@ export function propPlaces(props: readonly Prop[], now: number, land: Terrain): 
     // Sólo lo que está quieto: una pelota rodando se ofrece cuando pare, y así
     // el punto al que uno va es el punto donde está de verdad.
     if (prop.y > 0.001 || Math.hypot(prop.vx, prop.vz) > 0.05) continue;
-    const spec = OFFERS[OFFER_OF[prop.kind]];
+    const wants = OFFER_OF[prop.kind];
+    if (wants === undefined) continue;
+    const spec = OFFERS[wants];
     if (spec === undefined) continue;
     // **Se ofrece el sitio donde plantarse junto al trasto, no el trasto.** Una
     // pelota que ha ido a parar a un palmo de una pared se recoge desde el
