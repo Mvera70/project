@@ -630,7 +630,12 @@ export type ChronicleKind =
   | 'road'
   // M-2 · lo que el jugador metió en el valle. No es un suceso: es un acto, y
   // la crónica lo cuenta como lo que es.
-  | 'means';
+  | 'means'
+  // B1 · el clan del valle vecino (§1b). **Tampoco es un `happening`**, y por
+  // el mismo motivo que `road`: un suceso de R-1 le pasa al valle y queda en
+  // `state.happenings`, y esto es gente que baja de la ladera de al lado. Una
+  // prueba compara las dos listas y contarlo como suceso las descuadra.
+  | 'raid';
 
 /**
  * The chronicle stores keys and parameters, never prose. The text is composed
@@ -791,7 +796,7 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 10; // K-1: la corona (9 era P-4: el anillo de muralla)
+export const SCHEMA_VERSION = 11; // B1: el clan vecino (10 era K-1: la corona)
 
 
 /** Las familias de §7.3 que el jugador puede adelantar. */
@@ -993,7 +998,38 @@ export interface GameState {
    * el valle no cambia porque haya muerto la gente.
    */
   traits: ValleyTrait[];
+  /** B1 · El clan del valle vecino. Esquema 11. */
+  threat: Threat;
   ended: EndState | null;
+}
+
+/**
+ * §1b · **El clan del valle vecino**, que es quien ataca.
+ *
+ * Lo decidió el dueño del diseño el 18 sep 2026 —otro valle, no bandidos ni el
+ * señor— y de esa elección salen las dos mitades de esto:
+ *
+ *  · **`strength` corre con los años**, no con tu riqueza: es un valle que se
+ *    desarrolla en paralelo al tuyo y que no sabe que existes. Por eso crece
+ *    igual en un caserío miserable que en una villa rica.
+ *  · **lo que tú has juntado decide el premio y la dureza**: cuánto tientas
+ *    (`worth`) es lo que marca si bajan este año y con cuánta gente. Eso es §1
+ *    intacto —la letalidad sale de lo que el jugador acumuló— visto desde la
+ *    otra ladera.
+ *
+ * `comingTick` es la partida que **ya viene**: se decide con semanas de
+ * antelación para que el valle pueda enterarse (B2) y hacer algo. Mientras es
+ * `null`, no hay nadie en camino.
+ */
+export interface Threat {
+  /** Lo que el clan ha juntado, en hombres. Crece con los años. */
+  strength: number;
+  /** El tick en que llega la partida en camino, o `null` si no viene ninguna. */
+  comingTick: number | null;
+  /** Con cuántos viene la que está en camino. Cero si no hay ninguna. */
+  comingBand: number;
+  /** Cuántas han llegado ya, para que la crónica y §8.6 sepan que no es la primera. */
+  raids: number;
 }
 
 // ---------------------------------------------------------------------------

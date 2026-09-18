@@ -298,6 +298,7 @@ escrita (`rework.md` §2.7).
 | Qué se hace ahora, con briefs listos para agentes | `docs/next-plan.md` |
 | El plan que sacó al proyecto del atasco, y qué entregó | `docs/plan-juego.md` |
 | **El plan hacia la meta: puntos, fases, prioridad, dificultad y a qué agente** | **`docs/plan-meta.md`** |
+| **Lo que hace falta de Blender y 3D** — se apunta **en la misma ronda** que se descubre | **`docs/encargos-3d.md`** |
 | Qué falta en total, y qué no puede hacer ningún agente | `docs/roadmap.md` |
 | Cómo se delega y se audita | `docs/agents.md` |
 | Por qué el catálogo no sale | `docs/findings-drama.md` |

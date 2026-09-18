@@ -113,6 +113,8 @@ export function foundGame(
     // que una aldea que hereda el valle hereda sus rasgos: el valle no cambia
     // porque haya muerto la gente (§13.3).
     traits: valleyTraits(terrainSeed),
+    // B1 · el clan vecino empieza donde empieza todo: sin nada y sin bajar.
+    threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 },
     ended: null,
   };
   foundingBuildings(state, profile);

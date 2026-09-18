@@ -731,6 +731,100 @@ export const LIFE = {
   FRAIL: 1.6,
 } as const;
 
+/**
+ * §1b · **El clan del valle vecino** (B1, 18 sep 2026).
+ *
+ * Quien ataca es otro valle, por decisión del dueño del diseño, y de ahí salen
+ * las dos mitades de esta tabla: **lo que el clan junta corre con los años**
+ * —es un valle que se desarrolla en paralelo y no sabe que existes— y **lo que
+ * tú has juntado decide si bajan y con cuántos**, que es §1 visto desde la otra
+ * ladera: la letalidad sale de lo que el jugador acumuló.
+ *
+ * Todos TUNE, y todos con la misma advertencia escrita: **son la primera talla
+ * y se nivelan al final**, que es donde el dueño puso el balance. Lo que esta
+ * tabla tiene que hacer bien hoy es que la amenaza exista, crezca y llegue;
+ * cuánto duele es de la fase G.
+ */
+export const THREAT = {
+  /**
+   * Cuántos hombres junta el clan cada año. Dos: al cabo de veinte años son
+   * cuarenta, del orden de lo que una aldea hecha tiene de gente (mediana 48 a
+   * los sesenta años, medido en B-1), así que el vecino es un igual y no una
+   * marea. Con la variación de abajo, dos valles vecinos no crecen igual.
+   */
+  GROWTH_PER_YEAR: 2,
+  /** Cuánto varía ese crecimiento, arriba y abajo. Medio: de 1 a 3 al año. */
+  GROWTH_SPREAD: 0.5,
+  /**
+   * **Y el techo, porque el vecino es un valle y no una marea.** Sesenta
+   * hombres: medido en B-1, un valle llega a 48 personas de mediana y 80 en el
+   * mejor caso a los sesenta años, así que sesenta es «todos los que el valle
+   * de al lado puede armar» y no un ejército de la nada.
+   *
+   * Hacía falta por la forma, no por el balance: sin techo, el clan crecía dos
+   * al año para siempre y a los ochenta años bajaban **partidas de 152
+   * hombres** contra aldeas de cuarenta y ocho (medido con
+   * `tools/threat-report.ts`). Eso no es el valle de al lado, es una invasión.
+   */
+  STRENGTH_CAP: 60,
+  /**
+   * Antes de este año no baja nadie, por muy rica que sea la aldea.
+   *
+   * Cinco, y es la misma idea que la gracia de la pareja de M-1: una aldea que
+   * no ha tomado todavía ninguna decisión no tiene nada que se le pueda volver
+   * en contra, y que la maten en el año dos no cuenta una historia, corta una.
+   */
+  MIN_YEAR: 5,
+  /**
+   * Cuánto tienta un valle. Lo que se mira es **lo que se ve desde fuera**:
+   * la plata, el grano del granero y el ganado suelto. No las casas: nadie baja
+   * de la sierra por unas vigas.
+   */
+  WORTH_PER_SILVER: 1,
+  WORTH_PER_GRAIN: 0.02,
+  WORTH_PER_HEN: 0.5,
+  WORTH_PER_PIG: 2,
+  WORTH_PER_COW: 4,
+  /**
+   * El valor a partir del cual la aldea tienta del todo. 120, y sale de medir
+   * qué vale un valle hecho: a los cuarenta años la mediana ronda ese número
+   * (`tools/threat-report.ts`). Por debajo, la probabilidad baja en proporción.
+   */
+  WORTH_FULL: 120,
+  /** La probabilidad anual de que bajen, con la aldea tentando del todo. */
+  YEARLY_CHANCE: 0.35,
+  /**
+   * Semanas entre que el clan decide bajar y llega. Ocho: dos meses de juego,
+   * que a ×1 son casi dos horas de reloj. Es el hueco en el que B2 mete el
+   * aviso y el jugador puede hacer algo.
+   */
+  WARNING_WEEKS: 8,
+  /**
+   * De cuánto es la partida que baja: una parte de lo que el clan tiene, mayor
+   * cuanto más tienta la aldea. Un valle pobre ve bajar a cuatro; uno rico, a
+   * todos los que el vecino puede armar.
+   */
+  BAND_LEAST_SHARE: 0.25,
+  /** Y nunca menos de esto, o no es una partida, es un paseo. */
+  BAND_MIN: 4,
+  /**
+   * Lo que se llevan cuando saquean: esta parte de la plata y del grano.
+   *
+   * **Es la mitad pequeña de «caer»** (§1b): entran, se llevan lo que pueden y
+   * se van, y la aldea sigue con lo que queda. La mitad grande —la que acaba la
+   * partida— necesita la batalla física y no está hecha.
+   */
+  SACK_SHARE: 0.4,
+  /**
+   * Y lo que la muralla cerrada les quita. Con el anillo cerrado y su portón
+   * en pie se llevan una cuarta parte de lo que se llevarían a campo abierto:
+   * no es inmunidad —lo de dentro no está a salvo hasta que haya quien lo
+   * defienda (C) y la puerta aguante (D)— es la diferencia entre un pueblo
+   * abierto y uno cerrado.
+   */
+  WALLED_SACK: 0.25,
+} as const;
+
 export const MIGRATION = {
   ARRIVE_CHANCE: 0.3,
   // TUNE: **cada cuántas semanas se pregunta si llega alguien** (B-1, 18 sep

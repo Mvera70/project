@@ -72,6 +72,10 @@ describe('rng · reproducibilidad', () => {
       // R-1: el flujo `fate` (§7.10) entra al final y no mueve ni uno de los de
       // arriba, que es lo que esta prueba guarda.
       fate: 1432707347,
+      // B1: el flujo `raid` (§1b, el clan del valle vecino) entra detrás, y
+      // tampoco mueve ni uno de los de arriba. Eso es lo que esta prueba
+      // guarda: un flujo nuevo no puede desplazar una partida vieja.
+      raid: 911719150,
     });
   });
 

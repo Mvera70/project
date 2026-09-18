@@ -83,6 +83,8 @@ function village(seed: number, houses: number): GameState {
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
+    // B1 · el clan vecino: esta aldea de laboratorio no tiene vecinos.
+    threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 },
     ended: null,
   };
 }

@@ -827,6 +827,24 @@ export const BANK: Record<string, string[]> = {
   ],
   // A2 · El portón: se cuelga una vez y es por donde entra todo lo que entra,
   // incluido lo que algún día venga a tirarlo.
+  // B1 · El clan del valle vecino baja (§1b). Tres frases por caso, como todo
+  // lo demás; lo que cambia entre ellas es si la aldea lo recibió tras su
+  // muralla o a campo abierto.
+  'raid.open': [
+    'A band of {count} came down that {season} and took {silver} silver and {grain} grain.',
+    'Men from over the ridge walked in that {season}, {count} of them, and nobody stopped them.',
+    'The neighbours came raiding in year {year}: {count} of them, and the village lay open.',
+  ],
+  'raid.walled': [
+    'A band of {count} came down that {season} and found the gate shut.',
+    'Raiders from the next valley circled a closed wall in year {year}, {count} of them.',
+    'The wall held that {season}. The {count} who came went home with little.',
+  ],
+  'raid.beast': [
+    'They drove off a {animal} as they went.',
+    'A {animal} went up the valley with them.',
+    'The raiders took a {animal} too.',
+  ],
   'built.gate': [
     'They hung a gate in the {season} of year {year}, oak and iron, two men to swing it.',
     'The village got its gate that {season}: shut at dusk, open at first light.',

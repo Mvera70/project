@@ -58,6 +58,7 @@ import type { OfferOutcome, Tithe } from './world/road';
 import type { BuiltEvent } from './world/buildings';
 import { advanceWorks, requestBuild } from './world/works';
 import { ringClosed } from './world/placement';
+import { advanceThreat } from './world/threat';
 import { fellForest, fellForestWithLocation, regrowForest } from './world/forest';
 import { neighbours4 } from './world/tiles';
 import { accrueTraffic, routesFor, upgradePaths } from './world/paths';
@@ -751,6 +752,38 @@ export function tick(
         kind: 'departure',
         templateKey: departureKey(n),
         params: { year: year(), season: season(), count: n, people: population(state) },
+        weight: 2,
+      });
+    }
+  }
+
+  // ---- 2a bis · EL CLAN DEL VALLE VECINO (B1, §1b) --------------------------
+  // Va aquí, entre lo que le pasa a la aldea por el año (paso 2) y lo que le
+  // pasa por azar (2b), porque es de la misma clase que los dos: algo que el
+  // mundo hace y la aldea encaja. Y va **antes** de los sucesos para que un
+  // asalto y un rayo no se pisen en la misma semana: lo que se cuenta primero
+  // es lo que trae gente armada.
+  const sack = advanceThreat(state);
+  if (sack !== null) {
+    say({
+      kind: 'raid',
+      templateKey: sack.walled ? 'raid.walled' : 'raid.open',
+      params: {
+        year: year(),
+        season: season(),
+        count: sack.band,
+        silver: sack.silver,
+        grain: sack.grain,
+      },
+      // §9.2, peso 3: una partida armada bajando al valle es de lo que se
+      // cuenta en la crónica de una aldea, como la peste o la sucesión.
+      weight: 3,
+    });
+    if (sack.beast !== null) {
+      say({
+        kind: 'raid',
+        templateKey: 'raid.beast',
+        params: { year: year(), season: season(), animal: sack.beast },
         weight: 2,
       });
     }

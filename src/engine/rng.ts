@@ -25,7 +25,8 @@ export type RngStream =
   | 'traders'
   | 'quarrels'
   | 'minds'
-  | 'fate'; // R-1: los sucesos del valle (§7.10)
+  | 'fate' // R-1: los sucesos del valle (§7.10)
+  | 'raid'; // B1: el clan del valle vecino (§1b)
 
 /**
  * The 32-bit state of every stream. Part of GameState, so it is flat and
@@ -52,6 +53,8 @@ export const RNG_STREAMS: readonly RngStream[] = [
   'quarrels',
   'fate',
   'minds',
+  // B1 · el clan del valle vecino: cuánto junta y cuándo baja (§1b).
+  'raid',
 ] as const;
 
 /**
@@ -98,6 +101,7 @@ export function makeBundle(seed: number): RngBundle {
     quarrels: hash32(seed, 'quarrels'),
     fate: hash32(seed, 'fate'),
     minds: hash32(seed, 'minds'),
+    raid: hash32(seed, 'raid'),
   };
 }
 

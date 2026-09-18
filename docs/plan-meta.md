@@ -62,8 +62,8 @@ cuánto**, por lo que la aldea acumuló y decidió (§1, la fuente de letalidad)
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| B1 · La amenaza en el estado | **El clan vecino** (decidido el 18 sep): un valle que crece con los años por su cuenta, y lo que tú acumulaste decide el premio y la dureza. Un flujo `raid`; cuándo llega y con cuánto | **P1** | Media | Sol | — |
-| B2 · El aviso | Exploradores, rumores, un plazo: plantillas de encrucijada («riders at the ford»), crónica, y lo que el jugador puede hacer con el aviso | P2 | Media | Sol (motor) · Luna (textos) | B1 |
+| ~~B1 · La amenaza en el estado~~ · **hecho el 18 sep 2026**: `state.threat` (esquema 11) con el clan que crece 2 hombres al año hasta 60, el flujo `raid`, y el saqueo —la mitad pequeña de «caer»—. Medido: primer asalto a las **103 h**, partidas de 5 a 60 hombres, y tras la muralla se llevan una cuarta parte | Hecho | Media | — | — |
+| B2 · El aviso | Exploradores, rumores, un plazo: plantillas de encrucijada («riders at the ford»), crónica, y lo que el jugador puede hacer con el aviso. **El hueco ya existe**: `threat.comingTick` avisa ocho semanas antes | **P1** | Media | Sol (motor) · Luna (textos) | B1 hecha |
 | B3 · Qué es «caer» | **Decidido el 18 sep**: dos tamaños — el asalto pequeño se saquea y se sigue; el grande que entra acaba la partida. Queda implementarlo: `ended.cause` nuevo, qué se pierde en un saqueo | P2 | Media | Sol | B1 |
 | B4 · La puerta de vuelta al motor | El resultado del asalto entra como datos por donde entra `PlayerAct` («lo que el mundo hizo»: muertos, edificios perdidos, grano robado); guardados que siguen cargando | **P1** | Media-alta | Astra (diseño) → Sol | B3 |
 

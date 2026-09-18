@@ -377,7 +377,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8, 9].includes(candidate.schema)) {
+  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8, 9, 10].includes(candidate.schema)) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -426,6 +426,19 @@ export function deserialize(raw: unknown): SaveFile {
   // de entrar vacíos: el valle de una partida guardada siempre tuvo esos rasgos,
   // se hubieran guardado o no, así que ponerlos es recordar y no cambiar. Es la
   // misma razón por la que el sorteo es una función pura de la semilla.
+  // 10 -> 11 (B1, §1b): el clan del valle vecino y su flujo de azar. Aditiva.
+  // **Entra a cero, y no a lo que le tocaría por los años que lleva la
+  // partida**: el clan es gente que se junta, no una cuenta que corre sola, y
+  // una aldea que se cargó antes de que esto existiera no tuvo vecinos
+  // armándose. Empezar de cero le da los años de gracia que tuvo cualquier
+  // valle nuevo, que es lo contrario de castigarla por ser vieja.
+  if ((state as Partial<GameState>).threat === undefined) {
+    state = {
+      ...state,
+      rng: { ...state.rng, raid: state.rng.raid ?? hash32(state.seed, 'raid') },
+      threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 },
+    } as GameState;
+  }
   if ((state as Partial<GameState>).traits === undefined) {
     state = { ...state, traits: valleyTraits(state.terrainSeed) };
   }

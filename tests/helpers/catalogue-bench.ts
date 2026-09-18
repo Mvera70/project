@@ -80,7 +80,8 @@ function founded(seed: number): GameState {
     ],
     works: [], crossroad: null, seeds: [], flags: {}, chronicle: [], history: [], happenings: [], offer: null, acts: [],
     weather: { year: 0, index: 2, factor: 1 }, outbreak: null,
-    dwindlingSince: null, noOneStreak: 0, harvestModifier: null, ended: null,
+    dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
+    threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 }, ended: null,
   };
 }
 

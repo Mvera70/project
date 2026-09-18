@@ -60,6 +60,9 @@ const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] = [
   // A1 · el peldaño de la fase 3 (§1b): la villa cerrada, que es lo que un
   // asedio necesita para tener contra qué llegar.
   ['portón', (s) => s.buildings.some((b) => b.kind === 'gate' && b.lostTick === null)],
+  // B1 · el primer asalto del clan vecino (§1b): la primera vez que el valle
+  // paga por lo que ha juntado.
+  ['primer asalto', (s) => s.threat.raids > 0],
   ['VILLA CERRADA', (s) => ringClosed(s)],
 ];
 

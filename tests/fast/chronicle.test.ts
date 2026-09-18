@@ -73,6 +73,8 @@ function village(seed: number): GameState {
     weather: { year: 0, index: 2, factor: 1 },
     outbreak: null,
     dwindlingSince: null, noOneStreak: 0, harvestModifier: null,
+    // B1 · el clan vecino: esta aldea de laboratorio no tiene vecinos.
+    threat: { strength: 0, comingTick: null, comingBand: 0, raids: 0 },
     ended: null,
   };
 }
@@ -332,6 +334,8 @@ describe('render', () => {
       // A1 · los tramos de muralla que tiene el anillo al cerrarse
       // (medido: de 58 a 103 en doce semillas).
       pieces: 84,
+      // B1 · la cabeza que se lleva un asalto.
+      animal: 'cow',
     };
     const keys = bankKeys();
     let rendered = 0;
