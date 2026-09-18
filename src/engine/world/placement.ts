@@ -54,40 +54,122 @@ function standsInTheWay(b: Building, tick: number): boolean {
 
 function distance(a: Point, b: Point): number { return (a.x - b.x) ** 2 + (a.y - b.y) ** 2; }
 function center(rect: Rect): Point { return { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 }; }
-function cross(o: Point, a: Point, b: Point): number { return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x); }
 
-function convexHull(points: Point[]): Point[] {
-  const sorted = points.sort((a, b) => a.x - b.x || a.y - b.y);
-  const half = (input: Point[]): Point[] => {
-    const out: Point[] = [];
-    for (const point of input) {
-      while (out.length >= 2 && cross(out[out.length - 2]!, out[out.length - 1]!, point) <= 0) out.pop();
-      out.push(point);
+
+
+// ---------------------------------------------------------------------------
+// §7.4c · La muralla por anillos (P-4, 18 sep 2026)
+//
+// **Lo pidió el dueño del diseño mirando una captura**, y con el diseño hecho:
+// «¿podemos también evitar esos cachos sueltos? Sé que es complicado porque la
+// aldea tiene que ir creciendo, pero la muralla también tendrá que quedarse por
+// secciones. Es decir, si la aldea crece a un cierto punto, se construye la
+// muralla alrededor y después la siguiente sección de construcción va fuera de
+// la muralla».
+//
+// **Qué había y por qué salían cachos.** La empalizada se levantaba pieza a
+// pieza sobre la **envolvente convexa del núcleo dilatada dos celdas**
+// (`onEnvelope`), y esa envolvente **crece con la aldea**: cada pieza se ponía
+// sobre la envolvente del día en que le tocó, así que las piezas de años
+// distintos caían en líneas distintas. Medido en cuatro semillas al año 60:
+// **de 7 a 19 tramos desconectados por valle**, ninguno cerrando nada.
+//
+// Lo que hay ahora es un **anillo**: un círculo alrededor de la plaza —que desde
+// P-1 es el centro del pueblo y no se mueve— con un radio que **se deriva de la
+// muralla que ya hay**, así que la primera pieza fija el anillo y las
+// siguientes lo continúan. Cuando no cabe ni una pieza más en él, se empieza
+// otro más afuera; y como la aldea también crece hacia fuera, el anillo
+// siguiente la envuelve.
+//
+// No hace falta estado nuevo para esto —el anillo **está escrito en la propia
+// muralla**— y eso es deliberado: un radio guardado sería un número más que
+// migrar, y esto se puede leer del valle.
+// ---------------------------------------------------------------------------
+
+
+/**
+ * Si esa celda está en la banda del anillo.
+ *
+ * **Medio paso no basta, y esto costó tres medidas.** Un círculo dibujado con
+ * celdas enteras no pasa por el centro de las celdas: al ir de una a la de al
+ * lado en diagonal, el centro se separa del radio hasta 0,7. Con la banda en
+ * 0,5 se rechazaban celdas que están en el anillo, el anillo parecía lleno
+ * cuando no lo estaba, y la muralla salía a buscarse otro radio cada pocas
+ * piezas: **de 25 a 47 tramos por valle al año 60**, con doce y dieciséis
+ * piezas huérfanas. Con 0,75 la banda contiene un círculo de celdas conectado
+ * en ocho direcciones, que es lo que una muralla necesita para ser una muralla.
+ */
+function onRing(point: Point, centre: Point, radius: number): boolean {
+  return Math.abs(Math.sqrt(distance(point, centre)) - radius) <= RING_BAND;
+}
+
+/** Lo ancho que es el anillo, en celdas. Ver `onRing`. */
+const RING_BAND = 0.75;
+
+/** Si un solar entero pisa la banda del anillo, celda a celda. */
+function onRingRect(rect: Rect, centre: Point, radius: number): boolean {
+  for (let y = rect.y; y < rect.y + rect.h; y += 1) {
+    for (let x = rect.x; x < rect.x + rect.w; x += 1) {
+      if (onRing({ x: x + 0.5, y: y + 0.5 }, centre, radius)) return true;
     }
-    return out.slice(0, -1);
-  };
-  return [...half(sorted), ...half([...sorted].reverse())];
-}
-
-function edgeDistance(point: Point, a: Point, b: Point): number {
-  const length = distance(a, b);
-  const t = length === 0 ? 0 : Math.max(0, Math.min(1, ((point.x - a.x) * (b.x - a.x) + (point.y - a.y) * (b.y - a.y)) / length));
-  return Math.sqrt(distance(point, { x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) }));
-}
-
-/** Cell centres in the outermost one-cell band of the dilated convex hull. */
-function onEnvelope(point: Point, hull: Point[]): boolean {
-  if (hull.length < 3) return false;
-  let inside = true;
-  let d = Number.POSITIVE_INFINITY;
-  for (let i = 0; i < hull.length; i += 1) {
-    const a = hull[i]!;
-    const b = hull[(i + 1) % hull.length]!;
-    if (cross(a, b, point) < 0) inside = false;
-    d = Math.min(d, edgeDistance(point, a, b));
   }
-  if (inside) return false;
-  return d > BUILDING_RULES.PALISADE_DILATION - 1 && d <= BUILDING_RULES.PALISADE_DILATION;
+  return false;
+}
+
+/**
+ * El radio del anillo que toca levantar: el de la muralla que ya hay, y si en
+ * ése no cabe nada más, el siguiente que tenga sitio.
+ *
+ * El tope de la búsqueda es el corazón del valle: si no cabe un anillo más, no
+ * se levanta muralla, que es mejor que levantarla en la montaña.
+ */
+function ringToBuild(state: GameState, centre: Point, coreRadius: number,
+  ground: { occupied: Uint8Array; reserved: Uint8Array }): number | null {
+  // El que ya se decidió, si lo hay; y si no, uno alrededor de lo construido.
+  const base = state.ring ?? Math.round(coreRadius + BUILDING_RULES.PALISADE_DILATION);
+  // **De tres en tres, no de una en una.** Con el paso de una celda, un anillo
+  // que se queda sin sitio arranca el siguiente **pegado** al viejo, y lo que
+  // se ve entonces no es una muralla sino un bulto de estacas de tres o cuatro
+  // de grosor: rodado y mirado en la semilla 41 al año 60. Con tres celdas de
+  // paso quedan dos de calle entre anillo y anillo, que es donde cabe lo que se
+  // construya después —y es lo que el dueño del diseño pidió: «la siguiente
+  // sección de construcción va fuera de la muralla»—.
+  for (let radius = base; radius <= base + RING_SEARCH; radius += RING_STEP) {
+    if (ringHasRoom(state, centre, radius, ground)) return radius;
+  }
+  return null;
+}
+
+/** Si en ese anillo queda alguna celda donde se pueda plantar una pieza. */
+function ringHasRoom(state: GameState, centre: Point, radius: number,
+  ground: { occupied: Uint8Array; reserved: Uint8Array }): boolean {
+  // Se recorre el círculo por ángulos y no el mapa entero: un anillo de radio
+  // veinte son ciento treinta celdas, y el mapa cuatro mil.
+  const steps = Math.max(16, Math.round(radius * 8));
+  for (let n = 0; n < steps; n += 1) {
+    const angle = (n / steps) * Math.PI * 2;
+    // La celda cuyo centro cae sobre el círculo, no la que contiene el punto:
+    // así lo que se comprueba aquí es exactamente lo que `onRing` acepta abajo.
+    const x = Math.round(centre.x + Math.cos(angle) * radius - 0.5);
+    const y = Math.round(centre.y + Math.sin(angle) * radius - 0.5);
+    if (x < HEART.x0 || y < HEART.y0 || x >= HEART.x1 || y >= HEART.y1) continue;
+    if (!onRing({ x: x + 0.5, y: y + 0.5 }, centre, radius)) continue;
+    if (!fitsEmptyGround(state, 'palisade', x, y, ground)) continue;
+    return true;
+  }
+  return false;
+}
+
+/** Cuántas celdas más afuera se prueban antes de renunciar a la muralla. */
+const RING_SEARCH = 15;
+/** Lo que se separa un anillo del siguiente, en celdas. */
+const RING_STEP = 3;
+
+/** Si esa celda tiene una pieza de muralla pegada, en cruz. */
+function touchesWall(state: GameState, x: number, y: number): boolean {
+  return state.buildings.some((b) => b.lostTick === null
+    && (b.kind === 'wall' || b.kind === 'palisade')
+    && Math.abs(b.x - x) + Math.abs(b.y - y) === 1);
 }
 
 /**
@@ -206,8 +288,6 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   const centre = inside ? plaza
     : houses.length === 0 ? { x: state.map.width / 2, y: state.map.height / 2 }
       : { x: houses.reduce((n, b) => n + center(b).x, 0) / houses.length, y: houses.reduce((n, b) => n + center(b).y, 0) / houses.length };
-  const hull = convexHull(houses.flatMap((b) => [{ x: b.x, y: b.y }, { x: b.x + b.w, y: b.y },
-    { x: b.x + b.w, y: b.y + b.h }, { x: b.x, y: b.y + b.h }]));
   // How far a point sits from the edge of the built core, in cells. Zero is on
   // the rim; `set` pushes it that many cells beyond. This is the one shape §7.4
   // asks for twice — "en el borde del núcleo" and "algo apartada" — and it is a
@@ -218,6 +298,23 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   let best: Point | null = null;
   let bestScore: number[] | null = null;
   const spec = BUILDINGS[kind];
+  // §7.4c · el anillo que toca, sólo cuando se va a levantar muralla: es un
+  // barrido de círculos y no hay que pagarlo por cada casa.
+  const ring = kind === 'palisade' ? ringToBuild(state, centre, coreRadius, occupied) : null;
+  // **Y se escribe.** Es la única cosa que esta función cambia del estado, y es
+  // a propósito: un anillo es una decisión de la aldea —«hasta aquí llega el
+  // pueblo»— y una decisión se apunta. Si se volviera a calcular cada vez,
+  // volvería a moverse medio paso por pieza, que es lo que llenaba el valle de
+  // tramos sueltos (ver `GameState.ring`).
+  if (ring !== null && ring !== state.ring) state.ring = ring;
+  // **Y la línea de la muralla empezada es de la muralla.** Sin esto, la aldea
+  // levantaba casas encima del anillo en curso, el anillo se quedaba sin sitio
+  // y el siguiente arrancaba más afuera dejando la pieza vieja suelta: medido
+  // en la semilla 11 al año 40, once tramos de los que cuatro eran de una sola
+  // pieza. Reservarla es además lo que el dueño del diseño pidió con sus
+  // palabras —«después la siguiente sección de construcción va fuera de la
+  // muralla»—: cuando dentro ya no cabe nada, lo nuevo sale fuera solo.
+  const wallLine = kind === 'palisade' || kind === 'wall' ? null : state.ring;
   // **Sólo el corazón del valle**, y por dos razones que apuntan al mismo sitio.
   //
   // La de diseño: fuera del corazón no hay terreno productivo —es montaña, lago
@@ -235,7 +332,9 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
     if (!fitsEmptyGround(state, kind, x, y, occupied)) continue;
     const rect = { x, y, w: spec.w, h: spec.h };
     const p = center(rect);
-    if (kind === 'palisade' && !onEnvelope(p, hull)) continue;
+    // §7.4c · la muralla va en el anillo, no en la envolvente del día.
+    if (kind === 'palisade' && (ring === null || !onRing(p, centre, ring))) continue;
+    if (wallLine !== null && onRingRect(rect, centre, wallLine)) continue;
     let river = false;
     let touchesForest = false;
     let path = false;
@@ -276,6 +375,17 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       // in a corner of the map — where a 3×3 church can no longer replace it.
       case 'chapel': case 'church': score = [Math.round(rimOffset(p, BUILDING_RULES.CHAPEL_SET_BACK)), Number(!rock), distance(p, centre)]; break;
       case 'smithy': score = [rimOffset(p, 0), -houseDistance]; break;
+      // §7.4c · **la muralla crece pegada a la muralla.** Primero, que la pieza
+      // toque una que ya esté puesta: eso es lo que convierte piezas sueltas en
+      // secciones. Después, el ángulo alrededor del centro, que es lo que hace
+      // que el tramo avance siempre por el mismo lado en vez de saltar de un
+      // extremo al otro; y por último lo pisado, para que el portón caiga donde
+      // ya se pasa.
+      case 'palisade': score = [
+        Number(!touchesWall(state, x, y)),
+        Math.round((Math.atan2(p.y - centre.y, p.x - centre.x) + Math.PI) * 100),
+        Number(!path),
+      ]; break;
       default: score = [distance(p, centre)];
     }
     if (bestScore === null || lowerScore(score, bestScore)) {

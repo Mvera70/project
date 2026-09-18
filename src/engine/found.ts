@@ -69,6 +69,8 @@ export function foundGame(
     // de (34,55) a (31,55) en la semilla 7. Una plaza que aún no se ha elegido
     // no puede estorbar a la casa que la va a elegir.
     plaza: { x: -1_000, y: -1_000 },
+    // P-4 · sin muralla empezada: el primer tramo fija el anillo.
+    ring: null,
     herd: { ...profile.HERD },
     village: {
       grain: profile.GRAIN,

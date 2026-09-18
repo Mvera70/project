@@ -761,7 +761,7 @@ export type MigrationEvent =
  * es cuando lo habrá— no se ha validado todavía. Después de ese hito, esto ya
  * no sería aceptable.
  */
-export const SCHEMA_VERSION = 8; // P-1: la plaza (7 era M-0: piedra, plata, ofertas y actos)
+export const SCHEMA_VERSION = 9; // P-4: el anillo de muralla (8 era P-1: la plaza)
 
 /**
  * La postura de la aldea: lo único que el jugador manda de forma continua.
@@ -1000,6 +1000,21 @@ export interface GameState {
    * levantar nada dentro de su radio (`PLAZA.RADIUS`).
    */
   plaza: { x: number; y: number };
+  /**
+   * P-4 · **El anillo de muralla que se está levantando**, como radio en celdas
+   * desde la plaza, o nada si la aldea todavía no ha empezado ninguno
+   * (esquema 9).
+   *
+   * Está guardado y no se deriva, y esta vez el motivo se midió: derivarlo de
+   * la muralla construida —la mediana del tramo más largo— **no es estable**.
+   * La mediana se mueve al añadir cada pieza, la banda del anillo es de una
+   * celda, y con el radio moviéndose medio paso la pieza siguiente ya no cae en
+   * el mismo círculo: en la semilla 41 al año 60 salían **48 tramos, 17 de ellos
+   * de una sola pieza**. Un anillo es una decisión, no una media: se toma una
+   * vez, se escribe, y la muralla se levanta sobre ella hasta que no cabe nada
+   * más.
+   */
+  ring: number | null;
   village: VillageStats;
   herd: Herd; // §7.7, schema 3
   people: PeopleState;

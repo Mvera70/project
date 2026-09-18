@@ -12,7 +12,8 @@
 import { MARKS, TIME } from '@engine/balance';
 import type { Catalogue } from '@engine/crossroads/schema';
 import type { BuildingId, GameState } from '@engine/state';
-import { standing, valleyCore } from './anchors';
+import { standing } from './anchors';
+import { plazaCentre } from '@engine/world/plaza';
 
 export interface Banner {
   x: number;
@@ -42,7 +43,14 @@ function visibleOf(
  */
 export function bannersAt(state: GameState, catalogue: Catalogue): Banner[] {
   const out: Banner[] = [];
-  const core = valleyCore(state);
+  // P-1 · **el estandarte se iza en la plaza**, que es el sitio de la aldea y
+  // desde el esquema 8 está vacío por construcción: nadie puede levantar nada
+  // dentro. Antes era `valleyCore` —la media de los centros de los edificios— y
+  // eso podía caer **dentro de una casa**: una señal en la escena que no se veía
+  // (`tests/fast/graphics-effects.test.ts` lo cazó en la semilla 14 al cambiar
+  // el trazado). Un estandarte que se planta en el medio del pueblo necesita
+  // que el medio del pueblo sea un sitio, y ahora lo es.
+  const core = plazaCentre(state.plaza);
   for (const decision of state.history) {
     if (decision.tick > state.tick) continue;
     for (const effect of visibleOf(catalogue, decision.templateId, decision.optionId)) {

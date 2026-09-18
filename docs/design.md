@@ -1498,6 +1498,62 @@ atraviesa.
 
 ---
 
+### 7.4c La muralla, por anillos (P-4, 18 sep 2026)
+
+**La empalizada se levanta sobre un anillo, y el anillo se escribe.** Lo pidió el
+dueño del diseño mirando una captura: «¿podemos también evitar esos cachos
+sueltos? Sé que es complicado porque la aldea tiene que ir creciendo, pero la
+muralla también tendrá que quedarse por secciones. Es decir, si la aldea crece a
+un cierto punto, se construye la muralla alrededor y después la siguiente sección
+de construcción va fuera de la muralla».
+
+**Qué había.** §7.4 ponía cada pieza sobre la **envolvente convexa del núcleo
+dilatada dos celdas**, y esa envolvente crece con la aldea: cada pieza caía sobre
+la envolvente del año en que le tocó, así que las piezas de años distintos
+quedaban en líneas distintas. Medido en cuatro semillas al año 60: **de 7 a 19
+tramos desconectados por valle**, y el más largo con la cuarta parte de las
+piezas. Ninguno cerraba nada.
+
+Las reglas:
+
+1. **El anillo es un radio desde la plaza** (§7.4b), guardado en `state.ring`
+   (esquema 9). Se decide una vez —`coreRadius` + `PALISADE_DILATION`— y no se
+   mueve mientras quepa una pieza más.
+2. **La muralla crece pegada a la muralla**: de las celdas del anillo se elige
+   primero una que toque una pieza ya puesta, y entre ésas la siguiente en
+   ángulo, así que el tramo avanza por un lado en vez de saltar.
+3. **La línea del anillo es de la muralla**: ningún otro edificio puede pisarla.
+   Es lo que hace que «la siguiente sección de construcción vaya fuera» sin que
+   nadie lo mande: cuando dentro no cabe nada, lo nuevo sale.
+4. **Cuando el anillo se llena, el siguiente va tres celdas más afuera**, que
+   deja dos de calle entre anillo y anillo.
+
+**Lo medido, en cuatro semillas:** al año 20 hay de cero a cuatro piezas y un
+solo tramo; **al año 40, un solo tramo en las cuatro** (8, 28, 4 y 8 piezas); al
+año 60 los valles grandes han cerrado su anillo y empezado otro, y el tramo mayor
+tiene del 45 % al 100 % de las piezas —contra el 25 % de antes—.
+
+**Y dos números que costaron tres medidas cada uno**, porque el diseño era
+correcto y la geometría no:
+
+- **La banda del anillo es de 0,75 celdas y no de media.** Un círculo dibujado
+  con celdas enteras no pasa por el centro de las celdas: al avanzar en diagonal
+  el centro se separa del radio hasta 0,7. Con media celda se rechazaban celdas
+  que estaban en el anillo, el anillo parecía lleno, y la muralla salía a
+  buscarse otro radio cada pocas piezas: **de 25 a 47 tramos por valle**.
+- **El radio se guarda, no se deriva.** Derivarlo de la mediana del tramo más
+  largo parecía elegante y no es estable: la mediana se mueve al añadir cada
+  pieza, y con el radio moviéndose medio paso la siguiente pieza ya no cae en el
+  mismo círculo —48 tramos, 17 de ellos de una sola pieza—. Un anillo es una
+  decisión, no una media.
+
+**Lo que cuesta.** La muralla ahora se cierra, así que la aldea gasta mucha más
+madera en ella: en la semilla 41 al año 60 hay 128 piezas donde antes había 40.
+Medido en ocho partidas de sesenta años, la población baja de 334 a 322 —un 3 %—
+y en los dos valles grandes algo más. Es el precio de tener muralla.
+
+---
+
 ### 7.13 La leña se corta por necesidad (balanceo del 17 sep 2026)
 
 **La aldea manda al bosque las manos que hacen falta, no una cuota.** Lo pidió el

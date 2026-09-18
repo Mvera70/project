@@ -627,7 +627,18 @@ describe('G-10 · ninguna señal enterrada', () => {
     // Lo alto que llega el caballete de lo más alto del valle, en celdas. Por
     // encima de eso ya no hay nada que tape.
     const OVER_THE_ROOFS = 1.5;
-    const standing = state.buildings.filter((building) => building.lostTick === null);
+    // **Y lo que entierra son paredes, no cualquier huella.** Un campo, un
+    // cementerio y un pozo se andan por encima —es la misma distinción que hace
+    // `WALLED` en `engine/world/placement.ts` y la que usa `life/terrain.ts`
+    // para cerrar el paso—, así que un saco de grano apoyado en la linde de un
+    // sembrado está a la vista y no enterrado. Medido el 18 sep 2026, al
+    // ordenarse el trazado alrededor de la plaza: los sacos del granero de la
+    // semilla 7 caen en (42,59), que es la esquina del campo de (40,57), y la
+    // prueba los llamaba enterrados.
+    const WALLS = new Set(['house', 'stone_house', 'granary', 'chapel', 'church', 'smithy', 'mill', 'watchtower']);
+    const standing = state.buildings.filter(
+      (building) => building.lostTick === null && WALLS.has(building.kind),
+    );
 
     for (const mark of tells.group.children) {
       const { x, y, z } = mark.position;

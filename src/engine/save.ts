@@ -371,7 +371,7 @@ export function deserialize(raw: unknown): SaveFile {
     }, population(legacy as GameState));
     state = { ...legacy, version: SCHEMA_VERSION, terrainSeed: legacy.seed, peakPeople: observed };
     archive = archive.map((game) => ({ ...game, terrainSeed: game.terrainSeed ?? game.seed }));
-  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7].includes(candidate.schema)) {
+  } else if (candidate.schema !== SCHEMA_VERSION && ![2, 3, 6, 7, 8].includes(candidate.schema)) {
     throw new Error(`Save file schema ${candidate.schema} is not one this build can read.`);
   }
 
@@ -475,6 +475,16 @@ export function deserialize(raw: unknown): SaveFile {
   // cargar una partida no puede demoler la aldea del jugador.
   if ((state as Partial<GameState>).plaza === undefined) {
     state = { ...state, version: SCHEMA_VERSION, plaza: choosePlaza(state) } as GameState;
+  }
+  // 8 -> 9 (P-4): el anillo de muralla.
+  //
+  // Entra **vacío**, y es recordar y no cambiar: una partida guardada levantó su
+  // empalizada sobre la envolvente del núcleo, pieza a pieza, así que no tiene
+  // ningún anillo que recordar. Lo que ya está construido se queda donde está
+  // —§13.1 no deja que cargar demuela nada— y el primer tramo nuevo fija el
+  // primer anillo alrededor de la plaza.
+  if ((state as Partial<GameState>).ring === undefined) {
+    state = { ...state, version: SCHEMA_VERSION, ring: null } as GameState;
   }
   if (!isPlausibleState(state)) throw new Error('Save file has no valid state.');
   if (!archive.every(archivedGame)) throw new Error('Save file has no valid archive.');

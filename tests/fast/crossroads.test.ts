@@ -46,6 +46,7 @@ function village(seed: number, houses = 12): GameState {
     // estados se montan a mano y no fundan nada, así que no hay casa junto a la
     // que elegirla.
     plaza: { x: 36, y: 56 },
+    ring: null, // P-4 · sin muralla empezada (esquema 9)
     map: {
       width: WORLD.WIDTH,
       height: WORLD.HEIGHT,

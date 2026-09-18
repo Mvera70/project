@@ -135,7 +135,11 @@ function atFace(home: Building, hole: Window): { x: number; z: number; out: read
  * de los tejados, que desde ahí se ve siempre.
  */
 const FACES = [[0, -1], [1, 0], [-1, 0], [0, 1]] as const;
+const CORNERS = [[1, -1], [1, 1], [-1, 1], [-1, -1]] as const;
 const CLEAR = 0.12;
+/** Lo que se sube una señal que no cabe fuera, para que se vea sobre el
+ *  tejado. En celdas: un caballete de este valle llega a 1,5 (D.6.2). */
+const ROOF_CLEAR = 1.6;
 
 /** Lo que sobresale del muro un cristal encendido, en celdas: un dedo. */
 const GLASS = 0.03;
@@ -148,6 +152,16 @@ function outsideOf(
   for (const [dx, dz] of FACES) {
     const px = dx === 0 ? x : home.x + (dx > 0 ? home.w + CLEAR : -CLEAR);
     const pz = dz === 0 ? z : home.y + (dz > 0 ? home.h + CLEAR : -CLEAR);
+    if (at(px, pz) === undefined) return { x: px, z: pz, free: true };
+  }
+  // **Y las cuatro esquinas, antes de rendirse.** Con las cuatro caras
+  // ocupadas los sacos se dibujaban **dentro** del granero, o sea invisibles:
+  // lo cazó `graphics-effects` en la semilla 7 al año 14 el día que el trazado
+  // se ordenó alrededor de la plaza (§7.4b) y los edificios quedaron más
+  // juntos. Una esquina es sitio de sobra para cuatro sacos.
+  for (const [dx, dz] of CORNERS) {
+    const px = home.x + (dx > 0 ? home.w + CLEAR : -CLEAR);
+    const pz = home.y + (dz > 0 ? home.h + CLEAR : -CLEAR);
     if (at(px, pz) === undefined) return { x: px, z: pz, free: true };
   }
   return { x, z, free: false };
@@ -301,11 +315,15 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined)
         ? { x: tell.x + 1, z: tell.y + 1, free: true }
         : outsideOf(barn, at as (x: number, y: number) => Building | undefined);
       const count = Math.ceil(tell.fraction * 6);
+      // Si ni caras ni esquinas estaban libres, los sacos suben por encima del
+      // tejado: una señal que no se ve no dice nada, y lo que esta señal dice
+      // —cuánto grano hay— es de las que el jugador mira.
+      const lift = spot.free ? 0 : ROOF_CLEAR;
       return Array.from({ length: count }, (_, index) => {
         const upper = index >= 4;
         const slot = upper ? index - 4 : index;
         const x = spot.x + (slot - (upper ? 0.5 : 1.5)) * 0.27;
-        const y = HEIGHT.grain + 0.13 + (upper ? 0.21 : 0);
+        const y = HEIGHT.grain + 0.13 + (upper ? 0.21 : 0) + lift;
         const z = spot.z + (upper ? 0 : (index % 2) * 0.08);
         const sack = mark(
           new SphereGeometry(0.16, 8, 5), TONE.grain, false,
