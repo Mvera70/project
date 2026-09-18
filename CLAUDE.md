@@ -29,7 +29,13 @@ hay que tener en la cabeza siempre. Cuando algo no esté aquí, está allí.
 **Todo determinista.** Misma semilla y mismas decisiones → misma partida, byte a
 byte. La aleatoriedad viene de flujos con nombre (`weather`, `births`,
 `crossroads`…), nunca compartidos. Añadir una tirada en el render jamás puede
-desplazar la simulación.
+desplazar la simulación. **Con una frontera, escrita en §1b (18 sep 2026): el
+asedio.** La meta del juego es una villa cerrada que cae o aguanta, y el asalto
+se resuelve **en físico** —flechas, choques, un portón que se rompe— y no es
+determinista por decisión del dueño («que dos jugadores con la misma semilla
+tengan finales distintos no importa, esa es la gracia»). Su resultado entra al
+motor como datos por la puerta de `PlayerAct`, igual que lo que hace el
+jugador: el motor sigue siendo determinista dadas sus entradas.
 
 **Ningún número se inventa.** Todas las constantes del juego viven en
 `src/engine/balance.ts` y salen de `docs/design.md` §12. Si necesitas una que no
@@ -219,6 +225,14 @@ sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
   día salieron cuatro regresiones invisibles.
 - **Ninguna ronda de interfaz se cierra sin captura**, y ahora se puede:
   `npm run shot`.
+
+**La meta del proyecto está en `docs/design.md` §1b (18 sep 2026): una villa
+cerrada que cae o aguanta.** Cuatro fases —caserío, aldea, villa cerrada,
+asedio—, las dos primeras hechas y medidas en horas de reloj (B-1), la tercera a
+medias y la cuarta por hacer. Se cae por las decisiones, no por un rayo; la
+defensa se construye *dando* (armas, portón, atalaya) y el «tower defense» es
+literal —aldeanos en la muralla disparando— pero nada se coloca con el dedo.
+Toda ronda nueva se ordena contra esa tabla.
 
 **Los hitos humanos 0 y 6 se descartan** (dueño del diseño, 15 sep 2026). Eran
 la deuda más antigua del proyecto —una lectura de tres crónicas por un tercero y

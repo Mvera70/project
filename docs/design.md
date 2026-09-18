@@ -122,6 +122,70 @@ decisiones que hacen que se tumbe»):
 La sección 12.9 fija los objetivos de mortalidad que la suite de balance
 verifica, y está **por remedir** desde R-1 (`docs/rework.md` §5).
 
+### 1b. La meta del proyecto (18 sep 2026)
+
+**Adónde tiene que llegar el juego, dicho por el dueño del diseño** y escrito
+aquí para que cada ronda se ordene contra ello:
+
+> «El objetivo quizás es, el final, tener una aldea completa, fortificada, al
+> completo. […] Y el juego en ese momento se convertiría en una especie de tower
+> defense, aparte de la gestión de la aldea. Podrían venir ataques y crearemos
+> una especie de batallas con simulaciones. Los muñequitos empezarían a tener
+> física y pueden pelear entre ellos.»
+
+**Una partida tiene final.** El valle **cae o aguanta**. Caer es que el
+ejército rival consiga entrar y rompa todo —mate a la gente, queme lo que hay—
+y se vea; aguantar es un valle cerrado, entero y distinto de cualquier otro,
+porque su forma la hicieron las decisiones que se tomaron y lo que se le dio.
+**Y se cae por las decisiones**, no por un rayo: «a medida que vas tomando
+decisiones, si la vas cagando, el valle puede morir. Esa es la clave». Que hoy
+no muera nadie no preocupa; el juego se irá haciendo más difícil por ahí.
+
+**Cuatro fases, y ya se leen en la escalera del ritmo** (§12.1, horas de reloj a
+×1):
+
+| Fase | Qué es | Estado el 18 sep 2026 |
+|---|---|---|
+| 1 · El caserío | Dos personas, las primeras casas, la primera decisión | Hecha: primera decisión a las 14 h |
+| 2 · La aldea | Oficios, capilla, la piedra | Hecha: edad de piedra a las 61 h |
+| 3 · La villa cerrada | El primer anillo completo, el segundo anillo tres celdas afuera (§7.4c), lo de dentro a piedra | A medias: el anillo existe y se cierra; el cierre no se celebra ni se distingue |
+| 4 · El asedio | Lo acumulado y lo decidido atraen asaltos; la aldea se defiende con lo que se le dio; el valle cae o aguanta | Por hacer |
+
+**La regla nueva, y es una frontera y no una excepción: el asalto se resuelve
+en físico, y el motor lo apunta.** Hasta aquí el motor decide todo y la capa de
+vida interpreta (§1, «Vida del valle»; Anexo E). En un asalto es al revés:
+flechas con balística e impacto, cuerpos que chocan, golpean y caen, un portón
+que se rompe, y **quién muere y qué arde lo decide esa simulación**, que no es
+determinista y no tiene por qué serlo. Lo dijo el dueño con estas palabras:
+«que dos jugadores en ese punto ya con la misma semilla tengan finales
+distintos no importa, esa es un poco también la gracia. La semilla influye en
+cómo la aldea se desarrolla y toma las decisiones; después, en ese punto, ya no
+nos importa». El resultado entra en el motor por la misma puerta por la que
+entra lo que hace el jugador cada semana (`PlayerAct`, paso 1b de §4.2): «lo que
+el mundo hizo», como datos. Así el motor sigue siendo determinista *dadas sus
+entradas*, las partidas guardadas siguen cargando, y la semilla sigue mandando
+en todo lo demás.
+
+**Lo que no cambia, para que siga siendo este juego.** Quién viene, cuándo y
+con cuánto lo decide el motor, con semilla y por lo que la aldea acumuló y
+decidió: es §1 («la fuente de letalidad es la acumulación de lo que el jugador
+metió») llevado a su consecuencia. Y la defensa se construye **dando**, como
+todo lo demás desde M-2: armas a la herrería, un portón, una atalaya
+(`watchtower`), el herrero en el trono. El «tower defense» es literal —las
+torres son aldeanos en la muralla disparando— pero nada se coloca con el dedo:
+se da, y la aldea decide dónde se pone cada uno. Lo físico es la *resolución*
+del asalto, no su causa.
+
+**Lo que cuesta, por piezas**, para que ninguna ronda lo descubra a medias:
+las flechas (balística e impacto) y los aldeanos-torre son baratos —la capa de
+vida ya va a paso fijo y ya tiene círculos, `separate` y `resolve`—; el cuerpo
+a cuerpo (golpe, empujón, caída) y el ejército que entra (un bando hostil con su
+IA, un portón que se rompe) son del tamaño de una tanda como la de la IA de la
+vida; y el gore, los cuerpos que quedan y las casas que arden de verdad
+dependen de la sesión de arte, porque **hoy no existe un solo clip de pelea**.
+Cómo se hace el gore y cómo se hacen las físicas está por decidir; que sea así
+no.
+
 ---
 
 ## 2. Convenciones del proyecto
