@@ -2164,6 +2164,17 @@ export const UI_BANK: Record<string, string> = {
   // rellena a dos dígitos por quien la pinta, para que no baile de ancho.
   'app.clock.time': '{hour}:00',
   'app.clock.date': 'Year {year} · {season}, day {day}',
+  // A5 · **Las tres fases del valle, con las palabras de §1b** (`derive/era.ts`).
+  // Son un nombre y no una frase —van en versalitas bajo el ornamento de la
+  // bandeja y en la cabecera de año de la crónica—, así que viven aquí y no en
+  // el banco de plantillas, que exige tres variantes y punto final. Es el mismo
+  // trato que `milestone.kind.*` recibe unas líneas más abajo.
+  //
+  // «Walled town» y no «town» a secas: lo que la fase 3 nombra no es un tamaño
+  // de pueblo, es un pueblo **cerrado**, que es de lo que va la meta del juego.
+  'era.hamlet': 'Hamlet',
+  'era.village': 'Village',
+  'era.town': 'Walled town',
   'app.speed.controls': 'Simulation speed',
   'app.speed.pause': 'Pause',
   'app.speed.multiplier': '{speed}×',

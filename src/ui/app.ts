@@ -14,6 +14,7 @@ import './redesign/shell.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
+import { eraOf } from '@derive/era';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { offerLine } from './offer-line';
@@ -653,6 +654,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // todo lo que antes eran quince líneas sueltas por fotograma es ahora una
     // sola llamada, pura respecto al DOM que no le pertenece (`hud.ts`).
     hud.paint(state, fraction);
+    // A5 · **la fase del valle, bajo el ornamento de la bandeja.** Se deriva
+    // (`derive/era.ts`) y el texto sale del banco: aquí no se escribe ni se
+    // guarda nada. `setEra` no toca el DOM si la palabra no ha cambiado, que
+    // es lo mismo que hace el reloj de la cabecera — una era dura años y esto
+    // se llama sesenta veces por segundo.
+    shell.setEra(renderUiText(`era.${eraOf(state)}`));
     // Y si la hoja de órdenes está abierta, que sus botones sigan lo que diga
     // el estado: el único escritor es `actions.setIntent`, así que en la
     // práctica de hoy esto nunca discrepa de lo que ya pintó `navigate` al

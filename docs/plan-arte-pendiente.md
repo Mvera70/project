@@ -183,6 +183,47 @@ se mueve.
 referencia natural aprobada, se revisaron visualmente, se normalizaron a 640 ×
 512 y se añadieron al índice de arte. `raid.beast` reutiliza `raid-sack.png`.
 
+## Las cuatro de la villa cerrada (A1, A2, A4, C3 · 18 sep 2026)
+
+**Por la regla del dueño del diseño del 18 sep 2026:** cada crónica nueva crea
+aquí la tarea de pedir su imagen, en la misma ronda. Éstas son la deuda que esa
+regla destapa al escribirla, y todas tienen la misma causa: son entradas de
+`kind: 'built'`, así que `illustrationFor` las manda al grabado genérico de
+construcción (`built.png`). Una de las cuatro es **de peso 3** —el cierre de la
+villa, que pasa una vez en la vida de una aldea— y comparte dibujo con «se ha
+levantado un campo».
+
+Y tres de las cuatro **no existían de verdad hasta esta semana**: el portón es
+de A2, la atalaya de aldea es de C3 y la muralla de piedra no la levantaba
+ningún valle hasta A4 (cero de doce medidos), así que pedir su dibujo antes
+habría sido pedir el dibujo de algo que no se veía.
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `wall-closed.png` | `wall.closed` | **La villa se cierra**, y es el cuadro de la fase 3 de §1b: el anillo completo visto desde fuera con su portón echado y el pueblo dentro. No es una obra en marcha — es el día en que la última pieza cierra el círculo. Peso 3 |
+| `built-gate.png` | `built.gate` | **El portón recién colgado**: la hoja nueva en su hueco de la estacada, con las jambas. Es la puerta de un pueblo, no la de un castillo |
+| `built-wall.png` | `built.wall` (y `built.wall.year`) | **La estacada doblada en piedra**: el tramo de madera dando paso al muro, con la piedra de la cantera a pie de obra. Desde A4 lo tienen 10 de 12 valles |
+| `built-watchtower.png` | `built.watchtower` (y `built.watchtower.year`) | **La atalaya acabada** contra el cerco, que es donde A4 la planta: una torre de madera y piedra pegada a la muralla, con alguien arriba mirando el camino |
+
+## La temática nueva: grabado de tinta parda (18 sep 2026)
+
+**Cinco piezas subidas por el dueño del diseño**, con la referencia y la
+correspondencia pieza a pieza en `docs/visual-reference/engraving/README.md`.
+Lo que definen no es una ilustración más: es **el trazo y el color de la
+interfaz entera** —una sola tinta parda sobre papel crema, sin un segundo
+color—, así que lo que hoy va en oro o en rojo es de la versión anterior.
+
+| # | Pieza | Qué sustituye | Cómo entra |
+|---|---|---|---|
+| 1 | Hoja de roble | El `oak-leaf` del sprite, hoy pintado en oro (`--skin-gold`) en el ornamento de la bandeja | Calco a SVG (`calcar-iconos`) y al sprite de `public/ui/icons.svg` |
+| 2 | Sello de lacre con el roble | El `seal-tree` de VZ-03, el acceso a una decisión aplazada | Igual, al sprite |
+| 3 | Esquina de vid de roble | El canalón de la crónica (`paintVine`, `chronicle-ornaments.ts`) | Calco a SVG; es un adorno de página, no un icono |
+| 4 | Marco cuadrado con hojas en las esquinas | El capitular de la crónica (`capital-anno.png`: recuadro rojo con la A en oro) | PNG normalizado en `public/ui/art/`, como el resto del capitular |
+| 5 | Banderola de pergamino | **Nada todavía, y es el hueco más claro**: es una cinta para un rótulo. La fase del valle (A5) se lee hoy en versalitas sueltas bajo el ornamento de la bandeja; en una banderola sería un rótulo de verdad | Pieza nueva de piel: pide ronda con captura a 390 y a 750 |
+
+Ninguna de las cinco se integra sin pasar por la skill `piel-del-valle` (§10) y
+sin retirar, en la misma ronda, el color que sustituye.
+
 ## Orden recomendado
 
 1. ~~Resolver el recuento de ilustraciones y cerrar el catálogo nominal.~~

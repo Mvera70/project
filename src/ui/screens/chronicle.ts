@@ -9,6 +9,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { namesOf } from '@engine/crossroads/resolve';
 import { renderChronicleYear, renderEntry, renderUiText } from '@engine/chronicle/render';
 import { makeBundle, type RngBundle } from '@engine/rng';
+import { eraAtYear } from '@derive/era';
 import type { ArchivedGame, ChronicleEntry, GameState, HappeningRecord, PendingCrossroad } from '@engine/state';
 import { yearOf } from '@engine/time';
 import type { App } from '../app';
@@ -103,6 +104,11 @@ const STYLE = `
    -------------------------------------------------------------- año y capitular */
 .chronicle-year { padding: 28px 0 4px; }
 .chronicle-year-head { display: flex; align-items: center; gap: 14px; padding: 0 34px 0 30px; }
+/* A5 · la fase del valle aquel anyo, al final de la linea del anyo y en tinta
+   apagada: el anyo es el titulo y esto es su apunte al margen, no un segundo
+   titulo. Un margen izquierdo automatico la lleva al canto derecho sin una
+   caja mas. */
+.chronicle-era { margin-left: auto; color: var(--skin-ink-faded); white-space: nowrap; }
 /* UI-V3b · **El capitular es una pintura, no una letra en un cuadrado.**
    La ronda anterior lo dejó como la primitiva del kit —recuadro rojo y una
    \`A\` de Cinzel en oro— y el dueño del diseño resumió la página así: «la
@@ -499,7 +505,15 @@ function yearBlock(source: ChronicleSource, year: number, actions?: UiActions): 
   const heading = document.createElement('h2');
   heading.className = 'chronicle-anno skin-inscription';
   heading.textContent = headingText;
-  head.append(capital, heading);
+  // A5 · **y en qué fase estaba el valle aquel año** (§1b). Va con el año y no
+  // en la cabecera de la pantalla porque la crónica es el pasado: la fase se
+  // lee de la propia crónica (`eraAtYear`), así que el año doce dice «hamlet»
+  // aunque hoy el valle sea una villa cerrada. Sin eso, una pantalla que existe
+  // para contar la historia estaría fechándola mal.
+  const era = document.createElement('span');
+  era.className = 'chronicle-era skin-label';
+  era.textContent = renderUiText(`era.${eraAtYear(source.chronicle, year)}`);
+  head.append(capital, heading, era);
   const rule = document.createElement('div');
   rule.className = 'chronicle-year-rule';
   const ruleLine = document.createElement('hr');

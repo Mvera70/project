@@ -212,6 +212,22 @@ Cuando una prueba mida un lienzo, **espera a que esté dimensionado**.
 - **Ni un color ni una medida sin muestrear el prototipo.** Los prototipos están
   en `docs/ui-redesign/ui-prototypes/`. Muestrear es abrir el PNG y leer el
   píxel, no mirarlo.
+- **Pero el color de esos tres prototipos ya no manda.** El dueño del diseño
+  subió la temática nueva el 18 sep 2026 y la resumió en una frase: «esa
+  captura en concreto son conceptos antiguos; **la nueva temática es menos
+  colorida**». Son cinco grabados de **una sola tinta parda sobre papel crema,
+  sin un segundo color** —marco de hojas de roble, esquina de vid, sello con el
+  roble, banderola y la hoja—, y están con su correspondencia pieza a pieza en
+  `docs/visual-reference/engraving/README.md`. Así que: **los prototipos
+  01/02/03 siguen mandando en la maquetación** —dónde va cada cosa y cuánto
+  mide— y la temática manda en el color y el trazo. Lo que hay hoy en oro
+  (`--skin-gold`) y en rojo (el capitular) es de la versión coloreada, y
+  `../higgsfield/branding-sheet.png` también.
+- **Y todo diseño nuevo que suba el dueño pasa por aquí antes de entrar al
+  juego** —sus palabras del 18 sep: «todo debe pasar por nuestra skill»—: se
+  copia a una ruta estable de `docs/visual-reference/`, se apunta a qué pieza
+  de la piel sustituye, y se calca; nunca se integra desde la carpeta de
+  adjuntos ni «a ojo» junto a lo que ya hay.
 - **Ni una frase.** Todo lo que lee el jugador sale de
   `src/engine/chronicle/bank.en.ts`.
 - **Ni un dibujo a mano si está dibujado en el prototipo.** Se calca; cómo, en

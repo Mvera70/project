@@ -17,7 +17,8 @@
 // villa cerrada, y cuando el asalto pasa no «vuelve» a ninguna fase.
 
 import { count } from '@engine/subsistence/building-counts';
-import type { GameState } from '@engine/state';
+import { yearOf } from '@engine/time';
+import type { ChronicleEntry, GameState } from '@engine/state';
 
 /**
  * Las tres eras de un valle, en orden.
@@ -81,4 +82,30 @@ function everHadTrades(state: GameState): boolean {
 export function nextEra(state: GameState): Era | null {
   const era = eraOf(state);
   return era === 'hamlet' ? 'village' : era === 'village' ? 'town' : null;
+}
+
+/**
+ * A5 · En qué era estaba el valle **aquel año**, leído de la crónica.
+ *
+ * `eraOf` contesta por el estado de hoy, y eso vale para la cabecera; la
+ * crónica es otra cosa: es el pasado, y una cabecera de año que dijera la fase
+ * de hoy estaría fechando mal la historia —«ANNO XII · VILLA CERRADA» en un
+ * año en que había cuatro chozas—. Así que aquí la fuente es la crónica, que
+ * es lo que esa pantalla tiene delante y lo único que sabe de los años que ya
+ * pasaron. Es la misma técnica con la que `chronicle/ledger.ts` recuenta una
+ * partida acabada: las marcas están en las entradas.
+ *
+ * **Las dos marcas son las dos líneas que ya se escriben** y no hay que añadir
+ * ninguna: `wall.closed` (peso 3, una vez en la vida de una aldea) y la
+ * construcción de la fragua. Se recorre entero en vez de cortar en la primera
+ * coincidencia porque la crónica no promete orden.
+ */
+export function eraAtYear(chronicle: readonly ChronicleEntry[], year: number): Era {
+  let era: Era = 'hamlet';
+  for (const entry of chronicle) {
+    if (yearOf(entry.tick) > year) continue;
+    if (entry.templateKey === 'wall.closed') return 'town';
+    if (entry.templateKey.startsWith('built.smithy')) era = 'village';
+  }
+  return era;
 }

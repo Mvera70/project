@@ -56,6 +56,17 @@ referencias circulares. Objetos, arrays y referencias por `id`.
 del banco de plantillas de `src/engine/chronicle/bank.en.ts`. Los sistemas
 empujan claves y parámetros, no frases.
 
+**Y una crónica nueva trae su imagen pedida, en la misma ronda.** Regla del
+dueño del diseño, 18 sep 2026: «cada vez que crees una crónica hay que ir
+creando la tarea de pedir las imágenes». La tarea se escribe en
+`docs/plan-arte-pendiente.md` —fichero, clave y qué tiene que enseñar, como las
+siete del asedio— y el dibujo se integra por `public/ui/art/index.json` y
+`chronicle-art.ts`. Es la gemela de la §4b de la skill `goal` (lo que el motor
+sabe y la pantalla no enseña), y existe porque sin ella una línea nueva cae al
+respaldo por `kind` y nadie se entera: así llevaba `wall.closed` —el cierre de
+la villa, peso 3, una vez en la vida de una aldea— compartiendo el grabado
+genérico de construcción con «se ha levantado un campo».
+
 **Las cuatro capas, y las flechas van en un solo sentido.** Cada frontera tiene
 prueba, y saltársela es lo que costó la auditoría del 15 sep 2026:
 

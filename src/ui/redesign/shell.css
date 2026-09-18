@@ -105,6 +105,33 @@ html.welcome-open .ui-shell-stack { visibility: hidden; }
    frase». 8px sobre él, el mismo respiro que el plan da al pergamino bajo el
    borde curvado cuando el SVG llegue (§3.4, la variante que aún no existe). */
 .ui-shell-message > .skin-ornament { margin-top: 8px; margin-bottom: 14px; }
+/** A5 · **El titulo de la hoja: en que fase esta el valle.**
+
+    Va aqui y no en la placa de fecha porque en la placa no cabe: medido en el
+    navegador a 390 y a 750, la fecha ocupa 179 px y el arco del sol 90 de los
+    302 utiles, o sea 23 px de holgura, y la mas corta de las tres palabras pide
+    sesenta y pico. Recortar en silencio es lo que prohibe §4 del estandar y una
+    segunda cabecera lo que prohibe §3, asi que la era va donde una hoja grabada
+    pone su titulo: debajo del ornamento, que es el encabezado de esta
+    superficie desde el prototipo 01.
+
+    **El ornamento cede sus 14 px** y los reparte con esta linea, asi que la
+    bandeja crece 14 y no 28: la hoja de roble sigue a 14 px de lo que se lee,
+    solo que ahora lo que va debajo empieza por el titulo. Y no se mueve nunca
+    durante la partida —la era nunca esta vacia, un valle recien fundado es un
+    caserio—, que es la promesa de §8. */
+.ui-shell-message > .skin-ornament { margin-bottom: 6px; }
+.valley-era {
+  display: block;
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: var(--skin-text-label);
+  letter-spacing: var(--skin-track-label);
+  color: var(--skin-ink-faded);
+}
+/* La trampa de §12 del estandar: una hoja de autor que pone `display` le gana
+   al `hidden` del navegador, que no tiene especificidad. */
+.valley-era[hidden] { display: none; }
 .ui-shell-message:empty { min-height: 0; padding: 0; }
 /* El mensaje habla del valle —la crónica que acaba de pasar, la pista de las
    órdenes—, así que sólo tiene sitio con el valle en pantalla. Antes de este

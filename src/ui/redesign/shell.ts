@@ -300,7 +300,33 @@ export function createShell(actions: UiActions): ShellHandle {
 
   voice.append(voiceLine, voiceActions);
 
-  message.append(trayEdge, ornament, voice);
+  /**
+   * A5 · **En qué fase está el valle**, y va aquí por una medida.
+   *
+   * La fila A5 pide que «la cabecera diga en qué fase está el valle», y en la
+   * placa de fecha **no cabe**: medida en el navegador a 390 y a 750, la fecha
+   * ocupa 179 px y el arco del sol 90 de los 302 útiles, o sea **23 px de
+   * holgura**, y la palabra más corta de las tres pide sesenta y pico. Meterla
+   * ahí habría sido recortar en silencio, que es lo que §4 del estándar
+   * prohíbe, o inventar una segunda cabecera, que es lo que §3 prohíbe.
+   *
+   * Así que va donde una hoja grabada pone su título, y **la pieza ya existe**:
+   * el ornamento de la bandeja —la hoja de roble entre dos filetes que el
+   * prototipo 01 dibuja— es el encabezado de esta superficie, y esto es el
+   * título que va debajo. No hay geometría nueva ni un cartón más.
+   *
+   * **Y la bandeja no se mueve nunca**, que es la promesa de §8: la era nunca
+   * está vacía —un valle recién fundado es un caserío— así que esta línea mide
+   * lo mismo siempre. Lo que §8 prohíbe es que la bandeja **crezca durante la
+   * partida**, no que tenga una línea más.
+   */
+  const era = document.createElement('div');
+  era.className = 'valley-era skin-inscription';
+  const setEra = (text: string): void => {
+    if (era.textContent !== text) era.textContent = text;
+  };
+
+  message.append(trayEdge, ornament, era, voice);
 
   const nav = document.createElement('nav');
   // `ui-shell-nav` sólo aporta ya el respiro del área segura (`shell.css`);
@@ -401,6 +427,7 @@ export function createShell(actions: UiActions): ShellHandle {
     voice,
     voiceLine,
     setOrnament,
+    setEra,
     setOffer,
     setRoute: paintRoute,
     // Los botones no llevan más que `addEventListener`: quitar `element` del

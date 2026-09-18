@@ -70,6 +70,18 @@ anotándolo como pendiente». Una mecánica que no se ve no existe para quien
 juega, y un encargo que sólo vive en un comentario del código es un encargo que
 nadie hará.
 
+## 4c · Y una crónica sin su imagen pedida
+
+**Toda línea de crónica nueva crea, en la misma ronda, la tarea de pedir su
+ilustración**, en `docs/plan-arte-pendiente.md`: fichero, clave y qué tiene que
+enseñar. Es del dueño del diseño, 18 sep 2026 —«cada vez que crees una crónica
+hay que ir creando la tarea de pedir las imágenes»— y es la gemela de §4b.
+
+Sin ella la línea cae al respaldo por `kind` y nadie se entera: `wall.closed`
+—el cierre de la villa, peso 3, una vez en la vida de una aldea— compartía el
+grabado genérico de construcción con «se ha levantado un campo», y lo mismo les
+pasaba al portón, a la muralla de piedra y a la atalaya.
+
 ## 5 · Lo que no decides tú
 
 Qué es «caer» en detalle, cómo se ve el gore, cuánto hay que nivelar, y qué se

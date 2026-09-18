@@ -134,6 +134,12 @@ export interface ShellHandle {
    */
   setOrnament(kind: 'leaf' | 'seal', onTap?: () => void): void;
   /**
+   * A5 · **La fase del valle**, bajo el ornamento de la bandeja: caserío, aldea
+   * o villa cerrada (§1b). La frase ya viene compuesta del banco —aquí no se
+   * escribe texto— y quien la ofrece la saca de `derive/era.ts`.
+   */
+  setEra(text: string): void;
+  /**
    * M-0 · **Los dos toques de una oferta del camino**, dentro de la voz: se
    * enseñan cuando hay alguien esperando respuesta y `onAnswer` recibe `true`
    * por aceptar y `false` por dejarle ir. Sin pantalla propia, que es lo que el
