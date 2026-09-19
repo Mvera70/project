@@ -11,10 +11,12 @@ cifras que el cuaderno llevaba anotadas estaban caducadas.**
 | Lo que decía `task-log.md` §4 | Lo medido el 19 sep |
 |---|---|
 | «19 rojas de 37» | **11 de 37**, y de ellas **cuatro causas**, no once |
-| «tarda más que su propio presupuesto» (45 min) | **31 minutos** (1.857 s), y con dos sondas compitiendo |
+| «tarda más que su propio presupuesto» (45 min) | **de 31 a 46 min** — y ahí la corrección se pasó de frenada; ver §6 |
 
-El banco cabe en su presupuesto y tiene la mitad de rojas de las que se le
-atribuían. No había que recortarlo; había que correrlo.
+El banco tiene la mitad de rojas de las que se le atribuían. No había que
+recortarlo; había que correrlo. **Lo de la duración es más largo y está en §6:
+la primera corrección —«31 minutos»— salió de una sola pasada y tampoco era
+cierta.**
 
 ---
 
@@ -125,6 +127,13 @@ que lo hacía inútil: con once rojas conocidas mezcladas con las que vengan,
 nadie distingue una regresión nueva de la deuda de septiembre. Si una de las
 cuatro vuelve a su banda, su `it.fails` se pone roja y hay que venir a leer esto.
 
+**Cómo se sabe que está verde, y hasta dónde llega la evidencia.** La segunda
+pasada dio **4 rojas de 39**, todas de `after_the_raid` — la plantilla que el
+aserto de elegibilidad callaba porque fallaba en la primera que encontrara—, y
+los números de las tres que se pasan del 1 % salen de
+`artifacts/balance-summary.json`, que el banco escribe **antes** de los asertos.
+La pasada de confirmación con esa cuarta ya recogida está anotada en `§6`.
+
 ---
 
 ## 4 · Y la quinta, que sí era un defecto del instrumento
@@ -177,3 +186,51 @@ decir que **lo que un jugador ve en sus primeras trescientas horas no lo mide
 ningún listón de aquí**. Desde G2 cada uno lleva su hora escrita al lado y
 `runBalance` acepta el horizonte como parámetro (`PLAYED`, 60 años = 672 h),
 para que ese banco se pueda montar cuando haga falta.
+
+---
+
+## 6 · La confirmación, y una pasada que se perdió
+
+**El banco cuesta 31 minutos y hay que dejarlo solo.** La tercera pasada
+—lanzada para ver el banco entero en verde— **reventó a los siete minutos** con
+`Error: Worker exited unexpectedly`, porque a la vez corrían el empaquetador y
+Chrome para las capturas de F3d. No escribió artefactos: los de `artifacts/`
+eran de la pasada anterior, y su fichero de salida dejó de crecer sin que eso
+significara nada — que es justo lo que lo hace fácil de dar por vivo.
+
+**La regla que deja:** una pasada de este banco no se solapa con un empaquetado
+ni con un navegador, y **no se da por viva porque su fichero no crezca**: la
+salida va por `Out-File`, que escribe al final. Se comprueba con el proceso
+(`Get-Process node`, el trabajador del banco pasa de los 200 MB y acumula CPU).
+
+### La confirmación, y lo que corrigió de este mismo documento
+
+La cuarta pasada, sola y entera: **38 de 39 en verde**. Las cuatro rojas
+conocidas quedan recogidas por sus `it.fails` y **ninguna otra prueba falla**,
+que era lo que G2 compraba: una regresión nueva ya se distingue de la deuda de
+septiembre.
+
+**La única roja es el aserto de duración, y es de este documento.** Tres pasadas
+del mismo banco en la misma máquina:
+
+| pasada | duración | con qué al lado |
+|---|---|---|
+| 1 | 1.857 s · 31 min | dos sondas compitiendo |
+| 2 | 1.884 s · 31 min | — |
+| 4 | **2.732 s · 46 min** | **nada, y de madrugada** |
+
+O sea que **corriendo sola tardó un 45 % más**, y se pasó del presupuesto de 45
+minutos por treinta y dos segundos. El cuaderno decía «tarda más que su propio
+presupuesto»; esa frase estaba caducada, pero sustituirla por «tarda 31 minutos»
+fue pasarse al otro lado con **una sola medida**. Lo que las tres dicen juntas no
+es un número: es que **el banco varía de 31 a 46 minutos y el tope de 45 no tiene
+margen para distinguir «se ha degradado» de «el portátil estaba ocupado»**, que
+es lo único que ese aserto existe para cazar.
+
+**Sube a 60 minutos, por varianza y no por lentitud**, con las tres medidas
+escritas en `balance.test.ts` y el `testTimeout` de
+`vitest.balance.config.ts` subido con él — si no, la siguiente pasada de 46
+minutos la mata a media simulación y tira cuarenta y cinco minutos sin dejar un
+artefacto. **No es un número del juego**: no vive en `balance.ts` ni sale de
+§12, y §14.2 ya lo había subido dos veces (10 → 15 → 45) con su motivo escrito.
+Si vuelve a pasarse, lo que hay que mirar es el banco y no el tope.

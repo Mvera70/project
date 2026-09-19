@@ -33,16 +33,34 @@ describe(`M-12 · design.md §12.9, real founding and full catalogue (${H(SOAK.y
     // §14: A* rellenaba tres arrays del tamaño del mapa por cada ruta, y
     // `placeBuilding` recorría el mapa entero por cada solar.
     //
-    // G2 · **medido el 19 sep 2026: 1.857 s = 31 minutos**, y con dos sondas
-    // compitiendo por la máquina, así que es un techo. El cuaderno llevaba
-    // anotado que el banco «tarda más que su propio presupuesto» y que tenía
-    // 19 rojas de 37: las dos cifras estaban caducadas. Son **11 de 37**, y
-    // caben en el presupuesto.
+    // G2 · **remedido el 19 sep 2026, tres veces, y lo que enseña es la
+    // varianza y no el número**:
+    //
+    // | pasada | duración | con qué al lado |
+    // |---|---|---|
+    // | 1 | 1.857 s · 31 min | dos sondas compitiendo |
+    // | 2 | 1.884 s · 31 min | — |
+    // | 3 | **2.732 s · 46 min** | **nada, y de madrugada** |
+    //
+    // O sea: el mismo banco, en la misma máquina, va de 31 a 46 minutos, y la
+    // tercera se pasó del presupuesto de 45 **corriendo sola**. El cuaderno
+    // decía que «tarda más que su propio presupuesto» y eso resultó estar
+    // caducado; escribir «tarda 31 minutos» en su lugar fue pasarse al otro
+    // lado con una sola medida.
+    //
+    // **El presupuesto sube a 60 minutos, y no porque el banco se haya vuelto
+    // más lento.** Un tope con un 1,2 % de margen sobre lo observado no
+    // distingue «el banco se ha degradado» de «el portátil estaba ocupado», que
+    // es lo único que este aserto existe para cazar. Sesenta deja un 30 % sobre
+    // la peor de las tres. **No es un número del juego** —no vive en
+    // `balance.ts` ni sale de §12— sino el reloj de una herramienta, y §14.2 ya
+    // lo ha subido dos veces (10 → 15 → 45) por motivos escritos. Éste es el
+    // suyo. Si vuelve a pasarse, lo que hay que mirar es el banco, no el tope.
     expect(result.trials).toHaveLength(SOAK.seeds * POLICIES.length);
     for (const policy of POLICIES) {
       expect(result.trials.filter((t) => t.policy === policy)).toHaveLength(SOAK.seeds);
     }
-    expect(result.durationMs).toBeLessThan(2_700_000);
+    expect(result.durationMs).toBeLessThan(3_600_000);
   });
 
   for (const policy of POLICIES) {

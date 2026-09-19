@@ -60,7 +60,7 @@ de §8.6 de 48 ticks a 16. Consecuencias que te tocan de cerca:
 Esta es la parte que más te puede interesar criticar.
 
 1. **El banco de balance (G2).** El cuaderno decía «19 rojas de 37» y «tarda más
-   que sus 45 minutos». Corrido de verdad: **11 rojas de 37 y 31 minutos**.
+   que sus 45 minutos». Corrido de verdad: **11 rojas de 37**, y la duración va de **31 a 46 minutos** según lo que la máquina tenga al lado (tres pasadas medidas).
    Nadie lo había corrido desde M-4. Las once son **cuatro causas**, y tres son
    el juego moviéndose adonde se le pidió: cadencia 12,6–16,8 preguntas por
    generación contra una banda de 1–5 (de antes del ritmo nuevo), extinción

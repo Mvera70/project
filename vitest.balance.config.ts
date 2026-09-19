@@ -15,8 +15,15 @@ export default defineConfig({
     // partidas de doscientos años —cuarenta y ocho mil años de aldea—, así que
     // el reloj sube con el mundo. La cuenta está en §14, con las dos
     // optimizaciones que ya se hicieron para no subirlo más.
-    testTimeout: 2_700_000,
-    hookTimeout: 2_700_000,
+    //
+    // **Y sube a 60 el 19 sep 2026 (G2), por varianza y no por lentitud.**
+    // Tres pasadas del mismo banco en la misma máquina: 31, 31 y **46**
+    // minutos, la última corriendo sola. Con el tope en 45 la tercera se lo
+    // habría comido a media pasada y habría tirado cuarenta y cinco minutos de
+    // simulación sin dejar ni un artefacto. El aserto de duración de
+    // `balance.test.ts` sube con él y lleva la medida escrita al lado.
+    testTimeout: 3_600_000,
+    hookTimeout: 3_600_000,
     reporters: 'default',
   },
 });
