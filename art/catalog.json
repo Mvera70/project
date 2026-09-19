@@ -2,6 +2,427 @@
   "schemaVersion": 1,
   "assets": [
     {
+      "id": "bow",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/bow/bow.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-10-34-398Z-37748",
+        "directory": "artifacts/graphics/G-24/approved/7cf930f1bf263151"
+      },
+      "bounds": {
+        "min": [
+          -0.010104,
+          -0.003698,
+          -0.007
+        ],
+        "max": [
+          0.010104,
+          0.537031,
+          0.101667
+        ],
+        "size": [
+          0.020207,
+          0.540729,
+          0.108667
+        ]
+      },
+      "recipeSha256": "76CC2C3CDB33AAD53CF83C792703FC8856BE8DA39E33AC9F5C8D010DBC656C09",
+      "materials": [
+        "wood",
+        "wrap",
+        "string"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 5,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 240
+      },
+      "hashes": {
+        "bow.blend": "5299C07145C94E942F82DDEADA14E71316B589A0BFDBE8A4A8D7393BB6790614",
+        "bow.glb": "7CF930F1BF263151B338794526E5FFE83DBA93BFFA5263C4C8251FACA67774E1",
+        "bow-blender.png": "295EF1A8F98C5AAE2218714180B581E9BB13D04A355AE878335A3D9B1426AA40",
+        "capture-1.png": "08A10720D5F6362AB8B9213D69B2A0A912D79730E61F021EDFCE59E2D89CA367",
+        "capture-1-gray.png": "08FF8161C34D7FB6471DB4542A7E50804771FCB942840D89C46A07B14D8CB7E5",
+        "capture.json": "1FD1CCE3631161EDB173C95B986E4E3D30A40542B78973E613382DC8A3D10607",
+        "build.json": "67C4CD2F8A24BA987142CB28FABE7DF7EB2FB57665445D680C554652A32F1A1B",
+        "validation.json": "57EACDEDD7E92DBE103D1900A65337A428F4CDD0789CC7F8A8B6157985CAB73F"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "spear",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/spear/spear.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-13-37-858Z-47228",
+        "directory": "artifacts/graphics/G-24/approved/671e526d256a5859"
+      },
+      "bounds": {
+        "min": [
+          -0.028333,
+          0,
+          -0.028333
+        ],
+        "max": [
+          0.028333,
+          0.7,
+          0.028333
+        ],
+        "size": [
+          0.056667,
+          0.7,
+          0.056667
+        ]
+      },
+      "recipeSha256": "72A5E5FADEED12027237809855C76B69659FBA230E6FEEE6898F111DD9AC64AD",
+      "materials": [
+        "wood",
+        "iron"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 4,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 46
+      },
+      "hashes": {
+        "spear.blend": "E17D2FF4AAAEC31F1ACE7889A57DF2092CC280AFC477C610EF94C62E40039464",
+        "spear.glb": "671E526D256A5859F1F68CE3EE2158C8B00EC1749F4672466B6C8B38BC230F0A",
+        "spear-blender.png": "34477CA1B746A8DC61753ADC7D18575DF57E99B4EF68371D7B94A47C9796C53D",
+        "capture-1.png": "B8C47E16760239EEB08388A645280D400E8B9B5149DB564E9CCBDB85838FE967",
+        "capture-1-gray.png": "7B708548601F598E604F82CA1E73F1AAF3C22D851D40AFF0F396F13134F26914",
+        "capture.json": "7F8FF5E618F2D43249285A96038220A1360C42F5E09D7EE381024B8BFC788DDF",
+        "build.json": "F640997B48B79D877FF8355FED2F8FA69C91FE5C2006F7432B26904CF62D6E86",
+        "validation.json": "2118F0274BF38EBC438F73165C41DE86ADBFA54FFE89EEE9209A63D12FA8EFD1"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "arrow",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/arrow/arrow.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-13-54-879Z-47100",
+        "directory": "artifacts/graphics/G-24/approved/474435e79c604956"
+      },
+      "bounds": {
+        "min": [
+          -0.009822,
+          -0.014069,
+          0
+        ],
+        "max": [
+          0.01562,
+          0.014069,
+          0.266667
+        ],
+        "size": [
+          0.025442,
+          0.028138,
+          0.266667
+        ]
+      },
+      "recipeSha256": "E58F85E9940C20534E93ABCDC6786EA7C8FB48B9EA1C0AC60ADE6F393FB9C6E0",
+      "materials": [
+        "wood",
+        "iron",
+        "feather"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 5,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 62
+      },
+      "hashes": {
+        "arrow.blend": "47EAFEE3E77D4AE0D260AA71B93B1F56011D54E4444894E58B104328272D98D0",
+        "arrow.glb": "474435E79C60495683575EF1D1BE3F0F7717DC01242E8487414C145051F5596F",
+        "arrow-blender.png": "BCEA0CF362F043620BFB83E9832E1E26E9C9B34CDD98A2136DC4B331F273A36C",
+        "capture-1.png": "5082A88F0D27F22C607B33299A2B810484365C9CC541B56E1F343429FEF6CE17",
+        "capture-1-gray.png": "037CD94A87065D23326D55BA1180B437618E3E0974BAC51D074CF9B69BBC905A",
+        "capture.json": "BC87F96C4D2CB621D5E6FC766D868ECD2F487FB96662E152F3396724CE7FD7B4",
+        "build.json": "2D0EFE989CC67AD6637CEAF2ED6D46741CE70640BD084E3DC0AF09D21307A832",
+        "validation.json": "C21F5153AEA5119131D7F495470B828FA58B65A1CD0448B9806B72E95A37CBBD"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "shield",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/shield/shield.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-14-12-022Z-47272",
+        "directory": "artifacts/graphics/G-24/approved/a6a11ccf641b564c"
+      },
+      "bounds": {
+        "min": [
+          -0.15,
+          0,
+          -0.035839
+        ],
+        "max": [
+          0.15,
+          0.3,
+          0.048167
+        ],
+        "size": [
+          0.3,
+          0.3,
+          0.084006
+        ]
+      },
+      "recipeSha256": "B82272B91F642D76720577509B058181AA45FC8A89CF06B3046BA66564CC9E85",
+      "materials": [
+        "wood",
+        "iron",
+        "plank"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 5,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 122
+      },
+      "hashes": {
+        "shield.blend": "6665F27AE7CAC4E61C51BDE549A3D3735A1BB8B0BBF09378896C455B9A4D5D28",
+        "shield.glb": "A6A11CCF641B564CAE5867A72D37A328610E71FEBD84851837CA188E70A2C025",
+        "shield-blender.png": "BAFAA4E2FE1E50AE83FAD0D685B7966FA964017A90C516CE3EFEC20B6923AB7C",
+        "capture-1.png": "ED1B08AB664280B7EE424DC8EF20331D433D94DD471D9B4B956E81D1E2691F0C",
+        "capture-1-gray.png": "D54969C62D292B65F124429A3FC6AE25E6E123ACB009D830D6D45410A6F181E4",
+        "capture.json": "DFF42A2021B8BC0BBFEB26BBB7B885E2833C47BDCCA36C7A276C299D22468FE9",
+        "build.json": "693BB931F358250B6E84E9195C8BC59686AC9324DA94FFAE08136443644458C2",
+        "validation.json": "BA497AE34EFCDCB3C72DAAACA8243F6CE8488211FFC49D55E83ED3ECFAA70EBC"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "gate",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/gate/gate.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-14-29-216Z-48516",
+        "directory": "artifacts/graphics/G-24/approved/6a631196325241e1"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          -0.583333
+        ],
+        "max": [
+          1,
+          0.933333,
+          -0.416667
+        ],
+        "size": [
+          1,
+          0.933333,
+          0.166667
+        ]
+      },
+      "recipeSha256": "C34EA6FE92BEE7D530A1EDE0A61952C31AD8FE8B0039A8AA9E1393EAAB1FCC77",
+      "materials": [
+        "wood",
+        "iron",
+        "plank"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "gate_door"
+      ],
+      "statistics": {
+        "objects": 19,
+        "meshes": 17,
+        "materials": 3,
+        "triangles": 212
+      },
+      "hashes": {
+        "gate.blend": "28A1DE33347EE6312701316E64D2D72B32DE1FBD25B841F560DE63C2A3B55C54",
+        "gate.glb": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679",
+        "gate-blender.png": "51846C36D07D039A307BB9F64C2457A124A641BBABD0630EDE7075CD236CD8D9",
+        "capture-1.png": "62205272A3DD7E2F66357EAD35EBFBBB7E653DC8406B69AF897DCFCD9DB387C1",
+        "capture-1-gray.png": "18784BDFD536050F4DADD899D3189F39C96035A2437C654FD51AA16E4E8C346A",
+        "capture.json": "9A5ACDD6C86DCEE950F822BE5E32D5DF22D3B80CD71108685A62A9464067D597",
+        "build.json": "7895ABB6D459894A106D8A6351FEA63391F5492F82DC4E197045826A3772DE5E",
+        "validation.json": "242C04BD0DB601D6DF3330755FE067E60D09A8BE121EE537E5868E96CAF5D373"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "plough",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/plough/plough.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-14-46-547Z-37824",
+        "directory": "artifacts/graphics/G-24/approved/45ef9d8fbe869de5"
+      },
+      "bounds": {
+        "min": [
+          -0.146369,
+          0.000376,
+          -0.399657
+        ],
+        "max": [
+          0.146886,
+          0.333333,
+          0.391188
+        ],
+        "size": [
+          0.293255,
+          0.332957,
+          0.790845
+        ]
+      },
+      "recipeSha256": "8AEBAD1A49A76843BE70F29893DEED1550E4E3617C9B3521712187E78732EDC4",
+      "materials": [
+        "wood",
+        "iron",
+        "plank"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 136
+      },
+      "hashes": {
+        "plough.blend": "98AA060DF519D0B2CEDE0A4D77F7CF219D87325FD546A37AE179670B20FF89CB",
+        "plough.glb": "45EF9D8FBE869DE57950104479AAEC721E57D531412EAC74D5B8F33DB32B4915",
+        "plough-blender.png": "231ED1863D46B6A135B7E02C2A1C1753C695AD64EBF2DAB047E3892E724178C0",
+        "capture-1.png": "5066E32FF16480C2B6870B3D0AAF91E76E0C703B74E336D3C1CBACCBF39A0571",
+        "capture-1-gray.png": "851BE1C5B89B5E9650D5B1ECE0E8628BA4D4491594CB7A5E70003B4D8127FA22",
+        "capture.json": "B719AFE2D0CA476F0A664D4BF85DDE6BF999F8428218DD3FDAE402146EC0AF2B",
+        "build.json": "B73FF861CC84DC51D152B1F77C6AF4B6CA91731A184550D934FBC7E1D03A6A5E",
+        "validation.json": "5FBC8E0F1E34149F791F2D47AC4E64FF565D6B4DC43C22CC1C785C20E98CDFBB"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "fountain",
+      "artifactRound": "G-24",
+      "status": "study",
+      "recipe": "art/recipes/fountain/fountain.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-19T23-15-03-760Z-47268",
+        "directory": "artifacts/graphics/G-24/approved/5a65635457c33168"
+      },
+      "bounds": {
+        "min": [
+          -0.4,
+          0,
+          -0.4
+        ],
+        "max": [
+          0.4,
+          0.65,
+          0.4
+        ],
+        "size": [
+          0.8,
+          0.65,
+          0.8
+        ]
+      },
+      "recipeSha256": "D01EF253FE66ED0DDF71376511AC51CC7E541A30E05A5F1F8AEADCA804A89444",
+      "materials": [
+        "stone",
+        "water"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 406
+      },
+      "hashes": {
+        "fountain.blend": "0E4D33DFB774A6B2B096C9786DDA886ACEB3CCEBCD1A412D43BDC513AB88D60E",
+        "fountain.glb": "5A65635457C33168266836AD76D320959E9E82CE2E84B37AB5B48E39834CBB95",
+        "fountain-blender.png": "435EEF4A15EA35B927CA321C5809F0199CDF8C3E09971D68D83B3E1FA3631985",
+        "capture-1.png": "3940FDE9CBFDA2C06E2CC64B2902FF94D8FC18F7780FD8BC314836A2F51B1F69",
+        "capture-1-gray.png": "7B96760AA816B77FD660BFB5ADBC5CD90CFB6D0CB211CE80AE591755525AB69E",
+        "capture.json": "8BA47CBE5ECE8E57D7C4EFD4245CD00AC35CF85F4B40AD5C7C6003FC0DED11BC",
+        "build.json": "9756B32E59CEDC9EC2F3A65E0FBFD37784EB3CEC43F3D5DA8F09F1DA1EC07717",
+        "validation.json": "2046A33F39F4DA4491C4DE848E6157934A664D772E5EAB4B14EFA015AA830AF4"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
       "id": "axis-marker",
       "artifactRound": "G-02",
       "status": "study",
@@ -415,13 +836,46 @@
         "runId": "2026-09-17T18-50-54-254Z-28980",
         "directory": "artifacts/graphics/G-25/approved/20a5d8033e247108"
       },
-      "bounds": {"min": [-0.415969, 0, -0.426667], "max": [0.415969, 2.633334, 0.384413], "size": [0.831938, 2.633333, 0.81108]},
+      "bounds": {
+        "min": [
+          -0.415969,
+          0,
+          -0.426667
+        ],
+        "max": [
+          0.415969,
+          2.633334,
+          0.384413
+        ],
+        "size": [
+          0.831938,
+          2.633333,
+          0.81108
+        ]
+      },
       "recipeSha256": "647399763ED73B4C24EC3982A4207E736676F207BE286B2F1F4BBC0AC1C3520E",
-      "materials": ["bark", "leaf", "leaf-light"],
-      "clips": [], "motion": [], "connectors": [],
-      "statistics": {"objects": 4, "meshes": 3, "materials": 3, "triangles": 68},
-      "hashes": {"tree-pine.glb": "20A5D8033E247108EC37CC066A0DE40D22AB40B69B30E0E96FB7256E8BB99106"},
-      "provenance": {"kind": "original", "source": "Original conifer authored for The Valley G-25, forest variation batch", "license": "Project original"}
+      "materials": [
+        "bark",
+        "leaf",
+        "leaf-light"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 4,
+        "meshes": 3,
+        "materials": 3,
+        "triangles": 68
+      },
+      "hashes": {
+        "tree-pine.glb": "20A5D8033E247108EC37CC066A0DE40D22AB40B69B30E0E96FB7256E8BB99106"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Original conifer authored for The Valley G-25, forest variation batch",
+        "license": "Project original"
+      }
     },
     {
       "id": "rock",

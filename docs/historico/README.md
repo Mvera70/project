@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [Primera tanda de modelos, 20 sep](graphics-rounds/modelos-pendientes-2026-09-20.md):
+  siete recetas y exportaciones verificadas; sin publicación en el juego.
+
 Uno por ronda, con lo que se midió y en qué quedó. Se citan desde el código y
 desde `design.md` para explicar una decisión concreta.
 

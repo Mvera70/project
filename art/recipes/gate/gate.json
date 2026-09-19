@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "id": "gate",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": false,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "gate",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Portón de una celda (3 m), altura 2,80 m. Hoja gate_door separada del marco; origen de edificio en esquina. No incluye estado roto."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "timberDark",
+      "roughness": 0.9
+    },
+    {
+      "name": "plank",
+      "role": "soil",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "gate_door",
+      "location": [
+        0.39,
+        1.5,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cube",
+      "name": "Gate_Post_L",
+      "location": [
+        0.195,
+        1.5,
+        1.35
+      ],
+      "dimensions": [
+        0.39,
+        0.46,
+        2.7
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Post_R",
+      "location": [
+        2.805,
+        1.5,
+        1.35
+      ],
+      "dimensions": [
+        0.39,
+        0.46,
+        2.7
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Lintel",
+      "location": [
+        1.5,
+        1.5,
+        2.665
+      ],
+      "dimensions": [
+        3,
+        0.5,
+        0.27
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_0",
+      "location": [
+        0.13875,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_1",
+      "location": [
+        0.41625,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "plank",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_2",
+      "location": [
+        0.6937500000000001,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_3",
+      "location": [
+        0.9712500000000001,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_4",
+      "location": [
+        1.24875,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "plank",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_5",
+      "location": [
+        1.52625,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_6",
+      "location": [
+        1.80375,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Plank_7",
+      "location": [
+        2.0812500000000003,
+        0,
+        1.19
+      ],
+      "dimensions": [
+        0.268,
+        0.14,
+        2.3
+      ],
+      "material": "plank",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Rail_Lower",
+      "location": [
+        1.11,
+        0.1,
+        0.35
+      ],
+      "dimensions": [
+        2.22,
+        0.11,
+        0.14
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Rail_Upper",
+      "location": [
+        1.11,
+        0.1,
+        1.93
+      ],
+      "dimensions": [
+        2.22,
+        0.11,
+        0.14
+      ],
+      "material": "wood",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cylinder",
+      "name": "Gate_Brace",
+      "location": [
+        1.105,
+        0.15,
+        1.135
+      ],
+      "radius": 0.065,
+      "depth": 2.490180716333656,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "gate_door",
+      "rotationDegrees": [
+        53.82037955202105,
+        0,
+        90
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Hinge_Lower",
+      "location": [
+        0.16,
+        -0.105,
+        0.38
+      ],
+      "dimensions": [
+        0.54,
+        0.055,
+        0.13
+      ],
+      "material": "iron",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Hinge_Upper",
+      "location": [
+        0.16,
+        -0.105,
+        1.92
+      ],
+      "dimensions": [
+        0.54,
+        0.055,
+        0.13
+      ],
+      "material": "iron",
+      "parent": "gate_door",
+      "bevel": 0
+    },
+    {
+      "type": "cube",
+      "name": "Gate_Latch",
+      "location": [
+        1.92,
+        -0.12,
+        1.16
+      ],
+      "dimensions": [
+        0.3,
+        0.07,
+        0.085
+      ],
+      "material": "iron",
+      "parent": "gate_door",
+      "bevel": 0
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "gate_door"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2.5,
+      -3,
+      2.3
+    ],
+    "cameraTarget": [
+      0.5,
+      0.5,
+      0.45
+    ],
+    "orthoScale": 1.65,
+    "worldRole": "sky"
+  }
+}

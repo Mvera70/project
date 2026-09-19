@@ -1,0 +1,317 @@
+{
+  "schemaVersion": 1,
+  "id": "bow",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "bow",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Arco largo sencillo de 1,60 m, sin flecha incorporada. Agarre en grip; sin cuerda animada."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "wrap",
+      "role": "timberDark",
+      "roughness": 0.9
+    },
+    {
+      "name": "string",
+      "role": "grain",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        -0.27,
+        0.8
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Bow_Limb_0",
+      "location": [
+        0,
+        -0.06,
+        0.09
+      ],
+      "radius": 0.02,
+      "depth": 0.21633307652783934,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        33.690067525979785,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Limb_1",
+      "location": [
+        0,
+        -0.175,
+        0.305
+      ],
+      "radius": 0.03,
+      "depth": 0.27313000567495327,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        23.749494492866766,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Limb_2",
+      "location": [
+        0,
+        -0.25,
+        0.615
+      ],
+      "radius": 0.03,
+      "depth": 0.3721558813185679,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        6.170175095029527,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Limb_3",
+      "location": [
+        0,
+        -0.25,
+        0.985
+      ],
+      "radius": 0.03,
+      "depth": 0.37215588131856775,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        6.170175095029527,
+        0,
+        180
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Limb_4",
+      "location": [
+        0,
+        -0.175,
+        1.295
+      ],
+      "radius": 0.03,
+      "depth": 0.27313000567495327,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        23.749494492866766,
+        0,
+        180
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Limb_5",
+      "location": [
+        0,
+        -0.06,
+        1.51
+      ],
+      "radius": 0.02,
+      "depth": 0.2163330765278395,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        33.69006752597977,
+        0,
+        180
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_String",
+      "location": [
+        0,
+        0.015,
+        0.7999999999999999
+      ],
+      "radius": 0.006,
+      "depth": 1.57,
+      "vertices": 6,
+      "material": "string",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        180
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Grip_0",
+      "location": [
+        0,
+        -0.27,
+        0.735
+      ],
+      "radius": 0.035,
+      "depth": 0.026,
+      "vertices": 6,
+      "material": "wrap",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Grip_1",
+      "location": [
+        0,
+        -0.27,
+        0.767
+      ],
+      "radius": 0.035,
+      "depth": 0.026,
+      "vertices": 6,
+      "material": "wrap",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Grip_2",
+      "location": [
+        0,
+        -0.27,
+        0.7989999999999999
+      ],
+      "radius": 0.035,
+      "depth": 0.026,
+      "vertices": 6,
+      "material": "wrap",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Grip_3",
+      "location": [
+        0,
+        -0.27,
+        0.831
+      ],
+      "radius": 0.035,
+      "depth": 0.026,
+      "vertices": 6,
+      "material": "wrap",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Bow_Grip_4",
+      "location": [
+        0,
+        -0.27,
+        0.863
+      ],
+      "radius": 0.035,
+      "depth": 0.026,
+      "vertices": 6,
+      "material": "wrap",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.25
+    ],
+    "orthoScale": 1.05,
+    "worldRole": "sky"
+  }
+}

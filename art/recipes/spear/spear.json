@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "id": "spear",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "spear",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Lanza de valle de 2,10 m, asta de madera y punta de hierro facetada, sin adornos."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "timberDark",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0.95
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Spear_Shaft",
+      "location": [
+        0,
+        0,
+        0.89
+      ],
+      "radius": 0.026,
+      "depth": 1.78,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Spear_Socket",
+      "location": [
+        0,
+        0,
+        1.76
+      ],
+      "radius": 0.04,
+      "depth": 0.16,
+      "vertices": 6,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Spear_Point",
+      "location": [
+        0,
+        0,
+        1.96
+      ],
+      "radius": 0.085,
+      "depth": 0.28,
+      "vertices": 4,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.35
+    ],
+    "orthoScale": 1.25,
+    "worldRole": "sky"
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "id": "shield",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "shield",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Escudo redondo de 0,90 m, umbo de hierro y madera, sin escudo heráldico. Frente +Z glTF."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "timberDark",
+      "roughness": 0.9
+    },
+    {
+      "name": "plank",
+      "role": "soil",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0.085,
+        0.45
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Shield_Rim",
+      "location": [
+        0,
+        0,
+        0.45
+      ],
+      "radius": 0.45,
+      "depth": 0.075,
+      "vertices": 12,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Shield_Board",
+      "location": [
+        0,
+        -0.045,
+        0.45
+      ],
+      "radius": 0.422,
+      "depth": 0.04,
+      "vertices": 12,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Shield_Boss",
+      "location": [
+        0,
+        -0.092,
+        0.45
+      ],
+      "radius": 0.115,
+      "depth": 0.105,
+      "vertices": 8,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Shield_BackGrip",
+      "location": [
+        0,
+        0.085,
+        0.45
+      ],
+      "radius": 0.026,
+      "depth": 0.26,
+      "vertices": 6,
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        90
+      ],
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.15
+    ],
+    "orthoScale": 0.58,
+    "worldRole": "sky"
+  }
+}

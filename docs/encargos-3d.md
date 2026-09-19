@@ -41,6 +41,12 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 
 ## 2 · Mallas que faltan
 
+**20 sep 2026 — producidas, aún no publicadas:** `bow`, `spear`, `arrow`,
+`shield`, `gate`, `plough` y `fountain`. Las filas siguientes describen todavía
+lo que se ve **en el juego**, no ausencia de archivos fuente: las siete recetas
+y sus exportaciones ya existen en estado `study`. La hoja `gate_door` existe
+en el nuevo GLB; falta integrarlo. [Entrega y límites visuales](historico/graphics-rounds/modelos-pendientes-2026-09-20.md).
+
 | Malla | Para qué | Qué se ve hoy en su lugar |
 |---|---|---|
 | **El portón** (`gate`, A2) | La puerta del anillo | La malla de la empalizada, con dos jambas dibujadas por `obstacles.ts`. **Y necesita una hoja llamada `gate_door`** para que el gozne la abra: es el mismo mecanismo que las puertas de las casas, idea del dueño |

@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · Siete modelos producidos, todavía sin publicar
+
+Arco, lanza, flecha, escudo, portón, arado y fuente tienen receta, `.blend`,
+`.glb`, vistas y recibos de validación. Estado `study`: pendientes de aceptación
+visual e integración; el juego sigue usando sus representaciones anteriores.
+Armas con `grip`, hoja del portón separada como `gate_door`. Arado: 136
+triángulos; fuente: 406. Typecheck, lint y 11 pruebas focalizadas pasan.
+No se modificó la escena abierta de Blender ni se usaron proveedores de pago.
+[Entrega, límites y rutas](historico/graphics-rounds/modelos-pendientes-2026-09-20.md).
+E2/E3 no se cierran: clan, adarve, portón roto e integración siguen pendientes.
+
 ## 20 sep 2026 · El disparo único entregado; E1 global sigue parcial
 
 La pose se mide desde el hecho: tensar, soltar al nacer la flecha, golpear

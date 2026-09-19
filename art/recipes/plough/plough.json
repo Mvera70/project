@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "id": "plough",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "plough",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Encargo arado: 2,4 × 0,9 × 1,0 m nominales; manual sin ruedas, tres materiales y <=400 triángulos. Varales apoyados."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "timberDark",
+      "roughness": 0.9
+    },
+    {
+      "name": "plank",
+      "role": "soil",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Plough_Shaft_L",
+      "location": [
+        -0.256,
+        -0.5299999999999999,
+        0.1925
+      ],
+      "radius": 0.045,
+      "depth": 1.3257333819437451,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        77.14300920788634,
+        0,
+        167.12499844038754
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Plough_Shaft_R",
+      "location": [
+        0.256,
+        -0.5299999999999999,
+        0.1925
+      ],
+      "radius": 0.045,
+      "depth": 1.3257333819437451,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        77.14300920788634,
+        0,
+        -167.12499844038754
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Plough_Body",
+      "location": [
+        0,
+        0.17,
+        0.32
+      ],
+      "dimensions": [
+        0.25,
+        0.9,
+        0.16
+      ],
+      "material": "wood",
+      "parent": "Root",
+      "bevel": 0
+    },
+    {
+      "type": "gable",
+      "name": "Plough_Share",
+      "location": [
+        0,
+        0.02,
+        0.03
+      ],
+      "width": 0.34,
+      "depth": 0.1,
+      "height": 0.32,
+      "rotationDegrees": [
+        0,
+        0,
+        15
+      ],
+      "material": "iron",
+      "parent": "Root"
+    },
+    {
+      "type": "cylinder",
+      "name": "Plough_Mouldboard_0",
+      "location": [
+        0.21000000000000002,
+        0.16,
+        0.155
+      ],
+      "radius": 0.08,
+      "depth": 0.28861739379323625,
+      "vertices": 4,
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        80.0237623517404,
+        0,
+        129.28940686250039
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Plough_Mouldboard_1",
+      "location": [
+        0.245,
+        0.26,
+        0.23500000000000001
+      ],
+      "radius": 0.08,
+      "depth": 0.2886173937932362,
+      "vertices": 4,
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        80.0237623517404,
+        0,
+        129.28940686250039
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Plough_Mouldboard_2",
+      "location": [
+        0.28,
+        0.36,
+        0.315
+      ],
+      "radius": 0.08,
+      "depth": 0.28861739379323625,
+      "vertices": 4,
+      "material": "plank",
+      "parent": "Root",
+      "rotationDegrees": [
+        80.02376235174042,
+        0,
+        129.28940686250039
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Plough_Handle",
+      "location": [
+        0,
+        0.7999999999999999,
+        0.6525
+      ],
+      "radius": 0.045,
+      "depth": 0.9404387274033328,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        49.96041068756209,
+        0,
+        180
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Plough_Grip",
+      "location": [
+        0,
+        1.16,
+        0.955
+      ],
+      "radius": 0.045,
+      "depth": 0.3,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        90
+      ],
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.15
+    ],
+    "orthoScale": 1.05,
+    "worldRole": "sky"
+  }
+}

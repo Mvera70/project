@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "id": "arrow",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "arrow",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Flecha de 0,80 m, punta hacia +Z glTF. No sustituye la flecha física hasta integración."
+  },
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "timberDark",
+      "roughness": 0.9
+    },
+    {
+      "name": "feather",
+      "role": "grain",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Arrow_Shaft",
+      "location": [
+        0,
+        -0.355,
+        0
+      ],
+      "radius": 0.008,
+      "depth": 0.71,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Arrow_Point",
+      "location": [
+        0,
+        -0.755,
+        0
+      ],
+      "radius": 0.027,
+      "depth": 0.09,
+      "vertices": 4,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Arrow_Feather_0",
+      "location": [
+        0.025,
+        -0.10500000000000001,
+        0
+      ],
+      "radius": 0.012,
+      "depth": 0.13152946437965907,
+      "vertices": 4,
+      "material": "feather",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        8.74616226255521
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Arrow_Feather_1",
+      "location": [
+        -0.012499999999999995,
+        -0.10500000000000001,
+        0.021650635094610966
+      ],
+      "radius": 0.012,
+      "depth": 0.13152946437965907,
+      "vertices": 4,
+      "material": "feather",
+      "parent": "Root",
+      "rotationDegrees": [
+        82.43300490094296,
+        0,
+        -4.398705354995532
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Arrow_Feather_2",
+      "location": [
+        -0.012500000000000011,
+        -0.10500000000000001,
+        -0.02165063509461096
+      ],
+      "radius": 0.012,
+      "depth": 0.13152946437965907,
+      "vertices": 4,
+      "material": "feather",
+      "parent": "Root",
+      "rotationDegrees": [
+        97.56699509905704,
+        0,
+        -4.398705354995537
+      ],
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      -0.13,
+      0
+    ],
+    "orthoScale": 0.42,
+    "worldRole": "sky"
+  }
+}

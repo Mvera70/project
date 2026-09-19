@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 1,
+  "id": "fountain",
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba y frente +Z.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "fountain",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "ART-pendientes-1 · Encargo fuente: pilón octogonal de 2,4 m, borde ~0,45 m, columna hasta 1,95 m. Agua opaca; <=500 triángulos."
+  },
+  "materials": [
+    {
+      "name": "stone",
+      "role": "stone",
+      "roughness": 0.9
+    },
+    {
+      "name": "water",
+      "role": "riverBlue",
+      "roughness": 0.9
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    }
+  ],
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Fountain_Base",
+      "location": [
+        0,
+        0,
+        0.045
+      ],
+      "radius": 1.2,
+      "depth": 0.09,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_0",
+      "location": [
+        0.8620889244992065,
+        0.3570889244992065,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        -157.5
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_1",
+      "location": [
+        0.3570889244992066,
+        0.8620889244992065,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        -112.50000000000001
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_2",
+      "location": [
+        -0.35708892449920643,
+        0.8620889244992065,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        -67.50000000000001
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_3",
+      "location": [
+        -0.8620889244992065,
+        0.3570889244992066,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        -22.500000000000004
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_4",
+      "location": [
+        -0.8620889244992066,
+        -0.35708892449920643,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        22.499999999999986
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_5",
+      "location": [
+        -0.3570889244992067,
+        -0.8620889244992065,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        67.5
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_6",
+      "location": [
+        0.3570889244992063,
+        -0.8620889244992066,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        112.49999999999999
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Rim_7",
+      "location": [
+        0.8620889244992065,
+        -0.3570889244992067,
+        0.275
+      ],
+      "radius": 0.175,
+      "depth": 0.7730205333774813,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        157.5
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Water",
+      "location": [
+        0,
+        0,
+        0.335
+      ],
+      "radius": 0.925,
+      "depth": 0.005,
+      "vertices": 8,
+      "material": "water",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Foot",
+      "location": [
+        0,
+        0,
+        0.435
+      ],
+      "radius": 0.31,
+      "depth": 0.25,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Column",
+      "location": [
+        0,
+        0,
+        1.005
+      ],
+      "radius": 0.22,
+      "depth": 1.14,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Capital",
+      "location": [
+        0,
+        0,
+        1.57
+      ],
+      "radius": 0.29,
+      "depth": 0.15,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Fountain_Cap",
+      "location": [
+        0,
+        0,
+        1.7975
+      ],
+      "radius": 0.29,
+      "depth": 0.305,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cylinder",
+      "name": "Fountain_Spout",
+      "location": [
+        0,
+        -0.315,
+        1.1
+      ],
+      "radius": 0.058,
+      "depth": 0.39,
+      "vertices": 8,
+      "material": "stone",
+      "parent": "Root",
+      "rotationDegrees": [
+        90,
+        0,
+        0
+      ],
+      "smooth": false
+    }
+  ],
+  "clips": [],
+  "connectors": [],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      2,
+      -3,
+      2
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.3
+    ],
+    "orthoScale": 1.2,
+    "worldRole": "sky"
+  }
+}
