@@ -181,6 +181,20 @@ export interface GraphicsRenderer {
    * entre jornadas: es lo de **esta** jornada, que es la que el jugador vio.
    */
   battle(): BattleReport | null;
+  /**
+   * F2 · **Cómo va el asalto mientras pasa**, o `null` si no hay ninguno.
+   *
+   * Es hermano de `battle()` y no lo mismo: aquél es el parte que se entrega al
+   * motor **al acabar la jornada**, y esto es lo que se puede leer **mientras**
+   * — que es lo que le faltaba a la pantalla («ni aviso, ni cuenta atrás, ni
+   * marcador de lo que aguanta el portón», `docs/encargos-3d.md` §1).
+   *
+   * `gate` va de 0 a 1: lo que lleva encajado la hoja sobre lo que aguanta
+   * (`SIEGE.GATE_HITS`). Es una fracción y no el número de golpes a propósito,
+   * porque quien lo lee escribe una frase y no un marcador: §11.1 dice que el
+   * valle es el HUD y que las cifras viven en la tira y en las fichas.
+   */
+  siege(): { readonly gate: number; readonly broken: boolean } | null;
   dispose(): void;
 
   /**

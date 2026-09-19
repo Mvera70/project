@@ -13,7 +13,7 @@ import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run, tick } from '@engine/sim';
 import { nextProject } from '@engine/world/works';
-import { doingNow } from '@ui/doing';
+import { doingNow, gateNow } from '@ui/doing';
 
 const SEEDS = [7, 11, 23, 41];
 
@@ -97,5 +97,87 @@ describe('doingNow · la aldea dice qué está haciendo', () => {
     }
     expect(seen.get('doing.raising') ?? 0, 'se anuncia obra alguna vez').toBeGreaterThan(50);
     expect(seen.get('doing.nothing') ?? 0, 'y el silencio se declara').toBeGreaterThan(50);
+  });
+});
+
+describe('F2 · el asedio ocupa la línea de estado', () => {
+  // **Lo que faltaba, dicho por `docs/encargos-3d.md` §1**: «nada en pantalla
+  // dice que esa semana es la semana». La crónica contaba el aviso y el asalto
+  // y el valle seguía diciendo que estaba levantando un granero.
+  //
+  // Que un jugador llegue a verlo se mide sobre partidas de verdad, y eso son
+  // seis semillas × sesenta años: se pagaban 17 segundos en la suite rápida, así
+  // que vive en `tests/journeys/threat.test.ts` con el mismo cuerpo. Aquí queda
+  // lo que se comprueba con una partida sola.
+
+  it('y no promete un portón que no existe', () => {
+    // El defecto que cazó la captura de esta ronda y no la prueba: la semilla 7
+    // al año 20 recibe una partida **sin tener cerco**, y la frase le hablaba
+    // de un portón. §8.1 le exige a un precio no prometer lo que no hay; a una
+    // línea de estado, lo mismo.
+    const state = foundGame(7);
+    run(state, 20 * TIME.WEEKS_PER_YEAR, 'prudent', CATALOG);
+    state.threat.arrivedTick = state.tick;
+    state.threat.lastBand = 24;
+    const said = doingNow(state);
+    const walled = state.buildings.some((b) => b.kind === 'gate' && b.lostTick === null);
+    expect(said?.key).toBe(walled ? 'doing.besieged' : 'doing.besieged_open');
+    expect(renderUiText(said!.key, said!.params)).toContain('24');
+  });
+});
+
+describe('F2 · y mientras la puerta aguanta, manda la puerta', () => {
+  // Lo que esto guarda es la frontera de §1b: el motor sabe que hoy hay asalto
+  // y **no puede saber cómo va**, porque la pelea pasa en la escena y no es
+  // determinista. `gateNow` es ese reparto, y por eso se prueba con lecturas y
+  // no con una partida: una partida no tiene puerta que romper.
+  //
+  // Medido en el navegador con `?raid=24&assault=1` sobre la semilla 7 al año
+  // 30: los tres estados salen —11 golpes «holding», 47 «giving way», 60 y
+  // dentro «down»— y ningún error de página. Las capturas, en
+  // `artifacts/graphics/F2/`.
+  it('antes del primer golpe no dice nada de la puerta', () => {
+    // Deliberado: mientras la partida camina hacia ella, lo que hay que contar
+    // es que están ahí, y eso ya lo dice `doing.besieged`. Una puerta intacta
+    // no es noticia.
+    expect(gateNow(null)).toBeNull();
+    expect(gateNow({ gate: 0, broken: false })).toBeNull();
+  });
+
+  it('golpe a golpe la frase sólo avanza, y acaba en la puerta abajo', () => {
+    // La propiedad del diseño: la puerta no se repara mientras la golpean, así
+    // que la frase nunca puede retroceder. Es lo que hace que quien mira
+    // entienda que va a peor sin que haya un solo número en pantalla (§11.1).
+    const ORDER = ['doing.gate_holding', 'doing.gate_giving', 'doing.gate_broken'];
+    let rank = -1;
+    let said: string | null = null;
+    for (let blow = 1; blow <= 60; blow += 1) {
+      const key = gateNow({ gate: blow / 60, broken: blow >= 60 });
+      expect(key, `golpe ${blow}`).not.toBeNull();
+      const now = ORDER.indexOf(key!);
+      expect(now, `${key} no es una de las tres`).toBeGreaterThanOrEqual(0);
+      expect(now, `la frase retrocedió en el golpe ${blow}`).toBeGreaterThanOrEqual(rank);
+      rank = now;
+      said = key;
+    }
+    expect(said).toBe('doing.gate_broken');
+    // Y las tres salen por el camino: si una fracción no tuviera frase propia,
+    // el jugador vería la misma línea desde el primer golpe hasta el último.
+    expect(new Set(ORDER.map((k) => renderUiText(k, {}))).size).toBe(3);
+  });
+
+  it('un portón roto lo dice aunque la cuenta de golpes no llegue', () => {
+    // D5 · quien manda es `broken`, no la fracción: el portón puede caer por
+    // otra vía y la frase tiene que seguirlo. Al revés sería una puerta abajo
+    // que la pantalla sigue dando por firme.
+    expect(gateNow({ gate: 0.1, broken: true })).toBe('doing.gate_broken');
+  });
+
+  it('las tres están en el banco', () => {
+    for (const key of ['doing.gate_holding', 'doing.gate_giving', 'doing.gate_broken']) {
+      const line = renderUiText(key, {});
+      expect(line, `${key} no está en el banco`).not.toMatch(/^\[/u);
+      expect(line.length, `${key} está vacía`).toBeGreaterThan(3);
+    }
   });
 });

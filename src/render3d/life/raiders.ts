@@ -523,7 +523,7 @@ export interface Gate {
  * Y son golpes y no segundos porque lo que rompe una puerta son las manos que
  * la golpean: matar a la mitad de la partida dobla lo que tarda en caer.
  */
-const GATE_BLOWS = 60;
+export const GATE_BLOWS = 60;
 const BLOW_STEPS = 30;
 
 /**

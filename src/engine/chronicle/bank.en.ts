@@ -2393,6 +2393,16 @@ export const UI_BANK: Record<string, string> = {
   // una sola forma por clave, sin variantes, porque una etiqueta que cambia de
   // palabras cada vez que se mira no es una etiqueta. Presente, corta, y dicha
   // en lo que el jugador puede hacer con ella.
+  // F2 · el asedio, en la línea de estado. Las dos primeras cosas que la aldea
+  // puede estar haciendo, porque se resuelven antes que ninguna otra.
+  'doing.besieged': '{count} of them are at the gate.',
+  'doing.besieged_open': '{count} of them are in the valley, and nothing between.',
+  'doing.raid_coming': 'Men over the ridge: {weeks} weeks away.',
+  // F2 · y lo que la escena sabe y el motor no: cómo va la puerta, golpe a
+  // golpe. Tres estados de una fracción, nunca un marcador (§11.1).
+  'doing.gate_holding': 'The gate is holding.',
+  'doing.gate_giving': 'The gate is giving way.',
+  'doing.gate_broken': 'The gate is down.',
   'doing.hungry': 'The granary is low.',
   'doing.cold': 'The woodpile will not last the winter.',
   'doing.nothing': 'Nothing is being built.',

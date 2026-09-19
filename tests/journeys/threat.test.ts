@@ -17,6 +17,7 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { giveMeans } from '@engine/world/means';
 import { worthOf } from '@engine/world/threat';
+import { doingNow } from '@ui/doing';
 import type { GameState } from '@engine/state';
 
 const SEEDS = [3, 14, 25, 36, 47, 58];
@@ -345,5 +346,50 @@ describe('C1 · lo que se da para aguantar', () => {
     expect(given, 'alguna se levantó').toBeGreaterThan(0);
     expect(refused.given, 'la siguiente ya no cabe').toBe(false);
     expect(state.village.wood, 'y no se cobró').toBe(wood);
+  });
+});
+
+describe('F2 · y el valle lo dice mientras pasa', () => {
+  // La mudanza de `tests/fast/ui-doing.test.ts`: esto son seis semillas por
+  // sesenta años y costaba 17 segundos en la suite rápida, que por `CLAUDE.md`
+  // tiene que seguir siéndolo. El cuerpo y el umbral son los mismos.
+  //
+  // **Lo que faltaba, dicho por `docs/encargos-3d.md` §1**: «nada en pantalla
+  // dice que esa semana es la semana». La crónica contaba el aviso y el asalto
+  // y el valle seguía diciendo que estaba levantando un granero.
+  //
+  // Se mide sobre partidas de verdad y no montando el estado a mano, porque lo
+  // que se quiere saber es si un jugador lo ve alguna vez. Medido en las doce
+  // semillas por sesenta años: **los doce valles lo ven**, 1.048 semanas de
+  // víspera y 131 con el clan encima de 29.835 — el 4,0 % del tiempo, que es lo
+  // que debe ocupar algo que pasa pocas veces y manda cuando pasa.
+  const SIEGE = new Set(['doing.besieged', 'doing.besieged_open', 'doing.raid_coming']);
+
+  it('los valles la ven, y la víspera cuenta hacia atrás', () => {
+    const seeds = [3, 7, 11, 23, 31, 41];
+    let sawIt = 0;
+    const countdowns: number[] = [];
+    for (const seed of seeds) {
+      const state = foundGame(seed);
+      let sawHere = false;
+      let previous: number | null = null;
+      for (let week = 0; week < 60 * TIME.WEEKS_PER_YEAR && state.ended === null; week += 1) {
+        run(state, 1, 'prudent', CATALOG);
+        const said = doingNow(state);
+        if (said === null || !SIEGE.has(said.key)) { previous = null; continue; }
+        sawHere = true;
+        // La cuenta atrás es la propiedad: si dos semanas seguidas de víspera
+        // dijeran el mismo número, o subiera, no sería una víspera.
+        if (said.key === 'doing.raid_coming') {
+          const weeks = said.params['weeks'] as number;
+          if (previous !== null) countdowns.push(previous - weeks);
+          previous = weeks;
+        } else previous = null;
+      }
+      if (sawHere) sawIt += 1;
+    }
+    expect(sawIt, `valles que ven el asedio en la línea: ${sawIt}/${seeds.length}`).toBe(seeds.length);
+    expect(countdowns.length, 'hay vísperas de más de una semana').toBeGreaterThan(10);
+    for (const step of countdowns) expect(step, 'la víspera cuenta hacia atrás').toBe(1);
   });
 });

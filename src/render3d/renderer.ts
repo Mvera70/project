@@ -53,6 +53,7 @@ import { arrowsOf, castOf, propsOf } from './life/cast';
 import { Props } from './world/props';
 import { Arrows } from './world/arrows';
 import { LIFE_STEP } from './life/clock';
+import { GATE_BLOWS } from './life/raiders';
 import { daylightAt } from './effects/daylight';
 import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
@@ -1168,6 +1169,21 @@ export async function createGraphicsRenderer(
         // aguantó. Esto es lo que hace que la pelea pueda perder una partida que
         // los números daban por salvada, que es §1b: la batalla decide.
         breached: gate?.entered ?? false,
+      };
+    },
+
+    // F2 · **y cómo va mientras pasa**, que es lo que la pantalla no tenía.
+    // Hermano del de arriba: aquél se entrega al motor al acabar la jornada y
+    // esto se lee cada fotograma mientras la puerta aguanta. Se devuelve la
+    // fracción y no los golpes porque quien lo lee escribe una frase (§11.1:
+    // el valle es el HUD, las cifras viven en la tira y en las fichas).
+    siege(): { gate: number; broken: boolean } | null {
+      if (life === null) return null;
+      const { gate } = life.defence;
+      if (gate === null) return null;
+      return {
+        gate: Math.min(1, gate.hits / GATE_BLOWS),
+        broken: gate.broken,
       };
     },
 

@@ -35,7 +35,7 @@ import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
 import { milestonesAt } from './milestones';
-import { doingNow } from './doing';
+import { doingNow, gateNow } from './doing';
 import { noticeText } from './notice';
 import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
@@ -765,7 +765,17 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
      * escribe sólo cuando cambia lo que se lee: esto corre a 60 fps.
      */
     const doing = doingNow(state);
-    const doingText = doing === null ? null : renderUiText(doing.key, doing.params);
+    // F2 · **y mientras la puerta aguanta, manda la puerta.** El motor sabe que
+    // hoy hay asalto (`doing.besieged`) y no puede saber cómo va: eso pasa en
+    // la escena, golpe a golpe (§1b, «la pelea decide»). Lo que se dice es una
+    // frase y no un marcador —§11.1: el valle es el HUD, las cifras viven en la
+    // tira y en las fichas— así que la fracción se parte en tres estados y se
+    // escribe la que toca. El guardado de «sólo cuando cambia el texto» de
+    // abajo hace que esto cueste una comparación de cadenas por fotograma y no
+    // un repintado.
+    const gateKey = gateNow(backend.live.siege());
+    const doingText = gateKey !== null ? renderUiText(gateKey, {})
+      : doing === null ? null : renderUiText(doing.key, doing.params);
     if (doingText !== null && doingText !== spokenState) say('state', doingText);
     spokenState = doingText;
     // M-0 · **quien espera en el camino habla por la misma boca.** La oferta no

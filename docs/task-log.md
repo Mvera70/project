@@ -40,6 +40,27 @@ no existen, para que nadie las busque.
 
 ---
 
+**F2 · el asedio se ve venir (19 sep), hecha.** La crónica contaba el aviso y
+el asalto y **la pantalla no decía nada**: la línea de estado seguía anunciando
+un granero la semana en que bajaba el clan, que es lo que `encargos-3d.md` §1
+llevaba anotado. Cinco frases en la tira y ninguna cifra flotando (§11.1). Tres
+las pone el motor por `doing.ts`, delante del hambre porque son lo único de esa
+lista que se resuelve **hoy**: la víspera con su cuenta atrás y el clan encima,
+que dice «en la puerta» **sólo si hay puerta**. Las otras dos las pone la
+escena, y ahí está la frontera de §1b: el motor sabe que hoy hay asalto y no
+puede saber cómo va. El renderer expone `siege()` y `gateNow` (`src/ui/doing.ts`,
+puro y fuera del bucle de pintado, que es lo que lo hace probable) lo reparte en
+aguantar, ceder (`GATE_GIVING` = 2/3 de los sesenta golpes de D3b) y estar
+abajo. **Las bajas no llevan línea propia y es una decisión**: las cuenta la
+crónica al cerrar la semana (`raid.held`), y un marcador en vivo sería la única
+cifra flotante de la pantalla. **Medido**: 6 semillas × 60 años, los seis valles
+la ven, el 4,0 % de las semanas; y en el navegador los tres estados del portón
+salen en orden (11 golpes, 47, 60 y dentro), cero errores, capturas en
+`artifacts/graphics/F2/`. **El defecto lo cazó la captura y no la prueba**, otra
+vez: la primera versión le hablaba de un portón a un valle sin cerco. Y la
+medida de los seis valles costaba 17 s en la suite rápida, así que vive en
+`tests/journeys/threat.test.ts`. Detalle en `changelog.md` 4.18.
+
 **El arranque, arreglado (19 sep).** Del dueño, probándolo: «se tarda muchísimo
 en empezar a hacer cosas y es muy lento y muy aburrido», con el aviso de que el
 ritmo va a seguir cambiando. Medida de la apertura hora a hora: **el 35 % de las
@@ -122,9 +143,9 @@ dibujo de crónica propio — las dos tareas están en `encargos-3d.md` y
 `plan-arte-pendiente.md`. Puerta verde: `typecheck`, `lint`, y los ficheros
 tocados más las dos pruebas de `tests/journeys/works.test.ts` que fija el
 tope y la puerta del anillo cerrado. Detalle completo en `docs/changelog.md`
-4.14. Después de esto, `/goal` sigue con G3 (plantillas de caserío), G1 (el
-hambre muerde), F2 (el HUD del asedio), F3d (el cronicón) y G4/G2 (nivelado),
-que es lo que quedaba abierto y no es de Astra en `plan-meta.md`.
+4.14. Después de esto, `/goal` siguió con G3, G1, A3b y F2 —las cuatro
+cerradas el 19 sep— y **lo que queda sin Astra es F3d (el cronicón), G2 (el
+banco de balance contra la escalera en horas) y G4 (la curva de dificultad)**.
 
 **Crónicas · villa cerrada integrada (19 sep):** `wall-closed.png`,
 `built-gate.png`, `built-wall.png` y `built-watchtower.png` se generaron con

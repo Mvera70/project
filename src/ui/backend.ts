@@ -55,6 +55,15 @@ interface ValleyBackend {
    * defiende peor, y eso es verdad.
    */
   battle(): BattleReport | null;
+  /**
+   * F2 · Cómo va el asalto **mientras pasa**, o `null` si no hay ninguno.
+   *
+   * En Canvas es siempre `null` por lo mismo que `battle()`: sin cuerpos no hay
+   * puerta que aguantar, y el asalto lo resuelve el motor con su cuenta. La
+   * línea de estado se queda entonces con lo que el motor sí sabe —que hoy hay
+   * gente encima (`doing.besieged`)—, que es verdad en los dos caminos.
+   */
+  siege(): { readonly gate: number; readonly broken: boolean } | null;
   zoom(factor: number, atXCss: number, atYCss: number): void;
   pan(dxCss: number, dyCss: number): void;
   /** Gira la vista, en radianes. Canvas no puede: no tiene desde dónde mirar. */
@@ -145,6 +154,7 @@ function canvasBackend(canvas: HTMLCanvasElement, viewport: HTMLElement): Valley
     doing() { return null; },
     // El 2D no tiene batalla: el motor resuelve el asalto con su cuenta (B3).
     battle() { return null; },
+    siege() { return null; },
     zoom() { /* Canvas has no camera; app.ts scales the element instead. */ },
     pan() { /* idem */ },
     // El 2D es una proyección fija del mapa entero dibujada a mano: no hay ángulo
@@ -330,6 +340,7 @@ export function attachBackend(
         look(x, z) { renderer.look(x, z); },
         doing(id) { return renderer.doing(id); },
         battle() { return renderer.battle(); },
+        siege() { return renderer.siege(); },
         paint(state, tickFraction, speed) {
           // El reloj de presentacion es dueno unico del tiempo escenico y no
           // toca el acumulador del juego: quien avanza los ticks sigue siendo

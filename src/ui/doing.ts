@@ -21,11 +21,13 @@
 // haciendo cumpla o no. Los dos están aquí y no en `derive/` por la misma
 // razón: son una clave del banco para la cabecera, no geometría para pintar.
 
-import { FORAGE, LABOUR, TIME } from '@engine/balance';
+import { FORAGE, GATE_GIVING, LABOUR, TIME } from '@engine/balance';
 import { ratioOf } from '@engine/crossroads/conditions';
 import { population } from '@engine/people/demography';
 import type { GameState } from '@engine/state';
 import { nextProject } from '@engine/world/works';
+import { has } from '@engine/subsistence/building-counts';
+import { weeksAway } from '@derive/garrison';
 
 /** Lo que la aldea está haciendo, en una clave del banco. Nunca una frase. */
 export interface Doing {
@@ -81,8 +83,58 @@ export function doingNow(state: GameState): Doing | null {
   return said;
 }
 
+/**
+ * F2 · Cómo va la puerta, en una clave del banco.
+ *
+ * Es la hermana de `doingNow` para lo que el motor **no puede saber**: que hoy
+ * hay asalto lo dice el estado, pero cómo va lo dice la escena golpe a golpe y
+ * no es determinista por decisión del dueño (§1b, «la pelea decide»). De ahí
+ * que reciba la lectura de la vida (`backend.live.siege()`) y no la partida.
+ *
+ * Tres estados y no un marcador, porque §11.1 manda: el valle es el HUD y las
+ * cifras viven en la tira y en las fichas. `null` antes del primer golpe es
+ * deliberado — mientras la partida camina hacia la puerta lo que hay que contar
+ * es que están ahí (`doing.besieged`), no que la puerta esté intacta.
+ *
+ * Vive aquí, fuera de `app.ts`, por lo que `CLAUDE.md` pide de las pruebas: el
+ * bucle de pintado no se puede llamar desde la suite rápida y este reparto sí.
+ */
+export function gateNow(siege: { readonly gate: number; readonly broken: boolean } | null): string | null {
+  if (siege === null) return null;
+  if (siege.broken) return 'doing.gate_broken';
+  if (siege.gate >= GATE_GIVING) return 'doing.gate_giving';
+  return siege.gate > 0 ? 'doing.gate_holding' : null;
+}
+
 function sayWhat(state: GameState): Doing | null {
   if (state.ended !== null || population(state) === 0) return null;
+
+  // 0 · **El clan, encima.** F2, y va antes que el hambre porque es lo único de
+  // esta lista que se resuelve **hoy**: el hambre mata a final de semana y esto
+  // está pasando mientras se mira. Es además el momento de la fase 4 (§1b), y
+  // hasta ahora **nada en pantalla decía que esa semana era la semana**
+  // (`docs/encargos-3d.md` §1): la crónica lo contaba y el valle no.
+  //
+  // **Y se dice «en la puerta» sólo si hay puerta**, que lo cazó la captura de
+  // esta ronda: la semilla 7 al año 20 no tiene cerco todavía y la frase le
+  // hablaba de un portón que no existe. Es el mismo contrato que §8.1 le exige
+  // al precio de una opción — no prometer lo que no hay — aplicado a la línea
+  // de estado.
+  if (state.threat.arrivedTick === state.tick) {
+    const key = has(state, 'gate') ? 'doing.besieged' : 'doing.besieged_open';
+    return { key, params: { count: state.threat.lastBand } };
+  }
+
+  // 0b · **La víspera**, que es lo que B2 compró con sus ocho semanas de aviso.
+  // Va aquí y no más abajo porque una aldea que sabe que bajan **está haciendo
+  // eso**, aunque además tenga un granero a medias; y va después del asalto
+  // porque cuando ya están en la puerta no queda víspera que contar. Las
+  // semanas las cuenta `weeksAway` y no una resta aquí: dos sitios que restan
+  // ticks son dos ideas de cuánto aviso da el clan.
+  const away = weeksAway(state);
+  if (away !== null) {
+    return { key: 'doing.raid_coming', params: { weeks: away } };
+  }
 
   // 1 · El hambre. Es la única que no se puede posponer: §5.3 mata. El umbral
   // es el mismo con el que la aldea se va al monte (§7.7), y la cuenta sale de

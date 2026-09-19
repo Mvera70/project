@@ -624,6 +624,24 @@ export const MOOD_FACE = {
   GLAD: 70,
 } as const;
 
+/**
+ * F2 · **Cuándo se dice que la puerta está cediendo**, en la línea de estado.
+ *
+ * Es el hermano de `MOOD_FACE` y vive aquí por lo mismo: es un corte de
+ * pantalla —parte una fracción continua en las dos frases que el jugador lee—
+ * y los cortes de pantalla se escriben donde se escriben los números, no
+ * sueltos en un módulo de interfaz.
+ *
+ * TUNE: dos tercios de los golpes que la hoja aguanta (`GATE_BLOWS`, 60 en
+ * `life/raiders.ts`), o sea cuarenta. Medido con el asalto de D3b en el
+ * navegador: cinco hombres metían **18 golpes de los 60** antes de que las
+ * flechas se los comieran —o sea que un asalto que la muralla gana no llega a
+ * decir «cede»— y sin arcos los doce la tiran entera. El corte separa esas dos
+ * historias, que es lo único que tiene que hacer: por debajo la puerta aguanta
+ * y por encima el jugador tiene tiempo de ver que se va.
+ */
+export const GATE_GIVING = 2 / 3;
+
 // ---------------------------------------------------------------------------
 // M-2 · Los medios: lo que el jugador mete en el valle. `docs/historico/plan-medios.md` §3
 // ---------------------------------------------------------------------------
