@@ -7,10 +7,15 @@
 // takes centuries to visit some of these states, and a template that is dead
 // content should be caught by the shape of its conditions, not by luck.
 //
-// It lives here because both suites need it. The full 30 x 150 sweep is a §14.2
-// measurement — it costs about twenty-five seconds on its own, which is the
-// whole §14.1 budget — so it runs in tests/balance/. The fast suite runs a
-// smaller sweep off the same bench.
+// **Y desde G2 (19 sep 2026) no decide si hay contenido muerto.** Su premisa
+// —«la partida real tarda siglos en visitar estos estados»— caducó con la
+// fundación de dos y el ritmo de 4.16: medido, 20 de las 21 plantillas se
+// plantean en 12 semillas x 100 años jugadas de verdad, incluidas las tres que
+// este banco daba por mudas. Quien lo mide es
+// tests/journeys/catalogue-coverage.test.ts. Esto se queda como el barrido
+// barato de la suite rápida, que caza una plantilla cuyas condiciones no se
+// cumplen **ni en un banco generoso** — un defecto de forma, y se ve en dos
+// segundos.
 
 import { TIME, WORLD } from '@engine/balance';
 import { TWENTY, foundPeopleTwenty } from './founding';

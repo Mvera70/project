@@ -302,10 +302,12 @@ describe('el catálogo · los textos', () => {
 // ---------------------------------------------------------------------------
 // Cobertura
 //
-// El banco vive en tests/helpers/catalogue-bench.ts porque lo comparten las dos
-// suites. El barrido completo —30 semillas × 150 años— cuesta unos veinticinco
-// segundos él solo, que es el presupuesto entero de §14.1, así que se ejecuta
-// en tests/balance/catalog-coverage.test.ts. Aquí queda el que cabe.
+// El banco vive en tests/helpers/catalogue-bench.ts y es sintético: funda con
+// veinte personas y no es el juego. Lo que dice **si hay contenido muerto** es
+// tests/journeys/catalogue-coverage.test.ts, que juega partidas de verdad
+// (12 semillas × 100 años, 49 s) y sustituyó desde G2 al barrido de 30 × 150
+// que vivía en tests/balance/ — donde nadie lo corría, porque ese banco cuesta
+// más que su propio presupuesto. Aquí queda el barrido barato.
 // ---------------------------------------------------------------------------
 
 describe('el catálogo · cobertura rápida', () => {
@@ -337,14 +339,23 @@ describe('el catálogo · cobertura rápida', () => {
   // `docs/medidas/findings-drama.md`, la decisión que está tomada y pendiente. Lo que
   // el mapa grande hizo fue mover las trayectorias lo justo para que en estas
   // doce semillas concretas dejara de ganar el sorteo.
-  // G3 · `breaking_ground` y `one_at_the_ford` piden `people < 10`, y
-  // `founded()` (`tests/helpers/catalogue-bench.ts`) siembra el banco con
-  // **veinte** desde el tick 0 a propósito — es la aldea de antes de la pareja
-  // fundadora, y el contrato de §8.1 de las dos del caserío es justamente que
-  // se mueren solas al cruzar diez. No es contenido muerto: es que este banco
-  // nunca representa el valle en el que viven. **Quien lo comprueba de verdad
-  // es `tests/journeys/founding.test.ts`**, que juega con `foundGame` —dos
-  // personas— y exige que el caserío llegue a preguntar.
+  // **Esta lista no dice que estas plantillas estén muertas: dice que este
+  // banco no las ve.** `founded()` (`tests/helpers/catalogue-bench.ts`) funda
+  // con **veinte personas en el tick 0** —la aldea de antes de la pareja
+  // fundadora— y las mantiene ahí, con un bucle de tick propio. No es el juego,
+  // y a propósito: existe para que las condiciones del Anexo A se puedan
+  // cumplir alguna vez sin esperar siglos.
+  //
+  // Lo que se midió el 19 sep 2026 al rehacer el banco de balance (G2): con
+  // `foundGame` + `run` y la política prudente, **20 de las 21 plantillas se
+  // plantean** en 12 semillas × 100 años, y tres de las de esta lista salen en
+  // 24, 24 y 11 valles de 24 (`chapel_or_granary`, `one_at_the_ford`,
+  // `breaking_ground`). Quien dice si hay contenido muerto es
+  // `tests/journeys/catalogue-coverage.test.ts`, que juega de verdad.
+  //
+  // Esto se queda como lo que sirve: un barrido barato que caza una plantilla
+  // cuyas condiciones no se pueden cumplir **ni siquiera en un banco generoso**,
+  // que es un defecto de forma y se ve en dos segundos.
   const SLOW = [
     'plague_blame', 'forest_cut', 'wolf_winter', 'first_stone',
     'chapel_or_granary', 'feud_inherited', 'smith_feud', 'quiet_years',
