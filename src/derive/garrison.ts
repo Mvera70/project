@@ -75,7 +75,10 @@ export function postsOf(state: GameState): Post[] {
   const live = state.buildings.filter((b) => b.lostTick === null);
   const bows = (state.traits as readonly string[]).includes('bows');
   const gates = live.filter((b) => b.kind === 'gate').sort((a, b) => a.id - b.id);
-  const towers = live.filter((b) => b.kind === 'watchtower').sort((a, b) => a.id - b.id);
+  // A3 · el bastión es una atalaya metida en la línea de muralla: mismo puesto
+  // elevado, mismo disparo, sólo que sin las cuatro celdas propias.
+  const towers = live.filter((b) => b.kind === 'watchtower' || b.kind === 'bastion')
+    .sort((a, b) => a.id - b.id);
   const walls = live.filter((b) => b.kind === 'palisade' || b.kind === 'wall');
 
   const posts: Post[] = [

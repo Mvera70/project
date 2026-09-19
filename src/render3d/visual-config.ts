@@ -72,6 +72,12 @@ export const BUILDING_LOOKS: Readonly<Record<BuildingKind, BuildingLook>> = {
   // una puerta con jambas se ve por encima de la empalizada.
   gate: { walls: 0.95, roof: 0, wallColour: VALLEY_COLOURS.trunk, roofColour: TILE, roofed: false },
   wall: { walls: 0.8, roof: 0, wallColour: STONE, roofColour: TILE, roofed: false },
+  // A3 · el bastión: una torre de una sola celda sobre la línea de muralla, más
+  // alta que el muro que sustituye y con la malla prestada de la atalaya
+  // suelta (`BUILDING_ASSETS`). Esta caja es sólo el respaldo mientras esa
+  // malla carga o falta: más baja que la atalaya de dos celdas porque un
+  // bastión de una celda se leería fuera de escala con la misma altura.
+  bastion: { walls: 1.3, roof: 0.4, wallColour: STONE, roofColour: TILE, roofed: true },
   field: { walls: 0.04, roof: 0, wallColour: VALLEY_COLOURS.soil, roofColour: TILE, roofed: false },
   grave_yard: { walls: 0.1, roof: 0, wallColour: '#8E9576', roofColour: TILE, roofed: false },
   // K-4 · **la sala del rey**, y se diferencia sin malla: más alta que una casa

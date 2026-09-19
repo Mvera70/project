@@ -120,7 +120,8 @@ function temptation(state: GameState): number {
 function walled(state: GameState): boolean {
   const standing = state.buildings.filter((b) => b.lostTick === null);
   return standing.some((b) => b.kind === 'gate')
-    && standing.some((b) => b.kind === 'palisade' || b.kind === 'wall');
+    // A3 · el bastión es una pieza de muralla, así que cuenta como ella.
+    && standing.some((b) => b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'bastion');
 }
 
 /**

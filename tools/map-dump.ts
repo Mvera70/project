@@ -34,7 +34,7 @@ const TERRAIN: Record<number, string> = {
 const GLYPH: Record<BuildingKind, string> = {
   house: 'h', stone_house: 'H', field: 'f', granary: 'g', well: 'o',
   chapel: 'c', church: 'C', smithy: 's', mill: 'm', palisade: 'p', gate: 'G',
-  wall: 'W', grave_yard: 't', watchtower: 'T', hall: 'K',
+  wall: 'W', grave_yard: 't', watchtower: 'T', hall: 'K', bastion: 'B',
 };
 
 function draw(state: GameState): string[] {

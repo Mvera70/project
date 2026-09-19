@@ -81,8 +81,10 @@ describe('F3a · el libro de cuentas', () => {
       const standing = state.buildings.filter((b) => b.lostTick === null);
       expect(ledger.houses, `${tag}: casas en pie`)
         .toBe(standing.filter((b) => b.kind === 'house' || b.kind === 'stone_house').length);
+      // A3 · el bastión es una pieza de muralla, así que cuenta como ella
+      // (`ledger.ts`).
       expect(ledger.wall, `${tag}: cerco en pie`)
-        .toBe(standing.filter((b) => b.kind === 'palisade' || b.kind === 'wall').length);
+        .toBe(standing.filter((b) => b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'bastion').length);
     }
   });
 

@@ -1778,6 +1778,23 @@ export const BUILDINGS = {
   // aldea se la levanta sola cuando la han saqueado (`WATCHTOWER_AFTER_RAIDS`),
   // así que los tres caminos existen y este campo dice la verdad.
   watchtower: { w: 2, h: 2, wood: 0, stone: 60, bp: 90, cap: 2, tier: 1, upgradeOf: null, byCrossroad: false },
+  // A3 · **el bastión**: una torre en la propia línea de muralla, y no una
+  // segunda muralla. §7.4c prohíbe un segundo anillo por decisión medida del
+  // dueño del diseño (18 sep 2026); lo que pide A3 —más defensa cuando el
+  // primer cerco ya está lleno— se sirve subiendo una pieza de muralla, no
+  // rodeándola de otra. **1×1 y no 2×2** como la atalaya suelta: sobre un
+  // anillo de una celda de grosor, una torre de dos tapa dos o tres tramos y
+  // `upgradeOf` sólo da de baja uno, dejando `ringClosed` creyendo cerrado un
+  // anillo con un hueco detrás de la torre.
+  //
+  // TUNE: sin medir todavía —es la primera vez que existe—. Cap 2, el mismo
+  // que la atalaya suelta: reutiliza su malla y su puesto de tiro
+  // (`derive/garrison.ts`), así que dejarlo sin tope duplicaría de facto el
+  // número de torres de un valle sin que nadie lo pidiera. Coste por encima
+  // del muro que sustituye (`wall`: piedra 40, obra 60) y por debajo de la
+  // atalaya suelta (piedra 60, obra 90): sube sobre una pieza que ya está en
+  // pie, no levanta cuatro celdas desde cero.
+  bastion: { w: 1, h: 1, wood: 0, stone: 50, bp: 75, cap: 2, tier: 1, upgradeOf: 'wall', byCrossroad: false },
 } as const;
 
 /**

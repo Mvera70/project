@@ -241,6 +241,7 @@ describe('el banco · cobertura', () => {
     const kinds = [
       'house', 'field', 'granary', 'well', 'chapel', 'smithy', 'mill',
       'palisade', 'grave_yard', 'wall', 'stone_house', 'church', 'watchtower',
+      'bastion',
     ] as const;
     for (const k of kinds) {
       expect(knows(builtKey(k)), k).toBe(true);

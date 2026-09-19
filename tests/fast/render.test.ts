@@ -106,8 +106,10 @@ describe('M-17 · catálogo visual', () => {
     expect(Object.keys(BUILDING_SPRITES).sort()).toEqual([
       // A2 · `gate` reutiliza la silueta de la empalizada por lo mismo: aquí es
       // una celda de muralla, y quien lo enseña como portón es el 3D.
-      'chapel', 'church', 'field', 'gate', 'granary', 'grave_yard', 'hall', 'house', 'mill',
-      'palisade', 'smithy', 'stone_house', 'wall', 'watchtower', 'well',
+      // A3 · `bastion` reutiliza la silueta de la muralla de piedra, por el
+      // mismo motivo que `gate`: aquí es la pieza de muralla que ocupa.
+      'bastion', 'chapel', 'church', 'field', 'gate', 'granary', 'grave_yard', 'hall', 'house',
+      'mill', 'palisade', 'smithy', 'stone_house', 'wall', 'watchtower', 'well',
     ]);
   });
 

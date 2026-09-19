@@ -345,7 +345,16 @@ export type BuildingKind =
   | 'grave_yard'
   // K-4 · la sala del rey: la casa que se diferencia, y la única construcción
   // que sólo existe si alguien lleva la corona.
-  | 'hall';
+  | 'hall'
+  // A3 · **el bastión**: una torre construida en la propia línea de muralla, no
+  // al lado de ella. §7.4c prohíbe un segundo anillo (medido: 1 824 tramos
+  // contra 131 casas en doce semillas), así que lo que A3 pide de verdad es
+  // esto — más altura sobre el mismo cerco, no más cerco. De una pieza de
+  // muralla (`upgradeOf: 'wall'`), y **1×1** y no 2×2 como la atalaya suelta:
+  // una torre de dos celdas sobre un anillo de una tapa dos o tres tramos y
+  // `upgradeOf` sólo da de baja uno, dejando `ringClosed` diciendo que el
+  // anillo sigue cerrado cuando en realidad tiene un hueco detrás de la torre.
+  | 'bastion';
 
 export interface Building {
   id: BuildingId;

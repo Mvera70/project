@@ -49,6 +49,7 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 | **La sala del rey** (`hall`, K-4) | La casa del que manda | Una casa más alta con tejado burdeos. Encargo en `plan-rey.md` §8 |
 | **Armas y arcos** (C1) | Lo de arriba | Nada existe: ni lanza, ni arco, ni flecha, ni escudo |
 | **El clan vecino** (E2) | Quien ataca | Nada. Son **aldeanos armados de otro valle** —no soldados de cota ni bandidos andrajosos— y reaprovechan el aparejo del aldeano |
+| **El bastión** (`bastion`, A3, 19 sep 2026) | La torre en la línea de muralla | La malla de `watchtower.glb`, la misma atalaya suelta, escalada de 2×2 a 1×1 (`fitted.scale.set`) — se lee más achatada que una atalaya de verdad. Y hay una costura sin resolver aparte de la malla: `isDefence`/`defenceConnections` (`render3d/world/defences.ts`) sólo conocen `wall`/`palisade`, así que el tramo que llega hasta un bastión **no estira un extremo hacia él** y deja una junta entre el remate del muro y la base de la torre prestada. Necesita malla propia — más ancha en la base que la atalaya, para leerse *dentro* del grosor del muro y no al lado — y que esas dos funciones sepan de `bastion` el día que la malla exista |
 
 **Y las que sí están, para no volver a dudarlo:** `watchtower.glb` y `wall.glb`
 existen y se usan; la atalaya de C1 se levanta y se ve. Lo que no hay es nadie

@@ -157,8 +157,9 @@ describe('balance · topes duplicados', () => {
   it('la tabla de edificios cubre todos los BuildingKind', () => {
     // Comprobación de tipos: si §3.5 añade un edificio y §7.2 no, no compila.
     const covered: Record<BuildingKind, unknown> = BUILDINGS;
-    // Quince desde A2: el portón (`gate`). Catorce eran desde K-4 (`hall`).
-    expect(Object.keys(covered).length).toBe(15);
+    // Dieciséis desde A3: el bastión (`bastion`). Quince eran desde A2 (`gate`),
+    // y catorce desde K-4 (`hall`).
+    expect(Object.keys(covered).length).toBe(16);
   });
 
   it('cada edificio ocupa celdas y cuesta obra', () => {
@@ -178,12 +179,15 @@ describe('balance · topes duplicados', () => {
     }
   });
 
-  it('toda mejora apunta a un edificio de madera que existe', () => {
+  it('toda mejora apunta a un edificio que existe y da piedra', () => {
     for (const [kind, b] of Object.entries(BUILDINGS)) {
       if (b.upgradeOf === null) continue;
       const base = BUILDINGS[b.upgradeOf];
       expect(base, kind).toBeDefined();
-      expect(base.tier, kind).toBe(0);
+      // A3 · el bastión rompe «toda mejora sale de madera»: su origen es
+      // `wall`, que ya es piedra (tier 1) — es la primera mejora de una
+      // mejora, y arde tan poco como lo que mejora.
+      expect(base.tier, kind).toBeLessThanOrEqual(1);
       expect(b.tier, kind).toBe(1);
     }
   });

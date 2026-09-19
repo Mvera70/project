@@ -99,6 +99,11 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   gate: 'palisade',
   wall: 'wall',
   watchtower: 'watchtower',
+  // A3 · el bastión. **Todavía sin malla propia** (`docs/encargos-3d.md`): usa
+  // la de la atalaya suelta, que es la pieza que representa lo mismo que da —un
+  // puesto de tiro elevado sobre el cerco—, por el mismo camino que el portón
+  // reutiliza la empalizada.
+  bastion: 'watchtower',
   grave_yard: 'grave-yard',
   stone_house: 'stone-house',
   granary: 'granary',

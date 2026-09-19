@@ -242,6 +242,27 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
     expect(nextUpgrade(s)?.kind).toBe('church');
   });
 
+  it('A3 · el bastión sólo llega con el anillo cerrado, y va detrás de las otras mejoras', () => {
+    const s = raise(foundTwenty(7), 'wall', 3);
+    // Sin `wall_closed` el anillo sigue abierto, así que no hay bastión que
+    // pedir aunque ya haya muralla de piedra donde subirlo.
+    expect(nextUpgrade(s)).toBeNull();
+    s.flags['wall_closed'] = 0;
+    expect(nextUpgrade(s)?.kind).toBe('bastion');
+  });
+
+  it('A3 · el bastión tiene tope, y `withinCap` no sirve para contarlo', () => {
+    // `familyOf('bastion')` colapsa en `'wall'` por su propio `upgradeOf`, y esa
+    // familia no tiene tope: si el bastión se limitara por ahí no se limitaría
+    // nunca. El tope de verdad se cuenta contra `BUILDINGS.bastion.cap`.
+    const s = raise(foundTwenty(7), 'wall', BUILDINGS.bastion.cap + 1);
+    s.flags['wall_closed'] = 0;
+    const walls = live(s).filter((b) => b.kind === 'wall');
+    for (const b of walls.slice(0, BUILDINGS.bastion.cap)) b.kind = 'bastion';
+    expect(walls.length).toBeGreaterThan(BUILDINGS.bastion.cap);
+    expect(nextUpgrade(s)).toBeNull();
+  });
+
   it('la iglesia crece sobre la capilla desde cualquiera de sus cuatro esquinas', () => {
     // 3×3 sobre 2×2: si sólo se probara la esquina superior izquierda, una
     // capilla con un vecino al sur o al este no podría llegar nunca a iglesia.

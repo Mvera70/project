@@ -330,6 +330,11 @@ export const BANK: Record<string, string[]> = {
     '{count} watchtowers stood by the end of year {year}.',
     'Year {year} gave the valley {count} places to watch the road from.',
   ],
+  'built.bastion.year': [
+    'They built {count} bastions into the wall in year {year}.',
+    '{count} lengths of the wall grew into bastions that year.',
+    'Year {year} gave the wall {count} towers of its own.',
+  ],
 
   'lost.house.year': [
     '{count} houses were lost in year {year}.',
@@ -973,6 +978,11 @@ export const BANK: Record<string, string[]> = {
     'The watchtower was finished in the {season} of year {year}.',
     'They raised a tower that {season}, and put someone in it.',
     'A watchtower stood over the valley by the end of year {year}.',
+  ],
+  'built.bastion': [
+    'They raised a tower into the wall itself, in the {season} of year {year}.',
+    'A stretch of the wall grew a bastion that {season}.',
+    'The wall stood higher at one point by the end of year {year}, a bastion built into its line.',
   ],
 
   // -------------------------------------------------------------------------
@@ -2075,6 +2085,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The first burying ground is walled off.',
     'There is a graveyard in the valley.',
   ],
+  'milestone.first_of_kind.bastion': [
+    'The wall grew a tower of its own.',
+    'The first bastion stands in the wall.',
+    'Part of the wall stands higher than the rest now.',
+  ],
 
   'milestone.work_done.chapel': [
     'A second chapel stands.',
@@ -2115,6 +2130,11 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'A second gate opens on the far side of the wall.',
     'The wall has another way through it now.',
     'A new gate stands where the wall meets the other road.',
+  ],
+  'milestone.work_done.bastion': [
+    'A second bastion stands in the wall.',
+    'Another stretch of the wall rises into a tower.',
+    'There is one more bastion on the wall now.',
   ],
   'milestone.work_done.grave_yard': [
     'The burying ground is wider now.',
@@ -2331,6 +2351,7 @@ export const UI_BANK: Record<string, string> = {
   'doing.raising.stone_house': 'They are rebuilding a house in stone.',
   'doing.raising.church': 'They are raising the church.',
   'doing.raising.watchtower': 'They are raising the watchtower.',
+  'doing.raising.bastion': 'They are raising a bastion into the wall.',
   // U-06 · la línea de estación bajo el año (`src/ui/app.ts`, `seasonLabel`):
   // una clave por estación, nunca un literal junto a `seasonOf`.
   'app.season.spring': 'Spring',
@@ -2551,6 +2572,8 @@ export const UI_BANK: Record<string, string> = {
   'building.stone_house': 'stone house',
   'building.watchtower': 'watchtower',
   'building.grave_yard': 'graveyard',
+  // A3 · el bastión, la torre metida en la propia muralla.
+  'building.bastion': 'bastion',
   'trait.ambitious': 'ambitious',
   'trait.devout': 'devout',
   'trait.spiteful': 'spiteful',

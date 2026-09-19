@@ -1,5 +1,23 @@
 # Cuaderno de tareas — el rework
 
+**A3 · el bastión, hecho (19 sep), y el segundo anillo, sin resolver:**
+`plan-meta.md` pedía las dos cosas en una fila. El segundo anillo **contradice
+§7.4c** (18 sep, medido: 1 824 tramos de muralla contra 131 casas en doce
+semillas a 120 años) — no se ha tocado, queda como fila **A3b**, del dueño.
+El bastión sí: `BuildingKind` gana `'bastion'`, mejora de `wall` (1×1, no 2×2
+como la atalaya suelta — A4 ya midió por qué esa combinación tapa tramos), se
+pide sólo con `flags['wall_closed']` y con tope propio (`withinCap` no sirve:
+colapsa su familia en `'wall'`, que no tiene tope). Cuenta como muralla en
+`wallRuns`, `touchesWall`, `resistance`, `walled` y `ledger.ts`; ocupa puesto
+de tiro en `postsOf`. Sin malla propia (usa la atalaya escalada a 1×1) ni
+dibujo de crónica propio — las dos tareas están en `encargos-3d.md` y
+`plan-arte-pendiente.md`. Puerta verde: `typecheck`, `lint`, y los ficheros
+tocados más las dos pruebas de `tests/journeys/works.test.ts` que fija el
+tope y la puerta del anillo cerrado. Detalle completo en `docs/changelog.md`
+4.14. Después de esto, `/goal` sigue con G3 (plantillas de caserío), G1 (el
+hambre muerde), F2 (el HUD del asedio), F3d (el cronicón) y G4/G2 (nivelado),
+que es lo que quedaba abierto y no es de Astra en `plan-meta.md`.
+
 **Crónicas · catálogo visual integrado (18 sep):** 23 ilustraciones naturales
 de grabado marrón, normalizadas a 640 × 512 en `public/ui/art/`. Fundación y
 Nacimiento se regeneraron antes de integrar para eliminar el estilo infantil.

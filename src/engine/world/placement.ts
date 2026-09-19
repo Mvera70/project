@@ -409,7 +409,8 @@ function touchesWall(state: GameState, x: number, y: number): boolean {
     // muralla», la estacada crecía por otro lado y el anillo se cerraba con un
     // hueco a cada lado del portón. Medido en la semilla 11 al año 40: el
     // anillo partido en dos arcos de 37 y 32 piezas en vez de uno de 69.
-    && (b.kind === 'wall' || b.kind === 'palisade' || b.kind === 'gate')
+    // A3 · y el bastión igual: es una pieza de muralla mejorada, no un hueco.
+    && (b.kind === 'wall' || b.kind === 'palisade' || b.kind === 'gate' || b.kind === 'bastion')
     && Math.max(Math.abs(b.x - x), Math.abs(b.y - y)) === 1);
 }
 

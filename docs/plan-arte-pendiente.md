@@ -205,6 +205,24 @@ habría sido pedir el dibujo de algo que no se veía.
 | `built-wall.png` | `built.wall` (y `built.wall.year`) | **La estacada doblada en piedra**: el tramo de madera dando paso al muro, con la piedra de la cantera a pie de obra. Desde A4 lo tienen 10 de 12 valles |
 | `built-watchtower.png` | `built.watchtower` (y `built.watchtower.year`) | **La atalaya acabada** contra el cerco, que es donde A4 la planta: una torre de madera y piedra pegada a la muralla, con alguien arriba mirando el camino |
 
+**Integración cerrada · 19 sep 2026:** las cuatro escenas se generaron con la
+referencia aprobada de la fundación, se normalizaron a 640 × 512, se añadieron
+al índice y `illustrationFor` las selecciona por clave antes del respaldo
+genérico de construcción.
+
+## El bastión (A3 · 19 sep 2026)
+
+**Por la regla del dueño del diseño del 18 sep 2026:** cada crónica nueva crea
+aquí la tarea de pedir su imagen, en la misma ronda. `built.bastion` es
+`kind: 'built'`, así que hasta que exista su dibujo `illustrationFor` la manda
+al grabado genérico de construcción (`built.png`) — el mismo respaldo que
+tuvieron `built.gate`, `built.wall` y `built.watchtower` antes de que la
+sección de arriba les diera el suyo.
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `built-bastion.png` | `built.bastion` (y `built.bastion.year`) | **Una torre saliendo de la propia muralla**, no al lado de ella: la piedra del tramo subiendo de golpe en un punto y quedando más alta que el resto del cerco a los dos lados. Es la pieza que diferencia un bastión de una atalaya suelta (`built-watchtower.png`) — ésa se ve como un edificio aparte pegado al muro; el bastión tiene que leerse como el muro mismo levantándose |
+
 ## La temática nueva: grabado de tinta parda (18 sep 2026)
 
 **Cinco piezas subidas por el dueño del diseño**, con la referencia y la

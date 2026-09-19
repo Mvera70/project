@@ -68,7 +68,8 @@ export function defenders(state: GameState): number {
 export function resistance(state: GameState): number {
   const standing = state.buildings.filter((b) => b.lostTick === null);
   const gate = standing.some((b) => b.kind === 'gate');
-  const wall = standing.some((b) => b.kind === 'palisade' || b.kind === 'wall');
+  // A3 · el bastión es una pieza de muralla, así que cuenta como ella.
+  const wall = standing.some((b) => b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'bastion');
   return defenders(state)
     // **Y la aldea entera cuenta, aunque no le hayan dado nada.** Sin esto la
     // resistencia de un caserío es dos —una mano y el herrero— y **cualquier**

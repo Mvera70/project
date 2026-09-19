@@ -558,7 +558,9 @@ const EIGHT = [
 
 export function wallRuns(state: GameState): number[] {
   const walls = state.buildings.filter((b) => b.lostTick === null
-    && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'gate'));
+    // A3 · el bastión sustituye a un tramo de muralla en su propia celda: sigue
+    // siendo muralla para esta cuenta, o un bastión partiría el tramo en dos.
+    && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'gate' || b.kind === 'bastion'));
   const byCell = new Map(walls.map((b) => [b.y * state.map.width + b.x, b]));
   const seen = new Set<number>();
   const sizes: number[] = [];

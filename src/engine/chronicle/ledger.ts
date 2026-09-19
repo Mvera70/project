@@ -165,7 +165,8 @@ export function ledgerOf(state: GameState): Ledger {
   return {
     ...ledger,
     houses: standing.filter((b) => b.kind === 'house' || b.kind === 'stone_house').length,
-    wall: standing.filter((b) => b.kind === 'palisade' || b.kind === 'wall').length,
+    // A3 · el bastión es una pieza de muralla, así que cuenta como ella.
+    wall: standing.filter((b) => b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'bastion').length,
   };
 }
 
