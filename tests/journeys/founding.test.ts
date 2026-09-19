@@ -28,9 +28,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { TIME } from '@engine/balance';
+import { renderEntry } from '@engine/chronicle/render';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { population } from '@engine/people/demography';
+import { makeBundle } from '@engine/rng';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 
@@ -177,6 +179,7 @@ describe('G3 · el caserío pregunta antes de ser aldea', () => {
   interface Ask { readonly seed: number; readonly tick: number; readonly id: string; readonly people: number }
   const asks: Ask[] = [];
   const asked = new Set<number>();
+  const lines: string[] = [];
   for (const seed of SEEDS) {
     const state = foundGame(seed);
     for (let t = 1; t <= 10 * TIME.WEEKS_PER_YEAR && state.ended === null; t += 1) {
@@ -188,6 +191,12 @@ describe('G3 · el caserío pregunta antes de ser aldea', () => {
         asked.add(seed);
       }
     }
+    // Y su texto, compuesto como lo compone la pantalla.
+    const bundle = makeBundle(seed);
+    state.chronicle.forEach((entry, at) => {
+      if (!HAMLET_IDS.some((id) => entry.templateKey.includes(id))) return;
+      lines.push(renderEntry(entry, bundle, at));
+    });
   }
   const detail = asks.map((a) => `${a.seed}:${a.id}@t${a.tick}/${a.people}p`).join(', ');
 
@@ -217,6 +226,27 @@ describe('G3 · el caserío pregunta antes de ser aldea', () => {
     expect(asks.length, 'ninguna pregunta del caserío').toBeGreaterThan(0);
     for (const a of asks) {
       expect(a.people, `semilla ${a.seed}, ${a.id} en el tick ${a.tick}`).toBeLessThan(10);
+    }
+  });
+
+  it('y su texto llega entero a la pantalla, con nombres de verdad', () => {
+    // **La brecha que esto cierra**: todas las pruebas que buscan huecos en la
+    // crónica —`chronicle.test.ts`, `invariants.test.ts`— fundan con
+    // `foundTwenty`, así que ninguna había **compuesto** una sola línea de
+    // caserío. Que la clave exista en el banco (eso lo vigila
+    // `tests/fast/catalog.test.ts`) no es lo mismo que que la frase salga
+    // entera: el hueco de reparto de §4 del cuaderno enseña `{B}` en pantalla
+    // con la clave perfectamente presente.
+    //
+    // Medido: 18 líneas en estas doce semillas, todas con nombre y año
+    // resueltos. Las dos plantillas reparten sólo papeles que un caserío
+    // tiene desde el tick de la fundación (`leader`, `midwife`), que es
+    // justamente por lo que no les pasa lo que a `feud_inherited`, cuyo `B`
+    // es un hijo y por tanto nadie con nombre.
+    expect(lines.length, 'ninguna línea de caserío que leer').toBeGreaterThan(0);
+    for (const line of lines) {
+      expect(line, `hueco de reparto: ${line}`).not.toMatch(/\{[A-Za-z]+\}/u);
+      expect(line, `clave sin banco: ${line}`).not.toMatch(/\[[a-z][a-z0-9_.]*\]/u);
     }
   });
 });
