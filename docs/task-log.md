@@ -40,6 +40,24 @@ no existen, para que nadie las busque.
 
 ---
 
+**F3d · el cronicón (19 sep), hecho, y con él F3 entera salvo F3f.** Los
+valles acabados, uno debajo de otro, desde el menú de inicio
+(`src/ui/screens/annals.ts`). Dos decisiones del dueño ese día: **las lápidas
+una al lado de otra** y **empieza vacío y se llena**, así que la página vacía es
+una pantalla del juego. No sube el esquema ni dibuja una pieza nueva: el archivo
+existe desde M-25 y la lápida es la de F3c reducida.
+
+**Y lo que vale de esa ronda son tres defectos que cazó la captura y ninguna
+prueba, uno de ellos de la ronda anterior.** `fill` escribe `{count}` con letra
+por debajo de trece, así que `doing.besieged` —de F2, esa misma mañana— decía
+«six of them are at the gate.» con minúscula cuando bajaban seis; **la captura
+de F2 usó una partida de 24, fuera de la lista de palabras, y por eso enseñó un
+número y no el defecto**. Es la trampa de siempre en versión nueva: capturar un
+valor y dar por buenos todos. Hay guardia desde ahora en `ui-keys.test.ts`
+—ninguna plantilla que acabe en punto empieza por `{count}`—. Los otros dos: la
+fila decía «ANNO 39» y «38 years» dos líneas más abajo, y la página vacía subía
+como una tira. Detalle en `changelog.md` 4.21.
+
 **G4 · qué decisiones acumulan la caída (19 sep), medida.** Por contrafactual,
 que es lo único que contesta una pregunta causal: se juega el valle, se apunta
 cada respuesta y **se vuelve a jugar cambiando una sola** (`npm run lethality`).
@@ -185,8 +203,9 @@ dibujo de crónica propio — las dos tareas están en `encargos-3d.md` y
 tocados más las dos pruebas de `tests/journeys/works.test.ts` que fija el
 tope y la puerta del anillo cerrado. Detalle completo en `docs/changelog.md`
 4.14. Después de esto, `/goal` siguió con G3, G1, A3b y F2 —las cuatro
-cerradas el 19 sep, y G2 y G4 con ellas— y **lo que queda sin Astra es F3d
-(el cronicón)**.
+cerradas el 19 sep, y G2, G4 y F3d con ellas— **y con eso se acaba lo que no
+es de Astra**: lo que queda del plan es arte (E1–E4) y nivelado, que es del
+dueño.
 
 **Crónicas · villa cerrada integrada (19 sep):** `wall-closed.png`,
 `built-gate.png`, `built-wall.png` y `built-watchtower.png` se generaron con

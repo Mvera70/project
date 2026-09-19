@@ -79,6 +79,15 @@ export const UI_BANK_ES: Record<string, string> = {
   'title.seed.hint': 'El mismo número da a cualquiera el mismo valle inicial. Nadie lo conduce de la misma manera.',
   'title.reroll': 'Otro',
   'title.new.working': 'Fundando…',
+  // F3d · el cronicón. Las inscripciones de las lápidas no se traducen y caen
+  // al inglés por el respaldo de `renderUiText`, igual que ya hace el epitafio:
+  // son el texto grabado en la piedra y el juego se escribe en inglés (§2.2).
+  'title.annals': 'El cronicón',
+  'annals.title': 'El cronicón',
+  'annals.count': 'El cronicón guarda {count} valles.',
+  'annals.empty': 'Todavía no hay nada. Cada valle que termina queda escrito aquí; los anteriores a ti no lo estaban.',
+  'annals.anno': 'AÑO {year} · VALLE {seed}',
+  'annals.figures': '{peak} almas · {built} obras',
   'title.dev': 'Desarrollo',
   'title.dev.year': 'Abrir en el año',
   'title.dev.hint': 'El valle avanza con la política de referencia antes de abrirse. Lo que ves es una partida real.',

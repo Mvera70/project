@@ -2,8 +2,8 @@
 import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
-import { crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear, parseDebugRequest, raidNow,
-  bracedNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
+import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear,
+  parseDebugRequest, raidNow, bracedNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -48,7 +48,20 @@ const root = document.querySelector<HTMLDivElement>('#root');
 if (root) {
   const query = new URLSearchParams(window.location.search);
   const request = parseDebugRequest(window.location.search);
-  if (request === null) {
+  const annals = query.get('annals');
+  if (annals !== null) {
+    // F3d · `?annals=3` abre el menú de inicio con **tres valles acabados en el
+    // archivo**, que es la única forma de fotografiar el cronicón: el índice
+    // sólo tiene algo que enseñar cuando alguien ha acabado varios, y eso son
+    // horas de reloj. `?annals=0` es la página vacía, que es una pantalla del
+    // juego y no un hueco (decisión del dueño, 19 sep 2026).
+    const archive = archivedGames(Number(annals) || 0);
+    const state = foundGame(1);
+    openTitle({
+      schema: SCHEMA_VERSION, savedAtMs: Date.now(), state,
+      decisions: [...state.history], archive,
+    }, (choice) => boot(root, saveFor(choice, null)));
+  } else if (request === null) {
     // §13.1: resume the save if there is one and it still parses —
     // `loadSave` already turns a missing or corrupt one into `null` rather
     // than throwing, so a bad blob founds a fresh game instead of a blank page.

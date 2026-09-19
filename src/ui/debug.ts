@@ -5,11 +5,15 @@ import { CROWN, OFFER, TIME } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
+import { archiveGame } from '@engine/save';
 import { MEANS_SPEC, giveMeans } from '@engine/world/means';
 import { crownCandidates } from '@engine/people/crown';
 import { crownKing } from '@engine/world/crown';
 import { postOffer } from '@engine/world/road';
-import type { GameState, HappeningId, MeansId, Role, Season } from '@engine/state';
+import type { ArchivedGame, EndState, GameState, HappeningId, MeansId, Role, Season } from '@engine/state';
+
+/** Las cuatro maneras de acabar, que son las cuatro lápidas. */
+type EndCause = EndState['cause'];
 import { SEASONS, seasonOf, yearOf } from '@engine/time';
 import { paintVillageBackground, sizeCanvas } from '@render/canvas';
 import { paletteFor } from '@derive/palette';
@@ -223,6 +227,35 @@ export function raidNow(state: GameState, band: number, assault = false): void {
 export function bracedNow(state: GameState, weeks = 1): void {
   state.threat.comingTick = state.tick + Math.max(0, weeks);
   state.threat.comingBand = Math.max(state.threat.comingBand, 20);
+}
+
+/**
+ * F3d · **Un archivo con partidas dentro, para poder fotografiar el cronicón.**
+ *
+ * Hace falta por lo mismo que `?crossroad=1` y `?raid=`: el índice de valles
+ * acabados sólo tiene algo que enseñar cuando alguien ha acabado varios, y eso
+ * son horas de reloj. Se juegan de verdad —`foundGame` + `run` con la política
+ * de referencia— y se les pone el final a mano, uno de cada clase, porque las
+ * cuatro lápidas son cuatro capitulares distintas y esperar a que un valle se
+ * muera de cada manera es esperar días.
+ *
+ * Devuelve las partidas archivadas tal como las guardaría el juego
+ * (`archiveGame`), así que lo que se fotografía es lo que se vería jugando.
+ */
+export function archivedGames(count: number): ArchivedGame[] {
+  const CAUSES: readonly EndCause[] = ['stormed', 'abandoned', 'extinction', 'dispersed'];
+  const games: ArchivedGame[] = [];
+  for (let n = 0; n < Math.max(0, count); n += 1) {
+    const state = foundGame(7 + n * 13);
+    // Años distintos a propósito: un índice en el que todos los valles duran lo
+    // mismo no enseña lo que el índice existe para enseñar.
+    openAtYear(state, 12 + n * 9);
+    if (state.ended === null) {
+      state.ended = { tick: state.tick, cause: CAUSES[n % CAUSES.length]!, lastId: null };
+    }
+    games.push(archiveGame(state));
+  }
+  return games;
 }
 
 export function runToCrossroad(state: GameState, limitWeeks = 400): number {

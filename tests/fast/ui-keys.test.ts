@@ -29,6 +29,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { BUILDINGS } from '@engine/balance';
+import { UI_BANK } from '@engine/chronicle/bank.en';
 import { renderUiText } from '@engine/chronicle/render';
 import { ALL_TRAITS } from '@engine/people/traits';
 import { MEANS_IDS } from '@engine/state';
@@ -130,5 +131,28 @@ describe('ninguna clave de la interfaz llega entre corchetes', () => {
     for (const era of Object.keys(ERAS) as Era[]) {
       expect(missing(`era.${era}`), `era.${era}`).toBe(false);
     }
+  });
+
+  /**
+   * **Y ninguna frase empieza por una cifra**, que es el hermano de las tres
+   * de arriba: no se lee como un corchete, se lee como una minúscula a media
+   * pantalla.
+   *
+   * `fill` escribe `{count}` con letra por debajo de trece (`numberWord`), así
+   * que `'{count} of them are at the gate.'` sale **«six of them are at the
+   * gate.»** cuando bajan seis y «24 of them…» cuando bajan veinticuatro. La
+   * captura de F2 usó una partida de 24 —fuera de la lista de palabras— y por
+   * eso enseñó un número y no el defecto; lo destapó la de F3d, un día después,
+   * con un archivo de cuatro valles.
+   *
+   * Una etiqueta **sí** puede empezar por la cifra («{count} villagers» en un
+   * chip de la tira), así que la regla se ata a lo que distingue una frase: el
+   * punto final.
+   */
+  it('ninguna frase del banco empieza por una cifra que se escribe con letra', () => {
+    const offenders = Object.entries(UI_BANK)
+      .filter(([, template]) => template.startsWith('{count}') && template.trimEnd().endsWith('.'))
+      .map(([key]) => key);
+    expect(offenders, `empiezan por {count} y son frase: ${offenders.join(', ')}`).toEqual([]);
   });
 });

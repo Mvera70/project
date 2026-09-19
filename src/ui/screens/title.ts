@@ -27,6 +27,7 @@ import { nextUnusedSeed } from '../app';
 import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
 import { setSoundPreference, soundPreference } from '../sound';
 import { currentLocale, loadLocale, setSavedLocale } from '../locale';
+import { openAnnals } from './annals';
 import type { Locale } from '@engine/chronicle/render';
 
 const STYLE_ID = 'valley-title-style';
@@ -135,6 +136,17 @@ const STYLE = `
 .title-continue-row small { color: var(--skin-ink-faded);
   font: italic 12.5px/1.35 var(--skin-font-read); }
 .title-new[disabled] { opacity: .65; cursor: default; }
+/* F3d · **el cronicón no es un tercer botón de partida**, así que no lleva
+   papel ni madera: es un enlace en tinta, como el que se pone al pie de una
+   página. Fundar manda en esta pantalla y esto no puede competir con ello. */
+.title-annals { min-height: var(--ui-tap-min); padding: 0; border: 0;
+  background: transparent; color: var(--skin-ink-faded); cursor: pointer;
+  font: 400 12px/1 var(--skin-font-voice); letter-spacing: var(--skin-track-label);
+  text-transform: uppercase; text-decoration: underline;
+  text-underline-offset: 4px; text-decoration-thickness: 1px;
+  -webkit-tap-highlight-color: transparent; }
+.title-annals:active { color: var(--skin-ink); }
+.title-annals:focus-visible { outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 
 /* El pie: dos interruptores pequeños, y el de taller a la derecha porque no es
    para quien juega. */
@@ -465,11 +477,28 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
     openTitle(save, choose);
   });
 
+  // F3d · **el cronicón**, desde aquí y no desde el juego: éste es el momento
+  // en que se comparan valles —uno acaba de cerrarse y otro va a empezar— y es
+  // además la única pantalla que existe antes de que haya partida. Se enseña
+  // siempre, también con el archivo vacío: el dueño del diseño eligió que
+  // empezara vacío y se llenara, así que esa página es una pantalla del juego.
+  //
+  // **No cierra el menú.** El cronicón se abre encima y al cerrarse devuelve el
+  // foco a lo que había, que es lo que hace de él un índice y no una ruta: no
+  // hay nada que elegir ahí dentro.
+  const annals = document.createElement('button');
+  annals.type = 'button';
+  annals.className = 'title-annals';
+  annals.textContent = renderUiText('title.annals');
+  annals.addEventListener('click', () => {
+    openAnnals(save, () => { annals.focus(); });
+  });
+
   const bottom = document.createElement('div');
   bottom.className = 'title-bottom';
   bottom.append(language, sound, dev);
 
-  actions.append(seedRow, hint, devRow, begin, bottom);
+  actions.append(seedRow, hint, devRow, begin, annals, bottom);
   const sheet = document.createElement('div');
   sheet.className = 'title-sheet';
   sheet.append(head, seal, actions);

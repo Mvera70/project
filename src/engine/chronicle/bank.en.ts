@@ -2395,8 +2395,13 @@ export const UI_BANK: Record<string, string> = {
   // en lo que el jugador puede hacer con ella.
   // F2 · el asedio, en la línea de estado. Las dos primeras cosas que la aldea
   // puede estar haciendo, porque se resuelven antes que ninguna otra.
-  'doing.besieged': '{count} of them are at the gate.',
-  'doing.besieged_open': '{count} of them are in the valley, and nothing between.',
+  // **Y la cuenta no abre la frase**, que lo cazó la captura de F3d y no una
+  // prueba: `{count}` se escribe con letra por debajo de trece (`numberWord`),
+  // así que una partida de seis hombres decía «six of them are at the gate.»
+  // con minúscula. La captura de F2 usó banda 24 —fuera de la lista de
+  // palabras— y por eso enseñó un número y no el defecto.
+  'doing.besieged': 'There are {count} of them at the gate.',
+  'doing.besieged_open': 'There are {count} of them in the valley, and nothing between.',
   'doing.raid_coming': 'Men over the ridge: {weeks} weeks away.',
   // F2 · y lo que la escena sabe y el motor no: cómo va la puerta, golpe a
   // golpe. Tres estados de una fracción, nunca un marcador (§11.1).
@@ -2451,6 +2456,27 @@ export const UI_BANK: Record<string, string> = {
   'language.label': 'Language',
   'language.english': 'English',
   'language.spanish': 'Español',
+  // F3d · **El cronicón**: los valles que ya se acabaron, uno debajo de otro.
+  // El botón vive en el menú de inicio porque es donde se compara —el jugador
+  // acaba de cerrar uno y va a abrir otro— y **se enseña siempre**, aunque no
+  // haya ninguno: el dueño del diseño eligió que empezara vacío y se llenara,
+  // así que la página vacía es una pantalla del juego y no un hueco.
+  'title.annals': 'The annals',
+  'annals.title': 'The annals',
+  'annals.count': 'The annals hold {count} valleys.',
+  // La línea de la página vacía. Dice **qué la llenará**, no que esté vacía:
+  // un «no hay nada» no le dice a nadie qué hacer.
+  'annals.empty': 'Nothing here yet. Every valley that ends is written down, and the ones that came before you were not.',
+  'annals.anno': 'ANNO {year} · VALLEY {seed}',
+  // Las tres cifras grandes de la hoja de cuentas (F3b), en una línea: son las
+  // que dejan comparar dos valles de un vistazo.
+  // **Sin los años**, y es lo que la captura enseñó: la línea de arriba ya dice
+  // «ANNO 39» y ésta decía «38 years» dos líneas más abajo — el año de la
+  // crónica va en base 1 (`ABSOLUTE_YEARS`) y los años vividos no, así que el
+  // mismo valle salía con dos cifras que se contradicen. Es el mismo defecto
+  // que F3b quitó del epitafio —una línea de resumen repitiendo las cifras de
+  // la hoja a dos centímetros— y la misma cura: se quita la repetida.
+  'annals.figures': '{peak} souls · {built} works',
   'title.dev': 'Dev',
   'title.dev.year': 'Open at year',
   'title.dev.hint': 'The valley is played forward with the reference policy before it opens, so what you see is a real game and not a mock-up. Ten years take about a second. A valley that dies on the way opens as what it became.',
