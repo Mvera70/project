@@ -29,6 +29,7 @@ import { FAITH_TEMPLATES } from './faith';
 import { FAMINE_TEMPLATES } from './famine';
 import { FEUD_TEMPLATES } from './feud';
 import { FOREST_TEMPLATES } from './forest';
+import { HAMLET_TEMPLATES } from './hamlet';
 import { LORD_TEMPLATES } from './lord';
 import { PLAGUE_TEMPLATES } from './plague';
 import { RAID_TEMPLATES } from './raid';
@@ -50,6 +51,10 @@ export const CATALOG: Catalogue = [
   ...FAITH_TEMPLATES,
   ...FOREST_TEMPLATES,
   ...STRANGER_TEMPLATES,
+  // G3 · el caserío. Antes de la reserva porque, a diferencia de ella, sí
+  // tiene algo que decir; después de todo lo demás porque nada de lo de
+  // arriba compite con menos de diez personas en el valle.
+  ...HAMLET_TEMPLATES,
   // M-0 · los tres comerciantes ya no son encrucijadas: son ofertas del camino
   // (`world/road.ts`, los sucesos de visita de `world/fate.ts`). Se quedan en
   // `RETIRED_TEMPLATES` para que una partida guardada que ya los contestó siga

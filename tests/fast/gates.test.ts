@@ -24,7 +24,13 @@ function wallsByCell(state: GameState): Map<number, number> {
   const out = new Map<number, number>();
   for (const b of state.buildings) {
     if (b.lostTick !== null) continue;
-    if (b.kind !== 'wall' && b.kind !== 'palisade') continue;
+    // A3 · **el bastión también es muralla aquí**, y olvidarlo costó un rojo:
+    // el motor ya lo cuenta como pieza del cerco en `touchesWall`, `wallRuns`,
+    // `resistance`, `walled` y el libro de cuentas, pero esta prueba llevaba su
+    // propia copia de la idea. Con la trayectoria movida, la semilla 41 acabó
+    // con un portón que tenía un bastión al lado y ninguna estaca, y esto lo
+    // leyó como «un portón solo en el prado» cuando estaba pegado a su torre.
+    if (b.kind !== 'wall' && b.kind !== 'palisade' && b.kind !== 'bastion') continue;
     out.set(b.y * state.map.width + b.x, b.id);
   }
   return out;

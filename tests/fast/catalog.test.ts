@@ -24,7 +24,9 @@ describe('el catálogo · forma', () => {
     // porque una partida guardada las nombra.
     // Diecinueve desde B2: las dos del clan del valle vecino (§1b), una
     // categoría que el Anexo A no tenía porque el asedio es de la meta.
-    expect(CATALOG).toHaveLength(19);
+    // Veintiuna desde G3: las dos del caserío (`hamlet.ts`), la primera
+    // decisión que un valle de menos de diez personas puede ver.
+    expect(CATALOG).toHaveLength(21);
     expect(RETIRED_TEMPLATES).toHaveLength(3);
     for (const retired of RETIRED_TEMPLATES) {
       expect(CATALOG.some((t) => t.id === retired.id), retired.id).toBe(false);
@@ -42,7 +44,7 @@ describe('el catálogo · forma', () => {
     const byCategory = new Map<CrossroadCategory, number>();
     for (const t of CATALOG) byCategory.set(t.category, (byCategory.get(t.category) ?? 0) + 1);
     for (const c of [
-      'famine', 'plague', 'lord', 'feud', 'faith', 'forest', 'succession',
+      'famine', 'plague', 'lord', 'feud', 'faith', 'forest', 'succession', 'hamlet',
     ] as CrossroadCategory[]) {
       expect(byCategory.get(c), c).toBe(2);
     }
@@ -335,10 +337,18 @@ describe('el catálogo · cobertura rápida', () => {
   // `docs/findings-drama.md`, la decisión que está tomada y pendiente. Lo que
   // el mapa grande hizo fue mover las trayectorias lo justo para que en estas
   // doce semillas concretas dejara de ganar el sorteo.
+  // G3 · `breaking_ground` y `one_at_the_ford` piden `people < 10`, y
+  // `founded()` (`tests/helpers/catalogue-bench.ts`) siembra el banco con
+  // **veinte** desde el tick 0 a propósito — es la aldea de antes de la pareja
+  // fundadora, y el contrato de §8.1 de las dos del caserío es justamente que
+  // se mueren solas al cruzar diez. No es contenido muerto: es que este banco
+  // nunca representa el valle en el que viven. **Quien lo comprueba de verdad
+  // es `tests/journeys/founding.test.ts`**, que juega con `foundGame` —dos
+  // personas— y exige que el caserío llegue a preguntar.
   const SLOW = [
     'plague_blame', 'forest_cut', 'wolf_winter', 'first_stone',
     'chapel_or_granary', 'feud_inherited', 'smith_feud', 'quiet_years',
-    'grain_factor',
+    'grain_factor', 'breaking_ground', 'one_at_the_ford',
   ];
 
   it('ninguna plantilla corriente se queda a cero en 12 semillas × 100 años', () => {

@@ -1787,13 +1787,24 @@ export const BUILDINGS = {
   // `upgradeOf` sólo da de baja uno, dejando `ringClosed` creyendo cerrado un
   // anillo con un hueco detrás de la torre.
   //
-  // TUNE: sin medir todavía —es la primera vez que existe—. Cap 2, el mismo
-  // que la atalaya suelta: reutiliza su malla y su puesto de tiro
-  // (`derive/garrison.ts`), así que dejarlo sin tope duplicaría de facto el
-  // número de torres de un valle sin que nadie lo pidiera. Coste por encima
-  // del muro que sustituye (`wall`: piedra 40, obra 60) y por debajo de la
-  // atalaya suelta (piedra 60, obra 90): sube sobre una pieza que ya está en
-  // pie, no levanta cuatro celdas desde cero.
+  // TUNE: cap 2, el mismo que la atalaya suelta, porque reutiliza su malla y
+  // su puesto de tiro (`derive/garrison.ts`) y sin tope duplicaría de facto
+  // las torres de un valle sin que nadie lo pidiera. Coste por encima del muro
+  // que sustituye (`wall`: piedra 40, obra 60) y por debajo de la atalaya
+  // suelta (piedra 60, obra 90): sube sobre una pieza que ya está en pie, no
+  // levanta cuatro celdas desde cero.
+  //
+  // **Medido en doce semillas × ochenta años** (`npx tsx tools/pace-report.ts
+  // --seeds 12 --years 80`): el primer bastión llega a las **555 h de reloj**
+  // (mediana; reparto 224–656 h) en **9 de 12 valles** — exactamente los nueve
+  // que cierran su cerco, que es el contrato; los otros tres no lo cierran (dos
+  // tomados y uno extinguido). Y **el tope muerde**: los nueve llegan a dos,
+  // así que este número no es decoración, es la palanca que
+  // decide cuántas torres tiene una villa cerrada. Con dos atalayas sueltas
+  // más, un valle de fase 3 acaba con cuatro puestos de torre; el brazo que
+  // dan es el mismo que el de la muralla (`postsOf`), así que lo que cambia es
+  // dónde se pone la gente, no con qué. Letalidad sin mover: 3 de 12 partidas
+  // acabadas, dentro de la cuenta que B3 dejó escrita.
   bastion: { w: 1, h: 1, wood: 0, stone: 50, bp: 75, cap: 2, tier: 1, upgradeOf: 'wall', byCrossroad: false },
 } as const;
 

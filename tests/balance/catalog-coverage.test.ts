@@ -20,7 +20,16 @@ describe('M-08 · cobertura del catálogo, 30 semillas × 150 años', () => {
     // Las dos de `lord` estuvieron muertas hasta la v2.8: A.1 pedía el granero
     // vacío en invierno, y el invierno empieza la semana 36, justo después de
     // la cosecha. Con `grainToHarvest` y la semana mínima disparan.
-    const missing = silentIn(seen);
+    //
+    // G3 · `breaking_ground` y `one_at_the_ford` piden `people < 10`, y este
+    // banco (`tests/helpers/catalogue-bench.ts`) funda con **veinte** desde el
+    // tick 0 y a propósito no baja de ahí — es la aldea de antes de la pareja
+    // fundadora. Las dos se mueren solas al cruzar diez personas, que es su
+    // contrato (`hamlet.ts`), así que este banco nunca las va a ver: no
+    // representa el valle en el que viven. `tests/journeys/founding.test.ts`
+    // las mide contra `foundGame`, que sí funda con dos.
+    const HAMLET = ['breaking_ground', 'one_at_the_ford'];
+    const missing = silentIn(seen).filter((id) => !HAMLET.includes(id));
     expect(missing, `sin salir nunca: ${missing.join(', ')}`).toEqual([]);
   });
 

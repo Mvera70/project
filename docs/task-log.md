@@ -1,5 +1,45 @@
 # Cuaderno de tareas — el rework
 
+**Auditoría de la ronda A3/G3 (19 sep), y lo que corrigió.** La ronda se jugó
+con un modelo menor y se revisó entera después. El mecanismo del bastión estaba
+bien —la ruta de `upgradeSpot`/`canPlace` no pasa por la regla de la línea de
+muralla, y que `familyOf('bastion')` colapse en `wall` no rompe nada—, pero
+faltaban tres cosas y había un defecto latente:
+
+1. **No tenía medida**, que es lo que §4 de la skill `goal` exige para cerrar
+   una fase. Ahora la tiene, con su peldaño nuevo en `pace-report`: **bastión a
+   las 555 h de reloj** (mediana; 224–656 h) **en 9 de 12 valles**, que son
+   exactamente los nueve que cierran el cerco, y **los nueve llegan al tope de
+   dos**. El tope muerde, así que no es decoración.
+2. **La especificación no se enteró.** §7.2 no tenía fila para el bastión —ni
+   para el portón de A2 ni para la sala de K-4, que llevaban desde el 18 sep
+   sólo en `balance.ts`—, §7.3 punto 9 listaba tres mejoras cuando ya son
+   cuatro, y las dos uniones de tipos de §3.5 y §8 estaban viejas. Corregido:
+   es la trampa que `CLAUDE.md` nombra («una migración sin su documentación no
+   está hecha, está escondida»).
+3. **Un defecto latente que la trayectoria nueva destapó:** `wallsByCell` de
+   `tests/fast/gates.test.ts` llevaba su propia copia de «qué es muralla» y no
+   conocía el bastión, así que leía un portón con su torre al lado como «un
+   portón solo en el prado». A3 cerró esa idea en el motor y se dejó esta copia
+   fuera.
+
+**G3 · el caserío, hecho (19 sep).** Categoría propia `hamlet` y dos plantillas
+—`breaking_ground` y `one_at_the_ford`— que se mueren solas al cruzar diez
+personas. **Preguntan 5 de 12 valles y en los cinco es su primera decisión, a
+las 11,4 h**, con 4 a 9 personas dentro. Lo que la medida enseñó vale más que
+las plantillas: **el techo de G3 es el suelo de §8.6** (`MIN_TICKS_BETWEEN` =
+48 ticks: la primera pregunta no cabe antes del tick 47, y la población cruza
+diez a las 10 h), así que subir ese 5 de 12 es bajar el suelo, y eso es
+nivelado del dueño. De la versión anterior de estas plantillas se retiraron tres
+defectos: una se llamaba «The First Frost» y **no tenía puerta de estación**
+—disparaba en primavera con el texto hablando de escarcha—; otra regalaba una
+gallina con `{k:'herd'}` cuando la fundación empieza con **tres gallinas y
+aforo para dos**, así que la opción que prometía «una boca más» quitaba una; y
+las dos juntas **no tenían ningún lado malo en ninguna parte**, lo que puso
+`fate-chaos` en rojo (2 valles rotos de 12 donde pide 3) por apuntalar justo a
+los frágiles. Se arregló el contenido, no el listón. Detalle en
+`docs/changelog.md` 4.14 y 4.15.
+
 **A3 · el bastión, hecho (19 sep), y el segundo anillo, sin resolver:**
 `plan-meta.md` pedía las dos cosas en una fila. El segundo anillo **contradice
 §7.4c** (18 sep, medido: 1 824 tramos de muralla contra 131 casas en doce

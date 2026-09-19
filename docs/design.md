@@ -477,7 +477,9 @@ export type BuildingId = number;
 export type BuildingKind =
   | 'house' | 'field' | 'granary' | 'chapel' | 'smithy'
   | 'well' | 'mill' | 'palisade' | 'wall' | 'church'
-  | 'stone_house' | 'watchtower' | 'grave_yard';
+  | 'stone_house' | 'watchtower' | 'grave_yard'
+  // A2, K-4 y A3 (18-19 sep 2026): el portón, la sala del rey y el bastión.
+  | 'gate' | 'hall' | 'bastion';
 
 export interface Building {
   id: BuildingId;
@@ -1148,6 +1150,15 @@ borde a borde, entre el 18 % y el 30 % de bosque, y un sitio de fundación váli
 | `stone_house` | 2×2 | 0 + 50 piedra | 70 | Mejora de `house`; no arde | — |
 | `church` | 3×3 | 0 + 120 piedra | 200 | Mejora de `chapel` | 1 |
 | `watchtower` | 2×2 | 0 + 60 piedra | 90 | Solo por encrucijada | 2 |
+| `gate` | 1×1 | 60 | 40 | El paso del anillo (A2) | 2 |
+| `hall` | 3×3 | 200 | 160 | La casa del rey (K-4) | 1 |
+| `bastion` | 1×1 | 0 + 50 piedra | 75 | Mejora de `wall`; puesto de tiro (A3) | 2 |
+
+**Las tres últimas filas se escribieron tarde y conviene decirlo**, porque es la
+deriva que `CLAUDE.md` avisa: el portón es de A2 y la sala de K-4 (18 sep 2026),
+el bastión de A3 (19 sep), y las tres estuvieron en `balance.ts` antes que aquí.
+Una tabla que no conoce un edificio es una especificación describiendo el juego
+anterior.
 
 **La piedra es una existencia desde M-0** (17 sep 2026). Hasta entonces «no se
 almacenaba nunca»: canteala era trabajo, así que el coste de obra de una pieza
@@ -1193,7 +1204,12 @@ La aldea decide sola, siempre en este orden:
 7. `mill`, si no existe y `people ≥ 45`
 8. `palisade`, si existe `smithy` y la bandera `threatened` está puesta
 9. **Mejoras a piedra**, cuando no queda sitio: casas si A.16 las desbloqueó,
-   luego empalizada si A.16 desbloqueó el muro, luego capilla
+   luego empalizada si A.16 desbloqueó el muro, luego capilla, y desde A3
+   (19 sep 2026) **el bastión**: un tramo de muralla de piedra que sube a torre,
+   sólo con el cerco ya cerrado (`flags['wall_closed']`) y con tope propio
+   (`BUILDINGS.bastion.cap`, contado a mano porque `withinCap` colapsa su
+   familia en `wall`, que no tiene tope). Va el último de los cuatro a
+   propósito: es lo único de esta lista que no hace falta para vivir
 
 El punto 9 es lo que resuelve el problema de ritmo a largo plazo de `valle.md`
 §7. Cuando el mapa se llena, el mismo motor de obras sigue funcionando pero
@@ -2211,7 +2227,14 @@ export interface CrossroadTemplate {
 
 export type CrossroadCategory =
   | 'famine' | 'plague' | 'lord' | 'feud'
-  | 'faith' | 'forest' | 'stranger' | 'succession';
+  | 'faith' | 'forest' | 'stranger' | 'succession'
+  // `trade` es de v2.95 y sus tres plantillas están retiradas desde M-0 (son
+  // ofertas del camino), pero el tipo se queda: una partida guardada las
+  // nombra. `raid` es de B2 y `hamlet` de G3 (19 sep 2026), y ésta última
+  // tiene categoría propia a propósito: `crisisOf` da multiplicador de crisis
+  // a `famine`, y una pregunta de caserío sobre desmontar no es una crisis de
+  // hambre ni debe crecer cuando la haya.
+  | 'trade' | 'raid' | 'hamlet';
 
 export interface CrossroadOption {
   id: string;

@@ -18,6 +18,7 @@
 import { foundTwenty } from '../helpers/founding';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
+import { foundGame } from '@engine/found';
 import { all } from '@engine/crossroads/conditions';
 import { run } from '@engine/sim';
 import type { Policy } from '@engine/sim';
@@ -29,6 +30,11 @@ import type { GameState } from '@engine/state';
 const SEEDS = [7, 11, 23, 31, 37, 41];
 const YEARS = 60;
 const POLICY: Policy = 'prudent';
+// G3 · las que se fundan con la pareja, para que el caserío tenga dónde
+// cumplirse. Son las semillas que `tests/journeys/founding.test.ts` midió
+// preguntando algo del caserío, que es donde esa ventana existe de verdad.
+const COUPLE_SEEDS = [41, 53, 67, 89, 97];
+const COUPLE_YEARS = 10;
 
 /**
  * Por cada plantilla, cuántos ticks —sumados sobre todas las semillas— tenían
@@ -38,16 +44,31 @@ function passesByTemplate(): Map<string, number> {
   const passes = new Map<string, number>();
   for (const t of CATALOG) passes.set(t.id, 0);
 
-  for (const seed of SEEDS) {
-    const state: GameState = foundTwenty(seed);
-    const wanted = YEARS * TIME.WEEKS_PER_YEAR;
+  const play = (state: GameState, years: number): void => {
+    const wanted = state.tick + years * TIME.WEEKS_PER_YEAR;
     while (state.tick < wanted && state.ended === null) {
       for (const t of CATALOG) {
         if (all(t.requires, state)) passes.set(t.id, (passes.get(t.id) ?? 0) + 1);
       }
       run(state, 1, POLICY, CATALOG);
     }
-  }
+  };
+
+  for (const seed of SEEDS) play(foundTwenty(seed), YEARS);
+  // G3 · **y unas cuantas fundadas como funda el juego, que son dos.**
+  //
+  // La cabecera de este fichero dice que mide «partidas reales (`foundGame` +
+  // `run`)» y hasta G3 medía sólo `foundTwenty`, que nace con veinte personas:
+  // la aldea de antes del 15 sep 2026. Mientras todo el catálogo pedía aldea
+  // hecha eso daba igual; con las dos plantillas del caserío (`hamlet.ts`,
+  // `people < 10`) dejó de darlo — sus condiciones son inalcanzables en un
+  // banco que nunca tiene menos de diez, y esta prueba las habría llamado
+  // contenido muerto siendo falso.
+  //
+  // Se juegan pocos años a propósito: la ventana del caserío se cierra en
+  // cuanto el valle crece, así que diez años por semilla la cubren entera y el
+  // coste cabe en el presupuesto de §14.1.
+  for (const seed of COUPLE_SEEDS) play(foundGame(seed), COUPLE_YEARS);
   return passes;
 }
 

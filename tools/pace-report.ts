@@ -76,6 +76,11 @@ const LADDER: readonly (readonly [string, (s: GameState) => boolean])[] = [
   // A4 · y la piedra del cerco, que hasta hoy no llegaba nunca: la encrucijada
   // de la primera piedra obliga a elegir y la política elige las casas.
   ['muralla de piedra', (s) => alive(s, 'wall') >= 1],
+  // A3 · el bastión, que es el último peldaño de la fase 3: sólo se pide con
+  // el cerco ya cerrado y sobre un tramo que ya es de piedra, así que su hora
+  // dice cuánto tarda un valle en tener **algo más que muro** que ofrecerle a
+  // la fase 4.
+  ['bastión', (s) => alive(s, 'bastion') >= 1],
 ];
 
 const hits = new Map(LADDER.map(([name]) => [name, [] as number[]]));

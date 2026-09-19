@@ -154,3 +154,69 @@ describe('una pareja se hace aldea · v3.69', () => {
     expect(ends.size, [...ends].join(', ')).toBeGreaterThan(3);
   });
 });
+
+// ---------------------------------------------------------------------------
+// G3 · El caserío tiene algo que preguntar
+//
+// **Ésta es la prueba que de verdad vigila `hamlet.ts`**, y vive aquí y no en
+// `tests/fast/catalog.test.ts` por una razón que costó encontrarla: el banco
+// del catálogo (`tests/helpers/catalogue-bench.ts`) funda con **veinte**
+// personas desde el tick 0 —es la aldea de antes de la pareja— y las dos
+// plantillas del caserío piden menos de diez, así que allí no pueden salir
+// nunca. Medirlas con ese banco daría «contenido muerto» siendo falso, y por
+// eso están en su lista de excepciones con este fichero citado al lado.
+//
+// Se juega semana a semana, y no por años como la batería de arriba, porque lo
+// que se comprueba es **con cuánta gente en el valle** se hizo cada pregunta:
+// eso sólo se sabe en el tick en que se hace.
+// ---------------------------------------------------------------------------
+
+const HAMLET_IDS = ['breaking_ground', 'one_at_the_ford'];
+
+describe('G3 · el caserío pregunta antes de ser aldea', () => {
+  interface Ask { readonly seed: number; readonly tick: number; readonly id: string; readonly people: number }
+  const asks: Ask[] = [];
+  const asked = new Set<number>();
+  for (const seed of SEEDS) {
+    const state = foundGame(seed);
+    for (let t = 1; t <= 10 * TIME.WEEKS_PER_YEAR && state.ended === null; t += 1) {
+      const before = state.history.length;
+      run(state, 1, 'prudent', CATALOG);
+      for (const d of state.history.slice(before)) {
+        if (!HAMLET_IDS.includes(d.templateId)) continue;
+        asks.push({ seed, tick: d.tick, id: d.templateId, people: population(state) });
+        asked.add(seed);
+      }
+    }
+  }
+  const detail = asks.map((a) => `${a.seed}:${a.id}@t${a.tick}/${a.people}p`).join(', ');
+
+  it('no es contenido muerto: hay valles que la ven', () => {
+    // **Medido en estas doce semillas × diez años**: preguntan 5 —41, 53, 67,
+    // 89 y 97— y en las cinco es **su primera decisión**, en el tick 49, que
+    // son 11,4 h de reloj. Tres de ellas vuelven a preguntar en el tick 98.
+    //
+    // Que no sean doce de doce **no es un fallo del contenido, es el suelo de
+    // §8.6**: `CROSSROADS.MIN_TICKS_BETWEEN` son 48 ticks, así que la primera
+    // pregunta de una partida no puede plantearse antes del tick 47 —once
+    // horas—, y la población cruza diez a las diez horas (`pace-report`). Los
+    // siete valles que no preguntan es porque ya eran aldea cuando la puerta
+    // se abrió. Subir esa cifra es bajar el suelo de §8.6, que es una decisión
+    // de nivelado y del dueño (`plan-meta.md` §3), no de esta plantilla.
+    //
+    // La cota se queda en tres y no en cinco para que la varianza normal del
+    // caos no la rompa: lo que vigila es que el caserío **pueda** preguntar.
+    expect(asked.size, `preguntan: ${detail}`).toBeGreaterThanOrEqual(3);
+  });
+
+  it('y deja de preguntar cuando deja de ser caserío', () => {
+    // El contrato de §8.1 de estas dos: o dicen qué las mantiene vivas en una
+    // aldea de ochenta, o admiten que son contenido temprano. Admiten que lo
+    // son, y esto es esa admisión comprobada contra la partida y no contra el
+    // `requires`: medido, se preguntan con 4, 5, 5, 6, 7, 8 y 9 personas.
+    expect(asks.length, 'ninguna pregunta del caserío').toBeGreaterThan(0);
+    for (const a of asks) {
+      expect(a.people, `semilla ${a.seed}, ${a.id} en el tick ${a.tick}`).toBeLessThan(10);
+    }
+  });
+});

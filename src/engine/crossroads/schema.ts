@@ -35,7 +35,13 @@ export type CrossroadCategory =
   // B2 · el clan del valle vecino (§1b). Es una categoría propia y no `lord`
   // porque no es el señor: es gente que baja de la ladera de al lado.
   | 'raid'
-  | 'succession';
+  | 'succession'
+  // G3 · el caserío: menos de diez personas, antes de que exista casi
+  // cualquier otra cosa que este catálogo pregunta. Categoría propia y no
+  // `famine`/`stranger` a propósito: las dos comparten peso con `crisisOf`
+  // (§8.6), y una decisión de leña o de una gallina perdida no es una crisis
+  // real de hambre ni tiene por qué crecer cuando sí la hay.
+  | 'hamlet';
 
 export interface CrossroadTemplate {
   id: string; // 'winter_grain_debt'

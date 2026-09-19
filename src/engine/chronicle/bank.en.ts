@@ -1319,6 +1319,26 @@ export const CROSSROAD_BANK: Record<string, string> = {
   'crossroad.quiet_years.a_free_work.cost': 'Some of it goes to the men who dig',
   'crossroad.quiet_years.a_season_of_feasting.label': 'Eat it',
   'crossroad.quiet_years.a_season_of_feasting.cost': 'A winter shorter than it looks',
+
+  // --- G3 breaking_ground ---
+  'crossroad.breaking_ground.title': 'More Ground Than Hands',
+  'crossroad.breaking_ground.body':
+    'The thaw has left more good ground than the two of them can put under seed. {A} has paced out a strip at the wood’s edge that would take a season to clear. {B} has pointed out that the field they already have wants sowing this month, not next.',
+  'crossroad.breaking_ground.break_more_ground.label': 'Break the new strip',
+  'crossroad.breaking_ground.break_more_ground.cost': 'Thin weeks now, and a field only next year',
+  'crossroad.breaking_ground.let_it_wait.label': 'Let it wait',
+  'crossroad.breaking_ground.let_it_wait.cost': 'The wood’s edge stays the wood’s edge',
+
+  // --- G3 one_at_the_ford ---
+  'crossroad.one_at_the_ford.title': 'One at the Ford',
+  'crossroad.one_at_the_ford.body':
+    'A man has come up the river road with a bundle and no cart, and says he will work for a roof. {A} has counted the grain twice. It is the counting that is the trouble, not the man.',
+  'crossroad.one_at_the_ford.take_him_in.label': 'Take him in',
+  'crossroad.one_at_the_ford.take_him_in.cost': 'A third mouth before the harvest',
+  'crossroad.one_at_the_ford.feed_him_and_send_him_on.label': 'Feed him and send him on',
+  'crossroad.one_at_the_ford.feed_him_and_send_him_on.cost': 'A day of grain for nothing that stays',
+  'crossroad.one_at_the_ford.turn_him_away.label': 'Turn him away',
+  'crossroad.one_at_the_ford.turn_him_away.cost': 'Nobody else saw it, and that is worse',
 };
 
 // ---------------------------------------------------------------------------
@@ -2159,6 +2179,45 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'A hundred years since they came over the ridge.',
     'The valley has stood a century.',
     'A century, and the village is still here.',
+  ],
+
+  // --- G3 breaking_ground ---
+  'crossroad.breaking_ground.break_more_ground': [
+    '{A} broke a new strip at the wood’s edge in the spring of year {year}.',
+    'They cleared ground they could not yet sow, in year {year}.',
+    '{B} sowed the old field alone that spring while {A} cut at the trees. Year {year}.',
+  ],
+  'crossroad.breaking_ground.let_it_wait': [
+    'They let the wood’s edge stand and worked what they had, in year {year}.',
+    '{A} put the whole of that spring into one field. Year {year}.',
+    'In year {year} the new ground stayed under trees, and nobody went short for it.',
+  ],
+  'consequence.the_cleared_strip': [
+    'The strip cut in year {sinceYear} came under seed {years} year on.',
+    'What {A} cleared {years} year before was a field by year {year}.',
+    'A year after the trees came down in year {sinceYear}, there was grain standing where they had been.',
+  ],
+
+  // --- G3 one_at_the_ford ---
+  'crossroad.one_at_the_ford.take_him_in': [
+    'They took him in at the ford in year {year}, and he stayed.',
+    '{A} gave the stranger a roof in year {year} and counted the grain again after.',
+    'In year {year} the valley went from two households to something like three.',
+  ],
+  'crossroad.one_at_the_ford.feed_him_and_send_him_on': [
+    'He ate with them and went on up the road. Year {year}.',
+    '{A} fed the stranger and pointed him at the pass, in year {year}.',
+    'In year {year} they gave what they could spare and no more.',
+  ],
+  'crossroad.one_at_the_ford.turn_him_away': [
+    '{A} sent him back down the river road in year {year}.',
+    'They watched him go and did not offer. Year {year}.',
+    'In year {year} the valley kept its grain and said nothing about it after.',
+  ],
+  'consequence.what_he_was_running_from': [
+    'Riders asked after the man taken in at the ford in year {sinceYear}, {years} years on.',
+    '{years} years after he came up the road alone, somebody came up it after him.',
+    'Whatever he had left behind in year {sinceYear} found the valley {years} years later.',
   ],
 };
 
