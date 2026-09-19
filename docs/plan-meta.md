@@ -108,6 +108,11 @@ es divertido, y el resultado es el que sale.
 
 ### E · Arte y animación (sesión de arte)
 
+**20 sep, E1b:** contacto `spear_thrust` y reacción `hit_take` entregados sobre
+el esqueleto publicado y ligados a D4. E1 queda parcial por `flee`.
+Los siete modelos de la primera tanda están aceptados, aún sin publicar ni
+integrar. [Evidencia de E1b](historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
+
 **Es el camino largo y hay que empezarlo pronto**: hoy no existe un solo clip
 de pelea.
 

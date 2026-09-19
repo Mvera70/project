@@ -10,7 +10,7 @@
 // de una jornada de verdad la mide `tests/journeys/assault.test.ts`.
 
 import { describe, expect, it } from 'vitest';
-import { fallenDefenders, stepMelee, type Defender } from '../../src/render3d/life/melee';
+import { fallenDefenders, meleePose, stepMelee, type Defender } from '../../src/render3d/life/melee';
 import type { Manned } from '../../src/render3d/life/garrison';
 import type { Raider } from '../../src/render3d/life/raiders';
 import type { Arm } from '@derive/garrison';
@@ -48,6 +48,32 @@ function brawl(raiders: readonly Raider[], defenders: readonly Defender[], steps
 }
 
 describe('D4 · el cuerpo a cuerpo', () => {
+  it('fecha contacto y reacción sólo cuando cuenta un golpe, sin mover los cuerpos', () => {
+    const enemy = raider(10, 10), ally = defender(10.5, 10, 'spear');
+    const before = { ...enemy.body };
+    stepMelee([enemy], [ally], 14);
+    expect(meleePose(enemy, 14)).toBeNull();
+    stepMelee([enemy], [ally], 15);
+    expect(enemy).toMatchObject({ thrustAt: 15, hitAt: 15, hits: 1 });
+    expect(ally).toMatchObject({ thrustAt: 15, hitAt: 15, hits: 1 });
+    expect(enemy.body).toEqual(before);
+    expect(meleePose(enemy, 15)).toMatchObject({ clip: 'spear_thrust', since: 15, facing: Math.PI / 2 });
+    expect(meleePose(ally, 18)).toMatchObject({ clip: 'hit_take', since: 15, facing: -Math.PI / 2 });
+    stepMelee([enemy], [ally], 16);
+    expect(enemy.thrustAt).toBe(15);
+    expect(meleePose(enemy, 45)).toBeNull();
+  });
+
+  it('no inventa un contraataque del arquero en su paso lento', () => {
+    const enemy = raider(10, 10), ally = defender(10.5, 10, 'bow');
+    stepMelee([enemy], [ally], 15);
+    expect(ally.thrustAt).toBeUndefined();
+    expect(enemy.hitAt).toBeUndefined();
+    expect(meleePose(ally, 15)?.clip).toBe('hit_take');
+    expect(meleePose(enemy, 15)?.clip).toBe('spear_thrust');
+    expect(meleePose({ thrustAt: 20, hitAt: 15 }, 24)?.clip).toBe('spear_thrust');
+    expect(meleePose({ thrustAt: 15, hitAt: 20 }, 20)?.clip).toBe('hit_take');
+  });
   it('a distancia no se pega', () => {
     // La única regla: el alcance de un brazo. Un saqueador al otro lado del
     // pueblo no le hace nada a nadie, y sin esto la pelea empezaría el momento

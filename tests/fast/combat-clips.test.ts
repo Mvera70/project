@@ -43,6 +43,28 @@ function raider(): Raider {
 }
 
 describe('E1 · el hecho decide la pose', () => {
+  it('el reparto sirve contacto, impacto y caída por encima del gesto de puerta', () => {
+    const enemy = raider();
+    enemy.thrustAt = 30; enemy.hitAt = 30; enemy.blowAt = 30;
+    enemy.meleeFacing = Math.PI / 2;
+    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], steps: 31 } as unknown as Village;
+    expect(castOf(life, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'spear_thrust', clipSeconds: 0 });
+    expect(castOf({ ...life, steps: 34 }, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'hit_take', facing: Math.PI / 2 });
+    enemy.phase = 'down'; enemy.downAt = 33;
+    expect(castOf({ ...life, steps: 34 }, 999, new Map(), new Set())[0]).toMatchObject({ clip: 'fall', clipSeconds: 0 });
+    expect(castOf({ ...life, steps: 100 }, 999, new Map(), new Set())[0]?.facing).toBe(Math.PI / 2);
+  });
+
+  it.each(['spear_thrust', 'hit_take'] as const)('%s mueve los huesos del GLB, sin desplazar el actor', clip => {
+    const cast = makeCast();
+    try {
+      cast.show([actor('idle', 0)]); const idle = pose(cast);
+      cast.show([actor(clip, 0)]); const contact = pose(cast);
+      expect(contact).not.toEqual(idle);
+      cast.show([actor(clip, VILLAGER_CLIPS[clip].seconds)]);
+      expect(pose(cast)).not.toEqual(contact);
+    } finally { cast.dispose(); }
+  });
   it('sólo un golpe contado reinicia el gesto, con la misma fecha que el portón', () => {
     const enemy = raider(), gate: Gate = { at: { x: 12, z: 11 }, hits: 0, brokeAt: null };
     const land = { width: 32, height: 32, blocked: new Uint8Array(1024) };
@@ -59,14 +81,14 @@ describe('E1 · el hecho decide la pose', () => {
     expect(enemy.blowAt).toBe(60); expect(gate.hits).toBe(2);
   });
 
-  it.each(['bow_loose', 'gate_strike', 'fall'] as const)('%s no vuelve al principio ni hereda el desfase del vecino', clip => {
+  it.each(['bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall'] as const)('%s no vuelve al principio ni hereda el desfase del vecino', clip => {
     expect(clipTime(clip, 99, 9, 0.9, 10)).toBe(0);
     expect(clipTime(clip, 99, 10, 0.9, 10)).toBe(0);
     expect(clipTime(clip, 99, 10.2, 0.9, 10)).toBeCloseTo(0.2);
     expect(clipTime(clip, 99, 200, 0.9, 10)).toBe(VILLAGER_CLIPS[clip].seconds);
   });
 
-  it.each(['bow_draw', 'bow_loose', 'gate_strike', 'fall'] as const)('%s da la misma pose con salto, repetición, retroceso y otro clip previo', clip => {
+  it.each(['bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall'] as const)('%s da la misma pose con salto, repetición, retroceso y otro clip previo', clip => {
     const direct = makeCast(), watched = makeCast();
     try {
       for (const at of [0, 0.2, VILLAGER_CLIPS[clip].seconds, 0.1, VILLAGER_CLIPS[clip].seconds]) {

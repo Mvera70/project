@@ -19,14 +19,42 @@
 //
 // Lo que esta ronda **no** hace, y queda anotado en `encargos-3d.md`: el
 // ragdoll —los cuerpos de la gente todavía no son cuerpos de Rapier, y eso es
-// una tanda entera—, el clip del golpe (E1 pide `spear_thrust` y `hit_take`) y
-// cómo se ve morir, que es decisión del dueño (E4).
+// una tanda entera— y el gore, que es decisión del dueño (E4). E1 fecha ya
+// `spear_thrust`, `hit_take` y la caída sin alterar la resolución mecánica.
 
 import type { Manned } from './garrison';
 import type { Raider } from './raiders';
+import { VILLAGER_CLIPS } from '../clips';
+import { LIFE_STEP } from './clock';
+
+/** Fechas visuales: no cambian daño, alcance, velocidades ni selección. */
+export interface MeleeGesture {
+  thrustAt?: number;
+  hitAt?: number;
+  meleeFacing?: number;
+}
+
+/** Un intercambio simultáneo enseña contacto y después la reacción. */
+export function meleePose(body: MeleeGesture, step: number):
+  { clip: 'spear_thrust' | 'hit_take'; since: number; facing: number } | null {
+  const attack = body.thrustAt;
+  const hit = body.hitAt;
+  const attacking = attack !== undefined && step >= attack
+    && (hit === undefined || hit <= attack)
+    && (step - attack) * LIFE_STEP < VILLAGER_CLIPS.spear_thrust.seconds;
+  const hurt = hit !== undefined && step >= hit
+    && (step - hit) * LIFE_STEP < VILLAGER_CLIPS.hit_take.seconds;
+  // TUNE: tres pasos (0,1 s) de contacto antes del retroceso simultáneo.
+  // Ambos relojes conservan la fecha real: cambiar de clip no inventa un golpe.
+  if (hurt && (!attacking || hit > attack || (hit === attack && step - attack >= 3))) {
+    return { clip: 'hit_take', since: hit, facing: body.meleeFacing ?? 0 };
+  }
+  if (attacking) return { clip: 'spear_thrust', since: attack, facing: body.meleeFacing ?? 0 };
+  return null;
+}
 
 /** Lo que hace falta saber de quien defiende un puesto, sin conocer `Dweller`. */
-export interface Defender {
+export interface Defender extends MeleeGesture {
   downAt?: number;
   /** El cuerpo, para medir distancias. */
   readonly at: { readonly x: number; readonly z: number };
@@ -96,6 +124,10 @@ export function stepMelee(
     if (target === null) continue;
 
     target.hits += 1;
+    raider.thrustAt = step;
+    target.hitAt = step;
+    raider.meleeFacing = Math.atan2(target.at.x - raider.body.x, target.at.z - raider.body.z);
+    target.meleeFacing = Math.atan2(raider.body.x - target.at.x, raider.body.z - target.at.z);
     if (target.hits >= BLOWS_TO_FALL) { target.down = true; target.downAt = step; }
 
     // **Y le devuelve el golpe.** El arquero, la mitad de veces: tensar un arco
@@ -103,6 +135,8 @@ export function stepMelee(
     const slower = target.post.post.arm === 'bow' && step % (BLOW_STEPS * ARCHER_PENALTY) !== 0;
     if (slower) continue;
     raider.hits += 1;
+    target.thrustAt = step;
+    raider.hitAt = step;
     if (raider.hits >= BLOWS_TO_FALL) {
       raider.phase = 'down';
       raider.downAt = step;

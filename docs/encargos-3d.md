@@ -65,6 +65,11 @@ juego desde G-10 sin aparecer en una partida.
 
 ## 3 · Animación y efecto
 
+**Actualización E1b, 20 sep:** `spear_thrust` y `hit_take` ya están conectados
+al cuerpo a cuerpo real, además de los cuatro gestos de E1. Queda `flee` y
+la integración de las armas. Las menciones anteriores a esos dos clips como
+ausentes quedan superadas por [esta entrega](historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
+
 | Qué | Estado |
 |---|---|
 | **Clips de combate** (E1) | **Parcial, 20 sep:** tensar, soltar, golpear portón y caer hechos por código. Reacción de puerta hecha tras ampliación autorizada. Faltan `spear_thrust`, `hit_take` y `flee`. [Informe](historico/life-rounds/E1-disparo-unico.md) |

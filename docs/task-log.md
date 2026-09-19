@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · E1b: contacto y reacción del cuerpo a cuerpo
+
+Los siete modelos de la tanda anterior quedan aceptados por el dueño tal como
+están, sin publicación todavía. La siguiente prioridad abordada es E1:
+`spear_thrust` y `hit_take` procedurales, fechados por golpes reales en ambos
+bandos. Caída prioritaria, sin cambiar daño, alcance, cadencia ni motor.
+53 pruebas focalizadas, typecheck y lint; observación en 7 y 23, a 15 fps.
+[Contrato](encargos/encargo-cuerpo-a-cuerpo.md) y
+[evidencia y límites](historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
+E1 sigue parcial por `flee`; las armas siguen sin estar en las manos.
+**Bloqueo de empaquetado detectado:** `npm run bundle` exige promover `plough`
+y `fountain` desde que están catalogados. No se debilita la comprobación ni
+se publican implícitamente: la observación de esta ronda usa Vite local.
+
 ## 20 sep 2026 · Siete modelos producidos, todavía sin publicar
 
 Arco, lanza, flecha, escudo, portón, arado y fuente tienen receta, `.blend`,

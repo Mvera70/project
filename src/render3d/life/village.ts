@@ -31,7 +31,7 @@ import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { garrisonPlaces, type Manned } from './garrison';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
-import { fallenDefenders, stepMelee, type Defender } from './melee';
+import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
 import { createPhysics, type Physics } from './physics';
 import { commons } from './places';
 import {
@@ -79,7 +79,7 @@ const CATCH_RANGE = 2;
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
   /** Pose fechada por la vida, no por el mixer; `since` son pasos de jornada. */
-  combat?: { clip: 'bow_draw' | 'bow_loose' | 'fall'; since: number; facing: number };
+  combat?: { clip: 'bow_draw' | 'bow_loose' | 'spear_thrust' | 'hit_take' | 'fall'; since: number; facing: number };
   readonly residence?: HomeRoutine;
   readonly body: Body;
   readonly villager: VillagerId;
@@ -1718,6 +1718,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.combat = { clip: 'fall', since: hurt.downAt ?? steps,
             facing: dweller.combat?.facing ?? dweller.body.facing };
           dweller.body.vx = 0; dweller.body.vz = 0; dweller.motionSpeed = 0;
+          continue;
+        }
+        const melee = hurt === undefined ? null : meleePose(hurt, steps);
+        if (melee !== null) {
+          dweller.combat = melee;
           continue;
         }
         const archer = archers.find(a => a.post.place.id === dweller.dayPlan?.job?.place);

@@ -18,6 +18,7 @@ import type { Activity, Actor } from '../contracts';
 import type { ClipName } from '../clips';
 import { clipTime } from '../clips';
 import { LIFE_STEP } from './clock';
+import { meleePose } from './melee';
 import type { Prop } from './props';
 import type { Dweller, Village } from './village';
 
@@ -176,17 +177,19 @@ export function castOf(
     const { body } = raider;
     const speed = Math.hypot(body.vx, body.vz);
     const moving = speed > 0.05;
+    const melee = meleePose(raider, Math.max(0, life.steps - 1));
     const clip = raider.phase === 'down' ? 'fall'
-      : raider.phase === 'breaking' && raider.blowAt !== undefined ? 'gate_strike'
+      : melee !== null ? melee.clip
+        : raider.phase === 'breaking' && raider.blowAt !== undefined ? 'gate_strike'
         : moving ? 'walk' : 'idle';
-    const since = clip === 'fall' ? raider.downAt ?? 0 : raider.blowAt ?? 0;
+    const since = clip === 'fall' ? raider.downAt ?? 0 : melee?.since ?? raider.blowAt ?? 0;
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
     actors.push({
       id: body.id,
       x: body.x,
       z: body.z,
-      facing: body.facing,
+      facing: raider.phase === 'down' ? raider.meleeFacing ?? body.facing : melee?.facing ?? body.facing,
       // Andando o plantado. `walking`/`resting` son las dos únicas actividades
       // que un forastero puede tener: no trabaja, no vuelve a casa y no tiene
       // casa a la que volver.
@@ -195,7 +198,7 @@ export function castOf(
       load: null,
       poseSeconds: seconds,
       clipSeconds: clipTime(clip, raider.travelled ?? 0, combatSeconds, 0,
-        clip === 'fall' || clip === 'gate_strike' ? since * LIFE_STEP : undefined),
+        clip === 'fall' || clip === 'gate_strike' || melee !== null ? since * LIFE_STEP : undefined),
       travelled: raider.travelled ?? 0,
       cell: cellZ * width + cellX,
       named: false,

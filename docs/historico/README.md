@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [E1b, cuerpo a cuerpo](life-rounds/E1b-cuerpo-a-cuerpo.md): contacto y reacción
+  por hechos reales, sin cambiar la resolución de la pelea.
+
 - [Primera tanda de modelos, 20 sep](graphics-rounds/modelos-pendientes-2026-09-20.md):
   siete recetas y exportaciones verificadas; sin publicación en el juego.
 

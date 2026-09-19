@@ -2,6 +2,11 @@
 
 **Para la sesión de Blender.** 18 sep 2026.
 
+**Estado actualizado el 20 sep:** E1 y E1b entregan por código, sobre los huesos
+publicados, `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y
+`hit_take`. No son clips nuevos dentro del GLB. Queda `flee`; este encargo
+conserva debajo su formulación original. [E1b](../historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
+
 Este es el camino largo del proyecto: **hoy no existe ni un solo clip de
 pelea**, y sin ellos la batalla de `design.md` §1b no se puede ver por bien que
 funcione el motor. Todo lo demás de la fase 4 ya está o está en marcha —el mundo

@@ -14,7 +14,7 @@ import { VILLAGER_CLIPS, type ClipName } from './clips';
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
   'sit', 'talk', 'pray', 'hammer', 'chop', 'play', 'drink', 'sort',
-  'bow_draw', 'bow_loose', 'gate_strike', 'fall',
+  'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall',
 ];
 
 export function actionClips(idle: AnimationClip): AnimationClip[] {
@@ -56,6 +56,27 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         turn(`forearm.${side}`, x, t => -0.1 - 0.7 * t);
       }
       turn('spine', x, t => 0.3 * (1 - t));
+    } else if (name === 'spear_thrust') {
+      // Contacto en cero, como el daño real. Recuperación sin mover el cuerpo
+      // físico: un nuevo golpe puede interrumpir los 0,9 s del encargo.
+      const recoil = (t: number): number => Math.min(1, t * 3);
+      turn('upperarm.R', x, t => -1.55 + 1.1 * recoil(t));
+      turn('forearm.R', x, t => -0.08 - 0.8 * recoil(t));
+      turn('upperarm.L', x, t => -0.7 + 0.4 * recoil(t));
+      turn('forearm.L', x, () => -0.65);
+      turn('spine', x, t => 0.22 * (1 - recoil(t)));
+      turn('thigh.L', x, t => -0.2 * (1 - recoil(t)));
+      turn('shin.L', x, t => 0.25 * (1 - recoil(t)));
+    } else if (name === 'hit_take') {
+      const recoil = (t: number): number => (1 - t) * (1 - t);
+      turn('spine', x, t => -0.3 * recoil(t));
+      turn('head', x, t => -0.12 * recoil(t));
+      for (const side of ['L', 'R']) {
+        turn(`upperarm.${side}`, x, t => -0.8 * recoil(t));
+        turn(`forearm.${side}`, x, t => -0.9 * recoil(t));
+      }
+      turn('thigh.R', x, t => 0.15 * recoil(t));
+      turn('shin.R', x, t => 0.2 * recoil(t));
     } else if (name === 'fall') {
       const settle = (t: number): number => t * t * (3 - 2 * t);
       // De espaldas, brazos separados y rodillas flexionadas; el cuerpo gira

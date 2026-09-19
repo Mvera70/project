@@ -21,8 +21,8 @@
 // es que ahora hay una carrera de verdad —los golpes contra las flechas— y lo
 // que salga de ella es lo que pasa.
 //
-// Lo que sigue sin hacer: pelear cuerpo a cuerpo con quien defiende (D4, que
-// necesita los clips de E1) y quemar lo que hay dentro (E4, decisión del dueño).
+// D4 resuelve el cuerpo a cuerpo en melee.ts; E1 muestra contacto, reacción
+// y caída. Quemar lo que hay dentro sigue siendo E4, decisión del dueño.
 //
 // **Navegado, no guionizado**, por la lección que costó una tarde en IA-5: la
 // primera versión del lobo iba en línea recta con `seek`/`avoid` y se atascaba
@@ -37,6 +37,7 @@ import { reachableFrom, nearestReachable } from './terrain';
 import { blockedAt, integrate, turnTo } from './body';
 import { LIFE_STEP } from './clock';
 import { pathTo } from './navigate';
+import type { MeleeGesture } from './melee';
 import type { Waypoint } from './navigate';
 
 /**
@@ -54,7 +55,7 @@ import type { Waypoint } from './navigate';
  */
 export type RaiderPhase = 'coming' | 'standing' | 'breaking' | 'inside' | 'leaving' | 'gone' | 'down';
 
-export interface Raider {
+export interface Raider extends MeleeGesture {
   /** Instantes de hechos, en el reloj de pasos de esta jornada. */
   downAt?: number;
   blowAt?: number;

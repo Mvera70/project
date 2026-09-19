@@ -43,14 +43,17 @@ export interface ClipMotion {
 }
 
 export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'play' | 'drink' | 'sort'
-  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'fall';
+  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall';
 
 /** Gestos de combate: su reloj procede del hecho, nunca del primer pintado. */
 export function combatClip(clip: string): boolean {
-  return clip === 'bow_draw' || clip === 'bow_loose' || clip === 'gate_strike' || clip === 'fall';
+  return clip === 'bow_draw' || clip === 'bow_loose' || clip === 'gate_strike'
+    || clip === 'spear_thrust' || clip === 'hit_take' || clip === 'fall';
 }
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
+  spear_thrust: { seconds: 0.9, loop: false, strideLength: null },
+  hit_take: { seconds: 0.5, loop: false, strideLength: null },
   bow_draw: { seconds: 1.5, loop: true, strideLength: null },
   bow_loose: { seconds: 0.6, loop: false, strideLength: null },
   // Un golpe por segundo en raiders.ts; la recuperación ocupa el resto.
