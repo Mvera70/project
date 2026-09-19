@@ -3,7 +3,7 @@
 **16 septiembre 2026 · Propuesta, sin implementar ni calibrar.** Encargo del
 dueño: responder a las cuatro referencias solicitadas por Claude. Base leída:
 `9e22079`, rama `rework/parada-a-media`, con trabajo de IA concurrente sin commit.
-Los documentos normativos siguen siendo `../design.md` y `../rework.md`.
+Los documentos normativos siguen siendo `../design.md` y `../historico/rework.md`.
 
 Abre [el cuaderno visual](index.html) en un navegador. Funciona sin red; contiene
 24 viñetas, tres escenas a escala sobre el encuadre existente, diez plantas y
@@ -145,7 +145,7 @@ especial/camino; pequeños rectángulos = fundación; trazo discontinuo = coraz�
 | `wide_ford` | Banda somera ancha, dos orillas abiertas y camino exterior continuo | No puente dibujado encima de agua que el navegador no puede cruzar |
 
 Los cuatro primeros son rasgos existentes; sus nuevas señales visuales son
-propuestas. Los seis últimos proceden de `rework.md` R-3 y siguen pendientes.
+propuestas. Los seis últimos proceden de `docs/historico/rework.md` R-3 y siguen pendientes.
 No todos sus efectos mecánicos están implementados por tener aquí un dibujo.
 
 **Composición de parejas.** Aplicar primero hidrología, después relieve/cobertura,

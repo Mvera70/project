@@ -13,7 +13,7 @@
 //     people puts everything into the fields, never builds, and the player
 //     watches a valley that does not change — the cardinal sin of this game.
 //
-// **Y desde el esquema 4 esto obedece al jugador** (`docs/plan-juego.md`, E1).
+// **Y desde el esquema 4 esto obedece al jugador** (`docs/historico/plan-juego.md`, E1).
 // Hasta aquí era una fórmula cerrada: la aldea trabajaba exactamente los campos
 // que su población necesitaba y repartía lo que sobraba en una proporción fija.
 // Nadie decidía nada entre una encrucijada y la siguiente, que llegan dos veces
@@ -92,7 +92,7 @@ export function allocateLabour(state: GameState): Allocation {
   // (15 sep 2026) esto salió el primer día: dos personas menos la reserva de
   // obra son 1,7, y 1,7 entre `MIN_FIELD_CREW` = 2 es cero campos — la pareja
   // no cosechaba nada y moría de hambre en el año cuatro en cuatro semillas de
-  // seis (`tools/founding-report.ts`). La regla de v2.14 sigue para todo lo
+  // seis (`tools/reports/founding-report.ts`). La regla de v2.14 sigue para todo lo
   // demás; lo que cambia es que la reserva de obra no puede dejar a una aldea
   // de dos sin su único campo, porque entonces no es una reserva, es la ruina.
   const crewable = Math.max(

@@ -45,14 +45,14 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: 'node tools/subpath-server.mjs',
+      command: 'node tools/pwa/subpath-server.mjs',
       url: 'http://127.0.0.1:4180/project/',
       reuseExistingServer: false,
       timeout: 120_000,
     },
     {
       // The same build with the caching headers Pages really sends (§13.4).
-      command: 'node tools/stale-server.mjs',
+      command: 'node tools/pwa/stale-server.mjs',
       url: 'http://127.0.0.1:4181/',
       reuseExistingServer: false,
       timeout: 120_000,

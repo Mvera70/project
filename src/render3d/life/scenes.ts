@@ -411,7 +411,7 @@ export const SCENE_EARSHOT = EARSHOT;
 export const SCENE_COOLDOWN = COOLDOWN;
 
 // ---------------------------------------------------------------------------
-// IA-2 · Saludo de paso. docs/life-ai-proposal.md §7: «Mirada, gesto, siguen
+// IA-2 · Saludo de paso. docs/historico/life-ai-proposal.md §7: «Mirada, gesto, siguen
 // andando.» A diferencia de `chat`/`shove`/`brawl`, esto no para a nadie: es
 // el gesto más ligero del catálogo, y por eso sólo se ofrece cuando `propose`
 // ya ha mirado la pareja y no ha encontrado ni charla ni encontronazo
@@ -506,7 +506,7 @@ export function playGreet(a: Dweller, b: Dweller): void {
 /** A qué distancia se saludan dos que se cruzan de largo. */
 export const GREET_REACH = GREET_RANGE;
 // ---------------------------------------------------------------------------
-// IA-2 · Cesión de paso. docs/life-ai-proposal.md §7: «Uno espera, otro pasa,
+// IA-2 · Cesión de paso. docs/historico/life-ai-proposal.md §7: «Uno espera, otro pasa,
 // primero continúa.» Es de las cosas que más se notan en pantalla, porque hoy
 // dos que se cruzan en un hueco estrecho se empujan sin más (`separate`,
 // `steering.ts`) en vez de leerse como dos personas que se ceden el paso.
@@ -661,7 +661,7 @@ export function playYield(yielding: Yielding, yielder: Dweller): void {
 }
 
 // ---------------------------------------------------------------------------
-// IA-6 · La riña de la plaza. docs/design.md §7.10, docs/rework.md §4 (R-2,
+// IA-6 · La riña de la plaza. docs/design.md §7.10, docs/historico/rework.md §4 (R-2,
 // punto 1), docs/visual-reference/README.md §2.
 //
 // **Esta es la única de las cuatro historias de IA-6 con dato completo**: R-1

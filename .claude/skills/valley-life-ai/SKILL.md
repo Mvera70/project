@@ -104,7 +104,7 @@ Después:
    burbujas y clip aplicado. Para la noche, usa `--live --speed 64` y cuenta
    residentes durmiendo, pendientes, penetraciones, errores y deriva de malla.
 4. Repite al menos dos semillas y anota semilla, año, fase, fps, velocidad,
-   tick y cualquier pendiente en `docs/life-rounds/IA-<n>.md`.
+   tick y cualquier pendiente en `docs/historico/life-rounds/IA-<n>.md`.
 5. Revisa capturas consecutivas de cada gesto nuevo y una toma de un niño y un
    mayor. Una captura aislada no demuestra que la animación se use.
 

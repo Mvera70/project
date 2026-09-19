@@ -189,7 +189,7 @@ que es lo que hace un dedo que busca una casa. Pasa en 2,6 s.
 ## 5. Verificación
 
 - `npm run typecheck` y `npm run lint` limpios.
-- **Los trece recorridos de interfaz en verde** (`tools/valley.shots.ts`), tres
+- **Los trece recorridos de interfaz en verde** (`tools/shots/valley.shots.ts`), tres
   de ellos declarados (`test.fail()`) desde antes de esta ronda.
 - 76 pruebas rápidas de interfaz en los ocho ficheros tocados, con 31 nuevas
   (20 de la cola, 11 de las superposiciones) más 3 de la medida del hueco.

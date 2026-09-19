@@ -135,7 +135,13 @@ describe('B1 · lo que se llevan', () => {
     // La razón de ser de A1 y A2 vista desde fuera: cerrar el pueblo cambia lo
     // que un saqueador se lleva. Dos copias del mismo valle en el mismo
     // instante, una con su portón y otra sin nada.
-    const state = foundGame(36);
+    // **La semilla pasa de la 36 a la 7** (19 sep 2026). Lo que esta prueba
+    // mide es que un valle cerrado pierde menos que uno abierto, y la semilla
+    // es sólo el soporte: con el ritmo nuevo (§8.6) la 36 llega a los cuarenta
+    // años **tomada y sin cerco**, así que no había portón que quitarle y lo
+    // que fallaba era el andamio, no la propiedad. La 7 llega con portón y 59
+    // piezas de muralla, medido.
+    const state = foundGame(7);
     run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
     state.village.silver = 200;
     state.threat.comingTick = state.tick + 1;
@@ -145,7 +151,7 @@ describe('B1 · lo que se llevan', () => {
     open.buildings = open.buildings.filter((b) => b.kind !== 'gate');
     const closed = structuredClone(state);
     expect(closed.buildings.some((b) => b.kind === 'gate' && b.lostTick === null),
-      'la semilla 36 tiene portón a los cuarenta años').toBe(true);
+      'la semilla 7 tiene portón a los cuarenta años').toBe(true);
 
     run(open, 2, 'prudent', CATALOG);
     run(closed, 2, 'prudent', CATALOG);
@@ -248,7 +254,7 @@ describe('C1 · lo que se da para aguantar', () => {
   // aldea decide. Tres medios y **tres ejes distintos** — aguantar el golpe,
   // verlos venir, que no vengan — porque tres medios que hicieran lo mismo con
   // números distintos serían un solo medio con tres precios
-  // (`plan-medios.md` §3.2).
+  // (`docs/historico/plan-medios.md` §3.2).
   //
   // Medido al cerrar C1 en ocho semillas × 80 años, contra el mismo valle sin
   // nada: las armas bajan el botín de 5 817 a **4 386** (un cuarto menos), los

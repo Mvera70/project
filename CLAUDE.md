@@ -110,7 +110,7 @@ python tools/graphics/film-sheet.py artifacts/graphics/film/x
                      # cada cuerpo en cada uno (`window.__valleyLife`), y de ahí una
                      # tira de contactos y un informe de anomalías. Es la única forma
                      # de medir la capa de vida **como la ejecuta el navegador**: el
-                     # informe de fuera (`tools/life-report.ts`) no vio nunca que una
+                     # informe de fuera (`tools/reports/life-report.ts`) no vio nunca que una
                      # de cada cinco muestras era alguien de pie creyendo que iba a
                      # algún sitio (IA-9)
 node tools/graphics/press-kit.mjs  # **el paquete de prensa**: todas las pantallas y
@@ -124,7 +124,13 @@ npm run test:shots   # recorridos de interfaz en Canvas (Playwright)
 npm run test:pwa     # instalable y sin conexión, sobre el build real
 npm run chronicle -- --seed 7 --years 60   # runner del hito 0
 npm run eligibility  # por qué medio catálogo no sale nunca
+npx tsx tools/reports/pace-report.ts       # la escalera del juego en horas de reloj a ×1
 ```
+
+**El resto de las herramientas está en `tools/README.md`**, repartidas en seis
+carpetas —`reports/`, `shots/`, `pwa/`, `graphics/`, `ui/`, `art/`— con qué
+mide cada una y cómo se lanza. No hay herramientas sueltas: una que no tenga
+fila en ese catálogo no está terminada.
 
 **La puerta de un módulo:** `npm run typecheck && npm run test:all && npm run lint`.
 
@@ -156,7 +162,7 @@ se sostiene. La puerta de vuelta se queda por si acaso, no porque haga falta.
 **Cerrado:** el motor (M-01 a M-39), el render (G-00 a G-12), la interfaz (U-01 a
 U-14), la vida del valle (V-00 a V-10, V-12, V-13, V-14).
 
-**Y la versión 2.0, del 15 sep 2026, entregada** (`docs/plan-juego.md`, con sus
+**Y la versión 2.0, del 15 sep 2026, entregada** (`docs/historico/plan-juego.md`, con sus
 medidas en `docs/handover.md` §2.1). El juego tiene un verbo: tres palancas de
 órdenes permanentes —cuánto se siembra, dónde van las manos que sobran, qué se
 levanta antes—, la aldea contesta cuando no puede obedecer, cada cifra dice
@@ -188,7 +194,7 @@ este orden y pedidos por él: el menú de inicio (U-10, hecho: `screens/title.ts
 sólo se configura el número del valle), el inicio guiado desde lo alto (U-11,
 hecho: `flyIn` en el renderer y dos pistas en `app.ts`), el reloj con horas
 (U-12, hecho) y las tormentas con rayos (U-13, hecho: §10.7). **Los cinco
-están entregados**; lo que queda por delante está en `docs/next-plan.md`,
+están entregados**; lo que queda por delante está en `docs/historico/next-plan.md`,
 sección «Para quien siga».
 
 **Y con el reloj, el tick cambió de duración: una semana son catorce minutos a
@@ -210,17 +216,17 @@ los dos, no sus `id`, y `quarrelOf` no se puede llamar desde `life/` porque
 consume azar del motor. Servirla es un cambio del motor. **Desde R-1 hay un
 atajo:** la riña de la plaza (`quarrel_in_the_square`) guarda los `id` de los
 dos en `state.happenings[n].who`, y `staging.ts` puede leerlos sin tocar el
-motor (`docs/rework.md` §4, R-2).
+motor (`docs/historico/rework.md` §4, R-2).
 
 **Lo que decide si hay juego no es gráfico.** El jugador toma entre siete y doce
 decisiones en cuarenta años y diez de las veinte plantillas del catálogo no
-salieron ni una vez en cinco partidas (`docs/findings-drama.md`). **La medida
+salieron ni una vez en cinco partidas (`docs/medidas/findings-drama.md`). **La medida
 sigue valiendo; el plan de arreglarla, no** (ver arriba: el rework).
 
 **Reglas que cuestan tiempo cada vez que se olvidan:**
 
 - **Un umbral que decide *cuándo* pasa algo se mira en horas de reloj, no en
-  años de juego.** `npx tsx tools/pace-report.ts` imprime la escalera del juego
+  años de juego.** `npx tsx tools/reports/pace-report.ts` imprime la escalera del juego
   en horas a ×1, que es la velocidad por omisión y la unidad en la que el dueño
   del diseño pone los objetivos («la edad de piedra en 60/70 horas»). A catorce
   minutos por semana, **una hora real es un mes de juego**. Medirlo en años es
@@ -274,7 +280,7 @@ muralla tumbando al 30 % de la partida, ninguno.
 
 **Lo que le falta a la fase 4 es arte, no mecánica.** No existe un solo clip de
 pelea: el arquero se pinta con `idle`, el que cae se queda de pie, y el golpe
-contra la puerta no se ve. El encargo está en `docs/encargo-combate.md` y el
+contra la puerta no se ve. El encargo está en `docs/encargos/encargo-combate.md` y el
 inventario completo en `docs/encargos-3d.md`. **Y el gore, el fuego y la escena
 del saqueo (D6, E4) son decisión del dueño del diseño y están sin tomar.**
 
@@ -287,10 +293,10 @@ se validan y no se sustituyen por pruebas. Siguen descritos en `docs/design.md`
 **`docs/task-log.md` es el cuaderno de tareas: dónde está el rework, qué está en
 vuelo, qué cifras mandan y qué está abierto.** Se lee antes que nada y se
 actualiza antes de cerrar cualquier ronda — existe porque sin él cada sesión
-reconstruía el estado leyendo commits. `docs/rework.md` dice el plan;
+reconstruía el estado leyendo commits. `docs/historico/rework.md` dice el plan;
 `task-log.md` dice el punto exacto.
 
-**El rework está en marcha, y `docs/rework.md` es el plan que manda.** El
+**El rework está en marcha, y `docs/historico/rework.md` es el plan que manda.** El
 dueño lo pidió el 15 sep («mucho más aleatorio y con mucha más vida … cargárselo
 casi entero») y la primera fase está en `main`: **R-1, los sucesos del valle**
 (v3.75; §7.10, §12.10, paso 2b de §4.2). Cada semana el motor tira en el flujo
@@ -298,14 +304,14 @@ casi entero») y la primera fase está en `main`: **R-1, los sucesos del valle**
 bajo la nieve, fiesta de la cosecha, riña en la plaza, oso, niño perdido,
 forastero— y el que sale cambia el estado, se cuenta y se ve. Medido: trece al
 año, rencores donde antes no había ninguno. **Lo siguiente es la IA de animales
-y personas** («atraviesan paredes, dan vueltas sobre sí mismos»: `rework.md`
+y personas** («atraviesan paredes, dan vueltas sobre sí mismos»: `docs/historico/rework.md`
 §3, con diagnóstico, medida y orden de arreglo), después R-2/R-5 (gente
 distinta, escenas) y R-3 (diez rasgos de valle). Las encrucijadas se quedan y
 **no se afinan**.
 
 **Y desde el 17 sep 2026, la parada de las mecánicas: el juego de los
 medios.** El dueño lo dijo sin rodeos —«ahora mismo no es nada divertido; lo
-único bonito es mirar cómo avanza el pueblo»— y `docs/plan-medios.md` lo mide:
+único bonito es mirar cómo avanza el pueblo»— y `docs/historico/plan-medios.md` lo mide:
 las tres palancas de órdenes de v2.0 **son una trampa** (sólo vive la postura
 de fábrica; `timber` a 0,2 mata 11 aldeas de 16), las encrucijadas pesan (42
 personas contra 6) pero no se sienten, y la aldea prospera sola porque §1 lo
@@ -315,40 +321,58 @@ mete cosas en el valle —un arado, unos cerdos, un barril— pagándolas con lo
 del valle, y la aldea decide qué hace con ellas.** Piedra y plata entran como
 existencias, el ánimo se enseña como cara, las palancas se retiran, nada se
 coloca con el dedo, y el mundo sólo rompe lo que el jugador cargó. **Los
-briefs están en `docs/rework.md` §4b (M-0 a M-4) y van antes que R-2, R-5 y
+briefs están en `docs/historico/rework.md` §4b (M-0 a M-4) y van antes que R-2, R-5 y
 R-3.** La medida que decide si el patrón vale es la de M-2.
 
 Tres cosas del dueño que mandan sobre cualquier otra regla de este fichero:
 **el caos es el juego** («que haya partidas que se rompan es la idea»: las dos
-puertas del rayo que R-1 puso hay que quitarlas, `rework.md` §2.6); **los planes
+puertas del rayo que R-1 puso hay que quitarlas, `docs/historico/rework.md` §2.6); **los planes
 de prueba y el nivelado van después**, la puerta es la suite rápida y las
 jornadas y nada más; y **nueve jornadas están rojas por la trayectoria nueva**
-(`rework.md` §2.8, cada una con su causa), sin tocar porque pidió parar y
+(`docs/historico/rework.md` §2.8, cada una con su causa), sin tocar porque pidió parar y
 documentar. **Y desde v3.75 la aldea de veinte años de cualquier semilla ya no
 es la de antes** (16 personas en la semilla 7): un cambio del motor mueve todas
 las pruebas que midan una aldea hecha, y cada listón movido lleva su causa
-escrita (`rework.md` §2.7).
+escrita (`docs/historico/rework.md` §2.7).
 
 ---
 
 ## Dónde está cada cosa
 
+**Y desde el 19 sep 2026 está repartido en carpetas, para no tener que
+rebuscar.** Lo pidió el dueño del diseño: «se nos va de las manos la
+organización». La regla es de una línea:
+
+```
+docs/              lo vivo: se lee y se actualiza
+docs/medidas/      evidencia medida una vez; no se toca salvo para remedir
+docs/encargos/     lo que le falta al arte, con medidas y presupuesto
+docs/historico/    lo que entregó lo suyo; se lee por el porqué, nunca por el qué hacer
+tools/README.md    el catálogo de las seis carpetas de herramientas
+```
+
+**Mover un documento es mover sus citas.** Se hizo con 398 en 130 ficheros, y
+la regla queda: si mueves uno, reescribes sus referencias **en la misma ronda**.
+Los dos índices —`docs/README.md` y `docs/historico/README.md`— dicen qué es
+cada cosa y qué entregó.
+
 | Qué necesitas saber | Dónde |
 |---|---|
 | **Qué es cada documento y si sigue vivo** | **`docs/README.md` — el mapa de la documentación** |
 | **Dónde está el rework ahora mismo, y qué toca** | **`docs/task-log.md` — se lee primero y se actualiza al cerrar cada ronda** |
+| **Qué herramienta mide qué, y cómo se lanza** | **`tools/README.md` — el catálogo; ninguna herramienta vive fuera de él** |
 | Las reglas vigentes | `docs/design.md` — §1–4 primero |
 | Cómo se llegó a ellas | `docs/changelog.md` — el motivo de cada revisión |
 | En qué estado exacto está todo, y qué trampas ya costaron tiempo | `docs/handover.md` |
-| Qué se hace ahora, con briefs listos para agentes | `docs/next-plan.md` |
-| El plan que sacó al proyecto del atasco, y qué entregó | `docs/plan-juego.md` |
 | **El plan hacia la meta: puntos, fases, prioridad, dificultad y a qué agente** | **`docs/plan-meta.md`** |
 | **Lo que el juego no enseña todavía** — mallas, animaciones y **mecánicas que no se ven**; se apunta **en la misma ronda** que se diseña | **`docs/encargos-3d.md`** |
 | Qué falta en total, y qué no puede hacer ningún agente | `docs/roadmap.md` |
 | Cómo se delega y se audita | `docs/agents.md` |
-| Por qué el catálogo no sale | `docs/findings-drama.md` |
-| Informes de ronda | `docs/graphics-rounds/`, `docs/life-rounds/` |
 | Quién es dueño de qué, si hay dos sesiones | `docs/dos-sesiones.md` |
+| Por qué el catálogo no sale | `docs/medidas/findings-drama.md` |
+| Los encargos de arte con documento propio | `docs/encargos/` |
+| Los planes que ya entregaron, y qué entregó cada uno | `docs/historico/README.md` |
+| Informes de ronda | `docs/historico/graphics-rounds/`, `docs/historico/life-rounds/` |
 
 **Antes de tocar `life/`, lee E.1, E.3, E.6 y E.7 del Anexo E** — el diagnóstico,
 los seis innegociables, por qué la demo era peor que el descarte, y las trampas
@@ -370,7 +394,7 @@ primer tick y una sola es ruido. Suma varias.
 Y cuando algo no llega, **se escribe lo que se midió y se deja la prueba como
 `it.fails` con la propiedad del brief intacta**, en vez de bajar el listón. Está
 hecho así en `life-props.test.ts`, en `life-staging.test.ts` y en los recorridos
-de `valley.shots.ts`, y es el patrón a repetir.
+de `tools/shots/valley.shots.ts`, y es el patrón a repetir.
 
 ---
 

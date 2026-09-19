@@ -1,5 +1,5 @@
 // M-2 · Los medios: lo que el jugador mete en el valle.
-// `docs/plan-medios.md` §3, brief en `docs/rework.md` §4b.
+// `docs/historico/plan-medios.md` §3, brief en `docs/historico/rework.md` §4b.
 //
 // **El principio, con las palabras del dueño del diseño** (17 sep 2026): «es
 // como si cogieras a un grupo de personas y le dieses una pala, o un martillo.
@@ -10,7 +10,7 @@
 // de sucesos, las opiniones—.
 //
 // Es lo que sustituye a las tres palancas de órdenes de la versión 2.0, y el
-// motivo está medido en `plan-medios.md` §1: una orden global que la aldea
+// motivo está medido en `docs/historico/plan-medios.md` §1: una orden global que la aldea
 // obedece a ciegas mata cuando el jugador se equivoca —a dos muescas del reposo
 // moría media aldea, y tarde, sin que nada avisara—, y aprender eso enseña a no
 // tocar. Un medio no puede hacer eso porque no manda sobre nadie.
@@ -80,7 +80,7 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
   pigs: { cost: { grain: 30, silver: 14 }, trait: 'sty', herd: { kind: 'pigs', count: 2 } },
   // **Un barril.** Una fiesta esta semana: ánimo de golpe, bodas después… y
   // riñas, que es lo que una fiesta también trae. Es el medio que le da al ánimo
-  // el reloj del jugador (`plan-medios.md` §6.2).
+  // el reloj del jugador (`docs/historico/plan-medios.md` §6.2).
   ale: { cost: { grain: 25, silver: 10 }, feast: true },
   // **Un hacha buena.** Cada leñador trae más leña, así que la obra y la piedra
   // llegan antes; y el bosque del corazón retrocede, que es de donde la riada
@@ -106,7 +106,7 @@ export const MEANS_SPEC: Readonly<Record<MeansId, MeansSpec>> = {
   // **Tres medios y tres ejes distintos, y eso es lo que los hace una
   // elección**: uno aguanta el golpe, otro lo ve venir y el tercero hace que no
   // venga. Si los tres hicieran lo mismo con números distintos serían un solo
-  // medio con tres precios, que es exactamente lo que `plan-medios.md` §3.2
+  // medio con tres precios, que es exactamente lo que `docs/historico/plan-medios.md` §3.2
   // prohíbe. Y cada uno tiene su cara mala, como todos los demás desde M-2.
   // -------------------------------------------------------------------------
 

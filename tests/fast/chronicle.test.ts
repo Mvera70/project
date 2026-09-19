@@ -944,7 +944,7 @@ describe('Un hueco de reparto llega a la pantalla · declarado', () => {
   // candidatos cambia el flujo `crossroads` y con él la trayectoria de todas
   // las semillas: medido, la cadena de pases de V-09 pasó de cinco a ninguna
   // de tres en treinta muestras. Va con el carril del ritmo de decisión, donde
-  // el recalibrado está presupuestado (`docs/next-plan.md`).
+  // el recalibrado está presupuestado (`docs/historico/next-plan.md`).
 
   it.fails('ninguna entrada llega con un parámetro sin rellenar', () => {
     for (const seed of [7, 11, 23, 41]) {

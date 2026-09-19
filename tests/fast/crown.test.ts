@@ -1,4 +1,4 @@
-// K-1 · La corona. `docs/plan-rey.md`.
+// K-1 · La corona. `docs/historico/plan-rey.md`.
 //
 // **Lo que se guarda aquí es que dar la corona sea un acto del jugador como dar
 // un arado**: se paga con lo del valle, se apunta, se cuenta, y **no mueve una

@@ -272,7 +272,7 @@ export const LABOUR = {
    * CUTTER_SHARE` es el reparto fijo que la fórmula hacía sola. No es timidez:
    * es lo que permite comprobar que meter las palancas no ha movido el balance
    * —la suite tiene que dar lo mismo con esta postura— y por tanto lo que hace
-   * medible cualquier otra. Ver `docs/plan-juego.md`, decisión D-6.
+   * medible cualquier otra. Ver `docs/historico/plan-juego.md`, decisión D-6.
    */
   RESTING_FIELDS: 1,
   RESTING_TIMBER: 0.4, // el mismo valor que CUTTER_SHARE, y por eso está al lado
@@ -315,7 +315,7 @@ export const WEATHER = [
  * tirada. Vive aquí porque ningún número del juego se inventa en otro sitio.
  *
  * Las probabilidades son **por jornada de sol**, que desde v3.72 es un día.
- * Medidas con `tools/sky-report.ts` antes de fijarse: en un año normal salen
+ * Medidas con `tools/reports/sky-report.ts` antes de fijarse: en un año normal salen
  * unas dieciséis tormentas y sesenta y siete días de cielo cerrado de
  * trescientos treinta y seis, o sea una tormenta cada tres semanas y lluvia una
  * quinta parte del tiempo. Un valle ruinoso llueve el doble que uno abundante, y
@@ -361,7 +361,7 @@ export const SKY = {
  * pasa sin que nadie decida nada (`world/fate.ts`). Los pesos son relativos
  * entre los sucesos que **pueden** pasar esa semana; la estación, el cielo y
  * los rasgos del valle abren, cierran y pesan. Todo TUNE, y todo medido con
- * `tools/fate-report.ts` antes de escribirse aquí.
+ * `tools/reports/fate-report.ts` antes de escribirse aquí.
  */
 export const FATE = {
   // TUNE: la probabilidad semanal de que pase algo, y el hueco mínimo entre
@@ -426,7 +426,7 @@ export const FATE = {
     stranger_passes: 1,
     // M-0 · las visitas del camino. El buhonero ya pesaba 2 y ése es el
     // listón: una visita tiene que ser una cosa que pasa, no una rareza.
-    // TUNE: medido con `tools/agency-report.ts` contra «la plata entra y sale
+    // TUNE: medido con `tools/reports/agency-report.ts` contra «la plata entra y sale
     // al menos una vez por década» (brief M-0).
     factor_visit: 2,
     drover_visit: 1.5,
@@ -474,7 +474,7 @@ export const FATE = {
   FEAST_MORALE: 6,
   FEAST_FAITH: 3,
   // TUNE: la riña en la plaza baja la opinión mutua de los dos que peor se
-  // llevan. Es el empujón que `findings-drama.md` §1 dice que nadie daba: sin
+  // llevan. Es el empujón que `docs/medidas/findings-drama.md` §1 dice que nadie daba: sin
   // él ninguna opinión llegaba a −50 y no había rencores nunca.
   QUARREL_OPINION: -12,
   QUARREL_MORALE: -1,
@@ -487,7 +487,7 @@ export const FATE = {
   CHILD_MORALE: -3,
   STRANGER_MORALE: 1,
   // ---------------------------------------------------------------------------
-  // M-1 · **El mundo contesta a lo que hay.** `docs/rework.md` §4b.
+  // M-1 · **El mundo contesta a lo que hay.** `docs/historico/rework.md` §4b.
   //
   // No es «el mundo mata solo»: la decisión 4 del dueño del diseño dice que una
   // aldea no se muere sin motivo y que de primeras no se muere —«que caiga un
@@ -497,7 +497,7 @@ export const FATE = {
   // jugador ha metido**: más ganado, más lobos; más bosque talado, más riada;
   // más grano y más plata, más ladrones y más señor.
   //
-  // Todos TUNE, medidos con `tools/agency-report.ts`: un valle intocado tiene
+  // Todos TUNE, medidos con `tools/reports/agency-report.ts`: un valle intocado tiene
   // que morir lo mismo que antes de M-1, y un valle cargado de animales y con
   // el bosque talado, bastante más.
   // ---------------------------------------------------------------------------
@@ -548,7 +548,7 @@ export const FATE = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// M-0 · Las ofertas del camino y el diezmo. `docs/plan-medios.md` §6
+// M-0 · Las ofertas del camino y el diezmo. `docs/historico/plan-medios.md` §6
 // ---------------------------------------------------------------------------
 
 /**
@@ -556,7 +556,7 @@ export const FATE = {
  * lo medido y no de un gusto: la leña **no es escasa** en este juego —el
  * comentario del factor de grano en `catalog/trade.ts` midió existencias de
  * 507 a 43 000 en cien años— y el grano sobrante es corriente (2 600 de
- * mediana a los sesenta años, `plan-medios.md` §1). Así que lo que vale es la
+ * mediana a los sesenta años, `docs/historico/plan-medios.md` §1). Así que lo que vale es la
  * **plata**, que no se produce dentro, y los tratos se miden en ella.
  */
 export const OFFER = {
@@ -609,7 +609,7 @@ export const OFFER = {
  * diseño, 17 sep 2026: «creo que no varía nada, siempre está en 55, 50, 60»).
  *
  * Y medido, la cifra engañaba: en sesenta años el ánimo va de 6 a 79 y pasa el
- * 17 % de las semanas por debajo de 10 (`docs/plan-medios.md` §6.2). Lo que
+ * 17 % de las semanas por debajo de 10 (`docs/historico/plan-medios.md` §6.2). Lo que
  * pasa es que vive a escala de años —lo mueve la cosecha, una vez— y se mira a
  * escala de semanas, así que un número que no se mueve en una sesión se lee
  * como un número muerto. Una cara dice lo mismo sin prometer precisión.
@@ -625,7 +625,7 @@ export const MOOD_FACE = {
 } as const;
 
 // ---------------------------------------------------------------------------
-// M-2 · Los medios: lo que el jugador mete en el valle. `plan-medios.md` §3
+// M-2 · Los medios: lo que el jugador mete en el valle. `docs/historico/plan-medios.md` §3
 // ---------------------------------------------------------------------------
 
 /**
@@ -768,7 +768,7 @@ export const THREAT = {
    * Hacía falta por la forma, no por el balance: sin techo, el clan crecía dos
    * al año para siempre y a los ochenta años bajaban **partidas de 152
    * hombres** contra aldeas de cuarenta y ocho (medido con
-   * `tools/threat-report.ts`). Eso no es el valle de al lado, es una invasión.
+   * `tools/reports/threat-report.ts`). Eso no es el valle de al lado, es una invasión.
    */
   STRENGTH_CAP: 60,
   /**
@@ -792,7 +792,7 @@ export const THREAT = {
   /**
    * El valor a partir del cual la aldea tienta del todo. 120, y sale de medir
    * qué vale un valle hecho: a los cuarenta años la mediana ronda ese número
-   * (`tools/threat-report.ts`). Por debajo, la probabilidad baja en proporción.
+   * (`tools/reports/threat-report.ts`). Por debajo, la probabilidad baja en proporción.
    */
   WORTH_FULL: 120,
   /** La probabilidad anual de que bajen, con la aldea tentando del todo. */
@@ -1055,7 +1055,7 @@ export const MIGRATION = {
   // antes, llega gente con esta probabilidad al año en vez de con
   // `ARRIVE_CHANCE`. Un valle con sitio, agua y un techo atrae; es lo que
   // convierte una pareja en aldea en la primera década y no en la tercera.
-  // Medido con `tools/founding-report.ts` antes de fijarlo.
+  // Medido con `tools/reports/founding-report.ts` antes de fijarlo.
   ARRIVE_SMALL_BELOW: 20,
   ARRIVE_CHANCE_SMALL: 0.7,
   // TUNE: y el ánimo que se le pide a una aldea pequeña para que llegue gente.
@@ -1392,7 +1392,7 @@ export const FORAGE = {
 } as const;
 
 /**
- * Cuánto mueve cada rasgo del valle. E5 de `docs/plan-juego.md`.
+ * Cuánto mueve cada rasgo del valle. E5 de `docs/historico/plan-juego.md`.
  *
  * TUNE, los cuatro. Buscados para que **cambien la postura que funciona** y no
  * sólo el ritmo: un 15 % de cosecha es la diferencia entre sembrar de más y no
@@ -1430,7 +1430,7 @@ export const TRAITS = {
 // ---------------------------------------------------------------------------
 // §6.7 · El rey (K-1, 18 sep 2026)
 //
-// El plan entero está en `docs/plan-rey.md`. Aquí sólo las cifras, y cada una
+// El plan entero está en `docs/historico/plan-rey.md`. Aquí sólo las cifras, y cada una
 // con de dónde sale: ninguna se inventa, todas se apoyan en un número que el
 // juego ya tenía medido.
 // ---------------------------------------------------------------------------
@@ -1622,7 +1622,7 @@ export const WORLD = {
    * El valle jugable, en celdas. Una celda son tres metros (D.6.2).
    *
    * **Setenta y dos por ciento doce desde el mapa grande** (paso 3,
-   * `docs/next-plan.md`): cuatro veces el mapa de 36 × 56 que el juego tuvo
+   * `docs/historico/next-plan.md`): cuatro veces el mapa de 36 × 56 que el juego tuvo
    * desde M-13. Lo pidió el dueño del diseño con estas palabras —«el mapa sigue
    * siendo muy pequeño, dijimos que iba a ser mucho más grande; el valle es el
    * centro del mapa pero debe ser más amplio»— y lo que hace que se pueda hacer
@@ -1718,7 +1718,7 @@ export const CROSSROADS = {
   // mediano lo pone el contenido: 76 semanas. Bajarlo más no cambia el número
   // de decisiones (13 contra 14 en treinta años) porque lo que las limita es
   // qué hay elegible, así que se queda en el menor cambio que arregla la señal.
-  MIN_TICKS_BETWEEN: 48,
+  MIN_TICKS_BETWEEN: 16,
   GUARANTEE_TICKS: 960, // at least one per generation
   CRISIS_MULTIPLIER: 4.0,
   FEUD_RIPE_MULTIPLIER: 4.0,
@@ -1794,12 +1794,15 @@ export const BUILDINGS = {
   // suelta (piedra 60, obra 90): sube sobre una pieza que ya está en pie, no
   // levanta cuatro celdas desde cero.
   //
-  // **Medido en doce semillas × ochenta años** (`npx tsx tools/pace-report.ts
-  // --seeds 12 --years 80`): el primer bastión llega a las **555 h de reloj**
-  // (mediana; reparto 224–656 h) en **9 de 12 valles** — exactamente los nueve
-  // que cierran su cerco, que es el contrato; los otros tres no lo cierran (dos
-  // tomados y uno extinguido). Y **el tope muerde**: los nueve llegan a dos,
-  // así que este número no es decoración, es la palanca que
+  // **Medido en doce semillas × ochenta años** (`npx tsx tools/reports/pace-report.ts
+  // --seeds 12 --years 80`): el primer bastión llega a las **350 h de reloj**
+  // (mediana; reparto 197–602 h) en **7 de 12 valles** — exactamente los siete
+  // que cierran su cerco, que es el contrato; los otros cinco no lo cierran
+  // (cuatro tomados y uno abandonado). **Remedido con el ritmo nuevo del 19 sep**
+  // (§8.6, el hueco entre decisiones de un año a un tercio): con el ritmo viejo
+  // era 555 h en 9 de 12, y lo que lo mueve no es el bastión sino que la villa
+  // cerrada llega antes y que se acaban más partidas. Y **el tope muerde**: los
+  // siete llegan a dos, así que este número no es decoración, es la palanca que
   // decide cuántas torres tiene una villa cerrada. Con dos atalayas sueltas
   // más, un valle de fase 3 acaba con cuatro puestos de torre; el brazo que
   // dan es el mismo que el de la muralla (`postsOf`), así que lo que cambia es
@@ -2228,7 +2231,7 @@ export const NEIGHBOUR = {
   // Hasta aquí la convivencia **siempre acercaba**, y era la única fuerza
   // continua del mundo sobre las opiniones: todo lo demás —las tres de §6.4, la
   // riña— necesita una encrucijada, y salen entre siete y doce en cuarenta años
-  // (`findings-drama.md` §2). El valle derivaba por tanto hacia la concordia sin
+  // (`docs/medidas/findings-drama.md` §2). El valle derivaba por tanto hacia la concordia sin
   // remedio, ningún par llegaba jamás a −50, y sin ese cruce no hay rencor, sin
   // rencor no hay riña y sin riña nada empuja una opinión hacia abajo. **Un ciclo
   // que necesitaba un empujón que nadie daba.** Medido: cero rencores y cero

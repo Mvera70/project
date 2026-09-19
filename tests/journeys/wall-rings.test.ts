@@ -31,6 +31,7 @@ import { eraOf, type Era } from '@derive/era';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { destroyBuilding } from '@engine/world/buildings';
+import { wallRuns } from '@engine/world/works';
 import { canGive, giveMeans } from '@engine/world/means';
 import { terrainOf, reachableFrom } from '../../src/render3d/life/terrain';
 import type { Building, GameState } from '@engine/state';
@@ -50,32 +51,17 @@ import type { Building, GameState } from '@engine/state';
  * de la puerta —medido en la semilla 7: [39, 28, …] en vez de un tramo de 67—
  * y la prueba habría dicho que la muralla se rompió cuando lo que pasó es que
  * la aldea colgó su puerta.
+ *
+ * **Y desde el 19 sep esto no tiene copia propia: llama a `wallRuns` del
+ * motor.** Tenía una, calcada, y se quedó sin el bastión cuando A3 lo añadió a
+ * la del motor — así que esta prueba leía una torre del anillo como un agujero
+ * y partía el cerco en trozos que no existen. No se vio hasta que el ritmo
+ * nuevo adelantó el bastión del año 50 al 31 y entró dentro de los cuarenta
+ * años que esto juega. Dos ideas de qué es una muralla es una de más; la buena
+ * es la del motor, que es la que decide dónde va una puerta.
  */
 function runs(state: GameState): number[] {
-  const walls = state.buildings.filter(
-    (b) => b.lostTick === null
-      && (b.kind === 'wall' || b.kind === 'palisade' || b.kind === 'gate'),
-  );
-  const byCell = new Map(walls.map((b) => [b.y * state.map.width + b.x, b]));
-  const seen = new Set<number>();
-  const sizes: number[] = [];
-  for (const wall of walls) {
-    if (seen.has(wall.id)) continue;
-    const run: Building[] = [wall];
-    seen.add(wall.id);
-    for (let n = 0; n < run.length; n += 1) {
-      const b = run[n];
-      if (b === undefined) continue;
-      for (const [dx, dz] of [
-        [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1],
-      ] as const) {
-        const next = byCell.get((b.y + dz) * state.map.width + b.x + dx);
-        if (next !== undefined && !seen.has(next.id)) { seen.add(next.id); run.push(next); }
-      }
-    }
-    sizes.push(run.length);
-  }
-  return sizes.sort((a, b) => b - a);
+  return wallRuns(state);
 }
 
 const SEEDS = [7, 11, 23, 41];
@@ -259,8 +245,11 @@ describe('A2 · el portón es una cosa, no un cálculo', () => {
       const state = foundGame(seed);
       run(state, TIME.WEEKS_PER_YEAR * 40, 'prudent', CATALOG);
       const gates = state.buildings.filter((b) => b.kind === 'gate' && b.lostTick === null);
+      // A3 · el bastión es muralla también aquí: la semilla 41 acabó con la
+      // torre justo al lado del portón, y sin contarla esto leía «una puerta
+      // suelta en el prado» donde hay una puerta pegada a su bastión.
       const walls = state.buildings.filter((b) => b.lostTick === null
-        && (b.kind === 'palisade' || b.kind === 'wall'));
+        && (b.kind === 'palisade' || b.kind === 'wall' || b.kind === 'bastion'));
       // Sin muralla no hay puerta: una puerta suelta en el prado era el defecto
       // que el dueño del diseño vio en una captura el 18 sep.
       if (walls.length < BUILDING_RULES.GATE_MIN_RUN) {

@@ -1,4 +1,4 @@
-// K-4 · La sala del rey. `docs/plan-rey.md` §0.5b y §8.
+// K-4 · La sala del rey. `docs/historico/plan-rey.md` §0.5b y §8.
 //
 // **«Debe tener una casa que se diferencie»** (dueño del diseño, 18 sep 2026).
 // Lo que se guarda aquí es que exista, que sea del rey y que no exista sin rey.

@@ -1,4 +1,4 @@
-// M-1 · El mundo contesta a lo que hay. `docs/rework.md` §4b, brief M-1.
+// M-1 · El mundo contesta a lo que hay. `docs/historico/rework.md` §4b, brief M-1.
 //
 // **Lo que se guarda aquí no es que el mundo mate**: es que lo que puede romper
 // la aldea vaya con lo que la aldea ha acumulado, y que de primeras no la rompa.
@@ -9,7 +9,7 @@
 //
 // Se miden **pesos** y no partidas: `weightNow` dice lo que el sorteo va a usar,
 // así que dos estados que sólo se diferencian en el corral se comparan sin
-// jugar cien años y adivinar. Las partidas las mide `tools/agency-report.ts`.
+// jugar cien años y adivinar. Las partidas las mide `tools/reports/agency-report.ts`.
 
 import { describe, expect, it } from 'vitest';
 import { FATE, TIME } from '@engine/balance';

@@ -2,7 +2,7 @@
 //
 // Desde el 15 sep 2026 el valle lo fundan un hombre y una mujer, por decisión
 // del dueño del diseño, y la aldea crece con los que llegan. Esto es lo que esa
-// decisión prometía en su primera medida (`tools/founding-report.ts`, seis
+// decisión prometía en su primera medida (`tools/reports/founding-report.ts`, seis
 // semillas): ninguna pareja se extinguía, todas recibían gente y tenían hijos,
 // y la mayoría eran una aldea de verdad a los diez años.
 //
@@ -17,7 +17,7 @@
 // dueño del diseño pidió después de R-1, con estas palabras, lo contrario de
 // lo que esta promesa daba por hecho: «que haya caos y que haya partidas que
 // se rompan y no se pueda seguir jugando es la idea del juego»
-// (`docs/rework.md` §2.6). Sin las puertas, el rayo puede quemar la única casa
+// (`docs/historico/rework.md` §2.6). Sin las puertas, el rayo puede quemar la única casa
 // de la pareja en la primera semana, y una aldea de dos no siempre se
 // recupera a tiempo. Las pruebas de abajo que daban por hecho que la pareja
 // siempre llega a los cuarenta años se han vuelto a medir con **doce
@@ -37,7 +37,7 @@ import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
 
 // Doce semillas (v3.76, R-1 §2.6): las seis de siempre más 3, 53, 67, 79, 83 y
-// 89, las mismas que `tools/fate-report.ts` usa para medir el caos con más
+// 89, las mismas que `tools/reports/fate-report.ts` usa para medir el caos con más
 // señal que seis semillas.
 const SEEDS = [3, 7, 11, 23, 31, 41, 53, 67, 79, 83, 89, 97];
 const YEARS = 40;
@@ -82,7 +82,7 @@ describe('una pareja se hace aldea · v3.69', () => {
 
   it('las que aguantan crecen; las que se rompen, lo cuentan', () => {
     // Hasta v3.75 esta prueba pedía que ninguna pareja se extinguiera en
-    // cuarenta años. Sin las puertas del rayo (§2.6 de `docs/rework.md`, «que
+    // cuarenta años. Sin las puertas del rayo (§2.6 de `docs/historico/rework.md`, «que
     // haya partidas que se rompan y no se pueda seguir jugando es la idea del
     // juego») eso ya no es lo que se mide: el rayo puede quemar la única casa
     // de la pareja en la primera semana y una aldea de dos no siempre se

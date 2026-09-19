@@ -143,7 +143,7 @@ const TURN_RATE = 6;
  * Umbral de velocidad, relativo al paso propio, por debajo del cual la cara no
  * sigue al cuerpo.
  *
- * TUNE: 0,25 (rework.md §3.5.3). Con un número fijo (0,05 celdas/s) una vaca
+ * TUNE: 0,25 (docs/historico/rework.md §3.5.3). Con un número fijo (0,05 celdas/s) una vaca
  * —`pace` 0,32— lo supera agitándose contra una pared sin moverse de sitio;
  * relativo al paso de cada cual, una gallina rápida y una vaca lenta piden lo
  * mismo: una cuarta parte de lo que andarían sueltas.
@@ -154,7 +154,7 @@ export const TURN_MIN_SPEED = 0.25;
  * Cuánto tiene que haber avanzado en la misma dirección desde la última vez
  * que se giró la cara, en celdas, antes de volver a girarla.
  *
- * TUNE: 0,3 (rework.md §3.5.3). Un cuerpo apretado contra un muro o contra sus
+ * TUNE: 0,3 (docs/historico/rework.md §3.5.3). Un cuerpo apretado contra un muro o contra sus
  * vecinos oscila con velocidad por encima del umbral de arriba sin cambiar de
  * sitio: lo que distingue andar de temblar no es la velocidad de este
  * instante, es que el sitio cambie. Unas décimas de celda son varios pasos

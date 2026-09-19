@@ -83,7 +83,7 @@ export const BUILDING_LOOKS: Readonly<Record<BuildingKind, BuildingLook>> = {
   // K-4 · **la sala del rey**, y se diferencia sin malla: más alta que una casa
   // (0,93 de pared contra 0,62) y con el tejado burdeos del jefe, que es el
   // único color de la paleta que sólo lleva él. Cuando exista `hall.glb` esto
-  // deja de usarse; el encargo de arte está en `docs/plan-rey.md` §8.
+  // deja de usarse; el encargo de arte está en `docs/historico/plan-rey.md` §8.
   hall: { walls: 0.93, roof: 0.62, wallColour: PLASTER, roofColour: '#773B42', roofed: true },
 };
 

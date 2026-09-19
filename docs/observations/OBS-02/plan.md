@@ -7,7 +7,7 @@ puesta en marcha. Este documento no certifica el estado actual del juego.
 ## Diagnóstico del método anterior
 
 Base documental: [conclusiones OBS-01](../OBS-01/conclusions.md), sus informes y
-[IA-14](../../life-rounds/IA-14.md). No se han repetido sus pruebas para este plan.
+[IA-14](../../historico/life-rounds/IA-14.md). No se han repetido sus pruebas para este plan.
 
 - Nueve tomas y 627 imágenes no equivalen a 627 imágenes inspeccionadas. Se revisó
   una selección; los planos generales ocultaban pies, manos y contactos.

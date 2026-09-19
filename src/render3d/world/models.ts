@@ -27,7 +27,7 @@
 // hoy. No hay un paso de integración: hay mallas que aparecen.
 //
 // El encargo de arte con la lista entera y sus restricciones está en
-// `docs/graphics-rounds/aldeanos-por-hacer.md`.
+// `docs/historico/graphics-rounds/aldeanos-por-hacer.md`.
 
 import { LIFE } from '@engine/balance';
 import type { Role } from '@engine/state';

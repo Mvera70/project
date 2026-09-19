@@ -3,7 +3,7 @@
 // Lo que se vigila es la **regla**, no el catálogo de recursos: qué figura se
 // pide para quién, y en qué orden mandan la edad, el oficio y lo que se está
 // haciendo. Las mallas de la lista de encargo
-// (`docs/graphics-rounds/aldeanos-por-hacer.md`) aún no existen, y eso es
+// (`docs/historico/graphics-rounds/aldeanos-por-hacer.md`) aún no existen, y eso es
 // deliberado: quien consume esto cae al aldeano base si el recurso falta, así
 // que la regla se puede escribir y probar antes que el arte.
 

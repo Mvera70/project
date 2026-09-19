@@ -333,7 +333,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
      * Aquí vivía `setIntent`, la única escritura que un panel podía hacer sobre
      * las tres palancas de la v2.0. Se van con la hoja que las pintaba: medido,
      * sólo hacían daño —a dos muescas del reposo moría media aldea, tarde y sin
-     * aviso (`docs/plan-medios.md` §1)— y el dueño del diseño las retiró por
+     * aviso (`docs/historico/plan-medios.md` §1)— y el dueño del diseño las retiró por
      * eso. Lo que el jugador hace ahora es **dar** (`give`, arriba).
      *
      * `state.intent` se queda en reposo dentro del motor y se borra cuando el
@@ -469,7 +469,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    * El aviso de §11.6 (`notice.ts`) y la pista del inicio guiado (más abajo)
    * vivían sueltos, cada uno con su propio `bottom` fijo en `index.html`
    * (82px la pista, 118px el aviso): en cuanto la pista crecía a dos líneas
-   * se pisaban, fotografiado en `docs/life-rounds/evidencia-capturas.md` §3.
+   * se pisaban, fotografiado en `docs/historico/life-rounds/evidencia-capturas.md` §3.
    * Ninguno sabía del otro.
    *
    * Ahora los dos se montan dentro de la misma ranura de la carcasa
@@ -1094,7 +1094,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // Y la velocidad viaja con la ausencia hasta el final. Sin esto,
     // `resumeAfterHidden` decidía que había que recuperar dieciséis semanas y
     // el letargo recuperaba una: lo destapó el recorrido de §13.2 de
-    // `valley.shots.ts`, que cuenta los ticks de verdad.
+    // `tools/shots/valley.shots.ts`, que cuenta los ticks de verdad.
     if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome, speed);
   });
   window.addEventListener('pagehide', () => { persist(); loop?.stop(); }, { once: true });

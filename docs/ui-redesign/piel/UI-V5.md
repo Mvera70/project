@@ -60,7 +60,7 @@ abierto.
 
 Bajé el ancho de los botones de la regleta de velocidad a 42 px para ganar dos
 píxeles, y eso **rompe el mínimo táctil de 44** de `design.md` §11.3. Lo cazó
-`valley.shots.ts`, que mide la caja de cada botón: ninguna captura lo habría
+`tools/shots/valley.shots.ts`, que mide la caja de cada botón: ninguna captura lo habría
 enseñado. Apilada encima del rincón la tira cabe de sobra —cinco de 44 más los
 huecos son 236 de los 390 que hay—, así que los dos píxeles no hacían falta para
 nada.
@@ -175,7 +175,7 @@ no pisar el de la otra sesión:
 | Solape de la píldora | ninguno, ni con la fecha ni con las cifras |
 
 **Lo que no cubre ninguna prueba automática:** la jornada de la encrucijada de
-`valley.shots.ts` es un fallo declarado desde antes de esta ronda —«ya no se
+`tools/shots/valley.shots.ts` es un fallo declarado desde antes de esta ronda —«ya no se
 planta a los 58 s de reloj virtual en esa semilla»— así que no valida esta
 maquetación. Ahora hay con qué arreglarla, y queda anotado: `openAtYear` es
 `foundGame` más `run(…, 'prudent')`, y con eso se predice fuera del navegador en

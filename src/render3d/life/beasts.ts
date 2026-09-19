@@ -116,7 +116,7 @@ const BEAST_RISE: Readonly<Record<BeastKind, number>> = {
  * (`fordDrinkOf`/`Beast.drink`, más abajo), y darle sed a la gallina o al
  * cerdo sin ningún sitio propio donde saciarla sería dejarles siempre con el
  * impulso alto — el mismo síntoma de gente con la sed al máximo que
- * `docs/life-rounds/IA-1.md` §4.1 ya cerró una vez para las personas.
+ * `docs/historico/life-rounds/IA-1.md` §4.1 ya cerró una vez para las personas.
  *
  * TUNE: la misma cadencia que la gente (`needs.ts`, `RISE.thirst = 1/110`):
  * no hay una medida propia de un animal de la que partir, y usar la
@@ -143,7 +143,7 @@ interface SelfActivity {
 /**
  * Lo que cada clase hace sola, junto a su ancla — **varias actividades por
  * especie, no una** (IA-4, checklist del brief): antes las tres hacían lo
- * mismo con otro nombre y otra velocidad (`docs/life-rounds/IA-1.md`), y eso
+ * mismo con otro nombre y otra velocidad (`docs/historico/life-rounds/IA-1.md`), y eso
  * es justo lo que esta fase rompe. `gives`/`seconds` en la misma escala que
  * `OFFERS` (`offers.ts`): no hay otra referencia de la que partir.
  *
@@ -265,7 +265,7 @@ const GIVE_UP = 600;
  * especie, en celdas.
  *
  * TUNE: la primera versión usaba 1,5-1,8 —el alcance del regalo (1,0) más un
- * margen generoso— y **medido, era demasiado**: `tools/life-report-species.ts`
+ * margen generoso— y **medido, era demasiado**: `tools/reports/life-report-species.ts`
  * daba a la gallina reaccionando dos tercios de la jornada, y a cerdo y vaca
  * más de la mitad, no por visitas de verdad sino por quien se sienta o
  * cotillea junto a la puerta de al lado —`sit`/`gossip` duran hasta veinte
@@ -403,7 +403,7 @@ export interface Beast {
    * usa; la gallina y el cerdo se quedan en `null` y nunca ven esta oferta
    * entre sus opciones — no tienen sitio propio donde beber cerca del corral,
    * y forzarles el impulso sin oferta sería el mismo síntoma que
-   * `docs/life-rounds/IA-1.md` §4.1 ya cerró una vez para las personas.
+   * `docs/historico/life-rounds/IA-1.md` §4.1 ya cerró una vez para las personas.
    */
   readonly drink: Place | null;
   /**
@@ -911,7 +911,7 @@ export function stepBeasts(
     // al animal— disparaba `act` igual que quien de verdad se para a dar de
     // comer o acariciar: medido con seis semillas, más de un tercio de la
     // jornada de cerdo y de vaca «congelados» por gente que ni siquiera
-    // llegaba a mirarlos (`tools/life-report-species.ts`). `visitor.pace` es
+    // llegaba a mirarlos (`tools/reports/life-report-species.ts`). `visitor.pace` es
     // el mismo umbral relativo que `TURN_MIN_SPEED` (`body.ts`): una persona
     // rápida y una lenta cuentan igual de «parada» si las dos van muy por
     // debajo de su propio paso. La cautela de la gallina (`approach`, más
@@ -922,7 +922,7 @@ export function stepBeasts(
     // cercanía y quietud bastaba, y eso medía mal lo que quería medir: quien se
     // sienta a cotillear, reza en la capilla de al lado o bebe en el pozo está
     // cerca y está quieto, y el cerdo se paraba a mirarle igual que a quien le
-    // trae de comer. Medido con `tools/life-report-species.ts` en las semillas
+    // trae de comer. Medido con `tools/reports/life-report-species.ts` en las semillas
     // 7 y 23: **el cerdo pasaba el 38 % de la jornada reaccionando y el 12 %
     // hozando, y la vaca el 43 % reaccionando, el 6 % pastando y el 0,4 %
     // rumiando**. Un rebaño pendiente de la gente en vez de comiendo, que es lo
@@ -1106,7 +1106,7 @@ export function stepBeasts(
     // que la acaricien.
     const herd = herdPullOf(beast, beasts, overridden);
     // La intención cumplida frena de verdad, igual que la gente en
-    // `village.ts` (rework.md §3.5.3): `doing.there === true`, no «no hay
+    // `village.ts` (docs/historico/rework.md §3.5.3): `doing.there === true`, no «no hay
     // ruta» —`next` también es nulo sin intención todavía, y frenar ahí de
     // raíz le corta las alas a `avoid()` para sacar a la bestia de un mal
     // sitio, dejándola arrastrarse sin escapar nunca del todo—. Sin este

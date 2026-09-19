@@ -1,4 +1,4 @@
-// V-03 · Por dónde se pasa, y qué corta el paso. Anexo E, rework.md §3.5.6.
+// V-03 · Por dónde se pasa, y qué corta el paso. Anexo E, docs/historico/rework.md §3.5.6.
 //
 // El dueño: «atraviesan paredes». Una causa barata de descartar es que
 // `WALLED` (terrain.ts) se hubiera quedado corto frente a los tipos de
@@ -40,7 +40,7 @@ describe('V-03 · qué corta el paso', () => {
   });
 
   it('el campo se pisa: nadie lo necesita en WALLED para andar por él', () => {
-    // El caso que el brief nombra explícitamente (rework.md §3.5.6): «los
+    // El caso que el brief nombra explícitamente (docs/historico/rework.md §3.5.6): «los
     // campos no van». Lo mismo vale para el pozo y el camposanto (arriba),
     // pero el campo es el que más celdas cubre del valle, así que es el que
     // más se nota si se cuela por error.

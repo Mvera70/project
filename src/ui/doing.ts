@@ -110,7 +110,7 @@ function sayWhat(state: GameState): Doing | null {
 
   // 4 · **Y que no haya nada que levantar se dice.** No es un hueco que tapar:
   // es un estado en el que la aldea pasa buena parte de su vida —medido con
-  // `tools/works-report.ts` sobre las semillas 7, 11 y 41: entre el 54 % y el
+  // `tools/reports/works-report.ts` sobre las semillas 7, 11 y 41: entre el 54 % y el
   // 100 % de las semanas según la década, y el 100 % en la última—, y el
   // jugador tiene derecho a saber que su tercera palanca no tiene ahora nada
   // que ordenar. Esconderlo sería la mitad de «las decisiones se sienten

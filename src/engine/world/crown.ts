@@ -1,4 +1,4 @@
-// K-1 · Coronar. `docs/plan-rey.md` §1.
+// K-1 · Coronar. `docs/historico/plan-rey.md` §1.
 //
 // **El acto**: cobrar la plata, mover el asiento, agriar al que se queda sin él
 // y contarlo. Lo que el rey *quiere* vive en `people/crown.ts`; esto es lo que

@@ -97,7 +97,7 @@ export interface Dweller {
   motionSpeed?: number;
   /**
    * Desde dónde se cuenta el recorrido para decidir si la cara sigue al
-   * cuerpo. rework.md §3.5.3.
+   * cuerpo. docs/historico/rework.md §3.5.3.
    *
    * No es lo mismo que `travelled`: aquél es la longitud del camino —lo que
    * mueve el clip de andar, y por eso cuenta aunque el cuerpo tiemble sin
@@ -484,7 +484,7 @@ const POST_REACH = 1.2;
 export function createVillage(state: GameState, day: number, options: DayOptions = {}): Village {
   const land = options.land ?? terrainOf(state);
   const seed = seedOfDay(state.seed, day);
-  // IA-6 · La riña de la plaza (§7.10, `docs/rework.md` §4 R-2 punto 1): si el
+  // IA-6 · La riña de la plaza (§7.10, `docs/historico/rework.md` §4 R-2 punto 1): si el
   // motor tiró `quarrel_in_the_square` esta semana, éstos son los dos `id` de
   // verdad — nunca una pareja que esta capa se invente. `null` si esta semana
   // no hubo ninguno, o si el suceso no llegó a tener dos nombrados vivos
@@ -1166,7 +1166,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // vez llegado, así que quien no llegaba se quedaba con el viaje
         // puesto. Ahora entra porque la plaza que falló se descarta abajo:
         // sin eso, medido, empeoraba (0,06 % → 0,20 % de parados con un
-        // impulso al máximo, `docs/life-rounds/IA-6.md` §4.3).
+        // impulso al máximo, `docs/historico/life-rounds/IA-6.md` §4.3).
         const overdue = onTheWay && dweller.doing?.arriveBy !== undefined && steps >= dweller.doing.arriveBy;
         if (!heldSteady && steps >= dweller.rethinkAt && (!onTheWay || tooLong || overdue)) {
           dweller.rethinkAt = steps + RETHINK;
@@ -1205,7 +1205,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           // inalcanzable (punto 4)— siempre queda `pauseHere()`**, una pausa
           // local que sí se puede alcanzar. `dweller.doing` deja de poder
           // quedarse en `null` de aquí en adelante: es lo que arregla la
-          // medida que rework.md §3.6 dejó sin mover, parados con un impulso
+          // medida que docs/historico/rework.md §3.6 dejó sin mover, parados con un impulso
           // ≥ 0,9.
           dweller.doing = decide(
             {
@@ -1243,7 +1243,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // con el replanteo (`overdue`), y entró el día que existió la pieza que
         // faltaba: descartar la plaza que falló (`Dweller.failed`,
         // `Chooser.shunned`). Sin ella, medido, empeoraba: parados con un
-        // impulso al máximo de 0,06 % a 0,20 % (`life-rounds/IA-6.md` §4.3),
+        // impulso al máximo de 0,06 % a 0,20 % (`docs/historico/life-rounds/IA-6.md` §4.3),
         // porque se volvía a elegir la misma plaza inalcanzable. Con ella:
         // parados 0,08 %, y los giros suben de 0,37 % a 0,54 % porque quien
         // abandona ahora **se da la vuelta y va a otro sitio**, que es lo que
@@ -1474,7 +1474,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         const push = separate(body, around);
         const norm = Math.hypot(want.x, want.z);
         const along = norm > 0 ? (push.x * want.x + push.z * want.z) / (norm * norm) : 0;
-        // **La intención cumplida frena de verdad** (rework.md §3.5.3):
+        // **La intención cumplida frena de verdad** (docs/historico/rework.md §3.5.3):
         // `doing.there === true`, no «no hay ruta que seguir» —`next` también
         // es nulo sin intención todavía, recién llegado el día o entre una
         // ocupación y la siguiente, y frenar ahí de raíz cada paso le corta
@@ -1542,7 +1542,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // 6b · IA-2 · El gesto de un saludo, después de que la marcha normal ya
       //      haya puesto la cara mirando hacia donde se anda: esto la
       //      sobrescribe un instante. Nunca toca velocidad ni posición —
-      //      «siguen andando» (docs/life-ai-proposal.md §7) — así que va
+      //      «siguen andando» (docs/historico/life-ai-proposal.md §7) — así que va
       //      después del bucle principal y no dentro, sin ganarle la mano a
       //      nada de lo que ya ha decidido este paso.
       for (const active of greetings) {
@@ -1550,11 +1550,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         const b = byId.get(active.greeting.b);
         if (a === undefined || b === undefined) continue;
         // **El mismo umbral contra la vuelta sobre sí mismo que el resto del
-        // valle** (rework.md §3.5.3, `TURN_MIN_SPEED`): un saludo es un gesto
+        // valle** (docs/historico/rework.md §3.5.3, `TURN_MIN_SPEED`): un saludo es un gesto
         // de quien anda, y sobrescribir la cara de quien está casi parado
         // —por ejemplo, a un paso de que `decide()` le mande a otra cosa— es
         // justo el defecto que esa regla existe para evitar. Medido: sin este
-        // umbral, `tools/life-report.ts` subía los giros de 0,34 % a 0,43 %;
+        // umbral, `tools/reports/life-report.ts` subía los giros de 0,34 % a 0,43 %;
         // con él, se quedan donde estaban.
         const speedA = Math.hypot(a.body.vx, a.body.vz);
         const speedB = Math.hypot(b.body.vx, b.body.vz);
@@ -1585,7 +1585,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       //    no cambia). Sin esto el receptor tenía que volver a ganar el mismo
       //    concurso de utilidad que cualquier otra oferta para coger lo que le
       //    acababan de tirar, y casi nunca lo ganaba: la cadena moría en el
-      //    primer pase (medido, `docs/life-rounds/V-09.md`).
+      //    primer pase (medido, `docs/historico/life-rounds/V-09.md`).
       //
       //    **La plaza se sigue reservando al decidir, no al llegar** (V-06,
       //    E.7): si la pelota lleva ya un paso quieta y ofreciéndose de
@@ -1801,7 +1801,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const other = byId.get(otherBody.id);
           if (other === undefined || !freeToPropose(other)) return;
 
-          // Orden de prioridad, docs/life-ai-proposal.md §3.2: primero el
+          // Orden de prioridad, docs/historico/life-ai-proposal.md §3.2: primero el
           // paso físico (`yield` — un cruce que si no se resuelve se ve como
           // un empujón mudo), luego una escena de verdad (`propose`, con
           // genio y disposición de por medio) y sólo si no hay ni una cosa ni

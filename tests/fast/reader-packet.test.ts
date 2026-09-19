@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildReaderPacket } from '../../tools/reader-packet-content';
+import { buildReaderPacket } from '../../tools/reports/reader-packet-content';
 
 describe('paquete ciego del hito 0 · §9.5', () => {
   it('entrega solo tres crónicas anónimas y la pregunta acordada', () => {

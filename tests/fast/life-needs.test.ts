@@ -273,7 +273,7 @@ describe('IA-3 · aldeanos con hábitos', () => {
     expect(frail, 'el frail descansa más rato').toBeGreaterThan(plain);
     // Y «sin bloquear el cuerpo»: ninguna pausa se sale de lo que una pausa
     // puede durar como mucho — `PAUSE_FRAIL_SCALE` está pensado para no
-    // acercarse a `GIVE_UP` (rework.md, checklist IA-1).
+    // acercarse a `GIVE_UP` (docs/historico/rework.md, checklist IA-1).
     expect(frail, 'una pausa sigue siendo una pausa, no media jornada')
       .toBeLessThan(20 * 30);
   });
@@ -308,7 +308,7 @@ describe('IA-3 · aldeanos con hábitos', () => {
    * Dos semillas y una jornada cada una: pequeño a propósito para una prueba
    * rápida — «varias, nunca una» (`CLAUDE.md`), pero la muestra grande que de
    * verdad demuestra la fase (varias semillas × varios días) vive en
-   * `docs/life-rounds/IA-3.md`, medida con `tools/life-traits-report.ts`.
+   * `docs/historico/life-rounds/IA-3.md`, medida con `tools/reports/life-traits-report.ts`.
    */
   interface HabitSample {
     readonly byTrait: Map<Trait, { pray: number; total: number }>;
@@ -328,7 +328,19 @@ describe('IA-3 · aldeanos con hábitos', () => {
     // porque la propiedad sea falsa: baila porque doce muestras de una capa con
     // semilla por jornada son pocas. Cuatro semillas × tres jornadas son
     // veinticuatro, y eso es lo que pide `CLAUDE.md` para un umbral de aquí.
-    const seeds = [7, 23, 41, 11];
+    // **Seis valles y no cuatro** (19 sep 2026), y es la tercera vez que esta
+    // muestra se queda corta por lo mismo. Bajar el hueco entre decisiones a
+    // un tercio de año movió las trayectorias y el devoto se quedó en 3,05 %
+    // contra el 3,46 % que pedía el doble — la propiedad del pelo, por cuatro
+    // décimas. Con dieciocho muestras vuelve a sostenerse. No se toca el
+    // umbral: lo que baila es el tamaño de la muestra, que es lo que
+    // `CLAUDE.md` deja escrito para esta capa.
+    //
+    // **Y lo que cuesta, dicho aquí para que se vea**: esta muestra es el gasto
+    // más grande de la suite rápida —36 s de los 61— y se paga una vez para
+    // las tres pruebas que la usan. Si hay que ensancharla otra vez, ya no cabe
+    // aquí y se muda a las jornadas, que es la regla del 16 sep.
+    const seeds = [7, 23, 41, 11, 31, 53];
     const fiery: Trait[] = ['hot_tempered', 'spiteful'];
     const calm: Trait[] = ['kind', 'generous'];
     const byTrait = new Map<Trait, { pray: number; total: number }>();

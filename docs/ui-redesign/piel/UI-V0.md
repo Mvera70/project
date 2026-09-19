@@ -38,7 +38,7 @@ Commit de partida: `a5744b7`.
   6 KB). El tope del plan era 300 KB.
 - **Rutas:** el CSS compilado sale con `url(./cinzel-….woff2)` y
   `url(./parchment-….png)` — relativas, así que el mismo `dist/` sirve desde
-  la raíz y desde `/project/` (§13.4), que es lo que `subpath.pwa.ts` vigila.
+  la raíz y desde `/project/` (§13.4), que es lo que `tools/pwa/subpath.pwa.ts` vigila.
 - **Determinismo:** la textura da la misma huella zlib (`68cc24ee`) en dos
   ejecuciones seguidas.
 - **Pruebas:** `ui-skin` 12/12, y las **135** de las doce pruebas de interfaz

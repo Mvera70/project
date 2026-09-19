@@ -66,7 +66,7 @@ const WOLF_ID = 20_000;
  * el rodeo de un edificio de por medio, y confinar la visita entera a los
  * 720 pasos que quedan tras `NIGHT` la dejaba corta en las aldeas donde el
  * corral no está a un paso del borde del mapa — medido: forzada en la
- * semilla 11 de `docs/life-rounds/evidencia-capturas.md`. A mitad de jornada
+ * semilla 11 de `docs/historico/life-rounds/evidencia-capturas.md`. A mitad de jornada
  * quedan 1800 pasos, el doble largo, y sigue siendo la tarde cayendo — no el
  * mediodía —, que es lo bastante tarde para que se lea como una visita fuera
  * de horas.

@@ -1,5 +1,5 @@
 // M-0 · Lo que sube y baja por el camino: las ofertas y el diezmo.
-// `docs/plan-medios.md` §6, brief en `docs/rework.md` §4b.
+// `docs/historico/plan-medios.md` §6, brief en `docs/historico/rework.md` §4b.
 //
 // **Por qué existe.** La plata es lo único que viene de fuera del valle, y lo
 // que la mueve es quien pasa por el camino: el buhonero que compra leña, el

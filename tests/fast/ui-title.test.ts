@@ -59,7 +59,7 @@ describe('el año de taller · U-10b', () => {
     //
     // **Y un valle puede morirse antes de llegar al año que se pidió**, que es
     // el juego y no un fallo: 3 de 12 se rompen a los cuarenta años
-    // (`rework.md`, decisión del dueño). Medido aquí: la semilla 23 se acaba en
+    // (`docs/historico/rework.md`, decisión del dueño). Medido aquí: la semilla 23 se acaba en
     // el año 18. Entonces se abre lo que quedó, y por eso el aserto es «el año
     // pedido, **o** el final», nunca sólo el primero.
     const YEAR = 21;

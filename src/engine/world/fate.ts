@@ -2,7 +2,7 @@
 //
 // El rework empieza aquí. El dueño del diseño lo pidió el 15 sep 2026 —«esto
 // tiene que ser mucho más aleatorio y con mucha más vida»— y el diagnóstico de
-// `docs/findings-drama.md` dice por qué hacía falta: todo lo dramático del
+// `docs/medidas/findings-drama.md` dice por qué hacía falta: todo lo dramático del
 // motor colgaba de las encrucijadas, y las encrucijadas salen diez veces en
 // cuarenta años. Las opiniones sólo se movían con ellas, así que no había
 // rencores, así que no había riñas, así que media docena de plantillas no salía
@@ -125,7 +125,7 @@ function weightOf(state: GameState, id: HappeningId, ctx: Context): number {
   switch (id) {
     case 'lightning_fire':
       // Sin puertas: el dueño del diseño pidió que el caos sea el juego y que
-      // una partida pueda romperse (`docs/rework.md` §2.6). El rayo pide sólo
+      // una partida pueda romperse (`docs/historico/rework.md` §2.6). El rayo pide sólo
       // lo que la física pide, tormenta y algo de madera en pie, aunque eso
       // sea la única casa de la pareja fundadora — lo que M-1 le quita es
       // poder dejar a la aldea **sin ninguna** (ver `happen`).
@@ -261,7 +261,7 @@ function feastDue(state: GameState, ctx: Context): boolean {
 /**
  * Los dos nombrados que peor se llevan, para la riña de la plaza. Si nadie se
  * lleva mal todavía, los dos primeros: es el empujón inicial que
- * `findings-drama.md` §1 dice que nadie daba.
+ * `docs/medidas/findings-drama.md` §1 dice que nadie daba.
  */
 function worstPair(state: GameState): [VillagerId, VillagerId] | null {
   const named = state.people.namedIds.filter((id) => {
@@ -516,7 +516,7 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
  * M-1 promete es que el peso de lo que destruye **va con lo que la aldea ha
  * acumulado** (más ganado, más lobos; más bosque talado, más riada), y eso se
  * comprueba comparando dos estados, no jugando cien partidas y mirando el
- * resultado. `tools/fate-report.ts` puede usarlo igual.
+ * resultado. `tools/reports/fate-report.ts` puede usarlo igual.
  */
 export function weightNow(state: GameState, id: HappeningId): number {
   return weightOf(state, id, {

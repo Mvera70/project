@@ -8,7 +8,7 @@
 // **Mientras no exista la malla, una fuente de apaño de tres primitivas**, y por
 // la misma razón que el barril y el arado la tienen (§7.14): una plaza empedrada
 // con un agujero en medio no se lee como una plaza. En cuanto `fountain.glb`
-// esté publicado —el encargo está escrito en `docs/encargo-fuente.md`—
+// esté publicado —el encargo está escrito en `docs/encargos/encargo-fuente.md`—
 // `instance('fountain')` lo devuelve y esto no se usa.
 
 import {

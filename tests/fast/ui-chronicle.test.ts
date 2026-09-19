@@ -5,7 +5,7 @@
 // que no toca el DOM — el mismo criterio que aisló `nextIntentForLever`/
 // `nextIntentForPriority` de `orders.ts` en UI-R2. La integración real (el
 // montaje en `shell.content`, el cierre por gesto, que una entrada nueva no
-// mueva el scroll) se acredita con capturas y con `tools/valley.shots.ts`,
+// mueva el scroll) se acredita con capturas y con `tools/shots/valley.shots.ts`,
 // que ya cubre abrir/cerrar la crónica desde la barra (UI-R1 §6) y el regreso
 // desde el epitafio — ninguno de los dos se toca en esta ronda.
 //

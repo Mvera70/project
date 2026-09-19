@@ -365,7 +365,7 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   yearLabel.htmlFor = 'valley-year';
   const year = document.createElement('input');
   year.id = 'valley-year';
-  // Clase propia y no `title-seed`, a propósito: `valley.shots.ts` localiza
+  // Clase propia y no `title-seed`, a propósito: `tools/shots/valley.shots.ts` localiza
   // el número del valle por esa clase exacta —`page.locator('.title-seed')
   // .fill(...)`— y con dos campos compartiéndola, ese localizador dejó de
   // ser único ("strict mode violation") el mismo día que se escribió U-10b.

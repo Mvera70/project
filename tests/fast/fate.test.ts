@@ -162,7 +162,7 @@ describe('los sucesos del valle · R-1', () => {
   });
 
   it('empuja las opiniones: hay rencores donde antes no había ninguno', () => {
-    // `findings-drama.md` §1: cero rencores en tres partidas de cuarenta años,
+    // `docs/medidas/findings-drama.md` §1: cero rencores en tres partidas de cuarenta años,
     // porque nada movía una opinión sin una encrucijada. La riña de la plaza es
     // el empujón. Medido con los pesos de §12.10: entre seis y doce por
     // partida de cuarenta años; aquí, en treinta, se pide que haya alguno en
@@ -175,7 +175,7 @@ describe('los sucesos del valle · R-1', () => {
     // Integridad, no supervivencia. **Que unos valles se rompan y otros no es
     // ahora la propiedad del diseño** —el dueño lo pidió con estas palabras,
     // «que haya caos y que haya partidas que se rompan y no se pueda seguir
-    // jugando es la idea del juego» (`docs/rework.md` §2.6)— y medirla pide
+    // jugando es la idea del juego» (`docs/historico/rework.md` §2.6)— y medirla pide
     // doce semillas a cuarenta años, que son minutos: vive en
     // `tests/journeys/fate-chaos.test.ts`, no aquí. La suite rápida tiene que
     // caber en treinta segundos (`CLAUDE.md`), y lo que guarda es lo barato:

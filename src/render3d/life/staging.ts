@@ -134,7 +134,7 @@ export function meetingPlace(
  * de R-1 sólo existía el nombre en la crónica de texto
  * (`quarrel.words`/`quarrel.blows`, `sim.ts`) y esta capa no tenía manera de
  * saber de quién hablaba sin tocar el motor. Con `who` ya no hace falta: es
- * el atajo que `docs/rework.md` §4 (R-2, punto 1) describe.
+ * el atajo que `docs/historico/rework.md` §4 (R-2, punto 1) describe.
  *
  * **Sólo la semana en la que ocurrió** (`happening.tick === state.tick`), el
  * mismo criterio que ya usa `render/reactions.ts` para `lostTick`/`diedTick`:

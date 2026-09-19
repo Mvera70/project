@@ -79,7 +79,7 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   // cada uno (`needs.ts`, `RISE.thirst`) y una jornada dura ciento veinte, así
   // que en una aldea de treinta y cinco hay cola permanente y se midió gente
   // de pie con la sed al máximo (seis de treinta y cinco en la semilla 23,
-  // `docs/life-rounds/IA-0.md` §1). Seis es el aforo de `work`, que es el otro
+  // `docs/historico/life-rounds/IA-0.md` §1). Seis es el aforo de `work`, que es el otro
   // sitio donde se junta media aldea, y un brocal con seis alrededor se lee
   // como un pozo con gente y no como una cola.
   drink: { id: 'drink', reach: 0.9, seats: 6, gives: { thirst: 0.9 }, seconds: [4, 9] },

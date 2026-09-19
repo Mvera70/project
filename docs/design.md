@@ -99,7 +99,7 @@ llegada de forasteros.
 
 **Lo que M-1 cambia es de dónde sale esa consecuencia, no que tenga que
 haberla.** Con el juego de los medios el jugador mete cosas en el valle
-(`docs/plan-medios.md`), y lo que mete **es** lo que el mundo puede romper:
+(`docs/historico/plan-medios.md`), y lo que mete **es** lo que el mundo puede romper:
 lobos contra el corral que compró, riada contra el bosque que taló, ladrones y
 señor contra el grano y la plata que juntó. El mundo sigue sin matar por su
 cuenta —una aldea intocada muere lo que moría, medido— y el jugador sigue siendo
@@ -120,7 +120,7 @@ decisiones que hacen que se tumbe»):
   le pueda volver en contra.
 
 La sección 12.9 fija los objetivos de mortalidad que la suite de balance
-verifica, y está **por remedir** desde R-1 (`docs/rework.md` §5).
+verifica, y está **por remedir** desde R-1 (`docs/historico/rework.md` §5).
 
 ### 1b. La meta del proyecto (18 sep 2026)
 
@@ -1569,7 +1569,7 @@ no lo comprobaba—. La fiesta se iba andando detrás de él.
 **El jugador no manda; dice quién manda.** Es el principio de los medios (§7.12)
 aplicado a una persona: la corona es una cosa que se da, se paga con lo del valle
 y lo que la aldea haga con ella lo deciden los sistemas que ya existen. El plan
-completo está en `docs/plan-rey.md`; la medida, en `docs/rey-medida.md`.
+completo está en `docs/historico/plan-rey.md`; la medida, en `docs/medidas/rey-medida.md`.
 
 **Qué es.** `state.crown` (esquema 10) guarda quién la lleva, desde cuándo y **qué
 oficio tenía el día que la recibió** —eso último es lo que decide su estilo, y al
@@ -1614,7 +1614,7 @@ vale para un jefe y para un rey.
 casas, y como las casas son el techo de la población, coronar bajaba la población
 de 42 a 31–39 en las cuatro variantes. Un impuesto por coronar no es una elección.
 Es la casa del rey —se muda a ella y cuenta cinco camas— y arde como cualquier
-casa de madera. Su malla está encargada (`docs/plan-rey.md` §8); hasta que llegue,
+casa de madera. Su malla está encargada (`docs/historico/plan-rey.md` §8); hasta que llegue,
 el render la dibuja más alta que una casa y con el tejado burdeos del jefe.
 
 **Y el rey se ve** (K-8). Lo dijo el dueño del diseño al probarlo: «cuando
@@ -1670,7 +1670,7 @@ unas de otras. Se acepta a cambio de lo que se pidió: un pueblo con plaza.
 **Lo que se ve** (P-2, `src/render3d/`): el empedrado es el suelo de las celdas
 del círculo, con el borde un tono más oscuro (`world/ground.ts`, `cellColour`), y
 en el centro hay una fuente. La malla de la fuente está encargada
-(`docs/encargo-fuente.md`); mientras no exista, `PlazaFountain` dibuja un pilón,
+(`docs/encargos/encargo-fuente.md`); mientras no exista, `PlazaFountain` dibuja un pilón,
 el agua y una columna con tres primitivas, por la misma razón que el barril y el
 arado (§7.14). **Su celda está cerrada al paso**: la gente rodea la fuente, no la
 atraviesa.
@@ -1758,7 +1758,7 @@ antes la palanca `timber` de la v2.0): una parte de lo que sobraba tras el campo
 iba al bosque, hubiera leña o no.
 
 **Medido, eso hacía dos cosas mal a la vez** (24 semillas × 60 años,
-`tools/agency-report.ts`):
+`tools/reports/agency-report.ts`):
 
 | | Cuota fija | Por necesidad |
 |---|---|---|
@@ -1839,7 +1839,7 @@ sesenta años**, o sea fiesta permanente. Con veinte, catorce y diez, y sin pode
 encadenar barriles, toda la plata de una partida da para una docena de medios:
 un medio pasa a ser una decisión de década.
 
-**Lo que esto entrega, medido** (`tools/agency-report.ts`, 24 semillas × 60
+**Lo que esto entrega, medido** (`tools/reports/agency-report.ts`, 24 semillas × 60
 años, dando cada medio en cuanto el valle puede pagarlo):
 
 | Se da | Población mediana | Primera piedra |
@@ -2114,7 +2114,7 @@ verificadas por mutación.
 
 **El mundo pasa cosas por su cuenta.** Es la primera fase del rework que el
 dueño del diseño pidió el 15 sep 2026 («mucho más aleatorio y con mucha más
-vida»), y responde al diagnóstico de `docs/findings-drama.md`: todo lo
+vida»), y responde al diagnóstico de `docs/medidas/findings-drama.md`: todo lo
 dramático colgaba de las encrucijadas, y las encrucijadas salen diez veces en
 cuarenta años. Desde aquí, **cada semana el valle tira** (paso 2b de §4.2)
 contra una tabla de doce sucesos; el que sale cambia el estado, escribe en la
@@ -2150,7 +2150,7 @@ habitantes, en vez de 22, 9, 4 y 1.
 Y nunca dos sucesos a menos de `FATE.MIN_GAP_WEEKS` (un suceso pegado a otro no se lee, se
 apila). La fiesta de la cosecha es la excepción: **es un rito**, se celebra la
 semana después de la siega si hay grano y gente, sin tirar y sin respetar el
-hueco. Medido con seis semillas × cuarenta años (`tools/fate-report.ts`):
+hueco. Medido con seis semillas × cuarenta años (`tools/reports/fate-report.ts`):
 **13,0 sucesos al año, mediana de tres semanas entre dos**, y una distancia
 media entre los repartos de dos valles de 0,16 (0 iguales, 1 nada en común).
 
@@ -2185,7 +2185,7 @@ manda el jugador. El estado guarda `happenings: HappeningRecord[]` (`tick`,
 `id`, lo visible, y `who`: los `id` de los nombrados implicados, que es lo que
 la capa de vida necesita para la riña de §7.9). `SCHEMA_VERSION` es 6.
 
-**Lo que el dueño decidió después, y ya está hecho** (v3.76, `docs/rework.md`
+**Lo que el dueño decidió después, y ya está hecho** (v3.76, `docs/historico/rework.md`
 §2.6): «que haya caos y que haya partidas que se rompan es la idea del juego».
 Las dos puertas del rayo (`LIGHTNING_MIN_HOUSES`, `LIGHTNING_MIN_PEOPLE`),
 puestas porque el rayo quemaba la única casa de la pareja y tres aldeas de seis
@@ -2483,6 +2483,38 @@ score(t) = t.weight
          · noveltyMultiplier(t)         // ×0.4 si ya salió en esta partida
 pick weighted by score, from the 'crossroads' stream
 ```
+
+**El hueco mínimo es un tercio de año** (`CROSSROADS.MIN_TICKS_BETWEEN` = 16
+ticks, 19 sep 2026), y la regla que manda sobre ese número no es el número sino
+ésta: **el reloj no decide cuándo se pregunta, decide el contenido**. La medida
+que lo dice es qué porcentaje de los intervalos entre decisiones los pone el
+techo y no la elegibilidad; por encima del 40 % manda el reloj y hay que
+bajarlo.
+
+Estuvo en un año (48) hasta que el dueño del diseño lo probó y dijo lo que
+faltaba por medir: «ahora mismo se tarda muchísimo en empezar a hacer cosas y
+es muy lento y muy aburrido». Con un año, **la primera pregunta de una partida
+no podía plantearse antes del tick 47** —once horas de reloj—, así que el
+jugador no tenía verbo durante toda la apertura. Medido en doce semillas ×
+sesenta años al bajarlo a un tercio:
+
+| | un año (48) | un tercio (16) |
+|---|---:|---:|
+| primera decisión | 11 h, en 11 valles de 12 | **3,5 h, en 12 de 12** |
+| decisiones en las primeras 20 h | 0,8 por valle | **1,8** |
+| decisiones en toda la partida | 38,3 | **39,4** |
+| intervalos que manda el techo | 22 % | **11 %** |
+
+Lo que hay que leer de esa tabla es la tercera fila: **no hay preguntas de más,
+sólo llegan antes**. Un hueco de una estación (12) da el mismo arranque y sube
+el total a 43,4, o sea añade preguntas donde no hacían falta; un tercio de año
+es el menor cambio que arregla la apertura sin tocar el resto de la partida.
+
+**Y el corolario, que se paga si se olvida:** el tamaño del hueco decide **en
+qué estación cae la primera ranura legal de una partida**, y con ello qué
+contenido temprano es alcanzable. Las dos plantillas del caserío (§7.3, G3)
+están escritas contra esa ranura —una de primavera y otra de verano— y si el
+hueco se mueve hay que remedirlas.
 
 **El componente `story`, y cómo se compone (v2.43).** Las semillas pueden
 modificar el peso de una categoría: es lo que el Anexo A prometía desde la v2.0
@@ -2876,7 +2908,7 @@ sola cosecha, y dos partidas con la misma semilla llueven igual.
 | `storm` | 4 %, nunca en invierno | lluvia, la luz al 40 %, de dos a siete rayos |
 | `snow` | 3,5 %, sólo en invierno | ochocientos copos, lentos y con vaivén |
 
-Medido con `tools/sky-report.ts` (seis semillas, sesenta años): unas dieciséis
+Medido con `tools/reports/sky-report.ts` (seis semillas, sesenta años): unas dieciséis
 tormentas al año, o una cada tres semanas. Y **el año manda**: un valle ruinoso
 tiene el cielo cerrado el 33,9 % de las jornadas y uno abundante el 9,2 %, así
 que el cielo cuenta lo mismo que la cosecha y dos valles del mismo año se ven
@@ -2918,7 +2950,7 @@ existe el sonido.
 **Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
 ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
 —adelantan el valle hasta una jornada con ese cielo, porque esperarla no es una
-forma de probarla— y hay un recorrido en `valley.shots.ts` que cuenta el rayo y
+forma de probarla— y hay un recorrido en `tools/shots/valley.shots.ts` que cuenta el rayo y
 deja la captura. **En invierno hay que pedir `snow`**: aquí no truena, así que
 pedir tormenta en invierno se salta la estación entera buscando una que no puede
 haber, y eso costó tres años de valle en la primera medida de la nieve. El
@@ -2989,7 +3021,7 @@ semanas aguanta: la división ya la hace el juego en vez de pedírsela a él.
 > después**»*. Era correcto y esa última frase es exactamente lo que ha pasado:
 > el dueño del diseño pidió las dos el 17 sep 2026 —«no tenemos la piedra … y
 > sería clave alguna moneda»— porque desde el juego de los medios
-> (`docs/plan-medios.md`) el jugador **paga con lo del valle**, y una economía
+> (`docs/historico/plan-medios.md`) el jugador **paga con lo del valle**, y una economía
 > con la que se paga tiene que estar en pantalla.
 >
 > Las dos se decidieron en el motor primero: la piedra era ya trabajo (§7.2) y
@@ -3039,7 +3071,7 @@ cosas y una carcasa de navegación no se puede construir sobre una lista así.
   > dónde van las manos que sobran, qué se levanta antes—, y se retiran por
   > decisión del dueño del diseño («no me gustan para nada», 17 sep 2026) con la
   > medida detrás: sólo vivía la postura de fábrica, y a dos muescas del reposo
-  > se moría media aldea, tarde y sin aviso (`docs/plan-medios.md` §1). Lo que
+  > se moría media aldea, tarde y sin aviso (`docs/historico/plan-medios.md` §1). Lo que
   > ocupa su sitio es **lo que el jugador puede dar al valle** (§7.12): tres
   > cosas, lo que cuesta cada una en fichas de recurso, y el motivo escrito
   > cuando no se puede dar. Se abre desde la línea de la bandeja donde vivía el
@@ -3121,7 +3153,7 @@ casi siete—. La alternativa era un reloj que no cuadra con lo que se ve.
 
 Y se puede comprobar desde fuera, que es lo que impide que esto se rompa en
 silencio: la raíz lleva `data-sun-phase` con la fase de la última jornada
-pintada, y un recorrido de `valley.shots.ts` compara `hourAt` de esa fase con lo
+pintada, y un recorrido de `tools/shots/valley.shots.ts` compara `hourAt` de esa fase con lo
 que dice la cabecera.
 
 **2. Ficha.** Se despliega desde abajo al tocar. Para un edificio: qué es, cuándo
@@ -3297,7 +3329,7 @@ para que «ha pasado algo» signifique lo mismo en la crónica y en el valle.
 **Y de ahí sale la regla que v3.68 tuvo que escribir después de romperla: un
 estado no se convierte en aviso repitiéndolo.** El dueño del diseño dijo dos
 veces que los mensajes eran «horrorosos» y las dos veces se buscó el fallo en la
-redacción. `tools/notice-report.ts` lo midió: **2 831 de los 3 309 avisos de
+redacción. `tools/reports/notice-report.ts` lo midió: **2 831 de los 3 309 avisos de
 cinco partidas de cuarenta años eran la misma clave** —la temporada de caza,
 quinientos sesenta y seis por partida, catorce al año—. La frase daba igual; a
 la décima vez cualquier frase es ruido.
@@ -3932,7 +3964,7 @@ export const TIME = {
 > tener sucesos.
 >
 > **La escalera resultante, en horas de reloj a ×1** (`npx tsx
-> tools/pace-report.ts`, 24 semillas × 60 años, política `prudent`; entre
+> tools/reports/pace-report.ts`, 24 semillas × 60 años, política `prudent`; entre
 > paréntesis, lo que costaba antes de B-1):
 >
 > | Peldaño | Horas a ×1 | Antes |
@@ -3955,7 +3987,7 @@ export const TIME = {
 > 4 %— porque lo que lo hundía era dormir en el suelo mientras la casa tardaba
 > un año.
 >
-> **La herramienta es parte de la decisión.** `tools/pace-report.ts` imprime esa
+> **La herramienta es parte de la decisión.** `tools/reports/pace-report.ts` imprime esa
 > escalera en horas, y hay que volver a pasarla cada vez que se toque
 > `REAL_MS_PER_TICK` o cualquier número que decida cuándo pasa algo. Medir el
 > ritmo en años de juego es lo que dejó pasar esto durante tres días.
@@ -4006,11 +4038,11 @@ sembrar. `GRAIN` queda por debajo de `BASE_STORAGE` y el primer tick no merma.
 **Dos manos siempre pueden con un campo** (`labour.ts`, v3.69). La regla de
 v2.14 —`MIN_FIELD_CREW` sobre la mano de obra menos la reserva de obra— dejaba
 a la pareja en 1,7 brazos, y 1,7 entre 2 es cero campos: medido con
-`tools/founding-report.ts`, la pareja no cosechaba nada y moría de hambre en el
+`tools/reports/founding-report.ts`, la pareja no cosechaba nada y moría de hambre en el
 año cuatro en cuatro semillas de seis. Lo que la regla quería impedir —dos
 supervivientes cosechando cuatro campos— sigue impedido.
 
-**Medido antes de fijarlo** (`tools/founding-report.ts`, seis semillas,
+**Medido antes de fijarlo** (`tools/reports/founding-report.ts`, seis semillas,
 cuarenta años, política prudente): ninguna pareja se extingue; población a los
 10 / 20 / 30 / 40 años: 14/28/34/56, 20/30/56/70, 11/25/37/53, 11/12/21/25,
 20/48/61/56 y 5/13/18/28. La semilla lenta (97) lo es por el ánimo, no por el
@@ -4329,14 +4361,14 @@ que la plantilla ofrezca a cambio. Ver §2.23.
 **Y desde R-1 (v3.75) esta suite mide un juego que ya no existe:** sus 37
 aserciones se escribieron cuando sólo las encrucijadas movían el mundo. No se
 «arreglan»: se remiden con los sucesos dentro y se reescriben contra los
-números nuevos, **cuando el dueño lo pida** (`docs/rework.md` §5). Hasta
+números nuevos, **cuando el dueño lo pida** (`docs/historico/rework.md` §5). Hasta
 entonces la puerta es la suite rápida y las jornadas.
 
 ### 12.10 Los sucesos del valle (`FATE`, R-1)
 
 La tabla de §7.10 con sus números. Todo vive en `FATE` (`balance.ts`), con
 `// TUNE:` y lo medido al lado; el informe que los fijó es
-`tools/fate-report.ts` (seis semillas × cuarenta años, jugadas con `run` y la
+`tools/reports/fate-report.ts` (seis semillas × cuarenta años, jugadas con `run` y la
 política prudente), y hay que pasarlo antes y después de mover cualquiera.
 
 | Constante | Valor | Por qué |
@@ -4346,7 +4378,7 @@ política prudente), y hay que pasarlo antes y después de mover cualquiera.
 | `FATED_LEAST_SHARE` | 0,25 | el suelo de esa proporción, para que un caserío tenga vida y no silencio |
 | `MIN_GAP_WEEKS` | 2 | un suceso pegado a otro no se lee |
 | `FEAST_IS_A_RITE` | true | sorteada, la fiesta salía una vez cada veinte años |
-| `WEIGHT` | rayo 3 · riada 3 · lobos 3 · boda 0,6 · buhonero 2 · pesca 2 · tejado 3 · fiesta 1 (no se sortea) · riña 1 · oso 0,6 · niño 0,5 · forastero 1 | tercera vuelta; las dos anteriores en `docs/rework.md` §2.5 |
+| `WEIGHT` | rayo 3 · riada 3 · lobos 3 · boda 0,6 · buhonero 2 · pesca 2 · tejado 3 · fiesta 1 (no se sortea) · riña 1 · oso 0,6 · niño 0,5 · forastero 1 | tercera vuelta; las dos anteriores en `docs/historico/rework.md` §2.5 |
 | `WEIGHT` de las visitas | buhonero 2 · factor 2 · tratante 1,5 · salinero 1 | M-0: el listón es el del buhonero, que ya pesaba 2 — una visita es una cosa que pasa, no una rareza |
 | `OFFER.WEEKS` | 2 | lo que espera quien ha subido antes de seguir camino |
 | `OFFER.MIN_PEOPLE` | 8 | **medido**: sin suelo, aceptar ofertas bajaba la población mediana de 47 a 15 y mataba seis aldeas de dieciséis, casi todas parejas que vendían lo que las mantenía vivas |
@@ -4369,7 +4401,7 @@ política prudente), y hay que pasarlo antes y después de mover cualquiera.
 
 Los factores por rasgo no son constantes sino ramas de `weightOf`: lobos ×1,6
 y oso ×2 en `old_forest`; riada y lobos ×0,5 en `bare_hills`. R-3 los
-multiplica (`docs/rework.md` §4).
+multiplica (`docs/historico/rework.md` §4).
 
 **Medido con la proporción puesta** (v3.78, doce semillas × cuarenta años,
 `foundGame`): **tres valles de doce se rompen** —uno por extinción, dos por
@@ -4389,7 +4421,7 @@ años): 12,3 sucesos al año en 286 años de aldea —286 y no 480, porque 8 de 
 2,96, pesca 2,26, oso 1,55, buhonero 0,43, **rayo 0,32**, lobos 0,28, fiesta
 0,29, riada 0,27, niño 0,23, boda 0,10, tejado 0,10; rencores casi siempre 2
 por partida (0 en las dos semillas que no llegan a los ocho años); distancia
-entre valles 0,22. El detalle y las causas de fin están en `docs/rework.md`
+entre valles 0,22. El detalle y las causas de fin están en `docs/historico/rework.md`
 §2.5 y §2.6.
 
 ---
@@ -4714,7 +4746,7 @@ se comporta así». La segunda no se puede escribir barata y no se puede tirar.
 Presupuesto: **menos de tres minutos.** Si sube, o se reparte en más semillas de
 las que hacen falta o hay algo que medir.
 
-### 14.3 Capturas (`tools/screenshots.ts`, Playwright)
+### 14.3 Capturas (`tools/shots/screenshots.ts`, Playwright)
 
 **Obligatorio desde el primer día que se dibuje algo** (`valle.md` §12).
 
@@ -5133,7 +5165,7 @@ las cinco pantallas se resuelve mediante `renderEntry` o `renderUiText`.
 **Objetivo.** El tick completo y el entregable del hito 0.
 **Depende de.** M-04, M-06, M-07, M-08, M-09.
 **Ficheros.** `src/engine/sim.ts`, `src/engine/found.ts`, `src/cli/chronicle.ts`,
-`tools/reader-packet-content.ts`, `tools/reader-packet.ts`.
+`tools/reports/reader-packet-content.ts`, `tools/reports/reader-packet.ts`.
 **Contrato.**
 ```ts
 export function foundGame(seed: number, inherited?: {
@@ -5183,7 +5215,7 @@ la suite ejecuta 620 pruebas sin pendientes en 17,53 s.
 
 **Objetivo.** Poder tocar §12 sin volar el juego.
 **Depende de.** M-10.
-**Ficheros.** `tests/balance/**`, `tools/balance-report.ts`.
+**Ficheros.** `tests/balance/**`, `tools/reports/balance-report.ts`.
 **Contrato.** `npm run test:balance` ejecuta 60 semillas × 200 años con las
 políticas `prudent`, `first`, `last` y `worst`, comprueba los umbrales de §12.9, imprime una tabla
 y escribe `artifacts/balance.csv`.
@@ -5214,7 +5246,7 @@ bosque restante al año 100, de M-15.
 **Depende de.** M-02.
 **Ficheros.** `src/engine/world/mapgen.ts`, `tiles.ts`.
 La ronda v2.12 incluye sus constantes en `balance.ts` (`MAPGEN`), las pruebas en
-`tests/fast/mapgen.test.ts` y el volcado ASCII en `tools/map-dump.ts`
+`tests/fast/mapgen.test.ts` y el volcado ASCII en `tools/reports/map-dump.ts`
 (`npm run map -- --seed 7`); la conexión con `found.ts` pertenece a M-10.
 `idx` y `neighbours4` viven en `tiles.ts`, para que M-14 y M-15 tengan la
 topología sin arrastrar el generador, y `mapgen.ts` las reexporta para que el
@@ -5398,7 +5430,7 @@ regreso, noche y nuevo ciclo con la fracción temporal real de M-20.
 **Objetivo.** Que quien programa pueda ver el juego. Es el riesgo número uno de
 `valle.md` §12 y esto es su mitigación.
 **Depende de.** M-16.
-**Ficheros.** `tools/screenshots.ts`, `playwright.config.ts`, `src/ui/debug.ts`.
+**Ficheros.** `tools/shots/screenshots.ts`, `playwright.config.ts`, `src/ui/debug.ts`.
 **Contrato.** `npm run shots -- --seed 7 --years 1,20,60,120` genera en
 `artifacts/` una PNG por combinación de año y estación, a 390×844 (mapa 360×560), más su
 versión en escala de grises, más una hoja de contacto que las junta.
@@ -6382,7 +6414,7 @@ tools/graphics/              # visor, captura, validación y medición
 src/render3d/                # escena, cámara, adaptación, animación, selección
 public/assets/valley3d/       # GLB y manifiesto aprobados para distribución
 artifacts/graphics/<ronda>/   # resultados generados; no se asumen publicados
-docs/graphics-rounds/        # briefs ejecutados, evidencias resumidas y decisiones
+docs/historico/graphics-rounds/        # briefs ejecutados, evidencias resumidas y decisiones
 ```
 
 No mantener dos fuentes editables para un mismo recurso. Por defecto la receta
@@ -6500,7 +6532,7 @@ seguir porque el artefacto anterior no tenía esas piezas.
 **Deuda anotada.** El aldeano no tiene frente: por delante y por detrás es casi
 la misma silueta, y en el valle giran hacia donde caminan. Es asunto de
 geometría y de P1, no del rig. Informe completo en
-`docs/graphics-rounds/G-04.md`.
+`docs/historico/graphics-rounds/G-04.md`.
 
 ### D.5 Fronteras de software y contrato propuesto
 
@@ -7088,7 +7120,7 @@ Medido antes y después, como D.9 exige: de 18 mallas a **3**, de 914 llamadas a
 **269**, y el tiempo de CPU de la escena de comparación de 3,60 a **1,30 ms** de
 mediana. **Los triángulos no se mueven ni uno** y la auditoría de animación
 devuelve los mismos números dígito a dígito: lo que cambia es en cuántas tandas
-se envía lo mismo. Informe completo en `docs/graphics-rounds/G-09.md`.
+se envía lo mismo. Informe completo en `docs/historico/graphics-rounds/G-09.md`.
 
 Perfil bajo degrada sombra, vegetación decorativa, resolución y efectos en ese
 orden a validar, manteniendo personas y señales de crisis. Los valores visuales
@@ -7198,7 +7230,7 @@ si se agota, dejar checkpoint reproducible, nunca marcar aprobado lo pendiente.
 
 Los ficheros indicados son el alcance autorizado al despachar cada brief, no una
 orden de implementar todos ahora. Nuevos paths se crean en su ronda. Todos
-entregan informe `docs/graphics-rounds/G-XX.md` y evidencia en su carpeta
+entregan informe `docs/historico/graphics-rounds/G-XX.md` y evidencia en su carpeta
 `artifacts/graphics/G-XX/`. Los informes no son fuente normativa.
 
 #### G-00 · Entorno y circuito remoto
@@ -7370,7 +7402,7 @@ sin regresión de presupuesto con el catálogo real.
 **Objetivo:** uso instalable/offline y recuperación con recursos 3D.
 **Depende de:** G-07, G-10. **Lectura:** §13.4 y D.7/D.10/D.11.
 **Ficheros:** `src/ui/pwa.ts`, `public/sw.js`, `vite.config.ts`,
-`tools/valley.pwa.ts`, `tools/subpath.pwa.ts`, `tools/stale.pwa.ts`;
+`tools/pwa/valley.pwa.ts`, `tools/pwa/subpath.pwa.ts`, `tools/pwa/stale.pwa.ts`;
 `src/render3d/assets.ts` mediante transferencia explícita de propiedad.
 **Contrato:** manifiesto versionado; recursos bajo base de despliegue;
 fallback conserva estado en memoria. **Reglas:** no purgar caché activa antes
@@ -7459,7 +7491,7 @@ y captura; por ello se conserva la equivalencia semántica definida en D.4 y el
 hash exacto de cada entrega. Se promueve que clips y conectores vacíos solo son
 correctos para estudios que los declaran vacíos. G-03 puede ampliar primitivas
 del pipeline únicamente mediante transferencia explícita y general. Informe:
-`docs/graphics-rounds/G-02.md`.
+`docs/historico/graphics-rounds/G-02.md`.
 
 v2.91 arbitra G-01. Se ratifican la exportación Y-up sin reparación, el encuadre
 por caja, el tiempo de presentación explícito y la captura repetible: dos PNG
@@ -7467,7 +7499,7 @@ por caja, el tiempo de presentación explícito y la captura repetible: dos PNG
 de sombra se deriven de la caja. Three.js se fija en 0.185.0 con tipos 0.185.4:
 r186 estaba publicado pero no tenía tipos alineados. La suite nueva tarda 3 ms;
 la suite completa observada en 22,11 s supera el objetivo histórico por pruebas
-de simulación existentes, no por G-01. Informe: `docs/graphics-rounds/G-01.md`.
+de simulación existentes, no por G-01. Informe: `docs/historico/graphics-rounds/G-01.md`.
 
 v2.90 arbitra G-00. Se ratifica Blender en segundo plano con 5.2.1 LTS y Chrome
 del sistema como navegador Playwright. El diagnóstico no confía en el código de
@@ -7475,7 +7507,7 @@ salida de Blender: exige marca de finalización, los tres productos y cabecera
 GLB. Se promueve esta regla porque dos excepciones Python devolvieron 0 durante
 la construcción del propio diagnóstico. P0 permanece parcial: G-01 debe cargar
 el GLB en Three.js y la evidencia aún debe abrirse desde fuera del host. Informe:
-`docs/graphics-rounds/G-00.md`.
+`docs/historico/graphics-rounds/G-00.md`.
 
 v2.89 añade el programa sin cambiar código de producción. Motivos: separar
 capacidad de generar modelos de capacidad de manejar una GUI; hacer comprobable
@@ -7525,7 +7557,7 @@ cortos), E.6 (por qué lo que hay en el juego hoy es peor que el descarte, que e
 lo primero que un agente nuevo va a ver) y E.7 (las trampas ya pagadas, para no
 pagarlas dos veces). Después, el brief de la fase que se despacha en E.8.
 
-Los informes de ronda están en `docs/life-rounds/V-XX.md` y **no son fuente
+Los informes de ronda están en `docs/historico/life-rounds/V-XX.md` y **no son fuente
 normativa**: cuentan qué pasó y qué se midió. Lo que manda es este anexo.
 
 ### E.1 Diagnóstico: el valle no se simula, se dibuja
@@ -7688,7 +7720,7 @@ todo el mundo los tiene desde v3.61.
 
 ### E.5 Lo construido, con sus medidas
 
-Cada fase cerrada tiene su informe en `docs/life-rounds/`. Aquí, lo que
+Cada fase cerrada tiene su informe en `docs/historico/life-rounds/`. Aquí, lo que
 entregó y el número que lo prueba.
 
 | Fase | Ficheros | Lo que entregó | Medido |
@@ -7704,7 +7736,7 @@ entregó y el número que lo prueba.
 | **V-08** | `life/beasts.ts` | Gallinas, cerdos y vacas como `Dweller` con impulso propio, y una `Place` móvil que ofrece `pet`/`chase`/`feed` | 0 animales en el agua en 6 semillas; interacción persona-animal en todas las semillas con cabaña (1 411 a 4 895 instantes); `ashore` de 1,08 a 0,326 celdas |
 | **V-10** | `life/places.ts` | La plaza, el vado y el claro: sitios que no son un edificio | Los tres se detectan y son alcanzables en 6 de 6 semillas; visitados en la mayoría (plaza 4/6, claro 5/6, vado 3/6) |
 | **V-13** | `tests/fast/life-perf.test.ts` | La medida del coste por cuerpo, continua | 0,75 µs con 80, 1,02 µs con 200: sube un 36 % al multiplicar por 2,5 la gente |
-| **V-09** (abierta) | `life/props.ts` | Pelota, palo, cubo, haz: se reparten, se cogen, se sueltan, se tiran y ruedan; física del descarte | Un trasto nunca en dos manos, nunca bajo el agua, 6 semillas. Pero 0–0,20 pases por persona contra 0,30 del descarte: jugar gana el concurso de utilidad el 6 % de las veces y el receptor no recoge. Está en `docs/next-plan.md` (V-09b) |
+| **V-09** (abierta) | `life/props.ts` | Pelota, palo, cubo, haz: se reparten, se cogen, se sueltan, se tiran y ruedan; física del descarte | Un trasto nunca en dos manos, nunca bajo el agua, 6 semillas. Pero 0–0,20 pases por persona contra 0,30 del descarte: jugar gana el concurso de utilidad el 6 % de las veces y el receptor no recoge. Está en `docs/historico/next-plan.md` (V-09b) |
 | **V-14** | `world/ridge.ts` | El cuenco, fuera del mapa | 0 celdas del valle tocadas; 32 % del bosque vive en el borde y habría desaparecido |
 | **(arreglo)** | `life/offers.ts`, `decide.ts` | Las plazas del corro se comprueban al montar el sitio, y `decide` prueba la siguiente oferta si no hay camino | Sin nada que hacer, 33 % → **0 %**; andando, 26 % → **75 %**, que es la cifra del descarte |
 
@@ -7747,8 +7779,8 @@ cuatro ajustes no lo habían bajado y que por tanto «no es el número, es el
 modelo». **Las dos mitades resultaron falsas**, y conviene dejarlo escrito
 porque es la clase de error que se repite:
 
-- **El 74–81 % era de una sola semilla.** Medido luego en ocho (`docs/
-  life-rounds/sonda-linea-base.md`), la mediana era otra cosa. `CLAUDE.md` ya
+- **El 74–81 % era de una sola semilla.** Medido luego en ocho (`docs/historico/life-rounds/sonda-linea-base.md`),
+  la mediana era otra cosa. `CLAUDE.md` ya
   dice que un umbral no se fija con una semilla; un diagnóstico, tampoco.
 - **Y para cuando se escribió, la cifra ya se había dado la vuelta por un
   fallo.** El arreglo del imán de V-06 repartió las plazas de cada oferta en
@@ -7885,7 +7917,7 @@ si es uno de éstos.
 ### E.8 Briefs por módulo
 
 Los ficheros indicados son el alcance autorizado. Todos entregan informe en
-`docs/life-rounds/V-XX.md` con lo medido, y **todos los que cambien lo que se
+`docs/historico/life-rounds/V-XX.md` con lo medido, y **todos los que cambien lo que se
 ve entregan además la demo publicada** antes de cerrar (regla de E.6). Cada
 brief lista lo que existe para reutilizar y lo que no se debe reinventar.
 
@@ -8129,7 +8161,7 @@ ms sin escenas ni trastos). El paso de vida por debajo de 1 000 µs con todo
 **Ficheros.** `tools/graphics/bench-life.ts` (retirado en V-12) y una prueba en
 `life-*.test.ts` que falle si el coste por cuerpo deja de ser plano.
 **Terminado cuando.** Medido en el móvil de verdad, no en el portátil, y
-escrito en `docs/life-rounds/V-13.md`.
+escrito en `docs/historico/life-rounds/V-13.md`.
 
 ---
 
@@ -8198,7 +8230,7 @@ Se registran V-00 a V-06 y V-14 como hechas con sus medidas, y se escribe E.6
 que hay que leer, porque es la primera cosa que se va a ver. Se añade la regla
 séptima de método (no ajustar a ciegas más de dos veces) y la regla de E.6
 (cada fase que cambie lo que se ve, se enseña antes de cerrar la siguiente),
-las dos aprendidas en esta misma ronda. Informes: `docs/life-rounds/V-00.md` a
+las dos aprendidas en esta misma ronda. Informes: `docs/historico/life-rounds/V-00.md` a
 `V-06.md`.
 
 ---

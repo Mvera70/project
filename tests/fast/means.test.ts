@@ -1,12 +1,12 @@
 // M-2 · Los medios: lo que el jugador mete en el valle.
-// `docs/plan-medios.md` §3, brief en `docs/rework.md` §4b.
+// `docs/historico/plan-medios.md` §3, brief en `docs/historico/rework.md` §4b.
 //
 // **Lo que se guarda no es que un medio sea bueno.** Es que dar algo cueste lo
 // del valle, que no se pueda dar lo que no se puede pagar, que dar no mueva una
 // sola tirada del mundo, y que cada medio abra algo **y** cierre algo. Si un día
 // alguien hace que los medios sólo traigan cosas buenas, esto se rompe, y eso
 // es lo que tiene que pasar: la mitad mala es la mitad que hace que elegir sea
-// una decisión (`plan-medios.md` §3.2).
+// una decisión (`docs/historico/plan-medios.md` §3.2).
 
 import { describe, expect, it } from 'vitest';
 import { ANIMALS, FATE, MEANS, TIME } from '@engine/balance';

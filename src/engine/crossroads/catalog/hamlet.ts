@@ -15,14 +15,20 @@
 // pueblos grandes».
 //
 // **La estación no es decoración, es lo que las hace alcanzables.** §8.6 pone
-// un suelo de `MIN_TICKS_BETWEEN` = 48 ticks entre dos preguntas, así que la
-// primera encrucijada de una partida no puede plantearse antes del tick 47
-// —once horas de reloj— y la población cruza diez a las diez horas. La ventana
-// del caserío se cierra casi cuando la puerta se abre, de modo que lo que
-// decide si este contenido existe o no es **caer justo en esa ranura**: el
-// tick 48 es a la vez la primera ranura legal y la primera semana de primavera.
-// Medido en doce semillas (ver `docs/changelog.md` 4.15): cinco valles siguen
-// siendo caserío en el tick 47, y de ellos los que preguntan lo hacen ahí.
+// un suelo entre dos preguntas (`CROSSROADS.MIN_TICKS_BETWEEN`), así que la
+// primera encrucijada de una partida no puede plantearse antes de que ese
+// hueco pase, y la población cruza diez a las diez horas de reloj: la ventana
+// del caserío se cierra casi cuando la puerta se abre. Lo que decide si este
+// contenido existe o no es **caer justo en la primera ranura legal**, y por eso
+// las dos estaciones están elegidas contra ella y no por gusto.
+//
+// Con el suelo en un año —como estuvo hasta el 19 sep 2026— esa ranura caía en
+// el tick 47 y las dos plantillas tenían que ser de primavera; la primera
+// pregunta del juego llegaba a las **11 h**. Con el suelo en un tercio de año
+// la ranura cae en el tick 15, que es **verano del año 0**, y por eso el
+// forastero es de verano: la primera pregunta baja a **3,5 h y sale en los
+// doce valles**. Si el suelo vuelve a moverse, esto hay que remedirlo — es la
+// clase de acoplamiento que conviene tener escrito y no descubrir.
 
 import type { CrossroadTemplate } from '../schema';
 
@@ -112,11 +118,14 @@ const ONE_AT_THE_FORD: CrossroadTemplate = {
   cooldownYears: 6,
   requires: [
     { k: 'stat', stat: 'people', op: '<', v: 10 },
-    // Primavera, como A.13 y por el mismo motivo escrito: §5.7 es cuando la
-    // gente se mueve por los caminos. Compite con la de arriba por la misma
-    // ranura a propósito — `NOVELTY_MULTIPLIER` deja que la que no salió el año
-    // pasado salga este.
-    { k: 'season', season: 'spring' },
+    // **Verano, y la estación aquí decide si el contenido existe.** Con el
+    // suelo de §8.6 en 16 ticks la primera ranura legal de una partida cae en
+    // el tick 15, o sea en verano del año 0: con las dos plantillas en
+    // primavera, la primera pregunta del juego se iba a las 11 h; con ésta en
+    // verano baja a **3,5 h y en los doce valles**. Y es la estación de A.13
+    // por el mismo motivo escrito allí: §5.7 mueve a la gente por los caminos
+    // cuando hace bueno.
+    { k: 'season', season: 'summer' },
   ],
   cast: [{ as: 'A', role: 'leader' }],
   title: 'crossroad.one_at_the_ford.title',

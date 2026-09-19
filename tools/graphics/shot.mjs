@@ -26,7 +26,7 @@ const opt = (name, fallback) => {
 const runSeconds = Number(opt('run', '0'));
 // --advance N   adelanta N semanas del motor antes de fotografiar, falseando el
 //               reloj del navegador como hacen las jornadas de Playwright
-//               (`tools/valley.shots.ts`, `advanceWeeks`). Sin esto la única
+//               (`tools/shots/valley.shots.ts`, `advanceWeeks`). Sin esto la única
 //               aldea que se podía fotografiar era la del año 1 —la pareja
 //               fundadora, dos cuerpos— y **ninguna fase de la capa de vida
 //               podía entregar su evidencia**, porque lo que hay que ver es un

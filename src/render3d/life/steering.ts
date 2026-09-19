@@ -100,7 +100,7 @@ export function avoid(body: Body, land: Terrain): Push {
   // cae dentro de ella y ese punto coincide siempre con el cuerpo mismo —el
   // vector que los separa es cero en cualquier instante, no sólo justo en el
   // borde—, así que no hay fuerza que crezca al acercarse a un borde y morir
-  // en el otro (rework.md §3.5.1: probado, un cuerpo se quedaba clavado a
+  // en el otro (docs/historico/rework.md §3.5.1: probado, un cuerpo se quedaba clavado a
   // 0,04 celdas de la salida porque la vecina que lo empujaba dejaba de
   // hacerlo antes de que la propia celda aportara nada). Se empuja hacia el
   // borde más próximo de la propia celda —el que menos queda por cruzar—, y
@@ -141,7 +141,7 @@ export function avoid(body: Body, land: Terrain): Push {
       const clear = body.radius + Math.min(WALL_CLEAR, body.radius * 2);
       if (apart >= clear) continue;
       // **Justo en el borde compartido, el punto más cercano es el propio
-      // cuerpo** (rework.md §3.5.1): con el círculo colisionando de verdad, un
+      // cuerpo** (docs/historico/rework.md §3.5.1): con el círculo colisionando de verdad, un
       // cuerpo puede quedarse parado exactamente en la línea que separa su
       // celda de una cerrada — antes se cruzaba de largo y esto no se notaba
       // nunca—. El vector `(cuerpo − punto)` es cero ahí y no dice hacia dónde
@@ -182,7 +182,7 @@ const FIX_CAP = 0.06;
 /**
  * Si el círculo entero cabe ahí, no sólo el centro.
  *
- * rework.md §3.5.1: `resolve` corregía solapes mirando sólo si el centro de
+ * docs/historico/rework.md §3.5.1: `resolve` corregía solapes mirando sólo si el centro de
  * destino caía en celda cerrada, así que podía dejar el círculo —medio cuerpo—
  * metido en un muro con el centro todavía en celda libre, justo lo que
  * `integrate` (`body.ts`) ya no deja hacer al andar. Sin este mismo criterio

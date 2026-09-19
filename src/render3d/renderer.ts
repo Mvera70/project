@@ -89,10 +89,10 @@ export const WANTED = [
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
   ...VILLAGER_MODELS, TREE, TREE_PINE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
-  // P-2 · la fuente de la plaza, cuando exista (`docs/encargo-fuente.md`).
+  // P-2 · la fuente de la plaza, cuando exista (`docs/encargos/encargo-fuente.md`).
   'fountain',
   // M-3 · lo que el jugador mete en el valle. Ninguno de los dos está
-  // publicado todavía —el encargo es `docs/encargo-arado.md`— y por eso se
+  // publicado todavía —el encargo es `docs/encargos/encargo-arado.md`— y por eso se
   // piden aquí: `WANTED` es lo que el renderer puede pedir, exista ya o no,
   // y mientras no exista `world/props.ts` los dibuja con primitivas.
   'barrel', 'plough',

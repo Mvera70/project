@@ -51,7 +51,7 @@ const grown = new Map<string, GameState>();
  * cosas, y eso es lo que `foundTwenty` garantiza y una pareja no.
  *
  * Con `foundGame` cuatro de ellas fallaban, y es exactamente la misma causa que
- * movió a dieciocho fixtures en IA-0 (`docs/life-rounds/IA-0.md` §3): el valle
+ * movió a dieciocho fixtures en IA-0 (`docs/historico/life-rounds/IA-0.md` §3): el valle
  * de catorce años de la pareja ya no tiene fragua, ni capilla, ni granero, ni
  * vaca. La convención está en `CLAUDE.md` desde v3.69 y este fichero no se había
  * migrado — se descubrió al cerrar IA-5, cuando el agente demostró que esas

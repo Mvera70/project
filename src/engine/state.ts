@@ -53,7 +53,7 @@ export interface VillageStats {
    *
    * Entra vendiendo a quien pasa por el camino y sale comprándole lo que el
    * valle no sabe hacer, y con el diezmo del señor. No se produce dentro: por
-   * eso es la que hace que el camino importe (`docs/plan-medios.md` §6.3).
+   * eso es la que hace que el camino importe (`docs/historico/plan-medios.md` §6.3).
    */
   silver: number;
 }
@@ -270,7 +270,7 @@ export const TERRAIN_CODE = {
   rock: 3,
   marsh: 4,
   cleared: 5,
-  // El mapa grande, paso 1 (`docs/next-plan.md`). **Nada los genera todavía**:
+  // El mapa grande, paso 1 (`docs/historico/next-plan.md`). **Nada los genera todavía**:
   // esto es el tipo, el coste de A*, la prohibición de construir, el color y la
   // cota, con el mapa al tamaño de hoy. Se hace en un paso propio justamente
   // porque veinte ficheros miran esta tabla y unos cuantos daban por hecho que
@@ -547,7 +547,7 @@ export interface Offer {
  * más registro, y la partida se puede reproducir byte a byte.
  *
  * Es un canal aparte de `Decision` y no una unión con ella, a propósito (y es
- * una desviación del brief de `rework.md` §4b): una semana puede traer una
+ * una desviación del brief de `docs/historico/rework.md` §4b): una semana puede traer una
  * respuesta a la encrucijada **y** una oferta aceptada, y `history` —que las
  * encrucijadas leen para no repetirse— no tiene por qué aprender a saltarse lo
  * que no es suyo.
@@ -868,7 +868,7 @@ export const PRIORITY_FAMILIES: Readonly<Record<Exclude<PriorityName, 'none'>, r
 
 
 /**
- * Lo que **este** valle tiene y otro no. E5 de `docs/plan-juego.md`.
+ * Lo que **este** valle tiene y otro no. E5 de `docs/historico/plan-juego.md`.
  *
  * *«La aldea no muta en diferentes partidas, siempre prácticamente es lo
  * mismo.»* Y era verdad, con tres recetas fijas detrás: un mapa —río, fracción

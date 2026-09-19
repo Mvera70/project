@@ -22,8 +22,8 @@ borres sin preguntarle.
 
 ## Encargo abierto para la sesión de vida y arte · M-3 (17 sep 2026)
 
-**Contexto en una frase:** el juego de los medios (`docs/plan-medios.md`,
-`rework.md` §4b) hace que el jugador **dé cosas al valle** en vez de darle
+**Contexto en una frase:** el juego de los medios (`docs/historico/plan-medios.md`,
+`docs/historico/rework.md` §4b) hace que el jugador **dé cosas al valle** en vez de darle
 órdenes, y el principio es «ciertas cosas dan lugar a otras». Eso sólo se
 sostiene si **lo que se mete se ve**.
 

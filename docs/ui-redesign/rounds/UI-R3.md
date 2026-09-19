@@ -193,7 +193,7 @@ antigua.
 cierre por gesto, y sobre todo que una entrada nueva no roba el
 desplazamiento) se verificó con un recorrido de Playwright hecho a propósito
 para esta ronda — no forma parte del entregado, no toca `tools/graphics/
-shot.mjs` (que no trae `--open chronicle`) ni `tools/valley.shots.ts`. Reloj
+shot.mjs` (que no trae `--open chronicle`) ni `tools/shots/valley.shots.ts`. Reloj
 falso instalado antes de navegar (misma técnica que `shot.mjs --advance`),
 semilla 11, quince años adelantados, crónica abierta desde la barra,
 desplazada a `scrollTop = 300` (leyendo el año XIV), y ocho años más
@@ -244,8 +244,8 @@ conservado en el árbol (no es parte del entregado).
 
 | Caso | Resultado | Estado |
 |---|---|---|
-| Crónica: abrir desde la barra, años en orden, cerrar con «×» y con la barra visible encima | Pasa — capturado, y ya cubierto por `tools/valley.shots.ts` (línea 185-190, no reejecutado, no tocado) | cubierto |
-| Selector de archivos: no repite la partida actual, ordena de más reciente a más antigua | Las dos propiedades puras probadas en `ui-chronicle.test.ts`; el camino de DOM completo lo cubre `tools/valley.shots.ts` (`archivePicker`, líneas 532-539) — ese test concreto está declarado `test.fail()` desde antes de esta ronda por una causa ajena (bounding box del canvas al refundar), no reejecutado por regla del dueño | cubierto por lógica pura; el DOM completo hereda una prueba ya roja por otra causa |
+| Crónica: abrir desde la barra, años en orden, cerrar con «×» y con la barra visible encima | Pasa — capturado, y ya cubierto por `tools/shots/valley.shots.ts` (línea 185-190, no reejecutado, no tocado) | cubierto |
+| Selector de archivos: no repite la partida actual, ordena de más reciente a más antigua | Las dos propiedades puras probadas en `ui-chronicle.test.ts`; el camino de DOM completo lo cubre `tools/shots/valley.shots.ts` (`archivePicker`, líneas 532-539) — ese test concreto está declarado `test.fail()` desde antes de esta ronda por una causa ajena (bounding box del canvas al refundar), no reejecutado por regla del dueño | cubierto por lógica pura; el DOM completo hereda una prueba ya roja por otra causa |
 | Retorno desde el epitafio | `openChronicle`/`closeChronicle` sin cambios de comportamiento; `screens/epitaph.ts` no se ha tocado | pasa, sin cambios |
 | Una entrada nueva no roba el desplazamiento | Medido con reloj falso: ver §4 | pasa |
 | No enlazar identidades por texto | No se añadió ningún enlace: no hay identificador estable en `ChronicleEntry` (§3.4) | cumplido por abstención |
@@ -256,7 +256,7 @@ conservado en el árbol (no es parte del entregado).
 
 - **`ui-milestones` sigue roja** (semilla 999, 18 hitos contra ≥20).
   Heredada de UI-R1/UI-R2, ajena a esta ronda.
-- **`tools/valley.shots.ts`: «una aldea terminada deja epitafio…» sigue
+- **`tools/shots/valley.shots.ts`: «una aldea terminada deja epitafio…» sigue
   declarada `test.fail()`** por una causa que no es de la crónica (el canvas
   no da `boundingBox()` al refundar tras el epitafio). Ese mismo test es el
   que ejercita de verdad el selector de archivo sobre DOM completo
@@ -268,9 +268,9 @@ conservado en el árbol (no es parte del entregado).
 - **Sin evidencia de Playwright oficial** (`test:shots`) para el camino
   nuevo: la evidencia de §4/§5 es un recorrido ad hoc, no conservado en el
   árbol, hecho para no tocar `tools/`. UI-R6 debería, si hace falta una
-  prueba permanente de este camino, decidir si entra en `tools/valley.
-  shots.ts` (fuera del alcance de esta ronda) o en un fichero de
-  `test:shots` nuevo.
+  prueba permanente de este camino, decidir si entra en
+  `tools/shots/valley.shots.ts` (fuera del alcance de esta ronda) o en un
+  fichero de `test:shots` nuevo.
 - **No se ha probado la sucesión real** (epitafio → «Begin again» → abrir
   crónica por la barra) con un juego de verdad; `chronicleIdentity` está
   unit-testada con semillas sintéticas, pero la propiedad «una sucesora no
@@ -289,7 +289,7 @@ conservado en el árbol (no es parte del entregado).
   de un ancestro `overflow: auto` de forma distinta a lo que CSS2.1 exige —
   entonces la crónica se vería recortada a 60vh en vez de a pantalla
   completa. No se ha probado en un teléfono de verdad esta ronda.
-- Que `tools/valley.shots.ts` («una aldea terminada…»), al ejecutarse de
+- Que `tools/shots/valley.shots.ts` («una aldea terminada…»), al ejecutarse de
   verdad, encuentre un `combobox`/`option` que ya no coincide en texto o en
   cuenta — indicaría que reutilizar `archivedSource`/`yearBlock` sin
   cambios no bastó para preservar el contrato exacto que ese test fija.
@@ -304,7 +304,7 @@ conservado en el árbol (no es parte del entregado).
 ## 9. Lo siguiente
 
 **UI-R5** (integración), del integrador: juntar esta rama con UI-R4, y
-decidir si el hallazgo de §7 (`test.fail()` de `valley.shots.ts` sobre el
+decidir si el hallazgo de §7 (`test.fail()` de `tools/shots/valley.shots.ts` sobre el
 selector de archivo) se investiga entonces. **UI-R6** (validación): ejecutar
 `test:shots` de verdad sobre este camino, algo que esta ronda no ha hecho
 por regla del dueño («ninguna suite completa más de una vez»).

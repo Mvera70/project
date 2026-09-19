@@ -203,7 +203,7 @@ export function cellColour(
     case 3: return palette.rock;
     case 4: return palette.forestDark;
     case 5: return palette.field;
-    // El mapa grande: piedra desnuda y agua quieta (`docs/next-plan.md`).
+    // El mapa grande: piedra desnuda y agua quieta (`docs/historico/next-plan.md`).
     case 6: return palette.stone;
     case 7: return palette.lake;
     // El vado: el agua del río aclarada con el color de los caminos, que es

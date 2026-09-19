@@ -30,7 +30,7 @@
 // persona en el descarte. V-09 confió en que la misma `satisfy()`/`drift()`
 // de `needs.ts` bastara sin portar `PLAYED_OUT` aparte (E.3.7); medido, no
 // bastó, así que V-09b lo porta (`PLAYED_OUT`, abajo) y añade `Dweller.
-// playedUntil` (`village.ts`). Informe de ronda: `docs/life-rounds/V-09.md`
+// playedUntil` (`village.ts`). Informe de ronda: `docs/historico/life-rounds/V-09.md`
 // y su sección V-09b.
 //
 // **V-09b añade la quinta lección, y es la que faltaba para que se jugara de

@@ -1,4 +1,4 @@
-// M-0 · Las ofertas del camino y el diezmo. `docs/rework.md` §4b, brief M-0.
+// M-0 · Las ofertas del camino y el diezmo. `docs/historico/rework.md` §4b, brief M-0.
 //
 // Propiedades del diseño, no cifras: qué es una oferta (algo que no cambia el
 // estado hasta que el jugador contesta), qué no puede hacer el diezmo (matar de
@@ -212,7 +212,7 @@ describe('la mesa entera', () => {
     if (s.ended === null) {
       // Con fragua y roca en el valle, a los sesenta años hay piedra en el
       // montón o piedra puesta en algo. Lo que no puede haber es ninguna de las
-      // dos cosas: eso era la última década vacía de `plan-juego.md` §3.1.
+      // dos cosas: eso era la última década vacía de `docs/historico/plan-juego.md` §3.1.
       const quarried = s.village.stone > 0
         || s.buildings.some((b) => b.tier === 1);
       expect(quarried || !s.buildings.some((b) => b.kind === 'smithy')).toBe(true);

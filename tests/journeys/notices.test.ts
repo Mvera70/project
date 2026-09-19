@@ -3,7 +3,7 @@
 // «Los mensajes que aparecen ahí son horrorosos» — el dueño del diseño, dos
 // veces, y las dos veces se buscó el fallo en la redacción. No estaba ahí. Lo
 // que estaba mal era **cuál** de las frases salía: medido con
-// `tools/notice-report.ts` sobre cinco semillas y cuarenta años, 2 831 de los
+// `tools/reports/notice-report.ts` sobre cinco semillas y cuarenta años, 2 831 de los
 // 3 309 avisos eran la misma clave —la temporada de caza, quinientos sesenta y
 // seis por partida, catorce al año durante cuarenta años—. La frase daba igual:
 // a la décima vez cualquier frase es ruido.

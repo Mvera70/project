@@ -83,7 +83,7 @@ Los tres llevaban `test.fail()` y en los tres el fallo era de la prueba:
 | El epitafio | Congelaba «82 people at its height», exigía visible una clase que UI-V2b retiró (`.valley-speeds`) y probaba el selector de archivo que UI-V8 borró |
 | La encrucijada | Fijaba «60 ticks a 16×» para que el motor plantara una, y desde R-1 el valle tira sucesos cada semana: esa trayectoria ya no es la que era. Ahora sondea semana a semana con tope, y no exige **cuál** se planta: el catálogo tiene 56 opciones |
 
-Los trece recorridos de `valley.shots.ts` están en verde y **ninguno queda
+Los trece recorridos de `tools/shots/valley.shots.ts` están en verde y **ninguno queda
 declarado**.
 
 ## 4. La línea «Today» de la ficha

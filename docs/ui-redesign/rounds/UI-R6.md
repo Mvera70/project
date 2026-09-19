@@ -24,14 +24,14 @@ suite entera se deja para el cierre.
    buscando `closePanel()`/`.valley-panel-close`, que UI-R4/UI-R5 movieron a
    `redesign/shell.ts`. Mudadas al camino vivo.
 2. **`title.ts`** (mío, de U-10b, del mismo día): el campo «Open at year»
-   copió la clase `title-seed` del número del valle; `valley.shots.ts`
+   copió la clase `title-seed` del número del valle; `tools/shots/valley.shots.ts`
    localiza el número por esa clase exacta y con dos elementos rompía en
    «strict mode violation». Clase propia (`title-year`), piel compartida por
    selector CSS.
 3. **`test:pwa`** navegaba a `/` sin pasar el menú de inicio (U-10 llegó
    después de escribirse esta suite, y no se había vuelto a correr entera).
-   `tools/pass-title.ts` nuevo — **sin `test()` dentro a propósito**: la
-   primera versión importaba la función desde `valley.shots.ts`, y eso
+   `tools/shots/pass-title.ts` nuevo — **sin `test()` dentro a propósito**: la
+   primera versión importaba la función desde `tools/shots/valley.shots.ts`, y eso
    registra sus pruebas como efecto de cargar el módulo; `test:pwa` se puso a
    correr la suite de capturas entera con la configuración equivocada.
 
@@ -49,7 +49,7 @@ suite entera se deja para el cierre.
   el manifiesto ya está verificado, que es lo que hace falta para «Añadir a
   pantalla de inicio»; lo que queda en duda es la robustez fina de abrir sin
   red tras un redespliegue.
-- **`valley.shots.ts`**, «la ruta viva abre un valle maduro… para revisar la
+- **`tools/shots/valley.shots.ts`**, «la ruta viva abre un valle maduro… para revisar la
   multitud»: no encuentra ficha que abrir tras barrer toques alrededor del
   centro en la semilla 7 a los ochenta años (83 edificios). El enganche
   toque→ficha (`app.ts:803`) está intacto y sin cambios de esta tanda. Puede

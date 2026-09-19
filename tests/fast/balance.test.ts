@@ -246,9 +246,28 @@ describe('balance · encrucijadas', () => {
     //
     // Con un año baja al 34 % y el intervalo lo pone otra vez lo que hay
     // elegible (mediana 76 semanas). Lo que esta prueba guarda es la propiedad,
-    // no el número: **el hueco mínimo es un año de aldea**, que es lo que hace
-    // que dos decisiones no se pisen sin que el reloj sea quien decide.
-    expect(CROSSROADS.MIN_TICKS_BETWEEN).toBe(TIME.WEEKS_PER_YEAR);
+    // no el número: **el reloj no es quien decide cuándo se pregunta**.
+    //
+    // **Y de un año baja a un tercio de año** (19 sep 2026), por lo que el
+    // dueño del diseño dijo probándolo: «ahora mismo se tarda muchísimo en
+    // empezar a hacer cosas y es muy lento y muy aburrido». Con el hueco en un
+    // año, **la primera pregunta de una partida no podía plantearse antes del
+    // tick 47** —once horas de reloj—, y eso era el techo de todo el arranque:
+    // el jugador no tenía verbo hasta la hora once. Medido en doce semillas ×
+    // sesenta años, el cambio es exactamente el que se buscaba y no más:
+    //
+    //   · primera decisión, de **11 h a 3,5 h**, y de 11 valles de 12 a **12 de 12**
+    //   · decisiones en las primeras 20 h, de **0,8 a 1,8** por valle
+    //   · decisiones en toda la partida, de 38,3 a **39,4** — o sea, ninguna
+    //     de más: lo que cambia es cuándo llegan, no cuántas
+    //   · intervalos que manda el techo, del 22 % al **11 %**, más lejos aún
+    //     del 40 % que §8.6 pone como línea de «manda el reloj»
+    //
+    // Se probó también un hueco de una estación (12 ticks): da el mismo
+    // arranque —1,8 en las primeras 20 h— pero sube el total a 43,4, así que
+    // añade preguntas donde no hacía falta. Un tercio de año es el menor
+    // cambio que arregla el arranque sin tocar el resto de la partida.
+    expect(CROSSROADS.MIN_TICKS_BETWEEN).toBe(TIME.WEEKS_PER_YEAR / 3);
   });
 
   it('el techo es mucho más estrecho que la garantía', () => {

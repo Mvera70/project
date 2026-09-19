@@ -1,7 +1,7 @@
 # Hoja de ruta: qué le falta a esto para ser un juego
 
 **14 sep 2026 · estado actualizado el 15 sep, tras la auditoría.**
-`docs/next-plan.md` dice qué se hace **ahora** y con qué agente. Esto dice qué falta **en total**, en qué orden, y —lo más importante—
+`docs/historico/next-plan.md` dice qué se hace **ahora** y con qué agente. Esto dice qué falta **en total**, en qué orden, y —lo más importante—
 **qué no puede hacer ningún agente**, porque depende de una decisión o de una
 persona mirando.
 
@@ -51,15 +51,15 @@ escrito como si hiciera falta.
    dejar escrito lo que ya se sabe y no romper el motor.
 
 **Y tres más, del 15 sep por la noche**, ya con el rework empezado (R-1 en
-`main`, `docs/rework.md`):
+`main`, `docs/historico/rework.md`):
 
 5. **La IA de animales y personas es lo siguiente.** «Sobre todo los humanos,
    pero los animales ahora mismo es que están fatal, atraviesan paredes, dan
-   vueltas sobre sí mismos.» Brief con diagnóstico en `docs/rework.md` §3.
+   vueltas sobre sí mismos.» Brief con diagnóstico en `docs/historico/rework.md` §3.
 6. **El caos es el juego.** «Que haya caos y que haya partidas que se rompan y
    no se pueda seguir jugando es la idea del juego.» Ninguna puerta del motor
    debe proteger a la aldea de morir; las dos que R-1 puso al rayo se quitan
-   (`docs/rework.md` §2.6).
+   (`docs/historico/rework.md` §2.6).
 7. **Los planes de prueba y el nivelado van después**, y la documentación
    tiene que bastar para que Opus o Sonnet sigan sin el modelo caro. «Deja de
    hacer y dar vueltas.»
@@ -75,7 +75,7 @@ aldea ande, hable, se pelee y toque a los animales como el descarte que gustó.
 La interfaz acaba de estrenar piel.
 
 Y aun así no es un juego todavía, por una razón que no es técnica y está medida
-desde hace semanas en `docs/findings-drama.md`:
+desde hace semanas en `docs/medidas/findings-drama.md`:
 
 > **El jugador toma entre siete y doce decisiones en cuarenta años, y diez de
 > las veinte plantillas del catálogo no salieron ni una vez en cinco partidas.**
@@ -93,7 +93,7 @@ leerse viva, y seguirá sin haber un juego debajo.
 
 **Qué pasa.** Siete a doce encrucijadas en cuarenta años. Medio catálogo
 muerto. Cuatro plantillas al filo del 1 % de elegibilidad. Y debajo, la
-contradicción de `findings-drama.md` §4: las condiciones que hacen elegible a
+contradicción de `docs/medidas/findings-drama.md` §4: las condiciones que hacen elegible a
 una plantilla piden estados que el motor casi nunca alcanza.
 
 **Por qué no lo arregla un agente.** No es un bug. Es la pregunta de diseño
@@ -115,7 +115,7 @@ de causas concretas. Está a un brief de distancia y es barato (`Tier: medir`).
   puntos de distancia contra los 20 que pide el diseño. ¿Se arregla o se cambia
   lo que el diseño pide?
 
-### 2 · La interfaz — **en marcha, carril A de `next-plan.md`**
+### 2 · La interfaz — **en marcha, carril A de `docs/historico/next-plan.md`**
 
 U-05 a U-08 están escritas con brief y en cola. El diagnóstico es que no falta
 color: falta **que se vea qué se puede hacer**. Después de esas cuatro quedan:
@@ -170,7 +170,7 @@ Lo encontró la auditoría y no estaba en ninguna hoja de ruta:
 - **La reja de capturas de §14.3 llevaba roja desde U-01**, 8 de 13 recorridos,
   y nadie lo sabía porque CI sólo dispara en `main` o en un pull request y el
   trabajo lleva 167 commits en una rama. Siete quedan declarados con su medición
-  y son el carril C de `next-plan.md`.
+  y son el carril C de `docs/historico/next-plan.md`.
 - **Los dos recorridos de navegador medían el Canvas creyendo medir el juego**,
   porque no pasaban las banderas de WebGL y el relevo a 3D falla en silencio.
   Arreglado en la reja de PWA, que ahora exige `data-render`.
@@ -260,7 +260,7 @@ Arreglar los dos fallos **y** relajar condiciones **y** escribir plantillas
 nuevas de menor peso. Se acepta el riesgo de pasarse al otro lado.
 
 Orden, porque importa: primero los dos fallos (son bugs y no cambian balance),
-después medir de nuevo con `tools/eligibility-report.ts`, después relajar, y
+después medir de nuevo con `tools/reports/eligibility-report.ts`, después relajar, y
 sólo entonces escribir plantillas nuevas — **cada paso remidiendo**, porque
 relajar y añadir a la vez hace imposible saber cuál de los dos movió qué.
 

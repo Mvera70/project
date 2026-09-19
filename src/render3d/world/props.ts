@@ -32,7 +32,7 @@ const OTHER_HEIGHT = 0.28;
  * **El barril y el arado son de otra escala, y a propósito.** M-3: son lo que
  * el jugador metió en el valle, no algo que alguien se echa al hombro, así que
  * se leen desde lejos. Una celda de este valle son unos tres metros (D.6.2), de
- * donde salen las dos medidas del encargo de arte (`docs/encargo-arado.md`):
+ * donde salen las dos medidas del encargo de arte (`docs/encargos/encargo-arado.md`):
  * el barril mide 0,9 m de alto —0,3 celdas— y el arado 2,4 × 0,9 × 1,0 m, que
  * son 0,8 × 0,3 × 0,33.
  *
@@ -140,7 +140,7 @@ export class Props {
         }
         if (model !== undefined && (sighting.kind === 'barrel' || sighting.kind === 'plough')) {
           // Las mallas del encargo vienen ya en unidades de celda, con el origen
-          // centrado y en el suelo (`docs/encargo-arado.md`): ni escala ni
+          // centrado y en el suelo (`docs/encargos/encargo-arado.md`): ni escala ni
           // levante, o se dibujarían del tamaño de una casa.
           object.userData.groundLift = 0;
         } else if (model !== undefined) {
@@ -171,7 +171,7 @@ export class Props {
    * son las tres piezas por las que se reconoce un arado de vertedera de lejos,
    * que es la distancia a la que se mira este juego.
    *
-   * Las medidas son las del encargo (`docs/encargo-arado.md`) pasadas a celdas,
+   * Las medidas son las del encargo (`docs/encargos/encargo-arado.md`) pasadas a celdas,
    * así que el día que llegue el GLB no cambia de tamaño en pantalla.
    */
   private ploughStandIn(): Object3D {

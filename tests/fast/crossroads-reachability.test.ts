@@ -1,4 +1,4 @@
-// M-08 · design.md Anexo A, §8.2. findings-drama.md §7.
+// M-08 · design.md Anexo A, §8.2. docs/medidas/findings-drama.md §7.
 //
 // La prueba que habría cazado `wolf_winter`. `tests/fast/catalog.test.ts` ya
 // vigila que ninguna plantilla se quede sin **plantearse**, pero mide sobre el
@@ -9,7 +9,7 @@
 // no funda como funda `foundGame`. El fallo pasó dos rondas de pruebas verdes.
 //
 // Esta prueba mide sobre partidas **reales** (`foundGame` + `run`, la política
-// `prudent`, el mismo camino que `tools/eligibility-report.ts`) si `requires`
+// `prudent`, el mismo camino que `tools/reports/eligibility-report.ts`) si `requires`
 // llega a cumplirse alguna vez — no si la plantilla llega a plantearse, que
 // depende del peso y del sorteo y es otra pregunta (`docs/roadmap.md` §1). Una
 // condición que nunca se cumple en ninguna partida real, sea cual sea la

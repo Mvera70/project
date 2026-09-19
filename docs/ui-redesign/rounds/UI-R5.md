@@ -75,7 +75,7 @@ supuestos.
 **Sí se pudo, y con un identificador real** — la investigación de UI-R3
 («`ChronicleEntry.params` es texto, no hay id, no se enlaza nada») seguía
 siendo cierta para `ChronicleEntry` en sí, pero no agotaba lo que el motor
-guarda: R-1 (`docs/rework.md`, ya en `main`) añadió `state.happenings`, y
+guarda: R-1 (`docs/historico/rework.md`, ya en `main`) añadió `state.happenings`, y
 `world/fate.ts` deja un `VillagerId` real —nunca un nombre— en
 `record.who` para dos de los doce sucesos del valle:
 `quarrel_in_the_square` (los dos implicados) y `child_lost` cuando el niño
@@ -117,7 +117,7 @@ consistente con su decisión de «dos caminos, una piel» (§3.1 de su informe).
 **Verificado con un clic real** (script Playwright ad hoc, borrado al
 terminar — ver §6 y las capturas de §7): con la política de referencia
 (`--year 60 --answer 1`, semilla 11) la crónica trae docenas de riñas
-enlazadas (`docs/rework.md` cuenta trece sucesos al año; en sesenta años eso
+enlazadas (`docs/historico/rework.md` cuenta trece sucesos al año; en sesenta años eso
 es mucho volumen y una parte cae en `quarrel_in_the_square`/`child_lost`).
 Se clicó el nombre subrayado «Siward» dentro de «A quarrel between Siward and
 Offa in year 59…» y la ficha que se abrió es la de Siward de verdad —mismo

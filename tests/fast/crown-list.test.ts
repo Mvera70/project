@@ -1,4 +1,4 @@
-// K-8 · El rey se ve en la lista. `docs/plan-rey.md` §K-5, corregido por el
+// K-8 · El rey se ve en la lista. `docs/historico/plan-rey.md` §K-5, corregido por el
 // dueño del diseño el 18 sep 2026:
 //
 //   «cuando selecciones un rey, tiene que destacar después en la lista. No se

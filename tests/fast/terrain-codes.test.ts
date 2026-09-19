@@ -1,6 +1,6 @@
 // Los códigos de terreno, uno por uno. design.md §3.5, §7.4, §7.6.
 //
-// El mapa grande, paso 1 (`docs/next-plan.md`): la montaña y el lago existen
+// El mapa grande, paso 1 (`docs/historico/next-plan.md`): la montaña y el lago existen
 // como terreno —coste de A*, prohibición de construir, color en las dos
 // paletas, cota en el relieve— **con el mapa al tamaño de hoy y sin que nada
 // los genere todavía**. El paso se hace solo porque veinte ficheros de `src/`

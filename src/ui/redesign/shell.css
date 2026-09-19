@@ -5,7 +5,7 @@
    de mensaje. El acceso a órdenes/tiempo de §5 del cuaderno del dueño lo añade
    UI-R2 dentro de este mismo `.ui-shell-stack`; esta ronda sólo construye el
    contenedor y la geometría de lo que ya existe (navegación y mensaje), para
-   dejar imposible el pisado medido en `docs/life-rounds/evidencia-capturas.md`
+   dejar imposible el pisado medido en `docs/historico/life-rounds/evidencia-capturas.md`
    §3: el aviso de la crónica y la pista del inicio guiado competían por la
    misma franja con dos offsets fijos, y en cuanto la pista crecía a dos
    líneas se pisaban. Ahora comparten un hijo de flujo normal del mismo hueco,

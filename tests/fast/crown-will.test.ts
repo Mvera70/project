@@ -1,4 +1,4 @@
-// K-2 · La voluntad del rey. `docs/plan-rey.md` §0.3.
+// K-2 · La voluntad del rey. `docs/historico/plan-rey.md` §0.3.
 //
 // **Es la fase que hace que el rey importe**, y lo que se guarda aquí es la
 // frase del dueño del diseño hecha aserto: «dependiendo de quién elijamos —el
@@ -70,13 +70,19 @@ describe('K-2 · el rey herrero mira a la muralla', () => {
     // §7.3 punto 8 pide fragua **y** amenaza; con este rey basta la fragua. Es
     // lo que «si eliges al herrero, pues haces más armas» significa en un juego
     // que no tiene armas como montón: la muralla, y el señor que la cuenta.
-    // **Dieciocho años y no quince**, desde que la muralla espera a que haya
-    // pueblo que amurallar: §7.3 pide once casas (`PALISADE_HOUSES`) para que
-    // el anillo no se fije con el valle aún sin forma, y la 41 no las tiene al
-    // año quince. Lo que se mide sigue siendo lo mismo —el mismo valle con y
-    // sin rey—, sólo que cuando la muralla ya es una obra posible para los dos.
-    const plain = village(41, 18);
-    const forge = crowned(village(41, 18), 'smith');
+    // **Y vuelve a los quince años** (19 sep 2026). Estuvo en dieciocho desde
+    // que la muralla espera a que haya pueblo que amurallar —§7.3 pide once
+    // casas (`PALISADE_HOUSES`) y la 41 no las tenía al año quince—, y el
+    // motivo se ha evaporado solo: con el hueco entre decisiones en un tercio
+    // de año, este valle llega al año quince con **catorce casas**. Medido,
+    // dieciocho ya no sirve para lo que esta prueba mide: para entonces el
+    // anillo está lleno, `placeBuilding('palisade')` no encuentra sitio para
+    // ninguno de los dos y **los dos valles caen en la misma mejora a piedra**,
+    // que es la vía de escape de §7.3 y no la voluntad de nadie. En el quince
+    // el contraste es el que la fila describe: el rey pide estaca, el valle sin
+    // rey no pide nada.
+    const plain = village(41, 15);
+    const forge = crowned(village(41, 15), 'smith');
     for (const state of [plain, forge]) {
       delete state.flags['threatened'];
       state.village.wood = 4_000;

@@ -21,7 +21,7 @@
 // la misma lista, y volver de una ficha (`app.ts`) nunca puede reabrir una
 // identidad distinta de la que ya se cerró.
 //
-// **Por qué conserva la clase `people-scrim`.** `tools/valley.shots.ts`
+// **Por qué conserva la clase `people-scrim`.** `tools/shots/valley.shots.ts`
 // localiza esta pantalla por `.people-scrim` (líneas 174 y 179) — un fichero
 // que este brief no puede tocar—, así que el nombre se queda igual aunque ya
 // no sea un velo de pantalla completa: antes vivía con

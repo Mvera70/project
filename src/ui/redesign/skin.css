@@ -23,7 +23,7 @@
    **Viven junto a este fichero y no en `public/`, y es por §13.4.** Un fichero
    de `public/` se referencia por ruta absoluta (`/fonts/...`), y eso funciona
    en la raíz de un dominio y se rompe en el subdirectorio de Pages, que es el
-   fallo que `tools/subpath.pwa.ts` existe para cazar. Pasando por Vite, la
+   fallo que `tools/pwa/subpath.pwa.ts` existe para cazar. Pasando por Vite, la
    ruta la escribe el empaquetador y resuelve en desarrollo, en la raíz y en
    `/project/` sin tocar nada.
 
@@ -644,8 +644,8 @@
    desde UI-V9 hay una sola cabecera**, así que ya no hay dos pintándose una
    encima de otra: el defecto que esto cazaba no puede volver. */
 
-/** La hora sigue existiendo —U-12, la sigue leyendo `tools/valley.pwa.ts` y
-    `tools/valley.shots.ts`— pero el prototipo no dibuja un reloj digital,
+/** La hora sigue existiendo —U-12, la sigue leyendo `tools/pwa/valley.pwa.ts` y
+    `tools/shots/valley.shots.ts`— pero el prototipo no dibuja un reloj digital,
     sólo el arco del sol: se oculta visualmente sin quitarla del documento
     (patrón «sr-only»), que es lo que un lector de pantalla necesita para
     seguir anunciándola. */
@@ -1094,7 +1094,7 @@ html.bare .valley-sound { opacity: .4; }
 .valley-speeds.hud-speeds button {
   /* **44 y no menos.** Bajarlo a 42 para ganar dos píxeles de ancho rompió el
      mínimo táctil de `design.md` §11.3, y lo cazó el recorrido de las cuatro
-     velocidades (`valley.shots.ts`, que mide la caja de cada botón). Apilada
+     velocidades (`tools/shots/valley.shots.ts`, que mide la caja de cada botón). Apilada
      encima del rincón la tira cabe de sobra: cinco de 44 más los huecos son
      236 de los 390 que hay. */
   min-width: 44px;

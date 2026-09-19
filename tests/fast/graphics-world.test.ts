@@ -838,7 +838,7 @@ describe('G-10 · el reparto no son clones', () => {
  * Es una lista de deuda, no una excusa: cada entrada tiene que apuntar a un
  * encargo de arte pendiente, y el día que llega la malla la entrada se borra y
  * las dos pruebas de abajo vuelven a pedirla sin excepciones. Hoy sólo hay una:
- * la sala del rey de K-4, cuyo encargo está en `docs/plan-rey.md` §8 —el render
+ * la sala del rey de K-4, cuyo encargo está en `docs/historico/plan-rey.md` §8 —el render
  * la dibuja más alta que una casa y con el tejado burdeos del jefe, así que se
  * distingue, pero no es una malla—.
  */

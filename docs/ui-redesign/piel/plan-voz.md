@@ -363,7 +363,7 @@ altura fija; retirar las reglas de `.valley-notice` y `.valley-hint`),
 `STYLE`; se añade `noticeText(state, entries)` que devuelve la frase del
 último `noticeworthy` con el discriminante de `renderEntry`, o `null`),
 `src/engine/chronicle/bank.en.ts` (sólo si C: `intro.orders` dice «below»),
-`tools/valley.shots.ts` (el recorrido de §11.6 pasa de `.valley-notice` a
+`tools/shots/valley.shots.ts` (el recorrido de §11.6 pasa de `.valley-notice` a
 `.valley-voice[data-role="event"]`; el de U-02 en `notice.test.ts` se muda a
 `ui-voice.test.ts` si aún no está cubierto), `tests/fast/ui-redesign-shell.test.ts`
 (retirar las pruebas de `resolveMessageSlot`).
@@ -411,7 +411,7 @@ montarse**: `mountMoments` no se llama.
   recorre `doing.*`, `answer.*`, `founding.settled`, `valley.*`, `intro.*` y
   falla si alguna pasa de 64 caracteres × 2 (o lo que mida la hoja); si C se
   rechaza, `intro.*` queda en `it.fails` con su medida.
-- El recorrido §11.6 de `valley.shots.ts` sigue verde con el selector nuevo.
+- El recorrido §11.6 de `tools/shots/valley.shots.ts` sigue verde con el selector nuevo.
 
 **Terminado cuando.** `document.querySelector('.valley-notice')` y
 `.valley-moment` son `null` en el juego empaquetado; el recorrido §11.6 pasa;
@@ -433,7 +433,7 @@ sitio de la hoja de roble mientras hay una decisión aplazada, según §3.4-B.
 un manejador de toque cuando es sello), `src/ui/redesign/skin.css`,
 `src/ui/app.ts` (poner el ornamento en «sello» cuando
 `state.crossroad !== null` y está aplazada; en «hoja» al resolverse),
-`tools/valley.shots.ts` (el recorrido de la encrucijada que hoy busque la
+`tools/shots/valley.shots.ts` (el recorrido de la encrucijada que hoy busque la
 píldora pasa a tocar el ornamento).
 
 **Contrato.**
@@ -507,7 +507,7 @@ de la encrucijada (UI-V5c), no como un cuadro de diálogo de U-01.
 **Depende de.** Nada.
 
 **Ficheros.** `src/ui/screens/epitaph.ts` (`STYLE` y el DOM de `openEpitaph`;
-la lógica de heredar/fundar no se toca), la jornada de `valley.shots.ts`
+la lógica de heredar/fundar no se toca), la jornada de `tools/shots/valley.shots.ts`
 «una aldea terminada deja epitafio…» (selectores, si cambian).
 
 **Contrato.** Firma sin cambios. El DOM sigue la encrucijada:

@@ -13,7 +13,7 @@
 // (`voice` en el handle) es lo único que habla, y qué dice lo decide la cola de
 // `../voice.ts`. Antes de eso había cuatro emisores con dos arbitrajes que no
 // se conocían, y el fallo que UI-R1 arregló —el aviso y la pista pisándose con
-// dos offsets fijos, `docs/life-rounds/evidencia-capturas.md` §3— podía volver
+// dos offsets fijos, `docs/historico/life-rounds/evidencia-capturas.md` §3— podía volver
 // por cualquiera de los otros dos caminos.
 //
 // **UI-V2 · la piel de la bandeja y la navegación** (`docs/ui-redesign/piel/

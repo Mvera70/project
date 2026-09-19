@@ -154,7 +154,7 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
     expect(spread(summon(village(12, 7)), 0), 'semilla 7').toBeLessThan(14);
   });
 
-  // rework.md §3 (V-02/V-03, el círculo colisiona): con la semilla 23 esto
+  // docs/historico/rework.md §3 (V-02/V-03, el círculo colisiona): con la semilla 23 esto
   // subió de lo medido arriba a 17,98 celdas, y no es la capilla dentro de un
   // muro —esta vez el punto de partida está en suelo abierto de sobra—. Es un
   // mínimo local de `seek()`/`avoid()`: el 29 de esta semilla se detiene en

@@ -180,7 +180,7 @@ de esta ronda.
 
 ### 5.2 · `.valley-panel`/`.people-scrim` conservan su nombre, no su piel
 
-`tools/valley.shots.ts` localiza la ficha por `.valley-panel:not(.valley-
+`tools/shots/valley.shots.ts` localiza la ficha por `.valley-panel:not(.valley-
 orders)` (líneas 201, 310, 325, 365) y la gente por `.people-scrim` (líneas
 174, 179) — un fichero que este brief no puede tocar. Los dos nombres se
 quedan; lo que cambia es la CSS. `index.html` define `.valley-panel` para

@@ -12,7 +12,7 @@
 // ficha se monta dentro de `shell.content`, que pasa a ser la única.
 //
 // **Por qué conserva la clase `valley-panel` y no crea su propio botón de
-// cierre.** `tools/valley.shots.ts` localiza la ficha por
+// cierre.** `tools/shots/valley.shots.ts` localiza la ficha por
 // `.valley-panel:not(.valley-orders)` (líneas 201, 310, 325, 365) — un
 // fichero que este brief no puede tocar—, así que el nombre se queda igual.
 // Lo que cambia es la piel: `.valley-panel` de `index.html` se pensó para

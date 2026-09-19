@@ -330,11 +330,11 @@ describe('el catálogo · cobertura rápida', () => {
   // la señal buena**: significa que había algo mejor que preguntar.
   //
   // `grain_factor` se suma a la lista con el mapa grande, y su causa está
-  // medida y no supuesta: `npx tsx tools/eligibility-report.ts` dice que
+  // medida y no supuesta: `npx tsx tools/reports/eligibility-report.ts` dice que
   // **cumple condiciones en el 2,56 % de los ticks y se ofrece en el 0,00 %**
   // —«cumple condiciones pero nunca llega a ofrecerse»—. No es contenido
   // muerto, que es lo que esta prueba vigila: es la cadencia de encrucijadas de
-  // `docs/findings-drama.md`, la decisión que está tomada y pendiente. Lo que
+  // `docs/medidas/findings-drama.md`, la decisión que está tomada y pendiente. Lo que
   // el mapa grande hizo fue mover las trayectorias lo justo para que en estas
   // doce semillas concretas dejara de ganar el sorteo.
   // G3 · `breaking_ground` y `one_at_the_ford` piden `people < 10`, y

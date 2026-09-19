@@ -1,4 +1,4 @@
-// IA-4 · Animales con conducta propia. Anexo E, `docs/life-ai-proposal.md`,
+// IA-4 · Animales con conducta propia. Anexo E, `docs/historico/life-ai-proposal.md`,
 // `docs/life-ai-implementation-prompt.md`.
 //
 // Lo que se guarda aquí son propiedades del diseño, no detalles de

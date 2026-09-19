@@ -54,7 +54,7 @@ describe('el hambre le pasa factura al que manda · §7.9', () => {
   // M-0 cambió lo que se sortea cada semana —las visitas del camino entran en
   // la tabla de sucesos— y con ello la trayectoria de la semilla: la aldea de
   // veinte años ya no llega tan hundida y los dos extremos vuelven a
-  // distinguirse. Es la misma lección que `docs/rework.md` §2.7 escribió al
+  // distinguirse. Es la misma lección que `docs/historico/rework.md` §2.7 escribió al
   // revés (un cambio del motor mueve toda prueba que mida una aldea hecha), y
   // el aviso que deja es que esta prueba **sigue midiendo una biografía**: si
   // vuelve a caer, lo que hay que mirar es si la aldea llega al suelo, no si la

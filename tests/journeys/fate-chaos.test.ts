@@ -1,4 +1,4 @@
-// R-1 · El caos es el juego. design.md §7.10; docs/rework.md §2.6.
+// R-1 · El caos es el juego. design.md §7.10; docs/historico/rework.md §2.6.
 //
 // **Esto vive en las jornadas y no en la suite rápida porque cuesta minutos:**
 // doce semillas jugadas cuarenta años cada una con `run` y la política
@@ -34,7 +34,7 @@ describe('el caos es el juego · R-1 §2.6', () => {
     // de la pareja fundadora. El dueño del diseño dijo después, con estas
     // palabras, que eso es exactamente lo contrario de lo que quiere: «que
     // haya caos y que haya partidas que se rompan y no se pueda seguir
-    // jugando es la idea del juego» (`docs/rework.md` §2.6). Las puertas se
+    // jugando es la idea del juego» (`docs/historico/rework.md` §2.6). Las puertas se
     // quitaron: el rayo ya sólo pide tormenta y madera en pie, así que puede
     // quemar la única casa de dos en la semana 1. Lo que esta prueba mide
     // ahora es la propiedad nueva: que un valle se pueda romper, no que nunca

@@ -1,5 +1,73 @@
 # Cuaderno de tareas — el rework
 
+**Dónde está cada cosa, desde el 19 sep 2026.** El dueño del diseño: «se nos va
+de las manos la organización». `docs/` y `tools/` estaban planos, con lo vigente
+mezclado con lo entregado y herramientas sueltas sin documentar. Ahora:
+
+| Sitio | Qué hay | Índice |
+|---|---|---|
+| `docs/` | Lo vivo: `design.md`, `changelog.md`, `task-log.md`, `plan-meta.md`, `plan-final.md`, `plan-audio.md`, `encargos-3d.md`, `plan-arte-pendiente.md`, `handover.md`, `roadmap.md`, `agents.md`, `dos-sesiones.md` | `docs/README.md` |
+| `docs/medidas/` | Evidencia medida una vez: `findings-drama.md`, `rey-medida.md`, `dead-code-audit-2026-09-17.md`, `catalogo-historias-y-encrucijadas.md` | — |
+| `docs/encargos/` | Lo que le falta al arte con documento propio: combate, arado, fuente, sesión de Blender | `docs/encargos-3d.md` sigue siendo el índice de todo |
+| `docs/historico/` | Lo que entregó: `rework.md`, `plan-juego.md`, `plan-medios.md`, `plan-rey.md`, `next-plan.md`, `brief-reloj.md`, `life-ai-proposal.md`, y las rondas `graphics-rounds/`, `life-rounds/`, `sesiones/` | `docs/historico/README.md`, con **qué entregó** cada uno |
+| `tools/` | Seis carpetas: `reports/`, `shots/`, `pwa/`, `graphics/`, `ui/`, `art/` | `tools/README.md`, con qué mide cada una y cómo se lanza |
+
+Se quedan donde estaban `docs/ui-redesign/` (está vivo: lo citan `src/ui/`,
+treinta pruebas y dos skills), `docs/observations/` y `docs/visual-reference/`.
+
+**Lo que costó, y la regla que deja.** Mover un documento es mover sus citas:
+**398 referencias en 130 ficheros** —código, pruebas, herramientas y los propios
+documentos—, más dos importaciones sin extensión que ninguna búsqueda por ruta
+encuentra (`tests/balance/balance.test.ts` importaba `../../tools/balance-report`
+y `tests/fast/reader-packet.test.ts`, `../../tools/reader-packet-content`): sólo
+las vio el `typecheck`. **Si mueves un documento o una herramienta, reescribes
+sus referencias en la misma ronda y pasas el typecheck antes de cerrar.**
+`npm run typecheck` y `npm run lint`, verdes.
+
+**Un sitio donde una cita no se reescribió, a propósito:** las recetas de
+`art/recipes/`. `tools/art/index.ts` guarda su sha256 en `art/catalog.json` y
+sólo compara la construcción nueva con la aprobada si la receta es idéntica, así
+que cambiarles una ruta en el campo `note` habría saltado esa comprobación en
+silencio para la pelota, el cubo y el palo. Se revirtió; sí se actualizó el
+campo `source` de `art/catalog.json`, que no lo cubre ningún hash. Queda escrito
+en `tools/README.md`, sección `art/`.
+
+Los `npm run` afectados —`shots`, `eligibility`, `balance:report`, `icons`,
+`map`, `attribution`, `policy:attribution`, `migration:ab`, `reader:packet`—
+**conservan su nombre**; sólo cambió la ruta de detrás. Y `tools/README.md`
+apunta, al final, las nueve herramientas que el código sigue citando y que ya
+no existen, para que nadie las busque.
+
+---
+
+**El arranque, arreglado (19 sep).** Del dueño, probándolo: «se tarda muchísimo
+en empezar a hacer cosas y es muy lento y muy aburrido», con el aviso de que el
+ritmo va a seguir cambiando. Medida de la apertura hora a hora: **el 35 % de las
+primeras veinte horas la aldea no tiene ni una obra abierta** (semilla 7:
+termina su segunda casa a las 5,6 h y no vuelve a abrir hasta las 9,3 h), porque
+todas las puertas de §7.3 son de población y la población sólo se mueve cuando
+pasa el año — once horas de reloj. Y la primera decisión **no podía plantearse
+antes del tick 47**, que es el suelo de §8.6.
+
+Lo que se cambió es ese suelo: `CROSSROADS.MIN_TICKS_BETWEEN` de un año a **un
+tercio de año**. Medido en doce semillas × sesenta años: primera decisión **de
+11 h a 3,5 h** y de 11 valles de 12 a **los doce**; decisiones en las primeras
+veinte horas **de 0,8 a 1,8**; decisiones en toda la partida **de 38,3 a 39,4**
+—ninguna de más, sólo antes—; intervalos que manda el reloj del 22 % al **11 %**.
+De paso, la villa cerrada baja de 416 h a **308 h** con la edad de piedra clavada
+en **60 h**, que era el objetivo: eso encoge el hueco que `plan-meta.md` §0
+nombra como lo primero a nivelar. El forastero del caserío se muda a verano
+porque el tamaño del suelo decide en qué estación cae la primera ranura legal
+—acoplamiento escrito en §8.6 y en `hamlet.ts` para que no se descubra por las
+malas—. Tres listones movidos con su causa: el techo en `balance.test.ts`, el
+rey herrero **de vuelta al año 15** (en el 18 el anillo ya está lleno y los dos
+valles caen en la misma mejora a piedra, que no es la voluntad de nadie) y la
+muestra de hábitos de IA-3 a **seis** valles. Detalle en `changelog.md` 4.16.
+
+**Lo que queda abierto de esto**: estirar la fase 2 con contenido, que es la
+otra mitad de lo que §0 pedía, y el hambre que no muerde (G1). Las dos son
+nivelado y llevan medida delante.
+
 **Auditoría de la ronda A3/G3 (19 sep), y lo que corrigió.** La ronda se jugó
 con un modelo menor y se revisó entera después. El mecanismo del bastión estaba
 bien —la ruta de `upgradeSpot`/`canPlace` no pasa por la regla de la línea de
@@ -98,7 +166,7 @@ siguen pendientes de aprobación; ninguna está integrada.
 **Este fichero es lo primero que hay que leer, y lo último que hay que tocar
 antes de cerrar una ronda.** Existe porque el dueño del diseño dijo, el 16 sep
 2026: «te has perdido… necesitas un documento en el que te vaya guiando
-siempre». Tenía razón: había un informe por ronda (`docs/life-rounds/`,
+siempre». Tenía razón: había un informe por ronda (`docs/historico/life-rounds/`,
 `docs/ui-redesign/rounds/`) pero **ningún sitio que dijera dónde estoy**, así
 que cada vez que se retomaba la sesión había que reconstruirlo leyendo commits.
 
@@ -121,7 +189,7 @@ nadie va a encontrar.
 | Puerta usada en cada ronda | `npm run typecheck`, `npm run lint`, y **sólo los ficheros tocados** |
 | **En vuelo ahora** | **la tanda de piel** (`ui-redesign/piel/plan-piel.md`). **UI-V0 hecha** (`4da029c`: el kit — 17 colores muestreados, Cinzel y EB Garamond empaquetadas, 25 primitivas, muestrario, comparador y medidor de contraste). En vuelo, tres agentes Sonnet en worktrees: **UI-V1** (`hud.ts`), **UI-V2** (`shell.ts`/`shell.css`), **UI-V3** (`screens/chronicle.ts` + `chronicle-art.ts`). Después UI-V4 (ficha), UI-V5 (encrucijada) y UI-V6 (validación). **El dueño trabaja en paralelo en los modelos 3D: ningún agente mío entra en `src/render3d/` ni en `art/`** |
 | Blender · qué viene y su encaje | El agente de Codex está haciendo **el aldeano base, el herrero, el cura y un granjero**, y el dueño confirmó el 16 sep que **se meterán en el juego sustituyendo a los actuales**. Los tres primeros encajan uno a uno. El granjero es **un tipo nuevo**, y el dueño lo aclaró: «esto futuro puede implementarse en nuevos aldeanos, no significa que el granjero vaya a ser el aldeano base». O sea que **el repertorio de aldeanos crece** y no hay que encajarlo en los siete oficios que ya existen. Y hay una vía que lo hace fácil: **el modelo no tiene que elegirse por el oficio**. Hoy `VILLAGER_BY_ROLE` (`renderer.ts`) mapea oficio → malla, pero el render ya sabe qué hace cada persona (`Actor.activity`, y la oferta que está consumiendo), así que un granjero puede ser **quien trabaja el campo** sin que el motor invente un oficio nuevo ni se toque `src/engine/`. Eso deja el base para lo que es y admite más tipos después. **Se decide cuando estén las mallas.** |
-| Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/respuesta-sesion-blender.md`. |
+| Fuera de esta sesión | Un agente de Codex está **diseñando los aldeanos nuevos en Blender** (dicho por el dueño el 16 sep). Eso toca el aparejo del aldeano y `src/render3d/world/cast.ts`, que da talla y ropa por persona: **ningún agente mío entra ahí** hasta que él lo diga. Contexto en `docs/encargos/respuesta-sesion-blender.md`. |
 | Lo que acabo de cerrar | **G-18 entregado y verificado** (`9cc97af`: los doce aldeanos de Blender, sin tocar `src/`; pendiente de aprobación estética del dueño). **IA-8**: el descarte de la plaza que falló, el plazo propio del viaje (`arriveBy`) y el labrador a su puesto (fuera del campo 6,5 %, parados 0,08 %, giros 0,39 %). Antes: **Demo v16** con los cuatro aldeanos de G-17 en el valle (`artifacts/graphics/G-18/demo/`, sin seguimiento por `.gitignore`; semilla 11, año 20, ocho fotogramas). **IA-7**: los labradores dentro de su campo (96,1 % fuera → 13,6 %) y el suelo de la convocatoria aplicado de verdad. El encargo G-18 de los doce aldeanos que faltan, en `main` |
 
 ## 1b. La fase en curso: C-1 · Cierre de la tanda de IA
@@ -163,24 +231,24 @@ traído aquí.
 trabajadas, carga sacos, recorre el camino, descarga en almacenamiento real y
 vuelve sin producir grano dos veces. Ya no se ara en invierno ni se eligen
 descargas vacías. Dos semillas observadas; 89 pruebas dirigidas, typecheck y
-lint verdes. [Informe](life-rounds/IA-18.md).
+lint verdes. [Informe](docs/historico/life-rounds/IA-18.md).
 
 **IA-17 · cantera visible:** una obra cuyo coste real incluye piedra reparte
 jornadas entre parcela y roca alcanzable; se ve pico, carga, camino, descarga
 y vuelta, sin inventario paralelo. Semilla 11/año44 completa la entrega antes
 del regreso; 68 pruebas dirigidas, typecheck y lint verdes.
-[Informe](life-rounds/IA-17.md).
+[Informe](docs/historico/life-rounds/IA-17.md).
 
 **IA-16 · bosque visible:** las copas acusan cuatro tramos de existencias; el
 último árbol cae sólo con la transición real a claro, deja tocón y los claros
 aptos muestran un plantón creciente hasta la regeneración. Semilla 67 filmada
 con motor vivo y semilla 1 con rebrote real; 97 pruebas dirigidas, typecheck y
-lint verdes. [Informe](life-rounds/IA-16.md).
+lint verdes. [Informe](docs/historico/life-rounds/IA-16.md).
 
 **Icono PWA renovado (17 sep):** el mosaico plano de M-27 se sustituye por el
 emblema aprobado por el dueño —casa de paja, escudo y cinta sobre fondo cuero
 naranja— en 192, 512 y 512 `maskable`. La fuente maestra queda en
-`tools/icon-source.png` y `npm run icons` reproduce las tres salidas. Revisado a
+`tools/ui/icon-source.png` y `npm run icons` reproduce las tres salidas. Revisado a
 48 px y bajo máscara circular; typecheck, lint del generador y la prueba del
 manifiesto instalable, verdes. La caché del trabajador sube a `valley-v3`: los
 iconos conservan sus nombres públicos y, sin invalidarla, una instalación
@@ -261,7 +329,7 @@ créditos**. Pendiente de escucha; no se integra todavía.
 fundadora dedicada a subsistencia y ciclo `árbol → tala → carga → descarga → vuelta`.
 El tajo coincide con la celda que tala el motor; almiares y pilas responden a reservas
 reales y desaparecen de la fundación. Dos aldeas observadas sin errores, deriva ni
-penetraciones; 72 pruebas, typecheck y lint verdes. [Informe](life-rounds/IA-15.md).
+penetraciones; 72 pruebas, typecheck y lint verdes. [Informe](docs/historico/life-rounds/IA-15.md).
 
 **Localización · primera fase:** la portada ya permite elegir `English` o
 `Español`, la preferencia se conserva y la interfaz principal tiene banco
@@ -289,11 +357,11 @@ captura real sin errores. Pendientes monte bajo y más siluetas arbóreas.
 
 **G-25 · roca entregada:** afloramiento facetado y colocación completa dentro de
 su celda, sin ocupar caminos ni solares. 50 pruebas, typecheck y lint verdes.
-Captura real revisada; pendiente continuar vegetación. [Informe](graphics-rounds/G-25.md).
+Captura real revisada; pendiente continuar vegetación. [Informe](docs/historico/graphics-rounds/G-25.md).
 
 **G-25 · paisaje, primer modelo entregado:** árbol tree rehecho con horquillas
 y copa facetada asimétrica. GLB publicado selectivamente, captura real revisada,
-48 pruebas, typecheck y lint verdes. [Informe](graphics-rounds/G-25.md).
+48 pruebas, typecheck y lint verdes. [Informe](docs/historico/graphics-rounds/G-25.md).
 
 **OBS-02 · piloto y comparación cerrados:** tres Luna, un Terra y un Sol revisaron
 los casos archivados; ninguno localizó concretamente marcha lateral ni vado desplazado.
@@ -304,7 +372,7 @@ coordinador diagnostica, previa comprobación de calidad del material. No lanzad
 **IA-14 · contacto y marcha:** corregidos radio de contacto humano, giro continuo,
 recorrido posterior a colisiones y zancada proporcional a talla. Comparación
 cercana a 15 fps: desalineación rumbo/avance >60° baja del 45,6 % al 4,0 %.
-68 pruebas, typecheck y lint verdes. Informe [IA-14](life-rounds/IA-14.md).
+68 pruebas, typecheck y lint verdes. Informe [IA-14](docs/historico/life-rounds/IA-14.md).
 
 **OBS-01 · batería de observación con tres agentes Luna: ejecutada y auditada.**
 Informes separados de día, noche y fauna, más revisión de geometría por el
@@ -320,14 +388,14 @@ desde la orilla con una búsqueda de hasta catorce celdas. Ahora dibuja únicame
 las celdas de paso que guarda el mapa y conserva la conjetura sólo para partidas
 anteriores a ese terreno. En semilla 7/año 1 quedan dos losas contiguas dentro
 del cauce, separadas del campo. 60 pruebas, typecheck, lint y captura reales
-verdes. Informe [G-24](graphics-rounds/G-24.md).
+verdes. Informe [G-24](docs/historico/graphics-rounds/G-24.md).
 
 **IA-13 · puertas domésticas: hecha.** La IA sí entraba, pero a ×64 podía
 recorrer `opening → entering → sleeping` dentro de un solo fotograma y el
 renderer sólo miraba la etapa final. Ahora acumula el pulso de todos los pasos
 internos y la hoja permanece visible 0,8 s reales, también al salir; se congela
 en pausa. Validado con GLB publicado, 20/20 pruebas y toma viva a ×64 en
-`life-rounds/IA-13.md`. La evidencia posterior se empaquetó desde una copia
+`docs/historico/life-rounds/IA-13.md`. La evidencia posterior se empaquetó desde una copia
 aislada para no tocar la UI-V8 concurrente.
 
 **Limpieza de código muerto (17 sep): hecha.** Auditoría contrastada con Knip,
@@ -335,7 +403,7 @@ búsqueda global, puntos de entrada y configuración. Eliminados `src/ui/icons.t
 `GREET_COOLDOWN_SPAN` y el tipo huérfano `BeastSighting`; 78 exportaciones de
 valor y 34 de tipo pasan a ser internas. Se conservan los comandos manuales,
 hooks, service worker y el generador reproducible de animales. Informe completo
-en `docs/dead-code-audit-2026-09-17.md`.
+en `docs/medidas/dead-code-audit-2026-09-17.md`.
 
 **G-23 · animales:** encargo de rehacer las seis especies y sus animaciones.
 Vaca subida en `df0ac66`. Cerdo terminado y revisado en movimiento; preparado
@@ -352,14 +420,14 @@ cierre preparados para subida individual. 75 pruebas, typecheck y lint verdes;
 seis bancos visuales, visores con reproducción/pausa y captura del juego.
 Vaca terminada, articulada y conectada al render; 42 pruebas, typecheck y lint
 verdes. Banco de marcha y reposo revisado. Entrega individual preparada para
-subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](graphics-rounds/G-23.md).
+subida; siguen cerdo, gallina, lobo, cuervo y pez. Informe [G-23](docs/historico/graphics-rounds/G-23.md).
 
 **Siguiente encargo de Blender · aldea:** alcance preparado para viviendas,
 molino, iglesia/capilla, herrería, pozo, granero, campos, carros y adornos.
-Inventario y tandas en [encargo-blender-aldea](graphics-rounds/encargo-blender-aldea.md).
+Inventario y tandas en [encargo-blender-aldea](docs/historico/graphics-rounds/encargo-blender-aldea.md).
 **G-21: casas de paja, piedra y molino terminados**, con entrega individual por modelo.
 Paja subida en `dcb4cf1` y piedra en `4d2893e`; molino validado con 87 pruebas,
-typecheck, lint y captura del juego. Informe en [G-21](graphics-rounds/G-21.md).
+typecheck, lint y captura del juego. Informe en [G-21](docs/historico/graphics-rounds/G-21.md).
 Molino subido en `1889d40`. Herrería subida en `8d03f5c`;
 validación técnica verde. Su revisión frontal en juego se cierra con la captura
 de la capilla (semilla 2, año 60); detalles y evidencias en el informe G-21.
@@ -375,7 +443,7 @@ Pozo subido en `6f8876f`. Campo cultivado terminado, validado y revisado en
 verano dentro del juego; conserva la alternancia estacional. Sigue `field-cut`.
 **G-22 · cultivos:** el dueño rechaza las espigas de G-21 por parecer flechas.
 Trigo rehecho con granos laterales y tallos verdes, validado y revisado en juego.
-Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](graphics-rounds/G-22.md).
+Siguen coles, cultivo de hojas y variedades visuales por parcela; informe [G-22](docs/historico/graphics-rounds/G-22.md).
 Trigo G-22 subido en `1b834c7`. Coles terminadas y selección estable por parcela
 conectada en el render; 88 pruebas verdes y captura real revisada. Siguen puerros.
 Coles subidas en `0edca57`. Puerros terminados y conectados: trigo, coles y
@@ -411,7 +479,7 @@ en Blender y renderer real con estado de prueba. Los cuatro encargados
 están terminados; entrega final validada para commit y subida.
 
 **G-18 · entrega de Blender (16 sep):** doce recetas y GLB terminados y
-verificados; subida solicitada por el dueño. Véase [G-18](graphics-rounds/G-18.md).
+verificados; subida solicitada por el dueño. Véase [G-18](docs/historico/graphics-rounds/G-18.md).
 
 **U-10b · el menú abre el valle en el año que se le pida (16 sep, `21b11e9`).**
 Lo pidió el dueño porque probar le costaba demasiado: «no tengo manera de
@@ -439,8 +507,8 @@ final.
 
 **G-17 · Blender, entrega terminada (16 sep):** `villager`, `villager-smith`,
 `villager-priest` y `villager-farmer`, recetas canónicas, catálogo y cuatro GLB
-publicados. Informe: [G-17](graphics-rounds/G-17.md); prompt de integración:
-[G-17-handoff](graphics-rounds/G-17-handoff.md). No se ha tocado `src/`.
+publicados. Informe: [G-17](docs/historico/graphics-rounds/G-17.md); prompt de integración:
+[G-17-handoff](docs/historico/graphics-rounds/G-17-handoff.md). No se ha tocado `src/`.
 
 Orden fijado por el dueño: auditoría, movimiento, interacciones, hábitos,
 animales, fauna, escenas históricas, **y después interfaz**.
@@ -449,19 +517,19 @@ animales, fauna, escenas históricas, **y después interfaz**.
 
 | Fase | Estado | Commit | Informe |
 |---|---|---|---|
-| IA-12 · jornada, oficios y gestos | Rutina básica: 15/15 y 21/21 puestos alcanzados; ocho acciones, ocio por edad y burbujas ligadas a encuentros | (este commit) | `life-rounds/IA-12.md` |
-| IA-11 · circulación, portones y motor vivo | **hecha en los casos verificados** — 66/66 noches completas en tres aldeas; desvíos, pasillos y colisión fina | (este commit) | `life-rounds/IA-11.md` |
-| IA-10 · observatorio, hogares y sólidos | **seguida por IA-11** — visor sincronizado, puertas y rutina doméstica; cifras iniciales conservadas en el informe | `a472eca` | `life-rounds/IA-10.md` |
-| IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `life-rounds/IA-0.md` |
-| IA-1 · movimiento y destinos | **hecha** | `1509121` | `life-rounds/IA-1.md` |
-| IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `life-rounds/IA-2.md` |
-| IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `life-rounds/IA-3.md` |
-| IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `life-rounds/IA-4.md` |
-| IA-5 · fauna silvestre | **hecha** — el lobo migra y sólo sale la semana del suceso; el cuervo y el pez se quedan, con el motivo escrito | (este commit) | `life-rounds/IA-5.md` |
-| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | `e20eeb5` y anteriores | `life-rounds/IA-6.md` |
-| IA-9 · rodar el valle, y el que va a un sitio sin ruta | **hecha** — la herramienta de película (`film.mjs` + el enganche `__valleyLife` + `film-sheet.py`) y el arreglo que destapó: `decide()` devolvía la intención muerta tal cual. Clavados 3 → 0; queda el 15 % de gente con ruta que no anda, que es dirección y va como **IA-10** | (este commit) | `life-rounds/IA-9.md` |
-| IA-8 · la plaza que falló se descarta, el viaje tiene su plazo | **hecha** — cierra el punto 1 de lo abierto y el 0b de IA-7; el devoto queda frágil (§4) | (este commit) | `life-rounds/IA-8.md` |
-| IA-7 · los labradores, dentro de su campo | **hecha** — lo vio el dueño en la demo v15; de rebote, el suelo de V-11 se multiplicaba después y no era un suelo | (este commit) | `life-rounds/IA-7.md` |
+| IA-12 · jornada, oficios y gestos | Rutina básica: 15/15 y 21/21 puestos alcanzados; ocho acciones, ocio por edad y burbujas ligadas a encuentros | (este commit) | `docs/historico/life-rounds/IA-12.md` |
+| IA-11 · circulación, portones y motor vivo | **hecha en los casos verificados** — 66/66 noches completas en tres aldeas; desvíos, pasillos y colisión fina | (este commit) | `docs/historico/life-rounds/IA-11.md` |
+| IA-10 · observatorio, hogares y sólidos | **seguida por IA-11** — visor sincronizado, puertas y rutina doméstica; cifras iniciales conservadas en el informe | `a472eca` | `docs/historico/life-rounds/IA-10.md` |
+| IA-0 · auditoría y contratos | **hecha** | `0a45e0c` | `docs/historico/life-rounds/IA-0.md` |
+| IA-1 · movimiento y destinos | **hecha** | `1509121` | `docs/historico/life-rounds/IA-1.md` |
+| IA-2 · compromisos e interacciones | **hecha** | `17e9022` | `docs/historico/life-rounds/IA-2.md` |
+| IA-3 · aldeanos con hábitos | **hecha** | `37c7da6` | `docs/historico/life-rounds/IA-3.md` |
+| IA-4 · animales con conducta propia | **hecha**, con dos rondas de arreglo encima | `d7cac67`, `528a764`, `7822454` | `docs/historico/life-rounds/IA-4.md` |
+| IA-5 · fauna silvestre | **hecha** — el lobo migra y sólo sale la semana del suceso; el cuervo y el pez se quedan, con el motivo escrito | (este commit) | `docs/historico/life-rounds/IA-5.md` |
+| IA-6 · historia visible | **hecha** — la riña con sus dos `id`; funeral e incendio quedan para R-5 por falta de dato | `e20eeb5` y anteriores | `docs/historico/life-rounds/IA-6.md` |
+| IA-9 · rodar el valle, y el que va a un sitio sin ruta | **hecha** — la herramienta de película (`film.mjs` + el enganche `__valleyLife` + `film-sheet.py`) y el arreglo que destapó: `decide()` devolvía la intención muerta tal cual. Clavados 3 → 0; queda el 15 % de gente con ruta que no anda, que es dirección y va como **IA-10** | (este commit) | `docs/historico/life-rounds/IA-9.md` |
+| IA-8 · la plaza que falló se descarta, el viaje tiene su plazo | **hecha** — cierra el punto 1 de lo abierto y el 0b de IA-7; el devoto queda frágil (§4) | (este commit) | `docs/historico/life-rounds/IA-8.md` |
+| IA-7 · los labradores, dentro de su campo | **hecha** — lo vio el dueño en la demo v15; de rebote, el suelo de V-11 se multiplicaba después y no era un suelo | (este commit) | `docs/historico/life-rounds/IA-7.md` |
 
 ### El rediseño de interfaz (`docs/ui-redesign/implementation-prompt.md`)
 
@@ -480,11 +548,11 @@ animales, fauna, escenas históricas, **y después interfaz**.
 | **CERRADA · una decisión pendiente bloquea la navegación** | **Cerrada en VZ-6** (17 sep 2026) — y lo estaba desde VZ-03 sin que nadie lo hubiera comprobado: separar la decisión **aplazada** de la planteada quitó el candado, porque sólo la planteada devuelve la ruta al valle. Ahora hay recorrido que lo guarda (`una decisión aplazada deja ir a mirar otra cosa`), y hace falta uno: el fallo vivía en el bucle de pintado, así que un solo `expect` lo habría dado por bueno. Con ella se desbloquea **el documento sellado de UI-V3**, que sólo existe habiendo decisión pendiente y por eso no se había visto nunca en captura. Lo que sigue abajo es el diagnóstico original, que se queda escrito. **Fallo encontrado** (17 sep 2026), y era de los que cancelan dos funciones a la vez. `app.ts:624`, dentro de `paint` y por tanto **en cada fotograma**: `if (state.crossroad !== null …) if (currentRoute.kind !== 'valley') navigate({kind:'valley'})`. Mientras hay decisión pendiente —incluso **aplazada**, con la píldora puesta y el velo retirado— la crónica y la lista de la gente **no se pueden abrir**: la pestaña se pulsa, la ruta cambia y el fotograma siguiente la devuelve al valle. Medido: semilla 11, año 37 (`forest_cut` queda pendiente al abrir), aplazada deslizando; `data-screen` se queda en `valley`, 0 bloques de crónica y 0 filas de gente. **Y de ahí sale que el documento sellado de UI-V3 sea inalcanzable por construcción**: sólo existe cuando hay una decisión pendiente, que es justo el estado en el que la crónica no abre. La intención original es de UI-R5 y es buena —una bandeja abierta tapaba las opciones—, pero la condición tiene que ser «el velo de la encrucijada está en pantalla», no «hay decisión pendiente»: aplazar existe precisamente para poder ir a mirar otra cosa. Evidencia en `artifacts/graphics/UI-V3c/` |  |
 | **CERRADA · seguir a un aldeano no le marca** | **Cerrada en VZ-5** (`723dead`): se le enciende su propia ropa y lleva un anillo de oro en el suelo, y desde VZ-4 la cámara le sigue en cada fotograma. Lo de abajo es el diagnóstico con el que se abrió. **Revisado, sin tocar** (17 sep 2026, a petición del dueño para no pisar la sesión 3D). Enfocar **sí** funciona: `renderer.track` llama a `view.look` y la cámara se recentra (medido con el reloj en pausa: cambia el 44 % de los píxeles del valle). **Iluminar la silueta no existe en el 3D**: `src/render3d/renderer.ts:995` no guarda a quién sigue, así que no hay nada que pintar — el aro sí existe, pero en el renderer 2D (`src/render/renderer.ts:78`), o sea en el camino muerto. Además apunta una vez y no sigue, `track(null)` sale en la primera línea, y el texto `inspect.track.note` promete «marks {name} on the map», que en el 3D es falso. Faltan también el aro de luz y el contorno de oro de su casa del prototipo 03. El arreglo cabe entero en `src/render3d/renderer.ts` |  |
 | **BALANCEO · los recursos básicos** | **hecho, y a propósito corto** (pedido por el dueño al cerrar las cinco fases: «balancéalo un poco, tampoco te excedas porque el sistema irá mutando»). **La aldea corta la leña que necesita, no una cuota** (§7.13): la cuota fija hacía dos cosas mal con la misma regla —un valle sin ayuda del jugador pasaba **1 982 semanas de invierno con la leñera vacía** en 24 partidas y otro apilaba **20 415** de leña sin gastar—. Con la necesidad delante: **frío 0**, leña al final 368 y nunca por debajo de 168, población mediana sin ayuda de 38 a **44**, y los valles que llegan a la piedra de 7 a **12 de 24**. Y **las decisiones pasan a complementarse**: el hacha, que no cambiaba nada porque la leña ocupa la décima parte de las manos, gana su efecto propio en la obra (`MEANS.AXE_WORKS` 1,15) | **el hacha sigue siendo el medio más flojo**: 18 de plata para +2 obras de 60 y la primera piedra hasta veinte años antes en algún valle, pero sin mover la población (39 contra 40 en 60 semillas). O baja de precio o necesita otro efecto, y eso es decisión del dueño. **Y el banco de balance está por rehacer**: las 19 rojas de 37 que se midieron al cerrar M-4 son de **antes** de este cambio |
-| **M-4 · el resto del carro** | **hecha** (`rework.md` §4b), y con ella el juego de los medios entero. Tres medios más: **un hacha buena** (más leña por leñador, y el bosque lo paga), **una reliquia** (la fe deriva alto, así que hay capilla y cura sin esperar una generación — y el camino se entera) y **un par de manos** (el forastero que se queda). Éste último **no cuesta una tirada**: su nombre y sus rasgos salen de un `hash32` del tick, porque la invariante de los actos del jugador es que dar algo no mueve el azar del mundo; con `makeName` habría consumido del flujo `names` y un forastero habría desplazado la partida entera. **Retirado del código**: `redesign/orders.ts`, `ui/answer.ts`, `UiActions.setIntent`, su prueba y **41 claves del banco** (23 en inglés, 18 en español). `state.intent` se queda en reposo en el motor: sacarlo es una migración de esquema por limpieza, y la limpieza va después (decisión 5). **Medido** (24 semillas × 60 años, tabla en `design.md` §7.12): de 38 de población sin dar nada a **61 con el arado**, y la reliquia adelanta la primera piedra **diez años** (año 34 contra 44). Y dos cosas que la medida dice y el diseño no había previsto: **el carro entero sale peor que sólo el arado** (45 contra 61), porque comprar de todo deja sin plata para lo que cambia la partida; y **el hacha casi no cambia nada** (39 contra 38), y no por el medio sino porque **la leña no es un cuello de botella** en este juego (de 507 a 43 000 unidades en cien años, medido desde v2.9) | que la leña escasee es balance y va después (decisión 5); el banco de balance se remidió y **no se ha tocado** por lo mismo |
-| **M-2 · tres medios, de punta a punta** | **hecha, y el patrón vale** (`rework.md` §4b). El arado, dos cerdos y un barril: cada uno **cuesta lo del valle** y abre algo bueno **y** algo malo. El arado libera brazos —no sube la cosecha— y de ahí salen la leña, la obra y la piedra; los cerdos dan matanza y llaman a los lobos; el barril es una fiesta **esa misma semana** y trae bodas y riñas a partes iguales. **El carro** sustituye a la hoja de órdenes en la interfaz, con el precio en fichas de recurso y el motivo escrito cuando no se puede dar; las tres palancas quedan fuera. **La medida que decidía, cumplida** (24 semillas × 60 años): población mediana 38 sin dar nada contra **61 con arado**, y la primera piedra en 24 valles de 24 contra 7 — 23 puntos de distancia. Y el hallazgo que no estaba diseñado: **con la misma plata, quien compra barriles en cuanto puede nunca junta para el arado** (45 contra 60), así que elegir es la partida. **Lo que costó medir**: con los precios primeros (12, 8 y 4 de plata) un valle compraba 51 barriles en sesenta años; con 20, 14 y 10 y sin encadenar barriles, toda la plata de una partida da para una docena de medios. **Y tres trampas viejas que volvieron a morder, las tres cazadas por capturas**: `.valley-panel` es `position: absolute` y colapsaba la bandeja del carro; el `[hidden]` de los botones de la oferta no oculta nada si la piel les pone `display` (ya estaba escrito en `shell.css` desde UI-R2, ahora está en la skill); y un `TS1005` por acentos graves dentro de una plantilla de CSS. 13 pruebas nuevas en `means.test.ts` y un recorrido del carro | dos pruebas de trayectoria se reescribieron **para que midan la regla y no la biografía** (`resentment` había caído tres veces sin que la regla cambiara, y el listón del genio se remidió sobre tres semillas); `orders.ts` y `state.intent` se borran en M-4 |
-| **M-1 · el mundo contesta a lo que hay** | **hecha** (`rework.md` §4b). Lobos × cada cabeza del corral y ÷ empalizada —y con el corral apretado se llevan un cerdo—, riada × el bosque talado, y el ladrón del granero y el diezmo del señor miran **también la plata**: prosperar a la vista deja de ser gratis. Y las dos cosas que el dueño del diseño puso por delante: **el rayo y el incendio anual no dejan nunca a la aldea sin techo** —el fuego de §5.9 hacía lo mismo que el rayo dos semanas después, y lo cazó una prueba que forzaba un solo techo— y **la gracia de los primeros años**. **La medida corrigió el brief**: un valle intocado pasa de 9 muertas de 32 a **1**, y aislando las dos piezas se ve que no es la gracia (sin ella, 2 de 32) sino que **la mayoría de los finales de antes eran «un rayo quemó la única casa»**, que es justo lo que él dijo que no tiene gracia; el único final temprano que queda (año 8) es un **abandono**, con motivo. Y la letalidad por acumulación existe pero tarda: a 60 años el valle cargado muere lo mismo con **la mitad de gente** (23 contra 42), y a 120 años **9 de 24 contra 1**. **El error que casi se cuela**: la gracia atada a «pequeña o joven» volvía casi inmune a cualquier valle que se estuviera apagando —un escudo para el que va perdiendo borra el final—; ahora es «joven y pequeña», con prueba de ese nombre. `weightNow` expone el peso de un suceso para poder medirlo sin jugar cien partidas; nueve pruebas nuevas en `pressure.test.ts` | la letalidad por acumulación se ve a 120 años y apenas a 60: lo que la hará valer a escala de partida son los medios de M-2, que cuestan recursos |
-| **M-0 · la mesa: piedra y plata** | **hecha** (rama `medios/m-0`), primera fase del juego de los medios (`rework.md` §4b). **La piedra es una existencia**: la obra la cantea con sus propios puntos al cambio de siempre y la gasta al levantar, y con la obra parada cantea al montón hasta `STONE_IDLE_CAP` en vez de perder la semana. El trabajo total no se mueve —prueba de equivalencia en `journeys/works.test.ts`— y la primera piedra sigue en el año 48 de mediana (base medida: 48). **La plata entra por el camino y sale por el señor**: las tres encrucijadas de comercio y el buhonero pasan a ser **ofertas** —una frase en la voz de la bandeja y dos toques, «Take it» / «Let him go»—, el canal de comerciantes de §7.8 se retira entero (`selectTrader` fuera; las tres plantillas quedan en `RETIRED_TEMPLATES` para que una partida guardada siga cargando), y el diezmo se cobra cada otoño en plata o en grano del que sobra. **Cabecera de cinco cifras y el ánimo como cara** (`MOOD_FACE`): medido, el ánimo va de 6 a 79 y pasa el 17 % de las semanas por debajo de 10, así que la cifra no engañaba por estar quieta sino por vivir a escala de años. **Dos cifras que el camino obligó a medir**: sin `OFFER.MIN_PEOPLE` 8 y `FACTOR_KEEP_YEARS` 2, aceptar ofertas bajaba la población mediana de 47 a 15 y la semilla 9 se extinguía en el año 2 vendiendo su comida; y sin `AGAIN_WEEKS` el factor subía 1 181 veces en dieciséis partidas. **Y la trampa de la ronda**: `life/resource-sites.ts` detectaba la cantera por el coste viejo, así que sacar la piedra de `bpCost` la borraba del valle en silencio — la obra se abre antes de picar y lleva su `stoneDone`. Esquema 7 con migración (una obra en vuelo entra con su piedra puesta: ya la pagó). **Medido** (`tools/agency-report.ts`, 32 semillas × 60 años, con la base del motor de `a0e2706` al lado): primera piedra en el año 49 contra 48 de la base, muertas 9 contra 10, y la plata entra y sale en 123 de 161 décadas vividas. **Y una lectura que conviene tener escrita**: aceptar **todas** las ofertas siempre sale algo peor que no aceptar ninguna (población mediana 27 contra 39, con las mismas muertas), y no es un acantilado como las palancas —vender grano te pone la bandera `watched`, que es el precio que el factor siempre tuvo, y comprar vacas sube la densidad del corral y con ella la peste—. Lo que M-2 tiene que medir no es «aceptar es bueno» sino que **combinaciones distintas dan aldeas distintas**. Typecheck y lint limpios, 1 397 pruebas rápidas en verde con 25 nuevas, 15 recorridos y 6 de PWA | quedan 3 rojas de la otra sesión (`graphics-clock`, `life-staging` ×2), y una de ellas es una **declarada que ahora pasa** (el corro de la semilla 23): no se toca porque es su fichero |
-| **PARADA · las mecánicas, 17 sep** | **hecha: diagnóstico, plan y briefs**, sin código. El dueño paró el trabajo: «no es nada divertido; lo único bonito es mirar cómo avanza el pueblo». Medido con dieciséis semillas y sesenta años (`docs/plan-medios.md` §1): **las palancas de órdenes son una trampa** —sólo vive la postura de fábrica; `timber` a 0,2 mata 11 de 16, `fields` a 1,3 baja la población de 42 a 19—, **las encrucijadas pesan pero no se sienten** (42 contra 6 entre contestar bien y mal), y **la aldea prospera sola por diseño** (§1: letalidad sólo por encrucijadas). El ánimo, que él ve «siempre en 50–60», en el motor va de 6 a 79 y pasa un 27 % de las semanas de la primera década por debajo de 10: es un problema de reloj (lo mueve la cosecha una vez al año) y de que nada suyo lo levanta. **La propuesta, con su metáfora: dar medios, no órdenes** —el jugador mete cosas en el valle y la aldea decide—, más piedra y plata en la mesa. Sus decisiones: cuesta lo del valle y con ritmo alto; nada con el dedo; palancas fuera; el mundo no mata sin motivo; ánimo como cara; visitas de comercio como ofertas en la voz; diezmo regular; el rey después. **Briefs M-0 a M-4 en `rework.md` §4b**, con ficheros, contrato, pruebas y medida; van antes que R-2, R-5 y R-3 | ninguna línea de código; la medida de M-2 decide si el patrón vale |
+| **M-4 · el resto del carro** | **hecha** (`docs/historico/rework.md` §4b), y con ella el juego de los medios entero. Tres medios más: **un hacha buena** (más leña por leñador, y el bosque lo paga), **una reliquia** (la fe deriva alto, así que hay capilla y cura sin esperar una generación — y el camino se entera) y **un par de manos** (el forastero que se queda). Éste último **no cuesta una tirada**: su nombre y sus rasgos salen de un `hash32` del tick, porque la invariante de los actos del jugador es que dar algo no mueve el azar del mundo; con `makeName` habría consumido del flujo `names` y un forastero habría desplazado la partida entera. **Retirado del código**: `redesign/orders.ts`, `ui/answer.ts`, `UiActions.setIntent`, su prueba y **41 claves del banco** (23 en inglés, 18 en español). `state.intent` se queda en reposo en el motor: sacarlo es una migración de esquema por limpieza, y la limpieza va después (decisión 5). **Medido** (24 semillas × 60 años, tabla en `design.md` §7.12): de 38 de población sin dar nada a **61 con el arado**, y la reliquia adelanta la primera piedra **diez años** (año 34 contra 44). Y dos cosas que la medida dice y el diseño no había previsto: **el carro entero sale peor que sólo el arado** (45 contra 61), porque comprar de todo deja sin plata para lo que cambia la partida; y **el hacha casi no cambia nada** (39 contra 38), y no por el medio sino porque **la leña no es un cuello de botella** en este juego (de 507 a 43 000 unidades en cien años, medido desde v2.9) | que la leña escasee es balance y va después (decisión 5); el banco de balance se remidió y **no se ha tocado** por lo mismo |
+| **M-2 · tres medios, de punta a punta** | **hecha, y el patrón vale** (`docs/historico/rework.md` §4b). El arado, dos cerdos y un barril: cada uno **cuesta lo del valle** y abre algo bueno **y** algo malo. El arado libera brazos —no sube la cosecha— y de ahí salen la leña, la obra y la piedra; los cerdos dan matanza y llaman a los lobos; el barril es una fiesta **esa misma semana** y trae bodas y riñas a partes iguales. **El carro** sustituye a la hoja de órdenes en la interfaz, con el precio en fichas de recurso y el motivo escrito cuando no se puede dar; las tres palancas quedan fuera. **La medida que decidía, cumplida** (24 semillas × 60 años): población mediana 38 sin dar nada contra **61 con arado**, y la primera piedra en 24 valles de 24 contra 7 — 23 puntos de distancia. Y el hallazgo que no estaba diseñado: **con la misma plata, quien compra barriles en cuanto puede nunca junta para el arado** (45 contra 60), así que elegir es la partida. **Lo que costó medir**: con los precios primeros (12, 8 y 4 de plata) un valle compraba 51 barriles en sesenta años; con 20, 14 y 10 y sin encadenar barriles, toda la plata de una partida da para una docena de medios. **Y tres trampas viejas que volvieron a morder, las tres cazadas por capturas**: `.valley-panel` es `position: absolute` y colapsaba la bandeja del carro; el `[hidden]` de los botones de la oferta no oculta nada si la piel les pone `display` (ya estaba escrito en `shell.css` desde UI-R2, ahora está en la skill); y un `TS1005` por acentos graves dentro de una plantilla de CSS. 13 pruebas nuevas en `means.test.ts` y un recorrido del carro | dos pruebas de trayectoria se reescribieron **para que midan la regla y no la biografía** (`resentment` había caído tres veces sin que la regla cambiara, y el listón del genio se remidió sobre tres semillas); `orders.ts` y `state.intent` se borran en M-4 |
+| **M-1 · el mundo contesta a lo que hay** | **hecha** (`docs/historico/rework.md` §4b). Lobos × cada cabeza del corral y ÷ empalizada —y con el corral apretado se llevan un cerdo—, riada × el bosque talado, y el ladrón del granero y el diezmo del señor miran **también la plata**: prosperar a la vista deja de ser gratis. Y las dos cosas que el dueño del diseño puso por delante: **el rayo y el incendio anual no dejan nunca a la aldea sin techo** —el fuego de §5.9 hacía lo mismo que el rayo dos semanas después, y lo cazó una prueba que forzaba un solo techo— y **la gracia de los primeros años**. **La medida corrigió el brief**: un valle intocado pasa de 9 muertas de 32 a **1**, y aislando las dos piezas se ve que no es la gracia (sin ella, 2 de 32) sino que **la mayoría de los finales de antes eran «un rayo quemó la única casa»**, que es justo lo que él dijo que no tiene gracia; el único final temprano que queda (año 8) es un **abandono**, con motivo. Y la letalidad por acumulación existe pero tarda: a 60 años el valle cargado muere lo mismo con **la mitad de gente** (23 contra 42), y a 120 años **9 de 24 contra 1**. **El error que casi se cuela**: la gracia atada a «pequeña o joven» volvía casi inmune a cualquier valle que se estuviera apagando —un escudo para el que va perdiendo borra el final—; ahora es «joven y pequeña», con prueba de ese nombre. `weightNow` expone el peso de un suceso para poder medirlo sin jugar cien partidas; nueve pruebas nuevas en `pressure.test.ts` | la letalidad por acumulación se ve a 120 años y apenas a 60: lo que la hará valer a escala de partida son los medios de M-2, que cuestan recursos |
+| **M-0 · la mesa: piedra y plata** | **hecha** (rama `medios/m-0`), primera fase del juego de los medios (`docs/historico/rework.md` §4b). **La piedra es una existencia**: la obra la cantea con sus propios puntos al cambio de siempre y la gasta al levantar, y con la obra parada cantea al montón hasta `STONE_IDLE_CAP` en vez de perder la semana. El trabajo total no se mueve —prueba de equivalencia en `journeys/works.test.ts`— y la primera piedra sigue en el año 48 de mediana (base medida: 48). **La plata entra por el camino y sale por el señor**: las tres encrucijadas de comercio y el buhonero pasan a ser **ofertas** —una frase en la voz de la bandeja y dos toques, «Take it» / «Let him go»—, el canal de comerciantes de §7.8 se retira entero (`selectTrader` fuera; las tres plantillas quedan en `RETIRED_TEMPLATES` para que una partida guardada siga cargando), y el diezmo se cobra cada otoño en plata o en grano del que sobra. **Cabecera de cinco cifras y el ánimo como cara** (`MOOD_FACE`): medido, el ánimo va de 6 a 79 y pasa el 17 % de las semanas por debajo de 10, así que la cifra no engañaba por estar quieta sino por vivir a escala de años. **Dos cifras que el camino obligó a medir**: sin `OFFER.MIN_PEOPLE` 8 y `FACTOR_KEEP_YEARS` 2, aceptar ofertas bajaba la población mediana de 47 a 15 y la semilla 9 se extinguía en el año 2 vendiendo su comida; y sin `AGAIN_WEEKS` el factor subía 1 181 veces en dieciséis partidas. **Y la trampa de la ronda**: `life/resource-sites.ts` detectaba la cantera por el coste viejo, así que sacar la piedra de `bpCost` la borraba del valle en silencio — la obra se abre antes de picar y lleva su `stoneDone`. Esquema 7 con migración (una obra en vuelo entra con su piedra puesta: ya la pagó). **Medido** (`tools/reports/agency-report.ts`, 32 semillas × 60 años, con la base del motor de `a0e2706` al lado): primera piedra en el año 49 contra 48 de la base, muertas 9 contra 10, y la plata entra y sale en 123 de 161 décadas vividas. **Y una lectura que conviene tener escrita**: aceptar **todas** las ofertas siempre sale algo peor que no aceptar ninguna (población mediana 27 contra 39, con las mismas muertas), y no es un acantilado como las palancas —vender grano te pone la bandera `watched`, que es el precio que el factor siempre tuvo, y comprar vacas sube la densidad del corral y con ella la peste—. Lo que M-2 tiene que medir no es «aceptar es bueno» sino que **combinaciones distintas dan aldeas distintas**. Typecheck y lint limpios, 1 397 pruebas rápidas en verde con 25 nuevas, 15 recorridos y 6 de PWA | quedan 3 rojas de la otra sesión (`graphics-clock`, `life-staging` ×2), y una de ellas es una **declarada que ahora pasa** (el corro de la semilla 23): no se toca porque es su fichero |
+| **PARADA · las mecánicas, 17 sep** | **hecha: diagnóstico, plan y briefs**, sin código. El dueño paró el trabajo: «no es nada divertido; lo único bonito es mirar cómo avanza el pueblo». Medido con dieciséis semillas y sesenta años (`docs/historico/plan-medios.md` §1): **las palancas de órdenes son una trampa** —sólo vive la postura de fábrica; `timber` a 0,2 mata 11 de 16, `fields` a 1,3 baja la población de 42 a 19—, **las encrucijadas pesan pero no se sienten** (42 contra 6 entre contestar bien y mal), y **la aldea prospera sola por diseño** (§1: letalidad sólo por encrucijadas). El ánimo, que él ve «siempre en 50–60», en el motor va de 6 a 79 y pasa un 27 % de las semanas de la primera década por debajo de 10: es un problema de reloj (lo mueve la cosecha una vez al año) y de que nada suyo lo levanta. **La propuesta, con su metáfora: dar medios, no órdenes** —el jugador mete cosas en el valle y la aldea decide—, más piedra y plata en la mesa. Sus decisiones: cuesta lo del valle y con ritmo alto; nada con el dedo; palancas fuera; el mundo no mata sin motivo; ánimo como cara; visitas de comercio como ofertas en la voz; diezmo regular; el rey después. **Briefs M-0 a M-4 en `docs/historico/rework.md` §4b**, con ficheros, contrato, pruebas y medida; van antes que R-2, R-5 y R-3 | ninguna línea de código; la medida de M-2 decide si el patrón vale |
 | **VZ-6 · el resto de las deudas** | **hecha**, informe en `ui-redesign/piel/VZ-6.md`. Cierra la tanda VZ con el encargo «cubrir el resto de deudas». **(1) Los modelos viejos que no se iban del iPad**: no era código ni la otra sesión, era el worker. Su cabecera decía que «caché primero» es seguro porque cada recurso lleva huella en el nombre, y **para los modelos era falso** —`cow.glb` se llama igual toda la vida—, así que los animales rediseñados no llegaban a un dispositivo que ya hubiera visitado. `assets.ts` les cuelga los ocho primeros caracteres del `sha256` y `sw.js` precachea **esas mismas** direcciones, o se guardarían claves que nadie pide. **(2) Enfocar al decidir no hacía nada**, y la prueba declarada no estaba mal: el juego sí. `crossroad.ts` escalaba `#valley` con un `transform`, y ese lienzo va oculto desde UI-V10 — la prueba leía ese mismo `transform`, o sea que medía el camino muerto. Conducto nuevo `app.look` → `backend.live.look` → `renderer.look` → `view.look`, que mueve el centro y no la altura, y **cuenta como mover la cámara** (apaga el vuelo y pone `disturbed`, o el encuadre automático del fotograma siguiente se comía el enfoque). `viewCentre` entra en `GraphicsStats` y sale en la raíz como `data-view-centre`. **(3) Los tres recorridos declarados en verde**, los tres por fallo de la prueba: un velo congelado como literal, un «82 people at its height» y una clase que UI-V2b retiró, y un instante fijo que R-1 movió. **(4) La línea «Today» de la ficha**, que era la de «si es fácil»: lo fue en cuanto se vio de dónde sacar el dato — `ActorDoing` del mismo `lastActors` con el que se pintó el fotograma, así que dice lo que se ve. Nueve palabras y ninguna inventa un destino; la carga manda sobre el tramo; quien ya no está no tiene línea. **(5) Y tres cosas que no estaban en ninguna lista, las tres cazadas por una prueba nueva**: el **sello de la decisión aplazada no se podía pulsar** —llevaba `pointer-events: none` de cuando el ornamento era una hoja decorativa, y es el único camino de vuelta a esa decisión; la excepción va atada a `:disabled`—, la deuda «una decisión pendiente bloquea la navegación» estaba **cerrada por VZ-03 y nadie lo había comprobado**, y **el documento sellado de UI-V3 se ha visto por primera vez** (`artifacts/vz6-sealed.png`), gracias a `?crossroad=1` en las rutas de depuración. Typecheck y lint limpios, **15 recorridos en verde y ninguno declarado**, 172 pruebas rápidas de los ficheros tocados | el documento sellado lleva al valle y no abre la decisión de un toque: asimetría anotada, y cambiarla es del dueño del diseño. El nombre del caché del worker se sigue subiendo a mano |
 | **VZ-5 · a quien se sigue se le ve** | **hecha**, y cierra el encargo que VZ-4 dejó a medias. El resalte estaba bloqueado por tener `renderer.ts` con cambios sin comprometer de la otra sesión; en cuanto lo subieron (`141652d`) se hizo. **Dos piezas, y la segunda porque la primera no bastaba.** (1) **Se le enciende su propia ropa**: `dress` clona el material de cada malla para cada aldeano, así que subirle la emisión a uno no puede tocar a nadie más —un contorno postizo habría que clonarlo y posarlo cada fotograma sobre un cuerpo con esqueleto; esto son dos colores, y se guarda el que había para devolverlo—. (2) **Un anillo de oro en el suelo**, porque medido en el juego la ropa encendida sola no se distingue: a la distancia a la que se juega el cuerpo mide unos pocos píxeles y el tono se confunde con su propia tela. El anillo va en `cast.mark` y **no** en `cast.group` —ahí dentro están los cuerpos y siete pruebas los leen por índice, que es lo que rompí al primer intento— y se coloca en cada pasada donde esté el cuerpo, así que sigue al que anda y se apaga si esa persona se va del valle. Tres pruebas nuevas en `graphics-world.test.ts` guardan las tres propiedades: que se enciende sólo el seguido, que cambiar de persona apaga a la anterior, y que el anillo va donde está el cuerpo. **Y el texto de la ficha, que había pasado a ser falso**: decía «no promete mantener la vista» y desde VZ-4 la mantiene, así que ahora dice «rings them and keeps the view on them». Typecheck y lint limpios, 49 pruebas rápidas de los ficheros tocados y los trece recorridos en verde | la fuerza del resalte está sin juzgar en dispositivo: el arnés no la aísla —el oro del anillo se confunde con la paja del valle al buscarlo por píxel— y la cámara no centra a quien sigue, así que el recorte del medio no sirve |
 | **VZ-4 · la cámara sigue, y las seis pruebas de PWA** | **hecha**. Dos cosas que el dueño del diseño pidió al revisar lo pendiente. **(1) Seguir es seguir**: `renderer.track` mira a quien se le dice y vuelve, así que pulsar «Follow» centraba a la persona y ésta se iba andando del encuadre. Ahora `app.ts` guarda a quién sigue y lo repite en cada pintado. **Lo que falta —el resalte de la silueta— está bloqueado**: se dibuja en `src/render3d/renderer.ts` y la otra sesión lo tiene con cambios sin comprometer; se hace en cuanto quede libre. **(2) Las cinco pruebas de PWA que llevaban rotas, verdes, y la suite baja de 6,1 minutos a 11,5 segundos.** Dos causas, una del juego y otra de las pruebas. La del juego: **un valle recién fundado no se guardaba hasta el primer tick**, que a ×1 son catorce minutos, así que quien fundaba y cerraba la pestaña perdía la partida y al volver el menú ofrecía fundar otra en vez de continuar —el `pagehide` no lo tapaba, porque `persist` encola una escritura en IndexedDB y la página se desmonta antes—. Se arregla guardando al fundar. La de las pruebas: **el menú de inicio de U-10 sale también al recargar** y ninguna de las cinco lo pasaba, así que la espera de `data-app-ready` no se cumplía; `passTitle` ya sabía pulsar el botón que hubiera. Y tres medidas caducadas de paso: el avance del reloj usaba los **15 s por tick de antes de v3.72** (una cincuentava parte de lo que dice, así que el autoguardado no se cruzaba nunca) y ahora sale de `balance.ts`; ese avance se **salta** en vez de correrse, que es lo que los recorridos aprendieron (un millón de milisegundos fotograma a fotograma ahoga la página); y las cuatro velocidades viven recogidas detrás del botón desde UI-V2b, así que hay que desplegarlas antes de pedir una. **Y dos asimetrías que quedaron decididas, no arregladas**: `BACK TO THE LIST` no es una tercera forma de cerrar —sólo sale viniendo de la lista y vuelve a ella, cerrar lo hace la cruz— y la hoja de roble se queda sólo en el valle, que es el estándar aprobado en el lienzo de VZ-2. Typecheck y lint limpios, **los seis de PWA y los trece recorridos en verde** | la silueta resaltada y la línea «Today» de la ficha, las dos bloqueadas por la otra sesión; el nombre del caché del worker, que se sube a mano |
@@ -506,14 +574,14 @@ animales, fauna, escenas históricas, **y después interfaz**.
 ### Las fases nuevas, salidas de la lista de aldeanos (16 sep 2026)
 
 La lista completa, escrita para quien modela, está en
-`docs/graphics-rounds/aldeanos-por-hacer.md`. De analizarla salen cuatro fases,
+`docs/historico/graphics-rounds/aldeanos-por-hacer.md`. De analizarla salen cuatro fases,
 y **el orden importa**: la primera es de arte, la segunda es la que hace que el
 arte sirva sin tocar el motor, y las dos últimas necesitan que el motor tenga un
 dato que hoy no tiene.
 
 | Fase | Qué | Depende de | Estado |
 |---|---|---|---|
-| **G-19 · la hoja de contactos** | Las dieciséis figuras a tamaño natural, a 20 px y a 6 px, con quién las lleva y qué las distingue, para que la aprobación estética cueste un minuto | De G-17 y G-18 | **hecha** (`artifacts/graphics/G-19/aldeanos.html`, `graphics-rounds/G-19.md`). **Su veredicto quedó en duda el mismo día, y con razón:** decía que ocho de dieciséis son la misma mancha marrón, pero lo midió sobre un render de **estudio, fondo beige, sin movimiento y a píxeles de CSS**. El dueño lo miró en el juego y dijo que los modelos le gustan y que «no se ve tan mal»; el recorte del juego real a 1:1 (`artifacts/graphics/G-19/real-1a1.png`) le da la razón. Lo que sí sobrevive del análisis: las parejas que compiten por familia de color (dos azules, dos sombreros, tres verdes) son difíciles de distinguir **entre sí**. Aviso escrito en el propio informe |
+| **G-19 · la hoja de contactos** | Las dieciséis figuras a tamaño natural, a 20 px y a 6 px, con quién las lleva y qué las distingue, para que la aprobación estética cueste un minuto | De G-17 y G-18 | **hecha** (`artifacts/graphics/G-19/aldeanos.html`, `docs/historico/graphics-rounds/G-19.md`). **Su veredicto quedó en duda el mismo día, y con razón:** decía que ocho de dieciséis son la misma mancha marrón, pero lo midió sobre un render de **estudio, fondo beige, sin movimiento y a píxeles de CSS**. El dueño lo miró en el juego y dijo que los modelos le gustan y que «no se ve tan mal»; el recorte del juego real a 1:1 (`artifacts/graphics/G-19/real-1a1.png`) le da la razón. Lo que sí sobrevive del análisis: las parejas que compiten por familia de color (dos azules, dos sombreros, tres verdes) son difíciles de distinguir **entre sí**. Aviso escrito en el propio informe |
 | **G-20 · la medida sobre el juego, no sobre el taller** | Redirigida el mismo día: en vez de un plan de repintado, **medir la legibilidad en el juego empaquetado** —cuántos píxeles reales mide una persona a la distancia de apertura y acercada, recortes a 1:1 sobre prado— y corregir o confirmar el veredicto de G-19. Sólo si alguna figura falla **ahí**, se propone su arreglo mínimo | De G-19 | **en vuelo** (Sonnet) |
 | **G-18 · los aldeanos que faltan** | Las mallas: cinco oficios por rehacer en el estilo nuevo, y los tipos nuevos —niño, anciano, forastero, leñador, albañil, pastor, pescador— | De nada. Es la sesión de Blender | **entregado** (`9cc97af`, doce ids, verificado: huesos y clips del base al byte, 54 huellas, G-17 intacto). Falta la **aprobación estética del dueño** y la demo con los doce. Buhonero, novios, doliente y vigía: fuera hasta R-5b/R-6 |
 | **V-15 · el modelo se elige por lo que se hace** | La regla está escrita y probada en `src/render3d/world/models.ts`: manda la edad, luego el oficio, luego lo que se está haciendo. `Actor` gana `occupation` y la capa de vida la calcula del sitio y la oferta. Nueve pruebas en `tests/fast/life-models.test.ts` | — | **hecha, menos el último enganche** |
@@ -526,7 +594,7 @@ oficio del motor no tiene forma de entrar en el juego, y el arte se acumula sin
 verse. Es una fase pequeña —cambiar de qué se lee la malla— y desbloquea de una
 vez el niño, el anciano, el granjero, el leñador, el albañil y el pastor.
 
-### El rework de fondo (`docs/rework.md`)
+### El rework de fondo (`docs/historico/rework.md`)
 
 | Fase | Estado |
 |---|---|
@@ -545,7 +613,7 @@ piedra en 60/70 horas»** y «en los primeros meses deben pasar eventos ya». La
 velocidad por omisión es **×1**, y ahí una hora real es un mes de juego.
 
 **A partir de aquí, un umbral del §12 no se mira en años de juego.** Se mira con
-`npx tsx tools/pace-report.ts`, que imprime la escalera en horas de reloj.
+`npx tsx tools/reports/pace-report.ts`, que imprime la escalera en horas de reloj.
 Medirlo en años es lo que dejó pasar que v3.72 multiplicara la semana por 56 sin
 que nadie remidiera nada: cuatro constantes decían una cosa y significaban otra
 (el techo de decisión «30 minutos reales» eran 28 horas; la migración tiraba una
@@ -632,7 +700,7 @@ IA-12: dos tomas diurnas reales (semillas 11/43, años 20/60, 45 s a 2 fps),
 15/15 y 21/21 trabajadores/religiosos asignados llegan a ejercer. Cero discrepancias
 de burbuja de charla o clip aplicado. Mayor natural (7/37): descanso y conversación
 observados; ocho clips nuevos comprobados sobre esqueletos publicados. Detalles,
-regresión nocturna y límites en `life-rounds/IA-12.md`.
+regresión nocturna y límites en `docs/historico/life-rounds/IA-12.md`.
 
 IA-11: 62 pruebas pertinentes en 11 archivos; typecheck, lint y bundle verdes.
 Tres partidas vivas a ×64, 42 s y 2 fps: 22/22 noches completas cada una, 66/66
@@ -701,7 +769,7 @@ triángulos. 29 pruebas y doce auditorías verdes; las huellas de G-17 se conser
 Typecheck y lint verdes; 16/16 pruebas del rig; cuatro construcciones y cuatro
 auditorías de animación verdes. Todos reproducen los clips del base.
 
-**Movimiento** (`npx tsx tools/life-report.ts 7 23 97 --days 2`, 26 880
+**Movimiento** (`npx tsx tools/reports/life-report.ts 7 23 97 --days 2`, 26 880
 cuerpo-segundos). La primera columna es el estado antes de tocar nada.
 
 | | línea de partida | ahora (`7822454`) |
@@ -714,7 +782,7 @@ cuerpo-segundos). La primera columna es el estado antes de tocar nada.
 Los giros subieron de 0,21 % a 0,39 % en `7822454` y es efecto conocido: un
 animal que ahora se queda quieto en su sitio gira ahí. **Vigilar.**
 
-**El día de cada especie** (`npx tsx tools/life-report-species.ts 7 23 --days 2`):
+**El día de cada especie** (`npx tsx tools/reports/life-report-species.ts 7 23 --days 2`):
 
 | | andando | quieta sin nada | lo suyo |
 |---|---|---|---|
@@ -753,7 +821,7 @@ es**.
 | **La temática visual nueva, sin integrar** · subida el 18 sep 2026 | Sesión de piel (`piel-del-valle`) | Cinco grabados de **una sola tinta parda sobre papel crema** —marco de hojas de roble, esquina de vid, sello con el roble, banderola y la hoja—, con las palabras del dueño: «todo debe pasar por nuestra skill» y «la nueva temática es **menos colorida**». Referencia estable y correspondencia pieza a pieza en `docs/visual-reference/engraving/README.md`; tareas en `plan-arte-pendiente.md`; regla en §10 de la skill. **Lo que esto cambia hoy mismo**: los tres prototipos de `ui-prototypes/` siguen mandando en la maquetación y **dejan de mandar en el color**, así que la hoja de roble en oro (`--skin-gold`) y el capitular en rojo son de la versión anterior. Y **la banderola no tiene sitio todavía**, que es el hueco más claro: la fase del valle (A5) se lee en versalitas sueltas y en una banderola sería un rótulo |
 | **Cuatro crónicas sin su imagen** · destapadas al escribir la regla nueva | Sesión de arte | Regla del dueño del 18 sep: «cada vez que crees una crónica hay que ir creando la tarea de pedir las imágenes» (en `CLAUDE.md` y como §4c de la skill `goal`). Las cuatro son de `kind: 'built'`, así que `illustrationFor` las manda al grabado genérico de construcción: **`wall.closed`** —el cierre de la villa, **peso 3**, una vez en la vida de una aldea— comparte dibujo con «se ha levantado un campo», y con ella el portón (A2), la muralla de piedra (A4, que hasta hoy no levantaba ningún valle) y la atalaya (C3). Encargo con clave y qué enseñar en `plan-arte-pendiente.md` |
 | ~~**El barril y el arado en la escena**~~ · **hecho el 18 sep 2026** (§7.14): el barril en el corro de la plaza mientras dura la fiesta, y se bebe de él; el arado apoyado dentro de su campo. **Queda una de las tres**: el arado **acarreado** el día que se da, que es una escena de dos con la carreta y no una colocación | Sesión de vida (`life/props.ts`) | El sitio se midió tres veces tras el aviso del dueño («el posicionamiento no estaba bien hecho»): entre el trigo, luego a las afueras, y al final en una plaza del corro con 0,8 de aire |
-| **La malla del arado** | Sesión de Blender | No existe ninguna: `manifest.json` tiene 57 recursos y ni barril ni arado. **Encargo completo en `docs/encargo-arado.md`** (medidas, piezas, materiales, presupuesto de 400 triángulos y los tres pasos para meterlo). El barril lo tiene el dueño casi hecho |
+| **La malla del arado** | Sesión de Blender | No existe ninguna: `manifest.json` tiene 57 recursos y ni barril ni arado. **Encargo completo en `docs/encargos/encargo-arado.md`** (medidas, piezas, materiales, presupuesto de 400 triángulos y los tres pasos para meterlo). El barril lo tiene el dueño casi hecho |
 | ~~**Los lobos van al corral**~~ · **esta línea estaba mal anotada**: ya lo hacía IA-5 (`life/wildlife.ts`), y el 18 sep 2026 se rodó para comprobarlo | — | Toma de 90 s en la semilla 11, año 30, con el suceso provocado (`--happening wolves_at_the_coop`): el lobo sale del bosque, se acerca a **1,8 celdas de una gallina y 1,0 del corral**, ronda y se vuelve. Cero errores y cero penetraciones. Lo que faltaba no era el lobo: era poder **provocar** el suceso para verlo |
 | **LA META: la villa cerrada y el asedio** (`design.md` §1b, 18 sep 2026) · **A1, A2, A2c, B1, B2, B3, B4, C1, C2, D1, D2, D3, D4 (el núcleo) y D5 (el portón) hechas** (el cerco es de una capa y tiene dos puertas funcionales; la guarnición sube de una a siete manos la víspera de un asalto y ocupa todos sus puestos; **la muralla dispara**, y en el navegador tumba a 8 y 10 de 12 saqueadores con flechas de Rapier; **y el valle se puede perder**: `stormed` es el final de un valle tomado, y caen 3 de 12 sin dar defensa y 0 de 12 dándola; y **el resultado de la batalla física ya entra al motor** por la puerta de `PlayerAct`, con la semana de espera que deja que la pelea decida; **y el portón se rompe a golpes**: en el navegador, cinco hombres meten 18 de los 60 golpes antes de que las flechas se los coman; y **defender cuesta**: de 0 a 3 bajas propias por asalto) (el mundo físico ya existe y cuesta el 1,2 % del presupuesto; falta medirlo en un móvil de verdad) (el clan vecino baja a las 103 h y saquea; la mitad grande de «caer» espera a la batalla física): el cierre se cuenta con peso 3 y deja marca (`flags['wall_closed']`), y el portón es un edificio que va en el anillo (200 h de reloj); medido, la villa se cierra a las **425 h** de reloj contra las 61 h de la edad de piedra, y ese hueco es lo primero que pedirá el nivelado · **el plan está en `docs/plan-meta.md`**: ocho puntos (A-H), sus fases, prioridad, dificultad y agente (Luna/Terra baja, Sol media, Astra alta), y el orden en seis pasos | Dueño + quien retome | La fase 3 (villa cerrada) está a medias: el anillo existe y se cierra, el cierre no se celebra ni se ve distinto. La fase 4 (asedio) está por hacer entera y tiene tres piezas con coste conocido: flechas y aldeanos-torre (barato), cuerpo a cuerpo y ejército hostil (una tanda como la IA de la vida), gore y destrucción visible (sesión de arte: hoy no hay un solo clip de pelea). Antes de escribir el brief hay que decidir con el dueño qué es «caer» —el motor tiene tres finales y ninguno es una derrota militar— y con qué motor de físicas (balística propia basta para las flechas; el cuerpo a cuerpo con caídas pide más) |
 | ~~**LA LETALIDAD: el valle ya no se rompe**~~ · **respondido por el dueño el 18 sep y resuelto por B3 el mismo día**: `fate-chaos` **está verde** — la letalidad vino por el asedio, como él dijo: un valle al que no se le da defensa lo toma el clan vecino (3 de 12 en ochenta años, 8 de 24 en la escalera del ritmo). Lo que sigue abierto es el nivelado fino (G4) y por dónde muerde el hambre, abajo · lo que contestó: «no pasa nada, todo eso se irá nivelando y haciendo el juego más difícil; si la vas cagando, el valle puede morir. Esa es la clave». La letalidad vendrá por las decisiones y por el asedio (§1b), no por remedir el rayo. `fate-chaos` **ya no**: B3 la puso verde | Decisión tomada | B-1 arregló el ritmo y con ello se llevó el caos: `tests/journeys/fate-chaos.test.ts` mide el principio —«que haya partidas que se rompan es la idea»— y da **0 de 12 valles acabados donde pide 3 o más**; a sesenta años, 1 de 24. La causa está medida y es la misma que arregló el ritmo: con casas a tiempo hay camas, con camas llega gente, y el ánimo pasa de estar por debajo de 25 el 26 % de las semanas al 4 %. La prueba se queda **roja y sin tocar el listón**: bajar la cota sería borrar el principio. Lo que hay que decidir es **por dónde muerde el mundo** — el hambre (el grano toca cero y no mata a nadie, la línea de abajo), los desastres acumulados de M-1, o la gracia de la pareja, que hoy cubre `GRACE_PEOPLE` 6 y `GRACE_YEARS` 5 |
@@ -766,9 +834,9 @@ es**.
 | **El grano toca cero después del año 10** en todas las maneras de jugar medidas · **y B-1 lo hace más urgente**: las semanas con el ánimo por debajo de 25 caen del 26 % al 4 % porque la aldea ya no duerme en el suelo, así que la miseria dejó de morder por ningún lado | Decisión del dueño (balance) | La comida baja a menos de una semana por persona en el peor momento de casi toda partida, y **no mata a nadie** en sesenta años. O el hambre debe morder más, o el granero debe llenarse menos: es la otra mitad de «balancear los recursos básicos» y no se tocó para no excederse |
 | **`quiet_years` deja de salir nunca** | Decisión del dueño (balance) | Es la plantilla de reserva y deja de hacer falta por M-1: al abrir el ladrón y el diezmo a la riqueza, la aldea tiene más preguntas propias. Se queda donde está |
 | ~~**`state.intent` en el motor**~~ · **retirado el 18 sep 2026** (K-7): K-2 le quitó el último lector al pasar la cola de obras y el reparto de manos a la voluntad del rey. `PRIORITY_FAMILIES` se queda, que ahora es del rey | Hecho | Sacarlo es una migración entera por limpieza y la limpieza va después (decisión 5). La interfaz ya no lo escribe: `setIntent` y la hoja de órdenes están borradas | La única excepción a §13.1 de la fase, escrita en el changelog: un guardado de la v2.0 con palanca puesta cambia de postura al cargarlo |
-| ~~**LA PLAZA**~~ · **P-1 y P-2 hechos el 18 sep 2026** (§7.4b): se elige al fundar, se guarda (esquema 8), nadie construye dentro, el pueblo se ordena a su alrededor y se ve empedrada con una fuente. **Queda P-3**, la malla de la fuente: encargo en `docs/encargo-fuente.md` | Blender | Hoy la plaza es **un punto calculado y nada más**: `valleyCore` (`derive/anchors.ts`) es la media de los centros de los edificios en pie, se recalcula cada vez que se pregunta —así que **se mueve sola** mientras la aldea crece—, no se dibuja nada en ella y puede caer dentro de una casa o entre sembrados. El dueño la quiere «un espacio con un círculo grande, con separación, y en el centro quizás una fuente». Eso son tres trabajos y uno es del motor: ver §4.0b | La de apaño son tres primitivas y se ve; la buena son 500 triángulos y cinco piezas |
+| ~~**LA PLAZA**~~ · **P-1 y P-2 hechos el 18 sep 2026** (§7.4b): se elige al fundar, se guarda (esquema 8), nadie construye dentro, el pueblo se ordena a su alrededor y se ve empedrada con una fuente. **Queda P-3**, la malla de la fuente: encargo en `docs/encargos/encargo-fuente.md` | Blender | Hoy la plaza es **un punto calculado y nada más**: `valleyCore` (`derive/anchors.ts`) es la media de los centros de los edificios en pie, se recalcula cada vez que se pregunta —así que **se mueve sola** mientras la aldea crece—, no se dibuja nada en ella y puede caer dentro de una casa o entre sembrados. El dueño la quiere «un espacio con un círculo grande, con separación, y en el centro quizás una fuente». Eso son tres trabajos y uno es del motor: ver §4.0b | La de apaño son tres primitivas y se ve; la buena son 500 triángulos y cinco piezas |
 | ~~**LA MURALLA POR SECCIONES**~~ · **hecha el 18 sep 2026** (§7.4c, esquema 9): anillo escrito en el estado, la muralla crece pegada a sí misma, su línea es suya y el anillo siguiente va tres celdas afuera. Al año 40, un solo tramo en cuatro semillas | Hecho | «¿Podemos también evitar esos cachos sueltos? … la muralla también tendrá que quedarse por secciones: si la aldea crece a un cierto punto, se construye la muralla alrededor y después la siguiente sección de construcción va fuera de la muralla.» Hoy la empalizada se levanta **pieza a pieza sobre la envolvente del núcleo** (§7.4, `onEnvelope`), y la envolvente crece con la aldea, así que las piezas quedan repartidas por envolventes distintas: **de 7 a 19 tramos desconectados por valle al año 60**, medido. Lo que se pide es un **anillo**: cuando la aldea llega a un tamaño se fija un perímetro, se completa sección a sección, y lo que se construye después va fuera. Es un cambio del motor con estado nuevo (el anillo en curso) y toca §7.4, §12 y el trazado de todos los valles |
-| ~~**El rey**~~ · **K-1 a K-8 hechos el 18 sep 2026** (§6.7, esquema 10): se corona desde el carro, ocho pasos del tick leen su voluntad, la corona pasa por la sucesión y tiene su sala. **Queda K-6 a medias y K-7 sin empezar** | Medida en `docs/rey-medida.md` | «Más adelante». Sus piezas están puestas: tesorería en plata, rasgos que un medio añade, `who` en los sucesos. Nada de M-0 a M-4 lo impide | Lo que no llegó: **el rey del campo no tiene firma** —tres permisos probados y medidos, ninguno se ve— y eso es decisión del dueño (lo que queda sin usar es la cosecha por campo). Y la malla de la sala, encargada en `docs/plan-rey.md` §8. K-7 es retirar `state.intent`, que ya no lo lee nadie. **K-8 lo pidió el dueño al probarlo** —«cuando selecciones un rey, tiene que destacar después en la lista. No se ve rey en chiquitito, parece uno más»— y está hecho: medallón de lacre, chapa con la corona, primer sitio de la lista y a qué atiende el valle con él, en la lista y en la ficha (`artifacts/graphics/K-8/gente-rey.png`) |
+| ~~**El rey**~~ · **K-1 a K-8 hechos el 18 sep 2026** (§6.7, esquema 10): se corona desde el carro, ocho pasos del tick leen su voluntad, la corona pasa por la sucesión y tiene su sala. **Queda K-6 a medias y K-7 sin empezar** | Medida en `docs/medidas/rey-medida.md` | «Más adelante». Sus piezas están puestas: tesorería en plata, rasgos que un medio añade, `who` en los sucesos. Nada de M-0 a M-4 lo impide | Lo que no llegó: **el rey del campo no tiene firma** —tres permisos probados y medidos, ninguno se ve— y eso es decisión del dueño (lo que queda sin usar es la cosecha por campo). Y la malla de la sala, encargada en `docs/historico/plan-rey.md` §8. K-7 es retirar `state.intent`, que ya no lo lee nadie. **K-8 lo pidió el dueño al probarlo** —«cuando selecciones un rey, tiene que destacar después en la lista. No se ve rey en chiquitito, parece uno más»— y está hecho: medallón de lacre, chapa con la corona, primer sitio de la lista y a qué atiende el valle con él, en la lista y en la ficha (`artifacts/graphics/K-8/gente-rey.png`) |
 | **Una prueba rápida roja y once jornadas** | Sesión de vida | **B-1 rehízo la cuenta.** Rápida: queda **una**, la del devoto (`life-needs`), y dice algo distinto que antes — no es que nadie rece (0 % contra 0 %, porque no había capillas), es que el devoto reza el 8,6 % del tiempo contra el 6,0 % del resto y la propiedad pide el doble. Las tres de `life-staging` están declaradas con su medida. Jornadas: **9 de 161** (y las nueve son la familia de R-1: `life-beasts` ×3, `life-decide` ×2, `life-places`, `life-props` ×2 y `notices`) — A2c curó `works`, **B3 curó `fate-chaos`** (roja desde B-1) y la tanda de la fase 4 curó `founding`, y B-1 **curó** `founding` («a los diez años es una aldea») y dos de `life-props`; siguen `notices` (16,2 avisos al año contra 6, era 14,1; remedido el 18 sep tras A2c, y lo que habla son los doce sucesos de R-1 —`fate.*` en los doce primeros puestos—, no la muralla), `life-decide` ×2, `life-places` ×1, `life-beasts` ×3 y `life-props` ×2. La familia es la de R-1 §2.8 |
 | ~~**Tres pruebas rápidas rojas**~~ (`life-needs`, `life-staging` ×2) | Sesión de vida | `graphics-clock` **arreglada el 18 sep 2026**: comparaba doce clips contra los cuatro del GLB desde IA-12, que añadió ocho fabricados en código. Las otras tres siguen siendo ajenas; una es una declarada que cambia de estado según la trayectoria |
 | **Leer la crónica de un valle anterior** | Interfaz, sin dueño asignado | Sin puerta de entrada desde que UI-V8 retiró el selector de archivo. El dato sigue guardado |
@@ -812,7 +880,7 @@ conectados. Sentarse es en el suelo; un especialista sin edificio usa ocio.
 verificados con 66 noches del motor vivo. Queda revisar encuentros completos y clips
 de todas las especies, y ampliar la muestra a otros recintos y aldeas; los portones
 permanecen abiertos. No hay interiores ni clip de acostarse, ni se asignan viviendas
-ficticias a los residentes sin casa. Véase `docs/life-rounds/IA-11.md`; no dar por
+ficticias a los residentes sin casa. Véase `docs/historico/life-rounds/IA-11.md`; no dar por
 cerrada toda la IA por esta muestra.
 
 
@@ -847,7 +915,7 @@ medida/declarada del niño dentro de tolerancia, documentada en el informe.
 
 **G-17 queda cerrado técnicamente:** los cuatro recursos están publicados con
 los ids del encargo. El cura lleva sotana negra. No necesita cambios de selección
-en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
+en el juego; el seguimiento de esta entrega está en `docs/historico/graphics-rounds/G-17.md`.
 
 0. **La palanca «apretar el bosque» hace lo contrario de lo que dice, y es el
    verbo del juego.** Lo destapó C-1.3 al medir la jornada `intent.test.ts`,
@@ -882,7 +950,7 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
 0d. **`ui-milestones` está roja y no es de nadie de hoy**: «una partida de
    sesenta años da entre unos pocos y unas docenas de hitos», semilla 999 da
    18 contra 20. Falla igual en HEAD limpio (`4145cfc`). Es deriva de la
-   trayectoria nueva, como las de `rework.md` §2.8, y va con la decisión del
+   trayectoria nueva, como las de `docs/historico/rework.md` §2.8, y va con la decisión del
    peso de los avisos (punto 10).
 
 0e. **La limpieza no deja verde la suite completa por dos rojas ajenas más.**
@@ -890,12 +958,12 @@ en el juego; el seguimiento de esta entrega está en `graphics-rounds/G-17.md`.
    doce; `life-staging` reúne 20 de 39 aldeanos en la capilla (51,3 % frente al
    60 % exigido). Ninguna depende de los símbolos retirados: la primera mide el
    catálogo de arte y la segunda la trayectoria de V-11 ya documentada en
-   `rework.md` §2.8. Se dejan abiertas para sus rondas funcionales.
+   `docs/historico/rework.md` §2.8. Se dejan abiertas para sus rondas funcionales.
 
 0c. **El devoto se mide con una muestra que no lo ve.** `el devoto reza al
    menos el doble` (IA-3) pasa por poco con dos semillas y su proporción va
    de 0,6× a 2,7× sobre seis al apagar cambios que no tocan el rezo
-   (`life-rounds/IA-8.md` §3). Hace falta un sesgo del devoto visible con
+   (`docs/historico/life-rounds/IA-8.md` §3). Hace falta un sesgo del devoto visible con
    una muestra barata, o una muestra mayor en las jornadas. Mientras, si se
    pone roja al tocar otra cosa, no es del devoto.
 
@@ -924,9 +992,9 @@ Son tres trabajos, y el primero es del motor y manda sobre los otros dos:
 
 | Paso | Qué es | Quién |
 |---|---|---|
-| **P-1 · la plaza existe y no se mueve** | Un punto guardado en el estado (no una media que cambia cada semana) y un **radio reservado**: la colocación de obras (`world/works.ts`) no puede levantar nada dentro de él. Sin esto no hay plaza que empedrar: lo que hoy hay es un punto que se desplaza y al que las casas se le echan encima | Motor. **Sube el esquema del guardado** y **mueve el trazado de todos los valles**, así que toca medir población, obras y el frío antes y después con `tools/agency-report.ts` |
+| **P-1 · la plaza existe y no se mueve** | Un punto guardado en el estado (no una media que cambia cada semana) y un **radio reservado**: la colocación de obras (`world/works.ts`) no puede levantar nada dentro de él. Sin esto no hay plaza que empedrar: lo que hoy hay es un punto que se desplaza y al que las casas se le echan encima | Motor. **Sube el esquema del guardado** y **mueve el trazado de todos los valles**, así que toca medir población, obras y el frío antes y después con `tools/reports/agency-report.ts` |
 | **P-2 · la plaza se ve** | El empedrado: un círculo de suelo distinto donde cae el punto, con su borde. Y las reuniones, el barril y el corro pasan a usarlo | Render (`src/render3d/`) |
-| **P-3 · la fuente** | La malla del centro, por el mismo camino que el arado: receta en `art/recipes/`, `npm run art`, `npm run assets:publish` | Blender. **Encargo por escribir**, como `docs/encargo-arado.md` |
+| **P-3 · la fuente** | La malla del centro, por el mismo camino que el arado: receta en `art/recipes/`, `npm run art`, `npm run assets:publish` | Blender. **Encargo por escribir**, como `docs/encargos/encargo-arado.md` |
 
 **Lo que hay que decidir antes de empezar P-1, y es del dueño:** si la plaza se
 fija **en la fundación** —la pareja llega, elige un claro y ahí se queda para
@@ -991,7 +1059,7 @@ De diseño, y son las que más valen:
 - **La capa de vida sólo corre en 3D.** Una captura Canvas no acredita nada de
   estas fases, y la ruta `?debug=1` monta Canvas. Para ver un valle crecido hay
   que adelantar el reloj: `shot.mjs --advance <semanas>`
-  (`life-rounds/evidencia-capturas.md`).
+  (`docs/historico/life-rounds/evidencia-capturas.md`).
 
 ## 6. Qué hacer cuando se retoma esto
 
@@ -999,6 +1067,6 @@ De diseño, y son las que más valen:
 2. Mirar `git status` y `git log --oneline -5`. Conservar lo ajeno; nada de
    `reset` ni `checkout` destructivo sin documentarlo.
 3. Coger el punto 1 de §4, o la fase «siguiente» de §2 si el 1 está hecho.
-4. Cerrar con: informe de ronda en `docs/life-rounds/` o
+4. Cerrar con: informe de ronda en `docs/historico/life-rounds/` o
    `docs/ui-redesign/rounds/`, **actualizar este fichero**, y commit con las
    medidas dentro del mensaje.

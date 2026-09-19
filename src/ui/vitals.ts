@@ -19,7 +19,7 @@ import { population } from '@engine/people/demography';
 import type { GameState } from '@engine/state';
 
 /**
- * Hacia dónde va una cifra. E4 de `docs/plan-juego.md`.
+ * Hacia dónde va una cifra. E4 de `docs/historico/plan-juego.md`.
  *
  * **La mitad que faltaba para que un número signifique algo.** «Comida 40» es
  * ruido: cuarenta semanas subiendo es una aldea que va bien y cuarenta bajando

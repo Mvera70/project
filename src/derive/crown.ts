@@ -1,4 +1,4 @@
-// K-5 · La corona, para quien la pinta. `docs/plan-rey.md` §1.
+// K-5 · La corona, para quien la pinta. `docs/historico/plan-rey.md` §1.
 //
 // **Aquí vive la palabra «king»**, y el motor no la conoce: el asiento se llama
 // `leader` en el estado y se seguirá llamando así para siempre, porque los

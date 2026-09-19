@@ -7,6 +7,17 @@ el candado que evita el único fallo que ha costado una entrega entera.
 No es una preferencia de estilo: sale de tres entregas medidas en este mismo
 repositorio, con briefs del Anexo E escritos por un modelo superior.
 
+**Antes de escribir un brief, di en qué carpeta vive cada cosa.** Desde el
+19 sep 2026 la documentación va repartida: `docs/` es lo vivo, `docs/medidas/`
+la evidencia ya medida, `docs/encargos/` lo que le falta al arte y
+`docs/historico/` los planes que ya entregaron —con su índice en
+[`historico/README.md`](historico/README.md)—; las herramientas están en las
+seis carpetas de [`tools/README.md`](../tools/README.md). Un brief que cite un
+documento **por su ruta entera** ahorra al agente la búsqueda; uno que lo cite
+por el nombre suelto se la regala. Y si el trabajo mueve un documento, **las
+citas se reescriben en la misma ronda**, que es lo que costó la reorganización
+del 19 sep: 398 referencias en 130 ficheros.
+
 ## Lo medido
 
 | Ronda | Modelo | Resultado |

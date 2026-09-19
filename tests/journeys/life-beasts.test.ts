@@ -16,7 +16,7 @@ import { createVillage } from '../../src/render3d/life/village';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 
 // `foundGame` (la pareja) se rompe a menudo desde el equilibrado de la
-// densidad de sucesos (v3.78, `rework.md` §2.8 punto 4): tres de doce
+// densidad de sucesos (v3.78, `docs/historico/rework.md` §2.8 punto 4): tres de doce
 // semillas llegan extinguidas o abandonadas a los cuarenta años, y esta
 // familia de pruebas mide un mecanismo (la cabaña, el terreno), no la
 // fundación. Sigue la convención de `CLAUDE.md`: lo que mide una aldea hecha
@@ -91,7 +91,7 @@ describe('V-08 · los animales, iguales que la gente', () => {
     // persona esté de verdad consumiendo `feed`/`pet`/`chase` — antes bastaba
     // estar cerca y quieto, y el cerdo pasaba el 38 % de la jornada congelado
     // por gente que rezaba a un metro. Medido después de ese cambio: las
-    // interacciones bajan de 402 a 6 en dos jornadas (`life-rounds/IA-4.md`).
+    // interacciones bajan de 402 a 6 en dos jornadas (`docs/historico/life-rounds/IA-4.md`).
     // Es realista y queda pendiente de nivelado, pero exigir «una jornada, una
     // semilla, siempre» convierte la ausencia en la norma: dos de las seis
     // semillas canónicas se quedan en cero incluso mirando **cinco** jornadas

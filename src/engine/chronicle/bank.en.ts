@@ -1981,7 +1981,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'The valley had nobody in it until year {year}, and then it had two.',
   ],
 
-  // --- E5 · qué valle es éste (docs/plan-juego.md) ---
+  // --- E5 · qué valle es éste (docs/historico/plan-juego.md) ---
   //
   // Se dice **una vez, en la fundación**, y es lo que hace que un rasgo sea una
   // historia y no un modificador oculto: el jugador tiene que saber en qué sitio
@@ -2008,7 +2008,7 @@ const CROSSROAD_CHRONICLE: Record<string, string[]> = {
     'Bare slopes, and not a boulder field worth the name.',
   ],
 
-  // --- E4 · lo que la aldea contesta a una orden (docs/plan-juego.md) ---
+  // --- E4 · lo que la aldea contesta a una orden (docs/historico/plan-juego.md) ---
   //
   // La voz de siempre (§9.3): concreta, sin exclamaciones, sin juzgar al
   // jugador. **Y con alguien dentro** — no «no hay campos» sino «el alguacil

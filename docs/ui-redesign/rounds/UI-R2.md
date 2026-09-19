@@ -261,7 +261,7 @@ velocidad visibles y sin tapar debajo (arreglo §4.1).
 ### 7.1 · `orders.ts` conserva las clases viejas, no las reinventa
 
 `valley-orders`/`valley-panel-close` en vez de nombres nuevos: son las que
-`tools/graphics/shot.mjs` (líneas 190, 197, 243) y `tools/valley.shots.ts`
+`tools/graphics/shot.mjs` (líneas 190, 197, 243) y `tools/shots/valley.shots.ts`
 (`.valley-panel:not(.valley-orders)`) ya usan, y este brief no puede tocar
 `tools/`. El resultado es un close button propio de `orders.ts`
 (`.valley-panel-close`) apilado exactamente en el mismo sitio que el close

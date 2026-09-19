@@ -76,7 +76,7 @@ const LOOK = 5;
  * pausa de reserva —que es lo único que competía con la reunión— y por debajo
  * de una oferta que de verdad haga falta, así que no tapa una necesidad real.
  * El límite en 0,95 y no en 0,9 a propósito: 0,9 es la cota con la que se mide
- * «parado con un impulso al máximo» (`tools/life-report.ts`), y si la reunión
+ * «parado con un impulso al máximo» (`tools/reports/life-report.ts`), y si la reunión
  * cediera ahí, media aldea con sed se quedaría sin ir por un vaso de agua.
  */
 const GATHER_FLOOR = 0.8;
@@ -453,7 +453,7 @@ export function decide(
   // IA-3: un crío o un mayor busca más corto, a igualdad de necesidad — ver
   // `CHILD_RANGE_SCALE`/`ELDER_RANGE_SCALE`. Un adulto sigue con `LOOK` tal
   // cual, así que nada de esto cambia una sola cifra para quien ya tenía
-  // medidas las suyas (rework.md, IA-1 e IA-2).
+  // medidas las suyas (docs/historico/rework.md, IA-1 e IA-2).
   const rangeScale = who.ageGroup === 'child' ? CHILD_RANGE_SCALE
     : who.ageGroup === 'elder' ? ELDER_RANGE_SCALE : 1;
   const personalReach = LOOK * rangeScale;
@@ -595,7 +595,7 @@ export function decide(
     // punto 2). Con `seat = ya ocupadas` a secas, una oferta de uso exclusivo
     // —el `self` de un animal (`beasts.ts`), que nadie más elige nunca—
     // siempre ve cero ocupadas y siempre cae en el mismo `spots[0]`: la vaca
-    // que «vuelve siempre al mismo sitio exacto» de rework.md §3.5.2, aun
+    // que «vuelve siempre al mismo sitio exacto» de docs/historico/rework.md §3.5.2, aun
     // dándole varios puntos entre los que elegir. El desempate sale de
     // `hash32` por persona, paso y oferta, así que dos máquinas colocan al
     // mismo animal en el mismo sitio (§4.3), y sigue sin poder pasarse del
@@ -719,7 +719,7 @@ export const PROGRESS_CHECK = 90;
  * para contar como avance, en celdas.
  *
  * TUNE: 0,3. Más que el vaivén de un forcejeo con un vecino o una pared
- * (rework.md §3.5.1 y §3.5.3, mismo margen que `TURN_MIN_PROGRESS` en
+ * (docs/historico/rework.md §3.5.1 y §3.5.3, mismo margen que `TURN_MIN_PROGRESS` en
  * `body.ts`), menos que cualquier tramo real de camino andado a paso normal
  * en tres segundos.
  */
@@ -815,14 +815,14 @@ export function noProgress(
  * merezca la pena — o lo que había se acaba de invalidar por inalcanzable
  * (punto 4) — el cuerpo tiene que poder hacer algo donde está, en vez de
  * quedarse con `doing === null` hasta que la jornada vuelva a intentarlo
- * entero. Es la medida que sigue sin moverse en rework.md §3.6: parados con
+ * entero. Es la medida que sigue sin moverse en docs/historico/rework.md §3.6: parados con
  * un impulso ≥ 0,9, 0,19 %.
  *
  * No es una oferta del catálogo (`offers.ts`, `OFFERS`): nadie más la ve —se
  * construye aquí mismo, de un uso— y no compite por aforo con nadie. Sólo
  * tiene que existir un instante y ser alcanzable de verdad, así que sus
  * `spots` viven a una o dos celdas del punto de partida (el rango que pide
- * rework.md §3.5.4) y sólo en celda libre; si ninguno de los intentos cae
+ * docs/historico/rework.md §3.5.4) y sólo en celda libre; si ninguno de los intentos cae
  * bien —un rincón de una sola celda, rarísimo pero posible—, el propio punto
  * de partida entra como último recurso, porque ahí es donde el cuerpo ya
  * está de pie y por tanto siempre es alcanzable.

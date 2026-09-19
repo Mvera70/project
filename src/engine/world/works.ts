@@ -529,7 +529,7 @@ export function advanceWorks(state: GameState, buildPoints: number): BuiltEvent[
   // no tiene nada que levantar esta semana manda sus manos a la cantera en vez
   // de perder los puntos, hasta `STONE_IDLE_CAP`. Es lo que hace que la piedra
   // exista antes de que haga falta, y la última década de una partida —que
-  // `plan-juego.md` §3.1 midió vacía: el 100 % de las semanas sin nada que
+  // `docs/historico/plan-juego.md` §3.1 midió vacía: el 100 % de las semanas sin nada que
   // querer construir— deja un montón en vez de nada.
   if (state.works.length === 0 && left > 0 && canQuarry(state)) {
     const room = Math.max(0, WORLD.STONE_IDLE_CAP - state.village.stone);

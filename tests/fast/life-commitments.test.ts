@@ -1,4 +1,4 @@
-// IA-2 · El registro de compromisos. Anexo E, docs/life-ai-proposal.md §8.
+// IA-2 · El registro de compromisos. Anexo E, docs/historico/life-ai-proposal.md §8.
 //
 // Lo que se guarda aquí son propiedades del diseño (§8 del brief, y las que
 // `docs/life-ai-implementation-prompt.md` pide para esta fase), no detalles

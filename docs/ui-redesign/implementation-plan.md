@@ -11,7 +11,7 @@ persona. La referencia visual es [la propuesta original](ui-redesign-proposal.md
 y sus [tres imágenes](ui-prototypes/01-living-valley.png).
 
 Es un plan de cambio, no una segunda copia de la normativa vigente. Las reglas
-del juego siguen en `docs/design.md`; el rework sigue en `docs/rework.md`.
+del juego siguen en `docs/design.md`; el rework sigue en `docs/historico/rework.md`.
 Antes de ejecutar UI-R1, el coordinador debe integrar en el capítulo 11 del
 documento maestro las decisiones de esta propuesta, actualizar su registro y
 resolver las discrepancias de UI-R0. Los briefs de este fichero describen cómo

@@ -37,7 +37,7 @@ import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 import { createVillage } from '../../src/render3d/life/village';
 import { wolfRaidToday } from '../../src/render3d/life/staging';
 
-// Nueve semillas de `foundTwenty` (no las de `rework.md` §2.5, que son de
+// Nueve semillas de `foundTwenty` (no las de `docs/historico/rework.md` §2.5, que son de
 // `foundGame`: la pareja fundadora y los veinte parten de perfiles distintos
 // y no comparten lista de supervivientes) comprobadas contra cuarenta años de
 // verdad: las nueve llegan y las nueve sueltan `wolves_at_the_coop` al menos
@@ -155,7 +155,7 @@ describe('IA-5 · la visita aparece, se nota y se recupera — nunca colgada', (
     // semilla 11, tick 43, se planta a unas cinco celdas del corral —detrás de
     // una hilera de casas entre el bosque más cercano y el ancla de la
     // gallina— y `noticed` se queda en cero esa vez. Es la misma clase de
-    // límite que ya acepta `docs/life-rounds/IA-6.md` para la riña (6 a 20 de
+    // límite que ya acepta `docs/historico/life-rounds/IA-6.md` para la riña (6 a 20 de
     // 80 a 91 llegan a montarse el mismo día): un suceso real no garantiza una
     // escena completa cada vez, y exigirlo aquí sería bajar el listón en el
     // sitio equivocado — el que hay que vigilar es que nunca se quede colgada,

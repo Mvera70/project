@@ -31,7 +31,7 @@ TELEPORT_CELLS = 1.0
 # sobre el recorrido total de la pelicula, en celdas.
 STILL_CELLS = 0.25
 # Un giro de mas de medio angulo llano mientras casi no se avanza es la vuelta
-# sobre si mismo de `rework.md` §3.
+# sobre si mismo de `docs/historico/rework.md` §3.
 SPIN_RADIANS = math.pi / 2
 SLOW_PACE_SHARE = 0.25
 

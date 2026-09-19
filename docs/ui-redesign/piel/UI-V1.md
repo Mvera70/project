@@ -75,7 +75,7 @@ ronda) sólo sabe anexar `hud.speedControls` y `hud.speedBadge` a
 `speedBadge` pasa a ser un `<div>` con dos botones (`playPause` y el badge de
 siempre), y `HudHandle` no cambia de forma para quien lo consume. La regleta
 de cinco posiciones (con la pausa incluida) se conserva intacta —
-`tools/valley.shots.ts` sigue contando cinco botones—; el círculo ▶/⏸ es un
+`tools/shots/valley.shots.ts` sigue contando cinco botones—; el círculo ▶/⏸ es un
 atajo que llama a `actions.setSpeed(0)`/`actions.setSpeed(lastNonZeroSpeed)`,
 nada de estado nuevo del lado del motor. El badge enseña **la velocidad
 elegida, no el estado del reloj**: en pausa sigue diciendo «1×» si esa era la
@@ -94,8 +94,8 @@ dibuja una hora; dibuja el arco. Borrar `timeLine` habría sido una decisión
 de producto (quitar una entrega ya cerrada, U-12) que no le toca a una ronda
 de piel — el mismo argumento que el plan usa para no quitar la línea de
 órdenes. Se optó por el patrón «sr-only»: la hora sigue en el documento, la
-sigue leyendo quien usa lector de pantalla, y `tools/valley.pwa.ts` /
-`tools/valley.shots.ts` (que la comprueban por `.valley-time`) no se rompen.
+sigue leyendo quien usa lector de pantalla, y `tools/pwa/valley.pwa.ts` /
+`tools/shots/valley.shots.ts` (que la comprueban por `.valley-time`) no se rompen.
 Visualmente no ocupa sitio.
 
 **La cabecera compacta de la crónica parte el mismo texto del banco, no
@@ -116,7 +116,7 @@ escribir el mismo número dos veces con una función compartida
 la causa de que `document.querySelectorAll('.valley-vital')` devuelva ahora
 ocho elementos en vez de cuatro donde algo lo cuente a mano (visto en el
 JSON que imprime `shot.mjs`); no rompe ningún test de los que se pidió
-verificar ni las pruebas de `tools/valley.shots.ts` que usan `.first()`, que
+verificar ni las pruebas de `tools/shots/valley.shots.ts` que usan `.first()`, que
 sigue siendo el chip de gente.
 
 **Anular la piel vieja de `index.html` sin tocarlo, con especificidad y no

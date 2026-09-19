@@ -10,13 +10,24 @@ dar una persona: que alguien ajeno al proyecto distinga las tres crónicas del
 hito 0, y que una partida guardada sobreviva varios días de juego real en un
 teléfono para aceptar el hito 6.
 
+- [Mapa de la documentación](docs/README.md): qué es cada documento y si sigue
+  vivo. **Empieza por aquí si no sabes dónde mirar.**
 - [Documento de diseño](docs/design.md): fuente de verdad, decisiones y briefs.
+- [Cuaderno de tareas](docs/task-log.md): el punto exacto — qué está en vuelo,
+  qué cifras mandan y qué está abierto.
 - [Registro de cambios](docs/changelog.md): qué cambió en cada revisión y por qué.
 - [Traspaso](docs/handover.md): estado exacto, y las trampas que ya han costado
   tiempo.
 - [Hoja de ruta](docs/roadmap.md): qué falta en total, y qué no puede hacer
   ningún agente.
+- [Catálogo de herramientas](tools/README.md): qué mide cada informe, qué
+  fotografía cada captura y cómo se lanza.
 - [Instrucciones para agentes](CLAUDE.md).
+
+La documentación va repartida en cuatro sitios: `docs/` es lo vivo,
+`docs/medidas/` la evidencia ya medida, `docs/encargos/` lo que le falta al
+arte y [`docs/historico/`](docs/historico/README.md) los planes que ya
+entregaron. Las herramientas, en las seis carpetas de `tools/`.
 
 ## Arrancar
 

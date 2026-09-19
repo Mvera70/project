@@ -1,5 +1,5 @@
 // IA-6 · Historia visible: la riña de la plaza. docs/design.md §7.10,
-// docs/rework.md §4 (R-2, punto 1), docs/visual-reference/README.md §2.
+// docs/historico/rework.md §4 (R-2, punto 1), docs/visual-reference/README.md §2.
 //
 // Lo que se guarda aquí son las propiedades del brief, no detalles de
 // `scenes.ts`/`village.ts`: la riña sólo se monta con los `id` reales de

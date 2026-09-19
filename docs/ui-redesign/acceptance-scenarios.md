@@ -17,7 +17,7 @@ una prueba para que el resultado existente parezca correcto.
 
 ### Hechos comprobados al preparar esta guía
 
-- `tools/valley.shots.ts` pide Canvas explícitamente para la mayoría de sus
+- `tools/shots/valley.shots.ts` pide Canvas explícitamente para la mayoría de sus
   recorridos. No acredita que los mismos flujos funcionen con WebGL.
 - Hay un caso marcado `test.fail()` que espera una encrucijada concreta tras
   58 segundos. Su propio comentario documenta que esa trayectoria ya cambió.

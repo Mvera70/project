@@ -116,7 +116,7 @@ const ROUTE_CLEARANCE = 0.4;
  * Se usa para dos cosas: recortar la ruta y decidir si hace falta ruta siquiera.
  * Muestrea a pasos de 0,15 celdas y comprueba el disco contra cada sólido fino.
  *
- * **Y el radio, si se da, tiene que pasar también** (rework.md §3.5.1): sin
+ * **Y el radio, si se da, tiene que pasar también** (docs/historico/rework.md §3.5.1): sin
  * él, la recta entre dos centros roza un muro que el cuerpo sí toca —el punto
  * pasa, el cuerpo no— y eso es lo que se veía como cortar una esquina. Se
  * comprueba la intersección disco–rectángulo en cada muestra de la recta.

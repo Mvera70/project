@@ -79,7 +79,7 @@ const NIGHTFALL = NIGHT;
  * sea invierno».
  *
  * Lo que queda abierto, y es una decisión de diseño con su fork escrito en
- * `docs/next-plan.md`: a ×64 la gente y las casas que se pintan siguen siendo
+ * `docs/historico/next-plan.md`: a ×64 la gente y las casas que se pintan siguen siendo
  * de hasta sesenta y cuatro semanas atrás. Arreglarlo de verdad pide o que la
  * jornada escénica siga a la velocidad entera (y entonces la gente corre), o
  * que a velocidad alta no se dibujen los individuos (y entonces no hay salto

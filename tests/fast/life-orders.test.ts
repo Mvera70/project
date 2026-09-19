@@ -1,4 +1,4 @@
-// E2 · El valle obedece, y se ve. docs/plan-juego.md, Anexo E.4.
+// E2 · El valle obedece, y se ve. docs/historico/plan-juego.md, Anexo E.4.
 //
 // La queja era «no hay respuesta visual», y al buscarla salió que faltaba la
 // mitad del mundo: `placesOf` saca los sitios de los **edificios**, y de los

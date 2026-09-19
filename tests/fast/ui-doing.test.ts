@@ -81,7 +81,7 @@ describe('doingNow · la aldea dice qué está haciendo', () => {
   it('hay obra que anunciar y silencio que declarar, las dos cosas', () => {
     // Si una aldea de cuarenta años sólo dijera una de las cinco frases, esta
     // línea no estaría midiendo nada. Y la cuenta de cuál sale cuántas veces es
-    // la misma que `tools/works-report.ts` mide por otro camino: **la aldea
+    // la misma que `tools/reports/works-report.ts` mide por otro camino: **la aldea
     // pasa la mayor parte de su vida sin nada que construir**, y por eso esta
     // línea tiene que poder decirlo.
     const seen = new Map<string, number>();

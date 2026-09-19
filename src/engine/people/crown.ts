@@ -1,4 +1,4 @@
-// K-1 · La corona: quién la lleva y qué quiere. `docs/plan-rey.md`.
+// K-1 · La corona: quién la lleva y qué quiere. `docs/historico/plan-rey.md`.
 //
 // **El jugador no manda; dice quién manda.** Es el principio de los medios
 // (§7.12) aplicado a una persona: no se le dice a la aldea qué hacer, se le da

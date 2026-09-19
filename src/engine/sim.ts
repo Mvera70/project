@@ -972,7 +972,7 @@ export function tick(
   //
   // Es la misma regla que las líneas de arriba aplican a los cuervos —«seis
   // líneas sobre cuervos en seis semanas ahogarían la crónica»— y que aquí no
-  // se había aplicado. Medido con `tools/notice-report.ts` sobre cinco semillas
+  // se había aplicado. Medido con `tools/reports/notice-report.ts` sobre cinco semillas
   // y cuarenta años: **2 831 de los 3 309 avisos que el jugador ve sobre el
   // valle eran éste**, el 86 %, quinientos sesenta y seis por partida. El valle
   // decía la misma frase catorce veces al año durante cuarenta años, y ésa es

@@ -1,10 +1,10 @@
 // M-2 · El carro: lo que el jugador puede meter en el valle.
-// `docs/plan-medios.md` §3, brief en `docs/rework.md` §4b.
+// `docs/historico/plan-medios.md` §3, brief en `docs/historico/rework.md` §4b.
 //
 // **Sustituye a la hoja de órdenes**, y no es un cambio de aspecto: es el verbo
 // del juego cambiado de sitio. Las tres palancas mandaban —cuánto se siembra,
 // dónde van las manos, qué se levanta antes— y medido eso era una trampa (sólo
-// vivía la postura de fábrica; `plan-medios.md` §1). Aquí no se manda nada: se
+// vivía la postura de fábrica; `docs/historico/plan-medios.md` §1). Aquí no se manda nada: se
 // da una cosa y la aldea decide qué hacer con ella.
 //
 // Vive en la misma hoja de papel que la crónica, la gente y la ficha —mismo

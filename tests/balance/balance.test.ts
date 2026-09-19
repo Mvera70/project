@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { median, POLICIES, runBalance } from '../../tools/balance-report';
+import { median, POLICIES, runBalance } from '../../tools/reports/balance-report';
 
 describe('M-12 · design.md §12.9, real founding and full catalogue', () => {
   let result: ReturnType<typeof runBalance>;

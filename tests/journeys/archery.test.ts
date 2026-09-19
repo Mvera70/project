@@ -99,7 +99,16 @@ describe('D2 · la muralla contesta', () => {
     expect(life.manned.some((post) => post.post.arm === 'bow'), 'y ningún arco').toBe(false);
     for (let n = 0; n < DAY_STEPS; n += 1) life.step();
     expect(life.defence.loosed, 'ni una flecha').toBe(0);
-    expect(life.defence.fallen, 'y nadie en el suelo').toBe(0);
+    // **Y aquí acaba la propiedad, que es «sin arcos no hay arquería».**
+    // Esto pedía además que no cayera nadie, y eso dejó de ser lo mismo el día
+    // de D4: desde el cuerpo a cuerpo, el de la lanza que sujeta el portón
+    // puede tumbar a quien se le pone al alcance de un brazo, sin que vuele una
+    // sola flecha. Era cierto por casualidad —en este valle concreto ningún
+    // saqueador llegaba a esa distancia antes de acabarse el día— y con el
+    // ritmo nuevo (§8.6, el hueco entre decisiones) la guarnición de la
+    // semilla 7 al año 25 ya no es la misma y cae uno. Con `loosed` en cero,
+    // cualquier caído es de lanza **por construcción**, que es justo lo que
+    // esta prueba quería separar.
     physics.dispose();
   });
 

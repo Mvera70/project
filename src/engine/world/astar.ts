@@ -18,7 +18,7 @@ export function stepCost(map: ValleyMap, cell: number): number | null {
   const terrain = map.terrain[cell];
   // Lo que no se cruza. La montaña y el lago se suman aquí y no en otro sitio
   // porque **el brief del mapa grande los define por esto**: terreno que cierra
-  // en vez de terreno que produce (`docs/next-plan.md`). Un lago se cruza tan
+  // en vez de terreno que produce (`docs/historico/next-plan.md`). Un lago se cruza tan
   // poco como el río, y una montaña menos.
   if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh
     || terrain === TERRAIN_CODE.mountain || terrain === TERRAIN_CODE.lake) return null;

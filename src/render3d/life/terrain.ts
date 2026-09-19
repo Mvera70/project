@@ -34,7 +34,7 @@ import { fitsCircle, type Point, type Terrain } from './body';
  * clases de muralla (`palisade`, `wall`): no tienen puerta, pero tampoco se
  * cruzan.
  *
- * **Exportado y comprobado contra `BuildingKind`** (rework.md §3.5.6,
+ * **Exportado y comprobado contra `BuildingKind`** (docs/historico/rework.md §3.5.6,
  * `tests/fast/life-terrain.test.ts`): de los trece tipos de edificio que
  * existen hoy, sólo `field`, `well` y `grave_yard` quedan fuera de esta lista
  * — el propio motor los llama «suelo, no interior» en
@@ -149,7 +149,7 @@ export function canReach(land: Terrain, reach: Uint8Array, to: Point): boolean {
  * La celda libre y alcanzable más cercana a un punto, o nada si el valle
  * entero está cerrado.
  *
- * rework.md §3.5.2: un ancla que cae en celda cerrada, o en un patio sin
+ * docs/historico/rework.md §3.5.2: un ancla que cae en celda cerrada, o en un patio sin
  * salida hacia el resto de la aldea, es tan inútil como una dentro del muro
  * — `avoid` la empuja sin descanso en el primer caso, y en el segundo nadie
  * llega nunca a hacerle compañía. `reach` es la marca de `reachableFrom`

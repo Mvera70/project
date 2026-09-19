@@ -1,4 +1,4 @@
-// M-0 · La frase de una oferta del camino. `docs/plan-medios.md` §6.
+// M-0 · La frase de una oferta del camino. `docs/historico/plan-medios.md` §6.
 //
 // Pura y sin DOM, como `person-card.ts` y por el mismo motivo: así lo que se
 // puede comprobar sin navegador es **qué dice la oferta**, y no el HTML que la

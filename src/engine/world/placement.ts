@@ -14,7 +14,7 @@ const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + a.w > b
  *
  * Los dos sitios que lo comprueban tenían la lista escrita a mano, y eso es lo
  * que hace que añadir un terreno sea un fallo esperando: con la montaña y el
- * lago del mapa grande (`docs/next-plan.md`) serían cuatro códigos repetidos en
+ * lago del mapa grande (`docs/historico/next-plan.md`) serían cuatro códigos repetidos en
  * dos condiciones. Aquí, una vez.
  */
 function buildable(tile: number | undefined): boolean {

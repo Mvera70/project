@@ -13,8 +13,8 @@
 //      `skin.css` más un puñado de clases propias de esta ronda (`hud-*`).
 //   2. Las piezas que ya existían (`.valley-time`, `.valley-date`,
 //      `.valley-vitals`, `.valley-vital`, `.valley-speed-badge`) se quedan con
-//      su nombre —`tools/valley.shots.ts`, `tools/graphics/shot.mjs` y
-//      `tools/valley.pwa.ts` las buscan por esa clase, y ninguno de los tres
+//      su nombre —`tools/shots/valley.shots.ts`, `tools/graphics/shot.mjs` y
+//      `tools/pwa/valley.pwa.ts` las buscan por esa clase, y ninguno de los tres
 //      es mío en esta ronda— pero se **anulan** con una segunda clase propia
 //      en el mismo elemento: dos clases en el propio nodo (p. ej.
 //      `.valley-date.hud-date-text`) tienen más especificidad que la regla de
@@ -84,7 +84,7 @@ export function seasonLabel(tick: number): string {
   return renderUiText(SEASON_KEY[seasonOf(tick)]);
 }
 
-/** Las dos flechas de tendencia, dibujadas una vez (E4 de `docs/plan-juego.md`). */
+/** Las dos flechas de tendencia, dibujadas una vez (E4 de `docs/historico/plan-juego.md`). */
 const TREND_MARK: Readonly<Record<'up' | 'down', string>> = {
   up: '<svg viewBox="0 0 8 8" width="7" height="7" aria-hidden="true" focusable="false"'
     + ' fill="currentColor"><path d="M4 1 7 6H1z"/></svg>',
@@ -352,7 +352,7 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   dateLine.className = 'valley-date hud-date-text skin-inscription';
 
   // U-12 sigue calculando la hora — no se borra, se guarda para quien lee con
-  // lector de pantalla (`tools/valley.pwa.ts`/`valley.shots.ts` la siguen
+  // lector de pantalla (`tools/pwa/valley.pwa.ts`/`tools/shots/valley.shots.ts` la siguen
   // comprobando). El prototipo no dibuja un reloj digital, sólo el arco: la
   // cifra se queda, pero fuera de la vista.
   const timeLine = document.createElement('div');
@@ -468,11 +468,11 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
   // —el ▶/⏸ del prototipo—, el otro enseña el multiplicador elegido y
   // despliega la regleta de siempre (`speedControls`), sin tocarla: sigue
   // teniendo las cinco posiciones —pausa incluida— por si se prefiere elegir
-  // ahí, y `tools/valley.shots.ts` sigue contando cinco botones.
+  // ahí, y `tools/shots/valley.shots.ts` sigue contando cinco botones.
   // ---------------------------------------------------------------------
   const speedControls = document.createElement('div');
   // UI-V3b · la segunda clase la viste y la coloca (`skin.css`). `valley-speeds`
-  // se queda porque `tools/valley.shots.ts` cuenta sus cinco botones por ahí.
+  // se queda porque `tools/shots/valley.shots.ts` cuenta sus cinco botones por ahí.
   speedControls.className = 'valley-speeds hud-speeds';
   speedControls.setAttribute('aria-label', renderUiText('app.speed.controls'));
   const speedButtons = TIME.SPEEDS.map((value) => {
@@ -606,7 +606,7 @@ export function createHud(actions: UiActions, getRoute: () => SheetRoute): HudHa
     //
     // Decía cómo estaban puestas las tres palancas —«sowing enough · hands to
     // both · building as needed»—, y las palancas se retiran: medido, sólo
-    // hacían daño (`plan-medios.md` §1). Lo que dice ahora es si hay algo que
+    // hacían daño (`docs/historico/plan-medios.md` §1). Lo que dice ahora es si hay algo que
     // el valle pueda dar, que es lo único que hace falta saber sin abrirlo: si
     // no alcanza para nada, no merece la pena el toque.
     // K-5 · **y la corona cuenta como algo que dar.** Es lo más grande del

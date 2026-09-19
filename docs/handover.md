@@ -7,6 +7,13 @@ Este fichero no los sustituye: dice **en qué estado exacto está todo, qué
 decisiones ya están tomadas y qué trampas ya han costado tiempo.** Léelo antes de
 empezar cualquier ronda.
 
+**Dónde está cada documento** lo dice `docs/README.md`, y desde el 19 sep 2026
+hay cuatro sitios y no uno: `docs/` es lo vivo, `docs/medidas/` la evidencia ya
+medida, `docs/encargos/` lo que le falta al arte y `docs/historico/` lo que ya
+entregó. Las herramientas están catalogadas en `tools/README.md`, en seis
+carpetas. Si una ruta de este traspaso no existe, búscala en esos dos índices
+antes de darla por perdida.
+
 ---
 
 ## 1. El método, en cinco reglas
@@ -102,28 +109,28 @@ pertenece al día escénico; **D.6.5** un clip en el sitio exige un cuerpo en el
 sitio.
 
 **Y las del 15 sep por la tarde y por la noche, que mandan sobre todo lo de
-arriba** (`docs/rework.md` §0, con sus palabras): (1) la premisa es un idle
+arriba** (`docs/historico/rework.md` §0, con sus palabras): (1) la premisa es un idle
 bonito de fondo cuya esencia es que cada valle salga distinto; (2) el sistema
 se rehace hacia «mucho más aleatorio y con mucha más vida»; (3) **lo siguiente
 es la IA de animales y personas** («atraviesan paredes, dan vueltas sobre sí
 mismos»); (4) **el caos es el juego**: partidas que se rompen son la idea, así
 que ninguna puerta del motor debe impedirlo; (5) los planes de prueba y el
 nivelado van después; (6) la documentación tiene que bastar para que Opus o
-Sonnet sigan. El plan entero, con los briefs, es `docs/rework.md`.
+Sonnet sigan. El plan entero, con los briefs, es `docs/historico/rework.md`.
 
 ---
 
 ## 2.0. R-1, los sucesos del valle · 15 sep 2026, noche
 
 **Hecho y en `main` (v3.75).** El motor tira cada semana contra doce sucesos
-en el flujo `fate` (§7.10, §12.10, paso 2b). Medido con `tools/fate-report.ts`:
+en el flujo `fate` (§7.10, §12.10, paso 2b). Medido con `tools/reports/fate-report.ts`:
 13,0 sucesos al año en seis semillas × cuarenta años, mediana de tres semanas
 entre dos, rencores en cuarenta años entre 4 y 11 (antes, cero), distancia
 media entre valles 0,16. Suite rápida: 69 ficheros, 1 086 verdes, 25 s.
 **Jornadas: 107 verdes y 9 rojas**, todas por la trayectoria nueva y listadas
-con su causa en `docs/rework.md` §2.8. Playwright y la demo no se volvieron a
+con su causa en `docs/historico/rework.md` §2.8. Playwright y la demo no se volvieron a
 pasar. Todo lo demás de R-1 —ficheros, API, tabla, las tres vueltas de pesos,
-las doce pruebas movidas y por qué— está en `docs/rework.md` §2, que es donde
+las doce pruebas movidas y por qué— está en `docs/historico/rework.md` §2, que es donde
 hay que leerlo.
 
 ---
@@ -134,7 +141,7 @@ hay que leerlo.
 > nieva y hay tormentas con rayos (§10.8): el cielo se **deriva** de la fila del
 > clima del año, la estación y un `hash32` de la jornada, sin consumir una
 > tirada del motor —hay prueba— y sin tocar el balance. Medido con
-> `tools/sky-report.ts`: 79 % de jornadas claras, una tormenta cada tres
+> `tools/reports/sky-report.ts`: 79 % de jornadas claras, una tormenta cada tres
 > semanas, y el cielo cerrado va del 34 % en un valle ruinoso al 9 % en uno
 > abundante, que es lo que hace que dos valles del mismo año se vean distintos.
 >
@@ -171,7 +178,7 @@ hay que leerlo.
 > sigue siendo una generación (960 ticks) pero en la pared son nueve días y
 > medio. Y tres recorridos de Playwright que escribían sus milisegundos a mano
 > se cayeron juntos: ahora derivan el tiempo de la constante (`msFor`,
-> `advanceWeeks` en `valley.shots.ts`), y correr el reloj falso «por segundos»
+> `advanceWeeks` en `tools/shots/valley.shots.ts`), y correr el reloj falso «por segundos»
 > ya no vale porque son decenas de miles de fotogramas.
 >
 > **Dos fallos que costaron la tarde y quedan escritos:**
@@ -200,7 +207,7 @@ hay que leerlo.
 > filas de botones— y dio la premisa: un idle bonito de mirar de fondo, con la
 > aleatoriedad como esencia, y cinco pasos en orden: **pareja fundadora, menú
 > de inicio, inicio guiado desde lo alto, reloj con horas, tormentas**. El
-> primero está hecho y medido (`tools/founding-report.ts`, §12.2): ninguna de
+> primero está hecho y medido (`tools/reports/founding-report.ts`, §12.2): ninguna de
 > seis parejas se extingue en cuarenta años, 5 a 20 personas a los diez. Lo
 > que costó: la pareja no cosechaba (regla «dos manos, un campo» en
 > `labour.ts`), nadie llegaba (`ARRIVE_MIN_PEOPLE` 8 → 2, aldea pequeña sin
@@ -212,7 +219,7 @@ El dueño del diseño estuvo a punto de desestimar el proyecto —«la aldea no 
 siente viva, no hay ninguna manera lógica de jugar, o paramos y establecemos
 objetivos muy claros o esta idea se va fuera»— y después delegó: «toma la
 rienda y elige, toma todas tú las decisiones». De ahí salió
-`docs/plan-juego.md` y esto es lo que se hizo, en orden.
+`docs/historico/plan-juego.md` y esto es lo que se hizo, en orden.
 
 **E1 a E5 · el juego tiene un verbo.** La aldea obedece al jugador: tres
 palancas de órdenes permanentes —cuánto se siembra, dónde van las manos que
@@ -232,7 +239,7 @@ parpadeo de media pantalla tapa lo que uno mira a ×64.
 **Los mensajes.** «Horrorosos», dos veces, y las dos veces se buscó en la
 redacción. No estaba ahí:
 
-- `tools/notice-report.ts` (nuevo) mide qué frases lee el jugador de verdad.
+- `tools/reports/notice-report.ts` (nuevo) mide qué frases lee el jugador de verdad.
   **2 831 de 3 309 avisos eran la misma clave**: la temporada de caza, catorce
   veces al año. Ahora se cuenta al empezar la temporada, como los cuervos.
 - Las cartelas de hito hablaban **en pasado y con fecha** de algo que el
@@ -374,7 +381,7 @@ No son teoría: cada una se pagó con al menos una ronda.
 - **Tocar la elegibilidad de una sola plantilla mueve el balance entero.** El
   recalibrado de `wolf_winter` está hecho y sin fusionar por eso: mete veintiuna
   encrucijadas nuevas en la ventana medida y **trece pruebas calibradas sobre
-  semillas concretas pasan a fallar**. Detalle en `docs/next-plan.md`.
+  semillas concretas pasan a fallar**. Detalle en `docs/historico/next-plan.md`.
 - **Nunca un umbral con una sola semilla.** Dos partidas divergen desde el primer
   tick.
 - **Dos copias de la spec divergen.** Se sincroniza reemplazando, nunca
@@ -432,7 +439,7 @@ No son teoría: cada una se pagó con al menos una ronda.
   déficit semanal llegara a 25 (la sal), que hubiera dos nombrados sin taller
   cerca (los rencores), que alguien tuviera el campo pegado a casa (las
   salidas escalonadas). Cada una está reescrita contra la propiedad que decía
-  guardar, con la causa en `docs/rework.md` §2.7. **Antes de tocar el motor,
+  guardar, con la causa en `docs/historico/rework.md` §2.7. **Antes de tocar el motor,
   cuenta con una tarde de pruebas movidas, y no bajes un listón sin escribir
   el porqué.**
 - **Dos que trabajan en la misma celda no se pueden apartar.** El rechazo de
@@ -458,9 +465,9 @@ No son teoría: cada una se pagó con al menos una ronda.
   dentro» se convirtió en «el caos es el juego: unos valles se rompen y otros
   no» (`tests/fast/fate.test.ts`), y `tests/journeys/founding.test.ts` pasó a
   doce semillas con cuatro de sus cinco pruebas remedidas y su cota nueva
-  escrita. Ver `docs/rework.md` §2.5 y §2.6 para los números completos.
+  escrita. Ver `docs/historico/rework.md` §2.5 y §2.6 para los números completos.
 - **Un informe que avanza el mundo con `tick` no mide este juego** (ya estaba
-  en §2.1; sigue costando): `tools/fate-report.ts` juega con `run` y la
+  en §2.1; sigue costando): `tools/reports/fate-report.ts` juega con `run` y la
   política prudente, y las pruebas de `fate.test.ts` también.
 
 ---
@@ -525,11 +532,11 @@ No son teoría: cada una se pagó con al menos una ronda.
    demasiado —veinte puntos justos de extinción entre `prudent` y `worst`, que
    es el mínimo que el diseño pide—. No lo arregla una ronda gráfica: es balance
    del motor y lo decide el dueño del diseño. Medido en
-   `docs/findings-drama.md` §3–§6. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
+   `docs/medidas/findings-drama.md` §3–§6. La de fondo es que jugar bien y jugar mal se parecen demasiado: la
    distancia entre políticas cayó a cinco puntos contra los veinte que pide el
    diseño, y `smith_feud` se triplicó. **No lo arregla una ronda gráfica: es
    balance del motor y lo decide el dueño del diseño.** Medido en
-   `docs/findings-drama.md` §3–§6.
+   `docs/medidas/findings-drama.md` §3–§6.
 6. **Los siete recorridos de captura declarados.** Pide mirar capturas.
 7. **La reja visual del 3D no existe.** Hoy se mira a mano con `npm run shot`.
    Automatizarla es una ronda con alguien delante.
@@ -559,7 +566,7 @@ No son teoría: cada una se pagó con al menos una ronda.
     motor, suben `SCHEMA_VERSION` a 4 y rompen partidas guardadas. El cuenco de
     V-14 es decorado: el valle sigue plano por dentro.
 14. **Afinar el tick a día no arregla el desfase con la jornada** y su coste está
-    medido constante a constante en `docs/brief-reloj.md`. Si se hace, que sea
+    medido constante a constante en `docs/historico/brief-reloj.md`. Si se hace, que sea
     por simulación y no por dibujo.
 
 ---
@@ -614,16 +621,16 @@ o una captura comprueban el juego desde fuera. Los diez los escribe
 
 | Atributo | Qué dice | Quién lo escribe | Para qué existe |
 |---|---|---|---|
-| `data-app-ready` | El primer pintado ya se hizo: la partida está lista para tocarse. | `boot()`, tras el primer `paint(0)` | Toda espera de un recorrido o de una prueba PWA empieza por `html[data-app-ready="true"]` (`tools/valley.shots.ts`, `tools/valley.pwa.ts`, `tools/subpath.pwa.ts`, `tools/stale.pwa.ts`, `tools/animals.shots.ts`, `tools/graphics/sound-check.mjs`): es la puerta antes de tocar nada. |
-| `data-tick` | El tick de simulación pintado en este fotograma. | `paint()`, en cada pintado | `tools/valley.shots.ts` lo sondea (`page.evaluate`) para esperar a que el reloj avance antes de seguir un recorrido. |
-| `data-render` | Qué backend está vivo: `canvas` o `pilot3d`. | `stampRender()`, al montar y en cada relevo | `npm run test:pwa` (`tools/valley.pwa.ts`, `tools/subpath.pwa.ts`) espera `pilot3d` para comprobar que el 3D relevó de verdad y la partida no se quedó en el 2D de arranque. |
+| `data-app-ready` | El primer pintado ya se hizo: la partida está lista para tocarse. | `boot()`, tras el primer `paint(0)` | Toda espera de un recorrido o de una prueba PWA empieza por `html[data-app-ready="true"]` (`tools/shots/valley.shots.ts`, `tools/pwa/valley.pwa.ts`, `tools/pwa/subpath.pwa.ts`, `tools/pwa/stale.pwa.ts`, `tools/shots/animals.shots.ts`, `tools/graphics/sound-check.mjs`): es la puerta antes de tocar nada. |
+| `data-tick` | El tick de simulación pintado en este fotograma. | `paint()`, en cada pintado | `tools/shots/valley.shots.ts` lo sondea (`page.evaluate`) para esperar a que el reloj avance antes de seguir un recorrido. |
+| `data-render` | Qué backend está vivo: `canvas` o `pilot3d`. | `stampRender()`, al montar y en cada relevo | `npm run test:pwa` (`tools/pwa/valley.pwa.ts`, `tools/pwa/subpath.pwa.ts`) espera `pilot3d` para comprobar que el 3D relevó de verdad y la partida no se quedó en el 2D de arranque. |
 | `data-render-failure` | Por qué no relevó el 3D, cuando no releva. | `stampRender()`, sólo si `handle.failure !== null` | **Nadie lo lee.** Ninguna prueba ni herramienta lo consulta hoy; queda para mirarlo a mano en devtools cuando `data-render` se queda en `canvas` más de la cuenta. |
-| `data-intro` | En qué paso del vuelo de entrada está: `flight`, `hints` o `done`. | `flyIfWanted()` y `showStep()`, al fundar un valle nuevo | `tools/valley.shots.ts` comprueba que llega a `done` tras el vuelo guiado. |
-| `data-view-height` | La altura de la cámara del render vivo, en el fotograma actual. | `paint()`, con `stats.viewHeight` (calculado en `src/render3d/renderer.ts`) | **Nadie lo lee automáticamente.** Sirvió para medir a mano el vuelo de entrada (`docs/next-plan.md`, «el vuelo de entrada se midió con `data-view-height` en Chromium por software») y para destapar el enganche de la cámara con `zoom`; sigue ahí para la misma clase de depuración manual, no para una prueba. |
-| `data-sun-phase` | La fase del sol de la última jornada pintada (0–1). | `paint()`, con `stats.sunPhase` | `tools/valley.shots.ts` la contrasta con `hourAt()` para comprobar que la hora de la cabecera es la que se ve por la ventana; `tools/graphics/shot.mjs` la imprime junto a cada captura. |
-| `data-sky` | Qué cielo hace ahora: `clear`, `overcast`, `rain`, `storm` o `snow`. | `paint()`, con `stats.sky` | `tools/valley.shots.ts` comprueba que una jornada de tormenta forzada (`weather=storm`) pinta de verdad `storm` (o `snow` en invierno). |
-| `data-bolts` | Cuántos rayos han caído desde que arrancó el render. | `paint()`, con `stats.bolts` | `tools/valley.shots.ts` sondea que suba, para esperar a un rayo antes de fotografiarlo o de comprobar el trueno. |
-| `data-screen` | Qué pantalla está abierta: `valley`, `chronicle` o `people`. | `showing()`, al cambiar de pestaña | `tools/valley.shots.ts` comprueba que tocar una pestaña abre su pantalla y que cerrarla vuelve a `valley`. |
+| `data-intro` | En qué paso del vuelo de entrada está: `flight`, `hints` o `done`. | `flyIfWanted()` y `showStep()`, al fundar un valle nuevo | `tools/shots/valley.shots.ts` comprueba que llega a `done` tras el vuelo guiado. |
+| `data-view-height` | La altura de la cámara del render vivo, en el fotograma actual. | `paint()`, con `stats.viewHeight` (calculado en `src/render3d/renderer.ts`) | **Nadie lo lee automáticamente.** Sirvió para medir a mano el vuelo de entrada (`docs/historico/next-plan.md`, «el vuelo de entrada se midió con `data-view-height` en Chromium por software») y para destapar el enganche de la cámara con `zoom`; sigue ahí para la misma clase de depuración manual, no para una prueba. |
+| `data-sun-phase` | La fase del sol de la última jornada pintada (0–1). | `paint()`, con `stats.sunPhase` | `tools/shots/valley.shots.ts` la contrasta con `hourAt()` para comprobar que la hora de la cabecera es la que se ve por la ventana; `tools/graphics/shot.mjs` la imprime junto a cada captura. |
+| `data-sky` | Qué cielo hace ahora: `clear`, `overcast`, `rain`, `storm` o `snow`. | `paint()`, con `stats.sky` | `tools/shots/valley.shots.ts` comprueba que una jornada de tormenta forzada (`weather=storm`) pinta de verdad `storm` (o `snow` en invierno). |
+| `data-bolts` | Cuántos rayos han caído desde que arrancó el render. | `paint()`, con `stats.bolts` | `tools/shots/valley.shots.ts` sondea que suba, para esperar a un rayo antes de fotografiarlo o de comprobar el trueno. |
+| `data-screen` | Qué pantalla está abierta: `valley`, `chronicle` o `people`. | `showing()`, al cambiar de pestaña | `tools/shots/valley.shots.ts` comprueba que tocar una pestaña abre su pantalla y que cerrarla vuelve a `valley`. |
 
 Dos no los lee nadie todavía: `data-render-failure` y `data-view-height`. Los
 dos nacieron para depurar a mano un problema puntual (el relevo a 3D en

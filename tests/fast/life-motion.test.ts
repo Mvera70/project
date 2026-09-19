@@ -1,13 +1,13 @@
-// V-02/V-03/V-08 · Cuerpos y bestias, en marcha de verdad. rework.md §3.
+// V-02/V-03/V-08 · Cuerpos y bestias, en marcha de verdad. docs/historico/rework.md §3.
 //
 // El dueño: «los animales ahora mismo es que están fatal, atraviesan paredes,
-// dan vueltas sobre sí mismos». `tools/life-report.ts` midió las cuatro cosas
+// dan vueltas sobre sí mismos». `tools/reports/life-report.ts` midió las cuatro cosas
 // del brief (§3.4) sobre `createVillage`/`life.step()` — nunca con `tick` en
 // un bucle (`CLAUDE.md`) — antes y después de tocar `body.ts`, `steering.ts`,
 // `navigate.ts` y `beasts.ts`. Esta prueba guarda las mismas propiedades para
 // que no se rompan otra vez, con una muestra más pequeña que el informe
 // —tres semillas y dos jornadas, no seis y cuatro— porque aquí sí importa el
-// coste: `tools/life-report.ts` con seis semillas y cuatro jornadas tarda unos
+// coste: `tools/reports/life-report.ts` con seis semillas y cuatro jornadas tarda unos
 // 23 s, y la suite rápida entera tiene que quedarse por debajo de 30 s
 // (`CLAUDE.md`). Sigue siendo «varias semillas y varias jornadas», nunca una
 // sola (`CLAUDE.md`, Anexo E.7 «un umbral sobre una muestra es ruido»).
@@ -20,7 +20,7 @@
 //   después           0              ~0,11 %         ~0,38 %       ~0,02 %
 //
 // La tabla completa, con las seis semillas y cuatro jornadas del brief, está
-// en `docs/rework.md` §3.6.
+// en `docs/historico/rework.md` §3.6.
 
 import { beforeAll, describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -35,14 +35,14 @@ import { terrainOf } from '../../src/render3d/life/terrain';
 import { createVillage } from '../../src/render3d/life/village';
 import { avoid, drive } from '../../src/render3d/life/steering';
 
-/** Las mismas semillas que `tools/life-report.ts` usa por defecto, en un
+/** Las mismas semillas que `tools/reports/life-report.ts` usa por defecto, en un
  *  subconjunto de tres: cuestan tres veces menos y siguen siendo «varias». */
 const SEEDS = [7, 23, 97];
 const DAYS = 2;
 const SAMPLE_EVERY = 30;
 
 /** Si algún punto del círculo cae en celda cerrada, además del centro —los
- *  mismos cinco puntos que `tools/life-report.ts`. */
+ *  mismos cinco puntos que `tools/reports/life-report.ts`. */
 function circleBlocked(land: Terrain, body: Body): boolean {
   const { x, z, radius } = body;
   // IA-12: círculo completo, también en esquinas; tolerancia de redondeo
@@ -105,7 +105,7 @@ describe('V-02/V-03/V-08 · cuerpos y bestias en marcha', () => {
 
   it('el círculo casi nunca cae en una pared, muy por debajo del antes', () => {
     // Antes de tocar `integrate`/`resolve`/`avoid`, esta misma muestra daba
-    // ~1,3 % (`docs/rework.md` §3.6). El uno por ciento de margen deja hueco
+    // ~1,3 % (`docs/historico/rework.md` §3.6). El uno por ciento de margen deja hueco
     // de sobra al ruido de una muestra pequeña sin dejar que la regresión
     // vuelva a colarse sin que la suite lo note.
     const ratio = totals.circleInWall / totals.bodySeconds;
@@ -119,7 +119,7 @@ describe('V-02/V-03/V-08 · cuerpos y bestias en marcha', () => {
   });
 
   it('los giros sobre sí mismo se quedan por debajo del 2 % de los cuerpo-segundos', () => {
-    // El listón literal del brief (rework.md §3.5.3). Antes del arreglo esta
+    // El listón literal del brief (docs/historico/rework.md §3.5.3). Antes del arreglo esta
     // misma muestra daba ~4,8 %; después, ~0,38 %.
     const ratio = totals.spins / totals.bodySeconds;
     expect(ratio, `${totals.spins} de ${totals.bodySeconds} (${(100 * ratio).toFixed(2)}%)`)

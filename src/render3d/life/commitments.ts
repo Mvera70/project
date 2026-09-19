@@ -1,4 +1,4 @@
-// IA-2 · El registro de compromisos. design.md Anexo E, docs/life-ai-proposal.md §8.
+// IA-2 · El registro de compromisos. design.md Anexo E, docs/historico/life-ai-proposal.md §8.
 //
 // **Lo que faltaba, según IA-0 §2**: dos mecanismos parciales y separados
 // (`taken`/`noSeats` para el aforo de las ofertas, y `Dweller.scene` para las
@@ -114,7 +114,7 @@ function spotsClash(a: readonly [Point, Point], b: readonly [Point, Point]): boo
  * El registro común de propuestas y reservas. §8 del brief, con la forma que
  * hace falta para que `village.ts` deje de llevar la cuenta a mano.
  *
- * No es `InteractionRegistry` de `docs/life-ai-proposal.md` calcado: ese
+ * No es `InteractionRegistry` de `docs/historico/life-ai-proposal.md` calcado: ese
  * contrato no está en la lista de los tres que el brief congela, así que
  * aquí se amplía con lo que de verdad hace falta (`reserveRaw`, `stageOf`,
  * `advance`, `get`, `entries`) sin dejar de cumplir lo que sí pide —

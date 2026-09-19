@@ -13,7 +13,7 @@ visual de la portada y de la interfaz.
 - `chronicle-founding-640x512.png`: referencia aprobable para las ilustraciones
   de crónica: figuras kawaii de línea marrón sin relleno, fondo ambiental más
   fino y formato final 5:4. No se carga aún en el juego.
-- `../../../tools/icon-source.png`: fuente cuadrada del icono aprobado.
+- `../../../tools/ui/icon-source.png`: fuente cuadrada del icono aprobado.
 - `../../../public/ui/art/title-valley-higgsfield.png`: portada definitiva del
   menú, guardada desde la generación aprobada del 18 sep 2026. Está en
   `public/ui/art/` para poder conectarla al menú cuando se haga la integración.

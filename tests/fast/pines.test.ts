@@ -10,7 +10,7 @@
 //   · «de diferentes tamaños».
 //
 // Lo que se guarda aquí es eso, y nada más: dónde, en qué corros y con qué
-// alturas. Cómo se ve lo dice una captura (`docs/graphics-rounds/`), que es lo
+// alturas. Cómo se ve lo dice una captura (`docs/historico/graphics-rounds/`), que es lo
 // único que puede decirlo.
 
 import { describe, expect, it } from 'vitest';

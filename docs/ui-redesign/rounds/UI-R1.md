@@ -92,7 +92,7 @@ cinco variantes de `SheetRoute`.
 
 ### 3.3 La pila del mensaje: `resolveMessageSlot` y por qué no toca `notice.ts`
 
-El fallo que esta ronda tenía que dejar imposible (`docs/life-rounds/
+El fallo que esta ronda tenía que dejar imposible (`docs/historico/life-rounds/
 evidencia-capturas.md` §3): el aviso de la crónica y la pista del inicio
 guiado se pintaban encima, cada uno con su `bottom` fijo e independiente
 (82px y 118px). `mountNotices` acepta **cualquier** contenedor como `root`
@@ -258,7 +258,7 @@ caso de coincidencia sea real y no fabricado.
 
 No se ha ejecutado `test:shots` (Playwright) completo: el propio orden del
 dueño del diseño limita esta ronda a typecheck, lint y los ficheros de prueba
-listados, más las capturas. Un recorrido de `tools/valley.shots.ts` no
+listados, más las capturas. Un recorrido de `tools/shots/valley.shots.ts` no
 debería romperse —`getByRole('button', {name:...})` y `data-screen` no han
 cambiado de valor, y `.valley-hint`/`.valley-notice`/`.valley-orders-now`/
 `.valley-speed-badge` conservan su clase y su comportamiento observable—, pero
@@ -274,7 +274,7 @@ cambiado de valor, y `.valley-hint`/`.valley-notice`/`.valley-orders-now`/
   (§3.5). Heredado desde antes de esta ronda (comprobado contra
   `docs/ui-redesign/ui-captures/04-orders.png`); UI-R2 lo resuelve al
   construir el panel de verdad con su propio relleno inferior.
-- **Nueve jornadas rojas de `rework.md` §2.8** siguen sin tocar, por decisión
+- **Nueve jornadas rojas de `docs/historico/rework.md` §2.8** siguen sin tocar, por decisión
   del dueño y porque esta ronda no toca el motor.
 - **`test:shots` no se ha ejecutado entero** (§6): typecheck + lint + los
   ficheros listados + capturas es lo que pidió el dueño del diseño para esta
@@ -287,7 +287,7 @@ cambiado de valor, y `.valley-hint`/`.valley-notice`/`.valley-orders-now`/
 
 ## 8. Qué observación refutaría lo hecho aquí
 
-- Que un recorrido real de `tools/valley.shots.ts` (no ejecutado en esta
+- Que un recorrido real de `tools/shots/valley.shots.ts` (no ejecutado en esta
   ronda) encuentre un `getByRole`/`data-screen` que ya no coincide, o un
   listener que sobrevive a un `dispose()`.
 - Que exista una tercera ruta hacia el aviso o la pista que no pase por

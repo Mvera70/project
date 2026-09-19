@@ -31,7 +31,7 @@ las cifras de esta semana. El nivelado va al final y es del dueño.
 medida escrita al lado: qué se midió, en cuántas semillas, y qué salía antes.
 
 **Lo que decide *cuándo* pasa algo se mira en horas de reloj**, no en años:
-`npx tsx tools/pace-report.ts`. A catorce minutos por semana, una hora real es
+`npx tsx tools/reports/pace-report.ts`. A catorce minutos por semana, una hora real es
 un mes de juego.
 
 ## 3 · El trabajo

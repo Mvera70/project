@@ -68,7 +68,7 @@ describe('el cielo · U-13', () => {
   });
 
   it('un año ruinoso llueve más que uno abundante, y ninguno llueve siempre', () => {
-    // Medido con `tools/sky-report.ts` en seis semillas y sesenta años: del
+    // Medido con `tools/reports/sky-report.ts` en seis semillas y sesenta años: del
     // 33,9 % de jornadas cerradas en la fila ruinosa al 9,2 % en la abundante.
     const state = foundGame(7);
     const wetShare = (index: number): number => {
