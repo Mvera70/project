@@ -40,6 +40,9 @@ export interface Arrow {
 
 /** Un arquero en su puesto, con su cadencia. */
 export interface Archer {
+  /** Se conserva aunque la flecha ya haya salido de la lista de proyectiles. */
+  lastShot?: number;
+  facing?: number;
   readonly post: Manned;
   /** Paso a partir del cual puede volver a soltar. */
   nextShot: number;
@@ -239,10 +242,11 @@ export function stepArchery(
   occupied: ReadonlySet<string>,
 ): void {
   for (const archer of archers) {
-    if (step < archer.nextShot) continue;
     if (!occupied.has(archer.post.place.id)) continue;
     const target = targetFor(archer, raiders);
     if (target === null) continue;
+    archer.facing = Math.atan2(target.at.x - archer.post.place.at.x, target.at.z - archer.post.place.at.z);
+    if (step < archer.nextShot) continue;
     const from = { x: archer.post.place.at.x, y: LOOSE_HEIGHT, z: archer.post.place.at.z };
     const velocity = aimAt(from, target.at);
     if (velocity === null) continue;
@@ -253,6 +257,7 @@ export function stepArchery(
       spent: false,
     });
     archer.loosed += 1;
+    archer.lastShot = step;
     archer.nextShot = step + DRAW_STEPS;
   }
 
@@ -283,6 +288,7 @@ export function stepArchery(
       // la ladera. Cuántas hacen falta de verdad es balance, y el nivelado va
       // al final y es del dueño.
       raider.phase = 'down';
+      raider.downAt = step;
       raider.body.vx = 0;
       raider.body.vz = 0;
       break;

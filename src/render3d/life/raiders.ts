@@ -55,6 +55,10 @@ import type { Waypoint } from './navigate';
 export type RaiderPhase = 'coming' | 'standing' | 'breaking' | 'inside' | 'leaving' | 'gone' | 'down';
 
 export interface Raider {
+  /** Instantes de hechos, en el reloj de pasos de esta jornada. */
+  downAt?: number;
+  blowAt?: number;
+  travelled?: number;
   readonly body: Body;
   /** Por dónde entró al valle, y por dónde se irá. */
   readonly road: Point;
@@ -399,6 +403,9 @@ export function stepRaider(
       if (step % BLOW_STEPS === 0
         && Math.hypot(gate.at.x - body.x, gate.at.z - body.z) <= BLOW_REACH) {
         gate.hits += 1;
+        gate.hitAt = step;
+        raider.blowAt = step;
+        body.facing = Math.atan2(gate.at.x - body.x, gate.at.z - body.z);
         if (gate.hits >= GATE_BLOWS) gate.brokeAt = step;
       }
       return;
@@ -501,6 +508,8 @@ const RAIDER_RADIUS = 0.32;
  * en físico. Si cede, lo dice el parte (B4) y entonces sí lo sabe el motor.
  */
 export interface Gate {
+  /** Último contacto real: la sacudida no se inventa con el reloj global. */
+  hitAt?: number;
   /** Dónde está, para que los golpes y las jambas caigan en el mismo sitio. */
   readonly at: Point;
   /** Los golpes que lleva encima. */
@@ -578,4 +587,3 @@ export function raiderSpots(raiders: readonly Raider[]): { id: number; at: Point
     .filter((r) => r.phase !== 'gone')
     .map((r) => ({ id: r.body.id, at: { x: r.body.x, z: r.body.z } }));
 }
-

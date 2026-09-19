@@ -42,9 +42,20 @@ export interface ClipMotion {
   readonly strideLength: number | null;
 }
 
-export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'play' | 'drink' | 'sort';
+export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'play' | 'drink' | 'sort'
+  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'fall';
+
+/** Gestos de combate: su reloj procede del hecho, nunca del primer pintado. */
+export function combatClip(clip: string): boolean {
+  return clip === 'bow_draw' || clip === 'bow_loose' || clip === 'gate_strike' || clip === 'fall';
+}
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
+  bow_draw: { seconds: 1.5, loop: true, strideLength: null },
+  bow_loose: { seconds: 0.6, loop: false, strideLength: null },
+  // Un golpe por segundo en raiders.ts; la recuperación ocupa el resto.
+  gate_strike: { seconds: 0.6, loop: false, strideLength: null },
+  fall: { seconds: 1.2, loop: false, strideLength: null },
   sort: { seconds: 3, loop: true, strideLength: null },
   sit: { seconds: 5, loop: true, strideLength: null },
   talk: { seconds: 3.6, loop: true, strideLength: null },
@@ -68,8 +79,14 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
  */
 export function clipTime(
   clip: ClipName, distance: number, presentationSeconds: number, offset: number,
+  since?: number,
 ): number {
   const motion = VILLAGER_CLIPS[clip];
+  // El instante y el origen pertenecen al mismo reloj. Sin módulo ni desfase
+  // individual: soltar ocurre cuando nace la flecha; caer conserva su final.
+  const elapsed = Math.max(0, presentationSeconds - (since ?? 0));
+  if (!motion.loop) return Math.min(motion.seconds, elapsed);
+  if (since !== undefined) return elapsed % motion.seconds;
   if (motion.strideLength === null) {
     return (presentationSeconds + offset * motion.seconds) % motion.seconds;
   }

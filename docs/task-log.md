@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · E1: el disparo único, entrega parcial
+
+La pose se mide desde el hecho: tensar, soltar al nacer la flecha, golpear
+portón y caer (ambos bandos), con final sostenido y pureza probada sobre el
+GLB publicado. Cadencia y resistencia intactas. El caído deja de disparar y
+de ser desplazado por vecinos. **No cerrar E1:** falta reacción de puerta,
+fuera del alcance de archivos autorizado; ampliación solicitada, pendiente.
+También quedan lanza, recibir impacto, huir, armas, adarve y ragdoll.
+Typecheck/lint y pruebas focalizadas; asaltos en 7/23/36, clips a 15 fps.
+[Revisión, medidas y límites](historico/life-rounds/E1-disparo-unico.md).
+No llamar «§1b funcionando» al 26,7 % sin medir cuándo cae cada valle, ni
+equiparar `prudent` con un humano sensato. Sin cambios de política o nivelado.
+
+
 **Dónde está cada cosa, desde el 19 sep 2026.** El dueño del diseño: «se nos va
 de las manos la organización». `docs/` y `tools/` estaban planos, con lo vigente
 mezclado con lo entregado y herramientas sueltas sin documentar. Ahora:

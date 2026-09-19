@@ -13,6 +13,9 @@ Se separó del resto el 19 sep 2026, moviendo los ficheros y reescribiendo sus
 
 ## Los planes entregados
 
+Ronda E1, 20 sep: [el disparo único](life-rounds/E1-disparo-unico.md), entrega
+parcial de clips fechados, revisión previa y evidencia; reacción de puerta pendiente.
+
 | Documento | Qué fue | Qué entregó |
 |---|---|---|
 | `plan-juego.md` | El plan que sacó al proyecto del atasco (15 sep 2026) | **v2.0**: las tres palancas de órdenes permanentes, el reloj a velocidad entera, el mapa grande de 72 × 112 y el vado que se cruza. Sus decisiones se citan como «D-n» desde `balance.ts` |

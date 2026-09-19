@@ -17,6 +17,7 @@ import type { VillagerId } from '@engine/state';
 import type { Activity, Actor } from '../contracts';
 import type { ClipName } from '../clips';
 import { clipTime } from '../clips';
+import { LIFE_STEP } from './clock';
 import type { Prop } from './props';
 import type { Dweller, Village } from './village';
 
@@ -107,20 +108,23 @@ export function castOf(
   named: ReadonlySet<VillagerId>,
 ): Actor[] {
   const width = life.land.width;
+  // `steps` cuenta los pasos terminados; el último hecho lleva índice steps-1.
+  const combatSeconds = Math.max(0, life.steps - 1) * LIFE_STEP;
   const actors: Actor[] = [];
   for (const dweller of life.dwellers) {
     if (indoors(dweller)) continue;
     const { body } = dweller;
     const speed = dweller.motionSpeed ?? Math.hypot(body.vx, body.vz);
     const moving = speed > 0.05;
-    const clip = clipOf(dweller, moving);
+    const combat = dweller.combat;
+    const clip = combat?.clip ?? clipOf(dweller, moving);
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
     actors.push({
       id: dweller.villager,
       x: body.x,
       z: body.z,
-      facing: body.facing,
+      facing: combat?.facing ?? body.facing,
       activity: activityOf(dweller, moving),
       clip,
       load: dweller.holding !== null && dweller.holding <= -2_000_000 ? 'grain'
@@ -130,7 +134,9 @@ export function castOf(
       // El clip de andar lo mueve el suelo recorrido (G-04); los de estarse
       // quieto, el reloj, con un desfase por persona para que ochenta vecinos
       // no respiren a la vez.
-      clipSeconds: clipTime(clip, dweller.travelled, seconds, (dweller.villager % 11) / 11),
+      clipSeconds: combat === undefined
+        ? clipTime(clip, dweller.travelled, seconds, (dweller.villager % 11) / 11)
+        : clipTime(clip, 0, combatSeconds, 0, combat.since * LIFE_STEP),
       travelled: dweller.travelled,
       cell: cellZ * width + cellX,
       named: named.has(dweller.villager),
@@ -170,6 +176,10 @@ export function castOf(
     const { body } = raider;
     const speed = Math.hypot(body.vx, body.vz);
     const moving = speed > 0.05;
+    const clip = raider.phase === 'down' ? 'fall'
+      : raider.phase === 'breaking' && raider.blowAt !== undefined ? 'gate_strike'
+        : moving ? 'walk' : 'idle';
+    const since = clip === 'fall' ? raider.downAt ?? 0 : raider.blowAt ?? 0;
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
     actors.push({
@@ -181,13 +191,12 @@ export function castOf(
       // que un forastero puede tener: no trabaja, no vuelve a casa y no tiene
       // casa a la que volver.
       activity: moving ? 'walking' : 'resting',
-      clip: moving ? 'walk' : 'idle',
+      clip,
       load: null,
       poseSeconds: seconds,
-      clipSeconds: seconds,
-      // Sin `travelled`: la zancada de un saqueador la mueve el reloj y no el
-      // suelo, porque nadie le sigue la pista paso a paso como a un vecino.
-      travelled: 0,
+      clipSeconds: clipTime(clip, raider.travelled ?? 0, combatSeconds, 0,
+        clip === 'fall' || clip === 'gate_strike' ? since * LIFE_STEP : undefined),
+      travelled: raider.travelled ?? 0,
       cell: cellZ * width + cellX,
       named: false,
       age: 30,

@@ -10,14 +10,14 @@
 // shared by every villager in the valley. Disposing a clone must not touch them.
 
 import {
-  AnimationMixer, Color, DoubleSide, Group, Mesh, MeshBasicMaterial, RingGeometry,
+  AnimationMixer, Color, DoubleSide, Group, LoopOnce, Mesh, MeshBasicMaterial, RingGeometry,
   type AnimationClip, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
 import type { Actor } from '../contracts';
 import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
-import { clipTime } from '../clips';
+import { clipTime, combatClip, VILLAGER_CLIPS, type ClipName } from '../clips';
 import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
 
@@ -321,7 +321,26 @@ export class Cast {
       const made = player.mixer.clipAction(found);
       if (made === null) return;
       action = made;
+      if (VILLAGER_CLIPS[clip as ClipName]?.loop === false) {
+        action.setLoop(LoopOnce, 1);
+        action.clampWhenFinished = true;
+      }
       player.actions.set(clip, action);
+    }
+    // Un gesto fechado no puede mezclarse desde el fotograma que llegamos a
+    // ver: saltar directamente a su final debe dar la misma pose que verlo
+    // entero. También al salir de él se descarta el historial del mixer.
+    if (combatClip(clip) || (player.playing !== null && combatClip(player.playing))) {
+      for (const other of player.actions.values()) if (other !== action) other.stop();
+      player.previous = null;
+      player.playing = clip;
+      action.play();
+      action.enabled = true;
+      action.paused = false;
+      action.setEffectiveWeight(1);
+      action.time = seconds;
+      player.mixer.update(0);
+      return;
     }
     if (player.playing !== clip) {
       player.previous?.stop();

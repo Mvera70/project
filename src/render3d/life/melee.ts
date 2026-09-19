@@ -27,6 +27,7 @@ import type { Raider } from './raiders';
 
 /** Lo que hace falta saber de quien defiende un puesto, sin conocer `Dweller`. */
 export interface Defender {
+  downAt?: number;
   /** El cuerpo, para medir distancias. */
   readonly at: { readonly x: number; readonly z: number };
   /** Qué puesto ocupa: con lanza se pelea mejor que con un arco tensado. */
@@ -95,7 +96,7 @@ export function stepMelee(
     if (target === null) continue;
 
     target.hits += 1;
-    if (target.hits >= BLOWS_TO_FALL) target.down = true;
+    if (target.hits >= BLOWS_TO_FALL) { target.down = true; target.downAt = step; }
 
     // **Y le devuelve el golpe.** El arquero, la mitad de veces: tensar un arco
     // con alguien encima es lo que le pasa a un arquero.
@@ -104,6 +105,7 @@ export function stepMelee(
     raider.hits += 1;
     if (raider.hits >= BLOWS_TO_FALL) {
       raider.phase = 'down';
+      raider.downAt = step;
       raider.body.vx = 0;
       raider.body.vz = 0;
     }

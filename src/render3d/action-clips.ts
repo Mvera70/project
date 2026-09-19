@@ -14,6 +14,7 @@ import { VILLAGER_CLIPS, type ClipName } from './clips';
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
   'sit', 'talk', 'pray', 'hammer', 'chop', 'play', 'drink', 'sort',
+  'bow_draw', 'bow_loose', 'gate_strike', 'fall',
 ];
 
 export function actionClips(idle: AnimationClip): AnimationClip[] {
@@ -35,7 +36,48 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
     };
     const x = new Vector3(1, 0, 0), z = new Vector3(0, 0, 1);
     const wave = (t: number): number => Math.sin(t * Math.PI * 2);
-    if (name === 'sit') {
+    if (name === 'bow_draw' || name === 'bow_loose') {
+      // Tensado sostenible: extremos idénticos, respiración leve. La suelta
+      // empieza con la mano ya separándose de la mejilla, sin anticipación
+      // que desplace el nacimiento físico de la flecha.
+      const release = (t: number): number => name === 'bow_draw' ? 0 : Math.min(1, t * 4);
+      turn('upperarm.L', x, t => -1.4 + 0.45 * release(t));
+      turn('forearm.L', x, () => -0.12);
+      turn('upperarm.R', new Vector3(1, 0, -0.55).normalize(), t => -1.3 + 0.25 * release(t));
+      turn('forearm.R', x, t => -2.5 + 1.1 * release(t));
+      // El rig no tiene dedos articulados: la apertura se lee en la palma
+      // que gira y se libera, ya en t=0 de la flecha, y después en el brazo.
+      turn('hand.R', z, t => name === 'bow_draw' ? 0 : 0.35 * (1 - t));
+      turn('spine', z, t => name === 'bow_draw' ? 0.025 * wave(t) : -0.1 * Math.sin(Math.PI * t));
+    } else if (name === 'gate_strike') {
+      // El contacto es t=0; después se retiran ambos brazos y el torso.
+      for (const side of ['L', 'R']) {
+        turn(`upperarm.${side}`, x, t => -1.45 + 0.8 * t);
+        turn(`forearm.${side}`, x, t => -0.1 - 0.7 * t);
+      }
+      turn('spine', x, t => 0.3 * (1 - t));
+    } else if (name === 'fall') {
+      const settle = (t: number): number => t * t * (3 - 2 * t);
+      // De espaldas, brazos separados y rodillas flexionadas; el cuerpo gira
+      // desde la cadera y baja hasta apoyar el torso. Todo queda inmóvil al final.
+      turn('hips', x, t => -Math.PI / 2 * settle(t));
+      for (const side of ['L', 'R']) {
+        turn(`thigh.${side}`, x, t => -0.2 * settle(t));
+        turn(`shin.${side}`, x, t => 0.4 * settle(t));
+        turn(`upperarm.${side}`, z, t => (side === 'L' ? -0.65 : 0.65) * settle(t));
+        turn(`forearm.${side}`, x, t => -0.3 * settle(t));
+      }
+      const root = idle.tracks.find(track => track.name === 'hips.position');
+      if (root !== undefined) {
+        const at = Array.from(root.values.slice(0, 3)), times: number[] = [], values: number[] = [];
+        for (let n = 0; n <= 24; n++) {
+          const t = n / 24; times.push(t * duration);
+          values.push(at[0]!, at[1]! + (0.16 - at[1]!) * settle(t), at[2]!);
+        }
+        clip.tracks = clip.tracks.filter(track => track.name !== root.name);
+        clip.tracks.push(new VectorKeyframeTrack(root.name, times, values));
+      }
+    } else if (name === 'sit') {
       for (const side of ['L', 'R']) {
         turn(`thigh.${side}`, x, () => -1.35); turn(`shin.${side}`, x, () => 0.5);
         turn(`upperarm.${side}`, x, () => -0.35); turn(`forearm.${side}`, x, () => -0.8);

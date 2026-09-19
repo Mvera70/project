@@ -10,6 +10,7 @@
 
 import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './home';
 import { statureAt } from '../world/models';
+import { VILLAGER_CLIPS } from '../clips';
 import type { GameState, Trait, VillagerId } from '@engine/state';
 import { DAY, FOOD } from '@engine/balance';
 import { population } from '@engine/people/demography';
@@ -77,6 +78,8 @@ const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
+  /** Pose fechada por la vida, no por el mixer; `since` son pasos de jornada. */
+  combat?: { clip: 'bow_draw' | 'bow_loose' | 'fall'; since: number; facing: number };
   readonly residence?: HomeRoutine;
   readonly body: Body;
   readonly villager: VillagerId;
@@ -912,7 +915,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     step(phase = 0.45): void {
       const now = steps * LIFE_STEP;
       const starts = dwellers.map(d => ({ x: d.body.x, z: d.body.z, travelled: d.travelled }));
-      const outside = (): Body[] => bodies.filter(body => { const person = byId.get(body.id); return person === undefined || !indoors(person); });
+      const outside = (): Body[] => bodies.filter(body => {
+        const person = byId.get(body.id);
+        return person === undefined || (!indoors(person) && wounded.get(person.villager)?.down !== true);
+      });
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(outside());
@@ -1651,7 +1657,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // D3 · y la partida anda lo suyo. Guionizada como el lobo y por la misma
       // razón (E.8): lo que se llevan ya lo decidió el motor antes de que
       // empiece el día, y esto sólo lo enseña. No pelea, no rompe y no mata.
-      for (const raider of raiders) stepRaider(raider, land, seed, steps, gate ?? undefined);
+      for (const raider of raiders) {
+        const { x, z } = raider.body;
+        stepRaider(raider, land, seed, steps, gate ?? undefined);
+        raider.travelled = (raider.travelled ?? 0) + Math.hypot(raider.body.x - x, raider.body.z - z);
+      }
 
       // D2 · **y la muralla contesta.** Un paso de física por paso de vida, que
       // es el matrimonio que D1 dejó montado; las flechas salen de los puestos
@@ -1668,7 +1678,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         const held = new Set<string>();
         for (const post of manned) {
           const there = dwellers.some((dweller) =>
-            dweller.dayPlan?.job?.place === post.place.id
+            wounded.get(dweller.villager)?.down !== true
+            && dweller.dayPlan?.job?.place === post.place.id
             && Math.hypot(dweller.body.x - post.place.at.x,
               dweller.body.z - post.place.at.z) < POST_REACH);
           if (there) held.add(post.place.id);
@@ -1693,6 +1704,31 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           defenders.push(defender);
         }
         stepMelee(raiders, defenders, steps);
+      }
+
+      // El hecho manda sobre el gesto. La caída gana a todo, también en el
+      // paso del impacto; ninguna ausencia de fotogramas reinicia estos relojes.
+      for (const dweller of dwellers) {
+        const hurt = wounded.get(dweller.villager);
+        if (hurt?.down === true) {
+          dweller.combat = { clip: 'fall', since: hurt.downAt ?? steps,
+            facing: dweller.combat?.facing ?? dweller.body.facing };
+          dweller.body.vx = 0; dweller.body.vz = 0; dweller.motionSpeed = 0;
+          continue;
+        }
+        const archer = archers.find(a => a.post.place.id === dweller.dayPlan?.job?.place);
+        if (archer === undefined || Math.hypot(dweller.body.x - archer.post.place.at.x,
+          dweller.body.z - archer.post.place.at.z) >= POST_REACH) {
+          delete dweller.combat;
+          continue;
+        }
+        const looseSteps = Math.round(VILLAGER_CLIPS.bow_loose.seconds / LIFE_STEP);
+        const releasing = archer.lastShot !== undefined && steps - archer.lastShot < looseSteps;
+        const since = releasing ? archer.lastShot!
+          : archer.lastShot !== undefined ? archer.lastShot + looseSteps
+            : dweller.combat?.since ?? steps;
+        dweller.combat = { clip: releasing ? 'bow_loose' : 'bow_draw', since,
+          facing: archer.facing ?? dweller.body.facing };
       }
 
       if (wolf !== null && wolf.phase !== 'gone') {
