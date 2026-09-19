@@ -89,7 +89,23 @@ const NL = String.fromCharCode(10);
 const shots = [];
 // `--offset N` arranca la numeración en N: una tanda que se cayó a medias se
 // continúa sin renumerar lo que ya salió bien.
-let count = Number(opt('offset', '0'));
+// `--offset N` sigue disponible para forzar un punto de partida, pero por
+// defecto se detecta solo leyendo lo que ya hay en el disco: la segunda tanda
+// de esta misma ronda calculó mal el offset a mano y produjo dos capturas con
+// el mismo número (106-sello.png y 106-crece-ano-01.png) — no se pisaron
+// porque el nombre completo es distinto, pero la hoja de contactos quedó
+// desordenada. Autodetectar es lo que hace imposible repetir el fallo.
+function highestExisting() {
+  if (!existsSync(outDir)) return 0;
+  let max = 0;
+  for (const file of readdirSync(outDir)) {
+    const found = /^([0-9]+)-.*\.png$/.exec(file);
+    if (found !== undefined && found !== null) max = Math.max(max, Number(found[1]));
+  }
+  return max;
+}
+const offsetArg = opt('offset', '');
+let count = offsetArg !== '' ? Number(offsetArg) : highestExisting();
 
 /** Abre una página nueva. `query` usa la ruta de depuración del observatorio. */
 async function open(query = '') {
@@ -141,8 +157,15 @@ async function bare(tab) {
   // Con reintento, y hace falta: en la primera tanda el año 32 salió **con la
   // interfaz puesta** en medio de una tira que no la tiene. Un click que se
   // pierde no se nota hasta que se miran las nueve capturas en fila.
+  //
+  // **Y con `dismiss` dentro del propio reintento.** En una tanda larga puede
+  // aparecer una encrucijada nueva entre el segundo `dismiss` (tras `atHour`)
+  // y esta llamada — medido: el botón de despejar quedó tapado por el velo de
+  // una decisión que ninguno de los dos avisos anteriores llegó a ver. Cada
+  // intento la vuelve a apartar antes de tocar el botón.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     if (await tab.evaluate(() => document.documentElement.classList.contains('bare'))) return;
+    await dismiss(tab);
     await tab.locator('.valley-bare').click().catch(() => {});
     await tab.waitForTimeout(700);
   }
@@ -160,22 +183,37 @@ async function bare(tab) {
  * hora llega en un par de segundos; luego se vuelve a x1 para que la jornada se
  * mueva a su paso y la gente no vaya a tirones en el plano.
  */
-async function atHour(tab, hour = '09') {
-  const target = `${hour}:00`;
-  await tab.locator('.valley-speed-badge').click().catch(() => {});
+async function atHour(tab, low = 8, high = 17) {
+  // **Timeouts cortos y explícitos, no los treinta segundos por defecto.**
+  // `getByRole('button', { name: '64x' })` con la equis ASCII **nunca existe**
+  // —el botón lleva el signo de multiplicar, «64×»— y sin un plazo propio
+  // Playwright espera el máximo por si el elemento apareciera: eran los picos
+  // de ochenta segundos de la ronda anterior, no la simulación yendo lenta.
+  await tab.locator('.valley-speed-badge').click({ timeout: 3000 }).catch(() => {});
   await tab.waitForTimeout(350);
-  await tab.getByRole('button', { name: '64x' }).click().catch(() => {});
-  await tab.getByRole('button', { name: '64×' }).click().catch(() => {});
-  await tab.waitForFunction(
-    (want) => document.querySelector('.valley-time')?.textContent?.trim() === want,
-    target,
-    { timeout: 20000, polling: 100 },
-  ).catch(() => {});
-  await tab.locator('.valley-speed-badge').click().catch(() => {});
-  await tab.waitForTimeout(300);
-  await tab.getByRole('button', { name: '1x' }).click().catch(() => {});
-  await tab.getByRole('button', { name: '1×' }).click().catch(() => {});
-  await tab.waitForTimeout(1500);
+  await tab.getByRole('button', { name: '64×' }).click({ timeout: 3000 }).catch(() => {});
+  // **Una banda de luz de día, no un minuto exacto.** La primera versión pedía
+  // una hora concreta («09:00») y fallaba casi siempre: a ×64 un día dura ~2 s,
+  // así que cada hora entera sólo "existe" en pantalla ~83 ms, más estrecho que
+  // cualquier sondeo razonable — medido con sondeo de 20 ms, 3 de 4 intentos
+  // no la cazaban y el que sí acababa una hora más tarde por el propio tiempo
+  // de reacción. Pedir «entre las 8 y las 17» ensancha la ventana a horas
+  // enteras (~666 ms de las 2 s del día) y es lo único que hace falta para que
+  // una tira de crecimiento no mezcle una noche entre días claros.
+  const hit = await tab.waitForFunction(
+    ([lo, hi]) => {
+      const text = document.querySelector('.valley-time')?.textContent?.trim();
+      const hour = text === undefined || text === null ? Number.NaN : Number(text.slice(0, 2));
+      return hour >= lo && hour <= hi;
+    },
+    [low, high],
+    { timeout: 20000, polling: 20 },
+  ).then(() => true).catch(() => false);
+  // Frenar de un toque y no por el menú: abrir, esperar y elegir 1× tarda más
+  // que la ventana que se acaba de cazar, y a ×64 eso se come varias horas más
+  // — es lo que hacía que «llegó a la banda» y aun así saliera de noche.
+  if (hit) await tab.getByRole('button', { name: 'Pause' }).click({ timeout: 2000 }).catch(() => {});
+  await tab.waitForTimeout(200);
 }
 
 /** Aleja la vista con la rueda, que es lo que hace el dedo al pellizcar. */
@@ -445,16 +483,23 @@ if (want('asedio')) {
     ['asalto', `?debug=1&live=1&seed=${seed}&year=${year}&season=summer&raid=24&assault=1&means=bows,arms`,
       'El asalto: veinticuatro hombres a por el portón'],
   ]) {
-    const tab = await open(query);
-    await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
-    await tab.waitForTimeout(3000);
-    await wide(tab, 4);
-    await shot(tab, name, `${note} · al llegar`);
-    await tab.waitForTimeout(9000);
-    await shot(tab, `${name}-b`, `${note} · nueve segundos después`);
-    await tab.waitForTimeout(9000);
-    await shot(tab, `${name}-c`, `${note} · dieciocho segundos después`);
-    await tab.close();
+    // Un item que falle no se lleva la tanda por delante: un fallo sin aislar
+    // dentro de un for mata el proceso entero y lo que venia despues se pierde
+    // en silencio, que es justo lo que paso en la primera pasada.
+    try {
+      const tab = await open(query);
+      await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
+      await tab.waitForTimeout(3000);
+      await wide(tab, 4);
+      await shot(tab, name, `${note} · al llegar`);
+      await tab.waitForTimeout(9000);
+      await shot(tab, `${name}-b`, `${note} · nueve segundos después`);
+      await tab.waitForTimeout(9000);
+      await shot(tab, `${name}-c`, `${note} · dieciocho segundos después`);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: ${name} no se pudo capturar: ${String(error).slice(0, 120)}`);
+    }
   }
 }
 
@@ -483,12 +528,16 @@ if (want('estados')) {
     ['corona-puesta', `?debug=1&live=1&seed=${seed}&year=${year}&season=summer&crown=smith`,
       'Con un herrero coronado: la sala y el estilo del valle', 2],
   ]) {
-    const tab = await open(query);
-    await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
-    await tab.waitForTimeout(8000);
-    if (wideNotches > 0) await wide(tab, wideNotches);
-    await shot(tab, name, note);
-    await tab.close();
+    try {
+      const tab = await open(query);
+      await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
+      await tab.waitForTimeout(8000);
+      if (wideNotches > 0) await wide(tab, wideNotches);
+      await shot(tab, name, note);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: ${name} no se pudo capturar: ${String(error).slice(0, 120)}`);
+    }
   }
   // El sello, además, abierto: el documento sellado al final de la crónica.
   const tab = await open(`?debug=1&live=1&seed=${seed}&year=${year}&season=summer&crossroad=1`);
@@ -508,12 +557,16 @@ if (want('lapidas')) {
     ['abandoned', 'El valle abandonado'],
     ['dispersed', 'El valle disperso'],
   ]) {
-    const tab = await open(`?debug=1&live=1&seed=${seed}&year=${year}&season=summer&ended=${cause}`);
-    await tab.waitForTimeout(3000);
-    await shot(tab, `lapida-${cause}`, `${note}: la lápida y su inscripción`);
-    await tab.waitForTimeout(3200);
-    await shot(tab, `lapida-${cause}-cuentas`, `${note}: la hoja de cuentas`);
-    await tab.close();
+    try {
+      const tab = await open(`?debug=1&live=1&seed=${seed}&year=${year}&season=summer&ended=${cause}`);
+      await tab.waitForTimeout(3000);
+      await shot(tab, `lapida-${cause}`, `${note}: la lápida y su inscripción`);
+      await tab.waitForTimeout(3200);
+      await shot(tab, `lapida-${cause}-cuentas`, `${note}: la hoja de cuentas`);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: lapida-${cause} no se pudo capturar: ${String(error).slice(0, 120)}`);
+    }
   }
 }
 
@@ -545,14 +598,24 @@ if (want('final')) {
 // que juega la trayectoria de verdad con la política de referencia.
 if (want('crecimiento')) {
   for (const edad of [1, 2, 4, 8, 14, 22, 32, 44, 60]) {
-    const tab = await open();
-    await found(tab, 9000, edad);
-    await dismiss(tab);
-    await atHour(tab, '09');
-    await bare(tab);
-    await shot(tab, `crece-ano-${String(edad).padStart(2, '0')}`,
-      `El valle en el año ${edad}, sin interfaz`);
-    await tab.close();
+    try {
+      const tab = await open();
+      await found(tab, 9000, edad);
+      await dismiss(tab);
+      await atHour(tab);
+      // Y otra vez, porque el avance rapido de atHour puede provocar una
+      // decision nueva que el primer dismiss no pudo ver: paso por alli antes
+      // de que existiera. Sin este segundo aviso, el boton de despejar quedaba
+      // tapado por el velo (edad 44) o la decision se colaba en la captura
+      // despejada (edad 60).
+      await dismiss(tab);
+      await bare(tab);
+      await shot(tab, `crece-ano-${String(edad).padStart(2, '0')}`,
+        `El valle en el año ${edad}, sin interfaz`);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: crece-ano-${edad} no se pudo capturar: ${String(error).slice(0, 120)}`);
+    }
   }
 }
 
@@ -561,14 +624,19 @@ if (want('crecimiento')) {
 // color del valle y lo que la gente está haciendo, no el tamaño de la aldea.
 if (want('estaciones')) {
   for (const season of ['spring', 'summer', 'autumn', 'winter']) {
-    const tab = await open(`?debug=1&live=1&seed=${seed}&year=30&season=${season}`);
-    await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
-    await tab.waitForTimeout(8000);
-    await dismiss(tab);
-    await atHour(tab, '10');
-    await bare(tab);
-    await shot(tab, `estacion-${season}`, `El valle en ${season}, año 30, sin interfaz`);
-    await tab.close();
+    try {
+      const tab = await open(`?debug=1&live=1&seed=${seed}&year=30&season=${season}`);
+      await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
+      await tab.waitForTimeout(8000);
+      await dismiss(tab);
+      await atHour(tab);
+      await dismiss(tab);
+      await bare(tab);
+      await shot(tab, `estacion-${season}`, `El valle en ${season}, año 30, sin interfaz`);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: estacion-${season} no se pudo capturar: ${String(error).slice(0, 120)}`);
+    }
   }
 }
 
@@ -590,15 +658,19 @@ if (want('escenas')) {
     ['river_flood', 'La riada'],
     ['lightning_fire', 'El rayo y lo que arde'],
   ]) {
-    const tab = await open(`?debug=1&live=1&seed=${seed}&year=30&season=summer&happening=${id}`);
-    await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
-    await tab.waitForTimeout(9000);
-    await dismiss(tab);
-    await bare(tab);
-    await shot(tab, `escena-${id}`, note);
-    await tab.waitForTimeout(6000);
-    await shot(tab, `escena-${id}-b`, `${note} (seis segundos después)`);
-    await tab.close();
+    try {
+      const tab = await open(`?debug=1&live=1&seed=${seed}&year=30&season=summer&happening=${id}`);
+      await tab.waitForFunction(() => (window.__valleyLife?.()?.people.length ?? 0) > 0, { timeout: 30000 }).catch(() => {});
+      await tab.waitForTimeout(9000);
+      await dismiss(tab);
+      await bare(tab);
+      await shot(tab, `escena-${id}`, note);
+      await tab.waitForTimeout(6000);
+      await shot(tab, `escena-${id}-b`, `${note} (seis segundos después)`);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: escena-${id} no se pudo capturar: ${String(error).slice(0, 120)}`);
+    }
   }
 }
 
@@ -612,21 +684,31 @@ if (want('cerco')) {
     [40, 'El cerco cerrado, con su portón'],
     [55, 'La villa hecha, de piedra'],
   ]) {
-    const tab = await open();
-    await found(tab, 9000, edad);
-    await dismiss(tab);
-    await atHour(tab, '09');
-    await bare(tab);
-    await shot(tab, `cerco-ano-${edad}`, `${note}, sin interfaz`);
-    // Y el plano ancho: la rueda hacia atrás enseña el valle con su sierra.
-    for (let n = 0; n < 8; n += 1) {
-      await tab.mouse.move(width / 2, height * 0.45);
-      await tab.mouse.wheel(0, 120);
-      await tab.waitForTimeout(120);
+    try {
+      const tab = await open();
+      await found(tab, 9000, edad);
+      await dismiss(tab);
+      await atHour(tab);
+      // Y otra vez, porque el avance rapido de atHour puede provocar una
+      // decision nueva que el primer dismiss no pudo ver: paso por alli antes
+      // de que existiera. Sin este segundo aviso, el boton de despejar quedaba
+      // tapado por el velo (edad 44) o la decision se colaba en la captura
+      // despejada (edad 60).
+      await dismiss(tab);
+      await bare(tab);
+      await shot(tab, `cerco-ano-${edad}`, `${note}, sin interfaz`);
+      // Y el plano ancho: la rueda hacia atrás enseña el valle con su sierra.
+      for (let n = 0; n < 8; n += 1) {
+        await tab.mouse.move(width / 2, height * 0.45);
+        await tab.mouse.wheel(0, 120);
+        await tab.waitForTimeout(120);
+      }
+      await tab.waitForTimeout(1200);
+      await shot(tab, `cerco-ano-${edad}-ancho`, `${note}, plano ancho del valle entero`);
+      await tab.close();
+    } catch (error) {
+      console.log(`  ojo: cerco-ano-${edad} no se pudo capturar: ${String(error).slice(0, 120)}`);
     }
-    await tab.waitForTimeout(1200);
-    await shot(tab, `cerco-ano-${edad}-ancho`, `${note}, plano ancho del valle entero`);
-    await tab.close();
   }
 }
 
