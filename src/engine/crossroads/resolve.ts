@@ -8,7 +8,7 @@
 import { isHere, population } from '../people/demography';
 import { remember } from '../people/memories';
 import { adjustOpinion } from '../people/opinions';
-import { ageOf, makeVillager } from '../people/villagers';
+import { ageOf, makeVillager, promoteToNamed } from '../people/villagers';
 import { rollCharacter } from '../people/traits';
 import { int, next, pick } from '../rng';
 import { herdCapacity } from '../subsistence/herd';
@@ -264,6 +264,16 @@ export function applyOption(
 
   // K-3 · quién llevaba la corona antes de aplicar nada, para saber si pasó.
   const wore = state.crown?.id ?? null;
+
+  // **Y quien sale elegido se nombra, antes de nada más** (S-09, 19 sep 2026).
+  // `childOf` (`crossroads/cast.ts`) es el único reparto que rompe a propósito
+  // «sólo se reparte gente nombrada» — busca un hijo de verdad, y un hijo
+  // recién nacido casi nunca lo está—, así que sin esto la crónica escribía
+  // `{B}` en vez de un nombre: medido, en las doce semillas de la fundación
+  // sale en 12 de 12, siempre `feud_inherited.give_b_the_smithy`. Va **antes**
+  // de aplicar los efectos: si la opción también da un oficio (`{k:'role'}`),
+  // quien lo recibe ya es un personaje y no un anónimo con un puesto.
+  for (const id of Object.values(pending.cast)) promoteToNamed(state, id, null);
 
   for (const e of option.effects) applyEffect(state, pending.cast, e, out);
 

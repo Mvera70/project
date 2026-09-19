@@ -931,22 +931,31 @@ describe('Ninguna frase de la crónica sale rota', () => {
   });
 });
 
-describe('Un hueco de reparto llega a la pantalla · declarado', () => {
-  // **Roja a propósito, con lo medido.** El banco no inventa nombres (§9.3) y
-  // `namesOf` deja el hueco tal cual, así que una plantilla cuyo texto escribe
-  // una letra repartida a un anónimo se lee con la llave puesta. Medido: la
-  // semilla 23 escribe «{B} was given the forge in year 26» con
-  // `feud_inherited`, cuyo `{as:'B', childOf:'A'}` acepta hijos sin nombre — y
-  // lo acepta a propósito, que hay prueba de §8.3 que lo exige.
+describe('Un hueco de reparto llega a la pantalla', () => {
+  // **Arreglado el 19 sep 2026 (S-09).** El banco no inventa nombres (§9.3) y
+  // `namesOf` dejaba el hueco tal cual, así que una plantilla cuyo texto
+  // escribía una letra repartida a un anónimo se leía con la llave puesta.
+  // Medido antes del arreglo: la semilla 23 escribía «{B} was given the forge
+  // in year 26» con `feud_inherited`, cuyo `{as:'B', childOf:'A'}` acepta
+  // hijos sin nombre — y lo acepta a propósito, que hay prueba de §8.3 que lo
+  // exige: un hijo de verdad es casi siempre anónimo.
   //
-  // **El arreglo cabe en tres líneas y no se fusiona por método.** `fillCast`
-  // se evalúa en la elegibilidad de cada tick, así que cambiar su lista de
-  // candidatos cambia el flujo `crossroads` y con él la trayectoria de todas
-  // las semillas: medido, la cadena de pases de V-09 pasó de cinco a ninguna
-  // de tres en treinta muestras. Va con el carril del ritmo de decisión, donde
-  // el recalibrado está presupuestado (`docs/historico/next-plan.md`).
+  // **Y el arreglo no toca `fillCast`.** La otra opción —que el reparto sólo
+  // aceptara gente ya nombrada— habría cambiado la lista de candidatos de
+  // `childOf` y con ella el flujo `crossroads`, moviendo la trayectoria de
+  // toda partida que use esa plantilla: medido entonces, la cadena de pases de
+  // V-09 pasaba de cinco a ninguna de tres en treinta muestras. Lo que se hizo
+  // en su lugar (`applyOption`, `resolve.ts`) es nombrar a quien sale elegido
+  // **después** de resolver el reparto y **antes** de aplicar los efectos —es
+  // lo que el juego ya hace cuando alguien se vuelve notable
+  // (`promoteToNamed`)—, así que sólo gasta una tirada del flujo `names`, no
+  // del `crossroads`, y sólo la semana exacta en que la plantilla se contesta.
+  //
+  // Medido tras el arreglo, en las doce semillas de la fundación a cuarenta
+  // años: 22 líneas de `feud_inherited` vistas, todas con nombre, y **cero**
+  // huecos `{X}` en cualquier entrada de cualquier plantilla.
 
-  it.fails('ninguna entrada llega con un parámetro sin rellenar', () => {
+  it('ninguna entrada llega con un parámetro sin rellenar', () => {
     for (const seed of [7, 11, 23, 41]) {
       const state = foundTwenty(seed);
       run(state, 40 * 48, 'prudent', CATALOG);

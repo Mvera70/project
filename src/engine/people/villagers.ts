@@ -272,13 +272,22 @@ export function foundPeople(b: RngBundle, tick: number, profile: FoundingProfile
  *
  * Does nothing if the villager is unknown, dead, already named, or if the eight
  * seats are taken.
+ *
+ * `role` is `null` for a naming that is not a job — a crossroad's `childOf`
+ * reparto (`crossroads/cast.ts`) is the one place that already breaks "only
+ * the named get cast" on purpose, picking an actual child of a parent who is
+ * very likely anonymous. That villager still needs the name the chronicle is
+ * about to quote, and does not need — and may not be old enough for — the
+ * office an option's own `{k:'role'}` effect might hand them a moment later
+ * (§8.4). §12.4's floor only applies when there is a real office to check it
+ * against.
  */
-export function promoteToNamed(state: GameState, id: VillagerId, role: Role): void {
+export function promoteToNamed(state: GameState, id: VillagerId, role: Role | null): void {
   const people = state.people;
   const v = people.villagers.find((x) => x.id === id);
   if (v === undefined || v.diedTick !== null || v.named) return;
   if (people.namedIds.length >= PEOPLE.MAX_NAMED) return;
-  if (ageOf(v, state.tick) < minAgeFor(role)) return; // §12.4 ROLE_MIN_AGE
+  if (role !== null && ageOf(v, state.tick) < minAgeFor(role)) return; // §12.4 ROLE_MIN_AGE
 
   const living = people.namedIds
     .map((nid) => people.villagers.find((x) => x.id === nid))
