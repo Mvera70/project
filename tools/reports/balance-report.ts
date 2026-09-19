@@ -14,6 +14,20 @@ import type { GameState } from '../../src/engine/state';
 // with. The other three are bounds reported beside it.
 export const POLICIES = ['prudent', 'first', 'last', 'worst'] as const;
 export type BenchPolicy = typeof POLICIES[number];
+/**
+ * **El horizonte, y por qué es un parámetro desde G2 (19 sep 2026).**
+ *
+ * Doscientos años son 2.240 horas de reloj a ×1 (§12.1: una semana son catorce
+ * minutos), y el último peldaño del juego entero —el bastión— cae a las 350 h,
+ * o sea el año 31 (`tools/reports/pace-report.ts`). Un banco que sólo sabe
+ * medir a doscientos años está describiendo un valle que **nadie ve**, y además
+ * cuesta más que su propio presupuesto, que es lo que llevaba días dejando sus
+ * rojas sin remedir.
+ *
+ * Así que el horizonte se pide. Doscientos se quedan como lo que de verdad son
+ * —un remojo de estabilidad del motor— y la partida de un jugador se mide
+ * aparte, en su horizonte y con las horas escritas al lado.
+ */
 const YEARS = 200;
 const SEEDS = 60;
 const GENERATION = TIME.GENERATION_YEARS * TIME.WEEKS_PER_YEAR;
@@ -171,7 +185,7 @@ function checkRanges(state: GameState, failures: string[]): void {
   }
 }
 
-function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
+function trial(seed: number, policy: BenchPolicy, samples: Sample[], years: number): Trial {
   const state = foundGame(seed);
   const initialForest = forest(state);
   const result: Trial = { policy, seed, ticks: 0, extinct: false, peak: population(state),
@@ -207,7 +221,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
   samples.push(sample(state, policy, 'base'));
   checkRanges(state, result.invalid);
   checkGeometry(state, result.geometry);
-  while (state.tick < YEARS * TIME.WEEKS_PER_YEAR && state.ended === null) {
+  while (state.tick < years * TIME.WEEKS_PER_YEAR && state.ended === null) {
     // eligible only mutates rng.cast; copying the RNG keeps instrumentation
     // from consuming any of the game's streams. This is a start-of-tick probe,
     // before ANNUAL/DECISION, not a claim to observe the internal step 15.
@@ -288,7 +302,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
   // anyway, with `reachedHorizon` saying whether it is the year-200 reading
   // or an earlier one.
   result.fieldsAtEnd = state.buildings.filter((b) => b.kind === 'field' && b.lostTick === null).length;
-  result.reachedHorizon = state.tick >= YEARS * TIME.WEEKS_PER_YEAR;
+  result.reachedHorizon = state.tick >= years * TIME.WEEKS_PER_YEAR;
   result.ticks = state.tick;
   result.extinct = state.ended !== null;
   for (const template of CATALOG) {
@@ -304,7 +318,7 @@ function trial(seed: number, policy: BenchPolicy, samples: Sample[]): Trial {
   result.cadence = counted / (state.tick / GENERATION);
   result.allCadence = allCounted / (state.tick / GENERATION);
   if (shock !== null) {
-    while (shock.tick < YEARS * TIME.WEEKS_PER_YEAR && shock.ended === null) {
+    while (shock.tick < years * TIME.WEEKS_PER_YEAR && shock.ended === null) {
       run(shock, 1, policy, CATALOG);
       checkRanges(shock, result.invalid);
       if (shock.tick % TIME.WEEKS_PER_YEAR === 0 || shock.ended !== null) samples.push(sample(shock, policy, 'shock'));
@@ -432,14 +446,48 @@ export function summarize(trials: readonly Trial[], policy: BenchPolicy): Policy
     reachedHorizonTrials: group.filter((t) => t.reachedHorizon).length };
 }
 
-export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; durationMs: number } {
+/**
+ * Años de juego a horas de reloj a ×1. §12.1: una semana son catorce minutos.
+ *
+ * Sale de `balance.ts` y no de un 11,2 escrito aquí, que es la trampa de B-1:
+ * cuatro constantes decían una cosa y significaban otra porque nadie remidió
+ * el §12 cuando la semana se multiplicó por 56.
+ */
+export function hoursOf(years: number): number {
+  return (years * TIME.WEEKS_PER_YEAR * TIME.REAL_MS_PER_TICK) / 3_600_000;
+}
+
+/** Lo que el banco mide, en años de juego y en semillas. */
+export interface BenchScope {
+  readonly years: number;
+  readonly seeds: number;
+}
+
+/** El remojo de estabilidad: doscientos años, sesenta semillas. */
+export const SOAK: BenchScope = { years: YEARS, seeds: SEEDS };
+
+/**
+ * **El horizonte de un jugador**, que es contra el que se nivela.
+ *
+ * Sesenta años son 672 h de reloj a ×1, y el último peldaño del juego —el
+ * bastión— cae a las 350 h en la mediana y a 618 h en el valle más lento de
+ * veinticuatro. O sea: a sesenta años **ha pasado todo lo que el juego tiene
+ * que enseñar**, y lo que venga después es el motor girando.
+ */
+export const PLAYED: BenchScope = { years: 60, seeds: SEEDS };
+
+export function runBalance(scope: BenchScope = SOAK): { trials: Trial[]; summaries: PolicySummary[]; durationMs: number } {
   const started = performance.now();
   const samples: Sample[] = [];
   const trials: Trial[] = [];
   for (const policy of POLICIES) {
-    for (let seed = 0; seed < SEEDS; seed += 1) trials.push(trial(seed, policy, samples));
-    console.info(`M-12: ${policy}, ${SEEDS} seeds completed`);
+    for (let seed = 0; seed < scope.seeds; seed += 1) trials.push(trial(seed, policy, samples, scope.years));
+    console.info(`M-12: ${policy}, ${scope.seeds} seeds completed`);
   }
+  // G2 · **el horizonte, dicho en horas antes que en años**, que es la unidad
+  // en la que el dueño del diseño pone los objetivos (§12.1, `CLAUDE.md`).
+  console.info(`M-12: ${scope.years} años × ${scope.seeds} semillas = `
+    + `${hoursOf(scope.years).toFixed(0)} h de reloj a ×1 por partida.`);
   const summaries = POLICIES.map((policy) => summarize(trials, policy));
   mkdirSync('artifacts', { recursive: true });
   const columns: (keyof Sample)[] = ['policy', 'seed', 'scenario', 'tick', 'population', 'grain', 'morale', 'buildings', 'ended'];
@@ -486,9 +534,10 @@ export function runBalance(): { trials: Trial[]; summaries: PolicySummary[]; dur
     .map(([option, v]) => ({ option, 'avg. lost': v.average.toFixed(2), occurrences: v.occurrences })));
 
   // v2.45: the capacity experiment's own dependent variable.
-  console.info('Fields standing where each trial stops (median), and how many reached year 200:');
+  console.info(`Fields standing where each trial stops (median), and how many reached year ${scope.years}:`);
   console.table(summaries.map((s) => ({
-    policy: s.policy, medianFieldsAtEnd: s.medianFieldsAtEnd, reachedYear200: `${s.reachedHorizonTrials}/${SEEDS}`,
+    policy: s.policy, medianFieldsAtEnd: s.medianFieldsAtEnd,
+    reachedHorizon: `${s.reachedHorizonTrials}/${scope.seeds}`,
   })));
 
   for (const summary of summaries) {

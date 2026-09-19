@@ -45,6 +45,7 @@ las encrucijadas y con ellas se van sus consecuencias y sus obras. Se juega con
 | `notice-report.ts` | Qué frases lee **de verdad** el jugador, ordenadas por cuántas veces salen. Lo que sale arriba es lo que hay que escribir bien | `npx tsx tools/reports/notice-report.ts [--years 60] [--all]` |
 | `attribution-report.ts` | Dónde mueren las aldeas (§12.9) | `npm run attribution` |
 | `policy-attribution-report.ts` | Qué decisiones separan el juego prudente del adverso | `npm run policy:attribution` |
+| `lethality-report.ts` | **Qué decisiones acumulan la caída** (G4), por contrafactual: juega el valle y lo vuelve a jugar cambiando **una sola** respuesta | `npm run lethality` |
 | `balance-report.ts` | Las medidas del banco de §12.9. Lo importa `tests/balance/balance.test.ts` | `npm run balance:report` |
 | `balance-verdict.ts` | Lee `artifacts/balance-summary.json` y dice, aserto por aserto, qué pide §12.9 y qué salió. **No simula**: evita triar a ojo un banco de treinta y dos minutos | `npx tsx tools/reports/balance-verdict.ts` |
 | `migration-ab-report.ts` | El experimento A/B de la puerta de migración, restaurando la constante al salir | `npm run migration:ab` |

@@ -29,6 +29,7 @@
     "lint": "eslint .",
     "map": "tsx tools/reports/map-dump.ts",
     "attribution": "tsx tools/reports/attribution-report.ts",
+    "lethality": "tsx tools/reports/lethality-report.ts",
     "policy:attribution": "tsx tools/reports/policy-attribution-report.ts",
     "migration:ab": "tsx tools/reports/migration-ab-report.ts",
     "reader:packet": "tsx tools/reports/reader-packet.ts"
