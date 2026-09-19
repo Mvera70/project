@@ -38,6 +38,18 @@
 //   node tools/graphics/press-kit.mjs
 //   node tools/graphics/press-kit.mjs --only crecimiento,escenas
 //   node tools/graphics/press-kit.mjs --width 750            (la tablet)
+//   node tools/graphics/press-kit.mjs --out artifacts/graphics/press-ipad \
+//     --width 1024 --height 1366 --scale 2   (iPad Pro 12,9", tamaño real)
+//
+// **`--width`/`--height` son puntos CSS, no píxeles físicos — `--scale` es la
+// densidad.** Un iPad Pro 12,9" mide 2048 × 2732 físicos, pero su viewport CSS
+// es 1024 × 1366 a densidad ×2: pedirle al navegador `--width 2048 --height
+// 2732 --scale 1` (los físicos, tal cual) le dice que tiene una pantalla de
+// 2048 puntos CSS, cuatro veces más ancha de lo real, y el juego —pensado para
+// una columna de 390— sale con el contenido diminuto perdido en medio de un
+// vacío enorme. El PNG final mide igual en los dos casos (2048 × 2732); lo que
+// cambia es si el juego se entera de que tiene esa pantalla o cree que tiene
+// una descomunal.
 //
 // Sale en `artifacts/graphics/press/`: los PNG numerados, `index.html` con la
 // hoja de contactos y `manifest.json` con lo que cada una enseña.
