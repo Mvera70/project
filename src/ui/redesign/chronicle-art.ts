@@ -90,6 +90,16 @@ const RAID_ART: Readonly<Record<string, string>> = {
   'raid.beast': 'raid-sack.png',
 };
 
+/** A1, A2, A4 y C3 · obras que antes compartían el grabado genérico. */
+const BUILD_ART: Readonly<Record<string, string>> = {
+  'wall.closed': 'wall-closed.png',
+  'built.gate': 'built-gate.png',
+  'built.wall': 'built-wall.png',
+  'built.wall.year': 'built-wall.png',
+  'built.watchtower': 'built-watchtower.png',
+  'built.watchtower.year': 'built-watchtower.png',
+};
+
 /**
  * Qué dibujo le corresponde a una entrada de la crónica, según la tabla del
  * plan. `happenings` es `state.happenings` (R-1): sólo hace falta para
@@ -111,7 +121,7 @@ export function illustrationFor(
     case 'famine': return 'famine.png';
     case 'plague': return 'plague.png';
     case 'fire': return 'fire.png';
-    case 'built': return 'built.png';
+    case 'built': return BUILD_ART[entry.templateKey] ?? 'built.png';
     case 'lost':
     case 'abandonment': return 'lost.png';
     case 'arrival':

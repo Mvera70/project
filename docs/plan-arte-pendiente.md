@@ -9,6 +9,57 @@ tanda de aldeanos. Sirve como lista de trabajo para las siguientes rondas y
 separa las ilustraciones de crónica, los adornos de interfaz y el arte 3D del
 mundo.
 
+## Propuesta pendiente · portada del menú y apertura del libro
+
+**Estado:** propuesta visual aprobada como dirección; pendiente de diseño e
+implementación de la transición.
+
+La portada definitiva de Higgsfield (`public/ui/art/title-valley-higgsfield.png`)
+se conserva como una **pantalla plana de inicio de videojuego** con apariencia de
+portada de libro medieval. No se debe convertir en un libro 3D permanente ni en
+una escena de producto: la tapa frontal contiene el menú y conserva la lectura
+inmediata de una pantalla jugable.
+
+### Flujo propuesto
+
+1. El jugador pulsa `START GAME` o `CONTINUE` en la portada.
+2. La aplicación inicia inmediatamente la precarga del mapa y de los recursos
+   necesarios para el valle elegido, manteniendo la portada visible mientras el
+   trabajo avanza.
+3. Cuando el mapa ya tiene una escena presentable, comienza la transición: la
+   tapa frontal de cuero se abre desde el lomo del lateral izquierdo.
+4. Mientras la tapa gira y deja ver el interior, el mapa previamente cargado
+   aparece progresivamente detrás/debajo de ella; no debe mostrarse un vacío ni
+   una pantalla de carga separada.
+5. Al terminar la apertura, la cámara queda en el valle y la portada deja de
+   recibir interacción.
+
+### Lenguaje visual de la transición
+
+- El lomo izquierdo, el cuero de la tapa y los cantos de las hojas visibles en
+  la portada son las pistas visuales que justifican la animación posterior.
+- La portada permanece frontal durante el estado de espera; la perspectiva solo
+  aparece al abrirse, lo suficiente para que la tapa tenga bisagra y espesor.
+- `START GAME` y `CONTINUE` comparten la misma transición; cambia únicamente el
+  estado del valle que aparece debajo.
+- La precarga y la apertura son estados coordinados: la animación no debe dejar
+  al jugador esperando con el libro abierto a medias, y el mapa no debe aparecer
+  antes de que la tapa lo revele.
+- Si la precarga falla, la tapa no se abre: la portada conserva el menú y
+  muestra el error dentro del lenguaje de pergamino existente.
+
+### Criterio de aceptación pendiente
+
+- La captura inicial sigue pareciendo una portada de videojuego, no un libro
+  físico aislado.
+- Se distinguen tapa frontal, lomo izquierdo, cuero y hojas en el borde derecho
+  e inferior.
+- `START GAME` y `CONTINUE` empiezan la precarga sin bloquear la interfaz.
+- El mapa se ve cargado antes de que termine la apertura y aparece detrás de la
+  tapa, no como un corte brusco.
+- La transición funciona con una partida nueva y con una partida continuada, y
+  tiene un estado de error comprobable.
+
 ## Ilustraciones de la crónica
 
 El catálogo final usa **PNG 640 × 512**, todos con estilo de grabado marrón:
@@ -258,3 +309,30 @@ sin retirar, en la misma ronda, el color que sustituye.
 4. Abordar el 3D del mundo empezando por defensas y caminos, que pueden
    requerir cambios de generación y colisión.
 5. Cerrar escenario, cobertizo, adornos y agua del vado con capturas del juego.
+
+### La primera vectorización, descartada (19 sep 2026)
+
+Se calcaron las seis piezas a SVG (`public/ui/decorative/prototypes/`) y **el
+dueño del diseño las descartó**. Lo que merece la pena guardar de ese intento es
+la medida, porque la misma piedra está esperando al siguiente: cinco de las seis
+estaban dibujadas **para verse grandes** —lienzo de 256 con trazos de 2 a 9— y
+el hueco que les toca en la interfaz mide entre 30 y 66 px, así que su trazo más
+fino salía a:
+
+| Pieza | Hueco | Trazo fino en pantalla |
+|---|---|---|
+| Hoja de roble | 30 px | 0,47 px |
+| Sello del roble | 30 px | 0,35 px |
+| Marco del capitular | 56 px | 0,44 px |
+| Esquina de vid | 32 px | 0,50 px |
+| Anillo de retrato | 66 px | 0,52 px |
+| Banderola | 358 px | 1,12 px |
+
+Por debajo de un píxel un trazo no se dibuja: se insinúa. **La banderola era la
+única cuyo dibujo y cuyo destino coincidían** —se enseña ancha— y sigue siendo
+la pieza con el hueco más claro: un rótulo para la fase del valle, que hoy va en
+versalitas sueltas bajo el ornamento.
+
+Así que quien vuelva a intentarlo: **el tamaño de destino va antes del trazo**, y
+lo que hay hoy en el sprite son siluetas rellenas calcadas para leerse a 26 px,
+no dibujos de línea.

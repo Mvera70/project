@@ -14,9 +14,9 @@ visual de la portada y de la interfaz.
   de crónica: figuras kawaii de línea marrón sin relleno, fondo ambiental más
   fino y formato final 5:4. No se carga aún en el juego.
 - `../../../tools/icon-source.png`: fuente cuadrada del icono aprobado.
-- `../../../public/ui/art/title-valley-higgsfield.png`: fondo panorámico para
-  la portada del menú. Está en `public/ui/art/` para poder conectarlo al menú
-  cuando se haga la integración.
+- `../../../public/ui/art/title-valley-higgsfield.png`: portada definitiva del
+  menú, guardada desde la generación aprobada del 18 sep 2026. Está en
+  `public/ui/art/` para poder conectarla al menú cuando se haga la integración.
 
 Las tres salidas PWA derivadas del icono aprobado están en `public/` y son las
 que ya consume el manifiesto: `icon-192.png`, `icon-512.png` e
@@ -35,6 +35,8 @@ que ya consume el manifiesto: `icon-192.png`, `icon-512.png` e
 - Proveedor: Higgsfield
 - Modelo: `gpt_image_2_5`
 - Generación de portada: `86f9c2ab-306f-441b-9f7e-d9efcd8baabe`
+- **Generación de portada aprobada:** `306e44d5-e76f-4a65-a1a8-ea70f39a36f2`
+- Generaciones de exploración/prototipo: `52947175-cec3-4af4-a0e8-7491ff502426`, `b3259112-1c88-4728-ab0c-734d1a8e450e`, `4c3132c2-0995-4476-960c-cfc200e78eea`, `869dd97a-fedd-4fed-838c-d7796505fbbf`, `ba4e5032-1131-4dfc-9265-693c4d938b0a`, `1a5a0d34-0c48-4391-bc9d-7526b8c30a52`, `535eedbf-c11e-4fd8-a2ae-d316a97dd24c`
 - Generación de branding: `b1a297dd-75b9-48bc-85d1-5a0a23a3727d`
 - Generación del icono: `3e960fea-88e0-45fb-bb66-a2f1b684ffb3`
 - Generación del icono aprobado: `5ba9a038-ba35-47bd-a245-b9b6005a0ddb`

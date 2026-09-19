@@ -63,8 +63,19 @@ describe('illustrationFor · plan-piel.md §3.6, una prueba por fila', () => {
     expect(illustrationFor(entry('fire'), [])).toBe('fire.png');
   });
 
-  it('built → built.png', () => {
+  it('built genérico → built.png', () => {
     expect(illustrationFor(entry('built'), [])).toBe('built.png');
+  });
+
+  it.each([
+    ['wall.closed', 'wall-closed.png'],
+    ['built.gate', 'built-gate.png'],
+    ['built.wall', 'built-wall.png'],
+    ['built.wall.year', 'built-wall.png'],
+    ['built.watchtower', 'built-watchtower.png'],
+    ['built.watchtower.year', 'built-watchtower.png'],
+  ])('obra temática %s → %s', (templateKey, expected) => {
+    expect(illustrationFor({ ...entry('built'), templateKey }, [])).toBe(expected);
   });
 
   it('lost, abandonment → lost.png', () => {

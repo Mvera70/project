@@ -40,6 +40,10 @@
     { "name": "raid-walled", "file": "raid-walled.png" },
     { "name": "raid-assault", "file": "raid-assault.png" },
     { "name": "raid-held", "file": "raid-held.png" },
-    { "name": "raid-stormed", "file": "raid-stormed.png" }
+    { "name": "raid-stormed", "file": "raid-stormed.png" },
+    { "name": "wall-closed", "file": "wall-closed.png" },
+    { "name": "built-gate", "file": "built-gate.png" },
+    { "name": "built-wall", "file": "built-wall.png" },
+    { "name": "built-watchtower", "file": "built-watchtower.png" }
   ]
 }
