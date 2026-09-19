@@ -33,10 +33,35 @@ const arg = (name: string, fallback: number): number => {
   const value = at === -1 ? Number.NaN : Number(process.argv[at + 1]);
   return Number.isFinite(value) ? value : fallback;
 };
-const SEEDS = arg('seeds', 12);
+const SEED_COUNT = arg('seeds', 12);
 const YEARS = arg('years', 60);
 /** Cuántas decisiones por valle se contrafactualizan. Cada una es una partida más. */
 const CAP = arg('cap', 12);
+/**
+ * **De dónde salen las semillas, y por qué se puede elegir.**
+ *
+ * Medido el 19 sep 2026 al escribir esto, y es el hallazgo que más cuesta si se
+ * olvida: con la misma política y los mismos años, **la banda de semillas cambia
+ * la tasa de caída ocho veces**.
+ *
+ * | banda (30 semillas, 100 años) | caen |
+ * |---|---|
+ * | `0..29` | 1/30 |
+ * | `100..129` | 6/30 |
+ * | `3+7i` (la de `pace-report`) | 9/30 |
+ *
+ * No es la magnitud de la semilla —la banda alta queda en medio—: es que caer
+ * es un suceso raro y **veinticuatro semillas no bastan para medirlo**. Es la
+ * regla de `CLAUDE.md` («los umbrales nunca se fijan con una sola semilla»)
+ * llevada un paso más allá: para una caída, veinticuatro son una sola.
+ *
+ * Por eso la banda se pide (`--from 3 --step 7` da la de `pace-report`) y por
+ * eso lo primero que imprime este informe es cuántos valles caen en la suya: sin
+ * caídas en la rama base no hay letalidad que atribuir, y la tabla sale de ruido.
+ */
+const SEED_FROM = arg('from', 0);
+const SEED_STEP = arg('step', 1);
+const SEED_LIST = Array.from({ length: SEED_COUNT }, (_, i) => SEED_FROM + i * SEED_STEP);
 
 /** Cómo acabó una rama, que es lo único que se compara. */
 interface Outcome {
@@ -112,7 +137,7 @@ let baseFell = 0;
 let branches = 0;
 const started = Date.now();
 
-for (let seed = 0; seed < SEEDS; seed += 1) {
+for (const seed of SEED_LIST) {
   const base = play(seed, YEARS, null);
   if (base.outcome.ended) baseFell += 1;
   const answered = base.answers.slice(0, CAP);
@@ -147,8 +172,8 @@ for (let seed = 0; seed < SEEDS; seed += 1) {
 
 const hours = (years: number): number => (years * TIME.WEEKS_PER_YEAR * TIME.REAL_MS_PER_TICK) / 3_600_000;
 
-console.info(`\n## La letalidad por decisión · ${SEEDS} semillas × ${YEARS} años = ${hours(YEARS).toFixed(0)} h de reloj a ×1`);
-console.info(`   ${branches} ramas contrafactuales · ${baseFell}/${SEEDS} valles caen jugando prudente · ${((Date.now() - started) / 1000).toFixed(0)}s\n`);
+console.info(`\n## La letalidad por decisión · ${SEED_COUNT} semillas (${SEED_FROM}, paso ${SEED_STEP}) × ${YEARS} años = ${hours(YEARS).toFixed(0)} h de reloj a ×1`);
+console.info(`   ${branches} ramas contrafactuales · ${baseFell}/${SEED_COUNT} valles caen jugando prudente · ${((Date.now() - started) / 1000).toFixed(0)}s\n`);
 
 const rows = [...effects.entries()]
   .filter(([, e]) => e.pairs >= 2)

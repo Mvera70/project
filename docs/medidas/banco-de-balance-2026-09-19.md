@@ -54,10 +54,28 @@ escribió contra el juego anterior.
 ### 2.2 · La extinción prudente: 26,7 % contra 2–12 %
 
 **Es §1b funcionando.** Desde B1–B4 un clan vecino baja, rompe el portón y acaba
-la partida (`ended.cause = 'stormed'`). Medido aparte en `pace-report`: **8 de
-24 valles se acaban en sesenta años, y siete de los ocho son tomados.** La banda
-es de antes de que el asedio existiera, y el dueño lo dijo con todas las letras:
-«que haya partidas que se rompan es la idea».
+la partida (`ended.cause = 'stormed'`), y de las 26,7 % **casi todas son
+tomadas**. La banda de 2–12 % es de antes de que el asedio existiera, y el dueño
+lo dijo con todas las letras: «que haya partidas que se rompan es la idea».
+
+**Y aquí va un aviso que costó una conclusión falsa el mismo día.** La primera
+versión de este documento citaba `pace-report` —«8 de 24 valles se acaban en
+sesenta años»— como si fuera la tasa del juego. **No lo es: es la de su banda de
+semillas.** Medido al escribir el informe de G4, con la misma política y los
+mismos años:
+
+| banda (30 semillas, 100 años) | caen |
+|---|---|
+| `0..29` | **1/30** |
+| `100..129` | 6/30 |
+| `3+7i` (la de `pace-report`) | **9/30** |
+
+Nueve veces de diferencia, y **no es la magnitud de la semilla**: la banda alta
+queda en medio. Es que caer es un suceso raro y **veinticuatro o treinta
+semillas no bastan para medirlo**. La regla de `CLAUDE.md` —«los umbrales nunca
+se fijan con una sola semilla»— llevada un paso más allá: para una caída,
+veinticuatro **son** una sola. La cifra que vale para la extinción es la de este
+banco, que son **sesenta semillas**: 26,7 %.
 
 ### 2.3 · El bosque: 72,7 % de pie contra una banda de 40–70 %
 
