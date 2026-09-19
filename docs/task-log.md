@@ -40,6 +40,22 @@ no existen, para que nadie las busque.
 
 ---
 
+**G4 · qué decisiones acumulan la caída (19 sep), medida.** Por contrafactual,
+que es lo único que contesta una pregunta causal: se juega el valle, se apunta
+cada respuesta y **se vuelve a jugar cambiando una sola** (`npm run lethality`).
+30 semillas × 100 años, 291 ramas, 9 valles caídos de 30. **Lo que acumula la
+caída es no prepararse para el asedio** —`raiders_coming:wait` es la segunda
+opción más letal del catálogo, +19 pp sobre 26 pares, y las dos siguientes son
+de su familia—, con `granary_theft:believe_a` a la cabeza (+38 pp). Salvan
+arrodillarse por la deuda de grano (−9 pp) y acoger a los del vado (−4 pp).
+**Y lo que más incomoda: esperar es lo que elige la política prudente**, porque
+§12.9 la define sin lookahead y prepararse cuesta grano y ánimo *esta semana*:
+mira el precio y no ve el asalto. No se tocó ningún número —G4 es nivelado— y no
+se duplicó ninguna prueba: la propiedad ya la guarda `threat.test.ts`, y lo que
+el informe añade es el orden. Medida en
+`docs/medidas/letalidad-por-decision-2026-09-19.md`, detalle en `changelog.md`
+4.20.
+
 **Y la trampa más cara del 19 sep, que conviene leer antes de medir nada que
 cuente valles caídos: la banda de semillas cambia la tasa de caída nueve
 veces.** Con la misma política y los mismos años, `0..29` da **1 valle caído de
@@ -169,8 +185,8 @@ dibujo de crónica propio — las dos tareas están en `encargos-3d.md` y
 tocados más las dos pruebas de `tests/journeys/works.test.ts` que fija el
 tope y la puerta del anillo cerrado. Detalle completo en `docs/changelog.md`
 4.14. Después de esto, `/goal` siguió con G3, G1, A3b y F2 —las cuatro
-cerradas el 19 sep, y G2 con ellas— y **lo que queda sin Astra es F3d (el
-cronicón) y G4 (la curva de dificultad)**.
+cerradas el 19 sep, y G2 y G4 con ellas— y **lo que queda sin Astra es F3d
+(el cronicón)**.
 
 **Crónicas · villa cerrada integrada (19 sep):** `wall-closed.png`,
 `built-gate.png`, `built-wall.png` y `built-watchtower.png` se generaron con

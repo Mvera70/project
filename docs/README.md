@@ -60,6 +60,7 @@ Las herramientas que las produjeron están en `tools/reports/`.
 | `medidas/rey-medida.md` | Qué llegó y qué no de la fase del rey (K-6) |
 | `medidas/dead-code-audit-2026-09-17.md` | El código muerto que se encontró al auditar |
 | `medidas/catalogo-historias-y-encrucijadas.md` | Qué historias tiene el catálogo y cuáles no salen |
+| `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |
 | `medidas/banco-de-balance-2026-09-19.md` | **El banco remedido (G2)**: 11 rojas de 37 y 31 minutos, no 19 y 45; las cuatro rojas con su causa; y que el catálogo no tenía contenido muerto, lo tenía el banco que lo medía |
 
 ## Encargos de arte abiertos — `docs/encargos/`
