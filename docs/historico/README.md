@@ -14,7 +14,7 @@ Se separó del resto el 19 sep 2026, moviendo los ficheros y reescribiendo sus
 ## Los planes entregados
 
 Ronda E1, 20 sep: [el disparo único](life-rounds/E1-disparo-unico.md), entrega
-parcial de clips fechados, revisión previa y evidencia; reacción de puerta pendiente.
+de clips fechados, revisión previa y evidencia; reacción de puerta completada tras autorización. E1 global sigue parcial.
 
 | Documento | Qué fue | Qué entregó |
 |---|---|---|

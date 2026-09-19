@@ -271,6 +271,7 @@ function buildBuilding(planned: PlannedBuilding): BuildingModel {
 export class Village {
   readonly group = new Group();
   private readonly models = new Map<BuildingId, BuildingModel>();
+  private readonly gateRecoils = new Map<BuildingId, { x: number; z: number; axis: 'x' | 'z'; object: Group }>();
   /**
    * Tiempo real mínimo que una puerta sigue visible después de un paso.
    *
@@ -313,6 +314,18 @@ export class Village {
     const source = planned.asset === null ? undefined : this.instance?.(planned.asset);
     const model = source === undefined ? buildBuilding(planned) : buildFromAsset(planned, source);
     this.models.set(planned.id, model);
+    if (planned.kind === 'gate' && !planned.ruin) {
+      // Capa visual local: no mueve la huella ni el obstáculo. Si existe hoja,
+      // sólo ella acusa; mientras E3 no la entregue, acusa la malla prestada.
+      const leaf = model.object.getObjectByName('DoorHinge');
+      const parent = leaf?.parent ?? model.object;
+      const parts = leaf === undefined ? [...parent.children] : [leaf];
+      const recoil = new Group(); recoil.name = 'GateRecoil';
+      parent.add(recoil);
+      for (const part of parts) recoil.add(part);
+      this.gateRecoils.set(planned.id, { x: planned.x + 0.5, z: planned.z + 0.5,
+        axis: planned.gate ?? 'z', object: recoil });
+    }
     // Una casa levantada en enero nace nevada, no en verano hasta que cambie la
     // estación.
     model.weather(this.snow, this.snowColour);
@@ -335,12 +348,33 @@ export class Village {
     }
   }
 
+  /** Transformaciones reales para contrastar el píxel con el contacto en la traza. */
+  gatePoses(): { id: number; x: number; z: number; offset: number[]; rotation: number[] }[] {
+    return [...this.gateRecoils].map(([id, gate]) => ({ id, x: gate.x, z: gate.z,
+      offset: gate.object.position.toArray(), rotation: [gate.object.rotation.x, gate.object.rotation.y, gate.object.rotation.z] }));
+  }
+
+  /** E1 · Sacudida absoluta desde el contacto, sin acumulación entre pintados. */
+  gateImpact(at: { readonly x: number; readonly z: number } | null, elapsed: number | null): void {
+    for (const gate of this.gateRecoils.values()) {
+      const active = at !== null && at.x === gate.x && at.z === gate.z
+        && elapsed !== null && elapsed >= 0 && elapsed < 0.45;
+      // Impulso en el mismo fotograma, dos rebotes decrecientes y reposo exacto.
+      const pulse = active ? Math.cos(elapsed * Math.PI * 10) * (1 - elapsed / 0.45) ** 2 : 0;
+      gate.object.position.set(gate.axis === 'x' ? pulse * 0.08 : 0, 0,
+        gate.axis === 'z' ? pulse * 0.08 : 0);
+      gate.object.rotation.set(gate.axis === 'z' ? pulse * 0.08 : 0, 0,
+        gate.axis === 'x' ? -pulse * 0.08 : 0);
+    }
+  }
+
   remove(id: BuildingId): void {
     const model = this.models.get(id);
     if (model === undefined) return;
     this.group.remove(model.object);
     model.dispose();
     this.models.delete(id);
+    this.gateRecoils.delete(id);
     this.doorHolds.delete(id);
   }
 

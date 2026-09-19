@@ -310,6 +310,8 @@ export interface Village {
      * §1b: «la pelea decide».
      */
     readonly gate: {
+      readonly at: { readonly x: number; readonly z: number };
+      readonly hitAt: number | null;
       readonly hits: number;
       readonly broken: boolean;
       readonly entered: boolean;
@@ -877,6 +879,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // de B4, y es la primera vez que este número no es cero.
         lost: fallenDefenders([...wounded.values()]),
         gate: gate === null ? null : {
+          at: { ...gate.at },
+          hitAt: gate.hitAt ?? null,
           hits: gate.hits,
           broken: gate.brokeAt !== null,
           // **Y si alguien pasó por él**, que es otra cosa: una puerta rota con

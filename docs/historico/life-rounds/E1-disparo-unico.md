@@ -1,6 +1,7 @@
 # E1 · El disparo único — 20 sep 2026
 
-Entrega **parcial** de `docs/plan-disparo-unico.md`; E1 no se cierra.
+El brief `docs/plan-disparo-unico.md` queda entregado tras la ampliación
+autorizada descrita al final. E1 global no se cierra: faltan sus otros clips.
 
 ## Revisión anterior al código
 
@@ -85,9 +86,62 @@ suite completa ni banco de balance en esta ronda.
 
 ## Pendiente explícito
 
+**Estado de la primera entrega** (el permiso se concedió después; ver cierre abajo).
+
 **Que el portón acuse.** Requiere edificios/renderer, excluidos por el brief.
 Ampliación solicitada, pendiente de respuesta. `hitAt` prepara el hecho real,
 no una reacción terminada. Faltan también `spear_thrust`, `hit_take`, `flee`,
 armas, adarve, contacto preciso de manos (el alcance mecánico es grupal),
 adaptación al terreno, ragdoll y persistencia de cadáveres. Sangre/fuego/saqueo
 siguen siendo decisiones del dueño. Registro actualizado en `encargos-3d.md`.
+
+## Cierre de la ampliación autorizada · 20 sep
+
+El dueño autoriza `world/buildings.ts` y `renderer.ts`. La vida expone posición
+y `hitAt` del portón; el renderer calcula edad desde el último paso terminado,
+el mismo reloj del golpe del atacante. La malla reacciona desde fase cero,
+oscila amortiguada durante 0,45 s y vuelve exactamente al reposo. Su capa local
+no altera huellas, colisiones ni resistencia. Sin hoja propia mueve la malla
+provisional; con `DoorHinge` mueve sólo la hoja y respeta la apertura doméstica.
+No se sacude una ruina, otra puerta ni un lugar sin portón construido.
+
+Cuatro pruebas nuevas: ambos ejes, repetición/retroceso/reposo, selección de
+puerta y ciclo de retirada/recreación, y hoja independiente del marco y gozne.
+**72 pruebas focalizadas pasan**, más typecheck/lint: `gate-recoil`,
+`combat-clips`, `graphics-world`, `life-observation`. Sin banco largo.
+
+Bundle: `npm run bundle -- --out artifacts/graphics/E1-gate/game`.
+Observatorio estándar, con `--page artifacts/graphics/E1-gate/game/valley.html
+--year 30 --raid 24 --assault --fps 15`, y estas variantes:
+
+| Carpeta bajo E1-gate | Parámetros adicionales | Límite observado |
+|---|---|---|
+| `recoil-7` | `--seed 7 --means bows,arms --lead 18 --seconds 4 --follow -9006 --zoom 0.2` | 69 personas/19 animales; golpes, pero bosque tapa puerta |
+| `recoil-11` | `--seed 11 --means bows,arms --lead 18 --seconds 4 --follow -9000 --zoom 0.2` | 60/1; portón lógico sin edificio: caso negativo, no prueba de madera |
+| `recoil-41` | `--seed 41 --lead 18 --seconds 6 --follow -9000 --zoom 0.18` | 60/3; ningún golpe en esa ventana |
+| `recoil-3b` | `--seed 3 --lead 22 --seconds 6 --follow -9000 --zoom 0.18` | 68 personas; ningún golpe en esa ventana; un intento anterior falló al inicializar el reloj y no cuenta |
+
+`turned-7` usa copia local del observatorio con Shift-arrastre de (300,350) a
+(750,450), lead 19, 4 s, 15 fps, follow -9006, zoom 0,14; sigue ocluido.
+Por eso no se confunden las tomas anteriores con validación visual positiva.
+
+**Toma diagnóstica positiva:** `node artifacts/graphics/E1-gate/observe-study.mjs
+--page artifacts/graphics/E1-gate/game/valley.html --seed 7 --year 30 --raid 24
+--assault --lead 19 --seconds 4 --fps 15 --zoom 0.16
+--out artifacts/graphics/E1-gate/study-7`.
+Es copia local del observatorio con una única diferencia funcional: tercer
+argumento `true` a `__valleyCapture`. Enfoca el portón y oculta el bosque **sólo
+al capturar**, restaurando su visibilidad en `finally`. No altera física ni
+terreno. Los scripts auxiliares y metraje son artefactos locales, no herramientas
+nuevas de producción. La API habitual de captura conserva su comportamiento.
+
+Inspeccionados PNG 0000/0001/0003/0008: madera en reposo, desplazada e inclinada
+con el golpe, rebote y reposo. **61 fotogramas, 28 con reacción y 33 en reposo**;
+las transformaciones `renderedGates` coinciden numéricamente con la edad del
+golpe en todos ellos. El contador pasa de 0 a 47 golpes; 69 personas/19 animales;
+cero errores, drift, centros bloqueados y penetraciones muestreadas. Motor fijo.
+
+**Limitación sin ocultar:** el bosque puede tapar el portón durante la pelea
+normal. Se registra como pendiente visual en `encargos-3d.md`. No se modifica
+el bosque para hacer pasar una toma, ni se entrega hoja nueva, astillas, rotura
+animada o contacto preciso de manos. La reacción pedida sí queda conectada.

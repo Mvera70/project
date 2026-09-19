@@ -1,12 +1,15 @@
 # Cuaderno de tareas — el rework
 
-## 20 sep 2026 · E1: el disparo único, entrega parcial
+## 20 sep 2026 · El disparo único entregado; E1 global sigue parcial
 
 La pose se mide desde el hecho: tensar, soltar al nacer la flecha, golpear
 portón y caer (ambos bandos), con final sostenido y pureza probada sobre el
 GLB publicado. Cadencia y resistencia intactas. El caído deja de disparar y
-de ser desplazado por vecinos. **No cerrar E1:** falta reacción de puerta,
-fuera del alcance de archivos autorizado; ampliación solicitada, pendiente.
+de ser desplazado por vecinos. **Reacción de puerta hecha** tras autorización para edificios/renderer:
+sacudida absoluta desde el contacto, sin tocar colisiones. 61 fotogramas
+contrastados con la traza; 72 pruebas focalizadas, typecheck y lint pasan.
+Toma diagnóstica sin bosque: la oclusión de la puerta en vista normal queda pendiente.
+**No cerrar E1 global:** aún faltan los otros clips del encargo.
 También quedan lanza, recibir impacto, huir, armas, adarve y ragdoll.
 Typecheck/lint y pruebas focalizadas; asaltos en 7/23/36, clips a 15 fps.
 [Revisión, medidas y límites](historico/life-rounds/E1-disparo-unico.md).

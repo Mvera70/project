@@ -653,6 +653,7 @@ export async function createGraphicsRenderer(
     };
     return {
       renderedPeople: cast.snapshot(),
+      renderedGates: village.gatePoses(),
       bubbles: bubbles.snapshot(),
       buildings: (lifeState === null ? [] : visibleBuildings(lifeState)).map(building => ({ id: building.id, kind: building.kind,
         x: building.x, z: building.y, w: building.w, h: building.h, ruin: building.lostTick !== null })),
@@ -771,7 +772,7 @@ export async function createGraphicsRenderer(
   // estado en la misma tarea JavaScript. Ningún RAF puede colarse entre ambos.
   /** El «no sigas a nadie» del enganche de observación. Ver abajo. */
   const NOBODY = -1;
-  window.__valleyCapture = (follow?: number, zoom = 1) => {
+  window.__valleyCapture = (follow?: number, zoom = 1, gateStudy = false) => {
     // D2 · **y se puede seguir a un saqueador.** Hasta aquí el enganche sólo
     // encontraba vecinos y bichos, así que la única manera de grabar un asalto
     // era acertar con la cámara puesta en la plaza: la batalla pasa en el
@@ -785,9 +786,17 @@ export async function createGraphicsRenderer(
       ?? life?.beasts.find(beast => beast.dweller.body.id === follow)?.dweller.body
       ?? life?.raiders.find(raider => raider.body.id === follow)?.body;
     if (target !== undefined) view.look(target.x, target.z);
+    // Diagnóstico explícito: encuadrar el portón y apartar el bosque sólo del
+    // píxel capturado. No cambia terreno, colisiones, vida ni la vista normal.
+    const gate = gateStudy ? life?.defence.gate : null;
+    if (gate !== null && gate !== undefined) { flight = null; disturbed = true; view.look(gate.at.x, gate.at.z); }
     if (zoom !== 1) view.zoom(zoom, viewport.widthCss / 2, viewport.heightCss / 2);
-    renderer.render(scene, camera);
-    return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
+    const visible = forest?.group.visible ?? true;
+    try {
+      if (gateStudy && forest !== null) forest.group.visible = false;
+      renderer.render(scene, camera);
+      return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
+    } finally { if (forest !== null) forest.group.visible = visible; }
   };
   let observingLive = false;
   window.__valleyObserveLive = () => { observingLive = true; };
@@ -989,6 +998,9 @@ export async function createGraphicsRenderer(
       // congela en pausa. La jornada y los cuerpos siguen usando tiempo
       // escénico, como antes.
       village.doors(activeDoors, frame.speed === 0 ? 0 : frame.realDeltaSeconds);
+      const struckGate = life.defence.gate;
+      village.gateImpact(struckGate?.at ?? null, struckGate === null || struckGate.hitAt === null ? null
+        : (Math.max(0, life.steps - 1) - struckGate.hitAt) * LIFE_STEP);
       lastActors = castOf(life, frame.presentationSeconds, ages, named);
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
@@ -1350,7 +1362,7 @@ declare global {
      */
     __valleyLife?: () => LifeSnapshot | null;
     __valleyAdvance?: (steps: number, reset?: boolean) => void;
-    __valleyCapture?: (follow?: number, zoom?: number) => { image: string; life: LifeSnapshot | null };
+    __valleyCapture?: (follow?: number, zoom?: number, gateStudy?: boolean) => { image: string; life: LifeSnapshot | null };
     __valleyObserveLive?: () => void;
   }
 }
@@ -1359,6 +1371,8 @@ declare global {
 interface ScreenPoint { readonly x: number; readonly y: number }
 interface ObservedPoint { readonly x: number; readonly z: number; readonly screen: ScreenPoint }
 interface LifeSnapshot {
+  readonly renderedGates: readonly { readonly id: number; readonly x: number; readonly z: number;
+    readonly offset: readonly number[]; readonly rotation: readonly number[] }[];
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
   readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number;
     readonly scale: number }[];
