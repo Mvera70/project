@@ -77,6 +77,7 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-d6-acabado-fisico.md` | Contrato de D6 y acabado físico entregados el 20 sep; evidencia en el informe de ronda |
 | `encargos/encargo-e0-preparacion.md` | Contrato de E0a: preparación visible antes del asedio; cierre en `historico/life-rounds/E0a-preparacion.md` |
 | `encargos/encargo-e0-aviso.md` | Contrato de E0b: mensajero post-decisión desde el acceso real; cierre en `historico/life-rounds/E0b-aviso.md` |
+| `encargos/encargo-e0-semana-posterior.md` | Contrato de E0c: reservas volcadas y corral abierto durante la semana posterior al saqueo |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
 | `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |
