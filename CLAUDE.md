@@ -278,11 +278,13 @@ salva si adelgazó la partida —si no, mirar la pantalla volvería al valle
 inmortal. Medido: sin dar defensa caen 3 de 12 valles en ochenta años; con la
 muralla tumbando al 30 % de la partida, ninguno.
 
-**Lo que le falta a la fase 4 es arte, no mecánica.** No existe un solo clip de
-pelea: el arquero se pinta con `idle`, el que cae se queda de pie, y el golpe
-contra la puerta no se ve. El encargo está en `docs/encargos/encargo-combate.md` y el
-inventario completo en `docs/encargos-3d.md`. **Y el gore, el fuego y la escena
-del saqueo (D6, E4) son decisión del dueño del diseño y están sin tomar.**
+**El combate ya tiene representación, 20 sep 2026:** siete gestos procedurales,
+armas integradas, huida civil y portón articulado. D6 añade destinos de saqueo,
+cargas y huellas, transición terminal acotada, cuerpos articulados de Rapier
+y seis tablas físicas de la puerta rota. La caída animada sigue de respaldo.
+El inventario pendiente está en `docs/encargos-3d.md`; la evidencia y los límites
+de esta ronda, en `docs/historico/life-rounds/D6-saqueo-y-fisica.md`.
+**Sangre y fuego no forman parte del encargo autorizado y siguen pendientes.**
 
 **Los hitos humanos 0 y 6 se descartan** (dueño del diseño, 15 sep 2026). Eran
 la deuda más antigua del proyecto —una lectura de tres crónicas por un tercero y

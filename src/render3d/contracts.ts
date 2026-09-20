@@ -99,6 +99,52 @@ export interface Actor {
   readonly role: Role | null;
 }
 
+/** Vector y cuaternión planos para cruzar vida, Rapier y Three sin hacer que
+ * ninguna de las tres capas posea los objetos mutables de otra. */
+export interface PhysicalVector { readonly x: number; readonly y: number; readonly z: number }
+export interface PhysicalRotation extends PhysicalVector { readonly w: number }
+
+/**
+ * Una pieza del esqueleto publicado en la pose exacta `fall(0)`.
+ *
+ * `body` describe la cápsula que Rapier articula. `bone` conserva la transformación
+ * mundial del hueso dentro de esa cápsula, de modo que al primer fotograma
+ * físico no haya un salto desde la animación. Son datos, no objetos de Three.
+ */
+export interface RagdollSeedPart {
+  readonly bone: string;
+  readonly parent: string | null;
+  readonly joint: PhysicalVector;
+  /** Eje mundial de codo/rodilla en la pose publicada. */
+  readonly hingeAxis: PhysicalVector;
+  readonly body: {
+    readonly at: PhysicalVector;
+    readonly rotation: PhysicalRotation;
+    readonly halfLength: number;
+    readonly radius: number;
+  };
+  readonly boneAt: PhysicalVector;
+  readonly boneRotation: PhysicalRotation;
+}
+
+export interface RagdollSeed {
+  readonly id: number;
+  /** Paso de vida en que cayó; crear dos veces el mismo id y fecha es idempotente. */
+  readonly bornAt: number;
+  readonly parts: readonly RagdollSeedPart[];
+}
+
+/** Pose absoluta que sale de Rapier y que `Cast` vuelve a poner en el rig. */
+export interface RagdollPose {
+  readonly id: number;
+  readonly sleeping: boolean;
+  readonly bones: readonly {
+    readonly name: string;
+    readonly at: PhysicalVector;
+    readonly rotation: PhysicalRotation;
+  }[];
+}
+
 export type GraphicsTarget =
   | { kind: 'building'; id: number }
   | { kind: 'villager'; id: number }
@@ -203,6 +249,14 @@ export interface GraphicsRenderer {
    * valle es el HUD y que las cifras viven en la tira y en las fichas.
    */
   siege(): { readonly gate: number; readonly broken: boolean } | null;
+  /** D6 · El desenlace que la escena terminal está dejando acabar. */
+  ending(): {
+    readonly active: boolean;
+    readonly ready: boolean;
+    readonly phase: 'entering' | 'looting' | 'escaping' | 'complete';
+    readonly loads: number;
+    readonly traces: number;
+  } | null;
   dispose(): void;
 
   /**

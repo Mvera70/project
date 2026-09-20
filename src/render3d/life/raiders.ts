@@ -53,7 +53,8 @@ import type { Waypoint } from './navigate';
  * jornada —lo que hacen dentro es D4 y D6— y lo que importa de él es que
  * existió: es lo que el parte de B4 llama `breached`.
  */
-export type RaiderPhase = 'coming' | 'standing' | 'breaking' | 'inside' | 'leaving' | 'gone' | 'down';
+export type RaiderPhase = 'coming' | 'standing' | 'breaking' | 'inside'
+  | 'seeking' | 'sacking' | 'escaping' | 'leaving' | 'gone' | 'down';
 
 export interface Raider extends MeleeGesture {
   /** Instantes de hechos, en el reloj de pasos de esta jornada. */
@@ -103,6 +104,8 @@ export interface Raider extends MeleeGesture {
    * rota no es un valle tomado; un hombre dentro, sí.
    */
   entered: boolean;
+  /** D6 · lo que se lleva en la mano, sólo después de saquear de verdad. */
+  load?: 'grain' | 'bundle' | null;
 }
 
 /**
@@ -331,6 +334,7 @@ export function createRaiders(
       forced: false,
       hits: 0,
       entered: false,
+      load: null,
     });
   }
   return raiders;
@@ -374,6 +378,10 @@ export function stepRaider(
     return;
   }
   const { body } = raider;
+
+  // D6 gobierna estos tres tramos desde `sack.ts`: aquí no se les da además
+  // una segunda velocidad hacia el corazón o la carretera.
+  if (raider.phase === 'seeking' || raider.phase === 'sacking' || raider.phase === 'escaping') return;
 
   // D3b · **golpeando el portón.** Se queda donde está y pega; cada golpe es
   // uno de los sesenta que la puerta aguanta, así que cuantos menos queden en
@@ -453,9 +461,11 @@ export function stepRaider(
           + Math.round((hash32(seed, `raider:${body.id}:stand`) / 0xffffffff) * span);
       }
     } else if (raider.phase === 'inside') {
-      // Dentro. Lo que hacen aquí es D4 y D6; lo que importa de esta jornada es
-      // que entraron, y eso ya está dicho.
-      raider.phase = 'gone';
+      // D6 recoge este estado y lo manda a un objetivo real. No se convierte
+      // «llegó al corazón» en «saqueó»: la carga sólo nace ante el edificio.
+      body.vx = 0;
+      body.vz = 0;
+      return;
     } else {
       raider.phase = 'gone';
     }

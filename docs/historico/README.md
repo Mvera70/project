@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [D6: saqueo y física](life-rounds/D6-saqueo-y-fisica.md): registro de la
+  ronda autorizada de transición final, cuerpos articulados y escombros.
+
 - [Visibilidad y huida](life-rounds/E3-visibilidad-y-huida.md): evidencia de
   los puntos 3 y 4, oclusión selectiva, cuerpos atacantes y carrera civil.
 

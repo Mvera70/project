@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.24 · 20 de septiembre de 2026, 02:08 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.26 · 20 de septiembre de 2026, 13:17 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -6681,6 +6681,22 @@ exteriores —no defensores ni caídos— buscan refugio alcanzable y corren con
 `flee`; no vuelven al trabajo mientras persista la amenaza. No añade saqueo,
 muertes ni decisiones del motor. El clip es procedural y ligado a distancia,
 como el andar; el GLB aceptado no cambia.
+
+**D6 y acabado físico (20 sep 2026):** el clan que alcanza el interior busca
+lugares reales por rutas transitables, saquea al llegar y sale con cargas
+visuales. La representación no descuenta recursos ni añade víctimas. La caída
+usa cuerpos articulados de Rapier sobre la altura y obstáculos del valle; si
+no carga la física, conserva `fall`. La hoja rota deja fragmentos físicos
+acotados. La escena terminal de un `stormed` visto en esta sesión dispone de
+una breve continuidad visual antes del epitafio, con resultado guardado y motor
+parado. Cargar una partida ya terminada no repite la escena. El contrato y los
+criterios están en `encargos/encargo-d6-acabado-fisico.md`; sangre y fuego siguen
+fuera de esta ronda. Límites de presentación verificados: 24 ragdolls de once
+segmentos y 24 fragmentos dinámicos; seis tablas por portón. Un ragdoll duerme
+a los ocho segundos conservando su pose; las tablas liberan física a 3600 pasos
+y conservan su última transformación. La transición dura como mínimo 8 s y
+como máximo 12 s reales, a velocidad visual 1×; movimiento reducido y ausencia
+de escena viva no añaden espera. No son parámetros de daño ni de economía.
 
 Conservar fichas DOM, accesibilidad y crónica. Acciones de cámara no son decisiones
 del juego. La carga 3D no consume tiempo de simulación ocultamente; guardar/cerrar

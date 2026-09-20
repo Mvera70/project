@@ -61,6 +61,8 @@ import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
 import { TreeFalls, type TreeFallSighting } from './effects/tree-falls';
 import { FIELD_CROPS, isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
+import { BattleDebris } from './world/battle-debris';
+import type { Physics } from './life/physics';
 
 const VILLAGER = 'villager';
 const TREE = 'tree';
@@ -313,6 +315,17 @@ export async function createGraphicsRenderer(
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
   world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  let battleDebris: BattleDebris | null = null;
+  let debrisPhysics: Physics | null = null;
+  let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
+  const clearBattleDebris = (): void => {
+    if (battleDebris !== null) {
+      world.remove(battleDebris.group);
+      battleDebris.dispose();
+    }
+    battleDebris = null;
+    debrisPhysics = null;
+  };
 
   let ground: Ground | null = null;
   let forest: Forest | null = null;
@@ -751,6 +764,11 @@ export async function createGraphicsRenderer(
         screen: screen(arrow.x, arrow.z),
       })),
       defence: life.defence,
+      // D6 · objetivos auténticos, cargas y huellas. El observatorio puede así
+      // distinguir una entrada de un saqueo completado sin deducirlo de píxeles.
+      sack: life.sack,
+      physics: life.physics,
+      debris: battleDebris?.count ?? 0,
       forest: {
         standing: forest?.count ?? 0,
         stumps: forest?.stumpCount ?? 0,
@@ -909,9 +927,19 @@ export async function createGraphicsRenderer(
       // vale: se estrena una. `presentation-clock` ya distingue los tres casos.
       if (frame.discontinuity) scenic.reset();
       // **Y a partir de aqui se pinta esto y no `state`.** El de la jornada,
-      // quieto desde anoche: ver `scenic-state.ts` para por que. Lo vivo solo lo
-      // mira quien tenga una razon para mirarlo, y hoy no la tiene nadie.
-      const shown = scenic.of(state as GameState, phase);
+      // quieto desde anoche: ver `scenic-state.ts` para por que. D6 conserva
+      // además el snapshot entero del asalto —mallas, obstáculos y cuerpos—:
+      // conservar sólo `life` mientras `plan` pintaba el estado terminal dejaba
+      // a los saqueadores chocando con una puerta invisible distinta.
+      const sameValley = lifeState?.seed === state.seed;
+      const holdingAssault = !frame.discontinuity && sameValley && life !== null
+        && life.raidTick !== null && life.raidTick === state.threat.arrivedTick
+        && state.flags['assault'] !== undefined;
+      const holdingEnding = !frame.discontinuity && sameValley && state.ended?.cause === 'stormed'
+        && life !== null && life.sack !== null;
+      const holdPresentation = holdingAssault || holdingEnding;
+      const shown = holdPresentation && lifeState !== null
+        ? lifeState : scenic.of(state as GameState, phase);
 
       const next = planFor(shown);
       const change = planChange(plan, next);
@@ -930,6 +958,9 @@ export async function createGraphicsRenderer(
         arrows.clear();
         weather.clear();
         treeFalls.reset(state.map);
+        life?.dispose();
+        life = null;
+        lifeState = null;
         fallingChanged = false;
         disturbed = false;
         paintedSky = 'clear';
@@ -972,9 +1003,15 @@ export async function createGraphicsRenderer(
       //
       // La aldea vive por su cuenta: una jornada es una vida, y al amanecer se
       // estrena otra con la gente que el motor diga.
-      if (life === null || lifeState !== shown || frame.discontinuity) {
+      if (frame.discontinuity || (!holdPresentation && (life === null || lifeState !== shown))) {
         const previous = life;
-        life = createVillage(shown, today, { land: solidTerrain(shown, id => library.instance(id)) });
+        clearBattleDebris();
+        pendingBrokenGate = null;
+        life = createVillage(shown, today, {
+          land: solidTerrain(shown, id => library.instance(id)),
+          ground: groundFloor,
+          ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
+        });
         // El relevo del estado no recoloca a los supervivientes. Sólo una
         // discontinuidad explícita permite reconstruir toda la presentación.
         if (previous !== null && !frame.discontinuity) {
@@ -1002,11 +1039,22 @@ export async function createGraphicsRenderer(
             }
           }
         }
+        previous?.dispose();
         lifeDay = today;
         lifeState = shown;
         lifeCarry = 0;
       }
-      lifeCarry += frame.deltaSeconds;
+      // La rama de arriba crea siempre una jornada si faltaba. La guarda hace
+      // explícita esa invariante para TypeScript y protege un futuro fallo de
+      // construcción sin dejar que medio fotograma lea `null`.
+      if (life === null) return;
+      // D6 · cuando el motor ya ha parado, la misma escena sigue respirando
+      // con reloj real durante la transición acotada al epitafio. No se avanza
+      // ni una semana: sólo los pasos efímeros de esta Village conservada.
+      const terminalDelta = state.ended?.cause === 'stormed' && life.sack !== null
+        ? frame.realDeltaSeconds : frame.deltaSeconds;
+      if (state.ended?.cause === 'stormed') life.endBattle();
+      lifeCarry += terminalDelta;
       if (frame.discontinuity) { steppedPhase = phase; nightOutcomes.length = 0; }
       // Una entrada puede empezar y terminar dentro del mismo fotograma a
       // velocidades altas. Se acumulan los pulsos de todos los pasos de vida,
@@ -1049,6 +1097,35 @@ export async function createGraphicsRenderer(
         given += 1;
       }
       rememberDoors();
+      const battleWorld = life.battleWorld();
+      if (battleWorld !== null && battleWorld !== debrisPhysics) {
+        clearBattleDebris();
+        debrisPhysics = battleWorld;
+        battleDebris = new BattleDebris(battleWorld);
+        world.add(battleDebris.group);
+      }
+      const brokenGate = life.defence.gate;
+      if (brokenGate?.broken === true) {
+        // El contacto trae el centro exacto de *su* puerta. Buscar la más
+        // cercana cambiaba de objetivo al borrar su recoil y, al fotograma
+        // siguiente, abría otra del anillo. Si no queda la misma pose no se
+        // suplanta por una vecina: no hay un segundo boquete que contar.
+        const pose = village.gatePoses().find((candidate) =>
+          Math.abs(candidate.x - brokenGate.at.x) < 1e-6 && Math.abs(candidate.z - brokenGate.at.z) < 1e-6,
+        ) ?? null;
+        if (pose !== null && village.breakGate(pose.id)) {
+          // Sin Rapier el respaldo sigue dejando la hoja abajo; sólo faltan
+          // las tablas físicas, no vuelve a verse un portón intacto. La pose se
+          // conserva hasta que Rapier termine de cargar: borrar la hoja antes
+          // no puede borrar también las tablas que le corresponden.
+          pendingBrokenGate = { id: pose.id, x: pose.x, z: pose.z, axis: pose.axis };
+        }
+      }
+      if (battleDebris !== null && pendingBrokenGate !== null) {
+        battleDebris.breakGate(pendingBrokenGate, groundFloor);
+        pendingBrokenGate = null;
+      }
+      battleDebris?.step();
       const ages = new Map<VillagerId, number>();
       const named = new Set<VillagerId>();
       for (const villager of shown.people.villagers) {
@@ -1080,7 +1157,7 @@ export async function createGraphicsRenderer(
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
       arrows.update(arrowsOf(life));
       plaza.show(plazaOf(shown), groundFloor);
-      cast.show(lastActors);
+      cast.show(lastActors, life.physics?.ragdolls ?? []);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
       // obstáculos ni geometría física.
@@ -1276,6 +1353,18 @@ export async function createGraphicsRenderer(
       };
     },
 
+    ending() {
+      if (life === null || life.sack === null) return null;
+      const sack = life.sack;
+      return {
+        active: sack.phase !== 'complete',
+        ready: sack.ready,
+        phase: sack.phase,
+        loads: sack.loads,
+        traces: sack.traces,
+      };
+    },
+
     look(x: number, z: number): void {
       if (disposed) return;
       // VZ-6 · lo que §11.5 pide al contestar una decisión: mirar a lo que esa
@@ -1387,6 +1476,9 @@ export async function createGraphicsRenderer(
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      clearBattleDebris();
+      life?.dispose();
+      life = null;
       weather.dispose();
       tells.dispose();
       fauna.dispose();

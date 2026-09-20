@@ -32,7 +32,8 @@ import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } fro
 import { garrisonPlaces, type Manned } from './garrison';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
 import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
-import { createPhysics, type Physics } from './physics';
+import { createPhysics, type Physics, type PhysicsSnapshot } from './physics';
+import type { RagdollSeed } from '../contracts';
 import { commons } from './places';
 import {
   decide, failedSeatKey, freshProgress, moveSeat, noProgress, pauseHere, satisfy, PROGRESS_CHECK, RETHINK, SHUN_STEPS,
@@ -52,6 +53,7 @@ import {
 } from './raiders';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { beginFlight, stepFlight, type Flight } from './flee';
+import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
 import type { Animal } from '@derive/animals';
 import {
   carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
@@ -208,6 +210,14 @@ export interface Village {
    *  leña. Repartidos al amanecer con la semilla del día (`scatter`), y como
    *  el resto de esta capa, no sobreviven a la jornada. */
   readonly props: readonly Prop[];
+  /** D6 · la única escena de saqueo de este asalto, o nada en una jornada normal. */
+  readonly sack: SackSnapshot | null;
+  /** D6 · pose física para el render y la sonda; null antes de cargar Rapier. */
+  readonly physics: PhysicsSnapshot | null;
+  /** Puente estrecho para los escombros Three que comparten este mismo mundo. */
+  battleWorld(): Physics | null;
+  /** Tick del asalto que creó esta jornada; permite conservarla entre días escénicos. */
+  readonly raidTick: number | null;
   /** Un paso de vida para todos. */
   step(phase?: number): void;
   /** Cuántos pasos lleva la jornada. */
@@ -338,6 +348,10 @@ export interface Village {
   };
   /** Qué está haciendo la aldea ahora, para poder contarlo. */
   tally(): Record<string, number>;
+  /** Libera el mundo físico de esta jornada. Idempotente. */
+  dispose(): void;
+  /** Congela la pelea ya informada y deja acabar sólo el saqueo/las físicas. */
+  endBattle(): void;
 }
 
 /**
@@ -375,6 +389,11 @@ export interface DayOptions {
    * Un valle en paz nunca lo pide, que es la promesa de D1: **cero bytes**.
    */
   readonly physics?: Physics | null;
+  /** La misma cota que usa Three para apoyar actores y que Rapier usa de suelo. */
+  readonly ground?: (x: number, z: number) => number;
+  /** Captura síncrona de `fall(0)` en la posición exacta del fixed-step. */
+  readonly ragdollSeed?: (id: number, bornAt: number,
+    placement: { readonly x: number; readonly z: number; readonly facing: number }) => RagdollSeed | null;
 }
 
 /**
@@ -774,6 +793,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // D5 · el portón, como cosa que se rompe. Sólo existe en un asalto: en un
   // saqueo nadie lo toca.
   const gate: Gate | null = assault ? gateNow(state, heart) : null;
+  // D6 · un solo reparto de objetivos para toda la jornada. El renderer
+  // conserva esta Village durante el tick del asalto, así que el amanecer no
+  // vuelve a hacer aparecer a la partida ni duplica sus huellas.
+  const sackScene: SackScene | null = assault ? createSackScene(state, land, raiders) : null;
   // D2 · los arqueros de los puestos de C2, sus flechas, y el mundo físico en el
   // que vuelan. La lista de arqueros se saca una vez: los puestos son de la
   // jornada y no cambian a media jornada.
@@ -795,6 +818,31 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   let flightStarted = false;
   let physics: Physics | null = options.physics ?? null;
   let physicsAsked = physics !== null;
+  let disposed = false;
+  let battleEnded = false;
+  const ragdollKeys = new Set<string>();
+  const pendingRagdolls: RagdollSeed[] = [];
+
+  const flushRagdolls = (): void => {
+    if (physics === null) return;
+    while (pendingRagdolls.length > 0) {
+      const seed = pendingRagdolls.shift();
+      if (seed !== undefined) physics.articulate(seed);
+    }
+  };
+  const queueRagdoll = (id: number, bornAt: number, body: Body, facing = body.facing): void => {
+    const key = `${id}:${bornAt}`;
+    if (ragdollKeys.has(key)) return;
+    const seed = options.ragdollSeed?.(id, bornAt, {
+      x: body.x, z: body.z, facing,
+    }) ?? null;
+    if (seed === null) return;
+    // Un primer fotograma puede no tener todavía el clon del actor. Sólo una
+    // semilla capturada ocupa la clave: el siguiente paso podrá reintentarla.
+    ragdollKeys.add(key);
+    pendingRagdolls.push(seed);
+    flushRagdolls();
+  };
   let wolf: Wolf | null = null;
   let wolfSpawned = false;
   let wolfNoticedThisVisit = false;
@@ -845,6 +893,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     dwellers,
     beasts,
     props,
+    get sack(): SackSnapshot | null { return sackScene === null ? null : sackSnapshot(sackScene); },
+    get physics(): PhysicsSnapshot | null { return physics?.snapshot() ?? null; },
+    battleWorld(): Physics | null { return physics; },
+    raidTick: bandSize === 0 ? null : state.threat.arrivedTick,
     get steps(): number { return steps; },
     get passes(): number { return passes; },
     get timberDeliveries(): number { return timberDeliveries; },
@@ -922,10 +974,37 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       return count;
     },
 
+    dispose(): void {
+      if (disposed) return;
+      disposed = true;
+      physics?.dispose();
+      physics = null;
+    },
+
+    endBattle(): void { battleEnded = true; },
+
     step(phase = 0.45): void {
       const now = steps * LIFE_STEP;
       const starts = dwellers.map(d => ({ x: d.body.x, z: d.body.z, travelled: d.travelled }));
       const raiderStarts = new Map<number, Point>();
+      // D6 · el parte ya entró al motor. Desde aquí no se vuelve a disparar,
+      // pegar ni decidir nada: sólo acaban rutas/cargas y cuerpos físicos con
+      // el mismo paso fijo. Los civiles se quedan donde buscaron refugio (o en
+      // reposo) durante los ocho segundos de desenlace.
+      if (battleEnded) {
+        for (const raider of raiders) {
+          raiderStarts.set(raider.body.id, { x: raider.body.x, z: raider.body.z });
+          stepRaider(raider, land, seed, steps, gate ?? undefined);
+        }
+        if (sackScene !== null) props.push(...sackScene.step(raiders, land, seed, steps));
+        physics?.step();
+        for (const raider of raiders) {
+          const start = raiderStarts.get(raider.body.id);
+          if (start !== undefined) raider.travelled = (raider.travelled ?? 0) + gap(start, raider.body);
+        }
+        steps += 1;
+        return;
+      }
       const liveInvaders = (): Raider[] => raiders.filter((raider) => raider.entered
         && raider.phase !== 'gone' && raider.phase !== 'down');
       // Una vez que el último que entró deja de estar vivo dentro, la reacción
@@ -1705,6 +1784,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         raiderStarts.set(raider.body.id, { x: raider.body.x, z: raider.body.z });
         stepRaider(raider, land, seed, steps, gate ?? undefined);
       }
+      if (sackScene !== null) props.push(...sackScene.step(raiders, land, seed, steps));
 
       // E1 · La entrada que dispara la huida es un cuerpo hostil vivo con
       // `entered`, no la puerta rota ni el recuerdo de uno que ya se fue. Hoy
@@ -1787,11 +1867,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // D2 · **y la muralla contesta.** Un paso de física por paso de vida, que
       // es el matrimonio que D1 dejó montado; las flechas salen de los puestos
       // de C2 y lo que le pasa a quien la recibe lo decide el vuelo (§1b).
-      if (physics === null && !physicsAsked && archers.length > 0 && raidersHere(raiders)) {
+      if (physics === null && !physicsAsked && raidersHere(raiders)) {
         physicsAsked = true;
-        void createPhysics(land).then((world) => { physics = world; });
+        void createPhysics(land, options.ground === undefined ? {} : { ground: options.ground }).then((world) => {
+          if (disposed) world?.dispose();
+          else { physics = world; flushRagdolls(); }
+        });
       }
-      if (physics !== null && (arrows.length > 0 || raidersHere(raiders))) {
+      if (physics !== null && (physics.count > 0 || arrows.length > 0 || raidersHere(raiders))) {
         physics.step();
         // **Y sólo dispara el puesto que tiene a alguien dentro.** Se recalcula
         // cada paso porque el arquero llega, se va a beber y vuelve: lo que
@@ -1829,6 +1912,24 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           defenders.push(defender);
         }
         stepMelee(raiders, defenders, steps);
+      }
+
+      // Física nacida en la transición exacta a `down`, no al FPS al que el
+      // renderer alcance a pintar el clip. Si Rapier sigue cargando, se guarda
+      // la semilla ya posada y se articula cuando llegue el mundo.
+      for (const raider of raiders) {
+        if (raider.phase === 'down') queueRagdoll(raider.body.id, raider.downAt ?? steps, raider.body,
+          raider.meleeFacing ?? raider.body.facing);
+      }
+      for (const [id, defender] of wounded) {
+        if (!defender.down) continue;
+        // `wounded` se indexa por el id persistente del aldeano; `byId` por
+        // diseño usa el id del cuerpo. Coinciden por casualidad al fundar y
+        // divergen en cuanto se recoloca la jornada: buscar el campo correcto
+        // evita sembrar el ragdoll del defensor sobre otro vecino.
+        const dweller = dwellers.find((candidate) => candidate.villager === id);
+        if (dweller !== undefined) queueRagdoll(id, defender.downAt ?? steps, dweller.body,
+          defender.meleeFacing ?? dweller.body.facing);
       }
 
       // El hecho manda sobre el gesto. La caída gana a todo, también en el

@@ -100,10 +100,28 @@ try {
     if (advanceWeeks === 0) {
       const start = new Date();
       await tab.clock.install({ time: start });
-      await tab.clock.pauseAt(new Date(start.getTime() + 100));
+      // Instalar el reloj puede tardar más de 100 ms con WebGL ocupado. El
+      // reset de abajo descarta este margen; nunca pedimos pausar en el pasado.
+      await tab.clock.pauseAt(new Date(start.getTime() + 10_000));
     }
     await tab.evaluate(() => window.__valleyAdvance(0, true));
-    if (lead > 0) await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30));
+    if (lead > 0) {
+      // El reset crea otra Village. Dejar resolver su carga asíncrona antes
+      // del salto evita que 40 s síncronos parezcan 40 s de latencia de Rapier.
+      // Este paso se descuenta del lead: no se mueve la fase de la toma.
+      const warmup = raid !== '' ? 1 : 0;
+      if (warmup) {
+        await tab.evaluate(() => window.__valleyAdvance(1));
+        await tab.waitForFunction(() => {
+          const physics = window.__valleyLife?.()?.physics;
+          return physics !== null && physics !== undefined;
+        },
+          undefined, { polling: 100, timeout: 10_000 }).catch(() => {
+          process.stdout.write('Rapier no disponible: se observa el respaldo animado.\n');
+        });
+      }
+      await tab.evaluate(steps => window.__valleyAdvance(steps), Math.round(lead * 30) - warmup);
+    }
   }
   const frames = [];
   let basePhase = null;

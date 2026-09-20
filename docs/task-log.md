@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · D6 y acabado físico terminados; parada
+
+Saqueo con destino, gesto, carga y huella; transición terminal acotada;
+ragdolls de once segmentos y seis tablas físicas por portón roto. Sol y Terra
+implementan, el principal revisa y graba. La evidencia descubre y corrige rutas
+desde la jamba y mezcla de ids de cuerpo/aldeano al colocar el caído.
+66 pruebas focalizadas, typecheck y lint pasan. Dos aldeas muestran 2/3 cargas
+y huellas, seis tablas y caída articulada de ambos bandos en posición correcta.
+[Evidencia y límites](historico/life-rounds/D6-saqueo-y-fisica.md).
+Sin daño/economía nuevos, sangre, fuego, push ni despliegue. Se termina aquí,
+sin abrir otra tarea; `deliverables/` permanece ajeno y sin tocar.
+
 ## 20 sep 2026 · Puntos 3 y 4: visibilidad y huida terminados
 
 El robledal atenúa sólo los árboles que ocultan el portón y el frente atacante.

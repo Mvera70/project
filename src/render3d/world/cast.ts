@@ -10,11 +10,11 @@
 // shared by every villager in the valley. Disposing a clone must not touch them.
 
 import {
-  AnimationMixer, Color, DoubleSide, Group, LoopOnce, Mesh, MeshBasicMaterial, RingGeometry,
+  AnimationMixer, Color, DoubleSide, Group, LoopOnce, Mesh, MeshBasicMaterial, Quaternion, RingGeometry,
   Vector3, type AnimationClip, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
-import type { Actor } from '../contracts';
+import type { Actor, RagdollPose, RagdollSeed, RagdollSeedPart } from '../contracts';
 import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
 import { clipTime, combatClip, VILLAGER_CLIPS, type ClipName } from '../clips';
@@ -66,10 +66,34 @@ interface Player {
   readonly owned: Material[];
   /** Lo que lleva en la mano, por clip. Vacio si el catalogo no lo tiene. */
   readonly held: Map<string, Object3D>;
+  /** Pose local publicada, para que una jornada nueva no herede traslaciones del ragdoll. */
+  readonly bind: Map<string, { readonly position: Vector3; readonly rotation: Quaternion }>;
   playing: string | null;
   previous: Action | null;
   changedAt: number;
+  ragdolled: boolean;
 }
+
+/**
+ * Las cápsulas siguen el esqueleto publicado, no una segunda figura inventada.
+ * El orden es también el orden de padres: permite reconstruir las matrices
+ * locales después de recibir una pose absoluta de Rapier.
+ */
+const RAGDOLL_SEGMENTS: readonly {
+  readonly bone: string; readonly end: string; readonly parent: string | null;
+}[] = [
+  { bone: 'hips', end: 'spine', parent: null },
+  { bone: 'spine', end: 'head', parent: 'hips' },
+  { bone: 'head', end: 'head', parent: 'spine' },
+  { bone: 'upperarmL', end: 'forearmL', parent: 'spine' },
+  { bone: 'forearmL', end: 'handL', parent: 'upperarmL' },
+  { bone: 'upperarmR', end: 'forearmR', parent: 'spine' },
+  { bone: 'forearmR', end: 'handR', parent: 'upperarmR' },
+  { bone: 'thighL', end: 'shinL', parent: 'hips' },
+  { bone: 'shinL', end: 'footL', parent: 'thighL' },
+  { bone: 'thighR', end: 'shinR', parent: 'hips' },
+  { bone: 'shinR', end: 'footR', parent: 'thighR' },
+];
 
 /**
  * Que se lleva en la mano en cada clip, y en cual.
@@ -261,8 +285,9 @@ export class Cast {
    * treat the list as the whole truth every frame instead of listening for
    * events that a lethargy would swallow.
    */
-  show(actors: readonly Actor[]): void {
+  show(actors: readonly Actor[], ragdolls: readonly RagdollPose[] = []): void {
     const present = new Set<VillagerId>();
+    const physical = new Map(ragdolls.map((pose) => [pose.id, pose]));
 
     for (const actor of actors) {
       present.add(actor.id);
@@ -277,7 +302,7 @@ export class Cast {
         player = {
           model: modelFor(actor),
           object, mixer, actions: new Map(), owned: dress(object, actor.id),
-          held: new Map(), playing: null, previous: null, changedAt: 0,
+          held: new Map(), bind: bindPose(object), playing: null, previous: null, changedAt: 0, ragdolled: false,
         };
         this.players.set(actor.id, player);
         this.group.add(object);
@@ -293,8 +318,11 @@ export class Cast {
       // para recorrer la misma distancia, un adulto realzado necesita menos.
       const seconds = actor.clip === 'walk' || actor.clip === 'carry_walk' || actor.clip === 'flee'
         ? clipTime(actor.clip, actor.travelled / scale, 0, 0) : actor.clipSeconds;
+      const ragdoll = physical.get(actor.id);
+      if (player.ragdolled && ragdoll === undefined) this.leaveRagdoll(player);
       this.pose(player, actor.clip, seconds, actor.poseSeconds ?? actor.clipSeconds);
       this.equip(player, actor);
+      if (ragdoll !== undefined) this.applyRagdoll(player, ragdoll);
     }
 
     for (const id of [...this.players.keys()]) {
@@ -312,6 +340,103 @@ export class Cast {
         lit.object.position.z,
       );
     }
+  }
+
+  /**
+   * Captura la pose canónica de nacimiento de un ragdoll.
+   *
+   * Se evalúa aquí `fall(0)`, aunque el fotograma visible hubiese avanzado:
+   * así suspender una pestaña o pintar a 15/60 fps no cambia el impulso inicial.
+   * La talla ya está en `object.scale`, incluida la de niños y nombrados.
+   */
+  captureRagdoll(id: VillagerId, bornAt: number,
+    placement?: { readonly x: number; readonly z: number; readonly facing: number }): RagdollSeed | null {
+    const player = this.players.get(id);
+    if (player === undefined) return null;
+    if (placement !== undefined) {
+      player.object.position.set(placement.x, this.ground(placement.x, placement.z), placement.z);
+      player.object.rotation.set(0, placement.facing, 0);
+    }
+    this.restoreBind(player);
+    player.mixer.stopAllAction();
+    player.playing = null;
+    player.previous = null;
+    this.pose(player, 'fall', 0, 0);
+    player.object.updateMatrixWorld(true);
+
+    const parts: RagdollSeedPart[] = [];
+    const up = new Vector3(0, 1, 0);
+    for (const segment of RAGDOLL_SEGMENTS) {
+      const bone = player.object.getObjectByName(segment.bone);
+      const endBone = player.object.getObjectByName(segment.end);
+      if (bone === undefined || endBone === undefined) return null;
+      const from = bone.getWorldPosition(new Vector3());
+      let to = endBone.getWorldPosition(new Vector3());
+      // La cabeza no tiene otro hueso por encima. Su cápsula prolonga el
+      // último tramo del cuello a la escala real del rig.
+      if (segment.bone === segment.end) {
+        const neck = player.object.getObjectByName('spine')?.getWorldPosition(new Vector3()) ?? from.clone();
+        const direction = from.clone().sub(neck).normalize();
+        to = from.clone().add(direction.lengthSq() === 0 ? new Vector3(0, 0.08, 0) : direction.multiplyScalar(0.08 * player.object.scale.y));
+      }
+      const length = Math.max(0.025, from.distanceTo(to));
+      const radius = segment.bone === 'head'
+        ? Math.max(0.04 * player.object.scale.y, Math.min(0.06, length * 0.55))
+        : Math.max(0.018, Math.min(0.055, length * 0.24));
+      const bodyRotation = new Quaternion().setFromUnitVectors(up, to.clone().sub(from).normalize());
+      const boneRotation = bone.getWorldQuaternion(new Quaternion());
+      const hingeAxis = new Vector3(1, 0, 0).applyQuaternion(boneRotation).normalize();
+      const centre = from.clone().add(to).multiplyScalar(0.5);
+      parts.push({
+        bone: segment.bone,
+        parent: segment.parent,
+        joint: { x: from.x, y: from.y, z: from.z },
+        hingeAxis: { x: hingeAxis.x, y: hingeAxis.y, z: hingeAxis.z },
+        body: {
+          at: { x: centre.x, y: centre.y, z: centre.z },
+          rotation: { x: bodyRotation.x, y: bodyRotation.y, z: bodyRotation.z, w: bodyRotation.w },
+          halfLength: Math.max(0.006, length / 2 - radius), radius,
+        },
+        boneAt: { x: from.x, y: from.y, z: from.z },
+        boneRotation: { x: boneRotation.x, y: boneRotation.y, z: boneRotation.z, w: boneRotation.w },
+      });
+    }
+    return { id, bornAt, parts };
+  }
+
+  /** Pasa una pose mundial de Rapier al espacio local de cada hueso. */
+  private applyRagdoll(player: Player, pose: RagdollPose): void {
+    player.object.updateMatrixWorld(true);
+    for (const part of pose.bones) {
+      const bone = player.object.getObjectByName(part.name);
+      if (bone === undefined || bone.parent === null) continue;
+      const worldAt = new Vector3(part.at.x, part.at.y, part.at.z);
+      bone.position.copy(bone.parent.worldToLocal(worldAt));
+      const parentRotation = bone.parent.getWorldQuaternion(new Quaternion()).invert();
+      bone.quaternion.copy(parentRotation.multiply(new Quaternion(
+        part.rotation.x, part.rotation.y, part.rotation.z, part.rotation.w,
+      )));
+      bone.updateMatrixWorld(true);
+    }
+    player.ragdolled = true;
+  }
+
+  private restoreBind(player: Player): void {
+    for (const [name, bind] of player.bind) {
+      const bone = player.object.getObjectByName(name);
+      if (bone === undefined) continue;
+      bone.position.copy(bind.position);
+      bone.quaternion.copy(bind.rotation);
+    }
+    player.object.updateMatrixWorld(true);
+  }
+
+  private leaveRagdoll(player: Player): void {
+    this.restoreBind(player);
+    player.mixer.stopAllAction();
+    player.playing = null;
+    player.previous = null;
+    player.ragdolled = false;
   }
 
   /**
@@ -512,4 +637,14 @@ function dress(object: Object3D, id: number): Material[] {
     owned.push(copy);
   });
   return owned;
+}
+
+/** Copia pequeña de la pose local con la que llegó el GLB. */
+function bindPose(object: Object3D): Map<string, { readonly position: Vector3; readonly rotation: Quaternion }> {
+  const bind = new Map<string, { readonly position: Vector3; readonly rotation: Quaternion }>();
+  object.traverse((node) => {
+    if (node.type !== 'Bone') return;
+    bind.set(node.name, { position: node.position.clone(), rotation: node.quaternion.clone() });
+  });
+  return bind;
 }

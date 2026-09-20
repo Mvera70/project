@@ -185,7 +185,11 @@ export function castOf(
     const clip = raider.phase === 'down' ? 'fall'
       : melee !== null ? melee.clip
         : raider.phase === 'breaking' && raider.blowAt !== undefined ? 'gate_strike'
-        : moving ? 'walk' : 'idle';
+          // D6 · el saqueo tiene cuerpo: remover/cargar ante el edificio y
+          // volver con el bulto en la mano. No se concede la carga durante el
+          // camino de ida; `sack.ts` sólo la pone al completar el gesto.
+          : raider.phase === 'sacking' ? 'sort'
+             : moving ? raider.load === null || raider.load === undefined ? 'walk' : 'carry_walk' : 'idle';
     const since = clip === 'fall' ? raider.downAt ?? 0 : melee?.since ?? raider.blowAt ?? 0;
     const cellX = Math.max(0, Math.min(width - 1, Math.floor(body.x)));
     const cellZ = Math.max(0, Math.min(life.land.height - 1, Math.floor(body.z)));
@@ -199,7 +203,7 @@ export function castOf(
       // casa a la que volver.
       activity: moving ? 'walking' : 'resting',
       clip,
-      load: null,
+      load: raider.load ?? null,
       poseSeconds: seconds,
       clipSeconds: clipTime(clip, raider.travelled ?? 0, combatSeconds, 0,
         clip === 'fall' || clip === 'gate_strike' || melee !== null ? since * LIFE_STEP : undefined),

@@ -34,6 +34,7 @@ import { persistSave } from './idb';
 import { recogniseGesture, type Point } from './gestures';
 import { checkpointSavedAtMs, runLethargy } from './lethargy';
 import { startLoop, type Loop } from './loop';
+import { startStormedTransition, type StormedTransition } from './stormed-transition';
 import { milestonesAt } from './milestones';
 import { doingNow, gateNow } from './doing';
 import { noticeText } from './notice';
@@ -1075,6 +1076,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // §13.1: a snapshot and the decision log, every 20 ticks and whenever the
   // tab is hidden. M-25 also writes immediately on ending and beginning again.
   let loop: Loop | undefined;
+  let endingTransition: StormedTransition | null = null;
+  let finishing = false;
   let saveQueue = Promise.resolve();
   // During catch-up, a partial state is only as current as the ticks it has
   // actually processed. The checkpoint clock preserves the remaining debt if
@@ -1107,7 +1110,11 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // `tools/shots/valley.shots.ts`, que cuenta los ticks de verdad.
     if (resumption.ticks > 0) catchUpFor(Date.now() - since, resumption.welcome, speed);
   });
-  window.addEventListener('pagehide', () => { persist(); loop?.stop(); }, { once: true });
+  window.addEventListener('pagehide', () => {
+    persist();
+    loop?.stop();
+    endingTransition?.cancel();
+  }, { once: true });
 
   // The queue behind `decide` (v2.60). `runTick` is the one and only place a
   // queued decision is ever spent: it hands it to `tick`, which applies it at
@@ -1127,8 +1134,14 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
    */
   let pendingActs: PlayerAct[] = [];
   const finish = (): void => {
-    if (state.ended === null) return;
+    if (state.ended === null || finishing) return;
+    finishing = true;
     loop?.stop();
+    loop = undefined;
+    // La jornada terminal sigue pasos físicos fijos, pero el último `paint`
+    // heredaba x64 de la partida y hacía que el saqueo se leyera como un salto.
+    // La derrota se mira a velocidad humana desde el primer fotograma.
+    app.setSpeed(1);
     // VZ-02 · el valle calla: aquí habla el epitafio (§13.3).
     voice = SILENT;
     closeCrossroad();
@@ -1138,8 +1151,12 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       game = archiveGame(state);
       archive.push(game);
     }
+    // El resultado queda en disco antes de que empiece cualquier demora
+    // visual. Cerrar la pestaña durante la escena no puede resucitar el valle.
     persist();
-    openEpitaph(app, game, () => {
+    const openFinal = (): void => openEpitaph(app, game!, () => {
+      endingTransition?.cancel();
+      endingTransition = null;
       state = foundSuccessor(game, freshSeed(new Set(archive.map((item) => item.seed))));
       pendingDecision = undefined;
       lastFraction = 0;
@@ -1149,8 +1166,25 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       app.setSpeed(1);
       paint(0);
       persist();
+      finishing = false;
       beginLoop();
     });
+
+    // D6 · sólo una derrota `stormed` nacida en esta sesión puede tener una
+    // escena viva. Canvas, una recarga terminal y el gancho de captura sin
+    // asalto real devuelven `null` y abren el epitafio inmediatamente. El
+    // motor ya está parado: estos RAF sólo vuelven a pintar la misma Village,
+    // cuyo renderer avanza la vida efímera con `realDeltaSeconds`.
+    if (state.ended.cause === 'stormed') {
+      endingTransition = startStormedTransition({
+        reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        ending: () => backend.live.ending(),
+        paint: () => paint(lastFraction),
+        complete: openFinal,
+      });
+    } else {
+      openFinal();
+    }
   };
   /**
    * F3 · **Acabar la partida desde fuera, para poder fotografiar el final.**

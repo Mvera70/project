@@ -104,7 +104,13 @@ es divertido, y el resultado es el que sale.
 | ~~D3 · El bando hostil~~ · **entera el 18 sep 2026**. Primera mitad: llegan por el camino y se plantan (10 valles, 120 cuerpos, cero colgados). Segunda: **un asalto va a por la puerta** —el motor lo distingue de un saqueo (B3)—, se apretujan contra la hoja y la golpean, y si cede entran y van al corazón del pueblo. Medido en el navegador (semilla 7, siete puestos con arcos): llegan cinco a la puerta a los 18,5 s, meten **18 golpes de los 60** y las flechas se los comen — los doce en el suelo a los 24,5 s y el valle aguanta. Sin arcos la puerta cae en 18–31 s y entran los doce. **Falta lo que hacen dentro** (D4, D6) | Hecho | Alta | — | — |
 | ~~D4 · Cuerpo a cuerpo~~ · **el núcleo, hecho el 18 sep 2026**: `life/melee.ts`. Lo que decide es **la distancia** —el alcance de un brazo, 0,9 celdas, muy por debajo del empujón contra el portón— y las dos armas no valen igual: el de la lanza devuelve todos los golpes y **el arquero la mitad**, que es el defecto clásico del arquero y lo que hace que una muralla necesite las dos cosas (C1). Doce contra uno acaban con él. A quien cae se le acaba la jornada ahí, y el motor lo entierra cuando lee el parte (B4, `lost`, que **deja de ser cero**). Medido: de 0 a 3 bajas propias por asalto en cuatro valles × dos maneras. **Falta el ragdoll** —los cuerpos de la gente no son cuerpos de Rapier todavía, y eso es una tanda entera— y los clips (E1: `spear_thrust`, `hit_take`, `fall`) | Hecho (el núcleo) | Alta | — | D3 |
 | ~~D5 · Lo que se rompe~~ · **el portón, hecho el 18 sep 2026**: aguanta sesenta golpes y los golpes son **manos**, así que matar a la mitad de la partida dobla lo que tarda en caer — es la carrera de la fase 4, y los dos números están elegidos contra la arquería de D2 medida. Cuando cede, el parte de B4 dice `breached` y **la partida se acaba**; el boquete en el anillo lo abre el motor (`THREAT.BREACH`). **Falta lo que arde**: las casas durante el asalto son E4 y es decisión del dueño | Hecho (el portón) | Media-alta | — | A2, D3 |
-| D6 · El saqueo | La escena de cuando cae: la entrada, la gente, el final que se ve | P3 | Alta | Astra | D4, D5, B3 |
+| ~~D6 · El saqueo~~ | **20 sep 2026:** destinos alcanzables, gesto, cargas y huellas, salida y transición terminal acotada. Sin pérdidas económicas adicionales. [Evidencia y límites](historico/life-rounds/D6-saqueo-y-fisica.md) | Hecho | Alta | — | D4, D5, B3 |
+
+**Acabado físico, 20 sep:** se cierra el ragdoll que el registro de D4 del
+18 sep dejaba pendiente: once segmentos por cuerpo, terreno y obstáculos,
+reposo acotado y caída animada de respaldo. La hoja rota de D5 conserva el
+marco y produce seis tablas físicas. Ni sangre ni fuego ni persistencia entre
+jornadas forman parte de este cierre.
 
 ### E · Arte y animación (sesión de arte)
 
@@ -114,7 +120,8 @@ con conducta civil de refugio y carrera procedural.
 Los siete modelos de la primera tanda están aceptados e integrados en el juego
 (20 sep). También se corrige D4 sin arqueros: ya no depende de inicializar Rapier.
 [Integración y defensa](historico/life-rounds/E2-integracion-y-defensa.md).
-E2/E3 siguen parciales: faltan identidad del clan, adarve y portón roto.
+  E2/E3 siguen parciales: faltan identidad del clan y adarve. La rotura del
+  portón queda resuelta por código en D6, sin requerir otra variante GLB.
 
 **El arte sigue parcial:** los siete gestos de E1 tienen representación
 procedural; no son nuevos clips embebidos en el GLB.

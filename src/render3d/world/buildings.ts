@@ -52,6 +52,14 @@ export interface BuildingModel {
   weather(snow: number, colour: string): void;
   face?(radians: number): void;
   door?(open: boolean, seconds: number): void;
+  /**
+   * D6 · El portón que cedió deja de cerrar visualmente el paso.
+   *
+   * Es una marca de esta escena, no una ruina del motor: el parte de batalla
+   * decide después qué le ocurre a la partida. Por eso una escena nueva nace
+   * otra vez con su hoja puesta.
+   */
+  break?(): void;
   dispose(): void;
 }
 
@@ -208,6 +216,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   }
   const roofs = roofsOf(model);
   const snowy = new Color();
+  let broken = false;
   return {
     object: group,
     face(radians: number): void {
@@ -217,9 +226,18 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
       group.position.z = planned.z + planned.h / 2 - Math.sin(radians) * dx + Math.cos(radians) * dz;
     },
     door(open: boolean, seconds: number): void {
+      if (broken) return;
       const target = open ? -Math.PI / 2 : 0;
       const delta = Math.max(0, Math.min(1, seconds * 4));
       hinge.rotation.y += (target - hinge.rotation.y) * delta;
+    },
+    break(): void {
+      broken = true;
+      // La hoja sale como tablas físicas en `battle-debris.ts`. Conservar el
+      // marco deja que el boquete se lea como puerta rota, no como un tramo de
+      // muralla que desapareció por un fallo de reconstrucción.
+      if (doorMesh !== undefined) hinge.visible = false;
+      else model.visible = false;
     },
     weather(snow: number, colour: string): void {
       for (const roof of roofs) {
@@ -275,6 +293,13 @@ function buildBuilding(planned: PlannedBuilding): BuildingModel {
       // La caja de reserva no nieva. Es geometria provisional y pintarla de
       // blanco no la haria menos provisional.
     },
+    break(): void {
+      // La caja es sólo el respaldo de un catálogo incompleto; si la escena
+      // llega aquí, mostrarla entera tras los cascotes haría parecer intacto
+      // el portón. El recurso publicado conserva el marco por la rama de
+      // arriba.
+      group.visible = false;
+    },
     dispose(): void {
       for (const thing of owned) thing.dispose();
     },
@@ -291,6 +316,8 @@ export class Village {
   readonly group = new Group();
   private readonly models = new Map<BuildingId, BuildingModel>();
   private readonly gateRecoils = new Map<BuildingId, { x: number; z: number; axis: 'x' | 'z'; object: Group }>();
+  /** Portones que han cedido en esta escena efímera. */
+  private readonly brokenGates = new Set<BuildingId>();
   /**
    * Tiempo real mínimo que una puerta sigue visible después de un paso.
    *
@@ -327,7 +354,10 @@ export class Village {
   }
 
   add(planned: PlannedBuilding): void {
-    this.remove(planned.id);
+    // `add` reemplaza una malla durante la misma escena (nieve, ruina, cambio
+    // de recurso). No puede resucitar una hoja que ya rompió la física. Sólo
+    // `clear`, al abrir otra escena, olvida esa marca efímera.
+    this.remove(planned.id, false);
     // Quien decide el recurso es el plan, no esto: el campo cambia con la
     // cosecha y el plan es quien sabe en que semana estamos.
     const source = planned.asset === null ? undefined : this.instance?.(planned.asset);
@@ -348,7 +378,28 @@ export class Village {
     // Una casa levantada en enero nace nevada, no en verano hasta que cambie la
     // estación.
     model.weather(this.snow, this.snowColour);
+    if (planned.kind === 'gate' && this.brokenGates.has(planned.id)) model.break?.();
     this.group.add(model.object);
+  }
+
+  /**
+   * D6 · Quita la hoja una sola vez cuando la física abre el boquete.
+   *
+   * El booleano distingue la transición de las lecturas repetidas de
+   * `gate.broken`; el renderer puede usarlo para no crear dos tandas de tablas
+   * en el mismo paso ni al repintar el mismo fotograma.
+   */
+  breakGate(id: BuildingId): boolean {
+    if (this.brokenGates.has(id)) return false;
+    const model = this.models.get(id);
+    if (model === undefined) return false;
+    this.brokenGates.add(id);
+    model.break?.();
+    // Conservamos su pose aunque la hoja ya esté oculta. La escena sigue
+    // leyendo `gate.broken` durante muchos fotogramas: quitar esta entrada
+    // haría que una búsqueda por posición escogiera el siguiente portón del
+    // anillo y lo rompiera por error.
+    return true;
   }
 
   entrances(entries: ReadonlyMap<number, number>): void {
@@ -368,9 +419,10 @@ export class Village {
   }
 
   /** Transformaciones reales para contrastar el píxel con el contacto en la traza. */
-  gatePoses(): { id: number; x: number; z: number; offset: number[]; rotation: number[] }[] {
+  gatePoses(): { id: number; x: number; z: number; axis: 'x' | 'z'; offset: number[]; rotation: number[] }[] {
     return [...this.gateRecoils].map(([id, gate]) => ({ id, x: gate.x, z: gate.z,
-      offset: gate.object.position.toArray(), rotation: [gate.object.rotation.x, gate.object.rotation.y, gate.object.rotation.z] }));
+      axis: gate.axis, offset: gate.object.position.toArray(),
+      rotation: [gate.object.rotation.x, gate.object.rotation.y, gate.object.rotation.z] }));
   }
 
   /** E1 · Sacudida absoluta desde el contacto, sin acumulación entre pintados. */
@@ -387,7 +439,7 @@ export class Village {
     }
   }
 
-  remove(id: BuildingId): void {
+  remove(id: BuildingId, forgetBroken = true): void {
     const model = this.models.get(id);
     if (model === undefined) return;
     this.group.remove(model.object);
@@ -395,10 +447,14 @@ export class Village {
     this.models.delete(id);
     this.gateRecoils.delete(id);
     this.doorHolds.delete(id);
+    if (forgetBroken) this.brokenGates.delete(id);
   }
 
   clear(): void {
     for (const id of [...this.models.keys()]) this.remove(id);
+    // Una jornada/escena nueva no hereda física efímera de la anterior. La
+    // simulación decide de nuevo si hay portón y si llega a romperse.
+    this.brokenGates.clear();
   }
 
   get count(): number {
