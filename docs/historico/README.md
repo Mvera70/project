@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [E0b: el mensajero trae el aviso](life-rounds/E0b-aviso.md): corte de escena
+  post-decisión, regreso físico y evidencia del flujo real modal→tick en 7/23.
+
 - [E0a: la aldea se prepara](life-rounds/E0a-preparacion.md): evidencia de
   acopio visible, ganado replegado y convivencia con la guarnición antes del asedio.
 

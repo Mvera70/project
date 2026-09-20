@@ -229,7 +229,7 @@ const OPEN_COUNTRY = 22;
  * gastado (`map.path`) a propósito: un valle joven no tiene camino, y la
  * partida no deja de venir por eso.
  */
-function roadInto(land: Terrain, gate: Point, reach: Uint8Array): Point | null {
+export function roadInto(land: Terrain, gate: Point, reach: Uint8Array): Point | null {
   let best: Point | null = null;
   let bestFar = MIN_ENTRY;
   for (let z = 0; z < land.height; z += 1) {
@@ -242,6 +242,13 @@ function roadInto(land: Terrain, gate: Point, reach: Uint8Array): Point | null {
     }
   }
   return best;
+}
+
+/** La misma entrada exterior que usaría la partida el día del asalto. */
+export function approachOf(state: GameState, land: Terrain, heart: Point): Point | null {
+  const gate = gateOf(state, heart);
+  const outside = outsideOf(land, gate, heart);
+  return outside === null ? null : roadInto(land, gate, outside);
 }
 
 /**

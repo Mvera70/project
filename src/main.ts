@@ -3,7 +3,8 @@ import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
 import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear,
-  parseDebugRequest, raidNow, bracedNow, comingNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
+  parseDebugRequest, raidNow, bracedNow, comingNow, warningNow, warningPendingNow,
+  runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -113,6 +114,9 @@ if (root) {
     // `&coming=2` deja la misma víspera sin prepararse, para compararla.
     const coming = query.get('coming');
     if (coming !== null) comingNow(state, Number(coming) || 1);
+    const warning = query.get('warning');
+    if (warning === 'pending') warningPendingNow(state);
+    else if (warning !== null) warningNow(state, Number(warning) || 8);
     const braced = query.get('braced');
     if (braced !== null) bracedNow(state, Number(braced) || 1);
     const crown = query.get('crown');

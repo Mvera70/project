@@ -229,6 +229,23 @@ export function comingNow(state: GameState, weeks = 1): void {
   state.threat.comingBand = Math.max(state.threat.comingBand, 20);
 }
 
+/** E0b · Primer estado visible después de resolver B2, para observar el regreso. */
+export function warningNow(state: GameState, weeks = 8): void {
+  comingNow(state, weeks);
+  state.crossroad = null;
+  state.history.push({
+    tick: state.tick, templateId: 'raiders_coming', optionId: 'brace', cast: {},
+  });
+}
+
+/** E0b · Modal B2 auténtica para probar el corte y decidirla en navegador. */
+export function warningPendingNow(state: GameState, weeks = 8): void {
+  comingNow(state, weeks);
+  state.crossroad = {
+    templateId: 'raiders_coming', posedTick: state.tick, cast: {}, optionIds: ['brace', 'wait'],
+  };
+}
+
 /**
  * E0a · `?braced=` ya representa la decisión completa, no sólo una víspera.
  * `?coming=` conserva el control de comparación con la misma amenaza sin la

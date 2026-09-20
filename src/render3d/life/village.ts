@@ -12,7 +12,7 @@ import { homeRoutine, indoors, isNight, stepHome, type HomeRoutine } from './hom
 import { statureAt } from '../world/models';
 import { VILLAGER_CLIPS } from '../clips';
 import type { GameState, Trait, VillagerId } from '@engine/state';
-import { DAY, FOOD } from '@engine/balance';
+import { DAY, FOOD, TIME } from '@engine/balance';
 import { population } from '@engine/people/demography';
 import { opinionOf } from '@engine/people/opinions';
 import { ageOf } from '@engine/people/villagers';
@@ -49,8 +49,9 @@ import { LIFE_STEP, seedOfDay } from './clock';
 import { createBeasts, stepBeasts, WOLF_ALARM_RADIUS, type Beast } from './beasts';
 import {
   anyEntered, assaultToday, createRaiders, gateNow, raidToday, raidersHere, stepRaider,
-  type Gate, type Raider,
+  approachOf, type Gate, type Raider,
 } from './raiders';
+import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
@@ -85,6 +86,8 @@ const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
+  /** E0b · aviso físico exclusivo de esta jornada; nunca sale al motor. */
+  warning?: SiegeWarning;
   /** Pose fechada por la vida, no por el mixer; `since` son pasos de jornada. */
   combat?: { clip: 'bow_draw' | 'bow_loose' | 'spear_thrust' | 'hit_take' | 'fall'; since: number; facing: number };
   /** E1: huida efímera de esta jornada; no es combate ni estado del motor. */
@@ -772,6 +775,43 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     };
     dweller.rethinkAt = GIVE_UP;
   }
+  // E0b · La modal tapa el tramo de salida. El primer fotograma honesto es el
+  // de después de decidir: sólo el último registro B2 de este tick abre la
+  // vuelta, nunca una modal pendiente ni un aviso viejo.
+  const lastDecision = state.history.at(-1);
+  const warningWindow = warningActive(lastDecision?.templateId, state.tick, state.threat.comingTick)
+    && lastDecision?.tick === state.tick
+    // Un tick contiene siete jornadas escénicas. Sin esta puerta, reconstruir
+    // el martes volvía a mandar al mismo mensajero porque el historial seguía
+    // diciendo «esta semana». El aviso sólo pertenece al primer día visible.
+    && day === state.tick * TIME.DAYS_PER_WEEK;
+  const approach = warningWindow
+    ? approachOf(state, land, heart)
+    : null;
+  const warningPorters = new Set(preparationTrips.map((trip) => trip.villager));
+  if (approach !== null) {
+    const messenger = dwellers
+      .filter((dweller) => dweller.ageGroup !== 'child'
+        && !indoors(dweller)
+        && !isPost(dweller.dayPlan?.job?.place ?? '')
+        && !warningPorters.has(dweller.villager)
+        && dweller.holding === null
+        && dweller.flight === null
+        && dweller.scene === null
+        && dweller.quarrel === null
+        && dweller.needs.rest < 0.9
+        && dweller.needs.thirst < 0.9)
+      .sort((a, b) => a.villager - b.villager)[0];
+    if (messenger !== undefined) {
+      const warning = beginWarning(messenger.body, land, approach, heart, 0);
+      if (warning !== null) {
+        messenger.warning = warning;
+        messenger.doing = null;
+        messenger.faceAnchor = { x: messenger.body.x, z: messenger.body.z };
+        messenger.rethinkAt = GIVE_UP;
+      }
+    }
+  }
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
 
   // Checklist IA-1, punto 6: lo que `noProgress()` (`decide.ts`) necesita
@@ -1212,6 +1252,26 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.doing = null;
           dweller.flight = null;
           continue;
+        }
+
+        // E0b · El aviso se mueve antes de que el día normal elija oferta. Al
+        // terminar limpia su propio estado y vuelve al reparto sin tocar el
+        // estado congelado del motor.
+        if (dweller.warning !== undefined) {
+          if (!warningWindow) {
+            delete dweller.warning;
+            dweller.rethinkAt = steps;
+            continue;
+          }
+          const before = { x: body.x, z: body.z };
+          const active = stepWarning(body, dweller.warning, land, around);
+          const distance = gap(before, body);
+          dweller.travelled += distance;
+          dweller.motionSpeed = distance / LIFE_STEP;
+          dweller.faceAnchor = { x: body.x, z: body.z };
+          if (active) continue;
+          delete dweller.warning;
+          dweller.rethinkAt = steps;
         }
 
         // E1 · Una huida ya empezada manda sobre la rutina, la casa nocturna y

@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · E0b, el mensajero trae el aviso
+
+B2 ya tiene escena física: al cerrar la modal, un adulto vuelve a pie desde el
+acceso real del clan durante la primera jornada posterior y desemboca en el
+reparto/reunión normal. Astra autoriza la modal como corte de escena; dentro de
+la vuelta no hay saltos. La revisión detectó y corrigió dos fallos del primer
+prototipo: el relevo del renderer anulaba el origen en una partida continua y
+el historial semanal repetía al mensajero cada amanecer. Flujo real modal→tick
+validado en 7/23: máximo uno, controles cero, sin reaparición el segundo día,
+errores, bloqueos, penetraciones ni deriva. 21 pruebas focalizadas, typecheck y
+lint verdes. [Evidencia y límites](historico/life-rounds/E0b-aviso.md). E0 sigue
+abierto por pago, semana posterior y transiciones de muralla.
+
 ## 20 sep 2026 · E0a, la aldea se prepara
 
 La decisión `raiders_coming:brace` ya se ve mientras la partida sigue en

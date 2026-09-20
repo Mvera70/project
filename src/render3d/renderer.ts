@@ -799,10 +799,17 @@ export async function createGraphicsRenderer(
         screen: screen(dweller.body.x, dweller.body.z),
         home: dweller.home ?? null,
         residence: dweller.residence ?? null,
-        routePoints: (dweller.flight?.route
+        routePoints: (dweller.warning?.route
+          ?? dweller.flight?.route
           ?? (dweller.residence?.stage !== 'day' && dweller.residence !== undefined
             ? dweller.residence.route : dweller.doing?.route ?? []))
           .map(point => ({ ...point, screen: screen(point.x, point.z) })),
+        warning: dweller.warning === undefined ? null : {
+          since: dweller.warning.since,
+          origin: { ...dweller.warning.origin },
+          phase: dweller.warning.phase,
+          route: dweller.warning.route.length,
+        },
         flight: dweller.flight === null || dweller.flight === undefined ? null : {
           since: dweller.flight.since,
           target: { ...dweller.flight.target },
@@ -1029,6 +1036,16 @@ export async function createGraphicsRenderer(
           for (const person of life.dwellers) {
             const old = previous.dwellers.find(other => other.villager === person.villager);
             if (old === undefined || !fitsCircle(life.land, old.body.x, old.body.z, person.body.radius)) continue;
+            // E0b · cerrar la encrucijada es un corte de escena: la modal tapa
+            // el tramo en que el mensajero salió, y la primera imagen posterior
+            // lo reconstruye ya en el acceso real. La conservación general de
+            // cuerpos anularía justo ese encuadre y le daría una ruta que nace
+            // a veinte celdas de donde está. Sólo este actor conserva el origen
+            // nuevo; todos los demás mantienen la continuidad de siempre.
+            if (person.warning !== undefined) {
+              person.faceAnchor = { x: person.body.x, z: person.body.z };
+              continue;
+            }
             Object.assign(person.body, { x: old.body.x, z: old.body.z, facing: old.body.facing, vx: old.body.vx, vz: old.body.vz });
             person.travelled = old.travelled;
             if (person.residence !== undefined && old.residence?.building === person.residence.building) {
@@ -1604,6 +1621,8 @@ interface LifeSnapshot {
     readonly ageGroup: string;
     readonly home: { readonly x: number; readonly z: number } | null;
     readonly routePoints: readonly ObservedPoint[]; readonly partners: readonly number[];
+    readonly warning: null | { readonly since: number; readonly origin: { readonly x: number; readonly z: number };
+      readonly phase: 'return'; readonly route: number };
     readonly flight: null | { readonly since: number;
       readonly target: { readonly x: number; readonly z: number }; readonly sheltered: boolean };
     readonly x: number; readonly z: number;

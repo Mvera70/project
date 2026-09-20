@@ -53,16 +53,18 @@ try {
   // bandera para la toma de control.
   const braced = opt('braced', '');
   const coming = opt('coming', '');
+  const warning = opt('warning', '');
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
   const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== ''
-    || braced !== '' || coming !== '' || assault !== '';
+    || braced !== '' || coming !== '' || warning !== '' || assault !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
       + (crown === '' ? '' : `&crown=${crown}`)
       + (raid === '' ? '' : `&raid=${raid}`)
       + (coming === '' ? '' : `&coming=${coming}`)
+      + (warning === '' ? '' : `&warning=${warning}`)
       + (braced === '' ? '' : `&braced=${braced}`)
       + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
@@ -97,6 +99,14 @@ try {
   // no hace avanzar la simulación mientras se escribe el PNG.
   if (live) {
     await tab.evaluate(() => window.__valleyObserveLive());
+    // E0b · una decisión tapa los controles. Resolverla primero reproduce el
+    // flujo real (modal → tick → escena) y evita que el observatorio espere un
+    // botón de velocidad que está correctamente oculto detrás de la modal.
+    const openingDecision = tab.locator('.crossroad-options button').first();
+    if (await openingDecision.isVisible()) {
+      await openingDecision.click();
+      await tab.clock.runFor(100);
+    }
     await tab.locator('.valley-speed-badge').click();
     await tab.getByRole('button', { name: `${speed}×`, exact: true }).evaluate(button => button.click());
     if (lead > 0) await tab.clock.runFor(lead * 1000);
