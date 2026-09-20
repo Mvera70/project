@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 21 sep 2026 · E0d, transiciones de muralla visibles
+
+`ScenePlan` separa obras activas de edificios terminados y el renderer mantiene
+sus solares procedurales en un registro propio. Una obra `gate`/`wall` que
+sustituye una empalizada oculta sólo la fuente, recompone las defensas vecinas y
+deja el hueco con base y estructura por etapas; al terminar, el solar se libera
+y entra el edificio final. No toca estado, colisiones, navegación ni ritmo. La
+sonda `--wallwork gate|wall --progress` parte de una estaca real. 11 pruebas
+focalizadas, typecheck y lint verdes; capturas/trazas en
+`artifacts/graphics/E0d/seed-7-*`, sin errores. [Informe](historico/life-rounds/E0d-transiciones-muralla.md).
+
 ## 20 sep 2026 · E0c, la semana posterior al saqueo
 
 La única semana posterior a un saqueo deja dos o tres cargas fijas junto a un

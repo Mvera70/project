@@ -269,6 +269,24 @@ export function aftermathNow(state: GameState, beast = false): void {
   });
 }
 
+/** E0d · Obra real sobre una estaca existente, sólo para observar su transición. */
+export function wallWorkNow(state: GameState, kind: 'gate' | 'wall', progress = 0.35): void {
+  const source = state.buildings.find((building) => building.kind === 'palisade' && building.lostTick === null);
+  if (source === undefined) return;
+  if (progress >= 1) {
+    source.kind = kind;
+    source.tier = kind === 'wall' ? 1 : 0;
+    return;
+  }
+  const cost = 100;
+  state.works = [{
+    id: Math.max(0, ...state.works.map((work) => work.id), ...state.buildings.map((building) => building.id)) + 1,
+    kind, x: source.x, y: source.y, w: source.w, h: source.h, bpCost: cost,
+    bpDone: Math.max(0, Math.min(cost, Math.round(progress * cost))), stoneDone: 0,
+    materialsPaid: true, startedTick: state.tick, upgradeOf: source.id,
+  }];
+}
+
 /**
  * F3d · **Un archivo con partidas dentro, para poder fotografiar el cronicón.**
  *

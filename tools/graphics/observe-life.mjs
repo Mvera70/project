@@ -59,10 +59,12 @@ try {
   // así control y caso se comparan con idéntica partida y encuadre.
   const aftermathControl = args.includes('--aftermath-control') ? '1' : '';
   const beast = args.includes('--beast') ? '1' : '';
+  const wallwork = opt('wallwork', '');
+  const progress = opt('progress', '');
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
   const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== ''
-    || braced !== '' || coming !== '' || warning !== '' || assault !== '' || aftermath !== '' || aftermathControl !== '';
+    || braced !== '' || coming !== '' || warning !== '' || assault !== '' || aftermath !== '' || aftermathControl !== '' || wallwork !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
@@ -74,6 +76,8 @@ try {
       + (aftermath === '' ? '' : `&aftermath=${aftermath}`)
       + (aftermathControl === '' ? '' : '&aftermath=0')
       + (beast === '' ? '' : `&beast=${beast}`)
+      + (wallwork === '' ? '' : `&wallwork=${wallwork}`)
+      + (progress === '' ? '' : `&progress=${progress}`)
       + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }

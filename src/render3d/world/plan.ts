@@ -14,7 +14,7 @@ import { defenceGates } from '@derive/defence-gates';
 // game throws everything away, that painting twice as many frames changes
 // nothing. The picture still needs looking at. The bookkeeping does not.
 
-import type { Building, BuildingId, BuildingKind, GameState, ValleyMap } from '@engine/state';
+import type { Building, BuildingId, BuildingKind, ConstructionWork, GameState, ValleyMap } from '@engine/state';
 import { TIME } from '@engine/balance';
 import { SEASONS, clockOf, weekOf } from '@engine/time';
 import { BUILDING_ASSETS } from './buildings';
@@ -61,6 +61,19 @@ export interface ScenePlan {
   /** Cambia al adelgazar una copa o avanzar una etapa de rebrote. */
   readonly forest: number;
   readonly buildings: readonly PlannedBuilding[];
+  /** Obras separadas de lo terminado: no comparten id ni registro de render. */
+  readonly works: readonly PlannedWork[];
+}
+
+export interface PlannedWork {
+  readonly id: number;
+  readonly kind: BuildingKind;
+  readonly x: number;
+  readonly z: number;
+  readonly w: number;
+  readonly h: number;
+  readonly upgradeOf: BuildingId | null;
+  readonly progress: number;
 }
 
 export interface PlanChange {
@@ -70,6 +83,13 @@ export interface PlanChange {
   readonly added: readonly PlannedBuilding[];
   readonly changed: readonly PlannedBuilding[];
   readonly removed: readonly BuildingId[];
+  readonly works: WorkChange;
+}
+
+export interface WorkChange {
+  readonly added: readonly PlannedWork[];
+  readonly changed: readonly PlannedWork[];
+  readonly removed: readonly number[];
 }
 
 /**
@@ -163,8 +183,21 @@ function plannedFrom(building: Building, tick: number): PlannedBuilding {
   };
 }
 
+function plannedWork(work: ConstructionWork): PlannedWork {
+  return {
+    id: work.id, kind: work.kind, x: work.x, z: work.y, w: work.w, h: work.h,
+    upgradeOf: work.upgradeOf,
+    progress: Math.max(0, Math.min(1, work.bpCost <= 0 ? 1 : work.bpDone / work.bpCost)),
+  };
+}
+
 export function planFor(state: GameState): ScenePlan {
-  const visible = visibleBuildings(state);
+  const hiding = new Set(state.works
+    .filter((work) => work.upgradeOf !== null && (work.kind === 'gate' || work.kind === 'wall'))
+    .map((work) => work.upgradeOf!));
+  // Sólo la fuente de la sustitución desaparece durante la obra: sus vecinos
+  // siguen en el plan para que el ensamblador de defensas abra el hueco real.
+  const visible = visibleBuildings(state).filter((building) => !hiding.has(building.id));
   const connections = defenceConnections(visible);
   const gates = defenceGates(state);
   return {
@@ -176,6 +209,7 @@ export function planFor(state: GameState): ScenePlan {
       ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
     }))
       .sort((a, b) => a.id - b.id),
+    works: state.works.map(plannedWork).sort((a, b) => a.id - b.id),
   };
 }
 
@@ -184,6 +218,24 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
     && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
     && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate;
+}
+
+function sameWork(a: PlannedWork, b: PlannedWork): boolean {
+  return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
+    && a.upgradeOf === b.upgradeOf && a.progress === b.progress;
+}
+
+function workChange(previous: readonly PlannedWork[], next: readonly PlannedWork[]): WorkChange {
+  const before = new Map(previous.map((work) => [work.id, work]));
+  const added: PlannedWork[] = [];
+  const changed: PlannedWork[] = [];
+  for (const work of next) {
+    const was = before.get(work.id);
+    if (was === undefined) added.push(work);
+    else if (!sameWork(was, work)) changed.push(work);
+    before.delete(work.id);
+  }
+  return { added, changed, removed: [...before.keys()] };
 }
 
 /**
@@ -197,6 +249,7 @@ export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanCha
   if (previous === null || previous.game !== next.game) {
     return {
       ground: true, forest: true, cleared: true, added: next.buildings, changed: [], removed: [],
+      works: { added: next.works, changed: [], removed: [] },
     };
   }
 
@@ -217,11 +270,13 @@ export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanCha
     added,
     changed,
     removed: [...before.keys()],
+    works: workChange(previous.works, next.works),
   };
 }
 
 /** Whether a change asks for any work at all. Most frames ask for none. */
 export function isQuiet(change: PlanChange): boolean {
   return !change.ground && !change.forest && !change.cleared
-    && change.added.length === 0 && change.changed.length === 0 && change.removed.length === 0;
+    && change.added.length === 0 && change.changed.length === 0 && change.removed.length === 0
+    && change.works.added.length === 0 && change.works.changed.length === 0 && change.works.removed.length === 0;
 }

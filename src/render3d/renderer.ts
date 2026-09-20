@@ -62,6 +62,7 @@ import { Tells } from './effects/tells';
 import { TreeFalls, type TreeFallSighting } from './effects/tree-falls';
 import { FIELD_CROPS, isQuiet, planChange, planFor, type ScenePlan } from './world/plan';
 import { BattleDebris } from './world/battle-debris';
+import { Works } from './world/works';
 import type { Physics } from './life/physics';
 
 const VILLAGER = 'villager';
@@ -280,6 +281,7 @@ export async function createGraphicsRenderer(
   if (villager === undefined) throw new Error("The asset manifest has no 'villager'.");
 
   const village = new Village((id) => library.instance(id));
+  const works = new Works();
   // G-15 · el almiar, la leña y la carreta. Se montan con lo construido porque
   // cuelgan de ello: un almiar toca un campo y la leña toca una casa.
   const steading = new Steading();
@@ -314,7 +316,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -726,6 +728,7 @@ export async function createGraphicsRenderer(
       bubbles: bubbles.snapshot(),
       buildings: (lifeState === null ? [] : visibleBuildings(lifeState)).map(building => ({ id: building.id, kind: building.kind,
         x: building.x, z: building.y, w: building.w, h: building.h, ruin: building.lostTick !== null })),
+      works: plan?.works ?? [],
       viewport: { width: viewport.widthCss, height: viewport.heightCss },
       map: { width: life.land.width, height: life.land.height, blocked: Array.from(life.land.blocked) },
       renderedAnimals: fauna.snapshot().map(animal => ({ ...animal, screen: screen(animal.x, animal.z) })),
@@ -968,6 +971,7 @@ export async function createGraphicsRenderer(
         // than being updated into place: what the two happened to share would
         // otherwise survive into a game it never belonged to.
         village.clear();
+        works.clear();
         cast.clear();
         tells.clear();
         fauna.clear();
@@ -1003,6 +1007,8 @@ export async function createGraphicsRenderer(
       treeFalls.step(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
+      for (const id of change.works.removed) works.remove(id);
+      for (const work of [...change.works.added, ...change.works.changed]) works.add(work);
       plan = next;
       // El encuadre sigue a lo construido, asi que se rehace cuando el pueblo
       // cambia de forma y no en cada fotograma.
@@ -1517,6 +1523,7 @@ export async function createGraphicsRenderer(
       treeFalls.dispose();
       cast.dispose();
       village.dispose();
+      works.dispose();
       steading.dispose();
       if (ground !== null) {
         world.remove(ground.mesh);
