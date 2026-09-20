@@ -36,6 +36,14 @@ export interface Actor {
   readonly clip: ClipName;
   /** Carga profesional visible durante `carry_walk`; no forma parte del guardado. */
   readonly load?: 'bundle' | 'stone' | 'grain' | null;
+  /**
+   * Armamento que la escena sabe que lleva ahora. Es efímero: la guarnición lo
+   * deriva de lo que se le dio al valle y el asaltante lo recibe del renderer;
+   * no sube al motor ni se guarda.
+   */
+  readonly weapon?: 'bow' | 'spear' | null;
+  /** El escudo acompaña a la lanza; separado para no inventar un arma nueva. */
+  readonly shield?: boolean;
   /** En qué segundo de su propio clip hay que ponerlo. */
   readonly clipSeconds: number;
   readonly poseSeconds?: number;

@@ -90,6 +90,9 @@ export const WANTED = [
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
   ...VILLAGER_MODELS, TREE, TREE_PINE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  // G-24 · herramientas de defensa. La flecha se sigue moviendo con Rapier;
+  // ésta es sólo su silueta aprobada y las otras cuelgan de los conectores de mano.
+  'bow', 'spear', 'arrow', 'shield',
   // P-2 · la fuente de la plaza, cuando exista (`docs/encargos/encargo-fuente.md`).
   'fountain',
   // M-3 · lo que el jugador mete en el valle. Ninguno de los dos está
@@ -302,7 +305,7 @@ export async function createGraphicsRenderer(
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
   // D2b · las flechas del asedio. Un grupo vacío el 99 % de la partida.
-  const arrows = new Arrows();
+  const arrows = new Arrows((id) => library.instance(id));
   // P-2 · la fuente del centro de la plaza. El empedrado lo pinta el suelo.
   const plaza = new PlazaFountain((id) => library.instance(id));
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
@@ -760,6 +763,8 @@ export async function createGraphicsRenderer(
         named: actor.named,
         clip: actor.clip,
         load: actor.load ?? null,
+        weapon: actor.weapon ?? null,
+        shield: actor.shield === true,
         activity: actor.activity,
         talking: actor.talking,
         arguing: actor.arguing,
@@ -1001,7 +1006,16 @@ export async function createGraphicsRenderer(
       const struckGate = life.defence.gate;
       village.gateImpact(struckGate?.at ?? null, struckGate === null || struckGate.hitAt === null ? null
         : (Math.max(0, life.steps - 1) - struckGate.hitAt) * LIFE_STEP);
-      lastActors = castOf(life, frame.presentationSeconds, ages, named);
+      const arms = new Map<number, 'bow' | 'spear'>();
+      for (const post of life.manned) {
+        const defender = life.dwellers.find(person => person.dayPlan?.job?.place === post.place.id);
+        if (defender !== undefined) arms.set(defender.villager, post.post.arm);
+      }
+      lastActors = castOf(life, frame.presentationSeconds, ages, named).map(actor => {
+        if (actor.id < 0) return { ...actor, weapon: 'spear' as const, shield: true };
+        const weapon = arms.get(actor.id);
+        return weapon === undefined ? actor : { ...actor, weapon, shield: weapon === 'spear' };
+      });
       // V-09b: la pelota, el palo, el cubo, el haz de leña.
       props.update(propsOf(life), groundFloor);
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
@@ -1375,7 +1389,7 @@ interface LifeSnapshot {
     readonly offset: readonly number[]; readonly rotation: readonly number[] }[];
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
   readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number;
-    readonly scale: number }[];
+    readonly scale: number; readonly held: readonly string[] }[];
   readonly bubbles: readonly { readonly id: number; readonly kind: Bubble }[];
   readonly buildings: readonly { readonly id: number; readonly kind: string; readonly x: number;
     readonly z: number; readonly w: number; readonly h: number; readonly ruin: boolean }[];
@@ -1433,6 +1447,7 @@ interface LifeSnapshot {
   readonly actors: readonly {
     readonly id: number; readonly age: number; readonly named: boolean;
     readonly clip: string; readonly load: 'bundle' | 'stone' | 'grain' | null; readonly activity: string;
+    readonly weapon: 'bow' | 'spear' | null; readonly shield: boolean;
     readonly talking: boolean; readonly arguing: boolean;
     readonly occupation: string | null;
   }[];

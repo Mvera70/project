@@ -11,7 +11,7 @@
 
 import {
   AnimationMixer, Color, DoubleSide, Group, LoopOnce, Mesh, MeshBasicMaterial, RingGeometry,
-  type AnimationClip, type Material, type Object3D,
+  Vector3, type AnimationClip, type Material, type Object3D,
 } from 'three';
 import type { VillagerId } from '@engine/state';
 import type { Actor } from '../contracts';
@@ -79,12 +79,21 @@ interface Player {
  * Los conectores `hand_l` y `hand_r` los dejo G-04 en el aldeano justo para
  * esto, y hasta ahora no colgaba nada de ellos.
  */
-const HELD: Readonly<Record<string, { asset: string; hand: string; scale?: number }>> = {
-  work_hoe: { asset: 'hoe', hand: 'hand_r' },
+interface HeldSpec {
+  readonly key: string;
+  readonly asset: string;
+  readonly hand: string;
+  readonly scale?: number;
+  /** Sólo los gestos viejos tienen sustituto procedimental. */
+  readonly fallback?: boolean;
+}
+
+const HELD: Readonly<Record<string, Omit<HeldSpec, 'key'>>> = {
+  work_hoe: { asset: 'hoe', hand: 'hand_r', fallback: true },
   carry_walk: { asset: 'bundle', hand: 'hand_l' },
-  hammer: { asset: 'hammer', hand: 'hand_r' },
-  chop: { asset: 'axe', hand: 'hand_r' },
-  drink: { asset: 'cup', hand: 'hand_r' },
+  hammer: { asset: 'hammer', hand: 'hand_r', fallback: true },
+  chop: { asset: 'axe', hand: 'hand_r', fallback: true },
+  drink: { asset: 'cup', hand: 'hand_r', fallback: true },
 };
 
 /**
@@ -370,24 +379,55 @@ export class Cast {
   private equip(player: Player, actor: Actor): void {
     const key = actor.clip === 'carry_walk' && actor.load === 'stone' ? 'carry_stone'
       : actor.clip === 'carry_walk' && actor.load === 'grain' ? 'carry_grain' : actor.clip;
-    const wanted = key === 'carry_stone'
+    const wanted: HeldSpec[] = [];
+    const action = key === 'carry_stone'
       ? { asset: 'rock', hand: 'hand_l', scale: 0.18 }
       : key === 'carry_grain' ? { asset: 'bundle', hand: 'hand_l', scale: 0.8 }
-      : HELD[actor.clip];
-    if (wanted !== undefined && !player.held.has(key)) {
-      const tool = this.prop?.(wanted.asset) ?? handTool(actor.clip);
-      const hand = player.object.getObjectByName(wanted.hand);
+        : HELD[actor.clip];
+    if (action !== undefined) wanted.push({ key, ...action });
+    if (actor.weapon !== null && actor.weapon !== undefined) {
+      wanted.push({ key: `weapon_${actor.weapon}`, asset: actor.weapon,
+        hand: actor.weapon === 'bow' ? 'hand_l' : 'hand_r' });
+    }
+    if (actor.shield === true) wanted.push({ key: 'shield', asset: 'shield', hand: 'hand_l' });
+    for (const item of wanted) {
+      if (player.held.has(item.key)) continue;
+      const tool = this.prop?.(item.asset) ?? (item.fallback === true ? handTool(actor.clip) : undefined);
+      const hand = player.object.getObjectByName(item.hand);
       if (tool !== undefined && hand !== undefined) {
-        tool.name = `Held_${key}`;
-        if (wanted.scale !== undefined) tool.scale.multiplyScalar(wanted.scale);
+        tool.name = `Held_${item.key}`;
+        if (item.scale !== undefined) tool.scale.multiplyScalar(item.scale);
         // La herramienta no se selecciona: quien la lleva si. Sin esto, tocar la
         // azada no devolvia a nadie.
         tool.traverse((child) => { child.userData.villagerId = player.object.userData.villagerId; });
         hand.add(tool);
-        player.held.set(key, tool);
+        // La raíz de los recursos vive en el suelo para que sirva al visor y a
+        // los trastos. En una mano manda el conector `grip`: se lleva a origen
+        // **después** de colgarlo y escalarlo, con las matrices reales del rig,
+        // para que una lanza no nazca a los pies ni se despegue al crecer un niño.
+        tool.updateMatrixWorld(true);
+        const grip = tool.getObjectByName('grip');
+        if (grip !== undefined) {
+          // Los recursos con `grip` salen de Blender en metros y los huesos
+          // llevan la reducción metros→celdas. Sólo éstos la deshacen: los
+          // trastos anteriores no tienen tal contrato y conservan su escala
+          // heredada exactamente como antes.
+          const actorScale = player.object.getWorldScale(new Vector3());
+          const handScale = hand.getWorldScale(new Vector3());
+          tool.scale.multiply(new Vector3(
+            actorScale.x / handScale.x,
+            actorScale.y / handScale.y,
+            actorScale.z / handScale.z,
+          ));
+          tool.updateMatrixWorld(true);
+          const offset = hand.worldToLocal(grip.getWorldPosition(new Vector3()));
+          tool.position.sub(offset);
+        }
+        player.held.set(item.key, tool);
       }
     }
-    for (const [name, tool] of player.held) tool.visible = name === key;
+    const visible = new Set(wanted.map(item => item.key));
+    for (const [name, tool] of player.held) tool.visible = visible.has(name);
   }
 
   private retire(id: VillagerId): void {
@@ -415,10 +455,12 @@ export class Cast {
   }
 
   /** Posiciones de las mallas colocadas, para contrastarlas con sus cuerpos. */
-  snapshot(): { id: number; x: number; z: number; scale: number; clip: string | null; weight: number }[] {
+  snapshot(): { id: number; x: number; z: number; scale: number; clip: string | null; weight: number; held: string[] }[] {
     return [...this.players].map(([id, player]) => ({ id, x: player.object.position.x, z: player.object.position.z,
       scale: player.object.scale.x,
-      clip: player.playing, weight: player.playing === null ? 0 : player.actions.get(player.playing)?.getEffectiveWeight() ?? 0 }));
+      clip: player.playing, weight: player.playing === null ? 0 : player.actions.get(player.playing)?.getEffectiveWeight() ?? 0,
+      held: [...player.held].filter(([, object]) => object.visible).map(([name]) => name),
+    }));
   }
 
   get count(): number {

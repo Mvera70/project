@@ -91,12 +91,9 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   house: 'house',
   field: 'field',
   palisade: 'palisade',
-  // A2 · el portón. **Todavía sin malla propia** (E3 del plan de la meta):
-  // usa la de la empalizada, que es la pieza de muralla que ocupa, y las
-  // jambas las dibuja `obstacles.ts` en su celda. El día que la malla exista
-  // con una hoja llamada `gate_door`, el gozne de `door()` la abre sin tocar
-  // una línea de aquí.
-  gate: 'palisade',
+  // G-24 · el portón propio, con la hoja `gate_door` que `door()` abre desde
+  // su pivote exportado. El obstáculo lógico sigue siendo la celda del motor.
+  gate: 'gate',
   wall: 'wall',
   watchtower: 'watchtower',
   // A3 · el bastión. **Todavía sin malla propia** (`docs/encargos-3d.md`): usa
@@ -128,7 +125,10 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
  * lo que tiene que leerse es que ya no es una casa.
  */
 export function buildFromAsset(planned: PlannedBuilding, source: Object3D): BuildingModel {
-  if (!planned.ruin && planned.connections !== undefined) return buildDefence(planned, source);
+  // El portón aprobado es una pieza completa, con la hoja `gate_door` separada.
+  // No puede pasar por el ensamblador de tramos: aquél sólo toma su material y
+  // lo convertía de nuevo en una entrada provisional sin bisagra.
+  if (!planned.ruin && planned.connections !== undefined && planned.kind !== 'gate') return buildDefence(planned, source);
   const group = new Group();
   group.name = `Building_${planned.id}`;
   // **El fondo de la huella se suma a la Z, y esto es un arreglo, no un ajuste.**
@@ -175,15 +175,34 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
       mesh.receiveShadow = planned.kind !== 'field';
     }
   });
-  group.add(model);
+  if (planned.kind === 'gate' && planned.gate === 'x') {
+    // La receta abre en su eje base. `defences.ts` ya giraba los portones que
+    // dejan pasar por X; se conserva esa convención, pero alrededor del centro
+    // de la celda: girar el grupo de la esquina echaría el marco al vecino.
+    const turn = new Group();
+    turn.position.set(0.5, 0, -0.5);
+    turn.rotation.y = Math.PI / 2;
+    model.position.set(-0.5, 0, 0.5);
+    turn.add(model);
+    group.add(turn);
+  } else {
+    group.add(model);
+  }
   // La hoja usa material propio; nunca se arranca del material de toda la casa.
   group.updateMatrixWorld(true);
   const doorMesh = model.getObjectByName(`${planned.asset}_door`);
   const hinge = new Group();
   if (doorMesh !== undefined) {
-    const bounds = new Box3().setFromObject(doorMesh);
     hinge.name = 'DoorHinge';
-    hinge.position.copy(group.worldToLocal(new Vector3(bounds.min.x, bounds.min.y, bounds.max.z)));
+    // El portón G-24 trae un empty `gate_door` justo en el gozne. La caja de
+    // sus tablas no es un pivote: usarla lo desplazaba unos centímetros al
+    // abrir. Las puertas antiguas no tienen ese contrato y conservan su borde.
+    if (planned.kind === 'gate') {
+      hinge.position.copy(group.worldToLocal(doorMesh.getWorldPosition(new Vector3())));
+    } else {
+      const bounds = new Box3().setFromObject(doorMesh);
+      hinge.position.copy(group.worldToLocal(new Vector3(bounds.min.x, bounds.min.y, bounds.max.z)));
+    }
     group.add(hinge);
     hinge.attach(doorMesh);
   }

@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [Integración y defensa sin arqueros](life-rounds/E2-integracion-y-defensa.md):
+  siete modelos publicados localmente, conservación del catálogo y D4 sin Rapier.
+
 - [E1b, cuerpo a cuerpo](life-rounds/E1b-cuerpo-a-cuerpo.md): contacto y reacción
   por hechos reales, sin cambiar la resolución de la pelea.
 

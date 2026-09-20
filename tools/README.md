@@ -115,12 +115,12 @@ silencio y la prueba pasa sin probar nada.
 | `bench.ts` · `bench.html` · `bench-scenes.ts` · `benchmark.ts` | El banco de rendimiento de G-09 (D.9): la página, la lista de escenas y el corredor |
 | `doctor.ts` | Diagnóstico del entorno gráfico antes de culpar al código |
 | `viewer.ts` · `viewer.html` | El visor suelto de un GLB |
-| `publish-assets.ts` | De lo aprobado a `public/assets/valley3d/`, con manifiesto, identidad y hash |
+| `publish-assets.ts` | Admite un lote explícito aprobado con `--ids bow,spear`; verifica hash, bytes y procedencia antes de copiar, conserva todos los recursos ya publicados y rechaza sobrescribir bytes distintos |
 | `g20-check.mjs` | Comprueba la hoja de evidencia de G-20: cero imágenes rotas, cero errores de página |
 | `sound-check.mjs` | Comprueba que el juego montado suena, sin poder oírlo, por `window.__valleySound` |
 | `thunder-check.mjs` | Lo mismo para el trueno de U-13, entrando por su ruta de depuración |
 
-`npm run shot`, `npm run bundle`, `npm run serve:shots`, `npm run assets:publish`.
+`npm run shot`, `npm run bundle`, `npm run serve:shots`, `npx tsx tools/graphics/publish-assets.ts --ids bow,spear`.
 
 ## `ui/` — la piel y los iconos
 

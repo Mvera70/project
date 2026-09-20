@@ -8,11 +8,9 @@
 // al aparecer y se retira cuando la lista deja de nombrarla. Y por la misma
 // razón: una flecha no sobrevive a la jornada (E.2).
 //
-// **Es una primitiva y no una malla, y aquí sí es lo correcto.** Una flecha
-// vista desde la cámara ortográfica de este juego es un palo de treinta
-// centímetros: lo que se lee es la **trayectoria**, no el emplumado. El encargo
-// de arte (`encargos-3d.md`) pide arco y lanza en la mano, que sí se ven; la
-// flecha no está en esa lista a propósito.
+// El GLB aprobado conserva emplumado y punta sin añadir lógica: la física sigue
+// entregando sólo trayectoria. El cilindro queda como reserva de visor para el
+// caso en que no haya biblioteca de recursos.
 
 import {
   CylinderGeometry, Group, Mesh, MeshStandardMaterial, Quaternion, Vector3,
@@ -57,8 +55,10 @@ const WOOD = 0x6b4a2b;
 /** Por debajo de esta velocidad no se reorienta: una flecha clavada no gira. */
 const STILL = 0.2;
 
-/** El eje del cilindro de Three, para girarlo hacia donde vuela la flecha. */
+/** El eje del cilindro de reserva de Three, para girarlo hacia donde vuela. */
 const UP = new Vector3(0, 1, 0);
+/** El GLB aprobado sale con la punta en +Z. */
+const FORWARD = new Vector3(0, 0, 1);
 
 export class Arrows {
   readonly group = new Group();
@@ -68,7 +68,7 @@ export class Arrows {
   private readonly turn = new Quaternion();
   private readonly heading = new Vector3();
 
-  constructor() {
+  constructor(private readonly instance?: (id: string) => Object3D | undefined) {
     this.group.name = 'Valley_Arrows';
   }
 
@@ -87,8 +87,11 @@ export class Arrows {
       present.add(sighting.id);
       let shaft = this.shown.get(sighting.id);
       if (shaft === undefined) {
-        this.material ??= new MeshStandardMaterial({ color: WOOD, roughness: 0.8 });
-        shaft = new Mesh(this.geometry, this.material);
+        shaft = this.instance?.('arrow');
+        if (shaft === undefined) {
+          this.material ??= new MeshStandardMaterial({ color: WOOD, roughness: 0.8 });
+          shaft = new Mesh(this.geometry, this.material);
+        }
         shaft.name = `Arrow_${sighting.id}`;
         shaft.castShadow = true;
         this.group.add(shaft);
@@ -98,7 +101,10 @@ export class Arrows {
       const speed = Math.hypot(sighting.vx, sighting.vy, sighting.vz);
       if (speed > STILL) {
         this.heading.set(sighting.vx / speed, sighting.vy / speed, sighting.vz / speed);
-        this.turn.setFromUnitVectors(UP, this.heading);
+        // El fallback histórico es un cilindro vertical; el GLB nuevo apunta
+        // hacia +Z. Cada uno conserva su eje local para no tumbar sólo la
+        // flecha cuando un visor sin biblioteca usa la reserva.
+        this.turn.setFromUnitVectors(shaft instanceof Mesh ? UP : FORWARD, this.heading);
         shaft.quaternion.copy(this.turn);
       }
     }

@@ -1689,10 +1689,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           if (there) held.add(post.place.id);
         }
         stepArchery(archers, raiders, arrows, physics, steps, held);
+      }
 
-        // D4 · **y el cuerpo a cuerpo**, que es lo que hace que defender
-        // cueste. La lista de defensores se rehace con quien esté de verdad en
-        // su puesto: el que va de camino no pelea, y el que ha caído tampoco.
+      // D4 no usa Rapier: distancia y reloj de golpes bastan. Encerrarlo en
+      // la rama de arquería dejaba invulnerables a ambos bandos sin arcos,
+      // porque el renderer sólo pide física cuando hay quien dispare.
+      if (raidersHere(raiders)) {
+        // La lista se rehace con quien esté de verdad en su puesto:
+        // el que va de camino no pelea, y el que ha caído tampoco.
         defenders.length = 0;
         for (const post of manned) {
           const there = dwellers.find((dweller) =>

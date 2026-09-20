@@ -72,6 +72,7 @@ propio documento con medidas y presupuesto de triángulos.
 | Documento | Qué pide |
 |---|---|
 | `encargos/encargo-combate.md` | **Los seis clips de combate (E1)**, el camino largo de la fase 4 |
+| `encargos/encargo-integracion-y-defensa.md` | Alcance de los puntos 1 y 2: siete modelos y combate sin arqueros; cierre en `historico/life-rounds/E2-integracion-y-defensa.md` |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
 | `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |

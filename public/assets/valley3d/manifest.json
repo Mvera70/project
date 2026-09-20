@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-17T18:05:04.664Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts",
+  "generatedAt": "2026-09-19T23:51:38.083Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bow,spear,arrow,shield,gate,plough,fountain",
   "assets": [
     {
       "id": "axis-marker",
@@ -828,6 +828,83 @@
       "file": "scrub.glb",
       "sha256": "B425079A418A7B93A35AFA990702AF851F506FCE346BFD375813015B9770E136",
       "motion": []
+    },
+    {
+      "id": "bow",
+      "file": "bow.glb",
+      "sha256": "7CF930F1BF263151B338794526E5FFE83DBA93BFFA5263C4C8251FACA67774E1",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "spear",
+      "file": "spear.glb",
+      "sha256": "671E526D256A5859F1F68CE3EE2158C8B00EC1749F4672466B6C8B38BC230F0A",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "arrow",
+      "file": "arrow.glb",
+      "sha256": "474435E79C60495683575EF1D1BE3F0F7717DC01242E8487414C145051F5596F",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "shield",
+      "file": "shield.glb",
+      "sha256": "A6A11CCF641B564CAE5867A72D37A328610E71FEBD84851837CA188E70A2C025",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "gate",
+      "file": "gate.glb",
+      "sha256": "6A631196325241E1C6C6D53CDA4041D24DADCF6FC4FABF0C437F5CF4631FE679",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "plough",
+      "file": "plough.glb",
+      "sha256": "45EF9D8FBE869DE57950104479AAEC721E57D531412EAC74D5B8F33DB32B4915",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "fountain",
+      "file": "fountain.glb",
+      "sha256": "5A65635457C33168266836AD76D320959E9E82CE2E84B37AB5B48E39834CBB95",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
     }
   ]
 }

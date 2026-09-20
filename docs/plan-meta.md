@@ -110,15 +110,17 @@ es divertido, y el resultado es el que sale.
 
 **20 sep, E1b:** contacto `spear_thrust` y reacción `hit_take` entregados sobre
 el esqueleto publicado y ligados a D4. E1 queda parcial por `flee`.
-Los siete modelos de la primera tanda están aceptados, aún sin publicar ni
-integrar. [Evidencia de E1b](historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
+Los siete modelos de la primera tanda están aceptados e integrados en el juego
+(20 sep). También se corrige D4 sin arqueros: ya no depende de inicializar Rapier.
+[Integración y defensa](historico/life-rounds/E2-integracion-y-defensa.md).
+E2/E3 siguen parciales: faltan identidad del clan, adarve y portón roto.
 
-**Es el camino largo y hay que empezarlo pronto**: hoy no existe un solo clip
-de pelea.
+**El arte sigue parcial:** seis gestos de combate ya tienen representación
+procedural; `flee` sigue pendiente.
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| E1 · Clips de combate · **parcial, 20 sep 2026** | Tercer reloj por hecho, sin bucle y con final sostenido; `bow_draw` (1,5 s), `bow_loose` (0,6 s), `gate_strike` y `fall` procedurales. Pose absoluta probada sobre el GLB; asaltos observados en 7/23/36 y tomas a 15 fps. **Reacción de puerta conectada tras autorización (20 sep)**: sacudida absoluta validada en 61 fotogramas; toma diagnóstica sin bosque por oclusión. E1 sigue parcial: lanza, recibir impacto y huir. [Informe](historico/life-rounds/E1-disparo-unico.md) | **P1** | Alta | Código + arte pendiente | — |
+| E1 · Clips de combate · **parcial, 20 sep 2026** | Tercer reloj por hecho, sin bucle y con final sostenido; `bow_draw` (1,5 s), `bow_loose` (0,6 s), `gate_strike`, `fall`, `spear_thrust` y `hit_take` procedurales. Pose absoluta probada sobre el GLB y tomas a 15 fps. Reacción de puerta conectada y armas integradas. Falta `flee`; oclusión y solapes quedan abiertos. [Informe de contacto](historico/life-rounds/E1b-cuerpo-a-cuerpo.md) | **P1** | Alta | Código + arte pendiente | — |
 | E0 · **Lo que pasa y no se ve** | Ocho mecánicas ya en `main` que sólo salen como línea de crónica: el asalto, el aviso, prepararse, pagar, la semana de después, armas, arcos y la atalaya vacía. El inventario está en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Astra (diseño) · Sol (capa de vida) | — |
 | E2 · Modelos del asedio | **El clan vecino**: aldeanos armados de otro valle —no soldados de cota ni bandidos andrajosos—, arco, flecha, espada, escudo | P2 | Alta | Astra · sesión de arte | — |
 | E3 · Portón, muralla de piedra, torre | Las mallas de la fase 3; el portón con dos estados y roto | P2 | Media | Sesión de arte | A2, A4 |

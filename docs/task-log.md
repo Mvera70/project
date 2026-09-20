@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · Integración y defensa sin arqueros: puntos 1 y 2
+
+Los siete modelos aceptados quedan integrados y publicados localmente en
+`public/assets/valley3d/`: arco, lanza, flecha, escudo, portón, arado y fuente.
+65 entradas en el manifiesto: siete nuevas y 58 anteriores conservadas.
+Terra integra y Luna audita procedencia, hashes y conservación del catálogo.
+El publicador admite lotes explícitos y no borra el directorio de destino.
+
+D4 funcionaba sólo al inicializar la física de los arqueros. Se separa ese
+enganche: ahora hay combate y bajas sin arcos, sin cambiar daño ni cadencia.
+Regresión con semillas 7/23 sin Rapier inyectado y observación del juego real.
+[Informe y límites](historico/life-rounds/E2-integracion-y-defensa.md).
+El bloqueo de bundle por arado/fuente queda resuelto. No se hace push ni despliegue.
+**Parada pedida por el dueño:** no abrir oclusión/solapes ni `flee`.
+
 ## 20 sep 2026 · E1b: contacto y reacción del cuerpo a cuerpo
 
 Los siete modelos de la tanda anterior quedan aceptados por el dueño tal como
