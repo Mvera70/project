@@ -3,7 +3,7 @@ import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
 import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear,
-  parseDebugRequest, raidNow, bracedNow, comingNow, warningNow, warningPendingNow,
+  parseDebugRequest, raidNow, bracedNow, comingNow, warningNow, warningPendingNow, aftermathNow,
   runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
@@ -119,6 +119,7 @@ if (root) {
     else if (warning !== null) warningNow(state, Number(warning) || 8);
     const braced = query.get('braced');
     if (braced !== null) bracedNow(state, Number(braced) || 1);
+    if (query.get('aftermath') === '1') aftermathNow(state, query.get('beast') === '1');
     const crown = query.get('crown');
     if (crown === 'ready') crownReady(state);
     else if (crown !== null) crownNow(state, crown);

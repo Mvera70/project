@@ -256,6 +256,19 @@ export function bracedNow(state: GameState, weeks = 1): void {
   state.flags['braced'] = state.tick + Math.max(1, weeks);
 }
 
+/** E0c · El estado exacto que deja una llegada saqueadora al tick siguiente. */
+export function aftermathNow(state: GameState, beast = false): void {
+  const arrived = state.tick - 1;
+  state.threat.arrivedTick = arrived;
+  state.flags['just_sacked'] = state.tick + TIME.WEEKS_PER_YEAR - 1;
+  state.chronicle.push({
+    tick: arrived, kind: 'raid', templateKey: 'raid.open', params: {}, weight: 3,
+  });
+  if (beast) state.chronicle.push({
+    tick: arrived, kind: 'raid', templateKey: 'raid.beast', params: {}, weight: 2,
+  });
+}
+
 /**
  * F3d · **Un archivo con partidas dentro, para poder fotografiar el cronicón.**
  *

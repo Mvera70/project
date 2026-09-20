@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · E0c, la semana posterior al saqueo
+
+La única semana posterior a un saqueo deja dos o tres cargas fijas junto a un
+granero/molino real (o casa si no lo hay); si la entrada `raid.beast` consta en
+la crónica de llegada, deja además dos haces tumbados junto a un ancla de
+ganado/casa. Es una lectura pura de `just_sacked`, `arrivedTick` y crónica: no
+es inventario, oferta ni navegación, no escribe el motor y se reduce a nada si
+el suelo no es honesto. Las ids y posiciones se reconstruyen idénticas los siete
+días escénicos y desaparecen al tick siguiente. El observatorio acepta
+`--aftermath [--beast]`; controles y pos-saqueo en 7/23, con el caso de ganado
+visible en 23, dejan cero errores. 22 pruebas focalizadas, typecheck y lint
+verdes. [Evidencia y límites](historico/life-rounds/E0c-semana-posterior.md).
+No se cierra E0 completo ni se añaden activos, economía, combate o motor.
+
 ## 20 sep 2026 · E0, pagar al clan
 
 La resolución física de `bought_off` / `turned_back` ya se ve una sola vez: en

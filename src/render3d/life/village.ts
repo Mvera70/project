@@ -56,6 +56,7 @@ import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } f
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
+import { aftermathProps } from './aftermath';
 import type { Animal } from '@derive/animals';
 import {
   carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
@@ -659,7 +660,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // jugador dio va siempre: es una cosa con sitio y no una pelota en el prado
   // (M-3, ver `given` en `props.ts`).
   const loose: Prop[] = options.props === true ? scatter(state, land, seed) : [];
-  const props: Prop[] = [...loose, ...given(state, land, loose.length)];
+  // E0c · La pérdida de la semana anterior es un trasto fijo: no entra en el
+  // reparto ni en la física, sólo queda donde el motor ya dijo que se perdió.
+  const aftermath = aftermathProps(state, land);
+  const props: Prop[] = [...loose, ...given(state, land, loose.length), ...aftermath];
   const propsById = new Map(props.map((prop) => [prop.id, prop]));
 
   const alive = state.people.villagers.filter((v) => v.diedTick === null && v.leftTick === null);
@@ -1151,7 +1155,10 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // (V-09b, `PLAYED_OUT`) se filtra más abajo, al llamar a `decide` por
       // cada uno — no aquí, que es de todos, y no dentro de `decide`, que no
       // puede saber quién pregunta (E.4).
-      const propOptions = props.length === 0 ? [] : propPlaces(props, now, land);
+      // Los restos del saqueo no son recursos ni ofertas. El barril fijo sí
+      // conserva su bebida; el arado no tiene oferta propia.
+      const propOptions = props.length === 0 ? []
+        : propPlaces(props.filter((prop) => prop.fixed !== true || prop.kind === 'barrel'), now, land);
 
       // 0 · Vivir las escenas que ya estaban en marcha. V-07.
       //

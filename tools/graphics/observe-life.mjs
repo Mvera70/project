@@ -54,10 +54,15 @@ try {
   const braced = opt('braced', '');
   const coming = opt('coming', '');
   const warning = opt('warning', '');
+  const aftermath = args.includes('--aftermath') ? '1' : '';
+  // E0c · mismo constructor de depuración que el pos-saqueo, sin la huella:
+  // así control y caso se comparan con idéntica partida y encuadre.
+  const aftermathControl = args.includes('--aftermath-control') ? '1' : '';
+  const beast = args.includes('--beast') ? '1' : '';
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
   const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== ''
-    || braced !== '' || coming !== '' || warning !== '' || assault !== '';
+    || braced !== '' || coming !== '' || warning !== '' || assault !== '' || aftermath !== '' || aftermathControl !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
@@ -66,6 +71,9 @@ try {
       + (coming === '' ? '' : `&coming=${coming}`)
       + (warning === '' ? '' : `&warning=${warning}`)
       + (braced === '' ? '' : `&braced=${braced}`)
+      + (aftermath === '' ? '' : `&aftermath=${aftermath}`)
+      + (aftermathControl === '' ? '' : '&aftermath=0')
+      + (beast === '' ? '' : `&beast=${beast}`)
       + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
   }
