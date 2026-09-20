@@ -224,9 +224,19 @@ export function raidNow(state: GameState, band: number, assault = false): void {
  * la única manera de grabar a los arqueros en sus puestos era acertar la semana
  * exacta en la que el motor avisa, que pasa dos veces en sesenta años.
  */
-export function bracedNow(state: GameState, weeks = 1): void {
+export function comingNow(state: GameState, weeks = 1): void {
   state.threat.comingTick = state.tick + Math.max(0, weeks);
   state.threat.comingBand = Math.max(state.threat.comingBand, 20);
+}
+
+/**
+ * E0a · `?braced=` ya representa la decisión completa, no sólo una víspera.
+ * `?coming=` conserva el control de comparación con la misma amenaza sin la
+ * bandera: las dos tomas difieren en lo que el jugador eligió.
+ */
+export function bracedNow(state: GameState, weeks = 1): void {
+  comingNow(state, weeks);
+  state.flags['braced'] = state.tick + Math.max(1, weeks);
 }
 
 /**

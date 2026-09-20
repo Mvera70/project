@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · E0a, la aldea se prepara
+
+La decisión `raiders_coming:brace` ya se ve mientras la partida sigue en
+camino: 2–4 adultos disponibles meten cargas bajo techo por rutas reales y el
+ganado usa casas interiores; la guarnición conserva prioridad y el reparto
+normal vuelve al caducar la ventana. Dos valles activos/control: 47/49
+habitantes, 4 porteadores en ambos, 3/4 entregas, 1/2 defensores conservados y
+cero errores, penetraciones, bloqueos, deriva o atascos. 22 pruebas focalizadas,
+typecheck y lint verdes. [Evidencia y límites](historico/life-rounds/E0a-preparacion.md).
+Se cierra sólo **Prepararse**; E0 sigue abierto por aviso, pago, semana posterior
+y transiciones de muralla. Sin motor, balance, fuego ni gore.
+
 ## 20 sep 2026 · Plan e inventario sincronizados tras D6
 
 `docs/plan-meta.md` y `docs/encargos-3d.md` ya no presentan como abiertos el

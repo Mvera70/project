@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [E0a: la aldea se prepara](life-rounds/E0a-preparacion.md): evidencia de
+  acopio visible, ganado replegado y convivencia con la guarnición antes del asedio.
+
 - [D6: saqueo y física](life-rounds/D6-saqueo-y-fisica.md): registro de la
   ronda autorizada de transición final, cuerpos articulados y escombros.
 

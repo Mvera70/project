@@ -75,6 +75,7 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-integracion-y-defensa.md` | Alcance de los puntos 1 y 2: siete modelos y combate sin arqueros; cierre en `historico/life-rounds/E2-integracion-y-defensa.md` |
 | `encargos/encargo-visibilidad-y-huida.md` | Puntos 3 y 4: oclusión selectiva del bosque, contactos de atacantes y carrera civil `flee` |
 | `encargos/encargo-d6-acabado-fisico.md` | Contrato de D6 y acabado físico entregados el 20 sep; evidencia en el informe de ronda |
+| `encargos/encargo-e0-preparacion.md` | Contrato de E0a: preparación visible antes del asedio; cierre en `historico/life-rounds/E0a-preparacion.md` |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
 | `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |

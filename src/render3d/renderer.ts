@@ -734,6 +734,16 @@ export async function createGraphicsRenderer(
       timberDeliveries: life.timberDeliveries,
       stoneDeliveries: life.stoneDeliveries,
       harvestDeliveries: life.harvestDeliveries,
+      preparation: {
+        active: life.preparation.active,
+        deliveries: life.preparation.deliveries,
+        porters: life.preparation.porters.map(trip => ({
+          id: trip.villager,
+          load: trip.load,
+          source: { x: round(trip.source.at.x), z: round(trip.source.at.z) },
+          target: { x: round(trip.target.at.x), z: round(trip.target.at.z) },
+        })),
+      },
       // Con dónde está y dónde se ve: sin eso, un trasto en la traza sólo dice
       // que existe, y para mirar si el barril está en la plaza hay que poder
       // ir a su píxel (M-3).
@@ -829,6 +839,7 @@ export async function createGraphicsRenderer(
         screen: screen(beast.dweller.body.x, beast.dweller.body.z),
         routePoints: (beast.dweller.doing?.route ?? []).map(point => ({ ...point, screen: screen(point.x, point.z) })),
         kind: beast.kind,
+        anchor: { x: round(beast.anchor.x), z: round(beast.anchor.z) },
         reaction: { stage: beast.reaction.stage, commitment: beast.reaction.commitmentId },
         x: round(beast.dweller.body.x),
         z: round(beast.dweller.body.z),
@@ -1559,6 +1570,16 @@ interface LifeSnapshot {
   readonly timberDeliveries: number;
   readonly stoneDeliveries: number;
   readonly harvestDeliveries: number;
+  readonly preparation: {
+    readonly active: boolean;
+    readonly deliveries: number;
+    readonly porters: readonly {
+      readonly id: number;
+      readonly load: 'grain' | 'bundle';
+      readonly source: { readonly x: number; readonly z: number };
+      readonly target: { readonly x: number; readonly z: number };
+    }[];
+  };
   readonly props: readonly {
     readonly id: number; readonly kind: string; readonly heldBy: number | null;
     readonly x: number; readonly z: number; readonly y: number;
@@ -1599,6 +1620,7 @@ interface LifeSnapshot {
   }[];
   readonly beasts: readonly {
     readonly id: number; readonly kind: string;
+    readonly anchor: { readonly x: number; readonly z: number };
     readonly penetration: number;
     readonly reaction: { readonly stage: string | null; readonly commitment: string | null };
     readonly screen: ScreenPoint; readonly routePoints: readonly ObservedPoint[];

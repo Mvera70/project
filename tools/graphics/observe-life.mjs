@@ -49,16 +49,20 @@ try {
   // D3 · `--raid 20` planta la partida del valle vecino llegando hoy, que es
   // la única forma de grabarla: un asalto llega hacia la hora 114 de reloj.
   const raid = opt('raid', '');
-  // C2 · la vispera: la guarnicion arriba y nadie en el camino todavia.
+  // E0a · `braced` es la decisión real; `coming` deja la misma víspera sin
+  // bandera para la toma de control.
   const braced = opt('braced', '');
+  const coming = opt('coming', '');
   // D3b · `--assault` hace que la partida venga a tirar el porton.
   const assault = args.includes('--assault') ? '1' : '';
-  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== '' || braced !== '' || assault !== '';
+  const debugRoute = means !== '' || happening !== '' || crown !== '' || raid !== ''
+    || braced !== '' || coming !== '' || assault !== '';
   if (debugRoute) {
     const extra = (means === '' ? '' : `&means=${means}`)
       + (happening === '' ? '' : `&happening=${happening}`)
       + (crown === '' ? '' : `&crown=${crown}`)
       + (raid === '' ? '' : `&raid=${raid}`)
+      + (coming === '' ? '' : `&coming=${coming}`)
       + (braced === '' ? '' : `&braced=${braced}`)
       + (assault === '' ? '' : `&assault=${assault}`);
     pageUrl.search = `?debug=1&live=1&seed=${seed}&year=${year}&season=${opt('season', 'summer')}${extra}`;
@@ -138,16 +142,33 @@ try {
     const phaseError = Math.abs(shot.life.phase - expectedPhase);
     if (!live && Math.min(phaseError, 1 - phaseError) > 0.002) throw new Error('El reloj externo ha interferido en la toma.');
     const file = `frames/${String(n).padStart(4, '0')}.png`;
-    writeFileSync(join(out, file), Buffer.from(shot.image.split(',')[1], 'base64'));
+    const pixels = Buffer.from(shot.image.split(',')[1], 'base64');
+    writeFileSync(join(out, file), pixels);
+    if (n === 0) writeFileSync(join(out, 'before.png'), pixels);
+    if (n === Math.floor(seconds * fps / 2)) writeFileSync(join(out, 'middle.png'), pixels);
+    if (n === seconds * fps) writeFileSync(join(out, 'after.png'), pixels);
     frames.push({ seconds: n / fps, file, life: shot.life, engineTick: Number(await tab.locator('html').getAttribute('data-tick')) });
     if (n % (10 * fps) === 0) process.stdout.write(`${n / fps}s, fase ${shot.life.phase}, ${shot.life.people.length} personas\n`);
   }
   const summary = { sampledPeople: frames[0]?.life.people.length ?? 0, sampledBeasts: frames[0]?.life.beasts.length ?? 0,
     firstTick: frames[0]?.engineTick, lastTick: frames.at(-1)?.engineTick, nightOutcomes: frames.at(-1)?.life.nightOutcomes,
+    preparation: {
+      active: frames[0]?.life.preparation.active ?? false,
+      porters: frames[0]?.life.preparation.porters ?? [],
+      maxCarrying: 0,
+      deliveries: 0,
+      defenders: frames[0]?.life.people.filter(person => person.dayPlan?.job?.place?.startsWith('post:')).map(person => person.id) ?? [],
+      stalledPorters: [],
+    },
     meshDrift: 0, peopleMeshDrift: 0, penetratingCircles: 0, penetratingBeasts: 0, blockedCentres: 0, night: [], transitions: [] };
   const last = new Map();
+  const porterMotion = new Map();
   for (const frame of frames) {
     const life = frame.life;
+    const porterIds = new Set(life.preparation.porters.map(porter => porter.id));
+    summary.preparation.maxCarrying = Math.max(summary.preparation.maxCarrying,
+      life.actors.filter(actor => porterIds.has(actor.id) && actor.load !== null).length);
+    summary.preparation.deliveries = Math.max(summary.preparation.deliveries, life.preparation.deliveries);
     for (const beast of life.beasts) {
       if (beast.penetration > 0.001) summary.penetratingBeasts += 1;
       const mesh = life.renderedAnimals.find(item => item.id === beast.id);
@@ -163,6 +184,16 @@ try {
       if (stage !== 'sleeping' && life.map.blocked[cell] === 1) summary.blockedCentres += 1;
       if (last.get(person.id) !== stage) summary.transitions.push({ at: frame.seconds, id: person.id, stage });
       last.set(person.id, stage);
+      const preparingOutside = (person.residence === null || person.residence.stage === 'day')
+        && person.doing?.offer?.startsWith('prepare') && person.doing.route > 0;
+      if (porterIds.has(person.id) && preparingOutside) {
+        const prior = porterMotion.get(person.id);
+        const moved = prior === undefined || Math.hypot(person.x - prior.x, person.z - prior.z) > 0.02;
+        porterMotion.set(person.id, { x: person.x, z: person.z, since: moved ? frame.seconds : prior.since });
+        if (!moved && frame.seconds - prior.since >= 10 && !summary.preparation.stalledPorters.includes(person.id)) {
+          summary.preparation.stalledPorters.push(person.id);
+        }
+      } else porterMotion.delete(person.id);
     }
     if (life.phase >= 0.78 || life.phase < 0.06) summary.night.push({ at: frame.seconds, phase: life.phase, counts });
   }

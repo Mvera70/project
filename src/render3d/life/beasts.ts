@@ -507,10 +507,18 @@ function fordDrinkOf(state: GameState, land: Terrain): Place | null {
  */
 export function createBeasts(
   state: GameState, land: Terrain, heart: Point, seed: number, shore: Uint8Array,
+  secure = false,
 ): Beast[] {
   const houses = state.buildings
     .filter((b) => (b.kind === 'house' || b.kind === 'stone_house') && b.lostTick === null)
-    .sort((a, b) => a.id - b.id);
+    // E0a: durante la preparación se empieza por las casas más interiores.
+    // El corazón ya pertenece a la región con más aldea y cada ancla pasa
+    // después por `canReach`, así que esto no inventa un recinto ni atraviesa
+    // su muralla. Fuera de esa jornada se conserva literalmente el orden viejo.
+    .sort((a, b) => secure
+      ? gap({ x: a.x + a.w / 2, z: a.y + a.h / 2 }, heart)
+        - gap({ x: b.x + b.w / 2, z: b.y + b.h / 2 }, heart) || a.id - b.id
+      : a.id - b.id);
   const fields = state.buildings
     .filter((b) => b.kind === 'field' && b.lostTick === null)
     .sort((a, b) => a.id - b.id);
@@ -615,10 +623,14 @@ export function createBeasts(
     const house = houses[(i * ANIMALS.HOUSES_PER_PIG) % Math.max(1, houses.length)];
     spawn('pig', anchorOf(house, BEAST_ID_BASE + n));
   }
-  // Vacas: junto a los campos, dos por cabeza (`FIELDS_PER_COW`).
+  // Vacas: junto a los campos, dos por cabeza (`FIELDS_PER_COW`). E0a las
+  // lleva junto a las mismas casas interiores que ya cobijan al resto de la
+  // cabaña; no desaparecen ni cambia una unidad de `state.herd`.
   for (let i = 0; i < state.herd.cows; i += 1) {
-    const field = fields[(i * ANIMALS.FIELDS_PER_COW) % Math.max(1, fields.length)];
-    spawn('cow', anchorOf(field, BEAST_ID_BASE + n));
+    const shelter = secure
+      ? houses[(i * ANIMALS.FIELDS_PER_COW) % Math.max(1, houses.length)]
+      : fields[(i * ANIMALS.FIELDS_PER_COW) % Math.max(1, fields.length)];
+    spawn('cow', anchorOf(shelter, BEAST_ID_BASE + n));
   }
 
   return beasts;

@@ -29,7 +29,7 @@ import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
-import { garrisonPlaces, type Manned } from './garrison';
+import { garrisonPlaces, isPost, type Manned } from './garrison';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
 import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
 import { createPhysics, type Physics, type PhysicsSnapshot } from './physics';
@@ -59,6 +59,10 @@ import {
   carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
   REST_AFTER_THROW, scatter, settle, take, THROW, THROW_AHEAD, type Prop,
 } from './props';
+import {
+  planPreparation, preparationActive, preparationSites,
+  type PreparationTrip,
+} from './preparation';
 
 /**
  * Lo que se aguanta yendo a un sitio antes de pensárselo otra vez, en pasos.
@@ -230,6 +234,12 @@ export interface Village {
   readonly stoneDeliveries: number;
   /** Cargas llevadas del campo al almacén durante la semana real de cosecha. */
   readonly harvestDeliveries: number;
+  /** E0a · La decisión de prepararse, reconstruida para esta jornada. */
+  readonly preparation: {
+    readonly active: boolean;
+    readonly porters: readonly PreparationTrip[];
+    readonly deliveries: number;
+  };
   /** Cada pase, en orden, con quién lo dio y a quién iba. V-09b: lo que hace
    *  falta para medir una cadena — `passes` sólo da el total. */
   readonly passLog: readonly PassRecord[];
@@ -581,7 +591,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // casa o campo) no depende de `mine` pero lo que ofrece a la gente —`pet`,
   // `chase`, `feed`— sí entra en la misma lista que el resto de sitios: para
   // `decide()` un animal cerca no es distinto de un pozo cerca.
-  const beasts = createBeasts(state, land, heart, seed, shore);
+  const preparing = preparationActive(state);
+  const beasts = createBeasts(state, land, heart, seed, shore, preparing);
   // IA-5 · El lobo del corral (§7.10, `wolves_at_the_coop`): si el motor lo
   // soltó esta semana (`wolfRaidToday`, `staging.ts`), hay visita esta
   // jornada, guionizada en `wildlife.ts`. El corral es el ancla de la primera
@@ -736,6 +747,31 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   const bodies = [...dwellers.map((d) => d.body), ...beasts.map((b) => b.dweller.body)];
   const plans = dayPlans(state, mine, land, new Map(dwellers.map(d => [d.villager, d.body])), day);
   dwellers.forEach((dweller, index) => { dwellers[index] = { ...dweller, dayPlan: plans.get(dweller.villager)! }; });
+  // E0a · El cerco ya se ha repartido arriba. Sólo entonces se buscan de dos
+  // a cuatro manos entre los adultos restantes, y una convocatoria del motor
+  // conserva su prioridad como hasta ahora.
+  const prepSites = preparationSites(state, land, places);
+  const preparationTrips = summoned ? [] : planPreparation(state, land, dwellers.map(dweller => ({
+    villager: dweller.villager,
+    at: dweller.body,
+    radius: dweller.body.radius,
+    guarding: isPost(dweller.dayPlan?.job?.place ?? ''),
+  })), prepSites, seed);
+  const preparationByVillager = new Map(preparationTrips.map(trip => [trip.villager, trip]));
+  for (const dweller of dwellers) {
+    const trip = preparationByVillager.get(dweller.villager);
+    if (trip === undefined) continue;
+    dweller.doing = {
+      place: trip.source,
+      offer: trip.source.offers[0]!,
+      route: [...trip.toSource],
+      seat: trip.sourceSeat,
+      since: 0,
+      until: 0,
+      there: false,
+    };
+    dweller.rethinkAt = GIVE_UP;
+  }
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
 
   // Checklist IA-1, punto 6: lo que `noProgress()` (`decide.ts`) necesita
@@ -859,6 +895,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   let timberDeliveries = 0;
   let stoneDeliveries = 0;
   let harvestDeliveries = 0;
+  let preparationDeliveries = 0;
   // V-09b: el registro de cada pase, para poder medir una cadena — `passes`
   // por sí solo no dice quién se la pasó a quién.
   const passLog: PassRecord[] = [];
@@ -902,6 +939,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     get timberDeliveries(): number { return timberDeliveries; },
     get stoneDeliveries(): number { return stoneDeliveries; },
     get harvestDeliveries(): number { return harvestDeliveries; },
+    get preparation() {
+      return { active: preparing, porters: preparationTrips, deliveries: preparationDeliveries };
+    },
     get passLog(): readonly PassRecord[] { return passLog; },
     get interactions() {
       return {
@@ -1379,6 +1419,46 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // debe pasar — antes se quedaba clavado mirando a la plaza fallida.
         // Aquí queda sólo el final normal de una ocupación cumplida.
         if (dweller.doing !== null && dweller.doing.there && steps >= dweller.doing.until) {
+          // E0a · La ida exterior acaba al coger una carga visible; la vuelta
+          // usa otra ruta real hasta el almacén. No hay inventario aquí: el
+          // coste y la protección ya los resolvió el motor al elegir `brace`.
+          const preparation = preparationByVillager.get(dweller.villager);
+          if (preparation !== undefined && dweller.doing.offer.id === 'prepare-load') {
+            const targetOffer = preparation.target.offers[0];
+            const target = targetOffer === undefined ? null : seatAt(targetOffer, preparation.targetSeat);
+            const route = target === null ? null : pathTo(land, body, target, body.radius);
+            if (targetOffer !== undefined && route !== null) {
+              dweller.holding = preparation.load === 'grain'
+                ? -4_000_000 - body.id
+                : -100_000 - body.id;
+              dweller.doing = {
+                place: preparation.target,
+                offer: targetOffer,
+                seat: preparation.targetSeat,
+                route: [...route],
+                since: steps,
+                until: steps,
+                there: false,
+              };
+              dweller.rethinkAt = steps + GIVE_UP;
+              continue;
+            }
+          }
+          if (preparation !== undefined && dweller.doing.offer.id === 'prepare-store') {
+            preparationDeliveries += 1;
+            // Hasta cuatro cargas quedan bajo techo durante la jornada. Son
+            // huella visual, no existencias, y no se vuelven a ofrecer.
+            const load: Prop = {
+              id: -40_000_000 - preparationDeliveries,
+              kind: preparation.load,
+              x: body.x, z: body.z, y: 0,
+              vx: 0, vz: 0, vy: 0, held: null,
+              restUntil: Number.POSITIVE_INFINITY, for: null,
+            };
+            props.push(load);
+            propsById.set(load.id, load);
+            dweller.holding = null;
+          }
           // La cosecha entra en el motor de golpe en la semana 35. Esta ruta
           // hace visible esa jornada sin volver a sumar grano ni adjudicar una
           // producción a una parcela que el estado no conoce.
@@ -2055,6 +2135,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       const onDuty = (d: Dweller): boolean => d.holding !== null && d.holding < 0
         || d.doing?.offer.id === 'deliver' || d.doing?.offer.id === 'deliver-stone'
         || d.doing?.offer.id === 'deliver-grain'
+        || d.doing?.offer.id.startsWith('prepare') === true
         || (phase >= 0.16 && phase < 0.65
           && d.dayPlan?.job !== null && d.dayPlan?.job !== undefined
           && ['work', 'pray'].includes(d.dayPlan.job.offer)

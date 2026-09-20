@@ -3,7 +3,7 @@ import { foundGame } from '@engine/found';
 import { foundSuccessor } from '@engine/save';
 import { HAPPENINGS, MEANS_IDS, SCHEMA_VERSION, type HappeningId, type MeansId, type SaveFile } from '@engine/state';
 import { archivedGames, crownNow, crownReady, giveNow, happenNow, mountDebug, offerNow, openAtYear,
-  parseDebugRequest, raidNow, bracedNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
+  parseDebugRequest, raidNow, bracedNow, comingNow, runToCrossroad, runToSky, stateAt } from './ui/debug';
 import { boot } from './ui/app';
 import { loadSave } from './ui/idb';
 import { registerServiceWorker } from './ui/pwa';
@@ -109,8 +109,10 @@ if (root) {
     const raid = query.get('raid');
     // D3b · `&assault=1` hace que la partida venga a por la puerta.
     if (raid !== null) raidNow(state, Number(raid) || 12, query.get('assault') === '1');
-    // C2 · `&braced=2` deja el valle a dos semanas del asalto: la guarnición
-    // sube y todavía no hay nadie en el camino.
+    // E0a · `&braced=2` construye la decisión real: amenaza futura y bandera.
+    // `&coming=2` deja la misma víspera sin prepararse, para compararla.
+    const coming = query.get('coming');
+    if (coming !== null) comingNow(state, Number(coming) || 1);
     const braced = query.get('braced');
     if (braced !== null) bracedNow(state, Number(braced) || 1);
     const crown = query.get('crown');

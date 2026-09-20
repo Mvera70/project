@@ -40,6 +40,7 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
   if (dweller.scene === null && dweller.doing?.there === true
     && (dweller.residence === undefined || dweller.residence.stage === 'day')) {
     const action = dweller.doing.offer.id, place = dweller.doing.place.id;
+    if (action.startsWith('prepare')) return 'sort';
     if (action === 'harvest') return 'sort';
     if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
       : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
@@ -58,7 +59,7 @@ function activityOf(dweller: Dweller, moving: boolean): Activity {
   if (dweller.scene !== null || dweller.doing === null) return 'resting';
   return dweller.doing.there
     && (dweller.doing.offer.id === 'work' || dweller.doing.offer.id === 'harvest'
-      || dweller.doing.offer.id.startsWith('deliver')) ? 'working' : 'resting';
+      || dweller.doing.offer.id.startsWith('deliver') || dweller.doing.offer.id.startsWith('prepare')) ? 'working' : 'resting';
 }
 
 /**
