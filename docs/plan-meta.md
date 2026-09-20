@@ -109,18 +109,19 @@ es divertido, y el resultado es el que sale.
 ### E · Arte y animación (sesión de arte)
 
 **20 sep, E1b:** contacto `spear_thrust` y reacción `hit_take` entregados sobre
-el esqueleto publicado y ligados a D4. E1 queda parcial por `flee`.
+el esqueleto publicado y ligados a D4. La ronda posterior cierra `flee`,
+con conducta civil de refugio y carrera procedural.
 Los siete modelos de la primera tanda están aceptados e integrados en el juego
 (20 sep). También se corrige D4 sin arqueros: ya no depende de inicializar Rapier.
 [Integración y defensa](historico/life-rounds/E2-integracion-y-defensa.md).
 E2/E3 siguen parciales: faltan identidad del clan, adarve y portón roto.
 
-**El arte sigue parcial:** seis gestos de combate ya tienen representación
-procedural; `flee` sigue pendiente.
+**El arte sigue parcial:** los siete gestos de E1 tienen representación
+procedural; no son nuevos clips embebidos en el GLB.
 
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
-| E1 · Clips de combate · **parcial, 20 sep 2026** | Tercer reloj por hecho, sin bucle y con final sostenido; `bow_draw` (1,5 s), `bow_loose` (0,6 s), `gate_strike`, `fall`, `spear_thrust` y `hit_take` procedurales. Pose absoluta probada sobre el GLB y tomas a 15 fps. Reacción de puerta conectada y armas integradas. Falta `flee`; oclusión y solapes quedan abiertos. [Informe de contacto](historico/life-rounds/E1b-cuerpo-a-cuerpo.md) | **P1** | Alta | Código + arte pendiente | — |
+| E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
 | E0 · **Lo que pasa y no se ve** | Ocho mecánicas ya en `main` que sólo salen como línea de crónica: el asalto, el aviso, prepararse, pagar, la semana de después, armas, arcos y la atalaya vacía. El inventario está en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Astra (diseño) · Sol (capa de vida) | — |
 | E2 · Modelos del asedio | **El clan vecino**: aldeanos armados de otro valle —no soldados de cota ni bandidos andrajosos—, arco, flecha, espada, escudo | P2 | Alta | Astra · sesión de arte | — |
 | E3 · Portón, muralla de piedra, torre | Las mallas de la fase 3; el portón con dos estados y roto | P2 | Media | Sesión de arte | A2, A4 |

@@ -1,5 +1,19 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · Puntos 3 y 4: visibilidad y huida terminados
+
+El robledal atenúa sólo los árboles que ocultan el portón y el frente atacante.
+Los raiders participan en la separación de cuerpos: pares-muestra a <0,3 celdas
+bajan de 3927 a 47 en semilla 7 y de 4026 a cero en 23. Cambian los contactos
+y sus tiempos, sin retocar daño, alcance ni cadencia para compensarlos.
+Los civiles interrumpen su actividad, corren a un destino seguro alcanzable y
+esperan allí; los defensores permanecen en puesto. `flee` procedural cierra los
+gestos de E1, no el resto del arte ni D6. Dos Sol implementan y Terra audita.
+La observación ajustó la opacidad a 0,06 y detectó/corrigió carrera por empujón
+pasivo en refugiados. 131 pruebas focalizadas, typecheck y lint pasan.
+[Evidencia y límites](historico/life-rounds/E3-visibilidad-y-huida.md).
+Se termina aquí, sin abrir otra tarea, hacer push ni desplegar.
+
 ## 20 sep 2026 · Integración y defensa sin arqueros: puntos 1 y 2
 
 Los siete modelos aceptados quedan integrados y publicados localmente en

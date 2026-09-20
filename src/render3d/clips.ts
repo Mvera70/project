@@ -43,7 +43,7 @@ export interface ClipMotion {
 }
 
 export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'play' | 'drink' | 'sort'
-  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall';
+  | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall' | 'flee';
 
 /** Gestos de combate: su reloj procede del hecho, nunca del primer pintado. */
 export function combatClip(clip: string): boolean {
@@ -52,6 +52,9 @@ export function combatClip(clip: string): boolean {
 }
 
 export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
+  // E1: carrera civil, no gesto de combate. TUNE: ciclo de 0,8 s y zancada
+  // grande de 0,44 celdas, gobernada por suelo recorrido como `walk`.
+  flee: { seconds: 0.8, loop: true, strideLength: 0.44 },
   spear_thrust: { seconds: 0.9, loop: false, strideLength: null },
   hit_take: { seconds: 0.5, loop: false, strideLength: null },
   bow_draw: { seconds: 1.5, loop: true, strideLength: null },

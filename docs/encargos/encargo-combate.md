@@ -4,8 +4,10 @@
 
 **Estado actualizado el 20 sep:** E1 y E1b entregan por código, sobre los huesos
 publicados, `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y
-`hit_take`. No son clips nuevos dentro del GLB. Queda `flee`; este encargo
-conserva debajo su formulación original. [E1b](../historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
+`hit_take`. La ronda posterior añade `flee` y conducta civil de refugio:
+los siete gestos están entregados por código, no como clips nuevos dentro del GLB.
+Este encargo conserva debajo su formulación original.
+[Cierre](../historico/life-rounds/E3-visibilidad-y-huida.md).
 
 Este es el camino largo del proyecto: **hoy no existe ni un solo clip de
 pelea**, y sin ellos la batalla de `design.md` §1b no se puede ver por bien que

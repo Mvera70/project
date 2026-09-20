@@ -51,6 +51,7 @@ import {
   type Gate, type Raider,
 } from './raiders';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
+import { beginFlight, stepFlight, type Flight } from './flee';
 import type { Animal } from '@derive/animals';
 import {
   carryAt, drop, findMate, fling, given, LOFT, PLAYED_OUT, propPlaces, PROP_PLACE_PREFIX,
@@ -80,6 +81,8 @@ const CATCH_RANGE = 2;
 export interface Dweller {
   /** Pose fechada por la vida, no por el mixer; `since` son pasos de jornada. */
   combat?: { clip: 'bow_draw' | 'bow_loose' | 'spear_thrust' | 'hit_take' | 'fall'; since: number; facing: number };
+  /** E1: huida efímera de esta jornada; no es combate ni estado del motor. */
+  flight?: Flight | null;
   readonly residence?: HomeRoutine;
   readonly body: Body;
   readonly villager: VillagerId;
@@ -692,6 +695,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       faceAnchor: { x, z },
       scene: null,
       quarrel: null,
+      flight: null,
       sceneCooldownUntil: 0,
       holding: null,
       aimAt: null,
@@ -787,6 +791,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
    * bastaba con dar un paso atrás para volver a estar entero.
    */
   const wounded = new Map<VillagerId, Defender>();
+  const defendedPosts = new Set(manned.map((post) => post.place.id));
+  let flightStarted = false;
   let physics: Physics | null = options.physics ?? null;
   let physicsAsked = physics !== null;
   let wolf: Wolf | null = null;
@@ -919,10 +925,27 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     step(phase = 0.45): void {
       const now = steps * LIFE_STEP;
       const starts = dwellers.map(d => ({ x: d.body.x, z: d.body.z, travelled: d.travelled }));
-      const outside = (): Body[] => bodies.filter(body => {
+      const raiderStarts = new Map<number, Point>();
+      const liveInvaders = (): Raider[] => raiders.filter((raider) => raider.entered
+        && raider.phase !== 'gone' && raider.phase !== 'down');
+      // Una vez que el último que entró deja de estar vivo dentro, la reacción
+      // termina. No se inicia otra vez con el recuerdo `entered` de un `gone`.
+      if (flightStarted && liveInvaders().length === 0) {
+        for (const dweller of dwellers) {
+          if (dweller.flight === null || dweller.flight === undefined) continue;
+          dweller.flight = null;
+          dweller.rethinkAt = steps;
+          dweller.body.vx = 0;
+          dweller.body.vz = 0;
+          dweller.motionSpeed = 0;
+        }
+      }
+      const outside = (): Body[] => [...bodies.filter(body => {
         const person = byId.get(body.id);
         return person === undefined || (!indoors(person) && wounded.get(person.villager)?.down !== true);
-      });
+      }), ...raiders
+        .filter((raider) => raider.phase !== 'gone' && raider.phase !== 'down')
+        .map((raider) => raider.body)];
       const taken = seats();
       // Se va actualizando conforme la gente decide: ver el comentario de abajo.
       around.rebuild(outside());
@@ -1068,6 +1091,23 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           body.vx = 0;
           body.vz = 0;
           dweller.doing = null;
+          dweller.flight = null;
+          continue;
+        }
+
+        // E1 · Una huida ya empezada manda sobre la rutina, la casa nocturna y
+        // las ofertas. Al llegar se queda quieto hasta que cese la entrada; no
+        // vuelve a trabajar ni reproduce carrera sin avanzar.
+        if (dweller.flight !== null && dweller.flight !== undefined) {
+          const before = { x: body.x, z: body.z };
+          const moving = stepFlight(body, dweller.flight, land, around);
+          const distance = gap(before, body);
+          if (moving) dweller.travelled += distance;
+          dweller.motionSpeed = distance / LIFE_STEP;
+          dweller.faceAnchor = { x: body.x, z: body.z };
+          drift(dweller.needs, dweller.traits, {
+            moving, withOthers: false, working: false, hunger,
+          }, LIFE_STEP);
           continue;
         }
 
@@ -1662,9 +1702,86 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // razón (E.8): lo que se llevan ya lo decidió el motor antes de que
       // empiece el día, y esto sólo lo enseña. No pelea, no rompe y no mata.
       for (const raider of raiders) {
-        const { x, z } = raider.body;
+        raiderStarts.set(raider.body.id, { x: raider.body.x, z: raider.body.z });
         stepRaider(raider, land, seed, steps, gate ?? undefined);
-        raider.travelled = (raider.travelled ?? 0) + Math.hypot(raider.body.x - x, raider.body.z - z);
+      }
+
+      // E1 · La entrada que dispara la huida es un cuerpo hostil vivo con
+      // `entered`, no la puerta rota ni el recuerdo de uno que ya se fue. Hoy
+      // `stepRaider` marca `inside` justo antes del cruce visual de la hoja; no
+      // se redefine aquí ese contrato de B4.
+      const inside = liveInvaders();
+      if (!flightStarted && inside.length > 0) {
+        flightStarted = true;
+        const threat = inside.reduce((at, raider) => ({
+          x: at.x + raider.body.x / inside.length,
+          z: at.z + raider.body.z / inside.length,
+        }), { x: 0, z: 0 });
+        const fleeing = new Set<number>();
+        for (const dweller of dwellers) {
+          if (indoors(dweller) || wounded.get(dweller.villager)?.down === true
+            || defendedPosts.has(dweller.dayPlan?.job?.place ?? '')) continue;
+          const flight = beginFlight(dweller.body, land, threat, dweller.home, seed, steps);
+          if (flight === null) continue;
+          dweller.flight = flight;
+          fleeing.add(dweller.body.id);
+        }
+
+        // La alarma corta lo que estuvieran haciendo: una conversación o un
+        // pase no puede volver a imponer velocidad en el paso siguiente.
+        const interruptedScenes = scenes.filter((scene) => fleeing.has(scene.a) || fleeing.has(scene.b));
+        for (const scene of interruptedScenes) {
+          closeScene(byId.get(scene.a), scene, steps);
+          closeScene(byId.get(scene.b), scene, steps);
+          commitments.release(sceneCommitmentId(scene));
+          interactionsInvalidated += 1;
+        }
+        if (interruptedScenes.length > 0) scenes = scenes.filter((scene) => !interruptedScenes.includes(scene));
+
+        const interruptedYields = yieldings.filter((active) => fleeing.has(active.yielding.yielder)
+          || fleeing.has(active.yielding.passer));
+        for (const active of interruptedYields) {
+          commitments.release(active.id);
+          interactionsInvalidated += 1;
+        }
+        if (interruptedYields.length > 0) yieldings = yieldings.filter((active) => !interruptedYields.includes(active));
+
+        const interruptedGreets = greetings.filter((active) => fleeing.has(active.greeting.a)
+          || fleeing.has(active.greeting.b));
+        for (const active of interruptedGreets) {
+          commitments.release(active.id);
+          interactionsInvalidated += 1;
+        }
+        if (interruptedGreets.length > 0) greetings = greetings.filter((active) => !interruptedGreets.includes(active));
+
+        if (activeQuarrel !== null && (fleeing.has(activeQuarrel.scene.a)
+          || fleeing.has(activeQuarrel.scene.b))) {
+          const a = byId.get(activeQuarrel.scene.a);
+          const b = byId.get(activeQuarrel.scene.b);
+          if (a?.quarrel === activeQuarrel.scene) a.quarrel = null;
+          if (b?.quarrel === activeQuarrel.scene) b.quarrel = null;
+          commitments.release(activeQuarrel.id);
+          storiesInvalidated += 1;
+          activeQuarrel = null;
+        }
+
+        for (const dweller of dwellers) {
+          if (!fleeing.has(dweller.body.id)) continue;
+          const commitment = commitments.of(actorOf(dweller));
+          if (commitment !== undefined) commitments.release(commitment.id);
+          if (dweller.holding !== null) {
+            const held = propsById.get(dweller.holding);
+            if (held !== undefined) drop(held, dweller, land);
+          }
+          dweller.holding = null;
+          dweller.aimAt = null;
+          dweller.doing = null;
+          dweller.scene = null;
+          dweller.quarrel = null;
+          dweller.body.vx = 0;
+          dweller.body.vz = 0;
+          dweller.motionSpeed = 0;
+        }
       }
 
       // D2 · **y la muralla contesta.** Un paso de física por paso de vida, que
@@ -1788,6 +1905,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         wolf !== null && wolf.phase !== 'gone' ? { x: wolf.body.x, z: wolf.body.z } : null);
 
       resolve(outside(), around, land);
+      // La zancada del clan sigue el suelo final, incluida la corrección física
+      // del gentío. Contarla antes de `resolve` haría patinar justo al separarse.
+      for (const raider of raiders) {
+        const start = raiderStarts.get(raider.body.id);
+        if (start === undefined) continue;
+        raider.travelled = (raider.travelled ?? 0) + gap(start, raider.body);
+      }
       // El contacto puede cancelar parte del avance o apartar el cuerpo. La
       // zancada sigue la posición final, no el trayecto anterior a la corrección.
       dwellers.forEach((d, i) => {
@@ -1824,6 +1948,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         | { readonly a: Dweller; readonly b: Dweller; readonly tag: 'greet'; readonly data: Greeting };
 
       const freeToPropose = (d: Dweller): boolean => !indoors(d) && (d.residence === undefined || ['day', 'returning'].includes(d.residence.stage)) && d.scene === null
+        && (d.flight === null || d.flight === undefined)
         && (steps >= d.sceneCooldownUntil || isNight(phase) || (!quarrelStaged && quarrelPair?.includes(d.villager) === true))
         && !commitments.busy(actorOf(d));
       const onDuty = (d: Dweller): boolean => d.holding !== null && d.holding < 0

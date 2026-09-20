@@ -223,11 +223,15 @@ describe('G-04 · los clips del aldeano', () => {
     expect(extra, 'lo que no viene del GLB lo fabrica action-clips.ts')
       .toEqual([...ACTION_CLIPS].sort());
 
-    // Tres: ningún clip fabricado anda. Un clip clonado del `idle` no tiene
-    // paso que medir, así que darle zancada haría que se reprodujese a ritmo de
-    // distancia recorrida —`clipTime`— y eso es el aldeano patinando de D.6.
+    // Tres: sólo la carrera fabricada anda. Los gestos clonados del `idle` no
+    // tienen paso que medir; `flee` es la excepción deliberada de E1, fabricada
+    // con piernas y brazos en ciclo y por eso gobernada por suelo recorrido.
     for (const name of ACTION_CLIPS) {
-      expect(VILLAGER_CLIPS[name].strideLength, `${name} no puede tener zancada`).toBeNull();
+      if (name === 'flee') {
+        expect(VILLAGER_CLIPS[name]).toMatchObject({ seconds: 0.8, loop: true, strideLength: 0.44 });
+      } else {
+        expect(VILLAGER_CLIPS[name].strideLength, `${name} no puede tener zancada`).toBeNull();
+      }
     }
   });
 });

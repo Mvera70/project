@@ -31,6 +31,10 @@ import type { Dweller, Village } from './village';
  * charla seguiría cavando con la azada.
  */
 function clipOf(dweller: Dweller, moving: boolean): ClipName {
+  // E1: huir no es un gesto de combate. Lo mueve el suelo recorrido y sólo se
+  // enseña mientras el cuerpo avanza; al refugiarse vuelve a `idle`.
+  if (dweller.flight?.sheltered === true) return 'idle';
+  if (moving && dweller.flight !== null && dweller.flight !== undefined) return 'flee';
   if (moving) return dweller.holding !== null ? 'carry_walk' : 'walk';
   if (talkingOf(dweller)) return 'talk';
   if (dweller.scene === null && dweller.doing?.there === true

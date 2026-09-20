@@ -35,6 +35,7 @@ import { buildFord, type Ford } from './world/ford';
 import {
   buildForest, builtCells, scatterCells, scatterOn, scrubCells, shoreCells, type Forest,
 } from './world/forest';
+import type { ForestRevealTarget } from './world/forest-occlusion';
 import { BUILDING_ASSETS, Village } from './world/buildings';
 import { Steading, STEADING_ASSETS, steadingOf } from './world/steading';
 import { isNight, type HomeRoutine } from './life/home';
@@ -325,6 +326,15 @@ export async function createGraphicsRenderer(
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   /** Cuanto se sube en pantalla a quien se sigue. Ver `track`. TUNE: 0,14. */
   const TRACK_LIFT = 0.14;
+  /** D.6.2: altura visual del cuerpo; aquí ensancha lo que debe verse. */
+  const ACTOR_VISUAL_HEIGHT = 0.65;
+  /**
+   * TUNE visual: dos celdas alrededor del portón.
+   *
+   * Es un parámetro inicial pendiente de contraste en PNG. No es alcance ni
+   * colisión: sólo el radio de lectura de la escena.
+   */
+  const GATE_REVEAL_RADIUS = 2;
   // La cota del suelo, que la burbuja necesita para flotar sobre la cabeza y no
   // sobre el nivel del mar.
   let groundFloor: (x: number, z: number) => number = () => 0;
@@ -420,6 +430,49 @@ export async function createGraphicsRenderer(
   let disposed = false;
 
   const raycaster = new Raycaster();
+
+  /**
+   * Los dos volúmenes que forman el encuentro: portón y frente real.
+   *
+   * El frente no es un punto inventado delante de la puerta. Sale de los
+   * atacantes activos más próximos a ella y su radio es la caja que ocupan más
+   * la altura de un cuerpo. Así cubre la partida de la semilla 7 cuando aún
+   * está a unas cuatro celdas, sin transparentar su ruta entera por el bosque.
+   */
+  function revealAssault(): number {
+    if (forest === null || life === null) return 0;
+    const gate = life.defence.gate;
+    if (gate === null) return forest.reveal(camera, []);
+    const active = life.raiders.filter(raider => raider.phase !== 'down'
+      && raider.phase !== 'gone' && raider.phase !== 'leaving');
+    // El portón puede conservar su parte después de caer el último atacante.
+    // Sin un cuerpo hostil activo ya no hay encuentro que revelar.
+    if (active.length === 0) return forest.reveal(camera, []);
+    const targets: ForestRevealTarget[] = [{
+      x: gate.at.x,
+      y: groundFloor(gate.at.x, gate.at.z) + GATE_REVEAL_RADIUS / 2,
+      z: gate.at.z,
+      radius: GATE_REVEAL_RADIUS,
+    }];
+    const distance = (raider: typeof active[number]): number => Math.hypot(
+      raider.body.x - gate.at.x, raider.body.z - gate.at.z,
+    );
+    const nearest = Math.min(...active.map(distance));
+    // El mismo radio visual del portón selecciona la primera fila, no una
+    // distancia nueva que pudiera convertirse accidentalmente en balance.
+    const front = active.filter(raider => distance(raider) <= nearest + GATE_REVEAL_RADIUS);
+    const x = front.reduce((sum, raider) => sum + raider.body.x, 0) / front.length;
+    const z = front.reduce((sum, raider) => sum + raider.body.z, 0) / front.length;
+    const radius = front.reduce((outer, raider) => Math.max(outer,
+      Math.hypot(raider.body.x - x, raider.body.z - z)), 0) + ACTOR_VISUAL_HEIGHT;
+    targets.push({
+      x,
+      y: groundFloor(x, z) + ACTOR_VISUAL_HEIGHT / 2,
+      z,
+      radius,
+    });
+    return forest.reveal(camera, targets);
+  }
 
   /**
    * La caja que hay que encuadrar: lo construido mas su margen, recortado al
@@ -702,6 +755,7 @@ export async function createGraphicsRenderer(
         standing: forest?.count ?? 0,
         stumps: forest?.stumpCount ?? 0,
         regrowth: forest?.regrowthCount ?? 0,
+        revealed: forest?.revealedCount ?? 0,
         suppressed: treeFalls.suppressed.size,
         falls: treeFalls.snapshot(),
       },
@@ -717,7 +771,15 @@ export async function createGraphicsRenderer(
         screen: screen(dweller.body.x, dweller.body.z),
         home: dweller.home ?? null,
         residence: dweller.residence ?? null,
-        routePoints: (dweller.residence?.stage !== 'day' && dweller.residence !== undefined ? dweller.residence.route : dweller.doing?.route ?? []).map(point => ({ ...point, screen: screen(point.x, point.z) })),
+        routePoints: (dweller.flight?.route
+          ?? (dweller.residence?.stage !== 'day' && dweller.residence !== undefined
+            ? dweller.residence.route : dweller.doing?.route ?? []))
+          .map(point => ({ ...point, screen: screen(point.x, point.z) })),
+        flight: dweller.flight === null || dweller.flight === undefined ? null : {
+          since: dweller.flight.since,
+          target: { ...dweller.flight.target },
+          sheltered: dweller.flight.sheltered,
+        },
         partners: dweller.scene === null ? [] : [dweller.scene.a, dweller.scene.b],
         x: round(dweller.body.x),
         z: round(dweller.body.z),
@@ -791,17 +853,14 @@ export async function createGraphicsRenderer(
       ?? life?.beasts.find(beast => beast.dweller.body.id === follow)?.dweller.body
       ?? life?.raiders.find(raider => raider.body.id === follow)?.body;
     if (target !== undefined) view.look(target.x, target.z);
-    // Diagnóstico explícito: encuadrar el portón y apartar el bosque sólo del
-    // píxel capturado. No cambia terreno, colisiones, vida ni la vista normal.
+    // El diagnóstico sólo encuadra: la visibilidad es ahora la misma solución
+    // selectiva del juego, no el antiguo atajo que apagaba el bosque entero.
     const gate = gateStudy ? life?.defence.gate : null;
     if (gate !== null && gate !== undefined) { flight = null; disturbed = true; view.look(gate.at.x, gate.at.z); }
     if (zoom !== 1) view.zoom(zoom, viewport.widthCss / 2, viewport.heightCss / 2);
-    const visible = forest?.group.visible ?? true;
-    try {
-      if (gateStudy && forest !== null) forest.group.visible = false;
-      renderer.render(scene, camera);
-      return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
-    } finally { if (forest !== null) forest.group.visible = visible; }
+    revealAssault();
+    renderer.render(scene, camera);
+    return { image: options.canvas.toDataURL('image/png'), life: window.__valleyLife?.() ?? null };
   };
   let observingLive = false;
   window.__valleyObserveLive = () => { observingLive = true; };
@@ -1022,6 +1081,10 @@ export async function createGraphicsRenderer(
       arrows.update(arrowsOf(life));
       plaza.show(plazaOf(shown), groundFloor);
       cast.show(lastActors);
+      // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
+      // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
+      // obstáculos ni geometría física.
+      revealAssault();
 
       // §11.1.1 · la nube sobre la cabeza de quien esta viviendo algo. Lo que
       // lleva sale del estado; que este parado hablando lo dice el actor.
@@ -1264,6 +1327,7 @@ export async function createGraphicsRenderer(
       // que «sube dos celdas» no es «sube en pantalla». Y no acumula: cada
       // fotograma vuelve a mirar y a correr lo mismo.
       view.pan(0, -viewport.heightCss * TRACK_LIFT);
+      revealAssault();
     },
 
     zoom(factor: number, atXCss: number, atYCss: number): void {
@@ -1316,6 +1380,7 @@ export async function createGraphicsRenderer(
         sunPhase: paintedPhase,
         sky: paintedSky,
         bolts,
+        revealedTrees: forest?.revealedCount ?? 0,
       };
     },
 
@@ -1411,6 +1476,7 @@ interface LifeSnapshot {
     readonly standing: number;
     readonly stumps: number;
     readonly regrowth: number;
+    readonly revealed: number;
     readonly suppressed: number;
     readonly falls: readonly TreeFallSighting[];
   };
@@ -1425,6 +1491,8 @@ interface LifeSnapshot {
     readonly ageGroup: string;
     readonly home: { readonly x: number; readonly z: number } | null;
     readonly routePoints: readonly ObservedPoint[]; readonly partners: readonly number[];
+    readonly flight: null | { readonly since: number;
+      readonly target: { readonly x: number; readonly z: number }; readonly sheltered: boolean };
     readonly x: number; readonly z: number;
     readonly vx: number; readonly vz: number;
     readonly facing: number; readonly pace: number;

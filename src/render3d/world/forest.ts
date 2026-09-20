@@ -12,13 +12,16 @@ import { visibleBuildings } from '@derive/visible-buildings';
 
 import {
   Box3, CylinderGeometry, InstancedMesh, Group, Matrix4, MeshStandardMaterial, Quaternion, Vector3,
-  type BufferGeometry, type Color, type Material, type Object3D,
+  type BufferGeometry, type Camera, type Color, type Material, type Object3D,
 } from 'three';
 import type { Building, ValleyMap } from '@engine/state';
 import { TERRAIN_CODE } from '@engine/state';
 import type { Palette } from '@derive/palette';
 import { forestLooks, type ForestState } from './forest-state';
 import { elevationAt } from './ground';
+import {
+  forestOccluders, type ForestOccluder, type ForestRevealTarget,
+} from './forest-occlusion';
 
 /**
  * Cuántos árboles caben en una celda de bosque.
@@ -80,6 +83,10 @@ export interface Forest {
   readonly regrowthCount: number;
   /** Cuántos claros recién talados conservan el tocón. */
   readonly stumpCount: number;
+  /** Árboles atenuados por estar entre la cámara y el asalto. */
+  readonly revealedCount: number;
+  /** Actualiza la oclusión selectiva; una lista vacía restaura el bosque. */
+  reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number;
   dispose(): void;
 }
 
@@ -213,6 +220,7 @@ export function buildForest(
     false,
     false,
     scaleFor,
+    true,
   );
   // Y los pinos, en la loma, con su tamaño propio. No dependen de `forestLooks`
   // —no son bosque que se tale— así que su escala es sólo la del pino.
@@ -249,11 +257,12 @@ export function buildForest(
     group.add(stumps);
   }
   return {
-    ...scattered,
     group,
     count: looks.filter(look => look.stage === 'standing').length,
     regrowthCount: looks.filter(look => look.stage === 'regrowth').length,
     stumpCount: stumpCells.length,
+    get revealedCount(): number { return scattered.revealedCount; },
+    reveal(camera, targets): number { return scattered.reveal(camera, targets); },
     dispose(): void {
       scattered.dispose();
       conifers?.dispose();
@@ -397,6 +406,7 @@ export function scatterCells(
   map: ValleyMap, source: Object3D, cells: readonly number[], palette?: Palette,
   containInCell = false, varyRockSize = false,
   scaleFor?: (cell: number, material: string) => number,
+  occludable = false,
 ): Forest {
   const tree = source;
   const group = new Group();
@@ -410,8 +420,30 @@ export function scatterCells(
     if (piece.geometry.boundingBox !== null) bounds.union(piece.geometry.boundingBox);
   }
   const owned: InstancedMesh[] = [];
+  const faded: InstancedMesh[] = [];
   const tinted: Material[] = [];
+  const fadedMaterials: Material[] = [];
+  const matrices: Matrix4[][] = [];
   const total = cells.length * PER_CELL;
+  const occluders: ForestOccluder[] = [];
+  if (occludable) {
+    const sourceBounds = new Box3().setFromObject(tree);
+    const sourceCentre = sourceBounds.getCenter(new Vector3());
+    const sourceRadius = sourceBounds.getSize(new Vector3()).length() / 2;
+    for (const cell of cells) for (let extra = 0; extra < PER_CELL; extra += 1) {
+      const scattered = scatterTransform(map.width, cell, extra);
+      const visualScale = pieces.reduce((largest, piece) => Math.max(
+        largest, scaleFor?.(cell, piece.material.name) ?? 1,
+      ), 0);
+      const scale = scattered.scale * visualScale;
+      occluders.push({
+        x: scattered.x,
+        y: sourceCentre.y * scale,
+        z: scattered.z,
+        radius: sourceRadius * scale,
+      });
+    }
+  }
 
   if (total > 0) {
     const matrix = new Matrix4();
@@ -429,6 +461,7 @@ export function scatterCells(
       instanced.castShadow = true;
       instanced.receiveShadow = true;
       let slot = 0;
+      const pieceMatrices: Matrix4[] = [];
       for (const cell of cells) {
         for (let extra = 0; extra < PER_CELL; extra += 1) {
           const scattered = scatterTransform(map.width, cell, extra);
@@ -467,6 +500,7 @@ export function scatterCells(
           size.set(scale, heightScale, scale);
           matrix.compose(position, turn, size);
           instanced.setMatrixAt(slot, matrix);
+          if (occludable) pieceMatrices.push(matrix.clone());
           slot += 1;
         }
       }
@@ -475,7 +509,61 @@ export function scatterCells(
       group.add(instanced);
       owned.push(instanced);
       if (palette !== undefined) tinted.push(material);
+      if (occludable) {
+        matrices.push(pieceMatrices);
+        // TUNE visual contrastado en captura: 0,06 evita que varias copas
+        // superpuestas reconstruyan una pared oscura. Es material propio; el
+        // GLB compartido nunca se modifica.
+        const fadedMaterial = material.clone();
+        fadedMaterial.transparent = true;
+        fadedMaterial.opacity = 0.06;
+        fadedMaterial.depthWrite = false;
+        const revealed = new InstancedMesh(piece.geometry, fadedMaterial, total);
+        revealed.name = `${instanced.name || material.name}_revealed`;
+        revealed.count = 0;
+        revealed.castShadow = false;
+        revealed.receiveShadow = true;
+        faded.push(revealed);
+        fadedMaterials.push(fadedMaterial);
+      }
     }
+  }
+
+  let revealedSlots = '';
+  let revealedCount = 0;
+
+  function reveal(camera: Camera, targets: readonly ForestRevealTarget[]): number {
+    if (!occludable || total === 0) return 0;
+    const slots = forestOccluders(occluders, camera, targets);
+    const signature = slots.join(',');
+    if (signature === revealedSlots) return revealedCount;
+    revealedSlots = signature;
+    revealedCount = slots.length;
+    const selected = new Set(slots);
+    for (let piece = 0; piece < owned.length; piece += 1) {
+      const opaque = owned[piece]!;
+      const translucent = faded[piece]!;
+      const transforms = matrices[piece]!;
+      if (slots.length > 0 && translucent.parent !== group) group.add(translucent);
+      if (slots.length === 0 && translucent.parent === group) group.remove(translucent);
+      let solidSlot = 0, fadedSlot = 0;
+      for (let slot = 0; slot < transforms.length; slot += 1) {
+        if (selected.has(slot)) {
+          translucent.setMatrixAt(fadedSlot, transforms[slot]!);
+          fadedSlot += 1;
+        } else {
+          opaque.setMatrixAt(solidSlot, transforms[slot]!);
+          solidSlot += 1;
+        }
+      }
+      opaque.count = solidSlot;
+      translucent.count = fadedSlot;
+      opaque.instanceMatrix.needsUpdate = true;
+      translucent.instanceMatrix.needsUpdate = true;
+      opaque.computeBoundingSphere();
+      translucent.computeBoundingSphere();
+    }
+    return revealedCount;
   }
 
   return {
@@ -483,6 +571,8 @@ export function scatterCells(
     count: total,
     regrowthCount: 0,
     stumpCount: 0,
+    get revealedCount(): number { return revealedCount; },
+    reveal,
     dispose(): void {
       for (const instanced of owned) {
         group.remove(instanced);
@@ -492,10 +582,18 @@ export function scatterCells(
         // otro que estuviera usando el mismo árbol.
         instanced.geometry.dispose();
       }
+      for (const instanced of faded) {
+        group.remove(instanced);
+        instanced.dispose();
+      }
       // Los materiales teñidos sí eran nuestros, y se sueltan. El del recurso,
       // cuando no hay estación que aplicar, no.
       for (const material of tinted) material.dispose();
+      for (const material of fadedMaterials) material.dispose();
       tinted.length = 0;
+      fadedMaterials.length = 0;
+      faded.length = 0;
+      matrices.length = 0;
       owned.length = 0;
     },
   };

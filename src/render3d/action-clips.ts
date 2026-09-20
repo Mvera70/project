@@ -14,7 +14,7 @@ import { VILLAGER_CLIPS, type ClipName } from './clips';
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
   'sit', 'talk', 'pray', 'hammer', 'chop', 'play', 'drink', 'sort',
-  'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall',
+  'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
 ];
 
 export function actionClips(idle: AnimationClip): AnimationClip[] {
@@ -36,7 +36,20 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
     };
     const x = new Vector3(1, 0, 0), z = new Vector3(0, 0, 1);
     const wave = (t: number): number => Math.sin(t * Math.PI * 2);
-    if (name === 'bow_draw' || name === 'bow_loose') {
+    if (name === 'flee') {
+      // Carrera de silueta grande: piernas y brazos opuestos, torso echado
+      // hacia delante y dos apoyos idénticos por ciclo. Se fabrica aparte de
+      // `walk`: a la distancia de juego acelerar el paseo no se lee como huir.
+      turn('thigh.L', x, t => 0.85 * wave(t));
+      turn('shin.L', x, t => 0.65 + 0.45 * Math.max(0, -wave(t)));
+      turn('thigh.R', x, t => -0.85 * wave(t));
+      turn('shin.R', x, t => 0.65 + 0.45 * Math.max(0, wave(t)));
+      turn('upperarm.L', x, t => -0.8 * wave(t));
+      turn('forearm.L', x, () => -1.05);
+      turn('upperarm.R', x, t => 0.8 * wave(t));
+      turn('forearm.R', x, () => -1.05);
+      turn('spine', x, t => 0.2 + 0.04 * Math.abs(wave(t)));
+    } else if (name === 'bow_draw' || name === 'bow_loose') {
       // Tensado sostenible: extremos idénticos, respiración leve. La suelta
       // empieza con la mano ya separándose de la mejilla, sin anticipación
       // que desplace el nacimiento físico de la flecha.

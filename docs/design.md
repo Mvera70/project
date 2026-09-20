@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v3.66 · 15 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.24 · 20 de septiembre de 2026, 02:08 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -6670,6 +6670,17 @@ táctil sigue §11.6; no exigir acertar en una mano de pocos píxeles. Probar te
 y árboles delante del objetivo. Primera solución: encuadre y resalte de selección;
 si hace falta ocultación selectiva, incorporarla con brief, sin transparentar todo
 el pueblo indiscriminadamente. Los objetos decorativos no interceptan la ficha.
+
+**Asalto, puntos 3/4 (20 sep 2026):** la oclusión selectiva del robledal se
+limita a árboles delante del portón y del frente activo, respecto de la cámara.
+Es reversible y sólo visual: no tala, no cambia colisiones ni recursos.
+El contrato y la verificación viven en `encargos/encargo-visibilidad-y-huida.md`.
+Los atacantes vivos participan en los contactos de la capa de vida, no reciben
+desplazamientos cosméticos. Al hecho existente de entrada hostil, los civiles
+exteriores —no defensores ni caídos— buscan refugio alcanzable y corren con
+`flee`; no vuelven al trabajo mientras persista la amenaza. No añade saqueo,
+muertes ni decisiones del motor. El clip es procedural y ligado a distancia,
+como el andar; el GLB aceptado no cambia.
 
 Conservar fichas DOM, accesibilidad y crónica. Acciones de cámara no son decisiones
 del juego. La carga 3D no consume tiempo de simulación ocultamente; guardar/cerrar

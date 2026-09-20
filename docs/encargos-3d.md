@@ -32,8 +32,8 @@ Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
 | **Los arcos** (C1, D2) | Flechas físicas cada 2,1 s | Arco en mano, flecha GLB y tensado/suelta desde el paso real | No hay huesos de dedos: la suelta se expresa con palma y brazo |
 | ~~**El asalto que se decide**~~ (B4) | La semana que llegan el juego dice «vienen a por el pueblo» y la siguiente se resuelve con lo que la muralla hizo | La crónica lo cuenta las dos semanas (`raid.assault`, `raid.held`) **y desde F2 (19 sep) lo dice la línea de estado mientras pasa**: la víspera con su cuenta atrás, el clan encima —«en la puerta» sólo si hay puerta— y los tres estados del portón, que salen de la escena y no del motor (`gateNow`, `src/ui/doing.ts`). Medido: el 4,0 % de las semanas de una partida, seis valles de seis | Lo que queda de esta fila es **arte, no interfaz**: las cuatro filas de abajo (el cuerpo a cuerpo, la avalancha en el portón, el saqueador que cae, el valle tomado). La semana ya se siente como una víspera; lo que no se ve es la pelea |
 | **El cuerpo a cuerpo** (D4) | Ambos bandos golpean y pueden caer | `spear_thrust`, `hit_take`, armas y `fall`; también sin arqueros tras corregir el enganche de D4 | Ragdoll. La caída es animada, no física |
-| **La avalancha en el portón** (D3b/D5) | Sesenta golpes y cede | `gate_strike`, hoja GLB articulada y reacción desde el golpe real | Portón roto, oclusión por bosque y contacto preciso: alcance mecánico de grupo, no de mano |
-| **El valle tomado** (B3) | El clan entra y acaba la partida (`stormed`) | Crónica, epitafio, boquete; E1 muestra caídas durante la jornada escénica | D6: saqueo, huida y transición al final; persistencia de cadáveres entre jornadas. Sangre/fuego siguen siendo decisión del dueño |
+| **La avalancha en el portón** (D3b/D5) | Sesenta golpes y cede | `gate_strike`, hoja GLB articulada y reacción desde el golpe real; robledal atenuado selectivamente y separación de raiders | Portón roto y contacto preciso: alcance mecánico de grupo, no de mano; persisten contactos estrechos en embudos |
+| **El valle tomado** (B3) | El clan entra y acaba la partida (`stormed`) | Crónica, epitafio, boquete; caídas, huida civil y refugio durante la jornada escénica | D6: saqueo y transición al final; persistencia de cadáveres entre jornadas. Sangre/fuego siguen siendo decisión del dueño |
 | **El saqueador que cae** (D2) | Una flecha lo deja `down` | **E1, 20 sep:** caída de 1,2 s desde el impacto y final horizontal sostenido, también por cuerpo a cuerpo | Ragdoll, adaptación al terreno y obstáculos. Sangre sin decidir (E4) |
 | **La muralla de piedra** (A4) | El cerco cerrado abre la piedra y la aldea **dobla su estacada**: 10 de 12 valles, 65 tramos en la semilla 91, desde las 249 h de reloj | `wall.glb` existe y se usa, así que la pieza de piedra **se ve** — y es la primera vez, porque hasta A4 ningún valle levantaba una: la malla llevaba en el juego desde G-10 sin dibujarse en una sola partida | Dos cosas, y ninguna es una malla: **la obra** —una pieza de piedra en construcción se ve igual que cualquier otra obra, y aquí lo que pasa es que se derriba una estaca y se levanta un muro en su sitio— y **el cambio**: la estaca desaparece y el muro aparece de golpe, sin astillas ni transición, que es el mismo hueco que la segunda puerta de A2c. Y el cerco mezclado —madera y piedra en el mismo anillo mientras la obra avanza— **no se ha mirado nunca en una captura** |
 | **La era del valle** (A4, A5) | El valle es caserío, aldea o villa cerrada, y eso ya se puede preguntar (`derive/era.ts`) | La cabecera lo dice desde A5 | **Nada en el valle cambia de aspecto al cambiar de fase.** No es una malla: es que una villa cerrada se vea como una villa —el camino más pisado, la plaza con más cosas, humo en más tejados— y eso es material de una ronda de ambiente, no de Blender |
@@ -66,13 +66,14 @@ juego desde G-10 sin aparecer en una partida.
 ## 3 · Animación y efecto
 
 **Actualización E1b, 20 sep:** `spear_thrust` y `hit_take` ya están conectados
-al cuerpo a cuerpo real, además de los cuatro gestos de E1. Queda `flee`;
+al cuerpo a cuerpo real, además de los cuatro gestos de E1. La ronda posterior
+entrega también `flee` con huida civil y refugio;
 ya están integradas las armas. Las menciones anteriores a esos dos clips como
 ausentes quedan superadas por [esta entrega](historico/life-rounds/E1b-cuerpo-a-cuerpo.md).
 
 | Qué | Estado |
 |---|---|
-| **Clips de combate** (E1) | **Parcial, 20 sep:** tensar, soltar, golpear portón, lanza, recibir impacto y caer hechos por código. Reacción de puerta integrada. Falta `flee`. [Informe de contacto](historico/life-rounds/E1b-cuerpo-a-cuerpo.md) |
+| **Clips de combate** (E1) | **Entregados por código, 20 sep:** tensar, soltar, golpear portón, lanza, recibir impacto, caer y huir. Reacción de puerta integrada. No son clips embebidos nuevos. [Cierre y límites](historico/life-rounds/E3-visibilidad-y-huida.md) |
 | **La hoja del portón** | Integrada con pivote `gate_door`; queda la variante rota |
 | **Fuego, humo y gore** (E4) | Nada. Cómo se ve arder una casa en un asalto y cómo se ve morir. **El gore es decisión del dueño** |
 | **Escombros y ragdoll** | Flechas físicas y caída animada existen. Faltan escombros, cuerpos articulados de Rapier y adaptación al terreno; `fall` no es ragdoll |

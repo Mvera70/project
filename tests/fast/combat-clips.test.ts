@@ -135,6 +135,17 @@ describe('E1 · el hecho decide la pose', () => {
     } finally { cast.dispose(); }
   });
 
+  it('flee es una carrera cíclica de 0,8 s gobernada por suelo recorrido', () => {
+    const cast = makeCast();
+    try {
+      cast.show([actor('flee', 0)]); const start = pose(cast);
+      cast.show([{ ...actor('flee', 0), travelled: 0.11 }]); expect(pose(cast)).not.toEqual(start);
+      cast.show([{ ...actor('flee', 0), travelled: 0.44 }]); expect(pose(cast)).toEqual(start);
+      expect(clipTime('flee', 0.22, 999, 0.7)).toBeCloseTo(0.4);
+      expect(clipTime('flee', 0.44, 999, 0.7)).toBeCloseTo(0);
+    } finally { cast.dispose(); }
+  });
+
   it('cada flecha fecha la suelta, conserva los 63 pasos y no dispara un puesto vacío', async () => {
     const land = { width: 32, height: 32, blocked: new Uint8Array(1024) };
     const physics = await createPhysics(land);

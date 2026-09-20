@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [Visibilidad y huida](life-rounds/E3-visibilidad-y-huida.md): evidencia de
+  los puntos 3 y 4, oclusión selectiva, cuerpos atacantes y carrera civil.
+
 - [Integración y defensa sin arqueros](life-rounds/E2-integracion-y-defensa.md):
   siete modelos publicados localmente, conservación del catálogo y D4 sin Rapier.
 

@@ -291,7 +291,7 @@ export class Cast {
       player.object.scale.setScalar(scale);
       // La zancada del recurso también se escala: un niño necesita más pasos
       // para recorrer la misma distancia, un adulto realzado necesita menos.
-      const seconds = actor.clip === 'walk' || actor.clip === 'carry_walk'
+      const seconds = actor.clip === 'walk' || actor.clip === 'carry_walk' || actor.clip === 'flee'
         ? clipTime(actor.clip, actor.travelled / scale, 0, 0) : actor.clipSeconds;
       this.pose(player, actor.clip, seconds, actor.poseSeconds ?? actor.clipSeconds);
       this.equip(player, actor);

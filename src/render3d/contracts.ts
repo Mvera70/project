@@ -305,6 +305,8 @@ export interface GraphicsStats {
    */
   readonly sky: string;
   readonly bolts: number;
+  /** Punto 3 · árboles atenuados delante del encuentro del portón. */
+  readonly revealedTrees: number;
 }
 
 export interface GraphicsRendererOptions {
