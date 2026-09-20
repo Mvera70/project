@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.26 · 20 de septiembre de 2026, 13:17 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.27 · 20 de septiembre de 2026, 14:09 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -148,8 +148,8 @@ no muera nadie no preocupa; el juego se irá haciendo más difícil por ahí.
 |---|---|---|
 | 1 · El caserío | Dos personas, las primeras casas, la primera decisión | Hecha: primera decisión a las 14 h |
 | 2 · La aldea | Oficios, capilla, la piedra | Hecha: edad de piedra a las 61 h |
-| 3 · La villa cerrada | El primer anillo completo, el segundo anillo tres celdas afuera (§7.4c), lo de dentro a piedra | A medias: el anillo existe y se cierra; el cierre no se celebra ni se distingue |
-| 4 · El asedio | Lo acumulado y lo decidido atraen asaltos; la aldea se defiende con lo que se le dio; el valle cae o aguanta | Por hacer |
+| 3 · La villa cerrada | El primer anillo completo, su portón y bastiones; lo de dentro pasa a piedra. El anillo final de cierre de partida queda fuera de esta fase | Hecha: el cierre se celebra, la era se muestra y la piedra se construye; falta arte propio del bastión |
+| 4 · El asedio | Lo acumulado y lo decidido atraen asaltos; la aldea se defiende con lo que se le dio; el valle cae o aguanta | Hecha de punta a punta: aviso, guarnición, flechas, cuerpo a cuerpo, portón, saqueo y final. Quedan representación ambiental, identidad del clan, fuego y la decisión de gore |
 
 **La regla nueva, y es una frontera y no una excepción: el asalto se resuelve
 en físico, y el motor lo apunta.** Hasta aquí el motor decide todo y la capa de
@@ -176,14 +176,14 @@ torres son aldeanos en la muralla disparando— pero nada se coloca con el dedo:
 se da, y la aldea decide dónde se pone cada uno. Lo físico es la *resolución*
 del asalto, no su causa.
 
-**Lo que cuesta, por piezas**, para que ninguna ronda lo descubra a medias:
-las flechas (balística e impacto) y los aldeanos-torre son baratos —la capa de
-vida ya va a paso fijo y ya tiene círculos, `separate` y `resolve`—; el cuerpo
-a cuerpo (golpe, empujón, caída) y el ejército que entra (un bando hostil con su
-IA, un portón que se rompe) son del tamaño de una tanda como la de la IA de la
-vida; y el gore, los cuerpos que quedan y las casas que arden de verdad
-dependen de la sesión de arte, porque **hoy no existe un solo clip de pelea**.
-Cómo se hace el gore está por decidir; que sea así, no.
+**Lo que costó, por piezas**, y quedó medido al cerrarlo el 20 sep 2026: las
+flechas, la guarnición y el cuerpo a cuerpo usan la capa de vida; Rapier sirve
+la balística, once segmentos por cuerpo y seis tablas por portón roto. Siete
+gestos procedurales expresan el combate sin añadir clips embebidos al GLB. El
+saqueo tiene objetivos, cargas, huellas y salida; el final conserva 8–12 s de
+escena antes de la lápida. Lo que sigue fuera del cierre es el fuego, la
+persistencia de restos entre jornadas y el gore. Cómo se hace el gore está por
+decidir; que exista esa decisión, no.
 
 #### Las cuatro decisiones del 18 sep 2026
 

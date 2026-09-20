@@ -10,6 +10,12 @@ Lo pidió el dueño del diseño con estas palabras: «necesito saber qué es
 prioritario, qué va después y la dificultad de la tarea para así poder
 destinarla a diferentes agentes en función de la dificultad».
 
+**Estado sincronizado el 20 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
+los siete gestos procedurales, siete modelos publicados, armas en mano,
+visibilidad del frente, huida civil, saqueo, transición terminal, ragdolls y
+escombros. Las filas de arte de abajo describen sólo lo que sigue abierto; la
+evidencia del cierre está en `docs/historico/life-rounds/`.
+
 ---
 
 ## 0. Cómo se lee
@@ -102,7 +108,7 @@ es divertido, y el resultado es el que sale.
 | ~~D1 · Rapier, integrado~~ · **hecho el 18 sep 2026**: `life/physics.ts`, un paso de física por paso de vida, y **carga tardía** — el bundle principal no crece y Rapier queda en su trozo de 1,05 MB comprimido que sólo se pide cuando hay algo que simular. Medido: 200 cuerpos en el aire cuestan **403 µs**, el 1,2 % del presupuesto. **Falta la medida en un dispositivo real** | Hecho (salvo la medida en móvil) | Alta | — | — |
 | ~~D2 · Flechas y aldeanos-torre~~ · **hecha el 18 sep 2026**, y es **lo primero del juego que decide la física**: `life/archery.ts` resuelve la balística (parábola con velocidad dada, arco bajo, tiro adelantado), la flecha es un cuerpo de Rapier con gravedad y rozamiento, y a quien le entra se le acaba la visita (`RaiderPhase.down`). Sólo dispara el puesto **ocupado**, y sólo con arcos dados (C1). Se pintan (`world/arrows.ts`). Medido en el navegador con el observatorio, dos semillas: **primera flecha a los 9–10 s**, de 10 a 57 soltadas, **8 y 10 de 12 saqueadores en el suelo**, pico de 8 a 24 flechas en el aire, 0 errores, y la jornada cuesta **un 4–15 % más** sólo el día del asalto. En pruebas, cuatro semillas: 28–97 flechas y 4–12 caídos | Hecho | Media | — | — |
 | ~~D3 · El bando hostil~~ · **entera el 18 sep 2026**. Primera mitad: llegan por el camino y se plantan (10 valles, 120 cuerpos, cero colgados). Segunda: **un asalto va a por la puerta** —el motor lo distingue de un saqueo (B3)—, se apretujan contra la hoja y la golpean, y si cede entran y van al corazón del pueblo. Medido en el navegador (semilla 7, siete puestos con arcos): llegan cinco a la puerta a los 18,5 s, meten **18 golpes de los 60** y las flechas se los comen — los doce en el suelo a los 24,5 s y el valle aguanta. Sin arcos la puerta cae en 18–31 s y entran los doce. **Falta lo que hacen dentro** (D4, D6) | Hecho | Alta | — | — |
-| ~~D4 · Cuerpo a cuerpo~~ · **el núcleo, hecho el 18 sep 2026**: `life/melee.ts`. Lo que decide es **la distancia** —el alcance de un brazo, 0,9 celdas, muy por debajo del empujón contra el portón— y las dos armas no valen igual: el de la lanza devuelve todos los golpes y **el arquero la mitad**, que es el defecto clásico del arquero y lo que hace que una muralla necesite las dos cosas (C1). Doce contra uno acaban con él. A quien cae se le acaba la jornada ahí, y el motor lo entierra cuando lee el parte (B4, `lost`, que **deja de ser cero**). Medido: de 0 a 3 bajas propias por asalto en cuatro valles × dos maneras. **Falta el ragdoll** —los cuerpos de la gente no son cuerpos de Rapier todavía, y eso es una tanda entera— y los clips (E1: `spear_thrust`, `hit_take`, `fall`) | Hecho (el núcleo) | Alta | — | D3 |
+| ~~D4 · Cuerpo a cuerpo~~ · **hecho; acabado físico cerrado el 20 sep 2026**: `life/melee.ts`. Lo que decide es **la distancia** —el alcance de un brazo, 0,9 celdas, muy por debajo del empujón contra el portón— y las dos armas no valen igual: el de la lanza devuelve todos los golpes y **el arquero la mitad**, que es el defecto clásico del arquero y lo que hace que una muralla necesite las dos cosas (C1). Doce contra uno acaban con él. A quien cae se le acaba la jornada ahí, y el motor lo entierra cuando lee el parte (B4, `lost`, que **deja de ser cero**). Medido: de 0 a 3 bajas propias por asalto en cuatro valles × dos maneras. `spear_thrust`, `hit_take` y `fall` están ligados a hechos; la caída prioriza ragdoll de once segmentos con suelo y obstáculos, con animación de respaldo | Hecho | Alta | — | D3 |
 | ~~D5 · Lo que se rompe~~ · **el portón, hecho el 18 sep 2026**: aguanta sesenta golpes y los golpes son **manos**, así que matar a la mitad de la partida dobla lo que tarda en caer — es la carrera de la fase 4, y los dos números están elegidos contra la arquería de D2 medida. Cuando cede, el parte de B4 dice `breached` y **la partida se acaba**; el boquete en el anillo lo abre el motor (`THREAT.BREACH`). **Falta lo que arde**: las casas durante el asalto son E4 y es decisión del dueño | Hecho (el portón) | Media-alta | — | A2, D3 |
 | ~~D6 · El saqueo~~ | **20 sep 2026:** destinos alcanzables, gesto, cargas y huellas, salida y transición terminal acotada. Sin pérdidas económicas adicionales. [Evidencia y límites](historico/life-rounds/D6-saqueo-y-fisica.md) | Hecho | Alta | — | D4, D5, B3 |
 
@@ -129,9 +135,9 @@ procedural; no son nuevos clips embebidos en el GLB.
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
-| E0 · **Lo que pasa y no se ve** | Ocho mecánicas ya en `main` que sólo salen como línea de crónica: el asalto, el aviso, prepararse, pagar, la semana de después, armas, arcos y la atalaya vacía. El inventario está en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Astra (diseño) · Sol (capa de vida) | — |
-| E2 · Modelos del asedio | **El clan vecino**: aldeanos armados de otro valle —no soldados de cota ni bandidos andrajosos—, arco, flecha, espada, escudo | P2 | Alta | Astra · sesión de arte | — |
-| E3 · Portón, muralla de piedra, torre | Las mallas de la fase 3; el portón con dos estados y roto | P2 | Media | Sesión de arte | A2, A4 |
+| E0 · **Lo que todavía pasa y no se ve** | El asalto, las armas, los arcos, la pelea, la rotura del portón, la huida y el saqueo ya tienen escena. Quedan el **aviso físico** en la loma, la aldea **preparándose**, el pago de plata que sale, la **semana posterior** marcada, el derribo durante la segunda puerta y la transición estacada→piedra. También falta que la fase del valle cambie su ambiente. Inventario exacto en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Astra (diseño) · Sol (capa de vida) | — |
+| E2 · Modelos del asedio · **parcial, 20 sep 2026** | Arco, flecha, lanza y escudo están publicados y en las manos de ambos bandos. Queda la **identidad propia del clan vecino** —aldeanos armados de otro valle, no soldados de cota ni bandidos— y decidir si necesita espada además del aparejo ya integrado | P2 | Alta | Astra · sesión de arte | — |
+| E3 · Portón, muralla de piedra, torre · **parcial, 20 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. Quedan el **adarve/apoyo elevado real** y una **malla propia del bastión**, incluida su junta con el muro. No hace falta otro GLB para el portón roto | P2 | Media | Sesión de arte | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
 
 ### F · Interfaz y crónica
@@ -164,7 +170,7 @@ meta**, pero hay que ir bajando:
 |---|---|---|
 | La reunión de §11.8 no cabe en una aldea de 70 (se junta el 54 %) | Media | Sol (capa de vida) |
 | Las once jornadas rojas de la familia R-1 y la del devoto | Baja (medir y declarar) · Media (arreglar) | Luna, Terra → Sol |
-| Las mallas encargadas: arado, fuente, sala del rey | Media | Sesión de arte |
+| La malla de la sala del rey; el clan y el bastión permanecen en E2/E3. Arado y fuente están publicados e integrados | Media | Sesión de arte |
 | El hacha es el medio más flojo; `quiet_years` no sale | Baja | Dueño (decisión) → Luna |
 
 ---
@@ -174,28 +180,20 @@ meta**, pero hay que ir bajando:
 Lo que va junto puede ir en paralelo a agentes distintos; lo que va debajo
 necesita lo de arriba.
 
-1. **Ahora** — **A1** (el cierre se ve), elegido por el dueño el 18 sep. Las
-   decisiones que bloqueaban este paso están tomadas (§1b de `design.md`): caer
-   tiene dos tamaños, ataca un clan vecino, y las físicas son Rapier. En
-   paralelo, **E1** (los clips de combate, porque el arte tarda más que todo lo
-   demás) y **D1** (la integración de Rapier, que ahora es lo que bloquea toda
-   la letra D).
-2. **El motor del asedio** — B1 (la amenaza), B4 (la puerta de vuelta), C1 (los
-   medios de defensa). Es donde el asedio deja de ser una idea y pasa a ser un
-   número que crece en el estado.
-3. **Lo primero que se ve** — D2 (flechas y aldeanos-torre), C2 (la
-   guarnición), C4 y F1 (el carro y los textos). Con esto un valle ya se
-   defiende de algo, aunque el algo todavía no entre.
-4. **El enemigo** — D3 (el bando hostil), D5 (lo que se rompe), B2 (el aviso),
-   F2 (la alerta). Aquí el asedio existe entero salvo el final.
-5. **El final** — D4 (cuerpo a cuerpo), D6 (el saqueo), F3 (la pantalla del
-   final), E4 (fuego y gore).
-6. **Nivelar** — G entero, cuando haya juego que nivelar, que es donde el
-   dueño lo puso.
+El orden original A1→G ya se recorrió: A1–A5, B, C, D, E1, F2/F3 y la medición
+de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 
-A2, A3 y A4 (portón, bastión/segundo anillo, villa de piedra) van entre el
-paso 1 y el 4 según haga falta: el portón antes de D3, la piedra cuando el
-arte la tenga.
+1. **Ahora, si se autoriza otra ronda** — **E0**, representar lo que todavía
+   sólo cuenta la crónica o cambia de golpe: aviso, preparación, pago, semana
+   posterior y transiciones de muralla. No se abrió en el cierre de D6.
+2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve y bastión
+   propio con su junta. La sala del rey es deuda independiente en H.
+3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó
+   medido. Ningún agente inventa esos criterios.
+4. **Final del crecimiento** — A3b, sólo después de definir qué significa el
+   techo de la partida y cómo se juega el anillo final.
+5. **Deuda no bloqueante** — rendimiento en móvil, reunión de §11.8, jornadas
+   declaradas y F3f.
 
 ---
 

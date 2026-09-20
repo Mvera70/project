@@ -1,5 +1,13 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · Plan e inventario sincronizados tras D6
+
+`docs/plan-meta.md` y `docs/encargos-3d.md` ya no presentan como abiertos el
+asalto, las armas, los arcos, la ocupación de puestos, el portón roto, el
+arado ni la fuente. E0 conserva sólo las escenas realmente invisibles; E2 y E3
+quedan parciales por identidad del clan, adarve y bastión. La malla pendiente
+fuera de esos dos bloques es la sala del rey. No se abre una ronda nueva.
+
 ## 20 sep 2026 · D6 y acabado físico terminados; parada
 
 Saqueo con destino, gesto, carga y huella; transición terminal acotada;
@@ -1171,7 +1179,7 @@ Son tres trabajos, y el primero es del motor y manda sobre los otros dos:
 |---|---|---|
 | **P-1 · la plaza existe y no se mueve** | Un punto guardado en el estado (no una media que cambia cada semana) y un **radio reservado**: la colocación de obras (`world/works.ts`) no puede levantar nada dentro de él. Sin esto no hay plaza que empedrar: lo que hoy hay es un punto que se desplaza y al que las casas se le echan encima | Motor. **Sube el esquema del guardado** y **mueve el trazado de todos los valles**, así que toca medir población, obras y el frío antes y después con `tools/reports/agency-report.ts` |
 | **P-2 · la plaza se ve** | El empedrado: un círculo de suelo distinto donde cae el punto, con su borde. Y las reuniones, el barril y el corro pasan a usarlo | Render (`src/render3d/`) |
-| **P-3 · la fuente** | La malla del centro, por el mismo camino que el arado: receta en `art/recipes/`, `npm run art`, `npm run assets:publish` | Blender. **Encargo por escribir**, como `docs/encargos/encargo-arado.md` |
+| ~~**P-3 · la fuente**~~ · **hecha el 20 sep 2026** | Malla propia de 406 triángulos, con receta reproducible, publicada e integrada en el centro de la plaza | Cerrado en la tanda de siete modelos; evidencia en `docs/historico/life-rounds/E2-integracion-y-defensa.md` |
 
 **Lo que hay que decidir antes de empezar P-1, y es del dueño:** si la plaza se
 fija **en la fundación** —la pareja llega, elige un claro y ahí se queda para
@@ -1180,10 +1188,9 @@ siempre, aunque la aldea crezca hacia otro lado— o si la aldea puede
 veces queda descentrada; lo segundo es un empedrado que se mueve, y eso no
 existe en ningún pueblo.
 
-**Lo que no puedo hacer yo:** conducir el Blender que tienes abierto. El puente
-`blender-mcp` está corriendo en la máquina pero sus herramientas no están
-expuestas en esta sesión, así que la fuente sale o por la receta del pipeline
-(que sí puedo escribir y ejecutar con `npm run art`) o por la sesión de arte.
+**Cierre posterior:** la fuente se produjo por la receta reproducible del
+pipeline, fue aceptada y se publicó con la tanda del 20 de septiembre. No
+dependió de conducir manualmente la sesión de Blender abierta.
 
 
 ## 5. Lo que ya se aprendió y no hay que volver a aprender

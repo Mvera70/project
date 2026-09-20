@@ -16,13 +16,16 @@ la pantalla no cuenta. Una mecánica que no se ve no existe para quien juega.
 
 ---
 
-## 1 · Lo que pasa y no se ve (lo más grave)
+## 1 · Lo que todavía necesita representación (lo más grave)
 
-Son mecánicas **ya en `main`** que hoy sólo salen como una línea de crónica.
+Son mecánicas **ya en `main`** cuya representación sigue ausente o incompleta.
+El asalto dejó de ser una línea de crónica: ya tiene llegada, combate, portón,
+huida, saqueo, caída física y final. La tabla conserva el hueco exacto que
+queda, no el estado anterior a las rondas del 20 de septiembre.
 
 | Qué | Qué hace el motor | Qué se ve hoy | Qué haría falta |
 |---|---|---|---|
-| **El asalto** (B1, D3) | Una partida de 5 a 60 hombres baja del valle vecino, se lleva plata, grano y una cabeza | **Se les ve llegar** desde D3 (18 sep): doce cuerpos entran por el campo, se plantan ante el portón y se van. Se pintan con **la figura del forastero**, que es lo más honesto que hay hoy | El clan armado (E2) —una línea de `cast.ts` cuando exista— y la segunda mitad de D3: romper, entrar, y lo que arde |
+| **El asalto** (B1, D3–D6) | Una partida de 5 a 60 hombres baja del valle vecino, pelea, rompe el portón, saquea o toma el valle | **Se ve de punta a punta**: llegada, combate, armas, rotura, entrada, cargas, huellas, retirada y transición terminal. Se reutiliza la figura del forastero | La identidad propia del clan armado (E2) y el fuego de E4; la mecánica y la escena del asalto están cerradas |
 | **El aviso** (B2) | Ocho o catorce semanas antes, alguien los ve venir | La encrucijada, y la aldea reuniéndose (`gather`) | Un jinete que baja del pasto alto, o humo en la loma de enfrente. Es un efecto visual nuevo, no una malla |
 | **Prepararse** (B2, `braced`) | El ganado entra, el grano se esconde, se atranca | Nada | El corral vacío y la gente metiendo cosas: se puede hacer con la capa de vida, sin Blender |
 | **Pagar al clan** (B2, `bought_off`) | Treinta de plata suben la ladera y la partida se da la vuelta | Nada | Dos o tres cuerpos saliendo por el portón con una carga |
@@ -49,7 +52,7 @@ fuente propios. Se conserva la aceptación visual de la primera tanda.
 
 | Malla | Para qué | Qué se ve hoy en su lugar |
 |---|---|---|
-| **El portón** (`gate`, A2) | La puerta del anillo | GLB propio con hoja articulada; falta variante rota |
+| **El portón** (`gate`, A2) | La puerta del anillo | GLB propio con hoja articulada y rotura procedural que conserva el marco y genera seis tablas físicas; **no necesita variante rota aparte** |
 | **El arado** (M-3) | El medio que libera brazos | GLB propio integrado (136 triángulos) |
 | **La fuente** (P-3) | El centro de la plaza | GLB propio integrado (406 triángulos) |
 | **La sala del rey** (`hall`, K-4) | La casa del que manda | Una casa más alta con tejado burdeos. Encargo en `docs/historico/plan-rey.md` §8 |
@@ -58,8 +61,9 @@ fuente propios. Se conserva la aceptación visual de la primera tanda.
 | **El bastión** (`bastion`, A3, 19 sep 2026) | La torre en la línea de muralla | La malla de `watchtower.glb`, la misma atalaya suelta, escalada de 2×2 a 1×1 (`fitted.scale.set`) — se lee más achatada que una atalaya de verdad. Y hay una costura sin resolver aparte de la malla: `isDefence`/`defenceConnections` (`render3d/world/defences.ts`) sólo conocen `wall`/`palisade`, así que el tramo que llega hasta un bastión **no estira un extremo hacia él** y deja una junta entre el remate del muro y la base de la torre prestada. Necesita malla propia — más ancha en la base que la atalaya, para leerse *dentro* del grosor del muro y no al lado — y que esas dos funciones sepan de `bastion` el día que la malla exista |
 
 **Y las que sí están, para no volver a dudarlo:** `watchtower.glb` y `wall.glb`
-existen y se usan; la atalaya de C1 se levanta y se ve. Lo que no hay es nadie
-dentro. **Y `wall.glb` dejó de ser malla muerta el 18 sep** (A4): hasta ese día
+existen y se usan; la atalaya de C1 se levanta y sus puestos se ocupan. Lo que
+falta es apoyo elevado real: hoy la guardia queda detrás del muro, no sobre un
+adarve. **Y `wall.glb` dejó de ser malla muerta el 18 sep** (A4): hasta ese día
 ningún valle levantaba una sola pieza de piedra, así que la malla estaba en el
 juego desde G-10 sin aparecer en una partida.
 
