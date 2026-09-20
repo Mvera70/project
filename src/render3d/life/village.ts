@@ -52,6 +52,7 @@ import {
   approachOf, type Gate, type Raider,
 } from './raiders';
 import { beginWarning, stepWarning, warningActive, type SiegeWarning } from './siege-warning';
+import { beginPayoff, payoffActive, payoffRoute, stepPayoff, type PayoffTrip } from './payoff';
 import { createWolf, stepWolf, WOLF_START_STEP, type Wolf } from './wildlife';
 import { beginFlight, stepFlight, type Flight } from './flee';
 import { createSackScene, sackSnapshot, type SackScene, type SackSnapshot } from './sack';
@@ -86,6 +87,8 @@ const CATCH_RANGE = 2;
 
 /** Una persona, entera: cuerpo, cabeza y lo que está haciendo. */
 export interface Dweller {
+  /** E0 · Porte efímero de la plata que hace volver al clan. */
+  payoff?: PayoffTrip;
   /** E0b · aviso físico exclusivo de esta jornada; nunca sale al motor. */
   warning?: SiegeWarning;
   /** Pose fechada por la vida, no por el mixer; `since` son pasos de jornada. */
@@ -812,6 +815,38 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       }
     }
   }
+  // E0 · Al llegar la semana que el motor ya resolvió como `turned_back`, dos
+  // o tres adultos existentes sacan la paga por el portón real. No se repite:
+  // `payoffActive` sólo abre el primer día de esa semana.
+  const payoffWindow = payoffActive(state, day);
+  const gateBuilding = payoffWindow
+    ? state.buildings.find((building) => building.kind === 'gate' && building.lostTick === null)
+    : undefined;
+  const payoffApproach = gateBuilding === undefined ? null : approachOf(state, land, heart);
+  if (gateBuilding !== undefined && payoffApproach !== null) {
+    const gate = { x: gateBuilding.x + gateBuilding.w / 2, z: gateBuilding.y + gateBuilding.h / 2 };
+    const candidates = dwellers
+      .filter((dweller) => dweller.ageGroup !== 'child'
+        && !indoors(dweller)
+        && !isPost(dweller.dayPlan?.job?.place ?? '')
+        && !warningPorters.has(dweller.villager)
+        && dweller.holding === null
+        && dweller.flight === null
+        && dweller.scene === null
+        && dweller.quarrel === null)
+      .sort((a, b) => a.villager - b.villager);
+    const wanted = 2 + (seed % 2);
+    for (const porter of candidates.slice(0, wanted)) {
+      const trip = payoffRoute(land, porter.body, gate, payoffApproach, porter.body.radius);
+      if (trip === null) continue;
+      beginPayoff(porter.body);
+      porter.payoff = trip;
+      porter.holding = -5_000_000 - porter.body.id;
+      porter.doing = null;
+      porter.faceAnchor = { x: porter.body.x, z: porter.body.z };
+      porter.rethinkAt = GIVE_UP;
+    }
+  }
   const byId = new Map(dwellers.map((d) => [d.body.id, d]));
 
   // Checklist IA-1, punto 6: lo que `noProgress()` (`decide.ts`) necesita
@@ -1252,6 +1287,21 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.doing = null;
           dweller.flight = null;
           continue;
+        }
+
+        // E0 · La carga llega primero a la ladera. Cuando acaba, el vecino
+        // recupera su jornada normal; la plata no deja una orden colgada.
+        if (dweller.payoff !== undefined) {
+          const before = { x: body.x, z: body.z };
+          const active = stepPayoff(body, dweller.payoff, land, around);
+          const distance = gap(before, body);
+          dweller.travelled += distance;
+          dweller.motionSpeed = distance / LIFE_STEP;
+          dweller.faceAnchor = { x: body.x, z: body.z };
+          if (active) continue;
+          delete dweller.payoff;
+          dweller.holding = null;
+          dweller.rethinkAt = steps;
         }
 
         // E0b · El aviso se mueve antes de que el día normal elija oferta. Al

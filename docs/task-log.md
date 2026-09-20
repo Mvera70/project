@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 20 sep 2026 · E0, pagar al clan
+
+La resolución física de `bought_off` / `turned_back` ya se ve una sola vez: en
+el primer día de la semana exacta en que el motor ha hecho volver a la partida,
+dos o tres adultos existentes cargan la paga y salen por el portón real hacia
+la ladera, siempre por rutas navegables. La escena es efímera, no escribe en el
+estado ni consume azar del motor; termina dentro de la jornada y los cuerpos no
+vuelven a aparecer al día siguiente ni retienen su reparto. La guarnición queda
+fuera de la selección. 24 pruebas focalizadas con E0a/E0b y guarnición,
+typecheck y lint verdes. [Evidencia y límites](historico/life-rounds/E0-pago-al-clan.md).
+E0 conserva semana posterior y transiciones de muralla.
+
 ## 20 sep 2026 · E0b, el mensajero trae el aviso
 
 B2 ya tiene escena física: al cerrar la modal, un adulto vuelve a pie desde el
