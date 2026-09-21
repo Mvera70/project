@@ -188,9 +188,7 @@ export function cellColour(
     const z = Math.floor(cell / map.width);
     const gap = Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y);
     if (gap <= plaza.radius) {
-      return gap > plaza.radius - PLAZA_RIM
-        ? mixed(palette.stone, palette.path)
-        : mixed(palette.path, palette.stone);
+      return plazaPaving(palette, era, x, z, plaza, gap);
     }
   }
   const wear = map.path[cell] ?? 0;
@@ -223,6 +221,31 @@ export function cellColour(
     case 8: return mixed(palette.water, palette.path);
     default: return palette.meadow;
   }
+}
+
+/**
+ * El empedrado de la plaza, siempre dentro de su círculo reservado.
+ *
+ * No son losas ni geometría nueva: son tres lecturas de la misma piedra en el
+ * color por vértice del único suelo. La mancha sale de bloques de dos celdas,
+ * no de ruido fino, para que sobreviva la mezcla de vértices y el tamaño móvil.
+ */
+function plazaPaving(
+  palette: Palette, era: Era, x: number, z: number, plaza: Plaza, gap: number,
+): string {
+  const dark = mixed(palette.stone, palette.wood);
+  const settled = mixed(palette.stone, palette.path);
+  const light = mixed(palette.path, palette.accent);
+  const blockX = Math.floor((x - plaza.x + 4) / 2);
+  const blockZ = Math.floor((z - plaza.y + 4) / 2);
+  const patch = (Math.imul(blockX, 3) + Math.imul(blockZ, 5) + 17) & 3;
+  // El borde sigue dibujando el círculo. En caserío se muerde más, como canto
+  // irregular; en villa queda fino y continuo, sin inventar una ruta exterior.
+  const rim = gap > plaza.radius - (era === 'hamlet' ? 0.6 : 0.32);
+  if (rim) return era === 'town' ? settled : dark;
+  if (era === 'hamlet') return patch === 0 ? settled : dark;
+  if (era === 'village') return patch <= 1 ? light : settled;
+  return patch <= 2 ? light : settled;
 }
 
 /** Media de dos colores, para el escalón que la paleta no nombra. */
@@ -503,9 +526,6 @@ export interface Plaza { readonly x: number; readonly y: number; readonly radius
 export function groundAppearanceKey(ground: number, era: Era): string {
   return `${ground}:${era}`;
 }
-
-/** Cuánto del borde de la plaza se dibuja más oscuro, en celdas. */
-const PLAZA_RIM = 1;
 
 export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era: Era = 'hamlet'): Ground {
   const cells = map.width * map.height;

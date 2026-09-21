@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E0e, empedrado por era — técnico verificado, visual pendiente
+
+Sol fijó la dirección dentro del empedrado fundacional de §7.4b; Terra implementó
+tres acabados en el color del suelo sin cambiar geometría, plaza ni navegación.
+Doce controles en móvil/tableta y 92 pruebas focalizadas, typecheck y lint pasan.
+Sol revisó el resultado: caserío/aldea se separan, aldea/villa apenas en tableta;
+el patrón parece manchas, no distinta factura de piedra. Los controles aíslan
+el acabado pero no son una prueba ciega válida de la era histórica porque todos
+muestran la misma villa amurallada. No cerrar aceptación visual ni seguir
+ajustando color: decidir con Vera si se conserva el empedrado desde la fundación
+o se permite tierra/empedrado parcial, y validar después tomas históricas nuevas
+sin rótulo. [Informe](historico/life-rounds/E0e-ambiente-eras.md).
+
 ## 21 sep 2026 · E0e, ambiente de eras — código cerrado, visual pendiente
 
 Sol escribió y revisó el [brief](encargos/encargo-e0-ambiente-eras.md); Terra

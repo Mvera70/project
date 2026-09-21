@@ -5,10 +5,12 @@ modificaron motor, derivación, vida, navegación, guardados ni balance.
 
 ## Resultado implementado
 
-- El suelo recibe `Era` desde `renderer.ts`. Sólo cambia el color de las
-  celdas cuyo `map.path[cell] > 0`; plaza y vado siguen teniendo prioridad. La
-  clave de apariencia combina la firma de suelo existente y la era, por lo que
-  cambiar de era vuelve a construirlo aun sin cambio topológico.
+- El suelo recibe `Era` desde `renderer.ts`. Cambia el color de los caminos
+  existentes y, dentro del mismo círculo reservado de plaza, el empedrado:
+  canto oscuro irregular en caserío, mezcla asentada en aldea y piedra clara
+  sectorizada en villa. Plaza y vado siguen teniendo prioridad. La clave de
+  apariencia combina la firma de suelo existente y la era, por lo que cambiar
+  de era vuelve a construirlo aun sin cambio topológico.
 - La fuente no se desplaza. Aldea y villa añaden como máximo dos/cuatro bancos
   mínimos en candidatos estables alrededor de ella. El renderer rechaza cada
   huella que caiga sobre edificio vivo, camino, agua/roca/marisma o fuera del
@@ -83,7 +85,38 @@ prado. La cabecera continúa diciendo `WALLED TOWN`, dejando claro que el
 override no falsifica la historia. La diferencia de camino sigue limitada a
 celdas con desgaste real, no a todo el recinto.
 
-**Veredicto de revisión Sol:** implementación técnica aceptada; **aceptación
+La continuación de plaza repitió los controles sin alterar humo, bancos ni
+caminos: `control-seed-{7,23}-year-{30,31}-{hamlet,village,town}-{mobile,tablet}-plaza-v2.png`.
+Son 12 tomas: semilla 7/año 30 y semilla 23/año 31, las tres eras forzadas,
+390 × 844 y 1024 × 768. Todas conservan año, estación, cámara y cifras del
+estado real, y ninguna produjo errores de página. La inspección visual confirma
+el círculo, la fuente y los pasos libres; el pavimento oscurece/mezcla/aclara
+en ese orden, aunque en la panorámica de la villa la diferencia sigue siendo
+sutil. No se hizo otro ajuste por tanteo: queda pendiente de lectura ciega y
+arbitraje, no se declara aceptación visual plena.
+
+El coste medido de esta continuación es cero objetos, meshes, materiales,
+texturas, emisores y draw calls adicionales: reutiliza los atributos de color
+del único mesh de suelo y sólo recalcula su color en la reconstrucción ya
+provocada por mapa, estación o era. Se conservan los límites previos de 48/40
+esferas de humo y hasta ocho meshes de bancos en las villas medidas.
+
+**Revisión Sol de la continuación (22 sep):** la diferencia caserío → aldea
+se aprecia como suelo más claro; aldea → villa apenas se distingue, en especial
+en tableta. El patrón parece manchas de color, no un empedrado de distinta
+factura. Se mantiene la aceptación visual pendiente. Los controles son válidos
+para aislar el acabado, pero inválidos para exigir clasificación histórica de
+eras: todos muestran la misma villa amurallada. No se han generado tomas
+históricas nuevas tras esta variante ni se ha organizado lectura ciega externa.
+El cambio a tierra pisada/empedrado parcial sería más contrastado, pero exige
+decisión del dueño porque contradice `docs/design.md` §7.4b. No se seguirá
+afinando por tanteo.
+
+**Verificación de la continuación:** `npm run typecheck`, `npm run lint`, 92
+pruebas focalizadas (`era-ambience`, `graphics-world`, `graphics-effects`) y
+`git diff --check` pasan. Las 12 capturas no produjeron errores de página.
+
+**Veredicto de revisión Sol de la primera ronda:** implementación técnica aceptada; **aceptación
 visual pendiente**. Sin leer la cabecera y sin comparar las tres capturas lado
 a lado no se clasifican las eras de forma fiable, especialmente en tableta.
 Los bancos son el rasgo más legible; el camino y el humo todavía aportan poco

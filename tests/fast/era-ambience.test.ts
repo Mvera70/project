@@ -37,12 +37,39 @@ describe('E0e · ambiente de las eras', () => {
     expect(cellColour(map, ford, palette, plaza, 'hamlet')).toBe(cellColour(map, ford, palette, plaza, 'town'));
     // La plaza pisa la celda (1, 1), aunque tenga el máximo desgaste debajo.
     map.path[map.width + 1] = 3;
-    expect(cellColour(map, map.width + 1, palette, plaza, 'hamlet')).toBe(cellColour(map, map.width + 1, palette, plaza, 'town'));
+    expect(cellColour(map, map.width + 1, palette, plaza, 'hamlet')).not.toBe(cellColour(map, map.width + 1, palette, undefined, 'hamlet'));
+    expect(cellColour(map, map.width + 1, palette, plaza, 'hamlet')).not.toBe(cellColour(map, map.width + 1, palette, plaza, 'town'));
   });
 
   it('cambia la firma de suelo al cambiar sólo la era', () => {
     expect(groundAppearanceKey(123, 'hamlet')).not.toBe(groundAppearanceKey(123, 'village'));
     expect(groundAppearanceKey(123, 'village')).not.toBe(groundAppearanceKey(123, 'town'));
+  });
+
+  it('asienta el empedrado sólo dentro del mismo círculo y aclara más piedra por era', () => {
+    const state = village();
+    const map = structuredClone(state.map);
+    map.terrain.fill(0);
+    map.path.fill(0);
+    const plaza = { x: 8.5, y: 8.5, radius: 3 };
+    const palette = PALETTES.summer;
+    const brightness = (hex: string): number => {
+      const [r, g, b] = [1, 3, 5].map((at) => Number.parseInt(hex.slice(at, at + 2), 16));
+      return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0);
+    };
+    const cells = [...map.terrain.keys()].filter((cell) => {
+      const x = cell % map.width, z = Math.floor(cell / map.width);
+      return Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y) <= plaza.radius;
+    });
+    const average = (era: 'hamlet' | 'village' | 'town'): number => cells
+      .map((cell) => brightness(cellColour(map, cell, palette, plaza, era)))
+      .reduce((sum, value) => sum + value, 0) / cells.length;
+
+    expect(average('hamlet')).toBeLessThan(average('village'));
+    expect(average('village')).toBeLessThan(average('town'));
+    const outside = 0;
+    expect(cellColour(map, outside, palette, plaza, 'hamlet')).toBe(palette.meadow);
+    expect(cellColour(map, outside, palette, plaza, 'town')).toBe(palette.meadow);
   });
 
   it('mantiene fuente y pasos libres, y no duplica los complementos', () => {
