@@ -312,6 +312,15 @@ export function attachBackend(
         canvas: webgl,
         assetBaseUrl: options.assetBaseUrl ?? './assets/valley3d/',
         quality: 'standard',
+        // E0e · ruta de diagnóstico para `shot.mjs`, no una opción de UI. El
+        // renderer la usa sólo para elegir acabados; el estado sigue intacto.
+        ...(() => {
+          const local = window.location.protocol === 'file:'
+            || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          if (!local) return {};
+          const era = new URLSearchParams(window.location.search).get('preview-era');
+          return era === 'hamlet' || era === 'village' || era === 'town' ? { previewEra: era } : {};
+        })(),
       });
       if (closed) {
         // The view was closed while this was loading. D.5 asks that such a load

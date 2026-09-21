@@ -28,6 +28,9 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [E0e: ambiente de eras](life-rounds/E0e-ambiente-eras.md): acabado técnico,
+  controles de la misma escena y límite de aceptación visual.
+
 - [E0b: el mensajero trae el aviso](life-rounds/E0b-aviso.md): corte de escena
   post-decisión, regreso físico y evidencia del flujo real modal→tick en 7/23.
 

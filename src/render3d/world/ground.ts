@@ -15,6 +15,7 @@ import {
 import { TERRAIN_CODE } from '@engine/state';
 import type { ValleyMap } from '@engine/state';
 import type { Palette } from '@derive/palette';
+import type { Era } from '@derive/era';
 import { GROUND_BIAS } from '../visual-config';
 
 /**
@@ -141,7 +142,7 @@ const OWN_CELL = 0.46;
  */
 function cornerColour(
   map: ValleyMap, own: number, x: number, z: number, palette: Palette, into: Color,
-  plaza?: Plaza,
+  plaza?: Plaza, era?: Era,
 ): void {
   const rest = (1 - OWN_CELL) / 3;
   const ownX = own % map.width;
@@ -157,7 +158,7 @@ function cornerColour(
     // Fuera del mapa no hay terreno que mezclar: esa parte de la mezcla la pone
     // la propia celda, y asi los pesos siguen sumando uno.
     const inside = cx >= 0 && cz >= 0 && cx < map.width && cz < map.height;
-    sample.set(cellColour(map, inside ? cz * map.width + cx : own, palette, plaza));
+    sample.set(cellColour(map, inside ? cz * map.width + cx : own, palette, plaza, era));
     const weight = mine ? OWN_CELL : rest;
     r += sample.r * weight;
     g += sample.g * weight;
@@ -175,7 +176,7 @@ function cornerColour(
  * reutilizar el significado existente en vez de repetir las reglas.
  */
 export function cellColour(
-  map: ValleyMap, cell: number, palette: Palette, plaza?: Plaza,
+  map: ValleyMap, cell: number, palette: Palette, plaza?: Plaza, era: Era = 'hamlet',
 ): string {
   // P-2 · **el empedrado de la plaza.** Va antes que el camino y antes que el
   // terreno porque es lo que manda: dentro del círculo el suelo es empedrado, y
@@ -194,8 +195,17 @@ export function cellColour(
   }
   const wear = map.path[cell] ?? 0;
   if (wear > 0) {
-    // Un camino más pisado es más claro: de la senda al camino real.
-    return wear >= 3 ? palette.accent : wear === 2 ? palette.path : mixed(palette.path, palette.meadowAlt);
+    // La era no inventa caminos: sólo asienta los que ya dice el mapa. Cada
+    // peldaño conserva un tono distinto para que una calzada no aparezca donde
+    // sólo había hierba, ni una senda pase a leerse como piedra de golpe.
+    const base = wear >= 3 ? palette.accent : wear === 2 ? palette.path : mixed(palette.path, palette.meadowAlt);
+    if (era === 'hamlet') return base;
+    if (era === 'village') {
+      return wear >= 3 ? palette.accent
+        : wear === 2 ? mixed(palette.path, palette.accent) : mixed(base, palette.path);
+    }
+    return wear >= 3 ? mixed(palette.accent, palette.stone)
+      : wear === 2 ? palette.accent : palette.path;
   }
   switch (map.terrain[cell] ?? 0) {
     case 1: return palette.forest;
@@ -489,10 +499,15 @@ export interface Ground {
  */
 export interface Plaza { readonly x: number; readonly y: number; readonly radius: number }
 
+/** La firma de presentación añade la era a la firma pura del mapa. */
+export function groundAppearanceKey(ground: number, era: Era): string {
+  return `${ground}:${era}`;
+}
+
 /** Cuánto del borde de la plaza se dibuja más oscuro, en celdas. */
 const PLAZA_RIM = 1;
 
-export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza): Ground {
+export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza, era: Era = 'hamlet'): Ground {
   const cells = map.width * map.height;
   const positions = new Float32Array(cells * 4 * 3);
   const colours = new Float32Array(cells * 4 * 3);
@@ -522,7 +537,7 @@ export function buildGround(map: ValleyMap, palette: Palette, plaza?: Plaza): Gr
       normals[at] = 0;
       normals[at + 1] = 1;
       normals[at + 2] = 0;
-      cornerColour(map, cell, px, pz, palette, tint, plaza);
+      cornerColour(map, cell, px, pz, palette, tint, plaza, era);
       const shade = 1 + mottleAt(px, pz) + patchAt(px, pz);
       colours[at] = tint.r * shade;
       colours[at + 1] = tint.g * shade;

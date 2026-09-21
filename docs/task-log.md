@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 21 sep 2026 · E0e, ambiente de eras — código cerrado, visual pendiente
+
+Sol escribió y revisó el [brief](encargos/encargo-e0-ambiente-eras.md); Terra
+implementó acabado de caminos existentes, enseres de plaza y humo doméstico
+según `eraOf`, sin tocar motor, navegación ni guardados. 91 pruebas focalizadas,
+typecheck, lint y diff-check verdes. Se tomaron tres eras reales en semillas 7
+y 23, y seis controles del mismo estado (móvil/tableta) con `preview-era` sólo
+cosmético. La primera comparación no bastaba; una iteración mejoró el contraste
+y contuvo el humo de villa a +1 esfera por casa, pero Sol sigue sin poder
+reconocer las tres eras sin cabecera en la panorámica. **No cerrar E0e como
+aceptación visual ni ampliar otra vez por tanteo**; decidir dirección visual
+antes de seguir. [Informe y límites](historico/life-rounds/E0e-ambiente-eras.md).
+
 ## 21 sep 2026 · Recuperación espacial de bajo coste — cerrada localmente
 
 El dueño cambia la orquestación: Sol dirige como modelo fuerte; Astra sólo
@@ -14,7 +27,8 @@ menos 3/6 jornadas. V-06 9/9, recursos/distribución/defensas/viviendas 20/20, t
 lint verdes. La suite rápida de cierre quedó 1.682/1.686; los tres asertos
 de clips obsoletos se corrigieron y pasan aislados, y catch-up pasó aislado
 tras fallar su tiempo bajo carga paralela. Fase aceptada **localmente** con
-otros rojos de jornadas sin atribuir; sin commit ni publicación.
+otros rojos de jornadas sin atribuir; commit local `6fa7fda`, publicación
+remota pendiente de confirmar el destino.
 [Detalle](plan-espacial.md).
 
 ## 21 sep 2026 · Aldea orgánica y recinto honesto — implementado, aceptación pendiente

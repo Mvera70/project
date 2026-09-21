@@ -72,14 +72,28 @@ const seedArg = opt('seed', '');
 //     que el campo de año juega con la política de referencia, que es la
 //     trayectoria contra la que están medidas las cifras del proyecto.
 const yearArg = opt('year', '');
+// E0e · fuerza sólo el acabado de era de un estado ya jugado. Es una toma de
+// control, no cambia `GameState` ni la cabecera y nunca es una partida histórica.
+const previewEra = opt('preview-era', '');
+if (previewEra !== '' && !['hamlet', 'village', 'town'].includes(previewEra)) {
+  throw new Error(`--preview-era must be hamlet, village or town; got '${previewEra}'.`);
+}
+// `--viewport 1024x768` conserva móvil por defecto y permite revisar tablet.
+const viewportArg = opt('viewport', '390x844');
+const viewportMatch = /^(\d{2,4})x(\d{2,4})$/u.exec(viewportArg);
+if (viewportMatch === null) throw new Error(`--viewport must be WIDTHxHEIGHT; got '${viewportArg}'.`);
+const viewport = { width: Number(viewportMatch[1]), height: Number(viewportMatch[2]) };
 // `--page` acepta también una dirección `http://`. La demo partida en dos
 // (`bundle-game.ts --split`) pide su JSON de recursos por la red, y una página
 // abierta como `file://` no puede pedir nada: sin esto, la única manera de
 // comprobar que los modelos llegan era publicarla y mirar con el dedo.
 const pageArg = opt('page', 'artifacts/graphics/G-10/game/valley.html');
-const page = /^https?:\/\//u.test(pageArg)
+const pageBase = /^https?:\/\//u.test(pageArg)
   ? pageArg
   : `file:///${resolve(pageArg).replace(/\\/g, '/')}`;
+const pageUrl = new URL(pageBase);
+if (previewEra !== '') pageUrl.searchParams.set('preview-era', previewEra);
+const page = pageUrl.toString();
 
 function browserExe() {
   const root = join(homedir(), 'AppData', 'Local', 'ms-playwright');
@@ -108,7 +122,7 @@ const browser = await chromium.launch({
   ...(exe ? { executablePath: exe } : {}),
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
 });
-const tab = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+const tab = await browser.newPage({ viewport, deviceScaleFactor: 2 });
 const errors = [];
 tab.on('pageerror', (e) => errors.push(String(e)));
 tab.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });

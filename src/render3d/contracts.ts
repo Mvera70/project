@@ -3,6 +3,7 @@
 import type { GameState, Role, VillagerId } from '../engine/state';
 import type { ClipName } from './clips';
 import type { Occupation } from './world/models';
+import type { Era } from '../derive/era';
 
 /**
  * Qué está haciendo una figura, de las seis cosas que el render distingue.
@@ -380,6 +381,11 @@ export interface GraphicsRendererOptions {
    * publicada de una sola pieza, y una prueba.
    */
   readonly library?: AssetLibrary;
+  /**
+   * E0e · Sólo para la captura de diagnóstico. Cambia la lectura cosmética de
+   * era sin escribir el estado ni estar expuesto como control de jugador.
+   */
+  readonly previewEra?: Era;
 }
 
 /** Lo que el renderer necesita de una biblioteca de recursos. Ver `assets.ts`. */

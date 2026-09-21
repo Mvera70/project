@@ -135,7 +135,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
-| E0 · **Lo que todavía pasa y no se ve** · *Preparación, aviso y transiciones cerrados, 21 sep 2026* | El asalto y sus escenas ya tienen cuerpo; E0d completa el solar y hueco temporal de segunda puerta y muro de piedra. Queda ambiente de era. [E0d](historico/life-rounds/E0d-transiciones-muralla.md); inventario exacto en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Astra (diseño) · Sol (capa de vida) | — |
+| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0d cerrados; E0e técnico, visual pendiente* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. Pruebas y controles de la misma escena pasan, pero la diferencia no basta aún para identificar tres eras sin rótulo. [Brief](encargos/encargo-e0-ambiente-eras.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md); inventario en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Sol dirige · Terra ejecuta | — |
 | E2 · Modelos del asedio · **parcial, 20 sep 2026** | Arco, flecha, lanza y escudo están publicados y en las manos de ambos bandos. Queda la **identidad propia del clan vecino** —aldeanos armados de otro valle, no soldados de cota ni bandidos— y decidir si necesita espada además del aparejo ya integrado | P2 | Alta | Astra · sesión de arte | — |
 | E3 · Portón, muralla de piedra, torre · **parcial, 20 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. Quedan el **adarve/apoyo elevado real** y una **malla propia del bastión**, incluida su junta con el muro. No hace falta otro GLB para el portón roto | P2 | Media | Sesión de arte | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
@@ -183,11 +183,11 @@ necesita lo de arriba.
 El orden original A1→G ya se recorrió: A1–A5, B, C, D, E1, F2/F3 y la medición
 de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 
-1. **Siguiente** — ambiente de era pendiente de E0. La
-   [revisión espacial](plan-espacial.md) quedó aceptada localmente el 21 sep:
-   trazado orgánico, caminos y plaza, accesos y cierre real, variedad de casas,
-   con las incidencias de vida cerradas. Sin publicación implícita. Sol dirige
-   las fases de software; Astra se reserva para 3D excepcional.
+1. **Siguiente** — aceptación visual de E0e. Caminos, plaza y humo ya están
+   implementados y probados, pero [la comparación controlada](historico/life-rounds/E0e-ambiente-eras.md)
+   no permite reconocer las tres eras sin rótulo. No seguir afinando a ciegas:
+   primero dirección visual concreta. La [revisión espacial](plan-espacial.md)
+   está aceptada localmente. Sol dirige software; Astra sólo 3D excepcional.
 2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve y bastión
    propio con su junta. La sala del rey es deuda independiente en H.
 3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó

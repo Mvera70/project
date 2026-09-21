@@ -1,5 +1,6 @@
 import { visibleBuildings } from '@derive/visible-buildings';
 import { plazaOf } from '@derive/plaza';
+import { eraOf } from '@derive/era';
 import { PlazaFountain } from './world/plaza';
 // G-06 · The renderer. design.md D.5, D.6.
 //
@@ -29,7 +30,7 @@ import type {
   GraphicsTarget, GraphicsViewport,
 } from './contracts';
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
-import { buildGround, elevationAt, type Ground } from './world/ground';
+import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildRidge } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
 import {
@@ -432,6 +433,9 @@ export async function createGraphicsRenderer(
   let mapHeight = 0;
   // U-12 · la fase de la última jornada pintada, para poder mirarla desde fuera.
   let paintedPhase = 0;
+  // E0e · una fase puede cambiar sin tocar el mapa ni la estación: su acabado
+  // tiene que forzar la misma reconstrucción de suelo que cualquiera de ambas.
+  let paintedEra: ReturnType<typeof eraOf> | null = null;
   let steppedPhase = 0.28;
   const nightOutcomes: { tick: number; residents: number; sleeping: number; pending: number[] }[] = [];
   // U-13 · el cielo de la jornada que se está pintando, y los rayos que han
@@ -584,6 +588,7 @@ export async function createGraphicsRenderer(
    * menudo sí: se midió, y el rebaño saltaba 5,096 celdas (ver `scenic-state.ts`).
    */
   let painted = '';
+  let paintedGround = '';
   let paintedSteading = '';
 
   function rebuildForest(state: GameState, palette: ReturnType<typeof paletteFor>): void {
@@ -599,7 +604,7 @@ export async function createGraphicsRenderer(
     world.add(forest.group);
   }
 
-  function rebuildGround(state: GameState, clock: ReturnType<typeof clockOf>): void {
+  function rebuildGround(state: GameState, clock: ReturnType<typeof clockOf>, era: ReturnType<typeof eraOf>): void {
     if (ground !== null) {
       world.remove(ground.mesh);
       ground.dispose();
@@ -609,7 +614,7 @@ export async function createGraphicsRenderer(
     treeFalls.season(palette);
     // P-2 · con su plaza empedrada. El radio viene de `derive/plaza.ts`, que es
     // quien traduce la constante del motor a esta capa.
-    ground = buildGround(state.map, palette, plazaOf(state));
+    ground = buildGround(state.map, palette, plazaOf(state), era);
     // La nieve en los tejados sale de la misma paleta que la del suelo: cuando
     // §10.3 pone el prado blanco es que ha nevado, y la nieve no elige donde
     // cuajar. TUNE: 0,72 y no 1, que un tejado del color exacto del prado
@@ -994,12 +999,19 @@ export async function createGraphicsRenderer(
       // las dos primeras.
       const live = clockOf(state.tick);
       const colour = `${live.season}:${Math.min(2, live.seasonWeek)}`;
+      // E0e · El override sólo llega desde la herramienta de captura. No toca
+      // `shown`, ni las decisiones de vida, ni la cabecera: sirve para aislar
+      // el acabado de una misma escena real.
+      const era = options.previewEra ?? eraOf(shown);
+      const groundKey = groundAppearanceKey(next.ground, era);
       // Los almiares y leñeras se cuantizan a partir de reservas reales. Su
       // recuento puede cambiar en un tick sin que cambie terreno ni estación.
       const steadingKey = `${shown.tick === 0 ? 0 : Math.floor(shown.village.wood / 60)}:${Math.floor(shown.village.grain / 200)}`;
-      if (change.ground || change.cleared || colour !== painted || steadingKey !== paintedSteading) {
-        rebuildGround(shown, live);
+      if (change.cleared || colour !== painted || groundKey !== paintedGround || era !== paintedEra || steadingKey !== paintedSteading) {
+        rebuildGround(shown, live, era);
         painted = colour;
+        paintedGround = groundKey;
+        paintedEra = era;
         paintedSteading = steadingKey;
       } else if (change.forest || fallingChanged || acceptedForest) {
         rebuildForest(shown, paletteFor(live.season, live.seasonWeek));
@@ -1190,7 +1202,18 @@ export async function createGraphicsRenderer(
       props.update(propsOf(life), groundFloor);
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
       arrows.update(arrowsOf(life));
-      plaza.show(plazaOf(shown), groundFloor);
+      const standing = shown.buildings.filter((building) => building.lostTick === null);
+      const plazaFree = (x: number, z: number): boolean => {
+        const cellX = Math.floor(x);
+        const cellZ = Math.floor(z);
+        if (cellX < 0 || cellZ < 0 || cellX >= shown.map.width || cellZ >= shown.map.height) return false;
+        const cell = cellZ * shown.map.width + cellX;
+        const terrain = shown.map.terrain[cell];
+        const walkable = terrain === TERRAIN_CODE.meadow || terrain === TERRAIN_CODE.cleared || terrain === TERRAIN_CODE.ford;
+        return walkable && (shown.map.path[cell] ?? 0) === 0 && !standing.some((building) =>
+          x >= building.x && x <= building.x + building.w && z >= building.y && z <= building.y + building.h);
+      };
+      plaza.show(plazaOf(shown), groundFloor, era, plazaFree);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
@@ -1241,7 +1264,7 @@ export async function createGraphicsRenderer(
       bubbles.update(heads, carried);
       // Las señales cambian con la semana, no con el fotograma: `update` se sale
       // solo cuando nada ha cambiado.
-      tells.update(shown, entrances);
+      tells.update(shown, entrances, era);
       // El humo y las luces si son de cada fotograma: uno sube y las otras se
       // encienden cuando cae el dia.
       tells.drift(frame.presentationSeconds, phase, frame.speed);

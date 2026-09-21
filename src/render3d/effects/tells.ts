@@ -20,6 +20,7 @@ import type { Building, GameState } from '@engine/state';
 import { BUILDING_ASSETS } from '../world/buildings';
 import { daylightAt } from './daylight';
 import { tellsFor, type Tell } from '@derive/tells';
+import type { Era } from '@derive/era';
 
 /** Alturas en celdas. Una celda son unos tres metros (D.6.2). */
 const HEIGHT = {
@@ -36,7 +37,7 @@ const HEIGHT = {
 } as const;
 
 const TONE = {
-  smoke: '#5A5A52',
+  smoke: '#68685F',
   light: '#E6B85C',
   plague: '#7C5B7A',
   candles: '#F2D48A',
@@ -203,28 +204,31 @@ function mark(
  * color: el humo va arriba, la luz en la puerta, la peste en una esquina, las
  * velas en fila. **La posición y la forma son la señal; el color acompaña.**
  */
-function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined): Array<{ object: Object3D; dispose(): void }> {
+function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined, era: Era = 'hamlet'): Array<{ object: Object3D; dispose(): void }> {
   switch (tell.kind) {
     case 'smoke': {
       // Tres bolas cada vez más altas y más tenues: una columna, no una mancha.
       // La intensidad viene del ánimo, y una aldea hundida humea poco.
-      return [0, 1, 2].map((step) => {
+      const count = era === 'town' ? 4 : 3;
+      const presence = era === 'hamlet' ? 1 : era === 'village' ? 1.24 : 1.43;
+      const base = HEIGHT.smoke + (era === 'hamlet' ? 0 : era === 'village' ? 0.1 : 0.18);
+      return Array.from({ length: count }, (_, step) => {
         const piece = mark(
           // Material sin luz a proposito. Con luz, un gris oscuro bajo el sol de
           // este valle sale blanco: las bocanadas se veian como huevos puestos
           // en el tejado. El humo no se ilumina, se ve.
-          new SphereGeometry(0.09 + step * 0.035, 6, 5), TONE.smoke, true,
-          tell.x, HEIGHT.smoke, tell.y,
-          (0.18 + tell.intensity * 0.45),
+          new SphereGeometry((0.09 + step * 0.03) * presence, 6, 5), TONE.smoke, true,
+          tell.x, base, tell.y,
+          Math.min(0.8, (0.18 + tell.intensity * 0.45) * presence),
         );
         // Cada bola sube por su cuenta, desfasada un tercio de vuelta: eso es
         // lo que hace columna en vez de tres bolas que suben a la vez. El
         // desfase de la chimenea viene de dónde está, así que dos casas no
         // humean al unísono como un coro.
         piece.object.userData.plume = {
-          base: HEIGHT.smoke,
-          peak: 0.18 + tell.intensity * 0.45,
-          phase: (step / 3 + (tell.x * 0.37 + tell.y * 0.19)) % 1,
+          base,
+          peak: Math.min(0.8, (0.18 + tell.intensity * 0.45) * presence),
+          phase: (step / count + (tell.x * 0.37 + tell.y * 0.19)) % 1,
         };
         return piece;
       });
@@ -385,9 +389,9 @@ export class Tells {
   }
 
   /** Pone las señales al día. Sin cambios, no toca nada. */
-  update(state: GameState, facing: ReadonlyMap<number, number> = new Map()): void {
+  update(state: GameState, facing: ReadonlyMap<number, number> = new Map(), era: Era = 'hamlet'): void {
     const tells = tellsFor(state);
-    const signature = signatureOf(tells) + JSON.stringify([...facing]);
+    const signature = `${era}|${signatureOf(tells)}${JSON.stringify([...facing])}`;
     if (signature === this.signature) return;
     // El orden importa: `clear` borra la firma, así que guardarla antes la
     // perdía y todo se reconstruía en cada fotograma. Lo cazó la prueba
@@ -403,7 +407,7 @@ export class Tells {
         && y >= building.y && y < building.y + building.h,
     );
     for (const tell of tells) {
-      for (const piece of bodyOf(tell, at)) {
+      for (const piece of bodyOf(tell, at, era)) {
         const home = at(tell.x, tell.y);
         const angle = home === undefined ? 0 : facing.get(home.id) ?? 0;
         if (home !== undefined && angle !== 0) {
@@ -475,7 +479,7 @@ export class Tells {
       const mesh = plume.mesh as Object3D & { material?: { opacity: number; transparent: boolean } };
       if (mesh.material !== undefined) {
         mesh.material.transparent = true;
-        mesh.material.opacity = plume.peak * 0.55 * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
+        mesh.material.opacity = plume.peak * 0.62 * Math.max(0, 1 - turn) * (0.35 + 0.65 * Math.min(1, turn * 4));
       }
     }
   }
