@@ -1,5 +1,15 @@
 # The Valley — Registro de cambios
 
+## v4.30 · 22 sep 2026 · Plaza por eras, decisión del dueño
+
+§7.4b deja de exigir empedrado completo desde la fundación: el mismo círculo
+reservado pasa de tierra pisada en caserío a empedrado parcial en aldea y
+completo en villa. Plaza, fuente, accesos y navegación no cambian. Motivo:
+el dueño confirmó que el empedrado inicial era una regla antigua de
+presentación que debía ceder ante la lectura visual de las eras; los controles
+E0e muestran que tres tonos de piedra no separan bien aldea y villa en tableta.
+El acabado se deriva de la era y no se añade al estado ni al balance.
+
 ## v4.29 · 21 sep 2026 · Cierre de la revisión espacial
 
 El claro deja de ofrecer trabajo a personas que ya tienen oficio y pasa a

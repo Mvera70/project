@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.29 · 21 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.30 · 22 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -1687,9 +1687,15 @@ trazado en la plaza cuesta **un 6 % de población** —354 a 334, y casi todo en
 una semilla: la 11 pasa de 46 a 28— porque un anillo reparte las casas más lejos
 unas de otras. Se acepta a cambio de lo que se pidió: un pueblo con plaza.
 
-**Lo que se ve** (P-2, `src/render3d/`): el empedrado es el suelo de las celdas
-del círculo, con el borde un tono más oscuro (`world/ground.ts`, `cellColour`), y
-en el centro hay una fuente. La malla de la fuente está encargada
+**Lo que se ve** (P-2, `src/render3d/`; revisión del dueño, 22 sep 2026):
+la plaza y su fuente existen desde la fundación, pero el suelo del mismo círculo
+reservado progresa con la era real: **tierra pisada en caserío, tierra con
+empedrado parcial en aldea y empedrado completo en villa cerrada**. El acabado
+no mueve el círculo, la fuente, los accesos ni la navegación, ni se guarda en
+el estado: `world/ground.ts` lo deriva de `Era`. El empedrado íntegro desde el
+primer día era una regla de presentación anterior, no parte de la reserva del
+motor; las capturas E0e demostraron que tres tonos de piedra no distinguían
+bien aldea y villa, sobre todo en tableta. La malla de la fuente está encargada
 (`docs/encargos/encargo-fuente.md`); mientras no exista, `PlazaFountain` dibuja un pilón,
 el agua y una columna con tres primitivas, por la misma razón que el barril y el
 arado (§7.14). **Su celda está cerrada al paso**: la gente rodea la fuente, no la

@@ -46,27 +46,41 @@ describe('E0e · ambiente de las eras', () => {
     expect(groundAppearanceKey(123, 'village')).not.toBe(groundAppearanceKey(123, 'town'));
   });
 
-  it('asienta el empedrado sólo dentro del mismo círculo y aclara más piedra por era', () => {
+  it('cubre la plaza con 0, parte y toda la piedra según la era', () => {
     const state = village();
     const map = structuredClone(state.map);
     map.terrain.fill(0);
     map.path.fill(0);
     const plaza = { x: 8.5, y: 8.5, radius: 3 };
     const palette = PALETTES.summer;
-    const brightness = (hex: string): number => {
-      const [r, g, b] = [1, 3, 5].map((at) => Number.parseInt(hex.slice(at, at + 2), 16));
-      return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0);
-    };
     const cells = [...map.terrain.keys()].filter((cell) => {
       const x = cell % map.width, z = Math.floor(cell / map.width);
       return Math.hypot(x + 0.5 - plaza.x, z + 0.5 - plaza.y) <= plaza.radius;
     });
-    const average = (era: 'hamlet' | 'village' | 'town'): number => cells
-      .map((cell) => brightness(cellColour(map, cell, palette, plaza, era)))
-      .reduce((sum, value) => sum + value, 0) / cells.length;
+    const colours = (era: 'hamlet' | 'village' | 'town'): string[] =>
+      cells.map((cell) => cellColour(map, cell, palette, plaza, era));
+    const hamlet = colours('hamlet');
+    const villageColours = colours('village');
+    const town = colours('town');
+    const dirt = new Set(hamlet);
+    const stone = new Set(town);
+    const coverage = (coloursForEra: readonly string[]) => ({
+      dirt: coloursForEra.filter((colour) => dirt.has(colour)).length,
+      stone: coloursForEra.filter((colour) => stone.has(colour)).length,
+    });
 
-    expect(average('hamlet')).toBeLessThan(average('village'));
-    expect(average('village')).toBeLessThan(average('town'));
+    // 0 / parte / todo: cada celda interior es tierra en caserío, la aldea
+    // tiene ambas superficies y la villa es piedra de borde a borde.
+    expect(coverage(hamlet)).toEqual({ dirt: cells.length, stone: 0 });
+    expect(coverage(villageColours)).toMatchObject({
+      dirt: expect.any(Number), stone: expect.any(Number),
+    });
+    expect(coverage(villageColours).dirt).toBeGreaterThan(0);
+    expect(coverage(villageColours).stone).toBeGreaterThan(0);
+    expect(coverage(villageColours).stone).toBeLessThan(cells.length);
+    expect(coverage(town)).toEqual({ dirt: 0, stone: cells.length });
+    // El patrón depende sólo de las coordenadas y de la era recibida.
+    expect(colours('village')).toEqual(villageColours);
     const outside = 0;
     expect(cellColour(map, outside, palette, plaza, 'hamlet')).toBe(palette.meadow);
     expect(cellColour(map, outside, palette, plaza, 'town')).toBe(palette.meadow);

@@ -132,3 +132,51 @@ autorizadas sí conservan sus señales.
 
 No se verificó en iPad físico; 1024 × 768 es una inspección de viewport tablet,
 no una afirmación sobre hardware real.
+
+---
+
+## Ronda autorizada · tierra → piedra · 22 sep 2026
+
+Se sustituye el acabado anterior de tres tonos de empedrado por la progresión
+autorizada de la misma plaza reservada: tierra pisada en caserío, áreas de
+tierra y piedra en aldea, y piedra continua en villa. Sólo cambia
+`world/ground.ts`: el patrón usa los colores estacionales ya entregados y los
+atributos de color del único mesh de suelo. No añade geometría, materiales,
+texturas, emisores ni draw calls, y no toca radio, cota, fuente, navegación,
+vado ni los caminos externos.
+
+La prueba focalizada cuenta las celdas interiores: 0 de piedra en caserío,
+tierra y piedra presentes (sin cobertura completa) en aldea, y todas de piedra
+en villa. Conserva las comprobaciones de prioridad de plaza sobre camino, vado
+y exterior intactos, firma sensible a era y estado inmutable; además repite la
+misma entrada para exigir el mismo patrón determinista.
+
+Se generaron 12 controles sin errores de página, todos en primavera/día 1 y
+con la misma escena por terna: semilla 7/año 30 y semilla 23/año 31, las tres
+eras forzadas y ambos viewports. Están en
+`artifacts/graphics/E0e/control-seed-{7,23}-year-{30,31}-{hamlet,village,town}-{mobile,tablet}-earthstone-v3.png`.
+También se generaron seis tomas históricas sin `preview-era`: 7/años 0, 4 y 30,
+y 23/años 0, 3 y 31, en
+`artifacts/graphics/E0e/historical-seed-*-earthstone-v3.png`; tampoco tuvieron
+errores de página. El capturador disponible no ofrece ocultación de cabecera o
+pie sin ampliarlo, así que esas tomas se conservan con HUD y no se presentan
+como lectura ciega.
+
+Inspección propia a 1024 × 768 de los tres controles de semilla 7: la tierra
+ocre del caserío se distingue claramente del prado y la villa queda como plaza
+gris continua; la aldea conserva una zona ocre continua frente a la piedra, por
+lo que se separa de la villa al compararlas. Aun así, aldea frente a villa no
+es una clasificación independiente demostrada: el cambio ocupa un círculo
+pequeño dentro de una panorámica de villa. La lectura visual queda pendiente de
+una clasificación independiente de las tomas históricas; no se ajustaron más
+colores a ciegas. Esa lectura sería útil para aceptación del conjunto, pero no
+es la puerta de cierre de esta ronda acotada.
+
+La revisión de Sol de las doce tomas confirma tres grados de superficie
+distinguibles en móvil y tableta, sin regresión del círculo, la fuente ni los
+accesos. Límite explícito: la piedra se lee todavía lisa, sin juntas; resolver
+esa textura exigiría geometría o textura nueva y queda fuera del presupuesto de
+esta ronda.
+
+Verificación de esta ronda: `vitest` focalizado de `era-ambience`, `npm run
+typecheck`, `npm run lint` y `git diff --check`, verdes.

@@ -135,7 +135,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
-| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0d cerrados; E0e técnico, visual pendiente* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. La continuación del 22 sep da al empedrado tres acabados con controles y pruebas verdes, pero aldea/villa siguen parecidas en tableta. Antes de cerrar: decisión visual del dueño sobre mantener empedrado desde la fundación (§7.4b) o permitir tierra/empedrado parcial, y lectura de tomas históricas sin rótulo. [Brief](encargos/encargo-e0-ambiente-eras.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md); inventario en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Sol dirige · Terra ejecuta | — |
+| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0d cerrados; E0e progreso visual, aceptación histórica pendiente* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. El dueño revisó §7.4b: tierra pisada → piedra parcial → piedra completa. Sol verifica tres grados distinguibles en 12 controles móvil/tableta, sin alterar plaza ni accesos; la piedra aún es lisa y la clasificación independiente de tomas históricas no está demostrada. [Brief](encargos/encargo-e0-ambiente-eras.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md); inventario en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Sol dirige · Terra ejecuta | — |
 | E2 · Modelos del asedio · **parcial, 20 sep 2026** | Arco, flecha, lanza y escudo están publicados y en las manos de ambos bandos. Queda la **identidad propia del clan vecino** —aldeanos armados de otro valle, no soldados de cota ni bandidos— y decidir si necesita espada además del aparejo ya integrado | P2 | Alta | Astra · sesión de arte | — |
 | E3 · Portón, muralla de piedra, torre · **parcial, 20 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. Quedan el **adarve/apoyo elevado real** y una **malla propia del bastión**, incluida su junta con el muro. No hace falta otro GLB para el portón roto | P2 | Media | Sesión de arte | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
@@ -183,13 +183,13 @@ necesita lo de arriba.
 El orden original A1→G ya se recorrió: A1–A5, B, C, D, E1, F2/F3 y la medición
 de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 
-1. **Siguiente** — aceptación visual de E0e. Caminos, plaza y humo ya están
-   implementados y probados, incluido el nuevo acabado del empedrado. La
-   [comparación controlada](historico/life-rounds/E0e-ambiente-eras.md)
-   aísla el cambio pero aldea/villa aún se leen demasiado parecidas en tableta.
-   No seguir afinando color a ciegas: arbitrar si se conserva el empedrado
-   fundacional de §7.4b o se permite tierra/empedrado parcial; después validar
-   con tomas históricas nuevas sin rótulo. La [revisión espacial](plan-espacial.md)
+1. **Siguiente** — aceptación de E0e en partida histórica. Caminos, plaza y humo
+   están implementados y probados; §7.4b ya permite tierra pisada → piedra
+   parcial → piedra completa. La [comparación controlada](historico/life-rounds/E0e-ambiente-eras.md)
+   distingue los tres grados en móvil/tableta, pero no demuestra por sí sola
+   que una era se reconozca en capturas históricas individuales sin rótulo.
+   La piedra lisa sin juntas queda como deuda de acabado, no otra ronda de color
+   a ciegas. La [revisión espacial](plan-espacial.md)
    está aceptada localmente. Sol dirige software; Astra sólo 3D excepcional.
 2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve y bastión
    propio con su junta. La sala del rey es deuda independiente en H.

@@ -178,11 +178,11 @@ function cornerColour(
 export function cellColour(
   map: ValleyMap, cell: number, palette: Palette, plaza?: Plaza, era: Era = 'hamlet',
 ): string {
-  // P-2 · **el empedrado de la plaza.** Va antes que el camino y antes que el
-  // terreno porque es lo que manda: dentro del círculo el suelo es empedrado, y
-  // el motor ya garantiza que ahí no hay nada construido (P-1,
-  // `engine/world/plaza.ts`). El borde se dibuja un tono más oscuro, que es lo
-  // que hace que se lea como un espacio y no como una mancha.
+  // P-2 · **el acabado de la plaza.** Va antes que el camino y antes que el
+  // terreno porque es lo que manda: dentro del círculo la Era decide tierra
+  // pisada, mezcla o piedra, y el motor ya garantiza que ahí no hay nada
+  // construido (P-1, `engine/world/plaza.ts`). El borde dibuja el espacio sin
+  // convertir el exterior en un camino nuevo.
   if (plaza !== undefined) {
     const x = cell % map.width;
     const z = Math.floor(cell / map.width);
@@ -224,28 +224,32 @@ export function cellColour(
 }
 
 /**
- * El empedrado de la plaza, siempre dentro de su círculo reservado.
+ * El acabado de la plaza, siempre dentro de su círculo reservado.
  *
- * No son losas ni geometría nueva: son tres lecturas de la misma piedra en el
- * color por vértice del único suelo. La mancha sale de bloques de dos celdas,
- * no de ruido fino, para que sobreviva la mezcla de vértices y el tamaño móvil.
+ * No son losas ni geometría nueva: son tierra y piedra en el color por vértice
+ * del único suelo. La mancha sale de bloques de dos celdas, no de ruido fino,
+ * para que sobreviva la mezcla de vértices y el tamaño móvil.
  */
 function plazaPaving(
   palette: Palette, era: Era, x: number, z: number, plaza: Plaza, gap: number,
 ): string {
-  const dark = mixed(palette.stone, palette.wood);
-  const settled = mixed(palette.stone, palette.path);
-  const light = mixed(palette.path, palette.accent);
+  // La tierra pisada no es prado: conserva el ocre del camino, pero se apoya
+  // en la madera para no parecer que la plaza ha nacido ya como una calzada.
+  const compacted = mixed(palette.path, palette.wood);
+  const compactedRim = mixed(compacted, palette.wood);
+  // La piedra mezcla los tonos ya estacionales de la paleta. No hay material,
+  // textura ni malla nuevos: sólo cambia el color de los vértices existentes.
+  const stone = mixed(palette.stone, palette.accent);
+  const stoneShade = mixed(palette.stone, palette.path);
   const blockX = Math.floor((x - plaza.x + 4) / 2);
   const blockZ = Math.floor((z - plaza.y + 4) / 2);
   const patch = (Math.imul(blockX, 3) + Math.imul(blockZ, 5) + 17) & 3;
-  // El borde sigue dibujando el círculo. En caserío se muerde más, como canto
-  // irregular; en villa queda fino y continuo, sin inventar una ruta exterior.
-  const rim = gap > plaza.radius - (era === 'hamlet' ? 0.6 : 0.32);
-  if (rim) return era === 'town' ? settled : dark;
-  if (era === 'hamlet') return patch === 0 ? settled : dark;
-  if (era === 'village') return patch <= 1 ? light : settled;
-  return patch <= 2 ? light : settled;
+  // El borde sólo perfila el espacio reservado; jamás sale del círculo ni
+  // altera un camino exterior. Caserío = tierra completa; aldea = dos bloques
+  // de piedra por cada dos de tierra; villa = piedra continua.
+  if (era === 'hamlet') return gap > plaza.radius - 0.35 ? compactedRim : compacted;
+  if (era === 'village') return patch <= 1 ? stone : compacted;
+  return patch === 0 ? stoneShade : stone;
 }
 
 /** Media de dos colores, para el escalón que la paleta no nombra. */

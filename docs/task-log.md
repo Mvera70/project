@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E0e, tierra → piedra — cambio autorizado y verificado
+
+Vera autorizó retirar la regla de empedrado desde la fundación: §7.4b v4.30
+deja plaza y fuente fijas, con tierra pisada en caserío, empedrado parcial en
+aldea y piedra completa en villa. Terra cambió sólo el color del suelo; Sol
+revisó 12 controles de dos villas a tamaño móvil/tableta y distingue los tres
+grados sin regresión de círculo, fuente ni pasos. Se tomaron seis escenas
+históricas reales y pasaron typecheck, lint y pruebas focalizadas. La piedra
+se lee lisa, sin juntas, y aún no hay clasificación independiente de las eras
+históricas sin rótulo; E0e no se declara aceptada de punta a punta por ello.
+[Informe](historico/life-rounds/E0e-ambiente-eras.md).
+
 ## 22 sep 2026 · E0e, empedrado por era — técnico verificado, visual pendiente
 
 Sol fijó la dirección dentro del empedrado fundacional de §7.4b; Terra implementó

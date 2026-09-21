@@ -75,4 +75,34 @@ La ronda termina cuando las tres eras se distinguen sin leer la cabecera, los tr
 
 ### Límite de especificación
 
-La opción de tierra pisada en caserío y empedrado parcial en aldea daría un contraste mayor, pero `docs/design.md` §7.4b dice que el suelo de las celdas del círculo es empedrado desde la fundación. Requiere una decisión expresa del dueño y revisión de esa regla; no está autorizada por este brief. Si la dirección de tres acabados de piedra falla la lectura ciega, llevar esa decisión al arbitraje antes de otra iteración de color. Tampoco hay permiso aquí para encargar arte 3D nuevo.
+**Límite vigente antes de la decisión siguiente:** la opción de tierra pisada en caserío y empedrado parcial en aldea daba más contraste, pero la antigua §7.4b exigía empedrado desde la fundación. En esa ronda no estaba autorizada y había que llevarla al dueño. La autorización y la nueva regla aparecen a continuación; esta restricción queda como historial del arbitraje, no como regla vigente. Tampoco se encargó arte 3D nuevo.
+
+## Ronda autorizada · tierra → piedra · 22 sep 2026
+
+El dueño autorizó expresamente sustituir la regla antigua de §7.4b: plaza y
+fuente permanecen desde la fundación, pero el pavimento es **tierra pisada en
+caserío, mezcla de tierra y empedrado parcial en aldea, piedra continua en villa**.
+`docs/design.md` v4.30 y `docs/changelog.md` son la fuente normativa; el apartado
+anterior documenta por qué se paró la ronda v2, no limita esta implementación.
+La prohibición inicial de tocar `design.md` queda superada sólo para esta
+corrección documental. No se cambian motor, estado, navegación, radio, cota,
+fuente, caminos externos, humo ni bancos.
+
+**Contrato de ejecución:** `src/render3d/world/ground.ts` calcula los tres
+acabados a partir de `Era` y la paleta estacional ya recibidos. El caserío debe
+leerse como tierra compactada (distinta del prado, sin losas); la aldea deja
+áreas continuas de tierra y piedra reconocibles; la villa cubre el círculo con
+piedra. El borde sigue delimitando el espacio sin crear un camino nuevo. La
+misma entrada produce el mismo patrón, sin RNG, textura, mesh, material ni
+draw call nuevos. Si el color por vértice no da para leerlo, comunicarlo antes
+de ampliar el presupuesto visual; no inventar mosaicos geométricos por tanteo.
+
+**Evidencia exigida:** pruebas focalizadas de cobertura (0/parte/todo), plaza
+prioritaria sobre caminos, terreno exterior y vado intactos, firma sensible a
+era, estado serializado igual. Typecheck, lint y diff-check. Repetir dos
+controles de villa real con las tres eras forzadas en móvil/tableta (12 tomas)
+y obtener tomas históricas sin override de las tres eras en dos semillas, con
+cabecera/pie ocultos sólo para la revisión. Sol juzga la lectura a tamaño de
+uso. La propuesta anterior de cinco lectores externos no fue una decisión
+del dueño y no bloquea esta ronda; si la lectura sigue ambigua se documenta
+como pendiente, sin declarar aceptación visual por pasar los tests.
