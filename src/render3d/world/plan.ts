@@ -21,6 +21,7 @@ import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 import { defenceConnections } from './defences';
 import { forestSignature } from './forest-state';
+import { houseVariant } from './house-variation';
 
 export interface PlannedBuilding {
   readonly id: BuildingId;
@@ -48,6 +49,8 @@ export interface PlannedBuilding {
   /** Vecinos cardinales de una defensa viva; ausente en los demás edificios. */
   readonly connections?: number;
   readonly gate?: 'x' | 'z';
+  /** Acabado estable por parcela, ajeno al estado y al azar del motor. */
+  readonly variant?: number;
 }
 
 export interface ScenePlan {
@@ -205,6 +208,8 @@ export function planFor(state: GameState): ScenePlan {
     ground: groundSignature(state.map, state.tick),
     forest: forestSignature(state),
     buildings: visible.map((building) => ({ ...plannedFrom(building, state.tick),
+      ...((building.kind === 'house' || building.kind === 'stone_house') && building.lostTick === null
+        ? { variant: houseVariant(state.seed, building.x, building.y) } : {}),
       ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
       ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
     }))
@@ -217,7 +222,7 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
   return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
     && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
-    && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate;
+    && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate && a.variant === b.variant;
 }
 
 function sameWork(a: PlannedWork, b: PlannedWork): boolean {

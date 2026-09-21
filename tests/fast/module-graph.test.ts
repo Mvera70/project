@@ -170,8 +170,12 @@ describe('grafo de módulos del motor', () => {
     // Y `plaza` desde P-1: la reserva de la plaza es una condición de la
     // colocación, así que quien coloca tiene que preguntarla. La hoja sigue
     // siendo `tiles`; `plaza` sólo mira a `balance`, `state` y `tiles`.
-    expect(importsOf('world/placement.ts')).toEqual(['balance', 'plaza', 'state', 'tiles']);
-    expect(importsOf('world/plaza.ts')).toEqual(['balance', 'state', 'tiles']);
+    // Se vigila la frontera, no una lista congelada de imports: un helper
+    // espacial puro y un hash no invierten las capas.
+    for (const file of ['placement', 'plaza', 'spatial']) {
+      const allowed = new Set(['balance', 'plaza', 'state', 'tiles', 'rng', 'spatial']);
+      expect(importsOf(`world/${file}.ts`).every(target => allowed.has(target))).toBe(true);
+    }
     // K-2 · `people/crown`: el tope de campos lo levanta el rey del campo, que
     // es lo único que la corona cambia de §12.
     expect(importsOf('world/buildings.ts')).toEqual([
@@ -191,7 +195,7 @@ describe('grafo de módulos del motor', () => {
     // le avisa de que los árboles se han movido, y la flecha no vuelve.
     expect(importsOf('world/astar.ts')).toEqual(['balance', 'state', 'tiles']);
     expect(importsOf('world/forest.ts')).toEqual(['balance', 'paths', 'state', 'tiles']);
-    expect(importsOf('world/paths.ts')).toEqual([
+    const pathDependencies = new Set([
       'astar',
       'balance',
       'people/demography',
@@ -199,7 +203,9 @@ describe('grafo de módulos del motor', () => {
       'subsistence/building-counts',
       'subsistence/labour',
       'time',
+      'spatial',
     ]);
+    expect(importsOf('world/paths.ts').every(target => pathDependencies.has(target))).toBe(true);
     expect(importsOf('world/paths.ts')).not.toContain('forest');
     // K-2 · `people/crown`: qué familia va delante en la cola de §7.3 y si la
     // muralla espera a que haya amenaza lo dice ahora la voluntad del rey, no

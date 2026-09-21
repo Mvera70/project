@@ -3,6 +3,8 @@ import { HEART } from './tiles';
 import { inPlaza, plazaCentre } from './plaza';
 import { TERRAIN_CODE } from '../state';
 import type { Building, BuildingKind, GameState } from '../state';
+import { hash32 } from '../rng';
+import { floodCells, plotAccess, walkableTerrain, walkingBlocked } from './spatial';
 
 interface Rect { x: number; y: number; w: number; h: number }
 interface Point { x: number; y: number }
@@ -17,8 +19,11 @@ const overlaps = (a: Rect, b: Rect): boolean => a.x < b.x + b.w && a.x + a.w > b
  * lago del mapa grande (`docs/historico/next-plan.md`) serían cuatro códigos repetidos en
  * dos condiciones. Aquí, una vez.
  */
-function buildable(tile: number | undefined): boolean {
-  return tile !== TERRAIN_CODE.water && tile !== TERRAIN_CODE.marsh
+function buildable(tile: number | undefined, kind: BuildingKind): boolean {
+  // La marisma de ribera deja pasar cuerpos: defensas de una celda pueden
+  // hincarse ahí. Casas y campos conservan su exigencia de suelo seco.
+  const bankDefence = kind === 'palisade' || kind === 'wall' || kind === 'gate' || kind === 'bastion';
+  return tile !== undefined && tile !== TERRAIN_CODE.water && (tile !== TERRAIN_CODE.marsh || bankDefence)
     && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake
     // El vado se anda, no se edifica: una casa sobre el paso cierra el paso.
     && tile !== TERRAIN_CODE.ford;
@@ -30,7 +35,7 @@ export function canPlace(state: GameState, kind: BuildingKind, x: number, y: num
   if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0 || x + w > state.map.width || y + h > state.map.height) return false;
   for (let row = y; row < y + h; row += 1) for (let col = x; col < x + w; col += 1) {
     const tile = state.map.terrain[row * state.map.width + col];
-    if (!buildable(tile)) return false;
+    if (!buildable(tile, kind)) return false;
     if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
   }
   if (state.buildings.some((b) => b.id !== upgradeOf && standsInTheWay(b, state.tick) && overlaps(rect, b))) return false;
@@ -40,6 +45,18 @@ export function canPlace(state: GameState, kind: BuildingKind, x: number, y: num
   // ya estaba ahí antes de que existiera la regla no se demuele por decreto, y
   // en una partida migrada eso pasa.
   if (upgradeOf === null && inPlaza(state, x, y, w, h)) return false;
+  if (kind !== 'gate' && kind !== 'wall' && kind !== 'palisade' && kind !== 'bastion'
+    && inGateway(state, x, y, w, h)) return false;
+  if (upgradeOf !== null && WALLED.has(kind)) {
+    const source = state.buildings.find(b => b.id === upgradeOf);
+    const grows = source !== undefined && (w > source.w || h > source.h);
+    if (grows && (inPlaza(state, x, y, w, h)
+      || (state.ring !== null && onRingRect(rect, plazaCentre(state.plaza), state.ring)))) return false;
+    if (grows && state.buildings.some(b => b.id !== upgradeOf && standsInTheWay(b, state.tick)
+      && WALLED.has(b.kind) && overlaps(rect, { x: b.x - BUILDING_RULES.STREET_GAP,
+        y: b.y - BUILDING_RULES.STREET_GAP, w: b.w + 2 * BUILDING_RULES.STREET_GAP,
+        h: b.h + 2 * BUILDING_RULES.STREET_GAP }))) return false;
+  }
   return !state.works.some((work) => overlaps(rect, work));
 }
 
@@ -74,16 +91,9 @@ function center(rect: Rect): Point { return { x: rect.x + rect.w / 2, y: rect.y 
 // distintos caían en líneas distintas. Medido en cuatro semillas al año 60:
 // **de 7 a 19 tramos desconectados por valle**, ninguno cerrando nada.
 //
-// Lo que hay ahora es un **anillo**: un círculo alrededor de la plaza —que desde
-// P-1 es el centro del pueblo y no se mueve— con un radio que **se deriva de la
-// muralla que ya hay**, así que la primera pieza fija el anillo y las
-// siguientes lo continúan. Cuando no cabe ni una pieza más en él, se empieza
-// otro más afuera; y como la aldea también crece hacia fuera, el anillo
-// siguiente la envuelve.
-//
-// No hace falta estado nuevo para esto —el anillo **está escrito en la propia
-// muralla**— y eso es deliberado: un radio guardado sería un número más que
-// migrar, y esto se puede leer del valle.
+// Hay un solo anillo alrededor de la plaza. Su radio se guarda en `state.ring`
+// y no se desplaza; la expansión posterior sale fuera. El trazado nuevo se
+// valida entero antes de fijarlo, incluyendo el terreno exterior al corazón.
 // ---------------------------------------------------------------------------
 
 
@@ -184,30 +194,33 @@ function ringToBuild(state: GameState, centre: Point, coreRadius: number,
   const base = state.ring ?? Math.round(coreRadius + BUILDING_RULES.PALISADE_DILATION);
   // Si el anillo elegido no tiene sitio, se busca uno más afuera **sólo
   // mientras la aldea no tenga muralla**: el primer anillo tiene que caber en
-  // alguna parte, y para eso se prueba de tres en tres celdas (así dos anillos
-  // nunca se pegan y entre ellos cabe una calle).
+  // alguna parte. Se prueba cada radio entero: saltar de tres en tres podía
+  // omitir el único trazado que no cruzaba un campo o un vado.
   if (state.ring !== null) return ringHasRoom(state, centre, base, ground) ? base : null;
-  for (let radius = base; radius <= base + RING_SEARCH; radius += RING_STEP) {
-    if (ringHasRoom(state, centre, radius, ground)) return radius;
+  for (let radius = base; radius <= base + RING_SEARCH; radius += 1) {
+    // El trazado se decide entero: un campo, un vado o una obra no son muralla.
+    const viable = [...ringCells(centre, radius)].every(cell => {
+      const x = cell % RING_STRIDE, y = Math.floor(cell / RING_STRIDE);
+      if (x >= state.map.width || y >= state.map.height) return false;
+      if (!walkableTerrain(state.map.terrain[y * state.map.width + x])) return true;
+      return fitsEmptyGround(state, 'palisade', x, y, ground);
+    });
+    if (viable && ringHasRoom(state, centre, radius, ground)) return radius;
   }
   return null;
 }
 
 /**
- * A1 · **Si el anillo de muralla está cerrado**: hay anillo y ya no cabe ni una
- * pieza más en él.
+ * Si el recinto está terminado y separa topológicamente la plaza del exterior.
  *
  * Vive aquí y no en `derive/` porque la respuesta sale de las mismas rejillas
  * de ocupación que usa `placeBuilding` —lo construido, lo reservado, la línea
  * de la propia muralla— y duplicarlas fuera sería tener dos ideas distintas de
  * dónde cabe una pieza. Es pura: no escribe nada, ni siquiera el anillo.
  *
- * **Cerrado no quiere decir un círculo perfecto.** Quiere decir que la aldea
- * ya no tiene dónde seguir amurallando ese anillo: el agua, la roca y el borde
- * del mapa cierran el resto. Es exactamente la condición con la que §7.4c deja
- * de pedir muralla y la obra pasa a lo siguiente (`nextProject`), así que lo
- * que esto responde es «la aldea ha terminado su muralla», que es la fase 3 de
- * la meta (§1b).
+ * No basta agotar solares: un vado o un campo ocupando la línea dejan un paso.
+ * Se cierran sólo las defensas reales y el terreno físicamente impasable; el
+ * flood desde la plaza no debe escapar y una puerta real debe atravesar su borde.
  */
 export function ringClosed(state: GameState): boolean {
   const ring = state.ring;
@@ -216,7 +229,29 @@ export function ringClosed(state: GameState): boolean {
   const inside = plaza.x >= 0 && plaza.y >= 0
     && plaza.x < state.map.width && plaza.y < state.map.height;
   if (!inside) return false;
-  return !ringHasRoom(state, plaza, ring, occupiedCells(state));
+  if (ringHasRoom(state, plaza, ring, occupiedCells(state))) return false;
+  const gates = state.buildings.filter(b => b.lostTick === null && b.kind === 'gate'
+    && onRing(center(b), plaza, ring));
+  if (gates.length === 0) return false;
+  // Sólo defensa y terreno cierran el recinto: una casa o un solar no sustituyen una muralla.
+  const blocked = Uint8Array.from(state.map.terrain, tile => Number(!walkableTerrain(tile)));
+  for (const b of state.buildings) {
+    if (b.lostTick === null && ['palisade', 'wall', 'gate', 'bastion'].includes(b.kind)) {
+      blocked[b.y * state.map.width + b.x] = 1;
+    }
+  }
+  const seen = floodCells(state.map, blocked, [state.plaza.y * state.map.width + state.plaza.x]);
+  if (seen[state.plaza.y * state.map.width + state.plaza.x] !== 1) return false;
+  for (let cell = 0; cell < seen.length; cell++) {
+    if (seen[cell] === 1 && Math.hypot(cell % state.map.width + 0.5 - plaza.x,
+      Math.floor(cell / state.map.width) + 0.5 - plaza.y) > ring + 1) return false;
+  }
+  return gates.some(gate => ([[1, 0], [0, 1]] as const).some(([dx, dy]) => {
+    const ax = gate.x - dx, ay = gate.y - dy, bx = gate.x + dx, by = gate.y + dy;
+    if (ax < 0 || ay < 0 || bx >= state.map.width || by >= state.map.height) return false;
+    const a = ay * state.map.width + ax, b = by * state.map.width + bx;
+    return blocked[a] === 0 && blocked[b] === 0 && seen[a] !== seen[b];
+  }));
 }
 
 
@@ -245,7 +280,7 @@ function villageSide(state: GameState, ground: { occupied: Uint8Array }): Uint8A
   const free = (col: number, row: number): boolean => {
     if (col < 0 || row < 0 || col >= state.map.width || row >= state.map.height) return false;
     const cell = row * state.map.width + col;
-    return ground.occupied[cell] === 0 && buildable(state.map.terrain[cell]);
+    return ground.occupied[cell] === 0 && walkableTerrain(state.map.terrain[cell]);
   };
   const start: Point[] = [];
   for (let row = house.y - 1; row <= house.y + house.h; row += 1) {
@@ -281,12 +316,13 @@ function crossable(
   ground: { occupied: Uint8Array; reserved: Uint8Array },
   village: Uint8Array | null,
   ring: number,
+  exterior: Uint8Array,
 ): boolean {
   const centre = plazaCentre(state.plaza);
   const open = (col: number, row: number): boolean => {
     if (col < 0 || row < 0 || col >= state.map.width || row >= state.map.height) return false;
     const cell = row * state.map.width + col;
-    return ground.occupied[cell] === 0 && buildable(state.map.terrain[cell]);
+    return ground.occupied[cell] === 0 && walkableTerrain(state.map.terrain[cell]);
   };
   const far = (col: number, row: number): number =>
     Math.hypot(col + 0.5 - centre.x, row + 0.5 - centre.y);
@@ -310,7 +346,8 @@ function crossable(
     // gruesa, así que las quince casas quedaban en una bolsa de 220 celdas sin
     // salida mientras la puerta comunicaba campo con campo.
     const inner = inA ? a : b;
-    if (atHome(inner.x, inner.y)) return true;
+    const outer = inA ? b : a;
+    if (atHome(inner.x, inner.y) && exterior[outer.y * state.map.width + outer.x] === 1) return true;
   }
   return false;
 }
@@ -324,8 +361,8 @@ function crossable(
  */
 export function inGateway(state: GameState, x: number, y: number, w = 1, h = 1): boolean {
   const centre = plazaCentre(state.plaza);
-  for (const gate of state.buildings) {
-    if (gate.kind !== 'gate' || gate.lostTick !== null) continue;
+  for (const gate of [...state.buildings.filter(b => b.lostTick === null), ...state.works]) {
+    if (gate.kind !== 'gate') continue;
     const at = { x: gate.x + 0.5, y: gate.y + 0.5 };
     // El eje del paso: hacia fuera desde la plaza, que es por donde se cruza un
     // anillo. La muralla corre perpendicular a él.
@@ -366,7 +403,7 @@ function ringHasRoom(state: GameState, centre: Point, radius: number,
   for (const cell of ringCells(centre, radius)) {
     const x = cell % RING_STRIDE;
     const y = (cell - x) / RING_STRIDE;
-    if (x < HEART.x0 || y < HEART.y0 || x >= HEART.x1 || y >= HEART.y1) continue;
+    if (x < 0 || y < 0 || x >= state.map.width || y >= state.map.height) continue;
     if (!fitsEmptyGround(state, 'palisade', x, y, ground)) continue;
     return true;
   }
@@ -375,8 +412,6 @@ function ringHasRoom(state: GameState, centre: Point, radius: number,
 
 /** Cuántas celdas más afuera se prueban antes de renunciar a la muralla. */
 const RING_SEARCH = 15;
-/** Lo que se separa un anillo del siguiente, en celdas. */
-const RING_STEP = 3;
 
 /**
  * A2c · **La pieza de muralla que hay en esa celda**, si la hay y sigue en pie.
@@ -422,7 +457,7 @@ function touchesWall(state: GameState, x: number, y: number): boolean {
  * ground: people walk over them. A house is not.
  */
 const WALLED = new Set<BuildingKind>([
-  'house', 'stone_house', 'granary', 'chapel', 'church', 'smithy', 'mill', 'watchtower',
+  'house', 'stone_house', 'granary', 'chapel', 'church', 'smithy', 'mill', 'watchtower', 'hall',
 ]);
 
 /**
@@ -479,13 +514,15 @@ function fitsEmptyGround(
   // A2b · y el paso del portón, por la misma razón y con el mismo mecanismo: lo
   // que la aldea reserva no se le da a nadie. La muralla es la excepción —su
   // línea pasa por la puerta— y por eso se pregunta por la clase.
-  if (kind !== 'gate' && inGateway(state, x, y, w, h)) return false;
+  if (kind !== 'gate' && kind !== 'palisade' && kind !== 'wall' && inGateway(state, x, y, w, h)) return false;
   for (let row = y; row < y + h; row += 1) {
     for (let col = x; col < x + w; col += 1) {
       const cell = row * state.map.width + col;
       const tile = state.map.terrain[cell];
-      if (ground.occupied[cell] !== 0 || !buildable(tile)) return false;
+      if (ground.occupied[cell] !== 0 || !buildable(tile, kind)) return false;
       if (keepsAway && ground.reserved[cell] !== 0) return false;
+      // Una calle usada deja de ser un solar disponible cuando tiene paredes.
+      if (keepsAway && (state.map.path[cell] ?? 0) > 0) return false;
       if (kind === 'field' && tile !== TERRAIN_CODE.meadow && tile !== TERRAIN_CODE.cleared) return false;
     }
   }
@@ -546,8 +583,6 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   const spec = BUILDINGS[kind];
   // §7.4c · el anillo que toca, sólo cuando se va a levantar muralla: es un
   // barrido de círculos y no hay que pagarlo por cada casa.
-  // §7.4c · el anillo que toca, sólo cuando se va a levantar muralla: es un
-  // barrido de círculos y no hay que pagarlo por cada casa.
   const ring = kind === 'palisade' ? ringToBuild(state, centre, coreRadius, occupied) : null;
   // A2 · **el portón va en el anillo escrito, y en ninguno provisional.**
   //
@@ -580,7 +615,28 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // forma (once casas, el 91 % del radio que va a ocupar).
   // A2b · el suelo del pueblo, para saber si una puerta separa de verdad. Se
   // calcula una vez y sólo cuando se va a plantar una: es un barrido del valle.
-  const villageBag = kind === 'gate' ? villageSide(state, occupied) : null;
+  // Validar el portón contra la muralla terminada evita aprobar una salida
+  // que el siguiente tramo de estacas va a tapar.
+  const planned = { occupied: occupied.occupied.slice(), reserved: occupied.reserved };
+  if (kind === 'gate' && gateRing !== null) for (const cell of ringCells(centre, gateRing)) {
+    const x = cell % RING_STRIDE, y = Math.floor(cell / RING_STRIDE);
+    if (x < state.map.width && y < state.map.height) planned.occupied[y * state.map.width + x] = 1;
+  }
+  const villageBag = kind === 'gate' ? villageSide(state, planned) : null;
+  const exterior = new Uint8Array(state.map.terrain.length);
+  if (kind === 'gate' && gateRing !== null) {
+    const blocked = Uint8Array.from(state.map.terrain, (tile, cell) =>
+      Number(!walkableTerrain(tile) || planned.occupied[cell] !== 0));
+    const starts: number[] = [];
+    for (let cell = 0; cell < blocked.length; cell++) {
+      if (blocked[cell] === 0 && Math.hypot(cell % state.map.width + 0.5 - centre.x,
+        Math.floor(cell / state.map.width) + 0.5 - centre.y) > gateRing + BUILDING_RULES.GATE_CLEAR) starts.push(cell);
+    }
+    exterior.set(floodCells(state.map, blocked, starts));
+  }
+  const walking = WALLED.has(kind) ? walkingBlocked(state) : null;
+  const connected = walking === null || !inside ? null : floodCells(state.map, walking,
+    plotAccess(state.map, walking, { x: state.plaza.x, y: state.plaza.y, w: 1, h: 1 }));
   const grown = houses.length >= BUILDING_RULES.PALISADE_HOUSES;
   if (ring !== null && ring !== state.ring && grown) state.ring = ring;
   // A2c · **y no hay estaca antes de que el anillo esté decidido.** El tope de
@@ -603,7 +659,8 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // muralla»—: cuando dentro ya no cabe nada, lo nuevo sale fuera solo.
   if ((kind === 'palisade' || kind === 'wall') && state.ring === null) return null;
   const wallLine = kind === 'palisade' || kind === 'wall' || kind === 'gate' ? null : state.ring;
-  // **Sólo el corazón del valle**, y por dos razones que apuntan al mismo sitio.
+  // Los solares siguen dentro del corazón; la defensa puede alcanzar la falda
+  // para no terminar en un borde administrativo que físicamente deja pasar.
   //
   // La de diseño: fuera del corazón no hay terreno productivo —es montaña, lago
   // y falda (§7)— y los topes de §12 son absolutos, así que una aldea de
@@ -615,8 +672,13 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
   // cuatro veces más celdas por nada: la suite rápida pasó de 18,4 a 28,5
   // segundos —su presupuesto son 20— y la de balance de 18 minutos a más de
   // cincuenta. Acotar al corazón devuelve el coste que tenía.
-  for (let y = HEART.y0; y <= Math.min(HEART.y1, state.map.height) - spec.h; y += 1) {
-    for (let x = HEART.x0; x <= Math.min(HEART.x1, state.map.width) - spec.w; x += 1) {
+  const defence = kind === 'palisade' || kind === 'wall' || kind === 'gate';
+  for (let y = defence ? 0 : HEART.y0; y <= (defence ? state.map.height : Math.min(HEART.y1, state.map.height)) - spec.h; y += 1) {
+    for (let x = defence ? 0 : HEART.x0; x <= (defence ? state.map.width : Math.min(HEART.x1, state.map.width)) - spec.w; x += 1) {
+    // Primero el filtro barato: ampliar el cerco fuera del corazón no exige
+    // comprobar reservas y edificios para las ocho mil celdas del mapa.
+    if (kind === 'palisade' && (ring === null || !onRing({ x: x + 0.5, y: y + 0.5 }, centre, ring))) continue;
+    if (kind === 'gate' && (gateRing === null || !onRing({ x: x + 0.5, y: y + 0.5 }, centre, gateRing))) continue;
     // A2c · un portón vale sobre una estaca en pie: se derriba y se cuelga ahí.
     const onWall = kind === 'gate' && wallAt(state, x, y) !== null;
     if (!onWall && !fitsEmptyGround(state, kind, x, y, occupied)) continue;
@@ -648,7 +710,7 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
     // con 220 celdas de 8 064 a su alcance—. Una puerta se abre donde hay por
     // dónde entrar y por dónde salir.
     if (kind === 'gate'
-      && (gateRing === null || !crossable(state, x, y, occupied, villageBag, gateRing))) continue;
+      && (gateRing === null || !crossable(state, x, y, planned, villageBag, gateRing, exterior))) continue;
     if (wallLine !== null && onRingRect(rect, centre, wallLine)) continue;
     let river = false;
     let touchesForest = false;
@@ -673,7 +735,10 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
     const rock = state.map.terrain[y * state.map.width + x] === TERRAIN_CODE.rock;
     let score: number[];
     switch (kind) {
-      case 'house': case 'stone_house': score = [distance(p, centre), Number(!path), Number(river)]; break;
+      case 'house': case 'stone_house': score = [
+        Math.floor(Math.sqrt(distance(p, centre)) / (spec.w + BUILDING_RULES.STREET_GAP)),
+        Number(!path), Number(river), hash32(state.terrainSeed, `plot:${x},${y}`),
+      ]; break;
       // "Lejos del bosque" es *no pegado* al bosque, no lo más lejos posible.
       // Maximizar esa distancia manda los campos al borde del mapa y deja la
       // aldea desperdigada por el valle, que es justo lo contrario de §7.4.
@@ -760,6 +825,17 @@ export function placeBuilding(state: GameState, kind: BuildingKind): Point | nul
       default: score = [distance(p, centre)];
     }
     if (bestScore === null || lowerScore(score, bestScore)) {
+      // Se prueba sólo el solar que mejoraría al elegido: la accesibilidad es
+      // obligatoria, pero comprobarla en cada solar peor no cambia el resultado.
+      if (walking !== null) {
+        const access = plotAccess(state.map, walking, rect)
+          .filter(cell => connected === null || connected[cell] === 1);
+        const sides = new Set(access.map(cell => {
+          const ax = cell % state.map.width, ay = Math.floor(cell / state.map.width);
+          return ax < x ? 'west' : ax >= x + spec.w ? 'east' : ay < y ? 'north' : 'south';
+        }));
+        if (sides.size < 2) continue;
+      }
       best = { x, y }; bestScore = score;
     }
     }

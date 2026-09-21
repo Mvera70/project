@@ -4,6 +4,7 @@ import { foundGame } from '../../src/engine/found';
 import { bpCostOf } from '../../src/engine/world/works';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
+import { foundTwenty } from '../helpers/founding';
 
 describe('IA-15/17/18 · recursos visibles', () => {
   it('el talador corta, vuelve cargado, descarga y retoma el tajo sin escribir en el motor', () => {
@@ -51,6 +52,45 @@ describe('IA-15/17/18 · recursos visibles', () => {
       place: dweller.doing?.place.id ?? null,
     }));
     expect(snapshot(1)).toEqual(snapshot(0));
+  });
+
+  it('los porteadores de madera hacen cola sin compartir una plaza de descarga ni perder el haz', () => {
+    const state = foundTwenty(7);
+    const before = JSON.stringify(state);
+    const life = createVillage(state, 0);
+    const mirror = createVillage(foundTwenty(7), 0);
+    const store = life.places.find(place => place.id.startsWith('wood-store:'))!;
+    const delivery = store.offers.find(offer => offer.id === 'deliver')!;
+    expect(life.dwellers.filter(dweller => dweller.dayPlan?.job?.place.startsWith('felling:')).length)
+      .toBeGreaterThan(delivery.seats);
+
+    let sawQueue = false;
+    for (let step = 0; step < 4_800; step += 1) {
+      life.step(0.45);
+      mirror.step(0.45);
+      const carriers = life.dwellers.filter(dweller => dweller.holding === -1 - dweller.body.id);
+      const unloading = carriers.filter(dweller => dweller.doing?.place.id === store.id
+        && dweller.doing.offer.id === 'deliver');
+      const seats = unloading.map(dweller => dweller.doing!.seat);
+      expect(unloading.length).toBeLessThanOrEqual(delivery.seats);
+      expect(new Set(seats).size).toBe(seats.length);
+      const waiting = carriers.filter(dweller => dweller.doing?.offer.id === 'pause');
+      sawQueue ||= waiting.length > 0;
+      expect(carriers.every(dweller => dweller.doing?.offer.id === 'deliver'
+        || dweller.doing?.offer.id === 'pause')).toBe(true);
+    }
+    expect(sawQueue, 'cuando la leñera se llena, el tercer haz espera fuera de su puerta').toBe(true);
+    expect(life.timberDeliveries).toBeGreaterThan(delivery.seats);
+    expect(life.props.filter(prop => prop.kind === 'bundle' && prop.held === null).length).toBeLessThanOrEqual(3);
+    expect(mirror.timberDeliveries).toBe(life.timberDeliveries);
+    expect(mirror.dwellers.map(dweller => ({
+      id: dweller.villager, x: dweller.body.x, z: dweller.body.z, holding: dweller.holding,
+      place: dweller.doing?.place.id ?? null, seat: dweller.doing?.seat ?? null,
+    }))).toEqual(life.dwellers.map(dweller => ({
+      id: dweller.villager, x: dweller.body.x, z: dweller.body.z, holding: dweller.holding,
+      place: dweller.doing?.place.id ?? null, seat: dweller.doing?.seat ?? null,
+    })));
+    expect(JSON.stringify(state)).toBe(before);
   });
 
   it('una obra de piedra manda al albañil a roca real, carga, descarga y vuelve sin inventario', () => {

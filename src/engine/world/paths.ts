@@ -18,6 +18,8 @@ import { smithyWorking } from '../subsistence/building-counts';
 import { TERRAIN_CODE } from '../state';
 import type { GameState, PathEvent, Villager, VillagerId } from '../state';
 import { route } from './astar';
+import { plotAccess, solidKind, walkingBlocked, walkingMap } from './spatial';
+import type { ValleyMap } from '../state';
 
 /**
  * Routes are a cache, never state: they are derivable from the map and the
@@ -55,6 +57,29 @@ const CACHE = new WeakMap<GameState, Map<VillagerId, CachedRoute>>();
  * volver el verano, porque la ruta al campo sigue guardada.
  */
 const PAIRS = new WeakMap<GameState, Map<string, { ground: number; cells: number[] }>>();
+const WALKING = new WeakMap<GameState, { key: string; forest: number; map: ValleyMap; blocked: Uint8Array }>();
+
+/** Una obra nueva también corta una ruta: invalidar sólo por desgaste dejaba caminos bajo las casas. */
+function walkingGround(state: GameState): { map: ValleyMap; blocked: Uint8Array } {
+  const key = state.buildings.filter(b => b.lostTick === null)
+    .map(b => `${b.kind}:${b.x},${b.y},${b.w},${b.h}`).join('|')
+    + '/' + state.works.map(w => `${w.kind}:${w.x},${w.y},${w.w},${w.h}`).join('|')
+    + `/${state.plaza.x},${state.plaza.y}`;
+  const known = WALKING.get(state);
+  const forest = FOREST_VERSION.get(state) ?? 0;
+  if (known?.key === key) {
+    if (known.forest !== forest) {
+      known.map = walkingMap(state, known.blocked);
+      known.forest = forest;
+    }
+    return known;
+  }
+  const blocked = walkingBlocked(state);
+  const next = { key, forest, blocked, map: walkingMap(state, blocked) };
+  WALKING.set(state, next);
+  invalidateRoutes(state);
+  return next;
+}
 
 /** La ruta entre dos celdas, calculada una vez por partida y suelo. */
 function routeBetween(state: GameState, from: number, to: number, ground: number): number[] {
@@ -67,7 +92,23 @@ function routeBetween(state: GameState, from: number, to: number, ground: number
   const known = pairs.get(key);
   if (known !== undefined && known.ground === ground) return known.cells;
 
-  const cells = route(state.map, from, to);
+  const walking = WALKING.get(state) ?? walkingGround(state);
+  const endpoints = (cell: number): number[] => {
+    if (walking.blocked[cell] === 0) return [cell];
+    const x = cell % state.map.width, y = Math.floor(cell / state.map.width);
+    const plot = [...state.buildings.filter(b => b.lostTick === null), ...state.works]
+      .find(b => solidKind(b.kind) && x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h);
+    return plot === undefined ? [] : plotAccess(state.map, walking.blocked, plot);
+  };
+  const pairsToTry = endpoints(from).flatMap(a => endpoints(to).map(b => ({ a, b,
+    distance: Math.abs(a % state.map.width - b % state.map.width)
+      + Math.abs(Math.floor(a / state.map.width) - Math.floor(b / state.map.width)),
+  }))).sort((a, b) => a.distance - b.distance || a.a - b.a || a.b - b.b);
+  let cells: number[] = [];
+  for (const pair of pairsToTry) {
+    cells = route(walking.map, pair.a, pair.b);
+    if (cells.length > 0) break;
+  }
   // Un tope generoso: una aldea grande no llega a mil pares distintos, y sin
   // él una partida de dos siglos acumularía memoria sin necesidad.
   if (pairs.size > 4000) pairs.clear();
@@ -179,6 +220,21 @@ function centreOfVillage(state: GameState, homes: Map<number, number>): number {
 }
 
 const NEAR = new WeakMap<GameState, Map<string, number[]>>();
+const OPEN_TARGETS = new WeakMap<Uint8Array, Map<readonly number[], number[]>>();
+
+/** El terreno conserva bosque bajo los tejados, pero ese árbol ya no es un destino de trabajo. */
+function openTargets(state: GameState, cells: number[]): number[] {
+  const { blocked } = WALKING.get(state) ?? walkingGround(state);
+  let pools = OPEN_TARGETS.get(blocked);
+  if (pools === undefined) { pools = new Map(); OPEN_TARGETS.set(blocked, pools); }
+  const known = pools.get(cells);
+  if (known !== undefined) return known;
+  const free = cells.filter(cell => blocked[cell] === 0);
+  // Tala y rebrote cambian la lista fuente; no conservar cada semana del siglo.
+  if (pools.size > 2) pools.clear();
+  pools.set(cells, free);
+  return free;
+}
 
 /**
  * Las `many` celdas más cercanas a un punto, cacheadas por (versión, punto).
@@ -275,10 +331,10 @@ function destinations(
   const forestVersion = FOREST_VERSION.get(state) ?? 0;
   const groundVersion = GROUND.get(state) ?? 0;
   const wood = nearestCached(
-    state, treesOf(state), heart, LABOUR.WOOD_CHOICES, forestVersion, 'wood',
+    state, openTargets(state, treesOf(state)), heart, LABOUR.WOOD_CHOICES, forestVersion + groundVersion, 'wood',
   );
   const banks = nearestCached(
-    state, banksOf(state), heart, LABOUR.WOOD_CHOICES, groundVersion, 'bank',
+    state, openTargets(state, banksOf(state)), heart, LABOUR.WOOD_CHOICES, groundVersion, 'bank',
   );
   // Adónde va el que labra, según el año. En invierno, al bosque a por leña, y
   // si no queda bosque, a la obra: lo que no hace es fingir que ara la nieve.
@@ -384,6 +440,7 @@ function destinations(
 
 /** This week's routes, recomputing only the ones that actually moved. */
 export function routesFor(state: GameState): Map<VillagerId, number[]> {
+  walkingGround(state);
   const ground = GROUND.get(state) ?? 0;
   let cache = CACHE.get(state);
   if (cache === undefined) {
@@ -456,11 +513,18 @@ export function upgradePaths(state: GameState): PathEvent[] {
   const road = smithyWorking(state);
   const events: PathEvent[] = [];
   const active = activeTraffic(state);
+  const { blocked } = walkingGround(state);
   // The old full-map pass emitted cells in numeric order. Preserve that public
   // ordering even though the working set follows route insertion order.
   for (const i of [...active].sort((a, b) => a - b)) {
     const terrain = state.map.terrain[i];
-    if (terrain === TERRAIN_CODE.water || terrain === TERRAIN_CODE.marsh) {
+    if (blocked[i] !== 0 || terrain === TERRAIN_CODE.water) {
+      const has = state.map.path[i] ?? 0;
+      if (has > 0) {
+        state.map.path[i] = 0;
+        events.push({ cell: i, from: has as 0 | 1 | 2 | 3, to: 0 });
+      }
+      state.map.traffic[i] = 0;
       active.delete(i);
       continue;
     }

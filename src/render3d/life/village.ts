@@ -1003,6 +1003,43 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     return taken;
   }
 
+  /**
+   * Reserva materialmente una plaza de descarga, no sólo un hueco de aforo.
+   *
+   * La tala llega aquí fuera de `decide()`: contar `taken` bastaba para las
+   * ofertas normales, pero no decía qué plaza concreta tenía cada porteador.
+   * Mirar las intenciones vivas permite entregar sólo a una plaza que nadie
+   * está usando ni persiguiendo todavía. Quien no la encuentre espera donde
+   * terminó el tajo; nunca frente a la puerta de la leñera.
+   */
+  function woodDelivery(body: Body): Intent | null {
+    const store = mine.find((place) => place.id.startsWith('wood-store:'));
+    const offer = store?.offers.find((item) => item.id === 'deliver');
+    if (store === undefined || offer === undefined) return null;
+    // Una carga que ya espera tiene prioridad sobre el siguiente talador que
+    // acaba justo ahora. Sin este orden estable una espera podría volver a
+    // perder la plaza cada vez que otro tajo terminase en el mismo paso.
+    const queue = dwellers.filter((dweller) => dweller.holding === -1 - dweller.body.id
+      && dweller.doing?.offer.id === 'pause')
+      .sort((a, b) => (a.doing!.since - b.doing!.since) || (a.body.id - b.body.id));
+    if (queue[0] !== undefined && queue[0].body.id !== body.id) return null;
+    const used = new Set(dwellers.flatMap((dweller) => {
+      const doing = dweller.doing;
+      return doing?.place.id === store.id && doing.offer.id === offer.id ? [doing.seat] : [];
+    }));
+    for (let seat = 0; seat < offer.seats; seat += 1) {
+      if (used.has(seat)) continue;
+      const route = pathTo(land, body, seatAt(offer, seat), body.radius);
+      if (route === null) continue;
+      const durationSteps = Math.round(3 / LIFE_STEP);
+      return {
+        place: store, offer, seat, route: [...route], since: steps,
+        until: steps + durationSteps, durationSteps, there: false,
+      };
+    }
+    return null;
+  }
+
   return {
     land,
     places: mine,
@@ -1604,29 +1641,27 @@ export function createVillage(state: GameState, day: number, options: DayOptions
             }
             if (dweller.holding !== null) continue;
           }
-          // Una tanda de hachazos termina con un viaje visible a la leñera.
-          // Es coreografía derivada: no añade madera ni condiciona el tick.
+          // Una tanda de hachazos toma un haz visible. La descarga se intenta
+          // justo debajo: si los dos puestos están ocupados, el porteador
+          // espera lejos de la puerta conservando la carga, y vuelve a probar.
           const felling = dweller.doing.place.id.startsWith('felling:')
             && dweller.dayPlan?.job?.place.startsWith('felling:') === true;
-          if (felling) {
-            const store = mine.find(place => place.id.startsWith('wood-store:'));
-            const offer = store?.offers.find(item => item.id === 'deliver');
-            const seat = offer === undefined ? 0
-              : (dweller.dayPlan?.job?.seat ?? 0) % Math.max(1, offer.seats);
-            const spot = offer === undefined ? null : seatAt(offer, seat);
-            const route = spot === null ? null : pathTo(land, body, spot, body.radius);
-            if (store !== undefined && offer !== undefined && route !== null) {
-              const durationSteps = Math.round(3 / LIFE_STEP);
-              dweller.holding = -1 - body.id;
-              dweller.doing = {
-                place: store, offer, seat, route: [...route], since: steps,
-                until: steps + durationSteps, durationSteps, there: false,
-              };
-              // El viaje y la descarga son una sola tarea. Replantearla a los
-              // tres segundos cortaba portes largos justo al llegar.
-              dweller.rethinkAt = steps + GIVE_UP;
-              continue;
-            }
+          if (felling) dweller.holding = -1 - body.id;
+          if (dweller.holding === -1 - body.id && dweller.doing.offer.id !== 'deliver') {
+            const before = dweller.doing;
+            const delivery = woodDelivery(body);
+            dweller.doing = delivery ?? pauseHere(body, land, router, seed, body.id, steps, dweller.traits, body.pace);
+            // La transición manual no pasa por `decide()`: debe liberar el
+            // tajo y ocupar exactamente la descarga o la espera que acaba de
+            // elegir, igual que cualquier otra intención.
+            moveSeat(taken, before, dweller.doing);
+            prog.at = steps + PROGRESS_CHECK;
+            prog.gap = Number.POSITIVE_INFINITY;
+            prog.stalls = 0;
+            // El viaje y la descarga son una sola tarea. La espera conserva
+            // el haz y sólo termina para volver a pedir una plaza libre.
+            dweller.rethinkAt = steps + GIVE_UP;
+            continue;
           }
           // El coste de piedra ya forma parte de `bpCost`: esta ida representa
           // esa fracción de trabajo, sin crear un sexto recurso ni escribir en

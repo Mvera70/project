@@ -1,5 +1,35 @@
 # Cuaderno de tareas — el rework
 
+## 21 sep 2026 · Recuperación espacial de bajo coste — cerrada localmente
+
+El dueño cambia la orquestación: Sol dirige como modelo fuerte; Astra sólo
+para excepciones, especialmente 3D; Terra/Luna para encargos sencillos.
+Sol localizó la transición de tala que saltaba la reserva y Terra añadió
+puestos exclusivos con espera local conservando la carga. Luna midió los
+71.160/514.561 acercamientos <0,60 de V-06: el test conservaba la huella
+anterior a IA-14. La penetración visible es 83/522.213 (0,016 %) con el claro
+corregido y V-06 pasa sin cambiar la colisión. Terra dio al claro contemplación en vez de
+trabajo inelegible: V-10 pasa 9/9 con plaza, vado y claro visitados en al
+menos 3/6 jornadas. V-06 9/9, recursos/distribución/defensas/viviendas 20/20, tipos y
+lint verdes. La suite rápida de cierre quedó 1.682/1.686; los tres asertos
+de clips obsoletos se corrigieron y pasan aislados, y catch-up pasó aislado
+tras fallar su tiempo bajo carga paralela. Fase aceptada **localmente** con
+otros rojos de jornadas sin atribuir; sin commit ni publicación.
+[Detalle](plan-espacial.md).
+
+## 21 sep 2026 · Aldea orgánica y recinto honesto — implementado, aceptación pendiente
+
+Encargo ampliado por el dueño: caminos, plaza, edificios importantes, variedad
+de casas, distribución menos cuadriculada y cierre/portones. Astra dirige y
+ejecuta el núcleo; Terra audita independientemente. Caminos con obstáculos,
+casas por bandas/hash y calles, plaza social real, defensas de ribera,
+portones y cierre topológico, uniones diagonales y cuatro acabados de casa.
+Semillas 7/23/41 cierran al año 40; 11 tiene trazado viable pero cae sin cerco
+por condiciones de obra. Guardados sin recolocar. Contrato, pruebas, capturas
+y límites en [plan-espacial.md](plan-espacial.md). Esta entrada cuenta el primer
+estado, antes de la recuperación de arriba. E0 sigue siendo otra fase; no se
+hace commit ni publicación por implicación.
+
 ## 21 sep 2026 · E0d, transiciones de muralla visibles
 
 `ScenePlan` separa obras activas de edificios terminados y el renderer mantiene

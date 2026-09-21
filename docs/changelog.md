@@ -1,5 +1,27 @@
 # The Valley — Registro de cambios
 
+## v4.29 · 21 sep 2026 · Cierre de la revisión espacial
+
+El claro deja de ofrecer trabajo a personas que ya tienen oficio y pasa a
+ofrecer contemplación a mediodía; plaza, vado y claro reciben visita en al
+menos 3/6 jornadas distintas sin forzar decisiones ni alterar la utilidad
+global. La entrega de madera reserva el puesto concreto o espera lejos de la
+leñera con el haz. La prueba V-06 deja de confundir el radio de navegación de
+0,32 con la huella física de 0,19 por talla introducida en IA-14: mide
+penetración de la anchura visible del GLB (0,35 por talla), conserva el límite
+<0,1 % y no cambia colisiones.
+Motivo y medidas en `plan-espacial.md` y `medidas/spatial-plaza.md`.
+
+## v4.28 · 21 sep 2026, 20:46 · Revisión espacial
+
+Encargo del dueño: distribución orgánica, caminos, plaza, variedad de vivienda
+y cerco sin huecos falsos. Se corrigen rutas de desgaste que cruzaban edificios,
+la plaza social detectada en otro prado y el cierre confundido con agotamiento
+de solares. Defensas de una celda pueden ocupar ribera pantanosa, pero no agua
+ni vado; de otro modo ninguna circunferencia de ciertos valles era edificable.
+Variedad visual por parcela sin mover puertas. Contrato y evidencias en
+`plan-espacial.md`; no cambia economía ni añade azar a la simulación.
+
 **El historial de `docs/design.md`, que es la fuente de verdad.** Vivía dentro
 de él: tres mil líneas de registro por delante del §0, así que quien abría la
 especificación a buscar una regla se comía ochenta y cuatro revisiones antes de

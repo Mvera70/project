@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.27 · 20 de septiembre de 2026, 14:09 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.29 · 21 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -1230,6 +1230,12 @@ terminar una obra pasan a la siguiente de la cola.
 
 ### 7.4 Colocación
 
+**Revisión espacial del 21 sep 2026:** [plan-espacial.md](plan-espacial.md).
+Las viviendas se ordenan por bandas de proximidad a la plaza, contacto con
+camino y desempate hash de semilla/parcela. No consumen RNG. Se reservan calles
+usadas y acceso por al menos dos fachadas; la sala comunal conserva separación
+como los demás edificios habitables. Lo construido no se recoloca al cargar.
+
 Determinista y sin intervención del jugador. Para cada tipo se puntúa cada
 posición válida y se elige la mejor; empate por índice menor.
 
@@ -1243,7 +1249,11 @@ posición válida y se elige la mejor; empate por índice menor.
 | `well` | Lo más cerca posible del centroide de las casas |
 | `palisade` | Envolvente convexa del núcleo, dilatada 2 celdas |
 
-Ninguna colocación puede pisar `water`, `marsh` ni `ruins` de piedra. Las ruinas
+Ninguna colocación puede pisar `water` ni `ruins` de piedra. `marsh` sólo admite
+defensas de una celda (empalizada, muro, portón, bastión): estacas de ribera,
+porque es suelo transitable y dejarlo vacío rompe el recinto. El vado sigue
+libre de construcción. Esta excepción espacial se añade el 21 sep 2026.
+Las ruinas
 de madera **sí** se pueden edificar encima; la ruina desaparece del mapa pero
 queda en la crónica.
 
@@ -1281,6 +1291,12 @@ números de §12, un valle pierde la mitad de su bosque en unos cien años: visi
 sin ser brusco.
 
 ### 7.6 Caminos emergentes
+
+**Desde la revisión espacial del 21 sep:** las rutas de desgaste parten de
+fachadas accesibles y rodean volúmenes de edificios, obras y fuente. La máscara
+comparte la transitabilidad física (vado y bosque transitables, roca no). Una
+huella nueva invalida rutas y se borra desgaste antiguo bajo paredes. No se
+confunde esta ruta semanal con la trayectoria efímera de cada cuerpo.
 
 Cada tick, para cada aldeano vivo con casa y destino de trabajo, se suma 1 al
 `traffic` de las celdas de su trayecto. El trayecto se calcula una vez, con A\*
@@ -1635,6 +1651,10 @@ condición de un pintado.
 
 ### 7.4b La plaza (P-1 y P-2, 18 sep 2026)
 
+**Corrección de integración del 21 sep:** la oferta social `square:common`
+de la capa de vida usa esta plaza persistente, no el mayor prado del mapa.
+Los puestos se buscan en su círculo reservado, alcanzables y fuera de la fuente.
+
 **El valle tiene una plaza, y es un sitio, no un punto.** La pidió el dueño del
 diseño: «me gustaría que la plaza fuese un espacio que tuviese un círculo
 grande, con separación. Creo que las cosas se deberían mover para que esa plaza
@@ -1678,6 +1698,14 @@ atraviesa.
 ---
 
 ### 7.4c La muralla, por anillos (P-4, 18 sep 2026)
+
+**Revisión de cierre del 21 sep:** no tener más solares construibles no prueba
+el cierre. `ringClosed` exige puerta real y comprueba que, cerradas las defensas,
+la zona de la plaza no alcanza el exterior. Bosque y vado nunca sustituyen al
+muro. La línea puede continuar fuera del corazón productivo; las partidas
+guardadas conservan radio y edificios, y una brecha antigua deja de contarse
+como recinto cerrado. El render une diagonales sin codo intermedio y enlaza
+los tramos con el portón real, conservando las huellas de colisión.
 
 **La empalizada se levanta sobre un anillo, y el anillo se escribe.** Lo pidió el
 dueño del diseño mirando una captura: «¿podemos también evitar esos cachos
@@ -7761,7 +7789,7 @@ entregó y el número que lo prueba.
 | **V-06** | `life/decide.ts`, `village.ts`, `cast.ts` | Utilidad, inercia, reserva de plaza al decidir, la aldea entera ensamblada, el puente a `Cast` | Misma jornada = misma aldea cuerpo a cuerpo; dos jornadas ≠. Aforo: 0 excesos. Forcejeos 1 003 → 369 |
 | **V-07** | `life/scenes.ts` | Escenas de dos: charla, rechazo, encaro, pelea devuelta, con papeles distintos | Ninguna aldea de 38 se queda en cero encontronazos, pero varían de 1 a 17 según quién vive en ella. `castOf` no patina: 3 290 tramos, desajuste de orden 10⁻¹⁴ s |
 | **V-08** | `life/beasts.ts` | Gallinas, cerdos y vacas como `Dweller` con impulso propio, y una `Place` móvil que ofrece `pet`/`chase`/`feed` | 0 animales en el agua en 6 semillas; interacción persona-animal en todas las semillas con cabaña (1 411 a 4 895 instantes); `ashore` de 1,08 a 0,326 celdas |
-| **V-10** | `life/places.ts` | La plaza, el vado y el claro: sitios que no son un edificio | Los tres se detectan y son alcanzables en 6 de 6 semillas; visitados en la mayoría (plaza 4/6, claro 5/6, vado 3/6) |
+| **V-10** | `life/places.ts` | La plaza, el vado y el claro: sitios que no son un edificio | Los tres se detectan y son alcanzables en 6 de 6 semillas; tras separar la plaza real del claro y dar a éste contemplación en vez de trabajo inelegible, los tres reciben visita en al menos 3 de 6 jornadas (`docs/medidas/spatial-plaza.md`) |
 | **V-13** | `tests/fast/life-perf.test.ts` | La medida del coste por cuerpo, continua | 0,75 µs con 80, 1,02 µs con 200: sube un 36 % al multiplicar por 2,5 la gente |
 | **V-09** (abierta) | `life/props.ts` | Pelota, palo, cubo, haz: se reparten, se cogen, se sueltan, se tiran y ruedan; física del descarte | Un trasto nunca en dos manos, nunca bajo el agua, 6 semillas. Pero 0–0,20 pases por persona contra 0,30 del descarte: jugar gana el concurso de utilidad el 6 % de las veces y el receptor no recoge. Está en `docs/historico/next-plan.md` (V-09b) |
 | **V-14** | `world/ridge.ts` | El cuenco, fuera del mapa | 0 celdas del valle tocadas; 32 % del bosque vive en el borde y habría desaparecido |
@@ -8095,8 +8123,9 @@ junta sin que nadie la convoque, y a su hora.
 **Depende de.** V-06. Puede ir en paralelo con V-07/V-09. **Lectura:** E.4,
 §7.2, `life/offers.ts`.
 **Ficheros.** Toca `life/offers.ts` (hora punta por oferta) y nuevo
-`life/places.ts` (sitios que no son un edificio: la plaza como celdas libres
-rodeadas de casas, la orilla del vado, el claro del bosque).
+`life/places.ts` (sitios que no son un edificio: la plaza persistente y
+reservada con cotilleo, la orilla del vado con agua y estancia, y el claro del
+bosque con contemplación a mediodía, no otra oferta de trabajo asignado).
 **Contrato.**
 ```ts
 export interface Place { /* + */ readonly hours?: readonly [number, number]; } // fase de la jornada

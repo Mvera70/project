@@ -13,7 +13,7 @@
 // rondas de balance.
 
 import {
-  BoxGeometry, Color, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial,
+  Box3, BoxGeometry, Color, Group, Mesh, MeshBasicMaterial, MeshStandardMaterial,
   SphereGeometry, type Object3D,
 } from 'three';
 import type { Building, GameState } from '@engine/state';
@@ -143,6 +143,16 @@ const ROOF_CLEAR = 1.6;
 
 /** Lo que sobresale del muro un cristal encendido, en celdas: un dedo. */
 const GLASS = 0.03;
+
+/** Elevación necesaria si la geometría real de una señal invade un edificio. */
+function roofLift(mark: Object3D, buildings: readonly Building[]): number {
+  mark.updateMatrixWorld(true);
+  const bounds = new Box3().setFromObject(mark);
+  const buried = buildings.some((building) => bounds.min.x < building.x + building.w && bounds.max.x > building.x
+    && bounds.min.z < building.y + building.h && bounds.max.z > building.y
+    && bounds.min.y < ROOF_CLEAR);
+  return buried ? Math.max(0, ROOF_CLEAR - bounds.min.y) : 0;
+}
 
 function outsideOf(
   home: Building, at: (x: number, y: number) => Building | undefined,
@@ -402,6 +412,16 @@ export class Tells {
           piece.object.position.x = cx + Math.cos(angle) * dx + Math.sin(angle) * dz;
           piece.object.position.z = cz - Math.sin(angle) * dx + Math.cos(angle) * dz;
           piece.object.rotation.y += angle;
+        }
+        // La selección de fachada conoce el ancla, pero no la geometría que
+        // cuelga de ella: cuatro sacos pueden volver a entrar en el granero
+        // aun saliendo su centro de la pared. Se valida después de girar la
+        // pieza (la única coordenada que pinta) y se usa el fallback ya
+        // definido para una señal sin suelo visible. Ventanas y cruces son
+        // marcas de muro, no objetos enterrados.
+        if (piece.object.userData.mounted !== true && piece.object.position.y < ROOF_CLEAR) {
+          const lift = roofLift(piece.object, standing);
+          if (lift > 0) piece.object.position.y += lift;
         }
         this.group.add(piece.object);
         this.owned.push(piece);

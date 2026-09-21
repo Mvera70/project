@@ -18,6 +18,7 @@ import {
 import type { BuildingId, BuildingKind } from '@engine/state';
 import type { PlannedBuilding } from './plan';
 import { buildDefence } from './defences';
+import { varyHouse } from './house-variation';
 
 /**
  * A four-sided pyramid over a `w × h` footprint, `rise` tall.
@@ -137,6 +138,9 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   // No puede pasar por el ensamblador de tramos: aquél sólo toma su material y
   // lo convertía de nuevo en una entrada provisional sin bisagra.
   if (!planned.ruin && planned.connections !== undefined && planned.kind !== 'gate') return buildDefence(planned, source);
+  const disposeVariation = !planned.ruin && planned.variant !== undefined
+    && (planned.kind === 'house' || planned.kind === 'stone_house')
+    ? varyHouse(source, planned.variant) : undefined;
   const group = new Group();
   group.name = `Building_${planned.id}`;
   // **El fondo de la huella se suma a la Z, y esto es un arreglo, no un ajuste.**
@@ -250,6 +254,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
       // nuestros, porque se copiaron para poder nevar sobre ellos.
       for (const roof of roofs) roof.material.dispose();
       roofs.length = 0;
+      disposeVariation?.();
       group.clear();
     },
   };

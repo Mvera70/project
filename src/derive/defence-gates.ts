@@ -1,5 +1,6 @@
 import { BUILDING_RULES } from '@engine/balance';
-import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
+import { type Building, type ValleyMap } from '@engine/state';
+import { walkableTerrain } from '@engine/world/spatial';
 
 
 /**
@@ -32,8 +33,7 @@ export function defenceGates(state: { buildings: readonly Building[]; map: Valle
     if (x < 0 || z < 0 || x >= state.map.width || z >= state.map.height || solid.has(z * state.map.width + x)) return false;
     // Se usa la misma lista de agua y roca que la navegación de vida.
     const tile = state.map.terrain[z * state.map.width + x];
-    return tile !== TERRAIN_CODE.water && tile !== TERRAIN_CODE.rock
-      && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake;
+    return walkableTerrain(tile);
   };
   // Los portones de verdad, si los hay. El eje es por donde se pasa: el que
   // tiene suelo pisable a los dos lados. Si los dos ejes valen —una puerta en

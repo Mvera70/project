@@ -11,7 +11,7 @@ import { terrainOf } from '../../src/render3d/life/terrain';
 import { createVillage } from '../../src/render3d/life/village';
 import { castOf } from '../../src/render3d/life/cast';
 import { loadAssets, type AssetManifest } from '../../src/render3d/assets';
-import { actionClips } from '../../src/render3d/action-clips';
+import { ACTION_CLIPS, actionClips } from '../../src/render3d/action-clips';
 import { allocateLabour } from '../../src/engine/subsistence/labour';
 
 describe('IA-12 · jornada y acciones', () => {
@@ -134,7 +134,10 @@ describe('IA-12 · jornada y acciones', () => {
     const idle = library.get(id)!.clips.find(c => c.name === 'idle')!;
     const original = JSON.stringify(idle.toJSON()), clips = actionClips(idle), object = library.instance(id)!;
     const mixer = new AnimationMixer(object);
-    expect(clips.length).toBe(8);
+    const names = clips.map(clip => clip.name);
+    expect(new Set(names).size, 'los clips fabricados no deben repetirse').toBe(names.length);
+    expect(names, 'la librería debe cubrir todos los clips de acción esperados')
+      .toEqual(expect.arrayContaining([...ACTION_CLIPS]));
     for (const clip of clips) {
       expect(clip.tracks.some(track => /^(upperarm|forearm|thigh)/.test(track.name)
         && JSON.stringify(Array.from(track.values)) !== JSON.stringify(Array.from(idle.tracks.find(t => t.name === track.name)!.values))),

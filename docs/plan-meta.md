@@ -183,9 +183,11 @@ necesita lo de arriba.
 El orden original A1→G ya se recorrió: A1–A5, B, C, D, E1, F2/F3 y la medición
 de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 
-1. **Ahora, si se autoriza otra ronda** — **E0**, representar lo que todavía
-   sólo cuenta la crónica o cambia de golpe: pago, semana posterior y
-   transiciones de muralla. Aviso y preparación ya están cerrados.
+1. **Siguiente** — ambiente de era pendiente de E0. La
+   [revisión espacial](plan-espacial.md) quedó aceptada localmente el 21 sep:
+   trazado orgánico, caminos y plaza, accesos y cierre real, variedad de casas,
+   con las incidencias de vida cerradas. Sin publicación implícita. Sol dirige
+   las fases de software; Astra se reserva para 3D excepcional.
 2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve y bastión
    propio con su junta. La sala del rey es deuda independiente en H.
 3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó

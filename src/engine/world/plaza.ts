@@ -29,6 +29,7 @@ import { PLAZA } from '../balance';
 import { TERRAIN_CODE } from '../state';
 import type { Building, GameState } from '../state';
 import { HEART } from './tiles';
+import { floodCells, plotAccess, walkingBlocked } from './spatial';
 
 export interface Plaza { x: number; y: number }
 
@@ -50,7 +51,8 @@ function open(state: GameState, x: number, y: number): boolean {
   if (x < 0 || y < 0 || x >= state.map.width || y >= state.map.height) return false;
   const tile = state.map.terrain[y * state.map.width + x];
   return tile !== TERRAIN_CODE.water && tile !== TERRAIN_CODE.marsh
-    && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake;
+    && tile !== TERRAIN_CODE.mountain && tile !== TERRAIN_CODE.lake
+    && tile !== TERRAIN_CODE.rock && tile !== TERRAIN_CODE.ford;
 }
 
 /** El centro de un edificio, en celdas. */
@@ -123,6 +125,9 @@ export function choosePlaza(state: GameState): Plaza {
   const heart = { x: (HEART.x0 + HEART.x1) / 2, y: (HEART.y0 + HEART.y1) / 2 };
   const house = foundingHouse(state);
   const from = house === undefined ? heart : centreOf(house);
+  const blocked = walkingBlocked(state);
+  const reachable = house === undefined ? null
+    : floodCells(state.map, blocked, plotAccess(state.map, blocked, house));
   const reach = (house === undefined ? 0 : Math.max(house.w, house.h) / 2) + PLAZA.RADIUS
     + PLAZA.STREET;
 
@@ -137,6 +142,8 @@ export function choosePlaza(state: GameState): Plaza {
   ];
   for (const dir of rumbos) {
     const at = { x: Math.round(from.x + dir.x * reach), y: Math.round(from.y + dir.y * reach) };
+    // La plaza fundacional pertenece a la orilla de su casa y la fuente no va en roca ni vado.
+    if (!open(state, at.x, at.y)) continue;
     // **Vacía primero, despejada después.** El orden importa y lo enseñó la
     // fundación de veinte (`tests/helpers/founding.ts`): con el suelo abierto
     // como primer criterio, una dirección con más hierba ganaba aunque tuviera
@@ -144,6 +151,7 @@ export function choosePlaza(state: GameState): Plaza {
     // de la 11 encima de un campo. Con la pareja casi nunca pasaba —una sola
     // casa deja las ocho direcciones libres— y eso es lo que lo escondía.
     const score = [
+      reachable === null || reachable[at.y * state.map.width + at.x] === 1 ? 0 : 1,
       takenCells(state, at),
       -openCells(state, at),
       Math.round(Math.hypot(at.x - heart.x, at.y - heart.y) * 100),

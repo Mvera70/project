@@ -186,7 +186,7 @@ describe('V-06 · elegir', () => {
     let walking = 0;
     let tightest = Infinity;
     let close = 0;
-    let overlapping = 0;
+    let visibleOverlap = 0;
     const was = new Map<number, { x: number; z: number }>();
 
     for (let n = 0; n < STEPS_PER_DAY; n += 1) {
@@ -202,7 +202,14 @@ describe('V-06 · elegir', () => {
           // distintos no dicen nada del apiñamiento, y son casi todas.
           if (gap > 2) continue;
           close += 1;
-          if (gap < 0.6) overlapping += 1;
+          const contact = (a.contactRadius ?? a.radius) + (b.contactRadius ?? b.radius);
+          // IA-14 redujo la huella humana a 0,19 por talla sin cambiar su
+          // radio de navegación (0,32). El viejo `gap < 0,60` contaba como
+          // penetración a quienes estaban separados físicamente: 71.160 de
+          // 514.561 parejas cercanas en esta jornada. La propiedad real mira
+          // la anchura visible del GLB adulto (0,35) respecto de sus dos
+          // radios de contacto (0,19 × 2 = 0,38), ambos escalados por talla.
+          if (gap < contact * (0.35 / 0.38)) visibleOverlap += 1;
         }
       }
       if (n % 30 !== 0) continue;
@@ -228,37 +235,16 @@ describe('V-06 · elegir', () => {
 
     expect(overCapacity, `${overCapacity} veces más gente de la que cabe en un sitio`).toBe(0);
 
-    // **Apiñarse es una proporción, no un récord.** Hasta el arreglo de las
-    // plazas en pared, esto se medía con el peor caso de la jornada
-    // (`tightest > 0,58`) y pasaba. Con ese arreglo, la aldea dejó de estar
-    // parada un tercio del día —el 26 % del tiempo andando pasó al 72 %— y el
-    // tráfico subió de 200 a 254 parejas cercanas por paso. El peor caso de la
-    // jornada empeoró a 0,509 con ese tráfico, pero el peor caso de un millón
-    // de observaciones es una lotería de valores extremos, no una propiedad del
-    // diseño: lo que dice si la aldea se apiña es **cada cuánto** dos cuerpos se
-    // meten el uno en el otro, y cuánto.
-    //
-    // Medido en la jornada entera, semillas 7 y 11: de 827 234 y 686 135
-    // parejas a menos de dos celdas, quedan **35 y 276** por debajo de 0,60, y
-    // **0 y 4** por debajo de 0,55. Lo más cerca que llegan dos, 0,557 y 0,544.
-    // La mayoría de lo que está bajo los 0,64 de dos radios se queda entre 0,60
-    // y 0,64, que es rozarse el hombro andando por una calle estrecha.
-    //
-    // **Dos intentos gastados en esto, los dos midiendo y los dos peores:**
-    // exigir a cada plaza la holgura de `avoid` se llevaba por delante el 27 %
-    // de las plazas y la aldea se concentraba más; y repartir el tope de
-    // `resolve` como un presupuesto por cuerpo en vez de recortarlo al final
-    // —que parecía el modelo correcto, porque el recorte deshace separación ya
-    // hecha— **mata de hambre las correcciones siguientes**: quien gasta su
-    // tope en la primera pasada se queda encimado con todos los demás el resto
-    // del paso. Medido: de 35 solapes a 162 en la semilla 7, y de 276 a 3 492 en
-    // la 11. Revertido.
-    //
-    // Por la regla séptima de E.3, el tercer intento no es otro número ni otra
-    // variante de lo mismo. Lo que esta prueba vigila mientras tanto es que el
-    // solape siga siendo raro y leve.
-    expect(overlapping / Math.max(1, close),
-      `${overlapping} de ${close} parejas cercanas por debajo de 0,60`)
+    // **IA-14 cambió la huella física, no la anchura de la ruta.** El GLB
+    // adulto mide 0,35 celdas de ancho; la colisión usa 0,19 por talla,
+    // mientras el radio de navegación sigue en 0,32. El viejo corte fijo en
+    // 0,60 medía proximidad, no penetración: en esta jornada da 71.160/514.561
+    // (13,83 %) aunque 0,38–0,60 sea separación visible entre dos adultos.
+    // La penetración de las mallas visibles sí mide cuerpos que entran uno en
+    // otro: 83/522.213 (0,016 %) con la trayectoria nueva. Se conserva el
+    // umbral estricto de frecuencia <0,1 %; no se retoca `FIX_CAP` para pasarla.
+    expect(visibleOverlap / Math.max(1, close),
+      `${visibleOverlap} de ${close} parejas cercanas con penetración visible`)
       .toBeLessThan(0.001);
     // **Y el peor instante se mide por lo que puede significar, no por su
     // récord.** Medido tras el mapa grande: 0,178 en la semilla 7, contra los

@@ -203,7 +203,9 @@ describe('el desgaste del suelo · §7.6', () => {
     for (let i = 0; i < s.map.traffic.length; i += 1) s.map.traffic[i] = WORLD.PATH_T3;
     upgradePaths(s);
     for (let i = 0; i < s.map.terrain.length; i += 1) {
-      if (s.map.terrain[i] === TERRAIN_CODE.water || s.map.terrain[i] === TERRAIN_CODE.marsh) {
+      // El desgaste comparte ahora el suelo físico: marisma transitable, roca cerrada.
+      if (s.map.terrain[i] === TERRAIN_CODE.water || s.map.terrain[i] === TERRAIN_CODE.rock
+        || s.map.terrain[i] === TERRAIN_CODE.mountain || s.map.terrain[i] === TERRAIN_CODE.lake) {
         expect(s.map.path[i], `celda ${i}`).toBe(0);
       }
     }

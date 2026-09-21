@@ -10,9 +10,11 @@
 // al mediodía, la plaza al caer la tarde. Fuera de su hora una oferta vale
 // menos, no cero — eso da forma a la jornada sin guionizar a nadie.
 
+import { PLAZA } from '@engine/balance';
 import type { GameState } from '@engine/state';
 import { TERRAIN_CODE as CODES } from '@engine/state';
-import type { Point, Terrain } from './body';
+import { plazaCentre } from '@engine/world/plaza';
+import { fitsCircle, type Point, type Terrain } from './body';
 import type { Place } from './offers';
 import { OFFERS, placedOffer, placesOf } from './offers';
 import { canReach, reachableFrom } from './terrain';
@@ -54,93 +56,39 @@ function shoreOf(state: GameState, land: Terrain): Uint8Array {
 }
 
 /**
- * La plaza: celdas libres rodeadas de edificios, donde la aldea se junta.
+ * La plaza: el sitio que el motor eligió y reservó al fundar el valle.
  *
- * Se detecta buscando una región de prado/talado suficientemente grande,
- * rodeada de construcciones.
+ * No se vuelve a detectar en el prado más grande. Desde P-1 la plaza es un
+ * lugar persistente (`state.plaza`), con empedrado y fuente en su centro: que
+ * la vida eligiera otra explanada dejaba a la gente reuniéndose a veinte celdas
+ * de lo que el jugador ve como plaza. La fuente ocupa la celda central en la
+ * máscara, así que las plazas de la oferta se buscan alrededor de ella, dentro
+ * del círculo reservado y sólo en la misma zona alcanzable del pueblo.
  */
 function detectSquare(state: GameState, land: Terrain, shore: Uint8Array): Place | null {
-  const { width, height } = state.map;
-  const visited = new Uint8Array(width * height);
-  let best: { center: Point; size: number } | null = null;
-
-  for (let z = 1; z < height - 1; z += 1) {
-    for (let x = 1; x < width - 1; x += 1) {
-      const cell = z * width + x;
-      if (visited[cell] === 1) continue;
-      if (land.blocked[cell] === 1) continue;
-
-      // Busca una región de prado/talado que no sea muy pequeña.
-      const terrainKind = state.map.terrain[cell];
-      if (terrainKind !== CODES.meadow && terrainKind !== CODES.cleared) continue;
-
-      // Inundación por las 4 direcciones para medir la región.
-      const queue = [cell];
-      visited[cell] = 1;
-      let size = 0;
-      for (let head = 0; head < queue.length; head += 1) {
-        const cur = queue[head] as number;
-        size += 1;
-        const cx = cur % width;
-        const cz = Math.floor(cur / width);
-        for (const [dx, dz] of [[0, -1], [-1, 0], [1, 0], [0, 1]] as const) {
-          const nx = cx + dx;
-          const nz = cz + dz;
-          if (nx < 0 || nz < 0 || nx >= width || nz >= height) continue;
-          const next = nz * width + nx;
-          if (visited[next] === 1 || land.blocked[next] === 1) continue;
-          const nextTerrain = state.map.terrain[next];
-          if (nextTerrain !== CODES.meadow && nextTerrain !== CODES.cleared) continue;
-          visited[next] = 1;
-          queue.push(next);
-        }
-      }
-
-      // TUNE: 25 celdas es un área de 5×5. La plaza debe ser clara y no confundirse
-      // con un claro casual.
-      if (size >= 25) {
-        // Centro de la región: selecciona una celda que sea de verdad libre.
-        let sumX = 0;
-        let sumZ = 0;
-        for (const cell of queue) {
-          sumX += cell % width;
-          sumZ += Math.floor(cell / width);
-        }
-        const centerX = sumX / size;
-        const centerZ = sumZ / size;
-
-        // Busca la celda más cercana al centro que esté en la región.
-        let closest: Point | null = null;
-        let closestDist = Number.POSITIVE_INFINITY;
-        for (const cell of queue) {
-          const cx = (cell % width) + 0.5;
-          const cz = Math.floor(cell / width) + 0.5;
-          const dist = (cx - centerX) ** 2 + (cz - centerZ) ** 2;
-          if (dist < closestDist) {
-            closestDist = dist;
-            closest = { x: cx, z: cz };
-          }
-        }
-
-        // **Sólo si se puede llegar.** El río no se cruza (V-03): una región
-        // de prado grande al otro lado es transitable en sí misma pero
-        // inalcanzable para nadie, y sin este filtro ganaba igual si era la
-        // más grande.
-        if (closest !== null && canReach(land, shore, closest)
-          && (best === null || size > best.size)) {
-          best = { center: closest, size };
-        }
-      }
-    }
-  }
-
-  if (best === null) return null;
-
-  // Ofrece compañía y aburrimiento (gossip), con hora punta al caer la tarde.
+  const centre = plazaCentre(state.plaza);
+  const middle = { x: centre.x, z: centre.y };
   const gossipSpec = OFFERS.gossip;
   if (gossipSpec === undefined) return null;
-
-  const offer = placedOffer(gossipSpec, best.center, land, [0.6, 1.0]);
+  const spots: Point[] = [];
+  for (let z = Math.floor(centre.y - PLAZA.RADIUS); z <= Math.ceil(centre.y + PLAZA.RADIUS); z += 1) {
+    for (let x = Math.floor(centre.x - PLAZA.RADIUS); x <= Math.ceil(centre.x + PLAZA.RADIUS); x += 1) {
+      const at = { x: x + 0.5, z: z + 0.5 };
+      if (Math.hypot(at.x - centre.x, at.z - centre.y) > PLAZA.RADIUS) continue;
+      if (!canReach(land, shore, at) || !fitsCircle(land, at.x, at.z, 0.32)) continue;
+      spots.push(at);
+    }
+  }
+  // Cerca de la fuente primero; fila y columna hacen el desempate reproducible.
+  spots.sort((a, b) => (a.x - centre.x) ** 2 + (a.z - centre.y) ** 2
+    - ((b.x - centre.x) ** 2 + (b.z - centre.y) ** 2)
+    || a.z - b.z || a.x - b.x);
+  // `placedOffer` busca plazas alternativas cuando recibe una lista vacía.
+  // Aquí sería cambiar la plaza persistente por cualquier suelo alcanzable,
+  // justo la deriva que esta función evita: sin hueco en su recinto no hay
+  // oferta de plaza esta jornada.
+  if (spots.length === 0) return null;
+  const offer = placedOffer(gossipSpec, middle, land, [0.6, 1.0], spots.slice(0, gossipSpec.seats));
   if (offer === null) return null;
   return { id: 'square:common', at: offer.at, offers: [offer] };
 }
@@ -216,8 +164,8 @@ function detectFord(state: GameState, land: Terrain, shore: Uint8Array): Place |
 /**
  * El claro del bosque: prado rodeado de bosque.
  *
- * Un lugar de sosiego lejos del pueblo, donde la aldea va a trabajar o
- * descansar. Ofrece lo que ofrece la era (trabajo).
+ * Un lugar de sosiego lejos del pueblo, donde la aldea va a contemplar y
+ * descansar. Ofrece el rato tranquilo que ya existe en el catálogo.
  */
 function detectGlade(state: GameState, land: Terrain, shore: Uint8Array): Place | null {
   const { width, height } = state.map;
@@ -315,11 +263,13 @@ function detectGlade(state: GameState, land: Terrain, shore: Uint8Array): Place 
 
   if (best === null) return null;
 
-  const workSpec = OFFERS.work;
-  if (workSpec === undefined) return null;
+  const loiterSpec = OFFERS.loiter;
+  if (loiterSpec === undefined) return null;
 
-  // El claro ofrece trabajo, con hora punta al mediodía.
-  const offer = placedOffer(workSpec, best.center, land, [0.3, 0.7]);
+  // El claro ofrece contemplación, con hora punta al mediodía. No es una
+  // segunda era: `work` sólo entra para el oficio asignado y no puede llevar
+  // aquí a niños, mayores ni adultos sin puesto.
+  const offer = placedOffer(loiterSpec, best.center, land, [0.3, 0.7]);
   if (offer === null) return null;
   return { id: 'glade:meadow', at: offer.at, offers: [offer] };
 }

@@ -8,17 +8,29 @@ export const DEFENCE_DIRECTIONS = [
   { bit: 1, x: 0, z: -1 }, { bit: 2, x: 1, z: 0 },
   { bit: 4, x: 0, z: 1 }, { bit: 8, x: -1, z: 0 },
 ] as const;
+export const DEFENCE_DIAGONALS = [
+  { bit: 16, x: 1, z: -1 }, { bit: 32, x: 1, z: 1 },
+  { bit: 64, x: -1, z: 1 }, { bit: 128, x: -1, z: -1 },
+] as const;
 
 function isDefence(building: Pick<Building, 'kind' | 'lostTick'>): boolean {
   return building.lostTick === null && (building.kind === 'wall' || building.kind === 'palisade');
 }
 
-/** Las ruinas y los vecinos diagonales no cierran una unión. Madera y piedra sí. */
+/** La diagonal sólo une cuando no existe ya un codo cardinal entre ambos. */
 export function defenceConnections(buildings: readonly Building[]): ReadonlyMap<number, number> {
   const standing = buildings.filter(isDefence);
-  const occupied = new Set(standing.map((b) => `${b.x},${b.y}`));
-  return new Map(standing.map((b) => [b.id, DEFENCE_DIRECTIONS.reduce((mask, d) =>
-    occupied.has(`${b.x + d.x},${b.y + d.z}`) ? mask | d.bit : mask, 0)]));
+  const occupied = new Set(buildings.filter(b => isDefence(b) || (b.kind === 'gate' && b.lostTick === null))
+    .map((b) => `${b.x},${b.y}`));
+  return new Map(standing.map((b) => {
+    let mask = DEFENCE_DIRECTIONS.reduce((value, d) =>
+      occupied.has(`${b.x + d.x},${b.y + d.z}`) ? value | d.bit : value, 0);
+    for (const d of DEFENCE_DIAGONALS) {
+      if (occupied.has(`${b.x + d.x},${b.y + d.z}`)
+        && !occupied.has(`${b.x + d.x},${b.y}`) && !occupied.has(`${b.x},${b.y + d.z}`)) mask |= d.bit;
+    }
+    return [b.id, mask];
+  }));
 }
 
 /** Compone el tramo de catálogo alrededor del centro de su celda, nunca de una esquina. */
@@ -109,6 +121,27 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
       segment(length, 0.5 + d.x * distance, 0.5 + d.z * distance,
         d.x === 0 ? Math.PI / 2 : 0);
     }
+    for (const d of DEFENCE_DIAGONALS) {
+      if ((mask & d.bit) === 0) continue;
+      // Cada mitad llega a la esquina común. La malla se recorta después
+      // contra la parcela para no invadir las dos celdas transitables vecinas.
+      segment(Math.SQRT1_2, 0.5 + d.x * 0.25, 0.5 + d.z * 0.25, -Math.atan2(d.z, d.x));
+    }
+  }
+  if ((mask & 240) !== 0 && planned.gate === undefined) {
+    group.updateMatrixWorld(true);
+    const inverse = new Matrix4().copy(group.matrixWorld).invert();
+    const meshes: Mesh[] = [];
+    group.traverse(node => { if (node instanceof Mesh) meshes.push(node); });
+    const replacements: Mesh[] = [];
+    for (const mesh of meshes) {
+      const geometry = clippedStrip(mesh.geometry, new Matrix4().copy(inverse).multiply(mesh.matrixWorld), 1,
+        [{ axis: 'x', sign: -1, edge: 0 }, { axis: 'x', sign: 1, edge: 1 },
+          { axis: 'z', sign: -1, edge: 0 }, { axis: 'z', sign: 1, edge: 1 }]);
+      owned.push(geometry);
+      replacements.push(new Mesh(geometry, mesh.material));
+    }
+    group.clear(); group.add(...replacements);
   }
   group.traverse((node) => {
     node.userData.buildingId = planned.id;
@@ -122,20 +155,23 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
 }
 
 /** Recorte de triángulos en dos planos, para los brazos cortos de L/T/+. */
-function clippedStrip(source: BufferGeometry, matrix: Matrix4, length: number): BufferGeometry {
+function clippedStrip(source: BufferGeometry, matrix: Matrix4, length: number,
+  planes: readonly { axis: 'x' | 'z'; sign: number; edge: number }[] = [
+    { axis: 'x', sign: -1, edge: length / 2 }, { axis: 'x', sign: 1, edge: length / 2 },
+  ]): BufferGeometry {
   const flat = source.index === null ? source.clone() : source.toNonIndexed();
   flat.applyMatrix4(matrix);
   const position = flat.getAttribute('position');
   const vertices: number[] = [];
   for (let i = 0; i < position.count; i += 3) {
     let polygon = [0, 1, 2].map((offset) => new Vector3().fromBufferAttribute(position, i + offset));
-    for (const sign of [-1, 1]) {
+    for (const { axis, sign, edge } of planes) {
       const result: Vector3[] = [];
       for (let j = 0; j < polygon.length; j++) {
         const a = polygon[j]!;
         const b = polygon[(j + 1) % polygon.length]!;
-        const da = sign * a.x - length / 2;
-        const db = sign * b.x - length / 2;
+        const da = sign * a[axis] - edge;
+        const db = sign * b[axis] - edge;
         if (da <= 0) result.push(a);
         if ((da <= 0) !== (db <= 0)) result.push(a.clone().lerp(b, da / (da - db)));
       }

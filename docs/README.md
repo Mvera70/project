@@ -40,6 +40,7 @@ carpetas de `tools/`, con qué mide cada informe y cómo se lanza.
 | `changelog.md` | **El porqué de cada revisión.** Antes de deshacer una decisión, se busca aquí |
 | `task-log.md` | **El cuaderno de tareas.** El punto exacto: en vuelo, cifras, abierto |
 | `plan-meta.md` | **El plan hacia la meta** (§1b), con prioridad, dificultad y agente |
+| `plan-espacial.md` | Aldea orgánica: caminos, plaza, viviendas y cierre real del recinto; aceptada localmente tras recuperación dirigida por Sol |
 | `plan-disparo-unico.md` | **El brief de Astra** (19 sep): lo que ha pasado en dos días para que lo revise, y la tarea — clips que ocurren en un instante y sostienen su última pose. Desbloquea E1 y con ella el bloque de arte entero |
 | `plan-final.md` | **El final de una partida**: la lápida, la hoja de cuentas y el cronicón (F3), con fases por agente y las decisiones que son del dueño |
 | `encargos-3d.md` | **Todo lo que hace falta de Blender**, apuntado en la misma ronda en que se descubre |
@@ -59,6 +60,8 @@ Las herramientas que las produjeron están en `tools/reports/`.
 |---|---|
 | `medidas/findings-drama.md` | Los dos sistemas del motor que no se disparaban nunca (13 sep). **La medida sigue valiendo**; el plan de arreglarla, no |
 | `medidas/rey-medida.md` | Qué llegó y qué no de la fase del rey (K-6) |
+| `medidas/spatial-engine.md` | Cierre real, accesos y trazado en cuatro semillas; límites y reproducción |
+| `medidas/spatial-plaza.md` | Desfase plaza/vida y visitas al claro al separar los dos lugares |
 | `medidas/dead-code-audit-2026-09-17.md` | El código muerto que se encontró al auditar |
 | `medidas/catalogo-historias-y-encrucijadas.md` | Qué historias tiene el catálogo y cuáles no salen |
 | `medidas/letalidad-por-decision-2026-09-19.md` | **Qué decisiones acumulan la caída (G4)**, por contrafactual: lo que mata es no prepararse para el asedio, y es lo que elige la política prudente |

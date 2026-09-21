@@ -22,18 +22,18 @@ describe('G-21 · conexiones de defensas', () => {
       expect(defenceConnections([...buildings].reverse()).get(1)).toBe(mask);
     }
   });
-  it('no conecta diagonales ni ruinas y actualiza al vecino al construir o destruir', () => {
+  it('conecta diagonales sin codo, no ruinas, y actualiza al vecino al construir o destruir', () => {
     const state=foundTwenty(7);
     state.buildings=[wall(1,10,10),wall(2,11,11)];
     const before=planFor(state);
-    expect(before.buildings[0]?.connections).toBe(0);
+    expect(before.buildings[0]?.connections).toBe(32);
     state.buildings.push(wall(3,11,10));
     const joined=planFor(state);
     expect(planChange(before,joined).changed.map(b=>b.id)).toEqual([1,2]);
     state.buildings[2]!.lostTick=1;
     state.map.ruins[10 * state.map.width + 11] = 1;
     const broken=planFor(state);
-    expect(broken.buildings[0]?.connections).toBe(0);
+    expect(broken.buildings[0]?.connections).toBe(32);
     expect(broken.buildings[2]?.connections).toBeUndefined();
     expect(planChange(joined,broken).changed.map(b=>b.id)).toEqual([1,2,3]);
   });
@@ -44,7 +44,7 @@ describe('G-21 · conexiones de defensas', () => {
     const source=new Group();
     const mesh=new Mesh(new BoxGeometry(1,.8,.3),new MeshStandardMaterial());
     mesh.position.set(.5,.4,-.5);source.add(mesh);
-    for(let mask=0;mask<16;mask++) {
+    for(let mask=0;mask<256;mask++) {
       const model=buildFromAsset({...planned,connections:mask},source.clone(true));
       const bounds=new Box3().setFromObject(model.object);
       expect(bounds.min.x).toBeGreaterThanOrEqual(10-1e-6);
@@ -58,5 +58,11 @@ describe('G-21 · conexiones de defensas', () => {
       model.dispose();
     }
     mesh.geometry.dispose();(mesh.material as MeshStandardMaterial).dispose();
+  });
+  it('el tramo llega también al portón real sin convertirlo en muro', () => {
+    const gate = { ...wall(2, 11, 10), kind: 'gate' as const };
+    const connections = defenceConnections([wall(1, 10, 10), gate]);
+    expect(connections.get(1)).toBe(2);
+    expect(connections.has(2)).toBe(false);
   });
 });

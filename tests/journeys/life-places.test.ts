@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { CATALOG } from '@engine/crossroads/catalog';
+import { PLAZA } from '@engine/balance';
 import type { GameState } from '@engine/state';
 import { blockedAt } from '../../src/render3d/life/body';
 import { terrainOf } from '../../src/render3d/life/terrain';
@@ -18,6 +19,7 @@ import { createVillage } from '../../src/render3d/life/village';
 import { STEPS_PER_DAY } from '../../src/render3d/life/clock';
 
 const grown = new Map<number, GameState>();
+const visits = new Map<number, Set<string>>();
 function village(seed: number): GameState {
   let base = grown.get(seed);
   if (base === undefined) {
@@ -28,8 +30,21 @@ function village(seed: number): GameState {
   return base;
 }
 
+function visitedPlaces(seed: number): ReadonlySet<string> {
+  const known = visits.get(seed);
+  if (known !== undefined) return known;
+  const life = createVillage(village(seed), 0);
+  const seen = new Set<string>();
+  for (let step = 0; step < STEPS_PER_DAY; step += 1) {
+    life.step();
+    for (const dweller of life.dwellers) if (dweller.doing?.there === true) seen.add(dweller.doing.place.id);
+  }
+  visits.set(seed, seen);
+  return seen;
+}
+
 describe('V-10 · sitios con vida', () => {
-  it('la plaza se detecta en las seis semillas y está en suelo libre', () => {
+  it('la plaza del motor se detecta en las seis semillas y sus plazas son suelo libre', () => {
     const seeds = [7, 11, 23, 31, 37, 41];
     for (const seed of seeds) {
       const state = village(seed);
@@ -47,7 +62,33 @@ describe('V-10 · sitios con vida', () => {
       expect(square.at.z).toBeGreaterThan(0);
       expect(square.at.x).toBeLessThan(land.width);
       expect(square.at.z).toBeLessThan(land.height);
+      const centre = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+      // P-1 la decide y reserva al fundar; la vida no puede sustituirla por el
+      // prado más grande de otra parte del valle. La fuente cierra el centro,
+      // por eso se comprueban los puestos que realmente ofrece alrededor.
+      for (const offer of square.offers) {
+        for (const spot of offer.spots ?? [offer.at]) {
+          expect(Math.hypot(spot.x - centre.x, spot.z - centre.z),
+            `semilla ${seed}: plaza fuera del círculo reservado`).toBeLessThanOrEqual(PLAZA.RADIUS);
+          expect(blockedAt(land, spot.x, spot.z),
+            `semilla ${seed}: puesto de plaza bloqueado`).toBe(false);
+        }
+      }
     }
+  });
+
+  it('no inventa una plaza fuera de su recinto si no queda suelo libre', () => {
+    const state = structuredClone(village(7));
+    const land = terrainOf(state);
+    const centre = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+    // Máscara sintética: conserva el valle y sólo hace inhabitable el recinto
+    // que el motor reservó. No toca la partida cacheada de la multisemilla.
+    for (let z = 0; z < land.height; z += 1) for (let x = 0; x < land.width; x += 1) {
+      if (Math.hypot(x + 0.5 - centre.x, z + 0.5 - centre.z) <= PLAZA.RADIUS) {
+        land.blocked[z * land.width + x] = 1;
+      }
+    }
+    expect(commons(state, land).some((place) => place.id === 'square:common')).toBe(false);
   });
 
   it('ningún sitio se pasa de aforo', () => {
@@ -133,7 +174,7 @@ describe('V-10 · sitios con vida', () => {
     }
   });
 
-  it('cada sitio recibe visita en la mayoría de las jornadas', () => {
+  it('la plaza y el vado reciben visita en la mayoría de las jornadas', () => {
     // **No en todas, y no es lo mismo que "algo se visita".** El mundo ofrece,
     // el agente elige (E.4): un sitio con más competencia cerca —el vado
     // ofrece lo mismo que nada más, pero compite contra el trabajo justo
@@ -144,23 +185,22 @@ describe('V-10 · sitios con vida', () => {
     const seeds = [7, 11, 23, 31, 37, 41];
     const visits: Record<string, number> = {};
 
-    for (const seed of seeds) {
-      const state = village(seed);
-      const life = createVillage(state, 0);
-      const visitedToday = new Set<string>();
-      for (let step = 0; step < STEPS_PER_DAY; step += 1) {
-        life.step();
-        for (const dweller of life.dwellers) {
-          if (dweller.doing?.there === true) visitedToday.add(dweller.doing.place.id);
-        }
-      }
-      for (const id of visitedToday) visits[id] = (visits[id] ?? 0) + 1;
-    }
+    for (const seed of seeds) for (const id of visitedPlaces(seed)) visits[id] = (visits[id] ?? 0) + 1;
 
-    for (const id of ['square:common', 'ford:crossing', 'glade:meadow']) {
+    for (const id of ['square:common', 'ford:crossing']) {
       expect(visits[id] ?? 0, `${id}: visitado en ${visits[id] ?? 0} de ${seeds.length} semillas`)
         .toBeGreaterThanOrEqual(Math.floor(seeds.length / 2));
     }
+  });
+
+  it('el claro recibe visita en la mayoría de las jornadas', () => {
+    // El claro no duplica una era: ofrece contemplación a mediodía. Así puede
+    // atraer a toda la aldea por sus necesidades, incluidos niños, mayores y
+    // adultos sin un puesto laboral asignado.
+    const seeds = [7, 11, 23, 31, 37, 41];
+    const visited = seeds.filter(seed => visitedPlaces(seed).has('glade:meadow')).length;
+    expect(visited, `glade:meadow: visitado en ${visited} de ${seeds.length} semillas`)
+      .toBeGreaterThanOrEqual(Math.floor(seeds.length / 2));
   });
 
   it('los sitios comunes ofrecen y se alcanzan', () => {

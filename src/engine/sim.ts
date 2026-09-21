@@ -1193,10 +1193,9 @@ export function tick(
   // §7.5 and §7.6. The week's walking wears the ground, wear becomes a path,
   // and once a year the wood behind the cutters closes over again.
   //
-  // Nothing here invalidates the routes on a building. A building is not an
-  // obstacle: §7.6's cost reads the terrain and the path and nothing else, so
-  // raising one changes no route. What it can change is where people are going,
-  // and that is part of the route's cache key already.
+  // `routesFor` invalida su máscara cuando cambia una huella de edificio u
+  // obra. El desgaste rodea paredes y fuente y parte de accesos exteriores;
+  // no se duplica aquí la firma espacial que mantiene `world/paths.ts`.
   // §7.7: the herd breeds if there is room and food, and the wolves come in
   // winter if nothing stands in their way. Here and not in step 7 because this
   // is where the world acts on the village.

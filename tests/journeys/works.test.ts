@@ -2,7 +2,7 @@
 //
 // Las propiedades que se comprueban son las del diseño: la prioridad de §7.3,
 // los topes de §7.2, que nada se pise y que nada se levante sobre agua,
-// marisma o ruina de piedra. Cómo esté escrito el bucle de obras da igual.
+// vado o ruina de piedra. Sólo defensas de una celda admiten marisma de ribera.
 //
 // La batería de prioridad se construye a mano —una fundación real y luego el
 // estado exacto que activa cada regla— porque una partida simulada no visita
@@ -89,7 +89,11 @@ function onForbiddenGround(state: GameState): string | null {
     for (let y = b.y; y < b.y + b.h; y += 1) {
       for (let x = b.x; x < b.x + b.w; x += 1) {
         const t = state.map.terrain[y * state.map.width + x];
-        if (t === TERRAIN_CODE.water || t === TERRAIN_CODE.marsh) return `${b.kind}#${b.id} en ${x},${y}`;
+        const bankDefence = b.w === 1 && b.h === 1
+          && ['palisade', 'wall', 'gate', 'bastion'].includes(b.kind);
+        if (t === TERRAIN_CODE.water || t === TERRAIN_CODE.ford
+          || t === TERRAIN_CODE.mountain || t === TERRAIN_CODE.lake
+          || (t === TERRAIN_CODE.marsh && !bankDefence)) return `${b.kind}#${b.id} en ${x},${y}`;
       }
     }
   }
@@ -341,7 +345,33 @@ describe('mejoras a piedra · §7.3 punto 9', () => {
 });
 
 describe('colocación · §7.4', () => {
-  it('nunca sobre agua ni marisma, en 20 semillas', () => {
+  it('la excepción de ribera sólo admite defensas de una celda y no permite solapamientos', () => {
+    const state = foundTwenty(0);
+    const cell = 40 * state.map.width + 34;
+    // La celda del fallo medido gate#96 es marisma desde la generación, no agua.
+    expect(state.map.terrain[cell]).toBe(TERRAIN_CODE.marsh);
+    const template: Building = { id: 96, kind: 'gate', x: 34, y: 40, w: 1, h: 1,
+      builtTick: 0, lostTick: null, tier: 1, lit: true, blockedUntil: null };
+    state.works = [];
+    for (const kind of ['palisade', 'wall', 'gate', 'bastion'] as const) {
+      state.buildings = [{ ...template, kind }];
+      state.map.terrain[cell] = TERRAIN_CODE.marsh;
+      expect(onForbiddenGround(state)).toBeNull();
+      for (const terrain of [TERRAIN_CODE.water, TERRAIN_CODE.ford]) {
+        state.map.terrain[cell] = terrain;
+        expect(onForbiddenGround(state)).not.toBeNull();
+      }
+    }
+    state.map.terrain[cell] = TERRAIN_CODE.marsh;
+    state.buildings = [{ ...template, kind: 'house' }];
+    expect(onForbiddenGround(state)).not.toBeNull();
+    state.buildings = [{ ...template, w: 2 }];
+    expect(onForbiddenGround(state)).not.toBeNull();
+    state.buildings = [template, { ...template, id: 97 }];
+    expect(overlapping(state)).not.toBeNull();
+  });
+
+  it('la fundación nunca edifica sobre terreno prohibido, en 20 semillas', () => {
     for (const seed of Array.from({ length: 20 }, (_, i) => i)) {
       const s = foundTwenty(seed);
       expect(onForbiddenGround(s), `semilla ${seed}`).toBeNull();
