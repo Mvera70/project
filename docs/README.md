@@ -83,6 +83,7 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-e0-semana-posterior.md` | Contrato de E0c: reservas volcadas y corral abierto durante la semana posterior al saqueo |
 | `encargos/encargo-e0-transiciones-muralla.md` | Contrato de E0d: solar visible y hueco durante segunda puerta y estacada a piedra |
 | `encargos/encargo-e0-ambiente-eras.md` | Contrato de E0e: caminos, plaza y humo según era; código entregado, aceptación visual pendiente en `historico/life-rounds/E0e-ambiente-eras.md` |
+| `encargos/encargo-e3-modelo-bastion.md` | Sólo modelo 3D del bastión E3; candidato de estudio validado, sin integración ni aprobación artística |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
 | `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |

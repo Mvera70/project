@@ -2,6 +2,28 @@
   "schemaVersion": 1,
   "assets": [
     {
+      "id": "bastion",
+      "artifactRound": "G-26",
+      "status": "study",
+      "recipe": "art/recipes/bastion/bastion.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": null,
+      "bounds": null,
+      "recipeSha256": null,
+      "materials": ["stone", "mortar"],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": null,
+      "hashes": null,
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original E3. Candidato de bastión; sin aprobación ni integración.",
+        "license": "Project original"
+      }
+    },
+    {
       "id": "bow",
       "artifactRound": "G-24",
       "status": "study",

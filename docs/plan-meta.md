@@ -137,7 +137,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
 | E0 · **Lo que todavía pasa y no se ve** · *E0a–E0d cerrados; E0e progreso visual, aceptación histórica pendiente* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. El dueño revisó §7.4b: tierra pisada → piedra parcial → piedra completa. Sol verifica tres grados distinguibles en 12 controles móvil/tableta, sin alterar plaza ni accesos; la piedra aún es lisa y la clasificación independiente de tomas históricas no está demostrada. [Brief](encargos/encargo-e0-ambiente-eras.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md); inventario en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Sol dirige · Terra ejecuta | — |
 | E2 · Modelos del asedio · **parcial, 20 sep 2026** | Arco, flecha, lanza y escudo están publicados y en las manos de ambos bandos. Queda la **identidad propia del clan vecino** —aldeanos armados de otro valle, no soldados de cota ni bandidos— y decidir si necesita espada además del aparejo ya integrado | P2 | Alta | Astra · sesión de arte | — |
-| E3 · Portón, muralla de piedra, torre · **parcial, 20 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. Quedan el **adarve/apoyo elevado real** y una **malla propia del bastión**, incluida su junta con el muro. No hace falta otro GLB para el portón roto | P2 | Media | Sesión de arte | A2, A3, A4 |
+| E3 · Portón, muralla de piedra, torre · **parcial, 22 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. Astra entregó **modelo candidato** de bastión en G-26, validado pero sin aprobar ni integrar; el juego aún usa la atalaya escalada. Quedan admisión/integración del GLB, la junta con el muro y el **adarve/apoyo elevado real**. No hace falta otro GLB para el portón roto. [Encargo del modelo](encargos/encargo-e3-modelo-bastion.md) | P2 | Media | Astra sólo modelo; integración separada | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
 
 ### F · Interfaz y crónica
@@ -170,7 +170,7 @@ meta**, pero hay que ir bajando:
 |---|---|---|
 | La reunión de §11.8 no cabe en una aldea de 70 (se junta el 54 %) | Media | Sol (capa de vida) |
 | Las once jornadas rojas de la familia R-1 y la del devoto | Baja (medir y declarar) · Media (arreglar) | Luna, Terra → Sol |
-| La malla de la sala del rey; el clan y el bastión permanecen en E2/E3. Arado y fuente están publicados e integrados | Media | Sesión de arte |
+| La malla de la sala del rey y la identidad del clan siguen pendientes; el bastión tiene candidato de estudio sin integrar. Arado y fuente están publicados e integrados | Media | Sesión de arte |
 | El hacha es el medio más flojo; `quiet_years` no sale | Baja | Dueño (decisión) → Luna |
 
 ---
@@ -191,8 +191,9 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    La piedra lisa sin juntas queda como deuda de acabado, no otra ronda de color
    a ciegas. La [revisión espacial](plan-espacial.md)
    está aceptada localmente. Sol dirige software; Astra sólo 3D excepcional.
-2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve y bastión
-   propio con su junta. La sala del rey es deuda independiente en H.
+2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve e
+   integración/junta del bastión candidato. La sala del rey es deuda
+   independiente en H.
 3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó
    medido. Ningún agente inventa esos criterios.
 4. **Final del crecimiento** — A3b, sólo después de definir qué significa el

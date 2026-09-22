@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E3, bastión — modelo candidato sin integrar
+
+Con autorización de Vera para limitar a Astra al modelado 3D, se creó la
+receta `art/recipes/bastion/bastion.json` y el candidato G-26 en Blender de
+fondo. GLB validado y cargado en Three.js: huella 1×1, altura 1,36, 1.092
+triángulos, dos mallas/materiales. La comparativa con muro y atalaya muestra
+una torre maciza con plataforma abierta; aún requiere aceptación visual del
+dueño. `art/catalog.json` sigue `study`, `approved: null`; no se tocó `src/`,
+`public/` ni el ensamblador. La integración, la junta real muro–bastión y el
+puesto elevado navegable siguen pendientes. [Brief](encargos/encargo-e3-modelo-bastion.md)
+y evidencia/reproducción en `art/recipes/bastion/README.md`.
+
 ## 22 sep 2026 · E0e, tierra → piedra — cambio autorizado y verificado
 
 Vera autorizó retirar la regla de empedrado desde la fundación: §7.4b v4.30
