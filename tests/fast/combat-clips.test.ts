@@ -43,6 +43,15 @@ function raider(): Raider {
 }
 
 describe('E1 · el hecho decide la pose', () => {
+  it('el reparto marca al raider como clan vecino, no como forastero civil', () => {
+    const enemy = raider();
+    const life = { land: { width: 32, height: 32 }, dwellers: [], raiders: [enemy], steps: 1 } as unknown as Village;
+
+    expect(castOf(life, 0, new Map(), new Set())[0]).toMatchObject({
+      role: 'stranger', visualIdentity: 'neighbor',
+    });
+  });
+
   it('el reparto sirve contacto, impacto y caída por encima del gesto de puerta', () => {
     const enemy = raider();
     enemy.thrustAt = 30; enemy.hitAt = 30; enemy.blowAt = 30;

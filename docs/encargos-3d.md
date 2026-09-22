@@ -57,7 +57,7 @@ fuente propios. Se conserva la aceptación visual de la primera tanda.
 | **La fuente** (P-3) | El centro de la plaza | GLB propio integrado (406 triángulos) |
 | **La sala del rey** (`hall`, K-4) | La casa del que manda | Una casa más alta con tejado burdeos. Encargo en `docs/historico/plan-rey.md` §8 |
 | **Armas y arcos** (C1) | Lo de arriba | Arco, lanza, flecha y escudo publicados e integrados |
-| **El clan vecino** (E2) | Quien ataca | Nada. Son **aldeanos armados de otro valle** —no soldados de cota ni bandidos andrajosos— y reaprovechan el aparejo del aldeano |
+| ~~**El clan vecino** (E2)~~ · hecho 22 sep | Quien ataca | `villager-neighbor.glb` integrado: aldeano de otro valle, gorro y esclavina de silueta propia, rig y clips del adulto. Reaprovecha arco, lanza y escudo; sin espada solicitada por la conducta actual. [G-28](historico/graphics-rounds/G-28.md) |
 | **El bastión** (`bastion`, A3, 22 sep 2026) | La torre en la línea de muralla | **G-26:** modelo 1×1 aprobado y publicado. **G-27:** variante de 14 peldaños, huella 1×2 y respaldo G-26 si no cabe; el motor prefiere muros accesibles al mejorar, y el GLB se carga en el bundle. La escalera y la junta con muro se leen en captura focal de partida histórica real. La guardia sigue en suelo: faltan subida y adarve navegables. [G-26](historico/graphics-rounds/G-26.md) · [G-27](historico/graphics-rounds/G-27.md) |
 
 **Y las que sí están, para no volver a dudarlo:** `watchtower.glb` y `wall.glb`

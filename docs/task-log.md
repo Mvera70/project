@@ -1,5 +1,25 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E2, clan vecino integrado
+
+El clan atacante ya tiene malla propia (`villager-neighbor`) sin cambiar el
+asedio. Astra hizo sólo el modelo, con una revisión tras detectar que la
+primera silueta parecía un recolor; Terra conectó la identidad de presentación
+y el respaldo al forastero civil; Sol revisó el diff y las capturas reales.
+Se publicó únicamente el GLB nuevo, conservando los 67 hashes anteriores.
+Arma y escudo se ven sujetos en aproximación y puerta, sin errores de página.
+No hay captura de caída ni se atribuye aceptación visual de ragdoll a esta
+ronda. [G-28](historico/graphics-rounds/G-28.md).
+
+Foco de código: typecheck, lint y 37 pruebas verdes. La suite rápida cerró con
+1.707/1.708: el único rojo fue el listón temporal de `save` por 9,7 ms bajo
+carga; aislado pasó 15/15 y midió 739 ms. Jornadas de arquería 3/3; asalto
+5/7, con las dos rojas de semilla 7 y 11 ya anotadas antes de E2. No se
+aflojaron pruebas ni se declara arreglada la deuda ajena. E2 no pide espada
+porque las conductas existentes ya usan arco y lanza. Próximo bloque: E3,
+subida real al bastión y adarve; requiere acotar trabajo y respetar que Vera
+permitió diferirlo si resulta costoso.
+
 ## 22 sep 2026 · E0e histórico y G-27 en partida real
 
 E0e cierra su aceptación visual: doce capturas históricas sin rótulo de dos

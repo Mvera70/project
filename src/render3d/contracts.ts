@@ -98,6 +98,15 @@ export interface Actor {
    * Quien pinta decide con esto qué modelo usa (D.6.2, `world/cast.ts`).
    */
   readonly role: Role | null;
+  /**
+   * Identidad visual excepcional, ajena a los papeles que guarda el motor.
+   *
+   * `role: 'stranger'` sigue describiendo a un civil recién llegado al valle.
+   * El clan vecino no es ese civil ni existe en `GameState`: la vida lo marca
+   * aquí, en la frontera de presentación, para que el selector de malla no
+   * tenga que inferirlo de un id negativo, de un arma o de un clip de combate.
+   */
+  readonly visualIdentity?: 'neighbor';
 }
 
 /** Vector y cuaternión planos para cruzar vida, Rapier y Three sin hacer que

@@ -66,6 +66,9 @@ export const BASE_VILLAGER = 'villager';
  */
 export const STRANGER_VILLAGER = 'villager-stranger';
 
+/** La figura adulta del otro valle; sólo la pide el clan vecino durante el asedio. */
+export const NEIGHBOR_VILLAGER = 'villager-neighbor';
+
 /**
  * **Todos los nombres que la cadena puede pedir**, incluidos los que el taller
  * todavía no ha entregado.
@@ -82,7 +85,7 @@ export const STRANGER_VILLAGER = 'villager-stranger';
 export const VILLAGER_MODELS: readonly string[] = [
   BASE_VILLAGER,
   ...Object.values(VILLAGER_BY_ROLE),
-  'villager-child', 'villager-elder', STRANGER_VILLAGER,
+  'villager-child', 'villager-elder', STRANGER_VILLAGER, NEIGHBOR_VILLAGER,
   'villager-farmer', 'villager-woodcutter', 'villager-mason', 'villager-shepherd', 'villager-fisher',
 ];
 
@@ -176,6 +179,15 @@ export function modelFor(actor: Actor): string {
  * decisión única.
  */
 export function modelChainFor(actor: Actor): readonly string[] {
+  // E2 · Un raider no es un `stranger`: éste es un civil del propio valle que
+  // acaba de llegar. La identidad llega explícita desde `life/cast.ts`, sin
+  // añadir estado ni significado mecánico al motor. Si el arte nuevo aún no
+  // está publicado, conserva exactamente la lectura anterior: forastero y,
+  // al final, aldeano base.
+  if (actor.visualIdentity === 'neighbor') {
+    return [NEIGHBOR_VILLAGER, STRANGER_VILLAGER, BASE_VILLAGER];
+  }
+
   const chain: string[] = [];
 
   if (actor.age < CHILD_UNDER) chain.push('villager-child');

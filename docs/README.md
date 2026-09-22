@@ -84,6 +84,7 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-e0-transiciones-muralla.md` | Contrato de E0d: solar visible y hueco durante segunda puerta y estacada a piedra |
 | `encargos/encargo-e0-ambiente-eras.md` | Contrato de E0e: caminos, plaza y humo según era; código y aceptación histórica entregados en `historico/life-rounds/E0e-ambiente-eras.md` |
 | `encargos/encargo-e0e-aceptacion-historica.md` | Plan de cierre de E0e: historias reales, controles separados, lectura sin rótulos y regresiones |
+| `encargos/encargo-e2-clan-vecino.md` | Contrato de la figura del clan vecino E2 y su integración; cierre en `historico/graphics-rounds/G-28.md` |
 | `encargos/encargo-e3-modelo-bastion.md` | Sólo modelo 3D del bastión E3; fuente validada y apariencia aprobada por Vera |
 | `encargos/encargo-e3-integracion-bastion.md` | Admisión y conexión visual del bastión E3 aprobado; el adarve navegable queda aparte |
 | `encargos/encargo-e3-acceso-elevado.md` | Contrato de subida real al puesto del bastión; separa ese alcance del adarve continuo sobre toda la muralla |

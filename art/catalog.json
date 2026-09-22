@@ -2,6 +2,99 @@
   "schemaVersion": 1,
   "assets": [
     {
+      "id": "villager-neighbor",
+      "artifactRound": "G-28",
+      "status": "study",
+      "recipe": "art/recipes/villager-neighbor/villager-neighbor.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-22T07-03-21-410Z-11944",
+        "directory": "artifacts/graphics/G-28/approved/28b40fdbc007f27a"
+      },
+      "bounds": {
+        "min": [
+          -0.175,
+          0,
+          -0.086667
+        ],
+        "max": [
+          0.175,
+          0.65,
+          0.096667
+        ],
+        "size": [
+          0.35,
+          0.65,
+          0.183333
+        ]
+      },
+      "recipeSha256": "DDC2BE0AD33B3E5A3A9DA6D540077E14526B40DD9699A10451835758A7168D73",
+      "materials": [
+        "skin",
+        "cloth",
+        "cloth-accent",
+        "dark"
+      ],
+      "clips": [
+        "idle",
+        "walk",
+        "work_hoe",
+        "carry_walk"
+      ],
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "connectors": [
+        "hand_l",
+        "hand_r"
+      ],
+      "statistics": {
+        "objects": 24,
+        "meshes": 4,
+        "materials": 4,
+        "triangles": 1060
+      },
+      "hashes": {
+        "villager-neighbor.blend": "49BAD35B460DB3DFC64453CAF5DE96B06CD8A8F578BBC490F90B8A7A6F9A9AC8",
+        "villager-neighbor.glb": "28B40FDBC007F27A8635C5B03CF724527C588D997A761064E03AA92F0D39987C",
+        "villager-neighbor-blender.png": "3B32FB5CA0C99CC4916D0CE6D322DBC868F9A56CD2F29DA07D622C891BB8665E",
+        "capture-1.png": "A45C17E5C5F55AF9A0EF6CF065781B77C9D34BFDC9440743B6A41C204A5DEBE0",
+        "capture-1-gray.png": "7C432ACB6B4CD77F990610CCA7AF1D41D8139F50AF10ECB4EDD5700E2C7E133B",
+        "capture.json": "6B7F9588620AB7AD0D73590B2192EBDF88B9F085B27CCE1255708B8C3157132A",
+        "build.json": "AAC67CE3D1835C192004F130A3F910A4E5D796EB0FE0C3A8B6C4A87BD925040B",
+        "validation.json": "72FEC12421BEF44752F867ACC9A28B4DF42F6DFC7771E1C90843B99B7E65D61C"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original E2 para The Valley: esclavina corta de lana sobre el adulto base; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
       "id": "bastion",
       "artifactRound": "G-26",
       "status": "study",

@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { LIFE } from '@engine/balance';
 import type { Actor } from '../../src/render3d/contracts';
 import {
-  BASE_VILLAGER, STRANGER_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, displayScaleFor,
+  BASE_VILLAGER, NEIGHBOR_VILLAGER, STRANGER_VILLAGER, VILLAGER_BY_ROLE, VILLAGER_MODELS, displayScaleFor,
   modelChainFor, modelFor, occupationOf, statureAt,
 } from '../../src/render3d/world/models';
 import { WANTED } from '../../src/render3d/renderer';
@@ -82,6 +82,16 @@ describe('V-15 · la malla se elige por quién eres y por lo que haces', () => {
     // Pide su figura y, mientras no exista, cae al base como todos.
     expect(modelFor(actor({ role: 'stranger' }))).toBe(STRANGER_VILLAGER);
     expect(modelChainFor(actor({ role: 'stranger' }))).toEqual([STRANGER_VILLAGER, BASE_VILLAGER]);
+  });
+
+  it('el clan vecino pide su adulto propio, sin convertir al forastero civil en un raider', () => {
+    const civilian = actor({ role: 'stranger' });
+    const raider = actor({ role: 'stranger', visualIdentity: 'neighbor' });
+
+    expect(modelChainFor(civilian)).toEqual([STRANGER_VILLAGER, BASE_VILLAGER]);
+    expect(modelChainFor(raider)).toEqual([
+      NEIGHBOR_VILLAGER, STRANGER_VILLAGER, BASE_VILLAGER,
+    ]);
   });
 
   it('y quien no tiene oficio recibe figura por lo que hace, que es la mayoría', () => {
@@ -188,8 +198,13 @@ describe('V-15b · el cargador pide todo lo que la cadena puede nombrar', () => 
     const roles = [null, 'stranger', ...Object.keys(VILLAGER_BY_ROLE)] as Actor['role'][];
     const jobs = [null, 'field', 'felling', 'building', 'herding', 'water'] as Actor['occupation'][];
     const asked = new Set<string>();
-    for (const age of ages) for (const role of roles) for (const occupation of jobs) {
-      for (const name of modelChainFor(actor({ age, role, occupation }))) asked.add(name);
+    for (const identity of [false, true]) {
+      for (const age of ages) for (const role of roles) for (const occupation of jobs) {
+        const who = identity
+          ? actor({ age, role, occupation, visualIdentity: 'neighbor' })
+          : actor({ age, role, occupation });
+        for (const name of modelChainFor(who)) asked.add(name);
+      }
     }
     for (const name of asked) expect(WANTED, name).toContain(name);
     for (const name of VILLAGER_MODELS) expect(WANTED, name).toContain(name);

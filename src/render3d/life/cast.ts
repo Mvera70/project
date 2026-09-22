@@ -173,10 +173,10 @@ export function castOf(
   // con la gente del valle es que son cuerpos que andan, y eso es exactamente
   // lo que un `Actor` describe.
   //
-  // Se pintan con la figura del forastero (`role: 'stranger'` →
-  // `STRANGER_VILLAGER`), que es la más honesta que hay hoy: un desconocido
-  // entre conocidos. Cuando el taller entregue el clan armado (E2 del plan),
-  // esta línea es lo único que cambia.
+  // E2 · El clan vecino no es el forastero civil del valle. La identidad de
+  // presentación lo expresa sin contaminar `Role` ni el estado del juego; la
+  // cadena conserva `villager-stranger` y `villager` como respaldos mientras
+  // el recurso nuevo aún no esté disponible.
   for (const raider of life.raiders) {
     if (raider.phase === 'gone') continue;
     const { body } = raider;
@@ -216,6 +216,7 @@ export function castOf(
       arguing: false,
       occupation: null,
       role: 'stranger',
+      visualIdentity: 'neighbor',
     });
   }
   return actors;

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-22T01:42:50.665Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bastion-access-candidate",
+  "generatedAt": "2026-09-22T07:06:00.193Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids villager-neighbor",
   "assets": [
     {
       "id": "axis-marker",
@@ -925,6 +925,42 @@
       "provenance": {
         "kind": "original",
         "source": "Candidato E3 de escalera interior, aprobado provisionalmente el 22 sep 2026; deriva de G-26 sin sobrescribirlo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "villager-neighbor",
+      "file": "villager-neighbor.glb",
+      "sha256": "28B40FDBC007F27A8635C5B03CF724527C588D997A761064E03AA92F0D39987C",
+      "motion": [
+        {
+          "name": "idle",
+          "seconds": 4,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.317
+        },
+        {
+          "name": "work_hoe",
+          "seconds": 2,
+          "loop": true,
+          "strideLength": null
+        },
+        {
+          "name": "carry_walk",
+          "seconds": 1.3333333333333333,
+          "loop": true,
+          "strideLength": 0.26
+        }
+      ],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original E2 para The Valley: esclavina corta de lana sobre el adulto base; sin proveedor generativo.",
         "license": "Project original"
       }
     }

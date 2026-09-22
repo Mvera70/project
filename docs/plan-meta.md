@@ -136,7 +136,7 @@ procedural; no son nuevos clips embebidos en el GLB.
 |---|---|---|---|---|---|
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
 | E0 · **Lo que todavía pasa y no se ve** · *E0a–E0e cerrados, 22 sep 2026* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. §7.4b fija tierra pisada → piedra parcial → piedra completa. Doce tomas históricas sin rótulo, dos semillas y móvil/tableta fueron clasificadas 12/12 por otro agente; cuatro lecturas de plaza tuvieron confianza media. La piedra lisa sin juntas queda como deuda de acabado. [Brief](encargos/encargo-e0e-aceptacion-historica.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md) | Hecho | Media-alta | Sol dirige · Terra revisa | — |
-| E2 · Modelos del asedio · **parcial, 20 sep 2026** | Arco, flecha, lanza y escudo están publicados y en las manos de ambos bandos. Queda la **identidad propia del clan vecino** —aldeanos armados de otro valle, no soldados de cota ni bandidos— y decidir si necesita espada además del aparejo ya integrado | P2 | Alta | Astra · sesión de arte | — |
+| E2 · Modelos del asedio · **hecho, 22 sep 2026** | Arco, flecha, lanza y escudo están integrados. El clan vecino lleva `villager-neighbor`, aldeano de otro valle con gorro y esclavina propios; conserva rig/clips y respaldo al forastero civil. Se verificó en aproximación y puerta del juego real, sin cambiar mecánica. No se añade espada: ninguna conducta actual la pide. La captura no certifica ragdoll visual. [G-28](historico/graphics-rounds/G-28.md) | Hecho | Alta | Astra sólo modelo · Terra integra · Sol revisa | — |
 | E3 · Portón, muralla de piedra, torre · **parcial, 22 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. G-27 muestra en partida histórica la escalera de 14 peldaños sobre bastiones elegidos por huella accesible, con respaldo G-26 y celda cerrada a peatones; móvil/tableta y una jornada determinista lo comprueban. La guardia **no sube**; faltan apoyo elevado navegable y adarve continuo. No hace falta otro GLB para el portón roto. [G-26](historico/graphics-rounds/G-26.md) · [G-27](historico/graphics-rounds/G-27.md) | P2 | Media-alta | Astra sólo modelo; Terra integra; Sol revisa | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
 
@@ -187,11 +187,11 @@ de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
    rótulo clasificadas 12/12 por otro agente, con contraste moderado entre
    aldea y villa en algunos encuadres. La piedra lisa queda como deuda menor.
    La [revisión espacial](plan-espacial.md) está aceptada localmente.
-2. **Siguiente fase de arte** — E2/E3: identidad visual del clan vecino,
-   acceso elevado navegable y adarve continuo. G-27 ya tiene escalera visible
-   en partida real; subir guardias se difirió por decisión de Vera. La sala
-   del rey es deuda independiente en H. Sol dirige software; Astra sólo 3D
-   excepcional y con permiso.
+2. **Siguiente fase de arte** — E3: acceso elevado navegable y adarve
+   continuo. E2 quedó integrado y observado en partida real (G-28). G-27 ya
+   tiene escalera visible; subir guardias se difirió por decisión de Vera.
+   La sala del rey es deuda independiente en H. Sol dirige software; Astra
+   sólo 3D excepcional y con permiso nuevo.
 3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó
    medido. Ningún agente inventa esos criterios.
 4. **Final del crecimiento** — A3b, sólo después de definir qué significa el
