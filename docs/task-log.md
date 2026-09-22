@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E3, costura de subida auditada; sin implementación nueva
+
+Tras cerrar E2 se revisó el siguiente bloque. G-27 ya muestra la escalera
+pero la guardia sigue en suelo. La navegación de vida es X/Z, `terrainOf`
+cierra la celda de la escalera y el collider de proyectiles de una celda
+bloqueada mide 2 frente a plataforma a 1,02. Cambiar sólo Y o el origen de
+flecha no da una subida real y arriesga choques invisibles. El contrato
+[E3](encargos/encargo-e3-acceso-elevado.md) registra esta costura. Vera había
+permitido aplazar la subida si era costosa; pendiente su elección entre
+retomar un puesto navegable acotado o mantener E3 diferida. No se tocó código
+de navegación, física ni combate en esta auditoría, ni se encargó nuevo 3D.
+
 ## 22 sep 2026 · E2, clan vecino integrado
 
 El clan atacante ya tiene malla propia (`villager-neighbor`) sin cambiar el

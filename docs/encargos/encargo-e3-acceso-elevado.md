@@ -1,5 +1,24 @@
 # E3 · Acceso elevado de la guardia — contrato antes de ejecutar
 
+## Estado comprobado el 22 sep 2026
+
+G-27 ya entrega el modelo con 14 peldaños, lo publica y lo muestra en partidas
+históricas reales; la huella de la escalera está cerrada para peatones. Por
+tanto el punto 1 del orden de abajo **ya está entregado como arte visual**. No
+hay que repetir el modelado ni llamar otra vez a Astra para empezar el puesto
+navegable. La autorización anterior de Vera fue sólo para ese modelo; la subida
+se permitió diferir si resultaba costosa.
+
+La costura física es más seria de lo que sugiere mover el actor en Y:
+`life/physics.ts` da a toda celda bloqueada un collider de altura 2, mientras
+el suelo de la plataforma aprobada está a 1,02. Bajar la flecha histórica
+desde 2,3 a la mano del guardia sin rehacer/filtrar el volumen de su propio
+bastión la estrellaría contra piedra invisible. Antes de programar, medir
+posición y trayectoria de un arquero equipado en la plataforma, y fijar cómo
+se mantienen cerradas las demás celdas y los proyectiles de otros puestos.
+No reducir `WALL_HEIGHT` global ni conservar 2,3 diciendo que la flecha sale
+de la mano.
+
 ## Hallazgo
 
 El bastión G-26 tiene plataforma visual a cota 1,02, pero es macizo y no
