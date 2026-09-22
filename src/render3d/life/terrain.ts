@@ -22,8 +22,9 @@
 // Vive aquí y no en cada sitio que lo necesite porque es la clase de detalle
 // que se olvida al copiarlo: una sola máscara, y quien la use la hereda bien.
 
-import { TERRAIN_CODE, type Building, type ValleyMap } from '@engine/state';
+import { TERRAIN_CODE, type Building, type ConstructionWork, type ValleyMap } from '@engine/state';
 import { defenceGates } from '@derive/defence-gates';
+import { bastionAccessOf } from '@derive/bastion-access';
 import { fitsCircle, type Point, type Terrain } from './body';
 
 /**
@@ -65,8 +66,10 @@ export const WALLED: ReadonlySet<string> = new Set([
 export function terrainOf(state: {
   readonly map: ValleyMap;
   readonly buildings: readonly Building[];
+  readonly works?: readonly ConstructionWork[];
   /** P-2 · la celda de la fuente, si este valle ya tiene plaza (esquema 8). */
   readonly plaza?: { readonly x: number; readonly y: number };
+  readonly ring?: number | null;
 }): Terrain {
   const { width, height } = state.map;
   const blocked = new Uint8Array(width * height);
@@ -88,6 +91,17 @@ export function terrainOf(state: {
         if (x >= 0 && z >= 0 && x < width && z < height) blocked[z * width + x] = 1;
       }
     }
+  }
+
+  // E3 · La segunda celda de la malla es piedra maciza hasta que exista la
+  // navegación por niveles. Se toma de la misma elección pura que el plan.
+  for (const building of state.buildings) {
+    const access = building.kind === 'bastion' && state.plaza !== undefined && state.ring !== undefined
+      && state.works !== undefined ? bastionAccessOf({ ...state, plaza: state.plaza, ring: state.ring, works: state.works }, building) : null;
+    if (access === null) continue;
+    const x = building.x + access.x;
+    const z = building.y + access.z;
+    if (x >= 0 && z >= 0 && x < width && z < height) blocked[z * width + x] = 1;
   }
 
   // P-2 · **la fuente de la plaza se rodea, no se atraviesa.** Es una celda y

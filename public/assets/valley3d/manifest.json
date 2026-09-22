@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-22T00:08:14.446Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bastion",
+  "generatedAt": "2026-09-22T01:42:50.665Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bastion-access-candidate",
   "assets": [
     {
       "id": "axis-marker",
@@ -914,6 +914,17 @@
       "provenance": {
         "kind": "original",
         "source": "Modelado original E3 para The Valley, aprobado visualmente el 22 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bastion-access-candidate",
+      "file": "bastion-access-candidate.glb",
+      "sha256": "46E5A10C4D33361C1F36E5E18E6A06B5619A0B867C4EFD82EB3332A9FC1D503D",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Candidato E3 de escalera interior, aprobado provisionalmente el 22 sep 2026; deriva de G-26 sin sobrescribirlo.",
         "license": "Project original"
       }
     }

@@ -156,7 +156,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   // G-26 es la excepción deliberada: su caja local es 0..1 en X/Z, así que
   // sumarle la altura la echaría una celda al sur. No se normaliza el catálogo
   // entero por una pieza nueva; se conserva la colocación validada de cada una.
-  group.position.set(planned.x, 0, planned.asset === 'bastion' ? planned.z : planned.z + planned.h);
+  group.position.set(planned.x, 0, planned.asset === 'bastion' || planned.asset === 'bastion-access-candidate' ? planned.z : planned.z + planned.h);
   group.userData.buildingId = planned.id;
   let model = source;
   if (planned.ruin && planned.asset?.startsWith('ruin-')) {
@@ -198,7 +198,15 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
     turn.add(model);
     group.add(turn);
   } else {
-    group.add(model);
+  if (planned.bastionAccess !== undefined) {
+    // La receta abre hacia +Z local. Girar el modelo entero alrededor del
+    // centro de la celda conserva la torre sobre su parcela al cambiar de cara.
+    const anchor = new Group();
+    anchor.position.set(0.5, 0, 0.5);
+    anchor.rotation.y = Math.atan2(planned.bastionAccess.x, planned.bastionAccess.z);
+    model.position.set(-0.5, 0, -0.5);
+    anchor.add(model); group.add(anchor);
+  } else group.add(model);
   }
   // La hoja usa material propio; nunca se arranca del material de toda la casa.
   group.updateMatrixWorld(true);

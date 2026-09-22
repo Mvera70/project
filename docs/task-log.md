@@ -1,5 +1,32 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E3, escalera visual integrada, subida pendiente
+
+Una captura cercana del juego real, semilla 3/año 25, muestra la unión del
+bastión derecho con el muro sin hueco apreciable; el otro queda parcialmente
+tapado por árboles. La evidencia y sus límites están en
+`historico/graphics-rounds/G-26.md`. La guardia continúa a ras de suelo y el
+bastión aprobado carece de acceso. El nuevo
+[contrato](encargos/encargo-e3-acceso-elevado.md) distingue un puesto elevado
+recorrible en el bastión de un adarve continuo por toda la muralla; ninguno se
+declara hecho. Vera autorizó a Astra **sólo** a preparar una revisión 3D
+candidata, sin sustituir G-26 ni integrar. La primera rampa lisa se rechazó
+por pendiente; el candidato final tiene 14 peldaños, huella 1×2, paso libre
+mínimo 0,70 y plataforma a 1,02. Su GLB pasó reimportación Blender y carga
+GLTFLoader (`46e5a10c…1d503d`); fuente, cotas, ruta y límites están en
+`art/recipes/bastion-access-candidate/README.md`, con vistas en
+`artifacts/graphics/E3-access-candidate/`. Vera aceptó su apariencia «de
+momento» y pidió pegarla, permitiendo diferir la subida si lleva mucho
+trabajo. Terra publicó sólo el GLB nuevo y lo selecciona donde cabe una celda
+interior sin árboles, ruinas, edificios, obra ni terreno acuático/rocoso; en
+otro caso sigue G-26. La huella adicional cierra el paso en `terrainOf`.
+Sol confirmó 18 pruebas focales y que los 66 hashes previos del manifiesto no
+cambiaron. La prueba geométrica cubre las cuatro orientaciones del GLB. En
+semilla 3/año 60 se planifican dos variantes reales, pero las capturas de
+Chrome no permiten leer los peldaños por cámara/oclusiones: **aceptación visual
+fina pendiente**, sin presentarlas como prueba de aspecto. La navegación
+elevada y el adarve continuo siguen abiertos. [G-27](historico/graphics-rounds/G-27.md).
+
 ## 22 sep 2026 · E3, bastión — aprobación, publicación e integración visual
 
 Vera aprobó el aspecto de G-26. Se promovió exactamente el GLB validado
@@ -9,11 +36,12 @@ recurso del render de la atalaya escalada al bastión propio y conectó muros y
 empalizadas vivos a él sin pasar el bastión por el ensamblador de tramos. Sol
 revisó el diff; la prueba rápida importa los GLB publicados de bastión y muro,
 verifica caja 1×1, altura y coincidencia exacta de linde en el muro adyacente.
-Typecheck, lint y tests focales pasan. La captura móvil de año 25/semilla 3
-enseña el cerco pero no encuadra los dos bastiones; la toma amplia quedó
-bloqueada en Chrome. **No se declara todavía aceptación visual de la unión en
-escena real.** El adarve/puesto elevado navegable sigue pendiente, sin tocar
-motor ni físicas. [Contrato](encargos/encargo-e3-integracion-bastion.md).
+Typecheck, lint y tests focales pasan. La primera captura móvil de año
+25/semilla 3 no encuadró los bastiones; después se obtuvo una toma cercana del
+render principal que muestra sin hueco apreciable la junta derecha, mientras
+árboles tapan parcialmente la otra (límites en G-26). El adarve/puesto elevado
+navegable sigue pendiente, sin tocar motor ni físicas.
+[Contrato](encargos/encargo-e3-integracion-bastion.md).
 
 ## 22 sep 2026 · E3, bastión — modelo candidato sin integrar
 

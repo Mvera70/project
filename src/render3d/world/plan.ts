@@ -22,6 +22,7 @@ import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 import { defenceConnections } from './defences';
 import { forestSignature } from './forest-state';
 import { houseVariant } from './house-variation';
+import { bastionAccessOf, type BastionAccess } from '@derive/bastion-access';
 
 export interface PlannedBuilding {
   readonly id: BuildingId;
@@ -51,6 +52,8 @@ export interface PlannedBuilding {
   readonly gate?: 'x' | 'z';
   /** Acabado estable por parcela, ajeno al estado y al azar del motor. */
   readonly variant?: number;
+  /** E3 · Variante visual con escalera y la cara que mira al interior. */
+  readonly bastionAccess?: BastionAccess;
 }
 
 export interface ScenePlan {
@@ -212,6 +215,8 @@ export function planFor(state: GameState): ScenePlan {
         ? { variant: houseVariant(state.seed, building.x, building.y) } : {}),
       ...(connections.has(building.id) ? { connections: connections.get(building.id)! } : {}),
       ...(gates.has(building.id) ? { gate: gates.get(building.id)! } : {}),
+      ...(building.kind === 'bastion' && bastionAccessOf(state, building) !== null
+        ? { asset: 'bastion-access-candidate', bastionAccess: bastionAccessOf(state, building)! } : {}),
     }))
       .sort((a, b) => a.id - b.id),
     works: state.works.map(plannedWork).sort((a, b) => a.id - b.id),
@@ -222,7 +227,8 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
   return a.kind === b.kind && a.x === b.x && a.z === b.z && a.w === b.w && a.h === b.h
     && a.ruin === b.ruin && a.walls === b.walls && a.roof === b.roof
     && a.wallColour === b.wallColour && a.roofColour === b.roofColour && a.roofed === b.roofed
-    && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate && a.variant === b.variant;
+    && a.asset === b.asset && a.connections === b.connections && a.gate === b.gate && a.variant === b.variant
+    && a.bastionAccess?.x === b.bastionAccess?.x && a.bastionAccess?.z === b.bastionAccess?.z;
 }
 
 function sameWork(a: PlannedWork, b: PlannedWork): boolean {

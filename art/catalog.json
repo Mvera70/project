@@ -60,6 +60,42 @@
       }
     },
     {
+      "id": "bastion-access-candidate",
+      "artifactRound": "G-26",
+      "status": "approved",
+      "recipe": "art/recipes/bastion-access-candidate/bastion-access-candidate.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-22-e3-visual-46e5a10c4d33361c",
+        "directory": "artifacts/graphics/E3-access-candidate"
+      },
+      "bounds": {
+        "min": [0, 0, 0],
+        "max": [1, 1.36, 2],
+        "size": [1, 1.36, 2]
+      },
+      "recipeSha256": "775EB66BB8B2DC754079EE1397B11A4A23EEA4B242B460C3A92F49400EAD7C5D",
+      "materials": ["stone", "mortar"],
+      "clips": [],
+      "motion": [],
+      "connectors": [],
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 1236
+      },
+      "hashes": {
+        "bastion-access-candidate.glb": "46E5A10C4D33361C1F36E5E18E6A06B5619A0B867C4EFD82EB3332A9FC1D503D"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Candidato E3 de escalera interior, aprobado provisionalmente el 22 sep 2026; deriva de G-26 sin sobrescribirlo.",
+        "license": "Project original"
+      }
+    },
+    {
       "id": "bow",
       "artifactRound": "G-24",
       "status": "study",

@@ -52,12 +52,15 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 - [Primera tanda de modelos, 20 sep](graphics-rounds/modelos-pendientes-2026-09-20.md):
   siete recetas y exportaciones verificadas; sin publicación en el juego.
 
+- [G-27: escalera visual del bastión](graphics-rounds/G-27.md): GLB publicado,
+  selección y colisión coherentes; subida y aceptación visual fina pendientes.
+
 Uno por ronda, con lo que se midió y en qué quedó. Se citan desde el código y
 desde `design.md` para explicar una decisión concreta.
 
 | Carpeta | Qué hay |
 |---|---|
-| `graphics-rounds/` | Las rondas de gráficos **G-00 a G-26**, con sus prompts, sus traspasos y los encargos de Blender de la aldea y los aldeanos |
+| `graphics-rounds/` | Las rondas de gráficos **G-00 a G-27**, con sus prompts, sus traspasos y los encargos de Blender de la aldea y los aldeanos |
 | `life-rounds/` | Las rondas de la vida del valle: **V-00 a V-14** (la capa de vida) e **IA-0 a IA-18** (la IA escénica), más la sonda de línea base y la evidencia en capturas |
 | `sesiones/` | Notas de sesión |
 

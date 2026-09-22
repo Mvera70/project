@@ -85,6 +85,8 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-e0-ambiente-eras.md` | Contrato de E0e: caminos, plaza y humo según era; código entregado, aceptación visual pendiente en `historico/life-rounds/E0e-ambiente-eras.md` |
 | `encargos/encargo-e3-modelo-bastion.md` | Sólo modelo 3D del bastión E3; fuente validada y apariencia aprobada por Vera |
 | `encargos/encargo-e3-integracion-bastion.md` | Admisión y conexión visual del bastión E3 aprobado; el adarve navegable queda aparte |
+| `encargos/encargo-e3-acceso-elevado.md` | Contrato de subida real al puesto del bastión; separa ese alcance del adarve continuo sobre toda la muralla |
+| `encargos/encargo-e3-escalera-visual.md` | Integración visual acotada de la escalera aceptada; navegación elevada diferida |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
 | `encargos/encargo-fuente.md` | La fuente de la plaza (P-3) |
 | `encargos/respuesta-sesion-blender.md` | Contexto para la sesión de Blender sobre los aldeanos nuevos |
