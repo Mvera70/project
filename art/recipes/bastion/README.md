@@ -1,4 +1,4 @@
-# Bastión E3 · candidato sin integrar
+# Bastión E3 · fuente canónica
 
 Fuente canónica: `bastion.json`. El `.blend` es un producto generado, no una
 segunda fuente editable. `review.py` sólo importa el GLB candidato y los GLB
@@ -7,8 +7,10 @@ aprobados de referencia para medir y fotografiar; no exporta otros modelos.
 El CLI genérico `game-dev` no estaba disponible. Se utilizó el pipeline nativo
 del repositorio con Blender 5.2.1 LTS, sin proveedor ni generación de pago.
 `G-26` estaba libre y es el identificador técnico de corrida porque el esquema
-del runner sólo admite `G-XX`. La entrada de catálogo permanece `study`, con
-`approved: null`; no ejecutar `report` ni `all` hasta otra autorización.
+del runner sólo admite `G-XX`. Vera aprobó la apariencia el 22 sep 2026; la
+entrada de catálogo conserva `status: study` como los demás activos publicados,
+pero ya tiene recibo `approved` y hash. La integración en escena se contrasta
+por separado en `docs/encargos/encargo-e3-integracion-bastion.md`.
 
 ## Forma y coordenadas
 
@@ -75,9 +77,8 @@ silueta del bastión queda separada de la atalaya también en grises.
 
 ## Límites
 
-Modelo candidato validado en bancos aislados, sin aprobación artística final.
-La comparación muestra contacto cardinal ideal; **no prueba el ensamblador del
-juego**. Siguen pendientes la integración de `bastion`, las conexiones de
-defensa, el apoyo elevado real de la guardia y la lectura dentro del valle a
-tamaño móvil y en sus estaciones. No se han editado `src/`, `public/`, física,
-navegación, balance ni activos ajenos. No hay commit, publicación ni promoción.
+La comparación aislada muestra contacto cardinal ideal; **no prueba el
+ensamblador del juego**. La aprobación visual y la publicación del GLB no
+demuestran todavía la lectura dentro del valle a tamaño móvil ni en sus
+estaciones. El apoyo elevado real de la guardia permanece fuera de esta ronda.
+La producción del modelo no cambió física, navegación ni balance.

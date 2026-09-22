@@ -1,6 +1,6 @@
 # The Valley — Documento de diseño detallado
 
-**v4.30 · 22 de septiembre de 2026 (Europe/Madrid) · Sucede a `valle.md` (v1)**
+**v4.31 · 22 de septiembre de 2026, 02:19 (Europe/Madrid) · Sucede a `valle.md` (v1)**
 
 Simulación idle de una aldea medieval para móvil.
 
@@ -148,7 +148,7 @@ no muera nadie no preocupa; el juego se irá haciendo más difícil por ahí.
 |---|---|---|
 | 1 · El caserío | Dos personas, las primeras casas, la primera decisión | Hecha: primera decisión a las 14 h |
 | 2 · La aldea | Oficios, capilla, la piedra | Hecha: edad de piedra a las 61 h |
-| 3 · La villa cerrada | El primer anillo completo, su portón y bastiones; lo de dentro pasa a piedra. El anillo final de cierre de partida queda fuera de esta fase | Hecha: el cierre se celebra, la era se muestra y la piedra se construye; falta arte propio del bastión |
+| 3 · La villa cerrada | El primer anillo completo, su portón y bastiones; lo de dentro pasa a piedra. El anillo final de cierre de partida queda fuera de esta fase | Hecha: el cierre se celebra, la era se muestra y la piedra se construye; el bastión tiene malla propia publicada y conexión visual con el muro. La lectura de esa unión en la escena real sigue por revisar |
 | 4 · El asedio | Lo acumulado y lo decidido atraen asaltos; la aldea se defiende con lo que se le dio; el valle cae o aguanta | Hecha de punta a punta: aviso, guarnición, flechas, cuerpo a cuerpo, portón, saqueo y final. Quedan representación ambiental, identidad del clan, fuego y la decisión de gore |
 
 **La regla nueva, y es una frontera y no una excepción: el asalto se resuelve

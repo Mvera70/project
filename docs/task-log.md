@@ -1,5 +1,20 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E3, bastión — aprobación, publicación e integración visual
+
+Vera aprobó el aspecto de G-26. Se promovió exactamente el GLB validado
+(`F3596D92…8663F`) por el pipeline nativo y se publicó sólo `bastion.glb`:
+las otras 65 entradas del manifiesto permanecieron intactas. Terra cambió el
+recurso del render de la atalaya escalada al bastión propio y conectó muros y
+empalizadas vivos a él sin pasar el bastión por el ensamblador de tramos. Sol
+revisó el diff; la prueba rápida importa los GLB publicados de bastión y muro,
+verifica caja 1×1, altura y coincidencia exacta de linde en el muro adyacente.
+Typecheck, lint y tests focales pasan. La captura móvil de año 25/semilla 3
+enseña el cerco pero no encuadra los dos bastiones; la toma amplia quedó
+bloqueada en Chrome. **No se declara todavía aceptación visual de la unión en
+escena real.** El adarve/puesto elevado navegable sigue pendiente, sin tocar
+motor ni físicas. [Contrato](encargos/encargo-e3-integracion-bastion.md).
+
 ## 22 sep 2026 · E3, bastión — modelo candidato sin integrar
 
 Con autorización de Vera para limitar a Astra al modelado 3D, se creó la

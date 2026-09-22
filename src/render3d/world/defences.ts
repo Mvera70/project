@@ -17,10 +17,16 @@ function isDefence(building: Pick<Building, 'kind' | 'lostTick'>): boolean {
   return building.lostTick === null && (building.kind === 'wall' || building.kind === 'palisade');
 }
 
+/** Piezas que cierran visualmente un tramo, aunque no se ensamblen como él. */
+function isDefenceNeighbour(building: Pick<Building, 'kind' | 'lostTick'>): boolean {
+  return building.lostTick === null
+    && (building.kind === 'wall' || building.kind === 'palisade' || building.kind === 'gate' || building.kind === 'bastion');
+}
+
 /** La diagonal sólo une cuando no existe ya un codo cardinal entre ambos. */
 export function defenceConnections(buildings: readonly Building[]): ReadonlyMap<number, number> {
   const standing = buildings.filter(isDefence);
-  const occupied = new Set(buildings.filter(b => isDefence(b) || (b.kind === 'gate' && b.lostTick === null))
+  const occupied = new Set(buildings.filter(isDefenceNeighbour)
     .map((b) => `${b.x},${b.y}`));
   return new Map(standing.map((b) => {
     let mask = DEFENCE_DIRECTIONS.reduce((value, d) =>

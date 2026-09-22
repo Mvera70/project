@@ -57,7 +57,7 @@ desde `design.md` para explicar una decisión concreta.
 
 | Carpeta | Qué hay |
 |---|---|
-| `graphics-rounds/` | Las rondas de gráficos **G-00 a G-25**, con sus prompts, sus traspasos y los encargos de Blender de la aldea y los aldeanos |
+| `graphics-rounds/` | Las rondas de gráficos **G-00 a G-26**, con sus prompts, sus traspasos y los encargos de Blender de la aldea y los aldeanos |
 | `life-rounds/` | Las rondas de la vida del valle: **V-00 a V-14** (la capa de vida) e **IA-0 a IA-18** (la IA escénica), más la sonda de línea base y la evidencia en capturas |
 | `sesiones/` | Notas de sesión |
 

@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v4.31 · 22 sep 2026, 02:19 · Modelo propio del bastión
+
+§1b corrige el estado visual de la villa cerrada: Vera aprobó la malla propia
+G-26; el GLB se validó, se publicó con hash y el render lo coloca en su celda.
+El muro reconoce al bastión vivo como vecino sin ensamblar la torre como tramo;
+se prueban la caja real y las conexiones. Motivo: la atalaya escalada no leía
+como torre integrada y la junta muro–bastión dejaba un hueco. No se declara
+resuelta la lectura de esa unión en la cámara del juego: la captura móvil no
+incluyó los bastiones y la toma amplia quedó bloqueada en Chrome. Tampoco se
+declara construido el apoyo elevado navegable, que sigue en E3.
+
 ## v4.30 · 22 sep 2026 · Plaza por eras, decisión del dueño
 
 §7.4b deja de exigir empedrado completo desde la fundación: el mismo círculo

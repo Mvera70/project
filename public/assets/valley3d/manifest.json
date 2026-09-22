@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-19T23:51:38.083Z",
-  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bow,spear,arrow,shield,gate,plough,fountain",
+  "generatedAt": "2026-09-22T00:08:14.446Z",
+  "invocation": "npx tsx tools/graphics/publish-assets.ts --ids bastion",
   "assets": [
     {
       "id": "axis-marker",
@@ -903,6 +903,17 @@
       "provenance": {
         "kind": "original",
         "source": "Modelado original para The Valley, encargos de 17–20 sep 2026; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "bastion",
+      "file": "bastion.glb",
+      "sha256": "F3596D92F98E34A6CF90E1C7CF6BDA9490FFCB853CA301F3AC6C4F9F9AE8663F",
+      "motion": [],
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original E3 para The Valley, aprobado visualmente el 22 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     }

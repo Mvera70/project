@@ -8,18 +8,54 @@
       "recipe": "art/recipes/bastion/bastion.json",
       "generator": "tools/art/blender-build.py",
       "blenderVersion": "5.2.1 LTS",
-      "approved": null,
-      "bounds": null,
-      "recipeSha256": null,
-      "materials": ["stone", "mortar"],
+      "approved": {
+        "runId": "2026-09-21T23-56-06-389Z-6004",
+        "directory": "artifacts/graphics/G-26/approved/f3596d92f98e34a6"
+      },
+      "bounds": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          1,
+          1.36,
+          1
+        ],
+        "size": [
+          1,
+          1.36,
+          1
+        ]
+      },
+      "recipeSha256": "984C02E5625CAD99F6A38182F1F8403CEFA2B94C3B13DC94C9F4932DC54E0423",
+      "materials": [
+        "stone",
+        "mortar"
+      ],
       "clips": [],
       "motion": [],
       "connectors": [],
-      "statistics": null,
-      "hashes": null,
+      "statistics": {
+        "objects": 3,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 1092
+      },
+      "hashes": {
+        "bastion.blend": "A45E98F2CF5E95DE0928EDA74AD0672B9341BB587C720CF498EA723A96DD0F80",
+        "bastion.glb": "F3596D92F98E34A6CF90E1C7CF6BDA9490FFCB853CA301F3AC6C4F9F9AE8663F",
+        "bastion-blender.png": "60FC1FBDF9CBBC735CF795C9A4F23CBB006B97FB0262CA7063D0B0A9DC9CFA34",
+        "capture-1.png": "6CA80602A3603B689623DBDC37D372149CC1CA7138D65DF210D935AEB86322A1",
+        "capture-1-gray.png": "D8457E2E5CEF008FDAED19756DAD4FE2DEA1FF71938D6F2940864CA87A56C957",
+        "capture.json": "C5A97A4E8C8499F953E7198C05536EE941389AE731B4BE9AC9CE2DB588B06FAC",
+        "build.json": "B28FC18F8A21A72C8ABD677D301FB0B5FDAF6AF02B87FB13E74F437C50C11075",
+        "validation.json": "F3CD2B478469CDDBBB815938E9B8061CDBC56F1423A01C941E0619F7749A9730"
+      },
       "provenance": {
         "kind": "original",
-        "source": "Modelado original E3. Candidato de bastión; sin aprobación ni integración.",
+        "source": "Modelado original E3 para The Valley, aprobado visualmente el 22 sep 2026; sin proveedor generativo.",
         "license": "Project original"
       }
     },

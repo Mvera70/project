@@ -105,11 +105,7 @@ export const BUILDING_ASSETS: Partial<Record<BuildingKind, string>> = {
   gate: 'gate',
   wall: 'wall',
   watchtower: 'watchtower',
-  // A3 · el bastión. **Todavía sin malla propia** (`docs/encargos-3d.md`): usa
-  // la de la atalaya suelta, que es la pieza que representa lo mismo que da —un
-  // puesto de tiro elevado sobre el cerco—, por el mismo camino que el portón
-  // reutiliza la empalizada.
-  bastion: 'watchtower',
+  bastion: 'bastion',
   grave_yard: 'grave-yard',
   stone_house: 'stone-house',
   granary: 'granary',
@@ -156,7 +152,11 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D): Buil
   // coordenadas del motor. De ahi venian tres cosas que parecian tres fallos
   // distintos: los aldeanos cavando fuera del campo, las ventanas encendidas
   // donde no habia ventana, y la gente cruzando paredes.
-  group.position.set(planned.x, 0, planned.z + planned.h);
+  // Los recursos anteriores salen del exportador con la huella en Z negativa.
+  // G-26 es la excepción deliberada: su caja local es 0..1 en X/Z, así que
+  // sumarle la altura la echaría una celda al sur. No se normaliza el catálogo
+  // entero por una pieza nueva; se conserva la colocación validada de cada una.
+  group.position.set(planned.x, 0, planned.asset === 'bastion' ? planned.z : planned.z + planned.h);
   group.userData.buildingId = planned.id;
   let model = source;
   if (planned.ruin && planned.asset?.startsWith('ruin-')) {
