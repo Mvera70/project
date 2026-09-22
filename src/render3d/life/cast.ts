@@ -130,6 +130,7 @@ export function castOf(
       id: dweller.villager,
       x: body.x,
       z: body.z,
+      ...(body.y === undefined ? {} : { y: body.y }),
       facing: combat?.facing ?? body.facing,
       activity: activityOf(dweller, moving),
       clip,
@@ -198,6 +199,7 @@ export function castOf(
       id: body.id,
       x: body.x,
       z: body.z,
+      ...(body.y === undefined ? {} : { y: body.y }),
       facing: raider.phase === 'down' ? raider.meleeFacing ?? body.facing : melee?.facing ?? body.facing,
       // Andando o plantado. `walking`/`resting` son las dos únicas actividades
       // que un forastero puede tener: no trabaja, no vuelve a casa y no tiene

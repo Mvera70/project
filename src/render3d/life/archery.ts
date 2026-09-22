@@ -144,6 +144,40 @@ const BODY_TOP = 0.7;
 const LOOSE_HEIGHT = 2.3;
 const CHEST = 0.4;
 
+/**
+ * Cota local del grip `hand_l` al comienzo de `bow_draw`/`bow_loose`.
+ *
+ * El clip se construye desde `idle`: al evaluar el GLB publicado en t=0, el
+ * grip queda a 0,42863 sobre los pies. La flecha no tiene un hueso `nock` ni
+ * `arrow_exit`, por lo que éste es el origen reproducible más próximo al arma,
+ * no una altura de parapeto inventada. X/Z nacen del cuerpo que ocupa el
+ * puesto y se desplazan sólo por el conector medido, rotado con su `facing`.
+ */
+export const ELEVATED_BOW_GRIP = { x: -0.020588, y: 0.428627, z: 0.243754 } as const;
+
+type ArcherPosition = { readonly x: number; readonly y: number; readonly z: number };
+type OccupantPosition = { readonly x: number; readonly y?: number; readonly z: number };
+
+function shotOrigin(archer: Archer, positions: ReadonlyMap<string, OccupantPosition>, facing?: number): ArcherPosition | null {
+  if (archer.post.elevated === undefined) {
+    return { x: archer.post.place.at.x, y: LOOSE_HEIGHT, z: archer.post.place.at.z };
+  }
+  const body = positions.get(archer.post.place.id);
+  if (body === undefined || body.y === undefined) return null;
+  const yaw = facing ?? archer.facing ?? Math.atan2(
+    archer.post.elevated.approach.x - archer.post.elevated.foot.x,
+    archer.post.elevated.approach.z - archer.post.elevated.foot.z,
+  );
+  // Matriz de yaw de Three: el grip sigue el cuerpo real, no la plaza de
+  // aproximación. Con la escalera hacia +Z, mirando exterior -Z, resulta
+  // (.520588, 1.448627, .336246), la medición del GLB a t=0.
+  return {
+    x: body.x + ELEVATED_BOW_GRIP.x * Math.cos(yaw) + ELEVATED_BOW_GRIP.z * Math.sin(yaw),
+    y: body.y + ELEVATED_BOW_GRIP.y,
+    z: body.z - ELEVATED_BOW_GRIP.x * Math.sin(yaw) + ELEVATED_BOW_GRIP.z * Math.cos(yaw),
+  };
+}
+
 /** Los arqueros de hoy, de los puestos que tienen arco. */
 export function archersOf(manned: readonly Manned[]): Archer[] {
   return manned
@@ -192,9 +226,8 @@ export function aimAt(
  * una sola pasada: la segunda corrección vale menos que el ancho de un cuerpo.
  */
 function targetFor(
-  archer: Archer, raiders: readonly Raider[],
+  from: ArcherPosition, raiders: readonly Raider[],
 ): { at: { x: number; y: number; z: number }; raider: Raider } | null {
-  const from = { x: archer.post.place.at.x, y: LOOSE_HEIGHT, z: archer.post.place.at.z };
   let best: Raider | null = null;
   let bestGap = BOW_RANGE;
   for (const raider of raiders) {
@@ -240,18 +273,36 @@ export function stepArchery(
    * tarda en llegar. Quien llama sabe quién ha llegado, y lo dice aquí.
    */
   occupied: ReadonlySet<string>,
+  /** Posición real de quien ocupa los puestos elevados; el suelo conserva su origen previo. */
+  positions: ReadonlyMap<string, OccupantPosition> = new Map(),
 ): void {
   for (const archer of archers) {
     if (!occupied.has(archer.post.place.id)) continue;
-    const target = targetFor(archer, raiders);
+    // Primero se elige desde el cuerpo. Después se rota el grip hacia ese
+    // blanco y se vuelve a elegir desde la mano: no nace con el yaw del tiro
+    // anterior cuando cambia de saqueador.
+    const base = archer.post.elevated === undefined
+      ? shotOrigin(archer, positions)
+      : (() => {
+        const body = positions.get(archer.post.place.id);
+        return body?.y === undefined ? null : { x: body.x, y: body.y + ELEVATED_BOW_GRIP.y, z: body.z };
+      })();
+    if (base === null) continue;
+    const firstTarget = targetFor(base, raiders);
+    if (firstTarget === null) continue;
+    const firstFacing = Math.atan2(firstTarget.at.x - base.x, firstTarget.at.z - base.z);
+    const from = shotOrigin(archer, positions, firstFacing);
+    if (from === null) continue;
+    const target = targetFor(from, raiders);
     if (target === null) continue;
-    archer.facing = Math.atan2(target.at.x - archer.post.place.at.x, target.at.z - archer.post.place.at.z);
+    archer.facing = Math.atan2(target.at.x - from.x, target.at.z - from.z);
+    const finalFrom = shotOrigin(archer, positions, archer.facing);
+    if (finalFrom === null) continue;
     if (step < archer.nextShot) continue;
-    const from = { x: archer.post.place.at.x, y: LOOSE_HEIGHT, z: archer.post.place.at.z };
-    const velocity = aimAt(from, target.at);
+    const velocity = aimAt(finalFrom, target.at);
     if (velocity === null) continue;
     arrows.push({
-      body: physics.launch(from, velocity),
+      body: physics.launch(finalFrom, velocity),
       from: archer.post.place.id,
       loosed: step,
       spent: false,

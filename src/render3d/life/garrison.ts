@@ -20,16 +20,20 @@
 // porque `garrisonOf` no los da.
 
 import { garrisonOf, type Arm, type Post } from '@derive/garrison';
+import { bastionAccessOf } from '@derive/bastion-access';
 import type { GameState } from '@engine/state';
 import type { Point, Terrain } from './body';
 import { fitsCircle } from './body';
 import { canReach } from './terrain';
+import { elevatedPostOf, type ElevatedPost } from './elevated-post';
 import { OFFERS, placedOffer, type OfferSpec, type Place } from './offers';
 
 /** Un puesto ocupado: el sitio donde se está y lo que se sabe de él. */
 export interface Manned {
   readonly place: Place;
   readonly post: Post;
+  /** E3a · Acceso privado al bastión; no es una plaza de navegación pública. */
+  readonly elevated?: ElevatedPost;
   /** Hacia dónde mira quien está ahí: afuera, que es de donde vienen. */
   readonly facing: Point;
 }
@@ -106,13 +110,28 @@ function offerFor(arm: Arm): OfferSpec {
  */
 export function garrisonPlaces(
   state: GameState, land: Terrain, heart: Point, reach?: Uint8Array,
+  ground?: (x: number, z: number) => number,
 ): Manned[] {
   const garrison = garrisonOf(state);
   if (!garrison.manned) return [];
   const manned: Manned[] = [];
   const taken = new Set<number>();
   for (const post of garrison.posts) {
-    const at = postSpot(land, post, heart, reach, taken);
+    // Se busca por el edificio real, no por `post.on`: ambos bastión y
+    // atalaya son `tower` para la táctica, pero sólo el primero tiene escalera.
+    const bastion = state.buildings.find(building => building.kind === 'bastion'
+      && building.lostTick === null && building.x === post.x && building.y === post.y);
+    const access = bastion === undefined ? null : bastionAccessOf(state, bastion);
+    const elevated = access === null || bastion === undefined
+      ? null : elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground);
+    const entry = elevated?.approach;
+    const entryCell = entry === undefined ? -1 : Math.floor(entry.z) * land.width + Math.floor(entry.x);
+    const usingElevated = entry !== undefined && !taken.has(entryCell);
+    // `Place` sólo entiende suelo X/Z: la cota queda exclusivamente en la
+    // ruta privada y no puede filtrarse al router como un destino elevado.
+    const at = usingElevated
+      ? { x: entry.x, z: entry.z }
+      : postSpot(land, post, heart, reach, taken);
     if (at === null) continue;
     taken.add(Math.floor(at.z) * land.width + Math.floor(at.x));
     // Una plaza y su sitio dado: un puesto es de uno, y no se reparte en corro
@@ -122,6 +141,7 @@ export function garrisonPlaces(
     manned.push({
       place: { id: `post:${post.on}:${post.x},${post.y}`, at, offers: [offer] },
       post,
+      ...(elevated === null || !usingElevated ? {} : { elevated }),
       // Mirando afuera: el puesto está entre quien lo ocupa y el camino, así
       // que la celda de la muralla **es** la dirección de la amenaza.
       facing: { x: post.x + 0.5, z: post.y + 0.5 },

@@ -85,6 +85,15 @@ describe('D4 · el cuerpo a cuerpo', () => {
     expect(them[0]?.hits).toBe(0);
   });
 
+  it('un saqueador al pie no alcanza al guardia que ocupa la plataforma', () => {
+    const enemy = raider(10, 10);
+    const above = defender(10.1, 10, 'spear');
+    const elevated = { ...above, at: { x: 10.1, y: 1.02, z: 10 } };
+    brawl([enemy], [elevated], 90);
+    expect(elevated.hits).toBe(0);
+    expect(enemy.hits).toBe(0);
+  });
+
   it('al alcance, los dos se golpean y alguno cae', () => {
     const them = [raider(10, 10)];
     const us = [defender(10.5, 10, 'spear')];

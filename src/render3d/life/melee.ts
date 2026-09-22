@@ -57,7 +57,7 @@ export function meleePose(body: MeleeGesture, step: number):
 export interface Defender extends MeleeGesture {
   downAt?: number;
   /** El cuerpo, para medir distancias. */
-  readonly at: { readonly x: number; readonly z: number };
+  readonly at: { readonly x: number; readonly y?: number; readonly z: number };
   /** Qué puesto ocupa: con lanza se pelea mejor que con un arco tensado. */
   readonly post: Manned;
   /** Los golpes que lleva encima. */
@@ -116,7 +116,10 @@ export function stepMelee(
     let best = REACH;
     for (const defender of defenders) {
       if (defender.down) continue;
-      const gap = Math.hypot(defender.at.x - raider.body.x, defender.at.z - raider.body.z);
+      // E3a: un atacante al pie no alcanza a un guardia en el adarve. La
+      // distancia sigue siendo la misma para todo puesto de suelo (y=0).
+      const gap = Math.hypot(defender.at.x - raider.body.x,
+        (defender.at.y ?? 0) - (raider.body.y ?? 0), defender.at.z - raider.body.z);
       if (gap >= best) continue;
       best = gap;
       target = defender;

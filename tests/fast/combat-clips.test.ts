@@ -13,7 +13,7 @@ import { stepRaider, type Gate, type Raider } from '../../src/render3d/life/raid
 import { stepMelee } from '../../src/render3d/life/melee';
 import { archersOf, stepArchery } from '../../src/render3d/life/archery';
 import type { Manned } from '../../src/render3d/life/garrison';
-import { createPhysics } from '../../src/render3d/life/physics';
+import { createPhysics, type Physics } from '../../src/render3d/life/physics';
 
 let model: Object3D, clips: AnimationClip[];
 beforeAll(async () => {
@@ -169,6 +169,53 @@ describe('E1 · el hecho decide la pose', () => {
       stepArchery(archers, [enemy], arrows, physics, 200, new Set());
       expect(arrows).toHaveLength(3);
     } finally { physics.dispose(); }
+  });
+
+  it('un bastión no dispara desde la escalera y, ocupado, suelta desde el grip medido', () => {
+    const launched: Array<{ x: number; y: number; z: number }> = [];
+    const physics = {
+      launch(at: { x: number; y: number; z: number }) {
+        launched.push(at);
+        return { at, resting: false, remove() {} };
+      },
+    } as unknown as Physics;
+    const elevated = {
+      access: { x: 0, z: 1 },
+      approach: { x: .5, y: 0, z: 2.4 }, foot: { x: .5, y: 0, z: 2 },
+      supports: [], exit: { x: .5, y: 1.02, z: 1 }, post: { x: .5, y: 1.02, z: .58 },
+      climb: [], descent: [],
+    };
+    const post = { place: { id: 'high-bow', at: { x: .5, z: 2.4 } }, post: { arm: 'bow' }, elevated,
+      facing: { x: .5, z: 0 } } as unknown as Manned;
+    const archer = archersOf([post])[0]!;
+    archer.facing = Math.PI;
+    const enemy = raider(); enemy.body.x = .5; enemy.body.z = -4;
+    const arrows: Parameters<typeof stepArchery>[2] = [];
+
+    stepArchery([archer], [enemy], arrows, physics, 0, new Set(['high-bow']));
+    expect(launched, 'la aproximación no basta para disparar').toEqual([]);
+    stepArchery([archer], [enemy], arrows, physics, 1, new Set(['high-bow']),
+      new Map([['high-bow', { x: .5, y: 1.02, z: .58 }]]));
+
+    expect(launched).toHaveLength(1);
+    const firstFacing = archer.facing!;
+    const first = launched[0]!;
+    expect(first.x).toBeCloseTo(.5 + -.020588 * Math.cos(firstFacing)
+      + .243754 * Math.sin(firstFacing), 6);
+    expect(launched[0]?.y).toBeCloseTo(1.448627, 6);
+    expect(first.z).toBeCloseTo(.58 - -.020588 * Math.sin(firstFacing)
+      + .243754 * Math.cos(firstFacing), 6);
+
+    // Cambiar de flanco no recicla el yaw de la suelta anterior: el siguiente
+    // origen rota con la mano hacia el nuevo saqueador.
+    enemy.body.x = 5; enemy.body.z = .58;
+    stepArchery([archer], [enemy], arrows, physics, 64, new Set(['high-bow']),
+      new Map([['high-bow', { x: .5, y: 1.02, z: .58 }]]));
+    const second = launched[1]!;
+    expect(second.x).toBeCloseTo(.5 + -.020588 * Math.cos(archer.facing!)
+      + .243754 * Math.sin(archer.facing!), 6);
+    expect(second.z).toBeCloseTo(.58 - -.020588 * Math.sin(archer.facing!)
+      + .243754 * Math.cos(archer.facing!), 6);
   });
 
   it('el golpe fatal llega al reparto en el mismo fotograma y se queda al final', () => {

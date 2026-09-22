@@ -13,6 +13,8 @@
 export interface Point { x: number; z: number }
 
 export interface Body extends Point {
+  /** Cota absoluta de pies fuera del suelo; ausente para quienes pisan terreno. */
+  y?: number;
   readonly id: number;
   vx: number;
   vz: number;

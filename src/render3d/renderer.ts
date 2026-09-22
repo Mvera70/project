@@ -827,7 +827,9 @@ export async function createGraphicsRenderer(
         },
         partners: dweller.scene === null ? [] : [dweller.scene.a, dweller.scene.b],
         x: round(dweller.body.x),
+        y: round(dweller.body.y ?? groundFloor(dweller.body.x, dweller.body.z)),
         z: round(dweller.body.z),
+        elevated: dweller.elevated?.phase ?? null,
         vx: round(dweller.body.vx),
         vz: round(dweller.body.vz),
         facing: round(dweller.body.facing),
@@ -867,6 +869,7 @@ export async function createGraphicsRenderer(
       // se mueve con el clip de estarse quieto, o al revés.
       actors: lastActors.map((actor) => ({
         id: actor.id,
+        y: round(actor.y ?? groundFloor(actor.x, actor.z)),
         age: actor.age,
         named: actor.named,
         clip: actor.clip,
@@ -1246,7 +1249,7 @@ export async function createGraphicsRenderer(
           : actor.talking ? 'chat' : (actor.clip === 'idle' && Math.floor(frame.presentationSeconds + actor.id * 1.7) % 12 < 3 ? mood : undefined);
         if (bubble === undefined) continue;
         carried.set(actor.id, bubble);
-        heads.set(actor.id, { x: actor.x, y: groundFloor(actor.x, actor.z), z: actor.z });
+        heads.set(actor.id, { x: actor.x, y: actor.y ?? groundFloor(actor.x, actor.z), z: actor.z });
       }
       // **Y como mucho tres a la vez.** Mirando diez frames seguidos, lo que más
       // se movía en pantalla eran las nubes «…»: ocho o diez a la vez sobre la
@@ -1614,7 +1617,7 @@ interface LifeSnapshot {
   readonly renderedGates: readonly { readonly id: number; readonly x: number; readonly z: number;
     readonly offset: readonly number[]; readonly rotation: readonly number[] }[];
   readonly nightOutcomes: readonly { readonly tick: number; readonly residents: number; readonly sleeping: number; readonly pending: readonly number[] }[];
-  readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly z: number;
+  readonly renderedPeople: readonly { readonly id: number; readonly x: number; readonly y: number; readonly z: number;
     readonly scale: number; readonly held: readonly string[] }[];
   readonly bubbles: readonly { readonly id: number; readonly kind: Bubble }[];
   readonly buildings: readonly { readonly id: number; readonly kind: string; readonly x: number;
@@ -1666,7 +1669,7 @@ interface LifeSnapshot {
       readonly phase: 'return'; readonly route: number };
     readonly flight: null | { readonly since: number;
       readonly target: { readonly x: number; readonly z: number }; readonly sheltered: boolean };
-    readonly x: number; readonly z: number;
+    readonly x: number; readonly y: number; readonly z: number; readonly elevated: string | null;
     readonly vx: number; readonly vz: number;
     readonly facing: number; readonly pace: number;
     readonly needs: Readonly<Record<string, number>>;
@@ -1687,7 +1690,7 @@ interface LifeSnapshot {
     readonly x: number; readonly z: number; readonly doing: string | null;
   }[];
   readonly actors: readonly {
-    readonly id: number; readonly age: number; readonly named: boolean;
+    readonly id: number; readonly y: number; readonly age: number; readonly named: boolean;
     readonly clip: string; readonly load: 'bundle' | 'stone' | 'grain' | null; readonly activity: string;
     readonly weapon: 'bow' | 'spear' | null; readonly shield: boolean;
     readonly talking: boolean; readonly arguing: boolean;

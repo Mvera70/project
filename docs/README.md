@@ -88,6 +88,7 @@ propio documento con medidas y presupuesto de triángulos.
 | `encargos/encargo-e3-modelo-bastion.md` | Sólo modelo 3D del bastión E3; fuente validada y apariencia aprobada por Vera |
 | `encargos/encargo-e3-integracion-bastion.md` | Admisión y conexión visual del bastión E3 aprobado; el adarve navegable queda aparte |
 | `encargos/encargo-e3-acceso-elevado.md` | Contrato de subida real al puesto del bastión; separa ese alcance del adarve continuo sobre toda la muralla |
+| `encargos/encargo-e3-puesto-navegable.md` | Ejecución acotada E3a: ruta privada, cota, arquería y física; cierre en `historico/graphics-rounds/G-29.md` |
 | `encargos/encargo-e3-escalera-visual.md` | Integración visual acotada de la escalera aceptada; navegación elevada diferida |
 | `encargos/encargo-e3-emplazamiento-accesible.md` | Selección de muros aptos para que la escalera opcional aparezca en partidas históricas reales |
 | `encargos/encargo-arado.md` | La malla del arado (M-3) |
@@ -110,7 +111,7 @@ una decisión vieja, nunca para saber qué hacer ahora — para eso está
 | `historico/next-plan.md` | Los briefs de la auditoría (15 sep) | **Entregado**: U-10 a U-14 |
 | `historico/brief-reloj.md` | Qué costaba afinar el tick (14 sep) | **Entregado**: v3.72, el reloj con horas |
 | `historico/life-ai-proposal.md` | Propuesta de IA para aldeanos y fauna (16 sep) | **Superada** por las rondas IA-1 a IA-18, que sí están implementadas |
-| `historico/graphics-rounds/` | El informe de cada ronda de gráficos (G-xx) | Cerradas: G-00 a G-25 |
+| `historico/graphics-rounds/` | El informe de cada ronda de gráficos (G-xx) | Cerradas: G-00 a G-29; E3 sigue parcial porque falta el adarve continuo |
 | `historico/life-rounds/` | El informe de cada ronda de la vida del valle (V-xx, IA-xx) | Cerradas: V-00 a V-14, IA-0 a IA-18 |
 | `historico/sesiones/` | Notas de sesión | — |
 

@@ -308,7 +308,7 @@ export class Cast {
         this.group.add(object);
       }
 
-      player.object.position.set(actor.x, this.ground(actor.x, actor.z), actor.z);
+      player.object.position.set(actor.x, actor.y ?? this.ground(actor.x, actor.z), actor.z);
       player.object.rotation.set(0, actor.facing, 0);
       // La talla se pone en cada pasada y no al crear: un nino cumple anos sin
       // dejar de ser el mismo actor, y tiene que ir creciendo.
@@ -350,11 +350,11 @@ export class Cast {
    * La talla ya está en `object.scale`, incluida la de niños y nombrados.
    */
   captureRagdoll(id: VillagerId, bornAt: number,
-    placement?: { readonly x: number; readonly z: number; readonly facing: number }): RagdollSeed | null {
+    placement?: { readonly x: number; readonly y?: number; readonly z: number; readonly facing: number }): RagdollSeed | null {
     const player = this.players.get(id);
     if (player === undefined) return null;
     if (placement !== undefined) {
-      player.object.position.set(placement.x, this.ground(placement.x, placement.z), placement.z);
+      player.object.position.set(placement.x, placement.y ?? this.ground(placement.x, placement.z), placement.z);
       player.object.rotation.set(0, placement.facing, 0);
     }
     this.restoreBind(player);
@@ -580,8 +580,9 @@ export class Cast {
   }
 
   /** Posiciones de las mallas colocadas, para contrastarlas con sus cuerpos. */
-  snapshot(): { id: number; x: number; z: number; scale: number; clip: string | null; weight: number; held: string[] }[] {
-    return [...this.players].map(([id, player]) => ({ id, x: player.object.position.x, z: player.object.position.z,
+  snapshot(): { id: number; x: number; y: number; z: number; scale: number; clip: string | null; weight: number; held: string[] }[] {
+    return [...this.players].map(([id, player]) => ({ id, x: player.object.position.x, y: player.object.position.y,
+      z: player.object.position.z,
       scale: player.object.scale.x,
       clip: player.playing, weight: player.playing === null ? 0 : player.actions.get(player.playing)?.getEffectiveWeight() ?? 0,
       held: [...player.held].filter(([, object]) => object.visible).map(([name]) => name),

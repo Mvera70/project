@@ -4,6 +4,7 @@ import type RAPIER_NS from '@dimforge/rapier3d-compat';
 import type { PhysicalRotation, PhysicalVector, RagdollPose, RagdollSeed } from '../contracts';
 import { LIFE_STEP } from './clock';
 import type { Point, Solid, Terrain } from './body';
+import type { BastionAccess } from '@derive/bastion-access';
 import { buildRagdoll, type RagdollRuntime } from './ragdoll';
 
 type Rapier = typeof RAPIER_NS;
@@ -29,6 +30,53 @@ export interface PhysicsObstacle {
   readonly rotation?: PhysicalRotation;
 }
 
+/**
+ * Los únicos prismas altos del GLB G-27: Parapet_0/1/3 y los siete `*Merlon`.
+ * Las cotas y cajas salen literalmente de
+ * `art/recipes/bastion-access-candidate/bastion-access-candidate.json`;
+ * no se cierra la cara interior, que es la escalera publicada.
+ */
+const BASTION_PARAPETS: readonly {
+  readonly x: number; readonly z: number; readonly y: number;
+  readonly halfX: number; readonly halfZ: number; readonly halfY: number;
+}[] = [
+  // Parapet_0, Parapet_1, Parapet_3.
+  { x: 0.5, z: 0.08, y: 1.09, halfX: 0.48, halfZ: 0.07, halfY: 0.07 },
+  { x: 0.08, z: 0.5, y: 1.09, halfX: 0.07, halfZ: 0.34, halfY: 0.07 },
+  { x: 0.92, z: 0.5, y: 1.09, halfX: 0.07, halfZ: 0.34, halfY: 0.07 },
+  // CornerMerlon_NE/SE/NW/SW.
+  { x: 0.08, z: 0.12, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  { x: 0.08, z: 0.88, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  { x: 0.92, z: 0.12, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  { x: 0.92, z: 0.88, y: 1.26, halfX: 0.07, halfZ: 0.11, halfY: 0.1 },
+  // CenterMerlon_0/1/3. No existe CenterMerlon_2 en la cara de acceso.
+  { x: 0.5, z: 0.08, y: 1.26, halfX: 0.1, halfZ: 0.07, halfY: 0.1 },
+  { x: 0.08, z: 0.5, y: 1.26, halfX: 0.07, halfZ: 0.1, halfY: 0.1 },
+  { x: 0.92, z: 0.5, y: 1.26, halfX: 0.07, halfZ: 0.1, halfY: 0.1 },
+];
+
+/** Los prismas de piedra del bastión accesible, ya rotados alrededor de su celda. */
+export function bastionParapetObstacles(origin: Point, access: BastionAccess): PhysicsObstacle[] {
+  const angle = bastionAngle(access);
+  const sin = Math.sin(angle), cos = Math.cos(angle);
+  const rotation = angle === 0 ? undefined : { x: 0, y: Math.sin(angle / 2), z: 0, w: Math.cos(angle / 2) };
+  return BASTION_PARAPETS.map((piece) => {
+    const u = piece.x - 0.5, v = piece.z - 0.5;
+    return {
+      at: { x: origin.x + 0.5 + u * cos + v * sin, y: piece.y,
+        z: origin.z + 0.5 - u * sin + v * cos },
+      halfExtents: { x: piece.halfX, y: piece.halfY, z: piece.halfZ },
+      ...(rotation === undefined ? {} : { rotation }),
+    };
+  });
+}
+
+function bastionAngle(access: BastionAccess): number {
+  if (access.x === 1) return Math.PI / 2;
+  if (access.x === -1) return -Math.PI / 2;
+  return access.z === -1 ? Math.PI : 0;
+}
+
 export interface DebrisSpec {
   readonly id: string;
   readonly at: PhysicalVector;
@@ -44,6 +92,8 @@ export interface PhysicsOptions {
   /** La misma función que `Cast.standOn`/`groundFloor`; nunca se sustituye por y=0. */
   readonly ground?: ((x: number, z: number) => number) | undefined;
   readonly obstacles?: readonly PhysicsObstacle[];
+  /** Celdas de bastión cuyo suelo físico es la plataforma elevada, no la almena. */
+  readonly platformCells?: readonly Point[];
   readonly maxRagdolls?: number;
   readonly maxDebris?: number;
 }
@@ -83,6 +133,8 @@ interface LiveBody {
 /** Gravedad real pasada a celdas: una celda son tres metros. */
 const GRAVITY = -9.81 / 3;
 const WALL_HEIGHT = 2;
+/** E3a · la cota de pies aprobada del puesto elevado. */
+export const PLATFORM_HEIGHT = 1.02;
 const ARROW_RADIUS = 0.08;
 const ARROW_DRAG = 0.2;
 const RESTING_SPEED = 0.5;
@@ -100,7 +152,7 @@ export async function createPhysics(land: Terrain, options: PhysicsOptions = {})
   world.timestep = LIFE_STEP;
   const ground = options.ground ?? (() => 0);
   addGround(rapier, world, land, ground);
-  addObstacles(rapier, world, land, ground, options.obstacles ?? []);
+  addObstacles(rapier, world, land, ground, options.obstacles ?? [], options.platformCells ?? []);
 
   const bodies = new Set<LiveBody>();
   const ragdolls = new Map<string, {
@@ -222,20 +274,19 @@ function addGround(RAPIER: Rapier, world: RAPIER_NS.World, land: Terrain,
 }
 
 function addObstacles(RAPIER: Rapier, world: RAPIER_NS.World, land: Terrain,
-  ground: (x: number, z: number) => number, extra: readonly PhysicsObstacle[]): void {
+  ground: (x: number, z: number) => number, extra: readonly PhysicsObstacle[],
+  platformCells: readonly Point[]): void {
+  const platforms = platformCellKeys(land, platformCells);
   for (let z = 0; z < land.height; z += 1) for (let x = 0; x < land.width; x += 1) {
     if (land.blocked[z * land.width + x] !== 1) continue;
     const y = safeGround(ground, x + 0.5, z + 0.5);
-    world.createCollider(RAPIER.ColliderDesc.cuboid(0.5, WALL_HEIGHT / 2, 0.5)
-      .setTranslation(x + 0.5, y + WALL_HEIGHT / 2, z + 0.5));
+    addWallCollider(RAPIER, world, x, z, x + 1, z + 1, y,
+      platforms.has(cellKey(land, x, z)) ? PLATFORM_HEIGHT : y + WALL_HEIGHT);
   }
   const seen = new Set<Solid>();
   for (const list of land.solids?.values() ?? []) for (const solid of list) {
     if (seen.has(solid)) continue; seen.add(solid);
-    const x = (solid.minX + solid.maxX) / 2, z = (solid.minZ + solid.maxZ) / 2;
-    const y = safeGround(ground, x, z);
-    world.createCollider(RAPIER.ColliderDesc.cuboid(Math.max(0.01, (solid.maxX - solid.minX) / 2),
-      WALL_HEIGHT / 2, Math.max(0.01, (solid.maxZ - solid.minZ) / 2)).setTranslation(x, y + WALL_HEIGHT / 2, z));
+    addSolidColliders(RAPIER, world, land, ground, solid, platforms);
   }
   for (const obstacle of extra) {
     const desc = RAPIER.ColliderDesc.cuboid(obstacle.halfExtents.x, obstacle.halfExtents.y, obstacle.halfExtents.z)
@@ -244,6 +295,56 @@ function addObstacles(RAPIER: Rapier, world: RAPIER_NS.World, land: Terrain,
     world.createCollider(desc);
   }
 }
+
+/** Un cubo de piedra con suelo y techo absolutos. */
+function addWallCollider(RAPIER: Rapier, world: RAPIER_NS.World,
+  minX: number, minZ: number, maxX: number, maxZ: number, floor: number, ceiling: number): void {
+  const x = (minX + maxX) / 2, z = (minZ + maxZ) / 2;
+  const height = Math.max(0.01, ceiling - floor);
+  world.createCollider(RAPIER.ColliderDesc.cuboid(Math.max(0.01, (maxX - minX) / 2), height / 2,
+    Math.max(0.01, (maxZ - minZ) / 2)).setTranslation(x, floor + height / 2, z));
+}
+
+/**
+ * `terrainOf` puede aportar a la vez máscara y sólidos para el mismo bastión.
+ * Por eso se parte el sólido en la rejilla de las celdas de plataforma: bajar
+ * sólo el `blocked` dejaría encima un segundo collider de altura de muralla.
+ */
+function addSolidColliders(RAPIER: Rapier, world: RAPIER_NS.World, land: Terrain,
+  ground: (x: number, z: number) => number, solid: Solid, platforms: ReadonlySet<number>): void {
+  const xs = splitEdges(solid.minX, solid.maxX, true, land, platforms);
+  const zs = splitEdges(solid.minZ, solid.maxZ, false, land, platforms);
+  for (let xi = 0; xi < xs.length - 1; xi += 1) for (let zi = 0; zi < zs.length - 1; zi += 1) {
+    const minX = xs[xi]!, maxX = xs[xi + 1]!, minZ = zs[zi]!, maxZ = zs[zi + 1]!;
+    const x = (minX + maxX) / 2, z = (minZ + maxZ) / 2;
+    const cellX = Math.floor(x), cellZ = Math.floor(z);
+    const floor = safeGround(ground, x, z);
+    const ceiling = platforms.has(cellKey(land, cellX, cellZ)) ? PLATFORM_HEIGHT : floor + WALL_HEIGHT;
+    addWallCollider(RAPIER, world, minX, minZ, maxX, maxZ, floor, ceiling);
+  }
+}
+
+/** Límites de las celdas rebajadas que de verdad cruzan este sólido. */
+function splitEdges(min: number, max: number, xAxis: boolean, land: Terrain, platforms: ReadonlySet<number>): number[] {
+  const edges = new Set<number>([min, max]);
+  for (const key of platforms) {
+    const cell = xAxis ? key % land.width : Math.floor(key / land.width);
+    if (cell > min && cell < max) edges.add(cell);
+    if (cell + 1 > min && cell + 1 < max) edges.add(cell + 1);
+  }
+  return [...edges].sort((a, b) => a - b);
+}
+
+function platformCellKeys(land: Terrain, cells: readonly Point[]): ReadonlySet<number> {
+  const keys = new Set<number>();
+  for (const cell of cells) {
+    const x = Math.floor(cell.x), z = Math.floor(cell.z);
+    if (x >= 0 && z >= 0 && x < land.width && z < land.height) keys.add(cellKey(land, x, z));
+  }
+  return keys;
+}
+
+function cellKey(land: Terrain, x: number, z: number): number { return z * land.width + x; }
 
 function safeGround(ground: (x: number, z: number) => number, x: number, z: number): number {
   const height = ground(x, z); return Number.isFinite(height) ? height : 0;

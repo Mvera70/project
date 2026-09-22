@@ -1,5 +1,26 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E3a, puesto elevado navegable cerrado; adarve pendiente
+
+Vera autorizó continuar tras la auditoría de la costura. La guardia de un
+bastión accesible ya llega por suelo, sube los catorce peldaños, ocupa la
+plataforma a 1,02 y baja antes de regresar a su rutina. La ruta es privada;
+el arco sale de la mano medida y los parapetos conservan choque físico. Dos
+historias del juego real muestran subida/puesto/bajada sin errores ni deriva;
+una produjo 48 flechas y 9 impactos entre toda la defensa, la otra 13 y
+ningún impacto en su ventana. No se declara resuelta la eficacia en todos los
+emplazamientos. [Informe G-29](historico/graphics-rounds/G-29.md) y
+[contrato](encargos/encargo-e3-puesto-navegable.md).
+
+Sol dirigió y revisó; Terra hizo ruta/combate y física en encargos acotados.
+**Astra no se usó** y no se pidió modelo nuevo. `typecheck` y lint verdes;
+suite rápida 1.731/1.732 por listón temporal de `save` bajo carga, aislada
+15/15. Recorridos focales de guarnición, arquería e historia del bastión
+verdes; el listón de `life-decide` también pasó aislado 9/9. La batería
+amplia de recorridos no se declara limpia y el asalto
+repite las dos rojas conocidas. No se modificaron listones. E3 sigue
+**parcial**: falta el adarve continuo. Sin push ni despliegue.
+
 ## 22 sep 2026 · E3, costura de subida auditada; sin implementación nueva
 
 Tras cerrar E2 se revisó el siguiente bloque. G-27 ya muestra la escalera

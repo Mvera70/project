@@ -30,9 +30,10 @@ import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
 import { garrisonPlaces, isPost, type Manned } from './garrison';
+import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
 import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
-import { createPhysics, type Physics, type PhysicsSnapshot } from './physics';
+import { bastionParapetObstacles, createPhysics, type Physics, type PhysicsOptions, type PhysicsSnapshot } from './physics';
 import type { RagdollSeed } from '../contracts';
 import { commons } from './places';
 import {
@@ -98,6 +99,8 @@ export interface Dweller {
   flight?: Flight | null;
   readonly residence?: HomeRoutine;
   readonly body: Body;
+  /** E3a · Estado privado de la escalera; nunca sale al motor ni al router. */
+  elevated?: { readonly post: ElevatedPost; phase: 'climb' | 'occupied' | 'descent'; next: number; route?: readonly ElevatedPoint[] };
   readonly villager: VillagerId;
   readonly traits: readonly Trait[];
   readonly needs: Needs;
@@ -410,7 +413,7 @@ export interface DayOptions {
   readonly ground?: (x: number, z: number) => number;
   /** Captura síncrona de `fall(0)` en la posición exacta del fixed-step. */
   readonly ragdollSeed?: (id: number, bornAt: number,
-    placement: { readonly x: number; readonly z: number; readonly facing: number }) => RagdollSeed | null;
+    placement: { readonly x: number; readonly y?: number; readonly z: number; readonly facing: number }) => RagdollSeed | null;
 }
 
 /**
@@ -587,7 +590,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // día que llegan, porque `garrisonOf` sólo los da entonces. Van después del
   // corazón a propósito: el corazón se calcula con los sitios de la aldea, y una
   // guardia en la muralla no es un sitio donde viva nadie.
-  const manned = garrisonPlaces(state, land, heart, shore);
+  const manned = garrisonPlaces(state, land, heart, shore, options.ground);
   places.push(...manned.map((post) => post.place));
   // **Y sólo cuentan los sitios de esta orilla.** El río no se cruza, así que un
   // sitio del otro lado no es un sitio para esta gente: dejar a alguien allí era
@@ -916,6 +919,9 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // que vuelan. La lista de arqueros se saca una vez: los puestos son de la
   // jornada y no cambian a media jornada.
   const archers: Archer[] = archersOf(manned);
+  const elevatedPosts = new Map(manned
+    .filter((post): post is Manned & { readonly elevated: ElevatedPost } => post.elevated !== undefined)
+    .map(post => [post.place.id, post.elevated]));
   const arrows: Arrow[] = [];
   // D4 · los que defienden cada puesto, para que el cuerpo a cuerpo tenga a
   // quién golpear. Se llena al empezar la jornada con quien el reparto haya
@@ -949,7 +955,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     const key = `${id}:${bornAt}`;
     if (ragdollKeys.has(key)) return;
     const seed = options.ragdollSeed?.(id, bornAt, {
-      x: body.x, z: body.z, facing,
+      x: body.x, z: body.z, facing, ...(body.y === undefined ? {} : { y: body.y }),
     }) ?? null;
     if (seed === null) return;
     // Un primer fotograma puede no tener todavía el clon del actor. Sólo una
@@ -966,6 +972,94 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   let wildlifeRecovered = 0;
   let wildlifeStuck = 0;
   let steps = 0;
+
+  /** E3a · Avanza una escalera privada fuera del router y de la rejilla de suelo. */
+  const stepElevatedPost = (dweller: Dweller, phase: number): boolean => {
+    const placeId = dweller.dayPlan?.job?.place;
+    const assigned = placeId === undefined || placeId === null ? undefined : elevatedPosts.get(placeId);
+    const onAssignedPost = assigned !== undefined && dweller.doing?.place.id === placeId;
+    let elevated = dweller.elevated;
+    const { body } = dweller;
+
+    // El router llega al punto de aproximación de suelo; no se acepta una
+    // llegada por alcance antes de estar realmente en su extremo.
+    const closeToEntry = assigned !== undefined
+      && Math.hypot(body.x - assigned.approach.x, body.z - assigned.approach.z) <= body.radius / 4;
+    if (elevated === undefined && assigned !== undefined && onAssignedPost
+      && !dweller.doing!.there
+      && closeToEntry
+      && pathTo(land, body, assigned.approach, body.radius) !== null) {
+      // Se toma la cota que Three ya estaba mostrando sobre el suelo antes de
+      // entregar el cuerpo a la ruta; el primer segmento llega a `approach`.
+      body.y = options.ground?.(body.x, body.z) ?? 0;
+      elevated = { post: assigned, phase: 'climb', next: 0 };
+      dweller.elevated = elevated;
+    }
+    if (elevated === undefined) return false;
+
+    // Una caída conserva la cota donde ocurrió; no se usa la escalera como un
+    // teletransporte de vuelta al suelo antes de que el combate la resuelva.
+    if (wounded.get(dweller.villager)?.down === true) {
+      body.vx = 0; body.vz = 0; dweller.motionSpeed = 0;
+      return true;
+    }
+
+    // Si la intención cambia a media subida se vuelve por los apoyos ya
+    // recorridos. Jamás se toma el descenso completo desde la plataforma: eso
+    // convertiría un abandono en un salto hasta arriba y abajo.
+    if (elevated.phase === 'climb' && !onAssignedPost) {
+      elevated.phase = 'descent';
+      elevated.route = [...elevated.post.climb.slice(0, elevated.next)].reverse();
+      elevated.next = 0;
+    }
+
+    if (elevated.phase === 'occupied') {
+      const leave = !onAssignedPost || isNight(phase) || (dweller.doing?.until ?? Number.POSITIVE_INFINITY) <= steps;
+      if (!leave) {
+        body.x = elevated.post.post.x; body.z = elevated.post.post.z; body.y = elevated.post.post.y;
+        body.vx = 0; body.vz = 0; dweller.motionSpeed = 0;
+        drift(dweller.needs, dweller.traits, { moving: false, withOthers: false, working: false, hunger }, LIFE_STEP);
+        if (dweller.doing !== null) satisfy(dweller.needs, dweller.doing.offer, LIFE_STEP);
+        return true;
+      }
+      // Una guardia termina su turno antes de que cualquier nueva rutina o la
+      // casa pueda recuperar el cuerpo de suelo.
+      dweller.doing = null;
+      elevated.phase = 'descent'; elevated.route = elevated.post.descent; elevated.next = 1;
+    }
+
+    const route = elevated.route ?? (elevated.phase === 'climb' ? elevated.post.climb : elevated.post.descent);
+    const before = { x: body.x, y: body.y ?? elevated.post.approach.y, z: body.z };
+    const moved = advanceElevated(before, route, elevated.next, body.pace, LIFE_STEP);
+    body.x = moved.at.x; body.z = moved.at.z; body.y = moved.at.y; elevated.next = moved.next;
+    const distance = Math.hypot(body.x - before.x, body.y - before.y, body.z - before.z);
+    dweller.travelled += distance;
+    dweller.motionSpeed = distance / LIFE_STEP;
+    if (Math.hypot(body.x - before.x, body.z - before.z) > 1e-9) {
+      turnTo(body, Math.atan2(body.x - before.x, body.z - before.z), LIFE_STEP);
+    }
+    dweller.faceAnchor = { x: body.x, z: body.z };
+    drift(dweller.needs, dweller.traits, { moving: distance > 0, withOthers: false, working: false, hunger }, LIFE_STEP);
+    if (!moved.arrived) return true;
+
+    if (elevated.phase === 'climb') {
+      elevated.phase = 'occupied'; elevated.next = 0;
+      if (dweller.doing !== null) {
+        dweller.doing.there = true;
+        dweller.doing.until = steps + (dweller.doing.durationSteps ?? Math.round(dweller.doing.offer.seconds[0] * 30));
+        dweller.doing.route.length = 0;
+      }
+      return true;
+    }
+    // `approach.y` fue la cota que validó la entrada; sólo al coincidir se
+    // vuelve a delegar la altura en el suelo normal.
+    const groundAtApproach = options.ground?.(body.x, body.z) ?? 0;
+    if (Math.abs(body.y - groundAtApproach) > 1e-9) return true;
+    delete dweller.elevated;
+    delete body.y;
+    body.vx = 0; body.vz = 0; dweller.motionSpeed = 0; dweller.rethinkAt = steps;
+    return true;
+  };
   // V-09: pases de pelota dados en la jornada. Contados igual que en
   // `spike/life.ts` (`world.passes += 1`): cualquier tirada de una pelota a
   // alguien cuenta, aunque no haya nadie a quien apuntar y se tire hacia
@@ -1177,7 +1271,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       }
       const outside = (): Body[] => [...bodies.filter(body => {
         const person = byId.get(body.id);
-        return person === undefined || (!indoors(person) && wounded.get(person.villager)?.down !== true);
+        return person === undefined || (!indoors(person) && person.elevated === undefined
+          && wounded.get(person.villager)?.down !== true);
       }), ...raiders
         .filter((raider) => raider.phase !== 'gone' && raider.phase !== 'down')
         .map((raider) => raider.body)];
@@ -1332,6 +1427,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           dweller.flight = null;
           continue;
         }
+
+        // La escalera posee el cuerpo antes de avisos, escenas, regreso y
+        // movimiento ordinario: ninguna rutina de suelo puede recuperar su X/Z
+        // mientras atraviesa una celda que la máscara mantiene cerrada.
+        if (stepElevatedPost(dweller, phase)) continue;
 
         // E0 · La carga llega primero a la ladera. Cuando acaba, el vecino
         // recupera su jornada normal; la plata no deja una orden colgada.
@@ -1778,7 +1878,8 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         const wasThere = dweller.doing?.there === true;
         if (dweller.doing !== null && !dweller.doing.there) {
           const spot = seatAt(dweller.doing.offer, dweller.doing.seat);
-          if (Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
+          if (!elevatedPosts.has(dweller.doing.place.id)
+            && Math.hypot(spot.x - body.x, spot.z - body.z) <= dweller.doing.offer.reach * 0.6) {
             dweller.doing.there = true;
             dweller.doing.until = steps + (dweller.doing.durationSteps ?? Math.round(dweller.doing.offer.seconds[0] * 30));
             dweller.doing.route.length = 0;
@@ -2101,7 +2202,16 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       // de C2 y lo que le pasa a quien la recibe lo decide el vuelo (§1b).
       if (physics === null && !physicsAsked && raidersHere(raiders)) {
         physicsAsked = true;
-        void createPhysics(land, options.ground === undefined ? {} : { ground: options.ground }).then((world) => {
+        const platformCells = manned.flatMap(post => post.elevated === undefined
+          ? [] : [{ x: post.elevated.post.x, z: post.elevated.post.z }]);
+        const obstacles = manned.flatMap(post => post.elevated === undefined ? []
+          : bastionParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access));
+        const physicsOptions: PhysicsOptions = {
+          ...(options.ground === undefined ? {} : { ground: options.ground }),
+          ...(platformCells.length === 0 ? {} : { platformCells }),
+          ...(obstacles.length === 0 ? {} : { obstacles }),
+        };
+        void createPhysics(land, physicsOptions).then((world) => {
           if (disposed) world?.dispose();
           else { physics = world; flushRagdolls(); }
         });
@@ -2112,15 +2222,23 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         // cada paso porque el arquero llega, se va a beber y vuelve: lo que
         // decide si la muralla contesta es quién está en ella **ahora**.
         const held = new Set<string>();
+        const occupants = new Map<string, { x: number; y?: number; z: number }>();
         for (const post of manned) {
-          const there = dwellers.some((dweller) =>
+          const there = dwellers.find((dweller) =>
             wounded.get(dweller.villager)?.down !== true
             && dweller.dayPlan?.job?.place === post.place.id
-            && Math.hypot(dweller.body.x - post.place.at.x,
-              dweller.body.z - post.place.at.z) < POST_REACH);
-          if (there) held.add(post.place.id);
+            && (post.elevated === undefined
+              ? Math.hypot(dweller.body.x - post.place.at.x, dweller.body.z - post.place.at.z) < POST_REACH
+              : dweller.elevated?.phase === 'occupied' && dweller.elevated.post === post.elevated
+                && Math.hypot(dweller.body.x - post.elevated.post.x,
+                  (dweller.body.y ?? 0) - post.elevated.post.y,
+                  dweller.body.z - post.elevated.post.z) < 1e-6));
+          if (there !== undefined) {
+            held.add(post.place.id);
+            occupants.set(post.place.id, there.body);
+          }
         }
-        stepArchery(archers, raiders, arrows, physics, steps, held);
+        stepArchery(archers, raiders, arrows, physics, steps, held, occupants);
       }
 
       // D4 no usa Rapier: distancia y reloj de golpes bastan. Encerrarlo en
@@ -2132,9 +2250,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
         defenders.length = 0;
         for (const post of manned) {
           const there = dwellers.find((dweller) =>
+            wounded.get(dweller.villager)?.down !== true
+            &&
             dweller.dayPlan?.job?.place === post.place.id
-            && Math.hypot(dweller.body.x - post.place.at.x,
-              dweller.body.z - post.place.at.z) < POST_REACH);
+            && (post.elevated === undefined
+              ? Math.hypot(dweller.body.x - post.place.at.x, dweller.body.z - post.place.at.z) < POST_REACH
+              : dweller.elevated?.phase === 'occupied' && dweller.elevated.post === post.elevated
+                && Math.hypot(dweller.body.x - post.elevated.post.x,
+                  (dweller.body.y ?? 0) - post.elevated.post.y,
+                  dweller.body.z - post.elevated.post.z) < 1e-6));
           if (there === undefined) continue;
           const already = wounded.get(there.villager);
           const defender: Defender = already ?? {
@@ -2180,8 +2304,15 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           continue;
         }
         const archer = archers.find(a => a.post.place.id === dweller.dayPlan?.job?.place);
-        if (archer === undefined || Math.hypot(dweller.body.x - archer.post.place.at.x,
-          dweller.body.z - archer.post.place.at.z) >= POST_REACH) {
+        const elevatedReady = archer?.post.elevated !== undefined
+          && dweller.elevated?.phase === 'occupied' && dweller.elevated.post === archer.post.elevated
+          && Math.hypot(dweller.body.x - archer.post.elevated.post.x,
+            (dweller.body.y ?? 0) - archer.post.elevated.post.y,
+            dweller.body.z - archer.post.elevated.post.z) < 1e-6;
+        const groundReady = archer?.post.elevated === undefined && archer !== undefined
+          && Math.hypot(dweller.body.x - archer.post.place.at.x,
+            dweller.body.z - archer.post.place.at.z) < POST_REACH;
+        if (!elevatedReady && !groundReady) {
           delete dweller.combat;
           continue;
         }

@@ -31,6 +31,8 @@ export interface Actor {
   /** Posición en la escena. El `(x, y)` del mapa es `(x, 0, z)` con `z = y` (D.4). */
   readonly x: number;
   readonly z: number;
+  /** Cota absoluta de los pies cuando la vida ha abandonado el suelo del terreno. */
+  readonly y?: number;
   /** Hacia dónde mira, en radianes sobre la vertical. Cero mira a `+z`. */
   readonly facing: number;
   readonly activity: Activity;
