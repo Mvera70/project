@@ -3,6 +3,7 @@
 import { BUILDINGS } from '../balance';
 import type { Building, BuildingId, BuildingKind, GameState } from '../state';
 import { count } from '../subsistence/building-counts';
+import { bastionAccessOf } from './bastion-access';
 import { canPlace } from './placement';
 
 export interface Upgrade {
@@ -97,11 +98,39 @@ export function nextUpgrade(state: GameState): Upgrade | null {
     if (kind === 'stone_house' && !flagActive(state, 'stone_house_unlocked')) continue;
     if (kind === 'wall' && !stoneWallOpen(state)) continue;
     if (kind === 'bastion' && !bastionOpen(state)) continue;
-    for (const source of [...state.buildings].sort((a, b) => a.id - b.id)) {
-      if (source.lostTick !== null || source.kind !== BUILDINGS[kind].upgradeOf) continue;
-      if (state.works.some((work) => work.upgradeOf === source.id)) continue;
-      if (upgradeSpot(state, kind, source) !== null) return { kind, buildingId: source.id };
+    const sources = [...state.buildings].sort((a, b) => a.id - b.id);
+    if (kind !== 'bastion') {
+      // Estas tres mejoras siguen el recorrido histórico: se para en el primer
+      // solar válido, sin pagar `upgradeSpot` por todo el pueblo cada semana.
+      for (const source of sources) {
+        if (source.lostTick !== null || source.kind !== BUILDINGS[kind].upgradeOf) continue;
+        if (state.works.some((work) => work.upgradeOf === source.id)) continue;
+        if (upgradeSpot(state, kind, source) !== null) return { kind, buildingId: source.id };
+      }
+      continue;
     }
+
+    // E3 necesita comparar muros: sólo el bastión paga esta lista para poder
+    // preferir una huella de escalera real sin alterar el orden de las demás.
+    const eligible = sources.filter(source => source.lostTick === null && source.kind === 'wall'
+      && !state.works.some((work) => work.upgradeOf === source.id)
+      && upgradeSpot(state, kind, source) !== null);
+    const accessible = eligible.filter(source => bastionAccessOf(state, source) !== null);
+    if (accessible.length === 0) {
+      if (eligible[0] !== undefined) return { kind, buildingId: eligible[0].id };
+      continue;
+    }
+    const raised = state.buildings.filter(building => building.kind === 'bastion' && building.lostTick === null)
+      .sort((a, b) => a.id - b.id);
+    if (raised.length === 0) return { kind, buildingId: accessible[0]!.id };
+    // El segundo bastión reparte la lectura de la escalera por el anillo.
+    // No hay azar: la distancia al primero manda y el id desempata.
+    const first = raised[0]!;
+    accessible.sort((a, b) => {
+      const distance = (source: Building): number => (source.x - first.x) ** 2 + (source.y - first.y) ** 2;
+      return distance(b) - distance(a) || a.id - b.id;
+    });
+    return { kind, buildingId: accessible[0]!.id };
   }
   return null;
 }

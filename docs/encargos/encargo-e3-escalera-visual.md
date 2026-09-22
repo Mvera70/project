@@ -70,3 +70,12 @@ Terminado cuando el modelo aprobado aparece sin invadir otros objetos en una
 partida real, la elección y la colisión son coherentes y la deuda de subida
 queda explícita en el plan y el cuaderno. No publicar demo remota ni hacer
 push por este brief.
+
+## Adenda de cierre · 22 sep 2026
+
+La falsación histórica de esta ronda encontró **cero** variantes visibles en
+nueve semillas: la mejora escogía otros muros, y el recurso candidato tampoco
+figuraba en `WANTED`. El encargo posterior
+[de emplazamiento accesible](encargo-e3-emplazamiento-accesible.md) autoriza
+únicamente la corrección de elección del muro y la carga del mismo GLB. No
+amplía G-27 a navegación elevada, físicas, balance ni otra producción 3D.

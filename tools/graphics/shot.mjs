@@ -5,6 +5,7 @@
 //   node tools/graphics/shot.mjs --wait moment        → espera a que salga una cartela de hito
 //   node tools/graphics/shot.mjs --wait crossroad     → espera a una encrucijada
 //   node tools/graphics/shot.mjs --out foo.png
+//   node tools/graphics/shot.mjs --scene-only --out valley.png
 //
 // Playwright pide un navegador exacto y en esta máquina no hay red para
 // bajarlo; hay otros instalados de versiones anteriores y valen igual. Se busca
@@ -14,9 +15,9 @@
 // Antes: `npx tsx tools/graphics/bundle-game.ts` para tener la página al día.
 
 import { chromium } from '@playwright/test';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -44,6 +45,38 @@ const turn = Number(opt('turn', '0'));
 const tilt = Number(opt('tilt', '0'));
 //   --zoom -6       aleja seis muescas de rueda (positivo acerca)
 const zoomNotches = Number(opt('zoom', '0'));
+// E0e · Sólo el lienzo WebGL, sin cabecera, hojas ni otro DOM. El renderer
+// devuelve esta imagen en la misma llamada que fija la cámara, para que una
+// revisión ciega de la escena no dependa de recortar píxeles de pantalla.
+const sceneOnly = args.includes('--scene-only');
+// Zoom del enganche de captura, no un gesto de rueda: permite ampliar una
+// coordenada sin depender de la interfaz antes de pedir el mismo fotograma.
+const hasCaptureZoom = args.includes('--capture-zoom');
+const captureZoomArg = opt('capture-zoom', '');
+let captureZoom = 1;
+if (hasCaptureZoom) {
+  captureZoom = Number(captureZoomArg);
+  if (!Number.isFinite(captureZoom) || captureZoom < 0.1 || captureZoom > 1) {
+    throw new Error(`--capture-zoom must be a finite factor from 0.1 to 1; got '${captureZoomArg}'.`);
+  }
+}
+// G-27/E0e · encuadrar una coordenada del mundo para una captura focal.
+// El renderer resuelve el encuadre mediante su hook de diagnóstico; no se
+// permite degradar silenciosamente a la cámara panorámica si el hook falta.
+const lookArg = opt('look', '');
+let lookPoint = null;
+if (lookArg !== '') {
+  const parts = lookArg.split(',').map((part) => part.trim());
+  if (parts.length !== 2 || parts.some((part) => part === '')) {
+    throw new Error(`--look must be X,Z; got '${lookArg}'.`);
+  }
+  const x = Number(parts[0]);
+  const z = Number(parts[1]);
+  if (!Number.isFinite(x) || !Number.isFinite(z)) {
+    throw new Error(`--look must contain finite numbers; got '${lookArg}'.`);
+  }
+  lookPoint = { x, z };
+}
 // E1/E2 · La orden con la que se juega antes de disparar. Se pulsa el botón del
 // mando, que es lo que hace el dedo: así la captura prueba el camino del jugador
 // y no una función a la que nadie llega.
@@ -77,6 +110,12 @@ const yearArg = opt('year', '');
 const previewEra = opt('preview-era', '');
 if (previewEra !== '' && !['hamlet', 'village', 'town'].includes(previewEra)) {
   throw new Error(`--preview-era must be hamlet, village or town; got '${previewEra}'.`);
+}
+if (sceneOnly && sequence > 0) {
+  throw new Error('--scene-only captures one renderer frame; use one invocation per scene instead of --sequence.');
+}
+if (hasCaptureZoom && !sceneOnly && lookPoint === null) {
+  throw new Error('--capture-zoom requires --scene-only or --look.');
 }
 // `--viewport 1024x768` conserva móvil por defecto y permite revisar tablet.
 const viewportArg = opt('viewport', '390x844');
@@ -290,6 +329,22 @@ if (open === 'orders' || open === 'cart') {
 if (open === 'speed') await tab.locator('.valley-speed-badge').click().catch(() => {});
 if (open) await tab.waitForTimeout(300);
 
+let sceneImage = null;
+if (lookPoint !== null || sceneOnly) {
+  sceneImage = await tab.evaluate(({ point, zoom }) => {
+    if (typeof window.__valleyCapture !== 'function') {
+      throw new Error('--scene-only/--look requires the renderer __valleyCapture hook, but it is unavailable.');
+    }
+    const captured = point === null
+      ? window.__valleyCapture(-1, zoom, false)
+      : window.__valleyCapture(-1, zoom, false, point);
+    if (captured === null || typeof captured !== 'object' || typeof captured.image !== 'string') {
+      throw new Error('The renderer __valleyCapture hook returned no PNG image.');
+    }
+    return captured.image;
+  }, { point: lookPoint, zoom: captureZoom });
+}
+
 if (sequence > 0) {
   const stem = out.replace(/\.png$/u, '');
   // Y cada fotograma dice **qué hora era**, que es la mitad de lo que hace
@@ -315,7 +370,20 @@ if (sequence > 0) {
   when.forEach((label, n) => console.log(`  ${String(n + 1).padStart(2, '0')} · ${label}`));
 }
 
-const shot = await tab.screenshot({ path: out });
+let shot;
+if (sceneOnly) {
+  if (typeof sceneImage !== 'string') throw new Error('--scene-only did not receive a PNG from __valleyCapture.');
+  const match = /^data:image\/png;base64,([A-Za-z0-9+/]+={0,2})$/u.exec(sceneImage);
+  if (match === null) throw new Error('--scene-only received an invalid PNG data URL from __valleyCapture.');
+  shot = Buffer.from(match[1], 'base64');
+  if (shot.length < 8 || !shot.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
+    throw new Error('--scene-only decoded data is not a PNG image.');
+  }
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, shot);
+} else {
+  shot = await tab.screenshot({ path: out });
+}
 
 // Y a qué estación corresponde lo que se acaba de fotografiar, que es la mitad
 // de lo que hace falta para juzgar si el reloj cuadra.

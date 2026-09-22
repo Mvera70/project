@@ -97,7 +97,7 @@ silencio y la prueba pasa sin probar nada.
 
 | Herramienta | Qué hace |
 |---|---|
-| `shot.mjs` | **Fotografiar el juego montado.** `--seed`, `--year`, `--run`, `--speed`, `--wait moment\|crossroad`. Abre el valle en un año concreto sin falsear el reloj (U-10b) |
+| `shot.mjs` | **Fotografiar el juego montado.** `--seed`, `--year`, `--run`, `--speed`, `--wait moment\|crossroad`, `--look X,Z` para centrar una celda real y `--scene-only` para guardar el PNG WebGL sin HUD/DOM. `--capture-zoom 0.1..1` amplía esa captura del hook y exige `--look` o `--scene-only`. Abre el valle en un año concreto sin falsear el reloj (U-10b) |
 | `film.mjs` | **Rodar el valle**: fotogramas seguidos más la traza de cada cuerpo en cada uno (`window.__valleyLife`) |
 | `film-sheet.py` | Convierte esa película en tira de contactos e informe de anomalías. **Es la única forma de medir la capa de vida como la ejecuta el navegador** |
 | `observe-life.mjs` | Juego real con el reloj del navegador controlado, píxel y traza atómicos. Lo usa la skill `observe-valley-life` |

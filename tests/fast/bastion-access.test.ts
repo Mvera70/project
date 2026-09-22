@@ -10,6 +10,7 @@ import { bastionAccessOf } from '@derive/bastion-access';
 import { terrainOf } from '../../src/render3d/life/terrain';
 import { buildFromAsset } from '../../src/render3d/world/buildings';
 import { planChange, planFor } from '../../src/render3d/world/plan';
+import { WANTED } from '../../src/render3d/renderer';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 
@@ -44,6 +45,7 @@ describe('E3 · acceso visual del bastión', () => {
     expect(bastionAccessOf(state, tower)).toEqual(direction);
     const planned = planFor(state).buildings[0]!;
     expect(planned.asset).toBe('bastion-access-candidate');
+    expect(WANTED).toContain(planned.asset);
     expect(planned.bastionAccess).toEqual(direction);
     expect(terrainOf(state).blocked[(y + direction.z) * state.map.width + x + direction.x]).toBe(1);
     expect(JSON.stringify(state)).toBe(before);

@@ -106,6 +106,8 @@ export const WANTED = [
   // y mientras no exista `world/props.ts` los dibuja con primitivas.
   'barrel', 'plough',
   ...FAUNA,
+  // E3 · el plan sustituye el bastión por esta variante cuando cabe su escalera.
+  'bastion-access-candidate',
   ...new Set(Object.values(BUILDING_ASSETS)),
 ];
 
@@ -883,7 +885,7 @@ export async function createGraphicsRenderer(
   // estado en la misma tarea JavaScript. Ningún RAF puede colarse entre ambos.
   /** El «no sigas a nadie» del enganche de observación. Ver abajo. */
   const NOBODY = -1;
-  window.__valleyCapture = (follow?: number, zoom = 1, gateStudy = false) => {
+  window.__valleyCapture = (follow?: number, zoom = 1, gateStudy = false, point?: { x: number; z: number }) => {
     // D2 · **y se puede seguir a un saqueador.** Hasta aquí el enganche sólo
     // encontraba vecinos y bichos, así que la única manera de grabar un asalto
     // era acertar con la cámara puesta en la plaza: la batalla pasa en el
@@ -901,6 +903,15 @@ export async function createGraphicsRenderer(
     // selectiva del juego, no el antiguo atajo que apagaba el bosque entero.
     const gate = gateStudy ? life?.defence.gate : null;
     if (gate !== null && gate !== undefined) { flight = null; disturbed = true; view.look(gate.at.x, gate.at.z); }
+    // G-27 · Una toma puede señalar coordenadas reales sin fingir que allí hay
+    // alguien que seguir. Sólo se acepta un punto finito: este enganche vive
+    // en `window` y los scripts pueden saltarse el contrato TypeScript.
+    // Va tras el centinela/portón para que la toma explícita sea la pedida.
+    if (point !== undefined && Number.isFinite(point.x) && Number.isFinite(point.z)) {
+      flight = null;
+      disturbed = true;
+      view.look(point.x, point.z);
+    }
     if (zoom !== 1) view.zoom(zoom, viewport.widthCss / 2, viewport.heightCss / 2);
     revealAssault();
     renderer.render(scene, camera);
@@ -1591,7 +1602,7 @@ declare global {
      */
     __valleyLife?: () => LifeSnapshot | null;
     __valleyAdvance?: (steps: number, reset?: boolean) => void;
-    __valleyCapture?: (follow?: number, zoom?: number, gateStudy?: boolean) => { image: string; life: LifeSnapshot | null };
+    __valleyCapture?: (follow?: number, zoom?: number, gateStudy?: boolean, point?: { x: number; z: number }) => { image: string; life: LifeSnapshot | null };
     __valleyObserveLive?: () => void;
   }
 }

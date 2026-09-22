@@ -10,7 +10,7 @@ Lo pidió el dueño del diseño con estas palabras: «necesito saber qué es
 prioritario, qué va después y la dificultad de la tarea para así poder
 destinarla a diferentes agentes en función de la dificultad».
 
-**Estado sincronizado el 20 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
+**Estado sincronizado el 22 sep 2026.** Las rondas E1–E3 y D6 ya entregaron
 los siete gestos procedurales, siete modelos publicados, armas en mano,
 visibilidad del frente, huida civil, saqueo, transición terminal, ragdolls y
 escombros. Las filas de arte de abajo describen sólo lo que sigue abierto; la
@@ -135,9 +135,9 @@ procedural; no son nuevos clips embebidos en el GLB.
 | Fase | Qué | Prioridad | Dificultad | Agente | Depende de |
 |---|---|---|---|---|---|
 | E1 · Clips de combate · **entregados por código, 20 sep 2026** | `bow_draw`, `bow_loose`, `gate_strike`, `fall`, `spear_thrust` y `hit_take` fechados por hechos; `flee` cíclico con refugio civil. Reacción de puerta y armas integradas. Oclusión selectiva del robledal y separación de raiders verificadas, con límites documentados. [Cierre y evidencia](historico/life-rounds/E3-visibilidad-y-huida.md) | Hecho | Alta | Sol + revisión Terra | — |
-| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0d cerrados; E0e progreso visual, aceptación histórica pendiente* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. El dueño revisó §7.4b: tierra pisada → piedra parcial → piedra completa. Sol verifica tres grados distinguibles en 12 controles móvil/tableta, sin alterar plaza ni accesos; la piedra aún es lisa y la clasificación independiente de tomas históricas no está demostrada. [Brief](encargos/encargo-e0-ambiente-eras.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md); inventario en `docs/encargos-3d.md` §1 | **P1** | Media-alta | Sol dirige · Terra ejecuta | — |
+| E0 · **Lo que todavía pasa y no se ve** · *E0a–E0e cerrados, 22 sep 2026* | E0e conecta caminos, plaza y humo a la era real sin cambiar motor ni navegación. §7.4b fija tierra pisada → piedra parcial → piedra completa. Doce tomas históricas sin rótulo, dos semillas y móvil/tableta fueron clasificadas 12/12 por otro agente; cuatro lecturas de plaza tuvieron confianza media. La piedra lisa sin juntas queda como deuda de acabado. [Brief](encargos/encargo-e0e-aceptacion-historica.md) e [informe](historico/life-rounds/E0e-ambiente-eras.md) | Hecho | Media-alta | Sol dirige · Terra revisa | — |
 | E2 · Modelos del asedio · **parcial, 20 sep 2026** | Arco, flecha, lanza y escudo están publicados y en las manos de ambos bandos. Queda la **identidad propia del clan vecino** —aldeanos armados de otro valle, no soldados de cota ni bandidos— y decidir si necesita espada además del aparejo ya integrado | P2 | Alta | Astra · sesión de arte | — |
-| E3 · Portón, muralla de piedra, torre · **parcial, 22 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. El **bastión G-26** conserva malla propia y respaldo; una captura real revisa su junta visible. G-27 añade escalera de 14 peldaños sólo donde cabe una celda interior, con orientación, fallback y huella cerrada a peatones. El modelo está integrado técnicamente, pero las capturas reales no permiten aceptar aún el detalle visual de los peldaños. La guardia **no sube**; faltan apoyo elevado navegable y adarve continuo. No hace falta otro GLB para el portón roto. [G-26](historico/graphics-rounds/G-26.md) · [G-27](historico/graphics-rounds/G-27.md) | P2 | Media-alta | Astra sólo modelo; Terra integra; Sol revisa | A2, A3, A4 |
+| E3 · Portón, muralla de piedra, torre · **parcial, 22 sep 2026** | Portón, hoja articulada, rotura procedural, muralla y atalaya están integrados. G-27 muestra en partida histórica la escalera de 14 peldaños sobre bastiones elegidos por huella accesible, con respaldo G-26 y celda cerrada a peatones; móvil/tableta y una jornada determinista lo comprueban. La guardia **no sube**; faltan apoyo elevado navegable y adarve continuo. No hace falta otro GLB para el portón roto. [G-26](historico/graphics-rounds/G-26.md) · [G-27](historico/graphics-rounds/G-27.md) | P2 | Media-alta | Astra sólo modelo; Terra integra; Sol revisa | A2, A3, A4 |
 | E4 · Fuego, humo, gore | Cómo se ve arder una casa en el asalto y cómo se ve morir; **el gore es decisión del dueño** («ya veremos cómo») | P4 | Alta | Dueño → Astra | D5, D6 |
 
 ### F · Interfaz y crónica
@@ -170,7 +170,7 @@ meta**, pero hay que ir bajando:
 |---|---|---|
 | La reunión de §11.8 no cabe en una aldea de 70 (se junta el 54 %) | Media | Sol (capa de vida) |
 | Las once jornadas rojas de la familia R-1 y la del devoto | Baja (medir y declarar) · Media (arreglar) | Luna, Terra → Sol |
-| La malla de la sala del rey y la identidad del clan siguen pendientes; bastión y escalera visual están integrados, pero la lectura fina de peldaños en escena real y el adarve navegable siguen abiertos. Arado y fuente están publicados e integrados | Media | Sesión de arte |
+| La malla de la sala del rey y la identidad del clan siguen pendientes; bastión y escalera visual están aceptados en escena real, pero el acceso elevado navegable y el adarve continuo siguen abiertos. Arado y fuente están publicados e integrados | Media | Sesión de arte |
 | El hacha es el medio más flojo; `quiet_years` no sale | Baja | Dueño (decisión) → Luna |
 
 ---
@@ -183,17 +183,15 @@ necesita lo de arriba.
 El orden original A1→G ya se recorrió: A1–A5, B, C, D, E1, F2/F3 y la medición
 de G están cerrados. Desde el cierre del 20 de septiembre, el orden vivo es:
 
-1. **Siguiente** — aceptación de E0e en partida histórica. Caminos, plaza y humo
-   están implementados y probados; §7.4b ya permite tierra pisada → piedra
-   parcial → piedra completa. La [comparación controlada](historico/life-rounds/E0e-ambiente-eras.md)
-   distingue los tres grados en móvil/tableta, pero no demuestra por sí sola
-   que una era se reconozca en capturas históricas individuales sin rótulo.
-   La piedra lisa sin juntas queda como deuda de acabado, no otra ronda de color
-   a ciegas. La [revisión espacial](plan-espacial.md)
-   está aceptada localmente. Sol dirige software; Astra sólo 3D excepcional.
-2. **Arte restante en paralelo** — E2/E3: identidad del clan, adarve y
-   aceptación visual del bastión ya integrado. La sala del rey es deuda
-   independiente en H.
+1. **Hecho, 22 sep** — E0e se aceptó en partida histórica: doce capturas sin
+   rótulo clasificadas 12/12 por otro agente, con contraste moderado entre
+   aldea y villa en algunos encuadres. La piedra lisa queda como deuda menor.
+   La [revisión espacial](plan-espacial.md) está aceptada localmente.
+2. **Siguiente fase de arte** — E2/E3: identidad visual del clan vecino,
+   acceso elevado navegable y adarve continuo. G-27 ya tiene escalera visible
+   en partida real; subir guardias se difirió por decisión de Vera. La sala
+   del rey es deuda independiente en H. Sol dirige software; Astra sólo 3D
+   excepcional y con permiso.
 3. **Decisiones del dueño** — E4 (fuego y gore) y el nivelado que G ya dejó
    medido. Ningún agente inventa esos criterios.
 4. **Final del crecimiento** — A3b, sólo después de definir qué significa el

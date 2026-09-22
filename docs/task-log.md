@@ -1,5 +1,37 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · E0e histórico y G-27 en partida real
+
+E0e cierra su aceptación visual: doce capturas históricas sin rótulo de dos
+semillas, tres eras y dos tamaños fueron clasificadas 12/12 por un agente que
+no recibió el orden de las eras. Cuatro lecturas de plaza tuvieron confianza
+media; la piedra lisa sin juntas permanece como deuda menor, no se ajustó
+color por tanteo. [Evidencia](historico/life-rounds/E0e-ambiente-eras.md).
+
+G-27 destapó dos falsos positivos: las coordenadas atribuidas a semilla 3/año
+60 no eran la historia que abre el menú, y el asset de escalera no figuraba en
+`WANTED`, por lo que el juego dibujaba un bloque de respaldo. En nueve
+historias originales no apareció ninguna variante; Terra corrigió la
+selección de muro para preferir una huella accesible y registró el recurso en
+la carga. En la historia real de semilla 7/año 60 se ven peldaños y unión de
+muralla en móvil/tableta; semillas 3, 7 y 23 conservan dos bastiones
+accesibles, anillo cerrado y puerta. La subida de guardias y el adarve quedan
+fuera de este cierre por decisión previa. [G-27](historico/graphics-rounds/G-27.md).
+
+Regresión de la tanda: `npm test` pasó **1.706/1.706**, y el foco final
+E0e/E3/defensas **127/127** con typecheck, lint y diff-check verdes. La
+compilación de producción (`npm run build`) también pasó. La suite completa de
+jornadas no está verde: **156 verdes, 8 rojas** y un worker que
+salió inesperadamente; el fichero omitido, `life-props`, repetido aislado dio
+**8 verdes, 4 rojas**. El listón temporal de `life-decide` (3.288 ms frente
+a 2.500 bajo carga) pasó aislado. Las rojas restantes son dos de asedio,
+tres de ganado, una de avisos, una de cobertura `plague_blame` y cuatro de
+trastos. No se aflojó ningún listón ni se atribuyen todas a esta fase: el
+asedio fallido ocurre al año 25 y la cabaña vacía de semilla 11 al año 40,
+ambos sin bastiones construidos; avisos y familias de vida ya tenían deuda
+anotada en este cuaderno. Las rojas de trastos y cobertura quedan registradas
+para diagnóstico separado, sin declararlas resueltas por este cierre visual.
+
 ## 22 sep 2026 · E3, escalera visual integrada, subida pendiente
 
 Una captura cercana del juego real, semilla 3/año 25, muestra la unión del
@@ -21,10 +53,10 @@ trabajo. Terra publicó sólo el GLB nuevo y lo selecciona donde cabe una celda
 interior sin árboles, ruinas, edificios, obra ni terreno acuático/rocoso; en
 otro caso sigue G-26. La huella adicional cierra el paso en `terrainOf`.
 Sol confirmó 18 pruebas focales y que los 66 hashes previos del manifiesto no
-cambiaron. La prueba geométrica cubre las cuatro orientaciones del GLB. En
-semilla 3/año 60 se planifican dos variantes reales, pero las capturas de
-Chrome no permiten leer los peldaños por cámara/oclusiones: **aceptación visual
-fina pendiente**, sin presentarlas como prueba de aspecto. La navegación
+cambiaron. La prueba geométrica cubre las cuatro orientaciones del GLB. La
+afirmación inicial de dos variantes en semilla 3/año 60 fue falsa: aquellas
+coordenadas eran de otra simulación y faltaba cargar el GLB en `WANTED`. La
+corrección y las capturas posteriores están en la entrada de arriba. La navegación
 elevada y el adarve continuo siguen abiertos. [G-27](historico/graphics-rounds/G-27.md).
 
 ## 22 sep 2026 · E3, bastión — aprobación, publicación e integración visual

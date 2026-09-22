@@ -185,11 +185,11 @@ describe('grafo de módulos del motor', () => {
       'state',
       'subsistence/harvest',
     ]);
-    // A3 · el bastión cuenta su propio tope contra `subsistence/building-counts`
-    // (`count`), porque `withinCap` colapsa su familia en `'wall'`, que no tiene
-    // tope.
+    // A3/E3 · el bastión cuenta su propio tope contra `subsistence/building-counts`
+    // (`count`) y consulta su huella local de mundo, porque `withinCap` colapsa
+    // su familia en `'wall'`, que no tiene tope.
     expect(importsOf('world/upgrade.ts'))
-      .toEqual(['balance', 'placement', 'state', 'subsistence/building-counts']);
+      .toEqual(['balance', 'bastion-access', 'placement', 'state', 'subsistence/building-counts']);
     // M-15. astar.ts es hoja: el coste del suelo y nada más. paths.ts es quien
     // sabe quién va a dónde, así que mira a people/ y a subsistence/; forest.ts
     // le avisa de que los árboles se han movido, y la flecha no vuelve.

@@ -180,3 +180,46 @@ esta ronda.
 
 Verificación de esta ronda: `vitest` focalizado de `era-ambience`, `npm run
 typecheck`, `npm run lint` y `git diff --check`, verdes.
+
+---
+
+## Aceptación histórica sin rótulos · 22 sep 2026
+
+La prueba pendiente se repitió sobre el bundle actual
+`6CDD3171E88C41C15A7102B7E625BA7D00D2F3365000B655FE62A778CA36F76E`.
+`shot.mjs` puede centrar una coordenada real con `--look X,Z` y extraer el PNG
+del renderer con `--scene-only`, sin cabecera, pie ni texto de era. El gancho
+no cambia `GameState` ni fuerza `preview-era`. Se abrieron por el menú las
+historias prudentes de semilla 7/años 0, 4 y 30 y semilla 23/años 0, 3 y 31,
+en móvil 390×844 y tableta 1024×768. Las 12 capturas están en
+`artifacts/graphics/E0e/A01.png`…`A12.png`; cero errores de página y plaza
+visible en las doce. Orden, por parejas móvil/tableta: 7/0, 7/4, 7/30,
+23/0, 23/3 y 23/31. El año 0 del menú muestra el primer año, como hace el
+juego.
+
+Un agente distinto del que capturó recibió únicamente A01…A12, sin nombres de
+semilla, año o era, y no consultó metadatos. Clasificó **12/12** por la superficie
+de la plaza y también **12/12** por la escena completa: caserío, aldea y villa
+en ambas semillas y ambos tamaños. No asumió que el orden de archivo fuera
+cronológico. Cuatro clasificaciones de superficie tuvieron confianza media
+(A03, A09, A10, A11); ninguna plaza quedó tapada. Esto es una lectura ciega
+de otro agente, **no** una prueba con cinco lectores externos ni una inspección
+en iPad físico.
+
+Como control separado, se volvió a abrir **la misma villa real** (semilla 7,
+año 30, misma cámara y hora) con las tres apariencias `preview-era`, en móvil
+y tableta: `control-focused-seed-7-{hamlet,village,town}-{mobile,tablet}.png`.
+Los seis PNG no tuvieron errores de página. Aíslan el acabado, pero no son
+historias de otras eras. La tierra del caserío se distingue claramente;
+**aldea frente a villa tiene poco margen visual** en ese control aunque el
+patrón 0/parcial/total de piedra esté verificado en pruebas. En las escenas
+históricas la lectura se sostiene por la plaza y el resto de signos de fase;
+no se atribuye el acierto exclusivamente al pavimento.
+
+**Arbitraje:** se acepta la lectura histórica del conjunto E0e, con esa
+reserva de contraste. La piedra lisa sin juntas sigue como acabado futuro;
+no se añade geometría ni se afina color a ciegas. No se modificó motor,
+derivación de era, navegación, costes ni fuente en esta aceptación. Sus 92
+pruebas focalizadas y la suite rápida completa de la tanda (1.706/1.706)
+pasaron; la suite de jornadas conserva rojos ajenos al acabado, anotados en
+el cuaderno, sin rebajar listones para cerrar E0e.
