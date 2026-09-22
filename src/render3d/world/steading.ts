@@ -28,6 +28,8 @@ import { terrainOf } from '../life/terrain';
 import { homeRoutine } from '../life/home';
 import { hash32 } from '@engine/rng';
 import { woodStoreCells } from '../life/resource-sites';
+import { PLAZA } from '@engine/balance';
+import { plazaCentre } from '@engine/world/plaza';
 
 /** Qué se deja por el valle, y contra qué se apoya. */
 export const STEADING_ASSETS = ['haystack', 'log-pile', 'handcart', 'shed'] as const;
@@ -100,10 +102,12 @@ export function steadingOf(
     map: ValleyMap;
     village: Pick<VillageStats, 'grain' | 'wood'>;
     tick: number;
+    plaza: { x: number; y: number };
   },
   seed: number,
 ): Steaded[] {
   const { map } = state;
+  const square = plazaCentre(state.plaza);
   const taken = new Set<number>();
   for (const building of visibleBuildings(state)) {
     for (let row = 0; row < building.h; row += 1) {
@@ -150,6 +154,12 @@ export function steadingOf(
   const place = (asset: SteadingAsset, candidates: readonly number[], limit = MOST_STEADED[asset]): void => {
     for (const cell of candidates) {
       if (out.filter((one) => one.asset === asset).length >= limit) return;
+      if (asset === 'shed') {
+        const x = cell % map.width + 0.5, z = Math.floor(cell / map.width) + 0.5;
+        // El cobertizo ocupa una parcela entera y no pertenece a la plaza:
+        // dejamos también margen para su tejado fuera del borde empedrado.
+        if (Math.hypot(x - square.x, z - square.y) <= PLAZA.RADIUS + 0.75) continue;
+      }
       if (used.has(cell) || !free(cell) || !far(asset, cell)) continue;
       used.add(cell);
       // El rumbo sale de la celda, en ocho direcciones: un almiar y su vecino

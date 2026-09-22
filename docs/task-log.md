@@ -1,5 +1,15 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · G-31, plaza despejada
+
+La segunda captura reveló que las piezas marrones eran bancos provisionales de
+primitivas, no mesas funcionales. Se quitaron. Las casetas son cobertizos
+`shed.glb`: se conservan como almacén visual de madera, pero ya no se colocan
+en la plaza ni invaden su borde con el tejado. Fuente y pasos quedan despejados.
+Captura real sin errores y 62 pruebas focales verdes; sin cambio de motor ni
+de guardados. [Informe G-31](historico/graphics-rounds/G-31.md). Sin push ni
+despliegue.
+
 ## 22 sep 2026 · G-30, uniones diagonales y sacos naranjas
 
 Se corrigió la costura de las conexiones diagonales de muralla de piedra y

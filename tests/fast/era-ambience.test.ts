@@ -86,29 +86,18 @@ describe('E0e · ambiente de las eras', () => {
     expect(cellColour(map, outside, palette, plaza, 'town')).toBe(palette.meadow);
   });
 
-  it('mantiene fuente y pasos libres, y no duplica los complementos', () => {
+  it('mantiene sólo la fuente al cambiar de era y de valle', () => {
     const plaza = new PlazaFountain();
     const at = { x: 10, y: 12 };
     const ground = () => 0;
-    plaza.show(at, ground, 'hamlet');
+    plaza.show(at, ground);
     expect(plaza.group.children).toHaveLength(1);
     const fountain = plaza.group.children[0];
 
-    const free = (x: number, z: number): boolean => x > 10.9 && x < 11.6 && z > 12.95 && z < 13.55;
-    plaza.show(at, ground, 'village', free);
+    plaza.show(at, ground);
     expect(plaza.group.children[0]).toBe(fountain);
-    expect(plaza.group.children).toHaveLength(2);
-    const villageProps = plaza.group.children[1];
-    expect(villageProps?.children).toHaveLength(2);
-    for (const prop of villageProps?.children ?? []) expect(free(prop.position.x, prop.position.z)).toBe(true);
-    plaza.show(at, ground, 'village', free);
-    expect(plaza.group.children[1]).toBe(villageProps);
-
-    plaza.show(at, ground, 'town', free);
-    expect(plaza.group.children).toHaveLength(2);
-    expect(plaza.group.children[1]?.children.length).toBeLessThanOrEqual(8);
-    for (const prop of plaza.group.children[1]?.children ?? []) expect(free(prop.position.x, prop.position.z)).toBe(true);
-    plaza.show({ x: 20, y: 22 }, ground, 'hamlet');
+    expect(plaza.group.children).toHaveLength(1);
+    plaza.show({ x: 20, y: 22 }, ground);
     expect(plaza.group.children).toHaveLength(1);
     plaza.dispose();
     expect(plaza.group.children).toHaveLength(0);

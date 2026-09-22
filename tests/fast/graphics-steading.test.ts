@@ -11,6 +11,9 @@ import { foundGame } from '@engine/found';
 import { run } from '@engine/sim';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { MOST_STEADED, STEADING_ASSETS, steadingOf } from '../../src/render3d/world/steading';
+import { PLAZA } from '@engine/balance';
+import { plazaCentre } from '@engine/world/plaza';
+import { foundTwenty } from '../helpers/founding';
 
 function village(years: number, seed = 7): GameState {
   const state = foundGame(seed);
@@ -48,6 +51,23 @@ describe('G-15 · dónde se dejan los trastos del corral', () => {
     const state = village(30, 11);
     const places = steadingOf(state, state.terrainSeed);
     expect(new Set(places.map((one) => one.cell)).size).toBe(places.length);
+  });
+
+  it('ningún cobertizo invade la plaza, incluido el borde de su tejado', () => {
+    for (const seed of [7, 11, 23, 41]) {
+      const state = foundTwenty(seed);
+      state.tick = 1;
+      state.village.wood = 360;
+      const square = plazaCentre(state.plaza);
+      const sheds = steadingOf(state, state.terrainSeed).filter(one => one.asset === 'shed');
+      expect(sheds.length, `semilla ${seed}: no se comprobó ningún cobertizo`).toBeGreaterThan(0);
+      for (const place of sheds) {
+        const x = place.cell % state.map.width + 0.5;
+        const z = Math.floor(place.cell / state.map.width) + 0.5;
+        expect(Math.hypot(x - square.x, z - square.y), `semilla ${seed}: cobertizo en plaza`)
+          .toBeGreaterThan(PLAZA.RADIUS + 0.75);
+      }
+    }
   });
 
   it('ni cuatro almiares en fila, que se leen como un campamento', () => {

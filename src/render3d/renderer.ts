@@ -1216,18 +1216,7 @@ export async function createGraphicsRenderer(
       props.update(propsOf(life), groundFloor);
       // D2b · y las flechas, con su altura absoluta: la `y` es del mundo físico.
       arrows.update(arrowsOf(life));
-      const standing = shown.buildings.filter((building) => building.lostTick === null);
-      const plazaFree = (x: number, z: number): boolean => {
-        const cellX = Math.floor(x);
-        const cellZ = Math.floor(z);
-        if (cellX < 0 || cellZ < 0 || cellX >= shown.map.width || cellZ >= shown.map.height) return false;
-        const cell = cellZ * shown.map.width + cellX;
-        const terrain = shown.map.terrain[cell];
-        const walkable = terrain === TERRAIN_CODE.meadow || terrain === TERRAIN_CODE.cleared || terrain === TERRAIN_CODE.ford;
-        return walkable && (shown.map.path[cell] ?? 0) === 0 && !standing.some((building) =>
-          x >= building.x && x <= building.x + building.w && z >= building.y && z <= building.y + building.h);
-      };
-      plaza.show(plazaOf(shown), groundFloor, era, plazaFree);
+      plaza.show(plazaOf(shown), groundFloor);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
