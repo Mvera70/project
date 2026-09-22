@@ -1,5 +1,17 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · Accesos rápidos de prueba en Desarrollo
+
+El menú de inicio ya podía abrir una partida real en un año dado, pero había
+que escribir semilla y año. La zona «Desarrollo» incorpora tres botones de un
+toque: caserío (semilla 7, año 1), aldea (11, 21) y villa cerrada (7, 60).
+Se verificó que las tres trayectorias llegan vivas a la era anunciada; no son
+maquetas ni estados fabricados. El selector manual permanece y estos botones
+no aparecen fuera de Desarrollo. Prueba de navegador a 390 px: el botón de
+villa abre el año 60 y los tres rótulos muestran el año correcto. Build,
+typecheck, lint y pruebas focales verdes. La publicación sigue el flujo de
+GitHub Pages de `main`.
+
 ## 22 sep 2026 · G-31, plaza despejada
 
 La segunda captura reveló que las piezas marrones eran bancos provisionales de

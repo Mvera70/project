@@ -126,6 +126,10 @@ const STYLE = `
 .title-dev-row { display: flex; flex-direction: column; gap: 8px; }
 .title-dev-row[hidden] { display: none; }
 .title-dev-field { flex: 1 1 auto; display: flex; flex-direction: column; gap: 5px; }
+.title-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.title-preset { min-height: var(--ui-tap-min); padding: 6px 4px; font-size: 11px;
+  line-height: 1.2; text-wrap: balance; }
+.title-preset[disabled] { opacity: .65; cursor: default; }
 
 /* Los botones son los dos del prototipo 03, y el reparto dice cuál manda:
    **madera el de fundar**, que es lo que esta pantalla existe para hacer, y
@@ -204,6 +208,13 @@ export function parseSeed(text: string, fallback: number): number {
  * sesenta, y cada año cuesta unos 22 ms.
  */
 const YEAR_MAX = 120;
+
+/** Partidas reales y reproducibles, comprobadas en sus tres eras. Sólo taller. */
+export const DEV_PRESETS = [
+  { id: 'hamlet', seed: 7, year: 1 },
+  { id: 'village', seed: 11, year: 21 },
+  { id: 'town', seed: 7, year: 60 },
+] as const;
 
 /**
  * El año que se escribió en el campo de taller, o `fallback` si no vale.
@@ -411,12 +422,7 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   begin.type = 'button';
   begin.className = 'title-new skin-button--wood';
   begin.textContent = renderUiText('title.new');
-  begin.addEventListener('click', () => {
-    const choice: TitleChoice = {
-      kind: 'new',
-      seed: parseSeed(seed.value, rollSeed(played)),
-      year: devRow.hidden ? 1 : parseYear(year.value),
-    };
+  const launch = (choice: Extract<TitleChoice, { kind: 'new' }>, button: HTMLButtonElement): void => {
     // **Un fotograma de aviso antes de congelarse.** Jugar sesenta años es más
     // de un segundo de reloj de verdad, y quien lo pide en el menú se queda
     // mirando un botón que no responde: eso se lee como un juego roto. Con el
@@ -424,13 +430,31 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
     // pinta **antes** de que empiece la cuenta, porque el cuadro siguiente es
     // justo después del pintado.
     if (choice.year > 1) {
-      begin.textContent = renderUiText('title.new.working');
-      begin.disabled = true;
+      button.textContent = renderUiText('title.new.working');
+      button.disabled = true;
       requestAnimationFrame(() => { finish(choice); });
       return;
     }
     finish(choice);
+  };
+  begin.addEventListener('click', () => {
+    launch({ kind: 'new', seed: parseSeed(seed.value, rollSeed(played)),
+      year: devRow.hidden ? 1 : parseYear(year.value) }, begin);
   });
+
+  const presets = document.createElement('div');
+  presets.className = 'title-presets';
+  for (const preset of DEV_PRESETS) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'title-preset skin-button--parchment';
+    // `year` es una fecha de crónica para renderUiText y suma uno. Estos
+    // botones ya llevan el año de cabecera, así que usan un parámetro neutro.
+    button.textContent = renderUiText(`title.dev.preset.${preset.id}`, { target: preset.year });
+    button.addEventListener('click', () => launch({ kind: 'new', seed: preset.seed, year: preset.year }, button));
+    presets.append(button);
+  }
+  devRow.append(presets);
 
   const sound = document.createElement('button');
   sound.type = 'button';

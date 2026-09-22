@@ -2480,6 +2480,9 @@ export const UI_BANK: Record<string, string> = {
   'title.dev': 'Dev',
   'title.dev.year': 'Open at year',
   'title.dev.hint': 'The valley is played forward with the reference policy before it opens, so what you see is a real game and not a mock-up. Ten years take about a second. A valley that dies on the way opens as what it became.',
+  'title.dev.preset.hamlet': 'Hamlet · Year {target}',
+  'title.dev.preset.village': 'Village · Year {target}',
+  'title.dev.preset.town': 'Walled town · Year {target}',
   // U-11 · el inicio guiado: dos pistas, una vez, después del vuelo de entrada.
   // Se tocan para pasar. No son un tutorial: dicen dónde están los dos mandos.
   'intro.orders': 'The line below is the standing orders: what to sow, where hands go, what to raise. Tap to change.',
