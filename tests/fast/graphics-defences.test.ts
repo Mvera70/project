@@ -5,7 +5,7 @@ import { Box3, BoxGeometry, Group, Mesh, MeshStandardMaterial, Vector3 } from 't
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { foundTwenty } from '../helpers/founding';
 import type { Building } from '../../src/engine/state';
-import { DEFENCE_DIRECTIONS, defenceConnections } from '../../src/render3d/world/defences';
+import { DEFENCE_DIAGONALS, DEFENCE_DIRECTIONS, defenceConnections } from '../../src/render3d/world/defences';
 import { planChange, planFor } from '../../src/render3d/world/plan';
 import { buildFromAsset } from '../../src/render3d/world/buildings';
 
@@ -51,7 +51,7 @@ describe('G-21 · conexiones de defensas', () => {
     expect(broken.buildings[2]?.connections).toBeUndefined();
     expect(planChange(joined,broken).changed.map(b=>b.id)).toEqual([1,2,3]);
   });
-  it('todas las orientaciones llegan a la linde y quedan dentro de su celda', () => {
+  it('las cardinales quedan en la celda y las diagonales sólo sangran por su esquina', () => {
     const state=foundTwenty(7);
     state.buildings=[wall(1,10,10)];
     const planned=planFor(state).buildings[0]!;
@@ -61,10 +61,12 @@ describe('G-21 · conexiones de defensas', () => {
     for(let mask=0;mask<256;mask++) {
       const model=buildFromAsset({...planned,connections:mask},source.clone(true));
       const bounds=new Box3().setFromObject(model.object);
-      expect(bounds.min.x).toBeGreaterThanOrEqual(10-1e-6);
-      expect(bounds.max.x).toBeLessThanOrEqual(11+1e-6);
-      expect(bounds.min.z).toBeGreaterThanOrEqual(10-1e-6);
-      expect(bounds.max.z).toBeLessThanOrEqual(11+1e-6);
+      const bleed = .34 * Math.SQRT1_2 / 2;
+      const diagonal = DEFENCE_DIAGONALS.filter(d => mask & d.bit);
+      expect(bounds.min.x).toBeGreaterThanOrEqual(10 - (diagonal.some(d => d.x < 0) ? bleed : 0) - 1e-6);
+      expect(bounds.max.x).toBeLessThanOrEqual(11 + (diagonal.some(d => d.x > 0) ? bleed : 0) + 1e-6);
+      expect(bounds.min.z).toBeGreaterThanOrEqual(10 - (diagonal.some(d => d.z < 0) ? bleed : 0) - 1e-6);
+      expect(bounds.max.z).toBeLessThanOrEqual(11 + (diagonal.some(d => d.z > 0) ? bleed : 0) + 1e-6);
       for(const d of DEFENCE_DIRECTIONS.filter(d=>mask&d.bit)) {
         const endpoint=new Vector3(10.5+d.x*.5,.4,10.5+d.z*.5);
         expect(bounds.distanceToPoint(endpoint)).toBeLessThan(1e-6);
@@ -72,6 +74,43 @@ describe('G-21 · conexiones de defensas', () => {
       model.dispose();
     }
     mesh.geometry.dispose();(mesh.material as MeshStandardMaterial).dispose();
+  });
+  it('los GLB publicados cierran cada unión diagonal con una sección compartida y sin sangrado amplio', async () => {
+    const loader = new GLTFLoader();
+    for (const kind of ['wall', 'palisade'] as const) {
+      const gltf = await loader.parseAsync(publishedGlb(kind), '');
+      const thickness = kind === 'wall' ? .34 : .18;
+      const bleed = thickness * Math.SQRT1_2 / 2;
+      for (const direction of DEFENCE_DIAGONALS) {
+        const state = foundTwenty(7);
+        state.buildings = [wall(1, 10, 10, kind), wall(2, 10 + direction.x, 10 + direction.z, kind)];
+        const [first, second] = planFor(state).buildings;
+        expect(first?.connections).toBe(direction.bit);
+        expect(second?.connections).toBe(DEFENCE_DIAGONALS.find(d => d.x === -direction.x && d.z === -direction.z)?.bit);
+        const firstModel = buildFromAsset(first!, gltf.scene);
+        const secondModel = buildFromAsset(second!, gltf.scene);
+        try {
+          const a = new Box3().setFromObject(firstModel.object);
+          const b = new Box3().setFromObject(secondModel.object);
+          const corner = new Vector3(10.5 + direction.x * .5, 0, 10.5 + direction.z * .5);
+          for (const axis of ['x', 'z'] as const) {
+            // Antes las cajas sólo coincidían en el vértice. El GLB de estacas
+            // afina su remate, así que comprobamos solape geométrico positivo,
+            // y que nunca pueda superar la media sección autorizada.
+            const overlap = Math.min(a.max[axis], b.max[axis]) - Math.max(a.min[axis], b.min[axis]);
+            expect(overlap).toBeGreaterThan(1e-4);
+            const aBleed = direction[axis] > 0
+              ? a.max[axis] - corner[axis] : corner[axis] - a.min[axis];
+            const bBleed = direction[axis] > 0
+              ? corner[axis] - b.min[axis] : b.max[axis] - corner[axis];
+            expect(aBleed).toBeGreaterThan(1e-4);
+            expect(aBleed).toBeLessThanOrEqual(bleed + 1e-5);
+            expect(bBleed).toBeGreaterThan(1e-4);
+            expect(bBleed).toBeLessThanOrEqual(bleed + 1e-5);
+          }
+        } finally { firstModel.dispose(); secondModel.dispose(); }
+      }
+    }
   });
   it('el tramo llega también al portón real sin convertirlo en muro', () => {
     const gate = { ...wall(2, 11, 10), kind: 'gate' as const };

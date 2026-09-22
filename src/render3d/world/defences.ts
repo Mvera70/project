@@ -51,7 +51,8 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
   const owned: BufferGeometry[] = [];
   const mask = planned.connections ?? 0;
 
-  function segment(length: number, x: number, z: number, angle: number): void {
+  function segment(length: number, x: number, z: number, angle: number,
+    corner?: { x: number; z: number }): void {
     if (length < 1) {
       // Recortar, no aplastar: las almenas y las estacas mantienen su anchura.
       const turn = new Group();
@@ -63,7 +64,11 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
           .multiply(node.matrixWorld);
         const geometry = clippedStrip(node.geometry, matrix, length);
         owned.push(geometry);
-        turn.add(new Mesh(geometry, node.material));
+        const mesh = new Mesh(geometry, node.material);
+        // Sólo los dos extremos de un tramo diagonal pueden rebasar la celda.
+        // La marca sobre la malla sobrevive al aplanado que hacemos más abajo.
+        if (corner !== undefined) mesh.userData.defenceCorner = corner;
+        turn.add(mesh);
       });
       turn.rotation.y = angle;
       turn.position.set(x, 0, z);
@@ -129,9 +134,9 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
     }
     for (const d of DEFENCE_DIAGONALS) {
       if ((mask & d.bit) === 0) continue;
-      // Cada mitad llega a la esquina común. La malla se recorta después
-      // contra la parcela para no invadir las dos celdas transitables vecinas.
-      segment(Math.SQRT1_2, 0.5 + d.x * 0.25, 0.5 + d.z * 0.25, -Math.atan2(d.z, d.x));
+      // Cada mitad llega a la esquina común. El recorte posterior conserva sólo
+      // una media sección en esa esquina, para que ambas mitades no se separen.
+      segment(Math.SQRT1_2, 0.5 + d.x * 0.25, 0.5 + d.z * 0.25, -Math.atan2(d.z, d.x), d);
     }
   }
   if ((mask & 240) !== 0 && planned.gate === undefined) {
@@ -141,9 +146,17 @@ export function buildDefence(planned: PlannedBuilding, source: Object3D): Buildi
     group.traverse(node => { if (node instanceof Mesh) meshes.push(node); });
     const replacements: Mesh[] = [];
     for (const mesh of meshes) {
+      const corner = mesh.userData.defenceCorner as { x: number; z: number } | undefined;
+      // En una diagonal, el eje del tramo llega al vértice compartido. Recortar
+      // exactamente a [0, 1] deja las dos secciones transversales tocándose sólo
+      // en un punto. Dejamos salir media sección (t / 2√2) en sus dos planos de
+      // esquina; las piezas cardinales y el núcleo continúan ceñidos a la celda.
+      const bleed = corner === undefined ? 0 : thickness * Math.SQRT1_2 / 2;
       const geometry = clippedStrip(mesh.geometry, new Matrix4().copy(inverse).multiply(mesh.matrixWorld), 1,
-        [{ axis: 'x', sign: -1, edge: 0 }, { axis: 'x', sign: 1, edge: 1 },
-          { axis: 'z', sign: -1, edge: 0 }, { axis: 'z', sign: 1, edge: 1 }]);
+        [{ axis: 'x', sign: -1, edge: corner?.x === -1 ? bleed : 0 },
+          { axis: 'x', sign: 1, edge: corner?.x === 1 ? 1 + bleed : 1 },
+          { axis: 'z', sign: -1, edge: corner?.z === -1 ? bleed : 0 },
+          { axis: 'z', sign: 1, edge: corner?.z === 1 ? 1 + bleed : 1 }]);
       owned.push(geometry);
       replacements.push(new Mesh(geometry, mesh.material));
     }

@@ -33,7 +33,6 @@ const HEIGHT = {
   roofGlow: 1.55,
   candles: 0.42,
   banner: 1.1,
-  grain: 0.05,
 } as const;
 
 const TONE = {
@@ -41,7 +40,6 @@ const TONE = {
   light: '#E6B85C',
   plague: '#7C5B7A',
   candles: '#F2D48A',
-  grain: '#D8B25E',
 } as const;
 
 const BANNER_TONES: Record<string, string> = {
@@ -320,34 +318,12 @@ function bodyOf(tell: Tell, at?: (x: number, y: number) => Building | undefined,
         new BoxGeometry(0.07, 0.42, 0.02), BANNER_TONES[tell.colour] ?? '#8C3B34', false,
         tell.x, HEIGHT.banner, tell.y,
       )];
-    case 'granary': {
-      // El stock se lee como sacos apilados delante del granero. El bloque
-      // amarillo anterior tenía la huella de una habitación y parecía una
-      // pieza de depuración, justo al lado de la cosecha que debía explicar.
-      const barn = at === undefined ? undefined : at(tell.x + 1, tell.y + 1);
-      const spot = barn === undefined
-        ? { x: tell.x + 1, z: tell.y + 1, free: true }
-        : outsideOf(barn, at as (x: number, y: number) => Building | undefined);
-      const count = Math.ceil(tell.fraction * 6);
-      // Si ni caras ni esquinas estaban libres, los sacos suben por encima del
-      // tejado: una señal que no se ve no dice nada, y lo que esta señal dice
-      // —cuánto grano hay— es de las que el jugador mira.
-      const lift = spot.free ? 0 : ROOF_CLEAR;
-      return Array.from({ length: count }, (_, index) => {
-        const upper = index >= 4;
-        const slot = upper ? index - 4 : index;
-        const x = spot.x + (slot - (upper ? 0.5 : 1.5)) * 0.27;
-        const y = HEIGHT.grain + 0.13 + (upper ? 0.21 : 0) + lift;
-        const z = spot.z + (upper ? 0 : (index % 2) * 0.08);
-        const sack = mark(
-          new SphereGeometry(0.16, 8, 5), TONE.grain, false,
-          x, y, z,
-        );
-        sack.object.scale.set(1.35, 0.8, 0.95);
-        const tie = mark(new BoxGeometry(0.055, 0.055, 0.055), '#725438', false, x, y + 0.13, z);
-        return [sack, tie];
-      }).flat();
-    }
+    case 'granary':
+      // G-30: los sacos de esfera naranja eran una señal duplicada del grano.
+      // Invadían tejados y almiares y seguían pareciendo bultos sin contexto
+      // al bajarlos al suelo. El HUD conserva la cifra y G-15 ya pone almiares
+      // cuando existe cosecha; no se añade un segundo objeto de grano en 3D.
+      return [];
     default:
       return [];
   }

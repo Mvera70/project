@@ -612,6 +612,18 @@ describe('G-10 · la luz de las casas', () => {
 });
 
 describe('G-10 · ninguna señal enterrada', () => {
+  it('el nivel del granero sigue en el estado pero no dibuja sacos naranjas duplicados', () => {
+    const state = village(14);
+    const full = structuredClone(state);
+    full.village.grain = 100_000;
+    const empty = structuredClone(state);
+    empty.village.grain = 0;
+    expect(tellsFor(full).some((tell) => tell.kind === 'granary')).toBe(true);
+    const fullTells = new Tells(), emptyTells = new Tells();
+    fullTells.update(full); emptyTells.update(empty);
+    expect(fullTells.count).toBe(emptyTells.count);
+    fullTells.dispose(); emptyTells.dispose();
+  });
   it('toda señal se ve: o fuera de las paredes, o por encima del tejado', () => {
     // La lección de la ronda, convertida en aserto. `tellsFor` da posiciones en
     // coordenadas de mapa, pensadas para un dibujo plano donde la casa es una

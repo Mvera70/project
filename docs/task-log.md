@@ -1,5 +1,21 @@
 # Cuaderno de tareas — el rework
 
+## 22 sep 2026 · G-30, uniones diagonales y sacos naranjas
+
+Se corrigió la costura de las conexiones diagonales de muralla de piedra y
+empalizada. La media sección que faltaba en la esquina ahora se comparte sin
+ensanchar el resto de la celda. Se retiraron los sacos naranjas esféricos de
+la señal 3D del granero: invadían tejados y almiares; bajarlos al suelo no
+resolvía su aspecto. Si vuelven, deberán tener un modelo 3D rehecho y un
+emplazamiento propio. El grano permanece en el HUD y los almiares.
+
+Comparación antes/después del juego real sin errores de página; 49 pruebas
+focales verdes y comprobación de los GLB publicados en las cuatro diagonales.
+La vista original de Vera no se ha reproducido aún en su dispositivo. Sol
+dirigió y revisó, Terra implementó la unión, Luna apoyó la inspección; Astra
+no se usó. [Informe G-30](historico/graphics-rounds/G-30.md). Sin push ni
+despliegue.
+
 ## 22 sep 2026 · E3a, puesto elevado navegable cerrado; adarve pendiente
 
 Vera autorizó continuar tras la auditoría de la costura. La guardia de un
