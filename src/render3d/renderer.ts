@@ -33,6 +33,8 @@ import type {
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildBackdrop, type Backdrop } from './world/backdrop';
+import { buildGreatOak, type GreatOak } from './world/great-oak';
+import { greatOakCell } from '@derive/landmark';
 import { mountainWolves } from './world/mountain-wolves';
 import { ridgeAt } from './world/ridge';
 import { buildFord, type Ford } from './world/ford';
@@ -406,6 +408,8 @@ export async function createGraphicsRenderer(
   let plan: ScenePlan | null = null;
   /** La sierra de V-14. Vive con el valle y se rehace sólo si cambia el mapa. */
   let backdrop: Backdrop | null = null;
+  // UI-W · el roble del emblema a la orilla del lago (`world/great-oak.ts`).
+  let greatOak: GreatOak | null = null;
   let viewport: GraphicsViewport = { widthCss: 1, heightCss: 1, pixelRatio: 1 };
   /** Cuanto se sube en pantalla a quien se sigue. Ver `track`. TUNE: 0,14. */
   const TRACK_LIFT = 0.14;
@@ -717,6 +721,7 @@ export async function createGraphicsRenderer(
     appearanceSnow = snowFrom + (snowTarget - snowFrom) * eased;
     forest?.season(blendedPalette);
     backdrop?.season(blendedPalette);
+    greatOak?.season(blendedPalette);
     village.season(appearanceSnow, blendedPalette.accent);
     treeFalls.season(blendedPalette);
     if (t >= 1) {
@@ -758,6 +763,7 @@ export async function createGraphicsRenderer(
     appearanceElapsed = 0;
     forest?.season(appearancePalette);
     backdrop?.season(appearancePalette);
+    greatOak?.season(appearancePalette);
     village.season(appearanceSnow, appearancePalette.accent);
     treeFalls.season(appearancePalette);
   }
@@ -846,6 +852,13 @@ export async function createGraphicsRenderer(
     backdrop = buildBackdrop(state.map, state.terrainSeed, palette,
       library.get(TREE_PINE)?.original as Object3D | undefined);
     world.add(backdrop.group);
+    // El roble va con el mapa, como la sierra: su sitio sale del lago.
+    if (greatOak !== null) {
+      world.remove(greatOak.group);
+      greatOak.dispose();
+    }
+    greatOak = buildGreatOak(state.map, palette);
+    world.add(greatOak.group);
 
     // El bosque y los pedregales se replantan con el suelo, que es cuando
     // alguien tala o el terreno cambia.
@@ -862,6 +875,12 @@ export async function createGraphicsRenderer(
 
     // Lo construido no lleva vegetacion encima.
     const taken = builtCells(state);
+    // Ni juncos ni matas en el pie del roble del lago (se veía un junco
+    // saliendo del tronco). Sus vecinas también: las raíces asoman.
+    const oakCell = greatOakCell(state.map);
+    if (oakCell !== null) {
+      for (const cell of [oakCell, oakCell - 1, oakCell + 1, oakCell - state.map.width, oakCell + state.map.width]) taken.add(cell);
+    }
     rebuildForest(state, palette);
     // G-15 · y los trastos del corral, que cuelgan de lo construido: el almiar
     // toca un campo, la leña toca una casa, la carreta está en el camino. Se
@@ -1921,6 +1940,11 @@ export async function createGraphicsRenderer(
         world.remove(ground.mesh);
         ground.dispose();
         ground = null;
+      }
+      if (greatOak !== null) {
+        world.remove(greatOak.group);
+        greatOak.dispose();
+        greatOak = null;
       }
       if (backdrop !== null) {
         world.remove(backdrop.group);

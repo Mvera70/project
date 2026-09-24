@@ -1,5 +1,6 @@
 import { visibleBuildings } from '@derive/visible-buildings';
 // IA-10 · La navegación recibe los mismos objetos y transformaciones que se pintan.
+import { greatOakCell } from '@derive/landmark';
 import { Box3, Matrix4, Mesh, Quaternion, Vector3, type Object3D } from 'three';
 import { TERRAIN_CODE, type GameState } from '@engine/state';
 import { terrainOf } from '../life/terrain';
@@ -73,6 +74,9 @@ export function solidTerrain(state: GameState, source: (id: string) => Object3D 
     block(new Box3(new Vector3(building.x, 0, building.y),
       new Vector3(building.x + building.w, 1, building.y + building.h)));
   }
+  // UI-W · el roble del lago es un tronco de una celda: nadie lo atraviesa.
+  const oak = greatOakCell(state.map);
+  if (oak !== null) land.blocked[oak] = 1;
   const tree = source('tree');
   const taken = builtCells(state);
   if (tree !== undefined) {

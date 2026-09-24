@@ -99,3 +99,12 @@ cuenta, se añade aquí **en la misma ronda**, con qué hace el motor, qué se v
 hoy y qué haría falta. Un encargo que sólo vive en un comentario del código es
 un encargo que nadie hará — y una mecánica que no se ve no existe para quien
 juega.
+
+## El roble del valle (24 sep 2026)
+
+Hecho **por código** (`src/render3d/world/great-oak.ts`): primitivas facetadas,
+tronco con raíces, cinco ramas y copa ancha. Es el emblema del título a la
+orilla del lago. **Pendiente, si Vera lo quiere:** encargarlo en Blender con
+más carácter —corteza, raíces que abracen el suelo, copa con huecos— y
+cambiar sólo ese fichero por el modelo. Tampoco hace nada todavía: podría ser
+un sitio de la capa de vida (descansar a su sombra, reunirse en fiesta).

@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · El roble del valle
+
+El árbol del escudo del título tiene cuerpo en el mundo (Vera: «debe tener
+representación física en el juego; ponlo al lado del lago»). Un roble grande
+por código (`src/render3d/world/great-oak.ts`), en la orilla del lago más
+cercana al centro (`src/derive/landmark.ts`), y sin lago —17 de 60 valles— en
+la orilla del río fuera del corazón: todo valle tiene el suyo. Su celda la
+bloquea la capa de vida y ahí no brotan juncos. No toca el motor ni el
+guardado. Capturas en `artifacts/graphics/ui-wood/oak/`. Candidato a encargo
+de Blender si se quiere más detalle (`docs/encargos-3d.md`).
+
 ## 24 sep 2026 · UI-W, el logotipo del título
 
 Logotipo generado por Vera, recortado con `tools/ui/cut-logo.py` y puesto en la
