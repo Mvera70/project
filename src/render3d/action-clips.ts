@@ -1,6 +1,6 @@
 // IA-12 · Acciones compartidas por los esqueletos del catálogo, sin cambiar sus GLB.
 import { type AnimationClip, Quaternion, QuaternionKeyframeTrack, Vector3, VectorKeyframeTrack } from 'three';
-import { VILLAGER_CLIPS, type ClipName } from './clips';
+import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
 
 /**
  * Los clips que este módulo **fabrica**, y que por tanto no están en el GLB ni
@@ -13,7 +13,7 @@ import { VILLAGER_CLIPS, type ClipName } from './clips';
  * Lo vigila `tests/fast/graphics-clock.test.ts`.
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
-  'sit', 'talk', 'pray', 'hammer', 'chop', 'play', 'drink', 'sort',
+  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'play', 'drink', 'sort',
   'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
 ];
 
@@ -22,20 +22,47 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
     const duration = VILLAGER_CLIPS[name].seconds;
     const clip = idle.clone(); clip.name = name; clip.duration = duration;
     for (const track of clip.tracks) track.times = Float32Array.from(track.times, t => t * duration / idle.duration);
+    // Los giros de un mismo hueso se acumulan (IA-anim: el torso gira y se
+    // dobla a la vez); la pista se escribe una sola vez al final.
+    const turns = new Map<string, { axis: Vector3; angle: (t: number) => number }[]>();
     const turn = (bone: string, axis: Vector3, angle: (t: number) => number): void => {
-      // GLTFLoader elimina los puntos del nombre del hueso al crear los tracks.
-      const original = idle.tracks.find(track => track.name === `${bone.replaceAll('.', '')}.quaternion`);
-      if (original === undefined) return;
-      const base = new Quaternion().fromArray(original.values, 0), times: number[] = [], values: number[] = [];
-      for (let n = 0; n <= 24; n++) {
-        const t = n / 24; times.push(t * duration);
-        values.push(...base.clone().multiply(new Quaternion().setFromAxisAngle(axis, angle(t))).toArray());
-      }
-      clip.tracks = clip.tracks.filter(track => track.name !== original.name);
-      clip.tracks.push(new QuaternionKeyframeTrack(original.name, times, values));
+      turns.set(bone, [...turns.get(bone) ?? [], { axis, angle }]);
     };
-    const x = new Vector3(1, 0, 0), z = new Vector3(0, 0, 1);
+    const flush = (): void => {
+      for (const [bone, list] of turns) {
+        // GLTFLoader elimina los puntos del nombre del hueso al crear los tracks.
+        const original = idle.tracks.find(track => track.name === `${bone.replaceAll('.', '')}.quaternion`);
+        if (original === undefined) continue;
+        const base = new Quaternion().fromArray(original.values, 0), times: number[] = [], values: number[] = [];
+        // 48 muestras: el golpe dura una décima del ciclo y con 24 se perdía.
+        for (let n = 0; n <= 48; n++) {
+          const t = n / 48; times.push(t * duration);
+          const q = base.clone();
+          for (const { axis, angle } of list) q.multiply(new Quaternion().setFromAxisAngle(axis, angle(t)));
+          values.push(...q.toArray());
+        }
+        clip.tracks = clip.tracks.filter(track => track.name !== original.name);
+        clip.tracks.push(new QuaternionKeyframeTrack(original.name, times, values));
+      }
+    };
+    const x = new Vector3(1, 0, 0), y = new Vector3(0, 1, 0), z = new Vector3(0, 0, 1);
     const wave = (t: number): number => Math.sin(t * Math.PI * 2);
+    /**
+     * IA-anim · Un valor por pose clave, interpolado entre ellas. Cada tramo
+     * lleva su propia curva: la subida suave, el golpe acelerado hasta el
+     * impacto (`strike`), el rebote corto. Es lo que distingue un hachazo de un
+     * brazo que sube y baja al ritmo de un seno.
+     */
+    const keyed = (keys: readonly (readonly [number, number, 'smooth' | 'strike' | 'hold'])[]) => (t: number): number => {
+      for (let i = 1; i < keys.length; i += 1) {
+        const [t0, v0] = keys[i - 1]!, [t1, v1, curve] = keys[i]!;
+        if (t > t1) continue;
+        const u = t1 === t0 ? 1 : (t - t0) / (t1 - t0);
+        const eased = curve === 'strike' ? u * u * u : curve === 'hold' ? 0 : u * u * (3 - 2 * u);
+        return v0 + (v1 - v0) * eased;
+      }
+      return keys.at(-1)![1];
+    };
     if (name === 'flee') {
       // Carrera de silueta grande: piernas y brazos opuestos, torso echado
       // hacia delante y dos apoyos idénticos por ciclo. Se fabrica aparte de
@@ -129,11 +156,44 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
     } else if (name === 'pray') {
       for (const side of ['L', 'R']) { turn(`upperarm.${side}`, x, () => -0.55); turn(`forearm.${side}`, x, () => -1.1); }
       turn('head', x, () => 0.2);
-    } else if (name === 'hammer' || name === 'chop') {
+    } else if (name === 'mine' || name === 'chop') {
+      // IA-anim · Pico y hacha: tres poses —preparado, arriba, golpe— con la
+      // subida lenta, la bajada acelerada hasta el impacto y un rebote. El
+      // impacto cae en `STRIKE_AT` del ciclo (`clips.ts`), que es donde el
+      // render suelta las astillas. El pico sube por encima de la cabeza y
+      // clava al suelo delante; el hacha carga sobre el hombro derecho y
+      // barre en diagonal hasta el tronco a la altura de la cintura.
+      const at = STRIKE_AT[name];
+      // Preparado, arriba, golpe y rebote, en fracción del ciclo.
+      const pose = (ready: number, up: number, hit: number) => keyed([
+        [0, ready, 'smooth'], [at - 0.12, up, 'smooth'], [at, hit, 'strike'],
+        [at + 0.06, hit + (up - hit) * 0.08, 'smooth'], [at + 0.12, hit, 'smooth'],
+        [at + 0.3, ready, 'smooth'], [1, ready, 'smooth'],
+      ]);
+      if (name === 'mine') {
+        for (const side of ['L', 'R']) {
+          turn(`upperarm.${side}`, x, pose(-0.9, -2.75, -0.55));
+          turn(`forearm.${side}`, x, pose(-0.7, -1.0, -0.05));
+          turn(`upperarm.${side}`, z, pose(0, 0, 0));
+          turn(`thigh.${side}`, x, pose(-0.1, 0.05, -0.35));
+          turn(`shin.${side}`, x, pose(0.15, 0, 0.55));
+        }
+        turn('spine', x, pose(0.15, -0.2, 0.55));
+        turn('head', x, pose(0.1, -0.15, 0.25));
+      } else {
+        turn('upperarm.R', x, pose(-0.8, -2.3, -1.15));
+        turn('forearm.R', x, pose(-0.7, -1.4, -0.1));
+        turn('upperarm.L', x, pose(-0.85, -1.9, -1.2));
+        turn('forearm.L', x, pose(-0.75, -1.6, -0.15));
+        turn('spine', y, pose(0, 0.4, -0.4));
+        turn('spine', x, pose(0.1, -0.05, 0.3));
+        turn('thigh.L', x, pose(0, 0.05, -0.2));
+        turn('shin.L', x, pose(0.05, 0, 0.3));
+      }
+    } else if (name === 'hammer') {
       turn('upperarm.R', x, t => -0.5 - 0.65 * (1 + wave(t)));
       turn('forearm.R', x, t => -0.6 - 0.35 * (1 - wave(t)));
       turn('spine', x, t => 0.08 + 0.08 * wave(t));
-      if (name === 'chop') { turn('upperarm.L', x, t => -0.6 - 0.55 * (1 + wave(t))); turn('forearm.L', x, () => -0.7); }
     } else if (name === 'sort') {
       for (const side of ['L', 'R']) {
         turn(`upperarm.${side}`, x, t => -0.55 - 0.25 * wave(t));
@@ -147,6 +207,7 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
       turn('upperarm.L', z, t => -0.2 - 0.15 * wave(t)); turn('upperarm.R', z, t => 0.2 + 0.15 * wave(t));
       turn('spine', z, t => 0.08 * wave(t));
     }
+    flush();
     return clip;
   });
 }

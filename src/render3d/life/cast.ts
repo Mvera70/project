@@ -43,7 +43,8 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     if (action.startsWith('prepare')) return 'sort';
     if (action === 'harvest') return 'sort';
     if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
-      : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
+      : place.startsWith('quarry:') ? 'mine'
+        : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';
     if (action.startsWith('deliver')) return 'sort';
     if (action === 'sit') return 'sit';
     if (action === 'pray') return 'pray';

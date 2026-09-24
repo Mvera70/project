@@ -161,10 +161,11 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   //
   // Los números son los de una aldea entera junta y no los de un corro:
   //
-  //  · `seats: 40`, que es más gente de la que una aldea de este juego tiene
-  //    (`LIFE.MAX_HOUSES` × `HOUSE_CAPACITY` = 80, y nunca están todos fuera).
-  //    `seatsOn` recorta a lo que de verdad cabe en el suelo, así que pedir de
-  //    más no inventa sitio: sólo impide que el aforo sea lo que corte.
+  //  · `seats: 80`, el techo de una aldea (`LIFE.MAX_HOUSES` ×
+  //    `HOUSE_CAPACITY`). Eran 40, «más gente de la que una aldea tiene», y
+  //    dejó de serlo: la semilla 7 llega a 63 vecinos al año 30. El corro
+  //    (`crowdSeats`, `staging.ts`) recorta a lo que de verdad cabe en el
+  //    suelo, así que pedir de más no inventa sitio.
   //  · `reach: 2.2`, el doble que cualquier otra. Una reunión es un gentío, no
   //    una fila: quien llega al borde ya está en la reunión.
   //  · `gives` lo llena de compañía y aburrimiento —es estar con todo el
@@ -172,7 +173,7 @@ export const OFFERS: Readonly<Record<string, OfferSpec>> = {
   //    la diferencia que se ve desde arriba.
   //  · `seconds: [40, 120]`, de las más largas de la tabla: se está un rato.
   gather: {
-    id: 'gather', reach: 2.2, seats: 40,
+    id: 'gather', reach: 2.2, seats: 80,
     gives: { company: 1, boredom: 1 }, seconds: [40, 120],
   },
 };

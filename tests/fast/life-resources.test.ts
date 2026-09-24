@@ -114,7 +114,8 @@ describe('IA-15/17/18 · recursos visibles', () => {
       life.step(0.45);
       interrupted ||= mason.holding !== null && mason.holding <= -1_000_000 && mason.scene !== null;
       const actor = castOf(life, step / 30, new Map(), new Set()).find(item => item.id === mason.villager);
-      quarrying ||= actor?.clip === 'hammer' && mason.doing?.place.id.startsWith('quarry:') === true;
+      // IA-anim: en la cantera se pica con pico (`mine`), no con el martillo de la fragua.
+      quarrying ||= actor?.clip === 'mine' && mason.doing?.place.id.startsWith('quarry:') === true;
       hauling ||= actor?.clip === 'carry_walk' && actor.load === 'stone';
       unloading ||= actor?.clip === 'sort' && mason.doing?.offer.id === 'deliver-stone';
     }

@@ -663,7 +663,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // Dándole la orilla, `meetingPlace` mueve el punto a la celda alcanzable más
   // cercana y descarta las plazas de otra bolsa; si de verdad no hay ninguna,
   // sigue devolviendo nada y la jornada es la de siempre.
-  const summons = ordersOf(state)
+  const summons = ordersOf(state, day)
     .map((order, index) => meetingPlace(order, land, index, shore))
     .filter((place): place is Place => place !== null);
   /** Si el motor ha convocado a la aldea hoy y hay dónde reunirse. */
@@ -675,7 +675,13 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // caían de la lista que reparte la jornada y **nadie subía** — medido en la
   // semilla 11: siete puestos con sitio y cero asignados.
   const mine = summoned
-    ? [...summons, ...manned.map((post) => post.place)]
+    // Y el agua: la sed sí es urgente, y sin pozo ni vado en la lista el
+    // sediento se quedaba parado toda la jornada en vez de ir a beber y volver.
+    ? [...summons, ...manned.map((post) => post.place),
+      ...places.flatMap((place) => {
+        const drink = place.offers.filter((offer) => offer.id === 'drink');
+        return drink.length === 0 ? [] : [{ ...place, offers: drink }];
+      })]
     : [
       ...places,
       ...beasts.map((beast) => beast.gift),
@@ -2052,6 +2058,18 @@ export function createVillage(state: GameState, day: number, options: DayOptions
           const mate = byId.get(dweller.aimAt);
           if (mate !== undefined) {
             turnTo(body, Math.atan2(mate.body.x - body.x, mate.body.z - body.z), LIFE_STEP);
+          }
+        }
+
+        // IA-anim · Quien tala mira al árbol y quien pica, a la roca: la plaza
+        // está en suelo pisable junto a la celda, y llegar andando dejaba la
+        // cara hacia donde venía, hachazos al aire de espaldas al tronco.
+        if (speed <= 0.05 && dweller.doing?.there === true && dweller.doing.offer.id === 'work') {
+          const [kind, cell] = dweller.doing.place.id.split(':');
+          if ((kind === 'felling' || kind === 'quarry') && cell !== undefined) {
+            const index = Number(cell);
+            const tx = index % land.width + 0.5, tz = Math.floor(index / land.width) + 0.5;
+            if (Math.hypot(tx - body.x, tz - body.z) > 0.05) turnTo(body, Math.atan2(tx - body.x, tz - body.z), LIFE_STEP);
           }
         }
 

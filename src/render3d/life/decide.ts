@@ -485,7 +485,11 @@ export function decide(
     // propiedad que V-11 existe para vigilar es justamente que la orden del
     // motor llegue a toda la aldea.
     const searchReach = hasHour ? LOOK * reachMult : personalReach * reachMult;
-    if (away > searchReach && who.job?.place !== place.id) continue;
+    // Y la convocatoria llega a todos, esté donde esté: con el mapa grande el
+    // vado queda a más de veinte celdas de media aldea. Medido en la semilla 7
+    // (vado, año 12): los trece que no iban estaban a 20–25 celdas, fuera de
+    // `LOOK × 4`, y se quedaban en pausa toda la jornada.
+    if (away > searchReach && who.job?.place !== place.id && !place.id.startsWith('gather:')) continue;
     for (const offer of place.offers) {
       const assigned = who.job?.place === place.id && who.job.offer === offer.id;
       // Las descargas y la recolección nacen de una rutina que ya lleva su
@@ -546,7 +550,11 @@ export function decide(
       // campos movió a la gente de sitio. La orden del motor se aplica sobre
       // el resultado final, con la única excepción de una necesidad al límite.
       if (summoned) {
-        const urgent = Math.max(...NEED_NAMES.map((need) => who.needs[need]));
+        // El deber no cuenta: en día de reunión no hay tajo que lo calme, y
+        // contarlo dejaba fuera a todo el que venía de trabajar. Medido en la
+        // semilla 7 (vado, año 12): quince de veintinueve parados en pausa,
+        // todos con el deber a 0,92 o 1,0.
+        const urgent = Math.max(...NEED_NAMES.filter((need) => need !== 'duty').map((need) => who.needs[need]));
         if (urgent < GATHER_URGENT) score = Math.max(score, GATHER_FLOOR);
       }
 

@@ -1,5 +1,16 @@
 # The Valley — Registro de cambios
 
+## v4.39 · 24 sep 2026 · Reuniones que se acaban; talar y picar con gesto propio
+
+`gather.days` se lee como jornadas y no como semanas: desde v3.72 una reunión
+de tres días dejaba a la aldea parada veintiuna jornadas. Además el corro tenía
+seis plazas, la convocatoria no llegaba a más de veinte celdas y el deber
+contaba como urgencia; con las cuatro causas corregidas el vado de la semilla
+7 junta 29 de 29, y tres propiedades rojas desde B-1 pasan. Talar y picar
+tienen gesto de carga y golpe, herramienta visible (la de respaldo quedaba a
+un tercio de su tamaño) y astillas en el impacto. Evidencia en
+`historico/life-rounds/IA-anim-reuniones-y-gestos.md`.
+
 ## v4.38 · 24 sep 2026 · El adarve se genera desde el anillo (E3b cerrada)
 
 El adarve deja de depender de una malla aprobada por cada esquina: sale del

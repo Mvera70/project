@@ -42,8 +42,14 @@ export interface ClipMotion {
   readonly strideLength: number | null;
 }
 
-export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'play' | 'drink' | 'sort'
+export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'play' | 'drink' | 'sort'
   | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall' | 'flee';
+
+/**
+ * IA-anim · En qué fracción del ciclo pega la herramienta. Lo lee el clip para
+ * poner ahí el impacto y el render para soltar las astillas en ese instante.
+ */
+export const STRIKE_AT: Readonly<Record<'chop' | 'mine', number>> = { chop: 0.52, mine: 0.5 };
 
 /** Gestos de combate: su reloj procede del hecho, nunca del primer pintado. */
 export function combatClip(clip: string): boolean {
@@ -67,7 +73,11 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   talk: { seconds: 3.6, loop: true, strideLength: null },
   pray: { seconds: 5, loop: true, strideLength: null },
   hammer: { seconds: 1.6, loop: true, strideLength: null },
-  chop: { seconds: 2.2, loop: true, strideLength: null },
+  // IA-anim · Un hachazo y un golpe de pico por ciclo, con su impacto en
+  // `STRIKE_AT`. TUNE: 1,9 s y 1,7 s, el ritmo de alguien que trabaja todo el
+  // día y no de una exhibición; el pico pesa más pero recorre menos.
+  chop: { seconds: 1.9, loop: true, strideLength: null },
+  mine: { seconds: 1.7, loop: true, strideLength: null },
   play: { seconds: 2.4, loop: true, strideLength: null },
   drink: { seconds: 3, loop: true, strideLength: null },
   idle: { seconds: 4, loop: true, strideLength: null },

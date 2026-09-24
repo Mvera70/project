@@ -3532,9 +3532,13 @@ marcha que un salto de reloj pueda dejar a medias.
 decidió: si la capilla ardió entretanto, la gente se junta donde puede juntarse
 ahora.
 
-**`days` se lee como ticks, no como séptimos de semana.** A ×1 un tick es un día
-en pantalla (§10.6), así que una reunión de cuatro días que durase medio tick no
-se vería nunca. Es una decisión y queda anotada para la revisión artística.
+**`days` se lee como jornadas escénicas desde el 24 sep 2026** (IA-anim). Antes
+se leía como ticks porque a ×1 un tick era un día en pantalla (§10.6); desde
+v3.72 un tick son siete jornadas y la regla vieja dejaba a la aldea convocada
+`days` semanas: una reunión «de tres días» ocupaba veintiuna jornadas con la
+gente parada. Cuentan desde la primera jornada de la semana de la decisión
+(`tick · DAYS_PER_WEEK`, `life/staging.ts`). El render 2D de respaldo sigue
+leyendo ticks.
 
 #### `banner` y `douse` (v3.01)
 

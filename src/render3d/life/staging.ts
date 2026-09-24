@@ -19,8 +19,9 @@
 
 import { CATALOG } from '@engine/crossroads/catalog';
 import type { GameState, VillagerId } from '@engine/state';
+import { TIME } from '@engine/balance';
 import { gatheringsAt } from '@derive/gatherings';
-import type { Point, Terrain } from './body';
+import { fitsCircle, type Point, type Terrain } from './body';
 import { canReach, nearestReachable } from './terrain';
 import { OFFERS, placedOffer, type OfferSpec, type Place } from './offers';
 
@@ -59,8 +60,15 @@ export type Order =
  * la semana vuelve a durar menos que una jornada, esto vuelve a necesitar
  * ventana.
  */
-export function ordersOf(state: GameState, since: number = state.tick): Order[] {
-  return gatheringsAt(state, CATALOG, since)
+export function ordersOf(state: GameState, day?: number): Order[] {
+  return gatheringsAt(state, CATALOG, state.tick)
+    // **`days` son jornadas, no semanas.** §11.8 las leyó como ticks cuando un
+    // tick era un día en pantalla; desde v3.72 un tick son siete jornadas, y
+    // una reunión «de tres días» dejaba a la aldea plantada veintiuna jornadas
+    // seguidas. La semana de la decisión empieza en `tick · DAYS_PER_WEEK`.
+    .filter(meeting => day === undefined
+      || (day >= meeting.sinceTick * TIME.DAYS_PER_WEEK
+        && day < meeting.sinceTick * TIME.DAYS_PER_WEEK + meeting.ticks))
     .map((meeting): Order => ({
       kind: 'gather',
       // `Gathering` habla en coordenadas del mapa (`x`, `y`); esta capa llama
@@ -102,7 +110,7 @@ export function meetingPlace(
   if (order.kind !== 'gather') return null;
   const at = reach === undefined ? order.at : nearestReachable(land, reach, order.at, MEETING_SEARCH);
   if (at === null) return null;
-  const offer = placedOffer(OFFERS['gather'] as OfferSpec, at, land, MEETING_HOURS);
+  const offer = placedOffer(OFFERS['gather'] as OfferSpec, at, land, MEETING_HOURS, crowdSeats(land, at));
   if (offer === null) return null;
   if (reach !== undefined) {
     const spots = (offer.spots ?? []).filter((spot) => canReach(land, reach, spot));
@@ -194,3 +202,36 @@ const MEETING_HOURS: readonly [number, number] = [0.25, 0.75];
  * menos, una capilla pegada a otro edificio no encuentra la salida buena.
  */
 const MEETING_SEARCH = 6;
+
+/**
+ * Las plazas de un gentío: una malla hexagonal alrededor del punto, de dentro
+ * afuera, con cada cuerpo a un paso del vecino.
+ *
+ * La espiral genérica de `seatsOn` está hecha para un pozo o un tajo —cuatro
+ * puntos por vuelta, cuarenta intentos— y alrededor de la plaza o del vado
+ * daba **seis plazas**: medido en la semilla 7, año 30, con 63 vecinos. En día
+ * de reunión la reunión es la única oferta, así que los otros cincuenta se
+ * quedaban sin nada y se paraban donde estuvieran, toda la jornada.
+ *
+ * Separación 0,7: dos radios de cuerpo (0,64) y un pelo. Radio máximo 4,5
+ * celdas: ochenta cuerpos caben en unas 3,3, así que sobra para rodear un
+ * edificio sin irse a la otra punta del pueblo.
+ */
+function crowdSeats(land: Terrain, at: Point): Point[] {
+  const gap = 0.7, reach = 4.5, want = OFFERS['gather']!.seats;
+  const spots: Point[] = [];
+  const rows = Math.ceil(reach / (gap * Math.sqrt(3) / 2));
+  for (let row = -rows; row <= rows; row += 1) {
+    const z = at.z + row * gap * Math.sqrt(3) / 2;
+    const shift = row % 2 === 0 ? 0 : gap / 2;
+    for (let column = -Math.ceil(reach / gap) - 1; column <= Math.ceil(reach / gap) + 1; column += 1) {
+      const x = at.x + column * gap + shift;
+      if (Math.hypot(x - at.x, z - at.z) > reach) continue;
+      if (x <= 0.5 || z <= 0.5 || x >= land.width - 0.5 || z >= land.height - 0.5) continue;
+      if (fitsCircle(land, x, z, 0.32)) spots.push({ x, z });
+    }
+  }
+  return spots
+    .sort((a, b) => Math.hypot(a.x - at.x, a.z - at.z) - Math.hypot(b.x - at.x, b.z - at.z) || a.x - b.x || a.z - b.z)
+    .slice(0, want);
+}

@@ -384,7 +384,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1457,6 +1457,8 @@ export async function createGraphicsRenderer(
       arrows.update([...arrowsOf(life), ...(huntScene?.projectiles ?? [])]);
       plaza.show(plazaOf(shown), groundFloor);
       cast.show(lastActors, life.physics?.ragdolls ?? []);
+      // IA-anim · las astillas van con el reloj de la escena: en pausa, quietas.
+      cast.chips.step(frame.deltaSeconds, groundFloor);
       // D.7 · sólo el robledal realmente interpuesto ante el encuentro pierde
       // opacidad. Se calcula después de mover los cuerpos; no toca mapa,
       // obstáculos ni geometría física.

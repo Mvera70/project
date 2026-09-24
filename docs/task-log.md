@@ -1,5 +1,16 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · IA-anim: reuniones que se acaban, talar y picar
+
+Vera: la aldea se reunía fuera, pegada al bosque sin hacer nada, varios días
+seguidos; y talar y picar no tenían animación. Reproducido en la semilla 7,
+año 30 (45 de 63 parados). Cuatro causas corregidas: `days` como semanas, un
+corro de seis plazas, alcance de 20 celdas y el deber como urgencia. Vado de la
+semilla 7: 29 de 29 en la reunión. `chop` y `mine` nuevos, hacha y pico
+visibles, astillas en el golpe, orientación al árbol o la roca, y banco
+`tools/graphics/gesture-sheet.mjs`. Falta filmar el picado en partida y que el
+árbol acuse el golpe. Informe: `historico/life-rounds/IA-anim-reuniones-y-gestos.md`.
+
 ## 24 sep 2026 · E3b cerrada: el adarve se genera desde el anillo
 
 Vera pide cerrar E3b. El camino por piezas aprobadas (una malla por máscara de

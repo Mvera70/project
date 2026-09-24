@@ -22,8 +22,10 @@ import { describe, expect, it } from 'vitest';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { run } from '@engine/sim';
 import type { GameState } from '@engine/state';
+import { TIME } from '@engine/balance';
 import { gatheringsAt } from '@derive/gatherings';
 import { createVillage } from '../../src/render3d/life/village';
+import { ordersOf } from '../../src/render3d/life/staging';
 
 /**
  * Una decisión con `gather` puesta a mano, para no simular veinte años.
@@ -54,8 +56,13 @@ function village(years: number, seed = 7): GameState {
   return state;
 }
 
+/** La primera jornada de la semana de la decisión: `days` se cuentan desde ahí. */
+function firstDay(state: GameState): [GameState, number] {
+  return [state, state.tick * TIME.DAYS_PER_WEEK];
+}
+
 /** Lo lejos que está del sitio de la reunión el que más lejos está. */
-function spread(state: GameState, day: number): number {
+function spread([state, day]: [GameState, number]): number {
   const life = createVillage(state, day);
   // **Dos tercios de la jornada, y antes eran 900 pasos con el comentario
   // «media jornada» al lado**: una jornada son 3 600 pasos (`clock.ts`), así
@@ -71,6 +78,28 @@ function spread(state: GameState, day: number): number {
   return worst;
 }
 
+describe('§11.8 · una reunión dura sus días, no sus semanas', () => {
+  it('una convocatoria de n días ocupa n jornadas desde la semana de la decisión', () => {
+    // Hasta IA-anim `days` se leía como ticks, y un tick son siete jornadas
+    // desde v3.72: «tres días» dejaba a la aldea plantada veintiuna jornadas.
+    const state = foundTwenty(7);
+    for (const template of CATALOG) {
+      for (const option of template.options) {
+        const effect = option.visible.find((item) => item.k === 'gather');
+        if (effect === undefined || effect.k !== 'gather' || effect.days < 2) continue;
+        const called = structuredClone(state);
+        called.history.push({ tick: called.tick, templateId: template.id, optionId: option.id, cast: {} });
+        const first = called.tick * TIME.DAYS_PER_WEEK;
+        for (let day = first; day < first + effect.days; day += 1) expect(ordersOf(called, day), `día ${day - first}`).toHaveLength(1);
+        expect(ordersOf(called, first + effect.days)).toHaveLength(0);
+        expect(ordersOf(called, first + TIME.DAYS_PER_WEEK - 1)).toHaveLength(0);
+        return;
+      }
+    }
+    expect.fail('el catálogo no tiene una reunión de dos días o más');
+  });
+});
+
 describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
   it('el motor sabe que hay reunión, y dice dónde', () => {
     // La mitad del motor: esto es lo que la vida obedece.
@@ -81,7 +110,12 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
     expect(meetings[0]?.y).toBeGreaterThanOrEqual(0);
   });
 
-  it.fails('la aldea se junta donde la decisión dijo', () => {
+  it('la aldea se junta donde la decisión dijo', () => {
+    // **IA-anim (24 sep 2026): vuelve al verde, y esta vez arreglado.** Tres
+    // causas medidas: el corro daba seis plazas (espiral de cuarenta intentos),
+    // el deber a 1,0 contaba como urgencia y dejaba fuera a quien venía de
+    // trabajar, y la convocatoria no llegaba más allá de 20 celdas. Con las
+    // tres, el vado de la semilla 7 junta 29 de 29 a media jornada (antes 14).
     // **La propiedad del brief, y ahora se cumple.** Lo que se mide es el
     // destino y no la distancia: «ir a la reunión» es una decisión de cada
     // uno, y una reunión de treinta personas ocupa lo que ocupa. Medido al
@@ -121,7 +155,7 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
       let dwellersAll = 0;
       for (const seed of [7, 11, 23, 41]) {
         const called = summon(village(12, seed), where);
-        const life = createVillage(called, 0);
+        const life = createVillage(called, called.tick * TIME.DAYS_PER_WEEK);
         while (life.steps < 2400) life.step();
         const joined = life.dwellers
           .filter((dweller) => dweller.doing?.place.id.startsWith('gather:') === true).length;
@@ -136,7 +170,7 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
     }
   });
 
-  it.fails('y la aldea junta cabe en un corro, no en el valle entero (semilla 7)', () => {
+  it('y la aldea junta cabe en un corro, no en el valle entero (semilla 7)', () => {
     // La otra mitad, que es la que se ve: antes de V-11 el más lejano se
     // quedaba a **más de dieciséis celdas** del sitio —cada uno en su campo—.
     // Medido ahora: de 8,0 a 11,3 celdas en las doce combinaciones de arriba,
@@ -151,7 +185,7 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
     // celdas en la semilla 7 y 19,1 en la 23. No es que el corro se desparrame
     // —los que llegan llegan— es que no llegan todos. La cota se queda en 14 y
     // sin tocar: moverla sería tapar justamente lo que hay que arreglar.
-    expect(spread(summon(village(12, 7)), 0), 'semilla 7').toBeLessThan(14);
+    expect(spread(firstDay(summon(village(12, 7)))), 'semilla 7').toBeLessThan(14);
   });
 
   // docs/historico/rework.md §3 (V-02/V-03, el círculo colisiona): con la semilla 23 esto
@@ -184,7 +218,8 @@ describe('V-11 · la reunión de §11.8 en la capa de vida', () => {
   // tocado nadie. Deja de estar declarada porque una prueba que espera fallar y
   // pasa es una prueba roja, y el estado de este fichero tiene que decir la
   // verdad (`docs/handover.md`, la lección de v3.79).
-  it.fails('y la aldea junta cabe en un corro, no en el valle entero (semilla 23)', () => {
-    expect(spread(summon(village(12, 23)), 0), 'semilla 23').toBeLessThan(14);
+  // IA-anim (24 sep 2026): verde con la aldea entera en el corro (ver arriba).
+  it('y la aldea junta cabe en un corro, no en el valle entero (semilla 23)', () => {
+    expect(spread(firstDay(summon(village(12, 23)))), 'semilla 23').toBeLessThan(14);
   });
 });

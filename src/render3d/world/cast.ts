@@ -17,7 +17,8 @@ import type { VillagerId } from '@engine/state';
 import type { Actor, RagdollPose, RagdollSeed, RagdollSeedPart } from '../contracts';
 import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
-import { clipTime, combatClip, VILLAGER_CLIPS, type ClipName } from '../clips';
+import { clipTime, combatClip, STRIKE_AT, VILLAGER_CLIPS, type ClipName } from '../clips';
+import { WorkChips } from '../effects/work-chips';
 import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
 
@@ -72,6 +73,9 @@ interface Player {
   previous: Action | null;
   changedAt: number;
   ragdolled: boolean;
+  /** IA-anim · Fase del gesto de herramienta en el pintado anterior, para ver el golpe. */
+  strikePhase?: number;
+  strikes?: number;
 }
 
 /**
@@ -117,6 +121,7 @@ const HELD: Readonly<Record<string, Omit<HeldSpec, 'key'>>> = {
   carry_walk: { asset: 'bundle', hand: 'hand_l' },
   hammer: { asset: 'hammer', hand: 'hand_r', fallback: true },
   chop: { asset: 'axe', hand: 'hand_r', fallback: true },
+  mine: { asset: 'pickaxe', hand: 'hand_r', fallback: true },
   drink: { asset: 'cup', hand: 'hand_r', fallback: true },
 };
 
@@ -146,6 +151,8 @@ const CLOTH_LIGHT = 0.2;
 
 export class Cast {
   readonly group = new Group();
+  /** IA-anim · Astillas de los golpes de hacha y pico; el renderer las avanza. */
+  readonly chips: WorkChips;
   private readonly players = new Map<VillagerId, Player>();
   private readonly extraClips: AnimationClip[];
 
@@ -176,6 +183,8 @@ export class Cast {
     private readonly prop?: (id: string) => Object3D | undefined,
   ) {
     this.group.name = 'Valley_Cast';
+    // Fuera de `group` y de `mark`: las pruebas leen sus hijos por índice.
+    this.chips = new WorkChips();
     this.ring = new Mesh(
       new RingGeometry(RING_INNER, RING_OUTER, 28),
       new MeshBasicMaterial({
@@ -322,6 +331,7 @@ export class Cast {
       if (player.ragdolled && ragdoll === undefined) this.leaveRagdoll(player);
       this.pose(player, actor.clip, seconds, actor.poseSeconds ?? actor.clipSeconds);
       this.equip(player, actor);
+      this.strike(player, actor, seconds);
       if (ragdoll !== undefined) this.applyRagdoll(player, ragdoll);
     }
 
@@ -553,6 +563,30 @@ export class Cast {
     }
     const visible = new Set(wanted.map(item => item.key));
     for (const [name, tool] of player.held) tool.visible = visible.has(name);
+  }
+
+  /**
+   * IA-anim · Suelta astillas en el instante en que el ciclo cruza el golpe.
+   *
+   * Desde la cabeza de la herramienta que el aldeano lleva de verdad, no desde
+   * un punto fijo delante: si el gesto no llega al tronco, las astillas
+   * tampoco, y eso se ve.
+   */
+  private strike(player: Player, actor: Actor, seconds: number): void {
+    if (actor.clip !== 'chop' && actor.clip !== 'mine') { delete player.strikePhase; return; }
+    const phase = seconds / VILLAGER_CLIPS[actor.clip].seconds;
+    const before = player.strikePhase;
+    player.strikePhase = phase;
+    if (before === undefined) return;
+    const at = STRIKE_AT[actor.clip];
+    const crossed = before <= phase ? before < at && at <= phase : before < at || at <= phase;
+    if (!crossed) return;
+    const tool = player.held.get(actor.clip);
+    const head = tool?.children[0]?.children.at(-1) ?? tool;
+    if (head === undefined || !head.visible || tool?.visible === false) return;
+    player.strikes = (player.strikes ?? 0) + 1;
+    this.chips.hit(head.getWorldPosition(new Vector3()), actor.clip === 'chop' ? 'wood' : 'stone',
+      actor.id * 1009 + player.strikes);
   }
 
   private retire(id: VillagerId): void {
