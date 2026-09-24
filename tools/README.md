@@ -119,8 +119,6 @@ silencio y la prueba pasa sin probar nada.
 | `viewer.ts` · `viewer.html` | El visor suelto de un GLB |
 | `publish-assets.ts` | Admite un lote explícito aprobado con `--ids bow,spear`; verifica hash, bytes y procedencia antes de copiar, conserva todos los recursos ya publicados y rechaza sobrescribir bytes distintos |
 | `g20-check.mjs` | Comprueba la hoja de evidencia de G-20: cero imágenes rotas, cero errores de página |
-| `sound-check.mjs` | Comprueba que el juego montado suena, sin poder oírlo, por `window.__valleySound` |
-| `thunder-check.mjs` | Lo mismo para el trueno de U-13, entrando por su ruta de depuración |
 
 P-1b.2: `bench-app.ts --stages true` activa sólo en Vite local las marcas
 `valley3d:` de importación, creación y primer fotograma. Las guarda como

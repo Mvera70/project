@@ -502,9 +502,8 @@
 
 /* ------------------------------------------------ detalles de uso */
 
-/** El sonido y la caza son de la misma familia que los círculos de al lado:
-    mismo aro de madera y mismo escalón. */
-:root .valley-sound,
+/** La caza es de la misma familia que los círculos de al lado: mismo aro de
+    madera y mismo escalón. */
 :root .valley-hunt-action {
   border: 2px solid var(--wood-plank);
   background-color: var(--card);
@@ -870,10 +869,10 @@ html.bare .ui-hud-header::before { visibility: hidden; }
   background-size: 192px;
   box-shadow: inset 0 4px 6px rgba(0, 0, 0, .45);
 }
-/** Idioma y sonido, **de madera** con aro de latón, como en el primer diseño
-    de Vera: la versión de piedra «se ve muy mal» sobre el empedrado (24 sep). */
-:root .title-language,
-:root .title-sound {
+/** El idioma, **de madera** con aro de latón, como en el primer diseño de
+    Vera: la versión de piedra «se ve muy mal» sobre el empedrado (24 sep). El
+    botón de sonido se fue con el audio sintetizado. */
+:root .title-language {
   min-width: 52px;
   min-height: 52px;
   border: 2px solid var(--brass);
@@ -889,9 +888,7 @@ html.bare .ui-hud-header::before { visibility: hidden; }
     0 3px 0 #2B1A0E,
     0 6px 10px rgba(0, 0, 0, .45);
 }
-:root .title-sound svg,
 :root .title-language { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .6)); }
-:root .title-sound { display: grid; place-items: center; padding: 0; }
 :root .title-language {
   appearance: none;
   -webkit-appearance: none;
@@ -911,10 +908,6 @@ html.bare .ui-hud-header::before { visibility: hidden; }
 :root .title-dev { color: rgba(243, 227, 194, .55); }
 :root .title-dev[aria-pressed="true"] { color: var(--brass); }
 :root .title-dev-row label { color: #F3E3C2; }
-/* La portada pinta el sonido encendido en ocre (`title.ts`); sobre la madera
-   se perdía. Encendido va en crema y apagado, atenuado. */
-:root .title-sound[aria-pressed="true"] { color: #FFF3D6; }
-:root .title-sound[aria-pressed="false"] { color: rgba(255, 246, 224, .6); }
 :root .title-actions { flex: 1 1 auto; }
 /* En piedra, los rótulos de la barra sobre el empedrado necesitan sombra: el
    crema sobre gris moteado se perdía (captura de la semilla 7, año 30). */

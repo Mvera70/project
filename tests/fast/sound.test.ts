@@ -1,73 +1,20 @@
 // U-09 · design.md §11.1, §11.4, §11.6.
 //
 // Lo que estas pruebas guardan es la parte pura de `src/ui/sound.ts`: qué
-// ambiente corresponde a un estado dado, qué acento dispara un tick, y el
-// fusible de reloj de pared que evita que una tanda de ticks en el mismo
-// fotograma apile un acento sobre otro (§11.4). Igual que `notice.test.ts`
-// prueba `noticeworthy` sin arrancar nada, esto prueba `ambientFor`,
-// `accentFor` y `accentAllowed` sin un `AudioContext` de por medio.
+// acento dispara un tick y el fusible de reloj de pared que evita que una
+// tanda de ticks en el mismo fotograma apile un acento sobre otro (§11.4).
+// El ambiente sintetizado se retiró el 24 sep 2026 y sus pruebas con él; el
+// cuándo de un acento vale igual para los ficheros que vengan.
 
-import { foundTwenty, villageWhere } from '../helpers/founding';
+import { foundTwenty } from '../helpers/founding';
 import { describe, expect, it } from 'vitest';
 import { SOUND } from '@engine/balance';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { tick } from '@engine/sim';
-import { count, standing } from '@engine/subsistence/building-counts';
-import { seasonOf } from '@engine/time';
 import { milestonesAt } from '@ui/milestones';
-import { accentAllowed, accentFor, ambientFor } from '@ui/sound';
+import { accentAllowed, accentFor } from '@ui/sound';
 
 const SEEDS = [7, 42, 108, 999, 2024];
-
-describe('ambientFor · el viento sigue la estación', () => {
-  it('la ganancia del viento es la de SOUND.WIND_BY_SEASON en cada estación', () => {
-    for (const seed of SEEDS) {
-      const state = foundTwenty(seed);
-      // Las cuatro estaciones caben en el primer año: 0, 12, 24, 36 semanas.
-      for (const week of [0, 12, 24, 36]) {
-        state.tick = week;
-        const mix = ambientFor(state);
-        expect(mix.wind).toBe(SOUND.WIND_BY_SEASON[seasonOf(week)]);
-      }
-    }
-  });
-});
-
-describe('ambientFor · el río está, casi siempre', () => {
-  it('un valle recién fundado ya tiene agua que sonar', () => {
-    for (const seed of SEEDS) {
-      expect(ambientFor(foundTwenty(seed)).river).toBe(true);
-    }
-  });
-});
-
-// Una sola partida jugada una vez y compartida entre las dos pruebas de abajo
-// — el mismo motivo que `ui-milestones.test.ts` da para su propio `GAMES`:
-// `ambientFor` es de sólo lectura, así que jugarla dos veces no cuenta nada
-// que jugarla una sola no cuente ya, y ochenta años es lo que hace falta para
-// que el motor levante una fragua de verdad (`BUILDING_RULES.SMITHY_PEOPLE`).
-// **Y la semilla se elige por tener fragua, no por su número** (R-1 §2.6): el
-// rayo quema la fragua de la semilla 7 antes de los ochenta años, y esta
-// prueba medía justamente esa fragua. `villageWhere` busca un valle que la
-// tenga en pie; si ninguno la tiene, la prueba de abajo falla diciéndolo.
-const MATURE_VILLAGE = villageWhere(80, (s) => standing(s, 'smithy').length > 0)
-  ?? foundTwenty(7);
-
-describe('ambientFor · la fragua y la campana siguen al edificio, no a un contador', () => {
-  it('coincide con lo que el propio motor tiene en pie', () => {
-    const mix = ambientFor(MATURE_VILLAGE);
-    expect(mix.forge).toBe(standing(MATURE_VILLAGE, 'smithy').some((b) => b.lit));
-    expect(mix.bell).toBe(count(MATURE_VILLAGE, 'chapel') > 0 || count(MATURE_VILLAGE, 'church') > 0);
-  });
-
-  it('una fragua apagada no suena, aunque siga en pie', () => {
-    const state = structuredClone(MATURE_VILLAGE);
-    // Sólo dice algo si de verdad hay una fragua en pie que apagar.
-    expect(standing(state, 'smithy').length).toBeGreaterThan(0);
-    for (const smithy of standing(state, 'smithy')) smithy.lit = false;
-    expect(ambientFor(state).forge).toBe(false);
-  });
-});
 
 describe('accentFor · sólo dos motivos, y el hito gana', () => {
   it('sin hito y sin encrucijada, no suena nada', () => {

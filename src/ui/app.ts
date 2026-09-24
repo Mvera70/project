@@ -48,7 +48,7 @@ import { chroniclePanel, closeChronicle } from './screens/chronicle';
 import { closeCrossroad, isDeferred, openCrossroad, openDeferred } from './screens/crossroad';
 import { openEpitaph } from './screens/epitaph';
 import { isSpeed, type Speed } from './speed';
-import { accentFor, ambientFor, createSoundEngine } from './sound';
+import { accentFor, createSoundEngine } from './sound';
 import { openWelcome } from './welcome';
 import {
   SILENT,
@@ -388,31 +388,9 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const people = peoplePanel(actions);
   const shell = createShell(actions);
 
-  // U-09 · el sonido: sintetizado con Web Audio, nunca un fichero (§ ficha del
-  // encargo, CLAUDE.md). No suena nada hasta el primer toque (más abajo,
-  // junto a los demás gestos) ni si quien juega lo apaga, aquí, junto a la
-  // regleta de velocidad — el mismo sitio y la misma piel que ella.
+  // El audio: un hueco para ficheros, hoy en silencio (`sound.ts`). Sin botón
+  // mientras no haya nada que sonar.
   const sound = createSoundEngine();
-  const soundToggle = document.createElement('button');
-  soundToggle.type = 'button';
-  soundToggle.className = 'valley-sound';
-  // Dibujado y no escrito: dos trazos de más para la fuente que le toque al
-  // teléfono no son una opción a este tamaño. Las dos versiones —sonando y en
-  // silencio— están las dos en el DOM; el CSS enseña una u otra según
-  // `aria-pressed`, nunca cambia el texto.
-  soundToggle.innerHTML = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false"'
-    + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
-    + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
-    + '<path class="valley-sound-on" d="M10.7 5.3c1 .9 1 4.5 0 5.4"/>'
-    + '<path class="valley-sound-on" d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
-    + '<path class="valley-sound-off" d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>'
-    + '</svg>';
-  const updateSoundToggle = (): void => {
-    soundToggle.setAttribute('aria-pressed', String(sound.enabled));
-    soundToggle.setAttribute('aria-label', renderUiText(sound.enabled ? 'app.sound.on' : 'app.sound.off'));
-  };
-  soundToggle.addEventListener('click', () => { sound.setEnabled(!sound.enabled); updateSoundToggle(); });
-  updateSoundToggle();
 
   /**
    * UI-V10 · **Despejar la pantalla: sólo el valle.**
@@ -519,7 +497,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   // borde, que era la altura de la barra estrecha de antes del rediseño, y
   // con la bandeja nueva los dos círculos caían dentro de ella.
   hudRight.className = 'valley-hud-right hud-speed-corner';
-  hudRight.append(bareToggle, soundToggle, hud.speedControls, hud.speedBadge, huntAction);
+  hudRight.append(bareToggle, hud.speedControls, hud.speedBadge, huntAction);
 
   root.append(canvas, hud.header, hudRight, shell.element);
 
@@ -778,7 +756,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
       // subido la cuenta y se truena. Con retardo, porque el sonido va más
       // despacio que la luz y ese retardo es lo que hace que una tormenta se
       // sienta lejos o encima. Cuánto exactamente lo decide `Math.random`, y
-      // es legítimo por lo mismo que en `sound.ts`: es decorado del navegador,
+      // es legítimo porque es decorado del navegador,
       // no una tirada de la partida (§4.3).
       if (stats.bolts > lastBolts) {
         lastBolts = stats.bolts;
@@ -829,10 +807,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // on screen is rounded to twelve weeks, and a test about the clock needs
     // the week.
     document.documentElement.dataset.tick = String(state.tick);
-    // U-09 · el ambiente sigue el estado, no los sucesos: se recalcula cada
-    // pintado y `SoundEngine.update` es quien decide si de verdad cambia algo
-    // (no suena hasta el primer toque, §11's silencio por defecto).
-    sound.update(ambientFor(state));
     // UI-R1 · qué destino está abierto ahora mismo ya lo sabe `shell` en un
     // único sitio (`actions.navigate`): antes de esta ronda había que releer
     // el DOM de la crónica en cada fotograma porque ese adaptador no avisaba
@@ -1018,10 +992,8 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   const surface = (): HTMLCanvasElement => backend.live.surface;
 
   root.addEventListener('pointerdown', (event) => {
-    // U-09 · el único sitio que crea o reanuda el `AudioContext`: nunca antes
-    // del primer toque, porque el navegador no lo deja arrancar solo. Vale
-    // cualquier toque de la raíz, no sólo el del botón de sonido — incluido
-    // el del propio botón, cuyo `click` lo enciende un instante después.
+    // El audio sólo se arma con el primer toque: antes el navegador no deja
+    // sonar nada.
     sound.arm();
     if (!onValley(event)) return;
     root.setPointerCapture(event.pointerId);
@@ -1296,7 +1268,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
   /**
    * F3 · **Acabar la partida desde fuera, para poder fotografiar el final.**
    *
-   * El mismo tipo de gancho de observación que `__valleySound` (U-09) y que
+   * El mismo tipo de gancho de observación que
    * `data-app-ready`: no lo usa el juego y no cambia nada de él. Existe porque
    * las cuatro maneras de acabar tienen cada una su lápida, y esperar a que un
    * valle se muera de cada una para fotografiarlas es esperar horas de reloj.
@@ -1529,7 +1501,7 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
  * F3 · El gancho para fotografiar el final, y sólo para eso.
  *
  * Se declara aquí y no en `sound.ts` porque es de esta capa, y lleva el mismo
- * trato que `__valleySound`: existe para que una herramienta de fuera
+ * trato que los ganchos `data-*`: existe para que una herramienta de fuera
  * (`tools/graphics/shot.mjs --ended <causa>`) pueda ver una pantalla que de
  * otro modo tardaría horas de reloj en salir. El juego no lo llama nunca.
  */

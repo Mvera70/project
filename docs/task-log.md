@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · Fuera el audio sintetizado
+
+Vera: «el audio es malísimo, el de fondo es hasta incómodo; hay que sustituir o
+borrar el sistema al completo». Eligió **borrar y dejar hueco**. Se fue la
+síntesis de U-09 entera —viento, río, yunque, campana y los acentos—, los dos
+botones de sonido (valle y portada), las constantes de mezcla de `SOUND`
+(queda el fusible `ACCENT_MIN_GAP_MS`), `sound-check.mjs`, `thunder-check.mjs`
+y la captura «valle sin sonido» del paquete de prensa. **Queda el hueco:**
+`src/ui/sound.ts` reproduce ficheros de `public/audio/` registrados en
+`CUE_FILES` (vacío) en los tres momentos de siempre —hito, encrucijada,
+trueno—, con su fusible y sus pruebas. Cuando haya sonidos buenos, los
+consigue Vera y se registran; el botón de sonido vuelve con el primero.
+
 ## 24 sep 2026 · El roble del valle
 
 El árbol del escudo del título tiene cuerpo en el mundo (Vera: «debe tener

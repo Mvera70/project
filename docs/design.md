@@ -3023,8 +3023,10 @@ destello a cualquier velocidad— y **en pausa no se apaga**, como todo lo que s
 mueve (§11.4); eso es además lo que permite fotografiarlo, porque 0,12 s no los
 alcanza ninguna captura corriendo. El trueno llega entre 0,4 y 2,2 s después,
 porque el sonido va más despacio que la luz: el renderer **cuenta** los rayos
-(`GraphicsStats.bolts`) y `app.ts` truena, así que el render sigue sin saber que
-existe el sonido.
+(`GraphicsStats.bolts`) y `app.ts` pide el acento del trueno, así que el render
+sigue sin saber que existe el sonido. **Desde el 24 sep 2026 ese acento está
+en silencio**: el audio sintetizado se retiró y el trueno sonará cuando haya un
+fichero (`src/ui/sound.ts`, `CUE_FILES`).
 
 **Y se puede mirar desde fuera:** la raíz lleva `data-sky` y `data-bolts`, la
 ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
@@ -3032,9 +3034,7 @@ ruta de depuración acepta `&weather=storm`, `&weather=snow` y `&weather=wet`
 forma de probarla— y hay un recorrido en `tools/shots/valley.shots.ts` que cuenta el rayo y
 deja la captura. **En invierno hay que pedir `snow`**: aquí no truena, así que
 pedir tormenta en invierno se salta la estación entera buscando una que no puede
-haber, y eso costó tres años de valle en la primera medida de la nieve. El
-trueno se comprueba con `tools/graphics/thunder-check.mjs`, que engancha el
-`AudioContext` de verdad y cuenta los filtros que aparecen tras cada rayo.
+haber, y eso costó tres años de valle en la primera medida de la nieve. 
 
 ---
 
@@ -3207,7 +3207,8 @@ valle —misma pareja, mismo río, mismo bosque— y cada una lo lleva a su mane
 Sobre la noche (`--night`), no sobre el valle, porque el juego no existe
 todavía: el filete y el nombre en latón arriba, y abajo el número (editable,
 con «Another» para echar otro que no repita ninguno jugado), «Found a new
-valley» en el mismo oro que «Begin again», y la preferencia de sonido. «Continue»
+valley» en el mismo oro que «Begin again». (La preferencia de sonido se retiró
+con el audio sintetizado el 24 sep 2026.) «Continue»
 sólo cuando hay una partida guardada **y no ha terminado**: si terminó, lo que
 toca es fundar de nuevo sobre sus ruinas (§13.3), y eso lo hace el menú por su
 cuenta. Vive en `screens/title.ts`, se abre desde `main.ts` antes de `boot` y

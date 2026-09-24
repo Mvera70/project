@@ -390,11 +390,6 @@ if (want('valle')) {
   await shot(tab, 'valle-pausa', 'En pausa: el círculo cambia a ▶');
   await tab.locator('.valley-play-pause, .hud-speed-cluster button').first().click().catch(() => {});
   await tab.waitForTimeout(400);
-  // El sonido apagado.
-  await tab.locator('.valley-sound').click().catch(() => {});
-  await tab.waitForTimeout(400);
-  await shot(tab, 'valle-sin-sonido', 'El sonido apagado, con su aspa');
-  await tab.locator('.valley-sound').click().catch(() => {});
   // La pantalla despejada.
   await tab.locator('.valley-bare').click().catch(() => {});
   await tab.waitForTimeout(900);

@@ -26,7 +26,6 @@ import { yearOf } from '@engine/time';
 import { nextUnusedSeed } from '../app';
 import { retireOverlay } from '../motion';
 import { ORNAMENT_VIEWBOX, YEAR_FLOURISH } from '../redesign/chronicle-ornaments';
-import { setSoundPreference, soundPreference } from '../sound';
 import { currentLocale, loadLocale, setSavedLocale } from '../locale';
 import { openAnnals } from './annals';
 import type { Locale } from '@engine/chronicle/render';
@@ -196,12 +195,12 @@ const STYLE = `
    para quien juega. */
 .title-bottom { display: flex; align-items: center; justify-content: space-between;
   gap: 8px; margin-top: 4px; }
-.title-sound, .title-dev { min-width: var(--ui-tap-min); min-height: var(--ui-tap-min); padding: 0 10px; border: 0;
+.title-dev { min-width: var(--ui-tap-min); min-height: var(--ui-tap-min); padding: 0 10px; border: 0;
   background: transparent; color: var(--skin-ink-faded); cursor: pointer;
   font: 400 11px/1 var(--skin-font-voice); letter-spacing: var(--skin-track-label);
   text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
-.title-sound[aria-pressed="true"], .title-dev[aria-pressed="true"] { color: var(--skin-ochre); }
-.title-sound:focus-visible, .title-dev:focus-visible {
+.title-dev[aria-pressed="true"] { color: var(--skin-ochre); }
+.title-dev:focus-visible {
   outline: 2px solid var(--skin-gold); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -541,25 +540,6 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   }
   devRow.append(presets);
 
-  const sound = document.createElement('button');
-  sound.type = 'button';
-  sound.className = 'title-sound';
-  // UI-W · el altavoz dibujado, el mismo del rincón de mandos del valle; lo
-  // que dice (encendido, apagado) va en el nombre accesible, del banco.
-  const paintSound = (): void => {
-    const on = soundPreference();
-    sound.setAttribute('aria-pressed', String(on));
-    sound.setAttribute('aria-label', renderUiText(on ? 'app.sound.on' : 'app.sound.off'));
-    sound.innerHTML = '<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true" focusable="false"'
-      + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
-      + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
-      + (on
-        ? '<path d="M10.7 5.3c1 .9 1 4.5 0 5.4"/><path d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
-        : '<path d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>')
-      + '</svg>';
-  };
-  sound.addEventListener('click', () => { setSoundPreference(!soundPreference()); paintSound(); });
-  paintSound();
 
   const dev = document.createElement('button');
   dev.type = 'button';
@@ -614,7 +594,7 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
 
   const bottom = document.createElement('div');
   bottom.className = 'title-bottom';
-  bottom.append(language, sound, dev);
+  bottom.append(language, dev);
 
   actions.append(seedRow, hint, devRow, begin, annals, bottom);
   const sheet = document.createElement('div');

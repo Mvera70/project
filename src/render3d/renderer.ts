@@ -949,7 +949,7 @@ export async function createGraphicsRenderer(
   // existe para el juego —nadie de `src/` lo llama—. Si se borrara, no
   // cambiaría un solo píxel.
   //
-  // Va sin puerta, como `window.__valleySound`, por el mismo motivo: una
+  // Va sin puerta, por un motivo: una
   // bandera que hay que encender es una bandera que un día no está encendida
   // cuando hace falta, y lo que se quiere mirar casi nunca se repite a la
   // segunda.

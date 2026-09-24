@@ -850,10 +850,6 @@ html.bare .valley-hud-right.hud-speed-corner {
   left: max(10px, env(safe-area-inset-left));
   justify-content: space-between;
 }
-/* El del sonido, en tenue: sigue ahí para quien quiera callar el valle sin
-   volver a sacar la interfaz. El del valle se queda entero — es el camino de
-   vuelta, y un camino de vuelta a medio gas no se ve. */
-html.bare .valley-sound { opacity: .4; }
 /* Y con la pantalla despejada el botón dice que lo está: el mismo trato que
    `aria-pressed` le da al resto de los redondos. */
 .valley-bare[aria-pressed="true"] { color: var(--skin-ink); }

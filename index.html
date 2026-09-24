@@ -200,22 +200,9 @@
       .valley-speeds button:active { background: rgba(34,29,24,.10); }
       .valley-speeds button[aria-pressed="true"] { background: var(--ink); color: var(--parchment); }
       .valley-speeds button:focus-visible, .valley-panel:focus-visible,
-      .valley-panel-close:focus-visible,
-      .valley-sound:focus-visible {
+      .valley-panel-close:focus-visible {
         outline: 2px solid var(--gild); outline-offset: 2px; }
 
-      /* U-09 · el botón de sonido: un círculo del mismo tamaño mínimo que un
-         botón de velocidad (§11.3), con la misma piel de instrumento que la
-         regleta que tiene al lado — tinta sobre pergamino cuando está
-         apagado, el dibujo lo dice todo, nada de texto (CLAUDE.md). */
-      .valley-sound { width: 44px; height: 44px; padding: 0; display: flex; align-items: center;
-        justify-content: center; border: 1px solid var(--edge); border-radius: 50%; background: var(--plate);
-        color: var(--ink-soft); cursor: pointer; box-shadow: 0 2px 6px rgba(34,29,24,.20);
-        backdrop-filter: blur(2px); -webkit-tap-highlight-color: transparent; }
-      .valley-sound:active { background: rgba(34,29,24,.10); }
-      .valley-sound[aria-pressed="false"] { color: var(--ink-soft); opacity: .55; }
-      .valley-sound[aria-pressed="true"] .valley-sound-off,
-      .valley-sound[aria-pressed="false"] .valley-sound-on { display: none; }
 
       /* U-05 · los tres destinos de abajo. **Reemplazada por UI-R1**: la barra
          que iba aquí (`.valley-tabbar`/`.valley-tab`) es ahora `.ui-shell-nav`/

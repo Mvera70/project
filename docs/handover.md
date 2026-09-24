@@ -161,8 +161,8 @@ hay que leerlo.
 > verdad y cada pantalla lleva su botón de cerrar.
 >
 > **Lo que queda sin mirar de esto:** la nieve no se ha fotografiado (el valle
-> de las capturas era de verano), el trueno no se ha oído
-> (`tools/graphics/sound-check.mjs` no se ha usado con él) y nadie ha medido los
+> de las capturas era de verano), el trueno no se ha oído (y desde el 24 sep
+> 2026 no suena: el audio sintetizado se retiró) y nadie ha medido los
 > fotogramas con lluvia en un móvil de verdad.
 
 > **El reloj, v3.72 — y el cambio de ritmo que trae.** Cuarto paso del dueño:
@@ -621,7 +621,7 @@ o una captura comprueban el juego desde fuera. Los diez los escribe
 
 | Atributo | Qué dice | Quién lo escribe | Para qué existe |
 |---|---|---|---|
-| `data-app-ready` | El primer pintado ya se hizo: la partida está lista para tocarse. | `boot()`, tras el primer `paint(0)` | Toda espera de un recorrido o de una prueba PWA empieza por `html[data-app-ready="true"]` (`tools/shots/valley.shots.ts`, `tools/pwa/valley.pwa.ts`, `tools/pwa/subpath.pwa.ts`, `tools/pwa/stale.pwa.ts`, `tools/shots/animals.shots.ts`, `tools/graphics/sound-check.mjs`): es la puerta antes de tocar nada. |
+| `data-app-ready` | El primer pintado ya se hizo: la partida está lista para tocarse. | `boot()`, tras el primer `paint(0)` | Toda espera de un recorrido o de una prueba PWA empieza por `html[data-app-ready="true"]` (`tools/shots/valley.shots.ts`, `tools/pwa/valley.pwa.ts`, `tools/pwa/subpath.pwa.ts`, `tools/pwa/stale.pwa.ts`, `tools/shots/animals.shots.ts`): es la puerta antes de tocar nada. |
 | `data-tick` | El tick de simulación pintado en este fotograma. | `paint()`, en cada pintado | `tools/shots/valley.shots.ts` lo sondea (`page.evaluate`) para esperar a que el reloj avance antes de seguir un recorrido. |
 | `data-render` | Qué backend está vivo: `canvas` o `pilot3d`. | `stampRender()`, al montar y en cada relevo | `npm run test:pwa` (`tools/pwa/valley.pwa.ts`, `tools/pwa/subpath.pwa.ts`) espera `pilot3d` para comprobar que el 3D relevó de verdad y la partida no se quedó en el 2D de arranque. |
 | `data-render-failure` | Por qué no relevó el 3D, cuando no releva. | `stampRender()`, sólo si `handle.failure !== null` | **Nadie lo lee.** Ninguna prueba ni herramienta lo consulta hoy; queda para mirarlo a mano en devtools cuando `data-render` se queda en `canvas` más de la cuenta. |
