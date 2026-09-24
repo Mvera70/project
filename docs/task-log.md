@@ -1,5 +1,30 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · E3b cerrada: el adarve se genera desde el anillo
+
+Vera pide cerrar E3b. El camino por piezas aprobadas (una malla por máscara de
+vecinos) no cerraba: dieciséis carpetas `art/recipes/e3b-*` y ninguna villa
+aleatoria cubierta. El adarve pasa a generarse por código desde el trazado
+real del anillo (`world/rampart.ts`, `world/rampart-mesh.ts`,
+`sceneRampartOf` en `plan.ts`), con las cotas walltop. Vuelta cerrada si todo
+el anillo es transitable; si no, ida y vuelta por los dos tramos que salen de
+la torre hasta el primer corte.
+
+Medido en las villas 91, 23, 7 y 42 (tick 3846): suelo en todas las muestras
+de la ronda, holgura mínima 0,325 contra 0,32, cero bordes sin pretil. En la
+app, semilla 91 año 70: ronda en la víspera, relevo del anochecer sin saltos,
+y en asalto las torres se quedan en el puesto y tiran. Una primera versión con
+la ronda antes del puesto dejaba las torres sin disparar todo el asalto; se
+corrigió. De noche ya no se sube (cortaba un yoyó de escalera heredado de
+E3a). `observe-life.mjs` cuenta aparte a quien anda por su ruta elevada.
+
+Pruebas: `tests/fast/rampart.test.ts` (10), `tests/journeys/e3b-rampart.test.ts`
+(3, 36 s); `bastion-access` y `scene-ring` mudadas al camino vivo. Suite rápida:
+7 rojas **previas** e iguales con y sin este cambio (grafo de módulos del motor,
+manifiesto de arte, `gate` en art-props, picking, pinos, atalaya A4, oferta de
+V-05); `catchUp` roza su límite de 2 s bajo carga. Falta medir el coste en un
+móvil real. Informe: `historico/graphics-rounds/E3b3-adarve-generado.md`.
+
 ## 24 sep 2026 · Bastión de acceso del adarve
 
 Las semillas 23 y 91 cierran su anillo sobre un bastión con máscara 66

@@ -1,5 +1,21 @@
 # The Valley — Registro de cambios
 
+## v4.38 · 24 sep 2026 · El adarve se genera desde el anillo (E3b cerrada)
+
+El adarve deja de depender de una malla aprobada por cada esquina: sale del
+trazado real del anillo de piedra, igual que los muros de `defences.ts`. El
+motivo es medido: en tres días E3b.2 juntó dieciséis carpetas de candidatos y
+ninguna villa aleatoria quedaba cubierta, porque cada una trae máscaras nuevas.
+Se conservan las cotas de la familia walltop (suelo 1,02, tablero 0,90, paso
+0,70). El pretil va sobre el borde de la unión de suelos, así que las bocas,
+los descansillos y los extremos de tramo se resuelven sin casos especiales.
+
+El guardia sube directo a su puesto y hace la ronda después, sin enemigos a
+la vista. Al revés, medido en un asalto de la villa 91, las torres pasaban
+cincuenta segundos andando sin tirar. El relevo del anochecer ya no baja de
+golpe a quien está arriba, y de noche no se empieza a subir. La junta GLB de
+E3b.1 queda superada. Evidencia en `historico/graphics-rounds/E3b3-adarve-generado.md`.
+
 ## v4.37 · 23 sep 2026 · Bosque y ribera en el fondo del valle
 
 Revisión: composición longitudinal siguiendo el río, pasos abiertos y dos flancos

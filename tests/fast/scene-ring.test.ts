@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { TERRAIN_CODE, type Building } from '@engine/state';
 import { foundTwenty } from '../helpers/founding';
-import { crossing24TreeOnDeck, return66TreeOnDeck, sceneRingOf, sceneWalkwayOf } from '../../src/render3d/world/plan';
+import { scatterTransform } from '../../src/render3d/world/forest';
+import { RAMPART } from '../../src/render3d/world/rampart';
+import { crossing24TreeOnDeck, return66TreeOnDeck, sceneRampartOf, sceneRingOf, sceneWalkwayOf } from '../../src/render3d/world/plan';
 
 function stone(id: number, kind: 'bastion' | 'wall', x: number, y: number): Building {
   return { id, kind, x, y, w: 1, h: 1, builtTick: 0, lostTick: null,
@@ -22,7 +24,7 @@ describe('E3b.2c.2 · puerta de escena para la primera junta', () => {
     expect(return66TreeOnDeck(cell, { x: 32.5, z: 39.5, scale: 1 })).toBe(false);
   });
 
-  it('retira ambas tablas cuando un tronco adulto invade la franja interior', () => {
+  it('el adarve centrado sólo lo corta un tronco que alcanza su tablero', () => {
     const state = foundTwenty(91);
     state.map.terrain.fill(TERRAIN_CODE.meadow);
     state.map.ruins.fill(0);
@@ -31,15 +33,26 @@ describe('E3b.2c.2 · puerta de escena para la primera junta', () => {
     state.works = [];
     const bastion = stone(1, 'bastion', 14, 15);
     state.buildings = [bastion, stone(2, 'wall', 13, 15), stone(3, 'wall', 12, 15)];
-    expect(sceneWalkwayOf(state, bastion)).not.toBeNull();
+    // E3b.3 · El adarve generado sustituye a la junta: la misma puerta de troncos, en el camino vivo.
+    const covers = (): boolean => sceneRampartOf(state)?.layout.edges.flat()
+      .some(cell => cell.x === 13 && cell.z === 15) === true;
+    expect(sceneWalkwayOf(state, bastion)).toBeNull();
+    expect(covers()).toBe(true);
 
+    // El tablero de E3b.1 volaba 1,27 hacia dentro y un tronco de la celda
+    // interior lo cortaba. El generado va centrado en el muro (±0,45): ese
+    // mismo tronco queda fuera y no corta nada; uno que lo toque, sí.
     const treeCell = 14 * state.map.width + 13;
     state.map.terrain[treeCell] = TERRAIN_CODE.forest;
     state.map.forestStock[treeCell] = 1;
-    expect(sceneWalkwayOf(state, bastion)).toBeNull();
+    state.tick += 1;
+    const tree = scatterTransform(state.map.width, treeCell);
+    const reach = RAMPART.halfWidth + 0.34 / 3 * tree.scale;
+    expect(covers()).toBe(15.5 - tree.z > reach);
     state.map.terrain[treeCell] = TERRAIN_CODE.cleared;
     state.map.forestStock[treeCell] = 0;
-    expect(sceneWalkwayOf(state, bastion)).not.toBeNull();
+    state.tick += 1;
+    expect(covers()).toBe(true);
   });
 
   it('no acredita el tablero si un rebrote visible ya alcanza su cota', () => {

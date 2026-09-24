@@ -141,76 +141,74 @@ describe('E3 · acceso visual del bastión', () => {
     }
   });
 
+  // E3b.3 · La junta GLB de E3b.1 queda superada por el adarve generado: una
+  // torre con dos muros de piedra ya abre tablero, y estas pruebas se mudan a
+  // ese camino, que es el que el juego pinta.
   it.each([
     [10, 14, { x: 0, z: -1 }], [6, 10, { x: 1, z: 0 }],
     [10, 6, { x: 0, z: 1 }], [14, 10, { x: -1, z: 0 }],
-  ] as const)('monta junta y recto sobre los dos muros para %i,%i', async (x, y, access) => {
+  ] as const)('monta el adarve generado sobre los dos muros para %i,%i', async (x, y, access) => {
     const state = stateWithWalkway(x, y, access);
-    const planned = planFor(state).buildings[0]!;
+    const plan = planFor(state);
+    const planned = plan.buildings[0]!;
     expect(bastionWalkwayOf(state, state.buildings[0]!)).not.toBeNull();
-    expect(planned.asset).toBe('e3b-bastion-joint-candidate');
-    expect(WANTED).toEqual(expect.arrayContaining([
-      'e3b-bastion-joint-candidate', 'e3b-walkway-entry-candidate', 'e3b-walkway-candidate',
-    ]));
-    const [joint, entry, straight] = await Promise.all([
-      new GLTFLoader().parseAsync(publishedCandidate('e3b-bastion-joint-candidate'), ''),
-      new GLTFLoader().parseAsync(publishedCandidate('e3b-walkway-entry-candidate'), ''),
-      new GLTFLoader().parseAsync(publishedCandidate('e3b-walkway-candidate'), ''),
+    expect(planned.asset).toBe('bastion-access-candidate');
+    expect(planned.bastionWalkway).toBeUndefined();
+    expect(planned.rampartShift).toBe(0);
+    const side = { x: access.z, z: -access.x };
+    // En una cadena abierta el último muro no sabe hacia dónde sigue: el
+    // selector acredita la torre y el primer tramo, no un extremo a ciegas.
+    const covered = plan.rampart!.edges.flat().map(cell => `${cell.x},${cell.z}`);
+    expect(covered).toEqual(expect.arrayContaining([`${x},${y}`, `${x + side.x},${y + side.z}`]));
+    const [tower, wall] = await Promise.all([
+      new GLTFLoader().parseAsync(publishedCandidate('bastion-access-candidate'), ''),
+      new GLTFLoader().parseAsync(publishedCandidate('wall'), ''),
     ]);
-    joint.scene.name = 'BastionJoint'; entry.scene.name = 'WalkwayEntry'; straight.scene.name = 'WalkwayStraight';
-    const model = buildFromAsset(planned, joint.scene, entry.scene, straight.scene);
+    const model = buildFromAsset(planned, tower.scene);
+    const village = new Village(id => id === 'wall' ? wall.scene.clone(true) : undefined);
     try {
       model.object.updateMatrixWorld(true);
-      const anchor = model.object.children[0] as Group;
-      const entryObject = anchor.children.find(child => child.name === 'WalkwayEntry');
-      const straightObject = anchor.children.find(child => child.name === 'WalkwayStraight');
-      expect(entryObject).toBeDefined();
-      expect(straightObject).toBeDefined();
-      expect(entryObject?.position.toArray()).toEqual([0.5, 0, -0.5]);
-      expect(straightObject?.position.toArray()).toEqual([1.5, 0, -0.5]);
-      const side = planned.bastionWalkway!.side;
-      const firstCentre = new Vector3(x + side.x + 0.5, 1, y + side.z + 0.5);
-      const entryBounds = new Box3().setFromObject(entryObject!);
-      expect(entryBounds.containsPoint(firstCentre)).toBe(true);
-      const nextCentre = new Vector3(x + side.x * 2 + 0.5, 1, y + side.z * 2 + 0.5);
-      expect(new Box3().setFromObject(straightObject!).containsPoint(nextCentre)).toBe(true);
+      const bounds = new Box3().setFromObject(model.object);
+      // Sin almenas propias: la torre llega al suelo de 1,02 y no más.
+      expect(bounds.max.y).toBeLessThan(1.021);
       expect(model.object.userData.buildingId).toBe(1);
-      expect(entryObject!.userData.buildingId).toBe(1);
-      expect(straightObject!.userData.buildingId).toBe(1);
-    } finally { model.dispose(); }
+      village.rampart(plan.rampart);
+      const deck = village.group.getObjectByName('Rampart_Deck')!;
+      deck.updateMatrixWorld(true);
+      const deckBounds = new Box3().setFromObject(deck);
+      for (const distance of [1]) {
+        expect(deckBounds.containsPoint(new Vector3(x + side.x * distance + 0.5, 0.95, y + side.z * distance + 0.5)))
+          .toBe(true);
+      }
+    } finally { model.dispose(); village.dispose(); }
   });
 
-  it('vuelve a la variante E3a al perder la junta o al poner un muro en obra', () => {
+  it('vuelve a la variante E3a al perder el muro o al poner un muro en obra', () => {
     const state = stateWithWalkway(10, 14, { x: 0, z: -1 });
     const ready = planFor(state);
-    expect(ready.buildings[0]?.asset).toBe('e3b-bastion-joint-candidate');
-    state.buildings.splice(2, 1);
+    expect(ready.buildings[0]?.rampartShift).toBe(0);
+    state.buildings.splice(1, 1);
     const lost = planFor(state);
+    expect(lost.rampart).toBeNull();
     expect(lost.buildings[0]?.asset).toBe('bastion-access-candidate');
+    expect(lost.buildings[0]?.rampartShift).toBeUndefined();
     expect(planChange(ready, lost).changed.map(building => building.id)).toContain(1);
-    state.buildings.push({ ...bastion(3, 8, 14), kind: 'wall' });
+    expect(planChange(ready, lost).rampart).toBe(true);
+    state.buildings.push({ ...bastion(2, 9, 14), kind: 'wall' });
     state.works = [{ id: 9, kind: 'wall', x: 9, y: 14, w: 1, h: 1, bpCost: 1, bpDone: 0,
       stoneDone: 0, materialsPaid: false, startedTick: 0, upgradeOf: 2 }];
     const building = planFor(state);
+    expect(building.rampart).toBeNull();
     expect(building.buildings[0]?.asset).toBe('bastion-access-candidate');
     expect(planChange(ready, building).changed.map(item => item.id)).toContain(1);
   });
 
-  it('no deja una pasarela sin bastión si una biblioteca inyectada no tiene la entrada', async () => {
-    const planned = planFor(stateWithWalkway(10, 14, { x: 0, z: -1 })).buildings[0]!;
-    const [joint, fallback] = await Promise.all([
-      new GLTFLoader().parseAsync(publishedCandidate('e3b-bastion-joint-candidate'), ''),
-      new GLTFLoader().parseAsync(publishedCandidate('bastion-access-candidate'), ''),
-    ]);
-    fallback.scene.name = 'FallbackAccess';
-    const village = new Village((id) => {
-      if (id === 'e3b-bastion-joint-candidate') return joint.scene.clone(true);
-      return id === 'bastion-access-candidate' ? fallback.scene.clone(true) : undefined;
-    });
+  it('no pinta adarve sin la piedra del muro publicado', () => {
+    const plan = planFor(stateWithWalkway(10, 14, { x: 0, z: -1 }));
+    const village = new Village(() => undefined);
     try {
-      village.add(planned);
-      expect(village.group.getObjectByName('WalkwayEntry')).toBeUndefined();
-      expect(village.group.getObjectByName('FallbackAccess')).toBeDefined();
+      village.rampart(plan.rampart);
+      expect(village.group.getObjectByName('Valley_Rampart')).toBeUndefined();
     } finally { village.dispose(); }
   });
 });

@@ -182,7 +182,11 @@ try {
       defenders: frames[0]?.life.people.filter(person => person.dayPlan?.job?.place?.startsWith('post:')).map(person => person.id) ?? [],
       stalledPorters: [],
     },
-    meshDrift: 0, peopleMeshDrift: 0, penetratingCircles: 0, penetratingBeasts: 0, blockedCentres: 0, night: [], transitions: [] };
+    meshDrift: 0, peopleMeshDrift: 0, penetratingCircles: 0, penetratingBeasts: 0, blockedCentres: 0,
+    // E3b.3 · Quien va por su ruta privada del adarve pisa, por definición,
+    // encima de celdas de muro: no es un choque con la máscara del suelo. Se
+    // cuenta aparte para que se vea, en vez de esconderlo.
+    elevatedSamples: 0, night: [], transitions: [] };
   const last = new Map();
   const porterMotion = new Map();
   for (const frame of frames) {
@@ -201,9 +205,11 @@ try {
       const stage = person.residence?.stage ?? 'no-home';
       const mesh = life.renderedPeople.find(item => item.id === person.id);
       if (stage !== 'sleeping' && (mesh === undefined || Math.hypot(mesh.x - person.x, mesh.z - person.z) > 0.002)) summary.peopleMeshDrift += 1;
-      if (stage !== 'sleeping' && person.penetration > 0.001) summary.penetratingCircles += 1; counts[stage] = (counts[stage] ?? 0) + 1;
+      const elevated = person.elevated !== null && person.elevated !== undefined;
+      if (elevated) summary.elevatedSamples += 1;
+      if (stage !== 'sleeping' && !elevated && person.penetration > 0.001) summary.penetratingCircles += 1; counts[stage] = (counts[stage] ?? 0) + 1;
       const cell = Math.floor(person.z) * life.map.width + Math.floor(person.x);
-      if (stage !== 'sleeping' && life.map.blocked[cell] === 1) summary.blockedCentres += 1;
+      if (stage !== 'sleeping' && !elevated && life.map.blocked[cell] === 1) summary.blockedCentres += 1;
       if (last.get(person.id) !== stage) summary.transitions.push({ at: frame.seconds, id: person.id, stage });
       last.set(person.id, stage);
       const preparingOutside = (person.residence === null || person.residence.stage === 'day')

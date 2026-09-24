@@ -25,7 +25,8 @@ import { scatterTransform } from './forest';
 import { houseVariant } from './house-variation';
 import { bastionAccessOf, type BastionAccess } from '@derive/bastion-access';
 import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
-import { elevatedRingOf, type ElevatedRing, type ElevatedRingSegment, type ElevatedRingVariant, type RingCell } from '@derive/elevated-ring';
+import { elevatedRingOf, type ElevatedRing, type ElevatedRingSegment, type ElevatedRingVariant, type RingCell, type RingPoint } from '@derive/elevated-ring';
+import { RAMPART, rampartBoxes, rampartPlatformCells, rampartPrisms, type RampartBastion, type RampartLayout } from './rampart';
 
 /** Radio del tronco adulto de `tree.glb`, medido en la receta E3b.2. */
 const TREE_TRUNK_RADIUS = 0.34 / 3;
@@ -160,10 +161,226 @@ export function sceneRingOf(state: GameState, bastion: Building,
 
 /** Selector de la primera junta publicada, compartido por escena y vida. */
 export function sceneWalkwayOf(state: GameState, bastion: Building): BastionWalkway | null {
+  // El adarve generado ya cubre esa junta; dos tableros en la misma celda no.
+  if (sceneRampartOf(state)?.layout.bastions.some(item => item.id === bastion.id)) return null;
   const walkway = bastionWalkwayOf(state, bastion);
   if (walkway === null) return null;
   const ring = sceneRingOf(state, bastion);
   return ring.route.length >= 3 && ring.segments[0]?.eligible === true ? walkway : null;
+}
+
+const ALL_RING_VARIANTS: readonly ElevatedRingVariant[] = ['straight', 'turn', 'diagonal', 'mixed',
+  'gate-cardinal', 'gate-diagonal', 'gate-mixed', 'bastion-crossing', 'bastion-return'];
+
+/**
+ * E3b.3 · El anillo para el adarve generado: todas las formas valen, porque
+ * la malla sale del trazado y no de un catálogo de esquinas. Sólo los
+ * troncos, las obras y las casas pegadas al eje cortan el recorrido.
+ */
+export function sceneRampartRingOf(state: GameState, bastion: Building): ElevatedRing {
+  const topology = elevatedRingOf(state, bastion, { approvedVariants: ALL_RING_VARIANTS, lane: 'center' });
+  const trees = new Map<string, { x: number; z: number; scale: number }[]>();
+  for (const look of forestLooks(state)) {
+    if (look.stage === 'stump') continue;
+    const tree = scatterTransform(state.map.width, look.cell);
+    const scale = tree.scale * (look.stage === 'regrowth' ? look.size : 1);
+    if (TREE_BARK_TOP * scale < RAMPART.deckBottom) continue;
+    const bucket = `${Math.floor(tree.x)},${Math.floor(tree.z)}`;
+    trees.set(bucket, [...trees.get(bucket) ?? [], { ...tree, scale }]);
+  }
+  const blockedCells = new Set<string>();
+  for (const segment of topology.segments) {
+    const centre = { x: segment.cell.x + 0.5, z: segment.cell.z + 0.5 };
+    const tower = segment.kind === 'bastion'
+      ? state.buildings.find(item => item.id === segment.buildingId) : undefined;
+    const access = tower === undefined ? null : bastionAccessOf(state, tower);
+    const hits = (tree: { x: number; z: number; scale: number }): boolean => {
+      const radius = RAMPART.halfWidth + TREE_TRUNK_RADIUS * tree.scale;
+      // Tablero: el paso de 0,90 hacia los dos vecinos, con el inglete dentro.
+      for (const arm of [segment.incoming, segment.outgoing]) {
+        const vx = arm.x / 2, vz = arm.z / 2;
+        const t = Math.max(0, Math.min(1, ((tree.x - centre.x) * vx + (tree.z - centre.z) * vz) / (vx * vx + vz * vz)));
+        if (Math.hypot(tree.x - centre.x - vx * t, tree.z - centre.z - vz * t) <= radius) return true;
+      }
+      if (tower === undefined) return false;
+      // Torre, descansillo y escalera desplazada hasta 2,65 hacia dentro.
+      const trunk = TREE_TRUNK_RADIUS * tree.scale;
+      const reach = access === null ? 1 : 1 + RAMPART.stairShift + 1;
+      const minX = access?.x === -1 ? segment.cell.x + 1 - reach : segment.cell.x;
+      const maxX = access?.x === 1 ? segment.cell.x + reach : segment.cell.x + 1;
+      const minZ = access?.z === -1 ? segment.cell.z + 1 - reach : segment.cell.z;
+      const maxZ = access?.z === 1 ? segment.cell.z + reach : segment.cell.z + 1;
+      return Math.hypot(Math.max(0, minX - tree.x, tree.x - maxX), Math.max(0, minZ - tree.z, tree.z - maxZ)) <= trunk;
+    };
+    let blocked = false;
+    for (let dz = -3; dz <= 3 && !blocked; dz += 1) {
+      for (let dx = -3; dx <= 3 && !blocked; dx += 1) {
+        blocked = (trees.get(`${segment.cell.x + dx},${segment.cell.z + dz}`) ?? []).some(hits);
+      }
+    }
+    if (blocked) blockedCells.add(`${segment.cell.x},${segment.cell.z}`);
+  }
+  return elevatedRingOf(state, bastion, { approvedVariants: ALL_RING_VARIANTS, lane: 'center',
+    blockedAt: cell => blockedCells.has(`${cell.x},${cell.z}`) });
+}
+
+/** Lo que recorre el guardia de una torre: su escalera y el adarve que sale de ella. */
+export interface RampartPatrol {
+  readonly bastionId: number;
+  readonly stairShift: number;
+  /** Desde el puesto de la torre y de vuelta a él, a 1,02: vuelta entera o ida y vuelta. */
+  readonly route: readonly RingPoint[];
+  readonly closed: boolean;
+}
+
+export interface SceneRampart {
+  readonly layout: RampartLayout;
+  readonly patrols: ReadonlyMap<number, RampartPatrol>;
+}
+
+let rampartMemo: { key: string; value: SceneRampart | null } | null = null;
+
+/**
+ * E3b.3 · El adarve de la villa, derivado sin guardarlo.
+ *
+ * Cada torre con escalera abre su anillo. Si el anillo entero es transitable,
+ * el guardia da la vuelta; si no, recorre los dos tramos que salen de su torre
+ * hasta el primer corte —un tronco, una obra, una casa pegada, una ruina— y
+ * vuelve. Un tramo perdido corta el recorrido sin más reglas: el anillo deja
+ * de cerrar y el tramo roto no es transitable.
+ */
+export function sceneRampartOf(state: GameState): SceneRampart | null {
+  // Firma de lo que decide el anillo: tipo, posición, material y ruina de
+  // cada edificio, y las obras. El bosque cambia con el tick.
+  const memo = `${state.seed}:${state.terrainSeed}:${state.tick}:${state.plaza.x},${state.plaza.y}:${
+    state.buildings.map(item => `${item.id}${item.kind[0]}${item.kind.length}.${item.x}.${item.y}.${item.tier}${
+      item.lostTick === null ? '' : 'x'}`).join(',')}:${
+    state.works.reduce((sum, item) => (sum * 31 + item.id + item.x * 131 + item.y * 17) % 2147483647, 0)}`;
+  if (rampartMemo?.key === memo) return rampartMemo.value;
+  const value = computeRampart(state);
+  rampartMemo = { key: memo, value };
+  return value;
+}
+
+function computeRampart(state: GameState): SceneRampart | null {
+  const cellKey = (cell: RingCell): string => `${cell.x},${cell.z}`;
+  const edges = new Map<string, readonly [RingCell, RingCell]>();
+  const found: { bastionId: number; route: RingPoint[]; closed: boolean }[] = [];
+  const centreOf = (cell: RingCell): RingPoint => ({ x: cell.x + 0.5, z: cell.z + 0.5, y: 1.02 });
+  for (const bastion of state.buildings) {
+    if (bastion.kind !== 'bastion' || bastion.lostTick !== null) continue;
+    const ring = sceneRampartRingOf(state, bastion);
+    if (ring.access === null || ring.segments.length === 0) continue;
+    const s = ring.segments, n = s.length;
+    const start = { x: bastion.x, z: bastion.y };
+    const post = ring.route[0]!;
+    let runs: RingCell[][];
+    if (ring.geometryReady) runs = [[start, ...s.slice(0, n - 1).map(item => item.cell), start]];
+    else {
+      let fwd = 0;
+      while (fwd < n && s[fwd]!.eligible) fwd += 1;
+      let back = 0;
+      if (ring.topologyClosed && s[n - 1]!.variant === 'bastion-return') {
+        while (back < n - fwd && s[n - 1 - back]!.eligible) back += 1;
+      }
+      runs = [[start, ...s.slice(0, fwd).map(item => item.cell)],
+        [start, ...s.slice(n - back, n - 1).reverse().map(item => item.cell)]]
+        .filter(run => run.length >= 2);
+    }
+    if (runs.length === 0) continue;
+    for (const run of runs) {
+      for (let i = 1; i < run.length; i += 1) {
+        const a = run[i - 1]!, b = run[i]!;
+        edges.set([cellKey(a), cellKey(b)].sort().join('|'), [a, b]);
+      }
+    }
+    // El puesto está 0,08 hacia la escalera. Salir de él en línea recta al
+    // vecino roza el pretil interior del primer tramo (0,31 medido, frente a
+    // un cuerpo de 0,32): se pasa antes por el centro de la torre, en el eje.
+    const tower = centreOf(start);
+    const route: RingPoint[] = [post, tower];
+    if (ring.geometryReady) route.push(...ring.route.slice(1, -1), tower, post);
+    else {
+      for (const run of runs) {
+        const out = run.slice(1).map(centreOf);
+        route.push(...out, ...out.slice(0, -1).reverse(), tower);
+      }
+      route.push(post);
+    }
+    found.push({ bastionId: bastion.id, route, closed: ring.geometryReady });
+  }
+  if (edges.size === 0) return null;
+  const links = new Map<string, RingCell[]>();
+  for (const [a, b] of edges.values()) {
+    links.set(cellKey(a), [...links.get(cellKey(a)) ?? [], { x: b.x - a.x, z: b.z - a.z }]);
+    links.set(cellKey(b), [...links.get(cellKey(b)) ?? [], { x: a.x - b.x, z: a.z - b.z }]);
+  }
+  const at = new Map(state.buildings.filter(item => item.lostTick === null && item.w === 1 && item.h === 1)
+    .map(item => [`${item.x},${item.y}`, item]));
+  const bastions: RampartBastion[] = [];
+  const gates: RingCell[] = [];
+  for (const [cell, directions] of [...links].sort(([a], [b]) => a.localeCompare(b))) {
+    const building = at.get(cell);
+    if (building === undefined) continue;
+    const [x, z] = cell.split(',').map(Number) as [number, number];
+    if (building.kind === 'gate') gates.push({ x, z });
+    if (building.kind !== 'bastion') continue;
+    const access = bastionAccessOf(state, building);
+    // La escalera se aparta sólo si una diagonal sale por su lado: G-27 queda intacta en los demás.
+    const shifted = access !== null && directions.some(link => link.x !== 0 && link.z !== 0
+      && link.x * access.x + link.z * access.z > 0);
+    bastions.push({ id: building.id, cell: { x, z }, access, links: directions,
+      stairShift: shifted ? RAMPART.stairShift : 0 });
+  }
+  const shiftOf = new Map(bastions.map(item => [item.id, item.stairShift]));
+  const centre = { x: state.plaza.x + 0.5, z: state.plaza.y + 0.5 };
+  const sortedEdges = [...edges.entries()].sort(([a], [b]) => a.localeCompare(b));
+  const layout: RampartLayout = {
+    edges: sortedEdges.map(([, edge]) => edge), bastions, gates, centre,
+    signature: `${sortedEdges.map(([k]) => k).join(';')}#${bastions.map(item =>
+      `${item.id}:${item.stairShift}:${item.access?.x ?? 'n'}${item.access?.z ?? 'n'}`).join(';')}`,
+  };
+  return { layout, patrols: new Map(found.map(item => [item.bastionId, { ...item,
+    stairShift: shiftOf.get(item.bastionId) ?? 0 }])) };
+}
+
+/** El recorrido del guardia de una torre, o `null` si su torre no abre adarve. */
+export function sceneRampartPatrolOf(state: GameState, bastion: Building): RampartPatrol | null {
+  return sceneRampartOf(state)?.patrols.get(bastion.id) ?? null;
+}
+
+let rampartPhysics: { signature: string; cells: RingCell[]; obstacles: RampartObstacle[] } | null = null;
+
+/** Caja de Rapier con la forma de `PhysicsObstacle`, sin que el plan dependa de la vida. */
+export interface RampartObstacle {
+  readonly at: { readonly x: number; readonly y: number; readonly z: number };
+  readonly halfExtents: { readonly x: number; readonly y: number; readonly z: number };
+  readonly rotation: { readonly x: number; readonly y: number; readonly z: number; readonly w: number };
+}
+
+/**
+ * E3b.3 · Lo que la vida necesita del adarve de una torre: ruta, escalera,
+ * suelo físico y pretiles. Sale de los mismos prismas que se dibujan.
+ */
+export function sceneRampartPatrolView(state: GameState, bastion: Building): {
+  readonly stairShift: number; readonly route: readonly RingPoint[];
+  readonly platformCells: readonly RingCell[]; readonly obstacles: readonly RampartObstacle[];
+} | null {
+  const rampart = sceneRampartOf(state);
+  const patrol = rampart?.patrols.get(bastion.id);
+  if (rampart === null || rampart === undefined || patrol === undefined) return null;
+  if (rampartPhysics?.signature !== rampart.layout.signature) {
+    rampartPhysics = {
+      signature: rampart.layout.signature,
+      cells: rampartPlatformCells(rampart.layout),
+      obstacles: rampartBoxes(rampartPrisms(rampart.layout)).map(item => ({
+        at: item.at, halfExtents: item.half,
+        rotation: { x: 0, y: Math.sin(item.yaw / 2), z: 0, w: Math.cos(item.yaw / 2) },
+      })),
+    };
+  }
+  return { stairShift: patrol.stairShift, route: patrol.route,
+    platformCells: rampartPhysics.cells, obstacles: rampartPhysics.obstacles };
 }
 
 export interface PlannedBuilding {
@@ -202,6 +419,8 @@ export interface PlannedBuilding {
   readonly bastionAccess?: BastionAccess;
   /** E3b · Junta visible con el primer tramo de muro, derivada sin guardarla. */
   readonly bastionWalkway?: BastionWalkway;
+  /** E3b.3 · Torre bajo el adarve generado: sin almenas propias y, si hace falta, escalera apartada. */
+  readonly rampartShift?: number;
 }
 
 export interface ScenePlan {
@@ -217,6 +436,8 @@ export interface ScenePlan {
   readonly buildings: readonly PlannedBuilding[];
   /** Obras separadas de lo terminado: no comparten id ni registro de render. */
   readonly works: readonly PlannedWork[];
+  /** E3b.3 · El adarve generado sobre el anillo de piedra, o nada. */
+  readonly rampart: RampartLayout | null;
 }
 
 export interface PlannedWork {
@@ -238,6 +459,7 @@ export interface PlanChange {
   readonly changed: readonly PlannedBuilding[];
   readonly removed: readonly BuildingId[];
   readonly works: WorkChange;
+  readonly rampart: boolean;
 }
 
 export interface WorkChange {
@@ -392,8 +614,11 @@ export function planFor(state: GameState): ScenePlan {
       && diagonal.z === -direction.z)?.bit ?? 0;
     return (connections.get(neighbour.id) ?? 0) & returnBit ? mask | direction.bit : mask;
   }, 0);
+  const rampart = sceneRampartOf(state);
+  const rampartShift = new Map(rampart?.layout.bastions.map(item => [item.id, item.stairShift]) ?? []);
   return {
     game: `${state.seed}:${state.terrainSeed}`,
+    rampart: rampart?.layout ?? null,
     ground: groundSignature(state.map, state.tick),
     forest: forestSignature(state),
     buildings: visible.map((building) => {
@@ -411,6 +636,7 @@ export function planFor(state: GameState): ScenePlan {
         ...(access === null ? {} : walkway === null
           ? { asset: 'bastion-access-candidate', bastionAccess: access }
           : { asset: 'e3b-bastion-joint-candidate', bastionAccess: access, bastionWalkway: walkway }),
+        ...(rampartShift.has(building.id) ? { rampartShift: rampartShift.get(building.id)! } : {}),
       };
     })
       .sort((a, b) => a.id - b.id),
@@ -429,7 +655,8 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
     && a.bastionWalkway?.firstWallId === b.bastionWalkway?.firstWallId
     && a.bastionWalkway?.nextWallId === b.bastionWalkway?.nextWallId
     && a.bastionWalkway?.side.x === b.bastionWalkway?.side.x
-    && a.bastionWalkway?.side.z === b.bastionWalkway?.side.z;
+    && a.bastionWalkway?.side.z === b.bastionWalkway?.side.z
+    && a.rampartShift === b.rampartShift;
 }
 
 function sameWork(a: PlannedWork, b: PlannedWork): boolean {
@@ -461,7 +688,7 @@ export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanCha
   if (previous === null || previous.game !== next.game) {
     return {
       ground: true, forest: true, cleared: true, added: next.buildings, changed: [], removed: [],
-      works: { added: next.works, changed: [], removed: [] },
+      works: { added: next.works, changed: [], removed: [] }, rampart: true,
     };
   }
 
@@ -483,12 +710,13 @@ export function planChange(previous: ScenePlan | null, next: ScenePlan): PlanCha
     changed,
     removed: [...before.keys()],
     works: workChange(previous.works, next.works),
+    rampart: previous.rampart?.signature !== next.rampart?.signature,
   };
 }
 
 /** Whether a change asks for any work at all. Most frames ask for none. */
 export function isQuiet(change: PlanChange): boolean {
-  return !change.ground && !change.forest && !change.cleared
+  return !change.ground && !change.forest && !change.cleared && !change.rampart
     && change.added.length === 0 && change.changed.length === 0 && change.removed.length === 0
     && change.works.added.length === 0 && change.works.changed.length === 0 && change.works.removed.length === 0;
 }

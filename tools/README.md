@@ -100,7 +100,7 @@ silencio y la prueba pasa sin probar nada.
 | `shot.mjs` | **Fotografiar el juego montado.** `--seed`, `--year`, `--run`, `--speed`, `--wait moment\|crossroad`, `--look X,Z` para centrar una celda real y `--scene-only` para guardar el PNG WebGL sin HUD/DOM. `--capture-zoom 0.1..1` amplía esa captura del hook y exige `--look` o `--scene-only`. Abre el valle en un año concreto sin falsear el reloj (U-10b) |
 | `film.mjs` | **Rodar el valle**: fotogramas seguidos más la traza de cada cuerpo en cada uno (`window.__valleyLife`) |
 | `film-sheet.py` | Convierte esa película en tira de contactos e informe de anomalías. **Es la única forma de medir la capa de vida como la ejecuta el navegador** |
-| `observe-life.mjs` | Juego real con el reloj del navegador controlado, píxel y traza atómicos. Lo usa la skill `observe-valley-life` |
+| `observe-life.mjs` | Juego real con el reloj del navegador controlado, píxel y traza atómicos. Lo usa la skill `observe-valley-life`. Quien anda por su ruta elevada (escalera, adarve) se cuenta en `elevatedSamples`, no como choque |
 | `day-report.mjs` | Resume la traza del renderer (IA-12) — la traza real, no una simulación paralela |
 | `press-kit.mjs` | **El paquete de prensa**: todas las pantallas y todos sus estados en una pasada, con hoja de contactos, y el metraje del tráiler sin interfaz. `--only <grupos>`, `--offset N` |
 | `bundle-game.ts` | Empaqueta el juego entero en una página, para abrirlo desde el móvil |

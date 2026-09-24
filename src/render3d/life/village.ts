@@ -29,7 +29,7 @@ import { dayPlans, leisurePlaces, type DayPlan } from './day';
 import { canReach, reachableFrom, terrainOf } from './terrain';
 import { drift, freshNeeds, type Doing, type Needs } from './needs';
 import { doorOf, OFFERS, placesOf, seatAt, seatKey, type Offer, type Place } from './offers';
-import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RingSelector, type WalkwaySelector } from './garrison';
+import { garrisonPlaces, isPost, mannedPlatformCells, type Manned, type RampartSelector, type RingSelector, type WalkwaySelector } from './garrison';
 import { advanceElevated, type ElevatedPoint, type ElevatedPost } from './elevated-post';
 import { archersOf, stepArchery, type Archer, type Arrow } from './archery';
 import { fallenDefenders, meleePose, stepMelee, type Defender } from './melee';
@@ -102,7 +102,12 @@ export interface Dweller {
   readonly residence?: HomeRoutine;
   readonly body: Body;
   /** E3a · Estado privado de la escalera; nunca sale al motor ni al router. */
-  elevated?: { readonly post: ElevatedPost; phase: 'climb' | 'occupied' | 'descent'; next: number; route?: readonly ElevatedPoint[] };
+  elevated?: { readonly post: ElevatedPost; phase: 'climb' | 'occupied' | 'descent' | 'patrol'; next: number;
+    route?: readonly ElevatedPoint[];
+    /** E3b.3 · De vuelta al puesto por lo andado de la ronda. */
+    returning?: boolean;
+    /** E3b.3 · Paso de vida hasta el que se descansa en el puesto entre rondas. */
+    restUntil?: number };
   readonly villager: VillagerId;
   readonly traits: readonly Trait[];
   readonly needs: Needs;
@@ -420,6 +425,8 @@ export interface DayOptions {
   readonly walkwayOf?: WalkwaySelector;
   /** El circuito completo sólo aparece cuando todas sus mallas están aprobadas. */
   readonly ringOf?: RingSelector;
+  /** E3b.3 · El adarve generado: prevalece sobre el anillo de piezas aprobadas. */
+  readonly rampartOf?: RampartSelector;
   /** Captura síncrona de `fall(0)` en la posición exacta del fixed-step. */
   readonly ragdollSeed?: (id: number, bornAt: number,
     placement: { readonly x: number; readonly y?: number; readonly z: number; readonly facing: number }) => RagdollSeed | null;
@@ -528,6 +535,13 @@ interface ActiveYield { readonly id: string; readonly yielding: Yielding }
 interface ActiveQuarrel { readonly id: string; readonly scene: QuarrelScene }
 
 /**
+ * E3b.3 · Cuánto se queda el guardia en su puesto entre dos rondas por el
+ * adarve: veinte segundos de jornada. Es tinta de la vida, no del juego —el
+ * motor no sabe que hay ronda—, y la ronda nunca le quita a nadie el puesto.
+ */
+const PATROL_REST_STEPS = Math.round(20 / LIFE_STEP);
+
+/**
  * D2 · A qué distancia de su puesto se considera que alguien **está** en él.
  *
  * TUNE escénico: 1,2 celdas. El alcance de la propia oferta es 0,8 (`offers.ts`)
@@ -599,7 +613,7 @@ export function createVillage(state: GameState, day: number, options: DayOptions
   // día que llegan, porque `garrisonOf` sólo los da entonces. Van después del
   // corazón a propósito: el corazón se calcula con los sitios de la aldea, y una
   // guardia en la muralla no es un sitio donde viva nadie.
-  const manned = garrisonPlaces(state, land, heart, shore, options.ground, options.walkwayOf, options.ringOf);
+  const manned = garrisonPlaces(state, land, heart, shore, options.ground, options.walkwayOf, options.ringOf, options.rampartOf);
   places.push(...manned.map((post) => post.place));
   // **Y sólo cuentan los sitios de esta orilla.** El río no se cruza, así que un
   // sitio del otro lado no es un sitio para esta gente: dejar a alguien allí era
@@ -997,8 +1011,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     // llegada por alcance antes de estar realmente en su extremo.
     const closeToEntry = assigned !== undefined
       && Math.hypot(body.x - assigned.approach.x, body.z - assigned.approach.z) <= body.radius / 4;
+    // De noche no se sube: la guardia bajaría al llegar arriba y la jornada la
+    // volvería a mandar al puesto, escalera arriba y abajo hasta el alba.
     if (elevated === undefined && assigned !== undefined && onAssignedPost
       && !dweller.doing!.there
+      && !isNight(phase)
       && closeToEntry
       && pathTo(land, body, assigned.approach, body.radius) !== null) {
       // Se toma la cota que Three ya estaba mostrando sobre el suelo antes de
@@ -1025,19 +1042,44 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       elevated.next = 0;
     }
 
+    const leaving = !onAssignedPost || isNight(phase) || (dweller.doing?.until ?? Number.POSITIVE_INFINITY) <= steps;
+    // E3b.3 · A media ronda, la partida a la vista o el fin de la guardia
+    // devuelven al puesto por lo ya andado: desde allí se tira, y desde allí
+    // se baja por la escalera, nunca dando la vuelta entera.
+    if (elevated.phase === 'patrol' && elevated.returning !== true && (leaving || raidersHere(raiders))) {
+      // Por el lado más corto: en una vuelta cerrada, lo que queda por delante
+      // también acaba en el puesto. Medido en la villa 91: al anochecer iba al
+      // 70 % de la vuelta y desandaba ese 70 %.
+      const route = elevated.route ?? [];
+      const length = (points: readonly ElevatedPoint[]): number => points.reduce((sum, point, index) => {
+        const from = index === 0 ? body : points[index - 1]!;
+        return sum + Math.hypot(point.x - from.x, point.z - from.z);
+      }, 0);
+      const back = [...route.slice(0, elevated.next)].reverse();
+      const ahead = route.slice(elevated.next);
+      if (ahead.length === 0 || length(back) < length(ahead)) { elevated.route = back; elevated.next = 0; }
+      elevated.returning = true;
+    }
+
     if (elevated.phase === 'occupied') {
-      const leave = !onAssignedPost || isNight(phase) || (dweller.doing?.until ?? Number.POSITIVE_INFINITY) <= steps;
-      if (!leave) {
+      const leave = leaving;
+      if (!leave && elevated.post.patrol !== undefined && !raidersHere(raiders)
+        && steps >= (elevated.restUntil ?? 0)) {
+        elevated.phase = 'patrol'; elevated.route = elevated.post.patrol; elevated.next = 1;
+        delete elevated.returning;
+      } else if (!leave) {
         body.x = elevated.post.post.x; body.z = elevated.post.post.z; body.y = elevated.post.post.y;
         body.vx = 0; body.vz = 0; dweller.motionSpeed = 0;
         drift(dweller.needs, dweller.traits, { moving: false, withOthers: false, working: false, hunger }, LIFE_STEP);
         if (dweller.doing !== null) satisfy(dweller.needs, dweller.doing.offer, LIFE_STEP);
         return true;
       }
-      // Una guardia termina su turno antes de que cualquier nueva rutina o la
-      // casa pueda recuperar el cuerpo de suelo.
-      dweller.doing = null;
-      elevated.phase = 'descent'; elevated.route = elevated.post.descent; elevated.next = 1;
+      if (leave) {
+        // Una guardia termina su turno antes de que cualquier nueva rutina o la
+        // casa pueda recuperar el cuerpo de suelo.
+        dweller.doing = null;
+        elevated.phase = 'descent'; elevated.route = elevated.post.descent; elevated.next = 1;
+      }
     }
 
     const route = elevated.route ?? (elevated.phase === 'climb' ? elevated.post.climb : elevated.post.descent);
@@ -1053,6 +1095,14 @@ export function createVillage(state: GameState, day: number, options: DayOptions
     dweller.faceAnchor = { x: body.x, z: body.z };
     drift(dweller.needs, dweller.traits, { moving: distance > 0, withOthers: false, working: false, hunger }, LIFE_STEP);
     if (!moved.arrived) return true;
+
+    if (elevated.phase === 'patrol') {
+      // Fin de la ronda, o de la vuelta atrás: al puesto, a descansar.
+      elevated.phase = 'occupied'; elevated.next = 0;
+      delete elevated.route; delete elevated.returning;
+      elevated.restUntil = steps + PATROL_REST_STEPS;
+      return true;
+    }
 
     if (elevated.phase === 'climb') {
       elevated.phase = 'occupied'; elevated.next = 0;
@@ -2222,10 +2272,11 @@ export function createVillage(state: GameState, day: number, options: DayOptions
       if (physics === null && !physicsAsked && raidersHere(raiders)) {
         physicsAsked = true;
         const platformCells = mannedPlatformCells(manned);
-        const obstacles = manned.flatMap(post => post.elevated === undefined ? []
+        const rampartObstacles = new Set(manned.flatMap(post => post.rampart === undefined ? [] : [post.rampart.obstacles]));
+        const obstacles = [...[...rampartObstacles].flat(), ...manned.flatMap(post => post.elevated === undefined || post.rampart !== undefined ? []
           : post.elevatedVariant === 'wall'
             ? bastionWalkwayParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access)
-            : bastionParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access));
+            : bastionParapetObstacles({ x: post.post.x, z: post.post.y }, post.elevated.access))];
         const physicsOptions: PhysicsOptions = {
           ...(options.ground === undefined ? {} : { ground: options.ground }),
           ...(platformCells.length === 0 ? {} : { platformCells }),

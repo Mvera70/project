@@ -27,12 +27,27 @@ import type { GameState } from '@engine/state';
 import type { Point, Terrain } from './body';
 import { fitsCircle } from './body';
 import { canReach } from './terrain';
-import { elevatedPostOf, elevatedWallRoute, elevatedRingCircuit, type ElevatedPost } from './elevated-post';
+import { elevatedPatrol, elevatedPostOf, elevatedWallRoute, elevatedRingCircuit, type ElevatedPoint, type ElevatedPost } from './elevated-post';
+import type { PhysicsObstacle } from './physics';
 import { OFFERS, placedOffer, type OfferSpec, type Place } from './offers';
 
 /** La escena puede negar una junta cuando un tronco real ocupa su tablero. */
 export type WalkwaySelector = (state: GameState, bastion: GameState['buildings'][number]) => BastionWalkway | null;
 export type RingSelector = (state: GameState, bastion: GameState['buildings'][number]) => ElevatedRing;
+
+/**
+ * E3b.3 · El adarve generado, visto desde la vida: por dónde se anda, dónde
+ * está la escalera y qué piedra detiene una flecha. Lo calcula la escena con
+ * la misma descripción que dibuja; la vida no infiere ninguna forma.
+ */
+export interface RampartPatrolView {
+  readonly stairShift: number;
+  /** Desde el puesto de la torre y de vuelta a él, a 1,02. */
+  readonly route: readonly ElevatedPoint[];
+  readonly platformCells: readonly Point[];
+  readonly obstacles: readonly PhysicsObstacle[];
+}
+export type RampartSelector = (state: GameState, bastion: GameState['buildings'][number]) => RampartPatrolView | null;
 
 /** Un puesto ocupado: el sitio donde se está y lo que se sabe de él. */
 export interface Manned {
@@ -44,6 +59,8 @@ export interface Manned {
   readonly elevatedVariant?: 'bastion' | 'wall' | 'ring';
   /** Celdas del circuito acreditado para construir su suelo físico en batalla. */
   readonly ring?: ElevatedRing;
+  /** E3b.3 · El adarve generado que recorre este puesto. */
+  readonly rampart?: RampartPatrolView;
   /** Dos celdas de adarve que comparten plataforma física con el bastión. */
   readonly walkway?: { readonly firstWall: Point; readonly nextWall: Point };
   /** Hacia dónde mira quien está ahí: afuera, que es de donde vienen. */
@@ -53,7 +70,8 @@ export interface Manned {
 /** Sólo baja a la cota de tablero las celdas de piedra que sostienen una ruta asignada. */
 export function mannedPlatformCells(manned: readonly Manned[]): Point[] {
   return manned.flatMap(post => post.elevated === undefined
-    ? [] : post.elevatedVariant === 'ring' && post.ring !== undefined
+    ? [] : post.rampart !== undefined ? [...post.rampart.platformCells]
+    : post.elevatedVariant === 'ring' && post.ring !== undefined
       // El portón necesita un tablero propio sin tapiar el paso público inferior.
       ? post.ring.segments.filter(segment => segment.kind !== 'gate').map(segment => segment.cell)
       : post.elevatedVariant === 'wall' && post.walkway !== undefined
@@ -136,13 +154,30 @@ export function garrisonPlaces(
   ground?: (x: number, z: number) => number,
   walkwayOf: WalkwaySelector = bastionWalkwayOf,
   ringOf?: RingSelector,
+  rampartOf?: RampartSelector,
 ): Manned[] {
   const garrison = garrisonOf(state);
   if (!garrison.manned) return [];
   const manned: Manned[] = [];
   const taken = new Set<number>();
   const postKey = (post: Post): string => `${post.x},${post.y}`;
-  const ringCircuits = new Map<string, { route: ElevatedPost; ring: ElevatedRing }>();
+  const ringCircuits = new Map<string, { route: ElevatedPost; ring?: ElevatedRing; rampart?: RampartPatrolView }>();
+  const rampartShift = new Map<string, number>();
+  if (rampartOf !== undefined) {
+    for (const post of garrison.posts) {
+      const bastion = state.buildings.find(building => building.kind === 'bastion'
+        && building.lostTick === null && building.x === post.x && building.y === post.y);
+      if (bastion === undefined) continue;
+      const access = bastionAccessOf(state, bastion);
+      const patrol = rampartOf(state, bastion);
+      if (access === null || patrol === null) continue;
+      // La escalera de la ruta es la misma que se dibuja: apartada o no.
+      rampartShift.set(postKey(post), patrol.stairShift);
+      const stair = elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground, patrol.stairShift);
+      const route = stair === null ? null : elevatedPatrol(stair, patrol.route);
+      if (route !== null) ringCircuits.set(postKey(post), { route, rampart: patrol });
+    }
+  }
   if (ringOf !== undefined) {
     for (const post of garrison.posts) {
       const bastion = state.buildings.find(building => building.kind === 'bastion'
@@ -151,7 +186,7 @@ export function garrisonPlaces(
       const access = bastionAccessOf(state, bastion);
       if (access === null) continue;
       const ring = ringOf(state, bastion);
-      if (!ring.geometryReady) continue;
+      if (!ring.geometryReady || ringCircuits.has(postKey(post))) continue;
       const stair = elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground, .65);
       const circuit = stair === null ? null : elevatedRingCircuit(stair, ring);
       if (circuit !== null) ringCircuits.set(postKey(post), { route: circuit, ring });
@@ -170,7 +205,8 @@ export function garrisonPlaces(
       && building.lostTick === null && building.x === post.x && building.y === post.y);
     const access = bastion === undefined ? null : bastionAccessOf(state, bastion);
     const elevated = access === null || bastion === undefined
-      ? null : elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground);
+      ? null : elevatedPostOf(land, reach, { x: bastion.x, z: bastion.y }, access, ground,
+        rampartShift.get(postKey(post)) ?? 0);
     const walkway = elevated === null || bastion === undefined ? null : walkwayOf(state, bastion);
     const circuit = ringCircuits.get(postKey(post)) ?? null;
     const route = circuit?.route ?? (elevated === null || bastion === undefined ? null : walkway === null
@@ -196,7 +232,8 @@ export function garrisonPlaces(
       ...(route === null || !usingElevated ? {} : {
         elevated: route,
         elevatedVariant: circuit !== null ? 'ring' : walkway === null ? 'bastion' : 'wall',
-        ...(circuit === null ? {} : { ring: circuit.ring }),
+        ...(circuit?.ring === undefined ? {} : { ring: circuit.ring }),
+        ...(circuit?.rampart === undefined ? {} : { rampart: circuit.rampart }),
         ...(walkway === null || circuit !== null ? {} : { walkway: {
           firstWall: { x: bastion!.x + walkway.side.x, z: bastion!.y + walkway.side.z },
           nextWall: { x: bastion!.x + walkway.side.x * 2, z: bastion!.y + walkway.side.z * 2 },

@@ -32,6 +32,12 @@ export interface ElevatedPost {
   readonly post: ElevatedPoint;
   readonly climb: readonly ElevatedPoint[];
   readonly descent: readonly ElevatedPoint[];
+  /**
+   * E3b.3 · La ronda por el adarve, del puesto al puesto. Se anda estando de
+   * guardia y sin enemigos a la vista; nunca antes de ocupar el puesto, que
+   * es desde donde se tira.
+   */
+  readonly patrol?: readonly ElevatedPoint[];
 }
 
 /** Resultado de avanzar sin superar la velocidad dada, incluso al cruzar aristas. */
@@ -125,6 +131,28 @@ export function elevatedRingCircuit(stair: ElevatedPost, ring: ElevatedRing): El
   }
   const climb = [...stair.climb, ...ring.route.slice(1)];
   return { ...stair, post: last, climb, descent: [...climb].reverse() };
+}
+
+/**
+ * E3b.3 · La ronda por el adarve generado: vuelta entera o ida y vuelta por
+ * cada tramo que sale de la torre. Sólo exige que empiece y acabe en el
+ * puesto y que ningún paso salte más de una celda en diagonal.
+ *
+ * La subida sigue siendo la de E3a, directa al puesto. La primera versión
+ * encadenaba la ronda antes de ocuparlo y, medido en un asalto de la villa
+ * 91, las dos torres pasaron cincuenta segundos andando sin soltar una flecha.
+ */
+export function elevatedPatrol(stair: ElevatedPost, route: readonly ElevatedPoint[]): ElevatedPost | null {
+  if (route.length < 3) return null;
+  const joins = (point: ElevatedPoint): boolean =>
+    Math.hypot(point.x - stair.post.x, point.z - stair.post.z, point.y - stair.post.y) < 0.02;
+  if (!joins(route[0]!) || !joins(route.at(-1)!)) return null;
+  for (let index = 1; index < route.length; index += 1) {
+    const before = route[index - 1]!, after = route[index]!;
+    const length = Math.hypot(after.x - before.x, after.z - before.z, after.y - before.y);
+    if (!Number.isFinite(length) || length > Math.SQRT2 + 0.1) return null;
+  }
+  return { ...stair, patrol: route };
 }
 
 /**

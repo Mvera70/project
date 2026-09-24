@@ -28,6 +28,10 @@ de clips fechados, revisión previa y evidencia; reacción de puerta completada 
 
 ## Los informes de ronda
 
+- [E3b.3: el adarve generado desde el anillo](graphics-rounds/E3b3-adarve-generado.md):
+  cierra E3b. Tablero y pretiles salen del trazado real; vuelta cerrada o ida y
+  vuelta hasta el primer corte; las torres siguen tirando en el asalto.
+
 - [E3b.2a: topología del anillo y bosque](graphics-rounds/E3b2a-inventario-topologia.md):
   dos villas maduras, diagonales/portones efectivos y riesgo aproximado de
   troncos junto al tablero; prepara los modelos candidatos.

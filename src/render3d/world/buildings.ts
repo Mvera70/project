@@ -16,6 +16,8 @@ import type { ElevatedRingVariant } from '@derive/elevated-ring';
 import { DEFENCE_DIAGONALS } from './defences';
 import { buildDefence } from './defences';
 import { varyHouse } from './house-variation';
+import { buildRampart, rampartTower, type RampartModel } from './rampart-mesh';
+import type { RampartLayout } from './rampart';
 
 /**
  * A four-sided pyramid over a `w × h` footprint, `rise` tall.
@@ -187,6 +189,11 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
       ? planned.z : planned.z + planned.h);
   group.userData.buildingId = planned.id;
   let model = source;
+  // E3b.3 · Bajo el adarve la torre pierde sus almenas propias; el adarve
+  // dibuja las suyas sobre el borde real del suelo, bocas incluidas.
+  const tower = planned.rampartShift !== undefined && planned.kind === 'bastion' && !planned.ruin
+    ? rampartTower(source, planned.bastionAccess === undefined ? 0 : planned.rampartShift) : undefined;
+  if (tower !== undefined) model = tower.object;
   if (planned.rubbleStage === 'settling') model.scale.y *= 0.55;
   if (planned.ruin && planned.asset?.startsWith('ruin-')) {
     // La misma ruina sustituye parcelas de 1×1, 2×2, 3×2 o 3×3. Ajustar solo
@@ -344,6 +351,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
       for (const geometry of gateJointGeometries) geometry.dispose();
       roofs.length = 0;
       disposeVariation?.();
+      tower?.dispose();
       group.clear();
     },
   };
@@ -462,6 +470,32 @@ export class Village {
    */
   constructor(private readonly instance?: (id: string) => Object3D | undefined) {
     this.group.name = 'Valley_Buildings';
+  }
+
+  private rampartModel: RampartModel | null = null;
+
+  /**
+   * E3b.3 · El adarve generado, con la piedra del muro publicado.
+   *
+   * Sin recurso de muro no hay piedra que prestarle, y el adarve no se dibuja:
+   * la ruta del guardia depende del plan, no de esta malla.
+   */
+  rampart(layout: RampartLayout | null): void {
+    if (this.rampartModel !== null) {
+      this.group.remove(this.rampartModel.object);
+      this.rampartModel.dispose();
+      this.rampartModel = null;
+    }
+    if (layout === null) return;
+    let stone: Material | undefined;
+    this.instance?.('wall')?.traverse((node) => {
+      if (!(node instanceof Mesh)) return;
+      const materials = Array.isArray(node.material) ? node.material as Material[] : [node.material as Material];
+      stone ??= materials.find((material) => material.name.includes('stone'));
+    });
+    if (stone === undefined) return;
+    this.rampartModel = buildRampart(layout, stone);
+    this.group.add(this.rampartModel.object);
   }
 
   /** Cuánta nieve hay puesta ahora mismo, y de qué color. */
@@ -597,6 +631,7 @@ export class Village {
   }
 
   clear(): void {
+    this.rampart(null);
     for (const id of [...this.models.keys()]) this.remove(id);
     // Una jornada/escena nueva no hereda física efímera de la anterior. La
     // simulación decide de nuevo si hay portón y si llega a romperse.

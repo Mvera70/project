@@ -68,7 +68,7 @@ import { Bubbles, type Bubble } from './effects/bubbles';
 import { Fauna } from './effects/fauna';
 import { Tells } from './effects/tells';
 import { TreeFalls, type TreeFallSighting } from './effects/tree-falls';
-import { FIELD_CROPS, isQuiet, planChange, planFor, sceneRingOf, sceneWalkwayOf, seasonColourStep, type ScenePlan } from './world/plan';
+import { FIELD_CROPS, isQuiet, planChange, planFor, sceneRampartPatrolView, sceneRingOf, sceneWalkwayOf, seasonColourStep, type ScenePlan } from './world/plan';
 import { BattleDebris } from './world/battle-debris';
 import { Works } from './world/works';
 import type { Physics } from './life/physics';
@@ -1219,6 +1219,7 @@ export async function createGraphicsRenderer(
       treeFalls.step(frame.speed === 0 ? 0 : frame.realDeltaSeconds);
       for (const id of change.removed) village.remove(id);
       for (const building of [...change.added, ...change.changed]) village.add(building);
+      if (change.rampart) village.rampart(next.rampart);
       for (const id of change.works.removed) works.remove(id);
       for (const work of [...change.works.added, ...change.works.changed]) works.add(work);
       plan = next;
@@ -1250,6 +1251,7 @@ export async function createGraphicsRenderer(
           ground: groundFloor,
           walkwayOf: sceneWalkwayOf,
           ringOf: sceneRingOf,
+          rampartOf: sceneRampartPatrolView,
           ragdollSeed: (id, bornAt, placement) => cast.captureRagdoll(id, bornAt, placement),
         });
         if (denVisual !== null) world.remove(denVisual);
@@ -1269,6 +1271,25 @@ export async function createGraphicsRenderer(
         if (previous !== null && !frame.discontinuity) {
           for (const person of life.dwellers) {
             const old = previous.dwellers.find(other => other.villager === person.villager);
+            // E3b.3 · Quien está en el adarve no cabe en el suelo, y el relevo
+            // del anochecer lo bajaba de golpe a otra celda: con una ronda de
+            // medio minuto era lo normal pillarlo arriba. Si la jornada nueva le
+            // da el mismo puesto con la misma ruta, sigue donde iba; si no, la
+            // vida lo baja andando por donde subió.
+            if (old?.elevated !== undefined && old.body.y !== undefined) {
+              const post = life.manned.find(item => item.place.id === old.dayPlan?.job?.place)?.elevated;
+              const was = old.elevated.post.climb;
+              if (post !== undefined && post.climb.length === was.length && post.climb.every((point, index) =>
+                Math.hypot(point.x - was[index]!.x, point.y - was[index]!.y, point.z - was[index]!.z) < 1e-6)) {
+                Object.assign(person.body, { x: old.body.x, y: old.body.y, z: old.body.z, facing: old.body.facing, vx: 0, vz: 0 });
+                person.elevated = { post, phase: old.elevated.phase, next: old.elevated.next,
+                  ...(old.elevated.route === undefined ? {} : { route: old.elevated.route }),
+                  ...(old.elevated.returning === undefined ? {} : { returning: old.elevated.returning }),
+                  ...(old.elevated.restUntil === undefined ? {} : { restUntil: old.elevated.restUntil - previous.steps }) };
+                person.travelled = old.travelled;
+                continue;
+              }
+            }
             if (old === undefined || !fitsCircle(life.land, old.body.x, old.body.z, person.body.radius)) continue;
             // E0b · cerrar la encrucijada es un corte de escena: la modal tapa
             // el tramo en que el mensajero salió, y la primera imagen posterior
