@@ -1,5 +1,25 @@
 # The Valley — Registro de cambios
 
+## v4.43 · 24 sep 2026 · El año del campo, contado y visible
+
+Pedido por Vera: siembra, crecimiento continuo según el cultivo, cosecha y
+vuelta, con abonado y arado, y cada fase como suceso. El cultivo de cada
+parcela pasa al motor (`world/crops.ts`, el mismo reparto que se dibujaba) y
+`FIELD_CYCLE` fija el calendario en `balance.ts`: estiércol, arado, siembra
+escalonada por cultivo, crecimiento y maduración. **La cosecha y el grano no
+cambian.** La crónica cuenta cada fase que empieza y la primera vez de cada
+una como noticia («la primera siembra de coles»), con marcas permanentes en
+`flags` y sin consumir azar. En pantalla la parcela oscurece al abonarla y
+ararla, brota y crece de forma continua, y el cereal se dora; en la vida hay
+dos gestos nuevos, la horca del estiércol y la siembra a voleo, con terrones
+y simiente saltando al soltar.
+
+Y el arreglo de un efecto de v4.41: al cercar los campos, el pasto quedaba
+partido y el ganado de las casas separadas del corazón por una hilera de
+parcelas acababa en un único punto (30 animales en una celda, semilla 7). El
+pasto empieza ahora en su trozo más grande, cada casa con prado suficiente
+cría en el suyo y el resto se reparte en claros distintos.
+
 ## v4.42 · 24 sep 2026 · Hacha y pico modelados (G-40)
 
 Vera pidió el hacha y el pico en Blender. Salen del pipeline de recetas del

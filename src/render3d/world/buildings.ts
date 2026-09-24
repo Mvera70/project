@@ -147,6 +147,53 @@ export function gateLeafOnly(source: Object3D): Object3D {
 }
 
 /**
+ * IA-fields · La parcela según su momento del año (`world/crops.ts`).
+ *
+ * Las plantas del recurso son las mallas que no son tierra (`crop`, `leaf`,
+ * `heart`, `stalk`): crecen en altura desde el suelo con `fieldGrowth`, y al
+ * arar no hay ninguna. La tierra se oscurece recién abonada o arada, y el
+ * cereal maduro se dora. Los materiales se copian: los de la biblioteca son de
+ * todas las parcelas del valle.
+ */
+const FIELD_TINT = {
+  /** Estiércol recién echado: tierra casi negra. */
+  manure: new Color('#5d4431'),
+  /** Tierra recién vuelta, húmeda. */
+  plough: new Color('#6e5038'),
+  /** El cereal hecho, del verde al oro. */
+  ripe: new Color('#c9a64a'),
+} as const;
+
+function dressField(model: Object3D, planned: PlannedBuilding): Material[] {
+  const owned: Material[] = [];
+  const phase = planned.fieldPhase;
+  const growth = planned.fieldGrowth ?? 1;
+  model.traverse((node) => {
+    const mesh = node as Mesh;
+    if (mesh.isMesh !== true || Array.isArray(mesh.material)) return;
+    const material = mesh.material as MeshStandardMaterial;
+    const soil = material.name.includes('soil');
+    if (soil) {
+      if (phase === 'manure' || phase === 'plough' || phase === 'sow') {
+        const copy = material.clone(); owned.push(copy);
+        copy.color.copy(FIELD_TINT[phase === 'manure' ? 'manure' : 'plough']);
+        mesh.material = copy;
+      }
+      return;
+    }
+    // Brote a ras de suelo al sembrar, y de ahí hasta su altura.
+    mesh.visible = phase !== 'plough' && growth > 0;
+    mesh.scale.y *= Math.max(0.08, growth);
+    if (phase === 'ripe' && planned.asset === 'field' && material.name.includes('crop')) {
+      const copy = material.clone(); owned.push(copy);
+      copy.color.lerp(FIELD_TINT.ripe, 0.75);
+      mesh.material = copy;
+    }
+  });
+  return owned;
+}
+
+/**
  * Un edificio con su recurso de verdad, colocado sobre su huella.
  *
  * La receta se escribe con la esquina en el origen y la huella hacia +X y +Z,
@@ -194,6 +241,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
   const tower = planned.rampartShift !== undefined && planned.kind === 'bastion' && !planned.ruin
     ? rampartTower(source, planned.bastionAccess === undefined ? 0 : planned.rampartShift) : undefined;
   if (tower !== undefined) model = tower.object;
+  const fieldMaterials = planned.kind === 'field' && !planned.ruin ? dressField(model, planned) : [];
   if (planned.rubbleStage === 'settling') model.scale.y *= 0.55;
   if (planned.ruin && planned.asset?.startsWith('ruin-')) {
     // La misma ruina sustituye parcelas de 1×1, 2×2, 3×2 o 3×3. Ajustar solo
@@ -352,6 +400,7 @@ export function buildFromAsset(planned: PlannedBuilding, source: Object3D, walkw
       roofs.length = 0;
       disposeVariation?.();
       tower?.dispose();
+      for (const material of fieldMaterials) material.dispose();
       group.clear();
     },
   };

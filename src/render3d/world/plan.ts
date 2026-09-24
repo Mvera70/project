@@ -15,8 +15,8 @@ import { defenceGates } from '@derive/defence-gates';
 // nothing. The picture still needs looking at. The bookkeeping does not.
 
 import type { Building, BuildingId, BuildingKind, ConstructionWork, GameState, ValleyMap } from '@engine/state';
-import { HOUSE_RUBBLE, TIME } from '@engine/balance';
-import { SEASONS, clockOf, weekOf } from '@engine/time';
+import { HOUSE_RUBBLE } from '@engine/balance';
+import { SEASONS, clockOf } from '@engine/time';
 import { BUILDING_ASSETS } from './buildings';
 import { BUILDING_LOOKS, RUIN, type BuildingLook } from '../visual-config';
 import { DEFENCE_DIAGONALS, defenceConnections } from './defences';
@@ -26,6 +26,7 @@ import { houseVariant } from './house-variation';
 import { bastionAccessOf, type BastionAccess } from '@derive/bastion-access';
 import { bastionWalkwayOf, type BastionWalkway } from '@derive/bastion-walkway';
 import { elevatedRingOf, type ElevatedRing, type ElevatedRingSegment, type ElevatedRingVariant, type RingCell, type RingPoint } from '@derive/elevated-ring';
+import { CROPS, cropOf, fieldMoment, type FieldPhase } from '@engine/world/crops';
 import { RAMPART, rampartBoxes, rampartPlatformCells, rampartPrisms, type RampartBastion, type RampartLayout } from './rampart';
 
 /** Radio del tronco adulto de `tree.glb`, medido en la receta E3b.2. */
@@ -421,6 +422,10 @@ export interface PlannedBuilding {
   readonly bastionWalkway?: BastionWalkway;
   /** E3b.3 · Torre bajo el adarve generado: sin almenas propias y, si hace falta, escalera apartada. */
   readonly rampartShift?: number;
+  /** IA-fields · En qué punto del año está la parcela. */
+  readonly fieldPhase?: FieldPhase;
+  /** IA-fields · Cuánto han crecido sus plantas, en décimas de 0 a 1. */
+  readonly fieldGrowth?: number;
 }
 
 export interface ScenePlan {
@@ -502,8 +507,6 @@ function look(building: Building): BuildingLook {
   return BUILDING_LOOKS[building.kind];
 }
 
-/** Semana en la que el sembrado ya se ve. TUNE: media primavera. */
-const SOWN_FROM = 6;
 
 /**
  * El recurso que le toca a un edificio esta semana.
@@ -545,10 +548,12 @@ function assetFor(building: Building, tick: number): string | null {
     return building.kind === 'field' ? 'field-cut' : RUIN_ASSETS[building.tier];
   }
   if (building.kind === 'field') {
-    const week = weekOf(tick);
-    return week >= SOWN_FROM && week < TIME.HARVEST_WEEK
-      ? FIELD_CROPS[building.id % 3] ?? 'field'
-      : 'field-cut';
+    // IA-fields · la fase la dice el año del campo del motor (`world/crops`):
+    // abonado, rastrojo y reposo sobre tierra lisa; desde el arado, los surcos
+    // del cultivo, con sus plantas creciendo (`fieldGrowth`).
+    const { phase } = fieldMoment(cropOf(building), tick);
+    return phase === 'manure' || phase === 'stubble' || phase === 'fallow'
+      ? 'field-cut' : FIELD_CROPS[CROPS.indexOf(cropOf(building))] ?? 'field';
   }
   return BUILDING_ASSETS[building.kind] ?? null;
 }
@@ -575,7 +580,20 @@ function plannedFrom(building: Building, tick: number): PlannedBuilding {
     roofColour: shape.roofColour,
     roofed: ruin ? false : shape.roofed,
     ...(rubbleStage !== null && rubbleStage !== 'gone' ? { rubbleStage } : {}),
+    ...(building.kind === 'field' && !ruin ? fieldLook(building, tick) : {}),
   };
+}
+
+/**
+ * IA-fields · Cómo está la tierra y cuánto ha crecido lo sembrado.
+ *
+ * El crecimiento se cuantiza a décimas: el plan compara edificios en cada
+ * pintada y una parcela sólo se reconstruye cuando se nota la diferencia.
+ */
+function fieldLook(building: Building, tick: number): Pick<PlannedBuilding, 'fieldPhase' | 'fieldGrowth'> {
+  const moment = fieldMoment(cropOf(building), tick);
+  const growth = moment.phase === 'plough' ? 0 : Math.round(moment.growth * 10) / 10;
+  return { fieldPhase: moment.phase, fieldGrowth: growth };
 }
 
 function plannedWork(work: ConstructionWork): PlannedWork {
@@ -656,7 +674,8 @@ function same(a: PlannedBuilding, b: PlannedBuilding): boolean {
     && a.bastionWalkway?.nextWallId === b.bastionWalkway?.nextWallId
     && a.bastionWalkway?.side.x === b.bastionWalkway?.side.x
     && a.bastionWalkway?.side.z === b.bastionWalkway?.side.z
-    && a.rampartShift === b.rampartShift;
+    && a.rampartShift === b.rampartShift
+    && a.fieldPhase === b.fieldPhase && a.fieldGrowth === b.fieldGrowth;
 }
 
 function sameWork(a: PlannedWork, b: PlannedWork): boolean {

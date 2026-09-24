@@ -42,6 +42,9 @@ function clipOf(dweller: Dweller, moving: boolean): ClipName {
     const action = dweller.doing.offer.id, place = dweller.doing.place.id;
     if (action.startsWith('prepare')) return 'sort';
     if (action === 'harvest') return 'sort';
+    // IA-fields · en el campo, el gesto de la fase: horca, voleo o azada.
+    const task = dweller.doing.place.task;
+    if (action === 'work' && place.startsWith('field:')) return task === 'spread' ? 'spread' : task === 'sow' ? 'sow' : 'work_hoe';
     if (action === 'work') return place.startsWith('field:') ? 'work_hoe' : place.startsWith('felling:') ? 'chop'
       : place.startsWith('quarry:') ? 'mine'
         : place.startsWith('granary:') || place.startsWith('mill:') ? 'sort' : 'hammer';

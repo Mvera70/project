@@ -1,5 +1,27 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · IA-fields: el año del campo
+
+Hecho: calendario del motor (`FIELD_CYCLE`, `world/crops.ts`), sucesos de
+crónica por fase con primeras veces (peso 2) y rutina (peso 1), aspecto por
+fase y crecimiento continuo en la escena, y gestos de horca y voleo. Medido en
+la semilla 11 (año 21, semanas 0 a 38): la parcela recorre estiércol, arado,
+siembra, crecimiento, maduración y rastrojo; en partida hay 389 muestras de
+horca en la semana 0 y 373 de voleo en la 5. **Límite:** el voleo se lee mal
+porque los sembradores se apiñan en la esquina de la parcela, que es el punto
+2 de la cola (gente de más en el campo). Las ocho imágenes de crónica están
+pedidas en `plan-arte-pendiente.md`.
+
+**Y las gallinas apiñadas** (Vera, con captura): el cercado de los campos de
+v4.41 partía el pasto en trozos y el ganado se medía desde el primero libre
+junto al corazón, a veces un bolsillo entre parcelas. Las casas que quedaban
+fuera mandaban a toda su cabaña al mismo punto: 30 animales en una celda en la
+semilla 7 a los veinte años. Ahora el pasto arranca en el trozo más grande de
+la orilla de la gente, cada casa con prado propio de 30 celdas o más cría ahí
+a sus animales, y el que no tiene sitio busca un claro que nadie haya tomado.
+Peor celda: 2 animales (semillas 7 y 23, 68 anclas). Lo guarda
+`life-beasts.test.ts`.
+
 ## 24 sep 2026 · IA-anim, segunda tanda: contacto y cantera
 
 Hacha al derecho (el filo miraba arriba en el golpe), contacto medido de −0,06
@@ -10,7 +32,7 @@ en móvil corregida (`0140dfa`). Pedido después por Vera: el ciclo del campo
 (abonar, arar, sembrar, crecer según cultivo, cosechar, vuelta), sin empezar.
 
 **Pedidos de Vera en cola (24 sep 2026), sin empezar, en este orden propuesto:**
-1. **El ciclo del campo, con eventos.** Abonar, arar, sembrar, crecer (continuo
+1. ~~**El ciclo del campo, con eventos.**~~ Hecho el 24 sep (IA-fields). Abonar, arar, sembrar, crecer (continuo
    según el cultivo), cosechar y vuelta al bucle, **cada fase contada como
    suceso** («la primera siembra de X»). Cada línea de crónica nueva trae su
    imagen pedida en `plan-arte-pendiente.md`.

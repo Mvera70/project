@@ -3,6 +3,7 @@
 //   node tools/graphics/gesture-sheet.mjs chop            → aldeano leñador
 //   node tools/graphics/gesture-sheet.mjs mine --model villager-mason
 //   node tools/graphics/gesture-sheet.mjs chop --frames 10 --out artifacts/graphics/IA-anim/gestures
+//   node tools/graphics/gesture-sheet.mjs sow --views front,three   (vistas: side, front, three)
 //
 // Doce fotogramas repartidos por un ciclo, de lado y en tres cuartos, más la
 // posición de la mano y de la cabeza de la herramienta en cada uno: el golpe
@@ -49,11 +50,11 @@ try {
   const cells = [], samples = [];
   for (let i = 0; i < frames; i += 1) {
     const t = duration * i / frames;
-    for (const view of ['side', 'three']) {
+    for (const view of opt('views', 'side,three').split(',')) {
       const sample = await tab.evaluate(({ clip, t, view }) => window.pose(clip, t, view), { clip, t, view });
       const png = await tab.evaluate(() => document.querySelector('canvas').toDataURL('image/png'));
       cells.push({ png, label: `${t.toFixed(2)} s · ${view}` });
-      if (view === 'side') samples.push({ t: Number(t.toFixed(3)), ...sample });
+      if (view === opt('views', 'side,three').split(',')[0]) samples.push({ t: Number(t.toFixed(3)), ...sample });
     }
   }
   await tab.setContent('<body style="margin:0;background:#b7c3b2;font:13px sans-serif">'

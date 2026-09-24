@@ -520,6 +520,74 @@ export const BANK: Record<string, string[]> = {
   ],
 
   // -------------------------------------------------------------------------
+  // The field's year (IA-fields): manure, plough, sow, ripen. The first time
+  // of each is news; every year after is the quiet round of the land.
+  'fields.first_manure': [
+    'That {season} of year {year} they carted the first muck out onto the fields.',
+    'For the first time the byre was mucked out onto the land, in the {season} of year {year}.',
+    'Year {year}: the first dung went out to feed the fields.',
+  ],
+  'fields.manured': [
+    'Muck went out onto the fields before the plough, as it did every {season}.',
+    'The fields were dunged again in year {year}.',
+    'Carts of muck to the fields, the first work of the {season}.',
+  ],
+  'fields.first_plough': [
+    'The valley turned its earth for the first time, that {season} of year {year}.',
+    'The first furrows were cut in year {year}.',
+    'Year {year}: for the first time the ground was broken and turned.',
+  ],
+  'fields.ploughed': [
+    'The fields were turned again in the {season} of year {year}.',
+    'Ploughing time: the earth came up dark and wet.',
+    'The furrows were opened once more in year {year}.',
+  ],
+  'fields.first_sowing.grain': [
+    'The first grain went into the ground that {season} of year {year}.',
+    'Year {year} saw the valley’s first sowing of grain.',
+    'They broadcast the first seed-corn in the {season} of year {year}.',
+  ],
+  'fields.first_sowing.cabbage': [
+    'The first cabbages were set out in the {season} of year {year}.',
+    'Year {year}: the valley planted cabbages for the first time.',
+    'Rows of cabbage went in for the first time that {season}.',
+  ],
+  'fields.first_sowing.leeks': [
+    'The first leeks were planted in the {season} of year {year}.',
+    'Year {year} brought the valley its first bed of leeks.',
+    'Leeks went into the ground for the first time that {season}.',
+  ],
+  'fields.sown.grain': [
+    'The grain was sown in the {season} of year {year}.',
+    'Seed-corn went out over the furrows again in year {year}.',
+    'Sowing: the grain fields were seeded once more.',
+  ],
+  'fields.sown.cabbage': [
+    'The cabbages were set out again in year {year}.',
+    'Cabbage rows went in that {season}.',
+    'They planted the cabbage beds once more in year {year}.',
+  ],
+  'fields.sown.leeks': [
+    'The leeks went in again in year {year}.',
+    'Leek beds were planted that {season}.',
+    'They set the leeks out once more in year {year}.',
+  ],
+  'fields.ripe.grain': [
+    'The grain stood gold and heavy by the {season} of year {year}.',
+    'The corn was ripe and waiting for the sickle.',
+    'Year {year}: the grain turned from green to gold.',
+  ],
+  'fields.ripe.cabbage': [
+    'The cabbages were fat and ready that {season}.',
+    'By the {season} of year {year} the cabbage heads were full.',
+    'The cabbage beds were ready for cutting.',
+  ],
+  'fields.ripe.leeks': [
+    'The leeks stood tall and ready by the {season} of year {year}.',
+    'The leek beds were ready to lift.',
+    'Year {year}: the leeks were thick enough to pull.',
+  ],
+
   // The harvest
   // -------------------------------------------------------------------------
   'harvest.ruinous': [

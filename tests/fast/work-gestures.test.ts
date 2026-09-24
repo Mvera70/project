@@ -184,3 +184,26 @@ describe('G-40 · hacha y pico publicados se agarran como el respaldo', () => {
     expect(Math.hypot(centre.x - head.x, centre.z - head.z), 'cabeza del GLB frente al golpe medido').toBeLessThan(0.08);
   });
 });
+
+describe('IA-fields · sembrar a voleo y echar estiércol', () => {
+  const handIn = (clip: 'sow' | 'spread', fraction: number): Vector3 => {
+    const cast = new Cast({ id: 'villager', original: model, clips, motion: [] }, () => clone(model));
+    cast.show([{ ...actor('chop', 0), clip, clipSeconds: fraction * VILLAGER_CLIPS[clip].seconds }]);
+    cast.group.updateMatrixWorld(true);
+    return cast.group.getObjectByName('hand_r')!.getWorldPosition(new Vector3());
+  };
+
+  it('el voleo barre de un costado al otro y suelta por delante', () => {
+    const grab = handIn('sow', STRIKE_AT.sow - 0.2), release = handIn('sow', STRIKE_AT.sow);
+    // Más de un metro de arco (una celda son tres metros) y la suelta delante del pecho.
+    expect(Math.abs(grab.x - release.x)).toBeGreaterThan(0.3);
+    expect(release.z).toBeGreaterThan(0.05);
+    expect(release.y).toBeGreaterThan(grab.y);
+  });
+
+  it('la horca carga a ras de suelo y lanza por encima del pecho', () => {
+    const scoop = handIn('spread', STRIKE_AT.spread - 0.2), toss = handIn('spread', STRIKE_AT.spread);
+    expect(toss.y - scoop.y).toBeGreaterThan(0.15);
+    expect(handTool('spread')).toBeDefined();
+  });
+});

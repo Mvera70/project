@@ -276,10 +276,13 @@ describe('G-08 · las consecuencias', () => {
       const parcel = planFor(moment).buildings.find((building) => building.kind === 'field');
       return parcel?.asset ?? null;
     };
+    // IA-fields · la semana de la siega el campo aún está en pie y dorado; el
+    // rastrojo empieza la siguiente, y el abonado de primavera es tierra sola.
     expect(FIELD_CROPS).toContain(fieldAt(TIME.HARVEST_WEEK - 1));
-    expect(fieldAt(TIME.HARVEST_WEEK)).toBe('field-cut');
+    expect(FIELD_CROPS).toContain(fieldAt(TIME.HARVEST_WEEK));
+    expect(fieldAt(TIME.HARVEST_WEEK + 1)).toBe('field-cut');
     expect(fieldAt(TIME.HARVEST_WEEK + 6)).toBe('field-cut');
-    expect(fieldAt(2)).toBe('field-cut');
+    expect(fieldAt(0)).toBe('field-cut');
     expect(fieldAt(20)).toBe(fieldAt(TIME.HARVEST_WEEK - 1));
   });
 
@@ -293,14 +296,14 @@ describe('G-08 · las consecuencias', () => {
     const crops = (week: number) => planFor(atTick(state, week)).buildings.map((b) => b.asset);
     expect(new Set(crops(10))).toEqual(new Set(FIELD_CROPS));
     expect(crops(10)).toEqual(crops(30));
-    expect(crops(TIME.HARVEST_WEEK).every((id) => id === 'field-cut')).toBe(true);
+    expect(crops(TIME.HARVEST_WEEK + 1).every((id) => id === 'field-cut')).toBe(true);
     expect(JSON.stringify(state)).toBe(before);
   });
 
   it('y ese cambio pide reconstruir el campo, no el pueblo entero', () => {
     const state = village(14);
     const before = planFor(atTick(state, TIME.HARVEST_WEEK - 1));
-    const after = planFor(atTick(state, TIME.HARVEST_WEEK));
+    const after = planFor(atTick(state, TIME.HARVEST_WEEK + 1));
     const change = planChange(before, after);
     expect(change.added.length).toBe(0);
     expect(change.removed.length).toBe(0);

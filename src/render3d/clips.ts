@@ -42,14 +42,14 @@ export interface ClipMotion {
   readonly strideLength: number | null;
 }
 
-export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'play' | 'drink' | 'sort'
+export type ClipName = 'idle' | 'walk' | 'work_hoe' | 'carry_walk' | 'sit' | 'talk' | 'pray' | 'hammer' | 'chop' | 'mine' | 'sow' | 'spread' | 'play' | 'drink' | 'sort'
   | 'bow_draw' | 'bow_loose' | 'gate_strike' | 'spear_thrust' | 'hit_take' | 'fall' | 'flee';
 
 /**
  * IA-anim · En qué fracción del ciclo pega la herramienta. Lo lee el clip para
  * poner ahí el impacto y el render para soltar las astillas en ese instante.
  */
-export const STRIKE_AT: Readonly<Record<'chop' | 'mine', number>> = { chop: 0.52, mine: 0.5 };
+export const STRIKE_AT: Readonly<Record<'chop' | 'mine' | 'sow' | 'spread', number>> = { chop: 0.52, mine: 0.5, sow: 0.45, spread: 0.55 };
 
 /**
  * IA-anim · Dónde cae la cabeza de la herramienta en `STRIKE_AT`, en celdas y
@@ -94,6 +94,11 @@ export const VILLAGER_CLIPS: Readonly<Record<ClipName, ClipMotion>> = {
   // día y no de una exhibición; el pico pesa más pero recorre menos.
   chop: { seconds: 1.9, loop: true, strideLength: null },
   mine: { seconds: 1.7, loop: true, strideLength: null },
+  // IA-fields · Sembrar a voleo y echar estiércol con horca: un lanzamiento
+  // por ciclo, suelta en `STRIKE_AT`. TUNE: el voleo es un gesto corto y
+  // repetido; la horca pesa, carga y lanza.
+  sow: { seconds: 1.4, loop: true, strideLength: null },
+  spread: { seconds: 1.8, loop: true, strideLength: null },
   play: { seconds: 2.4, loop: true, strideLength: null },
   drink: { seconds: 3, loop: true, strideLength: null },
   idle: { seconds: 4, loop: true, strideLength: null },

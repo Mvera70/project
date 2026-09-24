@@ -13,7 +13,7 @@ import { STRIKE_AT, VILLAGER_CLIPS, type ClipName } from './clips';
  * Lo vigila `tests/fast/graphics-clock.test.ts`.
  */
 export const ACTION_CLIPS: readonly ClipName[] = [
-  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'play', 'drink', 'sort',
+  'sit', 'talk', 'pray', 'hammer', 'chop', 'mine', 'sow', 'spread', 'play', 'drink', 'sort',
   'bow_draw', 'bow_loose', 'gate_strike', 'spear_thrust', 'hit_take', 'fall', 'flee',
 ];
 
@@ -192,6 +192,39 @@ export function actionClips(idle: AnimationClip): AnimationClip[] {
         turn('spine', x, pose(0.1, -0.05, 0.3));
         turn('thigh.L', x, pose(0, 0.05, -0.2));
         turn('shin.L', x, pose(0.05, 0, 0.3));
+      }
+    } else if (name === 'sow' || name === 'spread') {
+      // IA-fields · Mismas tres poses que el hacha: preparado, carga, suelta.
+      const at = STRIKE_AT[name];
+      const pose = (ready: number, up: number, hit: number) => keyed([
+        [0, ready, 'smooth'], [at - 0.2, up, 'smooth'], [at, hit, 'strike'],
+        [at + 0.15, hit, 'smooth'], [1, ready, 'smooth'],
+      ]);
+      if (name === 'sow') {
+        // La bolsa cuelga de la izquierda, al costado; la derecha carga atrás,
+        // junto a su cadera, y barre hacia delante y afuera. Vera (24 sep):
+        // con la bolsa cruzada delante de la barriga y la mano yendo a buscar
+        // simiente al otro lado, los brazos se veían soldados al cuerpo.
+        turn('upperarm.L', x, () => -0.1); turn('upperarm.L', z, () => -0.15); turn('forearm.L', x, () => -0.35);
+        // Grande a propósito: a veinte píxeles de aldeano un voleo corto no se
+        // distingue de rascarse el pecho (primera versión, vista en el banco).
+        // Medido en el banco: con más apertura el brazo acababa por detrás
+        // del cuerpo; la suelta va delante y a la derecha, a la altura del hombro.
+        turn('upperarm.R', x, pose(-0.3, 0.35, -1.7));
+        turn('upperarm.R', z, pose(0.1, -0.15, 0.55));
+        turn('forearm.R', x, pose(-0.6, -0.4, -0.1));
+        turn('spine', y, pose(0, 0.35, -0.35));
+      } else {
+        // Horca: se hunde a los pies con el torso doblado y se lanza arriba y
+        // adelante; los brazos van juntos por el mango.
+        for (const side of ['L', 'R']) {
+          turn(`upperarm.${side}`, x, pose(-0.7, -0.45, -1.7));
+          turn(`forearm.${side}`, x, pose(-0.6, -0.3, -0.9));
+          turn(`thigh.${side}`, x, pose(0, -0.3, 0));
+          turn(`shin.${side}`, x, pose(0, 0.5, 0));
+        }
+        turn('spine', x, pose(0.15, 0.55, -0.1));
+        turn('spine', y, pose(0, 0.15, -0.2));
       }
     } else if (name === 'hammer') {
       turn('upperarm.R', x, t => -0.5 - 0.65 * (1 + wave(t)));

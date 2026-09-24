@@ -131,6 +131,9 @@ const HELD: Readonly<Record<string, Omit<HeldSpec, 'key'>>> = {
   hammer: { asset: 'hammer', hand: 'hand_r', fallback: true },
   chop: { asset: 'axe', hand: 'hand_r', fallback: true, turn: HAFT_GRIP },
   mine: { asset: 'pickaxe', hand: 'hand_r', fallback: true, turn: HAFT_GRIP },
+  // IA-fields · la bolsa de simiente a la cadera y la horca del estiércol.
+  sow: { asset: 'bundle', hand: 'hand_l', scale: 0.45 },
+  spread: { asset: 'fork', hand: 'hand_r', fallback: true, turn: HAFT_GRIP },
   drink: { asset: 'cup', hand: 'hand_r', fallback: true },
 };
 
@@ -586,7 +589,9 @@ export class Cast {
    * tampoco, y eso se ve.
    */
   private strike(player: Player, actor: Actor, seconds: number): void {
-    if (actor.clip !== 'chop' && actor.clip !== 'mine') { delete player.strikePhase; return; }
+    if (actor.clip !== 'chop' && actor.clip !== 'mine' && actor.clip !== 'sow' && actor.clip !== 'spread') {
+      delete player.strikePhase; return;
+    }
     const phase = seconds / VILLAGER_CLIPS[actor.clip].seconds;
     const before = player.strikePhase;
     player.strikePhase = phase;
@@ -594,15 +599,23 @@ export class Cast {
     const moment = STRIKE_AT[actor.clip];
     const crossed = before <= phase ? before < moment && moment <= phase : before < moment || moment <= phase;
     if (!crossed) return;
+    player.strikes = (player.strikes ?? 0) + 1;
+    if (actor.clip === 'sow' || actor.clip === 'spread') {
+      // Sale de la mano que lanza: la simiente a voleo, el estiércol de la horca.
+      const hand = player.object.getObjectByName('hand_r');
+      if (hand === undefined) return;
+      const from = hand.getWorldPosition(new Vector3());
+      this.chips.hit(from, actor.clip === 'sow' ? 'seed' : 'muck', actor.id * 1009 + player.strikes);
+      return;
+    }
     const tool = player.held.get(actor.clip);
     if (tool === undefined || !tool.visible) return;
-    player.strikes = (player.strikes ?? 0) + 1;
     // Desde el punto de golpe medido (`STRIKE_HEAD`), que vale para el
     // respaldo y para el recurso publicado sin depender de cómo esté montado.
-    const head = STRIKE_HEAD[actor.clip];
+    const head = STRIKE_HEAD[actor.clip as 'chop' | 'mine'];
     player.object.updateMatrixWorld(true);
     const at = player.object.localToWorld(new Vector3(head.x, head.y, head.z));
-    const kind = actor.clip === 'chop' ? 'wood' : 'stone';
+    const kind = actor.clip === 'chop' ? 'wood' : 'stone' as const;
     this.chips.hit(at, kind, actor.id * 1009 + player.strikes);
     this.onStrike?.(at, kind, actor.id * 1009 + player.strikes);
   }

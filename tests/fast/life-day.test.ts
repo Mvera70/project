@@ -137,7 +137,7 @@ describe('IA-12 · jornada y acciones', () => {
       }
       for (const actor of castOf(life, step / 30, new Map(), new Set())) {
         if (actor.talking) expect(actor.clip).toBe('talk');
-        if (actor.activity === 'working') expect(['work_hoe', 'hammer', 'chop', 'mine', 'sort']).toContain(actor.clip);
+        if (actor.activity === 'working') expect(['work_hoe', 'hammer', 'chop', 'mine', 'sort', 'sow', 'spread']).toContain(actor.clip);
       }
     }
     expect(workers.size).toBeGreaterThan(0);

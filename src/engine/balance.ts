@@ -150,6 +150,33 @@ export const FOUNDING = {
 // §12.3 · Subsistence
 // ---------------------------------------------------------------------------
 
+/**
+ * IA-fields · El año de una parcela, en semanas del año (0..47; la primavera
+ * empieza en la 0 y la cosecha del motor es `TIME.HARVEST_WEEK`, la 35).
+ *
+ * Pedido por Vera el 24 sep 2026: «fase de siembra, crecido continuo
+ * dependiendo del cultivo, recogida y vuelta a empezar; abonar la tierra, arar
+ * y vuelta al bucle». **No mueve el grano:** la cosecha sigue en la 35 con el
+ * mismo rendimiento, esto es el calendario que se ve y se cuenta.
+ *
+ * TUNE, de calendario y no de balance: a ×1 una semana son catorce minutos,
+ * así que abonar y arar ocupan media hora de reloj cada una, la siembra otra
+ * media y el crecimiento unas seis horas. El orden sigue al campo medieval:
+ * estiércol al salir del invierno, arado, siembra escalonada por cultivo.
+ */
+export const FIELD_CYCLE = {
+  /** Estiércol sobre el rastrojo, al salir del invierno. */
+  MANURE_FROM: 0,
+  /** La reja: la tierra se abre después de abonarla. */
+  PLOUGH_FROM: 2,
+  /** Cuándo se siembra cada cultivo: el cereal primero, la col la última. */
+  SOW_FROM: { grain: 4, leeks: 5, cabbage: 6 },
+  /** Semanas que dura la siembra de una parcela. */
+  SOW_WEEKS: 2,
+  /** Cuándo está hecho cada cultivo; de ahí a la cosecha, maduro en pie. */
+  RIPE_AT: { grain: 31, leeks: 29, cabbage: 27 },
+} as const;
+
 export const FOOD = {
   GRAIN_PER_PERSON: 1.0, // per week
   FIELD_YIELD: 600, // per field, full harvest

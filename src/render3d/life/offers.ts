@@ -16,7 +16,8 @@
 // en el río» es una entrada en una tabla, no una rama en un árbol de decisión.
 
 import { hash32 } from '@engine/rng';
-import { TERRAIN_CODE, type GameState } from '@engine/state';
+import { TERRAIN_CODE, type Building, type GameState } from '@engine/state';
+import { cropOf, fieldMoment } from '@engine/world/crops';
 import { allocateLabour } from '@engine/subsistence/labour';
 import { TIME } from '@engine/balance';
 import { seasonOf, weekOf } from '@engine/time';
@@ -263,6 +264,19 @@ export interface Place {
   readonly id: string;
   readonly at: Point;
   readonly offers: readonly Offer[];
+  /**
+   * IA-fields · Lo que toca hacer en esta parcela esta semana, según el año del
+   * campo del motor (`world/crops.ts`): estercolar, arar, sembrar o cuidar.
+   */
+  readonly task?: FieldTask;
+}
+
+export type FieldTask = 'spread' | 'plough' | 'sow' | 'tend';
+
+/** La tarea de la parcela en su fase del año. */
+export function fieldTask(field: Pick<Building, 'id'>, tick: number): FieldTask {
+  const { phase } = fieldMoment(cropOf(field), tick);
+  return phase === 'manure' ? 'spread' : phase === 'plough' ? 'plough' : phase === 'sow' ? 'sow' : 'tend';
 }
 
 /**
@@ -367,7 +381,10 @@ export function placesOf(state: GameState, land: Terrain): Place[] {
       const offer = placedOffer(parcel ? { ...spec, reach: PARCEL_REACH } : spec, at, land, undefined, seats);
       if (offer !== null) offers.push(offer);
     }
-    if (offers.length > 0) places.push({ id: `${building.kind}:${building.id}`, at, offers });
+    if (offers.length > 0) {
+      places.push({ id: `${building.kind}:${building.id}`, at, offers,
+        ...(parcel && !harvesting ? { task: fieldTask(building, state.tick) } : {}) });
+    }
   }
 
   // El juego guarda una capacidad base aunque no haya granero. La descarga

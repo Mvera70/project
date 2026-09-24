@@ -352,3 +352,21 @@ cuando sea visible y el entorno propio: prado, linde, bosque y entrada rocosa.
 La del oso ocurre **fuera** de la guarida; no hay interior ni pantalla jugable
 dentro de ella. Las huidas usan el mismo motivo sin cadáver. Los modelos 3D
 aprobados ya cubren la escena en vivo; esta tarea es solo para la crónica.
+
+## Pendiente · el año del campo (IA-fields, 24 sep 2026)
+
+Pedido por Vera: cada fase del campo es un suceso de la crónica («la primera
+siembra de X»). Mientras no haya dibujo, estas líneas caen al grabado genérico
+de la cosecha (`kind: 'harvest'`). Mismo tamaño que el resto, 640 × 512, y se
+integran por `public/ui/art/index.json` y `src/ui/redesign/chronicle-art.ts`.
+
+| Fichero | Clave | Qué tiene que enseñar |
+|---|---|---|
+| `field-manure.png` | `fields.first_manure`, `fields.manured` | **El estiércol al salir del invierno.** Una carretilla de estiércol junto al rastrojo y alguien echándolo con la horca; tierra oscura y vapor en la mañana fría |
+| `field-plough.png` | `fields.first_plough`, `fields.ploughed` | **El arado.** La tierra abriéndose en surcos oscuros detrás de la reja o de la azada; la primera vez, que se note que es tierra que nunca se había vuelto |
+| `field-sow-grain.png` | `fields.first_sowing.grain`, `fields.sown.grain` | **La siembra a voleo.** Un sembrador con la bolsa a la cadera lanzando la simiente en abanico sobre los surcos |
+| `field-sow-cabbage.png` | `fields.first_sowing.cabbage`, `fields.sown.cabbage` | **Plantar coles.** Plantones en fila, alguien de rodillas asentándolos con la mano |
+| `field-sow-leeks.png` | `fields.first_sowing.leeks`, `fields.sown.leeks` | **Plantar puerros.** El plantador abriendo hoyos con la estaca y metiendo cada puerro |
+| `field-ripe-grain.png` | `fields.ripe.grain` | **El cereal dorado en pie**, doblado por el peso, justo antes de la hoz |
+| `field-ripe-cabbage.png` | `fields.ripe.cabbage` | **Las coles hechas**, cabezas grandes y apretadas en su fila |
+| `field-ripe-leeks.png` | `fields.ripe.leeks` | **Los puerros altos**, listos para arrancar |

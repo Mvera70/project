@@ -51,6 +51,7 @@ import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { scarFire } from './people/scars';
 import { destroyBuilding } from './world/buildings';
 import { rollFate } from './world/fate';
+import { fieldEvents } from './world/crops';
 import { giveMeans } from './world/means';
 import { crownKing, type CrownOutcome } from './world/crown';
 import type { MeansOutcome } from './world/means';
@@ -1114,6 +1115,21 @@ export function tick(
 
   // ---- 8 · WINTER ----------------------------------------------------------
   const { cold } = overwinter(state);
+
+  // ---- 9a · THE FIELD'S YEAR (IA-fields) -------------------------------------
+  // Abonar, arar, sembrar, madurar: la crónica cuenta cada fase que empieza, y
+  // la primera vez de cada una como noticia. No toca grano ni consume azar; la
+  // cosecha sigue siendo el paso 9. Las marcas de «primera vez» son
+  // permanentes (valor 0), la misma maquinaria que el resto de `flags`.
+  for (const event of fieldEvents(state.buildings, state.flags, state.tick)) {
+    if (event.flag !== null) state.flags[event.flag] = 0;
+    say({
+      kind: 'harvest',
+      templateKey: event.templateKey,
+      params: { year: year(), season: season(), count: event.count },
+      weight: event.weight,
+    });
+  }
 
   // ---- 9 · HARVEST ---------------------------------------------------------
   // Read before reaping: `harvest` spends the crows' bite and resets it.

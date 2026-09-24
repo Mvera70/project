@@ -15,7 +15,8 @@ const LIFE = 0.7;
 /** Gravedad en celdas por segundo al cuadrado: una celda son tres metros. */
 const GRAVITY = 3.3;
 
-const COLOURS = { wood: new Color('#c9a26a'), stone: new Color('#a39d92'), leaf: new Color('#5d7a3a') } as const;
+const COLOURS = { wood: new Color('#c9a26a'), stone: new Color('#a39d92'), leaf: new Color('#5d7a3a'),
+  seed: new Color('#d8b25e'), muck: new Color('#4a3524') } as const;
 export type ChipKind = keyof typeof COLOURS;
 /**
  * Las hojas que suelta la copa al acusar el hachazo caen despacio y duran más:
@@ -26,6 +27,10 @@ const PHYSICS: Readonly<Record<ChipKind, { gravity: number; life: number; lift: 
   wood: { gravity: GRAVITY, life: LIFE, lift: 1, spread: 1 },
   stone: { gravity: GRAVITY, life: LIFE, lift: 1, spread: 1 },
   leaf: { gravity: 0.7, life: 2.2, lift: 0.1, spread: 0.5 },
+  // IA-fields · la simiente sale en abanico y cae despacio; el estiércol, en
+  // terrones que suben poco y caen pesados.
+  seed: { gravity: 2.2, life: 0.9, lift: 0.4, spread: 1.4 },
+  muck: { gravity: GRAVITY, life: LIFE, lift: 0.8, spread: 0.7 },
 };
 
 interface Chip { x: number; y: number; z: number; vx: number; vy: number; vz: number; age: number; spin: number; kind: ChipKind }

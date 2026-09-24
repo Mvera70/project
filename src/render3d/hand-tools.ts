@@ -2,13 +2,27 @@
 import { BoxGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial } from 'three';
 
 export function handTool(clip: string): Group | undefined {
-  if (!['hammer', 'chop', 'mine', 'drink'].includes(clip)) return undefined;
+  if (!['hammer', 'chop', 'mine', 'spread', 'drink'].includes(clip)) return undefined;
   const group = new Group(); group.userData.ownedTool = true;
   const wood = new MeshStandardMaterial({ color: 0x795633, roughness: 1 });
   const metal = new MeshStandardMaterial({ color: 0x555b59, roughness: 0.85 });
   if (clip === 'drink') {
     const cup = new Mesh(new CylinderGeometry(0.085, 0.07, 0.16, 8), wood);
     cup.position.y = 0.07; group.add(cup); metal.dispose();
+  } else if (clip === 'spread') {
+    // IA-fields · Horca de estiércol: mango de un metro y tres púas, en el
+    // mismo marco que hacha y pico (mango en +Y) y con su mismo agarre.
+    const tool = new Group();
+    const handle = new Mesh(new BoxGeometry(0.05, 1.0, 0.05), wood);
+    handle.position.y = 0.4; tool.add(handle);
+    const bar = new Mesh(new BoxGeometry(0.22, 0.04, 0.04), metal);
+    bar.position.y = 0.9; tool.add(bar);
+    for (const side of [-1, 0, 1]) {
+      const tine = new Mesh(new BoxGeometry(0.025, 0.22, 0.025), metal);
+      tine.position.set(side * 0.09, 1.02, 0); tool.add(tine);
+    }
+    tool.quaternion.set(0.6794, 0.2790, 0.6522, 0.1878);
+    group.add(tool); return group;
   } else if (clip === 'mine' || clip === 'chop') {
     // IA-anim · Pico y hacha de leñador, en metros como los demás respaldos:
     // mango de 1,0 y cabeza exagerada para que se lea a veinte píxeles de
