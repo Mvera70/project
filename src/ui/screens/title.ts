@@ -329,7 +329,16 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const head = document.createElement('header');
   head.className = 'title-head';
   const name = document.createElement('h1');
-  name.textContent = renderUiText('title.name');
+  // UI-W · el título es un logotipo de hierro pintado (`tools/ui/textures.py`,
+  // uno por lengua): cara, lateral y contorno, como pidió Vera con la portada de
+  // otro juego de ejemplo. El nombre del banco es su texto alternativo, así que
+  // el lector de pantalla sigue diciendo el título.
+  const logo = document.createElement('img');
+  logo.className = 'title-logo';
+  logo.src = `./ui/art/title-logo-${currentLocale()}.png`;
+  logo.alt = renderUiText('title.name');
+  logo.decoding = 'async';
+  name.append(logo);
   const tagline = document.createElement('p');
   tagline.textContent = renderUiText('title.tagline');
   // UI-V5 · el filete con su palmeta, el mismo que remata la cabecera de un

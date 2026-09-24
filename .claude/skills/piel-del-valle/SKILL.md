@@ -94,11 +94,13 @@ mías del lienzo las descartó («muy, muy malas») y generó ella la referencia
   carcasa, arriba a la derecha bajo el dintel; los propios de la crónica y del
   carro se apagan dentro de la hoja.
 - **El dintel mide 7 px** y el sello de la bandeja va encima: con 14 se lo comía.
-- **El título de la portada es de metal plateado en relieve**, no tallado:
-  metal cepillado de `textures.py` (`metal.png`) recortado a las letras, con
-  brillo de chapa y sombras de canto. Anuncia la edad del metal («que simule la
-  época de metal que habrá en un futuro»). Sin `text-stroke`: con Cinzel
-  variable dibuja las juntas internas de las letras.
+- **El título de la portada es un logotipo de hierro viejo pintado**, no texto
+  con efectos: `textures.py` lo pinta con la Cinzel de la casa al peso 900,
+  cara de hierro picado y oxidado con bisel, lateral extruido, contorno oscuro
+  y sombra (`public/ui/art/title-logo-<lengua>.png`, uno por lengua porque
+  «El valle» no es «The Valley»). El nombre del banco es su `alt`. Tallado en
+  la madera no se veía; en plata con CSS era «un título de PowerPoint»; Vera
+  dio de ejemplo la portada de otro juego: cara, lateral y contorno.
 - **La bandeja lleva el sello del árbol**, no la hoja de roble. La cera roja
   sigue siendo sólo la marca de una decisión aplazada.
 - **Tirar del tirador no cambia de pestaña: aparca la hoja** en pantalla

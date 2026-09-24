@@ -33,7 +33,7 @@ porque se decide píxel a píxel y no por mezcla.
 import math
 import os
 
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 SEED = 0x7A11  # fija: ver la cabecera
 OUT_DIR = os.path.join('src', 'ui', 'redesign')
@@ -204,15 +204,22 @@ def cobble():
 # ------------------------------------------------------------------ el metal
 
 METAL_SIZE = 256
-METAL_BASE = (196, 198, 202)   # plata vieja, un punto fría
+IRON = (78, 80, 84)            # hierro forjado, gris azulado oscuro
+RUST = (128, 66, 32)           # el óxido que se come los bordes
+RUST_DEEP = (84, 40, 20)
 
 
 def metal():
-    u"""Metal cepillado: vetas horizontales largas y finas, y algún rayón.
+    iron_image().save(os.path.join(OUT_DIR, 'metal.png'), optimize=True)
 
-    Para las letras del título (Vera, 24 sep: «algo como un plateado, chapado,
-    que simule la época de metal que habrá en un futuro»). El brillo y el
-    bisel los pone el CSS encima; esto es sólo la superficie.
+
+def iron_image():
+    u"""Hierro viejo: forjado, picado, con óxido y marcas de martillo.
+
+    Para las letras del título. La primera versión era plata cepillada y
+    quedaba limpia y brillante, «para un título de PowerPoint» (Vera, 24 sep);
+    lo que se pidió es «más efecto de hierro antiguo», con textura. El
+    volumen lo ponen las sombras del CSS; esto es la superficie.
     """
     size = METAL_SIZE
     image = Image.new('RGB', (size, size))
@@ -221,14 +228,100 @@ def metal():
         for x in range(size):
             u = x / size
             w = y / size
-            brush = 0.9 + 0.12 * pnoise(u, w, 2, 96, 80) + 0.05 * pnoise(u, w, 6, 192, 81)
-            brush *= 0.97 + 0.05 * pnoise(u, w, 128, 256, 82)
-            scratch = 1.0
-            if rnd(y, 0, 83) < 0.03 and pnoise(u, w, 4, 1, 84) > 0.55:
-                scratch = 1.12
-            k = brush * scratch
-            px[x, y] = (clamp(METAL_BASE[0] * k), clamp(METAL_BASE[1] * k), clamp(METAL_BASE[2] * k))
-    image.save(os.path.join(OUT_DIR, 'metal.png'), optimize=True)
+            # Martillazos: manchas medias más claras y más oscuras.
+            hammer = 0.82 + 0.3 * pnoise(u, w, 10, 10, 80) + 0.1 * pnoise(u, w, 24, 24, 81)
+            grain = 0.9 + 0.2 * pnoise(u, w, 96, 96, 82)
+            k = hammer * grain
+            col = [IRON[0] * k, IRON[1] * k, IRON[2] * k]
+            # Óxido: manchas grandes donde el ruido lento sube, más hondas en
+            # su centro.
+            rust = pnoise(u, w, 5, 5, 83) * 0.7 + pnoise(u, w, 17, 17, 84) * 0.3
+            if rust > 0.58:
+                t = min(1.0, (rust - 0.58) / 0.22)
+                deep = RUST_DEEP if pnoise(u, w, 40, 40, 85) > 0.55 else RUST
+                col = [col[c] * (1 - t * 0.85) + deep[c] * t * 0.85 * grain for c in range(3)]
+            # Picaduras: puntos sueltos oscuros, algunos con su halo de óxido.
+            pit = rnd(x, y, 86)
+            if pit < 0.018:
+                col = [c * 0.45 for c in col]
+            elif pit < 0.03:
+                col = [col[0] * 0.8 + 18, col[1] * 0.8 + 6, col[2] * 0.8]
+            px[x, y] = (clamp(col[0]), clamp(col[1]), clamp(col[2]))
+    return image
+
+
+# ------------------------------------------------------------------ el logotipo
+
+FONT = os.path.join('src', 'ui', 'redesign', 'fonts', 'cinzel.woff2')
+# El nombre del juego en cada lengua del banco (`title.name`): un logotipo en
+# imagen no se traduce solo, así que hay uno por lengua.
+LOGOS = {'en': 'THE VALLEY', 'es': 'EL VALLE'}
+LOGO_W, LOGO_H = 1500, 480     # se pinta a triple tamaño y se lee a ~340 px
+EXTRUDE = 28                   # el lateral de la letra, en píxeles del lienzo
+SIDE_NEAR = (92, 74, 58)       # el lateral junto a la cara, hierro en sombra
+SIDE_FAR = (30, 22, 16)        # y el fondo del lateral
+OUTLINE = (22, 15, 10)
+
+
+def logo(lang, text):
+    u"""El título como logotipo: hierro viejo con bisel, extrusión y contorno.
+
+    Vera, 24 sep, con la portada de un juego como ejemplo de «profundidad y
+    3D»: las letras tienen cara, lateral y contorno, no efectos sobre texto.
+    Con CSS sobre texto no se llega; pintado aquí, sí, y sale igual siempre.
+    """
+    font = ImageFont.truetype(FONT, 200)
+    font.set_variation_by_axes([900])
+    box = font.getbbox(text)
+    scale = min(1.0, 1320 / (box[2] - box[0]))
+    if scale < 1.0:
+        font = ImageFont.truetype(FONT, int(200 * scale))
+        font.set_variation_by_axes([900])
+        box = font.getbbox(text)
+    mask = Image.new('L', (LOGO_W, LOGO_H), 0)
+    x = (LOGO_W - (box[2] - box[0])) // 2 - box[0]
+    y = 90 - box[1]
+    ImageDraw.Draw(mask).text((x, y), text, font=font, fill=255)
+    outline = mask.filter(ImageFilter.MaxFilter(9)).filter(ImageFilter.MaxFilter(5))
+
+    canvas = Image.new('RGBA', (LOGO_W, LOGO_H), (0, 0, 0, 0))
+    # La sombra en la tabla, larga y blanda.
+    shadow = ImageChops.offset(outline.filter(ImageFilter.MaxFilter(7)), 0, EXTRUDE + 10)
+    shadow = shadow.filter(ImageFilter.GaussianBlur(14)).point(lambda v: int(v * 0.7))
+    canvas.paste((0, 0, 0, 255), (0, 0), shadow)
+    # El lateral: la silueta con contorno repetida hacia abajo, de lejos a cerca.
+    for d in range(EXTRUDE, 0, -1):
+        t = d / EXTRUDE
+        col = tuple(int(SIDE_NEAR[c] * (1 - t) + SIDE_FAR[c] * t) for c in range(3)) + (255,)
+        canvas.paste(col, (0, 0), ImageChops.offset(outline, 0, d))
+    # El contorno oscuro que separa la cara del lateral y de la madera.
+    canvas.paste(OUTLINE + (255,), (0, 0), outline)
+    # La cara: hierro con la luz de arriba y el bisel de los cantos.
+    # El azulejo de 256 se repetía a la vista en columnas de óxido iguales:
+    # aquí va a triple tamaño, que a lo ancho del título no llega a repetirse.
+    iron = iron_image().resize((768, 768), Image.BICUBIC)
+    face = Image.new('RGB', (LOGO_W, LOGO_H))
+    for ty in range(0, LOGO_H, iron.height):
+        for tx in range(0, LOGO_W, iron.width):
+            face.paste(iron, (tx, ty))
+    top, bottom = y + box[1], y + box[3]
+    light = Image.new('L', (LOGO_W, LOGO_H))
+    lp = light.load()
+    for yy in range(LOGO_H):
+        t = min(1.0, max(0.0, (yy - top) / max(1, bottom - top)))
+        v = int(255 * (1.35 - 0.6 * t) / 1.35)
+        for xx in range(LOGO_W):
+            lp[xx, yy] = v
+    face = ImageChops.multiply(face, Image.merge('RGB', (light, light, light)))
+    face = face.point(lambda v: min(255, int(v * 1.8)))
+    soft = mask.filter(ImageFilter.GaussianBlur(5))
+    lit = ImageChops.subtract(soft, ImageChops.offset(soft, 0, 6)).point(lambda v: min(255, v * 3))
+    shade = ImageChops.subtract(ImageChops.offset(soft, 0, 6), soft).point(lambda v: min(255, v * 2))
+    face = Image.composite(Image.new('RGB', face.size, (238, 226, 206)), face, lit.point(lambda v: int(v * 0.75)))
+    face = Image.composite(Image.new('RGB', face.size, (20, 16, 12)), face, shade.point(lambda v: int(v * 0.6)))
+    canvas.paste(face, (0, 0), mask)
+    canvas = canvas.crop(canvas.getbbox())
+    canvas.save(os.path.join('public', 'ui', 'art', f'title-logo-{lang}.png'), optimize=True)
 
 
 # ------------------------------------------------------ el grabado de la portada
@@ -258,4 +351,6 @@ if __name__ == '__main__':
     cobble()
     metal()
     engraving()
+    for lang, text in LOGOS.items():
+        logo(lang, text)
     print('wood-planks.png, cobble.png, metal.png y title-valley-engraving.png')
