@@ -1,5 +1,17 @@
 # The Valley — Registro de cambios
 
+## v4.45 · 25 sep 2026 · El fuego se ve (E4, tanda 1)
+
+El motor quemaba casas —el incendio anual de §5.9 y el rayo de §7.10— y en
+pantalla pasaban a escombro de golpe. Ahora la quema deja una marca
+`burnt:<id>` en `flags` (`burnBuilding`, sin campo nuevo en el esquema ni
+azar) y `effects/fires.ts` hace arder la casa: tres días de llama y cuatro de
+brasa (`BURNING`), llamas de textura dibujada animada, chispas, humo negro que
+se aclara y una luz naranja. Lee el estado vivo y no el de la víspera: con el
+de la víspera el fuego salía un día tarde, con la casa ya en ruina. Vera
+decidió en esta ronda el resto de E4: gore contenido, casas quemadas en el
+asalto y flechas incendiarias; van en las tandas siguientes.
+
 ## v4.44 · 24 sep 2026 · La interfaz de madera y piedra (UI-W)
 
 Vera trajo el mockup del carro que la dirección del 22 sep esperaba «para

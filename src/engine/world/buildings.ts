@@ -1,4 +1,4 @@
-import { BUILDINGS, LIFE, TIME } from '../balance';
+import { BUILDINGS, BURNING, LIFE, TIME } from '../balance';
 import { housingCapacity, isHere } from '../people/demography';
 import { storageCapacity } from '../subsistence/harvest';
 import type { BuildingId, BuildingKind, GameState } from '../state';
@@ -29,6 +29,20 @@ export function withinCap(state: GameState, kind: BuildingKind): boolean {
   const standing = state.buildings.filter((b) => b.lostTick === null && familyOf(b.kind) === family).length;
   const reserved = state.works.filter((w) => w.upgradeOf === null && familyOf(w.kind) === family).length;
   return standing + reserved < cap;
+}
+
+/**
+ * E4 · **Arde, y la pantalla lo sabe.** Lo mismo que `destroyBuilding` y una
+ * marca `burnt:<id>` que caduca a `BURNING.FLAG_WEEKS`: una ruina no dice por
+ * qué cayó, y sin esto la casa quemada pasaba a escombro de golpe. La marca es
+ * maquinaria que ya existe (`state.flags`), no un campo nuevo del esquema, y no
+ * tira dados. La leen el render (`effects/fires.ts`) y nadie más.
+ */
+export function burnBuilding(state: GameState, id: BuildingId, blockYears = 0): void {
+  const building = state.buildings.find((b) => b.id === id && b.lostTick === null);
+  if (building === undefined) return;
+  destroyBuilding(state, id, blockYears);
+  state.flags[`burnt:${id}`] = state.tick + BURNING.FLAG_WEEKS;
 }
 
 /** Ruin bytes are occupancy, while building history preserves their material. */

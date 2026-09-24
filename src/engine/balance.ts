@@ -397,6 +397,28 @@ export const SKY = {
  * los rasgos del valle abren, cierran y pesan. Todo TUNE, y todo medido con
  * `tools/reports/fate-report.ts` antes de escribirse aquí.
  */
+/**
+ * E4 · **Cuánto se ve arder una casa.** Presentación, como SOUND y DAY: no
+ * mueve una cifra del juego, pero es un número y vive aquí (§2).
+ *
+ * Vera, 24 sep 2026: «la casa arde durante días». En días escénicos (siete por
+ * semana, `SCENIC_DAY_SECONDS` cada uno): a ×1 son seis minutos de llamas y
+ * ocho de brasas.
+ */
+export const BURNING = {
+  // TUNE: días de llama viva y días de brasa y humo después. Tres y cuatro
+  // llenan una semana justa, así que la marca del motor dura un tick y se
+  // borra sola: nadie arrastra un incendio de un año para otro.
+  FLAME_DAYS: 3,
+  EMBER_DAYS: 4,
+  // TUNE: la marca `burnt:<id>` caduca a esta distancia del tick de la quema.
+  // Dos y no una: el render pinta el estado de la víspera, así que el fuego
+  // empieza a verse hasta un día tarde, y con una semana justa la marca se
+  // borraba con las brasas todavía humeando (medido en la primera captura).
+  // Cuánto dura lo manda el reloj de días; la marca sólo dice «ardió».
+  FLAG_WEEKS: 2,
+} as const;
+
 export const FATE = {
   // TUNE: la probabilidad semanal de que pase algo, y el hueco mínimo entre
   // dos sucesos. Con 0,35 y dos semanas salen unos catorce al año: uno cada

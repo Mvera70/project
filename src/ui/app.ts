@@ -18,6 +18,7 @@ import './redesign/wood.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
+import { burnBuilding } from '@engine/world/buildings';
 import { eraOf, uiMaterialOf } from '@derive/era';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
@@ -1281,6 +1282,25 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     finish();
   };
 
+  /**
+   * E4 · **Quemar una casa desde fuera, para poder mirar el fuego.** Mismo trato
+   * que `__valleyEnd`: el juego no lo llama nunca. Esperar al incendio anual o
+   * a un rayo para ver arder una casa es esperar horas de reloj. Quema la casa
+   * en pie más cercana al centro, por el mismo camino que el motor
+   * (`burnBuilding`), y deja la cámara mirándola.
+   */
+  window.__valleyBurn = (): { x: number; y: number } | null => {
+    const houses = state.buildings.filter((b) => b.lostTick === null && (b.kind === 'house' || b.kind === 'stone_house'));
+    const cx = state.map.width / 2;
+    const cy = state.map.height / 2;
+    const target = houses.sort((a, b) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(b.x - cx, b.y - cy))[0];
+    if (target === undefined) return null;
+    burnBuilding(state, target.id);
+    const at = { x: target.x + target.w / 2, y: target.y + target.h / 2 };
+    backend.live.look(at.x, at.y);
+    return at;
+  };
+
   const runTick = (): void => {
     if (state.ended !== null) return;
     // La semana espera al encuentro visible: cambiar el estado reconstruiría
@@ -1508,5 +1528,6 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
 declare global {
   interface Window {
     __valleyEnd?: (cause: string) => void;
+    __valleyBurn?: () => { x: number; y: number } | null;
   }
 }

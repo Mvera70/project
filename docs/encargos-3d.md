@@ -108,3 +108,11 @@ orilla del lago. **Pendiente, si Vera lo quiere:** encargarlo en Blender con
 más carácter —corteza, raíces que abracen el suelo, copa con huecos— y
 cambiar sólo ese fichero por el modelo. Tampoco hace nada todavía: podría ser
 un sitio de la capa de vida (descansar a su sombra, reunirse en fiesta).
+
+## E4 · El fuego (25 sep 2026)
+
+La casa que arde se pinta **sobre la ruina** desde el primer amanecer: no hay
+modelo de casa ardiendo ni se ve el derrumbe. Pendiente si se quiere más: la
+casa en pie tiznándose y un derrumbe animado al acabar la llama. Y nadie
+reacciona todavía al fuego —la gente pasa al lado—; que acudan con cubos es la
+tanda 4 (flechas incendiarias y defensa).

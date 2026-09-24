@@ -33,6 +33,7 @@ import type {
 import { SUN_SHADOW, VALLEY_COLOURS } from './visual-config';
 import { buildGround, elevationAt, groundAppearanceKey, type Ground } from './world/ground';
 import { buildBackdrop, type Backdrop } from './world/backdrop';
+import { createFires } from './effects/fires';
 import { buildGreatOak, type GreatOak } from './world/great-oak';
 import { greatOakCell } from '@derive/landmark';
 import { mountainWolves } from './world/mountain-wolves';
@@ -376,6 +377,8 @@ export async function createGraphicsRenderer(
   // U-13 · la lluvia, la nieve y el rayo. Tres mallas, creadas una vez.
   const weather = createWeather(scene);
   const tells = new Tells();
+  // E4 · los edificios que arden (`effects/fires.ts`).
+  const fires = createFires();
   const fauna = new Fauna((kind) => library.instance(kind), (kind) => library.get(kind));
   const bubbles = new Bubbles();
   const props = new Props((id) => library.instance(id));
@@ -386,7 +389,7 @@ export async function createGraphicsRenderer(
   // El árbol que cae es siempre de hoja: los pinos viven en la ladera, que no
   // es bosque y no se tala (`world/forest.ts`, corrección del 18 sep 2026).
   const treeFalls = new TreeFalls(() => library.instance(TREE));
-  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, tells.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
+  world.add(village.group, works.group, cast.group, cast.mark, cast.chips.mesh, tells.group, fires.group, fauna.group, bubbles.group, props.group, arrows.group, plaza.group, treeFalls.group);
   let battleDebris: BattleDebris | null = null;
   let debrisPhysics: Physics | null = null;
   let pendingBrokenGate: { readonly id: number; readonly x: number; readonly z: number; readonly axis: 'x' | 'z' } | null = null;
@@ -1237,6 +1240,7 @@ export async function createGraphicsRenderer(
         works.clear();
         cast.clear();
         tells.clear();
+        fires.clear();
         fauna.clear();
         bubbles.clear();
         props.clear();
@@ -1576,6 +1580,11 @@ export async function createGraphicsRenderer(
       // El humo y las luces si son de cada fotograma: uno sube y las otras se
       // encienden cuando cae el dia.
       tells.drift(frame.presentationSeconds, phase, frame.speed);
+      // Y lo que arde, que también es de cada fotograma: las llamas bailan.
+      // **Del estado vivo y no del de la víspera**: con `shown` el fuego salía
+      // un día tarde, con la casa ya en ruina (primera captura de E4). Así la
+      // casa arde todavía en pie y al amanecer se derrumba bajo las llamas.
+      fires.update(state, frame.presentationSeconds);
       // Y el rio corre. Un rio quieto es un suelo azul.
       ground?.ripple(frame.presentationSeconds);
       // La cabaña sí cambia en cada fotograma: los animales pastan, y un rebaño
@@ -1926,6 +1935,7 @@ export async function createGraphicsRenderer(
       life = null;
       weather.dispose();
       tells.dispose();
+      fires.dispose();
       fauna.dispose();
       bubbles.dispose();
       props.dispose();

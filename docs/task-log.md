@@ -1,5 +1,18 @@
 # Cuaderno de tareas — el rework
 
+## 25 sep 2026 · E4, tanda 1: el fuego se ve
+
+Hecho: marca `burnt:<id>` en el motor para el incendio anual y el rayo, y el
+fuego en pantalla (`src/render3d/effects/fires.ts`): llama, chispas, humo negro
+y brasas durante siete días escénicos. Gancho `window.__valleyBurn()` para
+mirarlo sin esperar a un incendio, y `data-fire-days` para saber en qué día va.
+Capturas en `artifacts/graphics/E4/` (`sheet-v2.png` el ciclo entero,
+`sheet-v3.png` la llama corregida). Lo que costó: el humo se leía como neblina
+azul (ahora opaco y negro), las llamas quemaban a blanco por la mezcla aditiva
+(menos llamas y opacidad tope), y el fuego llegaba un día tarde por pintar el
+estado de la víspera. **Siguen:** gore contenido, quema en el asalto,
+flechas incendiarias con la defensa apagando.
+
 ## 24 sep 2026 · Fuera el audio sintetizado
 
 Vera: «el audio es malísimo, el de fondo es hasta incómodo; hay que sustituir o

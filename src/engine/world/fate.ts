@@ -31,7 +31,7 @@ import type { Building, ChronicleEntry, GameState, HappeningId, HappeningRecord,
 import { HAPPENINGS } from '../state';
 import { count, has, standing } from '../subsistence/building-counts';
 import { seasonOf, weekOf } from '../time';
-import { destroyBuilding } from './buildings';
+import { burnBuilding } from './buildings';
 import { herdCapacity, herdDensity } from '../subsistence/herd';
 import { storageCapacity } from '../subsistence/harvest';
 import { aleWindow } from './means';
@@ -322,7 +322,7 @@ function happen(state: GameState, id: HappeningId, ctx: Context): FateOutcome {
       // Como el incendio de §5.9: la marca antes de la ruina, porque después
       // nadie tiene `homeId` apuntando a ella.
       scarFire(state, target.id);
-      destroyBuilding(state, target.id);
+      burnBuilding(state, target.id);
       moraleBy(state, FATE.LIGHTNING_MORALE);
       params['building'] = target.kind;
       visible.push({ k: 'ruin', kind: target.kind });

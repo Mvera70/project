@@ -49,7 +49,7 @@ import { isUnexplained, updateMood } from './subsistence/mood';
 import { rollWeather } from './subsistence/seasons';
 import { outbreakActive, rollFire, rollPlague } from './subsistence/disasters';
 import { scarFire } from './people/scars';
-import { destroyBuilding } from './world/buildings';
+import { burnBuilding, destroyBuilding } from './world/buildings';
 import { rollFate } from './world/fate';
 import { fieldEvents } from './world/crops';
 import { giveMeans } from './world/means';
@@ -733,7 +733,8 @@ export function tick(
       scarFire(state, fire.buildingId);
       // M-14 owns the destruction: the plot becomes a ruin and whoever slept
       // there is homeless this week, which the housing factor of §5.7 reads.
-      destroyBuilding(state, fire.buildingId);
+      // E4 · and it burns: the mark lets the screen show the flames.
+      burnBuilding(state, fire.buildingId);
       state.village.grain = Math.max(0, state.village.grain - fire.grainLost);
       state.village.morale = Math.max(0, Math.min(100, state.village.morale + fire.moraleDelta));
       say({
