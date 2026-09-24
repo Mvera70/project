@@ -49,7 +49,15 @@ const STYLE = `
 /* §11.7 · el área táctil no se rebaja: los botones de la piel ya miden 52. */
 .epitaph-open .valley-hud-right,
 .epitaph-open .valley-speeds,
-.epitaph-open .hud-speed-cluster { visibility: hidden; }
+.epitaph-open .hud-speed-cluster,
+/* 24 sep 2026 · y la fila de cifras y la fecha tampoco vuelven tras la lápida:
+   sólo las escondía \`.epitaph-stoned\`, que se retira al acabar su animación, y
+   en móvil reaparecían recortadas detrás de la hoja de cuentas. */
+.epitaph-open .valley-vitals,
+.epitaph-open .valley-time,
+.epitaph-open .valley-date,
+.epitaph-open .hud-plate-date,
+.epitaph-open .valley-orders-now { visibility: hidden; }
 
 /* F3c · **La lápida.** docs/plan-final.md §1.
  *
