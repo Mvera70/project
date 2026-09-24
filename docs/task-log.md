@@ -17,7 +17,7 @@ en móvil corregida (`0140dfa`). Pedido después por Vera: el ciclo del campo
 2. **Desorden en el reparto:** en las villas grandes se ve a demasiada gente en
    el campo, más de la que el espacio aguanta.
 3. **El ganado no se puede pisar** (pendiente de aclarar con Vera qué se ve).
-4. **Diseñar los oficios:** la herrería, por ejemplo, está vacía.
+4. **Diseñar los oficios:** la herrería, por ejemplo, está vacía, y el granero no lo lleva nadie.
 
 ## 24 sep 2026 · IA-anim: reuniones que se acaban, talar y picar
 
