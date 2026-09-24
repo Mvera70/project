@@ -149,6 +149,42 @@
   --skin-tilt-card: -0.4deg;
   --skin-tilt-sealed: -1.5deg;
 
+  /* ------------------------------------ UI-W · madera, piedra, cinta y lacre */
+  /* El mockup de Vera del 24 sep 2026 (`docs/visual-reference/ui-wood/`): el
+     que la dirección del 22 sep dejó pendiente «para fijar la dirección antes
+     del acabado final». Tokens nuevos y no reescritos: los de arriba siguen
+     siendo las muestras de los prototipos y los usan treinta reglas. Los lee
+     `wood.css`, la capa que viste encima. */
+  --wood-plank: #6B4226;            /* la tabla de la cabecera */
+  --wood-plank-lit: #8A5A34;        /* su canto al sol */
+  --wood-plank-deep: #3B2414;       /* el hueco donde van las cifras */
+  --wood-nail: #2B1A0E;
+  /* **La madera es una textura, no CSS** (Vera, 24 sep: «úsalo para texturas
+     en general, CSS se queda corto»). Tablones de `tools/ui/textures.py`,
+     semilla fija y sin costura; en un token para que la edad de piedra los
+     cambie por el empedrado sin tocar las reglas (`wood.css`, al final). */
+  --plank-texture: url('./wood-planks.png');
+  --plank-size: 256px;
+  --cobble-texture: url('./cobble.png');
+  --stone: #8A867D;                 /* el dintel de las hojas */
+  --stone-deep: #5E5A53;
+  --card: #F3EAD6;                  /* la tarjeta, marfil sobre la hoja */
+  --card-edge: #B99A6C;             /* su doble filete */
+  --card-tray: #E4D6B8;             /* la bandeja hundida del precio */
+  --sheet: #EADFC6;                 /* el pergamino de la hoja */
+  --ribbon: #2F4450;                /* la cinta del título */
+  --ribbon-deep: #1C2A32;           /* su doblez */
+  /* La acción principal lleva el verde azulado oscuro que era de la barra de
+     navegación, no el verde lacado del mockup: Vera, viéndolo junto a la
+     barra, «ese verde chillón no me gusta», y la barra pasó a madera. */
+  --give: var(--skin-wood-plaque);  /* #29464E */
+  --give-lit: var(--skin-wood-soft);/* #31525A */
+  --give-deep: #16262C;
+  --brass: #C9A24A;                 /* el borde de lo que se pulsa */
+  --lacquer: #8C2F22;               /* el sello de cerrar */
+  --lacquer-deep: #5A1D15;
+  --want: #8C2F22;                  /* la cifra que falta, en la tinta del lacre */
+
   /* ------------------------------------------- los `--ui-*` de UI-R1, vivos */
   /* Cinco rondas los usan. Se conservan y **apuntan a los de arriba**, así
      que la piel nueva entra sin tocar `hud.ts`, `orders.ts`, `shell.css` ni

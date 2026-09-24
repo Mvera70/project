@@ -1,5 +1,30 @@
 # The Valley — Registro de cambios
 
+## v4.44 · 24 sep 2026 · La interfaz de madera y piedra (UI-W)
+
+Vera trajo el mockup del carro que la dirección del 22 sep esperaba «para
+fijar la dirección antes del acabado final» y pidió completar la migración,
+corrigiendo también el uso: «no es solo estilo sino corregir UX». Entra como
+una capa, `src/ui/redesign/wood.css`, con tokens propios y sin tocar los
+muestreados. La cabecera es una tabla de madera con las cifras hundidas; las
+hojas, pergamino con dintel de piedra; las tarjetas llevan doble filete, cinta
+y el grabado de cada cosa; cerrar es un sello de lacre sin palabra; la barra de
+abajo es la misma madera que la cabecera y la acción principal lleva el verde
+azulado que antes era de la barra (el verde lacado del mockup se descartó). Y
+**con la primera obra de piedra la madera pasa a sillería** (`uiMaterialOf`),
+idea de Vera durante la ronda.
+
+Corregido de uso: la cabecera de cada hoja ya no gasta una fila en el cierre;
+las filas de la gente llevan su `›`; volver a la lista es un enlace; el carro
+marca la cifra que no llega y lo que ya se tiene no enseña precio; y **mientras
+llega el 3D hay una pantalla de carga** con el grabado de la fundación y una
+barra que avanza por los tramos reales del relevo, en vez del fondo verde liso.
+La portada entró al final con diseño de Vera (descartó mis tres propuestas y
+generó ella la referencia): una tabla en arco con el grabado en sepia, la
+ficha del número con dado y un pie empedrado. **Y la madera y la piedra dejaron
+de ser CSS**: salen de texturas de `tools/ui/textures.py`, porque con
+degradados quedaban en chapa lisa («CSS se queda corto»).
+
 ## v4.43 · 24 sep 2026 · El año del campo, contado y visible
 
 Pedido por Vera: siembra, crecimiento continuo según el cultivo, cosecha y

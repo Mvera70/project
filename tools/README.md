@@ -144,6 +144,7 @@ El estándar visual está en la skill `piel-del-valle`; el calco de dibujos, en
 | `parchment.py` | Genera el mosaico de pergamino. **Es un script y no un PNG pintado para que sea reproducible byte a byte** |
 | `deckle.py` | Escribe los `clip-path` de los bordes rasgados de las placas |
 | `torn-edge.py` | El canto rasgado de la hoja (VZ-2), uno solo para las tres secciones |
+| `textures.py` | **Las texturas de madera y empedrado de la piel UI-W** (`wood-planks.png`, `cobble.png`): semilla fija, ruido periódico, sin costura. Existe porque la madera en CSS se queda corta («úsalo para texturas en general, CSS se queda corto»). `python tools/ui/textures.py` |
 | `contrast.py` | Mide cada par texto/fondo que la piel usa de verdad contra el 4,5:1 de WCAG AA. El juego se mira a pleno sol |
 | `trace-glyph.py` | **Calca** un glifo del prototipo y lo devuelve como `<path>` de 24 × 24. Existe porque deducir la forma a ojo falló cinco veces |
 | `cut-art.py` | Recorta piezas pintadas del prototipo y las deja listas para la interfaz |

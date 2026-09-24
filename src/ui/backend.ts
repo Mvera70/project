@@ -16,6 +16,7 @@ import type { HuntSpecies, HuntWeapon } from '@engine/world/hunting';
 import type { ActorDoing, BattleReport, GraphicsStats } from '../render3d/contracts';
 import type { InspectTarget } from './inspect';
 import { inspectAt } from './inspect';
+import { renderUiText } from '@engine/chronicle/render';
 import { createRenderer, type ValleyRenderer } from '@render/renderer';
 
 export type BackendKind = 'canvas' | 'pilot3d';
@@ -249,6 +250,14 @@ export function attachBackend(
   // Y el hueco espera en verde prado en vez de en el fondo de la página: el
   // instante de carga es campo, no una pantalla en blanco.
   viewport.style.backgroundColor = 'var(--ui-ground, #8CA14B)';
+  // UI-W · **y el hueco dice que está cargando.** Un verde liso durante los
+  // segundos que tarda Three y los modelos se leía como un juego colgado: lo
+  // cazó Vera abriendo la demo en el teléfono («al principio se queda la
+  // pantalla verde todo el fondo antes de conseguir cargar la aldea»). La
+  // placa avanza por los tres tramos reales del relevo —el código, los
+  // modelos, el renderer— y no por un temporizador: nunca promete más de lo
+  // que ha pasado.
+  const loading = loadingPlate(viewport);
 
   void (async (): Promise<void> => {
     try {
@@ -263,7 +272,8 @@ export function attachBackend(
         import('../render3d/presentation-clock'),
       ]);
       markStage('backend:imports-end');
-      if (closed) return;
+      loading.step(0.35);
+      if (closed) { loading.done(); return; }
       const clock = createPresentationClock();
 
       const webgl = document.createElement('canvas');
@@ -321,6 +331,7 @@ export function attachBackend(
         });
       }
 
+      loading.step(0.7);
       markStage('backend:renderer-start');
       const renderer = await createGraphicsRenderer({
         ...(library === undefined ? {} : { library }),
@@ -351,6 +362,7 @@ export function attachBackend(
       if (closed) {
         // The view was closed while this was loading. D.5 asks that such a load
         // be destroyed rather than attached to nothing.
+        loading.done();
         renderer.dispose();
         webgl.remove();
         return;
@@ -416,15 +428,55 @@ export function attachBackend(
         },
       };
       options.onSwap?.(handle);
+      loading.done();
       markStage('backend:swap-end');
     } catch (error: unknown) {
       failure = error instanceof Error ? error.message : String(error);
       // El 3D no llegó: el 2D vuelve a la vista, que es para lo que está.
       canvas.style.visibility = 'visible';
       viewport.style.backgroundColor = '';
+      loading.done();
       options.onSwap?.(handle);
     }
   })();
 
   return handle;
+}
+
+/**
+ * UI-W · La placa de carga: el grabado de la fundación en su medallón, el
+ * rótulo del banco y una barra que sólo avanza cuando el relevo avanza.
+ * `done()` la desvanece y la quita; llamarla dos veces no hace nada.
+ */
+function loadingPlate(viewport: HTMLElement): { step(fraction: number): void; done(): void } {
+  const plate = document.createElement('div');
+  plate.className = 'valley-loading';
+  plate.setAttribute('role', 'status');
+  plate.innerHTML = '<div class="valley-loading-card">'
+    + '<img class="valley-loading-art" src="./ui/art/founding.png" alt="" />'
+    + '<p class="valley-loading-title"></p>'
+    + '<p class="valley-loading-step"></p>'
+    + '<div class="valley-loading-bar" aria-hidden="true"><span></span></div>'
+    + '</div>';
+  const title = plate.querySelector<HTMLElement>('.valley-loading-title');
+  const note = plate.querySelector<HTMLElement>('.valley-loading-step');
+  const fill = plate.querySelector<HTMLElement>('.valley-loading-bar span');
+  if (title !== null) title.textContent = renderUiText('app.loading');
+  if (note !== null) note.textContent = renderUiText('app.loading.step');
+  viewport.append(plate);
+  let gone = false;
+  const step = (fraction: number): void => {
+    if (fill !== null) fill.style.transform = `scaleX(${Math.max(0.08, Math.min(1, fraction))})`;
+  };
+  step(0.12);
+  return {
+    step,
+    done(): void {
+      if (gone) return;
+      gone = true;
+      step(1);
+      plate.classList.add('valley-loading--done');
+      window.setTimeout(() => { plate.remove(); }, 420);
+    },
+  };
 }

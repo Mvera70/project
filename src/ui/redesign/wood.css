@@ -1,0 +1,893 @@
+/* UI-W · La piel de madera, piedra y pergamino.
+
+   Es el mockup que Vera subió el 24 sep 2026 (`docs/visual-reference/ui-wood/`),
+   el que la dirección del 22 sep dejó pendiente «para fijar la dirección antes
+   del acabado final» (`docs/ui-redesign/game-ui-direction.md`). Lo que trae:
+
+   · la cabecera es **una tabla de madera** con la fecha en una placa clara y
+     las cifras hundidas en la madera;
+   · las hojas son **pergamino con un dintel de piedra**;
+   · cada tarjeta lleva su **doble filete** y su título en **una cinta** que
+     sale por el borde;
+   · la acción principal es **verde lacado con borde de latón**; cerrar es un
+     **sello de lacre** con su palabra al lado.
+
+   **Y los dos verdes, decididos por Vera viéndolos juntos:** la barra de
+   abajo es madera como la tabla de arriba, y la acción principal lleva el
+   verde azulado oscuro que antes era de la barra. El verde lacado del mockup
+   se descartó («ese verde chillón no me gusta»).
+
+   **Es una capa y no una reescritura**, igual que la dirección del 22 sep se
+   escribió al final de `skin.css`: va la última en `app.ts`, y los selectores
+   llevan `:root` o `#root` delante porque tres pantallas inyectan su propia
+   hoja con `ensureStyle()` **después** de ésta, y a igual peso gana la última.
+   Los colores salen de los tokens `--wood-*` y compañía de `tokens.css`; los
+   muestreados de los prototipos no se tocan.
+
+   **Y el reloj del sol no se toca**, que es lo único de la interfaz que Vera
+   pidió conservar tal cual: la placa de fecha cambia de fondo, el arco no. */
+
+/* --------------------------------------------------------- la cabecera */
+
+/** La tabla. `.ui-hud-header` es una caja de altura cero (sus dos placas van
+    `position: absolute`, `hud.ts`), así que la tabla es su `::before`, colocada
+    en el mismo sistema de coordenadas que las placas: de x 8 a x 382 en la
+    columna de 390 y de y 8 hasta el canto de los chips más su respiro. */
+:root .ui-hud-header::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  left: 8px;
+  top: 8px;
+  width: calc(100% - 16px);
+  max-width: 374px;
+  height: 92px;
+  box-sizing: border-box;
+  border: 2px solid var(--wood-plank-deep);
+  border-radius: 12px;
+  background-color: var(--wood-plank);
+  background-image: var(--plank-texture);
+  background-size: var(--plank-size);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 214, 160, .28),
+    inset 0 -3px 0 rgba(0, 0, 0, .35),
+    0 6px 14px rgba(0, 0, 0, .35);
+  pointer-events: none;
+}
+:root .ui-hud-header:has(.hud-plate-date[hidden])::before { display: none; }
+/** La placa de fecha, clara sobre la madera: la del mockup es un rótulo
+    encastrado. El arco del sol va dentro y no cambia. */
+:root .hud-plate-date.skin-plate {
+  border: 1px solid var(--wood-plank-deep);
+  border-radius: 8px;
+  background-color: var(--card);
+  box-shadow: inset 0 1px 3px rgba(59, 36, 20, .35), 0 1px 0 rgba(255, 214, 160, .3);
+}
+:root .valley-date.hud-date-text { color: var(--wood-plank-deep); }
+/** Las cifras, hundidas en la madera y en crema. */
+:root .valley-vital.skin-plate--chip {
+  border: 0;
+  border-radius: 8px;
+  background-color: var(--wood-plank-deep);
+  color: var(--card);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 214, 160, .22);
+}
+:root .valley-vital.skin-plate--chip .skin-icon { color: #E8C36A; }
+/* La comida que se acaba sigue avisando (§11.1.1), en un rojo que se lee sobre
+   la madera oscura: el `--ui-alarm` de siempre se hunde en ella. */
+:root .valley-vital.skin-plate--chip.thin,
+:root .valley-vital.skin-plate--chip.thin .skin-icon { color: #F2A08A; }
+
+/* ------------------------------------------------ los mandos del valle */
+
+/** Los círculos (vista, sonido, pausa, velocidad) y la caza: pergamino con un
+    aro de madera, para que sean de la misma familia que la tabla. */
+:root .hud-round-btn,
+:root .valley-speeds.hud-speeds {
+  border: 2px solid var(--wood-plank);
+  background-color: var(--card);
+  box-shadow: 0 3px 0 var(--wood-plank-deep), 0 6px 12px rgba(0, 0, 0, .25);
+}
+:root .hud-round-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--wood-plank-deep); }
+:root .valley-speeds.hud-speeds button[aria-pressed="true"] {
+  background: var(--give);
+  color: var(--card);
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+
+/* ----------------------------------------------- la acción principal */
+
+/** Verde azulado con borde de latón (el de la antigua barra, ver arriba). Es `.skin-button--wood`
+    porque ése es el botón principal en todas las pantallas —dar, seguir,
+    coronar, empezar de nuevo—, así que cambia en todas a la vez.
+
+    La portada también, desde que tiene diseño (abajo). */
+:root .skin-button--wood,
+:root .valley-orders-now.hud-say-line {
+  border: 2px solid var(--brass);
+  background: var(--give);
+  color: #F6ECD0;
+  font-family: var(--skin-font-display);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-shadow: 0 1px 0 var(--give-deep);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .22),
+    inset 0 -3px 0 rgba(0, 0, 0, .28),
+    0 3px 0 var(--give-deep),
+    0 6px 12px rgba(31, 63, 39, .25);
+}
+:root .skin-button--wood:hover,
+:root .valley-orders-now.hud-say-line:hover { background: var(--give-lit); }
+:root .skin-button--wood:active,
+:root .valley-orders-now.hud-say-line:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .18), 0 1px 0 var(--give-deep);
+}
+/** Lo que no se puede dar: madera apagada con el borde a trazos, no un verde
+    medio transparente que parece un fallo de carga. */
+:root .skin-button--wood:disabled {
+  opacity: 1;
+  border: 2px dashed #9C8360;
+  background: #CDBD9C;
+  color: #6E5A3E;
+  text-shadow: none;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+/** El secundario: pergamino con borde de madera y su escalón debajo. */
+:root .skin-button--parchment {
+  border: 2px solid var(--card-edge);
+  background-color: var(--card);
+  color: var(--wood-plank-deep);
+  font-family: var(--skin-font-display);
+  font-weight: 700;
+  box-shadow: 0 3px 0 var(--card-edge), 0 6px 10px rgba(60, 40, 20, .15);
+}
+:root .skin-button--parchment:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--card-edge); }
+
+/* --------------------------------------------------------- las hojas */
+
+/** Pergamino con dintel de piedra. Las cuatro hojas de la carcasa (crónica,
+    gente, ficha, carro) comparten caja (`skin.css`, la regla del 44 %), así
+    que el dintel va una vez en esa caja y sale igual en las cuatro. El
+    tirador de arrastre queda encima de la piedra, que es donde se agarra.
+
+    **Y no en las superposiciones que se desplazan** (el final, la bienvenida,
+    los anales): una tira absoluta dentro de una caja con `overflow: auto` se va
+    con el contenido y acaba encima del título —medido en la primera captura
+    del final—, que es la trampa que `piel-del-valle` §6 ya tiene escrita. La
+    decisión sí la lleva: su hoja no se desplaza en ningún valle medido. */
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) {
+  background-color: var(--sheet);
+  background-image: var(--skin-map-pattern);
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, .35);
+}
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart)::before,
+:root .ui-shell-message::before,
+:root .crossroad::before {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 14px;
+  border-radius: inherit;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: var(--stone);
+  background-image:
+    linear-gradient(90deg, rgba(0, 0, 0, .28) 0 2px, transparent 2px),
+    linear-gradient(rgba(255, 255, 255, .16) 0 1px, transparent 1px);
+  background-size: 64px 100%, 100% 100%;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .3), 0 2px 3px rgba(60, 40, 20, .25);
+  pointer-events: none;
+}
+#root .ui-shell-content:has(.chronicle-scrim, .people-scrim, .valley-panel, .valley-cart) > .ui-sheet-grip {
+  flex-basis: 34px;
+  height: 34px;
+}
+#root .ui-sheet-grip::before { background: var(--stone-deep); opacity: .9; }
+/* La bandeja del valle es la misma hoja más baja: mismo papel, misma piedra. */
+:root .ui-shell-message { background-color: var(--sheet); }
+:root .crossroad { position: relative; }
+
+/* ------------------------------------------------------------ cerrar */
+
+/** Un sello de lacre con su aspa, y nada más. La palabra salía al lado y
+    Vera la quitó viéndola: «la palabra close sobra, el botón es grande y se
+    intuye». **Sigue en el botón**, con tamaño cero: es su nombre accesible
+    (sale del banco, `app.close`) y lo que un lector de pantalla anuncia. El
+    aspa es un `::after`, así que ningún `.ts` cambia. */
+:root .cart-close,
+:root .ui-shell-content-close,
+:root .chronicle-close,
+:root .annals-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+  letter-spacing: 0;
+}
+:root .cart-close::after,
+:root .ui-shell-content-close::after,
+:root .chronicle-close::after,
+:root .annals-close::after {
+  content: '';
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  border: 2px solid var(--brass);
+  background-color: var(--lacquer);
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 7l10 10M17 7L7 17' stroke='%23F6ECD0' stroke-width='3' stroke-linecap='round'/></svg>");
+  background-size: 20px 20px;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .2), inset 0 -3px 0 rgba(0, 0, 0, .3), 0 2px 0 var(--lacquer-deep);
+}
+:root .cart-close:active::after,
+:root .ui-shell-content-close:active::after,
+:root .chronicle-close:active::after,
+:root .annals-close:active::after { transform: translateY(2px); box-shadow: 0 0 0 var(--lacquer-deep); }
+
+/* ------------------------------------------------------ las tarjetas */
+
+/** La tarjeta: marfil con doble filete de tinta, levantada de la hoja. Vale
+    para las del carro, las fichas y las de la crónica. */
+:root .skin-plate--card,
+:root .skin-plate--sealed {
+  border: 1px solid var(--card-edge);
+  border-radius: 6px;
+  background-color: var(--card);
+  box-shadow:
+    inset 0 0 0 4px var(--card),
+    inset 0 0 0 5px rgba(122, 88, 48, .45),
+    0 3px 0 #C9B08A,
+    0 6px 12px rgba(60, 40, 20, .18);
+}
+
+/** La cinta del título: pizarra que sale por el borde izquierdo de la tarjeta
+    con su doblez debajo, como en el mockup. Se aplica a los títulos que son
+    el nombre de una cosa: el carro y las decisiones. */
+:root .cart-row { position: relative; overflow: visible; padding: 12px 14px 14px; gap: 10px; }
+:root .cart-row-head { position: relative; margin: 0 0 0 -24px; min-height: 36px; align-items: center; }
+:root .cart-row-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 100%;
+  border-top: 7px solid var(--ribbon-deep);
+  border-left: 9px solid transparent;
+}
+:root .cart-name.skin-inscription {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: calc(100% - 64px);
+  min-height: 36px;
+  padding: 4px 12px 4px 22px;
+  border-radius: 0 4px 4px 0;
+  background: var(--ribbon);
+  color: var(--card);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 2px 0 var(--ribbon-deep);
+  font: 400 19px/1.1 var(--skin-font-display);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+/** El medallón con el grabado de la cosa: los `means-*.png` que ya ilustran su
+    línea de crónica (`public/ui/art/`). Recortado al centro, que es donde está
+    el objeto en los diez. */
+:root .cart-art {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: -6px;
+  width: 58px;
+  height: 58px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2px solid var(--wood-plank);
+  object-fit: cover;
+  object-position: 55% 55%;
+  background: var(--card);
+  box-shadow: 0 0 0 3px var(--card), 0 0 0 4px var(--card-edge), 0 3px 6px rgba(60, 40, 20, .25);
+}
+:root .cart-what { color: var(--skin-ink); font: 400 16px/1.4 var(--skin-font-story); }
+/** El precio en su bandeja hundida, y lo que falta en la tinta del lacre. */
+:root .cart-cost {
+  flex: 1 1 auto;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: var(--card-tray);
+  box-shadow: inset 0 1px 3px rgba(80, 55, 25, .35);
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+:root .cart-coin { color: var(--wood-plank-deep); font-weight: 800; }
+:root .cart-coin.cart-coin--want { color: var(--want); }
+:root .cart-coin-have { font-size: 12px; font-weight: 700; }
+:root .cart-give { min-width: 112px; min-height: 48px; font-size: 16px; }
+:root .cart-why { color: var(--want); font: italic 400 14px/1.35 var(--skin-font-story); }
+
+/* ------------------------------------------------ gente y la ficha */
+
+:root .people-row {
+  border: 1px solid var(--card-edge);
+  border-radius: 8px;
+  background-color: var(--card);
+  box-shadow: 0 2px 0 #C9B08A, 0 4px 8px rgba(60, 40, 20, .12);
+}
+:root .people-row:active { transform: translateY(1px); box-shadow: 0 1px 0 #C9B08A; }
+/* Los rasgos se leían «por el texto, no por la forma» (revisión del 24 sep):
+   ahora son placas con borde y escalón. */
+:root .skin-chip {
+  border: 1px solid var(--card-edge);
+  background: var(--card-tray);
+  color: var(--wood-plank-deep);
+  box-shadow: 0 2px 0 #C9B08A;
+}
+:root .skin-medallion { box-shadow: inset 0 0 0 2px var(--brass), 0 0 0 3px var(--wood-plank), 0 4px 10px rgba(0, 0, 0, .25); }
+:root .person-name { font-family: var(--skin-font-display); font-weight: 700; }
+
+/* ------------------------------------------------------ la decisión */
+
+/** Las opciones eran «casi planas, un tono de papel sobre otro» (revisión del
+    24 sep) y son la decisión más importante del juego: ahora son tarjetas con
+    el doble filete y el escalón del botón. */
+:root .crossroad-options button {
+  border: 1px solid var(--card-edge);
+  border-radius: 8px;
+  background-color: var(--card);
+  box-shadow:
+    inset 0 0 0 3px var(--card),
+    inset 0 0 0 4px rgba(122, 88, 48, .4),
+    0 3px 0 #C9B08A,
+    0 6px 12px rgba(60, 40, 20, .16);
+}
+:root .crossroad-options button:hover { border-color: var(--brass); }
+:root .crossroad-options button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 0 0 3px var(--card), inset 0 0 0 4px rgba(122, 88, 48, .4), 0 1px 0 #C9B08A;
+}
+:root .crossroad-label { font-family: var(--skin-font-display); font-weight: 700; color: var(--wood-plank-deep); }
+
+/* ---------------------------------------------------- la navegación */
+
+/** La barra de abajo es **la misma madera que la tabla de arriba**: Vera,
+    viendo el verde del botón junto al verde de la barra, pidió la barra de
+    madera «como lo de arriba del todo», y el verde azulado que tenía la
+    barra pasó a los botones. La activa es madera al sol, con latón y un
+    brillo cálido, que es lo que la regla 4 de la dirección pedía. */
+:root .skin-nav {
+  background-color: var(--wood-plank);
+  background-image: var(--plank-texture);
+  background-size: var(--plank-size);
+  /* El mismo acabado que la tabla de arriba: filete de latón, luz en el canto
+     alto y sombra en el bajo. Sin esto la barra era un tablero plano al lado
+     de una tabla con relieve (Vera: «no tiene la calidad del que hiciste la
+     primera vez»). */
+  border-top: 3px solid var(--brass);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 214, 160, .3),
+    inset 0 -3px 0 rgba(0, 0, 0, .35),
+    inset 0 5px 6px -3px rgba(0, 0, 0, .35),
+    0 -6px 16px rgba(0, 0, 0, .35);
+}
+:root .skin-nav .skin-nav-tab { color: #F3E3C2; font-family: var(--skin-font-display); font-weight: 700; text-shadow: 0 1px 0 rgba(0, 0, 0, .45); }
+/* Los surcos entre celdas: una ranura oscura con su luz al lado. */
+:root .skin-nav .skin-rule-v { width: 2px; background: rgba(0, 0, 0, .35); box-shadow: 1px 0 0 rgba(255, 214, 160, .18); }
+/** La activa es **una placa de madera rica sobre la barra**, en las dos
+    materias —sobre la madera y sobre la piedra—, como la del primer diseño
+    del lienzo: latón alrededor y brillo de brasa. En gris claro, sobre la
+    piedra, se leía como un botón apagado. */
+:root .skin-nav .skin-nav-tab[aria-pressed="true"] {
+  border: 2px solid var(--brass);
+  background-color: #6B3A22;
+  background-image: repeating-linear-gradient(90deg, rgba(0, 0, 0, .10) 0 2px, transparent 2px 19px);
+  color: #FFF3D6;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 214, 160, .3),
+    inset 0 -3px 0 rgba(0, 0, 0, .35),
+    0 0 16px rgba(242, 160, 60, .45);
+}
+
+/* ------------------------------------------------------ la carga */
+
+/** Mientras llega el 3D (`backend.ts`, `loadingPlate`). Cubre el hueco del
+    valle y nada más: la cabecera, la portada y la barra van por encima, así
+    que la portada sigue siendo lo primero que se ve si está abierta. */
+.valley-loading {
+  position: absolute;
+  inset: 0;
+  /* Cero y no uno: con el mismo nivel que la tabla de la cabecera
+     (`.ui-hud-header::before`, z 1) y montada después, la tapaba —lo vio Vera
+     en la primera captura—. A cero queda sobre el lienzo 3D, que también es
+     cero y va antes en el documento, y bajo la tabla. */
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background-color: var(--ui-ground);
+  background-image:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .12), transparent 45%),
+    radial-gradient(circle at 70% 80%, rgba(0, 0, 0, .12), transparent 50%);
+  transition: opacity 400ms ease;
+}
+.valley-loading--done { opacity: 0; pointer-events: none; }
+.valley-loading-card {
+  width: min(100%, 300px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 20px 18px;
+  border: 2px solid var(--wood-plank-deep);
+  border-radius: 12px;
+  background-color: var(--wood-plank);
+  background-image: var(--plank-texture);
+  background-size: var(--plank-size);
+  box-shadow: inset 0 2px 0 rgba(255, 214, 160, .28), inset 0 -3px 0 rgba(0, 0, 0, .35), 0 10px 24px rgba(0, 0, 0, .35);
+}
+.valley-loading-art {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--brass);
+  box-shadow: 0 0 0 4px var(--wood-plank-deep), 0 4px 10px rgba(0, 0, 0, .4);
+  background: var(--card);
+}
+.valley-loading-title {
+  margin: 6px 0 0;
+  color: #F6ECD0;
+  font: 700 20px/1.2 var(--skin-font-display);
+  letter-spacing: .05em;
+  text-align: center;
+  text-shadow: 0 1px 0 var(--wood-nail);
+}
+.valley-loading-step {
+  margin: 0;
+  color: #E8D3A2;
+  font: italic 400 15px/1.35 var(--skin-font-story);
+  text-align: center;
+}
+.valley-loading-bar {
+  width: 100%;
+  height: 10px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--wood-plank-deep);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, .55);
+}
+.valley-loading-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #E8C36A, var(--brass));
+  transform-origin: left center;
+  transform: scaleX(.12);
+  transition: transform 600ms cubic-bezier(.2, .75, .25, 1);
+}
+/* Y mientras espera, la barra respira: sin esto parece parada durante los
+   segundos del tramo más largo, que es bajar los modelos. */
+@keyframes valley-loading-breathe { 50% { filter: brightness(1.25); } }
+.valley-loading-bar span { animation: valley-loading-breathe 1.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .valley-loading, .valley-loading-bar span { transition: none; animation: none; }
+}
+
+/* ------------------------------------------------ detalles de uso */
+
+/** El sonido y la caza son de la misma familia que los círculos de al lado:
+    mismo aro de madera y mismo escalón. */
+:root .valley-sound,
+:root .valley-hunt-action {
+  border: 2px solid var(--wood-plank);
+  background-color: var(--card);
+  box-shadow: 0 3px 0 var(--wood-plank-deep), 0 6px 12px rgba(0, 0, 0, .25);
+}
+:root .valley-hunt-action-label { font-family: var(--skin-font-display); }
+
+/** Una fila de la gente se abre al tocarla, y no lo decía: lleva su `›`,
+    que es la marca de «esto lleva a otra cosa» en cualquier lista de móvil. */
+:root .people-row { position: relative; padding-right: 32px; }
+:root .people-row::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-right: 2.5px solid var(--wood-plank);
+  border-top: 2.5px solid var(--wood-plank);
+  transform: translateY(-50%) rotate(45deg);
+}
+/** Los títulos de las hojas, en la misma letra que las cintas. */
+:root .people-scrim h2,
+:root .skin-orders h2 { font-family: var(--skin-font-display); font-weight: 700; color: var(--wood-plank-deep); }
+
+/** La cabecera del carro: su nombre a la izquierda y el sello a la derecha. */
+:root .cart-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: -4px; }
+:root .cart-title { margin: 0; color: var(--wood-plank-deep); font: 700 24px/1.1 var(--skin-font-display); letter-spacing: .02em; }
+:root .cart-head .cart-close { align-self: center; }
+
+/** Seguir es la acción principal de la ficha: el mismo verde que dar. La
+    regla de la ficha (`skin.css`) pesa dos clases, así que ésta lleva tres. */
+:root .valley-panel-follow.person-actions .skin-button--wood {
+  border: 2px solid var(--brass);
+  background: var(--give);
+  color: #F6ECD0;
+}
+:root .valley-panel-follow.person-actions .skin-button--wood[aria-pressed="true"] {
+  background: var(--give-deep);
+}
+:root .valley-panel-follow.person-actions .skin-button--parchment {
+  border: 2px solid var(--card-edge);
+  background-color: var(--card);
+  color: var(--wood-plank-deep);
+}
+/** Volver a la lista es navegación, no una acción: un enlace con su flecha,
+    sin caja, para que no compita con Seguir. */
+:root .valley-panel .valley-panel-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: -6px 0 6px;
+  padding: 0 6px 0 2px;
+  border: 0;
+  clip-path: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--wood-plank-deep);
+  font: 700 14px/1 var(--skin-font-display);
+  letter-spacing: .04em;
+}
+:root .valley-panel .valley-panel-back::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-left: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/** La tabla se esconde con lo que va encima. Las superposiciones esconden las
+    placas con `visibility` desde su propia hoja (`crossroad.ts`, `epitaph.ts`,
+    la pantalla despejada de `skin.css`), así que la tabla pregunta por las
+    mismas clases: sin esto la decisión salía con una tabla de madera vacía. */
+.crossroad-open .ui-hud-header::before,
+.epitaph-open .ui-hud-header::before,
+html.bare .ui-hud-header::before { visibility: hidden; }
+
+/** La crónica: su cierre a la derecha, como en las otras tres hojas, y su
+    página sin segundo tono. La página traía su propio papel gris dentro del
+    pergamino de la hoja; ahora es la hoja la que pone el papel. */
+:root .chronicle-close {
+  display: flex;
+  width: fit-content;
+  margin: 0 max(12px, calc((100% - 390px) / 2)) 0 auto;
+}
+#root .ui-shell-content .chronicle-body {
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  padding-top: 0;
+}
+
+/** Lo que el valle ya tiene: sin precio ni botón, con su frase en tinta
+    corriente y la tarjeta un punto apagada (`cart.ts`, `cart-row--owned`). */
+:root .cart-row--owned .cart-foot { display: none; }
+:root .cart-row--owned { opacity: .78; }
+:root .cart-row--owned .cart-why { color: var(--wood-plank-deep); font-style: italic; }
+
+/* ------------------------------------------ la edad de piedra: la UI se vuelve piedra */
+
+/** UI-W · Idea de Vera, 24 sep 2026: «cuando la aldea pase a la edad de
+    piedra, que se cambie la UI por una de piedra». `app.ts` pone
+    `data-material` en `<html>` con `uiMaterialOf` (`derive/era.ts`): la
+    primera obra de piedra, el peldaño de las 61 h. **Todo lo de madera de esta
+    capa sale de cinco tokens**, así que basta con redefinirlos: la tabla de
+    arriba, la barra de abajo, los aros de los mandos, los medallones y la
+    carga pasan a sillería sin una regla más. El pergamino, las cintas, el
+    lacre y el botón de actuar no cambian: son lo que se lee y lo que se toca,
+    y eso no debe moverse de sitio ni de color de un día para otro. */
+:root[data-material="stone"] {
+  --wood-plank: #7D7870;
+  --wood-plank-lit: #9A958B;
+  --wood-plank-deep: #3E3B36;
+  --wood-nail: #2A2825;
+  /* El empedrado de `tools/ui/textures.py`, el mismo del pie de la portada. */
+  --plank-texture: var(--cobble-texture);
+  --plank-size: 192px;
+}
+/* Y el cambio se ve pasar: la tabla y la barra se funden a piedra en un
+   segundo largo en vez de saltar, la semana en que la primera obra se alza. */
+:root .ui-hud-header::before,
+:root .skin-nav,
+:root .valley-vital.skin-plate--chip {
+  transition: background-color 1.4s ease, border-color 1.4s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .ui-hud-header::before, :root .skin-nav, :root .valley-vital.skin-plate--chip { transition: none; }
+}
+/* En piedra la barra baja un tono respecto a la tabla de arriba: el crema de
+   las pestañas sobre el gris medio de la tabla se leía flojo (medido en la
+   captura de la semilla 7, año 30). */
+:root[data-material="stone"] .skin-nav { background-color: #5E5A53; }
+
+/* ------------------------------------------------------------ la portada */
+
+/** UI-W · **La portada: una tabla de madera con remate en arco.** Diseño de
+    Vera, 24 sep 2026 (`docs/visual-reference/ui-wood/Gemini_Generated_Image_*`),
+    después de descartar tres propuestas mías. Todo es la piel: la tabla, el
+    marco del grabado, la ficha del número, el botón de fundar y el pie. El
+    grabado es el de siempre (`title-valley-higgsfield.png`), recortado al
+    paisaje del arco y virado a sepia como el de la referencia. Sin frase de
+    entrada ni pista del número: Vera no quiere cargarla («ya veremos»). */
+:root .title-scrim { background: radial-gradient(ellipse at 50% 30%, #3a2a1c, #140d08 80%); }
+:root .title-book {
+  width: min(100%, 440px);
+  padding: 0;
+  border: 3px solid var(--wood-plank-deep);
+  /* Rectangular, como la referencia: el arco es una moldura interior, no el
+     borde. Con el borde en arco las esquinas de arriba quedaban en negro
+     (Vera: «se ven muy oscuras y no tienen el detalle que tiene el diseño»). */
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: #7A4E2E;
+  /* Los tablones de la textura, más grandes que en la cabecera: en la
+     referencia de Vera un tablón mide medio botón de fundar. */
+  background-image: var(--plank-texture);
+  background-size: 400px;
+  box-shadow:
+    inset 0 0 0 5px #5A3620,
+    inset 0 0 0 7px var(--brass),
+    inset 0 0 0 11px #5A3620,
+    inset 0 3px 0 11px rgba(255, 214, 160, .2),
+    0 18px 42px rgba(0, 0, 0, .55);
+}
+/** La moldura en arco: doble filete de latón sobre madera más oscura, y lo que
+    queda fuera del arco —las enjutas de las esquinas— un punto en sombra, como
+    madera tallada a otro nivel. */
+:root .title-book::before {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 0;
+  left: 14px;
+  right: 14px;
+  top: 14px;
+  bottom: -40px;
+  width: auto;
+  background: none;
+  opacity: 1;
+  border: 3px solid #4A2C19;
+  /* Arco rebajado: con 118 px de flecha cruzaba el título. */
+  border-radius: 50% 50% 0 0 / 56px 56px 0 0;
+  box-shadow:
+    inset 0 0 0 2px var(--brass),
+    inset 0 0 0 5px #4A2C19,
+    0 0 0 2px var(--brass),
+    0 0 0 60px rgba(40, 22, 10, .28);
+  pointer-events: none;
+}
+/** Los dos rosetones de las esquinas: un disco de madera en un aro de latón. */
+:root .title-book::after {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: auto;
+  opacity: 1;
+  border-radius: 0;
+  background:
+    radial-gradient(circle at 30px 30px, #8A5A34 0 8px, #4A2C19 8px 11px, var(--brass) 11px 13px, #4A2C19 13px 16px, transparent 16px),
+    radial-gradient(circle at calc(100% - 30px) 30px, #8A5A34 0 8px, #4A2C19 8px 11px, var(--brass) 11px 13px, #4A2C19 13px 16px, transparent 16px);
+  pointer-events: none;
+}
+:root .title-sheet {
+  gap: 16px;
+  min-height: 100%;
+  padding: max(56px, env(safe-area-inset-top)) 26px 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+}
+:root .title-head { gap: 0; padding-top: 6px; }
+:root .title-head h1 {
+  color: #3A2412;
+  font: 700 44px/1 var(--skin-font-display);
+  letter-spacing: .03em;
+  text-shadow: 0 1px 0 rgba(255, 214, 160, .35), 0 -1px 0 rgba(0, 0, 0, .45);
+}
+:root .title-head p,
+:root .title-flourish,
+:root .title-hint { display: none; }
+
+/** El grabado en su ventana en arco, con marco de madera y filete de latón. */
+:root .title-vignette {
+  width: min(64vw, 250px);
+  aspect-ratio: 258 / 312;
+  margin: 0 auto;
+  clip-path: none;
+  border: 9px solid #5A3620;
+  border-radius: 50% 50% 6px 6px / 34% 34% 6px 6px;
+  background-size: cover;
+  background-position: 50% 60%;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 0 2px var(--brass), inset 0 0 0 2px var(--brass), inset 0 0 18px rgba(58, 36, 18, .35), 0 8px 16px rgba(0, 0, 0, .45);
+}
+
+/** El número del valle, en una ficha de pergamino clavada a la tabla. */
+:root .title-seed-row {
+  align-items: flex-end;
+  padding: 12px 14px 14px;
+  background: var(--card);
+  clip-path: var(--skin-deckle-card);
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .4));
+}
+:root .title-seed-row label { color: #3A2412; font: 700 13px/1.1 var(--skin-font-display); letter-spacing: .06em; }
+:root .title-seed {
+  min-height: 52px;
+  border: 1px solid var(--card-edge);
+  background: #EFE3C8;
+  box-shadow: inset 0 2px 3px rgba(80, 55, 25, .3);
+  color: #2B1A0E;
+  font: 700 26px/1 var(--skin-font-display);
+}
+/** El dado: un taco de madera de verdad —la textura, con bisel y escalón— y
+    dentro el dado de marfil en perspectiva (`title.ts`). */
+:root .title-reroll.skin-button--parchment {
+  width: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  /* El taco de la referencia: un canto de madera al sol alrededor de un
+     hueco más oscuro donde descansa el dado. */
+  border: 2px solid #3B2414;
+  border-radius: 12px;
+  background-color: #7A4E2E;
+  background-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, .28) 0 42%, transparent 62%), var(--plank-texture);
+  background-size: auto, 180px;
+  box-shadow:
+    inset 0 0 0 4px #9A6A40,
+    inset 0 0 0 5px rgba(43, 26, 14, .6),
+    inset 0 3px 0 4px rgba(255, 214, 160, .3),
+    0 4px 0 #2B1A0E,
+    0 7px 10px rgba(0, 0, 0, .4);
+}
+:root .title-reroll.skin-button--parchment svg { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .45)); }
+:root .title-reroll.skin-button--parchment:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 0 0 2px rgba(255, 214, 160, .18), 0 1px 0 #2B1A0E;
+}
+
+/** Fundar: la acción principal, grande. Continuar y los anales, pergamino. */
+/** Fundar, con la profundidad de la referencia: biselado de arriba abajo, un
+    filete interior, el rótulo en relieve y un escalón más alto (Vera: «le
+    falta un poquito más de profundidad y estilo»). */
+:root .title-new.skin-button--wood {
+  min-height: 62px;
+  font-size: 21px;
+  border: 2px solid var(--brass);
+  border-radius: 12px;
+  background: linear-gradient(#3F6A74 0%, var(--give) 48%, #1F3940 100%);
+  text-shadow: 0 2px 0 #10222A, 0 0 8px rgba(0, 0, 0, .35);
+  box-shadow:
+    inset 0 0 0 2px rgba(16, 34, 42, .55),
+    inset 0 3px 0 2px rgba(255, 255, 255, .16),
+    inset 0 -4px 0 2px rgba(0, 0, 0, .25),
+    0 6px 0 #10222A,
+    0 10px 16px rgba(0, 0, 0, .45);
+}
+:root .title-new.skin-button--wood:active {
+  transform: translateY(4px);
+  box-shadow: inset 0 0 0 2px rgba(16, 34, 42, .55), 0 2px 0 #10222A;
+}
+:root .title-continue-row small { color: #F3E3C2; }
+:root .title-annals {
+  align-self: center;
+  min-width: 170px;
+  padding: 0 26px;
+  border: 2px solid var(--card-edge);
+  border-radius: 10px;
+  background: var(--card);
+  color: #3A2412;
+  font: 700 16px/1 var(--skin-font-display);
+  letter-spacing: .03em;
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--card-edge), 0 6px 10px rgba(0, 0, 0, .3);
+}
+:root .title-annals:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--card-edge); }
+
+/** El pie: una tabla más oscura que cruza la portada, con los dos mandos
+    redondos de madera y latón, y el taller discreto a la derecha. */
+:root .title-bottom {
+  justify-content: center;
+  gap: 18px;
+  /* Empujado al fondo: la tabla de la portada se estira a la pantalla y el
+     pie tiene que cerrarla, no quedarse a media altura con tabla debajo. */
+  margin: auto -26px 0;
+  padding: 14px 18px max(16px, env(safe-area-inset-bottom));
+  border-top: 3px solid #3B2414;
+  border-radius: 0 0 15px 15px;
+  background-color: #5A3620;
+  /* Empedrado, como la segunda versión de Vera: la tabla de madera se asienta
+     sobre piedra. */
+  background-color: #6E6A62;
+  background-image: var(--cobble-texture);
+  background-size: 192px;
+  box-shadow: inset 0 4px 6px rgba(0, 0, 0, .45);
+}
+/** Idioma y sonido son **de piedra**, más clara que el empedrado donde se
+    asientan (Vera: «los botones no son de madera, son de piedra; quizás la
+    piedra un pelín más clarita»). */
+:root .title-language,
+:root .title-sound {
+  min-width: 52px;
+  min-height: 52px;
+  border: 2px solid #3E3B36;
+  border-radius: 999px;
+  background-color: #A8A399;
+  background-image: linear-gradient(rgba(255, 255, 255, .22), rgba(255, 255, 255, .22)), var(--cobble-texture);
+  background-size: auto, 96px;
+  color: #FFF6E0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, .35),
+    inset 0 -3px 0 rgba(0, 0, 0, .35),
+    0 3px 0 #2A2825,
+    0 5px 8px rgba(0, 0, 0, .45);
+}
+:root .title-sound svg,
+:root .title-language { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .6)); }
+:root .title-sound { display: grid; place-items: center; padding: 0; }
+:root .title-language {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0 18px 0 42px;
+  font: 700 15px/1 var(--skin-font-display);
+  letter-spacing: .04em;
+  text-transform: none;
+  background-image:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFF6E0' stroke-width='1.8'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18'/></svg>"),
+    linear-gradient(rgba(255, 255, 255, .22), rgba(255, 255, 255, .22)),
+    var(--cobble-texture);
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-position: 14px 50%, 0 0, 0 0;
+  background-size: 20px 20px, auto, 96px;
+}
+:root .title-language option { color: #2B1A0E; background: #F3EAD6; }
+:root .title-dev { color: rgba(243, 227, 194, .55); }
+:root .title-dev[aria-pressed="true"] { color: var(--brass); }
+:root .title-dev-row label { color: #F3E3C2; }
+/* La portada pinta el sonido encendido en ocre (`title.ts`); sobre la madera
+   se perdía. Encendido va en crema y apagado, atenuado. */
+:root .title-sound[aria-pressed="true"] { color: #FFF6E0; }
+:root .title-sound[aria-pressed="false"] { color: rgba(255, 246, 224, .6); }
+:root .title-actions { flex: 1 1 auto; }
+/* En piedra, los rótulos de la barra sobre el empedrado necesitan sombra: el
+   crema sobre gris moteado se perdía (captura de la semilla 7, año 30). */
+:root[data-material="stone"] .skin-nav .skin-nav-tab { text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 6px rgba(0, 0, 0, .6); }
+:root[data-material="stone"] .skin-nav .skin-nav-tab .skin-icon { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .8)); }

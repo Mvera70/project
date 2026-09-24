@@ -12,10 +12,13 @@ import './redesign/tokens.css';
 import './redesign/skin.css';
 import './redesign/shell.css';
 import './redesign/hunt-action.css';
+// UI-W · la piel de madera, piedra y pergamino del mockup del 24 sep. Va la
+// última: es la capa que viste encima de las otras tres.
+import './redesign/wood.css';
 import { SKY, TIME } from '@engine/balance';
 import { welcomeDigest } from '@engine/chronicle/digest';
 import { renderEntry, renderUiText } from '@engine/chronicle/render';
-import { eraOf } from '@derive/era';
+import { eraOf, uiMaterialOf } from '@derive/era';
 import { vitalsOf } from './vitals';
 import { CATALOG } from '@engine/crossroads/catalog';
 import { offerLine } from './offer-line';
@@ -783,6 +786,13 @@ export function boot(root: HTMLElement, save?: SaveFile): App {
     // es lo mismo que hace el reloj de la cabecera — una era dura años y esto
     // se llama sesenta veces por segundo.
     shell.setEra(renderUiText(`era.${eraOf(state)}`));
+    // UI-W · y la materia de la interfaz: madera hasta la primera obra de
+    // piedra, piedra desde ella (`derive/era.ts`, `wood.css`). Se escribe sólo
+    // cuando cambia, que es una vez en la vida de una aldea.
+    const material = uiMaterialOf(state);
+    if (document.documentElement.dataset.material !== material) {
+      document.documentElement.dataset.material = material;
+    }
     // Y si la hoja de órdenes está abierta, que sus botones sigan lo que diga
     // el estado: el único escritor es `actions.setIntent`, así que en la
     // práctica de hoy esto nunca discrepa de lo que ya pintó `navigate` al

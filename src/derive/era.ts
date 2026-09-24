@@ -109,3 +109,22 @@ export function eraAtYear(chronicle: readonly ChronicleEntry[], year: number): E
   }
   return era;
 }
+
+/** De qué está hecha la interfaz: madera hasta la edad de piedra, piedra desde ella. */
+export type UiMaterial = 'wood' | 'stone';
+
+/**
+ * UI-W · **La interfaz cambia de madera a piedra con la aldea.**
+ *
+ * Idea de Vera, 24 sep 2026: «estaría muy guay que cuando la aldea pase a la
+ * edad de piedra se cambie la UI por una de piedra». La edad de piedra es la
+ * de `tools/reports/pace-report.ts` —la **primera obra de piedra**, el peldaño
+ * de las 61 h de reloj (`docs/design.md` §1b)— y no una marca nueva.
+ *
+ * Monótona como `eraOf`, y por la misma razón: se lee de todos los edificios,
+ * perdidos incluidos, así que una casa de piedra que se quema no devuelve la
+ * cabecera a la madera. La interfaz no retrocede por un rayo.
+ */
+export function uiMaterialOf(state: GameState): UiMaterial {
+  return state.buildings.some((b) => b.tier > 0) ? 'stone' : 'wood';
+}

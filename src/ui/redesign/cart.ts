@@ -90,16 +90,57 @@ function ensureStyle(): void {
 function coin(stat: string, amount: number): HTMLElement {
   const box = document.createElement('span');
   box.className = 'cart-coin';
+  box.dataset.stat = stat;
+  box.dataset.amount = String(amount);
   box.innerHTML = `<svg class="skin-icon" aria-hidden="true" focusable="false"><use href="#${COIN[stat] ?? 'silver'}"/></svg>`;
   const value = document.createElement('b');
   value.textContent = String(amount);
-  box.append(value);
+  // UI-W · lo que el valle tiene de esa cosa, sólo cuando no llega: la cifra
+  // que falta se tiñe de lacre y lleva al lado lo que hay (`paintCoins`).
+  const have = document.createElement('span');
+  have.className = 'cart-coin-have';
+  have.hidden = true;
+  box.append(value, have);
   box.title = renderUiText(`app.vitals.${stat === 'grain' ? 'food' : stat}`, { count: amount, weeks: amount });
   return box;
 }
 
+/**
+ * UI-W · **Lo que falta, dicho en la cifra.** El mockup enseña el precio y
+ * nada más; con eso, un botón apagado obliga a comparar a ojo con la cabecera.
+ * La cifra que el valle no alcanza va en la tinta del lacre y con lo que hay
+ * entre paréntesis, y las que sí alcanza se quedan como estaban.
+ */
+function paintCoins(cost: HTMLElement, village: Readonly<Record<string, number>>): void {
+  for (const box of cost.querySelectorAll<HTMLElement>('.cart-coin')) {
+    const have = Math.floor(village[box.dataset.stat ?? ''] ?? 0);
+    const short = have < Number(box.dataset.amount ?? 0);
+    box.classList.toggle('cart-coin--want', short);
+    const note = box.querySelector<HTMLElement>('.cart-coin-have');
+    if (note === null) continue;
+    const text = short ? `(${have})` : '';
+    if (note.textContent !== text) note.textContent = text;
+    note.hidden = !short;
+  }
+}
+
+/**
+ * UI-W · El grabado de cada cosa, el mismo que ilustra su línea de crónica
+ * (`public/ui/art/means-*.png`). La corona usa el de la sucesión.
+ */
+function artOf(file: string): HTMLImageElement {
+  const img = document.createElement('img');
+  img.className = 'cart-art';
+  img.src = `./ui/art/${file}`;
+  img.alt = '';
+  img.decoding = 'async';
+  img.loading = 'lazy';
+  return img;
+}
+
 interface Row {
   readonly element: HTMLElement;
+  readonly cost: HTMLElement;
   readonly give: HTMLButtonElement;
   readonly why: HTMLElement;
 }
@@ -140,7 +181,16 @@ export function cartPanel(actions: UiActions): UiPanel {
   close.addEventListener('click', () => {
     requestSheetClose(element, () => actions.navigate({ kind: 'valley' }));
   });
-  element.append(close);
+  // UI-W · **el cierre comparte fila con el nombre de la hoja.** Solo en su
+  // fila se comía 60 px de una hoja que ya empieza a media pantalla, y la hoja
+  // no decía qué era: la de la gente sí lo dice. Mismo patrón en las dos.
+  const head = document.createElement('div');
+  head.className = 'cart-head';
+  const title = document.createElement('h2');
+  title.className = 'cart-title';
+  title.textContent = renderUiText('cart');
+  head.append(title, close);
+  element.append(head);
 
   const rows = new Map<MeansId, Row>();
   for (const id of MEANS_IDS) {
@@ -178,9 +228,9 @@ export function cartPanel(actions: UiActions): UiPanel {
     why.className = 'cart-why';
     why.hidden = true;
 
-    row.append(head, what, foot, why);
+    row.append(artOf(`means-${id}.png`), head, what, foot, why);
     element.append(row);
-    rows.set(id, { element: row, give, why });
+    rows.set(id, { element: row, cost, give, why });
   }
 
   // K-5 · **la fila de la corona**, detrás de las seis cosas. Va última porque
@@ -213,7 +263,7 @@ export function cartPanel(actions: UiActions): UiPanel {
   const crownWhy = document.createElement('p');
   crownWhy.className = 'cart-why';
   crownWhy.hidden = true;
-  crownBox.append(crownHead, crownWhat, crownCost, crownReigns, crownWho, crownWhy);
+  crownBox.append(artOf('succession.png'), crownHead, crownWhat, crownCost, crownReigns, crownWho, crownWhy);
   element.append(crownBox);
 
   return {
@@ -230,6 +280,7 @@ export function cartPanel(actions: UiActions): UiPanel {
           : renderUiText('cart.crown.reigns', { name: row.kingName, year: row.sinceYear ?? 0 });
       }
       crownCost.hidden = row.style !== null;
+      paintCoins(crownCost, snapshot.state.village as unknown as Readonly<Record<string, number>>);
       const wanted = row.candidates.map((who) => who.id).join(',');
       if (crownWho.dataset.who !== wanted) {
         crownWho.dataset.who = wanted;
@@ -277,6 +328,13 @@ export function cartPanel(actions: UiActions): UiPanel {
         if (row === undefined) continue;
         const refusal = refusalFor(snapshot.state as { village: VillageStats } & typeof snapshot.state, id);
         row.give.disabled = refusal !== null;
+        // UI-W · **lo que el valle ya tiene no enseña precio.** Con el precio y
+        // el botón apagado, el arado ya dado salía con la plata en rojo como si
+        // faltara dinero, cuando lo que pasa es que ya está en el valle: la
+        // fila se queda con su frase y nada más.
+        const owned = refusal === 'already';
+        row.element.classList.toggle('cart-row--owned', owned);
+        if (!owned) paintCoins(row.cost, snapshot.state.village as unknown as Readonly<Record<string, number>>);
         // **El motivo, escrito.** Un botón apagado sin razón es un juego que no
         // contesta; es la misma regla que E4 puso en las órdenes («te he
         // entendido y no puedo») y lo único que se conserva de ellas.

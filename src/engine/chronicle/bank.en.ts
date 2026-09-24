@@ -2381,6 +2381,9 @@ export const UI_BANK: Record<string, string> = {
   'hunt.weapon.bow': 'Bow',
   'hunt.weapon.spear': 'Spear',
   'app.valley': 'The valley',
+  // UI-W · la pantalla de carga mientras llega el 3D (`backend.ts`).
+  'app.loading': 'The valley is waking',
+  'app.loading.step': 'Raising the houses, planting the woods',
   'app.close': 'Close',
   // E1 · El mando. Las dos únicas cosas que el jugador manda de forma continua,
   // y se nombran **con palabras y no con cifras** (§11.1): «sembrar de más» es

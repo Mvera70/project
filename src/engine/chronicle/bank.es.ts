@@ -41,6 +41,9 @@ export const UI_BANK_ES: Record<string, string> = {
   'cart.no.cost': 'Todavía no alcanza.',
   'cart.no.already': 'El valle ya tiene uno.',
   'cart.no.room': 'No cabe en el corral.',
+  // UI-W · la pantalla de carga mientras llega el 3D (`backend.ts`).
+  'app.loading': 'El valle despierta',
+  'app.loading.step': 'Levantando las casas, plantando el bosque',
   'app.close': 'Cerrar',
   'app.speed.open': 'Cambiar la velocidad',
   'app.year': 'AÑO {year}',

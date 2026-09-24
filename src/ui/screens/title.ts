@@ -357,6 +357,11 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const vignette = document.createElement('div');
   vignette.className = 'title-vignette';
   vignette.setAttribute('aria-hidden', 'true');
+  // UI-W · el grabado en dos tintas, pardo sobre crema, de `tools/ui/textures.py`.
+  // Virado en CSS teñía el papel de naranja (Vera: «el color de fondo de la
+  // imagen no me gusta nada»). La ruta va aquí porque es de `public/` y un
+  // `url()` en el CSS lo resolvería Vite.
+  vignette.style.backgroundImage = "url('./ui/art/title-valley-engraving.png')";
 
   const actions = document.createElement('div');
   actions.className = 'title-actions';
@@ -427,7 +432,32 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const reroll = document.createElement('button');
   reroll.type = 'button';
   reroll.className = 'title-reroll skin-button--parchment';
-  reroll.textContent = renderUiText('title.reroll');
+  // UI-W · un dado y no la palabra, como en la portada de Vera del 24 sep: el
+  // nombre sigue en el banco y es el nombre accesible del botón.
+  reroll.setAttribute('aria-label', renderUiText('title.reroll'));
+  reroll.title = renderUiText('title.reroll');
+  // Un dado de marfil en perspectiva, tres caras con su luz, como el de la
+  // referencia: el dibujado de frente se leía plano (Vera: «tiene que verse
+  // como en el diseño»).
+  reroll.innerHTML = '<svg viewBox="0 0 32 32" width="40" height="40" aria-hidden="true" focusable="false"'
+    + ' stroke="#3A2412" stroke-width="1" stroke-linejoin="round">'
+    + '<defs>'
+    + '<linearGradient id="die-top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFBF0"/><stop offset="1" stop-color="#F3E6CA"/></linearGradient>'
+    + '<linearGradient id="die-left" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0E2C4"/><stop offset="1" stop-color="#D9C39B"/></linearGradient>'
+    + '<linearGradient id="die-right" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D2BB91"/><stop offset="1" stop-color="#B89D70"/></linearGradient>'
+    + '</defs>'
+    + '<path d="M16 3.5 27.5 9.8 16 16.1 4.5 9.8Z" fill="url(#die-top)"/>'
+    + '<path d="M4.5 9.8 16 16.1V28.8L4.5 22.5Z" fill="url(#die-left)"/>'
+    + '<path d="M27.5 9.8 16 16.1V28.8l11.5-6.3Z" fill="url(#die-right)"/>'
+    + '<path d="M5.4 10.2 16 4.4 26.6 10.2" fill="none" stroke="#FFFFFF" stroke-opacity=".8" stroke-width=".7"/>'
+    + '<g fill="#3A2412" stroke="none">'
+    + '<ellipse cx="16" cy="9.8" rx="2.1" ry="1.2"/>'
+    + '<ellipse cx="7.6" cy="14.2" rx="1.25" ry="1.6" transform="rotate(-28 7.6 14.2)"/>'
+    + '<ellipse cx="12.9" cy="24.2" rx="1.25" ry="1.6" transform="rotate(-28 12.9 24.2)"/>'
+    + '<ellipse cx="19.1" cy="17.9" rx="1.2" ry="1.55" transform="rotate(28 19.1 17.9)"/>'
+    + '<ellipse cx="21.75" cy="20.3" rx="1.2" ry="1.55" transform="rotate(28 21.75 20.3)"/>'
+    + '<ellipse cx="24.4" cy="22.7" rx="1.2" ry="1.55" transform="rotate(28 24.4 22.7)"/>'
+    + '</g></svg>';
   reroll.addEventListener('click', () => { seed.value = String(rollSeed(played)); });
   const hint = document.createElement('p');
   hint.className = 'title-hint';
@@ -502,10 +532,19 @@ export function openTitle(save: SaveFile | null, choose: (choice: TitleChoice) =
   const sound = document.createElement('button');
   sound.type = 'button';
   sound.className = 'title-sound';
+  // UI-W · el altavoz dibujado, el mismo del rincón de mandos del valle; lo
+  // que dice (encendido, apagado) va en el nombre accesible, del banco.
   const paintSound = (): void => {
     const on = soundPreference();
     sound.setAttribute('aria-pressed', String(on));
-    sound.textContent = renderUiText(on ? 'app.sound.on' : 'app.sound.off');
+    sound.setAttribute('aria-label', renderUiText(on ? 'app.sound.on' : 'app.sound.off'));
+    sound.innerHTML = '<svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true" focusable="false"'
+      + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+      + '<path d="M3 6.3v3.4h2.3L8.6 12.2V3.8L5.3 6.3z"/>'
+      + (on
+        ? '<path d="M10.7 5.3c1 .9 1 4.5 0 5.4"/><path d="M12.5 3.6c2 1.8 2 6.9 0 8.7"/>'
+        : '<path d="M10.8 5.6 14.2 10.4M14.2 5.6 10.8 10.4"/>')
+      + '</svg>';
   };
   sound.addEventListener('click', () => { setSoundPreference(!soundPreference()); paintSound(); });
   paintSound();

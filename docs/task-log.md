@@ -1,5 +1,26 @@
 # Cuaderno de tareas — el rework
 
+## 24 sep 2026 · UI-W: la interfaz de madera y piedra (en revisión con Vera)
+
+Hecho, **sin commit** mientras Vera la revisa: la capa `wood.css` (cabecera de
+madera, hojas con dintel de piedra, tarjetas con cinta y grabado, cierre de
+lacre sin palabra, barra de madera, verde azulado para actuar), las
+correcciones de uso (cabeceras de hoja compactas, `›` en la gente, volver como
+enlace, cifra que falta y cosa ya tenida en el carro) y la pantalla de carga.
+Con la primera obra de piedra la madera pasa a sillería (`uiMaterialOf`,
+prueba en `ui-material.test.ts`). Capturas en `artifacts/graphics/ui-wood/`
+(antes, después y la pareja madera/piedra en `after5/pair.png`). La referencia
+está en `docs/visual-reference/ui-wood/` y el estándar en la skill
+`piel-del-valle` §0.
+
+**La portada, hecha** con la referencia que generó Vera tras descartar mis tres
+propuestas (`docs/visual-reference/ui-wood/Gemini_Generated_Image_*`), y **la
+madera y la piedra pasan a textura** (`tools/ui/textures.py`): comparación en
+`artifacts/graphics/ui-wood/tex2/sheet.png`. La placa de
+carga no se puede fotografiar en el paquete de prueba porque ahí los modelos
+van dentro de la página y el relevo no cede un fotograma; se vio montándola a
+mano (`artifacts/graphics/ui-wood/loading.png`).
+
 ## 24 sep 2026 · IA-fields: el año del campo
 
 Hecho: calendario del motor (`FIELD_CYCLE`, `world/crops.ts`), sucesos de
