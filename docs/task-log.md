@@ -19,6 +19,10 @@ en móvil corregida (`0140dfa`). Pedido después por Vera: el ciclo del campo
 3. ~~**El ganado no debe pisar el campo de cultivo.**~~ Hecho el 24 sep: terreno propio con los campos cerrados, de 29–40 % a 0 %.
 5. ~~**Montones de material olvidados en el suelo.**~~ Hecho el 24 sep: la carga entra en su almacén y la leña va a un solo leñero.
 4. **Diseñar los oficios:** la herrería, por ejemplo, está vacía, y el granero no lo lleva nadie.
+   La auditoría del 24 sep (`medidas/auditoria-cosas-a-medias-2026-09-24.md`) añade: el herrero de la
+   semilla 7/año 60 vive a 23 celdas y no llega antes de la noche (`day.ts` asigna oficio sin mirar la
+   distancia); el molino nunca tiene trabajador (no hay oficio de molinero); y una parcela de 6 celdas
+   llega a 6 personas a la vez (punto 2, medido).
 
 ## 24 sep 2026 · IA-anim: reuniones que se acaban, talar y picar
 
