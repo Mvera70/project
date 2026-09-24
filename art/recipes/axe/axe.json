@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba. Mango en +Z (glTF +Y) y cabeza en el eje X, la misma convención que el respaldo de `hand-tools.ts`: el juego aplica al colgarla el giro de agarre medido en el banco de gestos.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "elderGrey",
+      "roughness": 0.8
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      1.6,
+      -2.4,
+      1.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.45
+    ],
+    "orthoScale": 1.2,
+    "worldRole": "sky"
+  },
+  "id": "axe",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "axe",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "IA-anim · Hacha de leñador: mango de un metro y cabeza de hierro con el filo hacia -X, barba y talón. Sustituye al respaldo de cajas de `hand-tools.ts` sin cambiar el gesto `chop`."
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Axe_Handle",
+      "location": [
+        0,
+        0,
+        0.4
+      ],
+      "radius": 0.028,
+      "depth": 1.0,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Axe_Cheek",
+      "location": [
+        -0.06,
+        0,
+        0.82
+      ],
+      "dimensions": [
+        0.14,
+        0.06,
+        0.16
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Axe_Blade",
+      "location": [
+        -0.17,
+        0,
+        0.82
+      ],
+      "dimensions": [
+        0.1,
+        0.035,
+        0.26
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Axe_Edge",
+      "location": [
+        -0.225,
+        0,
+        0.82
+      ],
+      "dimensions": [
+        0.025,
+        0.022,
+        0.3
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Axe_Poll",
+      "location": [
+        0.04,
+        0,
+        0.82
+      ],
+      "dimensions": [
+        0.07,
+        0.07,
+        0.09
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

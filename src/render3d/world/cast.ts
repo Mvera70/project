@@ -17,7 +17,7 @@ import type { VillagerId } from '@engine/state';
 import type { Actor, RagdollPose, RagdollSeed, RagdollSeedPart } from '../contracts';
 import type { LoadedAsset } from '../assets';
 import { actionClips } from '../action-clips';
-import { clipTime, combatClip, STRIKE_AT, VILLAGER_CLIPS, type ClipName } from '../clips';
+import { clipTime, combatClip, STRIKE_AT, STRIKE_HEAD, VILLAGER_CLIPS, type ClipName } from '../clips';
 import { WorkChips } from '../effects/work-chips';
 import { handTool } from '../hand-tools';
 import { displayScaleFor, modelFor } from './models';
@@ -114,14 +114,23 @@ interface HeldSpec {
   readonly scale?: number;
   /** Sólo los gestos viejos tienen sustituto procedimental. */
   readonly fallback?: boolean;
+  /**
+   * G-40 · Giro de agarre para un recurso con `grip` construido con el mango en
+   * +Y y la cabeza en el eje X (hacha y pico). Es el mismo que lleva dentro el
+   * respaldo de `hand-tools.ts`, medido en el banco de gestos.
+   */
+  readonly turn?: readonly [number, number, number, number];
 }
+
+/** El agarre de hacha y pico, medido en el banco de gestos (`hand-tools.ts`). */
+const HAFT_GRIP: readonly [number, number, number, number] = [0.6794, 0.2790, 0.6522, 0.1878];
 
 const HELD: Readonly<Record<string, Omit<HeldSpec, 'key'>>> = {
   work_hoe: { asset: 'hoe', hand: 'hand_r', fallback: true },
   carry_walk: { asset: 'bundle', hand: 'hand_l' },
   hammer: { asset: 'hammer', hand: 'hand_r', fallback: true },
-  chop: { asset: 'axe', hand: 'hand_r', fallback: true },
-  mine: { asset: 'pickaxe', hand: 'hand_r', fallback: true },
+  chop: { asset: 'axe', hand: 'hand_r', fallback: true, turn: HAFT_GRIP },
+  mine: { asset: 'pickaxe', hand: 'hand_r', fallback: true, turn: HAFT_GRIP },
   drink: { asset: 'cup', hand: 'hand_r', fallback: true },
 };
 
@@ -534,6 +543,8 @@ export class Cast {
       if (tool !== undefined && hand !== undefined) {
         tool.name = `Held_${item.key}`;
         if (item.scale !== undefined) tool.scale.multiplyScalar(item.scale);
+        // El respaldo ya trae el giro dentro; el recurso publicado lo recibe aquí.
+        if (item.turn !== undefined && tool.userData.ownedTool !== true) tool.quaternion.set(...item.turn);
         // La herramienta no se selecciona: quien la lleva si. Sin esto, tocar la
         // azada no devolvia a nadie.
         tool.traverse((child) => { child.userData.villagerId = player.object.userData.villagerId; });
@@ -584,10 +595,13 @@ export class Cast {
     const crossed = before <= phase ? before < moment && moment <= phase : before < moment || moment <= phase;
     if (!crossed) return;
     const tool = player.held.get(actor.clip);
-    const head = tool?.children[0]?.children.at(-1) ?? tool;
-    if (head === undefined || !head.visible || tool?.visible === false) return;
+    if (tool === undefined || !tool.visible) return;
     player.strikes = (player.strikes ?? 0) + 1;
-    const at = head.getWorldPosition(new Vector3());
+    // Desde el punto de golpe medido (`STRIKE_HEAD`), que vale para el
+    // respaldo y para el recurso publicado sin depender de cómo esté montado.
+    const head = STRIKE_HEAD[actor.clip];
+    player.object.updateMatrixWorld(true);
+    const at = player.object.localToWorld(new Vector3(head.x, head.y, head.z));
     const kind = actor.clip === 'chop' ? 'wood' : 'stone';
     this.chips.hit(at, kind, actor.id * 1009 + player.strikes);
     this.onStrike?.(at, kind, actor.id * 1009 + player.strikes);

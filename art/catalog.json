@@ -5445,6 +5445,126 @@
         "source": "Original procedural exterior bear den for The Valley. 23 Sep 2026. No external provider.",
         "license": "Project original"
       }
+    },
+    {
+      "id": "axe",
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/axe/axe.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-24T14-51-55-169Z-42668",
+        "directory": "artifacts/graphics/G-40/approved/650fd5b98e3d7a30"
+      },
+      "bounds": {
+        "min": [
+          -0.079167,
+          -0.033333,
+          -0.011667
+        ],
+        "max": [
+          0.025,
+          0.323333,
+          0.011667
+        ],
+        "size": [
+          0.104167,
+          0.356667,
+          0.023333
+        ]
+      },
+      "recipeSha256": "3CA440B10C8C505BDFB757DE5D61D9E89780EF7C1A6DB12049C6A8113907A6F9",
+      "materials": [
+        "wood",
+        "iron"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 4,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 68
+      },
+      "hashes": {
+        "axe.blend": "2336BD208DAA2148F4E38B131D2CDB9A9B1CDD7FB81F84BC5EC027CFA4B3455E",
+        "axe.glb": "650FD5B98E3D7A300012F20C34EEDD6D0AB454D39581D5DD3D08C0D038A9E676",
+        "axe-blender.png": "3A147712590630615AABCC251C7B13B08F2F252C6F5771BEEDA787320ED6A51A",
+        "capture-1.png": "3DD141FC752E4FDA036FA398B041372EFC131A40DEE2449A180F3C1BA06C0C29",
+        "capture-1-gray.png": "5D3B5E9CC011F6361F654C73AC7EA81ED1690DF838E2E0291C490BEBDFA8B17B",
+        "capture.json": "D9FE7271DE0299F22856B8D2FC3F556B28C51E1383AE490CE67CB587F4A01BB6",
+        "build.json": "FAC7069883478562A30E25F04EFF18A1D2C91D8CCB3F9C37A4103D2037E16988",
+        "validation.json": "70A408C8F50C234E1DDAE13D3DE0E17DD9A11DA07E4573936D2E6D074827D944"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, 24 sep 2026, pedido por Vera; sin proveedor generativo.",
+        "license": "Project original"
+      }
+    },
+    {
+      "id": "pickaxe",
+      "artifactRound": "G-40",
+      "status": "study",
+      "recipe": "art/recipes/pickaxe/pickaxe.json",
+      "generator": "tools/art/blender-build.py",
+      "blenderVersion": "5.2.1 LTS",
+      "approved": {
+        "runId": "2026-09-24T14-52-07-095Z-42948",
+        "directory": "artifacts/graphics/G-40/approved/1d93208e3a58f8bb"
+      },
+      "bounds": {
+        "min": [
+          -0.125892,
+          -0.033333,
+          -0.011667
+        ],
+        "max": [
+          0.125892,
+          0.303333,
+          0.011667
+        ],
+        "size": [
+          0.251784,
+          0.336667,
+          0.023333
+        ]
+      },
+      "recipeSha256": "AEEB0445A6969B917FA08DA932A12E775CD1814BD26975C5BB00BE7ED4EA2417",
+      "materials": [
+        "wood",
+        "iron"
+      ],
+      "clips": [],
+      "motion": [],
+      "connectors": [
+        "grip"
+      ],
+      "statistics": {
+        "objects": 4,
+        "meshes": 2,
+        "materials": 2,
+        "triangles": 68
+      },
+      "hashes": {
+        "pickaxe.blend": "9604E55E00B1B7BAF38C77501D0D47F6B20EFC25C1A0E3D8F4906F052F6F171F",
+        "pickaxe.glb": "1D93208E3A58F8BBA8FDAE1159F52AD9E146CAA653F4AD4496D129280995E544",
+        "pickaxe-blender.png": "D5E01B0F2347B527B6BD662EE37F28BAD58C550D9B88E79CAD284283E70C8CE6",
+        "capture-1.png": "93E3F429F75F55232605F6CD21A26A9C763A64E929BCC8FCDD93DA2A7707C33B",
+        "capture-1-gray.png": "623BF7C2FDB82E1D2CFF84758268A862F90F275E452ECB0342DD2036DAAF1168",
+        "capture.json": "8B1BD395645C97CA69B5DA3510E3AC153FEE0A56F34EBF0B0E027F4327021893",
+        "build.json": "521092CBCD2427D7EE9C6D053E6C03EFDCF46924CB80E289516887FAB82C42AF",
+        "validation.json": "11D9C85D332C2F60524B37A4A7CC7C6CF1AF4C5AA14584B420B18100D0AA5FC3"
+      },
+      "provenance": {
+        "kind": "original",
+        "source": "Modelado original para The Valley, 24 sep 2026, pedido por Vera; sin proveedor generativo.",
+        "license": "Project original"
+      }
     }
   ]
 }

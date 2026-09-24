@@ -164,3 +164,23 @@ describe('IA-anim · STRIKE_HEAD es lo que el GLB hace', () => {
     expect(Math.abs(far.z - STRIKE_HEAD[clip].z)).toBeLessThan(0.03);
   });
 });
+
+describe('G-40 · hacha y pico publicados se agarran como el respaldo', () => {
+  it.each([['chop', 'axe'], ['mine', 'pickaxe']] as const)('%s con %s.glb: la cabeza de hierro cae donde el golpe medido', async (clip, asset) => {
+    const { Box3, Mesh: ThreeMesh } = await import('three');
+    const bytes = readFileSync(`public/assets/valley3d/${asset}.glb`);
+    const tool = (await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '')).scene;
+    const cast = new Cast({ id: 'villager', original: model, clips, motion: [] }, () => clone(model), id => id === asset ? tool.clone(true) : undefined);
+    cast.show([actor(clip, STRIKE_AT[clip] * VILLAGER_CLIPS[clip].seconds)]);
+    cast.group.updateMatrixWorld(true);
+    const held = cast.group.getObjectByName(`Held_${clip}`)!;
+    expect(held.userData.ownedTool, 'se usa el recurso publicado, no el respaldo').not.toBe(true);
+    // La pieza de hierro: la que no es el mango (material de madera).
+    let iron: InstanceType<typeof Box3> | null = null;
+    held.traverse(node => { if (node instanceof ThreeMesh && !/wood/.test((node.material as { name: string }).name)) iron = new Box3().setFromObject(node); });
+    expect(iron).not.toBeNull();
+    const centre = iron!.getCenter(new Vector3());
+    const head = STRIKE_HEAD[clip];
+    expect(Math.hypot(centre.x - head.x, centre.z - head.z), 'cabeza del GLB frente al golpe medido').toBeLessThan(0.08);
+  });
+});

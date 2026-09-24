@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "scale": 0.3333333333333333,
+  "scaleNote": "Metros de Blender (Z arriba) a celdas; glTF convierte a Y arriba. Mango en +Z (glTF +Y) y cabeza en el eje X, la misma convención que el respaldo de `hand-tools.ts`: el juego aplica al colgarla el giro de agarre medido en el banco de gestos.",
+  "mergeByMaterial": true,
+  "palette": "../palette.json",
+  "house": "thatched",
+  "materials": [
+    {
+      "name": "wood",
+      "role": "timber",
+      "roughness": 0.9
+    },
+    {
+      "name": "iron",
+      "role": "elderGrey",
+      "roughness": 0.8
+    }
+  ],
+  "groups": [
+    {
+      "name": "Root",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": null
+    },
+    {
+      "name": "grip",
+      "location": [
+        0,
+        0,
+        0
+      ],
+      "parent": "Root"
+    }
+  ],
+  "clips": [],
+  "connectors": [
+    "grip"
+  ],
+  "referenceRender": {
+    "width": 800,
+    "height": 800,
+    "cameraLocation": [
+      1.6,
+      -2.4,
+      1.4
+    ],
+    "cameraTarget": [
+      0,
+      0,
+      0.45
+    ],
+    "orthoScale": 1.2,
+    "worldRole": "sky"
+  },
+  "id": "pickaxe",
+  "metadata": {
+    "cellUnit": 1,
+    "kind": "pickaxe",
+    "footprint": [
+      1,
+      1
+    ],
+    "note": "IA-anim · Pico de cantero: mango de un metro y cabeza de hierro de dos puntas curvadas hacia el mango. Sustituye al respaldo de cajas de `hand-tools.ts` sin cambiar el gesto `mine`."
+  },
+  "primitives": [
+    {
+      "type": "cylinder",
+      "name": "Pick_Handle",
+      "location": [
+        0,
+        0,
+        0.4
+      ],
+      "radius": 0.028,
+      "depth": 1.0,
+      "vertices": 6,
+      "material": "wood",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cube",
+      "name": "Pick_Eye",
+      "location": [
+        0,
+        0,
+        0.86
+      ],
+      "dimensions": [
+        0.08,
+        0.07,
+        0.1
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Pick_Arm_L",
+      "location": [
+        -0.16,
+        0,
+        0.84
+      ],
+      "dimensions": [
+        0.26,
+        0.06,
+        0.07
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -16,
+        0
+      ]
+    },
+    {
+      "type": "cube",
+      "name": "Pick_Arm_R",
+      "location": [
+        0.16,
+        0,
+        0.84
+      ],
+      "dimensions": [
+        0.26,
+        0.06,
+        0.07
+      ],
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        16,
+        0
+      ]
+    },
+    {
+      "type": "cone",
+      "name": "Pick_Point_L",
+      "location": [
+        -0.32,
+        0,
+        0.79
+      ],
+      "radius": 0.035,
+      "depth": 0.12,
+      "vertices": 4,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        -106,
+        0
+      ],
+      "smooth": false
+    },
+    {
+      "type": "cone",
+      "name": "Pick_Point_R",
+      "location": [
+        0.32,
+        0,
+        0.79
+      ],
+      "radius": 0.035,
+      "depth": 0.12,
+      "vertices": 4,
+      "material": "iron",
+      "parent": "Root",
+      "rotationDegrees": [
+        0,
+        106,
+        0
+      ],
+      "smooth": false
+    }
+  ]
+}

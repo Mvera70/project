@@ -1,5 +1,12 @@
 # The Valley — Registro de cambios
 
+## v4.42 · 24 sep 2026 · Hacha y pico modelados (G-40)
+
+Vera pidió el hacha y el pico en Blender. Salen del pipeline de recetas del
+proyecto como recursos originales, con conector `grip` y cabeza de hierro
+gris que se distingue del mango. Mismo agarre y mismo golpe que el respaldo
+por código: la cabeza del GLB cae a menos de 0,08 del punto medido.
+
 ## v4.41 · 24 sep 2026 · Nada suelto por el pueblo, y el ganado fuera de los sembrados
 
 Vera vio montones de material tirados y olvidados. Cada entrega dejaba hasta

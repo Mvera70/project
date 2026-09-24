@@ -102,7 +102,7 @@ export const WANTED = [
   // G-15 · los trastos del corral, que es lo que dice que aquí vive alguien.
   ...STEADING_ASSETS,
   // V-15b · todo lo que la cadena de `modelFor` puede pedir, exista ya o no.
-  ...VILLAGER_MODELS, TREE, TREE_PINE, ROCK, REED, SCRUB, FORD, 'hoe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
+  ...VILLAGER_MODELS, TREE, TREE_PINE, ROCK, REED, SCRUB, FORD, 'hoe', 'axe', 'pickaxe', 'bundle', 'ball', 'stick', 'bucket', 'field-cut', 'ruin-wood', 'ruin-stone',
   // G-24 · herramientas de defensa. La flecha se sigue moviendo con Rapier;
   // ésta es sólo su silueta aprobada y las otras cuelgan de los conectores de mano.
   'bow', 'spear', 'sling', 'arrow', 'shield', 'bear-den',
